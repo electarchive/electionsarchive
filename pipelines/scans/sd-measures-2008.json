@@ -1,0 +1,406 @@
+{
+ "polity": "US-SD",
+ "publisher": "South Dakota Secretary of State",
+ "title": "2008 Official General Election State Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf"
+ },
+ "raw_source": "us.sos_measures",
+ "contests": {
+  "G": {
+   "year": 2008,
+   "chamber": "question-g",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  },
+  "H": {
+   "year": 2008,
+   "chamber": "question-h",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  },
+  "I": {
+   "year": 2008,
+   "chamber": "question-i",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  },
+  "J": {
+   "year": 2008,
+   "chamber": "question-j",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  },
+  "9": {
+   "year": 2008,
+   "chamber": "question-9",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  },
+  "10": {
+   "year": 2008,
+   "chamber": "question-10",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  },
+  "11": {
+   "year": 2008,
+   "chamber": "question-11",
+   "day": "2008-11-04",
+   "special": false,
+   "state": "SD",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 9,
+   "id": "Ga",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "G",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "G",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 10,
+   "id": "Gb",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "G",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "G",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 11,
+   "id": "Ha",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "H",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "H",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 12,
+   "id": "Hb",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "H",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "H",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 13,
+   "id": "Ia",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "I",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "I",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 14,
+   "id": "Ib",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "I",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "I",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 15,
+   "id": "Ja",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "J",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "J",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 16,
+   "id": "Jb",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "J",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "J",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "9a",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "9",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "9",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 18,
+   "id": "9b",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "9",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "9",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 19,
+   "id": "10a",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "10",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "10",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 20,
+   "id": "10b",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "10",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "10",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 21,
+   "id": "11a",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.87
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "11",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "11",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 22,
+   "id": "11b",
+   "orientation": "counties_down",
+   "crop": [
+    0.12,
+    0.1,
+    0.62,
+    0.33
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total column and the percentages in the Total row's Yes and No cells.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "11",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "11",
+     "candidate": "NO"
+    }
+   ]
+  }
+ ]
+}

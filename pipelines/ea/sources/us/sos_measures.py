@@ -448,6 +448,12 @@ AR_BOOKS = {
 AR_SHEETS = {date(2010, 11, 2): "2010_General_Election_Results_-_Fed%2C_State_-_by_Polling_Location.xlsx"}
 AR_PUBLICATIONS = {date(2006, 11, 7): "20070308_ARSOS_2006_Elections_Publication_Final__Revised.xls"}
 AR_VOICES = {date(2008, 11, 4): "Voices%20of%20Ark%202008-WEB2.pdf"}
+SD = "https://sdsos.gov/elections-voting/assets/Archive/Prior%20to%202026/"
+SD_SHEETS = {date(2000, 11, 7): "00SWgenres.xls"}
+SD_PRECINCTS = {date(2010, 11, 2): "pastelections_general2010_bqpct.xls"}
+SD_SCANS = {
+    "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf"
+}
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
 STATES = {
@@ -545,6 +551,11 @@ PUBLISHERS = {
         "Official abstract of votes",
         "https://digitalcollections.library.oregon.gov/nodes/view/88649",
     ),
+    "SD": (
+        "South Dakota Secretary of State",
+        "Official election returns",
+        "https://sdsos.gov/elections-voting/election-resources/election-history/election-history-search.aspx",
+    ),
     "ME": (
         "Maine Department of the Secretary of State",
         "Referendum election tabulations, 2000–2011",
@@ -636,6 +647,11 @@ def fetch() -> None:
         raw.fetch(SOURCE, NE + name, suffix=".pdf")
     for name in [*AR_BOOKS.values(), *AR_VOICES.values()]:
         raw.fetch(SOURCE, AR + name, suffix=".pdf")
+    for name in [*SD_SHEETS.values(), *SD_PRECINCTS.values()]:
+        raw.fetch(SOURCE, SD + name, suffix=".xls")
+        time.sleep(1)
+    for url in SD_SCANS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
     for name in AR_SHEETS.values():
         raw.fetch(SOURCE, AR + name, suffix=".xlsx")
     for name in AR_PUBLICATIONS.values():
@@ -1705,6 +1721,103 @@ def arkansas() -> list[dict[str, object]]:
     return rows
 
 
+def south_dakota() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, name in SD_SHEETS.items():
+        sheet = (
+            fastexcel.read_excel(raw.cached(SOURCE, SD + name).path)
+            .load_sheet_by_name("Ballot Questions", header_row=None)
+            .to_polars()
+            .rows()
+        )
+        columns: list[str] = []
+        for head in sheet[1][1:]:
+            columns.append(
+                columns[-1]
+                if head is None
+                else head
+                if head.startswith("Initiated")
+                else f"Constitutional Amendment {head}"
+            )
+        answers = [str(cell).upper() for cell in sheet[2][1:]]
+        counties = [row for row in sheet[3:] if row[0] is not None and row[0] not in ("TOTALS", "PERCENTAGE")]
+        (totals,) = [row for row in sheet if row[0] == "TOTALS"]
+        if len(counties) != 66:
+            raise ValueError(f"{name}: {len(counties)} counties")
+        for at, (label, answer) in enumerate(zip(columns, answers, strict=True), 1):
+            if sum(int(row[at]) for row in counties) != int(totals[at]):
+                raise ValueError(f"{name} {label} {answer}: counties do not add up to {totals[at]}")
+            rows.extend(
+                {
+                    "state": "SD",
+                    "day": day,
+                    "number": label.rsplit(" ", 1)[1],
+                    "label": label,
+                    "url": SD + name,
+                    "county": row[0],
+                    "answer": answer,
+                    "votes": int(row[at]),
+                }
+                for row in counties
+            )
+    for day, name in SD_PRECINCTS.items():
+        sheet = (
+            fastexcel.read_excel(raw.cached(SOURCE, SD + name).path)
+            .load_sheet(0, dtypes={"Votes": "int"})
+            .to_polars()
+            .with_columns(label=pl.col("Ballot Question").str.extract(r"^([^:]+):"))
+            .group_by("label", "County", "Yes/No", maintain_order=True)
+            .agg(pl.col("Votes").sum())
+        )
+        if sheet["County"].n_unique() != 66 or set(sheet["Yes/No"]) != {"Yes", "No"}:
+            raise ValueError(f"{name}: unexpected counties or answers")
+        rows.extend(
+            {
+                "state": "SD",
+                "day": day,
+                "number": label.rsplit(" ", 1)[1],
+                "label": label,
+                "url": SD + name,
+                "county": county,
+                "answer": answer.upper(),
+                "votes": votes,
+            }
+            for label, county, answer, votes in sheet.iter_rows()
+        )
+    for name, url in SD_SCANS.items():
+        contests = json.loads((SCANS / f"{name}.json").read_text())["contests"]
+        if not (DATA / "parsed" / "us.scans" / name / "tables.parquet").exists():
+            print(f"{name}: not read yet, skipped")
+            continue
+        scanned = pl.read_parquet(DATA / "parsed" / "us.scans" / name / "tables.parquet")
+        for number, contest in contests.items():
+            table = scanned.filter(pl.col("contest") == number)
+            if sorted(table["candidate"].unique()) != ["NO", "YES"] or table.height != 132:
+                print(f"{name} measure {number}: {table.height} cells passed, skipped")
+                continue
+            rows.extend(
+                {
+                    "state": "SD",
+                    "day": date.fromisoformat(contest["day"]),
+                    "number": number,
+                    "label": f"Initiated Measure {number}"
+                    if number.isdigit()
+                    else f"Constitutional Amendment {number}",
+                    "url": url,
+                    "county": row["code"],
+                    "answer": row["candidate"],
+                    "votes": row["votes"],
+                    "page": row["page"],
+                    "x0": row["x0"],
+                    "y0": row["y0"],
+                    "x1": row["x1"],
+                    "y1": row["y1"],
+                }
+                for row in table.iter_rows(named=True)
+            )
+    return rows
+
+
 def nebraska() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in NE_BOOKS.items():
@@ -1975,6 +2088,7 @@ def parse() -> None:
             *nevada(),
             *nebraska(),
             *arkansas(),
+            *south_dakota(),
         ],
         infer_schema_length=None,
     )
@@ -1988,6 +2102,7 @@ def parse() -> None:
             (
                 rows
                 for rows in (
+                    pool.filter(kind, pl.col("measure") == label),
                     pool.filter(kind, pl.col("number") == number),
                     pool.filter(kind, pl.col("number").is_null()),
                     pool.filter(pl.col("number") == number),
@@ -2023,7 +2138,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"]
+                if entry["number"] or state == "SD"
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
@@ -2127,11 +2242,15 @@ def emit() -> Path:
             fips[abbreviation] = code
         counties: dict[tuple[str, str], str] = {}
         for code, text in conn.execute(
-            """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+            """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
+               and n.kind in ('short', 'historical')
                where u.scheme_code = 'us.county' and (u.valid_from is null or u.valid_from <= '2011-12-31')
-               and (u.valid_to is null or u.valid_to > '2000-01-01')"""
+               and (u.valid_to is null or u.valid_to > '2000-01-01')
+               order by n.kind = 'historical'"""
         ).fetchall():
-            counties[(code[:2], re.sub(r"[^a-z]", "", text.lower()))] = code
+            counties.setdefault(
+                (code[:2], re.sub(r"[^a-z]", "", text.split(",")[0].removesuffix(" County").lower())), code
+            )
         frame = frame.with_columns(
             code=pl.struct("state", "county").map_elements(
                 lambda row: (
