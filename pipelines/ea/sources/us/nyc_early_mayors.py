@@ -26,6 +26,11 @@ METHOD = (
     "election. A candidate on several ballot lines carries the total of the lines; the lines themselves are not "
     "shown. The article's own total row is ignored."
 )
+BOROUGH_METHOD = (
+    "Votes by borough from the borough table in the English Wikipedia's article on the {year} New York City mayoral "
+    "election, for the candidates the table lists whose borough figures add up to their citywide total. A stopgap "
+    "until the Board of Elections' printed canvass is read."
+)
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -80,10 +85,34 @@ def fetch() -> None:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
+    boroughs: list[dict[str, object]] = []
     for year in YEARS:
         wikitext = json.loads(raw.cached(SOURCE, page(year)).path.read_text())["query"]["pages"][0]["revisions"][0][
             "slots"
         ]["main"]["content"]
+        for table in re.finditer(r"\{\|.*?\n\|\}", wikitext, re.DOTALL):
+            cells = table.group(0)
+            lines = re.split(r"\n\|-[^\n]*", cells)
+            if (
+                "Manhattan" not in cells
+                or "Bronx and Manhattan" in cells
+                or re.search("primary", lines[1], re.IGNORECASE)
+            ):
+                continue
+            for line in lines[2:]:
+                fields = []
+                for entry in line.strip().split("\n"):
+                    if entry.startswith(("|", "!")):
+                        fields.extend(re.split(r"\|\|", entry[1:]))
+                fields = [
+                    re.sub(r"</?u>", "", text(re.sub(r"^\s*(?:style|bgcolor|rowspan|colspan)[^|]*\|(?!\|)", "", field)))
+                    for field in fields
+                ]
+                counts = [
+                    int(field.replace(",", "")) for field in fields if re.fullmatch(r"\d{1,3}(?:,\d{3})+|\d+", field)
+                ]
+                if len(counts) >= 6 and sum(counts[-6:-1]) == counts[-1] and fields[0]:
+                    boroughs.append({"year": year, "candidate": NAMES.get(fields[0], fields[0]), "counts": counts[-6:]})
         if year == 1925:
             rows.extend(
                 {"year": year, "candidate": name, "line": line, "votes": votes, "won": name == "Jimmy Walker"}
@@ -121,10 +150,12 @@ def parse() -> None:
             )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows).write_parquet(PARSED / "lines.parquet")
+    pl.DataFrame(boroughs).write_parquet(PARSED / "boroughs.parquet")
 
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "lines.parquet")
+    boroughs = pl.read_parquet(PARSED / "boroughs.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -300,4 +331,41 @@ def emit() -> Path:
                 )
                 if won:
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
+            matched = {
+                candidate: row["counts"]
+                for candidate, _, votes, _ in candidates
+                for row in boroughs.filter(pl.col("year") == year).iter_rows(named=True)
+                if row["counts"][-1] == votes
+                and re.sub(r"[^a-z]", "", candidate.split()[-1].lower().replace("jr.", "")) in row["candidate"].lower()
+            }
+            if matched:
+                by_borough = cs.key(f"{SOURCE}.result_set", f"{contest_key}:boroughs")
+                cs.add(
+                    "result_set",
+                    id=by_borough,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=False,
+                    completeness=round(
+                        sum(counts[-1] for counts in matched.values()) / sum(v for _, _, v, _ in candidates), 4
+                    ),
+                )
+                cs.add("note", entity_id=by_borough, kind="methodology", body_md=BOROUGH_METHOD.format(year=year))
+                for candidate, counts in matched.items():
+                    for fips, count in zip(("36061", "36005", "36047", "36081", "36085"), counts[:5], strict=True):
+                        cs.add(
+                            "result_value",
+                            result_set_id=by_borough,
+                            unit_id=cs.unit("us.county", fips),
+                            option_id=cs.key("us.option", f"{contest_key}:{slug(candidate)}"),
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            flags=0,
+                            value=count,
+                        )
         return cs.write()
