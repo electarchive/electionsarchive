@@ -3150,7 +3150,9 @@ function contestMarkdown(
           m.change_other_margin,
         ]
       : [m.change_gain, m.change_hold, m.change_allied, m.change_other];
-  const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
+  const won = contest.rows
+    .filter((row) => (row.current?.seats ?? 0) > 0)
+    .toSorted((a, b) => (b.current?.seats ?? 0) - (a.current?.seats ?? 0));
   const held =
     handover == null || contest.current == null
       ? contest.kind === "list_allocation" && won.length > 1

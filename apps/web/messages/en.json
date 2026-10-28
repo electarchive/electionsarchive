@@ -344,7 +344,7 @@
   "declared_tacit": "Returned unopposed, so no vote was held.",
   "declared_show_of_hands": "Decided by a show of hands, so there is no vote count.",
   "declared_appointed": "Filled by appointment, so no vote was held.",
-  "declared_counted": "Official source lists only the winner, not vote counts.",
+  "declared_counted": "The source gives only the outcome, not vote counts.",
   "notes_title": "Notes",
   "note_no_target": "No earlier election in this race covers this area. Pick another election to compare with.",
   "note_not_covered": "The election you picked has no results for this area.",

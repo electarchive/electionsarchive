@@ -6787,7 +6787,7 @@ export const contests = {
             select distinct unit_k from result_value
             where result_set_k = any(${sql.param(active.rows.map((row) => row.k))}::int[])
           ) x
-          join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within'
+          join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within' and ru.kind = 'standard'
           join scheme sc on sc.code = ru.scheme_code
           where ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
             and sc.rank > (select rank from scheme where code = ${grid.level})
@@ -11767,7 +11767,7 @@ export const elections = {
                   select e.id, tree.root from election e join tree on e.parent_id = tree.id
                 ),
                 candidates as (
-                  select tree.root, rs.k, a.k as area, c.kind = 'body_seats' as "isSeat" from contest c
+                  select tree.root, c.id as contest, rs.k, a.k as area, c.kind = 'body_seats' as "isSeat" from contest c
                   join tree on tree.id = c.election_id
                   join election e on e.id = c.election_id
                   join result_set rs on rs.contest_id = c.id and ${latest("rs")}
@@ -11777,24 +11777,42 @@ export const elections = {
                     and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
                 ),
                 seats as (
-                  select root, k, area from candidates d
+                  select root, contest, k, area from candidates d
                   where d."isSeat" or not exists (select from candidates x where x.root = d.root and x."isSeat")
                 ),
+                tiers as (
+                  select root, k as top, k, area from seats
+                  union all
+                  select s.root, s.k, kr.k, ka.k from seats s
+                  join contest kc on kc.allocation_parent_id = s.contest and kc.body_id = ${chamber}::uuid and not kc.notional
+                  join result_set kr on kr.contest_id = kc.id and ${latest("kr")}
+                  join area ka on ka.id = kc.district_area_id
+                ),
                 counted as (
-                  select s.root, nullif(max(x.value) filter (where x.measure = 2), 0) as registered,
+                  select t.root, t.top, t.k = t.top as "isOwn", nullif(max(x.value) filter (where x.measure = 2), 0) as registered,
                     coalesce(max(x.value) filter (where x.measure = 14), max(x.value) filter (where x.measure = 3)) as voters,
                     max(x.value) filter (where x.measure = 4) as valid,
                     max(x.value) filter (where x.measure = 5) as invalid
-                  from seats s
+                  from tiers t
                   left join lateral (
                     select x.measure, x.value from result_rollup x
-                    where x.result_set_k = s.k and x.area_k = s.area and x.option_k = 0
+                    where x.result_set_k = t.k and x.area_k = t.area and x.option_k = 0
                       and x.channel = 0 and x.count_round = 0 and x.measure in (2, 3, 4, 5, 14) offset 0
                   ) x on true
-                  group by s.root, s.k
+                  group by t.root, t.top, t.k
+                ),
+                totals as (
+                  select *, coalesce(voters, valid + coalesce(invalid, 0)) as cast from counted
+                ),
+                pooled as (
+                  select t.top, coalesce(sum(t.cast) filter (where t."isOwn"), 0) < coalesce(sum(t.cast) filter (where not t."isOwn"), 0) as "isTree"
+                  from totals t group by t.top
                 ),
                 kept as (
-                  select *, coalesce(voters, valid + coalesce(invalid, 0)) as cast from counted
+                  select t.root, sum(t.registered) as registered, sum(t.voters) as voters, sum(t.invalid) as invalid, sum(t.cast) as cast
+                  from totals t join pooled p on p.top = t.top
+                  where t."isOwn" or p."isTree"
+                  group by t.root, t.top
                 )
                 select p."isNow", extract(year from p.date_from)::int as year,
                   sum(k.registered) filter (where k.cast <= k.registered)::float8 as registered,

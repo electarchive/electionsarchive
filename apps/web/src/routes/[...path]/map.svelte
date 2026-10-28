@@ -478,7 +478,9 @@
     nested == null ? null : engine.tiles(nested.tiles),
   );
 
-  const pools = $derived(places.rows.filter((row) => row.isPool === true));
+  const pools = $derived(
+    places.rows.filter((row) => row.isPool === true && row.leader != null),
+  );
   const rows = $derived(
     new Map(
       [...places.rows, ...(places.districts ?? [])].map((row) => [row.k, row]),

@@ -808,7 +808,9 @@
   const verdict = $derived(lede(contest));
   const held = $derived.by(() => {
     if (handover == null || contest.current == null) {
-      const won = contest.rows.filter((row) => (row.current?.seats ?? 0) > 0);
+      const won = contest.rows
+        .filter((row) => (row.current?.seats ?? 0) > 0)
+        .toSorted((a, b) => (b.current?.seats ?? 0) - (a.current?.seats ?? 0));
       return contest.kind === "list_allocation" && won.length > 1
         ? m.change_seats_list({
             changes: new Intl.ListFormat(getLocale(), {

@@ -23,7 +23,7 @@
   const uid = $props.id();
 </script>
 
-{#if day.groups.length > 0 || day.part != null}
+{#if day.groups.length > 0}
   <section
     class="col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
     aria-labelledby="{uid}-day"

@@ -1533,7 +1533,11 @@
           </p>
         {/if}
         {const districts = $derived(
-          new Set(places.rows.map((row) => row.k)).size,
+          new Set(
+            places.rows
+              .filter((row) => row.isPool !== true)
+              .map((row) => row.k),
+          ).size,
         )}
         {#if shape.shaped != null && shape.shaped < districts}
           <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
