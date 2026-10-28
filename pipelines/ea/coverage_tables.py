@@ -77,7 +77,7 @@ JUDICIAL = {
     "WI": 1,
 }
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
-CALENDAR: dict[tuple[str, str], tuple[int, int, str | None]] = {
+CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
     ("AK", "county"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
     ("AK", "municipality"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
     ("AK", "school"): (
@@ -341,7 +341,8 @@ CALENDAR: dict[tuple[str, str], tuple[int, int, str | None]] = {
     ("MN", "township"): (
         1,
         0,
-        "Minn. Stat. § 205.075, subd. 1; § 365.51, subd. 3, https://www.revisor.mn.gov/statutes/cite/205.075",
+        "Minn. Stat. § 205.075, subd. 1 (second Tuesday in March); § 365.51, subd. 3, https://www.revisor.mn.gov/statutes/cite/205.075",
+        3,
     ),
     ("MO", "county"): (2, 0, "RSMo § 115.121.1, https://revisor.mo.gov/main/OneSection.aspx?section=115.121"),
     ("MO", "municipality"): (1, 0, "RSMo § 115.121.3, https://revisor.mo.gov/main/OneSection.aspx?section=115.121"),
@@ -516,8 +517,19 @@ CALENDAR: dict[tuple[str, str], tuple[int, int, str | None]] = {
     ),
     ("NV", "school"): (2, 0, None),
     ("NY", "municipality"): (1, 0, None),
-    ("NY", "school"): (1, 0, None),
+    ("NY", "school"): (
+        1,
+        0,
+        "N.Y. Educ. Law § 2002(1) (third Tuesday in May); § 2601-a(2), https://www.nysenate.gov/legislation/laws/EDN/2002",
+        5,
+    ),
     ("NY", "special"): (1, 0, None),
+    ("NY", "village"): (
+        1,
+        0,
+        "N.Y. Elec. Law § 15-104(1)(a) (third Tuesday in March, unless a village moves it to June or November), https://www.nysenate.gov/legislation/laws/ELN/15-104",
+        3,
+    ),
     ("NY", "township"): (
         2,
         1,
@@ -1152,6 +1164,7 @@ def build() -> str:
                     for i, w in enumerate(words)
                 ),
                 "function": None if function is None else function.split(" - ", 1)[-1].capitalize(),
+                "village": match is not None and match[1] == "VILLAGE",
                 "population": population,
                 "population_basis": population_basis,
                 "active": active,
@@ -1178,6 +1191,7 @@ def build() -> str:
                 ),
                 "name": name,
                 "function": None,
+                "village": False,
                 "population": None,
                 "population_basis": None,
                 "active": True,
@@ -1229,13 +1243,14 @@ def build() -> str:
     ahead: dict[tuple[str, int], bool] = {}
     for g in governments:
         group = (g["state"], g["kind"])
+        calendar = CALENDAR.get(
+            (g["state"], g["function"] or ""),
+            CALENDAR.get(group, CALENDAR.get((g["state"], "school")))
+            if g["kind"] == "college"
+            else CALENDAR.get((g["state"], "village") if g["village"] else group, CALENDAR.get(group)),
+        )
         if g["period"] is None:
-            period, phase, cite = CALENDAR.get(
-                (g["state"], g["function"] or ""),
-                CALENDAR.get(group, CALENDAR.get((g["state"], "school"), (None, None, None)))
-                if g["kind"] == "college"
-                else CALENDAR.get(group, (None, None, None)),
-            )
+            period, phase, cite = calendar[:3] if calendar is not None else (None, None, None)
             common = [p for p, _ in patterns[group].most_common() if period is None or p[0] == period]
             if g["phase"] is not None:
                 if period is None:
@@ -1249,7 +1264,9 @@ def build() -> str:
                 g["period"], g["phase"] = common[0]
             else:
                 g["period"], g["phase"], g["basis"] = 2, 0, "unknown"
-        if g["month"] is None and months[group]:
+        if g["month"] is None and calendar is not None and len(calendar) == 4:
+            g["month"] = calendar[3]
+        elif g["month"] is None and months[group]:
             g["month"] = months[group].most_common(1)[0][0]
         years = held.get(g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
