@@ -16,7 +16,7 @@ from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import connect
 
 SOURCE = "identity"
-VERSION = "2"
+VERSION = "3"
 NEAR = 12 * 366
 LONG_GAP = 24 * 365
 LONG_SPAN = 50 * 365
@@ -1062,7 +1062,8 @@ def emit() -> Path:
                 "People recorded once per source or per race joined into one person where the same printed name "
                 "(ignoring case, accents, middle initials, and a common nickname such as Bill for William, or a first "
                 "name printed as its initial when one person on the race line fits it) ran for the same office or body in the same "
-                "district within 12 years, and nothing tells them apart, and party labels of one state or country "
+                "district within 12 years, and nothing tells them apart (no race for another seat within 60 days, and no "
+                "first name on either record that the other's names cannot be), and party labels of one state or country "
                 "that sources spelled apart joined by hand"
             ),
             polity=None,
@@ -1070,6 +1071,8 @@ def emit() -> Path:
         )
 
         dates: dict[UUID, list[date]] = defaultdict(list)
+        seats: dict[UUID, set[tuple[date, object, object, object]]] = defaultdict(set)
+        given: dict[UUID, set[str]] = defaultdict(set)
         pipelines: dict[UUID, set[str]] = defaultdict(set)
         lines: dict[tuple[object, ...], dict[UUID, list[date]]] = defaultdict(lambda: defaultdict(list))
         initials: dict[tuple[tuple[object, ...], UUID], set[frozenset[str]]] = defaultdict(set)
@@ -1088,6 +1091,8 @@ def emit() -> Path:
             if named is None:
                 continue
             first, rest = named[0].split(" ", 1)
+            seats[person].add((day, area, office, body))
+            given[person].add(first)
             line = (area, office, body, f"{canon.get(first, first)} {rest}")
             lines[line][person].append(day)
             if named[1]:
@@ -1139,7 +1144,31 @@ def emit() -> Path:
                         one in died and (max(dates[two], default=died[one]) - died[one]).days > 365
                         for one, two in ((person, other), (other, person))
                     )
-                    if set(dates[person]) & set(dates[other]) or len(signed) > 1 or len(births) > 1 or posthumous:
+                    rival = any(
+                        abs((one[0] - two[0]).days) <= 60 and one[1:] != two[1:]
+                        for one in seats[person]
+                        for two in seats[other]
+                    )
+                    strangers = any(
+                        not (
+                            one == two
+                            or canon.get(one, one) == canon.get(two, two)
+                            or (len(one) == 1 or len(two) == 1)
+                            and one[0] == two[0]
+                            or one.startswith(two)
+                            or two.startswith(one)
+                        )
+                        for one in given[person]
+                        for two in given[other]
+                    )
+                    if (
+                        set(dates[person]) & set(dates[other])
+                        or rival
+                        or strangers
+                        or len(signed) > 1
+                        or len(births) > 1
+                        or posthumous
+                    ):
                         blocked.append((person, other))
                         continue
                     if min(abs((a - b).days) for a in people[person] for b in people[other]) <= NEAR:
@@ -1747,6 +1776,7 @@ def emit() -> Path:
             recased += 1
         print(f"{recased} preferred names take a particle's case from a source's own spelling")
         staged = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
+        initialed: set[tuple[UUID, str, str | None]] = set()
         for name, entity, text, lang, script, kind, source, pipeline in conn.execute(
             """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id, c.pipeline from name n
                join entity e on e.id = n.entity_id and e.type = 'person'
@@ -1765,18 +1795,20 @@ def emit() -> Path:
                 bare = text
             if (fixed := names.initials(bare)) == text:
                 continue
-            if bare != text:
-                cs.add(
-                    "name",
-                    id=name,
-                    entity_id=entity,
-                    text=text,
-                    lang=lang,
-                    script=script,
-                    kind=kind,
-                    source_id=source,
-                    is_preferred=False,
-                )
+            cs.add(
+                "name",
+                id=name,
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                script=script,
+                kind=kind,
+                source_id=source,
+                is_preferred=False,
+            )
+            if (entity, lang, script) in initialed:
+                continue
+            initialed.add((entity, lang, script))
             cs.add(
                 "name",
                 entity_id=entity,

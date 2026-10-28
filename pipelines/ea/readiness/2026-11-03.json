@@ -30,6 +30,16 @@
       "title": "Statewide Ballot Measures Database",
       "publisher": "National Conference of State Legislatures",
       "url": "https://www.ncsl.org/elections-and-campaigns/statewide-ballot-measures-database"
+    },
+    "co-offices-2026": {
+      "title": "2026 Offices Up For Election",
+      "publisher": "Colorado Secretary of State",
+      "url": "https://www.coloradosos.gov/pubs/elections/vote/officeUpForElection.html"
+    },
+    "wy-offices-2026": {
+      "title": "2026 General Election: Offices Up for Election",
+      "publisher": "Wyoming Secretary of State",
+      "url": "https://sos.wyo.gov/Elections/Docs/2026/2026_Offices_Up_for_Election.pdf"
     }
   },
   "levels": [
@@ -131,14 +141,16 @@
         "WV": 1,
         "WY": 1
       },
-      "specials": {
-        "source": "senate-class-iii",
-        "quote": "Class III: \"Husted, Jon (R-OH)\" and \"Moody, Ashley (R-FL)\" took their seats through appointment, so each seat is filled by a special election on November 3, 2026.",
-        "states": {
-          "OH": 1,
-          "FL": 1
+      "specials": [
+        {
+          "source": "senate-class-iii",
+          "quote": "Class III: \"Husted, Jon (R-OH)\" and \"Moody, Ashley (R-FL)\" took their seats through appointment, so each seat is filled by a special election on November 3, 2026.",
+          "states": {
+            "OH": 1,
+            "FL": 1
+          }
         }
-      }
+      ]
     },
     {
       "key": "governor",
@@ -238,7 +250,23 @@
         "WV": 17,
         "WI": 17,
         "WY": 16
-      }
+      },
+      "specials": [
+        {
+          "source": "co-offices-2026",
+          "quote": "*These offices on ballot in 2026 due to vacancies; election to fill the remainder of 2025-2029 term.",
+          "states": {
+            "CO": 4
+          }
+        },
+        {
+          "source": "wy-offices-2026",
+          "quote": "* The Sixth Senate District will hold an election to fill the remainder of an unexpired term.",
+          "states": {
+            "WY": 1
+          }
+        }
+      ]
     },
     {
       "key": "state_lower",

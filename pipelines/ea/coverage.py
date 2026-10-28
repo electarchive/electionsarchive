@@ -212,8 +212,27 @@ create table if not exists coverage_cache_unit_k (unit_k integer primary key);
 
 create table if not exists coverage_cache_done (result_set_k integer primary key);
 
+alter table coverage_cache_done add column if not exists recorded_from timestamptz;
+
+do $$ begin
+    if not exists (select from coverage_cache_done where recorded_from is not null) then
+        truncate coverage_cache_unit, coverage_cache_measure, coverage_cache_unit_k, coverage_cache_done;
+    end if;
+end $$;
+
 create temp table fresh as
-select r.k from result_set r where not exists (select from coverage_cache_done d where d.result_set_k = r.k);
+select r.k, r.recorded_from, d.result_set_k is not null as restaged from result_set r
+left join coverage_cache_done d on d.result_set_k = r.k
+where d.recorded_from is distinct from r.recorded_from;
+
+create temp table gone as
+select d.result_set_k as k from coverage_cache_done d where not exists (select from result_set r where r.k = d.result_set_k);
+
+delete from coverage_cache_unit where result_set_k in (select k from fresh union all select k from gone);
+
+delete from coverage_cache_measure where result_set_k in (select k from fresh union all select k from gone);
+
+delete from coverage_cache_done where result_set_k in (select k from gone);
 
 insert into coverage_cache_unit
 select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_set_k in (select k from fresh)
@@ -233,7 +252,12 @@ insert into coverage_cache_unit_k
 select distinct unit_k from coverage_cache_unit where result_set_k in (select k from fresh)
 on conflict do nothing;
 
-insert into coverage_cache_done select k from fresh on conflict do nothing;
+delete from coverage_cache_unit_k k
+where exists (select from fresh where restaged union all select from gone)
+  and not exists (select from coverage_cache_unit u where u.unit_k = k.unit_k);
+
+insert into coverage_cache_done select k, recorded_from from fresh
+on conflict (result_set_k) do update set recorded_from = excluded.recorded_from;
 
 analyze coverage_cache_unit;
 

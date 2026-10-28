@@ -156,7 +156,7 @@ def database(conn) -> list[str]:
             )
     ready = readiness.spec(readiness.DAY)
     for level in ready["levels"]:
-        for part in (level, level.get("specials") or {}):
+        for part in (level, *(level.get("specials") or [])):
             if (
                 part
                 and not level.get("schedule")

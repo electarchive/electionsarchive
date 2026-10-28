@@ -213,15 +213,15 @@ def measure(conn, day: str) -> dict:
     for level in data["levels"]:
         if level.get("schedule"):
             due = {
-                (st, office)
-                for st, office, _, when, joint, _ in statewide_table.schedule(conn, year)
+                (st, office, seat)
+                for st, office, _, when, joint, _, seat in statewide_table.schedule(conn, year)
                 if when == year and not joint
             }
-            for st, _ in due:
+            for st, *_ in due:
                 expected[(level["key"], st)] += 1
                 listed[level["key"]].add(st)
             continue
-        for part in (level, level.get("specials") or {}):
+        for part in (level, *(level.get("specials") or [])):
             for st, n in part.get("states", {}).items():
                 expected[(level["key"], st)] += n
                 listed[level["key"]].add(st)
@@ -272,7 +272,7 @@ def notes(day: str) -> tuple[list[dict], dict]:
     year = int(day[:4])
     found = []
     for level in data["levels"]:
-        for part in (level, level.get("specials") or {}):
+        for part in (level, *(level.get("specials") or [])):
             if part.get("source"):
                 found.append(
                     {

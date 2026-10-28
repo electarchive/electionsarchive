@@ -16,6 +16,7 @@ from ea.sources.us import elstats
 from ea.sources.us.ak_dor import CONTESTS as RANKED_ROUNDS
 from ea.sources.us.ak_dor import MEDSL
 from ea.sources.us.klarner import LOWER, UPPER
+from ea.sources.us.wikidata_links import NICKNAMES
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_state"
@@ -176,6 +177,19 @@ def _district(state: str, text: str) -> tuple[str, str | None]:
         text, number = match[1], match[2]
     letters = "".join(word for word in re.findall(r"[A-Z]+", text) if word != "AND").lower()
     return letters + (f"-{int(number)}" if number else ""), None
+
+
+def fellow(one: str, other: str) -> bool:
+    one, other = re.sub(r"[^A-Z]", "", one).lower(), re.sub(r"[^A-Z]", "", other).lower()
+    canon = {form: first for first, forms in NICKNAMES.items() for form in forms.split()}
+    return (
+        not one
+        or not other
+        or one.startswith(other)
+        or other.startswith(one)
+        or one[:3] == other[:3]
+        or canon.get(one, one) == canon.get(other, other)
+    )
 
 
 def _surname(name: str) -> str:
@@ -923,7 +937,8 @@ def emit() -> Path:
                     surname = _surname(str(candidate))
                     first = str(candidate).split()[0]
                     found: set[UUID] = set()
-                    for key in (f"{first} {surname}", surname):
+                    single = re.fullmatch(r"[A-Z'-]+", str(candidate)) is not None
+                    for key in (f"{first} {surname}", surname) if single else (f"{first} {surname}",):
                         by_code = past.get((body_key, key), {})
                         found = by_code.get(full, set()) or (
                             set().union(*by_code.values()) if key != surname else set()
@@ -931,14 +946,18 @@ def emit() -> Path:
                         if len(found) == 1:
                             break
                     head = cs.key("us.candidacy", f"{option_key}:head")
-                    single = re.fullmatch(r"[A-Z'-]+", str(candidate)) is not None
                     if single and len(found) == 1:
                         ballot = initials(known_names[next(iter(found))])
                     elif single and candidate in full_names:
                         text = full_names[str(candidate)][0]
                         ballot = initials(title(text) if text.isupper() else text)
                     person_key = (state, ballot.upper() if single else str(candidate))
-                    if head in held and held[head] not in surnamed:
+                    kept = known_names.get(held.get(head), "").upper().split()[:-1]
+                    if (
+                        head in held
+                        and held[head] not in surnamed
+                        and (single or not kept or any(fellow(word, first) for word in kept))
+                    ):
                         person = held[head]
                     elif len(found) == 1:
                         person = next(iter(found))
