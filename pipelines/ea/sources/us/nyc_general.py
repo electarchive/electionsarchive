@@ -1216,9 +1216,7 @@ def emit() -> Path:
                         [contest, result_set],
                     ).fetchall():
                         declared[option_id] = declared_kind
-                        words = re.sub(r"[^a-z ]", "", str(label).lower()).split()
-                        if len(words) >= 2:
-                            by_name.append((words[0][0], words[-1], declared_kind))
+                        by_name.append((re.sub(r"[^a-z]", "", str(label).lower()), declared_kind))
                 cs.add(
                     "note",
                     entity_id=result_set,
@@ -1322,12 +1320,11 @@ def emit() -> Path:
                                 next(
                                     (
                                         declared_kind
-                                        for initial, surname, declared_kind in reversed(by_name)
-                                        if initial == candidate.lower()[0]
-                                        and SequenceMatcher(
-                                            None, surname, re.sub(r"[^a-z ]", "", candidate.lower()).split()[-1]
+                                        for squashed, declared_kind in reversed(by_name)
+                                        if SequenceMatcher(
+                                            None, squashed, re.sub(r"[^a-z]", "", candidate.lower())
                                         ).ratio()
-                                        >= 0.85
+                                        >= 0.9
                                     ),
                                     "lost",
                                 ),
