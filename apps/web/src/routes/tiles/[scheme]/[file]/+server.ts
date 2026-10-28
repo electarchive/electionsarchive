@@ -10,7 +10,7 @@ const ROOT = path.resolve("../../data/plane");
 
 export const GET: RequestHandler = async ({ params, request }) => {
   if (
-    !/^[a-z]{2,5}\.[a-z_]+$/u.test(params.scheme) ||
+    !/^[a-z]{2,5}\.[a-z0-9_]+$/u.test(params.scheme) ||
     !/^[\w:-]+(?:\.[\w:-]+)*\.pmtiles$/u.test(params.file)
   ) {
     error(404);
