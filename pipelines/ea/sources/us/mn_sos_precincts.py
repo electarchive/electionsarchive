@@ -26,16 +26,27 @@ OFFICES = {
     "house": ("Cong", "USCong", "CONG"),
     "senate": ("USSen", "USSEN"),
     "president": ("USPres", "USPRES"),
-    "governor": ("Gov",),
+    "governor": ("Gov", "GOV"),
 }
 GOVERNOR = {
-    "GP": "Ken Pentel",
-    "IP": "Tim Penny",
-    "R": "Tim Pawlenty",
-    "DFL": "Roger D. Moe",
-    "CP": "Lawrence Aeshliman",
-    "I": "Booker Hodges IV",
-    "SW": "Kari Sachs",
+    2002: {
+        "GP": "Ken Pentel",
+        "IP": "Tim Penny",
+        "R": "Tim Pawlenty",
+        "DFL": "Roger D. Moe",
+        "CP": "Lawrence Aeshliman",
+        "I": "Booker Hodges IV",
+        "SW": "Kari Sachs",
+    },
+    2010: {
+        "IP": "Thomas (Tom) Horner",
+        "R": "Tom Emmer",
+        "DFL": "Mark Dayton",
+        "GP": "Farheen Hakeem",
+        "TRP": "Linda S. Eno",
+        "GR": "Chris Wright",
+        "EDP": "Ken Pentel",
+    },
 }
 PARTIES = {
     "GP": "green",
@@ -56,6 +67,8 @@ PARTIES = {
     "BL": "better life",
     "IND": "independent",
     "GRP": "grassroots",
+    "TRP": "resource",
+    "EDP": "ecology democracy",
 }
 PUBLISHER = "Minnesota Secretary of State"
 TITLE = "Precinct results spreadsheets"
@@ -110,7 +123,7 @@ def parse() -> None:
             ]
             + ([("Wellstone", column["Wellstone"])] if chamber == "senate" and year == 2002 else [])
             for chamber, prefixes in OFFICES.items()
-            if (chamber != "governor" or year == 2002) and (chamber != "president" or year != 2000)
+            if (chamber != "governor" or year in GOVERNOR) and (chamber != "president" or year != 2000)
         }
         for row in cells[start + 1 :]:
             if row[0] is None or row[0] == cells[start][0] or re.match(r"(?i)(statewide )?totals?\b", str(row[0])):
@@ -129,7 +142,7 @@ def parse() -> None:
                 counted = 0
                 for name, index in found:
                     votes = int(float(row[index] or 0))
-                    party = re.sub(r"^(Cong|USCong|CONG|USSen|USSEN|USPres|USPRES|Gov)", "", name).upper()
+                    party = re.sub(r"^(Cong|USCong|CONG|USSen|USSEN|USPres|USPRES|Gov|GOV)", "", name).upper()
                     if party == "TOT":
                         total = votes
                         continue
@@ -180,7 +193,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Minnesota's U.S. House generals 2000–2010, its U.S. Senate generals of those years, its "
-            "presidential generals 2004 and 2008, and its 2002 governor, by precinct from the Secretary of State's precinct results spreadsheets",
+            "presidential generals 2004 and 2008, and its 2002 and 2010 governor, by precinct from the Secretary of State's precinct results spreadsheets",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -218,7 +231,11 @@ def emit() -> Path:
             candidate=pl.when("writein")
             .then(pl.lit("WRITE-INS"))
             .when(pl.col("chamber") == "governor")
-            .then(pl.col("party").replace_strict(GOVERNOR))
+            .then(
+                pl.struct("year", "party").map_elements(
+                    lambda row: GOVERNOR.get(row["year"], {}).get(row["party"], row["party"]), return_dtype=pl.String
+                )
+            )
             .otherwise(
                 pl.struct("key", "party").map_elements(
                     lambda row: labels.get((row["key"], row["party"])) or row["party"], return_dtype=pl.String
