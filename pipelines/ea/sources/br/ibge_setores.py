@@ -32,7 +32,7 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    rows: list[tuple[str, str, str, str, str]] = []
+    PARSED.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
         conn.execute(
             "create temp table feature (code text, municipality text, label text, geojson text) on commit drop"
@@ -47,13 +47,12 @@ def parse() -> None:
                     encoding="utf-8",
                 )
                 records = reader.records()
-                with_bairros = {str(record["CD_MUN"]) for record in records if record["CD_BAIRRO"]}
                 with (
                     conn.cursor() as cursor,
                     cursor.copy("copy feature (code, municipality, label, geojson) from stdin") as copy,
                 ):
                     for record, shape in zip(records, reader.iterShapes(), strict=True):
-                        if str(record["CD_MUN"]) not in with_bairros:
+                        if not record["CD_BAIRRO"]:
                             copy.write_row(
                                 (
                                     str(record["CD_SETOR"]),
@@ -62,7 +61,7 @@ def parse() -> None:
                                     json.dumps(shape.__geo_interface__),
                                 )
                             )
-            rows.extend(
+            rows = (
                 conn.execute(
                     """select code, min(municipality), min(label),
                               encode(st_asewkb(g), 'hex'), encode(st_asewkb(st_pointonsurface(g)), 'hex')
@@ -76,31 +75,27 @@ def parse() -> None:
                 ).fetchall()
             )
             conn.execute("truncate feature")
-    frame = pl.DataFrame(
-        rows,
-        schema={
-            "code": pl.String,
-            "municipality": pl.String,
-            "district": pl.String,
-            "geom": pl.String,
-            "label_point": pl.String,
-        },
-        orient="row",
-    )
-    if frame["code"].n_unique() != frame.height:
-        raise ValueError("a setor code has several shapes or districts")
-    PARSED.mkdir(parents=True, exist_ok=True)
-    frame.write_parquet(PARSED / "setores.parquet")
+            pl.DataFrame(
+                rows,
+                schema={
+                    "code": pl.String,
+                    "municipality": pl.String,
+                    "district": pl.String,
+                    "geom": pl.String,
+                    "label_point": pl.String,
+                },
+                orient="row",
+            ).write_parquet(PARSED / f"{state}.parquet")
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "setores.parquet").filter(pl.col("municipality") != "")
+    frame = pl.read_parquet(PARSED / "??.parquet").filter(pl.col("municipality") != "")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Brazil's census tracts (setores censitários) in municipalities with no bairros, from IBGE's 2022 census mesh",
+            summary="Brazil's census tracts (setores censitários) that lie in no bairro, from IBGE's 2022 census mesh",
             polity="BR",
         )
         source = cs.source("IBGE", "Malha de Setores Censitários 2022")
@@ -112,8 +107,9 @@ def emit() -> Path:
             title="Malha de Setores Censitários 2022",
             url=PAGE,
             attribution="Source: IBGE, 2022 Census",
-            notes="Loaded only for municipalities where IBGE's bairros mesh draws none, so polling places there can "
-            "be placed in the finest official unit.",
+            notes="Loaded only for tracts that IBGE's bairros mesh assigns to no bairro (whole municipalities with none, "
+            "and rural or peri-urban land outside the drawn bairros), so polling places there can be placed in the "
+            "finest official unit.",
         )
         for state in STATES:
             cs.artifact(raw.cached("br.ibge_bairros", f"{FOLDER}{state}_setores_CD2022.zip"), source)
