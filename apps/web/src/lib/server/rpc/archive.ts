@@ -50,6 +50,11 @@ const serial = (contest: string, election: string) =>
     `case when ${contest}.kind = 'ballot_question' then ${contest}.id::text else concat_ws(':', ${contest}.office_id, ${contest}.body_id, ${contest}.kind, ${election}.kind, case when ${contest}.previous_round_id is null then 1 else 1 + (with recursive back(id, depth) as (select ${contest}.previous_round_id, 1 union all select p.previous_round_id, back.depth + 1 from back join contest p on p.id = back.id where back.depth < 8) select count(*) from back join contest bc on bc.id = back.id join election be on be.id = bc.election_id where be.kind = ${election}.kind) end, ${contest}.party_scope_id) end`,
   );
 
+const reached = (contest: string, election: string) =>
+  sql.raw(
+    `case when ${contest}.district_area_id is null or ${contest}.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = ${election}.polity_id) then (select coalesce(array_agg(a.scheme_code || ':' || a.id::text order by a.scheme_code, a.id), '{}') from polity_territory pt join area_parent ap on ap.parent_id = pt.area_id join area a on a.id = ap.area_id where pt.polity_id = ${election}.polity_id and pt.valid @> ${election}.date_from and exists (select from result_set rs join result_rollup_sum x on x.result_set_k = rs.k and x.area_k = a.k where rs.contest_id = ${contest}.id and rs.is_default)) end`,
+  );
+
 const MEASURES = new Map([
   [1, "votes"],
   [8, "list_votes"],
@@ -6199,6 +6204,7 @@ export const contests = {
         own: boolean;
         lineage: boolean;
         notional: boolean;
+        reach: Array<string> | null;
       }>(sql`
         with recursive anc(id) as (
           select ${area.id}::uuid
@@ -6365,7 +6371,8 @@ export const contests = {
             c.term is not distinct from 'remainder' as "isRemainder", c.notional,
             c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
             c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
-              and c.district_area_id in (select id from later union select id from earlier) as lineage
+              and c.district_area_id in (select id from later union select id from earlier) as lineage,
+            ${reached("c", "e")} as reach
           from (
             select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
             union
@@ -6422,7 +6429,7 @@ export const contests = {
         )
         select * from (
           select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
+            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.reach, r.date_from
           from roots r
           where r.id <> ${contest.root}::uuid
         ) r
@@ -6445,20 +6452,41 @@ export const contests = {
           .filter((stop) => contest.date != null && stop <= contest.date)
           .toSorted((a, b) => a.localeCompare(b))
           .at(-1) ?? null;
-      const rootIds = covering.rows.map((row) => row.id);
+      const mine = await db.execute<{ reach: Array<string> | null }>(sql`
+        select ${reached("c", "e")} as reach from contest c join election e on e.id = c.election_id
+        where c.id = ${contest.root}::uuid
+      `);
+      const scope = (found: Array<string> | null | undefined) =>
+        found == null
+          ? null
+          : found.length === 0 ||
+              Map.groupBy(found, (entry) => entry.split(":")[0])
+                .values()
+                .some((group) => group.length > 1)
+            ? ""
+            : found.join("|");
+      const here = scope(mine.rows[0]?.reach);
+      const kept = covering.rows.filter((row) => {
+        const there = scope(row.reach);
+        return (
+          there == null ||
+          (there === "" ? here == null || here === "" : there === here)
+        );
+      });
+      const rootIds = kept.map((row) => row.id);
       const held = new Set([
         contest.election,
-        ...covering.rows
+        ...kept
           .filter(
             (row) => row.series === contest.series && row.own && !row.notional,
           )
           .map((row) => row.election),
       ]);
-      const sameRace = covering.rows.filter(
+      const sameRace = kept.filter(
         (row) =>
           row.series === contest.series && (row.own || !held.has(row.election)),
       );
-      const comparable = covering.rows.filter(
+      const comparable = kept.filter(
         (row) => row.counted && row.indirect === contest.indirect,
       );
       const day = contest.date;
