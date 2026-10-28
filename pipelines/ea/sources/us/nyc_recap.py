@@ -773,20 +773,38 @@ def emit(
                 cs.artifact(raw.cached(pipeline, url.partition("#")[0]), source)
             result_set = cs.key(f"{pipeline}.result_set", contest_key)
             declared = {}
+            declared_names = []
             if attach and whole:
                 columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
                 for row in conn.execute(
                     f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
                 ).fetchall():
                     cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
-                declared = dict(
-                    conn.execute(
-                        """select o.option_id, o.kind from outcome o join result_set r on r.id = o.result_set_id
-                           where r.contest_id = %s and r.id <> %s and o.kind <> 'lost'
-                           order by r.is_default, r.as_of nulls first""",
-                        [contest, result_set],
-                    ).fetchall()
-                )
+                for option_id, declared_kind, declared_label in conn.execute(
+                    """select o.option_id, o.kind, co.ballot_label from outcome o
+                       join result_set r on r.id = o.result_set_id
+                       join contest_option co on co.id = o.option_id
+                       where r.contest_id = %s and r.id <> %s and o.kind <> 'lost'
+                       order by r.is_default, r.as_of nulls first""",
+                    [contest, result_set],
+                ).fetchall():
+                    declared[option_id] = declared_kind
+                    declared_names.append((re.sub(r"[^a-z ]", "", str(declared_label).lower().split("/")[0]).split(), declared_kind))
+
+            def carried(option: UUID, label: str) -> str:
+                if option in declared:
+                    return declared[option]
+                parts = re.sub(r"[^a-z ]", "", label.lower().split("/")[0]).split()
+                for words, declared_kind in reversed(declared_names):
+                    if (
+                        words
+                        and parts
+                        and parts[0][:2] == words[0][:2]
+                        and SequenceMatcher(None, parts[-1], words[-1]).ratio() >= 0.75
+                    ):
+                        return declared_kind
+                return "lost"
+
             cs.add(
                 "result_set",
                 id=result_set,
@@ -807,7 +825,7 @@ def emit(
                 if attach and (existing := lookup(label_text)) is not None:
                     roots[candidate] = existing
                     if whole and declared:
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=declared.get(roots[candidate], "lost"))
+                        cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=carried(roots[candidate], label_text))
                     continue
                 roots[candidate] = cs.key("us.option", root_key)
                 if is_party:
@@ -834,7 +852,7 @@ def emit(
                         for entity in party_id(line):
                             cs.add("candidacy_nomination", candidacy_id=head, party_id=entity, kind="nominated")
                 if whole and attach and declared:
-                    cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind="lost")
+                    cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=carried(roots[candidate], label_text))
                 elif not margin and whole and not attach:
                     cs.add(
                         "outcome",

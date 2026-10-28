@@ -1216,7 +1216,7 @@ def emit() -> Path:
                         [contest, result_set],
                     ).fetchall():
                         declared[option_id] = declared_kind
-                        by_name.append((re.sub(r"[^a-z]", "", str(label).lower()), declared_kind))
+                        by_name.append((re.sub(r"[^a-z ]", "", str(label).lower()).split(), declared_kind))
                 cs.add(
                     "note",
                     entity_id=result_set,
@@ -1320,11 +1320,19 @@ def emit() -> Path:
                                 next(
                                     (
                                         declared_kind
-                                        for squashed, declared_kind in reversed(by_name)
-                                        if SequenceMatcher(
-                                            None, squashed, re.sub(r"[^a-z]", "", candidate.lower())
-                                        ).ratio()
-                                        >= 0.9
+                                        for words, declared_kind in reversed(by_name)
+                                        if words
+                                        and (
+                                            SequenceMatcher(
+                                                None, "".join(words), re.sub(r"[^a-z]", "", candidate.lower())
+                                            ).ratio()
+                                            >= 0.9
+                                            or (
+                                                (parts := re.sub(r"[^a-z ]", "", candidate.lower()).split())
+                                                and parts[0][:2] == words[0][:2]
+                                                and SequenceMatcher(None, parts[-1], words[-1]).ratio() >= 0.75
+                                            )
+                                        )
                                     ),
                                     "lost",
                                 ),

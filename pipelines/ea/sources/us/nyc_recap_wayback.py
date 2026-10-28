@@ -238,7 +238,7 @@ def read_page(page: str) -> dict[str, object] | None:
         labels.append(
             {
                 "party": (above or party or "").strip(),
-                "name": " / ".join(below) if TICKETS.search(" ".join(office)) else " ".join(below),
+                "name": (" / ".join(below) if TICKETS.search(" ".join(office)) else " ".join(below)).replace("*", "").strip(),
                 "code": code,
             }
         )
@@ -425,14 +425,15 @@ def parse() -> None:
     for fragment, day, kind in FILES:
         url, entry = next((u, e) for u, e in sorted(index.items()) if fragment in u)
         accumulated: dict[tuple[str, str], dict[str, object]] = {}
+        county_only = day < "2002-01-01" and day != "2000-11-07"
         for g in read_file(DATA / "raw" / SOURCE / str(entry["file"])):
-            if day < "2002-01-01" and g["scope"] == "CITY OF NEW YORK":
+            if county_only and g["scope"] == "CITY OF NEW YORK":
                 parts = [(str(r["label"]).title(), r) for r in g["rows"] if r["label"] in COUNTIES]
                 if not parts:
                     continue
             else:
                 county = COUNTY_NAMES.get(str(g["scope"]))
-                if county is None or g["grain"] == "county" or (day < "2002-01-01" and g["grain"] == "ed"):
+                if county is None or g["grain"] == "county" or (county_only and g["grain"] == "ed"):
                     continue
                 parts = [(county, None)]
             if OUT_OF_SCOPE.search(str(g["office"])):
@@ -454,13 +455,13 @@ def parse() -> None:
                 if signature in slot["seen"]:
                     continue
                 slot["seen"].append(signature)
-                if city_row is None and slot["labels"] != labels:
+                if city_row is None and [(x["code"], x["party"]) for x in slot["labels"]] != [(x["code"], x["party"]) for x in labels]:
                     skipped.append(f"{fragment} page {g['page']} {g['office'][:50]}: columns differ between blocks")
                     continue
                 total = city_row or next(r for r in g["rows"] if r["label"] == "TOTAL")
                 scat = total["tail"][0] if g["scat"] and total["tail"] else 0
                 slot["total"] += sum(total["cands"]) + scat
-                if day < "2002-01-01":
+                if county_only:
                     units = [("total", "TOTAL", total)]
                 elif g["grain"] == "ed":
                     ad = g["block"] or int(re.search(r"(\d+)(?:ST|ND|RD|TH) ASSEMBLY DISTRICT", str(g["office"]))[1])
