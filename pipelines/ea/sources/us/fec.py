@@ -26,7 +26,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.fec"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 DOCUMENTS = "https://www.fec.gov/documents/"
 FILES = {
@@ -768,6 +768,7 @@ PARTIES = {
     "Unity Party of America": "Unity Party America",
     "Veterans Party": "Veterans Party of America",
     "Constitution Party NJ": "Constitution Party",
+    "Hawaiins/LaRouche": "Hawaiians for LaRouche",
 }
 NATIONAL = {
     "Democratic Party",
@@ -828,6 +829,13 @@ COMPOUND = {
     "Republican/Democratic": ["Republican", "Democratic"],
     "Democratic and Republican": ["Republican", "Democratic"],
     "Republican (Write-In)": ["Republican"],
+    "Natural Law/New Alliance": ["Natural Law", "New Alliance"],
+}
+COMBINED = {
+    "VT:natural-law-new-alliance": "Two parties' joint nomination in the FEC's table, minted as one party; the candidate "
+    "is now nominated by each.",
+    "HI:hawaiins-larouche": "The FEC's shortened, misspelled form of the ballot designation Hawaiians for LaRouche, "
+    "which replaces it.",
 }
 REORDERED = {(1984, "PA", "Gus Yatron"): ["Democratic", "Republican"]}
 LRL = "https://www.lrl.mn.gov/history/caucus.aspx"
@@ -5096,6 +5104,10 @@ def emit() -> Path:
                     kind="regional_branch",
                     valid_from=None,
                 )
+        for (value,) in conn.execute(
+            "select value from external_id where scheme = 'us.party' and value = any(%s)", [list(COMBINED)]
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=cs.key("us.party", value), reason=COMBINED[value])
         for folded, into in FOLDED.items():
             if cs.key("us.party", folded) != cs.key("us.party", into):
                 cs.merge(cs.key("us.party", folded), cs.key("us.party", into))
@@ -6628,4 +6640,14 @@ def emit() -> Path:
         for row in cs.rows.get("result_set", []):
             if str(row["id"]) in demoted:
                 row["is_default"] = False
+        moved = {
+            str(id): person
+            for id, person in conn.execute(
+                """select k.id, k.person_id from candidacy k join changeset s on s.id = k.changeset_id
+                   where s.pipeline = 'splits'"""
+            ).fetchall()
+        }
+        for row in cs.rows.get("candidacy", []):
+            if str(row["id"]) in moved:
+                row["person_id"] = moved[str(row["id"])]
         return cs.write()
