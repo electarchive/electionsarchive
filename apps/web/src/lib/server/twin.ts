@@ -7,6 +7,8 @@ import {
   COUNTRY_COLUMNS,
   headline,
   levelLabel,
+  READY_COUNTS,
+  READY_LEVELS,
   measures,
   label as reasonLabel,
   REASONS,
@@ -624,14 +626,23 @@ function coverageMarkdown(
               m.coverage_ready_partial(),
               m.coverage_ready_bare(),
               m.coverage_ready_absent(),
+              m.coverage_ready_population_column(),
               m.coverage_ready_states(),
             ],
-            data.readiness.map((row) => [
+            READY_LEVELS.flatMap((level) =>
+              data.readiness.filter((row) => row.level === level),
+            ).map((row) => [
               levelLabel(data.polity, row.level),
-              `${percent(row.complete / Math.max(1, row.total), 1)} (${m.coverage_ready_of({ complete: count(row.complete), total: count(row.total) })})`,
+              `${percent(row.complete / Math.max(1, row.total), 1)} (${(READY_COUNTS[row.level] ?? m.coverage_ready_of)({ complete: count(row.complete), total: count(row.total) })})`,
               count(row.partial),
               count(row.bare),
               count(row.absent),
+              row.population > 0
+                ? m.coverage_ready_population({
+                    share: percent(row.populationReady / row.population, 1),
+                    total: count(row.population),
+                  })
+                : null,
               row.states
                 .filter((state) => state.complete < state.total)
                 .map(

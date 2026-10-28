@@ -70,6 +70,9 @@ const Ready = {
   absent: v.number(),
   bare: v.number(),
   partial: v.number(),
+  population: v.number(),
+  populationReady: v.number(),
+  populationAbsent: v.number(),
 };
 const Note = v.object({
   goal: v.string(),
@@ -471,7 +474,9 @@ export const coverage = {
           number
         >
       >(sql`
-        select g.level, g.year, g.state, g.total, g.complete, g.absent, g.bare, g.partial
+        select g.level, g.year, g.state, g.total, g.complete, g.absent, g.bare, g.partial,
+          coalesce(g.population_total, 0)::float8 as population, coalesce(g.population_complete, 0)::float8 as "populationReady",
+          coalesce(g.population_absent, 0)::float8 as "populationAbsent"
         from coverage_goal g
         where g.polity = ${input.polity} and g.goal = 'readiness'
         order by g.level, g.state
@@ -493,6 +498,9 @@ export const coverage = {
             absent: 0,
             bare: 0,
             partial: 0,
+            population: 0,
+            populationReady: 0,
+            populationAbsent: 0,
             states: [],
           };
           readiness.push(group);

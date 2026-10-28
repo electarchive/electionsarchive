@@ -17,6 +17,8 @@
     headline,
     label,
     levelLabel,
+    READY_COUNTS,
+    READY_LEVELS,
     measures,
     REASONS,
     spans,
@@ -82,15 +84,6 @@
     coarse: m.coverage_reason_turnout_coarse_def,
     absent: m.coverage_reason_turnout_absent_def,
   };
-  const READY_LEVELS = [
-    "us_house",
-    "us_senate",
-    "governor",
-    "statewide_exec",
-    "state_upper",
-    "state_lower",
-    "statewide_measure",
-  ];
   const READY = [
     {
       reason: "complete",
@@ -825,11 +818,19 @@
                 {/each}
               </span>
               <span class="text-xs text-muted-foreground tabular-nums"
-                >{m.coverage_ready_of({
+                >{(READY_COUNTS[row.level] ?? m.coverage_ready_of)({
                   complete: count(row.complete),
                   total: count(row.total),
                 })}</span
               >
+              {#if row.population > 0}
+                <span class="text-xs text-muted-foreground tabular-nums"
+                  >{m.coverage_ready_population({
+                    share: percent(row.populationReady / row.population, 1),
+                    total: count(row.population),
+                  })}</span
+                >
+              {/if}
               {#if short.length > 0}
                 <details class="group text-xs">
                   <summary
@@ -889,7 +890,7 @@
                   >{source == null
                     ? note.readiness
                     : `${source.publisher ?? ""}, ${source.title}`}</a
-                >
+                >. {note.note}
               </li>
             {/each}
           </ul>

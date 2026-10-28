@@ -449,6 +449,29 @@ export function label(goal: Goal, reason: Reason, polity = "us") {
   )();
 }
 
+export const READY_LEVELS = [
+  "us_house",
+  "us_senate",
+  "governor",
+  "statewide_exec",
+  "judicial",
+  "state_upper",
+  "state_lower",
+  "statewide_measure",
+  "county_office",
+  "municipal",
+  "school_board",
+  "local_judicial",
+];
+
+export const READY_COUNTS: Record<string, typeof m.coverage_ready_of> = {
+  judicial: m.coverage_ready_of_states,
+  county_office: m.coverage_ready_of_governments,
+  municipal: m.coverage_ready_of_governments,
+  school_board: m.coverage_ready_of_governments,
+  local_judicial: m.coverage_ready_of_held,
+};
+
 export const LEVELS: Record<string, () => string> = {
   president: m.coverage_level_president,
   us_senate: m.coverage_level_us_senate,
@@ -456,6 +479,10 @@ export const LEVELS: Record<string, () => string> = {
   governor: m.coverage_level_governor,
   statewide_exec: m.coverage_level_statewide_exec,
   judicial: m.coverage_level_judicial,
+  county_office: m.coverage_level_county_office,
+  municipal: m.coverage_level_municipal,
+  school_board: m.coverage_level_school_board,
+  local_judicial: m.coverage_level_local_judicial,
   state_upper: m.coverage_level_state_upper,
   state_lower: m.coverage_level_state_lower,
   statewide_measure: m.coverage_level_statewide_measure,
