@@ -16,11 +16,11 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.it.interno import key as interno_key
 from ea.sources.it.interno import proper
-from ea.sources.it.storico import EXISTING, NEW, NEW_OVERRIDES, NORTH, OVERRIDES, SOUTH, SYMBOLS
+from ea.sources.it.storico import EXISTING, NEW, NEW_OVERRIDES, NORTH, OVERRIDES, SOUTH, SYMBOLS, cased
 from ea.store import DATA, connect
 
 SOURCE = "it.senato"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/senato/senato-{day:%Y%m%d}.zip"
 ELIGENDO = (
@@ -1484,9 +1484,10 @@ def emit() -> Path:
                 parties[key] = cs.key(*key)
                 if parties[key] in cs.minted:
                     cs.add("party", id=parties[key], kind=kind, polity_id=italy)
-                    name(parties[key], full, "it")
                     if abbreviation is not None:
                         name(parties[key], abbreviation, "it", "abbreviation")
+                if parties[key] in cs.minted or not (known or parties[key] in cs.survivors.values()):
+                    name(parties[key], full if known else cased(label), "it")
             return parties[key]
 
         coalitions = {**SYMBOLS, "POLO DELLE LIBERTA'": NORTH, "POLO BUON GOVERNO": SOUTH}

@@ -69,7 +69,6 @@ def emit() -> Path:
         for title, origin, target, kind, day, precision in RELATIONS:
             cs.add(
                 "party_relation",
-                id=cs.key(f"{SOURCE}.relation", f"{origin}:{target}:{kind}"),
                 from_party_id=origin,
                 to_party_id=target,
                 kind=kind,

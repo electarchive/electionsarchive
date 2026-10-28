@@ -79,7 +79,7 @@ PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...
         "Rassemblement Pour la République": "RPR",
         "Union pour un mouvement populaire": "UMP",
         "Union for the French democracy": "UDF",
-        "Union for French Democracy (UDF) + Rally for the Republic (RPR)": "UDF–RPR",
+        "Union for French Democracy\u00a0(UDF) +\u00a0Rally for the Republic\u00a0(RPR)": "UDF–RPR",
         "Extrême droite": "Far right",
     },
     "it": {

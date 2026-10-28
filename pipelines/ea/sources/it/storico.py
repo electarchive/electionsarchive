@@ -13,13 +13,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.it.interno import MANDATES, proper
+from ea.sources.it.interno import ACCENTS, MANDATES, proper
 from ea.sources.it.interno import PARTIES as INTERNO_PARTIES
 from ea.sources.it.interno import key as estero_key
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/camera"
 ELIGENDO = "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=I&tpe=A&lev0=0&levsut0=0&es0=S&ms=S"
@@ -555,6 +555,169 @@ GROUP_LABELS = {
         "LIBERI E UGUALI": "LIBERI E UGUALI",
     },
 }
+PARTICLES = {
+    "di",
+    "del",
+    "dello",
+    "della",
+    "dei",
+    "degli",
+    "delle",
+    "dell",
+    "d",
+    "e",
+    "ed",
+    "per",
+    "con",
+    "la",
+    "le",
+    "il",
+    "lo",
+    "gli",
+    "l",
+    "i",
+    "a",
+    "al",
+    "allo",
+    "alla",
+    "ai",
+    "agli",
+    "alle",
+    "all",
+    "in",
+    "nel",
+    "nello",
+    "nella",
+    "nei",
+    "negli",
+    "nelle",
+    "nell",
+    "da",
+    "dal",
+    "dallo",
+    "dalla",
+    "dai",
+    "dall",
+    "su",
+    "sul",
+    "sulla",
+    "sull",
+    "tra",
+    "fra",
+    "o",
+    "un",
+    "una",
+    "uno",
+    "de",
+    "du",
+    "des",
+    "et",
+    "der",
+    "die",
+    "und",
+    "für",
+    "to",
+}
+ACRONYMS = {
+    "DC",
+    "PSDI",
+    "PRI",
+    "PLI",
+    "PCI",
+    "PSI",
+    "MSI",
+    "DN",
+    "PDUP",
+    "PSIUP",
+    "UDEUR",
+    "UDC",
+    "CCD",
+    "CDU",
+    "PDS",
+    "PPI",
+    "UDR",
+    "IDV",
+    "SEL",
+    "NPSI",
+    "PSU",
+    "MSFT",
+    "PNM",
+    "PMP",
+    "PDIUM",
+    "DS",
+    "MPA",
+    "USEI",
+    "MAIE",
+    "SVP",
+    "PSD",
+    "PRC",
+    "PDCI",
+    "UV",
+    "RV",
+    "PD",
+    "AN",
+    "FI",
+    "DP",
+    "PATT",
+    "ALPE",
+    "MIS",
+    "PPST",
+    "PPTT",
+    "IV",
+    "PC",
+    "PS",
+    "DL",
+    "UPT",
+    "UVP",
+    "EPAV",
+    "MIR",
+    "MID",
+    "ALA",
+    "FNS",
+    "PNI",
+    "UDP",
+    "PST",
+    "UNSIPO",
+}
+SPELLED = {
+    "VALLEE": "VALLÉE",
+    "VALDOTAINE": "VALDÔTAINE",
+    "VALDOTAINS": "VALDÔTAINS",
+    "PROGRES": "PROGRÈS",
+    "FEDERALISME": "FÉDÉRALISME",
+    "DEMOCRATIE": "DÉMOCRATIE",
+    "LIBERTE'": "LIBERTÉ",
+    "GRUNE": "GRÜNE",
+    "VERC": "VËRC",
+    "FUR": "FÜR",
+    "UNITA": "UNITÀ",
+    "VA'": "VA’",
+}
+
+
+def cased(label: str) -> str:
+    text = re.sub(r"\b(D|L|DELL|DALL|ALL|NELL|SULL|QUELL|UN)\?(?=[A-Z])", r"\1'", label.strip())
+    text = re.sub(r"\s*\?\s+", " – ", text).replace(" - ", " – ")
+    text = re.sub(r"[A-Z']+", lambda match: SPELLED.get(match[0], match[0]), text)
+    text = re.sub(r"(?<=CH)E'|(?<=\bN)E'", "É", text)
+    text = re.sub(r"([AEIOU])'(?=([A-Z])?)", lambda match: ACCENTS[match[1]] + (" " if match[2] else ""), text)
+    words = []
+    for index, word in enumerate(re.split(r"(\s+)", text)):
+        segments = re.split(r"([.\-'’/+,()?!])", word)
+        parts = []
+        for at, segment in enumerate(segments):
+            lowered = segment.lower()
+            dotted = at + 1 < len(segments) and segments[at + 1] == "."
+            if not segment.isalpha() or segment in ACRONYMS or (len(segment) == 1 and dotted):
+                parts.append(segment)
+            elif lowered in PARTICLES and not dotted and (index > 0 or any(parts)) and segments[at - 1] != "-":
+                parts.append(lowered)
+            elif len(segment) <= 3 and not dotted and re.search("[AEIOUÀÈÌÒÙÉ]", segment) is None:
+                parts.append(segment)
+            else:
+                parts.append(lowered[0].upper() + lowered[1:])
+        words.append("".join(parts))
+    return "".join(words)
 
 
 def fold(text: str) -> str:
@@ -1133,9 +1296,10 @@ def emit() -> Path:
                 parties[key] = cs.key(*key)
                 if parties[key] in cs.minted:
                     cs.add("party", id=parties[key], kind=kind, polity_id=italy)
-                    name(parties[key], full, "it")
                     if abbreviation is not None:
                         name(parties[key], abbreviation, "it", "abbreviation")
+                if parties[key] in cs.minted or not (known or parties[key] in cs.survivors.values()):
+                    name(parties[key], full if known else cased(label), "it")
             return parties[key]
 
         def value_row(result_set: UUID, unit: UUID, option: UUID | None, measure: int, value: int) -> None:
