@@ -113,6 +113,27 @@ PROSECUTORS = {
     "solicitor",
     "public-defender",
 }
+MARICOPA_CONSTABLES = {
+    "CHRIS WIBLE": "Arcadia Biltmore",
+    "PEDRO ANTONIO LOPEZ": "Country Meadows",
+    "JAMES RICH": "Desert Ridge",
+    "RHYS TORRES": "Dreamy Draw",
+    "THOMAS RAY": "Highland",
+    "DENICE M GARCIA": "Maryvale",
+    "MATTHEW H MCRAE": "Moon Valley",
+    "JON CURTIS": "North Mesa",
+    "CARLOS F GASTELUM": "San Tan",
+    "MICHAEL A FLORES": "Agua Fria",
+}
+SPLIT = {"2024-11-05:AZ:04013:constable"}
+WITHDRAWN = (
+    "Withdrawn: MEDSL's file lists Maricopa County's 2024 constable races under one countywide title. The archive now "
+    "holds them as ten separate races, one for each justice precinct, as the county's official canvass names them."
+)
+RETIRED = (
+    "Maricopa County's 2024 constable races, filed under one countywide title in MEDSL's file; the archive holds "
+    "each justice precinct's race separately."
+)
 OFFICES = [
     ("sheriff", "Sheriff", False, r"(?:HIGH )?SHERIFF"),
     ("coroner", "Coroner", False, r"CORONER"),
@@ -1157,7 +1178,11 @@ def parse() -> None:
                 .then(pl.col("candidate").str.slice(pl.col("office").str.len_chars() + 1))
                 .otherwise("candidate")
             )
-            .filter(~pl.col("candidate").str.contains(r"(?i)^(?:no name|no one|no petition filed|no vote)$"))
+            .filter(
+                ~pl.col("candidate").str.contains(
+                    r"(?i)^(?:no name|no one|no petition filed|no vote|(?:\w+ )?continued)$"
+                )
+            )
             .with_columns(total=(pl.col("mode") == "TOTAL").any().over(*precinct, "candidate", "party_detailed"))
             .filter(pl.col("total") == (pl.col("mode") == "TOTAL"))
             .with_columns(
@@ -1343,6 +1368,30 @@ def parse() -> None:
             ),
             remainder=pl.col("remainder") | (pl.col("special") == "TRUE"),
         ).with_columns(seat=pl.when(pl.col("scheme") != "us.judicial_district").then("seat"))
+        if year == 2024 and state == "AZ":
+            maricopa = (pl.col("county_fips") == "04013") & (pl.col("key") == "constable") & pl.col("seat").is_null()
+            justices = (
+                frame.filter(maricopa & ~pl.col("pooled"))
+                .select(
+                    "jurisdiction_name",
+                    "precinct",
+                    justice=pl.col("candidate")
+                    .str.to_uppercase()
+                    .replace_strict(MARICOPA_CONSTABLES, default=None)
+                    .map_elements(lambda name: f"{name} Justice Precinct", return_dtype=pl.String),
+                )
+                .unique(["jurisdiction_name", "precinct"])
+            )
+            frame = (
+                frame.join(justices, on=["jurisdiction_name", "precinct"], how="left", nulls_equal=True)
+                .with_columns(
+                    seat=pl.when(maricopa).then("justice").otherwise("seat"),
+                    remainder=pl.when(maricopa & (pl.col("justice") == "Agua Fria Justice Precinct"))
+                    .then(True)
+                    .otherwise("remainder"),
+                )
+                .drop("justice")
+            )
         contest = ["day", "code", "key", "seat", "remainder"]
         summary = frame.group_by(contest).agg(
             pl.col("state_po").first(),
@@ -1385,6 +1434,16 @@ def parse() -> None:
             .with_columns(
                 candidate=pl.when("pooled").then(pl.lit("WRITE-IN")).otherwise("candidate"),
                 party_detailed=pl.when("pooled").then(None).otherwise("party_detailed"),
+            )
+            .with_columns(
+                candidate=pl.when(
+                    pl.col("candidate")
+                    .str.to_lowercase()
+                    .str.starts_with(pl.col("key").str.replace_all("-", " ") + " ")
+                )
+                .then(pl.col("candidate").str.slice(pl.col("key").str.len_chars() + 1))
+                .otherwise("candidate")
+                .str.replace(r"(?i)^(?:circuit clerk|county clerk|sheriff|assessor|constable|mayor) ", "")
             )
             .with_columns(
                 unit=pl.when(
@@ -2380,11 +2439,28 @@ def emit() -> Path:
                     entity_id=person,
                     reason="A surname-only name in MEDSL's files, resolved to the full name",
                 )
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "supersedes_id", "completeness")
+        for row in conn.execute(
+            f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+                join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                where x.value = any(%s) and r.status <> 'withdrawn'""",
+            [sorted(SPLIT)],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn", is_default=False)
+            cs.add("note", id=uuid5(row[0], "withdrawn"), entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
+        for (contest,) in conn.execute(
+            """select x.entity_id from external_id x where x.scheme = 'us.contest' and x.value = any(%s)
+               and exists (select from result_set r where r.contest_id = x.entity_id)
+               and not exists (select from result_set r where r.contest_id = x.entity_id and r.status <> 'withdrawn')""",
+            [sorted(SPLIT)],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=contest, reason=RETIRED)
         cs.pool("A scattering line in MEDSL's files read as a candidate")
         cs.remainders(
             "A write-in mark, vote tally, placeholder, office title, or ballot answer in MEDSL's files read as a candidate",
             r"^(?:yes|no)\y|\((?:w/i|write[- ]?in)\)$|^write[- ]?in\y|\swrite[- ]?in$|declared write|valid votes"
-            r"|^(?:no name|no one|no petition filed|no vote)$|&[a-z]+;|^circuit clerk ",
+            r"|^(?:no name|no one|no petition filed|no vote|commission continued)$|&[a-z]+;"
+            r"|^(?:circuit clerk|county clerk|sheriff|assessor|constable|mayor) ",
         )
         cs.clear()
         return cs.write()
