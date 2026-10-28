@@ -27,7 +27,7 @@ from ea.sources.tr.ysk import DIGITIZED, PROVINCES, REGISTERED, VALID, VOTERS, V
 from ea.store import DATA, connect
 
 SOURCE = "tr.die_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 LIBRARY = "https://kutuphane.tuik.gov.tr/pdf"
@@ -1147,10 +1147,37 @@ SUSPECT_1973 = (
 )
 
 
+STRAYS = {
+    (1963, "34", "Küçükköy"): "Eyüp",
+    (1973, "34", "Avcdar"): "Bakırköy",
+    (1973, "34", "Kocasinan"): "Bakırköy",
+    (1973, "34", "Safra"): "Bakırköy",
+    (1973, "34", "Yenibosna"): "Bakırköy",
+    (1973, "34", "Alibeyköy"): "Eyüp",
+    (1973, "34", "Kemerburgaz"): "Eyüp",
+    (1973, "34", "Sağmalcılar"): "Eyüp",
+    (1973, "34", "Küçükköy"): "Gaziosmanpaşa",
+    (1973, "34", "Ümıaniye"): "Üsküdar",
+}
+
+
 def emit() -> Path:
     parsed_rows = pl.read_parquet(PARSED / "rows.parquet")
     parsed_values = pl.read_parquet(PARSED / "values.parquet")
     parsed_mayors = pl.read_parquet(PARSED / "mayors.parquet")
+    carved: dict[tuple[str, str], set[tuple[str, str]]] = {}
+    primary: dict[tuple[str, str], tuple[str, str]] = {}
+    firsts: dict[tuple[str, str], date] = {}
+    for row in pl.read_csv(Path(__file__).with_name("tkgm_parents.tsv"), separator="\t", infer_schema=False).iter_rows(
+        named=True
+    ):
+        firsts[row["plate"], norm(row["ilce"])] = date.fromisoformat(row["first"])
+        primary[row["plate"], norm(row["ilce"])] = (row["parent_plate"], row["parent"])
+        for parent_plate, parent in [
+            (row["parent_plate"], row["parent"]),
+            *(other.split(":") for other in (row["also"] or "").split(";") if other),
+        ]:
+            carved.setdefault((row["plate"], norm(row["ilce"])), set()).add((parent_plate, norm(parent)))
     measures = {"registered": REGISTERED, "voters": VOTERS, "valid": VALID}
     with connect() as conn:
         cs = Changeset(
@@ -1162,6 +1189,14 @@ def emit() -> Path:
             polity="TR",
         )
         turkey = cs.polity("TR")
+        pairs = list(
+            pl.read_csv(
+                Path(__file__).with_name("die_local_renamed.tsv"), separator="\t", infer_schema=False
+            ).iter_rows()
+        )
+        for old, new in pairs:
+            cs.renamed[new] = old
+            cs.renamed[f"{new[:4]}:{new[11:]}"] = f"{old[:4]}:{old[11:]}"
 
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -1175,6 +1210,14 @@ def emit() -> Path:
         minted_ilce: list[str] = []
         areas = {unit: area for area, unit in equals.items()}
         polities = {value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'")}
+        settled = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x join changeset c on c.id = x.changeset_id
+                   where x.scheme = 'tr.polity' and c.pipeline <> %s""",
+                [SOURCE],
+            )
+        }
         offices: set[UUID] = set()
         known_units = {
             (scheme, code)
@@ -1250,17 +1293,47 @@ def emit() -> Path:
 
             named_areas: dict[str, dict[str, set[UUID]]] = {}
             current_names: dict[str, dict[str, set[UUID]]] = {}
-            for area, text, start, end, plate_code in conn.execute(
+            unfounded: dict[tuple[str, str], str] = {}
+            kin: dict[str, set[str]] = {}
+            ilce_names = conn.execute(
                 """select a.id, n.text, n.valid_from, n.valid_to, pc.code from area a
                    join name n on n.entity_id = a.id and n.lang = 'tr'
                    join area_parent ap on ap.area_id = a.id
                    join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
                    join area_code pc on pc.area_id = p.id
                    where a.scheme_code = 'tr.ilce'"""
-            ).fetchall():
+            ).fetchall()
+            founding = {
+                area: firsts[plate_code, norm(text)]
+                for area, text, _, _, plate_code in ilce_names
+                if (plate_code, norm(text)) in firsts
+            }
+            plates_of: dict[UUID, set[str]] = {}
+            for area, _, _, _, plate_code in ilce_names:
+                plates_of.setdefault(area, set()).add(plate_code)
+            for plates in plates_of.values():
+                for plate_code in plates:
+                    kin.setdefault(plate_code, set()).update(plates)
+            for area, text, start, end, plate_code in ilce_names:
                 named_areas.setdefault(plate_code, {}).setdefault(norm(text), set()).add(area)
-                if (start is None or start <= day) and (end is None or end > day):
+                founded = founding.get(area, day) <= day
+                if not founded:
+                    unfounded[plate_code, norm(text)] = slug(text)
+                if founded and (start is None or start <= day) and (end is None or end > day):
                     current_names.setdefault(plate_code, {}).setdefault(norm(text), set()).add(area)
+            area_names: dict[UUID, set[str]] = {}
+            for by_name in current_names.values():
+                for form, found in by_name.items():
+                    for area in found:
+                        area_names.setdefault(area, set()).add(form)
+
+            def lineage(start: tuple[str, str]) -> set[str]:
+                seen_keys, frontier = set(), {start}
+                while frontier:
+                    seen_keys |= frontier
+                    frontier = {up for at in frontier for up in carved.get(at, set())} - seen_keys
+                return {form for _, form in seen_keys}
+
             resolved: dict[tuple[str, str], tuple[UUID, str]] = {}
 
             def trims(label: str) -> list[str]:
@@ -1403,7 +1476,9 @@ def emit() -> Path:
 
             grouped = {(table, seq): frame for (table, seq), frame in values.group_by("table", "seq")}
 
-            def mayor_contest(row: dict, stored: dict, parts: list[str], english: str, plate: str, unit: UUID) -> None:
+            def mayor_contest(
+                row: dict, stored: dict, parts: list[str], english: str, plate: str, unit: UUID, district: str
+            ) -> None:
                 key = "-".join(parts)
                 path = "tr/" + "/".join(parts)
                 polity = cs.key("tr.polity", key)
@@ -1436,7 +1511,6 @@ def emit() -> Path:
                 cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
                 contest_key = f"{day}:{key}-mayor"
                 contest = cs.key("tr.contest", contest_key)
-                district = current.get(plate, "Merkez")
                 cs.add(
                     "contest",
                     id=contest,
@@ -1622,6 +1696,7 @@ def emit() -> Path:
                     ):
                         order.setdefault((plate_number, text), []).append(level)
                     seen_names: dict[tuple[int, str], int] = {}
+                    printed = {norm(v) for text in listed["name"].unique() for v in variants(text)}
                     levels = []
                     for plate_number, text, level, bucak in listed.select(
                         "plate", "name", "level", "bucak"
@@ -1632,10 +1707,12 @@ def emit() -> Path:
                             levels.append(level)
                         elif len(order.get((plate_number, text), [])) > 1:
                             levels.append(order[(plate_number, text)][min(index, len(order[(plate_number, text)]) - 1)])
-                        elif bucak or lookup(f"{plate_number:02}", text, None, strict=True) is None:
-                            levels.append("belde")
                         else:
-                            levels.append("district")
+                            before = len(matched)
+                            hit = None if bucak else lookup(f"{plate_number:02}", text, None, strict=True)
+                            names = set() if hit is None else area_names.get(hit[0], set())
+                            fuzzy = len(matched) > before
+                            levels.append("belde" if hit is None or fuzzy and printed & names else "district")
                     listed = listed.with_columns(level=pl.Series(levels))
                 for row in listed.iter_rows(named=True):
                     if row["level"] == "national":
@@ -1658,6 +1735,9 @@ def emit() -> Path:
                     province_slug = slug(province)
                     frame = grouped.get((table, row["seq"]))
                     if frame is None:
+                        if row["level"] == "district" and table != "il_genel":
+                            ilce(plate, row["name"], row["alias"])
+                            current[plate] = resolved[(plate, row["name"])][1]
                         continue
                     if row["level"] == "province":
                         level, unit = "province", cs.unit("tr.il", plate)
@@ -1673,15 +1753,42 @@ def emit() -> Path:
                             central = label == "Merkez"
                             parts = [province_slug] if central else [province_slug, slug(label)]
                             english = province if central else label
-                            scheme = "tr.ilce"
+                            scheme, code = "tr.ilce", "-".join(parts)
+                            district = label
                         else:
                             district = current.get(plate, "Merkez")
                             words = row["name"].split()
-                            while len(words) > 1 and (len(words[-1]) <= 2 or any(c.isdigit() for c in words[-1])):
+                            while len(words) > 1 and (
+                                len(words[-1]) <= 2 or ")" in words[-1] or any(c.isdigit() for c in words[-1])
+                            ):
                                 words.pop()
                             while len(words) > 1 and (len(words[0]) <= 2 or any(c.isdigit() for c in words[0])):
                                 words.pop(0)
                             row = {**row, "name": " ".join(words)}
+                            within = area_names.get(areas.get(ilce(plate, district, None)), set())
+                            reach = {plate} | {other for other in kin.get(plate, set()) if other >= "68"}
+                            itself = [
+                                (other, norm(row["name"]))
+                                for other in sorted(reach)
+                                if (other, norm(row["name"])) in primary and (other, norm(row["name"])) in unfounded
+                            ]
+                            if (year, plate, row["name"]) in STRAYS:
+                                district = STRAYS[year, plate, row["name"]]
+                            elif itself and not lineage(itself[0]) & within:
+                                up = primary[itself[0]]
+                                while (up[0], norm(up[1])) in primary and (up[0], norm(up[1])) in unfounded:
+                                    up = primary[up[0], norm(up[1])]
+                                label = up[1].removesuffix(" Merkez")
+                                target = areas.get(ilce(plate, label, None))
+                                printed = sorted(
+                                    text
+                                    for (at, other), (unit_id, text) in resolved.items()
+                                    if at == plate
+                                    and other in districts.get(plate, set())
+                                    and areas.get(unit_id) == target
+                                )
+                                district = "Merkez" if label == province else printed[0] if printed else label
+                                within = area_names.get(areas.get(ilce(plate, district, None)), set())
                             options = [
                                 [province_slug, "merkez" if district == "Merkez" else slug(district), slug(row["name"])]
                             ]
@@ -1695,24 +1802,37 @@ def emit() -> Path:
                                         slug(row["alias"]),
                                     ]
                                 )
-                            parts = next((o for o in options if "-".join(o) in polities), options[0])
+                            moved = [
+                                [province_slug, later, slug(row["name"])]
+                                for at, later in sorted(unfounded.items())
+                                if at[0] in reach
+                                and f"{province_slug}-{later}-{slug(row['name'])}" in settled
+                                and lineage(at) & within
+                            ]
+                            parts = (
+                                moved[0]
+                                if len(moved) == 1
+                                else next((o for o in options if "-".join(o) in polities), options[0])
+                            )
                             english = row["name"]
-                            scheme = "tr.belde" if len(parts) == 3 else "tr.ilce"
+                            scheme, code = (
+                                "tr.belde",
+                                "-".join(parts if len(parts) == 3 and parts in options else options[0]),
+                            )
                         key = "-".join(parts)
                         if (year, table, key) in seen:
                             raise ValueError(f"two {year} municipalities share {key}")
                         seen.add((year, table, key))
-                        unit = cs.unit(scheme, key)
-                        if (scheme, key) not in known_units:
-                            known_units.add((scheme, key))
-                            district = current.get(plate, "Merkez")
+                        unit = cs.unit(scheme, code)
+                        if (scheme, code) not in known_units:
+                            known_units.add((scheme, code))
                             area = areas.get(ilce(plate, district, None)) or cs.area("tr.il", plate)
                             cs.add(
                                 "reporting_unit",
                                 id=unit,
                                 polity_id=turkey,
                                 scheme_code=scheme,
-                                code=key,
+                                code=code,
                                 area_relation="within",
                                 area_id=area,
                                 kind="aggregate",
@@ -1732,7 +1852,7 @@ def emit() -> Path:
                         else:
                             put(sets[level], unit, option_of(contest_key, column), VOTES, cell)
                     if table == "belediye_baskani" and level == "municipality":
-                        mayor_contest(row, stored, parts, english, plate, unit)
+                        mayor_contest(row, stored, parts, english, plate, unit, district)
                 for level, missing in unread.items():
                     if missing and level in sets:
                         cs.add(
@@ -1762,4 +1882,49 @@ def emit() -> Path:
                 pl.col("channel", "measure", "count_round").cast(pl.Int16), source_id=pl.lit(None, pl.String)
             ),
         )
+        staged = {table: {str(row["id"]) for row in cs.rows.get(table, [])} for table in ("contest", "election")}
+        holders = {str(row["polity_id"]) for row in cs.rows.get("election", [])}
+        mine = dict(
+            conn.execute(
+                """select x.value, x.entity_id::text from external_id x join changeset c on c.id = x.changeset_id
+                   where x.scheme = 'tr.polity' and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
+        for old, new in pairs:
+            before, after = old[11:], new[11:]
+            if before != after and before in mine and mine[before] not in holders:
+                cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
+                cs.merge(cs.key("tr.office", f"{before}-mayor"), cs.key("tr.office", f"{after}-mayor"))
+        reason = "A duplicate of a 1963 or 1973 municipal race, left behind when the archive re-read the race's town."
+        for contest, election in conn.execute(
+            """select c.id::text, c.election_id::text from contest c join changeset ch on ch.id = c.changeset_id
+               where ch.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if contest not in staged["contest"]:
+                cs.add("entity_retirement", entity_id=contest, reason=reason)
+                if election not in staged["election"]:
+                    cs.add("entity_retirement", entity_id=election, reason=reason)
+                for (person,) in conn.execute(
+                    """select distinct cy.person_id::text from candidacy cy join contest_option o on o.id = cy.option_id
+                       join external_id x on x.entity_id = cy.person_id and x.scheme = %s
+                       where o.contest_id = %s and not exists (
+                         select from candidacy other join contest_option oo on oo.id = other.option_id
+                         where other.person_id = cy.person_id and oo.contest_id <> %s)""",
+                    [f"{SOURCE}.person", contest, contest],
+                ).fetchall():
+                    cs.add("entity_retirement", entity_id=person, reason=reason)
+        used = set(facts["unit_id"].unique())
+        for (unit,) in conn.execute(
+            """select ru.id::text from reporting_unit ru join changeset ch on ch.id = ru.changeset_id
+               where ch.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if unit not in used:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=unit,
+                    reason="A 1963 or 1973 reporting unit the archive no longer uses, after re-reading which ilçe each town was in.",
+                )
         return cs.write()
