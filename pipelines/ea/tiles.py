@@ -4,7 +4,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from ea import plane
+from ea import display, plane
 from ea.store import DATA, ROOT, connect
 
 FEATURES_SQL = """
@@ -12,6 +12,7 @@ select '{{"type":"Feature","id":' || k || ',"properties":{{}},"geometry":' || ST
 from (
     select a.k, {plane} as p
     from area a join area_geometry g on g.area_id = a.id
+    left join display.clipped c on c.area_id = g.area_id and c.valid = g.valid and c.mask_version = %s
     where a.scheme_code = %s and g.valid @> %s::date
 ) x
 where p is not null
@@ -35,23 +36,33 @@ def build(prefix: str | None) -> str:
                order by bs.scheme_code, bs.vintage""",
             [prefix or ""],
         ).fetchall()
+    with connect() as conn:
+        mask = display.ensure(conn)
     summaries: list[str] = []
     with tempfile.TemporaryDirectory() as scratch:
         for scheme_code, vintage, as_of, features, attribution in sets:
             if not features:
                 continue
+            with connect() as conn:
+                fresh = display.refresh(conn, scheme_code, as_of, mask)
             areas_path = Path(scratch) / "areas.geojsonl"
             labels_path = Path(scratch) / "labels.geojsonl"
             output = Path(scratch) / "out.pmtiles"
             with connect() as conn, areas_path.open("w") as areas_file, labels_path.open("w") as labels_file:
                 for column, handle in (
-                    ("g.geom", areas_file),
-                    ("coalesce(g.label_point, ST_PointOnSurface(g.geom))", labels_file),
+                    ("coalesce(c.geom, g.geom)", areas_file),
+                    (
+                        (
+                            "coalesce(case when c.geom is null or ST_Covers(c.geom, g.label_point) then g.label_point end,"
+                            " ST_PointOnSurface(coalesce(c.geom, g.geom)))"
+                        ),
+                        labels_file,
+                    ),
                 ):
                     query = FEATURES_SQL.format(plane=plane.sql(column, scheme_code))
                     with conn.cursor(name="features") as cursor:
                         cursor.itersize = 10_000
-                        cursor.execute(query, [scheme_code, as_of])
+                        cursor.execute(query, [mask, scheme_code, as_of])
                         for (line,) in cursor:
                             handle.write(f"{line}\n")
             subprocess.run(
@@ -61,7 +72,7 @@ def build(prefix: str | None) -> str:
                     "--force",
                     "--quiet",
                     "--projection=EPSG:3857",
-                    f"--attribution={attribution or ''}",
+                    f"--attribution={chr(10).join(filter(None, [attribution, display.ATTRIBUTION]))}",
                     "--minimum-zoom=0",
                     f"--maximum-zoom={DENSE.get(scheme_code, 12 if features >= 5_000 else 10)}",
                     "--simplification=4",
@@ -87,7 +98,7 @@ def build(prefix: str | None) -> str:
             shutil.move(output, destination)
             size_mb = destination.stat().st_size / 1_000_000
             summaries.append(
-                f"{scheme_code} {vintage}: {features} features, {size_mb:.2f} MB, {destination.relative_to(ROOT)}"
+                f"{scheme_code} {vintage}: {features} features, {fresh} clipped, {size_mb:.2f} MB, {destination.relative_to(ROOT)}"
             )
     summaries.append(f"{len(sets)} archives in {time.monotonic() - started:.0f}s")
     return "\n".join(summaries)
