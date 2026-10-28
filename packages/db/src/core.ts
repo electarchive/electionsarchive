@@ -3,7 +3,7 @@ import { users } from "./schema.ts";
 import { pgEnum, pgTable, uuid, integer, smallint, text, boolean, customType, date, jsonb, timestamp, numeric, real, char, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
-export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting", "ex_officio"])
+export const acquiredVia = pgEnum("acquired_via", ["elected", "appointed", "trustee", "succession", "list_replacement", "co_opted", "acting", "ex_officio", "indirect"])
 export const allianceKind = pgEnum("alliance_kind", ["electoral_alliance", "joint_list", "federation", "apparentement"])
 export const areaEventKind = pgEnum("area_event_kind", ["created", "dissolved", "renamed", "recoded", "split", "merged", "absorbed", "boundary_changed", "transferred"])
 export const areaEventRole = pgEnum("area_event_role", ["from", "to"])
@@ -49,6 +49,7 @@ export const reportingUnitKind = pgEnum("reporting_unit_kind", ["standard", "abr
 export const resultKind = pgEnum("result_kind", ["counted", "tacit", "show_of_hands", "appointed"])
 export const resultSetStatus = pgEnum("result_set_status", ["active", "superseded", "annulled", "withdrawn"])
 export const schemeKind = pgEnum("scheme_kind", ["administrative", "electoral_district", "precinct", "census", "synthetic"])
+export const seatCategory = pgEnum("seat_category", ["elected", "appointed", "ex_officio", "indirect"])
 export const sourceKind = pgEnum("source_kind", ["official_body", "aggregator", "compendium", "news_agency", "academic", "community", "wikidata"])
 export const stage = pgEnum("stage", ["live", "preliminary", "official", "certified", "court_revised", "recount", "alternative", "notional"])
 export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
@@ -253,6 +254,21 @@ export const bodySize = pgTable("body_size", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.bodyId, table.valid], name: "body_size_pkey"}),
+]);
+
+export const bodySizePart = pgTable("body_size_part", {
+	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
+	category: seatCategory().notNull(),
+	seats: integer().notNull(),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.bodyId, table.category, table.valid], name: "body_size_part_pkey"}),
 ]);
 
 export const boundarySet = pgTable("boundary_set", {
