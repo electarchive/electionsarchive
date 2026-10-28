@@ -3148,7 +3148,7 @@ function electionMarkdown(
                           : row.parties
                               .map(
                                 (entry) =>
-                                  `${named(entry.party)} ${count(entry.seats)}`,
+                                  `${entry.party == null && entry.isIndependent ? m.seats_independents() : named(entry.party)} ${count(entry.seats)}`,
                               )
                               .join(", ")
                     }${tier.kind === "measure" || row.tacit === 0 ? "" : `. ${m.tiers_tacit({ count: row.tacit })}`}`,

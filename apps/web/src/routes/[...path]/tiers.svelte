@@ -91,9 +91,11 @@
     party == null
       ? swatch(null, "")
       : swatch(parties.get(party)?.color ?? null, `party:${party}`);
-  const label = (party: string | null) =>
+  const label = (party: string | null, isIndependent = false) =>
     party == null
-      ? m.record_none()
+      ? isIndependent
+        ? m.seats_independents()
+        : m.record_none()
       : (parties.get(party)?.short ?? parties.get(party)?.label ?? "");
   const lean = (party: string | null) =>
     (party == null ? null : parties.get(party)?.lean) ?? Infinity;
@@ -253,19 +255,19 @@
               tier.kind === "governor"
                 ? m.tiers_tile_party({
                     place: place.place,
-                    party: label(first?.party ?? null),
+                    party: label(first?.party ?? null, first?.isIndependent),
                   })
                 : row.tacit > 0
                   ? m.tiers_tile_tacit({
                       place: place.place,
-                      party: label(first?.party ?? null),
+                      party: label(first?.party ?? null, first?.isIndependent),
                       seats: count(first?.seats ?? 0),
                       total: count(filled),
                       tacit: count(row.tacit),
                     })
                   : m.tiers_tile_seats({
                       place: place.place,
-                      party: label(first?.party ?? null),
+                      party: label(first?.party ?? null, first?.isIndependent),
                       seats: count(first?.seats ?? 0),
                       total: count(filled),
                     }),

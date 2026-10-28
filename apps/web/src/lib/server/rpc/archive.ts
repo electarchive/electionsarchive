@@ -14645,6 +14645,7 @@ export const elections = {
                 parties: v.array(
                   v.object({
                     party: v.nullable(v.string()),
+                    isIndependent: v.boolean(),
                     seats: v.number(),
                   }),
                 ),
@@ -14669,6 +14670,7 @@ export const elections = {
         polity: string;
         tier: string | null;
         party: string | null;
+        independent: boolean;
         seats: number;
         races: number;
         passed: number;
@@ -14738,7 +14740,8 @@ export const elections = {
           from roots r where r.tier = 'measure'
           group by r.part
         )
-        select w.part, p.polity_id as polity, w.tier, coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
+        select w.part, p.polity_id as polity, w.tier, n.party,
+          n.party is null and exists (select from candidacy cy where cy.option_id = w.id and cy.is_independent) as independent,
           sum(w.seats)::int as seats, count(distinct w.contest)::int as races, 0 as passed,
           coalesce(sum(w.seats) filter (where w.tacit), 0)::int as tacit
         from winners w
@@ -14748,12 +14751,18 @@ export const elections = {
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
           and br.kind = 'regional_branch' and br.valid @> p.date_from
         left join entity_merge bm on bm.entity_id = br.parent_party_id
-        group by w.part, p.polity_id, w.tier, coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id)
+        cross join lateral (
+          select coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id,
+            (select min(cn.party_id::text)::uuid from candidacy cy
+              join candidacy_nomination cn on cn.candidacy_id = cy.id and cn.kind = 'nominated'
+              where cy.option_id = w.id having count(distinct cn.party_id) = 1)) as party
+        ) n
+        group by w.part, p.polity_id, w.tier, n.party, 5
         union all
-        select m.part, p.polity_id, 'measure', null, 0, m.races, m.passed, 0
+        select m.part, p.polity_id, 'measure', null, false, 0, m.races, m.passed, 0
         from measures m join parts p on p.id = m.part
         union all
-        select p.id, p.polity_id, null, null, 0, 0, 0, 0 from parts p
+        select p.id, p.polity_id, null, null, false, 0, 0, 0, 0 from parts p
       `);
       const parts = [...new Set(found.rows.map((row) => row.part))];
       const polities = [...new Set(found.rows.map((row) => row.polity))];
@@ -14814,7 +14823,11 @@ export const elections = {
                   tacit,
                   parties: group
                     .filter((row) => row.seats > 0)
-                    .map((row) => ({ party: row.party, seats: row.seats }))
+                    .map((row) => ({
+                      party: row.party,
+                      isIndependent: row.independent,
+                      seats: row.seats,
+                    }))
                     .toSorted((a, b) => b.seats - a.seats),
                 };
               })
