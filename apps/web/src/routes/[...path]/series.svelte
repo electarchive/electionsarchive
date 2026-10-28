@@ -340,7 +340,8 @@
                       {
                         "z-10 border-foreground highlighter font-semibold":
                           entry.current,
-                        "text-muted-foreground hover:z-10 hover:border-foreground hover:text-foreground":
+                        "text-muted-foreground": !entry.current,
+                        "hover:z-10 hover:border-foreground hover:text-foreground":
                           !entry.current && entry.href != null,
                       },
                       { "line-through": entry.annulled },
