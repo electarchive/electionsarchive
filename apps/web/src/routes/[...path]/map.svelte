@@ -983,9 +983,14 @@
       return;
     }
     const href = unit(path);
-    const box = engine.shape(engine.tiles(layer), k);
+    const box = remote.some((entry) => entry.k === k)
+      ? null
+      : engine.shape(engine.tiles(layer), k);
     if (box == null || calm) {
-      void goto(href);
+      opening = k;
+      void goto(href).finally(() => {
+        opening = null;
+      });
       return;
     }
     opening = k;
@@ -1964,7 +1969,13 @@
     {/if}
     {#if opening != null}
       <p
-        class="pointer-events-none absolute inset-x-0 inset-be-3 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit"
+        class={cn(
+          "pointer-events-none absolute inset-x-0 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit",
+          {
+            "inset-be-3": remote.length === 0,
+            "inset-be-11 pointer-coarse:inset-be-14": remote.length > 0,
+          },
+        )}
         role="status"
         transition:fade={{ duration: calm ? 0 : 120 }}
       >
@@ -2200,7 +2211,7 @@
         ></a
       >
     {/if}
-    {#if current != null || (pointer != null && (empty != null || beside != null))}
+    {#if opening == null && (current != null || (pointer != null && (empty != null || beside != null)))}
       <div
         class={cn(
           "pointer-events-none absolute inset-s-0 inset-bs-0 grid gap-1.5 rounded-sm bg-card/95 px-3 py-2.5 shadow-menu ring-1 ring-border max-sm:hidden",
