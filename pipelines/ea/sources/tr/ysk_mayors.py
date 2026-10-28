@@ -66,7 +66,9 @@ def parse() -> None:
         province_words = [w[4] for w in sorted(heading, key=lambda w: w[0])]
         if "Çevresi:" not in province_words:
             raise ValueError("page without a seçim çevresi")
-        province = " ".join(province_words[province_words.index("Çevresi:") + 1 :])
+        province_heading = " ".join(province_words[province_words.index("Çevresi:") + 1 :])
+        province = province_heading
+        page_rows: list[dict[str, object]] = []
         vocabulary = {piece for party in PARTIES_2004 for piece in party.split()}
         top = next(w[1] for w in words if w[4] == "Sandık")
         header = sorted((w for w in words if top - 5 < w[1] < top + 22 and w[4] in vocabulary), key=lambda w: w[2])
@@ -82,9 +84,10 @@ def parse() -> None:
                     break
             else:
                 raise ValueError(f"{province}: header word {header[cursor][4]} is no party")
+        header_bottom = max(w[3] for w in words if w[4] in ("sayısı", "oranı", "(%)", "ve") and top - 5 < w[1] < top + 22)
         lines: dict[int, list[tuple[float, float, str]]] = {}
         for x0, y0, x1, _, text in words:
-            if y0 > top + 24:
+            if y0 > header_bottom:
                 lines.setdefault(round(y0 / 3), []).append((x0, x1, text))
         labels = [
             (key, line)
@@ -92,14 +95,15 @@ def parse() -> None:
             if all(not (INTEGER.match(t) or re.match(r"^[\d.]+,\d$", t)) for _, _, t in line)
         ]
         for key, line in sorted(lines.items()):
-            left = {c: t for _, c, t in line if INTEGER.match(t) and c < 360}
-            numbers = [(c, t) for _, c, t in line if INTEGER.match(t)]
+            ordered = sorted(line)
+            split = max((i + 1 for i, (_, _, t) in enumerate(ordered) if not INTEGER.match(t)), default=0)
+            numbers = [(c, t) for _, c, t in ordered[split:]]
             near = sorted(numbers, key=lambda n: n[0])
             columns = [round(c) for c, _ in near]
             cutoff = min(edges.values()) - 35
             if len([c for c in columns if c < cutoff]) != 4:
                 continue
-            own = sorted((x0, t) for x0, x1, t in line if x1 < 185 and not INTEGER.match(t))
+            own = [(x0, t) for x0, _, t in ordered[:split]]
             name = (
                 (" ".join(t for _, t in own), own[0][0])
                 if own
@@ -110,10 +114,7 @@ def parse() -> None:
             )
             if name is None:
                 raise ValueError(f"{province}: row without a name at {key}")
-            level = "province" if name[1] < 60 else "district" if name[1] < 100 else "town"
-            if level == "province":
-                province = name[0]
-            record: dict[str, object] = {"province": province, "name": name[0], "level": level}
+            record: dict[str, object] = {"province": province, "name": name[0], "level": None, "indent": name[1]}
             for (c, t), field in zip([n for n in near if n[0] < cutoff], ("boxes", "registered", "voters", "valid"), strict=True):
                 record[field] = int(t.replace(".", ""))
             for c, t in near:
@@ -124,6 +125,26 @@ def parse() -> None:
                     if abs(edges[party] - c) > 14:
                         raise ValueError(f"{province} {name[0]}: {t} at {c} is under no party")
                     record[party] = int(t.replace(".", ""))
+            if name[0] != "Türkiye":
+                page_rows.append(record)
+        starts = sorted({round(float(r["indent"])) for r in page_rows})
+        clusters: list[list[int]] = []
+        for start in starts:
+            if clusters and start - clusters[-1][-1] <= 12:
+                clusters[-1].append(start)
+            else:
+                clusters.append([start])
+        has_province = bool(page_rows) and str(page_rows[0]["name"]) == province_heading
+        names = ["province", "district", "town"] if has_province else ["district", "town"] if len(clusters) > 1 else ["town"]
+        if len(clusters) > len(names):
+            raise ValueError(f"{province_heading}: {len(clusters)} indent levels {[(r["name"], round(float(r["indent"]))) for r in page_rows][:6]} {clusters}")
+        for record in page_rows:
+            rank = next(i for i, cluster in enumerate(clusters) if round(float(record["indent"])) in cluster)
+            record["level"] = names[rank]
+            if record["level"] == "province":
+                province = str(record["name"])
+            record["province"] = province
+            del record["indent"]
             rows.append(record)
     frame = pl.DataFrame(rows, infer_schema_length=None).fill_null(0)
     PARSED.mkdir(parents=True, exist_ok=True)
