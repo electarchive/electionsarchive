@@ -3176,18 +3176,34 @@ async function tabulate(
     .filter((item) => item.votes > 0 || item.lead)
     .toArray()
     .toSorted((a, b) => b.votes - a.votes);
-  const kept = ranked.filter((item, index) => index < 8 || item.lead);
+  const fields = new Map<string, number>();
+  for (const { row, result } of compared) {
+    for (const entry of result) {
+      if (row.isContest && entry.current != null) {
+        fields.set(entry.key, (fields.get(entry.key) ?? 0) + 1);
+      }
+    }
+  }
+  const isOwn = (key: string) =>
+    key.startsWith("person:") && fields.get(key) === 1;
+  const kept = ranked.filter(
+    (item, index) => index < 8 || item.lead || isOwn(item.key),
+  );
   const position = new Map(kept.map((item, index) => [item.key, index]));
   const relit = new Map(
     kept.flatMap((item) =>
-      item.color == null || rows.every((row) => !row.isContest)
+      item.color == null ||
+      rows.every((row) => !row.isContest) ||
+      isOwn(item.key)
         ? []
         : [[item.key, item.color] as const],
     ),
   );
   separate(
     relit,
-    kept.map((item) => [item.key, item.votes] as const),
+    kept.flatMap((item) =>
+      isOwn(item.key) ? [] : [[item.key, item.votes] as const],
+    ),
     new Map(),
     true,
   );
