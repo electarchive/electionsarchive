@@ -771,6 +771,22 @@ def emit() -> Path:
                 )
                 counts["tr.il council dissolved"] = counts.get("tr.il council dissolved", 0) + 1
 
+        claimed: dict[UUID, str | None] = {
+            polity: None if start is None else str(start)
+            for polity, start in conn.execute(
+                """select pt.polity_id, min(lower(pt.valid)) from polity_territory pt
+                   join changeset c on c.id = pt.changeset_id
+                   where c.pipeline <> %s group by pt.polity_id having bool_and(not lower_inf(pt.valid))""",
+                [SOURCE],
+            )
+        } | {
+            polity: ""
+            for (polity,) in conn.execute(
+                """select pt.polity_id from polity_territory pt join changeset c on c.id = pt.changeset_id
+                   where c.pipeline <> %s and lower_inf(pt.valid)""",
+                [SOURCE],
+            )
+        }
         metros: dict[str, UUID] = {}
         for row in events.filter(pl.col("scheme") == "tr.buyuksehir").sort("date").iter_rows(named=True):
             day, plate, kind = row["date"], row["plate"], row["kind"]
@@ -793,14 +809,15 @@ def emit() -> Path:
                     valid_to_precision="day",
                 )
                 polity = polities.get(slug(PROVINCES[int(plate) - 1]))
-                if polity is not None:
+                held = None if polity is None else claimed.get(polity)
+                if polity is not None and (held is None or held > day):
                     cs.add(
                         "polity_territory",
                         polity_id=polity,
                         area_id=area,
                         valid_from=day,
                         valid_from_precision="day",
-                        valid_to=None,
+                        valid_to=held,
                         valid_to_precision="day",
                     )
                 event(
