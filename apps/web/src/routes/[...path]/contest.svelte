@@ -482,6 +482,9 @@
       ),
     };
   });
+  const isMapped = $derived(
+    (drawn != null && placed != null) || locating != null,
+  );
   const unmapped = $derived.by(() => {
     const total = contest.current?.valid ?? 0;
     let mapped = 0;
@@ -1564,9 +1567,6 @@
       {m.map_rebuilding()}
     </p>
   {/if}
-  {const isMapped = $derived(
-    (drawn != null && placed != null) || locating != null,
-  )}
   {#snippet summary()}
     <div
       class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
@@ -2176,7 +2176,7 @@
   </section>
 {/if}
 
-{#if contest.sets.length > 0 || contest.citations.length > 0 || checks.length > 0 || boundaries.length > 0}
+{#if contest.sets.length > 0 || contest.citations.length > 0 || checks.length > 0 || (isMapped && boundaries.length > 0)}
   <section
     id="sources"
     class={cn("col-span-12 grid content-start gap-4 bg-card px-3.5 py-3", {
@@ -2280,7 +2280,7 @@
         </ul>
       </div>
     {/if}
-    {#if boundaries.length > 0}
+    {#if isMapped && boundaries.length > 0}
       <div id="boundaries">
         <h2 class="mbe-1.5 text-[0.8125rem] font-bold">
           {m.boundaries_title()}
