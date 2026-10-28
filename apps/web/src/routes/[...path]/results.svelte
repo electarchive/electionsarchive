@@ -72,7 +72,14 @@
   const isWrittenIn = $derived.by(() => {
     const named = rows.filter((row) => row.current?.person != null);
     return (
-      named.length > 0 && named.every((row) => row.current?.isWriteIn === true)
+      named.length > 0 &&
+      named.every((row) => row.current?.isWriteIn === true) &&
+      !rows.some(
+        (row) =>
+          row.current?.person == null &&
+          row.key.startsWith("party:") &&
+          (row.current?.votes ?? 0) > 0,
+      )
     );
   });
   const crowned = $derived.by(() => {

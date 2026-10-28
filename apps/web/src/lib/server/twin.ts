@@ -4112,7 +4112,14 @@ function resultsMarkdown(
   );
   const named = contest.rows.filter((row) => row.current?.person != null);
   const isWrittenIn =
-    named.length > 0 && named.every((row) => row.current?.isWriteIn === true);
+    named.length > 0 &&
+    named.every((row) => row.current?.isWriteIn === true) &&
+    !contest.rows.some(
+      (row) =>
+        row.current?.person == null &&
+        row.key.startsWith("party:") &&
+        (row.current?.votes ?? 0) > 0,
+    );
   const joined = new Intl.ListFormat(getLocale(), { type: "conjunction" });
   const parties = new Map(
     contest.rows.map((row) => [
