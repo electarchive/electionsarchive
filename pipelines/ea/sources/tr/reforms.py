@@ -1,15 +1,22 @@
 import re
 import subprocess
+from pathlib import Path
+from typing import LiteralString
 from urllib.parse import quote
+from uuid import UUID
 
 import polars as pl
 
 from ea import raw
-from ea.sources.tr import ysk_candidates_2009
+from ea.changeset import Changeset, slug
+from ea.sources.tr import ysk_candidates_2009, ysk_mayors
 from ea.sources.tr.ysk import PROVINCES, upper
-from ea.store import DATA
+from ea.sources.tr.ysk_local import title
+from ea.store import DATA, connect
 
 SOURCE = "tr.reforms"
+VERSION = "1"
+LICENSE = "Laws and official texts may be freely reproduced (Law 5846 art. 31)."
 PARSED = DATA / "parsed" / SOURCE
 ICISLERI = "https://icisleri.gov.tr/kurumlar/icisleri.gov.tr/IcSite/illeridaresi/" + quote(
     "İstatistiki Bilgiler/İl İdaresi ve Mülki Bölümler/il ilce kurulus tarihleri_2019.pdf"
@@ -37,6 +44,51 @@ LAWS = {
     4200: "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.4200.pdf",
 }
 GAZETTE_6447 = "https://www.resmigazete.gov.tr/eskiler/2013/03/20130322-2.htm"
+ORIGINALS = {
+    "5216": "https://www.resmigazete.gov.tr/eskiler/2004/07/20040723.htm",
+    "5747": "https://www.resmigazete.gov.tr/eskiler/2008/03/20080322M1-1.htm",
+    "6360": "https://www.resmigazete.gov.tr/eskiler/2012/12/20121206-1.htm",
+    "6447": GAZETTE_6447,
+}
+POPULATION = (
+    "https://dergipark.org.tr/en/download/article-file/1026739",
+    (
+        "Ozan Yetkin, Türkiye'de Büyükşehir Belediyelerinin Yapısı ve Geleceği, Akademik Düşünce Dergisi 1 (2020), "
+        "Tablo 1, from DİE's 2000 General Population Census"
+    ),
+)
+CENTERS = {
+    "06": (39.92645, 32.85616, 3_203_362, "OpenStreetMap way 1062345960, Ankara Valiliği"),
+    "35": (38.41875, 27.12970, 2_232_265, "OpenStreetMap node 8086003630, İzmir İli Hükümet Konağı"),
+    "01": (37.00034, 35.31335, 1_130_710, "OpenStreetMap way 441966319, Adana Valiliği"),
+    "16": (40.18269, 29.06615, 1_194_687, "OpenStreetMap way 254569407, Bursa Valiliği"),
+    "27": (37.06567, 37.37574, 853_513, "OpenStreetMap way 237059449, Gaziantep Valiliği"),
+    "42": (37.87150, 32.49897, 742_690, "OpenStreetMap relation 7585286, Konya Valilik"),
+    "38": (38.72289, 35.48911, 536_392, "OpenStreetMap way 255192353, Kayseri Valiliği"),
+    "07": (36.88810, 30.70264, 603_190, "OpenStreetMap way 431455136, Antalya Valiliği"),
+    "21": (37.91588, 40.22522, 545_983, "OpenStreetMap node 4592219790, Diyarbakır Valiliği"),
+    "25": (39.90001, 41.26455, 361_235, "OpenStreetMap node 14206239502, Erzurum Valiliği"),
+    "26": (39.77066, 30.51782, 482_793, "OpenStreetMap way 308893739, Eskişehir Valiliği"),
+    "33": (
+        36.79900,
+        34.63200,
+        537_842,
+        (
+            "Uray Caddesi in central Mersin, the seat of government before the move to Akkent; the building used in "
+            "2004 is not located, so the center may be off by about a kilometer"
+        ),
+    ),
+    "55": (41.28971, 36.33824, 363_180, "OpenStreetMap way 88116142, Samsun Valiliği"),
+    "54": (
+        40.77900,
+        30.40100,
+        303_989,
+        (
+            "the site of the Sakarya Hükümet Konağı on Çark Caddesi, demolished after the 1999 earthquake; the "
+            "governorship's temporary building in 2004 is not located, so the center may be off by about a kilometer"
+        ),
+    ),
+}
 GUIDE_6360 = "https://www.tbb.gov.tr/sites/default/files/storage/userfiles/rehber_ve_bilgi_notlari/6360_torba_personel_rehber.pdf"
 SPELLINGS = {"AFYON": "AFYONKARAHİSAR"}
 ROW = re.compile(
@@ -107,8 +159,16 @@ METROPOLISES = [
 ]
 PROVINCE_RULE_6360 = [plate for plate, *_ in METROPOLISES if plate not in ("34", "41")]
 RADIUS = (
-    "Law 5216 provisional art. 2: a circle around the valilik building, 20 km up to 1 million people, "
-    "30 km to 2 million, 50 km above, inside the province"
+    "Law 5216 provisional art. 2(1) as enacted in 2004: a circle around the valilik building, 20 km up to 1 million "
+    "people, 30 km to 2 million, 50 km above, inside the province. Its second paragraph made the ilçes inside the "
+    "circle metropolitan ilçe municipalities and the beldes first-tier municipalities; Law 5747 art. 3 repealed it "
+    "in 2008. Its fourth paragraph let municipalities and villages of those ilçes outside the circle join within six "
+    "months by council decision, which this boundary does not show."
+)
+VILLAGES = (
+    "Law 5216 provisional art. 2(3) as enacted in 2004: every köy inside the circle lost its legal personality and "
+    "became a mahalle, forest villages excepted; the metropolitan council assigned each to an ilçe or first-tier "
+    "municipality."
 )
 BOUNDARY_RULES = [
     *(
@@ -245,8 +305,10 @@ def fetch() -> None:
     raw.fetch(SOURCE, ICISLERI, suffix=".pdf")
     for link in LAWS.values():
         raw.fetch(SOURCE, link, suffix=".pdf")
-    raw.fetch(SOURCE, GAZETTE_6447, suffix=".htm")
     raw.fetch(SOURCE, GUIDE_6360, suffix=".pdf")
+    raw.fetch(SOURCE, POPULATION[0], suffix=".pdf")
+    for link in ORIGINALS.values():
+        raw.fetch(SOURCE, link, suffix=".htm")
 
 
 def text(link: str) -> str:
@@ -335,6 +397,10 @@ def parse() -> None:
         events.append(event(day, law, gazette, "created", "tr.buyuksehir", plate, name, rule="municipal"))
     for plate, name, day, law, gazette, rule, note in BOUNDARY_RULES:
         events.append(event(day, law, gazette, "boundary_changed", "tr.buyuksehir", plate, name, rule=rule, note=note))
+        if rule == "radius":
+            events.append(
+                event(day, law, gazette, "villages_converted", "tr.buyuksehir", plate, name, rule=rule, note=VILLAGES)
+            )
     for plate, old, new in (("41", "İzmit", "Kocaeli"), ("54", "Adapazarı", "Sakarya")):
         events.append(
             event("2008-03-22", "5747", "22.03.2008-26824", "renamed", "tr.buyuksehir", plate, new, sources=[old])
@@ -465,3 +531,419 @@ def parse() -> None:
         )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(events, infer_schema_length=None).write_parquet(PARSED / "events.parquet")
+
+
+def emit() -> Path:
+    events = pl.read_parquet(PARSED / "events.parquet")
+    founded = pl.read_parquet(PARSED / "ilce_2019.parquet")
+    plates = {upper(name): f"{plate:02}" for plate, name in enumerate(PROVINCES, 1)}
+    aliases = {"EYÜP": "EYÜPSULTAN", "BAHŞİLİ": "BAHŞILI", "ONDOKUZMAYIS": "19-MAY"}
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary=(
+                "Turkey's administrative reforms: ilçe and province creations, splits, renames, and closures; "
+                "metropolitan municipalities with their dated boundaries; belde municipalities as dated areas tied to "
+                "their polities, with the 5747 and 6360 closures; and the provincial councils 6360 abolished"
+            ),
+            polity="TR",
+        )
+
+        def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official", **valid: object) -> None:
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                kind=kind,
+                is_preferred=kind == "official",
+                valid_from=valid.get("valid_from"),
+                valid_from_precision="day",
+                valid_to=valid.get("valid_to"),
+                valid_to_precision="day",
+            )
+
+        def source(
+            publisher: str, heading: str, url: str | None, kind: str = "official_body", **extra: str | None
+        ) -> UUID:
+            id = cs.source(publisher, heading)
+            if id in cs.minted:
+                cs.add(
+                    "source",
+                    id=id,
+                    kind=kind,
+                    publisher=publisher,
+                    title=heading,
+                    url=url,
+                    license=extra.get("license", LICENSE),
+                    license_url=None,
+                    attribution=publisher,
+                    notes=extra.get("notes"),
+                )
+            return id
+
+        def event(kind: str, day: str, source_id: UUID, notes: str | None, members: list[tuple[UUID, str]]) -> None:
+            id = cs.key(f"{SOURCE}.event", f"{kind}:{day}:{':'.join(f'{role}={area}' for area, role in members)}")
+            cs.add("area_event", id=id, kind=kind, date=day, date_precision="day", source_id=source_id, notes=notes)
+            for area, role in dict.fromkeys(members):
+                cs.add("area_event_member", event_id=id, area_id=area, role=role)
+
+        turkey = cs.polity("TR")
+        interior = source("T.C. İçişleri Bakanlığı", "İl ve İlçe Kuruluş Tarihleri (2019)", ICISLERI)
+        cs.artifact(raw.cached(SOURCE, ICISLERI), interior)
+        laws: dict[str, UUID] = {}
+        for law, gazette in events.select("law", "gazette").unique().rows():
+            if law == "None":
+                laws[law] = interior
+                continue
+            numbers = [part.removeprefix("KHK ") for part in law.split("; ")]
+            words = " and ".join(
+                f"Decree-Law No. {part[4:]}" if part.startswith("KHK") else f"Law No. {part}"
+                for part in law.split("; ")
+            )
+            day, issue = gazette.split("-") if gazette != "None" else ("", "")
+            heading = f"{words} (Resmî Gazete {issue}, {day})" if issue else words
+            links = [LAWS[int(number)] for number in numbers if int(number) in LAWS]
+            laws[law] = source(
+                "Resmî Gazete",
+                heading,
+                links[0] if links else ORIGINALS.get(numbers[-1]),
+                notes="Consolidated text from the Mevzuat Bilgi Sistemi (mevzuat.gov.tr)" if links else None,
+            )
+            for link in [*links, *([ORIGINALS[numbers[-1]]] if numbers[-1] in ORIGINALS else [])]:
+                cs.artifact(raw.cached(SOURCE, link), laws[law])
+        guide = source("Türkiye Belediyeler Birliği", "6360 Sayılı Kanun Personel Rehberi", GUIDE_6360)
+        cs.artifact(raw.cached(SOURCE, GUIDE_6360), guide)
+        population = source(
+            "Akademik Düşünce Dergisi", POPULATION[1], POPULATION[0], kind="academic", license="No license stated."
+        )
+        cs.artifact(raw.cached(SOURCE, POPULATION[0]), population)
+
+        provinces = {plate: cs.area("tr.il", plate) for plate in plates.values()}
+        districts = {
+            (plate, upper(text)): id
+            for plate, text, id in conn.execute(
+                """select pc.code, n.text, a.id from area a
+                   join area_parent ap on ap.area_id = a.id
+                   join area p on p.id = ap.parent_id and p.scheme_code = 'tr.il'
+                   join area_code pc on pc.area_id = p.id
+                   join name n on n.entity_id = a.id
+                   where a.scheme_code = 'tr.ilce'"""
+            ).fetchall()
+        }
+        polities = {
+            value: id
+            for value, id in conn.execute("select value, entity_id from external_id where scheme = 'tr.polity'")
+        }
+
+        def find(plate: str, text: str) -> UUID | None:
+            label = aliases.get(upper(text), upper(text))
+            if label in ("MERKEZ", upper(PROVINCES[int(plate) - 1])):
+                label = f"{upper(PROVINCES[int(plate) - 1])} MERKEZ"
+            return districts.get((plate, label)) or districts.get((plate, upper(text)))
+
+        def geometry(query: LiteralString, params: list[object]) -> tuple[str, str, str, UUID] | None:
+            return conn.execute(query, params).fetchone()
+
+        historical: dict[tuple[str, str], UUID] = {}
+
+        def former(plate: str, text: str, day: str, law: str, successors: list[UUID]) -> UUID:
+            label = f"{PROVINCES[int(plate) - 1]} Merkez" if text == "Merkez" else text
+            area = cs.key(f"{SOURCE}.ilce", f"{plate}:{label}:{day}")
+            if (plate, label) not in historical:
+                historical[(plate, label)] = area
+                cs.add("area", id=area, scheme_code="tr.ilce")
+                name(area, label, valid_to=day)
+                cs.add(
+                    "area_parent",
+                    area_id=area,
+                    parent_id=provinces[plate],
+                    valid_from=None,
+                    valid_from_precision="day",
+                    valid_to=day,
+                    valid_to_precision="day",
+                )
+                shape = geometry(
+                    """select encode(st_asewkb(st_multi(st_union(geom))), 'hex'),
+                              encode(st_asewkb(st_pointonsurface(st_union(geom))), 'hex'), null, null
+                       from area_geometry where area_id = any(%s) and upper_inf(valid)""",
+                    [successors],
+                )
+                if successors and shape is not None and shape[0] is not None:
+                    cs.add(
+                        "area_geometry",
+                        area_id=area,
+                        valid_from=None,
+                        valid_from_precision="day",
+                        valid_to=day,
+                        valid_to_precision="day",
+                        geom=shape[0],
+                        label_point=shape[1],
+                        quality="synthetic",
+                        source_id=laws[law],
+                    )
+            return historical[(plate, label)]
+
+        counts: dict[str, int] = {}
+        missing: list[str] = []
+        for row in events.filter(pl.col("scheme") == "tr.ilce").iter_rows(named=True):
+            day, plate, kind = row["date"], row["plate"], row["kind"]
+            area = find(plate, row["name"])
+            targets = [find(plate, target) for target in row["targets"]]
+            successors = [target for target in targets if target is not None]
+            if len(successors) < len(targets) or (area is None and kind != "split"):
+                missing.append(f"{kind} {plate} {row['name']} {row['targets']}")
+                continue
+            if kind == "split":
+                members = [(area or former(plate, row["name"], day, row["law"], successors), "from")]
+                members += [(target, "to") for target in successors]
+            elif area is None:
+                continue
+            elif kind == "created":
+                members = [(area, "to")]
+            elif kind == "renamed":
+                members = [(area, "from"), (area, "to")]
+                old = row["sources"][0]
+                name(
+                    area,
+                    f"{PROVINCES[int(plate) - 1]} Merkez" if old == "Merkez" else old,
+                    kind="historical",
+                    valid_to=day,
+                )
+            else:
+                members = [*((former(plate, s, day, row["law"], []), "from") for s in row["sources"]), (area, "to")]
+            notes = row["note"] if kind != "renamed" else f"{row['sources'][0]} renamed {row['name']}. {row['note']}"
+            event(kind, day, interior if kind == "created" else laws[row["law"]], notes, members)
+            counts[f"tr.ilce {kind}"] = counts.get(f"tr.ilce {kind}", 0) + 1
+
+        for row in events.filter(pl.col("scheme") == "tr.il").iter_rows(named=True):
+            day, plate = row["date"], row["plate"]
+            if row["kind"] == "created":
+                older = [
+                    find(plate, ilce)
+                    for ilce, start in founded.filter((pl.col("plate") == plate) & ~pl.col("is_province_seat"))
+                    .select("name", "founded")
+                    .rows()
+                    if start is None or "-".join(reversed(start.split("."))) < day
+                ]
+                members = [*((a, "from") for a in [find(plate, "Merkez"), *older] if a is not None)]
+                notes = (
+                    f"{PROVINCES[int(plate) - 1]} became a province on {day}"
+                    + (f", formed from ilçes of {' and '.join(row['sources'])}" if row["sources"] else "")
+                    + ". The ilçes are those İçişleri dates before the province, matched to today's ilçes."
+                )
+                event("created", day, interior, notes, [*members, (provinces[plate], "to")])
+                counts["tr.il created"] = counts.get("tr.il created", 0) + 1
+            else:
+                province = PROVINCES[int(plate) - 1]
+                key = f"{slug(province)}-il-ozel-idaresi"
+                administration = cs.key("tr.polity", key)
+                if administration in cs.minted:
+                    cs.add("polity", id=administration, kind="region", iso_code=None)
+                    name(administration, f"{province} Special Provincial Administration", "en")
+                    name(administration, f"{province} İl Özel İdaresi", kind="native")
+                    cs.add("polity_parent", polity_id=administration, parent_id=turkey)
+                    cs.add("slug", path=f"tr/{slug(province)}/il-ozel-idaresi", entity_id=administration)
+                    cs.add(
+                        "polity_territory",
+                        polity_id=administration,
+                        area_id=provinces[plate],
+                        valid_from=None,
+                        valid_from_precision="day",
+                        valid_to=day,
+                        valid_to_precision="day",
+                    )
+                council = cs.key("tr.body", f"{key}:il-genel-meclisi")
+                if council in cs.minted:
+                    cs.add("body", id=council, polity_id=administration, kind="council")
+                    name(council, f"{province} Provincial Council", "en")
+                    name(council, f"{province} İl Genel Meclisi", kind="native")
+                cs.add(
+                    "body_event",
+                    id=cs.key(f"{SOURCE}.body_event", f"{key}:{day}"),
+                    body_id=council,
+                    kind="dissolved",
+                    date=day,
+                    date_precision="day",
+                    source_id=laws[row["law"]],
+                )
+                counts["tr.il council dissolved"] = counts.get("tr.il council dissolved", 0) + 1
+
+        metros: dict[str, UUID] = {}
+        for row in events.filter(pl.col("scheme") == "tr.buyuksehir").sort("date").iter_rows(named=True):
+            day, plate, kind = row["date"], row["plate"], row["kind"]
+            area = metros.setdefault(plate, cs.key("tr.buyuksehir", plate))
+            if kind == "created":
+                cs.add("area", id=area, scheme_code="tr.buyuksehir")
+                renamed = events.filter(
+                    (pl.col("scheme") == "tr.buyuksehir") & (pl.col("plate") == plate) & (pl.col("kind") == "renamed")
+                ).rows(named=True)
+                until = renamed[0]["date"] if renamed else None
+                name(area, f"{row['name']} Büyükşehir Belediyesi", valid_from=day, valid_to=until)
+                name(area, f"{row['name']} Metropolitan Municipality", "en", "english", valid_from=day, valid_to=until)
+                cs.add(
+                    "area_parent",
+                    area_id=area,
+                    parent_id=provinces[plate],
+                    valid_from=day,
+                    valid_from_precision="day",
+                    valid_to=None,
+                    valid_to_precision="day",
+                )
+                polity = polities.get(slug(PROVINCES[int(plate) - 1]))
+                if polity is not None:
+                    cs.add(
+                        "polity_territory",
+                        polity_id=polity,
+                        area_id=area,
+                        valid_from=day,
+                        valid_from_precision="day",
+                        valid_to=None,
+                        valid_to_precision="day",
+                    )
+                event(
+                    "created",
+                    day,
+                    laws[row["law"]],
+                    f"{row['name']} became a metropolitan municipality.",
+                    [(area, "to")],
+                )
+            elif kind == "renamed":
+                name(area, f"{row['name']} Büyükşehir Belediyesi", valid_from=day)
+                name(area, f"{row['name']} Metropolitan Municipality", "en", "english", valid_from=day)
+                event(
+                    "renamed",
+                    day,
+                    laws[row["law"]],
+                    f"{row['sources'][0]} renamed {row['name']}.",
+                    [(area, "from"), (area, "to")],
+                )
+            elif kind == "boundary_changed":
+                notes = str(row["note"])
+                if row["rule"] == "radius":
+                    lat, lon, people, center = CENTERS[plate]
+                    radius = 20 if people <= 1_000_000 else 30 if people <= 2_000_000 else 50
+                    shape = geometry(
+                        """select encode(st_asewkb(st_multi(st_collectionextract(st_makevalid(st_intersection(
+                                      st_buffer(st_setsrid(st_makepoint(%s, %s), 4326)::geography, %s)::geometry,
+                                      g.geom)), 3))), 'hex'),
+                                  encode(st_asewkb(st_setsrid(st_makepoint(%s, %s), 4326)), 'hex'), null, null
+                           from area_geometry g where g.area_id = %s and g.valid @> %s::date""",
+                        [lon, lat, radius * 1000, lon, lat, provinces[plate], day],
+                    )
+                    until = "2014-03-30"
+                    notes = (
+                        f"{notes} Drawn as a {radius} km circle for {people:,} people in the metropolitan municipality "
+                        f"at the 2000 census ({POPULATION[1]}), centered on {center}, and clipped to the province. "
+                        "The shape is approximate."
+                    )
+                else:
+                    shape = geometry(
+                        """select encode(st_asewkb(geom), 'hex'), encode(st_asewkb(label_point), 'hex'),
+                                  quality::text, source_id
+                           from area_geometry where area_id = %s and valid @> %s::date""",
+                        [provinces[plate], day],
+                    )
+                    until = None
+                if shape is None:
+                    raise ValueError(f"no province shape for {plate} on {day}")
+                cs.add(
+                    "area_geometry",
+                    area_id=area,
+                    valid_from=day,
+                    valid_from_precision="day",
+                    valid_to=until,
+                    valid_to_precision="day",
+                    geom=shape[0],
+                    label_point=shape[1],
+                    quality=shape[2] or "synthetic",
+                    source_id=shape[3] or laws[row["law"]],
+                )
+                event("boundary_changed", day, laws[row["law"]], notes, [(area, "from"), (area, "to")])
+            else:
+                counts[f"tr.buyuksehir {kind} (rule only)"] = counts.get(f"tr.buyuksehir {kind} (rule only)", 0) + 1
+                continue
+            counts[f"tr.buyuksehir {kind}"] = counts.get(f"tr.buyuksehir {kind}", 0) + 1
+
+        towns: dict[str, tuple[str, str, str]] = {}
+        district = ""
+        for level, province, label in (
+            pl.read_parquet(ysk_mayors.PARSED / "mayors_2004.parquet").select("level", "province", "name").rows()
+        ):
+            plate = plates[ysk_mayors.SPELLINGS.get(upper(province), upper(province))]
+            label = re.sub(r"\s*\(\d\)$", "", str(label)).strip()
+            if level == "district":
+                district = label
+            elif level == "town":
+                parts = [slug(PROVINCES[int(plate) - 1]), "merkez" if district.startswith("Merkez") else slug(district)]
+                towns["-".join([*parts, slug(label)])] = (plate, re.sub(r"\s*\(.*\)$", "", district), label)
+        candidates = pl.read_parquet(ysk_candidates_2009.PARSED / "candidates.parquet").filter(
+            pl.col("kind") == "belde"
+        )
+        for province, district, town in candidates.select("province", "district", "town").unique().rows():
+            plate = plates[str(province)]
+            central = district in (province, "MERKEZ") or district.endswith(" MERKEZ")
+            parts = [slug(PROVINCES[int(plate) - 1]), "merkez" if central else slug(district), slug(town)]
+            towns.setdefault("-".join(parts), (plate, "Merkez" if central else title(district), title(town)))
+        by_town: dict[tuple[str, str], list[str]] = {}
+        for key, (plate, _, town) in towns.items():
+            by_town.setdefault((plate, slug(town)), []).append(key)
+
+        def town_key(plate: str, parent: str, town: str) -> str:
+            province = PROVINCES[int(plate) - 1]
+            central = upper(parent) in ("MERKEZ", upper(province)) or upper(parent).endswith(" MERKEZ")
+            key = "-".join([slug(province), "merkez" if central else slug(parent), slug(town)])
+            if key not in towns and len(by_town.get((plate, slug(town)), [])) == 1:
+                key = by_town[(plate, slug(town))][0]
+            towns.setdefault(key, (plate, "Merkez" if central else title(parent), title(town)))
+            return key
+
+        closures: dict[str, tuple[str, str, list[str], str, str]] = {}
+        kept = 0
+        for row in events.filter(pl.col("scheme") == "tr.belde").sort("date").iter_rows(named=True):
+            key = town_key(row["plate"], str(row["parent"]), row["name"])
+            if row["kind"] == "kept":
+                kept += 1
+            elif key not in closures:
+                closures[key] = (row["date"], row["kind"], row["targets"], row["law"], row["note"])
+        for key, (plate, parent, town) in sorted(towns.items()):
+            area = cs.key("tr.belde", key)
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code="tr.belde")
+                name(area, town)
+            end = closures[key][0] if key in closures else None
+            cs.add(
+                "area_parent",
+                area_id=area,
+                parent_id=find(plate, parent) or provinces[plate],
+                valid_from=None,
+                valid_from_precision="day",
+                valid_to=end,
+                valid_to_precision="day",
+            )
+            if key in polities:
+                cs.add(
+                    "polity_territory",
+                    polity_id=polities[key],
+                    area_id=area,
+                    valid_from=None,
+                    valid_from_precision="day",
+                    valid_to=end,
+                    valid_to_precision="day",
+                )
+                counts["tr.belde tied to polity"] = counts.get("tr.belde tied to polity", 0) + 1
+            if key in closures:
+                day, kind, targets, law, note = closures[key]
+                into = [
+                    find(plate, target) or cs.key("tr.belde", town_key(plate, parent, target)) for target in targets
+                ]
+                event(kind, day, laws[law], note, [(area, "from"), *((t, "to") for t in into)])
+                counts[f"tr.belde {kind}"] = counts.get(f"tr.belde {kind}", 0) + 1
+        counts["tr.belde areas"] = len(towns)
+        counts["tr.belde kept by the court"] = kept
+        print(counts)
+        if missing:
+            print(f"{len(missing)} ilçe events not matched: {missing}")
+        return cs.write()
