@@ -3,12 +3,12 @@ import subprocess
 from pathlib import Path
 from typing import LiteralString
 from urllib.parse import quote
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.tr import ysk_candidates_2009, ysk_mayors
 from ea.sources.tr.ysk import PROVINCES, upper
 from ea.sources.tr.ysk_local import title
@@ -610,7 +610,9 @@ def emit() -> Path:
             return id
 
         def event(kind: str, day: str, source_id: UUID, notes: str | None, members: list[tuple[UUID, str]]) -> None:
-            id = cs.key(f"{SOURCE}.event", f"{kind}:{day}:{':'.join(f'{role}={area}' for area, role in members)}")
+            id = uuid5(
+                NAMESPACE, f"{SOURCE}.event\x1f{kind}:{day}:{':'.join(f'{role}={area}' for area, role in members)}"
+            )
             cs.add("area_event", id=id, kind=kind, date=day, date_precision="day", source_id=source_id, notes=notes)
             for area, role in dict.fromkeys(members):
                 cs.add("area_event_member", event_id=id, area_id=area, role=role)
@@ -787,7 +789,7 @@ def emit() -> Path:
                     name(council, f"{province} İl Genel Meclisi", kind="native")
                 cs.add(
                     "body_event",
-                    id=cs.key(f"{SOURCE}.body_event", f"{key}:{day}"),
+                    id=uuid5(NAMESPACE, f"{SOURCE}.body_event\x1f{key}:{day}"),
                     body_id=council,
                     kind="dissolved",
                     date=day,
