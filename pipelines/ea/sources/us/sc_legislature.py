@@ -19,9 +19,10 @@ PUBLISHER = "South Carolina State Election Commission"
 TITLE = "{year} Election Report"
 LANDING = "https://scvotes.gov/election-results/"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
-DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2)}
+DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 HEADING = re.compile(r"STATE\s+(HOUSE OF REPRESENTATIVES|SENATE)\s+DISTRICT\s+(\d+)")
+PRECINCTS = re.compile(r"^\s*District\s+(\d+)\s+PRECINCTS")
 NUMBER = re.compile(r"[0-9&lIOoSBZ|][0-9&lIOoSBZ|.,]*")
 COUNTIES = [
     "Abbeville",
@@ -127,6 +128,12 @@ def parse() -> None:
             blocks: list[tuple[str, int, list[str]]] = []
             for line in text.splitlines():
                 found = HEADING.search(line)
+                if year == 2006:
+                    if (numbered := PRECINCTS.match(line)) is not None:
+                        blocks.append(("house", int(numbered[1]), []))
+                    elif blocks:
+                        blocks[-1][2].append(line)
+                    continue
                 if found:
                     blocks.append(
                         (
@@ -153,11 +160,22 @@ def parse() -> None:
                     continue
                 total_ends = lines_[total_at][1]
                 total = lines_[total_at][2]
+                if year == 2006:
+                    if len(total) < 2 or sum(total[:-1]) != total[-1]:
+                        skipped += 1
+                        continue
+                    total, total_ends = total[:-1], total_ends[:-1]
+                    lines_ = [
+                        (name, ends[1:-1], values[1:-1])
+                        if name is not None and len(values) > 2 and sum(values[1:-1]) == values[-1]
+                        else (name, ends, values)
+                        for name, ends, values in lines_
+                    ]
                 counties: list = []
                 bad = False
                 for name, ends, values in lines_[:total_at]:
                     if name is not None:
-                        key_ = re.sub(r"[^a-z]", "", name.lower())
+                        key_ = re.sub(r"[^a-z]", "", name.lower().removesuffix(" county"))
                         close = [key_] if key_ in fips else difflib.get_close_matches(key_, list(fips), n=1, cutoff=0.7)
                         if not close:
                             continue
@@ -264,16 +282,16 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Carolina's 2000, 2002, and 2004 state legislative general elections by county",
+            summary="South Carolina's 2000, 2002, 2004, and 2006 state legislative general elections by county",
             polity="US-SC",
         )
-        source = cs.source(PUBLISHER, "Election Reports 2000, 2002, and 2004")
+        source = cs.source(PUBLISHER, "Election Reports 2000, 2002, 2004, and 2006")
         cs.add(
             "source",
             id=source,
             kind="official_body",
             publisher=PUBLISHER,
-            title="Election Reports 2000, 2002, and 2004",
+            title="Election Reports 2000, 2002, 2004, and 2006",
             url=LANDING,
             license="Public record",
         )
