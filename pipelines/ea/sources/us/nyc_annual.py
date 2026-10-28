@@ -80,6 +80,36 @@ CITY = {
         },
     ),
 }
+BOROUGH_PRESIDENTS = {
+    85: (
+        "new-york-city:borough-president:manhattan",
+        "borough-president-manhattan",
+        "Manhattan Borough President",
+        {
+            "Eilert": ("Ernest F. Eilert", "republican-party"),
+            "Miller": ("Julius Miller", "democratic-party"),
+            "Cannon": ("Joseph D. Cannon", "NY:socialist"),
+            "Balkam": ("Frank Whitney Balkam", "NY:farmer-labor"),
+            "Burnham": ("Herbert D. Burnham", "prohibition-party"),
+            "Stokes": ("Rose Pastor Stokes", "NY:workers"),
+            "Riley": ("J. Fred Riley", "NY:single-tax"),
+        },
+    ),
+    99: (
+        "new-york-city:borough-president:brooklyn",
+        "borough-president-brooklyn",
+        "Brooklyn Borough President",
+        {
+            "Baker": ("George W. Baker", "republican-party"),
+            "Riegelmann": ("Edward Riegelmann", "democratic-party"),
+            "Passage": ("William W. Passage", "NY:socialist"),
+            "Lindlof": ("Johanna F. Lindlof", "NY:farmer-labor"),
+            "Johnson": ("F. Lindsay Johnson", "prohibition-party"),
+            "Brower": ("Charles Brower", "NY:workers"),
+            "Schneidman": ("A. S. Schneidman", "NY:single-tax"),
+        },
+    ),
+}
 NOTE_1917 = (
     "County returns from the Board of Elections' annual report tables of the vote by counties, read from HathiTrust's "
     "page OCR. The report prints no party lines for these candidates, and each county column adds up to the printed "
@@ -241,13 +271,13 @@ def emit() -> Path:
         system = cs.key("us.electoral_system", "fptp")
         seen: set[UUID] = set()
 
-        def city_contest(day, office_key, office_slug, office_label, source, candidates, values, grain):
+        def city_contest(day, office_key, office_slug, office_label, source, candidates, values, grain, key_slug=None, caveats=()):
             election = cs.key("us.election", f"{day}:NY:3651000")
             office = cs.key("us.office", office_key)
             if office in cs.minted:
                 cs.add("office", id=office, polity_id=city_polity, kind="other")
                 cs.add("name", entity_id=office, text=office_label, lang="en", kind="official", is_preferred=True)
-            contest_key = f"{SOURCE}:{day}:NY:3651000:{office_slug}"
+            contest_key = f"{SOURCE}:{day}:NY:3651000:{key_slug or office_slug}"
             contest = cs.key("us.contest", contest_key)
             cs.add(
                 "contest",
@@ -285,7 +315,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=None,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE if grain == "ad" else NOTE_1917)
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=(NOTE if grain == "ad" else NOTE_1917) + "".join(f" Note: {c}." for c in caveats))
             top = max(candidates, key=lambda label: candidates[label][1])
             options = {}
             for label, (party_key, _) in candidates.items():
@@ -502,9 +532,14 @@ def emit() -> Path:
             if "1921" not in file:
                 continue
             day = date(1921, 11, 8)
-            for title, (office_key, office_slug, office_label, names) in CITY.items():
+            for page, (office_key, office_slug, office_label, names) in [
+                (None, entry) for entry in CITY.values()
+            ] + list(BOROUGH_PRESIDENTS.items()):
                 found: dict[str, dict[str, tuple[dict[int, int], int, int]]] = defaultdict(dict)
-                for (block,), group in report.filter(pl.col("title").is_in(list(CITY))).group_by(["block"]):
+                caveats: list[str] = []
+                for (block,), group in report.filter(
+                    pl.col("title").is_in(list(CITY)) if page is None else (pl.col("page") == page)
+                ).group_by(["block"]):
                     totals = group.filter(pl.col("ad") == 0)
                     county = next(
                         (
@@ -521,11 +556,17 @@ def emit() -> Path:
                         continue
                     for column, value, header in totals.select("column", "value", "header").iter_rows():
                         tokens = header.split()
-                        if len(tokens) > 7 or any(t.isupper() and len(t) > 3 for t in tokens):
+                        if page is None and (len(tokens) > 7 or any(t.isupper() and len(t) > 3 for t in tokens)):
                             continue
                         rows = group.filter((pl.col("column") == column) & (pl.col("ad") > 0))
-                        if rows["value"].sum() != value:
+                        gap = value - rows["value"].sum()
+                        if gap != 0 and (page is None or abs(gap) > 1):
                             continue
+                        if gap != 0:
+                            caveats.append(
+                                f"the {next((n for k, (n, _) in names.items() if k in tokens), '')} "
+                                f"column's assembly district lines add up to {value - gap} against the printed county total of {value}"
+                            )
                         for surname in names:
                             if surname in tokens:
                                 ads = dict(rows.group_by("ad").agg(pl.col("value").sum()).iter_rows())
@@ -557,7 +598,18 @@ def emit() -> Path:
                                     valid_to=day + timedelta(days=1),
                                 )
                             values.append((units[(day, code)], label, value))
-                city_contest(day, office_key, office_slug, office_label, source, candidates, values, "ad")
+                city_contest(
+                    day,
+                    office_key,
+                    office_slug,
+                    office_label,
+                    source,
+                    candidates,
+                    values,
+                    "ad",
+                    f"{office_slug}:2" if page is not None else None,
+                    caveats,
+                )
                 print(f"{office_slug}: {candidates}")
         for file, url, title, day, offices in REPORTS_1917:
             source = cs.source(PUBLISHER, title)
@@ -631,16 +683,4 @@ def emit() -> Path:
                     values.extend((cs.unit("us.county", county), name, value) for county, value in cells.items())
                 city_contest(day, office_key, office_slug, office_label, source, candidates, values, "county")
                 print(f"{day} {office_slug}: {candidates}")
-        for contest, in conn.execute(
-            """select c.id from contest c join changeset h on h.id = c.changeset_id
-               join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
-               join entity e on e.id = c.id and e.retired_by is null
-               where h.pipeline = %s and x.value like '%%1921-11-08%%borough-president%%'""",
-            [SOURCE],
-        ).fetchall():
-            cs.add(
-                "entity_retirement",
-                entity_id=contest,
-                reason="The report's column headings name only three of the candidates, so shares would omit the minor lines",
-            )
         return cs.write()
