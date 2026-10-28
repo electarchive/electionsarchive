@@ -108,13 +108,20 @@ METHOD = (
 def pages(election: int) -> tuple[str, list[tuple[str, str]]]:
     url = f"{HOST}results_report.aspx?e={election}"
     return url, [
-        (OFFICES.get(office) or f"house:{district[2]}", f"{HOST}results_report_county_breakdown.aspx?e={election}&t={contest}")
+        (
+            OFFICES.get(office) or f"house:{district[2]}",
+            f"{HOST}results_report_county_breakdown.aspx?e={election}&t={contest}",
+        )
         for office, contest in re.findall(
             r'<h3 class="reset-margin">([^<]*)</h3>.*?results_report_county_breakdown\.aspx\?e=\d+&amp;t=(\d+)',
             raw.cached(SOURCE, f"{HOST}results_report.aspx?e={election}").path.read_text(errors="ignore"),
             re.S,
         )
-        if (district := re.fullmatch(r"(U\. S\. Representative District #)(\d+)", office) if ELECTIONS[election] >= 1992 else None)
+        if (
+            district := re.fullmatch(r"(U\. S\. Representative District #)(\d+)", office)
+            if ELECTIONS[election] >= 1992
+            else None
+        )
         or office in OFFICES
     ]
 
@@ -125,7 +132,7 @@ def fetch() -> None:
         try:
             raw.fetch(SOURCE, f"{HOST}results_report.aspx?e={election}", suffix=".html")
             links = pages(election)[1]
-        except (httpx.HTTPError, FileNotFoundError):
+        except httpx.HTTPError, FileNotFoundError:
             failed += 1
             continue
         for _, url in links:
@@ -144,7 +151,9 @@ def fetch() -> None:
 
 
 def cells(text: str) -> list[str]:
-    return [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td[^>]*>.*?</td>", text, re.S)]
+    return [
+        html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td[^>]*>.*?</td>", text, re.S)
+    ]
 
 
 def parse() -> None:
@@ -185,7 +194,9 @@ def parse() -> None:
             seen: set[str] = set()
             part: list[tuple[str, str, str, str, str, int]] = []
             unknown: set[str] = set()
-            for county, table in re.findall(r'<h3 class="reset-margin">([^<]*)</h3></td></tr>(.*?)(?=<tr class="info">|$)', body, re.S):
+            for county, table in re.findall(
+                r'<h3 class="reset-margin">([^<]*)</h3></td></tr>(.*?)(?=<tr class="info">|$)', body, re.S
+            ):
                 seen.add(county)
                 code = codes.get(re.sub(r"[^a-z]", "", county.lower()))
                 if code is None:
@@ -196,7 +207,9 @@ def parse() -> None:
                     part.append((str(day), office, code, name, party, int(votes)))
                     sums[name] = sums.get(name, 0) + int(votes)
             if unknown or not seen or sums != printed:
-                print(f"{day} {office}: held, {len(seen)} counties, unknown {sorted(unknown)}, sums {sums}, printed {printed}")
+                print(
+                    f"{day} {office}: held, {len(seen)} counties, unknown {sorted(unknown)}, sums {sums}, printed {printed}"
+                )
                 continue
             rows.extend(part)
     frame = (
@@ -267,8 +280,9 @@ def emit() -> Path:
         )
         split = {
             (day, county)
-            for (day, county), titles in frame.filter(pl.col("title").str.starts_with("house:"))
-            .group_by("day", "county")
+            for (day, county), titles in frame.filter(pl.col("title").str.starts_with("house:")).group_by(
+                "day", "county"
+            )
             if titles["title"].n_unique() > 1
         }
         areas = dict(
@@ -306,6 +320,51 @@ def emit() -> Path:
             if county_rows:
                 continue
             row = old[0]
+            targets: dict[str, UUID] = {}
+            for name in rows["candidate"].unique(maintain_order=True):
+                surname = re.sub(r"[^a-z]", "", name.split()[-1].lower())
+                found = [option for option, label in roots if surname in re.sub(r"[^a-z]", "", (label or "").lower())]
+                if len(found) == 1:
+                    targets[name] = found[0]
+            if (
+                len(set(targets.values())) != len(targets)
+                or len(targets) != len(rows["candidate"].unique())
+                or len(targets) != len(roots)
+            ):
+                print(
+                    f"{key}: candidates {sorted(rows['candidate'].unique())} do not match options {[label for _, label in roots]}"
+                )
+                if row[0] == result_set and row[9] is not None:
+                    columns = (
+                        "id",
+                        "election_id",
+                        "contest_id",
+                        "stage",
+                        "kind",
+                        "status",
+                        "source_id",
+                        "as_of",
+                        "completeness",
+                        "supersedes_id",
+                    )
+                    restored = conn.execute(
+                        f"select {', '.join(columns)} from result_set where id = %s", [row[9]]
+                    ).fetchone()
+                    cs.add("result_set", **{**dict(zip(columns, restored, strict=True)), "is_default": True})
+                    cs.add(
+                        "result_set",
+                        **{**dict(zip(columns, row, strict=True)), "is_default": False, "status": "withdrawn"},
+                    )
+                    cs.add(
+                        "note",
+                        entity_id=row[0],
+                        kind="caveat",
+                        body_md=(
+                            "Withdrawn: the county breakdown lists a candidate the statewide results do not, so its rows "
+                            "could not be matched to the candidates. The statewide totals remain the default."
+                        ),
+                    )
+                continue
             if row[0] != result_set:
                 cs.add(
                     "result_set",
@@ -348,20 +407,13 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
-            targets: dict[str, UUID] = {}
-            for name in rows["candidate"].unique(maintain_order=True):
-                surname = re.sub(r"[^a-z]", "", name.split()[-1].lower())
-                found = [option for option, label in roots if surname in re.sub(r"[^a-z]", "", (label or "").lower())]
-                if len(found) == 1:
-                    targets[name] = found[0]
-            if len(set(targets.values())) != len(targets) or len(targets) != len(rows["candidate"].unique()) or len(targets) != len(roots):
-                print(f"{key}: candidates {sorted(rows['candidate'].unique())} do not match options {[label for _, label in roots]}")
-                continue
             for option, kind, seats in outcomes:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             unit_ids = dict(units)
             if office.startswith("house:"):
-                ((district_area,),) = conn.execute("select district_area_id from contest where id = %s", [contest]).fetchall()
+                ((district_area,),) = conn.execute(
+                    "select district_area_id from contest where id = %s", [contest]
+                ).fetchall()
                 for county in rows["county"].unique():
                     if (day, county) not in split:
                         continue
