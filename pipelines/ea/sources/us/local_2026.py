@@ -1675,7 +1675,16 @@ def parse() -> None:
             schools[contest] = (f"Board of Education, Educational District {district}", found[1], f"school:{found[0]}")
             contests.append(contest)
         elif post in ("MAYOR", "CITY LEGISLATIVE BODY") and city:
-            contests.append(f"City of {city} {'Mayor' if post == 'MAYOR' else 'City Council'}")
+            contests.append(
+                f"City of {city} "
+                + (
+                    "Mayor"
+                    if post == "MAYOR"
+                    else "City Commission"
+                    if "COMMISSION" in str(description).upper()
+                    else "City Council"
+                )
+            )
         else:
             contests.append(None)
     for (county, contest), group in (
@@ -1694,7 +1703,11 @@ def parse() -> None:
                 {
                     "county": place,
                     "contest": contest,
-                    "seats": 0 if str(contest).endswith("City Council") else 1,
+                    "seats": 0
+                    if str(contest).endswith("City Council")
+                    else 4
+                    if str(contest).endswith("City Commission")
+                    else 1,
                     "name": " ".join(
                         cased(part)
                         for part in (
@@ -3829,7 +3842,7 @@ def parse() -> None:
                     and (
                         state in ("NJ", "MI", "FL", "OR")
                         or state == "KY"
-                        and re.search(r"(?i)\bmayor$", str(row["contest"])) is not None
+                        and str(row["contest"]).startswith("City of ")
                         or state == "CA"
                         and bool(fits)
                         and fits[0][4].startswith("school:")
@@ -4164,6 +4177,7 @@ def emit() -> Path:
                         cs.add("area_code", area_id=area, code=district, valid_from=None)
                         cs.add("area_parent", area_id=area, parent_id=whole[0], valid_from=None)
                         name(area, f"{place} {title.split(',')[0]}, {seat}")
+                known_size = bool(group["seats"][0]) or not body
                 templates[tail] = (
                     tail,
                     None,
@@ -4173,9 +4187,9 @@ def emit() -> Path:
                     area,
                     None,
                     None,
-                    1,
+                    1 if known_size else None,
                     "full",
-                    cs.key("us.electoral_system", "fptp"),
+                    cs.key("us.electoral_system", "fptp") if known_size else None,
                     "counted",
                     DAY,
                     polity,
