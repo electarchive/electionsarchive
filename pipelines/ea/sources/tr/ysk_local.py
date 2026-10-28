@@ -2091,4 +2091,16 @@ def emit() -> Path:
                 y1=pl.col("box").list.get(3),
             ),
         )
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where n.kind = 'caveat' and c.pipeline = %s and n.body_md like %s""",
+            [SOURCE, "%The archive does not hold the rerun yet."],
+        ).fetchall():
+            cs.add(
+                "note_drop",
+                note_id=note,
+                entity_id=entity,
+                body_md=text,
+                reason="The rerun is now stored as its own election.",
+            )
         return cs.write()
