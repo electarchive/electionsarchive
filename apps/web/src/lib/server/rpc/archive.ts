@@ -968,19 +968,22 @@ async function children(
           scheme: string;
           parent: string;
         }>(sql`
-          select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
-          from area_parent p join area a on a.id = p.area_id
-          where p.parent_id = any(${sql.param(tops.map((row) => row.id))}::uuid[])
-            and p.valid @> ${date}::date
-            and a.scheme_code in (
-              select s.code from scheme s
-              where s.kind = 'administrative' and s.rank = (
-                select max(x.rank) + 1 from scheme x
-                where x.code = any(${sql.param([...new Set(tops.map((row) => row.scheme))])}::text[])
+          select a.id, a.k, a.scheme, a.parent from (
+            select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
+            from area_parent p join area a on a.id = p.area_id
+            where p.parent_id = any(${sql.param(tops.map((row) => row.id))}::uuid[])
+              and p.valid @> ${date}::date
+              and a.scheme_code in (
+                select s.code from scheme s
+                where s.kind = 'administrative' and s.rank = (
+                  select max(x.rank) + 1 from scheme x
+                  where x.code = any(${sql.param([...new Set(tops.map((row) => row.scheme))])}::text[])
+                )
               )
-            )
-            and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
-            and ${counted}
+              and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
+            offset 0
+          ) a
+          where ${counted}
         `)
       : { rows: [] };
   const deep = Map.groupBy(below.rows, (row) => row.scheme)
@@ -1581,7 +1584,9 @@ async function load(
       left join entity_merge m on m.entity_id = cy.person_id
       where n.kind in ('endorsed', 'supported')
     `),
-    db.execute<{ alliance: string; party: string; wins: number }>(sql`
+    options.rows.every((row) => row.alliance == null)
+      ? { rows: [] }
+      : db.execute<{ alliance: string; party: string; wins: number }>(sql`
       select distinct on (m.alliance_id) m.alliance_id as alliance, coalesce(pm.into_id, m.party_id) as party, w.wins
       from alliance_member m
       join alliance al on al.id = m.alliance_id
@@ -1627,10 +1632,21 @@ async function load(
       options.rows.map((row) => stand(row)).filter((id) => id != null),
     ),
   ];
-  const [labels, colors, positions] = await Promise.all([
+  const [labels, colors] = await Promise.all([
     names(entities, date),
-    db.execute<{ party_id: string; color: string; parent: string | null }>(sql`
-      select p.id as party_id, c.color, b.parent from unnest(${sql.param(parties)}::uuid[]) p(id)
+    parties.length === 0
+      ? { rows: [] }
+      : db.execute<{
+      party_id: string;
+      color: string | null;
+      parent: string | null;
+      lean: number | null;
+    }>(sql`
+      select p.id as party_id, c.color, b.parent, (
+        select (low + high) * 100 + coalesce(rank, 99) from party_position
+        where party_id = p.id and valid @> ${date}::date limit 1
+      ) as lean
+      from unnest(${sql.param(parties)}::uuid[]) p(id)
         left join lateral (
           select coalesce(m.into_id, a.parent_party_id) as parent from party_affiliation a
           left join entity_merge m on m.entity_id = a.parent_party_id
@@ -1641,23 +1657,28 @@ async function load(
           ${paint(sql`b.parent`, sql`select election_id from contest where id = any(${sql.param(roots)}::uuid[])`, sql`${date}::date`)},
           ${paint(sql`p.id`, sql`select election_id from contest where id = any(${sql.param(roots)}::uuid[])`, sql`${date}::date`)}
         ) as color) c
-      where c.color is not null
-    `),
-    db.execute<{ party_id: string; lean: number }>(sql`
-      select party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
-      where party_id = any(${sql.param(parties)}::uuid[]) and valid @> ${date}::date
     `),
   ]);
   const branch = new Map(
-    colors.rows.map((row) => [row.party_id, row.parent ?? row.party_id]),
+    colors.rows.flatMap((row) =>
+      row.color == null ? [] : [[row.party_id, row.parent ?? row.party_id]],
+    ),
   );
   const color = new Map(
-    colors.rows.flatMap((row) => [
-      [row.party_id, row.color],
-      [row.parent ?? row.party_id, row.color],
-    ]),
+    colors.rows.flatMap((row) =>
+      row.color == null
+        ? []
+        : [
+            [row.party_id, row.color],
+            [row.parent ?? row.party_id, row.color],
+          ],
+    ),
   );
-  const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
+  const lean = new Map(
+    colors.rows.flatMap((row) =>
+      row.lean == null ? [] : [[row.party_id, row.lean]],
+    ),
+  );
   const top = Math.max(0, ...tallies.values());
   const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
   const partisan = new Set(
