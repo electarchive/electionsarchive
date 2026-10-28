@@ -127,7 +127,14 @@
                             : m.round_number({
                                 round: generals.indexOf(round) + 1,
                               })
-                      : m.round_number({ round: index + 1 }),
+                      : round.kind === "local" && american
+                        ? rounds.some(
+                            (other, at) =>
+                              at > index && other.kind === "general",
+                          )
+                          ? m.round_primary()
+                          : m.round_general()
+                        : m.round_number({ round: index + 1 }),
           path: round.path,
           isCurrent: round.isCurrent,
           isMinor: false,

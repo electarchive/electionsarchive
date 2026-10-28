@@ -3398,7 +3398,14 @@ function contestMarkdown(
                         ? index === 0 && !american
                           ? m.round_first()
                           : m.round_general()
-                        : m.round_number({ round: index + 1 });
+                        : round.kind === "local" && american
+                          ? rounds.some(
+                              (other, at) =>
+                                at > index && other.kind === "general",
+                            )
+                            ? m.round_primary()
+                            : m.round_general()
+                          : m.round_number({ round: index + 1 });
             return [
               `### ${round.isCurrent ? label : link(label, round.path)}${round.date == null ? "" : `, ${date(round.date)}`}`,
               round.leaders
