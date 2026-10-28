@@ -2117,50 +2117,6 @@
     {/if}
   </div>
 
-  {#if pools.length > 0}
-    <div class="flex flex-wrap items-center gap-1.5 text-[0.8125rem]">
-      <span class="text-muted-foreground">{m.map_pools()}</span>
-      {#each pools as row (row.k)}
-        <button
-          type="button"
-          class={cn(
-            "flex items-center gap-1.5 rounded-xs px-1.5 block-7 hover:bg-secondary pointer-coarse:block-10",
-            { "marked bg-secondary": pinned === row.k },
-          )}
-          style:--party={row.leader == null
-            ? "var(--muted-foreground)"
-            : colors[row.leader]}
-          aria-pressed={pinned === row.k}
-          onpointerenter={() => {
-            if (pinned == null) {
-              focus = row.k;
-            }
-          }}
-          onpointerleave={() => {
-            if (pinned == null && focus === row.k) {
-              focus = null;
-            }
-          }}
-          onclick={() => {
-            pinned = pinned === row.k ? null : row.k;
-            focus = pinned;
-          }}
-        >
-          <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-          ></span>
-          <span class="font-semibold">{row.name}</span>
-          {#if row.leader != null}
-            <span
-              class="font-figures text-xs text-muted-foreground tabular-nums"
-              >{names[row.leader]}
-              {percent(row.shares[row.leader] ?? 0)}</span
-            >
-          {/if}
-        </button>
-      {/each}
-    </div>
-  {/if}
-
   <div
     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-[0.8125rem]"
   >
@@ -2601,6 +2557,49 @@
       </span>
     {/if}
   </div>
+  {#if pools.length > 0}
+    <div class="flex flex-wrap items-center gap-1.5 text-[0.8125rem]">
+      <span class="text-muted-foreground">{m.map_pools()}</span>
+      {#each pools as row (row.k)}
+        <button
+          type="button"
+          class={cn(
+            "flex items-center gap-1.5 rounded-xs px-1.5 block-7 hover:bg-secondary pointer-coarse:block-10",
+            { "marked bg-secondary": pinned === row.k },
+          )}
+          style:--party={row.leader == null
+            ? "var(--muted-foreground)"
+            : colors[row.leader]}
+          aria-pressed={pinned === row.k}
+          onpointerenter={() => {
+            if (pinned == null) {
+              focus = row.k;
+            }
+          }}
+          onpointerleave={() => {
+            if (pinned == null && focus === row.k) {
+              focus = null;
+            }
+          }}
+          onclick={() => {
+            pinned = pinned === row.k ? null : row.k;
+            focus = pinned;
+          }}
+        >
+          <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+          ></span>
+          <span class="font-semibold">{row.name}</span>
+          {#if row.leader != null}
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
+              >{names[row.leader]}
+              {percent(row.shares[row.leader] ?? 0)}</span
+            >
+          {/if}
+        </button>
+      {/each}
+    </div>
+  {/if}
   {#if credited.length > 0}
     {const notices = $derived(
       credited.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),
