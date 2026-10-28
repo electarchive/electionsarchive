@@ -1113,7 +1113,7 @@ def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
     for tail, text in conn.execute(
-        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id)
+        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id, named)
                   regexp_replace(x.value, '^[0-9-]+:', ''), n.text
            from contest c
            join election e on e.id = c.election_id
@@ -1123,10 +1123,14 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            left join office f on f.id = c.office_id
            left join body b on b.id = c.body_id
            join polity op on op.id = coalesce(f.polity_id, b.polity_id, e.polity_id)
+           cross join lateral (
+               select case when c.seat_id is null and seg !~ '\\d|at-large|(^|-)[a-z]($|-)' then seg end as named
+               from substring(x.value from '^[0-9-]+:[^:]+:[^:]+:[^:]+:([^:]+)') seg
+           ) k
            where (x.value ~ %s or x.value ~ %s) and e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
-           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, e.date_from desc, x.value ~ 'at-large', x.value""",
+           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, named, e.date_from desc, x.value ~ 'at-large', x.value""",
         [f"(^|:){state}:", "^ceda:" if state == "CA" else "^$", DAY],
     ):
         county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
@@ -3715,37 +3719,6 @@ def parse() -> None:
             home=pl.col("tail").replace_strict({tail: value[3] for tail, value in minted.items()}, default=None),
         )
     )
-    with connect() as conn:
-        held = {
-            frozenset(slug(label) for label in labels if label): tail
-            for tail, labels in conn.execute(
-                """select substr(x.value, 12), array_agg(distinct o.ballot_label) from external_id x
-                   join contest c on c.id = x.entity_id join changeset cs on cs.id = c.changeset_id
-                   join entity t on t.id = c.id and t.retired_by is null
-                   join contest_option o on o.contest_id = c.id
-                   where x.scheme = 'us.contest' and x.value like %s and cs.pipeline = %s
-                   group by 1""",
-                [f"{DAY}:%", SOURCE],
-            )
-        }
-    kept = set(frame["tail"])
-    renamed = {
-        tail for tail in held.values() if tail.endswith(":remainder") and tail.removesuffix(":remainder") in kept
-    }
-    lost = {
-        (":".join(tail.split(":")[:2]), person)
-        for persons, tail in held.items()
-        if tail not in kept and tail not in renamed
-        for person in persons
-    }
-    moved = {
-        tail
-        for (tail,), group in frame.group_by(["tail"])
-        if tail not in held.values()
-        and not lost.isdisjoint((":".join(str(tail).split(":")[:2]), person) for person in group["person"])
-    }
-    print(f"{len(moved)} contests left on the tail this pipeline already published")
-    frame = frame.filter(~pl.col("tail").is_in(moved))
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.group_by("fips").agg(pl.col("tail").n_unique().alias("contests"), pl.len().alias("candidates")))
 
@@ -3823,6 +3796,7 @@ def emit() -> Path:
             "no template": 0,
             "no filing": 0,
             "dropped": 0,
+            "stale contests": 0,
         }
         created: set[str] = set()
         made: set[object] = set()
@@ -4210,5 +4184,37 @@ def emit() -> Path:
                     cs.add("entity_retirement", entity_id=candidacy, reason=reason)
                 cs.add("entity_retirement", entity_id=option, reason=reason)
                 counts["dropped"] += 1
+        emitted = [str(row["id"]) for row in cs.rows.get("contest", [])]
+        reason = "No longer on any official candidate list or sample ballot for this election"
+        for option, candidacy, value in conn.execute(
+            """select o.id, ca.id, x.value from contest_option o join changeset c on c.id = o.changeset_id
+               join entity e on e.id = o.id and e.retired_by is null
+               join contest co on co.id = o.contest_id join election el on el.id = co.election_id
+               left join candidacy ca on ca.option_id = o.id
+               left join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
+               where c.pipeline = %s and el.date_from = %s and o.contest_id <> all(%s::uuid[])""",
+            [SOURCE, DAY, emitted],
+        ).fetchall():
+            print("dropping stale", value)
+            if candidacy is not None:
+                cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+            cs.add("entity_retirement", entity_id=option, reason=reason)
+            counts["dropped"] += 1
+        for contest, value in conn.execute(
+            """select co.id, x.value from contest co join entity e on e.id = co.id and e.retired_by is null
+               join election el on el.id = co.election_id
+               join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
+               join changeset c on c.id = x.changeset_id
+               where c.pipeline = %s and el.date_from = %s and co.id <> all(%s::uuid[])
+                   and not exists (
+                       select from contest_option o join entity oe on oe.id = o.id and oe.retired_by is null
+                       join changeset oc on oc.id = o.changeset_id
+                       where o.contest_id = co.id and oc.pipeline <> %s
+                   )""",
+            [SOURCE, DAY, emitted, SOURCE],
+        ).fetchall():
+            print("retiring stale contest", value)
+            cs.add("entity_retirement", entity_id=contest, reason=reason)
+            counts["stale contests"] += 1
         print(counts)
         return cs.write()
