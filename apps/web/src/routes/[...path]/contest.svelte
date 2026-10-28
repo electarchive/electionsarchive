@@ -1405,7 +1405,17 @@
   {/if}
 </header>
 
-<Road {rounds} {cycle}>
+<Road
+  {rounds}
+  {cycle}
+  paint={new Map(
+    contest.rows.flatMap((row) =>
+      row.current?.person == null
+        ? []
+        : [[row.current.person, swatch(row.color, row.key)]],
+    ),
+  )}
+>
   {#snippet more()}
     {#if cycle.others.length > 0}
       <details class="text-[0.8125rem]">
