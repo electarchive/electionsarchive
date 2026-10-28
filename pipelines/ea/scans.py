@@ -1481,7 +1481,7 @@ def emit(name: str) -> Path:
         }
         read = set(frame["series"])
         whole = {label for label in missing if all(item in read for item in listed if item.startswith(f"{label}|"))}
-        if whole:
+        if whole and "EA_SCANS_RESTAGE" not in os.environ:
             return totals(manifest, frame.filter(pl.col("contest").is_in(whole)))
         frame = frame.filter(~pl.col("contest").is_in(missing))
     towns = manifest.get("unit_scheme") == "town"
