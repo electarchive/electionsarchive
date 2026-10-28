@@ -10741,9 +10741,17 @@ async function races(
                 winner: string | null;
                 won: number | null;
                 isDone: boolean | null;
+                field: Array<{ person: string; party: string | null }> | null;
               }>(sql`
                 select g.id, c.district_area_id as area, (select st.label from seat st where st.id = c.seat_id) as seat,
                   f.person, f.share, f.won as "isWon", g.runoff,
+                  case when f.person is null and g.runoff is null then (
+                    select json_agg(json_build_object('person', coalesce(fm.into_id, fc.person_id), 'party', coalesce(fo.party_id, fc.member_of_party_id)) order by fo.ballot_position nulls last, fo.k)
+                    from contest_option fo
+                    join candidacy fc on fc.option_id = fo.id and fc.role = 'head'
+                    left join entity_merge fm on fm.entity_id = fc.person_id
+                    where fo.contest_id = c.id and fo.kind = 'candidate'
+                  ) end as field,
                   (select e.date_from::text from contest n join election e on e.id = n.election_id where n.id = g.runoff) as date,
                   (select e.kind = 'general' from contest n join election e on e.id = n.election_id where n.id = g.runoff) as "isGeneral",
                   r.person as winner, r.share as won, r.won as "isDone"
@@ -10811,9 +10819,15 @@ async function races(
               const [people, links] = await Promise.all([
                 names(
                   found.rows.flatMap((row) =>
-                    [row.area, row.person, row.winner].filter(
-                      (id) => id != null,
-                    ),
+                    [
+                      row.area,
+                      row.person,
+                      row.winner,
+                      ...(row.field ?? []).flatMap((entry) => [
+                        entry.person,
+                        entry.party,
+                      ]),
+                    ].filter((id) => id != null),
                   ),
                   date,
                 ),
@@ -10836,6 +10850,16 @@ async function races(
                   name: people.full.get(row.person ?? "") ?? null,
                   share: row.share,
                   isWon: row.isWon === true,
+                  field: (row.field ?? []).map((entry) => ({
+                    person: entry.person,
+                    name: people.full.get(entry.person) ?? "",
+                    party:
+                      entry.party == null
+                        ? null
+                        : (people.short.get(entry.party) ??
+                          people.full.get(entry.party) ??
+                          null),
+                  })),
                   runoff:
                     row.runoff == null
                       ? null
@@ -11487,6 +11511,13 @@ export const elections = {
                   name: v.nullable(v.string()),
                   share: v.nullable(v.number()),
                   isWon: v.boolean(),
+                  field: v.array(
+                    v.object({
+                      person: v.string(),
+                      name: v.string(),
+                      party: v.nullable(v.string()),
+                    }),
+                  ),
                   runoff: v.nullable(
                     v.object({
                       path: v.nullable(v.string()),

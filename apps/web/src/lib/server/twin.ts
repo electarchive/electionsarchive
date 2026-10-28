@@ -2395,7 +2395,15 @@ function electionMarkdown(
               const final = row.runoff?.isWon === true ? row.runoff : null;
               return [
                 link(row.label, row.path),
-                (final ?? row).name,
+                row.share == null && row.field.length > 0
+                  ? row.field
+                      .map((entry) =>
+                        entry.party == null
+                          ? entry.name
+                          : `${entry.name} (${entry.party})`,
+                      )
+                      .join(", ")
+                  : (final ?? row).name,
                 row.share == null
                   ? m.wards_none()
                   : row.runoff == null

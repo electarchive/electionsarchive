@@ -1939,6 +1939,31 @@
             >
           {/if}
           <span class="grid gap-0.5 min-inline-0">
+            {#if row.share == null && row.field.length > 0}
+              <span class="grid gap-0.5">
+                {#each row.field.slice(0, 3) as entry (entry.person)}
+                  <span class="flex items-baseline gap-1 min-inline-0">
+                    <Name
+                      class="font-semibold"
+                      label={entry.name}
+                      person={entry.person}
+                    />
+                    {#if entry.party != null}
+                      <span class="text-xs text-muted-foreground"
+                        >{entry.party}</span
+                      >
+                    {/if}
+                  </span>
+                {/each}
+                {#if row.field.length > 3}
+                  <span class="text-xs text-muted-foreground"
+                    >{m.wards_field_more({
+                      count: count(row.field.length - 3),
+                    })}</span
+                  >
+                {/if}
+              </span>
+            {/if}
             {#if row.share != null}
               <Name
                 class="justify-self-start font-semibold"
@@ -1946,7 +1971,11 @@
                 person={(final ?? row).person}
               />
             {/if}
-            <span class="text-xs text-muted-foreground">
+            <span
+              class={cn("text-xs text-muted-foreground", {
+                hidden: row.share == null && row.field.length > 0,
+              })}
+            >
               {#if row.share == null}
                 {m.wards_none()}
               {:else if row.runoff == null}

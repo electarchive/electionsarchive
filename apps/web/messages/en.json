@@ -279,6 +279,7 @@
   "term_incumbency_defeated": "Whoever held this seat on election day ran and did not win.",
   "slate_independent": "Independent",
   "wards_none": "No results yet",
+  "wards_field_more": "+{count} more",
   "count_title": "Ranked-choice count",
   "count_title_stv": "Single transferable vote count",
   "count_title_supplementary": "Supplementary vote count",
