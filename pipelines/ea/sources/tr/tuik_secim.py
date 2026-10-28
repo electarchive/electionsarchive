@@ -65,6 +65,13 @@ ILCE_ALIASES = {
     ("06", "KAZAN"): "KAHRAMANKAZAN",
     ("09", "YENİHİSAR"): "DİDİM",
     ("14", "CUMAOVA"): "CUMAYERİ",
+    ("01", "MAĞARA"): "TUFANBEYLİ",
+    ("17", "İMROZ"): "GÖKÇEADA",
+    ("34", "EYÜP"): "EYÜPSULTAN",
+    ("55", "19 MAYIS"): "19-MAY",
+    ("55", "ONDOKUZMAYIS"): "19-MAY",
+    ("56", "AYDINLAR"): "TİLLO",
+    ("71", "BAHŞİLİ"): "BAHŞILI",
 }
 METHODOLOGY = (
     "District results by ilçe from TÜİK's election database (table: {title}). TÜİK notes that its district totals come "
@@ -399,9 +406,10 @@ def emit() -> Path:
 
         def match(day: date, plate: str, label: str, late: bool = False) -> UUID | None:
             allowed = {plate} | {code for code, start in province_created.items() if start > day}
-            forms = {norm(re.sub(r"\s*\(.*?\)", "", label))} | {norm(alt) for alt in re.findall(r"\((.*?)\)", label)}
+            stem = label.split("/")[0]
+            forms = {norm(re.sub(r"\s*\(.*?\)", "", stem))} | {norm(alt) for alt in re.findall(r"\((.*?)\)", stem)}
             forms = {ILCE_ALIASES.get((plate, form), form) for form in forms}
-            if "MERKEZ" in forms:
+            if any(form == "MERKEZ" or form.endswith(" MERKEZ") for form in forms):
                 forms = {f"{norm(PROVINCES[int(plate) - 1])} MERKEZ"}
             since = day - timedelta(days=400) if late else day
             live = {
