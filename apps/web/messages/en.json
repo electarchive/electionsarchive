@@ -244,6 +244,7 @@
   "option_scattered": "Scattered votes",
   "option_individuals": "Individual candidates",
   "option_independents": "Independents",
+  "option_independents_count": "Independents ({count} candidates)",
   "option_others_independents": "Other parties and independents",
   "byes_change_other": "Passed between non-party candidates",
   "byes_majority": "Majority {count}.",

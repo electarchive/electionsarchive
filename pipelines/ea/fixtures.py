@@ -65,7 +65,7 @@ def export() -> list[str]:
                     """select n.text, coalesce(sum(x.seats), 0) from contest c
                        join name n on n.entity_id = c.id and n.is_preferred
                        join result_set rs on rs.contest_id = c.id and rs.is_default
-                       left join contest_option o on o.contest_id = c.id and o.kind = 'others'
+                       left join contest_option o on o.contest_id = c.id and o.kind in ('others', 'independents')
                        left join outcome x on x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null
                        where c.allocation_parent_id = %(national)s group by 1""",
                     tree,

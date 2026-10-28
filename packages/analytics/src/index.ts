@@ -394,7 +394,10 @@ export function compare(
     ) {
       return `alliance:${party}`;
     }
-    if (isPooledIndependent(option, party, match, isShared)) {
+    if (
+      isPooledIndependent(option, party, match, isShared) ||
+      (option.kind === "independents" && match !== "person" && isShared)
+    ) {
       return "independent";
     }
     if (

@@ -279,7 +279,7 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
                    ),
                    m as (
                      select t.result_set_id, max(t.votes) as top from t join {options} p on p.id = t.option_id
-                     where p.kind not in ('others', 'none_of_the_above', 'uncommitted')
+                     where p.kind not in ('others', 'independents', 'none_of_the_above', 'uncommitted')
                        and (p.kind <> 'write_in' or exists (select from {candidacies} x where x.option_id = t.option_id))
                        and not exists (select from {outcomes} w where w.result_set_id = t.result_set_id
                                        and w.option_id = t.option_id and w.kind = 'withdrew')

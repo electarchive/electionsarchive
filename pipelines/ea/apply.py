@@ -1204,7 +1204,7 @@ def defaults(
                              where x.result_set_id = p.old and x.candidacy_id is null and x.kind in ('elected', 'won')),
                        p.authoritative,
                        array(select o.k::text from contest_option o where o.contest_id = p.contest_id
-                             and o.kind in ('others', 'none_of_the_above', 'uncommitted'))
+                             and o.kind in ('others', 'independents', 'none_of_the_above', 'uncommitted'))
                 from picked p""",
         ),
         {"contests": contests},

@@ -36,7 +36,7 @@ export const nominationKind = pgEnum("nomination_kind", ["nominated", "endorsed"
 export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology", "editorial", "retired"])
 export const translationOrigin = pgEnum("translation_origin", ["official", "human", "machine"])
 export const officeKind = pgEnum("office_kind", ["head_of_state", "head_of_government", "governor", "mayor", "deputy_mayor", "muhtar", "speaker", "other"])
-export const optionKind = pgEnum("option_kind", ["candidate", "ticket", "list", "legend", "answer", "write_in", "others", "none_of_the_above", "uncommitted"])
+export const optionKind = pgEnum("option_kind", ["candidate", "ticket", "list", "legend", "answer", "write_in", "others", "none_of_the_above", "uncommitted", "independents"])
 export const outcomeKind = pgEnum("outcome_kind", ["elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified", "declined"])
 export const partyAffiliationKind = pgEnum("party_affiliation_kind", ["ep_group", "federation", "international", "regional_branch", "coalition"])
 export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group", "caucus"])
@@ -407,6 +407,7 @@ export const contestOption = pgTable("contest_option", {
 	ballotLabel: text("ballot_label"),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	candidateCount: integer("candidate_count"),
 }, (table) => [
 	foreignKey({
 		columns: [table.parentOptionId],
@@ -416,7 +417,8 @@ export const contestOption = pgTable("contest_option", {
 	index("contest_option_contest_idx").using("btree", table.contestId.asc().nullsLast()),
 	index("contest_option_parent_option_idx").using("btree", table.parentOptionId.asc().nullsLast()),
 	index("contest_option_party_idx").using("btree", table.partyId.asc().nullsLast()),
-	unique("contest_option_k_key").on(table.k),]);
+	unique("contest_option_k_key").on(table.k),
+check("contest_option_candidate_count_check", sql`(candidate_count > 0)`),]);
 
 export const coverageBuild = pgTable("coverage_build", {
 	id: boolean().default(true).primaryKey(),

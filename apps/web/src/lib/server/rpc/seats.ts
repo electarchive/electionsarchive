@@ -1722,7 +1722,7 @@ export const seats = {
         )
         select t.tier, t.id::text, coalesce(bm.into_id, br.parent_party_id, pm.into_id, t.party_id, t.id)::text as key,
           coalesce(pm.into_id, t.party_id)::text as own, t.ballot_label as label,
-          t.party_id is null and t.kind <> 'list' as is_person, t.kind = 'others' as is_pool, t.votes, t.seats, t.person::text, t.ballot,
+          t.party_id is null and t.kind <> 'list' as is_person, t.kind in ('others', 'independents') as is_pool, t.votes, t.seats, t.person::text, t.ballot,
           c.magnitude, c.day::text, c.kind, c.threshold
         from tiers t cross join c
         left join entity_merge pm on pm.entity_id = t.party_id

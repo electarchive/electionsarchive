@@ -1471,6 +1471,7 @@ async function load(
     party: string | null;
     person: string | null;
     label: string | null;
+    candidates: number | null;
     outcome: string | null;
     note: string | null;
     declined: boolean;
@@ -1521,7 +1522,7 @@ async function load(
         where o.parent_option_id is null and o.kind in ('candidate', 'ticket') and cy.option_id = o.id and cy.role = 'head' and not cy.is_independent
           and not exists (select from candidacy cz where cz.option_id = o.id and cz.role = 'head' and cz.id <> cy.id)
         limit 1
-      )) as party, o.ballot_label as label,
+      )) as party, o.ballot_label as label, o.candidate_count as candidates,
       o.alliance_id as alliance, o.parent_option_id is not null as is_line,
       exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
       case when o.contest_id in (select id from covered) then exists (
@@ -1835,6 +1836,11 @@ async function load(
             label:
               labels.full.get(row.person ?? "") ??
               labels.full.get(row.party ?? "") ??
+              (row.kind === "independents"
+                ? row.candidates == null
+                  ? m.option_independents()
+                  : m.option_independents_count({ count: row.candidates })
+                : undefined) ??
               (row.kind === "others"
                 ? (
                     {
@@ -2071,7 +2077,10 @@ function assign(
     const key = [
       option.party == null ? null : `party:${root(option.party)}`,
       option.people.length === 1 ? `person:${option.people[0]?.person}` : null,
-      option.party == null && option.isIndependent ? "independent" : null,
+      option.party == null &&
+      (option.isIndependent || option.kind === "independents")
+        ? "independent"
+        : null,
       option.party == null && loose.length === 1 ? loose[0] : null,
     ].find((entry) => entry != null && keys.has(entry));
     if (key != null) {
@@ -9683,7 +9692,7 @@ export const contests = {
           and ((o.kind = 'list' and cy.role = 'list_member' and (cy.list_position is not null or exists (
             select from outcome x join result_set r on r.id = x.result_set_id and ${latest("r")}
             where x.candidacy_id = cy.id and x.kind = 'elected'
-          ))) or (o.kind = 'others' and cy.role = 'head'))
+          ))) or (o.kind in ('others', 'independents') and cy.role = 'head'))
         left join entity_merge m on m.entity_id = cy.person_id
         left join entity_merge pm on pm.entity_id = o.party_id
         left join lateral (
@@ -9914,7 +9923,7 @@ export const contests = {
         ),
       );
       const independents = found.rows
-        .filter((row) => row.kind === "others")
+        .filter((row) => row.kind === "others" || row.kind === "independents")
         .map((row) => ({
           person: row.person,
           name: labels.full.get(row.person) ?? "",
@@ -19198,7 +19207,7 @@ export const people = {
             select count(*) from contest_option co where co.contest_id = o.root and co.parent_option_id is null and co.kind <> 'write_in'
           ))
             and not exists (
-              select from contest_option co where co.contest_id = o.root and co.kind not in ('candidate', 'ticket', 'write_in', 'others')
+              select from contest_option co where co.contest_id = o.root and co.kind not in ('candidate', 'ticket', 'write_in', 'others', 'independents')
             )
         )
         select p.root, p.date::text as date, p.year, p.kind, p.election, t.main::int as measure, t.votes,
