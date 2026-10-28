@@ -582,10 +582,25 @@ NO_ACCOUNTING_1973 = (
     "The registered voters, voters, and valid votes in this row of the book could not be read with confidence."
 )
 WINNER_PARTY_1973 = (
-    "The book's party column for this mayor is unreadable; the mayor is linked to the list with the most votes, "
-    "since a single plurality decided each mayoralty."
+    "The book names {mayor} as the elected mayor, but its party column for the mayor could not be read, so no "
+    "outcome is recorded for this contest."
 )
-INDEPENDENTS_1973 = "The independents' column sums every independent candidate in the municipality."
+INDEPENDENTS_1973 = (
+    "The book names {mayor}, an independent, as the elected mayor. The independents' column sums every independent "
+    "candidate in the municipality, so the mayor's own votes are unknown and no outcome is recorded."
+)
+GAP_1973 = (
+    "The party votes stored for this row add up to {votes:,} against the {valid:,} valid votes the book prints; "
+    "the difference is a count that could not be read or confirmed, or a misprint in the book."
+)
+UNREAD_WINNER_1973 = (
+    "The book names {mayor} ({party}) as the elected mayor, but a party's count in this row could not be read, so "
+    "the mayor's lead cannot be confirmed and no outcome is recorded."
+)
+SUSPECT_1973 = (
+    "The book names {mayor} ({party}) as the elected mayor, but another list has more votes in this row, so the "
+    "printed name, party, or a count is wrong, and no outcome is recorded."
+)
 
 
 def emit() -> Path:
@@ -824,6 +839,11 @@ def emit() -> Path:
                 raise ValueError(f"{contest_key}: no {label} option")
             return option
 
+        def shortfall(stored: dict) -> tuple[int, int] | None:
+            valid = next((cell["value"] for column, cell in stored.items() if measures.get(column) == VALID), None)
+            votes = sum(cell["value"] for column, cell in stored.items() if column not in measures)
+            return None if valid is None or votes == valid else (int(votes), int(valid))
+
         grouped = {(table, seq): frame for (table, seq), frame in values.group_by("table", "seq")}
         seen: set[tuple[str, str]] = set()
 
@@ -897,6 +917,8 @@ def emit() -> Path:
                 )
             if not row["accounting"]:
                 cs.add("note", entity_id=declared, kind="caveat", body_md=NO_ACCOUNTING_1973)
+            elif not row["unresolved"] and (gap := shortfall(stored)) is not None:
+                cs.add("note", entity_id=declared, kind="caveat", body_md=GAP_1973.format(votes=gap[0], valid=gap[1]))
             options: dict[str, UUID] = {}
 
             def option(label: str) -> UUID:
@@ -923,19 +945,39 @@ def emit() -> Path:
             if winner is None:
                 return
             label = winner["party"]
+            person_name, _, _ = tidy(winner["mayor"])
             if label is None:
-                votes = sorted(
-                    ((cell["value"], column) for column, cell in stored.items() if column not in measures), reverse=True
-                )
-                if not votes or (len(votes) > 1 and votes[0][0] == votes[1][0]) or row["unresolved"]:
-                    return
-                label = votes[0][1]
-                cs.add("note", entity_id=declared, kind="caveat", body_md=WINNER_PARTY_1973)
+                cs.add("note", entity_id=declared, kind="caveat", body_md=WINNER_PARTY_1973.format(mayor=person_name))
+                return
             if label not in KEYS_1973:
                 raise ValueError(f"{contest_key}: unknown party {label}")
-            if KEYS_1973[label] is None:
-                cs.add("note", entity_id=declared, kind="caveat", body_md=INDEPENDENTS_1973)
-            person_name, _, _ = tidy(winner["mayor"])
+            votes = {column: cell["value"] for column, cell in stored.items() if column not in measures}
+            listed = sorted((value for column, value in votes.items() if KEYS_1973[column] is not None), reverse=True)
+            independent = KEYS_1973[label] is None
+            unread = not independent and (
+                label not in votes or any(column in KEYS_1973 for column in row["unresolved"])
+            )
+            suspect = (
+                not independent
+                and not unread
+                and (votes[label] != listed[0] or (len(listed) > 1 and listed[0] == listed[1]))
+            )
+            if independent:
+                cs.add("note", entity_id=declared, kind="caveat", body_md=INDEPENDENTS_1973.format(mayor=person_name))
+            elif unread:
+                cs.add(
+                    "note",
+                    entity_id=declared,
+                    kind="caveat",
+                    body_md=UNREAD_WINNER_1973.format(mayor=person_name, party=party_names[label]),
+                )
+            elif suspect:
+                cs.add(
+                    "note",
+                    entity_id=declared,
+                    kind="caveat",
+                    body_md=SUSPECT_1973.format(mayor=person_name, party=party_names[label]),
+                )
             person = cs.key(f"{SOURCE}.person", f"1973:{key}")
             if person in cs.minted:
                 cs.add("person", id=person)
@@ -950,18 +992,19 @@ def emit() -> Path:
                 list_position=None,
                 ballot_name=None,
                 member_of_party_id=None,
-                is_independent=KEYS_1973[label] is None,
+                is_independent=independent,
             )
-            if KEYS_1973[label] is not None:
+            if not independent:
                 cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[label], kind="nominated")
-            cs.add(
-                "outcome",
-                result_set_id=declared,
-                option_id=option(label),
-                candidacy_id=candidacy,
-                kind="elected",
-                seats=None,
-            )
+            if not independent and not unread and not suspect:
+                cs.add(
+                    "outcome",
+                    result_set_id=declared,
+                    option_id=option(label),
+                    candidacy_id=candidacy,
+                    kind="elected",
+                    seats=None,
+                )
             cs.add(
                 "citation",
                 entity_id=candidacy,
@@ -1111,6 +1154,8 @@ def emit() -> Path:
                     unread[level].append(f"{place} ({', '.join(row['unresolved'])})")
                 if not row["accounting"]:
                     unread[level].append(f"{place} (registered, voters, valid)")
+                elif not row["unresolved"] and (gap := shortfall(stored)) is not None:
+                    unread[level].append(f"{place} (party votes {gap[0]:,} against {gap[1]:,} valid)")
                 for column, cell in stored.items():
                     if column in measures:
                         put(sets[level], unit, None, measures[column], cell)
@@ -1124,7 +1169,8 @@ def emit() -> Path:
                         "note",
                         entity_id=sets[level],
                         kind="caveat",
-                        body_md="Some counts in the book could not be read with confidence and are left out: "
+                        body_md="Some counts in the book could not be read with confidence and are left out, or the "
+                        + "party votes do not add up to the valid votes: "
                         + "; ".join(missing)
                         + ".",
                     )
