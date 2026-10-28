@@ -1191,7 +1191,7 @@ def emit() -> Path:
             if entity in cs.minted:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        counts = {"contests": 0, "candidates": 0, "matched": 0, "skipped": 0}
+        counts = {"contests": 0, "candidates": 0, "matched": 0, "skipped": 0, "elsewhere": 0}
         finalists: dict[str, dict[str, object]] = defaultdict(dict)
         kept = dict(
             conn.execute(
@@ -1199,6 +1199,15 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        elsewhere = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x join contest co on co.id = x.entity_id
+                   join changeset c on c.id = co.changeset_id
+                   join entity e on e.id = co.id and e.retired_by is null
+                   where x.scheme = 'us.contest' and c.pipeline = 'us.nyc_general' and x.value like '2026-%%'"""
+            ).fetchall()
+        }
         for state, day, publisher, title, page, address in ROUNDS:
             first = min(when for other, when, *_ in ROUNDS if other == state)
             runoff = day != first
@@ -1320,6 +1329,9 @@ def emit() -> Path:
                 if template is None:
                     print("no 2026 general contest for", state, chamber, district)
                     counts["skipped"] += 1
+                    continue
+                if f"{day}:{state}:{chamber}:{district}:{party}" in elsewhere:
+                    counts["elsewhere"] += 1
                     continue
                 kind, office, body, area, magnitude, term, chamber_name = template
                 contest_key = (
@@ -1486,5 +1498,20 @@ def emit() -> Path:
                 elif totals[0][0] > 0 and (len(totals) == 1 or totals[0][0] > totals[1][0]):
                     cs.add("outcome", result_set_id=result_set, option_id=totals[0][1], kind="won", seats=None)
                 counts["contests"] += 1
+        written = {str(row["id"]) for row in cs.rows.get("contest", [])}
+        for entity, value in conn.execute(
+            """select co.id, x.value from contest co join changeset c on c.id = co.changeset_id
+               join entity e on e.id = co.id and e.retired_by is null
+               join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
+               where c.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if str(entity) not in written:
+                print("retiring", value)
+                cs.add(
+                    "entity_retirement",
+                    entity_id=entity,
+                    reason="The primary is held by another pipeline's finer results for the same contest",
+                )
         print(counts)
         return cs.write()
