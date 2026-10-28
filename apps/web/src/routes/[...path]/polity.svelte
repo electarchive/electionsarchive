@@ -491,22 +491,31 @@
 
 {#if isNational}
   <Scrubber {id} place={polity.name} latest={polity.latest} />
-{:else if polity.latest != null && polity.latest.races.length > 0}
+{:else if (polity.latest != null && polity.latest.races.length > 0) || polity.next != null}
   <section
     class={cn(
       "col-span-12 grid content-start gap-3 bg-card px-3.5 pbs-3 pbe-3.5",
       { "lg:col-span-4": isMapped },
     )}
-    aria-labelledby="{uid}-latest"
+    aria-labelledby="{uid}-{polity.latest != null &&
+    polity.latest.races.length > 0
+      ? 'latest'
+      : 'next'}"
   >
     {#if polity.next != null}
       <div
         class={cn(
-          "flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-be border-border pbe-3",
+          "flex flex-wrap items-baseline gap-x-3 gap-y-0.5",
           { "lg:flex-col lg:items-start": isMapped },
+          {
+            "border-be border-border pbe-3":
+              polity.latest != null && polity.latest.races.length > 0,
+          },
         )}
       >
-        <h2 class="text-[0.8125rem] font-bold">{m.polity_next()}</h2>
+        <h2 id="{uid}-next" class="text-[0.8125rem] font-bold">
+          {m.polity_next()}
+        </h2>
         {#if polity.next.path == null}
           <span class="heading">{polity.next.name}</span>
         {:else}
@@ -523,165 +532,173 @@
         </span>
       </div>
     {/if}
-    <div
-      class={cn("flex flex-wrap items-baseline gap-x-3 gap-y-0.5", {
-        "lg:flex-col lg:items-start": isMapped,
-      })}
-    >
-      <h2 id="{uid}-latest" class="text-[0.8125rem] font-bold">
-        {polity.latest.isLocal ? m.polity_latest_local() : m.polity_latest()}
-      </h2>
-      {#if polity.latest.path == null}
-        <span class="heading">{polity.latest.name}</span>
-      {:else if polity.latest.scope != null}
-        <a
-          class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href="{resolve('/[...path]', { path: polity.latest.path })}?in={polity
-            .latest.scope}">{polity.latest.name}</a
-        >
-      {:else}
-        <Preview
-          class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
-          path={polity.latest.path}>{polity.latest.name}</Preview
-        >
-      {/if}
-      <time
-        class="text-[0.8125rem] text-muted-foreground"
-        datetime={polity.latest.date}>{date(polity.latest.date)}</time
+    {#if polity.latest != null && polity.latest.races.length > 0}
+      <div
+        class={cn("flex flex-wrap items-baseline gap-x-3 gap-y-0.5", {
+          "lg:flex-col lg:items-start": isMapped,
+        })}
       >
-    </div>
-    <ul
-      class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-x-6 gap-y-4"
-    >
-      {#each isAllRaces ? polity.latest.races : polity.latest.races.slice(0, 8) as race, index (index)}
-        {const isSeated = $derived(
-          race.contested > 1 &&
-            race.results.filter((row) => (row.seats ?? 0) > 0).length > 1,
-        )}
-        {const plain = $derived(
-          race.name.replace(/^\d{4} /u, "").replace(/ election$/u, ""),
-        )}
-        {const short = $derived(
-          plain.replace(new RegExp(`^${RegExp.escape(polity.name)} `, "u"), ""),
-        )}
-        {const local = $derived(
-          plain.replace(
-            new RegExp(`^(?:${RegExp.escape(polity.name)}[:,]? )+`, "u"),
-            "",
-          ),
-        )}
-        {const stripped = $derived(
-          polity.parent != null
-            ? /^\p{Lu}\S*\s/u.test(local)
-              ? local
-              : plain
-            : polity.latest.races.some(
-                  (other) =>
-                    other !== race &&
-                    other.name.replace(/ election$/u, "").endsWith(` ${short}`),
-                )
-              ? plain
-              : short,
-        )}
-        {const label = $derived(
-          stripped.charAt(0).toUpperCase() + stripped.slice(1),
-        )}
-        <li class="grid content-start gap-1.5">
-          <p class="text-sm font-semibold text-pretty">
-            {#if race.path == null}
-              {label}
-            {:else}
-              <Preview
-                class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                path={race.path}>{label}</Preview
-              >
-            {/if}
-          </p>
-          {#if race.isPartyless}
-            <p
-              class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-            >
-              {m.record_seats_filled({ count: race.contested })}
-            </p>
-          {:else if race.results.length > 1}
-            <div
-              class="flex overflow-hidden rounded-xs bg-muted block-2"
-              aria-hidden="true"
-            >
-              {#each race.results as row (row.key)}
-                <span
-                  class="block-full"
-                  style:inline-size="{(isSeated
-                    ? (row.seats ?? 0) / race.contested
-                    : row.share) * 100}%"
-                  style:background-color={swatch(row.color, row.key)}
-                ></span>
-              {/each}
-            </div>
-          {/if}
-          {#if !race.isPartyless}
-            <ul class="grid gap-0.5 text-sm">
-              {#each race.results.slice(0, 2) as row (row.key)}
-                <li
-                  class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
-                >
-                  <Name
-                    class="truncate min-inline-0"
-                    label={row.label}
-                    color={swatch(row.color, row.key)}
-                    person={row.person}
-                    party={row.party}
-                  />
-                  <span class="font-figures text-[0.8125rem] tabular-nums"
-                    >{isSeated
-                      ? m.polity_seats({
-                          seats: count(row.seats ?? 0),
-                          size: count(race.contested),
-                        })
-                      : race.results.length === 1
-                        ? m.map_unopposed()
-                        : percent(row.share)}</span
-                  >
-                </li>
-              {/each}
-            </ul>
-          {/if}
-          {#if race.first != null || race.pending != null}
-            <p
-              class="flex flex-wrap gap-x-3 text-[0.8125rem] text-muted-foreground"
-            >
-              {#if race.first != null}
+        <h2 id="{uid}-latest" class="text-[0.8125rem] font-bold">
+          {polity.latest.isLocal ? m.polity_latest_local() : m.polity_latest()}
+        </h2>
+        {#if polity.latest.path == null}
+          <span class="heading">{polity.latest.name}</span>
+        {:else if polity.latest.scope != null}
+          <a
+            class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
+            href="{resolve('/[...path]', {
+              path: polity.latest.path,
+            })}?in={polity.latest.scope}">{polity.latest.name}</a
+          >
+        {:else}
+          <Preview
+            class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
+            path={polity.latest.path}>{polity.latest.name}</Preview
+          >
+        {/if}
+        <time
+          class="text-[0.8125rem] text-muted-foreground"
+          datetime={polity.latest.date}>{date(polity.latest.date)}</time
+        >
+      </div>
+      <ul
+        class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-x-6 gap-y-4"
+      >
+        {#each isAllRaces ? polity.latest.races : polity.latest.races.slice(0, 8) as race, index (index)}
+          {const isSeated = $derived(
+            race.contested > 1 &&
+              race.results.filter((row) => (row.seats ?? 0) > 0).length > 1,
+          )}
+          {const plain = $derived(
+            race.name.replace(/^\d{4} /u, "").replace(/ election$/u, ""),
+          )}
+          {const short = $derived(
+            plain.replace(
+              new RegExp(`^${RegExp.escape(polity.name)} `, "u"),
+              "",
+            ),
+          )}
+          {const local = $derived(
+            plain.replace(
+              new RegExp(`^(?:${RegExp.escape(polity.name)}[:,]? )+`, "u"),
+              "",
+            ),
+          )}
+          {const stripped = $derived(
+            polity.parent != null
+              ? /^\p{Lu}\S*\s/u.test(local)
+                ? local
+                : plain
+              : polity.latest.races.some(
+                    (other) =>
+                      other !== race &&
+                      other.name
+                        .replace(/ election$/u, "")
+                        .endsWith(` ${short}`),
+                  )
+                ? plain
+                : short,
+          )}
+          {const label = $derived(
+            stripped.charAt(0).toUpperCase() + stripped.slice(1),
+          )}
+          <li class="grid content-start gap-1.5">
+            <p class="text-sm font-semibold text-pretty">
+              {#if race.path == null}
+                {label}
+              {:else}
                 <Preview
                   class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                  path={race.first}>{m.round_first()}</Preview
-                >
-              {/if}
-              {#if race.pending != null}
-                <span
-                  >{(race.pending.isGeneral
-                    ? m.race_next_general
-                    : m.race_next_runoff)({
-                    date: date(race.pending.date),
-                  })}</span
+                  path={race.path}>{label}</Preview
                 >
               {/if}
             </p>
-          {/if}
-        </li>
-      {/each}
-    </ul>
-    {#if polity.latest.races.length > 8}
-      <button
-        type="button"
-        class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
-        aria-expanded={isAllRaces}
-        onclick={() => (isAllRaces = !isAllRaces)}
-        >{isAllRaces
-          ? m.regions_fewer()
-          : m.regions_more({
-              count: count(polity.latest.races.length),
-            })}</button
-      >
+            {#if race.isPartyless}
+              <p
+                class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+              >
+                {m.record_seats_filled({ count: race.contested })}
+              </p>
+            {:else if race.results.length > 1}
+              <div
+                class="flex overflow-hidden rounded-xs bg-muted block-2"
+                aria-hidden="true"
+              >
+                {#each race.results as row (row.key)}
+                  <span
+                    class="block-full"
+                    style:inline-size="{(isSeated
+                      ? (row.seats ?? 0) / race.contested
+                      : row.share) * 100}%"
+                    style:background-color={swatch(row.color, row.key)}
+                  ></span>
+                {/each}
+              </div>
+            {/if}
+            {#if !race.isPartyless}
+              <ul class="grid gap-0.5 text-sm">
+                {#each race.results.slice(0, 2) as row (row.key)}
+                  <li
+                    class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
+                  >
+                    <Name
+                      class="truncate min-inline-0"
+                      label={row.label}
+                      color={swatch(row.color, row.key)}
+                      person={row.person}
+                      party={row.party}
+                    />
+                    <span class="font-figures text-[0.8125rem] tabular-nums"
+                      >{isSeated
+                        ? m.polity_seats({
+                            seats: count(row.seats ?? 0),
+                            size: count(race.contested),
+                          })
+                        : race.results.length === 1
+                          ? m.map_unopposed()
+                          : percent(row.share)}</span
+                    >
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+            {#if race.first != null || race.pending != null}
+              <p
+                class="flex flex-wrap gap-x-3 text-[0.8125rem] text-muted-foreground"
+              >
+                {#if race.first != null}
+                  <Preview
+                    class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                    path={race.first}>{m.round_first()}</Preview
+                  >
+                {/if}
+                {#if race.pending != null}
+                  <span
+                    >{(race.pending.isGeneral
+                      ? m.race_next_general
+                      : m.race_next_runoff)({
+                      date: date(race.pending.date),
+                    })}</span
+                  >
+                {/if}
+              </p>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+      {#if polity.latest.races.length > 8}
+        <button
+          type="button"
+          class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
+          aria-expanded={isAllRaces}
+          onclick={() => (isAllRaces = !isAllRaces)}
+          >{isAllRaces
+            ? m.regions_fewer()
+            : m.regions_more({
+                count: count(polity.latest.races.length),
+              })}</button
+        >
+      {/if}
     {/if}
   </section>
 {/if}
