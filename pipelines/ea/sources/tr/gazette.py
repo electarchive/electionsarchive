@@ -1494,6 +1494,11 @@ SENATE_CAVEATS = {
         "Tokat the seats split between two lists."
     ),
 }
+UNEVEN_CAVEAT = (
+    "The party and independent votes YSK prints for this province do not add up to the valid ballots it prints, so "
+    "one of the figures is probably misprinted; the archive keeps them as printed. Votes {votes:,}, valid ballots "
+    "{valid:,}."
+)
 SWAPPED = {(date(1961, 10, 15), "25"), (date(1961, 10, 15), "26")}
 SWAPPED_CAVEAT = (
     "The decision's list of senators prints Erzurum's three winners as Justice Party (AP) members and "
@@ -2015,6 +2020,12 @@ def emit() -> Path:
             name(contest, law_native, kind="native")
             cs.add("slug", path=f"tr/{day}-referendum/constitution", entity_id=contest)
             declared = cs.key(f"{SOURCE}.result_set", contest_key)
+            owner = conn.execute(
+                "select c.pipeline from result_set rs join changeset c on c.id = rs.changeset_id where rs.id = %s",
+                [declared],
+            ).fetchone()
+            if owner is not None and owner[0] != SOURCE:
+                continue
             cs.add(
                 "result_set",
                 id=declared,
@@ -2099,7 +2110,7 @@ def emit() -> Path:
                     height=height,
                 )
             vote = cs.key("tr.election", str(day))
-            general = vote not in cs.minted
+            general = day.year in (1961, 1969, 1973, 1977)
             path = f"tr/{day}-general/senate" if general else f"tr/{day}-senate"
             if not general:
                 cs.add("election", id=vote, polity_id=turkey, kind="general", date_from=day, date_to=day, status="held")
@@ -2215,6 +2226,17 @@ def emit() -> Path:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SWAPPED_CAVEAT)
                 fresh = declared in cs.minted
                 row = counted.filter(pl.col("unit") == unit)
+                printed = dict(row.select("column", "value").iter_rows())
+                cast = sum(value for column, value in printed.items() if column >= len(SENATE_COLUMNS)) + (
+                    stood["votes"].sum() or 0
+                )
+                if day not in SENATE_CAVEATS and 2 in printed and cast != printed[2]:
+                    cs.add(
+                        "note",
+                        entity_id=declared,
+                        kind="caveat",
+                        body_md=UNEVEN_CAVEAT.format(votes=int(cast), valid=int(printed[2])),
+                    )
                 lists = {}
                 for column, short in enumerate(parties, len(SENATE_COLUMNS)):
                     seats = listed.filter(pl.col("party") == short).height
