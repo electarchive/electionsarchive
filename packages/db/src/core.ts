@@ -968,11 +968,13 @@ export const partyImage = pgTable("party_image", {
 	uploadedAt: timestamp("uploaded_at", { withTimezone: true }),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	datedUrl: text("dated_url"),
 }, (table) => [
 	index("party_image_party_idx").using("btree", table.partyId.asc().nullsLast()),
 	check("party_image_width_check", sql`(width > 0)`),
 	check("party_image_height_check", sql`(height > 0)`),
-	check("party_image_dated_by_check", sql`(dated_by = ANY (ARRAY['wikidata'::text, 'file'::text, 'next_logo'::text]))`),
+	check("party_image_dated_by_check", sql`(dated_by = ANY (ARRAY['wikidata'::text, 'file'::text, 'source'::text, 'next_logo'::text]))`),
+	check("party_image_dated_url_check", sql`((dated_by = 'source'::text) = (dated_url IS NOT NULL))`),
 	check("party_image_check", sql`((dated_by IS NULL) = ((valid_from IS NULL) AND (valid_to IS NULL)))`),
 ]);
 
