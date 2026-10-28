@@ -14,7 +14,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "it.istat"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 LIMITS = {
     2022: "https://www.istat.it/storage/cartografia/confini_amministrativi/non_generalizzati/2022/Limiti01012022.zip",
@@ -49,6 +49,18 @@ LAYERS = {
         "CU20_COD",
         "CU20_DEN",
     ),
+    "plurinominale_senato_2020": (
+        COLLEGI,
+        "Collegi_Elettorali_BasiGeografiche/SENATO_CollegiPLURINOMINALI_2020/SENATO_CollegiPLURINOMINALI_2020",
+        "SP20_COD",
+        "SP20_DEN",
+    ),
+    "collegio_senato_2020": (
+        COLLEGI,
+        "Collegi_Elettorali_BasiGeografiche/SENATO_CollegiUNINOMINALI_2020/SENATO_CollegiUNINOMINALI_2020",
+        "SU20_COD",
+        "SU20_DEN",
+    ),
 }
 COUNTS = {
     "comune_2022": 7904,
@@ -57,6 +69,8 @@ COUNTS = {
     "circoscrizione_camera": 28,
     "plurinominale_camera": 49,
     "uninominale_camera": 147,
+    "plurinominale_senato_2020": 26,
+    "collegio_senato_2020": 74,
     "nation": 1,
 }
 TOLERANCE = 10
@@ -252,7 +266,13 @@ def emit() -> Path:
         geometry(cs.area("it.nation", "IT"), ("nation", "IT"), LIMITS[2025], None, None)
         for code in frame.filter(pl.col("layer") == "regione")["code"]:
             geometry(cs.area("it.regione", code), ("regione", code), LIMITS[2025], None, None)
-        for layer in ("circoscrizione_camera", "plurinominale_camera", "uninominale_camera"):
+        for layer in (
+            "circoscrizione_camera",
+            "plurinominale_camera",
+            "uninominale_camera",
+            "plurinominale_senato_2020",
+            "collegio_senato_2020",
+        ):
             known = {
                 slug(code): area
                 for code, area in conn.execute(
@@ -262,6 +282,8 @@ def emit() -> Path:
             }
             for code, name in frame.filter(pl.col("layer") == layer).select("code", "name").rows():
                 key = slug(name).replace("-vallee-d-aoste", "")
+                if layer.endswith("_senato_2020"):
+                    key = f"{int(code) // 10000:02d}-{key.replace('-sudtirol', '')}"
                 if key not in known:
                     raise ValueError(f"no it.{layer} area matches ISTAT's {name}")
                 geometry(known.pop(key), (layer, code), COLLEGI, None, None)
@@ -369,6 +391,8 @@ def emit() -> Path:
             ("it.circoscrizione_camera", "2020", None, None, ELECTIONS[2022]),
             ("it.plurinominale_camera", "2020", None, None, ELECTIONS[2022]),
             ("it.uninominale_camera", "2020", None, None, ELECTIONS[2022]),
+            ("it.plurinominale_senato_2020", "2020", None, None, ELECTIONS[2022]),
+            ("it.collegio_senato_2020", "2020", None, None, ELECTIONS[2022]),
         ):
             cs.add("boundary_set", scheme_code=scheme, vintage=vintage, valid_from=start, valid_to=end, as_of=on)
         return cs.write()
