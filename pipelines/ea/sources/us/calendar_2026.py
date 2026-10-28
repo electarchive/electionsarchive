@@ -75,6 +75,12 @@ SOURCES = {
         "Office of Governor Sarah Huckabee Sanders",
         "Amended proclamation calling a special election for State Senator for District 18",
     ),
+    "AR-18-candidates": (
+        "https://arkansasradio.com/2026/10/arkansas-senate-district-18-special-election-december-15-2026/",
+        "news_agency",
+        "Arkansas Radio",
+        "Sanders Calls Special Election to Fill Arkansas Senate District 18 Vacancy",
+    ),
     "MS-qualifying": (
         "https://sos.ms.gov/content/CandidateQualifying/default.aspx",
         "official_body",
@@ -111,7 +117,7 @@ CONTESTS = {
     "2026-11-03:MS:house:77:gs": ("2026-11-03:MS", "two_round", "MS-70-77", "MS-qualifying"),
     "2026-11-03:LA:house:92:gs": ("2026-11-03:LA", "two_round", "LA-92", "LA-344"),
     "2026-12-12:LA:senate:14:s": ("2026-12-12:LA:special", "two_round", "LA", "LA-345"),
-    "2026-12-15:AR:senate:18:s": ("2026-12-15:AR:special", "fptp", "AR-18", None),
+    "2026-12-15:AR:senate:18:s": ("2026-12-15:AR:special", "fptp", "AR-18", "AR-18-candidates"),
     "2026-12-22:MS:senate:34:s": ("2026-12-22:MS:special", "two_round", "MS-34", "MS-qualifying"),
 }
 STATES = {"MS": "Mississippi", "LA": "Louisiana", "AR": "Arkansas"}
@@ -177,6 +183,15 @@ def parse() -> None:
                 rows.append(
                     {"contest": contest, "name": listed[index + 1], "party": listed[listed.index("Party", index) + 1]}
                 )
+    article = " ".join(tokens("AR-18-candidates"))
+    for text, party in (
+        ("Will Moore", "Republican"),
+        ("Camille Feyen", "Democrat"),
+        ("Steven McClelland", "No Party"),
+        ("Trevor McGarrah", "No Party"),
+    ):
+        assert text in article, text
+        rows.append({"contest": "2026-12-15:AR:senate:18:s", "name": text, "party": party})
     page = raw.cached(SOURCE, SOURCES["MS-qualifying"][0]).path.read_text()
     judges = []
     for header, court in COURTS.items():
