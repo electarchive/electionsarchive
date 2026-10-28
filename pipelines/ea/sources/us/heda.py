@@ -1,20 +1,20 @@
 import json
+import os
 import re
 import time
-from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
 
-from ea import raw
+from ea import precinct_code, raw
 from ea.changeset import Changeset
 from ea.sources.us import medsl_state, openelections
 from ea.sources.us.klarner import LOWER
 from ea.store import DATA, connect
 
 SOURCE = "us.heda"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DATASET = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/YN4TLR"
 FILE = "https://dataverse.harvard.edu/api/access/datafile/{id}"
@@ -212,7 +212,8 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    lines = pl.read_parquet(PARSED / "lines.parquet")
+    scope = [state for state in os.environ.get("HEDA_STATES", "").split(",") if state]
+    lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("state").is_in(scope) if scope else pl.lit(True))
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -279,23 +280,25 @@ def emit() -> Path:
             license="CC BY 3.0",
         )
         cited: set[str] = set()
-        counties = {
-            code: (unit, area)
-            for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code = 'us.county'"
-            ).fetchall()
-        }
-        minted: dict[str, tuple[str, str, date]] = {}
+        parts = pl.col("code").str.splitn(":", 5)
+        held = precinct_code.held(conn, SOURCE, scope).with_columns(
+            canonical=precinct_code.expr(
+                parts.struct.field("field_0"),
+                parts.struct.field("field_1"),
+                parts.struct.field("field_2"),
+                parts.struct.field("field_4"),
+            )
+        )
+        values, locators = precinct_code.remap(cs, conn, held)
+        minted: set[str] = set(held["canonical"])
         skipped: dict[str, list[str]] = {}
         missed: list[tuple[float, str, int, int]] = []
-        values = []
         for (state, year, office, district, file), rows in lines.group_by(
             "state", "year", "office", "district", "file", maintain_order=True
         ):
             key = seats.get((state, year, office, district))
             if key is None:
                 continue
-            day = date.fromisoformat(key[:10])
             contest, election, first, official = conn.execute(
                 """select c.id, c.election_id, min(v.count_round), sum(v.value) filter (where v.measure = 1)::bigint
                    from external_id x join contest c on c.id = x.entity_id
@@ -386,11 +389,8 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, FILE.format(id=files()[file])), source)
             picked = rows.filter(
                 pl.col("party").is_in([side for side in "dr" if options[side]]), pl.col("votes") > 0
-            ).with_columns(
-                code=pl.concat_str(pl.lit(str(year)), "state", "fips", pl.lit(""), "precinct", separator=":")
-            )
-            for code, fips in picked.select("code", "fips").unique().iter_rows():
-                minted.setdefault(code, (state, fips, day))
+            ).with_columns(code=precinct_code.expr(pl.lit(year), pl.col("state"), pl.col("fips"), pl.col("precinct")))
+            minted |= set(picked["code"])
             values.append(
                 picked.select(
                     result_set_id=pl.lit(str(result_set)),
@@ -411,29 +411,10 @@ def emit() -> Path:
             print(f"{len(states)} contests skipped: {reason}", pl.Series(states).value_counts(sort=True).rows()[:12])
         for ratio, key, counted, official in sorted(missed)[:: max(1, len(missed) // 30)]:
             print(f"{key}: {counted} by precinct against {official} ({ratio:.3f})")
-        existing = {
-            code
-            for (code,) in conn.execute(
-                "select code from reporting_unit where scheme_code = 'us.precinct' and code = any(%s)", [list(minted)]
-            ).fetchall()
-        }
-        for code, (state, fips, day) in minted.items():
-            if code in existing:
-                continue
-            cs.add(
-                "reporting_unit",
-                id=cs.unit("us.precinct", code),
-                polity_id=cs.polity(f"US-{state}"),
-                scheme_code="us.precinct",
-                code=code,
-                parent_id=counties[fips][0],
-                area_relation="within",
-                area_id=counties[fips][1],
-                kind="standard",
-                valid_from=day,
-                valid_to=day + timedelta(days=1),
-            )
-        print(f"{len(values)} precinct sets, {len(minted) - len(existing)} new precincts, {len(existing)} reused")
+        precinct_code.units(cs, conn, pl.Series(sorted(minted), dtype=pl.String), held)
+        print(f"{held['result_set_id'].n_unique()} held sets, {len(values)} value frames, {len(minted)} units")
         if values:
-            cs.frame("result_value", pl.concat(values))
+            cs.frame("result_value", pl.concat(values, how="vertical_relaxed"))
+        if locators:
+            cs.frame("value_locator", pl.concat(locators, how="vertical_relaxed"))
         return cs.write()
