@@ -54,9 +54,11 @@
             ? null
             : isGain
               ? m.gains_seat({ to: label(to), from: label(from) })
-              : from != null && label(to) !== label(from)
-                ? m.byes_change_other()
-                : m.byes_hold({ party: label(to) }),
+              : from == null
+                ? m.byes_won({ party: label(to) })
+                : label(to) !== label(from)
+                  ? m.byes_change_other()
+                  : m.byes_hold({ party: label(to) }),
         why:
           row.member == null
             ? row.cause
@@ -110,9 +112,11 @@
               count: sheet.rows.length,
               year: String(sheet.until),
             })}
-        {sheet.changed === 0
-          ? m.byes_changed_none()
-          : m.byes_changed({ count: sheet.changed })}
+        {sheet.changed > 0
+          ? m.byes_changed({ count: sheet.changed })
+          : sheet.rows.every((row) => row.to == null || row.from != null)
+            ? m.byes_changed_none()
+            : ""}
       </p>
     </div>
     {#if sheet.net.length > 0}

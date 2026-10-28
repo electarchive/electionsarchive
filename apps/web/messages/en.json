@@ -239,6 +239,7 @@
   "byes_all": "Show all {count} by-elections",
   "byes_net": "Net change",
   "byes_hold": "{party} hold",
+  "byes_won": "Won by {party}; the previous member's party isn't recorded",
   "byes_change_other": "Passed between non-party candidates",
   "byes_majority": "Majority {count}.",
   "byes_reason_died": "{name} died.",

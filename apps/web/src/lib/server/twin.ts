@@ -3045,7 +3045,7 @@ function electionMarkdown(
             byes?.until == null
               ? m.byes_lede_open({ count: byeRows.length })
               : m.byes_lede({ count: byeRows.length, year: String(byes.until) })
-          } ${gained === 0 ? m.byes_changed_none() : m.byes_changed({ count: gained })}`,
+          } ${gained > 0 ? m.byes_changed({ count: gained }) : byeRows.every((row) => row.to == null || row.from != null) ? m.byes_changed_none() : ""}`.trimEnd(),
           table(
             [
               m.col_date(),
@@ -3063,9 +3063,11 @@ function electionMarkdown(
                 ? null
                 : row.isGain
                   ? m.gains_seat({ to: label(row.to), from: label(row.from) })
-                  : row.from != null && label(row.to) !== label(row.from)
-                    ? m.byes_change_other()
-                    : m.byes_hold({ party: label(row.to) }),
+                  : row.from == null
+                    ? m.byes_won({ party: label(row.to) })
+                    : label(row.to) !== label(row.from)
+                      ? m.byes_change_other()
+                      : m.byes_hold({ party: label(row.to) }),
               row.majority == null ? null : count(row.majority),
               row.member == null
                 ? row.cause
