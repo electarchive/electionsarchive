@@ -9,7 +9,7 @@ from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "4"
+VERSION = "5"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -40,6 +40,7 @@ MINTED: dict[str, tuple[str, list[tuple[str, str | None, date | None, date | Non
             ("Demokratik Bölgeler Partisi", "DBP", DBP_RENAMED, None),
         ],
     ),
+    "yeni-parti-2026": ("Q140644267", [("Yeni Parti", "YENİ", date(2026, 7, 24), None)]),
 }
 MERGED = {
     "ozgurluk-ve-dayanisma-partisi": "sol-parti",
@@ -49,14 +50,19 @@ MERGED = {
 DEM = ("tr", "Halkların Eşitlik ve Demokrasi Partisi")
 HEDEP = date(2023, 10, 15)
 DEM_SHORT = date(2023, 12, 11)
+YENI = ("tr", "Yeni Parti (2026)")
 NAMES = {
-    "yesiller-ve-sol-gelecek-partisi": [
-        ("Yeşiller ve Sol Gelecek Partisi", "official", date(2012, 11, 25), HEDEP),
-        ("YSP", "abbreviation", date(2012, 11, 25), HEDEP),
-        ("Halkların Eşitlik ve Demokrasi Partisi", "official", HEDEP, None),
-        ("HEDEP", "abbreviation", HEDEP, DEM_SHORT),
-        ("DEM Parti", "abbreviation", DEM_SHORT, None),
-    ]
+    "yesiller-ve-sol-gelecek-partisi": (
+        DEM,
+        [
+            ("Yeşiller ve Sol Gelecek Partisi", "official", "tr", date(2012, 11, 25), HEDEP),
+            ("YSP", "abbreviation", "tr", date(2012, 11, 25), HEDEP),
+            ("Halkların Eşitlik ve Demokrasi Partisi", "official", "tr", HEDEP, None),
+            ("HEDEP", "abbreviation", "tr", HEDEP, DEM_SHORT),
+            ("DEM Parti", "abbreviation", "tr", DEM_SHORT, None),
+        ],
+    ),
+    "yeni-parti-2026": (YENI, [("New Party", "english", "en", date(2026, 7, 24), None)]),
 }
 HDP_OPEN = (
     "HDP was not closed. Facing a closure case at the Constitutional Court, it handed its active political work to "
@@ -155,6 +161,7 @@ RELATIONS: list[tuple[str, str, str | None, date, str, tuple[str, str] | str]] =
         ("en", "Peace and Democracy Party"),
     ),
     ("halklarin-demokratik-partisi", "successor_of", "baris-ve-demokrasi-partisi", date(2014, 4, 28), "day", LIST),
+    ("yeni-parti-2026", "split_from", "cumhuriyet-halk-partisi", date(2026, 7, 24), "day", YENI),
     (
         "yesiller-ve-sol-gelecek-partisi",
         "successor_of",
@@ -331,7 +338,7 @@ JOINT_LISTS = [
 ARTICLES = sorted(
     {cite for *_, cite in RELATIONS if isinstance(cite, tuple)}
     | {cite for *_, cite in VEHICLES}
-    | {LIST, ("en", "Left Party (Turkey)"), ("tr", "Genç Parti"), DEM}
+    | {LIST, ("en", "Left Party (Turkey)"), ("tr", "Genç Parti"), DEM, YENI}
     | {("tr", "2018 Türkiye genel seçimleri"), ("tr", "2023 Türkiye genel seçimleri")}
 )
 
@@ -350,7 +357,7 @@ def emit() -> Path:
             summary=(
                 "Turkish party lineage from 1946 to 2025: court closures, mergers, parties that joined another, "
                 "successors, and splits within a tradition, with the renames of ÖDP to Sol Parti and Yeniden Doğuş "
-                "Partisi to Genç Parti merged into one party each, YSP renamed HEDEP and then DEM Parti, and the joint "
+                "Partisi to Genç Parti merged into one party each, YSP renamed HEDEP and then DEM Parti, YENİ Parti's split from CHP, and the joint "
                 "lists of 1991, 2002, 2018, and 2023 that carried other parties' candidates"
             ),
             polity="TR",
@@ -423,13 +430,13 @@ def emit() -> Path:
             if duplicate in known and known[duplicate] != known[survivor]:
                 cs.add("entity_merge", entity_id=known[duplicate], into_id=known[survivor])
 
-        for key, versions in NAMES.items():
-            for text, kind, start, end in versions:
+        for key, (cite, versions) in NAMES.items():
+            for text, kind, lang, start, end in versions:
                 cs.add(
                     "name",
                     entity_id=parties[key],
                     text=text,
-                    lang="tr",
+                    lang=lang,
                     kind=kind,
                     is_preferred=kind == "official" and end is None,
                     valid_from=start,
@@ -437,7 +444,7 @@ def emit() -> Path:
                     valid_to=end,
                     valid_to_precision="day",
                 )
-                cs.add("citation", entity_id=parties[key], source_id=sources[DEM], locator={"name": text})
+                cs.add("citation", entity_id=parties[key], source_id=sources[cite], locator={"name": text})
             for name_id, text in conn.execute(
                 """select id, text from name where entity_id = %s and lang = 'tr'
                    and kind in ('official', 'abbreviation') and valid_from is null and valid_to is null""",
@@ -448,7 +455,7 @@ def emit() -> Path:
                     name_id=name_id,
                     entity_id=parties[key],
                     text=text,
-                    reason="Replaced by the party's dated names: YSP from 2012, HEDEP from October 2023, DEM Parti from December 2023.",
+                    reason="Replaced by the party's dated names.",
                 )
         cs.add("note", entity_id=parties["halklarin-demokratik-partisi"], kind="context", body_md=HDP_OPEN)
         for origin, kind, target, day, precision, cite in RELATIONS:

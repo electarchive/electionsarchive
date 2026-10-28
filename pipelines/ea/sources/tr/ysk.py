@@ -1067,6 +1067,30 @@ CANDIDATES_2014 = [
     ("Selahattin Demirtaş", "Halkların Demokratik Partisi"),
     ("Ekmeleddin Mehmet İhsanoğlu", None),
 ]
+SWITCHES = Path(__file__).with_name("tbmm_2023_parties.tsv")
+SWITCH_SOURCES = {
+    "evrensel": (
+        "https://www.evrensel.net/haber/5993477/yeni-partinin-kuruculari-kimlerden-olusuyor-91-milletvekilinin-listesi",
+        "news_agency",
+        "Evrensel",
+        "YENİ Parti'nin kurucuları kimlerden oluşuyor? 91 milletvekilinin listesi",
+        ".html",
+    ),
+    "wikipedia": (
+        "https://tr.wikipedia.org/w/index.php?title=TBMM_28._d%C3%B6nem_milletvekilleri_listesi&action=raw",
+        "community",
+        "Wikipedia",
+        "TBMM 28. dönem milletvekilleri listesi",
+        ".wiki",
+    ),
+    "gazetemizmir": (
+        "https://www.gazetemizmir.com/umit-ozlale-iyi-parti-ye-geri-dondu/103275",
+        "news_agency",
+        "Gazetem İzmir",
+        "Ümit Özlale, İYİ Parti'ye geri döndü",
+        ".html",
+    ),
+}
 BACKING_SOURCES = {
     "https://www.ysk.gov.tr/doc/dosyalar/docs/Kararlar/2014Pdf/2014-3137.pdf": (
         "official_body",
@@ -2059,6 +2083,8 @@ def fetch() -> None:
     for url in WITHDREW_SOURCES:
         raw.fetch(SOURCE, url, suffix=".htm")
     for url, (*_, suffix) in BACKING_SOURCES.items():
+        raw.fetch(SOURCE, url, suffix=suffix)
+    for url, *_, suffix in SWITCH_SOURCES.values():
         raw.fetch(SOURCE, url, suffix=suffix)
     for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS, LISTS_2007):
         raw.fetch(SOURCE, url, suffix=".rtf")
@@ -6656,6 +6682,30 @@ def emit() -> Path:
                 notes="Names the parties that nominated, endorsed, or supported a presidential candidate.",
             )
             cs.artifact(raw.cached(SOURCE, url), backing_source)
+        switch_sources: dict[str, UUID] = {}
+        for code, (url, kind, publisher, heading, _) in SWITCH_SOURCES.items():
+            switch_sources[code] = cs.source(publisher, heading)
+            cs.add(
+                "source",
+                id=switch_sources[code],
+                kind=kind,
+                publisher=publisher,
+                title=heading,
+                url=url.replace("&action=raw", "").replace("w/index.php?title=", "wiki/"),
+                notes="Dates the party changes of members of the 28th Grand National Assembly.",
+            )
+            cs.artifact(raw.cached(SOURCE, url), switch_sources[code])
+        switches: dict[str, list[tuple[str, date, date | None, str]]] = {}
+        with SWITCHES.open(encoding="utf-8") as handle:
+            for line in csv.DictReader(handle, delimiter="\t"):
+                switches.setdefault(line["member"], []).append(
+                    (
+                        line["party"],
+                        date.fromisoformat(line["valid_from"]),
+                        date.fromisoformat(line["valid_to"]) if line["valid_to"] else None,
+                        line["source"],
+                    )
+                )
         members_2011 = cs.source("Wikidata", "Members of the 24th Grand National Assembly")
         cs.add(
             "source",
@@ -7098,13 +7148,18 @@ def emit() -> Path:
                             ended_via="term_end" if day == DAY_2018 and end is None else ended_via,
                             resumes_tenure_id=previous,
                         )
-                        cs.add(
-                            "tenure_affiliation",
-                            tenure_id=tenure,
-                            kind="party",
-                            party_id=parties[party],
-                            valid_from=start,
-                        )
+                        spans = switches.get(member, []) if previous is None else []
+                        for owner, valid_from, valid_to, _ in spans or [(None, start, None, None)]:
+                            cs.add(
+                                "tenure_affiliation",
+                                tenure_id=tenure,
+                                kind="party",
+                                party_id=parties[party] if owner is None else cs.key("tr.party", owner),
+                                valid_from=valid_from,
+                                valid_to=valid_to,
+                            )
+                        for cited in sorted({cited for *_, cited in spans}):
+                            cs.add("citation", entity_id=tenure, source_id=switch_sources[cited], locator=None)
                         if statement is not None:
                             cs.add(
                                 "citation", entity_id=tenure, source_id=members_source, locator={"statement": statement}
