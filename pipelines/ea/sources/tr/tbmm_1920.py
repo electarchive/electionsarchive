@@ -15,7 +15,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_1920"
-VERSION = "3"
+VERSION = "4"
 TITLE_ALBUM = "TBMM Albümü 1920-2010, 1. Cilt (1920-1950)"
 TITLE_TUIK = "Milletvekili Genel Seçimleri, 1923-2011"
 PARSED = DATA / "parsed" / SOURCE
@@ -558,16 +558,21 @@ def emit() -> Path:
                 cs.add("party", id=group_parties[code], kind="party", polity_id=turkey)
                 name(group_parties[code], label)
                 name(group_parties[code], short, kind="abbreviation")
+        for name_id, text in conn.execute(
+            "select id, text from name where entity_id = %s and valid_to = %s and kind = 'official'",
+            [chp, date(1935, 5, 1)],
+        ).fetchall():
+            cs.add(
+                "name_drop",
+                name_id=name_id,
+                entity_id=chp,
+                text=text,
+                reason="Replaced by the dated names tr.lineage holds, which end on 1935-05-09.",
+            )
         mhg = cs.key("tr.party", "mudafaa-i-hukuk-grubu")
         if mhg in cs.minted:
             cs.add("party", id=mhg, kind="party", polity_id=turkey)
             name(mhg, "Müdâfaa-i Hukuk Grubu", valid_from=OPENINGS[1], valid_to=date(1923, 9, 9))
-        chp_names = (
-            ("Halk Fırkası", date(1923, 9, 9), "day", date(1924, 11, 10)),
-            ("Cumhuriyet Halk Fırkası", date(1924, 11, 10), "day", date(1935, 5, 1)),
-        )
-        for text, from_day, from_precision, to_day in chp_names:
-            name(chp, text, valid_from=from_day, valid_from_precision=from_precision, valid_to=to_day)
         member_group: dict[tuple[int, str, str], tuple[str, str]] = {}
         for item in listed.iter_rows(named=True):
             wanted = words(item["name"])

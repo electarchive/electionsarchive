@@ -59,6 +59,8 @@ DEM = ("tr", "Halkların Eşitlik ve Demokrasi Partisi")
 HEDEP = date(2023, 10, 15)
 DEM_SHORT = date(2023, 12, 11)
 YENI = ("tr", "Yeni Parti (2026)")
+CHP = ("tr", "Cumhuriyet Halk Partisi")
+CHP_RENAMED = date(1935, 5, 9)
 NAMES = {
     "yesiller-ve-sol-gelecek-partisi": (
         DEM,
@@ -71,6 +73,18 @@ NAMES = {
         ],
     ),
     "yeni-parti-2026": (YENI, [("New Party", "english", "en", date(2026, 7, 24), None)]),
+    "cumhuriyet-halk-partisi": (
+        CHP,
+        [
+            ("Halk Fırkası", "official", "tr", date(1923, 9, 9), date(1924, 11, 10)),
+            ("Cumhuriyet Halk Fırkası", "official", "tr", date(1924, 11, 10), CHP_RENAMED),
+            ("CHF", "abbreviation", "tr", date(1924, 11, 10), CHP_RENAMED),
+            ("Cumhuriyet Halk Partisi", "official", "tr", CHP_RENAMED, None),
+            ("CHP", "abbreviation", "tr", CHP_RENAMED, None),
+            ("People's Party", "english", "en", date(1923, 9, 9), date(1924, 11, 10)),
+            ("Republican People's Party", "english", "en", date(1924, 11, 10), None),
+        ],
+    ),
 }
 REGISTRY = "https://www.yargitaycb.gov.tr/sipars"
 REGISTRY_TITLE = "Siyasi Parti Genel Bilgileri"
@@ -370,7 +384,7 @@ JOINT_LISTS = [
 ARTICLES = sorted(
     {cite for *_, cite in RELATIONS if isinstance(cite, tuple)}
     | {cite for *_, cite in VEHICLES}
-    | {LIST, ("en", "Left Party (Turkey)"), ("tr", "Genç Parti"), DEM, YENI}
+    | {LIST, ("en", "Left Party (Turkey)"), ("tr", "Genç Parti"), DEM, YENI, CHP}
     | {cite for _, _, cite in ABBREVIATIONS.values() if isinstance(cite, tuple)}
     | {("tr", "2018 Türkiye genel seçimleri"), ("tr", "2023 Türkiye genel seçimleri")}
 )
@@ -493,8 +507,8 @@ def emit() -> Path:
                 )
                 cs.add("citation", entity_id=parties[key], source_id=sources[cite], locator={"name": text})
             for name_id, text in conn.execute(
-                """select id, text from name where entity_id = %s and lang = 'tr'
-                   and kind in ('official', 'abbreviation') and valid_from is null and valid_to is null""",
+                """select id, text from name where entity_id = %s and valid_from is null and valid_to is null
+                   and ((lang = 'tr' and kind in ('official', 'abbreviation')) or (lang = 'en' and kind = 'english'))""",
                 [parties[key]],
             ).fetchall():
                 cs.add(
