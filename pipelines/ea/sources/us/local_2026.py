@@ -4221,7 +4221,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD')"""
         ).fetchall():
             mine = coverage_tables.tokens(label)
             hits = [
@@ -4305,14 +4305,14 @@ def parse() -> None:
             used: dict[str, str] = {}
             missed: set[str] = set()
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
-            if "-" in key and key != "MN-county" or key in ("KY", "OK"):
+            if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD"):
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
                         """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4421,7 +4421,7 @@ def parse() -> None:
                             if (
                                 said
                                 and (sort and said != sort or not sort and said == "township")
-                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -4438,7 +4438,7 @@ def parse() -> None:
                         state in ("NJ", "MI", "FL", "OR", "NV", "AR")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
-                        or state in ("CA", "TX", "UT", "AZ")
+                        or state in ("CA", "TX", "UT", "AZ", "MD")
                         and bool(fits)
                     )
                     and len({fit[4] for fit in fits}) == 1
@@ -4508,7 +4508,7 @@ def parse() -> None:
                         else "At-Large"
                         if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
-                        if state in ("CA", "UT")
+                        if state in ("CA", "UT", "MD")
                         and (
                             area := re.search(
                                 r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
