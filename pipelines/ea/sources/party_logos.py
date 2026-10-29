@@ -22,12 +22,12 @@ from ea.sources.wikidata_photos import _credit, _free, _text
 from ea.store import DATA, connect
 
 SOURCE = "party_logos"
-VERSION = "3"
+VERSION = "4"
 TITLE = "Party logos"
 LOGOS = DATA / "logos"
 ITEMS = DATA / "parsed" / SOURCE / "items.json"
 DATED = Path(__file__).with_suffix(".tsv")
-STATEMENTS = """SELECT ?item ?statement ?file ?rank ?start ?startPrecision ?end ?endPrecision ?began ?ended ?dissolved WHERE {{
+STATEMENTS = """SELECT ?item ?statement ?file ?rank ?inception ?inceptionPrecision ?start ?startPrecision ?end ?endPrecision ?began ?ended ?dissolved WHERE {{
   VALUES ?item {{ {items} }}
   ?item p:P154 ?statement . ?statement ps:P154 ?file ; wikibase:rank ?rank .
   FILTER(?rank != wikibase:DeprecatedRank)
@@ -36,6 +36,7 @@ STATEMENTS = """SELECT ?item ?statement ?file ?rank ?start ?startPrecision ?end 
   OPTIONAL {{ ?statement pq:P580 ?began }}
   OPTIONAL {{ ?statement pq:P582 ?ended }}
   OPTIONAL {{ ?item wdt:P576 ?dissolved }}
+  OPTIONAL {{ ?item p:P571/psv:P571 [ wikibase:timeValue ?inception ; wikibase:timePrecision ?inceptionPrecision ] }}
 }}"""
 SCOPE = "select x.value from external_id x join party p on p.id = x.entity_id where x.scheme = 'wikidata'"
 CHUNK = 300
@@ -65,6 +66,7 @@ class Logo:
     open: bool = True
     default: bool = False
     dated_url: str | None = None
+    inception: tuple[date | None, str] = UNDATED
 
 
 def _items() -> list[str]:
@@ -144,6 +146,7 @@ def _when(value: str | None, precision: str | None) -> tuple[date | None, str]:
 
 def _statements(items: list[str]) -> dict[str, list[Logo]]:
     parties: dict[str, dict[str, Logo]] = {}
+    founded: dict[str, tuple[date | None, str]] = {}
     for url in _sparql(items):
         for row in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]:
             item = row["item"]["value"].rsplit("/", 1)[1]
@@ -151,6 +154,11 @@ def _statements(items: list[str]) -> dict[str, list[Logo]]:
             file = unquote(row["file"]["value"].rsplit("/", 1)[1]).replace("_", " ")
             if (item, file) in NOT_LOGOS:
                 continue
+            began = _when(row.get("inception", {}).get("value"), row.get("inceptionPrecision", {}).get("value"))
+            if began[0] is not None and (
+                founded.get(item, UNDATED)[0] is None or str(began[0]) < str(founded[item][0])
+            ):
+                founded[item] = began
             begun = _when(row.get("start", {}).get("value"), row.get("startPrecision", {}).get("value"))
             ended = _when(row.get("end", {}).get("value"), row.get("endPrecision", {}).get("value"))
             if any(row.get(key, {}).get("value", "").startswith("http") for key in ("began", "ended")):
@@ -165,8 +173,10 @@ def _statements(items: list[str]) -> dict[str, list[Logo]]:
                 preferred=row["rank"]["value"].endswith("PreferredRank"),
                 open="ended" not in row,
             )
-    for statements in parties.values():
+    for item, statements in parties.items():
         logos = list(statements.values())
+        for logo in logos:
+            logo.inception = founded.get(item, UNDATED)
         preferred = [logo for logo in logos if logo.preferred]
         unended = [logo for logo in logos if logo.open]
         chosen = (
@@ -232,6 +242,10 @@ def _logos(items: list[str]) -> dict[str, list[Logo]]:
             if following is not None:
                 logo.end = following
                 logo.dated_by = "next_logo"
+        for logo in logos:
+            if logo.default and logo.dated_by is None and logo.inception[0] is not None:
+                logo.start = logo.inception
+                logo.dated_by = "inception"
     return parties
 
 
