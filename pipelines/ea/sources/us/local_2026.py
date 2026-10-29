@@ -157,6 +157,21 @@ FEEDS = {
         "McLean County Clerk",
         "Specimen Ballot, 2026 General Election",
     ),
+    "IL-17163": (
+        "https://www.stclaircountyil.gov/departments/county-clerk",
+        "St. Clair County Clerk",
+        "Specimen Ballot, 2026 General Election",
+    ),
+    "IL-17019": (
+        "https://www.champaigncountyil.gov/",
+        "Champaign County Clerk",
+        "Publication Ballot, 2026 General Election",
+    ),
+    "IL-17093": (
+        "https://www.kendallcountyil.gov/",
+        "Kendall County Clerk",
+        "County Candidates, 2026 General Election",
+    ),
     "IL-17119": (
         "https://www.madisoncountyil.gov/document_center/CountyClerk/2026%20Election/Candidate%20list.pdf",
         "Madison County Clerk",
@@ -1372,6 +1387,9 @@ DELIVERED = {
     "IL-17119": DATA / "inbox" / "y26" / "il" / "madison.pdf",
     "IL-17143": DATA / "inbox" / "y26" / "il" / "peoria.pdf",
     "IL-17113": DATA / "inbox" / "y26" / "il" / "mclean.pdf",
+    "IL-17163": DATA / "inbox" / "manual" / "MF-263" / "2026 General Election Voters Guide.pdf",
+    "IL-17019": DATA / "inbox" / "manual" / "MF-263" / "26GILCHM-Chopped 1 (1).pdf",
+    "IL-17093": DATA / "inbox" / "manual" / "MF-263" / "GE2026 County Candidate List.pdf",
     "IL-17167": DATA / "inbox" / "y26" / "il" / "sangamon.pdf",
     "MO-29183": DATA / "inbox" / "y26" / "mo" / "stcharles.pdf",
     "MO-29099": DATA / "inbox" / "y26" / "mo" / "jefferson.pdf",
@@ -1481,6 +1499,18 @@ NE_SOURCES = {
         "https://vote.sos.ri.gov/Candidates",
         "ne/ri_towns.zip",
     ),
+    "NJ-34007": (
+        "Camden County Clerk",
+        "Official General Election sample ballots, November 3, 2026, Camden County municipalities",
+        "https://www.camdencounty.com/service/voting-and-elections/sample-ballots/",
+        "nj/camden_sample_ballots.zip",
+    ),
+    "NJ-34007-s": (
+        "Camden County Clerk",
+        "Official General Election sample ballots, November 3, 2026, Camden County school districts",
+        "https://www.camdencounty.com/service/voting-and-elections/sample-ballots/",
+        "nj/camden_sample_ballots.zip",
+    ),
     "NJ-34019-s": (
         "Hunterdon County Clerk",
         "Annual School Election, November 3, 2026 (unofficial)",
@@ -1549,6 +1579,9 @@ for county, url in {
     "Delaware": "https://www.co.delaware.ny.us/departments/elections/",
     "Madison": "https://www.madisoncounty.ny.gov/3291/Sample-Ballots",
     "Livingston": "https://www.livingstoncountyny.gov/685/Sample-Ballots",
+    "Saratoga": "https://www.saratogacountyny.gov/departments/board-of-elections/",
+    "Lewis": "https://lewiscountyny.gov/public_notices/sample-ballots-general-election/",
+    "Orleans": "https://www.orleanscountyny.gov/government/elections/sample_ballots.php",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1556,7 +1589,7 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston') else 'pdf'}",
+        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans') else 'pdf'}",
     )
 for fips, county in {
     "32001": "Churchill",

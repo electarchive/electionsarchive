@@ -763,6 +763,8 @@ ABBREVIATIONS = {
     "CO": "COUNTY",
     "CNTY": "COUNTY",
     "TWP": "TOWNSHIP",
+    "BORO": "BOROUGH",
+    "SPGS": "SPRINGS",
     "TWNSHP": "TOWNSHIP",
     "HS": "HIGH",
     "COM": "COMMUNITY",
