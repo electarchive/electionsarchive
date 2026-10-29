@@ -42,7 +42,7 @@ PREFIX ocd: <http://dati.camera.it/ocd/>
 SELECT DISTINCT ?s ?inizio ?titolo WHERE {
  ?s a osr:Senatore ; ocd:aderisce ?a . ?a osr:legislatura %d ; osr:gruppo ?g ; osr:inizio ?inizio .
  ?g osr:denominazione ?d . ?d osr:titolo ?titolo . OPTIONAL { ?d osr:inizio ?di } OPTIONAL { ?d osr:fine ?df }
- FILTER(!BOUND(?di) || ?di <= ?inizio) FILTER(!BOUND(?df) || ?df > ?inizio)
+ FILTER(!BOUND(?di) || ?di <= ?inizio) FILTER(!BOUND(?df) || ?df >= ?inizio)
 } ORDER BY ?s ?inizio"""
 SENATE_GROUPS = (
     ("Fratelli d'Italia", "FRATELLI D'ITALIA"),

@@ -1350,7 +1350,7 @@ def emit() -> Path:
                     ballot_label=f"{surname} {forename}",
                 )
                 member = None
-                if won:
+                if won or (revision is not None and person == revision["replacement"]):
                     title = deputy_groups.get(person, "")
                     member = next((label for prefix, label in GROUP_LISTS.items() if title.startswith(prefix)), None)
                     if member is None:
