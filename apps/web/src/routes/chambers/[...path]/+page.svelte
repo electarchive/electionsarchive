@@ -618,7 +618,7 @@
       </div>
 
       <section
-        class="col-span-12 grid content-start gap-4 bg-card p-3.5 lg:col-span-8"
+        class="col-span-12 grid content-start gap-4 bg-card p-3.5 lg:col-span-8 lg:flex lg:flex-col"
       >
         {#if leader != null}
           <p

@@ -1586,6 +1586,7 @@
   "chamber_changes_all": "All",
   "chamber_changes_seats": "Seats",
   "chamber_changes_party": "Party changes",
+  "chamber_changes_more": "Show all {count} changes",
   "chamber_changed_party": "Changed party",
   "chamber_joined_party": "Joined {party}",
   "chamber_change": "Change",

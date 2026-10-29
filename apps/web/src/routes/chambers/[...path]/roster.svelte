@@ -1,6 +1,9 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { tick } from "svelte";
+  import { on } from "svelte/events";
+  import { MediaQuery } from "svelte/reactivity";
   import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
@@ -246,10 +249,49 @@
           }))),
     ].toSorted((a, b) => a.on.localeCompare(b.on)),
   );
+  const isWide = new MediaQuery("min-width: 64rem");
+  let isAll = $state(false);
+  let fit = $state<number | null>(null);
+  let box = $state<HTMLElement>();
+  const limit = $derived(
+    isAll ? feed.length : isWide.current ? (fit ?? feed.length) : 8,
+  );
+
+  $effect(() => {
+    const list = feed;
+    if (box == null || !isWide.current || isAll) {
+      return;
+    }
+    const frame = box;
+    const measure = async () => {
+      fit = null;
+      await tick();
+      const room = frame.clientHeight;
+      const reserve =
+        2.25 * Number.parseFloat(getComputedStyle(frame).fontSize);
+      const bottoms = [...frame.querySelectorAll<HTMLElement>("ol > li")].map(
+        (row) => row.offsetTop + row.offsetHeight,
+      );
+      fit =
+        (bottoms.at(-1) ?? 0) <= room
+          ? list.length
+          : Math.max(
+              1,
+              bottoms.filter((bottom) => bottom <= room - reserve).length,
+            );
+    };
+    const observer = new ResizeObserver(() => void measure());
+    observer.observe(frame);
+    const off = on(frame, "toggle", () => void measure(), { capture: true });
+    return () => {
+      observer.disconnect();
+      off();
+    };
+  });
 </script>
 
 {#if mode === "changes"}
-  <div class="grid gap-2">
+  <div class="grid gap-2 lg:flex lg:flex-1 lg:flex-col lg:min-block-0">
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
       <h2 class="text-[0.8125rem] font-bold">{m.chamber_changes()}</h2>
       {#if events.length > 0 && switches.length > 0}
@@ -274,106 +316,126 @@
     {#if feed.length === 0}
       <p class="text-sm text-muted-foreground">{m.chamber_changes_none()}</p>
     {:else}
-      <ol
-        class="grid overflow-y-auto rounded-sm text-[0.8125rem] ring-1 ring-border max-block-88"
+      <div
+        bind:this={box}
+        class={cn({ "lg:relative lg:flex-1 lg:min-block-40": !isAll })}
       >
-        {#each feed as event, index (index)}
-          <li
-            class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
-          >
-            <span
-              class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums sm:inline-34 max-sm:col-span-2"
-              >{date(event.on)}</span
-            >
-            {#if event.move != null}
-              <span class="grid gap-1 min-inline-0">
-                <span class="flex items-baseline gap-1.5 truncate">
-                  <span
-                    class="shrink-0 self-center rounded-xs block-2 inline-2"
-                    style:background={tint(event.move.from)}
-                  ></span>
-                  <span class="text-muted-foreground"
-                    >{label(event.move.from)}</span
+        <div
+          class={cn("grid content-start gap-2", {
+            "lg:absolute lg:inset-0": !isAll,
+          })}
+        >
+          <ol class="grid rounded-sm text-[0.8125rem] ring-1 ring-border">
+            {#each feed.slice(0, limit) as event, index (index)}
+              <li
+                class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
+              >
+                <span
+                  class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums sm:inline-34 max-sm:col-span-2"
+                  >{date(event.on)}</span
+                >
+                {#if event.move != null}
+                  <span class="grid gap-1 min-inline-0">
+                    <span class="flex items-baseline gap-1.5 truncate">
+                      <span
+                        class="shrink-0 self-center rounded-xs block-2 inline-2"
+                        style:background={tint(event.move.from)}
+                      ></span>
+                      <span class="text-muted-foreground"
+                        >{label(event.move.from)}</span
+                      >
+                      <span class="text-muted-foreground" aria-hidden="true"
+                        >→</span
+                      >
+                      <span
+                        class="shrink-0 self-center rounded-xs block-2 inline-2"
+                        style:background={tint(event.move.to)}
+                      ></span>
+                      <span class="text-muted-foreground"
+                        >{label(event.move.to)}</span
+                      >
+                      {#if event.move.members.length === 1 && event.move.members[0] != null}
+                        <Name
+                          class="truncate font-semibold"
+                          label={event.move.members[0].name}
+                          person={event.move.members[0].person}
+                        />
+                      {/if}
+                    </span>
+                    {#if event.move.members.length > 1}
+                      <details class="group">
+                        <summary
+                          class="cursor-pointer font-semibold marker:text-muted-foreground"
+                          >{m.chamber_step_members({
+                            count: event.move.members.length,
+                          })}</summary
+                        >
+                        <ul class="grid gap-0.5 ps-3.5 pbs-1">
+                          {#each event.move.members as member (member.person)}
+                            <li class="flex items-baseline gap-1.5 truncate">
+                              <Name
+                                class="truncate"
+                                label={member.name}
+                                person={member.person}
+                              />
+                              <span class="truncate text-muted-foreground"
+                                >{member.place?.slice(shared) ??
+                                  member.seat ??
+                                  ""}</span
+                              >
+                            </li>
+                          {/each}
+                        </ul>
+                      </details>
+                    {/if}
+                  </span>
+                  <span class="text-xs font-semibold whitespace-nowrap"
+                    >{event.move.to == null || event.move.to === "independent"
+                      ? m.chamber_changed_party()
+                      : m.chamber_joined_party({
+                          party: label(event.move.to),
+                        })}</span
                   >
-                  <span class="text-muted-foreground" aria-hidden="true">→</span
-                  >
-                  <span
-                    class="shrink-0 self-center rounded-xs block-2 inline-2"
-                    style:background={tint(event.move.to)}
-                  ></span>
-                  <span class="text-muted-foreground"
-                    >{label(event.move.to)}</span
-                  >
-                  {#if event.move.members.length === 1 && event.move.members[0] != null}
+                {:else}
+                  <span class="flex items-baseline gap-1.5 truncate">
+                    <span
+                      class="shrink-0 self-center rounded-xs block-2 inline-2"
+                      style:background={tint(event.member.party)}
+                    ></span>
                     <Name
                       class="truncate font-semibold"
-                      label={event.move.members[0].name}
-                      person={event.move.members[0].person}
+                      label={event.member.name}
+                      person={event.member.person}
                     />
-                  {/if}
-                </span>
-                {#if event.move.members.length > 1}
-                  <details class="group">
-                    <summary
-                      class="cursor-pointer font-semibold marker:text-muted-foreground"
-                      >{m.chamber_step_members({
-                        count: event.move.members.length,
-                      })}</summary
+                    <span class="truncate text-muted-foreground"
+                      >{event.member.place?.slice(shared) ??
+                        event.member.seat ??
+                        ""}</span
                     >
-                    <ul class="grid gap-0.5 ps-3.5 pbs-1">
-                      {#each event.move.members as member (member.person)}
-                        <li class="flex items-baseline gap-1.5 truncate">
-                          <Name
-                            class="truncate"
-                            label={member.name}
-                            person={member.person}
-                          />
-                          <span class="truncate text-muted-foreground"
-                            >{member.place?.slice(shared) ??
-                              member.seat ??
-                              ""}</span
-                          >
-                        </li>
-                      {/each}
-                    </ul>
-                  </details>
+                  </span>
+                  <span
+                    class={cn("text-xs font-semibold whitespace-nowrap", {
+                      "text-muted-foreground": !event.isJoin,
+                    })}
+                    >{event.why ??
+                      (event.isJoin
+                        ? m.chamber_joined()
+                        : m.chamber_left())}</span
+                  >
                 {/if}
-              </span>
-              <span class="text-xs font-semibold whitespace-nowrap"
-                >{event.move.to == null || event.move.to === "independent"
-                  ? m.chamber_changed_party()
-                  : m.chamber_joined_party({
-                      party: label(event.move.to),
-                    })}</span
-              >
-            {:else}
-              <span class="flex items-baseline gap-1.5 truncate">
-                <span
-                  class="shrink-0 self-center rounded-xs block-2 inline-2"
-                  style:background={tint(event.member.party)}
-                ></span>
-                <Name
-                  class="truncate font-semibold"
-                  label={event.member.name}
-                  person={event.member.person}
-                />
-                <span class="truncate text-muted-foreground"
-                  >{event.member.place?.slice(shared) ??
-                    event.member.seat ??
-                    ""}</span
-                >
-              </span>
-              <span
-                class={cn("text-xs font-semibold whitespace-nowrap", {
-                  "text-muted-foreground": !event.isJoin,
-                })}
-                >{event.why ??
-                  (event.isJoin ? m.chamber_joined() : m.chamber_left())}</span
-              >
-            {/if}
-          </li>
-        {/each}
-      </ol>
+              </li>
+            {/each}
+          </ol>
+          {#if limit < feed.length}
+            <button
+              type="button"
+              class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
+              onclick={() => (isAll = true)}
+              >{m.chamber_changes_more({ count: count(feed.length) })}</button
+            >
+          {/if}
+        </div>
+      </div>
     {/if}
   </div>
 {:else}
