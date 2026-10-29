@@ -8,12 +8,12 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.tr.ysk import PROVINCES
 from ea.sources.tr.tbmm import capitalize, fold, title
+from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_album"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cdn.tbmm.gov.tr/TbmmWeb/Albumler/Tbmm_Albumu/Cilt2.pdf"
 TITLE = "TBMM Albümü 1920-2010, 2. Cilt (1950-1980)"
@@ -27,6 +27,14 @@ OPENINGS = {
     16: date(1977, 6, 13),
 }
 CLOSED = date(1980, 9, 12)
+ELECTED = {
+    12: date(1961, 10, 15),
+    13: date(1965, 10, 10),
+    14: date(1969, 10, 12),
+    15: date(1973, 10, 14),
+    16: date(1977, 6, 5),
+}
+ALIASES = {"icel": "mersin", "maras": "kahramanmaras", "urfa": "sanliurfa", "afyon": "afyonkarahisar"}
 PARTIES = {
     "AP": "ADALET PARTİSİ",
     "MP": "MİLLET PARTİSİ",
@@ -70,8 +78,24 @@ def parse() -> None:
         for page in range(first, last + 1):
             for column in (0, 1):
                 text = subprocess.run(
-                    ["pdftotext", "-f", str(page), "-l", str(page), "-layout", "-x", str(column * 305), "-y", "0",
-                     "-W", "305", "-H", "850", str(pdf), "-"],
+                    [
+                        "pdftotext",
+                        "-f",
+                        str(page),
+                        "-l",
+                        str(page),
+                        "-layout",
+                        "-x",
+                        str(column * 305),
+                        "-y",
+                        "0",
+                        "-W",
+                        "305",
+                        "-H",
+                        "850",
+                        str(pdf),
+                        "-",
+                    ],
                     check=True,
                     capture_output=True,
                     text=True,
@@ -181,10 +205,50 @@ def emit() -> Path:
                    where p.iso_code = 'TR' and e.date_from between '1961-01-01' and '1977-12-31' and o.party_id is not null"""
             )
         }
+        contests: dict[tuple[object, str], object] = {}
+        by_elections: dict[str, list[tuple[date, object, object, str | None]]] = {}
+        for day, kind, area, contest, winner, winner_name in conn.execute(
+            """select e.date_from, e.kind::text, n.text, c.id, cy.person_id, wn.text
+               from contest c join election e on e.id = c.election_id
+               join name n on n.entity_id = c.district_area_id and n.lang = 'tr'
+               left join contest_option o on o.contest_id = c.id
+               left join candidacy cy on cy.option_id = o.id
+               left join name wn on wn.entity_id = cy.person_id and wn.is_preferred
+               where c.body_id = %s and e.kind in ('general', 'by_election')""",
+            [body[0]],
+        ):
+            if kind == "general":
+                contests[day, fold(area)] = contest
+            else:
+                held = by_elections.setdefault(fold(area), [])
+                if winner is not None or not any(found[1] == contest for found in held):
+                    held[:] = [found for found in held if found[1] != contest or found[2] is not None]
+                    if (day, contest, winner, winner_name) not in held:
+                        held.append((day, contest, winner, winner_name))
+        digits = re.compile(r"\d+")
+        for name_id, entity, text, preferred in conn.execute(
+            """select n.id, n.entity_id, n.text, n.is_preferred from name n
+               join external_id x on x.entity_id = n.entity_id and x.scheme = %s
+               where n.text ~ '[0-9]'""",
+            [f"{SOURCE}.person"],
+        ).fetchall():
+            cs.add(
+                "name_drop", name_id=name_id, entity_id=entity, text=text, reason="Footnote marker read into the name."
+            )
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=digits.sub("", text).strip(),
+                lang="tr",
+                kind="official",
+                is_preferred=preferred,
+            )
         counts: Counter[str] = Counter()
         written: set[object] = set()
+        merged: set[object] = set()
         for row in entries.iter_rows(named=True):
             term = row["term"]
+            province = ALIASES.get(fold(row["province"]), fold(row["province"]))
             person = cs.key(
                 f"{SOURCE}.person",
                 f"{fold(row['registered'] or row['name'])}:{fold(row['birthplace'] or '')}:{row['born']}",
@@ -205,21 +269,38 @@ def emit() -> Path:
                         cs.add(
                             "name",
                             entity_id=person,
-                            text=title(text),
+                            text=title(digits.sub("", text).strip()),
                             lang="tr",
                             kind="official",
                             is_preferred=preferred,
                         )
             ended = None if row["died"] is None else date.fromisoformat(row["died"])
             closing = OPENINGS.get(term + 1, CLOSED)
+            start = OPENINGS[term]
             died = ended is not None and OPENINGS[term] < ended < closing
+            entered = None
+            if row["by_election"]:
+                surname = fold(digits.sub("", row["name"]).split()[-1])
+                held = [
+                    found
+                    for found in by_elections.get(province, [])
+                    if OPENINGS[term] < found[0] < closing
+                    and (found[3] is None or fold(found[3].split()[-1]) == surname)
+                ]
+                if len(held) == 1:
+                    entered = held[0]
+                    if entered[2] is not None and entered[2] not in merged:
+                        merged.add(entered[2])
+                        cs.merge(entered[2], person)
+            contest = contests[ELECTED[term], province] if entered is None else entered[1]
             tenure = cs.key(f"{SOURCE}.tenure", f"{term}:{person}")
             cs.add(
                 "tenure",
                 id=tenure,
                 person_id=person,
                 body_id=body[0],
-                from_date=OPENINGS[term],
+                contest_id=contest,
+                from_date=OPENINGS[term] if entered is None else entered[0],
                 from_precision="unknown",
                 to_date=ended if died else closing,
                 acquired_via="elected",
@@ -231,11 +312,11 @@ def emit() -> Path:
                 entity_id=tenure,
                 kind="context",
                 body_md=f"Member for {capitalize(row['province'])}"
-                + (", entering at a by-election." if row["by_election"] else "."),
+                + (", entering at a by-election." if entered is not None else "."),
             )
             if died:
                 cs.add("tenure_event", tenure_id=tenure, kind="died", date=ended, source_id=source)
-            counts[term, "by_election" if row["by_election"] else "general"] += 1
+            counts[term, "by_election" if entered is not None else "general"] += 1
             if len(row["parties"]) == 1 and row["parties"][0] in PARTIES:
                 party = parties.get(fold(PARTIES[row["parties"][0]]))
                 if party is not None:
@@ -244,7 +325,7 @@ def emit() -> Path:
                         tenure_id=tenure,
                         kind="party",
                         party_id=party,
-                        valid_from=OPENINGS[term],
+                        valid_from=start if entered is None else entered[0],
                         valid_from_precision="unknown",
                         valid_to=ended if died else closing,
                     )
