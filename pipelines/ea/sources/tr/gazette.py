@@ -1179,7 +1179,7 @@ SENATE_PARTIES = {
     "MSP": "milli-selamet-partisi",
     "TBP": "turkiye-birlik-partisi",
     "SDP": "sosyalist-devrim-partisi",
-    "TİP-1975": "turkiye-isci-partisi",
+    "TİP-1975": "turkiye-isci-partisi-1975",
     "TSİP": "turkiye-sosyalist-isci-partisi",
 }
 SENATE_LABELS = {

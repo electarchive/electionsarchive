@@ -9,7 +9,7 @@ from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "8"
+VERSION = "9"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -24,7 +24,11 @@ PAGE = "https://{}.wikipedia.org/wiki/{}"
 WIKITEXT = "https://{}.wikipedia.org/w/index.php?title={}&action=raw"
 LIST = ("tr", "Türkiye'deki eski siyasi partiler listesi")
 DBP_RENAMED = date(2014, 7, 11)
-MINTED: dict[str, tuple[str, list[tuple[str, str | None, date | None, date | None]]]] = {
+MINTED: dict[str, tuple[str | None, list[tuple[str, str | None, date | None, date | None]]]] = {
+    "turkiye-isci-partisi-1975": (
+        None,
+        [("Türkiye İşçi Partisi", "TİP", date(1975, 4, 30), date(1981, 10, 16))],
+    ),
     "milli-nizam-partisi": ("Q834409", [("Millî Nizam Partisi", "MNP", None, None)]),
     "cumhuriyetci-parti": ("Q250316", [("Cumhuriyetçi Parti", "CP", None, None)]),
     "sosyal-demokrasi-partisi": ("Q1759655", [("Sosyal Demokrasi Partisi", "SODEP", None, None)]),
@@ -122,6 +126,7 @@ RELATIONS: list[tuple[str, str, str | None, date, str, tuple[str, str] | str]] =
         "day",
         ("en", "National Salvation Party"),
     ),
+    ("turkiye-isci-partisi-1975", "successor_of", "turkiye-isci-partisi-1961", date(1975, 4, 30), "day", LIST),
     ("demokrat-parti", "successor_of", "adalet-partisi-1961", date(1983, 6, 23), "day", ("en", "True Path Party")),
     (
         "milliyetci-hareket-partisi",
@@ -427,7 +432,8 @@ def emit() -> Path:
             if parties[key] not in cs.minted:
                 continue
             cs.add("party", id=parties[key], kind="party", polity_id=turkey)
-            cs.add("external_id", entity_id=parties[key], scheme="wikidata", value=item)
+            if item is not None:
+                cs.add("external_id", entity_id=parties[key], scheme="wikidata", value=item)
             for full, short, start, end in versions:
                 for text, kind in ((full, "official"), (short, "abbreviation")):
                     if text is None:
