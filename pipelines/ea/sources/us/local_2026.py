@@ -4769,7 +4769,7 @@ def emit() -> Path:
                         cs.add("area_code", area_id=area, code=district, valid_from=None)
                         cs.add("area_parent", area_id=area, parent_id=whole[0], valid_from=None)
                         name(area, f"{place} {title.split(',')[0]}, {seat}")
-                known_size = bool(group["seats"][0]) or not body
+                known_size = bool(group["seats"][0]) or not body or ", " in title
                 templates[tail] = (
                     tail,
                     None,
