@@ -13,22 +13,30 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "2"
+VERSION = "3"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
+OLD = (1963, 1973)
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
+
+
+def fetch() -> None:
+    mayors_1984_1999.fetch(OLD)
 
 
 def races() -> tuple[
     dict[tuple[int, str], list[tuple[str, str, str, int]]],
-    list[tuple[str, list[tuple[str, str, str, int]]]],
+    list[tuple[int, list[tuple[str, str, str, int]]]],
     dict[str, str],
 ]:
     found: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
-    municipal: list[tuple[str, list[tuple[str, str, str, int]]]] = []
+    municipal: list[tuple[int, list[tuple[str, str, str, int]]]] = []
     pages: dict[str, str] = {}
-    tables, _, _ = mayors_1984_1999.read()
+    tables, _, _ = mayors_1984_1999.read((*OLD, *mayors_1984_1999.YEARS))
     for (year, province, kind, _), (title, rows, _) in tables.items():
-        if kind == "bb":
+        if year in OLD:
+            municipal.append((year, [(abbreviation, label, names, votes) for abbreviation, label, names, votes in rows]))
+            pages[title] = mayors_1984_1999.SOURCE
+        elif kind == "bb":
             found[(year, mayors_1984_1999.PROVINCES.get(province, province))] = [
                 (abbreviation, label, names, votes) for abbreviation, label, names, votes in rows
             ]
@@ -41,7 +49,7 @@ def races() -> tuple[
             ]
             pages[title] = mayors_2004_2009.MAYORS
         else:
-            municipal.append((title, [(label, label, names, votes) for label, names, votes in rows]))
+            municipal.append((2004, [(label, label, names, votes) for label, names, votes in rows]))
             pages[title] = mayors_2004_2009.MAYORS
     return found, municipal, pages
 
@@ -76,16 +84,26 @@ def emit() -> Path:
             """select x.value, c.id, c.office_id from contest c
                join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
                join changeset cs on cs.id = c.changeset_id
-               where cs.pipeline in ('tr.ysk_local', 'tr.ysk_mayors') and c.kind = 'office'
-                 and x.value ~ '^(1984-03-25|1989-03-26|1994-03-27|1999-04-18|2004-03-28):.*-mayor$'"""
+               where cs.pipeline in ('tr.ysk_local', 'tr.ysk_mayors', 'tr.die_local') and c.kind = 'office'
+                 and x.value ~ '^(1963-11-17|1973-12-09|1984-03-25|1989-03-26|1994-03-27|1999-04-18|2004-03-28):.*-mayor$'"""
         ).fetchall():
             contests[key] = (contest, office)
-        sets = dict(
-            conn.execute(
-                "select k, contest_id from result_set where is_default and contest_id = any(%s)",
-                [[contest for contest, _ in contests.values()]],
+        declared: dict[UUID, UUID] = {}
+        sets: dict[int, UUID] = {}
+        for k, set_id, contest in conn.execute(
+            "select k, id, contest_id from result_set where is_default and contest_id = any(%s)",
+            [[contest for contest, _ in contests.values()]],
+        ).fetchall():
+            sets[k] = contest
+            declared[contest] = set_id
+        decided = {
+            result_set
+            for (result_set,) in conn.execute(
+                """select o.result_set_id from outcome o join changeset cs on cs.id = o.changeset_id
+                   where o.result_set_id = any(%s) and cs.pipeline <> %s""",
+                [list(declared.values()), SOURCE],
             ).fetchall()
-        )
+        }
         tally = dict(
             conn.execute(
                 """select option_k, sum(value) from public.result_value
@@ -115,21 +133,6 @@ def emit() -> Path:
                 [[contest for contest, _ in contests.values()]],
             ).fetchall()
         )
-        index: dict[tuple[int, ...], list[str]] = defaultdict(list)
-        for key, (contest, _) in contests.items():
-            if key.startswith("2004-03-28:") and winners.get(contest) is not None:
-                index[tuple(sorted(by_votes[contest], reverse=True)[:3])].append(key)
-        for title, rows in municipal:
-            hits = index.get(tuple(sorted((row[3] for row in rows), reverse=True)[:3]), [])
-            if len(rows) > 1 and len(hits) == 1:
-                found[(2004, hits[0])] = rows
-        offices: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
-        for office, person, text in conn.execute(
-            """select t.office_id, t.person_id, n.text from tenure t join name n on n.entity_id = t.person_id
-               where t.office_id = any(%s)""",
-            [[office for _, office in contests.values()]],
-        ).fetchall():
-            offices[(office, fold(text))].add(person)
         held = {
             contest
             for (contest,) in conn.execute(
@@ -139,6 +142,21 @@ def emit() -> Path:
                 [[contest for contest, _ in contests.values()], SOURCE],
             ).fetchall()
         }
+        index: dict[tuple[int, tuple[int, ...]], list[str]] = defaultdict(list)
+        for key, (contest, _) in contests.items():
+            if contest not in held and by_votes[contest] and int(key[:4]) in (*OLD, 2004):
+                index[(int(key[:4]), tuple(sorted(by_votes[contest], reverse=True)[:3]))].append(key)
+        for year, rows in municipal:
+            hits = index.get((year, tuple(sorted((row[3] for row in rows), reverse=True)[:3])), [])
+            if len(rows) > 1 and len(hits) == 1:
+                found[(year, hits[0])] = rows
+        offices: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
+        for office, person, text in conn.execute(
+            """select t.office_id, t.person_id, n.text from tenure t join name n on n.entity_id = t.person_id
+               where t.office_id = any(%s)""",
+            [[office for _, office in contests.values()]],
+        ).fetchall():
+            offices[(office, fold(text))].add(person)
         known: dict[str, set[UUID]] = defaultdict(set)
         national: dict[str, set[UUID]] = defaultdict(set)
         for person, text, tbmm in conn.execute(
@@ -223,6 +241,15 @@ def emit() -> Path:
                 if party_id is not None:
                     cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party_id, kind="nominated")
                 made += 1
+                if is_winner and declared.get(contest) not in (None, *decided):
+                    cs.add(
+                        "outcome",
+                        result_set_id=declared[contest],
+                        option_id=option,
+                        candidacy_id=candidacy,
+                        kind="elected",
+                        seats=None,
+                    )
                 if is_winner and contest not in winners:
                     start, end = date(year, 4, 1), date(year + 5, 4, 1)
                     tenure = cs.key(f"{SOURCE}.tenure", contest_key)

@@ -41,8 +41,8 @@ def search(year: int) -> str:
     )
 
 
-def fetch() -> None:
-    for year in YEARS:
+def fetch(years: tuple[int, ...] = YEARS) -> None:
+    for year in years:
         raw.fetch(SOURCE, search(year), suffix=".json")
         for row in json.loads(raw.cached(SOURCE, search(year)).path.read_bytes())["query"]["search"]:
             for attempt in range(6):
@@ -60,11 +60,11 @@ def number(text: str) -> int | None:
     return int(text.replace(".", "")) if NUMBER.match(text) else None
 
 
-def read() -> tuple[dict, dict, list[str]]:
+def read(years: tuple[int, ...] = YEARS) -> tuple[dict, dict, list[str]]:
     tables: dict[tuple[int, str, str, str], tuple[str, list[Row], dict[str, int]]] = {}
     beldes: dict[tuple[int, str, str, str], list[tuple[str, str, str, int]]] = defaultdict(list)
     pages: list[str] = []
-    for year in YEARS:
+    for year in years:
         for hit in json.loads(raw.cached(SOURCE, search(year)).path.read_bytes())["query"]["search"]:
             match = TITLE.match(hit["title"])
             if match is None:
