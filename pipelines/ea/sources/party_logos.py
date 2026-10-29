@@ -75,6 +75,7 @@ class Logo:
     default: bool = False
     dated_url: str | None = None
     inception: tuple[date | None, str] = UNDATED
+    again: bool = False
 
 
 def _items() -> list[str]:
@@ -229,19 +230,46 @@ def _infos(files: list[str]) -> dict[str, dict[str, str]]:
 
 def _logos(items: list[str]) -> dict[str, list[Logo]]:
     parties = _statements(items)
+    dated: list[Logo] = []
     for row in _dated():
         logos = parties.setdefault(row["item"], [])
-        match = next((logo for logo in logos if logo.file == row["file"]), None)
+        match = next((logo for logo in logos if logo.file == row["file"] and logo not in dated), None)
         if match is None:
-            match = Logo(statement=None, file=row["file"], dissolved=any(logo.dissolved for logo in logos))
+            match = Logo(
+                statement=None,
+                file=row["file"],
+                dissolved=any(logo.dissolved for logo in logos),
+                again=any(logo.file == row["file"] for logo in logos),
+            )
             logos.append(match)
-        if match.dated_by == "wikidata":
+        if match.dated_by == "wikidata" and not row["url"]:
             continue
         match.start = (date.fromisoformat(row["valid_from"]) if row["valid_from"] else None, row["from_precision"])
         match.end = (date.fromisoformat(row["valid_to"]) if row["valid_to"] else None, row["to_precision"])
         match.dated_by = "source" if row["url"] else "file"
         match.dated_url = row["url"] or None
+        dated.append(match)
     for logos in parties.values():
+        for logo in list(logos):
+            twin = next(
+                (
+                    other
+                    for other in logos
+                    if other is not logo
+                    and other.file == logo.file
+                    and other.end[0] is not None
+                    and other.end[0] == logo.start[0]
+                ),
+                None,
+            )
+            if twin is not None:
+                twin.end = logo.end
+                twin.open = logo.open
+                if twin.start[0] is None and twin.end[0] is None:
+                    twin.dated_by = None
+                twin.default = twin.default or logo.default
+                twin.preferred = twin.preferred or logo.preferred
+                logos.remove(logo)
         starts = sorted((logo.start for logo in logos if logo.start[0] is not None), key=lambda begun: str(begun[0]))
         for logo in logos:
             if logo.start[0] is None or logo.end[0] is not None:
@@ -529,7 +557,11 @@ def emit() -> Path:
                 party = known[item]
                 cs.add(
                     "party_image",
-                    id=uuid5(NAMESPACE, f"{SOURCE}.image:{logo.statement or f'{item}:{logo.file}'}"),
+                    id=uuid5(
+                        NAMESPACE,
+                        f"{SOURCE}.image:{logo.statement or f'{item}:{logo.file}'}"
+                        + (f":{logo.start[0]}" if logo.again else ""),
+                    ),
                     party_id=cs.survivors.get(party, party),
                     path=f"logos/{names[0]}",
                     width=lockup.width,

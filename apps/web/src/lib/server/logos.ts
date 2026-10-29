@@ -62,7 +62,10 @@ export async function logos(
       select img.*, case
           when img.dated_by <> 'inception' then (img.f is null or img.f <= day.d) and (img.valid_to is null or day.d < img.valid_to)
           else not ${isStrict}
-            and day.d >= coalesce((select max(coalesce(x.valid_to, 'infinity'::date)) from img x
+            and day.d >= coalesce((select max(coalesce(case x.valid_to_precision
+                                       when 'year' then (x.valid_to + interval '1 year')::date
+                                       when 'month' then (x.valid_to + interval '1 month')::date
+                                       else x.valid_to end, 'infinity'::date)) from img x
                                    where x.party_id = img.party_id and x.dated_by <> 'inception'), '-infinity'::date)
             and (img.f is null or img.f <= day.d)
             and (img.f is not null or not exists (select from named l where l.entity_id = img.party_id and l.founded > day.d))
