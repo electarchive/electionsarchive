@@ -29,7 +29,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "4"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -870,26 +870,17 @@ def parse() -> None:
         )
     )
     candidates = {contest: entry for contest, entry in lists.values() if entry}
-    listed = {
-        party(label, 2024) for label in local.filter(pl.col("year") == 2024)["label"].unique() if label in LABELS
-    } - {None}
     options: dict[tuple[str, str], tuple[str, str]] = {}
     for contest, label, year, votes in (
         local.group_by("contest", "label", "year").agg(pl.col("votes").sum()).sort("contest", "label").iter_rows()
     ):
-        lumped = year == 2024 and label == "BAĞIMSIZ"
         if contest not in candidates:
-            option = "others" if lumped else (party(label, year) if label in LABELS else None) or "independents"
-            options[(contest, label)] = (
-                f"{contest}:{option}",
-                "others" if lumped else "candidate" if contest.endswith("-mayor") else "list",
-            )
+            option = (party(label, year) if label in LABELS else None) or "independents"
+            options[(contest, label)] = (f"{contest}:{option}", "candidate" if contest.endswith("-mayor") else "list")
             continue
         running = candidates[contest]
         found = (
-            [option for owner, _, option in running if owner not in listed]
-            if lumped
-            else [option for owner, _, option in running if owner == party(label, year)]
+            [option for owner, _, option in running if owner == party(label, year)]
             if label in LABELS
             else [option for owner, name, option in running if owner is None and name == label]
         )
@@ -897,7 +888,7 @@ def parse() -> None:
             options[(contest, label)] = (found[0], "candidate")
         elif len(found) > 1:
             options[(contest, label)] = (f"{contest}:others", "others")
-        elif label in LABELS and not lumped and votes:
+        elif label in LABELS and votes:
             options[(contest, label)] = (f"{contest}:{party(label, year)}", "unlisted")
         elif votes:
             raise ValueError(f"{contest}: no candidate for {label}")
@@ -1067,10 +1058,15 @@ LABELS = {
     "İYİ PARTİ": "iyi-parti",
     "AB PARTİ": "adalet-birlik-partisi",
     "ABP": "anadolu-birligi-partisi",
+    "ADP": "aydinlik-demokrasi-partisi",
+    "GBP": "guc-birligi-partisi",
+    "AP": "adalet-partisi",
+    "BÜYÜK BİRLİK": "buyuk-birlik-partisi",
     "DEM Parti": "halklarin-esitlik-ve-demokrasi-partisi",
     "DEVA PARTİSİ": "demokrasi-ve-atilim-partisi",
     "MEMLEKET": "memleket-partisi",
     "MİLLİ YOL": "milli-yol-partisi",
+    "OCAK": "ocak-partisi",
     "TKH": "turkiye-komunist-hareketi",
     "TİP": "turkiye-isci-partisi",
     "YENİDEN REFAH": "yeniden-refah-partisi",
@@ -1090,6 +1086,7 @@ DATED = {
     ("ANAP", 2024): "anavatan-partisi",
     ("ANAVATAN PARTİSİ", 2024): "anavatan-partisi",
     ("YENİ TÜRKİYE PARTİSİ", 2024): "yeni-turkiye-partisi-2024",
+    ("YTP", 2024): "yeni-turkiye-partisi-2024",
 }
 MINTED = {
     "sosyalist-devrim-partisi": ("Sosyalist Devrim Partisi", None),
@@ -1108,7 +1105,7 @@ MINTED = {
     "yeni-turkiye-partisi-2024": ("Yeni Türkiye Partisi", "YTP"),
 }
 ANAGRAMS = {"".join(sorted(label.replace(" ", ""))): label for label in LABELS if " " in label}
-BALLOT_BOX = {2014, 2019}
+BALLOT_BOX = {2014, 2019, 2024}
 OFFICES = {
     "il_genel": ("provincial-councils", "Provincial councils", "İl Genel Meclisi Üyeliği"),
     "belediye_baskani": ("mayors", "Mayors", "Belediye Başkanlığı"),
@@ -1205,11 +1202,12 @@ UNLISTED = {
     "2024-03-31:osmaniye-toprakkale-mayor:gelecek-partisi",
     "2024-03-31:sivas-divrigi-mayor:bagimsiz-turkiye-partisi",
     "2024-03-31:tekirdag-corlu-mayor:demokrat-parti",
+    "2024-03-31:tokat-mayor:buyuk-birlik-partisi",
     "2024-03-31:yozgat-sorgun-yeniyer-mayor:milliyetci-hareket-partisi",
 }
 RESIDUAL: dict[tuple[int, str], dict[str | None, int]] = {
     (2019, "belediye_baskani"): {"milliyetci-hareket-partisi": 1, "saadet-partisi": -1, "iyi-parti": -1},
-    (2024, "belediye_baskani"): {None: -8, "adalet-ve-kalkinma-partisi": -3, "buyuk-birlik-partisi": -6},
+    (2024, "belediye_baskani"): {"adalet-ve-kalkinma-partisi": -2, "cumhuriyet-halk-partisi": 1},
 }
 RESIDUAL_CAVEAT = {
     (2019, "belediye_baskani"): (
@@ -1219,11 +1217,10 @@ RESIDUAL_CAVEAT = {
         "annulled; the rerun on August 4, 2019 is stored as its own election."
     ),
     (2024, "belediye_baskani"): (
-        "The mayors named in each municipality add up to these mayoralties by party except in 17 races: 16 where "
-        "the neighborhood results report the leading candidate's votes together with other small parties' and "
-        "independents', and a "
-        "tie in Çıldır. Those races have no winner named, so the named mayors fall short of YSK's table by 3 AKP, "
-        "6 BBP, and 8 independent mayoralties."
+        "The mayors named in each municipality match the table's count by party, with two exceptions. In Çıldır the "
+        "two leading candidates have the same number of votes, so the archive names no winner there. And YSK's table "
+        "gives AKP one more mayoralty and CHP one fewer than the ballot-box results do; the archive has not found the "
+        "decision behind the difference."
     ),
 }
 DERIVED_WINNER = (
@@ -1514,6 +1511,22 @@ def emit() -> Path:
                         body_md=f"YSK's table gives {filled:,} seats filled, but its seats by party add up to "
                         f"{filled - SHORTFALL[(year, office)]:,}.",
                     )
+                if year in BALLOT_BOX and office == "belediye_baskani":
+                    table = int(rows.filter(pl.col("column") == "valid", pl.col("unit") == "domestic")["value"][0])
+                    counted = municipal.filter(
+                        pl.col("year") == year,
+                        pl.col("office") == office,
+                        ~pl.col("contest").str.extract(r":(.+)-mayor$").is_in(list(ANNULLED.get(year, set()))),
+                    )["votes"].sum()
+                    if counted != table:
+                        cs.add(
+                            "note",
+                            entity_id=declared,
+                            kind="caveat",
+                            body_md=f"The ballot-box results of the individual mayoral races add up to "
+                            f"{abs(counted - table):,} {'more' if counted > table else 'fewer'} valid votes than this "
+                            f"table: {counted:,} against {table:,}. The archive keeps YSK's table as published.",
+                        )
                 rows = rows.with_columns(
                     column=pl.col("column").str.replace(":seats$", ""),
                     measure=pl.when(pl.col("office").str.ends_with(":seats") | pl.col("column").str.ends_with(":seats"))

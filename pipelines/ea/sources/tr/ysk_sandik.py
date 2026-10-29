@@ -1,7 +1,7 @@
 import gzip
 import json
 import re
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID, uuid7
 
@@ -50,8 +50,8 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
-BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31"}
-VERSION = "17"
+BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
+VERSION = "19"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -69,8 +69,10 @@ NOTE = (
     "renamed, so those votes are missing here; the 2014 and 2019 local copies also leave some neighborhoods out, "
     "though their province and district totals are complete. Neighborhoods are matched to Oy ve Ötesi's "
     "neighborhood list by province and district. In the 2014 and 2019 local elections independent candidates are "
-    "listed by name; in 2024 every party the copy does not list is reported together with the independents as one "
-    "total. Towns whose ballot boxes are reported only as a whole are kept as one unit. For 2014, the places whose "
+    "listed by name. For the 2024 local elections the archive uses YSK's own ballot-box files instead, saved from "
+    "its Sandık Sonuçları site on October 29, 2026. They name every party and every independent candidate, except "
+    "in the municipal council races, where independents are given as one total. "
+    "Towns whose ballot boxes are reported only as a whole are kept as one unit. For 2014, the places whose "
     "races YSK's March 30 totals leave out are left out here too: 12 mayoral races, and the provincial and "
     "municipal council races in central Ağrı and Yeşilyurt in Tokat. The copy's valid votes for the 2014 İstanbul "
     "mayoral race include 91 votes in Kadıköy that it assigns to no candidate; they are counted in valid votes but "
@@ -101,6 +103,23 @@ LOCAL = [
     for office in ("buyuksehir-baskanlık", "belediye-baskanlık", "belediye-meclis", "il-genel-meclis-uyeligi")
 ]
 URLS = {slug: f"{SOURCE}/{slug}" for slug in [*CONTESTS, *LOCAL]}
+YSK = {
+    "2024-yerel-belediye-meclis-secimleri": (
+        f"{SITE}/#secimId=60882&secimTuru=3",
+        DATA / "inbox" / "manual" / "MF-238" / "tr-2024-local-belediye-meclisi-sandik-results.jsonl.gz",
+    ),
+    **{
+        f"2024-yerel-{slug}-secimleri": (
+            f"{SITE}/#secimId=60882&secimTuru={type}",
+            DATA / "inbox" / "manual" / "MF-240" / f"tr-2024-local-{file}-sandik-results.jsonl.gz",
+        )
+        for slug, type, file in (
+            ("belediye-baskanlık", 2, "belediye-baskanligi"),
+            ("buyuksehir-baskanlık", 6, "buyuksehir-belediye-baskanligi"),
+            ("il-genel-meclis-uyeligi", 4, "il-genel-meclisi"),
+        )
+    },
+}
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
 LABELS = (
     {upper(short): full for full, short, *_ in PARTIES}
@@ -169,6 +188,17 @@ PRISON = r"CEZA|TUTUKEV|TİPİ\b|GÜVENLİKLİ"
 def fetch() -> None:
     for url in URLS.values():
         raw.cached(SOURCE, url)
+    _, index = raw._index(SOURCE)
+    for url, file in YSK.values():
+        if url not in index:
+            raw.store(
+                SOURCE,
+                url,
+                file.read_bytes(),
+                suffix=".jsonl.gz",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/gzip",
+            )
 
 
 def parse() -> None:
@@ -218,6 +248,83 @@ def parse() -> None:
         )
     frame = pl.concat(frames).with_columns(
         pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars()
+    )
+    official = []
+    keys = ["plate", "district", "neighborhood"]
+    for slug, (url, _) in YSK.items():
+        headers: dict[tuple[str, int], dict[str, str]] = {}
+        rows = []
+        with gzip.open(raw.cached(SOURCE, url).path, "rt") as file:
+            for line in file:
+                data = json.loads(line)
+                if "_headers" in data:
+                    headers[("il", data["il_ID"])] = {
+                        "bagimsiz_TOPLAM_OY": "BAĞIMSIZ",
+                        **{header["column_NAME"]: header["ad"] for header in data["_headers"]},
+                    }
+                    continue
+                if data.get("type") in ("il_header", "cevre_header"):
+                    level, id = (
+                        ("il", data["il_ID"]) if data["type"] == "il_header" else ("cevre", data["secim_CEVRESI_ID"])
+                    )
+                    headers[(level, id)] = {
+                        column: name for column, name in data["columns"].items() if column != "bagimsiz_TOPLAM_OY"
+                    }
+                    continue
+                if "_meta" in data:
+                    continue
+                names = headers[("il", data["il_ID"])] | headers.get(("cevre", data.get("secim_CEVRESI_ID")), {})
+                votes = {
+                    names[column]: value
+                    for column, value in data.items()
+                    if column in names and column.endswith("_OY") and value
+                }
+                if sum(votes.values()) != data.get("gecerli_OY_TOPLAMI", 0):
+                    raise ValueError(f"{slug} {data['sandik_ID']}: votes do not sum to valid votes")
+                base = data["ilce_ADI"].partition(" - ")[0]
+                district = "MERKEZ" if base in (f"{data['il_ADI']} MERKEZ", "MERKEZEFENDİ") else base
+                rows += [
+                    (f"{data['il_ID']:02}", district, data["muhtarlik_ADI"], label, value)
+                    for label, value in votes.items()
+                ]
+        boxes = (
+            pl.DataFrame(rows, schema=[*keys, "label", "votes"], orient="row")
+            .with_columns(pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars())
+            .group_by([*keys, "label"])
+            .agg(pl.col("votes").sum())
+        )
+        totals = boxes.group_by(keys).agg(pl.col("votes").sum())
+        mirror = (
+            frame.filter(pl.col("slug") == slug, pl.col("scope") == "neighborhood")
+            .group_by(keys)
+            .agg(pl.col("votes").sum())
+        )
+        renamed = (
+            totals.join(mirror, on=keys, how="anti")
+            .filter(pl.len().over("plate", "district", "votes") == 1)
+            .join(
+                mirror.join(totals, on=keys, how="anti").filter(pl.len().over("plate", "district", "votes") == 1),
+                on=["plate", "district", "votes"],
+                suffix="_mirror",
+            )
+            .select(*keys, "neighborhood_mirror")
+        )
+        boxes = (
+            boxes.join(renamed, on=keys, how="left")
+            .with_columns(neighborhood=pl.coalesce("neighborhood_mirror", "neighborhood"))
+            .drop("neighborhood_mirror")
+        )
+        official += [
+            boxes.with_columns(slug=pl.lit(slug), scope=pl.lit("neighborhood")),
+            boxes.group_by("plate", "district", "label")
+            .agg(pl.col("votes").sum())
+            .with_columns(slug=pl.lit(slug), scope=pl.lit("district")),
+            boxes.group_by("plate", "label")
+            .agg(pl.col("votes").sum())
+            .with_columns(slug=pl.lit(slug), scope=pl.lit("province")),
+        ]
+    frame = pl.concat([frame.filter(~pl.col("slug").is_in(list(YSK))), *official], how="diagonal_relaxed").select(
+        frame.columns
     )
     if frame.select("slug", "scope", "plate", "district", "neighborhood", "label").is_duplicated().any():
         raise ValueError("a label repeats within a place")
@@ -715,7 +822,7 @@ def emit() -> Path:
                 str(ysk_local.DAYS[2024]): ysk_local.ANNULLED[2024],
             }.get(contest_key[:10], set())
             ballot_box = contest_key[:10] in BALLOT_BOX_DAYS and contest_key in local_contests
-            declared = cs.key(f"{ysk_local.SOURCE}.result_set", contest_key)
+            declared = cs.key(f"{ysk_local.SOURCE}.result_set", contest_key) if ballot_box else None
             cs.add(
                 "result_set",
                 id=result_set,
@@ -726,7 +833,7 @@ def emit() -> Path:
                 status="annulled" if annulled else "active",
                 source_id=source,
                 is_default=ballot_box,
-                supersedes_id=declared if ballot_box else None,
+                supersedes_id=declared,
                 completeness=None if denominator is None else round(counted / denominator, 4),
             )
             if (
@@ -754,8 +861,21 @@ def emit() -> Path:
                     notes.append(
                         (
                             "caveat",
-                            f"The neighborhood results give this contest {gap:,} valid votes that no candidate holds. "
-                            "They are counted in valid votes here but not given to any option.",
+                            (
+                                f"The neighborhood results give this contest {gap:,} valid votes that no candidate holds. "
+                                "They are counted in valid votes here but not given to any option."
+                            ),
+                        )
+                    )
+                if ballot_box and denominator is not None and counted != denominator:
+                    notes.append(
+                        (
+                            "caveat",
+                            (
+                                f"The ballot-box results add up to {abs(counted - denominator):,} "
+                                f"{'more' if counted > denominator else 'fewer'} valid votes than YSK's national table: "
+                                f"{counted:,} against {denominator:,}."
+                            ),
                         )
                     )
                 if ballot_box:
