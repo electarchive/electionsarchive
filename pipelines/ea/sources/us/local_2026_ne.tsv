@@ -1,4 +1,4 @@
-key	contest	unexpired	name	party	county	seats
+key	contest	unexpired	name	party	county	seats	office_name	constituency_area
 NY	Nassau County Legislature District 1	0	Scott M. Davis	Democratic	Nassau	1
 NY	Nassau County Legislature District 1	0	Edward J. Lino	Republican	Nassau	1
 NY	Nassau County Legislature District 2	0	Viviana L. Russell	Democratic	Nassau	1
@@ -2413,8 +2413,8 @@ NY	Ballston Supervisor	0	Eric Connolly	Independent	Saratoga	1
 NY	Ballston Tax Collector	0	Mary Ziegler	Republican	Saratoga	1
 NY	Clifton Park Supervisor	0	Ram Mohan Lalukota	Democratic	Saratoga	1
 NY	Clifton Park Supervisor	0	Anthony Morelli	Republican	Saratoga	1
-NY	Clifton Park County Board Supervisor	0	Martin C. O'Connor	Democratic	Saratoga	1
-NY	Clifton Park County Board Supervisor	0	Chad Gregory	Republican	Saratoga	1
+NY	Saratoga County Board of Supervisors	0	Martin C. O'Connor	Democratic	Saratoga	2		Clifton Park
+NY	Saratoga County Board of Supervisors	0	Chad Gregory	Republican	Saratoga	2		Clifton Park
 NY	Clifton Park Town Clerk	0	Caitlin Fantini	Democratic	Saratoga	1
 NY	Clifton Park Highway Superintendent	0	Dahn Bull	Democratic	Saratoga	1
 NY	Day Supervisor	0	Harry Brennan Jr.	Republican	Saratoga	1
@@ -2561,8 +2561,8 @@ NJ-34007	Berlin Borough Council	0	Suzanne LaLENA	Democratic	Camden	2
 NJ-34007	Berlin Borough Council	0	Keith HOHING	Independent	Camden	2
 NJ-34007	Berlin Borough Council	0	William BEHNKE	Independent	Camden	2
 NJ-34007	Berlin Borough Council	0	Len BADOLATO	Independent	Camden	2
-NJ-34007	Eastern Camden County Regional School District Board of Education Berlin Borough	0	Jeremy CONNER	Nonpartisan	Camden	1
-NJ-34007	Eastern Camden County Regional School District Board of Education Berlin Borough	0	April E.	Nonpartisan	Camden	1
+NJ-34007	Eastern Camden County Regional School District Board of Education	0	Jeremy CONNER	Nonpartisan	Camden	1		Berlin Borough
+NJ-34007	Eastern Camden County Regional School District Board of Education	0	April E.	Nonpartisan	Camden	1		Berlin Borough
 NJ-34007	Berlin Borough Board of Education	0	John T. GUAGENTI, JR.	Nonpartisan	Camden	3
 NJ-34007	Berlin Borough Board of Education	0	Jacob W. SALVATORE	Nonpartisan	Camden	3
 NJ-34007	Berlin Borough Board of Education	0	JoAnne McALISTER	Nonpartisan	Camden	3
@@ -2659,7 +2659,7 @@ NJ-34007	Lindenwold Borough Board of Education	0	Alethia GIBBS-SMITH	Nonpartisan
 NJ-34007	Lindenwold Borough Board of Education	0	Lauren ROLDAN	Nonpartisan	Camden	3
 NJ-34007	Magnolia Borough Council	0	Mary F. MARTZ	Democratic	Camden	2
 NJ-34007	Magnolia Borough Council	0	Steven WHALEN	Democratic	Camden	2
-NJ-34007	Sterling Regional School District Board of Education Magnolia	0	DaNeen SATCHELL	Nonpartisan	Camden	1
+NJ-34007	Sterling Regional School District Board of Education	0	DaNeen SATCHELL	Nonpartisan	Camden	1	Sterling High School District	Magnolia
 NJ-34007	Magnolia Borough Board of Education	0	Dale E. MARTIN	Nonpartisan	Camden	2
 NJ-34007	Magnolia Borough Board of Education	0	Karen SORBELLO	Nonpartisan	Camden	2
 NJ-34007	Merchantville Borough Mayor	0	Raymond H. WOODS, III	Democratic	Camden	1
@@ -2696,25 +2696,25 @@ NJ-34007	Runnemede Borough Board of Education	0	Angel BEEBE	Nonpartisan	Camden	3
 NJ-34007	Somerdale Borough Council	0	John LACKEY	Republican	Camden	2
 NJ-34007	Somerdale Borough Council	0	Larry SEFCHICK	Democratic	Camden	2
 NJ-34007	Somerdale Borough Council	0	Thomas LEAKAN	Democratic	Camden	2
-NJ-34007	Sterling Regional School District Board of Education Somerdale	0	James MOHAN	Nonpartisan	Camden	1
+NJ-34007	Sterling Regional School District Board of Education	0	James MOHAN	Nonpartisan	Camden	1	Sterling High School District	Somerdale
 NJ-34007	Somerdale Borough Board of Education	0	Christopher SYLVESTER	Nonpartisan	Camden	3
 NJ-34007	Stratford Borough Council	0	Nicholas HAFTO	Republican	Camden	2
 NJ-34007	Stratford Borough Council	0	Edward MAENNER	Republican	Camden	2
 NJ-34007	Stratford Borough Council	0	Pat GILLIGAN	Democratic	Camden	2
 NJ-34007	Stratford Borough Council	0	Mike TOLOMEO	Democratic	Camden	2
 NJ-34007	Stratford Borough Council	0	Orum SNOW	Independent	Camden	2
-NJ-34007	Sterling Regional School District Board of Education Stratford	0	Shawn NICHOLAS	Nonpartisan	Camden	1
-NJ-34007	Sterling Regional School District Board of Education Stratford	0	Kathryn DECKER	Nonpartisan	Camden	1
+NJ-34007	Sterling Regional School District Board of Education	0	Shawn NICHOLAS	Nonpartisan	Camden	1	Sterling High School District	Stratford
+NJ-34007	Sterling Regional School District Board of Education	0	Kathryn DECKER	Nonpartisan	Camden	1	Sterling High School District	Stratford
 NJ-34007	Stratford Borough Board of Education	0	Kim BERDINE	Nonpartisan	Camden	3
 NJ-34007	Stratford Borough Board of Education	0	Michael REDFEARN	Nonpartisan	Camden	3
 NJ-34007	Stratford Borough Board of Education	0	Kimberly SIMS	Nonpartisan	Camden	3
 NJ-34007	Stratford Borough Board of Education	0	D. Robert WHITMAN	Nonpartisan	Camden	3
 NJ-34007	Voorhees Township Committee	0	Michael R. MIGNOGNA	Democratic	Camden	2
 NJ-34007	Voorhees Township Committee	0	Harry A. PLATT	Democratic	Camden	2
-NJ-34007	Eastern Camden County Regional School District Board of Education Voorhees	0	Elena M. CHOW	Nonpartisan	Camden	2
-NJ-34007	Eastern Camden County Regional School District Board of Education Voorhees	0	Assunta “Suzie” BARONE	Nonpartisan	Camden	2
-NJ-34007	Eastern Camden County Regional School District Board of Education Voorhees	0	Robert A. PAUL	Nonpartisan	Camden	2
-NJ-34007	Eastern Camden County Regional School District Board of Education Voorhees	0	John	Nonpartisan	Camden	2
+NJ-34007	Eastern Camden County Regional School District Board of Education	0	Elena M. CHOW	Nonpartisan	Camden	2		Voorhees
+NJ-34007	Eastern Camden County Regional School District Board of Education	0	Assunta “Suzie” BARONE	Nonpartisan	Camden	2		Voorhees
+NJ-34007	Eastern Camden County Regional School District Board of Education	0	Robert A. PAUL	Nonpartisan	Camden	2		Voorhees
+NJ-34007	Eastern Camden County Regional School District Board of Education	0	John	Nonpartisan	Camden	2		Voorhees
 NJ-34007	Voorhees Township Board of Education	0	Wilma CRAFT	Nonpartisan	Camden	3
 NJ-34007	Voorhees Township Board of Education	0	Jennifer BRANCH STEWART	Nonpartisan	Camden	3
 NJ-34007	Voorhees Township Board of Education	0	Jason BRICE	Nonpartisan	Camden	3
@@ -3031,7 +3031,7 @@ NJ-34029	Lavallette Borough Board of Education	0	Matthew SCHLOSSER	Nonpartisan	O
 NJ-34029	Lavallette Borough Board of Education	0	Steven SHOHFI	Nonpartisan	Ocean	2
 NJ-34029	Lavallette Borough Board of Education	1	Carly LaCICERO	Nonpartisan	Ocean	1
 NJ-34029	Little Egg Harbor Township Board of Education	0	Dennis S. O'KEEFE	Nonpartisan	Ocean	1
-NJ-34029	Long Beach Island Consolidated Board of Education Long Beach	0	Danielle R.W. HAGLER	Nonpartisan	Ocean	1
+NJ-34029	Long Beach Island School District Board of Education	0	Danielle R.W. HAGLER	Nonpartisan	Ocean	1		Long Beach
 NJ-34029	Manchester Township Board of Education	0	Laura WINGLER	Nonpartisan	Ocean	3
 NJ-34029	Manchester Township Board of Education	0	Gloria ADKINSON	Nonpartisan	Ocean	3
 NJ-34029	Manchester Township Board of Education	0	PaulaAnn FAZIO	Nonpartisan	Ocean	3
@@ -3052,18 +3052,18 @@ NJ-34029	Point Pleasant Borough Board of Education	0	Joseph MAZZARO	Nonpartisan	
 NJ-34029	Point Pleasant Borough Board of Education	0	John A. DAPKINS, JR.	Nonpartisan	Ocean	2
 NJ-34029	Point Pleasant Borough Board of Education	0	Daniel GAUDETTE	Nonpartisan	Ocean	2
 NJ-34029	Point Pleasant Borough Board of Education	0	Nicole CAPOANO	Nonpartisan	Ocean	2
-NJ-34029	Point Pleasant Beach Borough Board of Education	0	Scott LEE	Nonpartisan	Ocean	1
+NJ-34029	Point Pleasant Beach Board of Education	0	Scott LEE	Nonpartisan	Ocean	1
 NJ-34029	Seaside Heights Borough Board of Education	0	Erik HERSHEY	Nonpartisan	Ocean	2
 NJ-34029	Seaside Heights Borough Board of Education	0	Matthew WRIGHT	Nonpartisan	Ocean	2
 NJ-34029	Seaside Heights Borough Board of Education	0	Meghan CABALAR	Nonpartisan	Ocean	2
 NJ-34029	Seaside Park Borough Board of Education	0	Jason HANRAHAN	Nonpartisan	Ocean	1
-NJ-34029	Long Beach Island Consolidated Board of Education Ship Bottom	0	Jason D. CAPELLI	Nonpartisan	Ocean	1
+NJ-34029	Long Beach Island School District Board of Education	0	Jason D. CAPELLI	Nonpartisan	Ocean	1		Ship Bottom
 NJ-34029	Stafford Township Board of Education	0	Bonnie STROUSE	Nonpartisan	Ocean	3
 NJ-34029	Stafford Township Board of Education	0	Brian FENLON, JR.	Nonpartisan	Ocean	3
 NJ-34029	Stafford Township Board of Education	0	Gregory GIOE	Nonpartisan	Ocean	3
 NJ-34029	Stafford Township Board of Education	1	Keith MOLLEMA	Nonpartisan	Ocean	1
 NJ-34029	Stafford Township Board of Education	1	Taylor BRENNAN	Nonpartisan	Ocean	1
-NJ-34029	Long Beach Island Consolidated Board of Education Surf City	0	Michael RUSSO	Nonpartisan	Ocean	1
+NJ-34029	Long Beach Island School District Board of Education	0	Michael RUSSO	Nonpartisan	Ocean	1		Surf City
 NJ-34029	Toms River Regional Board of Education	0	Ashley LAMB	Nonpartisan	Ocean	3
 NJ-34029	Toms River Regional Board of Education	0	Gerard NAPPI	Nonpartisan	Ocean	3
 NJ-34029	Toms River Regional Board of Education	0	James CAPONE	Nonpartisan	Ocean	3
@@ -3071,3 +3071,12 @@ NJ-34029	Toms River Regional Board of Education	0	Anthony L. COLUCCI	Nonpartisan
 NJ-34029	Toms River Regional Board of Education	0	Laura PICURRO	Nonpartisan	Ocean	3
 NJ-34029	Toms River Regional Board of Education	0	Elizabeth HUBER	Nonpartisan	Ocean	3
 NJ-34029	Toms River Regional Board of Education	0	Kristen HANSON	Nonpartisan	Ocean	3
+NJ-34029	Southern Regional School District Board of Education	0	Paul F. SHARKEY	Nonpartisan	Ocean	3		Beach Haven
+NJ-34029	Central Regional School District Board of Education	1	A. Robert KING	Nonpartisan	Ocean	1		Island Heights
+NJ-34029	Central Regional School District Board of Education	1	Arron RUSTICI	Nonpartisan	Ocean	1		Island Heights
+NJ-34029	Pinelands Regional School District Board of Education	0	Stephanie JOHNSON	Nonpartisan	Ocean	3		Little Egg Harbor
+NJ-34029	Central Regional School District Board of Education	0	Richard J. CASEY	Nonpartisan	Ocean	3		Ocean Gate
+NJ-34029	Central Regional School District Board of Education	0	Michael GRAICHEN	Nonpartisan	Ocean	3		Seaside Heights
+NJ-34029	Southern Regional School District Board of Education	0	Paul METZGER	Nonpartisan	Ocean	3		Stafford
+NJ-34029	Southern Regional School District Board of Education	0	Heather TATUR	Nonpartisan	Ocean	3		Stafford
+NJ-34029	Pinelands Regional School District Board of Education	0	David HEWITT	Nonpartisan	Ocean	3		Tuckerton
