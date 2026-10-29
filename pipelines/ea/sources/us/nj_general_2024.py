@@ -24,11 +24,11 @@ def fetch() -> None:
         raw.fetch(SOURCE, BASE + path, suffix=".pdf")
 
 
-def parse() -> None:
-    rows = []
-    for path in FILES:
+def rows(source: str, files: list[str], day: date) -> list[tuple]:
+    out = []
+    for path in files:
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
+            ["pdftotext", "-layout", str(raw.cached(source, BASE + path).path), "-"],
             capture_output=True,
             check=True,
             text=True,
@@ -48,13 +48,18 @@ def parse() -> None:
             elif re.match(r"\s+Total\b", line):
                 name = None
             elif name and (found := re.match(r"\s{40,}(" + "|".join(COUNTIES) + r")\s.*?([\d,]+)\s*$", line)):
-                rows.append(
-                    (2024, office, DAY, False, "NJ", district if office == "house" else None, COUNTIES[found[1]], name,
+                out.append(
+                    (day.year, office, day, False, "NJ", district if office == "house" else None, COUNTIES[found[1]], name,
                      1, False, int(found[2].replace(",", "")))
                 )
+    return out
+
+
+def parse() -> None:
+    found = rows(SOURCE, FILES, DAY)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
-        rows,
+        found,
         schema={
             "year": pl.Int32,
             "chamber": pl.String,
