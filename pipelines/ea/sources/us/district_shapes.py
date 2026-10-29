@@ -130,6 +130,20 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://services3.arcgis.com/czrgcV6qkPuBJCRH/arcgis/rest/services/Hemet_Council_Districts_December_2023/FeatureServer/0",
         "field": "DISTRICT",
     },
+    {
+        "publisher": "Pima County GIS",
+        "title": "Pima County Justice Precincts",
+        "pattern": r"^04:04019:(justice-of-the-peace|constable):",
+        "layer": "https://gisdata.pima.gov/arcgis1/rest/services/GISOpenData/Boundaries/MapServer/12",
+        "field": "JPDIST",
+    },
+    {
+        "publisher": "Pinal County GIS",
+        "title": "Pinal County Justice Court Precincts",
+        "pattern": r"^04:04021:(justice-of-the-peace|constable):",
+        "layer": "https://services1.arcgis.com/UpxtrwRYNaXVpkGe/arcgis/rest/services/PinalCountyJP_Boundaries/FeatureServer/0",
+        "field": "Precinct",
+    },
 ]
 
 
@@ -160,7 +174,7 @@ def parse() -> None:
             ).fetchall()
             matched = 0
             for area, code in wanted:
-                geometry = shapes.get(re.split(r"(?:district|area)-", code, maxsplit=1)[1])
+                geometry = shapes.get(re.split(r"(?:district|area|precinct)-", code, maxsplit=1)[1])
                 if geometry is None:
                     print("no shape:", code)
                     continue
