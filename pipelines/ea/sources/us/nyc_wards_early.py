@@ -104,7 +104,9 @@ def parse() -> None:
                 {"year": year, "ward": ward, "candidate": candidate, "votes": numbers[position]}
                 for ward, numbers in wards
             )
+    coverage: list[dict[str, object]] = []
     for year, page in TRIB.items():
+        left: list[str] = []
         reads = [json.loads((TRIB_INBOX / f"p{page}-{reader}.json").read_text()) for reader in ("sonnet", "opus")]
         citywide = lines.filter((pl.col("year") == year) & (pl.col("stage") == "general") & (pl.col("office") == "mayor"))
         for position, head in enumerate(reads[0]["candidates"]):
@@ -115,12 +117,21 @@ def parse() -> None:
             total = citywide.filter(pl.col("candidate") == found)["votes"].sum()
             if cells[0] != cells[1] or wards[0] != list(range(1, 23)) or sum(cells[0]) != total:
                 print(f"{year} {found}: left out, wards add up to {sum(cells[0])} and {sum(cells[1])} against {total}")
+                left.append(found)
                 continue
             rows.extend(
                 {"year": year, "ward": ward, "candidate": found, "votes": votes, "page": page, "bbox": reads[0]["bbox"]}
                 for ward, votes in zip(wards[0], cells[0], strict=True)
             )
+        coverage.append(
+            {
+                "year": year,
+                "share": 1 - citywide.filter(pl.col("candidate").is_in(left))["votes"].sum() / citywide["votes"].sum(),
+                "left": ", ".join(left),
+            }
+        )
     PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(coverage).write_parquet(PARSED / "coverage.parquet")
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "wards.parquet")
 
 
@@ -142,6 +153,7 @@ def fetch() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "wards.parquet")
+    coverage = {year: (share, left) for year, share, left in pl.read_parquet(PARSED / "coverage.parquet").iter_rows()}
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -272,8 +284,20 @@ def emit() -> Path:
                 status="active",
                 source_id=held,
                 is_default=False,
-                completeness=1,
+                completeness=coverage.get(year, (1, ""))[0],
             )
+            if coverage.get(year, (1, ""))[1]:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=(
+                        f"This set holds only part of the candidates. {coverage[year][1]} {'is' if ',' not in coverage[year][1] else 'are'} "
+                        "missing because the ward column does not add up to the printed ward total or to the candidate's "
+                        "citywide total in the default set. Ward totals and winners from these columns are not the election's; "
+                        "the citywide set stays the default."
+                    ),
+                )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=(
                     METHOD_TRIB.format(year=year, unlocated="" if day >= FIRST_WARD_DAY else " except that the 1854 units are unlocated")
                     if year in TRIB
