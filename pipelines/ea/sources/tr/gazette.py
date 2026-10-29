@@ -30,7 +30,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.gazette"
-VERSION = "4"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 OCR = PARSED / "ocr"
@@ -1469,7 +1469,11 @@ SENATE_SYSTEMS = {
         ),
     ),
     "senate_1966": (
-        {"formula": "hare", "remainders": "national"},
+        {
+            "formula": "hagenbach_bischoff_quota",
+            "remainders": "national",
+            "districtFormulas": [{"seats": 1, "formula": "fptp"}],
+        },
         "Senate of the Republic national remainder, 1966",
         (
             "The 1966 renewal used the national remainder the National Assembly adopted in 1965. "
@@ -2082,10 +2086,9 @@ def emit() -> Path:
         systems = {}
         for code, (rules, label, methodology) in SENATE_SYSTEMS.items():
             systems[code] = cs.key("tr.electoral_system", code)
-            if systems[code] in cs.minted:
-                cs.add("electoral_system", id=systems[code], polity_id=turkey, rules=rules, rules_version=1)
-                name(systems[code], label, "en")
-                cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
+            cs.add("electoral_system", id=systems[code], polity_id=turkey, rules=rules, rules_version=1)
+            name(systems[code], label, "en")
+            cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
         assembly = cs.key("tr.body", "millet-meclisi")
         assembly_system = cs.key("tr.electoral_system", "parliament_1969")
         if {assembly, assembly_system} & cs.minted:
