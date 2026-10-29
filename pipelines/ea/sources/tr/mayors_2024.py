@@ -144,6 +144,7 @@ def emit() -> Path:
         for title in CHANGE_PAGES.values():
             cs.artifact(raw.cached(SOURCE, url(title)), index)
         matched: set[str] = set()
+        event_sources: dict[str, object] = {}
 
         skipped: list[tuple[str, str, str]] = []
         published = 0
@@ -227,7 +228,19 @@ def emit() -> Path:
                 continue
             when = date.fromisoformat(change["date"])
             locator = {"page": CHANGE_PAGES[change["page"]]}
+            if change["source_url"] not in event_sources:
+                event_sources[change["source_url"]] = cs.source(change["publisher"], change["source_title"])
+                cs.add(
+                    "source",
+                    id=event_sources[change["source_url"]],
+                    kind="news_agency",
+                    publisher=change["publisher"],
+                    title=change["source_title"],
+                    url=change["source_url"],
+                )
+            report = event_sources[change["source_url"]]
             cs.add("citation", entity_id=tenure, source_id=index, locator=locator)
+            cs.add("citation", entity_id=tenure, source_id=report, locator={"url": change["source_url"]})
             for kind in {"suspended": ("suspended",), "trustee": ("removed", "trustee_appointed"), "died": ("died",)}[
                 change["kind"]
             ]:
@@ -237,7 +250,7 @@ def emit() -> Path:
                     kind=kind,
                     date=when,
                     actor=None if change["kind"] == "died" else "İçişleri Bakanlığı",
-                    source_id=index,
+                    source_id=report,
                 )
             if change["replacement"]:
                 successor = cs.key(f"{SOURCE}.person", f"{contest}:{change['replacement']}")
@@ -261,6 +274,7 @@ def emit() -> Path:
                     succeeds_tenure_id=tenure,
                 )
                 cs.add("citation", entity_id=replacement, source_id=index, locator=locator)
+                cs.add("citation", entity_id=replacement, source_id=report, locator={"url": change["source_url"]})
                 if change["party"]:
                     cs.add(
                         "tenure_affiliation",

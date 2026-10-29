@@ -1,41 +1,41 @@
-municipality	mayor	kind	date	replacement	party	page
-Adana	Zeydan Karalar	suspended	2025-07-09	Güngör Geçer		changes
-Antalya	Muhittin Böcek	suspended	2025-07-07	Hasan Akkoyun		changes
-Bolu	Tanju Özcan	suspended	2026-03-02	Mehmet Tuna Özcan		changes
-Bursa	Mustafa Bozbey	suspended	2026-04-04	Şahin Biba		changes
-Ceyhan	Kadir Aydar	suspended	2025-06-05	Sevil Aydar Yıldız	cumhuriyet-halk-partisi	changes
-Seyhan	Oya Tekin	suspended	2025-06-05	Hasibe Akkan	cumhuriyet-halk-partisi	changes
-Manavgat	Niyazi Nefi Kara	suspended	2025-07-08	Mehmet Çiçek	cumhuriyet-halk-partisi	changes
-Avcılar	Utku Caner Çaykara	suspended	2025-06-05	Yüksel Can	cumhuriyet-halk-partisi	changes
-Bayrampaşa	Hasan Mutlu	suspended	2025-09-17	İbrahim Akın	adalet-ve-kalkinma-partisi	changes
-Beşiktaş	Rıza Akpolat	suspended	2025-01-17	Rasim Şişman	cumhuriyet-halk-partisi	changes
-Beykoz	Alaattin Köseler	suspended	2025-03-04	Özlem Vural Gürzel	adalet-ve-kalkinma-partisi	changes
-Beyoğlu	İnan Güney	suspended	2025-08-19	Sefer Karaahmetoğlu	cumhuriyet-halk-partisi	changes
-Beylikdüzü	Mehmet Murat Çalık	suspended	2025-03-23	Önder Serkan Çebi	cumhuriyet-halk-partisi	changes
-Büyükçekmece	Hasan Akgün	suspended	2025-06-05	Ahmet Şahin	cumhuriyet-halk-partisi	changes
-Gaziosmanpaşa	Hakan Bahçetepe	suspended	2025-06-05	Eray Karadeniz	adalet-ve-kalkinma-partisi	changes
-Şile	Özgür Kabadayı	suspended	2025-07-10	Sacit Terzi	cumhuriyet-halk-partisi	changes
-Yahşihan	Ahmet Sungur	suspended	2025-09-18	Aydın Demirdirek	adalet-ve-kalkinma-partisi	changes
-Ataşehir	Onursal Adıgüzel	suspended	2026-04-22	Murat Güneş	cumhuriyet-halk-partisi	changes
-Silifke	Mustafa Turgut	suspended	2026-06-23			changes
-Adalar	Ali Ercan Akpolat	suspended	2026-06-23			changes
-Silivri	Bora Balcıoğlu	suspended	2026-06-16	Yalçın Ekici	cumhuriyet-halk-partisi	changes
-Buca	Görkem Duman	suspended	2026-06-08	Hüseyin Benzer	cumhuriyet-halk-partisi	changes
-Güzelbahçe	Mustafa Günay	suspended	2026-05-28	Ayşe Akın	cumhuriyet-halk-partisi	changes
-Eşme	Yılmaz Tozan	suspended	2026-04-22	Zeki Işık	cumhuriyet-halk-partisi	changes
-Kuşadası	Ömer Günel	suspended	2026-03-17	Tahsin Demirtaş	cumhuriyet-halk-partisi	changes
-Akçakoca	Fikret Albayrak	suspended	2026-05-24	Alev Ünal	adalet-ve-kalkinma-partisi	changes
-Hakkâri	Mehmet Sıddık Akış	trustee	2024-06-03	Ali Çelik		kayyum
-Esenyurt	Ahmet Özer	trustee	2024-10-31	Can Aksoy		kayyum
-Mardin	Ahmet Türk	trustee	2024-11-04	Tuncay Akkoyun		kayyum
-Batman	Gülistan Sönük	trustee	2024-11-04	Ekrem Canalp		kayyum
-Halfeti	Mehmet Karayılan	trustee	2024-11-04	Hakan Başoğlu		kayyum
-Tunceli	Cevdet Konak	trustee	2024-11-22	Bülent Tekbıyıkoğlu		kayyum
-Ovacık	Mustafa Sarıgül	trustee	2024-11-22	Hüseyin Şamil Sözen		kayyum
-Bahçesaray	Ayvaz Hazır	trustee	2024-11-29	Harun Arslanhargun		kayyum
-Akdeniz	Hoşyar Sarıyıldız	trustee	2025-01-13	Zeyit Şener		kayyum
-Siirt	Sofya Alağaş	trustee	2025-01-29	Kemal Kızılkaya		kayyum
-Van	Abdullah Zeydan	trustee	2025-02-15	Ozan Balcı		kayyum
-Kağızman	Mehmet Alkan	trustee	2025-02-24	Okan Daşdan		kayyum
-Şişli	Resul Emrah Şahan	trustee	2025-03-23	Cevdet Ertürkmen		kayyum
-Manisa	Ferdi Zeyrek	died	2025-06-09			changes
+municipality	mayor	kind	date	replacement	party	page	publisher	source_url	source_title
+Adana	Zeydan Karalar	suspended	2025-07-09	Güngör Geçer		changes	Medyascope	https://medyascope.tv/2025/07/09/adana-buyuksehir-belediye-baskani-zeydan-karalar-gorevinden-uzaklastirildi/	Adana Büyükşehir Belediye Başkanı Zeydan Karalar görevinden uzaklaştırıldı
+Antalya	Muhittin Böcek	suspended	2025-07-07	Hasan Akkoyun		changes	Anadolu Ajansı	https://www.aa.com.tr/tr/gundem/antalya-buyuksehir-belediye-baskani-muhittin-bocek-tutuklandi/3622412	Antalya Büyükşehir Belediye Başkanı Muhittin Böcek tutuklandı
+Bolu	Tanju Özcan	suspended	2026-03-03	Mehmet Tuna Özcan		changes	Habertürk	https://www.haberturk.com/bolu-haberleri/116838895-bolu-belediye-baskani-tanju-ozcan-gorevden-uzaklastirildi	Bolu Belediye Başkanı Tanju Özcan görevden uzaklaştırıldı
+Bursa	Mustafa Bozbey	suspended	2026-04-04	Şahin Biba		changes	Evrensel	https://www.evrensel.net/haber/5978255/icisleri-bakanligi-mustafa-bozbeyi-gorevinden-uzaklastirdi	İçişleri Bakanlığı Mustafa Bozbey'i görevinden uzaklaştırdı
+Ceyhan	Kadir Aydar	suspended	2025-06-05	Sevil Aydar Yıldız	cumhuriyet-halk-partisi	changes	Habertürk	https://www.haberturk.com/son-dakika-5-belediye-baskani-gorevden-uzaklastirildi-3797150	5 belediye başkanı görevden uzaklaştırıldı
+Seyhan	Oya Tekin	suspended	2025-06-05	Hasibe Akkan	cumhuriyet-halk-partisi	changes	Habertürk	https://www.haberturk.com/son-dakika-5-belediye-baskani-gorevden-uzaklastirildi-3797150	5 belediye başkanı görevden uzaklaştırıldı
+Manavgat	Niyazi Nefi Kara	suspended	2025-07-08	Mehmet Çiçek	cumhuriyet-halk-partisi	changes	CNN Türk	https://www.cnnturk.com/turkiye/son-dakika-manavgat-belediye-baskani-niyazi-nefi-kara-gorevden-uzaklastirildi-2307447	Manavgat Belediye Başkanı Niyazi Nefi Kara görevden uzaklaştırıldı
+Avcılar	Utku Caner Çaykara	suspended	2025-06-05	Yüksel Can	cumhuriyet-halk-partisi	changes	Habertürk	https://www.haberturk.com/son-dakika-5-belediye-baskani-gorevden-uzaklastirildi-3797150	5 belediye başkanı görevden uzaklaştırıldı
+Bayrampaşa	Hasan Mutlu	suspended	2025-09-17			changes	Medyascope	https://medyascope.tv/2025/09/17/tutuklanan-bayrampasa-belediye-baskani-hasan-mutlu-gorevden-uzaklastirildi/	Tutuklanan Bayrampaşa Belediye Başkanı Hasan Mutlu görevden uzaklaştırıldı
+Beşiktaş	Rıza Akpolat	suspended	2025-01-17	Rasim Şişman	cumhuriyet-halk-partisi	changes	Cumhuriyet	https://www.cumhuriyet.com.tr/turkiye/son-dakika-icisleri-bakanligi-duyurdu-besiktas-belediye-baskani-2290363	İçişleri Bakanlığı duyurdu: Beşiktaş Belediye Başkanı Rıza Akpolat görevden uzaklaştırıldı
+Beykoz	Alaattin Köseler	suspended	2025-03-04	Özlem Vural Gürzel	adalet-ve-kalkinma-partisi	changes	Medyascope	https://medyascope.tv/2025/03/04/tutuklanan-beykoz-belediye-baskani-alaattin-koseler-gorevden-uzaklastirildi/	Tutuklanan Beykoz Belediye Başkanı Alaattin Köseler görevden uzaklaştırıldı
+Beyoğlu	İnan Güney	suspended	2025-08-19	Sefer Karaahmetoğlu	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2025/08/19/beyoglu-belediye-baskani-inan-guney-gorevden-uzaklastirildi/	Beyoğlu Belediye Başkanı İnan Güney görevden uzaklaştırıldı
+Beylikdüzü	Mehmet Murat Çalık	suspended	2025-03-23	Önder Serkan Çebi	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2025/03/23/imamoglu-gorevinden-uzaklastirildi/	İmamoğlu görevinden uzaklaştırıldı
+Büyükçekmece	Hasan Akgün	suspended	2025-06-05	Ahmet Şahin	cumhuriyet-halk-partisi	changes	Habertürk	https://www.haberturk.com/son-dakika-5-belediye-baskani-gorevden-uzaklastirildi-3797150	5 belediye başkanı görevden uzaklaştırıldı
+Gaziosmanpaşa	Hakan Bahçetepe	suspended	2025-06-05	Eray Karadeniz	adalet-ve-kalkinma-partisi	changes	Habertürk	https://www.haberturk.com/son-dakika-5-belediye-baskani-gorevden-uzaklastirildi-3797150	5 belediye başkanı görevden uzaklaştırıldı
+Şile	Özgür Kabadayı	suspended	2025-07-16	Sacit Terzi	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2025/07/16/sile-belediye-baskani-gorevden-uzaklastirildi/	Şile Belediye Başkanı görevden uzaklaştırıldı
+Yahşihan	Ahmet Sungur	suspended	2025-09-23	Aydın Demirdirek	adalet-ve-kalkinma-partisi	changes	NTV	https://www.ntv.com.tr/turkiye/yahsihan-belediye-baskani-ahmet-sungur-gorevden-uzaklastirildi,KYAdjdyph0aADMSD8_H2rA	Yahşihan Belediye Başkanı Ahmet Sungur görevden uzaklaştırıldı
+Ataşehir	Onursal Adıgüzel	suspended	2026-04-22	Murat Güneş	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2026/04/22/chpli-atasehir-belediye-baskani-onursal-adiguzel-gorevinden-uzaklastirildi/	CHP'li Ataşehir Belediye Başkanı Onursal Adıgüzel görevinden uzaklaştırıldı
+Silifke	Mustafa Turgut	suspended	2026-06-23			changes	Medyascope	https://medyascope.tv/2026/06/23/tutuklanan-iki-chpli-belediye-baskani-gorevden-uzaklastirildi/	Tutuklanan iki CHP'li belediye başkanı görevden uzaklaştırıldı
+Adalar	Ali Ercan Akpolat	suspended	2026-06-23			changes	Medyascope	https://medyascope.tv/2026/06/23/tutuklanan-iki-chpli-belediye-baskani-gorevden-uzaklastirildi/	Tutuklanan iki CHP'li belediye başkanı görevden uzaklaştırıldı
+Silivri	Bora Balcıoğlu	suspended	2026-06-16	Yalçın Ekici	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2026/06/16/tutuklanan-chpli-silivri-belediye-baskani-gorevden-uzaklastirildi/	Tutuklanan CHP'li Silivri Belediye Başkanı görevden uzaklaştırıldı
+Buca	Görkem Duman	suspended	2026-06-07	Hüseyin Benzer	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2026/06/08/buca-belediye-baskani-gorkem-duman-gorevden-uzaklastirildi/	Buca Belediye Başkanı Görkem Duman görevden uzaklaştırıldı
+Güzelbahçe	Mustafa Günay	suspended	2026-05-27	Ayşe Akın	cumhuriyet-halk-partisi	changes	Evrensel	https://www.evrensel.net/haber/5986031/guzelbahce-belediye-baskani-mustafa-gunay-gorevden-uzaklastirildi	Güzelbahçe Belediye Başkanı Mustafa Günay görevden uzaklaştırıldı
+Eşme	Yılmaz Tozan	suspended	2026-04-22	Zeki Işık	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2026/04/22/usak-esme-belediye-baskani-yilmaz-tozan-gorevden-uzaklastirildi/	Uşak Eşme Belediye Başkanı Yılmaz Tozan görevden uzaklaştırıldı
+Kuşadası	Ömer Günel	suspended	2026-03-17	Tahsin Demirtaş	cumhuriyet-halk-partisi	changes	Medyascope	https://medyascope.tv/2026/03/17/kusadasi-belediye-baskani-omer-gunel-gorevden-uzaklastirildi/	Kuşadası Belediye Başkanı Ömer Günel görevden uzaklaştırıldı
+Akçakoca	Fikret Albayrak	suspended	2026-05-24	Alev Ünal	adalet-ve-kalkinma-partisi	changes	Evrensel	https://www.evrensel.net/haber/5985579/icisleri-bakanligi-duyurdu-akcakoca-belediye-baskani-gorevden-uzaklastirildi	İçişleri Bakanlığı duyurdu: Akçakoca Belediye Başkanı görevden uzaklaştırıldı
+Hakkâri	Mehmet Sıddık Akış	trustee	2024-06-03	Ali Çelik		kayyum	Medyascope	https://medyascope.tv/2024/06/03/hakkari-belediyesine-kayyum-atandi/	Hakkari Belediyesi'ne kayyum atandı
+Esenyurt	Ahmet Özer	trustee	2024-10-31	Can Aksoy		kayyum	Medyascope	https://medyascope.tv/2024/10/31/esenyurt-belediyesine-kayyum-atandi/	Esenyurt Belediyesi'ne kayyum atandı
+Mardin	Ahmet Türk	trustee	2024-11-04	Tuncay Akkoyun		kayyum	Habertürk	https://www.haberturk.com/son-dakika-mardin-batman-ve-halfeti-ye-kayyum-atandi-3734581	Mardin, Batman ve Halfeti'ye kayyum atandı
+Batman	Gülistan Sönük	trustee	2024-11-04	Ekrem Canalp		kayyum	Habertürk	https://www.haberturk.com/son-dakika-mardin-batman-ve-halfeti-ye-kayyum-atandi-3734581	Mardin, Batman ve Halfeti'ye kayyum atandı
+Halfeti	Mehmet Karayılan	trustee	2024-11-04	Hakan Başoğlu		kayyum	Habertürk	https://www.haberturk.com/son-dakika-mardin-batman-ve-halfeti-ye-kayyum-atandi-3734581	Mardin, Batman ve Halfeti'ye kayyum atandı
+Tunceli	Cevdet Konak	trustee	2024-11-22	Bülent Tekbıyıkoğlu		kayyum	Habertürk	https://www.haberturk.com/son-dakika-tunceli-ve-ovacik-belediyelerine-kayyum-atandi-3740280	Tunceli ve Ovacık belediyelerine kayyum atandı
+Ovacık	Mustafa Sarıgül	trustee	2024-11-22	Hüseyin Şamil Sözen		kayyum	Habertürk	https://www.haberturk.com/son-dakika-tunceli-ve-ovacik-belediyelerine-kayyum-atandi-3740280	Tunceli ve Ovacık belediyelerine kayyum atandı
+Bahçesaray	Ayvaz Hazır	trustee	2024-11-29	Harun Arslanargun		kayyum	Medyascope	https://medyascope.tv/2024/11/29/bahcesaray-belediyesine-kayyum-atandi/	Bahçesaray Belediyesi'ne kayyum atandı
+Akdeniz	Hoşyar Sarıyıldız	trustee	2025-01-13	Zeyit Şener		kayyum	Habertürk	https://www.haberturk.com/son-dakika-akdeniz-belediyesi-nde-kayyum-atandi-3755499	Akdeniz Belediyesi'nde kayyum atandı
+Siirt	Sofya Alağaş	trustee	2025-01-29	Kemal Kızılkaya		kayyum	Habertürk	https://www.haberturk.com/son-dakika-siirt-belediyesi-ne-kayyum-atandi-3760502	Siirt Belediyesi'ne kayyum atandı
+Van	Abdullah Zeydan	trustee	2025-02-15	Ozan Balcı		kayyum	Milliyet	https://www.milliyet.com.tr/gundem/son-dakika-van-buyuksehir-belediyesine-kayyum-atandi-7308185	Van Büyükşehir Belediyesi'ne kayyum atandı
+Kağızman	Mehmet Alkan	trustee	2025-02-24	Okan Daştan		kayyum	Medyascope	https://medyascope.tv/2025/02/24/dem-partili-kagizman-belediyesine-kayyum-atandi/	DEM Partili Kağızman Belediyesi'ne kayyum atandı
+Şişli	Resul Emrah Şahan	trustee	2025-03-23	Cevdet Ertürkmen		kayyum	Medyascope	https://medyascope.tv/2025/03/23/chpnin-kalesi-sisli-belediyesine-kayyum-atandi/	CHP'nin kalesi Şişli Belediyesi'ne kayyum atandı
+Manisa	Ferdi Zeyrek	died	2025-06-09			changes	NTV	https://www.ntv.com.tr/turkiye/ferdi-zeyrek-hayatini-kaybetti,av1q-agzKka4DA4MTTycjQ	Ferdi Zeyrek hayatını kaybetti
