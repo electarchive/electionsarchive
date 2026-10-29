@@ -274,6 +274,7 @@ OPENINGS = {
 CLOSINGS = {11: date(1960, 5, 27), 26: date(2018, 6, 24)}
 ERDOGAN = "f72877c2-c08b-037b-e050-007f01005610"
 ERDOGAN_SWORN = date(2003, 3, 11)
+BY_ELECTED = {9: date(1951, 9, 16)}
 MINUTES = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d{term:02d}/c001/tbmm{term:02d}001fih.pdf"
 MINUTES_TITLE = "Tutanak Dergisi, {term}. Dönem, Cilt 1, fihrist"
 ERDOGAN_OATH = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d22/c006/tbmm22006fih.pdf"
@@ -358,6 +359,7 @@ def emit() -> Path:
                 ).fetchall()
             ]
         counts: Counter[tuple[int, str]] = Counter()
+        contexts: set[tuple[str, str]] = set()
         for term in sorted(ELECTIONS):
             listed = rows(term)
             matched: dict[str, tuple[UUID, UUID]] = {}
@@ -440,7 +442,11 @@ def emit() -> Path:
                     id=tenure,
                     person_id=person,
                     body_id=assembly,
-                    from_date=ERDOGAN_SWORN if term == 22 and member == ERDOGAN else OPENINGS.get(term),
+                    from_date=ERDOGAN_SWORN
+                    if term == 22 and member == ERDOGAN
+                    else BY_ELECTED[term]
+                    if hit is None and term in BY_ELECTED
+                    else OPENINGS.get(term),
                     from_precision="day" if hit is not None or (term == 22 and member == ERDOGAN) else "unknown",
                     to_date=(OPENINGS.get(term + 1) or CLOSINGS[term]).isoformat()
                     if row["end"] is not None and ENDS[str(row["reason"])] == "term_end"
@@ -460,12 +466,11 @@ def emit() -> Path:
                         locator={"item": "birinci birleşim"},
                     )
                 if term < 17 and row["province"] != "BİLİNMİYOR":
-                    cs.add(
-                        "note",
-                        entity_id=tenure,
-                        kind="context",
-                        body_md=f"Member for {capitalize(str(row['province']))}.",
+                    body = f"Member for {capitalize(str(row['province']))}" + (
+                        ", entering at a by-election." if hit is None and term in BY_ELECTED else "."
                     )
+                    cs.add("note", entity_id=tenure, kind="context", body_md=body)
+                    contexts.add((str(tenure), body))
                 if row["end"] is not None and ENDS[str(row["reason"])] in ("died", "resigned"):
                     cs.add(
                         "tenure_event",
@@ -474,6 +479,15 @@ def emit() -> Path:
                         date=row["end"],
                         source_id=source,
                     )
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where c.pipeline = %s and n.kind = 'context'""",
+            [SOURCE],
+        ).fetchall():
+            if (str(entity), text) not in contexts:
+                cs.add(
+                    "note_drop", note_id=note, entity_id=entity, body_md=text, reason="Superseded by a corrected note."
+                )
         for key, count in sorted(counts.items()):
             print(key, count)
         return cs.write()

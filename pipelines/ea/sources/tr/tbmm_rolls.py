@@ -42,6 +42,7 @@ DOUBLES = {
         ("Halil Özyörük", "istanbul", "izmir", 16),
         ("Refik Şevket İnce", "izmir", "manisa", 16),
         ("Samet Ağaoğlu", "mugla", "manisa", 686),
+        ("Adnan Menderes", "aydin", "istanbul", None),
     ],
     10: [
         ("Adnan Menderes", "aydin", "istanbul", 21),
@@ -60,7 +61,9 @@ DOUBLES = {
         ("Refik Koraltan", "kocaeli", "mersin", 15),
     ],
 }
-SWORN_LATER = {9: {"Reşat Şemsettin Sirer", "Ahmet Kemal Varınca"}}
+SWORN_LATER = {9: {"Reşat Şemsettin Sirer", "Ahmet Kemal Varınca", "Lütfi Ülkümen"}}
+OATH = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d09/c001/tbmm09001001.pdf"
+OATH_TITLE = "Tutanak Dergisi, 9. Dönem, Cilt 1, 1. Birleşim"
 ALIASES = tbmm_album.ALIASES | {"afyon": "afyonkarahisar", "kmaras": "kahramanmaras"}
 DIGITS = re.compile(r"\d+")
 
@@ -159,8 +162,8 @@ def emit() -> Path:
             summary=(
                 "Elected members of the 1950, 1954, and 1957 Turkish general elections by province, from the TBMM Albümü, "
                 "with members elected in two provinces from each term's minutes index; members who entered at a by-election "
-                "are left out, including Reşat Şemsettin Sirer and Ahmet Kemal Varınca, whom the album leaves unmarked "
-                "but who were not sworn in on 22 May 1950"
+                "are left out, including Reşat Şemsettin Sirer, Ahmet Kemal Varınca, and Lütfi Ülkümen, whom the album leaves "
+                "unmarked but who were not sworn in on 22 May 1950; Adnan Menderes, sworn in for Aydın, also holds Aydın's seat"
             ),
             polity="TR",
         )
@@ -180,6 +183,17 @@ def emit() -> Path:
                 license="Official public record, no license stated",
             )
             cs.artifact(raw.cached(tbmm.SOURCE, url), indexes[term])
+        oath = cs.source(PUBLISHER, OATH_TITLE)
+        cs.add(
+            "source",
+            id=oath,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=OATH_TITLE,
+            url=OATH,
+            license="Official public record, no license stated",
+        )
+        cs.artifact(raw.fetch(SOURCE, OATH, suffix=".pdf"), oath)
         declared = dict(
             conn.execute(
                 """select x.value, r.id from result_set r join source s on s.id = r.source_id
@@ -190,6 +204,7 @@ def emit() -> Path:
             ).fetchall()
         )
         written = set()
+        staged = set()
         for row in members.iter_rows(named=True):
             day = TERMS[row["term"]]
             contest_key = f"{day}:parliament:{plates[row['province']]:02}"
@@ -218,6 +233,7 @@ def emit() -> Path:
                         cs.add("name", entity_id=person, text=text, lang="tr", kind="official", is_preferred=preferred)
             written.add(person)
             candidacy = cs.key("tr.candidacy", f"{contest_key}:{slug(row['name'])}")
+            staged.add(candidacy)
             cs.add(
                 "candidacy",
                 id=candidacy,
@@ -232,7 +248,9 @@ def emit() -> Path:
             if party is not None:
                 cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party, kind="nominated")
             cs.add("citation", entity_id=candidacy, source_id=album, locator={"term": row["term"], "page": row["page"]})
-            if row["gave_up"] is not None:
+            if row["gave_up"] is not None and row["index_page"] is None:
+                cs.add("citation", entity_id=candidacy, source_id=oath, locator={"item": "andiçme", "page": 2})
+            elif row["gave_up"] is not None:
                 cs.add(
                     "citation",
                     entity_id=candidacy,
@@ -247,5 +265,14 @@ def emit() -> Path:
                 kind="elected",
                 seats=None,
             )
+        for (candidacy,) in conn.execute(
+            "select c.id from candidacy c join changeset s on s.id = c.changeset_id where s.pipeline = %s", [SOURCE]
+        ).fetchall():
+            if candidacy not in staged:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=candidacy,
+                    reason="Entered at a by-election, not elected at the general.",
+                )
         print(Counter(members["term"]))
         return cs.write()
