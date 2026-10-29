@@ -1828,6 +1828,20 @@ for fips, county, page in (
         f"https://www.sos.alabama.gov/sites/default/files/sample-ballots/2026/gen/{page}.pdf",
         f"al/{county.replace('. ', '').lower()}.pdf" if county != "St. Clair" else "al/stclair.pdf",
     )
+for key, publisher, title, url, local in (
+    ("MO-29037", "Cass County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.casscounty.com/DocumentCenter/View/4496/November-2026-Sample-Ballotpdf", "mo/cass.pdf"),
+    ("MO-29021", "Buchanan County Clerk", "Sample Ballot Style 1, General Election, November 3, 2026", "https://www.co.buchanan.mo.us/media/Document%20Center/County%20Clerk/Nov%203%202026%20Sample%20Ballots/Nov%203%202026%20Ballot%20Style%201.pdf", "mo/buchanan.pdf"),
+    ("MO-29031", "Cape Girardeau County Clerk", "Publication of Sample Ballot, General Election, November 3, 2026", "https://www.capecounty.us/wp-content/uploads/2026/09/Cape-Girardeau-Publication-110326.pdf", "mo/cape.pdf"),
+    ("MO-29051", "Cole County Clerk", "Combined Sample Ballot, General Election, November 3, 2026", "https://colecounty.org/DocumentCenter/View/14428/November-3-2026-Cole-County-Combined-Sample-Ballot", "mo/cole.pdf"),
+    ("MO-29187", "St. Francois County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.sfcgov.org/download/clerk/elections/Sample-Ballot-General-Election-November-3-2026.pdf", "mo/stfrancois.pdf"),
+    ("MO-29213", "Taney County Clerk", "Official Sample Compilation Ballot, General Election, November 3, 2026", "https://media.taneycounty.org/pdf.php?id=5758", "mo/taney.pdf"),
+    ("MO-29161", "Phelps County Clerk", "Sample Ballots, General Election, November 3, 2026", "https://www.phelpscounty.org/wp-content/uploads/2026/09/Phelps-Samples-To-Print-2026.pdf", "mo/phelps.pdf"),
+    ("IL-17095", "Knox County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://cms2.revize.com/revize/knoxcounty/Specimen%20Ballot%20-%20GE2026.pdf", "il/knox.pdf"),
+    ("IL-17081", "Jefferson County Clerk", "Official Ballot, General Election, November 3, 2026", "https://cms2.revize.com/revize/jeffersoncounty/Document%20center/County%20Clerks%20Docs/Elections/2026%20General/November%202026%20PUBLICATION%20Ballot.pdf", "il/jefferson.pdf"),
+    ("IL-17027", "Clinton County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://clintonco.illinois.gov/wp-content/uploads/2026-GE-ballot-pages.pdf", "il/clinton.pdf"),
+    ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
+):
+    NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
