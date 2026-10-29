@@ -432,6 +432,31 @@ NE_SCANS = {
     "ne-measures-2006": "2006%20General.pdf",
     "ne-measures-2006-primary": "2006%20Primary.pdf",
 }
+MO = (
+    "https://web.archive.org/web/2015id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/CountyGeneral{}.pdf"
+)
+MO_PART2 = (
+    "https://web.archive.org/web/2015id_/http://sos.mo.gov/cmsimages/ElectionResultsStatistics/CountyGeneral{}Part2.pdf"
+)
+MO_DAYS = (
+    date(2000, 11, 7),
+    date(2002, 11, 5),
+    date(2004, 11, 2),
+    date(2006, 11, 7),
+    date(2008, 11, 4),
+    date(2010, 11, 2),
+)
+MO_CODES = {"KANSAS CITY": "29095", "JACKSON": "29095", "ST LOUIS CITY": "29510", "ST LOUIS COUNTY": "29189"}
+MT = "https://sosmt.gov/"
+MT_FILES = {
+    date(2000, 11, 7): "Portals/142/Elections/archives/2000s/2000/2000-GenState.pdf",
+    date(2002, 11, 5): "wp-content/uploads/attachments/2002-GenState.pdf",
+    date(2004, 11, 2): "Portals/142/Elections/archives/2000s/2004/2004-GenState.pdf",
+    date(2006, 11, 7): "wp-content/uploads/attachments/2006_State_General_Final_Results.pdf",
+    date(2008, 11, 4): "wp-content/uploads/attachments/2008_State_General.pdf",
+    date(2010, 11, 2): "wp-content/uploads/attachments/2010_General_Election_Official_Statewide_Canvass.pdf",
+}
+MT_BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
 SCANS = Path(__file__).resolve().parents[3] / "scans"
 BALLOT_LABELS = {("NE", date(2006, 11, 7), "422"): ("Retain", "Repeal")}
 NE_HEADING = re.compile(
@@ -468,13 +493,37 @@ SD_SCANS = {
     "sd-measures-2012": "https://sdsos.gov/docs/2012ElectionReturnsBooklet.pdf",
 }
 SD_2012 = {
-    "M": ("An Amendment to the South Dakota Constitution regarding certain provisions relating to corporations.", "Legislative Referendum", False),
-    "N": ("An Amendment to the South Dakota Constitution repealing certain reimbursement restrictions for travel by legislators to and from a legislative session.", "Legislative Referendum", False),
-    "O": ("An Amendment to the South Dakota Constitution changing the method for distributions from the cement plant trust fund.", "Legislative Referendum", True),
-    "P": ("An Amendment to the South Dakota Constitution adding balanced budget requirements.", "Legislative Referendum", True),
-    "15": ("An initiated measure to increase state general sales and use taxes for additional K-12 public education and Medicaid funding.", "Initiative", False),
+    "M": (
+        "An Amendment to the South Dakota Constitution regarding certain provisions relating to corporations.",
+        "Legislative Referendum",
+        False,
+    ),
+    "N": (
+        "An Amendment to the South Dakota Constitution repealing certain reimbursement restrictions for travel by legislators to and from a legislative session.",
+        "Legislative Referendum",
+        False,
+    ),
+    "O": (
+        "An Amendment to the South Dakota Constitution changing the method for distributions from the cement plant trust fund.",
+        "Legislative Referendum",
+        True,
+    ),
+    "P": (
+        "An Amendment to the South Dakota Constitution adding balanced budget requirements.",
+        "Legislative Referendum",
+        True,
+    ),
+    "15": (
+        "An initiated measure to increase state general sales and use taxes for additional K-12 public education and Medicaid funding.",
+        "Initiative",
+        False,
+    ),
     "14": ("An Act to establish the Large Project Development Fund.", "Popular Referendum", False),
-    "16": ("An education reform act to establish a teacher scholarship program, math and science teacher bonuses, merit bonuses, uniform evaluations, and the elimination of state teacher tenure requirements.", "Popular Referendum", False),
+    "16": (
+        "An education reform act to establish a teacher scholarship program, math and science teacher bonuses, merit bonuses, uniform evaluations, and the elimination of state teacher tenure requirements.",
+        "Popular Referendum",
+        False,
+    ),
 }
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
@@ -531,6 +580,16 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "MO": (
+        "Missouri Secretary of State",
+        "Official election returns by county",
+        "https://www.sos.mo.gov/elections/results",
+    ),
+    "MT": (
+        "Montana Secretary of State",
+        "Statewide general election canvass",
+        "https://sosmt.gov/elections/results/",
+    ),
     "TX": ("Texas Secretary of State", "Texas election history: returns by county, 1992–2019", TX),
     "CA": (
         "California Secretary of State",
@@ -676,6 +735,23 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in (url for urls in SD_PAGES.values() for url in urls):
         raw.fetch(SOURCE, url, suffix=".htm")
+        time.sleep(1)
+    for day in MO_DAYS:
+        for url in (MO, MO_PART2) if day.year >= 2004 else (MO,):
+            raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
+            time.sleep(1)
+    for name in MT_FILES.values():
+        try:
+            raw.cached(SOURCE, MT + name)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                MT + name,
+                httpx.get(MT + name, headers=MT_BROWSER, follow_redirects=True, timeout=120).raise_for_status().content,
+                suffix=".pdf",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf",
+            )
         time.sleep(1)
     for name in AR_SHEETS.values():
         raw.fetch(SOURCE, AR + name, suffix=".xlsx")
@@ -2160,6 +2236,146 @@ def oregon() -> list[dict[str, object]]:
     return rows
 
 
+def missouri() -> list[dict[str, object]]:
+    value = re.compile(r"\b(Yes|No)\s+([\d,]+)\b")
+    heading = re.compile(
+        r"^\s*(?:Constitutional Amendment(?: No\.)? (\d+)|Proposition ([A-Z])|(Constitutional Convention))\b"
+    )
+    rows: list[dict[str, object]] = []
+    for day, url in (
+        (day, url.format(day.year)) for day in MO_DAYS for url in (MO, MO_PART2) if day.year >= 2004 or url == MO
+    ):
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.split("\n")
+        tallies: dict[tuple[str, str, str], list[int]] = {}
+        county = current = None
+        block: dict[str, int] = {}
+        for index, line in enumerate(lines):
+            if re.fullmatch(r"\s{0,8}[A-Z][A-Z .'&-]+", line) and any(
+                text.strip().startswith("Office") for text in lines[index + 1 : index + 9]
+            ):
+                name = re.sub(r"[^A-Z ]", "", line).strip()
+                county, current, block = MO_CODES.get(name, name), None, {}
+            elif current is not None and (found := value.search(line)):
+                if found[1] in block:
+                    raise ValueError(f"MO {day} {county} {current}: {found[1]} twice")
+                block[found[1]] = int(found[2].replace(",", ""))
+            elif found := heading.match(line):
+                current = found[1] or found[2] or "CC"
+                label = (
+                    f"Constitutional Amendment {found[1]}"
+                    if found[1]
+                    else f"Proposition {found[2]}"
+                    if found[2]
+                    else "Constitutional Convention"
+                )
+                block = {}
+            elif current is not None and "Total Votes" in line:
+                figures = re.findall(
+                    r"\d[\d,]*",
+                    " ".join(
+                        [line.split("Total Votes")[1]]
+                        + [text for text in lines[index + 1 : index + 8] if re.fullmatch(r"\s*\d[\d,]*\s*", text)]
+                    ),
+                )
+                if not figures:
+                    raise ValueError(f"MO {day} {county} {label}: no total")
+                total = figures[0]
+                if set(block) != {"Yes", "No"} or sum(block.values()) != int(total.replace(",", "")):
+                    raise ValueError(f"MO {day} {county} {label}: {block} against {total}")
+                for answer, votes in block.items():
+                    key = (county, current, answer)
+                    tallies.setdefault(key, [label, 0])[1] += votes
+                current = None
+        for (code, number, answer), (label, votes) in tallies.items():
+            rows.append(
+                {
+                    "state": "MO",
+                    "day": day,
+                    "number": number,
+                    "label": label,
+                    "url": url,
+                    "county": code,
+                    "answer": answer.upper(),
+                    "votes": votes,
+                }
+            )
+    return rows
+
+
+def montana() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, name in MT_FILES.items():
+        url = MT + name
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.split("\n")
+        tables: list[tuple[list[str], dict[str, list[int]], list[int]]] = []
+        if day.year == 2010:
+            titles = {"CONSTITUTIONAL CONVENTION": "CC", "CONSTITUTIONAL INITIATIVE": "CI", "INITIATIVE": "I"}
+            for index, line in enumerate(lines):
+                if (
+                    found := re.match(r"^\s*(CONSTITUTIONAL CONVENTION|CONSTITUTIONAL INITIATIVE|INITIATIVE)\b", line)
+                ) and (number := re.search(r"NO\.\s*(\d+)", " ".join(lines[index : index + 3]))):
+                    tables.append(([f"{titles[found[1]]}-{number[1]}"], {}, []))
+                    for follow in lines[index + 1 :]:
+                        if figures := re.fullmatch(r"\s*(.+?)\s{2,}([\d,]+)\s+([\d,]+)", follow):
+                            counts = [int(figures[2].replace(",", "")), int(figures[3].replace(",", ""))]
+                            if figures[1] == "Total":
+                                tables[-1][2].extend(counts)
+                                break
+                            tables[-1][1][figures[1]] = counts
+        else:
+            pattern = re.compile(r"\b(?:LR|IR|CI|CC|C|I)-\d+\b|HB 474")
+            heads = [
+                list(dict.fromkeys("IR-117" if text == "HB 474" else text for text in pattern.findall(line)))
+                for line in lines
+            ]
+            index = max(range(len(lines)), key=lambda at: len(heads[at]))
+            ids = heads[index]
+            width = 2 * len(ids)
+            table: dict[str, list[int]] = {}
+            total: list[int] = []
+            for follow in lines[index + 1 :]:
+                figures = re.findall(r"\d[\d,]*", follow)
+                if "%" in follow or len(figures) < width:
+                    continue
+                counts = [int(figure.replace(",", "")) for figure in figures[-width:]]
+                label = re.match(r"^\s*([A-Za-z][A-Za-z.&' ]*?)\s{2,}", follow)
+                if label is None or label[1] == "Total":
+                    total = counts
+                else:
+                    table[label[1].replace("&", "and")] = counts
+                if len(table) == 56 and total:
+                    break
+            tables = [
+                ([id], {c: v[2 * at : 2 * at + 2] for c, v in table.items()}, total[2 * at : 2 * at + 2])
+                for at, id in enumerate(ids)
+            ]
+        if not tables:
+            raise ValueError(f"MT {day}: no tables")
+        for ids, table, total in tables:
+            summed = [sum(votes[side] for votes in table.values()) for side in (0, 1)]
+            if len(table) != 56 or summed != total:
+                raise ValueError(f"MT {day} {ids[0]}: {len(table)} counties add up to {summed}, not {total}")
+            rows.extend(
+                {
+                    "state": "MT",
+                    "day": day,
+                    "number": re.sub(r"\D", "", ids[0]),
+                    "label": ids[0],
+                    "url": url,
+                    "county": county.replace("&", "and"),
+                    "answer": answer,
+                    "votes": votes[side],
+                }
+                for county, votes in table.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     listed = ncsl()
@@ -2181,6 +2397,8 @@ def parse() -> None:
             *nebraska(),
             *arkansas(),
             *south_dakota(),
+            *missouri(),
+            *montana(),
         ],
         infer_schema_length=None,
     )
@@ -2246,7 +2464,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"] or state == "SD"
+                if entry["number"] or state in ("SD", "MO")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
