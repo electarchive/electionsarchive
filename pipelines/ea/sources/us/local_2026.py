@@ -147,6 +147,16 @@ FEEDS = {
         "Kane County Clerk",
         "Candidates for the 2026 General Election",
     ),
+    "IL-17143": (
+        "https://www.peoriaelections.gov/DocumentCenter/View/1454/2026-General-Election---Sample-Ballot",
+        "Peoria County Board of Election Commissioners",
+        "Sample Ballot, 2026 General Election",
+    ),
+    "IL-17113": (
+        "https://www.mcleancountyil.gov/DocumentCenter/View/32912/2026-General-McLean-County-Specimen-Ballot",
+        "McLean County Clerk",
+        "Specimen Ballot, 2026 General Election",
+    ),
     "IL-17119": (
         "https://www.madisoncountyil.gov/document_center/CountyClerk/2026%20Election/Candidate%20list.pdf",
         "Madison County Clerk",
@@ -1355,6 +1365,8 @@ DELIVERED = {
     "IL-17089": DATA / "inbox" / "y26" / "il" / "kane.html",
     "IL-17201": DATA / "inbox" / "y26" / "il" / "winnebago.pdf",
     "IL-17119": DATA / "inbox" / "y26" / "il" / "madison.pdf",
+    "IL-17143": DATA / "inbox" / "y26" / "il" / "peoria.pdf",
+    "IL-17113": DATA / "inbox" / "y26" / "il" / "mclean.pdf",
     "IL-17167": DATA / "inbox" / "y26" / "il" / "sangamon.pdf",
     "MO-29183": DATA / "inbox" / "y26" / "mo" / "stcharles.pdf",
     "MO-29099": DATA / "inbox" / "y26" / "mo" / "jefferson.pdf",
