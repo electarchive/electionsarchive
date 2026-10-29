@@ -1643,6 +1643,12 @@ NE_SOURCES = {
         "https://www.co.ocean.nj.us/WebContentFiles/954890cf-db00-4b5b-b2e3-52d4b843aa40.pdf",
         "nj/ocean_school_certification.pdf",
     ),
+    "NJ-34017-s": (
+        "Hudson County Clerk",
+        "General Election sample ballot, City of Jersey City, November 3, 2026 (attested October 27, 2026)",
+        "https://www.hudsoncountyclerk.org/",
+        "nj/jersey_city_f09.pdf",
+    ),
     "NJ-34023-s": (
         "Middlesex County Clerk",
         "General Election 2026 Official Candidates List, school offices (updated 8/31/2026)",
@@ -1800,12 +1806,20 @@ for fips in sorted({line.split("\t")[0] for line in Path(__file__).with_name("lo
         f"https://vip.sos.nd.gov/candidatelist.aspx?eid=348#{fips}",
         "nd/candidates.html",
     )
-NE_SOURCES["AL-01115"] = (
-    "Alabama Secretary of State",
-    "2026 General Election Sample Ballot, St. Clair County, November 3, 2026",
-    "https://www.sos.alabama.gov/sites/default/files/sample-ballots/2026/gen/StClair-Sample.pdf",
-    "al/stclair.pdf",
-)
+for fips, county, page in (
+    ("01115", "St. Clair", "StClair-Sample"),
+    ("01121", "Talladega", "Talladega_Sample"),
+    ("01093", "Marion", "Marion_Sample"),
+    ("01087", "Macon", "Macon_Sample"),
+    ("01067", "Henry", "Henry_Sample"),
+    ("01131", "Wilcox", "Wilcox_Sample"),
+):
+    NE_SOURCES[f"AL-{fips}"] = (
+        "Alabama Secretary of State",
+        f"2026 General Election Sample Ballot, {county} County, November 3, 2026",
+        f"https://www.sos.alabama.gov/sites/default/files/sample-ballots/2026/gen/{page}.pdf",
+        f"al/{county.replace('. ', '').lower()}.pdf" if county != "St. Clair" else "al/stclair.pdf",
+    )
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
@@ -4646,6 +4660,7 @@ def parse() -> None:
                                         "consolidated",
                                         "elementary",
                                         "regional",
+                                        "corporation",
                                     )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
@@ -4748,8 +4763,9 @@ def parse() -> None:
                         else ([],)
                     ):
                         lead = start + ["st" if word == "saint" else word for word in stem]
-                        if stem and tokens[: len(lead)] == lead:
-                            rest = tokens[len(lead) :]
+                        skip = int(state == "IN" and sort == "school" and tokens[: len(lead)] != lead)
+                        if stem and tokens[skip : skip + len(lead)] == lead:
+                            rest = tokens[skip + len(lead) :]
                             said = (
                                 rest[0]
                                 if not start and rest and rest[0] in ("township", "borough", "city", "town", "village")
