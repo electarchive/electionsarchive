@@ -6232,7 +6232,8 @@ def emit() -> Path:
                 successor, day = RENAMED[full]
                 parties[full] = parties[successor]
                 name(parties[full], full, end=day)
-                name(parties[full], short, kind="abbreviation", end=day)
+                if full != f"{short} Partisi" and short != "Genç Parti":
+                    name(parties[full], short, kind="abbreviation", end=day)
                 continue
             start = next((day for successor, day in RENAMED.values() if successor == full), None)
             parties[full] = cs.key("tr.party", slug(full))
@@ -6261,7 +6262,8 @@ def emit() -> Path:
                 name(parties[full], abbreviation, kind="abbreviation", start=renamed, end=start)
             start, end = DATED.get(full, (start, None))
             name(parties[full], full, start=start, end=end)
-            name(parties[full], short, kind="abbreviation", start=start, end=end)
+            if full != f"{short} Partisi" and short != "Genç Parti":
+                name(parties[full], short, kind="abbreviation", start=start, end=end)
         persons: dict[str, UUID] = {}
         for label in dict.fromkeys(
             [label for label, _ in CANDIDATES + CANDIDATES_2018 + CANDIDATES_2014]

@@ -83,6 +83,13 @@ ABBREVIATIONS: dict[str, tuple[str | None, str | None, tuple[str, str] | str | N
     "milli-yol-partisi": ("Milli Yol", None, None),
     "anadolu-partisi": ("Anadolu", None, None),
     "vatan-partisi": ("Vatan", None, None),
+    "yeni-parti": ("Yeni Parti", None, None),
+    "genc-parti": ("Genç Parti", "GENÇPARTİ", ("tr", "Genç Parti")),
+    "vatandas-partisi": (None, "VAP", ("tr", "Vatandaş Partisi")),
+    "hur-demokrat-parti": (None, "HDP", ("tr", "Hür Demokrat Parti (Türkiye)")),
+    "bayrak-partisi": (None, "BP", ("tr", "Bayrak Partisi (Türkiye)")),
+    "buyuk-vatan-partisi": (None, "BVP", ("tr", "Büyük Vatan Partisi")),
+    "buyuk-anadolu-partisi": (None, "BAP", ("tr", "Büyük Anadolu Partisi")),
 }
 HDP_OPEN = (
     "HDP was not closed. Facing a closure case at the Constitutional Court, it handed its active political work to "
