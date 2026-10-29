@@ -971,6 +971,16 @@ FEEDS.update(
             "City of Tangent",
             "2026 Municipal Election",
         ),
+        "KS-20091": (
+            "https://www.jocoelection.org/sites/default/files/2026-10/11-03-2026%20-%20Notice%20of%20Election%20%28candidates%29%20-%20REVISED.pdf",
+            "Johnson County Election Office",
+            "Notice of Election (Candidates), November 3, 2026 General Election (revised)",
+        ),
+        "KS-20091-prairie-village": (
+            "https://www.jocoelection.org/sites/default/files/2026-10/11-03-2026%20-%20Notice%20of%20Election%20%28candidates%29%20-%20REVISED.pdf",
+            "Johnson County Election Office",
+            "Notice of Election (Candidates), November 3, 2026 General Election (revised)",
+        ),
         "OR-41043-lyons": (
             "https://www.cityoflyons.org/",
             "City of Lyons",
@@ -1168,6 +1178,8 @@ DELIVERED = {
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
+    "KS-20091": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
+    "KS-20091-prairie-village": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
     "OR-41019": DATA / "inbox" / "y26" / "or" / "douglas.pdf",
     "OR-41017": DATA / "inbox" / "y26" / "or" / "deschutes.html",
     "OR-41017-bend": DATA / "inbox" / "y26" / "or" / "bend.html",
