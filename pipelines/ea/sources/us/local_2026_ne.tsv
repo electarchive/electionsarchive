@@ -39,8 +39,6 @@ NY	Nassau County Legislature District 19	0	Christine Barlow	Democratic	Nassau	1
 NY	Nassau County Legislature District 19	0	James D. Kennedy	Republican	Nassau	1
 NY	Erie County Clerk	0	Steven G. Meyer	Democratic	Erie	1
 NY	Erie County Clerk	0	Michael P. Kearns	Republican	Erie	1
-NY	Erie County Comptroller	0	Thomas P. DiNapoli	Democratic	Erie	1
-NY	Erie County Comptroller	0	Joseph Hernandez	Republican	Erie	1
 NY	Erie County Legislature District 1	0	Lawrence J. Dupre	Democratic	Erie	1
 NY	Erie County Legislature District 2	0	Taisha E. St. Jean Tard	Democratic	Erie	1
 NY	Erie County Legislature District 3	0	Michael H. Kooshoian	Democratic	Erie	1
@@ -3221,3 +3219,351 @@ NY	Glenville Town Justice	0	John Lockwood	Democratic	Schenectady	1
 NY	Glenville Town Justice	0	Daniel P. Harrigan, Sr.	Republican	Schenectady	1
 NY	Princetown Town Justice	0	Michelle A. VanWoeart	Democratic	Schenectady	1
 NY	Scotia Village Justice	0	Michael L. Boyle	Democratic	Schenectady	1
+NY	Alden Town Supervisor	0	Gwendolyn A. Bork	Republican	Erie	1
+NY	Alden Town Justice	0	Louis C. Mussari	Republican	Erie	1
+NY	Aurora Town Supervisor	0	Raymond M. Wrazen	Democratic	Erie	1
+NY	Aurora Town Supervisor	0	Charles D. Snyder	Republican	Erie	1
+NY	Aurora Town Council	1	Molly Flynn	Democratic	Erie	1
+NY	Aurora Town Council	1	Shane M. Krieger	Republican	Erie	1
+NY	Boston Town Justice	0	Kyle W. Calabrese	Republican	Erie	1
+NY	Brant Town Council	1	Debora L. Bushnell	Democratic	Erie	1
+NY	Brant Town Council	1	Donna M. Marien	Republican	Erie	1
+NY	Brant Town Justice	0	Donald L. Clark	Republican	Erie	1
+NY	Cheektowaga Town Council	1	Rachel L. Martinez	Democratic	Erie	1
+NY	Cheektowaga Town Council	1	David J. DeFields Jr.	Republican	Erie	1
+NY	Cheektowaga Town Justice	0	John J. Wanat	Democratic	Erie	1
+NY	Colden Town Justice	0	Michael R. Schneider	Republican	Erie	1
+NY	Collins Town Supervisor	0	Kenneth E. Martin	Republican	Erie	1
+NY	Collins Town Justice	0	Sylvia L. Jock	Democratic	Erie	1
+NY	Collins Town Justice	0	Michael F. Cooper	Republican	Erie	1
+NY	Collins Town Justice	0	Kurt R. Stitzel	NY:conservative-party	Erie	1
+NY	Eden Town Highway Superintendent	1	Nicholas G. Blasz	Republican	Erie	1
+NY	Elma Town Supervisor	0	Wayne A. Clark	Republican	Erie	1
+NY	Elma Town Justice	0	M. William Boller	Republican	Erie	1
+NY	Evans Town Justice	0	Donald D. Hepkins	Democratic	Erie	1
+NY	Holland Town Justice	0	Christopher H. O'Brien	Republican	Erie	1
+NY	Lancaster Town Justice	0	David S. Stabler	Republican	Erie	1
+NY	Marilla Town Supervisor	0	Brian W. Nolan Sr.	Republican	Erie	1
+NY	Marilla Town Justice	0	Taylor A. Erhardt	Republican	Erie	1
+NY	Orchard Park Town Justice	0	Michael J. Pastrick	Democratic	Erie	2
+NY	Orchard Park Town Justice	0	Charles A. Messina	Democratic	Erie	2
+NY	Sardinia Town Justice	0	Eric G. Place	Republican	Erie	1
+NY	Tonawanda Town Supervisor	1	John J. Flynn	Democratic	Erie	1
+NY	Wales Town Supervisor	0	Timothy B. Howard	Republican	Erie	1
+NY	Wales Town Justice	0	Michael S. Simon	Republican	Erie	1
+NY	West Seneca Town Council	1	Jeffrey M. Quain	Democratic	Erie	1
+NY	West Seneca Town Council	1	John M. Rusinski	Republican	Erie	1
+NY	Buffalo City Court Judge	0	Michael J. Pacifico	Democratic	Erie	1
+NY	Camillus Town Supervisor	0	John A. Fatcheric II	Democratic	Onondaga	1
+NY	Camillus Town Council Ward 1	0	Adam King	Democratic	Onondaga	1
+NY	Camillus Town Council Ward 1	0	Mary H. Luber	Republican	Onondaga	1
+NY	Camillus Town Council Ward 2	0	Michael W. LaFlair	Republican	Onondaga	1
+NY	Camillus Town Council Ward 3	0	Fred Covert	Democratic	Onondaga	1
+NY	Camillus Town Council Ward 3	0	Thomas J. Hart	Republican	Onondaga	1
+NY	Camillus Town Council Ward 4	0	Laura Teufel	Democratic	Onondaga	1
+NY	Camillus Town Council Ward 4	0	Kimberly A. Sacco	Republican	Onondaga	1
+NY	Camillus Town Council Ward 5	0	Christopher S. Cesta	Republican	Onondaga	1
+NY	Camillus Town Council Ward 6	0	John O'Hara	Democratic	Onondaga	1
+NY	Camillus Town Council Ward 6	0	Douglas M. Shannon	Republican	Onondaga	1
+NY	Camillus Town Highway Superintendent	0	Ken Stoneburg	Democratic	Onondaga	1
+NY	Camillus Town Highway Superintendent	0	James F. Kelly	Republican	Onondaga	1
+NY	Cicero Town Supervisor	0	Rob Santucci	Democratic	Onondaga	1
+NY	Cicero Town Supervisor	0	Michael A. Aregano	Republican	Onondaga	1
+NY	Cicero Town Clerk	0	Tracy M. Cosilmon	Republican	Onondaga	1
+NY	Cicero Town Justice	0	Nate Riley	Democratic	Onondaga	1
+NY	Cicero Town Justice	0	Douglas M. DeMarche Jr.	Republican	Onondaga	1
+NY	Cicero Town Highway Superintendent	0	Christopher J. Woznica	Republican	Onondaga	1
+NY	Cicero Town Receiver of Taxes	1	Torrie L. Gavin	Republican	Onondaga	1
+NY	Clay Town Supervisor	0	Dave Capria	Democratic	Onondaga	1
+NY	Clay Town Supervisor	0	Joseph A. Bick	Republican	Onondaga	1
+NY	Clay Town Clerk	0	Justin P. Bailey	Democratic	Onondaga	1
+NY	Clay Town Clerk	0	Jill E. Hageman-Clark	Republican	Onondaga	1
+NY	DeWitt Town Supervisor	0	Max Ruckdeschel	Democratic	Onondaga	1
+NY	DeWitt Town Supervisor	0	Richard G. Kunz	NY:conservative-party	Onondaga	1
+NY	Elbridge Town Justice	0	George L. Betts	Republican	Onondaga	1
+NY	Fabius Town Supervisor	0	Michael L. Vilardi	Republican	Onondaga	1
+NY	Fabius Town Clerk	0	Margaret M. Riker	Republican	Onondaga	1
+NY	Fabius Town Highway Superintendent	0	Dennis C. Bobbette	Republican	Onondaga	1
+NY	Geddes Town Highway Superintendent	1	Robert Krupa	Democratic	Onondaga	1
+NY	LaFayette Town Supervisor	0	William D. McConnell	Republican	Onondaga	1
+NY	LaFayette Town Council	1	Michele Pirro Bailey	Republican	Onondaga	1
+NY	LaFayette Town Tax Collector	0	Katherine R. Rienhardt	Republican	Onondaga	1
+NY	Lysander Town Council	1	Timothy R. Osier	Democratic	Onondaga	1
+NY	Lysander Town Council	1	Tony McIntyre	Republican	Onondaga	1
+NY	Manlius Town Supervisor	0	Sara Bollinger	Democratic	Onondaga	1
+NY	Manlius Town Supervisor	0	Lawrence S. Koch	Republican	Onondaga	1
+NY	Manlius Town Council	1	Brett Edkins	Democratic	Onondaga	1
+NY	Manlius Town Council	1	Maria Mahar	Republican	Onondaga	1
+NY	Marcellus Town Supervisor	0	Jane Carmody Attley	Democratic	Onondaga	1
+NY	Marcellus Town Supervisor	0	Terrence D. Hoey	Republican	Onondaga	1
+NY	Marcellus Town Council	1	Marlene Spencer	Democratic	Onondaga	1
+NY	Marcellus Town Council	1	Denis Donovan IV	Republican	Onondaga	1
+NY	Onondaga Town Supervisor	0	Khalid Bey	Democratic	Onondaga	1
+NY	Onondaga Town Supervisor	0	John P. Mahar	Republican	Onondaga	1
+NY	Otisco Town Supervisor	0	Glenn Hall	Republican	Onondaga	1
+NY	Pompey Town Supervisor	0	Diana Carpenter	Democratic	Onondaga	1
+NY	Pompey Town Supervisor	0	David F. Angello	Republican	Onondaga	1
+NY	Pompey Town Clerk	1	Karen Dennis	Democratic	Onondaga	1
+NY	Pompey Town Clerk	1	Alma M. Hartnett	Republican	Onondaga	1
+NY	Pompey Town Justice	0	Trent Amond	Democratic	Onondaga	1
+NY	Pompey Town Council	1	Brian Nicholas	Democratic	Onondaga	1
+NY	Pompey Town Council	1	Nicholas D. Skeval	Republican	Onondaga	1
+NY	Salina Town Supervisor	0	Leesa Paul	Democratic	Onondaga	1
+NY	Salina Town Supervisor	0	David M. Stott	Republican	Onondaga	1
+NY	Salina Town Justice	0	Patrick Shanahan	Democratic	Onondaga	1
+NY	Salina Town Justice	0	Stuart James LaRose	Republican	Onondaga	1
+NY	Salina Town Council Ward 1	0	Heidi McElwee	Democratic	Onondaga	1
+NY	Salina Town Council Ward 1	0	Christina M. Fadden	Republican	Onondaga	1
+NY	Salina Town Council Ward 2	0	Sydney Szczesniak	Democratic	Onondaga	1
+NY	Salina Town Council Ward 2	0	David J. Butler Sr.	Republican	Onondaga	1
+NY	Salina Town Council Ward 3	0	Page Steinhardt	Democratic	Onondaga	1
+NY	Salina Town Council Ward 3	0	Dana Lewis Vinch	Republican	Onondaga	1
+NY	Salina Town Council Ward 4	0	Zettie A. Young	Democratic	Onondaga	1
+NY	Salina Town Council Ward 4	0	Brian J. DeCarlo	Republican	Onondaga	1
+NY	Skaneateles Town Supervisor	0	Chris Legg	Democratic	Onondaga	1
+NY	Skaneateles Town Supervisor	0	Laurie N. Coffey	Republican	Onondaga	1
+NY	Spafford Town Supervisor	0	Laura J. Moran	Democratic	Onondaga	1
+NY	Spafford Town Supervisor	0	Christopher Kozub	Republican	Onondaga	1
+NY	Spafford Town Clerk	1	Kayla Ramsden	Democratic	Onondaga	1
+NY	Spafford Town Highway Superintendent	0	Jody D. Fisher	Democratic	Onondaga	1
+NY	Spafford Town Tax Collector	0	Alison Barron	Republican	Onondaga	1
+NY	Van Buren Town Supervisor	0	Claude E. Sykes	Republican	Onondaga	1
+NY	Baldwinsville Village Mayor	0	Jim Dale	Democratic	Onondaga	1
+NY	Baldwinsville Village Mayor	0	Bruce Stebbins		Onondaga	1
+NY	Baldwinsville Village Trustee	0	Paul Dreher-Wiberg	Democratic	Onondaga	3
+NY	Baldwinsville Village Trustee	0	Nathan Collins	Democratic	Onondaga	3
+NY	Baldwinsville Village Trustee	0	Edward Connell	Democratic	Onondaga	3
+NY	Baldwinsville Village Trustee	0	Kevin Baker		Onondaga	3
+NY	Baldwinsville Village Trustee	0	Ruth Cico		Onondaga	3
+NY	East Syracuse Village Trustee	1	Robert Tackman	NY:conservative-party	Onondaga	1
+NY	Elbridge Village Trustee	0	Lindsay Striffler		Onondaga	2
+NY	Elbridge Village Trustee	0	Stephanie A. Harris		Onondaga	2
+NY	Fayetteville Village Trustee	0	Mark Matt	Democratic	Onondaga	2
+NY	Fayetteville Village Trustee	0	Jane Rice	Democratic	Onondaga	2
+NY	Liverpool Village Trustee	0	Amy Lago	Democratic	Onondaga	2
+NY	Liverpool Village Trustee	0	Cynthia Lee Hibbert	Democratic	Onondaga	2
+NY	Liverpool Village Trustee	0	Dominick R. Pirro	Republican	Onondaga	2
+NY	Tully Village Trustee	0	Kaula E. Pisano		Onondaga	2
+NY	Tully Village Trustee	0	Lucas T. Zimmerman		Onondaga	2
+NY	Syracuse Common Council At-Large	1	Helen Hudson	Democratic	Onondaga	1
+NY	Syracuse Common Council At-Large	1	Raymond J. Dague	Republican	Onondaga	1
+NY	Amenia Town Supervisor	0	Rosanna L Hamm	Democratic	Dutchess	1
+NY	Amenia Town Council	1	P Damian Gutierrez	Democratic	Dutchess	1
+NY	Amenia Town Justice	0	Thomas P Stefanopoulos	Republican	Dutchess	1
+NY	Beekman Town Supervisor	0	Laureen Abbatantuono	Republican	Dutchess	1
+NY	Beekman Town Clerk	1	Alicia Turenchalk	Republican	Dutchess	1
+NY	Clinton Town Supervisor	0	Michael Whitton	Democratic	Dutchess	1
+NY	Dover Town Supervisor	0	Linda S French	Democratic	Dutchess	1
+NY	Dover Town Supervisor	0	Richard C Yeno	Republican	Dutchess	1
+NY	Dover Town Clerk	1	Nicole E Plavchan	Republican	Dutchess	1
+NY	Dover Town Justice	0	Robert Taylor	Democratic	Dutchess	1
+NY	Dover Town Justice	0	Patricia A Hammond	Republican	Dutchess	1
+NY	Dover Town Tax Collector	0	Dina Marie Yeno	Republican	Dutchess	1
+NY	East Fishkill Town Justice	0	Rick Romig	Republican	Dutchess	1
+NY	Hyde Park Town Supervisor	0	Russell Urban-Mead	Democratic	Dutchess	1
+NY	Hyde Park Town Supervisor	0	Al Torreggiani	Republican	Dutchess	1
+NY	Hyde Park Town Council Ward 1	0	Marc Prine	Democratic	Dutchess	1
+NY	Hyde Park Town Council Ward 2	0	Gregory Komar	Democratic	Dutchess	1
+NY	Hyde Park Town Council Ward 3	0	Paul Donnelly	Democratic	Dutchess	1
+NY	Hyde Park Town Council Ward 3	0	Julie Pizzarelli	Republican	Dutchess	1
+NY	Hyde Park Town Council Ward 4	0	Rogerrio Rodriguez	Democratic	Dutchess	1
+NY	Hyde Park Town Council Ward 4	0	James Sheedy	Republican	Dutchess	1
+NY	Lagrange Town Justice	0	Susan M Sullivan-Bisceglia	Republican	Dutchess	1
+NY	Milan Town Supervisor	0	William Jeffway	Democratic	Dutchess	1
+NY	Milan Town Justice	0	Thomas Jones	Democratic	Dutchess	1
+NY	Pawling Town Supervisor	0	Catherine Giordano	Republican	Dutchess	1
+NY	Pawling Town Justice	0	Gayle Zelazny	Republican	Dutchess	1
+NY	Pine Plains Town Supervisor	0	Trevor Roush	Democratic	Dutchess	1
+NY	Pine Plains Town Supervisor	0	Brian Walsh	Republican	Dutchess	1
+NY	Pine Plains Town Justice	0	Ibis Guzman	Republican	Dutchess	1
+NY	Pleasant Valley Town Supervisor	0	Meghan Borland	Democratic	Dutchess	1
+NY	Pleasant Valley Town Supervisor	0	Mary Albrecht	Republican	Dutchess	1
+NY	Pleasant Valley Town Highway Superintendent	1	Mark Luby	Republican	Dutchess	1
+NY	Rhinebeck Town Supervisor	0	Debbie Hecht	Democratic	Dutchess	1
+NY	Rhinebeck Town Council	1	Josh Pulver	Democratic	Dutchess	1
+NY	Stanford Town Supervisor	0	Julia Descoteaux	Democratic	Dutchess	1
+NY	Stanford Town Clerk	0	Ritamary Bell	Democratic	Dutchess	1
+NY	Stanford Town Highway Superintendent	0	Jim Myers	Democratic	Dutchess	1
+NY	Stanford Town Council	1	Nathan Lavertue	Democratic	Dutchess	1
+NY	Stanford Town Council	1	Jack Evans	Republican	Dutchess	1
+NY	Poughkeepsie Town Supervisor	0	Rebecca Edwards	Democratic	Dutchess	1
+NY	Poughkeepsie Town Supervisor	0	Stephen C Oscarlece	Republican	Dutchess	1
+NY	Poughkeepsie Town Council Ward 1	0	Nicholas Rizzo	Democratic	Dutchess	1
+NY	Poughkeepsie Town Council Ward 2	0	Linzy Dineen	Democratic	Dutchess	1
+NY	Poughkeepsie Town Council Ward 2	0	Lawrence F Sheehan	Republican	Dutchess	1
+NY	Poughkeepsie Town Council Ward 3	0	Shantha Thangiah	Democratic	Dutchess	1
+NY	Poughkeepsie Town Council Ward 4	0	Emily Watson	Democratic	Dutchess	1
+NY	Poughkeepsie Town Council Ward 4	0	Margaret Kakish	Republican	Dutchess	1
+NY	Poughkeepsie Town Council Ward 5	0	Ryan Sharpe	Democratic	Dutchess	1
+NY	Poughkeepsie Town Council Ward 5	0	Theresa A Sheehan	Republican	Dutchess	1
+NY	Poughkeepsie Town Council Ward 6	0	Ann Shershin	Democratic	Dutchess	1
+NY	Union Vale Town Supervisor	0	Steven Frazier	Republican	Dutchess	1
+NY	Union Vale Town Clerk	0	Andrea Casey	Republican	Dutchess	1
+NY	Union Vale Town Justice	0	Andrea B Malin	Republican	Dutchess	1
+NY	Union Vale Town Highway Superintendent	0	Mark Rundall	Republican	Dutchess	1
+NY	Union Vale Town Tax Collector	0	Kaye Saglibene	Republican	Dutchess	1
+NY	Millbrook Village Trustee	0	Lisa Gamsu	Democratic	Dutchess	2
+NY	Millbrook Village Trustee	0	Theodore H Briggs II	Republican	Dutchess	2
+NY	Millbrook Village Trustee	0	Patrick Murphy	Republican	Dutchess	2
+NY	Pawling Village Trustee	0	Freddy Di Vitto	Republican	Dutchess	2
+NY	Pawling Village Trustee	0	Arthur Guzzo	Republican	Dutchess	2
+NY	Wappinger Town Supervisor	0	Joseph D Cavaccini	Republican	Dutchess	1
+NY	Wappinger Town Council Ward 1	0	Hayden Kellermeyer	Democratic	Dutchess	1
+NY	Wappinger Town Council Ward 1	0	John F Lorenzini	Republican	Dutchess	1
+NY	Wappinger Town Council Ward 2	0	Heather O'Dell	Democratic	Dutchess	1
+NY	Wappinger Town Council Ward 2	0	Markos C Peratikos	Republican	Dutchess	1
+NY	Wappinger Town Council Ward 3	0	Robert Cofer Jr	Democratic	Dutchess	1
+NY	Wappinger Town Council Ward 3	0	Christopher Phillips	Republican	Dutchess	1
+NY	Wappinger Town Council Ward 4	0	Matthew Campoli	Democratic	Dutchess	1
+NY	Wappinger Town Council Ward 4	0	Alfred J Casella	Republican	Dutchess	1
+NY	Washington Town Council	1	Deirdre Houston	Democratic	Dutchess	1
+NY	North Tonawanda City Court Judge	0	Shawn P Nickerson	Democratic	Niagara	1
+NY	Cambria Town Supervisor	0	Duncan J Ross	Democratic	Niagara	1
+NY	Cambria Town Supervisor	0	Matthew P Foe	Republican	Niagara	1
+NY	Lewiston Town Supervisor	0	Edward M Lilly	Republican	Niagara	1
+NY	Lewiston Town Supervisor	0	Steve Broderick	NY:conservative-party	Niagara	1
+NY	Lewiston Town Highway Superintendent	0	Michael J Weiss	Republican	Niagara	1
+NY	Lockport Town Supervisor	0	Paul W Siejak	Republican	Niagara	1
+NY	Lockport Town Council	0	Patrick G Weidel	Republican	Niagara	1
+NY	Newfane Town Supervisor	0	John Syracuse	Republican	Niagara	1
+NY	Pendleton Town Supervisor	0	Joel M Maerten	Republican	Niagara	1
+NY	Pendleton Town Clerk	0	Noreen E Lemma	Republican	Niagara	1
+NY	Pendleton Town Justice	0	Todd T Ostrowski	Democratic	Niagara	1
+NY	Pendleton Town Council	0	Dylan R Rumbold	Republican	Niagara	1
+NY	Pendleton Town Highway Superintendent	0	Davd I Fischer	Republican	Niagara	1
+NY	Royalton Town Supervisor	0	Jeff Brown	Republican	Niagara	1
+NY	Somerset Town Supervisor	0	Jeffrey M Dewart	Republican	Niagara	1
+NY	Somerset Town Justice	0	Pamela S Rider	Democratic	Niagara	1
+NY	Somerset Town Council	0	Jenny A Lee	Republican	Niagara	1
+NY	Somerset Town Tax Collector	0	Ruth H Wendler	Republican	Niagara	1
+NY	Wheatfield Town Supervisor	0	Don MacSwan	Republican	Niagara	1
+NY	Wilson Town Supervisor	0	William Tony Evans	Republican	Niagara	1
+NY	Wilson Town Supervisor	0	Charles J Flynn	NY:conservative-party	Niagara	1
+NY	Wilson Town Clerk and Tax Collector	0	Julie Evans	Republican	Niagara	1
+NY	Barker Town Supervisor	0	Lois Wiser Dilworth	Republican	Broome	1
+NY	Barker Town Clerk	0	Julie L. Scott	Republican	Broome	1
+NY	Barker Town Council	0	Terry R. Dean	Republican	Broome	2
+NY	Barker Town Council	0	Christopher P. Smith	Republican	Broome	2
+NY	Barker Town Highway Superintendent	0	Steven Compeau	Republican	Broome	1
+NY	Binghamton Town Supervisor	0	Elizabeth Rounds	Republican	Broome	1
+NY	Binghamton Town Clerk	0	Tracy Tokos	Republican	Broome	1
+NY	Binghamton Town Council	0	Vickie A. Conklin	Republican	Broome	2
+NY	Binghamton Town Council	0	Michael Bensley	Republican	Broome	2
+NY	Binghamton Town Highway Superintendent	0	Tom Hanna	Republican	Broome	1
+NY	Chenango Town Council	0	Luke Slota	Republican	Broome	2
+NY	Chenango Town Council	0	J. Jay Simonis	Republican	Broome	2
+NY	Chenango Town Justice	0	Michael A. Fedish	Republican	Broome	1
+NY	Colesville Town Council	0	Michael F. Olin	Republican	Broome	2
+NY	Colesville Town Council	0	Natalie Skellett-Collins	Republican	Broome	2
+NY	Conklin Town Council	0	Meg Jacobs	Democratic	Broome	2
+NY	Conklin Town Council	0	Maria Van De Weert	Democratic	Broome	2
+NY	Conklin Town Council	0	Dell Boyle	Republican	Broome	2
+NY	Conklin Town Council	0	William P. Farley	Republican	Broome	2
+NY	Conklin Town Justice	0	Dawn M. Shafer	Republican	Broome	1
+NY	Dickinson Town Supervisor	0	Michael Marinaccio	Republican	Broome	1
+NY	Dickinson Town Clerk	0	Wendi D. Evans	Republican	Broome	1
+NY	Dickinson Town Council	0	Hans Van Houten	Republican	Broome	2
+NY	Dickinson Town Council	0	Sharon M. Exley	Republican	Broome	2
+NY	Dickinson Town Highway Superintendent	0	Joel Kie	Republican	Broome	1
+NY	Dickinson Town Justice	0	Kathleen M. Groover	Republican	Broome	1
+NY	Fenton Town Supervisor	0	David Gunster	Republican	Broome	1
+NY	Fenton Town Council	0	David C. Hamlin	Republican	Broome	2
+NY	Fenton Town Council	0	Tom Moss	Republican	Broome	2
+NY	Kirkwood Town Council	0	Katie Legg	Republican	Broome	2
+NY	Kirkwood Town Council	0	Sandy Wasson	Republican	Broome	2
+NY	Kirkwood Town Justice	0	Michael J. Mucci, II	Republican	Broome	2
+NY	Lisle Town Supervisor	0	Edward Gehm	Republican	Broome	1
+NY	Lisle Town Clerk	0	Brenda Tillotson	Republican	Broome	1
+NY	Lisle Town Council	0	Ronald Manwaring	Republican	Broome	2
+NY	Lisle Town Council	0	Scott Glezen	Republican	Broome	2
+NY	Lisle Town Highway Superintendent	0	Ronald Henderson	Republican	Broome	1
+NY	Maine Town Supervisor	0	Art Robinson	Republican	Broome	1
+NY	Maine Town Clerk	0	Joyce Grover	Republican	Broome	1
+NY	Maine Town Council	0	Craig McConnell	Republican	Broome	2
+NY	Maine Town Council	0	Shaun Dyer	Republican	Broome	2
+NY	Nanticoke Town Supervisor	0	Roy Willis	Republican	Broome	1
+NY	Nanticoke Town Council	0	Anthony Slack	Republican	Broome	2
+NY	Nanticoke Town Council	0	Scott J. Whittaker	Republican	Broome	2
+NY	Nanticoke Town Justice	0	Bradley H. Baldwin	Republican	Broome	1
+NY	Sanford Town Supervisor	0	Kenneth R. Wist	Republican	Broome	1
+NY	Sanford Town Council	0	Shane Lester	Republican	Broome	2
+NY	Sanford Town Highway Superintendent	0	Leo C. Shew	Republican	Broome	1
+NY	Triangle Town Clerk	0	Sandra K. Martin	Republican	Broome	1
+NY	Triangle Town Council	0	Mark A. Mesceda	Republican	Broome	2
+NY	Triangle Town Council	0	John L. Bennett	Republican	Broome	2
+NY	Triangle Town Highway Superintendent	0	Daniel S. McGowan	Republican	Broome	1
+NY	Windsor Town Supervisor	0	Timothy Harting	Republican	Broome	1
+NY	Windsor Town Clerk	0	Elizabeth Pfister	Democratic	Broome	1
+NY	Windsor Town Council	0	James Conrad	Republican	Broome	2
+NY	Windsor Town Council	0	Christine Kennedy-Tierno	Republican	Broome	2
+NY	Windsor Town Council	0	Amanda Jackson	NY:conservative-party	Broome	2
+NY	Windsor Town Highway Superintendent	0	Michael Kithcart	Republican	Broome	1
+NY	Vestal Town Justice	0	Joshua S. Shapiro	Democratic	Broome	1
+NY	Vestal Town Justice	0	Matthew C. Butler	Republican	Broome	1
+NY	Union Town Supervisor	0	Robert M. Egan	Democratic	Broome	1
+NY	Union Town Supervisor	0	Robert Mack	Republican	Broome	1
+NY	Union Town Council	0	Meggan Taylor	Democratic	Broome	2
+NY	Union Town Council	0	Kerby Sainclair	Democratic	Broome	2
+NY	Union Town Council	0	David E. Kudgus	Republican	Broome	2
+NY	Union Town Council	0	Joseph P. Nirchi, Sr.	Republican	Broome	2
+NY	Union Town Justice	0	Andrew Petroski	Democratic	Broome	1
+NY	Union Town Justice	0	Thomas Dellapenna, Jr.	Republican	Broome	1
+NY	Endicott Village Trustee	0	Shellie Spinelli	Republican	Broome	2
+NY	Endicott Village Trustee	0	Mark Ponzi	Republican	Broome	2
+NY	Johnson City Village Trustee	0	Joseph M. Picalila	Democratic	Broome	2
+NY	Johnson City Village Trustee	0	Leona Rhea Perreault	Democratic	Broome	2
+NY	Johnson City Village Trustee	0	Lori Thorn	Republican	Broome	2
+NY	Johnson City Village Trustee	0	Mary F. Jacyna	Republican	Broome	2
+NY	Port Dickinson Village Mayor	0	Kevin M. Burke	Republican	Broome	1
+NY	Port Dickinson Village Trustee	0	Robert J. Warholic	Republican	Broome	2
+NY	Port Dickinson Village Trustee	0	Robert D. Moss	Republican	Broome	2
+NY	Windsor Village Mayor	0	Ronald Harting	Republican	Broome	1
+NY	Windsor Village Trustee	0	Elaine L. Card	Republican	Broome	2
+NY	Windsor Village Trustee	0	James W. Miller	Republican	Broome	2
+NY	Jamestown City Council Ward 2	1	Jason Sample	Democratic	Chautauqua	1
+NY	Jamestown City Council Ward 2	1	Bryan S. Bigelow	Republican	Chautauqua	1
+NY	Carroll Town Supervisor	0	Timothy Burkett	Republican	Chautauqua	1
+NY	Cherry Creek Town Supervisor	0	James Abbey	Republican	Chautauqua	1
+NY	Clymer Town Tax Collector	0	Lori Carutis	Republican	Chautauqua	1
+NY	Dunkirk Town Council	1	Scott Pagano	Democratic	Chautauqua	1
+NY	Ellery Town Supervisor	0	Lawrence Anderson	Republican	Chautauqua	1
+NY	Ellicott Town Council Ward 1	0	James Rensel	Republican	Chautauqua	1
+NY	Ellicott Town Council Ward 2	0	Robert White	Republican	Chautauqua	1
+NY	Ellicott Town Council Ward 3	0	Katy Whitmore	Republican	Chautauqua	1
+NY	Ellicott Town Council Ward 4	0	Kenneth Swan	Republican	Chautauqua	1
+NY	Harmony Town Council	1	Jeffrey Jordan	Republican	Chautauqua	1
+NY	Kiantone Town Supervisor	0	Joshua Ostrander	Republican	Chautauqua	1
+NY	Kiantone Town Clerk	0	Mary Cook	Democratic	Chautauqua	1
+NY	Kiantone Town Clerk	0	Jennifer A. Schmitt	Republican	Chautauqua	1
+NY	Kiantone Town Highway Superintendent	0	Robert Carlson	Republican	Chautauqua	1
+NY	Mina Town Council	1	Jeffrey W. Tornstrom	Republican	Chautauqua	1
+NY	Poland Town Supervisor	0	Robert Smith	Republican	Chautauqua	1
+NY	Pomfret Town Council	1	EvaDawn Bashaw	Democratic	Chautauqua	1
+NY	Sherman Town Highway Superintendent	1	Michael Courtney	Republican	Chautauqua	1
+NY	Villenova Town Highway Superintendent	1	Michael Emke Walker	Republican	Chautauqua	1
+NY	Bemus Point Village Trustee	0	David Lipsey	Republican	Chautauqua	2
+NY	Bemus Point Village Trustee	0	Theodore Farnham	Republican	Chautauqua	2
+NY	Cassadaga Village Trustee	1	David E. Rowley	Republican	Chautauqua	1
+NY	Celoron Village Trustee	0	Valerie R. Murphy		Chautauqua	2
+NY	Celoron Village Trustee	0	Kate Burnett		Chautauqua	2
+NY	Fredonia Village Trustee	1	Timothy Mulholland Jr.	Democratic	Chautauqua	1
+NY	Mayville Village Mayor	0	Richard Syper	Republican	Chautauqua	1
+NY	Mayville Village Trustee	0	Fairlee Fischer	Republican	Chautauqua	2
+NY	Mayville Village Trustee	0	Michael Testa	Republican	Chautauqua	2
+NY	Panama Village Mayor	0	William F. Schneider	Republican	Chautauqua	1
+NY	Panama Village Trustee	0	Todd E. Eddy	Republican	Chautauqua	1
+NY	Silver Creek Village Trustee	0	Natasha M. Souter	Democratic	Chautauqua	2
+NY	Silver Creek Village Trustee	0	Amanda E. Austin	Democratic	Chautauqua	2
+NY	Silver Creek Village Trustee	0	Dwayne Haskins	Republican	Chautauqua	2
+NY	Silver Creek Village Trustee	0	Mary Poissant	Republican	Chautauqua	2
+NY	Busti Town Justice	0	Lyle Hajdu	Republican	Chautauqua	2
+NY	Busti Town Justice	0	Ryan Roush	Republican	Chautauqua	2
+NY	Ellington Town Justice	0	Loren T. Kent	Democratic	Chautauqua	1
+NY	Kiantone Town Justice	0	Shannon Volpe	Republican	Chautauqua	1
+NY	Portland Town Justice	0	Daniel Thompson	Republican	Chautauqua	2
+NY	Portland Town Justice	0	Daniel Larish	Republican	Chautauqua	2
+NY	Villenova Town Justice	0	Ronald G. Lucas	Republican	Chautauqua	1
+NY	Westfield Town Justice	0	Rob Wilson	Republican	Chautauqua	1
+NY	Chautauqua County Legislature District 4	0	Sandra Lewis	Democratic	Chautauqua	1
+NY	Chautauqua County Family Court Judge	0	Alexandria B. Moss	Democratic	Chautauqua	1
+NY	Chautauqua County Family Court Judge	0	Michael Sullivan	Republican	Chautauqua	1
