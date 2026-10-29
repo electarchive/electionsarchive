@@ -19,7 +19,7 @@ from ea.sources.it.interno import key as estero_key
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/camera"
 ELIGENDO = "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=I&tpe=A&lev0=0&levsut0=0&es0=S&ms=S"
@@ -293,7 +293,7 @@ NEW = {
     "ASS.ITAL.SUD AMERICA": ("Associazioni Italiane in Sud America", "AISA", "party"),
     "LEGA - FORZA ITALIA - FRATELLI D'ITALIA CON GIORGIA MELONI": (
         "Lega – Forza Italia – Fratelli d'Italia con Giorgia Meloni",
-        None,
+        "Lega–FI–FdI",
         "list_vehicle",
     ),
     "LEGA PER SALVINI PREMIER - FORZA ITALIA - FRATELLI D'ITALIA": (
@@ -1316,8 +1316,8 @@ def emit() -> Path:
                 parties[key] = cs.key(*key)
                 if parties[key] in cs.minted:
                     cs.add("party", id=parties[key], kind=kind, polity_id=italy)
-                    if abbreviation is not None:
-                        name(parties[key], abbreviation, "it", "abbreviation")
+                if abbreviation is not None:
+                    name(parties[key], abbreviation, "it", "abbreviation")
                 if parties[key] in cs.minted or not (known or parties[key] in cs.survivors.values()):
                     name(parties[key], full if known else cased(label), "it")
             return parties[key]
