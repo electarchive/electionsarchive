@@ -12,6 +12,7 @@ from urllib.parse import unquote, urlencode
 from uuid import uuid5
 
 import httpx
+import numpy as np
 from PIL import Image
 
 from ea import raw
@@ -21,7 +22,7 @@ from ea.sources.wikidata_photos import _credit, _free, _text
 from ea.store import DATA, connect
 
 SOURCE = "party_logos"
-VERSION = "2"
+VERSION = "3"
 TITLE = "Party logos"
 LOGOS = DATA / "logos"
 ITEMS = DATA / "parsed" / SOURCE / "items.json"
@@ -278,6 +279,7 @@ def emit() -> Path:
             ),
             polity=None,
         )
+        cs.manifest["scope"] = {"polity": None, "sweeps": ["party_image"]}
         source = cs.source("Wikimedia Commons", TITLE)
         cs.add(
             "source",
@@ -321,6 +323,37 @@ def emit() -> Path:
                 width = min(WIDEST, round(image.width * HEIGHT / image.height))
                 height = round(image.height * width / image.width)
                 image = image.resize((width, height), Image.Resampling.LANCZOS)
+                pixels = np.asarray(image, dtype=np.float64) / 255
+                linear = np.where(
+                    pixels[..., :3] <= 0.04045, pixels[..., :3] / 12.92, ((pixels[..., :3] + 0.055) / 1.055) ** 2.4
+                )
+                lms = np.cbrt(
+                    linear
+                    @ np.array(
+                        [
+                            [0.4122214708, 0.2119034982, 0.0883024619],
+                            [0.5363325363, 0.6806995451, 0.2817188376],
+                            [0.0514459929, 0.1073969566, 0.6299787005],
+                        ]
+                    )
+                )
+                lab = lms @ np.array(
+                    [
+                        [0.2104542553, 1.9779984951, 0.0259040371],
+                        [0.793617785, -2.428592205, 0.7827717662],
+                        [-0.0040720468, 0.4505937099, -0.808675766],
+                    ]
+                )
+                bright = (lab[..., 0] >= 0.92) & (np.hypot(lab[..., 1], lab[..., 2]) <= 0.04)
+                opaque = pixels[..., 3] >= 0.5
+                padded = np.pad(opaque, 1, constant_values=False)
+                edge = opaque & ~(padded[:-2, 1:-1] & padded[2:, 1:-1] & padded[1:-1, :-2] & padded[1:-1, 2:])
+                light = (
+                    bool(opaque.mean() < 0.95)
+                    and bool(edge.any())
+                    and float(bright[edge].mean()) > 0.6
+                    and float(bright[opaque].mean()) > 0.6
+                )
                 buffer = io.BytesIO()
                 image.save(buffer, "WEBP", quality=90, method=6)
                 content = buffer.getvalue()
@@ -344,6 +377,7 @@ def emit() -> Path:
                     valid_to_precision=logo.end[1],
                     dated_by=logo.dated_by,
                     dated_url=logo.dated_url,
+                    is_light=light,
                     uploaded_at=datetime.fromisoformat(info["uploaded"]) if info["uploaded"] else None,
                 )
                 added += 1

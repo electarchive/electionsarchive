@@ -969,6 +969,7 @@ export const partyImage = pgTable("party_image", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 	datedUrl: text("dated_url"),
+	isLight: boolean("is_light").default(false).notNull(),
 }, (table) => [
 	index("party_image_party_idx").using("btree", table.partyId.asc().nullsLast()),
 	check("party_image_width_check", sql`(width > 0)`),

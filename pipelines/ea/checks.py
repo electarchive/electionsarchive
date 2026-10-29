@@ -18,6 +18,7 @@ KEYS = {
 }
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
 DROPPABLE = ("area_code", "area_parent", "area_geometry")
+SWEEPABLE = ("party_image",)
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -56,12 +57,17 @@ class Stage:
     nullable: dict[str, set[str]] = field(default_factory=dict)
     clears: list[str] = field(default_factory=list)
     drops: dict[str, dict[str, object]] = field(default_factory=dict)
+    sweeps: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if unknown := sorted(set(self.drops) - set(DROPPABLE)):
             raise ValueError(f"scope.drops may name only {', '.join(DROPPABLE)}, not {', '.join(unknown)}")
         if unstaged := sorted(set(self.drops) - set(self.tables)):
             raise ValueError(f"scope.drops names {', '.join(unstaged)}, which the changeset does not stage")
+        if unknown := sorted(set(self.sweeps) - set(SWEEPABLE)):
+            raise ValueError(f"scope.sweeps may name only {', '.join(SWEEPABLE)}, not {', '.join(unknown)}")
+        if unstaged := sorted(set(self.sweeps) - set(self.tables)):
+            raise ValueError(f"scope.sweeps names {', '.join(unstaged)}, which the changeset does not stage")
         if unknown := sorted(set(self.replaces) - set(REPLACEABLE)):
             raise ValueError(f"scope.replaces may name only {', '.join(REPLACEABLE)}, not {', '.join(unknown)}")
 
@@ -88,6 +94,11 @@ class Stage:
                 for column in self.tables[table]
             ),
         )
+
+    def swept(self, table: str) -> sql.Composable:
+        return sql.SQL(
+            "p.changeset_id = c.id and c.pipeline = {} and not exists (select from {} s where s.id = p.id)"
+        ).format(sql.Literal(self.pipeline), self.staged(table))
 
     def staged(self, table: str) -> sql.Composable:
         return sql.SQL("{}.{}").format(sql.Identifier(self.schema), sql.Identifier(table))

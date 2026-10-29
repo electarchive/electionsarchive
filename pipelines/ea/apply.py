@@ -19,11 +19,11 @@ MERGE_LOCK = 1700949316
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
     row = conn.execute(
-        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces', scope -> 'clears', scope -> 'drops' from changeset where id = %s",
+        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces', scope -> 'clears', scope -> 'drops', scope -> 'sweeps' from changeset where id = %s",
         [changeset_id],
     ).fetchone()
     assert row is not None, changeset_id
-    pipeline, polity, keys, replaces, clears, drops = row
+    pipeline, polity, keys, replaces, clears, drops, sweeps = row
     schema = f"cs_{changeset_id.replace('-', '')}"
     tables: dict[str, list[str]] = {}
     for key in keys:
@@ -107,6 +107,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         nullable,
         clears or [],
         drops or {},
+        sweeps or [],
     )
 
 
@@ -178,6 +179,14 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             ).fetchone()
             assert dropped is not None
             diff[table]["delete"] = dropped[0]
+        if table in stage.sweeps:
+            swept = conn.execute(
+                sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
+                    sql.Identifier(table), stage.swept(table)
+                )
+            ).fetchone()
+            assert swept is not None
+            diff[table]["delete"] = swept[0]
         if table == "tenure_affiliation":
             unstaged = conn.execute(
                 sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
@@ -936,6 +945,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         )
     if table in stage.drops:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.dropped(table)))
+    if table in stage.sweeps:
+        conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.swept(table)))
     if table in stage.temporal:
         conn.execute(
             sql.SQL(
