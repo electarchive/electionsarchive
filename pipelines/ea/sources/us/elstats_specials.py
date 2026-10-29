@@ -61,9 +61,16 @@ TEXAS_PAGES = [
     (329, 89, date(2018, 6, 30), 27, False),
 ]
 MASSACHUSETTS_SPECIALS = {
-    106102: (date(2001, 10, 16), 9),
-    103450: (date(2007, 10, 16), 5),
-    124836: (date(2013, 12, 10), 5),
+    106102: (date(2001, 10, 16), 9, ""),
+    106100: (date(2001, 9, 25), 9, "Democratic"),
+    106101: (date(2001, 9, 25), 9, "Republican"),
+    103450: (date(2007, 10, 16), 5, ""),
+    103437: (date(2007, 9, 4), 5, "Democratic"),
+    103438: (date(2007, 9, 4), 5, "Green-Rainbow"),
+    103439: (date(2007, 9, 4), 5, "Republican"),
+    124836: (date(2013, 12, 10), 5, ""),
+    124821: (date(2013, 10, 15), 5, "Democratic"),
+    124822: (date(2013, 10, 15), 5, "Republican"),
 }
 STATES = {
     "MA": "Massachusetts",
@@ -189,6 +196,7 @@ PARTIES = {
     "Green": "green-party",
     "Conservative": "NY:conservative-party",
     "Working Families": "NY:working-families-party",
+    "Green-Rainbow": "MA:green-rainbow-party",
     "Independence": "NY:independence-party",
 }
 SUPERSEDED = (
@@ -349,7 +357,7 @@ def emit() -> Path:
         massachusetts_towns.setdefault(plain(name), geoid[:5])
         massachusetts_towns.setdefault(plain(re.sub(SUFFIXES, "", name.lower())), geoid[:5])
     massachusetts: list[dict[str, object]] = []
-    for election, (day, district) in MASSACHUSETTS_SPECIALS.items():
+    for election, (day, district, primary) in MASSACHUSETTS_SPECIALS.items():
         table = pl.read_csv(
             raw.cached(ARCHIVE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/").path,
             infer_schema=False,
@@ -389,6 +397,7 @@ def emit() -> Path:
                 "candidate_party_name": party,
                 "division_name": f"code:{code}",
                 "votes": str(votes),
+                "primary": primary,
             }
             for (name, party, code), votes in tallies.items()
         )
