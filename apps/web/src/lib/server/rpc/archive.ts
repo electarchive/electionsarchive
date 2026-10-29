@@ -19214,7 +19214,14 @@ export const bodies = {
           v.object({ name: v.string(), path: v.nullable(v.string()) }),
         ),
         siblings: v.array(
-          v.object({ id: v.string(), name: v.string(), path: v.string() }),
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            path: v.string(),
+            kind: v.string(),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
+          }),
         ),
         sizes: v.array(
           v.object({
@@ -19304,27 +19311,56 @@ export const bodies = {
       if (body == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [labels, slugs, crumbs, peers, sizes, makeup, upcoming, changes] =
-        await Promise.all([
-          names([input.id, body.polity]),
-          paths([body.polity]),
-          breadcrumbs(body.polity),
-          chambers(body.polity),
-          db.execute<{ seats: number; from: string | null; to: string | null }>(
-            sql`
+      const [
+        labels,
+        slugs,
+        crumbs,
+        peers,
+        spans,
+        sizes,
+        makeup,
+        upcoming,
+        changes,
+      ] = await Promise.all([
+        names([input.id, body.polity]),
+        paths([body.polity]),
+        breadcrumbs(body.polity),
+        chambers(body.polity),
+        db.execute<{ id: string; from: string | null; to: string | null }>(
+          sql`
+            select b.id,
+              coalesce(z.first,
+                (select min(e.date_from) from contest k join election e on e.id = k.election_id where k.body_id = b.id),
+                (select min(t.from_date) from tenure t where t.body_id = b.id))::text as from,
+              coalesce(
+                (select max(v.date) from body_event v where v.body_id = b.id and v.kind in ('dissolved', 'replaced_by_appointed')
+                  and not exists (select from body_event r where r.body_id = b.id and r.kind = 'reconstituted' and r.date > v.date)),
+                case when z.open then null when z.last is not null then z.last
+                  else (select max(t.to_date) from tenure t where t.body_id = b.id having bool_and(t.to_date is not null)) end
+              )::text as to
+            from body b
+            cross join lateral (
+              select min(lower(valid)) as first, max(upper(valid)) as last, bool_or(upper_inf(valid)) as open
+              from body_size where body_id = b.id
+            ) z
+            where b.polity_id = ${body.polity}::uuid and b.kind <> 'electoral_college'
+          `,
+        ),
+        db.execute<{ seats: number; from: string | null; to: string | null }>(
+          sql`
             select seats, lower(valid)::text as from, upper(valid)::text as to
             from body_size where body_id = ${input.id}::uuid
             order by lower(valid) nulls first
           `,
-          ),
-          db.execute<{
-            start: string;
-            party: string | null;
-            caucus: string | null;
-            category: "elected" | "appointed" | "ex_officio";
-            seats: number;
-            isIndependent: boolean;
-          }>(sql`
+        ),
+        db.execute<{
+          start: string;
+          party: string | null;
+          caucus: string | null;
+          category: "elected" | "appointed" | "ex_officio";
+          seats: number;
+          isIndependent: boolean;
+        }>(sql`
           with recursive chain as materialized (
             select t.id, t.acquired_via::text as via,
               coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
@@ -19405,7 +19441,7 @@ export const bodies = {
           left join entity_merge bm on bm.entity_id = br.parent_party_id
           group by 1, 2, 3, 4 order by 1, x.category = 'elected' desc, 5 desc
         `),
-          db.execute<{ id: string; date: string; seats: number }>(sql`
+        db.execute<{ id: string; date: string; seats: number }>(sql`
           select e.id, e.date_from::text as date, sum(coalesce(c.magnitude, 1))::int as seats
           from contest c join election e on e.id = c.election_id
           where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
@@ -19414,14 +19450,14 @@ export const bodies = {
           order by e.date_from, seats desc
           limit 1
         `),
-          db.execute<{
-            date: string;
-            kind: "in" | "out" | "switch" | "rename";
-            from: string | null;
-            to: string | null;
-            cause: string | null;
-            members: number;
-          }>(sql`
+        db.execute<{
+          date: string;
+          kind: "in" | "out" | "switch" | "rename";
+          from: string | null;
+          to: string | null;
+          cause: string | null;
+          members: number;
+        }>(sql`
           with recursive chain as materialized (
             select t.id, t.acquired_via::text as via,
               coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
@@ -19521,7 +19557,7 @@ export const bodies = {
           select day::text as date, kind, "from", "to", cause, count(*)::int as members
           from events group by 1, 2, 3, 4, 5 order by 1, 2, 6 desc
         `),
-        ]);
+      ]);
       const home = slugs.get(body.polity) ?? null;
       const held = [
         ...new Set([
@@ -19605,11 +19641,17 @@ export const bodies = {
         siblings:
           home == null
             ? []
-            : peers.map((peer) => ({
-                id: peer.id,
-                name: peer.name,
-                path: `chambers/${home}/${peer.slug}`,
-              })),
+            : peers.map((peer) => {
+                const dated = spans.rows.find((row) => row.id === peer.id);
+                return {
+                  id: peer.id,
+                  name: peer.name,
+                  path: `chambers/${home}/${peer.slug}`,
+                  kind: peer.kind,
+                  from: dated?.from ?? null,
+                  to: dated?.to ?? null,
+                };
+              }),
         sizes: sizes.rows,
         tenures: body.tenures,
         closed: body.closed,

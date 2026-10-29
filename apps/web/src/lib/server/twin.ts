@@ -5174,6 +5174,7 @@ function sourcesMarkdown(
 
 function chamberMarkdown(
   {
+    id,
     body,
     terms,
     parties,
@@ -5187,7 +5188,15 @@ function chamberMarkdown(
     lower_house: m.chamber_kind_lower_house,
     upper_house: m.chamber_kind_upper_house,
     unicameral: m.chamber_kind_unicameral,
+    council: m.chamber_kind_council,
+    constituent_assembly: m.chamber_kind_constituent_assembly,
+    appointed_assembly: m.chamber_kind_appointed_assembly,
   };
+  const former = body.siblings.some((sibling) => sibling.to == null)
+    ? body.siblings
+        .filter((sibling) => sibling.to != null && sibling.id !== id)
+        .toSorted((a, b) => (a.from ?? "").localeCompare(b.from ?? ""))
+    : [];
   const close = members?.end ?? new Date().toISOString().slice(0, 10);
   const opened = members?.start ?? close;
   const roll = (members?.members ?? []).map((member) => ({
@@ -5396,6 +5405,27 @@ function chamberMarkdown(
                 : link(date(body.next.date), body.next.path),
             seats: m.chamber_next_seats({ count: body.next.seats }),
           }),
+        ]),
+    ...(former.length === 0
+      ? []
+      : [
+          `## ${m.chamber_former()}`,
+          former
+            .map((sibling) => {
+              const kind = (KINDS[sibling.kind] ?? m.chamber_kind_other)();
+              const first = year(sibling.from);
+              const last = year(sibling.to);
+              return `- ${link(sibling.name, sibling.path)}, ${
+                sibling.from == null
+                  ? kind
+                  : m.chamber_lifespan({
+                      kind,
+                      years:
+                        first === last ? first : m.polity_span({ first, last }),
+                    })
+              }`;
+            })
+            .join("\n"),
         ]),
     ...(isParty
       ? [

@@ -13,11 +13,11 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Council from "./council.svelte";
   import Roster from "./roster.svelte";
   import Stream from "./stream.svelte";
+  import Switcher from "./switcher.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -25,6 +25,9 @@
     lower_house: m.chamber_kind_lower_house,
     upper_house: m.chamber_kind_upper_house,
     unicameral: m.chamber_kind_unicameral,
+    council: m.chamber_kind_council,
+    constituent_assembly: m.chamber_kind_constituent_assembly,
+    appointed_assembly: m.chamber_kind_appointed_assembly,
   };
 
   let selected = $derived(Math.max(0, data.terms.length - 1));
@@ -378,22 +381,7 @@
           </p>
         </div>
         {#if body.siblings.length > 1}
-          <nav class="flex max-sm:inline-full" aria-label={m.record_tabs()}>
-            {#each body.siblings as sibling (sibling.id)}
-              <a
-                class={cn(
-                  "-ms-px flex items-center justify-center border border-input bg-card px-2.5 py-1 text-center text-[0.8125rem]/tight font-semibold keycap min-block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary max-sm:flex-1",
-                  {
-                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                      sibling.id === data.id,
-                  },
-                )}
-                aria-current={sibling.id === data.id ? "page" : undefined}
-                href={resolve("/[...path]", { path: sibling.path })}
-                >{sibling.name}</a
-              >
-            {/each}
-          </nav>
+          <Switcher siblings={body.siblings} current={data.id} />
         {/if}
       </div>
     </header>
