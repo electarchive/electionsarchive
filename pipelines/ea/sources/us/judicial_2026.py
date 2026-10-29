@@ -88,10 +88,10 @@ def emit() -> Path:
             election = cs.key("us.election", f"2026-11-03:{state}")
             if election in cs.minted:
                 raise LookupError(f"no 2026-11-03 election for {state}")
-            office = cs.key("us.office", f"{slug(title)}:{state}")
+            office = cs.key("us.office", f"{slug(title)}{'-retention' if retention else ''}:{state}")
             if office in cs.minted and office not in offices:
                 cs.add("office", id=office, polity_id=polity, kind="other")
-                name(office, f"{title}, {state}")
+                name(office, f"{title}{' retention' if retention else ''}, {state}")
             offices.add(office)
             contest = cs.key("us.contest", key)
             if contest not in contests:
