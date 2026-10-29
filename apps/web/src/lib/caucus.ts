@@ -1,6 +1,31 @@
 import { m } from "#lib/paraglide/messages.js";
 import { independent } from "#lib/party.js";
 
+export const ARRIVALS: Record<string, () => string> = {
+  appointed: m.chamber_via_appointed,
+  elected: m.chamber_via_elected,
+  by_election: m.chamber_via_by_election,
+  succession: m.chamber_via_succession,
+  list_replacement: m.chamber_via_list_replacement,
+  co_opted: m.chamber_via_co_opted,
+  trustee: m.chamber_via_trustee,
+  acting: m.chamber_via_acting,
+};
+export const DEPARTURES: Record<string, () => string> = {
+  resigned: m.chamber_end_resigned,
+  died: m.chamber_end_died,
+  removed: m.chamber_end_removed,
+  annulled: m.chamber_end_annulled,
+  dissolved: m.chamber_end_dissolved,
+  expelled: m.chamber_end_expelled,
+  lost_seat: m.chamber_end_lost_seat,
+  disqualified: m.chamber_end_disqualified,
+  elevated: m.chamber_end_elevated,
+  appointed: m.chamber_end_appointed,
+  withdrew: m.chamber_end_withdrew,
+  term_end: m.chamber_end_term_end,
+};
+
 type Party = {
   id: string;
   label: string;
@@ -73,6 +98,7 @@ export function segments(
   member: Parameters<typeof partyOn>[0],
   opened: string,
   closed: string,
+  renames: Set<string> = new Set(),
 ) {
   const low =
     member.from != null && member.from > opened ? member.from : opened;
@@ -94,7 +120,11 @@ export function segments(
     const party = partyOn(member, from, opened);
     const to = cuts[index + 1] ?? high;
     const last = out.at(-1);
-    if (last != null && last.party === party) {
+    if (
+      last != null &&
+      (last.party === party || renames.has(`${last.party}|${party}`))
+    ) {
+      last.party = party;
       last.to = to;
     } else {
       out.push({ party, from, to });

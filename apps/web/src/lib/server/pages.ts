@@ -509,6 +509,50 @@ export async function chamber(path: string) {
       group.map((party) => [party.id, group[0]?.id ?? party.id] as const),
     ),
   );
+  const rekey = (key: string | null) =>
+    key == null || key === "independent" || key.startsWith("category:")
+      ? key
+      : key
+          .split(">")
+          .map((part) =>
+            part === "independent" ? part : (kin.get(part) ?? part),
+          )
+          .join(">");
+  const running = new Map<string | null, number>();
+  const days = Map.groupBy(body.changes, (row) => row.date)
+    .entries()
+    .map(([day, rows]) => {
+      const moves = rows.map((row) => ({
+        ...row,
+        from: rekey(row.from),
+        to: rekey(row.to),
+      }));
+      for (const move of moves) {
+        if (move.kind !== "in") {
+          running.set(move.from, (running.get(move.from) ?? 0) - move.members);
+        }
+        if (move.kind !== "out") {
+          running.set(move.to, (running.get(move.to) ?? 0) + move.members);
+        }
+      }
+      return {
+        date: day,
+        parties: [...running]
+          .filter(([, count]) => count > 0)
+          .map(([party, count]) => ({ party, seats: count }))
+          .toSorted((a, b) => b.seats - a.seats),
+        moves: moves
+          .filter((move) => move.kind !== "rename")
+          .map(({ kind, from, to, cause, members }) => ({
+            kind,
+            from,
+            to,
+            cause,
+            members,
+          })),
+      };
+    })
+    .toArray();
   const gaps = raw
     .slice(1)
     .map(
@@ -571,50 +615,18 @@ export async function chamber(path: string) {
       seats.set(key, (seats.get(key) ?? 0) + entry.seats);
     }
     const end = lapse ?? stranded ?? next ?? body.closed;
-    const running = new Map(seats);
+    const settled = new Date(Date.parse(term.start) + 30 * 864e5)
+      .toISOString()
+      .slice(0, 10);
     const steps = term.isSeated
-      ? Map.groupBy(
-          body.switches.filter(
-            (row) => row.date > term.start && (end == null || row.date < end),
-          ),
-          (row) => row.date,
-        )
-          .entries()
-          .map(([day, rows]) => {
-            const moves = rows.map((row) => ({
-              from: row.from == null ? null : (kin.get(row.from) ?? row.from),
-              to: row.to == null ? null : (kin.get(row.to) ?? row.to),
-              members: row.members,
-            }));
-            for (const move of moves) {
-              const out = [
-                ...(move.from == null ? ["independent", null] : [move.from]),
-                ...running
-                  .keys()
-                  .filter(
-                    (key) =>
-                      move.from != null && key?.startsWith(`${move.from}>`),
-                  ),
-              ].find((key) => (running.get(key) ?? 0) > 0);
-              if (out !== undefined) {
-                running.set(
-                  out,
-                  Math.max(0, (running.get(out) ?? 0) - move.members),
-                );
-              }
-              const into = move.to ?? "independent";
-              running.set(into, (running.get(into) ?? 0) + move.members);
-            }
-            return {
-              date: day,
-              parties: [...running]
-                .filter(([, count]) => count > 0)
-                .map(([party, count]) => ({ party, seats: count }))
-                .toSorted((a, b) => b.seats - a.seats),
-              moves,
-            };
-          })
-          .toArray()
+      ? days
+          .filter(
+            (day) =>
+              day.date > settled &&
+              (end == null || day.date < end) &&
+              day.moves.length > 0,
+          )
+          .map(({ date, parties, moves }) => ({ date, parties, moves }))
       : [];
     return {
       ...term,
@@ -678,7 +690,10 @@ export async function chamber(path: string) {
           ...term.parties,
           ...term.steps.flatMap((step) => [
             ...step.parties,
-            ...step.moves.map((move) => ({ party: move.from, seats: 0 })),
+            ...step.moves.flatMap((move) => [
+              { party: move.from, seats: 0 },
+              { party: move.to, seats: 0 },
+            ]),
           ]),
         ].map((entry) => entry.party),
       ),
@@ -691,6 +706,9 @@ export async function chamber(path: string) {
       ),
     ),
     members,
+    renames: body.changes
+      .filter((row) => row.kind === "rename")
+      .map((row) => `${row.from}|${row.to}`),
   };
 }
 

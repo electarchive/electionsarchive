@@ -28,8 +28,10 @@
         date: string;
         parties: Array<{ party: string | null; seats: number }>;
         moves: Array<{
+          kind: "in" | "out" | "switch" | "rename";
           from: string | null;
           to: string | null;
+          cause: string | null;
           members: number;
         }>;
       }>;

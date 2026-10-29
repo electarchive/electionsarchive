@@ -19066,11 +19066,13 @@ export const bodies = {
             ),
           }),
         ),
-        switches: v.array(
+        changes: v.array(
           v.object({
             date: v.string(),
+            kind: v.picklist(["in", "out", "switch", "rename"]),
             from: v.nullable(v.string()),
             to: v.nullable(v.string()),
+            cause: v.nullable(v.string()),
             members: v.number(),
           }),
         ),
@@ -19127,7 +19129,7 @@ export const bodies = {
       if (body == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [labels, slugs, crumbs, peers, sizes, makeup, upcoming, switches] =
+      const [labels, slugs, crumbs, peers, sizes, makeup, upcoming, changes] =
         await Promise.all([
           names([input.id, body.polity]),
           paths([body.polity]),
@@ -19239,37 +19241,110 @@ export const bodies = {
         `),
           db.execute<{
             date: string;
+            kind: "in" | "out" | "switch" | "rename";
             from: string | null;
             to: string | null;
+            cause: string | null;
             members: number;
           }>(sql`
-          with s as materialized (
-            select a.tenure_id, coalesce(pm.into_id, a.party_id) as party, a.valid_from as f, a.valid_to as u,
-              t.from_date, t.to_date
-            from tenure t
-            join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
-            left join seat st on st.id = t.seat_id
-            left join entity_merge pm on pm.entity_id = a.party_id
-            where t.body_id = ${input.id}::uuid and coalesce(st.voting, true)
-          )
-          , moves as (
-            select x.u as day, x.party as before, n.party as after
-            from s x left join s n on n.tenure_id = x.tenure_id and n.f = x.u
-            where x.u is not null and x.u < coalesce(x.to_date, 'infinity'::date)
+          with recursive chain as materialized (
+            select t.id, t.acquired_via::text as via,
+              coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
+                lag(t.id) over (partition by t.seat_id order by t.from_date nulls first) end) as before
+            from tenure t where t.body_id = ${input.id}::uuid
+          ),
+          kinds(id, category) as (
+            select c.id, case when c.via in ('ex_officio', 'indirect', 'appointed') then c.via else 'elected' end
+            from chain c
+            where c.before is null or c.via not in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
             union all
-            select n.f, null, n.party from s n
-            where n.f > n.from_date and n.f < coalesce(n.to_date, 'infinity'::date)
-              and not exists (select from s x where x.tenure_id = n.tenure_id and x.u = n.f)
+            select c.id, k.category from kinds k join chain c on c.before = k.id
+            where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+          ),
+          t as materialized (
+            select t.id, t.from_date, t.to_date, t.contest_id, t.person_id, t.ended_via::text as ended,
+              case when t.acquired_via = 'elected' and t.contest_id is null and t.succeeds_tenure_id is not null
+                then 'by_election' else t.acquired_via::text end as acquired,
+              coalesce(k.category, 'elected') as category
+            from tenure t left join seat st on st.id = t.seat_id
+            left join kinds k on k.id = t.id
+            where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
+              and (t.to_date is null or t.to_date > t.from_date)
+          ),
+          s as materialized (
+            select a.tenure_id, coalesce(pm.into_id, a.party_id) as party,
+              greatest(coalesce(a.valid_from, t.from_date), t.from_date) as f, a.valid_to as u,
+              row_number() over (partition by a.tenure_id order by a.valid_from nulls first, a.party_id is null) as n
+            from t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
+            left join entity_merge pm on pm.entity_id = a.party_id
+            where a.valid_to is null or a.valid_to > t.from_date
+          ),
+          fallback as materialized (
+            select t.id, t.from_date, t.to_date, x.party, coalesce(x.independent, false) as independent
+            from t left join lateral (
+              select coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id) as party,
+                cd.is_independent as independent
+              from candidacy cd join contest_option o on o.id = cd.option_id
+              left join contest_option po on po.id = o.parent_option_id
+              left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+              left join entity_merge mm on mm.entity_id = cd.member_of_party_id
+              where cd.person_id = t.person_id and (o.contest_id = t.contest_id
+                or o.contest_id in (select k.id from contest k where k.allocation_parent_id = t.contest_id))
+              limit 1
+            ) x on true
+            where not exists (select from s where s.tenure_id = t.id)
+          ),
+          raw as (
+            select s.tenure_id, case when s.n = 1 then t.from_date else s.f end as f,
+              least(coalesce(s.u, 'infinity'::date), coalesce(t.to_date, 'infinity'::date)) as u, s.party, s.party is null as independent
+            from s join t on t.id = s.tenure_id
+            where s.n = 1 or s.f < coalesce(t.to_date, 'infinity'::date)
+            union all
+            select s.tenure_id, s.u, least(coalesce(lead(s.f) over w, 'infinity'::date), coalesce(t.to_date, 'infinity'::date)), null, true
+            from s join t on t.id = s.tenure_id
+            window w as (partition by s.tenure_id order by s.n)
+            union all
+            select f.id, f.from_date, coalesce(f.to_date, 'infinity'::date), f.party, f.independent
+            from fallback f
+          ),
+          seg as (
+            select r.tenure_id, r.f, r.u, t.category,
+              case when t.category in ('appointed', 'ex_officio') then 'category:' || t.category
+                when g.caucus is not null and g.caucus is distinct from coalesce(bm.into_id, br.parent_party_id, r.party)
+                  then coalesce(coalesce(bm.into_id, br.parent_party_id, r.party)::text, 'independent') || '>' || g.caucus
+                when r.party is null and r.independent then 'independent'
+                else coalesce(bm.into_id, br.parent_party_id, r.party)::text end as key,
+              coalesce(bm.into_id, br.parent_party_id, r.party) as party
+            from raw r join t on t.id = r.tenure_id
+            left join party_affiliation br on br.party_id = r.party and br.kind = 'regional_branch' and br.valid @> r.f
+            left join entity_merge bm on bm.entity_id = br.parent_party_id
+            left join lateral (
+              select coalesce(pm.into_id, g.party_id) as caucus from tenure_affiliation g
+              left join entity_merge pm on pm.entity_id = g.party_id
+              where g.tenure_id = r.tenure_id and g.kind = 'parliamentary_group' and g.party_id is not null and g.valid @> r.f limit 1
+            ) g on true
+            where r.f < r.u
+          ),
+          ordered as (
+            select g.*, lag(g.key) over w as was, lag(g.party) over w as was_party,
+              row_number() over w as n, count(*) over (partition by g.tenure_id) as of
+            from seg g window w as (partition by g.tenure_id order by g.f)
+          ),
+          events as (
+            select o.f as day, 'in' as kind, null as "from", o.key as "to", t.acquired as cause
+            from ordered o join t on t.id = o.tenure_id where o.n = 1
+            union all
+            select o.u, 'out', o.key, null, t.ended
+            from ordered o join t on t.id = o.tenure_id where o.n = o.of and o.u < 'infinity'::date
+            union all
+            select o.f, case when exists (
+                select from party_relation r where r.kind in ('successor_of', 'merged_into', 'absorbed_by', 'list_vehicle_for')
+                  and ((r.from_party_id = o.party and r.to_party_id = o.was_party) or (r.from_party_id = o.was_party and r.to_party_id = o.party))
+              ) then 'rename' else 'switch' end, o.was, o.key, null
+            from ordered o where o.n > 1 and o.key is distinct from o.was
           )
-          select x.day::text as date, coalesce(bf.into_id, f.parent_party_id, x.before) as from,
-            coalesce(bt.into_id, g.parent_party_id, x.after) as to, count(*)::int as members
-          from moves x
-          left join party_affiliation f on f.party_id = x.before and f.kind = 'regional_branch' and f.valid @> x.day
-          left join entity_merge bf on bf.entity_id = f.parent_party_id
-          left join party_affiliation g on g.party_id = x.after and g.kind = 'regional_branch' and g.valid @> x.day
-          left join entity_merge bt on bt.entity_id = g.parent_party_id
-          where coalesce(bf.into_id, f.parent_party_id, x.before) is distinct from coalesce(bt.into_id, g.parent_party_id, x.after)
-          group by 1, 2, 3 order by 1, 4 desc
+          select day::text as date, kind, "from", "to", cause, count(*)::int as members
+          from events group by 1, 2, 3, 4, 5 order by 1, 2, 6 desc
         `),
         ]);
       const home = slugs.get(body.polity) ?? null;
@@ -19278,8 +19353,16 @@ export const bodies = {
           ...makeup.rows.flatMap((row) =>
             [row.party, row.caucus].filter((party) => party != null),
           ),
-          ...switches.rows.flatMap((row) =>
-            [row.from, row.to].filter((party) => party != null),
+          ...changes.rows.flatMap((row) =>
+            [row.from, row.to].flatMap(
+              (key) =>
+                key
+                  ?.split(">")
+                  .filter(
+                    (part) =>
+                      part !== "independent" && !part.startsWith("category:"),
+                  ) ?? [],
+            ),
           ),
         ]),
       ];
@@ -19370,7 +19453,7 @@ export const bodies = {
             })),
           }))
           .toArray(),
-        switches: switches.rows,
+        changes: changes.rows,
         parties: held.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,

@@ -70,6 +70,7 @@
     chosen != null && chosen.term === term?.start ? chosen.day : first,
   );
   const DAY = 864e5;
+  const renames = $derived(new Set(data.renames));
   const roll = $derived(
     (members.data?.members ?? []).map((member) => ({
       ...member,
@@ -78,6 +79,7 @@
         member,
         first,
         members.data?.end ?? new Date().toISOString().slice(0, 10),
+        renames,
       ),
     })),
   );

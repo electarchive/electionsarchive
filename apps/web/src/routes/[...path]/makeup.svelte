@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
@@ -32,8 +33,10 @@
         date: string;
         parties: Array<{ party: string | null; seats: number }>;
         moves: Array<{
+          kind: "in" | "out" | "switch" | "rename";
           from: string | null;
           to: string | null;
+          cause: string | null;
           members: number;
         }>;
       }>;
@@ -171,12 +174,22 @@
       ];
       const parts = marks.map((part, at) => {
         const after = marks[at + 1];
+        const { layers, below: seated } = stack(part.parties);
+        const open =
+          term.isSeated && full != null
+            ? Math.max(0, full - seated - term.seceded)
+            : 0;
         return {
           ...part,
           x0: at === 0 ? x0 : sx(Date.parse(part.from)),
           x1: after == null ? x1 : sx(Date.parse(after.from)),
           to: after?.from ?? term.end,
-          stack: stack(part.parties).layers,
+          stack: layers,
+          empty: open,
+          vacant: {
+            y0: PAD.top + inner - (seated + term.seceded) * unit,
+            y1: PAD.top + inner - (seated + term.seceded + open) * unit,
+          },
         };
       });
       const n = term.size ?? term.total;
@@ -187,15 +200,10 @@
         x0,
         x1,
         parts,
-        empty,
         whole,
         seceded: {
           y0: PAD.top + inner - below * unit,
           y1: PAD.top + inner - (below + term.seceded) * unit,
-        },
-        vacant: {
-          y0: PAD.top + inner - (below + term.seceded) * unit,
-          y1: PAD.top + inner - (below + term.seceded + empty) * unit,
         },
         line:
           PAD.top +
@@ -487,12 +495,12 @@
       </pattern>
     </defs>
     <g>
-      {#each columns.filter((column) => column.empty > 0) as column (column.index)}
+      {#each slices.filter((entry) => entry.empty > 0) as entry, index (index)}
         <rect
-          x={column.x0}
-          y={column.vacant.y1}
-          width={Math.max(column.x1 - column.x0, 0.5)}
-          height={column.vacant.y0 - column.vacant.y1}
+          x={entry.x0}
+          y={entry.vacant.y1}
+          width={Math.max(entry.x1 - entry.x0, 0.5)}
+          height={entry.vacant.y0 - entry.vacant.y1}
           fill="url(#{uid}-vacant)"
           opacity="0.55"
         />
@@ -665,27 +673,47 @@
       >
       {#if part.step != null}
         <ul class="grid gap-0.5 border-be pbe-1">
-          {#each part.step.moves.slice(0, 4) as move, index (index)}
+          {#each part.step.moves.slice(0, 5) as move, index (index)}
             <li class="flex items-center justify-between gap-3">
               <span class="flex items-center gap-1 truncate">
+                {#if move.kind === "switch"}
+                  <span
+                    class="shrink-0 rounded-xs block-2 inline-2"
+                    style:background={tint(move.from)}
+                  ></span>
+                  <span class="truncate">{label(move.from)}</span>
+                  <span aria-hidden="true">→</span>
+                {/if}
                 <span
                   class="shrink-0 rounded-xs block-2 inline-2"
-                  style:background={tint(move.from ?? "independent")}
+                  style:background={tint(move.to ?? move.from)}
                 ></span>
-                <span class="truncate">{label(move.from ?? "independent")}</span
-                >
-                <span aria-hidden="true">→</span>
-                <span
-                  class="shrink-0 rounded-xs block-2 inline-2"
-                  style:background={tint(move.to ?? "independent")}
-                ></span>
-                <span class="truncate">{label(move.to ?? "independent")}</span>
+                <span class="truncate">{label(move.to ?? move.from)}</span>
+                {#if move.kind !== "switch"}
+                  <span class="truncate text-muted-foreground"
+                    >{(move.kind === "in"
+                      ? ARRIVALS[move.cause ?? ""]
+                      : DEPARTURES[move.cause ?? ""])?.() ??
+                      (move.kind === "in"
+                        ? m.chamber_joined()
+                        : m.chamber_left())}</span
+                  >
+                {/if}
               </span>
               <span class="font-figures tabular-nums"
-                >{m.chamber_step_members({ count: move.members })}</span
+                >{move.kind === "out"
+                  ? "−"
+                  : move.kind === "in"
+                    ? "+"
+                    : ""}{count(move.members)}</span
               >
             </li>
           {/each}
+          {#if part.step.moves.length > 5}
+            <li class="text-muted-foreground">
+              {m.count_more({ count: count(part.step.moves.length - 5) })}
+            </li>
+          {/if}
         </ul>
       {/if}
       <ul class="grid gap-0.5">
@@ -722,7 +750,7 @@
             >
           </li>
         {/if}
-        {#if lit.empty > 0}
+        {#if part.empty > 0}
           <li class="flex items-center justify-between gap-3">
             <span class="flex items-center gap-1.5 truncate">
               <span
@@ -731,9 +759,9 @@
               <span class="truncate">{m.seats_vacant()}</span>
             </span>
             <span class="font-figures tabular-nums"
-              ><span class="font-semibold">{count(lit.empty)}</span>
+              ><span class="font-semibold">{count(part.empty)}</span>
               <span class="text-muted-foreground"
-                >{percent(lit.empty / lit.whole)}</span
+                >{percent(part.empty / lit.whole)}</span
               ></span
             >
           </li>

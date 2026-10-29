@@ -5128,6 +5128,7 @@ function chamberMarkdown(
     parties,
     members,
     council,
+    renames,
   }: Extract<Data, { kind: "chamber" }>,
   link: Link,
 ) {
@@ -5141,7 +5142,7 @@ function chamberMarkdown(
   const roll = (members?.members ?? []).map((member) => ({
     ...member,
     party: partyOn(member, close, opened),
-    segments: segments(member, opened, close),
+    segments: segments(member, opened, close, new Set(renames)),
   }));
   const everyone = [
     ...parties,
@@ -5165,11 +5166,17 @@ function chamberMarkdown(
       .slice(0, members?.isSeated === true ? -1 : undefined)
       .flatMap((term) =>
         term.steps.flatMap((step) =>
-          step.moves.map((move) => [
-            date(step.date),
-            `${named(move.from)} → ${named(move.to)}`,
-            m.chamber_step_members({ count: move.members }),
-          ]),
+          step.moves.flatMap((move) =>
+            move.kind === "switch"
+              ? [
+                  [
+                    date(step.date),
+                    `${named(move.from)} → ${named(move.to)}`,
+                    m.chamber_step_members({ count: move.members }),
+                  ],
+                ]
+              : [],
+          ),
         ),
       ),
     ...(members?.isSeated === true

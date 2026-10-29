@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -47,31 +48,6 @@
   } = $props();
 
   const uid = $props.id();
-  const VIA: Record<string, () => string> = {
-    appointed: m.chamber_via_appointed,
-    elected: m.chamber_via_elected,
-    by_election: m.chamber_via_by_election,
-    succession: m.chamber_via_succession,
-    list_replacement: m.chamber_via_list_replacement,
-    co_opted: m.chamber_via_co_opted,
-    trustee: m.chamber_via_trustee,
-    acting: m.chamber_via_acting,
-  };
-  const ENDS: Record<string, () => string> = {
-    resigned: m.chamber_end_resigned,
-    died: m.chamber_end_died,
-    removed: m.chamber_end_removed,
-    annulled: m.chamber_end_annulled,
-    dissolved: m.chamber_end_dissolved,
-    expelled: m.chamber_end_expelled,
-    lost_seat: m.chamber_end_lost_seat,
-    disqualified: m.chamber_end_disqualified,
-    elevated: m.chamber_end_elevated,
-    appointed: m.chamber_end_appointed,
-    withdrew: m.chamber_end_withdrew,
-    term_end: m.chamber_end_term_end,
-  };
-
   let party = $state<string | null>(page.url.searchParams.get("party"));
   let query = $state(page.url.searchParams.get("member") ?? "");
 
@@ -201,7 +177,7 @@
                 member,
                 on: member.from ?? "",
                 isJoin: true,
-                why: VIA[member.acquired ?? ""]?.() ?? null,
+                why: ARRIVALS[member.acquired ?? ""]?.() ?? null,
               },
             ]
           : []),
@@ -211,7 +187,7 @@
                 member,
                 on: member.to ?? "",
                 isJoin: false,
-                why: ENDS[member.ended ?? ""]?.() ?? null,
+                why: DEPARTURES[member.ended ?? ""]?.() ?? null,
               },
             ]
           : []),
@@ -519,14 +495,15 @@
           {const change = $derived(
             isEarly(member)
               ? {
-                  why: ENDS[member.ended ?? ""]?.() ?? m.chamber_left(),
+                  why: DEPARTURES[member.ended ?? ""]?.() ?? m.chamber_left(),
                   party: null,
                   isSwitch: false,
                   on: member.to,
                 }
               : isLate(member)
                 ? {
-                    why: VIA[member.acquired ?? ""]?.() ?? m.chamber_joined(),
+                    why:
+                      ARRIVALS[member.acquired ?? ""]?.() ?? m.chamber_joined(),
                     party: null,
                     isSwitch: false,
                     on: member.from,
