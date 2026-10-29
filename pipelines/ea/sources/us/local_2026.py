@@ -617,6 +617,11 @@ FEEDS = {
         "Leander Independent School District",
         "Board of Trustees Elections, November 3, 2026",
     ),
+    "TX-48141": (
+        "https://www.epcounty.com/elections/",
+        "El Paso County Elections Department",
+        "Canutillo Independent School District sample ballot, November 3, 2026",
+    ),
     "UT-49035": (
         "https://www.saltlakecounty.gov/clerk/elections/",
         "Salt Lake County Clerk",
@@ -1392,6 +1397,7 @@ DELIVERED = {
     "UT-49035": DATA / "inbox" / "y26" / "ut" / "salt_lake.pdf",
     "UT-49057": DATA / "inbox" / "y26" / "ut" / "weber.html",
     "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
+    "TX-48141": DATA / "inbox" / "manual" / "MF-260" / "4._Canutillo_ISD_Ballot.pdf",
     "FL-12057": DATA / "inbox" / "manual" / "MF-177" / "2026 General Election_All Races Sample Ballot.pdf",
     "FL-12031": DATA / "inbox" / "manual" / "MF-178" / "2026 General All Races_202609210829090089.pdf",
     "FL-12071": DATA / "inbox" / "manual" / "MF-182" / "2026 General Election - All Inclusive Sample Ballot.pdf",
@@ -4284,7 +4290,7 @@ def parse() -> None:
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD')"""
         ).fetchall():
-            mine = coverage_tables.tokens(label)
+            mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
                 hit
                 for (code_st, theirs), found in index.items()
