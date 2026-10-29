@@ -991,6 +991,31 @@ FEEDS.update(
         "Austin Independent School District",
         "2026 Trustee Elections",
     ),
+    "DE-10003": (
+        "https://elections.delaware.gov/candidates/candidatelist/genl_fcddt_2026.html",
+        "Delaware Department of Elections",
+        "General Election 11/3/2026: Filed Candidates by Office",
+    ),
+    "DE-10001": (
+        "https://elections.delaware.gov/candidates/candidatelist/genl_fcddt_2026.html",
+        "Delaware Department of Elections",
+        "General Election 11/3/2026: Filed Candidates by Office",
+    ),
+    "DE-10005": (
+        "https://elections.delaware.gov/candidates/candidatelist/genl_fcddt_2026.html",
+        "Delaware Department of Elections",
+        "General Election 11/3/2026: Filed Candidates by Office",
+    ),
+    "NE-31055": (
+        "https://www.votedouglascounty-ne.gov/",
+        "Douglas County Election Commission",
+        "Candidates Up For Election: 2026 General",
+    ),
+    "KS-20173": (
+        "https://www.sedgwickcounty.org/elections/",
+        "Sedgwick County Election Office",
+        "Notice of General Election, November 3, 2026",
+    ),
     "OR-41043-lyons": (
             "https://www.cityoflyons.org/",
             "City of Lyons",
@@ -1188,6 +1213,11 @@ DELIVERED = {
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
+    "DE-10003": DATA / "inbox" / "y26" / "de" / "state.html",
+    "DE-10001": DATA / "inbox" / "y26" / "de" / "state.html",
+    "DE-10005": DATA / "inbox" / "y26" / "de" / "state.html",
+    "NE-31055": DATA / "inbox" / "y26" / "ne" / "douglas.html",
+    "KS-20173": DATA / "inbox" / "y26" / "ks" / "sedgwick.html",
     "TX-48453": DATA / "inbox" / "y26" / "tx" / "aisd.html",
     "FL-12009": DATA / "inbox" / "y26" / "fl" / "brevard.html",
     "KS-20091": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
