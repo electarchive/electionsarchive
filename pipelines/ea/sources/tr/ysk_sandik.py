@@ -51,7 +51,7 @@ from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
 BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31", "2024-03-31"}
-VERSION = "19"
+VERSION = "20"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -273,22 +273,34 @@ def parse() -> None:
                     continue
                 if "_meta" in data:
                     continue
-                names = headers[("il", data["il_ID"])] | headers.get(("cevre", data.get("secim_CEVRESI_ID")), {})
+                running = headers.get(("cevre", data.get("secim_CEVRESI_ID"))) or headers[("il", data["il_ID"])]
+                names = headers[("il", data["il_ID"])] | running
                 votes = {
-                    names[column]: value
-                    for column, value in data.items()
-                    if column in names and column.endswith("_OY") and value
+                    names[column]: data.get(column, 0)
+                    for column in {*running, *(column for column in data if column in names)}
+                    if column.endswith("_OY")
                 }
                 if sum(votes.values()) != data.get("gecerli_OY_TOPLAMI", 0):
                     raise ValueError(f"{slug} {data['sandik_ID']}: votes do not sum to valid votes")
                 base = data["ilce_ADI"].partition(" - ")[0]
                 district = "MERKEZ" if base in (f"{data['il_ADI']} MERKEZ", "MERKEZEFENDİ") else base
                 rows += [
-                    (f"{data['il_ID']:02}", district, data["muhtarlik_ADI"], label, value)
+                    (
+                        f"{data['il_ID']:02}",
+                        district,
+                        data["muhtarlik_ADI"],
+                        data.get("type") or data["ilce_ADI"],
+                        label,
+                        value,
+                    )
                     for label, value in votes.items()
                 ]
         boxes = (
-            pl.DataFrame(rows, schema=[*keys, "label", "votes"], orient="row")
+            pl.DataFrame(rows, schema=[*keys, "municipality", "label", "votes"], orient="row")
+            .filter(
+                (pl.col("municipality") == "sandik")
+                | (pl.col("votes").sum().over("plate", "municipality", "label") > 0)
+            )
             .with_columns(pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars())
             .group_by([*keys, "label"])
             .agg(pl.col("votes").sum())
@@ -299,15 +311,27 @@ def parse() -> None:
             .group_by(keys)
             .agg(pl.col("votes").sum())
         )
+        residual = totals.join(mirror, on=keys, how="anti")
+        unmatched = mirror.join(totals, on=keys, how="anti")
+        stem = (
+            pl.col("neighborhood").str.replace(r" (KÖYÜ|MAH\.)$", "").str.replace_all(" ", "").str.replace("KÖY$", "")
+        )
         renamed = (
-            totals.join(mirror, on=keys, how="anti")
-            .filter(pl.len().over("plate", "district", "votes") == 1)
-            .join(
-                mirror.join(totals, on=keys, how="anti").filter(pl.len().over("plate", "district", "votes") == 1),
-                on=["plate", "district", "votes"],
-                suffix="_mirror",
+            pl.concat(
+                [
+                    residual.with_columns(stem=stem)
+                    .filter(pl.len().over("plate", "district", match) == 1)
+                    .join(
+                        unmatched.with_columns(stem=stem).filter(pl.len().over("plate", "district", match) == 1),
+                        on=["plate", "district", match],
+                        suffix="_mirror",
+                    )
+                    .select(*keys, "neighborhood_mirror")
+                    for match in ("votes", "stem")
+                ]
             )
-            .select(*keys, "neighborhood_mirror")
+            .unique(subset=keys, keep="first", maintain_order=True)
+            .unique(subset=["plate", "district", "neighborhood_mirror"], keep="none")
         )
         boxes = (
             boxes.join(renamed, on=keys, how="left")
@@ -850,9 +874,9 @@ def emit() -> Path:
             ):
                 result_sets[contest_key] = str(result_set)
                 held = {
-                    (kind, body)
-                    for kind, body in conn.execute(
-                        "select kind, body_md from note where entity_id = %s", [result_set]
+                    (kind, body): note
+                    for note, kind, body in conn.execute(
+                        "select id, kind, body_md from note where entity_id = %s", [result_set]
                     ).fetchall()
                 }
                 notes = []
@@ -909,6 +933,15 @@ def emit() -> Path:
                 for kind, body in notes:
                     if (kind, body) not in held:
                         cs.add("note", entity_id=result_set, kind=kind, body_md=body)
+                for (kind, body), note in held.items():
+                    if (kind, body) not in notes:
+                        cs.add(
+                            "note_drop",
+                            note_id=note,
+                            entity_id=result_set,
+                            body_md=body,
+                            reason="no longer written by this pipeline",
+                        )
         values = pl.concat(
             [
                 votes.select(
