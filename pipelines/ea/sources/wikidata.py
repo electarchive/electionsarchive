@@ -78,6 +78,10 @@ THRESHOLD = 4
 SPLIT = r"\s[-–—]\s"
 LINKED = ("party", "federation", "parliamentary_group", "independent_group")
 MATCHES: dict[tuple[str, str], str | None] = {
+    ("US", "Forward Party"): "Q108816586",
+    ("US-CO", "Forward Party"): None,
+    ("US-PA", "Forward Party"): None,
+    ("US-VA", "Forward Party"): None,
     ("US", "Green Party"): "Q849158",
     ("US", "Reform Party"): "Q1893430",
     ("US", "Socialist Party USA"): "Q581259",
