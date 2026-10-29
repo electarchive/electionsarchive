@@ -63,11 +63,43 @@
     };
   });
 
+  let chosen = $state<{ term: string; day: string } | null>(null);
+  const first = $derived(members.data?.start ?? term?.start ?? "");
+  const on = $derived(
+    chosen != null && chosen.term === term?.start ? chosen.day : first,
+  );
+  const DAY = 864e5;
   const roll = $derived(
-    (members.data?.members ?? []).map((member) => ({
-      ...member,
-      party: effective(member),
-    })),
+    (members.data?.members ?? []).map((member) => {
+      const covering = (value: string) =>
+        member.spells.find(
+          (entry) =>
+            (entry.from ?? "") <= value &&
+            (entry.to == null || entry.to > value),
+        );
+      const spell = covering(
+        member.to != null && member.to <= on
+          ? new Date(Date.parse(member.to) - DAY).toISOString().slice(0, 10)
+          : member.from != null && member.from > on
+            ? member.from
+            : on,
+      );
+      const opening = covering(
+        member.from != null && member.from > first ? member.from : first,
+      );
+      return {
+        ...member,
+        party: effective({
+          ...member,
+          party:
+            spell != null ? spell.party : opening == null ? member.party : null,
+          isIndependent:
+            spell != null
+              ? spell.party == null
+              : opening != null || member.isIndependent,
+        }),
+      };
+    }),
   );
   const crew = $derived(
     stand(
@@ -75,12 +107,6 @@
       members.data?.parties ?? [],
     ),
   );
-  let chosen = $state<{ term: string; day: string } | null>(null);
-  const first = $derived(members.data?.start ?? term?.start ?? "");
-  const on = $derived(
-    chosen != null && chosen.term === term?.start ? chosen.day : first,
-  );
-  const DAY = 864e5;
   const range = $derived({
     low: Date.parse(first) / DAY,
     high:
@@ -106,14 +132,15 @@
               .filter(
                 (member) =>
                   member.isVoting &&
-                  member.seat != null &&
-                  !held.has(member.seat) &&
+                  (member.seat == null
+                    ? member.acquired === "elected"
+                    : !held.has(member.seat)) &&
                   member.from != null &&
                   member.from > on &&
                   Date.parse(member.from) - Date.parse(on) < 30 * DAY,
               )
               .toSorted((a, b) => (a.from ?? "").localeCompare(b.from ?? "")),
-            (member) => member.seat,
+            (member) => member.seat ?? member.person,
           )
             .values()
             .flatMap((group) => group.slice(0, 1))

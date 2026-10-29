@@ -5136,10 +5136,41 @@ function chamberMarkdown(
     upper_house: m.chamber_kind_upper_house,
     unicameral: m.chamber_kind_unicameral,
   };
+  const close = members?.end ?? new Date().toISOString().slice(0, 10);
+  const opened = members?.start ?? close;
+  const roll = (members?.members ?? []).map((member) => {
+    const covering = (value: string) =>
+      member.spells.find(
+        (entry) =>
+          (entry.from ?? "") <= value && (entry.to == null || entry.to > value),
+      );
+    const spell = covering(
+      member.to != null && member.to <= close
+        ? new Date(Date.parse(member.to) - 864e5).toISOString().slice(0, 10)
+        : member.from != null && member.from > close
+          ? member.from
+          : close,
+    );
+    const opening = covering(
+      member.from != null && member.from > opened ? member.from : opened,
+    );
+    return {
+      ...member,
+      party: effective({
+        ...member,
+        party:
+          spell != null ? spell.party : opening == null ? member.party : null,
+        isIndependent:
+          spell != null
+            ? spell.party == null
+            : opening != null || member.isIndependent,
+      }),
+    };
+  });
   const everyone = [
     ...parties,
     ...stand(
-      (members?.members ?? []).map((member) => effective(member)),
+      roll.map((member) => member.party),
       members?.parties ?? [],
     ),
   ];
@@ -5150,7 +5181,7 @@ function chamberMarkdown(
   const last = terms.at(-1);
   const first = last?.start.slice(0, 4) ?? "";
   const final = last?.end?.slice(0, 4) ?? m.governments_present();
-  const sitting = (members?.members ?? [])
+  const sitting = roll
     .filter((member) => member.isVoting)
     .toSorted(
       (a, b) =>
@@ -5338,7 +5369,7 @@ function chamberMarkdown(
                       ],
                       sitting.map((member) => [
                         `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
-                        label(effective(member)),
+                        label(member.party),
                         date(member.from),
                         date(member.to),
                       ]),
@@ -5347,7 +5378,7 @@ function chamberMarkdown(
                       [m.col_name(), m.col_party()],
                       sitting.map((member) => [
                         `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
-                        label(effective(member)),
+                        label(member.party),
                       ]),
                     ),
               ]),

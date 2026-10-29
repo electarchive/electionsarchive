@@ -1665,11 +1665,11 @@ async function load(
     parties.length === 0
       ? { rows: [] }
       : db.execute<{
-      party_id: string;
-      color: string | null;
-      parent: string | null;
-      lean: number | null;
-    }>(sql`
+          party_id: string;
+          color: string | null;
+          parent: string | null;
+          lean: number | null;
+        }>(sql`
       select p.id as party_id, c.color, b.parent, (
         select (low + high) * 100 + coalesce(rank, 99) from party_position
         where party_id = p.id and valid @> ${date}::date limit 1
@@ -19372,6 +19372,13 @@ export const bodies = {
             caucus: v.nullable(v.string()),
             isIndependent: v.boolean(),
             left: v.nullable(v.string()),
+            spells: v.array(
+              v.object({
+                party: v.nullable(v.string()),
+                from: v.nullable(v.string()),
+                to: v.nullable(v.string()),
+              }),
+            ),
             place: v.nullable(v.string()),
             path: v.nullable(v.string()),
             seat: v.nullable(v.string()),
@@ -19412,11 +19419,19 @@ export const bodies = {
         start: string | null;
         end: string | null;
       }>(sql`
+        with opening as (
+          select t.from_date as day, count(*) as n from tenure t
+          where t.body_id = ${input.id}::uuid and t.from_date >= ${input.from}::date
+            and (${until}::date is null or t.from_date < ${until}::date)
+          group by t.from_date order by count(*) desc, t.from_date limit 1
+        )
         select
-          (select t.from_date::text from tenure t
-            where t.body_id = ${input.id}::uuid and t.from_date >= ${input.from}::date
-              and (${until}::date is null or t.from_date < ${until}::date)
-            group by t.from_date order by count(*) desc, t.from_date limit 1) as start,
+          coalesce((select t.to_date::text from tenure t join opening o
+              on t.from_date < o.day and t.to_date > o.day and t.to_date < o.day + 30
+            where t.body_id = ${input.id}::uuid
+            group by t.to_date, o.n having count(*) > o.n
+            order by count(*) desc limit 1),
+            (select day::text from opening)) as start,
           (select t.from_date::text from tenure t
             where t.body_id = ${input.id}::uuid and ${until}::date is not null
               and t.from_date >= ${until}::date and t.from_date < ${until}::date + 400
@@ -19433,6 +19448,11 @@ export const bodies = {
               caucus: string | null;
               isIndependent: boolean;
               left: string | null;
+              spells: Array<{
+                party: string | null;
+                from: string | null;
+                to: string | null;
+              }>;
               place: string | null;
               contest: string | null;
               seat: string | null;
@@ -19466,7 +19486,12 @@ export const bodies = {
                 (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
                   left join entity_merge pm on pm.entity_id = a.party_id
                   where a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
-                  order by lower(a.valid) desc nulls last limit 1) as left
+                  order by lower(a.valid) desc nulls last limit 1) as left,
+                (select coalesce(json_agg(json_build_object('party', coalesce(pm.into_id, a.party_id),
+                    'from', lower(a.valid)::text, 'to', upper(a.valid)::text)
+                    order by lower(a.valid) nulls first, a.party_id is null), '[]')
+                  from tenure_affiliation a left join entity_merge pm on pm.entity_id = a.party_id
+                  where a.tenure_id = t.id and a.kind = 'party') as spells
               from tenure t
               left join seat s on s.id = t.seat_id
               left join contest c on c.id = t.contest_id
@@ -19531,6 +19556,7 @@ export const bodies = {
               ...row,
               caucus: null,
               left: null,
+              spells: [],
               seat: null,
               region: null,
               from: null,
@@ -19542,7 +19568,12 @@ export const bodies = {
       const parties = [
         ...new Set(
           rows
-            .flatMap((row) => [row.party, row.left, row.caucus])
+            .flatMap((row) => [
+              row.party,
+              row.left,
+              row.caucus,
+              ...row.spells.map((spell) => spell.party),
+            ])
             .filter((id) => id != null),
         ),
       ];
@@ -19603,6 +19634,7 @@ export const bodies = {
           caucus: row.caucus === row.party ? null : row.caucus,
           isIndependent: row.isIndependent,
           left: row.left === row.party ? null : row.left,
+          spells: row.spells,
           place:
             row.place == null ? null : (labels.full.get(row.place) ?? null),
           path: row.contest == null ? null : (slugs.get(row.contest) ?? null),
