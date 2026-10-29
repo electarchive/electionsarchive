@@ -102,6 +102,34 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://cwgis.baltimorecountymd.gov/arcgis/rest/services/Highways/Highways/MapServer/108",
         "field": "COUNCILMANIC_DISTRICTS",
     },
+    {
+        "publisher": "City of Bakersfield GIS",
+        "title": "Bakersfield City Council Wards",
+        "pattern": r"^06:0603526:council:(district|area)-",
+        "layer": "https://gis.bakersfieldcity.us/webmaps/rest/services/General/Boundary/MapServer/5",
+        "field": "WARD_ID",
+    },
+    {
+        "publisher": "City of Modesto GIS",
+        "title": "Modesto Council Districts",
+        "pattern": r"^06:0648354:council:(district|area)-",
+        "layer": "https://services1.arcgis.com/KN76x1eyfvozZO4M/arcgis/rest/services/Council_District_2021/FeatureServer/9",
+        "field": "DIST_TXT",
+    },
+    {
+        "publisher": "City of Palm Springs GIS",
+        "title": "Palm Springs Voting Districts",
+        "pattern": r"^06:0655254:council:(district|area)-",
+        "layer": "https://services.arcgis.com/f48yV21HSEYeCYMI/arcgis/rest/services/Palm_Springs_Voting_Districts_2022_(View)/FeatureServer/0",
+        "field": "DISTRICT",
+    },
+    {
+        "publisher": "City of Hemet GIS",
+        "title": "Hemet Council Districts (December 2023)",
+        "pattern": r"^06:0633182:council:(district|area)-",
+        "layer": "https://services3.arcgis.com/czrgcV6qkPuBJCRH/arcgis/rest/services/Hemet_Council_Districts_December_2023/FeatureServer/0",
+        "field": "DISTRICT",
+    },
 ]
 
 
@@ -120,7 +148,7 @@ def parse() -> None:
         for layer in LAYERS:
             features = json.loads(raw.cached(SOURCE, url(layer)).path.read_bytes())["features"]
             shapes = {
-                re.sub(r"[^a-z0-9]+", "-", str(f["properties"][layer["field"]]).lower()).strip("-"): f["geometry"]
+                re.sub(r"^(district|ward)-", "", re.sub(r"[^a-z0-9]+", "-", str(f["properties"][layer["field"]]).lower()).strip("-")): f["geometry"]
                 for f in features
                 if f["geometry"] is not None
             }
@@ -132,7 +160,7 @@ def parse() -> None:
             ).fetchall()
             matched = 0
             for area, code in wanted:
-                geometry = shapes.get(code.rsplit("district-", 1)[1])
+                geometry = shapes.get(re.split(r"(?:district|area)-", code, maxsplit=1)[1])
                 if geometry is None:
                     print("no shape:", code)
                     continue
