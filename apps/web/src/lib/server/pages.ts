@@ -687,7 +687,65 @@ export async function chamber(path: string) {
     ),
   );
   separate(relit, [...recent]);
-  const last = terms.at(-1);
+  const dated = await db.execute<{
+    start: string;
+    id: string;
+    kind: string;
+    lang: string;
+    text: string;
+  }>(sql`
+    select t.start::text as start, n.entity_id::text as id, n.kind::text as kind, n.lang, n.text
+    from unnest(${sql.param(terms.map((term) => term.start))}::date[]) t(start)
+    join name n on n.valid @> t.start and not (lower_inf(n.valid) and upper_inf(n.valid))
+      and n.kind in ('official', 'english', 'native', 'abbreviation')
+      and n.entity_id = any(${sql.param([id, ...recent.keys().filter((key) => /^[\da-f-]{36}$/u.test(key))])}::uuid[])
+    order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc
+  `);
+  const at = Map.groupBy(dated.rows, (row) => row.start);
+  const titled = terms.map((term) => {
+    const rows = at.get(term.start) ?? [];
+    const own = rows.filter((row) => row.id === id);
+    const native = own.find((row) => row.kind === "native")?.text;
+    const english = own.find(
+      (row) =>
+        (row.kind === "official" || row.kind === "english") &&
+        row.lang === "en",
+    )?.text;
+    return {
+      ...term,
+      title:
+        native != null && english != null && native !== english
+          ? `${native} (${english})`
+          : (english ?? native ?? null),
+      names: Object.fromEntries(
+        Map.groupBy(
+          rows.filter((row) => row.id !== id),
+          (row) => row.id,
+        )
+          .entries()
+          .flatMap(([party, names]) => {
+            const label = (
+              names.find((row) => row.kind === "official") ??
+              names.find((row) => row.kind === "english")
+            )?.text;
+            return label == null
+              ? []
+              : [
+                  [
+                    party,
+                    {
+                      label,
+                      short:
+                        names.find((row) => row.kind === "abbreviation")
+                          ?.text ?? null,
+                    },
+                  ] as const,
+                ];
+          }),
+      ),
+    };
+  });
+  const last = titled.at(-1);
   const [members, marks] = await Promise.all([
     last == null ? null : call(router.bodies.members, { id, from: last.start }),
     Promise.all(
@@ -705,7 +763,7 @@ export async function chamber(path: string) {
     id,
     body,
     council,
-    terms,
+    terms: titled,
     logos: Object.fromEntries(marks),
     basis: isSeated
       ? earlier.length > 0 || later.length > 0

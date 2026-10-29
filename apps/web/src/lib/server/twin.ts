@@ -5275,6 +5275,7 @@ function chamberMarkdown(
         (a.from ?? "").localeCompare(b.from ?? ""),
     );
   const isParty = council == null || council.isPartisan;
+  const isTitled = terms.some((term) => term.title != null);
   const partyOf = new Map(
     (council?.parties ?? []).map((party) => [party.id, party.label]),
   );
@@ -5435,6 +5436,7 @@ function chamberMarkdown(
             : table(
                 [
                   m.col_date(),
+                  ...(isTitled ? [m.chamber_title_col()] : []),
                   m.chamber_elected(),
                   m.chamber_seats(),
                   m.chamber_largest(),
@@ -5450,13 +5452,14 @@ function chamberMarkdown(
                     .toSorted((a, b) => b.seats - a.seats)[0];
                   return [
                     date(term.start),
+                    ...(isTitled ? [term.title ?? body.name] : []),
                     term.election == null
                       ? null
                       : link(term.election.name, term.election.path),
                     count(term.size ?? term.total),
                     largest == null
                       ? null
-                      : `${label(largest.party)} (${count(largest.seats)})`,
+                      : `${term.names[largest.party ?? ""]?.label ?? label(largest.party)} (${count(largest.seats)})`,
                   ];
                 }),
               ),
