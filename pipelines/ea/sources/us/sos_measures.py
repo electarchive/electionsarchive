@@ -97,6 +97,26 @@ WA_LISTS = {
     date(2003, 11, 4): ("20211128180613", 53),
     date(2006, 11, 7): ("20141025224427", 134),
 }
+WA_OLD = "https://web.archive.org/web/{}id_/https://wei.sos.wa.gov/agency/osos/en/press_and_research/PreviousElections/"
+WA_OLD_FILES = {
+    date(2004, 11, 2): (
+        "20170211042058",
+        "2004/Documents/2004%20General%20Election/2004%20Measure%20Results.xls",
+        {"I-872": "872", "I-884": "884", "I-892": "892", "R-55": "55", "I-297": "297"},
+    ),
+    date(2005, 11, 8): (
+        "20170128174533",
+        "2005/Documents/2005%20General%20folder/2005Gen%20Measures.XLS",
+        {
+            "Fuel": "912",
+            "Neg Healthcare": "330",
+            "Clean Air": "901",
+            "Perf Audits": "900",
+            "Jud Conduct": "8207",
+            "Medical": "336",
+        },
+    ),
+}
 WA_BILLS = {"2901": "53", "2969": "51"}
 WA_RESULTS = "https://results.vote.wa.gov/results/"
 WA_DATES = ("20071106", "20081104", "20091103", "20101102", "20111108")
@@ -917,6 +937,9 @@ def fetch() -> None:
                 suffix=".html",
             )
             time.sleep(1)
+    for stamp, path, _ in WA_OLD_FILES.values():
+        raw.fetch(SOURCE, WA_OLD.format(stamp) + path, suffix=".xls")
+        time.sleep(2)
     for day in WA_DATES:
         raw.fetch(SOURCE, f"{WA_RESULTS}{day}/measures-all.html", suffix=".html")
         for page in sorted(
@@ -1591,6 +1614,26 @@ def washington() -> list[dict[str, object]]:
             if number is None:
                 raise ValueError(f"{url}: no measure number")
             found.append((date(int(day[:4]), int(day[4:6]), int(day[6:])), number[1], url, votes, totals))
+    for day, (stamp, path, sheets) in WA_OLD_FILES.items():
+        url = WA_OLD.format(stamp) + path
+        workbook = fastexcel.read_excel(str(raw.cached(SOURCE, url).path))
+        for sheet, number in sheets.items():
+            votes = {"YES": {}, "NO": {}}
+            totals = {}
+            for row in workbook.load_sheet_by_name(sheet, header_row=None).to_polars().iter_rows():
+                cells = [cell for cell in row if cell is not None and str(cell).strip()]
+                name = next((str(cell) for cell in cells if not re.fullmatch(r"[\d.]+", str(cell))), None)
+                figures = [float(cell) for cell in cells if re.fullmatch(r"[\d.]+", str(cell))]
+                if len(figures) != 4 or name is None:
+                    continue
+                if name == "Total":
+                    totals = {"YES": int(figures[0]), "NO": int(figures[2])}
+                elif name in WA_COUNTIES:
+                    votes["YES"][name] = int(figures[0])
+                    votes["NO"][name] = int(figures[2])
+            if not totals:
+                totals = {answer: sum(counts.values()) for answer, counts in votes.items()}
+            found.append((day, number, url, votes, totals))
     for day, number, url, votes, totals in found:
         for answer in ("YES", "NO"):
             counts = votes.get(answer, {})
