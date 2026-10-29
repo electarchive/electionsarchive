@@ -1601,6 +1601,8 @@
   "chamber_within": "Chamber of",
   "chamber_nested": "Chambers",
   "chamber_no_election": "No election record for this term.",
+  "makeup_gap": "The chamber did not sit",
+  "makeup_gap_instead": "In its place: {bodies}",
   "chamber_governments": "Governments during the term",
   "chamber_changes": "Changes during the term",
   "chamber_changes_none": "No mid-term changes recorded in the archive.",

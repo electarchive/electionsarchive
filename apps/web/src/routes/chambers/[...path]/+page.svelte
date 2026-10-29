@@ -514,6 +514,7 @@
         terms={data.terms}
         parties={data.parties}
         governments={data.governments}
+        interim={body.siblings.filter((sibling) => sibling.id !== data.id)}
         basis={data.basis}
         bind:selected
       />

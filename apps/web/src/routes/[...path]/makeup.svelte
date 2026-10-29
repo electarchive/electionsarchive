@@ -6,6 +6,7 @@
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
 
@@ -13,6 +14,7 @@
     terms,
     parties,
     governments,
+    interim = [],
     isShare = false,
     selected = null,
     onselect,
@@ -70,6 +72,7 @@
       to: string | null;
       isCaretaker: boolean;
     }>;
+    interim?: Array<{ name: string; from: string | null; to: string | null }>;
     isShare?: boolean;
     selected?: number | null;
     onselect?: (index: number) => void;
@@ -592,12 +595,43 @@
     const found = columns.findIndex(
       (column) => x >= column.x0 && x < column.x1,
     );
-    return found < 0
-      ? x < (columns[0]?.x0 ?? 0)
-        ? 0
-        : columns.length - 1
-      : found;
+    if (found >= 0) {
+      return found;
+    }
+    return x < (columns[0]?.x0 ?? 0)
+      ? 0
+      : x >= (columns.at(-1)?.x1 ?? 0)
+        ? columns.length - 1
+        : null;
   };
+  const gap = $derived.by(() => {
+    if (pointer == null || hovered != null) {
+      return null;
+    }
+    const after = columns.findIndex((column) => column.x0 > (pointer ?? 0));
+    const before = columns[after - 1];
+    const next = columns[after];
+    if (before == null || next == null) {
+      return null;
+    }
+    const from = before.term.end ?? today;
+    const to = next.term.start;
+    const slack = 90 * 864e5;
+    return {
+      from,
+      to,
+      x0: before.x1,
+      x1: next.x0,
+      bodies: interim
+        .filter(
+          (body) =>
+            body.from != null &&
+            Date.parse(body.from) >= Date.parse(from) - slack &&
+            Date.parse(body.to ?? today) <= Date.parse(to) + slack,
+        )
+        .map((body) => body.name),
+    };
+  });
 </script>
 
 <Measured
@@ -639,7 +673,12 @@
         hovered = null;
       }
     }}
-    onclick={(event) => pick(locate(event))}
+    onclick={(event) => {
+      const index = locate(event);
+      if (index != null) {
+        pick(index);
+      }
+    }}
     onkeydown={(event) => {
       const moves: Record<string, number> = {
         ArrowRight: 1,
@@ -845,6 +884,29 @@
       >
     {/each}
   </svg>
+  {#if gap != null}
+    <div
+      class="pointer-events-none absolute grid gap-1 rounded-sm bg-card/95 px-2.5 py-2 text-xs shadow-menu ring-1 ring-border inline-60"
+      style:inset-inline-start="{gap.x1 + 248 > width
+        ? Math.max(0, gap.x0 - 248)
+        : gap.x1 + 8}px"
+      style:inset-block-start="{PAD.top}px"
+    >
+      <span class="text-[0.8125rem] font-semibold">{m.makeup_gap()}</span>
+      <span class="font-figures text-muted-foreground tabular-nums"
+        >{date(gap.from)} – {date(gap.to)}</span
+      >
+      {#if gap.bodies.length > 0}
+        <span
+          >{m.makeup_gap_instead({
+            bodies: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(gap.bodies),
+          })}</span
+        >
+      {/if}
+    </div>
+  {/if}
   {#if lit != null && part != null}
     {const leader = $derived(ranked[0])}
     <div
