@@ -1643,6 +1643,12 @@ NE_SOURCES = {
         "https://www.co.ocean.nj.us/WebContentFiles/954890cf-db00-4b5b-b2e3-52d4b843aa40.pdf",
         "nj/ocean_school_certification.pdf",
     ),
+    "NJ-34023-s": (
+        "Middlesex County Clerk",
+        "General Election 2026 Official Candidates List, school offices (updated 8/31/2026)",
+        "https://www.middlesexcountynj.gov/government/departments/department-of-community-services/office-of-county-clerk/election-services",
+        "nj/middlesex.pdf",
+    ),
     "NJ-34007": (
         "Camden County Clerk",
         "Official General Election sample ballots, November 3, 2026, Camden County municipalities",
