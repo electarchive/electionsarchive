@@ -1016,6 +1016,26 @@ FEEDS.update(
         "Sedgwick County Election Office",
         "Notice of General Election, November 3, 2026",
     ),
+    "OH-39165": (
+        "https://vote.warrencountyohio.gov/doc/Voting/100_Day_notice_for_November_3_2026.pdf",
+        "Warren County Board of Elections",
+        "Election Notice for the Federal Write-In Absentee Ballot, November 3, 2026 General Election",
+    ),
+    "OH-39041": (
+        "https://vote.delawarecountyohio.gov/wp-content/uploads/2026/10/46-DAY-NOV-2026-FWAB-PDF1.pdf",
+        "Delaware County Board of Elections",
+        "Election Notice for the Federal Write-In Absentee Ballot, November 3, 2026 General Election (revised 10/2/2026)",
+    ),
+    "OH-39155": (
+        "https://boe.co.trumbull.oh.gov/pdfs/100%20Day%20Notice.pdf",
+        "Trumbull County Board of Elections",
+        "Election Notice for the Federal Write-In Absentee Ballot, November 3, 2026 General Election",
+    ),
+    "IL-17161": (
+        "https://rockislandcountyil.gov/DocumentCenter/View/2818",
+        "Rock Island County Clerk",
+        "List of Candidates for the November 3, 2026 General Election",
+    ),
     "OR-41043-lyons": (
             "https://www.cityoflyons.org/",
             "City of Lyons",
@@ -1213,6 +1233,10 @@ DELIVERED = {
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
+    "OH-39165": DATA / "inbox" / "y26" / "oh" / "warren_cands.pdf",
+    "OH-39041": DATA / "inbox" / "y26" / "oh" / "delaware_cands.pdf",
+    "OH-39155": DATA / "inbox" / "y26" / "oh" / "trumbull_cands.pdf",
+    "IL-17161": DATA / "inbox" / "y26" / "il" / "rock_island_cands.pdf",
     "DE-10003": DATA / "inbox" / "y26" / "de" / "state.html",
     "DE-10001": DATA / "inbox" / "y26" / "de" / "state.html",
     "DE-10005": DATA / "inbox" / "y26" / "de" / "state.html",
