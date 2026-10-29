@@ -1040,6 +1040,8 @@ DELIVERED = {
     "SC": DATA / "inbox" / "y26" / "sc_candidates_2026-11-03_all.csv",
     "KY": DATA / "inbox" / "y26" / "ky" / "countycandidates_20261028.xls",
     "NM": DATA / "inbox" / "y26" / "nm_candidates_2026_all.csv",
+    "ME": DATA / "inbox" / "y26" / "ne" / "me_general_candidate_list_2026.xlsx",
+    "VT": DATA / "inbox" / "y26" / "ne" / "vt_ge_qualified_candidates_2026.xlsx",
     "NJ-34009": DATA / "inbox" / "y26" / "nj" / "cape_may.pdf",
     "NJ-34011": DATA / "inbox" / "y26" / "nj" / "cumberland.xlsx",
     "NJ-34019-r": DATA / "inbox" / "y26" / "nj" / "hunterdon_rep.pdf",
@@ -1172,17 +1174,76 @@ PUBLISHERS = {
         "The Contest List, General Election 2026 (tentative, printed 9/11/2026)",
     ),
     "04013": ("AZ", "Maricopa County Elections Department", "Official County Candidates, 2026 General Election"),
-    "NY": ("NY", "New York county boards of elections", "2026 General Election: Candidate Lists (county offices)"),
-    "NJ-34019-s": ("NJ", "Hunterdon County Clerk", "2026 General: Board of Education Candidates"),
-    "NJ-34025-s": ("NJ", "Monmouth County Clerk", "General Election, November 3, 2026: Board of Education Candidates"),
-    "NJ-34027-s": ("NJ", "Morris County Clerk", "General Election, November 3, 2026: Board of Education Candidates"),
-    "NJ-34039-s": ("NJ", "Union County Clerk", "General Election, November 3, 2026: Board of Education Candidates"),
     "17031c": (
         "IL",
         "Cook County Clerk",
         "View All Candidates, November 3, 2026 Gubernatorial General Election",
     ),
 }
+NE_SOURCES = {
+    "MA": (
+        "Massachusetts Secretary of the Commonwealth",
+        "Massachusetts Election Statistics: 2026 State Primary, county and district offices",
+        "https://electionstats.state.ma.us/elections/search/year_from:2026/year_to:2026",
+        "ne/ma_electionstats_2026_search.html",
+    ),
+    "NJ-34019-s": (
+        "Hunterdon County Clerk",
+        "Annual School Election, November 3, 2026 (unofficial)",
+        "https://www.co.hunterdon.nj.us/DocumentCenter/View/20403/UnOfficial-School-Board-Candidates-2026-PDF",
+        "nj/hunterdon_school.pdf",
+    ),
+    "NJ-34025-s": (
+        "Monmouth County Clerk",
+        "General Election, November 3, 2026: Official List, Board of Education Candidates (9/1/2026)",
+        "https://www.monmouthcountyvotes.gov/wp-content/uploads/2026/09/2026-11-03-General-Election-Candidates-Board-of-Education5.pdf",
+        "nj/monmouth_school.pdf",
+    ),
+    "NJ-34027-s": (
+        "Morris County Clerk",
+        "Candidates for School Board, General Election, November 3, 2026",
+        "https://www.morriscountyclerk.org/files/sharedassets/clerk/v/17/elections/past-results/2026-general-school-candidates.pdf",
+        "nj/morris_school.pdf",
+    ),
+    "NJ-34039-s": (
+        "Union County Clerk",
+        "Candidate List for the School Board Election, November 3, 2026 (8/12/2026)",
+        "https://unioncountyvotes.com/wp-content/uploads/2026/08/School-Board-2026-Candidate-List-8-12-26_.pdf",
+        "nj/union_school.pdf",
+    ),
+}
+for county, url in {
+    "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
+    "Erie": "https://elections.erie.gov/pdfs/2026%20General%20Candidates%20List%20For%20Web.pdf",
+    "Monroe": "https://www.monroecounty.gov/files/boe/Documents/GE26%20Candidates%20List%20-%20CERTIFICATION%2020260911%20-%20WEB.pdf",
+    "Onondaga": "https://onondaga.gov/elections/wp-content/uploads/sites/191/2026/09/GE26-Candidates-List-NO-ADDRESSES-3.pdf",
+    "Albany": "https://content.civicplus.com/api/assets/cd5f13cf-73f6-4151-bf22-82fa793f04e1",
+    "Dutchess": "https://elections.dutchessny.gov/wp-content/uploads/2026/09/Candidate-Notice-Website-1.pdf",
+    "Broome": "https://www.broomevotes.com/_files/ugd/be9a23_1289c9ca6ac143fe92ebbc505c8667c7.pdf",
+    "Rensselaer": "https://www.rensco.com/DocumentCenter/View/6785/Rensselaer-County-Candidates-List-General-2026",
+    "Chautauqua": "https://chautauquacountyny.gov/sites/default/files/inline-files/GE26%20Candidate%20Certification%20for%20Website.pdf",
+    "Putnam": "https://boe.putnamcountyny.gov/wp-content/uploads/2026/09/2026-LIST-CANDIDATES-PROPOSITIONS-GENERAL.pdf",
+    "Cattaraugus": "https://www.cattco.gov/sites/default/files/2026-09/Cattaraugus-Certification-GE26-signed--opt.pdf",
+    "Niagara": "https://elections.niagaracounty.gov/wp-content/uploads/2026/09/20260915163539-ge26-ballot-order-offices-and-candidates-for-november-3-2026.pdf",
+    "Ulster": "https://elections.ulstercountyny.gov/wp-content/uploads/2026/10/ULS-Ballots.pdf",
+    "Warren": "https://www.warrencountyny.gov/sites/default/files/boe/election/2026/2026%20Certification%20of%20Candidates%20and%20propositions%20-%20General(2).pdf",
+    "Jefferson": "https://www.jeffersoncountyny.gov/media/Elections/2026%20General%20Election%20Certification/GE26%20Ballot%20Certification%20-%20executed.pdf",
+    "Hamilton": "https://www.hamiltoncountyny.gov/sites/default/files/2025-09/2026%20Petition%20Report%20Final.pdf",
+    "Westchester": "https://citizenparticipation.westchestercountyny.gov/images/stories/pdfs/2026/2026-candidate-list-no-address.pdf",
+    "Herkimer": "https://herkimercountyny.gov/download/document.php?docid=5766",
+}.items():
+    NE_SOURCES[f"NY-{county}"] = (
+        f"{county} County Board of Elections",
+        "2026 General Election: Candidates (unofficial)"
+        if county == "Westchester"
+        else "2026 General Election: Candidates",
+        url,
+        f"ny/{county.lower()}.pdf",
+    )
+for key, (publisher, title, url, local) in NE_SOURCES.items():
+    PUBLISHERS[key] = (key[:2], publisher, title)
+    FILES[key] = url
+    DELIVERED[key] = DATA / "inbox" / "y26" / local
 COUNTIES = {"06073": "San Diego County", "06059": "Orange County"}
 OFFICES = {
     "0644000": [
@@ -1400,7 +1461,11 @@ def fetch() -> None:
                     DELIVERED[fips].read_bytes(),
                     suffix=DELIVERED[fips].suffix,
                     retrieved_at=datetime.fromtimestamp(DELIVERED[fips].stat().st_mtime, UTC),
-                    media_type="application/json" if fips == "17031c" else "application/pdf",
+                    media_type="application/json"
+                    if fips == "17031c"
+                    else "text/html"
+                    if DELIVERED[fips].suffix == ".html"
+                    else "application/pdf",
                 )
             continue
         try:
@@ -3556,17 +3621,39 @@ def parse() -> None:
                 }
             )
 
-    for row in [
-        row
+    tsv_rows = [
+        (state, number, row)
         for state in ("oh", "fl", "ca", "nj", "counties", "ne")
-        for row in csv.DictReader(
-            Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
+        for number, row in enumerate(
+            csv.DictReader(
+                Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
+            ),
+            start=2,
         )
-    ]:
+    ]
+    named_parties = {row["party"] for _, _, row in tsv_rows if ":" in row["party"]}
+    with connect() as conn:
+        known_parties = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.party' and value = any(%s)", [list(named_parties)]
+            )
+        }
+    unknown = [
+        f"local_2026_{state}.tsv row {number}: {row['party']}"
+        for state, number, row in tsv_rows
+        if ":" in row["party"] and row["party"] not in known_parties
+    ]
+    if unknown:
+        raise ValueError("party not in the archive:\n" + "\n".join(unknown))
+
+    for _, _, row in tsv_rows:
         named, independent = (row["party"], False) if ":" in row["party"] else party(row["party"])
         feeds[
-            row["key"] + "-s"
-            if row["key"] + "-s" in PUBLISHERS and "Board of Education" in row["contest"]
+            f"NY-{row['county']}"
+            if row["key"] == "NY"
+            else row["key"] + "-s"
+            if row["key"] + "-s" in NE_SOURCES and "Board of Education" in row["contest"]
             else row["key"]
         ].append(
             {
