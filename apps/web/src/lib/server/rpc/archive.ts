@@ -371,6 +371,13 @@ const PartyRef = v.object({
   color: v.nullable(v.string()),
 });
 
+const Held = v.object({
+  from: v.nullable(v.string()),
+  to: v.nullable(v.string()),
+  party: v.nullable(PartyRef),
+  isIndependent: v.boolean(),
+});
+
 const Winner = v.object({
   label: v.string(),
   person: v.nullable(v.string()),
@@ -20076,6 +20083,7 @@ export const people = {
               v.object({
                 from: v.nullable(v.string()),
                 to: v.nullable(v.string()),
+                parties: v.array(Held),
               }),
             ),
             seats: v.array(
@@ -20096,6 +20104,7 @@ export const people = {
             path: v.nullable(v.string()),
             from: v.string(),
             to: v.nullable(v.string()),
+            parties: v.array(Held),
           }),
         ),
         faithless: v.array(
@@ -20488,12 +20497,13 @@ export const people = {
       );
       const seated = new Set(spells.map((spell) => spell.owner));
       const wins = await db.execute<{
+        root: string;
         owner: string;
         isBody: boolean;
         from: string;
         to: string | null;
       }>(sql`
-        select o.owner, o.owner is not distinct from c.body_id as "isBody", e.date_from::text as from,
+        select c.id as root, o.owner, o.owner is not distinct from c.body_id as "isBody", e.date_from::text as from,
           coalesce(
             (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
@@ -20534,6 +20544,127 @@ export const people = {
             term.to = other.from;
           }
         }
+      }
+      const claims = await db.execute<{
+        owner: string | null;
+        party: string | null;
+        from: string | null;
+        to: string | null;
+        isExact: boolean;
+      }>(sql`
+        with recursive ids(id) as (
+          select ${person.id}::uuid
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        )
+        select coalesce(t.body_id, t.office_id) as owner, coalesce(pm.into_id, a.party_id) as party,
+          coalesce(lower(a.valid), t.from_date)::text as from, coalesce(upper(a.valid), t.to_date)::text as to,
+          true as "isExact"
+        from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
+        left join entity_merge pm on pm.entity_id = a.party_id
+        where t.person_id in (select id from ids)
+        union all
+        select null, coalesce(pm.into_id, m.party_id), m.valid_from::text, m.valid_to::text,
+          m.valid_from is not null and m.valid_from_precision in ('day', 'month')
+        from person_party_membership m left join party k on k.id = m.party_id
+        left join entity_merge pm on pm.entity_id = m.party_id
+        where m.person_id in (select id from ids) and k.kind is distinct from 'caucus'
+      `);
+      const chosen = new Map(
+        rows.rows
+          .filter((row) => row.party != null || row.independent)
+          .map((row) => [row.root, row.party] as const),
+      );
+      const painted = new Map<
+        object,
+        Array<{
+          from: string | null;
+          to: string | null;
+          party: string | null;
+          isIndependent: boolean;
+        }>
+      >();
+      for (const bar of [...spells, ...terms]) {
+        const start =
+          bar.from ??
+          (bar.to == null
+            ? ""
+            : new Date(Date.parse(bar.to) - 864e5).toISOString().slice(0, 10));
+        const stop = bar.to ?? "9999-12-31";
+        const pool = [
+          ...("root" in bar
+            ? wins.rows.flatMap((win) =>
+                win.owner === bar.owner && chosen.has(win.root)
+                  ? [
+                      {
+                        party: chosen.get(win.root) ?? null,
+                        from: win.from,
+                        to: win.to,
+                        rank: `1${win.from}`,
+                      },
+                    ]
+                  : [],
+              )
+            : claims.rows
+                .filter((claim) => claim.owner === bar.owner)
+                .map((claim) => ({ ...claim, rank: `1${claim.from ?? ""}` }))),
+          ...claims.rows
+            .filter((claim) => claim.owner == null)
+            .map((claim) => ({
+              ...claim,
+              rank:
+                "root" in bar && claim.isExact && (claim.from ?? "") > start
+                  ? `1${claim.from}`
+                  : `0${claim.from ?? ""}`,
+            })),
+        ].filter(
+          (claim) =>
+            (claim.from ?? "") < stop && (claim.to == null || claim.to > start),
+        );
+        const cuts = [
+          ...new Set([
+            start,
+            ...pool.flatMap((claim) =>
+              [claim.from, claim.to].flatMap((value) =>
+                value != null && value > start && value < stop ? [value] : [],
+              ),
+            ),
+          ]),
+        ].toSorted((a, b) => a.localeCompare(b));
+        const segments: Array<{
+          from: string | null;
+          to: string | null;
+          party: string | null;
+          isIndependent: boolean;
+        }> = [];
+        for (const [index, cut] of cuts.entries()) {
+          const winner = pool
+            .filter(
+              (claim) =>
+                (claim.from ?? "") <= cut &&
+                (claim.to == null || claim.to > cut),
+            )
+            .toSorted((a, b) => b.rank.localeCompare(a.rank))[0];
+          const party = winner?.party ?? null;
+          const isIndependent = winner != null && winner.party == null;
+          const to = cuts[index + 1] ?? bar.to;
+          const last = segments.at(-1);
+          if (
+            last != null &&
+            (winner == null ||
+              (last.party === party && last.isIndependent === isIndependent))
+          ) {
+            last.to = to;
+          } else {
+            segments.push({
+              from: index === 0 ? bar.from : cut,
+              to,
+              party,
+              isIndependent,
+            });
+          }
+        }
+        painted.set(bar, segments);
       }
       const joint = await db.execute<{
         root: string;
@@ -20730,7 +20861,17 @@ export const people = {
       const homes = [...new Set(housed.rows.map((row) => row.polity))];
       const [faces, owned, peers, homeSlugs] = await Promise.all([
         portraits([person.id]),
-        refs([own, caucus].filter((id) => id != null)),
+        refs([
+          ...new Set(
+            [
+              own,
+              caucus,
+              ...painted
+                .values()
+                .flatMap((segments) => segments.map((segment) => segment.party)),
+            ].filter((id) => id != null),
+          ),
+        ]),
         Promise.all(homes.map((polity) => chambers(polity))).then(
           (found) =>
             new Map(found.flat().map((peer) => [peer.id, peer.slug] as const)),
@@ -20829,7 +20970,17 @@ export const people = {
               to: group.some((spell) => spell.to == null)
                 ? null
                 : (group.at(-1)?.to ?? null),
-              spans: group.map((spell) => ({ from: spell.from, to: spell.to })),
+              spans: group.map((spell) => ({
+                from: spell.from,
+                to: spell.to,
+                parties: (painted.get(spell) ?? []).map((segment) => ({
+                  ...segment,
+                  party:
+                    segment.party == null
+                      ? null
+                      : (owned.get(segment.party) ?? null),
+                })),
+              })),
               seats,
             };
           })
@@ -20847,6 +20998,13 @@ export const people = {
             path: chamberPath.get(term.owner) ?? null,
             from: term.from,
             to: term.to,
+            parties: (painted.get(term) ?? []).map((segment) => ({
+              ...segment,
+              party:
+                segment.party == null
+                  ? null
+                  : (owned.get(segment.party) ?? null),
+            })),
           }))
           .toSorted((a, b) => b.from.localeCompare(a.from)),
         record,

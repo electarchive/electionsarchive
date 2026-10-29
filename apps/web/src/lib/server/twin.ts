@@ -1392,7 +1392,7 @@ function personMarkdown(
         : [
             `## ${title}`,
             table(
-              [m.col_name(), m.person_years()],
+              [m.col_name(), m.person_years(), m.col_party()],
               spells.map((spell) => [
                 `${spell.isBody ? link(spell.name, spell.path ?? `id/${spell.id}`) : link(spell.name, spell.path)}${
                   "seats" in spell && spell.seats.length > 0
@@ -1415,6 +1415,27 @@ function personMarkdown(
                 ("spans" in spell ? spell.spans : [spell])
                   .map((part) => years(part.from, part.to))
                   .join(", "),
+                (() => {
+                  const held = ("spans" in spell ? spell.spans : [spell])
+                    .flatMap((part) => part.parties)
+                    .map((segment) => ({
+                      ...segment,
+                      label:
+                        segment.party?.short ??
+                        segment.party?.label ??
+                        (segment.isIndependent
+                          ? m.person_parties_none()
+                          : m.record_none()),
+                    }));
+                  return new Set(held.map((segment) => segment.label)).size <= 1
+                    ? (held[0]?.label ?? "")
+                    : held
+                        .map(
+                          (segment) =>
+                            `${segment.label} (${years(segment.from, segment.to)})`,
+                        )
+                        .join(", ");
+                })(),
               ]),
             ),
           ],

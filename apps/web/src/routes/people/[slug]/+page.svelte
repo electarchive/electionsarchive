@@ -3,8 +3,10 @@
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
+  import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, credit, date, percent } from "#lib/format.js";
   import { explain, LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -175,6 +177,18 @@
   const since = $derived(
     person.isGone ? m.person_served_from : m.person_served_now,
   );
+  const tether = TooltipPrimitive.createTether<{
+    label: string;
+    color: string;
+    from: string | null;
+    to: string | null;
+  }>();
+  const month = (value: string) =>
+    new Intl.DateTimeFormat(getLocale(), {
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${value.slice(0, 10)}T00:00:00Z`));
 </script>
 
 {#snippet spells(
@@ -187,7 +201,32 @@
     path: string | null;
     from: string | null;
     to: string | null;
-    spans?: Array<{ from: string | null; to: string | null }>;
+    parties?: Array<{
+      from: string | null;
+      to: string | null;
+      party: {
+        id: string;
+        label: string;
+        short: string | null;
+        color: string | null;
+      } | null;
+      isIndependent: boolean;
+    }>;
+    spans?: Array<{
+      from: string | null;
+      to: string | null;
+      parties: Array<{
+      from: string | null;
+      to: string | null;
+      party: {
+        id: string;
+        label: string;
+        short: string | null;
+        color: string | null;
+      } | null;
+      isIndependent: boolean;
+    }>;
+    }>;
     seats?: Array<{
       name: string;
       from: string | null;
@@ -230,14 +269,71 @@
               {const x1 = $derived(
                 note != null && part.to == null ? x0 : at(part.to),
               )}
+              {const width = $derived(Math.max(x1 - x0, 0.01))}
               <span
-                class={cn("absolute inset-y-0 rounded-full", {
-                  "bg-(--party)": note == null,
-                  "border border-(--party) bg-(--party)/35": note != null,
-                })}
+                class="absolute inset-y-0 flex"
                 style:inset-inline-start="{x0 * 100}%"
-                style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
-              ></span>
+                style:inline-size="{width * 100}%"
+              >
+                {#each part.parties ?? [] as held, index (index)}
+                  {const color = $derived(
+                    held.party == null
+                      ? held.isIndependent
+                        ? swatch(null, "independent")
+                        : "color-mix(in oklab, var(--muted-foreground) 22%, var(--card))"
+                      : swatch(held.party.color, `party:${held.party.id}`),
+                  )}
+                  {const start = $derived(
+                    index === 0 ? x0 : at(held.from ?? part.from),
+                  )}
+                  {const stop = $derived(
+                    index === (part.parties?.length ?? 0) - 1
+                      ? x0 + width
+                      : at(held.to ?? part.to),
+                  )}
+                  <Tooltip.Trigger
+                    {tether}
+                    payload={{
+                      label:
+                        held.party?.label ??
+                        (held.isIndependent
+                          ? m.person_parties_none()
+                          : m.record_none()),
+                      color,
+                      from: held.from,
+                      to: held.to,
+                    }}
+                    tabindex={-1}
+                  >
+                    {#snippet child({ props })}
+                      <span
+                        {...props}
+                        class={cn(
+                          "block shrink-0 grow-0 first:rounded-s-full last:rounded-e-full",
+                          {
+                            "bg-(--party)": note == null,
+                            "border border-(--party) bg-(--party)/35":
+                              note != null,
+                          },
+                          { "ms-px": index > 0 },
+                        )}
+                        style:--party={color}
+                        style:flex-basis="{(Math.max(stop - start, 0) /
+                          width) *
+                          100}%"
+                      ></span>
+                    {/snippet}
+                  </Tooltip.Trigger>
+                {:else}
+                  <span
+                    class={cn("block grow", {
+                      "bg-(--party)": note == null,
+                      "rounded-full border border-(--party) bg-(--party)/35":
+                        note != null,
+                    })}
+                  ></span>
+                {/each}
+              </span>
             {/each}
           </span>
           <span
@@ -655,4 +751,33 @@
       {/if}
     </section>
   </article>
+  <Tooltip.Root {tether} delayDuration={120}>
+    {#snippet children({ payload })}
+      {#if payload != null}
+        <Tooltip.Content
+          collisionPadding={8}
+          class="grid gap-0.5 leading-snug inline-[min(18rem,calc(100vw-2rem))]"
+        >
+          <span class="flex items-center gap-1.5 font-semibold"
+            ><span
+              class="shrink-0 rounded-full bg-(--party) block-2 inline-2"
+              style:--party={payload.color}
+            ></span>{payload.label}</span
+          >
+          <span class="font-figures text-muted-foreground tabular-nums"
+            >{payload.from == null
+              ? payload.to == null
+                ? ""
+                : month(payload.to)
+              : payload.to == null
+                ? since({ from: month(payload.from) })
+                : m.person_served_span({
+                    from: month(payload.from),
+                    to: month(payload.to),
+                  })}</span
+          >
+        </Tooltip.Content>
+      {/if}
+    {/snippet}
+  </Tooltip.Root>
 </main>
