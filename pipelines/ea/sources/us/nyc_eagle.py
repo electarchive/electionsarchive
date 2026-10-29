@@ -29,11 +29,15 @@ YEARS = {
     1903: {
         "volume": "eagle1905",
         "item": "brooklyndailyeag00unse_5",
-        "pages": [636],
+        "pages": [636, 638, 645],
         "recap": None,
         "day": date(1903, 11, 3),
         "title": "Brooklyn Daily Eagle Almanac 1905",
-        "table": True,
+        "table": [
+            {"page": 636, "county": "BROOKLYN", "ads": 21, "columns": range(1, 9)},
+            {"page": 638, "county": "MANHATTAN", "ads": 36, "columns": range(1, 11)},
+            {"page": 645, "county": "QUEENS", "ads": 3, "columns": range(1, 9)},
+        ],
     },
     1901: {
         "volume": "eagle1902",
@@ -176,51 +180,66 @@ def parse() -> None:
     for year, spec in YEARS.items():
         volume = spec["volume"]
         if spec.get("table"):
-            reads = []
-            headers = []
-            for path in sorted(INBOX.glob(f"{volume}-p{spec['pages'][0]}-*.json")):
-                try:
-                    data = json.loads(path.read_text())
-                except json.JSONDecodeError:
-                    continue
-                cells = {p["ad"]: [number(cell) for cell in p["rows"][0]["cells"]] for p in data["panels"] if p["rows"]}
-                ads = {
-                    int(label): row
-                    for label, row in cells.items()
-                    if label.isdigit() and len(row) == len(data["columns"])
-                }
-                if "Totals" in cells and len(ads) == 21:
-                    reads.append(
-                        {
-                            "eds": ads,
-                            "total": cells["Totals"],
-                            "skip": {0, *range(9, 20)},
-                            "width": len(data["columns"]),
-                            "page": spec["pages"][0],
-                            "columns": data["columns"],
-                        }
-                    )
-                    headers.append(data["columns"])
-            result, why = settle(reads, 20, strict=True) if reads else (None, "no complete reads")
             out = []
-            if result is None:
-                print(year, why)
-            else:
-                header = [Counter(column).most_common(1)[0][0] for column in zip(*headers)]
-                for ad, row in result[0].items():
-                    for index in range(1, 17):
-                        out.append(
+            for table in spec["table"]:
+                reads = []
+                for path in sorted(INBOX.glob(f"{volume}-p{table['page']}-*.json")):
+                    try:
+                        data = json.loads(path.read_text())
+                    except json.JSONDecodeError:
+                        continue
+                    ads = {}
+                    total = None
+                    for panel in data["panels"]:
+                        label = panel["ad"].strip()
+                        if label.isdigit() and len(panel["rows"]) == 1:
+                            ads[int(label)] = [number(cell) for cell in panel["rows"][0]["cells"]]
+                        elif re.match(r"(?i)(totals?|tls)", label) and panel["rows"]:
+                            total = [number(cell) for cell in panel["rows"][0]["cells"]]
+                        else:
+                            for row in panel["rows"]:
+                                ads[row["ed"] or 99] = [number(cell) for cell in row["cells"]]
+                            if panel["total"]:
+                                total = [number(cell) for cell in panel["total"]]
+                    width = len(data["columns"])
+                    ads = {ad: cells for ad, cells in ads.items() if len(cells) == width}
+                    if total is not None and len(total) == width and len(ads) == table["ads"]:
+                        reads.append(
                             {
-                                "county": "BROOKLYN",
-                                "ad": ad,
-                                "ed": 0,
-                                "column": index,
-                                "value": row[index],
-                                "page": spec["pages"][0],
-                                "header": header[index],
+                                "eds": ads,
+                                "total": total,
+                                "skip": {i for i in range(width) if i not in table["columns"]},
+                                "width": width,
+                                "page": table["page"],
+                                "columns": data["columns"],
                             }
                         )
-                print(year, "assembly districts loaded", len(result[0]), "from", len(reads), "reads")
+                if not reads:
+                    print(year, table["page"], "no complete reads")
+                    continue
+                result, why = settle(reads, max(read["width"] for read in reads), strict=True)
+                if result is None:
+                    print(year, table["page"], why)
+                    continue
+                header = [Counter(column).most_common(1)[0][0] for column in zip(*[read["columns"] for read in reads])]
+                for ad, row in result[0].items():
+                    if ad == 99:
+                        continue
+                    county = "BRONX" if table["county"] == "MANHATTAN" and ad >= 31 else table["county"]
+                    for index in table["columns"]:
+                        if row[index] is not None:
+                            out.append(
+                                {
+                                    "county": county,
+                                    "ad": ad,
+                                    "ed": 0,
+                                    "column": index,
+                                    "value": row[index],
+                                    "page": table["page"],
+                                    "header": header[index],
+                                }
+                            )
+                print(year, table["page"], "assembly districts loaded", len(result[0]), "from", len(reads), "reads")
             pl.DataFrame(
                 out,
                 schema={
@@ -620,13 +639,15 @@ def emit():
                         entity_id=result_set,
                         kind="methodology",
                         body_md=(
-                            f"Assembly district returns for Brooklyn transcribed from the {spec['title']}, which prints one row per assembly district and a borough total row. Every column loaded adds up exactly to the printed borough total across three independent readings of the page; the almanac prints only the Fusion and Democratic lines for each office, so minor-party candidates are absent."
+                            f"Assembly district returns for {county.title()} transcribed from the {spec['title']}, which prints one row per assembly district and a borough total row. Every column loaded adds up exactly to the printed borough total across three independent readings of the page; the almanac prints only the Fusion and Democratic lines for each office, so minor-party candidates are absent."
                             if spec.get("table")
                             else f"Election district and assembly district returns transcribed from the {spec['title']}, a compendium that prints only assembly district totals and omits minor-party lines. A district is loaded only when every column of its election districts adds up to the printed assembly district total, or to within a few votes of it where the almanac's own total does not add up and every reading of the page agrees."
                         )
                         + (
                             " Only the Brooklyn tables were read, so the citywide sets carry no completeness."
                             if year == 1901
+                            else " Only the Brooklyn and Queens tables tie to their printed totals; the Manhattan and Bronx table is left out, so the citywide sets carry no completeness."
+                            if year == 1903
                             else ""
                         )
                         + left,
