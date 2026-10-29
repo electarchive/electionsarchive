@@ -42,6 +42,21 @@ FILES = {
     "17031c": "https://www.cookcountyclerkil.gov/elections/current-elections/view-all-candidates#GetAllCandidates.json",
 }
 FEEDS = {
+    "ME": (
+        "https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/2026%20General%20Candidate%20List%20-%20FINAL.xlsx",
+        "Maine Secretary of State",
+        "2026 General Candidate List",
+    ),
+    "VT": (
+        "https://outside.vermont.gov/dept/sos/Elections_Division/election_info_resources/candidates/2026_general_election_qualified_candidates.xlsx",
+        "Vermont Secretary of State",
+        "2026 General Election Qualified Candidates",
+    ),
+    "OK": (
+        "https://hosting.okelections.gov/electionlist.html",
+        "Oklahoma State Election Board",
+        "November 2026 List of Elections",
+    ),
     "NC": (
         "https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2026/Candidate%20Filing/Candidate_Listing_2026.csv",
         "North Carolina State Board of Elections",
@@ -1157,6 +1172,11 @@ PUBLISHERS = {
         "The Contest List, General Election 2026 (tentative, printed 9/11/2026)",
     ),
     "04013": ("AZ", "Maricopa County Elections Department", "Official County Candidates, 2026 General Election"),
+    "NY": ("NY", "New York county boards of elections", "2026 General Election: Candidate Lists (county offices)"),
+    "NJ-34019-s": ("NJ", "Hunterdon County Clerk", "2026 General: Board of Education Candidates"),
+    "NJ-34025-s": ("NJ", "Monmouth County Clerk", "General Election, November 3, 2026: Board of Education Candidates"),
+    "NJ-34027-s": ("NJ", "Morris County Clerk", "General Election, November 3, 2026: Board of Education Candidates"),
+    "NJ-34039-s": ("NJ", "Union County Clerk", "General Election, November 3, 2026: Board of Education Candidates"),
     "17031c": (
         "IL",
         "Cook County Clerk",
@@ -3538,13 +3558,17 @@ def parse() -> None:
 
     for row in [
         row
-        for state in ("oh", "fl", "ca", "nj", "counties")
+        for state in ("oh", "fl", "ca", "nj", "counties", "ne")
         for row in csv.DictReader(
             Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
         )
     ]:
         named, independent = (row["party"], False) if ":" in row["party"] else party(row["party"])
-        feeds[row["key"]].append(
+        feeds[
+            row["key"] + "-s"
+            if row["key"] + "-s" in PUBLISHERS and "Board of Education" in row["contest"]
+            else row["key"]
+        ].append(
             {
                 "county": row.get("county") or row["contest"].split(" County")[0],
                 "contest": row["contest"],
@@ -3801,16 +3825,16 @@ def parse() -> None:
             )
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
-            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY"]) & (pl.col("FUNCSTAT") == "A"))
+            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK"]) & (pl.col("FUNCSTAT") == "A"))
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
-        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky)/[^/]+$'")}
+        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok)/[^/]+$'")}
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -3858,7 +3882,7 @@ def parse() -> None:
             used: dict[str, str] = {}
             missed: set[str] = set()
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
-            if "-" in key and key != "MN-county" or key == "KY":
+            if "-" in key and key != "MN-county" or key in ("KY", "OK"):
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
                         """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
@@ -3987,7 +4011,7 @@ def parse() -> None:
                     template is None
                     and (
                         state in ("NJ", "MI", "FL", "OR")
-                        or state == "KY"
+                        or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state == "CA"
                         and bool(fits)
