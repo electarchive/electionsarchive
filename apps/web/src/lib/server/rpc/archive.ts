@@ -1450,6 +1450,7 @@ async function load(
       order by rs.contest_id, a.k,
         exists (select from source s where s.id = rs.source_id and s.license ilike '%ICPSR%'),
         (exists (select from source s where s.id = rs.source_id and s.kind = 'official_body')
+          and (rs.is_default or rs.stage not in ('preliminary', 'live'))
           and exists (select from result_rollup_unit u where u.result_set_k = rs.k and u.area_k = a.k)) desc,
         rs.is_default desc, array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
     )
