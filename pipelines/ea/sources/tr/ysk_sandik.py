@@ -30,6 +30,7 @@ from ea.sources.tr.ysk import (
     INDEPENDENTS_DOMESTIC_2018,
     INDEPENDENTS_DOMESTIC_JUNE_2015,
     ISTANBUL_CELLS,
+    ISTANBUL_INDEPENDENTS,
     MARCH,
     PARTIES,
     PARTIES_2011,
@@ -49,7 +50,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
-VERSION = "14"
+VERSION = "16"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -548,6 +549,12 @@ def emit() -> Path:
                     default=None,
                 )
             )
+            .when(pl.col("slug") == "2019-buyuksehir-birinci-tur-belediye-baskanligi-secimleri")
+            .then(
+                pl.col("label").replace_strict(
+                    LABELS | {printed: label for label, printed, _ in ISTANBUL_INDEPENDENTS}, default=None
+                )
+            )
             .otherwise(
                 pl.col("label").replace_strict(
                     LABELS, default=pl.when(parliament).then(pl.lit(INDEPENDENTS)).otherwise(pl.lit("others"))
@@ -578,7 +585,10 @@ def emit() -> Path:
             .agg(pl.col("votes").sum())
             .iter_rows()
         )
-        rerun = votes.filter((pl.col("contest") == f"{RERUN}:istanbul-mayor") & (pl.col("option") == "others"))
+        rerun = votes.filter(
+            (pl.col("contest") == f"{RERUN}:istanbul-mayor")
+            & pl.col("option").is_in([label for label, *_ in ISTANBUL_INDEPENDENTS])
+        )
         if independents != {
             str(ROUND_DAYS[1]): INDEPENDENTS_DOMESTIC,
             str(DAY_2018): INDEPENDENTS_DOMESTIC_2018,
@@ -638,7 +648,12 @@ def emit() -> Path:
                 )
             elif contest_key == f"{MARCH}:istanbul-mayor":
                 cs.add(
-                    "contest_option", id=id, contest_id=contest, kind="independents", party_id=None, ballot_label=INDEPENDENTS
+                    "contest_option",
+                    id=id,
+                    contest_id=contest,
+                    kind="independents",
+                    party_id=None,
+                    ballot_label=INDEPENDENTS,
                 )
             elif (alliance := alliances.get(f"{contest_key[:10]}:{option}")) is not None and alliance not in cs.minted:
                 cs.add(
@@ -708,7 +723,7 @@ def emit() -> Path:
                 is_default=False,
                 completeness=None if denominator is None else round(counted / denominator, 4),
             )
-            if result_set in cs.minted or (
+            if result_set in cs.minted or contest_key == f"{RERUN}:istanbul-mayor" or (
                 contest_key in unattributed["contest"]
                 and contest_key.startswith(str(DAY_2011))
                 and not conn.execute(

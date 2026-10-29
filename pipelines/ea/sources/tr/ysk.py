@@ -895,9 +895,35 @@ ATALAY_REMOVED = (
     "Elected while in prison and never sworn in. His membership ended when the Court of Cassation's ruling upholding "
     "his conviction was read out in the General Assembly."
 )
-ISTANBUL_CAVEAT = (
+ISTANBUL_CAVEAT_OLD = (
     "YSK tables label votes by party, not by candidate, and give independent candidates only as a combined total."
 )
+ISTANBUL_CAVEAT = (
+    "YSK's gazette table labels votes by party, not by candidate, and gives the 17 independent candidates only as a "
+    "combined total of 6,622. Each independent's votes here are summed from YSK's ballot-box results, which add up to "
+    "that total."
+)
+RERUN_LIST = "https://www.aa.com.tr/tr/politika/istanbul-yenileme-secimi-icin-kesin-aday-listesi-aciklandi/1490372"
+RERUN_STANDING = {"Saadet Partisi": "Necdet Gökçınar", "Vatan Partisi": "Mustafa İlker Yücel"}
+ISTANBUL_INDEPENDENTS = [
+    ("Seçkin İlker", "SEÇKİN İLKER", 1557),
+    ("Dursun Ali Bacıoğlu", "DURSUNALİ BACIOĞLU", 1131),
+    ("Lütfü Yılmaz", "LÜTFÜ YILMAZ", 577),
+    ("Doğan Duman", "DOĞAN DUMAN", 517),
+    ("Fatma Ragibe Kanıkuru Loğoğlu", "FATMA RAGİBE KANIKURU LOĞOĞLU", 462),
+    ("Vedat Öztürk", "VEDAT ÖZTÜRK", 353),
+    ("Muhammet Ali Canca", "MUHAMMET ALİ CANCA", 320),
+    ("Ahmet Çördük", "AHMET ÇÖRDÜK", 274),
+    ("Mehmet Yıldız", "MEHMET YILDIZ", 242),
+    ("Burak Kadıoğlu", "BURAK KADIOĞLU", 233),
+    ("Özkan Mustafa Küçükkural", "ÖZKAN MUSTAFA KÜÇÜKKURAL", 202),
+    ("Güldes Önkoyun", "GÜLDES ÖNKOYUN", 196),
+    ("Burhan Erol", "BURHAN EROL", 162),
+    ("Ali Rıza Kansız", "ALİ RIZA KANSIZ", 121),
+    ("Mehmet Ali Aydoğmuş", "MEMET ALİ AYDOĞMUŞ", 94),
+    ("Hasan Atasoy Torun", "HASAN ATASOY TORUN", 92),
+    ("Abdul Celil Gülalp", "ABDULCELİL GÜLAP", 89),
+]
 PROVINCES = [
     "Adana",
     "Adıyaman",
@@ -2119,6 +2145,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=suffix)
     for url, *_, suffix in SWITCH_SOURCES.values():
         raw.fetch(SOURCE, url, suffix=suffix)
+    raw.fetch(SOURCE, RERUN_LIST, suffix=".html")
     for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS, LISTS_2007):
         raw.fetch(SOURCE, url, suffix=".rtf")
     for url in (MAYORS, MPS_2018, MPS_2015, MPS_JUNE_2015, MPS_2011, OZONDER_ITEM):
@@ -7765,7 +7792,7 @@ def emit() -> Path:
                 "held",
                 "June 2019 İstanbul mayoral election",
                 "23 Haziran 2019 İstanbul Büyükşehir Belediye Başkanlığı Seçimi",
-                ("Saadet Partisi", "Vatan Partisi", "Cumhuriyet Halk Partisi", "Adalet ve Kalkınma Partisi", "others"),
+                ("Saadet Partisi", "Vatan Partisi", "Cumhuriyet Halk Partisi", "Adalet ve Kalkınma Partisi"),
             ),
         ):
             election = cs.key("tr.election", f"{day}:istanbul-mayor")
@@ -7819,12 +7846,84 @@ def emit() -> Path:
             else:
                 cs.add("external_id", entity_id=election, scheme="wikidata", value=RERUN_ELECTION)
                 cs.add("note", entity_id=contest, kind="caveat", body_md=ISTANBUL_CAVEAT)
+                for (old,) in conn.execute(
+                    "select id from note where entity_id = %s and body_md = %s", [contest, ISTANBUL_CAVEAT_OLD]
+                ).fetchall():
+                    cs.add(
+                        "note_drop",
+                        note_id=old,
+                        entity_id=contest,
+                        body_md=ISTANBUL_CAVEAT_OLD,
+                        reason="Replaced by the named independents.",
+                    )
                 declared = result_set(contest_key, election, contest, ISTANBUL)
+                rerun_list = cs.source("Anadolu Ajansı", "İstanbul yenileme seçimi için kesin aday listesi açıklandı")
+                cs.add(
+                    "source",
+                    id=rerun_list,
+                    kind="news_agency",
+                    publisher="Anadolu Ajansı",
+                    title="İstanbul yenileme seçimi için kesin aday listesi açıklandı",
+                    url=RERUN_LIST,
+                    notes="Reports the İstanbul Provincial Election Board's final list of candidates for June 23, 2019.",
+                )
+                cs.artifact(raw.cached(SOURCE, RERUN_LIST), rerun_list)
+                cs.add("citation", entity_id=contest, source_id=rerun_list, locator=None)
+                boxes = cs.source(
+                    "Yüksek Seçim Kurulu (YSK)", "Election results by province, district, and neighborhood"
+                )
+                cs.add("citation", entity_id=declared, source_id=boxes, locator=None)
+                if sum(votes for *_, votes in ISTANBUL_INDEPENDENTS) != ISTANBUL_CELLS[-1][2]:
+                    raise ValueError("İstanbul 2019: independents do not add up to the gazette's total")
+                for label, printed, votes in ISTANBUL_INDEPENDENTS:
+                    option = cs.key("tr.option", f"{contest_key}:{slug(label)}")
+                    options[f"{contest_key}:{label}"] = str(option)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=None,
+                        ballot_label=label,
+                    )
+                    person = cs.key("tr.person", f"{contest_key}:{slug(label)}")
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, label)
+                        if title(printed) != label:
+                            name(person, title(printed), kind="ballot")
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("tr.candidacy", f"{contest_key}:{slug(label)}"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        member_of_party_id=None,
+                        is_independent=True,
+                    )
+                    facts.append(
+                        {
+                            "set": contest_key,
+                            "unit": str(units["34"]),
+                            "option": str(option),
+                            "channel": 0,
+                            "measure": VOTES,
+                            "value": votes,
+                            "page": None,
+                            "box": None,
+                        }
+                    )
             for party in standing:
                 candidate, supporter = {
                     "Cumhuriyet Halk Partisi": ("Ekrem İmamoğlu", "İYİ Parti"),
                     "Adalet ve Kalkınma Partisi": ("Binali Yıldırım", "Milliyetçi Hareket Partisi"),
                 }.get(party, (None, None))
+                if day == RERUN and party in RERUN_STANDING:
+                    candidate = RERUN_STANDING[party]
+                    persons[candidate] = cs.key("tr.person", f"{contest_key}:{slug(candidate)}")
+                    if persons[candidate] in cs.minted:
+                        cs.add("person", id=persons[candidate])
+                        name(persons[candidate], candidate)
                 option = cs.key("tr.option", f"{contest_key}:{slug(party)}")
                 options[f"{contest_key}:{party}"] = str(option)
                 cs.add(
@@ -7835,7 +7934,7 @@ def emit() -> Path:
                     party_id=None if party == "others" else parties[party],
                     ballot_label=INDEPENDENTS if party == "others" else party,
                 )
-                if candidate is not None and supporter is not None:
+                if candidate is not None:
                     candidacy = cs.key("tr.candidacy", f"{contest_key}:{slug(candidate)}")
                     cs.add(
                         "candidacy",
@@ -7847,12 +7946,21 @@ def emit() -> Path:
                         is_independent=False,
                     )
                     cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[party], kind="nominated")
-                    cs.add(
-                        "candidacy_nomination", candidacy_id=candidacy, party_id=parties[supporter], kind="supported"
-                    )
+                    if supporter is not None:
+                        cs.add(
+                            "candidacy_nomination",
+                            candidacy_id=candidacy,
+                            party_id=parties[supporter],
+                            kind="supported",
+                        )
                 if candidate == "Ekrem İmamoğlu":
                     cs.add("outcome", result_set_id=declared, option_id=option, kind="elected", notes=None)
-        collect(istanbul, f"{RERUN}:istanbul-mayor", ISTANBUL, str(units["34"]))
+        collect(
+            istanbul.filter(pl.col("option").ne_missing("others")),
+            f"{RERUN}:istanbul-mayor",
+            ISTANBUL,
+            str(units["34"]),
+        )
 
         cs.add("external_id", entity_id=persons["Ekrem İmamoğlu"], scheme="wikidata", value=IMAMOGLU)
         previous: UUID | None = None
