@@ -1,6 +1,7 @@
 import io
 import re
 import subprocess
+import xml.etree.ElementTree as ET
 import zipfile
 from datetime import UTC, datetime
 
@@ -16,12 +17,19 @@ ARKANSAS_RUNOFFS = {
     "Democratic": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-dem.zip",
     "Republican": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-rep.zip",
 }
+SOUTH_CAROLINA = {
+    "2013-03-19": ("https://www.enr-scvotes.org/SC/45550/#detail.xls", "2013-03-19/detailxls (3).zip"),
+    "2013-03-22": ("https://www.enr-scvotes.org/SC/46058/#detail.xls", "2013-03-22/detailxls (4).zip"),
+    "2017-05-02": ("https://www.enr-scvotes.org/SC/68939/#detail.xls", "2017-05-02/detailxls (2).zip"),
+    "2017-05-16": ("https://www.enr-scvotes.org/SC/69738/#detail.xls", "2017-05-16/detailxls.zip"),
+}
 FILES = {
     WISCONSIN: INBOX / "2020-02-18" / "County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf",
     OREGON: INBOX / "2011-11-08" / "2011 Special Primary Election Official Results.PDF",
     ARKANSAS: INBOX / "2001" / "2001_Special_Primary_US_Congress_District_3.pdf",
     ARKANSAS_RUNOFFS["Democratic"]: INBOX / "2001" / "runoff24-dem.zip",
     ARKANSAS_RUNOFFS["Republican"]: INBOX / "2001" / "runoff24-rep.zip",
+    **{url: INBOX.parent / "MF-289" / name for url, name in SOUTH_CAROLINA.values()},
 }
 WISCONSIN_CANDIDATES = {
     "DEMOCRATIC": ("Democratic", ["Tricia Zunker", "Lawrence Dale", "Scattering"]),
@@ -166,6 +174,33 @@ def rows() -> list[dict[str, object]]:
                 add("AR", "2001-10-23", "3", party, name, county, count)
                 found[-1]["runoff"] = True
                 found[-1]["outcome"] = "Elected" if name == winner else "Defeated"
+    sheet = "{urn:schemas-microsoft-com:office:spreadsheet}"
+    for day, (url, _) in SOUTH_CAROLINA.items():
+        with zipfile.ZipFile(io.BytesIO(raw.cached(SOURCE, url).path.read_bytes())) as archive:
+            workbook = ET.fromstring(archive.read("detail.xls"))
+        for worksheet in workbook.iter(f"{sheet}Worksheet"):
+            table = [[cell.findtext(f"{sheet}Data") or "" for cell in row.iter(f"{sheet}Cell")] for row in worksheet.iter(f"{sheet}Row")]
+            hit = re.match(r"^U\.S\.\s+House of Representatives, District\s+(\d+) - (REP|DEM)", table[0][0] if table and table[0] else "")
+            if hit is None or (day == "2013-03-19" and hit[2] == "REP"):
+                continue
+            names = [cell for cell in table[1][2:] if cell]
+            runoff = day == "2017-05-16"
+            block = []
+            sums = [0] * len(names)
+            for line in table[3:]:
+                if line[0].startswith("Total"):
+                    if [int(line[3 + 2 * index]) for index in range(len(names))] != sums:
+                        raise ValueError(f"SC-{hit[1]} {day} {hit[2]}: counties do not sum")
+                    continue
+                for index, name in enumerate(names):
+                    sums[index] += int(line[3 + 2 * index])
+                    add("SC", "2013-03-19" if day == "2013-03-22" else day, hit[1], "Republican" if hit[2] == "REP" else "Democratic", name, line[0], int(line[3 + 2 * index]))
+                    block.append(found[-1])
+            qualifiers = {names[index] for index in sorted(range(len(names)), key=sums.__getitem__)[-2:]}
+            for row in block:
+                row["runoff"] = runoff
+                if hit[2] == "REP" and not runoff and row["candidate_name"] in qualifiers:
+                    row["outcome"] = "Runoff"
     for row in found:
         if row["state"] == "AR" and not row["runoff"]:
             totals = {}

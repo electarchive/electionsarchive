@@ -74,6 +74,7 @@ MASSACHUSETTS_SPECIALS = {
 }
 STATES = {
     "MA": "Massachusetts",
+    "SC": "South Carolina",
     "NY": "New York",
     "NM": "New Mexico",
     "VA": "Virginia",
@@ -103,6 +104,12 @@ STATES = {
     "OR": "Oregon",
 }
 OFFICIAL = {
+    "SC": (
+        "South Carolina Election Commission",
+        "Official county results of the 2013 and 2017 special primaries",
+        "https://www.enr-scvotes.org/SC/",
+        [url for url, _ in special_inbox.SOUTH_CAROLINA.values()],
+    ),
     "AR": (
         "Arkansas Secretary of State",
         "Certification report of the 2001 special primary",
