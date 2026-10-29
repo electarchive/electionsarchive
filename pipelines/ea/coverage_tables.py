@@ -84,6 +84,12 @@ KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
 DISTRICT_CALENDAR = {
+    ("OK", "Tulsa County"): (
+        4,
+        2,
+        6,
+        "NonDoc, Tulsa County candidate filing: 6 of 20 county offices contested, 14 elected by default, and the District 1 commissioner and treasurer races decided in the June 16, 2026 Republican primary, https://nondoc.com/2026/04/03/tulsa-county-candidate-filing-6-elections-set-14-elected-by-default/",
+    ),
     ("GA", "Gwinnett County School District"): (
         2,
         0,
