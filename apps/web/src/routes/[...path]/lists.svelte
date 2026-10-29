@@ -52,7 +52,11 @@
       return {
         ...list,
         cut,
-        depth: Math.max(3, cut + 2),
+        top:
+          lists.isRanked || cut === 0
+            ? list.members.slice(0, Math.max(3, cut + 2))
+            : list.members.filter((member) => member.fate === "elected"),
+        isCounted: list.members.some((member) => (member.votes ?? 0) > 0),
         next,
         changes,
         left: new Set(changes.map((change) => change.replaced.person)),
@@ -61,7 +65,7 @@
     }),
   );
   const isTruncated = $derived(
-    ladders.some((ladder) => ladder.members.length > ladder.depth + 1),
+    ladders.some((ladder) => ladder.members.length > ladder.top.length + 1),
   );
 </script>
 
@@ -153,9 +157,9 @@
     {#each ladders as ladder (ladder.key)}
       {const color = $derived(swatch(ladder.color, ladder.key))}
       {const rows = $derived(
-        isFull || ladder.members.length <= ladder.depth + 1
+        isFull || ladder.members.length <= ladder.top.length + 1
           ? ladder.members
-          : ladder.members.slice(0, ladder.depth),
+          : ladder.top,
       )}
       <article
         class="grid content-start bg-card shadow-[0_0_0_1px_var(--border)]"
@@ -280,7 +284,7 @@
                     >{m.lists_seated()}</span
                   >
                 {/if}
-                {#if member.votes != null}
+                {#if member.votes != null && ladder.isCounted}
                   <span
                     class="font-figures text-xs text-muted-foreground tabular-nums"
                     aria-label={m.lists_votes({ votes: count(member.votes) })}

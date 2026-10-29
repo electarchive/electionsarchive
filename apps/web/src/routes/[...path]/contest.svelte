@@ -671,6 +671,15 @@
     ),
   );
   const drilled = $derived(contest.scope.noun != null);
+  const tabled = $derived(
+    lists != null && additional == null && !drilled
+      ? contest.rows.filter(
+          (row) =>
+            row.current?.person == null &&
+            !row.key.startsWith("kind:candidate:"),
+        )
+      : contest.rows,
+  );
   const heading = $derived(
     drilled && contest.scope.abroad != null
       ? m.scope_abroad_title({ place: contest.scope.name })
@@ -2561,7 +2570,7 @@
 {#snippet results()}
   {#if contest.current != null}
     <Results
-      rows={contest.rows}
+      rows={tabled}
       trace={page.url.pathname.slice(1)}
       place={drilled ? contest.scope.home : null}
       overall={contest.overall}
