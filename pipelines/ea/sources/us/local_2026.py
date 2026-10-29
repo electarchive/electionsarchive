@@ -4574,7 +4574,7 @@ def parse() -> None:
             used: dict[str, str] = {}
             missed: set[str] = set()
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
-            if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA"):
+            if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA", "RI"):
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
                         """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
