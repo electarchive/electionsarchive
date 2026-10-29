@@ -19,7 +19,7 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "2"
+VERSION = "3"
 YEARS = (1968, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 TITLE = re.compile(r"^(.+?)'(?:d[ae]|t[ae]) (\d{4}) Türkiye yerel seçimleri$")
@@ -30,7 +30,7 @@ METHOD = (
     "beldes), only the winner's votes are recorded."
 )
 PROVINCES = {"afyon": "afyonkarahisar", "icel": "mersin", "urfa": "sanliurfa"}
-EXTRA = {"SODEP": "sosyal-demokrasi-partisi"}
+EXTRA = {"SODEP": "sosyal-demokrasi-partisi", "MSP": "milli-selamet-partisi"}
 Row = tuple[str, str, str, int]
 
 
