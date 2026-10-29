@@ -562,7 +562,9 @@ def emit() -> Path:
                     if chamber == "senate" and contest is None and start < date(1913, 5, 31)
                     else "elected",
                     contest_id=contest,
-                    ended_via=cause or ("term_end" if scheduled and end <= today else None),
+                    ended_via=cause
+                    or ("died" if (ids["bioguide"], end) == ("G000359", date(2026, 7, 11)) else None)
+                    or ("term_end" if scheduled and end <= today else None),
                 )
                 if vote is not None:
                     cs.add(
