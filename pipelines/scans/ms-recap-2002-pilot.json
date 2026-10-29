@@ -1,0 +1,175 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "title": "Official recapitulation sheets for the 2002 general election, county totals",
+ "authoritative": "Source: the county election commissioners' official recapitulation sheets filed with the Secretary of State; county totals add up to each candidate's state total.",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "file": {
+  "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/"
+ },
+ "contests": {
+  "sen": {
+   "year": 2002,
+   "chamber": "senate",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "MS",
+   "district": null
+  },
+  "h1": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "MS",
+   "district": 1
+  },
+  "h2": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "MS",
+   "district": 2
+  },
+  "h3": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "MS",
+   "district": 3
+  },
+  "h4": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "MS",
+   "district": 4
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "adams1",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Adams.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 2,
+   "id": "adams2",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Adams.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 1,
+   "id": "hinds1",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Hinds.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 2,
+   "id": "hinds2",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Hinds.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 1,
+   "id": "rankin1",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Rankin.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 2,
+   "id": "rankin2",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Rankin.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 1,
+   "id": "harrison1",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Harrison.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  },
+  {
+   "page": 2,
+   "id": "harrison2",
+   "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/EleResults/2002GeneralElection/Harrison.pdf",
+   "orientation": "counties_across",
+   "turn": 90,
+   "hint": "A rotated, handwritten county recapitulation sheet. Header has exactly one entry: the county name written after 'in the County of'. Each row is a printed candidate line, and its values has one string: the handwritten number in the rightmost Totals column. Ignore every precinct column and skip office heading lines.",
+   "discover": [
+    "sen",
+    "h1",
+    "h2",
+    "h3",
+    "h4"
+   ]
+  }
+ ]
+}

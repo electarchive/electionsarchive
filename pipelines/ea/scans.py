@@ -57,6 +57,7 @@ class Page(TypedDict):
     header: NotRequired[list[float]]
     turn: NotRequired[int]
     orientation: NotRequired[str]
+    url: NotRequired[str]
     start: NotRequired[Literal["second"]]
 
 
@@ -261,7 +262,7 @@ def encode(image: Image.Image) -> tuple[str, bytes]:
 
 
 def artifact(manifest: Manifest, spec: Page) -> raw.Artifact:
-    url = manifest["file"]["url"].format(page=spec["page"])
+    url = spec.get("url", manifest["file"]["url"]).format(page=spec["page"])
     try:
         return raw.cached(manifest.get("raw_source", SOURCE), url)
     except LookupError:
