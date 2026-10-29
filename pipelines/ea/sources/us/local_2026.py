@@ -3365,7 +3365,7 @@ def parse() -> None:
             feeds["NJ-34005"].append(
                 {
                     "county": "Burlington",
-                    "contest": cell["ENTITY"],
+                    "contest": cell["ENTITY"].replace("Eastamtpon", "Eastampton").replace("Bulington", "Burlington"),
                     "seats": int(cell.get("VACANCIES") or 0),
                     "name": cased(name),
                     "party": named,
@@ -4696,7 +4696,11 @@ def parse() -> None:
                 for stem, sort, label, owner, path in (
                     [town for pool in towns.values() for town in pool]
                     if state == "OR"
-                    else towns.get(str(row["fips"]), [])
+                    else [
+                        (variant, *rest)
+                        for full, *rest in towns.get(str(row["fips"]), [])
+                        for variant in ([full, [word for word in full if word != "and"]] if "and" in full else [full])
+                    ]
                 ):
                     for start in (
                         ([], *([word, "of"] for word in ("city", "village", "town", "township", "borough")))
@@ -4733,6 +4737,14 @@ def parse() -> None:
                 fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
+                if (
+                    state == "NJ"
+                    and row.get("tail") is None
+                    and template
+                    and len({fit[4] for fit in fits}) == 1
+                    and not template.startswith(f"NJ:{fits[0][4].split(':', 1)[1]}:")
+                ):
+                    template = tail = None
                 if (
                     template is None
                     and (
@@ -4779,7 +4791,7 @@ def parse() -> None:
                                     (r"\bcommittee\b", "committee"),
                                     (r"\bdirectors?\b", "board-of-directors"),
                                     (
-                                        r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmember\b|\balderm[ae]n\b",
+                                        r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmembers?\b|\balderm[ae]n\b",
                                         "council",
                                     ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
