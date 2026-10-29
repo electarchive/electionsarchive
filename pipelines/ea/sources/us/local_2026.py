@@ -1633,6 +1633,7 @@ for county, url in {
     "Tioga": "https://www.tiogacountyny.com/departments/board-of-elections/",
     "Greene": "https://greenecountyny.gov/sample-ballots/",
     "Wyoming": "https://www.wyomingcountyny.gov/912/Sample-Ballots",
+    "Wayne": "https://waynecountyny.gov/277/Elections",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1640,7 +1641,7 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming') else 'pdf'}",
+        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne') else 'pdf'}",
     )
 for fips, county in {
     "32001": "Churchill",
