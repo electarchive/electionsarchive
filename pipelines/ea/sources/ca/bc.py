@@ -9,7 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "ca.bc"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 10, 24)
 FIRST = date(2024, 10, 19)
@@ -133,5 +133,6 @@ def emit() -> Path:
                     option_id=option,
                     role="head",
                     ballot_name=ballot_name,
+                    is_independent=affiliation == "Independent",
                 )
         return cs.write()
