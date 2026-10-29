@@ -26,19 +26,24 @@ OVERPASS = (
 )
 CLIPPING = "https://bklyn-genealogy-info.stevemorse.org/Image/1915.Assembly.Bklyn.jpg"
 ALMANAC = "https://archive.org/download/brooklyndailyeag00unse_5/brooklyndailyeag00unse_5_djvu.txt"
-TITLE = "Brooklyn assembly districts 1906-1916, rebuilt from the Laws of 1906 descriptions"
-NOTE = (
-    "Approximate outlines of Brooklyn's 23 assembly districts under the apportionment of 1906, rebuilt by tracing the "
-    "streets named in the district descriptions that the Brooklyn Daily Eagle Almanac of 1915 reprinted (a clipping "
-    "transcribed on Steve Morse's Brooklyn genealogy site) over OpenStreetMap street centerlines (ODbL) and today's "
-    "shoreline. Approximations: streets renamed since 1906 are matched to their modern names, a few vanished streets "
-    "are skipped, a corner with no modern crossing is joined by a straight chord, waterfront legs follow today's "
-    "shoreline and the county line, and gaps between districts go to the neighbor sharing the longest edge. The "
-    "descriptions print each district's election district count; the 1914 vote per election district under these "
-    "counts runs from 245 to 317 in every district."
+APPROXIMATIONS = (
+    "Approximations: streets renamed since are matched to their modern names, a few vanished streets are skipped, a "
+    "corner with no modern crossing is joined by a straight chord, waterfront legs follow today's shoreline and the "
+    "county line, and gaps between districts go to the neighbor sharing the longest edge."
 )
 SETS = {
     "1906": {
+        "title": "Brooklyn assembly districts 1906-1916, rebuilt from the Laws of 1906 descriptions",
+        "url": CLIPPING,
+        "summary": "under the apportionment of 1906",
+        "note": (
+            "Approximate outlines of Brooklyn's 23 assembly districts under the apportionment of 1906, rebuilt by "
+            "tracing the streets named in the district descriptions that the Brooklyn Daily Eagle Almanac of 1915 "
+            "reprinted (a clipping transcribed on Steve Morse's Brooklyn genealogy site) over OpenStreetMap street "
+            "centerlines (ODbL) and today's shoreline. " + APPROXIMATIONS + " The descriptions print each district's "
+            "election district count; the 1914 vote per election district under these counts runs from 245 to 317 "
+            "in every district."
+        ),
         "valid_from": date(1906, 1, 1),
         "valid_to": date(1917, 1, 1),
         "districts": """
@@ -67,8 +72,49 @@ SETS = {
 23|Moffat, B'way, Rockaway av, Marion, Howard av, Sumpter, Patchen av, Fulton, Schenectady av, Pacific, Utica av, Church av, E 49th, Schenectady av, Flatbush av, Av R, Burnett, @, Williams av, Liberty av, Hinsdale, Atlantic av, Sherlock pl, Herkimer, Vesta av, Fulton, Norman pl, Fulton, B'way, Stewart, Bushwick av
 """,
     },
+    "1895": {
+        "title": "Brooklyn assembly districts 1895-1905, rebuilt from the apportionment of 1895 descriptions",
+        "url": ALMANAC,
+        "summary": "under the apportionment of 1895",
+        "note": (
+            "Approximate outlines of Brooklyn's 21 assembly districts under the apportionment of 1895, rebuilt by "
+            "tracing the streets named in the district descriptions in the Brooklyn Daily Eagle Almanac of 1905 (pp. "
+            "118-119, with the ward boundaries it prints) over OpenStreetMap street centerlines (ODbL) and today's "
+            "shoreline. Districts 7, 18, and 21 are described by ward boundaries (29th through 32d wards); those legs "
+            "are translated to the street lines of the 1906 act and the ward descriptions, and the 26th Ward line is "
+            "taken as Ralph Avenue. " + APPROXIMATIONS + " The Almanac prints each district's election district "
+            "count (540 in all)."
+        ),
+        "valid_from": date(1895, 1, 1),
+        "valid_to": date(1906, 1, 1),
+        "districts": """
+1|Atlantic av, Henry, Amity, Court, Bergen, 4th av, Flatbush av, Fulton, Hicks, Poplar, Willow, Middagh, Columbia Heights, Doughty, Furman, Fulton, @
+2|Fulton, Furman, Doughty, Columbia Heights, Middagh, Willow, Poplar, Hicks, Fulton, Bridge, Johnson, Navy, @
+3|Atlantic av, Henry, Amity, Court, 4th pl, Coles, Hamilton av, @
+4|Division av, Lee av, Rodney, Bedford av, Flushing av, Sandford, Park av, Nostrand av, Myrtle av, Bedford av, Brevoort pl, Franklin av, Atlantic av, Washington av, @
+5|Grand st, Rodney, B'way, Flushing av, Bedford av, Rodney, Lee av, Division av, @
+6|B'way, Flushing av, Sandford, Park av, Nostrand av, Myrtle av, Bedford av, Lafayette av
+7|19th, 3d av, 20th, 6th av, 23d, 7th av, 20th, 10th av, 22d, 11th av, Terrace pl, Gravesend av, Fort Hamilton pkway, 37th, 10th av, 39th, 12th av, 40th, 13th av, 41st, 14th av, 42d, 15th av, 43d, 16th av, 44th, 17th av, 45th, Gravesend av, Foster av, E 17th, Av I, Flatbush av, E 34th, Av J, Schenectady av, Flatbush av, Av R, Burnett, @
+8|1st pl, Smith, 2d, Bond, 1st, 4th av, Bergen, Court
+9|1st pl, Smith, 2d, Bond, 1st, Prospect av, 6th av, 20th, 3d av, 19th, @, Hamilton av, Coles, Henry, 4th pl, Court
+10|Washington av, Atlantic av, S Portland av, Fulton, Fort Greene pl, DeKalb av, Rockwell pl, Flatbush av, Fulton, Bridge, Johnson, Navy, @
+11|Atlantic av, S Portland av, Fulton, Fort Greene pl, DeKalb av, Rockwell pl, Flatbush av, 4th av, Garfield pl, 7th av, Carroll, Flatbush av, Washington av, Montgomery, Franklin av
+12|Prospect av, 6th av, 23d, 7th av, 20th, 10th av, 22d, 11th av, Prospect Park Southwest, Parkside av, Flatbush av, Carroll, 7th av, Garfield pl, 4th av, 1st, 2d av
+13|Ten Eyck, Bushwick av, N 2d, Humboldt, Richardson, Meeker av, @, Calyer, Oakland, Greenpoint av, Manhattan av, Kent, Franklin, Noble, Manhattan av, Norman av, Wythe av, N 14th, Union av, Grand, Hooper, S 1st, Maujer, Leonard
+14|Grand st, Havemeyer, N 2d, Marcy av, Ainslie, Rodney, N 2d, Union av, Driggs av, N 14th, Wythe av, Norman av, Manhattan av, Noble, Franklin, Kent, Manhattan av, Greenpoint av, Oakland, Calyer, @
+15|B'way, Flushing av, Bushwick av, Ten Eyck, Leonard, Maujer, Hooper, Grand, Union av, N 2d, Rodney, Ainslie, Marcy av, N 2d, Havemeyer, Grand, Rodney
+16|Lafayette av, B'way, Ralph av, Atlantic av, Schenectady av, Fulton, Stuyvesant av
+17|Stuyvesant av, Bainbridge, Sumner av, McDonough, Tompkins av, Fulton, New York av, Atlantic av, Franklin av, Brevoort pl, Bedford av, Lafayette av
+18|Atlantic av, New York av, Fulton, Tompkins av, McDonough, Sumner av, Bainbridge, Stuyvesant av, Fulton, Schenectady av, Atlantic av, Ralph av, Seaview av, @, Burnett, Av R, Flatbush av, Schenectady av, Av J, E 34th, Flatbush av, Av I, E 17th, Foster av, Gravesend av, 45th, 17th av, 44th, 16th av, 43d, 15th av, 42d, 14th av, 41st, 13th av, 40th, 12th av, 39th, 10th av, 37th, Fort Hamilton pkway, Gravesend av, Prospect av, Vanderbilt, Coney Island av, Parkside av, Ocean av, Flatbush av, Washington av, Montgomery, Franklin av
+19|Meeker av, @, Jefferson, Evergreen av, Troutman, Central av, Cedar, Bushwick av, Lafayette av, B'way, Flushing av, Bushwick av, N 2d, Humboldt, Richardson
+20|B'way, Cooper av, Evergreen av, Hancock, Central av, Linden, Knickerbocker av, Putnam av, @, Jefferson, Evergreen av, Troutman, Central av, Cedar, Bushwick av, Lafayette av
+21|B'way, Cooper av, Evergreen av, Hancock, Central av, Linden, Knickerbocker av, Putnam av, @, Seaview av, Ralph av
+""",
+    },
 }
 ALIASES = {
+    "s portland av": "south portland avenue",
+    "sumner av": "marcus garvey boulevard",
     "kosciusko": "kosciuszko street",
     "mcdonough": "macdonough street",
     "reid av": "malcolm x boulevard",
@@ -365,26 +411,26 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Brooklyn assembly district outlines under the apportionment of 1906, rebuilt from the Laws of 1906 descriptions over OpenStreetMap streets",
+            summary="Brooklyn assembly district outlines under the apportionments of 1895 and 1906, rebuilt from the printed descriptions over OpenStreetMap streets",
             polity="US",
         )
-        outline = cs.source("Brooklyn Daily Eagle Almanac; OpenStreetMap contributors", TITLE)
-        cs.add(
-            "source",
-            id=outline,
-            kind="academic",
-            publisher="Brooklyn Daily Eagle Almanac; OpenStreetMap contributors",
-            title=TITLE,
-            url=CLIPPING,
-            license="ODbL 1.0 (street lines)",
-            notes=NOTE,
-        )
-        cs.artifact(raw.cached(SOURCE, OVERPASS), outline)
-        cs.artifact(raw.cached(SOURCE, CLIPPING), outline)
         county = cs.area("us.county", "36047")
         vintages = dict(conn.execute("select vintage, id from boundary_set where scheme_code = 'us.nyc_ad'").fetchall())
         for vintage, spec in SETS.items():
             first, last = spec["valid_from"], spec["valid_to"]
+            outline = cs.source("Brooklyn Daily Eagle Almanac; OpenStreetMap contributors", spec["title"])
+            cs.add(
+                "source",
+                id=outline,
+                kind="academic",
+                publisher="Brooklyn Daily Eagle Almanac; OpenStreetMap contributors",
+                title=spec["title"],
+                url=spec["url"],
+                license="ODbL 1.0 (street lines)",
+                notes=spec["note"],
+            )
+            cs.artifact(raw.cached(SOURCE, OVERPASS), outline)
+            cs.artifact(raw.cached(SOURCE, spec["url"]), outline)
             cs.add(
                 "boundary_set",
                 id=vintages.get(vintage, uuid4()),
