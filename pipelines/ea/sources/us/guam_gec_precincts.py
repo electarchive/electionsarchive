@@ -12,6 +12,7 @@ SOURCE = "us.guam_gec_precincts"
 VERSION = "1"
 PUBLISHER = "Guam Election Commission"
 REPORTS = {
+    2014: (date(2014, 11, 4), "https://gec.guam.gov/wp-content/uploads/2014/11/2014-general-prec{:04d}.htm"),
     2016: (date(2016, 11, 8), "https://gec.guam.gov/wp-content/uploads/2016/11/2016-ge-unofficial-prec{:04d}.htm"),
     2018: (date(2018, 11, 6), "https://gec.guam.gov/wp-content/uploads/2018/11/2018-ge-official-prec{:04d}.htm"),
 }
@@ -84,7 +85,7 @@ def emit() -> Path:
                     results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip(" .")] = int(found[2].replace(",", ""))
                 elif stripped and not re.match(r"(?i)(vote for|mark no more|total|over votes|under votes|\(with|votes|registered|ballots|voter)", stripped):
                     lowered = stripped.lower()
-                    section = "governor" if lowered.startswith("governor") else "house:0" if lowered.startswith("non-voting delegate") else None
+                    section = "governor" if lowered.startswith("governor") else "house:0" if lowered.startswith(("non-voting delegate", "nv delegate")) else None
     for year, (day, listing) in DRIVE.items():
         for link in drive_links(listing):
             artifact = raw.cached(SOURCE, link)
@@ -114,7 +115,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Guam's governor and delegate elections 2016, 2018, and 2024 by precinct from the Guam Election Commission",
+            summary="Guam's governor and delegate elections 2014, 2016, 2018, and 2024 by precinct from the Guam Election Commission",
             polity="US-GU",
         )
         (state,) = conn.execute("select id from polity where iso_code = 'US-GU'").fetchone()
@@ -141,6 +142,8 @@ def emit() -> Path:
                 else:
                     surname = lowered.split(",")[0].strip()
                     found = [option for option, label, _ in labels if surname in label]
+                if not found and lowered in ("write-in", "write-ins", "write-in totals"):
+                    continue
                 if len(found) != 1:
                     raise ValueError(f"{key}: {len(found)} options for {name}")
                 picked[name] = found[0]
