@@ -4,7 +4,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import hi_county
+from ea.sources.us import hi_county, hi_statewide
 from ea.store import DATA, connect
 
 SOURCE = "us.hi_measures"
@@ -14,7 +14,7 @@ PARSED = DATA / "parsed" / SOURCE
 
 def parse() -> None:
     rows = []
-    for year in hi_county.YEARS:
+    for year in hi_statewide.DAYS:
         for county, code in hi_county.COUNTIES.items():
             found = 0
             for _, entries in hi_county.blocks(raw.cached(hi_county.SOURCE, hi_county.BASE.format(year=year, county=county)).path):
@@ -36,13 +36,13 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Hawaii's statewide constitutional questions of 2000 and 2004–2014 by county from the Office of Elections' county summary reports",
+            summary="Hawaii's statewide constitutional questions of 2000 and 2004–2022 by county from the Office of Elections' county summary reports",
             polity="US-HI",
         )
         source = cs.source(hi_county.PUBLISHER, hi_county.TITLE)
         if source in cs.minted:
             raise ValueError("the county summary source is not published")
-        for year in hi_county.YEARS:
+        for year in hi_statewide.DAYS:
             for county in hi_county.COUNTIES:
                 cs.artifact(raw.cached(hi_county.SOURCE, hi_county.BASE.format(year=year, county=county)), source)
         held = {
