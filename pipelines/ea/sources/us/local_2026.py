@@ -2391,7 +2391,7 @@ def parse() -> None:
         contest = (
             f"{town[2]} {'City Council' if town[1] == 'Council' else 'Mayor'}"
             if town
-            else f"{county} County {title} {re.sub(r'^.*?(District|Precinct)', r'\1', where) if 'District' in where else ''}"
+            else f"{county}{'' if county == 'Baltimore City' else ' County'} {title} {re.sub(r'^.*?(District|Precinct)', r'\1', where) if 'District' in where else ''}"
         )
         named, independent = party(row["Office Political Party"])
         feeds["MD"].append(
@@ -4564,6 +4564,15 @@ def parse() -> None:
                 if code_st == county_code[:2] and (theirs == mine or theirs < mine or mine < theirs)
                 for hit in found
             ]
+            if not hits:
+                generic = {"COUNTY", "CONSOLIDATED", "COMMUNITY", "METROPOLITAN", "UNITED", "AREA", "REGIONAL", "UNIFIED", "TOWNSHIP", "CITY"}
+                core = frozenset(mine - generic)
+                hits = [
+                    hit
+                    for (code_st, theirs), found in index.items()
+                    if code_st == county_code[:2] and core and frozenset(theirs - generic) == core
+                    for hit in found
+                ]
             alike = [hit for hit in hits if coverage_tables.tokens(hit[1]) == mine]
             if len(alike or hits) == 1:
                 code, district = (alike or hits)[0]
@@ -4689,6 +4698,9 @@ def parse() -> None:
                                         "regional",
                                         "corporation",
                                         "city",
+                                        "county",
+                                        "metropolitan",
+                                        "united",
                                         "sch",
                                         "dist",
                                         "pub",
@@ -4923,7 +4935,7 @@ def parse() -> None:
                         else f"{slot[1].title()} {slot[2]}"
                         if state == "TX" and role == "board-of-education" and (slot := re.search(r"\b(place|position) (\d+)\b", post))
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
-                        if state in ("CA", "UT", "MD")
+                        if state in ("CA", "UT", "MD", "IN")
                         and (
                             area := re.search(
                                 r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
