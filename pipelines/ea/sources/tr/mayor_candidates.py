@@ -13,7 +13,7 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "6"
+VERSION = "7"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
 OLD = (1963, 1973)
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
@@ -60,7 +60,7 @@ def races() -> tuple[
         if len(rows) != 1:
             continue
         title, _, district, label, names, votes = rows[0]
-        found[(2004, f"{DAYS[2004]}:{province}-{district}-{belde}-mayor")] = [("", label, names, votes)]
+        found[(2004, f"{DAYS[2004]}:{province}-{'merkez' if district == province else district}-{belde}-mayor")] = [("", label, names, votes)]
         pages[title] = mayors_2004_2009.MAYORS
     return found, municipal, pages
 
