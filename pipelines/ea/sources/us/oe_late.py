@@ -65,6 +65,28 @@ FILES = [
         "DEM",
         False,
     ),
+    ("KS", date(2017, 4, 11), "2017/20170411__ks__special__general__county.csv", "U.S. House", "house", 4, None, True),
+    ("CA", date(2017, 4, 4), "2017/20170404__ca__special__primary.csv", "U.S. House", "house", 34, None, True),
+    (
+        "KY",
+        date(2018, 5, 22),
+        "2018/20180522__ky__primary__county.csv",
+        "United States Representative",
+        "house:democratic",
+        2,
+        "Democratic",
+        False,
+    ),
+    (
+        "GA",
+        date(2018, 5, 22),
+        "2018/20180522__ga__primary.csv",
+        "Governor",
+        "governor:republican",
+        None,
+        "Republican",
+        False,
+    ),
 ]
 
 
@@ -137,7 +159,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Tennessee's 2022 governor and 2025 special U.S. House election, Texas's 2016 presidential and 2018 U.S. Senate primaries, and Michigan's 2020 1st District Democratic primary by county from OpenElections",
+            summary="Tennessee's 2022 governor and 2025 special U.S. House election, Texas's 2016 presidential and 2018 U.S. Senate primaries, Michigan's 2020 1st District Democratic primary, Kansas's 2017 and California's 2017 special U.S. House elections, Kentucky's 2018 2nd District Democratic primary, and Georgia's 2018 Republican governor primary by county from OpenElections",
             polity="US",
         )
         sources = {}

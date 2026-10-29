@@ -81,6 +81,7 @@ MISSPELLED = {
     ("MI", "gdtraverse"): "grandtraverse",
     ("IN", "laport"): "laporte",
     ("AL", "radolph"): "randolph",
+    ("KY", "breckenridge"): "breckinridge",
     ("NY", "genessee"): "genesee",
     ("NM", "doaana"): "donaana",
     ("MS", "jeffersondav"): "jeffersondavis",
