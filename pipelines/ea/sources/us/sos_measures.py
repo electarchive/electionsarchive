@@ -516,6 +516,17 @@ HI_MEASURES = {
     2010: {"Board of": ("2376", "HB 2376"), "Tax Rebate": ("2807", "SB 2807")},
 }
 NM_DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5)}
+OH_PAGES = "https://web.archive.org/web/2012id_/http://www.sos.state.oh.us/sos/elections/Research/electResultsMain/"
+OH_ISSUES = [
+    (date(2000, 11, 7), "1", "2000ElectionsResults/StateIssue1_11072000"),
+    (date(2002, 11, 5), "1", "2002Results/issue1"),
+    (date(2003, 9, 9), "1", "2003Results/Issue1"),
+    (date(2004, 11, 2), "1", "2004ElectionsResults/04-1102Issue1"),
+    *((date(2005, 11, 8), str(n), f"2005ElectionsResults/05-1108Issue{n}") for n in range(1, 6)),
+    *((date(2008, 11, 4), str(n), f"2008ElectionResults/issue{n}_110408") for n in (1, 2, 3, 5, 6)),
+    *((date(2009, 11, 3), str(n), f"2009ElectionResults/20091103issue{n}") for n in (1, 2, 3)),
+    *((date(2011, 11, 8), str(n), f"2011results/20111108Issue{n}") for n in (1, 2, 3)),
+]
 NM_PAGES = Path(__file__).with_name("nm_county_pages.tsv")
 MT_BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
 SCANS = Path(__file__).resolve().parents[3] / "scans"
@@ -821,6 +832,9 @@ def fetch() -> None:
         for url in (MO, MO_PART2) if day.year >= 2004 else (MO,):
             raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
             time.sleep(1)
+    for _, _, page in OH_ISSUES:
+        raw.fetch(SOURCE, f"{OH_PAGES}{page}.aspx", suffix=".html")
+        time.sleep(2)
     for day in SC_DAYS:
         if day.year == 2010:
             raw.fetch(SOURCE, SC_2010, suffix=".zip")
@@ -1701,6 +1715,55 @@ def ohio() -> list[dict[str, object]]:
         for row in counties.iter_rows(named=True)
         for column in issues
     ]
+
+
+def ohio_issues() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, number, page in OH_ISSUES:
+        url = f"{OH_PAGES}{page}.aspx"
+        text = raw.cached(SOURCE, url).path.read_bytes().decode("utf-8", "replace")
+        text = re.sub(r"(?is)<(script|style).*?</\1>", "", text)
+        tokens = [
+            cell for part in re.split(r"<[^>]+>", text) if (cell := re.sub(r"\s+", " ", html.unescape(part)).strip())
+        ]
+        width = 5 if day.year == 2000 else 2
+        lines: dict[str, list[int]] = {}
+        name = None
+        for token in tokens[tokens.index("Adams", tokens.index("County")) :]:
+            if re.fullmatch(r"[\d,]+", token):
+                lines[name].append(int(token.replace(",", "")))
+            elif token[0].isalpha() and not token.startswith("Stay"):
+                name = token
+                lines[name] = []
+            elif not token.endswith("%") and not re.fullmatch(r"[\d.]+|\*", token):
+                break
+            if name is not None and name.upper().startswith("TOTAL") and len(lines[name]) >= width:
+                break
+        total = next((figures for name, figures in lines.items() if name.upper().startswith("TOTAL")), None)
+        counties = {name: figures for name, figures in lines.items() if not name.upper().startswith("TOTAL")}
+        if total is None:
+            total = counties[next(reversed(counties))][width:]
+        if len(counties) != 88:
+            raise ValueError(f"OH {url}: {len(counties)} counties")
+        yes_at, no_at = (3, 4) if width == 5 else (0, 1)
+        counties = {name: [figures[yes_at], figures[no_at]] for name, figures in counties.items()}
+        if [sum(pair[side] for pair in counties.values()) for side in (0, 1)] != total[yes_at : no_at + 1]:
+            raise ValueError(f"OH {url}: counties do not add up to the total")
+        rows.extend(
+            {
+                "state": "OH",
+                "day": day,
+                "number": number,
+                "label": "",
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": pair[side],
+            }
+            for county, pair in counties.items()
+            for side, answer in enumerate(("YES", "NO"))
+        )
+    return rows
 
 
 def nevada() -> list[dict[str, object]]:
@@ -2813,6 +2876,7 @@ def parse() -> None:
             *florida(),
             *oklahoma(),
             *ohio(),
+            *ohio_issues(),
             *rhode_island(),
             *nevada(),
             *nebraska(),
@@ -2953,7 +3017,7 @@ def emit() -> Path:
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             artifacts[url] = cs.artifact(
                 raw.cached(
-                    {"FL": fl_sos.SOURCE, "OH": gov_counties.SOURCE, "RI": ri_countbook.SOURCE}.get(state, SOURCE), url
+                    {"FL": fl_sos.SOURCE, "RI": ri_countbook.SOURCE}.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE), url
                 ),
                 sources[state],
             )
