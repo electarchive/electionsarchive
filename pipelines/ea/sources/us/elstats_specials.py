@@ -610,6 +610,10 @@ def emit() -> Path:
                 for owner, link in special_files.STORED:
                     if owner == state:
                         cs.artifact(raw.cached(SOURCE, link), sources[state])
+                if state == "OH":
+                    for day, files in special_inbox.OHIO.items():
+                        for name in files.values():
+                            cs.artifact(raw.cached(SOURCE, special_inbox.OHIO_URL.format(day, name)), sources[state])
                 if state == "WI":
                     cs.artifact(raw.cached(SOURCE, special_pdfs.WISCONSIN), sources[state])
                     cs.artifact(raw.cached(SOURCE, special_inbox.WISCONSIN), sources[state])

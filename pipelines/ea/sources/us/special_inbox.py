@@ -5,6 +5,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 from datetime import UTC, datetime
 
+import polars as pl
+
 from ea import raw
 from ea.store import DATA
 
@@ -23,6 +25,33 @@ SOUTH_CAROLINA = {
     "2017-05-02": ("https://www.enr-scvotes.org/SC/68939/#detail.xls", "2017-05-02/detailxls (2).zip"),
     "2017-05-16": ("https://www.enr-scvotes.org/SC/69738/#detail.xls", "2017-05-16/detailxls.zip"),
 }
+OHIO = {
+    "2005-06-14": {
+        "Democratic": "2005_democratic_2nd_congressional_district_june_14.xlsx",
+        "Republican": "2005_republican_2nd_congressional_district_june_14.xlsx",
+    },
+    "2007-11-06": {
+        "Democratic": "2007_democratic_fifth_congressional_district_november_6_breakdown_by_county_table_2.xlsx",
+        "Republican": "2007_republican_fifth_congressional_district_november_6_official_results_table_2.xlsx",
+    },
+}
+OHIO_2005 = {
+    "Democratic": ["Paul Hackett", "Arthur Stanley Katz", "James John Parker", "Charles W. Sanders", "Jeff Sinnard", "Victoria Wells Wulsin"],
+    "Republican": [
+        "Steve Austin",
+        "Tom Bemmes",
+        "Tom Brinkman Jr.",
+        "Pat DeWine",
+        "Peter A. Fossett",
+        "Bob McEwen",
+        "Eric Minamyer",
+        "Douglas E. Mink",
+        "Jeff Morgan",
+        "Jean Schmidt",
+        "David R. Smith",
+    ],
+}
+OHIO_URL = "https://data.ohiosos.gov/portal/past-election-results#MF-290/{}/{}"
 FILES = {
     WISCONSIN: INBOX / "2020-02-18" / "County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf",
     OREGON: INBOX / "2011-11-08" / "2011 Special Primary Election Official Results.PDF",
@@ -30,6 +59,11 @@ FILES = {
     ARKANSAS_RUNOFFS["Democratic"]: INBOX / "2001" / "runoff24-dem.zip",
     ARKANSAS_RUNOFFS["Republican"]: INBOX / "2001" / "runoff24-rep.zip",
     **{url: INBOX.parent / "MF-289" / name for url, name in SOUTH_CAROLINA.values()},
+    **{
+        OHIO_URL.format(day, name): INBOX.parent / "MF-290" / day / name
+        for day, files in OHIO.items()
+        for name in files.values()
+    },
 }
 WISCONSIN_CANDIDATES = {
     "DEMOCRATIC": ("Democratic", ["Tricia Zunker", "Lawrence Dale", "Scattering"]),
@@ -201,6 +235,32 @@ def rows() -> list[dict[str, object]]:
                 row["runoff"] = runoff
                 if hit[2] == "REP" and not runoff and row["candidate_name"] in qualifiers:
                     row["outcome"] = "Runoff"
+    for day, files in OHIO.items():
+        for party, name in files.items():
+            cells = pl.read_excel(raw.cached(SOURCE, OHIO_URL.format(day, name)).path, has_header=False, engine="calamine").rows()
+            block = []
+            if day == "2005-06-14":
+                names = OHIO_2005[party]
+                for line in cells[2:-1]:
+                    for candidate, votes in zip(names, line[1:], strict=True):
+                        add("OH", day, "2", party, candidate, line[0].title(), int(votes.replace(",", "")))
+                        block.append(found[-1])
+                totals = [int(value.replace(",", "")) for value in cells[-1][1:]]
+                if [sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate) for candidate in names] != totals:
+                    raise ValueError(f"OH-2 2005 {party}: counties do not sum")
+            else:
+                county = None
+                for line in cells[1:]:
+                    if line[0] and not line[0].startswith("*") and line[1] is None:
+                        county = line[0].rstrip("*")
+                    elif county and line[1] and "(" in line[1] and "total" not in line[1]:
+                        candidate = re.sub(r"^\*|\s*\([A-Z]\)$", "", line[1])
+                        last, first = candidate.split(", ")
+                        add("OH", day, "5", party, f"{first} {last}", county, int(str(line[3]).replace(",", "")))
+                        block.append(found[-1])
+            top = max({row["candidate_name"] for row in block}, key=lambda candidate: sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate))
+            for row in block:
+                row["outcome"] = "Elected" if row["candidate_name"] == top else "Defeated"
     for row in found:
         if row["state"] == "AR" and not row["runoff"]:
             totals = {}
