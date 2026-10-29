@@ -622,6 +622,16 @@ FEEDS = {
         "Clark County Election Department",
         "Offices Up for Election and Candidates, 2026 General Election",
     ),
+    "UT-49053": (
+        "https://www.washco.utah.gov/wp-content/uploads/2026/09/2026-General-Election-Certification-of-County-Candidates-Notice.pdf",
+        "Washington County Clerk/Auditor",
+        "Certification of County Candidates and Ballot Propositions, 2026 General Election",
+    ),
+    "UT-49005": (
+        "https://www.cachecounty.gov/elections/elections-home/election-notice.html",
+        "Cache County Clerk",
+        "Certification for Regular General Election, November 3, 2026",
+    ),
     "UT-49057": (
         "https://www.weberelections.gov/",
         "Weber County Clerk/Auditor",
@@ -1414,6 +1424,8 @@ DELIVERED = {
     "NV-32003": DATA / "inbox" / "y26" / "nv" / "clark.pdf",
     "UT-49035": DATA / "inbox" / "y26" / "ut" / "salt_lake.pdf",
     "UT-49057": DATA / "inbox" / "y26" / "ut" / "weber.html",
+    "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
+    "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
     "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
     "TX-48141": DATA / "inbox" / "manual" / "MF-260" / "4._Canutillo_ISD_Ballot.pdf",
     "FL-12057": DATA / "inbox" / "manual" / "MF-177" / "2026 General Election_All Races Sample Ballot.pdf",
