@@ -21,6 +21,7 @@ PRIMARIES = {
     1933: date(1933, 9, 19),
     1937: date(1937, 9, 16),
     1941: date(1941, 9, 16),
+    1953: date(1953, 9, 15),
     1961: date(1961, 9, 7),
     1965: date(1965, 9, 14),
     1969: date(1969, 6, 17),
@@ -181,7 +182,7 @@ def parse() -> None:
             seen_boxes: dict[str, int] = {}
             for box in re.finditer(r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE):
                 heading = re.search(
-                    r"title\s*=\s*\d{4} (?:New York City )?(Democratic|Republican) (?:mayoral )?primary", box.group(0)
+                    r"title\s*=\s*(?:\d{4} )?(?:New York City )?(Democratic|Republican) (?:mayoral )?primary", box.group(0)
                 )
                 if heading is None:
                     continue
