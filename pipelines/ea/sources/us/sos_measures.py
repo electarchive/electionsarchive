@@ -458,6 +458,20 @@ MT_FILES = {
 }
 ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}-general.pdf"
 ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
+SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
+SC_DAYS = {
+    date(2000, 11, 7): 3,
+    date(2002, 11, 5): 2,
+    date(2004, 11, 2): 2,
+    date(2006, 11, 7): 7,
+    date(2008, 11, 4): 3,
+}
+SC_COUNTIES = (
+    "Abbeville Aiken Allendale Anderson Bamberg Barnwell Beaufort Berkeley Calhoun Charleston Cherokee Chester "
+    "Chesterfield Clarendon Colleton Darlington Dillon Dorchester Edgefield Fairfield Florence Georgetown Greenville "
+    "Greenwood Hampton Horry Jasper Kershaw Lancaster Laurens Lee Lexington Marion Marlboro McCormick Newberry Oconee "
+    "Orangeburg Pickens Richland Saluda Spartanburg Sumter Union Williamsburg York"
+).split()
 MT_BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
 SCANS = Path(__file__).resolve().parents[3] / "scans"
 BALLOT_LABELS = {("NE", date(2006, 11, 7), "422"): ("Retain", "Repeal")}
@@ -596,6 +610,11 @@ PUBLISHERS = {
         "North Dakota Secretary of State",
         "Abstract of votes cast at the general election",
         "https://www.sos.nd.gov/elections/election-results",
+    ),
+    "SC": (
+        "South Carolina State Election Commission",
+        "Report of the State Election Commission",
+        "https://scvotes.gov/",
     ),
     "TX": ("Texas Secretary of State", "Texas election history: returns by county, 1992–2019", TX),
     "CA": (
@@ -747,6 +766,9 @@ def fetch() -> None:
         for url in (MO, MO_PART2) if day.year >= 2004 else (MO,):
             raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
             time.sleep(1)
+    for day in SC_DAYS:
+        raw.fetch(SOURCE, SC.format(day.year), suffix=".pdf")
+        time.sleep(1)
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
         time.sleep(1)
@@ -2314,6 +2336,121 @@ def missouri() -> list[dict[str, object]]:
     return rows
 
 
+def south_carolina() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, count in SC_DAYS.items():
+        url = SC.format(day.year)
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.split("\n")
+        tables: list[tuple[str, dict[str, list[int]]]] = []
+        if day.year >= 2006:
+            starts = [
+                at
+                for at, line in enumerate(lines)
+                if (day.year == 2006 and line.strip() == "COUNTY                *WINNER* Yes      No             TOTAL")
+                or (day.year == 2008 and re.match(r"\s*Amendment No\. \d \(Vote For 1\)", line))
+            ]
+            names = ["1", "2a", "2b", "3a", "3b", "4", "5"] if day.year == 2006 else ["1", "2", "3"]
+            for name, start in zip(names, starts, strict=True):
+                table: dict[str, list[int]] = {}
+                for line in lines[start + 1 :]:
+                    if figures := re.fullmatch(r"\s*([A-Za-z]+)(?: County)?\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)", line):
+                        votes = [int(figures[at].replace(",", "")) for at in (2, 3, 4)]
+                        if votes[0] + votes[1] != votes[2]:
+                            raise ValueError(f"SC {day} {name} {figures[1]}: yes and no do not add up")
+                        table[figures[1]] = votes[:2]
+                    elif re.match(r"\s*(STATE TOTAL|Totals)", line):
+                        if len(table) != 46:
+                            raise ValueError(f"SC {day} {name}: {len(table)} counties")
+                        for column in range(2):
+                            if sum(votes[column] for votes in table.values()) != int(
+                                re.findall(r"[\d,]{3,}", line)[column].replace(",", "")
+                            ):
+                                raise ValueError(f"SC {day} {name}: column {column} does not match the state total")
+                        break
+                tables.append((name, table))
+        else:
+            start = next(at for at, line in enumerate(lines) if re.search(r"AMENDMENT # 1\s+AMENDMENT # 2", line))
+            table = {}
+            suspect: dict[tuple[str, int], bool] = {}
+            for line in lines[start:]:
+                tail = re.sub(r"[^A-Za-z0-9 ,.]", " ", line)
+                if re.match(r"\s*STATE TOTAL", tail):
+                    total = [
+                        int(re.sub(r"\D", "", part)) for part in re.split(r"\s{2,}", tail.split("TOTAL", 1)[1].strip())
+                    ]
+                    break
+                if figures := re.match(r"\s*([A-Za-z][A-Za-z ]*?)\s{2,}([\dIl][\dIl,. ]*)$", tail):
+                    parts = re.split(r"\s{2,}", re.sub(r" ,", ",", figures[2].strip()))
+                    if len(parts) != 2 * count:
+                        continue
+                    matched = [county for county in SC_COUNTIES if county.upper() == figures[1].strip().upper()] or [
+                        county
+                        for county in SC_COUNTIES
+                        if county not in table and county.upper().endswith(figures[1].strip().upper())
+                    ]
+                    if len(matched) != 1:
+                        raise ValueError(f"SC {day}: cannot place {figures[1]}")
+                    table[matched[0]] = [
+                        int(re.sub(r"\D", "", part.replace("I", "1").replace("l", "1"))) for part in parts
+                    ]
+                    for at, part in enumerate(parts):
+                        if not re.fullmatch(r"\d{1,3}([,.]\d{3})*", part):
+                            suspect[(matched[0], at)] = True
+            else:
+                raise ValueError(f"SC {day}: no state total")
+            for county, column in suspect:
+                if sum(1 for _, other in suspect if other == column) != 1:
+                    raise ValueError(f"SC {day}: more than one damaged figure in column {column}: {sorted(suspect)}")
+                table[county][column] = total[column] - sum(
+                    votes[column] for name, votes in table.items() if name != county
+                )
+            if day.year == 2000:
+                head = lines[start : start + 120]
+                lone = [
+                    int(re.sub(r"\D", "", line))
+                    for line in head
+                    if re.fullmatch(r"\s*\d[\d,]*\s*", line) and line.strip() != "0"
+                ]
+                last = next(
+                    [int(re.sub(r"\D", "", part)) for part in line.split()]
+                    for line in head
+                    if re.fullmatch(r"\s*\d[\d,]*(\s{2,}\d[\d,]*){3}\s*", line)
+                )
+                for at, county in enumerate(SC_COUNTIES[:3]):
+                    table[county] = [lone[at], lone[4 + at], lone[8 + at], lone[11 + at], lone[14 + at], lone[17 + at]]
+                table["Anderson"] = [lone[3], lone[7], *last]
+            if len(table) != 46:
+                raise ValueError(f"SC {day}: {len(table)} counties: {sorted(set(SC_COUNTIES) - set(table))}")
+            for column in range(2 * count):
+                if sum(votes[column] for votes in table.values()) != total[column]:
+                    raise ValueError(f"SC {day}: column {column} does not add up to {total[column]}")
+            for measure in range(count):
+                tables.append(
+                    (
+                        str(measure + 1),
+                        {county: votes[2 * measure : 2 * measure + 2] for county, votes in table.items()},
+                    )
+                )
+        rows.extend(
+            {
+                "state": "SC",
+                "day": day,
+                "number": re.sub(r"\D", "", name) if name.isdigit() else "",
+                "label": f"Constitutional Amendment {name}" if day.year == 2006 else f"Amendment {name}",
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": votes[side],
+            }
+            for name, table in tables
+            for county, votes in table.items()
+            for side, answer in enumerate(("YES", "NO"))
+        )
+    return rows
+
+
 def north_dakota() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, count in ND_DAYS.items():
@@ -2453,6 +2590,7 @@ def parse() -> None:
             *missouri(),
             *montana(),
             *north_dakota(),
+            *south_carolina(),
         ],
         infer_schema_length=None,
     )
@@ -2518,7 +2656,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO")
+                if entry["number"] or state in ("SD", "MO", "SC")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
