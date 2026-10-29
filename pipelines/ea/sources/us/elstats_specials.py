@@ -19,6 +19,7 @@ from ea.sources.us import (
     special_files,
     special_md,
     special_nc,
+    special_nj,
     special_nm_1997,
     special_pdfs,
     special_wi_1993,
@@ -76,6 +77,7 @@ STATES = {
     "PA": "Pennsylvania",
     "IL": "Illinois",
     "NC": "North Carolina",
+    "NJ": "New Jersey",
     "MD": "Maryland",
     "NE": "Nebraska",
     "KS": "Kansas",
@@ -104,6 +106,12 @@ OFFICIAL = {
         "Special election results",
         "https://elections.maryland.gov/elections/special_elections_past.html",
         [page for page, _, _ in special_md.PAGES],
+    ),
+    "NJ": (
+        "New Jersey Division of Elections",
+        "Official special primary election results",
+        "https://www.nj.gov/state/elections/election-information-2026.shtml",
+        [special_nj.RESULTS],
     ),
     "NE": (
         "Nebraska Secretary of State",
@@ -152,6 +160,12 @@ PARTIES = {
     "Working Families": "NY:working-families-party",
     "Independence": "NY:independence-party",
 }
+SUPERSEDED = (
+    ("VA", date(2023, 2, 21)),
+    ("NY", date(2015, 5, 5)),
+    ("MA", date(2013, 12, 10)),
+    ("MA", date(2007, 10, 16)),
+)
 MAIN = {"Democratic", "Republican", "DEM", "REP"}
 INDEPENDENT = {"IND", "NOPTY", "NPTY", "NOP"}
 WITHDREW = {
@@ -181,6 +195,7 @@ def fetch() -> None:
     special_nc.fetch()
     special_md.fetch()
     special_pdfs.fetch()
+    special_nj.fetch()
     special_counties.fetch()
     special_nm_1997.fetch()
     special_wi_1993.fetch()
@@ -459,6 +474,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_nc.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_md.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_nj.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_wi_1993.rows(), infer_schema_length=None))
@@ -469,6 +485,8 @@ def emit() -> Path:
         district=pl.col("district_name").cast(pl.Int32),
         votes=pl.col("votes").cast(pl.Int64),
     )
+    for state, day in SUPERSEDED:
+        frame = frame.filter(~((pl.col("state") == state) & (pl.col("day") == day)))
     with connect() as conn:
         counties: dict[str, dict[str, str]] = {}
         for code, text, iso in conn.execute(
