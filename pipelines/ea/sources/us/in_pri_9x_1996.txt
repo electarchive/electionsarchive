@@ -1,0 +1,295 @@
+@ 1
+Peter J. Visclosky (D) | Daniel C. Langmesser (D) | Michael Edward Petyo (R)
+Lake | 37471 6951 8053
+Porter | 5669 1265 8322
+TOTALS | 43140 8216 16375
+
+@ 2
+R. Marc Carmichael (D) | Mark A. Findling (D) | George Thomas Holland (D) | David M. McIntosh (R)
+Bartholomew | 1440 452 776 5103
+Decatur | 588 265 212 3009
+Delaware | 10028 1389 966 8510
+Henry | 1867 528 517 4953
+Jay | 951 245 212 2013
+Johnson | 81 40 42 366
+Madison | 9325 2075 1920 11543
+Randolph | 879 190 154 2949
+Rush | 343 167 141 2989
+Shelby | 1247 414 415 4222
+Wayne | 1430 550 466 7155
+TOTALS | 28179 6315 5821 52812
+
+@ 2
+Gregory "Greg" Lunsford (R)
+Bartholomew | 930
+Decatur | 536
+Delaware | 1696
+Henry | 864
+Jay | 300
+Johnson | 64
+Madison | 1400
+Randolph | 632
+Rush | 690
+Shelby | 694
+Wayne | 1612
+TOTALS | 9418
+
+@ 3
+Tim Roemer (D) | Joe Zakas (R) | Daniel Holtz (R) | Richard K. Burkett (R)
+Elkhart | 2850 4022 5739 3103
+Kosciusko | 624 778 1245 3059
+LaPorte | 8509 788 1163 1511
+Starke | 636 116 130 117
+St. Joseph | 15193 6168 2450 2316
+TOTALS | 27812 11872 10727 10106
+
+@ 3
+Brian K. Haygood (R) | J. Bradley Allamong (R) | H. Theodore Noell (R)
+Elkhart | 918 209 248
+Kosciusko | 284 207 85
+LaPorte | 999 2234 160
+Starke | 36 14 2
+St. Joseph | 990 165 1129
+TOTALS | 3227 2829 1624
+
+@ 4
+Gerald L. Houseman (D) | Gregg L. Jackson (D) | David Christopher Roach (D)
+Adams | 1092 770 300
+Allen | 5017 2398 1196
+Dekalb | 755 396 173
+Huntington | 564 523 129
+Jay | 85 98 59
+LaGrange | 344 244 108
+Noble | 807 486 267
+Steuben | 585 185 98
+Wells | 824 425 137
+Whitley | 543 372 180
+TOTALS | 10616 5897 2647
+
+@ 4
+Mark Edward Souder (R) | Phillip D. Marx (R)
+Adams | 2268 430
+Allen | 21644 4802
+Dekalb | 3424 811
+Huntington | 3948 799
+Jay | 393 53
+LaGrange | 2336 628
+Noble | 3148 666
+Steuben | 2942 864
+Wells | 2223 346
+Whitley | 2527 719
+TOTALS | 44853 10118
+
+@ 5
+Douglas L. Clark (D) | Hugh P. Salisbury (D) | Steve Buyer (R)
+Benton | 215 58 1981
+Blackford | 686 195 935
+Carroll | 568 230 2520
+Cass | 1428 467 3563
+Fulton | 575 139 2467
+Grant | 2078 676 6825
+Howard | 3023 1546 7982
+Jasper | 450 177 3918
+Kosciusko | 533 182 3575
+Lake | 1307 623 2503
+Marshall | 756 232 3292
+Miami | 1076 258 3179
+Newton | 365 110 1511
+Porter | 307 106 483
+Pulaski | 407 80 1401
+Starke | 686 282 790
+Vermillion | 951 372 488
+Wabash | 780 242 4187
+Warren | 310 79 1063
+White | 609 159 4189
+TOTALS | 17110 6213 56852
+
+@ 6
+Carrie Jean Dillard-Trammell (D) | Kent Steven Nelson (D) | Ramakishnan Nagarajan (D) | Dan Burton (R)
+Boone | 138 98 41 1883
+Clinton | 312 384 72 2662
+Hamilton | 706 583 227 20896
+Hancock | 553 661 125 7466
+Henry | 56 58 7 630
+Johnson | 1029 903 198 13696
+Marion | 3288 2179 1936 25490
+Morgan | 110 106 17 1442
+Tipton | 278 469 92 2904
+TOTALS | 6470 5441 2715 77069
+
+@ 7
+Robert F. Hellmann (D) | William F. Thompson (D) | John Wm. Riley, Jr. (D) | Fred B. "KC" Keuthan (D)
+Boone | 307 284 118 33
+Clay | 1998 554 314 165
+Fountain | 343 216 184 21
+Hendricks | 489 682 351 73
+Monroe | 265 208 187 50
+Montgomery | 453 437 236 47
+Morgan | 362 315 259 54
+Owen | 475 446 328 180
+Parke | 904 183 104 27
+Putnam | 634 517 186 108
+Tippecanoe | 1718 974 834 144
+Vermillion | 980 132 214 40
+Vigo | 12397 2802 1088 337
+TOTALS | 21325 7750 4403 1279
+
+@ 7
+Ed Pease (R) | John Meyers (R) | Richard "Dick" Thompson (R) | Dan L. Pool (R)
+Boone | 554 615 909 124
+Clay | 2393 370 60 68
+Fountain | 617 165 354 336
+Hendricks | 2642 2590 5228 227
+Monroe | 458 694 46 36
+Montgomery | 887 724 672 2989
+Morgan | 1990 1821 513 376
+Owen | 1033 388 64 26
+Parke | 1004 206 289 544
+Putnam | 1211 522 1124 259
+Tippecanoe | 4416 3675 1379 3017
+Vermillion | 195 61 10 15
+Vigo | 4655 656 144 140
+TOTALS | 22055 12487 10792 8157
+
+@ 7
+Katherine "Kathy" Willing (R) | Pete Ross (R) | John Lee Smith (R) | Jeffrey K. "Jeff" Baldwin (R)
+Boone | 2031 301 161 128
+Clay | 92 59 178 40
+Fountain | 148 602 66 10
+Hendricks | 816 863 514 1345
+Monroe | 102 83 595 63
+Montgomery | 615 556 347 60
+Morgan | 554 1048 499 239
+Owen | 65 22 199 52
+Parke | 114 155 104 28
+Putnam | 241 143 141 43
+Tippecanoe | 1664 1019 651 180
+Vermillion | 25 5 14 7
+Vigo | 257 164 263 71
+TOTALS | 6724 5020 3732 2266
+
+@ 7
+Anthony W. "Tony" Duncan (R) | Jack Reynolds (R) | Martin K. Riggen (R) | Edward J. "Ed" Gluck (R)
+Boone | 34 54 11 17
+Clay | 19 26 125 9
+Fountain | 18 9 4 7
+Hendricks | 213 120 49 58
+Monroe | 45 37 5 12
+Montgomery | 107 36 12 6
+Morgan | 255 111 37 31
+Owen | 25 68 4 14
+Parke | 5 32 27 5
+Putnam | 33 34 15 8
+Tippecanoe | 227 98 28 40
+Vermillion | 2 5 8 2
+Vigo | 31 56 97 50
+TOTALS | 1014 686 422 259
+
+@ 7
+John W. Timm (R) | Russell H. Stwalley (R) | Michael Ward Roberts (R)
+Boone | 23 7 18
+Clay | 4 3 1
+Fountain | 4 3 2
+Hendricks | 115 27 30
+Monroe | 8 2 10
+Montgomery | 14 66 11
+Morgan | 26 16 16
+Owen | 7 10 6
+Parke | 5 2 0
+Putnam | 15 7 4
+Tippecanoe | 19 51 26
+Vermillion | 0 0 0
+Vigo | 6 3 14
+TOTALS | 246 197 138
+
+@ 8
+Jonathan Weinzapel (D) | Richard L. McConnell (D) | Noah Jay Southwood (D) | Franklin Delano Roosevelt Enochs (D)
+Daviess | 392 838 84 91
+Gibson | 856 3630 44 74
+Greene | 612 924 182 520
+Knox | 1135 3855 202 177
+Lawrence | 277 487 42 141
+Martin | 474 620 87 121
+Monroe | 2163 959 51 147
+Orange | 282 397 27 151
+Pike | 605 1109 34 87
+Posey | 2389 658 24 40
+Sullivan | 270 616 1609 416
+Vanderburgh | 7169 2507 151 358
+Warrick | 2752 1742 87 175
+TOTALS | 19376 18342 2624 2498
+
+@ 8
+Samuel W. Hillenburg (D) | John Lawrence "L" Smith (D) | Ralph Spelbring (D) | John N. Hostettler (R)
+Daviess | 156 174 37 3504
+Gibson | 37 39 21 1454
+Greene | 288 248 84 2607
+Knox | 351 214 82 2833
+Lawrence | 284 101 30 4313
+Martin | 131 141 53 1020
+Monroe | 288 431 48 4292
+Orange | 115 81 22 2141
+Pike | 30 35 17 1011
+Posey | 41 33 22 1245
+Sullivan | 188 243 59 1181
+Vanderburgh | 196 177 75 9678
+Warrick | 92 99 37 3528
+TOTALS | 2197 2016 587 38807
+
+@ 8
+Michael Allen McCamish (R)
+Daviess | 465
+Gibson | 291
+Greene | 392
+Knox | 551
+Lawrence | 712
+Martin | 120
+Monroe | 1056
+Orange | 373
+Pike | 271
+Posey | 183
+Sullivan | 151
+Vanderburgh | 2963
+Warrick | 1009
+TOTALS | 8537
+
+@ 9
+Lee H. Hamilton (D) | E. Joe Finke (D) | Jean Leising (R) | Jesse R. Hall (R)
+Bartholomew | 446 74 474 221
+Brown | 1382 192 1014 387
+Clark | 11740 1616 1835 612
+Crawford | 1675 199 606 261
+Dearborn | 1901 341 2662 504
+Dubois | 3885 636 1403 213
+Fayette | 1825 285 1768 165
+Floyd | 5729 772 1941 443
+Franklin | 954 224 1289 181
+Harrison | 4834 989 1329 478
+Jackson | 2675 486 2110 512
+Jefferson | 2526 483 1341 240
+Jennings | 2301 412 1602 558
+Ohio | 615 77 291 44
+Perry | 2282 316 568 219
+Ripley | 1216 197 2272 302
+Scott | 1720 284 616 129
+Spencer | 1234 114 1411 440
+Switzerland | 1191 396 403 59
+Union | 323 31 662 185
+Washington | 2283 295 2143 353
+TOTALS | 52737 8419 27740 6506
+
+@ 10
+Julia M. Carson (D) | Ann Delaney (D) | Jocelyn-Tandy Aldande (D) | Mmoja Ajabu (D)
+Marion | 17950 11310 3747 1492
+
+@ 10
+Charles F. Henderson (D) | Joe L. Turner (D) | Gale P. Jontz (D) | F. Perry Ray (D)
+Marion | 784 611 441 227
+
+@ 10
+Bobby S. Hildago Kern (D) | Virginia Blankenbaker (R) | Marvin Scott (R) | Sherry M. Beck (R)
+Marion | 209 17837 14133 1912
+
+@ 10
+Catherine Ann Charter (R) | John M. Prescott (R)
+Marion | 1374 0
