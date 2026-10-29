@@ -31,15 +31,15 @@ YEARS = {
         "ad_page": 83,
         "ad_columns": (0, 1, 2, 4, 3),
         "confirmed": {"Orville Preston": 1017},
-        "county_extra": "The Total row prints Orville Preston's column as 1,011, but his county lines add up to 1,017, the figure Wikipedia's 1887 results table gives, so the Total row is taken as a misprint and the lines are loaded. J. Edward Hall ran for the Progressive Labor party and Preston for the Union Labor party, neither of which is in the archive yet, so their candidacies carry no party.",
+        "county_extra": "The Total row prints Orville Preston's column as 1,011, but his county lines add up to 1,017, the figure Wikipedia's 1887 results table gives, so the Total row is taken as a misprint and the lines are loaded.",
         "ad_extra": "The table prints no line for the Union Labor and Greenback candidates, so their columns are not loaded.",
         "columns": (
             ("Frederick D. Grant", "republican-party"),
             ("Frederick Cook", "democratic-party"),
             ("Henry George", "NY:united-labor"),
             ("D. W. C. Huntington", "prohibition-party"),
-            ("J. Edward Hall", None),
-            ("Orville Preston", None),
+            ("J. Edward Hall", "NY:progressive-labor"),
+            ("Orville Preston", "union-labor"),
             ("Thomas K. Beecher", "greenback-party"),
         ),
     },
@@ -65,6 +65,10 @@ YEARS = {
             ("Thaddeus B. Wakeman", "peoples-party"),
         ),
     },
+}
+PARTIES = {
+    "union-labor": ("Union Labor Party", "Q27632846", 1887, 1889),
+    "NY:progressive-labor": ("Progressive Labor Party", None, 1886, 1888),
 }
 COUNTY_NOTE = (
     "Vote for {label} on {day:%B} {day.day}, {day.year}, by county, from the Tribune Almanac's 'New-York State Election. Vote by Counties' "
@@ -128,6 +132,24 @@ def emit() -> Path:
             """select c.district_area_id, c.electoral_system_id from contest c
                join slug s on s.entity_id = c.id and s.path = 'us/ny/1894-11-06-general/governor'"""
         ).fetchone()
+        for key, (text, qid, began, ended) in PARTIES.items():
+            party = cs.key("us.party", key)
+            if qid is not None:
+                cs.add("external_id", entity_id=party, scheme="wikidata", value=qid)
+            if party in cs.minted:
+                cs.add("party", id=party, kind="party", polity_id=cs.polity("US"))
+                cs.add(
+                    "name",
+                    entity_id=party,
+                    text=text,
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                    valid_from=date(began, 1, 1),
+                    valid_from_precision="year",
+                    valid_to=date(ended, 1, 1),
+                    valid_to_precision="year",
+                )
         for year, spec in YEARS.items():
             day = spec["day"]
             frame = pl.read_parquet(PARSED / f"{year}.parquet")
