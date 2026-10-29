@@ -874,6 +874,13 @@
       {const isMuted = $derived(
         (link != null && party.here === 0) || party.seats === 0,
       )}
+      {const color = $derived(
+        colors.get(party.key) ??
+          swatch(
+            party.color,
+            /^[0-9a-f]{8}-/.test(party.key) ? `party:${party.key}` : party.key,
+          ),
+      )}
       <li
         class={cn(
           "relative flex items-center gap-2 rounded-xs px-1.5 py-1 pointer-coarse:py-2",
@@ -904,13 +911,7 @@
           class={cn("shrink-0 rounded-xs block-2.5 inline-2.5", {
             "opacity-35": isMuted,
           })}
-          style:background-color={colors.get(party.key) ??
-            swatch(
-              party.color,
-              /^[0-9a-f]{8}-/.test(party.key)
-                ? `party:${party.key}`
-                : party.key,
-            )}
+          style:background-color={color}
         ></span>
         <span class="flex-1 truncate font-semibold min-inline-0">
           <Name
@@ -981,45 +982,104 @@
             >{m.seats_of({ count: count(party.seats) })}</span
           >
         {/if}
-        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
-        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
-        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
       </li>
       {#if isListed && opened.includes(party.key)}
-        <li id="{uid}-members-{party.key}" class="ps-6 pe-1.5 pbe-1.5">
-          <ul
-            class="grid gap-x-3 overflow-y-auto overscroll-y-contain border-s border-border ps-3 text-[0.8125rem]/snug max-block-80"
-            style:border-color={colors.get(party.key)}
+        {const roster = $derived.by(() => {
+          const groups = new Map<number, Array<Member>>();
+          for (const member of party.members) {
+            if (member.name != null) {
+              groups.set(member.place, [
+                ...(groups.get(member.place) ?? []),
+                member,
+              ]);
+            }
+          }
+          return [...groups]
+            .map(([place, members]) => ({
+              seat: places.length < 2 ? null : (places[place] ?? null),
+              members: members.toSorted(
+                (a, b) => (a.position ?? Infinity) - (b.position ?? Infinity),
+              ),
+            }))
+            .toSorted((a, b) =>
+              (a.seat?.name ?? "").localeCompare(
+                b.seat?.name ?? "",
+                undefined,
+                { numeric: true },
+              ),
+            );
+        })}
+        <li id="{uid}-members-{party.key}" class="pbe-1.5">
+          <div
+            class="overflow-hidden rounded-xs border border-border bg-secondary/60 shadow-[inset_2px_0_0_var(--party)]"
+            style:--party={color}
           >
-            {#each party.members
-              .filter((member) => member.name != null)
-              .toSorted((a, b) => (places[a.place]?.name ?? "").localeCompare( places[b.place]?.name ?? "", undefined, { numeric: true } ) || (a.position ?? Infinity) - (b.position ?? Infinity)) as member, index (index)}
-              {const seat = $derived(
-                places.length < 2 ? null : (places[member.place] ?? null),
-              )}
-              <li class="flex items-baseline justify-between gap-3 py-0.5">
-                <span class="truncate min-inline-0"
-                  ><Name
-                    label={member.name ?? ""}
-                    person={member.person ?? null}
-                    hasSwatch={false}
-                  /></span
+            <div
+              class="[scrollbar-width:thin] [scrollbar-color:var(--input)_transparent] overflow-y-auto overscroll-y-contain py-1 ps-3.5 pe-2.5 max-block-[min(22rem,60dvh)]"
+              {@attach (node) => {
+                const fade = () => {
+                  const top = Math.min(node.scrollTop, 24);
+                  const bottom = Math.min(
+                    node.scrollHeight - node.clientHeight - node.scrollTop,
+                    24,
+                  );
+                  node.style.maskImage = `linear-gradient(to bottom, transparent, #000 ${top}px, #000 calc(100% - ${bottom}px), transparent)`;
+                };
+                fade();
+                node.addEventListener("scroll", fade, { passive: true });
+                return () => node.removeEventListener("scroll", fade);
+              }}
+            >
+              {#if roster.every((group) => group.seat == null)}
+                <ul
+                  class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-x-4 py-1 text-[0.8125rem]/snug"
                 >
-                {#if seat != null}
-                  <span
-                    class="shrink-0 truncate text-xs text-muted-foreground max-inline-[55%]"
-                    >{#if seat.path == null}{seat.name.slice(
-                        prefix.length,
-                      )}{:else}<Preview
-                        class="hover:text-foreground hover:underline hover:decoration-border hover:underline-offset-4"
-                        path={seat.path}
-                        >{seat.name.slice(prefix.length)}</Preview
-                      >{/if}</span
-                  >
-                {/if}
-              </li>
-            {/each}
-          </ul>
+                  {#each roster.flatMap((group) => group.members) as member, index (index)}
+                    <li class="truncate py-0.5">
+                      <Name
+                        label={member.name ?? ""}
+                        person={member.person ?? null}
+                        hasSwatch={false}
+                      />
+                    </li>
+                  {/each}
+                </ul>
+              {:else}
+                <dl
+                  class="grid grid-cols-[minmax(0,max-content)_minmax(0,1fr)] gap-x-4 text-[0.8125rem]/snug"
+                >
+                  {#each roster as group, index (index)}
+                    <div
+                      class="col-span-2 grid grid-cols-subgrid items-baseline border-bs border-border/70 py-1 first:border-bs-0"
+                    >
+                      <dt
+                        class="truncate text-xs/snug text-muted-foreground max-inline-36"
+                      >
+                        {#if group.seat == null}{:else if group.seat.path == null}{group.seat.name.slice(
+                            prefix.length,
+                          )}{:else}<Preview
+                            class="hover:text-foreground hover:underline hover:decoration-border hover:underline-offset-4"
+                            path={group.seat.path}
+                            >{group.seat.name.slice(prefix.length)}</Preview
+                          >{/if}
+                      </dt>
+                      <dd class="grid">
+                        {#each group.members as member, slot (slot)}
+                          <span class="truncate"
+                            ><Name
+                              label={member.name ?? ""}
+                              person={member.person ?? null}
+                              hasSwatch={false}
+                            /></span
+                          >
+                        {/each}
+                      </dd>
+                    </div>
+                  {/each}
+                </dl>
+              {/if}
+            </div>
+          </div>
         </li>
       {/if}
     {/each}
@@ -1044,6 +1104,7 @@
           class="text-end font-figures text-[0.8125rem] tabular-nums inline-16"
           >{percent(seceded / totals.all)}</span
         >
+        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
       </li>
     {/if}
     {#if held > 0}
@@ -1064,6 +1125,7 @@
           >{count(held)}</span
         >
         <span class="inline-16"></span>
+        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
       </li>
     {/if}
     {#if vacant > 0}
@@ -1087,6 +1149,7 @@
           class="text-end font-figures text-[0.8125rem] tabular-nums inline-16"
           >{percent(vacant / totals.all)}</span
         >
+        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
       </li>
     {/if}
   </ul>
