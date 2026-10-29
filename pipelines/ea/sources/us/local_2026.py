@@ -1813,6 +1813,14 @@ for fips, county, page in (
     ("01087", "Macon", "Macon_Sample"),
     ("01067", "Henry", "Henry_Sample"),
     ("01131", "Wilcox", "Wilcox_Sample"),
+    ("01073", "Jefferson", "Jefferson-Sample"),
+    ("01097", "Mobile", "Mobile-Sample"),
+    ("01089", "Madison", "Madison-Sample"),
+    ("01101", "Montgomery", "Montgomery-Sample"),
+    ("01117", "Shelby", "Shelby-Sample"),
+    ("01003", "Baldwin", "Baldwin-Sample"),
+    ("01125", "Tuscaloosa", "Tuscaloosa-Sample"),
+    ("01081", "Lee", "Lee-Sample"),
 ):
     NE_SOURCES[f"AL-{fips}"] = (
         "Alabama Secretary of State",
@@ -4648,7 +4656,8 @@ def parse() -> None:
                             [
                                 word
                                 for word in stem
-                                if word
+                                if not (kind == "school" and word.isdigit())
+                                and word
                                 not in (
                                     (
                                         "public",
@@ -4661,6 +4670,10 @@ def parse() -> None:
                                         "elementary",
                                         "regional",
                                         "corporation",
+                                        "city",
+                                        "sch",
+                                        "dist",
+                                        "pub",
                                     )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
@@ -4740,6 +4753,9 @@ def parse() -> None:
                 ]
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
+                for formal in (["public", "schools", "of", "the", "city", "of"], ["school", "district", "of", "the", "city", "of"]):
+                    if state == "MI" and tokens[: len(formal)] == formal:
+                        tokens = [*tokens[len(formal) :], "schools"]
                 fits = []
                 for stem, sort, label, owner, path in (
                     [town for pool in towns.values() for town in pool]
