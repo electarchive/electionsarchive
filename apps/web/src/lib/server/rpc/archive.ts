@@ -14210,16 +14210,18 @@ export const elections = {
           from g join election e on e.polity_id = g.polity_id and e.kind = 'general'
             and e.date_from < g.d and e.date_from >= g.d - 400 and not exists (select from entity_merge m where m.entity_id = e.id)
         ),
+        units as materialized (
+          select pp.polity_id from g join polity_parent pp on pp.parent_id = g.polity_id
+          join polity y on y.id = pp.polity_id
+          where y.kind in ('federal_unit', 'region')
+        ),
         picked as materialized (
           select e.id, e.polity_id, e.date_from, e.polity_id = g.polity_id as own
           from g cross join prev
           join election e on e.kind in ('primary', 'caucus') and e.date_from > prev.d and e.date_from <= g.d
           left join election p on p.id = e.parent_id
-          where (e.polity_id = g.polity_id and (p.id is null or p.polity_id <> e.polity_id))
-            or (e.polity_id in (
-              select pp.polity_id from polity_parent pp join polity y on y.id = pp.polity_id
-              where pp.parent_id = g.polity_id and y.kind in ('federal_unit', 'region')
-            ) and (p.id is null or p.polity_id <> e.polity_id))
+          where (e.polity_id = g.polity_id or e.polity_id in (select polity_id from units))
+            and (p.id is null or p.polity_id <> e.polity_id)
         )
         select g.id, null as polity, g.d::text as date, null as until, null as party, null as contest,
           true as "isGeneral", true as "isOwn"
