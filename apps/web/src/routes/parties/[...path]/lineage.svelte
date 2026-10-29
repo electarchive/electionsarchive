@@ -35,6 +35,7 @@
     ["successor_of", m.lineage_key_succession],
     ["list_vehicle_for", m.lineage_key_list],
     ["closed_by_court", m.rel_closed_by_court],
+    ["closed_by_government", m.rel_closed_by_government],
     ["renamed", m.lineage_key_rename],
   ];
   const DASHES: Record<string, string> = {
@@ -764,7 +765,9 @@
                 key: `closed:${index}`,
                 x: event.x,
                 y: axis + 14,
-                title: m.rel_closed_by_court(),
+                title: (event.kind === "closed_by_government"
+                  ? m.rel_closed_by_government
+                  : m.rel_closed_by_court)(),
                 short: null,
                 detail: event.date?.slice(0, 4) ?? "",
               })}
@@ -847,7 +850,11 @@
             <li>{segment.entry.name}: {years(segment.entry)}</li>
           {/each}
           {#each closures as event, index (index)}
-            <li>{m.rel_closed_by_court()}: {event.date?.slice(0, 4) ?? ""}</li>
+            <li>
+              {(event.kind === "closed_by_government"
+                ? m.rel_closed_by_government
+                : m.rel_closed_by_court)()}: {event.date?.slice(0, 4) ?? ""}
+            </li>
           {/each}
           {#each lanes as lane (lane.party.id)}
             <li>
@@ -899,7 +906,7 @@
                     class="fill-card stroke-muted-foreground"
                     stroke-width="2"
                   />
-                {:else if kind === "closed_by_court"}
+                {:else if kind === "closed_by_court" || kind === "closed_by_government"}
                   <path
                     d="M-4,-4 L4,4 M4,-4 L-4,4"
                     class="stroke-foreground"

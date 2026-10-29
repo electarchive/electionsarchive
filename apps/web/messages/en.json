@@ -935,6 +935,7 @@
   "rel_list_vehicle_for_out": "Electoral list for {name}",
   "rel_list_vehicle_for_in": "Ran on the {name} list",
   "rel_closed_by_court": "Closed by court order",
+  "rel_closed_by_government": "Closed by government decree",
   "aff_ep_group": "{name} group in the European Parliament",
   "aff_federation": "Part of {name}",
   "aff_international": "Member of {name}",

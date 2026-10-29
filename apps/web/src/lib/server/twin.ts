@@ -1624,9 +1624,9 @@ function partyMarkdown(
         `- ${AFFILIATIONS[parent.kind]?.({ name: link(parent.party.label, `id/${parent.party.id}`) }) ?? link(parent.party.label, `id/${parent.party.id}`)}`,
     ),
     ...(party.events ?? []).flatMap((event) =>
-      event.kind === "closed_by_court"
+      event.kind === "closed_by_court" || event.kind === "closed_by_government"
         ? [
-            `- ${m.rel_closed_by_court()}${event.date == null ? "" : ` (${event.date.slice(0, 4)})`}`,
+            `- ${(event.kind === "closed_by_government" ? m.rel_closed_by_government : m.rel_closed_by_court)()}${event.date == null ? "" : ` (${event.date.slice(0, 4)})`}`,
           ]
         : [],
     ),
