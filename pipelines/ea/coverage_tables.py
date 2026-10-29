@@ -114,6 +114,78 @@ DISTRICT_CALENDAR = {
         4,
         "Chalkbeat Newark: four board seats filled at the April 21, 2026 school election, https://www.chalkbeat.org/newark/2026/03/17/voters-choose-between-nine-candidates-four-seats-board-of-education-election-april/",
     ),
+    ("PA", "Crawford County"): (
+        4,
+        3,
+        11,
+        "Crawford County commissioners (three seats, four-year terms) were elected November 7, 2023; County Commissioners Association of Pennsylvania, https://ccapweb.pacounties.org/getattachment/11a99fb1-af07-42d4-8b1f-16967730f5aa/Commissioner-Elections-2023G-FINAL.pdf",
+    ),
+    ("NJ", "Edison"): (
+        4,
+        1,
+        11,
+        "Edison mayor and township council elected together in November of odd years on four-year terms, most recently November 4, 2025, https://www.aol.com/articles/heres-where-edison-mayor-township-131513200.html",
+    ),
+    ("NJ", "Woodbridge"): (
+        4,
+        3,
+        11,
+        "Woodbridge mayor elected to a four-year term November 7, 2023; at-large council seat runs to December 31, 2027, https://www.ballotready.org/people/kyle-anderson",
+    ),
+    ("NJ", "Old Bridge Township"): (
+        2,
+        1,
+        11,
+        "Old Bridge mayor elected for four years November 7, 2023 (https://newbrunswicktoday.com/2023/11/a-dozen-mayor-elections-in-county-but-almost-half-are-uncontested/); ward council seats elected in the offset odd years, https://newjerseyglobe.com/local/merwin-to-face-henry-in-old-bridge/",
+    ),
+    ("MA", "Berkshire County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 2000; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Essex County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 1999; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Franklin County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 1997; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Hampden County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 2000; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Hampshire County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 1999; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Middlesex County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 1997; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Suffolk County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 1999; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
+    ("MA", "Worcester County"): (
+        6,
+        4,
+        11,
+        "Massachusetts abolished county government in 1998; the county sheriff, register of probate, and register of deeds remain elected on a six-year cycle (M.G.L. c. 37 § 1; sheriffs last elected 2022), https://malegislature.gov/Laws/GeneralLaws/PartI/TitleVII/Chapter37/Section1",
+    ),
 }
 CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
     ("AK", "county"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
