@@ -1547,12 +1547,6 @@ NE_SOURCES = {
         "https://vote.sos.ri.gov/Candidates",
         "ne/ri_towns.zip",
     ),
-    "NJ-34029": (
-        "Ocean County Clerk",
-        "2026 General Election Official Candidate Certification Sheet, updated 9-14-2026",
-        "https://www.co.ocean.nj.us/WebContentFiles/a6ad1195-1bbf-442f-bbd0-b4398929f0ef.pdf",
-        "nj/ocean_certification.pdf",
-    ),
     "NJ-34007": (
         "Camden County Clerk",
         "Official General Election sample ballots, November 3, 2026, Camden County municipalities",
