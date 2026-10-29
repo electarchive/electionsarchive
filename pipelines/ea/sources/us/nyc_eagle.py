@@ -23,16 +23,22 @@ def parse() -> None:
         groups: dict[tuple[str, int], dict] = {}
         headings: dict[str, list[str]] = {}
         for page in spec["pages"]:
-            path = INBOX / f"{spec['volume']}-p{page}-haiku.json"
+            path = INBOX / f"{spec['volume']}-p{page}-{spec['volume']}.json"
             if not path.exists():
                 continue
-            data = json.loads(path.read_text())
+            try:
+                data = json.loads(path.read_text())
+            except json.JSONDecodeError:
+                print(year, "page", page, "truncated; reread")
+                continue
             borough = next((name for name in COUNTY if name in data["title"].upper()), None)
             if borough is None:
                 continue
             headings.setdefault(borough, data["columns"])
             for panel in data["panels"]:
-                ad = ordinal(re.sub(r"(?i)assembly|dist(rict)?|continued|a\. ?d\.", "", panel["ad"]))
+                label = re.sub(r"(?i)assembly|dist(rict)?|continued|a\. ?d\.", "", panel["ad"])
+                digits = re.search(r"\d+", label)
+                ad = int(digits.group()) if digits else ordinal(label)
                 if ad is None:
                     continue
                 group = groups.setdefault((borough, ad), {"eds": [], "total": None, "width": len(data["columns"])})
