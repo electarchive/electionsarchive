@@ -7,6 +7,7 @@ import re
 import subprocess
 import tempfile
 import time
+import xml.etree.ElementTree as ET
 import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -459,12 +460,14 @@ MT_FILES = {
 ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}-general.pdf"
 ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
 SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
+SC_2010 = "https://www.enr-scvotes.org/SC/19077/39934/reports/detailxml.zip"
 SC_DAYS = {
     date(2000, 11, 7): 3,
     date(2002, 11, 5): 2,
     date(2004, 11, 2): 2,
     date(2006, 11, 7): 7,
     date(2008, 11, 4): 3,
+    date(2010, 11, 2): 4,
 }
 SC_COUNTIES = (
     "Abbeville Aiken Allendale Anderson Bamberg Barnwell Beaufort Berkeley Calhoun Charleston Cherokee Chester "
@@ -767,7 +770,10 @@ def fetch() -> None:
             raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
             time.sleep(1)
     for day in SC_DAYS:
-        raw.fetch(SOURCE, SC.format(day.year), suffix=".pdf")
+        if day.year == 2010:
+            raw.fetch(SOURCE, SC_2010, suffix=".zip")
+        else:
+            raw.fetch(SOURCE, SC.format(day.year), suffix=".pdf")
         time.sleep(1)
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
@@ -2339,12 +2345,33 @@ def missouri() -> list[dict[str, object]]:
 def south_carolina() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, count in SC_DAYS.items():
-        url = SC.format(day.year)
-        lines = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
-        ).stdout.split("\n")
+        url = SC_2010 if day.year == 2010 else SC.format(day.year)
         tables: list[tuple[str, dict[str, list[int]]]] = []
-        if day.year >= 2006:
+        lines = (
+            []
+            if day.year == 2010
+            else subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.split("\n")
+        )
+        if day.year == 2010:
+            with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                for contest in ET.fromstring(archive.read("detail.xml")).iter("Contest"):
+                    text = contest.get("text") or ""
+                    if contest.get("isQuestion") != "true" or not text.startswith("Amendment"):
+                        continue
+                    table: dict[str, list[int]] = {}
+                    for choice in contest.findall("Choice"):
+                        side = {"Yes": 0, "No": 1}[choice.get("text") or ""]
+                        for county in choice.findall("VoteType/County"):
+                            table.setdefault(county.get("name") or "", [0, 0])[side] += int(county.get("votes") or 0)
+                    if len(table) != 46:
+                        raise ValueError(f"SC {day} {text}: {len(table)} counties")
+                    tables.append((text.removeprefix("Amendment "), table))
+        elif day.year >= 2006:
             starts = [
                 at
                 for at, line in enumerate(lines)
