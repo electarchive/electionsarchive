@@ -27,13 +27,15 @@
    "page": 1,
    "id": "h51",
    "orientation": "counties_down",
-   "discover": "h5"
+   "discover": "h5",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 2,
    "id": "h52",
    "orientation": "counties_down",
-   "discover": "h5"
+   "discover": "h5",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   }
  ]
 }
