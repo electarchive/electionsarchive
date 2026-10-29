@@ -293,12 +293,12 @@ def measure(conn, day: str) -> dict:
     listed: dict[str, set[str]] = defaultdict(set)
     params = {"year": year, "month": int(day[5:7])}
     places: list[tuple[str, str, str, int, bool]] = []
-    by_polity: dict[str, int] = {}
+    by_polity: dict[str, list[int]] = defaultdict(list)
     counties: dict[str, tuple[str, str]] = {}
     schools: dict[str, list[tuple[int, str]]] = defaultdict(list)
     for st, kind, polity, name, population, county, due in conn.execute(GOVERNMENTS_SQL, params):
         if polity is not None:
-            by_polity[polity] = len(places)
+            by_polity[polity].append(len(places))
             if kind == "county" and county is not None:
                 counties[polity] = (county, name.removesuffix(" County").removesuffix(" Parish"))
         if kind == "school" and county is not None:
@@ -339,19 +339,20 @@ def measure(conn, day: str) -> dict:
         if level == "judicial" and st not in judges:
             judges[st] = len(places)
             places.append(("judicial", st, st, 0, False))
-        place = (
-            judges[st]
+        targets = (
+            [judges[st]]
             if level == "judicial"
-            else by_polity.get(polity or "")
+            else by_polity.get(polity or "", [])
             if level in ("county", "municipal", "school", "special_district")
-            else None
+            else []
         )
         if level == "school" and (polity or "") in counties:
             county, short = counties[polity or ""]
             system = [i for i, name in schools[county] if short in name]
-            place = system[0] if len(system) == 1 else place
-        if place is not None:
-            held[place].append((has, ok.get(str(cid), False)))
+            targets = [system[0]] if len(system) == 1 else targets
+        if targets:
+            for place in targets:
+                held[place].append((has, ok.get(str(cid), False)))
             continue
         if level not in units or level not in ("statewide_exec", "local_judicial") and st not in listed[level]:
             continue

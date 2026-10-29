@@ -4209,7 +4209,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ')"""
         ).fetchall():
             mine = coverage_tables.tokens(label)
             hits = [
@@ -4236,16 +4236,16 @@ def parse() -> None:
             )
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
-            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR"]) & (pl.col("FUNCSTAT") == "A"))
+            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ"]) & (pl.col("FUNCSTAT") == "A"))
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
-        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar)/[^/]+$'")}
+        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az)/[^/]+$'")}
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -4300,7 +4300,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4409,7 +4409,7 @@ def parse() -> None:
                             if (
                                 said
                                 and (sort and said != sort or not sort and said == "township")
-                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -4426,7 +4426,7 @@ def parse() -> None:
                         state in ("NJ", "MI", "FL", "OR", "NV", "AR")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
-                        or state in ("CA", "TX", "UT")
+                        or state in ("CA", "TX", "UT", "AZ")
                         and bool(fits)
                     )
                     and len({fit[4] for fit in fits}) == 1
