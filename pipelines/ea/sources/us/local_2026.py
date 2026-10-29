@@ -4496,7 +4496,7 @@ def parse() -> None:
                         else "At-Large"
                         if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
-                        if state == "CA"
+                        if state in ("CA", "UT")
                         and (
                             area := re.search(
                                 r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
