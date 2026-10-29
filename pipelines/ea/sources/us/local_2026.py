@@ -2319,7 +2319,7 @@ def parse() -> None:
             continue
         where = row["Contest Run By District Name and Number"]
         county = where if "District" not in where else row["Candidate Residential Jurisdiction"]
-        county = re.sub(r"(?i) county$", "", county)
+        county = re.sub(r"(?i) county$", "", county).replace("Saint ", "St. ")
         title = row["Office Name"]
         town = re.match(r"(Council|Mayor) - City of (.+)", title)
         contest = (
@@ -4748,7 +4748,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA")
@@ -4777,7 +4777,7 @@ def parse() -> None:
                                 for pattern, role in (
                                     (
                                         (
-                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer)$"
+                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator)$"
                                             r"|^(?:town )?(?:clerk and )?tax collector$"
                                         ),
                                         "office",
@@ -4855,6 +4855,7 @@ def parse() -> None:
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
+                                "moderator": "Moderator",
                                 "collector": "Tax Collector",
                                 "highway-superintendent": "Highway Superintendent",
                                 "justice": "Justice",
