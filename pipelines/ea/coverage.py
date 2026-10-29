@@ -72,6 +72,7 @@ select c.id, extract(year from e.date_from)::int as year, coalesce(ps.st, 'US') 
         when b.kind in ('upper_house', 'unicameral') and op.kind in ('federal_unit', 'region') then 'state_upper'
         when b.kind = 'lower_house' and op.kind in ('federal_unit', 'region') then 'state_lower'
         when op.kind in ('federal_unit', 'region') and oe.value ~ '(justice|judge|court)' then 'judicial'
+        when oe.value ~ ':party:' then 'party'
         when op.kind in ('federal_unit', 'region') then 'statewide_exec'
         when op.kind = 'school_district' or coalesce(oe.value, be.value) ~ '(school|education)' then 'school'
         when op.kind = 'county' then 'county'
