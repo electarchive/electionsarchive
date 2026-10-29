@@ -30,6 +30,7 @@ TITLES = {
     1993: "New York City Campaign Finance Board, 1993 elections: Appendices B and C, totals for candidates appearing on the primary and general election ballots (scanned)",
     1997: "A Decade of Reform: the 1997 New York City Elections, Volume II, Appendices B and C",
 }
+RUNOFF = date(1993, 9, 28)
 DAYS = {
     1989: (date(1989, 9, 12), date(1989, 11, 7)),
     1991: (date(1991, 9, 10), date(1991, 11, 5)),
@@ -187,7 +188,7 @@ def parse_1997() -> list[dict[str, object]]:
                         "office": office,
                         "total": table["total"],
                         "candidate": re.sub(r"\s*\*$", "", f"{first.strip()} {last.strip()}").strip(),
-                        "codes": party if stage == "primary" else row["party_codes"].replace(" ", ""),
+                        "codes": party if stage != "general" else row["party_codes"].replace(" ", ""),
                         "votes": votes,
                         "page": page,
                     }
@@ -233,6 +234,8 @@ def parse_vision() -> list[dict[str, object]]:
             if "sonnet" not in reads:
                 continue
             for index, table in enumerate(reads["sonnet"]["tables"]):
+                if year == 1993 and page == 18 and index == 0:
+                    table = {**table, "office": "Comptroller", "stage": "runoff"}
                 office = table["office"]
                 scope = re.sub(r"^(Boro|District):\s*", "", table["scope"]).strip()
                 if office not in ("Mayor", "Comptroller", "Public Advocate", "City Council President", "Borough President", "City Council"):
@@ -240,8 +243,6 @@ def parse_vision() -> list[dict[str, object]]:
                 if (office in ("Borough President", "City Council")) and not scope:
                     continue
                 if table["stage"] == "general" and not (year == 1993 and office == "Borough President"):
-                    continue
-                if year == 1993 and page == 18 and office == "Public Advocate":
                     continue
                 key = (table["stage"], office, scope, table["party"])
                 seen[key] = seen.get(key, 0) + 1
@@ -272,7 +273,7 @@ def parse_vision() -> list[dict[str, object]]:
                     "office": f"council:{scope}" if office == "City Council" else f"borough-president:{slug(scope)}" if office == "Borough President" else OFFICES[office],
                     "total": table["total"],
                     "candidate": person(row["candidate"]),
-                    "codes": party if stage == "primary" else row["party_codes"].replace(" ", ""),
+                    "codes": party if stage != "general" else row["party_codes"].replace(" ", ""),
                     "votes": votes,
                     "page": table["page"],
                     "method": table["method"],
@@ -304,7 +305,7 @@ def parse() -> None:
         how="diagonal_relaxed",
     )
     frame = frame.with_columns(
-        pl.when(pl.col("stage") == "primary")
+        pl.when(pl.col("stage") != "general")
         .then(pl.col("codes").str.split(",").list.first().str.strip_chars())
         .otherwise(pl.lit(""))
         .alias("party")
@@ -403,10 +404,28 @@ def emit() -> Path:
             ):
                 if office == "mayor" and stage == "general":
                     continue
-                day = DAYS[year][0 if stage == "primary" else 1]
+                day = RUNOFF if stage == "runoff" else DAYS[year][0 if stage == "primary" else 1]
                 party_key = party_key or None
                 suffix = f"-{slug(PARTIES[party_key])}" if party_key else ""
-                if stage == "primary":
+                if stage == "runoff":
+                    election = cs.key("us.election", f"{day}:new-york-city:runoff")
+                    election_path = f"us/ny/new-york-city/{day}-runoff"
+                    if election in cs.minted and election not in made:
+                        made.add(election)
+                        cs.add(
+                            "election",
+                            id=election,
+                            polity_id=place_polity,
+                            parent_id=cs.key("us.election", f"{DAYS[year][0]}:new-york-city:primary"),
+                            kind="runoff",
+                            date_from=day,
+                            date_to=day,
+                            date_precision="day",
+                            status="held",
+                        )
+                        name(election, f"{year} New York City Democratic primary runoff")
+                        cs.add("slug", path=election_path, entity_id=election)
+                elif stage == "primary":
                     election = cs.key("us.election", f"{day}:new-york-city:primary")
                     election_path = f"us/ny/new-york-city/{day}-primary"
                     if election in cs.minted and election not in made:
@@ -447,7 +466,7 @@ def emit() -> Path:
                     title = {"mayor": "Mayor", "comptroller": "Comptroller", "public-advocate": "Public Advocate"}[kind]
                 contest_key = f"{SOURCE}:{day}:{stage}:{office}{suffix}"
                 contest = cs.key("us.contest", contest_key)
-                adjective = f"{PARTIES[party_key]} primary for " if party_key else ""
+                adjective = f"{PARTIES[party_key]} {stage} for " if party_key else ""
                 cs.add(
                     "contest",
                     id=contest,
@@ -458,7 +477,10 @@ def emit() -> Path:
                     party_scope_id=party_for(party_key) if party_key else None,
                     district_area_id=area,
                     magnitude=1,
-                    round_number=1,
+                    round_number=2 if stage == "runoff" else 1,
+                    previous_round_id=cs.key("us.contest", f"{SOURCE}:{DAYS[year][0]}:primary:{office}{suffix}")
+                    if stage == "runoff"
+                    else None,
                     electoral_system_id=system,
                     default_result_kind="counted",
                     term="full",
@@ -543,12 +565,12 @@ def emit() -> Path:
                         x1=1,
                         y1=1,
                     )
-                    if row["votes"] == top:
+                    if row["votes"] == top and not (year == 1993 and stage == "primary" and office == "comptroller"):
                         cs.add(
                             "outcome",
                             result_set_id=result_set,
                             option_id=option,
-                            kind="won" if stage == "primary" else "elected",
+                            kind="elected" if stage == "general" else "won",
                             seats=None,
                         )
         return cs.write()
