@@ -175,7 +175,7 @@ def settle(reads: list, width: int, strict: bool = False):
 
 
 HAND_READ = {
-    1903: ("MANHATTAN", 638, {
+    1903: [("MANHATTAN", 638, {
         1: (
             "Mayor S. Low Frs. 1903",
             [949,1521,1998,2297,4243,1765,2616,1498,3003,2429,1953,1730,1724,2137,2340,2399,2313,2125,6916,2710,11271,2449,9203,2261,4153,2517,3852,2265,6122,3172,10296,3470,2935,6581,11160],
@@ -192,8 +192,8 @@ HAND_READ = {
             "Comptroller E.M. Grout Dem. 1903",
             [3200,4912,4857,3564,3758,5606,5011,2715,4468,3792,3903,3152,3944,4687,4704,3930,4598,6520,5288,5023,8174,5554,8814,4972,2807,3931,2562,5113,3901,6293,7835,6903,5258,11510,14863],
         ),
-    }),
-    1901: ("QUEENS", 534, {
+    })],
+    1901: [("QUEENS", 534, {
         1: ("Mayor S. Low Fus.", [6495, 6086, 537]),
         2: ("Mayor E.M. Shepard Dem.", [8465, 4486, 728]),
         3: ("Comptroller E.M. Grout Fus.", [6459, 6109, 538]),
@@ -201,7 +201,14 @@ HAND_READ = {
         5: ("Pres. Bd. of Aldermen C.V. Fornes Fus.", [6248, 5974, 521]),
         6: ("Pres. Bd. of Aldermen G.M. Van Hoesen Dem.", [8557, 4495, 739]),
         7: ("Borough Pres. J. Cassidy Dem.", [9114, 4456, 814]),
-    }),
+    }), ("RICHMOND", 535, {
+        1: ("Mayor S. Low Fus.", [2229, 1313, 1437, 873, 920]),
+        2: ("Mayor E.M. Shepard Dem.", [1947, 1315, 1154, 864, 729]),
+        3: ("Comptroller E.M. Grout Fus.", [2245, 1329, 1432, 901, 925]),
+        4: ("Pres. Bd. of Aldermen C.V. Fornes Fus.", [2210, 1308, 1420, 890, 904]),
+        5: ("Pres. Bd. of Aldermen G.M. Van Hoesen Dem.", [1940, 1306, 1158, 846, 721]),
+        6: ("Borough Pres. G. Cromwell Fus.", [2110, 1284, 1406, 949, 884]),
+    })],
 }
 
 
@@ -270,10 +277,10 @@ def parse() -> None:
                                 }
                             )
                 print(year, table["page"], "assembly districts loaded", len(result[0]), "from", len(reads), "reads")
-            if year in HAND_READ:
+            for hand_county, hand_page, hand_columns in HAND_READ.get(year, []):
                 out.extend(
-                    {"county": HAND_READ[year][0], "ad": ad, "ed": 0, "column": column, "value": value, "page": HAND_READ[year][1], "header": header}
-                    for column, (header, values) in HAND_READ[year][2].items()
+                    {"county": hand_county, "ad": ad, "ed": 0, "column": column, "value": value, "page": hand_page, "header": header}
+                    for column, (header, values) in hand_columns.items()
                     for ad, value in enumerate(values, 1)
                 )
             pl.DataFrame(
@@ -358,10 +365,10 @@ def parse() -> None:
                         "header": columns[index],
                     }
                 )
-        if year in HAND_READ:
+        for hand_county, hand_page, hand_columns in HAND_READ.get(year, []):
             out.extend(
-                {"county": HAND_READ[year][0], "ad": ad, "ed": 0, "column": column, "value": value, "page": HAND_READ[year][1], "header": header}
-                for column, (header, values) in HAND_READ[year][2].items()
+                {"county": hand_county, "ad": ad, "ed": 0, "column": column, "value": value, "page": hand_page, "header": header}
+                for column, (header, values) in hand_columns.items()
                 for ad, value in enumerate(values, 1)
             )
         pl.DataFrame(
@@ -686,7 +693,7 @@ def emit():
                             else f"Election district and assembly district returns transcribed from the {spec['title']}, a compendium that prints only assembly district totals and omits minor-party lines. A district is loaded only when every column of its election districts adds up to the printed assembly district total, or to within a few votes of it where the almanac's own total does not add up and every reading of the page agrees."
                         )
                         + (
-                            " Only the Brooklyn tables and the Queens assembly district totals (every column but Dohl for borough president adds up exactly to the printed borough total) were read, so the citywide sets carry no completeness."
+                            " Only the Brooklyn tables, the Queens assembly district totals (every column but Dohl for borough president adds up exactly to the printed borough total), and the Richmond ward totals were read, so the citywide sets carry no completeness. Richmond is loaded by ward; the columns that add up to the printed borough total are in, and Seth Low's first-ward total is the 2,229 that the twelve election district rows and the borough total both give, where the ward row prints 2,269."
                             if year == 1901
                             else " The Brooklyn and Queens tables tie to their printed totals on every column. The Manhattan and Bronx table (35 assembly districts of New York County, the annexed district left out) was read by eye on the page and loaded only for the mayor and comptroller columns, each of which adds up exactly to the printed total; its other columns do not tie and are left out, so the citywide sets carry no completeness."
                             if year == 1903
@@ -731,14 +738,15 @@ def emit():
                         roots[surname] = root
                     options[(office_slug, county, column)] = roots[surname]
                 ad_code = f"{COUNTY[county]}:{ad:02d}"
+                ad_scheme = "us.nyc_ward" if county == "RICHMOND" else "us.nyc_ad"
                 if ad_code not in ads:
-                    ads[ad_code] = cs.unit("us.nyc_ad", ad_code, day)
+                    ads[ad_code] = cs.unit(ad_scheme, ad_code, day)
                     if ads[ad_code] in cs.minted:
                         cs.add(
                             "reporting_unit",
                             id=ads[ad_code],
                             polity_id=city_polity,
-                            scheme_code="us.nyc_ad",
+                            scheme_code=ad_scheme,
                             code=ad_code,
                             parent_id=cs.unit("us.county", COUNTY[county]),
                             area_relation="unlocated",
