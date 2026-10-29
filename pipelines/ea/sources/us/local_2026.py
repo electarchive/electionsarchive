@@ -4486,7 +4486,7 @@ def parse() -> None:
                             )
                             if (
                                 said
-                                and (sort and said != sort or not sort and said == "township")
+                                and (sort and said != sort and (said, sort) != ("town", "township") or not sort and said == "township")
                                 or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
