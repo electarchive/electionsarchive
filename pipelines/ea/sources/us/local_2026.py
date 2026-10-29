@@ -697,6 +697,11 @@ FEEDS = {
         "Natrona County Clerk",
         "Natrona County 2026 General Election Candidate Roster (9/11/2026)",
     ),
+    "OK-cand": (
+        "https://okcandidates.okelections.gov/",
+        "Oklahoma State Election Board",
+        "Candidate Filings, FilingsExport (county offices)",
+    ),
     "TX-48085": (
         "https://www.wylieisd.net/our-district/school-board/board-elections",
         "Wylie Independent School District",
@@ -1520,6 +1525,7 @@ DELIVERED = {
     "MT-30013": DATA / "inbox" / "y26" / "mt" / "cascade.pdf",
     "WY-56025": DATA / "inbox" / "y26" / "wy" / "natrona.pdf",
     "TX-48085": DATA / "inbox" / "y26" / "tx" / "wylie.html",
+    "OK-cand": DATA / "inbox" / "manual" / "MF-281" / "FilingsExport_CSV_20261029083401.zip",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
     "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
@@ -3138,7 +3144,10 @@ def parse() -> None:
         feeds["NJ-34029"].append(
             {
                 "county": "Ocean",
-                "contest": f"{found[1]} {found[2]}",
+                "contest": "Ocean County Board of County Commissioners"
+                if found[1] == "Ocean County"
+                else f"{found[1]} {found[2]}",
+                "whole": found[1] == "Ocean County",
                 "seats": int(found[5]),
                 "name": cased(f"{found[6]} {found[7]}"),
                 "party": named,
@@ -4611,9 +4620,13 @@ def parse() -> None:
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0] or (
                     "Carson City" if row["fips"] == "32510" else ""
                 )
-                if row.get("area"):
+                if row.get("area") or row.get("whole"):
                     office = re.sub(r"\s+", " ", str(row["contest"])).strip()
-                    if office.endswith("Board of Education"):
+                    if row.get("whole"):
+                        title = re.sub(rf"^{re.escape(place)}\s+", "", office)
+                        template, tail = "", f"{state}:{row['fips']}:{slug(title)}"
+                        minted[tail] = (title, place, "", "")
+                    elif office.endswith("Board of Education"):
                         hits = index.get((prefix, coverage_tables.tokens(str(row["office"] or office.removesuffix(" Board of Education")))), [])
                         if len(hits) != 1:
                             missed.add(f"{row['county']}: {row['contest']} {row['area']}")
