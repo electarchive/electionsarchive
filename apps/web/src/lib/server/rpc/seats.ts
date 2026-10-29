@@ -1075,9 +1075,9 @@ export const seats = {
           order by t.contest, t.k
         )
         select p.basis, p.prior, p.area, p.day::text as since, (select day::text from this) as day, (select "isUs" from this) as "isUs", (select "isIe" from this) as "isIe",
-          array(select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.id order by x.k) as now,
+          array(select coalesce(x.party, 'person:' || coalesce(x.person, 'k' || x.k)) from won x cross join generate_series(1, x.seats) where x.contest = p.id order by x.k) as now,
           array(
-            select coalesce(x.party, 'person:' || x.person) from won x cross join generate_series(1, x.seats) where x.contest = p.prior
+            select coalesce(x.party, 'person:' || coalesce(x.person, 'k' || x.k)) from won x cross join generate_series(1, x.seats) where x.contest = p.prior
             order by case when pc.magnitude > (select magnitude from this) then x.votes end desc nulls last, x.k
             limit case when pc.magnitude > (select magnitude from this) then (select magnitude from this) end
           ) as before,
