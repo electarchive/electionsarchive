@@ -1,7 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { tick } from "svelte";
   import { on } from "svelte/events";
   import { MediaQuery } from "svelte/reactivity";
   import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
@@ -252,37 +251,54 @@
   const isWide = new MediaQuery("min-width: 64rem");
   let isAll = $state(false);
   let fit = $state<number | null>(null);
+  let clip = $state<number | null>(null);
+  let floor = $state<number | null>(null);
   let box = $state<HTMLElement>();
+  let span = "";
+  let most = 0;
   const limit = $derived(
     isAll ? feed.length : isWide.current ? (fit ?? feed.length) : 8,
   );
 
   $effect(() => {
-    const list = feed;
+    void feed.length;
+    void kind;
     if (box == null || !isWide.current || isAll) {
+      fit = null;
+      clip = null;
       return;
     }
     const frame = box;
-    const measure = async () => {
-      fit = null;
-      await tick();
+    const measure = () => {
+      const key = `${start}|${frame.clientWidth}`;
       const room = frame.clientHeight;
+      if (key !== span) {
+        span = key;
+        most = 0;
+        floor = null;
+      } else if (room > most) {
+        most = room;
+        floor = room;
+      }
       const reserve =
         2.25 * Number.parseFloat(getComputedStyle(frame).fontSize);
       const bottoms = [...frame.querySelectorAll<HTMLElement>("ol > li")].map(
         (row) => row.offsetTop + row.offsetHeight,
       );
-      fit =
+      const fits =
         (bottoms.at(-1) ?? 0) <= room
-          ? list.length
+          ? bottoms.length
           : Math.max(
               1,
               bottoms.filter((bottom) => bottom <= room - reserve).length,
             );
+      fit = fits;
+      clip = fits < bottoms.length ? (bottoms[fits - 1] ?? 0) - 1 : null;
     };
-    const observer = new ResizeObserver(() => void measure());
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(frame);
-    const off = on(frame, "toggle", () => void measure(), { capture: true });
+    const off = on(frame, "toggle", measure, { capture: true });
     return () => {
       observer.disconnect();
       off();
@@ -319,15 +335,20 @@
       <div
         bind:this={box}
         class={cn({ "lg:relative lg:flex-1 lg:min-block-40": !isAll })}
+        style:min-block-size={isAll || floor == null ? null : `${floor}px`}
       >
         <div
           class={cn("grid content-start gap-2", {
             "lg:absolute lg:inset-0": !isAll,
           })}
         >
-          <ol class="grid rounded-sm text-[0.8125rem] ring-1 ring-border">
-            {#each feed.slice(0, limit) as event, index (index)}
+          <ol
+            class="grid content-start overflow-hidden rounded-sm text-[0.8125rem] ring-1 ring-border"
+            style:max-block-size={clip == null ? null : `${clip}px`}
+          >
+            {#each feed.slice(0, isWide.current ? feed.length : limit) as event, index (index)}
               <li
+                inert={index >= limit}
                 class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
               >
                 <span
