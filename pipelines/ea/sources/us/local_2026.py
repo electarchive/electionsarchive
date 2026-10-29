@@ -1787,6 +1787,13 @@ for page in sorted((DATA / "inbox" / "y26" / "la").glob("*.html")):
         f"https://voterportal.sos.la.gov/CandidateInquiry/ParishCandidate/Index?electionId=344&electionDate=11%2F03%2F2026#{page.stem}",
         f"la/{page.name}",
     )
+for fips in sorted({line.split("\t")[0] for line in Path(__file__).with_name("local_2026_states.tsv").read_text().splitlines() if line.startswith("ND-")}):
+    NE_SOURCES[fips] = (
+        "North Dakota Secretary of State",
+        "Candidate List, November 3, 2026 General Election",
+        f"https://vip.sos.nd.gov/candidatelist.aspx?eid=348#{fips}",
+        "nd/candidates.html",
+    )
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
