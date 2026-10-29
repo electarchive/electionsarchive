@@ -94,7 +94,7 @@ DISTRICT_CALENDAR = {
         1,
         0,
         4,
-        "Chalkbeat Newark: four board seats filled at the April 21, 2026 school election, N.J.S.A. 18A:14-53 lets a Type II district keep April, https://www.chalkbeat.org/newark/2026/03/17/voters-choose-between-nine-candidates-four-seats-board-of-education-election-april/",
+        "Chalkbeat Newark: four board seats filled at the April 21, 2026 school election, https://www.chalkbeat.org/newark/2026/03/17/voters-choose-between-nine-candidates-four-seats-board-of-education-election-april/",
     ),
 }
 CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
