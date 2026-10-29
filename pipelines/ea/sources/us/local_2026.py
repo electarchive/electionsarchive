@@ -1780,6 +1780,13 @@ NE_SOURCES["AR-05143"] = (
     "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-election-information",
     "ar/washington.html",
 )
+for page in sorted((DATA / "inbox" / "y26" / "la").glob("*.html")):
+    NE_SOURCES[f"LA-{page.stem}"] = (
+        "Louisiana Secretary of State",
+        "Candidate Inquiry, November 3, 2026 Election",
+        f"https://voterportal.sos.la.gov/CandidateInquiry/ParishCandidate/Index?electionId=344&electionDate=11%2F03%2F2026#{page.stem}",
+        f"la/{page.name}",
+    )
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
@@ -4485,7 +4492,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA')"""
         ).fetchall():
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
@@ -4513,7 +4520,7 @@ def parse() -> None:
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
             gazetteer.filter(
-                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD"]) & (pl.col("FUNCSTAT") == "A")
+                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA"]) & (pl.col("FUNCSTAT") == "A")
             )
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
@@ -4522,11 +4529,11 @@ def parse() -> None:
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
         claimed = {
             path
-            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md)/[^/]+$'")
+            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la)/[^/]+$'")
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -4581,7 +4588,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4887,7 +4894,7 @@ def parse() -> None:
                         or re.search(r"(?i)\bcounty (council|commission)\b", str(row["contest"])) is not None
                     )
                     and not LOCAL_BODY.search(
-                        re.sub(re.escape(place) if state == "MD" else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.I)
+                        re.sub(re.escape(place) if state in ("MD", "LA") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.I)
                     )
                     and (
                         "-" not in key
