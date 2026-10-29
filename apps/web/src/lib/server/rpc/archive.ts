@@ -19177,7 +19177,7 @@ export const bodies = {
             ) r where r.rank <= r.cap
           ),
           fallback as materialized (
-            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id) as party,
+            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id, mm.into_id, cd.member_of_party_id) as party,
               cd.is_independent as independent
             from t
             join contest_option o on o.contest_id = t.contest_id
@@ -19185,6 +19185,7 @@ export const bodies = {
             join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
             left join contest_option po on po.id = o.parent_option_id
             left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+            left join entity_merge mm on mm.entity_id = cd.member_of_party_id
             where not exists (select from tenure_affiliation a where a.tenure_id = t.id and a.kind = 'party')
             order by t.id
           )
