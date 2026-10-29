@@ -6,7 +6,7 @@ import subprocess
 import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
@@ -20,7 +20,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep2024"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 EP = "https://results.elections.europa.eu/data-sheets/csv/2024-2029/election-results"
 FILES = {
@@ -76,6 +76,7 @@ SUFFIXES = {
 }
 CHECKS = [
     "parties",
+    "groups",
     *(
         f"seats-breakdown-parties/{code}"
         for code in (
@@ -215,6 +216,17 @@ def italy() -> tuple[list[dict], dict]:
     }
 
 
+GROUPS = {
+    "EPP": "PPE",
+    "SD": "S&D",
+    "Renew": "Renew",
+    "GREENSEFA": "Verts/ALE",
+    "Theleft": "The Left",
+    "ECR": "ECR",
+    "PfE": "PfE",
+    "ESN": "ESN",
+    "NI": "NI",
+}
 COLLEGES = {
     "L12025": ("fbe", "Dutch-speaking electoral college"),
     "L92094": ("wbe", "French-speaking electoral college"),
@@ -1413,6 +1425,64 @@ def emit() -> Path:
                 source_id=None,
             )
 
+        def sheet(name: str) -> list[dict[str, str]]:
+            return list(
+                csv.DictReader(
+                    io.StringIO(raw.cached(SOURCE, f"{EP}/{name}.csv").path.read_text(encoding="utf-8-sig")),
+                    delimiter=";",
+                )
+            )
+
+        def norm(text: str | None) -> str:
+            text = "".join(
+                c for c in unicodedata.normalize("NFKD", (text or "").replace(".", "")) if not unicodedata.combining(c)
+            )
+            return " " + re.sub(r"[\W_]+", " ", text.casefold()).strip() + " "
+
+        ep_title = "European elections 2024: results data sheets"
+        ep_source = cs.source("European Parliament", ep_title)
+        cs.add(
+            "source",
+            id=ep_source,
+            kind="official_body",
+            publisher="European Parliament",
+            title=ep_title,
+            url="https://results.elections.europa.eu/en/data-sheets/",
+            license="European Parliament legal notice: reuse is authorized provided the source is acknowledged",
+            license_url="https://www.europarl.europa.eu/legal-notice/en/",
+            attribution="© European Union – Source: European Parliament",
+        )
+        for check in CHECKS:
+            cs.artifact(raw.cached(SOURCE, f"{EP}/{check}.csv"), ep_source)
+        ep_parties = {row["ID"]: row for row in sheet("parties")}
+        groups = {key: cs.key("ep.group", key) for key in GROUPS.values()}
+        for code, key in GROUPS.items():
+            if groups[key] in cs.minted:
+                cs.add("party", id=groups[key], polity_id=cs.polity("EU"), kind="parliamentary_group")
+                english = next(row for row in sheet("groups") if row["ID"] == code and row["LANGUAGE_ID"] == "EN")
+                for kind, text in (("official", english["LABEL"]), ("abbreviation", english["ACRONYM"])):
+                    cs.add(
+                        "name",
+                        entity_id=groups[key],
+                        text=text.strip(),
+                        lang="en",
+                        kind=kind,
+                        is_preferred=kind == "official",
+                        valid_from=date(2024, 7, 16),
+                        valid_from_precision="day",
+                        valid_to=None,
+                        valid_to_precision="day",
+                        source_id=ep_source,
+                    )
+        held = {
+            party
+            for (party,) in conn.execute(
+                "select distinct a.party_id::text from party_affiliation a join changeset c on c.id = a.changeset_id"
+                " where a.kind = 'ep_group' and c.pipeline <> %s and (a.valid_to is null or a.valid_to > '2024-06-06')",
+                [SOURCE],
+            ).fetchall()
+        }
+        blocs: dict[UUID, Counter[str]] = defaultdict(Counter)
         frames = []
         located: list[pl.DataFrame] = []
         for iso, (publisher, title, url, license, start, end) in AUTHORITIES.items():
@@ -1519,6 +1589,53 @@ def emit() -> Path:
                 )
                 if iso in NOTES:
                     cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTES[iso])
+                declared = sheet(
+                    f"seats-breakdown-parties/{ ({'GR': 'el'}.get(iso, iso.lower()) if not college else college) }"
+                )
+                units: dict[str, tuple[int, Counter[str], set[str]]] = {}
+                for entry in declared:
+                    info = ep_parties.get(entry["PARTY_ID"], {})
+                    if info.get("MEMBER_OF_COALITION"):
+                        continue
+                    members = [entry["PARTY_ID"], *(info.get("COALITION_MEMBERS") or "").split("|")]
+                    tally: Counter[str] = Counter()
+                    texts = set()
+                    for other in declared:
+                        if other["PARTY_ID"] in members and other["GROUP_ID"]:
+                            tally[other["GROUP_ID"]] += int(other["SEATS_TOTAL"])
+                    for member in members:
+                        for field in ("ACRONYM", "LABEL"):
+                            for part in (
+                                (ep_parties.get(member, {}).get(field) or "").removeprefix("Coalition ").split("/")
+                            ):
+                                if len(norm(part.split("(")[0]).strip()) >= 2:
+                                    texts.add(norm(part.split("(")[0]))
+                    units[entry["PARTY_ID"]] = (
+                        sum(int(other["SEATS_TOTAL"]) for other in declared if other["PARTY_ID"] == entry["PARTY_ID"]),
+                        tally,
+                        texts,
+                    )
+                seated = [row for row in rows.iter_rows(named=True) if row["seats"]]
+                scored = []
+                for row in seated:
+                    label = norm(row["label"])
+                    for key, (seats, _, texts) in units.items():
+                        text = max((len(t) for t in texts if t in label or label in t), default=0)
+                        if text:
+                            scored.append((text + 1000 * (seats == row["seats"]), row["position"], key))
+                matched: dict[int, str] = {}
+                for _, position, key in sorted(scored, reverse=True):
+                    if position not in matched and key not in matched.values():
+                        matched[position] = key
+                for row in seated:
+                    free = [
+                        key for key, unit in units.items() if key not in matched.values() and unit[0] == row["seats"]
+                    ]
+                    rivals = [
+                        other for other in seated if other["position"] not in matched and other["seats"] == row["seats"]
+                    ]
+                    if row["position"] not in matched and len(free) == 1 and len(rivals) == 1:
+                        matched[row["position"]] = free[0]
                 values = []
                 options: dict[int, str] = {}
                 for row in rows.iter_rows(named=True):
@@ -1552,6 +1669,8 @@ def emit() -> Path:
                     )
                     if row["seats"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=row["seats"])
+                        if row["position"] in matched and str(party) not in held:
+                            blocs[party].update(units[matched[row["position"]]][1])
                     options[row["position"]] = str(option)
                     values += [(str(option), 1, row["votes"]), (str(option), 16, row["seats"])]
                 for accounting in totals.filter((pl.col("iso") == iso) & (pl.col("college") == college)).iter_rows(
@@ -1601,6 +1720,22 @@ def emit() -> Path:
                             y1="y1",
                         )
                     )
+        for party, tally in blocs.items():
+            if len(tally) == 1:
+                cs.add(
+                    "party_affiliation",
+                    party_id=party,
+                    parent_party_id=groups[GROUPS[next(iter(tally))]],
+                    kind="ep_group",
+                    valid_from=date(2024, 6, 6),
+                    valid_from_precision="unknown",
+                    valid_to=None,
+                    valid_to_precision="unknown",
+                )
+        print(
+            f"ep_group affiliations: {sum(1 for tally in blocs.values() if len(tally) == 1)};"
+            f" split: {[(str(party), dict(tally)) for party, tally in blocs.items() if len(tally) != 1]}"
+        )
         cs.frame("result_value", pl.concat(frames))
         if located:
             cs.frame("value_locator", pl.concat(located))

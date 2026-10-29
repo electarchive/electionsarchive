@@ -2,7 +2,7 @@ import json
 import re
 import sqlite3
 import unicodedata
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 from urllib.parse import unquote, urlencode, urlparse
@@ -17,7 +17,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
 DEMON = "https://web.archive.org/web/20200201142936id_/http://www.election.demon.co.uk:80/eplon.html"
@@ -74,6 +74,64 @@ WINDOWS = {
     2014: (date(2014, 5, 22), date(2014, 5, 25)),
     2019: (date(2019, 5, 23), date(2019, 5, 26)),
 }
+GENERALS = [*(window[0] for window in WINDOWS.values()), date(2024, 6, 6)]
+GROUPS = {
+    **dict.fromkeys(("PPE", "EPP-ED", "EPP"), "PPE"),
+    **dict.fromkeys(("S", "PSE", "S&D"), "S&D"),
+    **dict.fromkeys(("L", "LDR", "ELDR", "ALDE", "Renew Europe"), "Renew"),
+    **dict.fromkeys(("V", "Verts/ALE", "VERTS/Ale", "Greens/EFA", "G/EFA"), "Verts/ALE"),
+    **dict.fromkeys(("GUE/NGL", "GUE/NFL"), "The Left"),
+    **dict.fromkeys(("Non-Inscrits", "non-inscrits", "Non inscrits"), "NI"),
+    **dict.fromkeys(("EFD", "EFDD"), "EFD"),
+    "CG": "LU",
+    **{
+        label: label
+        for label in ("ID", "ECR", "ED", "COM", "CDI", "DEP", "RDE", "DR", "ARC", "FE", "EDN", "ARE", "UEN", "TDI")
+    },
+    "EDD": "EDD",
+    "IND/DEM": "IND/DEM",
+}
+GROUP_NAMES = [
+    ("PPE", 1979, 1999, "Group of the European People's Party (Christian-Democratic Group)", "EPP"),
+    ("PPE", 1999, 2009, "Group of the European People's Party (Christian Democrats) and European Democrats", "EPP-ED"),
+    ("PPE", 2009, 2019, "Group of the European People's Party (Christian Democrats)", "EPP"),
+    ("S&D", 1979, 1994, "Socialist Group", "SOC"),
+    ("S&D", 1994, 2009, "Group of the Party of European Socialists", "PES"),
+    (
+        "S&D",
+        2009,
+        2019,
+        "Group of the Progressive Alliance of Socialists and Democrats in the European Parliament",
+        "S&D",
+    ),
+    ("Renew", 1979, 1989, "Liberal and Democratic Group", "LD"),
+    ("Renew", 1989, 1994, "Liberal and Democratic Reformist Group", "LDR"),
+    ("Renew", 1994, 2004, "Group of the European Liberal, Democrat and Reform Party", "ELDR"),
+    ("Renew", 2004, 2019, "Group of the Alliance of Liberals and Democrats for Europe", "ALDE"),
+    ("Verts/ALE", 1989, 1999, "The Green Group in the European Parliament", "Greens"),
+    ("Verts/ALE", 1999, 2019, "Group of the Greens/European Free Alliance", "Greens/EFA"),
+    ("The Left", 1994, 2020, "Confederal Group of the European United Left/Nordic Green Left", "GUE/NGL"),
+    ("NI", 1979, 2019, "Non-attached Members", "NI"),
+    ("EUL", 1989, 1994, "Group for the European United Left", "EUL"),
+    ("LU", 1989, 1994, "Left Unity", "LU"),
+    ("ECR", 2009, None, "European Conservatives and Reformists Group", "ECR"),
+    ("ED", 1979, None, "European Democratic Group", "ED"),
+    ("COM", 1979, None, "Communist and Allies Group", "COM"),
+    ("CDI", 1979, None, "Group for the Technical Coordination and Defence of Independent Groups and Members", "CDI"),
+    ("DEP", 1979, None, "Group of European Progressive Democrats", "EPD"),
+    ("RDE", 1984, None, "Group of the European Democratic Alliance", "EDA"),
+    ("DR", 1984, None, "Group of the European Right", "ER"),
+    ("ARC", 1984, None, "Rainbow Group", "RBW"),
+    ("FE", 1994, None, "Forza Europa Group", "FE"),
+    ("EDN", 1994, None, "Europe of Nations Group", "EN"),
+    ("ARE", 1994, None, "Group of the European Radical Alliance", "ERA"),
+    ("UEN", 1999, None, "Union for Europe of the Nations Group", "UEN"),
+    ("TDI", 1999, None, "Technical Group of Independent Members", "TGI"),
+    ("EDD", 1999, None, "Group for a Europe of Democracies and Diversities", "EDD"),
+    ("IND/DEM", 2004, None, "Independence/Democracy Group", "IND/DEM"),
+    ("EFD", 2009, 2014, "Europe of Freedom and Democracy Group", "EFD"),
+    ("EFD", 2014, None, "Europe of Freedom and Direct Democracy Group", "EFDD"),
+]
 ISO = {
     "Austria": "AT",
     "Belgium": "BE",
@@ -422,6 +480,7 @@ def parse() -> None:
         pl.col("cast").alias("ballots_cast"),
         "votes_valid",
         "votes",
+        pl.col("ep_affiliation").str.strip_chars(),
     ).write_parquet(PARSED / "results.parquet")
 
 
@@ -678,7 +737,11 @@ def emit() -> Path:
         elections: dict[tuple[str, int], tuple[UUID, str]] = {}
         parties: dict[tuple[str, str], UUID] = {}
         units: dict[tuple[str, str], UUID] = {}
+        joined: dict[UUID, dict[date, Counter[str]]] = defaultdict(lambda: defaultdict(Counter))
+        split: Counter[str] = Counter()
         skipped: dict[str, int] = {}
+        seen: dict[str, UUID] = {}
+        deferred: list[tuple[date, dict]] = []
         sets = 0
         frames: list[pl.DataFrame] = []
         for (country, year), by_election in results.group_by(["country", "year"], maintain_order=True):
@@ -718,6 +781,7 @@ def emit() -> Path:
                 euc = iso == "GB" and year < 1999 and constituency != "Northern Ireland"
                 if euc and year not in (1979, 1984):
                     skipped[f"{country} {constituency}"] = skipped.get(f"{country} {constituency}", 0) + 1
+                    deferred.extend((start, row) for row in rows.iter_rows(named=True) if row["seats"])
                     continue
                 replaced = REPLACED.get((year, constituency)) if iso == "GB" else None
                 if replaced is not None:
@@ -901,6 +965,8 @@ def emit() -> Path:
                                     name(party, row["party_original"], "und", "native", False)
                     if iso == "IT" and year >= 2018 and label_text in ("Lega", "Lega Nord"):
                         party = cs.key("wikidata", "Q85776185")
+                    if iso == "GB" and party is not None:
+                        seen.setdefault(label_text, party)
                     members = coalitions.get((iso, year, label_text))
                     alliance = None
                     if members is not None:
@@ -933,6 +999,16 @@ def emit() -> Path:
                             kind="elected" if euc else "won",
                             seats=row["seats"],
                         )
+                    if row["seats"]:
+                        label_group = row["ep_affiliation"] or ""
+                        group = (
+                            ("EUL" if year < 1994 else "The Left") if label_group == "GUE" else GROUPS.get(label_group)
+                        )
+                        if group is None and label_group not in MISSING:
+                            split[label_group] += row["seats"]
+                        for member in [party] if party is not None else sorted(members or (), key=str):
+                            if group is not None and member is not None:
+                                joined[member][start][group] += row["seats"]
                     values.append((str(option), 1, row["votes"]))
                     if row["seats"] is not None:
                         values.append((str(option), 16, row["seats"]))
@@ -1088,6 +1164,70 @@ def emit() -> Path:
                 },
             ),
         )
+        unseen = []
+        for start, row in deferred:
+            party = seen.get(row["party_original"] or row["party"])
+            group = GROUPS.get(row["ep_affiliation"] or "")
+            if party is None or group is None:
+                unseen.append((start.year, row["party"]))
+            else:
+                joined[party][start][group] += row["seats"]
+        print(f"skipped Great Britain rows grouped: {len(deferred) - len(unseen)}; unresolved: {unseen}")
+        held = {
+            party: low
+            for party, low in conn.execute(
+                "select a.party_id, min(coalesce(a.valid_from, '0001-01-01'::date)) from party_affiliation a"
+                " join changeset c on c.id = a.changeset_id where a.kind = 'ep_group' and c.pipeline <> %s group by 1",
+                [SOURCE],
+            ).fetchall()
+        }
+        groups: dict[str, UUID] = {}
+        for key in {*GROUPS.values(), "EUL", "The Left"}:
+            groups[key] = cs.key("ep.group", key)
+            if groups[key] in cs.minted:
+                cs.add("party", id=groups[key], polity_id=union, kind="parliamentary_group")
+        for key, first, last, text, short in GROUP_NAMES:
+            for kind, label in (("official", text), ("abbreviation", short)):
+                cs.add(
+                    "name",
+                    entity_id=groups[key],
+                    text=label,
+                    lang="en",
+                    kind=kind,
+                    is_preferred=kind == "official",
+                    valid_from=date(first, 1, 1),
+                    valid_from_precision="year",
+                    valid_to=None if last is None else date(last, 1, 1),
+                    valid_to_precision="year",
+                    source_id=source,
+                )
+        clipped = []
+        affiliations = 0
+        for party, terms in joined.items():
+            segments: list[tuple[date, date, str]] = []
+            for start, tally in sorted(terms.items()):
+                end = min(next(day for day in GENERALS if day > start), held.get(party, date.max))
+                if end <= start:
+                    clipped.append(party)
+                    continue
+                group = tally.most_common(1)[0][0]
+                if segments and segments[-1][2] == group and segments[-1][1] == start:
+                    segments[-1] = (segments[-1][0], end, group)
+                else:
+                    segments.append((start, end, group))
+            for start, end, group in segments:
+                affiliations += 1
+                cs.add(
+                    "party_affiliation",
+                    party_id=party,
+                    parent_party_id=groups[group],
+                    kind="ep_group",
+                    valid_from=start,
+                    valid_from_precision="unknown",
+                    valid_to=end,
+                    valid_to_precision="unknown",
+                )
+        print(f"ep_group affiliations: {affiliations}; split lists left ungrouped: {dict(split)}; clipped: {clipped}")
         cs.frame("result_value", pl.concat(frames))
         print(f"{sets} contests, {len(elections)} elections, {len(parties)} parties, skipped {skipped}")
         return cs.write()

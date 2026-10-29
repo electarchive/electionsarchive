@@ -97,6 +97,7 @@
             ? "independent"
             : entry.party,
         seats: entry.seats,
+        group: entry.group ?? null,
       })),
       election: { name: point.name, path: point.path, date: point.date },
     })),

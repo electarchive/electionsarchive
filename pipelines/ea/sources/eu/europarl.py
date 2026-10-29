@@ -16,7 +16,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "eu.europarl"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://data.europarl.europa.eu/api/v2"
 FORMAT = "format=application%2Fld%2Bjson"
@@ -411,7 +411,7 @@ def emit() -> Path:
                     party_id=party,
                     parent_party_id=group,
                     kind="ep_group",
-                    valid_from=None if low == WINDOW else low,
+                    valid_from=low,
                     valid_from_precision="unknown" if low == WINDOW else "day",
                     valid_to=None if high == date.max else high,
                 )

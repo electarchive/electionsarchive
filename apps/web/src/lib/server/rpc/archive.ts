@@ -16726,12 +16726,25 @@ export async function record(input: { id: string; body?: string }) {
     select body_id as body, lower(valid)::text as from, upper(valid)::text as to
     from body_size where body_id = any(${sql.param(seats)}::uuid[])
   `);
-  const parties = [
+  const fielded = [
     ...new Set([
       ...found.rows.flatMap((row) => row.party ?? []),
       ...cabinets.rows.flatMap((row) => row.party ?? []),
     ]),
   ];
+  const blocs = await db.execute<{
+    party: string;
+    group: string;
+    from: string | null;
+    to: string | null;
+  }>(sql`
+    select party_id::text as party, parent_party_id::text as group, valid_from::text as from, valid_to::text as to
+    from party_affiliation where kind = 'ep_group' and party_id = any(${sql.param(fielded)}::uuid[])
+  `);
+  const parties = [
+    ...new Set([...fielded, ...blocs.rows.map((row) => row.group)]),
+  ];
+  const sided = Map.groupBy(blocs.rows, (row) => row.party);
   const links = [
     ...new Set(
       found.rows.flatMap((row) => [row.link ?? [], row.decider ?? []].flat()),
@@ -16892,6 +16905,14 @@ export async function record(input: { id: string; body?: string }) {
                     party: row.party,
                     seats: row.seats,
                     isIndependent: row.isIndependent,
+                    group:
+                      sided
+                        .get(row.party ?? "")
+                        ?.find(
+                          (bloc) =>
+                            (bloc.from == null || bloc.from <= row.date) &&
+                            (bloc.to == null || row.date < bloc.to),
+                        )?.group ?? null,
                     label:
                       renamed
                         .get(row.party ?? "")
@@ -16933,15 +16954,18 @@ export async function record(input: { id: string; body?: string }) {
                   );
                 }
                 next.parties = [...merged]
-                  .map(([party, seats]) => ({
-                    party,
-                    seats,
-                    isIndependent: false,
-                    label:
-                      [...next.parties, ...point.parties].find(
-                        (entry) => entry.party === party,
-                      )?.label ?? null,
-                  }))
+                  .map(([party, seats]) => {
+                    const known = [...next.parties, ...point.parties].find(
+                      (entry) => entry.party === party,
+                    );
+                    return {
+                      party,
+                      seats,
+                      isIndependent: false,
+                      group: known?.group ?? null,
+                      label: known?.label ?? null,
+                    };
+                  })
                   .toSorted((x, y) => y.seats - x.seats);
                 return [];
               }
@@ -18036,6 +18060,7 @@ export const polities = {
                     party: v.nullable(v.string()),
                     seats: v.number(),
                     isIndependent: v.optional(v.boolean()),
+                    group: v.optional(v.nullable(v.string())),
                     label: v.nullable(v.string()),
                   }),
                 ),

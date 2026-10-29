@@ -27,12 +27,20 @@
       seceded: number;
       isSeated: boolean;
       isPartial: boolean;
-      parties: Array<{ party: string | null; seats: number }>;
+      parties: Array<{
+        party: string | null;
+        seats: number;
+        group?: string | null;
+      }>;
       election: { name: string; path: string | null; date: string } | null;
       near?: Record<string, string | null>;
       steps?: Array<{
         date: string;
-        parties: Array<{ party: string | null; seats: number }>;
+        parties: Array<{
+          party: string | null;
+          seats: number;
+          group?: string | null;
+        }>;
         near?: Record<string, string | null>;
         moves: Array<{
           kind: "in" | "out" | "switch" | "rename";
@@ -75,16 +83,106 @@
   let seated = $state<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
-  const info = $derived(new Map(parties.map((party) => [party.id, party])));
-  const tint = (party: string | null) =>
-    party == null
+  const blocs = $derived(
+    new Map<string, { group: string; party: string | null }>(
+      terms.flatMap((term) =>
+        [...term.parties, ...(term.steps ?? []).flatMap((step) => step.parties)]
+          .filter((entry) => entry.group != null)
+          .map((entry) => [
+            `${entry.group}/${entry.party ?? "none"}`,
+            { group: entry.group ?? "", party: entry.party },
+          ]),
+      ),
+    ),
+  );
+  const sheets = $derived.by(() => {
+    if (blocs.size === 0) {
+      return terms;
+    }
+    const fold = (entry: {
+      party: string | null;
+      seats: number;
+      group?: string | null;
+    }) =>
+      entry.group == null
+        ? entry
+        : { ...entry, party: `${entry.group}/${entry.party ?? "none"}` };
+    return terms.map((term) => ({
+      ...term,
+      parties: term.parties.map(fold),
+      steps: term.steps?.map((step) => ({
+        ...step,
+        parties: step.parties.map(fold),
+      })),
+    }));
+  });
+  const blocks = $derived.by(() => {
+    const own = new Map(parties.map((party) => [party.id, party]));
+    return new Map(
+      Map.groupBy(
+        terms.flatMap((term) =>
+          term.parties.filter((entry) => entry.group != null),
+        ),
+        (entry) => entry.group ?? "",
+      )
+        .entries()
+        .map(([group, entries]) => {
+          let seats = 0;
+          let weight = 0;
+          let sum = 0;
+          for (const entry of entries) {
+            const lean = own.get(entry.party ?? "")?.lean;
+            seats += entry.seats;
+            if (lean != null) {
+              weight += entry.seats;
+              sum += lean * entry.seats;
+            }
+          }
+          return { group, seats, lean: weight > 0 ? sum / weight : null };
+        })
+        .toArray()
+        .toSorted((a, b) => b.seats - a.seats)
+        .map(
+          (at, index) =>
+            [
+              at.group,
+              own.get(at.group)?.lean ?? at.lean ?? 1e6 + index,
+            ] as const,
+        ),
+    );
+  });
+  const info = $derived.by(() => {
+    const own = new Map(parties.map((party) => [party.id, party]));
+    return new Map([
+      ...own,
+      ...[...blocs].map(([key, bloc]) => {
+        const party = own.get(bloc.party ?? "");
+        return [
+          key,
+          {
+            id: key,
+            label: party?.label ?? "",
+            short: party?.short ?? null,
+            color: null,
+            lean: blocks.get(bloc.group) ?? null,
+            isStriped: false,
+            isMade: party == null,
+          },
+        ] as const;
+      }),
+    ]);
+  });
+  const tint = (key: string | null) => {
+    const party = blocs.get(key ?? "")?.group ?? key;
+    return party == null
       ? swatch(null, "")
       : swatch(
           info.get(party)?.color ?? null,
           /^[0-9a-f]{8}-/.test(party) ? `party:${party}` : party,
         );
+  };
   const label = (party: string | null) =>
-    party == null
+    party == null || party.endsWith("/none")
       ? m.record_none()
       : (info.get(party)?.short ?? info.get(party)?.label ?? "");
   const band = $derived(governments.length > 0 ? 18 : 0);
@@ -111,7 +209,7 @@
   const order = $derived.by(() => {
     const held = new Map(
       Map.groupBy(
-        terms.flatMap((term) => [
+        sheets.flatMap((term) => [
           ...term.parties,
           ...(term.steps ?? []).flatMap((step) => step.parties),
         ]),
@@ -135,7 +233,7 @@
     );
   });
   const columns = $derived(
-    terms.map((term, index) => {
+    sheets.map((term, index) => {
       const x0 = sx(Date.parse(term.start));
       const x1 = sx(Date.parse(term.end ?? today));
       const full =
@@ -201,6 +299,23 @@
       const parts = marks.map((part, at) => {
         const after = marks[at + 1];
         const { layers, below: seated } = stack(part.parties, part.near);
+        const spans = new Map(
+          Map.groupBy(
+            [...layers].filter(([key]) => blocs.has(key ?? "")),
+            ([key]) => blocs.get(key ?? "")?.group ?? "",
+          )
+            .entries()
+            .map(
+              ([group, entries]) =>
+                [
+                  group,
+                  {
+                    y0: Math.max(...entries.map(([, at]) => at.y0)),
+                    y1: Math.min(...entries.map(([, at]) => at.y1)),
+                  },
+                ] as const,
+            ),
+        );
         const open =
           term.isSeated && full != null
             ? Math.max(0, full - seated - term.seceded)
@@ -211,6 +326,7 @@
           x1: after == null ? x1 : sx(Date.parse(after.from)),
           to: after?.from ?? term.end,
           stack: layers,
+          spans,
           empty: open,
           vacant: {
             y0: PAD.top + inner - (seated + term.seceded) * unit,
@@ -243,8 +359,16 @@
       column.parts.map((part) => ({ ...part, column: column.index })),
     ),
   );
+  const groups = $derived(
+    [...blocks.keys()].toSorted(
+      (a, b) => (blocks.get(a) ?? 0) - (blocks.get(b) ?? 0),
+    ),
+  );
   const bands = $derived(
-    order.map((party) => {
+    [
+      ...order.map((party) => ({ party, isGroup: false })),
+      ...groups.map((party) => ({ party, isGroup: true })),
+    ].map(({ party, isGroup }) => {
       const runs = slices.map((part, index) => {
         const before = slices[index - 1];
         const after = slices[index + 1];
@@ -265,20 +389,22 @@
           b: part.x1 - (joinsAfter && !isInAfter ? ease : 0),
           edge: part.x1,
           joinsAfter,
-          ...(part.stack.get(party) ?? { y0: 0, y1: 0 }),
+          ...((isGroup
+            ? part.spans.get(party ?? "")
+            : part.stack.get(party)) ?? { y0: 0, y1: 0 }),
         };
       });
-      const groups: Array<typeof runs> = [];
+      const joined: Array<typeof runs> = [];
       for (const run of runs) {
-        const group = groups.at(-1);
+        const group = joined.at(-1);
         if (group == null || group.at(-1)?.joinsAfter !== true) {
-          groups.push([run]);
+          joined.push([run]);
         } else {
           group.push(run);
         }
       }
       let d = "";
-      for (const group of groups) {
+      for (const group of joined) {
         for (const [index, run] of group.entries()) {
           const before = group[index - 1];
           d +=
@@ -297,7 +423,7 @@
         }
         d += "Z";
       }
-      return { party, d: d.replaceAll(/(\.\d)\d+/g, "$1") };
+      return { party, isGroup, d: d.replaceAll(/(\.\d)\d+/g, "$1") };
     }),
   );
   const majority = $derived.by(() => {
@@ -316,14 +442,14 @@
   });
   const names = $derived.by(() => {
     const placed: Array<{ party: string; x: number; y: number }> = [];
-    for (const party of order) {
-      if (party == null) {
+    for (const party of [...groups, ...order]) {
+      if (party == null || blocs.has(party)) {
         continue;
       }
       const text = label(party);
       let best: { x: number; y: number; room: number } | null = null;
       for (const part of slices) {
-        const at = part.stack.get(party);
+        const at = part.spans.get(party) ?? part.stack.get(party);
         const thick = at == null ? 0 : at.y0 - at.y1;
         const wide = part.x1 - part.x0;
         if (at != null && thick >= 15 && wide >= text.length * 6.6 + 12) {
@@ -383,6 +509,28 @@
           lit.parts[0] ??
           null),
   );
+  const ranked = $derived(
+    Map.groupBy(
+      part?.parties ?? [],
+      (entry) => blocs.get(entry.party ?? "")?.group ?? entry.party,
+    )
+      .entries()
+      .map(([party, members]) => {
+        let seats = 0;
+        for (const member of members) {
+          seats += member.seats;
+        }
+        return {
+          party,
+          seats,
+          members: blocs.has(members[0]?.party ?? "")
+            ? members.toSorted((a, b) => b.seats - a.seats)
+            : [],
+        };
+      })
+      .toArray()
+      .toSorted((a, b) => b.seats - a.seats),
+  );
   const steps = $derived(
     slices.filter((entry) => entry.step != null).map((entry) => entry.x0),
   );
@@ -401,16 +549,19 @@
     cabinets.find((cabinet) => cabinet.from === seated) ?? null,
   );
   const legend = $derived(
-    order
+    [...groups, ...order.filter((party) => !blocs.has(party ?? ""))]
       .filter(
         (party) =>
           info.get(party ?? "")?.isStriped === true ||
-          terms.some((term) =>
-            term.parties.some(
-              (entry) =>
-                entry.party === party && entry.seats >= 0.06 * term.total,
-            ),
-          ),
+          terms.some((term) => {
+            let seats = 0;
+            for (const entry of term.parties) {
+              if ((entry.group ?? entry.party) === party) {
+                seats += entry.seats;
+              }
+            }
+            return seats >= 0.06 * term.total;
+          }),
       )
       .filter(
         (party, index, all) =>
@@ -542,15 +693,16 @@
           stroke-dasharray="3 2"
         />
       {/each}
-      {#each bands as entry (entry.party ?? "none")}
+      {#each bands as entry (`${entry.isGroup}:${entry.party ?? "none"}`)}
         <path
           d={entry.d}
-          fill={tint(entry.party)}
+          fill={entry.isGroup ? "none" : tint(entry.party)}
           stroke="var(--card)"
-          stroke-width="0.5"
+          stroke-width={entry.isGroup ? 1.75 : 0.5}
           stroke-linejoin="round"
+          class={cn({ "pointer-events-none": entry.isGroup })}
         />
-        {#if info.get(entry.party ?? "")?.isStriped === true}
+        {#if !entry.isGroup && info.get(entry.party ?? "")?.isStriped === true}
           <path
             d={entry.d}
             fill="url(#{uid}-stripe)"
@@ -681,7 +833,7 @@
     {/each}
   </svg>
   {#if lit != null && part != null}
-    {const leader = $derived(part.parties[0])}
+    {const leader = $derived(ranked[0])}
     <div
       class="pointer-events-none absolute grid gap-1 rounded-sm bg-card/95 px-2.5 py-2 text-xs shadow-menu ring-1 ring-border inline-60"
       style:inset-inline-start="{lit.x1 + 248 > width
@@ -743,7 +895,7 @@
         </ul>
       {/if}
       <ul class="grid gap-0.5">
-        {#each part.parties.slice(0, 6) as entry (entry.party ?? "none")}
+        {#each ranked.slice(0, blocs.size > 0 ? 4 : 6) as entry (entry.party ?? "none")}
           <li class="flex items-center justify-between gap-3">
             <span class="flex items-center gap-1.5 truncate">
               <span
@@ -759,6 +911,21 @@
               ></span
             >
           </li>
+          {#each entry.members.slice(0, 2) as member (member.party ?? "none")}
+            <li
+              class="flex items-center justify-between gap-3 ps-4 text-[0.6875rem] text-muted-foreground"
+            >
+              <span class="truncate">{label(member.party)}</span>
+              <span class="font-figures tabular-nums"
+                >{count(member.seats)}</span
+              >
+            </li>
+          {/each}
+          {#if entry.members.length > 2}
+            <li class="ps-4 text-[0.6875rem] text-muted-foreground">
+              {m.count_more({ count: count(entry.members.length - 2) })}
+            </li>
+          {/if}
         {/each}
         {#if lit.term.seceded > 0}
           <li class="flex items-center justify-between gap-3">
