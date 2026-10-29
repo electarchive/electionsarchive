@@ -15,7 +15,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_1920"
-VERSION = "2"
+VERSION = "3"
 TITLE_ALBUM = "TBMM Albümü 1920-2010, 1. Cilt (1920-1950)"
 TITLE_TUIK = "Milletvekili Genel Seçimleri, 1923-2011"
 PARSED = DATA / "parsed" / SOURCE
@@ -558,8 +558,18 @@ def emit() -> Path:
                 cs.add("party", id=group_parties[code], kind="party", polity_id=turkey)
                 name(group_parties[code], label)
                 name(group_parties[code], short, kind="abbreviation")
+        mhg = cs.key("tr.party", "mudafaa-i-hukuk-grubu")
+        if mhg in cs.minted:
+            cs.add("party", id=mhg, kind="party", polity_id=turkey)
+            name(mhg, "Müdâfaa-i Hukuk Grubu", valid_from=OPENINGS[1], valid_to=date(1923, 9, 9))
+        chp_names = (
+            ("Halk Fırkası", date(1923, 9, 9), "day", date(1924, 11, 10)),
+            ("Cumhuriyet Halk Fırkası", date(1924, 11, 10), "day", date(1935, 5, 1)),
+        )
+        for text, from_day, from_precision, to_day in chp_names:
+            name(chp, text, valid_from=from_day, valid_from_precision=from_precision, valid_to=to_day)
         member_group: dict[tuple[int, str, str], tuple[str, str]] = {}
-        for item in listed.filter(pl.col("kind") != "IND").iter_rows(named=True):
+        for item in listed.iter_rows(named=True):
             wanted = words(item["name"])
             found = [
                 (len(wanted & words(f"{row['name']} {row['registered'] or ''}")), row)
@@ -744,7 +754,26 @@ def emit() -> Path:
                 cs.add("tenure_event", tenure_id=tenure, kind=via, date=ended, source_id=album)
             made[term, via] += 1
             group = member_group.get((term, row["page"], row["name"]))
-            if group is not None:
+            group_start = None if group is None or group[0] == "IND" else groups[group[0]][3]
+            if term <= 6 and (group is None or group[0] != "IND"):
+                for party, span_start, span_end in (
+                    (mhg, OPENINGS[1], date(1923, 9, 9)),
+                    (chp, date(1923, 9, 9), CLOSED),
+                ):
+                    lo, hi = max(span_start, start), min(span_end, ended)
+                    if group_start is not None and party == chp:
+                        hi = min(hi, group_start)
+                    if lo < hi:
+                        cs.add(
+                            "tenure_affiliation",
+                            tenure_id=tenure,
+                            kind="party",
+                            party_id=party,
+                            valid_from=lo,
+                            valid_from_precision="unknown" if lo == start and not exact else "day",
+                            valid_to=hi,
+                        )
+            if group is not None and group[0] != "IND":
                 _, _, _, group_start, group_end = groups[group[0]]
                 cs.add(
                     "tenure_affiliation",
