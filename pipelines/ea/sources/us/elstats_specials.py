@@ -17,6 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.sources.us import (
     special_counties,
     special_files,
+    special_fl,
     special_md,
     special_nc,
     special_nj,
@@ -196,6 +197,7 @@ def fetch() -> None:
     special_md.fetch()
     special_pdfs.fetch()
     special_nj.fetch()
+    special_fl.fetch()
     special_counties.fetch()
     special_nm_1997.fetch()
     special_wi_1993.fetch()
@@ -475,6 +477,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_md.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nj.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_fl.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_wi_1993.rows(), infer_schema_length=None))
@@ -608,7 +611,7 @@ def emit() -> Path:
             if state == "FL":
                 publisher, title = (
                     "Florida Division of Elections",
-                    "Official results extract, January 11, 2022 special general election",
+                    "Official results extracts, special elections",
                 )
                 sources[state] = cs.source(publisher, title)
                 if sources[state] in cs.minted:
@@ -622,6 +625,7 @@ def emit() -> Path:
                         license="Public record",
                     )
                 cs.artifact(raw.cached(SOURCE, FLORIDA), sources[state])
+                cs.artifact(raw.cached(SOURCE, special_fl.PRIMARIES), sources[state])
                 continue
             _, publisher, _ = TENANTS[state]
             sources[state] = cs.source(publisher, "Election statistics archive")
