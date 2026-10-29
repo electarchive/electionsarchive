@@ -697,11 +697,6 @@ FEEDS = {
         "Natrona County Clerk",
         "Natrona County 2026 General Election Candidate Roster (9/11/2026)",
     ),
-    "OK-cand": (
-        "https://okcandidates.okelections.gov/",
-        "Oklahoma State Election Board",
-        "Candidate Filings, FilingsExport (county offices)",
-    ),
     "TX-48085": (
         "https://www.wylieisd.net/our-district/school-board/board-elections",
         "Wylie Independent School District",
@@ -1525,7 +1520,6 @@ DELIVERED = {
     "MT-30013": DATA / "inbox" / "y26" / "mt" / "cascade.pdf",
     "WY-56025": DATA / "inbox" / "y26" / "wy" / "natrona.pdf",
     "TX-48085": DATA / "inbox" / "y26" / "tx" / "wylie.html",
-    "OK-cand": DATA / "inbox" / "manual" / "MF-281" / "FilingsExport_CSV_20261029083401.zip",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
     "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
