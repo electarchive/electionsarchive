@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -36,10 +37,16 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    frame = pl.read_csv(raw.cached(SOURCE, url()).path, infer_schema=False).filter(
-        (pl.col("division_type") == "District") & (pl.col("election_type") != "Primary") & (pl.col("office_id") == "4")
+    everything = pl.read_csv(raw.cached(SOURCE, url()).path, infer_schema=False).filter(
+        (pl.col("election_type") != "Primary") & (pl.col("office_id") == "4")
     )
+    frame = everything.filter(pl.col("division_type") == "District")
     PARSED.mkdir(parents=True, exist_ok=True)
+    everything.filter(pl.col("division_type") == "Precinct").with_columns(
+        pl.col("votes").cast(pl.Int64), pl.col("election_date").str.slice(0, 10).str.to_date()
+    ).group_by("election_date", "division_name", "candidate_name").agg(pl.col("votes").sum()).write_parquet(
+        PARSED / "precincts.parquet"
+    )
     (
         frame.with_columns(pl.col("votes").cast(pl.Int64), pl.col("election_date").str.slice(0, 10).str.to_date())
         .group_by("election_date", "election_type", "candidate_name", "candidate_party_name")
@@ -51,6 +58,7 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
+    precincts = pl.read_parquet(PARSED / "precincts.parquet").filter(pl.col("election_date").dt.year() < 2016)
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -141,6 +149,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
+            options: dict[str, UUID] = {}
             winner: UUID | None = None
             top = rows.filter(~pl.col("candidate_name").is_in([*PSEUDO, "Write-In Votes"]))["votes"].max()
             for candidate, party, votes in (
@@ -152,6 +161,7 @@ def emit() -> Path:
                     continue
                 if candidate == "Write-In Votes":
                     option = cs.key("us.option", f"{contest_key}:write-ins")
+                    options[candidate] = option
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
                     head, _, mate = candidate.partition(" and ")
@@ -165,6 +175,7 @@ def emit() -> Path:
                             cs.add("party", id=party_id, kind="party", polity_id=polity)
                             name(party_id, party)
                     option = cs.key("us.option", f"{contest_key}:{token}")
+                    options[candidate] = option
                     cs.add(
                         "contest_option",
                         id=option,
@@ -206,4 +217,46 @@ def emit() -> Path:
                 )
             if winner is not None:
                 cs.add("outcome", result_set_id=result_set, option_id=winner, kind="elected", seats=None)
+            by_precinct = precincts.filter((pl.col("election_date") == day) & pl.col("candidate_name").is_in(list(options)))
+            if by_precinct.height > 0:
+                precinct_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
+                cs.add(
+                    "result_set",
+                    id=precinct_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=False,
+                    completeness=1,
+                )
+                for precinct, candidate, votes in by_precinct.select("division_name", "candidate_name", "votes").iter_rows():
+                    precinct_unit = cs.unit("us.precinct", f"{day.year}:VI:{precinct.lower()}")
+                    if precinct_unit in cs.minted and not any(r["id"] == precinct_unit for r in cs.rows.get("reporting_unit", [])):
+                        cs.add(
+                            "reporting_unit",
+                            id=precinct_unit,
+                            polity_id=polity,
+                            scheme_code="us.precinct",
+                            code=f"{day.year}:VI:{precinct.lower()}",
+                            parent_id=unit,
+                            area_relation="within",
+                            area_id=area,
+                            kind="standard",
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                    cs.add(
+                        "result_value",
+                        result_set_id=precinct_set,
+                        unit_id=precinct_unit,
+                        option_id=options[candidate],
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
         return cs.write()
