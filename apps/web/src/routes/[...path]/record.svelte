@@ -79,7 +79,11 @@
   const terms = $derived(
     sessions.map((point, index, all) => ({
       start: point.date,
-      end: all[index + 1]?.date ?? null,
+      end:
+        point.ended != null &&
+        (all[index + 1] == null || point.ended < (all[index + 1]?.date ?? ""))
+          ? point.ended
+          : (all[index + 1]?.date ?? null),
       total: point.filled,
       size: null,
       apportioned: null,

@@ -16718,6 +16718,14 @@ export async function record(input: { id: string; body?: string }) {
         .map((row) => row.seat),
     ),
   ];
+  const sizes = await db.execute<{
+    body: string;
+    from: string;
+    to: string | null;
+  }>(sql`
+    select body_id as body, lower(valid)::text as from, upper(valid)::text as to
+    from body_size where body_id = any(${sql.param(seats)}::uuid[])
+  `);
   const parties = [
     ...new Set([
       ...found.rows.flatMap((row) => row.party ?? []),
@@ -16868,6 +16876,17 @@ export async function record(input: { id: string; body?: string }) {
                     : null,
                 isRunoff:
                   group.length === 1 && first?.races === 1 && first.isRunoff,
+                ended:
+                  sizes.rows
+                    .filter((size) => size.body === seat)
+                    .find(
+                      (size, _, all) =>
+                        first != null &&
+                        size.from <= first.date &&
+                        size.to != null &&
+                        first.date < size.to &&
+                        !all.some((other) => other.from === size.to),
+                    )?.to ?? null,
                 parties: group
                   .map((row) => ({
                     party: row.party,
@@ -18010,6 +18029,7 @@ export const polities = {
                 winner: v.nullable(v.string()),
                 contest: v.nullable(v.string()),
                 isRunoff: v.boolean(),
+                ended: v.nullable(v.string()),
                 parties: v.array(
                   v.object({
                     party: v.nullable(v.string()),
