@@ -84,6 +84,12 @@ KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
 DISTRICT_CALENDAR = {
+    ("TX", "Katy Independent School District"): (
+        1,
+        0,
+        5,
+        "Katy ISD Board election page and canvass: trustee Positions 3, 4, and 5 were decided at the May 2, 2026 election, certified May 11, https://www.katyisd.org/board/election/home",
+    ),
     ("OK", "Tulsa County"): (
         4,
         2,
@@ -95,6 +101,12 @@ DISTRICT_CALENDAR = {
         0,
         5,
         "Gwinnett County Board of Registrations and Elections: Board of Education Districts 2 and 4 qualify for the nonpartisan general election held with the May 19, 2026 general primary (runoffs June 16 and December 1), https://www.gwinnettcounty.com/government/departments/elections/running-for-office",
+    ),
+    ("NC", "Charlotte-Mecklenburg Schools"): (
+        2,
+        1,
+        11,
+        "North Carolina Session Law 1993-167: Charlotte-Mecklenburg Board of Education members serve four-year terms and are elected in odd-numbered years, the three at-large seats from 1995 and the six district seats from 1997, so the six district seats were on the ballot on November 4, 2025, https://www.ncleg.gov/EnactedLegislation/SessionLaws/HTML/1993-1994/SL1993-167.html",
     ),
     ("TX", "Cypress-Fairbanks Independent School District"): (
         2,
@@ -1553,6 +1565,21 @@ def build(full: bool = False) -> str:
                 found = [g for _, g in ranked if mine < g[2] and "COLLEGE" not in g[2] - mine]
         if len(found) == 1 and found[0][0] not in link:
             link[found[0][0]] = pid
+            taken.add(pid)
+    plain = frozenset(
+        ("SCHOOL", "DISTRICT", "CITY", "PUBLIC", "COUNTY", "INDEPENDENT", "CONSOLIDATED", "COMMUNITY", "TOWNSHIP", "AREA", "ELEMENTARY")
+    )
+    for code, pid in codes.items():
+        if pid in taken or not code.startswith("school:"):
+            continue
+        mine = {w for w in tokens(polities[pid][2]) if not w.isdigit()} - plain
+        found = [
+            g[0]
+            for g in pools.get((code[7:9], "school"), [])
+            if g[0] not in link and mine and {w for w in g[2] if not w.isdigit()} - plain == mine
+        ]
+        if len(found) == 1:
+            link[found[0]] = pid
             taken.add(pid)
     link["23508201400000"] = "cf3230d1-cf93-5584-bb33-3458b297c168"
     link["05504300800000"] = "5f1810f8-9163-5a5e-aed2-ccd9fc4b1532"

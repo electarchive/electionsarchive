@@ -4510,6 +4510,7 @@ def parse() -> None:
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC')"""
         ).fetchall():
+            label = {"Rowan County Sch": "Rowan-Salisbury Schools"}.get(label, label)
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
                 hit
