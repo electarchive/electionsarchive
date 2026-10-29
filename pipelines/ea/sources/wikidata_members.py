@@ -1,4 +1,6 @@
+import csv
 import json
+import os
 from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
@@ -22,6 +24,7 @@ SCOPES = (
 )
 CHUNK = 400
 PRECISIONS = {11: "day", 10: "month", 9: "year"}
+ENDS = Path(__file__).with_name("wikidata_member_ends.tsv")
 
 
 def _urls() -> list[str]:
@@ -158,6 +161,12 @@ def emit() -> Path:
         )
         for url in [*urls, scoped]:
             cs.artifact(raw.cached(SOURCE, url), source)
+        ends: dict[tuple[str, UUID], dict[str, str]] = {}
+        for row in csv.DictReader(ENDS.open(encoding="utf-8"), delimiter="\t"):
+            ends[row["item"], parties[row["party"]][0]] = row
+        if os.environ.get("ONLY_ENDS"):
+            only = {item for item, _ in ends}
+            statements = defaultdict(list, {item: rows for item, rows in statements.items() if item in only})
         added = unmatched = undated = 0
         held: list[str] = []
         withheld: set[tuple[UUID, UUID]] = set()
@@ -195,7 +204,12 @@ def emit() -> Path:
                             last[2], last[3] = end, end_precision
                         continue
                     joined.append([start, start_precision, end, end_precision])
+                override = ends.get((item, party))
                 for start, start_precision, end, end_precision in joined:
+                    row_source = source
+                    if override is not None and (end is None or end > date.fromisoformat(override["end"])):
+                        end, end_precision = date.fromisoformat(override["end"]), override["precision"]
+                        row_source = cs.source(override["publisher"], override["title"])
                     cs.add(
                         "person_party_membership",
                         person_id=people[item][0],
@@ -204,7 +218,7 @@ def emit() -> Path:
                         valid_from_precision=start_precision,
                         valid_to=end,
                         valid_to_precision=end_precision,
-                        source_id=source,
+                        source_id=row_source,
                     )
                     added += 1
         dropped = 0
