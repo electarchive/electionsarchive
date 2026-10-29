@@ -259,9 +259,9 @@ MO-29097	Jasper County Auditor	0	Sarah D. Hoover	Republican	Jasper	1
 WV-54003	Berkeley County Commission	0	Jim Whitacre	Republican	Berkeley	2
 WV-54003	Berkeley County Commission	0	Eddie Gochenour	Republican	Berkeley	2
 WV-54003	Berkeley County Commission	0	Z Lansdowne	Democratic	Berkeley	2
-WV-54003	Berkeley Board of Education	0	Damon Wright		Berkeley	1
-WV-54003	Berkeley Board of Education	0	Robert McCaulley		Berkeley	1
-WV-54003	Berkeley Magistrate Division 5	1	Eri Belaj		Berkeley	1
+WV-54003	Berkeley County Board of Education	0	Damon Wright		Berkeley	1
+WV-54003	Berkeley County Board of Education	0	Robert McCaulley		Berkeley	1
+WV-54003	Berkeley County Magistrate Division 5	1	Eri Belaj		Berkeley	1
 WV-54039	Kanawha County Commission	0	Paul Monroe	Democratic	Kanawha	1
 WV-54039	Kanawha County Commission	0	Jared Page	Republican	Kanawha	1
 WV-54039	Kanawha Magistrate Division 6	1	WM Bolts Willis		Kanawha	1
@@ -358,3 +358,14 @@ MT-30013	Cascade County Treasurer and Superintendent of Schools	0	Diane Heikkila
 MT-30013	Cascade County Justice of the Peace Department 1	0	Brian Bebbington		Cascade	1
 MT-30013	Cascade County Justice of the Peace Department 1	0	Robert Polich		Cascade	1
 MT-30013	Cascade County Justice of the Peace Department 2	0	Steven Fagenstrom		Cascade	1
+WY-56025	Natrona County Commission	0	Lisa Jamieson	Democratic	Natrona	3
+WY-56025	Natrona County Commission	0	Matt Keating	Republican	Natrona	3
+WY-56025	Natrona County Commission	0	Ray Pacheco	Republican	Natrona	3
+WY-56025	Natrona County Commission	0	Candace Machado	Democratic	Natrona	3
+WY-56025	Natrona County Commission	0	Dallas Laird	Republican	Natrona	3
+WY-56025	Natrona County Assessor	0	Tammy Saulsbury	Republican	Natrona	1
+WY-56025	Natrona County Clerk	0	Tracy Good	Republican	Natrona	1
+WY-56025	Natrona County Clerk of District Court	0	Jill Kiester	Republican	Natrona	1
+WY-56025	Natrona County Coroner	0	James L. Whipps	Republican	Natrona	1
+WY-56025	Natrona County Treasurer	0	Heather Bryan	Republican	Natrona	1
+WY-56025	Natrona County Sheriff	0	John Harlin	Republican	Natrona	1

@@ -692,6 +692,11 @@ FEEDS = {
         "Cascade County Clerk and Recorder",
         "2026 Federal General Election: Certified Local Candidate List (August 20, 2026)",
     ),
+    "WY-56025": (
+        "https://www.natronacounty-wy.gov/DocumentCenter/View/13912/Natrona-County-2026-General-Candidate-Roster",
+        "Natrona County Clerk",
+        "Natrona County 2026 General Election Candidate Roster (9/11/2026)",
+    ),
     "UT-49053": (
         "https://www.washco.utah.gov/wp-content/uploads/2026/09/2026-General-Election-Certification-of-County-Candidates-Notice.pdf",
         "Washington County Clerk/Auditor",
@@ -1508,6 +1513,7 @@ DELIVERED = {
     "WY-56041": DATA / "inbox" / "y26" / "wy" / "uinta.pdf",
     "MT-30031": DATA / "inbox" / "y26" / "mt" / "gallatin.pdf",
     "MT-30013": DATA / "inbox" / "y26" / "mt" / "cascade.pdf",
+    "WY-56025": DATA / "inbox" / "y26" / "wy" / "natrona.pdf",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
     "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
@@ -2204,6 +2210,7 @@ def parse() -> None:
     feeds: dict[str, list[dict[str, object]]] = defaultdict(list)
     templated: dict[str, str] = {}
     minted: dict[str, tuple[str, str, str, str]] = {}
+    pinned: set[str] = set()
 
     with zipfile.ZipFile(raw.cached(SOURCE, PRIMARIES["NC"]).path) as archive:
         primary = archive.read(archive.namelist()[0]).decode("utf-8", "replace")
@@ -4195,6 +4202,8 @@ def parse() -> None:
                 "party": named,
                 "independent": independent,
                 "unexpired": row["unexpired"] == "1",
+                "office": row.get("office_name") or "",
+                "area": row.get("constituency_area") or "",
             }
         )
 
@@ -4596,6 +4605,28 @@ def parse() -> None:
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0] or (
                     "Carson City" if row["fips"] == "32510" else ""
                 )
+                if row.get("area"):
+                    office = re.sub(r"\s+", " ", str(row["contest"])).strip()
+                    if office.endswith("Board of Education"):
+                        hits = index.get((prefix, coverage_tables.tokens(str(row["office"] or office.removesuffix(" Board of Education")))), [])
+                        if len(hits) != 1:
+                            missed.add(f"{row['county']}: {row['contest']} {row['area']}")
+                            continue
+                        code, district = hits[0]
+                        owner = f"school:{code}"
+                        template, tail = "", f"{state}:{code}:board-of-education:{slug(str(row['area']))}"
+                        minted[tail] = (
+                            f"Board of Education, {row['area']}",
+                            district,
+                            owner,
+                            owned.get(owner) or f"us/{state.lower()}/{slug(district)}",
+                        )
+                        pinned.add(tail)
+                    elif place and row["fips"]:
+                        title = re.sub(rf"^{re.escape(place)}\s+", "", office)
+                        template, tail = "", f"{state}:{row['fips']}:{slug(title)}:{slug(str(row['area']))}"
+                        minted[tail] = (f"{title}, {row['area']}", place, "", "")
+                        pinned.add(tail)
                 tokens = [
                     "mount" if token == "mt" else "st" if token == "saint" else token
                     for token in re.findall(
@@ -4858,6 +4889,7 @@ def parse() -> None:
             place=pl.col("tail").replace_strict({tail: value[1] for tail, value in minted.items()}, default=None),
             owner=pl.col("tail").replace_strict({tail: value[2] for tail, value in minted.items()}, default=None),
             home=pl.col("tail").replace_strict({tail: value[3] for tail, value in minted.items()}, default=None),
+            pinned=pl.col("tail").is_in(sorted(pinned)),
         )
     )
     frame.write_parquet(PARSED / "candidates.parquet")
@@ -5044,7 +5076,7 @@ def emit() -> Path:
                     area,
                     None,
                     None,
-                    1 if known_size else None,
+                    (int(group["seats"][0]) if group["pinned"][0] else 1) if known_size else None,
                     "full",
                     cs.key("us.electoral_system", "fptp") if known_size else None,
                     "counted",
@@ -5070,20 +5102,31 @@ def emit() -> Path:
                 st, county = tail.split(":")[:2]
                 polity = cs.key("us.polity", f"county:{county}")
                 seats = int(group["seats"][0] or 1)
-                office = cs.key("us.office" if seats == 1 else "us.body", tail)
-                if office in cs.minted:
+                seat = title.split(", ", 1)[1] if group["pinned"][0] else None
+                holder = tail.rsplit(":", 1)[0] if seat else tail
+                office = cs.key("us.office" if seats == 1 else "us.body", holder)
+                if office in cs.minted and office not in made:
+                    made.add(office)
                     if seats == 1:
                         cs.add("office", id=office, polity_id=polity, kind="other")
                     else:
                         cs.add("body", id=office, polity_id=polity, kind="council")
-                    name(office, f"{place} {title.removeprefix('County ')}")
+                    name(office, f"{place} {title.split(', ')[0].removeprefix('County ')}")
+                area = cs.area("us.county", county)
+                if seat:
+                    area = cs.area("us.local_district", tail)
+                    if area in cs.minted:
+                        cs.add("area", id=area, scheme_code="us.local_district")
+                        cs.add("area_code", area_id=area, code=tail, valid_from=None)
+                        cs.add("area_parent", area_id=area, parent_id=cs.area("us.county", county), valid_from=None)
+                        name(area, f"{place} {title.split(', ')[0]}, {seat}")
                 templates[tail] = (
                     tail,
                     None,
                     "office" if seats == 1 else "body_seats",
                     office if seats == 1 else None,
                     None if seats == 1 else office,
-                    None if seats == 1 else cs.area("us.county", county),
+                    None if seats == 1 else area,
                     None,
                     None,
                     seats,
