@@ -38,6 +38,9 @@ export async function logos(
     path: string;
     width: number;
     height: number;
+    mark_path: string;
+    shape: "mark" | "wordmark";
+    is_plate: boolean;
     is_light: boolean;
     license: string;
     artist: string | null;
@@ -48,7 +51,7 @@ export async function logos(
           when 'year' then (i.valid_from + interval '1 year')::date
           when 'month' then (i.valid_from + interval '1 month')::date
           else i.valid_from end as f
-      from party_image i where i.party_id = any(${sql.param(ids)}::uuid[])
+      from party_image i where i.party_id = any(${sql.param(ids)}::uuid[]) and i.mark_path is not null
     ), named as (
       select entity_id, max(coalesce(upper(valid), 'infinity'::date)) as last, min(lower(valid)) as founded
       from name where kind in ('official', 'abbreviation') and entity_id = any(${sql.param(ids)}::uuid[])
@@ -71,7 +74,8 @@ export async function logos(
           and exists (select from named l where l.entity_id = img.party_id and l.last < current_date) as last
       from img, day
     )
-    select distinct on (party_id) party_id::text as party, path, width, height, is_light, license, artist,
+    select distinct on (party_id) party_id::text as party, path, width, height, mark_path, shape, is_plate,
+      is_light, license, artist,
       source_url as source
     from fit where fits or last
     order by party_id, fits desc, (dated_by is null or dated_by = 'inception'), valid_to desc nulls first, f desc nulls last,
@@ -84,6 +88,9 @@ export async function logos(
         src: `/${row.path}`,
         width: row.width,
         height: row.height,
+        mark: `/${row.mark_path}`,
+        shape: row.shape,
+        isPlate: row.is_plate,
         isLight: row.is_light,
         license: row.license,
         artist: row.artist,

@@ -970,6 +970,9 @@ export const partyImage = pgTable("party_image", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 	datedUrl: text("dated_url"),
 	isLight: boolean("is_light").default(false).notNull(),
+	markPath: text("mark_path"),
+	shape: text(),
+	isPlate: boolean("is_plate").default(false).notNull(),
 }, (table) => [
 	index("party_image_party_idx").using("btree", table.partyId.asc().nullsLast()),
 	check("party_image_width_check", sql`(width > 0)`),
@@ -977,6 +980,7 @@ export const partyImage = pgTable("party_image", {
 	check("party_image_dated_by_check", sql`(dated_by = ANY (ARRAY['wikidata'::text, 'file'::text, 'source'::text, 'next_logo'::text, 'inception'::text]))`),
 	check("party_image_dated_url_check", sql`((dated_by = 'source'::text) = (dated_url IS NOT NULL))`),
 	check("party_image_check", sql`((dated_by IS NULL) = ((valid_from IS NULL) AND (valid_to IS NULL)))`),
+	check("party_image_shape_check", sql`(shape = ANY (ARRAY['mark'::text, 'wordmark'::text]))`),
 ]);
 
 export const partyPage = pgTable("party_page", {

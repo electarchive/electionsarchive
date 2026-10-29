@@ -4,6 +4,9 @@ export type Logo = {
   src: string;
   width: number;
   height: number;
+  mark: string;
+  shape: "mark" | "wordmark";
+  isPlate: boolean;
   isLight: boolean;
   license: string;
   artist: string | null;
