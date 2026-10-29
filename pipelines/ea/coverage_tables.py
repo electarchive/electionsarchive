@@ -84,6 +84,12 @@ KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
 DISTRICT_CALENDAR = {
+    ("GA", "Gwinnett County School District"): (
+        2,
+        0,
+        5,
+        "Gwinnett County Board of Registrations and Elections: Board of Education Districts 2 and 4 qualify for the nonpartisan general election held with the May 19, 2026 general primary (runoffs June 16 and December 1), https://www.gwinnettcounty.com/government/departments/elections/running-for-office",
+    ),
     ("TX", "Cypress-Fairbanks Independent School District"): (
         2,
         1,
@@ -1594,7 +1600,8 @@ def build(full: bool = False) -> str:
                 "population_basis": population_basis,
                 "active": active,
                 # NJ county vocational boards are appointed by the county executive or commissioners (N.J.S.A. 18A:54-16, https://pub.njleg.state.nj.us/statutes), not elected.
-                "elected": elected and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name)),
+                "elected": elected
+                and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name)),
                 "polity_id": pid,
             }
         )
