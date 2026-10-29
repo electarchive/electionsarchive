@@ -188,6 +188,13 @@
       (entry) => entry.map != null && entry.places != null,
     ) ?? null,
   );
+  const states = createQuery(() => ({
+    ...orpc.elections.states.queryOptions({
+      input: { id: located.data?.id ?? "" },
+    }),
+    enabled: located.data != null && hub.data != null && race == null,
+    placeholderData: keepPreviousData,
+  }));
   const places = $derived.by(() => {
     const own = race?.places;
     if (race == null || own == null || race.count <= 1) {
@@ -609,7 +616,29 @@
               {m.map_rebuilding()}
             </p>
           {/if}
-        {:else if hub.isPending || isStale}
+        {:else if race == null && states.data != null}
+          {const drawn = $derived(states.data)}
+          {#key drawn.tiles}
+            <PlaceMap
+              places={drawn.places}
+              isTally
+              colors={drawn.places.legend.map((item) =>
+                swatch(item.color, item.key),
+              )}
+              tiles={drawn.tiles}
+              own={null}
+              frame={drawn.frame}
+              approximate={[]}
+              noun={drawn.places.levels[0]?.noun ?? ""}
+              votes={m.col_seats()}
+              names={drawn.places.legend.map(
+                (item) => item.short ?? item.label,
+              )}
+              levels={[]}
+              span={null}
+            />
+          {/key}
+        {:else if hub.isPending || isStale || states.isFetching}
           <div
             class="animate-pulse rounded-sm bg-muted block-[min(32rem,60svh)] motion-reduce:animate-none"
           ></div>

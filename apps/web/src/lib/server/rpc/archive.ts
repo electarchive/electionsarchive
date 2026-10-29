@@ -11197,6 +11197,8 @@ async function universe(
   return found.rows;
 }
 
+const framed = new Map<string, ReturnType<typeof framing>>();
+
 async function framing(area: string, day: string, ks: Array<number> = []) {
   const found = await db.execute<{
     west: number;
@@ -16190,6 +16192,213 @@ export const elections = {
           })),
         };
       });
+    }),
+  states: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/states",
+        summary:
+          "Map the seats each European Parliament group won in each member state",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          tiles: v.string(),
+          frame: v.object({
+            west: v.number(),
+            south: v.number(),
+            east: v.number(),
+            north: v.number(),
+          }),
+          places: v.nonNullable(Places),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        k: number;
+        area: string;
+        path: string | null;
+        key: string | null;
+        isGroup: boolean;
+        seats: number;
+        day: string;
+        tiles: string | null;
+        noun: string | null;
+      }>(sql`
+        with recursive
+        kids as (
+          select k.id, k.polity_id, s.path, e.date_from as day from election k
+          join election e on e.id = k.parent_id
+          left join slug s on s.entity_id = k.id and s.is_current
+          where k.parent_id = ${input.id}::uuid and k.kind not in ('runoff', 'indirect')
+            and exists (select from polity y where y.id = e.polity_id and y.kind = 'supranational')
+        ),
+        tree(id, kid) as (
+          select id, id from kids
+          union all
+          select k.id, tree.kid from election k join tree on k.parent_id = tree.id where k.kind not in ('runoff', 'indirect')
+        ),
+        roots as materialized (
+          select c.id, tree.kid from contest c join tree on tree.id = c.election_id
+          where c.allocation_parent_id is null and c.party_scope_id is null and not c.notional
+            and c.kind in ('body_seats', 'list_allocation')
+        ),
+        grp(id, kid) as (
+          select id, kid from roots
+          union all
+          select c.id, grp.kid from contest c join grp on c.allocation_parent_id = grp.id
+        ),
+        winners as materialized (
+          select g.kid, o.id, coalesce(pm.into_id, o.party_id, o.alliance_id) as party, max(coalesce(x.seats, 1))::int as seats
+          from grp g
+          join result_set rs on rs.contest_id = g.id and ${latest("rs")}
+          join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
+          join contest_option o on o.id = x.option_id
+          left join entity_merge pm on pm.entity_id = o.party_id
+          where not exists (select from contest d where d.allocation_parent_id = g.id)
+          group by g.kid, g.id, o.id, pm.into_id
+        ),
+        placed as (
+          select a.k, a.id as area, kids.path, kids.day,
+            coalesce(gm.into_id, f.parent_party_id, w.party)::text as key, f.parent_party_id is not null as "isGroup",
+            sum(w.seats)::int as seats
+          from winners w
+          join kids on kids.id = w.kid
+          join polity y on y.id = kids.polity_id
+          join area_code ac on ac.code = y.iso_code
+          join area a on a.id = ac.area_id and a.scheme_code = 'eu.member_state'
+          left join lateral (
+            select parent_party_id from party_affiliation
+            where kind = 'ep_group' and party_id = w.party and valid @> kids.day
+            order by valid_from desc nulls last limit 1
+          ) f on true
+          left join entity_merge gm on gm.entity_id = f.parent_party_id
+          group by 1, 2, 3, 4, 5, 6
+        )
+        select p.k, p.area, p.path, p.key, p."isGroup", p.seats, p.day::text as day,
+          (select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) from boundary_set bs
+            where bs.scheme_code = 'eu.member_state' and bs.valid @> p.day) as tiles,
+          (select noun from scheme where code = 'eu.member_state') as noun
+        from placed p
+      `);
+      const first = found.rows[0];
+      const tiles = stored(first?.tiles);
+      const frame =
+        first == null || tiles == null
+          ? null
+          : await (framed.get(tiles) ??
+              framed
+                .set(
+                  tiles,
+                  framing(first.area, first.day, [
+                    ...new Set(found.rows.map((row) => row.k)),
+                  ]),
+                )
+                .get(tiles));
+      if (first == null || tiles == null || frame == null) {
+        return null;
+      }
+      const totals = Map.groupBy(found.rows, (row) => row.key)
+        .entries()
+        .map(([key, rows]) => {
+          let seats = 0;
+          for (const row of rows) {
+            seats += row.seats;
+          }
+          return { key: key ?? "", seats, isGroup: rows[0]?.isGroup === true };
+        })
+        .toArray()
+        .toSorted(
+          (a, b) =>
+            Number(b.isGroup) - Number(a.isGroup) ||
+            b.seats - a.seats ||
+            a.key.localeCompare(b.key),
+        );
+      const at = new Map(totals.map((entry, index) => [entry.key, index]));
+      const states = Map.groupBy(found.rows, (row) => row.area);
+      const [info, labels] = await Promise.all([
+        refs(
+          totals.flatMap((entry) => (entry.key === "" ? [] : [entry.key])),
+          first.day,
+        ),
+        names([...states.keys()], first.day),
+      ]);
+      const palette = new Map(
+        info
+          .values()
+          .flatMap((entry) =>
+            entry.color == null ? [] : [[entry.id, entry.color] as const],
+          ),
+      );
+      separate(
+        palette,
+        totals.map((entry) => [entry.key, entry.seats] as const),
+      );
+      return {
+        tiles,
+        frame,
+        places: {
+          levels: [
+            {
+              code: "eu.member_state",
+              noun: first.noun ?? "",
+              count: states.size,
+            },
+          ],
+          level: "eu.member_state",
+          legend: totals.map((entry) => ({
+            key: entry.key === "" ? "independent" : entry.key,
+            label: info.get(entry.key)?.label ?? m.seats_independents(),
+            short: info.get(entry.key)?.short ?? null,
+            color: palette.get(entry.key) ?? null,
+            person: null,
+            party: entry.key === "" ? null : entry.key,
+          })),
+          rows: states
+            .entries()
+            .map(([area, rows]) => {
+              let valid = 0;
+              for (const row of rows) {
+                valid += row.seats;
+              }
+              const held = rows
+                .map((row): [number, number] => [
+                  at.get(row.key ?? "") ?? 0,
+                  row.seats,
+                ])
+                .toSorted((a, b) => b[1] - a[1] || a[0] - b[0]);
+              const shares = totals.map(() => 0);
+              for (const [index, seats] of held) {
+                shares[index] = valid > 0 ? seats / valid : 0;
+              }
+              const [top, next] = held;
+              return {
+                k: rows[0]?.k ?? 0,
+                name: labels.full.get(area) ?? "",
+                path: rows[0]?.path ?? null,
+                contest: false,
+                isRemainder: false,
+                valid,
+                shares,
+                leader: top?.[0] ?? null,
+                held,
+                margin:
+                  top == null || valid === 0
+                    ? null
+                    : (top[1] - (next?.[1] ?? 0)) / valid,
+                earlier: null,
+                prior: null,
+              };
+            })
+            .toArray()
+            .toSorted((a, b) => a.name.localeCompare(b.name)),
+          sources: [],
+        },
+      };
     }),
   tiers: os
     .meta(

@@ -1784,6 +1784,7 @@
   "scrubber_slider": "Election year",
   "scrubber_chamber": "{chamber} after the election",
   "scrubber_no_map": "No map for {year} yet",
+  "states_title": "Seats by member state",
   "map_rebuilding": "This map is being rebuilt. Check back in a few minutes.",
   "scrubber_government": "Government that followed",
   "scrubber_open": "Open election",

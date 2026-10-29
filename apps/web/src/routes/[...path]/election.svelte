@@ -42,6 +42,7 @@
   import Results from "./results.svelte";
   import Road from "./road.svelte";
   import Seated from "./seated.svelte";
+  import States from "./states.svelte";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
 
@@ -2380,6 +2381,7 @@
 {:else if parts.length >= 40}
   <Winners {id} {parts} />
 {:else if parts.length > 0}
+  <States {id} />
   {#if election.seated != null}
     {const seated = $derived(election.seated)}
     <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
