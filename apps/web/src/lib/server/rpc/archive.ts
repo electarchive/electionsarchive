@@ -20156,7 +20156,7 @@ export const bodies = {
           v.object({
             party: v.string(),
             on: v.string(),
-            kind: v.picklist(["closed_by_court", "merged_into", "absorbed_by"]),
+            kind: v.picklist(["closed_by_court", "closed_by_government", "merged_into", "absorbed_by"]),
           }),
         ),
       }),
@@ -20426,12 +20426,12 @@ export const bodies = {
         db.execute<{
           party: string;
           on: string;
-          kind: "closed_by_court" | "merged_into" | "absorbed_by";
+          kind: "closed_by_court" | "closed_by_government" | "merged_into" | "absorbed_by";
         }>(sql`
           select coalesce(fm.into_id, r.from_party_id)::text as party, r.date::text as on, r.kind::text as kind
           from party_relation r left join entity_merge fm on fm.entity_id = r.from_party_id
           where coalesce(fm.into_id, r.from_party_id) = any(${sql.param(parties)}::uuid[])
-            and r.kind in ('closed_by_court', 'merged_into', 'absorbed_by') and r.date_precision = 'day'
+            and r.kind::text in ('closed_by_court', 'closed_by_government', 'merged_into', 'absorbed_by') and r.date_precision = 'day'
             and r.date >= ${day}::date and (${end}::date is null or r.date <= ${end}::date)
           `),
       ]);

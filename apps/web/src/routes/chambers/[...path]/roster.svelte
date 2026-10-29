@@ -58,7 +58,7 @@
     ends?: Array<{
       party: string;
       on: string;
-      kind: "closed_by_court" | "merged_into" | "absorbed_by";
+      kind: "closed_by_court" | "closed_by_government" | "merged_into" | "absorbed_by";
     }>;
     present?: Set<unknown> | null;
     title?: string;
@@ -121,7 +121,9 @@
       ? null
       : kind === "closed_by_court"
         ? m.chamber_switch_closed
-        : m.chamber_switch_dissolved;
+        : kind === "closed_by_government"
+          ? m.chamber_switch_closed_government
+          : m.chamber_switch_dissolved;
   };
   const low = $derived(Date.parse(start ?? today));
   const high = $derived(Math.max(Date.parse(end ?? today), low + 1));

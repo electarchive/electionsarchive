@@ -12,7 +12,7 @@ from ea.sources.tr.senato_uyeleri import fold
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "11"
+VERSION = "12"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -78,6 +78,7 @@ NAMES = {
         [
             ("Halk Fırkası", "official", "tr", date(1923, 9, 9), date(1924, 11, 10)),
             ("Cumhuriyet Halk Fırkası", "official", "tr", date(1924, 11, 10), CHP_RENAMED),
+            ("HF", "abbreviation", "tr", date(1923, 9, 9), date(1924, 11, 10)),
             ("CHF", "abbreviation", "tr", date(1924, 11, 10), CHP_RENAMED),
             ("Cumhuriyet Halk Partisi", "official", "tr", CHP_RENAMED, None),
             ("CHP", "abbreviation", "tr", CHP_RENAMED, None),
@@ -115,6 +116,15 @@ HDP_OPEN = (
     "with its own co-chairs."
 )
 RELATIONS: list[tuple[str, str, str | None, date, str, tuple[str, str] | str]] = [
+    ("terakkiperver-cumhuriyet-firkasi", "closed_by_government", None, date(1925, 1, 1), "year", LIST),
+    ("adalet-partisi-1961", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("cumhuriyet-halk-partisi", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("cumhuriyetci-koylu-millet-partisi", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("cumhuriyetci-guven-partisi", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("demokratik-parti", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("milli-selamet-partisi", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("turkiye-isci-partisi-1975", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
+    ("turkiye-sosyalist-isci-partisi", "closed_by_government", None, date(1981, 10, 16), "day", LIST),
     ("millet-partisi-1948", "closed_by_court", None, date(1954, 1, 27), "day", LIST),
     ("vatan-partisi-1954", "closed_by_court", None, date(1957, 1, 30), "day", LIST),
     ("demokrat-parti-1946", "closed_by_court", None, date(1960, 9, 29), "day", LIST),
