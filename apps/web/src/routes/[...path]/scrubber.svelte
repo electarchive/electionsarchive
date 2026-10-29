@@ -615,7 +615,7 @@
           ></div>
         {:else}
           <p
-            class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-muted-foreground block-[min(32rem,60svh)]"
+            class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-24"
           >
             {m.scrubber_no_map({ year: String(step?.year ?? "") })}
           </p>
