@@ -172,6 +172,27 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://services.arcgis.com/neJvtQ4PXvnQ86MJ/arcgis/rest/services/County_Board_Dist_new/FeatureServer/0",
         "field": "District",
     },
+    {
+        "publisher": "Anne Arundel County GIS",
+        "title": "Anne Arundel County Council Districts",
+        "pattern": r"^24:24003:(council|board-of-commissioners):district-",
+        "layer": "https://gis.aacounty.org/arcgis/rest/services/OpenData/Political_OpenData/MapServer/4",
+        "field": "CNCL",
+    },
+    {
+        "publisher": "Anderson County GIS",
+        "title": "Anderson County Council Districts",
+        "pattern": r"^45:45007:(council|board-of-commissioners):district-",
+        "layer": "https://propertyviewer.andersoncountysc.org/arcgis/rest/services/Overlays/MapServer/3",
+        "field": "OBJECTID",
+    },
+    {
+        "publisher": "Charles County GIS",
+        "title": "Charles County Commissioner Districts (2022)",
+        "pattern": r"^24:24017:board-of-commissioners:district-",
+        "layer": "https://services7.arcgis.com/3BMWkdyrt45RNCrq/arcgis/rest/services/CommDistricts_2022/FeatureServer/0",
+        "field": "COMM_DIST",
+    },
 ]
 
 
