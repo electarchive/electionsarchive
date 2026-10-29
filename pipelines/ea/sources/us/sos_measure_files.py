@@ -24,6 +24,7 @@ WEST_VIRGINIA = "https://apps.sos.wv.gov/elections/results/#2018-11-06-detail"
 PUBLISHERS = {
     "OH": ("Ohio Secretary of State", "Official county results of statewide issues"),
     "PA": ("Pennsylvania Department of State", "Election Returns: county results of ballot questions"),
+    "GA": ("Georgia Secretary of State", "November 4, 2014 General Election: official results by county and precinct"),
     "WV": ("West Virginia Secretary of State", "2018 General Election: official county results of constitutional amendments"),
 }
 OHIO_FILES = (
@@ -44,6 +45,12 @@ WEST_VIRGINIA_CONTESTS = {
     "Amendment No. 1": "2018-11-06:WV:question:wikipedia:west-virginia-amendment-1-no-right-to-abortion-in-constitution-measure",
     "Amendment No. 2": "2018-11-06:WV:question:wikipedia:west-virginia-amendment-2-legislative-authority-over-budgeting-for-state-judicia",
 }
+GEORGIA = "https://results.enr.clarityelections.com/GA/#2014-11-04"
+GEORGIA_CONTESTS = {
+    "Constitutional Amendment #1": "2014-11-04:GA:question:wikipedia:georgia-income-tax-rate-cap-amendment-a",
+    "Constitutional Amendment #2": "2014-11-04:GA:question:wikipedia:georgia-reckless-driving-fines-for-injury-trust-fund-amendment-b",
+    "Statewide Referendum A": "2014-11-04:GA:question:wikipedia:georgia-private-college-buildings-tax-exemption-referendum-1",
+}
 ARCHIVE = datetime(2026, 10, 29, tzinfo=UTC)
 
 
@@ -61,6 +68,7 @@ def locations() -> dict[str, str]:
         **{path: url for path, url, _ in OHIO_FILES},
         **{path: PENNSYLVANIA.format(Path(path).stem) for path in PENNSYLVANIA_FILES},
         "MF-270/detailxls.zip": WEST_VIRGINIA,
+        "MF-271/november_4_2014_-_general_election.zip": GEORGIA,
     }
 
 
@@ -79,7 +87,7 @@ def fetch() -> None:
 def parse() -> None:
     with connect() as conn:
         fips: dict[str, dict[str, str]] = {}
-        for state, prefix in (("OH", "39"), ("PA", "42"), ("WV", "54")):
+        for state, prefix in (("GA", "13"), ("OH", "39"), ("PA", "42"), ("WV", "54")):
             fips[state] = {
                 key(text): code
                 for code, text in conn.execute(
@@ -121,6 +129,22 @@ def parse() -> None:
             if code is not None:
                 contest = WEST_VIRGINIA_CONTESTS[title[0]]
                 rows += [(contest, code, "YES", number(row[3]), "MF-270/detailxls.zip"), (contest, code, "NO", number(row[5]), "MF-270/detailxls.zip")]
+    with zipfile.ZipFile(raw.cached(SOURCE, GEORGIA).path) as archive:
+        for member in archive.namelist():
+            if not member.endswith("-detailtxt.zip"):
+                continue
+            code = fips["GA"][key(re.match(r"(.+?)_\d", Path(member).name)[1])]
+            with zipfile.ZipFile(io.BytesIO(archive.read(member))) as inner:
+                lines = inner.read(inner.namelist()[0]).decode("latin-1").splitlines()
+            contest = None
+            for line in lines:
+                header = re.match(r"\s*(Constitutional Amendment #\d|Statewide Referendum A)", line)
+                if header is not None:
+                    contest = GEORGIA_CONTESTS[header[1]]
+                elif contest is not None and line.startswith("Totals:"):
+                    figures = [int(text) for text in line.split()[1:]]
+                    rows += [(contest, code, "YES", figures[5], "MF-271"), (contest, code, "NO", figures[10], "MF-271")]
+                    contest = None
     frame = pl.DataFrame(rows, schema=["contest", "fips", "answer", "votes", "path"], orient="row")
     print(frame.group_by("contest", "answer").agg(pl.col("votes").sum(), pl.col("fips").n_unique().alias("counties")).sort("contest", "answer"))
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -135,7 +159,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Statewide ballot questions of Ohio, Pennsylvania, and West Virginia by county from each state's official results files",
+            summary="Statewide ballot questions of Georgia, Ohio, Pennsylvania, and West Virginia by county from each state's official results files",
             polity="US",
         )
         sources = {}
@@ -148,11 +172,11 @@ def emit() -> Path:
                     kind="official_body",
                     publisher=publisher,
                     title=title,
-                    url={"OH": OHIO, "PA": "https://www.electionreturns.pa.gov/", "WV": "https://apps.sos.wv.gov/elections/results/"}[state],
+                    url={"OH": OHIO, "PA": "https://www.electionreturns.pa.gov/", "WV": "https://apps.sos.wv.gov/elections/results/", "GA": "https://results.enr.clarityelections.com/GA/"}[state],
                     license="Public record",
                 )
         for path, url in urls.items():
-            cs.artifact(raw.cached(SOURCE, url), sources[{"MF-268": "OH", "MF-269": "PA", "MF-270": "WV"}[path.split("/")[0]]])
+            cs.artifact(raw.cached(SOURCE, url), sources[{"MF-268": "OH", "MF-269": "PA", "MF-270": "WV", "MF-271": "GA"}[path.split("/")[0]]])
         for contest_key in frame["contest"].unique().sort():
             found = conn.execute(
                 """select c.id, rs.election_id, rs.k from contest c
