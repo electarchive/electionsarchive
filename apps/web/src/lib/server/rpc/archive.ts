@@ -17695,6 +17695,7 @@ export const polities = {
             last: row.last,
             population: row.population,
           }))
+          .filter((row) => row.name !== "")
           .toSorted((a, b) =>
             a.name.localeCompare(b.name, undefined, { numeric: true }),
           ),
