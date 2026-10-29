@@ -4485,7 +4485,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI')"""
         ).fetchall():
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
@@ -4581,7 +4581,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4614,6 +4614,7 @@ def parse() -> None:
                                         "area",
                                         "consolidated",
                                         "elementary",
+                                        "regional",
                                     )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
@@ -4733,7 +4734,7 @@ def parse() -> None:
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
-                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -4784,7 +4785,7 @@ def parse() -> None:
                                 for pattern, role in (
                                     (
                                         (
-                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator)$"
+                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator)$"
                                             r"|^(?:town )?(?:clerk and )?tax collector$"
                                         ),
                                         "office",
@@ -4863,6 +4864,7 @@ def parse() -> None:
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
                                 "moderator": "Moderator",
+                                "administrator": "Administrator",
                                 "collector": "Tax Collector",
                                 "highway-superintendent": "Highway Superintendent",
                                 "justice": "Justice",
