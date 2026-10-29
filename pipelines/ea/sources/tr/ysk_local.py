@@ -29,7 +29,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "8"
+VERSION = "9"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -1670,7 +1670,7 @@ def emit() -> Path:
                 kind="local",
                 date_from=day,
                 date_to=day,
-                status="held",
+                status="annulled" if key in ANNULLED.get(day.year, set()) else "held",
             )
             name(election, f"{day.year} {english} mayoral election", "en")
             name(election, f"{day.year} {native} Belediye Başkanlığı Seçimi", kind="native")
