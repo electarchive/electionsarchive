@@ -30,7 +30,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.gazette"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 OCR = PARSED / "ocr"
@@ -1469,7 +1469,7 @@ SENATE_SYSTEMS = {
         ),
     ),
     "senate_1966": (
-        {"formula": "hare"},
+        {"formula": "hare", "remainders": "national"},
         "Senate of the Republic national remainder, 1966",
         (
             "The 1966 renewal used the national remainder the National Assembly adopted in 1965. "
