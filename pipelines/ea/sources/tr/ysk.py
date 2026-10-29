@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "20"
+VERSION = "21"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -849,7 +849,17 @@ LISTS_2018_CAVEAT = (
     "party leaders: Mustafa Destici of the Great Unity Party (BBP) ran on the AK Parti list, and Gültekin Uysal of the "
     "Democrat Party ran on the İYİ Parti list."
 )
+ENDS_2018 = [
+    ("Q4881622", MP_START_2018, date(2022, 1, 29), "disqualified", "Q51212178", None),
+    ("Q6064478", MP_START_2018, date(2022, 10, 20), "resigned", None, None),
+    ("Q23921010", MP_START_2018, date(2021, 10, 11), "died", None, None),
+    ("Q106194747", MP_START_2018, date(2021, 11, 18), "died", None, None),
+    ("Q106285435", MP_START_2018, date(2023, 2, 7), "died", None, None),
+    ("Q97388954", MP_START_2018, date(2022, 12, 22), "removed", "absence", None),
+    ("Q56173976", date(2021, 7, 16), None, None, None, None),
+]
 LEFT_2018 = {
+    "absence": "Left the Assembly when the General Assembly removed the membership for absence.",
     "Q51212178": (
         "Left the Assembly on appointment as a minister. Since the 2017 constitutional amendments, ministers cannot also "
         "be members of the Assembly."
@@ -857,7 +867,27 @@ LEFT_2018 = {
     "Q106224801": "Left the Assembly after being elected mayor in the March 2019 local elections.",
     "mayor-2024": "Left the Assembly after being elected mayor in the March 2024 local elections.",
 }
+ALLY_LIST_2018 = (
+    "Ran on an allied party's list as the leader of their own party. The source says only that after the election they "
+    "moved to their own party, with no date, so the span runs from the start of the tenure."
+)
 SWITCH_NOTES = {
+    "2018-06-24:06-2:1": ALLY_LIST_2018,
+    "2018-06-24:03:6": ALLY_LIST_2018,
+    "2018-06-24:34-3:32": ALLY_LIST_2018,
+    "2018-06-24:42:14": ALLY_LIST_2018,
+    "2018-06-24:34-1:32": (
+        "Resigned from CHP on June 25, 2021 to join TİP. The source gives that date and no separate joining date, so "
+        "the TİP span starts the same day."
+    ),
+    "2018-06-24:34-2:27": (
+        "Expelled from İYİ Parti on November 16, 2020. A court annulled the expulsion on January 13, 2021, and he "
+        "resigned on March 4, 2021, so the İYİ span resumes between those dates."
+    ),
+    "2018-06-24:49:3": (
+        "Suspended by HDP for two years on July 28, 2020 and counted as independent in the source. Returned to HDP in "
+        "December 2022; the source gives no day, so the span starts December 1."
+    ),
     "2023-05-14:34-1:30": (
         "Elected on the CHP list as a Gelecek Partisi member. Joined Saadet with nine other Gelecek members on July 6, "
         "2023, so the two parties could form a group in the Assembly, and later returned to Gelecek on a date the "
@@ -874,6 +904,7 @@ SWITCH_NOTES = {
     ),
 }
 CONVICTED = "Membership ended when a final court conviction was read out in the General Assembly."
+ABSENCE = "Membership ended when the General Assembly removed it for absence."
 POOL_METHODOLOGY_2015 = (
     "This contest holds the national pool of votes cast abroad and at customs gates, as cast. Each district contest "
     "holds its share of the pool as apportioned votes."
@@ -1119,7 +1150,10 @@ CANDIDATES_2014 = [
     ("Selahattin Demirtaş", "Halkların Demokratik Partisi"),
     ("Ekmeleddin Mehmet İhsanoğlu", None),
 ]
-SWITCHES = Path(__file__).with_name("tbmm_2023_parties.tsv")
+SWITCHES = (
+    Path(__file__).with_name("tbmm_2023_parties.tsv"),
+    Path(__file__).with_name("tbmm_2018_parties.tsv"),
+)
 SWITCH_SOURCES = {
     "evrensel": (
         "https://www.evrensel.net/haber/5993477/yeni-partinin-kuruculari-kimlerden-olusuyor-91-milletvekilinin-listesi",
@@ -1133,6 +1167,13 @@ SWITCH_SOURCES = {
         "community",
         "Wikipedia",
         "TBMM 28. dönem milletvekilleri listesi",
+        ".wiki",
+    ),
+    "wikipedia27": (
+        "https://tr.wikipedia.org/w/index.php?title=TBMM_27._d%C3%B6nem_milletvekilleri_listesi&action=raw",
+        "community",
+        "Wikipedia",
+        "TBMM 27. dönem milletvekilleri listesi",
         ".wiki",
     ),
     "tbmm": (
@@ -6023,6 +6064,9 @@ def emit() -> Path:
     president = pl.read_parquet(PARSED / "president.parquet")
     istanbul = pl.read_parquet(PARSED / "istanbul.parquet")
     tenures_2018 = pl.read_parquet(PARSED / f"tenures_{DAY_2018}.parquet")
+    tenures_2018 = pl.concat(
+        [tenures_2018, pl.DataFrame(ENDS_2018, schema=tenures_2018.schema, orient="row")]
+    ).sort("start")
     ranked = pl.read_parquet(PARSED / "lists.parquet")
     with connect() as conn:
         cs = Changeset(
@@ -6752,20 +6796,21 @@ def emit() -> Path:
                 publisher=publisher,
                 title=heading,
                 url=url.replace("&action=raw", "").replace("w/index.php?title=", "wiki/"),
-                notes="Dates the party changes and ended memberships of members of the 28th Grand National Assembly.",
+                notes="Dates the party changes and ended memberships of members of the 27th and 28th Grand National Assemblies.",
             )
             cs.artifact(raw.cached(SOURCE, url), switch_sources[code])
         switches: dict[str, list[tuple[str, date, date | None, str]]] = {}
-        with SWITCHES.open(encoding="utf-8") as handle:
-            for line in csv.DictReader(handle, delimiter="\t"):
-                switches.setdefault(line["member"], []).append(
-                    (
-                        line["party"],
-                        date.fromisoformat(line["valid_from"]),
-                        date.fromisoformat(line["valid_to"]) if line["valid_to"] else None,
-                        line["source"],
+        for switch_file in SWITCHES:
+            with switch_file.open(encoding="utf-8") as handle:
+                for line in csv.DictReader(handle, delimiter="\t"):
+                    switches.setdefault(line["member"], []).append(
+                        (
+                            line["party"],
+                            date.fromisoformat(line["valid_from"]),
+                            date.fromisoformat(line["valid_to"]) if line["valid_to"] else None,
+                            line["source"],
+                        )
                     )
-                )
         members_2011 = cs.source("Wikidata", "Members of the 24th Grand National Assembly")
         cs.add(
             "source",
@@ -7238,8 +7283,10 @@ def emit() -> Path:
                                 tenure_id=tenure,
                                 kind="reinstated",
                                 date=start,
-                                source_id=members_source,
+                                source_id=members_source if statement is not None else switch_sources["wikipedia27"],
                             )
+                        if day == DAY_2018 and statement is None and end is not None:
+                            cs.add("citation", entity_id=tenure, source_id=switch_sources["wikipedia27"], locator=None)
                         if cause in LEFT_2018:
                             cs.add("note", entity_id=tenure, kind="context", body_md=LEFT_2018[cause])
                         if ended_via in ("removed", "died"):
@@ -7253,8 +7300,14 @@ def emit() -> Path:
                                 if ended_via == "died"
                                 else ATALAY_REMOVED
                                 if day != DAY_2018
+                                else ABSENCE
+                                if cause == "absence"
                                 else CONVICTED,
-                                source_id=members_source if day == DAY_2018 else switch_sources["tbmm"],
+                                source_id=switch_sources["tbmm"]
+                                if day != DAY_2018
+                                else members_source
+                                if statement is not None
+                                else switch_sources["wikipedia27"],
                             )
                         previous = tenure
 
