@@ -49,6 +49,7 @@
       short: string | null;
       color: string | null;
       lean: number | null;
+      near?: string | null;
       seats: number;
       here: number;
       members: Array<Member>;
@@ -160,12 +161,38 @@
   let pointer = "mouse";
   let pressed: number | null = null;
 
-  const ordered = $derived(
-    folded.toSorted(
-      (a, b) =>
-        (a.lean ?? Infinity) - (b.lean ?? Infinity) || b.seats - a.seats,
-    ),
-  );
+  const isUnplaced = (party: { key: string; lean: number | null }) =>
+    party.lean == null && /^(?:party:)?[0-9a-f]{8}-/.test(party.key);
+  const unplaced = $derived(folded.filter(isUnplaced));
+  const ordered = $derived.by(() => {
+    const known = folded
+      .filter((party) => party.lean != null)
+      .toSorted((a, b) => (a.lean ?? 0) - (b.lean ?? 0) || b.seats - a.seats);
+    let rest = 0;
+    for (const party of known) {
+      rest += party.seats;
+    }
+    rest /= 2;
+    let middle: number | null = null;
+    for (const party of known) {
+      rest -= party.seats;
+      if (rest <= 0) {
+        middle = party.lean;
+        break;
+      }
+    }
+    const spot = (party: (typeof folded)[number]) =>
+      party.lean ??
+      (isUnplaced(party)
+        ? ((party.near == null
+            ? null
+            : folded.find((other) => other.keys.includes(party.near ?? ""))
+                ?.lean) ??
+            middle ??
+            Infinity) + 0.005
+        : Infinity);
+    return folded.toSorted((a, b) => spot(a) - spot(b) || b.seats - a.seats);
+  });
   const totals = $derived.by(() => {
     let [all, local] = [vacant + seceded + held, 0];
     for (const party of folded) {
@@ -408,6 +435,7 @@
           ? null
           : where.path,
       position: seat.member?.position ?? null,
+      isUnplaced: unplaced.some((party) => party.key === seat.party),
       x: (seat.x - box.x) / box.width,
       y: (seat.y - dot - box.y) / box.height,
     };
@@ -760,6 +788,9 @@
                 })}{/if}</span
             >
           {/if}
+          {#if tip.isUnplaced}
+            <span class="opacity-80">{m.seats_unplaced()}</span>
+          {/if}
         </div>
       {/if}
     </div>
@@ -977,6 +1008,13 @@
       </li>
     {/if}
   </ul>
+  {#if unplaced.length > 0 && !isCompact}
+    <p class="text-xs text-muted-foreground">
+      {m.seats_unplaced_note({
+        parties: unplaced.map((party) => party.short ?? party.label).join(", "),
+      })}
+    </p>
+  {/if}
   {#if whole && paths.length > 1 && !isCompact}
     <div class="grid gap-2 border-bs pbs-3">
       <div class="grid gap-0.5">

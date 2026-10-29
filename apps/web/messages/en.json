@@ -553,6 +553,8 @@
   "seats_filled": "{count} seats filled in this election.",
   "seats_part": "Shows {count} of the {total} total seats.",
   "seats_vacant": "Vacant",
+  "seats_unplaced": "No position recorded",
+  "seats_unplaced_note": "No left–right position recorded for {parties}. The chart seats them beside the party most of their members came from, or in the middle.",
   "seats_seceded": "Seceded",
   "seats_held": "Not up",
   "seats_after_title": "Chamber after this election",
