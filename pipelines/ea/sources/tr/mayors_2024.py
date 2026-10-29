@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.mayors_2024"
-VERSION = "1"
+VERSION = "2"
 PAGES = Path(__file__).with_name("mayors_2024_pages.tsv")
 SWITCHES = Path(__file__).with_name("party_members.tsv")
 CHANGES = Path(__file__).with_name("mayors_2024_changes.tsv")
@@ -104,6 +104,15 @@ def emit() -> Path:
                 if row["who"] in people:
                     switches[people[row["who"]]].append(row)
 
+        held = {
+            office
+            for (office,) in conn.execute(
+                """select t.office_id from tenure t join changeset c on c.id = t.changeset_id
+                   where c.pipeline <> %s and t.from_date between '2024-03-31' and '2024-05-01'""",
+                [SOURCE],
+            ).fetchall()
+        }
+
         changes: dict[str, dict[str, str]] = {}
         with CHANGES.open(encoding="utf-8") as handle:
             for row in csv.DictReader(handle, delimiter="\t"):
@@ -154,6 +163,9 @@ def emit() -> Path:
             votes = [int(option[3]) for option in options]
             if top[7]:
                 skipped.append((str(contest), name, "rerun held on 2024-06-02"))
+                continue
+            if top[1] in held:
+                skipped.append((str(contest), name, "term held by another pipeline"))
                 continue
             if second is None or votes[0] == votes[1]:
                 skipped.append((str(contest), name, "tie or single candidate"))
@@ -303,6 +315,12 @@ def emit() -> Path:
                         valid_from=successor_from,
                     )
 
+        for (tenure,) in conn.execute(
+            """select t.id from tenure t join changeset c on c.id = t.changeset_id
+               where c.pipeline = %s and t.office_id = any(%s::uuid[])""",
+            [SOURCE, list(held)],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=tenure, reason="duplicates the term another pipeline holds")
         for key in sorted(set(changes) - matched):
             print(f"unmatched change: {changes[key]['municipality']} / {changes[key]['mayor']}")
         with UNPUBLISHED.open("w", encoding="utf-8", newline="") as handle:
