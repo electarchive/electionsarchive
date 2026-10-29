@@ -280,7 +280,7 @@
                     held.party == null
                       ? held.isIndependent
                         ? swatch(null, "independent")
-                        : "color-mix(in oklab, var(--muted-foreground) 22%, var(--card))"
+                        : swatch(null, "none")
                       : swatch(held.party.color, `party:${held.party.id}`),
                   )}
                   {const start = $derived(
