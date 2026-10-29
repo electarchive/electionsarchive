@@ -90,6 +90,12 @@ DISTRICT_CALENDAR = {
         11,
         "Cypress-Fairbanks ISD board elections page: next trustee election November 2, 2027, https://www.cfisd.net/our-district/board-of-trustees/board-elections",
     ),
+    ("NJ", "Newark City School System"): (
+        1,
+        0,
+        4,
+        "Chalkbeat Newark: four board seats filled at the April 21, 2026 school election, N.J.S.A. 18A:14-53 lets a Type II district keep April, https://www.chalkbeat.org/newark/2026/03/17/voters-choose-between-nine-candidates-four-seats-board-of-education-election-april/",
+    ),
 }
 CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
     ("AK", "county"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
