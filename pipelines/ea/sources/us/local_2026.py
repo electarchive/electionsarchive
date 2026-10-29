@@ -986,7 +986,12 @@ FEEDS.update(
             "Brevard County Supervisor of Elections",
             "2026 Candidates",
         ),
-        "OR-41043-lyons": (
+        "TX-48453": (
+        "https://www.austinisd.org/board/elections",
+        "Austin Independent School District",
+        "2026 Trustee Elections",
+    ),
+    "OR-41043-lyons": (
             "https://www.cityoflyons.org/",
             "City of Lyons",
             "General Election Certified Candidates",
@@ -1183,6 +1188,7 @@ DELIVERED = {
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
+    "TX-48453": DATA / "inbox" / "y26" / "tx" / "aisd.html",
     "FL-12009": DATA / "inbox" / "y26" / "fl" / "brevard.html",
     "KS-20091": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
     "KS-20091-prairie-village": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
@@ -4098,7 +4104,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX')"""
         ).fetchall():
             mine = coverage_tables.tokens(label)
             hits = [
@@ -4189,7 +4195,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4296,7 +4302,7 @@ def parse() -> None:
                             if (
                                 said
                                 and (sort and said != sort or not sort and said == "township")
-                                or (sort == "school" or state in ("MI", "CA", "NJ"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -4313,7 +4319,7 @@ def parse() -> None:
                         state in ("NJ", "MI", "FL", "OR")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
-                        or state == "CA"
+                        or state in ("CA", "TX")
                         and bool(fits)
                     )
                     and len({fit[4] for fit in fits}) == 1
