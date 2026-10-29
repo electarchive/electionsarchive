@@ -966,6 +966,11 @@ FEEDS.update(
             "City of La Pine",
             "City Council Elections: 2026 General Election Current Candidates",
         ),
+        "OR-41017-sisters": (
+            "https://www.nuggetnews.com/story/2026/10/14/news/kollerer-makes-bid-for-city-council-seat/39640.html",
+            "The Nugget Newspaper",
+            "Kollerer makes bid for City Council seat (four candidates for three Sisters council seats)",
+        ),
         "OR-41017-redmond": (
             "https://www.redmondoregon.gov/government/city-council/running-for-elected-office",
             "City of Redmond",
@@ -1132,6 +1137,7 @@ DELIVERED = {
     "OR-41017-bend": DATA / "inbox" / "y26" / "or" / "bend.html",
     "OR-41017-la-pine": DATA / "inbox" / "y26" / "or" / "la-pine.html",
     "OR-41017-redmond": DATA / "inbox" / "y26" / "or" / "redmond.html",
+    "OR-41017-sisters": DATA / "inbox" / "y26" / "or" / "sisters.html",
     "OR-41003": DATA / "inbox" / "y26" / "or" / "benton.html",
     "OR-41003-rcv": DATA / "inbox" / "y26" / "or" / "benton.html",
     "OR-41029": DATA / "inbox" / "y26" / "or" / "jackson_city.pdf",
