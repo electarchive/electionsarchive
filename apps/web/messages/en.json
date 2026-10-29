@@ -1667,6 +1667,8 @@
   "chamber_nonvoting": "Non-voting",
   "chamber_switch_joined": "Joined {party}",
   "chamber_switch_left": "Left {party}",
+  "chamber_switch_closed": "{party} closed by court",
+  "chamber_switch_dissolved": "{party} dissolved",
   "chamber_open": "Chamber history",
   "chamber_makeup_mixed": "Seats each party held at the start of every term: from records of those who actually sat where available, and from election results otherwise. The dashed line marks a majority. Select a term to view details below.",
   "search_group_body": "Chambers",

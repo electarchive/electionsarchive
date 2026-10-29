@@ -3,9 +3,15 @@ import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
+import { era } from "#lib/party.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
-import { latest, representative, separate } from "#lib/server/rpc/archive.js";
+import {
+  eras,
+  latest,
+  representative,
+  separate,
+} from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import land from "#lib/server/world.txt?raw";
 
@@ -706,7 +712,7 @@ export async function chamber(path: string) {
     ),
   );
   separate(relit, [...recent]);
-  const dated = await db.execute<{
+  const spans = await db.execute<{
     start: string;
     id: string;
     kind: string;
@@ -723,7 +729,15 @@ export async function chamber(path: string) {
       and n.entity_id = any(${sql.param([id, ...recent.keys().filter((key) => /^[\da-f-]{36}$/u.test(key))])}::uuid[])
     order by n.valid @> t.start desc, lower(n.valid), n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc
   `);
-  const at = Map.groupBy(dated.rows, (row) => row.start);
+  const at = Map.groupBy(spans.rows, (row) => row.start);
+  const timeline = await eras(
+    recent
+      .keys()
+      .filter((key) => /^[\da-f-]{36}$/u.test(key))
+      .toArray(),
+    terms[0]?.start ?? new Date().toISOString().slice(0, 10),
+    null,
+  );
   const titled = terms.map((term) => {
     const rows = at.get(term.start) ?? [];
     const own = rows.filter((row) => row.id === id);
@@ -740,37 +754,13 @@ export async function chamber(path: string) {
           ? `${native} (${english})`
           : (english ?? native ?? null),
       names: Object.fromEntries(
-        Map.groupBy(
-          rows.filter((row) => row.id !== id),
-          (row) => row.id,
-        )
-          .entries()
-          .flatMap(([party, names]) => {
-            const label =
-              names.find((row) => row.kind === "official") ??
-              names.find((row) => row.kind === "english");
-            if (label == null) {
-              return [];
-            }
-            const on =
-              label.since != null && label.since > term.start
-                ? label.since
-                : term.start;
-            return [
-              [
-                party,
-                {
-                  label: label.text,
-                  short:
-                    names.find(
-                      (row) =>
-                        row.kind === "abbreviation" &&
-                        (row.since == null || row.since <= on) &&
-                        (row.until == null || on < row.until),
-                    )?.text ?? null,
-                },
-              ] as const,
-            ];
+        new Set(rows.flatMap((row) => (row.id === id ? [] : [row.id])))
+          .values()
+          .flatMap((party) => {
+            const found = era(timeline, party, term.start);
+            return found == null
+              ? []
+              : [[party, { label: found.label, short: found.short }] as const];
           }),
       ),
     };
@@ -794,6 +784,7 @@ export async function chamber(path: string) {
     body,
     council,
     terms: titled,
+    eras: timeline,
     logos: Object.fromEntries(marks),
     basis: isSeated
       ? earlier.length > 0 || later.length > 0

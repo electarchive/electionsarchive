@@ -97,3 +97,20 @@ export function swatch(color: string | null | undefined, key: string) {
   }
   return NEUTRALS[hash % NEUTRALS.length] ?? "var(--muted-foreground)";
 }
+
+export function era<T extends { party: string; from: string }>(
+  list: Array<T>,
+  party: string | null,
+  day: string | null,
+) {
+  let found: T | undefined;
+  for (const entry of list) {
+    if (
+      entry.party === party &&
+      (found == null || (day != null && entry.from <= day))
+    ) {
+      found = entry;
+    }
+  }
+  return found;
+}

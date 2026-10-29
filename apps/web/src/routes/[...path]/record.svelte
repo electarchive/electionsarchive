@@ -99,6 +99,18 @@
         seats: entry.seats,
         group: entry.group ?? null,
       })),
+      names: Object.fromEntries(
+        point.parties.flatMap((entry) =>
+          entry.party == null || entry.label == null
+            ? []
+            : [
+                [
+                  entry.party,
+                  { label: entry.label, short: entry.short ?? null },
+                ],
+              ],
+        ),
+      ),
       election: { name: point.name, path: point.path, date: point.date },
     })),
   );
@@ -593,7 +605,9 @@
                 ></span>
                 {winner == null && lit.parties[0]?.isIndependent === true
                   ? m.person_parties_none()
-                  : (lit.parties[0]?.label ?? label(winner))}
+                  : (lit.parties[0]?.short ??
+                    lit.parties[0]?.label ??
+                    label(winner))}
               </span>
             {/if}
             {#if lit.share != null}
@@ -623,7 +637,9 @@
                     ? ""
                     : entry.top.party == null && entry.top.isIndependent
                       ? m.person_parties_none()
-                      : (entry.top.label ?? label(entry.top.party)),
+                      : (entry.top.short ??
+                        entry.top.label ??
+                        label(entry.top.party)),
                 )}
                 <li>
                   <a

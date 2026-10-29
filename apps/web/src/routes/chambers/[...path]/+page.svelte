@@ -11,7 +11,7 @@
   import { Slider } from "#lib/components/ui/slider/index.js";
   import { count, date, definite } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { swatch } from "#lib/party.js";
+  import { era, swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import type { PageData } from "./$types";
   import Council from "./council.svelte";
@@ -169,13 +169,13 @@
   const own = $derived(new Map(crew.map((party) => [party.id, party])));
   const called = (
     party: string | null,
-    names: Record<
-      string,
-      { label: string; short: string | null }
-    > = term?.names ?? {},
+    names?: Record<string, { label: string; short: string | null }>,
   ) => {
     const found = info.get(party ?? "") ?? own.get(party ?? "");
-    const dated = names[party ?? ""];
+    const dated =
+      names == null
+        ? (era(members.data?.eras ?? [], party, on) ?? term?.names[party ?? ""])
+        : names[party ?? ""];
     return {
       label: dated?.label ?? found?.label ?? "",
       short:
@@ -515,6 +515,7 @@
         parties={data.parties}
         governments={data.governments}
         interim={body.siblings.filter((sibling) => sibling.id !== data.id)}
+        eras={data.eras}
         basis={data.basis}
         bind:selected
       />
@@ -730,6 +731,9 @@
             parties={crew}
             start={members.data.start}
             end={members.data.end}
+            day={on}
+            eras={members.data.eras}
+            ends={members.data.ends}
           />
         {/if}
       </section>
@@ -742,6 +746,9 @@
           present={members.data?.isSeated === true ? new Set(sitting) : null}
           start={members.data?.start ?? null}
           end={members.data?.end ?? null}
+          day={on}
+          eras={members.data?.eras ?? []}
+          ends={members.data?.ends ?? []}
           title={members.data?.isSeated === true
             ? m.chamber_members_title({ span: span(term.start, term.end) })
             : m.chamber_members_returned({ span: span(term.start, term.end) })}

@@ -9,7 +9,7 @@
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
-  import { swatch } from "#lib/party.js";
+  import { era, swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -18,6 +18,9 @@
     parties,
     start,
     end,
+    day = start,
+    eras = [],
+    ends = [],
     present = null,
     title = "",
   }: {
@@ -45,6 +48,18 @@
     }>;
     start: string | null;
     end: string | null;
+    day?: string | null;
+    eras?: Array<{
+      party: string;
+      from: string;
+      label: string;
+      short: string | null;
+    }>;
+    ends?: Array<{
+      party: string;
+      on: string;
+      kind: "closed_by_court" | "merged_into" | "absorbed_by";
+    }>;
     present?: Set<unknown> | null;
     title?: string;
   } = $props();
@@ -90,10 +105,24 @@
       info.get(id ?? "")?.color ?? null,
       /^[0-9a-f]{8}-/.test(id ?? "") ? `party:${id ?? ""}` : (id ?? ""),
     );
-  const label = (id: string | null) =>
-    id == null
+  const label = (id: string | null, on: string | null = day) => {
+    const named = era(eras, id, on);
+    return id == null
       ? m.record_none()
-      : (info.get(id)?.short ?? info.get(id)?.label ?? "");
+      : named != null
+        ? (named.short ?? named.label)
+        : (info.get(id)?.short ?? info.get(id)?.label ?? "");
+  };
+  const ending = (id: string | null, on: string) => {
+    const kind = ends.find(
+      (entry) => entry.party === id && entry.on === on,
+    )?.kind;
+    return kind == null
+      ? null
+      : kind === "closed_by_court"
+        ? m.chamber_switch_closed
+        : m.chamber_switch_dissolved;
+  };
   const low = $derived(Date.parse(start ?? today));
   const high = $derived(Math.max(Date.parse(end ?? today), low + 1));
   const at = (value: string | null, fallback: number) =>
@@ -363,7 +392,7 @@
                         style:background={tint(event.move.from)}
                       ></span>
                       <span class="text-muted-foreground"
-                        >{label(event.move.from)}</span
+                        >{label(event.move.from, event.on)}</span
                       >
                       <span class="text-muted-foreground" aria-hidden="true"
                         >→</span
@@ -373,7 +402,7 @@
                         style:background={tint(event.move.to)}
                       ></span>
                       <span class="text-muted-foreground"
-                        >{label(event.move.to)}</span
+                        >{label(event.move.to, event.on)}</span
                       >
                       {#if event.move.members.length === 1 && event.move.members[0] != null}
                         <Name
@@ -412,9 +441,13 @@
                   </span>
                   <span class="text-xs font-semibold whitespace-nowrap"
                     >{event.move.to == null || event.move.to === "independent"
-                      ? m.chamber_changed_party()
+                      ? (ending(
+                          event.move.from,
+                          event.on,
+                        )?.({ party: label(event.move.from, event.on) }) ??
+                        m.chamber_changed_party())
                       : m.chamber_joined_party({
-                          party: label(event.move.to),
+                          party: label(event.move.to, event.on),
                         })}</span
                   >
                 {:else}
@@ -566,13 +599,14 @@
             member.segments.slice(1).map((segment, step) => {
               const isLeft =
                 segment.party == null || segment.party === "independent";
+              const party = isLeft
+                ? (member.segments[step]?.party ?? null)
+                : segment.party;
               return {
-                why: (isLeft ? m.chamber_switch_left : m.chamber_switch_joined)(
-                  { party: "\u0000" },
-                ),
-                party: isLeft
-                  ? (member.segments[step]?.party ?? null)
-                  : segment.party,
+                why: (isLeft
+                  ? (ending(party, segment.from) ?? m.chamber_switch_left)
+                  : m.chamber_switch_joined)({ party: "\u0000" }),
+                party,
                 isSwitch: true,
                 on: segment.from,
               };
@@ -690,7 +724,7 @@
                         {const parts = $derived(line.why.split("\u0000"))}
                         <span class="font-semibold"
                           >{parts[0]}<Name
-                            label={label(line.party)}
+                            label={label(line.party, line.on)}
                             party={line.party}
                             color={tint(line.party)}
                             hasSwatch={false}

@@ -11,6 +11,7 @@
     parties,
     governments,
     interim,
+    eras,
     basis,
     selected = $bindable(),
   }: {
@@ -57,6 +58,12 @@
       isCaretaker: boolean;
     }>;
     interim: Array<{ name: string; from: string | null; to: string | null }>;
+    eras: Array<{
+      party: string;
+      from: string;
+      label: string;
+      short: string | null;
+    }>;
     basis: "seated" | "mixed" | "results";
     selected: number;
   } = $props();
@@ -117,6 +124,7 @@
     {parties}
     {governments}
     {interim}
+    {eras}
     {isShare}
     {selected}
     onselect={(index: number) => (selected = index)}

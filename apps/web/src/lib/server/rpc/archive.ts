@@ -18,6 +18,7 @@ import {
 import path from "node:path";
 import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
+import { era, independent } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, withLogos } from "#lib/server/logos.js";
@@ -28,7 +29,6 @@ import {
   projectionOf,
   spot,
 } from "#lib/server/plane.js";
-import { independent } from "#lib/party.js";
 
 const stored = (tiles: string | null | undefined) =>
   tiles != null &&
@@ -291,13 +291,18 @@ const tenured = (person: SQL, contest: SQL) => sql`exists (
       or (coalesce(hc.office_id, hp.office_id) is null and ht.body_id = hc.body_id))
 )`;
 
+const nearest = (alias: SQL, date: SQL) => sql`
+  case when ${date} is not null then greatest(lower(${alias}.valid) - ${date}, ${date} - upper(${alias}.valid) + 1, 0) end
+`;
+
 const abbreviate = (party: SQL, date: SQL) => sql`
   (select a.text from name a
     left join lateral (
       select f.text, f.is_preferred, f.valid from name f
       where f.entity_id = a.entity_id and f.kind in ('official', 'english')
       order by coalesce(f.valid @> coalesce(${date}, current_date), false) desc,
-        coalesce(f.valid @> coalesce(${date}, current_date) and not (lower_inf(f.valid) and upper_inf(f.valid)), false) desc, f.is_preferred desc,
+        coalesce(f.valid @> coalesce(${date}, current_date) and not (lower_inf(f.valid) and upper_inf(f.valid)), false) desc,
+        ${nearest(sql`f`, date)} nulls first, f.is_preferred desc,
         (f.lang = a.lang) desc, (f.kind = 'official') desc, f.recorded_from desc, f.id
       limit 1
     ) f on true
@@ -306,6 +311,7 @@ const abbreviate = (party: SQL, date: SQL) => sql`
         f.is_preferred is false and not (lower_inf(f.valid) and upper_inf(f.valid)) and lower_inf(a.valid) and upper_inf(a.valid)
         and exists (select from name p where p.entity_id = a.entity_id and p.kind in ('official', 'english') and p.is_preferred)
       )
+      and (f.valid is null or (lower_inf(a.valid) and upper_inf(a.valid)) or (lower_inf(f.valid) and upper_inf(f.valid)) or a.valid && f.valid)
     order by (a.kind = 'short') desc, coalesce(a.valid @> coalesce(${date}, current_date), false) desc,
       (lower_inf(a.valid) and upper_inf(a.valid)), a.is_preferred desc, (a.lang = 'en') desc,
       coalesce(
@@ -713,24 +719,59 @@ export async function names(
   on: string | null = null,
   common: Array<string> = [],
 ) {
+  const found = await dated(
+    ids.map((id) => ({ id, on })),
+    common,
+  );
+  const full = new Map<string, string>();
+  const short = new Map<string, string>();
+  for (const id of ids) {
+    const named = found(id, on);
+    if (named.label !== "") {
+      full.set(id, named.label);
+    }
+    if (named.short != null) {
+      short.set(id, named.short);
+    }
+  }
+  return { full, short };
+}
+
+export async function dated(
+  pairs: Array<{ id: string; on: string | null }>,
+  common: Array<string> = [],
+) {
+  const unique = new Map(
+    pairs.map((pair) => [`${pair.id}|${pair.on ?? ""}`, pair]),
+  )
+    .values()
+    .toArray();
   const result = await db.execute<{
     entity_id: string;
+    on: string | null;
     kind: string;
     text: string;
   }>(sql`
-    (select n.entity_id, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
-    from (
-      select distinct on (entity_id) entity_id, kind::text, text
+    with p as (
+      select * from unnest(${sql.param(unique.map((pair) => pair.id))}::uuid[], ${sql.param(unique.map((pair) => pair.on))}::date[]) p(entity_id, on_date)
+    )
+    (select p.entity_id, p.on_date::text as on, n.kind, coalesce(to_char(d.date, 'FMMonth FMDD, ') || n.text, n.text) as text
+    from p
+    cross join lateral (
+      select kind::text, text
       from name
-      where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
-      order by entity_id, coalesce(valid @> coalesce(${on}::date, current_date), false) desc,
-        coalesce(valid @> coalesce(${on}::date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+      where entity_id = p.entity_id and kind in ('official', 'english')
+      order by coalesce(valid @> coalesce(p.on_date, current_date), false) desc,
+        coalesce(valid @> coalesce(p.on_date, current_date) and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+        ${nearest(sql`name`, sql`p.on_date`)} nulls first,
         coalesce(kind = 'english' and script = 'Latn' and entity_id = any(${sql.param(common)}::uuid[]), false) desc, is_preferred desc,
+        lang = (select o.lang from name o where o.entity_id = p.entity_id and o.is_preferred and o.kind in ('official', 'english') limit 1) desc nulls last,
         (lang = 'en') desc, (kind = 'official') desc, recorded_from desc, id
+      limit 1
     ) n
     left join lateral (
       select e.date_from as date from election e
-      where e.id = n.entity_id and e.date_precision = 'day'
+      where e.id = p.entity_id and e.date_precision = 'day'
         and n.text like extract(year from e.date_from)::int || ' %'
         and exists (
           select from election o
@@ -743,17 +784,62 @@ export async function names(
         )
     ) d on true)
     union all
-    select i.id, 'abbreviation', short.text
-    from (select distinct unnest(${sql.param(ids)}::uuid[]) as id) i
-    cross join lateral (select ${abbreviate(sql`i.id`, sql`${on}::date`)} as text) short
+    select p.entity_id, p.on_date::text, 'abbreviation', short.text
+    from p
+    cross join lateral (select ${abbreviate(sql`p.entity_id`, sql`p.on_date`)} as text) short
     where short.text is not null
   `);
-  const full = new Map<string, string>();
-  const short = new Map<string, string>();
+  const found = new Map<string, { label: string; short: string | null }>();
   for (const row of result.rows) {
-    (row.kind === "abbreviation" ? short : full).set(row.entity_id, row.text);
+    const key = `${row.entity_id}|${row.on ?? ""}`;
+    const entry = found.get(key) ?? { label: "", short: null };
+    if (row.kind === "abbreviation") {
+      entry.short = row.text;
+    } else {
+      entry.label = row.text;
+    }
+    found.set(key, entry);
   }
-  return { full, short };
+  return (id: string, on: string | null) =>
+    found.get(`${id}|${on ?? ""}`) ?? { label: "", short: null };
+}
+
+export async function eras(
+  ids: Array<string>,
+  from: string,
+  to: string | null,
+) {
+  const bounds = await db.execute<{ id: string; on: string }>(sql`
+    select distinct n.entity_id::text as id, b::text as on
+    from name n cross join lateral unnest(array[lower(n.valid), upper(n.valid)]) b
+    where n.entity_id = any(${sql.param(ids)}::uuid[]) and n.kind in ('official', 'english', 'short', 'abbreviation')
+      and b > ${from}::date and (${to}::date is null or b < ${to}::date)
+  `);
+  const pairs = [
+    ...ids.map((id) => ({ id, on: from })),
+    ...bounds.rows.map((row) => ({ id: row.id, on: row.on })),
+  ].toSorted((a, b) => a.on.localeCompare(b.on));
+  const found = await dated(pairs);
+  const out: Array<{
+    party: string;
+    from: string;
+    label: string;
+    short: string | null;
+  }> = [];
+  const last = new Map<string, { label: string; short: string | null }>();
+  for (const pair of pairs) {
+    const named = found(pair.id, pair.on);
+    const before = last.get(pair.id);
+    if (
+      named.label === "" ||
+      (before?.label === named.label && before.short === named.short)
+    ) {
+      continue;
+    }
+    last.set(pair.id, named);
+    out.push({ party: pair.id, from: pair.on, ...named });
+  }
+  return out;
 }
 
 export async function paths(ids: Array<string>) {
@@ -14018,6 +14104,7 @@ export const elections = {
       const seatedRows = electionRows.rows.flatMap((row) => row.parties ?? []);
       const seatedRefs = await refs(
         seatedRows.flatMap((row) => row.party ?? []),
+        election.date,
       );
       const seatedTotals = Map.groupBy(
         seatedRows,
@@ -14700,7 +14787,8 @@ export const elections = {
         where gp.government_id = any(${sql.param(ids)}::uuid[])
       `);
       const parties = members.rows.map((row) => row.party);
-      const [labels, colors, positions] = await Promise.all([
+      const started = new Map(found.rows.map((row) => [row.id, row.from]));
+      const [labels, colors, positions, named] = await Promise.all([
         names(found.rows.flatMap((row) => row.head ?? [])),
         refs(parties),
         db.execute<{ party_id: string; lean: number }>(sql`
@@ -14708,6 +14796,12 @@ export const elections = {
           where party_id = any(${sql.param(parties)}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
+        dated(
+          members.rows.map((member) => ({
+            id: member.party,
+            on: started.get(member.government) ?? null,
+          })),
+        ),
       ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
@@ -14733,6 +14827,7 @@ export const elections = {
               short: null,
               color: null,
             }),
+            ...named(member.party, row.from),
             role: member.role,
             seats: member.seats,
             lean: lean.get(member.party) ?? null,
@@ -16571,10 +16666,13 @@ export const elections = {
       const parties = [
         ...new Set(found.rows.flatMap((row) => row.party ?? [])),
       ];
+      const held = await db.execute<{ day: string }>(sql`
+        select date_from::text as day from election where id = ${input.id}::uuid
+      `);
       const [labels, slugs, colors, positions] = await Promise.all([
         names(polities),
         paths([...parts, ...polities]),
-        refs(parties),
+        refs(parties, held.rows[0]?.day ?? null),
         db.execute<{ party_id: string; lean: number }>(sql`
           select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
           where party_id = any(${sql.param(parties)}::uuid[])
@@ -16965,7 +17063,7 @@ export async function record(input: { id: string; body?: string }) {
       found.rows.flatMap((row) => [row.link ?? [], row.decider ?? []].flat()),
     ),
   ];
-  const [labels, slugs, colors, positions, homes, own, dated, kinds] =
+  const [labels, slugs, colors, positions, homes, own, named, kinds] =
     await Promise.all([
       names([
         ...seats,
@@ -16999,17 +17097,11 @@ export async function record(input: { id: string; body?: string }) {
             where pp.polity_id = p.id
           )))
     `),
-      db.execute<{
-        party: string;
-        text: string;
-        from: string | null;
-        to: string | null;
-      }>(sql`
-      select n.entity_id::text as party, n.text, lower(n.valid)::text as from, upper(n.valid)::text as to from name n
-      where n.entity_id = any(${sql.param(parties)}::uuid[]) and n.kind in ('official', 'english') and not n.is_preferred
-        and not (lower_inf(n.valid) and upper_inf(n.valid))
-        and exists (select from name p where p.entity_id = n.entity_id and p.kind in ('official', 'english') and p.is_preferred)
-    `),
+      dated(
+        found.rows.flatMap((row) =>
+          row.party == null ? [] : [{ id: row.party, on: row.date }],
+        ),
+      ),
       db.execute<{ id: string; rank: number | null; isOwn: boolean }>(sql`
       select id::text, array_position(array['head_of_state', 'head_of_government', 'governor', 'mayor'], kind::text) as rank,
         polity_id = ${input.id}::uuid as "isOwn"
@@ -17022,7 +17114,6 @@ export async function record(input: { id: string; body?: string }) {
   const owned = new Set(
     kinds.rows.filter((row) => row.isOwn).map((row) => row.id),
   );
-  const renamed = Map.groupBy(dated.rows, (row) => row.party);
   const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
   const region = new Map(homes.rows.map((row) => [row.id, row.region]));
   const clashes = new Set<string>();
@@ -17120,6 +17211,12 @@ export async function record(input: { id: string; body?: string }) {
                     const sat = new Date(Date.parse(row.date) + 40 * 86_400_000)
                       .toISOString()
                       .slice(0, 10);
+                    const then =
+                      row.party == null ? null : named(row.party, row.date);
+                    const isRenamed =
+                      then != null &&
+                      then.label !== "" &&
+                      then.label !== colors.get(row.party ?? "")?.label;
                     return {
                       party: row.party,
                       seats: row.seats,
@@ -17132,14 +17229,8 @@ export async function record(input: { id: string; body?: string }) {
                               (bloc.from == null || bloc.from <= sat) &&
                               (bloc.to == null || sat < bloc.to),
                           )?.group ?? null,
-                      label:
-                        renamed
-                          .get(row.party ?? "")
-                          ?.find(
-                            (name) =>
-                              (name.from == null || name.from <= row.date) &&
-                              (name.to == null || row.date < name.to),
-                          )?.text ?? null,
+                      label: isRenamed ? then.label : null,
+                      short: isRenamed ? then.short : null,
                     };
                   })
                   .toSorted(
@@ -17184,6 +17275,7 @@ export async function record(input: { id: string; body?: string }) {
                       isIndependent: false,
                       group: known?.group ?? null,
                       label: known?.label ?? null,
+                      short: known?.short ?? null,
                     };
                   })
                   .toSorted((x, y) => y.seats - x.seats);
@@ -18282,6 +18374,7 @@ export const polities = {
                     isIndependent: v.optional(v.boolean()),
                     group: v.optional(v.nullable(v.string())),
                     label: v.nullable(v.string()),
+                    short: v.optional(v.nullable(v.string())),
                   }),
                 ),
               }),
@@ -20051,6 +20144,21 @@ export const bodies = {
             parent: v.nullable(v.string()),
           }),
         ),
+        eras: v.array(
+          v.object({
+            party: v.string(),
+            from: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+          }),
+        ),
+        ends: v.array(
+          v.object({
+            party: v.string(),
+            on: v.string(),
+            kind: v.picklist(["closed_by_court", "merged_into", "absorbed_by"]),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -20266,46 +20374,67 @@ export const bodies = {
             .filter((id) => id != null),
         ),
       ];
-      const [labels, slugs, colors, positions, branches, apportionment] =
-        await Promise.all([
-          names([
-            ...new Set([
-              ...rows.map((row) => row.person),
-              ...rows.flatMap((row) => row.place ?? []),
-            ]),
+      const day = start ?? input.from;
+      const [
+        labels,
+        slugs,
+        colors,
+        positions,
+        branches,
+        apportionment,
+        timeline,
+        closures,
+      ] = await Promise.all([
+        names([
+          ...new Set([
+            ...rows.map((row) => row.person),
+            ...rows.flatMap((row) => row.place ?? []),
           ]),
-          paths([...new Set(rows.flatMap((row) => row.contest ?? []))]),
-          refs(parties),
-          db.execute<{ party_id: string; lean: number }>(sql`
-            select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
-            where party_id = any(${sql.param(parties)}::uuid[])
-            order by party_id, valid_from desc nulls last
+        ]),
+        paths([...new Set(rows.flatMap((row) => row.contest ?? []))]),
+        refs(parties, day),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(parties)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+        db.execute<{ party: string; parent: string }>(sql`
+          select distinct on (a.party_id) a.party_id as party, coalesce(pm.into_id, a.parent_party_id) as parent
+          from party_affiliation a left join entity_merge pm on pm.entity_id = a.parent_party_id
+          where a.party_id = any(${sql.param(parties)}::uuid[]) and a.kind = 'regional_branch'
+            and (a.valid @> ${start ?? input.from}::date or upper(a.valid) is null)
+          order by a.party_id, lower(a.valid) desc nulls last
+        `),
+        db.execute<{
+          area: string;
+          seats: number;
+          from: string;
+          to: string | null;
+          gaps: Array<{ from: string; to: string | null }>;
+        }>(sql`
+          select a.area_id as area, a.seats, a.valid_from::text as from, a.valid_to::text as to,
+            coalesce(json_agg(json_build_object('from', g.valid_from::text, 'to', g.valid_to::text)
+              order by g.valid_from) filter (where g.valid_from is not null), '[]') as gaps
+          from body_apportionment a
+          left join representation_gap g on g.body_id = a.body_id and g.area_id = a.area_id
+            and g.valid && daterange(${start ?? input.from}::date, ${end}::date)
+          where a.body_id = ${input.id}::uuid and ${returned == null}
+            and a.valid && daterange(${start ?? input.from}::date, ${end}::date)
+          group by a.area_id, a.seats, a.valid_from, a.valid_to
+        `),
+        eras(parties, day, end),
+        db.execute<{
+          party: string;
+          on: string;
+          kind: "closed_by_court" | "merged_into" | "absorbed_by";
+        }>(sql`
+          select coalesce(fm.into_id, r.from_party_id)::text as party, r.date::text as on, r.kind::text as kind
+          from party_relation r left join entity_merge fm on fm.entity_id = r.from_party_id
+          where coalesce(fm.into_id, r.from_party_id) = any(${sql.param(parties)}::uuid[])
+            and r.kind in ('closed_by_court', 'merged_into', 'absorbed_by') and r.date_precision = 'day'
+            and r.date >= ${day}::date and (${end}::date is null or r.date <= ${end}::date)
           `),
-          db.execute<{ party: string; parent: string }>(sql`
-            select distinct on (a.party_id) a.party_id as party, coalesce(pm.into_id, a.parent_party_id) as parent
-            from party_affiliation a left join entity_merge pm on pm.entity_id = a.parent_party_id
-            where a.party_id = any(${sql.param(parties)}::uuid[]) and a.kind = 'regional_branch'
-              and (a.valid @> ${start ?? input.from}::date or upper(a.valid) is null)
-            order by a.party_id, lower(a.valid) desc nulls last
-          `),
-          db.execute<{
-            area: string;
-            seats: number;
-            from: string;
-            to: string | null;
-            gaps: Array<{ from: string; to: string | null }>;
-          }>(sql`
-            select a.area_id as area, a.seats, a.valid_from::text as from, a.valid_to::text as to,
-              coalesce(json_agg(json_build_object('from', g.valid_from::text, 'to', g.valid_to::text)
-                order by g.valid_from) filter (where g.valid_from is not null), '[]') as gaps
-            from body_apportionment a
-            left join representation_gap g on g.body_id = a.body_id and g.area_id = a.area_id
-              and g.valid && daterange(${start ?? input.from}::date, ${end}::date)
-            where a.body_id = ${input.id}::uuid and ${returned == null}
-              and a.valid && daterange(${start ?? input.from}::date, ${end}::date)
-            group by a.area_id, a.seats, a.valid_from, a.valid_to
-          `),
-        ]);
+      ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
@@ -20340,6 +20469,8 @@ export const bodies = {
           lean: lean.get(id) ?? null,
           parent: parent.get(id) ?? null,
         })),
+        eras: timeline,
+        ends: closures.rows,
       };
     }),
 };
@@ -21278,7 +21409,7 @@ export const people = {
         where id = any(${sql.param([...spells, ...terms].map((spell) => spell.owner))}::uuid[])
       `);
       const homes = [...new Set(housed.rows.map((row) => row.polity))];
-      const [faces, owned, peers, homeSlugs] = await Promise.all([
+      const [faces, owned, timeline, peers, homeSlugs] = await Promise.all([
         portraits([person.id]),
         refs([
           ...new Set(
@@ -21293,6 +21424,24 @@ export const people = {
             ].filter((id) => id != null),
           ),
         ]),
+        eras(
+          [
+            ...new Set(
+              painted
+                .values()
+                .toArray()
+                .flat()
+                .flatMap((segment) => segment.party ?? []),
+            ),
+          ],
+          painted
+            .values()
+            .toArray()
+            .flat()
+            .flatMap((segment) => segment.from ?? [])
+            .toSorted((a, b) => a.localeCompare(b))[0] ?? "1000-01-01",
+          null,
+        ),
         Promise.all(homes.map((polity) => chambers(polity))).then(
           (found) =>
             new Map(found.flat().map((peer) => [peer.id, peer.slug] as const)),
@@ -21395,13 +21544,36 @@ export const people = {
                 from: spell.from,
                 to: spell.to,
                 isFromUnknown: spell.isFromUnknown,
-                parties: (painted.get(spell) ?? []).map((segment) => ({
-                  ...segment,
-                  party:
+                parties: (painted.get(spell) ?? []).flatMap((segment) => {
+                  const found =
                     segment.party == null
-                      ? null
-                      : (owned.get(segment.party) ?? null),
-                })),
+                      ? undefined
+                      : owned.get(segment.party);
+                  const cuts = timeline.flatMap((entry) =>
+                    entry.party === segment.party &&
+                    segment.from != null &&
+                    entry.from > segment.from &&
+                    (segment.to == null || entry.from < segment.to)
+                      ? [entry.from]
+                      : [],
+                  );
+                  return [segment.from, ...cuts].map((from, index, all) => {
+                    const then = era(timeline, segment.party, from);
+                    return {
+                      ...segment,
+                      from,
+                      to: all[index + 1] ?? segment.to,
+                      party:
+                        found == null
+                          ? null
+                          : {
+                              ...found,
+                              label: then?.label ?? found.label,
+                              short: then == null ? found.short : then.short,
+                            },
+                    };
+                  });
+                }),
               })),
               seats,
             };
@@ -21420,13 +21592,34 @@ export const people = {
             path: chamberPath.get(term.owner) ?? null,
             from: term.from,
             to: term.to,
-            parties: (painted.get(term) ?? []).map((segment) => ({
-              ...segment,
-              party:
-                segment.party == null
-                  ? null
-                  : (owned.get(segment.party) ?? null),
-            })),
+            parties: (painted.get(term) ?? []).flatMap((segment) => {
+              const found =
+                segment.party == null ? undefined : owned.get(segment.party);
+              const cuts = timeline.flatMap((entry) =>
+                entry.party === segment.party &&
+                segment.from != null &&
+                entry.from > segment.from &&
+                (segment.to == null || entry.from < segment.to)
+                  ? [entry.from]
+                  : [],
+              );
+              return [segment.from, ...cuts].map((from, index, all) => {
+                const then = era(timeline, segment.party, from);
+                return {
+                  ...segment,
+                  from,
+                  to: all[index + 1] ?? segment.to,
+                  party:
+                    found == null
+                      ? null
+                      : {
+                          ...found,
+                          label: then?.label ?? found.label,
+                          short: then == null ? found.short : then.short,
+                        },
+                };
+              });
+            }),
           }))
           .toSorted((a, b) => b.from.localeCompare(a.from)),
         record,
@@ -21591,10 +21784,27 @@ export const people = {
         ),
       ];
       const contests = [...new Set(ballots.rows.map((row) => row.contest))];
-      const [entities, labels, slugs] = await Promise.all([
+      const last = new Map<string, string>();
+      for (const row of [
+        ...spans.rows.map((span) => ({ party: span.party, on: span.from })),
+        ...ballots.rows.map((ballot) => ({
+          party: ballot.party,
+          on: ballot.date,
+        })),
+      ]) {
+        if (
+          row.party != null &&
+          row.on != null &&
+          row.on > (last.get(row.party) ?? "")
+        ) {
+          last.set(row.party, row.on);
+        }
+      }
+      const [entities, labels, slugs, then] = await Promise.all([
         refs(parties),
         names(contests),
         paths(contests),
+        dated(parties.map((id) => ({ id, on: last.get(id) ?? null }))),
       ]);
       const lanes = new Map<
         string,
@@ -21626,8 +21836,15 @@ export const people = {
       >();
       const lane = (party: string | null) => {
         const key = party ?? "";
+        const entity = party == null ? undefined : entities.get(party);
+        const era = party == null ? null : then(party, last.get(party) ?? null);
         const found = lanes.get(key) ?? {
-          party: party == null ? null : (entities.get(party) ?? null),
+          party:
+            entity == null
+              ? null
+              : era == null || era.label === ""
+                ? entity
+                : { ...entity, label: era.label, short: era.short },
           spans: [],
           ballots: [],
         };

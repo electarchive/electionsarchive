@@ -17,7 +17,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
 DEMON = "https://web.archive.org/web/20200201142936id_/http://www.election.demon.co.uk:80/eplon.html"
@@ -75,6 +75,7 @@ WINDOWS = {
     2019: (date(2019, 5, 23), date(2019, 5, 26)),
 }
 GENERALS = [*(window[0] for window in WINDOWS.values()), date(2024, 6, 6)]
+GROUP_ENDS = {2019: date(2019, 7, 2), 2020: date(2020, 12, 18)}
 GROUPS = {
     **dict.fromkeys(("PPE", "EPP-ED", "EPP"), "PPE"),
     **dict.fromkeys(("S", "PSE", "S&D"), "S&D"),
@@ -1244,8 +1245,8 @@ def emit() -> Path:
                     is_preferred=kind == "official",
                     valid_from=date(first, 1, 1),
                     valid_from_precision="year",
-                    valid_to=None if last is None else date(last, 1, 1),
-                    valid_to_precision="year",
+                    valid_to=None if last is None else GROUP_ENDS.get(last, date(last, 1, 1)),
+                    valid_to_precision="day" if last in GROUP_ENDS else "year",
                     source_id=source,
                 )
         clipped = []

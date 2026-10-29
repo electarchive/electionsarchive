@@ -7,7 +7,7 @@
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
-  import { swatch } from "#lib/party.js";
+  import { era, swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -15,6 +15,7 @@
     parties,
     governments,
     interim = [],
+    eras = [],
     isShare = false,
     selected = null,
     onselect,
@@ -73,6 +74,12 @@
       isCaretaker: boolean;
     }>;
     interim?: Array<{ name: string; from: string | null; to: string | null }>;
+    eras?: Array<{
+      party: string;
+      from: string;
+      label: string;
+      short: string | null;
+    }>;
     isShare?: boolean;
     selected?: number | null;
     onselect?: (index: number) => void;
@@ -189,12 +196,14 @@
   const label = (
     party: string | null,
     names?: Record<string, { label: string; short: string | null }>,
+    on: string | null = null,
   ) => {
     if (party == null || party.endsWith("/none")) {
       return m.record_none();
     }
     const found = info.get(party);
-    const dated = names?.[blocs.get(party)?.party ?? party];
+    const key = blocs.get(party)?.party ?? party;
+    const dated = (on == null ? undefined : era(eras, key, on)) ?? names?.[key];
     return dated == null
       ? (found?.short ?? found?.label ?? "")
       : (dated.short ??
@@ -948,7 +957,7 @@
                     style:background={tint(move.from)}
                   ></span>
                   <span class="truncate"
-                    >{label(move.from, lit.term.names)}</span
+                    >{label(move.from, lit.term.names, part.from)}</span
                   >
                   <span aria-hidden="true">→</span>
                 {/if}
@@ -957,7 +966,11 @@
                   style:background={tint(move.to ?? move.from)}
                 ></span>
                 <span class="truncate"
-                  >{label(move.to ?? move.from, lit.term.names)}</span
+                  >{label(
+                    move.to ?? move.from,
+                    lit.term.names,
+                    part.from,
+                  )}</span
                 >
                 {#if move.kind !== "switch"}
                   <span class="truncate text-muted-foreground"
@@ -994,7 +1007,9 @@
                 class="shrink-0 rounded-xs block-2.5 inline-2.5"
                 style:background={tint(entry.party)}
               ></span>
-              <span class="truncate">{label(entry.party, lit.term.names)}</span>
+              <span class="truncate"
+                >{label(entry.party, lit.term.names, part.from)}</span
+              >
             </span>
             <span class="font-figures tabular-nums"
               ><span class="font-semibold">{count(entry.seats)}</span>
@@ -1007,7 +1022,8 @@
             <li
               class="flex items-center justify-between gap-3 ps-4 text-[0.6875rem] text-muted-foreground"
             >
-              <span class="truncate">{label(member.party, lit.term.names)}</span
+              <span class="truncate"
+                >{label(member.party, lit.term.names, part.from)}</span
               >
               <span class="font-figures tabular-nums"
                 >{count(member.seats)}</span

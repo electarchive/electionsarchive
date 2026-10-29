@@ -3,6 +3,7 @@ import type { InferRouterOutputs } from "@orpc/server";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { partyOn, segments, stand } from "#lib/caucus.js";
+import { era } from "#lib/party.js";
 import {
   COLUMN_LABELS,
   COUNTRY_COLUMNS,
@@ -5198,6 +5199,7 @@ function chamberMarkdown(
     members,
     council,
     renames,
+    eras,
   }: Extract<Data, { kind: "chamber" }>,
   link: Link,
 ) {
@@ -5233,11 +5235,17 @@ function chamberMarkdown(
   ];
   const names = new Map(everyone.map((entry) => [entry.id, entry.label]));
   const caucuses = new Map(everyone.map((entry) => [entry.id, entry.caucus]));
-  const label = (id: string | null) =>
-    id == null ? m.record_none() : (names.get(id) ?? "");
+  const label = (id: string | null, on: string | null = close) =>
+    id == null
+      ? m.record_none()
+      : ((era(eras, id, on) ?? era(members?.eras ?? [], id, on))?.label ??
+        names.get(id) ??
+        "");
   const last = terms.at(-1);
-  const named = (id: string | null) =>
-    id == null || id === "independent" ? m.chamber_independent() : label(id);
+  const named = (id: string | null, on: string | null) =>
+    id == null || id === "independent"
+      ? m.chamber_independent()
+      : label(id, on);
   const switches = [
     ...terms
       .slice(0, members?.isSeated === true ? -1 : undefined)
@@ -5248,7 +5256,7 @@ function chamberMarkdown(
               ? [
                   [
                     date(step.date),
-                    `${named(move.from)} → ${named(move.to)}`,
+                    `${named(move.from, step.date)} → ${named(move.to, step.date)}`,
                     m.chamber_step_members({ count: move.members }),
                   ],
                 ]
@@ -5275,7 +5283,7 @@ function chamberMarkdown(
           .toSorted((a, b) => (a[0]?.on ?? "").localeCompare(b[0]?.on ?? ""))
           .map((group) => [
             date(group[0]?.on ?? null),
-            `${named(group[0]?.from ?? null)} → ${named(group[0]?.to ?? null)}`,
+            `${named(group[0]?.from ?? null, group[0]?.on ?? null)} → ${named(group[0]?.to ?? null, group[0]?.on ?? null)}`,
             group
               .map((move) => link(move.member.name, `id/${move.member.person}`))
               .join(", "),
@@ -5498,7 +5506,7 @@ function chamberMarkdown(
                     count(term.size ?? term.total),
                     largest == null
                       ? null
-                      : `${term.names[largest.party ?? ""]?.label ?? label(largest.party)} (${count(largest.seats)})`,
+                      : `${label(largest.party, term.start)} (${count(largest.seats)})`,
                   ];
                 }),
               ),
