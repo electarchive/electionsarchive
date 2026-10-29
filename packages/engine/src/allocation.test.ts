@@ -1,13 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { allocate, qualify } from "./allocation.ts";
+import { allocate, distribute, qualify } from "./allocation.ts";
 import germany from "./fixtures/germany-2025.json" with { type: "json" };
 import germanyEuropean from "./fixtures/germany-ep-2024.json" with { type: "json" };
+import turkey1965 from "./fixtures/turkey-1965.json" with { type: "json" };
 import turkey2007 from "./fixtures/turkey-2007.json" with { type: "json" };
 import turkey2011 from "./fixtures/turkey-2011.json" with { type: "json" };
 import turkeyJune2015 from "./fixtures/turkey-2015-06.json" with { type: "json" };
 import turkeyNovember2015 from "./fixtures/turkey-2015-11.json" with { type: "json" };
 import turkey2018 from "./fixtures/turkey-2018.json" with { type: "json" };
 import turkey from "./fixtures/turkey-2023.json" with { type: "json" };
+import turkeySenate1966 from "./fixtures/turkey-senate-1966.json" with { type: "json" };
 
 const textbook = [
   { id: "A", votes: 100_000 },
@@ -217,6 +219,45 @@ describe("golden elections", () => {
         for (const { id, declared } of lists)
           expect(allocation.seats[id] ?? 0, `${name}: ${id}`).toBe(declared);
       }
+    });
+  }
+
+  for (const { election, chamber, rules, differences } of [
+    {
+      election: "1965",
+      chamber: turkey1965,
+      rules: {
+        formula: "hare",
+        remainders: "national",
+        districtFormulas: [{ seats: 2, formula: "hagenbach_bischoff_quota" }],
+      },
+      differences: { "Türkiye İşçi Partisi": 1, Bağımsızlar: -1 },
+    },
+    {
+      election: "1966 Senate",
+      chamber: turkeySenate1966,
+      rules: {
+        formula: "hagenbach_bischoff_quota",
+        remainders: "national",
+        districtFormulas: [{ seats: 1, formula: "fptp" }],
+      },
+      differences: {},
+    },
+  ] satisfies Array<{
+    election: string;
+    chamber: { districts: Parameters<typeof distribute>[1] };
+    rules: Parameters<typeof distribute>[0];
+    differences: Record<string, number>;
+  }>) {
+    it(`reproduces Turkey's ${election} national remainder`, () => {
+      const distribution = distribute(rules, chamber.districts);
+      const declared: Record<string, number> = { ...differences };
+      for (const { entries } of chamber.districts)
+        for (const { id, declared: seats } of entries)
+          declared[id] = (declared[id] ?? 0) + seats;
+      expect(distribution.tie).toBeUndefined();
+      for (const [id, seats] of Object.entries(declared))
+        expect(distribution.seats[id] ?? 0, id).toBe(seats);
     });
   }
 

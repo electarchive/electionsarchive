@@ -25,6 +25,13 @@ const lists = v.optional(
 const percent = v.pipe(v.number(), v.minValue(0), v.maxValue(100));
 const rounding = v.picklist(["up", "down", "nearest"]);
 const seatCount = v.pipe(v.number(), v.integer(), v.minValue(1));
+const quotas = [
+  "hare",
+  "droop",
+  "hagenbach_bischoff_quota",
+  "imperiali_quota",
+  "reinforced_imperiali_quota",
+] as const;
 
 const threshold = v.object({
   percent,
@@ -97,16 +104,19 @@ export const rules = v.variant("formula", [
     tieBreak,
   }),
   v.object({
-    formula: v.picklist([
-      "hare",
-      "droop",
-      "imperiali_quota",
-      "reinforced_imperiali_quota",
-    ]),
+    formula: v.picklist(quotas),
     threshold: thresholds,
     bonus,
     pooling,
     remainders: v.optional(v.picklist(["contest", "national"])),
+    districtFormulas: v.optional(
+      v.array(
+        v.object({
+          seats: seatCount,
+          formula: v.picklist([...quotas, "fptp"]),
+        }),
+      ),
+    ),
     remainderAccess: v.optional(
       v.object({ quotas: v.optional(seatCount), votes: v.optional(seatCount) }),
     ),

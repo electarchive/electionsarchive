@@ -111,6 +111,36 @@ def export() -> list[str]:
                 },
             )
 
+        for fixture, prefix in (
+            ("turkey-1965", "tr/1965-10-10-general/parliament/%"),
+            ("turkey-senate-1966", "tr/1966-06-05-senate/%"),
+        ):
+            magnitudes: dict[str, int] = {}
+            entries: dict[str, list[dict[str, object]]] = {}
+            for district, magnitude, label, kind, votes, seats in conn.execute(
+                """select n.text, c.magnitude, o.ballot_label, o.kind,
+                          sum(v.value) filter (where v.measure in (1, 19)),
+                          (select x.seats from outcome x
+                           where x.result_set_id = rs.id and x.option_id = o.id and x.seats is not null)
+                   from contest c
+                   join name n on n.entity_id = c.id and n.is_preferred
+                   join result_set rs on rs.contest_id = c.id and rs.is_default
+                   join result_value v on v.result_set_k = rs.k
+                   join contest_option o on o.k = v.option_k and o.kind in ('list', 'independents')
+                   where c.kind = 'list_allocation' and exists (select from slug s where s.entity_id = c.id and s.path like %s)
+                   group by n.text, c.magnitude, rs.id, o.id order by 1, 5 desc, 3""",
+                [prefix],
+            ):
+                entry: dict[str, object] = {"id": label, "votes": number(votes), "declared": seats or 0}
+                if kind == "independents":
+                    entry["inert"] = True
+                magnitudes[district] = magnitude
+                entries.setdefault(district, []).append(entry)
+            write(
+                fixture,
+                {"districts": [{"id": d, "seats": magnitudes[d], "entries": e} for d, e in entries.items()]},
+            )
+
         allocation, seats, allocation_rs = contest("de/2025-02-23-general/bundestag")
         election = {"allocation": allocation, "rs": allocation_rs}
         second = totals(

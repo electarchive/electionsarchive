@@ -1,0 +1,340 @@
+{
+  "districts": [
+    {
+      "id": "Senate of the Republic, Adana",
+      "seats": 4,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 108171, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 77347, "declared": 2 },
+        { "id": "Türkiye İşçi Partisi", "votes": 6433, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 5699, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 5048,
+          "declared": 0
+        },
+        { "id": "Yeni Türkiye Partisi", "votes": 2516, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Afyon",
+      "seats": 3,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 86517, "declared": 3 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 21234, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 6398, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 2664,
+          "declared": 0
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 2216, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 1903, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Ankara",
+      "seats": 7,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 203706, "declared": 4 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 116725, "declared": 2 },
+        { "id": "Millet Partisi", "votes": 41326, "declared": 1 },
+        { "id": "Türkiye İşçi Partisi", "votes": 17095, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 11225,
+          "declared": 0
+        },
+        { "id": "Yeni Türkiye Partisi", "votes": 7758, "declared": 0 },
+        { "id": "Bağımsızlar", "votes": 627, "declared": 0, "inert": true }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Bingöl",
+      "seats": 1,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 17436, "declared": 1 },
+        { "id": "Yeni Türkiye Partisi", "votes": 12207, "declared": 0 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 9992, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2182, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 668, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Bursa",
+      "seats": 4,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 152612, "declared": 3 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 45168, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 6809, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 5803, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 3763,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Denizli",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 77103, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 37439, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 3885, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2039, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 1906, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Diyarbakır",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 43432, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 19369, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 19055, "declared": 1 },
+        { "id": "Türkiye İşçi Partisi", "votes": 11549, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 1578, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 1471,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Elazığ",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 36860, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 20971, "declared": 1 },
+        { "id": "Türkiye İşçi Partisi", "votes": 3288, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 1702, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 1484, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 1174,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Eskişehir",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 73648, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 32633, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 5445, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2777, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 2513,
+          "declared": 0
+        },
+        { "id": "Yeni Türkiye Partisi", "votes": 1452, "declared": 0 },
+        { "id": "Bağımsızlar", "votes": 8, "declared": 0, "inert": true }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Giresun",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 59471, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 28410, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 9511, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 2096,
+          "declared": 0
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 1872, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 1556, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Gümüşhane",
+      "seats": 1,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 38479, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 28897, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 4016, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 2051, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, İstanbul",
+      "seats": 1,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 229276, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 120344, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 32155, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 16853, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 8664,
+          "declared": 0
+        },
+        { "id": "Yeni Türkiye Partisi", "votes": 5640, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Kayseri",
+      "seats": 3,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 82512, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 47409, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 7099, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 4306,
+          "declared": 0
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 4161, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Kocaeli",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 44281, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 20087, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 9112, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2195, "declared": 1 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 1263,
+          "declared": 0
+        },
+        { "id": "Yeni Türkiye Partisi", "votes": 696, "declared": 0 },
+        { "id": "Bağımsızlar", "votes": 287, "declared": 0, "inert": true }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Maraş",
+      "seats": 1,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 41426, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 29200, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 5206, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 4894, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 1564, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Muğla",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 62366, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 29638, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 2096, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2058, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 1789,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Niğde",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 49700, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 25015, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 5663, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 3238,
+          "declared": 1
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 2263, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 2064, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Sakarya",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 65510, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 23109, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 5841, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 4733, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 3796,
+          "declared": 0
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 2006, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Tekirdağ",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 49083, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 24499, "declared": 1 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2857, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 2023, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 972,
+          "declared": 0
+        },
+        { "id": "Bağımsızlar", "votes": 38, "declared": 0, "inert": true }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Trabzon",
+      "seats": 3,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 67836, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 45597, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 10667, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 1993,
+          "declared": 0
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 1792, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Tunceli",
+      "seats": 1,
+      "entries": [
+        { "id": "Cumhuriyet Halk Partisi", "votes": 20668, "declared": 1 },
+        { "id": "Adalet Partisi", "votes": 16141, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 1394, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 1200, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 859, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Urfa",
+      "seats": 2,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 53475, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 32509, "declared": 1 },
+        { "id": "Türkiye İşçi Partisi", "votes": 4178, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 3299, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 2258, "declared": 0 }
+      ]
+    },
+    {
+      "id": "Senate of the Republic, Uşak",
+      "seats": 1,
+      "entries": [
+        { "id": "Adalet Partisi", "votes": 29275, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 20806, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 1672, "declared": 0 },
+        {
+          "id": "Cumhuriyetçi Köylü Millet Partisi",
+          "votes": 1392,
+          "declared": 0
+        },
+        { "id": "Türkiye İşçi Partisi", "votes": 856, "declared": 0 },
+        { "id": "Bağımsızlar", "votes": 20, "declared": 0, "inert": true }
+      ]
+    }
+  ]
+}

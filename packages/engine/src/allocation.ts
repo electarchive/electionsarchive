@@ -1,6 +1,6 @@
 import type { Rules, Threshold } from "./rules.ts";
 
-type Entry = { id: string; votes: number; won?: number };
+type Entry = { id: string; votes: number; won?: number; inert?: boolean };
 type Claim = { id: string; score: number; votes: number };
 type Allocating = Exclude<
   Rules,
@@ -43,6 +43,7 @@ type Quota = Extract<
     formula:
       | "hare"
       | "droop"
+      | "hagenbach_bischoff_quota"
       | "imperiali_quota"
       | "reinforced_imperiali_quota";
   }
@@ -87,7 +88,9 @@ function byQuota(rules: Quota, seats: number, entries: Array<Entry>) {
       ? 3
       : rules.formula === "imperiali_quota"
         ? 2
-        : 0;
+        : rules.formula === "hagenbach_bischoff_quota"
+          ? 1
+          : 0;
   for (let extra = start; ; extra--) {
     const [numerator, denominator] =
       rules.formula === "droop"
@@ -171,6 +174,7 @@ export function allocate(
   switch (rules.formula) {
     case "hare":
     case "droop":
+    case "hagenbach_bischoff_quota":
     case "imperiali_quota":
     case "reinforced_imperiali_quota": {
       start = byQuota(rules, seats, entries);
@@ -218,15 +222,34 @@ export function distribute(
   const residuals: Array<{ district: string; id: string; residual: number }> =
     [];
   let remaining = 0;
+  let tie: Allocation["tie"];
   for (const { id: district, seats, entries } of districts) {
-    const { automatic, quota } = byQuota(rules, seats, entries);
-    placed[district] = { ...automatic };
+    const formula =
+      rules.districtFormulas?.find((entry) => entry.seats === seats)?.formula ??
+      rules.formula;
+    let automatic: Record<string, number>;
+    let quota = 0;
+    if (formula === "fptp") {
+      const plurality = allocate(
+        { formula, tieBreak: rules.tieBreak },
+        seats,
+        entries,
+      );
+      automatic = plurality.seats;
+      tie ??= plurality.tie;
+    } else {
+      ({ automatic, quota } = byQuota({ ...rules, formula }, seats, entries));
+    }
+    const placement: Record<string, number> = {};
+    placed[district] = placement;
     let left = seats;
-    for (const { id, votes } of entries) {
-      const won = automatic[id] ?? 0;
+    for (const { id, votes, inert } of entries) {
+      const won = inert ? 0 : (automatic[id] ?? 0);
+      placement[id] = won;
       left -= won;
-      const residual = votes - won * quota;
-      residuals.push({ district, id, residual });
+      const residual =
+        inert || (formula === "fptp" && won > 0) ? 0 : votes - won * quota;
+      if (!inert) residuals.push({ district, id, residual });
       const total = totals.get(id) ?? { votes: 0, quotas: 0, residual: 0 };
       total.votes += votes;
       total.quotas += won;
@@ -235,7 +258,7 @@ export function distribute(
     }
     if (left < 0)
       throw new Error(
-        `The ${rules.formula} quota awards more than ${seats} seats in ${district}`,
+        `The ${formula} quota awards more than ${seats} seats in ${district}`,
       );
     open.set(district, left);
     remaining += left;
@@ -270,7 +293,7 @@ export function distribute(
       isMoving = true;
     }
   }
-  return { seats, tie: national.tie, districts: placed };
+  return { seats, tie: tie ?? national.tie, districts: placed };
 }
 
 export function qualify(

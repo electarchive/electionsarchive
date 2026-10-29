@@ -745,6 +745,7 @@
           "enum": [
             "hare",
             "droop",
+            "hagenbach_bischoff_quota",
             "imperiali_quota",
             "reinforced_imperiali_quota"
           ],
@@ -1041,6 +1042,33 @@
             "national"
           ],
           "type": "string"
+        },
+        "districtFormulas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "seats": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "formula": {
+                "enum": [
+                  "hare",
+                  "droop",
+                  "hagenbach_bischoff_quota",
+                  "imperiali_quota",
+                  "reinforced_imperiali_quota",
+                  "fptp"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "seats",
+              "formula"
+            ]
+          }
         },
         "remainderAccess": {
           "type": "object",
