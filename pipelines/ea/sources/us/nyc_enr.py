@@ -17,7 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_enr"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = os.environ.get("NYC_ENR_BASE", "https://enr.boenyc.gov/")
 DAY = date.fromisoformat(os.environ.get("NYC_ENR_DAY", "2026-11-03"))
@@ -407,6 +407,7 @@ def emit():
         added: set[UUID] = set()
         unmatched: list[str] = []
         skipped = 0
+        emptied: list[UUID] = []
 
         def unit(level: str, borough: str | None, ad: int | None, ed: int | None) -> UUID | None:
             if level == "city":
@@ -492,6 +493,21 @@ def emit():
                 [contest],
             ).fetchone()
             owned = path == CITY_PATH and settled is None
+            reached = (
+                None
+                if settled is None
+                else {
+                    row[0]
+                    for row in conn.execute(
+                        """select ru.id from result_set d
+                           cross join lateral (select distinct q.area_k from result_rollup q where q.result_set_k = d.k) q
+                           join area a on a.k = q.area_k
+                           join reporting_unit ru on ru.area_id = a.id and ru.scheme_code = any(%s)
+                           where d.contest_id = %s and d.is_default and d.stage in ('official', 'certified')""",
+                        [["us.place", "us.county", "us.nyc_ad", "us.nyc_ed"], contest],
+                    ).fetchall()
+                }
+            )
             boroughs = set(group.filter(pl.col("level") == "borough")["borough"].to_list()) or {
                 c for c in COUNTIES if title.endswith(c)
             }
@@ -614,7 +630,22 @@ def emit():
             for (moment, level), rows in group.group_by("frame", "level", maintain_order=True):
                 default = owned and level == "ad" and moment == newest
                 result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}@{moment:%Y%m%dT%H%M%S}:{level}")
-                if result_set not in cs.minted and moment != newest:
+                values: dict[tuple[UUID, UUID], int] = {}
+                trimmed = False
+                for borough, ad, ed, name, line, votes in rows.select(
+                    "borough", "ad", "ed", "candidate", "line", "votes"
+                ).iter_rows():
+                    choice = ballots.get((name, line))
+                    place = unit(level, borough, ad, ed)
+                    if choice is None or place is None:
+                        continue
+                    if reached is not None and place not in reached:
+                        trimmed = True
+                        continue
+                    values[(place, choice)] = votes
+                if not values:
+                    emptied.append(result_set)
+                if result_set not in cs.minted and moment != newest and not trimmed:
                     was = conn.execute("select is_default from result_set where id = %s", [result_set]).fetchone()
                     if was is not None and was[0] == default:
                         skipped += 1
@@ -653,14 +684,6 @@ def emit():
                         else ""
                     ),
                 )
-                values: dict[tuple[UUID, UUID], int] = {}
-                for borough, ad, ed, name, line, votes in rows.select(
-                    "borough", "ad", "ed", "candidate", "line", "votes"
-                ).iter_rows():
-                    choice = ballots.get((name, line))
-                    place = unit(level, borough, ad, ed)
-                    if choice is not None and place is not None:
-                        values[(place, choice)] = votes
                 for (place, choice), votes in values.items():
                     cs.add(
                         "result_value",
@@ -676,4 +699,6 @@ def emit():
         for line in sorted(set(unmatched)):
             print("unmatched:", line)
         print(f"{skipped} published sets left as they are")
+        if emptied:
+            cs.manifest["scope"] = {"polity": "US", "clears": [str(id) for id in emptied]}
         return cs.write()
