@@ -141,6 +141,40 @@ YEARS = {
             "no shape in the archive. Blank, defective, and scattering ballots are not loaded. The scanned volume omits the printed pages between New York County's second assembly district and Orange County, so only New York County's first two assembly districts can appear."
         ),
     },
+    1914: {
+        "volume": "manual1915",
+        "item": "njp.32101076877305",
+        "title": "Manual for the Use of the Legislature of the State of New York, 1915 (vote for Governor, 1914, by election district)",
+        "day": date(1914, 11, 3),
+        "office": "governor",
+        "pages": (*range(974, 1000), *range(1020, 1048)),
+        "width": 12,
+        "whole_first": True,
+        "empty": (),
+        "bronx_in_new_york": True,
+        "columns": {
+            0: ("Martin H. Glynn", "democratic-party", "Democratic"),
+            1: ("Charles S. Whitman", None, None),
+            2: ("Frederick M. Davenport", None, None),
+            3: ("Gustave A. Strebel", None, None),
+            4: ("William Sulzer", "prohibition-party", "Prohibition"),
+            5: ("Martin H. Glynn", "NY:independence-league", "Independence League"),
+            6: ("James T. Hunter", None, None),
+            7: ("William Sulzer", "NY:american", "American"),
+            8: ("Martin H. Glynn", None, "No party"),
+            9: ("William Sulzer", None, "No party"),
+        },
+        "extra_party": {},
+        "note": (
+            "Vote for Governor on November 3, 1914, by assembly district and election district, from the Red Book's "
+            "'Vote of State of New York' tables, read from page images (printed sideways) by a vision model (Claude Sonnet 5.5, "
+            "with Claude Opus 5.5 rereading any assembly district that missed a total). A candidate who ran on more than one line "
+            "has a column per line. An assembly district is loaded only when its election district rows add up to the printed "
+            "assembly district total in every column, and that total adds up to its own whole number of votes. Each value's "
+            "locator is the whole page. The assembly districts are those of 1914, including the Bronx's 31 through 35 (printed "
+            "under New York County), and have no shape in the archive. Blank, void, and scattering ballots are not loaded."
+        ),
+    },
 }
 
 
@@ -172,6 +206,7 @@ def read(year: int, tag: str) -> pl.DataFrame:
     spec = YEARS[year]
     rows = []
     current: dict[str, int | None] = {}
+    last = None
     for page in spec["pages"]:
         path = INBOX / f"{spec['volume']}-p{page}-{tag}.json"
         for fallback in reversed(TAGS[: TAGS.index(tag)]):
@@ -181,8 +216,11 @@ def read(year: int, tag: str) -> pl.DataFrame:
             continue
         data = json.loads(path.read_text())
         county = next((name for name in COUNTY if name.lower() in data["county"].lower()), None)
-        if county is None or len(data["columns"]) != spec["width"]:
+        if county is None and not data["county"].strip():
+            county = last
+        if county is None or (len(data["columns"]) != spec["width"] and data["columns"]):
             continue
+        last = county
         for row in data["rows"]:
             if row["district"] == 0:
                 continue
@@ -225,7 +263,7 @@ def parse() -> None:
                 reason = None
                 if not totals:
                     rows = [r for r in eds if len(r["cells"]) == spec["width"] and None not in r["cells"] and sum(r["cells"][:-1]) == r["cells"][-1]]
-                    if rows:
+                    if rows and len({r["ed"] for r in rows}) == len(rows):
                         accepted[key] = (tag, rows)
                         failures.pop(key, None)
                         bare.append(f"{key[0]} assembly district {key[1]}: {len(rows)} of {len(eds)} election districts")
