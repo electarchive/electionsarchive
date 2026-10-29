@@ -4,6 +4,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
+  import Name from "#lib/components/name.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
   import { date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -698,10 +699,12 @@
             {#if party == null}
               <span class="text-muted-foreground">{label(party)}</span>
             {:else}
-              <a
-                class="hover:underline"
-                href={resolve("/id/[id]", { id: party })}>{label(party)}</a
-              >
+              <Name
+                label={label(party)}
+                {party}
+                color={tint(party)}
+                hasSwatch={false}
+              />
             {/if}
           </li>
         {/each}

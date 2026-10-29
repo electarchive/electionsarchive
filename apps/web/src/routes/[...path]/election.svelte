@@ -9,6 +9,7 @@
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
   import { MediaQuery, SvelteSet } from "svelte/reactivity";
+  import Name from "#lib/components/name.svelte";
   import {
     count,
     date,
@@ -17,7 +18,6 @@
     plural,
     points,
   } from "#lib/format.js";
-  import Name from "#lib/components/name.svelte";
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -28,10 +28,10 @@
   import Alongside from "./alongside.svelte";
   import Balance from "./balance.svelte";
   import ByElections from "./byelections.svelte";
-  import Electors from "./electors.svelte";
-  import Gains from "./gains.svelte";
   import Councils from "./councils.svelte";
   import Counties from "./counties.svelte";
+  import Electors from "./electors.svelte";
+  import Gains from "./gains.svelte";
   import Governments from "./governments.svelte";
   import Lead from "./lead.svelte";
   import Local from "./local.svelte";
@@ -1365,7 +1365,12 @@
                   class="shrink-0 rounded-xs block-2.5 inline-2.5"
                   style:background={swatch(row.color, row.key)}
                 ></span>
-                {row.short ?? row.label}
+                <Name
+                  label={row.short ?? row.label}
+                  party={row.key}
+                  color={swatch(row.color, row.key)}
+                  hasSwatch={false}
+                />
               </span>
             </th>
             {#if composition.hasBefore}

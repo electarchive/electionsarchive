@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
+  import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -95,11 +95,11 @@
           <span class="grid gap-0.5 text-[0.8125rem]">
             {#if card.head != null}
               <span
-                >{m.governments_head({ name: "" })}<a
-                  class="font-semibold hover:highlighter"
-                  href={resolve("/id/[id]", { id: card.head.id })}
-                  >{card.head.name}</a
-                ></span
+                >{m.governments_head({ name: "" })}<Name
+                  class="font-semibold"
+                  label={card.head.name}
+                  person={card.head.id}
+                /></span
               >
             {/if}
             <span
@@ -145,8 +145,12 @@
                   style:background={party.tint}
                 ></span>
                 <span class="truncate" title={party.label}
-                  >{party.short ??
-                    party.label}{#if party.role === "support"}<span
+                  ><Name
+                    label={party.short ?? party.label}
+                    party={party.id}
+                    color={party.tint}
+                    hasSwatch={false}
+                  />{#if party.role === "support"}<span
                       class="ms-1.5 text-xs text-muted-foreground"
                       >{m.governments_support()}</span
                     >{/if}</span

@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteMap } from "svelte/reactivity";
+  import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { VACANCIES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -132,7 +133,12 @@
               class="shrink-0 rounded-xs block-2 inline-2"
               style:background={party.color}
             ></span>
-            {party.label}
+            <Name
+              label={party.label}
+              party={party.key}
+              color={party.color}
+              hasSwatch={false}
+            />
             <span class="font-figures font-semibold"
               >{party.seats > 0 ? "+" : "−"}{count(Math.abs(party.seats))}</span
             >

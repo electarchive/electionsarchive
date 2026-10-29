@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { SvelteMap } from "svelte/reactivity";
+  import Name from "#lib/components/name.svelte";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -107,7 +108,12 @@
                     class="shrink-0 rounded-xs block-2 inline-2"
                     style:background={party.color}
                   ></span>
-                  {party.label}
+                  <Name
+                    label={party.label}
+                    party={party.key}
+                    color={party.color}
+                    hasSwatch={false}
+                  />
                 </span>
               </th>
               <td class="px-2 py-1.5 text-end font-figures tabular-nums">
@@ -184,7 +190,12 @@
                       class="shrink-0 rounded-xs block-2 inline-2"
                       style:background={swatch(party.color, party.key)}
                     ></span>
-                    {party.short ?? party.label}
+                    <Name
+                      label={party.short ?? party.label}
+                      party={party.key}
+                      color={swatch(party.color, party.key)}
+                      hasSwatch={false}
+                    />
                     <span class="font-figures font-semibold tabular-nums"
                       >{count(party.seats)}</span
                     >

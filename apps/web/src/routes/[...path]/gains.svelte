@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteMap } from "svelte/reactivity";
+  import Name from "#lib/components/name.svelte";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -168,7 +169,12 @@
                     class="shrink-0 rounded-xs block-2 inline-2"
                     style:background={row.color}
                   ></span>
-                  {row.label}
+                  <Name
+                    label={row.label}
+                    party={row.key}
+                    color={row.color}
+                    hasSwatch={false}
+                  />
                 </span>
               </th>
               {#each sheet.columns as column (column.key)}

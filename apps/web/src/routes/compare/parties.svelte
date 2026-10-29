@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
+  import Name from "#lib/components/name.svelte";
   import { percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -169,7 +170,13 @@
               <rect x="9" y="2" width="6" height="6" class="fill-(--party)" />
             {/if}
           </svg>
-          <span class="font-semibold">{side.label}</span>
+          <Name
+            class="font-semibold"
+            label={side.label}
+            party={side.id}
+            color={side.tone}
+            hasSwatch={false}
+          />
           {#if focus != null}
             <span class="font-figures text-xs tabular-nums"
               >{@render share(focus.sides[at] ?? null)}</span
@@ -289,7 +296,12 @@
             >
             {#each sides as side (side.id)}
               <th scope="col" class="px-2 py-1.5 text-end font-semibold"
-                >{side.label}</th
+                ><Name
+                  label={side.label}
+                  party={side.id}
+                  color={side.tone}
+                  hasSwatch={false}
+                /></th
               >
             {/each}
             <th scope="col" class="py-1.5 ps-2 text-end font-semibold"

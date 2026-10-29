@@ -15,7 +15,7 @@
     hasSwatch = true,
     hasLink = true,
     person = null,
-    party = null,
+    party: key = null,
     tabindex,
     class: className,
     children,
@@ -31,6 +31,9 @@
     children?: Snippet;
   } = $props();
 
+  const party = $derived(
+    key != null && /^[0-9a-f-]{36}$/u.test(key) ? key : null,
+  );
   const scope = getContext<(() => string | null) | undefined>(WITHIN);
 </script>
 

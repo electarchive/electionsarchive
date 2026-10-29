@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createQuery } from "@tanstack/svelte-query";
   import Download from "#lib/components/download.svelte";
+  import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -263,9 +264,13 @@
               <p class="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
                 {#each group.tally.slice(0, 4) as entry (entry.key)}
                   <span
-                    ><span class="font-semibold text-foreground"
-                      >{entry.short}</span
-                    >
+                    ><Name
+                      class="font-semibold text-foreground"
+                      label={entry.short}
+                      party={entry.key}
+                      color={entry.tone}
+                      hasSwatch={false}
+                    />
                     <span class="font-figures tabular-nums"
                       >{count(entry.wins)}</span
                     ></span
@@ -295,7 +300,13 @@
                   {#if row.label == null}
                     {m.winners_none()}
                   {:else}
-                    {row.label}{#if row.short != null && row.short !== row.label}
+                    <Name
+                      label={row.label}
+                      party={row.party}
+                      person={row.party == null ? row.person : null}
+                      color={row.tone}
+                      hasSwatch={false}
+                    />{#if row.short != null && row.short !== row.label}
                       <span class="ms-1 font-semibold text-foreground">
                         {row.short}</span
                       >{/if}

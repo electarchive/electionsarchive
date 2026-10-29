@@ -2,9 +2,10 @@
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
+  import Name from "#lib/components/name.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
-  import { named as years, RELATIONS } from "#lib/relations.js";
+  import { RELATIONS, named as years } from "#lib/relations.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -950,10 +951,12 @@
                 `party:${link.party.id}`,
               )}
             ></span>
-            <a
-              class="hover:highlighter"
-              href={resolve("/id/[id]", { id: link.party.id })}>{link.text}</a
-            >
+            <Name
+              label={link.text}
+              party={link.party.id}
+              color={swatch(link.party.color, `party:${link.party.id}`)}
+              hasSwatch={false}
+            />
           </li>
         {/each}
       </ul>

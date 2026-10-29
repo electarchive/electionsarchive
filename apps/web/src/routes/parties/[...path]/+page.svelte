@@ -5,6 +5,7 @@
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { SvelteSet } from "svelte/reactivity";
   import Logo from "#lib/components/logo.svelte";
+  import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -193,11 +194,11 @@
             <span
               >{m.party_scope_branch({ place: scope.polity.name })}
               {#each scope.branches as branch, index (branch.id)}{#if index > 0},
-                {/if}<a
-                  class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-                  href={resolve("/id/[id]", { id: branch.id })}
-                  >{branch.label}</a
-                >{/each}</span
+                {/if}<Name
+                  class="font-semibold text-foreground"
+                  label={branch.label}
+                  party={branch.id}
+                />{/each}</span
             >
           {/if}
           {#if scope.polity.path != null}
@@ -261,11 +262,10 @@
             m.party_namesakes({ parties: "\u0001" }).split("\u0001"),
           )}
           <p class="text-[0.9375rem] text-muted-foreground">
-            {frame[0]}{#each peers as part, index (index)}{#if part.namesake == null}{part.text}{:else}<a
-                  class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                  href={resolve("/id/[id]", { id: part.namesake.party.id })}
-                  >{part.label}</a
-                >{/if}{/each}{frame[1]}
+            {frame[0]}{#each peers as part, index (index)}{#if part.namesake == null}{part.text}{:else}<Name
+                  label={part.label}
+                  party={part.namesake.party.id}
+                />{/if}{/each}{frame[1]}
           </p>
         {/if}
       {/if}
@@ -348,11 +348,7 @@
             <li
               class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
             >
-              <a
-                class="hover:highlighter"
-                href={resolve("/id/[id]", { id: member.person })}
-                >{member.name}</a
-              >
+              <Name label={member.name} person={member.person} />
               <span
                 class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums"
                 >{from != null && to != null
@@ -414,7 +410,7 @@
                   <li
                     class="flex flex-wrap items-baseline justify-between gap-x-3"
                   >
-                    <span class="min-w-0">
+                    <span class="min-inline-0">
                       {#if election.path == null}
                         {name}
                       {:else}

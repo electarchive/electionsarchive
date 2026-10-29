@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import Measured from "#lib/components/measured.svelte";
+  import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -679,9 +680,12 @@
       {#if party == null || info.get(party)?.isMade === true}
         <span class="text-muted-foreground">{label(party)}</span>
       {:else}
-        <a class="hover:underline" href={resolve("/id/[id]", { id: party })}
-          >{label(party)}</a
-        >
+        <Name
+          label={label(party)}
+          {party}
+          color={tint(party)}
+          hasSwatch={false}
+        />
       {/if}
     </li>
   {/each}

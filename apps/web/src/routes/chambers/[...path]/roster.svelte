@@ -1,10 +1,10 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
-  import Name from "#lib/components/name.svelte";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -108,8 +108,6 @@
   const fold = (id: string | null) => (id == null ? null : (kin.get(id) ?? id));
   const tint = (id: string | null) =>
     swatch(info.get(id ?? "")?.color ?? null, `party:${id ?? ""}`);
-  const own = (id: string | null) =>
-    id != null && /^[0-9a-f-]{36}$/.test(id) ? id : null;
   const label = (id: string | null) =>
     id == null
       ? m.record_none()
@@ -319,7 +317,7 @@
           <Name
             class="font-semibold"
             label={label(entry)}
-            party={own(entry)}
+            party={entry}
             color={tint(entry)}
             hasSwatch={false}
             hasLink={false}
@@ -413,7 +411,7 @@
               <Name
                 class="flex shrink-0"
                 label={label(member.party)}
-                party={own(member.party)}
+                party={member.party}
                 color={tint(member.party)}
               >
                 <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
@@ -500,7 +498,7 @@
                         <span class="font-semibold"
                           >{parts[0]}<Name
                             label={label(line.party)}
-                            party={own(line.party)}
+                            party={line.party}
                             color={tint(line.party)}
                             hasSwatch={false}
                           />{parts[1]}</span

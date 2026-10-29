@@ -6,9 +6,9 @@
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
   import { partyOn, segments, stand } from "#lib/caucus.js";
+  import Name from "#lib/components/name.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Slider } from "#lib/components/ui/slider/index.js";
-  import Name from "#lib/components/name.svelte";
   import { count, date, definite } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -428,9 +428,7 @@
             <Name
               class="text-xl font-[760] tracking-[-0.015em]"
               label={largest?.name ?? ""}
-              party={largest?.id != null && /^[0-9a-f-]{36}$/.test(largest.id)
-                ? largest.id
-                : null}
+              party={largest?.id}
               color={swatch(
                 info.get(largest?.party ?? "")?.color ?? null,
                 `party:${largest?.party ?? ""}`,
@@ -637,9 +635,7 @@
             )}
             {parts[0]}<Name
               label={definite(leader.full ?? leader.name, parts[0] === "")}
-              party={leader.id != null && /^[0-9a-f-]{36}$/.test(leader.id)
-                ? leader.id
-                : null}
+              party={leader.id}
               hasSwatch={false}
             />{parts[1]}
           </p>

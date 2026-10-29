@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import Name from "#lib/components/name.svelte";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -20,6 +21,7 @@
         place: number;
         name: string | null;
         position: number | null;
+        person: string | null;
       }>;
     }>;
     places: Array<{ name: string; path: string | null }>;
@@ -47,6 +49,7 @@
           : [
               {
                 name: member.name,
+                person: member.person,
                 party: entry.key,
                 place: places[member.place] ?? null,
                 position: member.position,
@@ -126,7 +129,11 @@
           class="grid border-s-3 bg-card px-2.5 py-1.5 text-[0.8125rem]/snug shadow-[0_0_0_0.5px_var(--border)]"
           style:border-inline-start-color={colors.get(member.party)}
         >
-          <span class="truncate font-semibold">{member.name}</span>
+          <Name
+            class="truncate font-semibold"
+            label={member.name}
+            person={member.person}
+          />
           <span
             class="flex items-baseline gap-2 text-muted-foreground min-inline-0"
           >

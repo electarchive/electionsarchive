@@ -179,10 +179,11 @@
       {/if}
       <dt class="flex items-center gap-2">
         {@render glyph(index, true, "var(--foreground)", 12)}
-        <a
-          class="truncate text-lg font-[720] hover:highlighter"
-          href={resolve("/id/[id]", { id: side.id })}>{side.name}</a
-        >
+        <Name
+          class="truncate text-lg font-[720]"
+          label={side.name}
+          person={side.id}
+        />
       </dt>
       <dd class="grid gap-2">
         {#if side.party != null}
@@ -248,7 +249,10 @@
       {#if focus == null}
         {#each sides as side, index (side.id)}
           <span class="inline-flex items-center gap-1.5"
-            >{@render glyph(index, true, "var(--foreground)")}{side.name}</span
+            >{@render glyph(index, true, "var(--foreground)")}<Name
+              label={side.name}
+              person={side.id}
+            /></span
           >
         {/each}
       {:else}

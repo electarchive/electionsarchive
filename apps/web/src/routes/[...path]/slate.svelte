@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Name from "#lib/components/name.svelte";
   import { resolve } from "$app/paths";
+  import Name from "#lib/components/name.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -47,7 +47,7 @@
   >
     {#if slate.options.length > 0}
       <ul
-        class="grid divide-y divide-border border-y border-border max-inline-[40rem]"
+        class="grid divide-y divide-border border-y border-border max-inline-160"
       >
         {#each slate.options as option (option.key)}
           <li class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 py-2">
@@ -67,7 +67,11 @@
             {/if}
             <span class="ms-auto text-sm text-muted-foreground">
               {#if option.party != null}
-                {option.party.short ?? option.party.name}
+                <Name
+                  label={option.party.short ?? option.party.name}
+                  party={option.party.id}
+                  hasSwatch={false}
+                />
               {:else if option.isIndependent}
                 {m.slate_independent()}
               {/if}
