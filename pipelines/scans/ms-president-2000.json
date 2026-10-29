@@ -1,0 +1,129 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "authoritative": "Source: the Secretary of State's certified results by county, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065",
+  "Coplah": "28029"
+ },
+ "title": "Election summary for the 2000 general election, President and Vice President, certified results by county",
+ "file": {
+  "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/2000ReCap/CertResultsScans/President.pdf"
+ },
+ "contests": {
+  "pres": {
+   "year": 2000,
+   "chamber": "president",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "MS",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "pres1",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 2,
+   "id": "pres2",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 3,
+   "id": "pres3",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 4,
+   "id": "pres4",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 5,
+   "id": "pres5",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 6,
+   "id": "pres6",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 7,
+   "id": "pres7",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 8,
+   "id": "pres8",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 9,
+   "id": "pres9",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 10,
+   "id": "pres10",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 11,
+   "id": "pres11",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 12,
+   "id": "pres12",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 13,
+   "id": "pres13",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 14,
+   "id": "pres14",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 15,
+   "id": "pres15",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 16,
+   "id": "pres16",
+   "orientation": "counties_down",
+   "discover": "pres"
+  },
+  {
+   "page": 17,
+   "id": "pres17",
+   "orientation": "counties_down",
+   "discover": "pres"
+  }
+ ]
+}

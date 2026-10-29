@@ -1,0 +1,39 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "authoritative": "Source: the Secretary of State's certified results by county, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065",
+  "Coplah": "28029"
+ },
+ "title": "Election summary for the 2000 general election, United States Representative District 4, certified results by county",
+ "file": {
+  "url": "https://web.archive.org/web/2008id_/http://www.sos.state.ms.us/elections/2000ReCap/CertResultsScans/ushouse4.pdf"
+ },
+ "contests": {
+  "h4": {
+   "year": 2000,
+   "chamber": "house",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "MS",
+   "district": 4
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "h41",
+   "orientation": "counties_down",
+   "discover": "h4"
+  },
+  {
+   "page": 2,
+   "id": "h42",
+   "orientation": "counties_down",
+   "discover": "h4"
+  }
+ ]
+}
