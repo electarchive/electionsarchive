@@ -136,11 +136,7 @@ def parse() -> None:
         for table in re.finditer(r"\{\|.*?\n\|\}", wikitext, re.DOTALL):
             cells = table.group(0)
             lines = re.split(r"\n\|-[^\n]*", cells)
-            if (
-                "Manhattan" not in cells
-                or "Bronx and Manhattan" in cells
-                or re.search("primary", lines[1], re.IGNORECASE)
-            ):
+            if "Manhattan" not in cells or "Bronx and Manhattan" in cells:
                 continue
             for line in lines[2:]:
                 fields = []
@@ -156,6 +152,19 @@ def parse() -> None:
                 ]
                 if len(counts) >= 6 and sum(counts[-6:-1]) == counts[-1] and fields[0]:
                     boroughs.append({"year": year, "candidate": NAMES.get(fields[0], fields[0]), "counts": counts[-6:]})
+        for candidate in re.finditer(r"\{\{NY Election candidate\s*\|(.*?)\n\}\}", wikitext, re.DOTALL):
+            fields = {
+                key.strip(): value.strip()
+                for part in re.split(r"\n\s*\|\s*(?=\w+\s*=)", "\n|" + candidate.group(1))
+                if "=" in part
+                for key, value in [part.split("=", 1)]
+            }
+            counts = [
+                int(re.sub(r"\D", "", re.sub(r"</?u>", "", text(fields.get(key, "")))) or -1)
+                for key in ("manhattan", "bronx", "brooklyn", "queens", "staten", "total")
+            ]
+            if min(counts) >= 0 and sum(counts[:5]) == counts[5] and "percentage" not in fields.get("name", ""):
+                boroughs.append({"year": year, "candidate": text(fields["name"]), "counts": counts})
         if year == 1925:
             rows.extend(
                 {"year": year, "candidate": name, "line": line, "votes": votes, "won": name == "Jimmy Walker"}
