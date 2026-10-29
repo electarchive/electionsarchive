@@ -19,6 +19,7 @@ from ea.sources.us import (
     special_counties,
     special_files,
     special_fl,
+    special_inbox,
     special_md,
     special_nc,
     special_nj,
@@ -91,8 +92,22 @@ STATES = {
     "SD": "South Dakota",
     "AZ": "Arizona",
     "TN": "Tennessee",
+    "AR": "Arkansas",
+    "OR": "Oregon",
 }
 OFFICIAL = {
+    "AR": (
+        "Arkansas Secretary of State",
+        "Certification report of the 2001 special primary",
+        "https://www.sos.arkansas.gov/elections/research/election-results",
+        [special_inbox.ARKANSAS],
+    ),
+    "OR": (
+        "Oregon Secretary of State",
+        "Official results of the 2011 special primary election",
+        "https://sos.oregon.gov/elections/Pages/electionsstatistics.aspx",
+        [special_inbox.OREGON],
+    ),
     "AZ": (
         "Arizona Secretary of State",
         "Official canvass of the 2025 special primary election",
@@ -214,6 +229,7 @@ def fetch() -> None:
     special_nj.fetch()
     special_fl.fetch()
     special_2025.fetch()
+    special_inbox.fetch()
     special_counties.fetch()
     special_nm_1997.fetch()
     special_wi_1993.fetch()
@@ -495,6 +511,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_nj.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_fl.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_2025.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_inbox.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_wi_1993.rows(), infer_schema_length=None))
@@ -578,6 +595,7 @@ def emit() -> Path:
                         cs.artifact(raw.cached(SOURCE, link), sources[state])
                 if state == "WI":
                     cs.artifact(raw.cached(SOURCE, special_pdfs.WISCONSIN), sources[state])
+                    cs.artifact(raw.cached(SOURCE, special_inbox.WISCONSIN), sources[state])
                 continue
             if state in OFFICIAL:
                 publisher, title, site, links = OFFICIAL[state]
@@ -787,6 +805,7 @@ def emit() -> Path:
                     "TX": two_round,
                     "GA": two_round,
                     "MS": two_round,
+                    "AR": two_round,
                     "CA": top_two,
                 }.get(state, fptp),
                 default_result_kind="counted",
@@ -828,7 +847,7 @@ def emit() -> Path:
                         previous[1] + votes,
                     )
             outcomes = dict(lines.group_by("candidate_name").agg(pl.col("outcome").first()).iter_rows())
-            if state in ("LA", "CA", "TX", "GA", "MS"):
+            if state in ("LA", "CA", "TX", "GA", "MS", "AR"):
                 winners = {name for name, outcome in outcomes.items() if outcome == "Elected"}
             else:
                 winners = {max(candidates, key=lambda candidate: candidates[candidate][1])}
