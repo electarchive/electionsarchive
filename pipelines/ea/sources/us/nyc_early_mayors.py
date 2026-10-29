@@ -23,6 +23,8 @@ PRIMARIES = {
     1941: date(1941, 9, 16),
     1961: date(1961, 9, 7),
     1965: date(1965, 9, 14),
+    1969: date(1969, 6, 17),
+    1973: date(1973, 9, 11),
     1977: date(1977, 9, 8),
     1985: date(1985, 9, 10),
 }
@@ -166,7 +168,8 @@ def parse() -> None:
             if year != 1925 and re.search(r"title\s*=[^\n]*mayoral election", box.group(0), re.IGNORECASE)
         ][:1]
         if year in PRIMARIES:
-            boxes += [
+            firsts: dict[str, tuple[str, str, str]] = {}
+            for entry in [
                 (box.group(0), "primary", heading[1])
                 for box in re.finditer(
                     r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE
@@ -177,7 +180,9 @@ def parse() -> None:
                         box.group(0),
                     )
                 )
-            ]
+            ]:
+                firsts.setdefault(entry[2], entry)
+            boxes += list(firsts.values())
         for stage, party, kind, body in [
             (stage, party, kind, body)
             for box, stage, party in boxes
@@ -439,7 +444,8 @@ def emit() -> Path:
                     candidates.append((candidate, counted["line"][0], votes, bool(lines["won"].any())))
             if primary:
                 everyone = sum(votes for _, _, votes, _ in candidates)
-                candidates = [(*candidate[:3], candidate[2] * 2 > everyone) for candidate in candidates]
+                top = max(candidate[2] for candidate in candidates)
+                candidates = [(*candidate[:3], candidate[2] * 2 > everyone or year == 1969 and candidate[2] == top) for candidate in candidates]
             elif not any(won for *_, won in candidates):
                 top = max(candidates, key=lambda candidate: candidate[2])
                 candidates = [(*candidate[:3], candidate == top) for candidate in candidates]
