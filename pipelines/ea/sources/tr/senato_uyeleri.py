@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.senato_uyeleri"
-VERSION = "2"
+VERSION = "3"
 SENATE = UUID("fa08c487-e2d8-5d2e-9fc0-7f3bce579c1f")
 MEMBERS = Path(__file__).with_name("senato_uyeleri.tsv")
 PUBLISHER = "Türkiye Büyük Millet Meclisi Vakfı"
@@ -230,10 +230,12 @@ def emit() -> Path:
 
         sizes: list[tuple[date, date]] = []
         previous: dict[UUID, UUID] = {}
+        staged: set[UUID] = set()
         for row in sorted(appointed, key=lambda row: (row["from"], row["name"])):
             person = find(people[member(row)])
             start, end = date.fromisoformat(row["from"]), date.fromisoformat(row["to"])
             tenure = cs.key(f"{SOURCE}.tenure", f"{row['acquired_via']}:{member(row)}:{start}")
+            staged.add(tenure)
             cs.add(
                 "tenure",
                 id=tenure,
@@ -261,6 +263,7 @@ def emit() -> Path:
 
         for key, contest, day, plate, person, text, spans, end, ended, note in elected:
             tenure = cs.key(f"{SOURCE}.tenure", f"elected:{key}:{fold(text)}")
+            staged.add(tenure)
             cs.add(
                 "tenure",
                 id=tenure,
@@ -292,6 +295,12 @@ def emit() -> Path:
                     valid_to=stop,
                     valid_to_precision="day",
                 )
+
+        for (tenure,) in conn.execute(
+            "select t.id from tenure t join changeset s on s.id = t.changeset_id where s.pipeline = %s", [SOURCE]
+        ).fetchall():
+            if tenure not in staged:
+                cs.add("entity_retirement", entity_id=tenure, reason="Keyed by a senator's earlier name; restaged.")
 
         marks = sorted({OPENED, CLOSED, *(day for span in sizes for day in span if OPENED < day < CLOSED)})
         spans: list[tuple[date, date, int]] = []
