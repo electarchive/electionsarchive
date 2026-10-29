@@ -949,6 +949,15 @@ export const partyColor = pgTable("party_color", {
 	primaryKey({ columns: [table.partyId, table.valid], name: "party_color_pkey"}),
 check("party_color_color_check", sql`(color ~ '^#[0-9a-f]{6}$'::text)`),]);
 
+export const partyFounding = pgTable("party_founding", {
+	partyId: uuid("party_id").primaryKey().references(() => party.id, { onDelete: "cascade" } ),
+	date: date().notNull(),
+	datePrecision: datePrecision("date_precision").notNull(),
+	sourceId: uuid("source_id").notNull().references(() => source.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+});
+
 export const partyImage = pgTable("party_image", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	partyId: uuid("party_id").notNull().references(() => party.id),

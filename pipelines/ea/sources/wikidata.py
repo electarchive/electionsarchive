@@ -46,10 +46,10 @@ LABELS = """SELECT DISTINCT ?item ?name WHERE {{
   ?item rdfs:label ?name .
   FILTER(LANG(?name) = "en")
 }}"""
-SPANS = """SELECT DISTINCT ?item ?inception ?dissolved ?links WHERE {{
+SPANS = """SELECT DISTINCT ?item ?inception ?inceptionPrecision ?dissolved ?links WHERE {{
   {scope}
   ?item wikibase:sitelinks ?links .
-  OPTIONAL {{ ?item wdt:P571 ?inception }}
+  OPTIONAL {{ ?item p:P571 [ a wikibase:BestRank ; psv:P571 [ wikibase:timeValue ?inception ; wikibase:timePrecision ?inceptionPrecision ] ] }}
   OPTIONAL {{ ?item wdt:P576 ?dissolved }}
 }}"""
 COLORS = """SELECT DISTINCT ?item ?statement ?color ?rank ?start ?startPrecision ?end ?endPrecision WHERE {{
@@ -533,6 +533,7 @@ def fetch() -> None:
 def emit() -> Path:
     index: dict[str, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(dict))
     spans: dict[str, tuple[int | None, int | None, int]] = {}
+    inceptions: defaultdict[str, set[tuple[date, str]]] = defaultdict(set)
     statements: dict[str, list[dict[str, str]]] = defaultdict(list)
     stances: dict[str, list[dict[str, str]]] = defaultdict(list)
     for scope, country in COUNTRIES.items():
@@ -548,6 +549,10 @@ def emit() -> Path:
                     index[scope][key][item] = max(index[scope][key].get(item, 0), weight)
         for row in _rows(_url(SPANS, _scope(country))):
             item = row["item"].rsplit("/", 1)[1]
+            if row.get("inceptionPrecision") in ("9", "10", "11"):
+                day, precision = _day(row.get("inception"), row["inceptionPrecision"])
+                if day is not None:
+                    inceptions[item].add((day, precision))
             began, ended, _ = spans.get(item, (None, None, 0))
             spans[item] = (
                 min(filter(None, (began, _year(row.get("inception")))), default=None),
@@ -816,6 +821,16 @@ def emit() -> Path:
                 report[scope, "named"] += 1
             if party in linked:
                 report[scope, "linked"] += 1
+                if len(inceptions[linked[party]]) == 1:
+                    founded, precision = next(iter(inceptions[linked[party]]))
+                    cs.add(
+                        "party_founding",
+                        party_id=party,
+                        date=founded,
+                        date_precision=precision,
+                        source_id=wikidata,
+                    )
+                    report[scope, "founded"] += 1
             sourced = spectrum(linked.get(party)) or spectrum(inherited)
             hand_position = sourced_positions.get(str(party))
             span = (

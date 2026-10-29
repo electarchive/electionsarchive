@@ -578,6 +578,52 @@ def _memberships(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _founding(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    founded = """(select p.id as party_id, coalesce(f.date, n.day) as day
+                   from public.party p
+                   left join public.party_founding f on f.party_id = p.id
+                   left join (select entity_id, min(valid_from) as day from public.name
+                              where valid_from is not null group by 1) n
+                     on n.entity_id = p.id
+                     and not exists (select from public.name o where o.entity_id = p.id and o.valid_from is null)
+                   where coalesce(f.date, n.day) is not null
+                     and not exists (select from public.party_relation r
+                                     where p.id in (r.from_party_id, r.to_party_id)
+                                       and r.kind in ('successor_of', 'refounded_as', 'split_from', 'merged_into')))"""
+    queries: list[tuple[str, sql.Composed]] = []
+    if {"party_id", "contest_id"} <= set(stage.tables.get("contest_option", [])):
+        queries.append(
+            (
+                "party.before_founding",
+                sql.SQL(
+                    """select o.id, null::uuid, jsonb_build_object('party', o.party_id, 'founded', f.day, 'election', e.date_from)
+                       from {options} o
+                       join {contests} c on c.id = o.contest_id
+                       join {elections} e on e.id = c.election_id
+                       join {founded} f on f.party_id = o.party_id
+                       where e.date_from < f.day"""
+                ).format(
+                    options=stage.staged("contest_option"),
+                    contests=stage.either("contest", "id", "election_id"),
+                    elections=stage.either("election", "id", "date_from"),
+                    founded=sql.SQL(founded),
+                ),
+            )
+        )
+    if {"party_id", "valid_from"} <= set(stage.tables.get("tenure_affiliation", [])):
+        queries.append(
+            (
+                "party.before_founding",
+                sql.SQL(
+                    """select a.tenure_id, null::uuid, jsonb_build_object('party', a.party_id, 'founded', f.day, 'from', a.valid_from)
+                       from {staged} a join {founded} f on f.party_id = a.party_id
+                       where a.valid_from < f.day"""
+                ).format(staged=stage.staged("tenure_affiliation"), founded=sql.SQL(founded)),
+            )
+        )
+    return queries
+
+
 def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
     queries: list[tuple[str, sql.Composed]] = []
     for table, drop in stage.drops.items():
@@ -711,10 +757,17 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_country_names(stage),
         *_seated(stage),
         *_memberships(stage),
+        *_founding(stage),
         *_scope(stage),
     ]:
         findings.extend(
-            Finding(code, "warning" if code == "membership.overlap" else "error", entity_id, result_set_id, details)
+            Finding(
+                code,
+                "warning" if code in ("membership.overlap", "party.before_founding") else "error",
+                entity_id,
+                result_set_id,
+                details,
+            )
             for entity_id, result_set_id, details in conn.execute(query).fetchall()
         )
     return findings
