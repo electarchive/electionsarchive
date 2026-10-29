@@ -122,6 +122,10 @@
       const subtitle =
         row.short != null &&
         row.short !== row.label &&
+        !(
+          row.label.startsWith(`${row.short} `) &&
+          row.short !== row.short.toLocaleUpperCase()
+        ) &&
         !isOneParty &&
         nominated.length === 0 &&
         (span != null || (row.current?.lines.length ?? 0) === 0)
