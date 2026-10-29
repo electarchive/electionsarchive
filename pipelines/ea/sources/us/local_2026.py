@@ -3935,7 +3935,7 @@ def parse() -> None:
 
     tsv_rows = [
         (state, number, row)
-        for state in ("oh", "fl", "ca", "nj", "counties", "ne")
+        for state in ("oh", "fl", "ca", "nj", "counties", "ne", "states")
         for number, row in enumerate(
             csv.DictReader(
                 Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
@@ -4203,7 +4203,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT')"""
         ).fetchall():
             mine = coverage_tables.tokens(label)
             hits = [
@@ -4294,7 +4294,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4403,7 +4403,7 @@ def parse() -> None:
                             if (
                                 said
                                 and (sort and said != sort or not sort and said == "township")
-                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -4420,7 +4420,7 @@ def parse() -> None:
                         state in ("NJ", "MI", "FL", "OR", "NV", "AR")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
-                        or state in ("CA", "TX")
+                        or state in ("CA", "TX", "UT")
                         and bool(fits)
                     )
                     and len({fit[4] for fit in fits}) == 1
@@ -4687,7 +4687,11 @@ def emit() -> Path:
         made: set[object] = set()
         homes: dict[str, str] = {}
         homeless: set[str] = set()
-        for (fips, tail, template), group in frame.group_by(["fips", "tail", "template"], maintain_order=True):
+        split_tails = {
+            (row["fips"], row["tail"])
+            for row in frame.group_by(["fips", "tail"]).agg(pl.col("unexpired").n_unique().alias("n")).filter(pl.col("n") > 1).iter_rows(named=True)
+        }
+        for (fips, tail, template, _), group in frame.group_by(["fips", "tail", "template", "unexpired"], maintain_order=True):
             if template == "" and group["owner"][0]:
                 title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
                 st, code, role = tail.split(":")[:3]
@@ -5008,7 +5012,8 @@ def emit() -> Path:
                     ("portland:" if tail.startswith(("OR:4159000:", "OR:portland:")) else "")
                     + ("stv" if int(group["seats"][0] or 1) > 1 else "irv"),
                 )
-            key = f"{DAY}:{tail}"
+            split = bool(group["unexpired"][0]) and (fips, tail) in split_tails
+            key = f"{DAY}:{tail}" + (":unexpired" if split else "")
             try:
                 contest = cs.key("us.contest", key)
             except ValueError:
@@ -5039,7 +5044,7 @@ def emit() -> Path:
                     " election", " general municipal election" if fips == "0644000" else " runoff election", 1
                 )
             cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
-            cs.add("slug", path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path), entity_id=contest)
+            cs.add("slug", path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else ""), entity_id=contest)
             counts["contests"] += 1
             if tail in created:
                 counts["created"] += 1
