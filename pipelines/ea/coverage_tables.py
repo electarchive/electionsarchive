@@ -1430,6 +1430,7 @@ def build(full: bool = False) -> str:
         if len(found) == 1 and found[0][0] not in link:
             link[found[0][0]] = pid
             taken.add(pid)
+    link["23508201400000"] = "cf3230d1-cf93-5584-bb33-3458b297c168"
 
     governments: list[dict] = []
     for gid, kind, name, st, county, function, population, population_basis, active, elected in cog.select(
