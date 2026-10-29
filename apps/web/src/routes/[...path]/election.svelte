@@ -642,6 +642,9 @@
       const before = new Map(
         (race.before ?? []).map((entry) => [entry.key, entry.seats]),
       );
+      const lost = race.results.filter(
+        (row) => (row.seats ?? 0) === 0 && (before.get(row.key) ?? 0) > 0,
+      );
       const change =
         race.before == null ||
         seated.some(
@@ -650,7 +653,7 @@
         seated.every((row) => !before.has(row.key))
           ? null
           : Object.fromEntries(
-              seated.flatMap((row) => {
+              [...seated, ...lost].flatMap((row) => {
                 const earlier = before.get(row.key);
                 return earlier == null
                   ? []
@@ -1037,6 +1040,10 @@
           here: 0,
           members: race.holders?.seats[row.key] ?? [],
         })),
+        lost:
+          change == null
+            ? []
+            : lost.map((row) => ({ ...row, seats: 0, here: 0, members: [] })),
         holders: race.holders?.places ?? [],
         isLone: seated.length === 0,
         rows: race.results.map((row) => ({
@@ -1803,7 +1810,7 @@
     {/snippet}
     {#snippet hemicycle()}
       <Seated
-        parties={race.seated}
+        parties={[...race.seated, ...race.lost]}
         places={race.holders}
         body={race.body}
         size={race.isTier || scope != null ? null : race.size}

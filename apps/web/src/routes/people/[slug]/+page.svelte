@@ -216,16 +216,16 @@
       from: string | null;
       to: string | null;
       parties: Array<{
-      from: string | null;
-      to: string | null;
-      party: {
-        id: string;
-        label: string;
-        short: string | null;
-        color: string | null;
-      } | null;
-      isIndependent: boolean;
-    }>;
+        from: string | null;
+        to: string | null;
+        party: {
+          id: string;
+          label: string;
+          short: string | null;
+          color: string | null;
+        } | null;
+        isIndependent: boolean;
+      }>;
     }>;
     seats?: Array<{
       name: string;
@@ -318,8 +318,7 @@
                           { "ms-px": index > 0 },
                         )}
                         style:--party={color}
-                        style:flex-basis="{(Math.max(stop - start, 0) /
-                          width) *
+                        style:flex-basis="{(Math.max(stop - start, 0) / width) *
                           100}%"
                       ></span>
                     {/snippet}

@@ -904,7 +904,13 @@
           class={cn("shrink-0 rounded-xs block-2.5 inline-2.5", {
             "opacity-35": isMuted,
           })}
-          style:background-color={colors.get(party.key)}
+          style:background-color={colors.get(party.key) ??
+            swatch(
+              party.color,
+              /^[0-9a-f]{8}-/.test(party.key)
+                ? `party:${party.key}`
+                : party.key,
+            )}
         ></span>
         <span class="flex-1 truncate font-semibold min-inline-0">
           <Name

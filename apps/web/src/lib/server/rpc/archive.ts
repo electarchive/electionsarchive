@@ -20868,7 +20868,9 @@ export const people = {
               caucus,
               ...painted
                 .values()
-                .flatMap((segments) => segments.map((segment) => segment.party)),
+                .flatMap((segments) =>
+                  segments.map((segment) => segment.party),
+                ),
             ].filter((id) => id != null),
           ),
         ]),
