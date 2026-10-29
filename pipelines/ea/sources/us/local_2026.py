@@ -697,6 +697,11 @@ FEEDS = {
         "Natrona County Clerk",
         "Natrona County 2026 General Election Candidate Roster (9/11/2026)",
     ),
+    "TX-48085": (
+        "https://www.wylieisd.net/our-district/school-board/board-elections",
+        "Wylie Independent School District",
+        "Board Election Information: November 3, 2026",
+    ),
     "UT-49053": (
         "https://www.washco.utah.gov/wp-content/uploads/2026/09/2026-General-Election-Certification-of-County-Candidates-Notice.pdf",
         "Washington County Clerk/Auditor",
@@ -1514,6 +1519,7 @@ DELIVERED = {
     "MT-30031": DATA / "inbox" / "y26" / "mt" / "gallatin.pdf",
     "MT-30013": DATA / "inbox" / "y26" / "mt" / "cascade.pdf",
     "WY-56025": DATA / "inbox" / "y26" / "wy" / "natrona.pdf",
+    "TX-48085": DATA / "inbox" / "y26" / "tx" / "wylie.html",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
     "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
