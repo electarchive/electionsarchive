@@ -19,10 +19,11 @@ from ea.sources.br.tse import SEATS, UFS, proper
 from ea.store import DATA, connect
 
 SOURCE = "br.tse_history"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 TSE = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
 YEARS = (1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022, 2026)
+SAME = {"flavio-dino-de-castro-e-costa|1960-08-18": "flavio-dino-de-castro-e-costa|1968-04-30"}
 FILES = {
     (year, kind): f"{TSE}{folder}/{folder}_{year}.zip"
     for year in YEARS
@@ -847,15 +848,53 @@ def emit() -> Path:
                 """
             ).fetchall()
         }
-        for value, entity in conn.execute(
+        held = dict(
+            conn.execute(
+                """
+                select x.value, x.entity_id from external_id x
+                where x.scheme = 'br.tse_history.person'
+                  and not exists (select from entity_merge m where m.entity_id = x.entity_id)
+                """
+            ).fetchall()
+        )
+        for value, entity in held.items():
+            target = persons.get(SAME.get(value, value), held.get(SAME.get(value, value)))
+            if target is not None and target != entity:
+                cs.merge(entity, target)
+        spelled = dict(
+            candidates.filter(pl.col("birth").is_not_null())
+            .with_columns(
+                key=pl.concat_str(
+                    pl.col("name").map_elements(slug, return_dtype=pl.String),
+                    pl.col("birth").cast(pl.String),
+                    separator="|",
+                ),
+                accents=pl.col("name").str.count_matches(r"[^\x00-\x7F]"),
+            )
+            .group_by("key")
+            .agg(pl.col("name").sort_by("accents", "year").last())
+            .iter_rows()
+        )
+        for name_id, entity, value, text in conn.execute(
             """
-            select x.value, x.entity_id from external_id x
+            select n.id, n.entity_id, x.value, n.text from external_id x
+            join name n on n.entity_id = x.entity_id and n.kind = 'official'
+            join changeset c on c.id = n.changeset_id and c.pipeline = %s
             where x.scheme = 'br.tse_history.person'
               and not exists (select from entity_merge m where m.entity_id = x.entity_id)
-            """
+            """,
+            [SOURCE],
         ).fetchall():
-            if value in persons and persons[value] != entity:
-                cs.merge(entity, persons[value])
+            if value in spelled and proper(spelled[value]) != text:
+                cs.add(
+                    "name",
+                    id=name_id,
+                    entity_id=entity,
+                    text=proper(spelled[value]),
+                    lang="pt",
+                    kind="official",
+                    is_preferred=True,
+                )
         options: dict[str, str] = {}
         result_sets: dict[str, str] = {}
         contests: dict[str, UUID] = {}
@@ -1000,6 +1039,7 @@ def emit() -> Path:
                 person_key = (
                     f"{slug(row['name'])}|{row['birth']}" if row["birth"] is not None else f"{year}:{row['candidate']}"
                 )
+                person_key = SAME.get(person_key, person_key)
                 if person_key not in persons:
                     persons[person_key] = cs.key(f"{SOURCE}.person", person_key)
                     if persons[person_key] in cs.minted:
@@ -1010,7 +1050,7 @@ def emit() -> Path:
                             birth_date=row["birth"],
                             birth_precision="day" if row["birth"] is not None else None,
                         )
-                        name(persons[person_key], proper(row["name"]))
+                        name(persons[person_key], proper(spelled.get(person_key, row["name"])))
                 party = parties[party_key(row["party_number"], row["party_abbreviation"], int(year))]
                 option = cs.key("br.option", f"{key}:{row['candidate']}")
                 options[f"{code}:{row['candidate']}"] = str(option)
