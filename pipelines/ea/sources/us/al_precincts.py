@@ -43,6 +43,7 @@ FILES = [
     (date(2014, 11, 4), BASE + "2014General-precinctLevel.zip"),
     (date(2016, 11, 8), BASE + "2016-General-PrecinctLevel.zip"),
 ]
+STEM = r"(?i)^20(?:14|16)-general-|[ _-]*2014 general precinct"
 SS = "{urn:schemas-microsoft-com:office:spreadsheet}"
 COUNTYWIDE = r"ABSENTEE|PROVISIONAL|MAIL|CURBSIDE"
 TOTALS = r"TOTAL|REGISTERED|BALLOTS CAST|CALCULATED|REPORTED"
@@ -276,7 +277,7 @@ def parse() -> None:
                     re.sub(
                         r"[^a-z]",
                         "",
-                        re.sub(r"(?i)^20(?:14|16)-general-|[ _-]*2014 general precinct", "", Path(member).stem).lower(),
+                        re.sub(STEM, "", Path(member).stem).lower(),
                     )
                     .removesuffix("xls")
                     .removesuffix("gen")
