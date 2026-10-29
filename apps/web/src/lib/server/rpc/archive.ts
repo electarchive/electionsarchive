@@ -19523,6 +19523,7 @@ export const bodies = {
         select b.kind::text as kind, b.polity_id as polity,
           (select count(*)::int from tenure t where t.body_id = b.id) as tenures,
           coalesce(
+            (select max(x.date) from body_event x where x.body_id = b.id and x.kind = 'dissolved' and x.date > coalesce(s.last, '-infinity')),
             (select max(upper(z.valid)) from body_size z where z.body_id = b.id having bool_and(not upper_inf(z.valid))),
             (select min(p.valid_from) from polity_period p where p.polity_id = b.polity_id and p.valid_from > s.last),
             (select min(e.date_from) from body y join contest c on c.body_id = y.id join election e on e.id = c.election_id
