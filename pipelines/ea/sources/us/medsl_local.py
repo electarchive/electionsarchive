@@ -8,13 +8,16 @@ from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID, uuid5
 
+import fastexcel
 import polars as pl
 import shapefile
 from psycopg.rows import dict_row
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.coverage_tables import tokens
 from ea.sources.licenses import UNLICENSED
+from ea.sources.us import cog
 from ea.sources.us.electionsfl import FIPS as FLORIDA
 from ea.sources.us.electionsfl import JACKSONVILLE, REPORTS, export
 from ea.sources.us.medsl import RECODED
@@ -1902,6 +1905,36 @@ def emit() -> Path:
                 [SOURCE, SOURCE],
             ).fetchall()
         )
+        saipe = {
+            tokens(label): (f"{st}{district}", label)
+            for st, district, label in fastexcel.read_excel(raw.cached(cog.SOURCE, cog.SAIPE).path.read_bytes())
+            .load_sheet(0, header_row=2, dtypes="string")
+            .to_polars()
+            .select("State FIPS Code", "District ID", "Name")
+            .iter_rows()
+            if st == "21"
+        }
+        independents: dict[str, list[tuple[str, str, UUID | None]]] = defaultdict(list)
+        for county, text, linked in conn.execute(
+            """select county, name, polity_id from coverage_government
+               where state = 'KY' and kind = 'school' and active and name ~* ' ind'"""
+        ).fetchall():
+            mine = tokens(text)
+            found = [hit for theirs, hit in saipe.items() if theirs == mine] or [
+                hit
+                for hit in saipe.values()
+                if "Independent" in hit[1] and hit[1].split()[0].split("-")[0] == text.split()[0]
+            ]
+            if len(found) == 1:
+                independents[county].append((*found[0], linked))
+        homes: dict[UUID, str] = dict(
+            conn.execute(
+                """select distinct on (p.id) p.id, s.path from polity p join slug s on s.entity_id = p.id
+                   where p.kind = 'school_district' order by p.id, length(s.path)"""
+            ).fetchall()
+        )
+        schooled: set[UUID] = set()
+        districts_united: set[str] = set()
         survivors: dict[tuple[str, str], tuple[UUID, str, str]] = {}
         absorbed: dict[str, UUID] = {}
         for value, body, pipeline, text in conn.execute(
@@ -1959,6 +1992,49 @@ def emit() -> Path:
             if (scheme, code) not in polities:
                 continue
             polity, place, path = polities[(scheme, code)]
+            body_code, label, territory = code, seat, scheme
+            if state == "KY" and key == "board-of-education":
+                school = (
+                    (*saipe[tokens(f"{place} School District")], None)
+                    if seat and tokens(f"{place} School District") in saipe
+                    else independents[code][0]
+                    if not seat and len(independents[code]) == 1
+                    else None
+                )
+                if school is not None:
+                    body_code, place, territory = school[0], school[1], "us.school_district"
+                    label = seat and re.sub(r"^(?:Educational )?(?:District|Division)\b", "Educational District", seat)
+                    polity = school[2] if school[2] in homes else cs.key("us.polity", f"school:{body_code}")
+                    path = homes.get(polity) or f"us/ky/{slug(place)}"
+                    if polity in cs.minted and polity not in schooled:
+                        if path in slugs:
+                            raise ValueError(f"slug taken: {path} for school:{body_code}")
+                        schooled.add(polity)
+                        cs.add("polity", id=polity, kind="school_district", iso_code=None)
+                        name(polity, place)
+                        cs.add("polity_parent", polity_id=polity, parent_id=cs.polity("US-KY"))
+                        cs.add("slug", path=path, entity_id=polity)
+                        territory_area = cs.area(territory, body_code)
+                        if territory_area in cs.minted:
+                            cs.add("area", id=territory_area, scheme_code=territory)
+                            cs.add("area_code", area_id=territory_area, code=body_code, valid_from=None)
+                            cs.add("area_parent", area_id=territory_area, parent_id=cs.area("us.state", "21"))
+                            name(territory_area, f"{place}, KY")
+                        cs.add("polity_territory", polity_id=polity, area_id=territory_area)
+                        cs.add(
+                            "reporting_unit",
+                            id=cs.unit(territory, body_code),
+                            polity_id=polity,
+                            scheme_code=territory,
+                            code=body_code,
+                            area_relation="equals",
+                            area_id=territory_area,
+                            kind="standard",
+                            valid_from=None,
+                        )
+                    cs.renamed[f"{day}:{state}:{body_code}:{key}" + (f":{slug(label)}" if label else "")] = (
+                        f"{day}:{state}:{code}:{key}" + (f":{slug(seat)}" if seat else "")
+                    )
             official = row["origin"].startswith("electionsfl")
             if official and (f"{day:%Y-%m}", f"{state}:{code}:{key}") in held_fl:
                 continue
@@ -1995,33 +2071,36 @@ def emit() -> Path:
             if (day, f"{state}:{code}:{key}") in taken or survivor and (day, f"{state}:{code}:{survivor[1]}") in taken:
                 continue
             contest_key = (
-                f"{day}:{state}:{code}:{key}"
-                + (f":{slug(seat)}" if seat else "")
+                f"{day}:{state}:{body_code}:{key}"
+                + (f":{slug(label)}" if label else "")
                 + (":remainder" if row["remainder"] else "")
             )
             contest_path = (
                 f"{path}/{day}-general/{key}"
-                + (f"-{slug(seat)}" if seat else "")
+                + (f"-{slug(label)}" if label else "")
                 + ("-unexpired" if row["remainder"] else "")
             )
             if contest_path in slugs and slugs[contest_path] != known.get(contest_key):
                 continue
-            if (day, code) not in elections:
-                election = elections[(day, code)] = cs.key("us.election", f"{day}:{state}:{code}")
-                cs.add(
-                    "election",
-                    id=election,
-                    polity_id=polity,
-                    parent_id=parent,
-                    kind="general",
-                    date_from=day,
-                    date_to=day,
-                    date_precision="day",
-                    status="held",
+            if (day, body_code) not in elections:
+                election = elections[(day, body_code)] = cs.key(
+                    "us.election", f"{day}:{state}:{'sd' if territory == 'us.school_district' else ''}{body_code}"
                 )
-                name(election, f"{day.year} {place} general election")
-                cs.add("slug", path=f"{path}/{day}-general", entity_id=election)
-            election = elections[(day, code)]
+                if election in cs.minted:
+                    cs.add(
+                        "election",
+                        id=election,
+                        polity_id=polity,
+                        parent_id=parent,
+                        kind="general",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(election, f"{day.year} {place} general election")
+                    cs.add("slug", path=f"{path}/{day}-general", entity_id=election)
+            election = elections[(day, body_code)]
             body = row["body"]
             city = place.removeprefix("City of ")
             office_title = row["stem"] or (
@@ -2039,8 +2118,10 @@ def emit() -> Path:
                     cs.merge(absorbed[f"{state}:{code}:{key}"], survivor[0])
                 if key == "council" and (survivor[2] or "").endswith("Board of Commissioners"):
                     name(survivor[0], office_title)
-            if (code, key) not in owners:
-                owner = owners[(code, key)] = cs.key("us.body" if body else "us.office", f"{state}:{code}:{key}")
+            if (body_code, key) not in owners:
+                owner = owners[(body_code, key)] = cs.key(
+                    "us.body" if body else "us.office", f"{state}:{body_code}:{key}"
+                )
                 mayoral = key == "mayor" and bool(row["stem"] or office_title.startswith("Mayor of "))
                 if owner in cs.minted:
                     if body:
@@ -2050,10 +2131,14 @@ def emit() -> Path:
                     name(owner, office_title)
                 elif mayoral and owner in untyped:
                     cs.add("office", id=owner, polity_id=untyped[owner], kind="mayor")
-            whole, unit = cs.area(scheme, code), cs.unit(scheme, code)
+            whole, unit = cs.area(territory, body_code), cs.unit(territory, body_code)
             area = whole
             if row["district"]:
-                district = f"{code[:2]}:{code}:{key}:{slug(seat)}"
+                district = (
+                    f"{code[:2]}:{code}:{key}:{slug(seat)}"
+                    if body_code == code
+                    else f"{state}:{body_code}:{key}:{slug(label)}"
+                )
                 theirs = None if survivor is None else f"{code[:2]}:{code}:{survivor[1]}:{slug(seat)}"
                 if theirs is not None and theirs in local_areas and theirs != district:
                     if district in local_areas:
@@ -2062,12 +2147,15 @@ def emit() -> Path:
                         cs.merge(local_units[district], local_units[theirs])
                     district = theirs
                 area, unit = cs.area("us.local_district", district), cs.unit("us.local_district", district)
-                if area in cs.minted and district not in districts:
+                if district not in districts:
                     districts.add(district)
-                    cs.add("area", id=area, scheme_code="us.local_district")
-                    cs.add("area_code", area_id=area, code=district, valid_from=None)
-                    cs.add("area_parent", area_id=area, parent_id=whole, valid_from=None)
-                    name(area, f"{office_title}, {seat}")
+                    if area in cs.minted:
+                        cs.add("area", id=area, scheme_code="us.local_district")
+                        cs.add("area_code", area_id=area, code=district, valid_from=None)
+                        cs.add("area_parent", area_id=area, parent_id=whole, valid_from=None)
+                        name(area, f"{office_title}, {label}")
+                if unit in cs.minted and district not in districts_united:
+                    districts_united.add(district)
                     cs.add(
                         "reporting_unit",
                         id=unit,
@@ -2088,8 +2176,8 @@ def emit() -> Path:
                 id=contest,
                 election_id=election,
                 kind="ballot_question" if measure else "body_seats" if body else "office",
-                office_id=None if body or measure else owners[(code, key)],
-                body_id=owners[(code, key)] if body and not measure else None,
+                office_id=None if body or measure else owners[(body_code, key)],
+                body_id=owners[(body_code, key)] if body and not measure else None,
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=1,
@@ -2118,7 +2206,7 @@ def emit() -> Path:
                     if not seat or start is not None and starts[(day, code, key)] == 1
                     else f" (term from {begins})"
                     if start is not None
-                    else f", {seat}"
+                    else f", {label}"
                 )
                 + (" (unexpired term)" if row["remainder"] else ""),
             )
