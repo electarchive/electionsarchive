@@ -9992,9 +9992,10 @@ export const contests = {
                 `)
               ).rows.map((row) => row.id),
             );
-      const groups = day.rows.filter(
+      const listed = day.rows.filter(
         (row) => !(row.isCurrent && row.count === 1) && !away.has(row.sample),
       );
+      const groups = listed.every((row) => row.isCurrent) ? [] : listed;
       const top = day.rows[0]?.top ?? null;
       const election = day.rows[0]?.election ?? null;
       const topPolity = day.rows[0]?.topPolity ?? null;
