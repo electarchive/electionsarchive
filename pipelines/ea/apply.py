@@ -666,6 +666,12 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 conn.execute("delete from public.person_image where person_id = any(%s::uuid[])", [ids])
             if kind == "party":
                 conn.execute("delete from public.party_image where party_id = any(%s::uuid[])", [ids])
+            if kind == "body":
+                for owned in ("body_size", "body_size_part", "body_apportionment", "body_chamber"):
+                    conn.execute(
+                        sql.SQL("delete from public.{} where body_id = any(%s::uuid[])").format(sql.Identifier(owned)),
+                        [ids],
+                    )
             if kind == "area":
                 for owned in ("area_code", "area_geometry"):
                     conn.execute(
