@@ -515,6 +515,8 @@ HI_MEASURES = {
     },
     2010: {"Board of": ("2376", "HB 2376"), "Tax Rebate": ("2807", "SB 2807")},
 }
+NM_DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5)}
+NM_PAGES = Path(__file__).with_name("nm_county_pages.tsv")
 MT_BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
 SCANS = Path(__file__).resolve().parents[3] / "scans"
 BALLOT_LABELS = {("NE", date(2006, 11, 7), "422"): ("Retain", "Repeal")}
@@ -663,6 +665,11 @@ PUBLISHERS = {
         "Hawaii Office of Elections",
         "General election county summary reports",
         "https://elections.hawaii.gov/election-results/",
+    ),
+    "NM": (
+        "New Mexico Secretary of State",
+        "General election results by county",
+        "https://www.sos.nm.gov/sos-archive/election-results-archive/",
     ),
     "TX": ("Texas Secretary of State", "Texas election history: returns by county, 1992–2019", TX),
     "CA": (
@@ -822,6 +829,9 @@ def fetch() -> None:
         time.sleep(1)
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
+        time.sleep(1)
+    for line in NM_PAGES.read_text().splitlines()[1:]:
+        raw.fetch(SOURCE, line.split("\t")[1], suffix=".html")
         time.sleep(1)
     for year in HI_MEASURES:
         for code in HI_COUNTIES:
@@ -2661,6 +2671,60 @@ def hawaii() -> list[dict[str, object]]:
     return rows
 
 
+def new_mexico() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for line in NM_PAGES.read_text().splitlines()[1:]:
+        year, url = line.split("\t")
+        text = re.sub(
+            r"\s+",
+            " ",
+            re.sub(
+                r"<[^>]+>",
+                " ",
+                re.sub(
+                    r"<script.*?</script>|<style.*?</style>",
+                    "",
+                    raw.cached(SOURCE, url).path.read_text(errors="replace"),
+                    flags=re.DOTALL,
+                ),
+            ).replace("&nbsp;", " "),
+        )
+        county = re.search(r"([A-Z][A-Z. ]+?) County Official", text)
+        if county is None:
+            raise ValueError(f"NM {url}: no county name")
+        figures = re.findall(
+            r"(?:(\d)(?:ST|ND|RD|TH) CONSTITUTIONAL AMENDMENT|GO BOND ([A-E])) ([\d,]+) (\d+)% \(For\) ([\d,]+) (\d+)% \(Against\)",
+            text,
+        )
+        if len(figures) != (5 if year == "2000" else 14):
+            raise ValueError(f"NM {url}: {len(figures)} measures")
+        for amendment, bond, yes_text, yes_percent, no_text, no_percent in figures:
+            votes = [int(yes_text.replace(",", "")), int(no_text.replace(",", ""))]
+            if (
+                abs(100 * votes[0] / sum(votes) - int(yes_percent)) > 1
+                or abs(100 * votes[1] / sum(votes) - int(no_percent)) > 1
+            ):
+                raise ValueError(f"NM {url} {amendment or bond}: figures do not match the printed percents")
+            rows.extend(
+                {
+                    "state": "NM",
+                    "day": NM_DAYS[int(year)],
+                    "number": amendment,
+                    "label": f"Constitutional Amendment {amendment}" if amendment else f"Bond Question {bond}",
+                    "url": url,
+                    "county": county[1]
+                    .title()
+                    .replace("Dona Ana", "Doña Ana")
+                    .replace("Mckinley", "McKinley")
+                    .replace("De Baca", "De Baca"),
+                    "answer": answer,
+                    "votes": votes[side],
+                }
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def montana() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in MT_FILES.items():
@@ -2759,6 +2823,7 @@ def parse() -> None:
             *north_dakota(),
             *south_carolina(),
             *hawaii(),
+            *new_mexico(),
         ],
         infer_schema_length=None,
     )
@@ -2798,7 +2863,7 @@ def parse() -> None:
             ),
             pool.filter(kind) if label else pool.clear(),
         )
-        if found.height != 1 or found["number"][0] is None and label:
+        if found.height != 1 or found["number"][0] is None and label and found["measure"][0] != label:
             found = (
                 found.with_columns(
                     overlap=pl.struct("title", "measure").map_elements(
@@ -2824,7 +2889,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
