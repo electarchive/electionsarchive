@@ -23,7 +23,7 @@ WORDS = r"\b(?:city|town|village|borough|township|municipality|cdp|county|indepe
 
 
 def fold(text: str) -> str:
-    return " ".join(re.sub(WORDS, " ", re.sub(r"[^a-z0-9 ]", " ", text.lower().replace("&", " and "))).split())
+    return " ".join(re.sub(WORDS, " ", re.sub(r"[^a-z0-9 ]", " ", re.sub(r"\bsaint\b", "st", text.lower()).replace("&", " and "))).split())
 
 
 def fetch() -> None:
@@ -47,6 +47,7 @@ def parse() -> None:
     exact = set(wanted.filter(pl.col("code").str.contains(r"^\d{7}$"))["code"])
     records: dict[str, tuple[str, str, str, str]] = {}
     byname: dict[tuple[str, str, str], set[str]] = {}
+    kinds: dict[str, str] = {}
     for (year, kind), url in URLS.items():
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
@@ -58,6 +59,7 @@ def parse() -> None:
             if shape is None or key in records:
                 continue
             records[key] = (str(record["NAME"]), str(record["STATEFP"]), json.dumps(shape.__geo_interface__), str(year))
+            kinds[geoid] = "cdp" if kind == "place" and str(record["NAMELSAD"]).endswith("CDP") else kind
             byname.setdefault((scheme, geoid[:2], fold(str(record["NAME"]))), set()).add(geoid)
     rows = []
     for area, scheme, code, name in wanted.iter_rows():
@@ -65,6 +67,11 @@ def parse() -> None:
             geoid, how = (code, "geoid") if (scheme, code) in records else (None, "missing")
         else:
             found = byname.get((scheme, code.split(":")[0], fold((name or "").rsplit(",", 1)[0])), set())
+            if len(found) > 1 and scheme == "us.place":
+                found = {geoid for geoid in found if kinds[geoid] != "cdp"} or found
+            if len(found) > 1 and scheme == "us.school_district":
+                wanted_kind = "scsd" if "high" in (name or "").lower() else "unsd" if "unified" in (name or "").lower() else "elsd"
+                found = {geoid for geoid in found if kinds[geoid] == wanted_kind} or found
             geoid, how = (next(iter(found)), "name") if len(found) == 1 else (None, "ambiguous" if found else "unmatched")
         row = records.get((scheme, geoid)) if geoid else None
         rows.append((area, scheme, code, name, geoid, how, row[2] if row else None, row[3] if row else None))
