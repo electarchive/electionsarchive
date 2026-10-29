@@ -5,9 +5,10 @@ import os
 import re
 import time
 import zipfile
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID
+from xml.etree import ElementTree
 
 import httpx
 import polars as pl
@@ -30,13 +31,19 @@ EV = {
     "RI": ("electionresults.ri.gov", "RhodeIsland"),
     "WA": ("results.votewa.gov", "washington"),
 }
+CLARITY = {
+    "IA": "https://electionresults.iowa.gov/IA/",
+    "SC": "https://www.enr-scvotes.org/SC/",
+    "WV": "https://results.enr.clarityelections.com/WV/",
+}
 EV_OFFICES = re.compile(
     r"^(?:(?P<party0>REP|DEM) )?(?:(?P<senate>(?:U\.? ?S\.? |United States )Senat(?:e|or)|Senator in Congress)"
     r"|(?P<governor>Governor)"
-    r"|(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress)\b[^\d]*(?P<district>\d+))"
-    r"\s*(?:-\s*(?P<party1>Rep|Dem|Democratic|Republican|Libertarian))?\s*$"
+    r"|(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress)\b[^\d]*(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?)"
+    r"\s*(?:-\s*(?P<party1>Rep|Dem|Democratic|Republican|Libertarian))?\s*$",
+    re.IGNORECASE,
 )
-LISTINGS = ("/ballot-items", "Georgia", "/id", "/utah", "/RhodeIsland", "/washington")
+LISTINGS = ("elections.json", "cid=arkansas", "/ballot-items", "Georgia", "/id", "/utah", "/RhodeIsland", "/washington")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
 FL_OFFICES = {"USS": "senate", "USR": "house", "GOV": "governor"}
 IL_ELECTIONS = {2022: 62, 2024: 66, 2026: 70}
@@ -50,6 +57,8 @@ IL_CITIES = {
 }
 IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
 NC_CONTEST = re.compile(r"US SENATE|NC GOVERNOR|US HOUSE OF REPRESENTATIVES DISTRICT (\d+)")
+AR_CONTEST = re.compile(r"U\.S\. Senate|Governor|U\.S\. Congress District (\d+)")
+AR_HEADERS = {"User-Agent": "Mozilla/5.0", "Origin": "https://arkansas.tally-enr.com"}
 PA_API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
 PA_OFFICES = {"2": "senate", "3": "governor", "11": "house"}
 NOTE = (
@@ -58,10 +67,10 @@ NOTE = (
 )
 
 
-def get(client: httpx.Client, url: str) -> bytes | None:
+def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -> bytes | None:
     for attempt in range(3):
         try:
-            response = client.get(url)
+            response = client.get(url, headers=headers)
         except httpx.TransportError:
             time.sleep(2 + attempt * 3)
             continue
@@ -114,6 +123,45 @@ def fetch() -> None:
                 detail = get(client, f"{base}ballot-items/{item['id']}")
                 if detail is not None:
                     store(state, f"{base}ballot-items/{item['id']}", detail, ".json")
+    for state, base in CLARITY.items():
+        if ONLY and state not in ONLY:
+            continue
+        listing = get(client, f"{base}elections.json")
+        if listing is None:
+            print(f"{state}: no election listing")
+            continue
+        store(state, f"{base}elections.json", listing, ".json")
+        ids = (
+            [os.environ[f"ENR_2026_{state}_EID"]]
+            if f"ENR_2026_{state}_EID" in os.environ
+            else [
+                e["EID"]
+                for e in json.loads(listing)
+                if datetime.strptime(e["Date"].split()[0], "%m/%d/%Y").date() == DAY
+                and not re.search(r"TEST|MOCK|TRAINING", e["ElectionName"].upper())
+            ]
+        )
+        if not ids:
+            print(f"{state}: no election on {DAY}")
+            continue
+        version = get(client, f"{base}{ids[0]}/current_ver.txt")
+        content = version and get(client, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip")
+        if content is None:
+            print(f"{state}: no detail file")
+        else:
+            store(state, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip", content, ".zip")
+    if not ONLY or "AR" in ONLY:
+        url = "https://enr-results-api.totalresults.com/Election/GetElectionList?cid=arkansas"
+        listing = get(client, url, AR_HEADERS)
+        ids = [e["electionID"] for e in json.loads(listing or "[]") if e["electionDate"][:10] == DAY.isoformat()]
+        content = ids and get(
+            client, f"https://results.tally-enr.com/results/arkansas/{ids[0]}/FullDataFile.json", AR_HEADERS
+        )
+        if not content:
+            print("AR: no data file")
+        else:
+            store("AR", url, listing, ".json")
+            store("AR", f"https://results.tally-enr.com/results/arkansas/{ids[0]}/FullDataFile.json", content, ".json")
     if not ONLY or "FL" in ONLY:
         official = "Y" if DAY < date.today() else "N"
         url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
@@ -296,6 +344,69 @@ def rows(state: str, url: str, path: Path):
                             "as_of": None,
                             "reporting": None,
                             "total": None,
+                        }
+        return
+    if state == "AR":
+        for contest in json.loads(path.read_bytes())["ContestData"]:
+            found = AR_CONTEST.fullmatch(contest["ContestName"])
+            if found is None:
+                continue
+            for fips, location in contest["Locations"].items():
+                for choice in [*location["Choices"], *location["WriteinChoices"]]:
+                    named = re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"])
+                    yield {
+                        "office": "senate"
+                        if contest["ContestName"] == "U.S. Senate"
+                        else "governor"
+                        if found[1] is None
+                        else "house",
+                        "district": (found[1] or "").lstrip("0"),
+                        "party": named[1] if named else "",
+                        "county": fips,
+                        "candidate": named[2] if named else choice["Name"],
+                        "write_in": "write-in" in choice["Name"].lower(),
+                        "votes": choice["TotalVotes"]
+                        if "TotalVotes" in choice
+                        else sum(vote["Votes"] for vote in choice["Votes"]),
+                        "as_of": None,
+                        "reporting": None,
+                        "total": None,
+                    }
+        return
+    if state in CLARITY:
+        if not url.endswith("detailxml.zip"):
+            return
+        with zipfile.ZipFile(path) as archive:
+            root = ElementTree.fromstring(archive.read("detail.xml"))
+        stamped = re.fullmatch(r"(.+) ([ECMP])([SD])T", (root.findtext("Timestamp") or "").strip())
+        as_of = (
+            datetime.strptime(stamped[1], "%m/%d/%Y %I:%M:%S %p")
+            .replace(
+                tzinfo=timezone(timedelta(hours={"E": -5, "C": -6, "M": -7, "P": -8}[stamped[2]] + (stamped[3] == "D")))
+            )
+            .isoformat()
+            if stamped
+            else None
+        )
+        for contest in root.iter("Contest"):
+            found = EV_OFFICES.fullmatch((contest.get("text") or "").strip())
+            if found is None:
+                continue
+            for choice in contest.iter("Choice"):
+                for kind in choice.iter("VoteType"):
+                    for place in kind:
+                        yield {
+                            "office": "senate" if found["senate"] else "governor" if found["governor"] else "house",
+                            "district": found["district"] or "",
+                            "party": choice.get("party") or "",
+                            "county": (place.get("name") or "").removesuffix(" County"),
+                            "candidate": re.sub(r"\s*(\(I\)|\*)$", "", choice.get("text") or "").strip(),
+                            "write_in": "write-in" in (choice.get("text") or "").lower(),
+                            "votes": int(place.get("votes") or 0),
+                            "as_of": as_of,
+                            "reporting": int(contest.get("precinctsReported") or 0),
+                            "total": int(contest.get("precinctsParticipating") or 0),
+                            "scope": found["party0"] or found["party1"] or "",
                         }
         return
     detail = json.loads(path.read_bytes())
