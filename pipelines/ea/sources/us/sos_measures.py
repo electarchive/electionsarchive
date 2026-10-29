@@ -456,6 +456,8 @@ MT_FILES = {
     date(2008, 11, 4): "wp-content/uploads/attachments/2008_State_General.pdf",
     date(2010, 11, 2): "wp-content/uploads/attachments/2010_General_Election_Official_Statewide_Canvass.pdf",
 }
+ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}-general.pdf"
+ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
 MT_BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
 SCANS = Path(__file__).resolve().parents[3] / "scans"
 BALLOT_LABELS = {("NE", date(2006, 11, 7), "422"): ("Retain", "Repeal")}
@@ -589,6 +591,11 @@ PUBLISHERS = {
         "Montana Secretary of State",
         "Statewide general election canvass",
         "https://sosmt.gov/elections/results/",
+    ),
+    "ND": (
+        "North Dakota Secretary of State",
+        "Abstract of votes cast at the general election",
+        "https://www.sos.nd.gov/elections/election-results",
     ),
     "TX": ("Texas Secretary of State", "Texas election history: returns by county, 1992–2019", TX),
     "CA": (
@@ -740,6 +747,9 @@ def fetch() -> None:
         for url in (MO, MO_PART2) if day.year >= 2004 else (MO,):
             raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
             time.sleep(1)
+    for day in ND_DAYS:
+        raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
+        time.sleep(1)
     for name in MT_FILES.values():
         try:
             raw.cached(SOURCE, MT + name)
@@ -2304,6 +2314,49 @@ def missouri() -> list[dict[str, object]]:
     return rows
 
 
+def north_dakota() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, count in ND_DAYS.items():
+        url = ND.format(day.isoformat())
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.split("\n")
+        start = max(at for at, line in enumerate(lines) if re.search(r"MEASURES\s+BALLOT", line))
+        table: dict[str, list[int]] = {}
+        for line in lines[start:]:
+            if figures := re.fullmatch(r"\s*([A-Za-z][A-Za-z .]+?)\s{2,}(\d[\d,. ]*)", line):
+                numbers = [int(re.sub(r"\D", "", part)) for part in figures[2].split()]
+                if len(numbers) < 2 * count:
+                    continue
+                if figures[1].strip() == "Total":
+                    total = numbers[-2 * count :]
+                    break
+                table[figures[1].strip().replace("Mclntosh", "McIntosh")] = numbers[-2 * count :]
+        else:
+            raise ValueError(f"ND {day}: no Total row")
+        if len(table) != 53:
+            raise ValueError(f"ND {day}: {len(table)} counties")
+        for column in range(2 * count):
+            if sum(votes[column] for votes in table.values()) != total[column]:
+                raise ValueError(f"ND {day}: column {column} does not add up to {total[column]}")
+        rows.extend(
+            {
+                "state": "ND",
+                "day": day,
+                "number": str(measure + 1),
+                "label": f"Measure No. {measure + 1}",
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": votes[2 * measure + side],
+            }
+            for measure in range(count)
+            for county, votes in table.items()
+            for side, answer in enumerate(("YES", "NO"))
+        )
+    return rows
+
+
 def montana() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in MT_FILES.items():
@@ -2399,6 +2452,7 @@ def parse() -> None:
             *south_dakota(),
             *missouri(),
             *montana(),
+            *north_dakota(),
         ],
         infer_schema_length=None,
     )
