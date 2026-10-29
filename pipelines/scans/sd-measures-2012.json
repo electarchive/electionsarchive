@@ -1,0 +1,245 @@
+{
+ "polity": "US-SD",
+ "publisher": "South Dakota Secretary of State",
+ "title": "2012 Official Election Returns (primary and general)",
+ "license": "Public record",
+ "file": {
+  "url": "https://sdsos.gov/docs/2012ElectionReturnsBooklet.pdf"
+ },
+ "raw_source": "us.sos_measures",
+ "contests": {
+  "M": {
+   "year": 2012,
+   "chamber": "question-m",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Constitutional Amendment M"
+  },
+  "N": {
+   "year": 2012,
+   "chamber": "question-n",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Constitutional Amendment N"
+  },
+  "O": {
+   "year": 2012,
+   "chamber": "question-o",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Constitutional Amendment O"
+  },
+  "P": {
+   "year": 2012,
+   "chamber": "question-p",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Constitutional Amendment P"
+  },
+  "15": {
+   "year": 2012,
+   "chamber": "question-15",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Initiated Measure 15"
+  },
+  "14": {
+   "year": 2012,
+   "chamber": "question-14",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Referred Law 14"
+  },
+  "16": {
+   "year": 2012,
+   "chamber": "question-16",
+   "day": "2012-11-06",
+   "special": false,
+   "state": "SD",
+   "district": null,
+   "label": "Referred Law 16"
+  }
+ },
+ "pages": [
+  {
+   "page": 33,
+   "id": "qM",
+   "orientation": "counties_down",
+   "crop": [
+    0.04,
+    0.09,
+    0.58,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "M",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "M",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 33,
+   "id": "qN",
+   "orientation": "counties_down",
+   "crop": [
+    0.58,
+    0.09,
+    0.99,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "N",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "N",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 34,
+   "id": "qO",
+   "orientation": "counties_down",
+   "crop": [
+    0.04,
+    0.09,
+    0.58,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "O",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "O",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 34,
+   "id": "qP",
+   "orientation": "counties_down",
+   "crop": [
+    0.58,
+    0.09,
+    0.99,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "P",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "P",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 35,
+   "id": "q15",
+   "orientation": "counties_down",
+   "crop": [
+    0.28,
+    0.09,
+    0.7,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "15",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "15",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 36,
+   "id": "q14",
+   "orientation": "counties_down",
+   "crop": [
+    0.04,
+    0.09,
+    0.58,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "14",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "14",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 36,
+   "id": "q16",
+   "orientation": "counties_down",
+   "crop": [
+    0.58,
+    0.09,
+    0.99,
+    0.99
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore the Total row's cells if they disagree with the county sum, and read the Total row last.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "16",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "16",
+     "candidate": "NO"
+    }
+   ]
+  }
+ ]
+}

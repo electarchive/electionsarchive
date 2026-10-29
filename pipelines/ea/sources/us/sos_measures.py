@@ -464,7 +464,17 @@ SD_PAGES = {
     date(2006, 11, 7): (SD_NEW.format("20110416214157", "pastelections_electioninfo06_GEballotquestions.shtm"),),
 }
 SD_SCANS = {
-    "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf"
+    "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf",
+    "sd-measures-2012": "https://sdsos.gov/docs/2012ElectionReturnsBooklet.pdf",
+}
+SD_2012 = {
+    "M": ("An Amendment to the South Dakota Constitution regarding certain provisions relating to corporations.", "Legislative Referendum", False),
+    "N": ("An Amendment to the South Dakota Constitution repealing certain reimbursement restrictions for travel by legislators to and from a legislative session.", "Legislative Referendum", False),
+    "O": ("An Amendment to the South Dakota Constitution changing the method for distributions from the cement plant trust fund.", "Legislative Referendum", True),
+    "P": ("An Amendment to the South Dakota Constitution adding balanced budget requirements.", "Legislative Referendum", True),
+    "15": ("An initiated measure to increase state general sales and use taxes for additional K-12 public education and Medicaid funding.", "Initiative", False),
+    "14": ("An Act to establish the Large Project Development Fund.", "Popular Referendum", False),
+    "16": ("An education reform act to establish a teacher scholarship program, math and science teacher bonuses, merit bonuses, uniform evaluations, and the elimination of state teacher tenure requirements.", "Popular Referendum", False),
 }
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
 MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
@@ -1884,9 +1894,7 @@ def south_dakota() -> list[dict[str, object]]:
                     "state": "SD",
                     "day": date.fromisoformat(contest["day"]),
                     "number": number,
-                    "label": f"Initiated Measure {number}"
-                    if number.isdigit()
-                    else f"Constitutional Amendment {number}",
+                    "label": contest["label"],
                     "url": url,
                     "county": row["code"],
                     "answer": row["candidate"],
@@ -2179,6 +2187,21 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), _ in frame.group_by("state", "day", "number", "label", maintain_order=True):
+        if state == "SD" and day.year == 2012:
+            title, kind, passed = SD_2012[number]
+            matched.append(
+                {
+                    "state": state,
+                    "day": day,
+                    "number": number,
+                    "label": label,
+                    "measure": label,
+                    "title": title,
+                    "type": kind,
+                    "passed": passed,
+                }
+            )
+            continue
         mine = set(words.findall(label.lower()))
         pool = listed.filter(pl.col("state") == state, pl.col("year") == day.year)
         kind = (pl.col("election") == "General") == (day.month == 11)
