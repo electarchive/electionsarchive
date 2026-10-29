@@ -249,16 +249,13 @@ def rows(term: int) -> list[dict[str, object]]:
     return found
 
 
-VERSION = "3"
+VERSION = "4"
 NOTES = (
     "The Assembly's member search lists every member of a term with the province, the party label, and the date and "
     "reason the membership ended; it does not give start dates, and a member who replaced a departing one is listed "
     "as any other. Persons are matched to the term's elected candidacies by name."
 )
 OPENINGS = {
-    9: date(1950, 5, 22),
-    10: date(1954, 5, 14),
-    11: date(1957, 11, 1),
     17: date(1983, 11, 24),
     18: date(1987, 12, 14),
     19: date(1991, 11, 6),
@@ -424,7 +421,7 @@ def emit() -> Path:
                     body_id=assembly,
                     from_date=ERDOGAN_SWORN
                     if term == 22 and member == ERDOGAN
-                    else (OPENINGS.get(term) if hit is not None or term < 17 else None),
+                    else (OPENINGS.get(term) if hit is not None else None),
                     to_date=row["end"],
                     acquired_via="elected",
                     contest_id=None if hit is None else hit[1],
@@ -433,7 +430,7 @@ def emit() -> Path:
                 cs.add("citation", entity_id=tenure, source_id=source, locator={"term": term, "member": member})
                 if term == 22 and member == ERDOGAN:
                     cs.add("citation", entity_id=tenure, source_id=minutes[ERDOGAN_OATH], locator={"item": "andiçme"})
-                elif (hit is not None or term < 17) and term in OPENINGS:
+                elif hit is not None and term in OPENINGS:
                     cs.add(
                         "citation",
                         entity_id=tenure,
