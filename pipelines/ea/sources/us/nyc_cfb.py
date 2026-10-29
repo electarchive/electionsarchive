@@ -19,9 +19,9 @@ INBOX = DATA / "inbox" / "nyc_cfb"
 PUBLISHER = "New York City Campaign Finance Board"
 FILES = {1989: "1989_app.pdf", 1991: "1991_app.pdf", 1993: "1993_app.pdf", 1997: "98v2.pdf"}
 URLS = {
-    1989: "local:nyc_cfb/1989_app.pdf",
-    1991: "local:nyc_cfb/1991_app.pdf",
-    1993: "local:nyc_cfb/1993_app.pdf",
+    1989: "https://www.nyccfb.info/PDF/news_media/reports/1989_PER_appendices.pdf",
+    1991: "https://www.nyccfb.info/PDF/news_media/reports/1991_PER_appendices.pdf",
+    1993: "https://www.nyccfb.info/PDF/news_media/reports/1993_PER_appendices.pdf",
     1997: "https://www.nyccfb.info/pdf/per/98_per-vol.ii.pdf",
 }
 TITLES = {
