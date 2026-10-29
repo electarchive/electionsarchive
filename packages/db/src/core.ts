@@ -40,7 +40,7 @@ export const optionKind = pgEnum("option_kind", ["candidate", "ticket", "list", 
 export const outcomeKind = pgEnum("outcome_kind", ["elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified", "declined"])
 export const partyAffiliationKind = pgEnum("party_affiliation_kind", ["ep_group", "federation", "international", "regional_branch", "coalition"])
 export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group", "caucus"])
-export const partyRelationKind = pgEnum("party_relation_kind", ["merged_into", "split_from", "successor_of", "refounded_as", "absorbed_by", "closed_by_court", "list_vehicle_for"])
+export const partyRelationKind = pgEnum("party_relation_kind", ["merged_into", "split_from", "successor_of", "refounded_as", "absorbed_by", "closed_by_court", "list_vehicle_for", "closed_by_government"])
 export const payloadKind = pgEnum("payload_kind", ["ops", "artifacts"])
 export const polityKind = pgEnum("polity_kind", ["sovereign_state", "supranational", "federal_unit", "region", "county", "municipality", "submunicipal", "historical_state", "school_district", "judicial_district", "special_district"])
 export const polityPeriodKind = pgEnum("polity_period_kind", ["constitutional_order", "military_rule", "occupation", "transitional"])
@@ -1042,7 +1042,7 @@ export const partyRelation = pgTable("party_relation", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-check("party_relation_check", sql`((kind = 'closed_by_court'::party_relation_kind) = (to_party_id IS NULL))`),]);
+check("party_relation_check", sql`(((kind)::text = ANY (ARRAY['closed_by_court'::text, 'closed_by_government'::text])) = (to_party_id IS NULL))`),]);
 
 export const person = pgTable("person", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
