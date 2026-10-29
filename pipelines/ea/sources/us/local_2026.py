@@ -4818,8 +4818,8 @@ def parse() -> None:
                         and role in ("council", "commission", "board-of-directors")
                         else "At-Large"
                         if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
-                        else f"Place {slot[1]}"
-                        if state == "TX" and role == "board-of-education" and (slot := re.search(r"\bplace (\d+)\b", post))
+                        else f"{slot[1].title()} {slot[2]}"
+                        if state == "TX" and role == "board-of-education" and (slot := re.search(r"\b(place|position) (\d+)\b", post))
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
                         if state in ("CA", "UT", "MD")
                         and (
