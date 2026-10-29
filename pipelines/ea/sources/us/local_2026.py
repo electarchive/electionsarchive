@@ -2284,7 +2284,7 @@ def parse() -> None:
                 "seats": int(seats[1]) if seats else 0,
                 "name": cells[0],
                 "party": named,
-                "independent": independent,
+                "independent": independent or named is None and not re.sub(r"[()\s]", "", str(cells[1] or "")),
                 "unexpired": False,
             }
         )
