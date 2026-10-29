@@ -9,7 +9,7 @@ from ea.store import connect
 SOURCE = "us.judicial_2026"
 VERSION = "1"
 ROWS = Path(__file__).with_name("judicial_2026.tsv")
-PARTIES = {"Democrat": "democratic-party", "Republican": "republican-party"}
+PARTIES = {"Democrat": "democratic-party", "Democratic": "democratic-party", "Republican": "republican-party"}
 
 
 def read() -> list[dict[str, str]]:
@@ -18,7 +18,7 @@ def read() -> list[dict[str, str]]:
 
 
 def fetch() -> None:
-    for url in sorted({row["url"] for row in read()}):
+    for url in sorted({row["source"] for row in read()}):
         raw.fetch(SOURCE, url, suffix=Path(urlparse(url).path).suffix or ".html")
 
 
@@ -38,7 +38,7 @@ def emit() -> Path:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         sources = {}
-        for url in sorted({row["url"] for row in rows}):
+        for url in sorted({row["source"] for row in rows}):
             host = urlparse(url).netloc.removeprefix("www.")
             sources[url] = cs.source(host, f"2026 general election judicial candidates ({url})")
             if sources[url] in cs.minted:
@@ -73,11 +73,11 @@ def emit() -> Path:
                     [rf":{state}:[a-z-]*(supreme|appeal)"],
                 ).fetchall():
                     known[state].setdefault(slug(text), set()).add(person)
-            title = row["title"]
+            title = row["office"]
             seat = row["seat"]
             retention = row["kind"] == "retention"
-            stub = f"{slug(title)}{f':seat-{slug(seat)}' if seat else ''}"
-            key = f"2026-11-03:{state}:{stub}" + (f":{slug(row['candidate'])}" if retention and not seat else "")
+            stub = f"{slug(title)}{f':{slug(seat)}' if seat else ''}"
+            key = f"2026-11-03:{state}:{stub}" + (f":{slug(row['candidate'])}" if retention else "")
             polity = cs.polity(f"US-{state}")
             area = conn.execute(
                 """select u.area_id from polity p
@@ -113,15 +113,15 @@ def emit() -> Path:
                     electoral_system_id=cs.key("us.electoral_system", "retention" if retention else "fptp"),
                     default_result_kind="counted",
                 )
-                label = f"{title}{f', Seat {seat}' if seat else ''}"
+                label = f"{title}{f', {seat}' if seat else ''}"
                 name(contest, f"2026 {state} {label}{' retention election' if retention else ' election'}")
                 cs.add(
                     "slug",
                     path=f"us/{state.lower()}/2026-11-03-general/{slug(label)}"
-                    + (f"-{slug(row['candidate'])}" if retention and not seat else ""),
+                    + (f"-{slug(row['candidate'])}" if retention else ""),
                     entity_id=contest,
                 )
-                cs.add("citation", entity_id=contest, source_id=sources[row["url"]], locator=None)
+                cs.add("citation", entity_id=contest, source_id=sources[row["source"]], locator=None)
                 counts["contests"] += 1
             text = row["candidate"]
             pool = known[state].get(slug(text), set())
@@ -153,7 +153,7 @@ def emit() -> Path:
                 ballot_name=text,
                 is_independent=False,
             )
-            cs.add("citation", entity_id=candidacy, source_id=sources[row["url"]], locator=None)
+            cs.add("citation", entity_id=candidacy, source_id=sources[row["source"]], locator=None)
             counts["candidates"] += 1
         print(counts)
         return cs.write()
