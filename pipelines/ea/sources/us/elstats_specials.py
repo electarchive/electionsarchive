@@ -734,7 +734,7 @@ def emit() -> Path:
         ):
             label = STATES[state]
             key = (
-                f"{day}:{state}:house:{district}:{primary.lower()}"
+                f"{day}:{state}:house:{district}:{primary.lower()}" + (":runoff" if runoff else "")
                 if primary
                 else f"{day}:{state}:house:{district}:special" + (":runoff" if runoff else "")
             )
@@ -764,7 +764,7 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=election,
-                    text=f"{day:%B} {day.day}, {day.year} {label} special {'primary' if primary else 'runoff' if runoff else 'election'}",
+                    text=f"{day:%B} {day.day}, {day.year} {label} special {'primary runoff' if primary and runoff else 'primary' if primary else 'runoff' if runoff else 'election'}",
                     lang="en",
                     kind="official",
                     is_preferred=True,
@@ -794,7 +794,7 @@ def emit() -> Path:
                     (
                         previous
                         for earlier, previous in reversed(contests.items())
-                        if earlier.endswith(f":{state}:house:{district}:special")
+                        if earlier.endswith(f":{state}:house:{district}:{primary.lower() or 'special'}")
                     ),
                     None,
                 )
@@ -813,7 +813,7 @@ def emit() -> Path:
             cs.add(
                 "name",
                 entity_id=contest,
-                text=f"{day.year} U.S. House special {primary + ' primary' if primary else 'runoff' if runoff else 'election'} in {label}'s {ordinal} congressional district",
+                text=f"{day.year} U.S. House special {primary + ' primary' + (' runoff' if runoff else '') if primary else 'runoff' if runoff else 'election'} in {label}'s {ordinal} congressional district",
                 lang="en",
                 kind="official",
                 is_preferred=True,

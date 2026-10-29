@@ -1,5 +1,7 @@
+import io
 import re
 import subprocess
+import zipfile
 from datetime import UTC, datetime
 
 from ea import raw
@@ -10,10 +12,16 @@ INBOX = DATA / "inbox" / "manual" / "MF-288"
 WISCONSIN = "https://elections.wi.gov/elections/election-results/results-all#County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf"
 OREGON = "https://sos.oregon.gov/elections/Pages/electionsstatistics.aspx#2011%20Special%20Primary%20Election%20Official%20Results.PDF"
 ARKANSAS = "https://www.sos.arkansas.gov/elections/research/election-results#2001_Special_Primary_US_Congress_District_3.pdf"
+ARKANSAS_RUNOFFS = {
+    "Democratic": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-dem.zip",
+    "Republican": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-rep.zip",
+}
 FILES = {
     WISCONSIN: INBOX / "2020-02-18" / "County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf",
     OREGON: INBOX / "2011-11-08" / "2011 Special Primary Election Official Results.PDF",
     ARKANSAS: INBOX / "2001" / "2001_Special_Primary_US_Congress_District_3.pdf",
+    ARKANSAS_RUNOFFS["Democratic"]: INBOX / "2001" / "runoff24-dem.zip",
+    ARKANSAS_RUNOFFS["Republican"]: INBOX / "2001" / "runoff24-rep.zip",
 }
 WISCONSIN_CANDIDATES = {
     "DEMOCRATIC": ("Democratic", ["Tricia Zunker", "Lawrence Dale", "Scattering"]),
@@ -43,9 +51,9 @@ def fetch() -> None:
                 SOURCE,
                 url,
                 path.read_bytes(),
-                suffix=".pdf",
+                suffix=path.suffix.lower(),
                 retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
-                media_type="application/pdf",
+                media_type="application/zip" if path.suffix == ".zip" else "application/pdf",
             )
 
 
@@ -141,8 +149,25 @@ def rows() -> list[dict[str, object]]:
                 tally[hit[1]] = values
                 for column, count in zip(columns, values, strict=True):
                     add("AR", "2001-09-25", "3", "Democratic" if party == "Democrat" else party, ARKANSAS_CANDIDATES[column], hit[1], count)
+    for party, url in ARKANSAS_RUNOFFS.items():
+        with zipfile.ZipFile(io.BytesIO(raw.cached(SOURCE, url).path.read_bytes())) as archive:
+            lines = archive.read("runoff24.txt").decode("latin-1").replace("|Office|", "|\nOffice|").splitlines()
+        counties: list[str] = []
+        runoff: dict[str, list[int]] = {}
+        for line in lines:
+            cells = line.rstrip("|").split("|")
+            if cells[0] == "Office":
+                counties = [cell.removesuffix(" County") for cell in cells[3:]]
+            elif len(cells) == len(counties) + 3:
+                runoff[re.sub(r"^State (Senator|Representative) ", "", cells[1])] = [int(cell) for cell in cells[3:]]
+        winner = max(runoff, key=lambda name: sum(runoff[name]))
+        for name, values in runoff.items():
+            for county, count in zip(counties, values, strict=True):
+                add("AR", "2001-10-23", "3", party, name, county, count)
+                found[-1]["runoff"] = True
+                found[-1]["outcome"] = "Elected" if name == winner else "Defeated"
     for row in found:
-        if row["state"] == "AR":
+        if row["state"] == "AR" and not row["runoff"]:
             totals = {}
             for other in found:
                 if other["state"] == "AR" and other["primary"] == row["primary"]:
