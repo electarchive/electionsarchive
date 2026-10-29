@@ -98,6 +98,17 @@
   });
   const here = $derived(span?.forward === true ? span.from : span?.to);
   const there = $derived(span?.forward === true ? span.to : span?.from);
+  const isOneParty = $derived.by(() => {
+    const parties = rows.flatMap((row) => {
+      const option = row.current ?? row.earlier;
+      return option?.person == null ? [] : [option.party ?? null];
+    });
+    return (
+      parties.length > 1 &&
+      parties[0] != null &&
+      parties.every((party) => party === parties[0])
+    );
+  });
   const lines = $derived(
     rows.map((row) => {
       const before = span?.forward === true ? row.current : row.earlier;
@@ -108,8 +119,33 @@
           : [];
       const option = row.current ?? row.earlier;
       const outcome = row.current?.outcome ?? null;
+      const subtitle =
+        row.short != null &&
+        row.short !== row.label &&
+        !isOneParty &&
+        nominated.length === 0 &&
+        (span != null || (row.current?.lines.length ?? 0) === 0)
+          ? row.short
+          : null;
+      const isAbbreviated = subtitle != null && option?.person == null;
       return {
         row,
+        subtitle,
+        isAbbreviated,
+        isDouble:
+          (subtitle != null && !isAbbreviated) ||
+          (row.short == null &&
+            row.current?.person != null &&
+            row.current.isIndependent === true &&
+            !isOneParty) ||
+          (span != null &&
+            there != null &&
+            row.earlier?.label !== row.current?.label) ||
+          nominated.length > 0 ||
+          (span == null && row.supported.length > 0) ||
+          row.ballot != null ||
+          row.backed != null ||
+          row.origin != null,
         before,
         after,
         mark:
@@ -254,17 +290,7 @@
     ),
   );
   const isPictured = $derived(credits.length > 0);
-  const isOneParty = $derived.by(() => {
-    const parties = rows.flatMap((row) => {
-      const option = row.current ?? row.earlier;
-      return option?.person == null ? [] : [option.party ?? null];
-    });
-    return (
-      parties.length > 1 &&
-      parties[0] != null &&
-      parties.every((party) => party === parties[0])
-    );
-  });
+  const isDouble = $derived(shown.some((line) => line.isDouble));
   const sum = (keys: Set<string>) => {
     let total = 0;
     let current = 0;
@@ -483,13 +509,16 @@
     style:--party={swatch(row.color, row.key)}
   >
     <th
-      class={cn("px-2 py-1.5 text-start font-normal", {
-        "shadow-[inset_3px_0_0_var(--party)]": line.mark != null,
-      })}
+      class={cn(
+        "px-2 py-1.5 text-start font-normal [@media(width>=48rem)]:inline-full [@media(width>=48rem)]:max-inline-0",
+        { "shadow-[inset_3px_0_0_var(--party)]": line.mark != null },
+      )}
       scope="row"
     >
       <span
-        class={cn("flex items-center gap-2.5", { "min-block-9": isPictured })}
+        class={cn("flex items-center gap-2.5", {
+          "min-block-9": isPictured || isDouble,
+        })}
       >
         {#if row.photo != null}
           <img
@@ -528,75 +557,80 @@
             class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
           ></span>
         {/if}
-        <span class="flex-1 min-inline-0">
-          <Name
-            class="font-semibold text-foreground"
-            label={row.label}
-            color={swatch(row.color, row.key)}
-            hasSwatch={false}
-            person={(page ?? other)?.person}
-            party={(page ?? other)?.party}
-          />
-          {#if page?.isIncumbent === true && page.person != null}
-            <span class="ms-1 text-xs text-muted-foreground"
-              >{m.results_incumbent()}</span
-            >
-          {/if}
-          {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
-            <span class="ms-1 text-xs text-muted-foreground"
-              >{m.results_write_in()}</span
-            >
-          {/if}
-          {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
-            {#if page.note == null || page.isDeclined}
-              <span
-                class={cn("ms-1 px-1 text-xs font-semibold", {
-                  "rounded-xs bg-(--party) knockout": line.mark != null,
-                  "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
-                    page.isDeclined,
-                  "highlighter text-foreground":
-                    line.mark == null &&
-                    !page.isDeclined &&
-                    !LOST.has(page.outcome),
-                  "text-muted-foreground": LOST.has(page.outcome),
-                })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+        <span class="flex-1 min-inline-0 [@media(width>=48rem)]:*:truncate">
+          <span class="block"
+            ><Name
+              class="font-semibold text-foreground"
+              label={row.label}
+              color={swatch(row.color, row.key)}
+              hasSwatch={false}
+              person={(page ?? other)?.person}
+              party={(page ?? other)?.party}
+            />{#if line.isAbbreviated}&nbsp;<span
+                class="whitespace-nowrap text-muted-foreground"
+                >·&nbsp;{line.subtitle}</span
+              >{/if}
+            {#if page?.isIncumbent === true && page.person != null}
+              <span class="ms-1 text-xs text-muted-foreground"
+                >{m.results_incumbent()}</span
               >
-            {:else}
+            {/if}
+            {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
+              <span class="ms-1 text-xs text-muted-foreground"
+                >{m.results_write_in()}</span
+              >
+            {/if}
+            {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
+              {#if page.note == null || page.isDeclined}
+                <span
+                  class={cn("ms-1 px-1 text-xs font-semibold", {
+                    "rounded-xs bg-(--party) knockout": line.mark != null,
+                    "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
+                      page.isDeclined,
+                    "highlighter text-foreground":
+                      line.mark == null &&
+                      !page.isDeclined &&
+                      !LOST.has(page.outcome),
+                    "text-muted-foreground": LOST.has(page.outcome),
+                  })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+                >
+              {:else}
+                <Term
+                  class={cn("ms-1 px-1 text-xs font-semibold", {
+                    "rounded-xs bg-(--party) knockout": line.mark != null,
+                    "highlighter text-foreground":
+                      line.mark == null && !LOST.has(page.outcome),
+                    "text-muted-foreground": LOST.has(page.outcome),
+                  })}
+                  label={OUTCOMES[page.outcome]?.() ?? page.outcome}
+                  definition={explain(page.note)}
+                />
+              {/if}
+            {/if}
+            {#if page?.isDeclined === true}
               <Term
-                class={cn("ms-1 px-1 text-xs font-semibold", {
-                  "rounded-xs bg-(--party) knockout": line.mark != null,
-                  "highlighter text-foreground":
-                    line.mark == null && !LOST.has(page.outcome),
-                  "text-muted-foreground": LOST.has(page.outcome),
-                })}
-                label={OUTCOMES[page.outcome]?.() ?? page.outcome}
-                definition={explain(page.note)}
+                class="ms-1 text-xs text-muted-foreground"
+                label={m.outcome_declined()}
+                definition={page.note == null
+                  ? m.outcome_declined_definition()
+                  : explain(page.note)}
               />
             {/if}
-          {/if}
-          {#if page?.isDeclined === true}
-            <Term
-              class="ms-1 text-xs text-muted-foreground"
-              label={m.outcome_declined()}
-              definition={page.note == null
-                ? m.outcome_declined_definition()
-                : explain(page.note)}
-            />
-          {/if}
-          {#if line.isOverall && overall != null}
-            <Term
-              class="ms-1 rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
-              label={m.outcome_overall()}
-              definition={m.outcome_overall_definition({
-                place: definite(overall.place),
-              })}
-            />
-          {/if}
-          {#if row.short != null && !row.label.includes(row.short) && !isOneParty && !line.isNominated && (span != null || (page?.lines.length ?? 0) === 0)}
+            {#if line.isOverall && overall != null}
+              <Term
+                class="ms-1 rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
+                label={m.outcome_overall()}
+                definition={m.outcome_overall_definition({
+                  place: definite(overall.place),
+                })}
+              />
+            {/if}
+          </span>
+          {#if line.subtitle != null && !line.isAbbreviated}
             <span class="block text-[0.8125rem] text-pretty">
               <Name
                 class="text-muted-foreground"
-                label={row.short}
+                label={line.subtitle}
                 color={swatch(row.color, row.key)}
                 hasSwatch={false}
                 party={(page ?? other)?.party}
