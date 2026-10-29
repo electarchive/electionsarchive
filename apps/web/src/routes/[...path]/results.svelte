@@ -727,9 +727,17 @@
               aria-hidden="true"
             >
               <span
-                class="rounded-full bg-(--party)"
+                class="flex gap-px overflow-hidden rounded-full"
                 style:inline-size="{(page.share / topShare) * 100}%"
-              ></span>
+              >
+                {#each page.lines.length === 0 ? [page] : page.lines as part, index (index)}
+                  <span
+                    class="bg-(--party)"
+                    style:flex="{part.votes} 1 0%"
+                    style:opacity={Math.max(0.3, 0.55 ** index)}
+                  ></span>
+                {/each}
+              </span>
             </span>
           </span>
         {:else}
@@ -749,9 +757,17 @@
               aria-hidden="true"
             >
               <span
-                class="rounded-full bg-(--party)"
+                class="flex gap-px overflow-hidden rounded-full"
                 style:inline-size="{(page.share / topShare) * 100}%"
-              ></span>
+              >
+                {#each page.lines.length === 0 ? [page] : page.lines as part, index (index)}
+                  <span
+                    class="bg-(--party)"
+                    style:flex="{part.votes} 1 0%"
+                    style:opacity={Math.max(0.3, 0.55 ** index)}
+                  ></span>
+                {/each}
+              </span>
             </span>
           </span>
         {/if}
@@ -853,25 +869,62 @@
   </tr>
   {#if span == null && page != null}
     {#each page.lines as fused, index (index)}
+      {const isLast = $derived(index === page.lines.length - 1)}
       <tr
-        class={cn("text-[0.8125rem] text-muted-foreground", {
-          "border-be border-border/60": index === page.lines.length - 1,
-        })}
+        class={cn(
+          "text-[0.75rem] text-muted-foreground",
+          { "border-be border-border/60": isLast },
+          {
+            "bg-[color-mix(in_oklab,var(--party)_16%,var(--card))]":
+              line.mark === "won",
+            "bg-[color-mix(in_oklab,var(--party)_8%,var(--card))]":
+              line.mark === "advanced",
+          },
+        )}
+        style:--party={swatch(row.color, row.key)}
       >
-        <th class="ps-6.5 pe-2 pbe-1 text-start font-normal" scope="row">
-          {m.fusion_line({ name: fused.label })}
+        <th
+          class={cn("px-2 text-start font-normal", {
+            "shadow-[inset_3px_0_0_var(--party)]": line.mark != null,
+            "pbs-1": index === 0,
+            "pbe-2": isLast,
+            "pbe-0.5": !isLast,
+          })}
+          scope="row"
+        >
+          <span class="flex items-center gap-2.5">
+            <span
+              class={cn("grid shrink-0 place-items-center", {
+                "inline-7": isPictured,
+                "inline-2.5": !isPictured,
+              })}
+              aria-hidden="true"
+            >
+              <span
+                class="rounded-[1px] bg-(--party) block-1.5 inline-1.5"
+                style:opacity={Math.max(0.3, 0.55 ** index)}
+              ></span>
+            </span>
+            <span>{m.fusion_line({ name: fused.label })}</span>
+          </span>
         </th>
         {#if isReach}
           <td class="@max-[24rem]:hidden"></td>
         {/if}
         <td
-          class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+          class={cn(
+            "px-2 text-end font-figures whitespace-nowrap tabular-nums",
+            { "pbs-1": index === 0, "pbe-2": isLast, "pbe-0.5": !isLast },
+          )}
         >
           {count(fused.votes)}
         </td>
         {#if !isTally}
           <td
-            class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+            class={cn(
+              "px-2 text-end font-figures whitespace-nowrap tabular-nums",
+              { "pbs-1": index === 0, "pbe-2": isLast, "pbe-0.5": !isLast },
+            )}
           >
             {page.votes === 0
               ? ""
