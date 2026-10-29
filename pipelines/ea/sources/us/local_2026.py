@@ -981,6 +981,11 @@ FEEDS.update(
             "Johnson County Election Office",
             "Notice of Election (Candidates), November 3, 2026 General Election (revised)",
         ),
+        "FL-12009": (
+            "https://www.votebrevard.gov/Candidate-Information/2026-Candidates",
+            "Brevard County Supervisor of Elections",
+            "2026 Candidates",
+        ),
         "OR-41043-lyons": (
             "https://www.cityoflyons.org/",
             "City of Lyons",
@@ -1178,6 +1183,7 @@ DELIVERED = {
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
+    "FL-12009": DATA / "inbox" / "y26" / "fl" / "brevard.html",
     "KS-20091": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
     "KS-20091-prairie-village": DATA / "inbox" / "y26" / "ks" / "johnson.pdf",
     "OR-41019": DATA / "inbox" / "y26" / "or" / "douglas.pdf",
