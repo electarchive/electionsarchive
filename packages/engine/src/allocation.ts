@@ -1,6 +1,6 @@
 import type { Rules, Threshold } from "./rules.ts";
 
-type Entry = { id: string; votes: number };
+type Entry = { id: string; votes: number; won?: number };
 type Claim = { id: string; score: number; votes: number };
 type Allocating = Exclude<
   Rules,
@@ -82,20 +82,29 @@ function award(
 function byQuota(rules: Quota, seats: number, entries: Array<Entry>) {
   let total = 0;
   for (const { votes } of entries) total += votes;
-  const [numerator, denominator] = {
-    hare: [total, seats] as const,
-    droop: [Math.floor(total / (seats + 1)) + 1, 1] as const,
-    imperiali_quota: [total, seats + 2] as const,
-    reinforced_imperiali_quota: [total, seats + 3] as const,
-  }[rules.formula];
-  const automatic: Record<string, number> = {};
-  const claims: Array<Claim> = [];
-  for (const { id, votes } of entries) {
-    const won = Math.floor((votes * denominator) / numerator);
-    automatic[id] = won;
-    claims.push({ id, score: votes * denominator - won * numerator, votes });
+  const start =
+    rules.formula === "reinforced_imperiali_quota"
+      ? 3
+      : rules.formula === "imperiali_quota"
+        ? 2
+        : 0;
+  for (let extra = start; ; extra--) {
+    const [numerator, denominator] =
+      rules.formula === "droop"
+        ? [Math.floor(total / (seats + 1)) + 1, 1]
+        : [total, seats + extra];
+    const automatic: Record<string, number> = {};
+    const claims: Array<Claim> = [];
+    let awarded = 0;
+    for (const { id, votes } of entries) {
+      const won = Math.floor((votes * denominator) / numerator);
+      automatic[id] = won;
+      awarded += won;
+      claims.push({ id, score: votes * denominator - won * numerator, votes });
+    }
+    if (awarded <= seats || extra <= 0)
+      return { automatic, claims, quota: numerator / denominator };
   }
-  return { automatic, claims };
 }
 
 function byDivisor(
@@ -104,18 +113,20 @@ function byDivisor(
   entries: Array<Entry>,
 ) {
   const [slope, offset] = divisors[rules.formula];
-  const sequence = Array.from(
-    { length: slope === 0 ? 1 : seats },
-    (_, won) => slope * won + offset,
-  );
-  if (rules.formula === "modified_sainte_lague")
-    sequence[0] = rules.firstDivisor;
+  const isCompensatory =
+    "compensation" in rules && rules.compensation === "constituency_seats";
   const automatic: Record<string, number> = {};
   const claims: Array<Claim> = [];
-  for (const { id, votes } of entries) {
+  for (const { id, votes, won = 0 } of entries) {
     automatic[id] = 0;
-    for (const divisor of sequence)
+    const start = isCompensatory ? won : 0;
+    for (let k = start; k < start + (slope === 0 ? 1 : seats); k++) {
+      const divisor =
+        rules.formula === "modified_sainte_lague" && k === 0
+          ? rules.firstDivisor
+          : slope * k + offset;
       claims.push({ id, score: votes / divisor, votes });
+    }
   }
   return { automatic, claims };
 }
@@ -126,13 +137,17 @@ function byPool(
   entries: Array<Entry & { group?: string }>,
 ): Allocation {
   const pools = new Map<string, Array<Entry>>();
-  for (const { id, group = id, votes } of entries)
-    pools.set(group, [...(pools.get(group) ?? []), { id, votes }]);
+  for (const { id, group = id, votes, won } of entries)
+    pools.set(group, [...(pools.get(group) ?? []), { id, votes, won }]);
   const pooled: Array<Entry> = [];
   for (const [id, members] of pools) {
     let votes = 0;
-    for (const member of members) votes += member.votes;
-    pooled.push({ id, votes });
+    let won = 0;
+    for (const member of members) {
+      votes += member.votes;
+      won += member.won ?? 0;
+    }
+    pooled.push({ id, votes, won });
   }
   const unpooled = { ...rules, pooling: undefined };
   const first = allocate(unpooled, seats, pooled);
@@ -152,7 +167,7 @@ export function allocate(
 ): Allocation {
   if ("pooling" in rules && rules.pooling != null)
     return byPool(rules, seats, entries);
-  let start: ReturnType<typeof byQuota>;
+  let start: Pick<ReturnType<typeof byQuota>, "automatic" | "claims">;
   switch (rules.formula) {
     case "hare":
     case "droop":
@@ -183,6 +198,79 @@ export function allocate(
     seats: start.automatic,
     tie: isSlate && tie != null ? { ids: tie.ids, seats } : tie,
   };
+}
+
+export type Distribution = Allocation & {
+  districts: Record<string, Record<string, number>>;
+};
+
+export function distribute(
+  rules: Quota,
+  districts: Array<{ id: string; seats: number; entries: Array<Entry> }>,
+): Distribution {
+  const access = "remainderAccess" in rules ? rules.remainderAccess : undefined;
+  const placed: Record<string, Record<string, number>> = {};
+  const open = new Map<string, number>();
+  const totals = new Map<
+    string,
+    { votes: number; quotas: number; residual: number }
+  >();
+  const residuals: Array<{ district: string; id: string; residual: number }> =
+    [];
+  let remaining = 0;
+  for (const { id: district, seats, entries } of districts) {
+    const { automatic, quota } = byQuota(rules, seats, entries);
+    placed[district] = { ...automatic };
+    let left = seats;
+    for (const { id, votes } of entries) {
+      const won = automatic[id] ?? 0;
+      left -= won;
+      const residual = votes - won * quota;
+      residuals.push({ district, id, residual });
+      const total = totals.get(id) ?? { votes: 0, quotas: 0, residual: 0 };
+      total.votes += votes;
+      total.quotas += won;
+      total.residual += residual;
+      totals.set(id, total);
+    }
+    if (left < 0)
+      throw new Error(
+        `The ${rules.formula} quota awards more than ${seats} seats in ${district}`,
+      );
+    open.set(district, left);
+    remaining += left;
+  }
+  const pool: Array<Entry> = [];
+  for (const [id, { votes, quotas, residual }] of totals)
+    if (
+      (access?.quotas == null || quotas >= access.quotas) &&
+      (access?.votes == null || votes >= access.votes) &&
+      residual > 0
+    )
+      pool.push({ id, votes: residual });
+  const national =
+    remaining > 0 && pool.length > 0
+      ? allocate({ formula: "hare", tieBreak: rules.tieBreak }, remaining, pool)
+      : { seats: {} };
+  const seats: Record<string, number> = {};
+  for (const [id, { quotas }] of totals)
+    seats[id] = quotas + (national.seats[id] ?? 0);
+  const owed = new Map(Object.entries(national.seats));
+  const order = residuals.toSorted((a, b) => b.residual - a.residual);
+  for (let isMoving = true; isMoving;) {
+    isMoving = false;
+    for (const { district, id } of order) {
+      const left = open.get(district) ?? 0;
+      const due = owed.get(id) ?? 0;
+      const won = placed[district];
+      if (left === 0 || due === 0 || won == null) continue;
+      won[id] = (won[id] ?? 0) + 1;
+      open.set(district, left - 1);
+      owed.set(id, due - 1);
+      isMoving = true;
+    }
+  }
+  return { seats, tie: national.tie, districts: placed };
 }
 
 export function qualify(
@@ -272,9 +360,12 @@ export function apportion(
     threshold.exempt?.includes(id) === true ||
     (group != null && threshold.exempt?.includes(group) === true);
   const coalitions = new Map<string, Array<Entry>>();
-  for (const { id, votes, group } of entries)
+  for (const { id, votes, won, group } of entries)
     if (group != null)
-      coalitions.set(group, [...(coalitions.get(group) ?? []), { id, votes }]);
+      coalitions.set(group, [
+        ...(coalitions.get(group) ?? []),
+        { id, votes, won },
+      ]);
   const pooled = new Map<string, number>();
   for (const [group, members] of coalitions) {
     let votes = 0;
@@ -331,11 +422,13 @@ export function apportion(
     const admitted = list.filter(({ id }) => qualified.has(id));
     if (admitted.length === 0) continue;
     members.set(group, admitted);
-    contenders.push({ id: group, votes: pooled.get(group) ?? 0 });
+    let won = 0;
+    for (const member of admitted) won += member.won ?? 0;
+    contenders.push({ id: group, votes: pooled.get(group) ?? 0, won });
   }
-  for (const { id, votes, group } of entries)
+  for (const { id, votes, won, group } of entries)
     if (qualified.has(id) && (group == null || !standing.has(group)))
-      contenders.push({ id, votes });
+      contenders.push({ id, votes, won });
   const plain = {
     ...rules,
     pooling: undefined,

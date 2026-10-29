@@ -3,6 +3,8 @@ export {
   type Allocation,
   apportion,
   type Apportionment,
+  type Distribution,
+  distribute,
   qualify,
 } from "./allocation.ts";
 export {
