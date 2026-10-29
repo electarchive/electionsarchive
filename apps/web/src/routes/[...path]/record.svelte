@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import { MediaQuery } from "svelte/reactivity";
+  import { stand } from "#lib/caucus.js";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
@@ -91,19 +92,26 @@
       isSeated: false,
       isPartial: false,
       parties: point.parties.map((entry) => ({
-        party: entry.party,
+        party:
+          entry.party == null && entry.isIndependent === true
+            ? "independent"
+            : entry.party,
         seats: entry.seats,
       })),
       election: { name: point.name, path: point.path, date: point.date },
     })),
   );
-  const held = $derived(
-    (record.data?.parties ?? []).map((party) => ({
+  const held = $derived([
+    ...(record.data?.parties ?? []).map((party) => ({
       ...party,
       isStriped: false,
       isMade: false,
     })),
-  );
+    ...stand(
+      terms.flatMap((term) => term.parties.map((entry) => entry.party)),
+      record.data?.parties ?? [],
+    ),
+  ]);
   const band = $derived(cabinets.length > 0 ? 22 : 0);
   const height = $derived((isSingle ? 96 : 240) + band);
   const step = $derived(
