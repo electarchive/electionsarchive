@@ -1722,6 +1722,8 @@
   "person_lede_upcoming": "Next on the ballot {date}.",
   "person_served": "Served in",
   "person_served_span": "{from}–{to}",
+  "person_served_span_unrecorded": "{from} (date not recorded) – {to}",
+  "person_served_unrecorded": "From {from} (date not recorded)",
   "person_served_now": "{from}–present",
   "person_served_from": "From {from}",
   "person_seat": "{place}, {span}",

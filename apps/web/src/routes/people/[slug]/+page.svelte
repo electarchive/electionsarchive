@@ -182,6 +182,7 @@
     color: string;
     from: string | null;
     to: string | null;
+    isFromUnknown: boolean;
   }>();
   const month = (value: string) =>
     new Intl.DateTimeFormat(getLocale(), {
@@ -215,6 +216,7 @@
     spans?: Array<{
       from: string | null;
       to: string | null;
+      isFromUnknown?: boolean;
       parties: Array<{
         from: string | null;
         to: string | null;
@@ -302,6 +304,10 @@
                       color,
                       from: held.from,
                       to: held.to,
+                      isFromUnknown:
+                        "isFromUnknown" in part &&
+                        part.isFromUnknown === true &&
+                        index === 0,
                     }}
                     tabindex={-1}
                   >
@@ -768,12 +774,19 @@
               ? payload.to == null
                 ? ""
                 : month(payload.to)
-              : payload.to == null
-                ? since({ from: month(payload.from) })
-                : m.person_served_span({
-                    from: month(payload.from),
-                    to: month(payload.to),
-                  })}</span
+              : payload.isFromUnknown
+                ? payload.to == null
+                  ? m.person_served_unrecorded({ from: month(payload.from) })
+                  : m.person_served_span_unrecorded({
+                      from: month(payload.from),
+                      to: month(payload.to),
+                    })
+                : payload.to == null
+                  ? since({ from: month(payload.from) })
+                  : m.person_served_span({
+                      from: month(payload.from),
+                      to: month(payload.to),
+                    })}</span
           >
         </Tooltip.Content>
       {/if}

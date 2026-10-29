@@ -19750,11 +19750,17 @@ export const bodies = {
               region: string | null;
               from: string | null;
               to: string | null;
+              fromPrecision: string;
+              sizes: Array<{ seats: number; from: string; to: string | null }>;
               acquired: string;
               ended: string | null;
               isVoting: boolean;
             }>(sql`
               select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
+                t.from_precision::text as "fromPrecision",
+                (select coalesce(json_agg(json_build_object('seats', z.seats, 'from', lower(z.valid)::text,
+                    'to', upper(z.valid)::text)), '[]') from body_size z where z.body_id = ${input.id}::uuid
+                  and z.valid && daterange(${start}::date, ${end}::date)) as sizes,
                 coalesce(s.voting, true) as "isVoting",
                 case when t.acquired_via = 'elected' and t.contest_id is null and t.succeeds_tenure_id is not null
                   then 'by_election' else t.acquired_via::text end as acquired,
@@ -19805,6 +19811,52 @@ export const bodies = {
                 and coalesce(t.to_date, 'infinity'::date) > ${start}::date
               order by t.from_date, t.person_id
             `);
+      let kept = seated?.rows ?? [];
+      const sizes = kept[0]?.sizes ?? [];
+      const size = (day: string) =>
+        sizes.find(
+          (entry) => entry.from <= day && (entry.to == null || entry.to > day),
+        )?.seats ?? Infinity;
+      if (start != null) {
+        const serving = (day: string) =>
+          kept.filter(
+            (row) =>
+              row.isVoting &&
+              (row.from == null || row.from <= day) &&
+              (row.to == null || row.to > day),
+          ).length;
+        const over = [
+          start,
+          ...new Set(
+            kept.flatMap((row) =>
+              row.from != null &&
+              row.from > start &&
+              (end == null || row.from < end)
+                ? [row.from]
+                : [],
+            ),
+          ),
+        ].find((day) => serving(day) > size(day));
+        if (over != null) {
+          const cutoff = new Date(
+            Date.parse(over) +
+              Date.parse(end ?? new Date().toISOString().slice(0, 10)) -
+              Date.parse(start),
+          )
+            .toISOString()
+            .slice(0, 10);
+          console.warn(
+            `bodies.members: ${input.id} seats ${serving(over)} members on ${over}, more than its ${size(over)} seats; leaving out unknown-start tenures ending after ${cutoff}`,
+          );
+          kept = kept.filter(
+            (row) =>
+              !(
+                (row.from == null || row.fromPrecision === "unknown") &&
+                (row.to == null || row.to > cutoff)
+              ),
+          );
+        }
+      }
       const returned =
         seated == null || seated.rows.length === 0
           ? await db.execute<{
@@ -19838,7 +19890,7 @@ export const bodies = {
           : null;
       const rows =
         returned == null
-          ? (seated?.rows ?? [])
+          ? kept
           : returned.rows.map((row) => ({
               ...row,
               caucuses: [],
@@ -20096,6 +20148,7 @@ export const people = {
               v.object({
                 from: v.nullable(v.string()),
                 to: v.nullable(v.string()),
+                isFromUnknown: v.boolean(),
                 parties: v.array(Held),
               }),
             ),
@@ -20452,6 +20505,7 @@ export const people = {
         isBody: boolean;
         from: string | null;
         to: string | null;
+        isFromUnknown: boolean;
         place: string | null;
         via: string | null;
       }>(sql`
@@ -20461,7 +20515,7 @@ export const people = {
           select em.entity_id from entity_merge em join ids on em.into_id = ids.id
         )
         select coalesce(t.body_id, t.office_id) as owner, t.body_id is not null as "isBody",
-          t.from_date::text as from, t.to_date::text as to,
+          t.from_date::text as from, t.to_date::text as to, t.from_precision = 'unknown' as "isFromUnknown",
           case when t.ended_via not in ('term_end', 'dissolved') then t.ended_via::text end as via,
           coalesce((select k.district_area_id from contest k where k.id = t.contest_id), t.contest_id) as place
         from tenure t where t.person_id in (select id from ids)
@@ -20988,6 +21042,7 @@ export const people = {
               spans: group.map((spell) => ({
                 from: spell.from,
                 to: spell.to,
+                isFromUnknown: spell.isFromUnknown,
                 parties: (painted.get(spell) ?? []).map((segment) => ({
                   ...segment,
                   party:
