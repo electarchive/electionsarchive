@@ -712,6 +712,16 @@ FEEDS = {
         "Harris County Clerk",
         "November 3, 2026 General and Special Elections Sample Ballot",
     ),
+    "MO-29225": (
+        "https://webstercountymo.gov/wp-content/uploads/2026/09/Webster-Publication-110326.pdf",
+        "Webster County Clerk",
+        "Sample Ballot, General Election, Tuesday, November 3, 2026",
+    ),
+    "IL-17037": (
+        "https://dekalbcountyclerkil.gov/wp-content/uploads/2026/07/11032026LocalCandidates.pdf",
+        "DeKalb County Clerk and Recorder",
+        "November 3, 2026 General Election - Local Candidates (updated 6/3/2026)",
+    ),
     "TX-48085": (
         "https://www.wylieisd.net/our-district/school-board/board-elections",
         "Wylie Independent School District",
@@ -1537,6 +1547,8 @@ DELIVERED = {
     "MT-30067": DATA / "inbox" / "y26" / "mt" / "park.pdf",
     "TX-48491-rr": DATA / "inbox" / "manual" / "MF-282" / "20261103 November JGSE - COMPREHENSIVE BALLOT.pdf",
     "TX-48201": DATA / "inbox" / "manual" / "MF-282" / "1126_Yellow Sample Ballot ENG-SPA for Website Posting.pdf",
+    "MO-29225": DATA / "inbox" / "y26" / "mo" / "webster.pdf",
+    "IL-17037": DATA / "inbox" / "y26" / "il" / "dekalb.pdf",
     "TX-48085": DATA / "inbox" / "y26" / "tx" / "wylie.html",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
@@ -4805,6 +4817,8 @@ def parse() -> None:
                         and role in ("council", "commission", "board-of-directors")
                         else "At-Large"
                         if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
+                        else f"Place {slot[1]}"
+                        if state == "TX" and role == "board-of-education" and (slot := re.search(r"\bplace (\d+)\b", post))
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
                         if state in ("CA", "UT", "MD")
                         and (
