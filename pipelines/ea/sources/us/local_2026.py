@@ -702,6 +702,16 @@ FEEDS = {
         "Park County Clerk and Recorder",
         "2026 Park County Candidates",
     ),
+    "TX-48491-rr": (
+        "https://www.wilco.org/Departments/Elections",
+        "Williamson County Elections",
+        "November 3, 2026 Joint General and Special Election Comprehensive Sample Ballot",
+    ),
+    "TX-48201": (
+        "https://www.harrisvotes.com/",
+        "Harris County Clerk",
+        "November 3, 2026 General and Special Elections Sample Ballot",
+    ),
     "TX-48085": (
         "https://www.wylieisd.net/our-district/school-board/board-elections",
         "Wylie Independent School District",
@@ -1525,6 +1535,8 @@ DELIVERED = {
     "MT-30013": DATA / "inbox" / "y26" / "mt" / "cascade.pdf",
     "WY-56025": DATA / "inbox" / "y26" / "wy" / "natrona.pdf",
     "MT-30067": DATA / "inbox" / "y26" / "mt" / "park.pdf",
+    "TX-48491-rr": DATA / "inbox" / "manual" / "MF-282" / "20261103 November JGSE - COMPREHENSIVE BALLOT.pdf",
+    "TX-48201": DATA / "inbox" / "manual" / "MF-282" / "1126_Yellow Sample Ballot ENG-SPA for Website Posting.pdf",
     "TX-48085": DATA / "inbox" / "y26" / "tx" / "wylie.html",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
