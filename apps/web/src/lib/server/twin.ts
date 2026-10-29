@@ -2474,7 +2474,7 @@ function electionMarkdown(
       const until = new Date(Date.parse(election.date) + 120 * 86_400_000)
         .toISOString()
         .slice(0, 10);
-      const found = body.makeup
+      const latest = body.makeup
         .filter(
           (entry) =>
             election.date != null &&
@@ -2484,6 +2484,17 @@ function electionMarkdown(
         )
         .toSorted((a, b) => a.start.localeCompare(b.start))
         .at(-1);
+      let held = 0;
+      for (const party of latest?.parties ?? []) {
+        held += party.seats;
+      }
+      const size = body.sizes.find(
+        (entry) =>
+          latest != null &&
+          (entry.from == null || entry.from <= latest.start) &&
+          (entry.to == null || entry.to > latest.start),
+      )?.seats;
+      const found = size != null && held < size * 0.9 ? undefined : latest;
       const unelected =
         races.find((race) => (race.unelected ?? []).length > 0)?.unelected ??
         [];
