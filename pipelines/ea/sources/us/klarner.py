@@ -454,7 +454,9 @@ def emit() -> Path | str:
                 return cs.key("us.party", "democratic-party"), False
             if partyz == "r" and label not in STATE_PARTIES:
                 return cs.key("us.party", "republican-party"), False
-            if label is None or partyz in ("w", "b", "m", "np"):
+            if partyz == "np":
+                return None, False
+            if label is None or partyz in ("w", "b", "m"):
                 return None, label in INDEPENDENT
             if label in INDEPENDENT:
                 return None, True

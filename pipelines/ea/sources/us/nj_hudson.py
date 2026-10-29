@@ -21,10 +21,15 @@ BOOKS = (
         date(2023, 11, 7),
         "2023-general/Hudson-County-November-7-2023-General-Election-Official-Results-by-MWD-Results-with-Voting-Method-2.pdf",
     ),
+    (date(2022, 11, 8), "2022-general/November-2022-General-Election-Official-Results-Municipality-Ward-District.pdf"),
+    (
+        date(2025, 12, 2),
+        "2025-runoff/2025-General-Election-Runoff-Official-MWD-Results-with-Contest-Level-and-Voting-Method-Details.pdf",
+    ),
     (date(2024, 11, 5), "2024-general/2024-General-Election-MWD-Results-with-Voting-Method-Details-Official.pdf"),
     (date(2025, 11, 4), "2025-general/MWD-Results-with-Contest-Level-and-voting-Method-Details.pdf"),
 )
-PAGE = re.compile(r"<page [^>]*>(.*?)</page>", re.S)
+PAGE = re.compile(r"<page [^>]*>(.*?)</page>", re.DOTALL)
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
 NUMBER = re.compile(r"^\d[\d,]*$")
 DISTRICT = re.compile(r"^\d+[A-Z]?$")
@@ -115,7 +120,9 @@ def pages(path: Path) -> Iterator[dict[str, Any]]:
         head = [
             (x, y, w)
             for x, y, w in words
-            if x > 148 and top + 25 < y < first_y - 3 and w not in ("Registered", "Voters", "Ballots", "Cast", "Total")
+            if x > 148
+            and top + 25 < y < first_y - 3
+            and w not in ("Registered", "Voters", "Ballots", "Cast", "Total")
             and not NUMBER.match(w)
         ]
         if not head:
@@ -183,7 +190,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             if found := WARD.match(text):
                 text = f"{found['place']} Council Member Ward {found['ward']}"
             elif found := KINDS.match(text):
-                text = f"{found['kind'].title()} of {found['place'].title()} {found['office']}"
+                text = f"{found['kind'].title()} of {found['place'].title()} {re.sub(r' - .+$', '', found['office'])}"
             choices = []
             for position, label in enumerate(node["names"]):
                 party = None
@@ -192,7 +199,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 if split:
                     party = split[1] if split[1] in PARTIES else None
                     person = split[2]
-                if re.match(r"(?i)^write.?in$", person):
+                if re.match(r"(?i)^write.?in(?: totals)?$", person):
                     person, party = "Write-ins", None
                 choices.append(
                     {
@@ -207,7 +214,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             "tenant": tenant,
             "election": f"{day.year}:{Path(name).name[:40]}",
             "day": day,
-            "title": f"{day.year} general election",
+            "title": f"{day.year} general election" + (" runoff" if day.month == 12 else ""),
             "official": True,
             "primary": False,
             "contests": nodes,

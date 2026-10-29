@@ -17,6 +17,38 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 FIPS = "06037"
 RESULTS = "https://results.lavote.gov/ElectionResults"
+DISTRICT_MAPS = "https://public.gis.lacounty.gov/arcgis/rest/services/RRCC/District_Maps_EGIS/MapServer"
+DISTRICT_QUERY = "{base}/{layer}/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
+SHAPES = {
+    "Altadena Library District": (51, "ALTADENA LIBRARY"),
+    "Antelope Valley Healthcare District": (45, "ANTELOPE VALLEY HEALTH CARE"),
+    "Antelope Valley-East Kern Water Agency": (62, "ANTELOPE VALLEY E KERN WATER AGENCY"),
+    "Beach Cities Health District": (45, "BEACH CITIES HEALTH CARE"),
+    "Central Basin Municipal Water District": (54, "CENTRAL BASIN MUNICIPAL WATER"),
+    "Crescenta Valley Water District": (40, "CRESCENTA VALLEY COUNTY WATER"),
+    "Kinneloa Irrigation District": (50, "KINNELOA IRRIGATION"),
+    "La Habra Heights County Water District": (40, "LA HABRA HEIGHTS COUNTY WATER"),
+    "La Puente Valley County Water District": (40, "LA PUENTE VALLEY COUNTY WATER"),
+    "Las Virgenes Municipal Water District": (54, "LAS VIRGENES MUNICIPAL WATER"),
+    "Mountains Recreation and Conservation Authority": (55, "MOUNTAINS RECREATION AND CONSERVATION AUTHORITY"),
+    "Orchard Dale Water District": (40, "ORCHARD DALE WATER"),
+    "Palmdale Water District": (50, "PALMDALE WATER"),
+    "Palos Verdes Library District": (51, "PALOS VERDES LIBRARY"),
+    "Pico Water District": (40, "PICO WATER"),
+    "Puente Hills Habitat Preservation Authority": (56, "PUENTE HILLS HABITAT PRESERVATION AUTHORITY"),
+    "Quartz Hill Water District": (40, "QUARTZ HILL WATER"),
+    "Rowland Water District": (40, "ROWLAND WATER"),
+    "San Gabriel County Water District": (40, "SAN GABRIEL COUNTY WATER"),
+    "San Gabriel Valley Municipal Water District": (54, "SAN GABRIEL VALLEY MUNICIPAL WATER"),
+    "Santa Clarita Valley Water Agency": (62, "SANTA CLARITA VALLEY WATER AGENCY"),
+    "Sativa-Los Angeles County Water District": (40, "SATIVA LOS ANGELES COUNTY WATER"),
+    "Three Valleys Municipal Water District": (54, "THREE VALLEYS MUNICIPAL WATER"),
+    "Upper San Gabriel Valley Municipal Water District": (54, "UPPER SAN GABRIEL VALLEY MUNICIPAL WATER"),
+    "Valley County Water District": (40, "VALLEY COUNTY WATER"),
+    "Walnut Valley Water District": (35, "WALNUT VALLEY WATER"),
+    "Water Replenishment District of Southern California": (64, "WATER REPLENISHMENT DISTRICT OF SO CAL"),
+    "West Basin Municipal Water District": (54, "WEST BASIN MUNICIPAL WATER"),
+}
 NUMBERS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
 PLACE = "LOS ANGELES"
 NOTE = (
@@ -67,6 +99,71 @@ CITIES = {
     "SOUTH GATE": "South Gate",
     "TORRANCE": "Torrance",
 }
+ADDITIONAL_CITIES = {
+    "EL MONTE": "Montebello",
+    "MONTEBELLO": "CULVER",
+    "Culver City": "SO PASADENA",
+    "South Pasadena": "DOWNEY",
+    "Downey": "PALMDALE",
+    "Palmdale": "WEST COVINA",
+    "West Covina": "HAWTHORNE",
+    "Hawthorne": "HERMOSA BEACH",
+    "Hermosa Beach": "HEMOSA BEACH",
+    "Hermosa Beach": "HERMOSA BCH",
+    "Hermosa Beach": "REDONDO BEACH",
+    "Redondo Beach": "AZUSA",
+    "Azusa": "DUARTE",
+    "Duarte": "BALDWIN PARK",
+    "Baldwin Park": "CLAREMONT",
+    "Claremont": "CUDAHY",
+    "Cudahy": "SO EL MONTE",
+    "South El Monte": "ALHAMBRA",
+    "Alhambra": "MANHATTAN BEACH",
+    "Manhattan Beach": "MAYWOOD",
+    "Maywood": "SIGNAL HILL",
+    "Signal Hill": "BELLFLOWER",
+    "Bellflower": "BURBANK",
+    "Burbank": "LAWNDALE",
+    "Lawndale": "MONROVIA",
+    "Monrovia": "ARCADIA",
+    "Arcadia": "ARTESIA",
+    "Artesia": "HUNTINGTON PARK",
+    "Huntington Park": "HUNTINGTON PK",
+    "Huntington Park": "MALIBU",
+    "Malibu": "SAN DIMAS",
+    "San Dimas": "EL SEGUNDO",
+    "El Segundo": "PICO RIVERA",
+    "Pico Rivera": "SAN GABRIEL",
+    "San Gabriel": "DIAMOND BAR",
+    "Diamond Bar": "LA MIRADA",
+    "La Mirada": "LA VERNE",
+    "La Verne": "W HOLLYWOOD",
+    "West Hollywood": "WEST HOLLYWOOD",
+    "West Hollywood": "HAWAIIAN GARDENS",
+    "Hawaiian Gardens": "NORWALK",
+    "Norwalk": "SANTA FE SPRINGS",
+    "Santa Fe Springs": "CALABASAS",
+    "Calabasas": "IRWINDALE",
+    "Irwindale": "SANTA CLARITA",
+    "Santa Clarita": "TEMPLE",
+    "Temple City": "AGOURA HILLS",
+    "Agoura Hills": "GLENDORA",
+    "Glendora": "LANCASTER",
+    "Lancaster": "WHITTIER",
+    "Whittier": "HIDDEN HILLS",
+    "Hidden Hills": "LA HABRA HEIGHTS",
+    "La Habra Heights": "ROLLING HILLS EST",
+    "Rolling Hills Estates": "ROLLING HILLS",
+    "Rolling Hills": "LA CAÑADA FLNTRDG",
+    "La Cañada Flintridge": "LA CANADA FLNTRDG",
+    "La Cañada Flintridge": "MONTEREY PK",
+    "Monterey Park": "WALNUT",
+    "Walnut": "CERRITOS",
+    "Cerritos": "ROSEMEAD",
+    "Rosemead": "W LAKE VILLAGE",
+    "Westlake Village": "BEV HILLS",
+}
+CITIES |= {k: v for k, v in ADDITIONAL_CITIES.items() if k not in CITIES}
 CITY_SUFFIX = r"(?:CITY GEN(?: MUNI?)?|CITY|CTY GEN|CTY|CY)"
 SCHOOLS = {
     "BONITA UNIFIED SCHOOL": "Bonita Unified School District",
@@ -294,6 +391,8 @@ def fetch() -> None:
         for found in json.loads(listing.read_bytes())["Data"]:
             raw.fetch(SOURCE, f"{RESULTS}/GetElectionData?electionID={found['ID']}", suffix=".json")
             time.sleep(1)
+    for layer in sorted({layer for layer, _ in SHAPES.values()}):
+        raw.fetch(SOURCE, DISTRICT_QUERY.format(base=DISTRICT_MAPS, layer=layer), suffix=".json")
 
 
 def seat_counts() -> tuple[dict[tuple[date, bool], list[tuple[str, int]]], set[tuple[date, str]], list[raw.Artifact]]:
@@ -453,6 +552,19 @@ def emit() -> Path:
                 continue
             made[(kind, text)] = found
 
+        county_polity = conn.execute(
+            "select entity_id from external_id where scheme = 'us.polity' and value = 'county:06037'"
+        ).fetchone()[0]
+        own_polities = {
+            pid
+            for (pid,) in conn.execute(
+                "select p.id from polity p join changeset c on c.id = p.changeset_id where c.pipeline = %s", [SOURCE]
+            ).fetchall()
+        }
+        for (kind, text), (pid, code, _) in made.items():
+            if kind == "special" and pid in own_polities and text not in PARTIAL_DISTRICTS:
+                cs.add("polity_parent", polity_id=pid, parent_id=county_polity)
+
         for (kind, text), (pid, code, path) in made.items():
             if pid in territories or not code.startswith(("special:06037:", "school:06:")):
                 continue
@@ -465,6 +577,53 @@ def emit() -> Path:
             cs.add("polity_territory", polity_id=pid, area_id=area)
             territories[pid] = area
             own_areas.add(area)
+        maps_source = cs.source(
+            "Los Angeles County Registrar-Recorder/County Clerk", "District maps (public.gis.lacounty.gov)"
+        )
+        if maps_source in cs.minted:
+            cs.add(
+                "source",
+                id=maps_source,
+                kind="official_body",
+                publisher="Los Angeles County Registrar-Recorder/County Clerk",
+                title="District maps (public.gis.lacounty.gov)",
+                url=DISTRICT_MAPS,
+                license="Public record",
+            )
+        layers: dict[int, list[dict[str, object]]] = {}
+        for layer in sorted({layer for layer, _ in SHAPES.values()}):
+            artifact = raw.cached(SOURCE, DISTRICT_QUERY.format(base=DISTRICT_MAPS, layer=layer))
+            cs.artifact(artifact, maps_source)
+            layers[layer] = json.loads(artifact.path.read_bytes())["features"]
+        for (kind, text), (pid, code, path) in made.items():
+            if text not in SHAPES or pid not in territories or territories[pid] not in own_areas:
+                continue
+            layer, label = SHAPES[text]
+            pieces = [
+                f["geometry"]
+                for f in layers[layer]
+                if label in {str(v) for v in f["properties"].values()} and f["geometry"] is not None
+            ]
+            polygons = [
+                coordinates
+                for piece in pieces
+                for coordinates in (piece["coordinates"] if piece["type"] == "MultiPolygon" else [piece["coordinates"]])
+            ]
+            if not polygons:
+                report[f"no shape: {text}"] = 0
+                continue
+            cs.add(
+                "area_geometry",
+                area_id=territories[pid],
+                valid_from=None,
+                geom=conn.execute(
+                    "select ST_AsGeoJSON(ST_Multi(ST_CollectionExtract(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)), 3)))",
+                    [json.dumps({"type": "MultiPolygon", "coordinates": polygons})],
+                ).fetchone()[0],
+                label_point=None,
+                quality="official",
+                source_id=maps_source,
+            )
         for pid, text, short in conn.execute(
             """select p.id, n.text, case n.text when 'Los Angeles Unified School District' then 'LAUSD'
                    when 'Los Angeles Community College District' then 'LACCD' end

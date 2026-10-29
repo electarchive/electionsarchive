@@ -35,12 +35,17 @@ def parse() -> None:
         (pl.col("chamber") == "house") | (pl.col("year") >= 2022)
     )
     president = medsl.precincts({("president", 2024): raw.cached(medsl.SOURCE, medsl.DATAVERSE + PRESIDENT[0]).path})
+    matched = [
+        pl.col("jurisdiction").str.strip_chars().str.to_uppercase().alias("match_jurisdiction"),
+        pl.col("precinct").str.strip_chars().str.to_uppercase().alias("match_precinct"),
+    ]
     districts = (
         congress.filter((pl.col("year") == 2024) & (pl.col("chamber") == "house") & pl.col("state").is_in(["ME", "NE"]))
-        .group_by("state", "code", "jurisdiction", "precinct")
+        .with_columns(matched)
+        .group_by("state", "code", "match_jurisdiction", "match_precinct")
         .agg(pl.col("district").unique())
         .filter(pl.col("district").list.len() == 1)
-        .select("state", "code", "jurisdiction", "precinct", pl.col("district").list.first())
+        .select("state", "code", "match_jurisdiction", "match_precinct", pl.col("district").list.first())
     )
     counties = (
         districts.group_by("state", "code")
@@ -51,10 +56,11 @@ def parse() -> None:
     split = (
         president.filter(pl.col("state").is_in(["ME", "NE"]))
         .drop("district")
-        .join(districts, on=["state", "code", "jurisdiction", "precinct"], how="left")
+        .with_columns(matched)
+        .join(districts, on=["state", "code", "match_jurisdiction", "match_precinct"], how="left")
         .join(counties, on=["state", "code"], how="left")
         .with_columns(district=pl.coalesce("district", "county_district"))
-        .drop("county_district")
+        .drop("county_district", "match_jurisdiction", "match_precinct")
     )
     if split["district"].null_count():
         print(
