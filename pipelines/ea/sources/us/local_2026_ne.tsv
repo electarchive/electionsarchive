@@ -57,7 +57,6 @@ NY	Erie County Legislature District 9	0	David M. Denz	Republican	Erie	1
 NY	Erie County Legislature District 10	0	Lindsay R. Lorigo	Republican	Erie	1
 NY	Erie County Legislature District 11	0	Zachary Beaudoin	Democratic	Erie	1
 NY	Erie County Legislature District 11	0	Scott J. Honer	Republican	Erie	1
-NY	Monroe County District Attorney	0	Brian Green	Democratic	Monroe	1
 NY	Onondaga County Court Judge	0	Jeffrey G. Leibo	Democratic	Onondaga	1
 NY	Onondaga County Court Judge	0	Matthew J. Doran	Republican	Onondaga	1
 NY	Onondaga County Legislature District 1	0	Justin K. Neal	Democratic	Onondaga	1
@@ -170,8 +169,6 @@ NY	Broome County Legislature District 15	0	Timothy D. Ames	Democratic	Broome	1
 NY	Broome County Legislature District 15	0	Philip A. Strawn	Republican	Broome	1
 NY	Broome County Sheriff	0	Matt Ryan	Democratic	Broome	1
 NY	Broome County Sheriff	0	Fred Akshar	Republican	Broome	1
-NY	Rensselaer County District Attorney	0	Mary Pat Donnelly	Democratic	Rensselaer	1
-NY	Rensselaer County Legislature District 4	1	William J. Film	Republican	Rensselaer	1
 NY	Chautauqua County Legislature District 1	0	Marcus Buchanan	Democratic	Chautauqua	1
 NY	Chautauqua County Legislature District 1	0	Colby Garza	Republican	Chautauqua	1
 NY	Chautauqua County Legislature District 2	0	Robert Bankoski	Democratic	Chautauqua	1
@@ -3080,3 +3077,147 @@ NJ-34029	Central Regional School District Board of Education	0	Michael GRAICHEN	
 NJ-34029	Southern Regional School District Board of Education	0	Paul METZGER	Nonpartisan	Ocean	3		Stafford
 NJ-34029	Southern Regional School District Board of Education	0	Heather TATUR	Nonpartisan	Ocean	3		Stafford
 NJ-34029	Pinelands Regional School District Board of Education	0	David HEWITT	Nonpartisan	Ocean	3		Tuckerton
+NY	Monroe County District Attorney	0	Brian Green	Democratic	Monroe	1
+NY	Brighton Town Supervisor	0	Nate Salzman	Democratic	Monroe	1
+NY	Brighton Town Clerk	0	Daniel E Aman	Democratic	Monroe	1
+NY	Chili Town Supervisor	0	Emily Kalouch	Democratic	Monroe	1
+NY	Chili Town Supervisor	0	David J Dunning	Republican	Monroe	1
+NY	Chili Town Clerk	0	Virginia L Ignatowski	Republican	Monroe	1
+NY	Clarkson Town Supervisor	0	Ursula Liotta	Republican	Monroe	1
+NY	Gates Town Supervisor	0	Nick Coffee	Democratic	Monroe	1
+NY	Gates Town Supervisor	0	Cosmo Giunta	Republican	Monroe	1
+NY	Greece Town Council Ward 1	0	Ryan J McDonald	Democratic	Monroe	1
+NY	Greece Town Council Ward 1	0	David DiPonzio	Republican	Monroe	1
+NY	Greece Town Council Ward 2	0	Frank Femia	Democratic	Monroe	1
+NY	Greece Town Council Ward 2	0	Spencer Bernard	Republican	Monroe	1
+NY	Greece Town Council Ward 3	0	Amorette Miller	Democratic	Monroe	1
+NY	Greece Town Council Ward 3	0	Megan Ferra	Republican	Monroe	1
+NY	Greece Town Council Ward 4	0	Rick Antelli, Jr	Republican	Monroe	1
+NY	Hamlin Town Supervisor	0	Sharon Martin Steigerwald	Democratic	Monroe	1
+NY	Hamlin Town Supervisor	0	Steven J Baase	Republican	Monroe	1
+NY	Henrietta Town Supervisor	0	Stephen L Schultz	Democratic	Monroe	1
+NY	Irondequoit Town Supervisor	0	John Perticone	Democratic	Monroe	1
+NY	Irondequoit Town Council (Unexpired 1 Year Term)	1	Steven Barz	Democratic	Monroe	1
+NY	Irondequoit Town Council (Unexpired 1 Year Term)	1	Michael Cotsworth	Republican	Monroe	1
+NY	Irondequoit Town Council (Unexpired Term Ending 2028)	1	Ryan Trevas	Democratic	Monroe	1
+NY	Irondequoit Town Council (Unexpired Term Ending 2028)	1	Daniel Gaiteri	Republican	Monroe	1
+NY	Irondequoit Town Council (Unexpired Term Ending 2028)	1	Kathryn J Walker	NY:working-families-party	Monroe	1
+NY	Mendon Town Supervisor	0	Joseph W Alati	Democratic	Monroe	1
+NY	Mendon Town Supervisor	0	Cynthia Gleason	Republican	Monroe	1
+NY	Mendon Town Clerk	0	Michelle Booth	Republican	Monroe	1
+NY	Mendon Town Highway Superintendent	0	Jeff Klein	Democratic	Monroe	1
+NY	Mendon Town Highway Superintendent	0	Peter Doyle	Republican	Monroe	1
+NY	Ogden Town Supervisor	0	Mike Zale	Republican	Monroe	1
+NY	Parma Town Supervisor	0	Linda Judd	Democratic	Monroe	1
+NY	Parma Town Supervisor	0	Dave Ciufo	Republican	Monroe	1
+NY	Parma Town Council (Unexpired 1 Year Term)	1	Stephanie Michalowski	Republican	Monroe	1
+NY	Parma Town Highway Superintendent	0	Jim Christ	Republican	Monroe	1
+NY	Penfield Town Supervisor	0	Kevin Berry	Democratic	Monroe	1
+NY	Penfield Town Supervisor	0	Andris E Silins	NY:conservative-party	Monroe	1
+NY	Penfield Town Council (Unexpired 1 Year Term)	1	Catherine Dean	Democratic	Monroe	1
+NY	Perinton Town Supervisor	0	Jenn Townsend	Democratic	Monroe	1
+NY	Pittsford Town Supervisor	0	Max Gordon	Democratic	Monroe	1
+NY	Pittsford Town Supervisor	0	William A Smith, Jr	Republican	Monroe	1
+NY	Riga Town Supervisor	0	Brad O'Brocta	Republican	Monroe	1
+NY	Rush Town Supervisor	0	Lee Hankins	Democratic	Monroe	1
+NY	Rush Town Supervisor	0	Frank D Tasber	Republican	Monroe	1
+NY	Sweden Town Supervisor	0	Patricia Hayles	Republican	Monroe	1
+NY	Sweden Town Receiver of Taxes	0	Kathleen Roberts	Republican	Monroe	1
+NY	Webster Town Supervisor	0	Alex Scialdone	Democratic	Monroe	1
+NY	Webster Town Supervisor	0	Sean T Hanna	Republican	Monroe	1
+NY	Wheatland Town Supervisor	0	Jim Kirch	Republican	Monroe	1
+NY	Fairport Village Mayor	0	Heidi Woika	Democratic	Monroe	1
+NY	Fairport Village Trustee	0	Adam Bonosky	Democratic	Monroe	2
+NY	Fairport Village Trustee	0	Sarah Nazarian	Democratic	Monroe	2
+NY	Fairport Village Trustee	0	Paul Keitz	Republican	Monroe	2
+NY	Fairport Village Trustee	0	Ian Winner	Republican	Monroe	2
+NY	Fairport Village Trustee (Unexpired 1 Year Term)	1	Matthew Brown	Democratic	Monroe	1
+NY	Fairport Village Trustee (Unexpired 1 Year Term)	1	Jason Rinaudo	Republican	Monroe	1
+NY	Rochester City Court Judge	0	Maija C Dixon	Democratic	Monroe	1
+NY	Clarkson Town Justice	0	Christopher T Wilcox	Republican	Monroe	1
+NY	East Rochester Town Justice	0	Dennis J Greco	Democratic	Monroe	2
+NY	East Rochester Town Justice	0	Sam Hauser	Democratic	Monroe	2
+NY	East Rochester Town Justice	0	Shannon Pizzingrilli Romach	Republican	Monroe	2
+NY	East Rochester Town Justice	0	Adrianna Flocco	Republican	Monroe	2
+NY	Irondequoit Town Justice	0	Roman Misula	Democratic	Monroe	1
+NY	Parma Town Justice	0	Greg Colavecchia	Republican	Monroe	1
+NY	Riga Town Justice	0	Chris Lockwood	Republican	Monroe	1
+NY	Rush Town Justice	0	Logan C Geen	Democratic	Monroe	1
+NY	Rush Town Justice	0	Michael J Tallon	Republican	Monroe	1
+NY	Sweden Town Justice	0	Robert P Connors	Republican	Monroe	1
+NY	Rensselaer County District Attorney	0	Mary Pat Donnelly	Democratic	Rensselaer	1
+NY	Rensselaer County Legislature District 4	1	William J. Film	Republican	Rensselaer	1
+NY	Berlin Town Supervisor	0	Robert C. Jaeger	Democratic	Rensselaer	1
+NY	Berlin Town Clerk	0	Sarah G. VanBuskirk	Democratic	Rensselaer	1
+NY	Berlin Town Tax Collector	0	Nancy L. Sweener	Democratic	Rensselaer	1
+NY	Berlin Town Highway Superintendent	0	James A. Winn	Democratic	Rensselaer	1
+NY	Brunswick Town Clerk	1	Alicia F. Saunders	NY:conservative-party	Rensselaer	1
+NY	Grafton Town Council	1	Michael Longo	Republican	Rensselaer	1
+NY	Grafton Town Justice	0	Joseph Alund	Republican	Rensselaer	1
+NY	Hoosick Town Supervisor	0	Eric R. Sheffer	Republican	Rensselaer	1
+NY	Hoosick Town Council	0	Christopher M. Bettis	Republican	Rensselaer	1
+NY	Nassau Town Supervisor	0	David F. Fleming	Republican	Rensselaer	1
+NY	Nassau Town Highway Superintendent	0	Donald W. Denue	Republican	Rensselaer	1
+NY	North Greenbush Town Supervisor	0	Brian Zweig	Democratic	Rensselaer	1
+NY	North Greenbush Town Supervisor	0	Joseph H. Bott, III	Republican	Rensselaer	1
+NY	North Greenbush Town Clerk	0	Justan J. Foster	Democratic	Rensselaer	1
+NY	North Greenbush Town Clerk	0	Janice Hannigan Kerwin	Republican	Rensselaer	1
+NY	North Greenbush Town Highway Superintendent	0	James Paco McCarthy	Democratic	Rensselaer	1
+NY	North Greenbush Town Highway Superintendent	0	Michael E. Martinez	Republican	Rensselaer	1
+NY	Petersburgh Town Supervisor	0	Heinz H. Noeding	Republican	Rensselaer	1
+NY	Petersburgh Town Council	1	Jay P. Springer	Democratic	Rensselaer	1
+NY	Pittstown Town Supervisor	0	Matthew W. Curley, III	Republican	Rensselaer	1
+NY	Pittstown Town Clerk	0	Michelle A. Hoag	Republican	Rensselaer	1
+NY	Pittstown Town Tax Collector	0	Judy L. Herrington	Republican	Rensselaer	1
+NY	Pittstown Town Highway Superintendent	0	Paul G. Campbell	Republican	Rensselaer	1
+NY	Poestenkill Town Supervisor	0	Dominic Jacangelo	Democratic	Rensselaer	1
+NY	Poestenkill Town Supervisor	0	Michelle M. Garofolo	Republican	Rensselaer	1
+NY	Poestenkill Town Clerk	0	Susan A. Horton	Democratic	Rensselaer	1
+NY	Poestenkill Town Council	1	Robert W. Bayly	Republican	Rensselaer	1
+NY	Poestenkill Town Justice	0	Thomas F. Slavin, Jr.	Republican	Rensselaer	1
+NY	Poestenkill Town Highway Superintendent	0	David T. Goyer, Jr.	Democratic	Rensselaer	1
+NY	Sand Lake Town Supervisor	0	Olivia Kelley	Democratic	Rensselaer	1
+NY	Sand Lake Town Supervisor	0	Stephen Z. Clemens	Republican	Rensselaer	1
+NY	Sand Lake Town Clerk	0	Kristen L. Kelley	Democratic	Rensselaer	1
+NY	Sand Lake Town Clerk	0	Barbara A. Hansen	Republican	Rensselaer	1
+NY	Schaghticoke Town Supervisor	0	Timothy S. Salisbury	Republican	Rensselaer	1
+NY	Schaghticoke Town Clerk	0	Emily D. Calhoun	Republican	Rensselaer	1
+NY	Schaghticoke Town Justice	0	Jaime B. Thomas	Republican	Rensselaer	1
+NY	Schodack Town Supervisor	0	Charles J. Peter	Republican	Rensselaer	1
+NY	Schodack Town Justice	0	Ryan P. Mullahy	Republican	Rensselaer	1
+NY	Stephentown Town Justice	0	Phyllis H. Defreest	Republican	Rensselaer	2
+NY	Stephentown Town Justice	0	Bruce B. Smith	Republican	Rensselaer	2
+NY	Schenectady County Clerk	0	Cara M. Ackerley	Democratic	Schenectady	1
+NY	Duanesburg Town Supervisor	0	William Wenzel, Jr.	Republican	Schenectady	1
+NY	Glenville Town Council	0	Timothy Ferrara	Democratic	Schenectady	1
+NY	Glenville Town Council	0	Mark J. Agostino	Republican	Schenectady	1
+NY	Scotia Village Mayor	0	Matthew R. Horton		Schenectady	1
+NY	Scotia Village Mayor	0	David Bucciferro		Schenectady	1
+NY	Scotia Village Mayor	0	Amanda Barone		Schenectady	1
+NY	Scotia Village Trustee	0	Heather Gray		Schenectady	2
+NY	Scotia Village Trustee	0	Keith Brown		Schenectady	2
+NY	Scotia Village Trustee	0	Matthew Dolen		Schenectady	2
+NY	Scotia Village Trustee	0	Lorijo McConnelee		Schenectady	2
+NY	Scotia Village Trustee	0	Thomas Raux		Schenectady	2
+NY	Niskayuna Town Supervisor	0	Erin Cassady-Dorion		Schenectady	1
+NY	Niskayuna Town Supervisor	0	Elizabeth Santana		Schenectady	1
+NY	Princetown Town Supervisor	0	Nicholas J. Maura, Jr.	Democratic	Schenectady	1
+NY	Princetown Town Council	0	Gary L. Cuomo	Republican	Schenectady	1
+NY	Princetown Town Highway Superintendent	0	Ralph Santoro, Sr.	Republican	Schenectady	1
+NY	Rotterdam Town Supervisor	0	John Polimeni		Schenectady	1
+NY	Rotterdam Town Supervisor	0	Clark A. Collins		Schenectady	1
+NY	Rotterdam Town Highway Superintendent	0	Robert J. Denny	Republican	Schenectady	1
+NY	Schenectady City Council	0	Justin R. Chaires		Schenectady	4
+NY	Schenectady City Council	0	Sarojanie Ibrahim		Schenectady	4
+NY	Schenectady City Council	0	Rachel Ward		Schenectady	4
+NY	Schenectady City Council	0	Bradley M. Wanner		Schenectady	4
+NY	Schenectady City Council	0	Christine M. Clark		Schenectady	4
+NY	Schenectady City Council	0	Tom Buchanan		Schenectady	4
+NY	Schenectady City Council	0	John T. Ellis		Schenectady	4
+NY	Schenectady City Council	0	Kate Hogan		Schenectady	4
+NY	Schenectady City Council	0	Keith S. Massey, Jr.		Schenectady	4
+NY	Duanesburg Town Justice	0	Anthony J. Casso, Jr.	Republican	Schenectady	1
+NY	Glenville Town Justice	0	John Lockwood	Democratic	Schenectady	1
+NY	Glenville Town Justice	0	Daniel P. Harrigan, Sr.	Republican	Schenectady	1
+NY	Princetown Town Justice	0	Michelle A. VanWoeart	Democratic	Schenectady	1
+NY	Scotia Village Justice	0	Michael L. Boyle	Democratic	Schenectady	1
