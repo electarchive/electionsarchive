@@ -1530,6 +1530,18 @@ for fips, county in {
         "https://www.nvsos.gov/sos/elections/election-information/2026-election-information",
         "nv/certified.pdf",
     )
+NE_SOURCES["AR-05119"] = (
+    "Pulaski County Board of Election Commissioners",
+    "Notice of Election, November 3, 2026 General Election",
+    "https://www.votepulaskiar.gov/",
+    "ar/pulaski.pdf",
+)
+NE_SOURCES["AR-05143"] = (
+    "Washington County Election Commission",
+    "November 3, 2026 General Election Information",
+    "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-election-information",
+    "ar/washington.html",
+)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
