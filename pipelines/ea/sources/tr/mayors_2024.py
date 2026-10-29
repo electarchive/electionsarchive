@@ -252,7 +252,21 @@ def emit() -> Path:
                     actor=None if change["kind"] == "died" else "İçişleri Bakanlığı",
                     source_id=report,
                 )
+            if change["note"]:
+                cs.add("note", entity_id=tenure, kind="context", body_md=change["note"])
             if change["replacement"]:
+                successor_from = date.fromisoformat(change["replacement_from"] or change["date"])
+                successor_report = report
+                if change["replacement_url"]:
+                    successor_report = cs.source(change["replacement_publisher"], change["replacement_title"])
+                    cs.add(
+                        "source",
+                        id=successor_report,
+                        kind="news_agency",
+                        publisher=change["replacement_publisher"],
+                        title=change["replacement_title"],
+                        url=change["replacement_url"],
+                    )
                 successor = cs.key(f"{SOURCE}.person", f"{contest}:{change['replacement']}")
                 cs.add("person", id=successor)
                 cs.add(
@@ -269,19 +283,24 @@ def emit() -> Path:
                     id=replacement,
                     person_id=successor,
                     office_id=top[1],
-                    from_date=when,
+                    from_date=successor_from,
                     acquired_via="trustee" if change["kind"] == "trustee" else "acting",
                     succeeds_tenure_id=tenure,
                 )
                 cs.add("citation", entity_id=replacement, source_id=index, locator=locator)
-                cs.add("citation", entity_id=replacement, source_id=report, locator={"url": change["source_url"]})
+                cs.add(
+                    "citation",
+                    entity_id=replacement,
+                    source_id=successor_report,
+                    locator={"url": change["replacement_url"] or change["source_url"]},
+                )
                 if change["party"]:
                     cs.add(
                         "tenure_affiliation",
                         tenure_id=replacement,
                         kind="party",
                         party_id=parties[change["party"]],
-                        valid_from=when,
+                        valid_from=successor_from,
                     )
 
         for key in sorted(set(changes) - matched):

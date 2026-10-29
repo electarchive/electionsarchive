@@ -17,6 +17,16 @@ UNPUBLISHED = Path(__file__).with_name("mayors_2019_unpublished.tsv")
 LICENSE = "CC BY-SA 4.0"
 LICENSE_URL = "https://creativecommons.org/licenses/by-sa/4.0/"
 ROW = re.compile(r"\|bgcolor[^\n]*\n\|[^\n]*\n\|[^\n]*\n\|([^\n]*)\n\|\s*([\d.]+)\s*\n\|")
+KAYYUM_PAGE = "2019 Türkiye kayyum atamaları"
+MONTHS = {
+    name: number
+    for number, name in enumerate(
+        ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"],
+        start=1,
+    )
+}
+BULLET = re.compile(r"^\*(\d+) (\w+) (\d{4}) tarihinde (.*?) kayyım atandı\.(.*)$", re.MULTILINE)
+CITE = re.compile(r"url=([^\s|}]+).*?başlık=([^|}]*)(?:.*?yayıncı=([^|}]*))?")
 REF = re.compile(r"<ref[^>]*?/>|<ref[^>]*>.*?</ref>", re.DOTALL)
 WINNERS = """
 with rs as (
@@ -57,6 +67,7 @@ def fold(text: str) -> str:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, url(KAYYUM_PAGE), suffix=".txt")
     for title in titles():
         raw.fetch(SOURCE, url(title), suffix=".txt")
 
@@ -82,6 +93,21 @@ def emit() -> Path:
                 key = tuple(sorted((votes for _, votes in rows), reverse=True)[:3])
                 top = max(rows, key=lambda row: row[1])
                 tables[key].append((title, heading.group(2) if heading else "", top[0]))
+
+    removals: dict[tuple[str, str], tuple[date, str, str, str]] = {}
+    for match in BULLET.finditer(raw.cached(SOURCE, url(KAYYUM_PAGE)).path.read_text(encoding="utf-8")):
+        when = date(int(match.group(3)), MONTHS[match.group(2)], int(match.group(1)))
+        cite = CITE.search(match.group(5))
+        if when >= date(2024, 4, 1) or cite is None:
+            continue
+        for entity in re.split(r", | ve ", match.group(4)):
+            words = [word.split("'")[0] for word in entity.split()]
+            if "belde" in words:
+                key = (fold(words[0]), fold(words[words.index("belde") - 1]))
+            else:
+                words = [word for word in words if word not in ("Büyükşehir", "Merkez", "Belediyesi", "Belediyelerine")]
+                key = (fold(words[0]), fold(words[-1]))
+            removals[key] = (when, cite.group(1), cite.group(2).strip(), (cite.group(3) or "").strip())
 
     with connect() as conn:
         contests: dict[object, list[tuple]] = defaultdict(list)
@@ -111,6 +137,21 @@ def emit() -> Path:
         for title in titles():
             cs.artifact(raw.cached(SOURCE, url(title)), wiki)
 
+        kayyum = cs.source("Wikipedia", "Turkish Wikipedia: 2019 Türkiye kayyum atamaları")
+        cs.add(
+            "source",
+            id=kayyum,
+            kind="community",
+            publisher="Wikipedia",
+            title="Turkish Wikipedia: 2019 Türkiye kayyum atamaları",
+            url=f"https://tr.wikipedia.org/wiki/{quote(KAYYUM_PAGE.replace(' ', '_'))}",
+            license=LICENSE,
+            license_url=LICENSE_URL,
+        )
+        cs.artifact(raw.cached(SOURCE, url(KAYYUM_PAGE)), kayyum)
+        reports: dict[str, object] = {}
+        matched: set[tuple[str, str]] = set()
+
         skipped: list[tuple[str, str, str]] = []
         published = 0
         for contest, options in contests.items():
@@ -132,6 +173,10 @@ def emit() -> Path:
                 skipped.append((str(contest), name, f"disagreement: {title} lists {winner} first"))
                 continue
             tenure = cs.key(f"{SOURCE}.tenure", str(contest))
+            removal_key = (fold(title.split("'")[0]), fold(name.removeprefix("Mayor of ")))
+            removal = removals.get(removal_key)
+            if removal is not None:
+                matched.add(removal_key)
             cs.add(
                 "tenure",
                 id=tenure,
@@ -139,11 +184,11 @@ def emit() -> Path:
                 office_id=top[1],
                 from_date=date(2019, 4, 1),
                 from_precision="month",
-                to_date=date(2024, 4, 1),
-                to_precision="month",
+                to_date=date(2024, 4, 1) if removal is None else removal[0],
+                to_precision="month" if removal is None else "day",
                 acquired_via="elected",
                 contest_id=contest,
-                ended_via="term_end",
+                ended_via="term_end" if removal is None else "removed",
             )
             if top[6] in parties_present:
                 cs.add(
@@ -153,13 +198,37 @@ def emit() -> Path:
                     party_id=top[6],
                     valid_from=date(2019, 4, 1),
                     valid_from_precision="month",
-                    valid_to=date(2024, 4, 1),
-                    valid_to_precision="month",
+                    valid_to=date(2024, 4, 1) if removal is None else removal[0],
+                    valid_to_precision="month" if removal is None else "day",
                 )
             cs.add("citation", entity_id=tenure, source_id=ysk, locator={"contest": str(contest)})
             cs.add("citation", entity_id=tenure, source_id=wiki, locator={"page": title, "section": heading})
+            if removal is not None:
+                if removal[1] not in reports:
+                    reports[removal[1]] = cs.key(f"{SOURCE}.report", removal[1])
+                    cs.add(
+                        "source",
+                        id=reports[removal[1]],
+                        kind="news_agency",
+                        publisher=removal[3] or "News report",
+                        title=removal[2],
+                        url=removal[1],
+                    )
+                cs.add("citation", entity_id=tenure, source_id=kayyum, locator={"page": KAYYUM_PAGE})
+                cs.add("citation", entity_id=tenure, source_id=reports[removal[1]], locator={"url": removal[1]})
+                for kind in ("removed", "trustee_appointed"):
+                    cs.add(
+                        "tenure_event",
+                        tenure_id=tenure,
+                        kind=kind,
+                        date=removal[0],
+                        actor="İçişleri Bakanlığı",
+                        source_id=reports[removal[1]],
+                    )
             published += 1
 
+        for key in sorted(set(removals) - matched):
+            print(f"unmatched removal: {key[0]} / {key[1]} {removals[key][0]}")
         with UNPUBLISHED.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
             writer.writerow(("contest_id", "contest", "reason"))
