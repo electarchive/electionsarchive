@@ -15,6 +15,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import (
+    special_2025,
     special_counties,
     special_files,
     special_fl,
@@ -88,8 +89,22 @@ STATES = {
     "MT": "Montana",
     "WI": "Wisconsin",
     "SD": "South Dakota",
+    "AZ": "Arizona",
+    "TN": "Tennessee",
 }
 OFFICIAL = {
+    "AZ": (
+        "Arizona Secretary of State",
+        "Official canvass of the 2025 special primary election",
+        "https://azsos.gov/elections/election-information/2025-special-election",
+        [special_2025.ARIZONA],
+    ),
+    "TN": (
+        "Tennessee Secretary of State",
+        "Official results of the October 7, 2025 special primary elections",
+        "https://sos.tn.gov/elections/results",
+        list(special_2025.TENNESSEE.values()),
+    ),
     "SD": (
         "South Dakota Secretary of State",
         "Election history: official returns",
@@ -198,6 +213,7 @@ def fetch() -> None:
     special_pdfs.fetch()
     special_nj.fetch()
     special_fl.fetch()
+    special_2025.fetch()
     special_counties.fetch()
     special_nm_1997.fetch()
     special_wi_1993.fetch()
@@ -478,6 +494,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nj.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_fl.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_2025.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_wi_1993.rows(), infer_schema_length=None))
