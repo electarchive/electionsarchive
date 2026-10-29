@@ -46,6 +46,58 @@ OHIO_SPECIALS = {
         },
     ),
 }
+ARIZONA_URL = "https://azsos.gov/elections/results-data/election-results#MF-295/{}/{}"
+ARIZONA_SPECIALS = {
+    "2012-04-17": (
+        "Canvass2012SpecialPrimary.pdf",
+        ("Cochise", "Pima", "Pinal", "Santa Cruz"),
+        {
+            ("Democratic", "Ron Barber"): (4915, 37786, 1068, 416, 44185),
+            ("Green", "Richard Grayson"): (1, 1, 0, 0, 2),
+            ("Green", "Charlie Manolakis"): (13, 101, 0, 2, 116),
+            ("Republican", "Frank Antenori"): (2483, 14415, 412, 187, 17497),
+            ("Republican", "Jesse Kelly"): (4779, 21065, 1051, 206, 27101),
+            ("Republican", "Martha McSally"): (3132, 15194, 943, 144, 19413),
+            ("Republican", "Dave Sitton"): (843, 12054, 303, 99, 13299),
+        },
+        {"Ron Barber", "Charlie Manolakis", "Jesse Kelly"},
+    ),
+    "2018-02-27": (
+        "2018_0307_official_canvass_special_primary_election.pdf",
+        ("Maricopa",),
+        {
+            ("Democratic", "Kyle Martin"): (22, 22),
+            ("Democratic", "Hiral Tipirneni"): (23175, 23175),
+            ("Democratic", "Brianna Westbrook"): (15288, 15288),
+            ("Green", "Richard Grayson"): (13, 13),
+            ("Green", "Gary Swing"): (13, 13),
+            ("Libertarian", "Kelly Noble"): (22, 22),
+            ("Republican", "Chad Allen"): (824, 824),
+            ("Republican", "Brenden Dilley"): (823, 823),
+            ("Republican", "Stephen Dolgos"): (377, 377),
+            ("Republican", "Debbie Lesko"): (27047, 27047),
+            ("Republican", 'David "Dave" Lien'): (1341, 1341),
+            ("Republican", "Phil Lovas"): (18562, 18562),
+            ("Republican", "Richard Mack"): (1191, 1191),
+            ("Republican", "Patrick Masoya"): (5, 5),
+            ("Republican", "Steve Montenegro"): (18106, 18106),
+            ("Republican", "Bob Stump"): (4032, 4032),
+            ("Republican", "Christopher Sylvester"): (1490, 1490),
+            ("Republican", "Blake Taylor"): (2, 2),
+            ("Republican", "Clair Van Steenwyk"): (1787, 1787),
+            ("Republican", "Von Wehunt"): (1, 1),
+            ("Republican", "Mark Yates"): (871, 871),
+        },
+        {"Hiral Tipirneni", "Debbie Lesko"},
+    ),
+}
+UTAH_URL = "https://vote.utah.gov/wp-content/uploads/2023/09/2017-Primary-Election-Canvass-1.pdf"
+UTAH_2017 = {
+    "Tanner Ainge": (192, 135, 331, 5519, 246, 10113, 1029, 17565),
+    "John Curtis": (354, 247, 195, 7568, 227, 21733, 1157, 31481),
+    "Christopher Herrod": (371, 259, 346, 6112, 755, 14868, 975, 23686),
+}
+UTAH_2017_COUNTIES = ("Carbon", "Emery", "Grand", "Salt Lake", "San Juan", "Utah", "Wasatch")
 OHIO_2005 = {
     "Democratic": ["Paul Hackett", "Arthur Stanley Katz", "James John Parker", "Charles W. Sanders", "Jeff Sinnard", "Victoria Wells Wulsin"],
     "Republican": [
@@ -75,6 +127,11 @@ FILES = {
         for day, files in OHIO.items()
         for name in files.values()
     },
+    **{
+        ARIZONA_URL.format(day, name): INBOX.parent / "MF-295" / day / name
+        for day, (name, *_) in ARIZONA_SPECIALS.items()
+    },
+    UTAH_URL: INBOX.parent / "MF-295" / "2017-08-15" / "2017-Primary-Election-Canvass-1.pdf",
     **{
         OHIO_URL.format(day, name).replace("MF-290", "MF-293"): INBOX.parent / "MF-293" / day / name
         for day, (_, _, files) in OHIO_SPECIALS.items()
@@ -299,6 +356,19 @@ def rows() -> list[dict[str, object]]:
             top = max({row["candidate_name"] for row in block}, key=lambda candidate: sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate))
             for row in block:
                 row["outcome"] = "Elected" if row["candidate_name"] == top else "Defeated"
+    for day, (_, counties, tables, winners) in ARIZONA_SPECIALS.items():
+        for (party, candidate), votes in tables.items():
+            if sum(votes[:-1]) != votes[-1]:
+                raise ValueError(f"AZ-8 {day} {candidate}: counties do not sum to {votes[-1]}")
+            for county, count in zip(counties, votes, strict=False):
+                add("AZ", day, "8", party, candidate, county, count)
+                found[-1]["outcome"] = "Elected" if candidate in winners else "Defeated"
+    for candidate, votes in UTAH_2017.items():
+        if sum(votes[:-1]) != votes[-1]:
+            raise ValueError(f"UT-3 2017 {candidate}: counties do not sum to {votes[-1]}")
+        for county, count in zip(UTAH_2017_COUNTIES, votes, strict=False):
+            add("UT", "2017-08-15", "3", "Republican", candidate, county, count)
+            found[-1]["outcome"] = "Elected" if candidate == "John Curtis" else "Defeated"
     for row in found:
         if row["state"] == "AR" and not row["runoff"]:
             totals = {}

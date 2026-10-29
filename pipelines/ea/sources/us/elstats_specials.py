@@ -124,9 +124,12 @@ OFFICIAL = {
     ),
     "AZ": (
         "Arizona Secretary of State",
-        "Official canvass of the 2025 special primary election",
+        "Official canvasses of the 2012, 2018, and 2025 special primary elections",
         "https://azsos.gov/elections/election-information/2025-special-election",
-        [special_2025.ARIZONA],
+        [
+            special_2025.ARIZONA,
+            *(special_inbox.ARIZONA_URL.format(day, name) for day, (name, *_) in special_inbox.ARIZONA_SPECIALS.items()),
+        ],
     ),
     "TN": (
         "Tennessee Secretary of State",
@@ -617,6 +620,8 @@ def emit() -> Path:
                     for day, (_, _, files) in special_inbox.OHIO_SPECIALS.items():
                         for name in files.values():
                             cs.artifact(raw.cached(SOURCE, special_inbox.OHIO_URL.format(day, name).replace("MF-290", "MF-293")), sources[state])
+                if state == "UT":
+                    cs.artifact(raw.cached(SOURCE, special_inbox.UTAH_URL), sources[state])
                 if state == "WI":
                     cs.artifact(raw.cached(SOURCE, special_pdfs.WISCONSIN), sources[state])
                     cs.artifact(raw.cached(SOURCE, special_inbox.WISCONSIN), sources[state])
