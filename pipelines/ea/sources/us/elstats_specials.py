@@ -19,6 +19,7 @@ from ea.sources.us import (
     special_files,
     special_fl,
     special_md,
+    special_mn,
     special_nc,
     special_nj,
     special_nm_1997,
@@ -79,6 +80,7 @@ STATES = {
     "IL": "Illinois",
     "NC": "North Carolina",
     "NJ": "New Jersey",
+    "MN": "Minnesota",
     "MD": "Maryland",
     "NE": "Nebraska",
     "KS": "Kansas",
@@ -107,6 +109,12 @@ OFFICIAL = {
         "Special election results",
         "https://elections.maryland.gov/elections/special_elections_past.html",
         [page for page, _, _ in special_md.PAGES],
+    ),
+    "MN": (
+        "Minnesota Secretary of State",
+        "Election results files",
+        "https://electionresultsfiles.sos.mn.gov/",
+        [special_mn.PRIMARY],
     ),
     "NJ": (
         "New Jersey Division of Elections",
@@ -157,6 +165,9 @@ PARTIES = {
     "LIB": "libertarian-party",
     "LBT": "libertarian-party",
     "Green": "green-party",
+    "DFL": "democratic-party",
+    "GLC": "MN:grassroots-legalize-cannabis-party",
+    "LMN": "legal-marijuana-now",
     "Conservative": "NY:conservative-party",
     "Working Families": "NY:working-families-party",
     "Independence": "NY:independence-party",
@@ -198,6 +209,7 @@ def fetch() -> None:
     special_pdfs.fetch()
     special_nj.fetch()
     special_fl.fetch()
+    special_mn.fetch()
     special_counties.fetch()
     special_nm_1997.fetch()
     special_wi_1993.fetch()
@@ -478,6 +490,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nj.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_fl.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_mn.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_wi_1993.rows(), infer_schema_length=None))
