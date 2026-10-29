@@ -9,6 +9,7 @@ from datetime import UTC, date, datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID
 from xml.etree import ElementTree
+from zoneinfo import ZoneInfo
 
 import httpx
 import polars as pl
@@ -59,6 +60,11 @@ IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) 
 NC_CONTEST = re.compile(r"US SENATE|NC GOVERNOR|US HOUSE OF REPRESENTATIVES DISTRICT (\d+)")
 AR_CONTEST = re.compile(r"U\.S\. Senate|Governor|U\.S\. Congress District (\d+)")
 AR_HEADERS = {"User-Agent": "Mozilla/5.0", "Origin": "https://arkansas.tally-enr.com"}
+OK_BASE = "https://results.okelections.gov/OKERS/enrapi/"
+OK_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+}
+OK_RACE = re.compile(r"FOR (GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE DISTRICT (\d+))")
 PA_API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
 PA_OFFICES = {"2": "senate", "3": "governor", "11": "house"}
 NOTE = (
@@ -150,6 +156,34 @@ def fetch() -> None:
             print(f"{state}: no detail file")
         else:
             store(state, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip", content, ".zip")
+    if not ONLY or "OK" in ONLY:
+        login = client.put(
+            f"{OK_BASE}login/",
+            json={"Username": "appuser", "Password": "X098de!22k098Mgfd"},
+            headers=OK_HEADERS,
+        )
+        auth = {**OK_HEADERS, "Authorization": f"Bearer {login.json()[1:]}"}
+        listing = get(client, f"{OK_BASE}getelec/{DAY:%Y%m%d}/SW/xx", auth)
+        races = json.loads(listing or "{}").get("races") or []
+        if not races:
+            print("OK: no races")
+        for race in races:
+            if OK_RACE.fullmatch(race["raceTitle"]):
+                url = f"{OK_BASE}GetCntyResults/{DAY:%Y%m%d}/{race['raceID']}"
+                content = get(client, url, auth)
+                if content:
+                    store(
+                        "OK",
+                        url,
+                        json.dumps(
+                            {
+                                "race": race,
+                                "lastUpdate": json.loads(listing)["lastUpdate"],
+                                "results": json.loads(content),
+                            }
+                        ).encode(),
+                        ".json",
+                    )
     if not ONLY or "AR" in ONLY:
         url = "https://enr-results-api.totalresults.com/Election/GetElectionList?cid=arkansas"
         listing = get(client, url, AR_HEADERS)
@@ -345,6 +379,34 @@ def rows(state: str, url: str, path: Path):
                             "reporting": None,
                             "total": None,
                         }
+        return
+    if state == "OK":
+        stored = json.loads(path.read_bytes())
+        race = stored["race"]
+        found = OK_RACE.fullmatch(race["raceTitle"])
+        for county in stored["results"]["summaryCandResults"]:
+            for candidate, result in zip(race["raceCandidates"], county["candResults"], strict=True):
+                yield {
+                    "office": "senate"
+                    if found[1] == "UNITED STATES SENATOR"
+                    else "governor"
+                    if found[1] == "GOVERNOR"
+                    else "house",
+                    "district": (found[2] or "").lstrip("0"),
+                    "party": race["raceTitle2"],
+                    "county": f"40{2 * int(county['countyID']) - 1:03}",
+                    "candidate": candidate["candName"].title(),
+                    "write_in": False,
+                    "votes": int(result["totalVotes"]),
+                    "as_of": datetime.fromisoformat(stored["lastUpdate"])
+                    .replace(tzinfo=ZoneInfo("America/Chicago"))
+                    .isoformat(),
+                    "reporting": None,
+                    "total": None,
+                    "scope": race["raceTitle2"]
+                    if race["raceTitle2"] in ("Republican", "Democrat", "Libertarian")
+                    else "",
+                }
         return
     if state == "AR":
         for contest in json.loads(path.read_bytes())["ContestData"]:
