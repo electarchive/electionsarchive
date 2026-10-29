@@ -149,7 +149,7 @@ OFFICIAL = {
         "New Jersey Division of Elections",
         "Official special primary election results",
         "https://www.nj.gov/state/elections/election-information-2026.shtml",
-        [special_nj.RESULTS],
+        [url for url, *_ in special_nj.SPECIALS],
     ),
     "NE": (
         "Nebraska Secretary of State",
