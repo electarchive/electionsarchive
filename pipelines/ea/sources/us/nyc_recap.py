@@ -101,9 +101,37 @@ NOTE_STATE = (
 )
 
 
+CHARTER_2003 = "https://www.nyc.gov/assets/charter/downloads/pdf/ballot_questions.pdf"
 CHARTER_2005 = "https://www.nyc.gov/assets/charter/downloads/pdf/crc_ballot_questions.pdf"
 CHARTER_2010 = "https://www.nyc.gov/assets/charter/downloads/pdf/final_ballot_questions_combined.pdf"
 QUESTIONS = (
+    (
+        "2003-11-04",
+        "PROPOSAL #3",
+        "city-elections",
+        "Question 3: City Elections",
+        CHARTER_2003,
+        "2003 Ballot Questions, New York City Charter Revision Commission",
+        'Question 3: City Elections. This proposal would amend the City Charter to establish a new system of city elections for the offices of Mayor, Public Advocate, Comptroller, Borough President, and Council member. The September primary election would be open to all voters and all candidates, regardless of party membership or independent status. The top two vote getters would compete in the November general election. In both elections, candidates could indicate their party membership or independent status on the ballot. Candidates participating in the voluntary campaign finance program, which provides public campaign funding, could not accept contributions from political parties or party committees. The new system would replace the current system of political party nominations through primary elections in which only party members may vote. The changes would take effect after the 2005 Citywide election. Shall this proposal be adopted?',
+    ),
+    (
+        "2003-11-04",
+        "PROPOSAL #4",
+        "city-purchasing",
+        "Question 4: City Purchasing",
+        CHARTER_2003,
+        "2003 Ballot Questions, New York City Charter Revision Commission",
+        'Question 4: City Purchasing. This proposal would amend the City Charter to: • remove from the Charter detailed requirements for specific purchasing methods; • increase qualifications for City purchasing officials; • provide for citywide coordination to enhance opportunities for small businesses and minority and women-owned businesses; • reduce required procedures for security-related contracts; • reduce impact on City contractors, including not- for-profit organizations, of delays in contracting and payment; and • consolidate financial audit requirements for City contractors. Shall this proposal be adopted?',
+    ),
+    (
+        "2003-11-04",
+        "PROPOSAL #5",
+        "government-administration",
+        "Question 5: Government Administration",
+        CHARTER_2003,
+        "2003 Ballot Questions, New York City Charter Revision Commission",
+        'Question 5: Government Administration. This proposal would amend the City Charter to: • authorize the Mayor to issue rules governing the professional conduct of administrative law judges and hearing officers in the City’s administrative tribunals, require the coordination of such tribunals, and expand the authority of the administrative tribunal of the Department of Consumer Affairs to hear all matters within the agency’s jurisdiction; • enhance the enforcement authority of the Conflicts of Interest Board by allowing increased penalties for violations of the City’s ethics laws; • replace the current sixteen member Voter Assistance Commission with a seven member panel, which would include the Public Advocate; an appointee of the Council Speaker; and five appointees (one from each borough) of the Mayor, with Council advice and consent. The coordinator of voter assistance would be appointed by the Mayor, with Council advice and Consent, instead of by the Commission; and • require annual publication only of the Mayor’s Management Report. The Preliminary Mayor’s Management Report would no longer be required. Shall this proposal be adopted?',
+    ),
     (
         "2005-11-08",
         "Q3. ETHICS CODE",

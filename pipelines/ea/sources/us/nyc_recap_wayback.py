@@ -565,6 +565,38 @@ def parse() -> None:
             for (_, party, _), (name, votes, _) in chosen.items():
                 entries.append((*head, title, "total", "TOTAL", name, party, votes))
             totals.append((*head, title, "total", "TOTAL", sum(row[1] for row in chosen.values())))
+    url, entry = next((u, e) for u, e in sorted(index.items()) if "2003/general/G2003Recaps.pdf" in u)
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(DATA / "raw" / SOURCE / str(entry["file"])), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    for page in text.split("\f"):
+        proposal = re.search(r"PROPOSAL #(\d)", page)
+        county = re.search(r"^(NEW YORK|BRONX|KINGS|QUEENS|RICHMOND) COUNTY", page, re.MULTILINE)
+        if proposal is None or county is None or "A PROPOSITION" not in page:
+            continue
+        county = COUNTY_NAMES[f"{county[1]} COUNTY"]
+        head = (f"{url}#{county}", "2003-11-04", "General", county, f"{county} County")
+        office = f"PROPOSAL #{proposal[1]}"
+        rows = re.findall(
+            r"^(\w+)\s+(?:\d+\s+){6}\*\s+(\d+)\s+(\d+)\s+\d+\s+(\d+)\s*$", page, re.MULTILINE
+        )
+        body = [row for row in rows if row[0] != "TOTAL"]
+        total = next(row for row in rows if row[0] == "TOTAL")
+        if (
+            len(body) != len(rows) - 1
+            or sum(int(row[1]) for row in body) != int(total[1])
+            or sum(int(row[2]) for row in body) != int(total[2])
+        ):
+            skipped.append(f"{url} {county} {office}: assembly districts do not add to the total")
+            continue
+        for label, yes, no, cast in body:
+            bid = str(int(re.match(r"\d+", label)[0]))
+            entries.extend([(*head, office, "ad", bid, "YES", None, int(yes)), (*head, office, "ad", bid, "NO", None, int(no))])
+            ballots.append((*head, office, "ad", bid, int(cast)))
+        totals.append((*head, office, "total", "TOTAL", int(total[1]) + int(total[2])))
     head_schema = {"url": pl.String, "day": pl.String, "kind": pl.String, "county": pl.String, "scope": pl.String}
     pl.DataFrame(
         entries,
@@ -604,6 +636,6 @@ def emit() -> Path:
         summary=f"New York City's {', '.join(years)} contests by assembly district from the Board of Elections' certified recaps",
         note=NOTE,
         strict=not offices,
-        questions=False,
+        questions=True,
         fuller=bool(offices),
     )
