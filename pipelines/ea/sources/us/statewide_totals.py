@@ -217,8 +217,10 @@ def emit(
         skipped = 0
 
         def party(state: str, label: str | None) -> tuple[UUID | None, bool]:
-            if label is None or label.lower() in INDEPENDENT:
-                return None, label is not None
+            if label is None or not label.strip():
+                return None, False
+            if label.lower() in INDEPENDENT:
+                return None, True
             if (national := PARTIES.get(label.lower().removesuffix(" party"))) is not None:
                 return cs.key("us.party", national), False
             text = label if re.search(r"\bparty\b", label, re.IGNORECASE) else f"{label} Party"
@@ -516,4 +518,7 @@ def emit(
             filled += 1
         print(filled, "contests,", skipped, "skipped")
         cs.pool("A scattering or write-in line in a state manual read as a candidate")
+        for state in ("MI", "ND", "FL", "RI", "IA"):
+            if f"{state}:party" in parties_known:
+                cs.add("entity_retirement", entity_id=cs.key("us.party", f"{state}:party"), reason="no party printed in the source")
         return cs.write()
