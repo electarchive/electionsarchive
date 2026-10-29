@@ -19,8 +19,8 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "1"
-YEARS = (1984, 1989, 1994, 1999)
+VERSION = "2"
+YEARS = (1968, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 TITLE = re.compile(r"^(.+?)'(?:d[ae]|t[ae]) (\d{4}) Türkiye yerel seçimleri$")
 METHOD = (
@@ -141,10 +141,10 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mayoral elections of 1984, 1989, 1994, and 1999 by municipality, from Turkish Wikipedia's per-province tables",
+            summary="Mayoral elections of 1968, 1977, 1984, 1989, 1994, and 1999 by municipality, from Turkish Wikipedia's per-province tables",
             polity="TR",
         )
-        title = "Turkish Wikipedia: per-province 1984, 1989, 1994, and 1999 Türkiye yerel seçimleri articles"
+        title = "Turkish Wikipedia: per-province 1968, 1977, 1984, 1989, 1994, and 1999 Türkiye yerel seçimleri articles"
         wiki = cs.source("Wikipedia", title)
         if wiki in cs.minted:
             cs.add(
