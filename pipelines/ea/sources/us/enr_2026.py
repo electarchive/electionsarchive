@@ -16,6 +16,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.clarity_local import COUNTIES, STATES
 from ea.sources.us.oe_primaries_2026 import ALIASES, FIPS, OFFICIAL, plain, town_counties
 from ea.store import DATA, connect
 
@@ -46,6 +47,8 @@ EV_OFFICES = re.compile(
 )
 LISTINGS = ("elections.json", "cid=arkansas", "/ballot-items", "Georgia", "/id", "/utah", "/RhodeIsland", "/washington")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
+YESNO = {"for": "yes", "against": "no"}
+STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
 FL_OFFICES = {"USS": "senate", "USR": "house", "GOV": "governor"}
 IL_ELECTIONS = {2022: 62, 2024: 66, 2026: 70}
 IL_CITIES = {
@@ -71,6 +74,12 @@ NOTE = (
     "Unofficial election night results as the publisher's reporting site showed them at the time given. Counts change as "
     "ballots are counted and until the canvass certifies them; the certified canvass will publish as a separate result set."
 )
+
+
+def person(label: str) -> str:
+    words = [w for w in re.sub(r"[^a-z ]", " ", slug(label).replace("-", " ")).split() if w not in SUFFIXES]
+    words = ["yes" if w in ("for", "yes") else "no" if w in ("against", "no") else w for w in words]
+    return words[0][0] + words[-1] if len(words) > 1 else words[0] if words else ""
 
 
 def get(client: httpx.Client, url: str, headers: dict[str, str] | None = None) -> bytes | None:
@@ -196,6 +205,31 @@ def fetch() -> None:
         else:
             store("AR", url, listing, ".json")
             store("AR", f"https://results.tally-enr.com/results/arkansas/{ids[0]}/FullDataFile.json", content, ".json")
+    missing: list[str] = []
+    for fips, (tenant, *_) in COUNTIES.items():
+        state = STATES[fips[:2]]
+        if ONLY and state not in ONLY:
+            continue
+        base = f"https://results.enr.clarityelections.com/{state}/{tenant}/"
+        listing = get(client, f"{base}elections.json")
+        ids = (
+            [os.environ[f"ENR_2026_EID_{state}_{tenant}"]]
+            if f"ENR_2026_EID_{state}_{tenant}" in os.environ
+            else [
+                e["EID"]
+                for e in json.loads(listing or "[]")
+                if datetime.strptime(e["Date"].split()[0], "%m/%d/%Y").date() == DAY
+                and not re.search(r"TEST|MOCK|TRAINING", e["ElectionName"].upper())
+            ]
+        )
+        version = ids and get(client, f"{base}{ids[0]}/current_ver.txt")
+        content = version and get(client, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip")
+        if content:
+            store(state, f"{base}{ids[0]}/{version.decode().strip()}/reports/detailxml.zip", content, ".zip")
+        else:
+            missing.append(f"{state}/{tenant}")
+    if missing:
+        print(f"county Clarity sites with no {DAY} file: {len(missing)}", ", ".join(missing[:12]))
     if not ONLY or "FL" in ONLY:
         official = "Y" if DAY < date.today() else "N"
         url = f"https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate={DAY.month}/{DAY.day}/{DAY.year}&OfficialResults={official}"
@@ -265,6 +299,50 @@ def fetch() -> None:
 
 
 def rows(state: str, url: str, path: Path):
+    if url.endswith("detailxml.zip"):
+        with zipfile.ZipFile(path) as archive:
+            root = ElementTree.fromstring(archive.read("detail.xml"))
+        stamped = re.fullmatch(r"(.+) ([ECMP])([SD])T", (root.findtext("Timestamp") or "").strip())
+        tenant = re.search(r"/[A-Z]{2}/([A-Za-z_]+)/\d+/\d+/reports", url)
+        as_of = (
+            datetime.strptime(stamped[1], "%m/%d/%Y %I:%M:%S %p")
+            .replace(
+                tzinfo=timezone(timedelta(hours={"E": -5, "C": -6, "M": -7, "P": -8}[stamped[2]] + (stamped[3] == "D")))
+            )
+            .isoformat()
+            if stamped
+            else None
+        )
+        for contest in root.iter("Contest"):
+            found = EV_OFFICES.fullmatch((contest.get("text") or "").strip())
+            if tenant and found:
+                continue
+            for choice in contest.iter("Choice"):
+                for kind in choice.iter("VoteType"):
+                    for place in kind:
+                        yield {
+                            "office": "other"
+                            if found is None
+                            else "senate"
+                            if found["senate"]
+                            else "governor"
+                            if found["governor"]
+                            else "house",
+                            "contest": (contest.get("text") or "").strip() if found is None else "",
+                            "district": (found["district"] if found else None) or "",
+                            "party": choice.get("party") or "",
+                            "county": tenant[1].replace("_", " ")
+                            if tenant
+                            else (place.get("name") or "").removesuffix(" County"),
+                            "candidate": re.sub(r"\s*(\(I\)|\*)$", "", choice.get("text") or "").strip(),
+                            "write_in": "write-in" in (choice.get("text") or "").lower(),
+                            "votes": int(place.get("votes") or 0),
+                            "as_of": as_of,
+                            "reporting": int(contest.get("precinctsReported") or 0),
+                            "total": int(contest.get("precinctsParticipating") or 0),
+                            "scope": (found["party0"] or found["party1"] or "") if found else "",
+                        }
+        return
     if state == "FL":
         seen = set()
         content = path.read_bytes()
@@ -283,11 +361,14 @@ def rows(state: str, url: str, path: Path):
                 row["CanNameFirst"],
                 row["CanNameMiddle"],
             )
-            if office is None or key in seen:
+            if key in seen:
                 continue
             seen.add(key)
             yield {
-                "office": office,
+                "office": office or "other",
+                "contest": ""
+                if office
+                else " ".join(part for part in (row["OfficeDesc"], row["Juris1num"], row["Juris2num"]) if part),
                 "district": row["Juris1num"].lstrip("0"),
                 "party": row["PartyName"],
                 "county": row["CountyName"],
@@ -322,23 +403,32 @@ def rows(state: str, url: str, path: Path):
             }
         return
     if state == "NC":
+        totals: dict[tuple[str, str, str, str], int] = {}
         with zipfile.ZipFile(path) as archive, archive.open(archive.namelist()[0]) as handle:
             for row in csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8"), delimiter="\t"):
-                found = NC_CONTEST.fullmatch(row["Contest Name"].strip())
-                if found is None:
-                    continue
-                yield {
-                    "office": "house" if found[1] else "senate" if row["Contest Name"] == "US SENATE" else "governor",
-                    "district": (found[1] or "").lstrip("0"),
-                    "party": row["Choice Party"].strip(),
-                    "county": row["County"].title(),
-                    "candidate": row["Choice"].strip(),
-                    "write_in": row["Choice"].lower().startswith("write-in"),
-                    "votes": int(row["Total Votes"] or 0),
-                    "as_of": None,
-                    "reporting": None,
-                    "total": None,
-                }
+                key = (row["Contest Name"].strip(), row["County"], row["Choice"].strip(), row["Choice Party"].strip())
+                totals[key] = totals.get(key, 0) + int(row["Total Votes"] or 0)
+        for (contest, county, choice, party), votes in totals.items():
+            found = NC_CONTEST.fullmatch(contest)
+            yield {
+                "office": "other"
+                if found is None
+                else "house"
+                if found[1]
+                else "senate"
+                if contest == "US SENATE"
+                else "governor",
+                "contest": contest if found is None else "",
+                "district": ((found[1] if found else None) or "").lstrip("0"),
+                "party": party,
+                "county": county.title(),
+                "candidate": choice,
+                "write_in": choice.lower().startswith("write-in"),
+                "votes": votes,
+                "as_of": None,
+                "reporting": None,
+                "total": None,
+            }
         return
     if state == "IN":
         for region in json.loads(path.read_bytes().decode("utf-8-sig"))["Root"]["OfficeCategory"]["Regions"]["Region"]:
@@ -411,18 +501,19 @@ def rows(state: str, url: str, path: Path):
     if state == "AR":
         for contest in json.loads(path.read_bytes())["ContestData"]:
             found = AR_CONTEST.fullmatch(contest["ContestName"])
-            if found is None:
-                continue
             for fips, location in contest["Locations"].items():
                 for choice in [*location["Choices"], *location["WriteinChoices"]]:
                     named = re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"])
                     yield {
-                        "office": "senate"
+                        "office": "other"
+                        if found is None
+                        else "senate"
                         if contest["ContestName"] == "U.S. Senate"
                         else "governor"
                         if found[1] is None
                         else "house",
-                        "district": (found[1] or "").lstrip("0"),
+                        "contest": contest["ContestName"] if found is None else "",
+                        "district": ((found[1] if found else None) or "").lstrip("0"),
                         "party": named[1] if named else "",
                         "county": fips,
                         "candidate": named[2] if named else choice["Name"],
@@ -434,42 +525,6 @@ def rows(state: str, url: str, path: Path):
                         "reporting": None,
                         "total": None,
                     }
-        return
-    if state in CLARITY:
-        if not url.endswith("detailxml.zip"):
-            return
-        with zipfile.ZipFile(path) as archive:
-            root = ElementTree.fromstring(archive.read("detail.xml"))
-        stamped = re.fullmatch(r"(.+) ([ECMP])([SD])T", (root.findtext("Timestamp") or "").strip())
-        as_of = (
-            datetime.strptime(stamped[1], "%m/%d/%Y %I:%M:%S %p")
-            .replace(
-                tzinfo=timezone(timedelta(hours={"E": -5, "C": -6, "M": -7, "P": -8}[stamped[2]] + (stamped[3] == "D")))
-            )
-            .isoformat()
-            if stamped
-            else None
-        )
-        for contest in root.iter("Contest"):
-            found = EV_OFFICES.fullmatch((contest.get("text") or "").strip())
-            if found is None:
-                continue
-            for choice in contest.iter("Choice"):
-                for kind in choice.iter("VoteType"):
-                    for place in kind:
-                        yield {
-                            "office": "senate" if found["senate"] else "governor" if found["governor"] else "house",
-                            "district": found["district"] or "",
-                            "party": choice.get("party") or "",
-                            "county": (place.get("name") or "").removesuffix(" County"),
-                            "candidate": re.sub(r"\s*(\(I\)|\*)$", "", choice.get("text") or "").strip(),
-                            "write_in": "write-in" in (choice.get("text") or "").lower(),
-                            "votes": int(place.get("votes") or 0),
-                            "as_of": as_of,
-                            "reporting": int(contest.get("precinctsReported") or 0),
-                            "total": int(contest.get("precinctsParticipating") or 0),
-                            "scope": found["party0"] or found["party1"] or "",
-                        }
         return
     detail = json.loads(path.read_bytes())
     found = EV_OFFICES.fullmatch(detail["name"][0]["text"].strip())
@@ -508,7 +563,7 @@ def parse() -> None:
             if url.endswith(LISTINGS):
                 continue
             for row in rows(state, url, raw.cached(SOURCE, key).path):
-                table.append({"state": state, "page": url, "scope": "", **row})
+                table.append({"state": state, "page": url, "scope": "", "contest": "", **row})
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
         table,
@@ -516,6 +571,7 @@ def parse() -> None:
             "state": pl.String,
             "page": pl.String,
             "scope": pl.String,
+            "contest": pl.String,
             "office": pl.String,
             "district": pl.String,
             "party": pl.String,
@@ -534,6 +590,8 @@ def parse() -> None:
 
 def emit():
     frame = pl.read_parquet(PARSED / "results.parquet").filter(pl.col("scope") == "")
+    local = frame.filter(pl.col("office") == "other")
+    frame = frame.filter(pl.col("office") != "other")
     pages = json.loads((PARSED / "pages.json").read_text())
     with connect() as conn:
         cs = Changeset(
@@ -544,6 +602,7 @@ def emit():
             polity="US",
         )
         counties: dict[tuple[str, str], UUID] = {}
+        codes: dict[tuple[str, str], str] = {}
         for code, text, id in conn.execute(
             """select u.code, n.text, u.id from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
@@ -552,8 +611,10 @@ def emit():
         ).fetchall():
             counties.setdefault((code[:2], plain(text)), id)
             counties[(code[:2], code)] = id
+            codes.setdefault((code[:2], plain(text)), code)
         unmatched: list[str] = []
         sources: dict[str, UUID] = {}
+        work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
         for (state, office, district), group in frame.group_by("state", "office", "district", maintain_order=True):
             contest_key = f"{DAY}:{state}:{office}" + (f":{district}" if district else "")
             found = conn.execute(
@@ -562,7 +623,94 @@ def emit():
             if found is None:
                 unmatched.append(f"{contest_key}: no contest")
                 continue
-            contest = found[0]
+            work.append((state, contest_key, found[0], group, None))
+        for state in local["state"].unique(maintain_order=True):
+            published: dict[UUID, tuple[str, set[str]]] = {}
+            titles: dict[UUID, set[str]] = {}
+            for key, id in conn.execute(
+                """select x.value, x.entity_id from external_id x
+                   where x.scheme = 'us.contest' and x.value like %s""",
+                [f"{DAY}:{state}:%"],
+            ).fetchall():
+                if not re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
+                    published[id] = (key, set())
+            for contest, label in conn.execute(
+                """select o.contest_id, coalesce(ca.ballot_name, o.ballot_label, '') from contest_option o
+                   left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
+                   where o.parent_option_id is null and o.kind <> 'write_in' and o.contest_id = any(%s)""",
+                [list(published)],
+            ).fetchall():
+                published[contest][1].add(person(label))
+            for contest, text in conn.execute(
+                "select entity_id, text from name where entity_id = any(%s)", [list(published)]
+            ).fetchall():
+                titles.setdefault(contest, set()).update(slug(text).split("-"))
+            races: dict[tuple[str, frozenset[str]], list[str]] = {}
+            for (name, county), group in local.filter(pl.col("state") == state).group_by("contest", "county"):
+                people = frozenset(
+                    person(candidate) for candidate in group.filter(~pl.col("write_in"))["candidate"].unique()
+                )
+                races.setdefault((name, people), []).append(county)
+            matched = 0
+            for (name, people), places in races.items():
+                words = {w for w in slug(name).split("-") if w not in STOP}
+                scored = []
+                for contest, (key, wanted) in published.items():
+                    segment = key.split(":")[2]
+                    if re.fullmatch(r"\d{5}", segment) and (
+                        len(places) != 1 or codes.get((FIPS[state], plain(places[0]))) != segment
+                    ):
+                        continue
+                    if len(places) == 1 and not re.match(r"\d|sd|house$|senate$", segment):
+                        continue
+                    overlap = len(people & wanted) / len(people | wanted) if people | wanted else 0
+                    if overlap >= 0.6:
+                        scored.append(
+                            (
+                                round(overlap, 2),
+                                len(words & (titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:]))),
+                                contest,
+                                key,
+                            )
+                        )
+                scored.sort(key=lambda hit: (-hit[0], -hit[1]))
+                best = [hit for hit in scored if hit[:2] == scored[0][:2]] if scored else []
+                if len(best) != 1 or (people <= {"yes", "no"} and best[0][1] < 1):
+                    unmatched.append(
+                        f"local {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if best else 'no contest'}"
+                    )
+                    continue
+                _, _, contest, key = best[0]
+                if any(entry[1] == key for entry in work):
+                    unmatched.append(f"local {state}: {name} ({', '.join(places[:2])}): duplicate of {key}")
+                    continue
+                segment = key.split(":")[2]
+                place = None
+                if re.fullmatch(r"\d{7}", segment):
+                    found = conn.execute(
+                        "select id from reporting_unit where scheme_code = 'us.place' and code = %s limit 1", [segment]
+                    ).fetchone()
+                    if found is None:
+                        unmatched.append(f"local {state}: {name}: no place unit {segment}")
+                        continue
+                    place = found[0]
+                elif not re.fullmatch(r"\d{5}", segment) and re.match(r"\d|sd", segment):
+                    unmatched.append(f"local {state}: {name}: no unit for {key}")
+                    continue
+                matched += 1
+                work.append(
+                    (
+                        state,
+                        key,
+                        contest,
+                        local.filter(
+                            (pl.col("state") == state) & (pl.col("contest") == name) & pl.col("county").is_in(places)
+                        ),
+                        place,
+                    )
+                )
+            print(f"local {state}: {matched} of {len(races)} feed races matched")
+        for state, contest_key, contest, group, place in work:
             election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             if state not in sources:
@@ -597,7 +745,7 @@ def emit():
                         (
                             option,
                             [
-                                w
+                                YESNO.get(w, w)
                                 for w in re.sub(r"[^a-z ]", " ", slug(label).replace("-", " ")).split()
                                 if w not in SUFFIXES
                             ],
@@ -618,7 +766,11 @@ def emit():
                             )
                     ballots[name] = scattered
                     continue
-                tokens = {w for w in re.sub(r"[^a-z ]", " ", slug(name).replace("-", " ")).split() if w not in SUFFIXES}
+                tokens = {
+                    YESNO.get(w, w)
+                    for w in re.sub(r"[^a-z ]", " ", slug(name).replace("-", " ")).split()
+                    if w not in SUFFIXES
+                }
                 hits = sorted(
                     ((len(tokens & set(words)), option) for option, words in named if words and words[-1] in tokens),
                     key=lambda hit: -hit[0],
@@ -657,7 +809,7 @@ def emit():
             sums: dict[tuple[UUID, UUID], int] = {}
             for county, name, votes in group.select("county", "candidate", "votes").iter_rows():
                 option = ballots.get(name)
-                unit = (
+                unit = place or (
                     counties.get((FIPS[state], plain(ALIASES.get((state, plain(county)), county))))
                     or counties.get((FIPS[state], plain(county)))
                     or counties.get((FIPS[state], county))
