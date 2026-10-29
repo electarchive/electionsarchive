@@ -1,3 +1,4 @@
+import csv
 import json
 import math
 import re
@@ -13,8 +14,9 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "9"
+VERSION = "10"
 TITLE = "Political parties and their colors"
+HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
     "US": "Q30",
@@ -729,6 +731,20 @@ def emit() -> Path:
             polity=None,
         )
         wikidata = cs.source("Wikidata", TITLE)
+        with HAND_COLORS.open(encoding="utf-8") as handle:
+            sourced_colors = {row["party"]: row for row in csv.DictReader(handle, delimiter="\t")}
+        sourced_colors_source: dict[str, UUID] = {}
+        for key, row in sourced_colors.items():
+            sourced_colors_source[key] = cs.source(row["publisher"], row["title"])
+            cs.add(
+                "source",
+                id=sourced_colors_source[key],
+                kind=row["kind"],
+                publisher=row["publisher"],
+                title=row["title"],
+                url=row["url"],
+                license="Official public record, no license stated",
+            )
         cs.add(
             "source",
             id=wikidata,
@@ -796,6 +812,12 @@ def emit() -> Path:
                 )
                 report[scope, "positioned"] += options
             if party in painted:
+                report[scope, "painted"] += options
+                continue
+            if str(party) in sourced_colors:
+                row = sourced_colors[str(party)]
+                cs.add("party_color", party_id=party, color=row["color"], source_id=sourced_colors_source[str(party)])
+                shades[party].append((row["color"], None, None))
                 report[scope, "painted"] += options
                 continue
             hand, country = (
