@@ -16,30 +16,6 @@ PROPOSAL = "proposal-{}"
 ADOPTED = r"Shall this proposal be adopted\?"
 EDITIONS = (
     (
-        "2005-11-08",
-        "2005.pdf",
-        f"{CHARTER}/crc_ballot_questions.pdf",
-        CRC,
-        "2005 Ballot Questions, New York City Charter Revision Commission",
-        r"Shall the proposed changes be adopted\?",
-        (
-            ("Question 3: Ethics Code for City Administrative Judges", "ethics-code-for-city-administrative-judges"),
-            ("Question 4: Balanced Budget and Other City Fiscal Requirements", "balanced-budget-and-other-city-fiscal-requirements"),
-        ),
-    ),
-    (
-        "2010-11-02",
-        "2010.pdf",
-        f"{CHARTER}/final_ballot_questions_combined.pdf",
-        CRC,
-        "2010 Ballot Questions, New York City Charter Revision Commission",
-        ADOPTED,
-        (
-            ("City Question 1. Term Limits:", "term-limits"),
-            ("City Question 2. Elections and Government Administration:", "elections-and-government-administration"),
-        ),
-    ),
-    (
         "2018-11-06",
         "2018.pdf",
         f"{CHARTER}/final-report-20180904.pdf",
@@ -131,7 +107,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Official wording of New York City charter ballot questions 2005 to 2025, from the commissions' published ballot questions",
+            summary="Official wording of New York City charter ballot questions 2018 to 2025, from the commissions' published ballot questions",
             polity="US",
         )
         contests = {
@@ -156,7 +132,7 @@ def emit() -> Path:
                 if tail is None:
                     raise ValueError(f"{day}: no end after {heading!r}")
                 body = text[head.end() : head.end() + tail.end()].strip()
-                heading_title = re.sub(r"^(?:Ballot |City )?Question\s*#?\s*\d+[:.]?\s*", "", heading, flags=re.IGNORECASE).rstrip(":")
+                heading_title = re.sub(r"^(?:Ballot )?Question\s*#?\s*\d+:?\s*", "", heading, flags=re.IGNORECASE)
                 wording = f"{heading_title.title() if heading_title.isupper() else heading_title}: {body}"
                 contest = contests.get(f"{day}:new-york-city:{PROPOSAL.format(name)}")
                 if contest is None:
