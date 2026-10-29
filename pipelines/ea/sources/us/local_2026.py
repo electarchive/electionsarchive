@@ -941,6 +941,36 @@ FEEDS.update(
             "Columbia County Elections",
             "Voters' Pamphlet, November 3, 2026 General Election: Index of Candidates on Ballot",
         ),
+        "OR-41043": (
+            "https://www.linncountyor.gov/media/61426",
+            "Linn County Clerk",
+            "List of Candidates for Linn County Oregon, November 3, 2026 General Election",
+        ),
+        "OR-41019": (
+            "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
+            "Douglas County Clerk",
+            "Proof Ballot Content (Report E-019), November 3, 2026 General Election",
+        ),
+        "OR-41017": (
+            "https://www.deschutescounty.gov/1593/November-3-2026-General-Election",
+            "Deschutes County Clerk",
+            "November 3, 2026 General Election: Filed Candidates",
+        ),
+        "OR-41017-bend": (
+            "https://bendoregon.gov/city-council/elections/",
+            "City of Bend",
+            "City Council Elections: Candidate Filings",
+        ),
+        "OR-41017-la-pine": (
+            "https://www.lapineoregon.gov/660/Elections",
+            "City of La Pine",
+            "City Council Elections: 2026 General Election Current Candidates",
+        ),
+        "OR-41017-redmond": (
+            "https://www.redmondoregon.gov/government/city-council/running-for-elected-office",
+            "City of Redmond",
+            "Running for Elected Office: Current Mayor and Council Election Candidate Filings",
+        ),
         "OR-41029": (
             "https://www.jacksoncountyor.gov/Document%20Center/Departments/Clerk/Elections/General%20Elections/Nov%203,%202026/List%20of%20City%20Candidates%20(November%202026).pdf",
             "Jackson County Elections",
@@ -1096,6 +1126,12 @@ GA_STATE = (
 GA_BALLOTS = {"Fulton", "Gwinnett", "Cobb", "DeKalb", "Clayton", "Paulding", "Houston", "Columbia", "Richmond"}
 ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"]
 DELIVERED = {
+    "OR-41043": DATA / "inbox" / "y26" / "or" / "linn.pdf",
+    "OR-41019": DATA / "inbox" / "y26" / "or" / "douglas.pdf",
+    "OR-41017": DATA / "inbox" / "y26" / "or" / "deschutes.html",
+    "OR-41017-bend": DATA / "inbox" / "y26" / "or" / "bend.html",
+    "OR-41017-la-pine": DATA / "inbox" / "y26" / "or" / "la-pine.html",
+    "OR-41017-redmond": DATA / "inbox" / "y26" / "or" / "redmond.html",
     "OR-41003": DATA / "inbox" / "y26" / "or" / "benton.html",
     "OR-41003-rcv": DATA / "inbox" / "y26" / "or" / "benton.html",
     "OR-41029": DATA / "inbox" / "y26" / "or" / "jackson_city.pdf",
