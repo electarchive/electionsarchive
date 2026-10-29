@@ -652,6 +652,16 @@ FEEDS = {
         "Solano County Registrar of Voters",
         "Candidate Filed Log, November 3, 2026 General Election (as of 8/20/2026)",
     ),
+    "CA-06047": (
+        "https://www.countyofmerced.com/DocumentCenter/View/48056/Candidate-List",
+        "Merced County Registrar of Voters",
+        "Final Qualified Candidate List, November 3, 2026 General Election (printed 8/25/2026)",
+    ),
+    "CA-06041": (
+        "https://www.marincounty.gov/departments/elections/november-3-2026-general-election/information-and-about-candidates-110326/status-local-candidates-office-110326",
+        "Marin County Elections Department",
+        "Status of Local Candidates by Office, November 3, 2026 General Election",
+    ),
     "CA-06113": (
         "https://elections.yolocounty.gov/423/Municipal-City",
         "Yolo County Assessor/Clerk-Recorder/Elections",
@@ -1048,6 +1058,8 @@ DELIVERED = {
     "ME": DATA / "inbox" / "y26" / "ne" / "me_general_candidate_list_2026.xlsx",
     "VT": DATA / "inbox" / "y26" / "ne" / "vt_ge_qualified_candidates_2026.xlsx",
     "CA-06095": DATA / "inbox" / "y26" / "ca" / "solano_filed_log.pdf",
+    "CA-06047": DATA / "inbox" / "y26" / "ca" / "merced_final.pdf",
+    "CA-06041": DATA / "inbox" / "y26" / "ca" / "marin_local_status.html",
     "NJ-34009": DATA / "inbox" / "y26" / "nj" / "cape_may.pdf",
     "NJ-34011": DATA / "inbox" / "y26" / "nj" / "cumberland.xlsx",
     "NJ-34019-r": DATA / "inbox" / "y26" / "nj" / "hunterdon_rep.pdf",
@@ -1189,9 +1201,21 @@ PUBLISHERS = {
 NE_SOURCES = {
     "MA": (
         "Massachusetts Secretary of the Commonwealth",
-        "Massachusetts Election Statistics: 2026 State Primary, county and district offices",
-        "https://electionstats.state.ma.us/elections/search/year_from:2026/year_to:2026",
-        "ne/ma_electionstats_2026_search.html",
+        "2026 State Election Candidates",
+        "https://www.sec.state.ma.us/divisions/elections/research-and-statistics/2026-state-election-candidates.htm",
+        "ne/ma_2026-state-election-candidates.html",
+    ),
+    "NH": (
+        "New Hampshire Secretary of State",
+        "2026 General Election Candidate List (09/17/2026)",
+        "https://mm.nh.gov/files/uploads/sos/docs/2026-ge-candidate-list.pdf",
+        "ne/nh_2026-ge-candidate-list.pdf",
+    ),
+    "RI": (
+        "Rhode Island Secretary of State",
+        "Candidates and Declarations of Candidacy, 2026",
+        "https://vote.sos.ri.gov/Candidates",
+        "ne/ri_Candidates.xlsx",
     ),
     "NJ-34019-s": (
         "Hunterdon County Clerk",
