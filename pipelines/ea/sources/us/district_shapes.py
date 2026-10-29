@@ -39,6 +39,13 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://spatialags.vhb.com/arcgis/rest/services/29821_Syr_Onondaga/Onondaga_Service/MapServer/10",
         "field": "COUNTY_LEG",
     },
+    {
+        "publisher": "LOJIC",
+        "title": "Louisville KY Metro Council Districts",
+        "pattern": r"^21:21111:fiscal-court:district-",
+        "layer": "https://gis.lojic.org/maps/rest/services/LojicSolutions/OpenDataPolitical/MapServer/8",
+        "field": "COUNDIST",
+    },
 ]
 
 
