@@ -7,6 +7,8 @@ from ea import coverage, statewide_table
 from ea.store import ROOT, connect
 
 DAY = "2026-11-03"
+# Arkansas decides its nonpartisan judicial races on March 3 (Supreme Court Positions 3 and 6 and the Court of Appeals seats were decided then), so no judicial race sits on the November 3 ballot.
+MARCH_JUDGES = {"AR"}
 FOLDER = ROOT / "pipelines" / "ea" / "readiness"
 LEVELS = (
     "us_house",
@@ -309,7 +311,7 @@ def measure(conn, day: str) -> dict:
     judged = {st for (st,) in conn.execute(JUDGED_SQL, params)}
     judges: dict[str, int] = {}
     for st, period in JUDICIAL.items():
-        if st in judged and (year - (2001 if st == "PA" else 2000)) % period == 0:
+        if st in judged and st not in MARCH_JUDGES and (year - (2001 if st == "PA" else 2000)) % period == 0:
             judges[st] = len(places)
             places.append(("judicial", st, st, 0, True))
     held: dict[int, list[tuple[bool, bool]]] = defaultdict(list)
