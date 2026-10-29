@@ -179,14 +179,6 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             ).fetchone()
             assert dropped is not None
             diff[table]["delete"] = dropped[0]
-        if table in stage.sweeps:
-            swept = conn.execute(
-                sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
-                    sql.Identifier(table), stage.swept(table)
-                )
-            ).fetchone()
-            assert swept is not None
-            diff[table]["delete"] = swept[0]
         if table == "tenure_affiliation":
             unstaged = conn.execute(
                 sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
@@ -203,6 +195,14 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             ).fetchone()
             assert deleted is not None
             diff[table]["delete"] = deleted[0]
+        if table in stage.sweeps:
+            swept = conn.execute(
+                sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
+                    sql.Identifier(table), stage.swept(table)
+                )
+            ).fetchone()
+            assert swept is not None
+            diff[table]["delete"] += swept[0]
     return diff
 
 
