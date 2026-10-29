@@ -24,6 +24,8 @@
       isPartial: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
+      title: string | null;
+      names: Record<string, { label: string; short: string | null }>;
       steps: Array<{
         date: string;
         parties: Array<{ party: string | null; seats: number }>;

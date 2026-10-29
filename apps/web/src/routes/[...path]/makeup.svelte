@@ -33,6 +33,8 @@
         group?: string | null;
       }>;
       election: { name: string; path: string | null; date: string } | null;
+      title?: string | null;
+      names?: Record<string, { label: string; short: string | null }>;
       near?: Record<string, string | null>;
       steps?: Array<{
         date: string;
@@ -181,10 +183,21 @@
           /^[0-9a-f]{8}-/.test(party) ? `party:${party}` : party,
         );
   };
-  const label = (party: string | null) =>
-    party == null || party.endsWith("/none")
-      ? m.record_none()
-      : (info.get(party)?.short ?? info.get(party)?.label ?? "");
+  const label = (
+    party: string | null,
+    names?: Record<string, { label: string; short: string | null }>,
+  ) => {
+    if (party == null || party.endsWith("/none")) {
+      return m.record_none();
+    }
+    const found = info.get(party);
+    const dated = names?.[blocs.get(party)?.party ?? party];
+    return dated == null
+      ? (found?.short ?? found?.label ?? "")
+      : (dated.short ??
+          (dated.label === found?.label ? found.short : null) ??
+          dated.label);
+  };
   const band = $derived(governments.length > 0 ? 18 : 0);
   const height = $derived(width < 640 ? 230 : 320);
   const inner = $derived(height - PAD.top - PAD.axis - band);
@@ -844,6 +857,9 @@
       <span class="text-[0.8125rem] font-semibold"
         >{lit.term.election?.name ?? date(lit.term.start)}</span
       >
+      {#if lit.term.title != null && lit.term.title !== terms.at(-1)?.title}
+        <span class="text-muted-foreground">{lit.term.title}</span>
+      {/if}
       <span class="font-figures text-muted-foreground tabular-nums"
         >{date(part.from)} – {part.to == null
           ? m.governments_present()
@@ -859,14 +875,18 @@
                     class="shrink-0 rounded-xs block-2 inline-2"
                     style:background={tint(move.from)}
                   ></span>
-                  <span class="truncate">{label(move.from)}</span>
+                  <span class="truncate"
+                    >{label(move.from, lit.term.names)}</span
+                  >
                   <span aria-hidden="true">→</span>
                 {/if}
                 <span
                   class="shrink-0 rounded-xs block-2 inline-2"
                   style:background={tint(move.to ?? move.from)}
                 ></span>
-                <span class="truncate">{label(move.to ?? move.from)}</span>
+                <span class="truncate"
+                  >{label(move.to ?? move.from, lit.term.names)}</span
+                >
                 {#if move.kind !== "switch"}
                   <span class="truncate text-muted-foreground"
                     >{(move.kind === "in"
@@ -902,7 +922,7 @@
                 class="shrink-0 rounded-xs block-2.5 inline-2.5"
                 style:background={tint(entry.party)}
               ></span>
-              <span class="truncate">{label(entry.party)}</span>
+              <span class="truncate">{label(entry.party, lit.term.names)}</span>
             </span>
             <span class="font-figures tabular-nums"
               ><span class="font-semibold">{count(entry.seats)}</span>
@@ -915,7 +935,8 @@
             <li
               class="flex items-center justify-between gap-3 ps-4 text-[0.6875rem] text-muted-foreground"
             >
-              <span class="truncate">{label(member.party)}</span>
+              <span class="truncate">{label(member.party, lit.term.names)}</span
+              >
               <span class="font-figures tabular-nums"
                 >{count(member.seats)}</span
               >

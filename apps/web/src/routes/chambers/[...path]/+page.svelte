@@ -167,11 +167,30 @@
     members.data?.isSeated === true && (open.length > 0 || on !== first),
   );
   const own = $derived(new Map(crew.map((party) => [party.id, party])));
-  const label = (party: string | null) => {
+  const called = (
+    party: string | null,
+    names: Record<
+      string,
+      { label: string; short: string | null }
+    > = term?.names ?? {},
+  ) => {
     const found = info.get(party ?? "") ?? own.get(party ?? "");
-    return party == null
-      ? m.record_none()
-      : (found?.short ?? found?.label ?? "");
+    const dated = names[party ?? ""];
+    return {
+      label: dated?.label ?? found?.label ?? "",
+      short:
+        dated == null
+          ? (found?.short ?? null)
+          : (dated.short ??
+            (dated.label === found?.label ? (found.short ?? null) : null)),
+    };
+  };
+  const label = (
+    party: string | null,
+    names?: Record<string, { label: string; short: string | null }>,
+  ) => {
+    const found = called(party, names);
+    return party == null ? m.record_none() : (found.short ?? found.label);
   };
   const places = $derived(
     [
@@ -216,10 +235,11 @@
         entry.party == null
           ? null
           : (info.get(entry.party) ?? own.get(entry.party));
+      const name = called(entry.party);
       return {
         key: entry.party ?? "none",
-        label: party?.label ?? m.record_none(),
-        short: party?.short ?? null,
+        label: name.label === "" ? m.record_none() : name.label,
+        short: name.short,
         color: party?.color ?? null,
         lean: party?.lean ?? null,
         near: entry.party == null ? null : (near[entry.party] ?? null),
@@ -274,7 +294,10 @@
       }),
     );
   });
-  const lead = (parties: Array<{ party: string | null; seats: number }>) =>
+  const lead = (
+    parties: Array<{ party: string | null; seats: number }>,
+    names: Record<string, { label: string; short: string | null }>,
+  ) =>
     Map.groupBy(
       parties,
       (row) =>
@@ -302,12 +325,11 @@
                 : (rows[0]?.party ?? null)
               : null,
           name: caucus
-            ? label(key)
-            : rows.map((row) => label(row.party)).join("/"),
+            ? label(key, names)
+            : rows.map((row) => label(row.party, names)).join("/"),
           full:
             !caucus && rows.length === 1 && rows[0]?.party != null
-              ? ((info.get(rows[0].party) ?? own.get(rows[0].party))?.label ??
-                label(rows[0].party))
+              ? called(rows[0].party, names).label
               : null,
           seats,
         };
@@ -320,12 +342,13 @@
         party: entry.key === "none" ? null : entry.key,
         seats: entry.seats,
       })),
+      term?.names ?? {},
     ),
   );
   const largest = $derived(
     selected === data.terms.length - 1 && members.data != null
       ? leader
-      : lead(data.terms.at(-1)?.parties ?? []),
+      : lead(latest?.parties ?? [], latest?.names ?? {}),
   );
   const whole = $derived(term == null ? 0 : (term.size ?? term.total));
   const cabinets = $derived(
@@ -524,6 +547,11 @@
               (selected = Math.min(data.terms.length - 1, selected + 1))}
             ><ChevronRightIcon class="block-4 inline-4" /></button
           >
+          {#if term.title != null && term.title !== latest?.title}
+            <span class="ms-1.5 text-[0.8125rem] font-semibold"
+              >{term.title}</span
+            >
+          {/if}
         </div>
         <p class="text-[0.8125rem] text-muted-foreground">
           {#if term.election == null}

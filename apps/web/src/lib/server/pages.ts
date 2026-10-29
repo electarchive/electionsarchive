@@ -504,10 +504,29 @@ export async function chamber(path: string) {
   )
     .values()
     .toArray();
+  const shared = groups.flatMap((group) =>
+    group.length > 1 ? group.map((party) => party.id) : [],
+  );
+  const naming =
+    shared.length === 0
+      ? null
+      : await db.execute<{ id: string }>(sql`
+          select distinct entity_id::text as id from name
+          where entity_id = any(${sql.param(shared.filter((key) => /^[\da-f-]{36}$/u.test(key)))}::uuid[])
+            and kind in ('official', 'english') and not (lower_inf(valid) and upper_inf(valid))
+        `);
+  const renamed = new Set((naming?.rows ?? []).map((row) => row.id));
   const kin = new Map(
-    groups.flatMap((group) =>
-      group.map((party) => [party.id, group[0]?.id ?? party.id] as const),
-    ),
+    groups.flatMap((group) => {
+      const root = group.find((party) => !renamed.has(party.id))?.id;
+      return group.map(
+        (party) =>
+          [
+            party.id,
+            renamed.has(party.id) ? party.id : (root ?? party.id),
+          ] as const,
+      );
+    }),
   );
   const rekey = (key: string | null) =>
     key == null || key === "independent" || key.startsWith("category:")
