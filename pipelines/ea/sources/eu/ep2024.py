@@ -20,7 +20,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep2024"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 EP = "https://results.elections.europa.eu/data-sheets/csv/2024-2029/election-results"
 FILES = {
@@ -1297,6 +1297,131 @@ SHORTS = {
     ("SI", "SOCIALNI DEMOKRATI - SD"): "SD",
     ("SI", "VESNA - ZELENA STRANKA"): "Vesna",
     ("SK", "HLAS - sociálna demokracia"): "Hlas",
+    ("SK", "Progresívne Slovensko"): "PS",
+}
+COLORS = {
+    ("AT", "ÖVP"): "#63c3d0",
+    ("AT", "SPÖ"): "#ce000c",
+    ("AT", "FPÖ"): "#0056a2",
+    ("AT", "GRÜNE"): "#88b626",
+    ("AT", "NEOS"): "#e84188",
+    ("BE", "N-VA"): "#ffed00",
+    ("BE", "VLAAMS BELANG"): "#ffe500",
+    ("BE", "MR"): "#0047ab",
+    ("BE", "PS"): "#ff0000",
+    ("BE", "Vooruit"): "#ff2900",
+    ("BE", "cd&v"): "#ff9900",
+    ("BE", "Open Vld Renew EU"): "#003d6d",
+    ("BE", "GROEN"): "#83de62",
+    ("BE", "ECOLO"): "#3cb043",
+    ("BE", "PVDA"): "#aa0000",
+    ("BE", "PTB"): "#aa0000",
+    ("BE", "LES ENGAGÉS"): "#00c9c9",
+    ("BG", "ГЕРБ-СДС"): "#0054a6",
+    ("BG", "БСП за БЪЛГАРИЯ"): "#db0f28",
+    ("BG", "ВЪЗРАЖДАНЕ"): "#c09f2e",
+    ("CY", "ΔΗΜΟΚΡΑΤΙΚΟΣ ΣΥΝΑΓΕΡΜΟΣ"): "#1569c7",
+    ("CY", "ΑΚΕΛ (Α.Κ.Ε.Λ.) ΑΡΙΣΤΕΡΑ - ΚΟΙΝΩΝΙΚΗ ΣΥΜΜΑΧΙΑ"): "#d4202a",
+    ("CY", "ΔΗΜΟΚΡΑΤΙΚΟ ΚΟΜΜΑ"): "#f39200",
+    ("CY", "ΕΘΝΙΚΟ ΛΑΪΚΟ ΜΕΤΩΠΟ (Ε.ΛΑ.Μ.)"): "#1c2f5b",
+    ("CZ", "ANO 2011"): "#261060",
+    ("CZ", "SPOLU (ODS, KDU-ČSL, TOP 09)"): "#23438b",
+    ("CZ", "Starostové a osobn. pro Evropu"): "#5d8c00",
+    ("CZ", "Česká pirátská strana"): "#000000",
+    ("DK", "Socialdemokratiet"): "#a82721",
+    ("DK", "SF - Socialistisk Folkeparti"): "#e07ea8",
+    ("DK", "Venstre, Danmarks Liberale Parti"): "#254264",
+    ("DK", "Radikale Venstre"): "#733280",
+    ("DK", "Det Konservative Folkeparti"): "#96b226",
+    ("DK", "Dansk Folkeparti"): "#eac73e",
+    ("DK", "Danmarksdemokraterne - Inger Støjberg"): "#7896d2",
+    ("DK", "Liberal Alliance"): "#3fb2be",
+    ("DK", "Enhedslisten - De Rød-Grønne"): "#e6801a",
+    ("DK", "Moderaterne"): "#842990",
+    ("EE", "Sotsiaaldemokraatlik Erakond"): "#e10600",
+    ("EE", "Eesti Reformierakond"): "#ffde00",
+    ("EE", "ISAMAA Erakond"): "#009ce2",
+    ("EE", "Eesti Keskerakond"): "#007557",
+    ("EE", "Eesti Konservatiivne Rahvaerakond"): "#0f4dad",
+    ("ES", "Partido Popular"): "#1d84ce",
+    ("ES", "Partido Socialista Obrero Español"): "#e30613",
+    ("ES", "VOX"): "#63be21",
+    ("ES", "SUMAR"): "#e51c55",
+    ("ES", "PODEMOS"): "#6c1e74",
+    ("ES", "Junts i Lliures per Europa"): "#00c3b2",
+    ("FI", "Kansallinen Kokoomus"): "#006288",
+    ("FI", "Vasemmistoliitto"): "#f00a64",
+    ("FI", "Suomen Keskusta"): "#01954b",
+    ("FI", "Suomen Sosialidemokraattinen Puolue"): "#f54b4b",
+    ("FI", "Vihreä liitto"): "#61bf1a",
+    ("FI", "Perussuomalaiset"): "#ffde55",
+    ("FI", "Suomen ruotsalainen kansanpuolue"): "#ffdd93",
+    ("GR", "ΝΕΑ ΔΗΜΟΚΡΑΤΙΑ"): "#0f62ac",
+    ("GR", "ΣΥΝΑΣΠΙΣΜΟΣ ΡΙΖΟΣΠΑΣΤΙΚΗΣ ΑΡΙΣΤΕΡΑΣ-ΠΡΟΟΔΕΥΤΙΚΗ ΣΥΜΜΑΧΙΑ"): "#e2006a",
+    ("GR", "ΠΑΣΟΚ - Κίνημα Αλλαγής"): "#3ea34a",
+    ("GR", "ΚΟΜΜΟΥΝΙΣΤΙΚΟ ΚΟΜΜΑ ΕΛΛΑΔΑΣ"): "#ce0000",
+    ("HR", "HRVATSKA DEMOKRATSKA ZAJEDNICA - HDZ"): "#0e3a91",
+    (
+        "HR",
+        'SOCIJALDEMOKRATSKA PARTIJA HRVATSKE - SDP, "DALIJA OREŠKOVIĆ I LJUDI S IMENOM I PREZIMENOM" - "DO i SIP", CENTAR, HRVATSKA SELJAČKA STRANKA - HSS, GRAĐANSKO-LIBERALNI SAVEZ - GLAS',
+    ): "#e3000f",
+    ("HU", "FIDESZ-KDNP"): "#fd8204",
+    ("HU", "TISZA"): "#ee3d44",
+    ("HU", "DK-MSZP-Párbeszéd- ZÖLDEK"): "#0067aa",
+    ("HU", "Mi Hazánk"): "#688d1b",
+    ("LT", "Tėvynės sąjunga-Lietuvos krikščionys demokratai"): "#00a588",
+    ("LT", "Lietuvos socialdemokratų partija"): "#e10514",
+    ("LT", "Lietuvos valstiečių ir žaliųjų sąjunga"): "#00a651",
+    ("LT", "Liberalų sąjūdis"): "#f48022",
+    ("LU", "CSV"): "#f8a000",
+    ("LU", "LSAP"): "#ff0000",
+    ("LU", "DP – DEMOKRATESCH PARTEI"): "#00529c",
+    ("LU", "déi gréng"): "#83c441",
+    ("LV", "Jaunā VIENOTĪBA"): "#9fc54a",
+    ("LV", 'Nacionālā apvienība "Visu Latvijai!"-"Tēvzemei un Brīvībai/LNNK"'): "#942525",
+    ("MT", "Partit Nazzjonalista"): "#0047ab",
+    ("MT", "Partit Laburista"): "#e2001a",
+    ("NL", "GROENLINKS / Partij van de Arbeid (PvdA)"): "#df111a",
+    ("NL", "PVV (Partij voor de Vrijheid)"): "#002759",
+    ("NL", "VVD"): "#ff7709",
+    ("NL", "D66"): "#01af40",
+    ("NL", "CDA - Europese Volkspartij"): "#007b5f",
+    ("NL", "BBB"): "#94c11f",
+    ("NL", "Volt Nederland"): "#502379",
+    ("NL", "Partij voor de Dieren"): "#006c2e",
+    ("NL", "Staatkundig Gereformeerde Partij (SGP)"): "#f96a11",
+    ("PL", "KOALICYJNY KOMITET WYBORCZY KOALICJA OBYWATELSKA"): "#f68f2d",
+    ("PL", "KOMITET WYBORCZY PRAWO I SPRAWIEDLIWOŚĆ"): "#263778",
+    ("PL", "KOMITET WYBORCZY KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ"): "#122746",
+    ("PL", "KOALICYJNY KOMITET WYBORCZY LEWICA"): "#ac145a",
+    (
+        "PL",
+        "KOALICYJNY KOMITET WYBORCZY TRZECIA DROGA POLSKA 2050 SZYMONA HOŁOWNI - POLSKIE STRONNICTWO LUDOWE",
+    ): "#f9c013",
+    ("PT", "Partido Socialista"): "#ff66ff",
+    ("PT", "AD — ALIANÇA DEMOCRÁTICA"): "#ff8c00",
+    ("PT", "CHEGA"): "#202056",
+    ("PT", "Iniciativa Liberal"): "#00aeef",
+    ("PT", "Bloco de Esquerda"): "#c90535",
+    ("PT", "CDU — Coligação Democrática Unitária"): "#e2001a",
+    ("RO", "ALIANȚA ELECTORALĂ PSD PNL"): "#ed2128",
+    ("RO", "ALIANȚA AUR"): "#f4c300",
+    ("RO", "ALIANȚA DREAPTA UNITĂ USR - PMP - FORȚA DREPTEI"): "#00a6ff",
+    ("RO", "UNIUNEA DEMOCRATĂ MAGHIARĂ DIN ROMÂNIA"): "#15803c",
+    ("SE", "Arbetarepartiet-Socialdemokraterna"): "#e8112d",
+    ("SE", "Moderaterna"): "#52bdec",
+    ("SE", "Miljöpartiet de gröna"): "#83cf39",
+    ("SE", "Sverigedemokraterna"): "#dddd00",
+    ("SE", "Vänsterpartiet"): "#da291c",
+    ("SE", "Centerpartiet"): "#009933",
+    ("SE", "Kristdemokraterna"): "#000077",
+    ("SE", "Liberalerna (tidigare Folkpartiet)"): "#006ab3",
+    ("SI", "SLOVENSKA DEMOKRATSKA STRANKA - SDS"): "#ffdd00",
+    ("SI", "GIBANJE SVOBODA"): "#00b6dd",
+    ("SI", "NOVA SLOVENIJA - KRŠČANSKI DEMOKRATI"): "#0070c0",
+    ("SI", "SOCIALNI DEMOKRATI - SD"): "#e2001a",
+    ("SK", "Progresívne Slovensko"): "#00bdff",
+    ("SK", "SMER - sociálna demokracia"): "#d82222",
 }
 PARTIES = {
     ("ES", "Partido Popular"): "da48502c-6236-5a46-a8dc-8fc85e82630d",
@@ -1365,7 +1490,6 @@ PARTIES = {
     ("NL", "Forum voor Democratie"): "ff26f82a-31c7-5503-94f9-50164ca2425c",
     ("NL", "SP (Socialistische Partij)"): "d1fe8817-9318-54d5-90ea-1b0739d3fb66",
     ("PL", "KOMITET WYBORCZY PRAWO I SPRAWIEDLIWOŚĆ"): "5ac70265-719b-51a9-8e31-69a1d6e541c7",
-    ("SK", "Progresívne Slovensko"): "829eecda-2385-5a84-98ae-82e77b8159af",
     ("SK", "SMER - sociálna demokracia"): "b64c8320-810f-5e8b-b647-b55723e0362c",
     ("SK", "Kresťanskodemokratické hnutie"): "31f2b5fd-86b8-52e3-930b-0edd1fde5f19",
     ("SK", "Sloboda a Solidarita"): "999724ab-e3d7-5faa-9840-60de2c452bb0",
@@ -1483,6 +1607,7 @@ def emit() -> Path:
             ).fetchall()
         }
         blocs: dict[UUID, Counter[str]] = defaultdict(Counter)
+        painted: set[tuple[str, str]] = set()
         frames = []
         located: list[pl.DataFrame] = []
         for iso, (publisher, title, url, license, start, end) in AUTHORITIES.items():
@@ -1652,6 +1777,9 @@ def emit() -> Path:
                         name(party, proper or row["label"], "und", "official", True)
                     if mapped is None and (iso, row["label"]) in SHORTS:
                         name(party, SHORTS[iso, row["label"]], "und", "abbreviation", False)
+                    if (iso, row["label"]) in COLORS:
+                        cs.add("party_color", party_id=party, color=COLORS[iso, row["label"]], valid_from=None)
+                        painted.add((iso, row["label"]))
                     if mapped is not None and (old := published.get(f"{iso}:{row['label']}")) is not None:
                         cs.merge(UUID(old), UUID(str(party)))
                     option = cs.key(
@@ -1736,6 +1864,8 @@ def emit() -> Path:
             f"ep_group affiliations: {sum(1 for tally in blocs.values() if len(tally) == 1)};"
             f" split: {[(str(party), dict(tally)) for party, tally in blocs.items() if len(tally) != 1]}"
         )
+        if unpainted := set(COLORS) - painted:
+            raise ValueError(f"COLORS keys match no list: {sorted(unpainted)}")
         cs.frame("result_value", pl.concat(frames))
         if located:
             cs.frame("value_locator", pl.concat(located))

@@ -16252,6 +16252,7 @@ export const elections = {
           select id, kid from roots
           union all
           select c.id, grp.kid from contest c join grp on c.allocation_parent_id = grp.id
+          where c.party_scope_id is null
         ),
         winners as materialized (
           select g.kid, o.id, coalesce(pm.into_id, o.party_id, o.alliance_id) as party, max(coalesce(x.seats, 1))::int as seats
@@ -16260,7 +16261,7 @@ export const elections = {
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
           join contest_option o on o.id = x.option_id
           left join entity_merge pm on pm.entity_id = o.party_id
-          where not exists (select from contest d where d.allocation_parent_id = g.id)
+          where not exists (select from contest d where d.allocation_parent_id = g.id and d.party_scope_id is null)
           group by g.kid, g.id, o.id, pm.into_id
         ),
         placed as (
@@ -16274,7 +16275,7 @@ export const elections = {
           join area a on a.id = ac.area_id and a.scheme_code = 'eu.member_state'
           left join lateral (
             select parent_party_id from party_affiliation
-            where kind = 'ep_group' and party_id = w.party and valid @> kids.day
+            where kind = 'ep_group' and party_id = w.party and valid @> kids.day + 40
             order by valid_from desc nulls last limit 1
           ) f on true
           left join entity_merge gm on gm.entity_id = f.parent_party_id
@@ -17111,27 +17112,32 @@ export async function record(input: { id: string; body?: string }) {
                         !all.some((other) => other.from === size.to),
                     )?.to ?? null,
                 parties: group
-                  .map((row) => ({
-                    party: row.party,
-                    seats: row.seats,
-                    isIndependent: row.isIndependent,
-                    group:
-                      sided
-                        .get(row.party ?? "")
-                        ?.find(
-                          (bloc) =>
-                            (bloc.from == null || bloc.from <= row.date) &&
-                            (bloc.to == null || row.date < bloc.to),
-                        )?.group ?? null,
-                    label:
-                      renamed
-                        .get(row.party ?? "")
-                        ?.find(
-                          (name) =>
-                            (name.from == null || name.from <= row.date) &&
-                            (name.to == null || row.date < name.to),
-                        )?.text ?? null,
-                  }))
+                  .map((row) => {
+                    const sat = new Date(Date.parse(row.date) + 40 * 86_400_000)
+                      .toISOString()
+                      .slice(0, 10);
+                    return {
+                      party: row.party,
+                      seats: row.seats,
+                      isIndependent: row.isIndependent,
+                      group:
+                        sided
+                          .get(row.party ?? "")
+                          ?.find(
+                            (bloc) =>
+                              (bloc.from == null || bloc.from <= sat) &&
+                              (bloc.to == null || sat < bloc.to),
+                          )?.group ?? null,
+                      label:
+                        renamed
+                          .get(row.party ?? "")
+                          ?.find(
+                            (name) =>
+                              (name.from == null || name.from <= row.date) &&
+                              (name.to == null || row.date < name.to),
+                          )?.text ?? null,
+                    };
+                  })
                   .toSorted(
                     (a, b) =>
                       b.seats - a.seats ||

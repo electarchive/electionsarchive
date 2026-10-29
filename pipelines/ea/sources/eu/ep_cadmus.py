@@ -17,7 +17,7 @@ from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep_cadmus"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cadmus.eui.eu/bitstreams/9a5261b3-8dea-5650-988a-fac4460a8f3c/download"
 DEMON = "https://web.archive.org/web/20200201142936id_/http://www.election.demon.co.uk:80/eplon.html"
@@ -260,6 +260,41 @@ DATED_NAMES = [
     ("Q541679", "Democrats of the Left", "en", date(1998, 2, 13), date(2007, 10, 14)),
 ]
 WIKIDATA_TITLE = "Wikidata items for party names and dates"
+RENAMED = {
+    "AT:Das Neue Österreich und Liberales Forum": (None, "NEOS"),
+    "AT:Die Grünen": (None, "Grüne"),
+    "BE:Ecolo": (None, "Ecolo"),
+    "BE:Open Vlaamse Liberalen en Democraten": (None, "Open Vld"),
+    "BE:VLAAMS BELANG": (None, "VB"),
+    "BE:N-VA": (None, "N-VA"),
+    "BE:Parti socialiste": ("Socialist Party", "PS"),
+    "BE:Christlich-Soziale Partei": ("Christian Social Party", "CSP"),
+    "BE:PVDA/PTB": (None, "PVDA–PTB"),
+    "BE:Mouvement Réformateur (MR)": (None, "MR"),
+    "BE:Christen-Democratisch en Vlaams (CD&V)": (None, "CD&V"),
+    "BE:Groen": (None, "Groen"),
+    "CY:Δημοκρατικός Συναγερμός (ΔΗΣΥ)": (None, "DISY"),
+    "CY:Δημοκρατικό Κόμμα (ΔΗΚΟ)": (None, "DIKO"),
+    "CY:Ανορθωτικό Κόμμα Εργαζόμενου Λαού (ΑΚΕΛ)": (None, "AKEL"),
+    "CZ:ANO 2011": (None, "ANO"),
+    "CZ:Česká pirátská strana": (None, "Piráti"),
+    "EE:Sotsiaaldemokraatlik Erakond": ("Social Democratic Party", "SDE"),
+    "EE:Eesti Reformierakond": ("Estonian Reform Party", "Reform"),
+    "ES:Junts per Catalunya (previously CiU)": (None, "Junts"),
+    "HR:Hrvatska demokratska zajednica": (None, "HDZ"),
+    "IT:Forza Italia": ("Forza Italia", "FI"),
+    "LT:Tėvynės sąjunga – Lietuvos krikščionys demokratai": (
+        "Homeland Union – Lithuanian Christian Democrats",
+        "TS–LKD",
+    ),
+    "LT:Lietuvos socialdemokratų partija": ("Social Democratic Party of Lithuania", "LSDP"),
+    'LV:Nacionālā apvienība "Visu Latvijai!” – "Tēvzemei un Brīvībai/LNNK': (None, "NA"),
+    "NL:Partij voor de Vrijheid": (None, "PVV"),
+    "NL:Partij voor de Dieren": (None, "PvdD"),
+    "NL:Democraten 66": (None, "D66"),
+    "SK:Kresťanskodemokratické hnutie": (None, "KDH"),
+    "SK:Smer - sociálna demokracia": (None, "Smer"),
+}
 OTHERS = {"others", "other"}
 MISSING = {".", ""}
 UK_PARTIES = {
@@ -686,6 +721,18 @@ def emit() -> Path:
                 valid_to_precision="day",
                 source_id=wikidata,
             )
+        english = dict(
+            conn.execute(
+                """select n.entity_id, n.id from name n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'official' and n.lang = 'en' and n.entity_id = any(%s)""",
+                [SOURCE, [cs.key("eu.ep_cadmus.party", label) for label in RENAMED]],
+            ).fetchall()
+        )
+        for label, (text, short) in RENAMED.items():
+            party = cs.key("eu.ep_cadmus.party", label)
+            if text is not None and party not in cs.minted:
+                name(party, text, id=english.get(party))
+            name(party, short, "und", "abbreviation", False)
         allied: set[UUID] = set()
         print(f"{len(coalitions)} coalition lists with members named by ParlGov")
         stale = conn.execute(
@@ -960,7 +1007,7 @@ def emit() -> Path:
                             party = parties[key] = cs.key("eu.ep_cadmus.party", f"{iso}:{label_text}")
                             if party in cs.minted:
                                 cs.add("party", id=party, polity_id=polities[iso])
-                                name(party, row["party"])
+                                name(party, RENAMED.get(f"{iso}:{label_text}", (None,))[0] or row["party"])
                                 if row["party_original"] and row["party_original"] != row["party"]:
                                     name(party, row["party_original"], "und", "native", False)
                     if iso == "IT" and year >= 2018 and label_text in ("Lega", "Lega Nord"):

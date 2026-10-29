@@ -2450,6 +2450,9 @@
         ? m.election_children()
         : m.election_places({ noun: partNoun })}
     </h2>
+    {const isDated = $derived(
+      parts.some((child) => child.date !== election.date),
+    )}
     <ul class="grid grid-cols-2 gap-x-6 text-sm sm:grid-cols-3 lg:grid-cols-4">
       {#each parts as child, index (index)}
         <li
@@ -2462,7 +2465,7 @@
               >{child.place ?? child.name}</Preview
             >
           {/if}
-          {#if child.date !== election.date}
+          {#if isDated}
             <time
               class="shrink-0 font-figures text-xs text-muted-foreground"
               datetime={child.date}>{date(child.date)}</time
