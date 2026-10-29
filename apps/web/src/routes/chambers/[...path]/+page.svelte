@@ -204,27 +204,28 @@
         entry.party == null
           ? null
           : (info.get(entry.party) ?? own.get(entry.party));
-      const came = new Map<string, number>();
-      if (party != null && party.lean == null) {
-        for (const member of seated.get(entry.party) ?? []) {
-          const current = member.spells.find(
-            (spell) =>
-              (spell.from ?? "") <= on && (spell.to == null || spell.to > on),
-          );
-          const before = member.spells
-            .filter(
-              (spell) =>
-                current?.from != null &&
-                spell.to != null &&
-                spell.to <= current.from,
-            )
-            .toSorted((a, b) => (b.to ?? "").localeCompare(a.to ?? ""))[0];
-          const from = before?.party == null ? null : home(before.party);
-          if (from != null && from !== entry.party) {
-            came.set(from, (came.get(from) ?? 0) + 1);
-          }
-        }
-      }
+      const came = Map.groupBy(
+        party == null || party.lean != null
+          ? []
+          : (seated.get(entry.party) ?? []).flatMap((member) => {
+              const current = member.spells.find(
+                (spell) =>
+                  (spell.from ?? "") <= on &&
+                  (spell.to == null || spell.to > on),
+              );
+              const before = member.spells
+                .filter(
+                  (spell) =>
+                    current?.from != null &&
+                    spell.to != null &&
+                    spell.to <= current.from,
+                )
+                .toSorted((a, b) => (b.to ?? "").localeCompare(a.to ?? ""))[0];
+              const from = before?.party == null ? null : home(before.party);
+              return from == null || from === entry.party ? [] : [from];
+            }),
+        (from) => from,
+      );
       return {
         key: entry.party ?? "none",
         label: party?.label ?? m.record_none(),
@@ -235,7 +236,7 @@
           came
             .entries()
             .toArray()
-            .toSorted((a, b) => b[1] - a[1])[0]?.[0] ?? null,
+            .toSorted((a, b) => b[1].length - a[1].length)[0]?.[0] ?? null,
         seats: entry.seats,
         here: 0,
         members: (seated.get(entry.party) ?? []).map((member) => ({

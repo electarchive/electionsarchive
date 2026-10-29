@@ -24,6 +24,15 @@
       isPartial: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
+      steps: Array<{
+        date: string;
+        parties: Array<{ party: string | null; seats: number }>;
+        moves: Array<{
+          from: string | null;
+          to: string | null;
+          members: number;
+        }>;
+      }>;
     }>;
     parties: Array<{
       id: string;
@@ -72,6 +81,11 @@
           : basis === "mixed"
             ? m.chamber_makeup_mixed()
             : m.chamber_makeup_results()}
+        {#if terms.some((term) => term.steps.length > 0)}
+          {m.chamber_makeup_steps()}
+        {:else if basis !== "results"}
+          {m.chamber_makeup_no_steps()}
+        {/if}
       </p>
     </div>
     <div class="flex" role="group" aria-label={m.chamber_scale()}>

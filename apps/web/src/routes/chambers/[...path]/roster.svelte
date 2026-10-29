@@ -79,6 +79,7 @@
     keep({ party, member: query.trim() === "" ? null : query });
   });
   let isOpen = $state(false);
+  let kind = $state<"all" | "seats" | "party">("all");
 
   const today = new Date().toISOString().slice(0, 10);
   const groups = $derived([
@@ -220,18 +221,84 @@
           a.on.localeCompare(b.on) || Number(a.isJoin) - Number(b.isJoin),
       ),
   );
+  const switches = $derived(
+    Map.groupBy(
+      members.flatMap((member) =>
+        member.segments
+          .slice(1)
+          .map((segment, index) => ({
+            member,
+            on: segment.from,
+            from: member.segments[index]?.party ?? null,
+            to: segment.party,
+          })),
+      ),
+      (move) => `${move.on}|${move.from}|${move.to}`,
+    )
+      .values()
+      .flatMap((group) => {
+        const head = group[0];
+        return head == null
+          ? []
+          : [
+              {
+                on: head.on,
+                from: head.from,
+                to: head.to,
+                members: group.map((move) => move.member),
+              },
+            ];
+      })
+      .toArray(),
+  );
+  const feed = $derived(
+    [
+      ...(kind === "party"
+        ? []
+        : events.map((event) => ({ ...event, move: null }))),
+      ...(kind === "seats"
+        ? []
+        : switches.map((move) => ({
+            member: move.members[0],
+            on: move.on,
+            isJoin: true,
+            why: null,
+            move,
+          }))),
+    ].toSorted((a, b) => a.on.localeCompare(b.on)),
+  );
 </script>
 
 {#if mode === "changes"}
   <div class="grid gap-2">
-    <h2 class="text-[0.8125rem] font-bold">{m.chamber_changes()}</h2>
-    {#if events.length === 0}
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
+      <h2 class="text-[0.8125rem] font-bold">{m.chamber_changes()}</h2>
+      {#if events.length > 0 && switches.length > 0}
+        <div class="flex" role="group" aria-label={m.chamber_changes()}>
+          {#each [["all", m.chamber_changes_all()], ["seats", m.chamber_changes_seats()], ["party", m.chamber_changes_party()]] as const as [value, text] (value)}
+            <button
+              type="button"
+              class={cn(
+                "-ms-px flex items-center border border-input bg-card px-2 text-xs font-semibold keycap block-6 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                {
+                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                    kind === value,
+                },
+              )}
+              aria-pressed={kind === value}
+              onclick={() => (kind = value)}>{text}</button
+            >
+          {/each}
+        </div>
+      {/if}
+    </div>
+    {#if feed.length === 0}
       <p class="text-sm text-muted-foreground">{m.chamber_changes_none()}</p>
     {:else}
       <ol
         class="grid overflow-y-auto rounded-sm text-[0.8125rem] ring-1 ring-border max-block-88"
       >
-        {#each events as event, index (index)}
+        {#each feed as event, index (index)}
           <li
             class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
           >
@@ -239,29 +306,92 @@
               class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums sm:inline-34 max-sm:col-span-2"
               >{date(event.on)}</span
             >
-            <span class="flex items-baseline gap-1.5 truncate">
-              <span
-                class="shrink-0 self-center rounded-xs block-2 inline-2"
-                style:background={tint(event.member.party)}
-              ></span>
-              <Name
-                class="truncate font-semibold"
-                label={event.member.name}
-                person={event.member.person}
-              />
-              <span class="truncate text-muted-foreground"
-                >{event.member.place?.slice(shared) ??
-                  event.member.seat ??
-                  ""}</span
+            {#if event.move != null}
+              <span class="grid gap-1 min-inline-0">
+                <span class="flex items-baseline gap-1.5 truncate">
+                  <span
+                    class="shrink-0 self-center rounded-xs block-2 inline-2"
+                    style:background={tint(event.move.from)}
+                  ></span>
+                  <span class="text-muted-foreground"
+                    >{label(event.move.from)}</span
+                  >
+                  <span class="text-muted-foreground" aria-hidden="true">→</span
+                  >
+                  <span
+                    class="shrink-0 self-center rounded-xs block-2 inline-2"
+                    style:background={tint(event.move.to)}
+                  ></span>
+                  <span class="text-muted-foreground"
+                    >{label(event.move.to)}</span
+                  >
+                  {#if event.move.members.length === 1 && event.move.members[0] != null}
+                    <Name
+                      class="truncate font-semibold"
+                      label={event.move.members[0].name}
+                      person={event.move.members[0].person}
+                    />
+                  {/if}
+                </span>
+                {#if event.move.members.length > 1}
+                  <details class="group">
+                    <summary
+                      class="cursor-pointer font-semibold marker:text-muted-foreground"
+                      >{m.chamber_step_members({
+                        count: event.move.members.length,
+                      })}</summary
+                    >
+                    <ul class="grid gap-0.5 ps-3.5 pbs-1">
+                      {#each event.move.members as member (member.person)}
+                        <li class="flex items-baseline gap-1.5 truncate">
+                          <Name
+                            class="truncate"
+                            label={member.name}
+                            person={member.person}
+                          />
+                          <span class="truncate text-muted-foreground"
+                            >{member.place?.slice(shared) ??
+                              member.seat ??
+                              ""}</span
+                          >
+                        </li>
+                      {/each}
+                    </ul>
+                  </details>
+                {/if}
+              </span>
+              <span class="text-xs font-semibold whitespace-nowrap"
+                >{event.move.to == null || event.move.to === "independent"
+                  ? m.chamber_changed_party()
+                  : m.chamber_joined_party({
+                      party: label(event.move.to),
+                    })}</span
               >
-            </span>
-            <span
-              class={cn("text-xs font-semibold whitespace-nowrap", {
-                "text-muted-foreground": !event.isJoin,
-              })}
-              >{event.why ??
-                (event.isJoin ? m.chamber_joined() : m.chamber_left())}</span
-            >
+            {:else}
+              <span class="flex items-baseline gap-1.5 truncate">
+                <span
+                  class="shrink-0 self-center rounded-xs block-2 inline-2"
+                  style:background={tint(event.member.party)}
+                ></span>
+                <Name
+                  class="truncate font-semibold"
+                  label={event.member.name}
+                  person={event.member.person}
+                />
+                <span class="truncate text-muted-foreground"
+                  >{event.member.place?.slice(shared) ??
+                    event.member.seat ??
+                    ""}</span
+                >
+              </span>
+              <span
+                class={cn("text-xs font-semibold whitespace-nowrap", {
+                  "text-muted-foreground": !event.isJoin,
+                })}
+                >{event.why ??
+                  (event.isJoin ? m.chamber_joined() : m.chamber_left())}</span
+              >
+            {/if}
           </li>
         {/each}
       </ol>

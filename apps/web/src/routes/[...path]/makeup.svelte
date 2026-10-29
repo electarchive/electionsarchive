@@ -28,6 +28,15 @@
       isPartial: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
+      steps?: Array<{
+        date: string;
+        parties: Array<{ party: string | null; seats: number }>;
+        moves: Array<{
+          from: string | null;
+          to: string | null;
+          members: number;
+        }>;
+      }>;
     }>;
     parties: Array<{
       id: string;
@@ -57,6 +66,7 @@
 
   let width = $state(0);
   let hovered = $state<number | null>(null);
+  let pointer = $state<number | null>(null);
   let seated = $state<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -93,7 +103,10 @@
   const order = $derived.by(() => {
     const held = new Map(
       Map.groupBy(
-        terms.flatMap((term) => term.parties),
+        terms.flatMap((term) => [
+          ...term.parties,
+          ...(term.steps ?? []).flatMap((step) => step.parties),
+        ]),
         (entry) => entry.party,
       )
         .entries()
@@ -125,22 +138,47 @@
           : 0;
       const whole = Math.max(term.total + term.seceded + empty, 1);
       const unit = isShare ? inner / whole : inner / peak;
-      const seats = new Map(
-        term.parties.map((entry) => [entry.party, entry.seats]),
-      );
-      let below = 0;
-      const layers: Array<[string | null, { y0: number; y1: number }]> = [];
-      for (const party of order) {
-        const value = seats.get(party) ?? 0;
-        layers.push([
-          party,
-          {
-            y0: PAD.top + inner - below * unit,
-            y1: PAD.top + inner - (below + value) * unit,
-          },
-        ]);
-        below += value;
-      }
+      const stack = (
+        parties: Array<{ party: string | null; seats: number }>,
+      ) => {
+        const seats = new Map(
+          parties.map((entry) => [entry.party, entry.seats]),
+        );
+        let below = 0;
+        const layers: Array<[string | null, { y0: number; y1: number }]> = [];
+        for (const party of order) {
+          const value = seats.get(party) ?? 0;
+          layers.push([
+            party,
+            {
+              y0: PAD.top + inner - below * unit,
+              y1: PAD.top + inner - (below + value) * unit,
+            },
+          ]);
+          below += value;
+        }
+        return { layers: new Map(layers), below };
+      };
+      const { below } = stack(term.parties);
+      const opening = { from: term.start, parties: term.parties, step: null };
+      const marks = [
+        opening,
+        ...(term.steps ?? []).map((step) => ({
+          from: step.date,
+          parties: step.parties,
+          step,
+        })),
+      ];
+      const parts = marks.map((part, at) => {
+        const after = marks[at + 1];
+        return {
+          ...part,
+          x0: at === 0 ? x0 : sx(Date.parse(part.from)),
+          x1: after == null ? x1 : sx(Date.parse(after.from)),
+          to: after?.from ?? term.end,
+          stack: stack(part.parties).layers,
+        };
+      });
       const n = term.size ?? term.total;
       const majority = Math.floor(n / 2) + 1;
       return {
@@ -148,7 +186,7 @@
         term,
         x0,
         x1,
-        stack: new Map(layers),
+        parts,
         empty,
         whole,
         seceded: {
@@ -166,21 +204,34 @@
       };
     }),
   );
+  const slices = $derived(
+    columns.flatMap((column) =>
+      column.parts.map((part) => ({ ...part, column: column.index })),
+    ),
+  );
   const bands = $derived(
     order.map((party) => {
-      const runs = columns.map((column, index) => {
-        const ease = Math.min(5, (column.x1 - column.x0) * 0.22);
+      const runs = slices.map((part, index) => {
+        const before = slices[index - 1];
+        const after = slices[index + 1];
+        const column = columns[part.column];
+        const ease = Math.min(
+          5,
+          ((column?.x1 ?? 0) - (column?.x0 ?? 0)) * 0.22,
+          (part.x1 - part.x0) / 2,
+        );
+        const isInBefore = before?.column === part.column;
+        const isInAfter = after?.column === part.column;
         const joinsBefore =
-          index > 0 && column.x0 - (columns[index - 1]?.x1 ?? 0) < 1;
+          before != null && (isInBefore || part.x0 - before.x1 < 1);
         const joinsAfter =
-          index < columns.length - 1 &&
-          (columns[index + 1]?.x0 ?? 0) - column.x1 < 1;
+          after != null && (isInAfter || after.x0 - part.x1 < 1);
         return {
-          a: column.x0 + (joinsBefore ? ease : 0),
-          b: column.x1 - (joinsAfter ? ease : 0),
-          edge: column.x1,
+          a: part.x0 + (joinsBefore && !isInBefore ? ease : 0),
+          b: part.x1 - (joinsAfter && !isInAfter ? ease : 0),
+          edge: part.x1,
           joinsAfter,
-          ...(column.stack.get(party) ?? { y0: 0, y1: 0 }),
+          ...(part.stack.get(party) ?? { y0: 0, y1: 0 }),
         };
       });
       const groups: Array<typeof runs> = [];
@@ -237,18 +288,14 @@
       }
       const text = label(party);
       let best: { x: number; y: number; room: number } | null = null;
-      for (const column of columns) {
-        const at = column.stack.get(party);
+      for (const part of slices) {
+        const at = part.stack.get(party);
         const thick = at == null ? 0 : at.y0 - at.y1;
-        const wide = column.x1 - column.x0;
+        const wide = part.x1 - part.x0;
         if (at != null && thick >= 15 && wide >= text.length * 6.6 + 12) {
           const room = thick * Math.min(wide, 220);
           if (best == null || room > best.room) {
-            best = {
-              x: (column.x0 + column.x1) / 2,
-              y: (at.y0 + at.y1) / 2,
-              room,
-            };
+            best = { x: (part.x0 + part.x1) / 2, y: (at.y0 + at.y1) / 2, room };
           }
         }
       }
@@ -291,6 +338,20 @@
     }),
   );
   const lit = $derived(columns[hovered ?? -1] ?? null);
+  const part = $derived(
+    lit == null
+      ? null
+      : ((pointer == null
+          ? null
+          : lit.parts.findLast(
+              (entry) => pointer != null && pointer >= entry.x0,
+            )) ??
+          lit.parts[0] ??
+          null),
+  );
+  const steps = $derived(
+    slices.filter((entry) => entry.step != null).map((entry) => entry.x0),
+  );
   const current = $derived(selected ?? hovered ?? columns.length - 1);
   const pick = (index: number) => {
     if (selected != null) {
@@ -324,9 +385,12 @@
       .slice(0, 14),
   );
 
-  const locate = (event: MouseEvent & { currentTarget: SVGSVGElement }) => {
+  const along = (event: MouseEvent & { currentTarget: SVGSVGElement }) => {
     const box = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - box.left) / box.width) * width;
+    return ((event.clientX - box.left) / box.width) * width;
+  };
+  const locate = (event: MouseEvent & { currentTarget: SVGSVGElement }) => {
+    const x = along(event);
     const found = columns.findIndex(
       (column) => x >= column.x0 && x < column.x1,
     );
@@ -341,7 +405,7 @@
 <Measured
   bind:width
   class="relative min-inline-0"
-  reserve={"clamp(230px, (100vw - 640px) * 100, 320px)"}
+  reserve="clamp(230px, (100vw - 640px) * 100, 320px)"
 >
   <svg
     class={cn(
@@ -364,8 +428,14 @@
     aria-valuetext={terms[current]?.election?.name ??
       terms[current]?.start ??
       ""}
-    onpointermove={(event) => (hovered = locate(event))}
-    onpointerleave={() => (hovered = null)}
+    onpointermove={(event) => {
+      hovered = locate(event);
+      pointer = along(event);
+    }}
+    onpointerleave={() => {
+      hovered = null;
+      pointer = null;
+    }}
     onblur={() => {
       if (selected == null) {
         hovered = null;
@@ -384,6 +454,7 @@
       const move = moves[event.key];
       if (move != null) {
         event.preventDefault();
+        pointer = null;
         const next = Math.min(columns.length - 1, Math.max(0, current + move));
         if (selected == null) {
           hovered = next;
@@ -464,6 +535,27 @@
         opacity="0.5"
       />
     {/if}
+    {#each columns.slice(1) as column (column.index)}
+      <line
+        x1={column.x0}
+        x2={column.x0}
+        y1={PAD.top}
+        y2={PAD.top + inner}
+        class="pointer-events-none stroke-foreground"
+        stroke-width="0.75"
+        stroke-opacity="0.45"
+      />
+    {/each}
+    {#each steps as x, index (index)}
+      <line
+        x1={x}
+        x2={x}
+        y1={PAD.top + inner + 1}
+        y2={PAD.top + inner + 4}
+        class="pointer-events-none stroke-muted-foreground"
+        stroke-width="0.75"
+      />
+    {/each}
     {#each names as name (name.party)}
       <text
         x={name.x}
@@ -554,8 +646,8 @@
       >
     {/each}
   </svg>
-  {#if lit != null}
-    {const leader = $derived(lit.term.parties[0])}
+  {#if lit != null && part != null}
+    {const leader = $derived(part.parties[0])}
     <div
       class="pointer-events-none absolute grid gap-1 rounded-sm bg-card/95 px-2.5 py-2 text-xs shadow-menu ring-1 ring-border inline-60"
       style:inset-inline-start="{lit.x1 + 248 > width
@@ -567,12 +659,37 @@
         >{lit.term.election?.name ?? date(lit.term.start)}</span
       >
       <span class="font-figures text-muted-foreground tabular-nums"
-        >{date(lit.term.start)} – {lit.term.end == null
+        >{date(part.from)} – {part.to == null
           ? m.governments_present()
-          : date(lit.term.end)}</span
+          : date(part.to)}</span
       >
+      {#if part.step != null}
+        <ul class="grid gap-0.5 border-be pbe-1">
+          {#each part.step.moves.slice(0, 4) as move, index (index)}
+            <li class="flex items-center justify-between gap-3">
+              <span class="flex items-center gap-1 truncate">
+                <span
+                  class="shrink-0 rounded-xs block-2 inline-2"
+                  style:background={tint(move.from ?? "independent")}
+                ></span>
+                <span class="truncate">{label(move.from ?? "independent")}</span
+                >
+                <span aria-hidden="true">→</span>
+                <span
+                  class="shrink-0 rounded-xs block-2 inline-2"
+                  style:background={tint(move.to ?? "independent")}
+                ></span>
+                <span class="truncate">{label(move.to ?? "independent")}</span>
+              </span>
+              <span class="font-figures tabular-nums"
+                >{m.chamber_step_members({ count: move.members })}</span
+              >
+            </li>
+          {/each}
+        </ul>
+      {/if}
       <ul class="grid gap-0.5">
-        {#each lit.term.parties.slice(0, 6) as entry (entry.party ?? "none")}
+        {#each part.parties.slice(0, 6) as entry (entry.party ?? "none")}
           <li class="flex items-center justify-between gap-3">
             <span class="flex items-center gap-1.5 truncate">
               <span

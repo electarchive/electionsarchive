@@ -1581,6 +1581,31 @@
   "chamber_changes_none": "No mid-term changes recorded in the archive.",
   "chamber_joined": "Joined",
   "chamber_left": "Left",
+  "chamber_makeup_steps": "Within a term, steps mark recorded party changes; terms without them show only the opening makeup.",
+  "chamber_makeup_no_steps": "Party changes between elections aren't recorded for this chamber, so each term shows its opening makeup.",
+  "chamber_changes_all": "All",
+  "chamber_changes_seats": "Seats",
+  "chamber_changes_party": "Party changes",
+  "chamber_changed_party": "Changed party",
+  "chamber_joined_party": "Joined {party}",
+  "chamber_change": "Change",
+  "chamber_members": "Members",
+  "chamber_step_members": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{countText} member",
+        "countPlural=*": "{countText} members"
+      }
+    }
+  ],
   "chamber_via_appointed": "Appointed",
   "chamber_via_elected": "Joined via election",
   "chamber_via_by_election": "Won by-election",

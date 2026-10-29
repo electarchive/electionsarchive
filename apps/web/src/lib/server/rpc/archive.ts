@@ -19066,6 +19066,14 @@ export const bodies = {
             ),
           }),
         ),
+        switches: v.array(
+          v.object({
+            date: v.string(),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
+            members: v.number(),
+          }),
+        ),
         partners: v.array(v.array(v.string())),
         parties: v.array(
           v.object({
@@ -19119,7 +19127,7 @@ export const bodies = {
       if (body == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [labels, slugs, crumbs, peers, sizes, makeup, upcoming] =
+      const [labels, slugs, crumbs, peers, sizes, makeup, upcoming, switches] =
         await Promise.all([
           names([input.id, body.polity]),
           paths([body.polity]),
@@ -19229,14 +19237,51 @@ export const bodies = {
           order by e.date_from, seats desc
           limit 1
         `),
+          db.execute<{
+            date: string;
+            from: string | null;
+            to: string | null;
+            members: number;
+          }>(sql`
+          with s as materialized (
+            select a.tenure_id, coalesce(pm.into_id, a.party_id) as party, a.valid_from as f, a.valid_to as u,
+              t.from_date, t.to_date
+            from tenure t
+            join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
+            left join seat st on st.id = t.seat_id
+            left join entity_merge pm on pm.entity_id = a.party_id
+            where t.body_id = ${input.id}::uuid and coalesce(st.voting, true)
+          )
+          , moves as (
+            select x.u as day, x.party as before, n.party as after
+            from s x left join s n on n.tenure_id = x.tenure_id and n.f = x.u
+            where x.u is not null and x.u < coalesce(x.to_date, 'infinity'::date)
+            union all
+            select n.f, null, n.party from s n
+            where n.f > n.from_date and n.f < coalesce(n.to_date, 'infinity'::date)
+              and not exists (select from s x where x.tenure_id = n.tenure_id and x.u = n.f)
+          )
+          select x.day::text as date, coalesce(bf.into_id, f.parent_party_id, x.before) as from,
+            coalesce(bt.into_id, g.parent_party_id, x.after) as to, count(*)::int as members
+          from moves x
+          left join party_affiliation f on f.party_id = x.before and f.kind = 'regional_branch' and f.valid @> x.day
+          left join entity_merge bf on bf.entity_id = f.parent_party_id
+          left join party_affiliation g on g.party_id = x.after and g.kind = 'regional_branch' and g.valid @> x.day
+          left join entity_merge bt on bt.entity_id = g.parent_party_id
+          where coalesce(bf.into_id, f.parent_party_id, x.before) is distinct from coalesce(bt.into_id, g.parent_party_id, x.after)
+          group by 1, 2, 3 order by 1, 4 desc
+        `),
         ]);
       const home = slugs.get(body.polity) ?? null;
       const held = [
-        ...new Set(
-          makeup.rows.flatMap((row) =>
+        ...new Set([
+          ...makeup.rows.flatMap((row) =>
             [row.party, row.caucus].filter((party) => party != null),
           ),
-        ),
+          ...switches.rows.flatMap((row) =>
+            [row.from, row.to].filter((party) => party != null),
+          ),
+        ]),
       ];
       const starts = [...new Set(makeup.rows.map((row) => row.start))];
       const apportioned = await db.execute<{
@@ -19325,6 +19370,7 @@ export const bodies = {
             })),
           }))
           .toArray(),
+        switches: switches.rows,
         parties: held.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,

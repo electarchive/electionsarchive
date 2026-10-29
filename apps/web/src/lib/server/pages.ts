@@ -570,10 +570,57 @@ export async function chamber(path: string) {
       });
       seats.set(key, (seats.get(key) ?? 0) + entry.seats);
     }
+    const end = lapse ?? stranded ?? next ?? body.closed;
+    const running = new Map(seats);
+    const steps = term.isSeated
+      ? Map.groupBy(
+          body.switches.filter(
+            (row) => row.date > term.start && (end == null || row.date < end),
+          ),
+          (row) => row.date,
+        )
+          .entries()
+          .map(([day, rows]) => {
+            const moves = rows.map((row) => ({
+              from: row.from == null ? null : (kin.get(row.from) ?? row.from),
+              to: row.to == null ? null : (kin.get(row.to) ?? row.to),
+              members: row.members,
+            }));
+            for (const move of moves) {
+              const out = [
+                ...(move.from == null ? ["independent", null] : [move.from]),
+                ...running
+                  .keys()
+                  .filter(
+                    (key) =>
+                      move.from != null && key?.startsWith(`${move.from}>`),
+                  ),
+              ].find((key) => (running.get(key) ?? 0) > 0);
+              if (out !== undefined) {
+                running.set(
+                  out,
+                  Math.max(0, (running.get(out) ?? 0) - move.members),
+                );
+              }
+              const into = move.to ?? "independent";
+              running.set(into, (running.get(into) ?? 0) + move.members);
+            }
+            return {
+              date: day,
+              parties: [...running]
+                .filter(([, count]) => count > 0)
+                .map(([party, count]) => ({ party, seats: count }))
+                .toSorted((a, b) => b.seats - a.seats),
+              moves,
+            };
+          })
+          .toArray()
+      : [];
     return {
       ...term,
       parties: [...seats].map(([party, count]) => ({ party, seats: count })),
-      end: lapse ?? stranded ?? next ?? body.closed,
+      steps,
+      end,
       total: total(term.parties),
       size: size(term.start),
       isPartial: partial[index] ?? false,
@@ -626,7 +673,15 @@ export async function chamber(path: string) {
             ],
     ),
     parties: stand(
-      terms.flatMap((term) => term.parties.map((entry) => entry.party)),
+      terms.flatMap((term) =>
+        [
+          ...term.parties,
+          ...term.steps.flatMap((step) => [
+            ...step.parties,
+            ...step.moves.map((move) => ({ party: move.from, seats: 0 })),
+          ]),
+        ].map((entry) => entry.party),
+      ),
       groups.flatMap((group) =>
         group.map((party) =>
           new Set(group.map((entry) => entry.short)).size > 1

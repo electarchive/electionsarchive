@@ -2,7 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import type { InferRouterOutputs } from "@orpc/server";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
-import { partyOn, stand } from "#lib/caucus.js";
+import { partyOn, segments, stand } from "#lib/caucus.js";
 import {
   COLUMN_LABELS,
   COUNTRY_COLUMNS,
@@ -5141,11 +5141,15 @@ function chamberMarkdown(
   const roll = (members?.members ?? []).map((member) => ({
     ...member,
     party: partyOn(member, close, opened),
+    segments: segments(member, opened, close),
   }));
   const everyone = [
     ...parties,
     ...stand(
-      roll.map((member) => member.party),
+      roll.flatMap((member) => [
+        member.party,
+        ...member.segments.map((segment) => segment.party),
+      ]),
       members?.parties ?? [],
     ),
   ];
@@ -5154,6 +5158,46 @@ function chamberMarkdown(
   const label = (id: string | null) =>
     id == null ? m.record_none() : (names.get(id) ?? "");
   const last = terms.at(-1);
+  const named = (id: string | null) =>
+    id == null || id === "independent" ? m.chamber_independent() : label(id);
+  const switches = [
+    ...terms
+      .slice(0, members?.isSeated === true ? -1 : undefined)
+      .flatMap((term) =>
+        term.steps.flatMap((step) =>
+          step.moves.map((move) => [
+            date(step.date),
+            `${named(move.from)} → ${named(move.to)}`,
+            m.chamber_step_members({ count: move.members }),
+          ]),
+        ),
+      ),
+    ...(members?.isSeated === true
+      ? Map.groupBy(
+          roll.flatMap((member) =>
+            member.segments
+              .slice(1)
+              .map((segment, index) => ({
+                member,
+                on: segment.from,
+                from: member.segments[index]?.party ?? null,
+                to: segment.party,
+              })),
+          ),
+          (move) => `${move.on}|${move.from}|${move.to}`,
+        )
+          .values()
+          .toArray()
+          .toSorted((a, b) => (a[0]?.on ?? "").localeCompare(b[0]?.on ?? ""))
+          .map((group) => [
+            date(group[0]?.on ?? null),
+            `${named(group[0]?.from ?? null)} → ${named(group[0]?.to ?? null)}`,
+            group
+              .map((move) => link(move.member.name, `id/${move.member.person}`))
+              .join(", "),
+          ])
+      : []),
+  ].toReversed();
   const first = last?.start.slice(0, 4) ?? "";
   const final = last?.end?.slice(0, 4) ?? m.governments_present();
   const sitting = roll
@@ -5328,6 +5372,15 @@ function chamberMarkdown(
                   ];
                 }),
               ),
+          ...(switches.length === 0
+            ? []
+            : [
+                `## ${m.chamber_changes_party()}`,
+                table(
+                  [m.col_date(), m.chamber_change(), m.chamber_members()],
+                  switches,
+                ),
+              ]),
           ...(sitting.length === 0 || council != null
             ? []
             : [
