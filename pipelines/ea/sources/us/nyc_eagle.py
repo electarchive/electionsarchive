@@ -174,23 +174,34 @@ def settle(reads: list, width: int, strict: bool = False):
     return (settled, total, off), None
 
 
-MANHATTAN_1903 = {
-    1: (
-        "Mayor S. Low Frs. 1903",
-        [949,1521,1998,2297,4243,1765,2616,1498,3003,2429,1953,1730,1724,2137,2340,2399,2313,2125,6916,2710,11271,2449,9203,2261,4153,2517,3852,2265,6122,3172,10296,3470,2935,6581,11160],
-    ),
-    2: (
-        "Mayor G.B. McClellan Dem. 1903",
-        [3200,4918,4869,3565,3715,5614,5031,2716,4465,3812,3910,3190,3977,4699,4694,3928,4609,6561,5264,5050,8117,5563,8782,4940,2762,3928,2565,5123,3841,6304,7740,6904,5246,11522,14783],
-    ),
-    3: (
-        "Comptroller F.W. Hinrichs Frs. 1903",
-        [932,1502,1989,2237,4172,1736,2633,1452,3005,2380,1949,1736,1720,2122,2320,2339,2298,2111,6832,2725,11184,2449,9116,2208,4127,2476,3842,2237,6045,3121,10114,3407,2910,6528,10986],
-    ),
-    4: (
-        "Comptroller E.M. Grout Dem. 1903",
-        [3200,4912,4857,3564,3758,5606,5011,2715,4468,3792,3903,3152,3944,4687,4704,3930,4598,6520,5288,5023,8174,5554,8814,4972,2807,3931,2562,5113,3901,6293,7835,6903,5258,11510,14863],
-    ),
+HAND_READ = {
+    1903: ("MANHATTAN", 638, {
+        1: (
+            "Mayor S. Low Frs. 1903",
+            [949,1521,1998,2297,4243,1765,2616,1498,3003,2429,1953,1730,1724,2137,2340,2399,2313,2125,6916,2710,11271,2449,9203,2261,4153,2517,3852,2265,6122,3172,10296,3470,2935,6581,11160],
+        ),
+        2: (
+            "Mayor G.B. McClellan Dem. 1903",
+            [3200,4918,4869,3565,3715,5614,5031,2716,4465,3812,3910,3190,3977,4699,4694,3928,4609,6561,5264,5050,8117,5563,8782,4940,2762,3928,2565,5123,3841,6304,7740,6904,5246,11522,14783],
+        ),
+        3: (
+            "Comptroller F.W. Hinrichs Frs. 1903",
+            [932,1502,1989,2237,4172,1736,2633,1452,3005,2380,1949,1736,1720,2122,2320,2339,2298,2111,6832,2725,11184,2449,9116,2208,4127,2476,3842,2237,6045,3121,10114,3407,2910,6528,10986],
+        ),
+        4: (
+            "Comptroller E.M. Grout Dem. 1903",
+            [3200,4912,4857,3564,3758,5606,5011,2715,4468,3792,3903,3152,3944,4687,4704,3930,4598,6520,5288,5023,8174,5554,8814,4972,2807,3931,2562,5113,3901,6293,7835,6903,5258,11510,14863],
+        ),
+    }),
+    1901: ("QUEENS", 534, {
+        1: ("Mayor S. Low Fus.", [6495, 6086, 537]),
+        2: ("Mayor E.M. Shepard Dem.", [8465, 4486, 728]),
+        3: ("Comptroller E.M. Grout Fus.", [6459, 6109, 538]),
+        4: ("Comptroller W.W. Ladd Dem.", [8390, 4385, 727]),
+        5: ("Pres. Bd. of Aldermen C.V. Fornes Fus.", [6248, 5974, 521]),
+        6: ("Pres. Bd. of Aldermen G.M. Van Hoesen Dem.", [8557, 4495, 739]),
+        7: ("Borough Pres. J. Cassidy Dem.", [9114, 4456, 814]),
+    }),
 }
 
 
@@ -259,12 +270,12 @@ def parse() -> None:
                                 }
                             )
                 print(year, table["page"], "assembly districts loaded", len(result[0]), "from", len(reads), "reads")
-            if year == 1903:
-                for column, (header, values) in MANHATTAN_1903.items():
-                    for ad, value in enumerate(values, 1):
-                        out.append(
-                            {"county": "MANHATTAN", "ad": ad, "ed": 0, "column": column, "value": value, "page": 638, "header": header}
-                        )
+            if year in HAND_READ:
+                out.extend(
+                    {"county": HAND_READ[year][0], "ad": ad, "ed": 0, "column": column, "value": value, "page": HAND_READ[year][1], "header": header}
+                    for column, (header, values) in HAND_READ[year][2].items()
+                    for ad, value in enumerate(values, 1)
+                )
             pl.DataFrame(
                 out,
                 schema={
@@ -347,6 +358,12 @@ def parse() -> None:
                         "header": columns[index],
                     }
                 )
+        if year in HAND_READ:
+            out.extend(
+                {"county": HAND_READ[year][0], "ad": ad, "ed": 0, "column": column, "value": value, "page": HAND_READ[year][1], "header": header}
+                for column, (header, values) in HAND_READ[year][2].items()
+                for ad, value in enumerate(values, 1)
+            )
         pl.DataFrame(
             out,
             schema={
@@ -669,7 +686,7 @@ def emit():
                             else f"Election district and assembly district returns transcribed from the {spec['title']}, a compendium that prints only assembly district totals and omits minor-party lines. A district is loaded only when every column of its election districts adds up to the printed assembly district total, or to within a few votes of it where the almanac's own total does not add up and every reading of the page agrees."
                         )
                         + (
-                            " Only the Brooklyn tables were read, so the citywide sets carry no completeness."
+                            " Only the Brooklyn tables and the Queens assembly district totals (every column but Dohl for borough president adds up exactly to the printed borough total) were read, so the citywide sets carry no completeness."
                             if year == 1901
                             else " The Brooklyn and Queens tables tie to their printed totals on every column. The Manhattan and Bronx table (35 assembly districts of New York County, the annexed district left out) was read by eye on the page and loaded only for the mayor and comptroller columns, each of which adds up exactly to the printed total; its other columns do not tie and are left out, so the citywide sets carry no completeness."
                             if year == 1903
