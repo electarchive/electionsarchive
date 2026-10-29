@@ -16,11 +16,72 @@ PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "redbook"
 PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "New York State Legislature"
-TAGS = ("sonnet", "opus", "opushi")
+TAGS = ("haiku", "sonnet", "opus", "opushi")
 COUNTY = {"New York": "36061", "Bronx": "36005", "Kings": "36047", "Queens": "36081", "Richmond": "36085"}
 ONES = ("", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth")
 TENS = {"twentieth": 20, "thirtieth": 30, "twenty": 20, "thirty": 30}
 YEARS = {
+    1908: {
+        "volume": "manual1909",
+        "item": "pst.000070390179",
+        "title": "Manual for the Use of the Legislature of the State of New York, 1909 (vote for Governor, 1908, by election district)",
+        "day": date(1908, 11, 3),
+        "office": "governor",
+        "pages": (*range(966, 982), *range(989, 1013), *range(1027, 1030)),
+        "width": 8,
+        "whole_first": True,
+        "empty": (),
+        "bronx_in_new_york": True,
+        "unfiled": {"Kings": 6},
+        "columns": {
+            0: ("Charles Evans Hughes", None, None),
+            1: ("Lewis Stuyvesant Chanler", None, None),
+            2: ("Clarence J. Shearn", "NY:independence-league", None),
+            3: ("Joshua Wanhope", "NY:socialist", None),
+            4: ("George E. Stockwell", "prohibition-party", None),
+            5: ("Leander A. Armstrong", "NY:socialist-labor", None),
+        },
+        "extra_party": {},
+        "note": (
+            "Vote for Governor on November 3, 1908, by assembly district and election district, from the Manual's "
+            "'Vote of State of New York' tables, read from page images by a vision model (Claude Haiku 5.5, with "
+            "Claude Opus 5.5 rereading any assembly district that missed a total). An assembly district is loaded only "
+            "when its election district rows add up to the printed assembly district total in every column, and that "
+            "total adds up to its own whole number of votes. Each value's locator is the whole page. The assembly "
+            "districts are those of 1908, including the Bronx's 31 through 35 (printed under New York County), and have "
+            "no shape in the archive. Blank, void, defective, and scattering ballots are not loaded."
+        ),
+    },
+    1910: {
+        "volume": "manual1911",
+        "item": "pst.000070390193",
+        "title": "Manual for the Use of the Legislature of the State of New York, 1911 (vote for Governor, 1910, by election district)",
+        "day": date(1910, 11, 8),
+        "office": "governor",
+        "pages": (*range(914, 930), *range(937, 962), *range(976, 979)),
+        "width": 8,
+        "whole_first": False,
+        "empty": (),
+        "bronx_in_new_york": True,
+        "columns": {
+            0: ("Henry Lewis Stimson", None, None),
+            1: ("John Alden Dix", None, None),
+            2: ("John J. Hopper", "NY:independence-league", None),
+            3: ("Charles Edward Russell", "NY:socialist", None),
+            4: ("T. Alexander MacNicholl", "prohibition-party", None),
+            5: ("Frank E. Passanno", "NY:socialist-labor", None),
+        },
+        "extra_party": {},
+        "note": (
+            "Vote for Governor on November 8, 1910, by assembly district and election district, from the Manual's "
+            "'Vote of State of New York' tables, read from page images by a vision model (Claude Haiku 5.5, with "
+            "Claude Opus 5.5 rereading any assembly district that missed a total). An assembly district is loaded only "
+            "when its election district rows add up to the printed assembly district total in every column, and that "
+            "total adds up to its own whole number of votes. Each value's locator is the whole page. The assembly "
+            "districts are those of 1910, including the Bronx's 31 through 35 (printed under New York County), and have "
+            "no shape in the archive. Blank, void, defective, and scattering ballots are not loaded."
+        ),
+    },
     1912: {
         "volume": "manual1913",
         "item": "manualforuseofle1913newy",
@@ -195,6 +256,10 @@ def whole(spec: dict, cells: list[int | None]) -> list[int | None]:
     return [*cells[1:], *cells[:1]] if spec["whole_first"] else cells
 
 
+def short(spec: dict, county: str, cells: list[int]) -> int:
+    return sum(cells[:-1]) - (cells[spec["unfiled"][county]] if county in spec.get("unfiled", {}) else 0)
+
+
 def number(cell: str) -> int | None:
     text = cell.replace(",", "").replace(".", "").strip()
     if text == "":
@@ -262,7 +327,7 @@ def parse() -> None:
                     totals = totals[:1]
                 reason = None
                 if not totals:
-                    rows = [r for r in eds if len(r["cells"]) == spec["width"] and None not in r["cells"] and sum(r["cells"][:-1]) == r["cells"][-1]]
+                    rows = [r for r in eds if len(r["cells"]) == spec["width"] and None not in r["cells"] and short(spec, r["county"], r["cells"]) == r["cells"][-1]]
                     if rows and len({r["ed"] for r in rows}) == len(rows):
                         accepted[key] = (tag, rows)
                         failures.pop(key, None)
@@ -273,19 +338,19 @@ def parse() -> None:
                     wrong = [i for i, gap in enumerate(gaps) if gap]
                     if len(wrong) == 1 and wrong[0] < spec["width"] - 1:
                         column = wrong[0]
-                        misses = [r for r in eds if sum(r["cells"][:-1]) != r["cells"][-1]]
-                        if misses and sum(sum(r["cells"][:-1]) - r["cells"][-1] for r in misses) == gaps[column] and all(
-                            r["cells"][column] - (sum(r["cells"][:-1]) - r["cells"][-1]) >= 0 for r in misses
+                        misses = [r for r in eds if short(spec, r["county"], r["cells"]) != r["cells"][-1]]
+                        if misses and sum(short(spec, r["county"], r["cells"]) - r["cells"][-1] for r in misses) == gaps[column] and all(
+                            r["cells"][column] - (short(spec, r["county"], r["cells"]) - r["cells"][-1]) >= 0 for r in misses
                         ):
                             for r in misses:
-                                excess = sum(r["cells"][:-1]) - r["cells"][-1]
+                                excess = short(spec, r["county"], r["cells"]) - r["cells"][-1]
                                 fixed.append(f"{key[0]} assembly district {key[1]}, election district {r['ed']}, column {column + 1}: {r['cells'][column]} read, {r['cells'][column] - excess} used")
                                 r["cells"][column] -= excess
                 if len(totals) != 1:
                     reason = f"{len(totals)} total rows"
                 elif any(None in r["cells"] or len(r["cells"]) != spec["width"] for r in eds + totals):
                     reason = "an unreadable or misaligned cell"
-                elif sum(totals[0]["cells"][:-1]) != totals[0]["cells"][-1]:
+                elif short(spec, totals[0]["county"], totals[0]["cells"]) != totals[0]["cells"][-1]:
                     reason = "a printed total that does not add up to its whole number of votes"
                 elif any(sum(r["cells"][i] for r in eds) != totals[0]["cells"][i] for i in range(spec["width"])):
                     reason = "rows that do not add up to the printed total"
@@ -296,7 +361,7 @@ def parse() -> None:
                 if reason is None:
                     accepted[key] = (tag, records)
                     for r in eds:
-                        if sum(r["cells"][:-1]) != r["cells"][-1]:
+                        if short(spec, r["county"], r["cells"]) != r["cells"][-1]:
                             off.append(f"{key[0]} assembly district {key[1]}, election district {r['ed']}")
                     failures.pop(key, None)
                 else:
@@ -346,7 +411,8 @@ def emit():
                     [contest],
                 ).fetchall()
             }
-            url = f"https://archive.org/download/{spec['item']}/{spec['item']}.pdf"
+            hathi = "." in spec["item"]
+            url = f"https://babel.hathitrust.org/cgi/pt?id={spec['item']}" if hathi else f"https://archive.org/download/{spec['item']}/{spec['item']}.pdf"
             source = cs.source(PUBLISHER, spec["title"])
             cs.add(
                 "source",
@@ -354,7 +420,7 @@ def emit():
                 kind="compendium",
                 publisher=PUBLISHER,
                 title=spec["title"],
-                url=f"https://archive.org/details/{spec['item']}",
+                url=url if hathi else f"https://archive.org/details/{spec['item']}",
                 license="Public domain",
                 notes="Scanned volume on the Internet Archive.",
             )
