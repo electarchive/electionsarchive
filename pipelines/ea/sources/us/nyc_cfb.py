@@ -17,16 +17,25 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 INBOX = DATA / "inbox" / "nyc_cfb"
 PUBLISHER = "New York City Campaign Finance Board"
-FILES = {1989: "1989_app.pdf", 1997: "98v2.pdf"}
+FILES = {1989: "1989_app.pdf", 1991: "1991_app.pdf", 1993: "1993_app.pdf", 1997: "98v2.pdf"}
 URLS = {
     1989: "local:nyc_cfb/1989_app.pdf",
+    1991: "local:nyc_cfb/1991_app.pdf",
+    1993: "local:nyc_cfb/1993_app.pdf",
     1997: "https://www.nyccfb.info/pdf/per/98_per-vol.ii.pdf",
 }
 TITLES = {
     1989: "1989 Annual Report of the Board of Elections in the City of New York, Appendix B: Vote totals (as reprinted by the Campaign Finance Board)",
+    1991: "New York City Campaign Finance Board, 1991 elections: Appendices of vote totals and campaign finance data (scanned)",
+    1993: "New York City Campaign Finance Board, 1993 elections: Appendices B and C, totals for candidates appearing on the primary and general election ballots (scanned)",
     1997: "A Decade of Reform: the 1997 New York City Elections, Volume II, Appendices B and C",
 }
-DAYS = {1989: (date(1989, 9, 12), date(1989, 11, 7)), 1997: (date(1997, 9, 9), date(1997, 11, 4))}
+DAYS = {
+    1989: (date(1989, 9, 12), date(1989, 11, 7)),
+    1991: (date(1991, 9, 10), date(1991, 11, 5)),
+    1993: (date(1993, 9, 14), date(1993, 11, 2)),
+    1997: (date(1997, 9, 9), date(1997, 11, 4)),
+}
 BOROUGHS = {
     "bronx": "36005",
     "brooklyn": "36047",
@@ -40,6 +49,7 @@ PARTIES = {
     "CON": "Conservative",
     "LBL": "Liberal",
     "LTN": "Libertarian",
+    "LIB": "Liberal",
     "NAP": "New Alliance",
     "RTL": "Right to Life",
     "SWP": "Socialist Workers",
@@ -185,6 +195,94 @@ def parse_1997() -> list[dict[str, object]]:
     return rows
 
 
+READS = {
+    1989: "the page images by a vision model (Claude Sonnet 5.5)",
+    1991: "the page images by a vision model (Claude Sonnet 5.5)",
+    1993: "the page images by two vision models (Claude Sonnet 5.5 and Opus 5.5)",
+}
+SOLO = (
+    "Candidates' votes add up to the printed total or each row's printed percent matches its share of the sum."
+)
+PAIR = "The table is loaded only where both models read every name and number the same."
+VISION = {1989: (11, 19), 1991: (5, 40), 1993: (17, 41)}
+SUFFIX = {"Jr": "Jr.", "Sr": "Sr.", "Ii": "II", "Iii": "III", "Iv": "IV"}
+
+
+def person(name: str) -> str:
+    name = re.sub(r"^[*+\s]+|[*+\s]+$", "", name)
+    last, comma, first = name.partition(",")
+    if comma:
+        name = f"{first.strip()} {last.strip()}"
+    if name.isupper():
+        name = re.sub(r"\b(Mc|Mac)([a-z])", lambda m: m[1] + m[2].upper(), name.title())
+        name = " ".join(SUFFIX.get(word, word) for word in name.split())
+    return name
+
+
+def parse_vision() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for year, (first, last) in VISION.items():
+        seen: dict[tuple[str, str, str, str], int] = {}
+        found: dict[tuple[str, str, str, str], dict[str, object]] = {}
+        for page in range(first, last + 1):
+            reads: dict[str, dict[str, object]] = {}
+            for reader in ("sonnet", "opus"):
+                file = INBOX / str(year) / f"p{page}-{reader}.json"
+                if file.exists():
+                    reads[reader] = json.loads(file.read_text())
+            if "sonnet" not in reads:
+                continue
+            for index, table in enumerate(reads["sonnet"]["tables"]):
+                office = table["office"]
+                scope = re.sub(r"^(Boro|District):\s*", "", table["scope"]).strip()
+                if office not in ("Mayor", "Comptroller", "Public Advocate", "City Council President", "Borough President", "City Council"):
+                    continue
+                if (office in ("Borough President", "City Council")) and not scope:
+                    continue
+                if table["stage"] == "general" and not (year == 1993 and office == "Borough President"):
+                    continue
+                if year == 1993 and page == 18 and office == "Public Advocate":
+                    continue
+                key = (table["stage"], office, scope, table["party"])
+                seen[key] = seen.get(key, 0) + 1
+                votes = [number(row["votes"]) if row["votes"] else 0 for row in table["rows"]]
+                total = number(table["total"]) if table["total"] else None
+                percents = [float(re.sub(r"[^\d.]", "", row.get("percent") or "") or "nan") for row in table["rows"]]
+                if total is not None:
+                    method = "total" if sum(votes) == total else None
+                elif sum(votes) and all(abs(100 * v / sum(votes) - p) < 0.11 for v, p in zip(votes, percents, strict=True)):
+                    method = "percent"
+                else:
+                    method = None
+                if method is None and "opus" in reads:
+                    other = [t for t in reads["opus"]["tables"] if (t["office"], re.sub(r"^(Boro|District):\s*", "", t["scope"]).strip(), t["party"]) == key[1:]]
+                    if len(other) == 1 and [(person(r["candidate"]), number(r["votes"]) if r["votes"] else 0) for r in other[0]["rows"]] == [(person(r["candidate"]), v) for r, v in zip(table["rows"], votes, strict=True)]:
+                        method = "agree"
+                if method is None or len(table["rows"]) < 1:
+                    continue
+                found[key] = {**table, "votes": votes, "total": total, "method": method, "page": page}
+        for key, table in found.items():
+            stage, office, scope, party = key
+            if seen[key] > 1 or (office == "City Council" and not scope.isdigit()):
+                continue
+            rows.extend(
+                {
+                    "year": year,
+                    "stage": stage,
+                    "office": f"council:{scope}" if office == "City Council" else f"borough-president:{slug(scope)}" if office == "Borough President" else OFFICES[office],
+                    "total": table["total"],
+                    "candidate": person(row["candidate"]),
+                    "codes": party if stage == "primary" else row["party_codes"].replace(" ", ""),
+                    "votes": votes,
+                    "page": table["page"],
+                    "method": table["method"],
+                }
+                for row, votes in zip(table["rows"], table["votes"], strict=True)
+                if votes
+            )
+    return rows
+
+
 def fetch() -> None:
     for year, file in FILES.items():
         raw.store(
@@ -198,8 +296,13 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    rows = [*parse_1989(), *parse_1997()]
-    frame = pl.DataFrame(rows)
+    frame = pl.concat(
+        [
+            pl.DataFrame([*parse_1989(), *parse_1997()]).with_columns(pl.lit("").alias("method")),
+            pl.DataFrame(parse_vision()),
+        ],
+        how="diagonal_relaxed",
+    )
     frame = frame.with_columns(
         pl.when(pl.col("stage") == "primary")
         .then(pl.col("codes").str.split(",").list.first().str.strip_chars())
@@ -222,7 +325,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York City 1989 and 1997 primaries and borough president elections from the Campaign Finance Board's printed vote tables",
+            summary="New York City 1989 to 1997 primaries and borough president elections from the Campaign Finance Board's printed vote tables",
             polity="US",
         )
 
@@ -257,10 +360,6 @@ def emit() -> Path:
                 parties[label] = party
             return parties[label]
 
-        council = conn.execute(
-            "select c.body_id from contest c join slug s on s.entity_id = c.id "
-            "where s.path = 'us/ny/new-york-city/1997-11-04-local/council-district-1' and s.is_current"
-        ).fetchone()[0]
         seen: set[object] = set()
         made: set[object] = set()
         for (year,), rows_year in frame.group_by(["year"], maintain_order=True):
@@ -329,12 +428,12 @@ def emit() -> Path:
                     election_path = f"{place_path}/{day}-local"
                 kind, _, scope = office.partition(":")
                 if kind == "council":
-                    existing = conn.execute(
-                        "select c.district_area_id from contest c join slug s on s.entity_id = c.id "
+                    area, body = conn.execute(
+                        "select c.district_area_id, c.body_id from contest c join slug s on s.entity_id = c.id "
                         "where s.path = %s and s.is_current",
-                        [f"us/ny/new-york-city/{year}-11-04-local/council-district-{scope}"],
+                        [f"{place_path}/{DAYS[year][1]}-local/council-district-{scope}"],
                     ).fetchone()
-                    area, office_id, body = existing[0], None, council
+                    office_id = None
                     seat, title = f"council-district-{scope}", f"New York City Council, District {scope}"
                 elif kind == "borough-president":
                     area = cs.area("us.county", BOROUGHS[scope])
@@ -383,7 +482,12 @@ def emit() -> Path:
                     "note",
                     entity_id=result_set,
                     kind="methodology",
-                    body_md=METHOD.format(title=TITLES[year], reader=READ_1989 if year == 1989 else READ_1997),
+                    body_md=METHOD.format(
+                        title=TITLES[year],
+                        reader=(READ_1989 if year == 1989 else READ_1997)
+                        if table["method"][0] == "" and year in (1989, 1997)
+                        else f"Read from {READS[year]}. {PAIR if table['method'][0] == 'agree' else SOLO}",
+                    ),
                 )
                 unit = (
                     cs.unit("us.county", BOROUGHS[scope])
