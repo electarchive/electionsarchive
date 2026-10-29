@@ -18,7 +18,7 @@ from ea.sources.tr.ysk import INVALID, PROVINCES, REGISTERED, VALID, VOTERS, VOT
 from ea.store import DATA, connect
 
 SOURCE = "tr.tuik_secim"
-VERSION = "2"
+VERSION = "3"
 APP = "https://biruni.tuik.gov.tr/secimdagitimapp/secim.zul"
 TABLE = "Seçim çevresi ve ilçelere göre milletvekili genel seçimi sonuçları"
 REFERENDUMS = "https://biruni.tuik.gov.tr/secimdagitimapp/halkoylama.zul"
@@ -577,20 +577,20 @@ def emit() -> Path:
         )
         unmatched: set[str] = set()
         result_sets = 0
-        composition: dict[str, set[str]] = {}
+        composition: dict[date, dict[str, set[str]]] = {}
         with COMPOSITIONS.open() as handle:
             for row in csv.DictReader(handle, delimiter="\t"):
                 if row["split"]:
                     continue
                 name = norm(row["ilce"]).replace(" ", "")
                 name = "MERKEZ" if name.endswith("MERKEZ") else COMPOSITION_ALIASES.get(name, name)
-                composition.setdefault(row["district"], set()).add(name)
+                composition.setdefault(date.fromisoformat(row["day"]), {}).setdefault(row["district"], set()).add(name)
         declared_totals: dict[str, dict[str, int]] = {}
         for contest_key, measure, value in conn.execute(
             """select x.value, v.measure, sum(v.value) from external_id x
                join result_set rs on rs.contest_id = x.entity_id and rs.is_default
                join result_value v on v.result_set_k = rs.k
-               where x.scheme = 'tr.contest' and x.value like '1987-11-29:parliament:%%-%%'
+               where x.scheme = 'tr.contest' and x.value ~ '^(1983-11-06|1987-11-29):parliament:[0-9]+-[0-9]+$'
                  and v.measure = any(%s) group by 1, 2""",
             [[REGISTERED, VOTERS, VALID]],
         ).fetchall():
@@ -611,8 +611,8 @@ def emit() -> Path:
                 elif national_key not in contests:
                     raise ValueError(f"{year} {district}: no contest {key}")
             chosen: dict[str, list[tuple[str, str]]] = {}
-            if year == "1987":
-                for code, names in composition.items():
+            if day in composition:
+                for code, names in composition[day].items():
                     contest_key = f"{national_key}:{code}"
                     if contest_key not in contests or contest_key in groups:
                         continue
