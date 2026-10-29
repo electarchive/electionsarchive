@@ -28,6 +28,7 @@ PRIMARIES = {
     1977: date(1977, 9, 8),
     1985: date(1985, 9, 10),
 }
+RUNOFFS = {1973: date(1973, 9, 25), 1977: date(1977, 9, 19)}
 EARLY = {
     1834: (date(1834, 4, 8), date(1834, 4, 10)),
     1844: (date(1844, 4, 9),) * 2,
@@ -168,21 +169,18 @@ def parse() -> None:
             if year != 1925 and re.search(r"title\s*=[^\n]*mayoral election", box.group(0), re.IGNORECASE)
         ][:1]
         if year in PRIMARIES:
-            firsts: dict[str, tuple[str, str, str]] = {}
-            for entry in [
-                (box.group(0), "primary", heading[1])
-                for box in re.finditer(
-                    r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE
+            seen_boxes: dict[str, int] = {}
+            for box in re.finditer(r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE):
+                heading = re.search(
+                    r"title\s*=\s*\d{4} (?:New York City )?(Democratic|Republican) (?:mayoral )?primary", box.group(0)
                 )
-                if (
-                    heading := re.search(
-                        r"title\s*=\s*\d{4} (?:New York City )?(Democratic|Republican) (?:mayoral )?primary(?! runoff)",
-                        box.group(0),
-                    )
-                )
-            ]:
-                firsts.setdefault(entry[2], entry)
-            boxes += list(firsts.values())
+                if heading is None:
+                    continue
+                round_index = seen_boxes[heading[1]] = seen_boxes.get(heading[1], -1) + 1
+                if round_index == 0:
+                    boxes.append((box.group(0), "primary", heading[1]))
+                elif round_index == 1 and year in RUNOFFS:
+                    boxes.append((box.group(0), "runoff", heading[1]))
         for stage, party, kind, body in [
             (stage, party, kind, body)
             for box, stage, party in boxes
@@ -337,32 +335,35 @@ def emit() -> Path:
         ):
             office_label, office_id = offices[office_slug]
             first = date(year, 11, 1)
-            primary = stage == "primary"
+            runoff = stage == "runoff"
+            primary = stage in ("primary", "runoff")
             day = (
-                PRIMARIES[year]
+                RUNOFFS[year]
+                if runoff
+                else PRIMARIES[year]
                 if primary
                 else EARLY[year][0]
                 if year in EARLY
                 else SPECIALS.get(year, first + timedelta(days=(0 - first.weekday()) % 7 + 1))
             )
             end = EARLY[year][1] if year in EARLY and not primary else day
-            kind = "primary" if primary else "general" if year % 2 == 0 and year not in EARLY else "local"
+            kind = stage if primary else "general" if year % 2 == 0 and year not in EARLY else "local"
             if primary:
-                election = cs.key("us.election", f"{day}:new-york-city:primary")
+                election = cs.key("us.election", f"{day}:new-york-city:{kind}")
                 if election in cs.minted and election not in seen:
                     seen.add(election)
                     cs.add(
                         "election",
                         id=election,
                         polity_id=polity,
-                        kind="primary",
+                        kind=kind,
                         date_from=day,
                         date_to=end,
                         date_precision="day",
                         status="held",
                     )
-                    name(election, f"{year} New York City primary election")
-                    cs.add("slug", path=f"{polity_path}/{day}-primary", entity_id=election)
+                    name(election, f"{year} New York City {kind} election")
+                    cs.add("slug", path=f"{polity_path}/{day}-{kind}", entity_id=election)
             elif (parent := cs.key("us.election", f"{day}:NY")) in cs.minted:
                 cs.add(
                     "election",
@@ -407,15 +408,15 @@ def emit() -> Path:
                 party_scope_id=cs.key("us.party", PARTIES[scope]) if primary else None,
                 district_area_id=cs.area("us.place", "3651000"),
                 magnitude=1,
-                round_number=1,
-                previous_round_id=None,
+                round_number=2 if runoff else 1,
+                previous_round_id=cs.key("us.contest", f"nyc_early_mayors:{PRIMARIES[year]}:primary:NY:3651000:{office_slug}{suffix}") if runoff else None,
                 electoral_system_id=system,
                 default_result_kind="counted",
                 term="remainder" if year in SPECIALS else "full",
             )
             name(
                 contest,
-                f"{year} {scope + ' primary for ' if primary else ''}New York City {'special ' if year in SPECIALS else ''}{office_label}",
+                f"{year} {scope + (' primary runoff for ' if runoff else ' primary for ') if primary else ''}New York City {'special ' if year in SPECIALS else ''}{office_label}",
             )
             cs.add("slug", path=path, entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
