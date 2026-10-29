@@ -90,6 +90,18 @@ DISTRICT_CALENDAR = {
         11,
         "Cypress-Fairbanks ISD board elections page: next trustee election November 2, 2027, https://www.cfisd.net/our-district/board-of-trustees/board-elections",
     ),
+    ("NJ", "Union City"): (
+        4,
+        2,
+        5,
+        "City of Union City public notice: nonpartisan municipal election Tuesday, May 12, 2026, five commissioners for four-year terms, https://www.ucnj.com/News/View/2532/public-notice",
+    ),
+    ("NJ", "North Bergen"): (
+        4,
+        3,
+        5,
+        "Township of North Bergen, FAQ on the mayoral transition: next municipal election May 11, 2027, https://www.northbergen.org/News/View/12009/frequently-asked-questions-on-the-mayoral-transition",
+    ),
     ("NJ", "Newark City School System"): (
         1,
         0,

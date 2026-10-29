@@ -1451,6 +1451,18 @@ NE_SOURCES = {
         "https://vote.sos.ri.gov/Candidates",
         "ne/ri_Candidates.xlsx",
     ),
+    "ME-municipal": (
+        "Maine municipal clerks",
+        "Portland, Lewiston, Bangor, and South Portland: sample ballots and candidate lists, November 3, 2026",
+        "https://www.portlandmaine.gov/",
+        "ne/me_municipal.zip",
+    ),
+    "RI-towns": (
+        "Rhode Island Secretary of State",
+        "2026 General Election Candidates: Central Falls, Coventry, Hopkinton, Middletown, Narragansett, South Kingstown, Warwick",
+        "https://vote.sos.ri.gov/Candidates",
+        "ne/ri_towns.zip",
+    ),
     "NJ-34019-s": (
         "Hunterdon County Clerk",
         "Annual School Election, November 3, 2026 (unofficial)",
@@ -1515,6 +1527,10 @@ for county, url in {
     "Montgomery": "https://www.montgomerycountyny.gov/documents/boe/FiledPetitions.pdf",
     "Essex": "https://www.co.essex.ny.us/",
     "Schuyler": "https://www.schuylercounty.us/DocumentCenter/View/16302/2026-GE-Candidates-List",
+    "Sullivan": "https://www.sullivanny.gov/sites/default/files/departments/boe/Sullivan%20County%20GE26%20Ballot%20Certification%20for%20website.pdf",
+    "Delaware": "https://www.co.delaware.ny.us/departments/elections/",
+    "Madison": "https://www.madisoncounty.ny.gov/3291/Sample-Ballots",
+    "Livingston": "https://www.livingstoncountyny.gov/685/Sample-Ballots",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1522,7 +1538,7 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'pdf'}",
+        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston') else 'pdf'}",
     )
 for fips, county in {
     "32001": "Churchill",
@@ -1795,6 +1811,8 @@ def fetch() -> None:
                     if fips == "17031c"
                     else "text/html"
                     if DELIVERED[fips].suffix == ".html"
+                    else "application/zip"
+                    if DELIVERED[fips].suffix == ".zip"
                     else "application/pdf",
                 )
             continue
@@ -2080,7 +2098,14 @@ def parse() -> None:
         ):
             if word.startswith(prefix):
                 return key, False
-        return None, word in ("independent", "unaffiliated", "no party", "non-partisan independent", "petition", "nonpartisan")
+        return None, word in (
+            "independent",
+            "unaffiliated",
+            "no party",
+            "non-partisan independent",
+            "petition",
+            "nonpartisan",
+        )
 
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["MD"][0]).path.read_text(encoding="utf-8-sig"))):
         if row["Candidate Status"] != "Active":
@@ -2302,7 +2327,9 @@ def parse() -> None:
                 "seats": int(seats[1]) if seats else 0,
                 "name": cells[0],
                 "party": named,
-                "independent": independent or named is None and bool(re.search(r"(?i)non.?partisan|write-in|taxpayer watchdog|^[()\s]*$", str(cells[1] or ""))),
+                "independent": independent
+                or named is None
+                and bool(re.search(r"(?i)non.?partisan|write-in|taxpayer watchdog|^[()\s]*$", str(cells[1] or ""))),
                 "unexpired": False,
             }
         )
@@ -4014,7 +4041,15 @@ def parse() -> None:
         for post, people in offices.items():
             on = [person for person in people if person[2] in ("Qualified", "Advanced", "Runoff")]
             parties = Counter(person[1] for person in on if person[1] in ("REP", "DEM"))
-            title = re.sub(r"(?i)\bsch\b", "School", re.sub(r"(?i)^co\b", "County", re.sub(r"(?i)^bd of county comm(?:issioners?)?\b", "County Commissioner", post)))
+            title = re.sub(
+                r"(?i)\bsch\b",
+                "School",
+                re.sub(
+                    r"(?i)^co\b",
+                    "County",
+                    re.sub(r"(?i)^bd of county comm(?:issioners?)?\b", "County Commissioner", post),
+                ),
+            )
             title = re.sub(r"(?i)\b(?:dist|dst|pct)\b\.?", "District", title)
             title = re.sub(r"(?i)\s*-\s*(?:single m|at large)$|^member,\s*", "", title)
             title = re.sub(r"(?i)\s*-\s*(\d+)$", r" District \1", title)
@@ -4049,7 +4084,13 @@ def parse() -> None:
                 title = f"{town} {title}"
             for name, label, _ in on:
                 named, independent = party(
-                    {"REP": "Republican", "DEM": "Democratic", "LPF": "Libertarian", "LIB": "Libertarian", "GRE": "Green"}.get(label)
+                    {
+                        "REP": "Republican",
+                        "DEM": "Democratic",
+                        "LPF": "Libertarian",
+                        "LIB": "Libertarian",
+                        "GRE": "Green",
+                    }.get(label)
                 )
                 named = {
                     "ECO": "FL:ecology-party-of-florida",
@@ -4248,13 +4289,18 @@ def parse() -> None:
             )
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
-            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ"]) & (pl.col("FUNCSTAT") == "A"))
+            gazetteer.filter(
+                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ"]) & (pl.col("FUNCSTAT") == "A")
+            )
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
-        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az)/[^/]+$'")}
+        claimed = {
+            path
+            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az)/[^/]+$'")
+        }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ')"""
@@ -4435,7 +4481,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD")
@@ -4461,7 +4507,15 @@ def parse() -> None:
                             (
                                 role
                                 for pattern, role in (
-                                    (r"^(?:township |village |city )?(supervisor|clerk|treasurer)$", "office"),
+                                    (
+                                        (
+                                            r"^(?:township |village |city |town )?(supervisor|clerk|treasurer)$"
+                                            r"|^(?:town )?(?:clerk and )?tax collector$"
+                                        ),
+                                        "office",
+                                    ),
+                                    (r"^highway superintendent$", "highway-superintendent"),
+                                    (r"^(?:town |village )justice$", "justice"),
                                     (r"^village president$|^president$", "president"),
                                     (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
@@ -4530,6 +4584,9 @@ def parse() -> None:
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
+                                "collector": "Tax Collector",
+                                "highway-superintendent": "Highway Superintendent",
+                                "justice": "Justice",
                                 "treasurer": "Treasurer",
                                 "president": "President",
                             }[role]
@@ -4707,9 +4764,14 @@ def emit() -> Path:
         homeless: set[str] = set()
         split_tails = {
             (row["fips"], row["tail"])
-            for row in frame.group_by(["fips", "tail"]).agg(pl.col("unexpired").n_unique().alias("n")).filter(pl.col("n") > 1).iter_rows(named=True)
+            for row in frame.group_by(["fips", "tail"])
+            .agg(pl.col("unexpired").n_unique().alias("n"))
+            .filter(pl.col("n") > 1)
+            .iter_rows(named=True)
         }
-        for (fips, tail, template, _), group in frame.group_by(["fips", "tail", "template", "unexpired"], maintain_order=True):
+        for (fips, tail, template, _), group in frame.group_by(
+            ["fips", "tail", "template", "unexpired"], maintain_order=True
+        ):
             if template == "" and group["owner"][0]:
                 title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
                 st, code, role = tail.split(":")[:3]
@@ -5062,7 +5124,11 @@ def emit() -> Path:
                     " election", " general municipal election" if fips == "0644000" else " runoff election", 1
                 )
             cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
-            cs.add("slug", path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else ""), entity_id=contest)
+            cs.add(
+                "slug",
+                path=re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else ""),
+                entity_id=contest,
+            )
             counts["contests"] += 1
             if tail in created:
                 counts["created"] += 1
