@@ -1,3 +1,4 @@
+import csv
 import difflib
 import html
 import re
@@ -17,7 +18,7 @@ from ea.sources.tr.ysk import INVALID, PROVINCES, REGISTERED, VALID, VOTERS, VOT
 from ea.store import DATA, connect
 
 SOURCE = "tr.tuik_secim"
-VERSION = "1"
+VERSION = "2"
 APP = "https://biruni.tuik.gov.tr/secimdagitimapp/secim.zul"
 TABLE = "Seçim çevresi ve ilçelere göre milletvekili genel seçimi sonuçları"
 REFERENDUMS = "https://biruni.tuik.gov.tr/secimdagitimapp/halkoylama.zul"
@@ -109,6 +110,15 @@ REFERENDUM_PARTS = {
     "Belde/Köy toplamı": "rural",
     "İl/İlçe merkezi": "urban",
     "Belde/Köy": "rural",
+}
+COMPOSITIONS = Path(__file__).with_name("tkgm_districts.tsv")
+COMPOSITION_ALIASES = {
+    "ŞEREFLİKOÇHİSAR": "Ş,KOÇHİSAR",
+    "ÇİNE": "ÇINE",
+    "MUSTAFAKEMALPAŞA": "M,KEMALPAŞA",
+    "SAMANDAĞ": "SAMANDAĞI",
+    "EYÜPSULTAN": "EYÜP",
+    "SURUÇ": "SÜRÜÇ",
 }
 ITEM = r'<tr id="([^"]+)" z\.type="Lit"[^>]*>\s*<td[^>]*>([^<]+)'
 
@@ -567,6 +577,26 @@ def emit() -> Path:
         )
         unmatched: set[str] = set()
         result_sets = 0
+        composition: dict[str, set[str]] = {}
+        with COMPOSITIONS.open() as handle:
+            for row in csv.DictReader(handle, delimiter="\t"):
+                if row["split"]:
+                    continue
+                name = norm(row["ilce"]).replace(" ", "")
+                name = "MERKEZ" if name.endswith("MERKEZ") else COMPOSITION_ALIASES.get(name, name)
+                composition.setdefault(row["district"], set()).add(name)
+        declared_totals: dict[str, dict[str, int]] = {}
+        for contest_key, measure, value in conn.execute(
+            """select x.value, v.measure, sum(v.value) from external_id x
+               join result_set rs on rs.contest_id = x.entity_id and rs.is_default
+               join result_value v on v.result_set_k = rs.k
+               where x.scheme = 'tr.contest' and x.value like '1987-11-29:parliament:%%-%%'
+                 and v.measure = any(%s) group by 1, 2""",
+            [[REGISTERED, VOTERS, VALID]],
+        ).fetchall():
+            declared_totals.setdefault(contest_key, {})[
+                {REGISTERED: "registered", VOTERS: "voters", VALID: "valid"}[measure]
+            ] = int(value)
         for year, day in DAYS.items():
             held = frame.filter(pl.col("year") == year)
             national_key = f"{day}:parliament"
@@ -580,16 +610,40 @@ def emit() -> Path:
                     groups.setdefault(key, []).append(district)
                 elif national_key not in contests:
                     raise ValueError(f"{year} {district}: no contest {key}")
+            chosen: dict[str, list[tuple[str, str]]] = {}
+            if year == "1987":
+                for code, names in composition.items():
+                    contest_key = f"{national_key}:{code}"
+                    if contest_key not in contests or contest_key in groups:
+                        continue
+                    pairs = []
+                    for district, label in (
+                        held.filter(pl.col("level") == "ilce").select("district", "name").unique().iter_rows()
+                    ):
+                        province = norm(re.sub(r"\s*\(\d+\)$", "", district))
+                        stem = norm(label.split("/")[0]).replace(" ", "")
+                        if plates[PROVINCE_ALIASES.get(province, province)] == code[:2] and stem in names:
+                            pairs.append((district, label))
+                    if len(pairs) != len(names):
+                        raise ValueError(f"{contest_key}: {len(pairs)} ilçes found for {len(names)} in the composition")
+                    chosen[contest_key] = pairs
+                    groups[contest_key] = sorted({district for district, _ in pairs})
             if national_key in contests:
                 groups[national_key] = sorted(held["district"].unique())
             for contest_key, districts in groups.items():
                 contest, election = contests[contest_key]
                 rows = held.filter(pl.col("district").is_in(districts))
+                if contest_key in chosen:
+                    rows = rows.filter(
+                        pl.struct("district", "name").is_in(
+                            [{"district": district, "name": label} for district, label in chosen[contest_key]]
+                        )
+                    )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
                 ilce = rows.filter(pl.col("level") == "ilce")
                 declared = rows.filter(pl.col("level") == "district").group_by("column").agg(pl.col("value").sum())
                 summed = ilce.group_by("column").agg(pl.col("value").sum())
-                totals = dict(declared.iter_rows())
+                totals = declared_totals[contest_key] if contest_key in chosen else dict(declared.iter_rows())
                 sums = dict(summed.iter_rows())
                 cs.add(
                     "result_set",
