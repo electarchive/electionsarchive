@@ -1551,6 +1551,9 @@ NEW_PARTIES = {
     "NY:working-families-perseverance": "Working Families/Perseverance",
     "NY:the-peoples": "The Peoples",
     "NY:listening-party": "Listening Party",
+    "FL:ecology-party-of-florida": "Ecology Party of Florida",
+    "FL:independent-party-of-florida": "Independent Party of Florida",
+    "FL:jeffersonian-party-of-florida": "Jeffersonian Party of Florida",
 }
 NEW_PARTIES_ADDED: set[str] = set()
 COUNTIES = {"06073": "San Diego County", "06059": "Orange County"}
@@ -2059,7 +2062,7 @@ def parse() -> None:
         ):
             if word.startswith(prefix):
                 return key, False
-        return None, word in ("independent", "unaffiliated", "no party", "non-partisan independent", "petition")
+        return None, word in ("independent", "unaffiliated", "no party", "non-partisan independent", "petition", "nonpartisan")
 
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["MD"][0]).path.read_text(encoding="utf-8-sig"))):
         if row["Candidate Status"] != "Active":
@@ -3993,7 +3996,7 @@ def parse() -> None:
         for post, people in offices.items():
             on = [person for person in people if person[2] in ("Qualified", "Advanced", "Runoff")]
             parties = Counter(person[1] for person in on if person[1] in ("REP", "DEM"))
-            title = re.sub(r"(?i)\bsch\b", "School", re.sub(r"(?i)^co\b", "County", post))
+            title = re.sub(r"(?i)\bsch\b", "School", re.sub(r"(?i)^co\b", "County", re.sub(r"(?i)^bd of county comm(?:issioners?)?\b", "County Commissioner", post)))
             title = re.sub(r"(?i)\b(?:dist|dst|pct)\b\.?", "District", title)
             title = re.sub(r"(?i)\s*-\s*(?:single m|at large)$|^member,\s*", "", title)
             title = re.sub(r"(?i)\s*-\s*(\d+)$", r" District \1", title)
@@ -4013,6 +4016,7 @@ def parse() -> None:
                     post,
                 )
                 or len(on) > 2
+                and len({person[1] for person in on}) < len(on)
                 and (
                     countywide
                     and not {person[2] for person in on} & {"Advanced", "Runoff"}
@@ -4029,6 +4033,11 @@ def parse() -> None:
                 named, independent = party(
                     {"REP": "Republican", "DEM": "Democratic", "LPF": "Libertarian", "LIB": "Libertarian", "GRE": "Green"}.get(label)
                 )
+                named = {
+                    "ECO": "FL:ecology-party-of-florida",
+                    "IND": "FL:independent-party-of-florida",
+                    "JEF": "FL:jeffersonian-party-of-florida",
+                }.get(label, named)
                 feeds[key].append(
                     {
                         "county": county,
@@ -4036,7 +4045,7 @@ def parse() -> None:
                         "seats": 1,
                         "name": cased(name),
                         "party": named,
-                        "independent": independent or named is None and label not in ("ECO", "JEF"),
+                        "independent": independent or named is None,
                         "unexpired": False,
                     }
                 )
