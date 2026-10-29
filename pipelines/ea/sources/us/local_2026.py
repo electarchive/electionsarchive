@@ -4027,7 +4027,7 @@ def parse() -> None:
                 title = f"{town} {title}"
             for name, label, _ in on:
                 named, independent = party(
-                    {"REP": "Republican", "DEM": "Democratic", "LPF": "Libertarian", "GRE": "Green"}.get(label)
+                    {"REP": "Republican", "DEM": "Democratic", "LPF": "Libertarian", "LIB": "Libertarian", "GRE": "Green"}.get(label)
                 )
                 feeds[key].append(
                     {
@@ -4036,7 +4036,7 @@ def parse() -> None:
                         "seats": 1,
                         "name": cased(name),
                         "party": named,
-                        "independent": independent or label in ("NPA", "IND"),
+                        "independent": independent or named is None and label not in ("ECO", "JEF"),
                         "unexpired": False,
                     }
                 )
