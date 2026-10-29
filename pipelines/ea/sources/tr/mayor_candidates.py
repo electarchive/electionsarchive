@@ -13,13 +13,18 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
 
 
-def races() -> tuple[dict[tuple[int, str], list[tuple[str, str, str, int]]], dict[str, str]]:
+def races() -> tuple[
+    dict[tuple[int, str], list[tuple[str, str, str, int]]],
+    list[tuple[str, list[tuple[str, str, str, int]]]],
+    dict[str, str],
+]:
     found: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
+    municipal: list[tuple[str, list[tuple[str, str, str, int]]]] = []
     pages: dict[str, str] = {}
     tables, _, _ = mayors_1984_1999.read()
     for (year, province, kind, _), (title, rows, _) in tables.items():
@@ -35,17 +40,20 @@ def races() -> tuple[dict[tuple[int, str], list[tuple[str, str, str, int]]], dic
                 (label, label, names, votes) for label, names, votes in rows
             ]
             pages[title] = mayors_2004_2009.MAYORS
-    return found, pages
+        else:
+            municipal.append((title, [(label, label, names, votes) for label, names, votes in rows]))
+            pages[title] = mayors_2004_2009.MAYORS
+    return found, municipal, pages
 
 
 def emit() -> Path:
-    found, pages = races()
+    found, municipal, pages = races()
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Candidates and mayors of the metropolitan mayoral contests of 1984-2004, from Turkish Wikipedia's per-province tables",
+            summary="Candidates and mayors of the mayoral contests of 1984-2004 (metropolitan, and municipal in 2004), from Turkish Wikipedia's per-province tables",
             polity="TR",
         )
         wiki = cs.source("Wikipedia", TITLE)
@@ -68,7 +76,8 @@ def emit() -> Path:
             """select x.value, c.id, c.office_id from contest c
                join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
                join changeset cs on cs.id = c.changeset_id
-               where cs.pipeline = 'tr.ysk_local' and c.kind = 'office' and x.value like '%%-mayor'"""
+               where cs.pipeline in ('tr.ysk_local', 'tr.ysk_mayors') and c.kind = 'office'
+                 and x.value ~ '^(1984-03-25|1989-03-26|1994-03-27|1999-04-18|2004-03-28):.*-mayor$'"""
         ).fetchall():
             contests[key] = (contest, office)
         sets = dict(
@@ -85,12 +94,35 @@ def emit() -> Path:
             ).fetchall()
         )
         labels: dict[tuple[UUID, str], UUID | None] = {}
+        option_party: dict[UUID, UUID | None] = {}
         for contest, option, party_id, k, label in conn.execute(
             "select contest_id, id, party_id, k, ballot_label from contest_option where contest_id = any(%s)",
             [[contest for contest, _ in contests.values()]],
         ).fetchall():
             options[contest][party_id] = (option, tally.get(k))
+            option_party[option] = party_id
             labels[(contest, fold(label))] = party_id
+        by_votes: dict[UUID, dict[int, UUID]] = defaultdict(dict)
+        for contest, option, k in conn.execute(
+            "select contest_id, id, k from contest_option where contest_id = any(%s)",
+            [[contest for contest, _ in contests.values()]],
+        ).fetchall():
+            if tally.get(k) is not None:
+                by_votes[contest][int(tally[k])] = option
+        winners = dict(
+            conn.execute(
+                "select contest_id, person_id from tenure where contest_id = any(%s)",
+                [[contest for contest, _ in contests.values()]],
+            ).fetchall()
+        )
+        index: dict[tuple[int, ...], list[str]] = defaultdict(list)
+        for key, (contest, _) in contests.items():
+            if key.startswith("2004-03-28:") and winners.get(contest) is not None:
+                index[tuple(sorted(by_votes[contest], reverse=True)[:3])].append(key)
+        for title, rows in municipal:
+            hits = index.get(tuple(sorted((row[3] for row in rows), reverse=True)[:3]), [])
+            if len(rows) > 1 and len(hits) == 1:
+                found[(2004, hits[0])] = rows
         offices: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
         for office, person, text in conn.execute(
             """select t.office_id, t.person_id, n.text from tenure t join name n on n.entity_id = t.person_id
@@ -102,8 +134,9 @@ def emit() -> Path:
             contest
             for (contest,) in conn.execute(
                 """select distinct o.contest_id from candidacy ca join contest_option o on o.id = ca.option_id
-                   where o.contest_id = any(%s)""",
-                [[contest for contest, _ in contests.values()]],
+                   join changeset cs on cs.id = ca.changeset_id
+                   where o.contest_id = any(%s) and cs.pipeline <> %s""",
+                [[contest for contest, _ in contests.values()], SOURCE],
             ).fetchall()
         }
         known: dict[str, set[UUID]] = defaultdict(set)
@@ -123,7 +156,7 @@ def emit() -> Path:
         made = 0
         for (year, province), rows in sorted(found.items()):
             day = DAYS[year]
-            contest_key = f"{day}:{province}-mayor"
+            contest_key = province if ":" in province else f"{day}:{province}-mayor"
             if contest_key not in contests:
                 skipped.append((str(year), province, "no contest"))
                 continue
@@ -134,32 +167,40 @@ def emit() -> Path:
             leader = max(rows, key=lambda row: row[3])
             tied = sum(1 for row in rows if row[3] == leader[3]) > 1
             for abbreviation, label, names, votes in rows:
-                independent = fold(abbreviation).startswith(("bgmsz", "bagimsiz")) or fold(names) == ""
-                owner = None
-                if not independent:
-                    for candidate in (label, upper(label), abbreviation):
-                        try:
-                            owner = party(candidate, year)
-                        except KeyError:
-                            owner = mayors_1984_1999.EXTRA.get(abbreviation)
-                        if owner is not None:
-                            break
-                    if owner is None:
-                        skipped.append((str(year), province, f"unknown party {abbreviation}"))
+                option = by_votes[contest].get(votes)
+                if option is not None:
+                    party_id = option_party[option]
+                    existing = votes
+                else:
+                    independent = fold(abbreviation).startswith(("bgmsz", "bagimsiz")) or fold(names) == ""
+                    owner = None
+                    if not independent:
+                        for candidate in (label, upper(label), abbreviation):
+                            try:
+                                owner = party(candidate, year)
+                            except KeyError:
+                                owner = mayors_1984_1999.EXTRA.get(abbreviation)
+                            if owner is not None:
+                                break
+                        if owner is None:
+                            skipped.append((str(year), province, f"unknown party {abbreviation}"))
+                            continue
+                    party_id = None if owner is None else cs.key("tr.party", owner)
+                    if party_id is not None and party_id not in options[contest]:
+                        party_id = labels.get((contest, fold(label)), party_id)
+                    option, existing = options[contest].get(party_id, (None, None))
+                    if option is None:
+                        if year != 2004:
+                            skipped.append((str(year), province, f"no option for {abbreviation}"))
                         continue
-                party_id = None if owner is None else cs.key("tr.party", owner)
-                if party_id is not None and party_id not in options[contest]:
-                    party_id = labels.get((contest, fold(label)), party_id)
-                option, existing = options[contest].get(party_id, (None, None))
-                if option is None:
-                    if year != 2004:
-                        skipped.append((str(year), province, f"no option for {abbreviation}"))
-                    continue
-                if existing is not None and existing != votes:
-                    skipped.append((str(year), province, f"{abbreviation}: {votes} against {existing}"))
-                    continue
+                    if existing is not None and existing != votes:
+                        skipped.append((str(year), province, f"{abbreviation}: {votes} against {existing}"))
+                        continue
                 name = names.split("; ")[0].strip()
                 matches = offices.get((office, fold(name))) or national.get(fold(name)) or known.get(fold(name), set())
+                is_winner = (abbreviation, label, names, votes) == leader and not tied
+                if is_winner and winners.get(contest) is not None:
+                    matches = {winners[contest]}
                 if len(matches) == 1:
                     person = next(iter(matches))
                 else:
@@ -182,7 +223,7 @@ def emit() -> Path:
                 if party_id is not None:
                     cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=party_id, kind="nominated")
                 made += 1
-                if (abbreviation, label, names, votes) == leader and not tied:
+                if is_winner and contest not in winners:
                     start, end = date(year, 4, 1), date(year + 5, 4, 1)
                     tenure = cs.key(f"{SOURCE}.tenure", contest_key)
                     cs.add(
