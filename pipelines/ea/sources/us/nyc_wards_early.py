@@ -19,6 +19,8 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = (1859, 1861, 1870)
 TRIB = {1854: 56, 1857: 217, 1863: 509, 1865: 617, 1867: 712}
+PRES = {1856: 151}
+PRES_NAMES = {"Buchan.": "buchanan", "Frem.": "fremont", "Fillm.": "fillmore"}
 TRIB_URL = "https://archive.org/download/tribunealmanacfo00gree/tribunealmanacfo00gree.pdf"
 TRIB_TITLE = "The Tribune almanac for the years 1838 to 1868, inclusive (New York City vote by wards)"
 TRIB_NOTE = (
@@ -132,7 +134,21 @@ def parse() -> None:
                 "left": ", ".join(left),
             }
         )
+    president: list[dict[str, object]] = []
+    for year, page in PRES.items():
+        reads = [json.loads((TRIB_INBOX / f"p{page}-{reader}.json").read_text()) for reader in ("sonnet", "opus")]
+        for position, head in enumerate(reads[0]["candidates"]):
+            cells = [[int(ward["votes"][position].replace(",", "")) for ward in read["wards"]] for read in reads]
+            wards = [ward["ward"] for ward in reads[0]["wards"]]
+            printed = [int(read["total"][position].replace(",", "")) for read in reads]
+            if cells[0] != cells[1] or wards != list(range(1, 23)) or sum(cells[0]) != printed[0] or printed[0] != printed[1]:
+                raise ValueError(f"{year} president {head['name']}: reads disagree or wards do not add up to the printed total")
+            president.extend(
+                {"year": year, "ward": ward, "option": head["name"], "votes": votes, "page": page, "bbox": reads[0]["bbox"]}
+                for ward, votes in zip(wards, cells[0], strict=True)
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(president).write_parquet(PARSED / "president.parquet")
     pl.DataFrame(coverage).write_parquet(PARSED / "coverage.parquet")
     pl.DataFrame(rows, infer_schema_length=None).write_parquet(PARSED / "wards.parquet")
 
@@ -155,6 +171,7 @@ def fetch() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "wards.parquet")
+    president = pl.read_parquet(PARSED / "president.parquet")
     coverage = {year: (share, left) for year, share, left in pl.read_parquet(PARSED / "coverage.parquet").iter_rows()}
     with connect() as conn:
         cs = Changeset(
@@ -193,7 +210,7 @@ def emit() -> Path:
         trib_pdf = raw.cached(SOURCE, TRIB_URL)
         trib_artifact = cs.artifact(trib_pdf, tribune)
         trib_pages: dict[int, object] = {}
-        for page in TRIB.values():
+        for page in (*TRIB.values(), *PRES.values()):
             image = PAGES / f"{trib_pdf.sha256}-{page}.png"
             if not image.exists():
                 PAGES.mkdir(parents=True, exist_ok=True)
@@ -346,4 +363,61 @@ def emit() -> Path:
                         x1=bbox[2],
                         y1=bbox[3],
                     )
+        for year, page in PRES.items():
+            day = date(year, 11, 4)
+            ((contest, election),) = conn.execute(
+                "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id "
+                "where x.scheme = 'us.contest' and x.value = %s",
+                [f"{day}:NY:president"],
+            ).fetchall()
+            options = {label.split(" (")[0].split()[-1].lower(): option for option, label in conn.execute(
+                "select id, ballot_label from contest_option where contest_id = %s", [contest]
+            ).fetchall()}
+            result_set = cs.key(f"{SOURCE}.result_set", f"president:{day}:NY:wards:36061")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=tribune,
+                is_default=False,
+                completeness=1,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=(
+                f"New York City's vote for President in {year} by ward, from the Tribune Almanac's table, read from the page "
+                "image by two vision models (Claude Sonnet 5.5 and Opus 5.5). A column is loaded only where both reads agree "
+                "in every ward and the 22 wards add up to the printed total row. The set covers New York County only; the "
+                "statewide sets stay the default."
+            ))
+            for ward, option, votes, bbox in president.filter(pl.col("year") == year).select("ward", "option", "votes", "bbox").iter_rows():
+                code = f"36061:{ward:02d}"
+                unit = cs.unit("us.nyc_ward", code, day)
+                if unit not in added:
+                    added.add(unit)
+                    cs.add(
+                        "reporting_unit",
+                        id=unit,
+                        polity_id=polity,
+                        scheme_code="us.nyc_ward",
+                        code=code,
+                        parent_id=county,
+                        area_relation="equals",
+                        area_id=areas[ward],
+                        kind="standard",
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
+                fact = {
+                    "result_set_id": result_set,
+                    "unit_id": unit,
+                    "option_id": options[PRES_NAMES[option]],
+                    "channel": 0,
+                    "measure": 1,
+                    "count_round": 0,
+                }
+                cs.add("result_value", **fact, flags=0, value=votes)
+                cs.add("value_locator", **fact, page_id=trib_pages[page], source_id=None, x0=bbox[0], y0=bbox[1], x1=bbox[2], y1=bbox[3])
         return cs.write()
