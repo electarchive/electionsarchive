@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 from pathlib import Path
 
@@ -25,9 +26,12 @@ COMMITS = {
     "HI": ("56655e716b7752e2ffe0acb2b85c09e70807c4fa", (2016, 2022)),
     "IA": ("9ec8f4e142b5159f67b6aa447a583b63e249fd12", (2022,)),
     "IL": ("1fa096f60367a0fe22dc380cc9799abd5228b89c", (2008, 2010, 2012, 2014)),
-    "IN": ("b130b78cd7b55e57e766623772424f60c0e640bd", (2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022)),
+    "IN": (
+        "b130b78cd7b55e57e766623772424f60c0e640bd",
+        (2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2022),
+    ),
     "KS": ("11acd83f630a1404cfa507671e3ccf579b2887d8", (2012, 2014, 2016, 2022)),
-    "KY": ("025799258505414d62830ea75fd34b58cb2ee59b", (2016,)),
+    "KY": ("025799258505414d62830ea75fd34b58cb2ee59b", (2012, 2014, 2016)),
     "MD": ("c0683efed91d246d2d3d86d6ef599624cd21f58d", (2018,)),
     "ME": ("55ee677d8f0a36564e1a234399d5136441bdafe6", (2016, 2018, 2022)),
     "MI": ("2103114f669c2bb25f19792bf5ca290300381396", (2016, 2018, 2020, 2022)),
@@ -42,7 +46,10 @@ COMMITS = {
     "RI": ("977565f9d7cf7a32d3a2a454282b5fd291cef291", (2008, 2012, 2014, 2022)),
     "SC": ("5e05b67e15f3614a20d31144df83248235cba6f2", (2022,)),
     "SD": ("9e01b9aea628e9ae17ada6656b649daf319fd212", (2018,)),
-    "TX": ("c7185327aa987ecc23fefdde0ee53f5238f5da70", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2020, 2022)),
+    "TX": (
+        "c7185327aa987ecc23fefdde0ee53f5238f5da70",
+        (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2020, 2022),
+    ),
     "UT": ("a023ab4d87c4a93f0913f505c6fcbad1a585db57", (2016, 2018, 2022)),
     "WA": ("5ad56d3900dfe3678b827a6125e9c446fd32628b", (2016,)),
     "WI": ("f344a0ee7effcea4cf835750a3584a7fbb754b6d", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2022)),
@@ -63,8 +70,11 @@ OTHER = r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|refere
 
 
 def picks() -> list[tuple[str, int, str]]:
+    only = os.environ.get("OE_STATES")
     chosen = []
     for state, (commit, years) in COMMITS.items():
+        if only and state not in only.split(","):
+            continue
         paths = json.loads(
             raw.cached(SOURCE, openelections.TREE.format(state=state.lower(), commit=commit)).path.read_text()
         )["tree"]
@@ -102,7 +112,10 @@ def picks() -> list[tuple[str, int, str]]:
 
 
 def fetch() -> None:
+    only = os.environ.get("OE_STATES")
     for state, (commit, _) in COMMITS.items():
+        if only and state not in only.split(","):
+            continue
         raw.fetch(SOURCE, openelections.TREE.format(state=state.lower(), commit=commit), suffix=".json")
     for state, _, path in picks():
         raw.fetch(
@@ -146,7 +159,10 @@ def parse() -> None:
                 votes=pl.sum_horizontal(
                     pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
                     for column in frame.columns
-                    if re.fullmatch(r"(election_day|advanced|absentee_by_mail|provisional)(_votes)?|early_voting|absentee|mail|early|in_person", column)
+                    if re.fullmatch(
+                        r"(election_day|advanced|absentee_by_mail|provisional)(_votes)?|early_voting|absentee|mail|early|in_person",
+                        column,
+                    )
                 ).cast(pl.String)
             )
         for column in ("vote_type", "votetype"):
@@ -341,5 +357,13 @@ def emit() -> Path:
                     ),
                     sources[state],
                 )
-        medsl.attach(cs, conn, frame, sources)
+        ky = pl.col("state") == "KY"
+        medsl.attach(cs, conn, frame.filter(~ky), sources)
+        medsl.attach(
+            cs,
+            conn,
+            frame.filter(ky),
+            sources,
+            partial="Jefferson County's precinct file omits absentee and other ballots not tied to a precinct",
+        )
         return cs.write()
