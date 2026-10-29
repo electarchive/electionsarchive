@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "13"
+VERSION = "14"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -155,6 +155,7 @@ INHERITED: dict[tuple[str, str], str] = {
 }
 CHOSEN = {"Q47729": "EF1C27", "Q113168799": "56B45D"}
 PAINTED: dict[tuple[str, str, int | None], str] = {
+    ("EU", "Renew Europe Group", None): "FFD700",
     ("US", "American Independent Party", None): "800080",
     ("US", "Anti-Administration", None): "5BA45B",
     ("US", "Anti-Jacksonian", None): "FFE6B0",
