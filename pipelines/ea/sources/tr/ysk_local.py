@@ -29,7 +29,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "7"
+VERSION = "8"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -1434,6 +1434,7 @@ def emit() -> Path:
             )
 
         bloc_of: dict[tuple[date, UUID], UUID] = {}
+        seen_offices: set[UUID] = set()
         for year, day in DAYS.items():
             election = cs.key("tr.election", f"{day}:local")
             cs.add("election", id=election, polity_id=turkey, kind="local", date_from=day, date_to=day, status="held")
@@ -1465,10 +1466,22 @@ def emit() -> Path:
                 magnitude = rows.filter(pl.col("column") == "magnitude", pl.col("unit") == "domestic")["value"]
                 contest_key = f"{day}:{code}"
                 contest = cs.key("tr.contest", contest_key)
+                office_id = cs.key("tr.office", f"local-{code}")
+                if office_id in cs.minted and office_id not in seen_offices:
+                    seen_offices.add(office_id)
+                    cs.add(
+                        "office",
+                        id=office_id,
+                        polity_id=turkey,
+                        kind="mayor" if office in ("belediye_baskani", "buyuksehir") else "other",
+                    )
+                    name(office_id, english, "en")
+                    name(office_id, native, kind="native")
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
+                    office_id=office_id,
                     kind="body_seats",
                     district_area_id=nation,
                     magnitude=int(magnitude[0]) if magnitude.len() else None,
