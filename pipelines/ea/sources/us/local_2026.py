@@ -147,6 +147,11 @@ FEEDS = {
         "Kane County Clerk",
         "Candidates for the 2026 General Election",
     ),
+    "IL-17119": (
+        "https://www.madisoncountyil.gov/document_center/CountyClerk/2026%20Election/Candidate%20list.pdf",
+        "Madison County Clerk",
+        "2026 General Election: Candidate List (9/30/2026)",
+    ),
     "IL-17201": (
         "https://wincoil.gov/media/attachments/2026/09/25/november-2026-candidate-list.pdf",
         "Winnebago County Clerk",
@@ -1339,6 +1344,7 @@ DELIVERED = {
     "GA": DATA / "inbox" / "y26" / "ga" / "ev_2026_primaries.json",
     "IL-17089": DATA / "inbox" / "y26" / "il" / "kane.html",
     "IL-17201": DATA / "inbox" / "y26" / "il" / "winnebago.pdf",
+    "IL-17119": DATA / "inbox" / "y26" / "il" / "madison.pdf",
     "IL-17167": DATA / "inbox" / "y26" / "il" / "sangamon.pdf",
     "MO-29183": DATA / "inbox" / "y26" / "mo" / "stcharles.pdf",
     "MO-29099": DATA / "inbox" / "y26" / "mo" / "jefferson.pdf",
@@ -2284,7 +2290,7 @@ def parse() -> None:
                 "seats": int(seats[1]) if seats else 0,
                 "name": cells[0],
                 "party": named,
-                "independent": independent or named is None and not re.sub(r"[()\s]", "", str(cells[1] or "")),
+                "independent": independent or named is None and bool(re.search(r"(?i)non.?partisan|write-in|taxpayer watchdog|^[()\s]*$", str(cells[1] or ""))),
                 "unexpired": False,
             }
         )
