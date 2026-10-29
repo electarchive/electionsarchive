@@ -18,6 +18,7 @@
       kind: string;
       from: string | null;
       to: string | null;
+      of: { id: string } | null;
     }>;
     current: string;
   } = $props();
@@ -65,6 +66,18 @@
           (a.to ?? "9999").localeCompare(b.to ?? "9999") ||
           a.name.localeCompare(b.name),
       ),
+  );
+  const groups = $derived(
+    [
+      {
+        heading: m.chamber_nested(),
+        rows: former.filter((sibling) => sibling.of != null),
+      },
+      {
+        heading: m.chamber_former(),
+        rows: former.filter((sibling) => sibling.of == null),
+      },
+    ].filter((group) => group.rows.length > 0),
   );
   const isFormer = $derived(former.some((sibling) => sibling.id === current));
   const axis = $derived.by(() => {
@@ -134,72 +147,78 @@
             "text-primary-foreground/70": isFormer,
           })}>{count(former.length)}</span
         >
-        <ChevronDownIcon class="size-3.5 opacity-60" aria-hidden="true" />
+        <ChevronDownIcon
+          class="opacity-60 block-3.5 inline-3.5"
+          aria-hidden="true"
+        />
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         align="end"
         class="inline-[min(23rem,calc(100vw-1.5rem))]"
       >
-        <DropdownMenu.Group>
-          <DropdownMenu.GroupHeading
-            class="grid grid-cols-[minmax(0,1fr)_5.5rem] items-baseline gap-4"
-          >
-            <span>{m.chamber_former()}</span>
-            <span
-              class="flex justify-between font-figures font-normal tabular-nums"
-              aria-hidden="true"
-              ><span>{new Date(axis.low).getUTCFullYear()}</span><span
-                >{today.slice(0, 4)}</span
-              ></span
+        {#each groups as group, index (group.heading)}
+          {#if index > 0}<DropdownMenu.Separator />{/if}
+          <DropdownMenu.Group>
+            <DropdownMenu.GroupHeading
+              class="grid grid-cols-[minmax(0,1fr)_5.5rem] items-baseline gap-4"
             >
-          </DropdownMenu.GroupHeading>
-          {#each former as sibling (sibling.id)}
-            {const at = $derived(place(sibling.from, sibling.to))}
-            <DropdownMenu.Item
-              class="grid grid-cols-[minmax(0,1fr)_5.5rem] items-center gap-4 py-1.5"
-            >
-              {#snippet child({ props })}
-                <a
-                  {...props}
-                  href={resolve("/[...path]", { path: sibling.path })}
-                  aria-current={sibling.id === current ? "page" : undefined}
-                >
-                  <span class="grid gap-0.5 min-inline-0">
-                    <span
-                      class="flex items-center gap-1.5 text-[0.8125rem]/tight font-semibold"
-                      ><span class="min-inline-0">{sibling.name}</span
-                      >{#if sibling.id === current}<CheckIcon
-                          class="size-3.5 shrink-0"
-                          aria-hidden="true"
-                        />{/if}</span
-                    >
-                    <span
-                      class="font-figures text-xs text-muted-foreground tabular-nums"
-                      >{sibling.from == null
-                        ? (KINDS[sibling.kind] ?? m.chamber_kind_other)()
-                        : m.chamber_lifespan({
-                            kind: (
-                              KINDS[sibling.kind] ?? m.chamber_kind_other
-                            )(),
-                            years: years(sibling.from, sibling.to),
-                          })}</span
-                    >
-                  </span>
-                  <span
-                    class="relative overflow-clip rounded-full bg-border block-1.5"
-                    aria-hidden="true"
+              <span>{group.heading}</span>
+              <span
+                class="flex justify-between font-figures font-normal tabular-nums"
+                aria-hidden="true"
+                ><span>{new Date(axis.low).getUTCFullYear()}</span><span
+                  >{today.slice(0, 4)}</span
+                ></span
+              >
+            </DropdownMenu.GroupHeading>
+            {#each group.rows as sibling (sibling.id)}
+              {const at = $derived(place(sibling.from, sibling.to))}
+              <DropdownMenu.Item
+                class="grid grid-cols-[minmax(0,1fr)_5.5rem] items-center gap-4 py-1.5"
+              >
+                {#snippet child({ props })}
+                  <a
+                    {...props}
+                    href={resolve("/[...path]", { path: sibling.path })}
+                    aria-current={sibling.id === current ? "page" : undefined}
                   >
+                    <span class="grid gap-0.5 min-inline-0">
+                      <span
+                        class="flex items-center gap-1.5 text-[0.8125rem]/tight font-semibold"
+                        ><span class="min-inline-0">{sibling.name}</span
+                        >{#if sibling.id === current}<CheckIcon
+                            class="shrink-0 block-3.5 inline-3.5"
+                            aria-hidden="true"
+                          />{/if}</span
+                      >
+                      <span
+                        class="font-figures text-xs text-muted-foreground tabular-nums"
+                        >{sibling.from == null
+                          ? (KINDS[sibling.kind] ?? m.chamber_kind_other)()
+                          : m.chamber_lifespan({
+                              kind: (
+                                KINDS[sibling.kind] ?? m.chamber_kind_other
+                              )(),
+                              years: years(sibling.from, sibling.to),
+                            })}</span
+                      >
+                    </span>
                     <span
-                      class="absolute inset-y-0 rounded-full bg-foreground min-inline-0.75"
-                      style:inset-inline-start={at.start}
-                      style:inline-size={at.size}
-                    ></span>
-                  </span>
-                </a>
-              {/snippet}
-            </DropdownMenu.Item>
-          {/each}
-        </DropdownMenu.Group>
+                      class="relative overflow-clip rounded-full bg-border block-1.5"
+                      aria-hidden="true"
+                    >
+                      <span
+                        class="absolute inset-y-0 rounded-full bg-foreground min-inline-0.75"
+                        style:inset-inline-start={at.start}
+                        style:inline-size={at.size}
+                      ></span>
+                    </span>
+                  </a>
+                {/snippet}
+              </DropdownMenu.Item>
+            {/each}
+          </DropdownMenu.Group>
+        {/each}
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   {/if}

@@ -402,6 +402,19 @@
               polity: body.polity.name,
             })}
           </p>
+          {#if body.within != null}
+            <p class="text-[0.8125rem] text-muted-foreground">
+              {m.chamber_within()}
+              <a
+                class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                href={resolve("/[...path]", { path: body.within.path })}
+                >{body.within.name}</a
+              >{#if body.within.from != null}<span
+                  class="font-figures tabular-nums"
+                  >, {span(body.within.from, body.within.to)}</span
+                >{/if}
+            </p>
+          {/if}
         </div>
         {#if body.siblings.length > 1}
           <Switcher siblings={body.siblings} current={data.id} />

@@ -19455,6 +19455,22 @@ export const bodies = {
             kind: v.string(),
             from: v.nullable(v.string()),
             to: v.nullable(v.string()),
+            of: v.nullable(
+              v.object({
+                id: v.string(),
+                from: v.nullable(v.string()),
+                to: v.nullable(v.string()),
+              }),
+            ),
+          }),
+        ),
+        within: v.nullable(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            path: v.string(),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
           }),
         ),
         sizes: v.array(
@@ -19561,9 +19577,16 @@ export const bodies = {
         paths([body.polity]),
         breadcrumbs(body.polity),
         chambers(body.polity),
-        db.execute<{ id: string; from: string | null; to: string | null }>(
+        db.execute<{
+          id: string;
+          from: string | null;
+          to: string | null;
+          of: string | null;
+          ofFrom: string | null;
+          ofTo: string | null;
+        }>(
           sql`
-            select b.id,
+            select b.id, c.of_body_id::text as of, c.valid_from::text as "ofFrom", c.valid_to::text as "ofTo",
               coalesce(z.first,
                 (select min(e.date_from) from contest k join election e on e.id = k.election_id where k.body_id = b.id),
                 (select min(t.from_date) from tenure t where t.body_id = b.id))::text as from,
@@ -19578,6 +19601,10 @@ export const bodies = {
               select min(lower(valid)) as first, max(upper(valid)) as last, bool_or(upper_inf(valid)) as open
               from body_size where body_id = b.id
             ) z
+            left join lateral (
+              select of_body_id, valid_from, valid_to from body_chamber
+              where body_id = b.id order by valid_from desc nulls last limit 1
+            ) c on true
             where b.polity_id = ${body.polity}::uuid and b.kind <> 'electoral_college'
           `,
         ),
@@ -19864,6 +19891,8 @@ export const bodies = {
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
+      const nest = spans.rows.find((row) => row.id === input.id.toLowerCase());
+      const parent = peers.find((peer) => peer.id === nest?.of);
       return {
         name: labels.full.get(input.id) ?? "",
         kind: body.kind,
@@ -19885,8 +19914,22 @@ export const bodies = {
                   kind: peer.kind,
                   from: dated?.from ?? null,
                   to: dated?.to ?? null,
+                  of:
+                    dated?.of == null
+                      ? null
+                      : { id: dated.of, from: dated.ofFrom, to: dated.ofTo },
                 };
               }),
+        within:
+          home == null || nest == null || parent == null
+            ? null
+            : {
+                id: parent.id,
+                name: parent.name,
+                path: `chambers/${home}/${parent.slug}`,
+                from: nest.ofFrom,
+                to: nest.ofTo,
+              },
         sizes: sizes.rows,
         tenures: body.tenures,
         closed: body.closed,

@@ -5396,6 +5396,15 @@ function chamberMarkdown(
       kind: (KINDS[body.kind] ?? m.chamber_kind_other)(),
       polity: link(body.polity.name, body.polity.path),
     }),
+    ...(body.within == null
+      ? []
+      : [
+          `${m.chamber_within()} ${link(body.within.name, body.within.path)}${
+            body.within.from == null
+              ? ""
+              : `, ${year(body.within.from) === year(body.within.to) ? year(body.within.from) : m.polity_span({ first: year(body.within.from), last: body.within.to == null ? m.governments_present() : year(body.within.to) })}`
+          }`,
+        ]),
     ...(body.next == null
       ? []
       : [
@@ -5407,27 +5416,40 @@ function chamberMarkdown(
             seats: m.chamber_next_seats({ count: body.next.seats }),
           }),
         ]),
-    ...(former.length === 0
-      ? []
-      : [
-          `## ${m.chamber_former()}`,
-          former
-            .map((sibling) => {
-              const kind = (KINDS[sibling.kind] ?? m.chamber_kind_other)();
-              const first = year(sibling.from);
-              const last = year(sibling.to);
-              return `- ${link(sibling.name, sibling.path)}, ${
-                sibling.from == null
-                  ? kind
-                  : m.chamber_lifespan({
-                      kind,
-                      years:
-                        first === last ? first : m.polity_span({ first, last }),
-                    })
-              }`;
-            })
-            .join("\n"),
-        ]),
+    ...[
+      {
+        heading: m.chamber_nested(),
+        rows: former.filter((sibling) => sibling.of != null),
+      },
+      {
+        heading: m.chamber_former(),
+        rows: former.filter((sibling) => sibling.of == null),
+      },
+    ].flatMap(({ heading, rows }) =>
+      rows.length === 0
+        ? []
+        : [
+            `## ${heading}`,
+            rows
+              .map((sibling) => {
+                const kind = (KINDS[sibling.kind] ?? m.chamber_kind_other)();
+                const first = year(sibling.from);
+                const last = year(sibling.to);
+                return `- ${link(sibling.name, sibling.path)}, ${
+                  sibling.from == null
+                    ? kind
+                    : m.chamber_lifespan({
+                        kind,
+                        years:
+                          first === last
+                            ? first
+                            : m.polity_span({ first, last }),
+                      })
+                }`;
+              })
+              .join("\n"),
+          ],
+    ),
     ...(isParty
       ? [
           `## ${m.chamber_makeup_title()}`,
