@@ -946,6 +946,31 @@ FEEDS.update(
             "Linn County Clerk",
             "List of Candidates for Linn County Oregon, November 3, 2026 General Election",
         ),
+        "OR-41043-albany": (
+            "https://albanyoregon.gov/elections",
+            "City of Albany",
+            "Candidate Filings (monday.com board)",
+        ),
+        "OR-41043-lebanon": (
+            "https://www.ci.lebanon.or.us/",
+            "City of Lebanon",
+            "Register of City Candidates, November 2026 General Election",
+        ),
+        "OR-41043-sweet-home": (
+            "https://www.sweethomeor.gov/",
+            "City of Sweet Home",
+            "City Council Elections: Who has filed to run",
+        ),
+        "OR-41043-harrisburg": (
+            "https://www.ci.harrisburg.or.us/",
+            "City of Harrisburg",
+            "2026 General Election Certified Candidates",
+        ),
+        "OR-41043-tangent": (
+            "https://www.tangentor.gov/post/2026-municipal-election",
+            "City of Tangent",
+            "2026 Municipal Election",
+        ),
         "OR-41019": (
             "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
             "Douglas County Clerk",
@@ -1132,6 +1157,11 @@ GA_BALLOTS = {"Fulton", "Gwinnett", "Cobb", "DeKalb", "Clayton", "Paulding", "Ho
 ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"]
 DELIVERED = {
     "OR-41043": DATA / "inbox" / "y26" / "or" / "linn.pdf",
+    "OR-41043-albany": DATA / "inbox" / "y26" / "or" / "albany.txt",
+    "OR-41043-lebanon": DATA / "inbox" / "y26" / "or" / "lebanon.html",
+    "OR-41043-sweet-home": DATA / "inbox" / "y26" / "or" / "sweet-home.html",
+    "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
+    "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41019": DATA / "inbox" / "y26" / "or" / "douglas.pdf",
     "OR-41017": DATA / "inbox" / "y26" / "or" / "deschutes.html",
     "OR-41017-bend": DATA / "inbox" / "y26" / "or" / "bend.html",
@@ -1374,6 +1404,15 @@ for county, url in {
     "Chenango": "https://www.chenangocountyny.gov/DocumentCenter/View/7428",
     "Clinton": "https://www.clintoncountyny.gov/",
     "Steuben": "https://www.steubencountyny.gov/469/Board-of-Elections",
+    "Allegany": "https://www.alleganyco.gov/wp-content/uploads/2026-November-General-Election-Candidates-B.pdf",
+    "Chemung": "https://www.chemungcountyny.gov/DocumentCenter/View/20773/2026---Offices-Open-for-Election-and-the-Candidates-",
+    "Schoharie": "https://www.schohariecounty-ny.gov/Documents/Departments/Board%20of%20Elections/2026%20Election%20Documents/Candidates%20for%20Website%20GE26.pdf",
+    "Otsego": "https://www.otsegocounty.com/departments/a-c/board_of_elections/candidates.php",
+    "Seneca": "https://www.senecacountyny.gov/163/Board-of-Elections",
+    "Oswego": "https://www.oswegocountyny.gov/Candidates%20GE26.docx",
+    "Montgomery": "https://www.montgomerycountyny.gov/documents/boe/FiledPetitions.pdf",
+    "Essex": "https://www.co.essex.ny.us/",
+    "Schuyler": "https://www.schuylercounty.us/DocumentCenter/View/16302/2026-GE-Candidates-List",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1381,12 +1420,19 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.{'html' if county == 'Suffolk' else 'pdf'}",
+        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'pdf'}",
     )
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+NEW_PARTIES = {
+    "NY:middle-party": "Middle Party",
+    "NY:working-families-perseverance": "Working Families/Perseverance",
+    "NY:the-peoples": "The Peoples",
+    "NY:listening-party": "Listening Party",
+}
+NEW_PARTIES_ADDED: set[str] = set()
 COUNTIES = {"06073": "San Diego County", "06059": "Orange County"}
 OFFICES = {
     "0644000": [
@@ -3785,7 +3831,7 @@ def parse() -> None:
     unknown = [
         f"local_2026_{state}.tsv row {number}: {row['party']}"
         for state, number, row in tsv_rows
-        if ":" in row["party"] and row["party"] not in known_parties
+        if ":" in row["party"] and row["party"] not in known_parties and row["party"] not in NEW_PARTIES
     ]
     if unknown:
         raise ValueError("party not in the archive:\n" + "\n".join(unknown))
@@ -4906,6 +4952,10 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         name(person, row["name"])
                 party = cs.key("us.party", row["party"]) if row["party"] else None
+                if party in cs.minted and row["party"] in NEW_PARTIES and row["party"] not in NEW_PARTIES_ADDED:
+                    NEW_PARTIES_ADDED.add(row["party"])
+                    cs.add("party", id=party, kind="party", polity_id=cs.polity("US-NY"))
+                    name(party, NEW_PARTIES[row["party"]])
                 try:
                     option = cs.key("us.option", f"{key}:{slug(row['name'])}")
                 except ValueError:
