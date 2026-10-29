@@ -669,7 +669,8 @@ def emit() -> Path:
                         license="Public record",
                     )
                 cs.artifact(raw.cached(SOURCE, FLORIDA), sources[state])
-                cs.artifact(raw.cached(SOURCE, special_fl.PRIMARIES), sources[state])
+                for primaries in special_fl.PRIMARIES:
+                    cs.artifact(raw.cached(SOURCE, primaries), sources[state])
                 continue
             _, publisher, _ = TENANTS[state]
             sources[state] = cs.source(publisher, "Election statistics archive")
