@@ -645,11 +645,17 @@
       const lost = race.results.filter(
         (row) => (row.seats ?? 0) === 0 && (before.get(row.key) ?? 0) > 0,
       );
+      let pooled = 0;
+      let filled = 0;
+      for (const row of seated) {
+        filled += row.seats ?? 0;
+        if (row.key.startsWith("alliance:")) {
+          pooled += row.seats ?? 0;
+        }
+      }
       const change =
         race.before == null ||
-        seated.some(
-          (row) => row.key.startsWith("alliance:") && (row.seats ?? 0) > 0,
-        ) ||
+        pooled * 20 > filled ||
         seated.every((row) => !before.has(row.key))
           ? null
           : Object.fromEntries(

@@ -12288,7 +12288,15 @@ async function races(
                   select c.id from contest c join tree on c.allocation_parent_id = tree.id
                 ),
                 winners as materialized (
-                  select o.id, o.contest_id as contest, o.party_id, max(coalesce(x.seats, 1)) as seats
+                  select o.id, o.contest_id as contest, coalesce(o.party_id, (
+                      select coalesce(
+                        (select min(cn.party_id::text)::uuid from candidacy_nomination cn
+                          where cn.candidacy_id = cy.id and cn.kind = 'nominated' having count(distinct cn.party_id) = 1),
+                        cy.member_of_party_id
+                      )
+                      from candidacy cy where cy.option_id = o.id and cy.role = 'head' and o.alliance_id is not null
+                      limit 1
+                    )) as party_id, max(coalesce(x.seats, 1)) as seats
                   from tree t
                   join contest_option o on o.contest_id = t.id
                   join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
@@ -12365,14 +12373,17 @@ async function races(
                 left join lateral (
                   select n.party from party_relation r
                   cross join lateral (
-                    select case when r.kind = 'successor_of' then r.to_party_id else r.from_party_id end as old,
-                      case when r.kind = 'successor_of' then r.from_party_id else r.to_party_id end as new
+                    select case when r.kind in ('successor_of', 'list_vehicle_for') then r.to_party_id else r.from_party_id end as old,
+                      case when r.kind in ('successor_of', 'list_vehicle_for') then r.from_party_id else r.to_party_id end as new
                   ) d
                   left join entity_merge nm on nm.entity_id = d.new
                   cross join lateral (select coalesce(nm.into_id, d.new) as party) n
-                  where r.kind in ('merged_into', 'absorbed_by', 'successor_of')
+                  where (
+                      (r.kind in ('merged_into', 'absorbed_by', 'successor_of')
+                        and r.date > (select day from last) and r.date <= ${date}::date + 365)
+                      or (r.kind = 'list_vehicle_for' and r.election_id = ${head.election}::uuid)
+                    )
                     and d.old = coalesce(pm.into_id, w.party_id, ld.party_id)
-                    and r.date > (select day from last) and r.date <= ${date}::date + 365
                     and n.party in (select party from now)
                     and coalesce(pm.into_id, w.party_id, ld.party_id) not in (select party from now)
                   limit 1
