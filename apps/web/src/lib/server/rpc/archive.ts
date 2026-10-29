@@ -20,6 +20,7 @@ import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { os, remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import { logos, withLogos } from "#lib/server/logos.js";
 import {
   outside,
   parted,
@@ -434,6 +435,18 @@ const ResultSet = v.object({
     attribution: v.nullable(v.string()),
   }),
 });
+
+const LogoRef = v.object({
+  src: v.string(),
+  width: v.number(),
+  height: v.number(),
+  isLight: v.boolean(),
+  license: v.string(),
+  artist: v.nullable(v.string()),
+  source: v.string(),
+});
+
+const LogoMap = v.record(v.string(), LogoRef);
 
 const Photo = v.nullable(
   v.object({
@@ -5287,6 +5300,7 @@ export const contests = {
         quorum: v.nullable(v.number()),
         ballot: v.optional(v.nullable(v.number())),
         isStv: v.optional(v.boolean()),
+        logos: LogoMap,
         explanations: v.array(
           v.object({
             key: v.string(),
@@ -6221,7 +6235,7 @@ export const contests = {
         targets: [],
       };
       if (area == null) {
-        return page;
+        return withLogos(page, contest.date);
       }
 
       const covering = await db.execute<{
@@ -7561,34 +7575,37 @@ export const contests = {
           ),
           prior?.date ?? null,
         );
-        return {
-          ...page,
-          last:
-            prior == null || leaders.length === 0
-              ? null
-              : {
-                  date: prior.date,
-                  path: priorSlugs?.get(prior.id) ?? null,
-                  rows: leaders.map((row) => ({
-                    key: row.key,
-                    label:
-                      leaderNames.full.get(row.cell.person ?? "") ??
-                      row.cell.label,
-                    person: row.cell.person,
-                    party: row.cell.party,
-                    color: row.color,
-                    share: row.cell.share,
-                  })),
-                },
-          series,
-          places: grid,
-          targets,
-          origins: await origins,
-          county: await county,
-          locator: await locator,
-          deeper: await deeper,
-          overall: await overall,
-        };
+        return withLogos(
+          {
+            ...page,
+            last:
+              prior == null || leaders.length === 0
+                ? null
+                : {
+                    date: prior.date,
+                    path: priorSlugs?.get(prior.id) ?? null,
+                    rows: leaders.map((row) => ({
+                      key: row.key,
+                      label:
+                        leaderNames.full.get(row.cell.person ?? "") ??
+                        row.cell.label,
+                      person: row.cell.person,
+                      party: row.cell.party,
+                      color: row.color,
+                      share: row.cell.share,
+                    })),
+                  },
+            series,
+            places: grid,
+            targets,
+            origins: await origins,
+            county: await county,
+            locator: await locator,
+            deeper: await deeper,
+            overall: await overall,
+          },
+          contest.date,
+        );
       }
       const earlier = before?.get(area.k);
       const flagged = await db.execute<{
@@ -7878,171 +7895,176 @@ export const contests = {
         [...new Set(backers.rows.map((row) => row.party))],
         contest.date,
       );
-      return {
-        ...page,
-        notes: notes.rows
-          .filter(
-            (row) =>
-              isRoot ||
-              row.set == null ||
-              current.ks.includes(row.set) ||
-              grid?.sources.includes(row.publisher ?? "") === true,
-          )
-          .filter(
-            (row) =>
-              !page.wording.some(
-                (entry) => entry.body?.trim() === row.body.trim(),
-              ),
-          )
-          .map(({ kind, body }) => ({ kind, body })),
-        turnout: attended,
-        series: series.map((entry) =>
-          entry.winner == null
-            ? entry
-            : {
-                ...entry,
-                winner: {
-                  ...entry.winner,
-                  color:
-                    grid?.legend.find((item) => item.key === entry.winner?.key)
-                      ?.color ?? entry.winner.color,
-                  seats: entry.winner.seats?.map((seat) => ({
-                    ...seat,
+      return withLogos(
+        {
+          ...page,
+          notes: notes.rows
+            .filter(
+              (row) =>
+                isRoot ||
+                row.set == null ||
+                current.ks.includes(row.set) ||
+                grid?.sources.includes(row.publisher ?? "") === true,
+            )
+            .filter(
+              (row) =>
+                !page.wording.some(
+                  (entry) => entry.body?.trim() === row.body.trim(),
+                ),
+            )
+            .map(({ kind, body }) => ({ kind, body })),
+          turnout: attended,
+          series: series.map((entry) =>
+            entry.winner == null
+              ? entry
+              : {
+                  ...entry,
+                  winner: {
+                    ...entry.winner,
                     color:
-                      grid?.legend.find((item) => item.key === seat.key)
-                        ?.color ?? seat.color,
+                      grid?.legend.find(
+                        (item) => item.key === entry.winner?.key,
+                      )?.color ?? entry.winner.color,
+                    seats: entry.winner.seats?.map((seat) => ({
+                      ...seat,
+                      color:
+                        grid?.legend.find((item) => item.key === seat.key)
+                          ?.color ?? seat.color,
+                    })),
+                  },
+                },
+          ),
+          places: grid,
+          declared:
+            page.declared == null
+              ? null
+              : {
+                  ...page.declared,
+                  rows: page.declared.rows.map((row) => ({
+                    ...row,
+                    color:
+                      grid?.legend.find(
+                        (item) =>
+                          row.party != null &&
+                          item.key === `party:${row.party}`,
+                      )?.color ?? row.color,
                   })),
                 },
-              },
-        ),
-        places: grid,
-        declared:
-          page.declared == null
-            ? null
-            : {
-                ...page.declared,
-                rows: page.declared.rows.map((row) => ({
-                  ...row,
-                  color:
-                    grid?.legend.find(
-                      (item) =>
-                        row.party != null && item.key === `party:${row.party}`,
-                    )?.color ?? row.color,
-                })),
-              },
-        checks,
-        count: steps,
-        current: {
-          valid: current.side.valid,
-          measure: current.measure,
-          complete: current.complete,
-          sets: current.sets,
-          isAllied: current.side.options.some(
-            (option) => option.alliance != null && option.votes > 0,
-          ),
-          isTally: contest.indirect || current.isTally,
-        },
-        electors:
-          electors.length === 0
-            ? null
-            : {
-                rows: electors,
-                appointed: ballots?.appointed ?? null,
-                link: {
-                  path: rootSlugs.get(counterpart?.id ?? "") ?? null,
-                  date: counterpart?.date ?? null,
-                  popular: counterpart?.indirect === false,
-                },
-              },
-        chamber:
-          seats == null
-            ? null
-            : {
-                ...seats,
-                parties: seats.parties.map((party) => ({
-                  ...party,
-                  color:
-                    grid?.legend.find((item) => item.key === party.key)
-                      ?.color ?? party.color,
-                })),
-              },
-        partners: pairs.rows.map((row) => [row.from, row.to]),
-        target,
-        comparison: {
-          label:
-            target == null
+          checks,
+          count: steps,
+          current: {
+            valid: current.side.valid,
+            measure: current.measure,
+            complete: current.complete,
+            sets: current.sets,
+            isAllied: current.side.options.some(
+              (option) => option.alliance != null && option.votes > 0,
+            ),
+            isTally: contest.indirect || current.isTally,
+          },
+          electors:
+            electors.length === 0
               ? null
-              : [current, target].every((side) => side.complete)
-                ? "exact"
-                : "estimated",
-          notes: notesOut,
-        },
-        rows: rows.map((row) => {
-          const own = backers.rows
-            .filter(
-              (entry) =>
-                row.current?.person != null &&
-                entry.person === row.current.person,
-            )
-            .map((entry) => ({
-              kind: entry.kind,
-              party: entry.party,
-              isOwn: entry.isOwn,
-              label:
-                backed.short.get(entry.party) ??
-                backed.full.get(entry.party) ??
-                "",
-            }))
-            .filter((entry) => entry.label !== "")
-            .toSorted(
-              (a, b) =>
-                Number(b.isOwn) - Number(a.isOwn) ||
-                a.label.localeCompare(b.label),
-            );
-          const nominated = own.filter((entry) => entry.kind === "nominated");
-          return {
-            ...row,
-            color:
-              grid?.legend.find((item) => item.key === row.key)?.color ??
-              row.color,
-            current:
-              row.current?.seats == null ||
-              row.current.person == null ||
-              !electoral.has(row.current.person)
-                ? row.current
-                : {
-                    ...row.current,
-                    seats: electoral.get(row.current.person) ?? 0,
+              : {
+                  rows: electors,
+                  appointed: ballots?.appointed ?? null,
+                  link: {
+                    path: rootSlugs.get(counterpart?.id ?? "") ?? null,
+                    date: counterpart?.date ?? null,
+                    popular: counterpart?.indirect === false,
                   },
-            photo:
-              faces.get(row.current?.person ?? row.earlier?.person ?? "") ??
-              null,
-            ballot:
-              row.current?.isWriteIn === true
-                ? (elsewhere.get(row.current.person ?? "") ?? null)
-                : null,
-            nominated:
-              nominated.length > 1 || nominated[0]?.isOwn === false
-                ? nominated.map(({ party, label }) => ({ party, label }))
-                : [],
-            supported: own
+                },
+          chamber:
+            seats == null
+              ? null
+              : {
+                  ...seats,
+                  parties: seats.parties.map((party) => ({
+                    ...party,
+                    color:
+                      grid?.legend.find((item) => item.key === party.key)
+                        ?.color ?? party.color,
+                  })),
+                },
+          partners: pairs.rows.map((row) => [row.from, row.to]),
+          target,
+          comparison: {
+            label:
+              target == null
+                ? null
+                : [current, target].every((side) => side.complete)
+                  ? "exact"
+                  : "estimated",
+            notes: notesOut,
+          },
+          rows: rows.map((row) => {
+            const own = backers.rows
               .filter(
                 (entry) =>
-                  entry.kind === "supported" ||
-                  (entry.kind === "endorsed" &&
-                    !entry.isOwn &&
-                    nominated.every((other) => other.party !== entry.party)),
+                  row.current?.person != null &&
+                  entry.person === row.current.person,
               )
-              .map(({ party, label }) => ({ party, label })),
-          };
-        }),
-        targets,
-        origins: await origins,
-        county: await county,
-        locator: await locator,
-        deeper: await deeper,
-        overall: await overall,
-      };
+              .map((entry) => ({
+                kind: entry.kind,
+                party: entry.party,
+                isOwn: entry.isOwn,
+                label:
+                  backed.short.get(entry.party) ??
+                  backed.full.get(entry.party) ??
+                  "",
+              }))
+              .filter((entry) => entry.label !== "")
+              .toSorted(
+                (a, b) =>
+                  Number(b.isOwn) - Number(a.isOwn) ||
+                  a.label.localeCompare(b.label),
+              );
+            const nominated = own.filter((entry) => entry.kind === "nominated");
+            return {
+              ...row,
+              color:
+                grid?.legend.find((item) => item.key === row.key)?.color ??
+                row.color,
+              current:
+                row.current?.seats == null ||
+                row.current.person == null ||
+                !electoral.has(row.current.person)
+                  ? row.current
+                  : {
+                      ...row.current,
+                      seats: electoral.get(row.current.person) ?? 0,
+                    },
+              photo:
+                faces.get(row.current?.person ?? row.earlier?.person ?? "") ??
+                null,
+              ballot:
+                row.current?.isWriteIn === true
+                  ? (elsewhere.get(row.current.person ?? "") ?? null)
+                  : null,
+              nominated:
+                nominated.length > 1 || nominated[0]?.isOwn === false
+                  ? nominated.map(({ party, label }) => ({ party, label }))
+                  : [],
+              supported: own
+                .filter(
+                  (entry) =>
+                    entry.kind === "supported" ||
+                    (entry.kind === "endorsed" &&
+                      !entry.isOwn &&
+                      nominated.every((other) => other.party !== entry.party)),
+                )
+                .map(({ party, label }) => ({ party, label })),
+            };
+          }),
+          targets,
+          origins: await origins,
+          county: await county,
+          locator: await locator,
+          deeper: await deeper,
+          overall: await overall,
+        },
+        contest.date,
+      );
     }),
   places: os
     .meta(
@@ -13119,6 +13141,7 @@ export const elections = {
         coverage: v.nullable(
           v.object({ held: v.number(), of: v.number(), noun: v.string() }),
         ),
+        logos: LogoMap,
         coalitions: v.array(
           v.object({ name: v.string(), parties: v.array(v.string()) }),
         ),
@@ -13833,252 +13856,258 @@ export const elections = {
           seatedRest += party.seats;
         }
       }
-      return {
-        name:
-          within == null
-            ? (labels.full.get(input.id) ?? "")
-            : m.election_within({
-                name: labels.full.get(input.id) ?? "",
-                place: labels.full.get(within) ?? "",
-              }),
-        date: election.date,
-        status: election.status,
-        isIndirect: election.isIndirect,
-        breadcrumbs: crumbs,
-        parent:
-          within != null
-            ? {
-                name: labels.full.get(input.id) ?? "",
-                path: slugs.get(input.id) ?? null,
-              }
-            : election.parent == null
-              ? null
-              : {
-                  name: labels.full.get(election.parent) ?? "",
-                  path: slugs.get(election.parent) ?? null,
-                },
-        notes: notes.rows,
-        control: councils.length === 1 ? (standings[0]?.control ?? null) : null,
-        composition:
-          councils.length === 1 && standings[0]?.composition != null
-            ? {
-                rows: standings[0].composition,
-                hasBefore: standings[0].hasBefore,
-              }
-            : null,
-        councils: isUmbrella
-          ? standings.map(({ race, path, total, control }) => ({
-              name:
-                race.contest == null
-                  ? race.name
-                  : (labels.short.get(race.body ?? "") ??
-                    labels.full.get(race.body ?? "") ??
-                    race.name),
-              path,
-              up: total,
-              size: race.size,
-              parties: (race.contest == null
-                ? race.results
-                    .filter((row) => (row.seats ?? 0) > 0)
-                    .map((row) => ({
-                      key: row.key,
-                      label: row.label,
-                      short: row.short,
-                      color: row.color,
-                      seats: row.seats ?? 0,
-                    }))
-                : Map.groupBy(
-                    race.results.filter((row) => (row.seats ?? 0) > 0),
-                    (row) =>
-                      row.party == null ? "independent" : `party:${row.party}`,
-                  )
-                    .entries()
-                    .map(([key, [lead, ...rest]]) => {
-                      let seats = lead?.seats ?? 0;
-                      for (const row of rest) {
-                        seats += row.seats ?? 0;
-                      }
-                      return {
-                        key,
-                        label:
-                          lead?.party == null
-                            ? m.seats_independents()
-                            : (labels.full.get(lead.party) ??
-                              lead.short ??
-                              lead.label),
-                        short:
-                          lead?.party == null ? null : (lead.short ?? null),
-                        color: lead?.color ?? null,
-                        seats,
-                      };
-                    })
-                    .toArray()
-              ).toSorted((a, b) => b.seats - a.seats),
-              control,
-            }))
-          : [],
-        turnout: isUmbrella
-          ? null
-          : pooledNow != null && pooledNow.reporting >= pooledNow.of * 0.9
-            ? {
-                registered: pooledNow.registered,
-                voters: pooledNow.voters,
-                reporting: pooledNow.reporting,
-                of: pooledNow.of,
-                basis: pooledNow.basis,
-                earlier:
-                  pooledBefore == null ||
-                  pooledBefore.reporting < pooledBefore.of * 0.9
-                    ? null
-                    : {
-                        year: pooledBefore.year,
-                        registered: pooledBefore.registered,
-                        voters: pooledBefore.voters,
-                      },
-              }
-            : totaled == null || !isCovered(totaled)
-              ? null
-              : {
-                  ...totaled,
-                  earlier:
-                    earlier == null ||
-                    anchored?.year == null ||
-                    !isCovered(earlier)
-                      ? null
-                      : {
-                          year: anchored.year,
-                          registered: earlier.registered,
-                          voters: earlier.voters,
-                        },
-                },
-        races: (isUmbrella ? [] : raced).map((race, index) => {
-          const council = held.get(race.sample ?? race.contest ?? "");
-          return {
-            ...race,
-            isStaggered: council?.isStaggered === true,
-            unelected: (unelected.get(race.body ?? "") ?? []).map((row) => ({
-              category: row.category,
-              seats: row.seats,
-            })),
-            covered:
-              council == null ||
-              council.isWhole ||
-              council.isStaggered ||
-              council.covered == null ||
-              race.size == null ||
-              council.covered >= race.size
-                ? null
-                : council.covered,
-            anchor: raced
-              .slice(0, index)
-              .some((other) => other.anchor === race.anchor)
-              ? `${race.anchor}-${index + 1}`
-              : race.anchor,
-            results: race.results.map((row) => {
-              const own = nominations.rows
-                .filter(
-                  (entry) =>
-                    row.person != null &&
-                    entry.contest === race.contest &&
-                    entry.person === row.person,
-                )
-                .map((entry) => ({
-                  kind: entry.kind,
-                  party: entry.party,
-                  isOwn: entry.isOwn,
-                  label:
-                    nominators.short.get(entry.party) ??
-                    nominators.full.get(entry.party) ??
-                    "",
-                }))
-                .filter((entry) => entry.label !== "")
-                .toSorted(
-                  (a, b) =>
-                    Number(b.isOwn) - Number(a.isOwn) ||
-                    a.label.localeCompare(b.label),
-                );
-              const nominated = own.filter(
-                (entry) => entry.kind === "nominated",
-              );
-              return {
-                ...row,
-                photo: faces.get(row.person ?? "") ?? null,
-                nominated:
-                  nominated.length > 1 || nominated[0]?.isOwn === false
-                    ? nominated.map(({ party, label }) => ({ party, label }))
-                    : [],
-                supported: own
-                  .filter(
-                    (entry) =>
-                      entry.kind === "supported" ||
-                      (entry.kind === "endorsed" &&
-                        !entry.isOwn &&
-                        nominated.every(
-                          (other) => other.party !== entry.party,
-                        )),
-                  )
-                  .map(({ party, label }) => ({ party, label })),
-              };
-            }),
-          };
-        }),
-        coverage:
-          isUmbrella ||
-          partial?.noun == null ||
-          partial.held === 0 ||
-          partial.held > partial.of * 0.75
-            ? null
-            : { held: partial.held, of: partial.of, noun: partial.noun },
-        coalitions: allied.rows.map((row) => ({
-          name: labels.full.get(row.id) ?? "",
-          parties: row.parties,
-        })),
-        contests: contestRows.rows
-          .map((row) => ({
-            name: labels.full.get(row.id) ?? "",
-            path: slugs.get(row.id) ?? null,
-            children: row.children,
-          }))
-          .toSorted((a, b) =>
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
-          ),
-        elections: electionRows.rows
-          .map((row) => ({
-            name: labels.full.get(row.id) ?? "",
-            place: labels.full.get(row.polity ?? "") ?? null,
-            noun: row.polity == null ? null : row.noun,
-            path: slugs.get(row.id) ?? null,
-            date: row.date,
-            isStage: row.kind === "runoff" || row.kind === "indirect",
-            seats: row.seats,
-            lead:
-              row.parties?.[0] == null
+      return withLogos(
+        {
+          name:
+            within == null
+              ? (labels.full.get(input.id) ?? "")
+              : m.election_within({
+                  name: labels.full.get(input.id) ?? "",
+                  place: labels.full.get(within) ?? "",
+                }),
+          date: election.date,
+          status: election.status,
+          isIndirect: election.isIndirect,
+          breadcrumbs: crumbs,
+          parent:
+            within != null
+              ? {
+                  name: labels.full.get(input.id) ?? "",
+                  path: slugs.get(input.id) ?? null,
+                }
+              : election.parent == null
                 ? null
                 : {
-                    label:
-                      row.parties[0].party == null
-                        ? ""
-                        : (seatedRefs.get(row.parties[0].party)?.short ??
-                          seatedRefs.get(row.parties[0].party)?.label ??
-                          ""),
-                    seats: row.parties[0].seats,
+                    name: labels.full.get(election.parent) ?? "",
+                    path: slugs.get(election.parent) ?? null,
                   },
-          }))
-          .toSorted((a, b) =>
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
-          ),
-        seated:
-          seatedTotal === 0
+          notes: notes.rows,
+          control:
+            councils.length === 1 ? (standings[0]?.control ?? null) : null,
+          composition:
+            councils.length === 1 && standings[0]?.composition != null
+              ? {
+                  rows: standings[0].composition,
+                  hasBefore: standings[0].hasBefore,
+                }
+              : null,
+          councils: isUmbrella
+            ? standings.map(({ race, path, total, control }) => ({
+                name:
+                  race.contest == null
+                    ? race.name
+                    : (labels.short.get(race.body ?? "") ??
+                      labels.full.get(race.body ?? "") ??
+                      race.name),
+                path,
+                up: total,
+                size: race.size,
+                parties: (race.contest == null
+                  ? race.results
+                      .filter((row) => (row.seats ?? 0) > 0)
+                      .map((row) => ({
+                        key: row.key,
+                        label: row.label,
+                        short: row.short,
+                        color: row.color,
+                        seats: row.seats ?? 0,
+                      }))
+                  : Map.groupBy(
+                      race.results.filter((row) => (row.seats ?? 0) > 0),
+                      (row) =>
+                        row.party == null
+                          ? "independent"
+                          : `party:${row.party}`,
+                    )
+                      .entries()
+                      .map(([key, [lead, ...rest]]) => {
+                        let seats = lead?.seats ?? 0;
+                        for (const row of rest) {
+                          seats += row.seats ?? 0;
+                        }
+                        return {
+                          key,
+                          label:
+                            lead?.party == null
+                              ? m.seats_independents()
+                              : (labels.full.get(lead.party) ??
+                                lead.short ??
+                                lead.label),
+                          short:
+                            lead?.party == null ? null : (lead.short ?? null),
+                          color: lead?.color ?? null,
+                          seats,
+                        };
+                      })
+                      .toArray()
+                ).toSorted((a, b) => b.seats - a.seats),
+                control,
+              }))
+            : [],
+          turnout: isUmbrella
             ? null
-            : {
-                total: seatedTotal,
-                parties: seatedRanked.slice(0, 15),
-                others:
-                  seatedRanked.length > 15
-                    ? { count: seatedRanked.length - 15, seats: seatedRest }
-                    : null,
-              },
-      };
+            : pooledNow != null && pooledNow.reporting >= pooledNow.of * 0.9
+              ? {
+                  registered: pooledNow.registered,
+                  voters: pooledNow.voters,
+                  reporting: pooledNow.reporting,
+                  of: pooledNow.of,
+                  basis: pooledNow.basis,
+                  earlier:
+                    pooledBefore == null ||
+                    pooledBefore.reporting < pooledBefore.of * 0.9
+                      ? null
+                      : {
+                          year: pooledBefore.year,
+                          registered: pooledBefore.registered,
+                          voters: pooledBefore.voters,
+                        },
+                }
+              : totaled == null || !isCovered(totaled)
+                ? null
+                : {
+                    ...totaled,
+                    earlier:
+                      earlier == null ||
+                      anchored?.year == null ||
+                      !isCovered(earlier)
+                        ? null
+                        : {
+                            year: anchored.year,
+                            registered: earlier.registered,
+                            voters: earlier.voters,
+                          },
+                  },
+          races: (isUmbrella ? [] : raced).map((race, index) => {
+            const council = held.get(race.sample ?? race.contest ?? "");
+            return {
+              ...race,
+              isStaggered: council?.isStaggered === true,
+              unelected: (unelected.get(race.body ?? "") ?? []).map((row) => ({
+                category: row.category,
+                seats: row.seats,
+              })),
+              covered:
+                council == null ||
+                council.isWhole ||
+                council.isStaggered ||
+                council.covered == null ||
+                race.size == null ||
+                council.covered >= race.size
+                  ? null
+                  : council.covered,
+              anchor: raced
+                .slice(0, index)
+                .some((other) => other.anchor === race.anchor)
+                ? `${race.anchor}-${index + 1}`
+                : race.anchor,
+              results: race.results.map((row) => {
+                const own = nominations.rows
+                  .filter(
+                    (entry) =>
+                      row.person != null &&
+                      entry.contest === race.contest &&
+                      entry.person === row.person,
+                  )
+                  .map((entry) => ({
+                    kind: entry.kind,
+                    party: entry.party,
+                    isOwn: entry.isOwn,
+                    label:
+                      nominators.short.get(entry.party) ??
+                      nominators.full.get(entry.party) ??
+                      "",
+                  }))
+                  .filter((entry) => entry.label !== "")
+                  .toSorted(
+                    (a, b) =>
+                      Number(b.isOwn) - Number(a.isOwn) ||
+                      a.label.localeCompare(b.label),
+                  );
+                const nominated = own.filter(
+                  (entry) => entry.kind === "nominated",
+                );
+                return {
+                  ...row,
+                  photo: faces.get(row.person ?? "") ?? null,
+                  nominated:
+                    nominated.length > 1 || nominated[0]?.isOwn === false
+                      ? nominated.map(({ party, label }) => ({ party, label }))
+                      : [],
+                  supported: own
+                    .filter(
+                      (entry) =>
+                        entry.kind === "supported" ||
+                        (entry.kind === "endorsed" &&
+                          !entry.isOwn &&
+                          nominated.every(
+                            (other) => other.party !== entry.party,
+                          )),
+                    )
+                    .map(({ party, label }) => ({ party, label })),
+                };
+              }),
+            };
+          }),
+          coverage:
+            isUmbrella ||
+            partial?.noun == null ||
+            partial.held === 0 ||
+            partial.held > partial.of * 0.75
+              ? null
+              : { held: partial.held, of: partial.of, noun: partial.noun },
+          coalitions: allied.rows.map((row) => ({
+            name: labels.full.get(row.id) ?? "",
+            parties: row.parties,
+          })),
+          contests: contestRows.rows
+            .map((row) => ({
+              name: labels.full.get(row.id) ?? "",
+              path: slugs.get(row.id) ?? null,
+              children: row.children,
+            }))
+            .toSorted((a, b) =>
+              a.name.localeCompare(b.name, undefined, { numeric: true }),
+            ),
+          elections: electionRows.rows
+            .map((row) => ({
+              name: labels.full.get(row.id) ?? "",
+              place: labels.full.get(row.polity ?? "") ?? null,
+              noun: row.polity == null ? null : row.noun,
+              path: slugs.get(row.id) ?? null,
+              date: row.date,
+              isStage: row.kind === "runoff" || row.kind === "indirect",
+              seats: row.seats,
+              lead:
+                row.parties?.[0] == null
+                  ? null
+                  : {
+                      label:
+                        row.parties[0].party == null
+                          ? ""
+                          : (seatedRefs.get(row.parties[0].party)?.short ??
+                            seatedRefs.get(row.parties[0].party)?.label ??
+                            ""),
+                      seats: row.parties[0].seats,
+                    },
+            }))
+            .toSorted((a, b) =>
+              a.name.localeCompare(b.name, undefined, { numeric: true }),
+            ),
+          seated:
+            seatedTotal === 0
+              ? null
+              : {
+                  total: seatedTotal,
+                  parties: seatedRanked.slice(0, 15),
+                  others:
+                    seatedRanked.length > 15
+                      ? { count: seatedRanked.length - 15, seats: seatedRest }
+                      : null,
+                },
+        },
+        election.date,
+      );
     }),
   cycle: os
     .meta(
@@ -21715,6 +21744,7 @@ export const search = {
           context: v.nullable(v.string()),
           date: v.nullable(v.string()),
           photo: v.nullable(v.string()),
+          logo: v.nullable(LogoRef),
           office: v.nullable(v.string()),
           ballot: v.nullable(v.object({ date: v.string(), label: v.string() })),
           isBest: v.boolean(),
@@ -22151,6 +22181,10 @@ export const search = {
         words.every((word) => segment(first.name).split("-").includes(word))
           ? first
           : null;
+      const marks = await logos(
+        ranked.filter((row) => row.type === "party").map((row) => row.id),
+        null,
+      );
       const located = new Map(
         await Promise.all(
           people.map(async (row) => {
@@ -22170,6 +22204,7 @@ export const search = {
         context: row.context,
         date: row.date,
         photo: row.photo,
+        logo: marks[row.id] ?? null,
         office: row.office,
         ballot: row.ballot,
         isBest: row === best,

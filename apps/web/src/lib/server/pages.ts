@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
 import { db } from "#lib/server/db/index.js";
+import { logos, partiesIn } from "#lib/server/logos.js";
 import { latest, representative } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import land from "#lib/server/world.txt?raw";
@@ -349,10 +350,48 @@ export async function party(path: string, place: string | null = null) {
         ).rows.toSorted(
           (a, b) => elsewhere.indexOf(a.path) - elsewhere.indexOf(b.path),
         );
+  const [header, eras, related] = await Promise.all([
+    logos([id], null),
+    Promise.all(
+      (page.party.names ?? [])
+        .flatMap(({ name, short, to }) =>
+          to == null ? [] : [{ name: short ?? name, to }],
+        )
+        .map(async ({ name, to }) => {
+          const found = await logos(
+            [id],
+            new Date(Date.parse(to) - 86_400_000).toISOString().slice(0, 10),
+            true,
+          );
+          return { name, logo: found[id] ?? null };
+        }),
+    ),
+    Promise.all(
+      page.party.relations.map(async (relation) =>
+        logos(
+          [relation.party.id],
+          relation.span?.to ?? relation.date ?? null,
+          true,
+        ),
+      ),
+    ),
+  ]);
   return {
     kind: "party" as const,
     id,
     ...page,
+    logos: {
+      header: header[id] ?? null,
+      eras: eras.flatMap(({ name, logo }, index) =>
+        logo == null ||
+        eras.slice(0, index).some((other) => other.logo?.src === logo.src)
+          ? []
+          : [{ name, logo }],
+      ),
+      related: Object.fromEntries(
+        related.flatMap((found) => Object.entries(found)),
+      ),
+    },
     elections: generals.rows,
     members: members.rows,
     notes: notes.rows,
@@ -541,16 +580,25 @@ export async function chamber(path: string) {
     };
   });
   const last = terms.at(-1);
-  const members =
-    last == null
-      ? null
-      : await call(router.bodies.members, { id, from: last.start });
+  const [members, marks] = await Promise.all([
+    last == null ? null : call(router.bodies.members, { id, from: last.start }),
+    Promise.all(
+      terms.map(
+        async (term) =>
+          [
+            term.start,
+            await logos(partiesIn(term.parties), term.start),
+          ] as const,
+      ),
+    ),
+  ]);
   return {
     kind: "chamber" as const,
     id,
     body,
     council,
     terms,
+    logos: Object.fromEntries(marks),
     basis: isSeated
       ? earlier.length > 0 || later.length > 0
         ? ("mixed" as const)

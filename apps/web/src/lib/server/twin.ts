@@ -24,6 +24,7 @@ import {
   type Tier,
 } from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
+import { logoCredit } from "#lib/logo.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -344,7 +345,7 @@ export async function twin({ request, url }: RequestEvent) {
       return `[${name}](${url.origin}/${route}.md${query == null ? "" : `?${query}`})`;
     };
     return new Response(
-      `${markdown(data, link, ledger, winners).join("\n\n")}\n\n${m.twin_alternates(
+      `${markdown(data, link, url.origin, ledger, winners).join("\n\n")}\n\n${m.twin_alternates(
         {
           html: `${url.origin}${pathname}${url.search}`,
           json: `${base}.json${url.search}`,
@@ -387,6 +388,7 @@ function failure(
 function markdown(
   data: Data,
   link: Link,
+  origin: string,
   ledger: Ledger = null,
   winners: Winners | null = null,
 ) {
@@ -455,7 +457,7 @@ function markdown(
       return personMarkdown(data.person, data.parties, link);
     }
     case "party": {
-      return partyMarkdown(data, link);
+      return partyMarkdown(data, link, origin);
     }
     case "chamber": {
       return chamberMarkdown(data, link);
@@ -1545,8 +1547,10 @@ function partyMarkdown(
     notes,
     history,
     abroad,
+    logos,
   }: Extract<Data, { kind: "party" }>,
   link: Link,
+  origin: string,
 ) {
   const related = [
     ...party.relations.map(
@@ -1569,6 +1573,11 @@ function partyMarkdown(
     party.scope == null
       ? `# ${party.name}${party.short != null && !party.name.includes(party.short) ? ` (${party.short})` : ""}`
       : `# ${(party.scope.polity.path != null && party.polity?.path != null && !party.scope.polity.path.startsWith(`${party.polity.path}/`) ? m.party_abroad_title : m.party_scope_title)({ party: party.name, place: party.scope.polity.name })}`,
+    ...(logos.header == null
+      ? []
+      : [
+          `![${m.logo_alt({ party: party.name })}](${origin}${logos.header.src}) ${logoCredit(logos.header)}`,
+        ]),
     ...[formerly(party.names ?? [], getLocale())].flatMap((line) => line ?? []),
     ...(party.polity == null
       ? []
