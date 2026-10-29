@@ -20,7 +20,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "eu.ep2024"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 EP = "https://results.elections.europa.eu/data-sheets/csv/2024-2029/election-results"
 FILES = {
@@ -1514,6 +1514,7 @@ def emit() -> Path:
             "results: votes and seats for every list, with registered voters and ballots",
             polity="EU",
         )
+        cs.manifest["scope"] = {"polity": "EU", "sweeps": ["party_affiliation"]}
         umbrella = cs.key("eu.election", "2024-06-06:european-parliament")
         parliament = cs.key("eu.body", "european-parliament")
         if {umbrella, parliament} & cs.minted:
