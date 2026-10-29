@@ -84,6 +84,42 @@ KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
 DISTRICT_CALENDAR = {
+    ("TX", "Killeen Independent School District"): (
+        1,
+        0,
+        5,
+        "Killeen ISD election results page: the May 2, 2026 trustee election covered Places 4 and 5, https://www.killeenisd.org/article/2861919",
+    ),
+    ("TX", "Galena Park Independent School District"): (
+        1,
+        0,
+        5,
+        "Galena Park ISD elections page: trustee elections are held each year on the May uniform election date, with 2026 results dated May 2, 2026, https://www.galenaparkisd.com/district-info/gpisd-elections",
+    ),
+    ("TX", "Tyler"): (
+        1,
+        0,
+        5,
+        "City of Tyler City Clerk elections page: Mayor and Council are elected in May, even-numbered districts in even years and odd-numbered districts in odd years, with a May 2, 2026 general election, https://www.cityoftyler.org/City-Government/Mayor-and-Council/City-Clerk/Elections",
+    ),
+    ("TX", "Midland"): (
+        3,
+        2,
+        11,
+        "City of Midland: the next scheduled City Council elections are set for November 2027, https://golf.midlandtexas.gov/CivicAlerts.asp?AID=1843",
+    ),
+    ("GA", "Athens-Clarke County"): (
+        4,
+        2,
+        5,
+        "Athens-Clarke County elections page: local elections were held May 19, 2026 with a June 16 runoff, and the November 3 ballot carries only a special election for Board of Education District 8, https://www.accgov.com/elections",
+    ),
+    ("MN", "Anoka-Hennepin Sch Dist 11"): (
+        2,
+        1,
+        11,
+        "Anoka-Hennepin School District school board page: Districts 1, 2, and 5 four-year terms expire in 2027, so the district elects in odd-numbered years, https://www.ahschools.us/schoolboard",
+    ),
     ("TX", "Katy Independent School District"): (
         1,
         0,
