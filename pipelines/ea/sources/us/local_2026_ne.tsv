@@ -144,8 +144,8 @@ NY	Dutchess County Legislature District 24	0	Andrew J House	Republican	Dutchess	
 NY	Dutchess County Legislature District 25	0	Eric Alexander	Democratic	Dutchess	1
 NY	Dutchess County Legislature District 25	0	Stefanie W Hubert	Republican	Dutchess	1
 NY	Dutchess County Sheriff	0	Kirk A Imperati	Republican	Dutchess	1
-NY	Broome County County Court Judge	0	Michael Garzo, Jr.	Democratic	Broome	1
-NY	Broome County County Court Judge	0	Peter DeLucia	Republican	Broome	1
+NY	Broome County Court Judge	0	Michael Garzo, Jr.	Democratic	Broome	1
+NY	Broome County Court Judge	0	Peter DeLucia	Republican	Broome	1
 NY	Broome County Legislature District 1	0	Jennings W. Terrell	Democratic	Broome	1
 NY	Broome County Legislature District 1	0	Stephen J. Flagg	Republican	Broome	1
 NY	Broome County Legislature District 2	0	Scott Baker	Republican	Broome	1
@@ -947,33 +947,547 @@ NJ-34019	Tewksbury Township Board of Education	0	Justin Steele	Nonpartisan	Hunte
 NJ-34019	Tewksbury Township Board of Education	0	Lauren Bologno	Nonpartisan	Hunterdon	3
 NJ-34019	Union Township Board of Education	0	Amelia Lamonde	Nonpartisan	Hunterdon	3
 NJ-34019	Union Township Board of Education	0	Louis Palma	Nonpartisan	Hunterdon	3
-MA	Barnstable County Register of Probate	0	Anastasia Welsh Perrino	Republican	Barnstable	1
-MA	Berkshire County Register of Probate	0	Kenneth Paul Ferris	Democratic	Berkshire	1
 MA	Berkshire District Attorney	0	Timothy J. Shugrue	Democratic	Berkshire	1
-MA	Bristol County County Treasurer	0	Christopher T. Saunders	Democratic	Bristol	1
-MA	Bristol County Register of Probate	0	Thomas Cleary Hoye, Jr	Democratic	Bristol	1
-MA	Bristol District Attorney	0	Christopher Matthew Markey	Democratic	Bristol	1
 MA	Bristol District Attorney	0	Seth Thomas Aitken	Republican	Bristol	1
+MA	Bristol District Attorney	0	Christopher Matthew Markey	Democratic	Bristol	1
 MA	Cape and Islands District Attorney	0	Robert Joseph Galibois	Democratic	Barnstable	1
-MA	Dukes County Register of Probate	0	Daphne Devries	Democratic	Dukes	1
 MA	Eastern District Attorney	0	Paul F. Tucker	Democratic	Essex	1
-MA	Essex County Register of Probate	0	Pamela Casey O'Brien	Democratic	Essex	1
-MA	Franklin County Register of Probate	0	Daniel Francis Graves	Democratic	Franklin	1
-MA	Franklin County Sheriff	0	Lori M. Streeter	Democratic	Franklin	1
-MA	Hampden County Register of Probate	0	Rosemary A. Saccomani	Democratic	Hampden	1
 MA	Hampden District Attorney	0	Anthony D. Gulluni	Democratic	Hampden	1
-MA	Hampshire County Register of Probate	0	Mark Smith Ames	Democratic	Hampshire	1
 MA	Middle District Attorney	0	Joseph D. Early, Jr.	Democratic	Worcester	1
-MA	Middlesex County Register of Probate	0	Tara Decristofaro	Democratic	Middlesex	1
-MA	Nantucket County Register of Probate	0	Sarah Elizabeth Maxwell	Democratic	Nantucket	1
-MA	Norfolk County County Treasurer	0	Michael G. Bellotti	Democratic	Norfolk	1
-MA	Norfolk County Register of Probate	0	Colleen Marie Brierley	Democratic	Norfolk	1
 MA	Norfolk District Attorney	0	Djuna Elizabeth Perkins	Democratic	Norfolk	1
+MA	Norfolk District Attorney	0	Joseph Michael Pagliarulo	Independent	Norfolk	1
 MA	Northern District Attorney	0	Marian T. Ryan	Democratic	Middlesex	1
 MA	Northwestern District Attorney	0	David E. Sullivan	Democratic	Hampshire	1
-MA	Plymouth County County Treasurer	0	Thomas J. O'Brien	Democratic	Plymouth	1
-MA	Plymouth County Register of Probate	0	Matthew Joseph McDonough	Democratic	Plymouth	1
 MA	Plymouth District Attorney	0	Timothy J. Cruz	Republican	Plymouth	1
-MA	Suffolk County Register of Probate	0	Stephanie L. Everett	Democratic	Suffolk	1
 MA	Suffolk District Attorney	0	Kevin R. Hayden	Democratic	Suffolk	1
+MA	Barnstable County Register of Probate	0	Anastasia Welsh Perrino	Republican	Barnstable	1
+MA	Berkshire County Register of Probate	0	Kenneth Paul Ferris	Democratic	Berkshire	1
+MA	Bristol County Register of Probate	0	Thomas Cleary Hoye, Jr.	Democratic	Bristol	1
+MA	Bristol County Register of Probate	0	Melanie Patenaude Layden	Independent	Bristol	1
+MA	Dukes County Register of Probate	0	Daphne DeVries	Democratic	Dukes	1
+MA	Essex County Register of Probate	0	Pamela Casey O'Brien	Democratic	Essex	1
+MA	Franklin County Register of Probate	0	Daniel Francis Graves	Democratic	Franklin	1
+MA	Hampden County Register of Probate	0	Rosemary A. Saccomani	Democratic	Hampden	1
+MA	Hampshire County Register of Probate	0	Mark Smith Ames	Democratic	Hampshire	1
+MA	Middlesex County Register of Probate	0	Tara E. DeCristofaro	Democratic	Middlesex	1
+MA	Middlesex County Register of Probate	0	Tara Martorella		Middlesex	1
+MA	Nantucket County Register of Probate	0	Sarah Elizabeth Maxwell	Democratic	Nantucket	1
+MA	Norfolk County Register of Probate	0	Colleen Marie Brierley	Democratic	Norfolk	1
+MA	Plymouth County Register of Probate	0	Matthew Joseph McDonough	Democratic	Plymouth	1
+MA	Suffolk County Register of Probate	0	Stephanie L. Everett	Democratic	Suffolk	1
 MA	Worcester County Register of Probate	0	Stephanie K. Fattman	Republican	Worcester	1
+MA	Bristol County Treasurer	0	Christopher T. Saunders	Democratic	Bristol	1
+MA	Norfolk County Treasurer	0	Michael G. Bellotti	Democratic	Norfolk	1
+MA	Plymouth County Treasurer	0	Thomas J. O'Brien	Democratic	Plymouth	1
+MA	Barnstable County Commissioner	0	Daniel A. Gessen	Democratic	Barnstable	3
+MA	Barnstable County Commissioner	0	Adam Michael Hogue	Republican	Barnstable	3
+MA	Bristol County Commissioner	0	John Thomas Saunders	Democratic	Bristol	3
+MA	Dukes County Commissioner	0	Tristan R. Israel	Democratic	Dukes	3
+MA	Dukes County Commissioner	0	Randal Scot Milch	Independent	Dukes	3
+MA	Dukes County Commissioner	0	Douglas Ruskin	Democratic	Dukes	3
+MA	Dukes County Commissioner	0	Christine CS Todd	Democratic	Dukes	3
+MA	Dukes County Commissioner	0	Richard G. Wharton	Democratic	Dukes	3
+MA	Dukes County Commissioner	0	Michael Charles Bellissimo	Democratic	Dukes	3
+MA	Dukes County Commissioner	0	Katherine E. Putnam	Independent	Dukes	3
+MA	Norfolk County Commissioner	0	Peter Hugh Collins	Democratic	Norfolk	3
+MA	Plymouth County Commissioner	0	Rhonda L. Nyman	Democratic	Plymouth	3
+MA	Plymouth County Commissioner	0	Anthony Thomas O'Brien, Sr.	Republican	Plymouth	3
+MA	Franklin County Sheriff	1	Lori M. Streeter	Democratic	Franklin	1
+MA	Franklin County Sheriff	1	Gary Edward Gagnon	Independent	Franklin	1
+MA	Franklin County Sheriff	1	Jon J. Hall	Independent	Franklin	1
+NH	Belknap County Sheriff	0	Bill Wright	Democratic	Belknap	1
+NH	Belknap County Attorney	0	Keith Gerard Cormier	Democratic	Belknap	1
+NH	Belknap County Treasurer	0	Jason Sproul	Democratic	Belknap	1
+NH	Belknap County Treasurer	0	Travis J. O'Hara	Republican	Belknap	1
+NH	Belknap County Register of Deeds	0	Maureen Baxley	Democratic	Belknap	1
+NH	Belknap County Register of Deeds	0	Laura Lapointe	Republican	Belknap	1
+NH	Belknap County Register of Probate	0	Ruth Larson	Democratic	Belknap	1
+NH	Belknap County Register of Probate	0	Krystie Sullivan	Republican	Belknap	1
+NH	Belknap County Commissioner District 1	0	Peter John Spanos	Republican	Belknap	1
+NH	Belknap County Commissioner District 2	0	Glen A. Waring	Republican	Belknap	1
+NH	Carroll County Sheriff	0	Domenic M. Richardi	Democratic	Carroll	1
+NH	Carroll County Attorney	0	Keith D. Blair	Republican	Carroll	1
+NH	Carroll County Treasurer	0	Matt Sawyer, Jr.	Republican	Carroll	1
+NH	Carroll County Register of Deeds	0	Karen I. Rines	Democratic	Carroll	1
+NH	Carroll County Register of Probate	0	Steve Woodcock	Democratic	Carroll	1
+NH	Carroll County Register of Probate	0	Brett I. Williams	Republican	Carroll	1
+NH	Carroll County Commissioner District 1	0	Wharton Sinkler	Democratic	Carroll	1
+NH	Carroll County Commissioner District 1	0	Gene G. Chandler	Republican	Carroll	1
+NH	Carroll County Commissioner District 2	0	Tom Randell	Democratic	Carroll	1
+NH	Carroll County Commissioner District 2	0	Chuck McGee	Republican	Carroll	1
+NH	Carroll County Commissioner District 3	0	Michael Parton	Democratic	Carroll	1
+NH	Carroll County Commissioner District 3	0	Harold B. Parker	Republican	Carroll	1
+NH	Cheshire County Sheriff	0	Eli Rivera	Democratic	Cheshire	1
+NH	Cheshire County Attorney	0	D. Chris McLaughlin	Democratic	Cheshire	1
+NH	Cheshire County Treasurer	0	Jack Wozmak	Democratic	Cheshire	1
+NH	Cheshire County Register of Deeds	0	Anna Z. Tilton	Democratic	Cheshire	1
+NH	Cheshire County Register of Probate	0	Jeremy LaPlante	Democratic	Cheshire	1
+NH	Cheshire County Commissioner District 1	0	Benjamin Tilton	Democratic	Cheshire	1
+NH	Cheshire County Commissioner District 1	0	Kate Day	Republican	Cheshire	1
+NH	Cheshire County Commissioner District 2	0	Terry M. Clark	Democratic	Cheshire	1
+NH	Coos County Commissioner District 1	0	Eamon Kelley	Democratic	Coos	1
+NH	Coos County Commissioner District 1	0	Robert Theberge	Republican	Coos	1
+NH	Coos County Commissioner District 3	0	Ray Gorman	Democratic	Coos	1
+NH	Grafton County Sheriff	0	Jillian E. Myers	Democratic	Grafton	1
+NH	Grafton County Attorney	0	Martha Ann Hornick	Democratic	Grafton	1
+NH	Grafton County Attorney	0	Matthew D. Bjelobrk	Republican	Grafton	1
+NH	Grafton County Treasurer	0	Michael J. Cryans	Democratic	Grafton	1
+NH	Grafton County Treasurer	0	Brian Dear	Republican	Grafton	1
+NH	Grafton County Register of Deeds	0	Brie Choate	Democratic	Grafton	1
+NH	Grafton County Register of Deeds	0	Kelley Jean Monahan	Republican	Grafton	1
+NH	Grafton County Register of Probate	0	Sharon Modjeska	Democratic	Grafton	1
+NH	Grafton County Commissioner District 1	0	George Sykes	Democratic	Grafton	1
+NH	Grafton County Commissioner District 3	0	Katie Hedberg	Democratic	Grafton	1
+NH	Grafton County Commissioner District 3	0	Kimberly Chandonnet	Republican	Grafton	1
+NH	Hillsborough County Sheriff	0	Brian Newcomb	Democratic	Hillsborough	1
+NH	Hillsborough County Attorney	0	Travis Bennett	Democratic	Hillsborough	1
+NH	Hillsborough County Attorney	0	John J. Coughlin	Republican	Hillsborough	1
+NH	Hillsborough County Treasurer	0	Beverly Cotton	Democratic	Hillsborough	1
+NH	Hillsborough County Treasurer	0	Christopher Maidment	Republican	Hillsborough	1
+NH	Hillsborough County Register of Deeds	0	Mary Ann Crowell	Democratic	Hillsborough	1
+NH	Hillsborough County Register of Deeds	0	Dennis Hogan	Republican	Hillsborough	1
+NH	Hillsborough County Register of Probate	0	June Trisciani	Democratic	Hillsborough	1
+NH	Hillsborough County Register of Probate	0	Ross W. Terrio	Republican	Hillsborough	1
+NH	Hillsborough County Commissioner District 1	0	Pierre A. Cetoute	Democratic	Hillsborough	1
+NH	Hillsborough County Commissioner District 1	0	Toni Pappas	Republican	Hillsborough	1
+NH	Hillsborough County Commissioner District 2	0	Sherry Dutzy	Democratic	Hillsborough	1
+NH	Hillsborough County Commissioner District 2	0	David G. Fredette	Republican	Hillsborough	1
+NH	Hillsborough County Commissioner District 3	0	Julie Radhakrishnan	Democratic	Hillsborough	1
+NH	Hillsborough County Commissioner District 3	0	Robert H. Rowe	Republican	Hillsborough	1
+NH	Merrimack County Sheriff	0	Peter Shephard	Democratic	Merrimack	1
+NH	Merrimack County Sheriff	0	Frank T. Cassidy	Republican	Merrimack	1
+NH	Merrimack County Attorney	0	Steven Endres	Democratic	Merrimack	1
+NH	Merrimack County Attorney	0	Meg Hagaman	Republican	Merrimack	1
+NH	Merrimack County Treasurer	0	Kathleen Donnelly	Democratic	Merrimack	1
+NH	Merrimack County Register of Deeds	0	Erica S. Davis	Democratic	Merrimack	1
+NH	Merrimack County Register of Deeds	0	Samantha Morse	Republican	Merrimack	1
+NH	Merrimack County Register of Probate	0	Jane Bradstreet	Democratic	Merrimack	1
+NH	Merrimack County Register of Probate	0	Alyssa Ehl	Republican	Merrimack	1
+NH	Merrimack County Commissioner District 1	0	Steve Shurtleff	Democratic	Merrimack	1
+NH	Merrimack County Commissioner District 2	0	Vincent S. Ribas	Democratic	Merrimack	1
+NH	Merrimack County Commissioner District 2	0	Harold F. French	Republican	Merrimack	1
+NH	Rockingham County Sheriff	0	Chuck Massahos	Democratic	Rockingham	1
+NH	Rockingham County Attorney	0	Robert Wilson	Democratic	Rockingham	1
+NH	Rockingham County Attorney	0	Patricia G. Conway	Republican	Rockingham	1
+NH	Rockingham County Treasurer	0	Kevin Coyle	Democratic	Rockingham	1
+NH	Rockingham County Treasurer	0	Scott Priestley	Republican	Rockingham	1
+NH	Rockingham County Register of Deeds	0	Cathy Stacey	Democratic	Rockingham	1
+NH	Rockingham County Register of Probate	0	Douglas Marino	Democratic	Rockingham	1
+NH	Rockingham County Register of Probate	0	Jon Stark	Republican	Rockingham	1
+NH	Rockingham County Commissioner District 1	0	Kate Coyle	Democratic	Rockingham	1
+NH	Rockingham County Commissioner District 3	0	Thomas Tombarello	Democratic	Rockingham	1
+NH	Strafford County Sheriff	0	Kathryn L. Mone	Democratic	Strafford	1
+NH	Strafford County Sheriff	0	Richard Krauss	Republican	Strafford	1
+NH	Strafford County Attorney	0	Emily C. Garod	Democratic	Strafford	1
+NH	Strafford County Treasurer	0	Pamela J. Arnold	Democratic	Strafford	1
+NH	Strafford County Register of Deeds	0	Catherine A. Berube	Democratic	Strafford	1
+NH	Strafford County Register of Probate	0	Jan Nedelka	Democratic	Strafford	1
+NH	Strafford County Register of Probate	0	Nancy Sirois	Republican	Strafford	1
+NH	Strafford County Commissioner District 1	0	John Frank Scruton	Democratic	Strafford	1
+NH	Strafford County Commissioner District 1	0	Susan J. Rice	Republican	Strafford	1
+NH	Strafford County Commissioner District 2	0	George Maglaras	Democratic	Strafford	1
+NH	Strafford County Commissioner District 3	0	Heath Howard	Democratic	Strafford	1
+NH	Strafford County Commissioner District 3	0	Robert J. Drew	Republican	Strafford	1
+NH	Sullivan County Sheriff	0	James Ethan Yazinski	Republican	Sullivan	1
+NH	Sullivan County Attorney	0	Christine Hilliard	Democratic	Sullivan	1
+NH	Sullivan County Treasurer	0	Michael Sanderson	Republican	Sullivan	1
+NH	Sullivan County Register of Deeds	0	Je Austin	Democratic	Sullivan	1
+NH	Sullivan County Register of Deeds	0	Renee Simino	Republican	Sullivan	1
+NH	Sullivan County Register of Probate	0	Loren David Howard	Democratic	Sullivan	1
+NH	Sullivan County Register of Probate	0	Rodd Ward	Republican	Sullivan	1
+NH	Sullivan County Commissioner District 1	0	Benjamin Nelson	Democratic	Sullivan	1
+NH	Sullivan County Commissioner District 1	0	Joe Osgood	Republican	Sullivan	1
+NH	Sullivan County Commissioner District 2	0	Jim Bednar	Democratic	Sullivan	1
+NH	Sullivan County Commissioner District 2	0	Bennie Nelson	Republican	Sullivan	1
+RI	Barrington Town Moderator	0	Richard F. Staples Jr.	Democratic	Bristol	1
+RI	Barrington Town Council	0	Jessica Martin	Democratic	Bristol	0
+RI	Barrington Town Council	0	Braxton Howard Cloutier	Democratic	Bristol	0
+RI	Barrington Town Council	0	Anthony P. Arico	Independent	Bristol	0
+RI	Barrington Town Council	0	Neile Hartman	Independent	Bristol	0
+RI	Barrington School Committee	0	Adam Stearnbourne	Democratic	Bristol	0
+RI	Barrington School Committee	0	Sarah E. Whiting	Democratic	Bristol	0
+RI	Bristol Town Administrator	0	Steven Contente	Independent	Bristol	1
+RI	Bristol Town Clerk	0	Melissa M. Cordeiro	Democratic	Bristol	1
+RI	Bristol Town Council	0	Timothy Edward Sweeney	Democratic	Bristol	0
+RI	Bristol Town Council	0	Aaron J. Ley	Democratic	Bristol	0
+RI	Bristol Town Council	0	Mary A. Parella	Republican	Bristol	0
+RI	Bristol Town Council	0	Joseph F. Aguiar Jr.	Republican	Bristol	0
+RI	Bristol Town Council	0	Nathan T. Calouro	Independent	Bristol	0
+RI	Bristol Town Council	0	Antonio A. Teixeira	Independent	Bristol	0
+RI	Bristol Regional School Committee	0	William M. O.'Dell	Nonpartisan	Bristol	0
+RI	Bristol Regional School Committee	0	Adam Clifford McGovern	Nonpartisan	Bristol	0
+RI	Bristol Regional School Committee	0	Joy Titcomb	Nonpartisan	Bristol	0
+RI	Bristol Regional School Committee	0	Jessica A. Almeida	Nonpartisan	Bristol	0
+RI	Burrillville Town Council	0	Eugene L. Folgo	Democratic	Providence	0
+RI	Burrillville Town Council	0	Jason C. Moroney	Democratic	Providence	0
+RI	Burrillville Town Council	0	Dennis M. Anderson	Republican	Providence	0
+RI	Burrillville Town Council	0	David Houle	Republican	Providence	0
+RI	Burrillville Town Council	0	Stephen N. Rawson	Republican	Providence	0
+RI	Burrillville Town Council	0	Donald A. Fox	Republican	Providence	0
+RI	Burrillville Town Council	0	Donald Sullivan	Independent	Providence	0
+RI	Burrillville School Committee	0	Michael Puyana	Republican	Providence	0
+RI	Burrillville School Committee	0	Michael W. Long	Republican	Providence	0
+RI	Burrillville School Committee	0	Kaitlyn Poole	Republican	Providence	0
+RI	Burrillville School Committee	0	Mark Brizard	Independent	Providence	0
+RI	Burrillville School Committee	0	Terri Lacey	Independent	Providence	0
+RI	Burrillville School Committee	0	Silvia St Pierre	Independent	Providence	0
+RI	Burrillville School Committee	0	John Anthony Scott	Independent	Providence	0
+RI	Burrillville School Committee	0	David R. Landry	Independent	Providence	0
+RI	Burrillville School Committee	0	Jill E. Calapai	Independent	Providence	0
+RI	Charlestown Town Moderator	0	Tony Jones	Republican	Washington	1
+RI	Charlestown Town Moderator	0	David M. Wilkinson	Independent	Washington	1
+RI	Charlestown Town Council	0	Cynthia M. Drummond	Democratic	Washington	0
+RI	Charlestown Town Council	0	Deborah A. Carney	Democratic	Washington	0
+RI	Charlestown Town Council	0	Jill Marie Fonnemann	Democratic	Washington	0
+RI	Charlestown Town Council	0	Craig T. Marr	Republican	Washington	0
+RI	Charlestown Town Council	0	Stephen J. Stokes	Republican	Washington	0
+RI	Charlestown Town Council	0	Matthew Westover	Republican	Washington	0
+RI	Charlestown Town Council	0	Bonnita B. Van Slyke	Independent	Washington	0
+RI	Charlestown Town Council	0	Sasha Puchalski	Independent	Washington	0
+RI	Chariho School Committee	0	Craig F. Louzon	Democratic	Washington	0
+RI	Chariho School Committee	0	Linda D. Lyall	Democratic	Washington	0
+RI	Chariho School Committee	0	Holly Eaves	Democratic	Washington	0
+RI	Chariho School Committee	0	Kim M. Coulter	Republican	Washington	0
+RI	Chariho School Committee	0	Nicholas Testa	Independent	Washington	0
+RI	Charlestown Planning Commission	0	Ruth L. Platner	Nonpartisan	Washington	0
+RI	Charlestown Planning Commission	0	Coleen M. Galvin Yaroshenko	Nonpartisan	Washington	0
+RI	Charlestown Planning Commission	0	Frances M. Topping	Nonpartisan	Washington	0
+RI	Charlestown Planning Commission	0	Gordon S. Willcox	Nonpartisan	Washington	0
+RI	Charlestown Planning Commission	0	Katherine Gingras	Nonpartisan	Washington	0
+RI	Charlestown Planning Commission	0	Laura Anne Rom	Nonpartisan	Washington	0
+RI	Charlestown Planning Commission	0	Cheryl A. Lill	Nonpartisan	Washington	0
+RI	Cranston City Council City-Wide	0	Richard D. Campopiano	Republican	Providence	0
+RI	Cranston City Council City-Wide	0	Justin Erickson	Republican	Providence	0
+RI	Cranston City Council City-Wide	0	Joseph V. Iannitti	Republican	Providence	0
+RI	Cranston City Council Ward 2	0	Gregory P. Charpentier	Republican	Providence	1
+RI	Cranston City Council Ward 2	0	Jesse Dooley	Independent	Providence	1
+RI	Cranston City Council Ward 3	0	Andy M. Andujar	Democratic	Providence	1
+RI	Cranston City Council Ward 3	0	Alphonse Cardi	Republican	Providence	1
+RI	Cranston City Council Ward 4	0	Dante A. Diwan	Democratic	Providence	1
+RI	Cranston City Council Ward 4	0	Frank Ritz	Republican	Providence	1
+RI	Cranston City Council Ward 5	0	Michael A. Traficante	Republican	Providence	1
+RI	Cranston City Council Ward 6	0	Daniel Wall	Democratic	Providence	1
+RI	Cranston City Council Ward 6	0	Marcus Jason Stephenson	Republican	Providence	1
+RI	Cranston School Committee City-Wide	0	Anthony J. Melillo	Nonpartisan	Providence	0
+RI	Cranston School Committee District 1	0	Keith C. Catone	Nonpartisan	Providence	1
+RI	Cranston School Committee District 2	0	Anna Medeiros	Nonpartisan	Providence	1
+RI	Cranston School Committee District 3	0	Pablo Grullon	Nonpartisan	Providence	1
+RI	Cranston School Committee District 4	0	Lauren Marchetti-Boyle	Nonpartisan	Providence	1
+RI	Cranston School Committee District 5	0	Andrea Soave Nadeau	Nonpartisan	Providence	1
+RI	Cranston School Committee District 6	0	Kathryn M. Crowley	Nonpartisan	Providence	1
+RI	Cumberland Fire Committee At-Large	0	Timothy E. Hogan	Nonpartisan	Providence	0
+RI	Cumberland Fire Committee At-Large	0	Jacques Dextradeur II	Nonpartisan	Providence	0
+RI	East Greenwich Town Council	0	Caryn Corenthal	Democratic	Kent	0
+RI	East Greenwich Town Council	0	Deepak Vishnu	Democratic	Kent	0
+RI	East Greenwich Town Council	0	Michael Patrick Donegan	Democratic	Kent	0
+RI	East Greenwich Town Council	0	Michael J. Zarrella	Democratic	Kent	0
+RI	East Greenwich Town Council	0	Renu Englehart	Democratic	Kent	0
+RI	East Greenwich Town Council	0	Donna Costantino	Republican	Kent	0
+RI	East Greenwich Town Council	0	Peter Rodgers	Republican	Kent	0
+RI	East Greenwich Town Council	0	Ashley M. Graham	Independent	Kent	0
+RI	East Greenwich Town Council	0	Kimberly M. Edge Ambler	Independent	Kent	0
+RI	East Greenwich School Committee	0	Alyson Powell	Democratic	Kent	0
+RI	East Greenwich School Committee	0	Clare S. Cecil-Karb	Democratic	Kent	0
+RI	East Greenwich School Committee	0	Sabrina Weiss	Democratic	Kent	0
+RI	East Greenwich School Committee	0	Eugene Quinn	Democratic	Kent	0
+RI	East Greenwich School Committee	0	Lorraine E. Martin	Republican	Kent	0
+RI	East Providence School Committee District 1	0	Ryan M. Queenan	Nonpartisan	Providence	1
+RI	East Providence School Committee District 2	0	Antonio U. deSimas	Nonpartisan	Providence	1
+RI	East Providence School Committee District 2	0	John Medeiros	Nonpartisan	Providence	1
+RI	East Providence School Committee District 3	0	Elizabeth Merrill	Nonpartisan	Providence	1
+RI	East Providence School Committee District 3	0	Renee Ignacio	Nonpartisan	Providence	1
+RI	East Providence School Committee District 4	0	Anthony M. Pedulla	Nonpartisan	Providence	1
+RI	East Providence School Committee District 4	0	Chrissy Rossi	Nonpartisan	Providence	1
+RI	Exeter Town Moderator	0	John Curtis Varone	Democratic	Washington	1
+RI	Exeter Town Clerk	0	Patricia L. Whitford	Republican	Washington	1
+RI	Exeter Town Council	0	Erich Gruebel	Democratic	Washington	0
+RI	Exeter Town Council	0	Calvin Ellis	Democratic	Washington	0
+RI	Exeter Town Council	0	Kenneth L. Fernstrom	Democratic	Washington	0
+RI	Exeter Town Council	0	Katrina Thornley	Independent	Washington	0
+RI	Exeter Regional School Committee	0	Nicole K. Christoforo	Democratic	Washington	0
+RI	Exeter Town Sergeant	0	Scote N. Miller	Independent	Washington	1
+RI	Exeter Town Treasurer	0	Maria Lawler	Democratic	Washington	1
+RI	Exeter Zoning Inspector	0	Milan Adams	Republican	Washington	1
+RI	Exeter Zoning Inspector	0	David W. Thornley	Independent	Washington	1
+RI	Foster Town Moderator	0	Robert A. Boyden	Republican	Providence	1
+RI	Foster Town Clerk	0	Susan M. Dillon	Republican	Providence	1
+RI	Foster Town Council	0	Steven Henry Plouffe	Republican	Providence	0
+RI	Foster Town Council	0	Catherine Bay	Republican	Providence	0
+RI	Foster Town Council	0	Heidi Rogers	Republican	Providence	0
+RI	Foster Town Council	0	Christie H. Stone	Republican	Providence	0
+RI	Foster Town Council	0	James Barrentine	Republican	Providence	0
+RI	Foster Town Council	0	Kathleen Swanson	Independent	Providence	0
+RI	Foster School Committee	0	Shelley D. Pezza	Nonpartisan	Providence	0
+RI	Foster School Committee	0	Henry E. Gardiner III	Nonpartisan	Providence	0
+RI	Foster School Committee	0	Tara Krawczyk	Nonpartisan	Providence	0
+RI	Foster School Committee	0	Ronald Cervasio	Nonpartisan	Providence	0
+RI	Foster Town Sergeant	0	Michael Coggeshall	Democratic	Providence	1
+RI	Foster Town Sergeant	0	Michael John Krawczyk	Republican	Providence	1
+RI	Foster Tax Board Of Review	0	Lynne Stender Rider	Democratic	Providence	1
+RI	Glocester Town Clerk	0	Jean M. Fecteau	Independent	Providence	1
+RI	Glocester Town Council	0	Cheryl A. Greathouse	Republican	Providence	0
+RI	Glocester Town Council	0	William A. Worthy	Republican	Providence	0
+RI	Glocester Town Council	0	Stephanie Calise Westgate	Republican	Providence	0
+RI	Glocester Town Council	0	Jonathan Burlingame	Republican	Providence	0
+RI	Glocester Town Council	0	Walter M. O. Steere III	Republican	Providence	0
+RI	Glocester Town Council	0	Mark Howard	Independent	Providence	0
+RI	Glocester Town Council	0	Lewis Pryeor	Independent	Providence	0
+RI	Glocester Town Sergeant	0	Albert Kenneth Aubin	Republican	Providence	1
+RI	Glocester Town Sergeant	0	Matthew R. Burlingame	Independent	Providence	1
+RI	Glocester Director Of Human Services	0	John S. Luszcz	Republican	Providence	1
+RI	Jamestown Town Moderator	0	Bruce W. McIntyre	Democratic	Newport	1
+RI	Jamestown Town Council	0	Robert M. Bailey	Independent	Newport	0
+RI	Jamestown School Committee	0	Christian Cowan	Democratic	Newport	0
+RI	Jamestown School Committee	0	Sharon Rallis	Democratic	Newport	0
+RI	Johnston Mayor	0	Joseph M. Polisena Jr.	Democratic	Providence	1
+RI	Johnston Town Council Ward 1	0	Linda L. Folcarelli	Democratic	Providence	1
+RI	Johnston Town Council Ward 2	0	Lauren A. Garzone	Democratic	Providence	1
+RI	Johnston Town Council Ward 3	0	Alfred T. Carnevale	Democratic	Providence	1
+RI	Johnston Town Council Ward 4	0	Robert V. Russo	Democratic	Providence	1
+RI	Johnston Town Council Ward 5	0	Robert J. Civetti	Democratic	Providence	1
+RI	Johnston School Committee District 2	0	Dawn M. Aloisio	Democratic	Providence	1
+RI	Johnston School Committee District 3	0	Marysue Andreozzi	Democratic	Providence	1
+RI	Johnston School Committee District 5	0	Susan M. Mansolillo	Democratic	Providence	1
+RI	Lincoln Town Administrator	0	Philip Gould	Independent	Providence	1
+RI	Lincoln Town Administrator	0	John J. Cullen	Independent	Providence	1
+RI	Lincoln Town Council Ward 1	0	Arthur S. Russo Jr.	Independent	Providence	1
+RI	Lincoln Town Council Ward 2	0	Bonnie Taylor	Democratic	Providence	1
+RI	Lincoln Town Council Ward 2	0	Bruce J. Ogni	Independent	Providence	1
+RI	Lincoln Town Council Ward 3	0	Keith E. Macksoud	Independent	Providence	1
+RI	Lincoln Town Council Ward 4	0	Pamela M. Azar	Democratic	Providence	1
+RI	Lincoln Town Council Ward 4	0	Edward J. Sullivan III	Independent	Providence	1
+RI	Lincoln Town Council Ward 5	0	Kenneth G. Pichette	Republican	Providence	1
+RI	Lincoln School Committee District 1	0	Mario Carreno	Nonpartisan	Providence	1
+RI	Lincoln School Committee District 3	0	Cheryl DerHagopian	Nonpartisan	Providence	1
+RI	Lincoln Water Commissioner Ward 1	0	Edward K. Sliney	Independent	Providence	1
+RI	Lincoln Water Commissioner Ward 3	0	Edward F. Fox	Independent	Providence	1
+RI	Lincoln Water Commissioner Ward 5	0	Louis S. Long	Independent	Providence	1
+RI	Little Compton Town Moderator	0	George M. Crowell	Republican	Newport	1
+RI	Little Compton Town Clerk	0	Heather J. Cook	Republican	Newport	1
+RI	Little Compton Town Council	0	Victoria G. Talbot	Democratic	Newport	0
+RI	Little Compton Town Council	0	Patrick McHugh	Democratic	Newport	0
+RI	Little Compton Town Council	0	Travis H. Auty	Democratic	Newport	0
+RI	Little Compton Town Council	0	Andrew W. Iriarte Moore	Democratic	Newport	0
+RI	Little Compton Town Council	0	Michael W. Rocha II	Republican	Newport	0
+RI	Little Compton Town Council	0	Gary S. Mataronas	Republican	Newport	0
+RI	Little Compton Town Council	0	Salvatore A. Marinosci	Republican	Newport	0
+RI	Little Compton Town Council	0	Paul J. Golembeske	Republican	Newport	0
+RI	Little Compton School Committee	0	Nicholaus Carter	Democratic	Newport	0
+RI	Little Compton School Committee	0	Andrew L. Rhyne	Democratic	Newport	0
+RI	Little Compton School Committee	0	Brian Kenneth Snow	Republican	Newport	0
+RI	Little Compton School Committee	0	Mark A. Gleicher	Independent	Newport	0
+RI	Newport Council At-Large	0	Jane LeBoeuf	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	Christine Hope Sullivan	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	Stephanie Smyth	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	James Dring	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	Taryn Mazza	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	Meagan Elizabeth Landry	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	Elizabeth E. Cullen	Nonpartisan	Newport	0
+RI	Newport Council At-Large	0	Charles M. Holder Jr.	Nonpartisan	Newport	0
+RI	Newport City Council Ward 1	0	Ellen M. Pinnock	Nonpartisan	Newport	1
+RI	Newport City Council Ward 1	0	John Michael	Nonpartisan	Newport	1
+RI	Newport City Council Ward 2	0	Emily Conklin	Nonpartisan	Newport	1
+RI	Newport City Council Ward 2	0	John M. Walker	Nonpartisan	Newport	1
+RI	Newport City Council Ward 3	0	David R. Carlin III	Nonpartisan	Newport	1
+RI	Newport School Committee	0	Amy Yozura	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Penelope B. Hunt	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Brian Rochelle	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Elizabeth Barron	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Carrie Cassady	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Conner J. Hourihan	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Nicole Shevory	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Kendra Wilson Muenter	Nonpartisan	Newport	0
+RI	Newport School Committee	0	Robert J. Leary	Nonpartisan	Newport	0
+RI	New Shoreham Town Moderator	0	Christopher J. Blane	Republican	Newport	1
+RI	New Shoreham First Warden	0	Keith J. Stover	Democratic	Newport	1
+RI	New Shoreham Second Warden	0	Margaret M. O.'Neill	Democratic	Newport	1
+RI	New Shoreham Town Council	0	Elizabeth Doherty	Democratic	Newport	0
+RI	New Shoreham Town Council	0	William A. McCombe	Independent	Newport	0
+RI	New Shoreham Town Council	0	Heather Russo-Littlefield	Independent	Newport	0
+RI	New Shoreham School Committee	0	Greta Heinz	Nonpartisan	Newport	0
+RI	New Shoreham School Committee	0	Ann C. Hall	Nonpartisan	Newport	0
+RI	New Shoreham Tax Assessor	0	Christopher J. O.'Neill	Republican	Newport	1
+RI	New Shoreham Town Sergeant	0	Thomas W. Durden II	Democratic	Newport	1
+RI	New Shoreham Block Island Land Trust Trustee	0	Andrew R. Transue	Nonpartisan	Newport	0
+RI	New Shoreham Block Island Land Trust Trustee	0	Barbara A. MacMullan	Nonpartisan	Newport	0
+RI	New Shoreham Block Island Land Trust Trustee	0	Harold E. Hatfield	Nonpartisan	Newport	0
+RI	North Kingstown Town Council	0	Kimberly Ann Page	Democratic	Washington	0
+RI	North Kingstown Town Council	0	Jessica Plavicki	Democratic	Washington	0
+RI	North Kingstown Town Council	0	Linnea M. Drew	Democratic	Washington	0
+RI	North Kingstown Town Council	0	Stacey Lynn Weinstein	Democratic	Washington	0
+RI	North Kingstown Town Council	0	Gregory A. Mancini	Democratic	Washington	0
+RI	North Kingstown Town Council	0	Elizabeth Hill Ross	Independent	Washington	0
+RI	North Kingstown Town Council	0	Vanessa Mascaro	Independent	Washington	0
+RI	North Kingstown Town Council	0	Richard A. Welch	Independent	Washington	0
+RI	North Kingstown School Committee	0	Aubrey Schabowsky	Democratic	Washington	0
+RI	North Kingstown School Committee	0	Erin West Earle	Democratic	Washington	0
+RI	North Kingstown School Committee	0	Pamela R. Pinheiro	Independent	Washington	0
+RI	North Kingstown School Committee	0	Holly Quinn	Independent	Washington	0
+RI	North Providence Town Council At-Large	0	Dino P. Autiello	Democratic	Providence	0
+RI	North Providence Town Council Ward 1	0	Ronald R. Baccala Jr.	Democratic	Providence	1
+RI	North Providence Town Council Ward 2	0	Nicholas Anthony Feola	Democratic	Providence	1
+RI	North Providence Town Council Ward 3	0	Mario M. Martone	Democratic	Providence	1
+RI	North Providence School Committee District 1	0	Frank William Pallotta Jr.	Democratic	Providence	1
+RI	North Providence School Committee District 2	0	Anthony J. Mariorenzi	Democratic	Providence	1
+RI	North Providence School Committee District 2	0	Janet Elaine Smith	Independent	Providence	1
+RI	North Providence School Committee District 3	0	Arthur A. Corsini	Democratic	Providence	1
+RI	North Smithfield Town Council	0	Sean M. Fuller	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	Paul Jones	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	Kevin Carriere	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	Ann Fieler Lilley	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	Michael R. Plante	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	Elizabeth W. Newberry	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	Rebecca J. DeCristofaro	Nonpartisan	Providence	0
+RI	North Smithfield Town Council	0	David J. Punchak	Nonpartisan	Providence	0
+RI	North Smithfield School Committee	0	Mark Fasano	Nonpartisan	Providence	0
+RI	North Smithfield School Committee	0	Teresa Bartomioli	Nonpartisan	Providence	0
+RI	North Smithfield School Committee	0	Gabriella Stelle	Nonpartisan	Providence	0
+RI	Pawtucket City Council At-Large	0	Roberto H. Moreno	Democratic	Providence	0
+RI	Pawtucket City Council At-Large	0	Yesenia Rubio	Democratic	Providence	0
+RI	Pawtucket City Council At-Large	0	Michael A. Araujo	Democratic	Providence	0
+RI	Pawtucket City Council Ward 2	0	Mark J. Wildenhain	Democratic	Providence	1
+RI	Pawtucket City Council Ward 3	0	Terrence E. Mercer	Democratic	Providence	1
+RI	Pawtucket City Council Ward 4	0	Neicy Coderre	Democratic	Providence	1
+RI	Pawtucket City Council Ward 5	0	Clovis C. Gregor	Democratic	Providence	1
+RI	Pawtucket City Council Ward 6	0	Matthew P. Carvalho	Democratic	Providence	1
+RI	Pawtucket School Committee	0	David C. Fargnoli	Republican	Providence	0
+RI	Portsmouth Town Council	0	John G. McDaid	Democratic	Newport	0
+RI	Portsmouth Town Council	0	John Mark Ryan	Democratic	Newport	0
+RI	Portsmouth Town Council	0	M. Conley Wake Zani	Democratic	Newport	0
+RI	Portsmouth Town Council	0	David P. Fiorillo	Democratic	Newport	0
+RI	Portsmouth Town Council	0	Juan Carlos Payero	Democratic	Newport	0
+RI	Portsmouth Town Council	0	Leonard B. Katzman	Democratic	Newport	0
+RI	Portsmouth Town Council	0	Alexander Roberts	Democratic	Newport	0
+RI	Portsmouth Town Council	0	David G. Reise	Republican	Newport	0
+RI	Portsmouth Town Council	0	David M. Gleason	Republican	Newport	0
+RI	Portsmouth Town Council	0	Keith Hamilton	Republican	Newport	0
+RI	Portsmouth Town Council	0	Sharlene M. Patton	Republican	Newport	0
+RI	Portsmouth Town Council	0	Mary A. McDowell	Independent	Newport	0
+RI	Portsmouth School Committee	0	Isabelle Kelly	Democratic	Newport	0
+RI	Portsmouth School Committee	0	Tasha MacGibbon	Democratic	Newport	0
+RI	Portsmouth School Committee	0	Valerie A. Seveney	Democratic	Newport	0
+RI	Portsmouth School Committee	0	Brett W. Fox	Independent	Newport	0
+RI	Providence Mayor	0	David B. Talan	Republican	Providence	1
+RI	Providence City Council Ward 2	0	Jill Susan Davidson	Democratic	Providence	1
+RI	Providence City Council Ward 5	0	Christopher L. Woodley	Republican	Providence	1
+RI	Providence City Council Ward 5	0	Timothy D. Donahue	Independent	Providence	1
+RI	Providence City Council Ward 6	0	Jorge Porras	Independent	Providence	1
+RI	Providence City Council Ward 8	0	James E. Taylor	Democratic	Providence	1
+RI	Providence City Council Ward 9	0	Diego Arene Morley	Independent	Providence	1
+RI	Providence City Council Ward 14	0	Shelley T. Peterson	Democratic	Providence	1
+RI	Providence City Council Ward 15	0	Oscar O. Vargas	Democratic	Providence	1
+RI	Richmond Town Council	0	Douglas Deslauriers	Democratic	Washington	0
+RI	Richmond Town Council	0	Mark T. Reynolds	Democratic	Washington	0
+RI	Richmond Town Council	0	Daniel E. Madnick	Democratic	Washington	0
+RI	Richmond Town Council	0	James Palmisciano	Democratic	Washington	0
+RI	Richmond Town Council	0	Paul Erdos	Republican	Washington	0
+RI	Richmond Town Council	0	Norbert L. Morin	Republican	Washington	0
+RI	Richmond Town Council	0	Justin K. Price	Republican	Washington	0
+RI	Chariho School Committee	0	Patrick Farrell	Democratic	Washington	0
+RI	Chariho School Committee	0	Andrew A. McCoy	Democratic	Washington	0
+RI	Chariho School Committee	0	David Lelli	Republican	Washington	0
+RI	Scituate Town Clerk	0	Gloria M. Taylor	Independent	Providence	1
+RI	Scituate Town Council	0	Michael S. Marr	Republican	Providence	0
+RI	Scituate Town Council	0	Peter W. Meusert	Republican	Providence	0
+RI	Scituate Town Council	0	Charles A. Collins Jr.	Republican	Providence	0
+RI	Scituate Town Council	0	David M. Dagostino	Republican	Providence	0
+RI	Scituate Town Council	0	Jason Parmelee	Republican	Providence	0
+RI	Scituate Town Council	0	Brenda L. Frederickson	Republican	Providence	0
+RI	Scituate Town Council	0	Theresa C. Yeaw	Republican	Providence	0
+RI	Scituate Town Council	0	Richard Finnegan	Independent	Providence	0
+RI	Scituate School Committee	0	Brenden W. Machowski	Republican	Providence	0
+RI	Scituate School Committee	0	Tracey Noonan	Republican	Providence	0
+RI	Scituate School Committee	0	Lynn A. Francazio	Republican	Providence	0
+RI	Scituate Town Treasurer	0	Theodore J. Przybyla	Republican	Providence	1
+RI	Scituate Town Sergeant	0	Timothy L. Smith	Democratic	Providence	1
+RI	Scituate Town Sergeant	0	Bradford A. Dexter	Republican	Providence	1
+RI	Scituate Town Moderator	0	Harry Hall IV	Republican	Providence	1
+RI	Scituate Director Of Public Welfare	0	Joseph Adam Steiner III	Republican	Providence	1
+RI	Scituate Board Of Assessment Review	0	Joseph J. Deangelis	Democratic	Providence	1
+RI	Smithfield Town Council	0	Henry Jon Siravo	Democratic	Providence	0
+RI	Smithfield Town Council	0	Dante A. Digregorio	Democratic	Providence	0
+RI	Smithfield Town Council	0	Charles F. Boyd	Democratic	Providence	0
+RI	Smithfield Town Council	0	Angelica L. Bovis	Democratic	Providence	0
+RI	Smithfield Town Council	0	Patrick G. Reddy	Democratic	Providence	0
+RI	Smithfield Town Council	0	Ian McLean	Independent	Providence	0
+RI	Smithfield School Committee	0	Robert J. Randall	Democratic	Providence	0
+RI	Smithfield School Committee	0	Lauraine A. Ouellette	Democratic	Providence	0
+RI	Smithfield School Committee	0	Brenda M. Amodei	Democratic	Providence	0
+RI	Smithfield School Committee	0	Christopher DeBerardis	Republican	Providence	0
+RI	Smithfield School Committee	0	Frank Ricci	Republican	Providence	0
+RI	Tiverton Town Clerk	0	Joan B. Chabot	Nonpartisan	Newport	1
+RI	Tiverton Town Council	0	John Chelo	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Michael Burk	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Deborah G. Janick	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Andrew Walsh	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	V. A. Lopes	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Craig R. Committo	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Gary E. Monahan	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	John Edwards	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Robert J. Jobin	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	David Perry	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Denise M. deMedeiros	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	David J. Paull	Nonpartisan	Newport	0
+RI	Tiverton Town Council	0	Cheryl A. Valentine	Nonpartisan	Newport	0
+RI	Tiverton School Committee	0	Michael F. Janick	Nonpartisan	Newport	0
+RI	Tiverton School Committee	0	Christopher M. Englert	Nonpartisan	Newport	0
+RI	Tiverton School Committee	0	Christopher Cureton	Nonpartisan	Newport	0
+RI	Tiverton School Committee	0	Valerie M. Barbato	Nonpartisan	Newport	0
+RI	Tiverton Judge Of Probate	0	Richard P. D.'Addario	Democratic	Newport	1
+RI	Tiverton Town Sergeant	0	Kevin D. Noyes	Nonpartisan	Newport	1
+RI	Warren Town Council	0	Daniel Barlow	Democratic	Bristol	0
+RI	Warren Town Council	0	James A. Core	Democratic	Bristol	0
+RI	Warren Town Council	0	Rebecca Schmaeling	Democratic	Bristol	0
+RI	Warren Town Council	0	Bert S. Rodrigues	Independent	Bristol	0
+RI	Warren Town Council	0	Scott F. Lial	Independent	Bristol	0
+RI	Warren Regional School Committee	0	Kyle J. Jackson	Nonpartisan	Bristol	0
+RI	Warren Charter Review Commission	0	Finneaus Audette	Nonpartisan	Bristol	1
+RI	Warren Charter Review Commission	0	Brock Walsh	Nonpartisan	Bristol	1
+RI	Warren Charter Review Commission	0	Adam Speakman	Nonpartisan	Bristol	1
+RI	Warren Charter Review Commission	0	Stephen Piper	Nonpartisan	Bristol	1
+RI	Westerly Town Council	0	Anne M. Pearce	Democratic	Washington	0
+RI	Westerly Town Council	0	Alexandra L. Healy	Democratic	Washington	0
+RI	Westerly Town Council	0	Michael W. Ober	Democratic	Washington	0
+RI	Westerly Town Council	0	Jean L. Gagnier	Republican	Washington	0
+RI	Westerly Town Council	0	Rose Van Dover	Republican	Washington	0
+RI	Westerly Town Council	0	Caswell Cooke Jr.	Republican	Washington	0
+RI	Westerly School Committee	0	Colin Sweet	Democratic	Washington	0
+RI	Westerly School Committee	0	Dawn Discuillo	Democratic	Washington	0
+RI	Westerly School Committee	0	Gail Barrington	Democratic	Washington	0
+RI	Westerly School Committee	0	Jonathan E. McCusker	Republican	Washington	0
+RI	Westerly School Committee	0	Lori E. Wycall	Republican	Washington	0
+RI	Westerly School Committee	0	Eryc C. Constantikes Sr.	Republican	Washington	0
+RI	West Greenwich Town Council	0	Sheryl R. Green	Republican	Kent	0
+RI	West Greenwich Town Council	0	Michael H. Berek	Republican	Kent	0
+RI	West Greenwich Town Council	0	Thomas J. O.'Loughlin	Republican	Kent	0
+RI	West Greenwich Town Council	0	Stephen Salisbury	Republican	Kent	0
+RI	West Greenwich Town Council	0	Mark D. Tourgee	Republican	Kent	0
+RI	West Greenwich Regional School Committee	0	Jennifer Curry	Republican	Kent	0
+RI	West Greenwich Regional School Committee	0	Donna Gamache-Griffiths	Independent	Kent	0
+RI	West Greenwich Town Moderator	0	April M. Picozzi	Republican	Kent	1
+RI	West Greenwich Town Sergeant	0	Stephen St Onge	Republican	Kent	1
+RI	West Warwick Town Council Ward 1	0	Mary Quinn Williamson	Democratic	Kent	1
+RI	West Warwick Town Council Ward 2	0	David Gosselin Jr.	Democratic	Kent	1
+RI	West Warwick Town Council Ward 3	0	Kevin Millonzi	Democratic	Kent	1
+RI	West Warwick Town Council Ward 3	0	Donald Cote	Republican	Kent	1
+RI	West Warwick School Committee District 1	0	Glen A. Terilli	Democratic	Kent	1
+RI	West Warwick School Committee District 2	0	Rene E. Coutu	Democratic	Kent	1
+RI	West Warwick School Committee District 3	0	Luis R. Colon Jr.	Democratic	Kent	1
+RI	Woonsocket City Council	0	Michael Disney	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Damon S. Flynn	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Alana Gordon	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Dennis J. Kotal	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Sharon L. Harmon	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Valerie Gonzalez	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	James C. Cournoyer	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Michael Warner	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Denise D. Sierra	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Michael N. Dubois	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Lisa Baldelli-Hunt	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Robert Marquis	Nonpartisan	Providence	0
+RI	Woonsocket City Council	0	Roger G. Jalette Sr.	Nonpartisan	Providence	0
+RI	Woonsocket School Committee	0	Martin A. Crowley	Nonpartisan	Providence	0
+RI	Woonsocket School Committee	0	Paul A. Bourget	Nonpartisan	Providence	0
+RI	Woonsocket School Committee	0	Donald G. Burke	Nonpartisan	Providence	0
+RI	Woonsocket School Committee	0	Alan M. Leclaire	Nonpartisan	Providence	0
+RI	Woonsocket School Committee	0	Lynn B. Kapiskas	Nonpartisan	Providence	0
