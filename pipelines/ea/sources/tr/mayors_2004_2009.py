@@ -2,6 +2,7 @@ import csv
 import json
 import re
 from collections import defaultdict
+from collections.abc import Iterable
 from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -49,13 +50,19 @@ def cell(line: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"<[^>]*>|''+", "", text)).strip()
 
 
-def emit() -> Path:
+def read_tables(
+    years: Iterable[int],
+) -> tuple[
+    dict[int, list[tuple[str, str, str, list[tuple[str, str, int]]]]],
+    dict[int, dict[tuple[str, str], list[tuple[str, str, str, str, str, int]]]],
+    list[str],
+]:
     tables: dict[int, list[tuple[str, str, str, list[tuple[str, str, int]]]]] = defaultdict(list)
     beldes: dict[int, dict[tuple[str, str], list[tuple[str, str, str, str, str, int]]]] = defaultdict(
         lambda: defaultdict(list)
     )
     pages: list[str] = []
-    for year in DAYS:
+    for year in years:
         for title in titles(year):
             if not title.endswith(f"{year} Türkiye yerel seçimleri") or "'" not in title:
                 continue
@@ -77,6 +84,12 @@ def emit() -> Path:
                         )
                 if len(rows) >= 2:
                     tables[year].append((title, heading, province, rows))
+
+    return tables, beldes, pages
+
+
+def emit() -> Path:
+    tables, beldes, pages = read_tables(DAYS)
 
     with connect() as conn:
         party_ids: dict[str, set[UUID | None]] = defaultdict(set)
