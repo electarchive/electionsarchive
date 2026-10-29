@@ -19,6 +19,30 @@ INBOX = DATA / "inbox" / "nyc_trib_state"
 PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "The Tribune Association"
 YEARS = {
+    1887: {
+        "volume": "vol1888",
+        "item": "vol1888tribuneal00unse",
+        "title": "The Tribune Almanac and Political Register for 1888 (New York State election returns, 1887)",
+        "day": date(1887, 11, 8),
+        "office": "secretary-of-state",
+        "label": "Secretary of State",
+        "county_pages": (81,),
+        "first_county_page": 60,
+        "ad_page": 83,
+        "ad_columns": (0, 1, 2, 4, 3),
+        "confirmed": {"Orville Preston": 1017},
+        "county_extra": "The Total row prints Orville Preston's column as 1,011, but his county lines add up to 1,017, the figure Wikipedia's 1887 results table gives, so the Total row is taken as a misprint and the lines are loaded. J. Edward Hall ran for the Progressive Labor party and Preston for the Union Labor party, neither of which is in the archive yet, so their candidacies carry no party.",
+        "ad_extra": "The table prints no line for the Union Labor and Greenback candidates, so their columns are not loaded.",
+        "columns": (
+            ("Frederick D. Grant", "republican-party"),
+            ("Frederick Cook", "democratic-party"),
+            ("Henry George", "NY:united-labor"),
+            ("D. W. C. Huntington", "prohibition-party"),
+            ("J. Edward Hall", None),
+            ("Orville Preston", None),
+            ("Thomas K. Beecher", "greenback-party"),
+        ),
+    },
     1895: {
         "volume": "vol1896",
         "item": "vol1896tribuneal00unse",
@@ -29,6 +53,10 @@ YEARS = {
         "county_pages": (268, 269),
         "first_county_page": 12,
         "ad_page": 270,
+        "ad_columns": (0, 1, 2, 3),
+        "confirmed": {},
+        "county_extra": "Fulton and Hamilton are printed as one line.",
+        "ad_extra": "The Annexed District is loaded as its own unit. The table prints no assembly district line for the People's candidate, only his county total in a footnote, so his column is not loaded.",
         "columns": (
             ("John Palmer", "republican-party"),
             ("Horatio C. King", "democratic-party"),
@@ -41,13 +69,12 @@ YEARS = {
 COUNTY_NOTE = (
     "Vote for {label} on {day:%B} {day.day}, {day.year}, by county, from the Tribune Almanac's 'New-York State Election. Vote by Counties' "
     "table, read from the page image. A candidate's county lines are loaded when they add up to the printed Total row, and a candidate whose lines do not is "
-    "left out. Fulton and Hamilton are printed as one line. Each value's locator is the whole page. Blank, defective, and scattering ballots are not loaded."
+    "left out. {extra} Each value's locator is the whole page. Blank, defective, and scattering ballots are not loaded."
 )
 AD_NOTE = (
     "Vote for {label} on {day:%B} {day.day}, {day.year}, by assembly district for New York County, from the Tribune Almanac's "
-    "table 'New-York County Vote by Assembly Districts', read from the page image. Each column's district lines, with the Annexed District, add up to the "
-    "printed Total row, and the Total row matches the county table's New York County line. The table prints no assembly district line for the "
-    "People's candidate, only his county total in a footnote, so his column is not loaded. The assembly districts are those of 1895 and have no shape in the "
+    "table of the vote of New York City by assembly districts, read from the page image. Each column's district lines add up to the "
+    "printed Total row. {extra} The assembly districts are those of {day.year} and have no shape in the "
     "archive. Each value's locator is the whole page. Blank, defective, and scattering ballots are not loaded."
 )
 
@@ -60,7 +87,7 @@ def parse() -> None:
         rows = []
         for column, (name, _) in enumerate(spec["columns"]):
             total = sum(values[column] for values in data["counties"].values())
-            if total != data["county_totals"][column]:
+            if total != data["county_totals"][column] and total != spec["confirmed"].get(name):
                 left[name] = f"its county lines add up to {total:,} against the printed {data['county_totals'][column]:,}"
                 continue
             rows.extend((year, "county", county, column, values[column]) for county, values in data["counties"].items())
@@ -68,7 +95,7 @@ def parse() -> None:
             total = sum(values[column] for values in data["ads"].values())
             if total != data["ad_totals"][column]:
                 raise ValueError(f"{year} assembly district column {column}: {total} against {data['ad_totals'][column]}")
-            rows.extend((year, "ad", ad, column, values[column]) for ad, values in data["ads"].items())
+            rows.extend((year, "ad", ad, spec["ad_columns"][column], values[column]) for ad, values in data["ads"].items())
         pl.DataFrame(rows, schema=["year", "level", "unit", "column", "value"], orient="row").write_parquet(PARSED / f"{year}.parquet")
         (PARSED / f"{year}-left.json").write_text(json.dumps(left))
         print(year, len(data["counties"]), "county lines,", len(data["ads"]), "assembly districts; left out:", left)
@@ -123,7 +150,7 @@ def emit() -> Path:
                 source,
             )
             pages = {}
-            for number in (*spec["county_pages"], spec["ad_page"]):
+            for number in sorted({*spec["county_pages"], spec["ad_page"]}):
                 image = PAGES / f"{spec['volume']}-{number}.png"
                 if not image.exists():
                     PAGES.mkdir(parents=True, exist_ok=True)
@@ -177,7 +204,8 @@ def emit() -> Path:
                 cs.add("contest_option", id=root, contest_id=contest, kind="candidate", ballot_label=name)
                 candidacy = cs.key("us.candidacy", f"{root_key}:head")
                 cs.add("candidacy", id=candidacy, person_id=person, option_id=root, role="head", ballot_name=name, is_independent=False)
-                cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("us.party", party_key), kind="nominated")
+                if party_key is not None:
+                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("us.party", party_key), kind="nominated")
                 options.append(root)
             sets = {}
             for level, note in (("county", COUNTY_NOTE), ("ad", AD_NOTE)):
@@ -198,7 +226,7 @@ def emit() -> Path:
                     "note",
                     entity_id=sets[level],
                     kind="methodology",
-                    body_md=note.format(label=spec["label"], day=day) + ("".join(f" Note: {name}'s column is left out because {why}." for name, why in left.items()) if level == "county" else ""),
+                    body_md=note.format(label=spec["label"], day=day, extra=spec["county_extra"] if level == "county" else spec["ad_extra"]) + ("".join(f" Note: {name}'s column is left out because {why}." for name, why in left.items()) if level == "county" else ""),
                 )
             units: dict[str, object] = {}
             names = list(json.loads((INBOX / f"{year}.json").read_text())["counties"])
