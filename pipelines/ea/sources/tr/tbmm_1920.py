@@ -15,7 +15,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_1920"
-VERSION = "1"
+VERSION = "2"
 TITLE_ALBUM = "TBMM Albümü 1920-2010, 1. Cilt (1920-1950)"
 TITLE_TUIK = "Milletvekili Genel Seçimleri, 1923-2011"
 PARSED = DATA / "parsed" / SOURCE
@@ -214,6 +214,13 @@ def canon(text: str, term: int | None = None) -> str:
     if key == "icel":
         return "mersin"
     return key if key in HISTORICAL else OLD.get(key, key)
+
+
+STOP = {"bey", "pasa", "efendi", "paşa", "avukat", "dr", "hoca", "kitapci"}
+
+
+def words(text: str) -> set[str]:
+    return {fold(word) for word in re.findall(r"[^\W\d_]+", text) if len(word) > 3 and fold(word) not in STOP}
 
 
 def clause(bio: str, term: int, province: str) -> str:
@@ -523,6 +530,48 @@ def emit() -> Path:
         if chp in cs.minted or dp in cs.minted:
             raise ValueError("publish tr.thea before tr.tbmm_1920")
 
+        listed = lists()
+        independents = Counter(
+            (row["term"], canon(row["province"], row["term"]))
+            for row in listed.filter(pl.col("kind") == "IND").iter_rows(named=True)
+        )
+        groups = {
+            "TCF": (
+                "terakkiperver-cumhuriyet-firkasi",
+                "Terakkiperver Cumhuriyet Fırkası",
+                "TCF",
+                date(1924, 11, 17),
+                date(1925, 6, 5),
+            ),
+            "SCF": (
+                "serbest-cumhuriyet-firkasi",
+                "Serbest Cumhuriyet Fırkası",
+                "SCF",
+                date(1930, 8, 18),
+                date(1930, 11, 17),
+            ),
+        }
+        group_parties = {}
+        for code, (key, label, short, start, end) in groups.items():
+            group_parties[code] = cs.key("tr.party", key)
+            if group_parties[code] in cs.minted:
+                cs.add("party", id=group_parties[code], kind="party", polity_id=turkey)
+                name(group_parties[code], label)
+                name(group_parties[code], short, kind="abbreviation")
+        member_group: dict[tuple[int, str, str], tuple[str, str]] = {}
+        for item in listed.filter(pl.col("kind") != "IND").iter_rows(named=True):
+            wanted = words(item["name"])
+            found = [
+                (len(wanted & words(f"{row['name']} {row['registered'] or ''}")), row)
+                for row in entries.filter(pl.col("term") == item["term"]).iter_rows(named=True)
+                if canon(row["province"], item["term"]) == canon(item["province"], item["term"])
+            ]
+            best = max((score for score, _ in found), default=0)
+            top = [row for score, row in found if score == best and best > 0]
+            if len(top) == 1:
+                member_group[item["term"], top[0]["page"], top[0]["name"]] = (item["kind"], item["name"])
+            else:
+                print("unmatched list member", item["kind"], item["name"], item["province"], len(top))
         contests: dict[tuple[int, str], UUID] = {}
         report = []
         for term, day in ELECTED.items():
@@ -606,6 +655,17 @@ def emit() -> Path:
                                 ballot_label=label,
                             )
                             cs.add("outcome", result_set_id=result, option_id=option, kind="won", seats=seats_won)
+                if independents.get((term, key)):
+                    option = cs.key("tr.option", f"{contest_key}:bagimsiz")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="independents",
+                        party_id=None,
+                        ballot_label="Bağımsız",
+                    )
+                    cs.add("outcome", result_set_id=result, option_id=option, kind="won", seats=independents[term, key])
                 if counts.get(key, 0) != magnitude:
                     report.append((year, key, magnitude, counts.get(key, 0)))
             for key in sorted(set(counts) - set(table)):
@@ -683,6 +743,18 @@ def emit() -> Path:
             if via in ("resigned", "died"):
                 cs.add("tenure_event", tenure_id=tenure, kind=via, date=ended, source_id=album)
             made[term, via] += 1
+            group = member_group.get((term, row["page"], row["name"]))
+            if group is not None:
+                _, _, _, group_start, group_end = groups[group[0]]
+                cs.add(
+                    "tenure_affiliation",
+                    tenure_id=tenure,
+                    kind="party",
+                    party_id=group_parties[group[0]],
+                    valid_from=group_start,
+                    valid_from_precision="day",
+                    valid_to=group_end,
+                )
             parties_here = [token.strip() for token in re.split(r"\s*[/–-]\s*", row["party"]) if token.strip()]
             if len(parties_here) == 1 and term >= 7 and parties_here[0] in ("CHP", "DP"):
                 cs.add(
@@ -697,3 +769,42 @@ def emit() -> Path:
         for key, count in sorted(made.items()):
             print(key, count)
         return cs.write()
+
+
+LISTS = {99: (2, "TCF"), 155: (3, "SCF"), 207: (4, "IND"), 261: (5, "IND"), 327: (6, "IND")}
+
+
+def lists() -> pl.DataFrame:
+    pdf = raw.cached(SOURCE, ALBUM).path
+    rows = []
+    for page, (term, kind) in LISTS.items():
+        text = subprocess.run(
+            ["pdftotext", "-f", str(page), "-l", str(page), "-layout", str(pdf), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.replace("\xad", "")
+        for line in text.splitlines():
+            parts = re.split(r"\s{2,}", re.sub(r"^\s*\d+\.?\s+", "", line).strip())
+            if len(parts) < 2:
+                continue
+            name = parts[0]
+            place = re.match(r"^([A-ZÇĞİÖŞÜÂÎ][A-ZÇĞİÖŞÜÂÎ -]+?)(?:\s*\((.*)\))?$", parts[1])
+            if (
+                place is None
+                or not re.search(r"[a-zçğıöşü]", name)
+                or "ADI SOYADI" in name
+                or fold(place.group(1)) not in HEADINGS
+            ):
+                continue
+            rows.append(
+                {
+                    "term": term,
+                    "kind": kind,
+                    "page": page,
+                    "name": name,
+                    "province": place.group(1),
+                    "note": place.group(2),
+                }
+            )
+    return pl.DataFrame(rows)
