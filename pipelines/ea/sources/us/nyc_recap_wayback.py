@@ -34,6 +34,14 @@ LINES = {
     "NEW MARIJUANA": "MARIJUANA REFORM",
     "FAMILIES": "WORKING FAMILIES",
     "REFORM": "BUCHANAN REFORM",
+    "UNITY": "UNITY PARTY",
+    "PEOPLES": "PEOPLES VOICE",
+    "MOST": "MOST QUALIFIED",
+    "NO": "NO NEW TAXES",
+    "NEIGHBRHOOD": "NEIGHBORHOOD FIRST",
+    "COMMUNITY": "COMMUNITY FIRST",
+    "UNITED": "UNITED DISTRICT",
+    "BX": "BX ALLIANCE",
 }
 ROW = re.compile(rf"^\s*(?P<label>\d+(?:ST|ND|RD|TH)|{'|'.join(COUNTIES)}|TOTAL)\b(?P<rest>.*\d.*)$")
 KIND = re.compile(r"(GENERAL|RUNOFF|RUN-OFF|PRIMARY|PRESIDENTIAL PRIMARY|SPECIAL)[A-Z ]*ELECTION")
@@ -364,6 +372,16 @@ FILES = (
     ("2004/primary/p2004richmond.pdf", "2004-09-14", "Primary"),
     ("2004/general/g2004recaps.pdf", "2004-11-02", "General"),
     ("2004/general/g2004aded.pdf", "2004-11-02", "General"),
+    ("2001/special/bxcon15.pdf", "2001-02-20", "Special"),
+    ("2002/special/S2002RESULTS20S.pdf", "2002-03-21", "Special"),
+    ("2002/special/S2002RESULTS26S.pdf", "2002-03-21", "Special"),
+    ("2002/special/S2002RESULTS56S.pdf", "2002-03-21", "Special"),
+    ("2002/special/S2002RESULTS60S.pdf", "2002-03-21", "Special"),
+    ("2002/special/queens_assembly_31st_dist.pdf", "2002-04-30", "Special"),
+    ("2003/special/S2003ResultsBk55AD.pdf", "2003-02-25", "Special"),
+    ("2003/special/S2003ResultsBx79AD.pdf", "2003-02-25", "Special"),
+    ("2003/special/S2003ResultsBx18Council.pdf", "2003-02-25", "Special"),
+    ("2003/special/S2003ResultsBk43Council.pdf", "2003-02-25", "Special"),
 )
 COUNTY_NAMES = {
     "NEW YORK COUNTY": "New York",
@@ -425,8 +443,11 @@ def parse() -> None:
     for fragment, day, kind in FILES:
         url, entry = next((u, e) for u, e in sorted(index.items()) if fragment in u)
         accumulated: dict[tuple[str, str], dict[str, object]] = {}
-        county_only = day < "2002-01-01" and day != "2000-11-07"
-        for g in read_file(DATA / "raw" / SOURCE / str(entry["file"])):
+        county_only = day < "2002-01-01" and day != "2000-11-07" and kind != "Special"
+        groups = read_file(DATA / "raw" / SOURCE / str(entry["file"]))
+        if kind == "Special" and any(g["grain"] == "ed" for g in groups):
+            groups = [g for g in groups if g["grain"] == "ed"]
+        for g in groups:
             if county_only and g["scope"] == "CITY OF NEW YORK":
                 parts = [(str(r["label"]).title(), r) for r in g["rows"] if r["label"] in COUNTIES]
                 if not parts:
@@ -455,7 +476,7 @@ def parse() -> None:
                 if signature in slot["seen"]:
                     continue
                 slot["seen"].append(signature)
-                if city_row is None and [(x["code"], x["party"]) for x in slot["labels"]] != [(x["code"], x["party"]) for x in labels]:
+                if city_row is None and [(x["code"], x["party"].rpartition(" ")[2]) for x in slot["labels"]] != [(x["code"], x["party"].rpartition(" ")[2]) for x in labels]:
                     skipped.append(f"{fragment} page {g['page']} {g['office'][:50]}: columns differ between blocks")
                     continue
                 total = city_row or next(r for r in g["rows"] if r["label"] == "TOTAL")
