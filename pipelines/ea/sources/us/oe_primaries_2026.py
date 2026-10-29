@@ -102,6 +102,10 @@ FILES = {
         ],
     ),
 }
+SPECIALS = [
+    ("SC", 1, ("scx", "2026-08-11", ["detailxlsx.zip"])),
+    ("SC", 2, ("scr", "2026-08-25", ["detailxml-runoff-2026-08-25.zip"], "2026-08-11")),
+]
 RUNOFFS = {
     "GA": ("ga2", "2026-06-16", ["ballot-items"], "2026-05-19"),
     "AL": ("alx", "2026-06-16", ["2026-07/2026_PRIMARY_RUNOFF_ELECTION.zip"], "2026-05-19"),
@@ -152,6 +156,8 @@ MANUAL = {
     "mi": (DATA / "inbox" / "manual" / "MF-063", "https://mielections.us/election/results/2026PRI_CENR.html", ".txt", "text/tab-separated-values"),
     "pa": (DATA / "inbox" / "manual" / "MF-060", "https://www.electionreturns.pa.gov/", ".csv", "text/csv"),
     "sc": (DATA / "inbox" / "manual" / "MF-051", "https://scvotes.gov/", ".zip", "application/zip"),
+    "scx": (DATA / "inbox" / "manual" / "MF-279", "https://scvotes.gov/", ".zip", "application/zip"),
+    "scr": (DATA / "inbox" / "manual" / "MF-279-runoff", "https://scvotes.gov/", ".zip", "application/zip"),
     "ia": (DATA / "inbox" / "manual" / "MF-049", "https://sos.iowa.gov/elections/results/", ".zip", "application/zip"),
     "mt": (DATA / "inbox" / "manual" / "MF-052", "https://electionresults.mt.gov/", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
     "nv": (DATA / "inbox" / "manual" / "MF-053", "https://silverstateelection.nv.gov/", ".xml", "application/xml"),
@@ -461,7 +467,26 @@ def rows(code: str, path: Path, file: str = ""):
                         "votes": candidate.get("Votes"),
                     }
         return
-    if code == "sc":
+    if code == "scx":
+        with zipfile.ZipFile(path) as archive:
+            book = archive.read("detail.xlsx")
+        table = pl.read_excel(book, sheet_name="2", has_header=False, infer_schema_length=0).rows()
+        for column, candidate in enumerate(table[1]):
+            if not candidate:
+                continue
+            for county in table[3:]:
+                if county[0].strip().lower().startswith("total"):
+                    continue
+                yield {
+                    "county": county[0],
+                    "office": "U.S. Senate",
+                    "district": "",
+                    "party": "REP",
+                    "candidate": candidate,
+                    "votes": county[column + 6],
+                }
+        return
+    if code in ("sc", "scr"):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
         for contest in root.iter("Contest"):
@@ -1116,7 +1141,7 @@ def title(text: str) -> str:
 
 
 def fetch() -> None:
-    for code, _, names, *_ in [*FILES.values(), *RUNOFFS.values()]:
+    for code, _, names, *_ in [*FILES.values(), *RUNOFFS.values(), *(entry for _, _, entry in SPECIALS)]:
         for name in names:
             if code in MANUAL:
                 folder, link, suffix, media = MANUAL[code]
@@ -1286,12 +1311,14 @@ def emit() -> Path:
         for state, stage_no, (code, day, files, *first) in [
             *((state, 1, entry) for state, entry in FILES.items()),
             *((state, 2, entry) for state, entry in RUNOFFS.items()),
+            *SPECIALS,
         ]:
-            round_slot = (state, stage_no)
-            round_word = "primary runoff" if stage_no == 2 else "primary"
+            special = code in ("scx", "scr")
+            round_slot = (state, stage_no, day)
+            round_word = ("special " if special else "") + ("primary runoff" if stage_no == 2 else "primary")
             state_name = state_names[state]
             publisher, address, how = OFFICIAL.get(state, ("OpenElections", f"https://github.com/openelections/openelections-data-{code}", ""))
-            source_title = f"{state_name} 2026 primary{' runoff' if stage_no == 2 else ''} results by county"
+            source_title = f"{state_name} 2026 {'U.S. Senate special ' if special else ''}primary{' runoff' if stage_no == 2 else ''} results by county"
             sources[round_slot] = cs.source(publisher, source_title)
             if sources[round_slot] in cs.minted:
                 cs.add(
@@ -1319,7 +1346,7 @@ def emit() -> Path:
                     status="held",
                 )
                 if elections[round_slot] in cs.minted:
-                    name(elections[round_slot], f"2026 {state_name} primary runoff election" if stage_no == 2 else f"2026 {state_name} primary election")
+                    name(elections[round_slot], f"2026 {state_name} {'U.S. Senate special ' if special else ''}primary runoff election" if stage_no == 2 else f"2026 {state_name} {'U.S. Senate special ' if special else ''}primary election")
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{round_word.replace(' ', '-')}", entity_id=elections[round_slot])
             grouped: dict[tuple[str, str, str], dict[tuple[str, str, str], dict[str, int]]] = defaultdict(
                 lambda: defaultdict(lambda: defaultdict(int))
