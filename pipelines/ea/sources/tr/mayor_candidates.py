@@ -13,14 +13,14 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "5"
+VERSION = "6"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
 OLD = (1963, 1973)
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
 
 
 def fetch() -> None:
-    mayors_1984_1999.fetch(OLD)
+    mayors_1984_1999.fetch()
 
 
 def races() -> tuple[
@@ -31,7 +31,7 @@ def races() -> tuple[
     found: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
     municipal: list[tuple[int, list[tuple[str, str, str, int]]]] = []
     pages: dict[str, str] = {}
-    tables, beldes_old, _ = mayors_1984_1999.read((*OLD, *mayors_1984_1999.YEARS))
+    tables, beldes_old, _ = mayors_1984_1999.read()
     for (year, province, kind, _), (title, rows, _) in tables.items():
         if year in OLD:
             municipal.append((year, [(abbreviation, label, names, votes) for abbreviation, label, names, votes in rows]))
@@ -95,7 +95,7 @@ def emit() -> Path:
             """select x.value, c.id, c.office_id from contest c
                join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
                join changeset cs on cs.id = c.changeset_id
-               where cs.pipeline in ('tr.ysk_local', 'tr.ysk_mayors', 'tr.die_local') and c.kind = 'office'
+               where cs.pipeline in ('tr.ysk_local', 'tr.ysk_mayors', 'tr.die_local', 'tr.mayors_1984_1999') and c.kind = 'office'
                  and x.value ~ '^(1963-11-17|1973-12-09|1984-03-25|1989-03-26|1994-03-27|1999-04-18|2004-03-28):.*-mayor$'"""
         ).fetchall():
             contests[key] = (contest, office)

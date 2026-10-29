@@ -19,8 +19,8 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "4"
-YEARS = (1968, 1977, 1984, 1989, 1994, 1999)
+VERSION = "5"
+YEARS = (1963, 1968, 1973, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 TITLE = re.compile(r"^(.+?)'(?:d[ae]|t[ae]) (\d{4}) Türkiye yerel seçimleri$")
 METHOD = (
@@ -141,10 +141,10 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mayoral elections of 1968, 1977, 1984, 1989, 1994, and 1999 by municipality, from Turkish Wikipedia's per-province tables",
+            summary="Mayoral elections of 1963, 1968, 1973, 1977, 1984, 1989, 1994, and 1999 by municipality, from Turkish Wikipedia's per-province tables",
             polity="TR",
         )
-        title = "Turkish Wikipedia: per-province 1968, 1977, 1984, 1989, 1994, and 1999 Türkiye yerel seçimleri articles"
+        title = "Turkish Wikipedia: per-province 1963, 1968, 1973, 1977, 1984, 1989, 1994, and 1999 Türkiye yerel seçimleri articles"
         wiki = cs.source("Wikipedia", title)
         if wiki in cs.minted:
             cs.add(
@@ -237,8 +237,15 @@ def emit() -> Path:
             ).fetchall()
         }
 
+        taken: dict[str, UUID] = dict(
+            conn.execute(
+                "select path, entity_id from slug where path like any(%s)", [[f"%/{day}-local" for day in DAYS.values()]]
+            ).fetchall()
+        )
+        prior = dict(conn.execute("select value, entity_id from external_id where scheme = 'tr.election'").fetchall())
         skipped: list[tuple[str, str, str]] = []
         made: set[str] = set()
+        placed: set[tuple[UUID, date]] = set()
         results: list[dict[str, str | int | float | None]] = []
         complete = 0
         for year, keys, page_title, name, rows, totals in sorted(races, key=lambda race: (race[0], race[1][0])):
@@ -253,7 +260,7 @@ def emit() -> Path:
                     skipped.append((str(year), label, "no municipality"))
                     continue
             contest_key = f"{day}:{key}-mayor"
-            if contest_key in made:
+            if contest_key in made or (cs.key("tr.polity", key), day) in placed:
                 skipped.append((str(year), label, "second table for the same municipality"))
                 continue
             office = cs.key("tr.office", f"{key}-mayor")
@@ -296,11 +303,15 @@ def emit() -> Path:
             if unknown is not None:
                 skipped.append((str(year), label, f"unknown party {unknown}"))
                 continue
+            if taken.get(f"{paths[polity]}/{day}-local", prior.get(contest_key)) != prior.get(contest_key):
+                skipped.append((str(year), label, "election already held"))
+                continue
+            election = cs.key("tr.election", contest_key)
             made.add(contest_key)
+            placed.add((polity, day))
             contest = cs.key("tr.contest", contest_key)
             path = paths[polity]
             place = english.get(polity, name)
-            election = cs.key("tr.election", contest_key)
             cs.add(
                 "election",
                 id=election,
