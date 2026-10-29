@@ -104,6 +104,7 @@ def emit() -> Path:
             "select o.polity_id from office o join external_id x on x.entity_id = o.id "
             "where x.scheme = 'us.office' and x.value = 'NY:3651000:mayor'"
         ).fetchone()[0]
+        volumes = {}
         for year, spec in YEARS.items():
             day = spec["day"]
             frame = pl.read_parquet(PARSED / f"{year}.parquet")
@@ -123,43 +124,46 @@ def emit() -> Path:
                     [contest],
                 ).fetchall()
             }
-            url = f"https://archive.org/download/{spec['item']}/{spec['item']}.pdf"
-            source = cs.source(PUBLISHER, spec["title"])
-            cs.add(
-                "source",
-                id=source,
-                kind="compendium",
-                publisher=PUBLISHER,
-                title=spec["title"],
-                url=f"https://archive.org/details/{spec['item']}",
-                license="Public domain",
-                notes="Scanned volume on the Internet Archive.",
-            )
-            pdf = INBOX / f"{spec['volume']}.pdf"
-            artifact = cs.artifact(
-                raw.store(SOURCE, url, pdf.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"),
-                source,
-            )
-            pages = {}
-            for number in sorted(set(spec["pages"])):
-                image = PAGES / f"{spec['volume']}-{number}.png"
-                if not image.exists():
-                    PAGES.mkdir(parents=True, exist_ok=True)
-                    subprocess.run(
-                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile", str(pdf), str(image.with_suffix(""))],
-                        check=True,
-                    )
-                width, height = struct.unpack(">II", image.read_bytes()[16:24])
-                pages[number] = (cs.page(artifact, number), width, height)
+            if spec["volume"] not in volumes:
+                url = f"https://archive.org/download/{spec['item']}/{spec['item']}.pdf"
+                source = cs.source(PUBLISHER, spec["title"])
                 cs.add(
-                    "source_page",
-                    id=pages[number][0],
-                    artifact_id=artifact,
-                    page_number=number,
-                    image_key=f"pages/{SOURCE}/{image.name}",
-                    width=width,
-                    height=height,
+                    "source",
+                    id=source,
+                    kind="compendium",
+                    publisher=PUBLISHER,
+                    title=spec["title"],
+                    url=f"https://archive.org/details/{spec['item']}",
+                    license="Public domain",
+                    notes="Scanned volume on the Internet Archive.",
                 )
+                pdf = INBOX / f"{spec['volume']}.pdf"
+                artifact = cs.artifact(
+                    raw.store(SOURCE, url, pdf.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"),
+                    source,
+                )
+                pages = {}
+                for number in sorted(set(spec["pages"])):
+                    image = PAGES / f"{spec['volume']}-{number}.png"
+                    if not image.exists():
+                        PAGES.mkdir(parents=True, exist_ok=True)
+                        subprocess.run(
+                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile", str(pdf), str(image.with_suffix(""))],
+                            check=True,
+                        )
+                    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                    pages[number] = (cs.page(artifact, number), width, height)
+                    cs.add(
+                        "source_page",
+                        id=pages[number][0],
+                        artifact_id=artifact,
+                        page_number=number,
+                        image_key=f"pages/{SOURCE}/{image.name}",
+                        width=width,
+                        height=height,
+                    )
+                volumes[spec["volume"]] = (source, pages)
+            source, pages = volumes[spec["volume"]]
             options = []
             for name, party_key, existing in spec["columns"]:
                 if existing is not None:
