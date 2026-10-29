@@ -18,7 +18,7 @@ KEYS = {
 }
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
 DROPPABLE = ("area_code", "area_parent", "area_geometry")
-SWEEPABLE = {"party_image": "id", "party_founding": "party_id"}
+SWEEPABLE = {"party_image": "id", "party_founding": "party_id", "party_affiliation": "party_id"}
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
