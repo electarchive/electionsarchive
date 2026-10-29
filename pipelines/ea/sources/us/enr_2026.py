@@ -1,8 +1,10 @@
 import csv
+import io
 import json
 import os
 import re
 import time
+import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -37,6 +39,19 @@ EV_OFFICES = re.compile(
 LISTINGS = ("/ballot-items", "Georgia", "/id", "/utah", "/RhodeIsland", "/washington")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
 FL_OFFICES = {"USS": "senate", "USR": "house", "GOV": "governor"}
+IL_ELECTIONS = {2022: 62, 2024: 66, 2026: 70}
+IL_CITIES = {
+    "CITY OF CHICAGO": "Cook",
+    "CITY OF BLOOMINGTON": "McLean",
+    "CITY OF DANVILLE": "Vermilion",
+    "CITY OF EAST ST. LOUIS": "St. Clair",
+    "CITY OF GALESBURG": "Knox",
+    "CITY OF ROCKFORD": "Winnebago",
+}
+IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
+NC_CONTEST = re.compile(r"US SENATE|NC GOVERNOR|US HOUSE OF REPRESENTATIVES DISTRICT (\d+)")
+PA_API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
+PA_OFFICES = {"2": "senate", "3": "governor", "11": "house"}
 NOTE = (
     "Unofficial election night results as the publisher's reporting site showed them at the time given. Counts change as "
     "ballots are counted and until the canvass certifies them; the certified canvass will publish as a separate result set."
@@ -107,6 +122,61 @@ def fetch() -> None:
             print("FL: no extract")
         else:
             store("FL", url, content, ".txt")
+    if not ONLY or "IL" in ONLY:
+        election = IL_ELECTIONS[DAY.year]
+        base = f"https://elections.il.gov/Downloads/ElectionOperations/ElectionResults/ByOffice/{election}/{election}-"
+        files = [
+            f"150-UNITED%20STATES%20SENATOR-{DAY.year}GE",
+            f"180-GOVERNOR%20AND%20LIEUTENANT%20GOVERNOR-{DAY.year}GE",
+        ]
+        for number in range(1, 18):
+            ordinal = (
+                f"{number}{'TH' if 10 <= number % 100 <= 20 else {1: 'ST', 2: 'ND', 3: 'RD'}.get(number % 10, 'TH')}"
+            )
+            files.append(f"{240 + 10 * number}-{ordinal}%20CONGRESS-{DAY.year}GE")
+        for name in files:
+            content = get(client, f"{base}{name}.csv")
+            if content is None:
+                print(f"IL: no file {name}")
+            else:
+                store("IL", f"{base}{name}.csv", content, ".csv")
+    if not ONLY or "NC" in ONLY:
+        url = f"https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{DAY:%Y_%m_%d}/results_pct_{DAY:%Y%m%d}.zip"
+        content = get(client, url)
+        if content is None:
+            print("NC: no zip")
+        else:
+            store("NC", url, content, ".zip")
+    if not ONLY or "IN" in ONLY:
+        url = f"https://enr.indianavoters.in.gov/archive/{DAY.year}General/data/OffCatC_1005_B.json"
+        content = get(client, url)
+        if content is None:
+            print("IN: no house file")
+        else:
+            store("IN", url, content, ".json")
+    if not ONLY or "PA" in ONLY:
+        found = os.environ.get("ENR_2026_PA_ID")
+        for election in [found] if found else range(113, 160):
+            probe = get(
+                client,
+                f"{PA_API}GetOfficeData?officeId=11&methodName=GetOfficeData&electionid={election}&electiontype=G&isactive=0",
+            )
+            if probe and re.search(rf'"ElectionYear":\s*"{DAY.year}"', json.loads(probe) or ""):
+                break
+        else:
+            election = None
+            print("PA: no general election id")
+        for office in PA_OFFICES if election else ():
+            url = f"{PA_API}GetOfficeData?officeId={office}&methodName=GetOfficeData&electionid={election}&electiontype=G&isactive=0"
+            content = get(client, url)
+            if not content or content == b'""':
+                continue
+            store("PA", url, content, ".json")
+            for district in re.findall(r"\$\$(\d+)\$\$", json.loads(content)):
+                url = f"{PA_API}GetCountyBreak?officeId={office}&districtId={district}&methodName=GetCountyBreak&electionid={election}&electiontype=G&isactive=0"
+                detail = get(client, url)
+                if detail:
+                    store("PA", url, detail, ".json")
     PARSED.mkdir(parents=True, exist_ok=True)
     (PARSED / "pages.json").write_text(json.dumps(pages))
     print({state: len(urls) for state, urls in pages.items()})
@@ -150,6 +220,83 @@ def rows(state: str, url: str, path: Path):
                 "reporting": int(row["PrecinctsReporting"] or 0),
                 "total": int(row["Precincts"] or 0),
             }
+        return
+    if state == "IL":
+        for row in csv.DictReader(path.read_text(encoding="utf-8-sig").splitlines()):
+            found = IL_CONTEST.fullmatch(row["ContestName"].strip())
+            if found is None or row["EISCandidateID"] == "0":
+                continue
+            yield {
+                "office": "senate" if "SENATOR" in row["ContestName"] else "governor" if found[1] is None else "house",
+                "district": found[1] or "",
+                "party": row["PartyName"].title(),
+                "county": IL_CITIES.get(row["JurisName"], row["JurisName"].title()),
+                "candidate": row["CandidateName"].strip(),
+                "write_in": "write-in" in row["CandidateName"].lower(),
+                "votes": int(row["VoteCount"] or 0),
+                "as_of": None,
+                "reporting": None,
+                "total": None,
+            }
+        return
+    if state == "NC":
+        with zipfile.ZipFile(path) as archive, archive.open(archive.namelist()[0]) as handle:
+            for row in csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8"), delimiter="\t"):
+                found = NC_CONTEST.fullmatch(row["Contest Name"].strip())
+                if found is None:
+                    continue
+                yield {
+                    "office": "house" if found[1] else "senate" if row["Contest Name"] == "US SENATE" else "governor",
+                    "district": (found[1] or "").lstrip("0"),
+                    "party": row["Choice Party"].strip(),
+                    "county": row["County"].title(),
+                    "candidate": row["Choice"].strip(),
+                    "write_in": row["Choice"].lower().startswith("write-in"),
+                    "votes": int(row["Total Votes"] or 0),
+                    "as_of": None,
+                    "reporting": None,
+                    "total": None,
+                }
+        return
+    if state == "IN":
+        for region in json.loads(path.read_bytes().decode("utf-8-sig"))["Root"]["OfficeCategory"]["Regions"]["Region"]:
+            races = region["Races"]["Race"]
+            for race in races if isinstance(races, list) else [races]:
+                for candidate in race["Candidates"]["Candidate"]:
+                    yield {
+                        "office": "house",
+                        "district": region["MAP_JURISDICTION_NAME"],
+                        "party": candidate["PARTY_ABBREV"],
+                        "county": race["Jurisdiction"]["FIPS"],
+                        "candidate": re.sub(r"\s*\(W/I\)$", "", candidate["NAME_ON_BALLOT"]),
+                        "write_in": "(W/I)" in candidate["NAME_ON_BALLOT"],
+                        "votes": int(candidate["TOTAL_VOTES"] or 0),
+                        "as_of": None,
+                        "reporting": None,
+                        "total": None,
+                    }
+        return
+    if state == "PA":
+        found = re.search(r"officeId=(\d+)&districtId=\d+&methodName=GetCountyBreak", url)
+        if found is None:
+            return
+        for district, counties in json.loads(json.loads(path.read_bytes()))["Election"].items():
+            number = re.match(r"(\d+)", district)
+            for county in counties:
+                for name, candidates in county.items():
+                    for candidate in candidates:
+                        yield {
+                            "office": PA_OFFICES[found[1]],
+                            "district": number[1] if number else "",
+                            "party": candidate["PartyName"],
+                            "county": name.title(),
+                            "candidate": candidate["CandidateName"].strip(),
+                            "write_in": "write-in" in candidate["CandidateName"].lower(),
+                            "votes": int(candidate["Votes"] or 0),
+                            "as_of": None,
+                            "reporting": None,
+                            "total": None,
+                        }
         return
     detail = json.loads(path.read_bytes())
     found = EV_OFFICES.fullmatch(detail["name"][0]["text"].strip())
