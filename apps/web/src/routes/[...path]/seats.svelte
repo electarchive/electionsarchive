@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
+  import { arrange, isUnplaced } from "#lib/caucus.js";
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
@@ -161,38 +162,18 @@
   let pointer = "mouse";
   let pressed: number | null = null;
 
-  const isUnplaced = (party: { key: string; lean: number | null }) =>
-    party.lean == null && /^(?:party:)?[0-9a-f]{8}-/.test(party.key);
   const unplaced = $derived(folded.filter(isUnplaced));
-  const ordered = $derived.by(() => {
-    const known = folded
-      .filter((party) => party.lean != null)
-      .toSorted((a, b) => (a.lean ?? 0) - (b.lean ?? 0) || b.seats - a.seats);
-    let rest = 0;
-    for (const party of known) {
-      rest += party.seats;
-    }
-    rest /= 2;
-    let middle: number | null = null;
-    for (const party of known) {
-      rest -= party.seats;
-      if (rest <= 0) {
-        middle = party.lean;
-        break;
-      }
-    }
-    const spot = (party: (typeof folded)[number]) =>
-      party.lean ??
-      (isUnplaced(party)
-        ? ((party.near == null
-            ? null
-            : folded.find((other) => other.keys.includes(party.near ?? ""))
-                ?.lean) ??
-            middle ??
-            Infinity) + 0.005
-        : Infinity);
-    return folded.toSorted((a, b) => spot(a) - spot(b) || b.seats - a.seats);
-  });
+  const gone = $derived(
+    link == null && moved != null
+      ? given.flatMap((party) => {
+          const delta = moved[party.key];
+          return party.seats === 0 && delta != null && delta < 0
+            ? [{ ...party, keys: [party.key], delta }]
+            : [];
+        })
+      : [],
+  );
+  const ordered = $derived(arrange(folded));
   const totals = $derived.by(() => {
     let [all, local] = [vacant + seceded + held, 0];
     for (const party of folded) {
@@ -324,7 +305,13 @@
               ),
             )
             .toSorted((a, b) => b.seats - a.seats)[0] ?? party;
-        return [party.key, swatch(head.color, head.key)];
+        return [
+          party.key,
+          swatch(
+            head.color,
+            /^[0-9a-f]{8}-/.test(head.key) ? `party:${head.key}` : head.key,
+          ),
+        ];
       }),
     ),
   );
@@ -860,11 +847,13 @@
     </div>
   {/if}
   <ul class="grid grid-cols-[minmax(0,1fr)] gap-px text-sm/tight">
-    {#each ordered.toSorted((a, b) => b.seats - a.seats) as party (party.key)}
+    {#each [...ordered.toSorted((a, b) => b.seats - a.seats), ...gone] as party (party.key)}
       {const id = $derived(
         /^(?:party:)?([0-9a-f]{8}-[0-9a-f-]{27})$/.exec(party.key)?.[1] ?? null,
       )}
-      {const isMuted = $derived(link != null && party.here === 0)}
+      {const isMuted = $derived(
+        (link != null && party.here === 0) || party.seats === 0,
+      )}
       <li
         class={cn(
           "relative flex items-center gap-2 rounded-xs px-1.5 py-1 pointer-coarse:py-2",
@@ -879,7 +868,7 @@
         }}
         onpointerleave={() => (hovered = null)}
       >
-        {#if whole && folded.length > 1 && !isCompact}
+        {#if whole && folded.length > 1 && !isCompact && party.seats > 0}
           <button
             type="button"
             class="absolute inset-0 rounded-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"

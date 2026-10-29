@@ -493,44 +493,54 @@ const FINE = v.pipe(
   v.transform((value) => Math.round(value * 1e5) / 1e5),
 );
 
-const PlaceRow = v.object({
-  k: v.number(),
-  turnout: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
-  turnedBefore: v.optional(v.nullable(FINE)),
-  at: v.optional(v.nullable(v.tuple([FINE, FINE]))),
-  name: v.string(),
-  path: v.nullable(v.string()),
-  contest: v.boolean(),
-  isRemainder: v.boolean(),
-  valid: v.number(),
-  shares: v.array(FINE),
-  absent: v.optional(v.array(v.number())),
-  leader: v.nullable(v.number()),
-  held: v.optional(v.nullable(v.array(v.tuple([v.number(), v.number()])))),
-  margin: v.nullable(FINE),
-  earlier: v.nullable(v.array(FINE)),
-  prior: v.nullable(v.number()),
-  redrawn: v.optional(v.number()),
-  within: v.optional(v.number()),
-  seats: v.optional(v.nullable(v.number())),
-  isCounted: v.optional(v.boolean()),
-  isTally: v.optional(v.boolean()),
-  declared: v.optional(
-    v.nullable(
-      v.object({
-        kind: v.picklist(["elected", "won"]),
-        isTacit: v.boolean(),
-        label: v.string(),
-        color: v.nullable(v.string()),
-        person: v.nullable(v.string()),
-        party: v.nullable(v.string()),
-      }),
+const PlaceRow = v.pipe(
+  v.object({
+    k: v.number(),
+    turnout: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+    turnedBefore: v.optional(v.nullable(FINE)),
+    at: v.optional(v.nullable(v.tuple([FINE, FINE]))),
+    name: v.string(),
+    path: v.nullable(v.string()),
+    contest: v.boolean(),
+    isRemainder: v.boolean(),
+    valid: v.number(),
+    shares: v.array(v.number()),
+    people: v.optional(v.array(v.nullable(v.string()))),
+    absent: v.optional(v.array(v.number())),
+    leader: v.nullable(v.number()),
+    held: v.optional(v.nullable(v.array(v.tuple([v.number(), v.number()])))),
+    margin: v.nullable(FINE),
+    earlier: v.nullable(v.array(FINE)),
+    prior: v.nullable(v.number()),
+    redrawn: v.optional(v.number()),
+    within: v.optional(v.number()),
+    seats: v.optional(v.nullable(v.number())),
+    isCounted: v.optional(v.boolean()),
+    isTally: v.optional(v.boolean()),
+    declared: v.optional(
+      v.nullable(
+        v.object({
+          kind: v.picklist(["elected", "won"]),
+          isTacit: v.boolean(),
+          label: v.string(),
+          color: v.nullable(v.string()),
+          person: v.nullable(v.string()),
+          party: v.nullable(v.string()),
+        }),
+      ),
     ),
-  ),
-  isRecorded: v.optional(v.boolean()),
-  isPool: v.optional(v.boolean()),
-  status: v.optional(v.string()),
-});
+    isRecorded: v.optional(v.boolean()),
+    isPool: v.optional(v.boolean()),
+    status: v.optional(v.string()),
+  }),
+  v.transform((row) => {
+    const scale = 10 ** Math.max(5, Math.ceil(Math.log10(2 * row.valid + 1)));
+    return {
+      ...row,
+      shares: row.shares.map((share) => Math.round(share * scale) / scale),
+    };
+  }),
+);
 
 const Places = v.nullable(
   v.object({
@@ -3487,6 +3497,7 @@ async function tabulate(
       split: elects[index]?.split ?? null,
       valid: current?.side.valid ?? 0,
       isTally: current?.isTally === true,
+      isMulti: elects[index]?.isMulti === true,
     };
   });
   const silent = rows.flatMap((row, index) =>
@@ -3632,13 +3643,34 @@ async function tabulate(
       party: item.party,
     })),
     rows: compared.map(
-      ({ row, result, leader, seats, before, split, valid, isTally }) => {
+      ({
+        row,
+        result,
+        leader,
+        seats,
+        before,
+        split,
+        valid,
+        isTally,
+        isMulti,
+      }) => {
         const runner = result.find(
           (entry) =>
             entry.current != null &&
             !entry.key.startsWith("kind:") &&
             entry.key !== leader?.key,
         );
+        const people =
+          row.isContest && !isMulti
+            ? kept.map((item) => {
+                const cell = result.find(
+                  (entry) => entry.key === item.key,
+                )?.current;
+                return item.key.startsWith("person:") || cell?.person == null
+                  ? null
+                  : cell.label;
+              })
+            : [];
         const absent =
           valid > 0
             ? kept.flatMap((item, index) =>
@@ -3661,6 +3693,7 @@ async function tabulate(
               result.find((entry) => entry.key === item.key)?.current?.share ??
               0,
           ),
+          people: people.some((label) => label != null) ? people : undefined,
           absent: absent.length > 0 ? absent : undefined,
           leader:
             position.get(
@@ -19501,7 +19534,13 @@ export const bodies = {
             person: v.string(),
             name: v.string(),
             party: v.nullable(v.string()),
-            caucus: v.nullable(v.string()),
+            caucuses: v.array(
+              v.object({
+                party: v.string(),
+                from: v.nullable(v.string()),
+                to: v.nullable(v.string()),
+              }),
+            ),
             isIndependent: v.boolean(),
             spells: v.array(
               v.object({
@@ -19576,7 +19615,11 @@ export const bodies = {
           : await db.execute<{
               person: string;
               party: string | null;
-              caucus: string | null;
+              caucuses: Array<{
+                party: string;
+                from: string | null;
+                to: string | null;
+              }>;
               isIndependent: boolean;
               spells: Array<{
                 party: string | null;
@@ -19600,15 +19643,15 @@ export const bodies = {
                 t.ended_via::text as ended, t.contest_id as contest,
                 s.label as seat, s.apportioned_area_id as region, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id, inherited.place) as place,
                 coalesce(a.found and a.party_id is null, false) as "isIndependent",
-                (select coalesce(pm.into_id, g.party_id) from tenure_affiliation g
-                  left join entity_merge pm on pm.entity_id = g.party_id
-                  where g.tenure_id = t.id and g.kind = 'parliamentary_group' and g.party_id is not null
-                    and g.valid @> greatest(t.from_date, ${start}::date) limit 1) as caucus,
+                (select coalesce(json_agg(json_build_object('party', coalesce(pm.into_id, g.party_id),
+                    'from', lower(g.valid)::text, 'to', upper(g.valid)::text) order by lower(g.valid) nulls first), '[]')
+                  from tenure_affiliation g left join entity_merge pm on pm.entity_id = g.party_id
+                  where g.tenure_id = t.id and g.kind = 'parliamentary_group' and g.party_id is not null) as caucuses,
                 case when a.found then a.party else
-                  (select coalesce(pm.into_id, o.party_id, po.party_id) from contest_option o
+                  (select coalesce(pm.into_id, o.party_id, po.party_id, cd.member_of_party_id) from contest_option o
                     join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
                     left join contest_option po on po.id = o.parent_option_id
-                    left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+                    left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id, cd.member_of_party_id)
                     where o.contest_id = t.contest_id or o.contest_id in (
                       select k.id from contest k where k.allocation_parent_id = t.contest_id)
                     limit 1)
@@ -19680,7 +19723,7 @@ export const bodies = {
           ? (seated?.rows ?? [])
           : returned.rows.map((row) => ({
               ...row,
-              caucus: null,
+              caucuses: [],
               spells: [],
               seat: null,
               region: null,
@@ -19695,7 +19738,7 @@ export const bodies = {
           rows
             .flatMap((row) => [
               row.party,
-              row.caucus,
+              ...row.caucuses.map((caucus) => caucus.party),
               ...row.spells.map((spell) => spell.party),
             ])
             .filter((id) => id != null),
@@ -19755,7 +19798,7 @@ export const bodies = {
           person: row.person,
           name: labels.full.get(row.person) ?? "",
           party: row.party,
-          caucus: row.caucus === row.party ? null : row.caucus,
+          caucuses: row.caucuses,
           isIndependent: row.isIndependent,
           spells: row.spells,
           place:

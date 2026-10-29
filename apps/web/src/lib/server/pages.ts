@@ -519,6 +519,7 @@ export async function chamber(path: string) {
           )
           .join(">");
   const running = new Map<string | null, number>();
+  const came = new Map<string, Map<string, number>>();
   const days = Map.groupBy(body.changes, (row) => row.date)
     .entries()
     .map(([day, rows]) => {
@@ -534,6 +535,17 @@ export async function chamber(path: string) {
         if (move.kind !== "out") {
           running.set(move.to, (running.get(move.to) ?? 0) + move.members);
         }
+        if (
+          move.kind === "switch" &&
+          move.from != null &&
+          move.to != null &&
+          move.from !== "independent" &&
+          !move.from.startsWith("category:")
+        ) {
+          const tally = came.get(move.to) ?? new Map<string, number>();
+          tally.set(move.from, (tally.get(move.from) ?? 0) + move.members);
+          came.set(move.to, tally);
+        }
       }
       return {
         date: day,
@@ -541,6 +553,14 @@ export async function chamber(path: string) {
           .filter(([, count]) => count > 0)
           .map(([party, count]) => ({ party, seats: count }))
           .toSorted((a, b) => b.seats - a.seats),
+        near: Object.fromEntries(
+          [...came]
+            .filter(([party]) => (running.get(party) ?? 0) > 0)
+            .map(([party, tally]) => [
+              party,
+              [...tally].toSorted((a, b) => b[1] - a[1])[0]?.[0] ?? null,
+            ]),
+        ),
         moves: moves
           .filter((move) => move.kind !== "rename")
           .map(({ kind, from, to, cause, members }) => ({
@@ -626,12 +646,18 @@ export async function chamber(path: string) {
               (end == null || day.date < end) &&
               day.moves.length > 0,
           )
-          .map(({ date, parties, moves }) => ({ date, parties, moves }))
+          .map(({ date, parties, near, moves }) => ({
+            date,
+            parties,
+            near,
+            moves,
+          }))
       : [];
     return {
       ...term,
       parties: [...seats].map(([party, count]) => ({ party, seats: count })),
       steps,
+      near: days.findLast((day) => day.date <= settled)?.near ?? {},
       end,
       total: total(term.parties),
       size: size(term.start),
@@ -706,6 +732,7 @@ export async function chamber(path: string) {
       ),
     ),
     members,
+    kin: Object.fromEntries([...kin].filter(([id, root]) => id !== root)),
     renames: body.changes
       .filter((row) => row.kind === "rename")
       .map((row) => `${row.from}|${row.to}`),

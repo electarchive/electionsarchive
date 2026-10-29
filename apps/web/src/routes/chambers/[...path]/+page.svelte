@@ -74,7 +74,7 @@
   const roll = $derived(
     (members.data?.members ?? []).map((member) => ({
       ...member,
-      party: partyOn(member, on, first),
+      party: partyOn(member, on),
       segments: segments(
         member,
         first,
@@ -181,11 +181,15 @@
     ),
   );
   const hemicycle = $derived.by(() => {
+    const near =
+      term?.steps.findLast((step) => step.date <= on)?.near ?? term?.near ?? {};
     const keys = new Set((term?.parties ?? []).map((entry) => entry.party));
-    const home = (party: string | null) =>
-      party == null || keys.has(party)
-        ? party
-        : (own.get(party)?.parent ?? party);
+    const home = (party: string | null) => {
+      const root = party == null ? null : (data.kin[party] ?? party);
+      return root == null || keys.has(root)
+        ? root
+        : (own.get(root)?.parent ?? root);
+    };
     const seated = Map.groupBy(
       sitting.toSorted(
         (a, b) =>
@@ -206,39 +210,13 @@
         entry.party == null
           ? null
           : (info.get(entry.party) ?? own.get(entry.party));
-      const came = Map.groupBy(
-        party == null || party.lean != null
-          ? []
-          : (seated.get(entry.party) ?? []).flatMap((member) => {
-              const current = member.spells.find(
-                (spell) =>
-                  (spell.from ?? "") <= on &&
-                  (spell.to == null || spell.to > on),
-              );
-              const before = member.spells
-                .filter(
-                  (spell) =>
-                    current?.from != null &&
-                    spell.to != null &&
-                    spell.to <= current.from,
-                )
-                .toSorted((a, b) => (b.to ?? "").localeCompare(a.to ?? ""))[0];
-              const from = before?.party == null ? null : home(before.party);
-              return from == null || from === entry.party ? [] : [from];
-            }),
-        (from) => from,
-      );
       return {
         key: entry.party ?? "none",
         label: party?.label ?? m.record_none(),
         short: party?.short ?? null,
         color: party?.color ?? null,
         lean: party?.lean ?? null,
-        near:
-          came
-            .entries()
-            .toArray()
-            .toSorted((a, b) => b[1].length - a[1].length)[0]?.[0] ?? null,
+        near: entry.party == null ? null : (near[entry.party] ?? null),
         seats: entry.seats,
         here: 0,
         members: (seated.get(entry.party) ?? []).map((member) => ({

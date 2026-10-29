@@ -5141,7 +5141,7 @@ function chamberMarkdown(
   const opened = members?.start ?? close;
   const roll = (members?.members ?? []).map((member) => ({
     ...member,
-    party: partyOn(member, close, opened),
+    party: partyOn(member, close),
     segments: segments(member, opened, close, new Set(renames)),
   }));
   const everyone = [

@@ -84,7 +84,10 @@
   );
   const fold = (id: string | null) => (id == null ? null : (kin.get(id) ?? id));
   const tint = (id: string | null) =>
-    swatch(info.get(id ?? "")?.color ?? null, `party:${id ?? ""}`);
+    swatch(
+      info.get(id ?? "")?.color ?? null,
+      /^[0-9a-f]{8}-/.test(id ?? "") ? `party:${id ?? ""}` : (id ?? ""),
+    );
   const label = (id: string | null) =>
     id == null
       ? m.record_none()

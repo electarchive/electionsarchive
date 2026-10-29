@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
+  import { arrange, ARRIVALS, DEPARTURES } from "#lib/caucus.js";
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
@@ -29,9 +29,11 @@
       isPartial: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
+      near?: Record<string, string | null>;
       steps?: Array<{
         date: string;
         parties: Array<{ party: string | null; seats: number }>;
+        near?: Record<string, string | null>;
         moves: Array<{
           kind: "in" | "out" | "switch" | "rename";
           from: string | null;
@@ -77,7 +79,10 @@
   const tint = (party: string | null) =>
     party == null
       ? swatch(null, "")
-      : swatch(info.get(party)?.color ?? null, `party:${party}`);
+      : swatch(
+          info.get(party)?.color ?? null,
+          /^[0-9a-f]{8}-/.test(party) ? `party:${party}` : party,
+        );
   const label = (party: string | null) =>
     party == null
       ? m.record_none()
@@ -143,38 +148,59 @@
       const unit = isShare ? inner / whole : inner / peak;
       const stack = (
         parties: Array<{ party: string | null; seats: number }>,
+        near: Record<string, string | null> = {},
       ) => {
         const seats = new Map(
           parties.map((entry) => [entry.party, entry.seats]),
         );
+        const entry = (party: string | null) => ({
+          key: party ?? "none",
+          party,
+          lean: info.get(party ?? "")?.lean ?? null,
+          near: party == null ? null : (near[party] ?? null),
+          seats: seats.get(party) ?? 0,
+        });
         let below = 0;
-        const layers: Array<[string | null, { y0: number; y1: number }]> = [];
-        for (const party of order) {
-          const value = seats.get(party) ?? 0;
-          layers.push([
-            party,
-            {
-              y0: PAD.top + inner - below * unit,
-              y1: PAD.top + inner - (below + value) * unit,
-            },
-          ]);
+        const layers = new Map<string | null, { y0: number; y1: number }>();
+        for (const { party, seats: value } of arrange(
+          [...seats.keys()].map(entry).filter((item) => item.seats > 0),
+        )) {
+          layers.set(party, {
+            y0: PAD.top + inner - below * unit,
+            y1: PAD.top + inner - (below + value) * unit,
+          });
           below += value;
         }
-        return { layers: new Map(layers), below };
+        let top = PAD.top + inner - below * unit;
+        for (const { party } of arrange(order.map(entry)).toReversed()) {
+          const at = layers.get(party);
+          if (at == null) {
+            layers.set(party, { y0: top, y1: top });
+          } else {
+            top = at.y0;
+          }
+        }
+        return { layers, below };
       };
-      const { below } = stack(term.parties);
-      const opening = { from: term.start, parties: term.parties, step: null };
+      const { below } = stack(term.parties, term.near);
+      const opening = {
+        from: term.start,
+        parties: term.parties,
+        near: term.near,
+        step: null,
+      };
       const marks = [
         opening,
         ...(term.steps ?? []).map((step) => ({
           from: step.date,
           parties: step.parties,
+          near: step.near,
           step,
         })),
       ];
       const parts = marks.map((part, at) => {
         const after = marks[at + 1];
-        const { layers, below: seated } = stack(part.parties);
+        const { layers, below: seated } = stack(part.parties, part.near);
         const open =
           term.isSeated && full != null
             ? Math.max(0, full - seated - term.seceded)

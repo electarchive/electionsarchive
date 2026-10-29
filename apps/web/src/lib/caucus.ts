@@ -55,7 +55,7 @@ export function effective(entry: {
 export function partyOn(
   member: {
     party: string | null;
-    caucus?: string | null;
+    caucuses?: Array<{ party: string; from: string | null; to: string | null }>;
     category?: "elected" | "appointed" | "ex_officio";
     isIndependent: boolean;
     from: string | null;
@@ -67,30 +67,38 @@ export function partyOn(
     }>;
   },
   day: string,
-  opened: string,
 ) {
-  const covering = (value: string) =>
-    member.spells.find(
+  const covering = <T extends { from: string | null; to: string | null }>(
+    list: Array<T>,
+    value: string,
+  ) =>
+    list.find(
       (entry) =>
         (entry.from ?? "") <= value && (entry.to == null || entry.to > value),
     );
-  const spell = covering(
+  const at =
     member.to != null && member.to <= day
       ? new Date(Date.parse(member.to) - 864e5).toISOString().slice(0, 10)
       : member.from != null && member.from > day
         ? member.from
-        : day,
+        : day;
+  const spells = member.spells.filter(
+    (entry) => entry.to == null || entry.to > (member.from ?? ""),
   );
-  const opening = covering(
-    member.from != null && member.from > opened ? member.from : opened,
-  );
+  const spell =
+    covering(spells, at) ??
+    ((spells[0]?.from ?? "") > at ? spells[0] : undefined);
+  const party =
+    spell != null ? spell.party : spells.length === 0 ? member.party : null;
+  const caucus = covering(member.caucuses ?? [], at)?.party ?? null;
   return effective({
     ...member,
-    party: spell != null ? spell.party : opening == null ? member.party : null,
+    party,
+    caucus: caucus === party ? null : caucus,
     isIndependent:
       spell != null
         ? spell.party == null
-        : opening != null || member.isIndependent,
+        : spells.length > 0 || member.isIndependent,
   });
 }
 
@@ -117,7 +125,7 @@ export function segments(
   ].toSorted();
   const out: Array<{ party: string | null; from: string; to: string }> = [];
   for (const [index, from] of cuts.slice(0, -1).entries()) {
-    const party = partyOn(member, from, opened);
+    const party = partyOn(member, from);
     const to = cuts[index + 1] ?? high;
     const last = out.at(-1);
     if (
@@ -199,4 +207,49 @@ export function stand(
     })),
     ...added,
   ];
+}
+
+export const isUnplaced = (party: { key: string; lean: number | null }) =>
+  party.lean == null && /^(?:party:)?[0-9a-f]{8}-/.test(party.key);
+
+export function arrange<
+  T extends {
+    key: string;
+    keys?: Array<string>;
+    lean: number | null;
+    near?: string | null;
+    seats: number;
+  },
+>(parties: Array<T>) {
+  const known = parties
+    .filter((party) => party.lean != null)
+    .toSorted((a, b) => (a.lean ?? 0) - (b.lean ?? 0) || b.seats - a.seats);
+  let rest = 0;
+  for (const party of known) {
+    rest += party.seats;
+  }
+  rest /= 2;
+  let middle: number | null = null;
+  for (const party of known) {
+    rest -= party.seats;
+    if (rest <= 0) {
+      middle = party.lean;
+      break;
+    }
+  }
+  const spot = (party: T) =>
+    party.lean ??
+    (isUnplaced(party)
+      ? ((party.near == null
+          ? null
+          : parties.find((other) =>
+              (other.keys ?? [other.key]).includes(party.near ?? ""),
+            )?.lean) ??
+          middle ??
+          Infinity) + 0.005
+      : Infinity);
+  return parties.toSorted(
+    (a, b) =>
+      spot(a) - spot(b) || b.seats - a.seats || a.key.localeCompare(b.key),
+  );
 }
