@@ -51,7 +51,7 @@ export async function logos(
           when 'year' then (i.valid_from + interval '1 year')::date
           when 'month' then (i.valid_from + interval '1 month')::date
           else i.valid_from end as f
-      from party_image i where i.party_id = any(${sql.param(ids)}::uuid[]) and i.mark_path is not null
+      from party_image i where i.party_id = any(${sql.param(ids)}::uuid[])
     ), named as (
       select entity_id, max(coalesce(upper(valid), 'infinity'::date)) as last, min(lower(valid)) as founded
       from name where kind in ('official', 'abbreviation') and entity_id = any(${sql.param(ids)}::uuid[])

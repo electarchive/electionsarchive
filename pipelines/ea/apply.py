@@ -336,6 +336,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ),
             [stage.pipeline, stage.pipeline],
         )
+    if table in stage.sweeps:
+        conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.swept(table)))
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
         conflict = (
@@ -945,8 +947,6 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         )
     if table in stage.drops:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.dropped(table)))
-    if table in stage.sweeps:
-        conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.swept(table)))
     if table in stage.temporal:
         conn.execute(
             sql.SQL(
