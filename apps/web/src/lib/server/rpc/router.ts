@@ -9,6 +9,7 @@ import {
   search,
 } from "#lib/server/rpc/archive.js";
 import { coverage } from "#lib/server/rpc/coverage.js";
+import { live } from "#lib/server/rpc/live.js";
 import { seats } from "#lib/server/rpc/seats.js";
 
 export const router = {
@@ -17,6 +18,7 @@ export const router = {
   coverage,
   elections,
   entities,
+  live,
   parties,
   people,
   polities,
