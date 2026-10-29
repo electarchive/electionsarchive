@@ -13731,7 +13731,9 @@ export const elections = {
             select from external_id x where x.entity_id = c.election_id and x.scheme = 'gb.leh.type'
               and split_part(x.value, ':', 1) in ('SDT', 'UAT', 'MB')
           ) as "isStaggered", case when coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' then (
-            select sum(k.magnitude)::int from contest k where k.election_id = c.election_id and k.body_id = c.body_id and k.allocation_parent_id is null and not k.notional
+            select sum(k.magnitude)::int from contest k join election e on e.id = k.election_id
+            where k.body_id = c.body_id and k.allocation_parent_id is null and not k.notional
+              and (e.id = c.election_id or e.parent_id = (select p.parent_id from election p where p.id = c.election_id))
           ) end as covered
           from contest c
           left join electoral_system es on es.id = c.electoral_system_id
