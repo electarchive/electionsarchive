@@ -941,6 +941,31 @@ FEEDS.update(
             "Columbia County Elections",
             "Voters' Pamphlet, November 3, 2026 General Election: Index of Candidates on Ballot",
         ),
+        "OR-41029": (
+            "https://www.jacksoncountyor.gov/Document%20Center/Departments/Clerk/Elections/General%20Elections/Nov%203,%202026/List%20of%20City%20Candidates%20(November%202026).pdf",
+            "Jackson County Elections",
+            "List of City Candidates, November 3, 2026 General Election",
+        ),
+        "OR-41041": (
+            "https://co.lincoln.or.us/DocumentCenter/View/8365/List-of-Candidates-and-Measures-for-the-November-2026-General-Election?bidId=",
+            "Lincoln County Clerk",
+            "List of Candidates & Measures, November 3, 2026 General Election",
+        ),
+        "OR-41035": (
+            "https://www.klamathcounty.org/DocumentCenter/View/2313/City-Candidates-PDF",
+            "Klamath County Clerk / Elections",
+            "City Candidates, November 3, 2026 General Election",
+        ),
+        "OR-41003": (
+            "https://re.bentoncountyor.gov/current-election/candidates/",
+            "Benton County Records and Elections",
+            "November 3 General Election: Open Positions and Candidate Filings",
+        ),
+        "OR-41003-rcv": (
+            "https://re.bentoncountyor.gov/current-election/candidates/",
+            "Benton County Records and Elections",
+            "November 3 General Election: Open Positions and Candidate Filings (ranked choice contests)",
+        ),
         "OR-41067": (
             "https://www.washingtoncountyor.gov/elections/current-election",
             "Washington County Elections Division",
@@ -1071,6 +1096,11 @@ GA_STATE = (
 GA_BALLOTS = {"Fulton", "Gwinnett", "Cobb", "DeKalb", "Clayton", "Paulding", "Houston", "Columbia", "Richmond"}
 ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"]
 DELIVERED = {
+    "OR-41003": DATA / "inbox" / "y26" / "or" / "benton.html",
+    "OR-41003-rcv": DATA / "inbox" / "y26" / "or" / "benton.html",
+    "OR-41029": DATA / "inbox" / "y26" / "or" / "jackson_city.pdf",
+    "OR-41041": DATA / "inbox" / "y26" / "or" / "lincoln.pdf",
+    "OR-41035": DATA / "inbox" / "y26" / "or" / "kl_city.pdf",
     "04013": DATA
     / "inbox"
     / "manual"
