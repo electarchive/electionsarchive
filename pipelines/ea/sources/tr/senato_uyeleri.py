@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.senato_uyeleri"
-VERSION = "3"
+VERSION = "4"
 SENATE = UUID("fa08c487-e2d8-5d2e-9fc0-7f3bce579c1f")
 MEMBERS = Path(__file__).with_name("senato_uyeleri.tsv")
 PUBLISHER = "Türkiye Büyük Millet Meclisi Vakfı"
@@ -179,12 +179,16 @@ def emit() -> Path:
                         join(second[4], first[4])
                         break
 
-        def winner(link: str) -> UUID:
+        def winner(link: str, *names: str) -> UUID:
             day, _, name = link.removeprefix("elected:").partition(":")
             found = {
                 find(person)
                 for _, _, held_on, _, person, text, *_ in elected
                 if held_on == date.fromisoformat(day) and surname(text) == fold(name)
+            } or {
+                find(person)
+                for _, _, held_on, _, person, text, *_ in elected
+                if held_on == date.fromisoformat(day) and surname(text) in {fold(other) for other in names}
             }
             if len(found) != 1:
                 raise ValueError(f"{link} matches {len(found)} winners")
@@ -192,7 +196,10 @@ def emit() -> Path:
 
         for row in rows:
             if row["acquired_via"] == "elected" and not row["link"].startswith(f"elected:{row['from']}:"):
-                join(winner(f"elected:{row['from']}:{row['name'].split()[-1]}"), winner(row["link"]))
+                join(
+                    winner(f"elected:{row['from']}:{row['name'].split()[-1]}", row["link"].rpartition(":")[2]),
+                    winner(row["link"]),
+                )
 
         def member(row: dict[str, str]) -> str:
             return (

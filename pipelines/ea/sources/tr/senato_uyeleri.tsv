@@ -54,7 +54,7 @@ II-8	Fahri Korutürk	1903-1987	ex_officio	1980-04-06	1980-09-12	dissolved	sicil:
 267	İlhan Arsel	1921	appointed	1966-06-07	1966-07-04	resigned		Resigned before taking his seat.
 	Suat Hayri Ürgüplü	1903-1981	appointed	1966-06-07	1972-06-05	term_end	wikidata:Q2306500
 14	Cemal Madanoğlu	1907-1993	appointed	1966-06-07	1972-06-05	term_end		A natural member under Article 70, he resigned by letter on 25 October 1961 without taking his seat.
-268	Lütfi Akatlı	1902-1988	appointed	1966-06-07	1972-06-05	term_end
+268	Lütfi Akatlı	1902-1988	appointed	1966-07-04	1972-06-05	term_end		Appointed on 4 July 1966 in place of İlhan Arsel, who resigned before taking his seat (TBMM Albümü, vol. 4).
 311	Hayri Dener	1898-1980	appointed	1968-06-07	1974-06-06	term_end
 312	Vahap Güvenç	1926	appointed	1968-06-07	1974-06-06	term_end
 313	Fahri Korutürk	1903-1987	appointed	1968-06-07	1973-04-06	appointed		Elected President of the Republic.
@@ -115,18 +115,29 @@ II-8	Fahri Korutürk	1903-1987	ex_officio	1980-04-06	1980-09-12	dissolved	sicil:
 307	Nurettin Ertürk	1911-1977	elected	1968-06-02	1977-03-28	died	elected:1968-06-02:ERTÜRK
 350	Ayhan Peker	1931-1974	elected	1973-10-14	1974-04-02	died	elected:1973-10-14:PEKER
 361	Fevzi Geveci	1909-1974	elected	1973-10-14	1974-07-11	died	elected:1973-10-14:GEVECİ
-365	İbrahim Halil Balkıs	1919-1978	elected	1973-10-14	1978-01-05	died	elected:1973-10-14:BALKIS
+365	İbrahim Halil Balkıs	1919-1978	elected	1973-10-14	1975-10-12	term_end	elected:1973-10-14:BALKIS	Left at the 1975 renewal (Çöker, vol. II, p. 375); the index records his death in 1978.
 300	Ruhi Tunakan	1915-1979	elected	1977-06-05	1979-03-01	died	elected:1977-06-05:TUNAKAN
 47	Enver Aka	1901-1988	elected	1961-10-15	1968-06-02	term_end	elected:1961-10-15:AKA
-131	Cenap Aksu	1905-1984	elected	1961-10-15	1966-06-05	term_end	elected:1961-10-15:AKSU
-148	Cemalettin Bulak	1907-1975	elected	1961-10-15	1966-06-05	term_end	elected:1961-10-15:BULAK
+131	Cenap Aksu	1905-1984	elected	1961-10-15	1968-06-02	term_end	elected:1961-10-15:AKSU	Left at the 1968 renewal (Çöker, vol. I, and the TBMM Albümü, vol. 4).
+148	Cemalettin Bulak	1907-1975	elected	1961-10-15	1964-06-07	term_end	elected:1961-10-15:BULAK	Left at the 1964 renewal (Çöker, vol. I, p. 435, and the TBMM Albümü, vol. 4); the index says 1966.
 40	Mansur Ulusoy	1910-1973	elected	1966-06-05	1973-10-14	term_end	elected:1966-06-05:ULUSOY
 77	Gavsi Uçagök	1904-1969	elected	1966-06-05	1969-03-27	died	elected:1966-06-05:UÇAGÖK	Died in office in Ankara on 27 March 1969 (Çöker, vol. I, p. 225).
-263	Aslan Bora	1914-1974	elected	1966-06-05	1973-10-14	term_end	elected:1966-06-05:BORA
+263	Aslan Bora	1914-1974	elected	1966-06-05	1974-01-27	died	elected:1966-06-05:BORA	Died in office in Ankara on 27 January 1974 (Çöker, vol. II, and the TBMM Albümü, vol. 4).
 264	Etem Karakapıcı	1917-1973	elected	1966-06-05	1973-01-17	died	elected:1966-06-05:KARAKAPICI	Died in office on 17 January 1973 (Çöker, vol. II, p. 115); the index has him leaving at the 1973 renewal.
 273	Cemalettin İnkaya	1927	elected	1968-06-02	1975-10-12	term_end	elected:1968-06-02:İNKAYA
 286	Nazif Çağatay	1906-1976	elected	1968-06-02	1976-12-15	died	elected:1968-06-02:ÇAĞATAY	Died in office on 15 December 1976 (Çöker, vol. II, p. 183); the index has him leaving at the 1975 renewal.
 159	Zihni Betil	1910-1979	elected	1973-10-14	1979-09-16	died	elected:1973-10-14:BETİL	Died in office in Istanbul on 16 September 1979 (Çöker, vol. I, p. 469); the index has him leaving at the 1979 renewal.
 363	Kazım Kangal	1925	elected	1973-10-14	1977-06-05	term_end	elected:1973-10-14:KANGAL	Left at the 1977 renewal (Çöker, vol. II, p. 367); the index says 1979.
 382	Sıtkı Yırcalı	1908-1988	elected	1975-10-12	1980-09-12	dissolved	elected:1975-10-12:YIRCALI
-365	İbrahim Halil Balkış	1924-1978	elected	1973-10-14	1975-10-12	term_end	elected:1973-10-14:BALKIŞ	Left at the 1975 renewal (Çöker, vol. II, p. 375); the index records his death in 1978.
+100	İzzet Birand	1903-1968	elected	1961-10-15	1968-02-12	died	elected:1961-10-15:BİRAND	Died in office on 12 February 1968 (Çöker, vol. I, and the TBMM Albümü, vol. 4); the index has him leaving at the 1968 renewal.
+270	Ali Celâlettin Coşkun	1916-1976	elected	1968-06-02	1976-12-26	died	elected:1968-06-02:COŞKUN	Died in office in Ankara on 26 December 1976 (Çöker, vol. II, and the TBMM Albümü, vol. 4).
+335	Kâmran İnan	1929	elected	1973-10-14	1979-06-04	resigned	elected:1973-10-14:İNAN	Resigned on 4 June 1979 to take a post abroad (Çöker, vol. II); the TBMM Albümü, vol. 4, gives 7 June 1979.
+	İhsan Sabri Çağlayangil		elected	1966-06-05			elected:1961-10-15:ÇAĞLIYANGİL	
+	Haldun Menteşeoğlu		elected	1966-06-05			elected:1961-10-15:MENTEŞOĞLU	
+	Erdoğan Adalı		elected	1973-10-14			elected:1964-06-07:ADALILAR	
+	Mehmet Tekin Arıburun		elected	1973-10-14			elected:1964-06-07:ARIBURNU	
+	Nejat Sarıcalı		elected	1979-10-14			elected:1973-10-14:SARLICALI	
+	Safa Yalçuk		elected	1968-06-02			elected:1964-06-07:YALÇUK	
+	Mustafa Delivelli		elected	1979-10-14			elected:1973-10-14:DELİVELİ	
+	Mustafa Gülçiğil		elected	1979-10-14			elected:1973-10-14:GÜLCÜGİL	
+	Lütfü Tokoğlu		elected	1975-10-12			elected:1966-06-05:TOKOĞLU	
