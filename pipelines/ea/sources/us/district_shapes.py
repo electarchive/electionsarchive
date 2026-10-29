@@ -144,6 +144,34 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://services1.arcgis.com/UpxtrwRYNaXVpkGe/arcgis/rest/services/PinalCountyJP_Boundaries/FeatureServer/0",
         "field": "Precinct",
     },
+    {
+        "publisher": "McHenry County GIS",
+        "title": "McHenry County Board Districts",
+        "pattern": r"^17:17111:(board-of-commissioners|county-board):district-",
+        "layer": "https://services1.arcgis.com/6iYC5AXXYapRVNzl/arcgis/rest/services/McHenry_County_Board_Districts/FeatureServer/0",
+        "field": "District",
+    },
+    {
+        "publisher": "Carroll County GIS",
+        "title": "Carroll County Commissioner Districts",
+        "pattern": r"^24:24013:(board-of-commissioners|council):district-",
+        "layer": "https://services.arcgis.com/Uf0DiYpD9NOFO5YH/arcgis/rest/services/CommissionerDistricts/FeatureServer/0",
+        "field": "COMMDIST",
+    },
+    {
+        "publisher": "Montgomery County Planning",
+        "title": "Montgomery County Council Districts",
+        "pattern": r"^24:24031:(council|board-of-commissioners):district-",
+        "layer": "https://montgomeryplans.org/server/rest/services/Overlays/County_Council_Districts/FeatureServer/0",
+        "field": "COUNCIL",
+    },
+    {
+        "publisher": "DuPage County GIS",
+        "title": "DuPage County Board Districts",
+        "pattern": r"^17:17043:(board-of-commissioners|county-board):district-",
+        "layer": "https://services.arcgis.com/neJvtQ4PXvnQ86MJ/arcgis/rest/services/County_Board_Dist_new/FeatureServer/0",
+        "field": "District",
+    },
 ]
 
 
