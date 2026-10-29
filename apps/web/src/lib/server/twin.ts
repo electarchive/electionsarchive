@@ -3980,7 +3980,20 @@ function contestMarkdown(
             ];
           }),
         ]),
-    resultsMarkdown(contest, then, link),
+    resultsMarkdown(
+      additional == null && lists?.isOpen === true && contest.scope.noun == null
+        ? {
+            ...contest,
+            rows: contest.rows.filter(
+              (row) =>
+                row.current?.person == null &&
+                !row.key.startsWith("kind:candidate:"),
+            ),
+          }
+        : contest,
+      then,
+      link,
+    ),
     ...(additional != null || !lists?.isOpen
       ? []
       : [

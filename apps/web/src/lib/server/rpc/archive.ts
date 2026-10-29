@@ -10398,14 +10398,18 @@ export const contests = {
             from chosen
             cross join lateral (
               select r.option_k, r.measure, r.count_round, r.value from result_rollup r
-              where r.result_set_k = chosen.k and r.area_k = ${contest.place?.k ?? 0} and r.measure = any(${COUNTED}) offset 0
+              where r.result_set_k = chosen.k and r.area_k = ${contest.place?.k ?? 0} and (r.measure = any(${COUNTED}) or r.measure = 10) offset 0
             ) r
           ),
           main as (
             select (${COUNTED})[min(array_position(${COUNTED}, measure))] as measure, min(count_round) as round from picked
+            where measure = any(${COUNTED})
           )
-          select p.option_k as k, sum(p.value)::float8 as votes
-          from picked p join main on main.measure = p.measure and main.round = p.count_round
+          select p.option_k as k, coalesce(
+            sum(p.value) filter (where p.measure = main.measure),
+            sum(p.value) filter (where p.measure = 10)
+          )::float8 as votes
+          from picked p join main on main.round = p.count_round
           group by p.option_k
         `),
         db.execute<{ person: string; contest: string }>(sql`
