@@ -1839,6 +1839,9 @@ for key, publisher, title, url, local in (
     ("IL-17095", "Knox County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://cms2.revize.com/revize/knoxcounty/Specimen%20Ballot%20-%20GE2026.pdf", "il/knox.pdf"),
     ("IL-17081", "Jefferson County Clerk", "Official Ballot, General Election, November 3, 2026", "https://cms2.revize.com/revize/jeffersoncounty/Document%20center/County%20Clerks%20Docs/Elections/2026%20General/November%202026%20PUBLICATION%20Ballot.pdf", "il/jefferson.pdf"),
     ("IL-17027", "Clinton County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://clintonco.illinois.gov/wp-content/uploads/2026-GE-ballot-pages.pdf", "il/clinton.pdf"),
+    ("MO-29169", "Pulaski County Clerk", "Combined Sample Ballot, General Election, November 3, 2026", "https://www.pulaskivotes.org/p/what-on-ballot.html", "mo/pulaski.pdf"),
+    ("MO-29027", "Callaway County Clerk", "Official Ballot Style 1, General Election, November 3, 2026", "https://callawaycountyclerk.com/wp-content/uploads/2026/09/BP-70C31_20260921_112602.pdf", "mo/callaway.pdf"),
+    ("IL-17115", "Macon County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://maconcounty.illinois.gov/download/specimen-ballot/", "il/macon.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
