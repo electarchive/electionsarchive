@@ -9,7 +9,7 @@ from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "6"
+VERSION = "8"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -64,6 +64,21 @@ NAMES = {
         ],
     ),
     "yeni-parti-2026": (YENI, [("New Party", "english", "en", date(2026, 7, 24), None)]),
+}
+REGISTRY = "https://www.yargitaycb.gov.tr/sipars"
+REGISTRY_TITLE = "Siyasi Parti Genel Bilgileri"
+ABBREVIATIONS: dict[str, tuple[str | None, str | None, tuple[str, str] | str | None]] = {
+    "saadet-partisi": ("Saadet", "SP", ("tr", "Saadet Partisi")),
+    "zafer-partisi": ("Zafer", "ZP", ("tr", "Zafer Partisi")),
+    "gelecek-partisi": (None, "GP", ("tr", "Gelecek Partisi")),
+    "sosyalist-devrim-partisi": (None, "SDP", ("tr", "Sosyalist Devrim Partisi")),
+    "yenilik-partisi": ("Yenilik", "YP", REGISTRY),
+    "anadolu-birligi-partisi": (None, "ABP", REGISTRY),
+    "turkiye-sosyalist-isci-partisi": (None, "TSİP", REGISTRY),
+    "memleket-partisi": ("Memleket", None, None),
+    "milli-yol-partisi": ("Milli Yol", None, None),
+    "anadolu-partisi": ("Anadolu", None, None),
+    "vatan-partisi": ("Vatan", None, None),
 }
 HDP_OPEN = (
     "HDP was not closed. Facing a closure case at the Constitutional Court, it handed its active political work to "
@@ -340,11 +355,13 @@ ARTICLES = sorted(
     {cite for *_, cite in RELATIONS if isinstance(cite, tuple)}
     | {cite for *_, cite in VEHICLES}
     | {LIST, ("en", "Left Party (Turkey)"), ("tr", "Genç Parti"), DEM, YENI}
+    | {cite for _, _, cite in ABBREVIATIONS.values() if isinstance(cite, tuple)}
     | {("tr", "2018 Türkiye genel seçimleri"), ("tr", "2023 Türkiye genel seçimleri")}
 )
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, REGISTRY, suffix=".html")
     for host, title in ARTICLES:
         raw.fetch(SOURCE, WIKITEXT.format(host, quote(title.replace(" ", "_"))), suffix=".wiki")
 
@@ -378,6 +395,18 @@ def emit() -> Path:
             license=ysk.LICENSE,
             notes=COURT_NOTES,
         )
+        sources[REGISTRY] = cs.source("Yargıtay Cumhuriyet Başsavcılığı", REGISTRY_TITLE)
+        cs.add(
+            "source",
+            id=sources[REGISTRY],
+            kind="official_body",
+            publisher="Yargıtay Cumhuriyet Başsavcılığı",
+            title=REGISTRY_TITLE,
+            url=REGISTRY,
+            license=ysk.LICENSE,
+            notes="The Court of Cassation prosecutor's register of political parties, with each party's short name (Kısa Ad).",
+        )
+        cs.artifact(raw.cached(SOURCE, REGISTRY), sources[REGISTRY])
         for host, title in ARTICLES:
             sources[host, title] = cs.source("Wikipedia", title)
             cs.add(
@@ -458,6 +487,34 @@ def emit() -> Path:
                     text=text,
                     reason="Replaced by the party's dated names.",
                 )
+        for key, (old, abbreviation, cite) in ABBREVIATIONS.items():
+            party = known[key]
+            if old is not None:
+                for name_id, text, start, end in conn.execute(
+                    "select id, text, valid_from, valid_to from name where entity_id = %s and kind = 'abbreviation' and text = %s and lang = 'tr'",
+                    [party, old],
+                ).fetchall():
+                    cs.add(
+                        "name_drop",
+                        name_id=name_id,
+                        entity_id=party,
+                        text=text,
+                        reason="The registered short name is not an abbreviation; stored as a short name.",
+                    )
+                    cs.add(
+                        "name",
+                        entity_id=party,
+                        text=text,
+                        lang="tr",
+                        kind="short",
+                        valid_from=start,
+                        valid_from_precision="day",
+                        valid_to=end,
+                        valid_to_precision="day",
+                    )
+            if abbreviation is not None:
+                cs.add("name", entity_id=party, text=abbreviation, lang="tr", kind="abbreviation")
+                cs.add("citation", entity_id=party, source_id=sources[cite], locator={"name": abbreviation})
         cs.add("note", entity_id=parties["halklarin-demokratik-partisi"], kind="context", body_md=HDP_OPEN)
         for origin, kind, target, day, precision, cite in RELATIONS:
             cs.add(
