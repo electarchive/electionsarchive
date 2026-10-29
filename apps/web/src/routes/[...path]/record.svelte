@@ -240,7 +240,7 @@
     }> = [];
     for (const span of spans) {
       const run = runs.at(-1);
-      const label = span.head?.split(" ").at(-1) ?? "";
+      const label = span.head?.name.split(" ").at(-1) ?? "";
       if (run?.label === label && run.party === span.party) {
         run.w = span.x + span.w - run.x;
       } else {
@@ -673,7 +673,12 @@
             {sitting.name}
           </span>
           {#if sitting.head != null}
-            <span>{m.record_governments_head({ name: sitting.head })}</span>
+            <span
+              >{m.record_governments_head({ name: "" })}<Name
+                label={sitting.head.name}
+                person={sitting.head.id}
+              /></span
+            >
           {/if}
           <span class="font-figures text-xs text-muted-foreground tabular-nums"
             >{date(sitting.from)} – {sitting.to == null

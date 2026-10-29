@@ -52,7 +52,7 @@
     }>;
     governments: Array<{
       name: string;
-      head: string | null;
+      head: { id: string; name: string } | null;
       party: string | null;
       from: string;
       to: string | null;
@@ -802,7 +802,12 @@
         {sitting.name}
       </span>
       {#if sitting.head != null}
-        <span>{m.record_governments_head({ name: sitting.head })}</span>
+        <span
+          >{m.record_governments_head({ name: "" })}<Name
+            label={sitting.head.name}
+            person={sitting.head.id}
+          /></span
+        >
       {/if}
       <span class="font-figures text-xs text-muted-foreground tabular-nums"
         >{date(sitting.from)} – {sitting.to == null

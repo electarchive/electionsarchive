@@ -689,9 +689,10 @@
                     <span class="font-semibold">{cabinet.name}</span>
                     {#if cabinet.head != null}
                       <span class="text-muted-foreground"
-                        >{m.record_governments_head({
-                          name: cabinet.head,
-                        })}</span
+                        >{m.record_governments_head({ name: "" })}<Name
+                          label={cabinet.head.name}
+                          person={cabinet.head.id}
+                        /></span
                       >
                     {/if}
                     {#if cabinet.isCaretaker}

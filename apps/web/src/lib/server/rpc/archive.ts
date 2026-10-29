@@ -16801,7 +16801,10 @@ export async function record(input: { id: string; body?: string }) {
       ),
     governments: cabinets.rows.map((row) => ({
       name: row.name ?? "",
-      head: row.head == null ? null : (labels.full.get(row.head) ?? null),
+      head:
+        row.head == null
+          ? null
+          : { id: row.head, name: labels.full.get(row.head) ?? "" },
       party: row.party,
       from: row.from,
       to: row.to,
@@ -17871,7 +17874,7 @@ export const polities = {
         governments: v.array(
           v.object({
             name: v.string(),
-            head: v.nullable(v.string()),
+            head: v.nullable(v.object({ id: v.string(), name: v.string() })),
             party: v.nullable(v.string()),
             from: v.string(),
             to: v.nullable(v.string()),

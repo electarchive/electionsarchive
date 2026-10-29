@@ -12,6 +12,7 @@
   } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import Export from "#lib/components/export.svelte";
+  import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -680,7 +681,10 @@
             </p>
             {#if government.head != null}
               <p class="text-[0.8125rem] text-muted-foreground">
-                {government.head}
+                <Name
+                  label={government.head.name}
+                  person={government.head.id}
+                />
               </p>
             {/if}
           </div>

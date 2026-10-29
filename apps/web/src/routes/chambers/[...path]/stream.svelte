@@ -47,7 +47,7 @@
     }>;
     governments: Array<{
       name: string;
-      head: string | null;
+      head: { id: string; name: string } | null;
       party: string | null;
       from: string;
       to: string | null;

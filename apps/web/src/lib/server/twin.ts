@@ -2041,7 +2041,7 @@ function polityMarkdown(
                 government.isCaretaker
                   ? `${government.name} (${m.governments_caretaker()})`
                   : government.name,
-                government.head,
+                government.head?.name ?? null,
                 government.party == null
                   ? null
                   : (labels.get(government.party) ?? null),
