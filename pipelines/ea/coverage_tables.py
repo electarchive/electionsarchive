@@ -102,6 +102,12 @@ DISTRICT_CALENDAR = {
         5,
         "Township of North Bergen, FAQ on the mayoral transition: next municipal election May 11, 2027, https://www.northbergen.org/News/View/12009/frequently-asked-questions-on-the-mayoral-transition",
     ),
+    ("NY", "Buffalo"): (
+        4,
+        1,
+        11,
+        "Wikipedia, 2025 Buffalo mayoral election (Common Council and mayor elected November 4, 2025 for four-year terms; Buffalo City Charter), https://en.wikipedia.org/wiki/2025_Buffalo_mayoral_election",
+    ),
     ("NJ", "Newark City School System"): (
         1,
         0,
@@ -1509,7 +1515,8 @@ def build(full: bool = False) -> str:
                 "population": population,
                 "population_basis": population_basis,
                 "active": active,
-                "elected": elected,
+                # NJ county vocational boards are appointed by the county executive or commissioners (N.J.S.A. 18A:54-16, https://pub.njleg.state.nj.us/statutes), not elected.
+                "elected": elected and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name)),
                 "polity_id": pid,
             }
         )
