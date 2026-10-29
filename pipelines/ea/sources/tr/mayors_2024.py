@@ -215,7 +215,7 @@ def emit() -> Path:
                     row["to_precision"] or "day",
                 )
                 for row in sorted(switches.get(top[5], []), key=lambda row: row["valid_from"] or "0")
-                if row["party"]
+                if row["party"] and (row["valid_from"] or row["valid_to"])
             ]
             if top[6] is not None and (not spans or (spans[0][1] is not None and spans[0][0] != top[6])):
                 spans.insert(
