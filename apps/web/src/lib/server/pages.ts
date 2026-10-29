@@ -712,13 +712,16 @@ export async function chamber(path: string) {
     kind: string;
     lang: string;
     text: string;
+    since: string | null;
+    until: string | null;
   }>(sql`
-    select t.start::text as start, n.entity_id::text as id, n.kind::text as kind, n.lang, n.text
-    from unnest(${sql.param(terms.map((term) => term.start))}::date[]) t(start)
-    join name n on n.valid @> t.start and not (lower_inf(n.valid) and upper_inf(n.valid))
+    select t.start::text as start, n.entity_id::text as id, n.kind::text as kind, n.lang, n.text,
+      lower(n.valid)::text as since, upper(n.valid)::text as until
+    from unnest(${sql.param(terms.map((term) => term.start))}::date[], ${sql.param(terms.map((term) => term.end ?? null))}::date[]) t(start, finish)
+    join name n on n.valid && daterange(t.start, t.finish) and not (lower_inf(n.valid) and upper_inf(n.valid))
       and n.kind in ('official', 'english', 'native', 'abbreviation')
       and n.entity_id = any(${sql.param([id, ...recent.keys().filter((key) => /^[\da-f-]{36}$/u.test(key))])}::uuid[])
-    order by n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc
+    order by n.valid @> t.start desc, lower(n.valid), n.is_preferred desc, (n.lang = 'en') desc, n.recorded_from desc
   `);
   const at = Map.groupBy(dated.rows, (row) => row.start);
   const titled = terms.map((term) => {
@@ -743,23 +746,31 @@ export async function chamber(path: string) {
         )
           .entries()
           .flatMap(([party, names]) => {
-            const label = (
+            const label =
               names.find((row) => row.kind === "official") ??
-              names.find((row) => row.kind === "english")
-            )?.text;
-            return label == null
-              ? []
-              : [
-                  [
-                    party,
-                    {
-                      label,
-                      short:
-                        names.find((row) => row.kind === "abbreviation")
-                          ?.text ?? null,
-                    },
-                  ] as const,
-                ];
+              names.find((row) => row.kind === "english");
+            if (label == null) {
+              return [];
+            }
+            const on =
+              label.since != null && label.since > term.start
+                ? label.since
+                : term.start;
+            return [
+              [
+                party,
+                {
+                  label: label.text,
+                  short:
+                    names.find(
+                      (row) =>
+                        row.kind === "abbreviation" &&
+                        (row.since == null || row.since <= on) &&
+                        (row.until == null || on < row.until),
+                    )?.text ?? null,
+                },
+              ] as const,
+            ];
           }),
       ),
     };

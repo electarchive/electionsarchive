@@ -457,26 +457,33 @@
     return d;
   });
   const names = $derived.by(() => {
-    const placed: Array<{ party: string; x: number; y: number }> = [];
+    const placed: Array<{ party: string; x: number; y: number; text: string }> =
+      [];
     for (const party of [...groups, ...order]) {
       if (party == null || blocs.has(party)) {
         continue;
       }
-      const text = label(party);
-      let best: { x: number; y: number; room: number } | null = null;
+      let best: { x: number; y: number; room: number; text: string } | null =
+        null;
       for (const part of slices) {
+        const text = label(party, columns[part.column]?.term.names);
         const at = part.spans.get(party) ?? part.stack.get(party);
         const thick = at == null ? 0 : at.y0 - at.y1;
         const wide = part.x1 - part.x0;
         if (at != null && thick >= 15 && wide >= text.length * 6.6 + 12) {
           const room = thick * Math.min(wide, 220);
           if (best == null || room > best.room) {
-            best = { x: (part.x0 + part.x1) / 2, y: (at.y0 + at.y1) / 2, room };
+            best = {
+              x: (part.x0 + part.x1) / 2,
+              y: (at.y0 + at.y1) / 2,
+              room,
+              text,
+            };
           }
         }
       }
       if (best != null) {
-        placed.push({ party, x: best.x, y: best.y });
+        placed.push({ party, x: best.x, y: best.y, text: best.text });
       }
     }
     return placed;
@@ -564,6 +571,7 @@
   const sitting = $derived(
     cabinets.find((cabinet) => cabinet.from === seated) ?? null,
   );
+  const shown = $derived((lit ?? columns[current])?.term.names);
   const legend = $derived(
     [...groups, ...order.filter((party) => !blocs.has(party ?? ""))]
       .filter(
@@ -581,7 +589,9 @@
       )
       .filter(
         (party, index, all) =>
-          all.findIndex((other) => label(other) === label(party)) === index,
+          all.findIndex(
+            (other) => label(other, shown) === label(party, shown),
+          ) === index,
       )
       .slice(0, 14),
   );
@@ -802,7 +812,7 @@
         text-anchor="middle"
         class="pointer-events-none text-[0.6875rem] font-semibold"
         style:fill={`color(from ${tint(name.party)} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
-        >{label(name.party)}</text
+        >{name.text}</text
       >
     {/each}
     <path
@@ -1104,10 +1114,10 @@
           : null}
       ></span>
       {#if party == null || info.get(party)?.isMade === true}
-        <span class="text-muted-foreground">{label(party)}</span>
+        <span class="text-muted-foreground">{label(party, shown)}</span>
       {:else}
         <Name
-          label={label(party)}
+          label={label(party, shown)}
           {party}
           color={tint(party)}
           hasSwatch={false}
