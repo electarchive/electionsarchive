@@ -16,7 +16,7 @@ PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "redbook"
 PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "New York State Legislature"
-TAGS = ("sonnet", "opus")
+TAGS = ("sonnet", "opus", "opushi")
 COUNTY = {"New York": "36061", "Bronx": "36005", "Kings": "36047", "Queens": "36081", "Richmond": "36085"}
 ONES = ("", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth")
 TENS = {"twentieth": 20, "thirtieth": 30, "twenty": 20, "thirty": 30}
@@ -174,8 +174,9 @@ def read(year: int, tag: str) -> pl.DataFrame:
     current: dict[str, int | None] = {}
     for page in spec["pages"]:
         path = INBOX / f"{spec['volume']}-p{page}-{tag}.json"
-        if not path.exists():
-            path = INBOX / f"{spec['volume']}-p{page}-{TAGS[0]}.json"
+        for fallback in reversed(TAGS[: TAGS.index(tag)]):
+            if not path.exists():
+                path = INBOX / f"{spec['volume']}-p{page}-{fallback}.json"
         if not path.exists():
             continue
         data = json.loads(path.read_text())
