@@ -27,103 +27,120 @@
    "page": 1,
    "id": "pres1",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 2,
    "id": "pres2",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 3,
    "id": "pres3",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 4,
    "id": "pres4",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 5,
    "id": "pres5",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 6,
    "id": "pres6",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 7,
    "id": "pres7",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 8,
    "id": "pres8",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 9,
    "id": "pres9",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 10,
    "id": "pres10",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 11,
    "id": "pres11",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 12,
    "id": "pres12",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 13,
    "id": "pres13",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 14,
    "id": "pres14",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 15,
    "id": "pres15",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 16,
    "id": "pres16",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   },
   {
    "page": 17,
    "id": "pres17",
    "orientation": "counties_down",
-   "discover": "pres"
+   "discover": "pres",
+   "hint": "Each county is a block with one line per candidate. Make each county one row and each candidate one column, in printed order, with the candidate's name as the header (votes only, not percentages), then a Total for County column."
   }
  ]
 }
