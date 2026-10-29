@@ -14,10 +14,11 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "11"
+VERSION = "12"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
+LATE_FOUNDINGS = Path(__file__).with_name("wikidata_late_foundings.tsv")
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
     "US": "Q30",
@@ -797,6 +798,21 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), positioned)
         report: Counter[tuple[str, str]] = Counter()
         shades: defaultdict[UUID, list[tuple[str, date | None, date | None]]] = defaultdict(list)
+        evidence: dict[UUID, tuple[date, str]] = {}
+        for party, day, what in conn.execute(
+            """select o.party_id, min(e.date_from), 'option' from contest_option o
+               join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               where o.party_id is not null group by 1
+               union all
+               select party_id, min(valid_from), 'tenure_affiliation' from tenure_affiliation
+               where party_id is not null and valid_from is not null group by 1
+               union all
+               select n.entity_id, min(n.valid_from), 'name' from name n join party p on p.id = n.entity_id
+               where n.valid_from is not null group by 1"""
+        ).fetchall():
+            if party not in evidence or day < evidence[party][0]:
+                evidence[party] = (day, what)
+        late: list[dict[str, object]] = []
         for party, iso, kind, full, short, codes, first, last, options in parties:
             if party not in found:
                 continue
@@ -824,14 +840,29 @@ def emit() -> Path:
                 report[scope, "linked"] += 1
                 if len(inceptions[linked[party]]) == 1:
                     founded, precision = next(iter(inceptions[linked[party]]))
-                    cs.add(
-                        "party_founding",
-                        party_id=party,
-                        date=founded,
-                        date_precision=precision,
-                        source_id=wikidata,
-                    )
-                    report[scope, "founded"] += 1
+                    earliest = evidence.get(party)
+                    if earliest is not None and earliest[0] < founded:
+                        late.append(
+                            {
+                                "party": party,
+                                "polity": iso,
+                                "name": full[0] if full else "",
+                                "item": linked[party],
+                                "inception": founded,
+                                "precision": precision,
+                                "earliest": earliest[0],
+                                "evidence": earliest[1],
+                            }
+                        )
+                    else:
+                        cs.add(
+                            "party_founding",
+                            party_id=party,
+                            date=founded,
+                            date_precision=precision,
+                            source_id=wikidata,
+                        )
+                        report[scope, "founded"] += 1
             sourced = spectrum(linked.get(party)) or spectrum(inherited)
             hand_position = sourced_positions.get(str(party))
             span = (
@@ -915,6 +946,16 @@ def emit() -> Path:
             cs.add(
                 "name_drop", name_id=name_id, entity_id=party, text=text, reason="Named after an unlinked Wikidata item"
             )
+        with LATE_FOUNDINGS.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=["party", "polity", "name", "item", "inception", "precision", "earliest", "evidence"],
+                delimiter="\t",
+                lineterminator="\n",
+            )
+            writer.writeheader()
+            writer.writerows(sorted(late, key=lambda row: (str(row["polity"]), str(row["name"]))))
+        print(f"{len(late)} Wikidata inceptions fall after the party's earliest option, affiliation, or dated name")
         for scope in sorted({scope for scope, _ in report}):
             print(
                 f"{scope}: {report[scope, 'linked']} of {report[scope, 'parties']} parties linked, "

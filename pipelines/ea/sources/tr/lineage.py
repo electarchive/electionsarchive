@@ -9,7 +9,7 @@ from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "9"
+VERSION = "10"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -71,6 +71,7 @@ NAMES = {
 }
 REGISTRY = "https://www.yargitaycb.gov.tr/sipars"
 REGISTRY_TITLE = "Siyasi Parti Genel Bilgileri"
+FOUNDED = {"genc-parti": date(1992, 11, 26)}
 ABBREVIATIONS: dict[str, tuple[str | None, str | None, tuple[str, str] | str | None]] = {
     "saadet-partisi": ("Saadet", "SP", ("tr", "Saadet Partisi")),
     "zafer-partisi": ("Zafer", "ZP", ("tr", "Zafer Partisi")),
@@ -500,6 +501,14 @@ def emit() -> Path:
                     text=text,
                     reason="Replaced by the party's dated names.",
                 )
+        for key, founded in FOUNDED.items():
+            cs.add(
+                "party_founding",
+                party_id=known[key],
+                date=founded,
+                date_precision="day",
+                source_id=sources[REGISTRY],
+            )
         for key, (old, abbreviation, cite) in ABBREVIATIONS.items():
             party = known[key]
             if old is not None:
