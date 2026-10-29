@@ -20,7 +20,7 @@ from ea.sources.it.storico import EXISTING, NEW, NEW_OVERRIDES, NORTH, OVERRIDES
 from ea.store import DATA, connect
 
 SOURCE = "it.senato"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/senato/senato-{day:%Y%m%d}.zip"
 ELIGENDO = (
@@ -1768,7 +1768,7 @@ def emit() -> Path:
                     "contest_option",
                     id=option,
                     contest_id=contest,
-                    kind="list",
+                    kind="independents" if label in INDEPENDENT else "list",
                     party_id=party_of(label, day.year) if alliance_of(label, day, election) is None else None,
                     alliance_id=alliance_of(label, day, election),
                     ballot_label=label,

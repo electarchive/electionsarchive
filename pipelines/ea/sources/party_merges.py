@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "party_merges"
-VERSION = "3"
+VERSION = "4"
 MERGES = {
     "330bfd15-7970-5a47-9c1a-cb2b2632b5d7": "bc509349-9b70-5653-a994-69f2077ef882",
     "9fab4680-3011-5c3a-bd33-bdc6e96693aa": "8788ac83-2ebc-584d-9382-d46868efd147",
@@ -17,6 +17,7 @@ MERGES = {
     "67fda830-80c9-5975-a316-f611441d26c8": "ce2006d2-f0ae-5fc6-9279-3a6e924bd4a0",
     "ac8b37ef-f631-5d97-b065-59307c4e3402": "ce2006d2-f0ae-5fc6-9279-3a6e924bd4a0",
     "01a13b7e-b158-7755-a39c-0b4a8f4ada26": "e5a44fd1-55cf-51c8-b70c-f4c8c4d4a6ad",
+    "14a3aef4-1f43-5cd1-904b-3c4a6206c502": "64e4d6a9-f3a2-5eda-bd8f-59803a21612e",
 }
 
 
@@ -28,7 +29,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "One party recorded twice by two pipelines, or twice by one, merged into the record that carries "
-                "its other elections (PCF, PS, RPR, UMP, and the 2009 Majorité présidentielle list in France; NCD in Italy; Volt in Germany; the Partei der Arbeit in Switzerland; Podemos in Brazil)"
+                "its other elections (PCF, PS, RPR, UMP, and the 2009 Majorité présidentielle list in France; NCD and the Südtiroler Volkspartei's 1948 and 1953 Senate lists, filed under their Edelweiss symbol, in Italy; Volt in Germany; the Partei der Arbeit in Switzerland; Podemos in Brazil)"
             ),
             polity=None,
             kind="correction",

@@ -236,6 +236,7 @@ NEW = {
     "PPST": ("Südtiroler Volkspartei", "SVP", "party"),
     "PPST-PPTT": ("Südtiroler Volkspartei", "SVP", "party"),
     "SVP": ("Südtiroler Volkspartei", "SVP", "party"),
+    "EDELWEISS": ("Südtiroler Volkspartei", "SVP", "party"),
     "UV": ("Union Valdôtaine", "UV", "party"),
     "COMUNITA'": ("Movimento Comunità", None, "party"),
     "DEM.PROL": ("Democrazia Proletaria", "DP", "party"),
