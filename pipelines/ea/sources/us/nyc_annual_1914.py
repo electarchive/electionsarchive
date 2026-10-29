@@ -20,6 +20,35 @@ FIRST_PAGE, LAST_PAGE = 81, 83
 COUNTY = {"York": "36061", "Bronx": "36005", "Kings": "36047", "Queens": "36081", "Richmond": "36085"}
 NUMBER = re.compile(r"^\d{1,3}(,\d{3})*$")
 TOLERANCE = 0.001
+OFFICES = {
+    "lieutenant-governor": (84, 87, "lieutenant-governor:NY", "Lieutenant Governor", (
+        ("Thomas B. Lockwood", "democratic-party"), ("Edward Schoeneck", "republican-party"),
+        ("Chauncey J. Hamlin", "NY:progressive-party"), ("Stephen J. Mahoney", "NY:socialist"),
+        ("Charles E. Welch", None), ("Jeremiah D. Crowley", None))),
+    "secretary-of-state": (88, 90, "secretary-of-state:NY", "Secretary of State", (
+        ("Mitchell May", "democratic-party"), ("Francis M. Hugo", "republican-party"),
+        ("Sydney W. Stern", "NY:progressive-party"), ("Florence Cross Kitchelt", "NY:socialist"),
+        ("John R. Clements", None), ("Edmund Moonelis", None))),
+    "comptroller": (91, 93, "comptroller:NY", "Comptroller", (
+        ("William Sohmer", "democratic-party"), ("Eugene M. Travis", "republican-party"),
+        ("John B. Burnham", "NY:progressive-party"), ("Charles W. Noonan", "NY:socialist"),
+        ("Neil D. Cranmer", None), ("Charles E. Berns", None))),
+    "treasurer": (94, 96, "treasurer:NY", "Treasurer", (
+        ("Albert C. Carp", "democratic-party"), ("James L. Wells", "republican-party"),
+        ("Homer D. Call", "NY:progressive-party"), ("James C. Sheahan", "NY:socialist"),
+        ("Edward A. Packer", None), ("Anthony Houtenbrink", None))),
+    "attorney-general": (97, 99, "attorney-general:NY", "Attorney General", (
+        ("James A. Parsons", "democratic-party"), ("Egburt E. Woodbury", "republican-party"),
+        ("Robert H. Elder", "NY:progressive-party"), ("Frederick Haller", "NY:socialist"),
+        ("Walter T. Bliss", None), ("Edward R. O'Malley", None), ("John Hall", None))),
+}
+OFFICE_NOTE = (
+    "Assembly district returns for {office} from the Board of Elections' annual report canvass of the vote cast at the "
+    "general election, read from HathiTrust's page OCR for New York, Bronx, Kings, and Queens counties. Richmond prints "
+    "one county line and no assembly districts, so it is not here. A candidate's column in a county is loaded only when "
+    "its assembly district lines add up to a total the report prints for that county and column. The set holds the "
+    "city's districts only, so the leader and percentages shown are the city's, not the state's, and a column left out below changes them. The assembly districts are those of 1914 and have no shape in the archive."
+)
 COLUMNS = (
     ("Glynn", "Dem", "Martin H. Glynn", "Democratic", "democratic-party"),
     ("Glynn", "Ind", "Martin H. Glynn", "Independence League", "NY:independence-league"),
@@ -137,6 +166,82 @@ def parse() -> None:
     pl.DataFrame(rows, schema=["county", "page", "ad", "column", "value", "header"], orient="row").write_parquet(
         PARSED / "lines.parquet"
     )
+    state = []
+    for office, (first, last, _, _, candidates) in OFFICES.items():
+        count = len(candidates)
+        bare = []
+        cells: dict[str, dict[tuple[int, float], tuple[int, list[tuple[int, int]]]]] = collections.defaultdict(dict)
+        printed = collections.defaultdict(set)
+        county = "36061"
+        previous = 0
+        for number in range(first, last + 1):
+            words = [
+                (int(m[1]), int(m[2]), int(m[3]), int(m[4]), m[5].strip())
+                for m in re.finditer(r'data-coords="(\d+) (\d+) (\d+) (\d+)" class="ocrx_word">([^<]*)<', pages[number - 1])
+            ]
+            lines: list[list] = []
+            for word in sorted(words, key=lambda t: (t[1] + t[3]) / 2):
+                center = (word[1] + word[3]) / 2
+                if lines and abs(lines[-1][0] - center) < 14:
+                    lines[-1][1].append(word)
+                    lines[-1][0] = (lines[-1][0] + center) / 2
+                else:
+                    lines.append([center, [word]])
+            for center, line in lines:
+                line.sort(key=lambda t: t[0])
+                text = " ".join(t[4] for t in line)
+                for name, fips in (("Bronx", "36005"), ("Kings", "36047"), ("Queens", "36081"), ("Richmond", "36085")):
+                    if re.search(rf"\b{name}\b", text) and re.search(r"\b(County|of)\b", text) and "Total" not in text and len(text) < 60:
+                        county = fips
+                numbers = [(t[2], int(t[4].replace(",", ""))) for t in line if NUMBER.match(t[4])]
+                label = re.match(r"^(\d{1,2}) \.+", text)
+                if label is None:
+                    label = re.match(r"^(\d{1,2}) \d", text)
+                    if label and not (len(numbers) == count + 1 and int(label.group(1)) <= 35 and line[0][2] < 400):
+                        label = None
+                if label and numbers:
+                    if NUMBER.match(line[0][4]):
+                        numbers = numbers[1:]
+                    ad = int(label.group(1))
+                    if county == "36061" and previous and ad < previous - 3:
+                        county = "36005"
+                    previous = ad
+                    cells[county][(number, center)] = (ad, numbers)
+                elif len(numbers) == count and "Total" not in text and not re.search(r"[A-Za-z]{3}", text):
+                    bare.append((number, center, county, numbers))
+                    printed[county].update(v for _, v in numbers if v >= 100)
+                else:
+                    printed[county].update(v for _, v in numbers if v >= 100)
+        for number, center, fips, numbers in bare:
+            rows_of = cells.get(fips, {})
+            before = [k for k in sorted(rows_of) if k < (number, center)]
+            after = [k for k in sorted(rows_of) if k > (number, center)]
+            if before and after and rows_of[after[0]][0] - rows_of[before[-1]][0] == 2:
+                rows_of[(number, center)] = (rows_of[before[-1]][0] + 1, numbers)
+        for fips, rows_of in cells.items():
+            by_page = collections.defaultdict(list)
+            for (number, center), (ad, numbers) in sorted(rows_of.items(), key=lambda kv: (kv[0][0], kv[0][1])):
+                by_page[number].append((ad, numbers))
+            ordered = [(n, ad, nums) for n, rs in sorted(by_page.items()) for ad, nums in rs]
+            columns: list[dict[int, int]] = [{} for _ in range(count)]
+            for index, (number, ad, numbers) in enumerate(ordered):
+                full = [r[1] for r in by_page[number] if len(r[1]) == count]
+                centers = [sorted(r[i][0] for r in full)[len(full) // 2] for i in range(count)]
+                if fips == "36005":
+                    ad = 31 + index
+                for x, value in numbers:
+                    nearest = min(range(count), key=lambda i: abs(centers[i] - x))
+                    if abs(centers[nearest] - x) < 40 and ad not in columns[nearest]:
+                        columns[nearest][ad] = value
+                    else:
+                        printed[fips].add(value)
+            for column, values in enumerate(columns):
+                total = sum(values.values())
+                for ad, value in values.items():
+                    state.append((office, fips, column, ad, value, total, total in printed[fips]))
+    pl.DataFrame(state, schema=["office", "county", "column", "ad", "value", "sum", "tied"], orient="row").write_parquet(
+        PARSED / "offices.parquet"
+    )
 
 
 COUNTY_NAME = {fips: fips for fips in COUNTY.values()}
@@ -144,6 +249,7 @@ COUNTY_NAME = {fips: fips for fips in COUNTY.values()}
 
 def emit():
     lines = pl.read_parquet(PARSED / "lines.parquet")
+    state = pl.read_parquet(PARSED / "offices.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -292,5 +398,107 @@ def emit():
                 flags=0,
                 value=value,
             )
+        election_area, system = conn.execute(
+            "select district_area_id, electoral_system_id from contest where id = %s", [contest]
+        ).fetchone()
+        polity_path = conn.execute(
+            "select path from slug where entity_id = (select polity_id from office where id = (select office_id from contest where id = %s)) and is_current",
+            [contest],
+        ).fetchone()[0]
+        for office, (_, _, office_key, label, candidates) in OFFICES.items():
+            (office_id,) = conn.execute(
+                "select entity_id from external_id where scheme = 'us.office' and value = %s", [office_key]
+            ).fetchone()
+            office_contest = cs.key("us.contest", f"{DAY}:NY:{office}")
+            cs.add(
+                "contest",
+                id=office_contest,
+                election_id=election,
+                kind="office",
+                office_id=office_id,
+                district_area_id=election_area,
+                magnitude=1,
+                round_number=1,
+                previous_round_id=None,
+                electoral_system_id=system,
+                default_result_kind="counted",
+                term="full",
+            )
+            cs.add("name", entity_id=office_contest, text=f"{DAY.year} New York {label} election", lang="en", kind="official", is_preferred=True)
+            cs.add("slug", path=f"us/ny/{DAY}-general/{office}", entity_id=office_contest)
+            office_set = cs.key(f"{SOURCE}.result_set", f"{DAY}:NY:{office}")
+            cs.add(
+                "result_set",
+                id=office_set,
+                election_id=election,
+                contest_id=office_contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=False,
+                completeness=None,
+            )
+            candidate_options = []
+            for name, party_key in candidates:
+                person = cs.key(f"{SOURCE}.person", slug(name))
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    cs.add("name", entity_id=person, text=name, lang="en", kind="official", is_preferred=True)
+                option = cs.key("us.option", f"{DAY}:NY:{office}:{slug(name)}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=office_contest,
+                    kind="candidate",
+                    party_id=None if party_key is None else cs.key("us.party", party_key),
+                    ballot_label=name,
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("us.candidacy", f"{DAY}:NY:{office}:{slug(name)}:head"),
+                    person_id=person,
+                    option_id=option,
+                    role="head",
+                    ballot_name=name,
+                    is_independent=False,
+                )
+                candidate_options.append(option)
+            left = []
+            for (fips, column), group in state.filter(pl.col("office") == office).group_by(["county", "column"]):
+                if not group["tied"][0]:
+                    left.append(f"{candidates[column][0]}'s column in {fips} is left out because its lines add up to {group['sum'][0]}, which no total printed for that county matches")
+                    continue
+                for ad, value in group.select("ad", "value").iter_rows():
+                    code = f"{fips}:{ad:02d}"
+                    if code not in units:
+                        units[code] = cs.unit("us.nyc_ad", code, DAY)
+                        if units[code] in cs.minted:
+                            cs.add(
+                                "reporting_unit",
+                                id=units[code],
+                                polity_id=city_polity,
+                                scheme_code="us.nyc_ad",
+                                code=code,
+                                parent_id=cs.unit("us.county", fips),
+                                area_relation="unlocated",
+                                area_id=None,
+                                kind="standard",
+                                valid_from=DAY,
+                                valid_to=DAY + timedelta(days=1),
+                            )
+                    cs.add(
+                        "result_value",
+                        result_set_id=office_set,
+                        unit_id=units[code],
+                        option_id=candidate_options[column],
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=value,
+                    )
+            cs.add("note", entity_id=office_set, kind="methodology", body_md=OFFICE_NOTE.format(office=label) + "".join(f" Note: {c}." for c in sorted(left)))
+            print(office, "left out:", sorted(left))
         print(f"{len(options)} options, {len(units)} units, {len(values)} values; {caveats}")
         return cs.write()
