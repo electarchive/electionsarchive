@@ -1255,6 +1255,8 @@ def finalize(
             seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
             if seen is not None:
                 cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
+            elif "value" in item:
+                cellmap[key] = (int(item["value"]), (0.0, 0.0, 1.0, 1.0))
         if how == "review" and fixes:
             target = chosen.printed if chosen.printed is not None else held.get(name)
             slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
