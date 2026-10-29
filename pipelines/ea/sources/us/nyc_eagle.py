@@ -35,7 +35,6 @@ YEARS = {
         "title": "Brooklyn Daily Eagle Almanac 1905",
         "table": [
             {"page": 636, "county": "BROOKLYN", "ads": 21, "columns": range(1, 9)},
-            {"page": 638, "county": "MANHATTAN", "ads": 36, "columns": range(1, 11)},
             {"page": 645, "county": "QUEENS", "ads": 3, "columns": range(1, 9)},
         ],
     },
@@ -175,6 +174,26 @@ def settle(reads: list, width: int, strict: bool = False):
     return (settled, total, off), None
 
 
+MANHATTAN_1903 = {
+    1: (
+        "Mayor S. Low Frs. 1903",
+        [949,1521,1998,2297,4243,1765,2616,1498,3003,2429,1953,1730,1724,2137,2340,2399,2313,2125,6916,2710,11271,2449,9203,2261,4153,2517,3852,2265,6122,3172,10296,3470,2935,6581,11160],
+    ),
+    2: (
+        "Mayor G.B. McClellan Dem. 1903",
+        [3200,4918,4869,3565,3715,5614,5031,2716,4465,3812,3910,3190,3977,4699,4694,3928,4609,6561,5264,5050,8117,5563,8782,4940,2762,3928,2565,5123,3841,6304,7740,6904,5246,11522,14783],
+    ),
+    3: (
+        "Comptroller F.W. Hinrichs Frs. 1903",
+        [932,1502,1989,2237,4172,1736,2633,1452,3005,2380,1949,1736,1720,2122,2320,2339,2298,2111,6832,2725,11184,2449,9116,2208,4127,2476,3842,2237,6045,3121,10114,3407,2910,6528,10986],
+    ),
+    4: (
+        "Comptroller E.M. Grout Dem. 1903",
+        [3200,4912,4857,3564,3758,5606,5011,2715,4468,3792,3903,3152,3944,4687,4704,3930,4598,6520,5288,5023,8174,5554,8814,4972,2807,3931,2562,5113,3901,6293,7835,6903,5258,11510,14863],
+    ),
+}
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     for year, spec in YEARS.items():
@@ -225,7 +244,7 @@ def parse() -> None:
                 for ad, row in result[0].items():
                     if ad == 99:
                         continue
-                    county = "BRONX" if table["county"] == "MANHATTAN" and ad >= 31 else table["county"]
+                    county = table["county"]
                     for index in table["columns"]:
                         if row[index] is not None:
                             out.append(
@@ -240,6 +259,12 @@ def parse() -> None:
                                 }
                             )
                 print(year, table["page"], "assembly districts loaded", len(result[0]), "from", len(reads), "reads")
+            if year == 1903:
+                for column, (header, values) in MANHATTAN_1903.items():
+                    for ad, value in enumerate(values, 1):
+                        out.append(
+                            {"county": "MANHATTAN", "ad": ad, "ed": 0, "column": column, "value": value, "page": 638, "header": header}
+                        )
             pl.DataFrame(
                 out,
                 schema={
@@ -361,7 +386,7 @@ OFFICE_TITLES = {
 
 
 def column_of(header: str, year: int) -> tuple[str, str, str] | None:
-    text = re.sub(r"\([^)]*\)", " ", header)
+    text = re.sub(r"\s+(?:18|19)\d\d$", "", re.sub(r"\([^)]*\)", " ", header).strip())
     office = None
     if re.search(r"(?i)\bmayor", text):
         office = "mayor"
@@ -369,10 +394,10 @@ def column_of(header: str, year: int) -> tuple[str, str, str] | None:
         office = "comptroller"
     elif re.search(r"(?i)boro|bor\. pr", text):
         office = "borough-president"
-    elif re.search(r"(?i)aldermen|pres\. b\. ?a", text):
+    elif re.search(r"(?i)aldermen|pres\. b[.d]", text):
         office = "president-board-of-aldermen"
     text = re.sub(
-        r"(?i)mayor:?|compt?(?:'r|\.|roller)?:?|pres\. of boro:?|pres\. boro\.?|bor\.? ?pr\.?|pres\. b\. ?a\.?|,? ?$",
+        r"(?i)mayor:?|compt?(?:'r|\.|roller)?:?|borough pres\.?|pres\. of boro:?|pres\. boro\.?|bor\.? ?pr\.?|pres\. bd\. of ald(?:ermen|\.)?|pres\. b\. ?a\.?|,? ?$",
         "",
         text,
     ).strip(" :.,")
@@ -381,14 +406,14 @@ def column_of(header: str, year: int) -> tuple[str, str, str] | None:
     text = re.sub(r",\s*Jr\.?", "", text)
     text = re.sub(r"^(Civic All\.?|Civ\. Al\.?)\s+(\w.*)$", r"\2, \1", text)
     name, _, party = text.partition(",")
-    tail = re.match(r"(.+?)\.?\s+((?:Rep|Dem|Fus)\S*)$", name)
+    tail = re.match(r"(.+?)\.?\s+((?:Rep|Dem|Fus|Frs)\S*)$", name)
     if tail:
         name, party = tail.group(1), f"{tail.group(2)} {party}".strip()
     if not party:
-        match = re.match(r"(.+?)\s+((?:Rep|Dem|Fus|Soc|Civ|Prog|Proh|Ind|B\.H)\S*(?:\s.*)?)$", text)
+        match = re.match(r"(.+?)\s+((?:Rep|Dem|Fus|Frs|Soc|Civ|Prog|Proh|Ind|B\.H)\S*(?:\s.*)?)$", text)
         name, party = (match.group(1), match.group(2)) if match else (text, "")
     name = re.sub(r"[.,]?\s*Jr\.?$", "", name.strip()).strip(" .,").replace("Pornes", "Fornes")
-    party = party.strip(" .,")
+    party = party.strip(" .,").replace("Frs", "Fus")
     surname = re.sub(r"[^a-z]", "", name.split()[-1].lower()) if name else ""
     surname = GARBLES.get(surname, surname)
     if office is None:
@@ -646,7 +671,7 @@ def emit():
                         + (
                             " Only the Brooklyn tables were read, so the citywide sets carry no completeness."
                             if year == 1901
-                            else " Only the Brooklyn and Queens tables tie to their printed totals; the Manhattan and Bronx table is left out, so the citywide sets carry no completeness."
+                            else " The Brooklyn and Queens tables tie to their printed totals on every column. The Manhattan and Bronx table (35 assembly districts of New York County, the annexed district left out) was read by eye on the page and loaded only for the mayor and comptroller columns, each of which adds up exactly to the printed total; its other columns do not tie and are left out, so the citywide sets carry no completeness."
                             if year == 1903
                             else ""
                         )
