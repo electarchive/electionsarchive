@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "22"
+VERSION = "23"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -8056,7 +8056,7 @@ def emit() -> Path:
                 to_date=end,
                 acquired_via="acting" if elected_in is None else "elected",
                 contest_id={LOCAL_ELECTIONS: mayoral[MARCH], RERUN_ELECTION: mayoral[RERUN]}.get(elected_in or ""),
-                ended_via="annulled" if cause == RERUN_ELECTION else None,
+                ended_via="annulled" if cause == RERUN_ELECTION else "removed" if cause == ARREST else None,
                 succeeds_tenure_id=previous,
             )
             cs.add("citation", entity_id=tenure, source_id=wikidata, locator={"statement": statement})
