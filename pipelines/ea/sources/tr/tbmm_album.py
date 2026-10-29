@@ -17,8 +17,26 @@ VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cdn.tbmm.gov.tr/TbmmWeb/Albumler/Tbmm_Albumu/Cilt2.pdf"
 TITLE = "TBMM Albümü 1920-2010, 2. Cilt (1950-1980)"
-PAGES = {12: (247, 312), 13: (313, 376), 14: (377, 440), 15: (441, 504), 16: (505, 568)}
-LABELS = {12: "I. (XII)", 13: "II. (XIII)", 14: "III. (XIV)", 15: "IV. (XV)", 16: "V. (XVI)"}
+PAGES = {
+    9: (21, 90),
+    10: (91, 166),
+    11: (167, 246),
+    12: (247, 312),
+    13: (313, 376),
+    14: (377, 440),
+    15: (441, 504),
+    16: (505, 568),
+}
+LABELS = {
+    9: "IX.",
+    10: "X.",
+    11: "XI.",
+    12: "I. (XII)",
+    13: "II. (XIII)",
+    14: "III. (XIV)",
+    15: "IV. (XV)",
+    16: "V. (XVI)",
+}
 OPENINGS = {
     12: date(1961, 10, 25),
     13: date(1965, 10, 22),
@@ -34,7 +52,14 @@ ELECTED = {
     15: date(1973, 10, 14),
     16: date(1977, 6, 5),
 }
-ALIASES = {"icel": "mersin", "maras": "kahramanmaras", "urfa": "sanliurfa", "afyon": "afyonkarahisar"}
+ALIASES = {
+    "seyhan": "adana",
+    "coruh": "artvin",
+    "icel": "mersin",
+    "maras": "kahramanmaras",
+    "urfa": "sanliurfa",
+    "afyon": "afyonkarahisar",
+}
 PARTIES = {
     "AP": "ADALET PARTİSİ",
     "MP": "MİLLET PARTİSİ",
@@ -61,7 +86,7 @@ HEADING = re.compile(r"^ {0,3}([A-ZÇĞİÖŞÜÂÎÛ][A-ZÇĞİÖŞÜÂÎÛ.' -
 PARTY_LINE = re.compile(r"^[A-ZÇĞİÖŞÜ/ –-]+$")
 DEATH = re.compile(r"Ölüm Tarihi: (\d\d)\.(\d\d)\.(\d{4})")
 BIRTH = re.compile(r"^(.+?) [–-] (\d{4}),")
-KNOWN = {fold(name) for name in [*PROVINCES, "İçel", "Urfa", "Maraş"]}
+KNOWN = {fold(name) for name in [*PROVINCES, "İçel", "Urfa", "Maraş", "Seyhan", "Çoruh"]}
 RUNNING = re.compile(r"YASAMA DÖNEMİ /|^\d{3,4}$|^TBMM Albümü$")
 
 
@@ -154,7 +179,7 @@ def parse() -> None:
                 "birthplace": None if birth is None else birth.group(1),
                 "born": None if birth is None else int(birth.group(2)),
                 "died": None if death is None else f"{death.group(3)}-{death.group(2)}-{death.group(1)}",
-                "by_election": re.search(rf"{re.escape(label)}(?: Dönem)? ?\(Ara Seçim\)", bio) is not None,
+                "by_election": re.search(rf"(?<![IVX]){re.escape(label)}(?: Dönem)? ?\(Ara Seçim\)", bio) is not None,
                 "bio": bio,
             }
         )
@@ -246,7 +271,7 @@ def emit() -> Path:
         counts: Counter[str] = Counter()
         written: set[object] = set()
         merged: set[object] = set()
-        for row in entries.iter_rows(named=True):
+        for row in entries.filter(pl.col("term").is_in(list(OPENINGS))).iter_rows(named=True):
             term = row["term"]
             province = ALIASES.get(fold(row["province"]), fold(row["province"]))
             person = cs.key(

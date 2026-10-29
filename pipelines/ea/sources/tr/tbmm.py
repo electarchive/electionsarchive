@@ -12,6 +12,7 @@ import httpx
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.tr.ysk import PROVINCES
 from ea.store import connect
 
 SOURCE = "tr.tbmm"
@@ -33,7 +34,7 @@ def detail(term: int, member: str) -> str:
 
 ENTRY = re.compile(
     r'<strong class="isim_soyisim"[^>]*>\s*([^<]+?)\s*<.*?milletvekilidetay\?DonemId=([0-9a-f-]+)&(?:amp;)?Id=([0-9a-f-]+)',
-    re.S,
+    re.DOTALL,
 )
 
 
@@ -194,7 +195,7 @@ def fetch() -> None:
                 list(workers.map(one, missing))
 
 
-TEXT = re.compile(r"<script.*?</script>|<style.*?</style>", re.S)
+TEXT = re.compile(r"<script.*?</script>|<style.*?</style>", re.DOTALL)
 TAGS = re.compile(r"<[^>]+>")
 HEAD = re.compile(r"(\d+)\s?\. DÖNEM (.*?) MİLLETVEKİLİ(.*?)(?: Adres :|$)")
 DATE = re.compile(r"(\d\d)\.(\d\d)\.(\d{4})")
@@ -249,7 +250,7 @@ def rows(term: int) -> list[dict[str, object]]:
     return found
 
 
-VERSION = "6"
+VERSION = "7"
 NOTES = (
     "The Assembly's member search lists every member of a term with the province, the party label, and the date and "
     "reason the membership ended; it does not give start dates, and a member who replaced a departing one is listed "
@@ -330,41 +331,38 @@ def emit() -> Path:
         assembly = cs.key("tr.body", "tbmm")
         minutes = {}
         for term, url in [*((term, MINUTES.format(term=term)) for term in OPENINGS), (22, ERDOGAN_OATH)]:
-            title = MINUTES_TITLE.format(term=term) + (", andiçme" if url == ERDOGAN_OATH else "")
-            minutes[url] = cs.source("Türkiye Büyük Millet Meclisi", title)
+            heading = MINUTES_TITLE.format(term=term) + (", andiçme" if url == ERDOGAN_OATH else "")
+            minutes[url] = cs.source("Türkiye Büyük Millet Meclisi", heading)
             cs.add(
                 "source",
                 id=minutes[url],
                 kind="official_body",
                 publisher="Türkiye Büyük Millet Meclisi",
-                title=title,
+                title=heading,
                 url=url,
                 license="Official public record, no license stated",
             )
             cs.artifact(raw.fetch(SOURCE, url, suffix=".pdf"), minutes[url])
-        pools: dict[int, list[tuple[UUID, UUID, list[str]]]] = {}
+        pools: dict[int, list[tuple[UUID, UUID, list[str], str | None]]] = {}
         for term, days in ELECTIONS.items():
-            pools[term] = (
-                [
-                    (person, contest, names)
-                    for person, contest, names in conn.execute(
-                        """select ca.person_id, k.id, (select array_agg(text) from name where entity_id = ca.person_id)
-                           from outcome x join candidacy ca on ca.id = x.candidacy_id
-                           join contest_option o on o.id = ca.option_id join contest k on k.id = o.contest_id
-                           join election e on e.id = k.election_id join polity p on p.id = e.polity_id
-                           where p.iso_code = 'TR' and e.date_from = any(%s) and x.kind::text in ('elected', 'won')""",
-                        [list(days)],
-                    ).fetchall()
-                ]
-                if term >= 17
-                else []
-            )
-        counts: Counter[str] = Counter()
+            pools[term] = [
+                (person, contest, names, None if key is None or term >= 17 else fold(PROVINCES[int(key[-2:]) - 1]))
+                for person, contest, names, key in conn.execute(
+                    """select ca.person_id, k.id, (select array_agg(text) from name where entity_id = ca.person_id),
+                              (select value from external_id where entity_id = k.id and scheme = 'tr.contest')
+                       from outcome x join candidacy ca on ca.id = x.candidacy_id
+                       join contest_option o on o.id = ca.option_id join contest k on k.id = o.contest_id
+                       join election e on e.id = k.election_id join polity p on p.id = e.polity_id
+                       where p.iso_code = 'TR' and e.date_from = any(%s) and x.kind::text in ('elected', 'won')""",
+                    [list(days)],
+                ).fetchall()
+            ]
+        counts: Counter[tuple[int, str]] = Counter()
         for term in sorted(ELECTIONS):
             listed = rows(term)
             matched: dict[str, tuple[UUID, UUID]] = {}
-            free = {index: names for index, (_, _, names) in enumerate(pools[term])}
-            for strictness in range(4):
+            free = {index: (names, province) for index, (_, _, names, province) in enumerate(pools[term])}
+            for strictness in range(5):
                 claims: defaultdict[int, list[str]] = defaultdict(list)
                 options: dict[str, list[int]] = {}
                 for row in listed:
@@ -373,7 +371,9 @@ def emit() -> Path:
                         continue
                     words = [fold(word) for word in str(row["name"]).split()]
                     options[member] = []
-                    for index, names in free.items():
+                    for index, (names, province) in free.items():
+                        if province is not None and province != fold(str(row["province"])) != "bilinmiyor":
+                            continue
                         for name in names:
                             theirs = [fold(word) for word in name.split()]
                             if strictness == 0:
@@ -386,15 +386,21 @@ def emit() -> Path:
                                     and difflib.SequenceMatcher(None, "".join(theirs[:-1]), "".join(words[:-1])).ratio()
                                     >= 0.75
                                 )
-                            else:
+                            elif strictness == 3:
                                 hit = theirs[-1] == words[-1]
+                            else:
+                                hit = (
+                                    province is not None
+                                    and difflib.SequenceMatcher(None, fold(name), fold(str(row["name"]))).ratio()
+                                    >= 0.85
+                                )
                             if hit:
                                 options[member].append(index)
                                 claims[index].append(member)
                                 break
                 for member, found in options.items():
                     if len(found) == 1 and claims[found[0]] == [member]:
-                        person, contest, _ = pools[term][found[0]]
+                        person, contest, _, _ = pools[term][found[0]]
                         matched[member] = (person, contest)
                         del free[found[0]]
             for row in listed:
@@ -417,6 +423,17 @@ def emit() -> Path:
                 else:
                     person = hit[0]
                     counts[term, "matched"] += 1
+                    if term < 17:
+                        listed_person = cs.key(f"{SOURCE}.person", f"{term}:{member}")
+                        if listed_person in cs.minted:
+                            raise ValueError(f"{term}:{member} has no person to merge")
+                        if str(person) not in cs.merged:
+                            cs.merge(person, listed_person)
+                        elif str(listed_person) not in cs.merged:
+                            cs.merge(listed_person, person)
+                        elif person != listed_person:
+                            counts[term, "unmerged"] += 1
+                        person = cs.survivors.get(person, person)
                 cs.artifact(raw.cached(SOURCE, detail(term, member)), source)
                 cs.add(
                     "tenure",
