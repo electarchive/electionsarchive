@@ -4771,7 +4771,8 @@ def parse() -> None:
                                         "office",
                                     ),
                                     (r"^(?:town )?highway superintendent$", "highway-superintendent"),
-                                    (r"^(?:town |village )justice$", "justice"),
+                                    (r"^(?:town |village )?justice$", "justice"),
+                                    (r"^(?:city )?court judge$", "judge"),
                                     (r"^village president$|^president$", "president"),
                                     (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
@@ -4845,6 +4846,7 @@ def parse() -> None:
                                 "collector": "Tax Collector",
                                 "highway-superintendent": "Highway Superintendent",
                                 "justice": "Justice",
+                                "judge": "Court Judge",
                                 "treasurer": "Treasurer",
                                 "president": "President",
                             }[role]
@@ -4898,8 +4900,11 @@ def parse() -> None:
                     and tail.removesuffix(":unexpired") in minted
                     and tail.endswith(":unexpired")
                 ):
-                    missed.add(f"{row['county']}: {row['contest']} unexpired")
-                    continue
+                    base = minted[tail.removesuffix(":unexpired")]
+                    if ", " in base[0] or not base[2]:
+                        missed.add(f"{row['county']}: {row['contest']} unexpired")
+                        continue
+                    minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
                 if (
                     template is None
                     or tail is None
@@ -5047,7 +5052,7 @@ def emit() -> Path:
                     print(f"slug taken: {tail} {home}")
                     continue
                 polity = cs.key("us.polity", owner)
-                body = role not in ("mayor", "supervisor", "clerk", "treasurer", "president")
+                body = role not in ("mayor", "supervisor", "clerk", "treasurer", "president", "judge")
                 if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:")):
                     made.add(polity)
                     geoid = owner.split(":")[1]
@@ -5122,14 +5127,16 @@ def emit() -> Path:
                     area,
                     None,
                     None,
-                    (int(group["seats"][0]) if group["pinned"][0] else 1) if known_size else None,
+                    (int(group["seats"][0] or 1) if group["pinned"][0] or role == "justice" else 1) if known_size else None,
                     "full",
                     cs.key("us.electoral_system", "fptp") if known_size else None,
                     "counted",
                     DAY,
                     polity,
                     f"2026 {place} {title} election",
-                    f"{home}/{DAY}-general/{role}" + (f"-{slug(title.split(', ', 1)[1])}" if ", " in title else ""),
+                    f"{home}/{DAY}-general/{role}"
+                    + (f"-{slug(title.split(', ', 1)[1])}" if ", " in title else "")
+                    + ("-unexpired" if tail.endswith(":unexpired") else ""),
                     f"2026 {place} general election",
                     f"{home}/{DAY}-general",
                     f"{st}:{code}",
