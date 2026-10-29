@@ -19176,8 +19176,8 @@ export const bodies = {
               from (
                 select s.start, t.id, coalesce(t.seat_id, t.id) as slot, t.from_date, t.to_date, t.won,
                   min(t.won) filter (where t.won <= s.start) over (partition by s.start, coalesce(t.seat_id, t.id)) as first
-                from starts s join t on t.to_date > s.start
-                  and (t.from_date <= s.start or t.seat_id is not null and t.from_date < s.start + 30)
+                from starts s join t on t.from_date < s.start + 30
+                  and t.to_date > s.start + case when t.seat_id is null then 30 else 0 end
                 where not exists (select from starts l where l.start > s.start and l.start < s.start + 90)
               ) q
             ) r where r.rank <= r.cap
