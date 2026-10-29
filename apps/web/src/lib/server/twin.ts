@@ -241,15 +241,54 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   const found = await archive(segments.join("/"), search);
   if (found.kind === "election") {
     const parts = found.election.elections.filter((child) => !child.isStage);
-    const [byes, tiers] = await Promise.all([
+    const partial = new Set(
+      found.scope == null
+        ? Map.groupBy(
+            found.election.races.filter(
+              (race) => race.body != null && (race.round ?? 1) === 1,
+            ),
+            (race) => race.body ?? "",
+          )
+            .entries()
+            .flatMap(([body, races]) => {
+              let filled = 0;
+              for (const race of races) {
+                for (const row of race.results) {
+                  filled += row.seats ?? 0;
+                }
+              }
+              const size = races.find((race) => race.size != null)?.size;
+              return size != null &&
+                (filled < size ||
+                  races.some((race) => (race.unelected ?? []).length > 0))
+                ? [body]
+                : [];
+            })
+        : [],
+    );
+    const [byes, tiers, chambers] = await Promise.all([
       call(router.seats.byElections, { id: found.id, within: found.scope?.id }),
       found.scope == null &&
       parts.length > 1 &&
       parts.every((child) => /^us\/[a-z]{2}\/[^/]+$/.test(child.path ?? ""))
         ? call(router.elections.tiers, { id: found.id })
         : null,
+      partial.size > 4
+        ? []
+        : Promise.all(
+            partial.values().map((id) =>
+              call(router.bodies.get, { id })
+                .then((body) => ({ id, body }))
+                .catch(() => null),
+            ),
+          ),
     ]);
-    return { ...found, byes, tiers };
+    return {
+      ...found,
+      byes,
+      tiers,
+      chambers: chambers.flatMap((entry) => (entry == null ? [] : [entry])),
+    };
   }
   if (found.kind !== "polity") {
     return found;
@@ -489,6 +528,7 @@ function markdown(
           data.byes,
           data.cycle,
           data.tiers,
+          data.chambers,
           link,
         ),
         ...(winners == null || winners.rows.length === 0
@@ -2206,6 +2246,7 @@ function electionMarkdown(
   byes: Extract<Data, { kind: "election" }>["byes"],
   cycle: Extract<Data, { kind: "election" }>["cycle"],
   ballot: Extract<Data, { kind: "election" }>["tiers"],
+  chambers: Extract<Data, { kind: "election" }>["chambers"],
   link: Link,
 ) {
   const signed = new Intl.NumberFormat("en", { signDisplay: "exceptZero" });
@@ -2402,6 +2443,83 @@ function electionMarkdown(
             ]),
           ),
         ]),
+    ...chambers.flatMap(({ id, body }) => {
+      if (election.date == null) {
+        return [];
+      }
+      const races = election.races.filter(
+        (race) => race.body === id && (race.round ?? 1) === 1,
+      );
+      const until = new Date(Date.parse(election.date) + 120 * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
+      const found = body.makeup
+        .filter(
+          (entry) =>
+            election.date != null &&
+            entry.start >= election.date &&
+            entry.start <= until &&
+            entry.parties.some((party) => party.category === "elected"),
+        )
+        .toSorted((a, b) => a.start.localeCompare(b.start))
+        .at(-1);
+      const unelected =
+        races.find((race) => (race.unelected ?? []).length > 0)?.unelected ??
+        [];
+      if (found == null && unelected.length === 0) {
+        return [];
+      }
+      const info = new Map(body.parties.map((party) => [party.id, party]));
+      const rows = new Map<string, number>();
+      let filled = 0;
+      for (const race of races) {
+        for (const row of race.results) {
+          const party = /^party:(.+)$/.exec(row.key)?.[1];
+          const label =
+            row.isIndependent === true
+              ? m.seats_independents()
+              : ((party == null ? null : info.get(party)?.short) ?? row.label);
+          filled += row.seats ?? 0;
+          if (found == null) {
+            rows.set(label, (rows.get(label) ?? 0) + (row.seats ?? 0));
+          }
+        }
+      }
+      for (const entry of found?.parties ?? unelected) {
+        const label =
+          entry.category === "appointed"
+            ? m.seats_appointed()
+            : entry.category === "ex_officio"
+              ? m.seats_ex_officio()
+              : !("party" in entry) || entry.party == null
+                ? "isIndependent" in entry && entry.isIndependent
+                  ? m.seats_independents()
+                  : m.record_none()
+                : (info.get(entry.party)?.short ??
+                  info.get(entry.party)?.label ??
+                  m.record_none());
+        rows.set(label, (rows.get(label) ?? 0) + entry.seats);
+      }
+      let total = 0;
+      for (const seats of rows.values()) {
+        total += seats;
+      }
+      if (total <= filled) {
+        return [];
+      }
+      return [
+        `## ${m.seats_after_title()}: ${body.name}`,
+        table(
+          [m.col_party(), m.col_seats()],
+          rows
+            .entries()
+            .filter(([, seats]) => seats > 0)
+            .toArray()
+            .toSorted((a, b) => b[1] - a[1])
+            .map(([label, seats]) => [label, count(seats)]),
+        ),
+      ];
+    }),
     ...councilsMarkdown(election.councils, link),
     ...totals.flatMap(({ name, tiers, overall }) => [
       `## ${m.race_tiers_title({ name })}`,
