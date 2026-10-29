@@ -14,9 +14,10 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "10"
+VERSION = "11"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
+HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
     "US": "Q30",
@@ -733,6 +734,20 @@ def emit() -> Path:
         wikidata = cs.source("Wikidata", TITLE)
         with HAND_COLORS.open(encoding="utf-8") as handle:
             sourced_colors = {row["party"]: row for row in csv.DictReader(handle, delimiter="\t")}
+        with HAND_POSITIONS.open(encoding="utf-8") as handle:
+            sourced_positions = {row["party"]: row for row in csv.DictReader(handle, delimiter="\t")}
+        sourced_positions_source: dict[str, UUID] = {}
+        for key, row in sourced_positions.items():
+            sourced_positions_source[key] = cs.source(row["publisher"], row["title"])
+            cs.add(
+                "source",
+                id=sourced_positions_source[key],
+                kind=row["kind"],
+                publisher=row["publisher"],
+                title=row["title"],
+                url=row["url"],
+                license="Official public record, no license stated",
+            )
         sourced_colors_source: dict[str, UUID] = {}
         for key, row in sourced_colors.items():
             sourced_colors_source[key] = cs.source(row["publisher"], row["title"])
@@ -798,17 +813,26 @@ def emit() -> Path:
             if party in linked:
                 report[scope, "linked"] += 1
             sourced = spectrum(linked.get(party)) or spectrum(inherited)
-            span = sourced or next((PLACED[iso, name] for name in full + short if (iso, name) in PLACED), None)
+            hand_position = sourced_positions.get(str(party))
+            span = (
+                (int(hand_position["low"]), int(hand_position["high"]))
+                if hand_position
+                else sourced or next((PLACED[iso, name] for name in full + short if (iso, name) in PLACED), None)
+            )
             if span is not None:
                 cs.add(
                     "party_position",
                     party_id=party,
                     low=span[0],
                     high=span[1],
-                    rank=min(
-                        (ORDER[iso].index(name) for name in full + short if name in ORDER.get(iso, [])), default=None
-                    ),
-                    source_id=None if sourced is None else positioned,
+                    rank=None
+                    if hand_position
+                    else min((ORDER[iso].index(name) for name in full + short if name in ORDER.get(iso, [])), default=None),
+                    source_id=sourced_positions_source[str(party)]
+                    if hand_position
+                    else None
+                    if sourced is None
+                    else positioned,
                 )
                 report[scope, "positioned"] += options
             if party in painted:
