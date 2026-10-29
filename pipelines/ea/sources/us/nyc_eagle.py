@@ -26,6 +26,15 @@ COUNTY = {
     "KINGS": "36047",
 }
 YEARS = {
+    1903: {
+        "volume": "eagle1905",
+        "item": "brooklyndailyeag00unse_5",
+        "pages": [636],
+        "recap": None,
+        "day": date(1903, 11, 3),
+        "title": "Brooklyn Daily Eagle Almanac 1905",
+        "table": True,
+    },
     1901: {
         "volume": "eagle1902",
         "item": "brooklyndailyeag00unse_4",
@@ -80,7 +89,7 @@ def add_groups(groups: dict, path, page: int, borough: str) -> None:
             group["total"] = [number(cell) for cell in panel["total"]]
 
 
-def settle(reads: list, width: int):
+def settle(reads: list, width: int, strict: bool = False):
     eds: dict[int, list] = {}
     for read in reads:
         for ed in read["eds"]:
@@ -126,16 +135,32 @@ def settle(reads: list, width: int):
         if len(found) > 1:
             best = max(item[2] for item in found)
             found = [item for item in found if item[2] == best]
-        if not found:
-            top = {ed: options[ed].most_common(2) for ed in eds}
-            if all(len(pair) == 1 or pair[0][1] > pair[1][1] for pair in top.values()):
-                sums = sum(pair[0][0] for pair in top.values())
-                printed = min(target, key=lambda value: abs(value - sums))
-                if abs(printed - sums) <= max(10, printed // 100):
+        if not found and not strict:
+            tied = [
+                ed
+                for ed in eds
+                if len(options[ed]) > 1 and options[ed].most_common(2)[0][1] == options[ed].most_common(2)[1][1]
+            ]
+            if len(tied) <= 8:
+                fixed = sum(options[ed].most_common(1)[0][0] for ed in eds if ed not in tied)
+                printed = min(target)
+                scored = []
+                for combo in itertools.product(
+                    *(sorted(k for k, v in options[ed].items() if v == options[ed].most_common(1)[0][1]) for ed in tied)
+                ):
+                    sums = fixed + sum(combo)
+                    scored.append((abs(sums - printed), sums, dict(zip(tied, combo))))
+                scored.sort(key=lambda item: item[0])
+                if (
+                    scored
+                    and abs(scored[0][1] - printed) <= max(10, printed // 100)
+                    and (len(scored) == 1 or scored[1][0] > scored[0][0])
+                ):
+                    picks = scored[0][2]
                     for ed in eds:
-                        settled[ed][column] = top[ed][0][0]
+                        settled[ed][column] = picks[ed] if ed in picks else options[ed].most_common(1)[0][0]
                     total[column] = printed
-                    off.append(f"column {column + 1} adds up to {sums:,} against a printed {printed:,}")
+                    off.append(f"column {column + 1} adds up to {scored[0][1]:,} against a printed {printed:,}")
                     continue
         if len(found) != 1:
             return None, "rows that do not add up to the printed total" if not found else "more than one reading ties"
@@ -150,6 +175,66 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     for year, spec in YEARS.items():
         volume = spec["volume"]
+        if spec.get("table"):
+            reads = []
+            headers = []
+            for path in sorted(INBOX.glob(f"{volume}-p{spec['pages'][0]}-*.json")):
+                try:
+                    data = json.loads(path.read_text())
+                except json.JSONDecodeError:
+                    continue
+                cells = {p["ad"]: [number(cell) for cell in p["rows"][0]["cells"]] for p in data["panels"] if p["rows"]}
+                ads = {
+                    int(label): row
+                    for label, row in cells.items()
+                    if label.isdigit() and len(row) == len(data["columns"])
+                }
+                if "Totals" in cells and len(ads) == 21:
+                    reads.append(
+                        {
+                            "eds": ads,
+                            "total": cells["Totals"],
+                            "skip": {0, *range(9, 20)},
+                            "width": len(data["columns"]),
+                            "page": spec["pages"][0],
+                            "columns": data["columns"],
+                        }
+                    )
+                    headers.append(data["columns"])
+            result, why = settle(reads, 20, strict=True) if reads else (None, "no complete reads")
+            out = []
+            if result is None:
+                print(year, why)
+            else:
+                header = [Counter(column).most_common(1)[0][0] for column in zip(*headers)]
+                for ad, row in result[0].items():
+                    for index in range(1, 17):
+                        out.append(
+                            {
+                                "county": "BROOKLYN",
+                                "ad": ad,
+                                "ed": 0,
+                                "column": index,
+                                "value": row[index],
+                                "page": spec["pages"][0],
+                                "header": header[index],
+                            }
+                        )
+                print(year, "assembly districts loaded", len(result[0]), "from", len(reads), "reads")
+            pl.DataFrame(
+                out,
+                schema={
+                    "county": pl.String,
+                    "ad": pl.Int64,
+                    "ed": pl.Int64,
+                    "column": pl.Int64,
+                    "value": pl.Int64,
+                    "page": pl.Int64,
+                    "header": pl.String,
+                },
+            ).write_parquet(PARSED / f"{year}.parquet")
+            (PARSED / f"{year}-failures.json").write_text(json.dumps({"left": {}, "off": {}}))
+            continue
         kinds: dict[str, dict] = {"page": {}, "c": {}, "d": {}, "e": {}}
         borough = None
         for page in spec["pages"]:
@@ -235,6 +320,7 @@ def parse() -> None:
 
 
 PUBLISHER = "Brooklyn Daily Eagle"
+ALL_ADS = {1909: 64, 1917: 74}
 PAGES = DATA / "pages" / SOURCE
 NICKNAMES = {
     "KINGS": "Brooklyn",
@@ -244,8 +330,9 @@ NICKNAMES = {
     "QUEENS": "Queens",
     "RICHMOND": "Staten Island",
 }
-MAYORS = {"bannard", "gaynor", "hearst", "hylan", "mitchel", "low", "shepard"}
-COMPTROLLERS = {"prendergast", "craig"}
+MAYORS = {"bannard", "gaynor", "hearst", "hylan", "mitchel", "low", "shepard", "mclellan"}
+COMPTROLLERS = {"prendergast", "craig", "hinrichs", "hinricks", "grout", "ladd"}
+ALDERMEN = {"mcguire", "fornes", "pornes"}
 GARBLES = {"prndrgst": "prendergast"}
 OFFICE_TITLES = {
     "mayor": "Mayor",
@@ -281,7 +368,7 @@ def column_of(header: str, year: int) -> tuple[str, str, str] | None:
     if not party:
         match = re.match(r"(.+?)\s+((?:Rep|Dem|Fus|Soc|Civ|Prog|Proh|Ind|B\.H)\S*(?:\s.*)?)$", text)
         name, party = (match.group(1), match.group(2)) if match else (text, "")
-    name = re.sub(r"[.,]?\s*Jr\.?$", "", name.strip()).strip(" .,")
+    name = re.sub(r"[.,]?\s*Jr\.?$", "", name.strip()).strip(" .,").replace("Pornes", "Fornes")
     party = party.strip(" .,")
     surname = re.sub(r"[^a-z]", "", name.split()[-1].lower()) if name else ""
     surname = GARBLES.get(surname, surname)
@@ -290,6 +377,8 @@ def column_of(header: str, year: int) -> tuple[str, str, str] | None:
             office = "mayor"
         elif surname in COMPTROLLERS:
             office = "comptroller"
+        elif surname in ALDERMEN:
+            office = "president-board-of-aldermen"
         else:
             office = "borough-president"
     return office, name, party
@@ -312,14 +401,67 @@ def emit():
         county_areas = {code: cs.area("us.county", code) for code in COUNTY.values()}
         for year, spec in YEARS.items():
             day = spec["day"]
+            if not (PARSED / f"{year}.parquet").exists():
+                continue
             frame = pl.read_parquet(PARSED / f"{year}.parquet").filter(pl.col("value").is_not_null())
             if frame.is_empty():
                 continue
             failures = json.loads((PARSED / f"{year}-failures.json").read_text())
-            election = conn.execute(
+            found = conn.execute(
                 "select c.election_id from contest c join slug s on s.entity_id = c.id and s.path = %s",
                 [f"us/ny/new-york-city/{day}-local/mayor"],
-            ).fetchone()[0]
+            ).fetchone()
+            if found is not None:
+                election = found[0]
+            else:
+                parent = cs.key("us.election", f"{day}:NY")
+                election = cs.key("us.election", f"{day}:NY:3651000")
+                ((polity, polity_path),) = conn.execute(
+                    "select o.polity_id, s.path from office o join slug s on s.entity_id = o.polity_id and s.is_current "
+                    "where o.id = %s",
+                    [cs.key("us.office", "NY:3651000:mayor")],
+                ).fetchall()
+                if parent in cs.minted:
+                    cs.add(
+                        "election",
+                        id=parent,
+                        polity_id=cs.polity("US-NY"),
+                        kind="local",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    cs.add(
+                        "name",
+                        entity_id=parent,
+                        text=f"{year} New York local elections",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
+                    cs.add("slug", path=f"us/ny/{day}-local", entity_id=parent)
+                if election in cs.minted:
+                    cs.add(
+                        "election",
+                        id=election,
+                        polity_id=polity,
+                        parent_id=parent,
+                        kind="local",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    cs.add(
+                        "name",
+                        entity_id=election,
+                        text=f"{year} New York City local election",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
+                    cs.add("slug", path=f"{polity_path}/{day}-local", entity_id=election)
             item = spec["item"]
             url = f"https://archive.org/details/{item}"
             source = cs.source(PUBLISHER, spec["title"])
@@ -377,6 +519,12 @@ def emit():
                     width=width,
                     height=height,
                 )
+            loaded = {
+                county: count for county, count in frame.unique(["county", "ad"]).group_by("county").len().iter_rows()
+            }
+            attempted_left = {
+                county: sum(1 for key in failures["left"] if key.split(":")[0] == county) for county in loaded
+            }
             contests = {}
             options = {}
             ads: dict[str, object] = {}
@@ -410,6 +558,8 @@ def emit():
                         office_key = (
                             f"new-york-city:borough-president:{slug(nickname)}"
                             if office == "borough-president"
+                            else "NY:3651000:mayor"
+                            if office == "mayor"
                             else f"new-york-city:{office}"
                         )
                         title = (
@@ -448,7 +598,14 @@ def emit():
                         status="active",
                         source_id=source,
                         is_default=False,
-                        completeness=None,
+                        completeness=None
+                        if office != "borough-president" and year not in ALL_ADS
+                        else round(
+                            loaded[county] / (loaded[county] + attempted_left[county])
+                            if office == "borough-president"
+                            else min(1, sum(loaded.values()) / ALL_ADS[year]),
+                            3,
+                        ),
                     )
                     left = "".join(
                         f" Note: assembly district {key} is left out because of {why}."
@@ -462,7 +619,16 @@ def emit():
                         "note",
                         entity_id=result_set,
                         kind="methodology",
-                        body_md=f"Election district and assembly district returns transcribed from the {spec['title']}, a compendium that prints only assembly district totals and omits minor-party lines. A district is loaded only when every column of its election districts adds up to the printed assembly district total, or to within a few votes of it where the almanac's own total does not add up and every reading of the page agrees."
+                        body_md=(
+                            f"Assembly district returns for Brooklyn transcribed from the {spec['title']}, which prints one row per assembly district and a borough total row. Every column loaded adds up exactly to the printed borough total across three independent readings of the page; the almanac prints only the Fusion and Democratic lines for each office, so minor-party candidates are absent."
+                            if spec.get("table")
+                            else f"Election district and assembly district returns transcribed from the {spec['title']}, a compendium that prints only assembly district totals and omits minor-party lines. A district is loaded only when every column of its election districts adds up to the printed assembly district total, or to within a few votes of it where the almanac's own total does not add up and every reading of the page agrees."
+                        )
+                        + (
+                            " Only the Brooklyn tables were read, so the citywide sets carry no completeness."
+                            if year == 1901
+                            else ""
+                        )
                         + left,
                     )
                     contests[office_slug] = (contest, contest_key, result_set, {})
