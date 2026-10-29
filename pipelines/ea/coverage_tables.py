@@ -120,6 +120,12 @@ DISTRICT_CALENDAR = {
         11,
         "Crawford County commissioners (three seats, four-year terms) were elected November 7, 2023; County Commissioners Association of Pennsylvania, https://ccapweb.pacounties.org/getattachment/11a99fb1-af07-42d4-8b1f-16967730f5aa/Commissioner-Elections-2023G-FINAL.pdf",
     ),
+    ("ME", "Biddeford"): (
+        2,
+        1,
+        11,
+        "Biddeford mayor and council elected in November of odd years; mayor LaFountain elected November 4, 2025, term to December 31, 2027, https://spectrumlocalnews.com/me/maine/politics/2025/11/05/biddeford-chooses-new-mayor--passes-bonds-for-sewer-and-recreation-projects",
+    ),
     ("NJ", "Edison"): (
         4,
         1,
