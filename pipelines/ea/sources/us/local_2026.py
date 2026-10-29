@@ -597,6 +597,16 @@ FEEDS = {
         "Clark County Election Department",
         "Offices Up for Election and Candidates, 2026 General Election",
     ),
+    "UT-49057": (
+        "https://www.weberelections.gov/",
+        "Weber County Clerk/Auditor",
+        "List of Candidates, 2026 General Election",
+    ),
+    "TX-48491": (
+        "https://www.leanderisd.org/board-elections/",
+        "Leander Independent School District",
+        "Board of Trustees Elections, November 3, 2026",
+    ),
     "UT-49035": (
         "https://www.saltlakecounty.gov/clerk/elections/",
         "Salt Lake County Clerk",
@@ -1368,6 +1378,8 @@ DELIVERED = {
     "AZ-04019": DATA / "inbox" / "y26" / "az" / "pima.pdf",
     "NV-32003": DATA / "inbox" / "y26" / "nv" / "clark.pdf",
     "UT-49035": DATA / "inbox" / "y26" / "ut" / "salt_lake.pdf",
+    "UT-49057": DATA / "inbox" / "y26" / "ut" / "weber.html",
+    "TX-48491": DATA / "inbox" / "y26" / "tx" / "leander.html",
     "FL-12057": DATA / "inbox" / "manual" / "MF-177" / "2026 General Election_All Races Sample Ballot.pdf",
     "FL-12031": DATA / "inbox" / "manual" / "MF-178" / "2026 General All Races_202609210829090089.pdf",
     "FL-12071": DATA / "inbox" / "manual" / "MF-182" / "2026 General Election - All Inclusive Sample Ballot.pdf",
