@@ -95,6 +95,13 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://maps.wingis.org/public/rest/services/WardsAndDistricts/MapServer/4",
         "field": "DIST_ID",
     },
+    {
+        "publisher": "Baltimore County GIS",
+        "title": "Baltimore County Councilmanic Districts (Bill 22-22)",
+        "pattern": r"^24:24005:(council|board-of-commissioners|board-of-education):district-",
+        "layer": "https://cwgis.baltimorecountymd.gov/arcgis/rest/services/Highways/Highways/MapServer/108",
+        "field": "COUNCILMANIC_DISTRICTS",
+    },
 ]
 
 
