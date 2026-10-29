@@ -4595,6 +4595,7 @@ def parse() -> None:
                             .encode("ascii", "ignore")
                             .decode()
                             .lower()
+                            .replace("'", "")
                             .replace("&", " and "),
                         )
                     ]
@@ -4686,6 +4687,7 @@ def parse() -> None:
                                 .encode("ascii", "ignore")
                                 .decode()
                                 .lower()
+                                .replace("'", "")
                                 .replace("&", " and "),
                             ),
                         ),
