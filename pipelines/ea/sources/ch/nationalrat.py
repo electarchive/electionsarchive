@@ -12,10 +12,11 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "ch.nationalrat"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PX = "https://www.pxweb.bfs.admin.ch/api/v1/de/px-x-1702020000_{0}/px-x-1702020000_{0}.px"
 SEATS = "https://dam-api.bfs.admin.ch/hub/api/dam/assets/28765024/master"
+OGD = "https://ogd-static.voteinfo-app.ch/v4/ogd/sd-t-17.02-NRW2023-{}.json"
 PUBLISHER = "Federal Statistical Office"
 DAYS = {
     1919: date(1919, 10, 26),
@@ -172,12 +173,17 @@ PARTIES = {
     "Front": ("Nationale Front", "Front", None),
     "Grüt": ("Grütlianer", "Grüt", None),
 }
+OGD_PARTIES = PX_PARTIES | {"14": "SD"}
+LIST_PARTIES = {("VD", "19"): "Sol", ("NE", "36"): "Sol", ("GE", "2"): "Sol"}
 TURNOUT = {"1": 2, "2": 3, "4": 6, "5": 5, "6": 4, "7": 22, "8": 23}
 UNALLOCATED = 32
 SOURCE_NOTE = (
     "The Federal Statistical Office publishes party votes and ballots for every National Council election since "
     "1971, by canton and by commune, on today's communes and cantons: where communes merged after an election, "
-    "their results are added together under the merged commune. Seats by party and canton go back to 1919."
+    "their results are added together under the merged commune. Seats by party and canton go back to 1919. "
+    "For 2023 it also publishes each candidate's votes by commune. Outside Zurich, candidates appear under their "
+    "list's party, because a party often runs several lists in a canton (a youth or senior list, for example) and "
+    "the archive does not yet record which list each candidate stood on. A cantonal source can add that later."
 )
 MAJORITY = (
     "A canton with a single seat elects its member by relative majority: the candidate with the most votes wins. "
@@ -230,6 +236,8 @@ def fetch() -> None:
     for table, year in REQUESTS:
         raw.fetch(SOURCE, PX.format(table), suffix=".json", body=query(table, year))
     raw.fetch(SOURCE, SEATS, suffix=".xlsx")
+    for name in ("listen", "kandidierende"):
+        raw.fetch(SOURCE, OGD.format(name), suffix=".json")
 
 
 def cells(table: str, year: int | None) -> list[tuple[list[str], int | None]]:
@@ -384,6 +392,91 @@ def parse() -> None:
     if unknown.height:
         raise ValueError(f"seats for parties without votes: {unknown}")
 
+    numbers = dict(enumerate(CANTONS, start=1))
+    lists = pl.DataFrame(
+        [
+            (
+                numbers[row["kanton_nummer"]],
+                row["liste_nummer_kanton"],
+                LIST_PARTIES.get(
+                    (numbers[row["kanton_nummer"]], row["liste_nummer_kanton"]), OGD_PARTIES[str(row["partei_id"])]
+                ),
+                row["stimmen_liste"],
+            )
+            for row in json.loads(raw.cached(SOURCE, OGD.format("listen")).path.read_text(encoding="utf-8"))[
+                "level_kantone"
+            ]
+            if row["kanton_nummer"] != 1
+        ],
+        schema=["canton", "list", "party", "votes"],
+        orient="row",
+    )
+    mismatched = (
+        lists.group_by("canton", "party")
+        .agg(pl.col("votes").sum())
+        .join(cantons.filter(pl.col("year") == 2023), on=["canton", "party"], how="full", coalesce=True)
+        .filter(pl.col("votes").fill_null(0) != pl.col("votes_right").fill_null(0), pl.col("canton") != "ZH")
+    )
+    if mismatched.height:
+        raise ValueError(f"2023 list votes differ from party votes: {mismatched}")
+    data = json.loads(raw.cached(SOURCE, OGD.format("kandidierende")).path.read_text(encoding="utf-8"))
+    parties = dict(zip(lists.select(pl.concat_str("canton", pl.lit(":"), "list")).to_series(), lists["party"]))
+    candidates = pl.DataFrame(
+        [
+            (
+                numbers[row["kanton_nummer"]],
+                row["liste_nummer_kanton"],
+                row["kandidat_nummer"],
+                parties[f"{numbers[row['kanton_nummer']]}:{row['liste_nummer_kanton']}"],
+                OGD_PARTIES.get(str(row["kandidat_partei_id"])),
+                row["name"].strip(),
+                row["vorname"].strip(),
+                {"F": "female", "M": "male"}.get(row["geschlecht"]),
+                None
+                if row["geburtsdatum"] is None
+                else date(*reversed([int(part) for part in row["geburtsdatum"].split(".")])),
+                row["geburtsjahr"],
+                1 if row["kandidat_listenplatz_2"] is None else 2,
+                row["kandidat_status_id"] == 2,
+                row["flag_gewaehlt"],
+            )
+            for row in data["level_kantone"]
+            if row["kanton_nummer"] != 1
+        ],
+        schema=[
+            "canton",
+            "list",
+            "number",
+            "party",
+            "own",
+            "surname",
+            "given",
+            "gender",
+            "born",
+            "year",
+            "lines",
+            "incumbent",
+            "elected",
+        ],
+        orient="row",
+    )
+    pl.DataFrame(
+        [
+            (
+                numbers[row["kanton_nummer"]],
+                row["liste_nummer_kanton"],
+                row["kandidat_nummer"],
+                f"{row['gemeinde_nummer'] % 10000:04d}",
+                row["stimmen_kandidat"],
+            )
+            for row in data["level_gemeinden"]
+            if row["kanton_nummer"] != 1
+        ],
+        schema=["canton", "list", "number", "commune", "votes"],
+        orient="row",
+    ).write_parquet(PARSED / "candidate_votes.parquet")
+    del data
+    candidates.write_parquet(PARSED / "candidates.parquet")
     communes.write_parquet(PARSED / "communes.parquet")
     unit_turnout.write_parquet(PARSED / "turnout.parquet")
     labels.write_parquet(PARSED / "labels.parquet")
@@ -398,6 +491,8 @@ def emit() -> Path:
     labels = pl.read_parquet(PARSED / "labels.parquet")
     seats = pl.read_parquet(PARSED / "seats.parquet")
     cantons = pl.read_parquet(PARSED / "cantons.parquet")
+    candidates = pl.read_parquet(PARSED / "candidates.parquet")
+    candidate_votes = pl.read_parquet(PARSED / "candidate_votes.parquet")
     shortfalls = {
         (year, canton): (gap, ballots)
         for year, canton, gap, ballots in pl.read_parquet(PARSED / "short.parquet").iter_rows()
@@ -433,6 +528,8 @@ def emit() -> Path:
         for table, year in REQUESTS:
             cs.artifact(raw.cached(SOURCE, PX.format(table), query(table, year)), source)
         cs.artifact(raw.cached(SOURCE, SEATS), source)
+        for name_ in ("listen", "kandidierende"):
+            cs.artifact(raw.cached(SOURCE, OGD.format(name_)), source)
 
         switzerland = cs.polity("CH")
         areas = {code: cs.area("ch.canton", code) for code in CANTONS}
@@ -617,6 +714,45 @@ def emit() -> Path:
                     )
                 for key, count in frame.filter(pl.col("seats") > 0).select("party", "seats").iter_rows():
                     cs.add("outcome", result_set_id=result_set, option_id=options[key], kind="won", seats=count)
+                standing_by: dict[str, str] = {}
+                for row in candidates.filter(pl.col("canton") == canton).iter_rows(named=True) if year == 2023 else ():
+                    key = f"{contest_key}:{row['list']}.{row['number']}"
+                    option = cs.key("ch.option", key)
+                    standing_by[f"{row['list']}.{row['number']}"] = str(option)
+                    display = f"{row['given']} {row['surname']}"
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        parent_option_id=UUID(options[row["party"]]),
+                        ballot_label=display,
+                    )
+                    person = cs.key(f"{SOURCE}.person", key)
+                    cs.add(
+                        "person",
+                        id=person,
+                        birth_date=row["born"] or (None if row["year"] is None else date(row["year"], 1, 1)),
+                        birth_precision="day" if row["born"] is not None else "year" if row["year"] else None,
+                        gender=row["gender"],
+                    )
+                    name(person, display, LANGUAGES.get(canton, "de"))
+                    candidacy = cs.key("ch.candidacy", key)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=option,
+                        role="list_member",
+                        list_position=row["number"],
+                        ballot_name=f"{row['surname']} {row['given']}",
+                        member_of_party_id=parties.get(row["own"]) if row["own"] != "others" else None,
+                        is_independent=False,
+                        is_incumbent=row["incumbent"],
+                        ballot_lines=row["lines"],
+                    )
+                    if row["elected"]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
                 if counted:
                     located = {
                         "result_set_id": pl.lit(str(result_set)),
@@ -640,6 +776,20 @@ def emit() -> Path:
                             value="votes",
                         )
                     )
+                    if standing_by:
+                        values.append(
+                            candidate_votes.filter(pl.col("canton") == canton)
+                            .rename({"commune": "unit"})
+                            .select(
+                                **located,
+                                unit_id=pl.col("unit").replace_strict({c: str(u) for c, u in units.items()}),
+                                option_id=pl.concat_str(pl.col("list"), pl.lit("."), pl.col("number")).replace_strict(
+                                    standing_by
+                                ),
+                                measure=pl.lit(10, pl.Int16),
+                                value="votes",
+                            )
+                        )
                     values.append(
                         ballots.select(
                             **located,
