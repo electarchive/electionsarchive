@@ -13,13 +13,13 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.tr.mayors_2004_2009 import LICENSE, LICENSE_URL, NUMBER, REF, cell, fold
-from ea.sources.tr.ysk import INVALID, REGISTERED, VALID, VOTES, upper
+from ea.sources.tr.ysk import INVALID, PROVINCES as PLATES, REGISTERED, VALID, VOTES, upper
 from ea.sources.tr.ysk_local import DAYS, party
 from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "3"
+VERSION = "4"
 YEARS = (1968, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 TITLE = re.compile(r"^(.+?)'(?:d[ae]|t[ae]) (\d{4}) Türkiye yerel seçimleri$")
@@ -170,7 +170,7 @@ def emit() -> Path:
                    where district_area_id is not null and office_id is not null order by office_id, id"""
             ).fetchall()
         )
-        units: dict[UUID, UUID] = dict(
+        units: dict[UUID | str, UUID] = dict(
             conn.execute(
                 """select area_id, id from reporting_unit
                    where scheme_code in ('tr.ilce', 'tr.belde') and kind = 'aggregate' and area_id is not null
@@ -213,6 +213,9 @@ def emit() -> Path:
             keys = [f"{province}-{central}-{slug(name)}", f"{province}-{slug(name)}", f"{province}-merkez-{slug(name)}"]
             races.append((year, keys, entries[0][0], name, [("", entries[0][1], entries[0][2], entries[0][3])], {}))
 
+        turkey = cs.polity("TR")
+        plates = {slug(text): f"{plate:02d}" for plate, text in enumerate(PLATES, 1)}
+        provinces = {cs.area("tr.il", plate) for plate in plates.values()}
         polities = [cs.key("tr.polity", value) for value in existing]
         paths: dict[UUID, str] = {}
         english: dict[UUID, str] = {}
@@ -242,19 +245,34 @@ def emit() -> Path:
             day = DAYS[year]
             label = f"{year} {keys[0]} {name}"
             key = next((candidate for candidate in keys if candidate in existing), None)
+            minted_place = False
             if key is None:
-                skipped.append((str(year), label, "no municipality"))
-                continue
+                key = keys[0]
+                minted_place = key.count("-") >= 2 and key.split("-")[0] in plates
+                if not minted_place:
+                    skipped.append((str(year), label, "no municipality"))
+                    continue
             contest_key = f"{day}:{key}-mayor"
             if contest_key in made:
                 skipped.append((str(year), label, "second table for the same municipality"))
                 continue
             office = cs.key("tr.office", f"{key}-mayor")
             polity = cs.key("tr.polity", key)
+            if minted_place and polity in cs.minted and polity not in paths:
+                paths[polity] = f"tr/{key}"
+                english[polity] = name
+                cs.add("polity", id=polity, kind="municipality", iso_code=None)
+                for text, lang, kind in ((f"{name} Municipality", "en", "official"), (f"{name} Belediyesi", "tr", "native")):
+                    cs.add("name", entity_id=polity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+                cs.add("polity_parent", polity_id=polity, parent_id=turkey)
+                cs.add("slug", path=paths[polity], entity_id=polity)
+                cs.add("office", id=office, polity_id=polity, kind="mayor")
+                cs.add("name", entity_id=office, text=f"Mayor of {name}", lang="en", kind="official", is_preferred=True)
+                cs.add("name", entity_id=office, text=f"{name} Belediye Başkanı", lang="tr", kind="native")
             if contest_key in held and held[contest_key] not in own:
                 skipped.append((str(year), label, "contest already held"))
                 continue
-            area = areas.get(office)
+            area = areas.get(office) or (cs.area("tr.il", plates[key.split("-")[0]]) if minted_place else None)
             if area is None or polity not in paths:
                 skipped.append((str(year), label, "no area"))
                 continue
@@ -316,11 +334,12 @@ def emit() -> Path:
             )
             cs.add("name", entity_id=contest, text=f"Mayor of {place}", lang="en", kind="official", is_preferred=True)
             cs.add("slug", path=f"{path}/{day}-local/mayor", entity_id=contest)
-            unit = units.get(area)
+            slot = key if area in provinces else area
+            unit = units.get(slot)
             if unit is None:
                 scheme = "tr.belde" if key.count("-") >= 2 else "tr.ilce"
                 unit = cs.key(f"{SOURCE}.unit", key)
-                units[area] = unit
+                units[slot] = unit
                 cs.add(
                     "reporting_unit",
                     id=unit,
