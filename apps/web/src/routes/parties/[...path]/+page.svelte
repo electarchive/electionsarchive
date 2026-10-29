@@ -4,6 +4,7 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { SvelteSet } from "svelte/reactivity";
+  import Logo from "#lib/components/logo.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -35,6 +36,7 @@
   );
   const color = $derived(swatch(party.color, `party:${data.id}`));
   const former = $derived(formerly(party.names ?? [], getLocale()));
+  const header = $derived(data.logos.header);
   const links = $derived(
     party.parents.flatMap((parent) => {
       const phrase = AFFILIATIONS[parent.kind];
@@ -126,21 +128,40 @@
     style:--party={color}
   >
     <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
+      {#if header?.shape === "wordmark"}
+        <Logo
+          logo={header}
+          label={party.name}
+          kind="lockup"
+          size={44}
+          isEager
+          class="ms-[-0.35rem] mbe-1"
+        />
+      {/if}
       <div class="flex items-start justify-between gap-3">
-        <h1 class="title">
-          {party.scope == null
-            ? party.name
-            : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
-                party: party.name,
-                place: party.scope.polity.name,
-              })}
-          {#if party.scope == null && party.short != null && !party.name.includes(party.short)}
-            <span
-              class="ms-1 font-sans text-[0.5em] font-semibold tracking-normal text-muted-foreground"
-              >{party.short}</span
-            >
+        <div class="flex items-center gap-3.5 min-inline-0 sm:gap-4">
+          {#if header?.shape === "mark"}
+            <Logo
+              logo={header}
+              label={party.name}
+              kind="mark"
+              size={72}
+              isEager
+              class="-m-1 max-sm:block-14 max-sm:inline-14"
+            />
           {/if}
-        </h1>
+          <h1 class="title">
+            {party.scope == null
+              ? party.name
+              : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
+                  party: party.name,
+                  place: party.scope.polity.name,
+                })}{#if party.scope == null && party.short != null && !party.name.includes(party.short)}&nbsp;<span
+                class="font-sans text-[0.5em] font-semibold tracking-normal whitespace-nowrap text-muted-foreground"
+                >{party.short}</span
+              >{/if}
+          </h1>
+        </div>
         <a
           class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
           href={resolve(`/compare?a=${data.id}`)}

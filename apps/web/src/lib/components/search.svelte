@@ -21,10 +21,12 @@
   import { setMode } from "mode-watcher";
   import { toast } from "svelte-sonner";
   import { on } from "svelte/events";
+  import Logo from "#lib/components/logo.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import { date } from "#lib/format.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { finder } from "#lib/search.svelte.js";
 
@@ -299,7 +301,25 @@
               }
             }}
           >
-            {#if group.type !== "person"}
+            {#if group.type === "party" && hit.logo?.shape === "mark"}
+              <Logo
+                logo={hit.logo}
+                label={hit.name}
+                kind="mark"
+                size={24}
+                class="row-span-2 self-center"
+              />
+            {:else if group.type === "party"}
+              <span
+                class="row-span-2 grid place-items-center self-center block-6 inline-6"
+                aria-hidden="true"
+              >
+                <span
+                  class="rounded-full block-2.5 inline-2.5"
+                  style:background-color={swatch(hit.color, `party:${hit.id}`)}
+                ></span>
+              </span>
+            {:else if group.type !== "person"}
               <group.icon class="row-span-2 text-muted-foreground" />
             {:else if hit.photo == null}
               <span

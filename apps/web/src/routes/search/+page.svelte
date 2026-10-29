@@ -7,9 +7,11 @@
   import SearchIcon from "@lucide/svelte/icons/search";
   import UserIcon from "@lucide/svelte/icons/user";
   import VoteIcon from "@lucide/svelte/icons/vote";
+  import Logo from "#lib/components/logo.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -67,7 +69,27 @@
       class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2.5 py-2 hover:bg-secondary"
       href={resolve("/[...path]", { path: hit.path ?? "" })}
     >
-      {#if hit.type !== "person"}
+      {#if hit.type === "party"}
+        {#if hit.logo?.shape === "mark"}
+          <Logo
+            logo={hit.logo}
+            label={hit.name}
+            kind="mark"
+            size={36}
+            class="row-span-2 self-center"
+          />
+        {:else}
+          <span
+            class="row-span-2 grid place-items-center self-center block-9 inline-9"
+            aria-hidden="true"
+          >
+            <span
+              class="rounded-full block-3 inline-3"
+              style:background-color={swatch(hit.color, `party:${hit.id}`)}
+            ></span>
+          </span>
+        {/if}
+      {:else if hit.type !== "person"}
         <Icon
           class="self-center text-muted-foreground block-4 inline-4"
           aria-hidden="true"

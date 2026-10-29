@@ -21748,6 +21748,7 @@ export const search = {
           date: v.nullable(v.string()),
           photo: v.nullable(v.string()),
           logo: v.nullable(LogoRef),
+          color: v.nullable(v.string()),
           office: v.nullable(v.string()),
           ballot: v.nullable(v.object({ date: v.string(), label: v.string() })),
           isBest: v.boolean(),
@@ -22184,10 +22185,18 @@ export const search = {
         words.every((word) => segment(first.name).split("-").includes(word))
           ? first
           : null;
-      const marks = await logos(
-        ranked.filter((row) => row.type === "party").map((row) => row.id),
-        null,
-      );
+      const parties = ranked
+        .filter((row) => row.type === "party")
+        .map((row) => row.id);
+      const [marks, colors] = await Promise.all([
+        logos(parties, null),
+        db.execute<{ id: string; color: string }>(sql`
+          select distinct on (pc.party_id) pc.party_id as id, pc.color from party_color pc
+          where pc.party_id = any(${sql.param(parties)}::uuid[])
+          order by pc.party_id, upper_inf(pc.valid) desc, upper(pc.valid) desc
+        `),
+      ]);
+      const painted = new Map(colors.rows.map((row) => [row.id, row.color]));
       const located = new Map(
         await Promise.all(
           people.map(async (row) => {
@@ -22208,6 +22217,7 @@ export const search = {
         date: row.date,
         photo: row.photo,
         logo: marks[row.id] ?? null,
+        color: painted.get(row.id) ?? null,
         office: row.office,
         ballot: row.ballot,
         isBest: row === best,
