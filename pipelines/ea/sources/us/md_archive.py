@@ -15,12 +15,16 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://elections.maryland.gov/elections/archive/"
 FILES = {
+    "1994/results_1994/paall.csv": (date(1994, 9, 13), True),
+    "1996/results_1996/prepaa.csv": (date(1996, 3, 5), True),
+    "1998/results_1998/paall.csv": (date(1998, 9, 15), True),
     "2000/results/prepaa.csv": (date(2000, 3, 7), True),
     "2002/results/p_all_offices.txt": (date(2002, 9, 10), True),
     "2002/results/g_all_offices.txt": (date(2002, 11, 5), False),
 }
 HEADER = re.compile(
-    r"(U\.S\. Senator|Representative in Congress) - \(Vote for One\)(?: - Congressional District: (\d+))? - (Democratic|Republican) Candidate\(s\)"
+    r"(U\.S\. Senator|Representative in Congress) - (?:\(Vote for One\)|Vote for One)(?: - Congressional District: (\d+))? - (Democratic|Republican) Candidate\(s\)",
+    re.IGNORECASE,
 )
 PUBLISHER = "Maryland State Board of Elections"
 TITLE = "Election results archive"
@@ -46,7 +50,9 @@ def parse() -> None:
         if name.endswith(".csv"):
             contest = None
             for cells in csv.reader(text.splitlines()):
-                cells = [cell.strip() for cell in cells if cell.strip()]
+                cells = [cell.strip() for cell in cells]
+                while cells and not cells[-1]:
+                    cells.pop()
                 if not cells:
                     contest = None
                     continue
@@ -57,13 +63,27 @@ def parse() -> None:
                 if contest is None:
                     continue
                 if contest[3] is None:
-                    contest[3] = [re.sub(r"\s+Winner$", "", cell) for cell in cells]
+                    contest[3] = [re.sub(r"\s+Winner$", "", cell) for cell in cells[1:]]
                     continue
                 county, *votes = cells
+                votes += ["0"] * (len(contest[3]) - len(votes))
+                votes = [vote or "0" for vote in votes]
                 if len(votes) != len(contest[3]):
-                    raise ValueError(f"{name} {contest[:3]} {county}: {len(votes)} values for {len(contest[3])} candidates")
+                    raise ValueError(
+                        f"{name} {contest[:3]} {county}: {len(votes)} values for {len(contest[3])} candidates"
+                    )
                 for candidate, value in zip(contest[3], votes, strict=True):
-                    rows.append((day, contest[0], contest[1], contest[2], counties[county.lower()], candidate, int(value)))
+                    rows.append(
+                        (
+                            day,
+                            contest[0],
+                            contest[1],
+                            contest[2],
+                            counties[county.lower().replace("`", "'")],
+                            candidate,
+                            int(value),
+                        )
+                    )
         else:
             for line in text.splitlines():
                 cells = [cell.strip() for cell in line.split("|")]
@@ -90,7 +110,12 @@ def parse() -> None:
         raise ValueError("a county appears twice for a candidate")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("day", "office", "party").agg(pl.col("district").n_unique(), pl.col("votes").sum()).sort("day").rows())
+    print(
+        frame.group_by("day", "office", "party")
+        .agg(pl.col("district").n_unique(), pl.col("votes").sum())
+        .sort("day")
+        .rows()
+    )
 
 
 def emit() -> Path:
@@ -99,7 +124,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maryland's 2000 and 2002 U.S. House and Senate primaries and 2002 House generals by county from the State Board of Elections' results archive",
+            summary="Maryland's 1994–2002 U.S. House and Senate primaries and 2002 House generals by county from the State Board of Elections' results archive",
             polity="US-MD",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -121,7 +146,9 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "counties.parquet").select(
                 year=pl.col("day").dt.year().cast(pl.Int32),
                 chamber=pl.when(pl.col("office") == "U.S. Senator").then(pl.lit("senate")).otherwise(pl.lit("house"))
-                + pl.when(pl.col("party").is_not_null()).then(pl.lit(":") + pl.col("party").str.to_lowercase()).otherwise(pl.lit("")),
+                + pl.when(pl.col("party").is_not_null())
+                .then(pl.lit(":") + pl.col("party").str.to_lowercase())
+                .otherwise(pl.lit("")),
                 day="day",
                 special=pl.lit(False),
                 state=pl.lit("MD"),
