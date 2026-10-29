@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "21"
+VERSION = "22"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -96,11 +96,11 @@ MP_START_2018 = date(2018, 7, 7)
 ATALAY = ("ŞERAFETTİN CAN ATALAY", date(2024, 1, 30))
 ENDS_2023 = {
     "2023-05-14:41:12": (date(2023, 12, 14), "died", None),
-    "2023-05-14:03:5": (date(2024, 4, 3), "disqualified", "mayor-2024"),
-    "2023-05-14:71:3": (date(2024, 4, 4), "disqualified", "mayor-2024"),
-    "2023-05-14:02:5": (date(2024, 4, 4), "disqualified", "mayor-2024"),
-    "2023-05-14:37:3": (date(2024, 4, 5), "disqualified", "mayor-2024"),
-    "2023-05-14:34-1:1": (date(2024, 7, 2), "disqualified", "Q51212178"),
+    "2023-05-14:03:5": (date(2024, 4, 3), "chose_another_seat", "mayor-2024"),
+    "2023-05-14:71:3": (date(2024, 4, 4), "chose_another_seat", "mayor-2024"),
+    "2023-05-14:02:5": (date(2024, 4, 4), "chose_another_seat", "mayor-2024"),
+    "2023-05-14:37:3": (date(2024, 4, 5), "chose_another_seat", "mayor-2024"),
+    "2023-05-14:34-1:1": (date(2024, 7, 2), "appointed", "Q51212178"),
     "2023-05-14:34-1:18": (date(2025, 5, 3), "died", None),
 }
 RERUN = date(2019, 6, 23)
@@ -492,10 +492,10 @@ GROUPS_2018 = {
     "Q42313794": "İYİ Parti",
 }
 ENDINGS_2018 = {
-    "Q51212178": "disqualified",
-    "Q106224801": "disqualified",
-    "Q106307091": "removed",
-    "Q2916183": "removed",
+    "Q51212178": "appointed",
+    "Q106224801": "chose_another_seat",
+    "Q106307091": "lost_seat",
+    "Q2916183": "lost_seat",
     "Q5247364": "died",
 }
 MAYORS_SOURCE = (
@@ -849,13 +849,14 @@ LISTS_2018_CAVEAT = (
     "party leaders: Mustafa Destici of the Great Unity Party (BBP) ran on the AK Parti list, and Gültekin Uysal of the "
     "Democrat Party ran on the İYİ Parti list."
 )
+ENDS_TBMM_2018 = {"Q99628942": date(2019, 4, 10)}
 ENDS_2018 = [
-    ("Q4881622", MP_START_2018, date(2022, 1, 29), "disqualified", "Q51212178", None),
+    ("Q4881622", MP_START_2018, date(2022, 1, 29), "appointed", "Q51212178", None),
     ("Q6064478", MP_START_2018, date(2022, 10, 20), "resigned", None, None),
     ("Q23921010", MP_START_2018, date(2021, 10, 11), "died", None, None),
     ("Q106194747", MP_START_2018, date(2021, 11, 18), "died", None, None),
     ("Q106285435", MP_START_2018, date(2023, 2, 7), "died", None, None),
-    ("Q97388954", MP_START_2018, date(2022, 12, 22), "removed", "absence", None),
+    ("Q97388954", MP_START_2018, date(2022, 12, 22), "lost_seat", "absence", None),
     ("Q56173976", date(2021, 7, 16), None, None, None, None),
 ]
 LEFT_2018 = {
@@ -871,7 +872,28 @@ ALLY_LIST_2018 = (
     "Ran on an allied party's list as the leader of their own party. The source says only that after the election they "
     "moved to their own party, with no date, so the span runs from the start of the tenure."
 )
+GELECEK_SAADET = (
+    "Elected on the CHP list as a Gelecek Partisi member. Joined Saadet with nine other Gelecek members on July 6, "
+    "2023, so the two parties could form a group in the Assembly, which needs 20 members of one party. The Assembly's "
+    "roll listed them as Saadet members, while Gelecek's leader said they kept their own political identity."
+)
 SWITCH_NOTES = {
+    "2023-05-14:06-1:10": GELECEK_SAADET,
+    "2023-05-14:07:13": GELECEK_SAADET,
+    "2023-05-14:16-2:8": GELECEK_SAADET,
+    "2023-05-14:20:6": GELECEK_SAADET,
+    "2023-05-14:34-3:30": GELECEK_SAADET,
+    "2023-05-14:35-2:13": GELECEK_SAADET,
+    "2023-05-14:42:14": GELECEK_SAADET,
+    "2023-05-14:48:6": GELECEK_SAADET,
+    "2023-05-14:34-3:18": (
+        "Elected on the Green Left Party (YSP) list. Became a DBP co-chair at the party's extraordinary congress on "
+        "November 12, 2023, and the Assembly's roll lists the member under DBP from that day."
+    ),
+    "2023-05-14:47:3": (
+        "Elected on the Green Left Party (YSP) list while a DBP co-chair. DBP's extraordinary congress on November 12, "
+        "2023 elected new co-chairs, and the Assembly's roll lists the member under DEM Parti from that day."
+    ),
     "2018-06-24:06-2:1": ALLY_LIST_2018,
     "2018-06-24:03:6": ALLY_LIST_2018,
     "2018-06-24:34-3:32": ALLY_LIST_2018,
@@ -4191,7 +4213,7 @@ def parse() -> None:
                             {
                                 "person": person,
                                 "start": start,
-                                "end": date.fromisoformat(row["end"][:10]),
+                                "end": ENDS_TBMM_2018.get(person, date.fromisoformat(row["end"][:10])),
                                 "ended_via": "died" if died else ENDINGS_2018[row["cause"]],
                                 "cause": row.get("cause"),
                                 "statement": row["statement"],
@@ -7235,7 +7257,7 @@ def emit() -> Path:
                     elif day in (DAY_2015, DAY_JUNE_2015, DAY_2011, DAY_2007):
                         terms = []
                     elif row["name"] == ATALAY[0]:
-                        terms = [(MP_START, ATALAY[1], "removed", None, None)]
+                        terms = [(MP_START, ATALAY[1], "lost_seat", None, None)]
                     elif member in ENDS_2023:
                         end, ended_via, cause = ENDS_2023[member]
                         terms = [(MP_START, end, ended_via, cause, None)]
@@ -7289,11 +7311,11 @@ def emit() -> Path:
                             cs.add("citation", entity_id=tenure, source_id=switch_sources["wikipedia27"], locator=None)
                         if cause in LEFT_2018:
                             cs.add("note", entity_id=tenure, kind="context", body_md=LEFT_2018[cause])
-                        if ended_via in ("removed", "died"):
+                        if ended_via in ("lost_seat", "died"):
                             cs.add(
                                 "tenure_event",
                                 tenure_id=tenure,
-                                kind=ended_via,
+                                kind="removed" if ended_via == "lost_seat" else ended_via,
                                 date=end,
                                 actor=None if ended_via == "died" else "Türkiye Büyük Millet Meclisi Genel Kurulu",
                                 reason=None
