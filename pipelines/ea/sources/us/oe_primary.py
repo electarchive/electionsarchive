@@ -1,5 +1,6 @@
 import io
 import json
+import os
 import re
 from collections import defaultdict
 from datetime import date, timedelta
@@ -146,7 +147,10 @@ def picks() -> dict[tuple[str, str], dict[str, list[str]]]:
             if value not in filled
         }
     chosen: dict[tuple[str, str], dict[str, list[str]]] = {}
+    only = os.environ.get("OE_STATES")
     for state, commit in openelections.COMMITS.items():
+        if only and state not in only.split(","):
+            continue
         tree = json.loads(
             raw.cached(
                 openelections.SOURCE, openelections.TREE.format(state=state.lower(), commit=commit)
