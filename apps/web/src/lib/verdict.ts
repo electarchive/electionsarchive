@@ -251,7 +251,11 @@ export function verdict(contest: Page["contest"]) {
         });
   }
   const [top, next] = contest.rows
-    .filter((row) => row.current != null && !row.key.startsWith("kind:"))
+    .filter(
+      (row) =>
+        row.current != null &&
+        (!row.key.startsWith("kind:") || row.key.startsWith("kind:candidate:")),
+    )
     .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0));
   if (next == null && top?.current != null) {
     return (

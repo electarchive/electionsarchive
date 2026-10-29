@@ -3655,7 +3655,11 @@ function contestMarkdown(
       : String(target.year ?? target.date?.slice(0, 4) ?? target.name);
   const compared = comparedMarkdown(contest, link, then);
   const [top, next] = contest.rows
-    .filter((row) => row.current != null && !row.key.startsWith("kind:"))
+    .filter(
+      (row) =>
+        row.current != null &&
+        (!row.key.startsWith("kind:") || row.key.startsWith("kind:candidate:")),
+    )
     .toSorted((a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0));
   const label =
     handover?.party?.short ?? handover?.party?.label ?? m.seats_independents();
