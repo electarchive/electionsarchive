@@ -514,6 +514,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(texas, infer_schema_length=None))
     frames.append(pl.DataFrame(special_files.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_files.illinois_rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_files.illinois_primary_rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nc.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_md.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))

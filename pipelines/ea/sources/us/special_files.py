@@ -89,6 +89,12 @@ ILLINOIS_PAGES = {
     40: (date(2013, 4, 9), 2),
     49: (date(2015, 9, 10), 18),
 }
+ILLINOIS_PRIMARIES = {
+    26: (date(2009, 3, 3), 5),
+    38: (date(2013, 2, 26), 2),
+    48: (date(2015, 7, 7), 18),
+}
+ILLINOIS_PRIMARY_CSV = "https://www.elections.il.gov/Downloads/ElectionOperations/ElectionResults/ByOffice/48/48-420-18TH%20CONGRESS-2015SP.csv"
 
 
 def party(text: str | None) -> str | None:
@@ -314,7 +320,7 @@ def fetch_illinois() -> None:
         hit[0]: hit[1].replace("&amp;", "&")
         for hit in re.findall(r'name="(__[A-Z]+)" id="[^"]*" value="([^"]*)"', page)
     }
-    for election in ILLINOIS_PAGES:
+    for election in [*ILLINOIS_PAGES, *ILLINOIS_PRIMARIES]:
         url = f"{ILLINOIS}#election-{election}"
         try:
             raw.cached("us.elstats_specials", url)
@@ -337,6 +343,7 @@ def fetch_illinois() -> None:
                 media_type="text/html",
             )
     raw.fetch("us.elstats_specials", ILLINOIS_CSV, suffix=".csv")
+    raw.fetch("us.elstats_specials", ILLINOIS_PRIMARY_CSV, suffix=".csv")
 
 
 def illinois_rows() -> list[dict[str, object]]:
@@ -386,6 +393,63 @@ def illinois_rows() -> list[dict[str, object]]:
                     "outcome": "Elected" if name == person(winner) else "Defeated",
                     "runoff": False,
                     "manual": None,
+                }
+            )
+    return found
+
+
+def illinois_primary_rows() -> list[dict[str, object]]:
+    found: list[dict[str, object]] = []
+    for election, (day, district) in ILLINOIS_PRIMARIES.items():
+        url = f"{ILLINOIS}#election-{election}"
+        STORED.append(("IL", url))
+        text = raw.cached("us.elstats_specials", url).path.read_text(errors="replace")
+        start = text.index("CONGRESS")
+        body = text[start : text.index("</table>", start)]
+        candidates: list[tuple[str, str, int]] = []
+        printed = 0
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.S):
+            cells = [re.sub(r"\s+", " ", re.sub(r"<[^>]*>|&nbsp;", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+            if len(cells) < 3:
+                continue
+            if cells[0] == "Vote Totals":
+                printed = int(cells[2].replace(",", ""))
+            else:
+                candidates.append((cells[0], cells[1].title(), int(cells[2].replace(",", ""))))
+        if sum(count for _, _, count in candidates) != printed:
+            raise ValueError(f"{day}: the candidates do not sum to the printed total")
+        lines: list[tuple[str, str, str, int]] = []
+        if election == 48:
+            STORED.append(("IL", ILLINOIS_PRIMARY_CSV))
+            counts: dict[tuple[str, str, str], int] = {}
+            for record in csv.DictReader(io.StringIO(raw.cached("us.elstats_specials", ILLINOIS_PRIMARY_CSV).path.read_text(encoding="utf-8-sig"))):
+                if record["CandidateName"].lower().startswith("write-in"):
+                    continue
+                key = (
+                    person(record["CandidateName"]),
+                    record["PartyName"].title().replace("Democrat", "Democratic").replace("Democraticic", "Democratic"),
+                    record["JurisName"].replace("CITY OF BLOOMINGTON", "McLEAN").title(),
+                )
+                counts[key] = counts.get(key, 0) + int(record["VoteCount"])
+            lines = [(name, label, county, count) for (name, label, county), count in counts.items()]
+            for name, label, count in [(person(n), l, c) for n, l, c in candidates if not n.lower().startswith("write-in")]:
+                if any(line[0] == name for line in lines) and sum(line[3] for line in lines if line[0] == name) != count:
+                    raise ValueError(f"{day}: {name} counties do not sum to {count}")
+        else:
+            lines = [(person(name), label, f"cd:{district}", count) for name, label, count in candidates]
+        for name, label, division, count in lines:
+            found.append(
+                {
+                    "state": "IL",
+                    "election_date": str(day),
+                    "district_name": str(district),
+                    "candidate_name": name,
+                    "candidate_party_name": label,
+                    "division_name": division,
+                    "votes": str(count),
+                    "outcome": "Defeated",
+                    "runoff": False,
+                    "primary": label,
                 }
             )
     return found
