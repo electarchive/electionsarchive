@@ -143,7 +143,7 @@ OFFICIAL = {
         "Maryland State Board of Elections",
         "Special election results",
         "https://elections.maryland.gov/elections/special_elections_past.html",
-        [page for page, _, _ in special_md.PAGES],
+        [page for page, *_ in [*special_md.PAGES, *special_md.PRIMARIES]],
     ),
     "NJ": (
         "New Jersey Division of Elections",
@@ -749,6 +749,17 @@ def emit() -> Path:
                 if primary
                 else f"{day}:{state}:house:{district}:special" + (":runoff" if runoff else "")
             )
+            concurrent = (
+                bool(primary)
+                and not runoff
+                and conn.execute(
+                    """select exists (select 1 from external_id where scheme = 'us.contest' and value = %(key)s)
+                       and not exists (select 1 from external_id where scheme = %(scheme)s and value = %(key)s)""",
+                    {"key": key, "scheme": f"{SOURCE}.result_set"},
+                ).fetchone()[0]
+            )
+            if concurrent:
+                key += ":special"
             general = conn.execute(
                 """select ct.id, ct.district_area_id, ct.boundary_set_id from external_id e
                    join contest ct on ct.id = e.entity_id
@@ -758,7 +769,7 @@ def emit() -> Path:
             ).fetchone()
             if general is None:
                 raise ValueError(f"{key}: no earlier general for the district")
-            stage = "primary" if primary else "runoff" if runoff else "special"
+            stage = "special-primary" if concurrent else "primary" if primary else "runoff" if runoff else "special"
             election = cs.key("us.election", f"{day}:{state}:{stage}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
@@ -767,7 +778,7 @@ def emit() -> Path:
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
                     parent_id=None,
-                    kind=stage,
+                    kind="primary" if primary else stage,
                     date_from=day,
                     date_to=day,
                     status="held",
@@ -831,7 +842,7 @@ def emit() -> Path:
             )
             cs.add(
                 "slug",
-                path=f"us/{state.lower()}/{day}-{stage}/house-{'at-large' if district == 0 else district}-{primary.lower() or 'special'}",
+                path=f"us/{state.lower()}/{day}-{stage}/house-{'at-large' if district == 0 else district}-{primary.lower() or 'special'}{'-special' if concurrent else ''}",
                 entity_id=contest,
             )
 
