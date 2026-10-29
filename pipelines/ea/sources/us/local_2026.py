@@ -4221,16 +4221,16 @@ def parse() -> None:
             )
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
-            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK"]) & (pl.col("FUNCSTAT") == "A"))
+            gazetteer.filter(pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR"]) & (pl.col("FUNCSTAT") == "A"))
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
-        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok)/[^/]+$'")}
+        claimed = {path for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar)/[^/]+$'")}
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -4346,7 +4346,9 @@ def parse() -> None:
                     title, district, owner = schools[str(row["contest"])]
                     template, tail = "", f"KY:{owner.split(':')[1]}:board-of-education:{slug(title.split(', ')[1])}"
                     minted[tail] = (title, district, owner, owned.get(owner) or f"us/ky/{slug(district)}")
-                place = places.get(str(row["fips"]), "").rsplit(",", 1)[0]
+                place = places.get(str(row["fips"]), "").rsplit(",", 1)[0] or (
+                    "Carson City" if row["fips"] == "32510" else ""
+                )
                 tokens = [
                     "mount" if token == "mt" else "st" if token == "saint" else token
                     for token in re.findall(
@@ -4406,7 +4408,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX")
@@ -4437,6 +4439,7 @@ def parse() -> None:
                                     (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
                                     (r"\bcommittee\b", "committee"),
+                                    (r"\bdirectors?\b", "board-of-directors"),
                                     (
                                         r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmember\b|\balderm[ae]n\b",
                                         "council",
@@ -4456,17 +4459,27 @@ def parse() -> None:
                     if role == "office":
                         role = post.split()[-1]
                     ward = re.search(
-                        r"\bward (\d+)\b|\b(\d+)(?:st|nd|rd|th)? ward\b|\bw(\d+)\b|\b(north|south|east|west|central) ward\b",
+                        r"\bward (\d+)\b|\b(\d+)(?:st|nd|rd|th)? ward\b|\bw(\d+)\b|\b(north|south|east|west|central) ward\b"
+                        r"|\bward (f\d+)\b",
                         post,
                     )
                     seat = (
-                        (f"Ward {ward[1] or ward[2] or ward[3]}" if ward[4] is None else f"{ward[4].title()} Ward")
-                        if ward and role in ("council", "commission")
+                        (
+                            f"Ward {(ward[1] or ward[2] or ward[3] or ward[5]).upper()}"
+                            + (
+                                f" Position {pos[1]}"
+                                if state in ("AR", "NV") and (pos := re.search(r"\bposition (\d+)\b", post))
+                                else ""
+                            )
+                            if ward[4] is None
+                            else f"{ward[4].title()} Ward"
+                        )
+                        if ward and role in ("council", "commission", "board-of-directors")
                         else f"{other[1].title()} {other[2]}"
                         if (other := re.search(r"\b(seat|district|group|place|zone|position) (\d+)\b", post))
-                        and role in ("council", "commission")
+                        and role in ("council", "commission", "board-of-directors")
                         else "At-Large"
-                        if role in ("council", "commission") and re.search(r"\bat large\b", post)
+                        if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
                         if state == "CA"
                         and (
@@ -4487,6 +4500,7 @@ def parse() -> None:
                                 "council": "Council",
                                 "commission": "Commission",
                                 "board-of-trustees": "Board of Trustees",
+                                "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
                                 "treasurer": "Treasurer",
@@ -4504,7 +4518,7 @@ def parse() -> None:
                         int(str(row["seats"]) or 0) <= 1
                         or re.search(r"(?i)\bcounty (council|commission)\b", str(row["contest"])) is not None
                     )
-                    and not LOCAL_BODY.search(str(row["contest"]))
+                    and not LOCAL_BODY.search(str(row["contest"]).replace("Carson City", "Carson"))
                     and (
                         "-" not in key
                         or key == "MN-county"
