@@ -11,7 +11,7 @@ from ea.sources.tr.ysk import FORMER, INDEPENDENTS, PROVINCES, REGISTERED, RENAM
 from ea.store import connect
 
 SOURCE = "tr.thea"
-VERSION = "2"
+VERSION = "3"
 TURKEY = 792
 WORKBOOK = f"{thea.UPLOADS}/2025/10/clea_lc_20251015-L-Z.xlsx"
 DAYS = {
@@ -221,9 +221,9 @@ QUOTA_METHODOLOGY = (
 REMAINDER_METHODOLOGY = (
     "Each province first gave a list one seat for every full provincial quota, the province's valid votes divided by "
     "its seats. The votes left over and the seats left unfilled were pooled nationally, allocated in a second count, "
-    "and assigned back to provinces. The rules engine models the national pool but not the Hagenbach-Bischoff quota "
-    "that Law 533 set for two-seat provinces or the independents' votes that count toward the quota without winning "
-    "a pooled seat, so its seats can differ from the declared ones."
+    "and assigned back to provinces. Law 533 set the Hagenbach-Bischoff quota for two-seat provinces, and the "
+    "independents' votes counted toward the quota without winning a pooled seat; the rules engine models both, so "
+    "its seats match the declared ones except for THEA's İstanbul artifact."
 )
 BLOCK_CAVEAT = (
     "THEA gives one vote figure per party list. Voters could mix candidates from several lists, so in some provinces "
@@ -438,7 +438,12 @@ def emit() -> Path:
             ),
             (
                 "parliament_1965",
-                {"formula": "hare", "remainders": "national", "lists": lists},
+                {
+                    "formula": "hare",
+                    "remainders": "national",
+                    "districtFormulas": [{"seats": 2, "formula": "hagenbach_bischoff_quota"}],
+                    "lists": lists,
+                },
                 "National Assembly national remainder, 1965",
                 REMAINDER_METHODOLOGY,
             ),
