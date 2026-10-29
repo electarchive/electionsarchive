@@ -18,12 +18,12 @@ SOURCE = "us.nyc_wards_early"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = (1859, 1861, 1870)
-TRIB = {1854: 56, 1857: 217, 1863: 509, 1867: 712}
+TRIB = {1854: 56, 1857: 217, 1863: 509, 1865: 617, 1867: 712}
 TRIB_URL = "https://archive.org/download/tribunealmanacfo00gree/tribunealmanacfo00gree.pdf"
 TRIB_TITLE = "The Tribune almanac for the years 1838 to 1868, inclusive (New York City vote by wards)"
 TRIB_NOTE = (
     "Scanned volume on the Internet Archive (item tribunealmanacfo00gree), whose tables of New York City's vote for mayor "
-    "by ward sit on PDF pages 56 (1854), 217 (1857), 509 (1863), and 712 (1867)."
+    "by ward sit on PDF pages 56 (1854), 217 (1857), 509 (1863), 617 (1865), and 712 (1867)."
 )
 TRIB_INBOX = DATA / "inbox" / "nyc_trib"
 PAGES = DATA / "pages" / SOURCE
@@ -110,7 +110,9 @@ def parse() -> None:
         reads = [json.loads((TRIB_INBOX / f"p{page}-{reader}.json").read_text()) for reader in ("sonnet", "opus")]
         citywide = lines.filter((pl.col("year") == year) & (pl.col("stage") == "general") & (pl.col("office") == "mayor"))
         for position, head in enumerate(reads[0]["candidates"]):
-            surname = {"Her'ck": "Herrick"}.get(head["name"], head["name"]).lower()
+            if head["name"] == "Sc't":
+                continue
+            surname = {"Her'ck": "Herrick", "Hoff": "Hoffman", "Robts": "Roberts"}.get(head["name"], head["name"]).lower()
             (found,) = [c for c in citywide["candidate"] if c.split()[-1].lower() == surname]
             cells = [[int(ward["votes"][position].replace(",", "")) for ward in read["wards"]] for read in reads]
             wards = [[ward["ward"] for ward in read["wards"]] for read in reads]
@@ -159,7 +161,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York City mayoral elections of 1854, 1857, 1859, 1861, 1863, 1867, and 1870 by ward, from the English Wikipedia's ward tables and the Tribune Almanac",
+            summary="New York City mayoral elections of 1854, 1857, 1859, 1861, 1863, 1865, 1867, and 1870 by ward, from the English Wikipedia's ward tables and the Tribune Almanac",
             polity="US",
         )
         source = cs.source("Wikipedia", TITLE)
