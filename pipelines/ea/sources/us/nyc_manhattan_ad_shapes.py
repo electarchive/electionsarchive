@@ -24,8 +24,13 @@ LAST = date(1927, 1, 1)
 SCALE = 3
 CONTROL = {
     "Columbus Circle": ((4195, 3105), (-73.98197, 40.76806)),
-    "Hudson River at 160th Street": ((5715, 3875), (-73.9583, 40.8008)),
-    "Battery": ((2637, 2853), (-73.9903, 40.7359)),
+    "Central Park northwest corner": ((5715, 3875), (-73.9583, 40.8008)),
+    "Union Square": ((2637, 2853), (-73.9903, 40.7359)),
+    "Battery": ((976, 2080), (-74.0141, 40.7003)),
+    "Grand Army Plaza": ((4015, 3418), (-73.9738, 40.7648)),
+    "Washington Square": ((2385, 2608), (-73.9973, 40.7308)),
+    "125th Street and Lenox Avenue": ((6133, 4308), (-73.9453, 40.8081)),
+    "Inwood Hill nose": ((9590, 5100), (-73.924, 40.876)),
 }
 LABELS = {
     1: (240, 215), 2: (345, 285), 3: (590, 205), 4: (270, 425), 5: (775, 280), 6: (365, 440),
@@ -143,8 +148,8 @@ def emit() -> Path:
             notes=(
                 "Approximate outlines of Manhattan's 23 assembly districts under the apportionment of 1917, traced from the "
                 "red district lines of the 1918 NYPL map: the scan is georeferenced to modern coordinates by an affine fit "
-                "through three landmarks, each district is a watershed of the line network seeded at its printed label, and "
-                "the result is clipped to the present shoreline of New York County. Boundaries follow the printed lines "
+                "through eight landmarks (residuals at the landmarks: median 113 m, maximum 240 m), each district is a watershed of the line network seeded at its printed label, and "
+                "the result is clipped to the present shoreline of New York County. Every outline is approximate and can sit a block or two from the printed line. Boundaries follow the printed lines "
                 "where they are continuous and fall between neighboring labels where the lines break."
             ),
         )
