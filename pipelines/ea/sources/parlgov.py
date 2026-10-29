@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "parlgov"
-VERSION = "2"
+VERSION = "3"
 DATABASE = "https://dataverse.harvard.edu/api/access/datafile/10437086"
 LANDING = "https://doi.org/10.7910/DVN/2VZ5ZC"
 PUBLISHER = "ParlGov (Döring, Huber, and Manow)"
@@ -483,6 +483,9 @@ def emit() -> Path:
                 caretaker=caretaker,
                 source_id=source if key[0] == "parlgov.cabinet" else wikidata,
             )
+            if leader is not None:
+                spelled = {variant: word for word in leader[2].split() for variant in _folds(word)}
+                name = " ".join(next((spelled[v] for v in _folds(word) if v in spelled), word) for word in name.split())
             cs.add("name", entity_id=government, text=name, lang="en", kind="short", is_preferred=True)
             for party, role, seats in lineup:
                 cs.add("government_party", government_id=government, party_id=party, role=role, seats=seats)
