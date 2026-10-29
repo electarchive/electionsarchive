@@ -971,6 +971,11 @@ FEEDS.update(
             "City of Tangent",
             "2026 Municipal Election",
         ),
+        "OR-41043-lyons": (
+            "https://www.cityoflyons.org/",
+            "City of Lyons",
+            "General Election Certified Candidates",
+        ),
         "OR-41019": (
             "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
             "Douglas County Clerk",
@@ -1162,6 +1167,7 @@ DELIVERED = {
     "OR-41043-sweet-home": DATA / "inbox" / "y26" / "or" / "sweet-home.html",
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
+    "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
     "OR-41019": DATA / "inbox" / "y26" / "or" / "douglas.pdf",
     "OR-41017": DATA / "inbox" / "y26" / "or" / "deschutes.html",
     "OR-41017-bend": DATA / "inbox" / "y26" / "or" / "bend.html",
