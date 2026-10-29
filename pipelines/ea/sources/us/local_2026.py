@@ -647,6 +647,11 @@ FEEDS = {
         "Imperial County Registrar of Voters",
         "Imperial County Candidate Status, November 3, 2026 General Election (updated as of 08/14/2026)",
     ),
+    "CA-06095": (
+        "https://content.solanocounty.gov/sites/default/files/2026-07/CANDIDATE_FILED_LOG_Nov_3_2026_7.13.26.pdf",
+        "Solano County Registrar of Voters",
+        "Candidate Filed Log, November 3, 2026 General Election (as of 8/20/2026)",
+    ),
     "CA-06113": (
         "https://elections.yolocounty.gov/423/Municipal-City",
         "Yolo County Assessor/Clerk-Recorder/Elections",
@@ -1042,6 +1047,7 @@ DELIVERED = {
     "NM": DATA / "inbox" / "y26" / "nm_candidates_2026_all.csv",
     "ME": DATA / "inbox" / "y26" / "ne" / "me_general_candidate_list_2026.xlsx",
     "VT": DATA / "inbox" / "y26" / "ne" / "vt_ge_qualified_candidates_2026.xlsx",
+    "CA-06095": DATA / "inbox" / "y26" / "ca" / "solano_filed_log.pdf",
     "NJ-34009": DATA / "inbox" / "y26" / "nj" / "cape_may.pdf",
     "NJ-34011": DATA / "inbox" / "y26" / "nj" / "cumberland.xlsx",
     "NJ-34019-r": DATA / "inbox" / "y26" / "nj" / "hunterdon_rep.pdf",
