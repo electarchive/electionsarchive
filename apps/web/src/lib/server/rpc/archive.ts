@@ -1514,7 +1514,7 @@ async function load(
           order by (
             select max(x.value) from contest_option ch
             join result_set rs on rs.contest_id = ch.contest_id and ${latest("rs")}
-            cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k offset 0) x
+            cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k + 0 = ch.k offset 0) x
             where ch.parent_option_id = o.id and ch.party_id = n.party_id
           ) desc nulls last, n.party_id
           limit 1
@@ -7852,7 +7852,7 @@ export const contests = {
             join contest k on k.id = o.contest_id and k.election_id = ${contest.election}::uuid and k.id <> ${contest.id}::uuid
             order by w.person, k.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid desc, (
                 select max(x.value) from result_set rs
-                cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = o.k offset 0) x
+                cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k + 0 = o.k offset 0) x
                 where rs.contest_id = k.id and ${latest("rs")}
               ) desc nulls last, k.id
           `);
@@ -11066,10 +11066,13 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
       join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
       where ${ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`}
     ),
+    extent as materialized (
+      select box, (ST_XMax(box) - ST_XMin(box)) * (ST_YMax(box) - ST_YMin(box)) as size
+      from (select ST_SetSRID(ST_Extent(geom)::geometry, 4326) as box from shapes) e
+    ),
     bounds as (
       select box, least(greatest(ST_XMax(box) - ST_XMin(box), ST_YMax(box) - ST_YMin(box)) / 500, 0.01) as t
-      from (select ST_SetSRID(ST_Extent(geom)::geometry, 4326) as box from shapes) e
-      where (ST_XMax(box) - ST_XMin(box)) * (ST_YMax(box) - ST_YMin(box)) <= 4
+      from extent where size <= 4
     ),
     water as (
       select ST_Subdivide(ST_Difference(b.box, ST_Difference(
@@ -11082,7 +11085,8 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     dry as (
       select s.id, s.scheme, coalesce(
         (select coalesce(c.geom, s.geom) from display.clipped c join display.meta dm on dm.mask_version = c.mask_version
-          where c.area_id = s.id and c.valid = s.valid and c.geom_hash = md5(ST_AsBinary(s.geom))),
+          where c.area_id = s.id and c.valid = s.valid and c.geom_hash = md5(ST_AsBinary(s.geom))
+            and (select size from extent) <= 400),
         (select case when ST_IsEmpty(w.d) then null else w.d end from (
           select ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeValid(ST_Simplify(s.geom, b.t, true)),
             (select ST_UnaryUnion(ST_Collect(x.geom)) from water x where x.geom && s.geom)), 3)) as d
