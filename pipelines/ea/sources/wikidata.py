@@ -14,11 +14,12 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "12"
+VERSION = "13"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
 LATE_FOUNDINGS = Path(__file__).with_name("wikidata_late_foundings.tsv")
+REGISTERED = Path(__file__).parent / "tr" / "lineage_register_foundings.tsv"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
     "US": "Q30",
@@ -813,6 +814,8 @@ def emit() -> Path:
             if party not in evidence or day < evidence[party][0]:
                 evidence[party] = (day, what)
         late: list[dict[str, object]] = []
+        with REGISTERED.open(encoding="utf-8") as handle:
+            registered = {UUID(row["party_id"]) for row in csv.DictReader(handle, delimiter="\t")}
         for party, iso, kind, full, short, codes, first, last, options in parties:
             if party not in found:
                 continue
@@ -854,7 +857,7 @@ def emit() -> Path:
                                 "evidence": earliest[1],
                             }
                         )
-                    else:
+                    elif party not in registered:
                         cs.add(
                             "party_founding",
                             party_id=party,

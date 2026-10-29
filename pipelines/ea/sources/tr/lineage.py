@@ -1,4 +1,6 @@
-from datetime import date
+import html
+import re
+from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import quote
 from uuid import UUID
@@ -6,10 +8,11 @@ from uuid import UUID
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.tr import ysk
+from ea.sources.tr.senato_uyeleri import fold
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "10"
+VERSION = "11"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -71,7 +74,7 @@ NAMES = {
 }
 REGISTRY = "https://www.yargitaycb.gov.tr/sipars"
 REGISTRY_TITLE = "Siyasi Parti Genel Bilgileri"
-FOUNDED = {"genc-parti": date(1992, 11, 26)}
+REGISTER_FOUNDINGS = Path(__file__).with_name("lineage_register_foundings.tsv")
 ABBREVIATIONS: dict[str, tuple[str | None, str | None, tuple[str, str] | str | None]] = {
     "saadet-partisi": ("Saadet", "SP", ("tr", "Saadet Partisi")),
     "zafer-partisi": ("Zafer", "ZP", ("tr", "Zafer Partisi")),
@@ -388,7 +391,7 @@ def emit() -> Path:
             summary=(
                 "Turkish party lineage from 1946 to 2025: court closures, mergers, parties that joined another, "
                 "successors, and splits within a tradition, with the renames of ÖDP to Sol Parti and Yeniden Doğuş "
-                "Partisi to Genç Parti merged into one party each, YSP renamed HEDEP and then DEM Parti, YENİ Parti's split from CHP, Yeni Yol, and the joint "
+                "Partisi to Genç Parti merged into one party each, YSP renamed HEDEP and then DEM Parti, YENİ Parti's split from CHP, Yeni Yol, the founding dates of active parties from Yargıtay's register, and the joint "
                 "lists of 1991, 2002, 2018, and 2023 that carried other parties' candidates"
             ),
             polity="TR",
@@ -501,14 +504,67 @@ def emit() -> Path:
                     text=text,
                     reason="Replaced by the party's dated names.",
                 )
-        for key, founded in FOUNDED.items():
-            cs.add(
-                "party_founding",
-                party_id=known[key],
-                date=founded,
-                date_precision="day",
-                source_id=sources[REGISTRY],
+        page = re.sub(r"data:image/[^\"]+", "", raw.cached(SOURCE, REGISTRY).path.read_text(encoding="utf-8"))
+        register = [
+            (html.unescape(name).strip(), datetime.strptime(day.strip(), "%d.%m.%Y").date())
+            for name, day in re.findall(
+                r'/sipar/\d+" title="[^"]*">\s*(.*?)\s*</a>\s*</td>\s*<td class="align-middle">.*?</td>\s*'
+                r'<td class="align-middle">\s*(.*?)\s*</td>',
+                page,
+                re.DOTALL,
             )
+        ]
+        if len(register) < 150:
+            raise ValueError(f"register parsed to {len(register)} parties")
+        current: dict[str, list[tuple[UUID, date | None, str | None]]] = {}
+        for party, text, earliest, holder in conn.execute(
+            """select p.id, n.text,
+                 least((select min(e.date_from) from contest_option o join contest c on c.id = o.contest_id
+                          join election e on e.id = c.election_id where o.party_id = p.id),
+                       (select min(case when a.valid_from_precision in ('month', 'year') then (date_trunc(a.valid_from_precision::text,
+                          a.valid_from) + ('1 ' || a.valid_from_precision::text)::interval - interval '1 day')::date
+                          else a.valid_from end)
+                        from tenure_affiliation a where a.party_id = p.id),
+                       (select min(case when m.valid_from_precision in ('month', 'year') then (date_trunc(m.valid_from_precision::text,
+                          m.valid_from) + ('1 ' || m.valid_from_precision::text)::interval - interval '1 day')::date
+                          else m.valid_from end)
+                        from name m where m.entity_id = p.id)),
+                 (select s.pipeline from party_founding f join changeset s on s.id = f.changeset_id where f.party_id = p.id)
+               from party p join name n on n.entity_id = p.id and n.lang = 'tr' and n.kind = 'official' and n.valid_to is null
+               where p.polity_id = %s and not exists (select from entity_merge m where m.entity_id = p.id)""",
+            [turkey],
+        ).fetchall():
+            current.setdefault(fold(text), []).append((party, earliest, holder))
+        matched: list[tuple[UUID, str, date, str]] = []
+        for text, founded in register:
+            fits = sorted(
+                (row for row in current.get(fold(text), []) if row[1] is None or row[1] >= founded),
+                key=lambda row: row[1] or date.max,
+            )
+            if not fits:
+                continue
+            party, _, holder = fits[0]
+            matched.append((party, text, founded, holder or ""))
+            if holder in (None, SOURCE):
+                cs.add(
+                    "party_founding",
+                    party_id=party,
+                    date=founded,
+                    date_precision="day",
+                    source_id=sources[REGISTRY],
+                )
+        with open(REGISTER_FOUNDINGS, "w", encoding="utf-8") as handle:
+            handle.write("party_id\tname\tfounded\theld_by\n")
+            for party, text, founded, holder in sorted(matched, key=lambda row: row[1]):
+                handle.write(f"{party}\t{text}\t{founded}\t{'' if holder == SOURCE else holder}\n")
+        print(
+            len(register),
+            "register parties,",
+            len(matched),
+            "matched,",
+            sum(1 for row in matched if row[3] not in ("", SOURCE)),
+            "held by another pipeline",
+        )
         for key, (old, abbreviation, cite) in ABBREVIATIONS.items():
             party = known[key]
             if old is not None:
