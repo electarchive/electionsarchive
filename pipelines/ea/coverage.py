@@ -1,11 +1,9 @@
 import csv
-import json
 import time
 from collections import defaultdict
 from datetime import date
 
-from ea import raw, readiness
-from ea.sources.us.clerk import LEGISLATORS
+from ea import readiness
 from ea.store import ROOT, Connection, connect
 
 LEVELS = (
@@ -122,23 +120,14 @@ where level = 'us_house' and stage = 'general';
 
 create index on cc (id);
 
-delete from district_county x
-where not exists (select from area_geometry g where g.area_id = x.district_area_id and g.valid = x.district_valid)
-    or not exists (select from area_geometry g where g.area_id = x.county_area_id and g.valid = x.county_valid);
-
-create temp table cty as
-select g.area_id, g.valid, g.geom from area_geometry g join area a on a.id = g.area_id and a.scheme_code = 'us.county';
-
-create index on cty using gist (geom);
-
-analyze cty;
-
 create temp table dp as
 select dg.area_id, dg.valid, st_pointonsurface(dg.geom) as pt, d.dates
 from (select c.district_area_id as area_id, g.valid, array_agg(distinct e.date_from) as dates
       from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
       join area_geometry g on g.area_id = c.district_area_id and g.valid @> e.date_from
       where cc.level in ('us_house', 'state_upper', 'state_lower')
+          and not exists (select from district_county x where x.district_area_id = c.district_area_id
+              and x.district_valid = g.valid and x.county_valid @> e.date_from)
       group by 1, 2) d
 join area_geometry dg on dg.area_id = d.area_id and dg.valid = d.valid
 where st_area(dg.geom) > 0;
@@ -146,7 +135,8 @@ where st_area(dg.geom) > 0;
 create temp table dn as
 select distinct dp.area_id, dp.valid, c.area_id as county_area_id, c.valid as county_valid
 from dp cross join unnest(dp.dates) t(d)
-join cty c on c.valid @> t.d and st_intersects(c.geom, dp.pt)
+join area_geometry c on c.valid @> t.d and st_intersects(c.geom, dp.pt)
+join area a on a.id = c.area_id and a.scheme_code = 'us.county'
 where not exists (select from district_county x where x.district_area_id = dp.area_id and x.district_valid = dp.valid
     and x.county_area_id = c.area_id and x.county_valid = c.valid);
 
@@ -154,17 +144,19 @@ insert into district_county (district_area_id, district_valid, county_area_id, c
 select dn.area_id, dn.valid, dn.county_area_id, dn.county_valid, st_area(st_intersection(c.geom, dg.geom)) / st_area(dg.geom)
 from dn
 join area_geometry dg on dg.area_id = dn.area_id and dg.valid = dn.valid
-join cty c on c.area_id = dn.county_area_id and c.valid = dn.county_valid
+join area_geometry c on c.area_id = dn.county_area_id and c.valid = dn.county_valid
 on conflict do nothing;
 
 update district_county x set rest = coalesce((
     select max(st_area(st_intersection(c.geom, dg.geom)) / st_area(dg.geom))
     from area_geometry dg
-    join cty c on c.area_id <> x.county_area_id and c.geom && dg.geom
+    join area_geometry c on c.area_id <> x.county_area_id and c.geom && dg.geom
         and c.valid @> coalesce(lower(x.district_valid * x.county_valid), upper(x.district_valid * x.county_valid) - 1,
             current_date)
+    join area a on a.id = c.area_id and a.scheme_code = 'us.county'
     where dg.area_id = x.district_area_id and dg.valid = x.district_valid), 0)
-where x.rest is null and x.share >= 0.5 and x.share < 0.98;
+where x.rest is null and x.share >= 0.5 and x.share < 0.98
+    and x.district_area_id in (select c.district_area_id from cc join contest c on c.id = cc.id);
 
 create temp table sc as
 select distinct cc.id
@@ -180,92 +172,60 @@ where o.kind = 'candidate' and o.contest_id in (select id from cc);
 create index on ot (top);
 analyze ot;
 
-create temp table rs as
-select r.k, r.contest_id, cs.pipeline,
-    s.publisher in ('Inter-university Consortium for Political and Social Research', 'Algara and Amlani') as derived,
-    coalesce(r.completeness, 1) >= 0.98 or exists (
-        select from result_set d where d.contest_id = r.contest_id and d.is_default and d.status = 'active' and d.k <> r.k
-            and exists (select from contest_option o join result_value v on v.option_k = o.k and v.result_set_k = d.k
-                where o.contest_id = r.contest_id and o.kind = 'candidate' and v.measure = 1 and v.value > 0)
-            and not exists (select from ot o where o.contest_id = r.contest_id and o.top = o.k
-                and coalesce((select sum(v.value) from result_value v where v.result_set_k = r.k and v.measure = 1
-                    and v.option_k in (select t.k from ot t where t.top = o.k)), 0)
-                <> coalesce((select sum(v.value) from result_value v where v.result_set_k = d.k and v.measure = 1
-                    and v.option_k in (select t.k from ot t where t.top = o.k)), 0))) as whole,
-    r.completeness >= 0.98 and r.completeness < 1 and exists (
-        select from result_set d join ot o on o.contest_id = r.contest_id and o.top = o.k
-        where d.contest_id = r.contest_id and d.is_default and d.status = 'active' and d.k <> r.k
-            and not exists (select from result_value v where v.result_set_k = r.k and v.measure = 1
-                and v.option_k in (select t.k from ot t where t.top = o.k))
-            and (select coalesce(sum(v.value), 0) from result_value v where v.result_set_k = d.k and v.measure = 1
-                and v.option_k in (select t.k from ot t where t.top = o.k))
-                >= 0.005 * (select sum(v.value) from result_value v where v.result_set_k = d.k and v.measure = 1)) as major
+create temp table rs0 as
+select r.k, r.contest_id, cs.pipeline, r.completeness,
+    s.publisher in ('Inter-university Consortium for Political and Social Research', 'Algara and Amlani') as derived
 from result_set r join cc on cc.id = r.contest_id join changeset cs on cs.id = r.changeset_id
 left join source s on s.id = r.source_id
 where r.status <> 'withdrawn';
 
-create table if not exists coverage_cache_unit (result_set_k integer not null, unit_k integer not null,
-    primary key (result_set_k, unit_k));
+analyze rs0;
 
-create table if not exists coverage_cache_measure (result_set_k integer not null, measure smallint not null,
-    primary key (result_set_k, measure));
+create temp table rd as
+select d.k, d.contest_id from result_set d
+where d.is_default and d.status = 'active' and d.contest_id in (select contest_id from rs0);
 
-create table if not exists coverage_cache_unit_k (unit_k integer primary key);
+create index on rd (contest_id);
 
-create table if not exists coverage_cache_done (result_set_k integer primary key);
+create temp table rq as
+select r.k from rs0 r
+where r.completeness < 0.98
+    or (r.completeness is null or r.completeness >= 0.98 and r.completeness < 1)
+        and exists (select from rd d where d.contest_id = r.contest_id and d.k <> r.k)
+union select d.k from rd d
+where exists (select from rs0 r where r.contest_id = d.contest_id and r.k <> d.k
+    and (r.completeness < 0.98 or r.completeness is null or r.completeness >= 0.98 and r.completeness < 1));
 
-alter table coverage_cache_done add column if not exists recorded_from timestamptz;
+create temp table rt as
+select v.result_set_k as k, coalesce(t.top, 0) as top, sum(v.value) as votes, bool_or(v.value > 0) as positive,
+    t.k is not null as candidate
+from result_value v left join ot t on t.k = v.option_k
+where v.measure = 1 and v.result_set_k in (select k from rq)
+group by v.result_set_k, t.top, t.k is not null;
 
-do $$ begin
-    if not exists (select from coverage_cache_done where recorded_from is not null) then
-        truncate coverage_cache_unit, coverage_cache_measure, coverage_cache_unit_k, coverage_cache_done;
-    end if;
-end $$;
+create index on rt (k, top);
 
-create temp table fresh as
-select r.k, r.recorded_from, d.result_set_k is not null as restaged from result_set r
-left join coverage_cache_done d on d.result_set_k = r.k
-where d.recorded_from is distinct from r.recorded_from;
+analyze rt;
 
-create temp table gone as
-select d.result_set_k as k from coverage_cache_done d where not exists (select from result_set r where r.k = d.result_set_k);
+create temp table rs as
+select r.k, r.contest_id, r.pipeline, r.derived,
+    coalesce(r.completeness, 1) >= 0.98 or exists (
+        select from rd d where d.contest_id = r.contest_id and d.k <> r.k
+            and exists (select from rt where rt.k = d.k and rt.candidate and rt.positive)
+            and not exists (select from ot o where o.contest_id = r.contest_id and o.top = o.k
+                and coalesce((select a.votes from rt a where a.k = r.k and a.top = o.k and a.candidate), 0)
+                <> coalesce((select b.votes from rt b where b.k = d.k and b.top = o.k and b.candidate), 0))) as whole,
+    r.completeness >= 0.98 and r.completeness < 1 and exists (
+        select from rd d join ot o on o.contest_id = r.contest_id and o.top = o.k
+        where d.contest_id = r.contest_id and d.k <> r.k
+            and not exists (select from rt a where a.k = r.k and a.top = o.k and a.candidate)
+            and coalesce((select b.votes from rt b where b.k = d.k and b.top = o.k and b.candidate), 0)
+                >= 0.005 * (select sum(t.votes) from rt t where t.k = d.k)) as major
+from rs0 r;
 
-delete from coverage_cache_unit where result_set_k in (select k from fresh union all select k from gone);
+create index on rs (contest_id);
 
-delete from coverage_cache_measure where result_set_k in (select k from fresh union all select k from gone);
-
-delete from coverage_cache_done where result_set_k in (select k from gone);
-
-insert into coverage_cache_unit
-select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_set_k in (select k from fresh)
-on conflict do nothing;
-
-insert into coverage_cache_measure
-select distinct rv.result_set_k, rv.measure from result_value rv
-where rv.measure in (2, 3, 14, 24, 25) and rv.result_set_k in (select k from fresh)
-on conflict do nothing;
-
-insert into coverage_cache_unit_k
-select distinct unit_k from coverage_cache_unit
-where not exists (select from coverage_cache_unit_k)
-on conflict do nothing;
-
-insert into coverage_cache_unit_k
-select distinct unit_k from coverage_cache_unit where result_set_k in (select k from fresh)
-on conflict do nothing;
-
-delete from coverage_cache_unit_k k
-where exists (select from fresh where restaged union all select from gone)
-  and not exists (select from coverage_cache_unit u where u.unit_k = k.unit_k);
-
-insert into coverage_cache_done select k, recorded_from from fresh
-on conflict (result_set_k) do update set recorded_from = excluded.recorded_from;
-
-analyze coverage_cache_unit;
-
-analyze coverage_cache_measure;
-
-analyze coverage_cache_unit_k;
+analyze rs;
 
 create temp view rsm as
 select cm.result_set_k, cm.measure from coverage_cache_measure cm
@@ -289,8 +249,10 @@ select u.k,
         else 'total' end as grain,
     u.area_relation = 'equals' and g.area_id is not null as shaped
 from reporting_unit u
-left join (select distinct area_id from area_geometry) g on g.area_id = u.area_id
-where u.k in (select unit_k from coverage_cache_unit_k);
+left join coverage_cache_area g on g.area_id = u.area_id
+where u.k in (select unit_k from coverage_cache_unit where result_set_k in (select k from rs));
+
+analyze ug;
 
 create temp table cd as
 select cc.id as contest_id, cc.st, e.date_from as d
@@ -299,11 +261,15 @@ where cc.year >= 2000 and cc.level in ('president', 'us_senate', 'governor', 'st
     and not (cc.level = 'judicial' and exists (select from external_id y where y.entity_id = cc.id
         and y.scheme = 'us.contest' and y.value ~ '(appell|appeal|circuit|district|supreme-court:[0-9])'));
 
+analyze cd;
+
 create temp table cx as
 select s.st, s.d, count(u.k) as n
 from (select distinct st, d from cd) s
 left join (reporting_unit u join pstate ps on ps.id = u.polity_id) on u.scheme_code = 'us.county' and u.code <> '15005' and ps.st = s.st and u.valid @> s.d
 group by 1, 2;
+
+analyze cx;
 
 create temp table cu as
 select cd.contest_id, cx.n as expected, count(distinct u.k) as present
@@ -326,9 +292,61 @@ left join cu on cu.contest_id = rs.contest_id
 group by rs.contest_id;
 """
 
-CACHE_SQL = CONTESTS_SQL[
-    CONTESTS_SQL.index("create table if not exists coverage_cache_unit ") : CONTESTS_SQL.index("create temp view rsm")
-]
+CACHE_SQL = """
+delete from district_county x
+where not exists (select from area_geometry g where g.area_id = x.district_area_id and g.valid = x.district_valid)
+    or not exists (select from area_geometry g where g.area_id = x.county_area_id and g.valid = x.county_valid);
+
+create table if not exists coverage_cache_unit (result_set_k integer not null, unit_k integer not null,
+    primary key (result_set_k, unit_k));
+
+create table if not exists coverage_cache_measure (result_set_k integer not null, measure smallint not null,
+    primary key (result_set_k, measure));
+
+create table if not exists coverage_cache_done (result_set_k integer primary key);
+
+alter table coverage_cache_done add column if not exists recorded_from timestamptz;
+
+do $$ begin
+    if not exists (select from coverage_cache_done where recorded_from is not null) then
+        truncate coverage_cache_unit, coverage_cache_measure, coverage_cache_done;
+    end if;
+end $$;
+
+create temp table fresh as
+select r.k, r.recorded_from from result_set r
+left join coverage_cache_done d on d.result_set_k = r.k
+where d.recorded_from is distinct from r.recorded_from;
+
+create temp table gone as
+select d.result_set_k as k from coverage_cache_done d where not exists (select from result_set r where r.k = d.result_set_k);
+
+delete from coverage_cache_unit where result_set_k in (select k from fresh union all select k from gone);
+
+delete from coverage_cache_measure where result_set_k in (select k from fresh union all select k from gone);
+
+create table if not exists coverage_cache_voted (result_set_k integer primary key, voted boolean not null);
+
+delete from coverage_cache_voted where result_set_k in (select k from fresh union all select k from gone);
+
+delete from coverage_cache_done where result_set_k in (select k from gone);
+
+insert into coverage_cache_unit
+select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_set_k in (select k from fresh)
+on conflict do nothing;
+
+insert into coverage_cache_measure
+select distinct rv.result_set_k, rv.measure from result_value rv
+where rv.measure in (2, 3, 14, 24, 25) and rv.result_set_k in (select k from fresh)
+on conflict do nothing;
+
+insert into coverage_cache_done select k, recorded_from from fresh
+on conflict (result_set_k) do update set recorded_from = excluded.recorded_from;
+
+analyze coverage_cache_unit;
+
+analyze coverage_cache_measure;
+"""
 
 COUNT_SQL = """
 with c as (
@@ -621,11 +639,18 @@ def governor_years(st: str) -> set[int]:
     return set()
 
 
-def matrix(conn: Connection, last: int = LAST) -> list[dict]:
+def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = LAST) -> list[dict]:
     conn.execute("set statement_timeout = 0")
     readiness.local_days(conn)
     for statement in CONTESTS_SQL.split(";\n\n"):
         conn.execute(statement)
+        if statement.startswith("create temp table pstate"):
+            conn.execute(
+                """delete from uspol u using (select x.id from uspol x left join pstate ps on ps.id = x.id
+                   where coalesce(ps.st, 'US') <> all(%s)) o where o.id = u.id""",
+                [scope],
+            )
+            conn.execute("analyze uspol, pstate")
     readiness.flag(conn, "cc")
     conn.execute("create temp table published (st text, year integer, level text, county text, finest text)")
     published = ROOT / ".agents" / "spec" / "finest-reported.csv"
@@ -684,7 +709,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
     cached = {
         key: (signature, units, shaped)
         for key, signature, units, shaped in conn.execute(
-            "select key, signature, units, shaped from coverage_cache_shapes"
+            "select key, signature, units, shaped from coverage_cache_shapes where split_part(key, '|', 1) = any(%s)",
+            [scope],
         )
     }
     signatures = {
@@ -700,7 +726,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
     for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL):
         key = "|".join(str(part) for part in (st, year, level, stage))
         cached[key] = (signatures[key], n, shaped)
-    conn.execute("delete from coverage_cache_shapes")
+    conn.execute("delete from coverage_cache_shapes where split_part(key, '|', 1) = any(%s)", [scope])
     conn.cursor().executemany(
         "insert into coverage_cache_shapes values (%s, %s, %s, %s)",
         [(key, signature, n, shaped) for key, (signature, n, shaped) in cached.items() if key in signatures],
@@ -852,11 +878,6 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             continue
         expected[(st, next_year or loose_year or year, level, "runoff")] += 1
 
-    members = [
-        person
-        for kind in ("historical", "current")
-        for person in json.loads(raw.cached("us.clerk", LEGISLATORS.format(kind=kind)).path.read_text())
-    ]
     convenings = {
         1860: date(1861, 3, 4),
         1862: date(1863, 3, 4),
@@ -965,7 +986,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
     rows: list[dict] = []
     for key in sorted(set(held) | set(expected)):
         st, year, level, stage = key
-        if year > last:
+        if year > last or st not in scope:
             continue
         cell = held.get(
             key,
@@ -1070,9 +1091,16 @@ Overall, {weighted} of local election years are held when weighted by population
 
 def us() -> str:
     started = time.monotonic()
+    rows: list[dict] = []
+    units: dict[tuple, tuple[int, int]] = {}
     with connect() as conn:
-        rows = matrix(conn)
-        units = {(st, year): (n, shaped) for st, year, n, shaped in conn.execute(UNITS_SQL)}
+        for (part,) in conn.execute("select rows from coverage_cache_part where stage = 'state'"):
+            rows += part["cells"]
+            for st, year, n, shaped in part["units"]:
+                units[(st, year)] = (n, shaped)
+                total = units.get((None, year), (0, 0))
+                units[(None, year)] = (total[0] + n, total[1] + shaped)
+    rows.sort(key=lambda row: (row["state"], row["year"], row["level"], row["stage"]))
     spec = ROOT / ".agents" / "spec"
     with (spec / "us-coverage.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))

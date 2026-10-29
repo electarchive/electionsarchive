@@ -1,14 +1,18 @@
+import hashlib
 import json
 import re
 import subprocess
 import sys
 import time
 from collections import Counter, defaultdict
-from datetime import date
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, datetime
 
 import polars as pl
+from psycopg.types.json import Json
 
 from ea import coverage, coverage_countries, raw, readiness, statewide_table
+from ea.sources.us.clerk import LEGISLATORS
 from ea.store import ROOT, connect
 
 LOCK = 7_302_019
@@ -874,6 +878,7 @@ join name n on n.entity_id = p.id and n.is_preferred
 left join external_id e on e.entity_id = p.id and e.scheme = 'us.polity'
 left join pstate ps on ps.id = p.id
 where p.id in (select id from uspol) and p.kind not in ('sovereign_state', 'federal_unit', 'region')
+order by p.id, e.value, n.text
 """
 
 
@@ -889,7 +894,7 @@ with m as (
         bool_or(coalesce(m.registered, false)) as registered, bool_or(coalesce(m.ballots, false)) as ballots,
         bool_or(coalesce(m.survey, false)) as survey
     from election e
-    join polity p on p.id = e.polity_id and p.kind in ('federal_unit', 'region') and p.iso_code like 'US-%%'
+    join polity p on p.id = e.polity_id and p.kind in ('federal_unit', 'region') and p.iso_code = 'US-' || %(st)s
     left join m on m.election_id = e.id
     where e.status <> 'scheduled' and e.date_from < current_date
         and e.kind in ('general', 'primary', 'runoff', 'referendum')
@@ -947,20 +952,166 @@ def request() -> None:
     )
 
 
-FINGERPRINT_SQL = """
-select concat_ws(':', current_date, count(*) filter (where status = 'published'), max(published_at),
-    count(*) filter (where status = 'rejected'))
-from changeset
+WORKERS = 8
+STATE_INPUTS = (
+    "pipelines/ea/coverage.py",
+    "pipelines/ea/coverage_tables.py",
+    "pipelines/ea/statewide_table.py",
+    "pipelines/ea/readiness.py",
+    f"pipelines/ea/readiness/{readiness.DAY}.json",
+    "pipelines/ea/sources/us/ncsl_measures.csv",
+    ".agents/spec/finest-reported.csv",
+)
+COUNTRY_INPUTS = (
+    "pipelines/ea/coverage.py",
+    "pipelines/ea/coverage_countries.py",
+    "pipelines/ea/readiness.py",
+    f"pipelines/ea/readiness/{readiness.DAY}.json",
+    ".agents/spec/finest-reported.csv",
+)
+
+PART_SQL = """
+create table if not exists coverage_cache_part (stage text not null, part text not null, inputs text not null,
+    built_at timestamptz not null, seconds real not null, rows json not null, primary key (stage, part))
 """
 
+AREA_SQL = (
+    """insert into coverage_cache_area select distinct area_id from area_geometry where recorded_from > %(since)s
+       on conflict do nothing""",
+    """delete from coverage_cache_area a
+       where a.area_id in (select area_id from area_geometry_history where upper(recorded) > %(since)s)
+           and not exists (select from area_geometry g where g.area_id = a.area_id)""",
+)
 
-def fingerprint(conn, stamp: dict[str, str]) -> str:
-    row = conn.execute(FINGERPRINT_SQL).fetchone()
-    files = sorted(raw.parsed("us.cog").glob("*.parquet"))
-    return ":".join([row[0] if row else "", *stamp.values(), *(f"{f.name}{f.stat().st_mtime_ns}" for f in files)])
+STAMP_SQL = """
+select least(now(), min(xact_start)) from pg_stat_activity
+where datname = current_database() and backend_type = 'client backend' and pid <> pg_backend_pid()
+"""
+
+AREAS_SQL = """
+with recursive areas as (
+    select area_id as id, recorded_from as at from area_geometry where recorded_from > %(since)s
+    union all select area_id, upper(recorded) from area_geometry_history where upper(recorded) > %(since)s
+    union all select area_id, recorded_from from area_code where recorded_from > %(since)s
+    union all select area_id, upper(recorded) from area_code_history where upper(recorded) > %(since)s
+    union all select id, recorded_from from area where recorded_from > %(since)s
+    union all select id, upper(recorded) from area_history where upper(recorded) > %(since)s
+)"""
+
+CHANGED_SQL = (
+    AREAS_SQL
+    + """,
+k as (
+    select id, election_id, office_id, body_id, recorded_from as at from contest where recorded_from > %(since)s
+    union all select id, election_id, office_id, body_id, upper(recorded) from contest_history
+    where upper(recorded) > %(since)s
+    union all select c.id, c.election_id, c.office_id, c.body_id, t.at from (
+        select contest_id as id, recorded_from as at from result_set where recorded_from > %(since)s
+        union all select contest_id, upper(recorded) from result_set_history where upper(recorded) > %(since)s
+        union all select contest_id, recorded_from from contest_option where recorded_from > %(since)s
+        union all select contest_id, upper(recorded) from contest_option_history where upper(recorded) > %(since)s
+        union all select o.contest_id, y.at from (
+            select option_id, recorded_from as at from candidacy where recorded_from > %(since)s
+            union all select option_id, upper(recorded) from candidacy_history where upper(recorded) > %(since)s
+        ) y join contest_option o on o.id = y.option_id
+        union all select r.contest_id, x.at from (
+            select result_set_id, recorded_from as at from outcome where recorded_from > %(since)s
+            union all select result_set_id, upper(recorded) from outcome_history where upper(recorded) > %(since)s
+        ) x join result_set r on r.id = x.result_set_id
+        union all select contest_id, recorded_from from tenure where recorded_from > %(since)s
+        union all select contest_id, upper(recorded) from tenure_history where upper(recorded) > %(since)s
+        union all select contest_id, recorded_from from ballot_question_text where recorded_from > %(since)s
+        union all select contest_id, upper(recorded) from ballot_question_text_history where upper(recorded) > %(since)s
+        union all select entity_id, recorded_from from label where recorded_from > %(since)s
+        union all select entity_id, upper(recorded) from label_history where upper(recorded) > %(since)s
+        union all select entity_id, recorded_from from external_id
+        where recorded_from > %(since)s and scheme = 'us.contest'
+        union all select entity_id, upper(recorded) from external_id_history
+        where upper(recorded) > %(since)s and scheme = 'us.contest'
+        union all select r.contest_id, s.at from (
+            select id, recorded_from as at from source where recorded_from > %(since)s
+            union all select id, upper(recorded) from source_history where upper(recorded) > %(since)s
+        ) s join result_set r on r.source_id = s.id
+        union all select c.id, a.at from areas a join contest c on c.district_area_id = a.id
+    ) t join contest c on c.id = t.id
+),
+named as (
+    select entity_id, recorded_from as at from name where recorded_from > %(since)s
+    union all select entity_id, upper(recorded) from name_history where upper(recorded) > %(since)s
+    union all select entity_id, recorded_from from external_id where recorded_from > %(since)s
+    union all select entity_id, upper(recorded) from external_id_history where upper(recorded) > %(since)s
+),
+touched as (
+    select polity_id, max(at) as at, bool_or(wide) as wide from (
+        select e.polity_id, k.at, false as wide from k join election e on e.id = k.election_id
+        union all select o.polity_id, k.at, false from k join office o on o.id = k.office_id
+        union all select b.polity_id, k.at, false from k join body b on b.id = k.body_id
+        union all select e.polity_id, r.at, false from (
+            select election_id, recorded_from as at from result_set where recorded_from > %(since)s and contest_id is null
+            union all select election_id, upper(recorded) from result_set_history
+            where upper(recorded) > %(since)s and contest_id is null
+        ) r join election e on e.id = r.election_id
+        union all select polity_id, recorded_from, false from election where recorded_from > %(since)s
+        union all select polity_id, upper(recorded), false from election_history where upper(recorded) > %(since)s
+        union all select polity_id, recorded_from, false from reporting_unit where recorded_from > %(since)s
+        union all select polity_id, upper(recorded), false from reporting_unit_history where upper(recorded) > %(since)s
+        union all select u.polity_id, a.at, false from areas a join reporting_unit u on u.area_id = a.id
+        union all select t.polity_id, a.at, false from areas a join polity_territory t on t.area_id = a.id
+        union all select id, recorded_from, false from polity where recorded_from > %(since)s
+        union all select id, upper(recorded), false from polity_history where upper(recorded) > %(since)s
+        union all select unnest(array[polity_id, parent_id]), recorded_from, false from polity_parent
+        where recorded_from > %(since)s
+        union all select unnest(array[polity_id, parent_id]), upper(recorded), false from polity_parent_history
+        where upper(recorded) > %(since)s
+        union all select polity_id, recorded_from, false from polity_territory where recorded_from > %(since)s
+        union all select polity_id, upper(recorded), false from polity_territory_history where upper(recorded) > %(since)s
+        union all select p.id, n.at, false from named n join polity p on p.id = n.entity_id
+        union all select o.polity_id, n.at, true from named n join office o on o.id = n.entity_id
+        union all select b.polity_id, n.at, true from named n join body b on b.id = n.entity_id
+        union all select polity_id, recorded_from, true from office where recorded_from > %(since)s
+        union all select polity_id, upper(recorded), true from office_history where upper(recorded) > %(since)s
+        union all select polity_id, recorded_from, true from body where recorded_from > %(since)s
+        union all select polity_id, upper(recorded), true from body_history where upper(recorded) > %(since)s
+        union all select b.polity_id, s.at, true from (
+            select body_id, recorded_from as at from seat where recorded_from > %(since)s
+            union all select body_id, upper(recorded) from seat_history where upper(recorded) > %(since)s
+        ) s join body b on b.id = s.body_id
+    ) x
+    where polity_id is not null
+    group by 1
+),
+up(id, anc) as (
+    select polity_id, polity_id from touched
+    union select up.id, pp.parent_id from up join polity_parent pp on pp.polity_id = up.anc
+)
+select t.at, t.wide, array_agg(p.iso_code) filter (where p.iso_code is not null),
+    min(substr(p.iso_code, 4)) filter (where p.kind in ('federal_unit', 'region'))
+from touched t join up on up.id = t.polity_id join polity p on p.id = up.anc
+group by t.polity_id, t.at, t.wide
+"""
+)
+
+DISTRICTS_CHANGED_SQL = (
+    AREAS_SQL
+    + """
+select substr(ac.code, 1, 2), max(c.at)
+from areas c join area a on a.id = c.id and a.scheme_code = 'us.cd' join area_code ac on ac.area_id = a.id
+group by 1
+"""
+)
+
+OFFICE_YEARS_SQL = "select state, office_id::text, class, year, joint_ticket, basis from statewide_office_year"
 
 
-def refresh() -> str:
+def digest(paths: tuple[str, ...]) -> str:
+    sha = hashlib.sha256()
+    for path in paths:
+        sha.update(path.encode())
+        sha.update((ROOT / path).read_bytes())
+    return sha.hexdigest()[:16]
+
+
+def refresh(full: bool = False) -> str:
     built = []
     with connect(autocommit=True) as conn:
         conn.execute("update coverage_build set requested_at = now()")
@@ -974,19 +1125,12 @@ def refresh() -> str:
                        where built_at is null or requested_at > built_at returning started_at"""
                 ).fetchone()
             ) is not None:
-                conn.execute("create table if not exists coverage_cache_state (fingerprint text not null)")
                 stamp = coverage_countries.inputs()
                 commit = subprocess.run(
                     ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
                 ).stdout.strip()
-                current = fingerprint(conn, stamp)
-                previous = conn.execute("select fingerprint from coverage_cache_state").fetchone()
-                if previous is not None and previous[0] == current:
-                    built.append("nothing has changed since the last build")
-                else:
-                    built.append(build())
-                    conn.execute("delete from coverage_cache_state")
-                    conn.execute("insert into coverage_cache_state values (%s)", [current])
+                built.append(build(full))
+                full = False
                 conn.execute(
                     "update coverage_build set built_at = %s, commit = %s, inputs = %s",
                     [started[0], commit, json.dumps(stamp)],
@@ -998,74 +1142,197 @@ def refresh() -> str:
                 return "; ".join(built)
 
 
-def build() -> str:
+def measure(st: str, members: list[dict], today: date) -> tuple[str, dict, float]:
     started = time.monotonic()
-    today = date.today()
     with connect() as conn:
-        statewide_table.rebuild(conn)
-        cells = coverage.matrix(conn, last=today.year)
-        units = list(conn.execute(coverage.UNITS_SQL))
-        states = {fips: (st, name) for st, fips, name in conn.execute(coverage.STATES_SQL)}
+        cells = coverage.matrix(conn, [st], members, last=today.year)
+        units = [row for row in conn.execute(coverage.UNITS_SQL) if row[0] is not None]
         conn.execute(LOCAL_SQL)
         held: dict[str, dict[int, list]] = defaultdict(dict)
         for polity, year, n, precinct, regular, month, generals, up, ready in conn.execute(HELD_SQL):
             held[str(polity)][year] = [n, precinct, regular, month, 0, 0, generals, up, ready]
         for polity, year, n, shaped in conn.execute(LOCAL_SHAPES_SQL):
             held[str(polity)][year][4:6] = [n, shaped]
-        polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
         for statement in SHAPES_SQL.split(";\n\n"):
             conn.execute(statement)
         shapes = list(conn.execute(SHAPES_COUNT_SQL))
-        turnout = list(conn.execute(TURNOUT_SQL))
+        turnout = list(conn.execute(TURNOUT_SQL, {"st": st}))
+    return (
+        st,
+        {"cells": cells, "units": units, "held": held, "shapes": shapes, "turnout": turnout},
+        time.monotonic() - started,
+    )
 
-        by_key = {(c["state"], c["year"], c["level"], c["stage"]): c for c in cells}
-        for stage in ("primary", "general"):
-            for (st, year, level, cell_stage), cell in list(by_key.items()):
-                if (
-                    cell_stage != stage
-                    or level not in STATE_LEVELS
-                    or level == "statewide_measure"
-                    or year != today.year - OFFSETS.get(level, 4)
-                ):
-                    continue
-                key = (st, today.year, level, stage)
-                current = by_key.setdefault(
-                    key,
-                    {
-                        "state": st,
-                        "year": today.year,
-                        "level": level,
-                        "stage": stage,
-                        "expected": "",
-                        "held": 0,
-                        "county_or_finer": 0,
-                        "precinct": 0,
-                        "precincts": 0,
-                        "shaped_precincts": 0,
-                        "upcoming": 0,
-                        "pending": 0,
-                        "target": coverage.target(st, level, today.year),
-                    },
-                )
-                current["expected"] = max(current["expected"] or 0, cell["held"])
 
-        known = dict(KNOWN)
-        for st, period in JUDICIAL.items():
-            for year in range(2000 + (st == "PA"), today.year + 1, period):
-                retained = any(
-                    "us.retention" in c.get("pipelines", "")
-                    for (s, y, level, _), c in by_key.items()
-                    if s == st and y == year and level == "statewide_measure"
+def country(cc: str) -> tuple[str, dict, float]:
+    started = time.monotonic()
+    with connect() as conn:
+        goal_rows, polity_row = coverage_countries.part(conn, cc)
+    return cc, {"goals": goal_rows, "polity": polity_row}, time.monotonic() - started
+
+
+def build(full: bool = False) -> str:
+    started = time.monotonic()
+    today = date.today()
+    members = [
+        person
+        for kind in ("historical", "current")
+        for person in json.loads(raw.cached("us.clerk", LEGISLATORS.format(kind=kind)).path.read_text())
+    ]
+    states_code = digest(STATE_INPUTS) + ":" + hashlib.sha256(json.dumps(members).encode()).hexdigest()[:16]
+    countries_code = digest(COUNTRY_INPUTS)
+    cog_files = sorted(raw.parsed("us.cog").glob("*.parquet"))
+    local_code = (
+        digest(("pipelines/ea/coverage_tables.py",))
+        + ":"
+        + ":".join(f"{f.name}{f.stat().st_mtime_ns}" for f in cog_files)
+    )
+    timings: dict[str, float] = {}
+    with connect(autocommit=True) as conn:
+        conn.execute(PART_SQL)
+        stamp: datetime = next(iter(conn.execute(STAMP_SQL)))[0]
+        parts = {
+            (stage, part): (inputs, built_at, seconds)
+            for stage, part, inputs, built_at, seconds in conn.execute(
+                "select stage, part, inputs, built_at, seconds from coverage_cache_part"
+            )
+        }
+        clock = time.monotonic()
+        conn.execute(coverage.CACHE_SQL)
+        conn.execute("create table if not exists coverage_cache_area (area_id uuid primary key)")
+        for statement in AREA_SQL:
+            conn.execute(statement, {"since": parts.get(("cache", "area"), ("", "-infinity"))[1]})
+        conn.execute("analyze coverage_cache_area")
+        conn.execute(
+            """insert into coverage_cache_part values ('cache', 'area', '', %s, 0, '{}')
+               on conflict (stage, part) do update set built_at = excluded.built_at""",
+            [stamp],
+        )
+        timings["cache"] = time.monotonic() - clock
+        clock = time.monotonic()
+        before = set(conn.execute(OFFICE_YEARS_SQL))
+        with conn.transaction():
+            statewide_table.rebuild(conn)
+        offices = {row[0] for row in before ^ set(conn.execute(OFFICE_YEARS_SQL))}
+        timings["statewide"] = time.monotonic() - clock
+        for statement in coverage.CONTESTS_SQL.split(";\n\n")[:2]:
+            conn.execute(statement)
+        states = {fips: (st, name) for st, fips, name in conn.execute(coverage.STATES_SQL)}
+        scope = sorted({st for (st,) in conn.execute("select distinct st from pstate where st is not null")} | {"US"})
+        wanted = {("state", st): f"{states_code}:{today}:{readiness.local_today('US-' + st)}" for st in scope}
+        for cc in ["us", *coverage_countries.countries()]:
+            zones = sorted(
+                {str(readiness.local_today(iso)) for iso in readiness.ZONES if cc == "eu" or iso[:2] == cc.upper()}
+                | {str(readiness.local_today(cc.upper()))}
+            )
+            extra = "" if cc == "us" else digest((f"pipelines/ea/denominators/{cc}.json",))
+            wanted[("country", cc)] = f"{countries_code}:{extra}:{today}:{','.join(zones)}"
+        wanted[("local", "")] = f"{local_code}:{today}"
+        clock = time.monotonic()
+        moved: dict[tuple[str, str], datetime] = {}
+        since = min((built for (stage, _), (_, built, _) in parts.items() if stage != "cache"), default=None)
+        if since is not None and not full:
+            isos = {coverage_countries.load(cc)["polity"]: cc for cc in coverage_countries.countries()}
+            for at, wide, ancestors, st in conn.execute(CHANGED_SQL, {"since": since}):
+                keys = [("country", isos[iso]) for iso in set(ancestors or []) if iso in isos]
+                if "US" in (ancestors or []):
+                    keys += [("state", "*" if wide and st is None else st or "US"), ("country", "us"), ("local", "")]
+                for key in keys:
+                    moved[key] = max(moved.get(key, at), at)
+            for code, at in conn.execute(DISTRICTS_CHANGED_SQL, {"since": since}):
+                if code in states:
+                    key = ("state", states[code][0])
+                    moved[key] = max(moved.get(key, at), at)
+        for st in offices:
+            moved[("state", st)] = stamp
+        timings["changes"] = time.monotonic() - clock
+
+        def stale(key: tuple[str, str]) -> bool:
+            if full or key not in parts or parts[key][0] != wanted[key]:
+                return True
+            built = parts[key][1]
+            return any(at >= built for at in (moved.get(key), moved.get((key[0], "*"))) if at is not None)
+
+        todo = [st for st in scope if stale(("state", st))]
+        countries = [cc for stage, cc in wanted if stage == "country" and stale(("country", cc))]
+        clock = time.monotonic()
+        with ThreadPoolExecutor(WORKERS) as pool:
+            jobs = [
+                pool.submit(measure, part, members, today) if stage == "state" else pool.submit(country, part)
+                for stage, part in sorted(
+                    [("state", st) for st in todo] + [("country", cc) for cc in countries],
+                    key=lambda key: -parts.get(key, ("", None, 0.0))[2],
                 )
-                known.setdefault((st, year, "judicial", "general"), 0 if retained else 1)
-        for (st, year, level, stage), due in known.items():
-            if due == 0:
+            ]
+            for job in as_completed(jobs):
+                part, rows, seconds = job.result()
+                conn.execute(
+                    """insert into coverage_cache_part values (%s, %s, %s, %s, %s, %s)
+                       on conflict (stage, part) do update set inputs = excluded.inputs, built_at = excluded.built_at,
+                           seconds = excluded.seconds, rows = excluded.rows""",
+                    [
+                        "state" if "cells" in rows else "country",
+                        part,
+                        wanted[("state" if "cells" in rows else "country", part)],
+                        stamp,
+                        seconds,
+                        Json(rows),
+                    ],
+                )
+        timings["parts"] = time.monotonic() - clock
+        conn.execute("delete from coverage_cache_part where stage = 'state' and part <> all(%s)", [scope])
+        written = parts.get(("local", ""), ("", None, 0.0))[1]
+        newer = {
+            stage
+            for (stage, _), (_, built, _) in parts.items()
+            if stage in ("state", "country") and (written is None or built > written)
+        }
+        if not todo and not countries and not newer and not stale(("local", "")):
+            return "nothing has changed since the last build"
+        clock = time.monotonic()
+        country_goals: list[tuple] = []
+        country_polities: list[tuple] = []
+        for (rows,) in conn.execute("select rows from coverage_cache_part where stage = 'country' order by part"):
+            country_goals += [tuple(row) for row in rows["goals"]]
+            country_polities.append(tuple(rows["polity"]))
+        if not todo and "state" not in newer and not stale(("local", "")):
+            with conn.transaction():
+                coverage_countries.write(conn, country_goals, country_polities)
+                conn.execute("update coverage_cache_part set built_at = %s where stage = 'local'", [stamp])
+            return f"{len(countries)} countries rebuilt in {time.monotonic() - started:.0f}s"
+        cells: list[dict] = []
+        units: list[tuple] = []
+        held: dict[str, dict[int, list]] = defaultdict(dict)
+        shapes: list[tuple] = []
+        turnout: list[tuple] = []
+        for (rows,) in conn.execute("select rows from coverage_cache_part where stage = 'state' order by part"):
+            cells += rows["cells"]
+            units += rows["units"]
+            shapes += rows["shapes"]
+            turnout += rows["turnout"]
+            for polity, years in rows["held"].items():
+                for year, values in years.items():
+                    held[polity][int(year)] = values
+        polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
+        timings["load"] = time.monotonic() - clock
+        clock = time.monotonic()
+
+    by_key = {(c["state"], c["year"], c["level"], c["stage"]): c for c in cells}
+    for stage in ("primary", "general"):
+        for (st, year, level, cell_stage), cell in list(by_key.items()):
+            if (
+                cell_stage != stage
+                or level not in STATE_LEVELS
+                or level == "statewide_measure"
+                or year != today.year - OFFSETS.get(level, 4)
+            ):
                 continue
+            key = (st, today.year, level, stage)
             current = by_key.setdefault(
-                (st, year, level, stage),
+                key,
                 {
                     "state": st,
-                    "year": year,
+                    "year": today.year,
                     "level": level,
                     "stage": stage,
                     "expected": "",
@@ -1074,10 +1341,42 @@ def build() -> str:
                     "precinct": 0,
                     "precincts": 0,
                     "shaped_precincts": 0,
-                    "target": coverage.target(st, level, year),
+                    "upcoming": 0,
+                    "pending": 0,
+                    "target": coverage.target(st, level, today.year),
                 },
             )
-            current["expected"] = max(current["expected"] or 0, due, current["held"])
+            current["expected"] = max(current["expected"] or 0, cell["held"])
+
+    known = dict(KNOWN)
+    for st, period in JUDICIAL.items():
+        for year in range(2000 + (st == "PA"), today.year + 1, period):
+            retained = any(
+                "us.retention" in c.get("pipelines", "")
+                for (s, y, level, _), c in by_key.items()
+                if s == st and y == year and level == "statewide_measure"
+            )
+            known.setdefault((st, year, "judicial", "general"), 0 if retained else 1)
+    for (st, year, level, stage), due in known.items():
+        if due == 0:
+            continue
+        current = by_key.setdefault(
+            (st, year, level, stage),
+            {
+                "state": st,
+                "year": year,
+                "level": level,
+                "stage": stage,
+                "expected": "",
+                "held": 0,
+                "county_or_finer": 0,
+                "precinct": 0,
+                "precincts": 0,
+                "shaped_precincts": 0,
+                "target": coverage.target(st, level, year),
+            },
+        )
+        current["expected"] = max(current["expected"] or 0, due, current["held"])
 
     cog = pl.read_parquet(raw.parsed("us.cog") / "governments.parquet")
     codes = {code: pid for pid, (_, code, _, _) in polities.items() if code is not None}
@@ -1441,7 +1740,10 @@ def build() -> str:
         ) as copy:
             for row in years_out:
                 copy.write_row(row)
+        timings["local"] = time.monotonic() - clock
+        clock = time.monotonic()
         goals |= readiness.goals(conn, readiness.DAY)
+        timings["readiness"] = time.monotonic() - clock
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
             " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"
@@ -1449,13 +1751,18 @@ def build() -> str:
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])
-    with connect() as conn:
-        conn.execute(coverage.CACHE_SQL)
-        country_goals, country_polities = coverage_countries.build(conn)
-        with conn.transaction():
-            coverage_countries.write(conn, country_goals, country_polities)
+        coverage_countries.write(conn, country_goals, country_polities)
+        conn.execute(
+            """insert into coverage_cache_part values ('local', '', %s, %s, %s, '{}')
+               on conflict (stage, part) do update set inputs = excluded.inputs, built_at = excluded.built_at,
+                   seconds = excluded.seconds""",
+            [wanted[("local", "")], stamp, timings["local"]],
+        )
     return (
-        f"{len(governments):,} governments ({len(link):,} linked), {len(years_out):,} government years, "
-        f"{len(goals):,} goal rows, {len(country_polities)} other countries with {len(country_goals):,} goal rows "
-        f"in {time.monotonic() - started:.0f}s"
+        f"{len(todo)} of {len(scope)} states and {len(countries)} of {len(coverage_countries.countries()) + 1} "
+        f"countries rebuilt; {len(governments):,} governments ({len(link):,} linked), {len(years_out):,} government "
+        f"years, {len(goals):,} goal rows, {len(country_goals):,} other countries' goal rows in "
+        f"{time.monotonic() - started:.0f}s ("
+        + ", ".join(f"{stage} {seconds:.0f}s" for stage, seconds in timings.items())
+        + ")"
     )

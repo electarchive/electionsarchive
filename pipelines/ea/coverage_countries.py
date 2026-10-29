@@ -58,21 +58,31 @@ select r.contest_id::text, u.scheme_code, count(distinct u.k), count(distinct u.
 from result_set r
 join coverage_cache_unit cu on cu.result_set_k = r.k
 join reporting_unit u on u.k = cu.unit_k
-left join (select distinct area_id from area_geometry) g on g.area_id = u.area_id and u.area_relation = 'equals'
+left join coverage_cache_area g on g.area_id = u.area_id and u.area_relation = 'equals'
 where r.status <> 'withdrawn' and r.contest_id = any(%s::uuid[])
 group by 1, 2
 """
 
-SETS_SQL = """
-select r.contest_id::text, r.k, r.completeness::float, u.scheme_code, count(distinct u.k)
+VOTED_SQL = """
+insert into coverage_cache_voted
+select r.k, exists (
+    select from result_value v
+    where v.result_set_k = r.k and v.option_k <> 0 and v.measure in (1, 7, 8, 9, 10) and v.value > 0
+)
 from result_set r
+where r.status <> 'withdrawn' and r.contest_id = any(%s::uuid[])
+    and not exists (select from coverage_cache_voted c where c.result_set_k = r.k)
+order by r.k
+on conflict do nothing
+"""
+
+SETS_SQL = """
+select r.contest_id::text, r.k, r.completeness::float, u.scheme_code, count(*)
+from result_set r
+join coverage_cache_voted c on c.result_set_k = r.k and c.voted
 join coverage_cache_unit cu on cu.result_set_k = r.k
 join reporting_unit u on u.k = cu.unit_k
 where r.status <> 'withdrawn' and r.contest_id = any(%s::uuid[])
-    and exists (
-        select from result_value v
-        where v.result_set_k = r.k and v.option_k <> 0 and v.measure in (1, 7, 8, 9, 10) and v.value > 0
-    )
 group by 1, 2, 3, 4
 """
 
@@ -250,6 +260,8 @@ def measure(conn, cc: str) -> dict:
     units: dict[str, dict[str, tuple[int, int]]] = defaultdict(dict)
     for cid, scheme, n, shaped in conn.execute(UNITS_SQL, [ids]):
         units[cid][scheme] = (n, shaped)
+    conn.execute(VOTED_SQL, [ids])
+    conn.commit()
     sets: dict[str, dict[int, tuple[float | None, dict[str, int]]]] = defaultdict(dict)
     for cid, k, completeness, scheme, n in conn.execute(SETS_SQL, [ids]):
         sets[cid].setdefault(k, (completeness, {}))[1][scheme] = n
@@ -580,26 +592,25 @@ def place_of(cc: str, data: dict, area: str | None, election_iso: str | None) ->
     return region(cc, scheme, code, parent, election_iso)
 
 
-def build(conn) -> tuple[list[tuple], list[tuple]]:
-    goal_rows: list[tuple] = []
-    with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
-        canvass = [
-            {
-                "goal": "precinct",
-                "level": row["level"],
-                "from": int(row["year"]),
-                "to": int(row["year"]),
-                "note": row["source"],
-                "canvass": row["state"],
-                "county": row.get("county") or None,
-                "url": row["url"],
-            }
-            for row in csv.DictReader(f)
-            if row["finest"] == "precinct"
-        ]
-    ready, cited = readiness.notes(readiness.DAY)
-    polity_rows: list[tuple] = [
-        (
+def part(conn, cc: str) -> tuple[list[tuple], tuple]:
+    if cc == "us":
+        with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
+            canvass = [
+                {
+                    "goal": "precinct",
+                    "level": row["level"],
+                    "from": int(row["year"]),
+                    "to": int(row["year"]),
+                    "note": row["source"],
+                    "canvass": row["state"],
+                    "county": row.get("county") or None,
+                    "url": row["url"],
+                }
+                for row in csv.DictReader(f)
+                if row["finest"] == "precinct"
+            ]
+        ready, cited = readiness.notes(readiness.DAY)
+        return [], (
             "us",
             *summary(conn, "us"),
             "{}",
@@ -607,36 +618,29 @@ def build(conn) -> tuple[list[tuple], list[tuple]]:
             json.dumps(canvass + ready, ensure_ascii=False),
             json.dumps(cited, ensure_ascii=False),
         )
-    ]
-    for cc in countries():
-        data = measure(conn, cc)
-        goals, _, notes = tally(cc, data)
-        for (goal, reg, level, year), values in goals.items():
-            goal_rows.append((cc, goal, reg, level, year, *values))
-        spec = data["spec"]
-        polity_rows.append(
-            (
-                cc,
-                *summary(conn, cc),
-                json.dumps(data["labels"], ensure_ascii=False),
-                json.dumps(
-                    [
-                        {
-                            "key": lv["key"],
-                            "label": lv["label"],
-                            "goal": lv["goal"],
-                            "fine": bool(lv.get("fine")),
-                            "unit": lv.get("unit", "district"),
-                            "note": lv.get("note"),
-                        }
-                        for lv in spec["levels"]
-                    ]
-                ),
-                json.dumps(notes, ensure_ascii=False),
-                json.dumps(spec["sources"], ensure_ascii=False),
-            )
-        )
-    return goal_rows, polity_rows
+    data = measure(conn, cc)
+    goals, _, notes = tally(cc, data)
+    spec = data["spec"]
+    return [(cc, goal, reg, level, year, *values) for (goal, reg, level, year), values in goals.items()], (
+        cc,
+        *summary(conn, cc),
+        json.dumps(data["labels"], ensure_ascii=False),
+        json.dumps(
+            [
+                {
+                    "key": lv["key"],
+                    "label": lv["label"],
+                    "goal": lv["goal"],
+                    "fine": bool(lv.get("fine")),
+                    "unit": lv.get("unit", "district"),
+                    "note": lv.get("note"),
+                }
+                for lv in spec["levels"]
+            ]
+        ),
+        json.dumps(notes, ensure_ascii=False),
+        json.dumps(spec["sources"], ensure_ascii=False),
+    )
 
 
 def write(conn, goal_rows: list[tuple], polity_rows: list[tuple]) -> None:
