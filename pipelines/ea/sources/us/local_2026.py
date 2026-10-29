@@ -3314,7 +3314,8 @@ def parse() -> None:
             )
 
     town = ""
-    for line in text("NJ-34039", "-layout").splitlines():
+    union_lines = text("NJ-34039", "-layout").splitlines()
+    for number, line in enumerate(union_lines):
         if found := re.match(r"\s{30,}((?:TOWNSHIP|CITY|BOROUGH|TOWN|VILLAGE) OF [A-Z .'-]+?)\s*$", line):
             town = found[1].title()
         elif found := re.match(
@@ -3331,6 +3332,8 @@ def parse() -> None:
                 continue
             named, independent = party(codes.get(found[2].lower(), found[2]))
             post = re.sub(r"(?i)^members? of |(?<=\d)(st|nd|rd|th)\b|\s*-$", "", found[3] or "")
+            if (wrapped := re.match(r"\s*(?:\d{5})?\s{30,}(Committee|Council)\s*$", union_lines[number + 1])) and post.endswith("Township"):
+                post = f"{post} {wrapped[1]}"
             feeds["NJ-34039"].append(
                 {
                     "county": "Union",
@@ -4772,7 +4775,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA")
@@ -4815,7 +4818,7 @@ def parse() -> None:
                                     (r"\bcommittee\b", "committee"),
                                     (r"\bdirectors?\b", "board-of-directors"),
                                     (
-                                        r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmembers?\b|\balderm[ae]n\b",
+                                        r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmembers?\b|\bcouncilpersons?\b|\balderm[ae]n\b",
                                         "council",
                                     ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
