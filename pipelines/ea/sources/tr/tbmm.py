@@ -31,7 +31,10 @@ def detail(term: int, member: str) -> str:
     return f"{BASE}/milletvekili/milletvekilidetay?DonemId={term}&Id={member}"
 
 
-ENTRY = re.compile(r'<strong class="isim_soyisim"[^>]*>\s*([^<]+?)\s*<.*?milletvekilidetay\?DonemId=([0-9a-f-]+)&(?:amp;)?Id=([0-9a-f-]+)', re.S)
+ENTRY = re.compile(
+    r'<strong class="isim_soyisim"[^>]*>\s*([^<]+?)\s*<.*?milletvekilidetay\?DonemId=([0-9a-f-]+)&(?:amp;)?Id=([0-9a-f-]+)',
+    re.S,
+)
 
 
 def members(term: int) -> list[tuple[str, str, str]]:
@@ -110,7 +113,10 @@ def fetch() -> None:
                             "pageIndex": str(page),
                             "totalSize": str(PAGE),
                         },
-                        headers={"X-CSRF-TOKEN-TBMM.WEB.Mvc.Prod": fresh.group(1), "X-Requested-With": "XMLHttpRequest"},
+                        headers={
+                            "X-CSRF-TOKEN-TBMM.WEB.Mvc.Prod": fresh.group(1),
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
                     ),
                 )
             print(f"term {term}: {page + 1} pages")
@@ -243,12 +249,28 @@ def rows(term: int) -> list[dict[str, object]]:
     return found
 
 
-VERSION = "1"
+VERSION = "2"
 NOTES = (
     "The Assembly's member search lists every member of a term with the province, the party label, and the date and "
     "reason the membership ended; it does not give start dates, and a member who replaced a departing one is listed "
     "as any other. Persons are matched to the term's elected candidacies by name."
 )
+OPENINGS = {
+    17: date(1983, 11, 24),
+    19: date(1991, 11, 6),
+    20: date(1996, 1, 8),
+    21: date(1999, 5, 2),
+    22: date(2002, 11, 14),
+    23: date(2007, 8, 4),
+    24: date(2011, 6, 28),
+    25: date(2015, 6, 23),
+    26: date(2015, 11, 17),
+}
+ERDOGAN = "f72877c2-c08b-037b-e050-007f01005610"
+ERDOGAN_SWORN = date(2003, 3, 11)
+MINUTES = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d{term:02d}/c001/tbmm{term:02d}001fih.pdf"
+MINUTES_TITLE = "Tutanak Dergisi, {term}. Dönem, Cilt 1, fihrist"
+ERDOGAN_OATH = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d22/c006/tbmm22006fih.pdf"
 TITLE = "Türkiye Büyük Millet Meclisi: Milletvekilleri (dönem listeleri ve özgeçmiş sayfaları)"
 ELECTIONS = {
     9: (date(1950, 5, 14),),
@@ -301,6 +323,20 @@ def emit() -> Path:
             notes=NOTES,
         )
         assembly = cs.key("tr.body", "tbmm")
+        minutes = {}
+        for term, url in [*((term, MINUTES.format(term=term)) for term in OPENINGS), (22, ERDOGAN_OATH)]:
+            title = MINUTES_TITLE.format(term=term) + (", andiçme" if url == ERDOGAN_OATH else "")
+            minutes[url] = cs.source("Türkiye Büyük Millet Meclisi", title)
+            cs.add(
+                "source",
+                id=minutes[url],
+                kind="official_body",
+                publisher="Türkiye Büyük Millet Meclisi",
+                title=title,
+                url=url,
+                license="Official public record, no license stated",
+            )
+            cs.artifact(raw.fetch(SOURCE, url, suffix=".pdf"), minutes[url])
         pools: dict[int, list[tuple[UUID, UUID, list[str]]]] = {}
         for term, days in ELECTIONS.items():
             pools[term] = (
@@ -382,13 +418,24 @@ def emit() -> Path:
                     id=tenure,
                     person_id=person,
                     body_id=assembly,
-                    from_date=None,
+                    from_date=ERDOGAN_SWORN
+                    if term == 22 and member == ERDOGAN
+                    else (OPENINGS.get(term) if hit is not None else None),
                     to_date=row["end"],
                     acquired_via="elected",
                     contest_id=None if hit is None else hit[1],
                     ended_via=None if row["end"] is None else ENDS[str(row["reason"])],
                 )
                 cs.add("citation", entity_id=tenure, source_id=source, locator={"term": term, "member": member})
+                if term == 22 and member == ERDOGAN:
+                    cs.add("citation", entity_id=tenure, source_id=minutes[ERDOGAN_OATH], locator={"item": "andiçme"})
+                elif hit is not None and term in OPENINGS:
+                    cs.add(
+                        "citation",
+                        entity_id=tenure,
+                        source_id=minutes[MINUTES.format(term=term)],
+                        locator={"item": "birinci birleşim"},
+                    )
                 if term < 17 and row["province"] != "BİLİNMİYOR":
                     cs.add(
                         "note",
