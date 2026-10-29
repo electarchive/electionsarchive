@@ -193,6 +193,13 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://services7.arcgis.com/3BMWkdyrt45RNCrq/arcgis/rest/services/CommDistricts_2022/FeatureServer/0",
         "field": "COMM_DIST",
     },
+    {
+        "publisher": "Kane County GIS",
+        "title": "Kane County Board Districts",
+        "pattern": r"^17:17089:board-of-commissioners:district-",
+        "layer": "https://services1.arcgis.com/oRKmdBXD6EbdmVgJ/arcgis/rest/services/KaneCo_IL_County_Board/FeatureServer/1",
+        "field": "CBDist",
+    },
 ]
 
 
@@ -211,7 +218,7 @@ def parse() -> None:
         for layer in LAYERS:
             features = json.loads(raw.cached(SOURCE, url(layer)).path.read_bytes())["features"]
             shapes = {
-                re.sub(r"^(district|ward)-", "", re.sub(r"[^a-z0-9]+", "-", str(f["properties"][layer["field"]]).lower()).strip("-")): f["geometry"]
+                re.sub(r"^(district|ward)-|^0+(?=[0-9])", "", re.sub(r"[^a-z0-9]+", "-", str(f["properties"][layer["field"]]).lower()).strip("-")): f["geometry"]
                 for f in features
                 if f["geometry"] is not None
             }
