@@ -697,6 +697,11 @@ FEEDS = {
         "Natrona County Clerk",
         "Natrona County 2026 General Election Candidate Roster (9/11/2026)",
     ),
+    "MT-30067": (
+        "https://www.parkcountymt.gov/uploads/files/pages/171/2026-County-Candidates.pdf",
+        "Park County Clerk and Recorder",
+        "2026 Park County Candidates",
+    ),
     "TX-48085": (
         "https://www.wylieisd.net/our-district/school-board/board-elections",
         "Wylie Independent School District",
@@ -1519,6 +1524,7 @@ DELIVERED = {
     "MT-30031": DATA / "inbox" / "y26" / "mt" / "gallatin.pdf",
     "MT-30013": DATA / "inbox" / "y26" / "mt" / "cascade.pdf",
     "WY-56025": DATA / "inbox" / "y26" / "wy" / "natrona.pdf",
+    "MT-30067": DATA / "inbox" / "y26" / "mt" / "park.pdf",
     "TX-48085": DATA / "inbox" / "y26" / "tx" / "wylie.html",
     "UT-49053": DATA / "inbox" / "y26" / "ut" / "washington.pdf",
     "UT-49005": DATA / "inbox" / "y26" / "ut" / "cache.pdf",
