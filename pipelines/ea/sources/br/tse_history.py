@@ -19,7 +19,7 @@ from ea.sources.br.tse import SEATS, UFS, proper
 from ea.store import DATA, connect
 
 SOURCE = "br.tse_history"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 TSE = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
 YEARS = (1994, 1998, 2002, 2006, 2010, 2014, 2018, 2022, 2026)
@@ -523,6 +523,10 @@ def parse() -> None:
     excess.write_parquet(PARSED / "excess.parquet")
 
 
+def party_key(number: str, abbreviation: str, year: int) -> str:
+    return f"{number}:{abbreviation}" + (":1985" if abbreviation == "PL" and year <= 2006 else "")
+
+
 def emit() -> Path:
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
     votes = pl.read_parquet(PARSED / "votes.parquet")
@@ -786,7 +790,7 @@ def emit() -> Path:
             .sort("year", "party_number")
             .iter_rows()
         ):
-            key = f"{number}:{abbreviation}"
+            key = party_key(number, abbreviation, year)
             if key not in parties:
                 parties[key] = cs.key("br.tse.party", key)
                 if parties[key] in cs.minted:
@@ -967,7 +971,7 @@ def emit() -> Path:
                     .sort("party_number")
                     .iter_rows()
                 ):
-                    party = parties[f"{number}:{abbreviation}"]
+                    party = parties[party_key(number, abbreviation, int(year))]
                     group = coalition or f"{number}:{abbreviation}"
                     if group not in lists:
                         lists[group] = cs.key("br.option", f"{key}:list:{group}")
@@ -1007,7 +1011,7 @@ def emit() -> Path:
                             birth_precision="day" if row["birth"] is not None else None,
                         )
                         name(persons[person_key], proper(row["name"]))
-                party = parties[f"{row['party_number']}:{row['party_abbreviation']}"]
+                party = parties[party_key(row["party_number"], row["party_abbreviation"], int(year))]
                 option = cs.key("br.option", f"{key}:{row['candidate']}")
                 options[f"{code}:{row['candidate']}"] = str(option)
                 group = row["coalition"] or f"{row['party_number']}:{row['party_abbreviation']}"

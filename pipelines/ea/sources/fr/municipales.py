@@ -12,7 +12,7 @@ from ea.sources.fr.names import person_name
 from ea.store import DATA, connect
 
 SOURCE = "fr.municipales"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ROUNDS = {1: date(2026, 3, 15), 2: date(2026, 3, 22)}
 STATIC = "https://static.data.gouv.fr/resources"
@@ -81,6 +81,16 @@ OVER_SEVERAL = " The archive records no seats or elected councilors for this rou
 TURNOUT_CAVEAT = (
     "The ministry's results file reports more voters ({voters}) than registered voters ({registered}) in this commune."
 )
+VOTE_FIXES = {
+    (1, "62413"): (
+        {2: 928, 3: 1558},
+        (
+            "The ministry's results file swaps the votes of the second and third lists (1,558 and 928). The archive "
+            "uses the commune's published returns, which give Corinne Taté's list 928 votes and Sébastien Lysik's "
+            "1,558. Those figures match the seats each list won (Ville de Harnes, Élections municipales 2026)."
+        ),
+    ),
+}
 RULES = {
     "formula": "dhondt",
     "tieBreak": "votes",
@@ -434,6 +444,9 @@ def emit() -> Path:
                     kind="caveat",
                     body_md=TURNOUT_CAVEAT.format(voters=row["Votants"], registered=row["Inscrits"]),
                 )
+            fixed, fix_note = VOTE_FIXES.get((round_, unit_code), ({}, None))
+            if fix_note is not None:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=fix_note)
             for field, measure in ACCOUNTING.items():
                 values.append(
                     {
@@ -485,7 +498,7 @@ def emit() -> Path:
                         "unit_id": str(unit),
                         "option_id": str(options[panel]),
                         "measure": 1,
-                        "value": entry["votes"],
+                        "value": fixed.get(panel, entry["votes"]),
                     }
                 )
                 if over:

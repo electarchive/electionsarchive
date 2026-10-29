@@ -13,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "8"
+VERSION = "9"
 TITLE = "Political parties and their colors"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -113,7 +113,10 @@ MATCHES: dict[tuple[str, str], str | None] = {
     ("IT", "Unione Popolare"): None,
     ("TR", "Yeşiller ve Sol Gelecek Partisi"): "Q725173",
     ("TR", "Cumhuriyetçi Köylü Millet Partisi"): "Q6089601",
-    ("DE", "Kommunistische Partei Deutschlands"): None,
+    ("DE", "de.party:KPD"): "Q153401",
+    ("DE", "de.party:KPD (OST)"): "Q321633",
+    ("DE", "de.party:KPD/AO"): "Q1752945",
+    ("DE", "de.party:KPD/ML"): "Q324107",
     ("DE", "DL"): None,
     ("CA", "Marxist-Leninist Party of Canada"): "Q2344321",
     ("CA", "Reconstruction Party"): "Q7302781",
@@ -128,6 +131,9 @@ MATCHES: dict[tuple[str, str], str | None] = {
     ("DE", "Deutsche Reichs-Partei"): "Q495497",
     ("DE", "NATURGESETZ PARTEI, AUFBRUCH ZU NEUEM BEWUSSTSEIN"): "Q137687443",
     ("GB", "National Front"): "Q158093",
+    ("GB", "Independent Labour Party"): "Q1507913",
+    ("GB", "Independent Labour"): None,
+    ("US-CO", "Farmer-Labor Party"): None,
 }
 INHERITED: dict[tuple[str, str], str] = {
     ("FR", "ENS"): "Q109929254",
@@ -591,12 +597,15 @@ def emit() -> Path:
         return ranges
 
     with connect() as conn:
-        parties: list[tuple[UUID, str, str, list[str], list[str], int | None, int | None, int]] = conn.execute(
-            """select p.id, po.iso_code, p.kind,
+        parties: list[tuple[UUID, str, str, list[str], list[str], list[str], int | None, int | None, int]] = (
+            conn.execute(
+                """select p.id, po.iso_code, p.kind,
                       coalesce((select array_agg(n.text order by n.is_preferred desc, n.text) from name n
                                 where n.entity_id = p.id and n.kind <> 'abbreviation'), '{}'),
                       coalesce((select array_agg(n.text order by n.text) from name n
                                 where n.entity_id = p.id and n.kind = 'abbreviation'), '{}'),
+                      coalesce((select array_agg(x.scheme || ':' || x.value) from external_id x
+                                where x.entity_id = p.id and x.scheme <> 'wikidata'), '{}'),
                       s.first, s.last, s.options
                from party p
                join polity po on po.id = p.polity_id
@@ -607,7 +616,8 @@ def emit() -> Path:
                ) s(first, last, options)
                where not exists (select from entity_merge m where m.entity_id = p.id)
                order by p.id"""
-        ).fetchall()
+            ).fetchall()
+        )
         others: defaultdict[UUID, set[str]] = defaultdict(set)
         for entity, text in conn.execute(
             """select n.entity_id, n.text from name n join party p on p.id = n.entity_id
@@ -640,18 +650,22 @@ def emit() -> Path:
 
         owned = {entity: item for item, entity in taken.items()}
         found: dict[UUID, tuple[str | None, str | None, int]] = {}
+        unlinked: dict[UUID, str] = {}
         claims: dict[str, list[tuple[int, int, UUID]]] = defaultdict(list)
-        for party, iso, kind, full, short, first, last, options in parties:
+        for party, iso, kind, full, short, codes, first, last, options in parties:
             scope = iso.split("-")[0]
             if scope not in COUNTRIES:
                 continue
-            forced = next((name for name in full + short if (iso, name) in MATCHES), None)
+            forced = next((name for name in full + short + codes if (iso, name) in MATCHES), None)
             inherited = next((INHERITED[iso, name] for name in full + short if (iso, name) in INHERITED), None)
             if forced is not None:
                 item = MATCHES[iso, forced]
                 found[party] = (item, inherited, options)
                 if item is not None:
                     claims[item].append((1_000, options, party))
+                elif party in owned:
+                    unlinked[party] = owned[party]
+                    del taken[owned[party]]
                 continue
             if party in owned:
                 found[party] = (owned[party], inherited, options)
@@ -742,7 +756,7 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), positioned)
         report: Counter[tuple[str, str]] = Counter()
         shades: defaultdict[UUID, list[tuple[str, date | None, date | None]]] = defaultdict(list)
-        for party, iso, kind, full, short, first, last, options in parties:
+        for party, iso, kind, full, short, codes, first, last, options in parties:
             if party not in found:
                 continue
             scope = "US-*" if iso.startswith("US-") else iso
@@ -819,15 +833,21 @@ def emit() -> Path:
                 report[scope, "painted"] += options
             elif options >= 50:
                 print(f"no color: {iso} {(full + short)[0]} ({options} options, item {linked.get(party) or inherited})")
-        for party, value in conn.execute(
-            "select entity_id, value from external_id where scheme = 'wikidata' and value = 'Q3550075'"
-        ).fetchall():
+        for party, item in unlinked.items():
             cs.add(
                 "external_id_drop",
                 entity_id=party,
                 scheme="wikidata",
-                value=value,
-                reason="Q3550075 is the Union de la gauche of the 1970s, not the Union de la gauche of 2022 to 2024",
+                value=item,
+                reason=f"Matched by hand: the party is not Wikidata's {item}",
+            )
+        for name_id, party, text in conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and n.kind = 'english' and c.pipeline = %s""",
+            [list(unlinked), SOURCE],
+        ).fetchall():
+            cs.add(
+                "name_drop", name_id=name_id, entity_id=party, text=text, reason="Named after an unlinked Wikidata item"
             )
         for scope in sorted({scope for scope, _ in report}):
             print(

@@ -17,7 +17,7 @@ from ea.sources.de.btw import CONSTITUENCIES
 from ea.store import DATA, connect
 
 SOURCE = "de.landtag"
-VERSION = "1"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BW = "https://wahlen.statistik-bw.de/ltw26"
 MV = "https://www.laiv-mv.de/static/LAIV/Wahlen/2-Landtagswahlen/2026/Ergebnisse"
@@ -45,6 +45,7 @@ NOTE_BE = (
     "seats go to candidates on the party's Land list. Extra seats are added to balance out the overhang seats. The "
     "total came to 153."
 )
+KEYS = {"KPD": "KPD:1990"}
 BE_PARTIES = {"MIETERPARTEI", "MERA25", "DL", "DIE FRAUEN"}
 NOTE_BW = (
     "Voters have two votes for the first time in 2026. The second vote decides how many of the Landtag's seats each "
@@ -602,10 +603,11 @@ def emit() -> Path:
         for party in sorted(set(votes["party"]) | set(seats["party"]) | set(members["party"].drop_nulls())):
             if party in OTHERS or party.startswith("Einzelbewerber "):
                 continue
-            party_ids[party] = cs.key("de.party", party.upper())
+            party_ids[party] = cs.key("de.party", KEYS.get(party, party.upper()))
             if party_ids[party] in cs.minted:
                 cs.add("party", id=party_ids[party], kind="party", polity_id=germany)
                 name(party_ids[party], party, "official", "de")
+        cs.merge(party_ids["KPD"], cs.key("de.party", "KPD (OST)"))
 
         def emit_state(abbreviation: str, state: dict[str, Any]) -> None:
             day: date = state["day"]
