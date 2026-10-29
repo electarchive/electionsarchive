@@ -614,6 +614,9 @@ def emit() -> Path:
                     for day, files in special_inbox.OHIO.items():
                         for name in files.values():
                             cs.artifact(raw.cached(SOURCE, special_inbox.OHIO_URL.format(day, name)), sources[state])
+                    for day, (_, _, files) in special_inbox.OHIO_SPECIALS.items():
+                        for name in files.values():
+                            cs.artifact(raw.cached(SOURCE, special_inbox.OHIO_URL.format(day, name).replace("MF-290", "MF-293")), sources[state])
                 if state == "WI":
                     cs.artifact(raw.cached(SOURCE, special_pdfs.WISCONSIN), sources[state])
                     cs.artifact(raw.cached(SOURCE, special_inbox.WISCONSIN), sources[state])

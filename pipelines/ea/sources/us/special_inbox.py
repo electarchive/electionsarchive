@@ -35,6 +35,17 @@ OHIO = {
         "Republican": "2007_republican_fifth_congressional_district_november_6_official_results_table_2.xlsx",
     },
 }
+OHIO_SPECIALS = {
+    "2018-05-08": ("12", 0, {"Democratic": "summarydem.xlsx", "Republican": "summaryrep.xlsx"}),
+    "2024-03-19": (
+        "6",
+        -1,
+        {
+            "Democratic": "summary-level-official-results-primary-2024---democratic.xlsx",
+            "Republican": "summary-level-results-primary-2024---republican.xlsx",
+        },
+    ),
+}
 OHIO_2005 = {
     "Democratic": ["Paul Hackett", "Arthur Stanley Katz", "James John Parker", "Charles W. Sanders", "Jeff Sinnard", "Victoria Wells Wulsin"],
     "Republican": [
@@ -62,6 +73,11 @@ FILES = {
     **{
         OHIO_URL.format(day, name): INBOX.parent / "MF-290" / day / name
         for day, files in OHIO.items()
+        for name in files.values()
+    },
+    **{
+        OHIO_URL.format(day, name).replace("MF-290", "MF-293"): INBOX.parent / "MF-293" / day / name
+        for day, (_, _, files) in OHIO_SPECIALS.items()
         for name in files.values()
     },
 }
@@ -258,6 +274,28 @@ def rows() -> list[dict[str, object]]:
                         last, first = candidate.split(", ")
                         add("OH", day, "5", party, f"{first} {last}", county, int(str(line[3]).replace(",", "")))
                         block.append(found[-1])
+            top = max({row["candidate_name"] for row in block}, key=lambda candidate: sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate))
+            for row in block:
+                row["outcome"] = "Elected" if row["candidate_name"] == top else "Defeated"
+    for day, (district, which, files) in OHIO_SPECIALS.items():
+        for party, name in files.items():
+            sheet = pl.read_excel(
+                raw.cached(SOURCE, OHIO_URL.format(day, name).replace("MF-290", "MF-293")).path,
+                sheet_name="U.S. Congress",
+                has_header=False,
+                engine="calamine",
+            ).rows()
+            starts = [index for index, cell in enumerate(sheet[0]) if cell is not None and cell.strip().endswith(f"District {district.zfill(2)}")]
+            start = starts[which]
+            end = next((index for index in range(start + 1, len(sheet[0])) if sheet[0][index] is not None), len(sheet[0]))
+            block = []
+            for column in range(start, end):
+                candidate = re.sub(r"\s*(\(WI\)\*)?\s*\([A-Z]\)$", "", str(sheet[1][column]))
+                for line in sheet[4:]:
+                    add("OH", day, district, party, candidate, line[0], int(str(line[column]).replace(",", "")))
+                    block.append(found[-1])
+                if sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate) != int(str(sheet[2][column]).replace(",", "")):
+                    raise ValueError(f"OH-{district} {day} {party} {candidate}: counties do not sum")
             top = max({row["candidate_name"] for row in block}, key=lambda candidate: sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate))
             for row in block:
                 row["outcome"] = "Elected" if row["candidate_name"] == top else "Defeated"
