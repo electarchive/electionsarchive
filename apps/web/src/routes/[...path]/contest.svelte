@@ -2645,9 +2645,21 @@
           : m.explain_who_independent({ person: row.person, list: row.label }),
       )}
       <p class="px-2 text-[0.8125rem] text-muted-foreground">
-        {#if row.kind === "note"}{row.note}{:else if row.kind === "remainder"}{m.explain_remainder(
-            { who },
-          )}{:else if row.kind === "compensation"}{m.explain_compensation({
+        {#if row.kind === "note"}{row.note}{:else if row.kind === "access"}{row.votes ==
+          null
+            ? m.explain_access({
+                beaten: new Intl.ListFormat(getLocale(), {
+                  type: "conjunction",
+                }).format(row.beaten),
+              })
+            : m.explain_access_votes({
+                beaten: new Intl.ListFormat(getLocale(), {
+                  type: "conjunction",
+                }).format(row.beaten),
+                votes: count(row.votes),
+              })}{:else if row.kind === "remainder"}{m.explain_remainder({
+            who,
+          })}{:else if row.kind === "compensation"}{m.explain_compensation({
             who,
           })}{:else if row.kind === "threshold"}{m.explain_threshold({
             beaten: new Intl.ListFormat(getLocale(), {

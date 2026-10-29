@@ -97,11 +97,19 @@ export const rules = v.variant("formula", [
     tieBreak,
   }),
   v.object({
-    formula: v.picklist(["hare", "droop", "imperiali_quota"]),
+    formula: v.picklist([
+      "hare",
+      "droop",
+      "imperiali_quota",
+      "reinforced_imperiali_quota",
+    ]),
     threshold: thresholds,
     bonus,
     pooling,
     remainders: v.optional(v.picklist(["contest", "national"])),
+    remainderAccess: v.optional(
+      v.object({ quotas: v.optional(seatCount), votes: v.optional(seatCount) }),
+    ),
     lists,
     tieBreak,
   }),

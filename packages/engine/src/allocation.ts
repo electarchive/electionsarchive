@@ -39,7 +39,13 @@ const divisors = {
 
 type Quota = Extract<
   Allocating,
-  { formula: "hare" | "droop" | "imperiali_quota" }
+  {
+    formula:
+      | "hare"
+      | "droop"
+      | "imperiali_quota"
+      | "reinforced_imperiali_quota";
+  }
 >;
 
 function award(
@@ -80,6 +86,7 @@ function byQuota(rules: Quota, seats: number, entries: Array<Entry>) {
     hare: [total, seats] as const,
     droop: [Math.floor(total / (seats + 1)) + 1, 1] as const,
     imperiali_quota: [total, seats + 2] as const,
+    reinforced_imperiali_quota: [total, seats + 3] as const,
   }[rules.formula];
   const automatic: Record<string, number> = {};
   const claims: Array<Claim> = [];
@@ -149,7 +156,8 @@ export function allocate(
   switch (rules.formula) {
     case "hare":
     case "droop":
-    case "imperiali_quota": {
+    case "imperiali_quota":
+    case "reinforced_imperiali_quota": {
       start = byQuota(rules, seats, entries);
       break;
     }

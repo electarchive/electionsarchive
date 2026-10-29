@@ -19,7 +19,7 @@ from ea.sources.it.interno import key as estero_key
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/camera"
 ELIGENDO = "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=I&tpe=A&lev0=0&levsut0=0&es0=S&ms=S"
@@ -398,13 +398,22 @@ COALITIONS = {
 }
 SYSTEMS = {
     "camera-proportional-1948": (
-        {"formula": "imperiali_quota", "lists": {"order": "open", "vacancy": "next_by_votes"}},
+        {
+            "formula": "imperiali_quota",
+            "remainders": "national",
+            "remainderAccess": {"quotas": 1, "votes": 300000},
+            "lists": {"order": "open", "vacancy": "next_by_votes"},
+        },
         "Chamber of Deputies proportional representation, 1948–1993",
         (
             "Deputies were elected by open-list proportional representation in about thirty multi-member constituencies. "
-            "Seats were first shared out in each constituency with an Imperiali quota, and the remaining votes and seats "
-            "were pooled in a national college (Collegio Unico Nazionale) and shared by largest remainders. Voters could "
-            "cast preference votes for candidates on the list they chose. Valle d'Aosta elected one deputy by plurality."
+            "Seats were first shared out in each constituency by whole quotas, and the remaining votes and seats were "
+            "pooled in a national college (Collegio Unico Nazionale) and shared by largest remainders. In 1948 and 1953 "
+            "the quota was a constituency's valid votes divided by its seats plus three, and any list that won a whole "
+            "quota somewhere joined the national pool. From 1958, under law 493 of 1956, the quota was votes divided by "
+            "seats plus two (the Imperiali quota), and a list also needed 300,000 votes nationwide to join the pool. "
+            "Voters could cast preference votes for candidates on the list they chose. Valle d'Aosta elected one deputy "
+            "by plurality."
         ),
     ),
     "camera-single-member-1993": (
@@ -1269,10 +1278,20 @@ def emit() -> Path:
         systems: dict[str, UUID] = {}
         for code, (rules, label, methodology) in SYSTEMS.items():
             systems[code] = cs.key("it.electoral_system", code)
-            if code == "camera-proportional-2005":
+            if code in ("camera-proportional-2005", "camera-proportional-1948") or systems[code] in cs.minted:
                 cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
+            if code == "camera-proportional-1948" and systems[code] not in cs.minted:
+                held = conn.execute(
+                    "select id from note where entity_id = %s and kind = 'methodology'", [systems[code]]
+                ).fetchone()
+                cs.add(
+                    "note",
+                    **({"id": held[0]} if held else {}),
+                    entity_id=systems[code],
+                    kind="methodology",
+                    body_md=methodology,
+                )
             if systems[code] in cs.minted:
-                cs.add("electoral_system", id=systems[code], polity_id=italy, rules=rules, rules_version=1)
                 name(systems[code], label)
                 if methodology is not None:
                     cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
@@ -1592,6 +1611,8 @@ def emit() -> Path:
                         ]
                     }
                     if day in COALITIONS
+                    else {"formula": "reinforced_imperiali_quota", "remainderAccess": {"quotas": 1}}
+                    if year < 1958
                     else None
                 ),
                 default_result_kind="counted",

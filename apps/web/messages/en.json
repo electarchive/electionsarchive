@@ -2222,6 +2222,8 @@
       }
     }
   ],
+  "explain_access": "{beaten} won more votes but fewer seats, because only lists that won a whole quota in at least one constituency shared the seats left over after whole quotas.",
+  "explain_access_votes": "{beaten} won more votes but fewer seats, because only lists that won a whole quota in at least one constituency and at least {votes} votes nationwide shared the seats left over after whole quotas.",
   "explain_remainder": "{who} won this seat from the national remainder, a pool that fills the seats that districts leave after whole quotas by each party's leftover votes nationwide, so a list can win one here with few votes.",
   "explain_compensation": "{who} won list seats here with fewer votes than parties that took constituency seats, because list seats make up for the constituency results: each party's list votes are divided by one more than the seats it already holds in the region.",
   "explain_threshold": "{beaten} won more votes here but fewer seats, because only parties with at least {percent}% of the vote nationwide take seats.",

@@ -5309,6 +5309,7 @@ export const contests = {
             key: v.string(),
             kind: v.picklist([
               "note",
+              "access",
               "remainder",
               "compensation",
               "threshold",
@@ -5319,6 +5320,7 @@ export const contests = {
             label: v.string(),
             note: v.nullable(v.string()),
             percent: v.nullable(v.number()),
+            votes: v.nullable(v.number()),
             beaten: v.array(v.string()),
             person: v.nullable(v.string()),
             joined: v.nullable(v.string()),
@@ -10793,6 +10795,10 @@ async function explain(
           entry.level === "party" ||
           entry.level === "list"),
     );
+  const access =
+    typeof rules.remainderAccess === "object" && rules.remainderAccess != null
+      ? (rules.remainderAccess as { quotas?: number; votes?: number })
+      : null;
   const shares = new Map<string, number>();
   if (thresholds.length > 0) {
     const national = await db.execute<{ party: string; share: number }>(sql`
@@ -10846,8 +10852,16 @@ async function explain(
           (shares.get(other.party) ?? 0) * 100 < entry.percent,
       ),
     );
+    const isShut =
+      access != null &&
+      beaten.every(
+        (other) =>
+          (access.quotas != null && other.seats === 0) ||
+          (access.votes != null && other.votes < access.votes),
+      );
     const kind:
       | "note"
+      | "access"
       | "remainder"
       | "compensation"
       | "threshold"
@@ -10857,24 +10871,27 @@ async function explain(
       | null =
       row.note != null
         ? "note"
-        : rules.remainders === "national"
-          ? "remainder"
-          : rules.compensation === "constituency_seats"
-            ? "compensation"
-            : threshold != null
-              ? "threshold"
-              : rules.pooling != null
-                ? "pooling"
-                : rules.bonus != null
-                  ? "bonus"
-                  : row.person != null
-                    ? "independent"
-                    : null;
+        : isShut
+          ? "access"
+          : rules.remainders === "national"
+            ? "remainder"
+            : rules.compensation === "constituency_seats"
+              ? "compensation"
+              : threshold != null
+                ? "threshold"
+                : rules.pooling != null
+                  ? "pooling"
+                  : rules.bonus != null
+                    ? "bonus"
+                    : row.person != null
+                      ? "independent"
+                      : null;
     if (kind == null) {
       continue;
     }
     const merged = explained.find(
-      (entry) => kind === "threshold" && entry.kind === kind,
+      (entry) =>
+        (kind === "threshold" || kind === "access") && entry.kind === kind,
     );
     if (merged != null) {
       for (const other of beaten.map(label)) {
@@ -10890,7 +10907,9 @@ async function explain(
       label: label(row),
       note: kind === "note" ? row.note : null,
       percent: kind === "threshold" ? (threshold?.percent ?? null) : null,
-      beaten: kind === "threshold" ? beaten.map(label) : [],
+      votes: kind === "access" ? (access?.votes ?? null) : null,
+      beaten:
+        kind === "threshold" || kind === "access" ? beaten.map(label) : [],
       person: row.person == null ? null : (labels.full.get(row.person) ?? null),
       joined: row.joined,
       system: row.system,

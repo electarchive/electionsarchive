@@ -3659,31 +3659,44 @@ function contestMarkdown(
       const sentence =
         row.kind === "note"
           ? (row.note ?? "")
-          : row.kind === "remainder"
-            ? m.explain_remainder({ who })
-            : row.kind === "compensation"
-              ? m.explain_compensation({ who })
-              : row.kind === "threshold"
-                ? m.explain_threshold({
-                    beaten: new Intl.ListFormat(getLocale(), {
-                      type: "conjunction",
-                    }).format(row.beaten),
-                    percent: String(row.percent ?? ""),
-                  })
-                : row.kind === "pooling"
-                  ? m.explain_pooling({ who })
-                  : row.kind === "bonus"
-                    ? m.explain_bonus({ who })
-                    : row.joined == null
-                      ? m.explain_independent({
-                          person: row.person ?? "",
-                          list: row.label,
-                        })
-                      : m.explain_independent_joined({
-                          person: row.person ?? "",
-                          list: row.label,
-                          date: date(row.joined),
-                        });
+          : row.kind === "access"
+            ? row.votes == null
+              ? m.explain_access({
+                  beaten: new Intl.ListFormat(getLocale(), {
+                    type: "conjunction",
+                  }).format(row.beaten),
+                })
+              : m.explain_access_votes({
+                  beaten: new Intl.ListFormat(getLocale(), {
+                    type: "conjunction",
+                  }).format(row.beaten),
+                  votes: count(row.votes),
+                })
+            : row.kind === "remainder"
+              ? m.explain_remainder({ who })
+              : row.kind === "compensation"
+                ? m.explain_compensation({ who })
+                : row.kind === "threshold"
+                  ? m.explain_threshold({
+                      beaten: new Intl.ListFormat(getLocale(), {
+                        type: "conjunction",
+                      }).format(row.beaten),
+                      percent: String(row.percent ?? ""),
+                    })
+                  : row.kind === "pooling"
+                    ? m.explain_pooling({ who })
+                    : row.kind === "bonus"
+                      ? m.explain_bonus({ who })
+                      : row.joined == null
+                        ? m.explain_independent({
+                            person: row.person ?? "",
+                            list: row.label,
+                          })
+                        : m.explain_independent_joined({
+                            person: row.person ?? "",
+                            list: row.label,
+                            date: date(row.joined),
+                          });
       return row.kind === "note" ||
         row.kind === "independent" ||
         row.system == null
