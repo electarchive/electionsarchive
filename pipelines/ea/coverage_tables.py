@@ -1459,6 +1459,7 @@ def build(full: bool = False) -> str:
             link[found[0][0]] = pid
             taken.add(pid)
     link["23508201400000"] = "cf3230d1-cf93-5584-bb33-3458b297c168"
+    link["05504300800000"] = "5f1810f8-9163-5a5e-aed2-ccd9fc4b1532"
 
     governments: list[dict] = []
     for gid, kind, name, st, county, function, population, population_basis, active, elected in cog.select(
