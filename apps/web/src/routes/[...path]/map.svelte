@@ -2525,7 +2525,7 @@
         class={cn(
           "pointer-events-none absolute inset-s-0 inset-bs-0 grid gap-1.5 rounded-sm bg-card/95 px-3 py-2.5 shadow-menu ring-1 ring-border max-sm:hidden",
           {
-            "inline-[min(17rem,calc(100%-1rem))]": current != null,
+            "inline-[min(20rem,calc(100%-1rem))]": current != null,
             "gap-0.5 inline-fit": current == null,
           },
         )}
@@ -3330,6 +3330,21 @@
 {#snippet readout(isSheet = false)}
   {#if current != null}
     {const tallied = $derived(isTally || current.isTally === true)}
+    {const lead = $derived.by(() => {
+      const [first, second] = current.shares
+        .map((share, index) => ({ share, index }))
+        .toSorted((a, b) => b.share - a.share);
+      return current.margin == null ||
+        places.legend.length === 1 ||
+        first == null ||
+        second == null ||
+        second.share === 0 ||
+        first.index !== current.leader ||
+        Math.abs(current.margin - (first.share - second.share)) > 1e-4
+        ? null
+        : Math.round(first.share * current.valid) -
+            Math.round(second.share * current.valid);
+    })}
     <span class="flex items-baseline justify-between gap-3">
       <span class="font-semibold text-pretty">{current.name}</span>
       {#if moved?.from != null && moved.to != null && moved.from !== moved.to}
@@ -3344,11 +3359,12 @@
           >{m.map_unopposed()}</span
         >
       {:else if current.margin != null}
-        {const lead = $derived(Math.round(current.margin * current.valid))}
         <span
           class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
           >{tallied
-            ? `${lead > 0 ? "+" : ""}${count(lead)}`
+            ? new Intl.NumberFormat(getLocale(), {
+                signDisplay: "exceptZero",
+              }).format(lead ?? Math.round(current.margin * current.valid))
             : points(current.margin)}</span
         >
       {/if}
@@ -3360,26 +3376,45 @@
           class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-0.5 text-[0.8125rem]"
           style:--party={colors[entry.index]}
         >
-          <span
-            class={cn("truncate", {
-              "font-semibold": entry.index === current.leader,
-            })}>{names[entry.index] ?? option?.label}</span
-          >
+          {const person = $derived(current.people?.[entry.index] ?? null)}
+          {const tag = $derived.by(() => {
+            const lines = current.tags?.[entry.index];
+            return lines != null
+              ? new Intl.ListFormat(getLocale(), {
+                  type: "unit",
+                  style: "short",
+                }).format(lines)
+              : person == null
+                ? null
+                : (names[entry.index] ?? option?.label ?? null);
+          })}
+          <span class="flex items-baseline gap-1.5 min-inline-0">
+            <span
+              class={cn("truncate", {
+                "font-semibold": entry.index === current.leader,
+              })}>{person ?? names[entry.index] ?? option?.label}</span
+            >
+            {#if tag != null}
+              <span
+                class="shrink-[999] truncate text-xs text-muted-foreground min-inline-0"
+                title={tag}>{tag}</span
+              >
+            {/if}
+          </span>
           <span
             class="flex items-baseline gap-2 font-figures text-xs tabular-nums"
           >
-            {#if moved != null && !tallied}
+            {#if current.valid > 0 && !tallied}
               <span class="text-muted-foreground"
-                >{points(
-                  (moved.after[entry.index] ?? 0) -
-                    (moved.before[entry.index] ?? 0),
-                )}</span
+                >{count(Math.round(entry.share * current.valid))}</span
               >
             {/if}
-            {tallied
-              ? count(Math.round(entry.share * current.valid))
-              : percent(entry.share, precision(current.margin))}</span
-          >
+            <span class="text-end min-inline-10"
+              >{tallied
+                ? count(Math.round(entry.share * current.valid))
+                : percent(entry.share, precision(current.margin))}</span
+            >
+          </span>
           <span class="col-span-2 rounded-xs bg-muted block-1.5">
             <span
               class="block rounded-xs bg-(--party) block-full"
@@ -3459,7 +3494,11 @@
       <span class="text-muted-foreground"
         >{#if current.valid > 0}{votes}
           <span class="font-figures tabular-nums">{count(current.valid)}</span
-          >{/if}</span
+          >{#if lead != null && !tallied}<span class="mx-1.5" aria-hidden="true"
+              >·</span
+            >{m.map_lead()}
+            <span class="font-figures tabular-nums">{count(lead)}</span
+            >{/if}{/if}</span
       >
       {#if current.path != null && !isSheet && pinned == null}
         <span class="text-muted-foreground">{m.map_click_open()}</span>

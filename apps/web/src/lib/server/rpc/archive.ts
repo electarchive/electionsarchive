@@ -506,6 +506,7 @@ const PlaceRow = v.pipe(
     valid: v.number(),
     shares: v.array(v.number()),
     people: v.optional(v.array(v.nullable(v.string()))),
+    tags: v.optional(v.array(v.nullable(v.array(v.string())))),
     absent: v.optional(v.array(v.number())),
     leader: v.nullable(v.number()),
     held: v.optional(v.nullable(v.array(v.tuple([v.number(), v.number()])))),
@@ -3416,6 +3417,39 @@ async function tabulate(
         ),
     ),
   );
+  const usual = new Map<
+    string,
+    Map<string, { entry: (typeof results)[number][number]; votes: number }>
+  >();
+  for (const [index, entries] of results.entries()) {
+    const owner =
+      rows[index]?.isApart === true ? index : (rows[index]?.owner ?? "");
+    for (const entry of entries) {
+      if (entry.key.startsWith("party:") && entry.current?.person != null) {
+        const seat = `${owner}:${entry.current.person}`;
+        const tally = usual.get(seat) ?? new Map();
+        const held = tally.get(entry.key) ?? { entry, votes: 0 };
+        held.votes += entry.current.votes;
+        tally.set(entry.key, held);
+        usual.set(seat, tally);
+      }
+    }
+  }
+  const canonical = new Map(
+    usual
+      .entries()
+      .filter(([, tally]) => tally.size > 1)
+      .map(
+        ([seat, tally]) =>
+          [
+            seat,
+            tally
+              .values()
+              .toArray()
+              .toSorted((a, b) => b.votes - a.votes)[0]?.entry,
+          ] as const,
+      ),
+  );
   const compared = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
     const owner = row.isApart === true ? index : (row.owner ?? "");
@@ -3429,13 +3463,31 @@ async function tabulate(
         });
       }
     }
-    const result = (results[index] ?? []).map((entry) =>
-      entry.key.startsWith("party:") &&
-      entry.current?.person != null &&
-      personal.has(`${owner}:${entry.current.party}`)
-        ? { ...entry, key: `person:${entry.current.person}` }
-        : entry,
-    );
+    const result = (results[index] ?? []).map((entry, _, all) => {
+      if (
+        entry.key.startsWith("party:") &&
+        entry.current?.person != null &&
+        personal.has(`${owner}:${entry.current.party}`)
+      ) {
+        return { ...entry, key: `person:${entry.current.person}` };
+      }
+      const usual = canonical.get(`${owner}:${entry.current?.person}`);
+      return usual == null ||
+        entry.current == null ||
+        usual.key === entry.key ||
+        !entry.key.startsWith("party:") ||
+        all.some((other) => other.key === usual.key)
+        ? entry
+        : {
+            ...entry,
+            key: usual.key,
+            label: usual.label,
+            short: usual.short,
+            color: usual.color,
+            lean: usual.lean,
+            current: { ...entry.current, party: usual.current?.party ?? null },
+          };
+    });
     const running = result.find(
       (entry) => entry.current != null && !entry.key.startsWith("kind:"),
     );
@@ -3603,6 +3655,30 @@ async function tabulate(
     (item, index) => index < 8 || item.lead || isOwn(item.key),
   );
   const position = new Map(kept.map((item, index) => [item.key, index]));
+  const titled = await names(
+    [
+      ...new Set(
+        now.flatMap((loaded) =>
+          loaded
+            .values()
+            .flatMap((entry) =>
+              entry.side.options.flatMap((option) =>
+                option.line == null || option.party == null
+                  ? []
+                  : [option.party],
+              ),
+            )
+            .toArray(),
+        ),
+      ),
+    ],
+    date,
+  );
+  const shortened = new Map(
+    titled.full
+      .entries()
+      .map(([id, label]) => [label, titled.short.get(id) ?? label] as const),
+  );
   const relit = new Map(
     kept.flatMap((item) =>
       item.color == null ||
@@ -3671,6 +3747,27 @@ async function tabulate(
                   : cell.label;
               })
             : [];
+        const tags =
+          row.isContest && !isMulti
+            ? kept.map((item) => {
+                const cell = result.find(
+                  (entry) => entry.key === item.key,
+                )?.current;
+                if (cell == null) {
+                  return null;
+                }
+                if (cell.lines.length > 1) {
+                  return cell.lines.map(
+                    (line) => shortened.get(line.label) ?? line.label,
+                  );
+                }
+                const party =
+                  item.key.startsWith("person:") && cell.party != null
+                    ? legend.get(`party:${root(cell.party)}`)
+                    : null;
+                return party == null ? null : [party.short ?? party.label];
+              })
+            : [];
         const absent =
           valid > 0
             ? kept.flatMap((item, index) =>
@@ -3694,6 +3791,7 @@ async function tabulate(
               0,
           ),
           people: people.some((label) => label != null) ? people : undefined,
+          tags: tags.some((tag) => tag != null) ? tags : undefined,
           absent: absent.length > 0 ? absent : undefined,
           leader:
             position.get(

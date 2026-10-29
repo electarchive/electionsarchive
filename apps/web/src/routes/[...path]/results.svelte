@@ -939,7 +939,11 @@
   {/if}
 {/snippet}
 
-<div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
+<div
+  class={cn({
+    "overflow-x-auto overflow-y-hidden overscroll-x-contain": span != null,
+  })}
+>
   <table class="border-collapse text-sm/tight inline-full">
     <thead>
       <tr class="border-be text-[0.8125rem] text-muted-foreground">

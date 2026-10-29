@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -140,6 +141,22 @@
   ]);
 
   let hovered = $state<string | null>(null);
+  let opened = $state<Array<string>>([]);
+  const prefix = $derived.by(() => {
+    const first = places[0]?.name ?? "";
+    const head = first.slice(0, first.lastIndexOf(", ") + 2);
+    return head.length > 2 &&
+      places.every((entry) => entry.name.startsWith(head))
+      ? head
+      : "";
+  });
+  const isListed = $derived(
+    link == null &&
+      !isCompact &&
+      folded.some((party) =>
+        party.members.some((member) => member.name != null),
+      ),
+  );
   let picked = $state<Array<string>>(
     untrack(() =>
       isLinked
@@ -844,6 +861,9 @@
       {/if}
       <span class="text-end inline-10">{m.seats_col_seats()}</span>
       <span class="text-end inline-16">{m.seats_col_share()}</span>
+      {#if isListed}
+        <span class="inline-6"></span>
+      {/if}
     </div>
   {/if}
   <ul class="grid grid-cols-[minmax(0,1fr)] gap-px text-sm/tight">
@@ -919,6 +939,33 @@
             class="text-end font-figures text-[0.8125rem] text-muted-foreground tabular-nums inline-16"
             >{percent(party.seats / (totals.all - held))}</span
           >
+          {#if isListed}
+            {#if party.members.some((member) => member.name != null)}
+              <button
+                type="button"
+                class="relative z-1 -my-1 grid shrink-0 place-items-center rounded-xs text-muted-foreground block-6 inline-6 hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none pointer-coarse:block-8"
+                aria-expanded={opened.includes(party.key)}
+                aria-controls="{uid}-members-{party.key}"
+                aria-label={m.seats_members_toggle({
+                  party: party.short ?? party.label,
+                })}
+                onclick={() =>
+                  (opened = opened.includes(party.key)
+                    ? opened.filter((key) => key !== party.key)
+                    : [...opened, party.key])}
+              >
+                <ChevronDownIcon
+                  class={cn(
+                    "transition-transform duration-150 block-4 inline-4 motion-reduce:transition-none",
+                    { "rotate-180": opened.includes(party.key) },
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
+            {:else}
+              <span class="shrink-0 inline-6"></span>
+            {/if}
+          {/if}
         {:else}
           <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
             >{count(party.here)}</span
@@ -928,7 +975,47 @@
             >{m.seats_of({ count: count(party.seats) })}</span
           >
         {/if}
+        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
+        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
+        {#if isListed}<span class="shrink-0 inline-6"></span>{/if}
       </li>
+      {#if isListed && opened.includes(party.key)}
+        <li id="{uid}-members-{party.key}" class="ps-6 pe-1.5 pbe-1.5">
+          <ul
+            class="grid gap-x-3 overflow-y-auto overscroll-y-contain border-s border-border ps-3 text-[0.8125rem]/snug max-block-80"
+            style:border-color={colors.get(party.key)}
+          >
+            {#each party.members
+              .filter((member) => member.name != null)
+              .toSorted((a, b) => (places[a.place]?.name ?? "").localeCompare( places[b.place]?.name ?? "", undefined, { numeric: true } ) || (a.position ?? Infinity) - (b.position ?? Infinity)) as member, index (index)}
+              {const seat = $derived(
+                places.length < 2 ? null : (places[member.place] ?? null),
+              )}
+              <li class="flex items-baseline justify-between gap-3 py-0.5">
+                <span class="truncate min-inline-0"
+                  ><Name
+                    label={member.name ?? ""}
+                    person={member.person ?? null}
+                    hasSwatch={false}
+                  /></span
+                >
+                {#if seat != null}
+                  <span
+                    class="shrink-0 truncate text-xs text-muted-foreground max-inline-[55%]"
+                    >{#if seat.path == null}{seat.name.slice(
+                        prefix.length,
+                      )}{:else}<Preview
+                        class="hover:text-foreground hover:underline hover:decoration-border hover:underline-offset-4"
+                        path={seat.path}
+                        >{seat.name.slice(prefix.length)}</Preview
+                      >{/if}</span
+                  >
+                {/if}
+              </li>
+            {/each}
+          </ul>
+        </li>
+      {/if}
     {/each}
     {#if seceded > 0}
       <li
