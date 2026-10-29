@@ -249,13 +249,16 @@ def rows(term: int) -> list[dict[str, object]]:
     return found
 
 
-VERSION = "4"
+VERSION = "6"
 NOTES = (
     "The Assembly's member search lists every member of a term with the province, the party label, and the date and "
     "reason the membership ended; it does not give start dates, and a member who replaced a departing one is listed "
     "as any other. Persons are matched to the term's elected candidacies by name."
 )
 OPENINGS = {
+    9: date(1950, 5, 22),
+    10: date(1954, 5, 14),
+    11: date(1957, 11, 1),
     17: date(1983, 11, 24),
     18: date(1987, 12, 14),
     19: date(1991, 11, 6),
@@ -267,6 +270,7 @@ OPENINGS = {
     25: date(2015, 6, 23),
     26: date(2015, 11, 17),
 }
+CLOSINGS = {11: date(1960, 5, 27), 26: date(2018, 6, 24)}
 ERDOGAN = "f72877c2-c08b-037b-e050-007f01005610"
 ERDOGAN_SWORN = date(2003, 3, 11)
 MINUTES = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d{term:02d}/c001/tbmm{term:02d}001fih.pdf"
@@ -419,10 +423,11 @@ def emit() -> Path:
                     id=tenure,
                     person_id=person,
                     body_id=assembly,
-                    from_date=ERDOGAN_SWORN
-                    if term == 22 and member == ERDOGAN
-                    else (OPENINGS.get(term) if hit is not None else None),
-                    to_date=row["end"],
+                    from_date=ERDOGAN_SWORN if term == 22 and member == ERDOGAN else OPENINGS.get(term),
+                    from_precision="day" if hit is not None or (term == 22 and member == ERDOGAN) else "unknown",
+                    to_date=(OPENINGS.get(term + 1) or CLOSINGS[term]).isoformat()
+                    if row["end"] is not None and ENDS[str(row["reason"])] == "term_end"
+                    else row["end"],
                     acquired_via="elected",
                     contest_id=None if hit is None else hit[1],
                     ended_via=None if row["end"] is None else ENDS[str(row["reason"])],
@@ -430,7 +435,7 @@ def emit() -> Path:
                 cs.add("citation", entity_id=tenure, source_id=source, locator={"term": term, "member": member})
                 if term == 22 and member == ERDOGAN:
                     cs.add("citation", entity_id=tenure, source_id=minutes[ERDOGAN_OATH], locator={"item": "andiçme"})
-                elif hit is not None and term in OPENINGS:
+                elif term in OPENINGS:
                     cs.add(
                         "citation",
                         entity_id=tenure,
