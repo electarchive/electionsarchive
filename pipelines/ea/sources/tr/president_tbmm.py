@@ -10,7 +10,7 @@ from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SOURCE = "tr.president_tbmm"
-VERSION = "1"
+VERSION = "2"
 WIKI = "https://tr.wikipedia.org/wiki/{}"
 WIKITEXT = "https://tr.wikipedia.org/w/index.php?title={}&action=raw"
 LICENSE = "Creative Commons Attribution-ShareAlike 4.0"
@@ -79,7 +79,7 @@ ELECTIONS = [
     (1939, "İnönü", [(D(1939, 4, 3), 413, None, {"İnönü": 413}, {})]),
     (1943, "İnönü", [(D(1943, 3, 8), 435, None, {"İnönü": 435}, {})]),
     (1946, "İnönü", [(D(1946, 8, 5), 451, None, {"İnönü": 388, "Çakmak": 59}, {})]),
-    (1950, "Bayar", [(D(1950, 5, 22), 453, None, {"Bayar": 387}, {})]),
+    (1950, "Bayar", [(D(1950, 5, 22), 453, None, {"Bayar": 387, "İnönü": None}, {})]),
     (1954, "Bayar", [(D(1954, 5, 14), None, None, {"Bayar": 486}, {})]),
     (1957, "Bayar", [(D(1957, 11, 1), 413, None, {"Bayar": 413}, {})]),
     (1961, "Gürsel", [(D(1961, 10, 26), 607, None, {"Gürsel": 434}, {})]),
@@ -306,14 +306,34 @@ def emit() -> Path:
             cs.add("note", entity_id=election, kind="caveat", body_md=NOTE)
             previous = None
             contest = None
+            days: dict[date, UUID] = {}
             for number, (day, present, required, votes, others) in enumerate(rounds, 1):
+                round_election = election
+                round_path = path
+                if len(rounds) > 1:
+                    if day not in days:
+                        days[day] = cs.key("tr.election", f"{day}:president-tbmm:day")
+                        cs.add(
+                            "election",
+                            id=days[day],
+                            polity_id=turkey,
+                            parent_id=election,
+                            kind="indirect",
+                            date_from=day,
+                            date_to=day,
+                            status="held",
+                        )
+                        name(days[day], f"{year} Turkish presidential election, {day:%B} {day.day} ballots")
+                        cs.add("slug", path=f"{path}/{day}", entity_id=days[day])
+                    round_election = days[day]
+                    round_path = f"{path}/{day}"
                 contest_key = f"{first}:president-tbmm:{number}"
                 contest = cs.key("tr.contest", contest_key)
                 override = {} if required is None else {"required": required}
                 cs.add(
                     "contest",
                     id=contest,
-                    election_id=election,
+                    election_id=round_election,
                     kind="office",
                     office_id=president,
                     body_id=assembly,
@@ -326,7 +346,11 @@ def emit() -> Path:
                 )
                 label = f"Ballot {number}, {day:%B} {day.day}" if len(rounds) > 1 else f"{year} presidential vote"
                 name(contest, label)
-                cs.add("slug", path=f"{path}/ballot-{number}" if len(rounds) > 1 else f"{path}/vote", entity_id=contest)
+                cs.add(
+                    "slug",
+                    path=f"{round_path}/ballot-{number}" if len(rounds) > 1 else f"{path}/vote",
+                    entity_id=contest,
+                )
                 previous = contest
                 if year == 2007 and number == 1:
                     cs.add(
@@ -339,7 +363,7 @@ def emit() -> Path:
                 cs.add(
                     "result_set",
                     id=result_set,
-                    election_id=election,
+                    election_id=round_election,
                     contest_id=contest,
                     stage="official",
                     kind="counted",
@@ -369,6 +393,8 @@ def emit() -> Path:
                                 person_id=persons[candidate],
                                 option_id=option,
                             )
+                    if value is None:
+                        continue
                     result_values.append(
                         {
                             "result_set_id": str(result_set),
