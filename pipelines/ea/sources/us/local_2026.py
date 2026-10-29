@@ -1506,6 +1506,30 @@ for county, url in {
         url,
         f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca') else 'docx' if county == 'Oswego' else 'pdf'}",
     )
+for fips, county in {
+    "32001": "Churchill",
+    "32005": "Douglas",
+    "32007": "Elko",
+    "32009": "Esmeralda",
+    "32011": "Eureka",
+    "32013": "Humboldt",
+    "32015": "Lander",
+    "32017": "Lincoln",
+    "32019": "Lyon",
+    "32021": "Mineral",
+    "32023": "Nye",
+    "32027": "Pershing",
+    "32029": "Storey",
+    "32031": "Washoe",
+    "32033": "White Pine",
+    "32510": "Carson City",
+}.items():
+    NE_SOURCES[f"NV-{fips}"] = (
+        "Nevada Secretary of State",
+        "2026 General Election: Statewide Certified List of Candidates",
+        "https://www.nvsos.gov/sos/elections/election-information/2026-election-information",
+        "nv/certified.pdf",
+    )
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
