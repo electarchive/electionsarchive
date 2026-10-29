@@ -46,6 +46,20 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://gis.lojic.org/maps/rest/services/LojicSolutions/OpenDataPolitical/MapServer/8",
         "field": "COUNDIST",
     },
+    {
+        "publisher": "Charleston County GIS",
+        "title": "Charleston County Council Districts",
+        "pattern": r"^45:45019:board-of-commissioners:district-",
+        "layer": "https://gisccapps.charlestoncounty.org/arcgis/rest/services/CARTEGRAPH/CART_COUNCIL_DIST/MapServer/10",
+        "field": "DISTRICT",
+    },
+    {
+        "publisher": "Broome County GIS",
+        "title": "Broome County Legislative Districts",
+        "pattern": r"^36:36007:(county-)?legislature:district-",
+        "layer": "https://gis.broomecountyny.gov/arcgis/rest/services/elections/br_elections/MapServer/3",
+        "field": "LD",
+    },
 ]
 
 
