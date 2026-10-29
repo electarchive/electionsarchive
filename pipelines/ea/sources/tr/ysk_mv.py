@@ -49,6 +49,8 @@ ISSUES = {
     date(1973, 10, 14): (14698, date(1973, 10, 31), range(7, 24), 2),
     date(1977, 6, 5): (15971, date(1977, 6, 19), range(4, 49), 1),
 }
+TABLED = {date(1961, 10, 15): (10960, date(1961, 11, 17), range(7, 14), 1)}
+EDGES = [815, 1085, 1316, 1645, 1885, 2155, 2427, 2696, 2915, 3243, 3570]
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
 STOP = 320.0
@@ -235,6 +237,14 @@ NOTES = (
     "their parties. Read from the gazette's text layer and a Haiku transcription of the page images; figures where "
     "the two readings differ were settled against THEA's figure."
 )
+NOTES_1961 = (
+    "Decision 389 of the Supreme Election Council: section Ç lists the elected members by province with their "
+    "parties, and section E gives, by province, registered voters, voters, turnout, valid ballots, and each party's "
+    "and the independents' valid ballots. Read from the gazette's text layer and checked against the page images; "
+    "where a printed digit is broken, the reading THEA and the State Institute of Statistics share was taken. The "
+    "council published the returns as the provincial boards reported them, without correcting their addition errors, "
+    "so some rows do not sum."
+)
 LETTERS = re.compile(r"[A-Za-zÇĞİÖŞÜçğıöşüÂâÎîÛû]")
 CLEA = {
     "AP": 17,
@@ -259,7 +269,7 @@ def url(issue: int) -> str:
 
 
 def fetch() -> None:
-    for issue, *_ in ISSUES.values():
+    for issue, *_ in (ISSUES | TABLED).values():
         raw.fetch(SOURCE, url(issue), suffix=".pdf")
 
 
@@ -797,6 +807,99 @@ def parse() -> None:
                     }
                 )
             named.extend(listed)
+    for day, (issue, *_) in TABLED.items():
+        pdf = raw.cached(SOURCE, url(issue)).path
+        sizes = {
+            int(page): (float(width) * 300 / 72, float(height) * 300 / 72)
+            for page, width, height in re.findall(
+                r"Page\s+(\d+) size:\s+([\d.]+) x ([\d.]+)",
+                subprocess.run(
+                    ["pdfinfo", "-f", "12", "-l", "13", str(pdf)], capture_output=True, text=True, check=True
+                ).stdout,
+            )
+        }
+        located: dict[str, tuple[int, float, dict[int, list[float]]]] = {}
+        for page in (12, 13):
+            words = scan.layer(pdf, page)
+            for text, box in words:
+                folded = "agri" if fold(text) == "agn" else fold(text)
+                if box[0] > sizes[page][0] * 0.15 or len(folded) < 3:
+                    continue
+                match = (
+                    folded if folded in KNOWN else next(iter(difflib.get_close_matches(folded, KNOWN, 1, 0.75)), None)
+                )
+                middle = (box[1] + box[3]) / 2
+                line = sorted(
+                    (
+                        word
+                        for word in words
+                        if abs((word[1][1] + word[1][3]) / 2 - middle) < 22 and word[1][0] > box[2]
+                    ),
+                    key=lambda word: word[1][0],
+                )
+                if (
+                    match is None
+                    or ALIASES.get(match, match) in located
+                    or not line
+                    or not re.search(r"\d", line[0][0])
+                ):
+                    continue
+                cells: dict[int, list[float]] = {}
+                for _, at in line:
+                    held = cells.setdefault(
+                        min(range(len(EDGES)), key=lambda index: abs(EDGES[index] - at[2])), list(at)
+                    )
+                    held[:] = [min(held[0], at[0]), min(held[1], at[1]), max(held[2], at[2]), max(held[3], at[3])]
+                located[ALIASES.get(match, match)] = (page, middle, cells)
+        columns = {
+            "registered": 0,
+            "voters": 1,
+            "valid": 3,
+            "party:AP": 4,
+            "party:CHP": 5,
+            "party:CKMP": 6,
+            "party:YTP": 7,
+            "independents": 9,
+        }
+        for row in pl.read_csv(Path(__file__).with_name("ysk_mv_1961.tsv"), separator="\t").iter_rows(named=True):
+            province = fold(PROVINCES[row["plate"] - 1])
+            page, middle, cells = located[province]
+            width, height = sizes[page]
+            for measure, column in columns.items():
+                value = row[measure.removeprefix("party:")]
+                if value == 0 and measure not in TOTALS:
+                    continue
+                box = cells.get(
+                    column, [EDGES[column - 1] + 10 if column else 560, middle - 20, EDGES[column], middle + 20]
+                )
+                final.append(
+                    {
+                        "day": day,
+                        "province": province,
+                        "measure": measure,
+                        "value": value,
+                        "how": "printed",
+                        "page": page,
+                        "box": [box[0] / width, box[1] / height, box[2] / width, box[3] / height],
+                    }
+                )
+        for order, row in enumerate(
+            pl.read_csv(Path(__file__).with_name("ysk_mv_1961_members.tsv"), separator="\t", quote_char=None).iter_rows(
+                named=True
+            ),
+            1,
+        ):
+            named.append(
+                {
+                    "day": day,
+                    "province": fold(PROVINCES[row["plate"] - 1]),
+                    "order": order,
+                    "name": row["name"],
+                    "party": row["party"],
+                    "independent": row["independent"],
+                    "page": row["page"],
+                }
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(final).write_parquet(PARSED / "values.parquet")
     pl.DataFrame(named).write_parquet(PARSED / "names.parquet")
@@ -818,7 +921,7 @@ def emit() -> Path:
             " join external_id x on x.entity_id = t.contest_id and x.scheme = 'tr.contest'"
             " join name n on n.entity_id = t.person_id and n.is_preferred"
             " where x.value like any(%s) and t.acquired_via = 'elected'",
-            [[f"{day}:parliament:%" for day in ISSUES]],
+            [[f"{day}:parliament:%" for day in ISSUES | TABLED]],
         ):
             members.setdefault(key, []).append((person, text))
         cs = Changeset(
@@ -826,8 +929,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Official National Assembly results by province for the 1965, 1969, 1973, and 1977 Turkish general "
-                "elections, with the elected members, from YSK's notices in the Resmî Gazete"
+                "Official National Assembly results by province for the 1961, 1965, 1969, 1973, and 1977 Turkish "
+                "general elections, with the elected members, from YSK's notices in the Resmî Gazete"
             ),
             polity="TR",
         )
@@ -837,14 +940,14 @@ def emit() -> Path:
         moved = []
         listed_candidacies: set[UUID] = set()
         PAGES.mkdir(parents=True, exist_ok=True)
-        for day, (issue, published, _, _) in ISSUES.items():
+        for day, (issue, published, _, _) in (ISSUES | TABLED).items():
             held = values.filter(pl.col("day") == day)
             listed = names.filter(pl.col("day") == day)
             documents = [
                 (
                     issue,
                     f"{day.year} milletvekili genel seçimi sonuçları, Resmî Gazete {issue} ({published:%d.%m.%Y})",
-                    NOTES,
+                    NOTES_1961 if day in TABLED else NOTES,
                     sorted(set(held["page"]) | set(listed["page"])),
                 )
             ]

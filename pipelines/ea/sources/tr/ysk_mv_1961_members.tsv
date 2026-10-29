@@ -1,0 +1,451 @@
+plate	name	party	independent	page
+01	Ali Bozdoğanoğlu	AP	false	7
+01	Ahmet Topaloğlu	AP	false	7
+01	Cavit Oral	AP	false	7
+01	İbrahim Tekin	AP	false	7
+01	Hasan Aksay	AP	false	7
+01	Yusuf Aktimur	AP	false	7
+01	Ahmet Savrun	AP	false	7
+01	Kasım Gülek	CHP	false	7
+01	Melih Kemal Küçüktepepınar	CHP	false	7
+01	Kemal Sarıibrahimoğlu	CHP	false	7
+01	Ahmet Karamüftüoğlu	CHP	false	7
+01	Mehmet Geçioğlu	CHP	false	7
+02	Mahmut Deniz	CHP	false	7
+02	Mehmet Özbay	CHP	false	7
+02	Ali Turanlı	YTP	false	7
+02	Arif Atalay	YTP	false	7
+03	Mehmet Turgut	AP	false	7
+03	Haluk Nurbaki	AP	false	7
+03	Asım Yılmaz	CHP	false	7
+03	Şükrü Yüzbaşıoğlu	CHP	false	7
+03	Veli Başaran	CKMP	false	7
+03	Hasan Dinçer	CKMP	false	7
+03	Şevki Güler	CKMP	false	7
+04	Rıza Polat	CKMP	false	7
+04	Nevzat Güngör	CKMP	false	7
+04	Kerem Özcan	CKMP	false	7
+05	Nevzat Şener	AP	false	7
+05	İsmail Sarıgöz	AP	false	7
+05	Mustafa Kemal Karan	CHP	false	7
+05	Reşat Arpacıoğlu	CHP	false	7
+06	Mehti Mıhçıoğlu	AP	false	7
+06	Burhan Apaydın	AP	false	7
+06	Ferhat Yıldırım	AP	false	7
+06	İhsan Köknel	AP	true	7
+06	İsmail Rüştü Aksal	CHP	false	7
+06	Bülent Ecevit	CHP	false	7
+06	Fuat Börekçi	CHP	false	7
+06	Emin Paksüt	CHP	false	7
+06	İbrahim Sıtkı Hatipoğlu	CHP	false	7
+06	İlyas Seçkin	CHP	false	7
+06	İbrahim İmirzalıoğlu	CHP	false	7
+06	Ahmet Üstün	CHP	false	7
+06	Osman Bölükbaşı	CKMP	false	7
+06	Abdülhak Kemal Yörük	CKMP	false	7
+06	Muhlis Ete	CKMP	false	7
+06	Hüseyin Ataman	CKMP	false	7
+06	Zühtü Pehlivanlı	CKMP	false	7
+06	Mustafa Kemal Erkovan	CKMP	false	7
+06	İsmail Gence	CKMP	false	7
+06	Nihat Berkkan	CKMP	false	7
+06	Raif Aybar	YTP	false	7
+07	Nihat Su	AP	false	7
+07	Ömer Eken	AP	false	7
+07	Hasan Fehmi Boztepe	AP	false	7
+07	Nazmi Kerimoğlu	AP	false	7
+07	İhsan Ataöv	AP	false	7
+07	Etem Ağva	CHP	false	7
+07	Refet Eker	CHP	false	7
+08	Sabih Osman Avcı	AP	false	7
+08	Nihat Ata	AP	false	7
+08	Saffet Emin Ağaoğlu	CHP	false	7
+09	Orhan Apaydın	AP	false	7
+09	Melâhat Gedik	AP	false	7
+09	Reşat Özarda	AP	false	7
+09	İsmet Sezgin	AP	false	7
+09	Mehmet Yavaş	AP	false	7
+09	Hilmi Aydınçer	AP	false	7
+09	Mustafa Şükrü Koç	CHP	false	7
+09	Nedim Müren	CHP	false	7
+10	Cihat Bilgehan	AP	false	7
+10	Gökhan Evliyaoğlu	AP	false	7
+10	Ahmet İhsan Kırımlı	AP	false	7
+10	Cevat Kanpulat	AP	false	7
+10	Mithat Çavdaroğlu	AP	false	7
+10	Kaya Bulut	AP	false	7
+10	Cihat Turgut	AP	false	7
+10	Ahmet Aydın Bolak	CHP	false	7
+10	Fenni İslimyeli	CHP	false	7
+10	Süreyya Koç	CHP	false	7
+10	Mehmet Tiritoğlu	CHP	false	7
+11	Orhan Tuğrul	AP	false	7
+11	Şadi Binay	AP	false	7
+12	Sıddık Aydar	YTP	false	7
+12	Halit Rıza Ünal	YTP	false	7
+13	Müştak Okumuş	CHP	false	7
+13	Nafiz Giray	YTP	false	7
+14	Turgut Çulha	AP	false	7
+14	Kemal Demir	CHP	false	7
+14	Zeki Baltacıoğlu	CHP	false	7
+14	Kâmil İnal	CKMP	false	7
+14	Fuat Ümit	YTP	false	7
+14	Ahmet Çakmak	YTP	false	7
+15	Mehmet Özbey	AP	false	7
+15	Fethi Çelikbaş	CHP	false	7
+15	Nadir Yavuzkan	CHP	false	7
+16	Cevdet Perin	AP	false	8
+16	Ahmet Türkel	AP	false	8
+16	Ziya Uğur	AP	false	8
+16	Baha Cemal Zağra	AP	false	8
+16	İsmail Yılmaz	AP	false	8
+16	Mustafa Tayyar	AP	false	8
+16	Ekrem Paksoy	AP	false	8
+16	Hikmet Akalan	AP	false	8
+16	Edip Rüştü Akyürek	CHP	false	8
+16	İbrahim Öktem	CHP	false	8
+16	Sadrettin Çanga	CHP	false	8
+17	Süreyya Endik	AP	false	8
+17	Ahmet Nihat Akay	AP	false	8
+17	Burhan Arat	CHP	false	8
+17	Şefik İnan	CHP	false	8
+17	Refet Sezgin	YTP	false	8
+18	Nurettin Ok	CKMP	false	8
+18	Şaban Keskin	CKMP	false	8
+18	Kâzım Arar	CKMP	false	8
+18	Rahmi İnceler	CKMP	false	8
+19	Necmi Ökten	AP	false	8
+19	İhsan Tonbuş	AP	false	8
+19	Abdurrahman Güler	AP	false	8
+19	Muzaffer Dündar	AP	false	8
+19	Hilmi İncesulu	CHP	false	8
+19	Nuri Ahıskalıoğlu	CHP	false	8
+19	Faruk Küreli	CKMP	false	8
+20	Remzi Şenel	AP	false	8
+20	Sinan Bosna	AP	false	8
+20	Mehmet Çobanoğlu	AP	false	8
+20	İbrahim Kocatürk	AP	false	8
+20	Hüdai Oral	CHP	false	8
+20	Atıf Şohoğlu	CHP	false	8
+20	İsmail Ertan	CHP	false	8
+21	Alpdoğan Şen	AP	false	8
+21	Vefik Pirinççioğlu	CHP	false	8
+21	Hilmi Güldoğan	CHP	false	8
+21	Şeyhmus Aslan	CHP	false	8
+21	Yusuf Azizoğlu	YTP	false	8
+21	Recai İskenderoğlu	YTP	false	8
+21	Adnan Aral	YTP	false	8
+22	Nazmi Özoğul	AP	false	8
+22	İlhami Erten	AP	false	8
+22	Fahir Giritlioğlu	CHP	false	8
+22	Süleyman Bilgen	CHP	false	8
+22	Talât Asal	YTP	false	8
+23	Naci Güray	AP	false	8
+23	Ömer Faruk Sanaç	AP	false	8
+23	Kemal Satır	CHP	false	8
+23	Hürrem Müftügil	CHP	false	8
+23	Nurettin Ardıçoğlu	CKMP	false	8
+24	Zeynel Gündoğdu	CHP	false	8
+24	Naci Yıldırım	CHP	false	8
+24	Sadık Perinçek	YTP	false	8
+24	Hüsamettin Atabeyli	YTP	false	8
+25	Cevat Dursunoğlu	CHP	false	8
+25	Gıyasettin Karaca	CHP	false	8
+25	Adnan Şenyurt	CHP	false	8
+25	Şerafettin Korunay	CKMP	false	8
+25	Tahsin Telli	CKMP	false	8
+25	Ertuğrul Akça	YTP	false	8
+25	Cevat Önder	YTP	false	8
+25	Turhan Bilgin	YTP	false	8
+25	Nihat Diler	YTP	false	8
+26	Celâlettin Uzer	AP	false	8
+26	Ertuğrul Gazi Sakarya	AP	false	8
+26	Aziz Zeytinoğlu	AP	false	8
+26	İbrahim Cemalcılar	CHP	false	8
+26	Şevket Asbuzoğlu	CHP	false	8
+26	Seyfi Öztürk	CKMP	false	8
+27	Süleyman Ünlü	AP	false	8
+27	Kudret Mavitan	AP	false	8
+27	Hüseyin İncioğlu	CHP	false	8
+27	Ali İhsan Göğüş	CHP	false	8
+27	Osman Orhan Bilen	CHP	false	8
+27	Dr. Muzaffer Canbolat	CHP	false	8
+27	Mithat San	YTP	false	8
+28	Naim Tirali	CHP	false	8
+28	Mustafa Kemal Çilesiz	CHP	false	8
+28	Ali Cüceoğlu	CKMP	false	8
+28	Nizamettin Erkmen	YTP	false	8
+28	Ethem Kılıçoğlu	YTP	false	8
+28	Ali Köymen	YTP	false	8
+29	Sabahattin Savcı	AP	false	8
+29	Nurettin Özdemir	CHP	false	8
+29	Halis Bayramoğlu	CHP	false	8
+29	Necmettin Küçüker	YTP	false	8
+30	Ahmet Zeydan	CHP	false	8
+31	Saki Zorlu	AP	false	8
+31	Bahri Bahadır	CHP	false	8
+31	İnayet Mursaloğlu	CHP	false	8
+31	Ahmet Sırrı Hocaoğlu	CHP	false	8
+31	Şekip İnal	YTP	false	8
+31	Abdullah Cilli	YTP	false	8
+31	Ali Muhsin Bereketoğlu	YTP	false	8
+32	Sadettin Bilgiç	AP	false	8
+32	İhsan Balım	AP	false	8
+32	Mustafa Gülcügil	AP	false	8
+32	Lokman Başaran	CHP	false	8
+33	İhsan Önal	AP	false	9
+33	Mazhar Arıkan	AP	false	9
+33	Celâl Kılıç	AP	false	9
+33	Burhan Bozdoğan	AP	false	9
+33	Yahya Dermancı	CHP	false	9
+33	Mehmet Ali Arslan	CHP	false	9
+33	Sadık Kutlay	CHP	false	9
+34	Tahsin Demiray	AP	false	9
+34	Abdurrahman Yazgan	AP	false	9
+34	Nurettin Bulak	AP	false	9
+34	Muhittin Güven	AP	false	9
+34	Malik Yolaç	AP	false	9
+34	Ziya Altınoğlu	AP	false	9
+34	İbrahim Abak	AP	false	9
+34	Hilmi Oben	AP	false	9
+34	Mahmut Rıza Bertan	AP	false	9
+34	Ferruh Bozbeyli	AP	false	9
+34	Naci Öktem	AP	false	9
+34	Hüsamettin Tıyanşan	AP	false	9
+34	Şahabettin Orhon	AP	false	9
+34	İsmail Hakkı Tekinel	AP	false	9
+34	Selim Sarper	CHP	false	9
+34	İlhami Sancar	CHP	false	9
+34	Orhan Eyüpoğlu	CHP	false	9
+34	Cihat Baban	CHP	false	9
+34	Suphi Baykam	CHP	false	9
+34	Zeki Zeren	CHP	false	9
+34	Sabri Vardarlı	CHP	false	9
+34	Ratip Tahir Burak	CHP	false	9
+34	Oğuz Oran	CHP	false	9
+34	Coşkun Kırcalı	CHP	false	9
+34	Vahyi Özarar	CHP	false	9
+34	Reşit Ülker	CHP	false	9
+34	Ahmet Oğuz	CKMP	false	9
+34	Fuat Arna	CKMP	false	9
+34	Saadet Evren (Kaçar)	CKMP	false	9
+34	Zekai Dormen	CKMP	false	9
+34	Fahrettin Kerim Gökay	YTP	false	9
+35	Ragıp Gümüşpala	AP	false	9
+35	Şinasi Osma	AP	false	9
+35	Mehmet Ali Aytaç	AP	false	9
+35	Saim Kaygan	AP	false	9
+35	Muzaffer Döşemeci	AP	false	9
+35	Ali Naili Erdem	AP	false	9
+35	Nihat Kürşat	AP	false	9
+35	Şükrü Akkan	AP	false	9
+35	İhsan Gürsan	AP	false	9
+35	Kadri Özek	AP	false	9
+35	Lebit Yurtoğlu	CHP	false	9
+35	Mustafa Uyar	CHP	false	9
+35	Necip Mirkelamoğlu	CHP	false	9
+35	Arif Ertunga	CHP	false	9
+35	Osman Sabri Adal	CHP	false	9
+35	Şeref Bakşık	CHP	false	9
+35	Ziya Hanhan	CHP	false	9
+36	Lâtif Aküzüm	AP	false	9
+36	Necmettin Akan	AP	false	9
+36	Hasan Erdoğan	CHP	false	9
+36	Kemal Güven	CHP	false	9
+36	Bahtiyar Vural	CHP	false	9
+36	Kemal Okyay	CHP	false	9
+36	Kemal Kaya	YTP	false	9
+36	Rıza Yalçın	YTP	false	9
+36	Sırrı Öktem	YTP	false	9
+37	Avni Doğan	CHP	false	9
+37	Ali Dikmenli	CHP	false	9
+37	Hakkı Yılanlıoğlu	CKMP	false	9
+37	Fethi Doğançay	CKMP	false	9
+37	İhsan Şeref Dura	YTP	false	9
+37	Sabri Keskin	YTP	false	9
+37	Osman Zeki Oktay	YTP	false	9
+38	Vedat Ali Özkan	AP	false	9
+38	Mehmet Yüceler	AP	false	9
+38	Halim Aras	AP	false	9
+38	Hüsamettin Gümüşpala	AP	false	9
+38	Turhan Feyzioğlu	CHP	false	9
+38	Bahri Yazır	CHP	false	9
+38	Mehmet Göker	CHP	false	9
+38	Nuh Mehmet Sağlam	CHP	false	9
+39	Abdurrahman Altuğ	CHP	false	9
+39	Hasan Tahsin Uzun	CHP	false	9
+39	Mehmet Alâaddin Eriş	YTP	false	9
+39	Fikret Filiz	YTP	false	9
+40	Ahmet Bilgin	CKMP	false	9
+40	Halil Özmen	CKMP	false	9
+40	Memduh Erdemir	CKMP	false	9
+41	Cemal Babaç	AP	false	9
+41	Süreyya Sofuoğlu	AP	false	9
+41	Haldun Kısayol	AP	false	9
+41	Nihat Erim	CHP	false	9
+41	Şahabettin Bilgisu	CHP	false	9
+42	Ahmet Gürkan	AP	false	9
+42	Sait Sinan Yücesoy	AP	false	9
+42	Faruk Sükan	AP	false	9
+42	Cahit Yılmaz	AP	false	9
+42	İhsan Kabadayı	CHP	false	9
+42	Mehmet Rüştü Özal	CHP	false	9
+42	Fakih Özlen	CHP	false	9
+42	Samet Kuzucu	CHP	false	9
+42	Fakih Özfakih	CHP	false	9
+42	Vefa Tanır	CHP	false	9
+42	Kadircan Kaflı	CKMP	false	9
+42	İrfan Baran	CKMP	false	9
+42	Kemal Ataman	CKMP	false	9
+42	Ömer Kart	CKMP	false	9
+42	Mekki Keskin	YTP	false	9
+42	Selçuk Aytan	YTP	false	9
+43	Rauf Kıray	AP	false	9
+43	Sezai Sarpaşar	AP	false	9
+43	Ahmet Bozbay	CHP	false	9
+43	Ali Erbek	CHP	false	9
+43	Sadrettin Tosbi	CKMP	false	9
+43	Mehmet Kesen	CKMP	false	9
+44	İsmet İnönü	CHP	false	9
+44	Mehmet Delikaya	CHP	false	9
+44	Ahmet Fırat	CHP	false	9
+44	Halit Ziya Özkan	CHP	false	9
+44	Nurettin Akyurt	CHP	false	9
+44	Avni Akşit	YTP	false	9
+45	Hürrem Kubat	AP	false	10
+45	Neriman Ağaoğlu	AP	false	10
+45	Nahit Yenişehirlioğlu	AP	false	10
+45	Nüsret Köklü	AP	false	10
+45	Süleyman Çağlar	AP	false	10
+45	Hilmi Okçu	AP	false	10
+45	Yakup Yakut	AP	false	10
+45	Şevket Raşit Hatipoğlu	CHP	false	10
+45	Fevzi Lütfi Karaosmanoğlu	CHP	false	10
+45	Yakup Kadri Karaosmanoğlu	CHP	false	10
+45	Muammer Ertem	CHP	false	10
+46	Kemal Bağcıoğlu	AP	false	10
+46	Enver Kaplan	AP	false	10
+46	Adnan Karaküçük	AP	false	10
+46	Ali Hüdaioğlu	AP	false	10
+46	Kemali Beyazit	CHP	false	10
+46	Hasan Fehmi Evliya	CHP	false	10
+47	Vahap Dizdaroğlu	CHP	false	10
+47	Mehmet Ali Arıkan	CHP	false	10
+47	Şevki Aysan	CHP	false	10
+47	Talât Oğuz	CKMP	false	10
+47	Esat Kemal Aybar	YTP	false	10
+47	Seyfi Güneştan	YTP	false	10
+48	İlhan Tekinalp	AP	false	10
+48	Adnan Akarca	AP	false	10
+48	Cevdet Özkay	AP	false	10
+48	Turan Şahin	CHP	false	10
+48	Hilmi Baydur	CHP	false	10
+49	Sami Öztürk	YTP	false	10
+49	Kuddusi Aytaç	YTP	false	10
+49	Sait Mutlu	YTP	false	10
+50	Halit Fikret Aka	CKMP	false	10
+50	Ali Baran Numanoğlu	CKMP	false	10
+50	Ramazan Demirsoy	CKMP	false	10
+51	Haydar Özalp	AP	false	10
+51	Ruhi Soyer	CHP	false	10
+51	Asım Eren	CHP	false	10
+51	Mehmet Altınsoy	CKMP	false	10
+51	Oğuzdemir Tüzün	CKMP	false	10
+52	Rafet Aksoy	AP	false	10
+52	Şadi Pehlivanoğlu	AP	false	10
+52	Ferda Güley	CHP	false	10
+52	Arif Hikmet Onat	CHP	false	10
+52	İzzettin Ağaoğlu	CHP	false	10
+52	Orhan Naim Hazinedar	CHP	false	10
+52	Ata Topaloğlu	YTP	false	10
+52	Ata Bodur	YTP	false	10
+53	Erol Yılmaz Akçal	AP	false	10
+53	Cevat Yalçın	AP	false	10
+53	Arif Hikmet Güner	AP	false	10
+53	Fuat Sirmen	CHP	false	10
+54	Hami Tezkan	AP	false	10
+54	Nuri Bayar	AP	false	10
+54	Muslihittin Güler	AP	false	10
+54	Burhan Akdağ	CHP	false	10
+54	Yusuf Ulusoy	CHP	false	10
+54	Ekrem Alican	YTP	false	10
+55	Kâmuran Evliyaoğlu	AP	false	10
+55	Hüseyin Özalp	AP	false	10
+55	Bahri Cömert	AP	false	10
+55	Mehmet Başaran	AP	false	10
+55	Ali Fuat Alişan	AP	false	10
+55	Hamit Kiper	AP	false	10
+55	Osman Şahinoğlu	AP	false	10
+55	Fevzi Geveci	CHP	false	10
+55	İlyas Kılınç	CHP	false	10
+55	Nurettin Ceritoğlu	CHP	false	10
+55	Fevzi Ceylan	CHP	false	10
+56	Cevdet Aydın	CHP	false	10
+56	Süreyya Öner	CHP	false	10
+56	Hayrettin Özgen	YTP	false	10
+56	Adil Yaşa	YTP	false	10
+57	Mustafa Kaptan	AP	false	10
+57	Mahmut Alicanoğlu	CHP	false	10
+57	Haşim Tarı	CHP	false	10
+57	Cemil Karahan	CKMP	false	10
+58	Rahmi Günay	CHP	false	10
+58	Rahmi Çeltekli	CHP	false	10
+58	İbrahim Göker	CHP	false	10
+58	Ahmet Kangal	CHP	false	10
+58	Adil Altay	CHP	false	10
+58	Cevat Odyakmaz	CKMP	false	10
+58	Mahmut Vural	YTP	false	10
+58	Tahsin Türkay	YTP	false	10
+58	Sabahattin Hastaoğlu	YTP	false	10
+58	Güner Sarısözen	YTP	false	10
+58	Reşat Turhan	YTP	false	10
+59	Orhan Öztırak	CHP	false	10
+59	Turhan Kut	CHP	false	10
+59	Hayri Mumcuoğlu	YTP	false	10
+59	Fethi Mahramlı	YTP	false	10
+60	Sabahattin Baybora	AP	false	10
+60	Ali Rıza Ulusoy	CHP	false	10
+60	Bekir Şeyhoğlu	CHP	false	10
+60	Reşit Önder	CHP	false	10
+60	Mehmet Kazova	YTP	false	10
+60	H. Ali Dizman	YTP	false	10
+60	Zeyyat Kocamemi	YTP	false	10
+61	Salâhattin Güven	AP	false	11
+61	Ahmet Kara	AP	false	11
+61	Zeki Yağmurdereli	AP	false	11
+61	Nazmi Ökten	AP	false	11
+61	Ekrem Dikmen	AP	false	11
+61	Kâmuran Ural	CHP	false	11
+61	Ahmet Şener	CHP	false	11
+61	Ali Şakir Ağanoğlu	CHP	false	11
+61	Ali Rıza Uzuner	CHP	false	11
+62	Fethi Ülkü	CHP	false	11
+62	Vahap Kışoğlu	YTP	false	11
+63	Kadri Erogan	AP	false	11
+63	Atalay Akan	CHP	false	11
+63	Osman Ağan	CHP	false	11
+63	Bekir Sami Karahanlı	CHP	false	11
+63	Sabri Kılınç	CHP	false	11
+63	Celâl Öncel	YTP	false	11
+63	Kemal Badıllı	YTP	false	11
+64	Ali Rıza Akbıyıkoğlu	CHP	false	11
+64	İbrahim Bulanalp	CHP	false	11
+64	Ahmet Tahtakılıç	CKMP	false	11
+65	Muslih Görentaş	YTP	false	11
+65	Şükrü Kösereisoğlu	YTP	false	11
+65	İhsan Bedirhanoğlu	YTP	false	11
+66	Celâl Sungur	CHP	false	11
+66	Veli Uyar	CHP	false	11
+66	Mustafa Kepir	CKMP	false	11
+66	İsmail Hakkı Akdoğan	CKMP	false	11
+66	Turgut Nizamoğlu	CKMP	false	11
+66	İsmet Kapısız	CKMP	false	11
+67	Nuri Beşer	AP	false	11
+67	Fevzi Fırat	AP	false	11
+67	Ramiz Karakaşoğlu	AP	false	11
+67	Tekin Sadık Müftüoğlu	AP	false	11
+67	Fuat Ak	AP	false	11
+67	Mehmet Ali Pestilci	CHP	false	11
+67	Kenan Esengin	CHP	false	11
+67	Suphi Konak	CHP	false	11
+67	Yusuf Ziya Yücebilgin	CKMP	false	11
