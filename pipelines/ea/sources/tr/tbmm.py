@@ -250,11 +250,12 @@ def rows(term: int) -> list[dict[str, object]]:
     return found
 
 
-VERSION = "7"
+VERSION = "8"
 NOTES = (
     "The Assembly's member search lists every member of a term with the province, the party label, and the date and "
     "reason the membership ended; it does not give start dates, and a member who replaced a departing one is listed "
-    "as any other. Persons are matched to the term's elected candidacies by name."
+    "as any other. Persons are matched to the term's elected candidacies by name, and a member elected at a "
+    "by-election or a rerun within the term is dated from that election."
 )
 OPENINGS = {
     9: date(1950, 5, 22),
@@ -275,6 +276,19 @@ CLOSINGS = {11: date(1960, 5, 27), 26: date(2018, 6, 24)}
 ERDOGAN = "f72877c2-c08b-037b-e050-007f01005610"
 ERDOGAN_SWORN = date(2003, 3, 11)
 BY_ELECTED = {9: date(1951, 9, 16)}
+SAME = {
+    "f72877c2-d712-037b-e050-007f01005610": "7b4bf12c-4ece-5faa-9dd3-767a7006d389",
+    "f72877c2-cd07-037b-e050-007f01005610": "fb310269-da57-56c1-8bb2-8e431e93d79c",
+    "f72877c2-c5c4-037b-e050-007f01005610": "086c47e7-8450-5750-8bc3-fdcefe9bcdba",
+    "f72877c2-d1fc-037b-e050-007f01005610": "7315a3a5-69bb-501f-94c4-3a6ca6f2c54c",
+    "f72877c2-c66d-037b-e050-007f01005610": "3a1c05f8-cc61-5e86-9947-1804b481aecc",
+    "f72877c2-c323-037b-e050-007f01005610": "38ffacc8-e6ee-5efa-8596-f68d8d22b105",
+    "f72877c2-d216-037b-e050-007f01005610": "9588e32c-d021-533f-96a4-708af859ec88",
+    "f72877c2-da86-037b-e050-007f01005610": "f1fa5201-2a33-58c7-9c9a-b413679e39b9",
+    "f72877c2-da52-037b-e050-007f01005610": "9dcc3178-2b82-55e3-aa77-2b35cf76ceb8",
+    "f72877c2-cfac-037b-e050-007f01005610": "48f72470-f24b-5398-a3b1-24774d382c5f",
+    "f72877c2-d104-037b-e050-007f01005610": "93c6d88d-e0a1-543d-a137-9b58a80dcf8d",
+}
 MINUTES = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d{term:02d}/c001/tbmm{term:02d}001fih.pdf"
 MINUTES_TITLE = "Tutanak Dergisi, {term}. Dönem, Cilt 1, fihrist"
 ERDOGAN_OATH = "https://www5.tbmm.gov.tr/tutanaklar/TUTANAK/TBMM/d22/c006/tbmm22006fih.pdf"
@@ -283,7 +297,7 @@ ELECTIONS = {
     9: (date(1950, 5, 14),),
     10: (date(1954, 5, 2),),
     11: (date(1957, 10, 27),),
-    17: (date(1983, 11, 6),),
+    17: (date(1983, 11, 6), date(1986, 9, 28)),
     18: (date(1987, 11, 29),),
     19: (date(1991, 10, 20),),
     20: (date(1995, 12, 24),),
@@ -344,13 +358,13 @@ def emit() -> Path:
                 license="Official public record, no license stated",
             )
             cs.artifact(raw.fetch(SOURCE, url, suffix=".pdf"), minutes[url])
-        pools: dict[int, list[tuple[UUID, UUID, list[str], str | None]]] = {}
+        pools: dict[int, list[tuple[UUID, UUID, list[str], str | None, date]]] = {}
         for term, days in ELECTIONS.items():
             pools[term] = [
-                (person, contest, names, None if key is None or term >= 17 else fold(PROVINCES[int(key[-2:]) - 1]))
-                for person, contest, names, key in conn.execute(
+                (person, contest, names, None if key is None or term >= 17 else fold(PROVINCES[int(key[-2:]) - 1]), day)
+                for person, contest, names, key, day in conn.execute(
                     """select ca.person_id, k.id, (select array_agg(text) from name where entity_id = ca.person_id),
-                              (select value from external_id where entity_id = k.id and scheme = 'tr.contest')
+                              (select value from external_id where entity_id = k.id and scheme = 'tr.contest'), e.date_from
                        from outcome x join candidacy ca on ca.id = x.candidacy_id
                        join contest_option o on o.id = ca.option_id join contest k on k.id = o.contest_id
                        join election e on e.id = k.election_id join polity p on p.id = e.polity_id
@@ -358,12 +372,21 @@ def emit() -> Path:
                     [list(days)],
                 ).fetchall()
             ]
+        listed_persons = {
+            value for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{SOURCE}.person"])
+        }
         counts: Counter[tuple[int, str]] = Counter()
         contexts: set[tuple[str, str]] = set()
         for term in sorted(ELECTIONS):
             listed = rows(term)
-            matched: dict[str, tuple[UUID, UUID]] = {}
-            free = {index: (names, province) for index, (_, _, names, province) in enumerate(pools[term])}
+            matched: dict[str, tuple[UUID, UUID, date]] = {}
+            free = {index: (names, province) for index, (_, _, names, province, _) in enumerate(pools[term])}
+            for row in listed:
+                member = str(row["member"])
+                for index in list(free) if member in SAME else []:
+                    if str(pools[term][index][0]) == SAME[member]:
+                        matched[member] = (pools[term][index][0], pools[term][index][1], pools[term][index][4])
+                        del free[index]
             for strictness in range(5):
                 claims: defaultdict[int, list[str]] = defaultdict(list)
                 options: dict[str, list[int]] = {}
@@ -402,8 +425,8 @@ def emit() -> Path:
                                 break
                 for member, found in options.items():
                     if len(found) == 1 and claims[found[0]] == [member]:
-                        person, contest, _, _ = pools[term][found[0]]
-                        matched[member] = (person, contest)
+                        person, contest, _, _, day = pools[term][found[0]]
+                        matched[member] = (person, contest, day)
                         del free[found[0]]
             for row in listed:
                 member = str(row["member"])
@@ -436,6 +459,11 @@ def emit() -> Path:
                         elif person != listed_person:
                             counts[term, "unmerged"] += 1
                         person = cs.survivors.get(person, person)
+                    elif f"{term}:{member}" in listed_persons:
+                        listed_person = cs.key(f"{SOURCE}.person", f"{term}:{member}")
+                        if listed_person != person:
+                            cs.merge(listed_person, person)
+                            counts[term, "remerged"] += 1
                 cs.artifact(raw.cached(SOURCE, detail(term, member)), source)
                 cs.add(
                     "tenure",
@@ -446,6 +474,8 @@ def emit() -> Path:
                     if term == 22 and member == ERDOGAN
                     else BY_ELECTED[term]
                     if hit is None and term in BY_ELECTED
+                    else hit[2]
+                    if hit is not None and hit[2] > ELECTIONS[term][0]
                     else OPENINGS.get(term),
                     from_precision="day" if hit is not None or (term == 22 and member == ERDOGAN) else "unknown",
                     to_date=(OPENINGS.get(term + 1) or CLOSINGS[term]).isoformat()
