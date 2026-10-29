@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -13,7 +13,7 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "3"
+VERSION = "5"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
 OLD = (1963, 1973)
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
@@ -31,7 +31,7 @@ def races() -> tuple[
     found: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
     municipal: list[tuple[int, list[tuple[str, str, str, int]]]] = []
     pages: dict[str, str] = {}
-    tables, _, _ = mayors_1984_1999.read((*OLD, *mayors_1984_1999.YEARS))
+    tables, beldes_old, _ = mayors_1984_1999.read((*OLD, *mayors_1984_1999.YEARS))
     for (year, province, kind, _), (title, rows, _) in tables.items():
         if year in OLD:
             municipal.append((year, [(abbreviation, label, names, votes) for abbreviation, label, names, votes in rows]))
@@ -41,7 +41,7 @@ def races() -> tuple[
                 (abbreviation, label, names, votes) for abbreviation, label, names, votes in rows
             ]
             pages[title] = mayors_1984_1999.SOURCE
-    tables_2004, _, _ = mayors_2004_2009.read_tables((2004,))
+    tables_2004, beldes_2004, _ = mayors_2004_2009.read_tables((2004,))
     for title, heading, province, rows in tables_2004[2004]:
         if "buyuksehir" in fold(heading):
             found[(2004, mayors_1984_1999.PROVINCES.get(province, province))] = [
@@ -51,6 +51,17 @@ def races() -> tuple[
         else:
             municipal.append((2004, [(label, label, names, votes) for label, names, votes in rows]))
             pages[title] = mayors_2004_2009.MAYORS
+    for (year, province, district, belde), rows in beldes_old.items():
+        if year in OLD and len(rows) == 1:
+            title, label, names, votes = rows[0]
+            found[(year, f"{DAYS[year]}:{province}-{slug(district)}-{slug(belde)}-mayor")] = [("", label, names, votes)]
+            pages[title] = mayors_1984_1999.SOURCE
+    for (province, belde), rows in beldes_2004[2004].items():
+        if len(rows) != 1:
+            continue
+        title, _, district, label, names, votes = rows[0]
+        found[(2004, f"{DAYS[2004]}:{province}-{district}-{belde}-mayor")] = [("", label, names, votes)]
+        pages[title] = mayors_2004_2009.MAYORS
     return found, municipal, pages
 
 
@@ -142,14 +153,23 @@ def emit() -> Path:
                 [[contest for contest, _ in contests.values()], SOURCE],
             ).fetchall()
         }
-        index: dict[tuple[int, tuple[int, ...]], list[str]] = defaultdict(list)
+        index: dict[tuple[int, int], list[str]] = defaultdict(list)
         for key, (contest, _) in contests.items():
             if contest not in held and by_votes[contest] and int(key[:4]) in (*OLD, 2004):
-                index[(int(key[:4]), tuple(sorted(by_votes[contest], reverse=True)[:3]))].append(key)
+                index[(int(key[:4]), max(by_votes[contest]))].append(key)
+        claimed: Counter[str] = Counter()
+        matched: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
         for year, rows in municipal:
-            hits = index.get((year, tuple(sorted((row[3] for row in rows), reverse=True)[:3])), [])
-            if len(rows) > 1 and len(hits) == 1:
-                found[(year, hits[0])] = rows
+            votes = {row[3] for row in rows if row[3] > 0}
+            hits = [
+                key
+                for key in index.get((year, max(votes, default=0)), [])
+                if len(votes) > 1 and votes <= set(by_votes[contests[key][0]])
+            ]
+            if len(hits) == 1:
+                matched[(year, hits[0])] = rows
+                claimed[hits[0]] += 1
+        found.update({key: rows for key, rows in matched.items() if claimed[key[1]] == 1})
         offices: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
         for office, person, text in conn.execute(
             """select t.office_id, t.person_id, n.text from tenure t join name n on n.entity_id = t.person_id
@@ -190,7 +210,7 @@ def emit() -> Path:
                     party_id = option_party[option]
                     existing = votes
                 else:
-                    independent = fold(abbreviation).startswith(("bgmsz", "bagimsiz")) or fold(names) == ""
+                    independent = fold(abbreviation or label).startswith(("bgmsz", "bagimsiz")) or fold(names) == ""
                     owner = None
                     if not independent:
                         for candidate in (label, upper(label), abbreviation):

@@ -1,26 +1,1209 @@
 year	province	reason
-1963	1963-11-17:afyonkarahisar-dazkiri-mayor	no option for CKMP
+1963	1963-11-17:adiyaman-besni-tut-mayor	no contest
+1963	1963-11-17:afyon-bolvadin-disli-mayor	no contest
+1963	1963-11-17:afyon-cay-yakasinek-mayor	no contest
+1963	1963-11-17:afyon-dazkiri-basmakci-mayor	no contest
+1963	1963-11-17:afyon-dazkiri-evciler-mayor	no contest
+1963	1963-11-17:afyon-dinar-haydarli-mayor	no contest
+1963	1963-11-17:afyon-emirdag-bayat-mayor	no contest
+1963	1963-11-17:afyon-emirdag-davulga-mayor	no contest
+1963	1963-11-17:afyon-ihsaniye-anitkaya-mayor	no contest
+1963	1963-11-17:afyon-ihsaniye-doger-mayor	no contest
+1963	1963-11-17:afyon-merkez-cobanlar-mayor	no contest
+1963	1963-11-17:afyon-merkez-iscehisar-mayor	no contest
+1963	1963-11-17:afyon-sincanli-sinanpasa-serban-mayor	no contest
+1963	1963-11-17:afyon-suhut-balcikhisar-mayor	no contest
+1963	1963-11-17:afyon-sultandagi-derecine-mayor	no contest
+1963	1963-11-17:ankara-bala-karakecili-mayor	no contest
+1963	1963-11-17:ankara-elmadag-hasanoglan-mayor	no contest
 1963	1963-11-17:ankara-haymana-mayor	*: 2 namesakes, new person
-1963	1963-11-17:ankara-polatli-mayor	no option for BĞMSZ
-1963	1963-11-17:ankara-polatli-mayor	no option for BĞMSZ
+1963	1963-11-17:ankara-kirikkale-yahsihan-mayor	no contest
+1963	1963-11-17:ankara-sereflikochisar-agacoren-mayor	no contest
+1963	1963-11-17:ankara-sereflikochisar-cikinagil-evren-mayor	no contest
+1963	1963-11-17:ankara-sereflikochisar-sariyahsi-mayor	no contest
+1963	1963-11-17:antalya-alanya-aydinkent-ibradi-mayor	no contest
+1963	1963-11-17:antalya-korkuteli-bozova-mayor	no contest
+1963	1963-11-17:artvin-borcka-goktas-murgul-mayor	no contest
+1963	1963-11-17:artvin-yusufeli-ersis-kilickaya-mayor	no contest
+1963	1963-11-17:aydin-kuyucak-cubukdagi-buharkent-mayor	no contest
+1963	1963-11-17:aydin-kuyucak-horsunlu-mayor	no contest
+1963	1963-11-17:aydin-kuyucak-pamukoren-mayor	no contest
+1963	1963-11-17:balikesir-burhaniye-armutova-gomec-mayor	no contest
+1963	1963-11-17:balikesir-edremit-zeytinli-mayor	no contest
+1963	1963-11-17:balikesir-gonen-sarikoy-mayor	no contest
+1963	1963-11-17:balikesir-manyas-kizilkoy-kiziksa-mayor	no contest
+1963	1963-11-17:balikesir-manyas-salur-mayor	Sabri Öztürk: 3 namesakes, new person
+1963	1963-11-17:balikesir-susurluk-karapurcek-mayor	no contest
+1963	1963-11-17:bilecik-bozuyuk-dodurga-mayor	no contest
+1963	1963-11-17:bolu-duzce-cilimli-mayor	no contest
+1963	1963-11-17:bolu-gerede-dortdivan-mayor	no contest
 1963	1963-11-17:bolu-gerede-mayor	Mehmet Ünal: 7 namesakes, new person
+1963	1963-11-17:bolu-gerede-yenicaga-mayor	no contest
+1963	1963-11-17:burdur-golhisar-dirmil-altinyayla-mayor	no contest
+1963	1963-11-17:burdur-merkez-arvalli-bagsaray-mayor	no contest
+1963	1963-11-17:burdur-merkez-bebekler-kemer-mayor	no contest
+1963	1963-11-17:burdur-tefenni-karamanli-mayor	no contest
+1963	1963-11-17:bursa-merkez-gursu-mayor	no contest
+1963	1963-11-17:bursa-merkez-kestel-mayor	no contest
+1963	1963-11-17:bursa-mudanya-tirilye-zeytinbagi-mayor	no contest
+1963	1963-11-17:bursa-mustafakemalpasa-tepecik-mayor	no contest
+1963	1963-11-17:bursa-orhangazi-yenikoy-mayor	no contest
+1963	1963-11-17:bursa-orhangazi-yenisoloz-mayor	no contest
+1963	1963-11-17:canakkale-biga-dimetoka-gumuscay-mayor	no contest
+1963	1963-11-17:canakkale-gelibolu-bolayir-mayor	no contest
+1963	1963-11-17:canakkale-gelibolu-evrese-kadikoy-mayor	no contest
+1963	1963-11-17:canakkale-lapseki-umurbey-mayor	no contest
+1963	1963-11-17:cankiri-kursunlu-atkaracalar-mayor	no contest
+1963	1963-11-17:cankiri-merkez-korgun-mayor	no contest
+1963	1963-11-17:cankiri-orta-kalfat-mayor	no contest
+1963	1963-11-17:cankiri-orta-yaylakent-mayor	no contest
 1963	1963-11-17:corum-osmancik-mayor	Kemal Erdem: 2 namesakes, new person
-1963	1963-11-17:diyarbakir-mayor	no option for BĞMSZ
+1963	1963-11-17:denizli-acipayam-dariveren-mayor	no contest
+1963	1963-11-17:denizli-acipayam-kizilhisar-serinhisar-mayor	no contest
+1963	1963-11-17:denizli-acipayam-yesilyuva-mayor	no contest
+1963	1963-11-17:denizli-cal-akkent-zeyve-mayor	no contest
+1963	1963-11-17:denizli-cal-bekilli-mayor	no contest
+1963	1963-11-17:denizli-cal-dedekoy-baklan-mayor	no contest
+1963	1963-11-17:denizli-cardak-bozkurt-mayor	no contest
+1963	1963-11-17:denizli-civril-bulgaz-gurpinar-mayor	no contest
+1963	1963-11-17:denizli-civril-gurpinar-mayor	no contest
+1963	1963-11-17:denizli-civril-homa-gumussu-mayor	no contest
+1963	1963-11-17:denizli-merkez-honaz-mayor	no contest
+1963	1963-11-17:denizli-saraykoy-babadag-mayor	no contest
+1963	1963-11-17:denizli-tavas-buyukkonak-konak-mayor	no contest
+1963	1963-11-17:denizli-tavas-kizilcaboluk-mayor	no contest
+1963	1963-11-17:diyarbakir-merkez-egil-mayor	no contest
+1963	1963-11-17:edirne-ipsala-ibriktepe-mayor	Necdet Uysal: 2 namesakes, new person
 1963	1963-11-17:elazig-baskil-mayor	Osman Çetin: 2 namesakes, new person
-1963	1963-11-17:eskisehir-mahmudiye-mayor	BĞMSZ: 77 against 0
+1963	1963-11-17:erzincan-tercan-cadirkaya-mayor	: 1014 against 485
+1963	1963-11-17:erzincan-tercan-mercan-mayor	: 579 against 222
+1963	1963-11-17:erzurum-ispir-hunut-camlikaya-mayor	no contest
+1963	1963-11-17:erzurum-ispir-norgah-pazaryolu-mayor	no contest
+1963	1963-11-17:erzurum-merkez-ilica-mayor	no contest
+1963	1963-11-17:erzurum-tortum-azort-uzundere-mayor	no contest
+1963	1963-11-17:eskisehir-merkez-alpu-mayor	no contest
+1963	1963-11-17:eskisehir-merkez-inonu-mayor	no contest
+1963	1963-11-17:eskisehir-merkez-muttalip-mayor	no contest
+1963	1963-11-17:gaziantep-islahiye-fevzipasa-mayor	no contest
+1963	1963-11-17:gaziantep-nizip-barak-karkamis-mayor	no contest
+1963	1963-11-17:gaziantep-nizip-mizar-uluyatir-mayor	no contest
+1963	1963-11-17:giresun-eynesil-oren-mayor	no contest
 1963	1963-11-17:gumushane-bayburt-mayor	Osman Okumuş: 3 namesakes, new person
+1963	1963-11-17:gumushane-kelkit-kose-mayor	no contest
+1963	1963-11-17:hatay-dortyol-erzin-mayor	no contest
+1963	1963-11-17:hatay-iskenderun-belen-mayor	no contest
+1963	1963-11-17:icel-merkez-arslankoy-mayor	no contest
+1963	1963-11-17:icel-merkez-gozne-mayor	no contest
+1963	1963-11-17:icel-silifke-tasucu-mayor	no contest
+1963	1963-11-17:icel-tarsus-namrun-camliyayla-mayor	no contest
+1963	1963-11-17:icel-tarsus-panzincukuru-gulek-mayor	no contest
+1963	1963-11-17:icel-tarsus-yenice-mayor	no contest
+1963	1963-11-17:isparta-egirdir-aksu-anamas-mayor	no contest
+1963	1963-11-17:isparta-egirdir-barla-kocapinar-mayor	no contest
+1963	1963-11-17:isparta-keciborlu-goresin-guneykent-mayor	no contest
+1963	1963-11-17:isparta-keciborlu-senir-mayor	no contest
+1963	1963-11-17:isparta-merkez-gonen-mayor	no contest
+1963	1963-11-17:isparta-sarkikaraagac-cariksaraylar-mayor	no contest
+1963	1963-11-17:isparta-sarkikaraagac-yenisarbademli-mayor	no contest
+1963	1963-11-17:isparta-senirkent-ulugbey-mayor	no contest
+1963	1963-11-17:isparta-yalvac-buyuklu-huyuklu-mayor	no contest
+1963	1963-11-17:isparta-yalvac-kumdanli-mayor	no contest
+1963	1963-11-17:isparta-yalvac-orkenez-bagkonak-mayor	no contest
+1963	1963-11-17:istanbul-catalca-buyukcekmece-mayor	no contest
+1963	1963-11-17:istanbul-catalca-kucukcekmece-mayor	no contest
+1963	1963-11-17:istanbul-silivri-degirmenkoy-mayor	no contest
 1963	1963-11-17:izmir-bergama-mayor	Mustafa Yazıcı: 2 namesakes, new person
-1963	1963-11-17:kayseri-mayor	BĞMSZ: 133 against 0
-1963	1963-11-17:kocaeli-merkez-kacaeli-mayor	BĞMSZ: 166 against 176
-1963	1963-11-17:kocaeli-merkez-kacaeli-mayor	BĞMSZ: 10 against 176
+1963	1963-11-17:izmir-bergama-zeytindag-mayor	no contest
+1963	1963-11-17:izmir-cesme-mayor	Mehmet Aldemir: 2 namesakes, new person
+1963	1963-11-17:izmir-kemalpasa-parsa-bagyurdu-mayor	no contest
+1963	1963-11-17:izmir-menemen-aliaga-mayor	no contest
+1963	1963-11-17:izmir-odemis-adagide-ovakent-mayor	no contest
+1963	1963-11-17:izmir-odemis-adagume-konakli-mayor	no contest
+1963	1963-11-17:izmir-odemis-bademiye-bademli-mayor	no contest
+1963	1963-11-17:kastamonu-bozkurt-abana-mayor	no contest
+1963	1963-11-17:kastamonu-kure-agli-mayor	no contest
+1963	1963-11-17:kayseri-bunyan-akkisla-mayor	no contest
+1963	1963-11-17:kayseri-bunyan-buyuktuzhisar-mayor	no contest
+1963	1963-11-17:kayseri-felahiye-cukur-ozvatan-mayor	no contest
+1963	1963-11-17:kayseri-merkez-agirnas-tasoren-mayor	no contest
+1963	1963-11-17:kayseri-merkez-hacilar-mayor	no contest
+1963	1963-11-17:kayseri-merkez-talas-mayor	no contest
+1963	1963-11-17:kayseri-yesilhisar-mayor	Kemal Doğan: 3 namesakes, new person
+1963	1963-11-17:kirklareli-babaeski-buyukmandira-mayor	no contest
+1963	1963-11-17:kirklareli-luleburgaz-ahmetbey-mayor	: 772 against 112
+1963	1963-11-17:kirsehir-kaman-karginyenice-mayor	no contest
+1963	1963-11-17:kirsehir-merkez-boztepe-mayor	no contest
+1963	1963-11-17:kocaeli-merkez-suadiye-mayor	Mehmet Sezgin: 4 namesakes, new person
+1963	1963-11-17:konya-aksehir-egrigoz-mayor	: 323 against 348
+1963	1963-11-17:konya-aksehir-reis-mayor	Mehmet Bozkurt: 2 namesakes, new person
+1963	1963-11-17:konya-aksehir-tuzlukcu-mayor	no contest
+1963	1963-11-17:konya-beysehir-balkanda-imrenler-mayor	no contest
+1963	1963-11-17:konya-beysehir-huyuk-mayor	no contest
+1963	1963-11-17:konya-beysehir-mahremkolu-kayabasi-mayor	no contest
+1963	1963-11-17:konya-beysehir-uzumlu-mayor	no contest
+1963	1963-11-17:konya-bozkir-ahirli-mayor	no contest
+1963	1963-11-17:konya-cihanbeyli-altinekin-mayor	no contest
+1963	1963-11-17:konya-cumra-akoren-mayor	no contest
+1963	1963-11-17:konya-cumra-elmasun-guneybag-mayor	no contest
+1963	1963-11-17:konya-cumra-icericumra-mayor	: 829 against 929
+1963	1963-11-17:konya-cumra-karasenir-karasinir-mayor	no contest
+1963	1963-11-17:konya-doganhisar-karaaga-mayor	no contest
+1963	1963-11-17:konya-eregli-halkapinar-mayor	no contest
+1963	1963-11-17:konya-ermenek-gargara-guneyyurt-mayor	no contest
+1963	1963-11-17:konya-ermenek-goktepe-mayor	İbrahim Yıldız: 3 namesakes, new person
+1963	1963-11-17:konya-hadim-argithani-mayor	no contest
+1963	1963-11-17:konya-ilgin-argithani-mayor	no contest
+1963	1963-11-17:konya-ilgin-asagicigil-mayor	no contest
+1963	1963-11-17:konya-karaman-kazimkarabekir-mayor	no contest
+1963	1963-11-17:konya-karaman-yesildere-ibrala-mayor	no contest
+1963	1963-11-17:konya-karaman-yollarbasi-illisira-mayor	no contest
+1963	1963-11-17:konya-karapinar-emirgazi-mayor	no contest
+1963	1963-11-17:konya-kulu-omeranli-tavsancali-mayor	no contest
+1963	1963-11-17:konya-merkez-derbent-mayor	no contest
+1963	1963-11-17:konya-merkez-ismil-demirkent-mayor	no contest
+1963	1963-11-17:konya-merkez-tepekoy-tepekent-mayor	no contest
+1963	1963-11-17:konya-sarayonu-halici-ladik-mayor	no contest
+1963	1963-11-17:kutahya-altintas-dumlupinar-mayor	no contest
+1963	1963-11-17:kutahya-gediz-saphane-mayor	no contest
+1963	1963-11-17:kutahya-simav-citgol-mayor	no contest
+1963	1963-11-17:kutahya-simav-kusu-mayor	Ali Akın: 2 namesakes, new person
+1963	1963-11-17:kutahya-simav-pazarlar-mayor	no contest
 1963	1963-11-17:kutahya-tavsanli-mayor	Mehmet Çakmak: 2 namesakes, new person
+1963	1963-11-17:malatya-akcadag-mayor	Hasan Demir: 2 namesakes, new person
+1963	1963-11-17:malatya-darende-balaban-gerimter-mayor	no contest
+1963	1963-11-17:malatya-hekimhan-guzelyurt-mayor	no contest
+1963	1963-11-17:malatya-merkez-bahcebasi-orduzu-mayor	no contest
+1963	1963-11-17:malatya-merkez-eskimalatya-battalgazi-mayor	no contest
+1963	1963-11-17:malatya-merkez-konak-yukaribanazi-mayor	no contest
+1963	1963-11-17:malatya-puturge-doganyol-keferdiz-mayor	no contest
+1963	1963-11-17:manisa-akhisar-akselendi-mayor	no contest
+1963	1963-11-17:manisa-akhisar-golmarmara-mayor	no contest
+1963	1963-11-17:manisa-akhisar-suleymanli-mayor	: 682 against 736
+1963	1963-11-17:manisa-akhisar-yayakoy-palamut-mayor	no contest
+1963	1963-11-17:manisa-kula-menye-gokceoren-mayor	no contest
+1963	1963-11-17:manisa-merkez-asagicobanisa-mayor	no contest
+1963	1963-11-17:manisa-saruhanli-hacirahmanli-mayor	no contest
+1963	1963-11-17:manisa-turgutlu-ahmetli-mayor	no contest
+1963	1963-11-17:maras-afsin-humu-aritas-mayor	no contest
+1963	1963-11-17:maras-elbistan-cela-ekinozu-mayor	no contest
+1963	1963-11-17:maras-goksun-cardak-mayor	no contest
 1963	1963-11-17:mardin-midyat-mayor	Seyfi Güneştan: 2 namesakes, new person
-1963	1963-11-17:mersin-erdemli-golnar-mayor	Ali Özer: 2 namesakes, new person
+1963	1963-11-17:mersin-erdemli-golnar-mayor	Ali Özer: 3 namesakes, new person
+1963	1963-11-17:mugla-fethiye-gunlukbasi-foca-mayor	no contest
+1963	1963-11-17:mugla-koycegiz-ortaca-mayor	no contest
+1963	1963-11-17:mugla-merkez-bayirkoy-mayor	no contest
+1963	1963-11-17:mugla-merkez-pisi-yesilyurt-mayor	no contest
+1963	1963-11-17:mugla-merkez-yerkesik-mayor	: 1154 against 815
+1963	1963-11-17:mugla-yatagan-kavaklidere-mayor	no contest
+1963	1963-11-17:mugla-yatagan-turgut-leyne-mayor	no contest
+1963	1963-11-17:nevsehir-merkez-acigol-mayor	no contest
+1963	1963-11-17:nevsehir-merkez-avcilar-goreme-mayor	no contest
+1963	1963-11-17:nevsehir-merkez-cat-mayor	: 491 against 401
+1963	1963-11-17:nevsehir-merkez-uchisar-mayor	: 580 against 5
+1963	1963-11-17:nigde-aksaray-agacli-gulagac-mayor	no contest
+1963	1963-11-17:nigde-aksaray-eskil-mayor	no contest
+1963	1963-11-17:nigde-aksaray-gelveri-guzelyurt-mayor	no contest
+1963	1963-11-17:nigde-aksaray-ihlara-yesilkoy-mayor	no contest
+1963	1963-11-17:nigde-aksaray-kirgil-yesiltepe-mayor	no contest
+1963	1963-11-17:nigde-aksaray-tasviran-taspinar-mayor	no contest
+1963	1963-11-17:nigde-bor-altunhisar-mayor	no contest
+1963	1963-11-17:nigde-bor-bahceli-mayor	no contest
+1963	1963-11-17:nigde-bor-cukurkuyu-mayor	no contest
+1963	1963-11-17:nigde-bor-kemerhisar-mayor	no contest
+1963	1963-11-17:nigde-bor-kizilca-mayor	no contest
+1963	1963-11-17:nigde-bor-ulukisla-mayor	no contest
+1963	1963-11-17:nigde-merkez-aydinyurt-fertek-mayor	no contest
+1963	1963-11-17:nigde-merkez-koyunlu-mayor	no option for 
+1963	1963-11-17:nigde-ortakoy-balci-mayor	no contest
+1963	1963-11-17:ordu-golkoy-gurgentepe-mayor	no contest
+1963	1963-11-17:ordu-mesudiye-yesilce-mayor	no contest
+1963	1963-11-17:rize-cayeli-buyukkoy-mayor	no contest
+1963	1963-11-17:rize-merkez-derepazari-mayor	no contest
+1963	1963-11-17:rize-merkez-iyidere-mayor	no contest
+1963	1963-11-17:rize-pazar-ortakoy-hemsin-mayor	no contest
+1963	1963-11-17:sakarya-geyve-pamukova-mayor	no contest
+1963	1963-11-17:sakarya-geyve-tarakli-mayor	no contest
+1963	1963-11-17:sakarya-karasu-kocaali-mayor	no contest
+1963	1963-11-17:sakarya-merkez-arifiye-mayor	no contest
+1963	1963-11-17:sakarya-merkez-buyuksogutlu-sogutlu-mayor	no contest
+1963	1963-11-17:sakarya-merkez-erenler-mayor	no contest
+1963	1963-11-17:sakarya-merkez-serdivan-mayor	no contest
+1963	1963-11-17:samsun-alacam-yakakent-mayor	no contest
+1963	1963-11-17:samsun-merkez-tekkekoy-mayor	no contest
+1963	1963-11-17:siirt-merkez-tillo-aydinlar-mayor	no contest
+1963	1963-11-17:sivas-hafik-dogansar-mayor	no contest
+1963	1963-11-17:sivas-susehri-ezbider-akincilar-mayor	no contest
+1963	1963-11-17:tekirdag-corlu-marmaraereglisi-mayor	no contest
+1963	1963-11-17:tokat-erbaa-karayaka-mayor	no contest
+1963	1963-11-17:tokat-turhal-pazar-mayor	no contest
+1963	1963-11-17:trabzon-caykara-kondu-dernekpazari-mayor	no contest
+1963	1963-11-17:trabzon-caykara-serah-uzungol-mayor	no contest
+1963	1963-11-17:trabzon-caykara-sinek-atakoy-mayor	no contest
+1963	1963-11-17:trabzon-vakfikebir-besikduzu-mayor	no contest
+1963	1963-11-17:trabzon-vakfikebir-carsibasi-mayor	no contest
+1963	1963-11-17:urfa-viransehir-ceylanpinar-mayor	no contest
+1963	1963-11-17:usak-banaz-buyukoturak-mayor	: 477 against 0
+1963	1963-11-17:yozgat-bogazliyan-fakili-yenifakili-mayor	no contest
+1963	1963-11-17:yozgat-cayiralan-candir-mayor	no contest
+1973	1973-12-09:adana-bahce-ellek-mayor	contest already has candidacies
+1973	1973-12-09:adana-bahce-hacilar-mayor	contest already has candidacies
+1973	1973-12-09:adana-bahce-haruniye-mayor	contest already has candidacies
+1973	1973-12-09:adana-bahce-hasanbeyli-mayor	no contest
+1973	1973-12-09:adana-ceyhan-doruk-mayor	contest already has candidacies
+1973	1973-12-09:adana-ceyhan-kurtkulagi-mayor	contest already has candidacies
+1973	1973-12-09:adana-ceyhan-mustafabeyli-mayor	contest already has candidacies
+1973	1973-12-09:adana-karaisali-akoren-mayor	contest already has candidacies
+1973	1973-12-09:adana-karaisali-karsanti-mayor	contest already has candidacies
+1973	1973-12-09:adana-kozan-gazi-mayor	contest already has candidacies
+1973	1973-12-09:adana-kozan-hacibeyli-mayor	contest already has candidacies
+1973	1973-12-09:adana-kozan-imamoglu-mayor	no contest
+1973	1973-12-09:adana-merkez-incirlik-mayor	contest already has candidacies
+1973	1973-12-09:adana-osmaniye-cevdetiye-mayor	contest already has candidacies
+1973	1973-12-09:adana-osmaniye-kirmitli-mayor	contest already has candidacies
+1973	1973-12-09:adana-osmaniye-toprakkale-mayor	contest already has candidacies
+1973	1973-12-09:adana-yumurtalik-zeytinbeli-mayor	contest already has candidacies
+1973	1973-12-09:adiyaman-besni-cakirhuyuk-mayor	no contest
+1973	1973-12-09:adiyaman-besni-sambayat-mayor	contest already has candidacies
+1973	1973-12-09:adiyaman-besni-suvarli-mayor	contest already has candidacies
+1973	1973-12-09:adiyaman-besni-tut-mayor	no contest
+1973	1973-12-09:adiyaman-celikhan-pinarbasi-mayor	contest already has candidacies
+1973	1973-12-09:adiyaman-golbasi-beloren-mayor	contest already has candidacies
+1973	1973-12-09:adiyaman-golbasi-harmanli-mayor	contest already has candidacies
+1973	1973-12-09:afyon-bolvadin-buyukkarabag-mayor	no contest
+1973	1973-12-09:afyon-bolvadin-disli-mayor	no contest
+1973	1973-12-09:afyon-bolvadin-kemerkaya-mayor	no contest
+1973	1973-12-09:afyon-bolvadin-ozburun-mayor	no contest
+1973	1973-12-09:afyon-cay-karamikkaracaoren-mayor	no contest
+1973	1973-12-09:afyon-dazkiri-basmakci-mayor	no contest
+1973	1973-12-09:afyon-dazkiri-evciler-mayor	no contest
+1973	1973-12-09:afyon-dinar-haydarli-mayor	no contest
+1973	1973-12-09:afyon-dinar-tatarli-mayor	no contest
+1973	1973-12-09:afyon-dinar-ulukoy-mayor	no contest
+1973	1973-12-09:afyon-emirdag-asagipiribeyli-mayor	no contest
+1973	1973-12-09:afyon-emirdag-bademli-mayor	no contest
+1973	1973-12-09:afyon-emirdag-bayat-mayor	no contest
+1973	1973-12-09:afyon-emirdag-davulga-mayor	no contest
+1973	1973-12-09:afyon-ihsaniye-doger-mayor	no contest
+1973	1973-12-09:afyon-ihsaniye-karacaahmet-mayor	no contest
+1973	1973-12-09:afyon-merkez-anitkaya-mayor	no contest
+1973	1973-12-09:afyon-merkez-cobanlar-mayor	no contest
+1973	1973-12-09:afyon-merkez-iscehisar-mayor	no contest
+1973	1973-12-09:afyon-merkez-isiklar-mayor	no contest
+1973	1973-12-09:afyon-merkez-sulumenli-beskuyu-mayor	no contest
+1973	1973-12-09:afyon-sandikli-akharim-mayor	no contest
+1973	1973-12-09:afyon-sandikli-ballik-mayor	no contest
+1973	1973-12-09:afyon-sandikli-hocalar-mayor	no contest
+1973	1973-12-09:afyon-sandikli-karadirek-mayor	no contest
+1973	1973-12-09:afyon-sandikli-kiziloren-mayor	no contest
+1973	1973-12-09:afyon-sandikli-yavaslar-mayor	no contest
+1973	1973-12-09:afyon-sincanli-sinanpasa-ahmetpasa-cigiltepe-mayor	no contest
+1973	1973-12-09:afyon-sincanli-sinanpasa-duzagac-mayor	no contest
+1973	1973-12-09:afyon-sincanli-sinanpasa-nuhkoy-mayor	no contest
+1973	1973-12-09:afyon-sincanli-sinanpasa-serban-mayor	no contest
+1973	1973-12-09:afyon-sincanli-sinanpasa-tasoluk-mayor	no contest
+1973	1973-12-09:afyon-sincanli-sinanpasa-tinaztepe-senir-mayor	no contest
+1973	1973-12-09:afyon-suhut-balcikhisar-mayor	no contest
+1973	1973-12-09:afyon-suhut-karaadilli-mayor	no contest
+1973	1973-12-09:afyon-sultandagi-derecine-mayor	no contest
+1973	1973-12-09:afyon-sultandagi-karapinar-mayor	no contest
+1973	1973-12-09:afyon-sultandagi-uckuyu-mayor	no contest
+1973	1973-12-09:afyon-sultandagi-yakasinek-mayor	no contest
+1973	1973-12-09:afyon-sultandagi-yesilciftlik-mayor	no contest
+1973	1973-12-09:amasya-goynucek-gediksaray-mayor	contest already has candidacies
+1973	1973-12-09:amasya-gumushacikoy-gumus-mayor	contest already has candidacies
+1973	1973-12-09:amasya-gumushacikoy-hamamozu-mayor	no contest
+1973	1973-12-09:amasya-merkez-dogantepe-mayor	contest already has candidacies
+1973	1973-12-09:amasya-merkez-yesilyenice-mayor	contest already has candidacies
+1973	1973-12-09:amasya-merkez-ziyaret-mayor	contest already has candidacies
+1973	1973-12-09:amasya-merzifon-kayaduzu-mayor	contest already has candidacies
+1973	1973-12-09:amasya-tasova-alparslan-yolbasi-mayor	no contest
+1973	1973-12-09:amasya-tasova-caydibi-mayor	contest already has candidacies
+1973	1973-12-09:amasya-tasova-destek-mayor	contest already has candidacies
+1973	1973-12-09:amasya-tasova-esencay-mayor	contest already has candidacies
+1973	1973-12-09:amasya-tasova-golbeyli-mayor	contest already has candidacies
+1973	1973-12-09:amasya-tasova-ulucay-tekke-mayor	no contest
+1973	1973-12-09:amasya-tasova-ulukoy-sannu-mayor	no contest
+1973	1973-12-09:ankara-ayas-sinanli-mayor	contest already has candidacies
+1973	1973-12-09:ankara-bala-karakecili-mayor	no contest
+1973	1973-12-09:ankara-beypazari-karasar-mayor	contest already has candidacies
+1973	1973-12-09:ankara-beypazari-kirbasi-mayor	contest already has candidacies
+1973	1973-12-09:ankara-beypazari-urus-mayor	contest already has candidacies
+1973	1973-12-09:ankara-cubuk-akyurt-mayor	no contest
+1973	1973-12-09:ankara-delice-bagcilar-mayor	contest already has candidacies
+1973	1973-12-09:ankara-delice-buyukafsar-mayor	no contest
+1973	1973-12-09:ankara-elmadag-hasanoglan-mayor	contest already has candidacies
+1973	1973-12-09:ankara-elmadag-kazan-mayor	no contest
+1973	1973-12-09:ankara-gudul-yesiloz-mayor	contest already has candidacies
+1973	1973-12-09:ankara-haymana-oyaca-mayor	contest already has candidacies
+1973	1973-12-09:ankara-keskin-celebi-mayor	contest already has candidacies
+1973	1973-12-09:ankara-keskin-kopru-mayor	contest already has candidacies
+1973	1973-12-09:ankara-kirikkale-ahili-mayor	contest already has candidacies
+1973	1973-12-09:ankara-kirikkale-baliseyh-mayor	contest already has candidacies
+1973	1973-12-09:ankara-kirikkale-hasandede-mayor	contest already has candidacies
 1973	1973-12-09:ankara-kirikkale-mayor	Ali Sezer: 2 namesakes, new person
-1973	1973-12-09:trabzon-mayor	BĞMSZ: 510 against 712
-1973	1973-12-09:trabzon-mayor	BĞMSZ: 509 against 712
-1973	1973-12-09:trabzon-mayor	BĞMSZ: 96 against 712
-1973	1973-12-09:trabzon-mayor	BĞMSZ: 47 against 712
+1973	1973-12-09:ankara-kirikkale-yahsihan-mayor	no contest
+1973	1973-12-09:ankara-nallihan-sariyar-mayor	contest already has candidacies
+1973	1973-12-09:ankara-sereflikochisar-agacoren-mayor	no contest
+1973	1973-12-09:ankara-sereflikochisar-caloren-mayor	no contest
+1973	1973-12-09:ankara-sereflikochisar-cikinagil-evren-mayor	no contest
+1973	1973-12-09:ankara-sereflikochisar-sariyahsi-mayor	no contest
+1973	1973-12-09:antalya-akseki-cevizli-mayor	contest already has candidacies
+1973	1973-12-09:antalya-akseki-ibradi-mayor	no contest
+1973	1973-12-09:antalya-elmali-yuvakoy-mayor	contest already has candidacies
+1973	1973-12-09:antalya-finike-turuncova-mayor	contest already has candidacies
+1973	1973-12-09:antalya-gundogmus-guzelbag-mayor	contest already has candidacies
+1973	1973-12-09:antalya-kas-zumrutkaya-demre-mayor	no contest
+1973	1973-12-09:antalya-korkuteli-bozova-mayor	contest already has candidacies
+1973	1973-12-09:antalya-korkuteli-comakli-mayor	contest already has candidacies
+1973	1973-12-09:antalya-korkuteli-kucukkoy-mayor	contest already has candidacies
+1973	1973-12-09:antalya-korkuteli-yelten-mayor	contest already has candidacies
+1973	1973-12-09:antalya-korkuteli-yesilyayla-mayor	contest already has candidacies
+1973	1973-12-09:antalya-kumluca-yenice-mayor	contest already has candidacies
+1973	1973-12-09:antalya-manavgat-tasagil-mayor	contest already has candidacies
+1973	1973-12-09:antalya-merkez-bademagaci-mayor	no contest
+1973	1973-12-09:antalya-merkez-dagbeli-mayor	contest already has candidacies
+1973	1973-12-09:antalya-merkez-varsak-mayor	contest already has candidacies
+1973	1973-12-09:antalya-serik-gebiz-mayor	contest already has candidacies
+1973	1973-12-09:artvin-borcka-damar-mayor	contest already has candidacies
+1973	1973-12-09:artvin-borcka-goktas-murgul-mayor	no contest
+1973	1973-12-09:artvin-yusufeli-kilickaya-mayor	contest already has candidacies
+1973	1973-12-09:aydin-bozdogan-yazikent-mayor	contest already has candidacies
+1973	1973-12-09:aydin-cine-akcaova-mayor	contest already has candidacies
+1973	1973-12-09:aydin-cine-demircidere-karpuzlu-mayor	no contest
+1973	1973-12-09:aydin-germencik-hidirbeyli-mayor	contest already has candidacies
+1973	1973-12-09:aydin-germencik-mursalli-mayor	contest already has candidacies
+1973	1973-12-09:aydin-germencik-ortaklar-mayor	contest already has candidacies
+1973	1973-12-09:aydin-karacasu-selanikli-ataeymir-mayor	no contest
+1973	1973-12-09:aydin-karacasu-yenice-mayor	contest already has candidacies
+1973	1973-12-09:aydin-kocarli-biyikli-mayor	contest already has candidacies
+1973	1973-12-09:aydin-kocarli-yenikoy-mayor	contest already has candidacies
+1973	1973-12-09:aydin-kusadasi-davutlar-mayor	contest already has candidacies
+1973	1973-12-09:aydin-kuyucak-basaran-mayor	contest already has candidacies
+1973	1973-12-09:aydin-kuyucak-burhaniye-buharkent-mayor	no contest
+1973	1973-12-09:aydin-kuyucak-horsunlu-mayor	no contest
+1973	1973-12-09:aydin-kuyucak-pamukoren-mayor	contest already has candidacies
+1973	1973-12-09:aydin-merkez-acarlar-mayor	contest already has candidacies
+1973	1973-12-09:aydin-merkez-dalama-mayor	no contest
+1973	1973-12-09:aydin-merkez-incirliova-mayor	no contest
+1973	1973-12-09:aydin-merkez-kosk-mayor	no contest
+1973	1973-12-09:aydin-merkez-umurlu-mayor	contest already has candidacies
+1973	1973-12-09:aydin-nazilli-arslanli-mayor	contest already has candidacies
+1973	1973-12-09:aydin-nazilli-isabeyli-mayor	contest already has candidacies
+1973	1973-12-09:aydin-nazilli-pirlibey-mayor	contest already has candidacies
+1973	1973-12-09:aydin-soke-bagarasi-mayor	contest already has candidacies
+1973	1973-12-09:aydin-soke-gullubahce-mayor	contest already has candidacies
+1973	1973-12-09:aydin-soke-sarikemer-mayor	contest already has candidacies
+1973	1973-12-09:aydin-soke-sazlikoy-mayor	contest already has candidacies
+1973	1973-12-09:aydin-soke-yenihisar-didim-mayor	no contest
+1973	1973-12-09:aydin-sultanhisar-atca-mayor	contest already has candidacies
+1973	1973-12-09:aydin-sultanhisar-salavatli-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-ayvalik-altinova-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-ayvalik-kucukkoy-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-balya-ilica-sifa-mayor	no contest
+1973	1973-12-09:balikesir-bandirma-aksakal-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-bandirma-edincik-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-bigadic-iskelekoy-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-burhaniye-armutova-gomec-mayor	no contest
+1973	1973-12-09:balikesir-burhaniye-pelitkoy-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-edremit-altinoluk-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-edremit-armutova-gomec-mayor	no contest
+1973	1973-12-09:balikesir-erdek-marmara-mayor	no contest
+1973	1973-12-09:balikesir-gonen-sarikoy-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-ivrindi-buyukyenice-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-ivrindi-gokceyazi-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-ivrindi-kourucu-mayor	no contest
+1973	1973-12-09:balikesir-manyas-kiziloren-kiziksa-mayor	no contest
+1973	1973-12-09:balikesir-manyas-salur-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-merkez-pamukcu-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-merkez-samli-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-savastepe-saribeyler-mayor	no contest
+1973	1973-12-09:balikesir-susurluk-gobel-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-susurluk-karapurcek-mayor	contest already has candidacies
+1973	1973-12-09:bilecik-bozuyuk-dodurga-mayor	contest already has candidacies
+1973	1973-12-09:bilecik-sogut-calti-mayor	contest already has candidacies
+1973	1973-12-09:bingol-kigi-yedisu-mayor	no contest
+1973	1973-12-09:bitlis-merkez-guroymak-mayor	no contest
+1973	1973-12-09:bolu-duzce-cilimli-mayor	contest already has candidacies
+1973	1973-12-09:bolu-duzce-cumayeri-mayor	no contest
+1973	1973-12-09:bolu-duzce-golyaka-mayor	contest already has candidacies
+1973	1973-12-09:bolu-duzce-gumusova-mayor	contest already has candidacies
+1973	1973-12-09:bolu-duzce-kaynasli-mayor	contest already has candidacies
+1973	1973-12-09:bolu-duzce-konuralp-mayor	contest already has candidacies
+1973	1973-12-09:bolu-gerede-dortdivan-mayor	no contest
+1973	1973-12-09:bolu-gerede-yenicaga-mayor	no contest
+1973	1973-12-09:burdur-bucak-kizilkaya-mayor	contest already has candidacies
+1973	1973-12-09:burdur-bucak-urkutlu-mayor	contest already has candidacies
+1973	1973-12-09:burdur-golhisar-cavdir-mayor	no contest
+1973	1973-12-09:burdur-golhisar-dirmil-altinyayla-mayor	no contest
+1973	1973-12-09:burdur-golhisar-kozagaci-mayor	contest already has candidacies
+1973	1973-12-09:burdur-golhisar-sogut-mayor	contest already has candidacies
+1973	1973-12-09:burdur-golhisar-yusufca-mayor	contest already has candidacies
+1973	1973-12-09:burdur-merkez-bagsaray-mayor	contest already has candidacies
+1973	1973-12-09:burdur-merkez-celtikci-mayor	no contest
+1973	1973-12-09:burdur-merkez-kemer-mayor	no contest
+1973	1973-12-09:burdur-merkez-kozluca-mayor	contest already has candidacies
+1973	1973-12-09:burdur-tefenni-beykoy-mayor	no contest
+1973	1973-12-09:burdur-tefenni-karamanli-mayor	no contest
+1973	1973-12-09:burdur-yesilova-guney-mayor	contest already has candidacies
+1973	1973-12-09:bursa-gemlik-armutlu-mayor	contest already has candidacies
+1973	1973-12-09:bursa-gemlik-umurbey-mayor	contest already has candidacies
+1973	1973-12-09:bursa-inegol-kursunlu-mayor	contest already has candidacies
+1973	1973-12-09:bursa-inegol-yenicekoy-mayor	contest already has candidacies
+1973	1973-12-09:bursa-iznik-elbeyi-mayor	no contest
+1973	1973-12-09:bursa-merkez-akcalar-mayor	contest already has candidacies
+1973	1973-12-09:bursa-merkez-cali-mayor	contest already has candidacies
+1973	1973-12-09:bursa-merkez-demirtas-mayor	no contest
+1973	1973-12-09:bursa-merkez-gorukle-mayor	contest already has candidacies
+1973	1973-12-09:bursa-merkez-gursu-mayor	no contest
+1973	1973-12-09:bursa-merkez-hasanaga-mayor	contest already has candidacies
+1973	1973-12-09:bursa-merkez-kayapa-mayor	contest already has candidacies
+1973	1973-12-09:bursa-merkez-kestel-mayor	no contest
+1973	1973-12-09:bursa-mudanya-zeytinbagi-mayor	no contest
+1973	1973-12-09:bursa-mustafakemalpasa-ovaazatli-mayor	no contest
+1973	1973-12-09:bursa-mustafakemalpasa-tatkavakli-mayor	no contest
+1973	1973-12-09:bursa-mustafakemalpasa-tepecik-mayor	no contest
+1973	1973-12-09:bursa-orhaneli-buyukorhan-mayor	no contest
+1973	1973-12-09:bursa-orhaneli-harmancik-mayor	no contest
+1973	1973-12-09:bursa-orhangazi-yenikoy-mayor	contest already has candidacies
+1973	1973-12-09:bursa-orhangazi-yenisoloz-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-biga-gumuscay-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-biga-karabiga-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-biga-kozcesme-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-ezine-geyikli-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-gelibolu-bolayir-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-gelibolu-kadikoy-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-lapseki-cardak-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-lapseki-umurbey-mayor	contest already has candidacies
+1973	1973-12-09:canakkale-yenice-pazarkoy-mayor	contest already has candidacies
+1973	1973-12-09:cankiri-kursunlu-atkaracalar-mayor	no contest
+1973	1973-12-09:cankiri-kursunlu-bayramoren-mayor	no contest
+1973	1973-12-09:cankiri-kursunlu-cardakli-mayor	contest already has candidacies
+1973	1973-12-09:cankiri-kursunlu-yesildumlupinar-mayor	no contest
+1973	1973-12-09:cankiri-merkez-korgun-mayor	no contest
+1973	1973-12-09:cankiri-orta-elmalik-mayor	contest already has candidacies
+1973	1973-12-09:cankiri-orta-kalfat-mayor	contest already has candidacies
+1973	1973-12-09:cankiri-orta-yaylakent-mayor	contest already has candidacies
+1973	1973-12-09:cankiri-sabanozu-gumerdigin-mayor	contest already has candidacies
+1973	1973-12-09:corum-iskilip-karaoren-mayor	no contest
+1973	1973-12-09:corum-iskilip-ugurludag-mayor	no contest
+1973	1973-12-09:corum-kargi-hacihamza-mayor	contest already has candidacies
+1973	1973-12-09:corum-merkez-narli-mayor	contest already has candidacies
+1973	1973-12-09:corum-osmancik-baspinar-mayor	contest already has candidacies
+1973	1973-12-09:corum-osmancik-dodurga-mayor	no contest
+1973	1973-12-09:corum-sungurlu-arifegazili-mayor	contest already has candidacies
+1973	1973-12-09:corum-sungurlu-bogazkale-mayor	no contest
+1973	1973-12-09:denizli-acipayam-akalan-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-alaaddin-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-dariveren-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-dedebagi-mayor	no contest
+1973	1973-12-09:denizli-acipayam-dodurgalar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-kelekci-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-kizilhisar-serinhisar-mayor	no contest
+1973	1973-12-09:denizli-acipayam-yatagan-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-yazir-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-yesilyuva-mayor	contest already has candidacies
+1973	1973-12-09:denizli-acipayam-yumrutas-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cal-akkent-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cal-baklan-mayor	no contest
+1973	1973-12-09:denizli-cal-bekilli-mayor	no contest
+1973	1973-12-09:denizli-cal-bogazici-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cal-denizler-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cal-hancalar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cal-isabey-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cal-ortakoy-mayor	no contest
+1973	1973-12-09:denizli-cal-suller-mayor	no contest
+1973	1973-12-09:denizli-cardak-beylerli-mayor	contest already has candidacies
+1973	1973-12-09:denizli-cardak-bozkurt-mayor	no contest
+1973	1973-12-09:denizli-cardak-inceler-mayor	contest already has candidacies
+1973	1973-12-09:denizli-civril-citak-mayor	contest already has candidacies
+1973	1973-12-09:denizli-civril-emirhisar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-civril-gumussu-homa-mayor	no contest
+1973	1973-12-09:denizli-civril-gurpinar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-civril-irgilli-mayor	no contest
+1973	1973-12-09:denizli-civril-isikli-mayor	contest already has candidacies
+1973	1973-12-09:denizli-civril-kiralan-mayor	contest already has candidacies
+1973	1973-12-09:denizli-civril-ozdemirci-mayor	contest already has candidacies
+1973	1973-12-09:denizli-kale-beyagac-mayor	no contest
+1973	1973-12-09:denizli-merkez-akkoy-mayor	no contest
+1973	1973-12-09:denizli-merkez-asagisamli-mayor	contest already has candidacies
+1973	1973-12-09:denizli-merkez-baskarci-mayor	contest already has candidacies
+1973	1973-12-09:denizli-merkez-gozler-mayor	contest already has candidacies
+1973	1973-12-09:denizli-merkez-honaz-mayor	no contest
+1973	1973-12-09:denizli-merkez-irliganli-mayor	contest already has candidacies
+1973	1973-12-09:denizli-merkez-kaklik-mayor	no contest
+1973	1973-12-09:denizli-merkez-uzunpinar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-saraykoy-babadag-mayor	no contest
+1973	1973-12-09:denizli-saraykoy-sigma-mayor	contest already has candidacies
+1973	1973-12-09:denizli-tavas-karahisar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-tavas-kizilca-mayor	contest already has candidacies
+1973	1973-12-09:denizli-tavas-kizilcaboluk-mayor	contest already has candidacies
+1973	1973-12-09:denizli-tavas-konak-mayor	contest already has candidacies
+1973	1973-12-09:denizli-tavas-pinarlar-mayor	contest already has candidacies
+1973	1973-12-09:denizli-tavas-ulukent-mayor	no contest
+1973	1973-12-09:diyarbakir-merkez-egil-mayor	no contest
+1973	1973-12-09:edirne-ipsala-ibriktepe-mayor	contest already has candidacies
+1973	1973-12-09:edirne-kesan-begendik-mayor	contest already has candidacies
+1973	1973-12-09:edirne-kesan-camlica-mayor	contest already has candidacies
+1973	1973-12-09:edirne-meric-kuplu-mayor	contest already has candidacies
+1973	1973-12-09:edirne-merkez-suloglu-mayor	no contest
+1973	1973-12-09:edirne-uzunkopru-copkoy-mayor	contest already has candidacies
+1973	1973-12-09:edirne-uzunkopru-kircasalih-mayor	contest already has candidacies
+1973	1973-12-09:edirne-uzunkopru-kurtbey-mayor	contest already has candidacies
+1973	1973-12-09:edirne-uzunkopru-yenikoy-mayor	contest already has candidacies
+1973	1973-12-09:elazig-merkez-hankendi-mayor	contest already has candidacies
+1973	1973-12-09:elazig-merkez-harput-mayor	contest already has candidacies
+1973	1973-12-09:elazig-merkez-icme-mayor	contest already has candidacies
+1973	1973-12-09:elazig-merkez-yurtbasi-mayor	contest already has candidacies
+1973	1973-12-09:elazig-palu-aricak-mayor	no contest
+1973	1973-12-09:elazig-palu-beyhani-mayor	contest already has candidacies
+1973	1973-12-09:elazig-palu-kovancilar-mayor	no contest
+1973	1973-12-09:erzincan-cayirli-karakulak-otlukbeli-mayor	no contest
+1973	1973-12-09:erzincan-merkez-uzumlu-cimin-mayor	no contest
+1973	1973-12-09:erzincan-tercan-cadirkaya-pekeric-mayor	no contest
+1973	1973-12-09:erzincan-tercan-kargin-altunkent-mayor	no contest
+1973	1973-12-09:erzincan-tercan-mercan-mayor	contest already has candidacies
+1973	1973-12-09:erzurum-askale-kandilli-mayor	contest already has candidacies
+1973	1973-12-09:erzurum-hinis-karacoban-mayor	no contest
+1973	1973-12-09:erzurum-ispir-camlikaya-hunut-mayor	no contest
+1973	1973-12-09:erzurum-ispir-pazaryolu-norgah-mayor	no contest
+1973	1973-12-09:erzurum-merkez-dumlu-mayor	contest already has candidacies
+1973	1973-12-09:erzurum-merkez-ilica-mayor	no contest
+1973	1973-12-09:erzurum-pasinler-koprukoy-mayor	no contest
+1973	1973-12-09:erzurum-tortum-bagbasi-mayor	contest already has candidacies
+1973	1973-12-09:erzurum-tortum-uzundere-azort-mayor	no contest
+1973	1973-12-09:eskisehir-cifteler-han-mayor	no contest
+1973	1973-12-09:eskisehir-merkez-alpu-mayor	no contest
+1973	1973-12-09:eskisehir-merkez-bozan-mayor	contest already has candidacies
+1973	1973-12-09:eskisehir-merkez-cukurhisar-mayor	contest already has candidacies
+1973	1973-12-09:eskisehir-merkez-inonu-mayor	no contest
+1973	1973-12-09:eskisehir-merkez-muttalip-mayor	contest already has candidacies
+1973	1973-12-09:eskisehir-mihaliccik-beylikahir-mayor	contest already has candidacies
+1973	1973-12-09:eskisehir-saricakaya-mihalgazi-gumele-mayor	no contest
+1973	1973-12-09:eskisehir-seyitgazi-kirka-mayor	contest already has candidacies
+1973	1973-12-09:eskisehir-sivrihisar-gunyuzu-kozagac-mayor	no contest
+1973	1973-12-09:eskisehir-sivrihisar-kayakent-mayor	contest already has candidacies
+1973	1973-12-09:eskisehir-sivrihisar-kaymaz-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-islahiye-fevzipasa-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-islahiye-sakcagoz-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-merkez-aril-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-merkez-burc-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-merkez-korkun-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-nizip-karkamis-mayor	no contest
+1973	1973-12-09:gaziantep-nizip-salkim-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-nizip-sekili-mayor	contest already has candidacies
+1973	1973-12-09:gaziantep-nizip-uluyatir-mizar-mayor	no contest
+1973	1973-12-09:gaziantep-oguzeli-yesildere-mayor	contest already has candidacies
+1973	1973-12-09:giresun-bulancak-piraziz-eren-mayor	no contest
+1973	1973-12-09:giresun-espiye-palakli-yaglidere-mayor	no contest
+1973	1973-12-09:giresun-eynesil-oren-mayor	no contest
+1973	1973-12-09:giresun-gorele-canakci-mayor	no contest
+1973	1973-12-09:giresun-gorele-cavuslu-mayor	contest already has candidacies
+1973	1973-12-09:giresun-kesap-karabulduk-mayor	contest already has candidacies
+1973	1973-12-09:giresun-tirebolu-dogankent-mayor	no contest
+1973	1973-12-09:gumushane-bayburt-arpali-mayor	contest already has candidacies
+1973	1973-12-09:gumushane-bayburt-aydintepe-mayor	contest already has candidacies
+1973	1973-12-09:gumushane-bayburt-demirozu-mayor	contest already has candidacies
+1973	1973-12-09:gumushane-kelkit-kose-mayor	no contest
+1973	1973-12-09:gumushane-kelkit-salyazi-mayor	contest already has candidacies
+1973	1973-12-09:gumushane-torul-ulukoy-mayor	contest already has candidacies
+1973	1973-12-09:hakkari-beytussebap-uzungecit-mayor	contest already has candidacies
+1973	1973-12-09:hakkari-uludere-hilal-mayor	contest already has candidacies
+1973	1973-12-09:hatay-dortyol-kuzuculu-mayor	contest already has candidacies
+1973	1973-12-09:hatay-dortyol-yakacik-payas-mayor	no contest
+1973	1973-12-09:hatay-dortyol-yesil-mayor	contest already has candidacies
+1973	1973-12-09:hatay-dortyol-yesilkent-erzin-mayor	no contest
+1973	1973-12-09:hatay-hassa-akbez-mayor	no contest
+1973	1973-12-09:hatay-hassa-aktepe-mayor	contest already has candidacies
+1973	1973-12-09:hatay-iskenderun-belen-mayor	no contest
+1973	1973-12-09:hatay-merkez-harbiye-mayor	contest already has candidacies
+1973	1973-12-09:hatay-merkez-serinyol-mayor	contest already has candidacies
+1973	1973-12-09:hatay-reyhanli-kumlu-mayor	no contest
+1973	1973-12-09:hatay-yayladagi-yeditepe-mayor	contest already has candidacies
+1973	1973-12-09:icel-anamur-bozyazi-mayor	no contest
+1973	1973-12-09:icel-erdemli-arpacbahsis-mayor	no contest
+1973	1973-12-09:icel-erdemli-cesmeli-mayor	no contest
+1973	1973-12-09:icel-erdemli-kargipinari-mayor	no contest
+1973	1973-12-09:icel-erdemli-kocahasanli-mayor	no contest
+1973	1973-12-09:icel-erdemli-limonlu-mayor	no contest
+1973	1973-12-09:icel-erdemli-tomuk-elvanli-mayor	no contest
+1973	1973-12-09:icel-merkez-arslankoy-mayor	no contest
+1973	1973-12-09:icel-merkez-gozne-mayor	no contest
+1973	1973-12-09:icel-merkez-kazanli-mayor	no contest
+1973	1973-12-09:icel-merkez-mezitli-mayor	no contest
+1973	1973-12-09:icel-merkez-tece-mayor	no contest
+1973	1973-12-09:icel-silifke-tasucu-mayor	no contest
+1973	1973-12-09:icel-tarsus-camliyayla-namrun-mayor	no contest
+1973	1973-12-09:icel-tarsus-huzurkent-mayor	no contest
+1973	1973-12-09:icel-tarsus-sebil-mayor	no contest
+1973	1973-12-09:icel-tarsus-yaylacukuru-gulek-mayor	no contest
+1973	1973-12-09:icel-tarsus-yenice-mayor	no contest
+1973	1973-12-09:isparta-atabey-islamkoy-mayor	contest already has candidacies
+1973	1973-12-09:isparta-egirdir-aksu-yenice-mayor	no contest
+1973	1973-12-09:isparta-egirdir-barla-kocapinar-mayor	no contest
+1973	1973-12-09:isparta-egirdir-sariidris-mayor	no contest
+1973	1973-12-09:isparta-gelendost-bagilli-mayor	contest already has candidacies
+1973	1973-12-09:isparta-keciborlu-aydogmus-mayor	contest already has candidacies
+1973	1973-12-09:isparta-keciborlu-guneykent-mayor	contest already has candidacies
+1973	1973-12-09:isparta-keciborlu-kilic-mayor	contest already has candidacies
+1973	1973-12-09:isparta-keciborlu-senir-mayor	contest already has candidacies
+1973	1973-12-09:isparta-merkez-buyukgokceli-mayor	contest already has candidacies
+1973	1973-12-09:isparta-merkez-gonenkoy-mayor	contest already has candidacies
+1973	1973-12-09:isparta-merkez-kuleonu-mayor	contest already has candidacies
+1973	1973-12-09:isparta-merkez-savkoy-mayor	contest already has candidacies
+1973	1973-12-09:isparta-sarkikaraagac-cariksaraylar-mayor	contest already has candidacies
+1973	1973-12-09:isparta-sarkikaraagac-cicekpinar-mayor	contest already has candidacies
+1973	1973-12-09:isparta-sarkikaraagac-goksogut-mayor	contest already has candidacies
+1973	1973-12-09:isparta-sarkikaraagac-yenisarbademli-mayor	no contest
+1973	1973-12-09:isparta-senirkent-buyukkabaca-mayor	contest already has candidacies
+1973	1973-12-09:isparta-senirkent-ulugbey-mayor	contest already has candidacies
+1973	1973-12-09:isparta-senirkent-yassioren-mayor	no contest
+1973	1973-12-09:isparta-sutculer-ayvalipinar-mayor	contest already has candidacies
+1973	1973-12-09:isparta-sutculer-kesmekoy-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-bagkonak-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-cetince-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-huyuklu-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-korkuler-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-kozlucay-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-kumdanli-mayor	no contest
+1973	1973-12-09:isparta-yalvac-sucullu-mayor	contest already has candidacies
+1973	1973-12-09:isparta-yalvac-tokmacik-mayor	contest already has candidacies
+1973	1973-12-09:istanbul-catalca-buyukcekmece-mayor	no contest
+1973	1973-12-09:istanbul-kartal-dolayoba-mayor	contest already has candidacies
+1973	1973-12-09:istanbul-kartal-kucukyali-mayor	contest already has candidacies
+1973	1973-12-09:istanbul-kartal-yakacik-mayor	contest already has candidacies
+1973	1973-12-09:istanbul-silivri-celaliye-kamiloba-mayor	no contest
+1973	1973-12-09:istanbul-silivri-degirmenkoy-mayor	contest already has candidacies
+1973	1973-12-09:istanbul-silivri-selimpasa-mayor	contest already has candidacies
+1973	1973-12-09:istanbul-yalova-cinarcik-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bayindir-cirpi-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bayindir-zeytinova-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bergama-bolcek-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bergama-zeytindag-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bornova-altindag-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bornova-camdibi-mayor	contest already has candidacies
+1973	1973-12-09:izmir-bornova-pinarbasi-mayor	contest already has candidacies
+1973	1973-12-09:izmir-cesme-alacati-mayor	contest already has candidacies
+1973	1973-12-09:izmir-dikili-candarli-mayor	contest already has candidacies
+1973	1973-12-09:izmir-foca-yenifoca-mayor	contest already has candidacies
+1973	1973-12-09:izmir-kemalpasa-armutlu-mayor	contest already has candidacies
+1973	1973-12-09:izmir-kemalpasa-bagyurdu-parsa-mayor	no contest
+1973	1973-12-09:izmir-kemalpasa-yukarikizilca-mayor	contest already has candidacies
+1973	1973-12-09:izmir-kinik-poyracik-mayor	contest already has candidacies
+1973	1973-12-09:izmir-kinik-yayla-yayakoy-mayor	no contest
+1973	1973-12-09:izmir-menemen-aliaga-mayor	no contest
+1973	1973-12-09:izmir-menemen-helvaci-mayor	contest already has candidacies
+1973	1973-12-09:izmir-odemis-adagide-ovakent-mayor	no contest
+1973	1973-12-09:izmir-odemis-bademiye-mayor	contest already has candidacies
+1973	1973-12-09:izmir-odemis-beydag-mayor	no contest
+1973	1973-12-09:izmir-odemis-birgi-mayor	contest already has candidacies
+1973	1973-12-09:izmir-odemis-bozdag-mayor	contest already has candidacies
+1973	1973-12-09:izmir-odemis-kaymakci-mayor	contest already has candidacies
+1973	1973-12-09:izmir-odemis-konakli-mayor	contest already has candidacies
+1973	1973-12-09:izmir-odemis-zeytinlik-mayor	contest already has candidacies
+1973	1973-12-09:izmir-tire-gokcenli-kahrat-mayor	no contest
+1973	1973-12-09:izmir-torbali-pancar-mayor	contest already has candidacies
+1973	1973-12-09:izmir-torbali-yazibasi-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-altinelma-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-aritas-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-cobanbeyli-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-cogulhan-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-daglica-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-esence-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-afsin-tanir-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-elbistan-cela-ekinozu-mayor	no contest
+1973	1973-12-09:kahramanmaras-elbistan-nurhak-mayor	no contest
+1973	1973-12-09:kahramanmaras-goksun-cardak-mayor	no contest
+1973	1973-12-09:kahramanmaras-pazarcik-duzbag-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-pazarcik-evri-mayor	contest already has candidacies
+1973	1973-12-09:kahramanmaras-turkoglu-beyoglu-mayor	contest already has candidacies
+1973	1973-12-09:kars-arpacay-akyaka-mayor	no contest
+1973	1973-12-09:kars-arpacay-kockoy-mayor	contest already has candidacies
+1973	1973-12-09:kars-cildir-yakinsu-mayor	no contest
+1973	1973-12-09:kars-digor-dagpinar-mayor	no contest
+1973	1973-12-09:kars-gole-koprulu-mayor	contest already has candidacies
+1973	1973-12-09:kars-hanak-damal-mayor	contest already has candidacies
+1973	1973-12-09:kars-hanak-ortakent-mayor	contest already has candidacies
+1973	1973-12-09:kars-igdir-karakoyunlu-mayor	contest already has candidacies
+1973	1973-12-09:kars-igdir-melekli-mayor	no contest
+1973	1973-12-09:kastamonu-devrekani-seydiler-mayor	no contest
+1973	1973-12-09:kastamonu-kure-agli-mayor	no contest
+1973	1973-12-09:kastamonu-merkez-ihsangazi-mayor	no contest
+1973	1973-12-09:kayseri-bunyan-akkisla-mayor	no contest
+1973	1973-12-09:kayseri-bunyan-buyuktuzhisar-mayor	no contest
+1973	1973-12-09:kayseri-develi-sihli-seyhli-mayor	no contest
+1973	1973-12-09:kayseri-develi-sindelhoyuk-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-develi-zile-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-felahiye-buyuktoraman-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-felahiye-cukur-ozvatan-mayor	no contest
+1973	1973-12-09:kayseri-incesu-kiziloren-kizilviran-mayor	no contest
+1973	1973-12-09:kayseri-incesu-suksun-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-argincik-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-basakpinar-mayor	no contest
+1973	1973-12-09:kayseri-merkez-erciyes-mayor	no contest
+1973	1973-12-09:kayseri-merkez-erkilet-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-gesi-bagyurdu-mayor	no contest
+1973	1973-12-09:kayseri-merkez-hacilar-mayor	no contest
+1973	1973-12-09:kayseri-merkez-hisarcik-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-kiranardi-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-kuscu-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-mimarsinan-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-merkez-talas-mayor	no contest
+1973	1973-12-09:kayseri-merkez-tasoren-agirnas-mayor	no contest
+1973	1973-12-09:kayseri-merkez-yemliha-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-sarioglan-ciftlik-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-sariz-yalakkoy-mayor	no contest
+1973	1973-12-09:kayseri-tomarza-ozluce-mayor	contest already has candidacies
+1973	1973-12-09:kayseri-yahyali-derebag-mayor	no contest
+1973	1973-12-09:kirklareli-babaeski-alpullu-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-babaeski-buyukmandira-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-babaeski-karahalil-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-demirkoy-igneada-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-luleburgaz-ahmetbey-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-luleburgaz-evrensekiz-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-merkez-inece-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-merkez-kavakli-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-merkez-uskup-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-pinarhisar-kaynarca-mayor	contest already has candidacies
+1973	1973-12-09:kirklareli-vize-cakilli-mayor	contest already has candidacies
+1973	1973-12-09:kirsehir-kaman-akpinar-mayor	no contest
+1973	1973-12-09:kirsehir-kaman-cagirkan-mayor	contest already has candidacies
+1973	1973-12-09:kirsehir-kaman-demirli-mayor	contest already has candidacies
+1973	1973-12-09:kirsehir-kaman-isahocali-mayor	no contest
+1973	1973-12-09:kirsehir-kaman-karginyenice-mayor	no contest
+1973	1973-12-09:kirsehir-kaman-kurancili-mayor	contest already has candidacies
+1973	1973-12-09:kirsehir-kaman-omerhacili-mayor	contest already has candidacies
+1973	1973-12-09:kirsehir-kaman-savcili-mayor	no contest
+1973	1973-12-09:kirsehir-merkez-boztepe-mayor	no contest
+1973	1973-12-09:kirsehir-merkez-cayagzi-mayor	contest already has candidacies
+1973	1973-12-09:kirsehir-merkez-ozbag-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-gebze-darica-mayor	no contest
+1973	1973-12-09:kocaeli-gebze-hereke-mayor	no contest
+1973	1973-12-09:kocaeli-golcuk-degirmendere-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-golcuk-ihsaniye-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-karamursel-kizderbent-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-merkez-aslanbey-mayor	no contest
+1973	1973-12-09:kocaeli-merkez-bahcecik-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-merkez-kosekoy-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-merkez-kullar-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-merkez-suadiye-mayor	no contest
+1973	1973-12-09:kocaeli-merkez-yarimca-mayor	contest already has candidacies
+1973	1973-12-09:kocaeli-merkez-yuvacik-mayor	contest already has candidacies
+1973	1973-12-09:konya-aksehir-altintas-mayor	contest already has candidacies
+1973	1973-12-09:konya-aksehir-cakillar-mayor	contest already has candidacies
+1973	1973-12-09:konya-aksehir-egrigoz-dogrugoz-mayor	no contest
+1973	1973-12-09:konya-aksehir-reis-mayor	contest already has candidacies
+1973	1973-12-09:konya-aksehir-tuzlukcu-mayor	no contest
+1973	1973-12-09:konya-beysehir-cavuscu-cavus-mayor	no contest
+1973	1973-12-09:konya-beysehir-cetmi-akcabelen-mayor	no contest
+1973	1973-12-09:konya-beysehir-derebucak-mayor	no contest
+1973	1973-12-09:konya-beysehir-doganbey-mayor	contest already has candidacies
+1973	1973-12-09:konya-beysehir-gencek-mayor	no contest
+1973	1973-12-09:konya-beysehir-huglu-mayor	contest already has candidacies
+1973	1973-12-09:konya-beysehir-huyuk-mayor	no contest
+1973	1973-12-09:konya-beysehir-imrenler-balkanda-mayor	no contest
+1973	1973-12-09:konya-beysehir-kireli-mayor	no contest
+1973	1973-12-09:konya-beysehir-kurucaova-mayor	contest already has candidacies
+1973	1973-12-09:konya-beysehir-mahremli-kayabasi-mayor	no contest
+1973	1973-12-09:konya-beysehir-selki-mayor	no contest
+1973	1973-12-09:konya-beysehir-ustunler-mayor	contest already has candidacies
+1973	1973-12-09:konya-beysehir-uzumlu-manastir-mayor	no contest
+1973	1973-12-09:konya-beysehir-yenidogan-mayor	contest already has candidacies
+1973	1973-12-09:konya-beysehir-yesildag-kasakli-mayor	no contest
+1973	1973-12-09:konya-bozkir-ahirli-mayor	no contest
+1973	1973-12-09:konya-bozkir-akkise-mayor	contest already has candidacies
+1973	1973-12-09:konya-bozkir-derekoy-mayor	contest already has candidacies
+1973	1973-12-09:konya-bozkir-harmanpinar-mayor	contest already has candidacies
+1973	1973-12-09:konya-bozkir-ucpinar-mayor	contest already has candidacies
+1973	1973-12-09:konya-bozkir-yalihuyuk-mayor	no contest
+1973	1973-12-09:konya-cihanbeyli-altinekin-zivarik-mayor	no contest
+1973	1973-12-09:konya-cihanbeyli-karabag-mayor	no contest
+1973	1973-12-09:konya-cihanbeyli-yeniceoba-mayor	contest already has candidacies
+1973	1973-12-09:konya-cumra-akoren-mayor	no contest
+1973	1973-12-09:konya-cumra-alibeyhuyugu-mayor	no contest
+1973	1973-12-09:konya-cumra-dinek-mayor	contest already has candidacies
+1973	1973-12-09:konya-cumra-guneybag-elmasun-mayor	no contest
+1973	1973-12-09:konya-cumra-icericumra-mayor	no contest
+1973	1973-12-09:konya-cumra-karasenir-karasinir-mayor	no contest
+1973	1973-12-09:konya-cumra-karkin-mayor	no contest
+1973	1973-12-09:konya-doganhisar-ayaslar-mayor	contest already has candidacies
+1973	1973-12-09:konya-doganhisar-baskoy-mayor	contest already has candidacies
+1973	1973-12-09:konya-doganhisar-destigin-mayor	contest already has candidacies
+1973	1973-12-09:konya-doganhisar-karaaga-mayor	contest already has candidacies
+1973	1973-12-09:konya-eregli-ayranci-mayor	no contest
+1973	1973-12-09:konya-eregli-cayhan-mayor	contest already has candidacies
+1973	1973-12-09:konya-eregli-halkapinar-mayor	no contest
+1973	1973-12-09:konya-eregli-kutoren-mayor	contest already has candidacies
+1973	1973-12-09:konya-ermenek-basyayla-mayor	contest already has candidacies
+1973	1973-12-09:konya-ermenek-goktepe-fariske-mayor	no contest
+1973	1973-12-09:konya-ermenek-guneyyurt-gargana-mayor	no contest
+1973	1973-12-09:konya-ermenek-kazanci-mayor	contest already has candidacies
+1973	1973-12-09:konya-ermenek-sariveliler-mayor	no contest
+1973	1973-12-09:konya-hadim-afsar-mayor	no contest
+1973	1973-12-09:konya-hadim-balcilar-alata-mayor	no contest
+1973	1973-12-09:konya-hadim-cetmi-mayor	contest already has candidacies
+1973	1973-12-09:konya-hadim-dedemli-mayor	contest already has candidacies
+1973	1973-12-09:konya-hadim-korualan-mayor	contest already has candidacies
+1973	1973-12-09:konya-hadim-taskent-mayor	no contest
+1973	1973-12-09:konya-ilgin-argithani-mayor	contest already has candidacies
+1973	1973-12-09:konya-ilgin-asagicigil-mayor	contest already has candidacies
+1973	1973-12-09:konya-ilgin-beykonak-mayor	contest already has candidacies
+1973	1973-12-09:konya-ilgin-cavuscu-cavuscugol-mayor	no contest
+1973	1973-12-09:konya-ilgin-yukaricigil-mayor	contest already has candidacies
+1973	1973-12-09:konya-kadinhani-atlanti-mayor	contest already has candidacies
+1973	1973-12-09:konya-kadinhani-kolukisa-mayor	contest already has candidacies
+1973	1973-12-09:konya-karaman-akcasehir-mayor	no contest
+1973	1973-12-09:konya-karaman-kazimkarabekir-mayor	no contest
+1973	1973-12-09:konya-karaman-kilbasan-mayor	no contest
+1973	1973-12-09:konya-karaman-suduragi-mayor	contest already has candidacies
+1973	1973-12-09:konya-karaman-taskale-mayor	contest already has candidacies
+1973	1973-12-09:konya-karaman-yesildere-ibrala-mayor	no contest
+1973	1973-12-09:konya-karaman-yollarbasi-ilisira-mayor	no contest
+1973	1973-12-09:konya-karapinar-emirgazi-mayor	no contest
+1973	1973-12-09:konya-kulu-kozanli-mayor	contest already has candidacies
+1973	1973-12-09:konya-kulu-tavsancali-omerhanli-mayor	no contest
+1973	1973-12-09:konya-kulu-zincirlikuyu-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-basarakavak-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-bilecik-yukselen-mayor	no contest
+1973	1973-12-09:konya-merkez-ciftlikozu-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-demirkent-ismil-mayor	no contest
+1973	1973-12-09:konya-merkez-derbent-mayor	no contest
+1973	1973-12-09:konya-merkez-derekoy-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-hocacihan-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-inlice-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-kiziloren-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-saglik-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-sille-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-tepe-mayor	contest already has candidacies
+1973	1973-12-09:konya-merkez-yarma-mayor	contest already has candidacies
+1973	1973-12-09:konya-sarayonu-bashuyuk-mayor	no contest
+1973	1973-12-09:konya-sarayonu-cesmelisebil-mayor	contest already has candidacies
+1973	1973-12-09:konya-sarayonu-halici-ladik-mayor	no contest
+1973	1973-12-09:konya-seydisehir-gevrekli-mayor	contest already has candidacies
+1973	1973-12-09:konya-seydisehir-ketenli-mayor	contest already has candidacies
+1973	1973-12-09:konya-seydisehir-ortakaraoren-mayor	no contest
+1973	1973-12-09:konya-seydisehir-tarasci-mayor	contest already has candidacies
+1973	1973-12-09:konya-yunak-celtik-mayor	no contest
+1973	1973-12-09:konya-yunak-gokpinar-mayor	no contest
+1973	1973-12-09:konya-yunak-turgut-mayor	contest already has candidacies
+1973	1973-12-09:konya-yunak-yukaripiribeyli-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-altintas-calkoy-mayor	no contest
+1973	1973-12-09:kutahya-altintas-dumlupinar-mayor	no contest
+1973	1973-12-09:kutahya-emet-cavdarhisar-mayor	no contest
+1973	1973-12-09:kutahya-emet-gunluce-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-emet-hacibekir-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-emet-hisarcik-mayor	no contest
+1973	1973-12-09:kutahya-emet-orencik-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-gediz-akcaalan-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-gediz-gokler-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-gediz-gurlek-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-gediz-saphane-mayor	no contest
+1973	1973-12-09:kutahya-merkez-aslanapa-mayor	no contest
+1973	1973-12-09:kutahya-merkez-seyitomer-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-simav-citgol-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-simav-demirci-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-simav-kusu-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-simav-nasa-mayor	contest already has candidacies
+1973	1973-12-09:kutahya-simav-pazarlar-mayor	no contest
+1973	1973-12-09:kutahya-tavsanli-tuncbilek-mayor	contest already has candidacies
+1973	1973-12-09:malatya-akcadag-oren-mayor	contest already has candidacies
+1973	1973-12-09:malatya-darende-asagiulupinar-mayor	contest already has candidacies
+1973	1973-12-09:malatya-darende-ayvali-mayor	contest already has candidacies
+1973	1973-12-09:malatya-darende-balaban-gerimter-mayor	no contest
+1973	1973-12-09:malatya-darende-kuluncak-mayor	no contest
+1973	1973-12-09:malatya-dogansehir-erkenek-mayor	contest already has candidacies
+1973	1973-12-09:malatya-dogansehir-polat-mayor	contest already has candidacies
+1973	1973-12-09:malatya-dogansehir-surgu-mayor	contest already has candidacies
+1973	1973-12-09:malatya-hekimhan-agilbasi-mayor	no contest
+1973	1973-12-09:malatya-hekimhan-guzelyurt-mayor	contest already has candidacies
+1973	1973-12-09:malatya-hekimhan-hasancelebi-mayor	contest already has candidacies
+1973	1973-12-09:malatya-hekimhan-kocaozu-mayor	contest already has candidacies
+1973	1973-12-09:malatya-merkez-bahcebasi-orduzu-mayor	no contest
+1973	1973-12-09:malatya-merkez-dilek-mayor	contest already has candidacies
+1973	1973-12-09:malatya-merkez-eskimalatya-mayor	contest already has candidacies
+1973	1973-12-09:malatya-merkez-hanimciftligi-mayor	contest already has candidacies
+1973	1973-12-09:malatya-merkez-konak-yukaribanazi-mayor	no contest
+1973	1973-12-09:malatya-merkez-yaygin-mayor	contest already has candidacies
+1973	1973-12-09:malatya-merkez-yesiltepe-mayor	contest already has candidacies
+1973	1973-12-09:malatya-puturge-doganyol-keferdiz-mayor	no contest
+1973	1973-12-09:malatya-yesilyurt-gunduzbey-mayor	contest already has candidacies
+1973	1973-12-09:malatya-yesilyurt-yakinca-mayor	contest already has candidacies
+1973	1973-12-09:manisa-akhisar-beyoba-mayor	contest already has candidacies
+1973	1973-12-09:manisa-akhisar-golmarmara-mayor	no contest
+1973	1973-12-09:manisa-akhisar-kayalioglu-mayor	contest already has candidacies
+1973	1973-12-09:manisa-akhisar-mecidiye-mayor	contest already has candidacies
+1973	1973-12-09:manisa-akhisar-ovakoy-mayor	contest already has candidacies
+1973	1973-12-09:manisa-akhisar-selendi-akselendi-mayor	no contest
+1973	1973-12-09:manisa-akhisar-suleymanli-mayor	no contest
+1973	1973-12-09:manisa-akhisar-zeytinliova-mayor	contest already has candidacies
+1973	1973-12-09:manisa-alasehir-kavaklidere-mayor	contest already has candidacies
+1973	1973-12-09:manisa-alasehir-kemaliye-mayor	contest already has candidacies
+1973	1973-12-09:manisa-alasehir-killik-mayor	contest already has candidacies
+1973	1973-12-09:manisa-alasehir-uluderbent-mayor	contest already has candidacies
+1973	1973-12-09:manisa-alasehir-yesilyurt-mayor	contest already has candidacies
+1973	1973-12-09:manisa-gordes-gunesli-mayor	no contest
+1973	1973-12-09:manisa-gordes-kayacik-mayor	no contest
+1973	1973-12-09:manisa-gordes-koprubasi-mayor	no contest
+1973	1973-12-09:manisa-kirkagac-bakir-mayor	contest already has candidacies
+1973	1973-12-09:manisa-kula-gokceoren-mayor	contest already has candidacies
+1973	1973-12-09:manisa-merkez-asagicobanisa-mayor	contest already has candidacies
+1973	1973-12-09:manisa-merkez-horozkoy-mayor	contest already has candidacies
+1973	1973-12-09:manisa-merkez-karaoglanli-mayor	no contest
+1973	1973-12-09:manisa-merkez-muradiye-mayor	contest already has candidacies
+1973	1973-12-09:manisa-salihli-karatas-mayor	contest already has candidacies
+1973	1973-12-09:manisa-salihli-sartmahmut-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-alibeyli-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-gokce-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-hacirahmanli-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-halitpasa-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-ishakcelebi-mayor	no contest
+1973	1973-12-09:manisa-saruhanli-koldere-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-mutevelli-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-nuriye-mayor	contest already has candidacies
+1973	1973-12-09:manisa-saruhanli-pasakoy-mayor	contest already has candidacies
+1973	1973-12-09:manisa-soma-yagcili-mayor	no contest
+1973	1973-12-09:manisa-turgutlu-ahmetli-mayor	no contest
+1973	1973-12-09:manisa-turgutlu-urganli-mayor	contest already has candidacies
+1973	1973-12-09:mardin-gercus-hasankeyf-mayor	contest already has candidacies
+1973	1973-12-09:mardin-kiziltepe-senyurt-mayor	contest already has candidacies
+1973	1973-12-09:mardin-merkez-kabala-mayor	contest already has candidacies
+1973	1973-12-09:mardin-merkez-yesilli-mayor	no contest
+1973	1973-12-09:mardin-nusaybin-akarsu-mayor	contest already has candidacies
+1973	1973-12-09:mugla-bodrum-mumcular-mayor	no contest
+1973	1973-12-09:mugla-bodrum-turgutreis-karatoprak-mayor	no contest
+1973	1973-12-09:mugla-fethiye-foca-gunlukbasi-mayor	no contest
+1973	1973-12-09:mugla-fethiye-karaculha-mayor	contest already has candidacies
+1973	1973-12-09:mugla-fethiye-seki-mayor	contest already has candidacies
+1973	1973-12-09:mugla-fethiye-yesiluzumlu-mayor	contest already has candidacies
+1973	1973-12-09:mugla-koycegiz-dalaman-karacali-mayor	no contest
+1973	1973-12-09:mugla-koycegiz-dalyan-mayor	no contest
+1973	1973-12-09:mugla-koycegiz-ortaca-mayor	no contest
+1973	1973-12-09:mugla-merkez-bayir-mayor	contest already has candidacies
+1973	1973-12-09:mugla-merkez-yerkesik-mayor	contest already has candidacies
+1973	1973-12-09:mugla-merkez-yesilyurt-pisi-mayor	no contest
+1973	1973-12-09:mugla-milas-camici-bafa-mayor	no contest
+1973	1973-12-09:mugla-milas-selimiye-mayor	contest already has candidacies
+1973	1973-12-09:mugla-yatagan-kavaklidere-mayor	no contest
+1973	1973-12-09:mugla-yatagan-mentese-cardakli-mayor	no contest
+1973	1973-12-09:mugla-yatagan-turgut-leyne-mayor	no contest
+1973	1973-12-09:mugla-yatagan-yesilbagcilar-bagcilar-mayor	no contest
+1973	1973-12-09:mus-merkez-haskoy-mayor	no contest
+1973	1973-12-09:nevsehir-avanos-calis-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-avanos-goynuk-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-avanos-kalaba-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-avanos-ozkonak-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-avanos-sarilar-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-avanos-topakli-mayor	no contest
+1973	1973-12-09:nevsehir-gulsehir-gumuskent-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-gulsehir-karacasar-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-gulsehir-tuzkoy-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-kozakli-kanlica-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-kozakli-karahasanli-mayor	no contest
+1973	1973-12-09:nevsehir-kozakli-karasenir-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-acigol-mayor	no contest
+1973	1973-12-09:nevsehir-merkez-avcilar-goreme-mayor	no contest
+1973	1973-12-09:nevsehir-merkez-cat-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-gore-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-inalli-mayor	no contest
+1973	1973-12-09:nevsehir-merkez-kaymakli-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-nar-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-sulusaray-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-tatlarin-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-merkez-uchisar-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-urgup-aksalur-mayor	no contest
+1973	1973-12-09:nevsehir-urgup-basdere-baskoy-mayor	no contest
+1973	1973-12-09:nevsehir-urgup-mustafapasa-mayor	contest already has candidacies
+1973	1973-12-09:nevsehir-urgup-ortahisar-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-agacli-gulagac-mayor	no contest
+1973	1973-12-09:nigde-aksaray-altinkaya-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-demirci-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-eskil-mayor	no contest
+1973	1973-12-09:nigde-aksaray-esmekaya-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-gulpinar-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-guzelyurt-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-helvadere-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-ihlara-yesilkoy-mayor	no contest
+1973	1973-12-09:nigde-aksaray-incesu-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-sultanhani-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-taspinar-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-yenikent-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-yesilova-mayor	contest already has candidacies
+1973	1973-12-09:nigde-aksaray-yesiltepe-kirgil-mayor	no contest
+1973	1973-12-09:nigde-bor-akmanlar-mayor	no contest
+1973	1973-12-09:nigde-bor-altunhisar-mayor	no contest
+1973	1973-12-09:nigde-bor-bahceli-mayor	contest already has candidacies
+1973	1973-12-09:nigde-bor-cukurkuyu-mayor	contest already has candidacies
+1973	1973-12-09:nigde-bor-kemerhisar-mayor	contest already has candidacies
+1973	1973-12-09:nigde-bor-kizilca-mayor	contest already has candidacies
+1973	1973-12-09:nigde-bor-ulukisla-mayor	contest already has candidacies
+1973	1973-12-09:nigde-bor-yesilyurt-mayor	contest already has candidacies
+1973	1973-12-09:nigde-camardi-bademdere-mayor	no contest
+1973	1973-12-09:nigde-merkez-azatli-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-dundarli-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-edikli-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-fertek-mayor	no contest
+1973	1973-12-09:nigde-merkez-golcuk-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-gumusler-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-haciabdullah-mayor	no contest
+1973	1973-12-09:nigde-merkez-inli-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-kitreli-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-koyunlu-mayor	contest already has candidacies
+1973	1973-12-09:nigde-merkez-ozyurt-mayor	contest already has candidacies
+1973	1973-12-09:nigde-ortakoy-balci-mayor	contest already has candidacies
+1973	1973-12-09:nigde-ulukisla-darbogaz-mayor	contest already has candidacies
+1973	1973-12-09:ordu-aybasti-alankent-mayor	no contest
+1973	1973-12-09:ordu-aybasti-kabatas-mayor	no contest
+1973	1973-12-09:ordu-fatsa-bolaman-mayor	contest already has candidacies
+1973	1973-12-09:ordu-fatsa-catalpinar-mayor	no contest
+1973	1973-12-09:ordu-fatsa-eskikoy-mayor	contest already has candidacies
+1973	1973-12-09:ordu-fatsa-sariyakup-mayor	no contest
+1973	1973-12-09:ordu-fatsa-sarmasik-ilica-mayor	no contest
+1973	1973-12-09:ordu-fatsa-yalikoy-mayor	contest already has candidacies
+1973	1973-12-09:ordu-golkoy-gurgentepe-mayor	no contest
+1973	1973-12-09:ordu-golkoy-isiktepe-mayor	no contest
+1973	1973-12-09:ordu-korgan-tepealan-mayor	contest already has candidacies
+1973	1973-12-09:ordu-merkez-gulyali-mayor	no contest
+1973	1973-12-09:ordu-merkez-saraycik-mayor	contest already has candidacies
+1973	1973-12-09:ordu-mesudiye-yesilce-mayor	contest already has candidacies
+1973	1973-12-09:ordu-persembe-doganli-medreseonu-mayor	no contest
+1973	1973-12-09:ordu-unye-caybasi-mayor	no contest
+1973	1973-12-09:ordu-unye-ikizce-mayor	no contest
+1973	1973-12-09:rize-cayeli-buyukkoy-mayor	contest already has candidacies
+1973	1973-12-09:rize-cayeli-madenli-mayor	contest already has candidacies
+1973	1973-12-09:rize-ikizdere-guneyce-mayor	contest already has candidacies
+1973	1973-12-09:rize-merkez-derepazari-mayor	no contest
+1973	1973-12-09:rize-merkez-gundogdu-mayor	contest already has candidacies
+1973	1973-12-09:rize-merkez-guneysu-mayor	no contest
+1973	1973-12-09:rize-merkez-iyidere-mayor	no contest
+1973	1973-12-09:rize-merkez-kendirli-mayor	contest already has candidacies
+1973	1973-12-09:rize-pazar-ortakoy-hemsin-mayor	no contest
+1973	1973-12-09:sakarya-akyazi-akpurcek-mayor	contest already has candidacies
+1973	1973-12-09:sakarya-akyazi-altindere-mayor	contest already has candidacies
+1973	1973-12-09:sakarya-akyazi-kuzuluk-mayor	contest already has candidacies
+1973	1973-12-09:sakarya-geyve-alifuatpasa-mayor	contest already has candidacies
+1973	1973-12-09:sakarya-geyve-pamukova-mayor	no contest
+1973	1973-12-09:sakarya-geyve-tarakli-mayor	no contest
+1973	1973-12-09:sakarya-karasu-daricayiri-mayor	contest already has candidacies
+1973	1973-12-09:sakarya-karasu-kocaali-mayor	no contest
+1973	1973-12-09:sakarya-karasu-lahna-ortakoy-mayor	no contest
+1973	1973-12-09:sakarya-karasu-sinanoglu-mayor	contest already has candidacies
+1973	1973-12-09:sakarya-merkez-arifiye-mayor	no contest
+1973	1973-12-09:sakarya-merkez-erenler-mayor	no contest
+1973	1973-12-09:sakarya-merkez-ferizli-mayor	no contest
+1973	1973-12-09:sakarya-merkez-golkent-mayor	no contest
+1973	1973-12-09:sakarya-merkez-serdivan-mayor	no contest
+1973	1973-12-09:sakarya-merkez-sogutlu-mayor	no contest
+1973	1973-12-09:sakarya-sapanca-kirkpinar-mayor	contest already has candidacies
+1973	1973-12-09:samsun-alacam-yakakent-mayor	no contest
+1973	1973-12-09:samsun-bafra-ballica-19-mayis-mayor	no contest
+1973	1973-12-09:samsun-bafra-kolay-mayor	contest already has candidacies
+1973	1973-12-09:samsun-carsamba-salipazari-mayor	no contest
+1973	1973-12-09:samsun-merkez-tekkekoy-mayor	no contest
+1973	1973-12-09:samsun-terme-evci-mayor	contest already has candidacies
+1973	1973-12-09:samsun-terme-sakarli-mayor	contest already has candidacies
+1973	1973-12-09:siirt-kurtalan-kayabaglar-mayor	no contest
+1973	1973-12-09:siirt-merkez-aydinlar-mayor	no contest
+1973	1973-12-09:sivas-gemerek-cepni-mayor	contest already has candidacies
+1973	1973-12-09:sivas-gemerek-egerci-mayor	contest already has candidacies
+1973	1973-12-09:sivas-gemerek-karaozu-mayor	contest already has candidacies
+1973	1973-12-09:sivas-gemerek-sizir-mayor	contest already has candidacies
+1973	1973-12-09:sivas-gemerek-yenicubuk-mayor	contest already has candidacies
+1973	1973-12-09:sivas-gurun-sucati-mayor	contest already has candidacies
+1973	1973-12-09:sivas-hafik-dogansar-mayor	no contest
+1973	1973-12-09:sivas-kangal-alacahan-mayor	contest already has candidacies
+1973	1973-12-09:sivas-kangal-cetinkaya-mayor	contest already has candidacies
+1973	1973-12-09:sivas-merkez-ulas-mayor	no contest
+1973	1973-12-09:sivas-sarkisla-altinyayla-mayor	no contest
+1973	1973-12-09:sivas-sarkisla-cayirseyhi-mayor	contest already has candidacies
+1973	1973-12-09:sivas-sarkisla-deliilyas-mayor	contest already has candidacies
+1973	1973-12-09:sivas-susehri-akincilar-mayor	no contest
+1973	1973-12-09:sivas-susehri-golova-mayor	no contest
+1973	1973-12-09:tekirdag-corlu-marmaraereglisi-mayor	no contest
+1973	1973-12-09:tekirdag-hayrabolu-cerkezmusellim-mayor	contest already has candidacies
+1973	1973-12-09:tekirdag-malkara-kozyoruk-mayor	contest already has candidacies
+1973	1973-12-09:tekirdag-malkara-saglamtas-mayor	contest already has candidacies
+1973	1973-12-09:tekirdag-sarkoy-hoskoy-mayor	contest already has candidacies
+1973	1973-12-09:tekirdag-sarkoy-murefte-mayor	: 410 against 438
+1973	1973-12-09:tokat-almus-akarcay-mayor	contest already has candidacies
+1973	1973-12-09:tokat-almus-cevreli-muhat-mayor	no contest
+1973	1973-12-09:tokat-artova-arabacimusa-yesilyurt-mayor	no contest
+1973	1973-12-09:tokat-erbaa-degirmenli-mayor	contest already has candidacies
+1973	1973-12-09:tokat-erbaa-karayaka-mayor	no contest
+1973	1973-12-09:tokat-erbaa-kocak-mayor	contest already has candidacies
+1973	1973-12-09:tokat-erbaa-tanoba-mayor	contest already has candidacies
+1973	1973-12-09:tokat-merkez-camlibel-mayor	contest already has candidacies
+1973	1973-12-09:tokat-niksar-basciftlik-mayor	no contest
+1973	1973-12-09:tokat-niksar-gurcesme-mayor	contest already has candidacies
+1973	1973-12-09:tokat-resadiye-bereketli-mayor	contest already has candidacies
+1973	1973-12-09:tokat-resadiye-bozcali-mayor	contest already has candidacies
+1973	1973-12-09:tokat-resadiye-hasanseyh-mayor	contest already has candidacies
+1973	1973-12-09:tokat-turhal-pazar-mayor	no contest
+1973	1973-12-09:tokat-turhal-senyurt-mayor	contest already has candidacies
+1973	1973-12-09:tokat-turhal-uzumoren-mayor	contest already has candidacies
+1973	1973-12-09:tokat-zile-yildiztepe-boztepe-mayor	no contest
+1973	1973-12-09:trabzon-akcaabat-akcakoy-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-akcaabat-cayirbagi-mayor	no contest
+1973	1973-12-09:trabzon-akcaabat-derecik-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-akcaabat-isiklar-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-caykara-atakoy-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-caykara-dernekpazari-kondu-mayor	no contest
+1973	1973-12-09:trabzon-caykara-karacam-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-caykara-uzungol-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-merkez-caglayan-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-of-balaban-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-of-bolumlukoy-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-of-cumapazari-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-of-gurpinar-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-of-hayrat-mayor	no contest
+1973	1973-12-09:trabzon-of-ugurlu-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-surmene-koprubasi-mayor	no contest
+1973	1973-12-09:trabzon-surmene-yeniay-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-tonya-iskenderli-mayor	contest already has candidacies
+1973	1973-12-09:trabzon-vakfikebir-besikduzu-mayor	no contest
+1973	1973-12-09:trabzon-vakfikebir-carsibasi-mayor	no contest
+1973	1973-12-09:trabzon-vakfikebir-salpazari-mayor	no contest
+1973	1973-12-09:tunceli-mazgirt-akpazar-mayor	contest already has candidacies
+1973	1973-12-09:urfa-halfeti-yukarigoklu-mayor	no contest
+1973	1973-12-09:urfa-viransehir-ceylanpinar-mayor	no contest
+1973	1973-12-09:usak-banaz-buyukoturak-mayor	contest already has candidacies
+1973	1973-12-09:usak-esme-ahmetler-mayor	contest already has candidacies
+1973	1973-12-09:usak-esme-yelegen-mayor	contest already has candidacies
+1973	1973-12-09:usak-sivasli-agacbeyli-mayor	contest already has candidacies
+1973	1973-12-09:usak-sivasli-tatar-mayor	contest already has candidacies
+1973	1973-12-09:usak-ulubey-avgan-mayor	contest already has candidacies
+1973	1973-12-09:van-merkez-sarmansuyu-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-akdagmadeni-dogankent-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-akdagmadeni-karamagara-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-bogazliyan-bektasli-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-bogazliyan-devecipinar-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-bogazliyan-fakili-mayor	no contest
+1973	1973-12-09:yozgat-bogazliyan-ovakent-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-bogazliyan-uzunlu-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-bogazliyan-yamacli-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-cayiralan-babayagmur-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-cayiralan-buyukkisla-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-cayiralan-candir-mayor	no contest
+1973	1973-12-09:yozgat-cayiralan-cokradan-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-cekerek-aydincik-mayor	no contest
+1973	1973-12-09:yozgat-cekerek-bazlambac-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-cekerek-kazankaya-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-merkez-osmanpasa-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sarikaya-karayakup-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sefaatli-kuzayca-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sefaatli-pasakoy-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sefaatli-sarikent-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sorgun-bahadin-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sorgun-cigdemli-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sorgun-esenli-mayor	contest already has candidacies
+1973	1973-12-09:yozgat-sorgun-eymir-mayor	no contest
+1973	1973-12-09:zonguldak-bartin-ahmetler-mayor	contest already has candidacies
+1973	1973-12-09:zonguldak-bartin-amasra-mayor	contest already has candidacies
+1973	1973-12-09:zonguldak-caycuma-hisaronu-mayor	contest already has candidacies
+1973	1973-12-09:zonguldak-devrek-gokcebey-mayor	no contest
+1973	1973-12-09:zonguldak-eregli-alapli-mayor	no contest
+1973	1973-12-09:zonguldak-karabuk-yenice-mayor	contest already has candidacies
+1973	1973-12-09:zonguldak-merkez-catalagzi-mayor	contest already has candidacies
+1973	1973-12-09:zonguldak-merkez-kilimli-mayor	contest already has candidacies
+1973	1973-12-09:zonguldak-merkez-kozlu-mayor	contest already has candidacies
 1984	ankara	Hüseyin Erdal: 2 namesakes, new person
 1984	istanbul	*: 2 namesakes, new person
 1989	ankara	Oğuzhan Asiltürk: 2 namesakes, new person
@@ -58,23 +1241,85 @@ year	province	reason
 2004	2004-03-28:adana-aladag-mayor	Yusuf Şahin: 2 namesakes, new person
 2004	2004-03-28:adana-feke-mayor	Ahmet Sel: 3 namesakes, new person
 2004	2004-03-28:adana-kozan-mayor	Mehmet Demir: 2 namesakes, new person
+2004	2004-03-28:adiyaman-adiyaman-atakent-mayor	no contest
+2004	2004-03-28:adiyaman-adiyaman-hasancik-mayor	no contest
+2004	2004-03-28:adiyaman-adiyaman-komur-mayor	no contest
+2004	2004-03-28:adiyaman-adiyaman-yaylakonak-mayor	no contest
 2004	2004-03-28:adiyaman-mayor	Mehmet Özdemir: 2 namesakes, new person
+2004	2004-03-28:adiyaman-samsat-inlice-mayor	no contest
 2004	2004-03-28:adiyaman-samsat-mayor	Yusuf Fırat: 3 namesakes, new person
 2004	2004-03-28:adiyaman-tut-mayor	Mehmet Demir: 2 namesakes, new person
+2004	2004-03-28:afyonkarahisar-afyon-anitkaya-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-beyyazi-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-buyukkalecik-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-cayirbag-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-cikrik-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-degirmenayvali-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-erkmen-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-fethibey-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-gebeceler-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-isiklar-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-nuribey-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-salar-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-sulumenli-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-sulun-mayor	no contest
+2004	2004-03-28:afyonkarahisar-afyon-susuz-mayor	no contest
 2004	2004-03-28:afyonkarahisar-dazkiri-mayor	Mehmet Akgül: 3 namesakes, new person
-2004	2004-03-28:afyonkarahisar-hocalar-mayor	Ali Özer: 2 namesakes, new person
+2004	2004-03-28:afyonkarahisar-hocalar-mayor	Ali Özer: 3 namesakes, new person
 2004	2004-03-28:afyonkarahisar-mayor	Mehmet Acar: 3 namesakes, new person
+2004	2004-03-28:afyonkarahisar-sincanli-ahmetpasa-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-akoren-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-duzagac-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-guney-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-kilicarslan-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-kirka-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-kucukhuyuk-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-nuh-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-savran-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-tasoluk-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-tinaztepe-mayor	no contest
+2004	2004-03-28:afyonkarahisar-sincanli-tokuslar-mayor	no contest
+2004	2004-03-28:afyonkarahisar-suhut-efe-mayor	no contest
 2004	2004-03-28:afyonkarahisar-suhut-mayor	Ahmet Yeşilırmak: 2 namesakes, new person
 2004	2004-03-28:afyonkarahisar-sultandagi-mayor	Mehmet Şahin: 3 namesakes, new person
 2004	2004-03-28:agri-dogubayazit-mayor	Ahmet Yiğit: 2 namesakes, new person
 2004	2004-03-28:agri-eleskirt-mayor	Sebahattin Sarı: 2 namesakes, new person
+2004	2004-03-28:aksaray-aksaray-acipinar-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-akcakent-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-altinkaya-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-aratol-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-armutlu-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-baglikaya-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-dogantarla-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-hamidiye-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-helvadere-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-incesu-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-karkin-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-kutlu-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-saglik-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-sarayhan-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-sevincli-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-sultanhani-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-taspinar-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-topakkaya-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-ulukisla-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-yenikent-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-yesilova-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-yesiltepe-mayor	no contest
+2004	2004-03-28:aksaray-aksaray-yuva-mayor	no contest
 2004	2004-03-28:aksaray-eskil-mayor	Niyazi Alçay: 2 namesakes, new person
 2004	2004-03-28:aksaray-gulagac-mayor	Faruk Teymen: 3 namesakes, new person
 2004	2004-03-28:aksaray-mayor	Mustafa Şahin: 2 namesakes, new person
+2004	2004-03-28:amasya-amasya-aydinca-mayor	no contest
+2004	2004-03-28:amasya-amasya-dogantepe-mayor	no contest
+2004	2004-03-28:amasya-amasya-ezinepazar-mayor	no contest
+2004	2004-03-28:amasya-amasya-uygur-mayor	no contest
+2004	2004-03-28:amasya-amasya-yassical-mayor	no contest
+2004	2004-03-28:amasya-amasya-yesilyenice-mayor	no contest
+2004	2004-03-28:amasya-amasya-ziyaret-mayor	no contest
 2004	2004-03-28:amasya-goynucek-mayor	Mustafa Yılmaz: 2 namesakes, new person
 2004	2004-03-28:amasya-mayor	İsmail Arslan: 4 namesakes, new person
 2004	2004-03-28:amasya-merzifon-mayor	Mustafa Çelik: 2 namesakes, new person
-2004	2004-03-28:amasya-suluova-mayor	Bağımsız Türkiye Partisi: 51 against 3748
 2004	2004-03-28:amasya-tasova-mayor	Özgür Özdemir: 2 namesakes, new person
 2004	2004-03-28:ankara-ayas-mayor	Hasan Ekinci: 2 namesakes, new person
 2004	2004-03-28:ankara-ayas-mayor	Hüseyin Erdal: 2 namesakes, new person
@@ -84,71 +1329,200 @@ year	province	reason
 2004	2004-03-28:ankara-haymana-mayor	Mehmet Öztürk: 16 namesakes, new person
 2004	2004-03-28:ankara-mamak-mayor	Hüseyin Şahin: 2 namesakes, new person
 2004	2004-03-28:antalya-alanya-mayor	Ahmet Çelik: 2 namesakes, new person
+2004	2004-03-28:antalya-antalya-aksu-mayor	no contest
+2004	2004-03-28:antalya-antalya-bademagaci-mayor	no contest
+2004	2004-03-28:antalya-antalya-calkaya-mayor	no contest
+2004	2004-03-28:antalya-antalya-ciglik-mayor	no contest
+2004	2004-03-28:antalya-antalya-dagbeli-mayor	no contest
+2004	2004-03-28:antalya-antalya-dosemealti-mayor	no contest
+2004	2004-03-28:antalya-antalya-doyran-mayor	no contest
+2004	2004-03-28:antalya-antalya-duzlercami-mayor	no contest
+2004	2004-03-28:antalya-antalya-eksili-mayor	no contest
+2004	2004-03-28:antalya-antalya-karaoz-mayor	no contest
+2004	2004-03-28:antalya-antalya-karaveliler-mayor	no contest
+2004	2004-03-28:antalya-antalya-kepez-mayor	no contest
+2004	2004-03-28:antalya-antalya-konyaalti-mayor	no contest
+2004	2004-03-28:antalya-antalya-muratpasa-mayor	no contest
+2004	2004-03-28:antalya-antalya-pinarli-mayor	no contest
+2004	2004-03-28:antalya-antalya-varsak-mayor	no contest
+2004	2004-03-28:antalya-antalya-yesilbayir-mayor	no contest
+2004	2004-03-28:antalya-antalya-yurtpinar-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-ak-parti-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-anap-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-bagimsiz-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-bbp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-btp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-chp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-dsp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-dyp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-genc-parti-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-ip-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-mhp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-millet-partisi-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-saadet-partisi-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-shp-mayor	no contest
+2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-tkp-mayor	no contest
 2004	2004-03-28:antalya-gazipasa-mayor	Ali Çelik: 3 namesakes, new person
+2004	2004-03-28:antalya-il-genel-meclisi-yeni-turkiye-partisi-2002-width-1-mayor	no contest
 2004	2004-03-28:antalya-kas-mayor	Saadet Partisi: 0 against 7
 2004	2004-03-28:antalya-kemer-mayor	Mustafa Gül: 3 namesakes, new person
 2004	2004-03-28:antalya-kumluca-mayor	İbrahim Öztürk: 2 namesakes, new person
 2004	2004-03-28:ardahan-cildir-mayor	Yusuf Yılmaz: 4 namesakes, new person
 2004	2004-03-28:ardahan-hanak-mayor	Ayhan Büyükkaya: 2 namesakes, new person
-2004	2004-03-28:artvin-mayor	Mustafa Polat: 3 namesakes, new person
+2004	2004-03-28:aydin-aydin-cestepe-mayor	no contest
+2004	2004-03-28:aydin-aydin-dalama-mayor	no contest
+2004	2004-03-28:aydin-aydin-ovaeymir-mayor	no contest
+2004	2004-03-28:aydin-aydin-tepecik-mayor	no contest
+2004	2004-03-28:aydin-aydin-umurlu-mayor	no contest
 2004	2004-03-28:aydin-buharkent-mayor	Mehmet Vural: 2 namesakes, new person
+2004	2004-03-28:aydin-didim-ak-yenikoy-mayor	no contest
 2004	2004-03-28:aydin-karacasu-mayor	Mustafa Büyükyapıcı: 3 namesakes, new person
 2004	2004-03-28:aydin-karacasu-mayor	Mustafa Uysal: 3 namesakes, new person
 2004	2004-03-28:aydin-yenipazar-mayor	Mehmet Yüsran Erden: 2 namesakes, new person
 2004	2004-03-28:balikesir-ayvalik-mayor	Ahmet Polat: 2 namesakes, new person
+2004	2004-03-28:balikesir-balikesir-kocaavsar-mayor	no contest
+2004	2004-03-28:balikesir-balikesir-pamukcu-mayor	no contest
+2004	2004-03-28:balikesir-balikesir-samli-mayor	no contest
 2004	2004-03-28:balikesir-burhaniye-mayor	Ömer Yılmaz: 2 namesakes, new person
 2004	2004-03-28:balikesir-gonen-mayor	Rahmi Yılmaz: 2 namesakes, new person
 2004	2004-03-28:balikesir-havran-mayor	Mustafa Kulak: 2 namesakes, new person
 2004	2004-03-28:balikesir-susurluk-mayor	Mehmet Çetin: 3 namesakes, new person
+2004	2004-03-28:bartin-bartin-arit-mayor	no contest
+2004	2004-03-28:bartin-bartin-hasankadi-mayor	no contest
+2004	2004-03-28:bartin-bartin-kozcagiz-mayor	no contest
 2004	2004-03-28:bartin-ulus-mayor	Hasan Hüseyin Uzun: 2 namesakes, new person
+2004	2004-03-28:batman-batman-balpinar-mayor	no contest
 2004	2004-03-28:batman-besiri-mayor	Sait Karabulut: 2 namesakes, new person
 2004	2004-03-28:batman-sason-mayor	Muzaffer Arslan: 2 namesakes, new person
+2004	2004-03-28:bayburt--aksar-mayor	no contest
+2004	2004-03-28:bayburt--arpali-mayor	no contest
+2004	2004-03-28:bayburt--bespinar-mayor	no contest
+2004	2004-03-28:bayburt--cayiryolu-mayor	no contest
+2004	2004-03-28:bayburt--gokcedere-mayor	no contest
+2004	2004-03-28:bayburt--konursu-mayor	no contest
+2004	2004-03-28:bilecik-bilecik-bayirkoy-mayor	no contest
+2004	2004-03-28:bilecik-bilecik-vezirhan-mayor	no contest
 2004	2004-03-28:bilecik-inhisar-mayor	İbrahim Ünal: 3 namesakes, new person
 2004	2004-03-28:bilecik-inhisar-mayor	Mehmet Karaca: 2 namesakes, new person
 2004	2004-03-28:bilecik-pazaryeri-mayor	Ahmet Kart: 2 namesakes, new person
 2004	2004-03-28:bilecik-sogut-mayor	Ali Çelik: 3 namesakes, new person
+2004	2004-03-28:bingol-bingol-ilicalar-mayor	no contest
+2004	2004-03-28:bingol-bingol-sancak-mayor	no contest
 2004	2004-03-28:bingol-kigi-mayor	Yılmaz Gündüz: 2 namesakes, new person
 2004	2004-03-28:bingol-solhan-mayor	İsmail Yılmaz: 2 namesakes, new person
 2004	2004-03-28:bingol-yedisu-mayor	Mehmet Şerif Memioğlu: 2 namesakes, new person
 2004	2004-03-28:bitlis-adilcevaz-mayor	Adnan Göksoy: 2 namesakes, new person
+2004	2004-03-28:bitlis-bitlis-yolalan-mayor	no contest
 2004	2004-03-28:bitlis-hizan-mayor	Cezail Aktaş: 2 namesakes, new person
+2004	2004-03-28:bolu-bolu-karacasu-mayor	no contest
 2004	2004-03-28:bolu-goynuk-mayor	Ahmet Çankaya: 2 namesakes, new person
 2004	2004-03-28:burdur-altinyayla-mayor	Mehmet Şen: 3 namesakes, new person
 2004	2004-03-28:burdur-bucak-mayor	Ahmet Çetin: 2 namesakes, new person
+2004	2004-03-28:burdur-burdur-bugduz-mayor	no contest
+2004	2004-03-28:burdur-burdur-kozluca-mayor	no contest
 2004	2004-03-28:burdur-tefenni-mayor	Ahmet Çelik: 2 namesakes, new person
 2004	2004-03-28:bursa-harmancik-mayor	Mustafa Çetinkaya: 2 namesakes, new person
 2004	2004-03-28:bursa-inegol-mayor	Selçuk Yılmaz: 2 namesakes, new person
 2004	2004-03-28:bursa-mudanya-mayor	Osman Genç: 2 namesakes, new person
 2004	2004-03-28:bursa-orhangazi-mayor	Mehmet Akın: 3 namesakes, new person
+2004	2004-03-28:canakkale-canakkale-intepe-mayor	no contest
+2004	2004-03-28:canakkale-canakkale-kepez-mayor	no contest
+2004	2004-03-28:canakkale-canakkale-kumkale-mayor	no contest
 2004	2004-03-28:canakkale-ezine-mayor	İsmail Yılmaz: 2 namesakes, new person
 2004	2004-03-28:canakkale-gelibolu-mayor	Münir Mustafa Özacar: 3 namesakes, new person
 2004	2004-03-28:canakkale-mayor	Halil Aydın: 2 namesakes, new person
 2004	2004-03-28:canakkale-mayor	İsmail Uysal: 2 namesakes, new person
 2004	2004-03-28:cankiri-atkaracalar-mayor	Hüseyin Aktaş: 2 namesakes, new person
+2004	2004-03-28:cankiri-cankiri-unur-mayor	no contest
 2004	2004-03-28:cankiri-kizilirmak-mayor	Bayar Soysal: 3 namesakes, new person
 2004	2004-03-28:cankiri-korgun-mayor	Mustafa Özkan: 2 namesakes, new person
 2004	2004-03-28:cankiri-mayor	Mustafa Köroğlu: 2 namesakes, new person
+2004	2004-03-28:corum-corum-duvenci-mayor	no contest
+2004	2004-03-28:corum-corum-konakli-mayor	no contest
+2004	2004-03-28:corum-corum-seydim-mayor	no contest
 2004	2004-03-28:denizli-beyagac-mayor	Mustafa Akçay: 3 namesakes, new person
 2004	2004-03-28:denizli-beyagac-mayor	Mehmet Çakmak: 2 namesakes, new person
 2004	2004-03-28:denizli-bozkurt-mayor	Hayrettin Akgün: 2 namesakes, new person
+2004	2004-03-28:denizli-denizli-akkale-mayor	no contest
+2004	2004-03-28:denizli-denizli-asagisamli-mayor	no contest
+2004	2004-03-28:denizli-denizli-bagbasi-mayor	no contest
+2004	2004-03-28:denizli-denizli-baskarci-mayor	no contest
+2004	2004-03-28:denizli-denizli-bereketli-mayor	no contest
+2004	2004-03-28:denizli-denizli-cankurtaran-mayor	no contest
+2004	2004-03-28:denizli-denizli-gokpinar-mayor	no contest
+2004	2004-03-28:denizli-denizli-goveclik-mayor	no contest
+2004	2004-03-28:denizli-denizli-gozler-mayor	no contest
+2004	2004-03-28:denizli-denizli-gumusler-mayor	no contest
+2004	2004-03-28:denizli-denizli-hallaclar-mayor	no contest
+2004	2004-03-28:denizli-denizli-irliganli-mayor	no contest
+2004	2004-03-28:denizli-denizli-karahayit-mayor	no contest
+2004	2004-03-28:denizli-denizli-kayhan-mayor	no contest
+2004	2004-03-28:denizli-denizli-kinikli-mayor	no contest
+2004	2004-03-28:denizli-denizli-korucuk-mayor	no contest
+2004	2004-03-28:denizli-denizli-pamukkale-mayor	no contest
+2004	2004-03-28:denizli-denizli-pinarkent-mayor	no contest
+2004	2004-03-28:denizli-denizli-servergazi-mayor	no contest
+2004	2004-03-28:denizli-denizli-ucler-mayor	no contest
+2004	2004-03-28:denizli-denizli-uzunpinar-mayor	no contest
 2004	2004-03-28:denizli-guney-mayor	Halil Ayhan: 3 namesakes, new person
 2004	2004-03-28:diyarbakir-bismil-mayor	Mehmet Aydın: 3 namesakes, new person
 2004	2004-03-28:diyarbakir-cermik-mayor	Mehmet Demir: 2 namesakes, new person
 2004	2004-03-28:diyarbakir-cungus-mayor	Ali Suat Akmeşe: 2 namesakes, new person
+2004	2004-03-28:diyarbakir-diyarbakir-bagivar-mayor	no contest
+2004	2004-03-28:diyarbakir-diyarbakir-baglar-mayor	no contest
+2004	2004-03-28:diyarbakir-diyarbakir-carikli-mayor	no contest
+2004	2004-03-28:diyarbakir-diyarbakir-kayapinar-mayor	no contest
+2004	2004-03-28:diyarbakir-diyarbakir-ozekli-mayor	no contest
+2004	2004-03-28:diyarbakir-diyarbakir-sur-mayor	no contest
+2004	2004-03-28:diyarbakir-diyarbakir-yenisehir-mayor	no contest
 2004	2004-03-28:diyarbakir-lice-mayor	Mustafa Kılınç: 2 namesakes, new person
 2004	2004-03-28:duzce-akcakoca-mayor	Fikret Albayrak: 2 namesakes, new person
 2004	2004-03-28:duzce-cilimli-mayor	Hasan Çelebi: 2 namesakes, new person
+2004	2004-03-28:duzce-duzce-beykoy-mayor	no contest
+2004	2004-03-28:duzce-duzce-bogazici-mayor	no contest
+2004	2004-03-28:duzce-duzce-konuralp-mayor	no contest
 2004	2004-03-28:duzce-kaynasli-mayor	Ahmet Balcı: 2 namesakes, new person
 2004	2004-03-28:duzce-yigilca-mayor	Ahmet Balcı: 2 namesakes, new person
 2004	2004-03-28:edirne-havsa-mayor	Oğuz Tekin: 2 namesakes, new person
 2004	2004-03-28:edirne-lalapasa-mayor	Bülent Şahinşah: 2 namesakes, new person
 2004	2004-03-28:edirne-suleoglu-mayor	Mehmet Uzun: 2 namesakes, new person
 2004	2004-03-28:elazig-aricak-mayor	Ahmet Yılmaz: 3 namesakes, new person
+2004	2004-03-28:elazig-elazig-akcakiraz-mayor	no contest
+2004	2004-03-28:elazig-elazig-hankendi-mayor	no contest
+2004	2004-03-28:elazig-elazig-icme-mayor	no contest
+2004	2004-03-28:elazig-elazig-mollakendi-mayor	no contest
+2004	2004-03-28:elazig-elazig-yazikonak-mayor	no contest
+2004	2004-03-28:elazig-elazig-yurtbasi-mayor	no contest
 2004	2004-03-28:elazig-keban-mayor	Hadi Turan: 2 namesakes, new person
 2004	2004-03-28:elazig-keban-mayor	Ahmet Polat: 2 namesakes, new person
+2004	2004-03-28:erzincan-erzincan-akyazi-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-bahcelikoy-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-caglayan-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-cukurkuyu-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-demirkent-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-dortler-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-gecit-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-kavakyolu-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-mollakoy-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-ulalar-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-ulukoy-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-yalnizbag-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-yaylabasi-mayor	no contest
+2004	2004-03-28:erzincan-erzincan-yogurtlu-mayor	no contest
+2004	2004-03-28:erzurum-erzurum-dadaskent-mayor	no contest
+2004	2004-03-28:erzurum-erzurum-dadaskoy-mayor	no contest
+2004	2004-03-28:erzurum-erzurum-dumlu-mayor	no contest
+2004	2004-03-28:erzurum-erzurum-kazimkarabekir-mayor	no contest
+2004	2004-03-28:erzurum-erzurum-yakutiye-mayor	no contest
+2004	2004-03-28:erzurum-erzurum-yenisehir-mayor	no contest
 2004	2004-03-28:erzurum-ilica-mayor	Yaşar ...: 9 namesakes, new person
 2004	2004-03-28:erzurum-oltu-mayor	Necmettin Taşci: 2 namesakes, new person
 2004	2004-03-28:eskisehir-alpu-mayor	Mehmet Keskin: 3 namesakes, new person
+2004	2004-03-28:eskisehir-eskisehir-cukurhisar-mayor	no contest
+2004	2004-03-28:eskisehir-eskisehir-gunduzler-mayor	no contest
+2004	2004-03-28:eskisehir-eskisehir-muttalip-mayor	no contest
+2004	2004-03-28:eskisehir-eskisehir-odunpazari-mayor	no contest
+2004	2004-03-28:eskisehir-eskisehir-tepebasi-mayor	no contest
 2004	2004-03-28:eskisehir-gunyuzu-mayor	Mustafa Özkan: 2 namesakes, new person
 2004	2004-03-28:eskisehir-inonu-mayor	Kadir Bozkurt: 2 namesakes, new person
 2004	2004-03-28:gaziantep-islahiye-mayor	Mustafa Şahin: 2 namesakes, new person
@@ -160,16 +1534,49 @@ year	province	reason
 2004	2004-03-28:gaziantep-sehitkamil-mayor	Mehmet Çetiner: 2 namesakes, new person
 2004	2004-03-28:gaziantep-yavuzeli-mayor	Adnan Korkmaz: 2 namesakes, new person
 2004	2004-03-28:giresun-dogankent-mayor	Ekrem Ünlü: 3 namesakes, new person
+2004	2004-03-28:giresun-giresun-caldag-mayor	no contest
+2004	2004-03-28:giresun-giresun-duroglu-mayor	no contest
+2004	2004-03-28:giresun-giresun-inisdibi-mayor	no contest
 2004	2004-03-28:giresun-mayor	Mehmet Özdemir: 2 namesakes, new person
 2004	2004-03-28:giresun-mayor	Mustafa Şahin: 2 namesakes, new person
+2004	2004-03-28:gumushane-gumushane-arzular-mayor	no contest
+2004	2004-03-28:gumushane-gumushane-tekke-mayor	no contest
 2004	2004-03-28:gumushane-kelkit-mayor	Halit Doğan: 2 namesakes, new person
 2004	2004-03-28:gumushane-kose-mayor	Mehmet Akgül: 3 namesakes, new person
 2004	2004-03-28:gumushane-torul-mayor	İbrahim Aydın: 2 namesakes, new person
+2004	2004-03-28:hakkari-hakkari-durankaya-mayor	no contest
 2004	2004-03-28:hakkari-yuksekova-mayor	Kamil Öz: 3 namesakes, new person
+2004	2004-03-28:hatay-antakya-avsuyu-mayor	no contest
+2004	2004-03-28:hatay-antakya-cekmece-mayor	no contest
+2004	2004-03-28:hatay-antakya-dursunlu-mayor	no contest
+2004	2004-03-28:hatay-antakya-ekinci-mayor	no contest
+2004	2004-03-28:hatay-antakya-gumusgoze-mayor	no contest
+2004	2004-03-28:hatay-antakya-guzelburc-mayor	no contest
+2004	2004-03-28:hatay-antakya-harbiye-mayor	no contest
+2004	2004-03-28:hatay-antakya-karaali-mayor	no contest
+2004	2004-03-28:hatay-antakya-karlisu-mayor	no contest
+2004	2004-03-28:hatay-antakya-kucukdalyan-mayor	no contest
+2004	2004-03-28:hatay-antakya-kuzeytepe-mayor	no contest
+2004	2004-03-28:hatay-antakya-masuklu-mayor	no contest
+2004	2004-03-28:hatay-antakya-narlica-mayor	no contest
+2004	2004-03-28:hatay-antakya-odabasi-mayor	no contest
+2004	2004-03-28:hatay-antakya-ovakent-mayor	no contest
+2004	2004-03-28:hatay-antakya-senkoy-mayor	no contest
+2004	2004-03-28:hatay-antakya-serinyol-mayor	no contest
+2004	2004-03-28:hatay-antakya-subasi-mayor	no contest
+2004	2004-03-28:hatay-antakya-toygarli-mayor	no contest
+2004	2004-03-28:hatay-antakya-turunclu-mayor	no contest
+2004	2004-03-28:hatay-antakya-yesilpinar-mayor	no contest
 2004	2004-03-28:hatay-belen-mayor	Mehmet Demir: 2 namesakes, new person
 2004	2004-03-28:hatay-dortyol-mayor	Fadıl Keskin: 2 namesakes, new person
+2004	2004-03-28:igdir-igdir-halfeli-mayor	no contest
+2004	2004-03-28:igdir-igdir-hoshaber-mayor	no contest
+2004	2004-03-28:igdir-igdir-melekli-mayor	no contest
 2004	2004-03-28:igdir-mayor	Ali Ağrı: 2 namesakes, new person
 2004	2004-03-28:isparta-gonen-mayor	Ahmet Demir: 4 namesakes, new person
+2004	2004-03-28:isparta-isparta-buyukgokceli-mayor	no contest
+2004	2004-03-28:isparta-isparta-kuleonu-mayor	no contest
+2004	2004-03-28:isparta-isparta-savkoy-mayor	no contest
 2004	2004-03-28:isparta-keciborlu-mayor	Osman Arı: 3 namesakes, new person
 2004	2004-03-28:isparta-mayor	Yusuf Ziya Günaydın: 2 namesakes, new person
 2004	2004-03-28:isparta-uluborlu-mayor	Salih Kara: 2 namesakes, new person
@@ -184,16 +1591,37 @@ year	province	reason
 2004	2004-03-28:istanbul-sile-mayor	Ahmet Ulusoy: 3 namesakes, new person
 2004	2004-03-28:istanbul-sisli-mayor	Ali Yıldız: 4 namesakes, new person
 2004	2004-03-28:istanbul-tuzla-mayor	Zeki Yıldız: 2 namesakes, new person
-2004	2004-03-28:izmir-beydag-mayor	Ali Özer: 2 namesakes, new person
+2004	2004-03-28:izmir-beydag-mayor	Ali Özer: 3 namesakes, new person
 2004	2004-03-28:izmir-gaziemir-mayor	Halil İbrahim Şenol: 2 namesakes, new person
 2004	2004-03-28:izmir-karsiyaka-mayor	Yunus Kılıç: 2 namesakes, new person
 2004	2004-03-28:izmir-kemalpasa-mayor	Yunus Kılıç: 2 namesakes, new person
 2004	2004-03-28:izmir-menemen-mayor	Ahmet Şahin: 8 namesakes, new person
 2004	2004-03-28:izmir-menemen-mayor	İbrahim Yıldız: 3 namesakes, new person
 2004	2004-03-28:izmir-tire-mayor	Tayfur Çiçek: 3 namesakes, new person
+2004	2004-03-28:kahramanmaras-kahramanmaras-baydemirli-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-dongele-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-fatih-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-fatmali-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-ilica-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-kale-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-karacasu-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-karadere-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-kavlakli-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-kurtul-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-onsen-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-sahinkayasi-mayor	no contest
+2004	2004-03-28:kahramanmaras-kahramanmaras-tekir-mayor	no contest
 2004	2004-03-28:karabuk-eskipazar-mayor	Mehmet Ateş: 2 namesakes, new person
 2004	2004-03-28:karabuk-yenice-mayor	Zeki Çaylı: 3 namesakes, new person
 2004	2004-03-28:karabuk-yenice-mayor	Mehmet Eren: 2 namesakes, new person
+2004	2004-03-28:karabuk-yenice-yortan-mayor	no contest
+2004	2004-03-28:karaman-karaman-akcasehir-mayor	no contest
+2004	2004-03-28:karaman-karaman-kilbasan-mayor	no contest
+2004	2004-03-28:karaman-karaman-kisecik-mayor	no contest
+2004	2004-03-28:karaman-karaman-suduragi-mayor	no contest
+2004	2004-03-28:karaman-karaman-taskale-mayor	no contest
+2004	2004-03-28:karaman-karaman-yesildere-mayor	no contest
+2004	2004-03-28:karaman-karaman-yollarbasi-mayor	no contest
 2004	2004-03-28:karaman-sariveliler-mayor	Hayri Samur: 2 namesakes, new person
 2004	2004-03-28:kars-arpacay-mayor	Enver Akkaya: 2 namesakes, new person
 2004	2004-03-28:kars-kagizman-mayor	Mehmet Alkan: 2 namesakes, new person
@@ -203,27 +1631,75 @@ year	province	reason
 2004	2004-03-28:kayseri-melikgazi-mayor	Ahmet Bayraktar: 2 namesakes, new person
 2004	2004-03-28:kayseri-pinarbasi-mayor	Mustafa Çetinkaya: 4 namesakes, new person
 2004	2004-03-28:kayseri-yesilhisar-mayor	Saadet Partisi: 0 against 42
+2004	2004-03-28:kilis-kilis-yavuzlu-mayor	no contest
 2004	2004-03-28:kilis-polateli-mayor	Mehmet Polat: 3 namesakes, new person
 2004	2004-03-28:kilis-polateli-mayor	Ahmet Polat: 2 namesakes, new person
 2004	2004-03-28:kirikkale-bahsili-mayor	Recep Kaplan: 4 namesakes, new person
+2004	2004-03-28:kirikkale-kirikkale-ahili-mayor	no contest
+2004	2004-03-28:kirikkale-kirikkale-asagimahmutlar-mayor	no contest
+2004	2004-03-28:kirikkale-kirikkale-cullu-mayor	no contest
+2004	2004-03-28:kirikkale-kirikkale-hacilar-mayor	no contest
+2004	2004-03-28:kirikkale-kirikkale-hasandede-mayor	no contest
 2004	2004-03-28:kirikkale-yahsihan-mayor	Mehmet Bozkurt: 2 namesakes, new person
+2004	2004-03-28:kirklareli-kirklareli-inece-mayor	no contest
+2004	2004-03-28:kirklareli-kirklareli-kavakli-mayor	no contest
+2004	2004-03-28:kirklareli-kirklareli-uskup-mayor	no contest
 2004	2004-03-28:kirsehir-kaman-mayor	Kemal Aydın: 2 namesakes, new person
+2004	2004-03-28:kirsehir-kirsehir-cayagzi-mayor	no contest
+2004	2004-03-28:kirsehir-kirsehir-dulkadirli-mayor	no contest
+2004	2004-03-28:kirsehir-kirsehir-karahidir-mayor	no contest
+2004	2004-03-28:kirsehir-kirsehir-ozbag-mayor	no contest
+2004	2004-03-28:kirsehir-kirsehir-toklumen-mayor	no contest
+2004	2004-03-28:kirsehir-kirsehir-ulupinar-mayor	no contest
 2004	2004-03-28:kirsehir-mucur-mayor	Mehmet Güler: 4 namesakes, new person
 2004	2004-03-28:kocaeli-gebze-mayor	Mustafa Özcan: 2 namesakes, new person
+2004	2004-03-28:kocaeli-kocaeli-acisu-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-akmese-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-alikahya-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-arslanbey-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-bekirpasa-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-buyukderbent-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-esme-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-karsiyaka-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-kosekoy-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-kullar-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-kurucesme-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-masukiye-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-saraybahce-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-sarimese-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-suadiye-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-uzunciftlik-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-uzuntarla-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-yenikoy-mayor	no contest
+2004	2004-03-28:kocaeli-kocaeli-yuvacik-mayor	no contest
 2004	2004-03-28:konya-ahirli-mayor	Mehmet Özkaya: 2 namesakes, new person
+2004	2004-03-28:konya-beysehir-kurucaova-mayor	no contest
 2004	2004-03-28:konya-bozkir-mayor	Bayram Şahin: 2 namesakes, new person
 2004	2004-03-28:konya-cihanbeyli-mayor	Ahmet Erdoğan: 2 namesakes, new person
 2004	2004-03-28:konya-hadim-mayor	Ali Alkan: 2 namesakes, new person
 2004	2004-03-28:konya-huyuk-mayor	Abdullah Çelik: 2 namesakes, new person
 2004	2004-03-28:konya-sarayonu-mayor	Mehmet Karataş: 3 namesakes, new person
+2004	2004-03-28:konya-selcuklu-tepekoy-mayor	no contest
+2004	2004-03-28:konya-selcuklu-yukselen-bilecik-mayor	no contest
 2004	2004-03-28:konya-tuzlukcu-mayor	Genç Parti: 0 against 15
 2004	2004-03-28:kutahya-cavdarhisar-mayor	Halil Başer: 3 namesakes, new person
+2004	2004-03-28:kutahya-kutahya-kizilcaoren-mayor	no contest
+2004	2004-03-28:kutahya-kutahya-seyitomer-mayor	no contest
+2004	2004-03-28:kutahya-simav-kelemyenice-gumussu-mayor	no contest
 2004	2004-03-28:malatya-arapkir-mayor	Mustafa Şahin: 2 namesakes, new person
 2004	2004-03-28:malatya-arguvan-mayor	Mehmet Yıldız: 7 namesakes, new person
 2004	2004-03-28:malatya-battalgazi-mayor	Mehmet Akgün: 2 namesakes, new person
-2004	2004-03-28:malatya-mayor	Bağımsız: 287 against 531
-2004	2004-03-28:malatya-mayor	Bağımsız: 152 against 531
-2004	2004-03-28:malatya-mayor	Bağımsız: 92 against 531
+2004	2004-03-28:malatya-malatya-beydagi-mayor	no contest
+2004	2004-03-28:malatya-malatya-dilek-mayor	no contest
+2004	2004-03-28:malatya-malatya-erenli-mayor	no contest
+2004	2004-03-28:malatya-malatya-haniminciftligi-mayor	no contest
+2004	2004-03-28:malatya-malatya-konak-mayor	no contest
+2004	2004-03-28:malatya-malatya-orduzu-mayor	no contest
+2004	2004-03-28:malatya-malatya-sahnahan-mayor	no contest
+2004	2004-03-28:malatya-malatya-topsogut-mayor	no contest
+2004	2004-03-28:malatya-malatya-yaygin-mayor	no contest
+2004	2004-03-28:malatya-puturge-nohutlu-mayor	no contest
+2004	2004-03-28:malatya-puturge-tepehan-mayor	no contest
 2004	2004-03-28:manisa-ahmetli-mayor	Ali Yıldırım: 3 namesakes, new person
 2004	2004-03-28:manisa-alasehir-mayor	İbrahim Öztürk: 2 namesakes, new person
 2004	2004-03-28:manisa-demirci-mayor	İsmail Arslan: 4 namesakes, new person
@@ -231,33 +1707,150 @@ year	province	reason
 2004	2004-03-28:manisa-golmarmara-mayor	Mustafa Coşkun: 2 namesakes, new person
 2004	2004-03-28:manisa-kirkagac-mayor	Mehmet Aydın: 3 namesakes, new person
 2004	2004-03-28:manisa-kula-mayor	Selim Aşkın: 2 namesakes, new person
+2004	2004-03-28:manisa-manisa-asagicobanisa-mayor	no contest
+2004	2004-03-28:manisa-manisa-hacihaliller-mayor	no contest
+2004	2004-03-28:manisa-manisa-hamzabeyli-mayor	no contest
+2004	2004-03-28:manisa-manisa-karaagacli-mayor	no contest
+2004	2004-03-28:manisa-manisa-muradiye-mayor	no contest
+2004	2004-03-28:manisa-manisa-sancaklibozkoy-mayor	no contest
+2004	2004-03-28:manisa-manisa-sancakliigdecik-mayor	no contest
+2004	2004-03-28:manisa-manisa-selimsahlar-mayor	no contest
+2004	2004-03-28:manisa-manisa-ucpinar-mayor	no contest
+2004	2004-03-28:manisa-manisa-yagcilar-mayor	no contest
+2004	2004-03-28:manisa-manisa-yenikoy-mayor	no contest
 2004	2004-03-28:manisa-saruhanli-mayor	Mehmet Vural: 2 namesakes, new person
 2004	2004-03-28:manisa-selendi-mayor	Mehmet Karataş: 3 namesakes, new person
+2004	2004-03-28:manisa-soma-yagcilli-mayor	no contest
+2004	2004-03-28:mardin-mardin-kabala-mayor	no contest
+2004	2004-03-28:mardin-mardin-ortakoy-mayor	no contest
+2004	2004-03-28:mardin-mardin-yalim-mayor	no contest
 2004	2004-03-28:mardin-yesilli-mayor	Hayrettin Demir: 3 namesakes, new person
 2004	2004-03-28:mersin-anamur-mayor	Hüseyin Kaya: 2 namesakes, new person
 2004	2004-03-28:mersin-camliyayla-mayor	Osman Yılmaz: 5 namesakes, new person
+2004	2004-03-28:mersin-mersin-adanalioglu-mayor	no contest
+2004	2004-03-28:mersin-mersin-akdeniz-mayor	no contest
+2004	2004-03-28:mersin-mersin-arpacsakarlar-mayor	no contest
+2004	2004-03-28:mersin-mersin-arslankoy-mayor	no contest
+2004	2004-03-28:mersin-mersin-bahceli-mayor	no contest
+2004	2004-03-28:mersin-mersin-ciftlikkoy-mayor	no contest
+2004	2004-03-28:mersin-mersin-davultepe-mayor	no contest
+2004	2004-03-28:mersin-mersin-degirmencay-mayor	no contest
+2004	2004-03-28:mersin-mersin-dikilitas-mayor	no contest
+2004	2004-03-28:mersin-mersin-dorukkent-mayor	no contest
+2004	2004-03-28:mersin-mersin-fatih-mayor	no contest
+2004	2004-03-28:mersin-mersin-findikpinari-mayor	no contest
+2004	2004-03-28:mersin-mersin-gozne-mayor	no contest
+2004	2004-03-28:mersin-mersin-guzelyayla-mayor	no contest
+2004	2004-03-28:mersin-mersin-karacailyas-mayor	no contest
+2004	2004-03-28:mersin-mersin-kazanli-mayor	no contest
+2004	2004-03-28:mersin-mersin-kuyuluk-mayor	no contest
+2004	2004-03-28:mersin-mersin-mezitli-mayor	no contest
+2004	2004-03-28:mersin-mersin-sogucak-mayor	no contest
+2004	2004-03-28:mersin-mersin-tece-mayor	no contest
+2004	2004-03-28:mersin-mersin-tepekoy-mayor	no contest
+2004	2004-03-28:mersin-mersin-toroslar-mayor	no contest
+2004	2004-03-28:mersin-mersin-yalinayak-mayor	no contest
+2004	2004-03-28:mersin-mersin-yenisehir-mayor	no contest
+2004	2004-03-28:mersin-mersin-yenitaskent-mayor	no contest
 2004	2004-03-28:mersin-mut-mayor	Mehmet Akpınar: 2 namesakes, new person
 2004	2004-03-28:mugla-kavaklidere-mayor	Mehmet Vural: 2 namesakes, new person
+2004	2004-03-28:mugla-mugla-bayir-mayor	no contest
+2004	2004-03-28:mugla-mugla-kafaca-mayor	no contest
+2004	2004-03-28:mugla-mugla-yerkesik-mayor	no contest
+2004	2004-03-28:mugla-mugla-yesilyurt-mayor	no contest
 2004	2004-03-28:mus-bulanik-mayor	Yusuf Özdemir: 3 namesakes, new person
+2004	2004-03-28:mus-mus-karaagacli-mayor	no contest
+2004	2004-03-28:mus-mus-kirkoy-mayor	no contest
+2004	2004-03-28:mus-mus-kizilagac-mayor	no contest
+2004	2004-03-28:mus-mus-konukbekler-mayor	no contest
+2004	2004-03-28:mus-mus-serinova-mayor	no contest
+2004	2004-03-28:mus-mus-sungu-mayor	no contest
+2004	2004-03-28:mus-mus-yagcilar-mayor	no contest
+2004	2004-03-28:mus-mus-yaygin-mayor	no contest
 2004	2004-03-28:nevsehir-avanos-mayor	Kemal Çelik: 2 namesakes, new person
 2004	2004-03-28:nevsehir-derinkuyu-mayor	Mustafa Erdem: 2 namesakes, new person
 2004	2004-03-28:nevsehir-kozakli-mayor	Orhan Yıldırım: 4 namesakes, new person
+2004	2004-03-28:nevsehir-nevsehir-cat-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-gore-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-goreme-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-kavak-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-kaymakli-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-nar-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-sulusaray-mayor	no contest
+2004	2004-03-28:nevsehir-nevsehir-uchisar-mayor	no contest
+2004	2004-03-28:nigde-nigde-aktas-mayor	no contest
+2004	2004-03-28:nigde-nigde-alay-mayor	no contest
+2004	2004-03-28:nigde-nigde-aydinyurt-fertek-mayor	no contest
+2004	2004-03-28:nigde-nigde-baglama-mayor	no contest
+2004	2004-03-28:nigde-nigde-cavdarli-mayor	no contest
+2004	2004-03-28:nigde-nigde-cayirli-mayor	no contest
+2004	2004-03-28:nigde-nigde-degirmenli-mayor	no contest
+2004	2004-03-28:nigde-nigde-dikilitas-mayor	no contest
+2004	2004-03-28:nigde-nigde-dundarli-mayor	no contest
+2004	2004-03-28:nigde-nigde-edikli-mayor	no contest
+2004	2004-03-28:nigde-nigde-elmali-mayor	no contest
+2004	2004-03-28:nigde-nigde-gumusler-mayor	no contest
+2004	2004-03-28:nigde-nigde-haciabdullah-mayor	no contest
+2004	2004-03-28:nigde-nigde-hacibeyli-mayor	no contest
+2004	2004-03-28:nigde-nigde-icmeli-mayor	no contest
+2004	2004-03-28:nigde-nigde-karaatli-mayor	no contest
+2004	2004-03-28:nigde-nigde-kayirli-mayor	no contest
+2004	2004-03-28:nigde-nigde-kiledere-mayor	no contest
+2004	2004-03-28:nigde-nigde-konakli-mayor	no contest
+2004	2004-03-28:nigde-nigde-koyunlu-mayor	no contest
+2004	2004-03-28:nigde-nigde-orhanli-mayor	no contest
+2004	2004-03-28:nigde-nigde-ovacik-mayor	no contest
+2004	2004-03-28:nigde-nigde-sazlica-mayor	no contest
+2004	2004-03-28:nigde-nigde-yesilgolcuk-mayor	no contest
+2004	2004-03-28:nigde-nigde-yildiztepe-inli-mayor	no contest
+2004	2004-03-28:ordu-gurgentepe-direkli-mayor	Mustafa Aydın: 6 namesakes, new person
 2004	2004-03-28:ordu-mesudiye-mayor	Ahmet Coşkun: 2 namesakes, new person
 2004	2004-03-28:ordu-mesudiye-mayor	İsa Gül: 3 namesakes, new person
 2004	2004-03-28:ordu-mesudiye-mayor	Ahmet Özdemir: 3 namesakes, new person
+2004	2004-03-28:ordu-ordu-saraycik-mayor	no contest
 2004	2004-03-28:osmaniye-duzici-mayor	Ökkeş Namlı: 2 namesakes, new person
+2004	2004-03-28:osmaniye-osmaniye-cevdetiye-mayor	no contest
+2004	2004-03-28:osmaniye-osmaniye-kirmitli-mayor	no contest
 2004	2004-03-28:osmaniye-sumbas-mayor	Mustafa Nuri Nuhoğlu: 2 namesakes, new person
+2004	2004-03-28:osmaniye-toprakkale-turkmen-tuysuz-mayor	no contest
 2004	2004-03-28:rize-kalkandere-mayor	Yakup Yılmaz: 5 namesakes, new person
 2004	2004-03-28:rize-kalkandere-mayor	İbrahim Yıldız: 3 namesakes, new person
+2004	2004-03-28:rize-rize-caykent-mayor	no contest
+2004	2004-03-28:rize-rize-gundogdu-mayor	no contest
+2004	2004-03-28:rize-rize-kendirli-mayor	no contest
+2004	2004-03-28:rize-rize-muradiye-mayor	no contest
 2004	2004-03-28:sakarya-ferizli-mayor	Ali Genç: 2 namesakes, new person
 2004	2004-03-28:sakarya-ferizli-mayor	Mehmet Çolak: 2 namesakes, new person
 2004	2004-03-28:sakarya-karapurcek-mayor	Orhan Yıldırım: 4 namesakes, new person
 2004	2004-03-28:sakarya-pamukova-mayor	Cevat Keser: 3 namesakes, new person
+2004	2004-03-28:sakarya-sakarya-adapazari-merkez-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-arifiye-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-bekirpasa-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-caybasiyenikoy-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-erenler-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-gunesler-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-hanli-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-kazimpasa-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-nehirkent-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-serdivan-mayor	no contest
+2004	2004-03-28:sakarya-sakarya-yazlik-mayor	no contest
 2004	2004-03-28:sakarya-sogutlu-mayor	Mehmet Keskin: 3 namesakes, new person
 2004	2004-03-28:sakarya-tarakli-mayor	Hüseyin Doğan: 3 namesakes, new person
 2004	2004-03-28:samsun-19-mayis-mayor	Osman Topaloğlu: 2 namesakes, new person
 2004	2004-03-28:samsun-alacam-mayor	İlyas Acar: 2 namesakes, new person
 2004	2004-03-28:samsun-kavak-mayor	Şerif Ün: 3 namesakes, new person
+2004	2004-03-28:samsun-ondokuzmayis-derekoy-mayor	no contest
+2004	2004-03-28:samsun-ondokuzmayis-yorukler-mayor	no contest
+2004	2004-03-28:samsun-samsun-altinkum-mayor	no contest
+2004	2004-03-28:samsun-samsun-atakent-mayor	no contest
+2004	2004-03-28:samsun-samsun-atakum-mayor	no contest
+2004	2004-03-28:samsun-samsun-canik-mayor	no contest
+2004	2004-03-28:samsun-samsun-catalcam-mayor	no contest
+2004	2004-03-28:samsun-samsun-gazi-mayor	no contest
+2004	2004-03-28:samsun-samsun-ilkadim-mayor	no contest
+2004	2004-03-28:samsun-samsun-kurupelit-mayor	no contest
+2004	2004-03-28:samsun-samsun-taflan-mayor	no contest
+2004	2004-03-28:samsun-samsun-yesilkent-mayor	no contest
 2004	2004-03-28:samsun-tekkekoy-mayor	Hasan Togar: 2 namesakes, new person
 2004	2004-03-28:samsun-terme-mayor	Vedat Öztürk: 2 namesakes, new person
 2004	2004-03-28:samsun-vezirkopru-mayor	İbrahim Sadık Edis: 2 namesakes, new person
@@ -268,28 +1861,85 @@ year	province	reason
 2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
 2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
 2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
+2004	2004-03-28:sanliurfa-sanliurfa-karakopru-mayor	no contest
+2004	2004-03-28:sanliurfa-sanliurfa-kisas-mayor	no contest
+2004	2004-03-28:sanliurfa-sanliurfa-konuklu-mayor	no contest
+2004	2004-03-28:sanliurfa-sanliurfa-ugurlu-mayor	no contest
 2004	2004-03-28:sanliurfa-viransehir-mayor	Lütfi Aydın: 2 namesakes, new person
+2004	2004-03-28:siirt-siirt-gokcebag-mayor	no contest
 2004	2004-03-28:sinop-boyabat-mayor	Hasan Kara: 2 namesakes, new person
 2004	2004-03-28:sinop-duragan-mayor	Ömer Yılmaz: 2 namesakes, new person
 2004	2004-03-28:sinop-mayor	Baki Ergül: 2 namesakes, new person
 2004	2004-03-28:sinop-turkeli-mayor	Halil Dilek Özcan: 3 namesakes, new person
+2004	2004-03-28:sirnak-sirnak-balveren-mayor	no contest
+2004	2004-03-28:sirnak-sirnak-kasrik-mayor	no contest
+2004	2004-03-28:sirnak-sirnak-kumcati-mayor	no contest
+2004	2004-03-28:sivas-sivas-gumusdere-mayor	no contest
+2004	2004-03-28:sivas-sivas-kurtlapa-mayor	no contest
+2004	2004-03-28:sivas-sivas-yakupoglan-mayor	no contest
+2004	2004-03-28:sivas-sivas-yildiz-mayor	no contest
 2004	2004-03-28:sivas-susehri-mayor	Sedat Sel: 2 namesakes, new person
 2004	2004-03-28:tekirdag-hayrabolu-mayor	Mehmet Çetin: 3 namesakes, new person
 2004	2004-03-28:tekirdag-mayor	Ali Koç: 2 namesakes, new person
 2004	2004-03-28:tekirdag-saray-mayor	Nazmi Çoban: 2 namesakes, new person
 2004	2004-03-28:tekirdag-sarkoy-mayor	Süleyman Altınok: 3 namesakes, new person
+2004	2004-03-28:tekirdag-tekirdag-banarli-mayor	no contest
+2004	2004-03-28:tekirdag-tekirdag-barbaros-mayor	no contest
+2004	2004-03-28:tekirdag-tekirdag-karacakilavuz-mayor	no contest
+2004	2004-03-28:tekirdag-tekirdag-kumbag-mayor	no contest
 2004	2004-03-28:tokat-erbaa-mayor	Mehmet Karaca: 2 namesakes, new person
 2004	2004-03-28:tokat-pazar-mayor	Mehmet Şahin: 3 namesakes, new person
+2004	2004-03-28:tokat-tokat-akbelen-mayor	no contest
+2004	2004-03-28:tokat-tokat-avlunlar-mayor	no contest
+2004	2004-03-28:tokat-tokat-buyukyildiz-mayor	no contest
+2004	2004-03-28:tokat-tokat-camlibel-mayor	no contest
+2004	2004-03-28:tokat-tokat-cat-mayor	no contest
+2004	2004-03-28:tokat-tokat-emirseyit-mayor	no contest
+2004	2004-03-28:tokat-tokat-guryildiz-mayor	no contest
+2004	2004-03-28:tokat-tokat-kemalpasa-mayor	no contest
+2004	2004-03-28:tokat-tokat-yagmurlu-mayor	no contest
 2004	2004-03-28:tokat-turhal-mayor	Mehmet Bayram: 3 namesakes, new person
 2004	2004-03-28:trabzon-besikduzu-mayor	Yusuf Öztürk: 3 namesakes, new person
 2004	2004-03-28:trabzon-salpazari-mayor	Hüseyin Karadağ: 2 namesakes, new person
 2004	2004-03-28:trabzon-salpazari-mayor	Mehmet Öztürk: 16 namesakes, new person
+2004	2004-03-28:trabzon-trabzon-akoluk-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-akyazi-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-caglayan-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-cukurcayir-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-gurbulak-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-pelitli-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-yalincak-mayor	no contest
+2004	2004-03-28:trabzon-trabzon-yesilova-mayor	no contest
 2004	2004-03-28:tunceli-hozat-mayor	Mehmet Yıldız: 7 namesakes, new person
 2004	2004-03-28:tunceli-pulumur-mayor	Halil Kılıç: 2 namesakes, new person
 2004	2004-03-28:usak-karahalli-mayor	Hasan Çoban: 2 namesakes, new person
+2004	2004-03-28:usak-usak-bolme-mayor	no contest
+2004	2004-03-28:usak-usak-gure-mayor	no contest
+2004	2004-03-28:usak-usak-ilyasli-mayor	no contest
 2004	2004-03-28:van-bahcesaray-mayor	Hüseyin Kılıç: 2 namesakes, new person
+2004	2004-03-28:van-van-bostanici-mayor	no contest
+2004	2004-03-28:van-van-ercek-mayor	no contest
 2004	2004-03-28:yalova-armutlu-mayor	Ali Demir: 2 namesakes, new person
+2004	2004-03-28:yalova-yalova-kadikoy-mayor	no contest
 2004	2004-03-28:yozgat-candir-mayor	Mustafa Ertanörgün: 2 namesakes, new person
 2004	2004-03-28:yozgat-sarikaya-mayor	Ömer Yıldız: 2 namesakes, new person
 2004	2004-03-28:yozgat-yenifakili-mayor	Selahattin Arslan: 2 namesakes, new person
+2004	2004-03-28:yozgat-yozgat-cadirardic-mayor	no contest
+2004	2004-03-28:yozgat-yozgat-esenli-mayor	no contest
+2004	2004-03-28:yozgat-yozgat-osmanpasa-mayor	no contest
 2004	2004-03-28:zonguldak-alapli-mayor	Mehmet Ateş: 2 namesakes, new person
+2004	2004-03-28:zonguldak-karadeniz-eregli-gokceler-mayor	no contest
+2004	2004-03-28:zonguldak-karadeniz-eregli-guluc-mayor	no contest
+2004	2004-03-28:zonguldak-karadeniz-eregli-gunesli-mayor	no contest
+2004	2004-03-28:zonguldak-karadeniz-eregli-kandilli-mayor	no contest
+2004	2004-03-28:zonguldak-karadeniz-eregli-ogberler-mayor	no contest
+2004	2004-03-28:zonguldak-karadeniz-eregli-ormanli-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-beycuma-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-catalagzi-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-elvanpazarcik-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-gelik-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-karaman-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-kilimli-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-kozlu-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-muslu-mayor	no contest
+2004	2004-03-28:zonguldak-zonguldak-sivriler-mayor	no contest
