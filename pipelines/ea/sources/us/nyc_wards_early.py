@@ -1,19 +1,30 @@
 import json
 import re
-from datetime import timedelta
+from datetime import date, timedelta
 from pathlib import Path
+from uuid import uuid4
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import nyc_early_mayors as mayors
+from ea.sources.us import nyc_wards_shapes as shapes
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_wards_early"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = (1859, 1861, 1870)
+JOHNSON = "http://bklyn-genealogy-info.stevemorse.org/Ward/1864.Man.html"
+SHAPES_TITLE = "Manhattan ward boundaries 1859-1870, rebuilt from the ward ordinances"
+SHAPES_NOTE = (
+    "Approximate outlines of Manhattan's 22 wards, rebuilt by tracing the street lines in the ward descriptions of "
+    "Johnson's 1864 Manhattan ward list (transcribed on Steve Morse's Brooklyn genealogy site, credit to the "
+    "transcriber Sullivan) over OpenStreetMap street centerlines (ODbL) and today's shoreline. Approximations: modern "
+    "shoreline and landfill, Cottage Place replaced by Sixth Avenue, chords across gaps in the street data, and Central "
+    "Park split as the Johnson note describes. The Hayward 1851 map (Princeton) shows only 20 wards and serves as a check."
+)
 TITLE = "New York City mayoral election articles, ward tables"
 NOTE = (
     "Ward tables from the English Wikipedia's articles on the 1859, 1861, and 1870 New York City mayoral elections. "
@@ -23,7 +34,7 @@ NOTE = (
 METHOD = (
     "Votes by ward from the ward table in the English Wikipedia's article on the {year} New York City mayoral election. "
     "Each ward's candidate votes add up to its printed total, and each candidate's ward votes add up to the citywide "
-    "total in the default set. Wards have no shapes yet; the city was Manhattan's 22 wards."
+    "total in the default set. The city was Manhattan's 22 wards; their shapes are approximate (see the shape source)."
 )
 
 
@@ -81,6 +92,8 @@ def parse() -> None:
 def fetch() -> None:
     for year in YEARS:
         raw.fetch(SOURCE, mayors.page(year), suffix=".json")
+    raw.fetch(SOURCE, shapes.OVERPASS, suffix=".json")
+    raw.fetch(SOURCE, JOHNSON, suffix=".html")
 
 
 def emit() -> Path:
@@ -108,10 +121,60 @@ def emit() -> Path:
             "select o.polity_id from office o join external_id x on x.entity_id = o.id "
             "where x.scheme = 'us.office' and x.value = 'NY:3651000:mayor'"
         ).fetchall()
+        outline = cs.source("Johnson; OpenStreetMap contributors", SHAPES_TITLE)
+        cs.add(
+            "source",
+            id=outline,
+            kind="academic",
+            publisher="Johnson; OpenStreetMap contributors",
+            title=SHAPES_TITLE,
+            url=JOHNSON,
+            license="ODbL 1.0 (street lines)",
+            notes=SHAPES_NOTE,
+        )
+        cs.artifact(raw.cached(SOURCE, shapes.OVERPASS), outline)
+        cs.artifact(raw.cached(SOURCE, JOHNSON), outline)
         if conn.execute("select 1 from scheme where code = 'us.nyc_ward'").fetchone() is None:
             cs.add("scheme", code="us.nyc_ward", polity_id=polity, kind="precinct", rank=1, noun="ward")
         added: set[object] = set()
         county = cs.unit("us.county", "36061")
+        county_area = cs.area("us.county", "36061")
+        built = shapes.build(raw.cached(SOURCE, shapes.OVERPASS).path.read_bytes(), conn)
+        geoms = {
+            ward: (geom, point)
+            for ward, geom, point in conn.execute(
+                """select f.ward, encode(st_asewkb(st_multi(st_collectionextract(st_makevalid(
+                        st_setsrid(st_geomfromgeojson(f.geojson), 4326)), 3))), 'hex'),
+                      encode(st_asewkb(st_pointonsurface(st_makevalid(st_setsrid(st_geomfromgeojson(f.geojson), 4326)))), 'hex')
+                   from unnest(%s::int[], %s::text[]) as f(ward, geojson)""",
+                [list(built), list(built.values())],
+            ).fetchall()
+        }
+        cs.add(
+            "boundary_set",
+            id=(conn.execute("select id from boundary_set where scheme_code = 'us.nyc_ward'").fetchone() or (uuid4(),))[0],
+            scheme_code="us.nyc_ward",
+            vintage="1859",
+            valid_from=date(1859, 1, 1),
+            valid_to=date(1871, 1, 1),
+            as_of=date(1859, 1, 1),
+        )
+        areas = {ward: cs.area("us.nyc_ward", f"36061:{ward:02d}") for ward in range(1, 23)}
+        for ward, area in areas.items():
+            cs.add("area", id=area, scheme_code="us.nyc_ward")
+            cs.add("area_code", area_id=area, code=f"36061:{ward:02d}", valid_from=date(1859, 1, 1), valid_to=date(1871, 1, 1))
+            cs.add("name", entity_id=area, text=f"Ward {ward}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=date(1859, 1, 1),
+                valid_to=date(1871, 1, 1),
+                geom=geoms[ward][0],
+                label_point=geoms[ward][1],
+                quality="academic",
+                source_id=outline,
+            )
+            cs.add("area_parent", area_id=area, parent_id=county_area, valid_from=date(1859, 1, 1), valid_to=date(1871, 1, 1))
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, mayors.page(year)), source)
             day = mayors.EARLY[year][0]
@@ -135,7 +198,7 @@ def emit() -> Path:
             for ward, candidate, votes in frame.filter(pl.col("year") == year).select("ward", "candidate", "votes").iter_rows():
                 code = f"36061:{ward:02d}"
                 unit = cs.unit("us.nyc_ward", code, day)
-                if unit in cs.minted and unit not in added:
+                if unit not in added:
                     added.add(unit)
                     cs.add(
                         "reporting_unit",
@@ -144,8 +207,8 @@ def emit() -> Path:
                         scheme_code="us.nyc_ward",
                         code=code,
                         parent_id=county,
-                        area_relation="unlocated",
-                        area_id=None,
+                        area_relation="equals",
+                        area_id=areas[ward],
                         kind="standard",
                         valid_from=day,
                         valid_to=day + timedelta(days=1),

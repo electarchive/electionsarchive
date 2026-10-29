@@ -176,13 +176,16 @@ def build(osm: bytes, conn: Connection) -> dict[int, str]:
     north = to_m(-73.99, 40.745)[1]
     south_of_14 = to_m(-73.99, 40.7360)[1]
     ways: dict[str, list[LineString]] = {}
+    near: dict[str, list[LineString]] = {}
     for element in json.loads(osm)["elements"]:
         points = [to_m(node["lon"], node["lat"]) for node in element["geometry"]]
         if len(points) > 1:
             line = LineString(points)
-            if zone.intersects(line) and line.bounds[3] < north and line.length < 3000:
+            if zone.intersects(line) and line.length < 3000:
                 ways.setdefault(element["tags"]["name"], []).append(line)
-    streets = {key: Street([line for name in names for line in ways[name]]) for key, names in STREETS.items()}
+                if line.bounds[3] < north:
+                    near.setdefault(element["tags"]["name"], []).append(line)
+    streets = {key: Street([line for name in names for line in near[name]]) for key, names in STREETS.items()}
     for key, names in FITS.items():
         points = np.array([point for name in names for line in ways[name] for point in line.coords])
         center = points.mean(axis=0)
