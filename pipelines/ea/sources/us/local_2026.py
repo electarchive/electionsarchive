@@ -1800,6 +1800,12 @@ for fips in sorted({line.split("\t")[0] for line in Path(__file__).with_name("lo
         f"https://vip.sos.nd.gov/candidatelist.aspx?eid=348#{fips}",
         "nd/candidates.html",
     )
+NE_SOURCES["AL-01115"] = (
+    "Alabama Secretary of State",
+    "2026 General Election Sample Ballot, St. Clair County, November 3, 2026",
+    "https://www.sos.alabama.gov/sites/default/files/sample-ballots/2026/gen/StClair-Sample.pdf",
+    "al/stclair.pdf",
+)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
@@ -4508,7 +4514,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN')"""
         ).fetchall():
             label = {"Rowan County Sch": "Rowan-Salisbury Schools"}.get(label, label)
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
@@ -4537,7 +4543,7 @@ def parse() -> None:
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
             gazetteer.filter(
-                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA"]) & (pl.col("FUNCSTAT") == "A")
+                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN"]) & (pl.col("FUNCSTAT") == "A")
             )
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
@@ -4546,11 +4552,11 @@ def parse() -> None:
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
         claimed = {
             path
-            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la)/[^/]+$'")
+            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in)/[^/]+$'")
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -4598,14 +4604,14 @@ def parse() -> None:
             used: dict[str, str] = {}
             missed: set[str] = set()
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
-            if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA", "RI", "NC"):
+            if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA", "RI", "NC", "IN"):
                 for county_code, label, owner, path, kind in [
                     *conn.execute(
                         """select distinct on (g.id) g.county, g.name, x.value, s.path, g.kind from coverage_government g
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -4722,7 +4728,7 @@ def parse() -> None:
                 fits = []
                 for stem, sort, label, owner, path in (
                     [town for pool in towns.values() for town in pool]
-                    if state == "OR"
+                    if state in ("OR", "IN")
                     else [
                         (variant, *rest)
                         for full, *rest in towns.get(str(row["fips"]), [])
@@ -4760,7 +4766,7 @@ def parse() -> None:
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
-                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -4782,7 +4788,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC")
