@@ -11,7 +11,7 @@ from ea.sources.tr.ysk import FORMER, INDEPENDENTS, PROVINCES, REGISTERED, RENAM
 from ea.store import connect
 
 SOURCE = "tr.thea"
-VERSION = "3"
+VERSION = "4"
 TURKEY = 792
 WORKBOOK = f"{thea.UPLOADS}/2025/10/clea_lc_20251015-L-Z.xlsx"
 DAYS = {
@@ -407,19 +407,23 @@ def emit() -> Path:
                 valid_to=end,
                 valid_to_precision=precision,
             )
-        lower = cs.key("tr.body", "millet-meclisi")
-        cs.add("body", id=lower, polity_id=turkey, kind="lower_house")
-        name(lower, "National Assembly", "en")
-        name(lower, "Millet Meclisi", kind="native")
+        name(assembly, "National Assembly", "en", start=DAYS[1961], end=COUP_1980)
+        name(assembly, "Millet Meclisi", kind="native", start=DAYS[1961], end=COUP_1980)
         cs.add(
             "body_size",
-            body_id=lower,
+            body_id=assembly,
             seats=450,
             valid_from=DAYS[1961],
             valid_from_precision="day",
             valid_to=COUP_1980,
             valid_to_precision="day",
         )
+        for (lower,) in conn.execute(
+            "select entity_id from external_id where scheme = 'tr.body' and value = 'millet-meclisi'"
+        ).fetchall():
+            cs.add(
+                "entity_retirement", entity_id=lower, reason="the Millet Meclisi is the TBMM's lower chamber, 1961–1980"
+            )
 
         systems: dict[str, UUID] = {}
         lists = {"order": "closed", "vacancy": "by_election"}
@@ -542,7 +546,7 @@ def emit() -> Path:
                 held = held.with_columns(
                     party=pl.when(pl.col("pty") == 47).then(pl.lit(COMBINED[year])).otherwise("party")
                 )
-            body, kind = (assembly, "body_seats") if year < 1961 else (lower, "list_allocation")
+            kind = "body_seats" if year < 1961 else "list_allocation"
             system = (
                 "parliament_1946"
                 if year < 1961
@@ -655,7 +659,7 @@ def emit() -> Path:
                     id=national,
                     election_id=election,
                     kind="list_allocation",
-                    body_id=body,
+                    body_id=assembly,
                     district_area_id=nation,
                     magnitude=SEATS[year],
                     round_number=1,
@@ -682,7 +686,7 @@ def emit() -> Path:
                     id=contest,
                     election_id=election,
                     kind=kind,
-                    body_id=body,
+                    body_id=assembly,
                     district_area_id=provinces[plate],
                     magnitude=int(province["seat"].sum()),
                     round_number=1,

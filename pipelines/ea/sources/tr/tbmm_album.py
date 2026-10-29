@@ -13,7 +13,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_album"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cdn.tbmm.gov.tr/TbmmWeb/Albumler/Tbmm_Albumu/Cilt2.pdf"
 TITLE = "TBMM Albümü 1920-2010, 2. Cilt (1950-1980)"
@@ -215,11 +215,9 @@ def emit() -> Path:
             ),
         )
         cs.artifact(raw.cached(SOURCE, URL), source)
-        body = conn.execute(
-            """select b.id from body b join name n on n.entity_id = b.id
-               where n.text = 'Millet Meclisi' and b.polity_id = (select id from polity where iso_code = 'TR')"""
-        ).fetchone()
-        assert body is not None
+        assembly = cs.key("tr.body", "tbmm")
+        if assembly in cs.minted:
+            raise ValueError("publish tr.ysk before tr.tbmm_album")
         parties = {
             fold(text): party
             for party, text in conn.execute(
@@ -239,8 +237,9 @@ def emit() -> Path:
                left join contest_option o on o.contest_id = c.id
                left join candidacy cy on cy.option_id = o.id
                left join name wn on wn.entity_id = cy.person_id and wn.is_preferred
-               where c.body_id = %s and e.kind in ('general', 'by_election')""",
-            [body[0]],
+               join body b on b.id = c.body_id and b.kind in ('unicameral', 'lower_house')
+               join polity p on p.id = b.polity_id and p.iso_code = 'TR'
+               where e.kind in ('general', 'by_election') and e.date_from between '1961-10-15' and '1980-09-11'""",
         ):
             if kind == "general":
                 contests[day, fold(area)] = contest
@@ -323,7 +322,7 @@ def emit() -> Path:
                 "tenure",
                 id=tenure,
                 person_id=person,
-                body_id=body[0],
+                body_id=assembly,
                 contest_id=contest,
                 from_date=OPENINGS[term] if entered is None else entered[0],
                 from_precision="unknown",

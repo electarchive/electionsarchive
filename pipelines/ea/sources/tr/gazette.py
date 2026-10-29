@@ -30,7 +30,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.gazette"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 OCR = PARSED / "ocr"
@@ -2089,7 +2089,7 @@ def emit() -> Path:
             cs.add("electoral_system", id=systems[code], polity_id=turkey, rules=rules, rules_version=1)
             name(systems[code], label, "en")
             cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
-        assembly = cs.key("tr.body", "millet-meclisi")
+        assembly = cs.key("tr.body", "tbmm")
         assembly_system = cs.key("tr.electoral_system", "parliament_1969")
         if {assembly, assembly_system} & cs.minted:
             raise ValueError("publish tr.thea before tr.gazette")

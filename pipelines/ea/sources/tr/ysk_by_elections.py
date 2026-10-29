@@ -12,7 +12,7 @@ from ea.sources.tr.ysk import DIGITIZED, INDEPENDENTS, REGISTERED, VALID, VOTERS
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_by_elections"
-VERSION = "2"
+VERSION = "3"
 PUBLISHER = "Yüksek Seçim Kurulu"
 ARCHIVE = "https://www.resmigazete.gov.tr/arsiv"
 WAYBACK = "https://web.archive.org/web/2023id_"
@@ -446,7 +446,7 @@ def emit() -> Path:
         cs.add("slug", path=f"tr/{HATAY_DAY}-by-election", entity_id=election)
         contest_key = f"{HATAY_DAY}:by-election:31"
         contest = cs.key("tr.contest", contest_key)
-        assembly = cs.key("tr.body", "millet-meclisi")
+        assembly = cs.key("tr.body", "tbmm")
         if assembly in cs.minted:
             raise ValueError("publish tr.thea before tr.ysk_by_elections")
         cs.add(

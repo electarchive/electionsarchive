@@ -256,6 +256,21 @@ export const bodySize = pgTable("body_size", {
 	primaryKey({ columns: [table.bodyId, table.valid], name: "body_size_pkey"}),
 ]);
 
+export const bodyChamber = pgTable("body_chamber", {
+	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
+	ofBodyId: uuid("of_body_id").notNull().references(() => body.id),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	sourceId: uuid("source_id").notNull().references(() => source.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.bodyId, table.valid], name: "body_chamber_pkey"}),
+]);
+
 export const bodySizePart = pgTable("body_size_part", {
 	bodyId: uuid("body_id").notNull().references(() => body.id, { onDelete: "cascade" } ),
 	category: seatCategory().notNull(),

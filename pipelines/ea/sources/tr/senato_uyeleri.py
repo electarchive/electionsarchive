@@ -11,7 +11,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.senato_uyeleri"
-VERSION = "4"
+VERSION = "5"
 SENATE = UUID("fa08c487-e2d8-5d2e-9fc0-7f3bce579c1f")
 MEMBERS = Path(__file__).with_name("senato_uyeleri.tsv")
 PUBLISHER = "Türkiye Büyük Millet Meclisi Vakfı"
@@ -321,6 +321,28 @@ def emit() -> Path:
             cs.add("body_size", body_id=SENATE, seats=seats, valid_from=start, valid_to=end)
         for category, seats in (("elected", ELECTED), ("appointed", APPOINTED)):
             cs.add("body_size_part", body_id=SENATE, category=category, seats=seats, valid_from=OPENED, valid_to=CLOSED)
+        constitution = cs.source("Resmî Gazete", "Law No. 334 (Resmî Gazete 10859, 20.07.1961)")
+        cs.add(
+            "source",
+            id=constitution,
+            kind="official_body",
+            publisher="Resmî Gazete",
+            title="Law No. 334 (Resmî Gazete 10859, 20.07.1961)",
+            url="https://www.resmigazete.gov.tr/arsiv/10859.pdf",
+            notes=(
+                'Türkiye Cumhuriyeti Anayasası, the 1961 Constitution. Article 63: "Türkiye Büyük Millet Meclisi, '
+                "Millet Meclisi ve Cumhuriyet Senatosundan kuruludur.\" Read from the Wayback Machine's copy "
+                "(https://web.archive.org/web/2020/https://www.resmigazete.gov.tr/arsiv/10859.pdf)."
+            ),
+        )
+        cs.add(
+            "body_chamber",
+            body_id=SENATE,
+            of_body_id=cs.key("tr.body", "tbmm"),
+            valid_from=OPENED,
+            valid_to=CLOSED,
+            source_id=constitution,
+        )
         cs.add(
             "body_event",
             id=uuid5(SENATE, "dissolved"),
