@@ -1572,6 +1572,16 @@ def build(full: bool = False) -> str:
                 g["period"], g["phase"] = common[0]
             else:
                 g["period"], g["phase"], g["basis"] = 2, 0, "unknown"
+        if (
+            calendar is not None
+            and calendar[0] == 2
+            and calendar[2]
+            and g["period"] == 1
+            and g["era"] is None
+            and g["basis"].startswith("own")
+        ):
+            g["period"], g["phase"] = calendar[:2]
+            g["basis"] = "state calendar, own history conflicted"
         if g["month"] is None and calendar is not None and len(calendar) == 4:
             g["month"] = calendar[3]
         elif g["month"] is None and months[group]:
