@@ -475,6 +475,46 @@ SC_COUNTIES = (
     "Greenwood Hampton Horry Jasper Kershaw Lancaster Laurens Lee Lexington Marion Marlboro McCormick Newberry Oconee "
     "Orangeburg Pickens Richland Saluda Spartanburg Sumter Union Williamsburg York"
 ).split()
+HI = "https://files.hawaii.gov/elections/files/results/{}/general/{}.pdf"
+HI_DAYS = {
+    2000: date(2000, 11, 7),
+    2002: date(2002, 11, 5),
+    2004: date(2004, 11, 2),
+    2006: date(2006, 11, 7),
+    2008: date(2008, 11, 4),
+    2010: date(2010, 11, 2),
+}
+HI_COUNTIES = {"coh": "Hawaii", "cch": "Honolulu", "cok": "Kauai", "com": "Maui"}
+HI_MEASURES = {
+    2000: {
+        "UH SELF": ("1", "Constitutional Amendment 1"),
+        "TAX REVIEW": ("2", "Constitutional Amendment 2"),
+        "STAGGERED": ("3", "Constitutional Amendment 3"),
+    },
+    2002: {
+        "RESIDENCY": ("1", "Constitutional Amendment 1"),
+        "NOT-FOR-PROFIT": ("2", "Constitutional Amendment 2"),
+        "FELONY": ("3", "Constitutional Amendment 3"),
+    },
+    2004: {
+        "Sexual Assault": ("1", "Constitutional Amendment 1"),
+        "Public Right": ("2", "Constitutional Amendment 2"),
+        "Rights of Accused": ("3", "Constitutional Amendment 3"),
+        "Felony": ("4", "Constitutional Amendment 4"),
+    },
+    2006: {
+        "Board of Regents": ("1", "Constitutional Amendment 1"),
+        "Salary": ("2", "Constitutional Amendment 2"),
+        "Justices": ("3", "Constitutional Amendment 3"),
+        "Sexual Assault": ("4", "Constitutional Amendment 4"),
+        "Agricultural": ("5", "Constitutional Amendment 5"),
+    },
+    2008: {
+        "Age Qualification": ("", "Constitutional Amendment"),
+        "Constitutional Convention": ("", "Constitutional Convention Question"),
+    },
+    2010: {"Board of": ("2376", "HB 2376"), "Tax Rebate": ("2807", "SB 2807")},
+}
 MT_BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
 SCANS = Path(__file__).resolve().parents[3] / "scans"
 BALLOT_LABELS = {("NE", date(2006, 11, 7), "422"): ("Retain", "Repeal")}
@@ -618,6 +658,11 @@ PUBLISHERS = {
         "South Carolina State Election Commission",
         "Report of the State Election Commission",
         "https://scvotes.gov/",
+    ),
+    "HI": (
+        "Hawaii Office of Elections",
+        "General election county summary reports",
+        "https://elections.hawaii.gov/election-results/",
     ),
     "TX": ("Texas Secretary of State", "Texas election history: returns by county, 1992–2019", TX),
     "CA": (
@@ -778,6 +823,10 @@ def fetch() -> None:
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
         time.sleep(1)
+    for year in HI_MEASURES:
+        for code in HI_COUNTIES:
+            raw.fetch(SOURCE, HI.format(year, code), suffix=".pdf")
+            time.sleep(1)
     for name in MT_FILES.values():
         try:
             raw.cached(SOURCE, MT + name)
@@ -1654,7 +1703,7 @@ def nevada() -> list[dict[str, object]]:
             text for cell in re.split(r"<[^>]+>", page) if (text := re.sub(r"\s+", " ", html.unescape(cell)).strip())
         ]
         number = None
-        found: dict[str, dict[str, list[int]]] = {}
+        found: dict[str, dict[str, tuple[list[int], str]]] = {}
         for at, token in enumerate(tokens):
             if heading := re.fullmatch(r"(?i)(?:state |ballot )?question(?: no\.)? ?(\d+)", token):
                 number = heading[1]
@@ -2521,6 +2570,97 @@ def north_dakota() -> list[dict[str, object]]:
     return rows
 
 
+def hawaii() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for year, measures in HI_MEASURES.items():
+        found: dict[str, dict[str, tuple[list[int], str]]] = {}
+        for code, county in HI_COUNTIES.items():
+            url = HI.format(year, code)
+            xml = subprocess.run(
+                ["pdftotext", "-bbox", str(raw.cached(SOURCE, url).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+            for page in xml.split("<page")[1:]:
+                words: list[tuple[float, float, float, float, str]] = []
+                for m in re.finditer(
+                    r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>', page
+                ):
+                    text = html.unescape(m[5])
+                    step = (float(m[3]) - float(m[1])) / len(text)
+                    for part in re.finditer(r"[^│├┤╞╡═─┼╪┬┴╤╧╔╗╚╝║╒╕╛╘╤]+", text):
+                        words.append(
+                            (
+                                float(m[1]) + step * part.start(),
+                                float(m[2]),
+                                float(m[1]) + step * part.end(),
+                                float(m[4]),
+                                part[0],
+                            )
+                        )
+                for at, (x, y, _, _, text) in enumerate(words):
+                    if (
+                        text.upper() not in ("AMEND:", "AMENDMENT:", "CON:")
+                        or at == 0
+                        or words[at - 1][4].upper() not in ("CON", "CONSTITUTIONAL")
+                    ):
+                        continue
+                    answers = {
+                        word[4]: word
+                        for word in sorted(words, key=lambda word: word[1], reverse=True)
+                        if word[4] in ("YES", "NO") and 0 <= word[1] - y <= 70 and abs(word[0] - x) <= 90
+                    }
+                    if len(answers) != 2:
+                        raise ValueError(f"HI {year} {county}: no answers under the header at {x}, {y}")
+                    answer_top = min(word[1] for word in answers.values())
+                    head = " ".join(
+                        word[4]
+                        for word in sorted(words, key=lambda word: (round(word[1]), word[0]))
+                        if x - 3 <= word[0] < x + 150 and y - 1 <= word[1] < answer_top
+                    )
+                    matched = [name for name in measures if name.lower() in head.lower()]
+                    if len(matched) != 1:
+                        raise ValueError(f"HI {year} {county}: cannot place {head!r}")
+                    votes: list[int] = []
+                    for answer in ("YES", "NO"):
+                        marker = answers[answer]
+                        numbers = sorted(
+                            (
+                                word
+                                for word in words
+                                if re.fullmatch(r"\d[\d,]*", word[4])
+                                and abs(word[1] - marker[1]) <= 6
+                                and marker[2] - 1 <= word[0] < marker[2] + 260
+                            ),
+                            key=lambda word: (word[0], abs(word[1] - marker[1])),
+                        )
+                        if not numbers:
+                            raise ValueError(f"HI {year} {county} {matched[0]}: no {answer} figure")
+                        votes.append(int(numbers[0][4].replace(",", "")))
+                    if county in found.setdefault(matched[0], {}):
+                        raise ValueError(f"HI {year} {county}: {matched[0]} appears twice")
+                    found[matched[0]][county] = (votes, url)
+        for name, (number, label) in measures.items():
+            if len(found.get(name, {})) != len(HI_COUNTIES):
+                raise ValueError(f"HI {year} {name}: counties {sorted(found.get(name, {}))}")
+            rows.extend(
+                {
+                    "state": "HI",
+                    "day": HI_DAYS[year],
+                    "number": number,
+                    "label": label,
+                    "url": url,
+                    "county": county,
+                    "answer": answer,
+                    "votes": votes[side],
+                }
+                for county, (votes, url) in found[name].items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def montana() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in MT_FILES.items():
@@ -2618,6 +2758,7 @@ def parse() -> None:
             *montana(),
             *north_dakota(),
             *south_carolina(),
+            *hawaii(),
         ],
         infer_schema_length=None,
     )
@@ -2683,7 +2824,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
