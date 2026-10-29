@@ -60,6 +60,20 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://gis.broomecountyny.gov/arcgis/rest/services/elections/br_elections/MapServer/3",
         "field": "LD",
     },
+    {
+        "publisher": "Prince George's County GIS",
+        "title": "Prince George's County Councilmanic Districts",
+        "pattern": r"^24:24033:(council|board-of-commissioners):district-",
+        "layer": "https://gis.princegeorgescountymd.gov/arcgis/rest/services/SCF_NEW/MapServer/4",
+        "field": "DISTRICTID",
+    },
+    {
+        "publisher": "Wicomico County GIS",
+        "title": "Wicomico County Councilmanic Districts",
+        "pattern": r"^24:24045:(council|board-of-commissioners):district-",
+        "layer": "https://gisapps.wicomicocounty.org/server/rest/services/Councilmanic2017a/MapServer/0",
+        "field": "DistrictNo",
+    },
 ]
 
 
