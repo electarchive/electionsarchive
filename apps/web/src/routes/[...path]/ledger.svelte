@@ -175,7 +175,7 @@
           : m.ledger_lede({ nouns, group: noun })}
       {#if echoes > 0}
         {m.ledger_single({
-          count: count(echoes),
+          count: echoes,
           groups: echoes === 1 ? noun : plural(noun),
         })}
       {/if}

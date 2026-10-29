@@ -447,7 +447,21 @@
   "ledger_lede_mapped": "We don't have boundaries for these {nouns}, so each one is listed under the {group} it's in. Point at a {group} to find it on the map.",
   "ledger_lede": "We don't have boundaries for these {nouns}, so each one is listed under the {group} it's in.",
   "ledger_lede_flat": "We don't have boundaries for these {nouns}, so they're listed here instead of on the map.",
-  "ledger_single": "{count} {groups} have no results beyond those already shown above, so they aren't listed here.",
+  "ledger_single": [
+    {
+      "declarations": [
+        "input count",
+        "input groups",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} {groups} has no results beyond those already shown above, so it isn't listed here.",
+        "countPlural=*": "{countText} {groups} have no results beyond those already shown above, so they aren't listed here."
+      }
+    }
+  ],
   "ledger_open": "Open {name}",
   "ledger_unplaced": "In {place}, {group} unknown",
   "places_leads": "{label} leads in {count}",

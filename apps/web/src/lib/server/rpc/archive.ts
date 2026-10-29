@@ -2961,7 +2961,7 @@ async function places(
       select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active'
     ),
     short as materialized (
-      select ${isRoot && contest.place?.k === area.k ? sql`true` : sql`false`} and (
+      select ${isRoot && contest.id === contest.root && contest.place?.k === area.k ? sql`true` : sql`false`} and (
         select sum(r.value) from sets cross join lateral (
           select r.value from result_rollup r
           where r.result_set_k = sets.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
