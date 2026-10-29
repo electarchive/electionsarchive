@@ -2108,7 +2108,7 @@ def parse() -> None:
         )
 
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["MD"][0]).path.read_text(encoding="utf-8-sig"))):
-        if row["Candidate Status"] != "Active":
+        if row["Candidate Status"] != "Active" or "Write-In" in row["Filing Type and Date"]:
             continue
         where = row["Contest Run By District Name and Number"]
         county = where if "District" not in where else row["Candidate Residential Jurisdiction"]
@@ -2548,7 +2548,13 @@ def parse() -> None:
                 else f"{county} County {race}"
             )
             preference = row["Party Preference"].strip().upper()
-            named, independent = party({"GOP": "Republican", "DEMOCRAT": "Democratic"}.get(preference, preference))
+            named, independent = party(
+                "Democratic"
+                if "DEMOCRAT" in preference
+                else "Republican"
+                if preference == "GOP" or "REPUBLICAN" in preference
+                else preference
+            )
             feeds["WA"].append(
                 {
                     "county": county,
@@ -2557,7 +2563,7 @@ def parse() -> None:
                     "name": row["Name"],
                     "party": named,
                     "independent": independent
-                    or preference in ("INDEPENDENT", "INDEPENDANT", "IND", "STATES NO PARTY PREFERENCE"),
+                    or preference in ("", "INDEPENDENT", "INDEPENDANT", "IND", "STATES NO PARTY PREFERENCE"),
                     "unexpired": row["Term Type"] == "Unexpired",
                 }
             )
