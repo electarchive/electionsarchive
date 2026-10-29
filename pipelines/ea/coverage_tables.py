@@ -83,6 +83,14 @@ JUDICIAL = {
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
+DISTRICT_CALENDAR = {
+    ("TX", "Cypress-Fairbanks Independent School District"): (
+        2,
+        1,
+        11,
+        "Cypress-Fairbanks ISD board elections page: next trustee election November 2, 2027, https://www.cfisd.net/our-district/board-of-trustees/board-elections",
+    ),
+}
 CALENDAR: dict[tuple[str, str], tuple[int, int, str | None] | tuple[int, int, str | None, int]] = {
     ("AK", "county"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
     ("AK", "municipality"): (1, 0, "Alaska Stat. § 29.26.040, https://ak.elaws.us/as/29.26.040"),
@@ -1591,6 +1599,10 @@ def build(full: bool = False) -> str:
             g["era"] = (SWITCHED[group][0] - 1, SWITCHED[group][0], (g["period"], g["phase"]))
             g["period"], g["phase"] = SWITCHED[group][1]
             g["basis"] = "state calendar, changed"
+        if (g["state"], g["name"]) in DISTRICT_CALENDAR:
+            g["period"], g["phase"], g["month"], _ = DISTRICT_CALENDAR[(g["state"], g["name"])]
+            g["era"] = None
+            g["basis"] = "district calendar"
         g["month"] = HELD_IN.get(group, g["month"])
         years = held.get(g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
