@@ -74,6 +74,27 @@ LAYERS: list[dict[str, str]] = [
         "layer": "https://gisapps.wicomicocounty.org/server/rest/services/Councilmanic2017a/MapServer/0",
         "field": "DistrictNo",
     },
+    {
+        "publisher": "Harford County GIS",
+        "title": "Harford County Councilmanic Districts",
+        "pattern": r"^24:24025:(council|board-of-commissioners|board-of-education):district-",
+        "layer": "https://hcggis.harfordcountymd.gov/eg/rest/services/EnerGovWM/MapServer/42",
+        "field": "DISTRICT",
+    },
+    {
+        "publisher": "Greenville County GIS",
+        "title": "Greenville County Council Districts",
+        "pattern": r"^45:45045:board-of-commissioners:district-",
+        "layer": "https://www.gcgis.org/arcgis3/rest/services/GCGIA/Greenville_Base/MapServer/48",
+        "field": "DISTRICT",
+    },
+    {
+        "publisher": "Winnebago County GIS",
+        "title": "Winnebago County Board Districts",
+        "pattern": r"^17:17201:(board-of-commissioners|county-board):district-",
+        "layer": "https://maps.wingis.org/public/rest/services/WardsAndDistricts/MapServer/4",
+        "field": "DIST_ID",
+    },
 ]
 
 
