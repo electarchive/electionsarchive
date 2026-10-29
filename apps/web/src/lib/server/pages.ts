@@ -5,7 +5,7 @@ import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
-import { latest, representative } from "#lib/server/rpc/archive.js";
+import { latest, representative, separate } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import land from "#lib/server/world.txt?raw";
 
@@ -664,6 +664,29 @@ export async function chamber(path: string) {
       isPartial: partial[index] ?? false,
     };
   });
+  const recent = new Map<string, number>();
+  for (const term of terms) {
+    for (const [index, parties] of [
+      term.parties,
+      ...term.steps.map((step) => step.parties),
+    ].entries()) {
+      for (const entry of parties) {
+        for (const part of entry.party?.split(">") ?? []) {
+          if (index === 0 || !recent.has(part)) {
+            recent.set(part, entry.seats);
+          }
+        }
+      }
+    }
+  }
+  const relit = new Map(
+    groups.flatMap((group) =>
+      group.flatMap((party) =>
+        party.color == null ? [] : [[party.id, party.color] as const],
+      ),
+    ),
+  );
+  separate(relit, [...recent]);
   const last = terms.at(-1);
   const [members, marks] = await Promise.all([
     last == null ? null : call(router.bodies.members, { id, from: last.start }),
@@ -724,11 +747,14 @@ export async function chamber(path: string) {
         ].map((entry) => entry.party),
       ),
       groups.flatMap((group) =>
-        group.map((party) =>
-          new Set(group.map((entry) => entry.short)).size > 1
-            ? { ...party, short: null }
-            : party,
-        ),
+        group.map((party) => ({
+          ...party,
+          color: relit.get(kin.get(party.id) ?? party.id) ?? party.color,
+          short:
+            new Set(group.map((entry) => entry.short)).size > 1
+              ? null
+              : party.short,
+        })),
       ),
     ),
     members,

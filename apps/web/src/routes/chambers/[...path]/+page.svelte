@@ -89,7 +89,10 @@
         member.party,
         ...member.segments.map((segment) => segment.party),
       ]),
-      members.data?.parties ?? [],
+      (members.data?.parties ?? []).map((party) => ({
+        ...party,
+        color: info.get(party.id)?.color ?? party.color,
+      })),
     ),
   );
   const range = $derived({

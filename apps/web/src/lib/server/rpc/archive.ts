@@ -1147,7 +1147,7 @@ const VARIANTS = [
   [0.2, -0.45],
 ] as const;
 
-function separate(
+export function separate(
   colors: Map<string, string>,
   votes: Array<readonly [string | null, number]>,
   branch: Map<string, string> = new Map(),
