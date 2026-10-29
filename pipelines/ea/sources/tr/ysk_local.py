@@ -29,7 +29,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -1108,6 +1108,7 @@ MINTED = {
     "yeni-turkiye-partisi-2024": ("Yeni Türkiye Partisi", "YTP"),
 }
 ANAGRAMS = {"".join(sorted(label.replace(" ", ""))): label for label in LABELS if " " in label}
+BALLOT_BOX = {2014, 2019}
 OFFICES = {
     "il_genel": ("provincial-councils", "Provincial councils", "İl Genel Meclisi Üyeliği"),
     "belediye_baskani": ("mayors", "Mayors", "Belediye Başkanlığı"),
@@ -1482,6 +1483,7 @@ def emit() -> Path:
                 cs.add("slug", path=f"tr/{day}-local/{code}", entity_id=contest)
                 cs.add("note", entity_id=contest, kind="methodology", body_md=AGGREGATE)
                 declared = cs.key(f"{SOURCE}.result_set", contest_key)
+                superseded = year in BALLOT_BOX and office in ("belediye_meclisi", "il_genel")
                 cs.add(
                     "result_set",
                     id=declared,
@@ -1489,9 +1491,9 @@ def emit() -> Path:
                     contest_id=contest,
                     stage="official",
                     kind="counted",
-                    status="active",
+                    status="withdrawn" if superseded else "active",
                     source_id=sources[year],
-                    is_default=True,
+                    is_default=not superseded,
                     completeness=0.95 if (year, office) == (1999, "belediye_meclisi") else 1,
                 )
                 for caveat, applies in (
@@ -1736,9 +1738,9 @@ def emit() -> Path:
                     contest_id=contest,
                     stage="official",
                     kind="counted",
-                    status="active",
+                    status="withdrawn" if year in BALLOT_BOX else "active",
                     source_id=sources[year],
-                    is_default=True,
+                    is_default=year not in BALLOT_BOX,
                     completeness=0 if rows.is_empty() else 1,
                 )
                 if rows.is_empty():
@@ -1908,9 +1910,9 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="counted",
-                status="annulled" if annulled else "active",
+                status="withdrawn" if year in BALLOT_BOX else "annulled" if annulled else "active",
                 source_id=sources[year],
-                is_default=True,
+                is_default=year not in BALLOT_BOX,
                 completeness=0,
             )
             if year == 2014:

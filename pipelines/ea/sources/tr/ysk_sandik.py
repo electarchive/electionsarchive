@@ -50,7 +50,8 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
-VERSION = "16"
+BALLOT_BOX_DAYS = {"2014-03-30", "2019-03-31"}
+VERSION = "17"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://sonuc.ysk.gov.tr"
 PUBLISHER = "Yüksek Seçim Kurulu (YSK)"
@@ -701,6 +702,8 @@ def emit() -> Path:
             for contest_key in local["contest"].unique()
         } | {contest_key: election for election, contest_key in CONTESTS.values()}
         result_sets: dict[str, str] = {}
+        declared_values: list[tuple[str, str, str | None, int, int, int]] = []
+        local_contests = set(local["contest"].unique())
         for contest_key, counted in valid.group_by("contest").agg(pl.col("votes").sum()).sort("contest").iter_rows():
             election_key = elections.get(contest_key) or next(
                 election for election, prefix in CONTESTS.values() if contest_key.startswith(prefix)
@@ -711,37 +714,81 @@ def emit() -> Path:
                 str(MARCH): ysk_local.ANNULLED[2019] | {"istanbul"},
                 str(ysk_local.DAYS[2024]): ysk_local.ANNULLED[2024],
             }.get(contest_key[:10], set())
+            ballot_box = contest_key[:10] in BALLOT_BOX_DAYS and contest_key in local_contests
+            declared = cs.key(f"{ysk_local.SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
                 id=result_set,
                 election_id=cs.key("tr.election", election_key),
                 contest_id=cs.key("tr.contest", contest_key),
-                stage="alternative",
+                stage="official" if ballot_box else "alternative",
                 kind="counted",
                 status="annulled" if annulled else "active",
                 source_id=source,
-                is_default=False,
+                is_default=ballot_box,
+                supersedes_id=declared if ballot_box else None,
                 completeness=None if denominator is None else round(counted / denominator, 4),
             )
-            if result_set in cs.minted or contest_key == f"{RERUN}:istanbul-mayor" or (
-                contest_key in unattributed["contest"]
-                and contest_key.startswith(str(DAY_2011))
-                and not conn.execute(
-                    "select from note where entity_id = %s and kind = 'caveat'", [result_set]
-                ).fetchone()
+            if (
+                result_set in cs.minted
+                or ballot_box
+                or contest_key == f"{RERUN}:istanbul-mayor"
+                or (
+                    contest_key in unattributed["contest"]
+                    and contest_key.startswith(str(DAY_2011))
+                    and not conn.execute(
+                        "select from note where entity_id = %s and kind = 'caveat'", [result_set]
+                    ).fetchone()
+                )
             ):
                 result_sets[contest_key] = str(result_set)
+                held = {
+                    (kind, body)
+                    for kind, body in conn.execute(
+                        "select kind, body_md from note where entity_id = %s", [result_set]
+                    ).fetchall()
+                }
+                notes = []
                 if contest_key in unattributed["contest"]:
                     gap = unattributed.filter(pl.col("contest") == contest_key)["votes"].sum()
-                    cs.add(
-                        "note",
-                        entity_id=result_set,
-                        kind="caveat",
-                        body_md=(
+                    notes.append(
+                        (
+                            "caveat",
                             f"The neighborhood results give this contest {gap:,} valid votes that no candidate holds. "
-                            "They are counted in valid votes here but not given to any option."
-                        ),
+                            "They are counted in valid votes here but not given to any option.",
+                        )
                     )
+                if ballot_box:
+                    notes += [
+                        (kind, body)
+                        for kind, body in conn.execute(
+                            "select kind, body_md from note where entity_id = %s", [declared]
+                        ).fetchall()
+                    ]
+                    for option, kind, seats, outcome_notes, candidacy in conn.execute(
+                        "select option_id, kind, seats, notes, candidacy_id from outcome where result_set_id = %s",
+                        [declared],
+                    ).fetchall():
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind=kind,
+                            seats=seats,
+                            notes=outcome_notes,
+                            candidacy_id=candidacy,
+                        )
+                    for unit, option, measure, flags, value in conn.execute(
+                        """select u.id, o.id, v.measure, v.flags, v.value
+                           from result_set r join result_value v on v.result_set_k = r.k
+                           join reporting_unit u on u.k = v.unit_k left join contest_option o on o.k = v.option_k
+                           where r.id = %s and v.measure not in (%s, %s) and u.scheme_code = 'tr.nation'""",
+                        [declared, VOTES, VALID],
+                    ).fetchall():
+                        declared_values.append((contest_key, str(unit), option and str(option), measure, flags, value))
+                for kind, body in notes:
+                    if (kind, body) not in held:
+                        cs.add("note", entity_id=result_set, kind=kind, body_md=body)
         values = pl.concat(
             [
                 votes.select(
@@ -756,6 +803,24 @@ def emit() -> Path:
                 ),
             ]
         ).filter(pl.col("contest").is_in(list(result_sets)))
+        values = pl.concat(
+            [
+                values,
+                pl.DataFrame(
+                    declared_values,
+                    schema={
+                        "contest": pl.String,
+                        "unit": pl.String,
+                        "option_id": pl.String,
+                        "measure": pl.Int16,
+                        "flags": pl.Int16,
+                        "value": pl.Int64,
+                    },
+                    orient="row",
+                ),
+            ],
+            how="diagonal_relaxed",
+        )
         cs.frame(
             "result_value",
             values.select(
@@ -765,7 +830,7 @@ def emit() -> Path:
                 channel=pl.lit(0, pl.Int16),
                 measure="measure",
                 count_round=pl.lit(0, pl.Int16),
-                flags=pl.lit(0, pl.Int16),
+                flags=pl.col("flags").fill_null(0),
                 value="value",
             ),
         )
