@@ -5,6 +5,7 @@
     ArrowLeftRightIcon,
     GaugeIcon,
     LayoutDashboardIcon,
+    LogInIcon,
     LogOutIcon,
     MonitorIcon,
     MoonIcon,
@@ -39,7 +40,7 @@
       >
         <Monogram size={26} />
         <span
-          class="text-lg font-[780] tracking-[-0.015em] whitespace-nowrap max-[24rem]:text-base"
+          class="text-lg font-[780] tracking-[-0.015em] whitespace-nowrap max-[24rem]:text-base max-[22.5rem]:sr-only"
           >{m.wordmark()}</span
         >
       </a>
@@ -55,22 +56,22 @@
       <Search />
       <a
         href={resolve("/compare")}
-        class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
+        class={cn(buttonVariants({ variant: "ghost" }), "max-md:px-2")}
         aria-current={page.url.pathname === "/compare" ? "page" : undefined}
       >
         <ArrowLeftRightIcon />
-        <span class="max-sm:sr-only">{m.versus_action()}</span>
+        <span class="max-md:sr-only">{m.versus_action()}</span>
       </a>
       <a
         href={resolve("/coverage")}
-        class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
+        class={cn(buttonVariants({ variant: "ghost" }), "max-md:px-2")}
         aria-current={page.url.pathname === "/coverage" ||
         page.url.pathname.startsWith("/coverage/")
           ? "page"
           : undefined}
       >
         <GaugeIcon />
-        <span class="max-sm:sr-only">{m.coverage_nav()}</span>
+        <span class="max-md:sr-only">{m.coverage_nav()}</span>
       </a>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger
@@ -116,9 +117,11 @@
           href="{resolve('/sign-in')}?next={encodeURIComponent(
             page.url.pathname,
           )}"
-          class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2.5")}
-          >{m.sign_in_submit()}</a
+          class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
         >
+          <LogInIcon class="sm:hidden" />
+          <span class="max-sm:sr-only">{m.sign_in_submit()}</span>
+        </a>
       {:else}
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
