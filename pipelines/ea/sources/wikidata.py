@@ -740,6 +740,7 @@ def emit() -> Path:
             ),
             polity=None,
         )
+        cs.manifest["scope"] = {"polity": None, "sweeps": ["party_founding"]}
         wikidata = cs.source("Wikidata", TITLE)
         with HAND_COLORS.open(encoding="utf-8") as handle:
             sourced_colors = {row["party"]: row for row in csv.DictReader(handle, delimiter="\t")}

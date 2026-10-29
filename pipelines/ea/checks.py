@@ -18,7 +18,7 @@ KEYS = {
 }
 REPLACEABLE = ("area_geometry", "area_parent", "tenure_affiliation")
 DROPPABLE = ("area_code", "area_parent", "area_geometry")
-SWEEPABLE = ("party_image",)
+SWEEPABLE = {"party_image": "id", "party_founding": "party_id"}
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -97,8 +97,8 @@ class Stage:
 
     def swept(self, table: str) -> sql.Composable:
         return sql.SQL(
-            "p.changeset_id = c.id and c.pipeline = {} and not exists (select from {} s where s.id = p.id)"
-        ).format(sql.Literal(self.pipeline), self.staged(table))
+            "p.changeset_id = c.id and c.pipeline = {} and not exists (select from {} s where s.{key} = p.{key})"
+        ).format(sql.Literal(self.pipeline), self.staged(table), key=sql.Identifier(SWEEPABLE[table]))
 
     def staged(self, table: str) -> sql.Composable:
         return sql.SQL("{}.{}").format(sql.Identifier(self.schema), sql.Identifier(table))
