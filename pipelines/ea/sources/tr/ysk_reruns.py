@@ -10,7 +10,7 @@ from ea.sources.tr.ysk import INDEPENDENTS, INVALID, LICENSE, PUBLISHER, REGISTE
 from ea.store import connect
 
 SOURCE = "tr.ysk_reruns"
-VERSION = "3"
+VERSION = "4"
 FAALIYET = "https://www.ysk.gov.tr/doc/dosyalar/docs/Faaliyet_Raporlari/2024_Yili_idari_Faaliyet_Raporu.pdf"
 ANNEX_2019 = "https://www.ysk.gov.tr/doc/dosyalar/docs/2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Ek-2.pdf"
 AA_2024 = (
@@ -19,6 +19,22 @@ AA_2024 = (
 AA_2019 = "https://www.aa.com.tr/tr/politika/3-ilce-ve-bir-beldede-yenileme-secimleri-yapildi/1495170"
 BOOK = "https://www.ysk.gov.tr/doc/dosyalar/docs/2009_2019_%C4%B0STAT%C4%B0ST%C4%B0K_K%C4%B0TABI.pdf"
 SABAH_2019 = "https://www.sabah.com.tr/gundem/2019/08/04/adiyamanin-ilk-kadin-belediye-baskani-secildi"
+WIKI = {
+    "denizli-honaz": "Denizli'de 2019 Türkiye yerel seçimleri",
+    "kirikkale-keskin": "Kırıkkale'de 2019 Türkiye yerel seçimleri",
+    "artvin-yusufeli": "Artvin'de 2019 Türkiye yerel seçimleri",
+    "adiyaman-besni-kesmetepe": "Adıyaman'da 2019 Türkiye yerel seçimleri",
+    "kayseri-pinarbasi": "Kayseri'de 2024 Türkiye yerel seçimleri",
+    "aksaray-guzelyurt": "Aksaray'da 2024 Türkiye yerel seçimleri",
+    "sanliurfa-hilvan": "Şanlıurfa'da 2024 Türkiye yerel seçimleri",
+    "kirklareli-luleburgaz-buyukkaristiran": "Kırklareli'de 2024 Türkiye yerel seçimleri",
+    "tunceli-mazgirt-akpazar": "Tunceli'de 2024 Türkiye yerel seçimleri",
+    "aksaray-merkez-saglik": "Aksaray'da 2024 Türkiye yerel seçimleri",
+}
+WIKI_SOURCES = {
+    2019: UUID("993b963e-f0be-52f1-8bd7-cc2d77a068b9"),
+    2024: UUID("bc682548-3abe-5e3c-9330-1c04702c76a0"),
+}
 RERUN_2019 = date(2019, 6, 2)
 SUVARLI = date(2019, 8, 4)
 RERUN_2024 = date(2024, 6, 2)
@@ -410,6 +426,33 @@ def emit() -> Path:
             )
             cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[winner_label], kind="nominated")
             cs.add("outcome", result_set_id=declared, option_id=options[winner_label], kind="elected")
+            start = date(day.year, day.month, 1)
+            tenure = cs.key(f"{SOURCE}.tenure", contest_key)
+            cs.add(
+                "tenure",
+                id=tenure,
+                person_id=person,
+                office_id=office,
+                from_date=start,
+                from_precision="month",
+                to_date=date(2024, 4, 1) if day.year == 2019 else None,
+                to_precision="month",
+                acquired_via="elected",
+                contest_id=contest,
+                ended_via="term_end" if day.year == 2019 else None,
+            )
+            cs.add(
+                "tenure_affiliation",
+                tenure_id=tenure,
+                kind="party",
+                party_id=parties[winner_label],
+                valid_from=start,
+                valid_from_precision="month",
+            )
+            cs.add("citation", entity_id=tenure, source_id=sources[day], locator={"contest": str(contest)})
+            cs.add("citation", entity_id=tenure, source_id=press[day], locator={"contest": str(contest)})
+            if key in WIKI:
+                cs.add("citation", entity_id=tenure, source_id=WIKI_SOURCES[day.year], locator={"page": WIKI[key]})
             for measure, value in zip((REGISTERED, VOTERS, VALID, INVALID), totals, strict=True):
                 if value is not None:
                     cs.add(
