@@ -4439,7 +4439,7 @@ def parse() -> None:
                         "mount" if word == "mt" else word
                         for word in re.findall(
                             r"[a-z0-9]+",
-                            unicodedata.normalize("NFKD", label)
+                            unicodedata.normalize("NFKD", re.sub(r"\s*\([^)]*\bCounty\)$", "", label) if kind != "school" else label)
                             .encode("ascii", "ignore")
                             .decode()
                             .lower()
@@ -4537,7 +4537,13 @@ def parse() -> None:
                             )
                             if (
                                 said
-                                and (sort and said != sort and (said, sort) != ("town", "township") or not sort and said == "township")
+                                and (
+                                    sort
+                                    and said != sort
+                                    and (said, sort) != ("town", "township")
+                                    or not sort
+                                    and (said == "township" or state == "NY" and said == "town")
+                                )
                                 or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
@@ -4571,6 +4577,7 @@ def parse() -> None:
                     post = " ".join(
                         re.sub(r"\b(member|members|of the|partial term|full term)\b", " ", " ".join(rest)).split()
                     )
+                    post = post.replace("receiver of taxes", "tax collector")
                     role = (
                         "board-of-education"
                         if owner.startswith("school:")
@@ -4585,7 +4592,7 @@ def parse() -> None:
                                         ),
                                         "office",
                                     ),
-                                    (r"^highway superintendent$", "highway-superintendent"),
+                                    (r"^(?:town )?highway superintendent$", "highway-superintendent"),
                                     (r"^(?:town |village )justice$", "justice"),
                                     (r"^village president$|^president$", "president"),
                                     (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),

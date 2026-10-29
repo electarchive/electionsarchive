@@ -1474,6 +1474,9 @@ def build(full: bool = False) -> str:
         "elected",
     ).iter_rows():
         pid = link.get(gid)
+        # Census of Governments leaves the Jersey City School System (31000000030100) without a county; Jersey City is in Hudson County (FIPS 34017).
+        if gid == "31000000030100":
+            county = "017"
         match = PREFIX.match(name)
         words = (
             name

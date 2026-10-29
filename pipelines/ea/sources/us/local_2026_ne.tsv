@@ -2432,7 +2432,7 @@ NY	Malta Supervisor	0	Cynthia Young	Democratic	Saratoga	1
 NY	Malta Supervisor	0	Timothy Moseman	Republican	Saratoga	1
 NY	Malta Town Clerk	0	Jennifer Holmes	Republican	Saratoga	1
 NY	Malta Highway Superintendent	0	Brian Cline	Republican	Saratoga	1
-NY	Malta Receiver of Taxes	1	Nancy Fodera DeLeonardis	Republican	Saratoga	1
+NY	Malta Town Receiver of Taxes	1	Nancy Fodera DeLeonardis	Republican	Saratoga	1
 NY	Milton Supervisor	0	Michele D. Juda	Democratic	Saratoga	1
 NY	Milton Supervisor	0	Scott T. Ostrander	Republican	Saratoga	1
 NY	Milton Highway Superintendent	1	Jason W. Miller	Republican	Saratoga	1
@@ -2470,11 +2470,11 @@ NY	Harrisburg Supervisor	0	Jonathan Bernat	Republican	Lewis	1
 NY	Harrisburg Town Clerk and Tax Collector	0	Sadie M. Snyder	Republican	Lewis	1
 NY	Harrisburg Highway Superintendent	0	Terry C. Snyder	Republican	Lewis	1
 NY	Lewis County Legislature District 10	0	Jeffrey G. Nellenback	Republican	Lewis	1
-NY	Lewis Supervisor	0	Dawn M. Zagurski	Republican	Lewis	1
+NY	Lewis Town Supervisor	0	Dawn M. Zagurski	Republican	Lewis	1
 NY	Lewis Town Clerk	0	Olivia M. Fruin	Republican	Lewis	1
-NY	Lewis Highway Superintendent	0	John E. Race	Republican	Lewis	1
-NY	Lewis Highway Superintendent	0	Matthew B. Flansburg	Independent	Lewis	1
-NY	Lewis Tax Collector	0	Christina A. Stinebrickner	Democratic	Lewis	1
+NY	Lewis Town Highway Superintendent	0	John E. Race	Republican	Lewis	1
+NY	Lewis Town Highway Superintendent	0	Matthew B. Flansburg	Independent	Lewis	1
+NY	Lewis Town Tax Collector	0	Christina A. Stinebrickner	Democratic	Lewis	1
 NY	Leyden Supervisor	0	Rosalie E. White	Republican	Lewis	1
 NY	Leyden Town Clerk	0	Janice L. Dosztan	Republican	Lewis	1
 NY	Leyden Highway Superintendent	0	Sean Shanks	Independent	Lewis	1
@@ -2508,10 +2508,10 @@ NY	Osceola Tax Collector	0	Andrew P. Burns	Democratic	Lewis	1
 NY	Pinckney Supervisor	0	Sherry J. Harmych	Republican	Lewis	1
 NY	Pinckney Town Clerk and Tax Collector	0	Melissa R. Birchenough	Republican	Lewis	1
 NY	Pinckney Highway Superintendent	0	Donald M. Cook	Republican	Lewis	1
-NY	Turin Supervisor	0	Daniel S. Szalach	Republican	Lewis	1
+NY	Turin Town Supervisor	0	Daniel S. Szalach	Republican	Lewis	1
 NY	Turin Town Clerk and Tax Collector	0	Sheena L. Dickinson	Republican	Lewis	1
 NY	Turin Town Council	1	Robert C. Watson	Democratic	Lewis	1
-NY	Turin Highway Superintendent	0	Paul J. Dickinson	Republican	Lewis	1
+NY	Turin Town Highway Superintendent	0	Paul J. Dickinson	Republican	Lewis	1
 NY	Turin Village Mayor	0	Joshua P. Leviker	Republican	Lewis	1
 NY	Turin Village Trustee	0	Geoffrey R. Buckingham	Republican	Lewis	1
 NY	Watson Supervisor	0	Jeffrey F. Hoch	Republican	Lewis	1
@@ -2525,7 +2525,7 @@ NY	Orleans County Legislature District 1	0	William Eick	Republican	Orleans	1
 NY	Orleans County Legislature District 2	0	Lynne M. Johnson	Republican	Orleans	1
 NY	Orleans County Legislature District 3	0	Fred Miller	Democratic	Orleans	1
 NY	Orleans County Legislature District 4	0	John M. Fitzak	Republican	Orleans	1
-NY	Albion Supervisor	0	F. Richard Remley	Republican	Orleans	1
+NY	Albion Town Supervisor	0	F. Richard Remley	Republican	Orleans	1
 NY	Albion Town Justice	0	Joseph Fuller	Republican	Orleans	2
 NY	Albion Town Justice	0	Gary Moore	Republican	Orleans	2
 NY	Barre Supervisor	0	Stephen F. Coville II	Republican	Orleans	1
