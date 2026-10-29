@@ -8,7 +8,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "br.lineage"
-VERSION = "2"
+VERSION = "3"
 API = "https://pt.wikipedia.org/w/api.php?"
 REGISTRY = "https://www.tse.jus.br/partidos/partidos-registrados-no-tse"
 REGISTRY_TITLE = "Partidos políticos registrados no TSE"
@@ -104,6 +104,11 @@ RENAMES = {
             ("Partido Humanista da Solidariedade", "PHS", date(2000, 5, 30), None),
         ),
     ),
+    UUID("01a13ba1-d3a6-7084-b7c4-4e7136b5ba16"): (
+        "Partido Comunista do Brasil",
+        (UUID("d4726eb4-e70e-5bf1-880a-ccd1060423fd"), UUID("e5dca903-1543-5914-a666-d12ab52afe0f")),
+        (("Partido Comunista do Brasil", "PCdoB", date(1962, 2, 18), None),),
+    ),
     DEM: (
         "Democratas (Brasil)",
         (UUID("ef31efea-21fb-54d5-83dd-ef0eab65db4c"),),
@@ -138,7 +143,7 @@ def emit() -> Path:
             summary=(
                 "Brazilian party lineage: renamed parties held as one party each with dated names (PPS to Cidadania, "
                 "PMN to Mobilização Nacional, PT do B to Avante, PSDC to DC, PMB to Democrata, PMDB to MDB, PRB to "
-                "Republicanos, PR to PL, PRN to PTC to Agir, SD to Solidariedade, PSN to PHS, and PFL to Democratas), "
+                "Republicanos, PR to PL, PRN to PTC to Agir, SD to Solidariedade, PSN to PHS, and PFL to Democratas), the TSE's three spellings of PCdoB as one party, "
                 "the 1985 PL and PRONA merged into PR, and DEM and PSL merged into União Brasil"
             ),
             polity="BR",
