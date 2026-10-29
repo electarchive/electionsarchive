@@ -5208,8 +5208,6 @@ def emit() -> Path:
                     NEW_PARTIES_ADDED.add(row["party"])
                     cs.add("party", id=party, kind="party", polity_id=cs.polity("US" if row["party"] == "forward-party" else "US-NY"))
                     name(party, NEW_PARTIES[row["party"]])
-                    if row["party"] == "forward-party":
-                        cs.add("external_id", entity_id=party, scheme="wikidata", value="Q108816586")
                 try:
                     option = cs.key("us.option", f"{key}:{slug(row['name'])}")
                 except ValueError:
