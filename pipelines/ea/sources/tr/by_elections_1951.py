@@ -34,6 +34,7 @@ def emit() -> Path:
     affiliations = {
         (fold(province), fold(name.split()[-1])): parties[0]
         for province, name, parties in album.select("province", "name", "parties").iter_rows()
+        if len(parties) > 0
     }
     plates = {fold(name): f"{plate:02d}" for plate, name in enumerate(PROVINCES, 1)}
     with connect() as conn:
