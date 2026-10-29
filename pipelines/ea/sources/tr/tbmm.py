@@ -250,7 +250,7 @@ def rows(term: int) -> list[dict[str, object]]:
     return found
 
 
-VERSION = "8"
+VERSION = "9"
 NOTES = (
     "The Assembly's member search lists every member of a term with the province, the party label, and the date and "
     "reason the membership ended; it does not give start dates, and a member who replaced a departing one is listed "
@@ -272,7 +272,7 @@ OPENINGS = {
     25: date(2015, 6, 23),
     26: date(2015, 11, 17),
 }
-CLOSINGS = {11: date(1960, 5, 27), 26: date(2018, 6, 24)}
+CLOSINGS = {11: date(1960, 5, 27), 26: date(2018, 7, 7)}
 ERDOGAN = "f72877c2-c08b-037b-e050-007f01005610"
 ERDOGAN_SWORN = date(2003, 3, 11)
 BY_ELECTED = {9: date(1951, 9, 16)}
