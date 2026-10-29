@@ -657,6 +657,31 @@ FEEDS = {
         "Merced County Registrar of Voters",
         "Final Qualified Candidate List, November 3, 2026 General Election (printed 8/25/2026)",
     ),
+    "CA-06055": (
+        "https://www.napacounty.gov/",
+        "Napa County Registrar of Voters",
+        "Roster of Candidates, General Election 11/3/2026 (qualified candidates)",
+    ),
+    "CA-06017": (
+        "https://www.eldoradocounty.ca.gov/",
+        "El Dorado County Elections Department",
+        "Candidate List, General Election 11/3/2026 (qualified candidates only)",
+    ),
+    "CA-06053": (
+        "https://www.countyofmonterey.gov/",
+        "Monterey County Elections Department",
+        "Candidate List, November 3, 2026 General Election",
+    ),
+    "CA-06031": (
+        "https://www.countyofkingsca.gov/",
+        "Kings County Elections Department",
+        "Contest/Candidate Proof List, November 3, 2026 General Election",
+    ),
+    "CA-06101": (
+        "https://www.suttercounty.org/",
+        "Sutter County Elections",
+        "Candidates for the November 2026 General Election (as of 8/12/2026)",
+    ),
     "CA-06041": (
         "https://www.marincounty.gov/departments/elections/november-3-2026-general-election/information-and-about-candidates-110326/status-local-candidates-office-110326",
         "Marin County Elections Department",
@@ -1059,6 +1084,11 @@ DELIVERED = {
     "VT": DATA / "inbox" / "y26" / "ne" / "vt_ge_qualified_candidates_2026.xlsx",
     "CA-06095": DATA / "inbox" / "y26" / "ca" / "solano_filed_log.pdf",
     "CA-06047": DATA / "inbox" / "y26" / "ca" / "merced_final.pdf",
+    "CA-06055": DATA / "inbox" / "y26" / "ca" / "napa_qualified.pdf",
+    "CA-06017": DATA / "inbox" / "y26" / "ca" / "eldorado_list.pdf",
+    "CA-06053": DATA / "inbox" / "y26" / "ca" / "monterey_list.html",
+    "CA-06031": DATA / "inbox" / "y26" / "ca" / "kings_proof.pdf",
+    "CA-06101": DATA / "inbox" / "y26" / "ca" / "sutter_list.pdf",
     "CA-06041": DATA / "inbox" / "y26" / "ca" / "marin_local_status.html",
     "NJ-34009": DATA / "inbox" / "y26" / "nj" / "cape_may.pdf",
     "NJ-34011": DATA / "inbox" / "y26" / "nj" / "cumberland.xlsx",
@@ -1261,6 +1291,17 @@ for county, url in {
     "Hamilton": "https://www.hamiltoncountyny.gov/sites/default/files/2025-09/2026%20Petition%20Report%20Final.pdf",
     "Westchester": "https://citizenparticipation.westchestercountyny.gov/images/stories/pdfs/2026/2026-candidate-list-no-address.pdf",
     "Herkimer": "https://herkimercountyny.gov/download/document.php?docid=5766",
+    "Orange": "https://www.orangecountyny.gov/DocumentCenter/View/38730",
+    "Rockland": "https://ny.rocklandcountyny.gov/home/showpublisheddocument/3957/639268124361400000",
+    "Suffolk": "https://suffolkcountyny.gov/Departments/BOE/2026-General-Election-Candidate-List",
+    "Ontario": "https://www.ontariocountyny.gov/DocumentCenter/View/64056",
+    "Tompkins": "https://www.tompkinscountyny.gov/",
+    "Columbia": "https://elections.columbiacountyny.com/",
+    "Oneida": "https://oneidacountynyvotes.gov/",
+    "Washington": "https://www.washingtoncountyny.gov/DocumentCenter/View/31734",
+    "Chenango": "https://www.chenangocountyny.gov/DocumentCenter/View/7428",
+    "Clinton": "https://www.clintoncountyny.gov/",
+    "Steuben": "https://www.steubencountyny.gov/469/Board-of-Elections",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1268,7 +1309,7 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.pdf",
+        f"ny/{county.lower()}.{'html' if county == 'Suffolk' else 'pdf'}",
     )
 for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
