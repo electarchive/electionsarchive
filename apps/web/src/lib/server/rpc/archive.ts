@@ -19371,7 +19371,6 @@ export const bodies = {
             party: v.nullable(v.string()),
             caucus: v.nullable(v.string()),
             isIndependent: v.boolean(),
-            left: v.nullable(v.string()),
             spells: v.array(
               v.object({
                 party: v.nullable(v.string()),
@@ -19447,7 +19446,6 @@ export const bodies = {
               party: string | null;
               caucus: string | null;
               isIndependent: boolean;
-              left: string | null;
               spells: Array<{
                 party: string | null;
                 from: string | null;
@@ -19483,10 +19481,6 @@ export const bodies = {
                       select k.id from contest k where k.allocation_parent_id = t.contest_id)
                     limit 1)
                 end as party,
-                (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
-                  left join entity_merge pm on pm.entity_id = a.party_id
-                  where a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
-                  order by lower(a.valid) desc nulls last limit 1) as left,
                 (select coalesce(json_agg(json_build_object('party', coalesce(pm.into_id, a.party_id),
                     'from', lower(a.valid)::text, 'to', upper(a.valid)::text)
                     order by lower(a.valid) nulls first, a.party_id is null), '[]')
@@ -19555,7 +19549,6 @@ export const bodies = {
           : returned.rows.map((row) => ({
               ...row,
               caucus: null,
-              left: null,
               spells: [],
               seat: null,
               region: null,
@@ -19570,7 +19563,6 @@ export const bodies = {
           rows
             .flatMap((row) => [
               row.party,
-              row.left,
               row.caucus,
               ...row.spells.map((spell) => spell.party),
             ])
@@ -19633,7 +19625,6 @@ export const bodies = {
           party: row.party,
           caucus: row.caucus === row.party ? null : row.caucus,
           isIndependent: row.isIndependent,
-          left: row.left === row.party ? null : row.left,
           spells: row.spells,
           place:
             row.place == null ? null : (labels.full.get(row.place) ?? null),

@@ -4,6 +4,7 @@
   import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
+  import Name from "#lib/components/name.svelte";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -14,6 +15,7 @@
     parties,
     start,
     end,
+    present = null,
     title = "",
   }: {
     mode: "all" | "changes";
@@ -21,7 +23,7 @@
       person: string;
       name: string;
       party: string | null;
-      left: string | null;
+      segments: Array<{ party: string | null; from: string; to: string }>;
       place: string | null;
       path: string | null;
       seat: string | null;
@@ -40,6 +42,7 @@
     }>;
     start: string | null;
     end: string | null;
+    present?: Set<unknown> | null;
     title?: string;
   } = $props();
 
@@ -105,6 +108,8 @@
   const fold = (id: string | null) => (id == null ? null : (kin.get(id) ?? id));
   const tint = (id: string | null) =>
     swatch(info.get(id ?? "")?.color ?? null, `party:${id ?? ""}`);
+  const own = (id: string | null) =>
+    id != null && /^[0-9a-f-]{36}$/.test(id) ? id : null;
   const label = (id: string | null) =>
     id == null
       ? m.record_none()
@@ -241,11 +246,11 @@
                 class="shrink-0 self-center rounded-xs block-2 inline-2"
                 style:background={tint(event.member.party)}
               ></span>
-              <a
-                class="truncate font-semibold hover:underline hover:underline-offset-4"
-                href={resolve("/id/[id]", { id: event.member.person })}
-                >{event.member.name}</a
-              >
+              <Name
+                class="truncate font-semibold"
+                label={event.member.name}
+                person={event.member.person}
+              />
               <span class="truncate text-muted-foreground"
                 >{event.member.place?.slice(shared) ??
                   event.member.seat ??
@@ -311,10 +316,19 @@
             class="rounded-xs block-2.5 inline-2.5"
             style:background={tint(entry)}
           ></span>
-          <span class="font-semibold">{label(entry)}</span>
+          <Name
+            class="font-semibold"
+            label={label(entry)}
+            party={own(entry)}
+            color={tint(entry)}
+            hasSwatch={false}
+            hasLink={false}
+          />
           <span class="font-figures text-xs text-muted-foreground tabular-nums"
-            >{members.filter((member) => fold(member.party) === entry)
-              .length}</span
+            >{members.filter(
+              (member) =>
+                fold(member.party) === entry && (present?.has(member) ?? true),
+            ).length}</span
           >
         </button>
       {/each}
@@ -358,17 +372,35 @@
       </div>
       <ul class="grid">
         {#each isOpen || query !== "" || party != null ? shown : shown.slice(0, 40) as member, index (index)}
-          {const x0 = $derived(at(member.from, low))}
-          {const x1 = $derived(at(member.to, high))}
+          {const switches = $derived(
+            member.segments.slice(1).map((segment, step) => {
+              const isLeft =
+                segment.party == null || segment.party === "independent";
+              return {
+                why: (isLeft ? m.chamber_switch_left : m.chamber_switch_joined)(
+                  { party: "\u0000" },
+                ),
+                party: isLeft
+                  ? (member.segments[step]?.party ?? null)
+                  : segment.party,
+                isSwitch: true,
+                on: segment.from,
+              };
+            }),
+          )}
           {const change = $derived(
             isEarly(member)
               ? {
                   why: ENDS[member.ended ?? ""]?.() ?? m.chamber_left(),
+                  party: null,
+                  isSwitch: false,
                   on: member.to,
                 }
               : isLate(member)
                 ? {
                     why: VIA[member.acquired ?? ""]?.() ?? m.chamber_joined(),
+                    party: null,
+                    isSwitch: false,
                     on: member.from,
                   }
                 : null,
@@ -378,14 +410,21 @@
             style:--party={tint(member.party)}
           >
             <span class="flex items-center gap-1.5 truncate">
-              <span
-                class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
-              ></span>
-              <a
-                class="truncate font-semibold hover:underline hover:underline-offset-4"
-                href={resolve("/id/[id]", { id: member.person })}
-                >{member.name}</a
+              <Name
+                class="flex shrink-0"
+                label={label(member.party)}
+                party={own(member.party)}
+                color={tint(member.party)}
               >
+                <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+                ></span>
+                <span class="sr-only">{label(member.party)}</span>
+              </Name>
+              <Name
+                class="truncate font-semibold"
+                label={member.name}
+                person={member.person}
+              />
             </span>
             <span
               class="flex items-baseline gap-1.5 truncate text-muted-foreground max-sm:justify-end"
@@ -404,17 +443,12 @@
               {#if !member.isVoting}
                 <span class="shrink-0 text-xs">{m.chamber_nonvoting()}</span>
               {/if}
-              {#if member.left != null}
-                <span class="shrink-0 text-xs font-semibold text-foreground"
-                  >{m.chamber_switched({ party: label(member.left) })}</span
-                >
-              {/if}
             </span>
             {#if start != null}
               <span
                 class={cn(
                   "flex items-center gap-3 self-stretch max-sm:col-span-2",
-                  { "max-sm:hidden": change == null },
+                  { "max-sm:hidden": change == null && switches.length === 0 },
                 )}
               >
                 <span
@@ -428,11 +462,22 @@
                       ></span>
                     {/if}
                   {/each}
-                  <span
-                    class="absolute inset-bs-1/2 -translate-y-1/2 rounded-full bg-(--party) block-1.5"
-                    style:inset-inline-start="{x0 * 100}%"
-                    style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
-                  ></span>
+                  {#each member.segments as segment, step (step)}
+                    {const x0 = $derived(at(segment.from, low))}
+                    {const x1 = $derived(at(segment.to, high))}
+                    <span
+                      class={cn(
+                        "absolute inset-bs-1/2 -translate-y-1/2 bg-(--segment) block-1.5",
+                        {
+                          "rounded-s-full": step === 0,
+                          "rounded-e-full": step === member.segments.length - 1,
+                        },
+                      )}
+                      style:--segment={tint(segment.party)}
+                      style:inset-inline-start="{x0 * 100}%"
+                      style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
+                    ></span>
+                  {/each}
                   <span class="sr-only"
                     >{m.chamber_served({
                       from: short.format(
@@ -446,19 +491,33 @@
                   >
                 </span>
                 <span
-                  class="flex shrink-0 items-baseline gap-1.5 text-xs whitespace-nowrap sm:inline-48 max-sm:ps-4"
+                  class="grid shrink-0 gap-0.5 text-xs whitespace-nowrap sm:inline-48 max-sm:ps-4"
                 >
-                  {#if change != null}
-                    <span class="font-semibold">{change.why}</span>
-                    <span
-                      class="font-figures text-muted-foreground tabular-nums"
-                      >{change.on == null
-                        ? ""
-                        : short.format(
-                            new Date(`${change.on}T00:00:00Z`),
-                          )}</span
-                    >
-                  {/if}
+                  {#each [...switches, ...(change == null ? [] : [change])].toSorted( (a, b) => (a.on ?? "").localeCompare(b.on ?? "") ) as line, step (step)}
+                    <span class="flex items-baseline gap-1.5">
+                      {#if line.isSwitch}
+                        {const parts = $derived(line.why.split("\u0000"))}
+                        <span class="font-semibold"
+                          >{parts[0]}<Name
+                            label={label(line.party)}
+                            party={own(line.party)}
+                            color={tint(line.party)}
+                            hasSwatch={false}
+                          />{parts[1]}</span
+                        >
+                      {:else}
+                        <span class="font-semibold">{line.why}</span>
+                      {/if}
+                      <span
+                        class="font-figures text-muted-foreground tabular-nums"
+                        >{line.on == null
+                          ? ""
+                          : short.format(
+                              new Date(`${line.on}T00:00:00Z`),
+                            )}</span
+                      >
+                    </span>
+                  {/each}
                 </span>
               </span>
             {/if}

@@ -27,6 +27,82 @@ export function effective(entry: {
     : entry.party;
 }
 
+export function partyOn(
+  member: {
+    party: string | null;
+    caucus?: string | null;
+    category?: "elected" | "appointed" | "ex_officio";
+    isIndependent: boolean;
+    from: string | null;
+    to: string | null;
+    spells: Array<{
+      party: string | null;
+      from: string | null;
+      to: string | null;
+    }>;
+  },
+  day: string,
+  opened: string,
+) {
+  const covering = (value: string) =>
+    member.spells.find(
+      (entry) =>
+        (entry.from ?? "") <= value && (entry.to == null || entry.to > value),
+    );
+  const spell = covering(
+    member.to != null && member.to <= day
+      ? new Date(Date.parse(member.to) - 864e5).toISOString().slice(0, 10)
+      : member.from != null && member.from > day
+        ? member.from
+        : day,
+  );
+  const opening = covering(
+    member.from != null && member.from > opened ? member.from : opened,
+  );
+  return effective({
+    ...member,
+    party: spell != null ? spell.party : opening == null ? member.party : null,
+    isIndependent:
+      spell != null
+        ? spell.party == null
+        : opening != null || member.isIndependent,
+  });
+}
+
+export function segments(
+  member: Parameters<typeof partyOn>[0],
+  opened: string,
+  closed: string,
+) {
+  const low =
+    member.from != null && member.from > opened ? member.from : opened;
+  const high = member.to != null && member.to < closed ? member.to : closed;
+  const cuts = [
+    ...new Set([
+      low,
+      ...member.spells.flatMap((spell) =>
+        [spell.from, spell.to].filter(
+          (value): value is string =>
+            value != null && value > low && value < high,
+        ),
+      ),
+      high,
+    ]),
+  ].toSorted();
+  const out: Array<{ party: string | null; from: string; to: string }> = [];
+  for (const [index, from] of cuts.slice(0, -1).entries()) {
+    const party = partyOn(member, from, opened);
+    const to = cuts[index + 1] ?? high;
+    const last = out.at(-1);
+    if (last != null && last.party === party) {
+      last.to = to;
+    } else {
+      out.push({ party, from, to });
+    }
+  }
+  return out;
+}
+
 export function stand(
   keys: Iterable<string | null>,
   parties: Array<Party>,

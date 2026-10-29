@@ -5,9 +5,10 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
-  import { effective, stand } from "#lib/caucus.js";
+  import { partyOn, segments, stand } from "#lib/caucus.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Slider } from "#lib/components/ui/slider/index.js";
+  import Name from "#lib/components/name.svelte";
   import { count, date, definite } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -70,40 +71,22 @@
   );
   const DAY = 864e5;
   const roll = $derived(
-    (members.data?.members ?? []).map((member) => {
-      const covering = (value: string) =>
-        member.spells.find(
-          (entry) =>
-            (entry.from ?? "") <= value &&
-            (entry.to == null || entry.to > value),
-        );
-      const spell = covering(
-        member.to != null && member.to <= on
-          ? new Date(Date.parse(member.to) - DAY).toISOString().slice(0, 10)
-          : member.from != null && member.from > on
-            ? member.from
-            : on,
-      );
-      const opening = covering(
-        member.from != null && member.from > first ? member.from : first,
-      );
-      return {
-        ...member,
-        party: effective({
-          ...member,
-          party:
-            spell != null ? spell.party : opening == null ? member.party : null,
-          isIndependent:
-            spell != null
-              ? spell.party == null
-              : opening != null || member.isIndependent,
-        }),
-      };
-    }),
+    (members.data?.members ?? []).map((member) => ({
+      ...member,
+      party: partyOn(member, on, first),
+      segments: segments(
+        member,
+        first,
+        members.data?.end ?? new Date().toISOString().slice(0, 10),
+      ),
+    })),
   );
   const crew = $derived(
     stand(
-      roll.map((member) => member.party),
+      roll.flatMap((member) => [
+        member.party,
+        ...member.segments.map((segment) => segment.party),
+      ]),
       members.data?.parties ?? [],
     ),
   );
@@ -299,6 +282,12 @@
         );
         return {
           party: caucus ? key : (rows[0]?.party ?? null),
+          id:
+            caucus || rows.length === 1
+              ? caucus
+                ? key
+                : (rows[0]?.party ?? null)
+              : null,
           name: caucus
             ? label(key)
             : rows.map((row) => label(row.party)).join("/"),
@@ -320,7 +309,11 @@
       })),
     ),
   );
-  const largest = $derived(lead(data.terms.at(-1)?.parties ?? []));
+  const largest = $derived(
+    selected === data.terms.length - 1 && members.data != null
+      ? leader
+      : lead(data.terms.at(-1)?.parties ?? []),
+  );
   const whole = $derived(term == null ? 0 : (term.size ?? term.total));
   const cabinets = $derived(
     term == null
@@ -432,9 +425,18 @@
                 `party:${largest?.party ?? ""}`,
               )}
             ></span>
-            <span class="text-xl font-[760] tracking-[-0.015em]"
-              >{largest?.name ?? ""}</span
-            >
+            <Name
+              class="text-xl font-[760] tracking-[-0.015em]"
+              label={largest?.name ?? ""}
+              party={largest?.id != null && /^[0-9a-f-]{36}$/.test(largest.id)
+                ? largest.id
+                : null}
+              color={swatch(
+                info.get(largest?.party ?? "")?.color ?? null,
+                `party:${largest?.party ?? ""}`,
+              )}
+              hasSwatch={false}
+            />
             <span
               class="font-figures text-base text-muted-foreground tabular-nums"
               >{count(largest?.seats ?? 0)}</span
@@ -617,25 +619,29 @@
           <p
             class="font-serif text-[1.375rem]/snug font-[560] tracking-[-0.005em] text-pretty max-inline-[44ch]"
           >
-            {#if term.isPartial}
-              {m.chamber_renewal({
-                party: definite(leader.full ?? leader.name, true),
-                seats: count(leader.seats),
-                total: count(term.total),
-              })}
-            {:else if leader.seats >= Math.floor(whole / 2) + 1}
-              {m.chamber_majority({
-                party: definite(leader.full ?? leader.name, true),
-                seats: count(leader.seats),
-                total: count(whole),
-              })}
-            {:else}
-              {m.chamber_plurality({
-                party: definite(leader.full ?? leader.name),
-                seats: count(leader.seats),
-                total: count(whole),
-              })}
-            {/if}
+            {const parts = $derived(
+              (term.isPartial
+                ? m.chamber_renewal({
+                    party: "\u0000",
+                    seats: count(leader.seats),
+                    total: count(term.total),
+                  })
+                : (leader.seats >= Math.floor(whole / 2) + 1
+                    ? m.chamber_majority
+                    : m.chamber_plurality)({
+                    party: "\u0000",
+                    seats: count(leader.seats),
+                    total: count(whole),
+                  })
+              ).split("\u0000"),
+            )}
+            {parts[0]}<Name
+              label={definite(leader.full ?? leader.name, parts[0] === "")}
+              party={leader.id != null && /^[0-9a-f-]{36}$/.test(leader.id)
+                ? leader.id
+                : null}
+              hasSwatch={false}
+            />{parts[1]}
           </p>
         {/if}
         {#if cabinets.length > 0}
@@ -696,6 +702,7 @@
           mode="all"
           members={roll}
           parties={crew}
+          present={members.data?.isSeated === true ? new Set(sitting) : null}
           start={members.data?.start ?? null}
           end={members.data?.end ?? null}
           title={members.data?.isSeated === true

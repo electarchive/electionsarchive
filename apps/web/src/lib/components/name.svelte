@@ -13,6 +13,7 @@
     label,
     color = null,
     hasSwatch = true,
+    hasLink = true,
     person = null,
     party = null,
     tabindex,
@@ -22,6 +23,7 @@
     label: string;
     color?: string | null;
     hasSwatch?: boolean;
+    hasLink?: boolean;
     person?: string | null;
     party?: string | null;
     tabindex?: number;
@@ -48,33 +50,39 @@
   <HoverCard.Root openDelay={280} closeDelay={120}>
     <HoverCard.Trigger>
       {#snippet child({ props })}
-        <a
-          {...props}
-          href={resolve("/id/[id]", { id: person ?? party ?? "" })}
-          {tabindex}
-          class={cn(
-            "underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
-            className,
-          )}
-          onclick={(event) => {
-            if (isTouch(event)) {
-              show(
-                event,
-                person == null
-                  ? {
-                      kind: "party",
-                      id: party ?? "",
-                      color,
-                      within: scope?.() ?? null,
-                    }
-                  : { kind: "person", id: person },
-              );
-            }
-          }}
-          role={undefined}
-          aria-haspopup={undefined}
-          aria-expanded={undefined}>{@render (children ?? face)()}</a
-        >
+        {#if !hasLink}
+          <span {...props} class={className}
+            >{@render (children ?? face)()}</span
+          >
+        {:else}
+          <a
+            {...props}
+            href={resolve("/id/[id]", { id: person ?? party ?? "" })}
+            {tabindex}
+            class={cn(
+              "underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
+              className,
+            )}
+            onclick={(event) => {
+              if (isTouch(event)) {
+                show(
+                  event,
+                  person == null
+                    ? {
+                        kind: "party",
+                        id: party ?? "",
+                        color,
+                        within: scope?.() ?? null,
+                      }
+                    : { kind: "person", id: person },
+                );
+              }
+            }}
+            role={undefined}
+            aria-haspopup={undefined}
+            aria-expanded={undefined}>{@render (children ?? face)()}</a
+          >
+        {/if}
       {/snippet}
     </HoverCard.Trigger><HoverCard.Content
       collisionPadding={8}

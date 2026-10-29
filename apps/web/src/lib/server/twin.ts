@@ -2,7 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import type { InferRouterOutputs } from "@orpc/server";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
-import { effective, stand } from "#lib/caucus.js";
+import { partyOn, stand } from "#lib/caucus.js";
 import {
   COLUMN_LABELS,
   COUNTRY_COLUMNS,
@@ -5138,35 +5138,10 @@ function chamberMarkdown(
   };
   const close = members?.end ?? new Date().toISOString().slice(0, 10);
   const opened = members?.start ?? close;
-  const roll = (members?.members ?? []).map((member) => {
-    const covering = (value: string) =>
-      member.spells.find(
-        (entry) =>
-          (entry.from ?? "") <= value && (entry.to == null || entry.to > value),
-      );
-    const spell = covering(
-      member.to != null && member.to <= close
-        ? new Date(Date.parse(member.to) - 864e5).toISOString().slice(0, 10)
-        : member.from != null && member.from > close
-          ? member.from
-          : close,
-    );
-    const opening = covering(
-      member.from != null && member.from > opened ? member.from : opened,
-    );
-    return {
-      ...member,
-      party: effective({
-        ...member,
-        party:
-          spell != null ? spell.party : opening == null ? member.party : null,
-        isIndependent:
-          spell != null
-            ? spell.party == null
-            : opening != null || member.isIndependent,
-      }),
-    };
-  });
+  const roll = (members?.members ?? []).map((member) => ({
+    ...member,
+    party: partyOn(member, close, opened),
+  }));
   const everyone = [
     ...parties,
     ...stand(
