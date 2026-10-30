@@ -1,4 +1,5 @@
 import html
+import json
 import re
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -9,7 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda
+from ea.sources.us import ceda, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.wa_measures_2026"
@@ -20,9 +21,11 @@ KING = "https://info.kingcounty.gov/kcelections/Vote/contests/ballotmeasures.asp
 PUBLISHER = "King County Elections"
 TITLE = "Ballot measures, November 3, 2026 General Election"
 BROWSER = {"User-Agent": "Mozilla/5.0"}
+SAMPLES = json.loads((Path(__file__).parent / "wa_samples_2026.json").read_text())
+SAMPLE_COUNTY = {"Snohomish": "53061", "Kitsap": "53035"}
 
 
-def download(url: str) -> raw.Artifact:
+def download(url: str, suffix: str = ".html") -> raw.Artifact:
     try:
         return raw.cached(SOURCE, url)
     except LookupError:
@@ -33,7 +36,7 @@ def download(url: str) -> raw.Artifact:
         SOURCE,
         url,
         response.content,
-        suffix=".html",
+        suffix=suffix,
         retrieved_at=datetime.now(UTC),
         media_type=response.headers.get("content-type", ""),
     )
@@ -53,6 +56,8 @@ def fetch() -> None:
     download(KING)
     for url in details():
         download(url)
+    for url in {sample["url"] for sample in SAMPLES}:
+        download(url, ".pdf")
 
 
 def parse() -> None:
@@ -66,9 +71,10 @@ def parse() -> None:
             r"General Election (.+?) (Proposition No\. \d+) (.+?) (The .+?|Shall .+?|Should .+?|This .+?)\s+(?:Yes No|Explanatory statement)\b",
             text,
         ):
-            rows.append({"url": url, "place": place, "number": number, "title": title, "text": wording})
+            rows.append({"url": url, "publisher": PUBLISHER, "place": place, "number": number, "title": title, "text": wording})
         if not any(row["url"] == url for row in rows):
             print("no wording:", url)
+    rows.extend(SAMPLES)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows)
     frame.write_parquet(PARSED / "measures.parquet")
@@ -82,7 +88,7 @@ def emit() -> Path:
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
         found: dict[str, tuple[UUID, UUID, str, str, str]] = {}
-        names: dict[str, str] = {}
+        names: dict[tuple[str, str], str] = {}
         for scheme, code, polity, area, text, path in conn.execute(
             """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
                join area_code c on c.area_id = a.id
@@ -90,11 +96,11 @@ def emit() -> Path:
                join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district', 'special_district')
                join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                join slug s on s.entity_id = p.id and s.is_current
-               where a.scheme_code in ('us.place', 'us.school_district', 'us.special_district') and c.code like '53%%'"""
+               where a.scheme_code in ('us.county', 'us.place', 'us.school_district', 'us.special_district') and c.code like '53%%'"""
         ).fetchall():
             key = f"{scheme}:{code}"
             found[key] = (polity, area, text, path, code)
-            names[ceda._core(text) if scheme != "us.place" else ceda._city(text)] = key
+            names[(scheme, text if scheme == "us.county" else ceda._core(text) if scheme != "us.place" else ceda._city(text))] = key
         slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/wa/%%'").fetchall())
         known = {
             value
@@ -110,23 +116,25 @@ def emit() -> Path:
             polity="US-WA",
         )
         system = cs.key("us.electoral_system", "referendum")
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=KING)
-        cs.artifact(raw.cached(SOURCE, KING), source)
+        sources: dict[str, UUID] = {}
+        for row in frame.iter_rows(named=True):
+            if row["publisher"] not in sources:
+                source = sources[row["publisher"]] = cs.source(row["publisher"], TITLE)
+                origin = KING if row["publisher"] == PUBLISHER else row["url"]
+                cs.add("source", id=source, kind="official_body", publisher=row["publisher"], title=TITLE, url=origin)
+                cs.artifact(raw.cached(SOURCE, origin), source)
         parent = cs.key("us.election", f"{DAY}:WA")
         elections: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
             place = row["place"]
-            key = names.get(
-                ceda._city(place)
-                if place.startswith("City of")
-                else ceda._core(
-                    re.sub(r"\s+No\.?\s*\d+$", "", place)
-                    if "School District" in place
-                    else re.sub(r"\s+No\.?\s*(\d+)$", r" \1", place.replace("Fire Protection District", "Fire District"))
-                )
-            )
+            if place.startswith("City of"):
+                key = names.get(("us.place", ceda._city(place)))
+            elif "School District" in place:
+                key = names.get(("us.school_district", ceda._core(re.sub(r"\s+No\.?\s*\d+$", "", place))))
+            else:
+                core = ceda._core(re.sub(r"\s+No\.?\s*(\d+)$", r" \1", place.replace("Fire Protection District", "Fire District")))
+                key = names.get(("us.county", place)) or names.get(("us.special_district", core))
             if key is None and place in UNMINTED:
                 geoid, text = UNMINTED[place]
                 key = f"us.place:{geoid}"
@@ -155,6 +163,15 @@ def emit() -> Path:
                         valid_from=None,
                     )
                 found[key] = (polity_id, area_id, text, path, geoid)
+            if key is None and not place.startswith("City of") and "School District" not in place:
+                home = next((fips for name, fips in SAMPLE_COUNTY.items() if name.lower() in row["url"].lower()), None)
+                county_key = f"us.county:{home}"
+                if home is not None and county_key in found:
+                    county, county_area, _, county_path, county_code = found[county_key]
+                    minted = govmint.special(conn, cs, "WA", (county, county_area, county_path, county_code), place, slugs)
+                    if minted is not None:
+                        key = f"special:{home}:{place}"
+                        found[key] = minted
             if key is None:
                 print("no polity:", place, row["number"])
                 continue
@@ -211,7 +228,7 @@ def emit() -> Path:
                     ballot_position=position + 1,
                     ballot_label=answer,
                 )
-            cs.add("citation", entity_id=contest, source_id=source)
+            cs.add("citation", entity_id=contest, source_id=sources[row["publisher"]])
             cs.add(
                 "ballot_question_text",
                 contest_id=contest,
@@ -219,7 +236,7 @@ def emit() -> Path:
                 lang="en",
                 body=row["text"],
                 url=row["url"],
-                source_id=source,
+                source_id=sources[row["publisher"]],
             )
         print(f"{kept} of {frame.height} measures")
         return cs.write()
