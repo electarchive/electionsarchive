@@ -422,7 +422,7 @@
           "candidate": "Write-Ins"
         }
       ],
-      "hint": "The page holds several district tables; read only the table headed DISTRICT 23. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Dean Baxter; column 2 is Marsha Blackburn. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 23. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Dean Baxter; column 2 is Marsha Blackburn. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total. Column 3 is blank for this table: return only the columns for candidates 1 and 2 and the Write-Ins column, with three values per row."
     },
     {
       "page": 3,
