@@ -21,7 +21,7 @@ PAGE = "https://electionresults.mt.gov/"
 URL = f"{PAGE}#MF-406"
 TITLE = "Montana June 2, 2026 primary election results"
 NOTE = (
-    "The Secretary of State's statewide export by county, headed unofficial, with all 728 precincts reporting; "
+    "Unofficial: the Secretary of State's statewide export by county, with all 728 precincts reporting, not the certified state canvass (requested as MF-418); "
     "the county sums were checked against the TOTALS row of each race."
 )
 PARTIES = {
