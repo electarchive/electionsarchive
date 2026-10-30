@@ -1046,7 +1046,7 @@ def official_totals(manifest: Manifest) -> dict[str, int | None]:
     return held
 
 
-GENERIC_NAMES = {"other", "others", "votes", "write", "ins", "scattering", "scattered"}
+GENERIC_NAMES = {"votes"}
 
 
 def match(labels: list[str], held: list[tuple[str, str, int]], contest: str) -> tuple[list[Column], list[str]]:
@@ -1055,8 +1055,10 @@ def match(labels: list[str], held: list[tuple[str, str, int]], contest: str) -> 
         found_surnames = set()
         for form in (name, text):
             forms = [word for word in slug(form).split() if len(word) > 1 and word not in SUFFIX_WORDS]
-            if forms and not set(forms) <= GENERIC_NAMES:
-                found_surnames.add(forms[0] if "," in form else forms[-1])
+            if forms:
+                surname = forms[0] if "," in form else forms[-1]
+                if surname not in GENERIC_NAMES:
+                    found_surnames.add(surname)
         surnames.append((name, found_surnames))
     columns: list[Column] = []
     unmatched: list[str] = []
