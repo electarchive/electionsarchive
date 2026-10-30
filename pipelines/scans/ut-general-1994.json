@@ -1,0 +1,71 @@
+{
+  "polity": "US-UT",
+  "publisher": "Utah Lieutenant Governor's Office",
+  "authoritative": "Source: the Lieutenant Governor's official general election report, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "General election report by county, Utah, November 8, 1994",
+  "file": {
+    "url": "https://vote.utah.gov/wp-content/uploads/2023/09/1994Gen.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 1994,
+      "chamber": "senate",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "UT",
+      "district": null
+    },
+    "h1": {
+      "year": 1994,
+      "chamber": "house",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "UT",
+      "district": 1
+    },
+    "h2": {
+      "year": 1994,
+      "chamber": "house",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "UT",
+      "district": 2
+    },
+    "h3": {
+      "year": 1994,
+      "chamber": "house",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "UT",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "orientation": "counties_down",
+      "discover": [
+        "senate",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "orientation": "counties_down",
+      "discover": [
+        "senate",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    }
+  ]
+}

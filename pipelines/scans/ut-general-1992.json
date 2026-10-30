@@ -1,0 +1,148 @@
+{
+  "polity": "US-UT",
+  "publisher": "Utah Lieutenant Governor's Office",
+  "authoritative": "Source: the Lieutenant Governor's official general election report, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "General election report by county, Utah, November 3, 1992",
+  "file": {
+    "url": "https://vote.utah.gov/wp-content/uploads/2023/09/1992Gen.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": null
+    },
+    "senate": {
+      "year": 1992,
+      "chamber": "senate",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": null
+    },
+    "governor": {
+      "year": 1992,
+      "chamber": "governor",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": null
+    },
+    "h1": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": 1
+    },
+    "h2": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": 2
+    },
+    "h3": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "UT",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "orientation": "counties_down",
+      "discover": [
+        "president",
+        "senate",
+        "governor",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers.",
+      "dpi": 450
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "orientation": "counties_down",
+      "discover": [
+        "president",
+        "senate",
+        "governor",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "orientation": "counties_down",
+      "discover": [
+        "president",
+        "senate",
+        "governor",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "orientation": "counties_down",
+      "discover": [
+        "president",
+        "senate",
+        "governor",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "orientation": "counties_down",
+      "discover": [
+        "president",
+        "senate",
+        "governor",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "orientation": "counties_down",
+      "discover": [
+        "president",
+        "senate",
+        "governor",
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "hint": "One row per Utah county with its registered voters and number voting, then one column per candidate across the page, in printed order, with the candidate's name as the header; read the votes only, never the percent row, and leave a cell empty when it is blank. Include the TOTAL row. Columns of state legislative races, judges, and other offices may appear: keep them with their printed headers."
+    }
+  ]
+}
