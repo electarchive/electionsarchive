@@ -1901,7 +1901,6 @@ for key, publisher, title, url, local in (
     ("MO-29209", "Stone County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://stonecountyclerk.com/media/uploads/downloads/Stone_Publication_110326.pdf", "mo/stone.pdf"),
     ("MO-29069", "Dunklin County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://dunklincounty.gov/wp-content/uploads/2026/09/Sample-ballot-1.pdf", "mo/dunklin.pdf"),
     ("MO-29201", "Scott County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.scottcountymo.com/cmsAdmin/uploads/2/november-scott-publication-110326.pdf", "mo/scott.pdf"),
-    ("MO-29141", "Morgan County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.morgancountymo.gov/plugins/show_image.php?id=399", "mo/morgan.pdf"),
     ("MO-29113", "Lincoln County Clerk", "Election Authority's Certification, General Election, November 3, 2026", "https://www.lincolncomo.gov/sample-ballots", "mo/lincoln.pdf"),
     ("MO-29145", "Newton County Clerk", "Official General Election Ballot (sample), Newton County, November 3, 2026", "https://www.ncclerk.org/electionsvoters/", "mo/newton.pdf"),
     ("IL-17117", "Macoupin County Clerk", "Candidate List, 2026 General Election", "https://www.macoupinvotes.gov/election-information/sample-ballot/?electionId=23", "il/macoupin_candidates.html"),
