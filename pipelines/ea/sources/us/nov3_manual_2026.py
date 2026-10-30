@@ -16,14 +16,21 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
-MANUAL = DATA / "inbox" / "manual" / "MF-387"
+MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
 COUNTIES = {
-    "35001": ("NM", "https://www.bernco.gov/public-works/capital-improvement-program/general-obligation-bonds/", "bernalillo/bernalillo-general-obligation-bonds.html"),
-    "05007": ("AR", "https://bentoncountyar.gov/election-commission/", "benton-ar/benton-ar-election-commission.html"),
-    "04013": ("AZ", "https://elections.maricopa.gov/candidates/county-ballot-measures.html", "maricopa/maricopa-county-ballot-measures.html"),
-    "04019": ("AZ", "https://www.recorder.pima.gov/PressRelease/2026/11.3%20General%20Election%20What%20Voters%20Need%20to%20Know.pdf", "pima/11.3 General Election What Voters Need to Know.pdf"),
-    "04021": ("AZ", "https://www.pinal.gov/1847/2026-General-Election-Sample-Ballots", "pinal/pinal-2026-general-election-sample-ballots.html"),
+    "35001": ("NM", "https://www.bernco.gov/public-works/capital-improvement-program/general-obligation-bonds/", "MF-387/bernalillo/bernalillo-general-obligation-bonds.html"),
+    "05007": ("AR", "https://bentoncountyar.gov/election-commission/", "MF-387/benton-ar/benton-ar-election-commission.html"),
+    "04013": ("AZ", "https://elections.maricopa.gov/candidates/county-ballot-measures.html", "MF-387/maricopa/maricopa-county-ballot-measures.html"),
+    "04019": ("AZ", "https://www.recorder.pima.gov/PressRelease/2026/11.3%20General%20Election%20What%20Voters%20Need%20to%20Know.pdf", "MF-387/pima/11.3 General Election What Voters Need to Know.pdf"),
+    "04021": ("AZ", "https://www.pinal.gov/1847/2026-General-Election-Sample-Ballots", "MF-387/pinal/pinal-2026-general-election-sample-ballots.html"),
+    "45019": ("SC", "https://vote.charlestoncounty.gov/", "MF-390/sc-charleston-2026-11-03-local-questions.html"),
+    "45043": ("SC", "https://www.gtcountysc.gov/upcoming-elections/", "MF-390/22110326_abs_sample (3).pdf"),
+    "13035": ("GA", "https://www.buttscounty.org/elections", "MF-390/ga-butts-2026-11-03-referendum-notice.html"),
+    "13255": ("GA", "https://www.spaldingcountyelections.com/", "MF-390/RESOLUTION-CORRECTED-WITH-BOER-CHAIR-SIGNATURE.pdf"),
+    "31055": ("NE", "https://www.votedouglascounty-ne.gov/", "MF-390/GN26SampleBallot.pdf"),
+    "31109": ("NE", "https://www.lancaster.ne.gov/", "MF-390/LCEC General Sample Ballot.pdf"),
+    "31079": ("NE", "https://files.hallcountyne.gov/", "MF-390/26GNEHALL_7_PUB.pdf"),
 }
 
 
@@ -55,7 +62,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, and Arkansas, with official wording",
+            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, and Nebraska, with official wording",
             polity="US",
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
