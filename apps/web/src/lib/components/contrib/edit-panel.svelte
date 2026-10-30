@@ -11,6 +11,7 @@
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
+  import * as ToggleGroup from "#lib/components/ui/toggle-group/index.js";
   import {
     kindLabel,
     sourceKindLabel,
@@ -332,31 +333,31 @@
                       n={1}
                     />
                     <div class="mbs-2 grid gap-2 ps-1.5">
-                      <div
-                        class="flex gap-4 border-be text-xs"
-                        role="radiogroup"
+                      <ToggleGroup.Root
+                        type="single"
+                        variant="outline"
+                        size="sm"
+                        class="grid auto-cols-fr grid-flow-col inline-full"
                         aria-label={m.edit_evidence()}
+                        value={shown}
+                        onValueChange={(next: string) => {
+                          if (
+                            next === "source" ||
+                            next === "url" ||
+                            next === "upload"
+                          ) {
+                            mode = next;
+                          }
+                        }}
                       >
                         {#each modes as option (option)}
-                          <label
-                            class={cn(
-                              "-mbe-px cursor-pointer border-be-2 border-transparent pbe-1.5 text-muted-foreground hover:text-foreground has-focus-visible:text-foreground has-focus-visible:outline-[1.5px] has-focus-visible:outline-ring",
-                              {
-                                "border-foreground font-semibold text-foreground":
-                                  shown === option,
-                              },
-                            )}
-                            ><input
-                              class="sr-only"
-                              type="radio"
-                              name="edit-evidence-mode"
-                              value={option}
-                              checked={shown === option}
-                              onchange={() => (mode = option)}
-                            />{modeLabel[option]()}</label
+                          <ToggleGroup.Item
+                            value={option}
+                            class="px-1.5 text-xs text-muted-foreground data-[state=on]:font-semibold data-[state=on]:text-foreground"
+                            >{modeLabel[option]()}</ToggleGroup.Item
                           >
                         {/each}
-                      </div>
+                      </ToggleGroup.Root>
                       {#if shown === "source"}
                         <Combobox
                           items={sources}

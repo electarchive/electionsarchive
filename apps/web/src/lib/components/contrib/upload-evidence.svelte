@@ -1,11 +1,14 @@
 <script lang="ts">
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import Crop from "@lucide/svelte/icons/crop";
   import ZoomIn from "@lucide/svelte/icons/zoom-in";
   import ZoomOut from "@lucide/svelte/icons/zoom-out";
   import { onDestroy } from "svelte";
+  import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Checkbox } from "#lib/components/ui/checkbox/index.js";
+  import * as Dialog from "#lib/components/ui/dialog/index.js";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -30,6 +33,10 @@
   let shared = $state(false);
   let over = $state(false);
   let zoomed = $state(false);
+  let viewing = $state(false);
+  let size = $state<[number, number] | null>(null);
+  let image = $state<HTMLImageElement | null>(null);
+  const frame = $state({ width: 0, height: 0 });
   let draft = $state<Region | null>(null);
   let start: [number, number] | null = null;
   let request: XMLHttpRequest | null = null;
@@ -50,6 +57,8 @@
     problem = null;
     pages = null;
     zoomed = false;
+    viewing = false;
+    size = null;
     draft = null;
   };
 
@@ -198,7 +207,16 @@
     }
   };
 
-  const shown = $derived(draft ?? value?.region ?? null);
+  const marked = $derived(draft ?? value?.region ?? null);
+  const fit = $derived.by(() => {
+    if (size == null || frame.width === 0) {
+      return null;
+    }
+    const whole = Math.floor(
+      Math.min(frame.width, (frame.height * size[0]) / size[1]),
+    );
+    return zoomed ? whole * 2 : whole;
+  });
 </script>
 
 {#if phase === "ready" && value != null}
@@ -214,89 +232,158 @@
     {#if value.page == null || pages == null}
       <p class="text-xs text-muted-foreground">{m.upload_no_pages()}</p>
     {:else}
-      <div
-        class="overflow-auto overscroll-contain rounded-sm bg-white ring-1 ring-border max-block-[min(60dvh,32rem)]"
-      >
-        <div
-          class="relative cursor-crosshair touch-none select-none"
-          style:inline-size={zoomed ? "200%" : "100%"}
-          onpointerdown={down}
-          onpointermove={move}
-          onpointerup={up}
-          onpointercancel={() => {
-            start = null;
-            draft = null;
-          }}
-          role="presentation"
-        >
-          <img
-            class="block inline-full"
-            src="/uploads/{value.id}/pages/{value.page}"
-            alt={m.upload_page_alt({ page: value.page, filename })}
-            draggable="false"
-          />
-          {#if shown != null}
-            <div
-              class={cn(
-                "pointer-events-none absolute rounded-[2px] bg-marker/55 mix-blend-multiply ring-[1.5px] ring-ring",
-                { "bg-marker/35": draft != null },
-              )}
-              style:inset-inline-start="{shown[0] * 100}%"
-              style:inset-block-start="{shown[1] * 100}%"
-              style:inline-size="{(shown[2] - shown[0]) * 100}%"
-              style:block-size="{(shown[3] - shown[1]) * 100}%"
-            ></div>
-          {/if}
-        </div>
-      </div>
-      <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            class="block-8 inline-8"
-            aria-label={m.upload_previous()}
-            disabled={value.page <= 1}
-            onclick={() => turn(-1)}><ChevronLeft /></Button
-          >
-          <span class="font-figures text-sm tabular-nums" aria-live="polite"
-            >{m.upload_page({ page: value.page, pages: count(pages) })}</span
-          >
-          <Button
-            variant="ghost"
-            size="icon"
-            class="block-8 inline-8"
-            aria-label={m.upload_next()}
-            disabled={value.page >= pages}
-            onclick={() => turn(1)}><ChevronRight /></Button
-          >
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="block-8 inline-8"
-          aria-label={zoomed ? m.upload_zoom_out() : m.upload_zoom_in()}
-          aria-pressed={zoomed}
-          onclick={() => (zoomed = !zoomed)}
-          >{#if zoomed}<ZoomOut />{:else}<ZoomIn />{/if}</Button
-        >
-      </div>
-      <p
-        class="flex items-baseline justify-between gap-3 text-xs text-pretty text-muted-foreground"
-      >
-        <span>{m.upload_mark_hint()}</span>
-        {#if value.region != null}
+      {const page = $derived(value.page)}
+      {#if value.region != null && size != null}
+        <figure class="grid justify-items-start gap-1.5">
           <button
             type="button"
-            class="shrink-0 underline underline-offset-2 hover:text-foreground"
-            onclick={() => {
-              if (value != null) {
-                value = { ...value, region: null };
-              }
-            }}>{m.upload_mark_clear()}</button
+            class="rounded-sm outline-offset-2 max-inline-full focus-visible:outline-[1.5px] focus-visible:outline-ring"
+            aria-label={m.upload_edit()}
+            onclick={() => (viewing = true)}
           >
-        {/if}
-      </p>
+            <ScanCrop
+              class="hover:ring-foreground"
+              href="/uploads/{value.id}/pages/{page}"
+              width={size[0]}
+              height={size[1]}
+              region={value.region}
+              label={m.upload_page_alt({ page, filename })}
+              limit={240}
+            />
+          </button>
+          <figcaption
+            class="flex flex-wrap items-baseline gap-x-3 text-xs text-muted-foreground"
+          >
+            <span class="font-figures">{m.upload_marked({ page })}</span>
+            <button
+              type="button"
+              class="underline underline-offset-2 hover:text-foreground"
+              onclick={() => (viewing = true)}>{m.upload_edit()}</button
+            >
+          </figcaption>
+        </figure>
+      {:else}
+        <p class="text-xs text-pretty text-muted-foreground">
+          {m.upload_unmarked()}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          class="justify-self-start"
+          onclick={() => (viewing = true)}><Crop />{m.upload_open()}</Button
+        >
+      {/if}
+      <Dialog.Root bind:open={viewing}>
+        <Dialog.Content
+          class="grid-rows-[auto_minmax(0,1fr)_auto] gap-3 overflow-hidden block-[92dvh] sm:inline-[min(96vw,80rem)] sm:max-inline-[min(96vw,80rem)] max-sm:inset-s-0 max-sm:inset-bs-0 max-sm:translate-0 max-sm:rounded-none max-sm:p-3 max-sm:block-dvh max-sm:inline-screen  max-sm:max-block-dvh max-sm:max-inline-none"
+        >
+          <Dialog.Header class="pe-8">
+            <Dialog.Title class="truncate" title={filename}
+              >{filename}</Dialog.Title
+            >
+            <Dialog.Description>{m.upload_mark_hint()}</Dialog.Description>
+          </Dialog.Header>
+          <div
+            class="overflow-auto overscroll-contain rounded-sm bg-muted ring-1 ring-border"
+            bind:clientWidth={frame.width}
+            bind:clientHeight={frame.height}
+          >
+            <div
+              class="relative mx-auto cursor-crosshair touch-none bg-white select-none"
+              style:inline-size={fit == null ? "100%" : `${fit}px`}
+              onpointerdown={down}
+              onpointermove={move}
+              onpointerup={up}
+              onpointercancel={() => {
+                start = null;
+                draft = null;
+              }}
+              role="presentation"
+            >
+              <img
+                class="block inline-full"
+                src="/uploads/{value.id}/pages/{page}"
+                alt={m.upload_page_alt({ page, filename })}
+                draggable="false"
+                bind:this={image}
+                onload={() => {
+                  if (image != null) {
+                    size = [image.naturalWidth, image.naturalHeight];
+                  }
+                }}
+              />
+              {#if marked != null}
+                <div
+                  class={cn(
+                    "pointer-events-none absolute rounded-[2px] bg-marker/55 mix-blend-multiply ring-[1.5px] ring-ring",
+                    { "bg-marker/35": draft != null },
+                  )}
+                  style:inset-inline-start="{marked[0] * 100}%"
+                  style:inset-block-start="{marked[1] * 100}%"
+                  style:inline-size="{(marked[2] - marked[0]) * 100}%"
+                  style:block-size="{(marked[3] - marked[1]) * 100}%"
+                ></div>
+              {/if}
+            </div>
+          </div>
+          <div
+            class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+          >
+            <div class="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                class="block-8 inline-8"
+                aria-label={m.upload_previous()}
+                disabled={page <= 1}
+                onclick={() => turn(-1)}><ChevronLeft /></Button
+              >
+              <span class="font-figures text-sm tabular-nums" aria-live="polite"
+                >{m.upload_page({ page, pages: count(pages) })}</span
+              >
+              <Button
+                variant="ghost"
+                size="icon"
+                class="block-8 inline-8"
+                aria-label={m.upload_next()}
+                disabled={page >= pages}
+                onclick={() => turn(1)}><ChevronRight /></Button
+              >
+              <Button
+                variant="ghost"
+                size="icon"
+                class="block-8 inline-8"
+                aria-label={zoomed ? m.upload_zoom_out() : m.upload_zoom_in()}
+                aria-pressed={zoomed}
+                onclick={() => (zoomed = !zoomed)}
+                >{#if zoomed}<ZoomOut />{:else}<ZoomIn />{/if}</Button
+              >
+            </div>
+            <div
+              class="flex items-center gap-3 max-sm:justify-between max-sm:inline-full"
+            >
+              {#if value.region != null}
+                <button
+                  type="button"
+                  class="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                  onclick={() => {
+                    if (value != null) {
+                      value = { ...value, region: null };
+                    }
+                  }}>{m.upload_mark_clear()}</button
+                >
+              {/if}
+              <Dialog.Close>
+                {#snippet child({ props })}
+                  <Button {...props} size="sm" class="ms-auto"
+                    >{m.upload_done()}</Button
+                  >
+                {/snippet}
+              </Dialog.Close>
+            </div>
+          </div>
+        </Dialog.Content>
+      </Dialog.Root>
     {/if}
   </div>
 {:else if phase === "sending" || phase === "reading"}
