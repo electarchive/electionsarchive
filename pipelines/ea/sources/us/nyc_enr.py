@@ -397,11 +397,12 @@ def emit():
             ).fetchall()
         }
         borough_of_ad = {
-            ad: borough
-            for ad, borough in frame.filter(pl.col("level") == "ad", pl.col("borough").is_not_null())
-            .select("ad", "borough")
-            .unique()
+            ad: boroughs[0]
+            for ad, boroughs in frame.filter(pl.col("level") == "ad", pl.col("borough").is_not_null())
+            .group_by("ad")
+            .agg(pl.col("borough").unique())
             .iter_rows()
+            if len(boroughs) == 1
         }
         units: dict[tuple[str, str], UUID | None] = {}
         added: set[UUID] = set()
@@ -535,7 +536,7 @@ def emit():
                     cluster = []
                 cluster.append(stamp)
             frames.update({s: cluster[-1] for s in cluster})
-            group = group.with_columns(frame=pl.col("as_of").replace_strict(frames)).sort("as_of")
+            group = group.with_columns(frame=pl.col("as_of").replace_strict(frames)).sort("as_of", maintain_order=True)
             newest = max(frames.values())
             roots = {}
             children = {}
@@ -584,26 +585,7 @@ def emit():
                 ).fetchone()
                 is None
             )
-            spans = {end: min(s for s, e in frames.items() if e == end) for end in set(frames.values())}
-            for stale, stale_as_of in conn.execute(
-                """select id, as_of from result_set where contest_id = %s and source_id = %s
-                   and stage = 'preliminary' and status = 'active'""",
-                [contest, source],
-            ).fetchall():
-                if any(first <= stale_as_of < end for end, first in spans.items()):
-                    cs.add(
-                        "result_set",
-                        id=stale,
-                        election_id=election,
-                        contest_id=contest,
-                        stage="preliminary",
-                        kind="counted",
-                        status="withdrawn",
-                        source_id=source,
-                        as_of=stale_as_of,
-                        is_default=False,
-                    )
-                    withdrawn += 1
+            seen: set[UUID] = set()
             ballots: dict[tuple[str, str], UUID | None] = {}
 
             for name, line in group.select("candidate", "line").unique().iter_rows():
@@ -680,6 +662,7 @@ def emit():
                 ):
                     continue
                 result_set = cs.key(f"{SOURCE}.result_set", frame_key)
+                seen.add(result_set)
                 stored = (
                     None
                     if result_set in cs.minted
@@ -759,9 +742,28 @@ def emit():
                         flags=0,
                         value=votes,
                     )
+            for stale, stale_as_of in conn.execute(
+                """select id, as_of from result_set where contest_id = %s and source_id = %s
+                   and stage = 'preliminary' and status = 'active'""",
+                [contest, source],
+            ).fetchall():
+                if stale not in seen:
+                    cs.add(
+                        "result_set",
+                        id=stale,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="preliminary",
+                        kind="counted",
+                        status="withdrawn",
+                        source_id=source,
+                        as_of=stale_as_of,
+                        is_default=False,
+                    )
+                    withdrawn += 1
         for line in sorted(set(unmatched)):
             print("unmatched:", line)
-        print(f"{skipped} published sets left as they are, {withdrawn} partial frames withdrawn")
+        print(f"{skipped} published sets left as they are, {withdrawn} frames the pages no longer give withdrawn")
         if emptied:
             cs.manifest["scope"] = {"polity": "US", "clears": [str(id) for id in emptied]}
         return cs.write()
