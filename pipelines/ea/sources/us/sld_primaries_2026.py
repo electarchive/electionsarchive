@@ -17,7 +17,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.county_changes import ct_regions
-from ea.sources.us.enr_clarity import STATE_NAMES
+from ea.sources.us.enr_clarity import STATE_NAMES as CLARITY_NAMES
 from ea.sources.us.oe_primaries_2026 import (
     BASE,
     BROWSER,
@@ -41,7 +41,16 @@ from ea.store import DATA, connect
 SOURCE = "us.sld_primaries_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
+STATE_NAMES = {**CLARITY_NAMES, "DC": "District of Columbia"}
 ROUNDS = [
+    (
+        "DC",
+        date(2026, 6, 16),
+        "District of Columbia Board of Elections",
+        "June 16, 2026 primary and special election certified results by precinct",
+        "https://electionresults.dcboe.org/election_results/2026-Primary-Election",
+        "https://electionresults.dcboe.org/Downloads/Reports/June_16_2026_Primary_and_Special_Election_Certified_Results.csv",
+    ),
     (
         "MI",
         date(2026, 8, 4),
@@ -425,7 +434,7 @@ ROUNDS += [
         ),
     )
 ]
-SYSTEMS = {**RUNOFF_SYSTEMS, "AR": "two_round", "ME": "irv"}
+SYSTEMS = {**RUNOFF_SYSTEMS, "AR": "two_round", "ME": "irv", "DC": "irv"}
 MAJORITY = {**THRESHOLDS, "AR": 50}
 AR_CONTESTS = "https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={}"
 SIDECARS = {
@@ -459,6 +468,8 @@ LEGISLATIVE = re.compile(
     r"(?P<party>REP|DEM) (?:State (?P<chamber>Senate|House)|(?P<body>Senator|Representative) in General Assembly) District (?P<district>\d+)"
 )
 STATEWIDE = {
+    "mayor of the district of columbia": ("mayor", "Mayor"),
+    "attorney general for the district of columbia": ("attorney-general", "Attorney General"),
     "lieutenant governor": ("lieutenant-governor", "Lieutenant Governor"),
     "attorney general": ("attorney-general", "Attorney General"),
     "secretary of state": ("secretary-of-state", "Secretary of State"),
@@ -1203,6 +1214,19 @@ def parse() -> None:
                 .agg(pl.col("Votes").sum())
                 .iter_rows()
             ]
+        if state == "DC":
+            totals = defaultdict(int)
+            with path.open(newline="", encoding="utf-8-sig") as handle:
+                for row in csv.DictReader(handle):
+                    statewide = STATEWIDE.get(re.sub(r"^(DEM|REP|STG) ", "", row["ContestName"].strip()).lower())
+                    if (
+                        statewide is None
+                        or row["Party"] not in ("DEM", "REP")
+                        or re.fullmatch(r"(?i)over votes|under votes|write-in", row["Candidate"])
+                    ):
+                        continue
+                    totals[(statewide[0], "", {"DEM": "democratic", "REP": "republican"}[row["Party"]], row["Candidate"], "11001")] += int(row["Votes"])
+            rows = [(*key, votes) for key, votes in totals.items()]
         if state == "IL":
             totals = defaultdict(int)
             for link in IL_FILES:
@@ -1660,20 +1684,20 @@ def emit() -> Path:
                         )
             election = cs.key("us.election", f"{day}:{state}:{'runoff' if runoff else 'primary'}")
             if election in cs.minted:
-                if not runoff:
+                if not runoff and state != "DC":
                     raise ValueError(f"the {day} {state} primary election must exist")
                 cs.add(
                     "election",
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
                     parent_id=None,
-                    kind="runoff",
+                    kind="runoff" if runoff else "primary",
                     date_from=day,
                     date_to=day,
                     status="held",
                 )
-                name(election, f"2026 {STATE_NAMES[state]} primary runoff election")
-                cs.add("slug", path=f"us/{state.lower()}/{day}-primary-runoff", entity_id=election)
+                name(election, f"2026 {STATE_NAMES[state]} primary{' runoff' if runoff else ''} election")
+                cs.add("slug", path=f"us/{state.lower()}/{day}-primary{'-runoff' if runoff else ''}", entity_id=election)
             templates = {
                 value: row
                 for value, *row in conn.execute(
@@ -1830,6 +1854,8 @@ def emit() -> Path:
                             " and House District 58 (Republican), the ranked-choice tabulation elected the first-round"
                             " leader."
                             if state == "ME"
+                            else " The District's primaries are ranked-choice: these are first choices, and each winner shown held a majority of them, so no later round was needed."
+                            if state == "DC"
                             else ""
                         )
                     )
