@@ -282,6 +282,7 @@ export const proposalJobKind = pgEnum("proposal_job_kind", [
   "publish",
   "reject",
   "revert",
+  "withdraw",
 ]);
 
 export const proposalJobStatus = pgEnum("proposal_job_status", [
