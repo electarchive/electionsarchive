@@ -2555,6 +2555,7 @@ for key, publisher, title, url, local in (
     ("MN-27145-st-cloud", "City of St. Cloud", "Local Election Filings", "https://ci.stcloud.mn.us/846/Local-Election-Filings", "mn/stcloud_local_election_filings.html"),
     ("AZ-04003-sierra-vista", "City of Sierra Vista City Clerk", "Mayor and City Council Member Candidates, November 3, 2026 General Election (08-18-26)", "https://www.sierravistaaz.gov/our-city/departments/city-clerk/elections/campaign-for-office", "az/sierra_vista_candidates.pdf"),
     ("AZ-04015-county", "Mohave County Elections Department", "2026 General Election County Candidates", "https://www.mohave.gov/departments/elections/2026-general-election-county-candidates/", "az/mohave_county_candidates.html"),
+    ("AZ-04015-bullhead-city", "Bullhead City Clerk", "Sample Ballot, 2026 General Election (Precinct 211)", "https://www.bullheadcityaz.gov/leadership-government/elections/", "az/bullhead_sample_ballot.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():

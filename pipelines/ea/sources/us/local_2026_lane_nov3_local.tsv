@@ -1269,7 +1269,7 @@ AZ-04003-sierra-vista	Sierra Vista Mayor	0	Brandon Martin	Nonpartisan	Cochise	1
 AZ-04003-sierra-vista	Sierra Vista Mayor	0	Mark Rodriguez	Nonpartisan	Cochise	1
 AZ-04003-sierra-vista	Sierra Vista Council Member(s)	0	Brian Miers	Nonpartisan	Cochise	4
 AZ-04003-sierra-vista	Sierra Vista Council Member(s)	0	Edward Wozniak	Nonpartisan	Cochise	4
-AZ-04015-county	Mohave County Clerk of the Superior Court	0	Christina Spurlock		Mohave	1
+AZ-04015-county	Mohave County Clerk of the Superior Court	0	Christina Spurlock	Republican	Mohave	1
 AZ-04015-county	Mohave County Superior Court Judge Division 1	0	Megan A. McCoy	Nonpartisan	Mohave	1
 AZ-04015-county	Mohave County Superior Court Judge Division 2	0	Derek Carlisle	Nonpartisan	Mohave	1
 AZ-04015-county	Mohave County Superior Court Judge Division 3	0	Steven Moss	Nonpartisan	Mohave	1
@@ -1277,15 +1277,17 @@ AZ-04015-county	Mohave County Superior Court Judge Division 4	0	Aaron Demke	Nonp
 AZ-04015-county	Mohave County Superior Court Judge Division 6	0	Eric E. Gordon	Nonpartisan	Mohave	1
 AZ-04015-county	Mohave County Superior Court Judge Division 7	0	Kenneth L. Gregory	Nonpartisan	Mohave	1
 AZ-04015-county	Mohave County Superior Court Judge Division 8	0	Douglas Camacho	Nonpartisan	Mohave	1
-AZ-04015-county	Mohave County Justice of the Peace Precinct 1	0	Dave Huerta	Nonpartisan	Mohave	1
-AZ-04015-county	Mohave County Justice of the Peace Precinct 2	0	Jennifer Brodie	Nonpartisan	Mohave	1
-AZ-04015-county	Mohave County Justice of the Peace Precinct 3	0	Jon Moss	Nonpartisan	Mohave	1
-AZ-04015-county	Mohave County Justice of the Peace Precinct 4	0	Barbara Joy Brown	Nonpartisan	Mohave	1
-AZ-04015-county	Mohave County Justice of the Peace Precinct 5	0	David Jay Wayt	Nonpartisan	Mohave	1
+AZ-04015-county	Mohave County Justice of the Peace Precinct 1	0	Dave Huerta		Mohave	1
+AZ-04015-county	Mohave County Justice of the Peace Precinct 2	0	Jennifer Brodie		Mohave	1
+AZ-04015-county	Mohave County Justice of the Peace Precinct 3	0	Jon Moss	Republican	Mohave	1
+AZ-04015-county	Mohave County Justice of the Peace Precinct 4	0	Barbara Joy Brown		Mohave	1
+AZ-04015-county	Mohave County Justice of the Peace Precinct 5	0	David Jay Wayt		Mohave	1
 AZ-04015-county	Mohave County Constable Precinct 1	0	Timothy F. Griepp		Mohave	1
 AZ-04015-county	Mohave County Constable Precinct 2	0	Martin Standsberry		Mohave	1
-AZ-04015-county	Mohave County Constable Precinct 3	0	John Deese		Mohave	1
+AZ-04015-county	Mohave County Constable Precinct 3	0	John Deese	Republican	Mohave	1
 AZ-04015-county	Mohave County Constable Precinct 4	0	Michael K. Hoggard		Mohave	1
 AZ-04015-county	Mohave County Constable Precinct 5	0	Robert "Joey" McEuen		Mohave	1
 AZ-04015-county	Mohave Community College Governing Board District 2	0	Robert S. Arp	Nonpartisan	Mohave	1
 AZ-04015-county	Mohave Community College Governing Board District 5	0	Diane Singer	Nonpartisan	Mohave	1
+AZ-04015-bullhead-city	Bullhead City Council Member	1	Britnee Kidwell	Nonpartisan	Mohave	1
+AZ-04015-bullhead-city	Bullhead City Council Member	1	Tami Ring	Nonpartisan	Mohave	1
