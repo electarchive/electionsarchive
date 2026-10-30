@@ -20,9 +20,13 @@ HAMILTON = "https://www.hamiltoncountyohio.gov/government/departments/board_of_e
 HAMILTON_FILE = INBOX / "hamilton" / "November-2026-Ballot-Issues.pdf"
 SUMMIT = "https://www.summitcountyohio.gov/boe/election-60-day-issue-synopsis"
 SUMMIT_FILE = INBOX / "summit" / "Election_60IssueSynopsis.pdf"
+CUYAHOGA = "https://boe.cuyahogacounty.gov/"
+CUYAHOGA_FILE = INBOX / "cuyahoga" / "PDF Sample Ballot Package.pdf"
+CUYAHOGA_BOXES = ((5, 20, 195, 375), (5, 215, 175, 355), (5, 392, 215, 325), (6, 20, 195, 545), (6, 215, 190, 345))
 SOURCES = {
     HAMILTON: ("Hamilton", HAMILTON_FILE, "Hamilton County Board of Elections", "November 3, 2026 General Election ballot issues"),
     SUMMIT: ("Summit", SUMMIT_FILE, "Summit County Board of Elections", "Issue synopsis, November 3, 2026 General Election"),
+    CUYAHOGA: ("Cuyahoga", CUYAHOGA_FILE, "Cuyahoga County Board of Elections", "Sample ballot (Bay Village 01-A), November 3, 2026 General Election"),
 }
 
 
@@ -82,8 +86,27 @@ def summit() -> list[dict[str, str]]:
     return rows
 
 
+def cuyahoga() -> list[dict[str, str]]:
+    rows = []
+    path = str(raw.cached(SOURCE, CUYAHOGA).path)
+    for page, x, width, bottom in CUYAHOGA_BOXES:
+        text = subprocess.run(
+            ["pdftotext", "-f", str(page), "-l", str(page), "-layout", "-x", str(x), "-y", "135", "-W", str(width), "-H", str(bottom - 135), path, "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        flat = re.sub(r"\s+", " ", text).strip()
+        head, _, body = flat.partition("A majority affirmative vote is necessary for passage.")
+        kind = re.sub(r"^\d+ ", "", head)
+        rows.append(
+            {"url": CUYAHOGA, "county": "Cuyahoga", "kind": kind.split(" County of")[0].split(" Board of")[0].split(" Health and")[0], "entity": "Cuyahoga County", "text": body.strip()}
+        )
+    return rows
+
+
 def parse() -> None:
-    frame = pl.DataFrame(hamilton() + summit())
+    frame = pl.DataFrame(hamilton() + summit() + cuyahoga())
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "issues.parquet")
     print(frame.group_by("county").len().rows())
@@ -112,7 +135,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Official ballot language for Hamilton County, Ohio local issues on the November 3, 2026 ballot",
+            summary="Official ballot language for Hamilton, Summit, and Cuyahoga County, Ohio local issues on the November 3, 2026 ballot",
             polity="US-OH",
         )
         sources: dict[str, UUID] = {}
@@ -131,6 +154,9 @@ def emit() -> Path:
             for word in ("additional", "renewal", "replacement", "decrease", "increase"):
                 if len(narrowed) > 1 and word in row["kind"].lower():
                     narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
+            section = re.search(r"Section (\d+\.\d+)", row["text"])
+            if len(narrowed) > 1 and section:
+                narrowed = [c for c in narrowed if f"Section {section[1]}" in c[2]] or narrowed
             if len({c[0] for c in narrowed}) != 1:
                 print("no match:", row["entity"], row["kind"], len(narrowed))
                 continue
