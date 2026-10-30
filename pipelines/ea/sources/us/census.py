@@ -70,6 +70,13 @@ REDRAWN_2026 = {
         "Congressional plan adopted October 31, 2025, from the commission's block assignment file",
         "https://redistricting.ohio.gov/maps",
     ),
+    "29": (
+        "MO",
+        "https://www.arcgis.com/sharing/rest/content/items/ee1971b86cce43d4b92b5ce614866a18/data",
+        "Missouri Spatial Data Information Service, University of Missouri",
+        "House Bill 1 congressional districts (2025 second extraordinary session), as used in the August 2026 primary",
+        "https://www.arcgis.com/home/item.html?id=ee1971b86cce43d4b92b5ce614866a18",
+    ),
     "37": (
         "NC",
         "https://webservices.ncleg.gov/ViewBillDocument/2025/7667/0/SL%202025-95%20-%20Shapefile",
@@ -99,6 +106,7 @@ REDRAWN_2026 = {
         "https://opendata.gis.utah.gov/datasets/utah-us-congress-districts-2026-to-2032/about",
     ),
 }
+PRIMARY_ONLY = {"29": date(2026, 8, 5)}
 BLOCKS = {"39": f"{TIGER}TIGER2020PL/LAYER/TABBLOCK/2020/tl_2020_39_tabblock20.zip"}
 LEWIS = (
     "https://github.com/JeffreyBLewis/congressional-district-boundaries/archive/"
@@ -403,7 +411,7 @@ def parse() -> None:
                     {
                         "code": record["GEOID"],
                         "valid_from": CONGRESSES[120],
-                        "valid_to": None,
+                        "valid_to": PRIMARY_ONLY.get(str(record["STATEFP"])),
                         "quality": "official",
                         "geom": geometry[("cd120", str(record["GEOID"]))][0],
                         "label_point": geometry[("cd120", str(record["GEOID"]))][1],
@@ -412,6 +420,18 @@ def parse() -> None:
                     for record, _ in layers["cd120"]
                 ],
                 schema_overrides={"valid_to": pl.Date},
+            ),
+        ],
+        how="diagonal",
+    )
+    districts = pl.concat(
+        [
+            districts,
+            *(
+                districts.filter(
+                    (pl.col("code").str.slice(0, 2) == fips) & (pl.col("valid_from") == CONGRESSES[119]) & pl.col("state").is_null()
+                ).with_columns(valid_from=pl.lit(reopened), valid_to=pl.lit(None, dtype=pl.Date))
+                for fips, reopened in PRIMARY_ONLY.items()
             ),
         ],
         how="diagonal",
