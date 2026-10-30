@@ -4281,6 +4281,8 @@ def parse() -> None:
                     "party": named,
                     "independent": independent,
                     "unexpired": False,
+                    "mint": (town, post.split(" Ward")[0]) in (("City Of Summit", "1"), ("City Of Linden", "8"), ("City Of Linden", "10"))
+                    or (town == "City Of Linden" and post.lower() == "president of council"),
                 }
             )
 
@@ -5925,7 +5927,7 @@ def parse() -> None:
                                     (r"^(?:town )?highway superintendent$", "highway-superintendent"),
                                     (r"^(?:town |village )?justice$", "justice"),
                                     (r"^(?:city )?court judge$", "judge"),
-                                    (r"^village president$|^president$", "president"),
+                                    (r"^village president$|^president$|^president of (?:the )?council$", "president"),
                                     (r"(?<!president of )(?<!deputy )\bmayor\b", "mayor"),
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
                                     (r"\bcommittee\b", "committee"),
