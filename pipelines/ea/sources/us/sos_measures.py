@@ -291,6 +291,23 @@ OR_ABSTRACTS = {
     ),
     date(2010, 11, 2): (OR.format(354805),),
 }
+MI = "https://web.archive.org/web/2id_/https://mielections.us/election/results/DATA/{}_MI_CENR_BY_COUNTY.xls"
+MI_PROPOSALS = {
+    ("2012GEN", "12-1"): ("Referendum on Public Act 4 of 2011, the Emergency Manager Law", "Popular Referendum"),
+    ("2012GEN", "12-2"): ("Constitutional amendment protecting collective bargaining rights", "Initiative"),
+    ("2012GEN", "12-3"): ("Constitutional amendment establishing a renewable energy standard", "Initiative"),
+    ("2012GEN", "12-4"): ("Constitutional amendment establishing the Michigan Quality Home Care Council", "Initiative"),
+    ("2012GEN", "12-5"): ("Constitutional amendment requiring a two-thirds legislative vote or voter approval for new taxes", "Initiative"),
+    ("2012GEN", "12-6"): ("Constitutional amendment requiring voter approval for new international bridges and tunnels", "Initiative"),
+    ("2014PRI", "14-1"): ("Referendum on Public Act 80 of 2014", "Popular Referendum"),
+    ("2014GEN", "14-1"): ("Referendum on Public Act 520 of 2012", "Popular Referendum"),
+    ("2014GEN", "14-2"): ("Referendum on Public Act 21 of 2013", "Popular Referendum"),
+    ("2018GEN", "18-1"): ("Initiated law to regulate marijuana like alcohol", "Initiative"),
+    ("2018GEN", "18-2"): ("Constitutional amendment creating an independent redistricting commission", "Initiative"),
+    ("2018GEN", "18-3"): ("Constitutional amendment on voting rights and election administration", "Initiative"),
+    ("2020GEN", "20-1"): ("Constitutional amendment on oil and gas royalty funds for parks and conservation", "Legislative Referendum"),
+    ("2020GEN", "20-2"): ("Constitutional amendment requiring a search warrant for electronic data and communications", "Legislative Referendum"),
+}
 UT_FILES = {
     date(2000, 11, 7): "2000Gen.pdf",
     date(2002, 11, 5): "2002Gen.pdf",
@@ -905,6 +922,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "MI": (
+        "Michigan Bureau of Elections",
+        "Official election results by county",
+        "https://mielections.us/election/results/",
+    ),
     "UT": (
         "Utah Lieutenant Governor's Office of Elections",
         "Official canvass by county",
@@ -1226,6 +1248,9 @@ def fetch() -> None:
         for path in paths:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
+    for name in dict.fromkeys(file for file, _ in MI_PROPOSALS):
+        raw.fetch(SOURCE, MI.format(name), suffix=".tsv")
+        time.sleep(1)
     raw.fetch(SOURCE, AK_2000, suffix=".txt")
     for path, _ in WY_FILES.values():
         raw.fetch(SOURCE, WY + path, suffix=".pdf")
@@ -3434,6 +3459,35 @@ def new_york() -> list[dict[str, object]]:
     return rows
 
 
+def michigan() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for name in dict.fromkeys(file for file, _ in MI_PROPOSALS):
+        url = MI.format(name)
+        lines = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace").splitlines()
+        header = lines[0].split("\t")
+        for line in lines[1:]:
+            fields = dict(zip(header, line.split("\t"), strict=False))
+            if fields["OfficeCode(Text)"] != "90":
+                continue
+            number = re.search(r"\d{2}-\d", fields["OfficeDescription"])[0]
+            title, kind = MI_PROPOSALS[name, number]
+            rows.append(
+                {
+                    "state": "MI",
+                    "day": date.fromisoformat(fields["ElectionDate"]),
+                    "number": number,
+                    "label": f"Proposal {number}",
+                    "url": url,
+                    "county": fields["CountyName"].title().replace("Gd.", "Grand"),
+                    "answer": fields["CandidateLastName"].upper(),
+                    "votes": int(fields["CandidateVotes"]),
+                    "title": title,
+                    "kind": kind,
+                }
+            )
+    return rows
+
+
 def utah() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in UT_FILES.items():
@@ -3944,6 +3998,7 @@ def parse() -> None:
             *montana(),
             *north_dakota(),
             *new_york(),
+            *michigan(),
             *utah(),
             *wyoming(),
             *south_carolina(),
