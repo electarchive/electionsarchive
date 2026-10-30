@@ -25,6 +25,7 @@
     "@fontsource-variable/sofia-sans-semi-condensed": "catalog:",
     "@fontsource/piazzolla": "catalog:",
     "@fontsource/sofia-sans-semi-condensed": "catalog:",
+    "@modelcontextprotocol/sdk": "catalog:",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
