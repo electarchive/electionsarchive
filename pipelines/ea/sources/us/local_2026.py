@@ -2736,7 +2736,7 @@ def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
     for tail, text in conn.execute(
-        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id, named, x.value ~ 'at-large')
+        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id, named)
                   regexp_replace(x.value, '^[0-9-]+:', ''), n.text
            from contest c
            join election e on e.id = c.election_id
@@ -2754,7 +2754,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            where (x.value ~ %s or x.value ~ %s) and e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
-           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, named, x.value ~ 'at-large', e.date_from desc, x.value""",
+           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, named, e.date_from desc, x.value ~ 'at-large', x.value""",
         [f"(^|:){state}:", "^ceda:" if state == "CA" else "^$", DAY],
     ):
         county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
