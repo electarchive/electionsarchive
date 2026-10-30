@@ -1,0 +1,36 @@
+@media (prefers-reduced-motion: no-preference) {
+  .contrib-sheet {
+    animation: contrib-sheet-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @container (width < 64rem) {
+    .contrib-sheet {
+      animation-name: contrib-sheet-up;
+      transition: block-size 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+  }
+
+  .contrib-settle {
+    animation: contrib-settle 260ms ease-out;
+  }
+}
+
+@keyframes contrib-sheet-in {
+  from {
+    translate: 24px 0;
+    opacity: 0;
+  }
+}
+
+@keyframes contrib-sheet-up {
+  from {
+    translate: 0 24px;
+    opacity: 0;
+  }
+}
+
+@keyframes contrib-settle {
+  from {
+    background-color: color-mix(in oklab, var(--marker) 45%, transparent);
+  }
+}
