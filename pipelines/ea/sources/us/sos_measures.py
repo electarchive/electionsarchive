@@ -345,6 +345,8 @@ WI_FILES = {
 IA = "https://web.archive.org/web/20141231002203id_/http://sos.iowa.gov/elections/"
 IA_2008 = IA + "pdf/2008/OfficialCanvass2008General.pdf"
 IA_2010 = IA + "results/xls/2010/general/statewidepct.xlsx"
+MS = "https://web.archive.org/web/2022id_/https://www.sos.ms.gov/links/elections/results/statewide/Statewide%20Initiative%20Measure%20{}%20-%20General%20Election%202011%20Results.pdf"
+MS_2011 = ("26", "27", "31")
 KS = "https://sos.ks.gov/elections/22elec/"
 KS_2022 = (
     (
@@ -999,6 +1001,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "MS": (
+        "Mississippi Secretary of State",
+        "Total votes reported by county",
+        "https://www.sos.ms.gov/elections-voting/election-results",
+    ),
     "IA": (
         "Iowa Secretary of State",
         "Official canvass and precinct results",
@@ -1355,6 +1362,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    for number in MS_2011:
+        raw.fetch(SOURCE, MS.format(number), suffix=".pdf")
     raw.fetch(SOURCE, IA_2008, suffix=".pdf")
     raw.fetch(SOURCE, IA_2010, suffix=".xlsx")
     for stamp, file, _ in WI_FILES.values():
@@ -3908,6 +3917,43 @@ def iowa() -> list[dict[str, object]]:
     return rows
 
 
+def mississippi() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for number in MS_2011:
+        url = MS.format(number)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        county = ""
+        counties: dict[str, dict[str, int]] = {}
+        totals: dict[str, int] = {}
+        for text_line in text.splitlines():
+            if match := re.match(r"^(\S.*?)\s+Measure No\. \d+", text_line):
+                county = match[1]
+            elif match := re.match(r"^\s+Measure No\. \d+", text_line):
+                county = ""
+            elif match := re.match(r"^\s+(YES|NO)\s+([\d,]+)\s+[\d.]+%", text_line):
+                (counties.setdefault(county, {}) if county else totals)[match[1]] = int(match[2].replace(",", ""))
+        sums = {answer: sum(votes[answer] for votes in counties.values()) for answer in ("YES", "NO")}
+        if len(counties) != 82 or sums != totals:
+            raise ValueError(f"{url}: {len(counties)} counties add up to {sums}, not {totals}")
+        rows.extend(
+            {
+                "state": "MS",
+                "day": date(2011, 11, 8),
+                "number": number,
+                "label": f"Initiative Measure {number}",
+                "url": url,
+                "county": place,
+                "answer": answer,
+                "votes": votes[answer],
+            }
+            for place, votes in counties.items()
+            for answer in ("YES", "NO")
+        )
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -4522,6 +4568,7 @@ def parse() -> None:
             *west_virginia(),
             *wisconsin(),
             *iowa(),
+            *mississippi(),
             *utah(),
             *wyoming(),
             *south_carolina(),
