@@ -260,6 +260,15 @@ const holding = (tenure: string, day: SQL) => {
       or (${t}.ended_via in ('term_end', 'dissolved') and ${t}.to_date >= ${day} - 120))`;
 };
 
+const undated = (tenure: string) => {
+  const t = sql.raw(tenure);
+  return sql`
+    (${t}.from_precision = 'unknown'
+      and exists (select from note n where n.entity_id = ${t}.id and n.body_md like '%entering at a by-election%')
+      and exists (select from tenure d where d.body_id = ${t}.body_id and d.from_date = ${t}.from_date and d.from_precision = 'day'))
+  `;
+};
+
 const covered = (contests: SQL) => sql`
   with tk as (
     select c.id, coalesce(c.office_id, pc.office_id) as office_id, c.body_id, e.date_from as d
@@ -19592,6 +19601,7 @@ export const bodies = {
             start: v.string(),
             apportioned: v.nullable(v.number()),
             seceded: v.number(),
+            undated: v.array(v.nullable(v.string())),
             parties: v.array(
               v.object({
                 party: v.nullable(v.string()),
@@ -19677,6 +19687,7 @@ export const bodies = {
         makeup,
         upcoming,
         changes,
+        late,
       ] = await Promise.all([
         names([input.id, body.polity]),
         paths([body.polity]),
@@ -19747,6 +19758,7 @@ export const bodies = {
               (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
             from tenure t left join seat st on st.id = t.seat_id
             where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
+              and not ${undated("t")}
           ),
           starts as (
             select t.from_date as start from t
@@ -19847,7 +19859,7 @@ export const bodies = {
             from tenure t left join seat st on st.id = t.seat_id
             left join kinds k on k.id = t.id
             where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
-              and (t.to_date is null or t.to_date > t.from_date)
+              and (t.to_date is null or t.to_date > t.from_date) and not ${undated("t")}
           ),
           s as materialized (
             select a.tenure_id, coalesce(pm.into_id, a.party_id) as party,
@@ -19923,6 +19935,11 @@ export const bodies = {
           )
           select day::text as date, kind, "from", "to", cause, count(*)::int as members
           from events group by 1, 2, 3, 4, 5 order by 1, 2, 6 desc
+        `),
+        db.execute<{ start: string; to: string | null }>(sql`
+          select t.from_date::text as start, t.to_date::text as to
+          from tenure t left join seat st on st.id = t.seat_id
+          where t.body_id = ${input.id}::uuid and coalesce(st.voting, true) and ${undated("t")}
         `),
       ]);
       const home = slugs.get(body.polity) ?? null;
@@ -20044,6 +20061,9 @@ export const bodies = {
             start,
             apportioned: entitled.get(start)?.seats ?? null,
             seceded: entitled.get(start)?.seceded ?? 0,
+            undated: late.rows
+              .filter((row) => row.start === start)
+              .map((row) => row.to),
             parties: rows.map((row) => ({
               party: row.party,
               caucus: row.caucus,
@@ -20157,7 +20177,12 @@ export const bodies = {
           v.object({
             party: v.string(),
             on: v.string(),
-            kind: v.picklist(["closed_by_court", "closed_by_government", "merged_into", "absorbed_by"]),
+            kind: v.picklist([
+              "closed_by_court",
+              "closed_by_government",
+              "merged_into",
+              "absorbed_by",
+            ]),
           }),
         ),
       }),
@@ -20427,7 +20452,11 @@ export const bodies = {
         db.execute<{
           party: string;
           on: string;
-          kind: "closed_by_court" | "closed_by_government" | "merged_into" | "absorbed_by";
+          kind:
+            | "closed_by_court"
+            | "closed_by_government"
+            | "merged_into"
+            | "absorbed_by";
         }>(sql`
           select coalesce(fm.into_id, r.from_party_id)::text as party, r.date::text as on, r.kind::text as kind
           from party_relation r left join entity_merge fm on fm.entity_id = r.from_party_id

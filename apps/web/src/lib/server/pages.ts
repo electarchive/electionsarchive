@@ -473,6 +473,7 @@ export async function chamber(path: string) {
     isSeated: false,
     apportioned: null,
     seceded: 0,
+    undated: [] as Array<string | null>,
   }));
   const first = Date.parse(body.makeup[0]?.start ?? "9999-12-31") - 2e10;
   const earlier = results.filter((term) => Date.parse(term.start) < first);
@@ -489,6 +490,7 @@ export async function chamber(path: string) {
             isSeated: true,
             apportioned: term.apportioned,
             seceded: term.seceded,
+            undated: term.undated,
             election:
               point == null ||
               Date.parse(term.start) - Date.parse(point.date) > 8e10
@@ -676,12 +678,15 @@ export async function chamber(path: string) {
             parties,
             near,
             moves,
+            undated: term.undated.filter((to) => to == null || to > date)
+              .length,
           }))
       : [];
     return {
       ...term,
       parties: [...seats].map(([party, count]) => ({ party, seats: count })),
       steps,
+      undated: term.undated.filter((to) => to == null || to > settled).length,
       near: days.findLast((day) => day.date <= settled)?.near ?? {},
       end,
       total: total(term.parties),

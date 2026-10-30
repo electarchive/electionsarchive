@@ -28,6 +28,7 @@
       size: number | null;
       apportioned: number | null;
       seceded: number;
+      undated?: number;
       isSeated: boolean;
       isPartial: boolean;
       parties: Array<{
@@ -47,6 +48,7 @@
           group?: string | null;
         }>;
         near?: Record<string, string | null>;
+        undated?: number;
         moves: Array<{
           kind: "in" | "out" | "switch" | "rename";
           from: string | null;
@@ -88,6 +90,8 @@
 
   const uid = $props.id();
   const PAD = { top: 10, side: 1, axis: 22 };
+  const UNDATED =
+    "repeating-linear-gradient(-45deg, var(--muted-foreground) 0 1px, transparent 1px 3px)";
 
   let width = $state(0);
   let hovered = $state<number | null>(null);
@@ -310,6 +314,7 @@
         from: term.start,
         parties: term.parties,
         near: term.near,
+        entrants: term.undated ?? 0,
         step: null,
       };
       const marks = [
@@ -318,6 +323,7 @@
           from: step.date,
           parties: step.parties,
           near: step.near,
+          entrants: step.undated ?? 0,
           step,
         })),
       ];
@@ -345,6 +351,7 @@
           term.isSeated && full != null
             ? Math.max(0, full - seated - term.seceded)
             : 0;
+        const late = Math.min(open, part.entrants);
         return {
           ...part,
           x0: at === 0 ? x0 : sx(Date.parse(part.from)),
@@ -352,9 +359,14 @@
           to: after?.from ?? term.end,
           stack: layers,
           spans,
-          empty: open,
-          vacant: {
+          empty: open - late,
+          late,
+          undated: {
             y0: PAD.top + inner - (seated + term.seceded) * unit,
+            y1: PAD.top + inner - (seated + term.seceded + late) * unit,
+          },
+          vacant: {
+            y0: PAD.top + inner - (seated + term.seceded + late) * unit,
             y1: PAD.top + inner - (seated + term.seceded + open) * unit,
           },
         };
@@ -741,6 +753,16 @@
       >
         <rect width="1.5" height="5" class="fill-card" />
       </pattern>
+      <pattern
+        id="{uid}-undated"
+        width="4"
+        height="4"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(-45)"
+      >
+        <rect width="4" height="4" class="fill-muted" />
+        <rect width="1.25" height="4" class="fill-muted-foreground" />
+      </pattern>
     </defs>
     <g>
       {#each slices.filter((entry) => entry.empty > 0) as entry, index (index)}
@@ -751,6 +773,16 @@
           height={entry.vacant.y0 - entry.vacant.y1}
           fill="url(#{uid}-vacant)"
           opacity="0.55"
+        />
+      {/each}
+      {#each slices.filter((entry) => entry.late > 0) as entry, index (index)}
+        <rect
+          x={entry.x0}
+          y={entry.undated.y1}
+          width={Math.max(entry.x1 - entry.x0, 0.5)}
+          height={entry.undated.y0 - entry.undated.y1}
+          fill="url(#{uid}-undated)"
+          opacity="0.7"
         />
       {/each}
       {#each columns.filter((column) => column.term.seceded > 0) as column (column.index)}
@@ -1052,6 +1084,23 @@
             >
           </li>
         {/if}
+        {#if part.late > 0}
+          <li class="flex items-center justify-between gap-3">
+            <span class="flex min-inline-0 items-center gap-1.5">
+              <span
+                class="shrink-0 rounded-xs bg-muted block-2.5 inline-2.5"
+                style:background-image={UNDATED}
+              ></span>
+              <span class="text-pretty">{m.seats_undated()}</span>
+            </span>
+            <span class="shrink-0 font-figures whitespace-nowrap tabular-nums"
+              ><span class="font-semibold">{count(part.late)}</span>
+              <span class="text-muted-foreground"
+                >{percent(part.late / lit.whole)}</span
+              ></span
+            >
+          </li>
+        {/if}
         {#if part.empty > 0}
           <li class="flex items-center justify-between gap-3">
             <span class="flex items-center gap-1.5 truncate">
@@ -1147,6 +1196,15 @@
         class="rounded-xs border border-dashed border-muted-foreground bg-muted block-2.5 inline-2.5"
       ></span>
       <span class="text-muted-foreground">{m.seats_seceded()}</span>
+    </li>
+  {/if}
+  {#if terms.some((term) => (term.undated ?? 0) > 0)}
+    <li class="flex items-center gap-1.5">
+      <span
+        class="rounded-xs bg-muted block-2.5 inline-2.5"
+        style:background-image={UNDATED}
+      ></span>
+      <span class="text-muted-foreground">{m.seats_undated()}</span>
     </li>
   {/if}
 </ul>

@@ -570,6 +570,7 @@
   "seats_unplaced": "No position recorded",
   "seats_unplaced_note": "No left–right position recorded for {parties}. The chart seats them beside the party most of their members came from, or in the middle.",
   "seats_seceded": "Seceded",
+  "seats_undated": "Seated during the term, date unknown",
   "seats_held": "Not up",
   "seats_after_title": "Chamber after this election",
   "seats_appointed": "Appointed",
