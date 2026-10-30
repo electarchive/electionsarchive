@@ -1036,8 +1036,14 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         conn.execute(
             sql.SQL(
                 """delete from public.{target} p using {staged} s, changeset c
-                   where c.id = p.changeset_id and c.pipeline = any({writers}) and {overlaps}"""
-            ).format(target=target, staged=staged, writers=stage.writers(table), overlaps=stage.overlaps(table))
+                   where c.id = p.changeset_id and (c.pipeline = any({writers}) or {contrib}) and {overlaps}"""
+            ).format(
+                target=target,
+                staged=staged,
+                writers=stage.writers(table),
+                contrib=sql.Literal(stage.pipeline == "contrib"),
+                overlaps=stage.overlaps(table),
+            )
         )
     if table == "tenure_affiliation":
         conn.execute(
@@ -1058,9 +1064,33 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 )
             print(f"{table}: cleared {sum(row[2] for row in cleared)} rows in {len(cleared)} listed sets")
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.stale(table)))
+    kept = sql.SQL("")
+    if table in stage.temporal and stage.pipeline != "contrib":
+        guard = sql.SQL(
+            "exists (select from public.{} p join changeset c on c.id = p.changeset_id where c.pipeline = 'contrib' and {})"
+        ).format(target, stage.overlaps(table))
+        keys = [*stage.temporal[table], *(column for column in ("valid_from", "valid_to") if column in columns)]
+        skipped = conn.execute(
+            sql.SQL(
+                "select current_setting('ea.changeset_id'), jsonb_build_object({}) from {} s where not {} and {}"
+            ).format(
+                sql.SQL(", ").join(sql.SQL("{}, s.{}").format(sql.Literal(key), sql.Identifier(key)) for key in keys),
+                staged,
+                _present(conn, table, columns),
+                guard,
+            )
+        ).fetchall()
+        if skipped:
+            print(
+                f"{table}: skipped {len(skipped)} staged rows whose period a contributor holds, "
+                f"first {', '.join(json.dumps(key, default=str) for _, key in skipped[:3])}"
+            )
+            with (DATA / "logs" / "held.tsv").open("a", encoding="utf-8") as log:
+                log.writelines(f"{changeset}\t{table}\t{json.dumps(key, default=str)}\n" for changeset, key in skipped)
+        kept = sql.SQL(" and not {}").format(guard)
     conn.execute(
-        sql.SQL("insert into public.{} ({}) select distinct {} from {} s where not {}").format(
-            target, listed, listed, staged, _present(conn, table, columns)
+        sql.SQL("insert into public.{} ({}) select distinct {} from {} s where not {}{}").format(
+            target, listed, listed, staged, _present(conn, table, columns), kept
         )
     )
 
