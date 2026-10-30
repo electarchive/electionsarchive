@@ -17519,7 +17519,8 @@ export const polities = {
         from polity p
         left join own o on o.polity_id = p.id
         left join nested i on i.top = p.id
-        where ${kinds}::text[] is null or p.kind::text = any(${kinds}::text[])
+        where (${kinds}::text[] is null or p.kind::text = any(${kinds}::text[]))
+          and exists (select from slug s where s.entity_id = p.id and s.is_current)
       `);
       const ids = result.rows.flatMap((row) =>
         row.latest == null ? [row.id] : [row.id, row.latest],
