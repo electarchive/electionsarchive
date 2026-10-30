@@ -2956,5 +2956,6 @@
         "countPlural=*": "{countText} rows"
       }
     }
-  ]
+  ],
+  "ws_value_held": "This record already has {scheme} ID {value}."
 }

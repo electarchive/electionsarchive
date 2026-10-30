@@ -78,6 +78,11 @@
         ? partySchemes.some((item) => item === scheme)
         : scheme === "wikidata";
 
+  const schemeName = (code: string) => {
+    const scheme = schemes.find((item) => item === code);
+    return scheme == null ? code : schemeLabel[scheme]();
+  };
+
   const kindOf = (type: string) =>
     type === "person"
       ? m.ws_kind_person()
@@ -116,6 +121,17 @@
       ) {
         problem = m.ws_scheme_unfit({ scheme: schemeLabel[row.scheme]() });
         field = "scheme";
+      } else if (
+        entity != null &&
+        row.scheme !== "" &&
+        entity.ids.some((held) => held.scheme === row.scheme)
+      ) {
+        problem = m.ws_value_held({
+          scheme: schemeLabel[row.scheme](),
+          value:
+            entity.ids.find((held) => held.scheme === row.scheme)?.value ?? "",
+        });
+        field = "value";
       } else if (row.scheme !== "" && value !== "") {
         const earlier = seen[`${row.scheme}:${value}`];
         if (earlier == null) {
@@ -659,7 +675,9 @@
                 onclick={() => pickEntity(group.id)}
               >
                 <span class="flex items-baseline justify-between gap-2">
-                  <span class="truncate font-semibold">{group.name}</span>
+                  <span class="truncate font-semibold min-inline-0"
+                    >{group.name}</span
+                  >
                   {#if group.problems > 0}
                     <span class="font-figures font-semibold text-destructive"
                       >{group.problems}</span
@@ -690,7 +708,7 @@
           <span class="text-xs text-muted-foreground">{m.ws_table_hint()}</span>
         </div>
         <div
-          class="grid grid-cols-[2.25rem_minmax(0,1fr)_9rem_10rem_2rem] gap-x-2 border-be py-1 text-muted-foreground max-sm:hidden"
+          class="grid grid-cols-[2rem_minmax(0,1fr)_11.5rem_9rem_2rem] gap-x-2 border-s-2 border-be border-s-transparent py-1 ps-1 text-muted-foreground max-sm:hidden"
           aria-hidden="true"
         >
           <span></span>
@@ -710,7 +728,7 @@
             )}
             <li
               class={cn(
-                "grid grid-cols-[2rem_minmax(0,1fr)_2rem] gap-x-2 gap-y-1 border-s-2 border-be py-1.5 ps-1 sm:grid-cols-[2rem_minmax(0,1fr)_9rem_10rem_2rem]",
+                "grid grid-cols-[2rem_minmax(0,1fr)_2rem] gap-x-2 gap-y-1 border-s-2 border-be py-1.5 ps-1 sm:grid-cols-[2rem_minmax(0,1fr)_11.5rem_9rem_2rem]",
                 {
                   "border-s-foreground": isReady,
                   "border-s-destructive": isWrong,
@@ -809,12 +827,12 @@
                       target="_blank"
                       rel="noopener">{item.entity.name}</a
                     >
-                    · {kindOf(
-                      item.entity.type,
-                    )}{#each item.entity.ids as held (held.scheme + held.value)}
-                      · {schemeLabel[held.scheme]()}
-                      <span class="font-figures">{held.value}</span>
-                    {/each}
+                    · {[
+                      kindOf(item.entity.type),
+                      ...item.entity.ids.map(
+                        (held) => `${schemeLabel[held.scheme]()} ${held.value}`,
+                      ),
+                    ].join(" · ")}
                   {/if}
                 </p>
               {/if}
@@ -885,7 +903,8 @@
                       >{entityNames[entity] ?? entity}</span
                     >
                     <span class="font-figures text-xs"
-                      >+ {row.key.scheme} {row.key.value}</span
+                      >+ {schemeName(row.key.scheme ?? "")}
+                      {row.key.value}</span
                     >
                   </button>
                 </li>
