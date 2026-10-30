@@ -1,9 +1,9 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import type { Found } from "#lib/workspace.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import type { Looked } from "./records.svelte.js";
 
   let {
     value = $bindable(),
@@ -23,7 +23,7 @@
     isLabelShown?: boolean;
     placeholder?: string;
     isLocked: boolean;
-    state: { entity: Found | null; problem: string | null; isLooking: boolean };
+    state: Looked;
     note?: string | null;
     onfocus?: () => void;
     onpaste?: (event: ClipboardEvent) => void;
