@@ -393,6 +393,24 @@ export type Editable = {
     own: Array<string>;
   }>;
   open: Array<{ number: number; title: string; state: ProposalState }>;
+  results: {
+    options: Array<{
+      id: string;
+      label: string;
+      kind: string;
+      position: number | null;
+    }>;
+    sets: Array<{
+      id: string;
+      stage: string;
+      status: string;
+      is_default: boolean;
+      pipeline: string;
+      source: string | null;
+      as_of: string | null;
+      cells: number;
+    }>;
+  } | null;
 };
 
 export const stateLabel: Record<ProposalState, () => string> = {

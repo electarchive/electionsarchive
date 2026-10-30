@@ -2,7 +2,7 @@ import { openapi } from "@orpc/openapi";
 import { ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { editable, roles } from "#lib/server/contrib.js";
+import { cells, editable, roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { keyed, reader, run, WRITES } from "#lib/server/rpc/keyed.js";
 
@@ -250,6 +250,58 @@ export const GUIDE = {
       },
       note: "Adds or replaces one language's translation of a note. Only notes can be translated so far, and a machine translation never replaces a human or official one. Translate a note in a separate proposal from an edit to it.",
     },
+    results: {
+      shape: {
+        op: "results",
+        contest_id: "uuid",
+        stage:
+          "preliminary, official, certified, court_revised, recount, or alternative",
+        as_of: "YYYY-MM-DD, optional: the date the document reports",
+        rows: [
+          {
+            unit: "a reporting unit uuid, or { scheme, code } such as { scheme: 'us.county', code: '06037' }",
+            option:
+              "a contest_option uuid; omit for a unit-level measure such as registered or ballots_cast",
+            measure:
+              "votes, registered, ballots_cast, valid, invalid, blank, …",
+            channel:
+              "all (the default), election_day, early, postal, abroad, provisional, …",
+            count_round: "0 (the default); 1, 2, … for ranked-choice rounds",
+            value: 1234,
+            page: "upload page, 1-based; defaults to the evidence's page",
+            region:
+              "[x0, y0, x1, y1] fractions of that page around the printed figure",
+          },
+        ],
+        outcomes: [
+          {
+            option: "uuid",
+            kind: "elected, won, advanced, eliminated, lost, tied, withdrew, disqualified, or declined",
+            seats: "whole number, optional",
+          },
+        ],
+        evidence: ["e1"],
+      },
+      note: "Adds a new result set for a contest from one document: up to 50,000 rows. The first evidence key is the set's source, and page and region need it to be an upload, so every figure links to its place on the page. Units and options come from get_editable (results) and get_result_cells. The set becomes the contest's default for its stage only when none is held and no accounting check fires (parts that don't add up to their totals); otherwise it is added alongside the existing one for review.",
+    },
+    correct: {
+      shape: {
+        op: "correct",
+        result_set: "uuid of an active result set",
+        cells: [
+          {
+            unit: "uuid or { scheme, code }",
+            option: "uuid, or omitted",
+            measure: "votes",
+            channel: "all",
+            count_round: 0,
+            value: 1234,
+          },
+        ],
+        evidence: ["e1"],
+      },
+      note: "Changes up to 2,000 figures in a published result set; each cell is addressed as in results, and a cell the set already holds at that value is refused. A set the archive's own pipelines wrote is never edited in place: once approved, the correction is folded into that pipeline's next run, and the proposal shows as awaiting fold until the rerun matches every cell. Read the current figures with get_result_cells first.",
+    },
     image: {
       shape: {
         op: "image",
@@ -262,9 +314,9 @@ export const GUIDE = {
   tables: TABLES,
   drop_only: DROP_ONLY,
   not_yet:
-    "Results tables, corrections to published results, merges, retirements, boundary uploads, and adds or changes on other tables are planned. Until they ship, describe the change in a note proposal's rationale or wait.",
+    "Merges, retirements, new elections and contests, boundary uploads, and adds or changes on other tables are planned. Until they ship, describe the change in a note proposal's rationale or wait.",
   tiers:
-    "Tier 1 changes can be approved by the editorial desk alone; everything else waits for an administrator. A proposal takes the highest tier of the rows it changes.",
+    "Tier 1 changes can be approved by the editorial desk alone; everything else waits for an administrator. A proposal takes the highest tier of the rows it changes. New results are tier 1 only when they come from an official body's document with its URL and stored copy, declare no outcomes, raise no check findings, and no default set is held for that contest and stage; otherwise tier 2. Any correct op is tier 3.",
 };
 
 const DESCRIBED = new Map(Object.entries(TABLES));
@@ -371,4 +423,39 @@ export const agents = {
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
     .handler(async ({ input }) => run(async () => editable(input.id))),
+  cells: reader
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/result-sets/{id}/cells",
+        summary:
+          "One result set's figures with their unit, option, measure, channel, and round, and the page and region each was read from, paged in unit code order",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        unit: v.optional(v.pipe(v.string(), v.uuid())),
+        offset: v.optional(
+          v.pipe(
+            v.union([v.number(), v.string()]),
+            v.transform(Number),
+            v.integer(),
+            v.minValue(0),
+          ),
+          0,
+        ),
+        limit: v.optional(
+          v.pipe(
+            v.union([v.number(), v.string()]),
+            v.transform(Number),
+            v.integer(),
+            v.minValue(1),
+            v.maxValue(2000),
+          ),
+          500,
+        ),
+      }),
+    )
+    .handler(async ({ input }) => run(async () => cells(input))),
 };

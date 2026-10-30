@@ -57,6 +57,7 @@ const TOOLS: Array<{
     access: "read",
   },
   { name: "get_editable", procedure: router.agents.editable, access: "read" },
+  { name: "get_result_cells", procedure: router.agents.cells, access: "read" },
   { name: "describe_ops", procedure: router.agents.ops, access: "read" },
   {
     name: "find_open_proposals",

@@ -26,7 +26,7 @@ The archive holds election results down to the smallest reporting unit, from eac
 - **Names** carry a kind (official, native, english, ballot, short, …), a language, and optional valid dates; one is preferred. **Notes** are Markdown with a kind (context, caveat, methodology, editorial) and a language. **Sources** are documents; **citations** tie a source to a record.
 - **Valid time** is when something was true in the world, with a precision (day, month, year, unknown).
 
-Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, and note translations, and can drop rows from several linking tables. Results, outcomes, merges, and new elections are coming; until then, describe such a problem in a note proposal's rationale.
+Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, and note translations; can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, describe such a problem in a note proposal's rationale.
 
 ## Evidence
 
@@ -55,7 +55,7 @@ Every fact you add or change cites evidence. A proposal declares its evidence on
 Each step ends when its condition holds.
 
 1. **Orient.** Call `whoami`. Done when you know whose key this is, its roles, and its write limits.
-2. **Look.** Find the record with `search` and the `get_` tools, then call `get_editable` for its editable rows and their IDs. Done when you hold the UUID of every row you will touch.
+2. **Look.** Find the record with `search` and the `get_` tools, then call `get_editable` for its editable rows and their IDs. For a contest, its `results` lists the ballot options and the active result sets; `get_result_cells` pages through a set's figures with each unit's ID, scheme, and code. Done when you hold the UUID of every row you will touch.
 3. **Check for duplicates.** Call `find_open_proposals` with the entity. Done when no open proposal already makes your change; if one does, stop or build on it.
 4. **Learn the ops.** Call `describe_ops`, with `table` for the table you will touch. Done when every op you plan matches a listed shape.
 5. **Draft.** Call `draft_proposal` with a summary, a rationale, the ops, and the evidence. It compiles and checks the change and waits up to 60 seconds. Done when the latest job's `status` is `done` with no error; otherwise fix the payload with `revise_proposal` and repeat.
@@ -195,10 +195,95 @@ Each payload goes to `draft_proposal`. IDs here are placeholders; take real ones
 }
 ```
 
+**Add county results from a PDF canvass.** Upload the PDF, read the page, and box each figure. Units can be UUIDs or `{scheme, code}`; `page` defaults to the evidence's page.
+
+```json
+{
+  "summary": "Add the certified county results for the 1996 Example County Commission race",
+  "rationale": "The archive holds no results for this contest. The county's certified canvass prints both candidates in every district.",
+  "ops": [
+    {
+      "op": "results",
+      "contest_id": "<contest id>",
+      "stage": "certified",
+      "as_of": "1996-11-22",
+      "rows": [
+        {
+          "unit": { "scheme": "us.county", "code": "01001" },
+          "option": "<option id>",
+          "measure": "votes",
+          "value": 5120,
+          "region": [0.41, 0.22, 0.49, 0.24]
+        },
+        {
+          "unit": { "scheme": "us.county", "code": "01001" },
+          "option": "<option id>",
+          "measure": "votes",
+          "value": 4870,
+          "region": [0.52, 0.22, 0.6, 0.24]
+        },
+        {
+          "unit": { "scheme": "us.county", "code": "01001" },
+          "measure": "ballots_cast",
+          "value": 10112,
+          "region": [0.65, 0.22, 0.73, 0.24]
+        }
+      ],
+      "outcomes": [{ "option": "<option id>", "kind": "elected" }],
+      "evidence": ["canvass"]
+    }
+  ],
+  "evidence": {
+    "canvass": {
+      "upload": "<upload id>",
+      "title": "Official Canvass, General Election, November 5, 1996",
+      "publisher": "Example County Board of Elections",
+      "kind": "official_body",
+      "page": 3
+    }
+  }
+}
+```
+
+**Correct a misread figure.** Read the current figures with `get_result_cells` first. A correction to a set the archive's own pipelines loaded is folded into that pipeline's next run after approval, so the proposal shows as awaiting fold until the rerun matches.
+
+```json
+{
+  "summary": "Correct Jane Smyth's vote in Precinct 12",
+  "rationale": "The archive has 1,034; the certified canvass prints 1,304.",
+  "ops": [
+    {
+      "op": "correct",
+      "result_set": "<result set id>",
+      "cells": [
+        {
+          "unit": "<unit id>",
+          "option": "<option id>",
+          "measure": "votes",
+          "value": 1304
+        }
+      ],
+      "evidence": ["canvass"]
+    }
+  ],
+  "evidence": {
+    "canvass": {
+      "url": "https://sos.example.gov/2022/canvass.pdf",
+      "title": "2022 General Election Official Canvass",
+      "publisher": "Example Secretary of State",
+      "kind": "official_body",
+      "page": 31,
+      "quote": "Precinct 12 ... 1,304"
+    }
+  }
+}
+```
+
 ## Limits, tiers, and etiquette
 
 - A key makes at most 60 writes a minute and 2,000 a day; `whoami` shows the limits. A proposal holds 1 to 500 ops. Uploads are up to 20 MB as base64 over MCP or REST, 2 GB a day per person.
-- **Tiers.** Tier 1 changes (names, notes, external IDs, colors, images, citations, and translations) can be approved by the editorial desk. Everything else waits for an administrator. A proposal takes the highest tier of its rows.
+- **Tiers.** Tier 1 changes (names, notes, external IDs, colors, images, citations, and translations) can be approved by the editorial desk. Everything else waits for an administrator. A proposal takes the highest tier of its rows. New results are tier 1 only from an official body's document with a URL and stored copy, with no outcomes, no check findings, and no default set already held for that contest and stage; a `correct` op is always tier 3.
+- A results op holds up to 50,000 rows and a correction up to 2,000 cells. New results become the contest's default only when no default is held and the accounting checks pass (options add up to valid votes, valid and invalid to ballots cast); otherwise they sit beside the held set for a reviewer.
 - Batch related changes to one record into one proposal, and keep unrelated changes apart, so each can be reviewed and reverted on its own.
 - Resubmit a rejected change only with new evidence, and say what is new.
 - Write summaries and rationales for a reviewer who has not seen your research: what changes, why, and where the evidence says so.

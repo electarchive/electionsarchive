@@ -64,106 +64,146 @@ export async function roles(userId: string | undefined) {
 }
 
 export async function editable(entityId: string): Promise<Editable> {
-  const [names, notes, ids, colors, kind, images, sources, citations, open] =
-    await Promise.all([
-      db.execute<Editable["names"][number]>(sql`
-        with shown as (
-          select id from name
-          where entity_id = ${entityId} and kind in ('official', 'english')
-          order by coalesce(valid @> current_date, false) desc,
-            coalesce(valid @> current_date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
-            (kind = 'english' and script = 'Latn') desc, is_preferred desc, (lang = 'en') desc,
-            (kind = 'official') desc, recorded_from desc, id
-          limit 1
-        )
-        select n.id, n.text, n.kind::text as kind, n.lang, n.script, n.is_preferred,
-               n.id in (select id from shown) as shown,
-               n.source_id, s.title as source, c.published_at::text as changed
-        from name n
-        left join source s on s.id = n.source_id
-        left join changeset c on c.id = n.changeset_id
-        where n.entity_id = ${entityId}
-        order by shown desc, n.is_preferred desc, n.kind, n.text
-      `),
-      db.execute<Editable["notes"][number]>(sql`
-        select n.id, n.kind::text as kind, n.body_md, n.lang, md5(n.body_md) as md5,
-               c.published_at::text as changed,
-               coalesce((
-                 select json_agg(json_build_object(
-                          'lang', t.lang, 'body', t.body, 'origin', t.origin, 'stale', t.stale_from is not null
-                        ) order by t.lang)
-                 from translation t
-                 where t.source_md5 = md5(n.body_md)
-               ), '[]') as translations
-        from note n
-        left join changeset c on c.id = n.changeset_id
-        where n.entity_id = ${entityId} and n.kind <> 'retired'
-        order by n.recorded_from, n.id
-      `),
-      db.execute<Editable["ids"][number]>(sql`
-        select scheme, value
-        from external_id
-        where entity_id = ${entityId} and scheme = any(${`{${schemes.join(",")}}`}::text[])
-        order by scheme, value
-      `),
-      db.execute<Editable["colors"][number]>(sql`
-        select pc.color, pc.valid_from::text, pc.valid_from_precision::text as valid_from_precision,
-               pc.valid_to::text, pc.valid_to_precision::text as valid_to_precision, s.title as source
-        from party_color pc
-        left join source s on s.id = pc.source_id
-        where pc.party_id = ${entityId}
-        order by pc.valid_from nulls first
-      `),
-      db.execute<{ party: boolean; person: boolean }>(sql`
-        select exists (select from party where id = ${entityId}) as party,
-               exists (select from person where id = ${entityId}) as person
-      `),
-      db.execute<Editable["images"][number]>(sql`
-        select path, license, artist, source_url, valid_from::text, valid_from_precision::text as valid_from_precision,
-               valid_to::text, valid_to_precision::text as valid_to_precision
-        from party_image
-        where party_id = ${entityId}
-        union all
-        select path, license, artist, source_url, taken_from::text, taken_from_precision::text,
-               taken_to::text, taken_to_precision::text
-        from person_image
-        where person_id = ${entityId}
-        order by valid_from nulls first, path
-      `),
-      db.execute<Editable["sources"][number]>(sql`
-        select s.id, s.title, s.publisher
-        from source s
-        where s.id in (
-          select source_id from name where entity_id = ${entityId} and source_id is not null
-          union
-          select source_id from citation where entity_id = ${entityId}
-          union
-          select source_id from party_color where party_id = ${entityId} and source_id is not null
-        )
-        order by s.title
-        limit 50
-      `),
-      db.execute<Editable["citations"][number]>(sql`
-        select s.id, s.title, s.publisher, s.url,
-               coalesce(array_agg(c.id::text order by c.id)
-                 filter (where ch.pipeline = 'contrib' and c.locator ->> 'op' = 'cite'), '{}') as own
-        from citation c
-        join source s on s.id = c.source_id
-        join changeset ch on ch.id = c.changeset_id
-        where c.entity_id = ${entityId}
-        group by s.id
-        order by s.title
-        limit 50
-      `),
-      db.execute<Editable["open"][number]>(sql`
-        select p.number, p.title, p.state::text as state
-        from proposal p
-        join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
-        where p.state in ('open', 'approved', 'changes_requested')
-          and r.diff -> 'entities' ? ${entityId}
-        order by p.number
-      `),
-    ]);
+  const [
+    names,
+    notes,
+    ids,
+    colors,
+    kind,
+    images,
+    sources,
+    citations,
+    open,
+    options,
+    sets,
+  ] = await Promise.all([
+    db.execute<Editable["names"][number]>(sql`
+      with shown as (
+        select id from name
+        where entity_id = ${entityId} and kind in ('official', 'english')
+        order by coalesce(valid @> current_date, false) desc,
+          coalesce(valid @> current_date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+          (kind = 'english' and script = 'Latn') desc, is_preferred desc, (lang = 'en') desc,
+          (kind = 'official') desc, recorded_from desc, id
+        limit 1
+      )
+      select n.id, n.text, n.kind::text as kind, n.lang, n.script, n.is_preferred,
+             n.id in (select id from shown) as shown,
+             n.source_id, s.title as source, c.published_at::text as changed
+      from name n
+      left join source s on s.id = n.source_id
+      left join changeset c on c.id = n.changeset_id
+      where n.entity_id = ${entityId}
+      order by shown desc, n.is_preferred desc, n.kind, n.text
+    `),
+    db.execute<Editable["notes"][number]>(sql`
+      select n.id, n.kind::text as kind, n.body_md, n.lang, md5(n.body_md) as md5,
+             c.published_at::text as changed,
+             coalesce((
+               select json_agg(json_build_object(
+                        'lang', t.lang, 'body', t.body, 'origin', t.origin, 'stale', t.stale_from is not null
+                      ) order by t.lang)
+               from translation t
+               where t.source_md5 = md5(n.body_md)
+             ), '[]') as translations
+      from note n
+      left join changeset c on c.id = n.changeset_id
+      where n.entity_id = ${entityId} and n.kind <> 'retired'
+      order by n.recorded_from, n.id
+    `),
+    db.execute<Editable["ids"][number]>(sql`
+      select scheme, value
+      from external_id
+      where entity_id = ${entityId} and scheme = any(${`{${schemes.join(",")}}`}::text[])
+      order by scheme, value
+    `),
+    db.execute<Editable["colors"][number]>(sql`
+      select pc.color, pc.valid_from::text, pc.valid_from_precision::text as valid_from_precision,
+             pc.valid_to::text, pc.valid_to_precision::text as valid_to_precision, s.title as source
+      from party_color pc
+      left join source s on s.id = pc.source_id
+      where pc.party_id = ${entityId}
+      order by pc.valid_from nulls first
+    `),
+    db.execute<{ party: boolean; person: boolean; contest: boolean }>(sql`
+      select exists (select from party where id = ${entityId}) as party,
+             exists (select from person where id = ${entityId}) as person,
+             exists (select from contest where id = ${entityId}) as contest
+    `),
+    db.execute<Editable["images"][number]>(sql`
+      select path, license, artist, source_url, valid_from::text, valid_from_precision::text as valid_from_precision,
+             valid_to::text, valid_to_precision::text as valid_to_precision
+      from party_image
+      where party_id = ${entityId}
+      union all
+      select path, license, artist, source_url, taken_from::text, taken_from_precision::text,
+             taken_to::text, taken_to_precision::text
+      from person_image
+      where person_id = ${entityId}
+      order by valid_from nulls first, path
+    `),
+    db.execute<Editable["sources"][number]>(sql`
+      select s.id, s.title, s.publisher
+      from source s
+      where s.id in (
+        select source_id from name where entity_id = ${entityId} and source_id is not null
+        union
+        select source_id from citation where entity_id = ${entityId}
+        union
+        select source_id from party_color where party_id = ${entityId} and source_id is not null
+      )
+      order by s.title
+      limit 50
+    `),
+    db.execute<Editable["citations"][number]>(sql`
+      select s.id, s.title, s.publisher, s.url,
+             coalesce(array_agg(c.id::text order by c.id)
+               filter (where ch.pipeline = 'contrib' and c.locator ->> 'op' = 'cite'), '{}') as own
+      from citation c
+      join source s on s.id = c.source_id
+      join changeset ch on ch.id = c.changeset_id
+      where c.entity_id = ${entityId}
+      group by s.id
+      order by s.title
+      limit 50
+    `),
+    db.execute<Editable["open"][number]>(sql`
+      select p.number, p.title, p.state::text as state
+      from proposal p
+      join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
+      where p.state in ('open', 'approved', 'changes_requested')
+        and r.diff -> 'entities' ? ${entityId}
+      order by p.number
+    `),
+    db.execute<NonNullable<Editable["results"]>["options"][number]>(sql`
+      select o.id, o.kind::text as kind, o.ballot_position as position,
+             coalesce(
+               o.ballot_label,
+               (select string_agg(coalesce(c.ballot_name, (
+                  select n.text from name n where n.entity_id = c.person_id
+                  order by n.is_preferred desc, n.id limit 1
+                )), ' / ') from candidacy c where c.option_id = o.id),
+               (select n.text from name n where n.entity_id = o.party_id
+                order by n.is_preferred desc, n.id limit 1),
+               o.kind::text
+             ) as label
+      from contest_option o
+      where o.contest_id = ${entityId}
+      order by o.ballot_position nulls last, o.k
+    `),
+    db.execute<NonNullable<Editable["results"]>["sets"][number]>(sql`
+      select r.id, r.stage::text as stage, r.status::text as status, r.is_default,
+             c.pipeline, s.title as source, r.as_of::text,
+             (select count(*)::int from (
+                select from result_value v where v.result_set_k = r.k limit 100000
+              ) x) as cells
+      from result_set r
+      join changeset c on c.id = r.changeset_id
+      left join source s on s.id = r.source_id
+      where r.contest_id = ${entityId} and r.status = 'active'
+      order by r.is_default desc, r.stage, r.k
+    `),
+  ]);
   return {
     names: names.rows,
     notes: notes.rows,
@@ -179,6 +219,83 @@ export async function editable(entityId: string): Promise<Editable> {
     sources: sources.rows,
     citations: citations.rows,
     open: open.rows,
+    results:
+      kind.rows[0]?.contest === true
+        ? { options: options.rows, sets: sets.rows }
+        : null,
+  };
+}
+
+export async function cells({
+  id,
+  offset,
+  limit,
+  unit,
+}: {
+  id: string;
+  offset: number;
+  limit: number;
+  unit?: string;
+}) {
+  const { rows } = await db.execute<{
+    k: number;
+    contest: string;
+    stage: string;
+    is_default: boolean;
+    pipeline: string;
+    total: number;
+  }>(sql`
+    select r.k, r.contest_id as contest, r.stage::text as stage, r.is_default, c.pipeline,
+           (select count(*)::int from result_value v where v.result_set_k = r.k) as total
+    from result_set r
+    join changeset c on c.id = r.changeset_id
+    where r.id = ${id}
+  `);
+  const set = rows[0];
+  if (set == null) {
+    error(404);
+  }
+  const found = await db.execute<{
+    unit: string;
+    scheme: string;
+    code: string;
+    name: string;
+    option: string | null;
+    measure: string;
+    channel: string;
+    count_round: number;
+    value: number;
+    page: number | null;
+    region: Array<number> | null;
+  }>(sql`
+    select u.id as unit, u.scheme_code as scheme, u.code,
+           coalesce((select n.text from name n where n.entity_id = u.id
+                     order by n.is_preferred desc, n.id limit 1), u.code) as name,
+           o.id as option, m.code as measure, ch.code as channel, v.count_round, v.value::float8 as value,
+           p.page_number as page,
+           case when l.x0 is not null then array[l.x0, l.y0, l.x1, l.y1]::float8[] end as region
+    from result_value v
+    join reporting_unit u on u.k = v.unit_k
+    left join contest_option o on o.k = v.option_k and v.option_k <> 0
+    join measure m on m.id = v.measure
+    join channel ch on ch.id = v.channel
+    left join value_locator l on l.result_set_k = v.result_set_k and l.unit_k = v.unit_k
+      and l.option_k = v.option_k and l.channel = v.channel and l.measure = v.measure
+      and l.count_round = v.count_round
+    left join source_page p on p.id = l.page_id
+    where v.result_set_k = ${set.k} and (${unit ?? null}::uuid is null or u.id = ${unit ?? null}::uuid)
+    order by u.code, o.ballot_position nulls first, o.k nulls first, v.measure, v.channel, v.count_round
+    offset ${offset} limit ${limit}
+  `);
+  return {
+    result_set: id,
+    contest: set.contest,
+    stage: set.stage,
+    is_default: set.is_default,
+    pipeline: set.pipeline,
+    total: set.total,
+    offset,
+    cells: found.rows,
   };
 }
 
