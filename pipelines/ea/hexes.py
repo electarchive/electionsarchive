@@ -126,6 +126,7 @@ STATES = {
     "ch": ("ch.canton", {}),
     "br": ("br.uf", {}),
     "tr": ("tr.il", {}),
+    "eu": ("eu.member_state", {}),
 }
 
 
