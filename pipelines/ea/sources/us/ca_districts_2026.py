@@ -16,7 +16,7 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara", "06001": "Alameda"}
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
@@ -361,9 +361,70 @@ def santa_clara() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+ALAMEDA_NAMES = {
+    "EBMUD": "East Bay Municipal Utility District",
+    "BART": "San Francisco Bay Area Rapid Transit District",
+    "AC Transit District": "Alameda-Contra Costa Transit District",
+    "Dublin San Ramon": "Dublin San Ramon Services District",
+}
+ALAMEDA = re.compile(
+    r"^(?:Member, Board Of Directors?, )?(?P<body>.+?)(?: Directors?)?"
+    r"(?:,? (?P<kind>Ward|District|Area|Dist) #?(?P<number>\d+))?(?P<short>, Short Term)?$"
+)
+ALAMEDA_KEPT = re.compile(r"(?i)water|EBMUD|sanitary|fire|park|health|irrigation|BART|AC Transit|Dublin San Ramon")
+
+
+def alameda() -> list[dict[str, str | int | bool]]:
+    rows = []
+    text = html.unescape(
+        re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", raw.cached(local_2026.SOURCE, feed("06001")[0]).path.read_text()))
+    )
+    text = [line.strip() for line in text.splitlines() if line.strip()]
+    contest = None
+    seats = 1
+    seen: set[tuple[str, str, str]] = set()
+    for index, line in enumerate(text):
+        if line.endswith(" -") and text[index + 1 : index + 2] == ["On Ballot"]:
+            found = ALAMEDA.match(line[:-2])
+            contest = (
+                found
+                if found is not None
+                and ALAMEDA_KEPT.search(found["body"])
+                and not re.search(r"(?i)school|college|education|city|unified|congress|assembly|senate|equalization", line)
+                else None
+            )
+            seats = int(re.match(r"Vote For: (\d+)", text[index + 2])[1]) if contest is not None else 1
+            continue
+        if contest is None:
+            continue
+        name = None
+        if line == "CANDIDATE" and text[index + 1] != "BALLOT DESIGNATION":
+            name = text[index + 1]
+        elif line == "DETAILS" and text[index - 4] == "CANDIDATE":
+            name = text[index + 1]
+        if name is not None:
+            body = ALAMEDA_NAMES.get(contest["body"], contest["body"])
+            seat = f"{'Ward' if contest['kind'] == 'Ward' else 'Area' if contest['kind'] == 'Area' else 'District' if contest['kind'] == 'District' else 'Division'} {contest['number']}" if contest["kind"] else ""
+            key = (body, seat, name)
+            if key not in seen:
+                seen.add(key)
+                rows.append(
+                    {
+                        "county": "Alameda",
+                        "district": full_name(re.sub(r"\bDist\b", "District", body)) if body == contest["body"] else body,
+                        "seat": seat or ("Short Term" if contest["short"] else ""),
+                        "role": "Director",
+                        "seats": seats,
+                        "name": " ".join(cased(name).split()),
+                        "unexpired": contest["short"] is not None,
+                    }
+                )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara(), *alameda()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
