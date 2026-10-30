@@ -305,6 +305,7 @@ UT_COUNTIES = (
     "Juab", "Kane", "Millard", "Morgan", "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete", "Sevier", "Summit",
     "Tooele", "Uintah", "Utah", "Wasatch", "Washington", "Wayne", "Weber",
 )
+OR_HISTORY = "https://web.archive.org/web/20251003191748id_/https://sos.oregon.gov/blue-book/Documents/elections/initiative.pdf"
 OR_2022 = "https://web.archive.org/web/20221219164703id_/https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
 OR_COUNTIES = (
     "Baker",
@@ -1147,6 +1148,7 @@ def fetch() -> None:
     for _, _, _, stamp, path in NY_MEASURES.values():
         raw.fetch(SOURCE, NY.format(stamp, path), suffix=Path(path).suffix)
         time.sleep(1)
+    raw.fetch(SOURCE, OR_HISTORY, suffix=".pdf")
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
         time.sleep(1)
@@ -2924,6 +2926,66 @@ def rhode_island() -> list[dict[str, object]]:
     return rows
 
 
+def oregon_history() -> list[dict[str, object]]:
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, OR_HISTORY).path), "-"], capture_output=True, text=True, check=True
+    ).stdout.split("\n")
+    blocks: list[tuple[date, list[str]]] = []
+    day = None
+    for line in lines[next(i for i, line in enumerate(lines) if line.strip() == "June 2, 1902") :]:
+        text = line.strip()
+        if not text or text.isdigit() or text.startswith("Election Date/Measure"):
+            continue
+        if heading := re.fullmatch(r"([A-Z][a-z]+ \d+, \d{4})(?: \(.*\))?", text):
+            day = datetime.strptime(heading[1], "%B %d, %Y").date()
+            if day.year >= 2000:
+                break
+        elif re.match(r"\d+[A-E]?\.\s*\S", text):
+            blocks.append((day, [text]))
+        elif blocks:
+            blocks[-1][1].append(text)
+    rows: list[dict[str, object]] = []
+    seen: set[tuple[date, str]] = set()
+    for day, block in blocks:
+        votes = None
+        words = []
+        for text in block:
+            if found := re.search(r"\s\*?(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)$", text):
+                if votes is None:
+                    votes = (int(found[1].replace(",", "")), int(found[2].replace(",", "")))
+                    text = text[: found.start()]
+            words.append(text.strip())
+        title = " ".join(words)
+        number, title = re.match(r"(\d+[A-E]?)\.\s*(.*)", title).groups()
+        suffix = re.search(r"\s*—([LIR])\d?$", title)
+        if votes is None or suffix is None:
+            continue
+        title = title[: suffix.start()]
+        label = f"Measure {number}"
+        if (day, number) in seen:
+            label += " (second listed)"
+            number += "-2"
+        seen.add((day, number))
+        for answer, count in zip(("YES", "NO"), votes, strict=True):
+            rows.append(
+                {
+                    "state": "OR",
+                    "day": day,
+                    "number": number,
+                    "label": label,
+                    "url": OR_HISTORY,
+                    "county": "statewide",
+                    "answer": answer,
+                    "votes": count,
+                    "title": title,
+                    "kind": "Advisory Vote"
+                    if title.startswith("Advisory Vote")
+                    else {"L": "Legislative Referendum", "I": "Initiative", "R": "Popular Referendum"}[suffix[1]],
+                }
+            )
+    return rows
+
+
 def oregon() -> list[dict[str, object]]:
     listed = ncsl().filter(pl.col("state") == "OR")
     words = re.compile(r"[a-z]{4,}")
@@ -3820,6 +3882,7 @@ def parse() -> None:
             *louisiana(),
             *washington(),
             *oregon(),
+            *oregon_history(),
             *florida(),
             *oklahoma(),
             *ohio(),
@@ -3848,6 +3911,21 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), group in frame.group_by("state", "day", "number", "label", maintain_order=True):
+        if group["title"][0] is not None:
+            matched.append(
+                {
+                    "state": state,
+                    "day": day,
+                    "number": number,
+                    "label": label,
+                    "measure": label,
+                    "title": group["title"][0],
+                    "type": group["kind"][0],
+                    "passed": group.filter(pl.col("answer") == "YES")["votes"].sum()
+                    > group.filter(pl.col("answer") == "NO")["votes"].sum(),
+                }
+            )
+            continue
         if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022), ("OR", 2022), ("UT", 2012), ("MD", 2022)):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
