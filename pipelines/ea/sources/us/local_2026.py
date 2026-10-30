@@ -2391,7 +2391,7 @@ def parse() -> None:
         contest = (
             f"{town[2]} {'City Council' if town[1] == 'Council' else 'Mayor'}"
             if town
-            else f"{county}{'' if county == 'Baltimore City' else ' County'} {title} {re.sub(r'^.*?(District|Precinct)', r'\1', where) if 'District' in where else ''}"
+            else f"{'Baltimore' if county == 'Baltimore City' else county + ' County'} {title} {re.sub(r'^.*?(District|Precinct)', r'\1', where) if 'District' in where else ''}"
         )
         named, independent = party(row["Office Political Party"])
         feeds["MD"].append(
@@ -4941,6 +4941,8 @@ def parse() -> None:
                                 r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
                             )
                         )
+                        else " ".join(rest[rest.index("board") + 1 :]).title()
+                        if state == "IN" and role == "board-of-education" and "board" in rest
                         else ""
                     )
                     if role is not None:
