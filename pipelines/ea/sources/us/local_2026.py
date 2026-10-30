@@ -5232,6 +5232,20 @@ def parse() -> None:
                             path,
                         )
                     )
+                if state == "CA":
+                    pools = dict(towns)
+                    for county_code, pool in pools.items():
+                        own = {tuple(town[0]) for town in pool if town[1] == "school"}
+                        towns[county_code] = [
+                            *pool,
+                            *(
+                                town
+                                for other, others in pools.items()
+                                if other != county_code
+                                for town in others
+                                if town[1] == "school" and tuple(town[0]) not in own
+                            ),
+                        ]
             for row in found:
                 template, tail = tails.get((str(row["fips"]), str(row["contest"])), (None, None))
                 if row.get("tail") is not None:
