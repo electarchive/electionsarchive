@@ -1581,6 +1581,7 @@ DELIVERED = {
     "MI-26075": DATA / "inbox" / "y26" / "mi" / "jackson_school.pdf",
     "MI-26075-v": DATA / "inbox" / "y26" / "mi" / "jackson_village.pdf",
 }
+TERRITORIES = {"GU": "Guam", "VI": "U.S. Virgin Islands", "AS": "American Samoa", "MP": "Northern Mariana Islands"}
 PUBLISHERS = {
     "0644000": (
         "CA",
@@ -2157,6 +2158,11 @@ for key, publisher, title, url, local in (
     ("UT-49031", "Piute County Clerk/Auditor", "2026 General Election Candidate Certification", "https://piute.gov/wp-content/uploads/2026/09/2026-General-Election-Candidate-Certification.pdf", "ut/piute_gen.pdf"),
     ("UT-49033", "Rich County Clerk/Auditor", "2026 General Election Certification with Candidates", "https://www.richcounty.gov/wp-content/uploads/2026-General-Election-Certification-with-Candidates-and-LGO-Attachment.pdf", "ut/rich_gen.pdf"),
     ("UT-49055", "Wayne County", "2026 Candidates for Office", "https://waynecountyutah.gov/news/2026-candidates-for-office", "ut/wayne_gen.html"),
+    ("GU-66", "Guam Election Commission", "2026 General Election Sample Ballot", "https://gec.guam.gov/2026-general-election-info/", "gu/gu_2026-general_sample-ballot_gec.pdf"),
+    ("VI-78-stx", "Virgin Islands Elections System", "2026 General Election Candidates, St. Croix District", "https://vivote.gov/?elections=2026-general-election", "vi/2026-general-official-listing-candidates-stx-district.pdf"),
+    ("VI-78-stt", "Virgin Islands Elections System", "2026 General Election Candidates, St. Thomas-St. John District", "https://vivote.gov/?elections=2026-general-election", "vi/2026-general-official-listing-candidates-stt-stj-district.pdf"),
+    ("AS-60", "American Samoa Election Office", "2026 Midterm Certified Candidates", "https://www.aselectionoffice.gov/candidates-information/candidates-for-the-2026-midterm-election", "as/2026-midterm-certified-candidates-aselectionoffice.html"),
+    ("MP-69", "Commonwealth Election Commission", "2026 General Election Certified Candidates Listing", "https://www.votecnmi.gov.mp/candidate/2026-certified-candidates-listing", "mp/2026-ge-certified-candidates-listing.html"),
     ("MT-30111", "Yellowstone County Election Administrator", "November 2026 General Election Candidate List (memo to the County Commissioners, August 10, 2026)", "https://www.yellowstonecountymt.gov/BOCCDocs/2026/BOCCDIS/20260813_1601/16873_Letter_to_Commissioners_regarding_candidates.pdf", "mt/yellowstone_gen.pdf"),
     ("WV-54001", "West Virginia Secretary of State", "Barbour County General Election Sample Ballots, November 3, 2026", "https://apps.sos.wv.gov/elections/2026GeneralSampleBallots/SAMPLE%20-%20WV%20Barbour%20261103%20General%20-%2014inch.pdf", "wv/barbour_gen.pdf"),
     ("WV-54007", "West Virginia Secretary of State", "Braxton County General Election Sample Ballots, November 3, 2026", "https://apps.sos.wv.gov/elections/2026GeneralSampleBallots/SAMPLE%20-%20WV%20Braxton%20261103%20General%20-%2014inch.pdf", "wv/braxton_gen.pdf"),
@@ -5255,6 +5261,11 @@ def parse() -> None:
                     title, district, owner = schools[str(row["contest"])]
                     template, tail = "", f"KY:{owner.split(':')[1]}:board-of-education:{slug(title.split(', ')[1])}"
                     minted[tail] = (title, district, owner, owned.get(owner) or f"us/ky/{slug(district)}")
+                if state in TERRITORIES:
+                    head, _, seat = str(row["contest"]).partition(", ")
+                    template, tail = "", f"{state}:{prefix}:{slug(head)}" + (f":{slug(seat)}" if seat else "")
+                    minted[tail] = (str(row["contest"]), TERRITORIES[state], f"territory:{state}", f"us/{state.lower()}")
+                    pinned.add(tail)
                 place = places.get(str(row["fips"]), "").rsplit(",", 1)[0] or (
                     "Carson City" if row["fips"] == "32510" else ""
                 )
@@ -5716,8 +5727,12 @@ def emit() -> Path:
                     counts["no template"] += 1
                     print(f"slug taken: {tail} {home}")
                     continue
-                polity = cs.key("us.polity", owner)
-                body = role not in ("mayor", "supervisor", "clerk", "treasurer", "president", "judge")
+                territory = owner.startswith("territory:")
+                polity = cs.polity(f"US-{st}") if territory else cs.key("us.polity", owner)
+                body = role not in (
+                    "mayor", "vice-mayor", "supervisor", "clerk", "treasurer", "president", "judge",
+                    "attorney-general", "public-auditor", "justice",
+                )
                 if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:")):
                     made.add(polity)
                     geoid = owner.split(":")[1]
@@ -5749,7 +5764,9 @@ def emit() -> Path:
                         valid_from=None,
                     )
                 whole = (
-                    (cs.area("us.school_district" if owner.startswith("school:") else "us.place", owner.split(":")[1]),)
+                    (cs.area("us.state", code),)
+                    if territory
+                    else (cs.area("us.school_district" if owner.startswith("school:") else "us.place", owner.split(":")[1]),)
                     if polity in cs.minted
                     else conn.execute(
                         "select t.area_id from polity_territory t join polity p on p.id = t.polity_id"
@@ -5766,7 +5783,14 @@ def emit() -> Path:
                 if holder in cs.minted and holder not in made:
                     made.add(holder)
                     if body:
-                        cs.add("body", id=holder, polity_id=polity, kind="council")
+                        cs.add(
+                            "body",
+                            id=holder,
+                            polity_id=polity,
+                            kind={"legislature": "unicameral", "senate": "upper_house", "house": "lower_house"}.get(role, "council")
+                            if territory
+                            else "council",
+                        )
                         name(holder, f"{place} {title.split(',')[0]}")
                     else:
                         cs.add("office", id=holder, polity_id=polity, kind="mayor" if role == "mayor" else "other")
