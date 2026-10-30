@@ -1038,7 +1038,8 @@ COLLEGE = re.compile(
 
 LOCAL_SQL = """
 create temp table lc as
-select coalesce(o.polity_id, b.polity_id, e.polity_id) as polity_id, cc.id, cc.year,
+select coalesce(o.polity_id, b.polity_id, e.polity_id)::text
+        || case when cc.level = 'school' and hp.kind = 'county' then '#school' else '' end as polity_id, cc.id, cc.year,
     extract(month from e.date_from)::int as month,
     cc.level <> 'local_measure' and cc.stage in ('general', 'primary', 'runoff') as regular, cc.stage,
     coalesce(cg.precinct, false) or cc.tacit as precinct, cc.upcoming, coalesce(rdy.ok, false) as ready
@@ -1048,6 +1049,7 @@ join contest c on c.id = cc.id
 join election e on e.id = c.election_id
 left join office o on o.id = c.office_id
 left join body b on b.id = c.body_id
+left join polity hp on hp.id = coalesce(o.polity_id, b.polity_id, e.polity_id)
 left join cg on cg.contest_id = cc.id
 where cc.level in ('county', 'municipal', 'school', 'special_district', 'local_measure')
 """
@@ -1747,6 +1749,11 @@ def build(full: bool = False) -> str:
     link["23508201400000"] = "cf3230d1-cf93-5584-bb33-3458b297c168"
     link["05504300800000"] = "5f1810f8-9163-5a5e-aed2-ccd9fc4b1532"
 
+    school_count = Counter(
+        (st, county)
+        for kind, name, st, county in cog.select("kind", "name", "state_fips", "county_fips").iter_rows()
+        if kind in ("school", "dependent_school") and not COLLEGE.search(name)
+    )
     governments: list[dict] = []
     for gid, kind, name, st, county, function, population, population_basis, active, elected in cog.select(
         "id",
@@ -1764,6 +1771,15 @@ def build(full: bool = False) -> str:
         # Census of Governments leaves the Jersey City School System (31000000030100) without a county; Jersey City is in Hudson County (FIPS 34017).
         if gid == "31000000030100":
             county = "017"
+        held_key = f"{codes.get(f'county:{st}{county}')}#school"
+        if (
+            kind not in ("school", "dependent_school")
+            or COLLEGE.search(name)
+            or held.get(str(pid))
+            or held_key not in held
+            or school_count[(st, county)] != 1
+        ):
+            held_key = None
         match = PREFIX.match(name)
         words = (
             name
@@ -1799,6 +1815,7 @@ def build(full: bool = False) -> str:
                 "elected": elected
                 and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name)),
                 "polity_id": pid,
+                "held_key": held_key,
             }
         )
     for pid, years in held.items():
@@ -1832,7 +1849,7 @@ def build(full: bool = False) -> str:
     patterns: dict[tuple[str, str], Counter] = defaultdict(Counter)
     months: dict[tuple[str, str], Counter] = defaultdict(Counter)
     for g in governments:
-        years = held.get(g["polity_id"] or "", {})
+        years = held.get(g.get("held_key") or g["polity_id"] or "", {})
         regular = sorted(y for y, v in years.items() if v[2] and 2000 <= y <= today.year)
         g["month"] = Counter(years[y][3] for y in regular).most_common(1)[0][0] if regular else None
         g["period"] = g["phase"] = g["era"] = None
@@ -1916,7 +1933,7 @@ def build(full: bool = False) -> str:
             g["era"] = None
             g["basis"] = "district calendar"
         g["month"] = HELD_IN.get(group, g["month"])
-        years = held.get(g["polity_id"] or "", {})
+        years = held.get(g.get("held_key") or g["polity_id"] or "", {})
         for year in sorted(set(years) | set(range(2000, today.year + 1))):
             era = g["era"]
             due = (g["period"], g["phase"]) if era is None or year >= era[1] else era[2] if year <= era[0] else None
@@ -1940,7 +1957,7 @@ def build(full: bool = False) -> str:
                         year,
                         expected,
                         n,
-                        expected and (n == 0 or generals < earlier),
+                        expected and ((n == 0 and not up) or generals < earlier),
                         precinct,
                         precincts,
                         shaped,
