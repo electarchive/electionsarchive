@@ -145,6 +145,9 @@ def parse() -> None:
         day = DAYS[year]
         for title, counted, columns in read(raw.cached(SOURCE, f"manual://MF-266/{year}/{path.name}").path, year):
             office = next((office for prefix, office in OFFICES.items() if (title or "").startswith(prefix)), None)
+            seat = re.fullmatch(r"(HOUSE|SENATE) DISTRICT (\w+)", title or "")
+            if office is None and year == 2002 and seat:
+                office = f"{seat[1].lower()}:{int(seat[2]) if seat[1] == 'HOUSE' else seat[2].lower()}:g"
             if office is None:
                 continue
             for label, column in columns:
@@ -214,15 +217,15 @@ def emit() -> Path:
     missing = (
         (pl.col("year") == 2002)
         | ((pl.col("year") == 2006) & (pl.col("chamber") == "governor"))
-        | ((pl.col("year") == 2010) & (pl.col("chamber") != "senate"))
-    )
+        | ((pl.col("year") == 2010) & ~pl.col("chamber").is_in(["senate"]))
+    ) & ~pl.col("chamber").str.contains(":")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska's 2002, 2006, and 2010 general elections for governor, U.S. Senate, and U.S. House by "
-            "precinct and House district, from the Division of Elections' statements of votes cast",
+            summary="Alaska's 2002, 2006, and 2010 general elections for governor, U.S. Senate, and U.S. House, and 2002 "
+            "legislative races, by precinct and House district, from the Division of Elections' statements of votes cast",
             polity="US-AK",
         )
         source = cs.source(PUBLISHER, TITLE)
