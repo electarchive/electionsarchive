@@ -543,6 +543,35 @@ MT_FILES = {
     date(2008, 11, 4): "wp-content/uploads/attachments/2008_State_General.pdf",
     date(2010, 11, 2): "wp-content/uploads/attachments/2010_General_Election_Official_Statewide_Canvass.pdf",
 }
+WY = "https://web.archive.org/web/2id_/https://sos.wyo.gov/Elections/Docs/"
+WY_FILES = {
+    date(2000, 11, 7): (
+        "2000/00Results/00General/00_General_SW_Candidate_Judicial_Issues.pdf",
+        [[("Amendment B", 4)]],
+    ),
+    date(2002, 11, 5): (
+        "2002/02Results/02General/02_General%20Election_SW_Candidates.pdf",
+        [[(f"Constitutional Amendment {letter}", 2 * index) for index, letter in enumerate("ABCD")]],
+    ),
+    date(2004, 11, 2): (
+        "2004/04Results/04General/04_General_SW_Candidates.pdf",
+        [[(f"Constitutional Amendment {letter}", 2 * index) for index, letter in enumerate("ABCD")]],
+    ),
+    date(2006, 11, 7): (
+        "2006/06Results/06General/SW_Const.Amendments_Summary.pdf",
+        [
+            [("Constitutional Amendment A", 0), ("Constitutional Amendment B", 2)],
+            [("Constitutional Amendment C", 0)],
+        ],
+    ),
+    date(2008, 11, 4): (
+        "2008/08Results/General/SW-ConstitutionalAmendments.pdf",
+        [[("Constitutional Amendment A", 0), ("Constitutional Amendment B", 4)]],
+    ),
+}
+WY_COUNTIES = frozenset(
+    "Albany|Big Horn|Campbell|Carbon|Converse|Crook|Fremont|Goshen|Hot Springs|Johnson|Laramie|Lincoln|Natrona|Niobrara|Park|Platte|Sheridan|Sublette|Sweetwater|Teton|Uinta|Washakie|Weston".split("|")
+)
 ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}-general.pdf"
 ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
 ND_ABSTRACTS = "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year%5C2000%20through%202008%20Statewide%20Election%20Results%5C"
@@ -796,6 +825,11 @@ PUBLISHERS = {
         "Montana Secretary of State",
         "Statewide general election canvass",
         "https://sosmt.gov/elections/results/",
+    ),
+    "WY": (
+        "Wyoming Secretary of State",
+        "Statewide issues and candidates abstract",
+        "https://sos.wyo.gov/Elections/",
     ),
     "ND": (
         "North Dakota Secretary of State",
@@ -1086,6 +1120,9 @@ def fetch() -> None:
         for path in paths:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
+    for path, _ in WY_FILES.values():
+        raw.fetch(SOURCE, WY + path, suffix=".pdf")
+        time.sleep(1)
     for day, name in AK_STATEWIDE.items():
         raw.store(
             SOURCE,
@@ -3050,6 +3087,51 @@ def south_carolina() -> list[dict[str, object]]:
     return rows
 
 
+def wyoming() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, (path, tables) in WY_FILES.items():
+        url = WY + path
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.split("\n")
+        blocks: list[dict[str, list[int]]] = [{}]
+        for line in lines[next(i for i, line in enumerate(lines) if re.search(r"Amendment [A-D]", line)) :]:
+            if figures := re.fullmatch(r"\s*([A-Z][A-Za-z ]+?)\s{2,}((?:(?:\d[\d,]*|NA)\s*)+)", line):
+                name = figures[1].strip()
+                if name in WY_COUNTIES or name in ("Total", "Official Totals"):
+                    blocks[-1]["Total" if name.startswith(("Total", "Official")) else name] = [
+                        -1 if part == "NA" else int(part.replace(",", "")) for part in figures[2].split()
+                    ]
+                    if name.startswith(("Total", "Official")):
+                        blocks.append({})
+        blocks = [block for block in blocks if block]
+        if len(blocks) != len(tables):
+            raise ValueError(f"WY {day}: {len(blocks)} tables, expected {len(tables)}")
+        for block, spec in zip(blocks, tables, strict=True):
+            printed = block.pop("Total", None)
+            if len(block) != len(WY_COUNTIES):
+                raise ValueError(f"WY {day}: {len(block)} counties")
+            for label, offset in spec:
+                for side in (0, 1):
+                    if printed is not None and sum(votes[offset + side] for votes in block.values()) != printed[offset + side]:
+                        raise ValueError(f"WY {day} {label}: counties do not sum to {printed[offset + side]}")
+                for county, votes in block.items():
+                    for answer, count in zip(("YES", "NO"), votes[offset : offset + 2], strict=True):
+                        rows.append(
+                            {
+                                "state": "WY",
+                                "day": day,
+                                "number": label[-1],
+                                "label": label,
+                                "url": url,
+                                "county": county,
+                                "answer": answer,
+                                "votes": count,
+                            }
+                        )
+    return rows
+
+
 def north_dakota() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     sheets = {
@@ -3425,6 +3507,7 @@ def parse() -> None:
             *missouri(),
             *montana(),
             *north_dakota(),
+            *wyoming(),
             *south_carolina(),
             *hawaii(),
             *new_mexico(),
@@ -3495,7 +3578,7 @@ def parse() -> None:
                 else f"Public Question {number}"
                 if state == "NJ"
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
