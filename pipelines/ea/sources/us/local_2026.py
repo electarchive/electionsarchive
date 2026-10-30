@@ -1826,6 +1826,8 @@ for county, url in {
     "Schenectady": "https://www.dailygazette.com/classifieds/legals/ad-2641098/pdfdisplayad_126cdecb-769f-568c-9e08-1a979c3b6418.html",
     "Genesee": "https://www.geneseeny.gov/Department-Content/Board-of-Elections/Election-Day-Sample-Ballots",
     "Yates": "https://www.yatescountyny.gov/318/Sample-Ballots",
+    "Franklin": "https://www.franklincountyny.gov/departments/elections/",
+    "Fulton": "https://www.fultoncountyny.gov/departments/board-of-elections",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1833,7 +1835,7 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates') else 'pdf'}",
+        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates', 'Franklin', 'Fulton') else 'pdf'}",
     )
 for fips, county in {
     "32001": "Churchill",
@@ -2016,6 +2018,7 @@ for key, publisher, title, url, local in (
     ("FL-12086-municipal", "Miami-Dade County Elections Department", "Official Sample Ballot, General Election, November 3, 2026 (municipal contests)", "https://www.miamidade.gov/elections/library/2026-11-03-general-election-sample-ballot.pdf", "fl/miami_dade_nov_municipal.pdf"),
     ("AR-05143-municipal", "Washington County Election Commission", "November 3, 2026 General Election Information: Municipal General Election candidates (updated August 21, 2026)", "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-general-election-information", "ar/washington_municipal.html"),
     ("KY-21111-jefferson", "Jefferson County Clerk", "2026 Jefferson County Candidate Filings, revised August 10, 2026", "https://www.jeffersoncountyclerk.org/files/assets/clerk/v/1/elections/documents/2026-candidate-filing-8-10-26.pdf", "ky/jefferson.pdf"),
+    ("NE-31109-lancaster", "Lancaster County Election Commission", "Lancaster County List of Candidates, General Election, November 3, 2026", "https://www.lancaster.ne.gov/DocumentCenter/View/30701", "ne/lancaster.pdf"),
     ("TX-48041-college-station", "City of College Station", "General and Special Election November 3, 2026: Candidates for Office", "https://cstx-us.govstack.com/your-government/elections/", "tx/college_station.html"),
     ("WY-56021-cheyenne", "Laramie County Clerk", "2026 General Election Candidate Roster, Municipal Offices (final)", "https://www.laramiecountywy.gov/County-Government/Elected-Officials/County-Clerk/Elections/2026-Election-Information", "wy/laramie_municipal.pdf"),
     ("WV-54039-kanawha", "West Virginia Secretary of State", "Official sample ballot, Kanawha County, November 3, 2026 General Election", "https://apps.sos.wv.gov/elections/SampleBallots/Home/GetBallot?County=Kanawha", "wv/kanawha_sample_ballot.pdf"),
