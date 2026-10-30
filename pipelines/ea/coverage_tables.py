@@ -1591,6 +1591,8 @@ def build(full: bool = False) -> str:
             ):
                 continue
             key = (st, today.year, level, stage)
+            if key in by_key:
+                continue
             current = by_key.setdefault(
                 key,
                 {
@@ -1609,7 +1611,7 @@ def build(full: bool = False) -> str:
                     "target": coverage.target(st, level, today.year),
                 },
             )
-            current["expected"] = max(current["expected"] or 0, cell["held"])
+            current["expected"] = cell["held"]
 
     known = dict(KNOWN)
     for st, period in JUDICIAL.items():
