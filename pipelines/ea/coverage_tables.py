@@ -68,7 +68,6 @@ JUDICIAL = {
             "OH",
             "OK",
             "OR",
-            "SD",
             "TN",
             "TX",
             "UT",
