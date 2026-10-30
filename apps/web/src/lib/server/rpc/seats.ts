@@ -624,7 +624,7 @@ export const seats = {
         0.5 * winners.length;
       return {
         isPartisan,
-        parties: [...colors],
+        parties: [...colors.values()],
         seats: seats
           .values()
           .toArray()
@@ -1664,7 +1664,7 @@ export const seats = {
           member: person(row.member),
           reason: row.via,
           cause: row.via == null ? row.cause : null,
-          isOther: row.isOther,
+          isOther: row.isOther === true,
           isHere: row.isHere,
         })),
       };

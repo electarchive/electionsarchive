@@ -659,6 +659,51 @@
     layout === "cartogram" ? drawn : layout === "hexes" ? tiled : null,
   );
   const isSummary = $derived(grid != null);
+  let zoom = $state({ scale: 1, x: 0, y: 0 });
+  let touches: Array<{ id: number; x: number; y: number }> = [];
+  const pinch = (
+    svg: SVGSVGElement,
+    moved: { id: number; x: number; y: number },
+  ) => {
+    const matrix = svg.getScreenCTM()?.inverse();
+    const before = touches.slice(0, 2);
+    touches = touches.map((touch) => (touch.id === moved.id ? moved : touch));
+    const after = touches.slice(0, 2);
+    if (
+      grid == null ||
+      matrix == null ||
+      (after.length < 2 && zoom.scale <= 1)
+    ) {
+      return;
+    }
+    const center = (list: typeof touches) => {
+      let x = 0;
+      let y = 0;
+      for (const touch of list) {
+        x += touch.x / list.length;
+        y += touch.y / list.length;
+      }
+      return new DOMPoint(x, y).matrixTransform(matrix);
+    };
+    const spread = (list: typeof touches) => {
+      const [a, b] = list;
+      return a == null || b == null ? 1 : Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    };
+    const scale = Math.min(
+      Math.max((zoom.scale * spread(after)) / spread(before), 1),
+      8,
+    );
+    const from = center(before);
+    const to = center(after);
+    const ratio = zoom.scale / scale;
+    const x = from.x - (to.x - grid.x - zoom.x) * ratio - grid.x;
+    const y = from.y - (to.y - grid.y - zoom.y) * ratio - grid.y;
+    zoom = {
+      scale,
+      x: Math.min(Math.max(x, 0), grid.width - grid.width / scale),
+      y: Math.min(Math.max(y, 0), grid.height - grid.height / scale),
+    };
+  };
   const tinted = $derived.by(() => {
     void engine.theme;
     return isSummary
@@ -2068,7 +2113,10 @@
               },
             )}
             aria-pressed={(grid == null ? "map" : layout) === choice}
-            onclick={() => (layout = choice)}
+            onclick={() => {
+              layout = choice;
+              zoom = { scale: 1, x: 0, y: 0 };
+            }}
             >{choice === "hexes"
               ? m.map_view_hexes()
               : choice === "cartogram"
@@ -2137,9 +2185,34 @@
     {#if isSummary && grid != null}
       <svg
         class="absolute inset-0 block-full inline-full"
-        viewBox="{grid.x} {grid.y} {grid.width} {grid.height}"
+        viewBox="{grid.x + zoom.x} {grid.y + zoom.y} {grid.width /
+          zoom.scale} {grid.height / zoom.scale}"
+        style:touch-action={zoom.scale > 1 ? "none" : "pan-y"}
         role="group"
         aria-label={m.map_label({ noun })}
+        onpointerdown={(event) => {
+          if (event.pointerType === "touch") {
+            touches = [
+              ...touches,
+              { id: event.pointerId, x: event.clientX, y: event.clientY },
+            ];
+          }
+        }}
+        onpointermove={(event) => {
+          if (touches.some((touch) => touch.id === event.pointerId)) {
+            pinch(event.currentTarget, {
+              id: event.pointerId,
+              x: event.clientX,
+              y: event.clientY,
+            });
+          }
+        }}
+        onpointerup={(event) => {
+          touches = touches.filter((touch) => touch.id !== event.pointerId);
+        }}
+        onpointercancel={(event) => {
+          touches = touches.filter((touch) => touch.id !== event.pointerId);
+        }}
         onpointerleave={() => {
           pointer = null;
           if (pinned == null) {
@@ -2258,7 +2331,7 @@
           stroke-linecap="round"
           pointer-events="none"
         />
-        {#each grid.size * stretch < 7 ? [] : grid.labels as label (label.text)}
+        {#each grid.size * stretch * zoom.scale < 7 ? [] : grid.labels as label (label.text)}
           <text
             class="fill-foreground font-semibold"
             x={label.x}
