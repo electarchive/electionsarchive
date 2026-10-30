@@ -161,11 +161,19 @@ export async function proposal(number: number) {
       checks: Checks | null;
       created_at: string;
       sources: Array<{ key: string; id: string; title: string }> | null;
+      titles: Record<string, string> | null;
     }>(sql`
       select r.n, r.payload, r.diff, r.checks, r.created_at::text,
              (select json_agg(json_build_object('key', e.key, 'id', s.id, 'title', s.title) order by e.key)
               from jsonb_each(r.payload -> 'evidence') e
-              join source s on s.id::text = e.value ->> 'source') as sources
+              join source s on s.id::text = e.value ->> 'source') as sources,
+             (select json_object_agg(s.id, s.title)
+              from source s
+              where s.id::text in (
+                select jsonb_array_elements_text(x -> 'fields' -> 'source_id')
+                from jsonb_array_elements(r.diff -> 'rows') x
+                where x -> 'fields' ? 'source_id'
+              )) as titles
       from proposal_revision r
       where r.proposal_id = ${found.id}
       order by r.n desc
@@ -199,7 +207,7 @@ export async function queue() {
   }>(sql`
     select p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.submitted_at::text,
-           coalesce(jsonb_array_length(r.diff -> 'rows'), 0)::int as changes,
+           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' <> 'citation')::int as changes,
            coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings
     from proposal p
     left join users a on a.id = p.author_user_id

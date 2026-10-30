@@ -20,7 +20,44 @@
   {:else if data.proposals.length === 0}
     <p class="mbs-4 text-sm text-muted-foreground">{m.review_empty()}</p>
   {:else}
-    <div class="mbs-5 overflow-x-auto">
+    <ul class="mbs-5 grid border-bs text-sm sm:hidden">
+      {#each data.proposals as item (item.number)}
+        <li class="border-be">
+          <a
+            class="grid gap-1 py-2.5 hover:[&>span:first-child]:underline"
+            href={resolve("/proposals/[number]", {
+              number: String(item.number),
+            })}
+          >
+            <span class="text-pretty"
+              ><span class="font-figures text-muted-foreground"
+                >#{item.number}</span
+              >
+              <span class="font-semibold">{item.title}</span></span
+            >
+            <span
+              class="flex flex-wrap gap-x-3 font-figures text-xs text-muted-foreground"
+            >
+              {#if item.state !== "open"}
+                <span class="font-semibold text-foreground"
+                  >{stateLabel[item.state]()}</span
+                >
+              {/if}
+              <span>{item.author ?? m.proposal_unknown_author()}</span>
+              {#if item.tier != null}
+                <span>{tierLabel[item.tier]?.()}</span>
+              {/if}
+              <span>{m.review_changes({ count: item.changes })}</span>
+              {#if item.findings > 0}
+                <span>{m.proposal_findings({ count: item.findings })}</span>
+              {/if}
+              <span>{date(item.submitted_at?.slice(0, 10) ?? null)}</span>
+            </span>
+          </a>
+        </li>
+      {/each}
+    </ul>
+    <div class="mbs-5 overflow-x-auto max-sm:hidden">
       <table class="border-bs text-sm inline-full">
         <thead>
           <tr class="border-be text-start text-muted-foreground">

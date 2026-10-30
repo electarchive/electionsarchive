@@ -37,6 +37,7 @@ export type Diff = {
 export type Checks = {
   diff?: Record<string, Record<string, number>>;
   findings?: Record<string, number>;
+  examples?: Record<string, Array<{ details?: { pipeline?: string } }>>;
   unchanged?: boolean;
 };
 

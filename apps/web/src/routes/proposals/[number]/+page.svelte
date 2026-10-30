@@ -18,6 +18,11 @@
   const pending = $derived(
     job?.status === "queued" || job?.status === "running",
   );
+  const working: Record<string, () => string> = {
+    publish: m.proposal_publishing,
+    reject: m.proposal_rejecting,
+    revert: m.proposal_reverting,
+  };
   const rows = $derived(
     (head?.diff?.rows ?? []).filter((row) => row.table !== "citation"),
   );
@@ -33,12 +38,43 @@
     note: m.proposal_table_note,
     translation: m.proposal_table_translation,
   };
+  const fields: Record<string, () => string> = {
+    source_id: m.proposal_field_source,
+  };
+  const checks: Record<string, (pipelines: string) => string> = {
+    "scope.owner": (pipelines) => m.proposal_check_scope_owner({ pipelines }),
+    "scope.polity": m.proposal_check_scope_polity,
+    "name.capitals": m.proposal_check_name_capitals,
+    "translation.held": m.proposal_check_translation_held,
+    "facts.immutable": m.proposal_check_facts_immutable,
+    "reference.facts": m.proposal_check_reference_facts,
+  };
+  const found = $derived(
+    Object.entries(head?.checks?.findings ?? {})
+      .filter(([, value]) => value > 0)
+      .map(([code, value]) => {
+        const pipelines: Array<string> = [];
+        for (const example of head?.checks?.examples?.[code] ?? []) {
+          const pipeline = example.details?.pipeline;
+          if (pipeline != null && !pipelines.includes(pipeline)) {
+            pipelines.push(pipeline);
+          }
+        }
+        return {
+          code,
+          value,
+          label: checks[code]?.(pipelines.join(", ")) ?? code,
+        };
+      }),
+  );
   const day = (value: string | null) => date(value?.slice(0, 10) ?? null);
-  const shown = (value: unknown) =>
+  const shown = (field: string, value: unknown) =>
     value == null
       ? null
       : typeof value === "string"
-        ? value
+        ? field === "source_id"
+          ? (head?.titles?.[value] ?? value)
+          : value
         : JSON.stringify(value);
   const decided = $derived(
     proposal.state === "published"
@@ -91,16 +127,14 @@
   </header>
 
   <dl
-    class="mbs-6 grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-bs text-sm max-sm:grid-cols-1"
+    class="mbs-6 grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-y text-sm max-sm:grid-cols-1"
   >
-    <dt
-      class="border-be py-2 text-muted-foreground max-sm:border-be-0 max-sm:pbe-0"
-    >
+    <dt class="py-2 text-muted-foreground max-sm:pbe-0">
       {decided == null ? m.proposal_checks() : m.proposal_decision()}
     </dt>
-    <dd class="border-be py-2" role="status">
+    <dd class="py-2" role="status">
       {#if pending}
-        {m.proposal_checking()}
+        {(working[job?.kind ?? ""] ?? m.proposal_checking)()}
       {:else if job?.status === "failed"}
         {m.proposal_failed({ reason: job.error ?? job.kind })}
       {:else if decided != null}
@@ -119,12 +153,16 @@
         {m.proposal_checks_passed()}
       {:else}
         {m.proposal_findings({ count: findings })}
-        <span class="block font-figures text-xs text-muted-foreground"
-          >{Object.entries(head?.checks?.findings ?? {})
-            .filter(([, value]) => value > 0)
-            .map(([code, value]) => `${code} ${count(value)}`)
-            .join(", ")}</span
-        >
+        <ul class="mbs-1 grid gap-0.5 text-muted-foreground">
+          {#each found as item (item.code)}
+            <li class="flex items-baseline gap-2">
+              <span class="text-pretty">{item.label}</span>
+              {#if item.value > 1}
+                <span class="font-figures">{count(item.value)}</span>
+              {/if}
+            </li>
+          {/each}
+        </ul>
       {/if}
     </dd>
   </dl>
@@ -141,12 +179,18 @@
           >
           <span class="grid gap-1">
             {#each Object.entries(row.fields) as [field, [before, after]] (field)}
-              <Proof
-                class="flex-wrap"
-                before={shown(before)}
-                after={shown(after)}
-                label={field}
-              />
+              <span class="flex flex-wrap items-baseline gap-x-2">
+                {#if field !== "text"}
+                  <span class="text-xs text-muted-foreground"
+                    >{fields[field]?.() ?? field}</span
+                  >
+                {/if}
+                <Proof
+                  class="flex-wrap"
+                  before={shown(field, before)}
+                  after={shown(field, after)}
+                />
+              </span>
             {/each}
           </span>
         </li>
