@@ -15,7 +15,7 @@ from ea.sources.gb import dc_local, leap, leh
 from ea.store import DATA, connect
 
 SOURCE = "gb.mayors"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 COUNCILS = {
@@ -216,6 +216,58 @@ BRIEFINGS = {
             "ballots, from the councils' results."
         ),
     ),
+    "rp05093": (
+        (
+            "https://web.archive.org/web/20130530214648id_/"
+            "http://www.parliament.uk/documents/commons/lib/research/rp2005/rp05-093.pdf"
+        ),
+        "https://commonslibrary.parliament.uk/research-briefings/rp05-93/",
+        "Local and Mayoral elections 2005, Research Paper 05/93 (31 December 2005)",
+        "E. Mayoral elections",
+        (
+            "The local and mayoral elections of 5 May 2005, with first and second votes in the four mayoral "
+            "elections, from David Cowling (BBC Political Research) and Rallings and Thrasher."
+        ),
+    ),
+}
+RELEASES = {
+    "stoke2002": (
+        (
+            "https://web.archive.org/web/20021031140949id_/"
+            "http://www.stoke.gov.uk:80/content/cc/news_releases/mayoral_final_results.jsp"
+        ),
+        (
+            "https://web.archive.org/web/20021031140949/"
+            "http://www.stoke.gov.uk:80/content/cc/news_releases/mayoral_final_results.jsp"
+        ),
+        "Stoke-on-Trent City Council",
+        "17/10 Mayoral Election Final Results, press release 161_02 (October 2002)",
+    ),
+}
+TABLES: dict[tuple[str, str, date], dict[str, tuple[str | None, int, int | None]]] = {
+    ("stoke2002", "E06000021", date(2002, 10, 17)): {
+        "Mike Wolfe": ("Mayor 4 Stoke", 9356, 12693),
+        "George Stevenson": ("Labour Party", 9752, 12379),
+        "Steven Batkin": ("British National Party", 8213, None),
+        "Roger Ibbs": ("Conservative", 4417, None),
+        "Geoffrey Snow": (None, 3975, None),
+        "Fred Morrow": ("Liberal Democrats", 2408, None),
+        "Paul Breeze": (None, 1349, None),
+        "Patricia Whitehouse": (None, 1280, None),
+        "Graham Wilkes": (None, 1157, None),
+        "David Chatton": (None, 926, None),
+        "Adrian Knapper": ("Adrian Knapper Independent Party", 708, None),
+        "Harry Chesters": (None, 453, None),
+    },
+    ("rp05093", "E06000021", date(2005, 5, 5)): {
+        "Mark Meredith": ("Labour Party", 27253, 36961),
+        "Roger Ibbs": ("Conservative", 16211, 23130),
+        "Mike Wolfe": ("Supporting Green Shoots", 15882, None),
+        "Steven Batkin": ("British National Party", 15776, None),
+        "Gary Chevin": (None, 4505, None),
+        "Justine Harvey": (None, 1955, None),
+        "Gary Falconer": (None, 1368, None),
+    },
 }
 QUESTIONS = {
     "mayor": ("Directly elected mayor", ("Yes", "No"), "A Yes vote was for a directly elected mayor."),
@@ -282,6 +334,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=suffix)
     for url, *_ in BRIEFINGS.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for url, *_ in RELEASES.values():
+        raw.fetch(SOURCE, url, suffix=".html")
     for page in LEAP_PAGES:
         url = LEAP.format(page)
         try:
@@ -365,11 +419,42 @@ def parse() -> None:
                         "reason": "; ".join(reasons) or None,
                     }
                 )
+    for (key, code, day), candidates in TABLES.items():
+        path = raw.cached(SOURCE, (BRIEFINGS[key] if key in BRIEFINGS else RELEASES[key])[0]).path
+        text = (
+            subprocess.run(["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True).stdout
+            if path.suffix == ".pdf"
+            else path.read_bytes()
+        )
+        printed = set(re.findall(r"\d+", text.decode(errors="replace").replace(",", "")))
+        figures = {str(votes) for _, *pair in candidates.values() for votes in pair if votes is not None}
+        if not figures <= printed:
+            raise ValueError(f"{key} {code} {day}: {sorted(figures - printed)} not printed")
+        winner = max(candidates, key=lambda name: candidates[name][2] or 0)
+        for name, (party, votes, final) in candidates.items():
+            rows.append(
+                {
+                    "origin": "library",
+                    "year": day.year,
+                    "day": day,
+                    "ballot": f"library:{code}:{day}",
+                    "code": code,
+                    "person_id": people.get((code, leh.fold(name)), f"{code}:{slug(name)}"),
+                    "person_name": name,
+                    "party_name": party,
+                    "votes": votes,
+                    "round2": final,
+                    "winner": name == winner,
+                    "spoilt": None,
+                    "source": key,
+                    "reason": None,
+                }
+            )
     frame = pl.concat([dc, pl.DataFrame(rows, schema=dc.schema)])
     for (ballot,), group in frame.group_by("ballot"):
         if group["winner"].sum() != 1:
             raise ValueError(f"{ballot}: {group['winner'].sum()} winners")
-        if group["origin"][0] != "leap":
+        if group["origin"][0] == "dc":
             continue
         runoff = group.filter(pl.col("round2").is_not_null())
         (winner,) = group.filter("winner").rows(named=True)
@@ -415,7 +500,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Directly elected council mayors of England, 2002 on, from Democracy Club's results where it "
-            "has the ballot and Andrew Teale's Local Elections Archive Project otherwise, with the second round of "
+            "has the ballot and Andrew Teale's Local Elections Archive Project, the House of Commons Library, or the council otherwise, with the second round of "
             "each supplementary vote count from the council's declaration where Democracy Club gives none, and every "
             "council governance referendum since 2001 from the House of Commons Library",
             polity="GB",
@@ -446,7 +531,29 @@ def emit() -> Path:
         ).fetchall():
             known[leh.fold(text)] = id
         party_ids: dict[str, UUID | None] = {"Independent": None}
-        sources: dict[int | str, UUID] = {}
+        library: dict[str, UUID] = {}
+        for key, (url, page, title, _, notes) in BRIEFINGS.items():
+            library[key] = cs.source("House of Commons Library", title)
+            if library[key] in cs.minted:
+                cs.add(
+                    "source",
+                    id=library[key],
+                    kind="official_body",
+                    publisher="House of Commons Library",
+                    title=title,
+                    url=page,
+                    license="Open Parliament Licence v3.0",
+                    license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+                    attribution="Contains Parliamentary information licensed under the Open Parliament Licence v3.0.",
+                    notes=notes,
+                )
+                cs.artifact(raw.cached(SOURCE, url), library[key])
+        sources: dict[int | str, UUID] = {**library}
+        for key, (url, page, publisher, title) in RELEASES.items():
+            sources[key] = cs.source(publisher, title)
+            if sources[key] in cs.minted:
+                cs.add("source", id=sources[key], kind="official_body", publisher=publisher, title=title, url=page)
+                cs.artifact(raw.cached(SOURCE, url), sources[key])
         offices: set[UUID] = set()
         added: set[UUID] = set()
         for (ballot,), group in frame.sort("ballot").group_by("ballot", maintain_order=True):
@@ -708,6 +815,15 @@ def emit() -> Path:
                 )
                 if first["origin"] == "leap":
                     cs.add("citation", entity_id=result_set, source_id=source, locator={"date": day.isoformat()})
+                elif first["origin"] == "library":
+                    cs.add(
+                        "citation",
+                        entity_id=result_set,
+                        source_id=source,
+                        locator={"section": BRIEFINGS[first["source"]][3]}
+                        if first["source"] in BRIEFINGS
+                        else {"date": day.isoformat()},
+                    )
                 elif source == sources[year]:
                     cs.add(
                         "citation",
@@ -765,23 +881,6 @@ def emit() -> Path:
         system = cs.key("gb.electoral_system", "referendum")
         if system in cs.minted:
             raise ValueError("publish gb.referendums first")
-        library: dict[str, UUID] = {}
-        for key, (url, page, title, _, notes) in BRIEFINGS.items():
-            library[key] = cs.source("House of Commons Library", title)
-            if library[key] in cs.minted:
-                cs.add(
-                    "source",
-                    id=library[key],
-                    kind="official_body",
-                    publisher="House of Commons Library",
-                    title=title,
-                    url=page,
-                    license="Open Parliament Licence v3.0",
-                    license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
-                    attribution="Contains Parliamentary information licensed under the Open Parliament Licence v3.0.",
-                    notes=notes,
-                )
-                cs.artifact(raw.cached(SOURCE, url), library[key])
         for row in pl.read_csv(
             REFERENDUMS,
             separator="\t",
