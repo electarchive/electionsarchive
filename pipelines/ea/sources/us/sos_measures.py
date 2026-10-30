@@ -164,6 +164,12 @@ DERIVED_HAND = {
     (date(2022, 12, 10), "1"): ("Amendment No. 1", "Requires U.S. citizenship in order to register and vote in Louisiana", "Legislative Referendum"),
     (date(2022, 12, 10), "2"): ("Amendment No. 2", "Requires Senate confirmation of gubernatorially appointed members of the State Civil Service Commission", "Legislative Referendum"),
     (date(2022, 12, 10), "3"): ("Amendment No. 3", "Requires Senate confirmation of certain members of the State Police Commission", "Legislative Referendum"),
+    (date(2022, 11, 8), "111"): ("Measure 111", "State must ensure affordable healthcare access, balanced against requirement to fund schools, other essential services", "Legislative Referendum"),
+    (date(2022, 11, 8), "112"): ("Measure 112", "Removes language allowing slavery and involuntary servitude as punishment for crime", "Legislative Referendum"),
+    (date(2022, 11, 8), "113"): ("Measure 113", "Legislators with ten unexcused absences from floor sessions disqualified from holding next term of office", "Legislative Referendum"),
+    (date(2022, 11, 8), "114"): ("Measure 114", "Requires permit to acquire firearms; police maintain permit/firearm database; criminally prohibits certain ammunition magazines", "Initiative"),
+    (date(2012, 11, 6), "A"): ("Constitutional Amendment A", "Deposit of severance tax revenue into the Permanent State Trust Fund", "Legislative Referendum"),
+    (date(2012, 11, 6), "B"): ("Constitutional Amendment B", "Property tax exemption for military personnel on active duty", "Legislative Referendum"),
     (date(2022, 11, 8), "40"): ("Advisory Vote 40", "Concerning premiums for transportation network company drivers' workers' compensation (ESHB 2076)", "Advisory Vote"),
 }
 WA_COUNTIES = (
@@ -280,6 +286,21 @@ OR_ABSTRACTS = {
     ),
     date(2010, 11, 2): (OR.format(354805),),
 }
+UT_FILES = {
+    date(2000, 11, 7): "2000Gen.pdf",
+    date(2002, 11, 5): "2002Gen.pdf",
+    date(2004, 11, 2): "2004Gen.pdf",
+    date(2006, 11, 7): "2006Gen.pdf",
+    date(2008, 11, 4): "2008Gen.xls",
+    date(2010, 11, 2): "2010Gen.xls",
+    date(2012, 11, 6): "2012-General-Canvass-Report.xls",
+}
+UT_COUNTIES = (
+    "Beaver", "Box Elder", "Cache", "Carbon", "Daggett", "Davis", "Duchesne", "Emery", "Garfield", "Grand", "Iron",
+    "Juab", "Kane", "Millard", "Morgan", "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete", "Sevier", "Summit",
+    "Tooele", "Uintah", "Utah", "Wasatch", "Washington", "Wayne", "Weber",
+)
+OR_2022 = "https://web.archive.org/web/20221219164703id_/https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
 OR_COUNTIES = (
     "Baker",
     "Benton",
@@ -864,6 +885,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "UT": (
+        "Utah Lieutenant Governor's Office of Elections",
+        "Official canvass by county",
+        "https://vote.utah.gov/past-election-results/",
+    ),
     "MO": (
         "Missouri Secretary of State",
         "Official election returns by county",
@@ -1180,6 +1206,15 @@ def fetch() -> None:
     for path, _ in WY_FILES.values():
         raw.fetch(SOURCE, WY + path, suffix=".pdf")
         time.sleep(1)
+    for name in UT_FILES.values():
+        raw.store(
+            SOURCE,
+            f"manual://MF-355/{name}",
+            (DATA / "inbox" / "manual" / "MF-355" / name).read_bytes(),
+            suffix=Path(name).suffix,
+            retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+            media_type="application/octet-stream",
+        )
     for day, name in AK_STATEWIDE.items():
         raw.store(
             SOURCE,
@@ -1235,7 +1270,7 @@ def fetch() -> None:
     for path in OK_FILES:
         raw.fetch(SOURCE, OK + path, suffix=".pdf")
         time.sleep(1)
-    for url in dict.fromkeys(url for urls in OR_ABSTRACTS.values() for url in urls):
+    for url in dict.fromkeys([*(url for urls in OR_ABSTRACTS.values() for url in urls), OR_2022]):
         raw.fetch(SOURCE, url, suffix=".htm" if url.endswith(".htm") else ".pdf")
         time.sleep(1)
 
@@ -2962,6 +2997,33 @@ def oregon() -> list[dict[str, object]]:
                 for county, yes, no in table
                 for answer, value in (("YES", yes), ("NO", no))
             )
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, OR_2022).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    for number, body, yes, no in re.findall(
+        r"Measure (\d+)\n.*?\nCounty\s+\*?Yes\s+\*?No\n(.*?)\n\s+Total\s+([\d,]+)\s+([\d,]+)", text, re.DOTALL
+    ):
+        table = re.findall(r"^(\w[\w ]*?)\s+([\d,]+)\s+([\d,]+)$", body, re.MULTILINE)
+        if (
+            [county for county, _, _ in table] != list(OR_COUNTIES)
+            or sum(int(value.replace(",", "")) for _, value, _ in table) != int(yes.replace(",", ""))
+            or sum(int(value.replace(",", "")) for _, _, value in table) != int(no.replace(",", ""))
+        ):
+            raise ValueError(f"{OR_2022} Measure {number}: {len(table)} counties")
+        rows.extend(
+            {
+                "state": "OR",
+                "day": date(2022, 11, 8),
+                "number": number,
+                "label": f"Measure {number}",
+                "url": OR_2022,
+                "county": county,
+                "answer": answer,
+                "votes": int(value.replace(",", "")),
+            }
+            for county, *votes in table
+            for answer, value in zip(("YES", "NO"), votes, strict=True)
+        )
     return rows
 
 
@@ -3248,6 +3310,116 @@ def new_york() -> list[dict[str, object]]:
                         "votes": count,
                     }
                 )
+    return rows
+
+
+def utah() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, name in UT_FILES.items():
+        url = f"manual://MF-355/{name}"
+        path = raw.cached(SOURCE, url).path
+        tables: list[tuple[str, str, list[str], list[int]]] = []
+        if name.endswith(".xls"):
+            sheet = {2008: "Amendments", 2010: "Constitutional Amd.", 2012: "Constitutional Amendments"}[day.year]
+            cells = [
+                [str(cell).strip() if cell is not None else "" for cell in row]
+                for row in fastexcel.read_excel(path).load_sheet_by_name(sheet, header_row=None, dtypes="string").to_polars().iter_rows()
+            ]
+            body = [row for row in cells if row[0].upper() != "COUNTY" and row[0].replace(",", "").strip() and row[1].isdigit()]
+            letters = [re.search(r"Amendment (?:Number )?([A-E])$", label)[1] for label in cells[0][1:] if label]
+            names = [row[0] for row in body if row[0].upper() != "TOTAL"]
+            total = next(row for row in body if row[0].upper() == "TOTAL")
+            for index, letter in enumerate(letters):
+                tables.append(
+                    (
+                        letter,
+                        f"{'Amendment' if day.year == 2010 else 'Constitutional Amendment'} {letter}",
+                        names,
+                        [int(row[4 + 2 * index + side]) for row in [*body[: len(names)], total] for side in (0, 1)],
+                    )
+                )
+        elif day.year == 2000:
+            pages = {}
+            for page, left in ((13, 56), (14, 0)):
+                text = subprocess.run(
+                    ["pdftotext", "-f", str(page), "-l", str(page), "-layout", str(path), "-"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout
+                pages[page] = [
+                    [int(match[0]) for match in re.finditer(r"\d+", line) if match.end() >= left]
+                    for line in text.splitlines()
+                    if not re.search(r"[A-Za-z.]", line) and re.search(r"\d", line)
+                ]
+            for index, (number, label) in enumerate(
+                (("1", "Proposition 1"), ("2", "Proposition 2"), ("A", "Initiative A"), ("B", "Initiative B"))
+            ):
+                column = [(pages[13], 0), (pages[13], 2), (pages[14], 1), (pages[14], 3)][index]
+                against = [(pages[13], 1), (pages[14], 0), (pages[14], 2), (pages[14], 4)][index]
+                if len(pages[13]) != 30 or len(pages[14]) != 30:
+                    raise ValueError(f"{url}: {len(pages[13])} and {len(pages[14])} rows")
+                tables.append(
+                    (
+                        number,
+                        label,
+                        list(UT_COUNTIES),
+                        [value for yes, no in zip(column[0], against[0], strict=True) for value in (yes[column[1]], no[against[1]])],
+                    )
+                )
+        else:
+            lines = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            ).stdout.splitlines()
+            fence = 0
+            for start, line in enumerate(lines):
+                if re.search(r"(?i)^\s*percent", line):
+                    fence = start
+                if not line.startswith("Beaver"):
+                    continue
+                measures = re.findall(r"(Amendment|Initiative)\s+(?:Number\s+)?(\d+)", " ".join(lines[fence:start]))
+                block = []
+                for row in lines[start:]:
+                    match = re.match(r"\s*([A-Za-z]+(?: [A-Za-z]+)?)\s+([\d,%. ]+)$", row)
+                    if match is None:
+                        break
+                    block.append((match[1], [int(value.replace(",", "")) for value in match[2].split() if "%" not in value]))
+                    if match[1].upper() == "TOTAL":
+                        break
+                if not measures or block[-1][0].upper() != "TOTAL":
+                    continue
+                for index, (kind, number) in enumerate(measures):
+                    tables.append(
+                        (
+                            number,
+                            f"Constitutional Amendment {number}" if kind == "Amendment" else f"Initiative {number}",
+                            [county for county, _ in block[:-1]],
+                            [figures[2 + 2 * index + side] for _, figures in block for side in (0, 1)],
+                        )
+                    )
+        for number, label, names, values in tables:
+            votes = dict(zip([*names, "TOTAL"], zip(values[0::2], values[1::2], strict=True), strict=True))
+            total = votes.pop("TOTAL")
+            if (
+                list(votes) != list(UT_COUNTIES)
+                or sum(yes for yes, _ in votes.values()) != total[0]
+                or sum(no for _, no in votes.values()) != total[1]
+            ):
+                raise ValueError(f"{url} {label}: counties do not sum to {total}")
+            rows.extend(
+                {
+                    "state": "UT",
+                    "day": day,
+                    "number": number,
+                    "label": label,
+                    "url": url,
+                    "county": county,
+                    "answer": answer,
+                    "votes": value,
+                }
+                for county, pair in votes.items()
+                for answer, value in zip(("YES", "NO"), pair, strict=True)
+            )
     return rows
 
 
@@ -3627,6 +3799,7 @@ def parse() -> None:
             *montana(),
             *north_dakota(),
             *new_york(),
+            *utah(),
             *wyoming(),
             *south_carolina(),
             *hawaii(),
@@ -3637,7 +3810,7 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), group in frame.group_by("state", "day", "number", "label", maintain_order=True):
-        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022)):
+        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022), ("OR", 2022), ("UT", 2012)):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
                 if state == "NY"
@@ -3647,7 +3820,7 @@ def parse() -> None:
                     group.filter(pl.col("answer") == "YES")["votes"].sum()
                     > group.filter(pl.col("answer") == "NO")["votes"].sum(),
                 )
-                if state in ("WA", "LA")
+                if state in ("WA", "LA", "OR", "UT")
                 else (SD_2012 if state == "SD" else AZ_2022)[number]
             )
             matched.append(
@@ -3709,7 +3882,7 @@ def parse() -> None:
                 else f"Public Question {number}"
                 if state == "NJ"
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY", "UT")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
