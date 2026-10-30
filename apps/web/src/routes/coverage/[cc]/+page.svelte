@@ -573,19 +573,48 @@
                 .find((tier) => tier.key === tierKey)
                 ?.levels.map((level) => level.key) ?? [],
             )}
+            {const entries = $derived(
+              summary.notes.filter(
+                (note) =>
+                  note.category ===
+                    (reason === "knownGap" ? "known_gap" : "blocked") &&
+                  (note.level === "" || levels.includes(note.level)) &&
+                  GAP_GRAINS[goal].includes(note.goal) &&
+                  (note.count ?? 0) > 0,
+              ),
+            )}
+            {#snippet entry(note: (typeof entries)[number])}
+              <span>
+                <span class="font-medium">{gapSpan(note)}</span>
+                <span class="text-muted-foreground"
+                  >({count(note.count ?? 0)})</span
+                >
+                <span class="block">{note.note}</span>
+                <span class="block text-muted-foreground">{gapTried(note)}</span
+                >
+              </span>
+            {/snippet}
             <span class="mbs-1 grid gap-1.5 text-xs">
-              {#each summary.notes.filter((note) => note.category === (reason === "knownGap" ? "known_gap" : "blocked") && (note.level === "" || levels.includes(note.level)) && GAP_GRAINS[goal].includes(note.goal) && (note.count ?? 0) > 0) as note, index (index)}
-                <span>
-                  <span class="font-medium">{gapSpan(note)}</span>
-                  <span class="text-muted-foreground"
-                    >({count(note.count ?? 0)})</span
-                  >
-                  <span class="block">{note.note}</span>
-                  <span class="block text-muted-foreground"
-                    >{gapTried(note)}</span
-                  >
-                </span>
+              {#each entries.slice(0, 3) as note, index (index)}
+                {@render entry(note)}
               {/each}
+              {#if entries.length > 3}
+                <details class="group/more grid gap-1.5">
+                  <summary
+                    class="flex cursor-pointer list-none items-center gap-1 text-muted-foreground inline-fit hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden"
+                  >
+                    <ChevronRightIcon
+                      class="transition-transform block-3.5 inline-3.5 group-open/more:rotate-90"
+                    />
+                    {m.count_more({ count: count(entries.length - 3) })}
+                  </summary>
+                  <span class="grid gap-1.5 pbs-1.5">
+                    {#each entries.slice(3) as note, index (index)}
+                      {@render entry(note)}
+                    {/each}
+                  </span>
+                </details>
+              {/if}
             </span>
           {/if}
         </span>

@@ -79,8 +79,15 @@
           <ul class="grid gap-2.5">
             {#each group.entries as entry, index (index)}
               {const tried = $derived(gapTried(entry))}
+              {const grain = $derived(
+                GRAIN_LABELS[entry.goal]?.() ?? entry.goal,
+              )}
               {const where = $derived(
-                [entry.state, entry.label].filter((part) => part != null),
+                [entry.state, entry.label].filter(
+                  (part) =>
+                    part != null &&
+                    !grain.toLowerCase().includes(part.toLowerCase()),
+                ),
               )}
               <li
                 class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2 text-[0.8125rem] leading-snug"
@@ -98,9 +105,7 @@
                 {/if}
                 <div class="grid gap-0.5 min-inline-0">
                   <p>
-                    <span class="font-semibold"
-                      >{GRAIN_LABELS[entry.goal]?.() ?? entry.goal}</span
-                    >
+                    <span class="font-semibold">{grain}</span>
                     <span class="text-muted-foreground"
                       >{[CATEGORY_LABELS[entry.category](), ...where].join(
                         ", ",
@@ -118,14 +123,30 @@
                       {m.polity_known_races({ count: count(entry.count) })}
                     </p>
                     <p class="text-xs">
+                      {const dates = $derived(
+                        entry.elections.map((election) => election.date),
+                      )}
+                      {const isSameDay = $derived(
+                        dates.length > 1 && new Set(dates).size === 1,
+                      )}
+                      {const repeated = $derived(
+                        new Set(
+                          dates.filter((day, at) => dates.indexOf(day) !== at),
+                        ),
+                      )}
                       {#each entry.elections as election, at (election.path)}
                         <a
                           href={resolve("/[...path]", { path: election.path })}
                           class="tabular-nums underline underline-offset-2 hover:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring"
-                          >{election.date == null
-                            ? election.path
-                            : date(election.date)}</a
-                        >{at < entry.elections.length - 1 ? "," : ""}
+                          >{isSameDay && election.place != null
+                            ? election.place
+                            : election.date == null
+                              ? election.path
+                              : repeated.has(election.date) &&
+                                  election.place != null
+                                ? `${date(election.date)} (${election.place})`
+                                : date(election.date)}</a
+                        >{at < entry.elections.length - 1 ? ", " : " "}
                       {/each}
                       {#if entry.more > 0}
                         <span class="text-muted-foreground"

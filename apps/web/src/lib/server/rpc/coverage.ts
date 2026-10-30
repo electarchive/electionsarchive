@@ -689,7 +689,11 @@ export const coverage = {
           ref: v.nullable(v.string()),
           count: v.number(),
           elections: v.array(
-            v.object({ path: v.string(), date: v.nullable(v.string()) }),
+            v.object({
+              path: v.string(),
+              date: v.nullable(v.string()),
+              place: v.nullable(v.string()),
+            }),
           ),
           more: v.number(),
         }),
@@ -716,15 +720,20 @@ export const coverage = {
         checked: string | null;
         ref: string | null;
         count: number;
-        elections: Array<{ path: string; date: string | null }>;
+        elections: Array<{
+          path: string;
+          date: string | null;
+          place: string | null;
+        }>;
         more: number;
       }>(sql`
         select c.polity, n ->> 'goal' as goal, n ->> 'level' as level, n ->> 'state' as state, n ->> 'stage' as stage,
           (n ->> 'from')::int as "from", (n ->> 'to')::int as "to", n ->> 'label' as label, n ->> 'category' as category,
           n ->> 'note' as note, coalesce(n ->> 'sources', '') as sources, n ->> 'checked' as checked, n ->> 'ref' as ref,
           coalesce((n ->> 'count')::int, 0) as count,
-          coalesce((select jsonb_agg(jsonb_build_object('path', x.path, 'date', x.date) order by x.date, x.path)
-            from (select s.path, e.date_from::text as date
+          coalesce((select jsonb_agg(jsonb_build_object('path', x.path, 'date', x.date, 'place', x.place) order by x.date, x.path)
+            from (select s.path, e.date_from::text as date,
+                (select pn.text from name pn where pn.entity_id = e.polity_id and pn.is_preferred limit 1) as place
               from jsonb_array_elements_text(coalesce(n -> 'elections', '[]')) a (eid)
               join election e on e.id = a.eid::uuid
               join slug s on s.entity_id = e.id and s.is_current
@@ -732,11 +741,11 @@ export const coverage = {
           greatest(jsonb_array_length(coalesce(n -> 'elections', '[]')) - 12, 0) as more
         from coverage_polity c cross join jsonb_array_elements(c.notes) with ordinality as t (n, i)
           cross join (select coalesce(${polity}::text, (select lower(p.iso_code) from polity p
-            where p.id::text = ${id}::text and p.kind in ('sovereign_state', 'supranational'))) as cc) w
+            where p.id::text = ${id}::uuid::text and p.kind in ('sovereign_state', 'supranational'))) as cc) w
         where n ? 'category'
           and case when w.cc is not null then c.polity = w.cc and (coalesce((n ->> 'count')::int, 0) > 0
               or n ->> 'category' = 'not_applicable' or n ->> 'goal' in ('dates', 'party'))
-            else coalesce(n -> 'contests', '[]') ? ${id}::text or coalesce(n -> 'elections', '[]') ? ${id}::text end
+            else coalesce(n -> 'contests', '[]') ? ${id}::uuid::text or coalesce(n -> 'elections', '[]') ? ${id}::uuid::text end
         order by c.polity, (n ->> 'from')::int nulls first, n ->> 'level', n ->> 'goal', i
       `);
       return found.rows;

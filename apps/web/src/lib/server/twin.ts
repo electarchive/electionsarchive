@@ -751,25 +751,40 @@ function knownMarkdown(known: Known, link: Link, isFull: boolean) {
         return [
           `### ${[years, office].filter((part) => part !== "").join(", ")}`,
           entries
-            .map((entry) =>
-              [
-                `- **${GRAIN_LABELS[entry.goal]?.() ?? entry.goal}** (${CATEGORY_LABELS[entry.category]()}${[
+            .map((entry) => {
+              const grain = GRAIN_LABELS[entry.goal]?.() ?? entry.goal;
+              const dates = entry.elections.map((election) => election.date);
+              const isSameDay = dates.length > 1 && new Set(dates).size === 1;
+              const repeated = new Set(
+                dates.filter((day, at) => dates.indexOf(day) !== at),
+              );
+              return [
+                `- **${grain}** (${CATEGORY_LABELS[entry.category]()}${[
                   entry.state,
                   entry.label,
                 ]
-                  .filter((part) => part != null)
+                  .filter(
+                    (part) =>
+                      part != null &&
+                      !grain.toLowerCase().includes(part.toLowerCase()),
+                  )
                   .map((part) => `, ${part}`)
                   .join("")}): ${entry.note}`,
-                gapTried(entry),
+                gapTried(entry).replace(/[^.]$/u, "$&."),
                 entry.category === "not_applicable" || entry.count === 0
                   ? ""
                   : m.polity_known_races({ count: count(entry.count) }),
                 entry.elections
                   .map((election) =>
                     link(
-                      election.date == null
-                        ? election.path
-                        : date(election.date),
+                      isSameDay && election.place != null
+                        ? election.place
+                        : election.date == null
+                          ? election.path
+                          : repeated.has(election.date) &&
+                              election.place != null
+                            ? `${date(election.date)} (${election.place})`
+                            : date(election.date),
                       election.path,
                     ),
                   )
@@ -779,8 +794,8 @@ function knownMarkdown(known: Known, link: Link, isFull: boolean) {
                     : ""),
               ]
                 .filter((part) => part !== "")
-                .join(" "),
-            )
+                .join(" ");
+            })
             .join("\n"),
         ].join("\n\n");
       }),
