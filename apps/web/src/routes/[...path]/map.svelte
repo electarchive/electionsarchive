@@ -531,6 +531,31 @@
       [...places.rows, ...(places.districts ?? [])].map((row) => [row.k, row]),
     ),
   );
+  const seated = $derived.by(() => {
+    const nested = Map.groupBy(places.districts ?? [], (row) => row.within);
+    const sum = (list: Array<number>) => {
+      let total = 0;
+      for (const value of list) {
+        total += value;
+      }
+      return total;
+    };
+    const totals = new Map(
+      places.rows.map((row) => {
+        const held = sum((row.held ?? []).map(([, won]) => won));
+        const own =
+          row.seats ??
+          (held > 0 || !row.contest || row.leader == null ? held : 1);
+        const within = sum(
+          (nested.get(row.k) ?? []).map((district) => district.seats ?? 0),
+        );
+        return [row.k, own + within] as const;
+      }),
+    );
+    return totals.values().some((seats) => seats > 1)
+      ? new Map(totals.entries().filter(([, seats]) => seats > 0))
+      : null;
+  });
   let layout = $state<"map" | "cartogram" | "hexes">("hexes");
   const hexed = $derived(
     covering(hexes, { has: (k) => rows.has(k), size: places.rows.length }),
@@ -608,10 +633,7 @@
       labels: hexed.labels.map((label) => ({
         ...center(label.q, label.r),
         text: label.text,
-        seats:
-          isTally && label.k != null
-            ? (rows.get(label.k)?.valid ?? null)
-            : null,
+        seats: seated?.get(label.k ?? -1) ?? null,
       })),
       nations: line(
         hexed.borders.flatMap((border) =>
@@ -642,7 +664,12 @@
       seam: 0.05,
       size: 0.9,
       credit: cartogram.credit,
-      labels: cartogram.labels.map((label) => ({ ...label, seats: null })),
+      labels: cartogram.labels.map(
+        (label): typeof label & { seats: number | null } => ({
+          ...label,
+          seats: null,
+        }),
+      ),
       nations: cartogram.states.join(""),
       regions: "",
     };
