@@ -232,6 +232,9 @@ const stated = async (id: string) => {
       select id from districts
       union
       select ap.parent_id from districts d join area_parent ap on ap.area_id = d.id and ap.valid @> d.date_from
+      union
+      select ac.area_id from tree join election k on k.id = tree.id and k.id <> ${id}::uuid
+      join polity y on y.id = k.polity_id join area_code ac on ac.code = y.iso_code
     )
     select a.k, ac.code, s.path as polity, exists (select 1 from used where used.id = a.id) as "isUsed"
     from election e
@@ -263,6 +266,7 @@ const stated = async (id: string) => {
           q: cell.q,
           r: cell.r,
           text: cell.region,
+          k: cell.k,
         })),
         cartogram: null,
         isPartial: true,
@@ -1881,7 +1885,12 @@ export const seats = {
             }),
           ),
           labels: v.array(
-            v.object({ q: v.number(), r: v.number(), text: v.string() }),
+            v.object({
+              q: v.number(),
+              r: v.number(),
+              text: v.string(),
+              k: v.optional(v.number()),
+            }),
           ),
           cartogram: v.nullable(
             v.object({

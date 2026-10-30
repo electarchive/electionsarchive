@@ -278,7 +278,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
             })
         : [],
     );
-    const [byes, tiers, chambers, known, hexes] = await Promise.all([
+    const [byes, tiers, chambers, known, hexes, states] = await Promise.all([
       call(router.seats.byElections, { id: found.id, within: found.scope?.id }),
       found.scope == null &&
       parts.length > 1 &&
@@ -296,6 +296,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
           ),
       call(router.coverage.known, { id: found.id }),
       call(router.seats.hexes, { id: found.id, within: found.scope?.id }),
+      found.scope == null && parts.length > 0 && parts.length < 40
+        ? call(router.elections.states, { id: found.id })
+        : null,
     ]);
     return {
       ...found,
@@ -304,6 +307,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       chambers: chambers.flatMap((entry) => (entry == null ? [] : [entry])),
       known,
       hexes,
+      states,
     };
   }
   if (found.kind === "contest") {
@@ -560,6 +564,7 @@ function markdown(
           data.tiers,
           data.chambers,
           data.hexes,
+          data.states,
           link,
         ),
         ...knownMarkdown(data.known, link, false),
@@ -2394,6 +2399,7 @@ function electionMarkdown(
   ballot: Extract<Data, { kind: "election" }>["tiers"],
   chambers: Extract<Data, { kind: "election" }>["chambers"],
   hexes: Extract<Data, { kind: "election" }>["hexes"],
+  states: Extract<Data, { kind: "election" }>["states"],
   link: Link,
 ) {
   const signed = new Intl.NumberFormat("en", { signDisplay: "exceptZero" });
@@ -3634,6 +3640,7 @@ function electionMarkdown(
             )
             .join("\n"),
         ]),
+    ...hexMarkdown(states?.places ?? null, hexes),
   ].filter((block) => block !== "");
 }
 

@@ -135,7 +135,7 @@
       credit: string | null;
       cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
-      labels: Array<{ q: number; r: number; text: string }>;
+      labels: Array<{ q: number; r: number; text: string; k?: number }>;
       cartogram: {
         credit: string;
         box: Array<number>;
@@ -542,8 +542,8 @@
     ArrowUp: [0, -1],
   };
   const framed = (left: number, top: number, right: number, bottom: number) => {
-    const width = Math.max(right - left, 24);
-    const height = Math.max(bottom - top, 16);
+    const width = Math.max(right - left, 12);
+    const height = Math.max(bottom - top, 9);
     return {
       x: (left + right - width) / 2,
       y: (top + bottom - height) / 2,
@@ -608,6 +608,10 @@
       labels: hexed.labels.map((label) => ({
         ...center(label.q, label.r),
         text: label.text,
+        seats:
+          isTally && label.k != null
+            ? (rows.get(label.k)?.valid ?? null)
+            : null,
       })),
       nations: line(
         hexed.borders.flatMap((border) =>
@@ -638,7 +642,7 @@
       seam: 0.05,
       size: 0.9,
       credit: cartogram.credit,
-      labels: cartogram.labels,
+      labels: cartogram.labels.map((label) => ({ ...label, seats: null })),
       nations: cartogram.states.join(""),
       regions: "",
     };
@@ -2328,8 +2332,8 @@
           <text
             class="fill-foreground font-semibold"
             x={label.x}
-            y={label.y}
-            font-size={grid.size}
+            y={label.seats == null ? label.y : label.y - grid.size * 0.42}
+            font-size={label.seats == null ? grid.size : grid.size * 0.85}
             text-anchor="middle"
             dominant-baseline="central"
             stroke="var(--card)"
@@ -2338,6 +2342,21 @@
             paint-order="stroke"
             pointer-events="none">{label.text}</text
           >
+          {#if label.seats != null}
+            <text
+              class="fill-foreground font-figures tabular-nums"
+              x={label.x}
+              y={label.y + grid.size * 0.5}
+              font-size={grid.size * 0.8}
+              text-anchor="middle"
+              dominant-baseline="central"
+              stroke="var(--card)"
+              stroke-width={grid.size * 0.22}
+              stroke-linejoin="round"
+              paint-order="stroke"
+              pointer-events="none">{count(label.seats)}</text
+            >
+          {/if}
         {/each}
         {#if focus != null && grid.at.has(focus)}
           {const cell = $derived(grid.at.get(focus))}

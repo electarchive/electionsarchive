@@ -10,6 +10,9 @@
   const states = createQuery(() =>
     orpc.elections.states.queryOptions({ input: { id } }),
   );
+  const hexes = createQuery(() =>
+    orpc.seats.hexes.queryOptions({ input: { id, within: undefined } }),
+  );
 </script>
 
 {#if states.data != null}
@@ -30,6 +33,7 @@
         names={drawn.places.legend.map((item) => item.short ?? item.label)}
         levels={[]}
         span={null}
+        hexes={hexes.data ?? null}
       />
     {/key}
   </section>
