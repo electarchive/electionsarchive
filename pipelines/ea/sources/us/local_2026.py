@@ -1868,7 +1868,7 @@ NE_SOURCES["AR-05119"] = (
 NE_SOURCES["AR-05143"] = (
     "Washington County Election Commission",
     "November 3, 2026 General Election Information",
-    "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-election-information",
+    "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-general-election-information",
     "ar/washington.html",
 )
 for page in sorted((DATA / "inbox" / "y26" / "la").glob("*.html")):
@@ -2013,7 +2013,8 @@ for key, publisher, title, url, local in (
     ("AR-05131-fort-smith", "City of Fort Smith", "Candidates for Mayor and Directors-at-Large, media notification of August 5, 2026", "https://content.govdelivery.com/accounts/ARFORTSMITH/bulletins/423bddb", "ar/fort_smith.html"),
     ("FL-12086-coral-gables", "Miami-Dade County Elections Department", "Official Sample Ballot, Coral Gables General Biennial and Special Elections, November 3, 2026", "https://www.miamidade.gov/elections/library/sample-ballots/2026-11-03-coral-gables-general-biennial-and-special-elections-sample-ballot.pdf", "fl/coral_gables.pdf"),
     ("FL-12086-municipal", "Miami-Dade County Elections Department", "Official Sample Ballot, General Election, November 3, 2026 (municipal contests)", "https://www.miamidade.gov/elections/library/2026-11-03-general-election-sample-ballot.pdf", "fl/miami_dade_nov_municipal.pdf"),
-    ("AR-05143-municipal", "Washington County Election Commission", "November 3, 2026 General Election Information: Municipal General Election candidates (updated August 21, 2026)", "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-election-information", "ar/washington_municipal.html"),
+    ("AR-05143-municipal", "Washington County Election Commission", "November 3, 2026 General Election Information: Municipal General Election candidates (updated August 21, 2026)", "https://www.washingtoncountyar.gov/government/departments-a-e/election-commission/november-3-2026-general-election-information", "ar/washington_municipal.html"),
+    ("KY-21111-jefferson", "Jefferson County Clerk", "2026 Jefferson County Candidate Filings, revised August 10, 2026", "https://www.jeffersoncountyclerk.org/files/assets/clerk/v/1/elections/documents/2026-candidate-filing-8-10-26.pdf", "ky/jefferson.pdf"),
     ("TX-48041-college-station", "City of College Station", "General and Special Election November 3, 2026: Candidates for Office", "https://cstx-us.govstack.com/your-government/elections/", "tx/college_station.html"),
     ("WY-56021-cheyenne", "Laramie County Clerk", "2026 General Election Candidate Roster, Municipal Offices (final)", "https://www.laramiecountywy.gov/County-Government/Elected-Officials/County-Clerk/Elections/2026-Election-Information", "wy/laramie_municipal.pdf"),
     ("WV-54039-kanawha", "West Virginia Secretary of State", "Official sample ballot, Kanawha County, November 3, 2026 General Election", "https://apps.sos.wv.gov/elections/SampleBallots/Home/GetBallot?County=Kanawha", "wv/kanawha_sample_ballot.pdf"),
