@@ -4897,6 +4897,7 @@ def parse() -> None:
                 "unexpired": row["unexpired"] == "1",
                 "office": row.get("office_name") or "",
                 "area": row.get("constituency_area") or "",
+                "mint": row.get("ward_mint") == "1",
             }
         )
 
@@ -5234,7 +5235,7 @@ def parse() -> None:
                         "",
                     )
             tails = resolve(
-                conn, state, {(str(row["fips"]), str(row["contest"])) for row in found if row.get("tail") is None}
+                conn, state, {(str(row["fips"]), str(row["contest"])) for row in found if row.get("tail") is None and not row.get("mint")}
             )
             used: dict[str, str] = {}
             missed: set[str] = set()
