@@ -19,7 +19,8 @@ TAGGED = re.compile(r"^(.*?)\s*\(([A-Za-z .-]+)\)$")
 
 
 def _days() -> list[str]:
-    return sorted(set(re.findall(r'href="/(\d{4}-\d{2}-\d{2})/Contests/"', raw.cached(SOURCE, f"{HOST}/").path.read_text())))
+    found = re.findall(r'href="/(\d{4}-\d{2}-\d{2})/Contests/"', raw.cached(SOURCE, f"{HOST}/").path.read_text())
+    return sorted({day for day in found if day <= date.today().isoformat()})
 
 
 def fetch() -> None:

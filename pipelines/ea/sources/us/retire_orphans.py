@@ -70,14 +70,15 @@ def emit() -> Path:
                 for (person,) in conn.execute(
                     """select p.id from person p join changeset c on c.id = p.changeset_id
                        where c.pipeline = %s
-                         and exists (select from candidacy y where y.person_id = p.id and y.id = any(%s::uuid[]))
-                         and not exists (select from candidacy y where y.person_id = p.id and not y.id = any(%s::uuid[]))
+                         and (not exists (select from candidacy y where y.person_id = p.id)
+                              or (exists (select from candidacy y where y.person_id = p.id and y.id = any(%s::uuid[]))
+                                  and not exists (select from candidacy y where y.person_id = p.id and not y.id = any(%s::uuid[]))))
                          and not exists (select from entity_merge m where m.entity_id = p.id or m.into_id = p.id)
                          and not exists (select from name n join changeset w on w.id = n.changeset_id
                                          where n.entity_id = p.id and w.pipeline <> all(%s))
                          and not exists (select from external_id x join changeset w on w.id = x.changeset_id
                                          where x.entity_id = p.id and w.pipeline <> %s)""",
-                    [pipeline, candidacies, candidacies, [pipeline, "shorts"], pipeline],
+                    [pipeline, candidacies, candidacies, [pipeline, "shorts", "identity"], pipeline],
                 ).fetchall()
             ]
             for relation, column in references:
@@ -92,17 +93,55 @@ def emit() -> Path:
                 }
                 people = [p for p in people if p not in held]
             retired_people = set(people)
+            future = conn.execute(
+                """select k.id from contest k join changeset c on c.id = k.changeset_id
+                   join election e on e.id = k.election_id
+                   where c.pipeline = %s and e.date_from > current_date
+                     and exists (select from result_set r where r.contest_id = k.id)
+                     and not exists (select from result_set r join changeset w on w.id = r.changeset_id
+                                     where r.contest_id = k.id and w.pipeline <> %s)""",
+                [pipeline, pipeline],
+            ).fetchall()
+            for (contest,) in future:
+                cs.add("entity_retirement", entity_id=contest, reason="Results dated before the election was held")
+            for row in conn.execute(
+                """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness
+                   from result_set r join changeset w on w.id = r.changeset_id
+                   join election e on e.id = r.election_id
+                   where w.pipeline = %s and e.date_from > current_date and r.status = 'active'
+                     and r.contest_id <> all(%s::uuid[])""",
+                [pipeline, [contest for (contest,) in future]],
+            ).fetchall():
+                cs.add(
+                    "result_set",
+                    id=row[0],
+                    election_id=row[1],
+                    contest_id=row[2],
+                    stage=row[3],
+                    kind=row[4],
+                    status="withdrawn",
+                    source_id=row[5],
+                    is_default=False,
+                    completeness=row[6],
+                )
             for candidacy in candidacies:
                 cs.add("entity_retirement", entity_id=candidacy, reason="Superseded by a re-emit")
+            held = {
+                id
+                for (id,) in conn.execute(
+                    "select option_id from candidacy where option_id = any(%s::uuid[])", [option_ids]
+                ).fetchall()
+            }
             for option, contest, _ in options:
-                cs.add("option_drop", option_id=option, contest_id=contest, reason="Superseded by a re-emit")
+                if option not in held:
+                    cs.add("option_drop", option_id=option, contest_id=contest, reason="Superseded by a re-emit")
             for person in retired_people:
                 cs.add("entity_retirement", entity_id=person, reason="Superseded by a re-emit")
             with (DATA / "logs" / "retire_orphans.tsv").open("a", encoding="utf-8") as log:
                 log.write(
-                    f"{pipeline}\toptions {len(options)}\tcandidacies {len(candidacies)}\tpeople {len(retired_people)}"
+                    f"{pipeline}\toptions {len(options)}\tcandidacies {len(candidacies)}\tpeople {len(retired_people)}\tfuture contests {len(future)}"
                     f"\n"
                 )
-            print(pipeline, len(options), len(candidacies), len(retired_people))
+            print(pipeline, len(options), len(candidacies), len(retired_people), len(future))
             paths.append(cs.write())
     return paths[-1]
