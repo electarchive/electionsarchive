@@ -16,7 +16,7 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara"}
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
@@ -321,9 +321,49 @@ def san_bernardino() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+SANTA_CLARA = re.compile(r"^(?P<body>.+?),? (?P<kind>District|Ward|D)\s?(?P<number>\d+)$")
+
+
+def santa_clara() -> list[dict[str, str | int | bool]]:
+    contests: dict[tuple[str, str], list[str]] = {}
+    incumbents: dict[tuple[str, str], int] = {}
+    current = None
+    for index, line in enumerate(lines("06085")):
+        if found := re.match(r"^6\d{3}\s+(\S.*?)\s{2,}On Ballot: (Yes|No)\s+Vote For: (\d+)", line):
+            label = found[1]
+            if seat := SANTA_CLARA.match(label):
+                current = (seat["body"], f"{'Ward' if seat['kind'] == 'Ward' else 'District'} {seat['number']}")
+            else:
+                current = (label, "")
+            contests.setdefault(current, [])
+            incumbents[current] = int(found[3]) if found[2] == "Yes" else 0
+        elif current is None:
+            continue
+        elif found := re.match(r"\s+Qualified\s+\d+\s+(\S.*?)\s{2,}Candidate Stmt", line):
+            contests[current].append(found[1])
+    rows = []
+    for key, names in contests.items():
+        seats = incumbents[key]
+        if seats == 0 or len(names) <= seats:
+            continue
+        for name in names:
+            rows.append(
+                {
+                    "county": "Santa Clara",
+                    "district": full_name(key[0]),
+                    "seat": key[1],
+                    "role": "Director",
+                    "seats": seats,
+                    "name": name,
+                    "unexpired": False,
+                }
+            )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
