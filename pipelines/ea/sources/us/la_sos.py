@@ -35,6 +35,7 @@ OFFICES = {
     "Superintendent of Education": "Superintendent of Education",
     "Commissioner of Elections": "Commissioner of Elections",
     "Comptroller": "Comptroller",
+    "Justice of the Supreme Court": "Justice of the Supreme Court",
 }
 PARTIES = {
     "DEM": "democratic-party",
@@ -138,7 +139,9 @@ def statewide(day: date) -> list[dict[str, Any]]:
     return [
         race
         for race in many((races.get("Races") or {}).get("Race"))
-        if race["GeneralTitle"] in OFFICES and race.get("IsMultiParish") == "1"
+        if race["GeneralTitle"] in OFFICES
+        and race.get("IsMultiParish") == "1"
+        and (day.year >= 2000 or race["GeneralTitle"] != "Justice of the Supreme Court")
     ]
 
 
@@ -159,6 +162,8 @@ def fetch() -> None:
             if response.status_code not in (403, 429):
                 break
             time.sleep(2**attempt)
+        if response.status_code == 404 and "/VotesParish/" in link:
+            return
         response.raise_for_status()
         with lock:
             raw.store(
@@ -194,7 +199,10 @@ def parse() -> None:
         }
         counted: dict[tuple[str, str], int] = {}
         for parish in PARISHES:
-            listed = json.loads(raw.cached(SOURCE, blob(day, f"VotesParish/Votes_{parish}.htm")).path.read_text())
+            try:
+                listed = json.loads(raw.cached(SOURCE, blob(day, f"VotesParish/Votes_{parish}.htm")).path.read_text())
+            except LookupError:
+                continue
             by_race = {race["ID"]: race for race in many((listed.get("Races") or {}).get("Race"))}
             for race in races:
                 if race["ID"] not in by_race:
@@ -268,7 +276,10 @@ def emit() -> Path:
             for name_ in ["RacesCandidates_Multiparish.htm", "Votes_Multiparish.htm"] + [
                 f"VotesParish/Votes_{parish}.htm" for parish in PARISHES
             ]:
-                cs.artifact(raw.cached(SOURCE, blob(day, name_)), source)
+                try:
+                    cs.artifact(raw.cached(SOURCE, blob(day, name_)), source)
+                except LookupError:
+                    pass
         ((area,),) = conn.execute(
             """select u.area_id from reporting_unit u
                join polity_territory t on t.area_id = u.area_id
@@ -307,7 +318,9 @@ def emit() -> Path:
             pl.col("office", "title", "seats").first(), pl.col("outcome")
         )
         for day, race, office, title, seats, outcomes in races.sort("day").iter_rows():
-            pending = runoffs.get(office)
+            district = re.search(r"(\d+)(?:st|nd|rd|th)(?: Supreme Court)? District", title)
+            scope = f"{office}:{district[1]}" if district else office
+            pending = runoffs.get(scope)
             round_number = 2 if pending is not None and 0 < (day - pending[0]).days <= 70 else 1
             kind = "runoff" if round_number == 2 else "general"
             election_key = f"{day}:LA" + (":runoff" if round_number == 2 else "")
@@ -341,10 +354,14 @@ def emit() -> Path:
                 )
                 name(office_id, f"{office} of Louisiana")
             remainder = bool(re.search(r"(?i)unexpired|special", title))
-            contest_key = f"{day}:LA:{office_slug}" + (":special" if remainder else "")
+            contest_key = (
+                f"{day}:LA:{office_slug}"
+                + (f":district-{district[1]}" if district else "")
+                + (":special" if remainder else "")
+            )
             contest = cs.key("us.contest", contest_key)
             if "Runoff" in outcomes:
-                runoffs[office] = (day, contest)
+                runoffs[scope] = (day, contest)
             reused = contest_key in others
             if not reused:
                 cs.add(
@@ -353,7 +370,7 @@ def emit() -> Path:
                     election_id=election,
                     kind="office",
                     office_id=office_id,
-                    district_area_id=area,
+                    district_area_id=None if district else area,
                     term="remainder" if remainder else "full",
                     magnitude=seats,
                     round_number=round_number,
@@ -363,12 +380,16 @@ def emit() -> Path:
                 )
                 name(
                     contest,
-                    f"{day.year} Louisiana {office} "
+                    f"{day.year} Louisiana {office}"
+                    + (f", district {district[1]}" if district else "")
+                    + " "
                     + ("runoff" if round_number == 2 else "special election" if remainder else "election"),
                 )
                 cs.add(
                     "slug",
-                    path=f"us/la/{day}-{kind}/{office_slug}" + ("-special" if remainder else ""),
+                    path=f"us/la/{day}-{kind}/{office_slug}"
+                    + (f"-district-{district[1]}" if district else "")
+                    + ("-special" if remainder else ""),
                     entity_id=contest,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
