@@ -6089,7 +6089,7 @@ def emit() -> Path:
             if template == "" and group["owner"][0]:
                 title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
                 st, code, role = tail.split(":")[:3]
-                if owner.startswith(("school:", "place:")) and (
+                if owner.startswith(("school:", "place:", "town:")) and (
                     owner in homeless
                     or conn.execute(
                         "select 1 from external_id where scheme = 'us.polity' and value = %s", [owner]
@@ -6128,14 +6128,14 @@ def emit() -> Path:
                     "mayor", "vice-mayor", "supervisor", "clerk", "treasurer", "president", "judge",
                     "attorney-general", "public-auditor", "justice",
                 )
-                if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:")):
+                if polity in cs.minted and polity not in made and owner.startswith(("school:", "place:", "town:")):
                     made.add(polity)
                     geoid = owner.split(":")[1]
-                    scheme, polity_kind = (
-                        ("us.school_district", "school_district")
-                        if owner.startswith("school:")
-                        else ("us.place", "municipality")
-                    )
+                    scheme, polity_kind = {
+                        "school": ("us.school_district", "school_district"),
+                        "place": ("us.place", "municipality"),
+                        "town": ("us.town", "municipality"),
+                    }[owner.split(":")[0]]
                     cs.add("polity", id=polity, kind=polity_kind, iso_code=None)
                     name(polity, place)
                     cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{st}"))
@@ -6163,7 +6163,12 @@ def emit() -> Path:
                     if special
                     else (cs.area("us.state", code),)
                     if territory
-                    else (cs.area("us.school_district" if owner.startswith("school:") else "us.place", owner.split(":")[1]),)
+                    else (
+                        cs.area(
+                            {"school": "us.school_district", "place": "us.place", "town": "us.town"}[owner.split(":")[0]],
+                            owner.split(":")[1],
+                        ),
+                    )
                     if polity in cs.minted
                     else conn.execute(
                         "select t.area_id from polity_territory t join polity p on p.id = t.polity_id"
