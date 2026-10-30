@@ -1645,6 +1645,12 @@ NE_SOURCES = {
         "https://vote.sos.ri.gov/Candidates",
         "ne/ri_towns.zip",
     ),
+    "NJ-34011-s": (
+        "Cumberland County Clerk",
+        "2026 General Election Sample Ballots by municipality",
+        "https://cumberlandcountyclerknj.gov/",
+        "nj/cumberland_ballots.pdf",
+    ),
     "NJ-34029-s": (
         "Ocean County Clerk",
         "2026 General Election Official School Board Candidate Certification Sheet, updated 9-14-2026",
@@ -1782,6 +1788,30 @@ NE_SOURCES = {
         "2026 Candidate Statements of Interest (updated 7/27/2026)",
         "https://www.gilacountyaz.gov/government/school_superintendent/school_district_maps/index.php",
         "az/gila_schools.html",
+    ),
+    "AZ-04001-s": (
+        "Apache County School Superintendent",
+        "2026 School Board Candidates",
+        "https://www.apachecountyaz.gov/School-Board-Elections",
+        "az/apache_schools.pdf",
+    ),
+    "AZ-04003-s": (
+        "Cochise County School Superintendent",
+        "2026 Candidate Filing (7/9/26)",
+        "https://www.cochise.az.gov/",
+        "az/cochise_schools.pdf",
+    ),
+    "AZ-04023-s": (
+        "Santa Cruz County School Superintendent",
+        "2026 Candidate Filing (7/29/26)",
+        "https://www.santacruzcountyaz.gov/624/Elections-Information",
+        "az/santa-cruz_schools.pdf",
+    ),
+    "AZ-04011": (
+        "Greenlee County Elections Department",
+        "2026 Official List of Candidates",
+        "https://greenlee.az.gov/ova_dep/elections/",
+        "az/greenlee.pdf",
     ),
     "AZ-04009-s": (
         "Graham County Elections",
