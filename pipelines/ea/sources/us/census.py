@@ -9,7 +9,11 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+import pyproj
 import shapefile
+import shapely
+import shapely.geometry
+import shapely.ops
 
 from ea import raw
 from ea.changeset import Changeset
@@ -37,6 +41,50 @@ DISTRICTS = {
     "119": (f"{TIGER}GENZ2024/shp/cb_2024_us_cd119_500k.zip", CONGRESSES[119], None),
 }
 REDRAWN_2021 = {"37"}
+REDRAWN_2026 = {
+    "06": (
+        "CA",
+        "https://aelc.assembly.ca.gov/media/2608",
+        "California State Assembly Elections and Redistricting Committee",
+        "AB 604 congressional districts, as enacted by Proposition 50",
+        "https://aelc.assembly.ca.gov",
+    ),
+    "12": (
+        "FL",
+        "https://www.edr.state.fl.us/Content/redistricting/2026redistricting/EOGPCRP2026.zip",
+        "Florida Legislature Office of Economic and Demographic Research",
+        "Congressional districts EOGPCRP2026 (HB 1-D, 2026D)",
+        "https://www.edr.state.fl.us/Content/redistricting/2026redistricting/index.cfm",
+    ),
+    "37": (
+        "NC",
+        "https://webservices.ncleg.gov/ViewBillDocument/2025/7667/0/SL%202025-95%20-%20Shapefile",
+        "North Carolina General Assembly",
+        "Congressional districts, S.L. 2025-95 (S.B. 249)",
+        "https://www.ncleg.gov/redistricting",
+    ),
+    "47": (
+        "TN",
+        "https://comptroller.tn.gov/content/dam/cot/pa/documents/district-maps/congress-districts/NewCongressional26.zip",
+        "Tennessee Comptroller of the Treasury",
+        "Congressional districts adopted May 7, 2026",
+        "https://comptroller.tn.gov/office-functions/research-and-education-accountability/interactive-tools/district-maps.html",
+    ),
+    "48": (
+        "TX",
+        "https://data.capitol.texas.gov/dataset/748c952b-e926-4f44-8d01-a738884b3ec8/resource/5712ebe1-d777-4d4a-b836-0534e17bca01/download/planc2333.zip",
+        "Texas Legislative Council",
+        "Congressional plan PLANC2333 (H.B. 4, 2025)",
+        "https://data.capitol.texas.gov/dataset/planc2333",
+    ),
+    "49": (
+        "UT",
+        "https://opendata.gis.utah.gov/api/download/v1/items/d3388c1f7d894ab789247f6442855d66/shapefile?layers=0",
+        "Utah Geospatial Resource Center",
+        "US Congress districts 2026 to 2032 (court-adopted map)",
+        "https://opendata.gis.utah.gov/datasets/utah-us-congress-districts-2026-to-2032/about",
+    ),
+}
 LEWIS = (
     "https://github.com/JeffreyBLewis/congressional-district-boundaries/archive/"
     "aba2b6b17120718782605534b4bcc6c5ab3d09e2.tar.gz"
@@ -62,6 +110,8 @@ def fetch() -> None:
     for url in (STATES, COUNTIES, *(url for url, _, _ in DISTRICTS.values())):
         raw.fetch(SOURCE, url, suffix=".zip")
     raw.fetch(SOURCE, LEWIS, suffix=".tar.gz")
+    for _, url, *_ in REDRAWN_2026.values():
+        raw.fetch(SOURCE, url, suffix=".zip")
 
 
 def parse() -> None:
@@ -94,6 +144,33 @@ def parse() -> None:
                 for record, geojson in layers[layer]
                 if record["CD"]
             ]
+
+    layers["cd120"] = []
+    for fips, (_, url, *_) in REDRAWN_2026.items():
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as z:
+            parts = {
+                name.rsplit(".", 1)[1].lower(): z.read(name)
+                for name in z.namelist()
+                if "__MACOSX" not in name and not name.rsplit("/", 1)[-1].startswith("._") and "." in name
+            }
+        reader = shapefile.Reader(
+            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]), encoding="latin-1"
+        )
+        crs = pyproj.CRS.from_wkt(parts["prj"].decode())
+        project = pyproj.Transformer.from_crs(crs, 4326, always_xy=True).transform
+        field = next(name for name, *_ in reader.fields if name.upper() == "DISTRICT")
+        numbers = [int(float(record[field])) for record in reader.records()]
+        shapes = shapely.coverage_simplify(
+            [shapely.ops.transform(project, shapely.geometry.shape(shape.__geo_interface__)) for shape in reader.shapes()],
+            TOLERANCE,
+        )
+        layers["cd120"].extend(
+            (
+                {"GEOID": f"{fips}{number:02d}", "STATEFP": fips, "CD120FP": f"{number:02d}"},
+                json.dumps(shapely.geometry.mapping(geom)),
+            )
+            for number, geom in zip(numbers, shapes, strict=True)
+        )
 
     historical: list[dict[str, object]] = []
     with connect() as conn:
@@ -250,7 +327,11 @@ def parse() -> None:
             {
                 "code": record["GEOID"],
                 "valid_from": valid_from,
-                "valid_to": CONGRESSES[117] if vintage == "116" and record["STATEFP"] in REDRAWN_2021 else valid_to,
+                "valid_to": CONGRESSES[117]
+                if vintage == "116" and record["STATEFP"] in REDRAWN_2021
+                else CONGRESSES[120]
+                if vintage == "119" and record["STATEFP"] in REDRAWN_2026
+                else valid_to,
                 "quality": "official",
                 "geom": geometry[(f"cd{vintage}", str(record["GEOID"]))][0],
                 "label_point": geometry[(f"cd{vintage}", str(record["GEOID"]))][1],
@@ -280,6 +361,27 @@ def parse() -> None:
             ]
         ]
         + historical
+    )
+    districts = pl.concat(
+        [
+            districts,
+            pl.DataFrame(
+                [
+                    {
+                        "code": record["GEOID"],
+                        "valid_from": CONGRESSES[120],
+                        "valid_to": None,
+                        "quality": "official",
+                        "geom": geometry[("cd120", str(record["GEOID"]))][0],
+                        "label_point": geometry[("cd120", str(record["GEOID"]))][1],
+                        "state": record["STATEFP"],
+                    }
+                    for record, _ in layers["cd120"]
+                ],
+                schema_overrides={"valid_to": pl.Date},
+            ),
+        ],
+        how="diagonal",
     ).sort("code", "valid_from")
     overlaps = districts.filter(pl.col("valid_from") < pl.col("valid_to").shift(1).over("code"))
     if overlaps.height:
@@ -328,6 +430,19 @@ def emit() -> Path:
             attribution="Jeffrey B. Lewis, Brandon DeVine, Lincoln Pitcher, and Kenneth C. Martis",
         )
         cs.artifact(raw.cached(SOURCE, LEWIS), lewis)
+        redrawn: dict[str, UUID] = {}
+        for fips, (_, url, publisher, title, page) in REDRAWN_2026.items():
+            redrawn[fips] = cs.source(publisher, title)
+            cs.add(
+                "source",
+                id=redrawn[fips],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=page,
+                license="Public record",
+            )
+            cs.artifact(raw.cached(SOURCE, url), redrawn[fips])
 
         us = cs.polity("US")
         cs.add("polity", id=us, kind="sovereign_state", iso_code="US")
@@ -433,7 +548,11 @@ def emit() -> Path:
                 geom=district["geom"],
                 label_point=district["label_point"],
                 quality=district["quality"],
-                source_id=census if district["quality"] == "official" else lewis,
+                source_id=redrawn[district["state"]]
+                if district["state"] is not None
+                else census
+                if district["quality"] == "official"
+                else lewis,
             )
         for code in UNCOVERED:
             cs.add("note", entity_id=cs.area("us.cd", code), kind="caveat", body_md=UNCOVERED_NOTE)
@@ -466,6 +585,7 @@ def emit() -> Path:
         for vintage, valid_from, valid_to in (
             *((vintage, valid_from, valid_to) for vintage, (_, valid_from, valid_to) in DISTRICTS.items()),
             *((str(number), CONGRESSES[number], CONGRESSES[number + 1]) for number in (*range(1, 108), 117)),
+            ("120", CONGRESSES[120], None),
         ):
             cs.add(
                 "boundary_set",

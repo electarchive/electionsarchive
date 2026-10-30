@@ -403,6 +403,7 @@ OFFICE_ALIASES = {
 SUFFIX = re.compile(r"(?i)^(jr|sr|ii|iii|iv|v)\.?$")
 DAY = date(2026, 11, 3)
 REDISTRICTED = {"AL", "CA", "FL", "LA", "NC", "OH", "TN", "TX", "UT"}
+REDRAWN_LOADED = {"CA", "FL", "NC", "TN", "TX", "UT"}
 CLASS_THREE_SPECIALS = ("OH", "FL")
 NO_GENERAL = ("PR",)
 SUPPLEMENTED = {"RI", "AR", "NV", "MN"}
@@ -2151,8 +2152,9 @@ def emit() -> Path:
             special_seats[(state, level, seat.split(":", 1)[1].replace(":", "-"))] = key
             templates.append((f"{template[0]}|special", *template[1:7], 1, "remainder", *template[9:]))
         latest_plan = conn.execute(
-            "select id from boundary_set where scheme_code = 'us.cd' order by valid_from desc limit 1"
+            "select id from boundary_set where scheme_code = 'us.cd' and vintage = '119'"
         ).fetchone()[0]
+        new_plan = conn.execute("select id from boundary_set where scheme_code = 'us.cd' and vintage = '120'").fetchone()[0]
         sitting: dict[str, set[UUID]] = {"house": set(), "senate": set()}
         members: dict[tuple[str, str], list[list[str]]] = {}
         states = {fips: state for state, fips in FIPS.items()}
@@ -2619,6 +2621,8 @@ def emit() -> Path:
                 seat_id=seat,
                 boundary_set_id=plan
                 if chamber == "legislative"
+                else new_plan
+                if chamber == "house" and state in REDRAWN_LOADED
                 else latest_plan
                 if chamber == "house" and state not in REDISTRICTED
                 else None,
@@ -2675,7 +2679,7 @@ def emit() -> Path:
                     kind="methodology",
                     body_md="Louisiana Act 7 of 2026 cancelled the closed party primaries for the U.S. House and moved the races to the open primary on 2026-11-03: every candidate runs on one ballot, a majority wins outright, and otherwise the top two meet in a general election on 2026-12-12.",
                 )
-            if chamber == "house" and state in REDISTRICTED:
+            if chamber == "house" and state in REDISTRICTED and state not in REDRAWN_LOADED:
                 cs.add(
                     "note",
                     entity_id=contest,
