@@ -83,6 +83,12 @@ def parse() -> None:
     print(frame.group_by("scheme").len().sort("scheme").rows())
 
 
+MINTED = {
+    "us.place:2740418": ("us.place", "2740418", "Marble", "us/mn/marble-city"),
+    "us.school_district:2718390": ("us.school_district", "2718390", "Lynd Public School District", "us/mn/lynd-public-school-district"),
+}
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "questions.parquet")
     with connect() as conn:
@@ -115,6 +121,32 @@ def emit() -> Path:
         parent = cs.key("us.election", f"{DAY}:MN")
         elections: set[UUID] = set()
         skipped = 0
+        for key, (scheme, code, text, path) in MINTED.items():
+            if key in polities or path in slugs:
+                continue
+            polity = cs.key("us.polity", f"{scheme}:{code}")
+            area = cs.area(scheme, code)
+            cs.add("polity", id=polity, kind="school_district" if scheme == "us.school_district" else "municipality", iso_code=None)
+            cs.add("name", entity_id=polity, text=text, lang="en", kind="official", is_preferred=True)
+            cs.add("polity_parent", polity_id=polity, parent_id=cs.polity("US-MN"))
+            cs.add("slug", path=path, entity_id=polity)
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", "27"))
+            cs.add("name", entity_id=area, text=f"{text}, MN", lang="en", kind="official", is_preferred=True)
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit(scheme, code),
+                polity_id=polity,
+                scheme_code=scheme,
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
+            polities[key] = (polity, area, text, path)
         for row in frame.sort("scheme", "code", "title").iter_rows(named=True):
             if f"{row['scheme']}:{row['code']}" not in polities:
                 skipped += 1
