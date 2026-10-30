@@ -84,6 +84,24 @@ JUDICIAL = {
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
+CANCELED = {
+    "06037": (
+        "Los Angeles County Registrar-Recorder/County Clerk, tentative list of canceled elections for November 3, 2026 (appointment in lieu of election due to insufficiency of candidates), https://content.lavote.gov/docs/rrcc/documents/canceled-elections-november-2026-tentative.pdf",
+        [
+            "El Rancho",
+            "El Segundo",
+            "Manhattan Beach",
+            "San Marino",
+            "Walnut Valley",
+            "West Covina",
+            "El Monte City",
+            "Gorman Joint",
+            "Hawthorne",
+            "Hermosa Beach City",
+            "Rosemead",
+        ],
+    ),
+}
 DISTRICT_CALENDAR = {
     ("TX", "Killeen Independent School District"): (
         1,

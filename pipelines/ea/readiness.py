@@ -298,7 +298,11 @@ def measure(conn, day: str) -> dict:
     by_polity: dict[str, list[int]] = defaultdict(list)
     counties: dict[str, tuple[str, str]] = {}
     schools: dict[str, list[tuple[int, str]]] = defaultdict(list)
+    from ea.coverage_tables import CANCELED, tokens
+
     for st, kind, polity, name, population, county, due in conn.execute(GOVERNMENTS_SQL, params):
+        if due and kind == "school" and county in CANCELED:
+            due = not any(tokens(word) <= tokens(name) for word in CANCELED[county][1])
         if polity is not None:
             by_polity[polity].append(len(places))
             if kind == "county" and county is not None:
