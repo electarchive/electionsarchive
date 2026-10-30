@@ -4,7 +4,7 @@ import json
 import re
 import unicodedata
 import zipfile
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -19,9 +19,10 @@ from ea.sources.it.interno import key as estero_key
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/camera"
+DELIVERED = DATA / "inbox" / "manual"
 ELIGENDO = "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=I&tpe=A&lev0=0&levsut0=0&es0=S&ms=S"
 RIPARTIZIONE = (
     "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=E&tpe=T&lev0=0&levsut0=0"
@@ -755,6 +756,15 @@ def fetch() -> None:
         if CALDEROLI <= day < ROSATO:
             for n in range(1, 5):
                 raw.fetch(SOURCE, RIPARTIZIONE.format(day=day, n=n), suffix=".html")
+    for page in sorted(DELIVERED.glob("MF-31[34]/it-camera-*-c*.html")):
+        raw.store(
+            SOURCE,
+            page.read_text(encoding="utf-8").split(" -->", 1)[0].removeprefix("<!-- "),
+            page.read_bytes(),
+            suffix=".html",
+            retrieved_at=datetime.fromtimestamp(page.stat().st_mtime, UTC),
+            media_type="text/html",
+        )
     for groups_url in GROUPS.values():
         raw.fetch(SOURCE, groups_url, suffix=".json")
     raw.fetch(SOURCE, url(NEXT), suffix=".zip")
@@ -769,6 +779,7 @@ def parse() -> None:
     abroad: list[pl.DataFrame] = []
     abroad_accounting: list[pl.DataFrame] = []
     abroad_seats: list[pl.DataFrame] = []
+    circoscrizioni: list[tuple[date, int, str, str, int, int, str]] = []
     for day in DAYS:
         with zipfile.ZipFile(raw.cached(SOURCE, url(day)).path) as archive:
             names = archive.namelist()
@@ -857,6 +868,32 @@ def parse() -> None:
                 if won.filter(pl.col("archived").fill_null(0) > pl.col("seats").fill_null(0)).height:
                     raise ValueError(f"{day}: lists with more elected deputies than national seats")
                 won = won.with_columns(pl.col("seats", "archived").fill_null(0))
+                placed = 0
+                for page in sorted(DELIVERED.glob(f"MF-31[34]/it-camera-{day.year}-c*.html")):
+                    address = page.read_text(encoding="utf-8").split(" -->", 1)[0].removeprefix("<!-- ")
+                    text = raw.cached(SOURCE, address).path.read_text(encoding="utf-8")
+                    n = int(re.findall(r"&ne1=(\d+)", address)[0])
+                    circ = re.findall(r"Circoscrizione ([^<]+)</h3>", text)[0].strip()
+                    for label, total, seated in re.findall(
+                        r'<th id="lista\d+"[^>]*>(?:<a[^>]*>)?([^<]+)(?:</a>)?</th><td[^>]*headers="hvoti[^>]*>([\d.]+)</td>'
+                        r'<td[^>]*>[^<]*</td><td[^>]*headers="hseggi[^>]*>(\d*)</td>',
+                        text,
+                    ):
+                        label = label.replace("&#039;", "'").strip()
+                        label = {
+                            ("M.GARIB.PART.D'ITALIA", 1953): "M.GARIB.ANTIF.PART.",
+                            ("UN.BEN.CIV.", 1976): "PART.BEN.CIV.",
+                            ("ASSOCIAZIONE PER TRIESTE", 1979): "LISTA PER TRIESTE",
+                            ("MOV.LIBERTA'", 1992): "MOVIMENTO DELLE LIBERTA'",
+                        }.get((label, day.year), label)
+                        if label not in national and "ALTRE LISTE" not in national:
+                            raise ValueError(f"{day}: circoscrizione {circ} list {label} is not in the archive")
+                        placed += int(seated or 0)
+                        circoscrizioni.append(
+                            (day, n, circ, label, int(total.replace(".", "")), int(seated or 0), address)
+                        )
+                if placed > magnitude:
+                    raise ValueError(f"{day}: circoscrizioni seat {placed}, more than {magnitude}")
             seats.append(won.filter(pl.col("seats") > 0).with_columns(day=pl.lit(day)))
             totals = totals.join(votes.group_by("region").agg(valid=pl.col("votes").sum()), on="region")
             accounting.append(totals.with_columns(day=pl.lit(day)))
@@ -1140,6 +1177,19 @@ def parse() -> None:
     pl.concat(abroad_seats).write_parquet(PARSED / "abroad_seats.parquet")
     pl.concat(singles, how="diagonal").write_parquet(PARSED / "singles.parquet")
     pl.DataFrame(
+        circoscrizioni,
+        schema={
+            "day": pl.Date,
+            "n": pl.Int64,
+            "circ": pl.String,
+            "label": pl.String,
+            "votes": pl.Int64,
+            "seats": pl.Int64,
+            "address": pl.String,
+        },
+        orient="row",
+    ).write_parquet(PARSED / "circoscrizioni.parquet")
+    pl.DataFrame(
         [
             (
                 year,
@@ -1169,6 +1219,7 @@ def emit() -> Path:
     abroad_members = pl.read_parquet(PARSED / "abroad_members.parquet")
     singles = pl.read_parquet(PARSED / "singles.parquet")
     single_accounting = pl.read_parquet(PARSED / "single_accounting.parquet")
+    circoscrizioni = pl.read_parquet(PARSED / "circoscrizioni.parquet")
     deputy_spells: dict[int, dict[str, list[tuple[str, str]]]] = {}
     surnames: dict[tuple[int, str], dict[str, tuple[str, date | None]]] = {}
     for year, deputy, surname, forename, birth, group, start in (
@@ -1181,7 +1232,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Italian Chamber of Deputies elections 1948–2018: list votes by region, seats, single-member colleges, and the constituency abroad, with the 2022 constituency abroad",
+            summary="Italian Chamber of Deputies elections 1948–2018: list votes by region, seats, 1948–1992 circoscrizione allocations, single-member colleges, and the constituency abroad, with the 2022 constituency abroad",
             polity="IT",
         )
 
@@ -1269,6 +1320,42 @@ def emit() -> Path:
                     rank=3,
                     noun="single-member college",
                 )
+
+        if "it.circoscrizione_camera_1948" not in schemes:
+            cs.add(
+                "scheme",
+                code="it.circoscrizione_camera_1948",
+                polity_id=italy,
+                kind="electoral_district",
+                rank=2,
+                noun="constituency",
+            )
+        circ_areas: dict[int, tuple[UUID, UUID]] = {}
+        for n, circ, start in (
+            circoscrizioni.sort("day").group_by("n").agg(pl.first("circ"), pl.first("day")).sort("n").iter_rows()
+        ):
+            area = cs.area("it.circoscrizione_camera_1948", str(n), on=start)
+            unit = cs.unit("it.circoscrizione_camera_1948", str(n), on=start)
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code="it.circoscrizione_camera_1948")
+                cs.add("area_code", area_id=area, code=str(n), valid_from=start, valid_to=MATTARELLA)
+                cs.add("area_parent", area_id=area, parent_id=nation, valid_from=start, valid_to=MATTARELLA)
+                name(area, circ, "it")
+            if unit in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=italy,
+                    scheme_code="it.circoscrizione_camera_1948",
+                    code=str(n),
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=start,
+                    valid_to=MATTARELLA,
+                )
+                name(unit, circ, "it")
+            circ_areas[n] = (area, unit)
 
         chamber = existing("it.body", "chamber-of-deputies")
         sized = {row[0] for row in conn.execute("select valid_from from body_size where body_id = %s", [chamber])}
@@ -1596,6 +1683,17 @@ def emit() -> Path:
                 system, magnitude = "camera-proportional", 386
             contest_key = f"{day}:camera"
             contest = cs.key("it.contest", contest_key)
+            override = (
+                {
+                    "threshold": [
+                        {**bar, "exempt": [str(party_of("SVP", year))]} for bar in SYSTEMS[system][0]["threshold"]
+                    ]
+                }
+                if day in COALITIONS
+                else {"formula": "reinforced_imperiali_quota", "remainderAccess": {"quotas": 1}}
+                if year < 1958
+                else None
+            )
             cs.add(
                 "contest",
                 id=contest,
@@ -1605,17 +1703,7 @@ def emit() -> Path:
                 district_area_id=nation,
                 magnitude=magnitude,
                 electoral_system_id=systems[system],
-                rules_override=(
-                    {
-                        "threshold": [
-                            {**bar, "exempt": [str(party_of("SVP", year))]} for bar in SYSTEMS[system][0]["threshold"]
-                        ]
-                    }
-                    if day in COALITIONS
-                    else {"formula": "reinforced_imperiali_quota", "remainderAccess": {"quotas": 1}}
-                    if year < 1958
-                    else None
-                ),
+                rules_override=override,
                 default_result_kind="counted",
             )
             name(contest, "Chamber of Deputies, national seat allocation")
@@ -1704,6 +1792,45 @@ def emit() -> Path:
                         .iter_rows()
                     ):
                         value_row(counted, region_units[region], option, VOTES, votes)
+
+            for (n,), rows in circoscrizioni.filter(pl.col("day") == day).sort("n").group_by("n", maintain_order=True):
+                area, unit = circ_areas[n]
+                circ, address = rows["circ"][0], rows["address"][0]
+                child_key = f"{contest_key}:{n}"
+                child = cs.key("it.contest", child_key)
+                cs.add(
+                    "contest",
+                    id=child,
+                    election_id=election,
+                    kind="list_allocation",
+                    body_id=chamber,
+                    district_area_id=area,
+                    allocation_parent_id=contest,
+                    electoral_system_id=systems[system],
+                    rules_override=override,
+                    default_result_kind="counted",
+                )
+                name(child, f"Chamber of Deputies, {circ}")
+                cs.add("slug", path=f"{path}/chamber/{slug(circ)}", entity_id=child)
+                cs.artifact(raw.cached(SOURCE, address), interno)
+                child_set = result_set(child_key, election, child)
+                fresh = child_set in cs.minted
+                if fresh:
+                    value_row(child_set, unit, None, VALID, int(rows["votes"].sum()))
+                for label, votes, seated in rows.select("label", "votes", "seats").sort("label").iter_rows():
+                    option = cs.key("it.option", f"{child_key}:{slug(label)}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=child,
+                        kind="list",
+                        party_id=party_of(label, year),
+                        ballot_label=label,
+                    )
+                    if seated:
+                        cs.add("outcome", result_set_id=child_set, option_id=option, kind="won", seats=seated)
+                    if fresh and votes:
+                        value_row(child_set, unit, option, VOTES, votes)
 
             abroad_contests(day, election, path, year)
 
