@@ -2,7 +2,7 @@
   import PlusIcon from "@lucide/svelte/icons/plus";
   import XIcon from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
-  import type { ContestKind, OptionKind } from "#lib/workspace.js";
+  import type { ContestKind, Found, OptionKind } from "#lib/workspace.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
@@ -19,11 +19,12 @@
     languageLabel,
     optionKinds,
     questionTypes,
+    recordKind,
     templateTitle,
   } from "#lib/workspace.js";
   import type { PageData } from "./$types";
   import Cite from "./cite.svelte";
-  import { none, Records } from "./records.svelte.js";
+  import { Records } from "./records.svelte.js";
   import Ref from "./ref.svelte";
   import { Session } from "./session.svelte.js";
   import Shell from "./shell.svelte";
@@ -53,6 +54,11 @@
     body: string;
     magnitude: string;
     options: Array<Option>;
+  };
+  type Looked = {
+    entity: Found | null;
+    problem: string | null;
+    isLooking: boolean;
   };
 
   const electionKindLabel: Record<
@@ -97,6 +103,7 @@
   ] as const;
 
   const languages = languageItems();
+  const none: Looked = { entity: null, problem: null, isLooking: false };
 
   const contestKindOf = (value: string): ContestKind =>
     contestKinds.find((kind) => kind === value) ?? "office";
@@ -164,6 +171,33 @@
   ]);
   let selected = $state<number | null>(null);
 
+  const look = (value: string, kind: string): Looked => {
+    if (value.trim() === "") {
+      return none;
+    }
+    const found = records.get(value);
+    if (found == null) {
+      return { entity: null, problem: null, isLooking: true };
+    }
+    if (found.state === "missing") {
+      return { entity: null, problem: m.ws_record_missing(), isLooking: false };
+    }
+    if (found.state === "retired") {
+      return { entity: null, problem: m.ws_record_retired(), isLooking: false };
+    }
+    if (found.type !== kind) {
+      return {
+        entity: null,
+        problem: m.ws_ref_wrong_kind({
+          wanted: recordKind(kind),
+          kind: recordKind(found.type),
+        }),
+        isLooking: false,
+      };
+    }
+    return { entity: found, problem: null, isLooking: false };
+  };
+
   const assessed = $derived.by(() => {
     const day = election.date.trim();
     const slugs: Record<string, number> = {};
@@ -174,8 +208,8 @@
       }
     }
     return {
-      polity: records.look(election.polity, "polity"),
-      parent: records.look(election.parent, "election"),
+      polity: look(election.polity, "polity"),
+      parent: look(election.parent, "election"),
       day,
       isDated: isDate(day),
       dateProblem: day !== "" && !isDate(day) ? m.ws_election_bad_date() : null,
@@ -205,12 +239,10 @@
             (sort === "answer" && label === "");
           const looked = {
             person:
-              sort === "candidate" && !isNew
-                ? records.look(person, "person")
-                : none,
+              sort === "candidate" && !isNew ? look(person, "person") : none,
             party:
               sort === "candidate" || sort === "list"
-                ? records.look(party, "party")
+                ? look(party, "party")
                 : none,
           };
           const needs =
@@ -259,10 +291,9 @@
           };
         });
         const refs = {
-          area: records.look(contest.area, "area"),
-          office:
-            kind === "office" ? records.look(contest.office, "office") : none,
-          body: isSeated ? records.look(contest.body, "body") : none,
+          area: look(contest.area, "area"),
+          office: kind === "office" ? look(contest.office, "office") : none,
+          body: isSeated ? look(contest.body, "body") : none,
         };
         const nameProblem =
           contest.name.trim() === "" || tail === ""

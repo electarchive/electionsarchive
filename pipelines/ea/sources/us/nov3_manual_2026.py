@@ -82,6 +82,8 @@ COUNTIES = {
     "05051": ("AR", "https://www.garlandcountyvote.org/uploads/6/3/0/4/63045401/local_issues.pdf", "N3M-web/garland-local-issues.pdf"),
     "05131": ("AR", "https://www.uaex.uada.edu/business-communities/ced-blog/posts/2026/september/2026-arkansas-ballot-issues-voter-guide-now-available-online.aspx", "N3M-web/lavaca-2026.pdf"),
     "05031": ("AR", "https://jonesbororightnow.com/wp-content/blogs.dir/286/files/2026/07/JB-Public-Safety-Sales-Use-Tax-Election-County-Clerk-Filing.pdf", "N3M-web/jonesboro-psst.pdf"),
+    "05125": ("AR", "https://arkansasadvocate.com/wp-content/uploads/2026/04/2026-Saline-County-library-funding-cut-proposal.pdf", "N3M-web/ar/ar-saline.pdf"),
+    "05089": ("AR", "https://irp.cdn-website.com/091beef6/files/uploaded/Ordinance+2026-07.pdf", "N3M-web/ar/ar-marion.pdf"),
     "16069": ("ID", "https://nezpercecountyelections.gov/wp-content/uploads/SampleBallot_Nov2026.pdf", "N3M-web/id/nezperce-sample-ballot.pdf"),
     "35049": ("NM", "https://www.santafecountynm.gov/uploads/documents/2026_Constitutional_Amendments_and_Bond_Questions_General_Election.pdf", "N3M-web/nm/santafe-county-bond-questions.pdf"),
     "05075": ("AR", "https://www.uaex.uada.edu/business-communities/ced-blog/posts/2026/august/Lawrence%20County%20election%202026.pdf", "N3M-web/ar/ar-lawrence.pdf"),
@@ -107,7 +109,9 @@ COUNTIES = {
     "48113": ("TX", "https://www.dallascounty.org/government/county-clerk/", "N3M-web/tx/dallas-bond-election.pdf"),
     "34029": ("NJ", "https://www.lacey-nj.org/", "N3M-web/nj/lacey-doc669.pdf"),
     "34037": ("NJ", "https://www.sussexcountyclerk.org/", "N3M-web/nj/4744.pdf"),
-    "34039": ("NJ", "https://ucnj.org/board-of-elections/", "N3M-web/nj/f7.pdf")
+    "34039": ("NJ", "https://ucnj.org/board-of-elections/", "N3M-web/nj/f7.pdf"),
+    "48439": ("TX", "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/06_NRH-1126_Notice_of_Election_Eng.pdf", "N3M-web/tx2/nrh_eng.pdf"),
+    "48439-kel": ("TX", "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/08_KEL_Notice_of_Bond_Election.pdf", "N3M-web/tx3/kel.pdf"),
 }
 
 
