@@ -390,3 +390,59 @@ export const archiveCapture = snakeCase.table(
     index("archive_capture_sha256_idx").on(t.rawSha256),
   ],
 );
+
+export const uploadStatus = pgEnum("upload_status", [
+  "received",
+  "ready",
+  "rejected",
+]);
+
+export const upload = snakeCase.table(
+  "upload",
+  {
+    id: primaryId(),
+    ownerUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    agentKeyId: uuid().references(() => apikeys.id, { onDelete: "set null" }),
+    sha256: text().notNull(),
+    mediaType: text().notNull(),
+    bytes: bigint({ mode: "number" }).notNull(),
+    filename: text().notNull(),
+    storageKey: text(),
+    pages: integer(),
+    status: uploadStatus().notNull().default("received"),
+    error: text(),
+    publicRecord: boolean().notNull().default(false),
+    createdAt: time().notNull().defaultNow(),
+  },
+  (t) => [
+    check("upload_sha256_check", sql`${t.sha256} ~ '^[0-9a-f]{64}$'`),
+    check(
+      "upload_bytes_check",
+      sql`${t.bytes} > 0 and ${t.bytes} <= 209715200`,
+    ),
+    check(
+      "upload_ready_check",
+      sql`${t.status} <> 'ready' or ${t.storageKey} is not null`,
+    ),
+    uniqueIndex("upload_owner_sha256_idx").on(t.ownerUserId, t.sha256),
+    index("upload_sha256_idx").on(t.sha256),
+  ],
+);
+
+export const uploadPage = snakeCase.table(
+  "upload_page",
+  {
+    uploadId: uuid()
+      .notNull()
+      .references(() => upload.id, { onDelete: "cascade" }),
+    pageNumber: integer().notNull(),
+    imageKey: text().notNull(),
+    width: integer().notNull(),
+    height: integer().notNull(),
+    textLayer: boolean().notNull().default(false),
+  },
+  (t) => [
+    primaryKey({ columns: [t.uploadId, t.pageNumber] }),
+    check("upload_page_number_check", sql`${t.pageNumber} > 0`),
+  ],
+);
