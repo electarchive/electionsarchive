@@ -65,6 +65,24 @@ def fetch() -> None:
         download(notice)
 
 
+def resolution(text: str) -> str | None:
+    marker = re.search(
+        r"(?:following question[^\n]*|ballot as\s+follows:?)\n", text
+    )
+    if marker is not None:
+        segment = text[marker.end() : marker.end() + 2500]
+    else:
+        segment = text
+    for candidate in re.finditer(r"[^\n](?:[^\n]|\n(?!\s*\n))*?\b[Ss]hall\b[^?]{0,1500}\?", segment):
+        body = re.sub(
+            r"RESOLUTION NO\.? [\w-]+\s*PAGE \d+|\x0c|^\s*(?:YES|NO)\s*$", "", candidate.group(0), flags=re.M
+        )
+        body = re.sub(r"\s+", " ", body).strip()
+        if not re.search(r"WHEREAS|RESOLVED|SECTION \d|Section \d|ADOPTED", body):
+            return body
+    return None
+
+
 def parse() -> None:
     rows = []
 
@@ -100,19 +118,12 @@ def parse() -> None:
             current["lines"].append(line.strip())
     for letter, notice, place, threshold in notices():
         if "/Notice_" in notice:
-            found = re.search(
+            match = re.search(
                 r"Measure\s+[“\"]?[^”\"\n]*[”\"]?\s*\n\s*(.+?)\s*\n\s*[A-Z ]+ YES", pdf(notice), re.S
             )
+            found = match[1] if match is not None else None
         else:
-            found = re.search(
-                r"Ballot Question\.\s*That the .*?following question:\s*(.+?)\s*\n\s*(?:YES|NO)\b",
-                pdf(notice, False),
-                re.S,
-            )
-            if found is not None:
-                found = re.search(
-                    r"(.+)", re.sub(r"RESOLUTION NO\. [\w-]+\s*PAGE \d+", "", found[1]), re.S
-                )
+            found = resolution(pdf(notice, False))
         if found is None:
             print("no wording:", place, letter)
             continue
@@ -122,7 +133,7 @@ def parse() -> None:
                 "place": place.upper(),
                 "letter": letter,
                 "threshold": f"{threshold} of the votes cast",
-                "lines": [found[1].strip("“”\" ")],
+                "lines": [found.strip("“”\" ")],
             }
         )
     text = re.sub(r"\s+", " ", pdf(SAN_FRANCISCO))
