@@ -6134,7 +6134,6 @@ def emit() -> Path:
         created: set[str] = set()
         made: set[object] = set()
         at_large: dict[object, tuple | None] = {}
-        freed: set[object] = set()
         homes: dict[str, str] = {}
         homeless: set[str] = set()
         special_slugs: dict[str, dict[str, UUID]] = {}
@@ -6537,7 +6536,6 @@ def emit() -> Path:
                         [area],
                     ).fetchone()
                 if at_large[area] is not None:
-                    freed.add(area)
                     area = at_large[area][0]
             elif office_id is not None and COUNTY_SCOPE.fullmatch(scope) and countywide(tail):
                 area = cs.area("us.county", scope[3:])
@@ -6705,23 +6703,5 @@ def emit() -> Path:
             print("retiring stale contest", value)
             cs.add("entity_retirement", entity_id=contest, reason=reason)
             counts["stale contests"] += 1
-        freed |= {
-            row[0]
-            for row in conn.execute(
-                "select distinct co.district_area_id from contest co join area_code c on c.area_id = co.district_area_id"
-                " where co.id = any(%s::uuid[]) and c.code ~ ':at-large$'",
-                [emitted],
-            ).fetchall()
-        }
-        for area in freed:
-            if (
-                conn.execute(
-                    "select 1 from contest co join entity e on e.id = co.id and e.retired_by is null"
-                    " where co.district_area_id = %s and co.id <> all(%s::uuid[]) limit 1",
-                    [area, emitted],
-                ).fetchone()
-                is None
-            ):
-                cs.add("entity_retirement", entity_id=area, reason="At-large seats are held to the whole government's area.")
         print(counts)
         return cs.write()
