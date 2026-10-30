@@ -5,6 +5,7 @@ import subprocess
 import traceback
 import unicodedata
 from collections.abc import Callable
+from datetime import date
 from pathlib import Path
 from typing import Literal, LiteralString, TypedDict, cast
 from uuid import UUID, uuid7
@@ -112,6 +113,8 @@ TIERS = {
 }
 
 KEYED = {"translation": ("source_md5", "lang"), "external_id": ("scheme", "value")}
+
+COLOR = regex.compile(r"#[0-9a-f]{6}")
 
 ROW_DROP_TIERS = {"label": 1}
 
@@ -223,6 +226,120 @@ def _translate(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID
         origin=origin,
         source_id=source,
         stale_from=None,
+    )
+
+
+def _day(value: object, where: str) -> date | None:
+    if value is None:
+        return None
+    try:
+        return date.fromisoformat(str(value))
+    except ValueError:
+        raise ValueError(f"{where}: expected a YYYY-MM-DD date, got {value!r}") from None
+
+
+def _color(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID) -> tuple[UUID, str, list[str]]:
+    values = dict(op.get("values") or {})
+    kind = op.get("op")
+    allowed = {"add": {"party_id", "color", "valid_from", "valid_to"}, "set": {"color"}, "end": {"valid_to"}}
+    if kind not in allowed:
+        raise ValueError(f"{where}: a party color is added, set, ended, or dropped")
+    if unknown := values.keys() - allowed[kind]:
+        raise ValueError(f"{where}: {kind} party_color does not take {', '.join(sorted(unknown))}")
+    precision = {"valid_from": "day", "valid_to": "day"}
+    if kind == "add":
+        party = _uuid(values.get("party_id"), f"{where}.values.party_id")
+        color = values.get("color")
+        start, end = (
+            _day(values.get("valid_from"), f"{where}.valid_from"),
+            _day(values.get("valid_to"), f"{where}.valid_to"),
+        )
+        changed = ["color"]
+    else:
+        key = op.get("key") or {}
+        party = _uuid(key.get("party_id"), f"{where}.key.party_id")
+        start = _day(key.get("valid_from"), f"{where}.key.valid_from")
+        current = conn.execute(
+            """select color, valid_to, valid_from_precision::text, valid_to_precision::text from party_color
+               where party_id = %s and valid_from is not distinct from %s""",
+            [party, start],
+        ).fetchone()
+        if current is None:
+            raise ValueError(f"{where}: party {party} has no color from {start or 'the start'}")
+        precision = {"valid_from": current[2], "valid_to": current[3]}
+        color, end = (values.get("color"), current[1]) if kind == "set" else (current[0], None)
+        if kind == "end":
+            end = _day(values.get("valid_to"), f"{where}.values.valid_to")
+            if end is None:
+                raise ValueError(f"{where}: end needs valid_to")
+            precision["valid_to"] = "day"
+        if (color, end) == (current[0], current[1]):
+            raise ValueError(f"{where}: {kind} changes nothing")
+        changed = ["color"] if kind == "set" else ["valid_to"]
+    if conn.execute("select from party where id = %s", [party]).fetchone() is None:
+        raise ValueError(f"{where}: party {party} does not exist")
+    color = str(color or "").strip().lower()
+    if not COLOR.fullmatch(color):
+        raise ValueError(f"{where}: color must look like #1a2b3c, got {color!r}")
+    if start is not None and end is not None and start >= end:
+        raise ValueError(f"{where}: valid_to must come after valid_from")
+    for held_from, from_precision, held_to, to_precision, held_color, held_source in conn.execute(
+        """select valid_from, valid_from_precision::text, valid_to, valid_to_precision::text, color, source_id
+           from party_color where party_id = %s and valid && daterange(%s, %s, '[)')""",
+        [party, start, end],
+    ).fetchall():
+        if kind == "end" and held_from == start:
+            continue
+        remainders = [
+            *(
+                [(held_from, from_precision, start, "day")]
+                if start is not None and (held_from is None or held_from < start)
+                else []
+            ),
+            *([(end, "day", held_to, to_precision)] if end is not None and (held_to is None or held_to > end) else []),
+        ]
+        for left, left_precision, right, right_precision in remainders:
+            cs.add(
+                "party_color",
+                party_id=party,
+                color=held_color,
+                valid_from=left,
+                valid_from_precision=left_precision,
+                valid_to=right,
+                valid_to_precision=right_precision,
+                source_id=held_source,
+            )
+    cs.add(
+        "party_color",
+        party_id=party,
+        color=color,
+        valid_from=start,
+        valid_from_precision=precision["valid_from"],
+        valid_to=end,
+        valid_to_precision=precision["valid_to"],
+        source_id=source,
+    )
+    return party, f"{party}:{start or ''}", changed
+
+
+def _cite(
+    cs: Changeset,
+    entity: UUID,
+    source: UUID,
+    item: Evidence,
+    proof: dict[str, str],
+    locator: dict[str, object],
+) -> None:
+    cs.add(
+        "citation",
+        id=uuid7(),
+        entity_id=entity,
+        source_id=source,
+        locator={
+            **locator,
+            **{field: item[field] for field in ("page", "region", "quote", "locator") if field in item},
+            **proof,
+        },
     )
 
 
@@ -492,6 +609,7 @@ def compile(
             refs[op["ref"]] = uuid7()
 
     targets: set[tuple[object, str]] = set()
+    colored: set[UUID] = set()
     dropped = {
         (str((op.get("key") or {}).get("scheme")), str((op.get("key") or {}).get("value")))
         for op in ops
@@ -511,24 +629,34 @@ def compile(
         if op.get("op") == "drop":
             reason = unicodedata.normalize("NFC", str(op.get("reason") or summary)).strip()
             owner, label = _drop(conn, cs, op, where, reason)
-            for key in cited if owner is not None else []:
-                cs.add(
-                    "citation",
-                    id=uuid7(),
-                    entity_id=owner,
-                    source_id=sources[key],
-                    locator={
-                        "table": op.get("table"),
-                        "row": label,
-                        "op": "drop",
-                        **{
-                            field: evidence[key][field]
-                            for field in ("page", "region", "quote", "locator")
-                            if field in evidence[key]
-                        },
-                        **proofs.get(key, {}),
-                    },
-                )
+            for key in cited:
+                if owner is not None:
+                    _cite(
+                        cs,
+                        owner,
+                        sources[key],
+                        evidence[key],
+                        proofs.get(key, {}),
+                        {"table": op.get("table"), "row": label, "op": "drop"},
+                    )
+            continue
+        if op.get("table") == "party_color":
+            if not cited:
+                raise ValueError(f"{where}: a change to party_color needs evidence")
+            party, label, changed = _color(conn, cs, op, where, sources[cited[0]])
+            if party in colored:
+                raise ValueError(f"{where}: change one color period per party in a proposal")
+            colored.add(party)
+            for key in cited:
+                for column in changed:
+                    _cite(
+                        cs,
+                        party,
+                        sources[key],
+                        evidence[key],
+                        proofs.get(key, {}),
+                        {"table": "party_color", "row": label, "column": column, "op": op.get("op")},
+                    )
             continue
         if op.get("op") == "translate":
             note = str((op.get("of") or {}).get("id"))
@@ -624,19 +752,17 @@ def compile(
             row[PROVENANCE[table]] = sources[cited[0]]
         cs.add(table, **row)
         for key in cited:
-            item = evidence[key]
             for column in changed:
-                cs.add(
-                    "citation",
-                    id=uuid7(),
-                    entity_id=entity,
-                    source_id=sources[key],
-                    locator={
+                _cite(
+                    cs,
+                    entity,
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {
                         "table": table,
                         "row": str(row["id"]) if "id" in row else ":".join(str(row[c]) for c in KEYED[table]),
                         "column": column,
-                        **{field: item[field] for field in ("page", "region", "quote", "locator") if field in item},
-                        **proofs.get(key, {}),
                     },
                 )
     return cs.write()
@@ -700,6 +826,57 @@ def _dropped(conn: Connection, table: str, staged: sql.Composable) -> list[tuple
     ]
 
 
+def _periods(conn: Connection, staged: sql.Composable) -> list[dict[str, object]]:
+    compared = ("color", "valid_from", "valid_from_precision", "valid_to", "valid_to_precision", "source_id")
+    after = [
+        cast(dict[str, object], row)
+        for (row,) in conn.execute(sql.SQL("select to_jsonb(s) from {} s").format(staged)).fetchall()
+    ]
+    before = [
+        cast(dict[str, object], row)
+        for (row,) in conn.execute(
+            sql.SQL(
+                """select distinct to_jsonb(p) from public.party_color p
+                   join {} s on p.party_id = s.party_id and p.valid && daterange(s.valid_from, s.valid_to, '[)')"""
+            ).format(staged)
+        ).fetchall()
+    ]
+
+    def same(row: dict[str, object]) -> tuple[object, ...]:
+        return (row["party_id"], *(row.get(column) for column in compared))
+
+    kept = {same(row) for row in before} & {same(row) for row in after}
+    after = [row for row in after if same(row) not in kept]
+    replaced = {(row["party_id"], row["valid_from"]): row for row in before if same(row) not in kept}
+    rows: list[dict[str, object]] = []
+    for row in after:
+        old = replaced.pop((row["party_id"], row["valid_from"]), None)
+        rows.append(
+            {
+                "table": "party_color",
+                "key": {"party_id": row["party_id"], "valid_from": row["valid_from"]},
+                "entity_id": row["party_id"],
+                "op": "add" if old is None else "change",
+                "fields": {
+                    column: [None if old is None else old.get(column), row.get(column)]
+                    for column in compared
+                    if old is None or old.get(column) != row.get(column)
+                },
+            }
+        )
+    rows.extend(
+        {
+            "table": "party_color",
+            "key": {"party_id": row["party_id"], "valid_from": row["valid_from"]},
+            "entity_id": row["party_id"],
+            "op": "drop",
+            "fields": {column: [row.get(column), None] for column in compared if row.get(column) is not None},
+        }
+        for row in replaced.values()
+    )
+    return rows
+
+
 def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object], object]:
     stage = _stage(conn, changeset_id)
     shown: list[dict[str, object]] = []
@@ -730,6 +907,14 @@ def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object]
                         },
                     }
                 )
+            continue
+        if table == "party_color":
+            for row in _periods(conn, staged):
+                entities.add(str(row["entity_id"]))
+                if len(shown) == SHOWN:
+                    truncated = True
+                    break
+                shown.append(row)
             continue
         if "entity_id" in columns:
             entities.update(
