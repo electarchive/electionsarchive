@@ -2550,6 +2550,8 @@ for key, publisher, title, url, local in (
     ("WY-56001-towns", "Albany County Clerk", "Official general election sample ballots, Laramie wards 1 to 3, November 3, 2026", "https://www.albanycountywy.gov/", "wy/albany_laramie_ward1.pdf"),
     ("WY-56009-towns", "Converse County Clerk", "Official sample ballot, Courthouse precinct (City of Douglas), November 3, 2026", "https://www.conversecounty.org/", "wy/converse_douglas_sample_ballot.pdf"),
     ("WY-56019-towns", "Johnson County Clerk", "Sample general election ballot, Buffalo precinct 3-3, November 3, 2026", "https://www.johnsoncountywy.org/", "wy/johnson_buffalo_sample_ballot.pdf"),
+    ("KY-21111-stm", "Jefferson County Clerk", "Sample ballot G163, City of St. Matthews, November 3, 2026", "https://www.jeffersoncountyclerk.org/", "ky/jefferson_st_matthews.pdf"),
+    ("KY-21111-shively", "Jefferson County Clerk", "Sample ballot K123, City of Shively, November 3, 2026", "https://www.jeffersoncountyclerk.org/", "ky/jefferson_shively.pdf"),
     ("NE-31019-buffalo", "Buffalo County Election Commissioner", "2026 General Election Candidate List", "https://buffalocounty.ne.gov/Portals/0/adam/Content/mgWb3Nnhl0WyG-jsGQjG2A/Link/GN26%20Candidate%20List.pdf", "ne/buffalo_cities.pdf"),
     ("NE-31141-platte", "Platte County Election Commissioner", "Countywide Candidate List, General Election November 3, 2026 (August 4, 2026)", "https://plattecounty.ne.gov/wp-content/uploads/2026/08/Countywide-Candidate-List-08.04.26.pdf", "ne/platte_cities.pdf"),
     ("NE-31111-lincoln", "Lincoln County Election Commissioner", "2026 Election Candidates as of August 3, 2026", "https://lincolncountyne.gov/wp-content/uploads/2026/08/2026-Candidates-List-1.pdf", "ne/lincoln_cities.pdf"),
