@@ -114,6 +114,7 @@ COUNTIES = {
     "53065": ("WA", "https://www.stevenscountywa.gov/document/38435", "MF-428/1315012300092526pm.pdf"),
     "53041": ("WA", "https://lewiscountywa.gov/", "MF-428/Nov_2026_Sample_Ballot.pdf"),
     "53029": ("WA", "https://www.islandcountywa.gov/", "MF-428/Sample_Ballot_202609291007164234 (1).pdf"),
+    "53063": ("WA", "https://www.spokanecounty.gov/3418/Ballot-Resolutions", "MF-441/2026 regular ems tax levy resolution.pdf"),
     "48113": ("TX", "https://www.dallascounty.org/government/county-clerk/", "N3M-web/tx/dallas-bond-election.pdf"),
     "34029": ("NJ", "https://www.lacey-nj.org/", "N3M-web/nj/lacey-doc669.pdf"),
     "34037": ("NJ", "https://www.sussexcountyclerk.org/", "N3M-web/nj/4744.pdf"),
