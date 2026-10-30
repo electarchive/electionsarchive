@@ -293,6 +293,17 @@ OR_ABSTRACTS = {
 }
 MI = "https://web.archive.org/web/2id_/https://mielections.us/election/results/DATA/{}_MI_CENR_BY_COUNTY.xls"
 MI_PROPOSALS = {
+    ("2004GEN", "04-1"): ("Constitutional amendment requiring voter approval of gambling and lottery expansion", "Initiative"),
+    ("2004GEN", "04-2"): ("Constitutional amendment recognizing marriage as between one man and one woman", "Initiative"),
+    ("2006GEN", "06-1"): ("Constitutional amendment dedicating use of conservation and recreation funds", "Legislative Referendum"),
+    ("2006GEN", "06-2"): ("Constitutional amendment banning affirmative action programs", "Initiative"),
+    ("2006GEN", "06-3"): ("Referendum on Public Act 160 of 2005, the mourning dove hunting season", "Popular Referendum"),
+    ("2006GEN", "06-4"): ("Constitutional amendment restricting the use of eminent domain", "Legislative Referendum"),
+    ("2006GEN", "06-5"): ("Constitutional amendment establishing mandatory school funding", "Initiative"),
+    ("2008GEN", "08-1"): ("Initiated law allowing the medical use of marijuana", "Initiative"),
+    ("2008GEN", "08-2"): ("Constitutional amendment on human embryonic stem cell research", "Initiative"),
+    ("2010GEN", "10-1"): ("Question on convening a constitutional convention", "Legislative Referendum"),
+    ("2010GEN", "10-2"): ("Constitutional amendment banning felons from certain public offices and positions", "Legislative Referendum"),
     ("2012GEN", "12-1"): ("Referendum on Public Act 4 of 2011, the Emergency Manager Law", "Popular Referendum"),
     ("2012GEN", "12-2"): ("Constitutional amendment protecting collective bargaining rights", "Initiative"),
     ("2012GEN", "12-3"): ("Constitutional amendment establishing a renewable energy standard", "Initiative"),
@@ -309,6 +320,15 @@ MI_PROPOSALS = {
     ("2020GEN", "20-1"): ("Constitutional amendment on oil and gas royalty funds for parks and conservation", "Legislative Referendum"),
     ("2020GEN", "20-2"): ("Constitutional amendment requiring a search warrant for electronic data and communications", "Legislative Referendum"),
 }
+MI_OLD = "http://web.archive.org/web/2id_/http://miboecfr.nictusa.com/election/results/{}GEN/9000000{}.html"
+MI_OLD_PROPOSALS = (
+    (date(2000, 11, 7), "00", 1, "00-1", "Constitutional amendment permitting indirect state support of nonpublic school students", "Initiative"),
+    (date(2000, 11, 7), "00", 2, "00-2", "Constitutional amendment requiring a two-thirds legislative vote for laws affecting local governments", "Initiative"),
+    (date(2002, 11, 5), "02", 1, "02-1", "Referendum on Public Act 269 of 2001 amending the Michigan election law", "Popular Referendum"),
+    (date(2002, 11, 5), "02", 2, "02-2", "Bonds for sewage treatment, storm water, and water pollution projects", "Legislative Referendum"),
+    (date(2002, 11, 5), "02", 3, "02-3", "Constitutional amendment granting state classified employees collective bargaining with binding arbitration", "Initiative"),
+    (date(2002, 11, 5), "02", 4, "02-4", "Constitutional amendment reallocating tobacco settlement revenue", "Initiative"),
+)
 UT_2007 = "https://vote.utah.gov/wp-content/uploads/2023/09/2007Muni_Special.pdf"
 UT_FILES = {
     date(2000, 11, 7): "2000Gen.pdf",
@@ -1260,6 +1280,9 @@ def fetch() -> None:
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
     for name in dict.fromkeys(file for file, _ in MI_PROPOSALS):
         raw.fetch(SOURCE, MI.format(name), suffix=".tsv")
+        time.sleep(1)
+    for _, year, index, *_ in MI_OLD_PROPOSALS:
+        raw.fetch(SOURCE, MI_OLD.format(year, index), suffix=".html")
         time.sleep(1)
     raw.fetch(SOURCE, AK_2000, suffix=".txt")
     for path, _ in WY_FILES.values():
@@ -3588,6 +3611,37 @@ def michigan() -> list[dict[str, object]]:
     return rows
 
 
+def michigan_old() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, year, index, number, title, kind in MI_OLD_PROPOSALS:
+        url = MI_OLD.format(year, index)
+        text = re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace"))
+        found = re.findall(r"^\s*(\d{2}) ([A-Z][A-Z. ]+?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$", text, re.MULTILINE)
+        total = re.search(r"Totals\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)", text)
+        if len(found) != 83 or total is None:
+            raise ValueError(f"{url}: {len(found)} counties")
+        for column, answer in ((3, "YES"), (4, "NO")):
+            if sum(int(row[column].replace(",", "")) for row in found) != int(total[column - 1].replace(",", "")):
+                raise ValueError(f"{url} {answer}: counties do not sum to the printed total")
+        rows.extend(
+            {
+                "state": "MI",
+                "day": day,
+                "number": number,
+                "label": f"Proposal {number}",
+                "url": url,
+                "county": row[1].title().replace("Gd.", "Grand"),
+                "answer": answer,
+                "votes": int(row[column].replace(",", "")),
+                "title": title,
+                "kind": kind,
+            }
+            for row in found
+            for column, answer in ((3, "YES"), (4, "NO"))
+        )
+    return rows
+
+
 def utah() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in UT_FILES.items():
@@ -4126,6 +4180,7 @@ def parse() -> None:
             *north_dakota(),
             *new_york(),
             *michigan(),
+            *michigan_old(),
             *utah(),
             *wyoming(),
             *south_carolina(),
