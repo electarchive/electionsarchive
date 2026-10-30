@@ -5727,12 +5727,14 @@ def parse() -> None:
                     template = tail = str(row["tail"]) if row["tail"] in exact else None
                     if tail is None and row.get("owner"):
                         template, tail = "", str(row["tail"])
-                        minted[tail] = (
-                            str(row["office"]),
-                            str(row["label"]),
-                            str(row["owner"]),
-                            owned.get(str(row["owner"])) or f"us/mn/{slug(str(row['label']))}",
-                        )
+                        home = owned.get(str(row["owner"])) or f"us/mn/{slug(str(row['label']))}"
+                        if (
+                            str(row["owner"]).startswith("place:")
+                            and str(row["owner"]) not in owned
+                            and conn.execute("select 1 from slug where path = %s", [home]).fetchone() is not None
+                        ):
+                            home += "-city"
+                        minted[tail] = (str(row["office"]), str(row["label"]), str(row["owner"]), home)
                         pinned.add(tail)
                 if key == "KY" and str(row["contest"]) in schools:
                     title, district, owner = schools[str(row["contest"])]
@@ -6016,7 +6018,7 @@ def parse() -> None:
                     and place
                     and (
                         int(str(row["seats"]) or 0) <= 1
-                        or re.search(r"(?i)\bcounty (council|commission|board district)\b", str(row["contest"])) is not None
+                        or re.search(r"(?i)\bcounty (council|commission|board district|coroner|board of supervisors(?: at large)?)\b", str(row["contest"])) is not None
                     )
                     and not LOCAL_BODY.search(
                         re.sub(re.escape(place) if state in ("MD", "LA", "WY") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.IGNORECASE)
