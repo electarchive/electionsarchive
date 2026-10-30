@@ -338,6 +338,10 @@ AL_FILES = {
     date(2004, 11, 2): ("20170706141810", "2004ge-countylevel_0.xls"),
     date(2010, 11, 2): ("20170706", "2010-general-precinctLevel.zip"),
 }
+AL_CERTS = {
+    date(2006, 11, 7): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2006/statecert-2006-general-election-11-29-2006-without-write-in-appendix.pdf",
+    date(2008, 11, 4): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2008/statecert-2008-general-election-11-25-2008-without-write-in-appendix.pdf",
+}
 AL_COUNTIES = {
     "autauga",
     "baldwin",
@@ -981,6 +985,9 @@ def fetch() -> None:
     for stamp, file in AL_FILES.values():
         raw.fetch(SOURCE, AL.format(stamp=stamp) + file, suffix=Path(file).suffix.lower())
         time.sleep(1)
+    for url in AL_CERTS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
+        time.sleep(1)
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -1313,12 +1320,35 @@ def alabama() -> list[dict[str, object]]:
     names = sorted(AL_COUNTIES | {"state total", "state totals", "total", "totals"}, key=len, reverse=True)
     heading = re.compile(r"^(?:Statewide\s+)?Amendment\s*(?:No\.|#)?\s*(\d+)\s*$", re.IGNORECASE)
     rows: list[dict[str, object]] = []
-    for day, (stamp, file) in AL_FILES.items():
-        url = AL.format(stamp=stamp) + file
+    urls = {day: AL.format(stamp=stamp) + file for day, (stamp, file) in AL_FILES.items()} | AL_CERTS
+    for day, url in urls.items():
+        file = url.rsplit("/", 1)[1]
         path = raw.cached(SOURCE, url).path
         votes: dict[tuple[str, str], dict[str, int]] = {}
         totals: dict[tuple[str, str], int] = {}
-        if file.endswith(".zip"):
+        if file.endswith(".pdf"):
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+            for page in text.split("\f"):
+                if "Constitutional Amendments" not in page:
+                    continue
+                props = re.findall(r"Statewide (?:Amendment |#)(\d+)", page)
+                if not props:
+                    continue
+                for line in page.splitlines():
+                    match = re.fullmatch(r"([A-Za-z. ]+?)\s{2,}((?:[\d,]+\s+)*[\d,]+)\s*", line)
+                    if match is None:
+                        continue
+                    name = match[1].lower().replace("st clair", "st. clair")
+                    figures = [int(figure.replace(",", "")) for figure in match[2].split()]
+                    for index, prop in enumerate(props):
+                        pair = figures[2 * index : 2 * index + 2]
+                        if name in AL_COUNTIES:
+                            for answer, value in zip(("YES", "NO"), pair, strict=True):
+                                votes.setdefault((prop, answer), {})[name] = value
+                        elif name == "total":
+                            for answer, value in zip(("YES", "NO"), pair, strict=True):
+                                totals[(prop, answer)] = value
+        elif file.endswith(".zip"):
             with zipfile.ZipFile(path) as archive:
                 for member in archive.namelist():
                     county = Path(member).stem.lower()
@@ -3380,7 +3410,7 @@ def emit() -> Path:
             election_key = next(
                 (
                     key
-                    for key in (f"{day}:{state}:special", f"{day}:{state}", f"{day}:{state}:primary")
+                    for key in (f"{day}:{state}:referendum", f"{day}:{state}:special", f"{day}:{state}", f"{day}:{state}:primary")
                     if key in elections
                 ),
                 f"{day}:{state}:referendum",
