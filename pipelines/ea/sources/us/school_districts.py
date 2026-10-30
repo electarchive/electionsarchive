@@ -15,7 +15,7 @@ VERSION = "1"
 URLS = [
     f"https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_{kind}_500k.zip" for kind in ("unsd", "elsd", "scsd")
 ]
-STATES = {"47": "TN", "34": "NJ"}
+STATES = {"47": "TN", "34": "NJ", "13": "GA"}
 CENSUS = "Cartographic Boundary Files, 1:500,000 (2024)"
 
 
@@ -55,7 +55,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="School districts of Tennessee and New Jersey missing a polity, with the Census Bureau's 2024 cartographic boundaries",
+            summary="School districts of Georgia, New Jersey, and Tennessee missing a polity, with the Census Bureau's 2024 cartographic boundaries",
             polity="US",
         )
         census = cs.source("U.S. Census Bureau", CENSUS)
