@@ -22,7 +22,16 @@ PUBLISHER = "King County Elections"
 TITLE = "Ballot measures, November 3, 2026 General Election"
 BROWSER = {"User-Agent": "Mozilla/5.0"}
 SAMPLES = json.loads((Path(__file__).parent / "wa_samples_2026.json").read_text())
-SAMPLE_COUNTY = {"Snohomish": "53061", "Kitsap": "53035"}
+SAMPLE_COUNTY = {"Snohomish": "53061", "Kitsap": "53035", "Clark": "53011", "Pierce": "53053", "Thurston": "53067", "Skagit": "53057", "Spokane": "53063", "Whatcom": "53073"}
+LOCAL = {
+    "https://clark.wa.gov/elections/november-3-2026-general-special-election": "Clark/november_3_2026_general_election-sample_ballot.pdf",
+    "https://www.piercecountywa.gov/328/Elections": "Pierce/Sample Ballot_15.pdf",
+    "https://www.thurstoncountywa.gov/": "Thurston/Sample Ballot_2611.pdf",
+    "https://www.skagitcountywa.gov/": "Skagit/2026-11-03-sample.pdf",
+    "https://www.spokanecounty.gov/DocumentCenter/View/73769/November-3-2026-General-Election-Sample-Ballot-PDF": "Spokane/G126 Sample Ballot_202610021258308134.pdf",
+    "https://www.whatcomcounty.us/1574": "Whatcom/11.03.26 Sample Ballot_202609231409027439.pdf",
+}
+MANUAL = DATA / "inbox" / "manual" / "MF-386"
 
 
 def download(url: str, suffix: str = ".html") -> raw.Artifact:
@@ -30,6 +39,9 @@ def download(url: str, suffix: str = ".html") -> raw.Artifact:
         return raw.cached(SOURCE, url)
     except LookupError:
         pass
+    if url in LOCAL:
+        path = MANUAL / LOCAL[url]
+        return raw.store(SOURCE, url, path.read_bytes(), suffix=".pdf", retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC), media_type="application/pdf")
     response = httpx.get(url, headers=BROWSER, follow_redirects=True, timeout=120)
     response.raise_for_status()
     return raw.store(
@@ -64,7 +76,7 @@ def parse() -> None:
     rows = []
     for url in details():
         page = download(url).path.read_text(encoding="utf-8", errors="replace")
-        body = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", page, flags=re.S)
+        body = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", page, flags=re.DOTALL)
         text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body)))
         text = text[text.find("General Election ", text.find("Ballot measures v1")) :]
         for place, number, title, wording in re.findall(
@@ -128,8 +140,8 @@ def emit() -> Path:
         kept = 0
         for row in frame.iter_rows(named=True):
             place = row["place"]
-            if place.startswith("City of"):
-                key = names.get(("us.place", ceda._city(place)))
+            if place.startswith(("City of", "Town of")):
+                key = names.get(("us.place", ceda._city(re.sub(r"^Town of ", "City of ", place))))
             elif "School District" in place:
                 key = names.get(("us.school_district", ceda._core(re.sub(r"\s+No\.?\s*\d+$", "", place))))
             else:
@@ -163,7 +175,7 @@ def emit() -> Path:
                         valid_from=None,
                     )
                 found[key] = (polity_id, area_id, text, path, geoid)
-            if key is None and not place.startswith("City of") and "School District" not in place:
+            if key is None and not place.startswith(("City of", "Town of")) and "School District" not in place:
                 home = next((fips for name, fips in SAMPLE_COUNTY.items() if name.lower() in row["url"].lower()), None)
                 county_key = f"us.county:{home}"
                 if home is not None and county_key in found:
