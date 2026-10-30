@@ -16,7 +16,7 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara", "06001": "Alameda", "06013": "Contra Costa"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara", "06001": "Alameda", "06013": "Contra Costa", "06019": "Fresno"}
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
@@ -214,64 +214,86 @@ def los_angeles() -> list[dict[str, str | int | bool]]:
     return rows
 
 
-RIVERSIDE = re.compile(
-    r"^Non-Partisan DISTRICT (?P<body>.+?) (?P<role>Director|Trustee)"
-    r"(?:, (?P<seat>(?:Division|Zone|At Large) \d+))?(?:, (?P<term>Full|Short) Term)?\s*$"
+PROOF_HEAD = re.compile(
+    r"^(?:Non-?Partisan|NONPARTISAN OFFICES) (?:DISTRICT) (?P<body>.+?) (?P<role>Director|Trustee|Member, Board of (?:Directors|Trustees))(?P<rest>.*)$",
+    re.IGNORECASE,
 )
+PROOF_SEAT = re.compile(r"(Division|Zone|District Area|Area|At Large)(?: No\.?)? ?(\d+)")
 
 
-def riverside() -> list[dict[str, str | int | bool]]:
+def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int | bool]]:
     contests: dict[tuple[str, str, str, bool], list[str]] = {}
     incumbents: dict[tuple[str, str, str, bool], int] = {}
     current = None
-    text = lines("06065")
+    text = lines(fips)
+    gap = f" {{{indent}}}"
     for index, line in enumerate(text):
-        if found := RIVERSIDE.match(line):
+        if found := PROOF_HEAD.match(line):
+            rest = found["rest"]
+            seat = PROOF_SEAT.search(rest)
+            label = (
+                f"{seat[1].replace('District Area', 'Area')} {seat[2]}"
+                if seat
+                else ("Veteran" if "Veteran" in rest else "")
+            )
+            role = "Trustee" if "trustee" in found["role"].lower() else "Director"
             current = (
-                full_name(found["body"]),
-                found["role"],
-                found["seat"] or "",
-                found["term"] == "Short",
+                full_name(found["body"].replace("COMMUNITY SERVICE DISTRICT", "COMMUNITY SERVICES DISTRICT")),
+                role,
+                label,
+                re.search(r"Short Term|\bST\b", rest) is not None,
             )
             contests.setdefault(current, [])
             incumbents.setdefault(current, 0)
         elif current is None:
             continue
         elif found := re.match(r"\s+Candidate\(s\):\s+(\S.*?)\s*$", line):
-            if found[1] not in contests[current]:
-                contests[current].append(found[1])
+            name = cased(found[1]) if found[1].isupper() else found[1]
+            if name not in contests[current]:
+                contests[current].append(name)
         elif re.match(r"\s+Incumbent\(s\):", line) or re.match(
-            r" {33}\S.*\s{3,}(?:Elected|Appointed in Lieu|Appointed to Vacancy)\s*$", line
+            gap + r"\S.*\s{3,}(?:Elected|Appointed in Lieu|Appointed to Vacancy|Vacated)\s*$", line
         ):
             incumbents[current] += 1
         elif (
-            re.match(r" {33}\S", line)
+            re.match(gap + r"\S", line)
             and not re.match(
-                r" {33}(?:Requirements|Sigs|Declaration|Candidate|Code|Incumbent|Appointed|Director|Vacant)", line
+                gap + r"(?:Requirements|Sigs|Declaration|Nomination|Candidate|Code|Incumbent|Appointed|Director|Vacant)",
+                line,
             )
             and (re.match(r"\s*$", text[index - 1]) or "Shared with" in text[index - 1])
         ):
             name = re.sub(r"\s{2,}.*$", "", line.strip())
+            name = cased(name) if name.isupper() else name
             if name not in contests[current]:
                 contests[current].append(name)
     rows = []
     for key, names in contests.items():
-        district, role, seat, short = key
-        if len(names) < 2:
+        district, role, label, short = key
+        seats = 1 if label else max(incumbents[key], 1)
+        if len(names) <= seats:
             continue
         for name in names:
             rows.append(
                 {
-                    "county": "Riverside",
+                    "county": county,
                     "district": district,
-                    "seat": seat or ("Short Term" if short else ""),
+                    "seat": label or ("Short Term" if short else ""),
                     "role": role,
-                    "seats": max(incumbents[key], 1) if not seat else 1,
+                    "seats": seats,
                     "name": name,
                     "unexpired": short,
                 }
             )
     return rows
+
+
+def riverside() -> list[dict[str, str | int | bool]]:
+    return proof_list("06065", "Riverside", 33)
+
+
+def fresno() -> list[dict[str, str | int | bool]]:
+    return proof_list("06019", "Fresno", 30)
 
 
 SAN_BERNARDINO = re.compile(
@@ -466,7 +488,7 @@ def contra_costa() -> list[dict[str, str | int | bool]]:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara(), *alameda(), *contra_costa()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara(), *alameda(), *contra_costa(), *fresno()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
