@@ -481,6 +481,22 @@ ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-re
 ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
 SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 SC_2010 = "https://www.enr-scvotes.org/SC/19077/39934/reports/detailxml.zip"
+GA = "https://web.archive.org/web/{}id_/http://sos.georgia.gov/elections/election_results/{}.htm"
+GA_PAGES = {
+    date(2008, 11, 4): (
+        ("20081208213608", "2008_1104/270", "Constitutional Amendment 1"),
+        ("20081208213613", "2008_1104/271", "Constitutional Amendment 2"),
+        ("20081208213618", "2008_1104/272", "Constitutional Amendment 3"),
+    ),
+    date(2010, 11, 2): (
+        ("20101207040853", "2010_1102/09000", "Constitutional Amendment 1"),
+        ("20101107190426", "2010_1102/09001", "Constitutional Amendment 2"),
+        ("20101107190454", "2010_1102/09002", "Constitutional Amendment 3"),
+        ("20101106161831", "2010_1102/09003", "Constitutional Amendment 4"),
+        ("20101107190519", "2010_1102/09004", "Constitutional Amendment 5"),
+        ("20101107190434", "2010_1102/09050", "Referendum A"),
+    ),
+}
 SC_DAYS = {
     date(2000, 11, 7): 3,
     date(2002, 11, 5): 2,
@@ -722,6 +738,11 @@ PUBLISHERS = {
     ),
     "FL": (fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
     "OH": gov_counties.OFFICIAL["OH"][:3],
+    "GA": (
+        "Georgia Secretary of State",
+        "Official election results",
+        "https://sos.ga.gov/page/historical-elections-results",
+    ),
     "NV": (
         "Nevada Secretary of State",
         "Official election results",
@@ -836,6 +857,10 @@ def tx_races(election: int) -> list[tuple[int, str]]:
 def fetch() -> None:
     for stamp, folder in NV_PAGES.values():
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
+    for pages in GA_PAGES.values():
+        for stamp, page, _ in pages:
+            raw.fetch(SOURCE, GA.format(stamp, page), suffix=".htm")
+            time.sleep(1)
     for name in [*NE_BOOKS.values(), *NE_SCANS.values()]:
         raw.fetch(SOURCE, NE + name, suffix=".pdf")
     for name in [*AR_BOOKS.values(), *AR_VOICES.values()]:
@@ -2903,6 +2928,46 @@ def montana() -> list[dict[str, object]]:
     return rows
 
 
+def georgia() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, pages in GA_PAGES.items():
+        for stamp, page, label in pages:
+            url = GA.format(stamp, page)
+            text = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
+            text = re.sub(r"(?is)<(script|style).*?</\1>", "", text)
+            tokens = [
+                found for cell in re.split(r"<[^>]+>", text) if (found := re.sub(r"\s+", " ", html.unescape(cell)).strip())
+            ]
+            start = tokens.index("County")
+            names, votes = [], []
+            for token in tokens[start + 1 :]:
+                if token not in ("PR", "TP", "PPR") and re.fullmatch(r"[A-Z][A-Z .'-]+", token):
+                    names.append(token)
+                    votes.append([])
+                elif names and re.fullmatch(r"[\d,]+", token):
+                    votes[-1].append(int(token.replace(",", "")))
+                elif token.startswith("Totals") or token.startswith("Official"):
+                    break
+            for name, cells in zip(names, votes, strict=True):
+                yes, no, total = cells[-3:]
+                if yes + no != total:
+                    raise ValueError(f"{url} {name}: {yes} + {no} is not {total}")
+                for answer, count in (("YES", yes), ("NO", no)):
+                    rows.append(
+                        {
+                            "state": "GA",
+                            "day": day,
+                            "number": page,
+                            "label": label,
+                            "url": url,
+                            "county": name.title(),
+                            "answer": answer,
+                            "votes": count,
+                        }
+                    )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     listed = ncsl()
@@ -2922,6 +2987,7 @@ def parse() -> None:
             *ohio_issues(),
             *rhode_island(),
             *nevada(),
+            *georgia(),
             *nebraska(),
             *arkansas(),
             *south_dakota(),
@@ -2996,7 +3062,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
