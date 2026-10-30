@@ -13570,7 +13570,8 @@ export const elections = {
             from (
               select v.party, bool_or(v.independent) as independent, sum(v.seats)::int as seats from (
                 select coalesce(m.into_id, o.party_id) as party, max(coalesce(x.seats, 1)) as seats,
-                  exists (select from candidacy cy where cy.option_id = o.id and cy.is_independent) as independent
+                  (o.party_id is null and o.alliance_id is null)
+                    or exists (select from candidacy cy where cy.option_id = o.id and cy.is_independent) as independent
                 from contest c
                 join body b on b.id = c.body_id and b.polity_id = p.polity_id
                 join result_set rs on rs.contest_id = c.id and ${latest("rs")}
@@ -14146,13 +14147,45 @@ export const elections = {
         new Set(whole.rows.map((row) => row.election)).size === raced.length &&
         !whole.rows.some((row) => row.election === input.id);
       const seatedRows = electionRows.rows.flatMap((row) => row.parties ?? []);
-      const seatedRefs = await refs(
-        seatedRows.flatMap((row) => row.party ?? []),
-        election.date,
+      const grouped = new Map(
+        (
+          await db.execute<{ party: string; group: string }>(sql`
+            select distinct on (a.party_id) a.party_id::text as party,
+              coalesce(gm.into_id, a.parent_party_id)::text as group
+            from party_affiliation a
+            left join entity_merge gm on gm.entity_id = a.parent_party_id
+            where a.kind = 'ep_group'
+              and a.party_id = any(${sql.param(seatedRows.flatMap((row) => row.party ?? []))}::uuid[])
+              and a.valid @> ${election.date ?? "infinity"}::date + 40
+              and exists (select from polity p where p.id = ${election.polity}::uuid and p.iso_code = 'EU')
+            order by a.party_id, a.valid_from desc nulls last
+          `)
+        ).rows.map((row) => [row.party, row.group]),
       );
-      const seatedTotals = Map.groupBy(
-        seatedRows,
-        (row) => row.party ?? (row.independent ? "independent" : ""),
+      const seatedRefs = new Map(
+        (
+          await Promise.all([
+            refs(
+              seatedRows.flatMap((row) => row.party ?? []),
+              election.date,
+            ),
+            refs(
+              [...grouped.values()],
+              election.date == null
+                ? null
+                : new Date(Date.parse(election.date) + 40 * 86_400_000)
+                    .toISOString()
+                    .slice(0, 10),
+            ),
+          ])
+        ).flatMap((found) => [...found]),
+      );
+      const seatedTotals = Map.groupBy(seatedRows, (row) =>
+        row.party == null
+          ? row.independent
+            ? "independent"
+            : ""
+          : (grouped.get(row.party) ?? row.party),
       );
       const seatedParties = [...seatedTotals.entries()].map(([key, rows]) => {
         let seats = 0;
