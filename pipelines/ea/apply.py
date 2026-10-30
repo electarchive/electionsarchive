@@ -1270,7 +1270,13 @@ def defaults(
     return flipped, skipped
 
 
-def publish(conn: Connection, changeset_id: str) -> None:
+REVIEWED = (
+    "reviewed_by = coalesce(%s::uuid, reviewed_by), "
+    "reviewed_at = case when %s::uuid is null then reviewed_at else now() end"
+)
+
+
+def publish(conn: Connection, changeset_id: str, reviewer: str | None = None) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
@@ -1502,7 +1508,10 @@ def publish(conn: Connection, changeset_id: str) -> None:
                             json.dumps(finding.details, default=str),
                         )
                     )
-        conn.execute("update changeset set status = 'published', published_at = now() where id = %s", [changeset_id])
+        conn.execute(
+            f"update changeset set status = 'published', published_at = now(), {REVIEWED} where id = %s",
+            [reviewer, reviewer, changeset_id],
+        )
         conn.execute(sql.SQL("drop schema {} cascade").format(sql.Identifier(stage.schema)))
     us = conn.execute(
         "select pipeline like 'us.%%' or scope->>'polity' = 'US' from changeset where id = %s", [changeset_id]
@@ -1511,7 +1520,7 @@ def publish(conn: Connection, changeset_id: str) -> None:
         coverage_tables.request()
 
 
-def revert(conn: Connection, changeset_id: str, reason: str) -> None:
+def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | None = None) -> None:
     status = conn.execute("select status from changeset where id = %s", [changeset_id]).fetchone()
     if status is not None and status[0] in ("draft", "pending_review"):
         with conn.transaction():
@@ -1521,8 +1530,8 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 )
             )
             conn.execute(
-                "update changeset set status = 'rejected', rationale = %s where id = %s",
-                [f"Rejected: {reason}", changeset_id],
+                f"update changeset set status = 'rejected', rationale = %s, {REVIEWED} where id = %s",
+                [f"Rejected: {reason}", reviewer, reviewer, changeset_id],
             )
         return
     folder = next(
@@ -1869,8 +1878,8 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [changeset_id],
             )
         conn.execute(
-            "update changeset set status = 'rejected', rationale = %s where id = %s",
-            [f"Reverted: {reason}", changeset_id],
+            f"update changeset set status = 'rejected', rationale = %s, {REVIEWED} where id = %s",
+            [f"Reverted: {reason}", reviewer, reviewer, changeset_id],
         )
 
 

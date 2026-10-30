@@ -7,6 +7,7 @@ import sys
 import time
 from collections import Counter
 from pathlib import Path
+from uuid import UUID
 
 from ea import (
     basemap,
@@ -37,12 +38,15 @@ def main() -> None:
     for step in ("fetch", "parse", "emit"):
         commands.add_parser(step).add_argument("source", help="registry name, such as ca.elections")
     commands.add_parser("apply").add_argument("changeset", type=Path, help="changeset artifact directory")
-    commands.add_parser("publish").add_argument("changeset_id", help="a changeset in pending_review")
+    publishing = commands.add_parser("publish")
+    publishing.add_argument("changeset_id", help="a changeset in pending_review")
     reverting = commands.add_parser(
         "revert", help="reject an unpublished changeset or undo a published one no later changeset builds on"
     )
     reverting.add_argument("changeset_id")
     reverting.add_argument("reason")
+    for command in (publishing, reverting):
+        command.add_argument("--reviewer", type=lambda value: str(UUID(value)), help="user id of the person deciding")
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
@@ -215,10 +219,10 @@ def main() -> None:
                 rollup(conn, args.sets, args.affected)
         case "publish":
             with connect() as conn:
-                publish(conn, args.changeset_id)
+                publish(conn, args.changeset_id, args.reviewer)
         case "revert":
             with connect() as conn:
-                revert(conn, args.changeset_id, args.reason)
+                revert(conn, args.changeset_id, args.reason, args.reviewer)
         case step:
             module = importlib.import_module(f"ea.sources.{args.source}")
             for loaded in [loaded for name, loaded in sys.modules.items() if name.startswith("ea.sources.")]:
