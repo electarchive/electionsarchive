@@ -5336,14 +5336,19 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL')"""
         ).fetchall():
             label = {"Rowan County Sch": "Rowan-Salisbury Schools"}.get(label, label)
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
                 hit
                 for (code_st, theirs), found in index.items()
-                if code_st == county_code[:2] and (theirs == mine or theirs < mine or mine < theirs)
+                if code_st == county_code[:2]
+                and (
+                    frozenset(token for token in theirs if not token.isdigit()) == mine
+                    if st == "IL"
+                    else theirs == mine or theirs < mine or mine < theirs
+                )
                 for hit in found
             ]
             if not hits:
@@ -5444,7 +5449,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -5656,7 +5661,7 @@ def parse() -> None:
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
-                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN"))
+                                or (sort == "school" or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN", "IL"))
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
                             ):
@@ -5664,6 +5669,8 @@ def parse() -> None:
                             fits.append(
                                 (len(stem), bool(said), rest[1:] if said and not start else rest, label, owner, path)
                             )
+                if state == "IL" and re.search(r"(?i)\bregional (superintendent|office)\b", str(row["contest"])):
+                    fits = []
                 fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
@@ -5681,7 +5688,7 @@ def parse() -> None:
                         state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "WY")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
-                        or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC")
+                        or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC", "IL")
                         and bool(fits)
                     )
                     and len({fit[4] for fit in fits}) == 1
@@ -5771,6 +5778,8 @@ def parse() -> None:
                         )
                         else " ".join(rest[rest.index("board") + 1 :]).title()
                         if state == "IN" and role == "board-of-education" and "board" in rest
+                        else chair[1].title()
+                        if state == "IL" and role == "board-of-education" and (chair := re.search(r"\b(president|subdistrict \w+)\b", post))
                         else ""
                     )
                     if role is not None:
