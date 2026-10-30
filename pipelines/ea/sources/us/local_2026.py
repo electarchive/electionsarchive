@@ -1965,6 +1965,8 @@ for key, publisher, title, url, local in (
     ("MO-29001", "Adair County Clerk", "Sample Ballot BT 1, General Election, November 3, 2026", "https://adaircountymissouri.com/wp-content/uploads/2026/09/Adair-Sample-BT1.pdf", "mo/adair.pdf"),
     ("MO-29215", "Texas County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://eadn-wc01-3627135.nxedge.io/wp-content/uploads/November-2026-Sample-Ballot.pdf", "mo/texas.pdf"),
     ("TX-48215-ecisd", "Edinburg CISD", "School Board Candidates, November 3, 2026 Election", "https://4.files.edl.io/5137/10/16/26/141722-ce5d89de-f0e6-4db4-b79b-63f4f2091cec.pdf", "tx/edinburg.pdf"),
+    ("MT-30029", "Flathead County Elections", "2026 General Election, Flathead County Offices", "https://flatheadcounty.gov/application/files/6517/8551/6200/Candidate_Information.pdf", "mt/flathead.pdf"),
+    ("MT-30049", "Lewis and Clark County Clerk and Recorder", "Publication Ballot, 2026 General Election", "https://www.lccountymt.gov/files/assets/county/v/1/treasurer-clerk-and-recorder/documents/elections/sample-ballots/2026-general-publication-ballot.pdf", "mt/lewisclark.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
