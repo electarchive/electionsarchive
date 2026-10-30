@@ -188,9 +188,21 @@
   }
 </script>
 
-<figure class="grid gap-2">
+<figure
+  class={cn(
+    "grid gap-2 transition-opacity duration-300 motion-reduce:transition-none",
+    { "opacity-60": isLoading && sheet != null },
+  )}
+  aria-busy={isLoading}
+>
   <div
-    class="relative aspect-[1/1.05] overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full sm:aspect-[4/3.4]"
+    class={cn(
+      "relative aspect-[1/1.05] overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full sm:aspect-[4/3.4]",
+      {
+        "animate-pulse bg-muted motion-reduce:animate-none":
+          (sheet == null && isLoading) || (sheet != null && !engine.isLoaded),
+      },
+    )}
   >
     <div
       class={cn(

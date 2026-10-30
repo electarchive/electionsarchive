@@ -6,7 +6,7 @@ import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
-import { names } from "#lib/server/rpc/archive.js";
+import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
 
 const LEVELS = new Set([
   "us.place",
@@ -358,6 +358,8 @@ export const live = {
           }
         }
         const path = paths.get(contest) ?? "";
+        const tally = final.length > 0 ? votes : (series.at(-1)?.votes ?? []);
+        const top = Math.max(0, ...tally);
         return {
           id: contest,
           path,
@@ -365,12 +367,18 @@ export const live = {
             .replace(/^\d{4} /u, "")
             .replace(/ election$/u, ""),
           group: group(path),
-          options: own.map(({ id, name, party, key, color, kind }) => ({
+          options: own.map(({ id, name, party, key, color, kind }, at) => ({
             id,
             name,
             party,
             key,
-            color,
+            color:
+              color ??
+              (key.startsWith("party:") && (tally[at] ?? 0) >= top * 0.05
+                ? (UNAFFILIATED[
+                    Number.parseInt(key.slice(-4), 16) % UNAFFILIATED.length
+                  ] ?? null)
+                : null),
             kind,
           })),
           outside: mine.some((row) => row.outside),

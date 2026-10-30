@@ -1209,7 +1209,7 @@ const ABROAD: Record<string, string> = {
   tr: "Yurt dışı",
 };
 
-const UNAFFILIATED = [
+export const UNAFFILIATED = [
   "#0e8f7e",
   "#8250c4",
   "#b5651d",

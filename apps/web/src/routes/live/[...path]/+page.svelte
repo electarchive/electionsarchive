@@ -6,7 +6,7 @@
   import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
-  import { independent, swatch } from "#lib/party.js";
+  import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageProps } from "./$types";
   import Board from "./board.svelte";
@@ -43,17 +43,10 @@
 
   const tones = $derived(
     new Map(
-      night.races.map((race) => {
-        let neutral = 0;
-        return [
-          race.id,
-          race.options.map((option) =>
-            option.color == null && !option.key.startsWith("answer:")
-              ? independent((neutral += 1) - 1)
-              : swatch(option.color, option.key),
-          ),
-        ];
-      }),
+      night.races.map((race) => [
+        race.id,
+        race.options.map((option) => swatch(option.color, option.key)),
+      ]),
     ),
   );
 
@@ -162,8 +155,8 @@
         ).length,
     ),
   );
-  const scanners = $derived(
-    Object.entries(
+  const scanners = $derived.by(() => {
+    const list = Object.entries(
       Object.fromEntries(
         frames
           .slice(0, position + 1)
@@ -171,8 +164,12 @@
             frame.scanners.map((entry) => [entry.area, entry.share]),
           ),
       ) as Record<string, number>,
-    ).map(([area, share]) => ({ area, share })),
-  );
+    ).map(([area, share]) => ({ area, share }));
+    return list.length > 1 &&
+      list.every((entry) => entry.share === list[0]?.share)
+      ? [{ area: m.live_scanners_all(), share: list[0]?.share ?? 0 }]
+      : list;
+  });
 
   const map = $derived.by(() => {
     if (lead == null) {
