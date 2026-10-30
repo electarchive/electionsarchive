@@ -2812,8 +2812,10 @@ async function places(
         ) as "isDefault"
       from reporting_unit u join scheme s on s.code = u.scheme_code
       where u.k in (
-          select x.k from reporting_unit x where x.area_relation = 'within'
-            and (x.area_id = any(${sql.param(within)}::uuid[]) or x.id in (select m.unit_id from reporting_unit_area m where m.area_id = any(${sql.param(within)}::uuid[])))
+          select x.k from reporting_unit x where x.area_relation = 'within' and x.area_id = any(${sql.param(within)}::uuid[])
+          union
+          select x.k from reporting_unit_area m join reporting_unit x on x.id = m.unit_id
+          where x.area_relation = 'within' and m.area_id = any(${sql.param(within)}::uuid[])
           union
           select v.unit_k from result_value v join reporting_unit x on x.k = v.unit_k and x.area_id is null and x.kind <> 'standard'
           where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[])
