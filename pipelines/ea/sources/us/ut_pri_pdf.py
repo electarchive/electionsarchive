@@ -39,13 +39,18 @@ COLUMNS = {
         *[None] * 4,
     ],
 }
+PRESIDENT = "2008WSPprimary.pdf"
+NAMES = {
+    "democratic": ["Joe Biden", "Hillary Clinton", "Christopher J. Dodd", "John Edwards", "Mike Gravel", "Dennis Kucinich", "Frank Lynch", "Barack Obama", "Bill Richardson"],
+    "republican": ["Rudy Giuliani", "Mike Huckabee", "Duncan Hunter", "Alan Keyes", "John McCain", "Ron Paul", "Mitt Romney", "Tom Tancredo", "Fred Thompson"],
+}  # fmt: skip
 WORD = re.compile(r'<word xMin="[\d.]+" yMin="([\d.]+)" xMax="([\d.]+)" yMax="[\d.]+">([^<]*)</word>')
 PUBLISHER = "Utah Lieutenant Governor's Office of Elections"
 TITLE = "Official primary results by county"
 
 
 def fetch() -> None:
-    for name in FILES:
+    for name in [*FILES, PRESIDENT]:
         raw.store(
             SOURCE,
             BASE + name,
@@ -97,6 +102,13 @@ def parse() -> None:
             counted = sum(row[5] for row in rows if row[0] == day and row[1:3] == spec[:2] and row[4] == spec[2])
             if counted != printed[column]:
                 raise ValueError(f"{name} {spec[2]}: counties sum to {counted}, printed {printed[column]}")
+    for line in Path(__file__).with_name("ut_pri_2008.tsv").read_text().splitlines():
+        party, county, *cells = line.split("\t")
+        code = codes[re.sub(r"[^a-z]", "", county.lower())]
+        rows.extend(
+            (date(2008, 2, 5), f"president:{party}", None, code, candidate, int(cell))
+            for candidate, cell in zip(NAMES[party], cells, strict=True)
+            )
     frame = pl.DataFrame(
         rows,
         schema={
@@ -120,7 +132,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Utah's 2002 and 2004 U.S. House primaries by county from the Office of Elections' official canvasses",
+            summary="Utah's 2002 and 2004 U.S. House primaries and 2008 presidential primaries by county from the Office of Elections' official canvasses",
             polity="US-UT",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -134,7 +146,7 @@ def emit() -> Path:
                 url="https://vote.utah.gov/historical-election-results/",
                 license="Public record",
             )
-        for name in FILES:
+        for name in [*FILES, PRESIDENT]:
             cs.artifact(raw.cached(SOURCE, BASE + name), source)
         medsl.attach(
             cs,
@@ -156,5 +168,6 @@ def emit() -> Path:
             ),
             {"UT": source},
             strict=True,
+            restage=True,
         )
         return cs.write()

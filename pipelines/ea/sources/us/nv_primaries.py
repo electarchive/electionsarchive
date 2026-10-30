@@ -116,7 +116,7 @@ def parse() -> None:
             while cursor + 2 + width < len(tokens) and re.fullmatch(r"[\d.]+%", tokens[cursor + 1]):
                 candidate = tokens[cursor]
                 for county, cell in zip(names, tokens[cursor + 3 : cursor + 3 + width], strict=True):
-                    if cell != "N/A" and not re.match(r"(NONE OF|UNDER VOTES|OVER VOTES)", candidate.upper()):
+                    if cell != "N/A" and not re.match(r"(NONE OF|UNDER VOTES|OVER VOTES)" if chamber != "president" else r"(UNDER VOTES|OVER VOTES)", candidate.upper()):
                         rows.append(
                             (
                                 day,
