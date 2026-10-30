@@ -1443,6 +1443,7 @@ DELIVERED = {
     "NJ-34025": DATA / "inbox" / "y26" / "nj" / "monmouth_municipal.pdf",
     "NJ-34025-c": DATA / "inbox" / "y26" / "nj" / "monmouth.pdf",
     "NJ-34027": DATA / "inbox" / "y26" / "nj" / "morris.pdf",
+    "NJ-34033": DATA / "inbox" / "y26" / "nj" / "salem_candidates.pdf",
     "MI-26017": DATA / "inbox" / "y26" / "mi" / "bay.pdf",
     "MI-26049": DATA / "inbox" / "y26" / "mi" / "genesee.pdf",
     "MI-26091": DATA / "inbox" / "y26" / "mi" / "lenawee.pdf",
@@ -1702,6 +1703,12 @@ NE_SOURCES = {
         "Candidate List for the School Board Election, November 3, 2026 (8/12/2026)",
         "https://unioncountyvotes.com/wp-content/uploads/2026/08/School-Board-2026-Candidate-List-8-12-26_.pdf",
         "nj/union_school.pdf",
+    ),
+    "NJ-34033-s": (
+        "Salem County Clerk",
+        "2026 General Election Candidates",
+        "https://www.salemcountynj.gov/wp-content/uploads/2026/07/2026-Candidate-List-1.pdf",
+        "nj/salem_candidates.pdf",
     ),
 }
 for county, url in {
