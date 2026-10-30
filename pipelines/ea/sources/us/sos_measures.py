@@ -342,6 +342,11 @@ AL_CERTS = {
     date(2006, 11, 7): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2006/statecert-2006-general-election-11-29-2006-without-write-in-appendix.pdf",
     date(2008, 11, 4): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2008/statecert-2008-general-election-11-25-2008-without-write-in-appendix.pdf",
 }
+AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
+AL_2007_TOTALS = {
+    "1": ((189032, 50111), ((0.7028, 0.7753, 0.7186, 0.8481), (0.7028, 0.6962, 0.7186, 0.7721))),
+    "2": ((200698, 38797), ((0.7028, 0.5381, 0.7186, 0.6263), (0.7028, 0.4561, 0.7186, 0.5351))),
+}
 AL_COUNTIES = {
     "autauga",
     "baldwin",
@@ -835,6 +840,11 @@ STATEWIDE_ONLY = (
     " Only the statewide totals are recorded: the state's archived results pages for this election carry no county "
     "table for ballot questions."
 )
+AL_2007_NOTE = (
+    " Only the statewide totals are recorded: the county tables in the Secretary of State's scanned canvass are too "
+    "degraded to read, so the figures are the printed Total row, entered by hand from page 3; the box shown on each "
+    "figure is approximate."
+)
 OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 
 
@@ -985,7 +995,7 @@ def fetch() -> None:
     for stamp, file in AL_FILES.values():
         raw.fetch(SOURCE, AL.format(stamp=stamp) + file, suffix=Path(file).suffix.lower())
         time.sleep(1)
-    for url in AL_CERTS.values():
+    for url in [*AL_CERTS.values(), AL_2007]:
         raw.fetch(SOURCE, url, suffix=".pdf")
         time.sleep(1)
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
@@ -1427,6 +1437,25 @@ def alabama() -> list[dict[str, object]]:
                     "votes": value,
                 }
                 for county, value in found.items()
+            )
+    for number, (counts, boxes) in AL_2007_TOTALS.items():
+        for answer, votes, (x0, y0, x1, y1) in zip(("YES", "NO"), counts, boxes, strict=True):
+            rows.append(
+                {
+                    "state": "AL",
+                    "day": date(2007, 6, 5),
+                    "number": number,
+                    "label": "",
+                    "url": AL_2007,
+                    "county": "statewide",
+                    "answer": answer,
+                    "votes": votes,
+                    "page": 3,
+                    "x0": x0,
+                    "y0": y0,
+                    "x1": x1,
+                    "y1": y1,
+                }
             )
     return rows
 
@@ -3492,9 +3521,13 @@ def emit() -> Path:
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
-                + (SCANNED if rows["page"].is_not_null().any() else "")
+                + (SCANNED if rows["page"].is_not_null().any() and state != "AL" else "")
                 + (GA_PRELIMINARY if preliminary else "")
-                + (STATEWIDE_ONLY if (rows["county"] == "statewide").any() else ""),
+                + (
+                    (AL_2007_NOTE if state == "AL" else STATEWIDE_ONLY)
+                    if (rows["county"] == "statewide").any()
+                    else ""
+                ),
             )
             yes = int(rows.filter(pl.col("answer") == "YES")["votes"].sum())
             no = int(rows.filter(pl.col("answer") == "NO")["votes"].sum())
