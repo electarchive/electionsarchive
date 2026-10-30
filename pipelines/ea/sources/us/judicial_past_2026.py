@@ -1,8 +1,9 @@
 import csv
 import json
 import re
+import zipfile
 from collections import defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -11,7 +12,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import oe_primaries_2026 as oe
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.judicial_past_2026"
 VERSION = "1"
@@ -28,7 +29,7 @@ TITLES = {
     "Court of Appeals - Western Division": "Judge of the Court of Appeals",
     "Court of Criminal Appeals - Eastern Division": "Judge of the Court of Criminal Appeals",
 }
-STATES = {"AR": "Arkansas", "GA": "Georgia", "ID": "Idaho", "OR": "Oregon", "TN": "Tennessee"}
+STATES = {"AR": "Arkansas", "GA": "Georgia", "ID": "Idaho", "OR": "Oregon", "TN": "Tennessee", "WV": "West Virginia"}
 EVENTS = {
     "GA": (
         "ga",
@@ -40,13 +41,26 @@ EVENTS = {
     ),
 }
 AR_DAY = date(2026, 3, 3)
-PAGES = {"AR": "https://arkansas.tally-enr.com/", "GA": "https://results.sos.ga.gov/", "ID": "https://results.voteidaho.gov/"}
+PAGES = {
+    "AR": "https://arkansas.tally-enr.com/",
+    "GA": "https://results.sos.ga.gov/",
+    "ID": "https://results.voteidaho.gov/",
+    "WV": "https://results.enr.clarityelections.com/WV/",
+}
+WV_DAY = date(2026, 5, 12)
+WV_FILE = DATA / "inbox" / "manual" / "MF-409" / "detailxlsx.zip"
+WV_URL = PAGES["WV"] + "#detail.xlsx"
+WV_SHEETS = {
+    "246": ("Justice of the Supreme Court", "Division 1", "remainder"),
+    "247": ("Justice of the Supreme Court", "Division 2", "remainder"),
+    "248": ("Judge of the Intermediate Court of Appeals", "", "full"),
+}
 OE_PAGE = "https://github.com/openelections"
 NOTE = (
     "County totals as published by the state's election authority; the county sums were checked against the statewide totals "
     "where the source gives them."
 )
-PLURALITY = {"ID"}
+PLURALITY = {"ID", "WV"}
 
 
 def is_write_in(name: str) -> bool:
@@ -69,6 +83,18 @@ def fetch() -> None:
     for state, (code, _) in EVENTS.items():
         for item in items(state):
             raw.fetch(SOURCE, f"{oe.EV[code][0]}ballot-items/{item['id']}", suffix=".json")
+    try:
+        raw.cached(SOURCE, WV_URL)
+    except LookupError:
+        with zipfile.ZipFile(WV_FILE) as archive:
+            raw.store(
+                SOURCE,
+                WV_URL,
+                archive.read("detail.xlsx"),
+                suffix=".xlsx",
+                retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+                media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
 
 
 def ev_rows(state: str) -> list[dict[str, str | int]]:
@@ -92,6 +118,29 @@ def ev_rows(state: str) -> list[dict[str, str | int]]:
             name = re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip()
             if by_candidate[name] != option["voteCount"]:
                 raise ValueError(f"{state} {text} {name}: counties {by_candidate[name]} differ from statewide {option['voteCount']}")
+    return rows
+
+
+def wv_rows() -> list[dict[str, str | int]]:
+    sheets = pl.read_excel(raw.cached(SOURCE, WV_URL).path, sheet_id=0, has_header=False)
+    rows: list[dict[str, str | int]] = []
+    for sheet, (title, seat, _) in WV_SHEETS.items():
+        table = sheets[sheet]
+        names = {index: str(table[1, index]).title() for index in range(2, table.width - 1, 2)}
+        by_candidate: dict[str, int] = defaultdict(int)
+        for line in range(3, table.height):
+            county = str(table[line, 0])
+            if county == "Total:":
+                for index, name in names.items():
+                    if by_candidate[name] != int(str(table[line, index + 1])):
+                        raise ValueError(f"WV {seat or title} {name}: counties differ from the Total row")
+                break
+            for index, name in names.items():
+                votes = int(str(table[line, index + 1]))
+                by_candidate[name] += votes
+                rows.append(
+                    {"state": "WV", "title": title, "seat": seat, "county": county, "answer": "", "candidate": name, "votes": votes}
+                )
     return rows
 
 
@@ -147,20 +196,20 @@ def oe_rows(state: str) -> list[dict[str, str | int]]:
 
 
 def emit() -> Path:
-    rows = [*ar_rows(), *ev_rows("GA"), *ev_rows("ID"), *oe_rows("OR"), *oe_rows("TN")]
+    rows = [*ar_rows(), *ev_rows("GA"), *ev_rows("ID"), *oe_rows("OR"), *oe_rows("TN"), *wv_rows()]
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Statewide judicial contests held before November 3, 2026: the Arkansas Supreme Court race, the Oregon Supreme Court and Court of Appeals races, and the Tennessee appellate retention questions, by county",
+            summary="Statewide judicial contests held before November 3, 2026: the Arkansas Supreme Court race, the Georgia and Idaho appellate races, the Oregon Supreme Court and Court of Appeals races, the Tennessee appellate retention questions, and the West Virginia Supreme Court of Appeals and Intermediate Court of Appeals races, by county",
             polity="US",
         )
         counties: dict[tuple[str, str], UUID] = {}
         for code, text, id in conn.execute(
             """select u.code, n.text, u.id from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(05|13|16|41|47)'"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(05|13|16|41|47|54)'"""
         ).fetchall():
             counties.setdefault((code[:2], oe.plain(text)), id)
             counties[(code[:2], code)] = id
@@ -178,20 +227,20 @@ def emit() -> Path:
                from candidacy cy join contest_option o on o.id = cy.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                join name n on n.entity_id = cy.person_id and n.is_preferred
-               where x.value ~ ':(AR|GA|ID|OR|TN):[a-z-]*(justice|judge)'"""
+               where x.value ~ ':(AR|GA|ID|OR|TN|WV):[a-z-]*(justice|judge)'"""
         ).fetchall():
             pool[(state, slug(text))].add(person)
-        election_keys = {"AR": "2026-03-03:AR:primary", "GA": "2026-05-19:GA:primary", "ID": "2026-05-19:ID:primary", "OR": FILES["OR"][2], "TN": FILES["TN"][2]}
+        election_keys = {"AR": "2026-03-03:AR:primary", "GA": "2026-05-19:GA:primary", "ID": "2026-05-19:ID:primary", "OR": FILES["OR"][2], "TN": FILES["TN"][2], "WV": "2026-05-12:WV:primary"}
         elections = {
             state: conn.execute(
                 "select entity_id from external_id where scheme = 'us.election' and value = %s", [key]
             ).fetchone()[0]
             for state, key in election_keys.items()
         }
-        days = {"AR": AR_DAY, "GA": FILES["OR"][0], "ID": FILES["OR"][0], "OR": FILES["OR"][0], "TN": FILES["TN"][0]}
+        days = {"AR": AR_DAY, "GA": FILES["OR"][0], "ID": FILES["OR"][0], "OR": FILES["OR"][0], "TN": FILES["TN"][0], "WV": WV_DAY}
         sources: dict[str, UUID] = {}
         for state in STATES:
-            official = state in ("AR", "GA", "ID")
+            official = state in ("AR", "GA", "ID", "WV")
             publisher = f"{STATES[state]} Secretary of State" if official else "OpenElections"
             title = f"{STATES[state]} {days[state]:%B %-d, %Y} election results"
             sources[state] = cs.source(publisher, title)
@@ -206,6 +255,8 @@ def emit() -> Path:
             )
             if state == "AR":
                 cs.artifact(raw.cached(oe.SOURCE, oe.url("ar", "data")), sources[state])
+            elif state == "WV":
+                cs.artifact(raw.cached(SOURCE, WV_URL), sources[state])
             elif state in EVENTS:
                 for item in items(state):
                     cs.artifact(raw.cached(SOURCE, f"{oe.EV[EVENTS[state][0]][0]}ballot-items/{item['id']}"), sources[state])
@@ -231,12 +282,13 @@ def emit() -> Path:
             if row["answer"]:
                 judge = str(row["candidate"])
             groups[(str(row["state"]), str(row["title"]), str(row["seat"]), judge)].append(row)
+        terms = {("WV", title, seat): term for title, seat, term in WV_SHEETS.values()}
         made = 0
         for (state, title, seat, judge), group in groups.items():
             retention = judge != ""
             seat_slug = slug(judge) if retention else (slug(seat) if seat else "")
             day = days[state]
-            contest_key = f"{day}:{state}:{slug(title)}:{seat_slug}"
+            contest_key = f"{day}:{state}:{slug(title)}:{seat_slug}".rstrip(":")
             office = cs.key("us.office", f"{slug(title)}:{state}")
             if office not in offices:
                 offices.add(office)
@@ -252,7 +304,7 @@ def emit() -> Path:
                 office_id=office,
                 district_area_id=areas[state],
                 magnitude=1,
-                term="full",
+                term=terms.get((state, title, seat), "full"),
                 round_number=1,
                 electoral_system_id=retention_system if retention else systems[state],
                 default_result_kind="counted",
