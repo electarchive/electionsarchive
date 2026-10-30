@@ -757,7 +757,7 @@
           top: 64,
           right: side,
           bottom: 24,
-          left: width >= 1024 ? Math.max(side, 336) : side,
+          left: width >= 1024 ? Math.max(side, 360) : side,
         }
       : {
           top: 64,
