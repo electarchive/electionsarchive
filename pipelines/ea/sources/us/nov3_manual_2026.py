@@ -140,6 +140,13 @@ COUNTIES = {
     "34013": ("NJ", "https://www.essexclerk.com/", "MF-438/Essex-2026-Sample-Ballots.pdf"),
     "34007": ("NJ", "https://www.camdencounty.com/", "MF-438/LAUREL_SPRINGS.pdf"),
     "34007-coll": ("NJ", "https://www.camdencounty.com/", "MF-438/COLLINGSWOOD.pdf"),
+    "34019": ("NJ", "https://www.co.hunterdon.nj.us/", "MF-440/public questions website.pdf"),
+    "34021-hb": ("NJ", "https://nj-mercercounty.civicplus.com/", "MF-440/F07 Hopewell Borough General 2026.pdf"),
+    "34021": ("NJ", "https://nj-mercercounty.civicplus.com/", "MF-440/F08 Hopewell Township General 2026.pdf"),
+    "34023-ob": ("NJ", "https://www.middlesexcountynj.gov/", "MF-440/2026 General Election  Old Bridge Sample Ballots.pdf"),
+    "34023-say": ("NJ", "https://www.middlesexcountynj.gov/", "MF-440/2026 General Election  Sayreville Sample Ballots.pdf"),
+    "34011-br": ("NJ", "https://www.cumberlandcountynj.gov/", "MF-440/Bridgeton-Sample-Ballot-2026-General-Election.pdf"),
+    "34011": ("NJ", "https://www.cumberlandcountynj.gov/", "MF-440/Downe-Sample-Ballot-2026-General-Election.pdf"),
     "48439": ("TX", "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/06_NRH-1126_Notice_of_Election_Eng.pdf", "N3M-web/tx2/nrh_eng.pdf"),
     "48029-comal": ("TX", "https://elections.bexar.org/#comal-isd-order-of-bond-election", "MF-433/CISD Notice of Order of Bond Election signed with exhibits FINAL 9.16.26_1.pdf"),
     "48029-nisd": ("TX", "https://elections.bexar.org/#northside-isd-order-of-bond-election", "MF-433/Northside Independent School District-Order of Bond Election.pdf"),
@@ -203,7 +210,7 @@ def emit() -> Path:
             parent = cs.key("us.election", f"{DAY}:{state}")
             url = COUNTIES[row["county"]][1]
             entity = row["entity"]
-            county_key = f"us.county:{row['county']}"
+            county_key = f"us.county:{row['county'][:5]}"
             source = sources[row["county"]]
             option = None
             if re.match(r"(?i)(city|town|village|borough) of ", entity):
