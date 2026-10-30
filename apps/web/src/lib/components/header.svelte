@@ -4,6 +4,7 @@
   import {
     ArrowLeftRightIcon,
     GaugeIcon,
+    KeyRoundIcon,
     LayoutDashboardIcon,
     LogInIcon,
     LogOutIcon,
@@ -142,6 +143,14 @@
                 <a {...props} href={resolve("/workbench")}>
                   <LayoutDashboardIcon class="text-muted-foreground" />
                   {m.workbench_nav()}
+                </a>
+              {/snippet}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item>
+              {#snippet child({ props })}
+                <a {...props} href={resolve("/settings/keys")}>
+                  <KeyRoundIcon class="text-muted-foreground" />
+                  {m.keys_nav()}
                 </a>
               {/snippet}
             </DropdownMenu.Item>

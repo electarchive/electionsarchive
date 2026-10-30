@@ -24,6 +24,9 @@ export class ConfirmationStore {
   private close() {
     this.state.isOpen = false;
     setTimeout(() => {
+      if (this.state.isOpen) {
+        return;
+      }
       this.state.options = null;
       this.state.resolve = null;
     }, 300);
