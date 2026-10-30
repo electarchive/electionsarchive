@@ -1777,6 +1777,36 @@ NE_SOURCES = {
         "https://www.navajocountyaz.gov/816/2026-Filed-Candidates",
         "az/navajo_schools.html",
     ),
+    "AZ-04007-s": (
+        "Gila County School Superintendent",
+        "2026 Candidate Statements of Interest (updated 7/27/2026)",
+        "https://www.gilacountyaz.gov/government/school_superintendent/school_district_maps/index.php",
+        "az/gila_schools.html",
+    ),
+    "AZ-04009-s": (
+        "Graham County Elections",
+        "Candidates and Propositions, 2026 General Election",
+        "https://www.graham.az.gov/",
+        "az/graham_schools.html",
+    ),
+    "AZ-04012-s": (
+        "La Paz County Elections Department",
+        "2026 General Election Local Candidates (8-17-26)",
+        "https://lapaz.gov/",
+        "az/la_paz_local.pdf",
+    ),
+    "AZ-04021-s": (
+        "Pinal County School Office",
+        "2026 Election Candidate Filing Status",
+        "https://www.pinalcso.org/",
+        "az/pinal_schools.html",
+    ),
+    "AZ-04025-s": (
+        "Yavapai County Education Service Agency",
+        "Election Services, 2026 school district candidate races",
+        "https://www.yavapaicoesa.gov/election-services",
+        "az/yavapai_schools.html",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
