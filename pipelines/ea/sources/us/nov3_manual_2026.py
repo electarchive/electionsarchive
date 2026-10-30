@@ -26,6 +26,11 @@ SCHOOLS = {
     ("CA", "Acalanes Union High School District"): "0601650",
     ("CA", "Liberty Union High School District"): "0621600",
     ("CA", "West Contra Costa Unified School District"): "0632550",
+    ("WA", "Kiona-Benton City School District No. 52"): "5304020",
+    ("AZ", "Prescott Unified School District No. 1"): "0406730",
+    ("AZ", "Humboldt Unified School District No. 22"): "0403870",
+    ("AZ", "Camp Verde Unified School District No. 28"): "0400813",
+    ("AZ", "Cottonwood-Oak Creek Elementary School District No. 6"): "0402370",
 }
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
@@ -64,6 +69,12 @@ COUNTIES = {
     "06013": ("CA", "https://www.cocovote.us/", "MF-427/26Nov03_Measure-Wording-List-1.pdf"),
     "44001": ("RI", "https://www.barrington.ri.gov/DocumentCenter/View/2978/BOC-Booklet-Questions-Info-revised-10-6", "RI-web/barrington-boc-booklet.pdf"),
     "38015": ("ND", "https://www.bismarckschools.org/fs/resource-manager/view/11ac6ea4-ff0d-4486-84da-16289d7f918f", "ND-web/bps-official-ballot.pdf"),
+    "53005": ("WA", "https://www.bentoncountywa.gov/Documents/Government/Elected%20Officials/Auditor/Elections/Current%20Election/Sample%20Ballot.pdf", "N3M-web/wa_benton_sample.pdf"),
+    "53021": ("WA", "https://www.franklincountywa.gov/DocumentCenter/View/4553", "N3M-web/wa_franklin_vp_nov26.pdf"),
+    "04025": ("AZ", "https://www.azcleanelections.gov/november-3-2026/yavapai", "N3M-web/yavapai-countywide-sample.pdf"),
+    "05051": ("AR", "https://www.garlandcountyvote.org/uploads/6/3/0/4/63045401/local_issues.pdf", "N3M-web/garland-local-issues.pdf"),
+    "05131": ("AR", "https://www.uaex.uada.edu/business-communities/ced-blog/posts/2026/september/2026-arkansas-ballot-issues-voter-guide-now-available-online.aspx", "N3M-web/lavaca-2026.pdf"),
+    "05031": ("AR", "https://jonesbororightnow.com/wp-content/blogs.dir/286/files/2026/07/JB-Public-Safety-Sales-Use-Tax-Election-County-Clerk-Filing.pdf", "N3M-web/jonesboro-psst.pdf"),
     "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
 }
 
@@ -96,7 +107,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, Texas, California, Rhode Island, and North Dakota, with official wording",
+            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, Texas, California, Rhode Island, North Dakota, Washington, Idaho, and Arizona, with official wording",
             polity="US",
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
