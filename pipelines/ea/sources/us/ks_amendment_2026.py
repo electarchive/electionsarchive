@@ -67,11 +67,13 @@ def emit() -> Path:
         system = cs.key("us.electoral_system", "referendum")
         state_unit = conn.execute("select id from reporting_unit where scheme_code = 'us.state' and code = '20'").fetchone()[0]
         counties: dict[str, UUID] = {}
+        names: dict[str, str] = {}
         for text, id in conn.execute(
             """select n.text, u.id from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
                where u.scheme_code = 'us.county' and u.code ~ '^20'"""
         ).fetchall():
             counties[oe.plain(text)] = id
+            names[oe.plain(text)] = text
         source = cs.source(PUBLISHER, TITLE)
         cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=PAGE, license="Public record")
         for url in (COUNTIES, TOTALS):
@@ -125,11 +127,12 @@ def emit() -> Path:
                 is_default=default,
                 completeness=completeness,
             )
+        absent = sorted(text for key, text in names.items() if key not in {oe.plain(county) for county in frame["County"]})
         cs.add(
             "note",
             entity_id=by_county,
             kind="caveat",
-            body_md=f"County totals for {frame['County'].n_unique()} of Kansas's 105 counties; the Secretary of State's precinct file omits the rest, so the county sums are below the official statewide totals.",
+            body_md=f"County totals for {frame['County'].n_unique()} of Kansas's 105 counties; the Secretary of State's precinct file omits {', '.join(absent)}, so the county sums are below the official statewide totals.",
         )
         cs.add("outcome", result_set_id=official, option_id=options["NO" if totals["NO"] > totals["YES"] else "YES"], kind="won")
         rows = [(str(official), str(state_unit), str(options[answer]), 0, 1, 0, 0, votes) for answer, votes in totals.items()]
