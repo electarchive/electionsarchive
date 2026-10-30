@@ -878,13 +878,13 @@ export const note = pgTable("note", {
 export const translation = pgTable("translation", {
 	sourceMd5: text("source_md5").notNull(),
 	lang: text().notNull(),
-	sourceLang: text("source_lang").default("en").notNull(),
 	body: text().notNull(),
 	origin: translationOrigin().notNull(),
-	sourceId: uuid("source_id").references(() => source.id),
-	staleFrom: text("stale_from"),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	sourceLang: text("source_lang").default("en").notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	staleFrom: text("stale_from"),
 }, (table) => [
 	primaryKey({ columns: [table.sourceMd5, table.lang], name: "translation_pkey"}),
 	check("translation_source_md5_check", sql`(source_md5 ~ '^[0-9a-f]{32}$'::text)`),
