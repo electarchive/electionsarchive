@@ -209,7 +209,11 @@ async function options(contests: Array<string>, date: string) {
     left join lateral (
       select x.party_id as party from contest_option x
       where (x.id = o.id or x.parent_option_id = o.id) and x.party_id is not null
-      order by exists (select from party_color pc where pc.party_id = x.party_id) desc, x.k
+      order by (
+        select max(v.value) from result_set rs join result_value v on v.result_set_k = rs.k and v.option_k = x.k
+        where rs.contest_id = x.contest_id
+      ) desc nulls last,
+        exists (select from party_color pc where pc.party_id = x.party_id) desc, x.k
       limit 1
     ) line on true
     where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.parent_option_id is null

@@ -2343,6 +2343,7 @@
   "live_scanners_note": "This is the share of the Board's scanners that had sent results. Early votes are counted first, so early in the night the vote count runs ahead of this share.",
   "live_scanners_none": "The Board hadn't published scanner shares by this time.",
   "live_scanners_all": "All boroughs",
+  "live_after_night": "The certified count added {count} votes ({share} of the total) after the last update on election night.",
   "live_citywide": "Citywide offices",
   "live_measures": "Ballot proposals",
   "live_boroughs": "Borough presidents and district attorneys",

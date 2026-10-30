@@ -2,6 +2,7 @@
   import { goto, refreshAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { untrack } from "svelte";
   import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -121,6 +122,13 @@
       total += value;
     }
     return total;
+  });
+  const nightTotal = $derived.by(() => {
+    let sum = 0;
+    for (const value of lead?.series.at(-1)?.votes ?? []) {
+      sum += value;
+    }
+    return sum;
   });
 
   const trace = $derived(
@@ -388,6 +396,18 @@
                 </p>
               </div>
             {/if}
+            {#if isFinal && certifiedTotal > nightTotal && nightTotal > 0}
+              <p
+                class="text-[0.8125rem] text-muted-foreground max-inline-[60ch]"
+              >
+                {m.live_after_night({
+                  count: count(certifiedTotal - nightTotal),
+                  share: percent(
+                    (certifiedTotal - nightTotal) / certifiedTotal,
+                  ),
+                })}
+              </p>
+            {/if}
             {#if certifiedTotal > 0 && ranked.total > 0 && !isFinal}
               <p class="text-xs text-muted-foreground max-inline-[60ch]">
                 {m.live_of_certified({
@@ -542,8 +562,12 @@
           >
             {m.live_courts()}
             <span
-              class="font-figures text-sm font-normal text-muted-foreground tabular-nums"
-              >{count(courts.length)}</span
+              class="flex items-center gap-1.5 font-figures text-sm font-normal text-muted-foreground tabular-nums"
+              >{count(courts.length)}
+              <ChevronDownIcon
+                class="transition-transform duration-200 block-4 inline-4 group-open:rotate-180 motion-reduce:transition-none"
+                aria-hidden="true"
+              /></span
             >
           </summary>
           <ul class="grid gap-x-10 gap-y-6 pbs-4 sm:grid-cols-2 lg:grid-cols-3">
