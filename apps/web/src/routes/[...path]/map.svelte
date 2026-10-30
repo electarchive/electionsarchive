@@ -33,6 +33,7 @@
   import { keep } from "#lib/linked.js";
   import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
+  import { covering } from "#lib/map/hexes.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -130,7 +131,7 @@
       | null;
     up?: { name: string; path: string } | null;
     tallies?: Array<number | null> | null;
-    hexes?: {
+    hexes?: Array<{
       credit: string | null;
       cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
@@ -142,7 +143,8 @@
         states: Array<string>;
         labels: Array<{ x: number; y: number; text: string }>;
       } | null;
-    } | null;
+      isPartial: boolean;
+    }> | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
@@ -530,18 +532,7 @@
     ),
   );
   let layout = $state<"map" | "cartogram" | "hexes">("hexes");
-  const isCovered = $derived.by(() => {
-    if (hexes == null) {
-      return false;
-    }
-    let covered = 0;
-    for (const cell of hexes.cells) {
-      if (rows.has(cell.k)) {
-        covered += 1;
-      }
-    }
-    return covered > 0 && covered >= hexes.cells.length * 0.9;
-  });
+  const hexed = $derived(covering(hexes, rows));
   const headings: Record<string, [number, number]> = {
     ArrowRight: [1, 0],
     ArrowLeft: [-1, 0],
@@ -561,14 +552,14 @@
   const hexagon = (x: number, y: number) =>
     `M${x.toFixed(3)} ${(y - 1).toFixed(3)}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z`;
   const tiled = $derived.by(() => {
-    if (hexes == null || !isCovered) {
+    if (hexed == null) {
       return null;
     }
     const center = (q: number, r: number) => ({
       x: Math.sqrt(3) * (q + (r & 1) / 2),
       y: -1.5 * r,
     });
-    const cells = hexes.cells.map((cell) => {
+    const cells = hexed.cells.map((cell) => {
       const at = center(cell.q, cell.r);
       return {
         k: cell.k,
@@ -611,26 +602,26 @@
       ...framed(left - 1.2, top - 1.4, right + 1.2, bottom + 1.4),
       seam: 0.12,
       size: 0.62,
-      credit: hexes.credit,
-      labels: hexes.labels.map((label) => ({
+      credit: hexed.credit,
+      labels: hexed.labels.map((label) => ({
         ...center(label.q, label.r),
         text: label.text,
       })),
       nations: line(
-        hexes.borders.flatMap((border) =>
+        hexed.borders.flatMap((border) =>
           border.isNation ? border.edges : [],
         ),
       ),
       regions: line(
-        hexes.borders.flatMap((border) =>
+        hexed.borders.flatMap((border) =>
           border.isNation ? [] : border.edges,
         ),
       ),
     };
   });
   const drawn = $derived.by(() => {
-    const cartogram = hexes?.cartogram;
-    if (cartogram == null || !isCovered) {
+    const cartogram = hexed?.cartogram;
+    if (cartogram == null) {
       return null;
     }
     const cells = cartogram.districts.map((district) => ({
@@ -2223,7 +2214,7 @@
         {#each grid.cells as cell (cell.k)}
           {const row = $derived(rows.get(cell.k))}
           <path
-            class="cursor-pointer outline-none"
+            class={cn("outline-none", { "cursor-pointer": row != null })}
             d={cell.d}
             fill={tinted.get(cell.k) ??
               "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))"}

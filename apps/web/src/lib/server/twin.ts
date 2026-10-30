@@ -31,6 +31,7 @@ import {
 } from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { logoCredit } from "#lib/logo.js";
+import { covering } from "#lib/map/hexes.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
@@ -3643,14 +3644,17 @@ function hexMarkdown(
   >["election"]["races"][number]["places"],
   hexes: Extract<Data, { kind: "election" }>["hexes"],
 ) {
-  if (places == null || hexes == null) {
+  if (places == null) {
     return [];
   }
   const rows = new Map(places.rows.map((row) => [row.k, row]));
-  const cells = hexes.cells.filter((cell) => rows.has(cell.k));
-  if (cells.length === 0 || cells.length < hexes.cells.length * 0.9) {
+  const layout = covering(hexes, rows);
+  if (layout == null) {
     return [];
   }
+  const cells = layout.isPartial
+    ? layout.cells
+    : layout.cells.filter((cell) => rows.has(cell.k));
   const won = new Map<number, number>();
   for (const cell of cells) {
     const leader = rows.get(cell.k)?.leader;
@@ -3707,12 +3711,12 @@ function hexMarkdown(
       )
       .toArray()
       .join("\n"),
-    ...(hexes.credit == null
+    ...(layout.credit == null
       ? []
-      : [m.map_hex_credit({ credit: hexes.credit })]),
-    ...(hexes.cartogram == null
+      : [m.map_hex_credit({ credit: layout.credit })]),
+    ...(layout.cartogram == null
       ? []
-      : [m.twin_hexes_cartogram({ credit: hexes.cartogram.credit })]),
+      : [m.twin_hexes_cartogram({ credit: layout.cartogram.credit })]),
   ];
 }
 

@@ -121,6 +121,7 @@ TILES = {
     ),
     "de-wk": Tiles("de.wahlkreis", 25832, 0, LANDER, {2025: date(2025, 2, 23)}, parent="de.land"),
 }
+STATES = {"us": ("us.state", STATE_FIPS | INSETS)}
 
 
 def fetch(congress: int) -> Path:
@@ -372,6 +373,30 @@ def build_tiles() -> str:
             "years": years,
         }
         (OUT / f"{name}-tiles.json").write_text(json.dumps(built, separators=(",", ":")) + "\n")
+    return "\n".join([*report, build_states()])
+
+
+def build_states() -> str:
+    built = {}
+    report = []
+    with connect() as db:
+        for polity, (scheme, codes) in STATES.items():
+            known = {
+                row[0]
+                for row in db.execute(
+                    "select ac.code from area a join area_code ac on ac.area_id = a.id where a.scheme_code = %s",
+                    [scheme],
+                )
+            }
+            hexes = {
+                codes.get(token, token): [q, -r, token]
+                for (q, r), token in grid(GRIDS / f"states-{polity}.txt").items()
+            }
+            report.append(
+                f"states {polity}: {len(hexes)} placed; unknown {sorted(set(hexes) - known)}; off the grid {sorted(known - set(hexes))}"
+            )
+            built[polity] = {"scheme": scheme, "hexes": dict(sorted(hexes.items()))}
+    (OUT / "states.json").write_text(json.dumps(built, separators=(",", ":")) + "\n")
     return "\n".join(report)
 
 

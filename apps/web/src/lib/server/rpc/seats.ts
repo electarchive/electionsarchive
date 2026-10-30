@@ -72,6 +72,15 @@ const TILE_SETS: Record<
     isUs: false,
   },
 };
+const STATES =
+  Object.values(
+    import.meta.glob<
+      Record<
+        string,
+        { scheme: string; hexes: Record<string, [number, number, string]> }
+      >
+    >("../hex/states.json", { eager: true, import: "default" }),
+  )[0] ?? {};
 const SHRINK = Math.sqrt((3 * Math.sqrt(3)) / 2) / 50;
 const shrink = (value: number) => Math.round(value * SHRINK * 100) / 100;
 const shrunk = (path: string) =>
@@ -200,6 +209,112 @@ const tiled = async (id: string, within: string | undefined) => {
                   : [],
             ),
           },
+    isPartial: false,
+  };
+};
+
+const stated = async (id: string) => {
+  const found = await db.execute<{
+    k: number;
+    code: string;
+    polity: string;
+    isUsed: boolean;
+  }>(sql`
+    with recursive tree(id) as (
+      select ${id}::uuid
+      union all
+      select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
+    ),
+    used as (select distinct c.district_area_id as id from contest c join tree on tree.id = c.election_id)
+    select a.k, ac.code, s.path as polity, exists (select 1 from used where used.id = a.id) as "isUsed"
+    from election e
+    join slug ps on ps.entity_id = e.polity_id and ps.is_current
+    join (values ${sql.join(
+      Object.entries(STATES).map(
+        ([path, layout]) => sql`(${path}, ${layout.scheme})`,
+      ),
+      sql`, `,
+    )}) as s(path, scheme) on s.path = ps.path
+    join area a on a.scheme_code = s.scheme
+    join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
+    where e.id = ${id}::uuid
+  `);
+  const isUsed = found.rows.some((row) => row.isUsed);
+  const cells = found.rows.flatMap((row) => {
+    const hex = STATES[row.polity]?.hexes[row.code];
+    return hex == null || (isUsed && !row.isUsed)
+      ? []
+      : [{ k: row.k, q: hex[0], r: hex[1], isApart: false, region: hex[2] }];
+  });
+  return cells.length < 2
+    ? null
+    : {
+        credit: null,
+        cells,
+        borders: [],
+        labels: cells.map((cell) => ({
+          q: cell.q,
+          r: cell.r,
+          text: cell.region,
+        })),
+        cartogram: null,
+        isPartial: true,
+      };
+};
+
+const british = async (id: string, within: string | undefined) => {
+  const found = await db.execute<{ k: number; code: string }>(sql`
+    with recursive tree(id) as (
+      select e.id from election e join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'gb' or ps.path like 'gb/%') where e.id = ${id}::uuid
+      union all
+      select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
+    )
+    select distinct a.k, ac.code
+    from contest c join tree on tree.id = c.election_id
+    join election e on e.id = c.election_id
+    join area a on a.id = c.district_area_id
+    join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
+    where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
+      and coalesce(c.magnitude, 1) = 1 and not c.notional
+      and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
+  `);
+  const layout = [layout2024, layout2010].find((entry) => {
+    let matched = 0;
+    for (const row of found.rows) {
+      if (Object.hasOwn(entry.hexes, row.code)) {
+        matched += 1;
+      }
+    }
+    return matched > 0 && matched >= found.rows.length * 0.95;
+  });
+  if (layout == null) {
+    return null;
+  }
+  const hexes: Record<string, Array<number>> = layout.hexes;
+  const cells = found.rows.flatMap((row) => {
+    const [q, r] = hexes[row.code] ?? [];
+    return q == null || r == null
+      ? []
+      : [{ k: row.k, q, r, isApart: false, region: null }];
+  });
+  const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
+  return {
+    credit: "Open Innovations and contributors (MIT)",
+    cells,
+    borders: Object.entries(layout.boundaries).flatMap(([name, edges]) => {
+      const isNation = ["sc-en", "wa-en"].includes(name);
+      return isNation && within != null
+        ? []
+        : [
+            {
+              isNation,
+              edges: edges.filter(([q, r]) => kept.has(`${q},${r}`)),
+            },
+          ];
+    }),
+    labels: [],
+    cartogram: null,
+    isPartial: false,
   };
 };
 
@@ -1730,7 +1845,7 @@ export const seats = {
         method: "GET",
         path: "/elections/{id}/hexes",
         summary:
-          "Place each single-member seat of an election on an equal-area hex layout, where one exists",
+          "Place each single-member seat of an election, and each state-level unit across the country, on equal-area hex layouts where they exist; a partial layout keeps cells for units without a result",
       }),
     )
     .input(
@@ -1740,7 +1855,7 @@ export const seats = {
       }),
     )
     .output(
-      v.nullable(
+      v.array(
         v.object({
           credit: v.nullable(v.string()),
           cells: v.array(
@@ -1779,66 +1894,16 @@ export const seats = {
               ),
             }),
           ),
+          isPartial: v.boolean(),
         }),
       ),
     )
     .handler(async ({ input }) => {
-      const tiledSeats = await tiled(input.id, input.within);
-      if (tiledSeats != null) {
-        return tiledSeats;
-      }
-      const found = await db.execute<{ k: number; code: string }>(sql`
-        with recursive tree(id) as (
-          select e.id from election e join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'gb' or ps.path like 'gb/%') where e.id = ${input.id}::uuid
-          union all
-          select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
-        )
-        select distinct a.k, ac.code
-        from contest c join tree on tree.id = c.election_id
-        join election e on e.id = c.election_id
-        join area a on a.id = c.district_area_id
-        join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
-        where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-          and coalesce(c.magnitude, 1) = 1 and not c.notional
-          and ${input.within == null ? sql`true` : inside(input.within, sql`c.district_area_id`, sql`e.date_from`)}
-      `);
-      const layout = [layout2024, layout2010].find((entry) => {
-        let matched = 0;
-        for (const row of found.rows) {
-          if (Object.hasOwn(entry.hexes, row.code)) {
-            matched += 1;
-          }
-        }
-        return matched > 0 && matched >= found.rows.length * 0.95;
-      });
-      if (layout == null) {
-        return null;
-      }
-      const hexes: Record<string, Array<number>> = layout.hexes;
-      const cells = found.rows.flatMap((row) => {
-        const [q, r] = hexes[row.code] ?? [];
-        return q == null || r == null
-          ? []
-          : [{ k: row.k, q, r, isApart: false, region: null }];
-      });
-      const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
-      return {
-        credit: "Open Innovations and contributors (MIT)",
-        cells,
-        borders: Object.entries(layout.boundaries).flatMap(([name, edges]) => {
-          const isNation = ["sc-en", "wa-en"].includes(name);
-          return isNation && input.within != null
-            ? []
-            : [
-                {
-                  isNation,
-                  edges: edges.filter(([q, r]) => kept.has(`${q},${r}`)),
-                },
-              ];
-        }),
-        labels: [],
-        cartogram: null,
-      };
+      const district =
+        (await tiled(input.id, input.within)) ??
+        (await british(input.id, input.within));
+      const state = input.within == null ? await stated(input.id) : null;
+      return [district, state].filter((layout) => layout != null);
     }),
   additional: os
     .meta(

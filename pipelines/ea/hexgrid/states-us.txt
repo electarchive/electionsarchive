@@ -1,0 +1,8 @@
+AK  ..  ..  ..  ..  ..  ..  ..  ..  ..  ME
+  WA  ID  MT  ND  MN  MI  ..  ..  VT  NH
+OR  NV  WY  SD  IA  WI  OH  PA  NY  MA  RI
+  CA  UT  CO  NE  IL  IN  WV  MD  NJ  CT
+..  AZ  NM  KS  MO  KY  VA  DC  DE
+  ..  ..  TX  OK  AR  TN  NC
+HI  ..  ..  LA  MS  AL  GA  SC
+  GU  MP  AS  ..  ..  ..  FL  ..  PR  VI
