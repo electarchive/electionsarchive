@@ -103,6 +103,12 @@ CANCELED = {
     ),
 }
 DISTRICT_CALENDAR = {
+    ("MD", "Anne Arundel County Public Schools"): (
+        4,
+        0,
+        11,
+        "Maryland State Board of Elections, Anne Arundel County sample general ballot for November 3, 2026: no Board of Education contest appears, and the state's 2026 general candidate list carries none, https://www.elections.maryland.gov/elections/2026/general_ballots/AnneArundel.pdf",
+    ),
     ("TX", "Killeen Independent School District"): (
         1,
         0,
