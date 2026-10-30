@@ -5999,7 +5999,7 @@ export const contests = {
               select c.district_area_id, 'methodology' from contest c where c.id = ${contest.id}::uuid
               union all
               select rs.id, null from result_set rs
-                where rs.contest_id = ${contest.id}::uuid and (${latest("rs")} or exists (
+                where rs.contest_id = ${contest.id}::uuid and (${latest("rs")} or rs.stage not in ('preliminary', 'live') and exists (
                   select from result_rollup r
                   where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
                     select from result_set d
