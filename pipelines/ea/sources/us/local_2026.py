@@ -2542,6 +2542,7 @@ for key, publisher, title, url, local in (
     ("OR-41033-grants-pass", "Grants Pass City Recorder", "Nonpartisan Filings for City Council Positions, General Election November 3, 2026 (certified August 26, 2026)", "https://cms9files.revize.com/josephinecountyor/City%20of%20GP%20candidates.pdf", "or/grantspass_council_nov2026_candidates.pdf"),
     ("OR-41071-mcminnville", "City of McMinnville", "November 3, 2026 General Election", "https://www.mcminnvilleoregon.gov/cityrecorder/page/november-3-2026-general-election", "or/mcminnville_nov3_2026_election.html"),
     ("MN-27145-st-cloud", "City of St. Cloud", "Local Election Filings", "https://ci.stcloud.mn.us/846/Local-Election-Filings", "mn/stcloud_local_election_filings.html"),
+    ("AZ-04003-sierra-vista", "City of Sierra Vista City Clerk", "Mayor and City Council Member Candidates, November 3, 2026 General Election (08-18-26)", "https://www.sierravistaaz.gov/our-city/departments/city-clerk/elections/campaign-for-office", "az/sierra_vista_candidates.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
