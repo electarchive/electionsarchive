@@ -129,6 +129,7 @@ EXEC = {
     "61-treasurer": ("Treasurer", "treasurer", "treasurer"),
     "64-ag": ("Attorney General", "attorney-general", "attorney general"),
     "67-ic": ("Insurance Commissioner", "insurance-commissioner", "insurance commissioner"),
+    "labor": ("Labor Commissioner", "commissioner-of-the-bureau-of-labor-and-industries", "labor commissioner"),
 }
 OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor", **{office: key for office, key, _ in EXEC.values()}}
 TOP_TWO = {"CA", "WA"}
@@ -1366,10 +1367,13 @@ def emit() -> Path:
             for file in files:
                 for row in rows(code, raw.cached(SOURCE, url(code, file)).path, file):
                     chamber = OFFICES.get(row["office"])
-                    if chamber is None or not row["votes"].isdigit() or row["party"] not in PARTIES or state != "CA" and chamber not in ("house", "senate", "governor"):
+                    if chamber is None or not row["votes"].isdigit() or state not in ("CA", "OR") and chamber not in ("house", "senate", "governor"):
                         continue
-                    scope = PARTIES[row["party"]][0]
-                    if scope == "" and state not in TOP_TWO:
+                    nonpartisan = state == "OR" and chamber == EXEC["labor"][1]
+                    if row["party"] not in PARTIES and not nonpartisan:
+                        continue
+                    scope = "" if nonpartisan else PARTIES[row["party"]][0]
+                    if scope == "" and state not in TOP_TWO and not nonpartisan:
                         continue
                     scope_labels.setdefault(scope, row["party"])
                     district = ("0" if state in AT_LARGE else str(int(row["district"]))) if chamber == "house" else ""
@@ -1377,7 +1381,7 @@ def emit() -> Path:
                         junk[(chamber, district, "" if state in TOP_TWO else scope)].add(title(row["candidate"].strip()))
                         continue
                     pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
-                    label = row["party"] if not pooled else ""
+                    label = "" if pooled or nonpartisan else row["party"]
                     candidate = "Write-ins" if pooled else title(row["candidate"].strip())
                     candidate = spellings.setdefault((chamber, district, scope, slug(candidate)), candidate)
                     county = row["county"] if row["county"].isdigit() else plain(row["county"])
@@ -1431,7 +1435,7 @@ def emit() -> Path:
                 else:
                     adjective = next((phrase for _, key, phrase in EXEC.values() if key == chamber), "gubernatorial")
                     title_text = f"2026 {state_name} {adjective} " + (
-                        f"{scope_label} {round_word}" if scope else "top-two primary"
+                        f"{scope_label} {round_word}" if scope else "top-two primary" if state in TOP_TWO else "nonpartisan primary"
                     )
                 cs.add(
                     "contest",
