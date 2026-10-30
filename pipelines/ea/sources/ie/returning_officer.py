@@ -82,11 +82,11 @@ EXHAUSTED = 21
 DERIVED = 1
 DIGITIZED = 8
 PARTIES = {
-    "FF": ("Fianna Fáil", "FF", "#66bb66"),
+    "FF": ("Fianna Fáil", "FF", "#029439"),
     "FG": ("Fine Gael", "FG", "#6699ff"),
     "SF": ("Sinn Féin", "SF", "#326760"),
     "LAB": ("Labour Party", "Lab", "#cc0000"),
-    "GRN": ("Green Party", "GP", "#99cc33"),
+    "GRN": ("Green Party", "GP", "#4ef798"),
     "SD": ("Social Democrats", "SD", "#752f8b"),
     "PBP": ("People Before Profit–Solidarity", "PBP–S", None),
     "ANT": ("Aontú", None, None),
