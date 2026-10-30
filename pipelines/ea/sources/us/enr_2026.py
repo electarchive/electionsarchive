@@ -712,7 +712,6 @@ def emit():
             print(f"local {state}: {matched} of {len(races)} feed races matched")
         for state, contest_key, contest, group, place in work:
             election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             if state not in sources:
                 publisher, site, _ = OFFICIAL[state]
                 title = f"Unofficial Election Night Results {DAY}: {state}"
@@ -787,25 +786,14 @@ def emit():
                 if state == "FL"
                 else group.select(pl.col("reporting").max(), pl.col("total").max()).row(0)
             )
-            as_of = group["as_of"].drop_nulls().max()
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="preliminary",
-                kind="counted",
-                status="active",
-                source_id=sources[state],
-                as_of=datetime.fromisoformat(as_of) if as_of else datetime.now(UTC),
-                is_default=conn.execute(
-                    "select 1 from result_set where contest_id = %s and is_default and id <> %s limit 1",
-                    [contest, result_set],
-                ).fetchone()
-                is None,
-                completeness=reporting[0] / reporting[1] if reporting[1] else None,
+            stamp = group["as_of"].drop_nulls().max()
+            as_of = (
+                datetime.fromisoformat(str(stamp))
+                if stamp
+                else datetime.strptime(next(iter(pages[state].values())).rsplit("@", 1)[1], "%Y%m%dT%H%M%SZ").replace(
+                    tzinfo=UTC
+                )
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
             sums: dict[tuple[UUID, UUID], int] = {}
             for county, name, votes in group.select("county", "candidate", "votes").iter_rows():
                 option = ballots.get(name)
@@ -820,6 +808,66 @@ def emit():
                     unmatched.append(f"{contest_key}: no county {county}")
                     continue
                 sums[(unit, option)] = sums.get((unit, option), 0) + votes
+            frames = conn.execute(
+                """select r.id, r.k, r.is_default, r.as_of, r.completeness from result_set r
+                   where r.contest_id = %s and r.source_id = %s and r.stage = 'preliminary' and r.status = 'active'
+                   order by r.as_of desc""",
+                [contest, sources[state]],
+            ).fetchall()
+            if not any(sums.values()) or (
+                frames
+                and (
+                    frames[0][3] > as_of
+                    or {
+                        (unit, option): int(value)
+                        for unit, option, value in conn.execute(
+                            """select u.id, o.id, v.value from result_value v join reporting_unit u on u.k = v.unit_k
+                           join contest_option o on o.k = v.option_k where v.result_set_k = %s and v.measure = 1""",
+                            [frames[0][1]],
+                        ).fetchall()
+                    }
+                    == sums
+                )
+            ):
+                continue
+            result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}@{as_of.astimezone(UTC):%Y%m%dT%H%M%SZ}")
+            is_default = (
+                conn.execute(
+                    "select 1 from result_set where contest_id = %s and is_default and source_id <> %s limit 1",
+                    [contest, sources[state]],
+                ).fetchone()
+                is None
+            )
+            if is_default:
+                for frame, _, was_default, frame_as_of, completeness in frames:
+                    if was_default and frame != result_set:
+                        cs.add(
+                            "result_set",
+                            id=frame,
+                            election_id=election,
+                            contest_id=contest,
+                            stage="preliminary",
+                            kind="counted",
+                            status="active",
+                            source_id=sources[state],
+                            as_of=frame_as_of,
+                            is_default=False,
+                            completeness=completeness,
+                        )
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="preliminary",
+                kind="counted",
+                status="active",
+                source_id=sources[state],
+                as_of=as_of,
+                is_default=is_default,
+                completeness=reporting[0] / reporting[1] if reporting[1] else None,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
             for (unit, option), votes in sums.items():
                 cs.add(
                     "result_value",
