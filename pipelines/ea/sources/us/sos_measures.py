@@ -398,6 +398,7 @@ AK_STATEWIDE = {
     date(2008, 11, 4): "results (1).pdf",
     date(2010, 8, 24): "results (5).pdf",
 }
+AK_2000 = "https://web.archive.org/web/2id_/http://www.elections.alaska.gov/results/00GENR/data/results.txt"
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
     "1": ((189032, 50111), ((0.7028, 0.7753, 0.7186, 0.8481), (0.7028, 0.6962, 0.7186, 0.7721))),
@@ -1120,6 +1121,7 @@ def fetch() -> None:
         for path in paths:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
+    raw.fetch(SOURCE, AK_2000, suffix=".txt")
     for path, _ in WY_FILES.values():
         raw.fetch(SOURCE, WY + path, suffix=".pdf")
         time.sleep(1)
@@ -1727,6 +1729,31 @@ def alaska() -> list[dict[str, object]]:
                             "votes": count,
                         }
                     )
+    measure_votes: dict[int, dict[str, int]] = {}
+    current = 0
+    for line in raw.cached(SOURCE, AK_2000).path.read_text(encoding="latin-1").splitlines():
+        if line[:1].isdigit():
+            if re.match(r'\d+ \d+ "(?:Const\. Am\.|Initiative|Referendum)', line):
+                current += 1
+                measure_votes[current] = {}
+            else:
+                current = 0
+        elif current and (answer := re.fullmatch(r'\s+\d+ \d+ "(YES|NO)" "" 0 (\d+)', line)):
+            measure_votes[current][answer[1]] = int(answer[2])
+    for number, votes in measure_votes.items():
+        for answer, count in votes.items():
+            rows.append(
+                {
+                    "state": "AK",
+                    "day": date(2000, 11, 7),
+                    "number": str(number),
+                    "label": "",
+                    "url": AK_2000,
+                    "county": "statewide",
+                    "answer": answer,
+                    "votes": count,
+                }
+            )
     for year, district, path in ak_sovc.files():
         url = f"manual://MF-266/{year}/{path.name}"
         for title, _, columns in ak_sovc.read(raw.cached(ak_sovc.SOURCE, url).path, year):
