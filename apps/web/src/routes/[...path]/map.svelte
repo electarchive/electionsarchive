@@ -1378,7 +1378,7 @@
         id: "fill",
         type: "fill",
         ...areas,
-        filter: inland,
+        filter: own == null ? inland : ["all", inland, ["!", around]],
         paint: {
           "fill-color": [
             "coalesce",
@@ -1480,61 +1480,9 @@
           type: "fill",
           ...ownAreas,
           filter: beyond,
-          paint: {
-            "fill-color": "var(--card)",
-            "fill-opacity": [
-              "case",
-              ["boolean", ["feature-state", "near"], false],
-              0.35,
-              0.6,
-            ],
-          },
+          paint: { "fill-color": "var(--card)", "fill-opacity": 0 },
         },
         "fills",
-      );
-      engine.add(
-        {
-          id: "rim",
-          type: "line",
-          ...areas,
-          filter: ["all", inland, around],
-          paint: {
-            "line-color":
-              "color-mix(in oklab, var(--foreground) 13%, transparent)",
-            "line-width": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              4,
-              0.4,
-              10,
-              0.9,
-            ],
-          },
-        },
-        "lines",
-      );
-      engine.add(
-        {
-          id: "border",
-          type: "line",
-          ...ownAreas,
-          filter: beyond,
-          paint: {
-            "line-color":
-              "color-mix(in oklab, var(--foreground) 30%, transparent)",
-            "line-width": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              4,
-              0.6,
-              10,
-              1.2,
-            ],
-          },
-        },
-        "lines",
       );
       engine.add(
         {
@@ -1701,7 +1649,7 @@
   );
 
   $effect(() => {
-    if (isBasemap && own != null) {
+    if (own != null) {
       void orpc.contests.outline.call({ k: own.k }).then(
         (found) => {
           outline = found;
@@ -1715,10 +1663,10 @@
     if (engine.gl == null) {
       return;
     }
-    basemap(engine, scheme, isBasemap && outline != null, outline ?? [], [
-      ["fill", around],
-      ["veil", around],
-    ]);
+    const shown = isHexView ? null : outline;
+    const isDetailed = isBasemap;
+    const polity = scheme;
+    untrack(() => basemap(engine, polity, isDetailed, shown));
   });
 
   $effect(() => {
@@ -3157,7 +3105,7 @@
       {#if credited.length > 0}
         <p>{m.map_water_credit()}</p>
       {/if}
-      {#if isBasemap && SCHEMES.has(scheme)}
+      {#if !isHexView && SCHEMES.has(scheme)}
         <p>{m.map_basemap_credit()}</p>
       {/if}
     </div>

@@ -6,7 +6,14 @@ import { isHover, isTouch } from "#lib/explain.svelte.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
 type Padding = { top: number; right: number; bottom: number; left: number };
-type Slot = "fills" | "etch" | "lines" | "points" | "labels" | "focus";
+type Slot =
+  | "ground"
+  | "fills"
+  | "etch"
+  | "lines"
+  | "points"
+  | "labels"
+  | "focus";
 type Paint =
   Parameters<Maplibre.Map["setPaintProperty"]> extends [
     string,
@@ -34,6 +41,7 @@ type Options = {
 };
 
 const SLOTS: Array<Slot> = [
+  "ground",
   "fills",
   "etch",
   "lines",
@@ -911,22 +919,6 @@ export class Engine {
 
   has(id: string) {
     return this.#layers.has(id);
-  }
-
-  lift(id: string, filter: Maplibre.ExpressionSpecification, group: string) {
-    const spec = this.#layers.get(id)?.spec;
-    if (spec?.type !== "fill" && spec?.type !== "line") {
-      return;
-    }
-    this.add(
-      {
-        ...spec,
-        id: `${id}:lifted`,
-        filter: spec.filter == null ? filter : ["all", spec.filter, filter],
-      } as Maplibre.LayerSpecification,
-      "etch",
-      { group },
-    );
   }
 
   filter(id: string, filter: Maplibre.FilterSpecification | null) {

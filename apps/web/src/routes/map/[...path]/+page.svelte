@@ -1061,7 +1061,9 @@
 
   $effect(() => {
     if (engine.gl != null) {
-      basemap(engine, scheme, isBasemap, [], []);
+      const isDetailed = isBasemap;
+      const polity = scheme;
+      untrack(() => basemap(engine, polity, isDetailed, []));
     }
   });
 
@@ -2627,7 +2629,7 @@
               })}
         </p>
         <p class="truncate">{m.map_water_credit()}</p>
-        {#if isBasemap && SCHEMES.has(scheme)}
+        {#if SCHEMES.has(scheme)}
           <p class="truncate">{m.map_basemap_credit()}</p>
         {/if}
       </div>

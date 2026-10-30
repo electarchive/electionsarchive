@@ -13,7 +13,7 @@ from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont
 from pmtiles.reader import MmapSource, Reader
 from pyproj import Transformer
-from shapely import affinity, box, clip_by_rect, make_valid, unary_union
+from shapely import affinity, box, clip_by_rect, get_dimensions, make_valid, unary_union
 from shapely.geometry import Point, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.prepared import PreparedGeometry, prep
@@ -43,6 +43,7 @@ COUNTRIES = {
 }
 BANDS = {6: (0, 7), 8: (8, 9), 10: (10, 12)}
 METRO = 500_000
+MARGIN = 8
 ROADS = {
     "motorway": ("highway", 4),
     "trunk": ("highway", 5),
@@ -102,9 +103,18 @@ def walk(coords, fn):
     return [walk(part, fn) for part in coords]
 
 
-def emit(geometry: dict, z: int, x: int, y: int, layer: str, props: dict, zooms: tuple[int, int]) -> str | None:
+def emit(
+    geometry: dict | BaseGeometry,
+    z: int,
+    x: int,
+    y: int,
+    layer: str,
+    props: dict,
+    zooms: tuple[int, int],
+    outside: bool = False,
+) -> str | None:
     span, extent = 2**z, 4096
-    raw_shape = shape(geometry)
+    raw_shape = geometry if isinstance(geometry, BaseGeometry) else shape(geometry)
     if raw_shape.geom_type == "Point":
         if not (0 <= raw_shape.x < extent and 0 <= raw_shape.y < extent):
             return None
@@ -131,11 +141,18 @@ def emit(geometry: dict, z: int, x: int, y: int, layer: str, props: dict, zooms:
         None,
     )
     if zone is None:
-        return None
+        if not outside:
+            return None
+        zone = zones[-1]
     _, clip, project, scaling = zone
     if clip is not None:
         geom = clip_by_rect(geom, *clip)
-    if not inside.contains(geom):
+    if outside:
+        english = props.get("en")
+        props = {key: value for key, value in props.items() if key != "en"}
+        if "name" in props and not inside.contains(geom):
+            props |= {"out": 1, "name": english or props["name"]}
+    elif not inside.contains(geom):
         if not inside.intersects(geom):
             return None
         geom = make_valid(geom).intersection(land)
@@ -160,21 +177,30 @@ def emit(geometry: dict, z: int, x: int, y: int, layer: str, props: dict, zooms:
     )
 
 
-def work(job: tuple[str, int, int, int, bool]) -> list[tuple[str, str]]:
-    path, z, x, y, metro = job
+def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | None]) -> list[tuple[str, str]]:
+    path, z, x, y, metro, rest = job
     with open(path, "rb") as f:
         data = Reader(MmapSource(f)).get(z, x, y)
     if not data:
         return []
     tile = mapbox_vector_tile.decode(gzip.decompress(data), default_options={"y_coord_down": True})
     low, high = (10, 14) if metro else BANDS[z]
+    spare = None if rest is None else box(0, 0, 4096, 4096).difference(unary_union([box(*r) for r in rest]))
     out = []
 
-    def push(feature: dict, layer: str, props: dict, minzoom: int) -> None:
-        if max(low, minzoom) <= high:
-            row = emit(feature["geometry"], z, x, y, layer, props, (max(low, minzoom), high))
-            if row is not None:
-                out.append((layer, row))
+    def push(geometry: dict | BaseGeometry, layer: str, props: dict, minzoom: int, outside: bool = False) -> None:
+        geometry = geometry if isinstance(geometry, BaseGeometry) else shape(geometry)
+        bands = [(low, high, geometry)]
+        if outside and spare is not None and not spare.is_empty:
+            piece = make_valid(geometry).intersection(spare)
+            if piece.geom_type == "GeometryCollection":
+                piece = unary_union([g for g in piece.geoms if get_dimensions(g) == get_dimensions(geometry)])
+            bands.append((high + 1, 12, piece))
+        for start, end, part in bands:
+            if max(start, minzoom) <= end and not part.is_empty:
+                row = emit(part, z, x, y, layer, props, (max(start, minzoom), end), outside)
+                if row is not None:
+                    out.append((layer, row))
 
     for feature in tile.get("places", {}).get("features", []):
         p = feature["properties"]
@@ -184,8 +210,14 @@ def work(job: tuple[str, int, int, int, bool]) -> list[tuple[str, str]]:
         if p.get("kind") == "locality" and not metro:
             mz = float(p.get("min_zoom") or 12)
             tier = 0 if mz <= 4 else 1 if mz <= 6 else 2 if mz <= 8 else 3
-            props = {"name": name, "pop": int(p.get("population") or 0), "tier": tier, "mz": mz}
-            row = emit(feature["geometry"], z, x, y, "places", props, (min(12, max(0, math.floor(mz) - 1)), 12))
+            props = {
+                "name": name,
+                "en": p.get("name:en"),
+                "pop": int(p.get("population") or 0),
+                "tier": tier,
+                "mz": mz,
+            }
+            row = emit(feature["geometry"], z, x, y, "places", props, (min(12, max(0, math.floor(mz) - 1)), 12), True)
             if row is not None:
                 out.append(("places", row))
         elif p.get("kind") in ("neighbourhood", "macrohood") and metro:
@@ -194,12 +226,26 @@ def work(job: tuple[str, int, int, int, bool]) -> list[tuple[str, str]]:
             row = emit(feature["geometry"], z, x, y, "hoods", props, (8 if pop >= 250_000 else 10, 14))
             if row is not None:
                 out.append(("hoods", row))
+    earth = (
+        [] if metro else [f for f in tile.get("earth", {}).get("features", []) if "Polygon" in f["geometry"]["type"]]
+    )
+    for feature in earth:
+        push(feature["geometry"], "earth", {}, 0, True)
+    ground = unary_union([make_valid(shape(f["geometry"])) for f in earth]) if earth else None
+    for feature in [] if ground is None else tile.get("boundaries", {}).get("features", []):
+        kind = feature["properties"].get("kind")
+        if kind not in ("country", "region", "county"):
+            continue
+        cut = shape(feature["geometry"]).intersection(ground)
+        lines = [part for part in getattr(cut, "geoms", [cut]) if "LineString" in part.geom_type]
+        if lines:
+            push(unary_union(lines), "bounds", {"kind": kind}, 8 if kind == "county" else 0, True)
     for feature in [] if metro else tile.get("water", {}).get("features", []):
         p = feature["properties"]
         if "Polygon" in feature["geometry"]["type"] and p.get("kind") != "ocean":
-            push(feature, "water", {"kind": p.get("kind", "")}, 0)
+            push(feature["geometry"], "water", {"kind": p.get("kind", "")}, 0, True)
         elif p.get("kind") in ("river", "canal"):
-            push(feature, "rivers", {"kind": p["kind"]}, 7)
+            push(feature["geometry"], "rivers", {"kind": p["kind"]}, 7, True)
     for feature in tile.get("roads", {}).get("features", []):
         p = feature["properties"]
         if p.get("is_tunnel"):
@@ -222,7 +268,7 @@ def work(job: tuple[str, int, int, int, bool]) -> list[tuple[str, str]]:
                 minzoom,
             )
         elif metro and p.get("kind") == "rail" and detail not in ("subway", "station", "ventilation_shaft"):
-            push(feature, "streets", {"kind": "rail", "name": ""}, 10)
+            push(feature["geometry"], "streets", {"kind": "rail", "name": ""}, 10)
     return out
 
 
@@ -257,10 +303,28 @@ def build(scheme: str) -> str:
         if old != folder:
             shutil.rmtree(old)
     country = folder / f"{scheme}.pmtiles"
-    extract(key, country, unary_union([box(*b) for zone in zones for b in zone[0]]), 0, 10)
-    jobs = [
-        (str(country), *t, False) for t in {t for z in BANDS for zone in zones for b in zone[0] for t in tiles(z, *b)}
-    ]
+    core = [b for zone in zones for b in zone[0]]
+    extract(key, country, unary_union([box(*b) for b in core]), 0, 10)
+    wide = unary_union(
+        [box(*b) for b in core]
+        + [box(w - MARGIN, max(s - MARGIN, -80), e + MARGIN, min(n + MARGIN, 80)) for w, s, e, n in zones[-1][0]]
+    )
+    broad = folder / f"{scheme}.wide.pmtiles"
+    extract(key, broad, wide, 0, 8)
+    fine = {z: {t for b in core for t in tiles(z, *b)} for z in (8, 10)}
+    jobs = []
+    for z, path, area, finer in (
+        (6, broad, getattr(wide, "geoms", [wide]), fine[8]),
+        (8, country, [box(*b) for b in core], fine[10]),
+    ):
+        for t in {t for part in area for t in tiles(z, *part.bounds)}:
+            covered = [
+                ((cx % 4) * 1024, (cy % 4) * 1024, (cx % 4 + 1) * 1024, (cy % 4 + 1) * 1024)
+                for _, cx, cy in finer
+                if cx // 4 == t[1] and cy // 4 == t[2]
+            ]
+            jobs.append((str(path), *t, False, None if len(covered) == 16 else covered))
+    jobs += [(str(country), *t, False, None) for t in fine[10]]
     found = []
     with open(country, "rb") as f:
         reader = Reader(MmapSource(f))
@@ -295,7 +359,7 @@ def build(scheme: str) -> str:
         extract(key, city, metros, 14, 14)
         covered = prep(metros)
         jobs += [
-            (str(city), z, x, y, True)
+            (str(city), z, x, y, True, None)
             for z, x, y in {t for b in getattr(metros, "geoms", [metros]) for t in tiles(14, *b.bounds)}
             if covered.intersects(
                 box(
@@ -329,7 +393,7 @@ def build(scheme: str) -> str:
     OUT.mkdir(parents=True, exist_ok=True)
     sizes = []
     for name, layers, low, high in (
-        (scheme, ("places", "water", "rivers", "roads"), 0, 12),
+        (scheme, ("earth", "bounds", "places", "water", "rivers", "roads"), 0, 12),
         (f"{scheme}.metro", ("streets", "hoods"), 8, 14),
     ):
         target = OUT / f"{name}.pmtiles"
