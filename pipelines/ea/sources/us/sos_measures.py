@@ -305,6 +305,10 @@ UT_COUNTIES = (
     "Juab", "Kane", "Millard", "Morgan", "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete", "Sevier", "Summit",
     "Tooele", "Uintah", "Utah", "Wasatch", "Washington", "Wayne", "Weber",
 )
+WA_HISTORY = {
+    "Referendum Bill": "https://web.archive.org/web/20251017055222id_/https://apps.sos.wa.gov/elections/initiatives/statistics_referendumbills.aspx",
+    "Referendum Measure": "https://web.archive.org/web/20251017055222id_/https://apps.sos.wa.gov/elections/initiatives/statistics_referendummeasures.aspx",
+}
 OR_HISTORY = "https://web.archive.org/web/20251003191748id_/https://sos.oregon.gov/blue-book/Documents/elections/initiative.pdf"
 OR_2022 = "https://web.archive.org/web/20221219164703id_/https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
 OR_COUNTIES = (
@@ -1149,6 +1153,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, NY.format(stamp, path), suffix=Path(path).suffix)
         time.sleep(1)
     raw.fetch(SOURCE, OR_HISTORY, suffix=".pdf")
+    for url in WA_HISTORY.values():
+        raw.fetch(SOURCE, url, suffix=".html")
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
         time.sleep(1)
@@ -2926,6 +2932,43 @@ def rhode_island() -> list[dict[str, object]]:
     return rows
 
 
+def washington_history() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for kind, url in WA_HISTORY.items():
+        page = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace")
+        page = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", page, flags=re.S)
+        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", page)))
+        parts = re.split(r"REFERENDUM (?:BILL|MEASURE) NO\. (\d+(?: [A-Z])?)", text)
+        for number, block in zip(parts[1::2], parts[2::2], strict=True):
+            held = re.search(r"(?:held on|at the) ([A-Z][a-z]+ \d+, ?\d{4})", block)
+            vote = re.search(r"For\s*[-–—\s]*([\d,]+)\s*Against\s*[-–—\s]*([\d,]+)", block)
+            if held is None or vote is None:
+                continue
+            day = datetime.strptime(re.sub(r",(?=\d)", ", ", held[1]), "%B %d, %Y").date()
+            if day.year >= 2000:
+                continue
+            head = re.split(r"\bFiled\b|\bThe measure was\b", block)[0]
+            title = (re.search(r"\((.*)\)", head) or re.search(r"(.*)", head))[1].strip()
+            title = re.sub(r"^Chapter [^,]+, Laws of [\d-]+(?:,[^,(]*Session)?\.?,?\s*", "", title).strip(" .")
+            number = number.replace(" ", "")
+            for answer, count in zip(("YES", "NO"), vote.groups(), strict=True):
+                rows.append(
+                    {
+                        "state": "WA",
+                        "day": day,
+                        "number": f"{kind[0]}{number}",
+                        "label": f"{kind} {number}",
+                        "url": url,
+                        "county": "statewide",
+                        "answer": answer,
+                        "votes": int(count.replace(",", "")),
+                        "title": title,
+                        "kind": "Legislative Referendum" if kind.endswith("Bill") else "Popular Referendum",
+                    }
+                )
+    return rows
+
+
 def oregon_history() -> list[dict[str, object]]:
     lines = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, OR_HISTORY).path), "-"], capture_output=True, text=True, check=True
@@ -3883,6 +3926,7 @@ def parse() -> None:
             *washington(),
             *oregon(),
             *oregon_history(),
+            *washington_history(),
             *florida(),
             *oklahoma(),
             *ohio(),
