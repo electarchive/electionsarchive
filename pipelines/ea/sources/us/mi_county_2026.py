@@ -27,16 +27,190 @@ COUNTIES = {
         "macomb-county-mi/elect-2026-11-03-proposals.pdf",
         "Macomb County Clerk",
     ),
+    "26125": (
+        "https://www.oakgov.com/media/12731/download",
+        "../MF-376/MI-Oakland/11032026-proposal-list.pdf",
+        "Oakland County Clerk",
+    ),
+    "26163": (
+        "https://www.waynecounty.com/documents/clerk/official-proposal-list_november-3-2026.pdf",
+        "../MF-376/MI-Wayne/official-proposal-list_november-3-2026-2_1.pdf",
+        "Wayne County Clerk",
+    ),
+    "26139": (
+        "https://www.miottawa.org/Elections/proposalFile-226.pdf",
+        "../MF-376/MI-Ottawa/proposalFile-226.pdf",
+        "Ottawa County Clerk",
+    ),
 }
 PAGED = {"26099"}
 TITLE = "Official candidates and proposals list, November 3, 2026 general election"
 CENTERED = re.compile(r"^\s{40,}\S")
-NOISE = re.compile(r"^\s*(Updated \d|.*November 3, 2026 General Election\s+Page|Official Candidates and Proposals List|November 3, 2026 General Election\s*$)")
-SECTIONS = {"County Proposals", "City/Township Proposals", "Local School District", "Local School Districts", "Other Proposals", "Library Proposals"}
+NOISE = re.compile(
+    r"^\s*(Updated \d|.*November 3, 2026 General Election\s+Page|Official Candidates and Proposals List|November 3, 2026 General Election\s*$)"
+)
+SECTIONS = {
+    "County Proposals",
+    "City/Township Proposals",
+    "Local School District",
+    "Local School Districts",
+    "Other Proposals",
+    "Library Proposals",
+}
+
+
+LABELISH = re.compile(r"Millage|Amendment|Proposal|Proposed|Bond|Charter|Question|Renewal|Counties of")
+
+
+def tidy(name: str) -> str:
+    return re.sub(r"^(.+?) Charter Township$", r"Charter Township of \1", name)
+
+
+def oakland_new(section: str, head: str) -> bool:
+    if section in {"City", "Village"}:
+        return LABELISH.search(head) is None
+    if section == "Township":
+        return re.fullmatch(r"[A-Z][a-z]+(?: [A-Z][a-z]+)? Township", head) is not None
+    if section == "Local School District":
+        return re.search(r"(Schools|School District)$", head) is not None and LABELISH.search(head) is None
+    return True
+
+
+def ottawa_new(section: str, head: str) -> bool:
+    return (
+        re.search(r"^(City|Village) of |Township$|Schools?$|School District$|County$|District$|Authority$", head)
+        is not None
+    )
+
+
+def centered(
+    county: str,
+    url: str,
+    text: str,
+    start: str,
+    prefixes: dict[str, str],
+    noise: re.Pattern[str],
+    threshold: int,
+    is_new,
+) -> list[dict[str, str]]:
+    lines = text.replace("\f", "\n").split("\n")
+    begin = next(index for index, line in enumerate(lines) if line.strip() == start)
+    rows = []
+    section = ""
+    jurisdiction = ""
+    heads: list[str] = []
+    body: list[str] = []
+
+    def flush() -> None:
+        nonlocal jurisdiction, heads, body
+        if heads and body:
+            if is_new(section, heads[0]) or not jurisdiction:
+                jurisdiction, labels = heads[0], heads[1:]
+            else:
+                labels = heads
+            rows.append(
+                {
+                    "county": county,
+                    "jurisdiction": tidy(prefixes.get(section, "") + jurisdiction),
+                    "label": " – ".join(labels),
+                    "wording": re.sub(r"\s+", " ", " ".join(body)).strip(),
+                    "url": url,
+                }
+            )
+        heads, body = [], []
+
+    for line in lines[begin:]:
+        if not line.strip() or noise.match(line):
+            continue
+        label = line.strip()
+        if re.match(rf"^\s{{{threshold},}}\S", line):
+            if label in prefixes or label.endswith(" Proposals"):
+                flush()
+                section = label
+                continue
+            if body:
+                flush()
+            heads.append(label)
+        else:
+            body.append(label)
+    flush()
+    return rows
+
+
+def oakland(county: str, url: str, text: str) -> list[dict[str, str]]:
+    noise = re.compile(
+        r"^\s*(Updated \d|Oakland County\s*$|Official Proposal List|November 3, 2026 General Election\s*$|County of Oakland\s*$|State of Michigan\s*$)"
+    )
+    prefixes = {
+        "Authority": "",
+        "City": "City of ",
+        "Township": "",
+        "Village": "Village of ",
+        "Community College": "",
+        "Local School District": "",
+    }
+    rows = centered(county, url, text, "Authority", prefixes, noise, 40, oakland_new)
+    for row in rows:
+        if row["jurisdiction"] == "Millage Proposal":
+            row["jurisdiction"] = "Southeast Michigan Public Historical Museum Authority"
+            row["label"] = "Millage Proposal"
+    for row in rows:
+        row["label"] = row["label"] or row["jurisdiction"]
+    return rows
+
+
+def ottawa(county: str, url: str, text: str) -> list[dict[str, str]]:
+    noise = re.compile(r"^\s*(\d+/\d+/\d{4}|Official List of Proposals)")
+    rows = centered(county, url, text, "County Proposals", {}, noise, 60, ottawa_new)
+    for row in rows:
+        row["label"] = row["label"] or row["jurisdiction"]
+    return rows
+
+
+def wayne(county: str, url: str, text: str) -> list[dict[str, str]]:
+    lines = [line.strip() for line in text.replace("\f", "\n").split("\n") if line.strip()]
+    lines = [
+        line for line in lines if not re.match(r"(\d+/\d+/\d{4} \d|11/03/2026 - STATE GENERAL|WAYNE \(82\))", line)
+    ]
+    blocks: list[tuple[str, list[str]]] = []
+    for line in lines:
+        if re.fullmatch(r"[A-Z0-9 /&,.'’()-]+ PROPOSALS?", line) and line != "PROPOSAL":
+            blocks.append((line.rsplit(" PROPOSAL", 1)[0].split(" / ")[-1].title().replace(" Of ", " of "), []))
+        elif blocks:
+            blocks[-1][1].append(line)
+    rows = []
+    for jurisdiction, block in blocks:
+        kept = [line for line in block if not re.fullmatch(r"(County of Wayne|State of Michigan)", line, re.IGNORECASE)]
+        kept = [line for line in kept if line.lower() != jurisdiction.lower()]
+        parts: list[dict[str, list[str] | str]] = []
+        for index, line in enumerate(kept):
+            before = kept[index - 1] if index else ""
+            if not parts or (len(line) < 100 and not re.search(r"[.?:,;]$", line) and re.search(r"[.?]$", before)):
+                parts.append({"label": line, "body": []})
+            else:
+                parts[-1]["body"].append(line)
+        for part in parts:
+            label = str(part["label"])
+            body = list(part["body"])
+            if label.endswith(" for the") and body:
+                label = f"{label} {body[0].split(' which ')[0]}"
+            rows.append(
+                {
+                    "county": county,
+                    "jurisdiction": tidy(jurisdiction),
+                    "label": label.title() if label.isupper() else label,
+                    "wording": re.sub(r"\s+", " ", " ".join(body)).strip(),
+                    "url": url,
+                }
+            )
+    return rows
+
+
+PARSERS = {"26125": oakland, "26163": wayne, "26139": ottawa}
 
 
 def fetch() -> None:
-    for county, (url, file, _) in COUNTIES.items():
+    for url, file, _ in COUNTIES.values():
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -82,6 +256,9 @@ def parse() -> None:
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
         ).stdout
+        if county in PARSERS:
+            rows.extend(PARSERS[county](county, url, text))
+            continue
         if county in PAGED:
             rows.extend(paged_rows(county, url, text))
             continue
@@ -126,7 +303,7 @@ def parse() -> None:
                 }
             )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(rows).unique(["jurisdiction", "label"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "questions.parquet")
     print(frame.height)
 
@@ -170,8 +347,12 @@ def emit() -> Path:
             if jurisdiction.lower().startswith(("city of", "village of")):
                 options = names.get(ceda._city(re.sub(r"(?i)^(city|village) of ", "", jurisdiction)), [])
             else:
-                options = names.get(ceda._core(re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 \1", jurisdiction)), [])
-            options = [option for option in options if not option.startswith("us.town:") or option[8:13] == row["county"]]
+                options = names.get(
+                    ceda._core(re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 \1", jurisdiction)), []
+                )
+            options = [
+                option for option in options if not option.startswith("us.town:") or option[8:13] == row["county"]
+            ]
             if not options and re.search(r"authority|district", jurisdiction, re.IGNORECASE):
                 county_key = f"us.county:{row['county']}"
                 if county_key in found:
@@ -201,7 +382,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:MI:{code}:measure:{slug(label)}"
@@ -222,7 +410,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):
