@@ -22,6 +22,9 @@ WORK = DATA / "work" / "hexes"
 OUT = ROOT / "apps" / "web" / "src" / "lib" / "server" / "hex"
 UNIT = 50
 CREDIT = "third-party US House layout, since removed"
+GRIDS = Path(__file__).parent / "hexgrid"
+ELECTIONS = range(1992, 2027, 2)
+INSETS = {"PR": "72", "VI": "78", "GU": "66", "AS": "60", "MP": "69"}
 
 
 def fetch(congress: int) -> Path:
@@ -115,6 +118,142 @@ def layout(shapes: dict[str, BaseGeometry]) -> dict:
     }
 
 
+def grid(path: Path) -> dict[tuple[int, int], str]:
+    lines = path.read_text().rstrip("\n").split("\n")
+    offset = 1 if lines[0].startswith("  ") else 0
+    cells = {}
+    for index, line in enumerate(lines):
+        for q, token in enumerate(line.split()):
+            if token != "..":
+                cells[(q, index + offset)] = token
+    return cells
+
+
+def center(q: int, r: int) -> tuple[float, float]:
+    return (math.sqrt(3) * (q + (r & 1) / 2), 1.5 * r)
+
+
+def ahead(q: int, r: int) -> list[tuple[int, int]]:
+    odd = r & 1
+    return [(q + odd, r - 1), (q + 1, r), (q + odd, r + 1)]
+
+
+def match(cost: list[list[float]]) -> list[int]:
+    n = len(cost)
+    u, v, owner, way = [0.0] * (n + 1), [0.0] * (n + 1), [0] * (n + 1), [0] * (n + 1)
+    for row in range(1, n + 1):
+        owner[0] = row
+        column = 0
+        least = [math.inf] * (n + 1)
+        used = [False] * (n + 1)
+        while owner[column] != 0:
+            used[column] = True
+            current, delta, step = owner[column], math.inf, 0
+            for j in range(1, n + 1):
+                if used[j]:
+                    continue
+                value = cost[current - 1][j - 1] - u[current] - v[j]
+                if value < least[j]:
+                    least[j], way[j] = value, column
+                if least[j] < delta:
+                    delta, step = least[j], j
+            for j in range(n + 1):
+                if used[j]:
+                    u[owner[j]] += delta
+                    v[j] -= delta
+                else:
+                    least[j] -= delta
+            column = step
+        while column != 0:
+            previous = way[column]
+            owner[column] = owner[previous]
+            column = previous
+    picked = [0] * n
+    for j in range(1, n + 1):
+        picked[owner[j] - 1] = j - 1
+    return picked
+
+
+def normal(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    mx = sum(x for x, _ in points) / len(points)
+    my = sum(y for _, y in points) / len(points)
+    spread = math.sqrt(sum((x - mx) ** 2 + (y - my) ** 2 for x, y in points) / len(points)) or 1
+    return [((x - mx) / spread, (y - my) / spread) for x, y in points]
+
+
+def centers(year: int) -> dict[str, tuple[float, float]]:
+    with connect() as db:
+        rows = db.execute(
+            """
+            select ac.code, st_x(p), st_y(p)
+            from area a
+            join area_code ac on ac.area_id = a.id and ac.valid @> make_date(%s, 11, 8)
+            join area_geometry g on g.area_id = a.id and g.valid @> make_date(%s, 11, 8),
+            lateral st_pointonsurface(st_transform(g.geom, 5070)) p
+            where a.scheme_code = 'us.cd'
+            """,
+            (year, year),
+        ).fetchall()
+    return {code: (x, y) for code, x, y in rows}
+
+
+def outline(cells: dict[tuple[int, int], str]) -> dict:
+    fips = STATE_FIPS | INSETS
+    edges = []
+    for (q, r), token in sorted(cells.items()):
+        for side, other in enumerate(ahead(q, r)):
+            if other in cells and cells[other] != token:
+                edges.append([q, -r, side + 1])
+    groups: dict[str, list[tuple[float, float, int, int]]] = {}
+    for (q, r), token in cells.items():
+        groups.setdefault(token, []).append((*center(q, r), q, r))
+    labels = {}
+    for token, spots in groups.items():
+        mx = sum(spot[0] for spot in spots) / len(spots)
+        my = sum(spot[1] for spot in spots) / len(spots)
+        _, _, q, r = min(spots, key=lambda spot: (spot[0] - mx) ** 2 + (spot[1] - my) ** 2)
+        labels[fips[token]] = [q, -r]
+    return {"boundaries": {"states": edges}, "labels": dict(sorted(labels.items()))}
+
+
+def tiles(year: int, cells: dict[tuple[int, int], str]) -> tuple[dict[str, list[int]], list[str]]:
+    fips = STATE_FIPS | INSETS
+    points = centers(year)
+    groups: dict[str, list[tuple[int, int]]] = {}
+    for cell, token in cells.items():
+        groups.setdefault(token, []).append(cell)
+    hexes: dict[str, list[int]] = {}
+    problems = []
+    for token, spots in sorted(groups.items()):
+        codes = sorted(code for code in points if code[:2] == fips[token])
+        if not codes:
+            continue
+        if len(codes) != len(spots):
+            problems.append(f"{token} {len(codes)} districts for {len(spots)} cells")
+            continue
+        real = normal([(points[code][0], -points[code][1]) for code in codes])
+        plane = normal([center(*spot) for spot in spots])
+        cost = [[(x - a) ** 2 + (y - b) ** 2 for a, b in plane] for x, y in real]
+        for code, column in zip(codes, match(cost)):
+            q, r = spots[column]
+            hexes[code] = [q, -r]
+    return dict(sorted(hexes.items())), problems
+
+
+def build_tiles() -> str:
+    grids = {path.stem.rsplit("-", 1)[1]: grid(path) for path in sorted(GRIDS.glob("us-cd-*.txt"))}
+    years = {}
+    report = []
+    for year in ELECTIONS:
+        start = max(first for first in grids if int(first) <= year)
+        hexes, problems = tiles(year, grids[start])
+        years[str(year)] = {"grid": start, "hexes": hexes}
+        report.append(f"{year} (grid {start}): {len(hexes)} placed; {'; '.join(problems) or 'ok'}")
+    built = {"layout": "odd-r", "grids": {start: outline(cells) for start, cells in grids.items()}, "years": years}
+    (OUT / "us-cd-tiles.json").write_text(json.dumps(built, separators=(",", ":")) + "\n")
+    return "\n".join(report)
+
+
 def build() -> str:
     seen: dict[str, int] = {}
     report = []
@@ -134,4 +273,4 @@ def build() -> str:
             f" layout only {sorted(theirs - ours)}; ours only {sorted(ours - theirs)}"
         )
     (OUT / "us-cd.json").write_text(json.dumps(index, separators=(",", ":")) + "\n")
-    return "\n".join(report)
+    return "\n".join([*report, build_tiles()])

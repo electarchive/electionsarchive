@@ -76,7 +76,8 @@ def main() -> None:
     )
     commands.add_parser("glyphs", help="build the basemap label glyphs the app serves")
     commands.add_parser(
-        "hexes", help="build the US House district cartograms the app serves (run with uv run --with rdata)"
+        "hexes",
+        help="build the US House district cartograms and tile maps the app serves (run with uv run --with rdata)",
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
