@@ -32,6 +32,8 @@ COUNTIES = {
     "31109": ("NE", "https://www.lancaster.ne.gov/", "MF-390/LCEC General Sample Ballot.pdf"),
     "31079": ("NE", "https://files.hallcountyne.gov/", "MF-390/26GNEHALL_7_PUB.pdf"),
     "48135": ("TX", "https://www.ectorcountytx.gov/271/Elections", "MF-392/ector/Pct. 201, 202, 203, 204.3, 206.5, 209_ybmswlfq61.pdf"),
+    "48209": ("TX", "https://www.hayscountytx.gov/elections", "MF-392/hays/Hays County Combined Sample Ballot 11x17.pdf"),
+    "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
 }
 
 
