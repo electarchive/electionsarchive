@@ -129,7 +129,7 @@
 </script>
 
 <div class="grid grid-rows-[auto_auto_minmax(0,1fr)] block-full min-block-0">
-  <div class="flex flex-wrap items-center gap-1  border-be px-2 py-1">
+  <div class="flex flex-wrap items-center gap-1 border-be px-2 py-1">
     <Button
       variant="ghost"
       size="icon"
@@ -245,7 +245,7 @@
         ></div>
         {#if isActive}
           <span
-            class="pointer-events-none absolute -translate-y-full rounded-t-xs bg-foreground px-1 text-[11px]/4  whitespace-nowrap text-background"
+            class="pointer-events-none absolute -translate-y-full rounded-t-xs bg-foreground px-1 text-[11px]/4 whitespace-nowrap text-background"
             style:inset-inline-start="{mark.region[0] * 100}%"
             style:inset-block-start="{mark.region[1] * 100}%">{mark.label}</span
           >

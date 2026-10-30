@@ -4,8 +4,8 @@
   import XIcon from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
-  import type { Cells, Column, Table  } from "#lib/workspace.js";
-    import { Button } from "#lib/components/ui/button/index.js";
+  import type { Cells, Column, Table } from "#lib/workspace.js";
+  import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
