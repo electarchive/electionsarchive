@@ -1825,6 +1825,12 @@ NE_SOURCES = {
         "https://www.co.midland.mi.us/",
         "mi/midland.pdf",
     ),
+    "MI-26087": (
+        "Lapeer County Clerk",
+        "Lapeer County Schools Candidates for Member of Board of Education, November 3, 2026",
+        "https://www.lapeercounty.org/",
+        "mi/lapeer_schools.doc",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
