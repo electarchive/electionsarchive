@@ -532,7 +532,9 @@
     ),
   );
   let layout = $state<"map" | "cartogram" | "hexes">("hexes");
-  const hexed = $derived(covering(hexes, rows));
+  const hexed = $derived(
+    covering(hexes, { has: (k) => rows.has(k), size: places.rows.length }),
+  );
   const headings: Record<string, [number, number]> = {
     ArrowRight: [1, 0],
     ArrowLeft: [-1, 0],

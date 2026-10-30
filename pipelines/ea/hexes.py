@@ -121,7 +121,12 @@ TILES = {
     ),
     "de-wk": Tiles("de.wahlkreis", 25832, 0, LANDER, {2025: date(2025, 2, 23)}, parent="de.land"),
 }
-STATES = {"us": ("us.state", STATE_FIPS | INSETS)}
+STATES = {
+    "us": ("us.state", STATE_FIPS | INSETS),
+    "ch": ("ch.canton", {}),
+    "br": ("br.uf", {}),
+    "tr": ("tr.il", {}),
+}
 
 
 def fetch(congress: int) -> Path:

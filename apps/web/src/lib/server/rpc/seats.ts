@@ -225,7 +225,14 @@ const stated = async (id: string) => {
       union all
       select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
     ),
-    used as (select distinct c.district_area_id as id from contest c join tree on tree.id = c.election_id)
+    districts as (
+      select c.district_area_id as id, e.date_from from contest c join tree on tree.id = c.election_id join election e on e.id = c.election_id
+    ),
+    used as (
+      select id from districts
+      union
+      select ap.parent_id from districts d join area_parent ap on ap.area_id = d.id and ap.valid @> d.date_from
+    )
     select a.k, ac.code, s.path as polity, exists (select 1 from used where used.id = a.id) as "isUsed"
     from election e
     join slug ps on ps.entity_id = e.polity_id and ps.is_current
