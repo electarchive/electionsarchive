@@ -461,6 +461,7 @@ STATEWIDE = {
         "superintendent-of-public-instruction",
         "Superintendent of Public Instruction",
     ),
+    "chief financial officer": ("chief-financial-officer", "Chief Financial Officer"),
     "psc - district 3": ("public-service-commissioner:district-3", "Public Service Commissioner, District 3"),
     "psc - district 5": ("public-service-commissioner:district-5", "Public Service Commissioner, District 5"),
 }
@@ -486,6 +487,7 @@ PARTIES = {
     "democratic": ("dp", "democratic-party", "Democratic"),
     "republican": ("rp", "republican-party", "Republican"),
 }
+
 
 def cased(text: str) -> str:
     if not text.isupper():
@@ -738,8 +740,10 @@ def parse() -> None:
             for county, office, district, party, candidate, votes, *_ in pl.read_csv(
                 path, infer_schema=False
             ).iter_rows():
-                chamber = {"State House": "house", "State Representative": "house"}.get(office) or (
-                    "senate" if office in ("State Senate", "State Senator") else None
+                chamber = (
+                    {"State House": "house", "State Representative": "house"}.get(office)
+                    or ("senate" if office in ("State Senate", "State Senator") else None)
+                    or STATEWIDE.get(office.lower(), (None,))[0]
                 )
                 party = {"REP": "republican", "R": "republican", "DEM": "democratic", "D": "democratic"}.get(
                     party, (party or "").lower()
@@ -755,7 +759,9 @@ def parse() -> None:
                 rows.append(
                     (
                         chamber,
-                        re.sub(r"^(\d+)([AB])$", lambda match: f"{match[1]}-{match[2].lower()}", district),
+                        ""
+                        if chamber not in ("house", "senate")
+                        else re.sub(r"^(\d+)([AB])$", lambda match: f"{match[1]}-{match[2].lower()}", district),
                         party,
                         re.sub(r"\bMc(\w)", lambda match: f"Mc{match[1].upper()}", candidate.title())
                         if candidate.isupper()
@@ -779,13 +785,23 @@ def parse() -> None:
                         "CanNameMiddle",
                     )
                 )
-                if row["RaceCode"] not in ("STS", "STR") or row["PartyCode"] not in ("REP", "DEM") or key in seen:
+                if (
+                    row["RaceCode"] not in ("STS", "STR", "AGR", "CFO", "ATG")
+                    or row["PartyCode"] not in ("REP", "DEM")
+                    or key in seen
+                ):
                     continue
                 seen.add(key)
                 rows.append(
                     (
-                        "senate" if row["RaceCode"] == "STS" else "house",
-                        row["Juris1num"].lstrip("0"),
+                        {
+                            "STS": "senate",
+                            "STR": "house",
+                            "AGR": "commissioner-of-agriculture",
+                            "CFO": "chief-financial-officer",
+                            "ATG": "attorney-general",
+                        }[row["RaceCode"]],
+                        row["Juris1num"].lstrip("0") if row["RaceCode"] in ("STS", "STR") else "",
                         "republican" if row["PartyCode"] == "REP" else "democratic",
                         " ".join(
                             part for part in (row["CanNameFirst"], row["CanNameMiddle"], row["CanNameLast"]) if part
@@ -1708,7 +1724,11 @@ def emit() -> Path:
                 cs.add(
                     "slug",
                     path=f"us/{state.lower()}/{day}-{stage.replace(' ', '-')}/"
-                    + (f"state-{chamber}-{district.replace(':', '-')}-{party}" if district else f"{chamber.replace(':', '-')}-{party}"),
+                    + (
+                        f"state-{chamber}-{district.replace(':', '-')}-{party}"
+                        if district
+                        else f"{chamber.replace(':', '-')}-{party}"
+                    ),
                     entity_id=contest,
                 )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
