@@ -1,7 +1,13 @@
 import { error, redirect } from "@sveltejs/kit";
 import * as v from "valibot";
 import { view } from "#lib/server/rpc/proposals.js";
-import { latest, records, Workspace } from "#lib/server/workspace.js";
+import {
+  latest,
+  records,
+  sheet,
+  upload,
+  Workspace,
+} from "#lib/server/workspace.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({
@@ -32,12 +38,32 @@ export const load: PageServerLoad = async ({
   ) {
     redirect(303, `/proposals/${number}`);
   }
+  const output = workspace.output;
+  const looked = await records(
+    output.template === "results"
+      ? output.contests.map((contest) => contest.record)
+      : output.rows.map((row) => row.record),
+  );
+  const contests = new Set(
+    Object.values(looked).flatMap((item) =>
+      item.state === "found" && item.type === "contest" ? [item.id] : [],
+    ),
+  );
+  const id = output.template === "results" ? output.evidence?.upload : null;
   return {
     number,
     summary:
       typeof found.draft?.summary === "string" ? found.draft.summary : "",
-    workspace: workspace.output,
-    records: await records(workspace.output.rows.map((row) => row.record)),
+    workspace: output,
+    records: looked,
+    sheets: Object.fromEntries(
+      await Promise.all(
+        [...contests].map(
+          async (contest) => [contest, await sheet(contest)] as const,
+        ),
+      ),
+    ),
+    upload: id == null ? null : await upload(id, locals.user.id),
     check: await latest(number, "check"),
   };
 };

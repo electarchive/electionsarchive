@@ -2,6 +2,7 @@ import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Checks, Diff, NameKind, Scheme } from "#lib/contrib.js";
+import type { Sheet, Upload } from "#lib/sheet.js";
 import type { Lookup } from "#lib/workspace.js";
 import {
   hex,
@@ -9,10 +10,12 @@ import {
   nameKinds,
   schemes,
   sourceKinds,
+  stages,
 } from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
+import { outcomeKinds } from "#lib/sheet.js";
 
 const Line = (max: number) =>
   v.pipe(
@@ -38,7 +41,55 @@ const Evidence = v.nullish(
   null,
 );
 
+const Id = v.pipe(v.string(), v.uuid());
+const Fraction = v.pipe(v.number(), v.minValue(0), v.maxValue(1));
+const Region = v.pipe(
+  v.tuple([Fraction, Fraction, Fraction, Fraction]),
+  v.check(([x0, y0, x1, y1]) => x0 < x1 && y0 < y1),
+);
+const Page = v.pipe(v.number(), v.integer(), v.minValue(1));
+const Key = Raw(60);
+
 export const Workspace = v.variant("template", [
+  v.object({
+    template: v.literal("results"),
+    contests: v.pipe(
+      v.array(
+        v.object({
+          record: Raw(2048),
+          stage: Raw(20),
+          columns: v.pipe(v.array(Key), v.maxLength(200)),
+          rows: v.pipe(
+            v.array(
+              v.object({
+                unit: v.union([
+                  Id,
+                  v.object({ scheme: Raw(40), code: Raw(100) }),
+                ]),
+                name: Raw(300),
+                values: v.record(Key, Raw(40)),
+                marks: v.record(Key, v.object({ page: Page, region: Region })),
+              }),
+            ),
+            v.maxLength(2000),
+          ),
+          printed: v.record(Key, Raw(40)),
+          outcomes: v.record(Key, Raw(20)),
+        }),
+      ),
+      v.maxLength(20),
+    ),
+    evidence: v.nullish(
+      v.object({
+        url: Raw(2048),
+        upload: v.nullable(Id),
+        title: Raw(500),
+        publisher: Raw(200),
+        kind: v.picklist(sourceKinds),
+      }),
+      null,
+    ),
+  }),
   v.object({
     template: v.literal("identifiers"),
     rows: Rows({ scheme: Raw(20), value: Raw(100) }),
@@ -56,7 +107,6 @@ export const Workspace = v.variant("template", [
   }),
 ]);
 
-const Id = v.pipe(v.string(), v.uuid());
 const Cited = v.optional(v.tuple([v.literal("e1")]));
 const Day = v.optional(v.pipe(v.string(), v.isoDate()));
 
@@ -87,6 +137,37 @@ export const Draft = v.object({
           evidence: Cited,
         }),
         v.object({
+          op: v.literal("results"),
+          contest_id: Id,
+          stage: v.picklist(stages),
+          rows: v.pipe(
+            v.array(
+              v.object({
+                unit: v.union([
+                  Id,
+                  v.object({ scheme: Line(40), code: Line(100) }),
+                ]),
+                option: v.nullable(Id),
+                measure: v.pipe(v.string(), v.regex(/^[a-z_]{1,40}$/u)),
+                channel: v.literal("all"),
+                count_round: v.literal(0),
+                value: v.pipe(v.number(), v.finite(), v.minValue(0)),
+                page: v.optional(Page),
+                region: v.optional(Region),
+              }),
+            ),
+            v.minLength(1),
+            v.maxLength(50_000),
+          ),
+          outcomes: v.optional(
+            v.pipe(
+              v.array(v.object({ option: Id, kind: v.picklist(outcomeKinds) })),
+              v.maxLength(200),
+            ),
+          ),
+          evidence: Cited,
+        }),
+        v.object({
           op: v.literal("add"),
           table: v.literal("party_color"),
           values: v.object({
@@ -103,18 +184,26 @@ export const Draft = v.object({
   ),
   evidence: v.optional(
     v.object({
-      e1: v.object({
-        url: v.pipe(
-          v.string(),
-          v.trim(),
-          v.maxLength(2048),
-          v.url(),
-          v.regex(/^https?:\/\//iu),
-        ),
-        title: Line(500),
-        publisher: Line(200),
-        kind: v.picklist(sourceKinds),
-      }),
+      e1: v.union([
+        v.object({
+          url: v.pipe(
+            v.string(),
+            v.trim(),
+            v.maxLength(2048),
+            v.url(),
+            v.regex(/^https?:\/\//iu),
+          ),
+          title: Line(500),
+          publisher: Line(200),
+          kind: v.picklist(sourceKinds),
+        }),
+        v.object({
+          upload: Id,
+          title: Line(500),
+          publisher: Line(200),
+          kind: v.picklist(sourceKinds),
+        }),
+      ]),
     }),
   ),
   workspace: Workspace,
@@ -261,4 +350,74 @@ export async function records(refs: Array<string>) {
             };
   }
   return result;
+}
+
+export async function sheet(id: string): Promise<Sheet> {
+  const [options, sets] = await Promise.all([
+    db.execute<Sheet["options"][number]>(sql`
+      select o.id, o.kind::text as kind, o.ballot_position as position,
+             coalesce(
+               o.ballot_label,
+               (select string_agg(coalesce(c.ballot_name, (
+                  select n.text from name n where n.entity_id = c.person_id
+                  order by n.is_preferred desc, n.id limit 1
+                )), ' / ') from candidacy c where c.option_id = o.id),
+               (select n.text from name n where n.entity_id = o.party_id
+                order by n.is_preferred desc, n.id limit 1),
+               o.kind::text
+             ) as label
+      from contest_option o
+      where o.contest_id = ${id}
+      order by o.ballot_position nulls last, o.k
+    `),
+    db.execute<{
+      k: number;
+      id: string;
+      stage: string;
+      source: string | null;
+    }>(sql`
+      select r.k, r.id, r.stage::text as stage, s.title as source
+      from result_set r left join source s on s.id = r.source_id
+      where r.contest_id = ${id} and r.status = 'active'
+      order by r.is_default desc, r.stage, r.k
+      limit 1
+    `),
+  ]);
+  const set = sets.rows[0];
+  if (set == null) {
+    return { id, options: options.rows, places: [], measures: [], set: null };
+  }
+  const [places, measures] = await Promise.all([
+    db.execute<Sheet["places"][number]>(sql`
+      select u.id as unit, u.scheme_code as scheme, u.code,
+             coalesce((select n.text from name n where n.entity_id = u.id
+                       order by n.is_preferred desc, n.id limit 1),
+                      (select n.text from name n where n.entity_id = u.area_id
+                       order by n.is_preferred desc, n.id limit 1), u.code) as name
+      from reporting_unit u
+      where u.k in (select distinct v.unit_k from result_value v where v.result_set_k = ${set.k})
+      order by u.code, u.id
+      limit 2000
+    `),
+    db.execute<{ code: string }>(sql`
+      select distinct m.code
+      from result_value v join measure m on m.id = v.measure
+      where v.result_set_k = ${set.k} and v.option_k = 0
+    `),
+  ]);
+  return {
+    id,
+    options: options.rows,
+    places: places.rows,
+    measures: measures.rows.map((row) => row.code),
+    set: { id: set.id, stage: set.stage, source: set.source },
+  };
+}
+
+export async function upload(id: string, userId: string) {
+  const { rows } = await db.execute<Upload>(sql`
+    select id, filename, pages from upload
+    where id = ${id} and owner_user_id = ${userId} and status = 'ready'
+  `);
+  return rows[0] ?? null;
 }

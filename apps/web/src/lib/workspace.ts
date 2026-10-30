@@ -15,17 +15,23 @@ import {
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 
-export const templates = ["identifiers", "names", "colors"] as const;
+export const tables = ["identifiers", "names", "colors"] as const;
+
+export type Table = (typeof tables)[number];
+
+export const templates = ["results", ...tables] as const;
 
 export type Template = (typeof templates)[number];
 
 export const templateTitle: Record<Template, () => string> = {
+  results: m.ws_template_results,
   identifiers: m.ws_template_identifiers,
   names: m.ws_template_names,
   colors: m.ws_template_colors,
 };
 
 export const templateBody: Record<Template, () => string> = {
+  results: m.ws_template_results_body,
   identifiers: m.ws_template_identifiers_body,
   names: m.ws_template_names_body,
   colors: m.ws_template_colors_body,
@@ -37,11 +43,11 @@ export const columns = {
   colors: ["color", "from", "to"],
 } as const;
 
-export type Column = "record" | (typeof columns)[Template][number];
+export type Column = "record" | (typeof columns)[Table][number];
 
 export type Cells = Partial<Record<Column, string>>;
 
-export const needsSource: Record<Template, boolean> = {
+export const needsSource: Record<Table, boolean> = {
   identifiers: false,
   names: true,
   colors: true,
@@ -65,7 +71,7 @@ export type Lookup =
   | { state: "missing" }
   | { state: "retired" };
 
-export const blank = (template: Template) =>
+export const blank = (template: Table) =>
   Object.fromEntries(columns[template].map((column) => [column, ""]));
 
 const text = (cells: Cells, column: Column) => (cells[column] ?? "").trim();
@@ -186,7 +192,7 @@ function judgeColor(cells: Cells, entity: Found | null): Judged {
 }
 
 export const judge = (
-  template: Template,
+  template: Table,
   cells: Cells,
   entity: Found | null,
 ): Judged =>
@@ -196,7 +202,7 @@ export const judge = (
       ? judgeName(cells, entity)
       : judgeColor(cells, entity);
 
-export const isComplete = (template: Template, cells: Cells) =>
+export const isComplete = (template: Table, cells: Cells) =>
   template === "identifiers"
     ? schemeOf(cells) != null && text(cells, "value") !== ""
     : template === "names"
@@ -206,7 +212,7 @@ export const isComplete = (template: Template, cells: Cells) =>
       : colorOf(cells) !== "";
 
 export function repeats(
-  template: Template,
+  template: Table,
   cells: Cells,
   entity: string,
 ): { key: string; problem: (row: number) => string; field: Column } {
@@ -236,7 +242,7 @@ export function repeats(
   };
 }
 
-export function op(template: Template, cells: Cells, entity: string) {
+export function op(template: Table, cells: Cells, entity: string) {
   if (template === "identifiers") {
     return {
       op: "add",
@@ -295,7 +301,7 @@ const matching = <T extends string>(
   );
 };
 
-export function parse(template: Template, parts: Array<string>): Cells {
+export function parse(template: Table, parts: Array<string>): Cells {
   const [record = "", first = "", second = "", third = ""] = parts;
   if (template === "identifiers") {
     const value = parts.length >= 3 ? second : first;
@@ -320,7 +326,7 @@ export function parse(template: Template, parts: Array<string>): Cells {
   return { record, color: first, from: second, to: third };
 }
 
-export function summarize(template: Template, cells: Cells) {
+export function summarize(template: Table, cells: Cells) {
   if (template === "identifiers") {
     const scheme = schemeOf(cells);
     return `${scheme == null ? "" : schemeLabel[scheme]()} ${text(cells, "value")}`;
@@ -340,7 +346,7 @@ export function summarize(template: Template, cells: Cells) {
   return `${colorOf(cells)} · ${period(from === "" ? null : from, "day", to === "" ? null : to, "day")}`;
 }
 
-export function holdings(template: Template, entity: Found) {
+export function holdings(template: Table, entity: Found) {
   if (template === "identifiers") {
     return entity.ids.map(
       (held) => `${schemeLabel[held.scheme]()} ${held.value}`,
@@ -357,7 +363,7 @@ export function holdings(template: Template, entity: Found) {
   );
 }
 
-export const swatch = (template: Template, cells: Cells) =>
+export const swatch = (template: Table, cells: Cells) =>
   template === "colors" && hex.test(colorOf(cells)) ? colorOf(cells) : null;
 
 const sideOf = (row: DiffRow, column: string) => {

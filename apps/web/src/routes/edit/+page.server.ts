@@ -18,7 +18,11 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
     rows: number;
     updated_at: string;
   }>(sql`
-    select p.number, p.title, coalesce(jsonb_array_length(p.draft -> 'workspace' -> 'rows'), 0)::int as rows,
+    select p.number, p.title,
+           coalesce(jsonb_array_length(p.draft -> 'workspace' -> 'rows'), (
+             select sum(jsonb_array_length(c -> 'rows'))
+             from jsonb_array_elements(p.draft -> 'workspace' -> 'contests') c
+           ), 0)::int as rows,
            p.updated_at::text
     from proposal p
     where p.author_user_id = ${locals.user.id} and p.state = 'draft'
@@ -40,18 +44,35 @@ export const actions: Actions = {
     if (template == null) {
       error(400);
     }
-    const record = form.get("record");
+    const given = form.get("record");
+    const record = typeof given === "string" ? given.trim().slice(0, 2048) : "";
     const summary = templateTitle[template]();
     const draft = {
       summary,
       ops: [],
-      workspace: {
-        template,
-        rows:
-          typeof record === "string" && record.trim() !== ""
-            ? [{ ...blank(template), record: record.trim().slice(0, 2048) }]
-            : [],
-      },
+      workspace:
+        template === "results"
+          ? {
+              template,
+              contests:
+                record === ""
+                  ? []
+                  : [
+                      {
+                        record,
+                        stage: "certified",
+                        columns: [],
+                        rows: [],
+                        printed: {},
+                        outcomes: {},
+                      },
+                    ],
+              evidence: null,
+            }
+          : {
+              template,
+              rows: record === "" ? [] : [{ ...blank(template), record }],
+            },
     };
     const { rows } = await db.execute<{ number: number }>(sql`
       insert into proposal (author_user_id, title, draft)
