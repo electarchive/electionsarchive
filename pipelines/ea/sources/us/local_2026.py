@@ -2761,6 +2761,9 @@ def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
     return frozenset(word for word in found if word not in FILLER and word not in marks), marks
 
 
+SHADOWED_TAILS = {"KS:2042875:council:at-large"}
+
+
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
     for tail, text in conn.execute(
@@ -2787,6 +2790,19 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
     ):
         county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
         pool[county[1] if county else ""].append((tail, *words(f"{text} {tail.split(':', 2)[-1].replace('-', ' ')}")))
+    for tail in sorted(SHADOWED_TAILS):
+        if not tail.startswith(f"{state}:"):
+            continue
+        for (text,) in conn.execute(
+            """select n.text from contest c
+               join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+               join name n on n.entity_id = c.id and n.is_preferred and n.lang = 'en'
+               join election e on e.id = c.election_id
+               where x.value ~ %s order by e.date_from desc limit 1""",
+            [f"^[0-9-]+:{tail}$"],
+        ):
+            county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
+            pool[county[1] if county else ""].append((tail, *words(f"{text} {tail.split(':', 2)[-1].replace('-', ' ')}")))
     found = {}
     scores: dict[tuple[str, str], float] = {}
     for county, contest in wanted:
