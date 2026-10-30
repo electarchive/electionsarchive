@@ -5016,7 +5016,7 @@ def parse() -> None:
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
             gazetteer.filter(
-                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN"]) & (pl.col("FUNCSTAT") == "A")
+                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "WY"]) & (pl.col("FUNCSTAT") == "A")
             )
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
@@ -5025,11 +5025,11 @@ def parse() -> None:
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
         claimed = {
             path
-            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in)/[^/]+$'")
+            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|wy)/[^/]+$'")
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'WY')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
