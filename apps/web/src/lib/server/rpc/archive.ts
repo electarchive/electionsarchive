@@ -17867,7 +17867,7 @@ export const polities = {
             ) ??
             held.find(
               (row) =>
-                row.kind !== "primary" &&
+                row.kind === "local" &&
                 Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") <
                   9e10,
             ))) ??
