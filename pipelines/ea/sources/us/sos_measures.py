@@ -329,6 +329,31 @@ MI_OLD_PROPOSALS = (
     (date(2002, 11, 5), "02", 3, "02-3", "Constitutional amendment granting state classified employees collective bargaining with binding arbitration", "Initiative"),
     (date(2002, 11, 5), "02", 4, "02-4", "Constitutional amendment reallocating tobacco settlement revenue", "Initiative"),
 )
+KS = "https://sos.ks.gov/elections/22elec/"
+KS_2022 = (
+    (
+        date(2022, 8, 2),
+        "2022-Primary-Election-Constitutional-Amendment-Results-By-Precinct.xlsx",
+        "1",
+        "Constitutional amendment on abortion and legislative authority (Value Them Both)",
+        (385014, 557837),
+    ),
+    (
+        date(2022, 11, 8),
+        "2022-General-Election-Constitutional-Amendment-Question-1-Rules-and-Regulations-Results-By-Precinct.xlsx",
+        "1",
+        "Constitutional amendment on legislative oversight of rules and regulations",
+        (472074, 480719),
+    ),
+    (
+        date(2022, 11, 8),
+        "2022-General-Election-Constitutional-Amendment-Question-2-Sheriff-Election-and-Recall-Results-By-Precinct.xlsx",
+        "2",
+        "Constitutional amendment on sheriff election and recall",
+        (588417, 366167),
+    ),
+)
+KS_GAPS = {(date(2022, 8, 2), "1", "YES"): -3, (date(2022, 8, 2), "1", "NO"): -16}
 UT_2007 = "https://vote.utah.gov/wp-content/uploads/2023/09/2007Muni_Special.pdf"
 UT_FILES = {
     date(2000, 11, 7): "2000Gen.pdf",
@@ -958,6 +983,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "KS": (
+        "Kansas Secretary of State",
+        "Official election results by precinct",
+        "https://sos.ks.gov/elections/election-results.html",
+    ),
     "MI": (
         "Michigan Bureau of Elections",
         "Official election results by county",
@@ -1289,6 +1319,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    for _, file, *_ in KS_2022:
+        raw.fetch(SOURCE, KS + file, suffix=".xlsx")
+        time.sleep(1)
     for name in dict.fromkeys(file for file, _ in MI_PROPOSALS):
         raw.fetch(SOURCE, MI.format(name), suffix=".tsv")
         time.sleep(1)
@@ -3633,6 +3666,45 @@ def michigan() -> list[dict[str, object]]:
     return rows
 
 
+def kansas() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, file, number, title, printed in KS_2022:
+        url = KS + file
+        book = fastexcel.read_excel(raw.cached(SOURCE, url).path)
+        tallies: dict[str, list[int]] = {}
+        for name in book.sheet_names:
+            sheet = book.load_sheet(name, header_row=None, dtypes="string").to_polars()
+            if name == book.sheet_names[0]:
+                for row in sheet.iter_rows():
+                    county, candidate, votes = row[0], row[3], row[5]
+                    if county in (None, "County"):
+                        continue
+                    tallies.setdefault(county, [0, 0])[int(candidate.endswith('"NO"'))] += int(votes or 0)
+                continue
+            total = next(row for row in sheet.iter_rows() if "COUNTY TOTALS" in row)
+            tallies[name.title()] = [int(total[-2]), int(total[-1])]
+        for index, answer in enumerate(("YES", "NO")):
+            if sum(sides[index] for sides in tallies.values()) != printed[index] + KS_GAPS.get((day, number, answer), 0):
+                raise ValueError(f"{url} {answer}: counties do not sum to the printed total")
+        rows.extend(
+            {
+                "state": "KS",
+                "day": day,
+                "number": number,
+                "label": f"Constitutional Amendment {number}",
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": sides[index],
+                "title": title,
+                "kind": "Legislative Referendum",
+            }
+            for county, sides in tallies.items()
+            for index, answer in enumerate(("YES", "NO"))
+        )
+    return rows
+
+
 def michigan_old() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, year, index, number, title, kind in MI_OLD_PROPOSALS:
@@ -4203,6 +4275,7 @@ def parse() -> None:
             *new_york(),
             *michigan(),
             *michigan_old(),
+            *kansas(),
             *utah(),
             *wyoming(),
             *south_carolina(),
