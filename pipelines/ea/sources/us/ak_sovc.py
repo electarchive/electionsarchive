@@ -15,11 +15,13 @@ from ea.store import DATA, connect
 SOURCE = "us.ak_sovc"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-INBOX = DATA / "inbox" / "manual" / "MF-266"
+INBOX = DATA / "inbox" / "manual"
+FOLDERS = {2000: ("MF-359", "2000-11-07"), 2002: ("MF-266", "2002"), 2006: ("MF-266", "2006"), 2010: ("MF-266", "2010")}
 BASE = "https://www.elections.alaska.gov/results/"
-DAYS = {2002: date(2002, 11, 5), 2006: date(2006, 11, 7), 2010: date(2010, 11, 2)}
+DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2006: date(2006, 11, 7), 2010: date(2010, 11, 2)}
 PUBLISHER = "Alaska Division of Elections"
 TITLE = "Statements of votes cast by House district and precinct results"
+SOVC = {2000, 2002}
 OFFICES = {"US SENAT": "senate", "US REPRESENTATIVE": "house", "GOVERNOR": "governor"}
 
 
@@ -27,8 +29,9 @@ def files() -> list[tuple[int, int, Path]]:
     found = []
     for year in DAYS:
         for number in range(1, 41):
-            names = [f"sovc{number}.pdf"] if year == 2002 else [f"hd{number}.pdf", f"hd{number} (1).pdf"]
-            found.append((year, number, next(INBOX / str(year) / name for name in names if (INBOX / str(year) / name).exists())))
+            names = [f"sovc{number}.pdf"] if year in SOVC else [f"hd{number}.pdf", f"hd{number} (1).pdf"]
+            folder = INBOX / "/".join(FOLDERS[year])
+            found.append((year, number, next(folder / name for name in names if (folder / name).exists())))
     return found
 
 
@@ -49,7 +52,8 @@ def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None],
             if w[1] > 100
             and (
                 (w[0] < 50 and re.fullmatch(r"\d\d-\d\d\d|District|Total|Jurisdiction", w[4]))
-                or (year == 2002 and (64 < w[0] < 66 or (w[0] < 50 and w[4] == "State")))
+                or (year in SOVC and (64 < w[0] < 66 or (w[0] < 50 and w[4] == "State")))
+                or (year == 2000 and w[0] < 60 and w[4] == "SubTotal")
             )
         ]
         if not marks:
@@ -65,7 +69,7 @@ def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None],
             for x, stack in sorted(stacks.items())
             if len(stack) > 1 or len(stack[0][4]) > 1
         ]
-        total = [w for w in marks if w[4] == "Total"]
+        total = [w for w in marks if w[4] in {"Total", "SubTotal"}]
         if not total:
             pending.append((words, heads, marks))
             continue
@@ -80,7 +84,7 @@ def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None],
                 print(path.name, "continued page has other columns")
                 continue
             edges = [a[2] + page[0] - head[0] for a, page, head in zip(anchors, page_heads, heads, strict=True)]
-            for start in sorted((w for w in page_marks if w[4] not in {"Total", "State"}), key=lambda w: w[1]):
+            for start in sorted((w for w in page_marks if w[4] not in {"Total", "SubTotal", "State"}), key=lambda w: w[1]):
                 line = sorted((w for w in page_words if abs(w[1] - start[1]) < 1), key=lambda w: w[0])
                 cells: list[int | None] = [None] * len(anchors)
                 label = []
@@ -102,7 +106,7 @@ def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None],
                 titles[-1][2] += f" {w[4]}"
             else:
                 titles.append([w[0], w[2], w[4], w[1]])
-        starts = [i for i, (_, label) in enumerate(heads) if label.startswith("Reg")]
+        starts = [i for i, (_, label) in enumerate(heads) if label.startswith("Total" if year == 2000 else "Reg")]
         if starts and starts[0] > 0 and blocks:
             blocks[-1][3].extend(
                 (heads[i][1], {place: values[i] for place, values in table.items()}) for i in range(starts[0])
@@ -130,7 +134,7 @@ def fetch() -> None:
     for year, number, path in files():
         raw.store(
             SOURCE,
-            f"manual://MF-266/{year}/{path.name}",
+            f"manual://{FOLDERS[year][0]}/{year}/{path.name}",
             path.read_bytes(),
             suffix=".pdf",
             retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
@@ -143,12 +147,12 @@ def parse() -> None:
     names: dict[str, str] = {}
     for year, number, path in files():
         day = DAYS[year]
-        for title, counted, columns in read(raw.cached(SOURCE, f"manual://MF-266/{year}/{path.name}").path, year):
+        for title, counted, columns in read(raw.cached(SOURCE, f"manual://{FOLDERS[year][0]}/{year}/{path.name}").path, year):
             office = next((office for prefix, office in OFFICES.items() if (title or "").startswith(prefix)), None)
             seat = re.fullmatch(r"(HOUSE|SENATE) DISTRICT (\w+)", title or "")
-            if office is None and year == 2002 and seat:
+            if office is None and year in SOVC and seat:
                 office = f"{seat[1].lower()}:{int(seat[2]) if seat[1] == 'HOUSE' else seat[2].lower()}:g"
-            if office is None:
+            if office is None or (year == 2000 and ":" not in office):
                 continue
             for label, column in columns:
                 if column.get("Total") != sum(v or 0 for place, v in column.items() if place != "Total"):
@@ -171,8 +175,8 @@ def parse() -> None:
                         label_kind = aggregate[2] or aggregate[4]
                         code, kind = f"AK:{year}:{number:02}:{KINDS[label_kind]}", "aggregate"
                         names[code] = f"District {number} {label_kind.lower()}"
-                    elif year == 2002:
-                        code, kind = f"2002:AK:{number:02}:{slug(place)}", "precinct"
+                    elif year in SOVC:
+                        code, kind = f"{year}:AK:{number:02}:{slug(place)}", "precinct"
                         names[code] = place
                     else:
                         print(year, number, "place", place)
@@ -224,7 +228,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska's 2002, 2006, and 2010 general elections for governor, U.S. Senate, and U.S. House, and 2002 "
+            summary="Alaska's 2002, 2006, and 2010 general elections for governor, U.S. Senate, and U.S. House, and 2000 and 2002 "
             "legislative races, by precinct and House district, from the Division of Elections' statements of votes cast",
             polity="US-AK",
         )
@@ -239,7 +243,7 @@ def emit() -> Path:
             license="Public record",
         )
         for year, number, path in files():
-            cs.artifact(raw.cached(SOURCE, f"manual://MF-266/{year}/{path.name}"), source)
+            cs.artifact(raw.cached(SOURCE, f"manual://{FOLDERS[year][0]}/{year}/{path.name}"), source)
         state, parent = conn.execute(
             """select p.id, u.id from reporting_unit u join polity p on p.id = u.polity_id
                where u.scheme_code = 'us.state' and p.iso_code = 'US-AK'"""
