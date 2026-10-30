@@ -1,8 +1,15 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { stateLabel, tierLabel } from "#lib/contrib.js";
+  import {
+    escalationLabel,
+    recommendationLabel,
+    stateLabel,
+    tierLabel,
+    verdictLabel,
+  } from "#lib/contrib.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
@@ -51,8 +58,25 @@
               {#if item.findings > 0}
                 <span>{m.proposal_findings({ count: item.findings })}</span>
               {/if}
+              {#if item.prescreen != null}
+                <span
+                  class={cn({
+                    "font-semibold text-foreground": item.prescreen !== "clean",
+                  })}>{verdictLabel[item.prescreen]()}</span
+                >
+              {/if}
+              {#if item.recommendation != null}
+                <span>{recommendationLabel[item.recommendation]()}</span>
+              {/if}
               <span>{date(item.submitted_at?.slice(0, 10) ?? null)}</span>
             </span>
+            {#if item.state === "open" && item.escalations.length > 0}
+              <span class="text-xs text-pretty text-muted-foreground"
+                >{m.proposal_escalations()}: {item.escalations
+                  .map((code) => escalationLabel[code]())
+                  .join(", ")}</span
+              >
+            {/if}
           </a>
         </li>
       {/each}
@@ -75,6 +99,12 @@
             >
             <th class="py-2 pe-4 text-end font-normal"
               >{m.review_col_findings()}</th
+            >
+            <th class="py-2 pe-4 text-start font-normal"
+              >{m.review_col_prescreen()}</th
+            >
+            <th class="py-2 pe-4 text-start font-normal"
+              >{m.review_col_desk()}</th
             >
             <th class="py-2 text-end font-normal">{m.review_col_submitted()}</th
             >
@@ -100,6 +130,12 @@
                     <span class="text-xs text-muted-foreground"
                       >{stateLabel[item.state]()}</span
                     >
+                  {:else if item.escalations.length > 0}
+                    <span class="text-xs text-pretty text-muted-foreground"
+                      >{m.proposal_escalations()}: {item.escalations
+                        .map((code) => escalationLabel[code]())
+                        .join(", ")}</span
+                    >
                   {/if}
                 </a>
               </td>
@@ -114,6 +150,21 @@
               >
               <td class="py-2 pe-4 text-end font-figures"
                 >{count(item.findings)}</td
+              >
+              <td
+                class={cn(
+                  "py-2 pe-4",
+                  { "font-semibold": item.prescreen !== "clean" },
+                  { "text-muted-foreground": item.prescreen == null },
+                )}
+                >{item.prescreen == null
+                  ? "–"
+                  : verdictLabel[item.prescreen]()}</td
+              >
+              <td class="py-2 pe-4 text-muted-foreground"
+                >{item.recommendation == null
+                  ? "–"
+                  : recommendationLabel[item.recommendation]()}</td
               >
               <td class="py-2 text-end font-figures whitespace-nowrap"
                 >{date(item.submitted_at?.slice(0, 10) ?? null)}</td

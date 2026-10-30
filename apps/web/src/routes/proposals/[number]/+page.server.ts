@@ -17,9 +17,21 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     roles(locals.user?.id),
   ]);
   const viewer = locals.user?.id;
+  const isReviewer = allowed.admin || allowed.reviewer;
+  const head = found.revisions.at(0)?.n;
+  const { prescreen, prereview, escalations, ...rest } = found;
+  const isCurrent = prescreen != null && prescreen.revision === head;
   return {
     proposal: {
-      ...found,
+      ...rest,
+      prescreen: isCurrent
+        ? {
+            verdict: prescreen.verdict,
+            reason: isReviewer ? prescreen.reason : null,
+          }
+        : null,
+      prereview,
+      escalations: isReviewer ? escalations : [],
       revisions: found.revisions.map((revision) => ({
         ...revision,
         sources: (revision.sources ?? []).map(({ scan, ...item }) => ({
@@ -41,14 +53,14 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
         })),
       })),
     },
-    canDecide:
-      found.state === "open" &&
-      (allowed.admin || (allowed.reviewer && found.tier === 1)),
+    canDecide: found.state === "open" && isReviewer,
+    canReject: allowed.admin || found.tier === 1,
+    canApprove: allowed.admin || (found.tier === 1 && escalations.length === 0),
   };
 };
 
 const decision =
-  (verb: "approve" | "reject"): Action =>
+  (verb: "approve" | "reject" | "request_changes"): Action =>
   async ({ params, locals, request }) => {
     if (locals.user == null) {
       return fail(401, { message: "Sign in to decide proposals." });
@@ -77,4 +89,5 @@ const decision =
 export const actions: Actions = {
   approve: decision("approve"),
   reject: decision("reject"),
+  request_changes: decision("request_changes"),
 };

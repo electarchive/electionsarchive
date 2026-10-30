@@ -278,6 +278,44 @@ export type Prereview = {
   at: string;
 };
 
+export const escalationLabel: Record<Escalation, () => string> = {
+  unchecked: m.escalation_unchecked,
+  findings: m.escalation_findings,
+  prescreen: m.escalation_prescreen,
+  newcomer: m.escalation_newcomer,
+  preferred_name: m.escalation_preferred_name,
+  large: m.escalation_large,
+  conflict: m.escalation_conflict,
+};
+
+export const verdictLabel: Record<Prescreen["verdict"], () => string> = {
+  clean: m.prescreen_clean,
+  spam: m.prescreen_spam,
+  abuse: m.prescreen_abuse,
+  missing_evidence: m.prescreen_missing_evidence,
+  evidence_mismatch: m.prescreen_evidence_mismatch,
+  malformed: m.prescreen_malformed,
+  duplicate: m.prescreen_duplicate,
+};
+
+export const recommendationLabel: Record<
+  Prereview["recommendation"],
+  () => string
+> = {
+  approve: m.prereview_recommends_approve,
+  request_changes: m.prereview_recommends_request_changes,
+  reject: m.prereview_recommends_reject,
+};
+
+export const factLabel: Record<
+  Prereview["facts"][number]["status"],
+  () => string
+> = {
+  verified: m.prereview_verified,
+  unverified: m.prereview_unverified,
+  contradicted: m.prereview_contradicted,
+};
+
 export type DiffRow = {
   table: string;
   key: Record<string, string>;

@@ -503,15 +503,17 @@ export async function proposal(number: number) {
     head_changeset_id: string | null;
     prescreen: Prescreen | null;
     prereview: Prereview | null;
+    prereviewer: string | null;
     escalations: Array<Escalation>;
   }>(sql`
     select p.id, p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.created_at::text, p.submitted_at::text, p.decided_at::text, d.name as decider,
-           p.decision_reason, p.head_changeset_id, p.prescreen, p.prereview,
+           p.decision_reason, p.head_changeset_id, p.prescreen, p.prereview, w.name as prereviewer,
            ${escalations(sql`p.id`)} as escalations
     from proposal p
     left join users a on a.id = p.author_user_id
     left join users d on d.id = p.decided_by
+    left join users w on w.id::text = p.prereview ->> 'by'
     where p.number = ${number}
   `);
   const found = rows[0];
@@ -728,7 +730,7 @@ export async function decide({
     if (verb === "request_changes") {
       await tx.execute(sql`
         update proposal
-        set state = 'changes_requested', decision_reason = ${reason}, updated_at = now()
+        set state = 'changes_requested', decision_reason = ${reason}, decided_by = ${userId}, decided_at = now(), updated_at = now()
         where id = ${found.id}
       `);
       await tx.execute(

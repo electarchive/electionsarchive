@@ -22,6 +22,7 @@ from ea import (
     layout,
     names,
     portals,
+    prescreen,
     rasters,
     raw,
     scans,
@@ -50,9 +51,11 @@ def main() -> None:
         command.add_argument("--reviewer", type=lambda value: str(UUID(value)), help="user id of the person deciding")
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
     contributing = commands.add_parser(
-        "contrib", help="compile a contribution payload into a changeset folder, or serve the proposal_job queue"
+        "contrib",
+        help="compile a contribution payload into a changeset folder, serve the proposal_job queue, "
+        "or prescreen open proposals with a Haiku batch (run through anthropic-batch)",
     )
-    contributing.add_argument("action", choices=("compile", "serve"))
+    contributing.add_argument("action", choices=("compile", "serve", "prescreen"))
     contributing.add_argument(
         "payload", nargs="?", type=Path, help="payload JSON, as contributions.md (Payload) describes"
     )
@@ -163,6 +166,8 @@ def main() -> None:
             print(fixtures.export())
         case "contrib" if args.action == "serve":
             contrib.serve()
+        case "contrib" if args.action == "prescreen":
+            prescreen.run()
         case "contrib":
             if args.payload is None or args.author is None:
                 parser.error("contrib compile needs a payload and --author")

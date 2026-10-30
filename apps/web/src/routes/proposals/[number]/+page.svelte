@@ -8,14 +8,18 @@
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import {
     dated,
+    escalationLabel,
+    factLabel,
     noteKindLabel,
     originLabel,
     origins,
     precisions,
+    recommendationLabel,
     schemeLabel,
     schemes,
     stateLabel,
     tierLabel,
+    verdictLabel,
   } from "#lib/contrib.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -237,7 +241,9 @@
         ? m.proposal_rejected_by
         : proposal.state === "reverted"
           ? m.proposal_reverted_by
-          : null,
+          : proposal.state === "changes_requested"
+            ? m.proposal_changes_requested_by
+            : null,
   );
 
   let reason = $state("");
@@ -319,6 +325,45 @@
         </ul>
       {/if}
     </dd>
+    {#if proposal.prescreen != null || proposal.state === "open"}
+      <div class="col-span-full grid grid-cols-subgrid border-bs">
+        <dt class="py-2 text-muted-foreground max-sm:pbe-0">
+          {m.proposal_prescreen()}
+        </dt>
+        <dd class="py-2">
+          {#if proposal.prescreen == null}
+            <span class="text-muted-foreground"
+              >{m.proposal_prescreen_waiting()}</span
+            >
+          {:else}
+            <span
+              class={cn({
+                "font-semibold": proposal.prescreen.verdict !== "clean",
+              })}>{verdictLabel[proposal.prescreen.verdict]()}</span
+            >
+            {#if proposal.prescreen.reason != null}
+              <span class="block text-pretty text-muted-foreground"
+                >{proposal.prescreen.reason}</span
+              >
+            {/if}
+          {/if}
+        </dd>
+      </div>
+    {/if}
+    {#if proposal.escalations.length > 0 && proposal.state === "open"}
+      <div class="col-span-full grid grid-cols-subgrid border-bs">
+        <dt class="py-2 text-muted-foreground max-sm:pbe-0">
+          {m.proposal_escalations()}
+        </dt>
+        <dd class="py-2">
+          <ul class="grid gap-0.5">
+            {#each proposal.escalations as code (code)}
+              <li>{escalationLabel[code]()}</li>
+            {/each}
+          </ul>
+        </dd>
+      </div>
+    {/if}
   </dl>
 
   <section class="mbs-8" aria-labelledby="changes">
@@ -516,6 +561,77 @@
     </section>
   {/if}
 
+  {#if proposal.prereview != null}
+    {const review = $derived(proposal.prereview)}
+    <section class="mbs-8" aria-labelledby="prereview">
+      <h2 id="prereview" class="heading">{m.proposal_prereview()}</h2>
+      <p class="mbs-2 flex flex-wrap items-baseline gap-x-3 text-sm">
+        <span class="font-semibold"
+          >{recommendationLabel[review.recommendation]()}</span
+        >
+        <span class="text-muted-foreground"
+          >{m.prereview_by({
+            name: proposal.prereviewer ?? m.proposal_unknown_author(),
+            date: day(review.at),
+          })}</span
+        >
+      </p>
+      {#if review.revision !== head?.n}
+        <p class="mbs-1 text-sm text-muted-foreground">
+          {m.prereview_stale({ revision: review.revision })}
+        </p>
+      {/if}
+      <p class="mbs-3 text-sm text-pretty whitespace-pre-line">
+        {review.summary}
+      </p>
+      {#if review.facts.length > 0}
+        <table class="mbs-4 border-bs text-sm inline-full">
+          <thead>
+            <tr class="border-be text-muted-foreground">
+              <th class="py-2 pe-4 text-start font-normal"
+                >{m.prereview_fact()}</th
+              >
+              <th class="py-2 text-end font-normal">{m.prereview_status()}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each review.facts as fact, index (index)}
+              <tr class="border-be align-baseline">
+                <td class="py-2 pe-4">
+                  <span class="block text-pretty">{fact.fact}</span>
+                  {#if fact.note != null}
+                    <span
+                      class="block text-xs text-pretty text-muted-foreground"
+                      >{fact.note}</span
+                    >
+                  {/if}
+                </td>
+                <td
+                  class={cn(
+                    "py-2 text-end whitespace-nowrap",
+                    {
+                      "font-semibold text-destructive":
+                        fact.status === "contradicted",
+                    },
+                    { "text-muted-foreground": fact.status === "unverified" },
+                  )}>{factLabel[fact.status]()}</td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {/if}
+      {#if review.risks.length > 0}
+        <h3 class="mbs-4 text-sm font-semibold">{m.prereview_risks()}</h3>
+        <ul class="mbs-1 grid list-disc gap-1 ps-5 text-sm">
+          {#each review.risks as risk, index (index)}
+            <li class="text-pretty">{risk}</li>
+          {/each}
+        </ul>
+      {/if}
+    </section>
+  {/if}
+
   {#if data.canDecide && !pending}
     <section class="mbs-10 grid gap-3" aria-labelledby="decide">
       <h2 id="decide" class="heading">{m.proposal_decision()}</h2>
@@ -533,25 +649,38 @@
         <Textarea
           name="reason"
           bind:value={reason}
-          aria-label={m.proposal_reject_reason()}
-          placeholder={m.proposal_reject_reason()}
+          aria-label={m.proposal_decision_reason()}
+          placeholder={m.proposal_decision_reason()}
           maxlength={2000}
           rows={3}
         />
         {#if form?.message != null}
           <p class="text-sm text-destructive" role="alert">{form.message}</p>
+        {:else if !data.canApprove}
+          <p class="text-sm text-muted-foreground">{m.proposal_admin_only()}</p>
         {/if}
         <div class="flex flex-wrap justify-end gap-2">
+          {#if data.canReject}
+            <Button
+              type="submit"
+              variant="outline"
+              formaction="?/reject"
+              disabled={busy || reason.trim() === ""}
+              >{m.proposal_reject()}</Button
+            >
+          {/if}
           <Button
             type="submit"
             variant="outline"
-            formaction="?/reject"
+            formaction="?/request_changes"
             disabled={busy || reason.trim() === ""}
-            >{m.proposal_reject()}</Button
+            >{m.proposal_request_changes()}</Button
           >
-          <Button type="submit" formaction="?/approve" disabled={busy}
-            >{m.proposal_approve()}</Button
-          >
+          {#if data.canApprove}
+            <Button type="submit" formaction="?/approve" disabled={busy}
+              >{m.proposal_approve()}</Button
+            >
+          {/if}
         </div>
       </form>
     </section>
