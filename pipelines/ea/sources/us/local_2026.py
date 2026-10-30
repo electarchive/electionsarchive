@@ -5756,6 +5756,25 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
+    tail_set = set(frame["tail"])
+    merged = {
+        row["tail"]
+        for row in frame.group_by("tail").agg(pl.col("unexpired").n_unique().alias("n")).filter(pl.col("n") > 1).iter_rows(named=True)
+        if f"{row['tail']}:unexpired" in tail_set
+    }
+    frame = (
+        frame.with_columns(
+            tail=pl.when(pl.col("tail").str.replace(r":unexpired$", "").is_in(merged))
+            .then(pl.col("tail").str.replace(r":unexpired$", ""))
+            .otherwise(pl.col("tail"))
+        )
+        .with_columns(
+            fips=pl.when(pl.col("tail").is_in(merged) & pl.col("unexpired"))
+            .then(pl.col("fips").first().over("tail", "unexpired"))
+            .otherwise(pl.col("fips"))
+        )
+        .filter(~pl.col("tail").is_in(merged) | pl.struct("tail", "unexpired", "name").is_first_distinct())
+    )
     tails = sorted(set(frame["template"]))
     with connect() as conn:
         cs = Changeset(
