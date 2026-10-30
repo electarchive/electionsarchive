@@ -5,7 +5,7 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import { stateLabel, tierLabel } from "#lib/contrib.js";
-  import { date } from "#lib/format.js";
+  import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { ActionData, PageData } from "./$types";
@@ -96,7 +96,7 @@
     <dt
       class="border-be py-2 text-muted-foreground max-sm:border-be-0 max-sm:pbe-0"
     >
-      {m.proposal_decision()}
+      {decided == null ? m.proposal_checks() : m.proposal_decision()}
     </dt>
     <dd class="border-be py-2" role="status">
       {#if pending}
@@ -119,6 +119,12 @@
         {m.proposal_checks_passed()}
       {:else}
         {m.proposal_findings({ count: findings })}
+        <span class="block font-figures text-xs text-muted-foreground"
+          >{Object.entries(head?.checks?.findings ?? {})
+            .filter(([, value]) => value > 0)
+            .map(([code, value]) => `${code} ${count(value)}`)
+            .join(", ")}</span
+        >
       {/if}
     </dd>
   </dl>

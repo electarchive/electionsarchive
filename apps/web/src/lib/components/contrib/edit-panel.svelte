@@ -248,8 +248,10 @@
                 {const draft = $derived(drafts[name.id] ?? name.text)}
                 {const dirty = $derived(draft.trim() !== name.text)}
                 <dt class="pbs-2 text-muted-foreground">
-                  {kindLabel[name.kind]()}{#if name.is_preferred}<span
-                      class="block text-xs">{m.edit_preferred()}</span
+                  {kindLabel[name.kind]()}{#if name.shown}<span
+                      class="block text-xs">{m.edit_shown()}</span
+                    >{:else if name.is_preferred}<span class="block text-xs"
+                      >{m.edit_preferred()}</span
                     >{/if}
                 </dt>
                 <dd class="py-1">

@@ -21,13 +21,23 @@ export async function roles(userId: string | undefined) {
 export async function editable(entityId: string): Promise<Editable> {
   const [names, sources, open] = await Promise.all([
     db.execute<Editable["names"][number]>(sql`
+      with shown as (
+        select id from name
+        where entity_id = ${entityId} and kind in ('official', 'english')
+        order by coalesce(valid @> current_date, false) desc,
+          coalesce(valid @> current_date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+          (kind = 'english' and script = 'Latn') desc, is_preferred desc, (lang = 'en') desc,
+          (kind = 'official') desc, recorded_from desc, id
+        limit 1
+      )
       select n.id, n.text, n.kind::text as kind, n.lang, n.script, n.is_preferred,
+             n.id in (select id from shown) as shown,
              n.source_id, s.title as source, c.published_at::text as changed
       from name n
       left join source s on s.id = n.source_id
       left join changeset c on c.id = n.changeset_id
       where n.entity_id = ${entityId}
-      order by n.is_preferred desc, n.kind, n.text
+      order by shown desc, n.is_preferred desc, n.kind, n.text
     `),
     db.execute<Editable["sources"][number]>(sql`
       select s.id, s.title, s.publisher

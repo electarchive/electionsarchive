@@ -48,6 +48,7 @@ export type Editable = {
     lang: string | null;
     script: string | null;
     is_preferred: boolean;
+    shown: boolean;
     source_id: string | null;
     source: string | null;
     changed: string | null;
