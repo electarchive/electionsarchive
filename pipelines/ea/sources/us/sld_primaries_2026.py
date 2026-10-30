@@ -461,6 +461,21 @@ STATEWIDE = {
         "superintendent-of-public-instruction",
         "Superintendent of Public Instruction",
     ),
+    "state auditor": ("auditor", "Auditor"),
+    "commissioner of agriculture and industries": (
+        "commissioner-of-agriculture-and-industries",
+        "Commissioner of Agriculture and Industries",
+    ),
+    "public service commission, place 1": (
+        "public-service-commissioner:place-1",
+        "Public Service Commissioner, Place 1",
+    ),
+    "public service commission, place 2": (
+        "public-service-commissioner:place-2",
+        "Public Service Commissioner, Place 2",
+    ),
+    "state superintendent of education": ("superintendent-of-education", "Superintendent of Education"),
+    "comptroller general": ("comptroller-general", "Comptroller General"),
     "chief financial officer": ("chief-financial-officer", "Chief Financial Officer"),
     "psc - district 3": ("public-service-commissioner:district-3", "Public Service Commissioner, District 3"),
     "psc - district 5": ("public-service-commissioner:district-5", "Public Service Commissioner, District 5"),
@@ -1260,12 +1275,13 @@ def parse() -> None:
                     if len(cells) > 13
                     else None
                 )
-                if found is None or cells[10] not in ("DFL", "R"):
+                statewide = STATEWIDE.get(cells[4].lower()) if len(cells) > 13 else None
+                if found is None and statewide is None or cells[10] not in ("DFL", "R"):
                     continue
                 totals[
                     (
-                        "senate" if found[1] == "Senator" else "house",
-                        "-".join(filter(None, (found[2], found[3].lower()))),
+                        statewide[0] if statewide else "senate" if found[1] == "Senator" else "house",
+                        "" if statewide else "-".join(filter(None, (found[2], found[3].lower()))),
                         "dfl" if cells[10] == "DFL" else "republican",
                         re.sub(r"\s+", " ", cells[7]),
                         f"27{2 * int(cells[1]) - 1:03}",
@@ -1423,14 +1439,21 @@ def parse() -> None:
                         found = re.fullmatch(
                             r"STATE (SENATOR|REPRESENTATIVE), DISTRICT (\d+) \((REP|DEM)\)", (line[0] or "").strip()
                         )
+                        statewide = re.fullmatch(r"(.+) \((REP|DEM)\)", (line[0] or "").strip())
                         candidate = (line[2] or "").strip()
-                        if found is None or re.fullmatch(r"(?i)(over|under) votes|write-in", candidate):
+                        if (
+                            found is None
+                            and (statewide is None or statewide[1].lower() not in STATEWIDE)
+                            or re.fullmatch(r"(?i)(over|under) votes|write-in", candidate)
+                        ):
                             continue
                         rows.append(
                             (
-                                "senate" if found[1] == "SENATOR" else "house",
-                                found[2],
-                                {"REP": "republican", "DEM": "democratic"}[found[3]],
+                                ("senate" if found[1] == "SENATOR" else "house")
+                                if found
+                                else STATEWIDE[statewide[1].lower()][0],
+                                found[2] if found else "",
+                                {"REP": "republican", "DEM": "democratic"}[(found or statewide)[3 if found else 2]],
                                 candidate,
                                 member.rsplit("-", 1)[1].removesuffix(".xls"),
                                 sum(int(value or 0) for value in line[3:]),
@@ -1467,7 +1490,12 @@ def parse() -> None:
                     else r"(STATE SENATOR|HOUSE OF DELEGATES), (\d+)\w\w (?:Senatorial )?District - (REP|DEM)",
                     re.sub(r"\s+", " ", contest.get("text")),
                 )
-                if found is None:
+                statewide = (
+                    re.fullmatch(r"(.+) - (REP|DEM)", re.sub(r"\s+", " ", contest.get("text")))
+                    if state == "SC"
+                    else None
+                )
+                if found is None and (statewide is None or statewide[1].lower() not in STATEWIDE):
                     continue
                 for choice in contest.iter("Choice"):
                     if "*Decertified" in choice.get("text"):
@@ -1478,13 +1506,15 @@ def parse() -> None:
                             totals[county.get("name")] += int(county.get("votes"))
                     rows.extend(
                         (
-                            {
+                            STATEWIDE[statewide[1].lower()][0]
+                            if found is None
+                            else {
                                 "Senate": "senate",
                                 "STATE SENATOR": "senate",
                                 "HOUSE OF DELEGATES": "house-of-delegates",
                             }.get(found[1], "house"),
-                            found[2] + (":2" if found[1] == "STATE SENATOR" else ""),
-                            {"REP": "republican", "DEM": "democratic"}[found[3]],
+                            "" if found is None else found[2] + (":2" if found[1] == "STATE SENATOR" else ""),
+                            {"REP": "republican", "DEM": "democratic"}[statewide[2] if found is None else found[3]],
                             choice.get("text"),
                             county,
                             votes,
@@ -1637,7 +1667,7 @@ def emit() -> Path:
                        left join name n on n.entity_id = co.body_id and n.is_preferred
                        where x.value ~ %s""",
                     [
-                        f"^2026-11-03:{state}:((house|senate|assembly|house-of-delegates):[0-9a-z-]+(:[0-9])?:g|[a-z-]+(:district-[0-9]+)?)$"
+                        f"^2026-11-03:{state}:((house|senate|assembly|house-of-delegates):[0-9a-z-]+(:[0-9])?:g|[a-z-]+(:(district|place)-[0-9]+)?)$"
                     ],
                 ).fetchall()
             }
