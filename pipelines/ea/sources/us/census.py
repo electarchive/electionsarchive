@@ -56,6 +56,13 @@ REDRAWN_2026 = {
         "Congressional districts EOGPCRP2026 (HB 1-D, 2026D)",
         "https://www.edr.state.fl.us/Content/redistricting/2026redistricting/index.cfm",
     ),
+    "22": (
+        "LA",
+        "https://redist.legis.la.gov/2026_Files/Act2Congress/Shapefile/Shapefile%20-%20Act_2_(2026_RS).zip",
+        "Louisiana Legislature Redistricting",
+        "Congressional districts, Act 2 (S.B. 121) of the 2026 Regular Session",
+        "https://redist.legis.la.gov/2026_Files/2026CONGRESSACT2.aspx",
+    ),
     "37": (
         "NC",
         "https://webservices.ncleg.gov/ViewBillDocument/2025/7667/0/SL%202025-95%20-%20Shapefile",
@@ -158,7 +165,7 @@ def parse() -> None:
         )
         crs = pyproj.CRS.from_wkt(parts["prj"].decode())
         project = pyproj.Transformer.from_crs(crs, 4326, always_xy=True).transform
-        field = next(name for name, *_ in reader.fields if name.upper() == "DISTRICT")
+        field = next(name for name, *_ in reader.fields if name.upper() in ("DISTRICT", "DISTRICT_I"))
         numbers = [int(float(record[field])) for record in reader.records()]
         shapes = shapely.coverage_simplify(
             [shapely.ops.transform(project, shapely.geometry.shape(shape.__geo_interface__)) for shape in reader.shapes()],
