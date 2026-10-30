@@ -14,6 +14,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.enr_2026 import HEADERS, NOTE, STOP, SUFFIXES, YESNO, get, person
+from ea.sources.us.la_judicial_2026 import classify as la_classify
 from ea.sources.us.oe_primaries_2026 import ALIASES, FIPS, OFFICIAL, plain
 from ea.store import DATA, connect
 
@@ -24,6 +25,12 @@ DAY = date.fromisoformat(os.environ.get("ENR_LOCAL_2026_DAY", "2026-11-03"))
 FEED_DAY = date.fromisoformat(os.environ.get("ENR_LOCAL_2026_FEED", DAY.isoformat()))
 ONLY = set(filter(None, os.environ.get("ENR_LOCAL_2026_STATES", "").split(",")))
 MN_BASE = "https://electionresultsfiles.sos.mn.gov/{:%Y%m%d}/"
+LA_BASE = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={:%Y%m%d}/"
+LA_NOT_LOCAL = re.compile(r"U\. ?S\.|PSC|BESE|State Representative|CA No")
+LA_TOWN = re.compile(
+    r"(Mayor|Alderm[a-z]+(?: at Large)?|Councilman|Chief of Police) -- (?:(.+?), )?(?:City|Town|Village) of (.+)"
+)
+LA_HELD = {"Mayor": "mayor", "Alderm": "board-of-aldermen", "Councilman": "council", "Chief": "chief-of-police"}
 MN_FILES = ("local.txt", "allracesbyprecinct.txt")
 NC_URL = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{:%Y_%m_%d}/results_pct_{:%Y%m%d}.zip"
 MN_HELD = (
@@ -83,6 +90,20 @@ def fetch() -> None:
                 print(f"MN: no file {name}")
             else:
                 store("MN", url, content, ".txt")
+    if not ONLY or "LA" in ONLY:
+        listing_url = LA_BASE.format(FEED_DAY) + "RacesCandidates_Multiparish.htm"
+        listing = get(client, listing_url)
+        if listing is None:
+            print("LA: no race listing")
+        else:
+            store("LA", listing_url, listing, ".json")
+            for race in json.loads(listing)["Races"]["Race"]:
+                url = LA_BASE.format(FEED_DAY) + f"csv/ByParish_{race['ID']}.csv"
+                content = get(client, url)
+                if content is None:
+                    print(f"LA: no file for race {race['ID']}")
+                else:
+                    store("LA", url, content, ".csv")
     if not ONLY or "NC" in ONLY:
         url = NC_URL.format(FEED_DAY, FEED_DAY)
         content = get(client, url)
@@ -121,6 +142,28 @@ def rows(state: str, url: str, path):
                 "reporting": reporting or None,
                 "total": total or None,
             }
+        return
+    if state == "LA":
+        if url.endswith(".htm"):
+            return
+        table = csv.reader(path.read_text(encoding="utf-8-sig").splitlines())
+        header = next(table)
+        for row in table:
+            if LA_NOT_LOCAL.match(row[0].strip()):
+                continue
+            for label, votes in zip(header[2:], row[2:], strict=False):
+                named = re.fullmatch(r"(.*?)\s*\((\w+)\)", label.strip())
+                candidate = named[1] if named else label.strip()
+                yield {
+                    "contest": re.sub(r"\s+", " ", row[0]).strip(),
+                    "geo": "",
+                    "county": row[1],
+                    "candidate": candidate,
+                    "write_in": "write-in" in label.lower(),
+                    "votes": int(votes or 0),
+                    "reporting": None,
+                    "total": None,
+                }
         return
     if state == "NC":
         totals: dict[tuple[str, str, str], int] = {}
@@ -203,6 +246,18 @@ def derive(
             (held for held, pattern in MN_HELD if re.match(rf"(?:SPECIAL ELECTION FOR )?{pattern}", upper)), None
         )
         return [f"MN:{code}:{held}{seat_tail(stem)}{special}" for code in codes.get(geo, [])] if held else []
+    if state == "LA":
+        found = la_classify(name)
+        if found:
+            return [found[1]]
+        town = LA_TOWN.fullmatch(name)
+        if town and plain(town[3]) in places:
+            held = LA_HELD[next(key for key in LA_HELD if town[1].startswith(key))]
+            seat = ":at-large" if "at Large" in town[1] else seat_tail(town[2] or "")
+            return [f"LA:{code}:{held}{seat}" for code in places[plain(town[3])]] + [
+                f"LA:{code}:{held}" for code in places[plain(town[3])]
+            ]
+        return []
     if state == "NC":
         unexpired = "(UNEXPIRED)" in name
         name = re.sub(r"\s*\(UNEXPIRED\)", "", name)
