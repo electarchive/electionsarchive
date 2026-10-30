@@ -196,18 +196,6 @@ FL-12069-clermont	City of Clermont City Council Seat 5	0	Michael Gonzalez	Nonpar
 FL-12069-clermont	City of Clermont City Council Seat 5	0	William "Bill" Petersen	Nonpartisan	Lake	1	
 FL-12069-tavares	City of Tavares City Council Seat 3	0	Amir Asghar	Nonpartisan	Lake	1	
 FL-12069-tavares	City of Tavares City Council Seat 3	0	Walter Price	Nonpartisan	Lake	1	
-AR-05125-saline	City of Alexander Mayor	0	Crystal Hermann	Nonpartisan	Saline	1	
-AR-05125-saline	City of Alexander Mayor	0	Paul Mitchell	Nonpartisan	Saline	1	
-AR-05125-saline	City of Alexander Council	0	Wayne Smith	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Joe Pollard	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Joy Gray	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Christopher Prowse	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Daniel Bates	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Amy Lyons	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Angela Griffin	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Trevis Bentley	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Stephanie Beck	Nonpartisan	Saline	8	
-AR-05125-saline	City of Alexander Council	0	Juanita Wilson	Nonpartisan	Saline	8	
 AR-05125-saline	City of Bauxite Mayor	0	Jamie Barlow	Nonpartisan	Saline	1	
 AR-05125-saline	City of Bauxite Mayor	0	Eddie Jones	Nonpartisan	Saline	1	
 AR-05125-saline	City of Bauxite Council	0	John Davis	Nonpartisan	Saline	6	
@@ -219,7 +207,6 @@ AR-05125-saline	City of Bauxite Council	0	John Simpson	Nonpartisan	Saline	6
 AR-05125-saline	City of Benton Mayor	0	Don White	Nonpartisan	Saline	1	
 AR-05125-saline	City of Benton Mayor	0	Tom Farmer	Nonpartisan	Saline	1	
 AR-05125-saline	City of Benton Mayor	0	Jake Wear	Nonpartisan	Saline	1	
-AR-05125-saline	City of Benton City Attorney	0	Baxter Drennon	Nonpartisan	Saline	1	
 AR-05125-saline	City of Benton City Clerk	0	Cindy Stracener	Nonpartisan	Saline	1	
 AR-05125-saline	City of Benton Council	0	Preston Madison	Nonpartisan	Saline	5	
 AR-05125-saline	City of Benton Council	0	Frank Baptist	Nonpartisan	Saline	5	
@@ -235,7 +222,6 @@ AR-05125-saline	City of Benton Council	0	Kerry Tebbe	Nonpartisan	Saline	5
 AR-05125-saline	City of Benton Council	0	Lamont Cornwell	Nonpartisan	Saline	5	
 AR-05125-saline	City of Bryant Mayor	0	Chris Treat	Nonpartisan	Saline	1	
 AR-05125-saline	City of Bryant Mayor	0	Walter Burgess	Nonpartisan	Saline	1	
-AR-05125-saline	City of Bryant City Attorney	0	Ashley Clancy	Nonpartisan	Saline	1	
 AR-05125-saline	City of Bryant City Clerk	0	Mark Smith	Nonpartisan	Saline	1	
 AR-05125-saline	City of Bryant Council	0	Lisa Meyer	Nonpartisan	Saline	7	
 AR-05125-saline	City of Bryant Council	0	Wade Permenter	Nonpartisan	Saline	7	
@@ -281,11 +267,6 @@ AR-05051-garland	City of Hot Springs Board of Directors	0	Carroll Weatherford	No
 AR-05051-garland	City of Hot Springs Board of Directors	0	Dudley Webb III	Nonpartisan	Garland	3	
 AR-05051-garland	City of Hot Springs Board of Directors	0	Tyler Draper	Nonpartisan	Garland	3	
 AR-05051-garland	City of Hot Springs Board of Directors	0	Garrett Collier	Nonpartisan	Garland	3	
-AR-05051-garland	City of Mount Pine Mayor	0	Paula Matthews	Nonpartisan	Garland	1	
-AR-05051-garland	City of Mount Pine Mayor	0	Jonathan Arnold	Nonpartisan	Garland	1	
-AR-05051-garland	City of Mount Pine Alderman	0	LaTonya McElroy	Nonpartisan	Garland	1	
-AR-05051-garland	City of Mount Pine Alderman	0	Christopher J. Hays	Nonpartisan	Garland	1	
-AR-05051-garland	City of Diamondhead Mayor	0	Ralph Carruth	Nonpartisan	Garland	1	
 AR-05051-garland	City of Fountain Lake Mayor	0	Jack Fields	Nonpartisan	Garland	1	
 AR-05033-crawford	City of Chester Mayor	0	Buddy Duggin	Nonpartisan	Crawford	1	
 AR-05033-crawford	City of Chester Mayor	0	Jeremy Bray	Nonpartisan	Crawford	1	
@@ -307,3 +288,50 @@ AR-05005-baxter	City of Gassville Council	0	Anita Seamans	Nonpartisan	Baxter	3
 AR-05005-baxter	City of Gassville Council	0	Sierra Tumey Palmer	Nonpartisan	Baxter	3	
 AR-05005-baxter	City of Gassville Council	0	Sharon Kaster	Nonpartisan	Baxter	3	
 AR-05005-baxter	City of Gassville Council	0	Jason Bradley	Nonpartisan	Baxter	3	
+AR-05145-white	City of Bald Knob Mayor	0	Beth Calhoun	Nonpartisan	White	1	
+AR-05145-white	City of Bald Knob Mayor	0	Brandon Brown	Nonpartisan	White	1	
+AR-05145-white	City of Bald Knob Mayor	0	Barth Grayson	Republican	White	1	
+AR-05145-white	City of Bald Knob Council	0	Tammy Wools	Nonpartisan	White	2	
+AR-05145-white	City of Bald Knob Council	0	Nancy Corbit	Nonpartisan	White	2	
+AR-05145-white	City of Bald Knob Council	0	Willie Gilbert	Nonpartisan	White	2	
+AR-05145-white	City of Bald Knob Council	0	Eddie Leonard	Nonpartisan	White	2	
+AR-05145-white	City of Beebe Council	0	Kelli Taylor	Nonpartisan	White	2	
+AR-05145-white	City of Beebe Council	0	Jean (Shawn) Stark	Nonpartisan	White	2	
+AR-05145-white	City of Beebe Council	0	Dakota Burks	Nonpartisan	White	2	
+AR-05145-white	City of Beebe Council	0	Chris Cossey	Nonpartisan	White	2	
+AR-05145-white	City of Judsonia Council	0	David Conley	Nonpartisan	White	1	
+AR-05145-white	City of Judsonia Council	0	David Blue	Nonpartisan	White	1	
+AR-05145-white	City of Kensett Mayor	0	Bill Mills	Nonpartisan	White	1	
+AR-05145-white	City of Kensett Mayor	0	Don Fuller	Nonpartisan	White	1	
+AR-05145-white	City of Kensett Council	0	Maxine T. Teague	Nonpartisan	White	2	
+AR-05145-white	City of Kensett Council	0	Joseph Myles	Nonpartisan	White	2	
+AR-05145-white	City of Kensett Council	0	Heath Guinn	Nonpartisan	White	2	
+AR-05145-white	City of Kensett Council	0	Keith M. Baker	Nonpartisan	White	2	
+AR-05145-white	City of Letona Mayor	0	Steve Lassiter	Nonpartisan	White	1	
+AR-05145-white	City of Letona Mayor	0	Sherrel Bennett	Nonpartisan	White	1	
+AR-05145-white	City of Letona Clerk/Recorder/Treasurer	0	Margie Olive	Nonpartisan	White	1	
+AR-05145-white	City of Letona Clerk/Recorder/Treasurer	0	Mandy Stout	Nonpartisan	White	1	
+AR-05145-white	City of Letona Council	0	Michael Fike	Nonpartisan	White	3	
+AR-05145-white	City of Letona Council	0	Charles "Kenny" Diffy	Nonpartisan	White	3	
+AR-05145-white	City of Letona Council	0	Kelly Cleveland	Nonpartisan	White	3	
+AR-05145-white	City of Letona Council	0	Garry Maxey	Nonpartisan	White	3	
+AR-05145-white	City of Letona Council	0	Mike Stout	Nonpartisan	White	3	
+AR-05145-white	City of Letona Council	0	Samuel Olive	Nonpartisan	White	3	
+AR-05145-white	City of McRae Council	0	Terry Hogan	Nonpartisan	White	1	
+AR-05145-white	City of McRae Council	0	Calvin McDaniel	Nonpartisan	White	1	
+AR-05145-white	City of Pangburn Mayor	0	Ben Langley	Nonpartisan	White	1	
+AR-05145-white	City of Pangburn Mayor	0	Michael Marsh	Nonpartisan	White	1	
+AR-05145-white	City of Searcy Clerk	0	Tommy Centola	Nonpartisan	White	1	
+AR-05145-white	City of Searcy Clerk	0	Angel Hodnett	Nonpartisan	White	1	
+AR-05145-white	City of Searcy Council	0	Davis Morris	Nonpartisan	White	2	
+AR-05145-white	City of Searcy Council	0	Ryland Lauen	Nonpartisan	White	2	
+AR-05145-white	City of Searcy Council	0	Donald P. Raney	Nonpartisan	White	2	
+AR-05145-white	City of Searcy Council	0	Justin Johnson	Nonpartisan	White	2	
+FL-12115-venice	City of Venice City Council Seat 2	0	Christopher Derbak	Nonpartisan	Sarasota	1	
+FL-12115-venice	City of Venice City Council Seat 2	0	Jenny Heussner	Nonpartisan	Sarasota	1	
+FL-12115-venice	City of Venice City Council Seat 2	0	Sue Perry	Nonpartisan	Sarasota	1	
+FL-12115-venice	City of Venice City Council Seat 5	0	David Gress	Nonpartisan	Sarasota	1	
+FL-12115-venice	City of Venice City Council Seat 5	0	Rick Howard	Nonpartisan	Sarasota	1	
+FL-12103-seminole	City of Seminole City Council	0	Ray Beliveau	Nonpartisan	Pinellas	2	
+FL-12103-seminole	City of Seminole City Council	0	Mike Lurie	Nonpartisan	Pinellas	2	
+FL-12103-seminole	City of Seminole City Council	0	Kadi Hendricks Tubbs	Nonpartisan	Pinellas	2	
