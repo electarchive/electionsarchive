@@ -73,6 +73,7 @@ def emit() -> Path:
             polity_path = election_path.removesuffix(f"/{DAY}-general")
             polity = slugs[polity_path]
             place = conn.execute("select text from name where entity_id = %s and is_preferred and lang = 'en'", [polity]).fetchone()[0]
+            area = conn.execute("select area_id from polity_territory where polity_id = %s", [polity]).fetchone()[0]
             full = f"{place} {office_title}"
             owner = cs.key("us.office", f"WA:{code}:{tail}")
             contest_key = f"{DAY}:WA:{code}:{tail}"
@@ -90,6 +91,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="office",
                 office_id=owner,
+                district_area_id=area,
                 magnitude=1,
                 round_number=1,
                 electoral_system_id=system,
