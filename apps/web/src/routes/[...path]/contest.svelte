@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
@@ -1235,9 +1236,16 @@
         path={contest.path}>{contest.name}</Preview
       >
     {/if}
-    <h1 class="title" data-scope-title>
-      {(drilled ? heading : contest.name).replaceAll("—", "\u2060—")}
-    </h1>
+    <div class="flex items-start justify-between gap-3">
+      <h1 class="title" data-scope-title>
+        {(drilled ? heading : contest.name).replaceAll("—", "\u2060—")}
+      </h1>
+      <EditPanel
+        entity={id}
+        label={contest.name}
+        title={m.edit_title_contest()}
+      />
+    </div>
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
     >

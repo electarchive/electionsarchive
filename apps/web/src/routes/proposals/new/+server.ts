@@ -13,6 +13,7 @@ import {
   schemePattern,
   schemes,
   sourceKinds,
+  stages,
 } from "#lib/contrib.js";
 import { editable, propose } from "#lib/server/contrib.js";
 import type { RequestHandler } from "./$types";
@@ -50,7 +51,28 @@ const Reference = <Kind extends "id_add" | "id_drop">(kind: Kind) =>
     v.check(({ scheme, value }) => schemePattern[scheme].test(value)),
   );
 
+const Code = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(100));
+
+const Cell = v.object({
+  unit: v.union([Uuid, v.object({ scheme: Code, code: Code })]),
+  option: v.nullable(Uuid),
+  measure: v.pipe(v.string(), v.regex(/^[a-z_]{1,40}$/u)),
+  channel: v.pipe(v.string(), v.regex(/^[a-z_]{1,40}$/u)),
+  count_round: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  value: v.pipe(v.number(), v.minValue(0)),
+});
+
 const Change = v.variant("kind", [
+  v.object({
+    kind: v.literal("results"),
+    stage: v.picklist(stages),
+    rows: v.pipe(v.array(Cell), v.minLength(1), v.maxLength(50_000)),
+  }),
+  v.object({
+    kind: v.literal("correct"),
+    resultSet: Uuid,
+    cells: v.pipe(v.array(Cell), v.minLength(1), v.maxLength(2000)),
+  }),
   v.object({ kind: v.literal("name"), id: Uuid, text: Line(500) }),
   v.object({
     kind: v.literal("note_add"),

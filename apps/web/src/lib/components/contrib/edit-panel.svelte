@@ -9,6 +9,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import type { Change, Editable, Origin, Scheme } from "#lib/contrib.js";
   import Proof from "#lib/components/contrib/proof.svelte";
+  import ResultsGrid from "#lib/components/contrib/results-grid.svelte";
   import UploadEvidence from "#lib/components/contrib/upload-evidence.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
@@ -129,6 +130,8 @@
   let summary = $state("");
   let submitting = $state(false);
   let submitted = $state<number | null>(null);
+  let figures = $state<Change | null>(null);
+  let badFigures = $state(false);
 
   $effect(() => {
     if (!open) {
@@ -490,6 +493,9 @@
         to: image.to.trim() === "" ? null : image.to.trim(),
       });
     }
+    if (figures != null) {
+      list.push(figures);
+    }
     return list;
   });
   const invalid = $derived(
@@ -508,7 +514,8 @@
           (item.scheme === "") !== (item.value.trim() === ""),
       ) ||
       colorProblem != null ||
-      imageProblem != null,
+      imageProblem != null ||
+      badFigures,
   );
   const dated = $derived(
     image != null && (image.from.trim() !== "" || image.to.trim() !== ""),
@@ -519,6 +526,8 @@
         (change.kind === "image" && dated) ||
         change.kind === "name" ||
         change.kind === "cite" ||
+        change.kind === "results" ||
+        change.kind === "correct" ||
         change.kind.startsWith("color_") ||
         (change.kind === "translate" && change.origin === "official"),
     ),
@@ -581,6 +590,8 @@
     colorDraft = null;
     newColor = null;
     image = null;
+    figures = null;
+    badFigures = false;
     cite = false;
     uncites.clear();
     source = null;
@@ -691,7 +702,11 @@
     class={cn(
       "contrib-sheet fixed z-40 flex flex-col bg-background",
       "max-lg:inset-x-0 max-lg:inset-be-0 max-lg:rounded-t-md max-lg:border-bs max-lg:shadow-[0_-8px_24px_-12px_rgb(0_0_0/0.25)]",
-      "lg:inset-y-0 lg:inset-e-0 lg:border-s lg:inline-105",
+      "lg:inset-y-0 lg:inset-e-0 lg:border-s",
+      {
+        "lg:inline-105": data?.results == null,
+        "lg:inline-176": data?.results != null,
+      },
       {
         "max-lg:block-17": sheet === "peek",
         "max-lg:block-[58dvh]": sheet === "half",
@@ -818,6 +833,15 @@
               {/each}
             </dl>
           </section>
+
+          {#if data.results != null}
+            <ResultsGrid
+              results={data.results}
+              {signedIn}
+              bind:change={figures}
+              bind:invalid={badFigures}
+            />
+          {/if}
 
           {#if data.kind != null}
             {const portrait = $derived(data.kind === "person")}

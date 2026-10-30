@@ -284,7 +284,7 @@ export async function cells({
       and l.count_round = v.count_round
     left join source_page p on p.id = l.page_id
     where v.result_set_k = ${set.k} and (${unit ?? null}::uuid is null or u.id = ${unit ?? null}::uuid)
-    order by u.code, o.ballot_position nulls first, o.k nulls first, v.measure, v.channel, v.count_round
+    order by u.code, u.id, o.ballot_position nulls first, o.k nulls first, v.measure, v.channel, v.count_round
     offset ${offset} limit ${limit}
   `);
   return {
@@ -336,6 +336,8 @@ export async function propose({
     change.kind === "image" && (change.from != null || change.to != null);
   const requiresSource = (change: Change) =>
     hasDates(change) ||
+    change.kind === "results" ||
+    change.kind === "correct" ||
     change.kind === "name" ||
     change.kind === "cite" ||
     change.kind.startsWith("color_") ||
@@ -347,7 +349,7 @@ export async function propose({
   if (evidence == null && changes.some((change) => requiresSource(change))) {
     error(
       400,
-      "A name, color, logo date, citation, or official translation needs a source.",
+      "A name, color, logo date, citation, official translation, or result needs a source.",
     );
   }
   if (
@@ -395,6 +397,10 @@ export async function propose({
     );
   }
   const seen = translated.map((change) => `${change.note}:${change.md5}`);
+  const hasResults = changes.some((change) => change.kind === "results");
+  const corrected = changes.flatMap((change) =>
+    change.kind === "correct" ? [change.resultSet] : [],
+  );
   const sourceId = evidence?.type === "source" ? evidence.sourceId : null;
   const uploadId = evidence?.type === "upload" ? evidence.uploadId : null;
   const { rows } = await db.execute<{
@@ -418,6 +424,10 @@ export async function propose({
        and (${uploadId}::uuid is null or exists (
          select from upload where id = ${uploadId} and owner_user_id = ${userId} and status = 'ready'
        ))
+       and (${!hasResults} or exists (select from contest where id = ${entityId}))
+       and (select count(*) from result_set
+            where id = any(${`{${corrected.join(",")}}`}::uuid[]) and contest_id = ${entityId} and status = 'active')
+             = ${new Set(corrected).size}
        and (${image == null} or exists (select from person where id = ${entityId})
             or exists (select from party where id = ${entityId}))
        and (select count(*) from citation c join changeset ch on ch.id = c.changeset_id
@@ -461,6 +471,21 @@ export async function propose({
   })();
   const op = (change: Change) => {
     switch (change.kind) {
+      case "results": {
+        return {
+          op: "results",
+          contest_id: entityId,
+          stage: change.stage,
+          rows: change.rows,
+        };
+      }
+      case "correct": {
+        return {
+          op: "correct",
+          result_set: change.resultSet,
+          cells: change.cells,
+        };
+      }
       case "name": {
         return {
           op: "set",
@@ -675,6 +700,10 @@ export async function proposal(number: number) {
       }> | null;
       titles: Record<string, string> | null;
       originals: Record<string, { body: string; lang: string }> | null;
+      pages: Record<
+        string,
+        { upload: string; page: number; width: number; height: number }
+      > | null;
     }>(sql`
       select r.n, r.payload, r.diff, r.checks, r.created_at::text,
              (select json_agg(json_build_object(
@@ -714,7 +743,25 @@ export async function proposal(number: number) {
                   from jsonb_array_elements(r.payload -> 'ops') op
                   where op ->> 'op' = 'translate'
                 ))
-              ) o) as originals
+              ) o) as originals,
+             (select json_object_agg(l.id, json_build_object(
+                       'upload', up.upload_id, 'page', up.page_number, 'width', up.width, 'height', up.height
+                     ))
+              from (
+                select distinct x -> 'locator' ->> 'page_id' as id
+                from jsonb_array_elements(r.diff -> 'rows') x
+                where x ->> 'table' = 'result_value' and x ? 'locator'
+              ) l
+              cross join lateral (
+                select u.upload_id, u.page_number, u.width, u.height
+                from upload_page u
+                where u.image_key = coalesce(
+                  (select y -> 'fields' -> 'image_key' ->> 1 from jsonb_array_elements(r.diff -> 'rows') y
+                   where y ->> 'table' = 'source_page' and y -> 'key' ->> 'id' = l.id limit 1),
+                  (select sp.image_key from source_page sp where sp.id::text = l.id)
+                )
+                limit 1
+              ) up) as pages
       from proposal_revision r
       where r.proposal_id = ${found.id}
       order by r.n desc
@@ -748,9 +795,12 @@ export async function queue() {
     prescreen: Prescreen["verdict"] | null;
     recommendation: Prereview["recommendation"] | null;
     escalations: Array<Escalation>;
+    fold: "awaiting" | "mismatch" | null;
   }>(sql`
     select p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.submitted_at::text,
+           case when p.state = 'approved' and p.decided_by is not null and r.diff ? 'fold'
+                then case when r.diff -> 'fold' ? 'mismatch' then 'mismatch' else 'awaiting' end end as fold,
            (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page')
               or (x ->> 'table' = 'citation' and (x ->> 'op' = 'drop' or x -> 'fields' -> 'locator' -> 1 ->> 'op' = 'cite')))::int as changes,
            coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings,
@@ -761,7 +811,7 @@ export async function queue() {
     left join users a on a.id = p.author_user_id
     left join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
     where p.state in ('open', 'approved')
-    order by p.tier nulls last, p.submitted_at nulls last, p.number
+    order by (p.state = 'approved' and r.diff ? 'fold'), p.tier nulls last, p.submitted_at nulls last, p.number
     limit 200
   `);
   return rows;

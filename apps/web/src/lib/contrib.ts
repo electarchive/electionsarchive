@@ -201,7 +201,36 @@ export const isFree = (code: string, name: string) =>
   !/\bNC\b|\bND\b/u.test(name) &&
   (freeCode.test(code) || freeName.test(name));
 
+export const stages = [
+  "preliminary",
+  "official",
+  "certified",
+  "court_revised",
+  "recount",
+  "alternative",
+] as const;
+
+export const stageLabel: Record<(typeof stages)[number], () => string> = {
+  preliminary: m.stage_preliminary,
+  official: m.stage_official,
+  certified: m.stage_certified,
+  court_revised: m.stage_court_revised,
+  recount: m.stage_recount,
+  alternative: m.stage_alternative,
+};
+
+export type Cell = {
+  unit: string | { scheme: string; code: string };
+  option: string | null;
+  measure: string;
+  channel: string;
+  count_round: number;
+  value: number;
+};
+
 export type Change =
+  | { kind: "results"; stage: (typeof stages)[number]; rows: Array<Cell> }
+  | { kind: "correct"; resultSet: string; cells: Array<Cell> }
   | { kind: "name"; id: string; text: string }
   | {
       kind: "note_add";
@@ -322,12 +351,29 @@ export type DiffRow = {
   entity_id: string | null;
   op: "add" | "change" | "drop";
   fields: Record<string, [unknown, unknown]>;
+  labels?: {
+    unit: string;
+    option: string | null;
+    measure: string;
+    channel: string;
+  };
+  locator?: {
+    page_id: string;
+    region: [number, number, number, number] | null;
+  };
 };
 
 export type Diff = {
   rows: Array<DiffRow>;
   truncated: boolean;
   entities: Array<string>;
+  fold?: {
+    sets: Array<{ result_set: string; pipeline: string }>;
+    cells: number;
+    checked?: string;
+    published_by?: string;
+    mismatch?: { changeset: string; cells: number };
+  };
 };
 
 export type Checks = {
@@ -423,6 +469,40 @@ export const stateLabel: Record<ProposalState, () => string> = {
   withdrawn: m.proposal_state_withdrawn,
   reverted: m.proposal_state_reverted,
 };
+
+const measures: Record<string, () => string> = {
+  votes: m.measure_votes,
+  registered: m.measure_registered,
+  ballots_cast: m.measure_ballots_cast,
+  valid: m.measure_valid,
+  invalid: m.measure_invalid,
+  blank: m.measure_blank,
+  voters: m.measure_voters,
+  present: m.measure_present,
+  seats: m.measure_seats,
+  list_votes: m.measure_list_votes,
+  electoral_votes: m.measure_electoral_votes,
+  state_delegate_equivalents: m.measure_state_delegate_equivalents,
+  caucus_delegates: m.measure_caucus_delegates,
+};
+
+export const measureLabel = (code: string) =>
+  measures[code]?.() ?? code.replaceAll("_", " ");
+
+const channels: Record<string, () => string> = {
+  election_day: m.channel_election_day,
+  early: m.channel_early,
+  postal: m.channel_postal,
+  abroad: m.channel_abroad,
+  provisional: m.channel_provisional,
+  mobile: m.channel_mobile,
+  prison: m.channel_prison,
+  customs: m.channel_customs,
+  special_rules: m.channel_special_rules,
+};
+
+export const channelLabel = (code: string) =>
+  channels[code]?.() ?? code.replaceAll("_", " ");
 
 export const tierLabel: Record<number, () => string> = {
   1: m.proposal_tier_1,

@@ -7,9 +7,11 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import {
+    channelLabel,
     dated,
     escalationLabel,
     factLabel,
+    measureLabel,
     noteKindLabel,
     originLabel,
     origins,
@@ -46,13 +48,23 @@
     locator != null &&
     "op" in locator &&
     locator.op === "cite";
+  const fold = $derived(
+    proposal.state === "approved" && head?.diff?.fold != null
+      ? head.diff.fold
+      : null,
+  );
+  const cells = $derived(
+    (head?.diff?.rows ?? []).filter((row) => row.table === "result_value"),
+  );
+  let opened = $state<number | null>(null);
   const rows = $derived(
     (head?.diff?.rows ?? [])
       .filter(
         (row) =>
-          !evidential.includes(row.table) ||
-          (row.table === "citation" &&
-            (row.op === "drop" || cites(row.fields.locator?.[1]))),
+          row.table !== "result_value" &&
+          (!evidential.includes(row.table) ||
+            (row.table === "citation" &&
+              (row.op === "drop" || cites(row.fields.locator?.[1])))),
       )
       .map((row): DiffRow =>
         row.table === "external_id" && row.op === "add"
@@ -93,6 +105,8 @@
     party_color: m.proposal_table_party_color,
     party_image: m.proposal_table_party_image,
     person_image: m.proposal_table_person_image,
+    result_set: m.proposal_table_result_set,
+    outcome: m.proposal_table_outcome,
   };
   const fields: Record<string, () => string> = {
     source_id: m.proposal_field_source,
@@ -107,6 +121,11 @@
     artist: m.proposal_field_artist,
     source_url: m.proposal_field_source_url,
     taken_text: m.proposal_field_taken_text,
+    stage: m.proposal_field_stage,
+    is_default: m.proposal_field_is_default,
+    status: m.proposal_field_status,
+    as_of: m.proposal_field_as_of,
+    seats: m.proposal_field_seats,
   };
   const hidden = new Set([
     "id",
@@ -134,6 +153,12 @@
     "taken_from_precision",
     "taken_to",
     "taken_to_precision",
+    "result_set_id",
+    "option_id",
+    "election_id",
+    "contest_id",
+    "supersedes_id",
+    "completeness",
   ]);
   const unlabeled = new Set(["text", "body_md", "body", "path"]);
   const order = [
@@ -201,6 +226,8 @@
       }),
   );
   const day = (value: string | null) => date(value?.slice(0, 10) ?? null);
+  const figure = (value: unknown) =>
+    typeof value === "number" ? count(value) : null;
   const precision = (value: unknown) =>
     precisions.find((item) => item === value) ?? "day";
   const shown = (field: string, value: unknown, at: unknown) => {
@@ -250,7 +277,7 @@
   let busy = $state(false);
 
   $effect(() => {
-    if (!pending && proposal.state !== "approved") {
+    if (!pending && (proposal.state !== "approved" || fold != null)) {
       return;
     }
     const timer = setInterval(() => void invalidateAll(), 2500);
@@ -270,7 +297,11 @@
     <p class="flex flex-wrap items-baseline gap-x-4 text-sm">
       <span class="font-figures font-semibold">#{proposal.number}</span>
       <span class={cn({ "font-semibold": proposal.state !== "open" })}
-        >{stateLabel[proposal.state]()}</span
+        >{fold == null
+          ? stateLabel[proposal.state]()
+          : fold.mismatch == null
+            ? m.proposal_state_awaiting_fold()
+            : m.proposal_state_fold_mismatch()}</span
       >
       {#if proposal.tier != null}
         <span class="text-muted-foreground">{tierLabel[proposal.tier]?.()}</span
@@ -307,6 +338,18 @@
         {#if proposal.decision_reason != null}
           <span class="block text-pretty">{proposal.decision_reason}</span>
         {/if}
+      {:else if fold != null}
+        {const pipeline = $derived(
+          fold.sets.map((item) => item.pipeline).join(", "),
+        )}
+        <span class="block text-pretty"
+          >{fold.mismatch == null
+            ? m.proposal_fold_waiting({ pipeline })
+            : m.proposal_fold_mismatch({
+                pipeline,
+                count: fold.mismatch.cells,
+              })}</span
+        >
       {:else if head?.checks?.unchanged === true}
         {m.proposal_unchanged()}
       {:else if findings === 0}
@@ -482,6 +525,117 @@
         </li>
       {/each}
     </ul>
+    {#if cells.length > 0}
+      <div class="mbs-4 flex items-baseline justify-between gap-4">
+        <h3 class="text-sm font-semibold">{m.proposal_results()}</h3>
+        <span class="text-xs text-muted-foreground"
+          >{m.proposal_results_count({ count: cells.length })}</span
+        >
+      </div>
+      <div class="mbs-1 overflow-x-auto">
+        <table class="border-bs text-sm inline-full">
+          <thead>
+            <tr class="border-be text-xs text-muted-foreground">
+              <th class="py-1.5 pe-4 text-start font-normal"
+                >{m.proposal_results_unit()}</th
+              >
+              <th class="py-1.5 pe-4 text-start font-normal"
+                >{m.proposal_results_option()}</th
+              >
+              <th class="py-1.5 pe-4 text-start font-normal"
+                >{m.proposal_results_measure()}</th
+              >
+              <th class="py-1.5 text-end font-normal"
+                >{m.proposal_results_value()}</th
+              >
+            </tr>
+          </thead>
+          <tbody>
+            {#each cells as cell, i (i)}
+              {const previous = $derived(cells[i - 1]?.labels?.unit)}
+              {const page = $derived(
+                cell.locator == null
+                  ? null
+                  : (head?.pages?.[cell.locator.page_id] ?? null),
+              )}
+              {const channel = $derived(cell.labels?.channel ?? "all")}
+              <tr
+                class={cn("align-baseline", {
+                  "border-bs": previous !== cell.labels?.unit,
+                })}
+              >
+                <td class="py-1.5 pe-4"
+                  >{#if previous !== cell.labels?.unit}{cell.labels
+                      ?.unit}{/if}</td
+                >
+                <td class="py-1.5 pe-4">{cell.labels?.option ?? ""}</td>
+                <td class="py-1.5 pe-4 text-muted-foreground"
+                  >{measureLabel(
+                    cell.labels?.measure ?? "",
+                  )}{#if channel !== "all"}<span class="block text-xs"
+                      >{channelLabel(channel)}</span
+                    >{/if}</td
+                >
+                <td class="py-1.5 text-end whitespace-nowrap">
+                  <Proof
+                    class="justify-end"
+                    before={figure(cell.fields.value?.[0])}
+                    after={figure(cell.fields.value?.[1])}
+                    n={page == null ? undefined : i + 1}
+                    label={page == null
+                      ? undefined
+                      : m.proposal_results_mark({ n: i + 1, page: page.page })}
+                    onopen={page == null
+                      ? undefined
+                      : () => {
+                          opened = opened === i ? null : i;
+                        }}
+                  />
+                </td>
+              </tr>
+              {#if opened === i && page != null}
+                {const href = $derived(
+                  `/uploads/${page.upload}/pages/${page.page}`,
+                )}
+                <tr>
+                  <td colspan="4" class="pbe-3">
+                    <figure class="grid justify-items-end gap-1.5">
+                      <ScanCrop
+                        {href}
+                        width={page.width}
+                        height={page.height}
+                        region={cell.locator?.region ?? null}
+                        label={m.proposal_scan_alt({ page: page.page })}
+                        limit={480}
+                      />
+                      <figcaption
+                        class="flex flex-wrap items-baseline gap-x-3 text-xs text-muted-foreground"
+                      >
+                        <span class="font-figures"
+                          >{m.proposal_scan_page({ page: page.page })}</span
+                        >
+                        <a
+                          class="underline underline-offset-2 hover:text-foreground"
+                          {href}
+                          rel="external">{m.proposal_scan_open()}</a
+                        >
+                        <button
+                          type="button"
+                          class="underline underline-offset-2 hover:text-foreground"
+                          onclick={() => {
+                            opened = null;
+                          }}>{m.proposal_results_hide()}</button
+                        >
+                      </figcaption>
+                    </figure>
+                  </td>
+                </tr>
+              {/if}
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
     {#if head?.diff?.truncated === true}
       <p class="mbs-2 text-sm text-muted-foreground">
         {m.proposal_truncated()}

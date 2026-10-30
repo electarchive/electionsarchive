@@ -13,6 +13,13 @@
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
+
+  const status = (item: PageData["proposals"][number]) =>
+    item.fold == null
+      ? stateLabel[item.state]()
+      : item.fold === "mismatch"
+        ? m.proposal_state_fold_mismatch()
+        : m.proposal_state_awaiting_fold();
 </script>
 
 <svelte:head>
@@ -46,8 +53,7 @@
               class="flex flex-wrap gap-x-3 font-figures text-xs text-muted-foreground"
             >
               {#if item.state !== "open"}
-                <span class="font-semibold text-foreground"
-                  >{stateLabel[item.state]()}</span
+                <span class="font-semibold text-foreground">{status(item)}</span
                 >
               {/if}
               <span>{item.author ?? m.proposal_unknown_author()}</span>
@@ -128,7 +134,7 @@
                   >
                   {#if item.state !== "open"}
                     <span class="text-xs text-muted-foreground"
-                      >{stateLabel[item.state]()}</span
+                      >{status(item)}</span
                     >
                   {:else if item.escalations.length > 0}
                     <span class="text-xs text-pretty text-muted-foreground"
