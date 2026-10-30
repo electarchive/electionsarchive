@@ -23,6 +23,7 @@ from ea import raw
 from ea.apply import _stage, apply, publish, revert
 from ea.capture import capture, resume
 from ea.changeset import Changeset, bcp47
+from ea.checks import Stage
 from ea.sources import party_logos, wikidata_photos
 from ea.store import DATA, ROOT, Connection, connect
 from ea.uploads import process, sweep
@@ -116,7 +117,7 @@ TIERS = {
         ),
         1,
     ),
-    **dict.fromkeys(("result_value", "result_flow", "outcome", "seat", "body_size"), 3),
+    **dict.fromkeys(("result_flow", "seat", "body_size"), 3),
 }
 
 KEYED = {"translation": ("source_md5", "lang"), "external_id": ("scheme", "value")}
@@ -134,6 +135,24 @@ ROW_DROP_TIERS = {"label": 1}
 
 
 SOURCE_KINDS = ("official_body", "aggregator", "compendium", "news_agency", "academic", "community")
+
+STAGES = ("preliminary", "official", "certified", "court_revised", "recount", "alternative")
+
+OUTCOMES = ("elected", "won", "advanced", "eliminated", "lost", "tied", "withdrew", "disqualified", "declined")
+
+RESULT_TABLES = ("result_set", "result_value", "value_locator", "outcome")
+
+UNIT_LABEL = sql.SQL(
+    "coalesce((select n.text from name n where n.entity_id = u.id order by n.is_preferred desc, n.id limit 1), u.code)"
+)
+
+OPTION_LABEL = sql.SQL("""coalesce(
+    o.ballot_label,
+    (select string_agg(coalesce(c.ballot_name, (select n.text from name n where n.entity_id = c.person_id
+                                                 order by n.is_preferred desc, n.id limit 1)), ' / ')
+     from candidacy c where c.option_id = o.id),
+    (select n.text from name n where n.entity_id = o.party_id order by n.is_preferred desc, n.id limit 1),
+    o.kind::text)""")
 
 
 class Evidence(TypedDict, total=False):
@@ -155,6 +174,23 @@ class Of(TypedDict):
     id: str
 
 
+class Cell(TypedDict, total=False):
+    unit: object
+    option: str | None
+    measure: str
+    channel: str
+    count_round: int
+    value: object
+    page: int
+    region: list[float]
+
+
+class Declared(TypedDict, total=False):
+    option: str
+    kind: str
+    seats: int
+
+
 class Op(TypedDict, total=False):
     op: str
     table: str
@@ -168,6 +204,13 @@ class Op(TypedDict, total=False):
     lang: str
     body: str
     origin: str
+    contest_id: str
+    stage: str
+    as_of: str
+    rows: list[Cell]
+    outcomes: list[Declared]
+    result_set: str
+    cells: list[Cell]
 
 
 class Payload(TypedDict, total=False):
@@ -574,8 +617,49 @@ def _linked(
     return source, {"sha256": sha256} | ({} if wayback is None else {"wayback": wayback})
 
 
+def _page(
+    conn: Connection, cs: Changeset, upload: UUID, artifact: UUID, number: int, added: set[UUID], where: str
+) -> UUID:
+    image = conn.execute(
+        "select image_key, width, height from upload_page where upload_id = %s and page_number = %s", [upload, number]
+    ).fetchone()
+    if image is None:
+        raise ValueError(f"{where}: upload {upload} has no page {number}")
+    page = cs.page(artifact, number)
+    if page not in added:
+        added.add(page)
+        cs.add(
+            "source_page",
+            id=page,
+            artifact_id=artifact,
+            page_number=number,
+            image_key=image[0],
+            width=image[1],
+            height=image[2],
+        )
+    return page
+
+
+def _region(region: object, where: str) -> list[float]:
+    if not (
+        isinstance(region, list)
+        and len(region) == 4
+        and all(isinstance(value, int | float) and not isinstance(value, bool) and 0 <= value <= 1 for value in region)
+        and region[0] < region[2]
+        and region[1] < region[3]
+    ):
+        raise ValueError(f"{where}: region must be [x0, y0, x1, y1] fractions of the page, with x0 < x1 and y0 < y1")
+    return [float(value) for value in region]
+
+
 def _uploaded(
-    conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]
+    conn: Connection,
+    cs: Changeset,
+    item: Evidence,
+    author: UUID,
+    where: str,
+    added: set[UUID],
+    files: dict[UUID, tuple[UUID, UUID, int]],
 ) -> tuple[UUID, dict[str, str]]:
     upload = _uuid(item.get("upload"), f"{where}.upload")
     row = conn.execute(
@@ -599,6 +683,7 @@ def _uploaded(
         ),
         source,
     )
+    files[source] = (upload, artifact, pages or 0)
     proof = {"sha256": sha256}
     number = item.get("page")
     if number is None:
@@ -607,32 +692,9 @@ def _uploaded(
         return source, proof
     if pages is None or not isinstance(number, int) or isinstance(number, bool) or not 1 <= number <= pages:
         raise ValueError(f"{where}: page must be between 1 and {pages or 0}")
-    region = item.get("region")
-    if region is not None and not (
-        isinstance(region, list)
-        and len(region) == 4
-        and all(isinstance(value, int | float) and not isinstance(value, bool) and 0 <= value <= 1 for value in region)
-        and region[0] < region[2]
-        and region[1] < region[3]
-    ):
-        raise ValueError(f"{where}: region must be [x0, y0, x1, y1] fractions of the page, with x0 < x1 and y0 < y1")
-    image = conn.execute(
-        "select image_key, width, height from upload_page where upload_id = %s and page_number = %s", [upload, number]
-    ).fetchone()
-    if image is None:
-        raise ValueError(f"{where}: upload {upload} has no page {number}")
-    page = cs.page(artifact, number)
-    if page not in added:
-        added.add(page)
-        cs.add(
-            "source_page",
-            id=page,
-            artifact_id=artifact,
-            page_number=number,
-            image_key=image[0],
-            width=image[1],
-            height=image[2],
-        )
+    if "region" in item:
+        _region(item["region"], where)
+    page = _page(conn, cs, upload, artifact, number, added, where)
     return source, proof | {"page_id": str(page)}
 
 
@@ -722,6 +784,378 @@ def _drop(conn: Connection, cs: Changeset, op: Op, where: str, reason: str) -> t
     raise ValueError(f"{where}: {table!r} rows cannot be dropped")
 
 
+def _codes(conn: Connection, table: Literal["measure", "channel"]) -> dict[str, int]:
+    return {code: id for id, code in conn.execute(sql.SQL("select id, code from {}").format(sql.Identifier(table)))}
+
+
+def _code(codes: dict[str, int], value: object, where: str) -> int:
+    if not isinstance(value, str) or value not in codes:
+        raise ValueError(f"{where}: expected one of {', '.join(codes)}, got {value!r}")
+    return codes[value]
+
+
+def _unit(conn: Connection, value: object, on: date | None, where: str) -> UUID:
+    if isinstance(value, dict):
+        scheme, code = value.get("scheme"), value.get("code")
+        found = (
+            conn.execute(
+                """select id from reporting_unit where scheme_code = %s and code = %s
+                   and (%s::date is null or valid @> %s::date)""",
+                [scheme, code, on, on],
+            ).fetchone()
+            if isinstance(scheme, str) and isinstance(code, str)
+            else None
+        )
+        if found is None:
+            raise ValueError(f"{where}: no reporting unit {scheme} {code} on {on}")
+        return cast(UUID, found[0])
+    unit = _uuid(value, where)
+    if conn.execute("select from reporting_unit where id = %s", [unit]).fetchone() is None:
+        raise ValueError(f"{where}: reporting unit {unit} does not exist")
+    return unit
+
+
+def _amount(value: object, where: str) -> float:
+    if not isinstance(value, int | float) or isinstance(value, bool) or value < 0:
+        raise ValueError(f"{where}: value must be a number of at least 0, got {value!r}")
+    return float(value)
+
+
+def _round(value: object, where: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise ValueError(f"{where}: count_round must be a whole number of at least 0")
+    return value
+
+
+Address = tuple[UUID, UUID | None, int, int, int]
+
+
+def _address(
+    conn: Connection,
+    cell: Cell,
+    on: date | None,
+    options: set[UUID],
+    codes: tuple[dict[str, int], dict[str, int]],
+    where: str,
+) -> Address:
+    unit = _unit(conn, cell.get("unit"), on, f"{where}.unit")
+    option = None if cell.get("option") is None else _uuid(cell.get("option"), f"{where}.option")
+    if option is not None and option not in options:
+        raise ValueError(f"{where}: option {option} is not on this contest's ballot")
+    return (
+        unit,
+        option,
+        _code(codes[1], cell.get("channel", "all"), f"{where}.channel"),
+        _code(codes[0], cell.get("measure"), f"{where}.measure"),
+        _round(cell.get("count_round", 0), f"{where}.count_round"),
+    )
+
+
+def _held(conn: Connection, election: UUID, contest: UUID, stage: str) -> bool:
+    return (
+        conn.execute(
+            "select from result_set where election_id = %s and contest_id = %s and stage = %s and is_default",
+            [election, contest, stage],
+        ).fetchone()
+        is not None
+    )
+
+
+def _results(
+    conn: Connection,
+    cs: Changeset,
+    op: Op,
+    where: str,
+    source: UUID,
+    files: dict[UUID, tuple[UUID, UUID, int]],
+    evidence: Evidence,
+    proof: dict[str, str],
+    added: set[UUID],
+    undefaulted: bool,
+) -> tuple[UUID, UUID]:
+    contest = _uuid(op.get("contest_id"), f"{where}.contest_id")
+    found = conn.execute(
+        "select c.election_id, e.date_from from contest c join election e on e.id = c.election_id where c.id = %s",
+        [contest],
+    ).fetchone()
+    if found is None:
+        raise ValueError(f"{where}: contest {contest} does not exist")
+    election, on = cast(tuple[UUID, date | None], found)
+    stage = op.get("stage")
+    if stage not in STAGES:
+        raise ValueError(f"{where}: stage must be one of {', '.join(STAGES)}")
+    rows = op.get("rows") or []
+    if not rows:
+        raise ValueError(f"{where}: results need rows")
+    if len(rows) > HEAVY:
+        raise ValueError(f"{where}: a results op holds at most {HEAVY:,} rows")
+    options = {id for (id,) in conn.execute("select id from contest_option where contest_id = %s", [contest])}
+    codes = (_codes(conn, "measure"), _codes(conn, "channel"))
+    result_set = uuid7()
+    as_of = _day(op.get("as_of"), f"{where}.as_of")
+    cs.add(
+        "result_set",
+        id=result_set,
+        election_id=election,
+        contest_id=contest,
+        stage=stage,
+        kind="counted",
+        source_id=source,
+        as_of=None if as_of is None else datetime(as_of.year, as_of.month, as_of.day),
+        status="active",
+        is_default=not undefaulted and not _held(conn, election, contest, stage),
+        supersedes_id=None,
+        completeness=None,
+    )
+    upload = files.get(source)
+    seen: set[Address] = set()
+    for n, row in enumerate(rows):
+        at = f"{where}.rows[{n}]"
+        unit, option, channel, measure, count_round = address = _address(conn, row, on, options, codes, at)
+        if address in seen:
+            raise ValueError(f"{at}: this unit, option, channel, measure, and round appear twice")
+        seen.add(address)
+        keys = {
+            "result_set_id": result_set,
+            "unit_id": unit,
+            "option_id": option,
+            "channel": channel,
+            "measure": measure,
+            "count_round": count_round,
+        }
+        cs.add("result_value", **keys, flags=0, value=_amount(row.get("value"), f"{at}.value"))
+        if "region" not in row and "page" not in row:
+            continue
+        if upload is None:
+            raise ValueError(f"{at}: a page or region needs upload evidence")
+        number = row.get("page", evidence.get("page"))
+        if not isinstance(number, int) or isinstance(number, bool) or not 1 <= number <= upload[2]:
+            raise ValueError(f"{at}: page must be between 1 and {upload[2]}")
+        region = _region(row["region"], f"{at}.region") if "region" in row else [None, None, None, None]
+        cs.add(
+            "value_locator",
+            **keys,
+            page_id=_page(conn, cs, upload[0], upload[1], number, added, at),
+            source_id=None,
+            x0=region[0],
+            y0=region[1],
+            x1=region[2],
+            y1=region[3],
+        )
+    declared: set[UUID] = set()
+    for n, outcome in enumerate(op.get("outcomes") or []):
+        at = f"{where}.outcomes[{n}]"
+        option = _uuid(outcome.get("option"), f"{at}.option")
+        if option not in options:
+            raise ValueError(f"{at}: option {option} is not on this contest's ballot")
+        if option in declared:
+            raise ValueError(f"{at}: option {option} has two outcomes")
+        declared.add(option)
+        kind = outcome.get("kind")
+        if kind not in OUTCOMES:
+            raise ValueError(f"{at}: kind must be one of {', '.join(OUTCOMES)}")
+        seats = outcome.get("seats")
+        if seats is not None and (not isinstance(seats, int) or isinstance(seats, bool) or seats < 0):
+            raise ValueError(f"{at}: seats must be a whole number of at least 0")
+        cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats, notes=None)
+    _cite(cs, contest, source, evidence, proof, {"table": "result_set", "row": str(result_set), "op": "results"})
+    return contest, result_set
+
+
+class Corrected(TypedDict):
+    result_set: UUID
+    contest: UUID
+    pipeline: str
+    cells: list[tuple[Address, float | None, float]]
+
+
+def _corrected(conn: Connection, op: Op, where: str) -> Corrected:
+    result_set = _uuid(op.get("result_set"), f"{where}.result_set")
+    found = conn.execute(
+        """select r.k, r.contest_id, r.status::text, c.pipeline, e.date_from
+           from result_set r join changeset c on c.id = r.changeset_id join election e on e.id = r.election_id
+           where r.id = %s""",
+        [result_set],
+    ).fetchone()
+    if found is None:
+        raise ValueError(f"{where}: result set {result_set} does not exist")
+    k, contest, status, pipeline, on = found
+    if status != "active":
+        raise ValueError(f"{where}: result set {result_set} is {status}; correct the active set")
+    cells = op.get("cells") or []
+    if not cells:
+        raise ValueError(f"{where}: a correction needs cells")
+    if len(cells) > SHOWN:
+        raise ValueError(f"{where}: a correction holds at most {SHOWN:,} cells")
+    options = {id for (id,) in conn.execute("select id from contest_option where contest_id = %s", [contest])}
+    codes = (_codes(conn, "measure"), _codes(conn, "channel"))
+    corrected: list[tuple[Address, float | None, float]] = []
+    seen: set[Address] = set()
+    for n, cell in enumerate(cells):
+        at = f"{where}.cells[{n}]"
+        address = _address(conn, cell, on, options, codes, at)
+        if address in seen:
+            raise ValueError(f"{at}: this cell appears twice")
+        seen.add(address)
+        unit, option, channel, measure, count_round = address
+        value = _amount(cell.get("value"), f"{at}.value")
+        held = conn.execute(
+            """select v.value from result_value v join reporting_unit u on u.k = v.unit_k
+               where v.result_set_k = %s and u.id = %s
+                 and v.option_k = coalesce((select o.k from contest_option o where o.id = %s), 0)
+                 and v.channel = %s and v.measure = %s and v.count_round = %s""",
+            [k, unit, option, channel, measure, count_round],
+        ).fetchone()
+        before = None if held is None else float(held[0])
+        if before == value:
+            raise ValueError(f"{at}: the set already holds {value:g}")
+        corrected.append((address, before, value))
+    return {"result_set": result_set, "contest": contest, "pipeline": pipeline, "cells": corrected}
+
+
+def _restage(
+    conn: Connection,
+    cs: Changeset,
+    corrected: Corrected,
+    source: UUID,
+    evidence: Evidence,
+    proof: dict[str, str],
+) -> None:
+    result_set = corrected["result_set"]
+    changes = {address: value for address, _, value in corrected["cells"]}
+    held = conn.execute(
+        """select u.id, o.id, v.channel, v.measure, v.count_round, v.flags, v.value
+           from result_value v join result_set r on r.k = v.result_set_k join reporting_unit u on u.k = v.unit_k
+           left join contest_option o on o.k = v.option_k where r.id = %s""",
+        [result_set],
+    ).fetchall()
+    for unit, option, channel, measure, count_round, flags, value in held:
+        address = (unit, option, channel, measure, count_round)
+        cs.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=channel,
+            measure=measure,
+            count_round=count_round,
+            flags=flags,
+            value=changes.pop(address, value),
+        )
+    for (unit, option, channel, measure, count_round), value in changes.items():
+        cs.add(
+            "result_value",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=channel,
+            measure=measure,
+            count_round=count_round,
+            flags=0,
+            value=value,
+        )
+    for unit, option, channel, measure, count_round, page, located, x0, y0, x1, y1 in conn.execute(
+        """select u.id, o.id, l.channel, l.measure, l.count_round, l.page_id, l.source_id, l.x0, l.y0, l.x1, l.y1
+           from value_locator l join result_set r on r.k = l.result_set_k join reporting_unit u on u.k = l.unit_k
+           left join contest_option o on o.k = l.option_k where r.id = %s""",
+        [result_set],
+    ).fetchall():
+        cs.add(
+            "value_locator",
+            result_set_id=result_set,
+            unit_id=unit,
+            option_id=option,
+            channel=channel,
+            measure=measure,
+            count_round=count_round,
+            page_id=page,
+            source_id=located,
+            x0=x0,
+            y0=y0,
+            x1=x1,
+            y1=y1,
+        )
+    _cite(
+        cs,
+        corrected["contest"],
+        source,
+        evidence,
+        proof,
+        {"table": "result_set", "row": str(result_set), "op": "correct"},
+    )
+
+
+def _cell_rows(conn: Connection, corrected: Corrected) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for (unit, option, channel, measure, count_round), before, after in corrected["cells"]:
+        labels = conn.execute(
+            sql.SQL(
+                """select u.code, {},
+                          (select {} from contest_option o where o.id = %s),
+                          (select code from measure where id = %s), (select code from channel where id = %s)
+                   from reporting_unit u where u.id = %s"""
+            ).format(UNIT_LABEL, OPTION_LABEL),
+            [option, measure, channel, unit],
+        ).fetchone()
+        rows.append(
+            {
+                "table": "result_value",
+                "key": {
+                    "result_set_id": corrected["result_set"],
+                    "unit_id": unit,
+                    "option_id": option,
+                    "channel": channel,
+                    "measure": measure,
+                    "count_round": count_round,
+                },
+                "labels": None
+                if labels is None
+                else {"unit": labels[1], "option": labels[2], "measure": labels[3], "channel": labels[4]},
+                "entity_id": corrected["contest"],
+                "op": "add" if before is None else "change",
+                "fields": {"value": [before, after]},
+            }
+        )
+    return rows
+
+
+def _fold(conn: Connection, payload: Payload) -> dict[str, object] | None:
+    ops = payload.get("ops") or []
+    corrections = [(n, op) for n, op in enumerate(ops) if op.get("op") == "correct"]
+    if not corrections:
+        return None
+    folded = [(n, _corrected(conn, op, f"ops[{n}]")) for n, op in corrections]
+    foreign = [corrected for _, corrected in folded if corrected["pipeline"] != "contrib"]
+    if not foreign:
+        return None
+    if len(foreign) != len(ops):
+        raise ValueError(
+            "a correction to a set a pipeline wrote is folded into that pipeline: put it in its own proposal, "
+            "with only correct ops on such sets"
+        )
+    evidence = payload.get("evidence") or {}
+    for n, op in corrections:
+        cited = op.get("evidence") or []
+        if not cited:
+            raise ValueError(f"ops[{n}]: a correction needs evidence")
+        missing = [key for key in cited if key not in evidence]
+        if missing:
+            raise ValueError(f"ops[{n}]: unknown evidence {', '.join(missing)}")
+    rows = [row for _, corrected in folded for row in _cell_rows(conn, corrected)]
+    return {
+        "rows": rows,
+        "truncated": False,
+        "entities": sorted({str(corrected["contest"]) for _, corrected in folded}),
+        "fold": {
+            "sets": [
+                {"result_set": str(corrected["result_set"]), "pipeline": corrected["pipeline"]}
+                for _, corrected in folded
+            ],
+            "cells": len(rows),
+        },
+    }
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -730,6 +1164,7 @@ def compile(
     author_kind: AuthorKind = "user",
     kind: Kind = "edit",
     proposal: UUID | None = None,
+    undefaulted: bool = False,
 ) -> Path:
     summary = payload.get("summary", "").strip()
     if not summary:
@@ -744,6 +1179,7 @@ def compile(
     cs = Changeset(conn, pipeline="contrib", version=VERSION, summary=summary, polity=payload.get("polity"), kind=kind)
     added: set[UUID] = set()
     proofs: dict[str, dict[str, str]] = {}
+    files: dict[UUID, tuple[UUID, UUID, int]] = {}
     for key, item in evidence.items():
         if "source" in item:
             source = _uuid(item["source"], f"evidence {key}.source")
@@ -753,7 +1189,7 @@ def compile(
         elif "url" in item:
             sources[key], proofs[key] = _linked(conn, cs, item, author, f"evidence {key}", added)
         elif "upload" in item:
-            sources[key], proofs[key] = _uploaded(conn, cs, item, author, f"evidence {key}", added)
+            sources[key], proofs[key] = _uploaded(conn, cs, item, author, f"evidence {key}", added, files)
         else:
             raise ValueError(f"evidence {key}: needs a source, a url, or an upload")
 
@@ -840,6 +1276,43 @@ def compile(
                     evidence[key],
                     proofs.get(key, {}),
                     {"table": op.get("table"), "row": label, "op": "image"},
+                )
+            continue
+        if op.get("op") in ("results", "correct"):
+            if not cited:
+                raise ValueError(f"{where}: {op.get('op')} needs evidence")
+            first = cited[0]
+            if op.get("op") == "results":
+                contest, result_set = _results(
+                    conn,
+                    cs,
+                    op,
+                    where,
+                    sources[first],
+                    files,
+                    evidence[first],
+                    proofs.get(first, {}),
+                    added,
+                    undefaulted,
+                )
+            else:
+                corrected = _corrected(conn, op, where)
+                contest, result_set = corrected["contest"], corrected["result_set"]
+                if ("result_set", str(result_set)) in targets:
+                    raise ValueError(f"{where}: result set {result_set} is corrected twice")
+                targets.add(("result_set", str(result_set)))
+                if corrected["pipeline"] == "contrib":
+                    _restage(conn, cs, corrected, sources[first], evidence[first], proofs.get(first, {}))
+                else:
+                    cited = [first, *cited]
+            for key in cited[1:]:
+                _cite(
+                    cs,
+                    contest,
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {"table": "result_set", "row": str(result_set), "op": op.get("op")},
                 )
             continue
         if op.get("op") == "cite":
@@ -1084,14 +1557,178 @@ def _periods(conn: Connection, staged: sql.Composable) -> list[dict[str, object]
     return rows
 
 
+def _graded(conn: Connection, stage: Stage, findings: dict[str, int]) -> int:
+    if "result_set" not in stage.tables:
+        return 3
+    restaged = conn.execute(
+        sql.SQL(
+            """select exists (select from {sets} s join public.result_set p on p.id = s.id)
+                   or exists (select from {values} v where not exists (select from {sets} s where s.id = v.result_set_id))"""
+        ).format(
+            sets=stage.staged("result_set"),
+            values=stage.staged("result_value")
+            if "result_value" in stage.tables
+            else sql.SQL("(select null::uuid as result_set_id where false)"),
+        )
+    ).fetchone()
+    if restaged is not None and restaged[0]:
+        return 3
+    sets = conn.execute(
+        sql.SQL(
+            """select s.kind = 'official_body' and s.url is not null
+                      and exists (select from {artifacts} a where a.source_id = r.source_id),
+                      exists (select from public.result_set p where p.election_id = r.election_id and p.is_default
+                              and p.contest_id is not distinct from r.contest_id and p.stage = r.stage)
+               from {sets} r join {sources} s on s.id = r.source_id"""
+        ).format(
+            artifacts=stage.either("source_artifact", "source_id"),
+            sets=stage.staged("result_set"),
+            sources=stage.either("source", "id", "kind", "url"),
+        )
+    ).fetchall()
+    if any(held for _, held in sets):
+        return 3
+    if "outcome" in stage.tables or any(findings.values()) or not all(official for official, _ in sets):
+        return 2
+    return 1
+
+
+def _undefault(conn: Connection, changeset_id: str, checks: object) -> bool:
+    findings = cast(dict[str, int], (checks or {}).get("findings") or {}) if isinstance(checks, dict) else {}
+    if not any(count for code, count in findings.items() if code.startswith("accounting.")):
+        return False
+    stage = _stage(conn, changeset_id)
+    if "result_set" not in stage.tables:
+        return False
+    found = conn.execute(sql.SQL("select bool_or(is_default) from {}").format(stage.staged("result_set"))).fetchone()
+    return found is not None and bool(found[0])
+
+
+def _cells(conn: Connection, stage: Stage, limit: int) -> list[dict[str, object]]:
+    located = "value_locator" in stage.tables
+    rows = conn.execute(
+        sql.SQL(
+            """with changed as (
+                 select s.result_set_id, s.unit_id, s.option_id, s.channel, s.measure, s.count_round,
+                        p.value as before, s.value as after
+                 from {values} s
+                 join reporting_unit u on u.id = s.unit_id
+                 left join contest_option o on o.id = s.option_id
+                 left join public.result_set r on r.id = s.result_set_id
+                 left join public.result_value p on p.result_set_k = r.k and p.unit_k = u.k
+                      and p.option_k = coalesce(o.k, 0) and p.channel = s.channel and p.measure = s.measure
+                      and p.count_round = s.count_round
+                 where p.value is distinct from s.value
+                 order by u.code, o.ballot_position nulls first, o.k nulls first, s.measure, s.channel, s.count_round
+                 limit %s)
+               select c.result_set_id, c.unit_id, c.option_id, c.channel, c.measure, c.count_round, c.before, c.after,
+                      {unit}, case when o.id is null then null else {option} end, m.code, h.code, x.contest_id,
+                      {locator}
+               from changed c
+               join reporting_unit u on u.id = c.unit_id
+               left join contest_option o on o.id = c.option_id
+               join measure m on m.id = c.measure
+               join channel h on h.id = c.channel
+               left join {sets} x on x.id = c.result_set_id
+               {located}
+               order by u.code, o.ballot_position nulls first, o.k nulls first, c.measure, c.channel, c.count_round"""
+        ).format(
+            values=stage.staged("result_value"),
+            unit=UNIT_LABEL,
+            option=OPTION_LABEL,
+            sets=stage.either("result_set", "id", "contest_id"),
+            locator=sql.SQL("l.page_id, l.x0, l.y0, l.x1, l.y1" if located else "null, null, null, null, null"),
+            located=sql.SQL(
+                """left join {} l on l.result_set_id = c.result_set_id and l.unit_id = c.unit_id
+                        and l.option_id is not distinct from c.option_id and l.channel = c.channel
+                        and l.measure = c.measure and l.count_round = c.count_round"""
+            ).format(stage.staged("value_locator"))
+            if located
+            else sql.SQL(""),
+        ),
+        [limit],
+    ).fetchall()
+    cells: list[dict[str, object]] = []
+    for (
+        result_set,
+        unit,
+        option,
+        channel,
+        measure,
+        count_round,
+        before,
+        after,
+        unit_label,
+        option_label,
+        measure_code,
+        channel_code,
+        contest,
+        page,
+        x0,
+        y0,
+        x1,
+        y1,
+    ) in rows:
+        cells.append(
+            {
+                "table": "result_value",
+                "key": {
+                    "result_set_id": result_set,
+                    "unit_id": unit,
+                    "option_id": option,
+                    "channel": channel,
+                    "measure": measure,
+                    "count_round": count_round,
+                },
+                "labels": {
+                    "unit": unit_label,
+                    "option": option_label,
+                    "measure": measure_code,
+                    "channel": channel_code,
+                },
+                "entity_id": contest,
+                "op": "add" if before is None else "change",
+                "fields": {"value": [None if before is None else float(before), float(after)]},
+            }
+            | (
+                {}
+                if page is None
+                else {"locator": {"page_id": page, "region": None if x0 is None else [x0, y0, x1, y1]}}
+            )
+        )
+    return cells
+
+
 def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object], object]:
     stage = _stage(conn, changeset_id)
     shown: list[dict[str, object]] = []
     entities: set[str] = set()
     truncated = False
-    tiers = [TIERS.get(table, 2) for table in stage.tables if table != "row_drop"]
+    found = conn.execute("select checks from changeset where id = %s", [changeset_id]).fetchone()
+    checks = found and found[0]
+    tiers = [TIERS.get(table, 2) for table in stage.tables if table not in ("row_drop", *RESULT_TABLES)]
+    if any(table in stage.tables for table in RESULT_TABLES):
+        findings = checks.get("findings") if isinstance(checks, dict) else None
+        tiers.append(_graded(conn, stage, cast(dict[str, int], findings or {})))
     for table, columns in stage.tables.items():
         staged = stage.staged(table)
+        if table == "value_locator":
+            continue
+        if table == "result_value":
+            cells = _cells(conn, stage, SHOWN - len(shown) + 1)
+            entities.update(str(cell["entity_id"]) for cell in cells if cell["entity_id"] is not None)
+            if len(shown) + len(cells) > SHOWN:
+                truncated = True
+                cells = cells[: SHOWN - len(shown)]
+            shown.extend(cells)
+            continue
+        if table == "result_set":
+            entities.update(
+                str(contest)
+                for (contest,) in conn.execute(
+                    sql.SQL("select distinct contest_id from {} where contest_id is not null").format(staged)
+                ).fetchall()
+            )
         if table in ("row_drop", "name_drop", "note_drop", "external_id_drop"):
             for relation, key, owner in _dropped(conn, table, staged):
                 if table == "row_drop":
@@ -1157,13 +1794,12 @@ def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object]
                 {
                     "table": table,
                     "key": {column: after[column] for column in key},
-                    "entity_id": after.get("entity_id"),
+                    "entity_id": after.get("entity_id", after.get("contest_id")),
                     "op": "add" if before is None else "change",
                     "fields": fields,
                 }
             )
-    checks = conn.execute("select checks from changeset where id = %s", [changeset_id]).fetchone()
-    return max(tiers), {"rows": shown, "truncated": truncated, "entities": sorted(entities)}, checks and checks[0]
+    return max(tiers), {"rows": shown, "truncated": truncated, "entities": sorted(entities)}, checks
 
 
 def _apply(folder: Path) -> str:
@@ -1203,15 +1839,61 @@ def _activity(
     )
 
 
-def _compiled(conn: Connection, proposal: UUID, payload: object) -> Path:
+def _compiled(conn: Connection, proposal: UUID, payload: object, undefaulted: bool) -> Path:
     row = conn.execute(
         "select author_user_id, agent_key_id is not null from proposal where id = %s", [proposal]
     ).fetchone()
     if row is None or row[0] is None:
         raise ValueError(f"proposal {proposal} has no author")
-    folder = compile(conn, cast(Payload, payload), row[0], author_kind="agent" if row[1] else "user", proposal=proposal)
+    folder = compile(
+        conn,
+        cast(Payload, payload),
+        row[0],
+        author_kind="agent" if row[1] else "user",
+        proposal=proposal,
+        undefaulted=undefaulted,
+    )
     conn.commit()
     return folder
+
+
+def _discard(conn: Connection, changeset_id: str) -> None:
+    conn.execute(
+        sql.SQL("drop schema if exists {} cascade").format(sql.Identifier(f"cs_{changeset_id.replace('-', '')}"))
+    )
+    conn.execute("delete from changeset where id = %s and status = 'pending_review'", [changeset_id])
+    conn.commit()
+    folder = DATA / "changesets" / changeset_id
+    if folder.exists():
+        folder.rename(DATA / "retired" / "changesets" / changeset_id)
+
+
+def _prepared(conn: Connection, proposal: UUID, payload: object) -> tuple[str, int, dict[str, object], object] | None:
+    fold = _fold(conn, cast(Payload, payload))
+    undefaulted = False
+    while True:
+        folder = _compiled(conn, proposal, payload, undefaulted)
+        if _apply(folder) == "unchanged":
+            return None
+        tier, diff, checks = _review(conn, folder.name)
+        if undefaulted or not _undefault(conn, folder.name, checks):
+            break
+        _discard(conn, folder.name)
+        undefaulted = True
+    if fold is None:
+        return folder.name, tier, diff, checks
+    rows = cast(list[dict[str, object]], fold["rows"])
+    return (
+        folder.name,
+        3,
+        diff
+        | {
+            "rows": [*rows, *cast(list[dict[str, object]], diff["rows"])],
+            "entities": sorted({*cast(list[str], fold["entities"]), *cast(list[str], diff["entities"])}),
+            "fold": fold["fold"],
+        },
+        checks,
+    )
 
 
 def _payload(conn: Connection, proposal: UUID, n: int | None) -> object:
@@ -1253,15 +1935,11 @@ def _captured(conn: Connection, proposal: UUID, n: int | None) -> object:
 
 def _check(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
     with connect() as conn:
-        folder = _compiled(conn, proposal, _captured(conn, proposal, n))
-        if _apply(folder) == "unchanged":
+        prepared = _prepared(conn, proposal, _captured(conn, proposal, n))
+        if prepared is None:
             return {"status": "unchanged"}
-        tier, diff, checks = _review(conn, folder.name)
-        conn.execute(
-            sql.SQL("drop schema if exists {} cascade").format(sql.Identifier(f"cs_{folder.name.replace('-', '')}"))
-        )
-        conn.execute("delete from changeset where id = %s and status = 'pending_review'", [folder.name])
-    folder.rename(DATA / "retired" / "changesets" / folder.name)
+        changeset_id, tier, diff, checks = prepared
+        _discard(conn, changeset_id)
     return {"status": "checked", "tier": tier, "diff": diff, "checks": checks}
 
 
@@ -1269,15 +1947,14 @@ def _submit(proposal: UUID, n: int | None, requested: UUID | None, output: dict[
     if n is None:
         raise ValueError("a submit job needs revision_n")
     with connect() as conn:
-        folder = _compiled(conn, proposal, _captured(conn, proposal, n))
-        if _apply(folder) == "unchanged":
+        prepared = _prepared(conn, proposal, _captured(conn, proposal, n))
+        if prepared is None:
             conn.execute(
                 "update proposal_revision set checks = %s where proposal_id = %s and n = %s",
                 [Jsonb({"unchanged": True}), proposal, n],
             )
             return {"status": "unchanged"}
-        changeset_id = folder.name
-        tier, diff, checks = _review(conn, changeset_id)
+        changeset_id, tier, diff, checks = prepared
         conn.execute(
             "update proposal_revision set changeset_id = %s, diff = %s, checks = %s where proposal_id = %s and n = %s",
             [changeset_id, Jsonb(diff, dumps=_dumps), Jsonb(checks, dumps=_dumps), proposal, n],
@@ -1333,9 +2010,25 @@ def _close(conn: Connection, proposal: UUID, state: str, requested: UUID, reason
     )
 
 
+def _folded(conn: Connection, head: str) -> dict[str, object] | None:
+    row = conn.execute("select diff -> 'fold' from proposal_revision where changeset_id = %s", [head]).fetchone()
+    return None if row is None else cast(dict[str, object] | None, row[0])
+
+
 def _publish(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
     with connect() as conn:
         head, _ = _decided(conn, proposal, requested, ("open", "approved"))
+        fold = _folded(conn, head)
+        if fold is not None:
+            _close(conn, proposal, "approved", cast(UUID, requested), output.get("reason"))
+            number = conn.execute("select number from proposal where id = %s", [proposal]).fetchone()
+            with (DATA / "logs" / "folds.tsv").open("a", encoding="utf-8") as log:
+                log.writelines(
+                    f"{datetime.now().isoformat(timespec='seconds')}\t{number and number[0]}\t{proposal}"
+                    f"\t{held['pipeline']}\t{held['result_set']}\t{fold['cells']}\n"
+                    for held in cast(list[dict[str, str]], fold["sets"])
+                )
+            return {"status": "awaiting_fold", "changeset_id": head}
         if _rows(DATA / "changesets" / head) > HEAVY:
             conn.commit()
             _gated("publish", head, "--reviewer", str(requested))
@@ -1354,6 +2047,10 @@ def _reverse(state: str, accepted: tuple[str, ...], activity: str, summary: str)
             reason = output.get("reason") or (stored and stored[0])
             if not reason:
                 raise ValueError(f"a {state} decision needs a reason")
+            if state == "reverted" and _folded(conn, head) is not None:
+                raise ValueError(
+                    "a folded correction lives in its pipeline's re-emit; propose a new correction instead"
+                )
             if _rows(DATA / "changesets" / head) > HEAVY:
                 conn.commit()
                 _gated("revert", head, str(reason), "--reviewer", str(requested))
@@ -1439,6 +2136,60 @@ def work() -> bool:
     return True
 
 
+def _folds() -> None:
+    with connect() as conn:
+        waiting = conn.execute(
+            """select p.id, p.head_changeset_id::text, p.decided_by, r.diff -> 'fold', r.diff -> 'rows', c.id::text
+               from proposal p
+               join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
+               join lateral (select c.id from changeset c
+                             where c.pipeline <> 'contrib' and c.status = 'published'
+                               and (c.scope -> 'proposal' = to_jsonb(p.id::text)
+                                    or c.scope -> 'proposal' @> jsonb_build_array(p.id::text))
+                             order by c.id desc limit 1) c on true
+               where p.state = 'approved' and p.decided_by is not null and r.diff ? 'fold'
+                 and (r.diff -> 'fold' ->> 'checked') is distinct from c.id::text"""
+        ).fetchall()
+        for proposal, head, reviewer, fold, rows, carried in waiting:
+            missed = 0
+            for row in rows[: fold["cells"]]:
+                key = row["key"]
+                held = conn.execute(
+                    """select v.value from result_value v join result_set r on r.k = v.result_set_k
+                       join reporting_unit u on u.k = v.unit_k
+                       where r.id = %s and r.status = 'active' and u.id = %s
+                         and v.option_k = coalesce((select o.k from contest_option o where o.id = %s), 0)
+                         and v.channel = %s and v.measure = %s and v.count_round = %s""",
+                    [
+                        key["result_set_id"],
+                        key["unit_id"],
+                        key["option_id"],
+                        key["channel"],
+                        key["measure"],
+                        key["count_round"],
+                    ],
+                ).fetchone()
+                if held is None or float(held[0]) != row["fields"]["value"][1]:
+                    missed += 1
+            checked = {"checked": carried} | (
+                {"published_by": carried} if missed == 0 else {"mismatch": {"changeset": carried, "cells": missed}}
+            )
+            conn.execute(
+                "update proposal_revision set diff = jsonb_set(diff, '{fold}', (diff -> 'fold') || %s) where changeset_id = %s",
+                [Jsonb(checked), head],
+            )
+            if missed:
+                print(f"fold {proposal}: {carried} misses {missed} of {fold['cells']} cells", flush=True)
+                conn.commit()
+                continue
+            conn.commit()
+            publish(conn, head, str(reviewer))
+            conn.execute("update proposal set state = 'published', updated_at = now() where id = %s", [proposal])
+            _activity(conn, proposal, "proposal_published", reviewer, head, "Proposal %s published")
+            conn.commit()
+            print(f"fold {proposal}: published by {carried}", flush=True)
+
+
 def serve() -> None:
     with connect(autocommit=True) as listener:
         listener.execute(
@@ -1450,6 +2201,7 @@ def serve() -> None:
         resume(listener)
         while True:
             sweep()
+            _folds()
             while work() or process():
                 pass
             for _ in listener.notifies(timeout=60, stop_after=1):
