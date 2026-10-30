@@ -15,7 +15,8 @@ from ea.store import DATA, connect
 SOURCE = "us.elstats_pres_pri"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-WANTED = {"CT": (2016, 2020), "VT": (2016, 2020)}
+WANTED = {"CT": (2016, 2020), "NH": (2016, 2020, 2024), "VT": (2016, 2020)}
+PLACES = {"5000710675": "5010675", "3301145140": "3345140", "3301150260": "3350260"}
 
 
 def url(state: str, year: int) -> str:
@@ -52,6 +53,7 @@ def parse() -> None:
     for (state, name), code in elstats.FORMER.items():
         if state in towns:
             towns[state][name] = code
+    towns["NH"].update({"wentworthslocation": "3300780740", "hartslocation": "3300334500"})
     frames = []
     for state, years in WANTED.items():
         for year in years:
@@ -85,15 +87,15 @@ def parse() -> None:
         state="state",
         district=pl.lit(None, pl.Int16),
         code="code",
-        candidate=pl.when(pl.col("candidate").str.contains("WRITE")).then(pl.lit("WRITE-INS")).otherwise("candidate"),
+        candidate=pl.when(pl.col("candidate").str.contains("WRITE|ALL OTHER")).then(pl.lit("WRITE-INS")).otherwise("candidate"),
         measure=pl.lit(1, pl.Int16),
-        writein=pl.col("candidate").str.contains("WRITE"),
+        writein=pl.col("candidate").str.contains("WRITE|ALL OTHER"),
         votes="votes",
     ).group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure").agg(
         pl.col("writein").any(), pl.col("votes").sum()
     ).with_columns(
-        code=pl.when(pl.col("code") == "5000710675").then(pl.lit("5010675")).otherwise("code"),
-        kind=pl.when(pl.col("code") == "5000710675").then(pl.lit("place")).otherwise(pl.lit("town")),
+        code=pl.col("code").replace(PLACES),
+        kind=pl.when(pl.col("code").is_in(list(PLACES))).then(pl.lit("place")).otherwise(pl.lit("town")),
         source="state",
     )
     frame.write_parquet(PARSED / "towns.parquet")
@@ -107,7 +109,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Connecticut's and Vermont's 2016 and 2020 Democratic and Republican presidential primaries by town from the states' election statistics archives",
+            summary="Connecticut's, New Hampshire's, and Vermont's Democratic and Republican presidential primaries (2016 and 2020, and New Hampshire's 2024) by town from the states' election statistics archives",
             polity="US",
         )
         sources = {}
