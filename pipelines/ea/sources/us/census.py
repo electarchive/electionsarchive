@@ -21,17 +21,20 @@ PARSED = DATA / "parsed" / SOURCE
 TIGER = "https://www2.census.gov/geo/tiger/"
 STATES = f"{TIGER}GENZ2020/shp/cb_2020_us_state_500k.zip"
 COUNTIES = f"{TIGER}GENZ2020/shp/cb_2020_us_county_500k.zip"
+CONGRESSES = {
+    number: date(1787 + 2 * number, 3, 4) if number <= 73 else date(1786 + 2 * number, 1, 1) for number in range(1, 121)
+}
 DISTRICTS = {
-    "108": (f"{TIGER}PREVGENZ/cd/cd108shp/cd99_108_shp.zip", date(2003, 1, 3), date(2005, 1, 3)),
-    "109": (f"{TIGER}PREVGENZ/cd/cd109shp/cd99_109_shp.zip", date(2005, 1, 3), date(2007, 1, 3)),
-    "110": (f"{TIGER}PREVGENZ/cd/cd110shp/cd99_110_shp.zip", date(2007, 1, 3), date(2009, 1, 3)),
-    "111": (f"{TIGER}GENZ2010/gz_2010_us_500_11_5m.zip", date(2009, 1, 3), date(2013, 1, 3)),
-    "113": (f"{TIGER}GENZ2013/cb_2013_us_cd113_500k.zip", date(2013, 1, 3), date(2015, 1, 3)),
-    "114": (f"{TIGER}GENZ2014/shp/cb_2014_us_cd114_500k.zip", date(2015, 1, 3), date(2017, 1, 3)),
-    "115": (f"{TIGER}GENZ2016/shp/cb_2016_us_cd115_500k.zip", date(2017, 1, 3), date(2019, 1, 3)),
-    "116": (f"{TIGER}GENZ2020/shp/cb_2020_us_cd116_500k.zip", date(2019, 1, 3), date(2023, 1, 3)),
-    "118": (f"{TIGER}GENZ2022/shp/cb_2022_us_cd118_500k.zip", date(2023, 1, 3), date(2025, 1, 3)),
-    "119": (f"{TIGER}GENZ2024/shp/cb_2024_us_cd119_500k.zip", date(2025, 1, 3), None),
+    "108": (f"{TIGER}PREVGENZ/cd/cd108shp/cd99_108_shp.zip", CONGRESSES[108], CONGRESSES[109]),
+    "109": (f"{TIGER}PREVGENZ/cd/cd109shp/cd99_109_shp.zip", CONGRESSES[109], CONGRESSES[110]),
+    "110": (f"{TIGER}PREVGENZ/cd/cd110shp/cd99_110_shp.zip", CONGRESSES[110], CONGRESSES[111]),
+    "111": (f"{TIGER}GENZ2010/gz_2010_us_500_11_5m.zip", CONGRESSES[111], CONGRESSES[113]),
+    "113": (f"{TIGER}GENZ2013/cb_2013_us_cd113_500k.zip", CONGRESSES[113], CONGRESSES[114]),
+    "114": (f"{TIGER}GENZ2014/shp/cb_2014_us_cd114_500k.zip", CONGRESSES[114], CONGRESSES[115]),
+    "115": (f"{TIGER}GENZ2016/shp/cb_2016_us_cd115_500k.zip", CONGRESSES[115], CONGRESSES[116]),
+    "116": (f"{TIGER}GENZ2020/shp/cb_2020_us_cd116_500k.zip", CONGRESSES[116], CONGRESSES[118]),
+    "118": (f"{TIGER}GENZ2022/shp/cb_2022_us_cd118_500k.zip", CONGRESSES[118], CONGRESSES[119]),
+    "119": (f"{TIGER}GENZ2024/shp/cb_2024_us_cd119_500k.zip", CONGRESSES[119], None),
 }
 REDRAWN_2021 = {"37"}
 LEWIS = (
@@ -39,7 +42,6 @@ LEWIS = (
     "aba2b6b17120718782605534b4bcc6c5ab3d09e2.tar.gz"
 )
 LEWIS_TITLE = "Digital Boundary Definitions of United States Congressional Districts, 1789–2025"
-CONGRESSES = {number: date(1787 + 2 * number, *((3, 4) if number <= 73 else (1, 3))) for number in range(1, 121)}
 DELEGATES = {
     "11": ((42, 43), (92, 119)),
     "60": ((97, 119),),
@@ -248,7 +250,7 @@ def parse() -> None:
             {
                 "code": record["GEOID"],
                 "valid_from": valid_from,
-                "valid_to": date(2021, 1, 3) if vintage == "116" and record["STATEFP"] in REDRAWN_2021 else valid_to,
+                "valid_to": CONGRESSES[117] if vintage == "116" and record["STATEFP"] in REDRAWN_2021 else valid_to,
                 "quality": "official",
                 "geom": geometry[(f"cd{vintage}", str(record["GEOID"]))][0],
                 "label_point": geometry[(f"cd{vintage}", str(record["GEOID"]))][1],
@@ -378,15 +380,6 @@ def emit() -> Path:
             cs.add("area_code", area_id=area, code=state["code"], valid_from=None)
             name(area, state["name"])
             cs.add("polity_territory", polity_id=polity, area_id=area)
-            cs.add(
-                "area_geometry",
-                area_id=area,
-                valid_from=None,
-                geom=state["geom"],
-                label_point=state["label_point"],
-                quality="official",
-                source_id=census,
-            )
             unit = state_units[state["code"]] = cs.unit("us.state", state["code"])
             cs.add(
                 "reporting_unit",
@@ -409,15 +402,6 @@ def emit() -> Path:
             cs.add("area_parent", area_id=area, parent_id=state_areas[county["state"]])
             name(area, f"{county['name']}, {usps[county['state']]}")
             name(area, county["short"], "short")
-            cs.add(
-                "area_geometry",
-                area_id=area,
-                valid_from=None,
-                geom=county["geom"],
-                label_point=county["label_point"],
-                quality="official",
-                source_id=census,
-            )
             cs.add(
                 "reporting_unit",
                 id=cs.unit("us.county", county["code"]),
@@ -487,8 +471,11 @@ def emit() -> Path:
                 "boundary_set",
                 scheme_code="us.cd",
                 vintage=vintage,
-                valid_from=valid_from,
-                valid_to=valid_to,
-                as_of=valid_from,
+                valid_from=valid_from
+                and (valid_from.replace(year=valid_from.year + 1, day=3) if valid_from.day == 1 else valid_from),
+                valid_to=valid_to
+                and (valid_to.replace(year=valid_to.year + 1, day=3) if valid_to.day == 1 else valid_to),
+                as_of=valid_from
+                and (valid_from.replace(year=valid_from.year + 1, day=3) if valid_from.day == 1 else valid_from),
             )
         return cs.write()
