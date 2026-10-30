@@ -1,0 +1,26 @@
+..  ..  ..  ..  ..  ..  SH
+  ..  ..  ..  ..  ..  ..  SH  SH
+..  ..  ..  ..  ..  ..  SH  SH  SH  SH  ..  ..  HH  MV
+  ..  ..  ..  ..  ..  ..  HB  SH  SH  SH  SH  HH  MV  MV  MV
+..  ..  ..  ..  ..  ..  HB  NI  NI  NI  HH  HH  HH  MV  MV  BB
+  ..  ..  ..  NW  NW  NI  NI  NI  NI  NI  NI  HH  BB  BB  BB  BB
+..  ..  ..  NW  NW  NW  NI  NI  NI  NI  NI  NI  NI  BE  BE  BB
+  ..  ..  ..  NW  NW  NW  NI  NI  NI  NI  NI  NI  BE  BE  BE  BB
+..  ..  ..  NW  NW  NW  NW  NW  NI  NI  NI  NI  ST  BE  BE  BE  BB
+  ..  ..  NW  NW  NW  NW  NW  NW  NI  NI  NI  ST  ST  BE  BE  BE  BB
+..  ..  NW  NW  NW  NW  NW  NW  NW  NW  NI  ST  ST  ST  SN  BE  BB
+  ..  NW  NW  NW  NW  NW  NW  NW  NW  NW  TH  ST  ST  SN  SN  SN  SN
+..  NW  NW  NW  NW  NW  NW  NW  NW  HE  HE  TH  TH  SN  SN  SN  SN  SN
+  NW  NW  NW  NW  NW  NW  NW  NW  HE  HE  HE  TH  TH  SN  SN  SN  SN
+..  NW  NW  NW  NW  NW  NW  NW  HE  HE  HE  TH  TH  TH  SN  SN
+  ..  NW  NW  NW  NW  NW  HE  HE  HE  HE  HE  BY  BY  BY
+..  RP  RP  RP  RP  RP  HE  HE  HE  HE  HE  BY  BY
+  ..  SL  RP  RP  RP  RP  HE  HE  HE  BY  BY  BY  BY
+..  ..  SL  RP  RP  RP  RP  BW  HE  BY  BY  BY  BY
+  ..  SL  SL  RP  RP  BW  BW  BW  BW  BY  BY  BY  BY  BY
+..  ..  ..  ..  BW  BW  BW  BW  BW  BY  BY  BY  BY  BY  BY
+  ..  ..  ..  ..  BW  BW  BW  BW  BW  BY  BY  BY  BY  BY  BY  BY
+..  ..  ..  ..  BW  BW  BW  BW  BW  BW  BY  BY  BY  BY  BY
+  ..  ..  ..  BW  BW  BW  BW  BW  BW  BY  BY  BY  BY  BY
+..  ..  ..  ..  BW  BW  BW  BW  BW  BW  BY  BY  BY  BY
+  ..  ..  ..  BW  BW  ..  ..  BW  BW  BW  BY  BY

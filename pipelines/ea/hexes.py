@@ -59,6 +59,24 @@ REGIONS = {
     "COR": "2A 2B",
 }
 DEPARTEMENTS = {code: code for codes in REGIONS.values() for code in codes.split()}
+LANDER = {
+    "01": "SH",
+    "02": "HH",
+    "03": "NI",
+    "04": "HB",
+    "05": "NW",
+    "06": "HE",
+    "07": "RP",
+    "08": "BW",
+    "09": "BY",
+    "10": "SL",
+    "11": "BE",
+    "12": "BB",
+    "13": "MV",
+    "14": "SN",
+    "15": "ST",
+    "16": "TH",
+}
 
 
 @dataclass(frozen=True)
@@ -69,6 +87,7 @@ class Tiles:
     regions: dict[str, str]
     dates: dict[int, date]
     groups: dict[str, str] | None = None
+    parent: str | None = None
 
 
 TILES = {
@@ -100,6 +119,7 @@ TILES = {
         {day.year: day for day in [date(2012, 6, 10), date(2017, 6, 11), date(2022, 6, 12), date(2024, 6, 30)]},
         {code: region for region, codes in REGIONS.items() for code in codes.split()},
     ),
+    "de-wk": Tiles("de.wahlkreis", 25832, 0, LANDER, {2025: date(2025, 2, 23)}, parent="de.land"),
 }
 
 
@@ -270,20 +290,22 @@ def normal(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
     return [((x - mx) / spread, (y - my) / spread) for x, y in points]
 
 
-def centers(tiles: Tiles, day: date) -> dict[str, tuple[float, float]]:
+def centers(tiles: Tiles, day: date) -> dict[str, tuple[str, float, float]]:
     with connect() as db:
         rows = db.execute(
             """
-            select ac.code, st_x(p), st_y(p)
+            select ac.code, pc.code, st_x(p), st_y(p)
             from area a
             join area_code ac on ac.area_id = a.id and ac.valid @> %(day)s
+            left join (area_parent ap join area pa on pa.id = ap.parent_id and pa.scheme_code = %(parent)s
+              join area_code pc on pc.area_id = pa.id) on ap.area_id = a.id and ap.valid @> %(day)s
             join area_geometry g on g.area_id = a.id and (g.valid @> %(day)s or g.valid is null),
             lateral st_pointonsurface(st_transform(g.geom, %(srid)s)) p
             where a.scheme_code = %(scheme)s
             """,
-            {"day": day, "srid": tiles.srid, "scheme": tiles.scheme},
+            {"day": day, "srid": tiles.srid, "scheme": tiles.scheme, "parent": tiles.parent},
         ).fetchall()
-    return {code: (x, y) for code, x, y in rows}
+    return {code: (parent or code[: -tiles.cut], x, y) for code, parent, x, y in rows}
 
 
 def outline(tiles: Tiles, cells: dict[tuple[int, int], str]) -> dict:
@@ -308,7 +330,9 @@ def outline(tiles: Tiles, cells: dict[tuple[int, int], str]) -> dict:
     return {"boundaries": {name: kept for name, kept in edges.items() if kept}, "labels": dict(sorted(labels.items()))}
 
 
-def place(tiles: Tiles, day: date, cells: dict[tuple[int, int], str]) -> tuple[dict[str, list[int]], list[str]]:
+def place(
+    tiles: Tiles, day: date, cells: dict[tuple[int, int], str]
+) -> tuple[dict[str, list[int]], dict[str, str], list[str]]:
     prefix = {token: code for code, token in tiles.regions.items()}
     points = centers(tiles, day)
     groups: dict[str, list[tuple[int, int]]] = {}
@@ -317,19 +341,19 @@ def place(tiles: Tiles, day: date, cells: dict[tuple[int, int], str]) -> tuple[d
     hexes: dict[str, list[int]] = {}
     problems = []
     for token, spots in sorted(groups.items()):
-        codes = sorted(code for code in points if code[: -tiles.cut] == prefix[token])
+        codes = sorted(code for code, point in points.items() if point[0] == prefix[token])
         if not codes:
             continue
         if len(codes) != len(spots):
             problems.append(f"{token} {len(codes)} districts for {len(spots)} cells")
             continue
-        real = normal([(points[code][0], -points[code][1]) for code in codes])
+        real = normal([(points[code][1], -points[code][2]) for code in codes])
         plane = normal([center(*spot) for spot in spots])
         cost = [[(x - a) ** 2 + (y - b) ** 2 for a, b in plane] for x, y in real]
         for code, column in zip(codes, match(cost)):
             q, r = spots[column]
             hexes[code] = [q, -r]
-    return dict(sorted(hexes.items())), problems
+    return dict(sorted(hexes.items())), {code: points[code][0] for code in sorted(hexes)}, problems
 
 
 def build_tiles() -> str:
@@ -339,8 +363,8 @@ def build_tiles() -> str:
         years = {}
         for year, day in tiles.dates.items():
             start = max(first for first in grids if int(first) <= year)
-            hexes, problems = place(tiles, day, grids[start])
-            years[str(year)] = {"grid": start, "hexes": hexes}
+            hexes, regions, problems = place(tiles, day, grids[start])
+            years[str(year)] = {"grid": start, "hexes": hexes} | ({"regions": regions} if tiles.parent else {})
             report.append(f"{name} {year} (grid {start}): {len(hexes)} placed; {'; '.join(problems) or 'ok'}")
         built = {
             "layout": "odd-r",

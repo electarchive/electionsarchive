@@ -36,7 +36,11 @@ const TILES = import.meta.glob<{
   >;
   years: Record<
     string,
-    { grid: string; hexes: Record<string, [number, number]> }
+    {
+      grid: string;
+      hexes: Record<string, [number, number]>;
+      regions?: Record<string, string>;
+    }
   >;
 }>("../hex/*-tiles.json", { eager: true, import: "default" });
 const TILE_SETS: Record<
@@ -61,6 +65,12 @@ const TILE_SETS: Record<
     cut: 2,
     isUs: false,
   },
+  "de.wahlkreis": {
+    file: "../hex/de-wk-tiles.json",
+    year: (year) => year,
+    cut: 0,
+    isUs: false,
+  },
 };
 const SHRINK = Math.sqrt((3 * Math.sqrt(3)) / 2) / 50;
 const shrink = (value: number) => Math.round(value * SHRINK * 100) / 100;
@@ -82,7 +92,7 @@ const tiled = async (id: string, within: string | undefined) => {
     select distinct a.k, ac.code, extract(year from e.date_from)::int as year, a.scheme_code as scheme
     from contest c join tree on tree.id = c.election_id
     join election e on e.id = c.election_id
-    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'ca.fed', 'fr.circonscription')
+    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'ca.fed', 'fr.circonscription', 'de.wahlkreis')
     join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
     where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
       and coalesce(c.magnitude, 1) = 1 and not c.notional
@@ -104,7 +114,8 @@ const tiled = async (id: string, within: string | undefined) => {
   const drawn = set.isUs
     ? CARTOGRAMS[String(CARTOGRAM_YEARS[year] ?? "")]
     : undefined;
-  const prefix = (code: string) => code.slice(0, -set.cut);
+  const prefix = (code: string) =>
+    placed.regions?.[code] ?? code.slice(0, -set.cut);
   const states = new Set(rows.map((row) => prefix(row.code)));
   const cells = rows.flatMap((row) => {
     const hex = placed.hexes[row.code];
