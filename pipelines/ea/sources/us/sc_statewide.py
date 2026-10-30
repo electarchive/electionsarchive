@@ -13,16 +13,39 @@ from ea.store import DATA, connect
 SOURCE = "us.sc_statewide"
 VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
-BOOKS = {1992: "1992-1993", 1998: "1997-1998"}
-DAYS = {1992: date(1992, 11, 3), 1998: date(1998, 11, 3)}
+BOOKS = {1992: "1992-1993", 1996: "1995-1996", 1998: "1997-1998"}
+DAYS = {1992: date(1992, 11, 3), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
 BLOCKS = [
     (1992, "president", 5128, 6),
     (1992, "senate", 5218, 5),
+    (1996, "president", 2543, 7),
+    (1996, "senate", 2707, 6),
     (1998, "governor", 1713, 5),
     (1998, "senate", 1998, 4),
 ]
 STACKED: dict[tuple[int, str], dict[int, list[int]]] = {
     (1992, "president"): {21: [18, 25, 6870, 25, 1840, 7494], 22: [143, 99, 65066, 249, 13699, 34651]},
+    (1996, "president"): {
+        0: [3054, 8, 3493, 5, 310, 227, 3],
+        1: [26539, 154, 14314, 53, 1152, 832, 30],
+        2: [941, 12, 2222, 7, 66, 21, 4],
+        3: [24137, 158, 17460, 79, 2285, 1611, 39],
+        4: [1715, 13, 3380, 8, 143, 49, 4],
+        5: [3808, 14, 3620, 19, 236, 74, 3],
+        42: [12080, 120, 12198, 33, 641, 292, 28],
+        43: [3855, 15, 5407, 21, 462, 287, 8],
+        44: [3957, 19, 6987, 15, 215, 160, 4],
+        45: [22222, 146, 16873, 72, 1891, 1282, 37],
+    },
+    (1996, "senate"): {
+        20: [19556, 245, 16402, 224, 110, 0],
+        21: [7685, 204, 9101, 181, 80, 0],
+        22: [73170, 1058, 45767, 1337, 1599, 0],
+    },
+}
+TOTALS = {
+    (1996, "president"): [573458, 4271, 506283, 2043, 37079, 27307, 1248],
+    (1996, "senate"): [619859, 12988, 510951, 9740, 7693, 141],
 }
 METHOD = (
     "County totals are from the State Election Commission's Election Reports (read from the text layer, columns "
@@ -61,13 +84,16 @@ def parse() -> None:
         data: list[list[tuple[int, int | None]]] = []
         total: list[tuple[int, int | None]] = []
         begin = next(i for i in range(start - 12, start + 15) if "ABBEVILLE" in lines[i])
-        for line in lines[begin : begin + 90]:
+        for line in lines[begin : begin + 200]:
             if re.search(r"STATE TOTAL|TOTALS", line):
                 total = tokens(line)[:width]
                 break
             found = tokens(line)
             if len(found) > 1 or (found and (year, office) not in STACKED):
                 data.append(found)
+        if (year, office) in TOTALS:
+            full = next(found for found in data if len(found) == width)
+            total = [(end, TOTALS[year, office][index]) for index, (end, _) in enumerate(full)]
         edges = [end for end, _ in total]
         table: dict[str, list[int | None]] = {}
         fixed = STACKED.get((year, office), {})
@@ -104,7 +130,7 @@ def emit() -> Path:
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "South Carolina's president, governor, and U.S. Senate general elections of 1992 and 1998 by county from the State Election Commission's reports",
+        "South Carolina's president, governor, and U.S. Senate general elections of 1992, 1996, and 1998 by county from the State Election Commission's reports",
         PUBLISHER,
         TITLE.format(year="Election Report"),
         LANDING,
