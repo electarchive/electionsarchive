@@ -127,6 +127,12 @@ DISTRICT_CALENDAR = {
         5,
         "Academy ISD trustee election page: the 2026 election was May 2, 2026, with filing January 14 to February 13, 2026, https://www.academyisd.net/our-district/our-district-a-z/board-of-trustees/trustee-election",
     ),
+    ("TX", "Granbury Independent School District"): (
+        2,
+        1,
+        5,
+        "Hood County Elections, Precinct 101 sample ballot for November 3, 2026: only City of Granbury races appear and no Granbury ISD trustee contest, with the district's last trustee election in 2025 (Places 5 to 7), https://hoodcounty.texas.gov/departments/elections_administration/sample_ballots.php",
+    ),
     ("TX", "Killeen Independent School District"): (
         1,
         0,
