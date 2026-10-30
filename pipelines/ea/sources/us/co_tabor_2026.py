@@ -27,6 +27,11 @@ COUNTIES = {
         "CO-Larimer/tabor-notice-07-final.pdf",
         "Larimer County Clerk and Recorder",
     ),
+    "08041": (
+        "https://epc-assets.elpasoco.com/wp-content/uploads/sites/5/2026-General-Election-TABOR-Accessible.pdf",
+        None,
+        "El Paso County Clerk and Recorder",
+    ),
     "08035": (
         "https://www.douglas.co.us/documents/2026-general-election-ballot-issue-notices-booklet.pdf",
         "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
@@ -79,6 +84,17 @@ def jeffco_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
+def elpaso_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    for index, line in enumerate(lines):
+        match = re.match(r"^\s*(.+?) ((?:Ballot|Referred) (?:Issue|Question|Measure))\s+(\w+)\s*$", line)
+        if match is None or not any(previous.strip().startswith("Election Hours") for previous in lines[max(index - 5, 0) : index]):
+            continue
+        entity = f"{lines[index - 1].strip()} {match[1]}" if match[1].startswith("(") else match[1]
+        rows.append({"entity": entity, "label": f"{match[2]} {match[3]}", "wording": question(lines, index + 1)})
+    return rows
+
+
 def larimer_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for index, line in enumerate(lines):
@@ -118,7 +134,7 @@ def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-PARSERS = {"08059": jeffco_rows, "08069": larimer_rows, "08035": douglas_rows}
+PARSERS = {"08059": jeffco_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
 
 
 def parse() -> None:
