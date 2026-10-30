@@ -17,8 +17,8 @@ TITLE = "Count books: vote by counties, 1992, 1994, and 1998 general elections"
 URL = "https://elections.ri.gov/publications/election-publications"
 COUNTIES = {"bristol": "44001", "kent": "44003", "newport": "44005", "providence": "44007", "washington": "44009"}
 TABLES = [
-    ("1992-Count-Book.pdf", 41, "1992-11-03", "president", 8, 8),
-    ("1992-Count-Book.pdf", 47, "1992-11-03", "governor", 8, 5),
+    ("1992-Count-Book.pdf", 40, "1992-11-03", "president", 8, 8),
+    ("1992-Count-Book.pdf", 46, "1992-11-03", "governor", 8, 5),
     ("1994-Count-Book.pdf", 33, "1994-11-08", "senate", 2, 2),
     ("1994-Count-Book.pdf", 34, "1994-11-08", "governor", 6, 3),
     ("1998-Count-Book.pdf", 84, "1998-11-03", "governor", 4, 4),
@@ -34,7 +34,11 @@ def fetch() -> None:
 def numbers(text: str, count: int) -> list[int] | None:
     text = re.sub(r"(?<=\d)\s*,\s*(?=\d)", ",", text)
     text = re.sub(r"(?<=\d)\.(?=\d{3}\b)", ",", text)
+    text = re.sub(r"(?<=\d)['’]\s*(?=\d{3}\b)", ",", text)
     found = [int(token.replace(",", "")) for token in NUMBER.findall(text) if token.strip(",")]
+    if len(found) > count:
+        text = re.sub(r"\b(\d) (\d{2,3})\b", r"\1\2", text)
+        found = [int(token.replace(",", "")) for token in NUMBER.findall(text) if token.strip(",")]
     return found[:count] if len(found) >= count else None
 
 
