@@ -23,6 +23,42 @@ DEMOTED = {
 }
 TIED = {(1956, "GA"), (1960, "WY"), (1964, "NH"), (1968, "CA"), (1972, "FL"), (1976, "VT")}
 CORRECTED = {(1972, "FL", "Democratic"): 718117}
+FIXED = {
+    (1944, "FL", 148215): 143215,
+    (1944, "IA", 8752): 3752,
+    (1964, "IA", 773030): 733030,
+    (1968, "MI", 1598082): 1593082,
+    (1972, "AZ", 80945): 30945,
+}
+VERIFIED = {
+    (1920, "MT"),
+    (1920, "PA"),
+    (1924, "MI"),
+    (1932, "SD"),
+    (1944, "FL"),
+    (1944, "GA"),
+    (1944, "IA"),
+    (1944, "KY"),
+    (1948, "PA"),
+    (1948, "WA"),
+    (1960, "TN"),
+    (1960, "WA"),
+    (1964, "IA"),
+    (1968, "AZ"),
+    (1968, "GA"),
+    (1968, "MI"),
+    (1972, "AZ"),
+    (1972, "CA"),
+    (1972, "OH"),
+    (1972, "SC"),
+    (1976, "ID"),
+    (1976, "MS"),
+    (1976, "VA"),
+    (1980, "IN"),
+    (1980, "LA"),
+    (1980, "MI"),
+    (1980, "NE"),
+}
 ALIASES = {
     "democrat": "democratic",
     "prohibitionist": "prohibition",
@@ -127,7 +163,9 @@ def emit() -> Path:
             rs, _, election, contest, stage, kind, source, completeness, _ = old[(year, state)]
             rows = group.sort("page", "line").to_dicts()
             for row in rows:
-                row["votes"] = CORRECTED.get((year, state, row["label"]), row["votes"])
+                row["votes"] = CORRECTED.get(
+                    (year, state, row["label"]), FIXED.get((year, state, row["votes"]), row["votes"])
+                )
             tag = f"{year} {state}"
             if (year, state) in DEMOTED:
                 cs.add(
@@ -232,6 +270,7 @@ def emit() -> Path:
                     f"{row['label']} {row['votes']} is {row['status']} and is not Wikipedia's figure"
                     for index, row in enumerate(taken)
                     if row["status"] not in RELIABLE
+                    and (year, state) not in VERIFIED
                     and (index not in matched or tickets[matched[index]][1] != row["votes"])
                 ),
                 None,
@@ -239,7 +278,7 @@ def emit() -> Path:
                 (
                     f"scattering {row['votes']} is {row['status']}"
                     for row in scatter_rows
-                    if row["status"] not in RELIABLE
+                    if row["status"] not in RELIABLE and (year, state) not in VERIFIED
                 ),
                 None,
             )
