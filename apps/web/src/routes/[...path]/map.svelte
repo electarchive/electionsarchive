@@ -1478,7 +1478,18 @@
           type: "line",
           ...ownAreas,
           filter: ["==", ["id"], own.k],
-          paint: { "line-color": "var(--foreground)", "line-width": 1.75 },
+          paint: {
+            "line-color": "var(--foreground)",
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              settled,
+              1,
+              settled + 3,
+              1.75,
+            ],
+          },
         },
         "lines",
       );
