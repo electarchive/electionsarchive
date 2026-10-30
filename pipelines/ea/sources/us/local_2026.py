@@ -5796,6 +5796,10 @@ def parse() -> None:
                         ),
                     )
                 ]
+                if state == "NY":
+                    tokens = re.sub(
+                        r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)
+                    ).split()
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
                 for formal in (["public", "schools", "of", "the", "city", "of"], ["school", "district", "of", "the", "city", "of"]):
