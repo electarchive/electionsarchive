@@ -23,6 +23,9 @@ SCHOOLS = {
     ("CA", "Galt Joint Union High School District"): "0614820",
     ("CA", "Jefferson Union High School District"): "0618930",
     ("CA", "Perris Union High School District"): "0630210",
+    ("CA", "Acalanes Union High School District"): "0601650",
+    ("CA", "Liberty Union High School District"): "0621600",
+    ("CA", "West Contra Costa Unified School District"): "0632550",
 }
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
@@ -58,6 +61,7 @@ COUNTIES = {
     "06085": ("CA", "https://vote.santaclaracounty.gov/", "MF-423/santa-clara-2026-11-03-list-of-local-measures.html"),
     "06111": ("CA", "https://clerkrecorder.venturacounty.gov/elections/", "MF-423/ventura-2026-11-03-measures.html"),
     "06019": ("CA", "https://www.fresnocountyca.gov/Departments/County-ClerkRegistrar-of-Voters/Elections/Election-Information/2026/November-3-2026-Consolidated-Statewide-General-Election", "MF-423/fresno-2026-11-03-measures.html"),
+    "06013": ("CA", "https://www.cocovote.us/", "MF-427/26Nov03_Measure-Wording-List-1.pdf"),
     "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
 }
 
