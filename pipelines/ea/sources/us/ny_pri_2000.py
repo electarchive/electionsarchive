@@ -30,7 +30,14 @@ TITLE = "September 12, 2000 primary results"
 NUMBER = re.compile(r"^\d[\d,]*$")
 BLOCK = re.compile(r"^(?:Congress|Senate|Assembly)$")
 HOUSE = re.compile(r"^(\d+)-(Dem|Rep)")
-PARTIES = {"Dem": "democratic", "Rep": "republican"}
+PARTIES = {
+    "Dem": "democratic",
+    "Rep": "republican",
+    "Indep": "independence",
+    "Rtl": "right-to-life",
+    "Green": "green",
+}
+MINOR = {"INDEPENDENCE": "Indep", "RIGHT TO LIFE": "Rtl", "GREEN": "Green"}
 
 
 def fetch() -> None:
@@ -59,6 +66,9 @@ def read(pdf: Path) -> list[dict]:
             joined = " ".join(texts)
             if re.search(r"PRIMARY", joined) and re.search(r"(DEMOCRATIC|REPUBLICAN)", joined):
                 title = "Dem" if "DEMOCRATIC" in joined else "Rep"
+                continue
+            if number <= 5 and re.search(r"PRIMARY", joined) and (minor := re.search("|".join(MINOR), joined)):
+                title = MINOR[minor[0]]
                 continue
             if re.fullmatch(r"U\.?S\.?\s+SENATOR", joined):
                 block = {"office": "senate", "district": None, "party": title, "page": number, "lines": []}
@@ -201,7 +211,8 @@ def parse() -> None:
             print(f"{label}: no column header")
             continue
         anchors, names, first = found
-        scatter = len(anchors) - 1
+        scattered = any(w[0].startswith("Scatter") for line in block["lines"][:first] for w in line)
+        scatter = len(anchors) - int(scattered)
         if not all(names[:scatter]):
             print(f"{label}: a candidate name is missing {names}")
             continue
@@ -261,9 +272,9 @@ def parse() -> None:
                         "state": "NY",
                         "district": block["district"],
                         "code": counties[key],
-                        "candidate": "WRITE-INS" if column == scatter else names[column],
+                        "candidate": "WRITE-INS" if scattered and column == scatter else names[column],
                         "measure": 1,
-                        "writein": column == scatter,
+                        "writein": scattered and column == scatter,
                         "votes": value,
                         "kind": "county",
                         "source": "NY",
