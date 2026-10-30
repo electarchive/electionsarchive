@@ -738,6 +738,12 @@
       <div class="min-inline-0">
         <h2 id="edit-panel-title" class="text-base font-bold">{title}</h2>
         <p class="truncate text-sm text-muted-foreground">{label}</p>
+        {#if signedIn}
+          <a
+            class="text-xs text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground"
+            href="{resolve('/edit')}?record={entity}">{m.ws_open()}</a
+          >
+        {/if}
       </div>
       <Button
         variant="ghost"

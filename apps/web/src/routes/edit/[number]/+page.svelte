@@ -5,17 +5,18 @@
   import XIcon from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
-  import type { Scheme } from "#lib/contrib.js";
+  import type { Cells, Column } from "#lib/workspace.js";
   import { Button } from "#lib/components/ui/button/index.js";
+  import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import {
-    partySchemes,
-    personSchemes,
+    findingsOf,
+    kindLabel,
+    nameKinds,
     schemeExample,
     schemeLabel,
-    schemePattern,
     schemes,
     sourceKindLabel,
     sourceKinds,
@@ -24,25 +25,45 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
+  import {
+    blank,
+    columns,
+    described,
+    holdings,
+    isBlank,
+    isComplete,
+    judge,
+    languageItems,
+    languageLabel,
+    needsSource,
+    op,
+    parse,
+    recordKind,
+    repeats,
+    summarize,
+    swatch,
+    templateTitle,
+  } from "#lib/workspace.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
 
-  type Row = {
-    key: number;
-    record: string;
-    scheme: Scheme | "";
-    value: string;
-  };
+  type Row = { key: number; cells: Cells };
+
+  const template = untrack(() => data.workspace.template);
+  const fields = columns[template];
+  const languages = languageItems();
 
   let next = 0;
-  const keyed = (row: Omit<Row, "key">): Row => ({ key: next++, ...row });
-  const blank = () => keyed({ record: "", scheme: "", value: "" });
+  const keyed = (cells: Cells): Row => ({
+    key: next++,
+    cells: { record: "", ...blank(template), ...cells },
+  });
 
   const initial = untrack(() => data);
   let rows = $state<Array<Row>>(
     initial.workspace.rows.length === 0
-      ? [blank()]
+      ? [keyed({})]
       : initial.workspace.rows.map((row) => keyed(row)),
   );
   let summary = $state(initial.summary);
@@ -65,89 +86,73 @@
   let tab = $state<"diff" | "checks" | "evidence">("checks");
   let palette = $state(false);
 
+  const columnLabel: Record<Exclude<Column, "record">, () => string> = {
+    scheme: m.ws_col_scheme,
+    value: m.ws_col_value,
+    text: m.ws_col_text,
+    lang: m.ws_col_lang,
+    kind: m.ws_col_kind,
+    color: m.ws_col_color,
+    from: m.ws_col_from,
+    to: m.ws_col_to,
+  };
+
+  const placeholderOf = (column: Column, cells: Cells) => {
+    if (column === "value") {
+      const scheme = schemes.find((option) => option === cells.scheme);
+      return scheme == null ? "" : schemeExample[scheme];
+    }
+    return column === "color"
+      ? "#1a2b3c"
+      : column === "from" || column === "to"
+        ? "YYYY-MM-DD"
+        : "";
+  };
+
   const tabs = [
     ["diff", m.ws_tab_diff],
     ["checks", m.ws_tab_checks],
     ["evidence", m.ws_tab_evidence],
   ] as const;
 
-  const fits = (type: string, scheme: Scheme) =>
-    type === "person"
-      ? personSchemes.some((item) => item === scheme)
-      : type === "party"
-        ? partySchemes.some((item) => item === scheme)
-        : scheme === "wikidata";
-
-  const schemeName = (code: string) => {
-    const scheme = schemes.find((item) => item === code);
-    return scheme == null ? code : schemeLabel[scheme]();
-  };
-
-  const kindOf = (type: string) =>
-    type === "person"
-      ? m.ws_kind_person()
-      : type === "party"
-        ? m.ws_kind_party()
-        : m.ws_kind_other();
-
   const assessed = $derived.by(() => {
     const seen: Record<string, number> = {};
     return rows.map((row, index) => {
       const n = index + 1;
-      const record = row.record.trim();
-      const value = row.value.trim();
-      const isBlank = record === "" && row.scheme === "" && value === "";
+      const record = (row.cells.record ?? "").trim();
       const found = record === "" ? undefined : records.get(record);
       const entity = found?.state === "found" ? found : null;
       let problem: string | null = null;
-      let field: "record" | "scheme" | "value" | null = null;
+      let field: Column | null = null;
       if (found?.state === "missing") {
         problem = m.ws_record_missing();
         field = "record";
       } else if (found?.state === "retired") {
         problem = m.ws_record_retired();
         field = "record";
-      } else if (
-        row.scheme !== "" &&
-        value !== "" &&
-        !schemePattern[row.scheme].test(value)
-      ) {
-        problem = m.ws_value_invalid({ scheme: schemeLabel[row.scheme]() });
-        field = "value";
-      } else if (
-        entity != null &&
-        row.scheme !== "" &&
-        !fits(entity.type, row.scheme)
-      ) {
-        problem = m.ws_scheme_unfit({ scheme: schemeLabel[row.scheme]() });
-        field = "scheme";
-      } else if (
-        entity != null &&
-        row.scheme !== "" &&
-        entity.ids.some((held) => held.scheme === row.scheme)
-      ) {
-        problem = m.ws_value_held({
-          scheme: schemeLabel[row.scheme](),
-          value:
-            entity.ids.find((held) => held.scheme === row.scheme)?.value ?? "",
-        });
-        field = "value";
-      } else if (row.scheme !== "" && value !== "") {
-        const earlier = seen[`${row.scheme}:${value}`];
-        if (earlier == null) {
-          seen[`${row.scheme}:${value}`] = n;
-        } else {
-          problem = m.ws_row_duplicate({ row: earlier });
-          field = "value";
+      } else {
+        const judged = judge(template, row.cells, entity);
+        if (judged != null) {
+          problem = judged.problem;
+          field = judged.field;
+        } else if (entity != null && isComplete(template, row.cells)) {
+          const repeat = repeats(template, row.cells, entity.id);
+          const earlier = seen[repeat.key];
+          if (earlier == null) {
+            seen[repeat.key] = n;
+          } else {
+            problem = repeat.problem(earlier);
+            field = repeat.field;
+          }
         }
       }
       return {
         row,
         n,
-        isBlank,
+        isBlank: isBlank(row.cells),
         entity,
         isLooking: record !== "" && found == null,
-        isComplete: entity != null && row.scheme !== "" && value !== "",
+        isComplete: entity != null && isComplete(template, row.cells),
         problem,
         field,
       };
@@ -156,19 +161,8 @@
 
   const ready = $derived(
     assessed.flatMap((item) =>
-      item.entity != null &&
-      item.row.scheme !== "" &&
-      item.isComplete &&
-      item.problem == null
-        ? [
-            {
-              n: item.n,
-              key: item.row.key,
-              entity: item.entity,
-              scheme: item.row.scheme,
-              value: item.row.value.trim(),
-            },
-          ]
+      item.entity != null && item.isComplete && item.problem == null
+        ? [{ n: item.n, entity: item.entity, cells: item.row.cells }]
         : [],
     ),
   );
@@ -190,13 +184,7 @@
 
   const ops = $derived(
     ready.map((item) => ({
-      op: "add",
-      table: "external_id",
-      values: {
-        entity_id: item.entity.id,
-        scheme: item.scheme,
-        value: item.value,
-      },
+      ...op(template, item.cells, item.entity.id),
       ...(source != null && { evidence: ["e1"] }),
     })),
   );
@@ -209,14 +197,10 @@
       ops,
       ...(source != null && { evidence: { e1: source } }),
       workspace: {
-        template: "identifiers",
+        template,
         rows: assessed
           .filter((item) => !item.isBlank)
-          .map(({ row }) => ({
-            record: row.record,
-            scheme: row.scheme,
-            value: row.value,
-          })),
+          .map(({ row }) => row.cells),
         evidence,
       },
     }),
@@ -236,16 +220,12 @@
     };
   });
 
-  const findings = $derived(
-    Object.entries(check?.checks?.findings ?? {}).filter(
-      ([, value]) => value > 0,
-    ),
-  );
+  const findings = $derived(findingsOf(check?.checks));
 
   const findingCount = $derived.by(() => {
     let total = 0;
-    for (const [, value] of findings) {
-      total += value;
+    for (const finding of findings) {
+      total += finding.value;
     }
     return total;
   });
@@ -258,11 +238,13 @@
       : ready.length === 0 ||
           assessed.some((item) => !item.isBlank && !item.isComplete)
         ? m.ws_submit_needs_rows()
-        : summary.trim() === ""
-          ? m.ws_submit_needs_summary()
-          : check?.status !== "done" || isStale
-            ? m.ws_submit_needs_check()
-            : null,
+        : needsSource[template] && source == null
+          ? m.ws_submit_needs_source()
+          : summary.trim() === ""
+            ? m.ws_submit_needs_summary()
+            : check?.status !== "done" || isStale
+              ? m.ws_submit_needs_check()
+              : null,
   );
 
   const outline = $derived.by(() => {
@@ -272,7 +254,7 @@
         id: string;
         name: string;
         type: string;
-        adds: Array<{ key: number; scheme: Scheme; value: string }>;
+        adds: Array<{ key: number; text: string; color: string | null }>;
         problems: number;
       }
     > = {};
@@ -287,11 +269,11 @@
         adds: [],
         problems: 0,
       };
-      if (item.row.scheme !== "" && item.row.value.trim() !== "") {
+      if (item.isComplete) {
         group.adds.push({
           key: item.row.key,
-          scheme: item.row.scheme,
-          value: item.row.value.trim(),
+          text: summarize(template, item.row.cells),
+          color: swatch(template, item.row.cells),
         });
       }
       if (item.problem != null || failure?.row === item.n) {
@@ -306,10 +288,27 @@
     Object.fromEntries(outline.map((group) => [group.id, group.name])),
   );
 
-  const added = $derived(
-    (check?.diff?.rows ?? []).filter(
-      (row) => row.table === "external_id" && row.op === "add",
-    ),
+  const changes = $derived(
+    (
+      [
+        ["add", "+", m.ws_diff_added],
+        ["change", "~", m.ws_diff_changed],
+        ["drop", "−", m.ws_diff_removed],
+      ] as const
+    )
+      .map(([kind, mark, label]) => ({
+        kind,
+        mark,
+        label,
+        rows: (check?.diff?.rows ?? [])
+          .filter(
+            (row) =>
+              row.op === kind &&
+              ["external_id", "name", "party_color"].includes(row.table),
+          )
+          .map((row) => ({ entity: row.entity_id ?? "", ...described(row) })),
+      }))
+      .filter((group) => group.rows.length > 0),
   );
 
   const saveStatus = $derived(
@@ -385,9 +384,9 @@
   });
 
   $effect(() => {
-    const wanted = [...new Set(rows.map((row) => row.record.trim()))].filter(
-      (ref) => ref !== "" && !records.has(ref),
-    );
+    const wanted = [
+      ...new Set(rows.map((row) => (row.cells.record ?? "").trim())),
+    ].filter((ref) => ref !== "" && !records.has(ref));
     if (wanted.length === 0) {
       return;
     }
@@ -415,6 +414,7 @@
   const canCheck = $derived(
     !isLocked &&
       ready.length > 0 &&
+      (!needsSource[template] || source != null) &&
       assessed.every((item) => item.problem == null && !item.isLooking),
   );
 
@@ -486,7 +486,7 @@
     }
   }
 
-  async function focusRow(key: number, field: "record" | "value" = "record") {
+  async function focusRow(key: number, field: Column = "record") {
     await tick();
     document.getElementById(`ws-${field}-${key}`)?.focus();
   }
@@ -508,7 +508,7 @@
   }
 
   function addRow() {
-    const row = blank();
+    const row = keyed({});
     rows.push(row);
     void focusRow(row.key);
   }
@@ -516,26 +516,9 @@
   function removeRow(key: number) {
     rows = rows.filter((row) => row.key !== key);
     if (rows.length === 0) {
-      rows = [blank()];
+      rows = [keyed({})];
     }
   }
-
-  const guess = (value: string): Scheme | "" =>
-    /^Q[1-9]\d*$/u.test(value)
-      ? "wikidata"
-      : /^[A-Z]\d{6}$/u.test(value)
-        ? "bioguide"
-        : "";
-
-  const schemeOf = (text: string, value: string): Scheme | "" => {
-    const lower = text.trim().toLowerCase();
-    return (
-      schemes.find(
-        (scheme) =>
-          scheme === lower || schemeLabel[scheme]().toLowerCase() === lower,
-      ) ?? guess(value)
-    );
-  };
 
   function paste(event: ClipboardEvent, index: number) {
     const text = event.clipboardData?.getData("text/plain") ?? "";
@@ -548,26 +531,16 @@
       if (line.trim() === "") {
         continue;
       }
-      const cells = (
+      const parts = (
         line.includes("\t") ? line.split("\t") : line.split(",")
       ).map((cell) => cell.trim().replace(/^"(.*)"$/u, "$1"));
-      const record = cells[0] ?? "";
-      if (pasted.length === 0 && !/[/\d]/u.test(record)) {
+      if (pasted.length === 0 && !/[/\d]/u.test(parts[0] ?? "")) {
         continue;
       }
-      const value = (cells.length >= 3 ? cells[2] : cells[1]) ?? "";
-      pasted.push(
-        keyed({
-          record,
-          scheme:
-            cells.length >= 3 ? schemeOf(cells[1] ?? "", value) : guess(value),
-          value,
-        }),
-      );
+      pasted.push(keyed(parse(template, parts)));
     }
     const current = rows[index];
-    const replaces =
-      current?.record.trim() === "" && current.value.trim() === "";
+    const replaces = current != null && isBlank(current.cells);
     rows.splice(index, replaces ? 1 : 0, ...pasted);
     rows = rows.slice(0, 500);
   }
@@ -625,7 +598,8 @@
       <span class="shrink-0 font-figures text-muted-foreground"
         >{m.ws_draft_number({ number: data.number })}</span
       >
-      <span class="truncate">{summary.trim() || m.ws_summary_default()}</span>
+      <span class="truncate">{summary.trim() || templateTitle[template]()}</span
+      >
     </h1>
     <p
       class="ms-auto flex items-baseline gap-4 text-muted-foreground"
@@ -685,11 +659,16 @@
                   {/if}
                 </span>
                 <span class="text-xs text-muted-foreground"
-                  >{kindOf(group.type)}</span
+                  >{recordKind(group.type)}</span
                 >
                 {#each group.adds as add (add.key)}
-                  <span class="font-figures text-xs"
-                    >+ {schemeLabel[add.scheme]()} {add.value}</span
+                  <span class="flex items-center gap-1.5 text-xs min-inline-0"
+                    >+{#if add.color != null}<span
+                        class="shrink-0 rounded-[2px] ring-1 ring-foreground/20 block-2.5 inline-2.5"
+                        style:background-color={add.color}
+                      ></span>{/if}<span class="truncate font-figures"
+                      >{add.text}</span
+                    ></span
                   >
                 {/each}
               </button>
@@ -704,17 +683,40 @@
         <div
           class="flex flex-wrap items-baseline justify-between gap-x-4 pbe-2"
         >
-          <h2 id="ws-table" class="font-semibold">{m.ws_table_title()}</h2>
-          <span class="text-xs text-muted-foreground">{m.ws_table_hint()}</span>
+          <h2 id="ws-table" class="font-semibold">
+            {template === "identifiers"
+              ? m.ws_table_title()
+              : template === "names"
+                ? m.edit_names()
+                : m.ws_table_colors()}
+          </h2>
+          <span class="text-xs text-muted-foreground"
+            >{template === "identifiers"
+              ? m.ws_table_hint()
+              : template === "names"
+                ? m.ws_table_hint_names()
+                : m.ws_table_hint_colors()}</span
+          >
         </div>
         <div
-          class="grid grid-cols-[2rem_minmax(0,1fr)_11.5rem_9rem_2rem] gap-x-2 border-s-2 border-be border-s-transparent py-1 ps-1 text-muted-foreground max-sm:hidden"
+          class={cn(
+            "grid gap-x-2 border-s-2 border-be border-s-transparent py-1 ps-1 text-muted-foreground max-sm:hidden",
+            {
+              "grid-cols-[2rem_minmax(0,1fr)_11.5rem_9rem_2rem]":
+                template === "identifiers",
+              "grid-cols-[2rem_minmax(0,1fr)_minmax(0,1fr)_10rem_9.5rem_2rem]":
+                template === "names",
+              "grid-cols-[2rem_minmax(0,1fr)_8.5rem_8.5rem_8.5rem_2rem]":
+                template === "colors",
+            },
+          )}
           aria-hidden="true"
         >
           <span></span>
           <span class="ps-1">{m.ws_col_record()}</span>
-          <span class="ps-1">{m.ws_col_scheme()}</span>
-          <span class="ps-1">{m.ws_col_value()}</span>
+          {#each fields as column (column)}
+            <span class="ps-1">{columnLabel[column]()}</span>
+          {/each}
           <span></span>
         </div>
         <ol class="grid">
@@ -728,7 +730,15 @@
             )}
             <li
               class={cn(
-                "grid grid-cols-[2rem_minmax(0,1fr)_2rem] gap-x-2 gap-y-1 border-s-2 border-be py-1.5 ps-1 sm:grid-cols-[2rem_minmax(0,1fr)_11.5rem_9rem_2rem]",
+                "grid grid-cols-[2rem_minmax(0,1fr)_2rem] gap-x-2 gap-y-1 border-s-2 border-be py-1.5 ps-1",
+                {
+                  "sm:grid-cols-[2rem_minmax(0,1fr)_11.5rem_9rem_2rem]":
+                    template === "identifiers",
+                  "sm:grid-cols-[2rem_minmax(0,1fr)_minmax(0,1fr)_10rem_9.5rem_2rem]":
+                    template === "names",
+                  "sm:grid-cols-[2rem_minmax(0,1fr)_8.5rem_8.5rem_8.5rem_2rem]":
+                    template === "colors",
+                },
                 {
                   "border-s-foreground": isReady,
                   "border-s-destructive": isWrong,
@@ -745,7 +755,7 @@
               >
               <Input
                 id="ws-record-{row.key}"
-                bind:value={row.record}
+                bind:value={row.cells.record}
                 disabled={isLocked}
                 placeholder={m.ws_record_placeholder()}
                 aria-label="{label}, {m.ws_col_record()}"
@@ -757,47 +767,136 @@
                 onfocus={() => (selected = item?.entity?.id ?? null)}
                 onpaste={(event: ClipboardEvent) => paste(event, index)}
               />
-              <div class="col-2 grid grid-cols-2 gap-2 sm:contents">
-                <Select.Root
-                  type="single"
-                  value={row.scheme}
-                  disabled={isLocked}
-                  onValueChange={(next: string) => {
-                    row.scheme =
-                      schemes.find((scheme) => scheme === next) ?? "";
-                  }}
-                >
-                  <Select.Trigger
-                    class="text-sm block-8 inline-full"
-                    aria-label="{label}, {m.ws_col_scheme()}"
-                    aria-invalid={item?.field === "scheme"}
-                    >{row.scheme === ""
-                      ? m.ws_col_scheme()
-                      : schemeLabel[row.scheme]()}</Select.Trigger
-                  >
-                  <Select.Content>
-                    {#each schemes as scheme (scheme)}
-                      <Select.Item value={scheme}
-                        >{schemeLabel[scheme]()}</Select.Item
+              <div
+                class={cn("col-2 grid gap-2 sm:contents", {
+                  "grid-cols-2": template !== "colors",
+                  "grid-cols-3": template === "colors",
+                })}
+              >
+                {#each fields as column (column)}
+                  {const named = $derived(`${label}, ${columnLabel[column]()}`)}
+                  {const isInvalid = $derived(item?.field === column)}
+                  {#if column === "scheme"}
+                    {const scheme = $derived(
+                      schemes.find((option) => option === row.cells.scheme),
+                    )}
+                    <Select.Root
+                      type="single"
+                      value={row.cells.scheme}
+                      disabled={isLocked}
+                      onValueChange={(chosen: string) => {
+                        row.cells.scheme = chosen;
+                      }}
+                    >
+                      <Select.Trigger
+                        class="text-sm block-8 inline-full"
+                        aria-label={named}
+                        aria-invalid={isInvalid}
+                        >{scheme == null
+                          ? m.ws_col_scheme()
+                          : schemeLabel[scheme]()}</Select.Trigger
                       >
-                    {/each}
-                  </Select.Content>
-                </Select.Root>
-                <Input
-                  id="ws-value-{row.key}"
-                  bind:value={row.value}
-                  disabled={isLocked}
-                  placeholder={row.scheme === ""
-                    ? ""
-                    : schemeExample[row.scheme]}
-                  aria-label="{label}, {m.ws_col_value()}"
-                  aria-invalid={item?.field === "value"}
-                  autocomplete="off"
-                  spellcheck={false}
-                  maxlength={100}
-                  class="font-figures block-8"
-                  onkeydown={(event: KeyboardEvent) => onvaluekey(event, index)}
-                />
+                      <Select.Content>
+                        {#each schemes as option (option)}
+                          <Select.Item value={option}
+                            >{schemeLabel[option]()}</Select.Item
+                          >
+                        {/each}
+                      </Select.Content>
+                    </Select.Root>
+                  {:else if column === "kind"}
+                    {const kind = $derived(
+                      nameKinds.find((option) => option === row.cells.kind),
+                    )}
+                    <Select.Root
+                      type="single"
+                      value={row.cells.kind}
+                      disabled={isLocked}
+                      onValueChange={(chosen: string) => {
+                        row.cells.kind = chosen;
+                      }}
+                    >
+                      <Select.Trigger
+                        class="text-sm block-8 inline-full"
+                        aria-label={named}
+                        aria-invalid={isInvalid}
+                        >{kind == null
+                          ? (row.cells.kind ?? "") || m.ws_col_kind()
+                          : kindLabel[kind]()}</Select.Trigger
+                      >
+                      <Select.Content>
+                        {#each nameKinds as option (option)}
+                          <Select.Item value={option}
+                            >{kindLabel[option]()}</Select.Item
+                          >
+                        {/each}
+                      </Select.Content>
+                    </Select.Root>
+                  {:else if column === "lang"}
+                    {#if isLocked}
+                      <Input
+                        value={languageLabel(row.cells.lang ?? "")}
+                        disabled
+                        aria-label={named}
+                        class="block-8"
+                      />
+                    {:else}
+                      <Combobox
+                        items={languages}
+                        value={row.cells.lang ?? null}
+                        label={named}
+                        placeholder={m.ws_col_lang()}
+                        search={m.edit_note_lang_search()}
+                        empty={m.edit_note_lang_empty()}
+                        class="block-8 inline-full"
+                        onValueChange={(chosen: string | null) => {
+                          row.cells.lang = chosen ?? "";
+                        }}
+                      />
+                    {/if}
+                  {:else}
+                    {const color = $derived(
+                      column === "color" ? swatch(template, row.cells) : null,
+                    )}
+                    <div
+                      class={cn("relative", {
+                        "max-sm:col-span-2": column === "text",
+                      })}
+                    >
+                      {#if column === "color"}
+                        <span
+                          class="pointer-events-none absolute inset-s-2 inset-bs-1/2 -translate-y-1/2 rounded-[2px] ring-1 ring-foreground/20 block-4 inline-4"
+                          style:background-color={color ?? "transparent"}
+                          aria-hidden="true"
+                        ></span>
+                      {/if}
+                      <Input
+                        id="ws-{column}-{row.key}"
+                        bind:value={row.cells[column]}
+                        disabled={isLocked}
+                        placeholder={placeholderOf(column, row.cells)}
+                        aria-label={named}
+                        aria-invalid={isInvalid}
+                        autocomplete="off"
+                        spellcheck={column === "text"}
+                        maxlength={column === "text"
+                          ? 500
+                          : column === "value"
+                            ? 100
+                            : 20}
+                        inputmode={column === "from" || column === "to"
+                          ? "numeric"
+                          : undefined}
+                        class={cn("block-8", {
+                          "font-figures": column !== "text",
+                          "ps-8": column === "color",
+                        })}
+                        onkeydown={(event: KeyboardEvent) =>
+                          onvaluekey(event, index)}
+                      />
+                    </div>
+                  {/if}
+                {/each}
               </div>
               <Button
                 variant="ghost"
@@ -828,10 +927,8 @@
                       rel="noopener">{item.entity.name}</a
                     >
                     · {[
-                      kindOf(item.entity.type),
-                      ...item.entity.ids.map(
-                        (held) => `${schemeLabel[held.scheme]()} ${held.value}`,
-                      ),
+                      recordKind(item.entity.type),
+                      ...holdings(template, item.entity).slice(0, 6),
                     ].join(" · ")}
                   {/if}
                 </p>
@@ -878,7 +975,7 @@
         aria-labelledby="ws-tab-{tab}"
       >
         {#if tab === "diff"}
-          {#if added.length === 0}
+          {#if changes.length === 0}
             <p class="text-pretty text-muted-foreground">
               {m.ws_diff_empty()}
             </p>
@@ -886,30 +983,41 @@
             {#if isStale}
               <p class="pbe-2 text-xs font-semibold">{m.ws_checks_stale()}</p>
             {/if}
-            <p class="text-xs text-muted-foreground">{m.ws_diff_added()}</p>
-            <ul class="mbs-1 grid border-s-2 border-foreground">
-              {#each added as row, i (i)}
-                {const entity = $derived(row.entity_id ?? "")}
-                <li>
-                  <button
-                    type="button"
-                    class={cn(
-                      "grid gap-0.5 border-be py-1.5 ps-3 text-start inline-full hover:bg-muted",
-                      { "bg-muted": selected === entity },
-                    )}
-                    onclick={() => pickEntity(entity)}
-                  >
-                    <span class="truncate font-semibold"
-                      >{entityNames[entity] ?? entity}</span
-                    >
-                    <span class="font-figures text-xs"
-                      >+ {schemeName(row.key.scheme ?? "")}
-                      {row.key.value}</span
-                    >
-                  </button>
-                </li>
+            <div class="grid gap-4">
+              {#each changes as group (group.kind)}
+                <section>
+                  <h3 class="text-xs text-muted-foreground">
+                    {group.label()}
+                  </h3>
+                  <ul class="mbs-1 grid border-s-2 border-foreground">
+                    {#each group.rows as row, i (i)}
+                      <li>
+                        <button
+                          type="button"
+                          class={cn(
+                            "grid gap-0.5 border-be py-1.5 ps-3 text-start inline-full hover:bg-muted",
+                            { "bg-muted": selected === row.entity },
+                          )}
+                          onclick={() => pickEntity(row.entity)}
+                        >
+                          <span class="truncate font-semibold"
+                            >{entityNames[row.entity] ?? row.entity}</span
+                          >
+                          <span class="flex items-center gap-1.5 text-xs"
+                            >{group.mark}{#if row.color != null}<span
+                                class="shrink-0 rounded-[2px] ring-1 ring-foreground/20 block-2.5 inline-2.5"
+                                style:background-color={row.color}
+                              ></span>{/if}<span class="font-figures"
+                              >{row.text}</span
+                            ></span
+                          >
+                        </button>
+                      </li>
+                    {/each}
+                  </ul>
+                </section>
               {/each}
-            </ul>
+            </div>
           {/if}
         {:else if tab === "checks"}
           {#if isChecking}
@@ -969,12 +1077,14 @@
                   </p>
                 {:else}
                   <ul class="grid border-s-2 border-foreground">
-                    {#each findings as [code, value] (code)}
+                    {#each findings as finding (finding.code)}
                       <li
-                        class="flex items-baseline justify-between gap-2 border-be py-1.5 ps-3"
+                        class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2 border-be py-1.5 ps-3"
                       >
-                        <span class="font-figures">{code}</span>
-                        <span class="font-figures font-semibold">{value}</span>
+                        <span class="text-pretty">{finding.label}</span>
+                        <span class="font-figures font-semibold"
+                          >{finding.value}</span
+                        >
                       </li>
                     {/each}
                   </ul>
@@ -986,7 +1096,9 @@
           {/if}
         {:else if evidence == null}
           <p class="text-pretty text-muted-foreground">
-            {m.ws_evidence_empty()}
+            {needsSource[template]
+              ? m.ws_evidence_needed()
+              : m.ws_evidence_empty()}
           </p>
           {#if !isLocked}
             <Button

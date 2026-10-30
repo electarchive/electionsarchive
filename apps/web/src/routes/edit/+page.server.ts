@@ -1,12 +1,15 @@
-import { redirect } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
-import { m } from "#lib/paraglide/messages.js";
 import { db } from "#lib/server/db/index.js";
+import { blank, templates, templateTitle } from "#lib/workspace.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
   if (locals.user == null) {
-    redirect(303, `/sign-in?next=${encodeURIComponent(url.pathname)}`);
+    redirect(
+      303,
+      `/sign-in?next=${encodeURIComponent(url.pathname + url.search)}`,
+    );
   }
   setHeaders({ "cache-control": "no-store" });
   const { rows } = await db.execute<{
@@ -24,19 +27,31 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
     order by p.updated_at desc
     limit 50
   `);
-  return { drafts: rows };
+  return { drafts: rows, record: url.searchParams.get("record") ?? "" };
 };
 
 export const actions: Actions = {
-  start: async ({ locals, url }) => {
+  start: async ({ locals, url, request }) => {
     if (locals.user == null) {
       redirect(303, `/sign-in?next=${encodeURIComponent(url.pathname)}`);
     }
-    const summary = m.ws_summary_default();
+    const form = await request.formData();
+    const template = templates.find((item) => item === form.get("template"));
+    if (template == null) {
+      error(400);
+    }
+    const record = form.get("record");
+    const summary = templateTitle[template]();
     const draft = {
       summary,
       ops: [],
-      workspace: { template: "identifiers", rows: [] },
+      workspace: {
+        template,
+        rows:
+          typeof record === "string" && record.trim() !== ""
+            ? [{ ...blank(template), record: record.trim().slice(0, 2048) }]
+            : [],
+      },
     };
     const { rows } = await db.execute<{ number: number }>(sql`
       insert into proposal (author_user_id, title, draft)

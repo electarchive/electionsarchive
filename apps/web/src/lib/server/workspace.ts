@@ -1,8 +1,15 @@
 import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import type { Checks, Diff, Scheme } from "#lib/contrib.js";
-import { schemes, sourceKinds } from "#lib/contrib.js";
+import type { Checks, Diff, NameKind, Scheme } from "#lib/contrib.js";
+import type { Lookup } from "#lib/workspace.js";
+import {
+  hex,
+  languages,
+  nameKinds,
+  schemes,
+  sourceKinds,
+} from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
@@ -18,43 +25,79 @@ const Line = (max: number) =>
 
 const Raw = (max: number) => v.pipe(v.string(), v.maxLength(max));
 
-export const Workspace = v.object({
-  template: v.literal("identifiers"),
-  rows: v.pipe(
-    v.array(
-      v.object({
-        record: Raw(2048),
-        scheme: v.union([v.picklist(schemes), v.literal("")]),
-        value: Raw(100),
-      }),
-    ),
-    v.maxLength(500),
-  ),
-  evidence: v.nullish(
-    v.object({
-      url: Raw(2048),
-      title: Raw(500),
-      publisher: Raw(200),
-      kind: v.picklist(sourceKinds),
-    }),
-    null,
-  ),
-});
+const Rows = <T extends v.ObjectEntries>(cells: T) =>
+  v.pipe(v.array(v.object({ record: Raw(2048), ...cells })), v.maxLength(500));
+
+const Evidence = v.nullish(
+  v.object({
+    url: Raw(2048),
+    title: Raw(500),
+    publisher: Raw(200),
+    kind: v.picklist(sourceKinds),
+  }),
+  null,
+);
+
+export const Workspace = v.variant("template", [
+  v.object({
+    template: v.literal("identifiers"),
+    rows: Rows({ scheme: Raw(20), value: Raw(100) }),
+    evidence: Evidence,
+  }),
+  v.object({
+    template: v.literal("names"),
+    rows: Rows({ text: Raw(500), lang: Raw(20), kind: Raw(20) }),
+    evidence: Evidence,
+  }),
+  v.object({
+    template: v.literal("colors"),
+    rows: Rows({ color: Raw(20), from: Raw(20), to: Raw(20) }),
+    evidence: Evidence,
+  }),
+]);
+
+const Id = v.pipe(v.string(), v.uuid());
+const Cited = v.optional(v.tuple([v.literal("e1")]));
+const Day = v.optional(v.pipe(v.string(), v.isoDate()));
 
 export const Draft = v.object({
   summary: v.pipe(v.string(), v.normalize("NFC"), v.trim(), v.maxLength(300)),
   ops: v.pipe(
     v.array(
-      v.object({
-        op: v.literal("add"),
-        table: v.literal("external_id"),
-        values: v.object({
-          entity_id: v.pipe(v.string(), v.uuid()),
-          scheme: v.picklist(schemes),
-          value: Raw(100),
+      v.union([
+        v.object({
+          op: v.literal("add"),
+          table: v.literal("external_id"),
+          values: v.object({
+            entity_id: Id,
+            scheme: v.picklist(schemes),
+            value: Raw(100),
+          }),
+          evidence: Cited,
         }),
-        evidence: v.optional(v.tuple([v.literal("e1")])),
-      }),
+        v.object({
+          op: v.literal("add"),
+          table: v.literal("name"),
+          values: v.object({
+            entity_id: Id,
+            text: Line(500),
+            lang: v.picklist(languages),
+            kind: v.picklist(nameKinds),
+          }),
+          evidence: Cited,
+        }),
+        v.object({
+          op: v.literal("add"),
+          table: v.literal("party_color"),
+          values: v.object({
+            party_id: Id,
+            color: v.pipe(v.string(), v.regex(hex)),
+            valid_from: Day,
+            valid_to: Day,
+          }),
+          evidence: Cited,
+        }),
+      ]),
     ),
     v.maxLength(500),
   ),
@@ -95,17 +138,6 @@ export async function latest(number: number, kind: "check" | "submit") {
   `);
   return rows[0] ?? null;
 }
-
-export type Lookup =
-  | {
-      state: "found";
-      id: string;
-      type: string;
-      name: string;
-      ids: Array<{ scheme: Scheme; value: string }>;
-    }
-  | { state: "missing" }
-  | { state: "retired" };
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
@@ -180,6 +212,12 @@ export async function records(refs: Array<string>) {
     type: string;
     gone: boolean;
     ids: Array<{ scheme: Scheme; value: string }>;
+    names: Array<{ text: string; lang: string; kind: NameKind }>;
+    colors: Array<{
+      color: string;
+      valid_from: string | null;
+      valid_to: string | null;
+    }>;
   }>(sql`
     select e.id, e.type::text as type,
            exists (select from entity_merge m where m.entity_id = e.id)
@@ -188,7 +226,16 @@ export async function records(refs: Array<string>) {
              select json_agg(json_build_object('scheme', x.scheme, 'value', x.value) order by x.scheme, x.value)
              from external_id x
              where x.entity_id = e.id and x.scheme = any(${`{${schemes.join(",")}}`}::text[])
-           ), '[]') as ids
+           ), '[]') as ids,
+           coalesce((
+             select json_agg(json_build_object('text', n.text, 'lang', n.lang, 'kind', n.kind) order by n.text)
+             from name n where n.entity_id = e.id
+           ), '[]') as names,
+           coalesce((
+             select json_agg(json_build_object('color', c.color, 'valid_from', c.valid_from, 'valid_to', c.valid_to)
+                             order by c.valid_from nulls first)
+             from party_color c where c.party_id = e.id
+           ), '[]') as colors
     from entity e
     where e.id = any(${sql.param(wanted)}::uuid[])
   `);
@@ -209,6 +256,8 @@ export async function records(refs: Array<string>) {
               type: entity.type,
               name: full.get(entity.id) ?? entity.id,
               ids: entity.ids,
+              names: entity.names,
+              colors: entity.colors,
             };
   }
   return result;

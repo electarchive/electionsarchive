@@ -1,14 +1,16 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
+  import type { Template } from "#lib/workspace.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { templateBody, templates, templateTitle } from "#lib/workspace.js";
   import type { PageData } from "./$types";
 
   const { data }: { data: PageData } = $props();
 
-  let isStarting = $state(false);
+  let starting = $state<Template | null>(null);
 </script>
 
 <svelte:head>
@@ -31,28 +33,40 @@
     aria-labelledby="templates"
   >
     <h2 id="templates" class="heading">{m.ws_templates()}</h2>
-    <form
-      method="POST"
-      action="?/start"
-      class="flex items-start justify-between gap-6 border-be pbe-4 max-sm:flex-col max-sm:gap-3"
-      use:enhance={() => {
-        isStarting = true;
-        return async ({ update }) => {
-          await update();
-          isStarting = false;
-        };
-      }}
-    >
-      <div class="grid gap-1">
-        <h3 class="font-semibold">{m.ws_template_identifiers()}</h3>
-        <p class="text-sm text-pretty text-muted-foreground max-inline-[52ch]">
-          {m.ws_template_identifiers_body()}
-        </p>
-      </div>
-      <Button type="submit" disabled={isStarting}
-        >{m.ws_template_start()}</Button
-      >
-    </form>
+    <ul class="grid">
+      {#each templates as template (template)}
+        <li>
+          <form
+            method="POST"
+            action="?/start"
+            class="flex items-start justify-between gap-6 border-be py-4 max-sm:flex-col max-sm:gap-3"
+            use:enhance={() => {
+              starting = template;
+              return async ({ update }) => {
+                await update();
+                starting = null;
+              };
+            }}
+          >
+            <input type="hidden" name="template" value={template} />
+            {#if data.record !== ""}
+              <input type="hidden" name="record" value={data.record} />
+            {/if}
+            <div class="grid gap-1">
+              <h3 class="font-semibold">{templateTitle[template]()}</h3>
+              <p
+                class="text-sm text-pretty text-muted-foreground max-inline-[52ch]"
+              >
+                {templateBody[template]()}
+              </p>
+            </div>
+            <Button type="submit" variant="outline" disabled={starting != null}
+              >{m.ws_template_start()}</Button
+            >
+          </form>
+        </li>
+      {/each}
+    </ul>
   </section>
 
   <section

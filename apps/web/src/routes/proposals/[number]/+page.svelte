@@ -11,6 +11,7 @@
     dated,
     escalationLabel,
     factLabel,
+    findingsOf,
     labelKindLabel,
     labelKinds,
     labelValue,
@@ -210,32 +211,7 @@
     const found = schemes.find((item) => item === value);
     return found == null ? String(value) : schemeLabel[found]();
   };
-  const checks: Record<string, (pipelines: string) => string> = {
-    "scope.owner": (pipelines) => m.proposal_check_scope_owner({ pipelines }),
-    "scope.polity": m.proposal_check_scope_polity,
-    "name.capitals": m.proposal_check_name_capitals,
-    "translation.held": m.proposal_check_translation_held,
-    "facts.immutable": m.proposal_check_facts_immutable,
-    "reference.facts": m.proposal_check_reference_facts,
-  };
-  const found = $derived(
-    Object.entries(head?.checks?.findings ?? {})
-      .filter(([, value]) => value > 0)
-      .map(([code, value]) => {
-        const pipelines: Array<string> = [];
-        for (const example of head?.checks?.examples?.[code] ?? []) {
-          const pipeline = example.details?.pipeline;
-          if (pipeline != null && !pipelines.includes(pipeline)) {
-            pipelines.push(pipeline);
-          }
-        }
-        return {
-          code,
-          value,
-          label: checks[code]?.(pipelines.join(", ")) ?? code,
-        };
-      }),
-  );
+  const found = $derived(findingsOf(head?.checks));
   const day = (value: string | null) => date(value?.slice(0, 10) ?? null);
   const figure = (value: unknown) =>
     typeof value === "number" ? count(value) : null;

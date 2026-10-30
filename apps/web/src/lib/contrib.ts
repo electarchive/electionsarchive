@@ -11,15 +11,18 @@ export type ProposalState =
   | "withdrawn"
   | "reverted";
 
-export type NameKind =
-  | "official"
-  | "native"
-  | "english"
-  | "historical"
-  | "transliteration"
-  | "abbreviation"
-  | "ballot"
-  | "short";
+export const nameKinds = [
+  "official",
+  "native",
+  "english",
+  "historical",
+  "transliteration",
+  "abbreviation",
+  "ballot",
+  "short",
+] as const;
+
+export type NameKind = (typeof nameKinds)[number];
 
 export type NoteKind = "context" | "caveat" | "methodology" | "editorial";
 
@@ -594,3 +597,31 @@ export const kindLabel: Record<NameKind, () => string> = {
   ballot: m.name_kind_ballot,
   short: m.name_kind_short,
 };
+
+const checkLabel: Record<string, (pipelines: string) => string> = {
+  "scope.owner": (pipelines) => m.proposal_check_scope_owner({ pipelines }),
+  "scope.polity": m.proposal_check_scope_polity,
+  "name.capitals": m.proposal_check_name_capitals,
+  "translation.held": m.proposal_check_translation_held,
+  "facts.immutable": m.proposal_check_facts_immutable,
+  "reference.facts": m.proposal_check_reference_facts,
+};
+
+export const findingsOf = (checks: Checks | null | undefined) =>
+  Object.entries(checks?.findings ?? {})
+    .filter(([, value]) => value > 0)
+    .map(([code, value]) => {
+      const pipelines: Array<string> = [];
+      const examples = checks?.examples?.[code] ?? [];
+      for (const example of examples) {
+        const pipeline = example.details?.pipeline;
+        if (pipeline != null && !pipelines.includes(pipeline)) {
+          pipelines.push(pipeline);
+        }
+      }
+      return {
+        code,
+        value,
+        label: checkLabel[code]?.(pipelines.join(", ")) ?? code,
+      };
+    });
