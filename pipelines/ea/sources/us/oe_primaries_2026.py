@@ -1334,7 +1334,7 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url(code, file)), sources[round_slot])
             election_key = f"{day}:{state}:{'runoff' if stage_no == 2 else 'primary'}"
             elections[round_slot] = cs.key("us.election", election_key)
-            if elections[round_slot] in cs.minted or (state, stage_no) == ("WV", 1):
+            if elections[round_slot] in cs.minted or (state, stage_no) in (("WV", 1), ("TN", 1)):
                 cs.add(
                     "election",
                     id=elections[round_slot],
