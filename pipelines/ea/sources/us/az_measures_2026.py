@@ -25,6 +25,9 @@ PUBLISHERS = {
     "Tempe": "City of Tempe City Clerk",
     "Chandler": "City of Chandler City Clerk",
     "Paradise Valley": "Town of Paradise Valley Town Clerk",
+    "Avondale": "City of Avondale City Clerk",
+    "Cave Creek": "Town of Cave Creek Town Clerk",
+    "Gila Bend": "Town of Gila Bend Town Clerk",
 }
 TITLE = "Publicity pamphlet, November 3, 2026 general election"
 
