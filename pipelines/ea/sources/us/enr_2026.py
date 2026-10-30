@@ -32,6 +32,7 @@ EV = {
     "UT": ("electionresults.utah.gov", "utah"),
     "RI": ("electionresults.ri.gov", "RhodeIsland"),
     "WA": ("results.votewa.gov", "washington"),
+    "VA": ("app.enhancedvoting.com", "virginia"),
 }
 CLARITY = {
     "IA": "https://electionresults.iowa.gov/IA/",
@@ -47,7 +48,19 @@ EV_OFFICES = re.compile(
     r"\s*(?:-\s*(?P<party1>Rep|Dem|Democratic|Republican|Libertarian))?\s*$",
     re.IGNORECASE,
 )
-LISTINGS = ("elections.json", "cid=arkansas", "/ballot-items", "Georgia", "/id", "/utah", "/RhodeIsland", "/washington")
+LISTINGS = (
+    "elections.json",
+    "cid=arkansas",
+    "/ballot-items",
+    "Georgia",
+    "/id",
+    "/utah",
+    "/RhodeIsland",
+    "/washington",
+    "/virginia",
+    "Multiparish.htm",
+)
+EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
 YESNO = {"for": "yes", "against": "no"}
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
@@ -62,6 +75,13 @@ IL_CITIES = {
     "CITY OF ROCKFORD": "Winnebago",
 }
 IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
+MN_CONTEST = re.compile(r"(U\.S\. Representative|U\.S\. Senator|Governor & Lt Governor)(?: District (\d+))?")
+MN_OFFICES = {"U.S. Representative": "house", "U.S. Senator": "senate", "Governor & Lt Governor": "governor"}
+LA_BASE = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob="
+LA_RACE = re.compile(
+    r"U\. S\. (?:(?P<senate>Senator)|Representative -- (?P<district>\d+)(?:st|nd|rd|th) Congressional District)"
+    r"(?: -- (?P<party>\w+) Party)?"
+)
 NC_CONTEST = re.compile(r"US SENATE|NC GOVERNOR|US HOUSE OF REPRESENTATIVES DISTRICT (\d+)")
 AR_CONTEST = re.compile(r"U\.S\. Senate|Governor|U\.S\. Congress District (\d+)")
 AR_HEADERS = {"User-Agent": "Mozilla/5.0", "Origin": "https://arkansas.tally-enr.com"}
@@ -76,6 +96,13 @@ NOTE = (
     "Unofficial election night results as the publisher's reporting site showed them at the time given. Counts change as "
     "ballots are counted and until the canvass certifies them; the certified canvass will publish as a separate result set."
 )
+
+
+def office_name(text: str) -> str:
+    found = EV_MEMBER.fullmatch(text.strip())
+    if found is None:
+        return text.strip()
+    return f"United States Representative {found[1]}" if found[1] else "United States Senator"
 
 
 def person(label: str) -> str:
@@ -138,7 +165,7 @@ def fetch() -> None:
             continue
         store(state, base + "ballot-items", content, ".json")
         for item in json.loads(content)["data"]:
-            if EV_OFFICES.fullmatch(item["name"][0]["text"].strip()):
+            if EV_OFFICES.fullmatch(office_name(item["name"][0]["text"])):
                 detail = get(client, f"{base}ballot-items/{item['id']}")
                 if detail is not None:
                     store(state, f"{base}ballot-items/{item['id']}", detail, ".json")
@@ -260,6 +287,31 @@ def fetch() -> None:
                 print(f"IL: no file {name}")
             else:
                 store("IL", f"{base}{name}.csv", content, ".csv")
+    if not ONLY or "MN" in ONLY:
+        base = f"https://electionresultsfiles.sos.mn.gov/{DAY:%Y%m%d}/"
+        for names in (("USSenateCty.txt",), ("USHouseCty.txt",), ("GovernorCty.txt", "GovernorPct.txt")):
+            for name in names:
+                content = get(client, base + name)
+                if content is not None:
+                    store("MN", base + name, content, ".txt")
+                    break
+            else:
+                print(f"MN: no file {names[0]}")
+    if not ONLY or "LA" in ONLY:
+        listing_url = f"{LA_BASE}{DAY:%Y%m%d}/RacesCandidates_Multiparish.htm"
+        listing = get(client, listing_url)
+        if listing is None:
+            print("LA: no race listing")
+        else:
+            store("LA", listing_url, listing, ".json")
+            for race in json.loads(listing)["Races"]["Race"]:
+                if LA_RACE.fullmatch(race["SpecificTitle"].strip()):
+                    url = f"{LA_BASE}{DAY:%Y%m%d}/csv/ByParish_{race['ID']}.csv"
+                    content = get(client, url)
+                    if content is None:
+                        print(f"LA: no file for race {race['ID']}")
+                    else:
+                        store("LA", url, content, ".csv")
     if not ONLY or "NC" in ONLY:
         url = f"https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{DAY:%Y_%m_%d}/results_pct_{DAY:%Y%m%d}.zip"
         content = get(client, url)
@@ -406,6 +458,61 @@ def rows(state: str, url: str, path: Path):
                 "total": None,
             }
         return
+    if state == "LA":
+        table = csv.reader(path.read_text(encoding="utf-8-sig").splitlines())
+        header = next(table)
+        for row in table:
+            found = LA_RACE.fullmatch(row[0].strip())
+            if found is None:
+                continue
+            for label, votes in zip(header[2:], row[2:]):
+                named = re.fullmatch(r"(.*?)\s*\((\w+)\)", label.strip())
+                yield {
+                    "office": "senate" if found["senate"] else "house",
+                    "district": found["district"] or "",
+                    "party": named[2] if named else "",
+                    "county": row[1],
+                    "candidate": named[1] if named else label.strip(),
+                    "write_in": "write-in" in label.lower(),
+                    "votes": int(votes or 0),
+                    "as_of": None,
+                    "reporting": None,
+                    "total": None,
+                    "scope": found["party"] or "",
+                }
+        return
+    if state == "MN":
+        totals: dict[tuple[str, str, str, str, str], list[int]] = {}
+        for line in path.read_text(encoding="latin-1").splitlines():
+            cells = [cell.strip().strip('"').strip() for cell in line.split(";")]
+            found = MN_CONTEST.fullmatch(cells[4]) if len(cells) > 13 else None
+            if found is None:
+                continue
+            key = (
+                f"27{2 * int(cells[1]) - 1:03}",
+                MN_OFFICES[found[1]],
+                found[2] or "",
+                cells[10],
+                re.sub(r"\s+", " ", cells[7].split(" and ")[0]),
+            )
+            tally = totals.setdefault(key, [0, 0, 0])
+            tally[0] += int(cells[13] or 0)
+            if url.endswith("Cty.txt"):
+                tally[1], tally[2] = int(cells[11] or 0), int(cells[12] or 0)
+        for (county, office, district, party, candidate), (votes, reporting, total) in totals.items():
+            yield {
+                "office": office,
+                "district": district,
+                "party": party,
+                "county": county,
+                "candidate": candidate,
+                "write_in": candidate.upper().startswith("WRITE-IN"),
+                "votes": votes,
+                "as_of": None,
+                "reporting": reporting or None,
+                "total": total or None,
+            }
+        return
     if state == "NC":
         totals: dict[tuple[str, str, str, str], int] = {}
         with zipfile.ZipFile(path) as archive, archive.open(archive.namelist()[0]) as handle:
@@ -531,7 +638,7 @@ def rows(state: str, url: str, path: Path):
                     }
         return
     detail = json.loads(path.read_bytes())
-    found = EV_OFFICES.fullmatch(detail["name"][0]["text"].strip())
+    found = EV_OFFICES.fullmatch(office_name(detail["name"][0]["text"]))
     if found is None or "breakdownResults" not in detail:
         return
     status = detail.get("reportingStatus") or {}
@@ -541,6 +648,8 @@ def rows(state: str, url: str, path: Path):
         county = (
             town_counties("RI").get(plain(re.sub(r"\s+(city|town)$", "", place.lower())), place)
             if state == "RI"
+            else f"51{locality['locality']['mapFeatureId']}"
+            if state == "VA"
             else place.removesuffix(" County")
         )
         for option in locality["ballotOptions"]:
