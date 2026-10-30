@@ -5245,6 +5245,10 @@ def parse() -> None:
                         )
                     )
                 if state == "CA":
+                    held = {
+                        path
+                        for (path,) in conn.execute("select path from slug where path ~ '^us/ca/[^/]+/2026-11-03-general$'")
+                    }
                     pools = dict(towns)
                     for county_code, pool in pools.items():
                         own = {tuple(town[0]) for town in pool if town[1] == "school"}
@@ -5255,7 +5259,7 @@ def parse() -> None:
                                 for other, others in pools.items()
                                 if other != county_code
                                 for town in others
-                                if town[1] == "school" and tuple(town[0]) not in own
+                                if town[1] == "school" and tuple(town[0]) not in own and f"{town[4]}/2026-11-03-general" not in held
                             ),
                         ]
             for row in found:
