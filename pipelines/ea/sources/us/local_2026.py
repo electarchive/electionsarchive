@@ -1710,6 +1710,18 @@ NE_SOURCES = {
         "https://www.salemcountynj.gov/wp-content/uploads/2026/07/2026-Candidate-List-1.pdf",
         "nj/salem_candidates.pdf",
     ),
+    "NJ-34001-s": (
+        "Atlantic County Clerk",
+        "Candidates for the 2026 School Election (8/13/2026)",
+        "https://www.atlanticcountyclerk.org/wp-content/uploads/2026/08/Official-2026-School-Board-Candidates-List-8-13-26.pdf",
+        "nj/atlantic_school.pdf",
+    ),
+    "NJ-34031-s": (
+        "Passaic County Clerk",
+        "List of Local and Regional School Candidates for the General Election, November 3, 2026",
+        "https://www.passaiccountynj.org/home/showpublisheddocument/12407",
+        "nj/passaic_school.pdf",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
@@ -1910,6 +1922,12 @@ for key, publisher, title, url, local in (
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
     ("MO-29141", "Morgan County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.morgancountymo.gov/plugins/show_image.php?id=399", "mo/morgan.pdf"),
     ("MO-29105", "Laclede County Clerk", "Sample Ballot Style 1 (District 141), General Election, November 3, 2026", "https://lacledecountyclerk.org/whats-on-the-ballot/", "mo/laclede.pdf"),
+    ("IL-17099", "La Salle County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://www.lasallecountyil.gov/DocumentCenter/View/4565/Specimen-Ballot-PDF", "il/lasalle.pdf"),
+    ("IL-17133", "Monroe County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.mococlerk.com/files/2026%20GE%20Publication%20Ballot.pdf", "il/monroe.pdf"),
+    ("MO-29127", "Marion County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://marioncounty-mo.gov/wp-content/uploads/2026/09/November-3-2026-General-Election-Sample-Ballot.pdf", "mo/marion.pdf"),
+    ("MO-29207", "Stoddard County Clerk", "Sample Ballot BT 1, General Election, November 3, 2026", "https://stoddardcountyclerk.gov/wp-content/uploads/2026/09/Sample-Ballot-1.pdf", "mo/stoddard.pdf"),
+    ("MO-29001", "Adair County Clerk", "Sample Ballot BT 1, General Election, November 3, 2026", "https://adaircountymissouri.com/wp-content/uploads/2026/09/Adair-Sample-BT1.pdf", "mo/adair.pdf"),
+    ("MO-29215", "Texas County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://eadn-wc01-3627135.nxedge.io/wp-content/uploads/November-2026-Sample-Ballot.pdf", "mo/texas.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
