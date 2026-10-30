@@ -1,6 +1,13 @@
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
-import type { Checks, Diff, Editable, ProposalState } from "#lib/contrib.js";
+import type {
+  Change,
+  Checks,
+  Diff,
+  Editable,
+  ProposalState,
+} from "#lib/contrib.js";
+import { schemes } from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 
 const notify = sql`select pg_notify('proposal_job', json_build_object('kind', 'queued')::text)`;
@@ -19,7 +26,7 @@ export async function roles(userId: string | undefined) {
 }
 
 export async function editable(entityId: string): Promise<Editable> {
-  const [names, sources, open] = await Promise.all([
+  const [names, notes, ids, sources, open] = await Promise.all([
     db.execute<Editable["names"][number]>(sql`
       with shown as (
         select id from name
@@ -38,6 +45,19 @@ export async function editable(entityId: string): Promise<Editable> {
       left join changeset c on c.id = n.changeset_id
       where n.entity_id = ${entityId}
       order by shown desc, n.is_preferred desc, n.kind, n.text
+    `),
+    db.execute<Editable["notes"][number]>(sql`
+      select n.id, n.kind::text as kind, n.body_md, n.lang, c.published_at::text as changed
+      from note n
+      left join changeset c on c.id = n.changeset_id
+      where n.entity_id = ${entityId} and n.kind <> 'retired'
+      order by n.recorded_from, n.id
+    `),
+    db.execute<Editable["ids"][number]>(sql`
+      select scheme, value
+      from external_id
+      where entity_id = ${entityId} and scheme = any(${`{${schemes.join(",")}}`}::text[])
+      order by scheme, value
     `),
     db.execute<Editable["sources"][number]>(sql`
       select s.id, s.title, s.publisher
@@ -59,22 +79,26 @@ export async function editable(entityId: string): Promise<Editable> {
       order by p.number
     `),
   ]);
-  return { names: names.rows, sources: sources.rows, open: open.rows };
+  return {
+    names: names.rows,
+    notes: notes.rows,
+    ids: ids.rows,
+    sources: sources.rows,
+    open: open.rows,
+  };
 }
 
 export async function propose({
   userId,
   entityId,
-  nameId,
-  text,
+  changes,
   evidence,
   quote,
   summary,
 }: {
   userId: string;
   entityId: string;
-  nameId: string;
-  text: string;
+  changes: Array<Change>;
   evidence:
     | { type: "source"; sourceId: string }
     | {
@@ -92,14 +116,36 @@ export async function propose({
         title: string;
         publisher: string;
         kind: string;
-      };
+      }
+    | null;
   quote: string;
   summary: string;
 }) {
-  const sourceId = evidence.type === "source" ? evidence.sourceId : null;
-  const uploadId = evidence.type === "upload" ? evidence.uploadId : null;
+  if (evidence == null && changes.some((change) => change.kind === "name")) {
+    error(400, "A name change needs a source.");
+  }
+  const nameIds = changes.flatMap((change) =>
+    change.kind === "name" ? [change.id] : [],
+  );
+  const noteIds = changes.flatMap((change) =>
+    change.kind === "note_set" || change.kind === "note_drop"
+      ? [change.id]
+      : [],
+  );
+  const dropped = changes.flatMap((change) =>
+    change.kind === "id_drop" ? [`${change.scheme}:${change.value}`] : [],
+  );
+  const sourceId = evidence?.type === "source" ? evidence.sourceId : null;
+  const uploadId = evidence?.type === "upload" ? evidence.uploadId : null;
   const { rows } = await db.execute<{ ok: boolean }>(sql`
-    select exists (select from name where id = ${nameId} and entity_id = ${entityId})
+    select (select count(*) from name where id = any(${`{${nameIds.join(",")}}`}::uuid[]) and entity_id = ${entityId})
+             = ${nameIds.length}
+       and (select count(*) from note
+            where id = any(${`{${noteIds.join(",")}}`}::uuid[]) and entity_id = ${entityId} and kind <> 'retired')
+             = ${noteIds.length}
+       and (select count(*) from external_id
+            where scheme || ':' || value = any(${`{${dropped.join(",")}}`}::text[]) and entity_id = ${entityId})
+             = ${dropped.length}
        and (${sourceId}::uuid is null or exists (select from source where id = ${sourceId}))
        and (${uploadId}::uuid is null or exists (
          select from upload where id = ${uploadId} and owner_user_id = ${userId} and status = 'ready'
@@ -108,11 +154,14 @@ export async function propose({
   if (rows[0]?.ok !== true) {
     error(
       400,
-      "That name, source, or upload can't be used. It may have been removed, or the upload may still be processing.",
+      "Some of these changes, or the source, can't be used. They may have been removed, or the upload may still be processing.",
     );
   }
   const cited = (() => {
-    switch (evidence.type) {
+    switch (evidence?.type) {
+      case undefined: {
+        return null;
+      }
       case "source": {
         return { source: evidence.sourceId };
       }
@@ -131,18 +180,68 @@ export async function propose({
       }
     }
   })();
+  const op = (change: Change) => {
+    switch (change.kind) {
+      case "name": {
+        return {
+          op: "set",
+          table: "name",
+          id: change.id,
+          values: { text: change.text },
+        };
+      }
+      case "note_add": {
+        return {
+          op: "add",
+          table: "note",
+          values: {
+            entity_id: entityId,
+            kind: change.noteKind,
+            lang: change.lang,
+            body_md: change.body,
+          },
+        };
+      }
+      case "note_set": {
+        return {
+          op: "set",
+          table: "note",
+          id: change.id,
+          values: { body_md: change.body },
+        };
+      }
+      case "note_drop": {
+        return { op: "drop", table: "note", id: change.id };
+      }
+      case "id_add": {
+        return {
+          op: "add",
+          table: "external_id",
+          values: {
+            entity_id: entityId,
+            scheme: change.scheme,
+            value: change.value,
+          },
+        };
+      }
+      case "id_drop": {
+        return {
+          op: "drop",
+          table: "external_id",
+          key: { scheme: change.scheme, value: change.value },
+        };
+      }
+    }
+  };
   const payload = {
     summary,
-    ops: [
-      {
-        op: "set",
-        table: "name",
-        id: nameId,
-        values: { text },
-        evidence: ["e1"],
-      },
-    ],
-    evidence: { e1: { ...cited, ...(quote !== "" && { quote }) } },
+    ops: changes.map((change) => ({
+      ...op(change),
+      ...(cited != null && { evidence: ["e1"] }),
+    })),
+    ...(cited != null && {
+      evidence: { e1: { ...cited, ...(quote !== "" && { quote }) } },
+    }),
   };
   return db.transaction(async (tx) => {
     const created = await tx.execute<{ id: string; number: number }>(sql`

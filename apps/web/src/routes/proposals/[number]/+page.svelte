@@ -5,9 +5,16 @@
   import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
-  import { stateLabel, tierLabel } from "#lib/contrib.js";
+  import {
+    noteKindLabel,
+    schemeLabel,
+    schemes,
+    stateLabel,
+    tierLabel,
+  } from "#lib/contrib.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { ActionData, PageData } from "./$types";
 
@@ -26,7 +33,20 @@
   };
   const evidential = ["citation", "source", "source_artifact", "source_page"];
   const rows = $derived(
-    (head?.diff?.rows ?? []).filter((row) => !evidential.includes(row.table)),
+    (head?.diff?.rows ?? [])
+      .filter((row) => !evidential.includes(row.table))
+      .map((row) =>
+        row.table === "external_id" && row.op === "add"
+          ? {
+              ...row,
+              fields: {
+                scheme: [null, row.key.scheme],
+                value: [null, row.key.value],
+                ...row.fields,
+              },
+            }
+          : row,
+      ),
   );
   const titles = $derived.by(() => {
     const found: Record<string, string> = { ...head?.titles };
@@ -49,9 +69,36 @@
     name: m.proposal_table_name,
     note: m.proposal_table_note,
     translation: m.proposal_table_translation,
+    external_id: m.proposal_table_external_id,
   };
   const fields: Record<string, () => string> = {
     source_id: m.proposal_field_source,
+    kind: m.proposal_field_kind,
+    lang: m.proposal_field_lang,
+  };
+  const hidden = new Set([
+    "entity_id",
+    "name_id",
+    "note_id",
+    "scheme",
+    "valid_from_precision",
+    "valid_to_precision",
+  ]);
+  const unlabeled = new Set(["text", "body_md"]);
+  const languageName = new Intl.DisplayNames([getLocale()], {
+    type: "language",
+  });
+  const noteKind = (value: string) =>
+    value === "context" ||
+    value === "caveat" ||
+    value === "methodology" ||
+    value === "editorial"
+      ? noteKindLabel[value]()
+      : value;
+  const scheme = (fields: Record<string, [unknown, unknown]>) => {
+    const value = fields.scheme?.[1] ?? fields.scheme?.[0];
+    const found = schemes.find((item) => item === value);
+    return found == null ? String(value) : schemeLabel[found]();
   };
   const checks: Record<string, (pipelines: string) => string> = {
     "scope.owner": (pipelines) => m.proposal_check_scope_owner({ pipelines }),
@@ -80,14 +127,28 @@
       }),
   );
   const day = (value: string | null) => date(value?.slice(0, 10) ?? null);
-  const shown = (field: string, value: unknown) =>
-    value == null
-      ? null
-      : typeof value === "string"
-        ? field === "source_id"
-          ? (titles[value] ?? value)
-          : value
-        : JSON.stringify(value);
+  const shown = (field: string, value: unknown) => {
+    if (value == null) {
+      return null;
+    }
+    if (typeof value !== "string") {
+      return JSON.stringify(value);
+    }
+    switch (field) {
+      case "source_id": {
+        return titles[value] ?? value;
+      }
+      case "kind": {
+        return noteKind(value);
+      }
+      case "lang": {
+        return languageName.of(value) ?? value;
+      }
+      default: {
+        return value;
+      }
+    }
+  };
   const decided = $derived(
     proposal.state === "published"
       ? m.proposal_published_by
@@ -187,12 +248,19 @@
           class="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-be py-2 max-sm:grid-cols-1"
         >
           <span class="text-muted-foreground"
-            >{tables[row.table]?.() ?? row.table}</span
+            >{tables[row.table]?.() ?? row.table}{#if row.op === "drop"}<span
+                class="block text-xs font-semibold text-foreground"
+                >{m.proposal_removed()}</span
+              >{/if}</span
           >
           <span class="grid gap-1">
-            {#each Object.entries(row.fields) as [field, [before, after]] (field)}
+            {#each Object.entries(row.fields).filter(([field, [before, after]]) => !hidden.has(field) && (before != null || after != null)) as [field, [before, after]] (field)}
               <span class="flex flex-wrap items-baseline gap-x-2">
-                {#if field !== "text"}
+                {#if row.table === "external_id" && field === "value"}
+                  <span class="text-xs text-muted-foreground"
+                    >{scheme(row.fields)}</span
+                  >
+                {:else if !unlabeled.has(field)}
                   <span class="text-xs text-muted-foreground"
                     >{fields[field]?.() ?? field}</span
                   >

@@ -20,11 +20,117 @@ export type NameKind =
   | "ballot"
   | "short";
 
+export type NoteKind = "context" | "caveat" | "methodology" | "editorial";
+
+export const noteKinds = ["context", "caveat", "methodology"] as const;
+
+export const noteKindLabel: Record<NoteKind, () => string> = {
+  context: m.note_kind_context,
+  caveat: m.note_kind_caveat,
+  methodology: m.note_kind_methodology,
+  editorial: m.note_kind_editorial,
+};
+
+export const noteLimit = 10_000;
+
+export const schemes = ["wikidata", "bioguide", "mnis", "parlgov"] as const;
+
+export type Scheme = (typeof schemes)[number];
+
+export const schemePattern: Record<Scheme, RegExp> = {
+  wikidata: /^Q[1-9]\d*$/,
+  bioguide: /^[A-Z]\d{6}$/,
+  mnis: /^[1-9]\d*$/,
+  parlgov: /^[1-9]\d*$/,
+};
+
+export const schemeExample: Record<Scheme, string> = {
+  wikidata: "Q42",
+  bioguide: "S000148",
+  mnis: "4514",
+  parlgov: "1017",
+};
+
+export const schemeLabel: Record<Scheme, () => string> = {
+  wikidata: m.id_scheme_wikidata,
+  bioguide: m.id_scheme_bioguide,
+  mnis: m.id_scheme_mnis,
+  parlgov: m.id_scheme_parlgov,
+};
+
+export const personSchemes = ["wikidata", "bioguide", "mnis"] as const;
+
+export const schemeHref: Partial<Record<Scheme, (value: string) => string>> = {
+  wikidata: (value) => `https://www.wikidata.org/wiki/${value}`,
+  bioguide: (value) => `https://bioguide.congress.gov/search/bio/${value}`,
+  mnis: (value) => `https://members.parliament.uk/member/${value}/career`,
+};
+
+export const languages = [
+  "en",
+  "fr",
+  "de",
+  "it",
+  "es",
+  "pt",
+  "pt-BR",
+  "tr",
+  "nl",
+  "ga",
+  "rm",
+  "cy",
+  "gd",
+  "ca",
+  "eu",
+  "gl",
+  "bg",
+  "cs",
+  "da",
+  "el",
+  "et",
+  "fi",
+  "hr",
+  "hu",
+  "lt",
+  "lv",
+  "mt",
+  "pl",
+  "ro",
+  "sk",
+  "sl",
+  "sv",
+  "ku",
+  "ar",
+  "ru",
+  "uk",
+  "ja",
+  "ko",
+  "zh-Hans",
+  "zh-Hant",
+] as const;
+
+export const graphemes = (text: string) =>
+  [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)]
+    .length;
+
+export type Change =
+  | { kind: "name"; id: string; text: string }
+  | {
+      kind: "note_add";
+      noteKind: (typeof noteKinds)[number];
+      lang: string;
+      body: string;
+    }
+  | { kind: "note_set"; id: string; body: string }
+  | { kind: "note_drop"; id: string }
+  | { kind: "id_add"; scheme: Scheme; value: string }
+  | { kind: "id_drop"; scheme: Scheme; value: string };
+
 export type DiffRow = {
   table: string;
   key: Record<string, string>;
   entity_id: string | null;
-  op: "add" | "change";
+  op: "add" | "change" | "drop";
   fields: Record<string, [unknown, unknown]>;
 };
 
@@ -54,6 +160,14 @@ export type Editable = {
     source: string | null;
     changed: string | null;
   }>;
+  notes: Array<{
+    id: string;
+    kind: NoteKind;
+    body_md: string;
+    lang: string;
+    changed: string | null;
+  }>;
+  ids: Array<{ scheme: Scheme; value: string }>;
   sources: Array<{ id: string; title: string; publisher: string | null }>;
   open: Array<{ number: number; title: string; state: ProposalState }>;
 };

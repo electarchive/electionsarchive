@@ -1,6 +1,14 @@
 import { error } from "@sveltejs/kit";
 import * as v from "valibot";
-import { sourceKinds } from "#lib/contrib.js";
+import {
+  graphemes,
+  languages,
+  noteKinds,
+  noteLimit,
+  schemePattern,
+  schemes,
+  sourceKinds,
+} from "#lib/contrib.js";
 import { editable, propose } from "#lib/server/contrib.js";
 import type { RequestHandler } from "./$types";
 
@@ -15,42 +23,75 @@ const Line = (max: number) =>
     v.maxLength(max),
   );
 
+const Body = v.pipe(
+  v.string(),
+  v.normalize("NFC"),
+  v.trim(),
+  v.minLength(1),
+  v.check((body) => graphemes(body) <= noteLimit),
+);
+
+const Reference = <Kind extends "id_add" | "id_drop">(kind: Kind) =>
+  v.pipe(
+    v.object({
+      kind: v.literal(kind),
+      scheme: v.picklist(schemes),
+      value: v.pipe(v.string(), v.trim()),
+    }),
+    v.check(({ scheme, value }) => schemePattern[scheme].test(value)),
+  );
+
+const Change = v.variant("kind", [
+  v.object({ kind: v.literal("name"), id: Uuid, text: Line(500) }),
+  v.object({
+    kind: v.literal("note_add"),
+    noteKind: v.picklist(noteKinds),
+    lang: v.picklist(languages),
+    body: Body,
+  }),
+  v.object({ kind: v.literal("note_set"), id: Uuid, body: Body }),
+  v.object({ kind: v.literal("note_drop"), id: Uuid }),
+  Reference("id_add"),
+  Reference("id_drop"),
+]);
+
 const Fraction = v.pipe(v.number(), v.minValue(0), v.maxValue(1));
 
 const Proposal = v.object({
   entityId: Uuid,
-  nameId: Uuid,
-  text: Line(500),
-  evidence: v.variant("type", [
-    v.object({ type: v.literal("source"), sourceId: Uuid }),
-    v.object({
-      type: v.literal("url"),
-      url: v.pipe(
-        v.string(),
-        v.trim(),
-        v.maxLength(2048),
-        v.url(),
-        v.regex(/^https?:\/\//i),
-      ),
-      title: Line(500),
-      publisher: Line(200),
-      kind: v.picklist(sourceKinds),
-    }),
-    v.object({
-      type: v.literal("upload"),
-      uploadId: Uuid,
-      page: v.nullable(v.pipe(v.number(), v.integer(), v.minValue(1))),
-      region: v.nullable(
-        v.pipe(
-          v.tuple([Fraction, Fraction, Fraction, Fraction]),
-          v.check(([x0, y0, x1, y1]) => x0 < x1 && y0 < y1),
+  changes: v.pipe(v.array(Change), v.minLength(1), v.maxLength(50)),
+  evidence: v.nullable(
+    v.variant("type", [
+      v.object({ type: v.literal("source"), sourceId: Uuid }),
+      v.object({
+        type: v.literal("url"),
+        url: v.pipe(
+          v.string(),
+          v.trim(),
+          v.maxLength(2048),
+          v.url(),
+          v.regex(/^https?:\/\//i),
         ),
-      ),
-      title: Line(500),
-      publisher: Line(200),
-      kind: v.picklist(sourceKinds),
-    }),
-  ]),
+        title: Line(500),
+        publisher: Line(200),
+        kind: v.picklist(sourceKinds),
+      }),
+      v.object({
+        type: v.literal("upload"),
+        uploadId: Uuid,
+        page: v.nullable(v.pipe(v.number(), v.integer(), v.minValue(1))),
+        region: v.nullable(
+          v.pipe(
+            v.tuple([Fraction, Fraction, Fraction, Fraction]),
+            v.check(([x0, y0, x1, y1]) => x0 < x1 && y0 < y1),
+          ),
+        ),
+        title: Line(500),
+        publisher: Line(200),
+        kind: v.picklist(sourceKinds),
+      }),
+    ]),
+  ),
   quote: v.pipe(v.string(), v.normalize("NFC"), v.trim(), v.maxLength(1000)),
   summary: Line(200),
 });
