@@ -115,6 +115,18 @@ DISTRICT_CALENDAR = {
         11,
         "Maryland State Board of Elections, Anne Arundel County sample general ballot for November 3, 2026: no Board of Education contest appears, and the state's 2026 general candidate list carries none, https://www.elections.maryland.gov/elections/2026/general_ballots/AnneArundel.pdf",
     ),
+    ("TX", "Hawkins Independent School District"): (
+        1,
+        0,
+        5,
+        "Hawkins ISD elections page: Places 6 and 7 were on the May 2, 2026 uniform election date, https://hawkinsisd.org/176801_2",
+    ),
+    ("TX", "Academy Independent School District"): (
+        1,
+        0,
+        5,
+        "Academy ISD trustee election page: the 2026 election was May 2, 2026, with filing January 14 to February 13, 2026, https://www.academyisd.net/our-district/our-district-a-z/board-of-trustees/trustee-election",
+    ),
     ("TX", "Killeen Independent School District"): (
         1,
         0,
