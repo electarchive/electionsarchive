@@ -1991,6 +1991,7 @@ for key, publisher, title, url, local in (
     ("IL-17073", "Henry County Clerk", "Henry County General Election 2026 Sample Ballot", "https://www.henrycty.com/DocumentCenter/View/1202/HENRY-COUNTY-GENERAL-ELECTION-2026-SAMPLE-BALLOT", "il/henry.pdf"),
     ("IL-17177", "Stephenson County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://www.stephensoncountyil.gov/26nov3ilstephenson-Publication%20(1)%20(1).pdf", "il/stephenson.pdf"),
     ("IL-17055", "Franklin County Clerk", "2026 General Election Ballot", "https://franklincountyil.gov/wp-content/uploads/2026/10/2026-GE-FRANKLIN-Updated.pdf", "il/franklin.pdf"),
+    ("WV-54077", "Preston County Clerk", "Sample Ballot, General Election 2026", "https://www.prestoncountyclerkwv.com/wp-content/uploads/2026/10/SAMPLE-BALLOT-Preston-WV-General-2026.pdf", "wv/preston.pdf"),
     ("IL-17099", "La Salle County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://www.lasallecountyil.gov/DocumentCenter/View/4565/Specimen-Ballot-PDF", "il/lasalle.pdf"),
     ("IL-17133", "Monroe County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.mococlerk.com/files/2026%20GE%20Publication%20Ballot.pdf", "il/monroe.pdf"),
     ("MO-29127", "Marion County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://marioncounty-mo.gov/wp-content/uploads/2026/09/November-3-2026-General-Election-Sample-Ballot.pdf", "mo/marion.pdf"),
