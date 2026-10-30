@@ -1650,6 +1650,12 @@ NE_SOURCES = {
         "https://www.hudsoncountyclerk.org/",
         "nj/jersey_city_f09.pdf",
     ),
+    "NJ-34017-h-s": (
+        "Hudson County Clerk",
+        "General Election sample ballots for Bayonne, East Newark, Guttenberg, Hoboken, Kearny, and Secaucus, November 3, 2026 (attested October 27, 2026)",
+        "https://www.hudsoncountyclerk.org/",
+        "nj/hudson_school_ballots.pdf",
+    ),
     "CA-06071-s": (
         "San Bernardino County Registrar of Voters",
         "November 3, 2026 General Election: School District Appointments in Lieu of Election",
