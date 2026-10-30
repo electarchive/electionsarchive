@@ -1,6 +1,6 @@
 import json
 from collections import Counter, defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from ea import coverage, statewide_table
@@ -22,7 +22,9 @@ LEVELS = (
     "county_office",
     "municipal",
     "school_board",
+    "special_district",
     "local_judicial",
+    "local_measure",
 )
 LABELS = {
     "us_house": "U.S. House",
@@ -36,18 +38,23 @@ LABELS = {
     "county_office": "County offices (governments)",
     "municipal": "Municipal and township offices (governments)",
     "school_board": "School boards (governments)",
+    "special_district": "Special districts (governments)",
     "local_judicial": "Local judicial (races held)",
+    "local_measure": "Local ballot measures",
 }
 GOVERNMENTS = {
     "county": "county_office",
     "municipality": "municipal",
     "township": "municipal",
     "school": "school_board",
+    "special": "special_district",
+    "college": "special_district",
 }
 GOVERNMENT_NOTES = {
     "county_office": "Counted by government, not by seat, because no state calendar the archive cites gives a seat count for county offices. Expected is every county government in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. A county is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
     "municipal": "Counted by government, not by seat, because no state calendar the archive cites gives a seat count for city, town, village, and township offices. Expected is every municipal and township government in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. A government is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
     "school_board": "Counted by government, not by seat, because no state calendar the archive cites gives a seat count for school boards. Expected is every school district in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. A district is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
+    "special_district": "Counted by government, not by seat. Expected is every special district and community college district in the 2022 Census of Governments that the coverage calendar has voting in November 2026, judged from its own past elections or else from its state's election law or pattern. The Census does not say which boards are elected and the calendar knows few districts' own cycles, so the count includes some appointed boards and misses districts that vote on other dates. A district is ready when the archive holds at least one of its November 3 contests and every one of them is ready.",
 }
 COG = {
     "title": "2022 Census of Governments, Government Units",
@@ -141,7 +148,7 @@ select g.state, g.kind, g.polity_id::text, g.name, coalesce(g.population, 0), g.
         select from coverage_government_year y where y.government_id = g.id and y.year = %(year)s - g.period and y.expected),
         false)
 from coverage_government g
-where g.kind in ('county', 'municipality', 'township', 'school')
+where g.kind in ('county', 'municipality', 'township', 'school', 'special', 'college')
 """
 
 JUDGED_SQL = f"""
@@ -154,6 +161,18 @@ join polity op on op.id = f.polity_id
 join external_id oe on oe.entity_id = c.office_id and oe.scheme = 'us.office'
 where extract(year from e.date_from) in (%(year)s - 2, %(year)s - 4) and extract(month from e.date_from) = %(month)s
     and not c.notional and c.party_scope_id is null and e.kind in ('general', 'special') and {JUDGES} and {APPELLATE}
+"""
+
+PRIOR_MEASURES_SQL = """
+select coalesce(ps.st, 'US'), count(*)
+from contest c
+join election e on e.id = c.election_id
+join uspol u on u.id = e.polity_id
+join polity p on p.id = e.polity_id
+left join pstate ps on ps.id = e.polity_id
+where c.kind = 'ballot_question' and not c.notional and e.date_from = %s
+    and p.kind not in ('sovereign_state', 'federal_unit', 'region')
+group by 1
 """
 
 
@@ -334,7 +353,10 @@ def measure(conn, day: str) -> dict:
             for st, n in part.get("states", {}).items():
                 expected[(level["key"], st)] += n
                 listed[level["key"]].add(st)
-    units = {level["key"]: level["unit"] for level in data["levels"]} | {"local_judicial": "races"}
+    units = {level["key"]: level["unit"] for level in data["levels"]} | {
+        "local_judicial": "races",
+        "local_measure": "measures",
+    }
     cells: dict[tuple[str, str], dict] = defaultdict(
         lambda: dict.fromkeys(
             ("exist", "candidates", "ready", "places", "population_total", "population_ready", "population_absent")
@@ -362,7 +384,7 @@ def measure(conn, day: str) -> dict:
         return found
 
     for cid, st, level, magnitude, candidates, answers, unqualified, polity in conn.execute(OPTIONS_SQL):
-        has = unqualified or (answers if level == "statewide_measure" else candidates) >= 1
+        has = unqualified or (answers if level in ("statewide_measure", "local_measure") else candidates) >= 1
         if level == "judicial" and st not in judges:
             judges[st] = len(places)
             places.append(("judicial", st, st, 0, False, None, None))
@@ -381,7 +403,11 @@ def measure(conn, day: str) -> dict:
             for place in targets:
                 held[place].append((has, ok.get(str(cid), False)))
             continue
-        if level not in units or level not in ("statewide_exec", "local_judicial") and st not in listed[level]:
+        if (
+            level not in units
+            or level not in ("statewide_exec", "local_judicial", "local_measure")
+            and st not in listed[level]
+        ):
             continue
         weight = magnitude if units[level] == "seats" else 1
         cell = cells[(level, st)]
@@ -390,6 +416,11 @@ def measure(conn, day: str) -> dict:
         cell["ready"] += weight if ok.get(str(cid)) else 0
         if not ok.get(str(cid)):
             gap(cell, level, st, [str(cid)], "gap_partial" if has else "gap_bare", weight)
+    prior = date(year - 4, int(day[5:7]), 2)
+    prior = prior + timedelta(days=(1 - prior.weekday()) % 7)
+    for st, n in conn.execute(PRIOR_MEASURES_SQL, [prior]):
+        exist = cells[("local_measure", st)]["exist"] if ("local_measure", st) in cells else 0
+        expected[("local_measure", st)] = max(n, exist)
     decided = {
         polity
         for st, (early, _) in DECIDED_EARLIER.items()
@@ -554,8 +585,11 @@ def markdown(day: str) -> str:
             " state is expected when `coverage_tables.JUDICIAL` has it electing judges that year and the archive holds a"
             " November statewide judicial race there two or four years earlier, and it is ready when the archive holds at"
             " least one of its Nov 3 judicial races and every one is ready. Local judicial races (trial courts, justices of"
-            " the peace) have no cited count, so they are measured against the races the archive holds. County, municipal"
-            " and township, and school board offices count by government, not seat: expected is every 2022 Census of"
+            " the peace) have no cited count, so they are measured against the races the archive holds. Local ballot measures"
+            " have no cited count either: expected in each state is the larger of the measures the archive holds for that day"
+            " and the local measures it holds for the general election four years earlier, a floor that is only as complete as"
+            " that year's holdings. County, municipal"
+            " and township, school board, and special district offices count by government, not seat: expected is every 2022 Census of"
             " Governments unit that the coverage build's calendar (`coverage_government`: its own cycle, else the state"
             " calendar or pattern) has electing in November of that year, and a government is ready when the archive holds"
             " at least one of its Nov 3 contests and every one is ready. Run `ea coverage us` first, since these read the"

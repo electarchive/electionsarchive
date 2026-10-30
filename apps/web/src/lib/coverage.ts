@@ -511,7 +511,9 @@ export const READY_LEVELS = [
   "county_office",
   "municipal",
   "school_board",
+  "special_district",
   "local_judicial",
+  "local_measure",
 ];
 
 export const READY_COUNTS: Record<string, typeof m.coverage_ready_of> = {
@@ -519,7 +521,9 @@ export const READY_COUNTS: Record<string, typeof m.coverage_ready_of> = {
   county_office: m.coverage_ready_of_governments,
   municipal: m.coverage_ready_of_governments,
   school_board: m.coverage_ready_of_governments,
+  special_district: m.coverage_ready_of_governments,
   local_judicial: m.coverage_ready_of_held,
+  local_measure: m.coverage_ready_of_measures,
 };
 
 export const LEVELS: Record<string, () => string> = {
@@ -533,6 +537,8 @@ export const LEVELS: Record<string, () => string> = {
   municipal: m.coverage_level_municipal,
   school_board: m.coverage_level_school_board,
   local_judicial: m.coverage_level_local_judicial,
+  special_district: m.coverage_level_special_district,
+  local_measure: m.coverage_level_local_measure,
   state_upper: m.coverage_level_state_upper,
   state_lower: m.coverage_level_state_lower,
   statewide_measure: m.coverage_level_statewide_measure,
