@@ -2248,6 +2248,8 @@ for key, publisher, title, url, local in (
     ("WY-56037-towns", "Sweetwater County Clerk", "Official General Election Publishing Ballot, Sweetwater County, November 3, 2026", "https://www.sweetwatercountywy.gov/General%202026%20Publication%20Ballot.pdf?t=202610131618280", "wy/sweetwater_publication_ballot.pdf"),
     ("CA-06073-cities", "San Diego County Registrar of Voters", "Candidate list, November 3, 2026 general election, city offices", "https://www.sdvote.com/", "ca/sandiego_candidate_list.pdf"),
     ("CA-06059-cities", "Orange County Registrar of Voters", "Contest and candidate proof list, November 3, 2026 general election, city offices", "https://ocvote.gov/", "ca/orange_candlog.pdf"),
+    ("CA-06069-hollister", "Hollister City Clerk", "Elections, candidates on the ballot, November 3, 2026", "https://hollister.ca.gov/", "ca/hollister.html"),
+    ("CA-06037-alhambra", "Alhambra City Clerk", "Notice of nominees for public office, November 3, 2026", "https://www.cityofalhambra.org/", "ca/alhambra_nominees.pdf"),
     ("CA-06087-cities", "Santa Cruz County Clerk", "Candidates for the November 3, 2026 California General Election, city offices", "https://votescount.santacruzcountyca.gov/Home/Elections/November3,2026CaliforniaGeneralElection/ContactCandidates.aspx", "ca/santacruz_contact.html"),
     ("ME-23011-waterville", "Waterville City Clerk", "Sample ballots, Wards 1-7, regular and special municipal election, November 3, 2026", "https://www.watervillemaine.org/", "ne/waterville.zip"),
     ("ME-23031-saco", "Saco City Clerk", "Sample ballots, Wards 1-7, November 3, 2026 general and referendum election", "https://www.sacomaine.org/City%20Clerk/Elections/Sample%20Ballots/", "ne/saco.zip"),
