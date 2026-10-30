@@ -302,6 +302,7 @@ MI_PROPOSALS = {
     ("2014PRI", "14-1"): ("Referendum on Public Act 80 of 2014", "Popular Referendum"),
     ("2014GEN", "14-1"): ("Referendum on Public Act 520 of 2012", "Popular Referendum"),
     ("2014GEN", "14-2"): ("Referendum on Public Act 21 of 2013", "Popular Referendum"),
+    ("2015SG1", "15-1"): ("Constitutional amendment increasing the sales and use tax to fund roads and schools", "Legislative Referendum"),
     ("2018GEN", "18-1"): ("Initiated law to regulate marijuana like alcohol", "Initiative"),
     ("2018GEN", "18-2"): ("Constitutional amendment creating an independent redistricting commission", "Initiative"),
     ("2018GEN", "18-3"): ("Constitutional amendment on voting rights and election administration", "Initiative"),
