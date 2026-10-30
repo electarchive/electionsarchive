@@ -26,6 +26,7 @@ SOURCE = "us.local_2026"
 VERSION = "1"
 DAY = date(2026, 11, 3)
 GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
+COUSUB_GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_cousubs_national.zip"
 BALLOTS = "https://web.sos.ky.gov/ballots/{}%202026G.pdf"
 PARSED = DATA / "parsed" / SOURCE
 FILES = {
@@ -5344,7 +5345,7 @@ def parse() -> None:
         owned = dict(
             conn.execute(
                 """select distinct on (x.value) x.value, s.path from external_id x join slug s on s.entity_id = x.entity_id
-                   where x.scheme = 'us.polity' and x.value ~ '^(place|school):' order by x.value, length(s.path)"""
+                   where x.scheme = 'us.polity' and x.value ~ '^(place|town|school):' order by x.value, length(s.path)"""
             ).fetchall()
         )
         for st, county_code, label in conn.execute(
@@ -5420,6 +5421,37 @@ def parse() -> None:
                         f"place:{geoid}",
                         owned.get(f"place:{geoid}") or (f"us/{st.lower()}/{slug(full)}" if path in claimed else path),
                         "municipality",
+                    )
+                )
+        with zipfile.ZipFile(raw.fetch(SOURCE, COUSUB_GAZETTEER, suffix=".zip").path) as archive:
+            cousubs_all = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).rename(
+                lambda column: column.strip()
+            )
+        cousubs: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
+        for geoid, full in cousubs_all.filter((pl.col("USPS") == "KS") & (pl.col("FUNCSTAT") == "A")).select("GEOID", "NAME").iter_rows():
+            cousubs[(geoid[:5], coverage_tables.tokens(re.sub(r" township$", "", full)))].append((geoid, full))
+        counties_ks = {
+            code: re.sub(r" County$", "", text.rsplit(",", 1)[0])
+            for code, text in conn.execute(
+                """select u.code, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'official' and n.is_preferred
+                   where u.scheme_code = 'us.county' and u.code like '20%%'"""
+            ).fetchall()
+        }
+        for county_code, label in conn.execute(
+            """select g.county, g.name from coverage_government g
+               where g.kind = 'township' and g.polity_id is null and g.state = 'KS' and g.county is not null"""
+        ).fetchall():
+            hits = cousubs.get((county_code, coverage_tables.tokens(re.sub(r" Township$", "", label))), [])
+            if len(hits) == 1 and county_code in counties_ks:
+                geoid, full = hits[0]
+                unowned["KS"].append(
+                    (
+                        county_code,
+                        full,
+                        f"town:{geoid}",
+                        owned.get(f"town:{geoid}") or f"us/ks/{slug(full)}-{slug(counties_ks[county_code])}-county",
+                        "township",
                     )
                 )
         for key, found in feeds.items():
@@ -5723,6 +5755,8 @@ def parse() -> None:
                     template is None
                     and (
                         state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "WY")
+                        or state == "KS"
+                        and "Township" in str(row["contest"])
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC", "IL")
