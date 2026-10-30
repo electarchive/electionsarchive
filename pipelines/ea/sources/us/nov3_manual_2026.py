@@ -18,6 +18,7 @@ DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
 SCHOOLS = {
     ("TX", "Georgetown Independent School District"): "4820600",
+    ("TX", "Irving Independent School District"): "4824420",
     ("CA", "Fallbrook Union Elementary School District"): "0613500",
     ("CA", "Julian Union High School District"): "0619110",
     ("CA", "Galt Joint Union High School District"): "0614820",
@@ -27,6 +28,10 @@ SCHOOLS = {
     ("CA", "Liberty Union High School District"): "0621600",
     ("CA", "West Contra Costa Unified School District"): "0632550",
     ("WA", "Kiona-Benton City School District No. 52"): "5304020",
+    ("WA", "Yelm Community Schools"): "5310140",
+    ("WA", "Auburn School District No. 408"): "5300300",
+    ("WA", "Nine Mile Falls School District No. 325-179"): "5305640",
+    ("WA", "Quillayute Valley School District No. 402"): "5307020",
     ("AZ", "Prescott Unified School District No. 1"): "0406730",
     ("AZ", "Humboldt Unified School District No. 22"): "0403870",
     ("AZ", "Camp Verde Unified School District No. 28"): "0400813",
@@ -75,7 +80,18 @@ COUNTIES = {
     "05051": ("AR", "https://www.garlandcountyvote.org/uploads/6/3/0/4/63045401/local_issues.pdf", "N3M-web/garland-local-issues.pdf"),
     "05131": ("AR", "https://www.uaex.uada.edu/business-communities/ced-blog/posts/2026/september/2026-arkansas-ballot-issues-voter-guide-now-available-online.aspx", "N3M-web/lavaca-2026.pdf"),
     "05031": ("AR", "https://jonesbororightnow.com/wp-content/blogs.dir/286/files/2026/07/JB-Public-Safety-Sales-Use-Tax-Election-County-Clerk-Filing.pdf", "N3M-web/jonesboro-psst.pdf"),
-    "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
+    "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf"),
+    "53053": ("WA", "https://www.piercecountywa.gov/328/Elections", "MF-428/Sample Ballot_15.pdf"),
+    "53009": ("WA", "https://clallamcountywa.gov/2002", "MF-428/2026 General Sample Ballot_w7x8zqq7zwj.pdf"),
+    "53025": ("WA", "https://www.grantcountywa.gov/1374", "MF-428/November 2026 SAMPLE BALLOT.pdf"),
+    "53015": ("WA", "https://www.co.cowlitz.wa.us/2357/Elections", "MF-428/G126 Sample Ballot.pdf"),
+    "53065": ("WA", "https://www.stevenscountywa.gov/document/38435", "MF-428/1315012300092526pm.pdf"),
+    "53041": ("WA", "https://lewiscountywa.gov/", "MF-428/Nov_2026_Sample_Ballot.pdf"),
+    "53029": ("WA", "https://www.islandcountywa.gov/", "MF-428/Sample_Ballot_202609291007164234 (1).pdf"),
+    "48113": ("TX", "https://www.dallascounty.org/government/county-clerk/", "N3M-web/tx/dallas-bond-election.pdf"),
+    "34029": ("NJ", "https://www.lacey-nj.org/", "N3M-web/nj/lacey-doc669.pdf"),
+    "34037": ("NJ", "https://www.sussexcountyclerk.org/", "N3M-web/nj/4744.pdf"),
+    "34039": ("NJ", "https://ucnj.org/board-of-elections/", "N3M-web/nj/f7.pdf")
 }
 
 
