@@ -12,6 +12,7 @@ import httpx
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.names import display
 from ea.sources.tr.ysk import PROVINCES
 from ea.store import connect
 
@@ -217,10 +218,7 @@ def capitalize(word: str) -> str:
 
 
 def title(text: str) -> str:
-    return " ".join(
-        word if not (len(word) > 1 and word == word.upper() and word.isalpha()) else capitalize(word)
-        for word in text.split()
-    )
+    return display(" ".join(text.split()), "tr")
 
 
 def page(text: str) -> str:

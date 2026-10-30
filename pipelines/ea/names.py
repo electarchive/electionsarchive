@@ -130,10 +130,14 @@ def display(text: str, lang: str = "en", known: str | None = None) -> str:
         ):
             out.append(lower(word))
             continue
+        if word[:2].isupper() and sum(c.islower() for c in word) == 1 and sum(c.isupper() for c in word) >= 3:
+            word = word.upper()
         if not word.isupper() or len(word) < 2 or word in ACRONYMS or (index and word in ROMAN):
             out.append(word)
             continue
-        if not shouting and not (vowel(word) and (len(word) >= 4 or any(c.islower() for c in text[: run.start()]))):
+        if not shouting and not (
+            vowel(word) and (lang != "en" or len(word) >= 4 or any(c.islower() for c in text[: run.start()]))
+        ):
             out.append(word)
             continue
         out.append(proper(word))
