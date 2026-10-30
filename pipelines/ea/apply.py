@@ -1887,6 +1887,10 @@ def apply(folder: Path) -> str:
     manifest = json.loads((folder / "manifest.json").read_text())
     changeset_id: str = manifest["id"]
     tables: list[str] = manifest["tables"]
+    if (manifest["author_kind"] in ("user", "agent")) != (manifest.get("author_user_id") is not None):
+        raise ValueError(
+            f"{manifest['author_kind']} changeset {changeset_id}: author_user_id is required for user and agent, refused otherwise"
+        )
     schema = sql.Identifier(f"cs_{changeset_id.replace('-', '')}")
     with connect() as conn:
         existing = conn.execute("select status from changeset where id = %s", [changeset_id]).fetchone()
