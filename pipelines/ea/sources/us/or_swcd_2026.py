@@ -78,11 +78,13 @@ def emit() -> Path:
             polity="US-OR",
         )
         system = cs.key("us.electoral_system", "fptp")
+        by_publisher: dict[str, UUID] = {}
         sources: dict[str, UUID] = {}
         for url, publisher in PUBLISHERS.items():
-            sources[url] = cs.source(publisher, TITLE)
-            if sources[url] in cs.minted:
-                cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=TITLE, url=url, license="Public record")
+            if publisher not in by_publisher:
+                by_publisher[publisher] = cs.source(publisher, TITLE)
+                cs.add("source", id=by_publisher[publisher], kind="official_body", publisher=publisher, title=TITLE, url=url, license="Public record")
+            sources[url] = by_publisher[publisher]
             cs.artifact(raw.cached(SOURCE, url), sources[url])
         parent = cs.key("us.election", f"{DAY}:OR")
         if parent in cs.minted:
