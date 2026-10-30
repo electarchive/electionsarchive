@@ -42,6 +42,13 @@ DISTRICTS = {
 }
 REDRAWN_2021 = {"37"}
 REDRAWN_2026 = {
+    "01": (
+        "AL",
+        "https://www.sos.alabama.gov/alabama-votes/state-district-maps",
+        "Alabama Legislature",
+        "2026 Congressional Plan, as certified (Act 2026, congressional districts)",
+        "https://www.sos.alabama.gov/alabama-votes/state-district-maps",
+    ),
     "06": (
         "CA",
         "https://aelc.assembly.ca.gov/media/2608",
