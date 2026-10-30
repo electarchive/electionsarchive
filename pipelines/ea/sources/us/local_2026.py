@@ -5466,7 +5466,7 @@ def parse() -> None:
                         or re.search(r"(?i)\bcounty (council|commission|board district)\b", str(row["contest"])) is not None
                     )
                     and not LOCAL_BODY.search(
-                        re.sub(re.escape(place) if state in ("MD", "LA") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.I)
+                        re.sub(re.escape(place) if state in ("MD", "LA", "WY") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.I)
                     )
                     and (
                         "-" not in key
