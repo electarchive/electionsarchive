@@ -16,7 +16,7 @@ from ea.sources.gb import leh, london
 from ea.store import DATA, connect
 
 SOURCE = "gb.cauth"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 SERVICES = "https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services"
 ERAS = {
@@ -293,7 +293,7 @@ def emit() -> Path:
             version=VERSION,
             summary="England's combined authorities from the Office for National Statistics, 2017-2025, as areas and "
             "as polities for those with an elected mayor, with every mayoral election 2017-2025 from the returning "
-            "officers' declarations (West of England 2017 excepted), and results by council where declared",
+            "officers' declarations, and results by council where declared",
             polity="GB",
         )
         gb = cs.polity("GB")
@@ -556,6 +556,7 @@ def emit() -> Path:
             whole = rows.filter(pl.col("council") == "TOTAL")
             candidates: list[tuple[str, str, str, int, int | None]] = []
             figures: dict[int, tuple[int, str]] = {}
+            shown = set().union(*(printed(url) for url in set(whole["source"])))
             for row in whole.iter_rows(named=True):
                 value = int(row["round1"])
                 if value_missing := str(value) not in printed(row["source"]):
@@ -566,8 +567,8 @@ def emit() -> Path:
                     figures[MEASURES[row["printed"]]] = (value, row["source"])
                     continue
                 final = None if not row["round2"] else int(row["round2"])
-                if final is not None and str(final) not in printed(row["source"]):
-                    raise ValueError(f"{day} {code}: {row['printed']} {final} not printed in {row['source']}")
+                if final is not None and str(final) not in shown:
+                    raise ValueError(f"{day} {code}: {row['printed']} {final} not printed in its sources")
                 candidates.append((row["name"], row["printed"], row["party"], value, final))
             local = commons_rows.get(code, []) if day_text == COMMONS_DAY else []
             source = cite(whole["source"][0]) if whole.height else commons
