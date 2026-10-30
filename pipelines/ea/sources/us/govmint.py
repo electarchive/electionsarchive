@@ -35,6 +35,8 @@ def display_name(label: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+MULTI_COUNTY = {("CO", "frontrangepassengerraildistrict"): "us/co/douglas-county/front-range-passenger-rail-district"}
+
 HELD: dict[UUID, dict[str, tuple[UUID, UUID, str, str]]] = {}
 
 
@@ -86,6 +88,16 @@ def special(
                 return (slugs[path], cs.area("us.special_district", code), display, path, code)
             return None
         return (existing[0], existing[1], display, path, existing[2])
+    shared = MULTI_COUNTY.get((state, fold(display)))
+    if shared is not None and shared != path:
+        existing = conn.execute(
+            """select t.polity_id, t.area_id, c.code from slug s
+               join polity_territory t on t.polity_id = s.entity_id
+               join area_code c on c.area_id = t.area_id where s.path = %s limit 1""",
+            [shared],
+        ).fetchone()
+        if existing is not None:
+            return (existing[0], existing[1], display, shared, existing[2])
     twin = held(conn, county_polity).get(fold(display))
     if twin is not None:
         return (twin[0], twin[1], display, twin[2], twin[3])
