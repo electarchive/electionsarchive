@@ -1,4 +1,5 @@
 import re
+import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -24,6 +25,13 @@ FILES = {
     "STATEwidebycounty.txt": date(2006, 11, 7),
     "STATEwide by candidate by county gen 08.txt": date(2008, 11, 4),
 }
+PDFS = {
+    "2012genresults.pdf": date(2012, 11, 6),
+    "2014 General Election Results.pdf": date(2014, 11, 4),
+    "2016 General Election Results.pdf": date(2016, 11, 8),
+    "2020 General Election Results.pdf": date(2020, 11, 3),
+    "2024 General Election Certification as Amended on December 9th 2024.pdf": date(2024, 11, 5),
+}
 METHOD = (
     "County totals come from the State Board of Elections' official election night tally reports by county. "
     "Kentucky elects each Supreme Court justice by district, so each contest covers only that district's counties."
@@ -35,14 +43,14 @@ def link(name: str) -> str:
 
 
 def fetch() -> None:
-    for name in FILES:
+    for name in [*FILES, *PDFS]:
         raw.store(
             SOURCE,
             link(name),
             (INBOX / name).read_bytes(),
-            suffix=".txt",
+            suffix=Path(name).suffix,
             retrieved_at=datetime.fromtimestamp((INBOX / name).stat().st_mtime, UTC),
-            media_type="text/plain",
+            media_type="application/pdf" if name in PDFS else "text/plain",
         )
 
 
@@ -107,6 +115,70 @@ def parse() -> None:
         for key, summed in found.items():
             if totals.get(key, summed) != summed:
                 raise ValueError(f"{name} {key}: counties sum to {summed}, printed total {totals[key]}")
+    codes = dict(names)
+    for name, day in PDFS.items():
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, link(name)).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.splitlines()
+        for start, line in enumerate(lines):
+            heading = re.fullmatch(r"\s*(\d+)(?:st|nd|rd|th) Supreme Court District\s*", line)
+            if heading is None or not any(
+                "Justice of the Supreme Court" in text for text in lines[max(0, start - 2) : start]
+            ):
+                continue
+            header: list[str] = []
+            body: list[str] = []
+            for text in lines[start + 1 :]:
+                if re.match(r"\s*Total Votes", text):
+                    body.append(text)
+                    break
+                if re.fullmatch(r"\s*[A-Za-z][A-Za-z .'-]*?\s{2,}[\d,]+(?:\s+[\d,]+)*\s*", text):
+                    body.append(text)
+                elif not body and text.strip():
+                    header.append(text)
+            first = re.search(r"\s{2,}", body[0].strip())
+            cells = [
+                (m.start(), m.end())
+                for m in re.finditer(r"[\d,]+", body[0][len(body[0]) - len(body[0].lstrip()) + first.end() :])
+            ]
+            offset = len(body[0]) - len(body[0].lstrip()) + first.end()
+            centers = [offset + (a + b) / 2 for a, b in cells]
+            labels: list[list[str]] = [[] for _ in centers]
+            for text in header:
+                for token in re.finditer(r"\S+(?: \S+)*", text):
+                    if token[0] == "Nonpartisan":
+                        continue
+                    middle = (token.start() + token.end()) / 2
+                    labels[min(range(len(centers)), key=lambda i: abs(centers[i] - middle))].append(token[0])
+            candidates = [re.sub(r"\s+", " ", " ".join(label)).upper() for label in labels]
+            totals = None
+            sums = [0] * len(centers)
+            for row in body:
+                if re.match(r"\s*Total Votes", row):
+                    totals = [int(v.replace(",", "")) for v in re.findall(r"[\d,]+", row)]
+                    continue
+                county, values = re.match(r"\s*(.*?\S)\s{2,}([\d,]+(?:\s+[\d,]+)*)\s*$", row).groups()
+                votes = [int(v.replace(",", "")) for v in values.split()]
+                if len(votes) != len(candidates):
+                    raise ValueError(
+                        f"{name} {heading[1]} {county}: {len(votes)} cells for {len(candidates)} candidates"
+                    )
+                for index, (candidate, count) in enumerate(zip(candidates, votes, strict=True)):
+                    rows.append(
+                        (
+                            day,
+                            int(heading[1]),
+                            candidate,
+                            codes[re.sub(r"^mc", "m!", re.sub(r"[^a-z]", "", county.lower()))],
+                            count,
+                        )
+                    )
+                    sums[index] += count
+            if totals != sums:
+                raise ValueError(f"{name} district {heading[1]}: counties sum to {sums}, printed totals {totals}")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema=["day", "district", "candidate", "county", "votes"], orient="row").select(
         year=pl.col("day").dt.year().cast(pl.Int32),
@@ -152,7 +224,7 @@ def emit() -> Path:
                 url="https://elect.ky.gov/results/",
                 license="Public record",
             )
-        for name in FILES:
+        for name in [*FILES, *PDFS]:
             cs.artifact(raw.cached(SOURCE, link(name)), source)
         return {"KY": source}
 
@@ -160,7 +232,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="Kentucky's 2000–2008 Supreme Court district elections by county from the State Board of Elections' official results",
+        summary="Kentucky's 2000–2024 Supreme Court district elections by county from the State Board of Elections' official results",
         cite=cite,
         method=METHOD,
     )
