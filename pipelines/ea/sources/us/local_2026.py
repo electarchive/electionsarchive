@@ -1915,6 +1915,12 @@ NE_SOURCES = {
         "https://www.shiawasseecounty.org/",
         "mi/shiawassee.pdf",
     ),
+    "MI-26159": (
+        "Van Buren County Clerk",
+        "Non-Partisan Candidates, November 3, 2026 General Election",
+        "https://www.vanburencountymi.gov/",
+        "mi/van-buren.xlsx",
+    ),
     "MI-26073": (
         "Isabella County Clerk",
         "Sample Ballots, November 3, 2026 General Election",
