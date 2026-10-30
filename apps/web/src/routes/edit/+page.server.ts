@@ -95,6 +95,9 @@ function fresh(template: Template, record: string) {
         evidence: null,
       };
     }
+    case "lineage": {
+      return { template, party: record, rows: [], drops: [], evidence: null };
+    }
     case "merge": {
       return {
         template,

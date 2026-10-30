@@ -1,5 +1,15 @@
 import { SvelteMap } from "svelte/reactivity";
-import type { Lookup } from "#lib/workspace.js";
+import type { Found, Lookup } from "#lib/workspace.js";
+import { m } from "#lib/paraglide/messages.js";
+import { recordKind } from "#lib/workspace.js";
+
+export type Looked = {
+  entity: Found | null;
+  problem: string | null;
+  isLooking: boolean;
+};
+
+export const none: Looked = { entity: null, problem: null, isLooking: false };
 
 export class Records {
   readonly #map: SvelteMap<string, Lookup | null>;
@@ -41,5 +51,32 @@ export class Records {
 
   get(ref: string) {
     return this.#map.get(ref.trim());
+  }
+
+  look(value: string, kind: string): Looked {
+    if (value.trim() === "") {
+      return none;
+    }
+    const found = this.get(value);
+    if (found == null) {
+      return { entity: null, problem: null, isLooking: true };
+    }
+    if (found.state === "missing") {
+      return { entity: null, problem: m.ws_record_missing(), isLooking: false };
+    }
+    if (found.state === "retired") {
+      return { entity: null, problem: m.ws_record_retired(), isLooking: false };
+    }
+    if (found.type !== kind) {
+      return {
+        entity: null,
+        problem: m.ws_ref_wrong_kind({
+          wanted: recordKind(kind),
+          kind: recordKind(found.type),
+        }),
+        isLooking: false,
+      };
+    }
+    return { entity: found, problem: null, isLooking: false };
   }
 }

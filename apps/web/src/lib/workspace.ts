@@ -19,7 +19,13 @@ export const tables = ["identifiers", "names", "colors"] as const;
 
 export type Table = (typeof tables)[number];
 
-export const templates = ["election", "results", "merge", ...tables] as const;
+export const templates = [
+  "election",
+  "results",
+  "merge",
+  "lineage",
+  ...tables,
+] as const;
 
 export type Template = (typeof templates)[number];
 
@@ -60,10 +66,40 @@ export const questionTypes = [
   "recall_question",
 ] as const;
 
+export const relationKinds = [
+  "merged_into",
+  "split_from",
+  "successor_of",
+  "refounded_as",
+  "absorbed_by",
+  "closed_by_court",
+  "closed_by_government",
+  "list_vehicle_for",
+] as const;
+
+export type RelationKind = (typeof relationKinds)[number];
+
+export const closures: ReadonlyArray<RelationKind> = [
+  "closed_by_court",
+  "closed_by_government",
+];
+
+export const relationLabel: Record<RelationKind, () => string> = {
+  merged_into: m.ws_rel_merged_into,
+  split_from: m.ws_rel_split_from,
+  successor_of: m.ws_rel_successor_of,
+  refounded_as: m.ws_rel_refounded_as,
+  absorbed_by: m.ws_rel_absorbed_by,
+  closed_by_court: m.ws_rel_closed_by_court,
+  closed_by_government: m.ws_rel_closed_by_government,
+  list_vehicle_for: m.ws_rel_list_vehicle_for,
+};
+
 export const templateTitle: Record<Template, () => string> = {
   election: m.ws_template_election,
   results: m.ws_template_results,
   merge: m.ws_template_merge,
+  lineage: m.ws_template_lineage,
   identifiers: m.ws_template_identifiers,
   names: m.ws_template_names,
   colors: m.ws_template_colors,
@@ -73,6 +109,7 @@ export const templateBody: Record<Template, () => string> = {
   election: m.ws_template_election_body,
   results: m.ws_template_results_body,
   merge: m.ws_template_merge_body,
+  lineage: m.ws_template_lineage_body,
   identifiers: m.ws_template_identifiers_body,
   names: m.ws_template_names_body,
   colors: m.ws_template_colors_body,
