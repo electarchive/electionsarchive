@@ -390,6 +390,14 @@ MD_COUNTIES = frozenset(
         "Worcester",
     )
 )
+AK_STATEWIDE = {
+    date(2002, 8, 27): "results (2).pdf",
+    date(2004, 11, 2): "results.pdf",
+    date(2006, 8, 22): "results (3).pdf",
+    date(2008, 8, 26): "results (4).pdf",
+    date(2008, 11, 4): "results (1).pdf",
+    date(2010, 8, 24): "results (5).pdf",
+}
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
     "1": ((189032, 50111), ((0.7028, 0.7753, 0.7186, 0.8481), (0.7028, 0.6962, 0.7186, 0.7721))),
@@ -898,6 +906,10 @@ STATEWIDE_ONLY = (
     " Only the statewide totals are recorded: the state's archived results pages for this election carry no county "
     "table for ballot questions."
 )
+AK_STATEWIDE_NOTE = (
+    " Only the statewide totals are recorded, taken from the Division of Elections' statewide results sheet. The"
+    " state's per-district statements of votes cast for this election are not loaded yet."
+)
 AL_2007_NOTE = (
     " Only the statewide totals are recorded: the county tables in the Secretary of State's scanned canvass are too "
     "degraded to read, so the figures are the printed Total row, entered by hand from page 3; the box shown on each "
@@ -1060,6 +1072,15 @@ def fetch() -> None:
         for path in paths:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
+    for day, name in AK_STATEWIDE.items():
+        raw.store(
+            SOURCE,
+            f"manual://MF-359/{day.isoformat()}/{name}",
+            (DATA / "inbox" / "manual" / "MF-359" / day.isoformat() / name).read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+            media_type="application/pdf",
+        )
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -1583,8 +1604,8 @@ def maryland() -> list[dict[str, object]]:
                 for index, cell in enumerate(cells):
                     if heading := re.match(r"(?:Question|Constitutional Amendment) (\d+)\b", cell):
                         number = heading[1]
-                    elif number and index + 2 < len(cells) and re.fullmatch(r"[\d,]+", cells[index + 1]):
-                        name = cell.removesuffix(" County")
+                    elif number and index + 2 < len(cells) and re.fullmatch(r"[\d,]+(?: \(.*\))?", cells[index + 1]):
+                        name = cell.removesuffix(" County").replace("Saint ", "St. ")
                         total = name.lower().startswith("total")
                         if total or name in MD_COUNTIES:
                             yes, no = (
@@ -1617,6 +1638,44 @@ def maryland() -> list[dict[str, object]]:
 
 def alaska() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
+    for day, name in AK_STATEWIDE.items():
+        url = f"manual://MF-359/{day.isoformat()}/{name}"
+        markup = subprocess.run(
+            ["pdftotext", "-bbox", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        for sheet in markup.split("<page ")[1:]:
+            words = [
+                (float(x0), float(y0), html.unescape(text))
+                for x0, y0, text in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="[\d.]+" yMax="[\d.]+">(.*?)</word>', sheet)
+            ]
+            for index, (x, y, text) in enumerate(words):
+                if text == "NO." and words[index - 1][2] == "MEASURE" and index + 1 < len(words):
+                    number, label = words[index + 1][2], ""
+                elif text == "PROPOSITION" and words[index - 1][2] == "BOND" and words[index + 1][2] in "ABC":
+                    number, label = "", "Bond Question"
+                else:
+                    continue
+                x = words[index - 1][0]
+                votes: dict[str, int] = {}
+                for answer in ("YES", "NO"):
+                    below = sorted(
+                        (w for w in words if w[2] == answer and w[1] > y and abs(w[0] - x) < 150), key=lambda w: w[1]
+                    )
+                    line = sorted((w for w in words if abs(w[1] - below[0][1]) < 1 and w[0] > below[0][0]), key=lambda w: w[0])
+                    votes[answer] = int(line[0][2].replace(",", ""))
+                for answer, count in votes.items():
+                    rows.append(
+                        {
+                            "state": "AK",
+                            "day": day,
+                            "number": number,
+                            "label": label,
+                            "url": url,
+                            "county": "statewide",
+                            "answer": answer,
+                            "votes": count,
+                        }
+                    )
     for year, district, path in ak_sovc.files():
         url = f"manual://MF-266/{year}/{path.name}"
         for title, _, columns in ak_sovc.read(raw.cached(ak_sovc.SOURCE, url).path, year):
@@ -3478,7 +3537,7 @@ def emit() -> Path:
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             artifacts[url] = cs.artifact(
                 raw.cached(
-                    {"FL": fl_sos.SOURCE, "RI": ri_countbook.SOURCE, "AK": ak_sovc.SOURCE}.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE), url
+                    {"FL": fl_sos.SOURCE, "RI": ri_countbook.SOURCE, "AK": ak_sovc.SOURCE if "MF-266" in url else SOURCE}.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE), url
                 ),
                 sources[state],
             )
@@ -3532,12 +3591,10 @@ def emit() -> Path:
                 lambda row: (
                     f"{row['state']}:{row['county']}"
                     if row["county"] in ("uocava", "limited")
-                    else row["county"]
-                    if row["state"] == "AK"
                     else fips[row["state"]]
                     if row["county"] == "statewide"
                     else row["county"]
-                    if row["county"].isdigit()
+                    if row["state"] == "AK" or row["county"].isdigit()
                     else counties.get((fips[row["state"]], re.sub(r"[^a-z]", "", row["county"].lower())))
                 ),
                 return_dtype=pl.String,
@@ -3683,7 +3740,7 @@ def emit() -> Path:
                 + (SCANNED if rows["page"].is_not_null().any() and state != "AL" else "")
                 + (GA_PRELIMINARY if preliminary else "")
                 + (
-                    (AL_2007_NOTE if state == "AL" else STATEWIDE_ONLY)
+                    (AL_2007_NOTE if state == "AL" else AK_STATEWIDE_NOTE if state == "AK" else STATEWIDE_ONLY)
                     if (rows["county"] == "statewide").any()
                     else ""
                 ),
@@ -3703,7 +3760,7 @@ def emit() -> Path:
                 for row in rows.iter_rows(named=True):
                     unit = cs.unit(
                         "us.ak_house_district"
-                        if row["state"] == "AK"
+                        if row["state"] == "AK" and row["county"] != "statewide"
                         else "us.aggregate"
                         if ":" in row["code"]
                         else "us.state"
