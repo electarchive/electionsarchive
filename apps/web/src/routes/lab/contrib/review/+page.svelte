@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "#routes/lab/contrib/contrib.css";
+  import "#lib/components/contrib/contrib.css";
   import ProposalBody from "#routes/lab/contrib/proposal-body.svelte";
   import { resolve } from "$app/paths";
   import { SvelteMap } from "svelte/reactivity";

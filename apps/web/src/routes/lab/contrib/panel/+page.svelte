@@ -1,7 +1,7 @@
 <script lang="ts">
-  import "#routes/lab/contrib/contrib.css";
+  import "#lib/components/contrib/contrib.css";
   import Checks from "#routes/lab/contrib/checks.svelte";
-  import Proof from "#routes/lab/contrib/proof.svelte";
+  import Proof from "#lib/components/contrib/proof.svelte";
   import Scan from "#routes/lab/contrib/scan.svelte";
   import { resolve } from "$app/paths";
   import History from "@lucide/svelte/icons/history";

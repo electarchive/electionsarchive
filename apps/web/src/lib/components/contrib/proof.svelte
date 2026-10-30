@@ -35,7 +35,7 @@
     {:else}
       <button
         type="button"
-        class="-translate-y-1.5 self-start rounded-[2px] px-0.5 text-[0.6875rem] leading-none font-semibold text-muted-foreground hover:bg-accent hover:text-foreground"
+        class="-translate-y-1.5 self-start rounded-xs px-0.5 text-[0.6875rem] leading-none font-semibold text-muted-foreground hover:bg-accent hover:text-foreground"
         aria-label={label}
         onclick={onopen}>{n}</button
       >
