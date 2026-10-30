@@ -1998,10 +1998,10 @@
             <p class="text-sm text-muted-foreground" role="status">
               {#if failed != null}
                 <span class="text-destructive">{failed}</span>
-              {:else if changes.length === 0}
-                {m.edit_no_change()}
               {:else if invalid}
                 {m.edit_needs_fix()}
+              {:else if changes.length === 0}
+                {m.edit_no_change()}
               {:else if !cited}
                 {shown === "source"
                   ? m.edit_needs_source()

@@ -388,6 +388,10 @@ def _color(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID) ->
     return party, f"{party}:{start or ''}", changed
 
 
+def _an(word: str) -> str:
+    return f"{'an' if word[0] in 'aeiou' else 'a'} {word}"
+
+
 def _label(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID) -> tuple[UUID, str]:
     values = dict(op.get("values") or {})
     if unknown := values.keys() - {"entity_id", "kind", "value", "assessor", "valid_from", "valid_to"}:
@@ -402,15 +406,17 @@ def _label(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID) ->
         raise ValueError(f"{where}: label kind must be one of {', '.join(LABELS)}")
     types, allowed = LABELS[kind]
     if types is not None and found[0] not in types:
-        raise ValueError(f"{where}: a {kind} label goes on a {' or '.join(types)}, not a {found[0]}")
+        raise ValueError(
+            f"{where}: {_an(kind)} label goes on {' or '.join(_an(t) for t in types)}, not {_an(found[0])}"
+        )
     value = unicodedata.normalize("NFC", str(values.get("value") or "")).strip()
     if value == "" or len(value) > 200:
         raise ValueError(f"{where}: a label value is 1 to 200 characters")
     if allowed is not None and value not in allowed:
-        raise ValueError(f"{where}: a {kind} label is one of {', '.join(allowed)}")
+        raise ValueError(f"{where}: {_an(kind)} label is one of {', '.join(allowed)}")
     assessor = unicodedata.normalize("NFC", str(values.get("assessor") or "")).strip() or None
     if kind in ASSESSED and assessor is None:
-        raise ValueError(f"{where}: a {kind} label names its external assessor")
+        raise ValueError(f"{where}: {_an(kind)} label names its external assessor")
     if assessor is not None and len(assessor) > 200:
         raise ValueError(f"{where}: an assessor is at most 200 characters")
     start, end = (

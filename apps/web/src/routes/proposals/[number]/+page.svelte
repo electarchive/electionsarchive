@@ -11,6 +11,9 @@
     dated,
     escalationLabel,
     factLabel,
+    labelKindLabel,
+    labelKinds,
+    labelValue,
     measureLabel,
     noteKindLabel,
     originLabel,
@@ -190,13 +193,18 @@
   const languageName = new Intl.DisplayNames([getLocale()], {
     type: "language",
   });
-  const noteKind = (value: string) =>
-    value === "context" ||
-    value === "caveat" ||
-    value === "methodology" ||
-    value === "editorial"
-      ? noteKindLabel[value]()
-      : value;
+  const kindLabel = (value: string) => {
+    if (
+      value === "context" ||
+      value === "caveat" ||
+      value === "methodology" ||
+      value === "editorial"
+    ) {
+      return noteKindLabel[value]();
+    }
+    const label = labelKinds.find((item) => item === value);
+    return label == null ? value : labelKindLabel[label]();
+  };
   const scheme = (fields: Record<string, [unknown, unknown]>) => {
     const value = fields.scheme?.[1] ?? fields.scheme?.[0];
     const found = schemes.find((item) => item === value);
@@ -245,7 +253,10 @@
         return titles[value] ?? value;
       }
       case "kind": {
-        return noteKind(value);
+        return kindLabel(value);
+      }
+      case "value": {
+        return labelValue(value);
       }
       case "lang":
       case "source_lang": {

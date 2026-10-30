@@ -37,6 +37,21 @@
     to: string;
   } | null>(null);
 
+  const dateProblem = $derived.by(() => {
+    if (draft == null) {
+      return null;
+    }
+    const from = draft.from.trim();
+    const to = draft.to.trim();
+    if ((from !== "" && !isDay(from)) || (to !== "" && !isDay(to))) {
+      return m.edit_date_invalid();
+    }
+    if (from !== "" && to !== "" && to <= from) {
+      return m.edit_color_order();
+    }
+    return null;
+  });
+
   const problem = $derived.by(() => {
     if (draft == null) {
       return null;
@@ -48,13 +63,8 @@
     if (assessed.has(draft.kind) && draft.assessor.trim() === "") {
       return m.edit_label_needs_assessor();
     }
-    const from = draft.from.trim();
-    const to = draft.to.trim();
-    if ((from !== "" && !isDay(from)) || (to !== "" && !isDay(to))) {
-      return m.edit_date_invalid();
-    }
-    if (from !== "" && to !== "" && to <= from) {
-      return m.edit_color_order();
+    if (dateProblem != null) {
+      return dateProblem;
     }
     const kind = draft.kind;
     if (
@@ -238,6 +248,7 @@
             {m.edit_color_from()}
             <Input
               bind:value={draft.from}
+              aria-invalid={dateProblem != null}
               placeholder="YYYY-MM-DD"
               inputmode="numeric"
               autocomplete="off"
@@ -249,6 +260,7 @@
             {m.edit_color_to()}
             <Input
               bind:value={draft.to}
+              aria-invalid={dateProblem != null}
               placeholder="YYYY-MM-DD"
               inputmode="numeric"
               autocomplete="off"
