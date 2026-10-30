@@ -1885,12 +1885,13 @@ def apply(folder: Path) -> str:
             return str(existing[0])
         conn.execute(
             """insert into changeset
-                 (id, author_kind, pipeline, pipeline_version, kind, status, summary, scope, payload_kind,
-                  artifact_keys)
-               values (%s, %s, %s, %s, %s, 'draft', %s, %s, 'artifacts', %s)""",
+                 (id, author_kind, author_user_id, pipeline, pipeline_version, kind, status, summary, scope,
+                  payload_kind, artifact_keys)
+               values (%s, %s, %s, %s, %s, %s, 'draft', %s, %s, 'artifacts', %s)""",
             [
                 changeset_id,
                 manifest["author_kind"],
+                manifest.get("author_user_id"),
                 manifest["pipeline"],
                 manifest["pipeline_version"],
                 manifest["kind"],
@@ -2095,8 +2096,10 @@ def apply(folder: Path) -> str:
                 changeset_id,
             ],
         )
-        if any(finding.severity == "error" for finding in findings) or (
-            manifest["kind"] != "match" and (official is None or not official[0])
+        if (
+            any(finding.severity == "error" for finding in findings)
+            or manifest["author_kind"] in ("user", "agent")
+            or (manifest["kind"] != "match" and (official is None or not official[0]))
         ):
             conn.execute("update changeset set status = 'pending_review' where id = %s", [changeset_id])
             return "pending_review"
