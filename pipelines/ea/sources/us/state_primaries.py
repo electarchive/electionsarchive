@@ -756,7 +756,7 @@ IN_CATEGORIES = {
     2016: {1202: "senate", 1201: "house"},
     2018: {1938: "senate", 1937: "house"},
     2020: {1009: "GOVERNOR", 1018: "senate", 1039: "house"},
-    2022: {1009: "GOVERNOR", 1018: "senate", 1039: "house"},
+    2022: {1018: "senate", 1039: "house"},
 }
 IN_FILES = [
     (year, category, label) for year, categories in IN_CATEGORIES.items() for category, label in categories.items()
