@@ -1652,9 +1652,30 @@
   });
 
   $effect(() => {
-    if (engine.gl != null) {
-      basemap(engine, scheme, isBasemap && outline != null, outline ?? []);
+    if (engine.gl == null) {
+      return;
     }
+    const beyond: Maplibre.ExpressionSpecification = [
+      "!",
+      [
+        "in",
+        ["id"],
+        [
+          "literal",
+          [
+            ...places.rows.map((row) => row.k),
+            ...(blank ?? [])
+              .filter((entry) => !entry.isOutside)
+              .map((entry) => entry.k),
+          ],
+        ],
+      ],
+    ];
+    basemap(engine, scheme, isBasemap && outline != null, outline ?? [], [
+      ["fill", beyond],
+      ["seam", beyond],
+      ["veil", beyond],
+    ]);
   });
 
   $effect(() => {
@@ -2219,7 +2240,7 @@
     >
       <button
         type="button"
-        class="grid place-items-center block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
+        class="grid place-items-center block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_in()}
         title={m.map_zoom_in()}
         onclick={() => engine.zoomIn()}
@@ -2228,7 +2249,7 @@
       </button>
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
+        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
         onclick={() => engine.zoomOut()}
@@ -2237,7 +2258,7 @@
       </button>
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
+        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_reset()}
         title={m.map_reset()}
         onclick={() => engine.reset()}
@@ -2248,7 +2269,7 @@
         <button
           type="button"
           class={cn(
-            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10",
+            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2 pointer-coarse:block-10 pointer-coarse:inline-10",
             { "text-muted-foreground": !isBasemap },
           )}
           aria-label={m.map_basemap()}

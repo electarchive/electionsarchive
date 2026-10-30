@@ -15,7 +15,6 @@ export const SCHEMES = new Set([
 ]);
 const REGULAR = ["Sofia Sans Semi Condensed Regular"];
 const STRONG = ["Sofia Sans Semi Condensed SemiBold"];
-const WATER = "color-mix(in oklab, var(--card) 74%, #5f93b8)";
 const HALO = "color-mix(in oklab, var(--card) 88%, transparent)";
 
 export function basemap(
@@ -23,6 +22,7 @@ export function basemap(
   scheme: string,
   isShown: boolean,
   outline: Array<Array<[number, number]>>,
+  lifted: Array<[string, Maplibre.ExpressionSpecification]>,
 ) {
   engine.drop("basemap");
   if (!isShown || !SCHEMES.has(scheme)) {
@@ -63,25 +63,41 @@ export function basemap(
       slot,
       { group: "basemap" },
     );
-  const roads = [
+  add(
+    {
+      type: "fill",
+      "source-layer": "water",
+      paint: { "fill-color": "var(--card)" },
+    },
+    "water",
+    "etch",
+  );
+  add(
+    {
+      type: "line",
+      "source-layer": "rivers",
+      minzoom: 9,
+      paint: {
+        "line-color": "var(--card)",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.6, 14, 2.5],
+      },
+    },
+    "river",
+    "etch",
+  );
+  for (const [kind, layer, minzoom, widths, ink] of [
     ["minor", "streets", 12.5, [12.5, 0.3, 15, 2.2], 12],
     ["tertiary", "streets", 11, [11, 0.3, 15, 2.8], 15],
     ["secondary", "roads", 9.5, [9.5, 0.3, 15, 3.4], 17],
     ["primary", "roads", 8, [8, 0.35, 15, 4], 19],
     ["highway", "roads", 6, [6, 0.5, 9, 1.1, 15, 4.5], 22],
-  ] as const;
-  const road = (
-    [kind, , minzoom, widths, ink]: (typeof roads)[number],
-    id: string,
-    layer: string,
-    filter: Maplibre.ExpressionSpecification,
-  ) =>
+  ] as const) {
     add(
       {
         type: "line",
         "source-layer": layer,
         minzoom,
-        filter: ["all", ["==", ["get", "kind"], kind], filter],
+        filter: ["==", ["get", "kind"], kind],
         layout: { "line-cap": "round", "line-join": "round" },
         paint: {
           "line-color": `color-mix(in oklab, var(--map-road) ${ink}%, transparent)`,
@@ -94,11 +110,9 @@ export function basemap(
           "line-opacity": ["interpolate", ["linear"], ["zoom"], 6, 0.45, 11, 1],
         },
       },
-      id,
+      kind,
       "etch",
     );
-  for (const entry of roads) {
-    road(entry, entry[0], entry[1], ["literal", true]);
   }
   add(
     {
@@ -142,30 +156,9 @@ export function basemap(
       "etch",
       { group: "basemap" },
     );
-  }
-  add(
-    { type: "fill", "source-layer": "water", paint: { "fill-color": WATER } },
-    "water",
-    "etch",
-  );
-  add(
-    {
-      type: "line",
-      "source-layer": "rivers",
-      paint: {
-        "line-color": WATER,
-        "line-width": ["interpolate", ["linear"], ["zoom"], 7, 0.5, 14, 2.5],
-      },
-    },
-    "river",
-    "etch",
-  );
-  for (const entry of roads) {
-    road(entry, `${entry[0]}-bridge`, "streets", [
-      "all",
-      ["==", ["get", "bridge"], true],
-      inside,
-    ]);
+    for (const [id, filter] of lifted) {
+      engine.lift(id, filter, "basemap");
+    }
   }
   for (const [kind, layer, minzoom] of [
     ["minor", "streets", 14.5],
@@ -225,7 +218,8 @@ export function basemap(
           "text-color":
             "color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground))",
           "text-halo-color": HALO,
-          "text-halo-width": 1.4,
+          "text-halo-width": 1.2,
+          "text-halo-blur": 0.4,
         },
       },
       kind,
@@ -272,7 +266,8 @@ export function basemap(
         paint: {
           "text-color": "var(--foreground)",
           "text-halo-color": HALO,
-          "text-halo-width": 1.6,
+          "text-halo-width": 1.3,
+          "text-halo-blur": 0.4,
         },
       },
       `place-${tier}`,

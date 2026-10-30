@@ -135,7 +135,7 @@ def emit(geometry: dict, z: int, x: int, y: int, layer: str, props: dict, zooms:
     _, clip, project, scaling = zone
     if clip is not None:
         geom = clip_by_rect(geom, *clip)
-    if props.get("kind") != "ocean" and not inside.contains(geom):
+    if not inside.contains(geom):
         if not inside.intersects(geom):
             return None
         geom = make_valid(geom).intersection(land)
@@ -196,7 +196,7 @@ def work(job: tuple[str, int, int, int, bool]) -> list[tuple[str, str]]:
                 out.append(("hoods", row))
     for feature in [] if metro else tile.get("water", {}).get("features", []):
         p = feature["properties"]
-        if "Polygon" in feature["geometry"]["type"]:
+        if "Polygon" in feature["geometry"]["type"] and p.get("kind") != "ocean":
             push(feature, "water", {"kind": p.get("kind", "")}, 0)
         elif p.get("kind") in ("river", "canal"):
             push(feature, "rivers", {"kind": p["kind"]}, 7)
@@ -213,15 +213,12 @@ def work(job: tuple[str, int, int, int, bool]) -> list[tuple[str, str]]:
                 {"kind": kind, "name": p.get("ref") or p.get("name") or ""},
                 minzoom,
             )
-        elif metro and detail in ROADS and p.get("is_bridge"):
-            kind, minzoom = ROADS[detail]
-            push(feature, "streets", {"kind": kind, "name": "", "bridge": True}, minzoom)
         elif metro and detail in STREETS:
             kind, minzoom = STREETS[detail]
             push(
                 feature,
                 "streets",
-                {"kind": kind, "name": p.get("name", ""), "bridge": bool(p.get("is_bridge"))},
+                {"kind": kind, "name": p.get("name", "")},
                 minzoom,
             )
         elif metro and p.get("kind") == "rail" and detail not in ("subway", "station", "ventilation_shaft"):

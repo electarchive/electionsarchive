@@ -913,6 +913,22 @@ export class Engine {
     return this.#layers.has(id);
   }
 
+  lift(id: string, filter: Maplibre.ExpressionSpecification, group: string) {
+    const spec = this.#layers.get(id)?.spec;
+    if (spec?.type !== "fill" && spec?.type !== "line") {
+      return;
+    }
+    this.add(
+      {
+        ...spec,
+        id: `${id}:lifted`,
+        filter: spec.filter == null ? filter : ["all", spec.filter, filter],
+      } as Maplibre.LayerSpecification,
+      "etch",
+      { group },
+    );
+  }
+
   filter(id: string, filter: Maplibre.FilterSpecification | null) {
     if (this.gl?.getLayer(id) != null) {
       this.gl.setFilter(id, filter);

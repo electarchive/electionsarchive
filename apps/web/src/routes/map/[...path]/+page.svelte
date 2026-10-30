@@ -1059,24 +1059,9 @@
     );
   }
 
-  let outline = $state<Array<Array<[number, number]>> | null>(null);
-
-  $effect(() => {
-    const k = sheet.trail.length > 1 ? sheet.scope.k : null;
-    outline = k == null ? [] : null;
-    if (isBasemap && k != null) {
-      void orpc.contests.outline.call({ k }).then(
-        (found) => {
-          outline = found;
-        },
-        () => {},
-      );
-    }
-  });
-
   $effect(() => {
     if (engine.gl != null) {
-      basemap(engine, scheme, isBasemap && outline != null, outline ?? []);
+      basemap(engine, scheme, isBasemap, [], []);
     }
   });
 
@@ -2570,7 +2555,7 @@
     >
       <button
         type="button"
-        class="grid place-items-center block-8 inline-8 hover:bg-secondary"
+        class="grid place-items-center block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2"
         aria-label={m.map_zoom_in()}
         title={m.map_zoom_in()}
         onclick={() => engine.zoomIn()}
@@ -2578,7 +2563,7 @@
       >
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary"
+        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
         onclick={() => engine.zoomOut()}
@@ -2586,7 +2571,7 @@
       >
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary"
+        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2"
         aria-label={m.map_reset()}
         title={m.map_reset()}
         onclick={() => engine.reset()}
@@ -2596,7 +2581,7 @@
         <button
           type="button"
           class={cn(
-            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary",
+            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary focus-visible:-outline-offset-2",
             { "text-muted-foreground": !isBasemap },
           )}
           aria-label={m.map_basemap()}
