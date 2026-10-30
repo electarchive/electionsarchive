@@ -43,9 +43,16 @@ COUNTIES = [
         DAY,
         "primary",
     ),
+    (
+        "1301020",
+        "Chatham County Board of Elections",
+        "Chatham/official-and-complete-election-summary-report-05-19-2026.pdf",
+        DAY,
+        "local",
+    ),
 ]
 HEADING = re.compile(
-    r"^County (?:BOE|Board of Education) - District (?P<seat>\d+)(?:/.*?)?(?: - (?P<party>Dem|Rep))? \(Vote for (?P<seats>\d+)\)$"
+    r"^(?:County )?(?:BOE|Board of Education)(?: - District (?P<seat>\d+)| (?P<top>President))(?: \(\w[\w -]*\))?(?:/.*?)?(?: - (?P<party>Dem|Rep))? \(Vote for (?P<seats>\d+)\)$"
 )
 PARTIES = {"Dem": "democratic", "Rep": "republican"}
 ROW = re.compile(r"^(?P<name>[A-Z].*?)\s{2,}(?:[\d,]+\s+)*(?P<total>[\d,]+)(?:\s+[\d.]+%)?$")
@@ -104,7 +111,7 @@ def emit() -> Path:
             for line in text.splitlines():
                 stripped = line.strip()
                 if found := HEADING.match(stripped):
-                    current = races.setdefault((found["seat"], found["party"]), (int(found["seats"]), {}))[1]
+                    current = races.setdefault((found["seat"] or found["top"], found["party"]), (int(found["seats"]), {}))[1]
                 elif stripped.startswith("Total Votes"):
                     current = None
                 elif current is not None and (row := ROW.match(stripped)):
@@ -132,9 +139,14 @@ def emit() -> Path:
             whole = cs.area("us.school_district", code)
             for (seat, party), (magnitude, votes) in races.items():
                 suffix = f"-{PARTIES[party]}" if party else ""
-                district = f"GA:{code}:board-of-education:district-{seat}"
-                area, unit = cs.area("us.local_district", district), cs.unit("us.local_district", district)
-                if area in cs.minted and district not in districts:
+                label = f"district-{seat}" if seat.isdigit() else slug(seat)
+                district = f"GA:{code}:board-of-education:{label}"
+                area, unit = (
+                    (cs.area("us.local_district", district), cs.unit("us.local_district", district))
+                    if seat.isdigit()
+                    else (whole, cs.unit("us.school_district", code))
+                )
+                if seat.isdigit() and area in cs.minted and district not in districts:
                     districts.add(district)
                     cs.add("area", id=area, scheme_code="us.local_district")
                     cs.add("area_code", area_id=area, code=district, valid_from=None)
@@ -157,8 +169,8 @@ def emit() -> Path:
                         area_id=area,
                         kind="standard",
                     )
-                key = f"{day}:GA:{code}:board-of-education:district-{seat}{suffix}"
-                previous = cs.key("us.contest", f"{DAY}:GA:{code}:board-of-education:district-{seat}{suffix}") if day == RUNOFF else None
+                key = f"{day}:GA:{code}:board-of-education:{label}{suffix}"
+                previous = cs.key("us.contest", f"{DAY}:GA:{code}:board-of-education:{label}{suffix}") if day == RUNOFF else None
                 contest = cs.key("us.contest", key)
                 cs.add(
                     "contest",
@@ -177,12 +189,12 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=contest,
-                    text=f"2026 {place} Board of Education, District {seat} election" + (f" ({party} primary)".replace("Dem", "Democratic").replace("Rep", "Republican") if party else "") + (" (runoff)" if previous else ""),
+                    text=f"2026 {place} Board of Education, {seat if not seat.isdigit() else f"District {seat}"} election" + (f" ({party} primary)".replace("Dem", "Democratic").replace("Rep", "Republican") if party else "") + (" (runoff)" if previous else ""),
                     lang="en",
                     kind="official",
                     is_preferred=True,
                 )
-                cs.add("slug", path=f"{base}/{day}-{kind}/board-of-education-district-{seat}{suffix}", entity_id=contest)
+                cs.add("slug", path=f"{base}/{day}-{kind}/board-of-education-{label}{suffix}", entity_id=contest)
                 result_set = cs.key(f"{SOURCE}.result_set", key)
                 cs.add(
                     "result_set",
