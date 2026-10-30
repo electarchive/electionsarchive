@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import unicodedata
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -28,6 +29,7 @@ PUBLISHERS = {
     "Avondale": "City of Avondale City Clerk",
     "Cave Creek": "Town of Cave Creek Town Clerk",
     "Gila Bend": "Town of Gila Bend Town Clerk",
+    "Maricopa County": "Maricopa County Elections Department",
 }
 TITLE = "Publicity pamphlet, November 3, 2026 general election"
 
@@ -114,7 +116,7 @@ def parse() -> None:
             {
                 "city": spec["city"],
                 "label": spec["title"],
-                "wording": text[begin.start() : end.end()],
+                "wording": unicodedata.normalize("NFKC", text[begin.start() : end.end()]),
                 "options": "|".join(str(option) for option in spec["options"] or []),
                 "url": key(spec),
             }
@@ -134,10 +136,10 @@ def emit() -> Path:
             """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
                join area_code c on c.area_id = a.id
                join polity_territory t on t.area_id = a.id
-               join polity p on p.id = t.polity_id and p.kind = 'municipality'
+               join polity p on p.id = t.polity_id and p.kind in ('municipality', 'county')
                join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                join slug s on s.entity_id = p.id and s.is_current
-               where a.scheme_code = 'us.place' and left(c.code, 2) = '04'"""
+               where a.scheme_code in ('us.place', 'us.county') and left(c.code, 2) = '04'"""
         ).fetchall():
             key = f"{scheme}:{code}"
             found[key] = (polity, area, text, path, code)
@@ -172,7 +174,7 @@ def emit() -> Path:
         elections: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
-            options = names.get(ceda._city(row["city"]), [])
+            options = names.get(ceda._city(row["city"]), []) or names.get(ceda._core(row["city"]), [])
             if len(options) != 1:
                 print("no polity:", row["city"], row["label"])
                 continue
