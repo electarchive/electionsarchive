@@ -42,6 +42,16 @@ COUNTIES = {
         None,
         "Mesa County Clerk and Recorder",
     ),
+    "08001": (
+        "https://adamscountyco.gov/wp-content/uploads/2026/09/CR-Adams-County-2026G-TABOR-Notice-092426.pdf",
+        "../MF-388/CR-Adams-County-2026G-TABOR-Notice-092426.pdf",
+        "Adams County Clerk and Recorder",
+    ),
+    "08123": (
+        "https://www.weld.gov/files/sharedassets/public/v/1/departments/clerk-and-recorder/documents/elections/weld-tabor-2026-general.pdf",
+        "../MF-389/weld-tabor-2026-general.pdf",
+        "Weld County Clerk and Recorder",
+    ),
     "08035": (
         "https://www.douglas.co.us/documents/2026-general-election-ballot-issue-notices-booklet.pdf",
         "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
@@ -181,7 +191,71 @@ def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-PARSERS = {"08059": jeffco_rows, "08077": mesa_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
+ADAMS_ISSUES = (
+    ("City of Aurora", "3A"),
+    ("City of Aurora", "3B"),
+    ("City of Aurora", "3C"),
+    ("City of Northglenn", "3H"),
+    ("Westminster Public Schools", "4A"),
+    ("Bennett School District No. 29J", "5A"),
+    ("North Range Metropolitan District No. 3", "6A"),
+    ("North Range Metropolitan District No. 3", "6B"),
+    ("North Range Metropolitan District No. 3", "6C"),
+    ("North Range Metropolitan District No. 3", "6D"),
+    ("Adams County Fire Protection District", "6E"),
+    ("Central Colorado Water Conservancy District", "7B"),
+    ("Groundwater Management Subdistrict of the Central Colorado Water Conservancy District", "7C"),
+    ("Greater Brighton Fire Protection District", "7D"),
+    ("Bennett Fire Protection District", "7F"),
+    ("Bennett Fire Protection District", "7G"),
+)
+ADAMS_HEADING = re.compile(r"(?i)^\s*(?:.+ )?BALLOT ISSUE\s*(?:NO\.?\s*|#\s*)?(\d[A-Z])\b")
+
+
+def adams_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    cursor = 0
+    for entity, issue in ADAMS_ISSUES:
+        cursor = next(index for index in range(cursor, len(lines)) if (match := ADAMS_HEADING.match(lines[index])) is not None and match[1] == issue and "Written" not in lines[index] and "authorized" not in lines[index])
+        start = next(index for index in range(cursor, cursor + 40) if re.match(r"^\s*(?:[A-Z][A-Z ,]*\b)?SHALL\b", lines[index]))
+        end = next(index for index in range(start, start + 80) if lines[index].rstrip().endswith("?"))
+        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip() and not line.strip().isdigit())).strip()
+        rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
+    return rows
+
+
+WELD_ISSUES = (
+    ("Town of Eaton", "2A"),
+    ("Town of Kersey", "2B"),
+    ("City of Evans", "2C"),
+    ("Town of Frederick", "2D"),
+    ("Town of Frederick", "2E"),
+    ("City of Greeley", "2F"),
+    ("City of Longmont", "3A"),
+    ("Town of Erie", "3E"),
+    ("Town of Erie", "3F"),
+    ("Town of Berthoud", "3G"),
+    ("City of Northglenn", "3H"),
+    ("Weld County School District No. RE-2", "4A"),
+    ("Weld County School District No. RE-1", "4B"),
+)
+WELD_HEADING = re.compile(r"(?i)^\s*(?:.*\b)?(?:ballot issue|referred measure)\s*(?:no\.?\s*)?#?\s*(\d[A-Z])\b")
+
+
+def weld_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    cursor = 0
+    for entity, issue in WELD_ISSUES:
+        cursor = next(index for index in range(cursor, len(lines)) if (match := WELD_HEADING.match(lines[index])) is not None and match[1] == issue and not re.search(r"(?i)written|summar|authorized|bonded", lines[index]))
+        start = next(index for index in range(cursor, cursor + 60) if re.search(r"\bSHALL\b", lines[index]))
+        end = next(index for index in range(start, start + 90) if lines[index].rstrip().endswith("?"))
+        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip() and not line.strip().isdigit())).strip()
+        rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
+        cursor = end + 1
+    return rows
+
+
+PARSERS = {"08123": weld_rows, "08001": adams_rows, "08059": jeffco_rows, "08077": mesa_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
 
 
 def parse() -> None:
