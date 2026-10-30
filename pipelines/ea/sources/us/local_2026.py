@@ -1834,6 +1834,7 @@ for county, url in {
     "Yates": "https://www.yatescountyny.gov/318/Sample-Ballots",
     "Franklin": "https://www.franklincountyny.gov/departments/elections/",
     "Fulton": "https://www.fultoncountyny.gov/departments/board-of-elections",
+    "St. Lawrence": "https://www.stlawco.org/Board-of-Elections",
 }.items():
     NE_SOURCES[f"NY-{county}"] = (
         f"{county} County Board of Elections",
@@ -1841,7 +1842,7 @@ for county, url in {
         if county == "Westchester"
         else "2026 General Election: Candidates",
         url,
-        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates', 'Franklin', 'Fulton') else 'pdf'}",
+        f"ny/{county.lower()}.{'html' if county in ('Suffolk', 'Otsego', 'Seneca', 'Schenectady') else 'docx' if county == 'Oswego' else 'zip' if county in ('Delaware', 'Madison', 'Livingston', 'Saratoga', 'Lewis', 'Orleans', 'Tioga', 'Greene', 'Wyoming', 'Wayne', 'Cayuga', 'Cortland', 'Genesee', 'Yates', 'Franklin', 'Fulton', 'St. Lawrence') else 'pdf'}",
     )
 for fips, county in {
     "32001": "Churchill",
