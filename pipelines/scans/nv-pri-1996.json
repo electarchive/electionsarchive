@@ -1,0 +1,134 @@
+{
+ "polity": "US-NV",
+ "publisher": "Nevada Secretary of State",
+ "authoritative": "Source: the Secretary of State's official returns of the September 3, 1996 primary election; each county column adds up to the printed state total.",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "1996 Primary Election Returns by county",
+ "file": {
+  "url": "https://nvsos.gov/MF-397/NV-1996-primary-and-general.pdf"
+ },
+ "contests": {
+  "h1d": {
+   "year": 1996,
+   "chamber": "house:democratic",
+   "day": "1996-09-03",
+   "special": false,
+   "state": "NV",
+   "district": 1
+  },
+  "h2d": {
+   "year": 1996,
+   "chamber": "house:democratic",
+   "day": "1996-09-03",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  },
+  "h2r": {
+   "year": 1996,
+   "chamber": "house:republican",
+   "day": "1996-09-03",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2",
+   "orientation": "counties_across",
+   "turn": -90,
+   "bands": 1,
+   "hint": "Read the Congressional District One (Democrat) and Congressional District Two (Democrat) blocks only; leave out the registration and turnout rows.",
+   "columns": [
+    {
+     "label": "Banta, Danie D.",
+     "contest": "h1d",
+     "candidate": "Danie D. Banta"
+    },
+    {
+     "label": "Coffin, Bob",
+     "contest": "h1d",
+     "candidate": "Bob Coffin"
+    },
+    {
+     "label": "Gross, Robert E.",
+     "contest": "h1d",
+     "candidate": "Robert E. Gross"
+    },
+    {
+     "label": "Mautner, David B.",
+     "contest": "h1d",
+     "candidate": "David B. Mautner"
+    },
+    {
+     "label": "Martin, Mike",
+     "contest": "h2d",
+     "candidate": "Mike Martin"
+    },
+    {
+     "label": "Wilson, Thomas \"Spike\"",
+     "contest": "h2d",
+     "candidate": "Thomas Wilson"
+    },
+    {
+     "label": "Winchester, Jessi",
+     "contest": "h2d",
+     "candidate": "Jessi Winchester"
+    }
+   ]
+  },
+  {
+   "page": 3,
+   "id": "3",
+   "orientation": "counties_across",
+   "turn": -90,
+   "bands": 1,
+   "hint": "Read the Congressional District Two (Republican) block only; leave out every state senate block.",
+   "columns": [
+    {
+     "label": "Cafferata, Patty",
+     "contest": "h2r",
+     "candidate": "Patty Cafferata"
+    },
+    {
+     "label": "Edwards, Sr., Robert J.",
+     "contest": "h2r",
+     "candidate": "Robert J. Edwards"
+    },
+    {
+     "label": "Gibbons, Jim",
+     "contest": "h2r",
+     "candidate": "Jim Gibbons"
+    },
+    {
+     "label": "Lau, Cheryl A.",
+     "contest": "h2r",
+     "candidate": "Cheryl A. Lau"
+    },
+    {
+     "label": "McMillan, Pat",
+     "contest": "h2r",
+     "candidate": "Pat McMillan"
+    },
+    {
+     "label": "Milko, Hilary Michael",
+     "contest": "h2r",
+     "candidate": "Hilary Michael Milko"
+    },
+    {
+     "label": "Schaefer, Mike",
+     "contest": "h2r",
+     "candidate": "Mike Schaefer"
+    },
+    {
+     "label": "Seale, Bob",
+     "contest": "h2r",
+     "candidate": "Bob Seale"
+    }
+   ]
+  }
+ ]
+}

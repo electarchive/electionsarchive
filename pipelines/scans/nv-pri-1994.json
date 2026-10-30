@@ -1,0 +1,149 @@
+{
+ "polity": "US-NV",
+ "publisher": "Nevada Secretary of State",
+ "authoritative": "Source: the Secretary of State's official abstract of the September 6, 1994 primary election, as canvassed by the county commissioners; each county column adds up to the printed state total.",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "1994 Primary Election Returns by county",
+ "file": {
+  "url": "https://nvsos.gov/MF-397/NV-1994-primary-and-general.pdf"
+ },
+ "contests": {
+  "sr": {
+   "year": 1994,
+   "chamber": "senate:republican",
+   "day": "1994-09-06",
+   "special": false,
+   "state": "NV",
+   "district": null
+  },
+  "h1d": {
+   "year": 1994,
+   "chamber": "house:democratic",
+   "day": "1994-09-06",
+   "special": false,
+   "state": "NV",
+   "district": 1
+  },
+  "h1r": {
+   "year": 1994,
+   "chamber": "house:republican",
+   "day": "1994-09-06",
+   "special": false,
+   "state": "NV",
+   "district": 1
+  },
+  "h2d": {
+   "year": 1994,
+   "chamber": "house:democratic",
+   "day": "1994-09-06",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  },
+  "h2r": {
+   "year": 1994,
+   "chamber": "house:republican",
+   "day": "1994-09-06",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "2",
+   "orientation": "counties_across",
+   "bands": 1,
+   "hint": "Read the US Senate Republican, Congress District 1 Democrat and Republican, and Congress District 2 Democrat and Republican blocks only; leave out the registration and turnout rows.",
+   "columns": [
+    {
+     "label": "ANDERSON, PROLIFE",
+     "contest": "sr",
+     "candidate": "Prolife Anderson"
+    },
+    {
+     "label": "BALISTERE, JOHN VINCENT",
+     "contest": "sr",
+     "candidate": "John Vincent Balistere"
+    },
+    {
+     "label": "FURMAN, HAL",
+     "contest": "sr",
+     "candidate": "Hal Furman"
+    },
+    {
+     "label": "HOUGH, DAVID L.",
+     "contest": "sr",
+     "candidate": "David L. Hough"
+    },
+    {
+     "label": "WOODS, CHARLES",
+     "contest": "sr",
+     "candidate": "Charles Woods"
+    },
+    {
+     "label": "NONE OF THESE CANDIDATES (senate)",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "BILBRAY, JAMES H.",
+     "contest": "h1d",
+     "candidate": "James H. Bilbray"
+    },
+    {
+     "label": "HOLLINGSWORTH, NORMAN E.",
+     "contest": "h1d",
+     "candidate": "Norman E. Hollingsworth"
+    },
+    {
+     "label": "ENSIGN, JOHN",
+     "contest": "h1r",
+     "candidate": "John Ensign"
+    },
+    {
+     "label": "MARLER, KISH M.",
+     "contest": "h1r",
+     "candidate": "Kish M. Marler"
+    },
+    {
+     "label": "SCHANTZ, WILLIAM J.",
+     "contest": "h1r",
+     "candidate": "William J. Schantz"
+    },
+    {
+     "label": "WEEKS, REX",
+     "contest": "h1r",
+     "candidate": "Rex Weeks"
+    },
+    {
+     "label": "CLARY, PAT",
+     "contest": "h2d",
+     "candidate": "Pat Clary"
+    },
+    {
+     "label": "GREESON, JANET",
+     "contest": "h2d",
+     "candidate": "Janet Greeson"
+    },
+    {
+     "label": "ROBERTS, JAMES S.",
+     "contest": "h2d",
+     "candidate": "James S. Roberts"
+    },
+    {
+     "label": "FAY, JOE EMMETT",
+     "contest": "h2r",
+     "candidate": "Joe Emmett Fay"
+    },
+    {
+     "label": "VUCANOVICH, BARBARA F.",
+     "contest": "h2r",
+     "candidate": "Barbara F. Vucanovich"
+    }
+   ]
+  }
+ ]
+}
