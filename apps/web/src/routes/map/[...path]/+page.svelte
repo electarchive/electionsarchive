@@ -41,6 +41,11 @@
 
   const MID = 4.4;
   const FINE = 7;
+  const COUNTY_LINES: Maplibre.LineLayerSpecification["paint"] = {
+    "line-color": "var(--card)",
+    "line-width": ["interpolate", ["linear"], ["zoom"], 4.5, 0, 6, 0.5, 9, 1],
+    "line-opacity": 0.7,
+  };
   const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
   const LEANS = [26, 40, 54, 68, 84, 100];
   const STRENGTHS = [34, 54, 76, 100];
@@ -836,7 +841,13 @@
     return level?.tiles == null ? null : `fill:t:${level.tiles}`;
   });
 
-  function tier(tiles: string, rank: number, from: number, isDense: boolean) {
+  function tier(
+    tiles: string,
+    rank: number,
+    from: number,
+    isDense: boolean,
+    isStroked = rank < 2,
+  ) {
     const id = engine.tiles(tiles, "sheet");
     if (engine.has(`fill:${id}`)) {
       return id;
@@ -903,7 +914,7 @@
         options,
       );
     }
-    if (rank < 2) {
+    if (isStroked) {
       engine.add(
         {
           id: `seam:${id}`,
@@ -1091,7 +1102,33 @@
     }
     const level = next.levels.find((entry) => entry.code === next.level);
     if (level?.tiles != null) {
-      index(next, tier(level.tiles, 0, 0, next.places.k.length > 400), 0);
+      index(
+        next,
+        tier(
+          level.tiles,
+          0,
+          0,
+          next.places.k.length > 400,
+          !level.code.endsWith(".precinct"),
+        ),
+        0,
+      );
+      const counties = level.code.endsWith(".precinct")
+        ? next.levels.find((entry) => entry.code === "us.county")
+        : undefined;
+      if (counties?.tiles != null) {
+        engine.add(
+          {
+            id: "lines",
+            type: "line",
+            source: engine.tiles(counties.tiles, "sheet"),
+            "source-layer": "areas",
+            paint: COUNTY_LINES,
+          },
+          "lines",
+          { group: "sheet" },
+        );
+      }
     }
   }
 
@@ -1247,21 +1284,7 @@
           type: "line",
           source: engine.tiles(mid.tiles, "sheet"),
           "source-layer": "areas",
-          paint: {
-            "line-color": "var(--card)",
-            "line-width": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              4.5,
-              0,
-              6,
-              0.5,
-              9,
-              1,
-            ],
-            "line-opacity": 0.7,
-          },
+          paint: COUNTY_LINES,
         },
         "lines",
         { group: "sheet" },
