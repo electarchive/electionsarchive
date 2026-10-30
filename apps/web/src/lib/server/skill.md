@@ -26,7 +26,7 @@ The archive holds election results down to the smallest reporting unit, from eac
 - **Names** carry a kind (official, native, english, ballot, short, …), a language, and optional valid dates; one is preferred. **Notes** are Markdown with a kind (context, caveat, methodology, editorial) and a language. **Sources** are documents; **citations** tie a source to a record.
 - **Valid time** is when something was true in the world, with a precision (day, month, year, unknown).
 
-Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, and note translations; can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, describe such a problem in a note proposal's rationale.
+Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, note translations, and labels (a contest where no candidate qualified, or an assessed integrity or recognition label on an election, polity, or area); can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, describe such a problem in a note proposal's rationale.
 
 ## Evidence
 
@@ -282,7 +282,7 @@ Each payload goes to `draft_proposal`. IDs here are placeholders; take real ones
 ## Limits, tiers, and etiquette
 
 - A key makes at most 60 writes a minute and 2,000 a day; `whoami` shows the limits. A proposal holds 1 to 500 ops. Uploads are up to 20 MB as base64 over MCP or REST, 2 GB a day per person.
-- **Tiers.** Tier 1 changes (names, notes, external IDs, colors, images, citations, and translations) can be approved by the editorial desk. Everything else waits for an administrator. A proposal takes the highest tier of its rows. New results are tier 1 only from an official body's document with a URL and stored copy, with no outcomes, no check findings, and no default set already held for that contest and stage; a `correct` op is always tier 3.
+- **Tiers.** Tier 1 changes (names, notes, external IDs, colors, images, citations, translations, and labels) can be approved by the editorial desk. Everything else waits for an administrator. A proposal takes the highest tier of its rows. New results are tier 1 only from an official body's document with a URL and stored copy, with no outcomes, no check findings, and no default set already held for that contest and stage; a `correct` op is always tier 3.
 - A results op holds up to 50,000 rows and a correction up to 2,000 cells. New results become the contest's default only when no default is held and the accounting checks pass (options add up to valid votes, valid and invalid to ballots cast); otherwise they sit beside the held set for a reviewer.
 - Batch related changes to one record into one proposal, and keep unrelated changes apart, so each can be reviewed and reverted on its own.
 - Resubmit a rejected change only with new evidence, and say what is new.

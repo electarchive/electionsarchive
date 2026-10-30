@@ -133,6 +133,15 @@ IMAGES = {"party_image": ("party", "party_id"), "person_image": ("person", "pers
 
 ROW_DROP_TIERS = {"label": 1}
 
+LABELS = {
+    "ballot": (("contest",), ("no_candidate_qualified",)),
+    "integrity": (("election", "polity"), None),
+    "recognition": (("polity", "area"), None),
+    "data_quality": (None, None),
+}
+
+ASSESSED = ("integrity", "recognition")
+
 
 SOURCE_KINDS = ("official_body", "aggregator", "compendium", "news_agency", "academic", "community")
 
@@ -377,6 +386,71 @@ def _color(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID) ->
         source_id=source,
     )
     return party, f"{party}:{start or ''}", changed
+
+
+def _label(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID) -> tuple[UUID, str]:
+    values = dict(op.get("values") or {})
+    if unknown := values.keys() - {"entity_id", "kind", "value", "assessor", "valid_from", "valid_to"}:
+        raise ValueError(f"{where}: a label does not take {', '.join(sorted(unknown))}")
+    entity = _uuid(values.get("entity_id"), f"{where}.values.entity_id")
+    entity = cs.survivors.get(entity, entity)
+    found = conn.execute("select type::text from entity where id = %s and retired_by is null", [entity]).fetchone()
+    if found is None or entity in cs.retired:
+        raise ValueError(f"{where}: entity {entity} does not exist")
+    kind = str(values.get("kind"))
+    if kind not in LABELS:
+        raise ValueError(f"{where}: label kind must be one of {', '.join(LABELS)}")
+    types, allowed = LABELS[kind]
+    if types is not None and found[0] not in types:
+        raise ValueError(f"{where}: a {kind} label goes on a {' or '.join(types)}, not a {found[0]}")
+    value = unicodedata.normalize("NFC", str(values.get("value") or "")).strip()
+    if value == "" or len(value) > 200:
+        raise ValueError(f"{where}: a label value is 1 to 200 characters")
+    if allowed is not None and value not in allowed:
+        raise ValueError(f"{where}: a {kind} label is one of {', '.join(allowed)}")
+    assessor = unicodedata.normalize("NFC", str(values.get("assessor") or "")).strip() or None
+    if kind in ASSESSED and assessor is None:
+        raise ValueError(f"{where}: a {kind} label names its external assessor")
+    if assessor is not None and len(assessor) > 200:
+        raise ValueError(f"{where}: an assessor is at most 200 characters")
+    start, end = (
+        _day(values.get("valid_from"), f"{where}.valid_from"),
+        _day(values.get("valid_to"), f"{where}.valid_to"),
+    )
+    if start is not None and end is not None and end <= start:
+        raise ValueError(f"{where}: a label ends after it starts")
+    if kind == "ballot":
+        listed = conn.execute(
+            "select count(*) from contest_option where contest_id = %s and kind in ('candidate', 'ticket', 'list')",
+            [entity],
+        ).fetchone()
+        if listed is not None and listed[0] > 0:
+            raise ValueError(f"{where}: this contest lists candidates, so nobody-qualified does not apply")
+        if start is None:
+            held = conn.execute(
+                "select e.date_from from contest c join election e on e.id = c.election_id where c.id = %s", [entity]
+            ).fetchone()
+            start = None if held is None else held[0]
+    if conn.execute(
+        "select from label where entity_id = %s and kind = %s and value = %s and valid_to is null",
+        [entity, kind, value],
+    ).fetchone():
+        raise ValueError(f"{where}: this record already has that {kind} label")
+    id = uuid7()
+    cs.add(
+        "label",
+        id=id,
+        entity_id=entity,
+        kind=kind,
+        value=value,
+        assessor=assessor,
+        source_id=source,
+        valid_from=start,
+        valid_from_precision="day",
+        valid_to=end,
+        valid_to_precision="day",
+    )
+    return entity, str(id)
 
 
 def _cite(
@@ -1259,6 +1333,20 @@ def compile(
                         proofs.get(key, {}),
                         {"table": "party_color", "row": label, "column": column, "op": op.get("op")},
                     )
+            continue
+        if op.get("op") == "label":
+            if not cited:
+                raise ValueError(f"{where}: a label needs evidence")
+            owner, label = _label(conn, cs, op, where, sources[cited[0]])
+            for key in cited:
+                _cite(
+                    cs,
+                    owner,
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {"table": "label", "row": label, "op": "add"},
+                )
             continue
         if op.get("op") == "image":
             linked = None

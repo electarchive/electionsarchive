@@ -139,10 +139,29 @@ const TABLES: Record<
     evidence: "required",
     columns: {},
   },
+  label: {
+    ops: ["label", "drop"],
+    tier: 1,
+    evidence: "required",
+    columns: {
+      entity_id: { type: "uuid", required: true },
+      kind: {
+        type: "enum",
+        values: ["ballot", "integrity", "recognition", "data_quality"],
+        required: true,
+      },
+      value: { type: "text, up to 200 characters", required: true },
+      assessor: {
+        type: "text, up to 200 characters; required for integrity and recognition",
+        required: false,
+      },
+      valid_from: { type: "date", required: false },
+      valid_to: { type: "date", required: false },
+    },
+  },
 };
 
 const DROP_ONLY = [
-  "label",
   "alliance_member",
   "candidacy_nomination",
   "government_party",
@@ -239,6 +258,21 @@ export const GUIDE = {
     cite: {
       shape: { op: "cite", entity_id: "uuid", evidence: ["e1"] },
       note: "Adds a citation of a source to a record that doesn't cite it yet.",
+    },
+    label: {
+      shape: {
+        op: "label",
+        values: {
+          entity_id: "uuid",
+          kind: "ballot, integrity, recognition, or data_quality",
+          value: "what the label says",
+          assessor: "the outside body that made the assessment",
+          valid_from: "YYYY-MM-DD, optional",
+          valid_to: "YYYY-MM-DD, optional",
+        },
+        evidence: ["e1"],
+      },
+      note: "Adds a label to a record, citing the first evidence key as its source. ballot goes on a contest that lists no candidates, and its only value is no_candidate_qualified (it starts on the election date unless given). integrity goes on an election or polity and recognition on a polity or area; both name an outside assessor, such as OSCE/ODIHR, because the archive never makes those judgments itself. data_quality goes on any record. Remove a label with drop by id.",
     },
     translate: {
       shape: {

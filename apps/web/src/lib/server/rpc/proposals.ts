@@ -25,6 +25,7 @@ const Payload = {
           "translate",
           "image",
           "cite",
+          "label",
           "results",
           "correct",
         ]),

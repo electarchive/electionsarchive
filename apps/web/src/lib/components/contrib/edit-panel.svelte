@@ -8,6 +8,7 @@
   import X from "@lucide/svelte/icons/x";
   import { SvelteSet } from "svelte/reactivity";
   import type { Change, Editable, Origin, Scheme } from "#lib/contrib.js";
+  import LabelsSection from "#lib/components/contrib/labels-section.svelte";
   import Proof from "#lib/components/contrib/proof.svelte";
   import ResultsGrid from "#lib/components/contrib/results-grid.svelte";
   import UploadEvidence from "#lib/components/contrib/upload-evidence.svelte";
@@ -132,6 +133,8 @@
   let submitted = $state<number | null>(null);
   let figures = $state<Change | null>(null);
   let badFigures = $state(false);
+  let labelChanges = $state<Array<Change>>([]);
+  let badLabel = $state(false);
 
   $effect(() => {
     if (!open) {
@@ -496,6 +499,7 @@
     if (figures != null) {
       list.push(figures);
     }
+    list.push(...labelChanges);
     return list;
   });
   const invalid = $derived(
@@ -515,7 +519,8 @@
       ) ||
       colorProblem != null ||
       imageProblem != null ||
-      badFigures,
+      badFigures ||
+      badLabel,
   );
   const dated = $derived(
     image != null && (image.from.trim() !== "" || image.to.trim() !== ""),
@@ -528,6 +533,7 @@
         change.kind === "cite" ||
         change.kind === "results" ||
         change.kind === "correct" ||
+        change.kind === "label" ||
         change.kind.startsWith("color_") ||
         (change.kind === "translate" && change.origin === "official"),
     ),
@@ -592,6 +598,8 @@
     image = null;
     figures = null;
     badFigures = false;
+    labelChanges = [];
+    badLabel = false;
     cite = false;
     uncites.clear();
     source = null;
@@ -1771,6 +1779,13 @@
               >
             {/if}
           </section>
+
+          <LabelsSection
+            labels={data.labels}
+            {signedIn}
+            bind:changes={labelChanges}
+            bind:invalid={badLabel}
+          />
 
           <section class="border-be px-4 py-3" aria-labelledby="edit-citations">
             <h3 id="edit-citations" class="text-sm font-bold">

@@ -72,6 +72,38 @@ export const isDay = (value: string) =>
 
 export const precisions = ["day", "month", "year", "unknown"] as const;
 
+export const labelKinds = [
+  "ballot",
+  "integrity",
+  "recognition",
+  "data_quality",
+] as const;
+
+export type LabelKind = (typeof labelKinds)[number];
+
+export const labelTypes: Record<LabelKind, Array<string> | null> = {
+  ballot: ["contest"],
+  integrity: ["election", "polity"],
+  recognition: ["polity", "area"],
+  data_quality: null,
+};
+
+export const ballotValues = ["no_candidate_qualified"] as const;
+
+export const assessed = new Set<LabelKind>(["integrity", "recognition"]);
+
+export const labelKindLabel: Record<LabelKind, () => string> = {
+  ballot: m.label_kind_ballot,
+  integrity: m.label_kind_integrity,
+  recognition: m.label_kind_recognition,
+  data_quality: m.label_kind_data_quality,
+};
+
+export const labelValue = (value: string) =>
+  value === "no_candidate_qualified"
+    ? m.label_value_no_candidate_qualified()
+    : value;
+
 export type Precision = (typeof precisions)[number];
 
 export const dated = (value: string, precision: Precision) =>
@@ -251,6 +283,15 @@ export type Change =
   | { kind: "image"; file: string; from: string | null; to: string | null }
   | { kind: "cite" }
   | { kind: "cite_drop"; id: string }
+  | {
+      kind: "label";
+      label: LabelKind;
+      value: string;
+      assessor: string | null;
+      from: string | null;
+      to: string | null;
+    }
+  | { kind: "label_drop"; id: string }
   | { kind: "id_add"; scheme: Scheme; value: string }
   | { kind: "id_drop"; scheme: Scheme; value: string }
   | { kind: "color_set"; from: string | null; color: string }
@@ -439,6 +480,18 @@ export type Editable = {
     own: Array<string>;
   }>;
   open: Array<{ number: number; title: string; state: ProposalState }>;
+  labels: {
+    held: Array<{
+      id: string;
+      kind: LabelKind;
+      value: string;
+      assessor: string | null;
+      valid_from: string | null;
+      valid_to: string | null;
+      source: string | null;
+    }>;
+    kinds: Array<LabelKind>;
+  };
   results: {
     options: Array<{
       id: string;

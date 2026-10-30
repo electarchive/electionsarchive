@@ -11,7 +11,13 @@ import type {
   Prescreen,
   ProposalState,
 } from "#lib/contrib.js";
-import { schemes } from "#lib/contrib.js";
+import {
+  assessed,
+  ballotValues,
+  labelKinds,
+  labelTypes,
+  schemes,
+} from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 
 const notify = sql`select pg_notify('proposal_job', json_build_object('kind', 'queued')::text)`;
@@ -76,6 +82,7 @@ export async function editable(entityId: string): Promise<Editable> {
     open,
     options,
     sets,
+    labels,
   ] = await Promise.all([
     db.execute<Editable["names"][number]>(sql`
       with shown as (
@@ -125,8 +132,17 @@ export async function editable(entityId: string): Promise<Editable> {
       where pc.party_id = ${entityId}
       order by pc.valid_from nulls first
     `),
-    db.execute<{ party: boolean; person: boolean; contest: boolean }>(sql`
-      select exists (select from party where id = ${entityId}) as party,
+    db.execute<{
+      party: boolean;
+      person: boolean;
+      contest: boolean;
+      type: string | null;
+      listed: boolean;
+    }>(sql`
+      select (select type::text from entity where id = ${entityId}) as type,
+             exists (select from contest_option where contest_id = ${entityId}
+                     and kind in ('candidate', 'ticket', 'list')) as listed,
+             exists (select from party where id = ${entityId}) as party,
              exists (select from person where id = ${entityId}) as person,
              exists (select from contest where id = ${entityId}) as contest
     `),
@@ -203,7 +219,16 @@ export async function editable(entityId: string): Promise<Editable> {
       where r.contest_id = ${entityId} and r.status = 'active'
       order by r.is_default desc, r.stage, r.k
     `),
+    db.execute<Editable["labels"]["held"][number]>(sql`
+      select l.id, l.kind::text as kind, l.value, l.assessor, l.valid_from::text, l.valid_to::text,
+             s.title as source
+      from label l
+      left join source s on s.id = l.source_id
+      where l.entity_id = ${entityId}
+      order by l.kind, l.valid_from nulls first, l.id
+    `),
   ]);
+  const type = kind.rows[0]?.type ?? null;
   return {
     names: names.rows,
     notes: notes.rows,
@@ -219,6 +244,15 @@ export async function editable(entityId: string): Promise<Editable> {
     sources: sources.rows,
     citations: citations.rows,
     open: open.rows,
+    labels: {
+      held: labels.rows,
+      kinds: labelKinds.filter(
+        (label) =>
+          (labelTypes[label] == null ||
+            (type != null && labelTypes[label].includes(type))) &&
+          !(label === "ballot" && kind.rows[0]?.listed === true),
+      ),
+    },
     results:
       kind.rows[0]?.contest === true
         ? { options: options.rows, sets: sets.rows }
@@ -299,6 +333,24 @@ export async function cells({
   };
 }
 
+const ballot = new Set<string>(ballotValues);
+
+const fitLabels = (
+  labeled: Array<Extract<Change, { kind: "label" }>>,
+  type: string | null,
+) => {
+  for (const change of labeled) {
+    const types = labelTypes[change.label];
+    if (
+      (types != null && (type == null || !types.includes(type))) ||
+      (change.assessor == null && assessed.has(change.label)) ||
+      (change.label === "ballot" && !ballot.has(change.value))
+    ) {
+      error(400, "That kind of label doesn't fit this record.");
+    }
+  }
+};
+
 export async function propose({
   userId,
   entityId,
@@ -340,6 +392,7 @@ export async function propose({
     change.kind === "correct" ||
     change.kind === "name" ||
     change.kind === "cite" ||
+    change.kind === "label" ||
     change.kind.startsWith("color_") ||
     (change.kind === "translate" && change.origin === "official");
   const canCite = (change: Change) =>
@@ -349,7 +402,7 @@ export async function propose({
   if (evidence == null && changes.some((change) => requiresSource(change))) {
     error(
       400,
-      "A name, color, logo date, citation, official translation, or result needs a source.",
+      "A name, color, logo date, citation, label, official translation, or result needs a source.",
     );
   }
   if (
@@ -365,6 +418,12 @@ export async function propose({
     error(400, "A proposal can cite one source.");
   }
   const hasCite = changes.some((change) => change.kind === "cite");
+  const labeled = changes.flatMap((change) =>
+    change.kind === "label" ? [change] : [],
+  );
+  const unlabeled = changes.flatMap((change) =>
+    change.kind === "label_drop" ? [change.id] : [],
+  );
   const uncited = changes.flatMap((change) =>
     change.kind === "cite_drop" ? [change.id] : [],
   );
@@ -407,6 +466,7 @@ export async function propose({
     ok: boolean;
     party: boolean;
     held: boolean;
+    type: string | null;
   }>(sql`
     select (select count(*) from name where id = any(${`{${nameIds.join(",")}}`}::uuid[]) and entity_id = ${entityId})
              = ${nameIds.length}
@@ -433,7 +493,10 @@ export async function propose({
        and (select count(*) from citation c join changeset ch on ch.id = c.changeset_id
             where c.id = any(${`{${uncited.join(",")}}`}::uuid[]) and c.entity_id = ${entityId}
               and ch.pipeline = 'contrib' and c.locator ->> 'op' = 'cite')
-             = ${new Set(uncited).size} as ok,
+             = ${new Set(uncited).size}
+       and (select count(*) from label where id = any(${`{${unlabeled.join(",")}}`}::uuid[]) and entity_id = ${entityId})
+             = ${new Set(unlabeled).size} as ok,
+       (select type::text from entity where id = ${entityId} and retired_by is null) as type,
        exists (select from party where id = ${entityId}) as party,
        ${hasCite} and exists (select from citation where entity_id = ${entityId} and source_id = ${sourceId}::uuid) as held
   `);
@@ -446,6 +509,7 @@ export async function propose({
   if (rows[0].held) {
     error(400, "This record already cites that source.");
   }
+  fitLabels(labeled, rows[0].type);
   const cited = (() => {
     switch (evidence?.type) {
       case undefined: {
@@ -546,6 +610,22 @@ export async function propose({
       }
       case "cite_drop": {
         return { op: "drop", table: "citation", id: change.id };
+      }
+      case "label": {
+        return {
+          op: "label",
+          values: {
+            entity_id: entityId,
+            kind: change.label,
+            value: change.value,
+            ...(change.assessor != null && { assessor: change.assessor }),
+            ...(change.from != null && { valid_from: change.from }),
+            ...(change.to != null && { valid_to: change.to }),
+          },
+        };
+      }
+      case "label_drop": {
+        return { op: "drop", table: "label", id: change.id };
       }
       case "id_add": {
         return {

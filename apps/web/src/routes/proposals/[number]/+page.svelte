@@ -107,6 +107,7 @@
     person_image: m.proposal_table_person_image,
     result_set: m.proposal_table_result_set,
     outcome: m.proposal_table_outcome,
+    label: m.proposal_table_label,
   };
   const fields: Record<string, () => string> = {
     source_id: m.proposal_field_source,
@@ -126,6 +127,8 @@
     status: m.proposal_field_status,
     as_of: m.proposal_field_as_of,
     seats: m.proposal_field_seats,
+    value: m.proposal_field_value,
+    assessor: m.proposal_field_assessor,
   };
   const hidden = new Set([
     "id",
