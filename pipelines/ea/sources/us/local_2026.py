@@ -2020,6 +2020,7 @@ for key, publisher, title, url, local in (
     ("MO-29221", "Washington County Clerk", "Official Ballot, General Election, November 3, 2026", "https://www.washcoclerkmo.gov/wp-content/uploads/2026/10/Nov-3-2026-Sample-Ballots.pdf", "mo/washington.pdf"),
     ("MO-29049", "Clinton County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://clintoncomo.org/wp-content/uploads/2026/09/Clinton-Publication-110326.pdf", "mo/clinton.pdf"),
     ("MO-29229", "Wright County Clerk", "Official General Election Ballot, November 3, 2026", "https://eadn-wc01-3570615.nxedge.io/wp-content/uploads/Publication-Ballot.pdf", "mo/wright.pdf"),
+    ("MT-30111", "Yellowstone County Election Administrator", "November 2026 General Election Candidate List (memo to the County Commissioners, August 10, 2026)", "https://www.yellowstonecountymt.gov/BOCCDocs/2026/BOCCDIS/20260813_1601/16873_Letter_to_Commissioners_regarding_candidates.pdf", "mt/yellowstone_gen.pdf"),
     ("IL-17099", "La Salle County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://www.lasallecountyil.gov/DocumentCenter/View/4565/Specimen-Ballot-PDF", "il/lasalle.pdf"),
     ("IL-17133", "Monroe County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.mococlerk.com/files/2026%20GE%20Publication%20Ballot.pdf", "il/monroe.pdf"),
     ("MO-29127", "Marion County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://marioncounty-mo.gov/wp-content/uploads/2026/09/November-3-2026-General-Election-Sample-Ballot.pdf", "mo/marion.pdf"),
