@@ -1903,6 +1903,18 @@ NE_SOURCES = {
         "https://www.wexfordcounty.org/",
         "mi/wexford.pdf",
     ),
+    "MI-26143": (
+        "Roscommon County Clerk",
+        "Candidate List, November 3, 2026 General Election",
+        "https://www.roscommoncountymi.gov/",
+        "mi/roscommon.pdf",
+    ),
+    "MI-26155": (
+        "Shiawassee County Clerk",
+        "Candidate List, November 3, 2026 General Election",
+        "https://www.shiawasseecounty.org/",
+        "mi/shiawassee.pdf",
+    ),
     "MI-26073": (
         "Isabella County Clerk",
         "Sample Ballots, November 3, 2026 General Election",
