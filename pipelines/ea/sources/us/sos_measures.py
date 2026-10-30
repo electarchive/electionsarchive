@@ -342,6 +342,9 @@ WI_FILES = {
         ("Definition of Marriage", "Death Penalty-Advisory"),
     ),
 }
+IA = "https://web.archive.org/web/20141231002203id_/http://sos.iowa.gov/elections/"
+IA_2008 = IA + "pdf/2008/OfficialCanvass2008General.pdf"
+IA_2010 = IA + "results/xls/2010/general/statewidepct.xlsx"
 KS = "https://sos.ks.gov/elections/22elec/"
 KS_2022 = (
     (
@@ -996,6 +999,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "IA": (
+        "Iowa Secretary of State",
+        "Official canvass and precinct results",
+        "https://sos.iowa.gov/elections/results/index.html",
+    ),
     "WI": (
         "Wisconsin Elections Commission",
         "Canvass results by county",
@@ -1347,6 +1355,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    raw.fetch(SOURCE, IA_2008, suffix=".pdf")
+    raw.fetch(SOURCE, IA_2010, suffix=".xlsx")
     for stamp, file, _ in WI_FILES.values():
         raw.fetch(SOURCE, WI.format(stamp, file), suffix=".pdf")
         time.sleep(1)
@@ -3838,6 +3848,66 @@ def wisconsin() -> list[dict[str, object]]:
     return rows
 
 
+def iowa() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, IA_2008).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    counties: dict[str, tuple[int, int]] = {}
+    totals: tuple[int, int] | None = None
+    reading = False
+    for text_line in text.splitlines():
+        if text_line.startswith("Constitutional Amendment - 1"):
+            reading = True
+        elif reading and (match := re.match(r"^([A-Z][A-Za-z.' ]+?):?\s+(\d+)\s+(\d+)\s+\d+\s*$", text_line)):
+            pair = (int(match[2]), int(match[3]))
+            if match[1] == "Total":
+                totals = pair
+                break
+            counties[match[1]] = pair
+    if len(counties) != 99 or tuple(sum(pair[side] for pair in counties.values()) for side in (0, 1)) != totals:
+        raise ValueError(f"{IA_2008}: {len(counties)} counties do not add up to {totals}")
+    rows: list[dict[str, object]] = [
+        {
+            "state": "IA",
+            "day": date(2008, 11, 4),
+            "number": "1",
+            "label": "Constitutional Amendment Question",
+            "url": IA_2008,
+            "county": county,
+            "answer": answer,
+            "votes": pair[side],
+        }
+        for county, pair in counties.items()
+        for side, answer in enumerate(("YES", "NO"))
+    ]
+    table = fastexcel.read_excel(str(raw.cached(SOURCE, IA_2010).path)).load_sheet_by_idx(0, header_row=None).to_polars()
+    table = table.rename({column: f"c{index}" for index, column in enumerate(table.columns)})
+    for office, number in (("Constitutional Amendment 1", "1"), ("Constitutional Convention Question", "2")):
+        sums = (
+            table.filter(pl.col("c0") == office, pl.col("c1") != "County")
+            .with_columns(yes=pl.col("c3").cast(pl.Int64), no=pl.col("c4").cast(pl.Int64))
+            .group_by("c1")
+            .agg(pl.col("yes").sum(), pl.col("no").sum())
+        )
+        if sums.height != 99:
+            raise ValueError(f"{IA_2010} {office}: {sums.height} counties")
+        rows.extend(
+            {
+                "state": "IA",
+                "day": date(2010, 11, 2),
+                "number": number,
+                "label": office,
+                "url": IA_2010,
+                "county": county,
+                "answer": answer,
+                "votes": votes,
+            }
+            for county, yes, no in sums.iter_rows()
+            for answer, votes in (("YES", yes), ("NO", no))
+        )
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -4451,6 +4521,7 @@ def parse() -> None:
             *north_carolina(),
             *west_virginia(),
             *wisconsin(),
+            *iowa(),
             *utah(),
             *wyoming(),
             *south_carolina(),
@@ -4549,7 +4620,7 @@ def parse() -> None:
                 else f"Public Question {number}"
                 if state == "NJ"
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY", "UT")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY", "UT", "IA")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
