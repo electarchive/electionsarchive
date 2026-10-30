@@ -354,3 +354,39 @@ export const activity = snakeCase.table(
     index("activity_polity_ids_idx").using("gin", t.polityIds),
   ],
 );
+
+export const archiveCaptureStatus = pgEnum("archive_capture_status", [
+  "captured",
+  "blocked",
+  "failed",
+]);
+
+export const archiveCapture = snakeCase.table(
+  "archive_capture",
+  {
+    id: primaryId(),
+    ownerUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    url: text().notNull(),
+    finalUrl: text(),
+    waybackUrl: text(),
+    status: archiveCaptureStatus().notNull(),
+    error: text(),
+    rawSha256: text(),
+    rawKey: text(),
+    mediaType: text(),
+    bytes: bigint({ mode: "number" }),
+    capturedAt: time().notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      "archive_capture_sha256_check",
+      sql`${t.rawSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "archive_capture_raw_check",
+      sql`(${t.status} = 'captured') = (${t.rawSha256} is not null and ${t.rawKey} is not null)`,
+    ),
+    index("archive_capture_owner_idx").on(t.ownerUserId, t.capturedAt.desc()),
+    index("archive_capture_sha256_idx").on(t.rawSha256),
+  ],
+);
