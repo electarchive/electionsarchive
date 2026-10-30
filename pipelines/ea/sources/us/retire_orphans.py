@@ -73,12 +73,13 @@ def emit() -> Path:
                          and (not exists (select from candidacy y where y.person_id = p.id)
                               or (exists (select from candidacy y where y.person_id = p.id and y.id = any(%s::uuid[]))
                                   and not exists (select from candidacy y where y.person_id = p.id and not y.id = any(%s::uuid[]))))
+                         and (%s = '' or exists (select from name q where q.entity_id = p.id and q.text ~ %s))
                          and not exists (select from entity_merge m where m.entity_id = p.id or m.into_id = p.id)
                          and not exists (select from name n join changeset w on w.id = n.changeset_id
                                          where n.entity_id = p.id and w.pipeline <> all(%s))
                          and not exists (select from external_id x join changeset w on w.id = x.changeset_id
                                          where x.entity_id = p.id and w.pipeline <> %s)""",
-                    [pipeline, candidacies, candidacies, [pipeline, "shorts", "identity"], pipeline],
+                    [pipeline, candidacies, candidacies, os.environ.get("RETIRE_NAMES", ""), os.environ.get("RETIRE_NAMES", ""), [pipeline, "shorts", "identity"], pipeline],
                 ).fetchall()
             ]
             for relation, column in references:
@@ -102,6 +103,13 @@ def emit() -> Path:
                                      where r.contest_id = k.id and w.pipeline <> %s)""",
                 [pipeline, pipeline],
             ).fetchall()
+            for pattern in filter(None, os.environ.get("RETIRE_SLUGS", "").split(",")):
+                future += conn.execute(
+                    """select k.id from contest k join changeset c on c.id = k.changeset_id
+                       join slug s on s.entity_id = k.id and s.is_current
+                       where c.pipeline = %s and s.path ~ %s""",
+                    [pipeline, pattern],
+                ).fetchall()
             for (contest,) in future:
                 cs.add("entity_retirement", entity_id=contest, reason="Results dated before the election was held")
             for row in conn.execute(

@@ -151,6 +151,7 @@ def normalize(text: str) -> str:
     text = re.sub(r"\bHCCSN?\b|\bHCC\b|\bHouston Comm(?:unity)? Col(?:lege)? Dist\w*(?: \d+)?", "Houston Community College District", text, flags=re.I)
     text = re.sub(r"\bU D\b", "Utility District", text, flags=re.I)
     text = re.sub(r"\bCity of W University\b", "City of West University", text, flags=re.I)
+    text = re.sub(r"^(County Commissioner(?:s Court)?,?) Precinct (\d)\b", r"\1 District \2", text, flags=re.I)
     text = re.sub(r"\bAlder ?person\b", "Alderman", text, flags=re.I)
     text = re.sub(r"\bREG WA\b", "Regional Water Authority", text, flags=re.I)
     text = re.sub(r"\bDistrict (VIII|VII|VI|IV|IX|III|II|V|I)\b", lambda m: f"District {ROMAN[m[1].upper()]}", text, flags=re.I)
