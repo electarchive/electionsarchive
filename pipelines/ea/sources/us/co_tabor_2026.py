@@ -32,6 +32,11 @@ COUNTIES = {
         None,
         "El Paso County Clerk and Recorder",
     ),
+    "08005": (
+        "https://www.arapahoeco.gov/Clerk%20and%20Recorder/ArapahoeVotes/Documents/TABOR%20Notice%202026.pdf?t=202609291813040",
+        None,
+        "Arapahoe County Clerk and Recorder",
+    ),
     "08035": (
         "https://www.douglas.co.us/documents/2026-general-election-ballot-issue-notices-booklet.pdf",
         "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
@@ -95,6 +100,33 @@ def elpaso_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
+ARAPAHOE_ISSUES = (
+    ("Arapahoe County School District No. 6", "4A"),
+    ("Bennett Fire Protection District", "7F"),
+    ("Bennett Fire Protection District", "7G"),
+    ("Bennett School District No. 29J", "5A"),
+    ("City of Aurora", "3A"),
+    ("City of Aurora", "3B"),
+    ("City of Aurora", "3C"),
+    ("City of Centennial", "2A"),
+    ("City of Sheridan", "2D"),
+    ("Hills at Cherry Creek Metropolitan District", "6A"),
+)
+ARAPAHOE_END = re.compile(r"^\s*(FISCAL INFORMATION|Total District|Actual Historical|Summary of Written)")
+
+
+def arapahoe_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    cursor = next(index for index, line in enumerate(lines) if "Your Voting Options" in line and "...." not in line)
+    for entity, issue in ARAPAHOE_ISSUES:
+        cursor = next(index for index in range(cursor, len(lines)) if re.match(rf"^\s*(.+ )?BALLOT ISSUE {issue}\b", lines[index]))
+        start = next(index for index in range(cursor, cursor + 20) if lines[index].lstrip().startswith("SHALL"))
+        end = next(index for index in range(start, start + 80) if ARAPAHOE_END.match(lines[index]))
+        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start:end] if line.strip() and not line.strip().isdigit() and line.strip().upper() != entity.upper())).strip()
+        rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
+    return rows
+
+
 def larimer_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for index, line in enumerate(lines):
@@ -134,7 +166,7 @@ def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-PARSERS = {"08059": jeffco_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
+PARSERS = {"08059": jeffco_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
 
 
 def parse() -> None:
