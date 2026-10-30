@@ -347,6 +347,19 @@ IA_2008 = IA + "pdf/2008/OfficialCanvass2008General.pdf"
 IA_2010 = IA + "results/xls/2010/general/statewidepct.xlsx"
 MS = "https://web.archive.org/web/2022id_/https://www.sos.ms.gov/links/elections/results/statewide/Statewide%20Initiative%20Measure%20{}%20-%20General%20Election%202011%20Results.pdf"
 MS_2011 = ("26", "27", "31")
+INBOX = DATA / "inbox" / "manual"
+KY_PAGE = "https://elect.ky.gov/results/#{}"
+KY_FILES = {
+    date(2000, 11, 7): "MF-429/2000-11/ky-2000-general-county-results.txt",
+    date(2002, 11, 5): "MF-429/2002-11/ky-2002-general-county-results.txt",
+    date(2004, 11, 2): "MF-429/2004-11/ky-2004-general-county-results.txt",
+}
+TN_PAGE = "https://sos.tn.gov/elections/election-results#{}"
+TN_FILES = {
+    date(2002, 11, 5): ("MF-430/2002-11/amendments.pdf", ("1", "2")),
+    date(2006, 11, 7): ("MF-430/2006-11/RptCtyCon1andCon2.pdf", ("1", "2")),
+    date(2010, 11, 2): ("MF-430/2010-11/CACounty.pdf", ("1",)),
+}
 KS = "https://sos.ks.gov/elections/22elec/"
 KS_2022 = (
     (
@@ -1001,6 +1014,16 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "TN": (
+        "Tennessee Secretary of State",
+        "Certified county results",
+        "https://sos.tn.gov/elections/election-results",
+    ),
+    "KY": (
+        "Kentucky State Board of Elections",
+        "Official election night tally results by county",
+        "https://elect.ky.gov/results/",
+    ),
     "MS": (
         "Mississippi Secretary of State",
         "Total votes reported by county",
@@ -1245,6 +1268,20 @@ def tx_races(election: int) -> list[tuple[int, str]]:
     ]
 
 
+def store_manual(url: str, file: str, media_type: str) -> None:
+    try:
+        raw.cached(SOURCE, url)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            url,
+            (INBOX / file).read_bytes(),
+            suffix=Path(file).suffix,
+            retrieved_at=datetime.fromtimestamp((INBOX / file).stat().st_mtime, UTC),
+            media_type=media_type,
+        )
+
+
 def fetch() -> None:
     for stamp, folder in NV_PAGES.values():
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
@@ -1364,6 +1401,10 @@ def fetch() -> None:
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
     for number in MS_2011:
         raw.fetch(SOURCE, MS.format(number), suffix=".pdf")
+    for day, file in KY_FILES.items():
+        store_manual(KY_PAGE.format(day.year), file, "text/plain")
+    for day, (file, _) in TN_FILES.items():
+        store_manual(TN_PAGE.format(day.year), file, "application/pdf")
     raw.fetch(SOURCE, IA_2008, suffix=".pdf")
     raw.fetch(SOURCE, IA_2010, suffix=".xlsx")
     for stamp, file, _ in WI_FILES.values():
@@ -3954,6 +3995,76 @@ def mississippi() -> list[dict[str, object]]:
     return rows
 
 
+def kentucky() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, file in KY_FILES.items():
+        url = KY_PAGE.format(day.year)
+        text = raw.cached(SOURCE, url).path.read_text(errors="replace")
+        county = ""
+        counties: dict[str, dict[str, tuple[int, int]]] = {}
+        for text_line in text.splitlines():
+            if match := re.match(r"^\s+([A-Z][A-Z .'-]+?)\s+COUNTY REPORT OF", text_line):
+                county = match[1]
+            elif match := re.match(r"^\s+Constitutional Amendment\s*#\s*(\d+)\s+([\d,]+)\s+([\d,]+)\s*$", text_line):
+                counties.setdefault(match[1], {})[county] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+        for number, by_county in counties.items():
+            if len(by_county) != 120:
+                raise ValueError(f"{file} amendment {number}: {len(by_county)} counties")
+            rows.extend(
+                {
+                    "state": "KY",
+                    "day": day,
+                    "number": number,
+                    "label": f"Constitutional Amendment {number}",
+                    "url": url,
+                    "county": place.title(),
+                    "answer": answer,
+                    "votes": pair[side],
+                }
+                for place, pair in by_county.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
+def tennessee() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, (file, numbers) in TN_FILES.items():
+        url = TN_PAGE.format(day.year)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        figure = r"\s+([\d,]+)" * (2 * len(numbers))
+        counties: dict[str, list[int]] = {}
+        totals: list[int] = []
+        for text_line in text.splitlines():
+            if match := re.match(rf"^\s*([A-Z][A-Z .'-]+?){figure}\s*$", text_line):
+                values = [int(value.replace(",", "")) for value in match.groups()[1:]]
+                if match[1] == "STATEWIDE TOTALS":
+                    totals = values
+                else:
+                    counties[match[1]] = values
+        sums = [sum(values[index] for values in counties.values()) for index in range(2 * len(numbers))]
+        if len(counties) != 95 or sums != totals:
+            raise ValueError(f"{file}: {len(counties)} counties add up to {sums}, not {totals}")
+        for index, number in enumerate(numbers):
+            rows.extend(
+                {
+                    "state": "TN",
+                    "day": day,
+                    "number": number,
+                    "label": f"Constitutional Amendment {number}",
+                    "url": url,
+                    "county": place.title(),
+                    "answer": answer,
+                    "votes": values[2 * index + side],
+                }
+                for place, values in counties.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -4569,6 +4680,8 @@ def parse() -> None:
             *wisconsin(),
             *iowa(),
             *mississippi(),
+            *kentucky(),
+            *tennessee(),
             *utah(),
             *wyoming(),
             *south_carolina(),
