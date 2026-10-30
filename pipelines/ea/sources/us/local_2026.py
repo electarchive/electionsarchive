@@ -1807,6 +1807,12 @@ NE_SOURCES = {
         "https://www.yavapaicoesa.gov/election-services",
         "az/yavapai_schools.html",
     ),
+    "MI-26145": (
+        "Saginaw County Clerk",
+        "Unofficial Candidate List, November 3, 2026 General Election",
+        "https://www.saginawcounty.com/",
+        "mi/saginaw.pdf",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
