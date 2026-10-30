@@ -2099,6 +2099,21 @@ def build(full: bool = False) -> str:
         cell[16] += population if n == 0 and found is None else 0
         cell[14] -= population if found is not None and found["category"] == "not_applicable" else 0
         cell[17] += population if population_basis in ("place", "county") else 0
+    measures: dict[tuple[str, int], list[int]] = defaultdict(lambda: [0, 0, 0, 0])
+    for (st, year, level, _), c in by_key.items():
+        if level == "local_measure" and st in names:
+            for i, key in enumerate(("held", "no_results", "upcoming", "pending")):
+                measures[(st, year)][i] += c.get(key, 0)
+    for (st, year), (count, bare, upcoming, pending) in list(measures.items()):
+        if not 2000 <= year <= today.year:
+            continue
+        cell = goals[("local", st, "local_measure", year)]
+        cell[0] += max(count, measures[(st, year - 4)][0] if (st, year - 4) in measures else 0)
+        cell[1] += count - bare - upcoming - pending
+        cell[2] += cell[0] - count
+        cell[3] += bare
+        cell[20] += upcoming
+        cell[21] += pending
 
     with connect() as conn, conn.transaction():
         conn.execute("delete from coverage_goal where polity = 'us'")

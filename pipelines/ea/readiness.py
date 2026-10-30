@@ -19,6 +19,7 @@ LEVELS = (
     "state_upper",
     "state_lower",
     "statewide_measure",
+    "territory",
     "county_office",
     "municipal",
     "school_board",
@@ -34,6 +35,7 @@ LABELS = {
     "state_upper": "State senate",
     "state_lower": "State house",
     "statewide_measure": "Statewide ballot measures",
+    "territory": "Territories (seats)",
     "judicial": "Statewide judicial (states)",
     "county_office": "County offices (governments)",
     "municipal": "Municipal and township offices (governments)",
@@ -62,6 +64,7 @@ COG = {
     "url": "https://www2.census.gov/programs-surveys/gus/datasets/2022/govt_units_2022.ZIP",
 }
 JUDGES = """oe.value ~ '(justice|judge|court|chancellor|magistrate)' and oe.value !~ '(clerk|county-judge)'"""
+TERRITORIES = {"GU", "VI", "AS", "MP"}
 APPELLATE = "(op.kind in ('federal_unit', 'region') or oe.value ~ '(supreme|appeal)')"
 ZONES = {
     "US": "Pacific/Honolulu",
@@ -356,6 +359,7 @@ def measure(conn, day: str) -> dict:
     units = {level["key"]: level["unit"] for level in data["levels"]} | {
         "local_judicial": "races",
         "local_measure": "measures",
+        "territory": "seats",
     }
     cells: dict[tuple[str, str], dict] = defaultdict(
         lambda: dict.fromkeys(
@@ -384,6 +388,7 @@ def measure(conn, day: str) -> dict:
         return found
 
     for cid, st, level, magnitude, candidates, answers, unqualified, polity in conn.execute(OPTIONS_SQL):
+        level = "territory" if st in TERRITORIES and level != "statewide_measure" else level
         has = unqualified or (answers if level in ("statewide_measure", "local_measure") else candidates) >= 1
         if level == "judicial" and st not in judges:
             judges[st] = len(places)
@@ -405,7 +410,7 @@ def measure(conn, day: str) -> dict:
             continue
         if (
             level not in units
-            or level not in ("statewide_exec", "local_judicial", "local_measure")
+            or level not in ("statewide_exec", "local_judicial", "local_measure", "territory")
             and st not in listed[level]
         ):
             continue

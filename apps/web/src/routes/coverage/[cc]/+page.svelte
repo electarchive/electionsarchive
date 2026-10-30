@@ -29,7 +29,6 @@
     GAP_GRAINS,
     gapSpan,
     gapTried,
-    weighted,
   } from "#lib/coverage.js";
   import Tone from "#routes/coverage/tone.svelte";
 
@@ -438,13 +437,7 @@
   </dl>
 {/snippet}
 
-{#snippet legend(
-  counts: Counts,
-  shown: Counts,
-  goal: Goal,
-  isWeighted: boolean,
-  tierKey: string,
-)}
+{#snippet legend(counts: Counts, shown: Counts, goal: Goal, tierKey: string)}
   <ul class="grid gap-y-2 text-sm">
     {#each REASONS[goal].filter((reason) => reason === "complete" || shown[reason] > 0) as reason (reason)}
       {const definition = $derived(
@@ -473,13 +466,7 @@
         <Tone {reason} class="mbs-1 rounded-xs block-3 inline-3" />
         <span>
           <span class="font-semibold">{label(goal, reason, data.polity)}</span>
-          <span class="tabular-nums"
-            >{isWeighted
-              ? m.coverage_population_share({
-                  percent: percent(shown[reason] / shown.total, 1),
-                })
-              : count(counts[reason])}</span
-          >
+          <span class="tabular-nums">{count(counts[reason])}</span>
           <span class="block text-xs text-muted-foreground"
             >{definition}{#if span != null}{" "}{(span.from >= 2000 &&
                 span.to <= 2002
@@ -659,33 +646,17 @@
   isBonus: boolean,
 )}
   {const isWeighted = $derived(goal === "local" && counts.populationTotal > 0)}
-  {const shown = $derived(
-    isWeighted
-      ? weighted(counts)
-      : isBonus
-        ? { ...counts, unshaped: 0 }
-        : counts,
-  )}
+  {const shown = $derived(isBonus ? { ...counts, unshaped: 0 } : counts)}
   {const held = $derived(counts.total - counts.absent)}
   <div class="grid content-start gap-2 min-inline-0">
     <p class="text-xs font-bold tracking-wide text-muted-foreground uppercase">
       {title}
     </p>
-    {#if isWeighted}
-      <p class="text-lg font-bold tracking-[-0.01em] tabular-nums">
-        {m.coverage_progress_local_population({
-          percent: percent(
-            counts.populationComplete / counts.populationTotal,
-            1,
-          ),
-        })}
-      </p>
-    {/if}
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm tabular-nums"
     >
-      <span class={cn({ "text-lg font-bold tracking-[-0.01em]": !isWeighted })}>
-        {(isWeighted ? m.coverage_progress_local_count : progress)({
+      <span class="text-lg font-bold tracking-[-0.01em]">
+        {progress({
           complete: count(counts.complete),
           total: count(counts.total),
         })}
@@ -735,15 +706,19 @@
         </span>
       {/if}
     </p>
-    <Bar
-      counts={shown}
-      {goal}
-      polity={data.polity}
-      population={isWeighted}
-      class="block-3"
-    />
+    {#if isWeighted}
+      <p class="text-sm text-muted-foreground tabular-nums">
+        {m.coverage_progress_local_population({
+          percent: percent(
+            counts.populationComplete / counts.populationTotal,
+            1,
+          ),
+        })}
+      </p>
+    {/if}
+    <Bar counts={shown} {goal} polity={data.polity} class="block-3" />
     <div class="hidden pbs-1 md:block">
-      {@render legend(counts, shown, goal, isWeighted, tierKey)}
+      {@render legend(counts, shown, goal, tierKey)}
     </div>
     <details class="group md:hidden">
       <summary
@@ -755,7 +730,7 @@
         {m.coverage_legend()}
       </summary>
       <div class="pbs-2">
-        {@render legend(counts, shown, goal, isWeighted, tierKey)}
+        {@render legend(counts, shown, goal, tierKey)}
       </div>
     </details>
     {#if isUs && goal === "history" && tierKey !== "legislative"}

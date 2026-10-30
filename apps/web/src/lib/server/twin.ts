@@ -23,7 +23,6 @@ import {
   spans,
   TIER_LABELS,
   US_COLUMNS,
-  weighted,
   columnGroup,
   ERA_LABELS,
   type Column,
@@ -957,17 +956,15 @@ function coverageMarkdown(
           const isBonus =
             item.goal === "precinct_shapes" && item.column === "precinct_2000";
           const held = row.total - row.absent;
-          const progress = isWeighted
-            ? m.coverage_progress_local_count
-            : !isUs
-              ? lead.progress
-              : item.goal === "local"
-                ? m.coverage_progress_local
-                : item.goal === "turnout"
-                  ? m.coverage_progress_turnout
-                  : item.goal === "precinct_shapes"
-                    ? m.coverage_progress_precincts
-                    : m.coverage_progress;
+          const progress = !isUs
+            ? lead.progress
+            : item.goal === "local"
+              ? m.coverage_progress_local
+              : item.goal === "turnout"
+                ? m.coverage_progress_turnout
+                : item.goal === "precinct_shapes"
+                  ? m.coverage_progress_precincts
+                  : m.coverage_progress;
           const note =
             isUs && item.goal === "history" && tier.key !== "legislative"
               ? m.coverage_note_history_1824()
@@ -987,6 +984,7 @@ function coverageMarkdown(
           return [
             [
               `**${item.title()}**: ${[
+                `${progress({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
                 ...(isWeighted
                   ? [
                       m.coverage_progress_local_population({
@@ -997,7 +995,6 @@ function coverageMarkdown(
                       }),
                     ]
                   : []),
-                `${progress({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
                 ...(row.upcoming > 0
                   ? [m.coverage_upcoming_of({ count: count(row.upcoming) })]
                   : []),
@@ -1037,7 +1034,7 @@ function coverageMarkdown(
                     (row[reason] > 0 && !(isBonus && reason === "unshaped")),
                 )
                 .flatMap((reason) => [
-                  `- ${reasonLabel(item.goal, reason, data.polity)}: ${count(row[reason])}${isWeighted ? ` (${m.coverage_population_share({ percent: percent(weighted(row)[reason] / Math.max(1, row.populationTotal), 1) })})` : ""}`,
+                  `- ${reasonLabel(item.goal, reason, data.polity)}: ${count(row[reason])}`,
                   ...(reason === "complete" && row.upcoming > 0
                     ? [
                         `  - ${m.coverage_upcoming()}: ${count(row.upcoming)}. ${m.coverage_upcoming_def()}`,

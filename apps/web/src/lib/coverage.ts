@@ -35,6 +35,7 @@ export const US_TIERS = {
     "college",
     "special",
     "other",
+    "local_measure",
   ],
   referendums: ["statewide_measure"],
   precinct_shapes: ["precinct"],
@@ -337,19 +338,6 @@ export type Counts = Record<
   number
 >;
 
-export const weighted = (row: Counts): Counts => ({
-  ...row,
-  total: row.populationTotal,
-  complete: row.populationComplete,
-  absent: row.populationAbsent,
-  totals: 0,
-  bare: 0,
-  icpsr: 0,
-  published: 0,
-  upcoming: 0,
-  pending: 0,
-});
-
 export const REASONS: Record<Goal, Array<Reason>> = {
   county: [
     "complete",
@@ -508,6 +496,7 @@ export const READY_LEVELS = [
   "state_upper",
   "state_lower",
   "statewide_measure",
+  "territory",
   "county_office",
   "municipal",
   "school_board",
@@ -539,6 +528,7 @@ export const LEVELS: Record<string, () => string> = {
   local_judicial: m.coverage_level_local_judicial,
   special_district: m.coverage_level_special_district,
   local_measure: m.coverage_level_local_measure,
+  territory: m.coverage_level_territory,
   state_upper: m.coverage_level_state_upper,
   state_lower: m.coverage_level_state_lower,
   statewide_measure: m.coverage_level_statewide_measure,
