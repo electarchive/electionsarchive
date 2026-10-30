@@ -329,6 +329,8 @@ MI_OLD_PROPOSALS = (
     (date(2002, 11, 5), "02", 3, "02-3", "Constitutional amendment granting state classified employees collective bargaining with binding arbitration", "Initiative"),
     (date(2002, 11, 5), "02", 4, "02-4", "Constitutional amendment reallocating tobacco settlement revenue", "Initiative"),
 )
+NC = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
+NC_DAYS = (date(2004, 11, 2), date(2010, 11, 2))
 KS = "https://sos.ks.gov/elections/22elec/"
 KS_2022 = (
     (
@@ -983,6 +985,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "NC": (
+        "North Carolina State Board of Elections",
+        "Official election results by precinct",
+        "https://www.ncsbe.gov/results-data/election-results",
+    ),
     "KS": (
         "Kansas Secretary of State",
         "Official election results by precinct",
@@ -1319,6 +1326,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    for day in NC_DAYS:
+        raw.fetch(SOURCE, NC.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}"), suffix=".zip")
+        time.sleep(1)
     for _, file, *_ in KS_2022:
         raw.fetch(SOURCE, KS + file, suffix=".xlsx")
         time.sleep(1)
@@ -3666,6 +3676,46 @@ def michigan() -> list[dict[str, object]]:
     return rows
 
 
+def north_carolina() -> list[dict[str, object]]:
+    roman = {"I": "1", "II": "2", "III": "3", "IV": "4", "V": "5"}
+    rows: list[dict[str, object]] = []
+    for day in NC_DAYS:
+        url = NC.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}")
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            table = pl.read_csv(
+                archive.read(archive.namelist()[0]), infer_schema=False, encoding="utf8-lossy", truncate_ragged_lines=True
+            )
+        if day.year == 2004:
+            table = table.rename({"contest_name": "contest", "name_on_ballot": "choice", "ballot_count": "total votes"})
+        table = table.filter(pl.col("contest").str.to_uppercase().str.contains("CONSTITUTIONAL AMENDMENT"))
+        for contest in table["contest"].unique().sort().to_list():
+            suffix = contest.upper().removeprefix("NC ").removeprefix("CONSTITUTIONAL AMENDMENT").strip()
+            number = roman.get(suffix, "1")
+            label = f"Constitutional Amendment {suffix}".strip()
+            sums = (
+                table.filter(pl.col("contest") == contest)
+                .with_columns(votes=pl.col("total votes").cast(pl.Int64))
+                .group_by("county", "choice")
+                .agg(pl.col("votes").sum())
+            )
+            if sums["county"].n_unique() != 100:
+                raise ValueError(f"{url} {contest}: {sums['county'].n_unique()} counties")
+            rows.extend(
+                {
+                    "state": "NC",
+                    "day": day,
+                    "number": number,
+                    "label": label,
+                    "url": url,
+                    "county": county.title(),
+                    "answer": {"For": "YES", "Against": "NO"}[choice.strip()],
+                    "votes": votes,
+                }
+                for county, choice, votes in sums.iter_rows()
+            )
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -4276,6 +4326,7 @@ def parse() -> None:
             *michigan(),
             *michigan_old(),
             *kansas(),
+            *north_carolina(),
             *utah(),
             *wyoming(),
             *south_carolina(),
