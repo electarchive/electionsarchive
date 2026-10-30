@@ -799,6 +799,10 @@ SCANNED = (
     " The county figures were read from the scanned canvass book by a vision model and checked against the book's "
     "printed state totals; the box shown on each figure is approximate."
 )
+GA_PRELIMINARY = (
+    " The county figures are the state's page as captured on November 6 or 7, 2010, before certification; the "
+    "certified statewide totals, posted November 15, differ by up to 3,500 votes."
+)
 OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 
 
@@ -3303,12 +3307,13 @@ def emit() -> Path:
                     ballot_label=BALLOT_LABELS.get((state, day, entry["number"]), ("Yes", "No"))[position],
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            preliminary = state == "GA" and day.year == 2010 and entry["number"] != "2010_1102/09000"
             cs.add(
                 "result_set",
                 id=result_set,
                 election_id=election,
                 contest_id=contest,
-                stage="certified",
+                stage="preliminary" if preliminary else "certified",
                 kind="counted",
                 status="active",
                 source_id=sources[state],
@@ -3323,7 +3328,8 @@ def emit() -> Path:
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
-                + (SCANNED if rows["page"].is_not_null().any() else ""),
+                + (SCANNED if rows["page"].is_not_null().any() else "")
+                + (GA_PRELIMINARY if preliminary else ""),
             )
             yes = int(rows.filter(pl.col("answer") == "YES")["votes"].sum())
             no = int(rows.filter(pl.col("answer") == "NO")["votes"].sum())
