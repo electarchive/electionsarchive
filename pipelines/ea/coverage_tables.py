@@ -1849,7 +1849,7 @@ def build(full: bool = False) -> str:
     patterns: dict[tuple[str, str], Counter] = defaultdict(Counter)
     months: dict[tuple[str, str], Counter] = defaultdict(Counter)
     for g in governments:
-        years = held.get(g.get("held_key") or g["polity_id"] or "", {})
+        years = held.get(g["polity_id"] or "", {})
         regular = sorted(y for y, v in years.items() if v[2] and 2000 <= y <= today.year)
         g["month"] = Counter(years[y][3] for y in regular).most_common(1)[0][0] if regular else None
         g["period"] = g["phase"] = g["era"] = None
