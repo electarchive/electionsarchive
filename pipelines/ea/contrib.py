@@ -222,6 +222,11 @@ class Op(TypedDict, total=False):
     cells: list[Cell]
     into: str
     election: dict[str, object]
+    party: str
+    other: str
+    kind: str
+    date: str
+    election_id: str
 
 
 class Payload(TypedDict, total=False):
@@ -258,7 +263,9 @@ def _lang(value: object, where: str) -> str:
         raise ValueError(f"{where}: {error}") from None
 
 
-def _translate(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID | None) -> None:
+def _translate(
+    conn: Connection, cs: Changeset, op: Op, where: str, source: UUID | None, seen: set[tuple[str, str]]
+) -> None:
     of = op.get("of") or {}
     if of.get("table") != "note":
         raise ValueError(f"{where}: only notes can be translated yet")
@@ -285,6 +292,9 @@ def _translate(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID
     ).fetchone()
     if origin == "machine" and held is not None and held[0] != "machine":
         raise ValueError(f"{where}: a machine translation cannot replace the {held[0]} one in {lang}")
+    if (_md5(original), lang) in seen:
+        raise ValueError(f"{where}: this text is already translated into {lang} in this draft")
+    seen.add((_md5(original), lang))
     cs.add(
         "translation",
         source_md5=_md5(original),
@@ -1248,6 +1258,19 @@ OPTION_KINDS: dict[str, tuple[str, ...]] = {
 }
 QUESTION_TYPES = ("initiative", "mandatory_referendum", "optional_referendum", "plebiscite", "recall_question")
 
+RELATION_KINDS = (
+    "merged_into",
+    "split_from",
+    "successor_of",
+    "refounded_as",
+    "absorbed_by",
+    "closed_by_court",
+    "closed_by_government",
+    "list_vehicle_for",
+)
+
+CLOSURES = ("closed_by_court", "closed_by_government")
+
 
 def _typed(conn: Connection, cs: Changeset, value: object, where: str, kind: str) -> UUID:
     entity = _uuid(value, where)
@@ -1428,6 +1451,65 @@ def _election(conn: Connection, cs: Changeset, op: Op, where: str) -> list[UUID]
     return created
 
 
+def _when(value: object, where: str) -> tuple[date | None, str]:
+    text = str(value or "").strip()
+    if not text:
+        return None, "unknown"
+    match = regex.fullmatch(r"(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?", text)
+    if match is None:
+        raise ValueError(f"{where}: {text!r} is not YYYY, YYYY-MM, or YYYY-MM-DD")
+    year, month, day = match.groups()
+    try:
+        when = date(int(year), int(month or 1), int(day or 1))
+    except ValueError:
+        raise ValueError(f"{where}: {text!r} is not a date") from None
+    return when, "day" if day else "month" if month else "year"
+
+
+def _lineage(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID, unlinked: set[UUID]) -> UUID:
+    kind = str(op.get("kind"))
+    if kind not in RELATION_KINDS:
+        raise ValueError(f"{where}.kind: {kind!r} is not one of {', '.join(RELATION_KINDS)}")
+    party = _typed(conn, cs, op.get("party"), f"{where}.party", "party")
+    other = None if op.get("other") is None else _typed(conn, cs, op.get("other"), f"{where}.other", "party")
+    if kind in CLOSURES and other is not None:
+        raise ValueError(f"{where}.other: a closure has no other party")
+    if kind not in CLOSURES and other is None:
+        raise ValueError(f"{where}.other: a {kind} link needs the other party")
+    if other == party:
+        raise ValueError(f"{where}.other: a party cannot link to itself")
+    election = (
+        None
+        if op.get("election_id") is None
+        else _typed(conn, cs, op.get("election_id"), f"{where}.election_id", "election")
+    )
+    if (kind == "list_vehicle_for") != (election is not None):
+        raise ValueError(f"{where}.election_id: only a list_vehicle_for link names its election, and it must")
+    when, precision = _when(op.get("date"), f"{where}.date")
+    held = {
+        row[0]
+        for row in conn.execute(
+            """select id from party_relation where from_party_id = %s and to_party_id is not distinct from %s
+               and kind = %s and election_id is not distinct from %s""",
+            [party, other, kind, election],
+        )
+    }
+    if held - unlinked:
+        raise ValueError(f"{where}: the archive already has this {kind} link")
+    cs.add(
+        "party_relation",
+        id=uuid7(),
+        from_party_id=party,
+        to_party_id=other,
+        kind=kind,
+        date=when,
+        date_precision=precision,
+        election_id=election,
+        source_id=source,
+    )
+    return party
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -1485,6 +1567,9 @@ def compile(
     targets: set[tuple[object, str]] = set()
     colored: set[UUID] = set()
     merging: set[UUID] = set()
+    unlinked: set[UUID] = set()
+    translated: set[tuple[str, str]] = set()
+    links: set[tuple[str, ...]] = set()
     dropped = {
         (str((op.get("key") or {}).get("scheme")), str((op.get("key") or {}).get("value")))
         for op in ops
@@ -1502,6 +1587,8 @@ def compile(
                 raise ValueError(f"{where}: {target[0]} {target[1]} is changed twice")
             targets.add(target)
         if op.get("op") == "drop":
+            if op.get("table") == "party_relation":
+                unlinked.add(_uuid(op.get("id"), f"{where}.id"))
             reason = unicodedata.normalize("NFC", str(op.get("reason") or summary)).strip()
             owner, label = _drop(conn, cs, op, where, reason)
             for key in cited:
@@ -1617,6 +1704,24 @@ def compile(
                         {"op": "election"},
                     )
             continue
+        if op.get("op") == "lineage":
+            if not cited:
+                raise ValueError(f"{where}: a lineage link needs evidence")
+            link = tuple(str(op.get(field)) for field in ("party", "other", "kind", "election_id"))
+            if link in links:
+                raise ValueError(f"{where}: this link is added twice")
+            links.add(link)
+            party = _lineage(conn, cs, op, where, sources[cited[0]], unlinked)
+            for key in cited:
+                _cite(
+                    cs,
+                    party,
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {"table": "party_relation", "op": "lineage"},
+                )
+            continue
         if op.get("op") == "merge":
             id = _uuid(op.get("id"), f"{where}.id")
             into = _uuid(op.get("into"), f"{where}.into")
@@ -1676,7 +1781,7 @@ def compile(
                 other.get("op") == "set" and other.get("table") == "note" and other.get("id") == note for other in ops
             ):
                 raise ValueError(f"{where}: translate note {note} in a separate proposal from its edit")
-            _translate(conn, cs, op, where, sources[cited[0]] if cited else None)
+            _translate(conn, cs, op, where, sources[cited[0]] if cited else None, translated)
             continue
         table = op.get("table", "")
         if table not in EDITABLE:

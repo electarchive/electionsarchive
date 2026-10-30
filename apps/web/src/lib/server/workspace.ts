@@ -8,6 +8,7 @@ import {
   hex,
   languages,
   nameKinds,
+  origins,
   schemes,
   sourceKinds,
   stages,
@@ -22,6 +23,7 @@ import {
   isRef,
   optionKinds,
   questionTypes,
+  relationKinds,
 } from "#lib/workspace.js";
 
 const Line = (max: number) =>
@@ -138,6 +140,35 @@ export const Workspace = v.variant("template", [
     template: v.literal("merge"),
     pairs: v.pipe(
       v.array(v.object({ record: Raw(2048), into: Raw(2048) })),
+      v.maxLength(500),
+    ),
+    evidence: Evidence,
+  }),
+  v.object({
+    template: v.literal("lineage"),
+    party: Raw(2048),
+    rows: v.pipe(
+      v.array(
+        v.object({
+          party: Raw(2048),
+          kind: Raw(30),
+          other: Raw(2048),
+          date: Raw(10),
+          election: Raw(2048),
+        }),
+      ),
+      v.maxLength(200),
+    ),
+    drops: v.pipe(v.array(Id), v.maxLength(200)),
+    evidence: Evidence,
+  }),
+  v.object({
+    template: v.literal("translate"),
+    lang: v.nullable(v.picklist(languages)),
+    origin: v.picklist(origins),
+    records: v.pipe(v.array(Raw(2048)), v.maxLength(50)),
+    bodies: v.pipe(
+      v.array(v.object({ note: Id, body: Raw(40_000) })),
       v.maxLength(500),
     ),
     evidence: Evidence,
@@ -263,6 +294,37 @@ export const Draft = v.object({
         }),
         v.object({ op: v.literal("merge"), id: Id, into: Id, evidence: Cited }),
         v.object({
+          op: v.literal("lineage"),
+          party: Id,
+          kind: v.picklist(relationKinds),
+          other: v.optional(Id),
+          date: v.optional(
+            v.pipe(v.string(), v.regex(/^\d{4}(?:-\d{2}(?:-\d{2})?)?$/u)),
+          ),
+          election_id: v.optional(Id),
+          evidence: v.tuple([v.literal("e1")]),
+        }),
+        v.object({
+          op: v.literal("translate"),
+          of: v.object({ table: v.literal("note"), id: Id }),
+          lang: v.picklist(languages),
+          origin: v.picklist(origins),
+          body: v.pipe(
+            v.string(),
+            v.normalize("NFC"),
+            v.trim(),
+            v.minLength(1),
+            v.maxLength(40_000),
+          ),
+          evidence: Cited,
+        }),
+        v.object({
+          op: v.literal("drop"),
+          table: v.literal("party_relation"),
+          id: Id,
+          evidence: Cited,
+        }),
+        v.object({
           op: v.literal("add"),
           table: v.literal("party_color"),
           values: v.object({
@@ -368,6 +430,70 @@ async function located(path: string) {
     select entity_id as id from slug where path = ${path}
   `);
   return rows[0]?.id ?? null;
+}
+
+export type Relation = {
+  id: string;
+  kind: (typeof relationKinds)[number];
+  from: string;
+  from_name: string | null;
+  to: string | null;
+  to_name: string | null;
+  date: string | null;
+  precision: "day" | "month" | "year" | "unknown";
+  election_name: string | null;
+};
+
+export async function relations(party: string) {
+  const { rows } = await db.execute<Relation>(sql`
+    select r.id, r.kind::text as kind, r.from_party_id as "from", r.to_party_id as "to",
+           r.date::text as date, r.date_precision::text as precision,
+           (select n.text from name n where n.entity_id = r.from_party_id
+            order by n.is_preferred desc, n.id limit 1) as from_name,
+           (select n.text from name n where n.entity_id = r.to_party_id
+            order by n.is_preferred desc, n.id limit 1) as to_name,
+           (select n.text from name n where n.entity_id = r.election_id
+            order by n.is_preferred desc, n.id limit 1) as election_name
+    from party_relation r
+    where r.from_party_id = ${party} or r.to_party_id = ${party}
+    order by r.date nulls last, r.kind, r.id
+    limit 200
+  `);
+  return rows;
+}
+
+export type Noted = {
+  entity: string;
+  id: string;
+  kind: string;
+  body_md: string;
+  lang: string;
+  md5: string;
+  translations: Array<{
+    lang: string;
+    body: string;
+    origin: (typeof origins)[number];
+    stale: boolean;
+  }>;
+};
+
+export async function notes(entities: Array<string>) {
+  const { rows } = await db.execute<Noted>(sql`
+    select n.entity_id as entity, n.id, n.kind::text as kind, n.body_md, n.lang,
+           md5(n.body_md) as md5,
+           coalesce((
+             select json_agg(json_build_object(
+                      'lang', t.lang, 'body', t.body, 'origin', t.origin, 'stale', t.stale_from is not null
+                    ) order by t.lang)
+             from translation t
+             where t.source_md5 = md5(n.body_md)
+           ), '[]') as translations
+    from note n
+    where n.entity_id = any(${`{${entities.join(",")}}`}::uuid[]) and n.kind <> 'retired'
+    order by n.entity_id, n.recorded_from, n.id
+    limit 500
+  `);
+  return rows;
 }
 
 export async function records(refs: Array<string>) {
@@ -554,6 +680,19 @@ export function refsOf(workspace: v.InferOutput<typeof Workspace>) {
     }
     case "merge": {
       return workspace.pairs.flatMap((pair) => [pair.record, pair.into]);
+    }
+    case "lineage": {
+      return [
+        workspace.party,
+        ...workspace.rows.flatMap((row) => [
+          row.party,
+          row.other,
+          row.election,
+        ]),
+      ].filter((ref) => ref.trim() !== "");
+    }
+    case "translate": {
+      return workspace.records.filter((ref) => ref.trim() !== "");
     }
     default: {
       return workspace.rows.map((row) => row.record);
