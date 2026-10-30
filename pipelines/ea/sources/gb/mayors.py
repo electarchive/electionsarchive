@@ -1,33 +1,113 @@
+import html
 import re
 import struct
 import subprocess
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.gb import dc_local, leh
+from ea.sources.gb import dc_local, leap, leh
 from ea.store import DATA, connect
 
 SOURCE = "gb.mayors"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 COUNCILS = {
     "bedford": "E06000055",
     "copeland": "E07000029",
+    "croydon": "E09000008",
+    "doncaster": "E08000017",
     "hackney": "E09000012",
     "leicester": "E06000016",
     "lewisham": "E09000023",
     "mansfield": "E07000174",
     "middlesbrough": "E06000002",
     "newham": "E09000025",
+    "north-tyneside": "E08000022",
+    "salford": "E08000006",
     "tower-hamlets": "E09000030",
     "watford": "E07000103",
 }
+LEAP = "https://www.andrewteale.me.uk/leap/ward/{}/"
+LEAP_PAGES = {
+    23657: "E07000002",
+    23656: "E06000055",
+    24574: "E06000023",
+    23963: "E07000029",
+    25319: "E09000008",
+    21579: "E08000017",
+    21605: "E09000012",
+    24970: "E06000001",
+    21854: "E06000016",
+    24926: "E09000023",
+    24682: "E08000012",
+    22184: "E07000174",
+    23655: "E06000002",
+    21606: "E09000025",
+    24858: "E08000022",
+    24683: "E08000006",
+    23964: "E06000027",
+    21624: "E09000030",
+    21625: "E07000103",
+}
+LEAP_PARTIES = {
+    **leap.NATIONAL,
+    "Ind": None,
+    "CPA": "Christian Peoples Alliance",
+    "NF": "National Front",
+    "SocAlt": "Socialist Alternative",
+    "RfmUK": "Reform UK",
+    "Yorks": "Yorkshire Party",
+    "Comm": "Communist Party of Britain",
+    "Chr": "Christian Party",
+    "Aspire": "Aspire",
+    "THF": "Tower Hamlets First",
+    "Brist1st": "Bristol First",
+    "MIF": "Mansfield Independent Forum",
+    "WEP": "Women's Equality Party",
+    "Workers": "Workers Party of Britain",
+    "AnimalW": "Animal Welfare Party",
+    "SYS": "Save Your Services",
+    "CG": "Community Group",
+    "HPBP": "Hackney People Before Profit",
+    "OneLove": "One Love Party",
+    "PHacknyF": "Putting Hackney First",
+    "Hckny1st": "Hackney First",
+    "DVP": "Democrats and Veterans Party",
+    "CUP": "Communities United Party",
+    "KMCWP": "Kamran Malik Communities Welfare Party",
+    "PATH": "People's Alliance of Tower Hamlets",
+    "RFAC": "Red Flag Anti-Corruption",
+    "FatCat": "Fat Cat Party",
+    "UPS": "Unity for Peace and Socialism",
+    "Bedford": "Better Bedford Independent",
+    "Torbay": "Voice 4 Torbay",
+    "Birthday": "The Birthday Party",
+    "LivInd": "Liverpool Independent Party",
+    "CA": "Community Action Party",
+    "LPBP": "Lewisham People Before Profit",
+    "LPA": "Lewisham Peoples Alliance",
+    "LEAP": "Local Education Action by Parents",
+    "PHF": "Putting Hartlepool First",
+    "TTI": "Taking the Initiative Party",
+}
+LEAP_CANDIDATE = re.compile(
+    r'<th class="cand(elected)?">(.*?)</th>\s*<td class="party(?:elected)?">(.*?)</td>\s*'
+    r'<td class="votes(?:elected)?">(\d+)</td>'
+)
+LEAP_TITLE = "Local Elections Archive Project: {}"
+LEAP_NOTE = (
+    "Compiled by Andrew Teale for the Local Elections Archive Project from each council's Returning Officer: first "
+    "preferences for every candidate and, where no one won a majority, the two finalists' totals after second "
+    "preferences. Party codes are expanded from the candidates' registered descriptions."
+)
+BY_ELECTION = re.compile(r"Resignation|Death|Disqualification")
 SV_FROM = date(2000, 5, 4)
 SV_TO = date(2023, 5, 4)
 TOWER_HAMLETS = "https://democracy.towerhamlets.gov.uk/mgElectionAreaResults.aspx?ID=126&RPID=13851705"
@@ -118,18 +198,22 @@ def lines() -> pl.DataFrame:
         frames.append(
             frame.filter(pl.col("election_id").str.starts_with("mayor."))
             .select(
+                origin=pl.lit("dc"),
                 year=pl.lit(year),
+                day=pl.lit(dc_local.DAYS[year]),
                 ballot="election_id",
-                council=pl.col("election_id").str.split(".").list.get(1),
+                code=pl.col("election_id").str.split(".").list.get(1).replace_strict(COUNCILS, default=None),
                 person_id="person_id",
                 person_name="person_name",
                 party_name="party_name",
                 votes=pl.col("ballots_cast").cast(pl.Int64),
+                round2=pl.lit(None, pl.Int64),
                 winner=pl.col("is_winner").str.to_lowercase().is_in(["true", "t", "1"]),
                 spoilt=pl.col("spoilt_ballots").cast(pl.Int64, strict=False),
                 source="source",
+                reason=pl.lit(None, pl.String),
             )
-            .filter(pl.col("council").is_in(list(COUNCILS)))
+            .filter(pl.col("code").is_not_null())
         )
     return pl.concat(frames)
 
@@ -137,14 +221,107 @@ def lines() -> pl.DataFrame:
 def fetch() -> None:
     for url, suffix, _, _, _, _ in ROUND2.values():
         raw.fetch(SOURCE, url, suffix=suffix)
+    for page in LEAP_PAGES:
+        url = LEAP.format(page)
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            response = httpx.get(
+                url,
+                headers={
+                    "Accept": "text/html,application/xhtml+xml",
+                    "Accept-Language": "en-GB,en;q=0.9",
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like "
+                    "Gecko) Chrome/130.0 Safari/537.36",
+                },
+                timeout=60,
+                follow_redirects=True,
+            )
+            response.raise_for_status()
+            raw.store(
+                SOURCE, url, response.content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html"
+            )
 
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = lines()
-    for ballot, group in frame.group_by("ballot"):
+    dc = lines()
+    held = set(zip(dc["code"], dc["day"]))
+    people = {(row["code"], leh.fold(row["person_name"])): row["person_id"] for row in dc.iter_rows(named=True)}
+    rows = []
+    for page, code in LEAP_PAGES.items():
+        url = LEAP.format(page)
+        text = raw.cached(SOURCE, url).path.read_text()
+        for block in text.split("<h4>")[1:]:
+            heading = html.unescape(re.sub("<[^>]+>", "", block.split("</h4>")[0]))
+            day = datetime.strptime(
+                re.sub(r"(\d+)(st|nd|rd|th)", r"\1", re.split(r" [\[(]", heading)[0]), "%d %B %Y"
+            ).date()
+            candidates = [
+                (bool(elected), html.unescape(name).strip(), party.strip(), int(votes))
+                for elected, name, party, votes in LEAP_CANDIDATE.findall(block)
+            ]
+            if not candidates or (code, day) in held:
+                continue
+            bracket = re.search(r"\[(.*)\]", heading)
+            reasons = [
+                part
+                for part in (bracket.group(1).split("; ") if bracket else [])
+                if " gain from " not in part and not part.endswith(" hold")
+            ]
+            finals: dict[str, int] = {}
+            if "<h5>Transfers" in block:
+                for name, cells in re.findall(
+                    r'<th class="candtransfers">(.*?)</th>(.*?)</tr>', block.split("<h5>Transfers")[1], re.DOTALL
+                ):
+                    stages = re.findall(r'<td class="transfers(?:elected)?">(\d*)</td>', cells)
+                    if html.unescape(name).strip() != "Stage" and len(stages) > 1 and stages[1]:
+                        finals[html.unescape(name).strip()] = int(stages[1])
+            unknown = {party for *_, party, _ in candidates if party not in LEAP_PARTIES}
+            if unknown:
+                raise ValueError(f"{url} {day}: no party for {sorted(unknown)}")
+            if not any(elected for elected, *_ in candidates):
+                top = sorted(candidates, key=lambda row: -row[3])
+                if day < SV_TO or top[0][3] == top[1][3]:
+                    raise ValueError(f"{url} {day}: no candidate is marked elected")
+                candidates = [(row == top[0], *row[1:]) for row in candidates]
+            for elected, name, party, votes in candidates:
+                rows.append(
+                    {
+                        "origin": "leap",
+                        "year": day.year,
+                        "day": day,
+                        "ballot": f"leap:{code}:{day}",
+                        "code": code,
+                        "person_id": people.get((code, leh.fold(name)), f"{code}:{slug(name)}"),
+                        "person_name": name,
+                        "party_name": LEAP_PARTIES[party],
+                        "votes": votes,
+                        "round2": finals.get(name),
+                        "winner": elected,
+                        "spoilt": None,
+                        "source": url,
+                        "reason": "; ".join(reasons) or None,
+                    }
+                )
+    frame = pl.concat([dc, pl.DataFrame(rows, schema=dc.schema)])
+    for (ballot,), group in frame.group_by("ballot"):
         if group["winner"].sum() != 1:
             raise ValueError(f"{ballot}: {group['winner'].sum()} winners")
+        if group["origin"][0] != "leap":
+            continue
+        runoff = group.filter(pl.col("round2").is_not_null())
+        (winner,) = group.filter("winner").rows(named=True)
+        supplementary = SV_FROM <= group["day"][0] < SV_TO
+        if runoff.height:
+            if not supplementary or runoff.height != 2 or (runoff["round2"] < runoff["votes"]).any():
+                raise ValueError(f"{ballot}: the second round must carry two candidates, each above their first round")
+            if runoff.sort("round2")["person_name"][-1] != winner["person_name"]:
+                raise ValueError(f"{ballot}: the second round's leader is not the elected candidate")
+        elif supplementary and winner["votes"] * 2 <= group["votes"].sum():
+            raise ValueError(f"{ballot}: no majority on first preferences and no second round")
+        elif not supplementary and winner["votes"] != group["votes"].max():
+            raise ValueError(f"{ballot}: the elected candidate did not top the poll")
     for ballot, (url, suffix, _, _, rounds, _) in ROUND2.items():
         group = frame.filter(pl.col("ballot") == ballot)
         if rounds.keys() != set(group["person_name"]):
@@ -176,8 +353,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Directly elected council mayors of England from Democracy Club's results, with the second round "
-            "of each supplementary vote count from the council's declaration",
+            summary="Directly elected council mayors of England, 2002 on, from Democracy Club's results where it "
+            "has the ballot and Andrew Teale's Local Elections Archive Project otherwise, with the second round of "
+            "each supplementary vote count from the council's declaration where Democracy Club gives none",
             polity="GB",
         )
 
@@ -206,20 +384,13 @@ def emit() -> Path:
         ).fetchall():
             known[leh.fold(text)] = id
         party_ids: dict[str, UUID | None] = {"Independent": None}
-        sources: dict[int, UUID] = {}
-        skipped: list[str] = []
+        sources: dict[int | str, UUID] = {}
         offices: set[UUID] = set()
+        added: set[UUID] = set()
         for (ballot,), group in frame.sort("ballot").group_by("ballot", maintain_order=True):
             first = group.row(0, named=True)
-            year, code = first["year"], COUNCILS[first["council"]]
-            day = dc_local.DAYS[year]
-            found = conn.execute(
-                "select entity_id from external_id where scheme = 'gb.election' and value = %s",
-                [f"{day}:local:{code}"],
-            ).fetchone()
-            if found is None:
-                skipped.append(ballot)
-                continue
+            year, day, code = first["year"], first["day"], first["code"]
+            by = first["reason"] is not None and BY_ELECTION.search(first["reason"]) is not None
             election = cs.key("gb.election", f"{day}:local:{code}")
             polity = cs.key("gb.polity", code)
             area = cs.area("gb.lad", code)
@@ -229,7 +400,42 @@ def emit() -> Path:
                 [polity],
             ).fetchone()
             place = council_name.removesuffix(" City Council").removesuffix(" Council")
-            if year not in sources:
+            if election in cs.minted:
+                national = conn.execute(
+                    "select entity_id from external_id where scheme = 'gb.election' and value = %s",
+                    [f"{day}:local:gb"],
+                ).fetchone()
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    parent_id=None if national is None else national[0],
+                    kind="by_election" if by else "local",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(election, f"{year} {place} mayoral {'by-election' if by else 'election'}")
+                cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
+            if first["origin"] == "leap" and first["source"] not in sources:
+                spanned = frame.filter(pl.col("source") == first["source"])["year"]
+                title = LEAP_TITLE.format(f"Mayor of {place}, {spanned.min()}–{spanned.max()}")
+                sources[first["source"]] = cs.source("Andrew Teale", title)
+                if sources[first["source"]] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[first["source"]],
+                        kind="compendium",
+                        publisher="Andrew Teale",
+                        title=title,
+                        url=first["source"],
+                        license=leap.LICENSE,
+                        license_url=leap.LICENSE_URL,
+                        attribution=leap.ATTRIBUTION,
+                        notes=LEAP_NOTE,
+                    )
+                    cs.artifact(raw.cached(SOURCE, first["source"]), sources[first["source"]])
+            if first["origin"] == "dc" and year not in sources:
                 title = f"Candidate results, {day}"
                 sources[year] = cs.source(dc_local.DC, title)
                 if sources[year] in cs.minted:
@@ -253,7 +459,8 @@ def emit() -> Path:
                 cs.add("office", id=office, polity_id=polity, body_id=None, kind="mayor")
                 name(office, f"Mayor of {place}")
             unit = cs.unit("gb.lad", code)
-            if unit in cs.minted:
+            if unit in cs.minted and unit not in added:
+                added.add(unit)
                 cs.add(
                     "reporting_unit",
                     id=unit,
@@ -281,11 +488,14 @@ def emit() -> Path:
                 round_number=1,
                 electoral_system_id=sv if supplementary else fptp,
                 default_result_kind="counted",
-                term="full",
+                term="remainder" if by else "full",
             )
             name(contest, f"Mayor of {place}, {year}")
             cs.add("slug", path=f"{path}/{day}-local/mayor", entity_id=contest)
-            cs.add("external_id", entity_id=contest, scheme="democracyclub.ballot", value=ballot)
+            if first["origin"] == "dc":
+                cs.add("external_id", entity_id=contest, scheme="democracyclub.ballot", value=ballot)
+            if first["reason"] is not None:
+                cs.add("note", entity_id=contest, kind="context", body_md=f"{first['reason']}.")
             rows = group.sort("votes", descending=True).rows(named=True)
             options: dict[str, UUID] = {}
             for row in rows:
@@ -305,8 +515,11 @@ def emit() -> Path:
                 owner = party_ids[label]
                 option_key = f"{contest_key}:{row['person_id']}"
                 option = options[row["person_id"]] = cs.key("gb.mayors.option", option_key)
-                person = cs.key("gb.dc_local.person", row["person_id"])
-                if person in cs.minted:
+                person = cs.key(
+                    "gb.mayors.person" if ":" in row["person_id"] else "gb.dc_local.person", row["person_id"]
+                )
+                if person in cs.minted and person not in added:
+                    added.add(person)
                     cs.add("person", id=person)
                     name(person, row["person_name"])
                 cs.add(
@@ -330,7 +543,10 @@ def emit() -> Path:
             ids = {row["person_name"]: row["person_id"] for row in rows}
             winner = next(row["person_id"] for row in rows if row["winner"])
             first_round = 1 if supplementary else 0
-            dc_values = {row["person_id"]: {first_round: row["votes"]} for row in rows}
+            dc_values = {
+                row["person_id"]: {first_round: row["votes"], **({} if row["round2"] is None else {2: row["round2"]})}
+                for row in rows
+            }
             sets: list[
                 tuple[
                     UUID,
@@ -405,7 +621,7 @@ def emit() -> Path:
                 sets.append(
                     (
                         cs.key("gb.mayors.result_set", contest_key),
-                        sources[year],
+                        sources[year if first["origin"] == "dc" else first["source"]],
                         True,
                         dc_values,
                         first["spoilt"],
@@ -428,7 +644,9 @@ def emit() -> Path:
                     is_default=default,
                     completeness=1,
                 )
-                if source == sources[year]:
+                if first["origin"] == "leap":
+                    cs.add("citation", entity_id=result_set, source_id=source, locator={"date": day.isoformat()})
+                elif source == sources[year]:
                     cs.add(
                         "citation",
                         entity_id=result_set,
@@ -445,7 +663,7 @@ def emit() -> Path:
                         cells.append((options[row["person_id"]], VOTES, number, votes))
                     if row["person_id"] == winner:
                         kinds = ("won", "elected")
-                    elif 2 in values[row["person_id"]] and not values[row["person_id"]][2]:
+                    elif any(2 in other for other in values.values()) and not values[row["person_id"]].get(2):
                         kinds = ("eliminated",)
                     else:
                         kinds = ("lost",)
@@ -482,6 +700,4 @@ def emit() -> Path:
                             x1=x1,
                             y1=y1,
                         )
-        if skipped:
-            print(f"held until their council election publishes: {', '.join(skipped)}")
         return cs.write()
