@@ -1478,3 +1478,49 @@ export async function atlasPage(path: string, search: URLSearchParams) {
     ),
   };
 }
+
+export async function livePage(path: string, at: string | null) {
+  const night = await found(call(router.live.get, { path }));
+  const hasFinal = night.races.some((race) => race.certified != null);
+  const wanted = Date.parse(at ?? "");
+  const position =
+    at === "final" && hasFinal
+      ? night.frames.length
+      : at == null || Number.isNaN(wanted)
+        ? night.frames.length - 1
+        : Math.max(
+            0,
+            night.frames.findLastIndex(
+              (frame) => Date.parse(frame.at) <= wanted,
+            ),
+          );
+  const isFinal = hasFinal && position === night.frames.length;
+  const time = isFinal ? null : (night.frames[position]?.at ?? null);
+  return {
+    kind: "live" as const,
+    path,
+    ...night,
+    at: isFinal ? "final" : time,
+    scanners: Object.entries(
+      Object.fromEntries(
+        night.frames
+          .slice(0, position + 1)
+          .flatMap((frame) =>
+            frame.scanners.map((entry) => [entry.area, entry.share]),
+          ),
+      ) as Record<string, number>,
+    ).map(([area, share]) => ({ area, share })),
+    races: night.races.map((race) => {
+      const current =
+        race.series.findLast((point) => time == null || point.at <= time) ??
+        null;
+      return {
+        ...race,
+        standing:
+          isFinal && race.certified != null
+            ? { at: "final", level: null, votes: race.certified.votes }
+            : current,
+      };
+    }),
+  };
+}

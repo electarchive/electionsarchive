@@ -44,6 +44,7 @@ import {
   coverage,
   coverageOverview,
   home,
+  livePage,
   party,
   person,
   results,
@@ -229,6 +230,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   }
   if (head === "coverage" && rest.length === 1) {
     return coverage(rest[0] ?? "");
+  }
+  if (head === "live" && rest.length > 0) {
+    return livePage(rest.join("/"), search.get("at"));
   }
   if (head === "map" && rest.length > 0) {
     return atlasPage(rest.join("/"), search);
@@ -530,6 +534,9 @@ function markdown(
     }
     case "map": {
       return mapMarkdown(data, link);
+    }
+    case "live": {
+      return liveMarkdown(data, link);
     }
     case "election": {
       const named = new Map(
@@ -3610,6 +3617,124 @@ function electionMarkdown(
             .join("\n"),
         ]),
   ].filter((block) => block !== "");
+}
+
+function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
+  const clock = new Intl.DateTimeFormat(getLocale(), {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: data.election.zone,
+  });
+  const moment = (at: string) =>
+    link(
+      at === "final" ? m.live_certified_count() : clock.format(Date.parse(at)),
+      `live/${data.path}?at=${at}`,
+    );
+  const groups = Map.groupBy(data.races, (race) => race.group);
+  const sections = [
+    [m.live_citywide(), groups.get("executive") ?? []],
+    [m.live_measures(), groups.get("measure") ?? []],
+    [
+      m.live_boroughs(),
+      [...(groups.get("borough") ?? []), ...(groups.get("prosecutor") ?? [])],
+    ],
+    [
+      m.live_council(),
+      (groups.get("council") ?? []).toSorted(
+        (a, b) =>
+          Number(a.path.split("-").at(-1)) - Number(b.path.split("-").at(-1)),
+      ),
+    ],
+    [
+      m.live_courts(),
+      [...(groups.get("judicial") ?? []), ...(groups.get("legislative") ?? [])],
+    ],
+  ] as const;
+  const isFinal = data.at === "final";
+  return [
+    `# ${m.live_title({ place: data.election.place })}`,
+    byline(
+      [{ name: data.election.name, path: data.election.path }],
+      link,
+      data.election.date,
+    ),
+    m.live_twin_summary({
+      publisher:
+        data.source.url == null
+          ? data.source.publisher
+          : `[${data.source.publisher}](${data.source.url})`,
+    }),
+    `**${data.at == null ? m.live_waiting() : isFinal ? m.live_certified_count() : m.live_as_of({ time: clock.format(Date.parse(data.at)) })}**`,
+    ...(data.scanners.length === 0 || isFinal
+      ? []
+      : [
+          `${m.live_scanners()}: ${data.scanners.map((entry) => `${entry.area} ${percent(entry.share / 100)}`).join(", ")}`,
+        ]),
+    ...sections.flatMap(([heading, races]) =>
+      races.length === 0
+        ? []
+        : [
+            `## ${heading}`,
+            ...races.flatMap((race) => {
+              const votes = race.standing?.votes ?? null;
+              let total = 0;
+              for (const value of votes ?? []) {
+                total += value;
+              }
+              const rows = race.options
+                .map((option, index) => ({
+                  ...option,
+                  votes: votes?.[index] ?? 0,
+                  isElected: isFinal && race.certified?.elected[index] === true,
+                }))
+                .filter((row) => row.kind !== "write_in" || row.votes > 0)
+                .toSorted((a, b) => b.votes - a.votes);
+              return [
+                `### ${link(race.name, race.path)}`,
+                votes == null || total === 0
+                  ? m.live_no_update()
+                  : [
+                      race.group === "measure"
+                        ? table(
+                            [m.col_answer(), m.col_votes(), m.col_share()],
+                            rows.map((row) => [
+                              row.name,
+                              count(row.votes),
+                              percent(row.votes / total),
+                            ]),
+                          )
+                        : table(
+                            [
+                              m.col_candidate(),
+                              m.col_party(),
+                              m.col_votes(),
+                              m.col_share(),
+                            ],
+                            rows.map((row) => [
+                              row.isElected
+                                ? `${row.name} (${m.live_elected()})`
+                                : row.name,
+                              row.party,
+                              count(row.votes),
+                              percent(row.votes / total),
+                            ]),
+                          ),
+                      isFinal
+                        ? m.live_certified_count()
+                        : m.live_votes_counted({ count: count(total) }),
+                    ].join("\n\n"),
+              ];
+            }),
+          ],
+    ),
+    `## ${m.live_twin_updates()}`,
+    [
+      ...data.frames.map((frame) => frame.at),
+      ...(data.races.some((race) => race.certified != null) ? ["final"] : []),
+    ]
+      .map((at) => `- ${moment(at)}${at === data.at ? " ←" : ""}`)
+      .join("\n"),
+  ];
 }
 
 function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
