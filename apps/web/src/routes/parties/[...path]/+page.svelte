@@ -4,6 +4,7 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { SvelteSet } from "svelte/reactivity";
+  import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import Logo from "#lib/components/logo.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
@@ -163,13 +164,20 @@
               >{/if}
           </h1>
         </div>
-        <a
-          class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
-          href={resolve(`/compare?a=${data.id}`)}
-          ><ArrowLeftRightIcon
-            class="block-3.5 inline-3.5"
-          />{m.versus_action()}</a
-        >
+        <div class="flex shrink-0 gap-2">
+          <a
+            class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
+            href={resolve(`/compare?a=${data.id}`)}
+            ><ArrowLeftRightIcon
+              class="block-3.5 inline-3.5"
+            />{m.versus_action()}</a
+          >
+          <EditPanel
+            entity={data.id}
+            label={party.name}
+            title={m.edit_title_party()}
+          />
+        </div>
       </div>
       {#if former != null}
         <p class="text-[0.9375rem] text-pretty text-muted-foreground">

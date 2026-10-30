@@ -26,7 +26,7 @@ export async function roles(userId: string | undefined) {
 }
 
 export async function editable(entityId: string): Promise<Editable> {
-  const [names, notes, ids, sources, open] = await Promise.all([
+  const [names, notes, ids, colors, kind, sources, open] = await Promise.all([
     db.execute<Editable["names"][number]>(sql`
       with shown as (
         select id from name
@@ -59,6 +59,18 @@ export async function editable(entityId: string): Promise<Editable> {
       where entity_id = ${entityId} and scheme = any(${`{${schemes.join(",")}}`}::text[])
       order by scheme, value
     `),
+    db.execute<Editable["colors"][number]>(sql`
+      select pc.color, pc.valid_from::text, pc.valid_from_precision::text as valid_from_precision,
+             pc.valid_to::text, pc.valid_to_precision::text as valid_to_precision, s.title as source
+      from party_color pc
+      left join source s on s.id = pc.source_id
+      where pc.party_id = ${entityId}
+      order by pc.valid_from nulls first
+    `),
+    db.execute<{ party: boolean; person: boolean }>(sql`
+      select exists (select from party where id = ${entityId}) as party,
+             exists (select from person where id = ${entityId}) as person
+    `),
     db.execute<Editable["sources"][number]>(sql`
       select s.id, s.title, s.publisher
       from source s
@@ -66,6 +78,8 @@ export async function editable(entityId: string): Promise<Editable> {
         select source_id from name where entity_id = ${entityId} and source_id is not null
         union
         select source_id from citation where entity_id = ${entityId}
+        union
+        select source_id from party_color where party_id = ${entityId} and source_id is not null
       )
       order by s.title
       limit 50
@@ -83,6 +97,13 @@ export async function editable(entityId: string): Promise<Editable> {
     names: names.rows,
     notes: notes.rows,
     ids: ids.rows,
+    kind:
+      kind.rows[0]?.party === true
+        ? "party"
+        : kind.rows[0]?.person === true
+          ? "person"
+          : null,
+    colors: colors.rows,
     sources: sources.rows,
     open: open.rows,
   };
@@ -121,8 +142,16 @@ export async function propose({
   quote: string;
   summary: string;
 }) {
-  if (evidence == null && changes.some((change) => change.kind === "name")) {
-    error(400, "A name change needs a source.");
+  if (
+    evidence == null &&
+    changes.some(
+      (change) => change.kind === "name" || change.kind.startsWith("color_"),
+    )
+  ) {
+    error(400, "A name or color change needs a source.");
+  }
+  if (changes.filter((change) => change.kind.startsWith("color_")).length > 1) {
+    error(400, "A proposal can change one color period.");
   }
   const nameIds = changes.flatMap((change) =>
     change.kind === "name" ? [change.id] : [],
@@ -229,6 +258,34 @@ export async function propose({
           op: "drop",
           table: "external_id",
           key: { scheme: change.scheme, value: change.value },
+        };
+      }
+      case "color_set": {
+        return {
+          op: "set",
+          table: "party_color",
+          key: { party_id: entityId, valid_from: change.from },
+          values: { color: change.color },
+        };
+      }
+      case "color_end": {
+        return {
+          op: "end",
+          table: "party_color",
+          key: { party_id: entityId, valid_from: change.from },
+          values: { valid_to: change.to },
+        };
+      }
+      case "color_add": {
+        return {
+          op: "add",
+          table: "party_color",
+          values: {
+            party_id: entityId,
+            color: change.color,
+            valid_from: change.from,
+            valid_to: change.to,
+          },
         };
       }
     }

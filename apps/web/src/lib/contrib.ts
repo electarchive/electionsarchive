@@ -1,3 +1,4 @@
+import { date } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 
 export type ProposalState =
@@ -59,6 +60,45 @@ export const schemeLabel: Record<Scheme, () => string> = {
 };
 
 export const personSchemes = ["wikidata", "bioguide", "mnis"] as const;
+
+export const partySchemes = ["wikidata", "parlgov"] as const;
+
+export const hex = /^#[0-9a-f]{6}$/iu;
+
+export const isDay = (value: string) =>
+  /^\d{4}-\d{2}-\d{2}$/u.test(value) &&
+  !Number.isNaN(Date.parse(`${value}T00:00:00Z`)) &&
+  new Date(`${value}T00:00:00Z`).toISOString().startsWith(value);
+
+export const precisions = ["day", "month", "year", "unknown"] as const;
+
+export type Precision = (typeof precisions)[number];
+
+export const dated = (value: string, precision: Precision) =>
+  date(
+    precision === "day"
+      ? value
+      : precision === "month"
+        ? value.slice(0, 7)
+        : value.slice(0, 4),
+  );
+
+export const period = (
+  from: string | null,
+  fromPrecision: Precision,
+  to: string | null,
+  toPrecision: Precision,
+) =>
+  from == null
+    ? to == null
+      ? m.edit_color_always()
+      : m.edit_color_until({ date: dated(to, toPrecision) })
+    : to == null
+      ? m.edit_color_since({ date: dated(from, fromPrecision) })
+      : m.edit_color_between({
+          from: dated(from, fromPrecision),
+          to: dated(to, toPrecision),
+        });
 
 export const schemeHref: Partial<Record<Scheme, (value: string) => string>> = {
   wikidata: (value) => `https://www.wikidata.org/wiki/${value}`,
@@ -124,7 +164,15 @@ export type Change =
   | { kind: "note_set"; id: string; body: string }
   | { kind: "note_drop"; id: string }
   | { kind: "id_add"; scheme: Scheme; value: string }
-  | { kind: "id_drop"; scheme: Scheme; value: string };
+  | { kind: "id_drop"; scheme: Scheme; value: string }
+  | { kind: "color_set"; from: string | null; color: string }
+  | { kind: "color_end"; from: string | null; to: string }
+  | {
+      kind: "color_add";
+      color: string;
+      from: string | null;
+      to: string | null;
+    };
 
 export type DiffRow = {
   table: string;
@@ -168,6 +216,15 @@ export type Editable = {
     changed: string | null;
   }>;
   ids: Array<{ scheme: Scheme; value: string }>;
+  kind: "party" | "person" | null;
+  colors: Array<{
+    color: string;
+    valid_from: string | null;
+    valid_from_precision: Precision;
+    valid_to: string | null;
+    valid_to_precision: Precision;
+    source: string | null;
+  }>;
   sources: Array<{ id: string; title: string; publisher: string | null }>;
   open: Array<{ number: number; title: string; state: ProposalState }>;
 };

@@ -2,6 +2,8 @@ import { error } from "@sveltejs/kit";
 import * as v from "valibot";
 import {
   graphemes,
+  hex,
+  isDay,
   languages,
   noteKinds,
   noteLimit,
@@ -31,6 +33,10 @@ const Body = v.pipe(
   v.check((body) => graphemes(body) <= noteLimit),
 );
 
+const Hex = v.pipe(v.string(), v.trim(), v.regex(hex), v.toLowerCase());
+
+const Day = v.pipe(v.string(), v.check(isDay));
+
 const Reference = <Kind extends "id_add" | "id_drop">(kind: Kind) =>
   v.pipe(
     v.object({
@@ -53,6 +59,17 @@ const Change = v.variant("kind", [
   v.object({ kind: v.literal("note_drop"), id: Uuid }),
   Reference("id_add"),
   Reference("id_drop"),
+  v.object({ kind: v.literal("color_set"), from: v.nullable(Day), color: Hex }),
+  v.object({ kind: v.literal("color_end"), from: v.nullable(Day), to: Day }),
+  v.pipe(
+    v.object({
+      kind: v.literal("color_add"),
+      color: Hex,
+      from: v.nullable(Day),
+      to: v.nullable(Day),
+    }),
+    v.check(({ from, to }) => from == null || to == null || from < to),
+  ),
 ]);
 
 const Fraction = v.pipe(v.number(), v.minValue(0), v.maxValue(1));

@@ -1,12 +1,15 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
+  import type { DiffRow } from "#lib/contrib.js";
   import Proof from "#lib/components/contrib/proof.svelte";
   import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import {
+    dated,
     noteKindLabel,
+    precisions,
     schemeLabel,
     schemes,
     stateLabel,
@@ -35,7 +38,7 @@
   const rows = $derived(
     (head?.diff?.rows ?? [])
       .filter((row) => !evidential.includes(row.table))
-      .map((row) =>
+      .map((row): DiffRow =>
         row.table === "external_id" && row.op === "add"
           ? {
               ...row,
@@ -70,11 +73,15 @@
     note: m.proposal_table_note,
     translation: m.proposal_table_translation,
     external_id: m.proposal_table_external_id,
+    party_color: m.proposal_table_party_color,
   };
   const fields: Record<string, () => string> = {
     source_id: m.proposal_field_source,
     kind: m.proposal_field_kind,
     lang: m.proposal_field_lang,
+    color: m.proposal_field_color,
+    valid_from: m.proposal_field_valid_from,
+    valid_to: m.proposal_field_valid_to,
   };
   const hidden = new Set([
     "entity_id",
@@ -85,6 +92,21 @@
     "valid_to_precision",
   ]);
   const unlabeled = new Set(["text", "body_md"]);
+  const order = [
+    "text",
+    "body_md",
+    "kind",
+    "lang",
+    "value",
+    "color",
+    "valid_from",
+    "valid_to",
+    "source_id",
+  ];
+  const rank = (field: string) => {
+    const at = order.indexOf(field);
+    return at === -1 ? order.length : at;
+  };
   const languageName = new Intl.DisplayNames([getLocale()], {
     type: "language",
   });
@@ -127,7 +149,9 @@
       }),
   );
   const day = (value: string | null) => date(value?.slice(0, 10) ?? null);
-  const shown = (field: string, value: unknown) => {
+  const precision = (value: unknown) =>
+    precisions.find((item) => item === value) ?? "day";
+  const shown = (field: string, value: unknown, at: unknown) => {
     if (value == null) {
       return null;
     }
@@ -143,6 +167,10 @@
       }
       case "lang": {
         return languageName.of(value) ?? value;
+      }
+      case "valid_from":
+      case "valid_to": {
+        return dated(value, precision(at));
       }
       default: {
         return value;
@@ -251,10 +279,22 @@
             >{tables[row.table]?.() ?? row.table}{#if row.op === "drop"}<span
                 class="block text-xs font-semibold text-foreground"
                 >{m.proposal_removed()}</span
+              >{/if}{#if row.table === "party_color" && row.op !== "add"}<span
+                class="block text-xs"
+                >{row.key.valid_from == null
+                  ? m.proposal_color_start()
+                  : m.proposal_color_from({
+                      date: dated(
+                        row.key.valid_from,
+                        precision(row.key.valid_from_precision),
+                      ),
+                    })}</span
               >{/if}</span
           >
           <span class="grid gap-1">
-            {#each Object.entries(row.fields).filter(([field, [before, after]]) => !hidden.has(field) && (before != null || after != null)) as [field, [before, after]] (field)}
+            {#each Object.entries(row.fields)
+              .filter(([field, [before, after]]) => !hidden.has(field) && (before != null || after != null))
+              .toSorted(([a], [b]) => rank(a) - rank(b)) as [field, [before, after]] (field)}
               <span class="flex flex-wrap items-baseline gap-x-2">
                 {#if row.table === "external_id" && field === "value"}
                   <span class="text-xs text-muted-foreground"
@@ -265,10 +305,33 @@
                     >{fields[field]?.() ?? field}</span
                   >
                 {/if}
+                {#if field === "color"}
+                  {const swatches = $derived(
+                    [before, after].filter(
+                      (value): value is string => typeof value === "string",
+                    ),
+                  )}
+                  {#each swatches as swatch, index (index)}
+                    <span
+                      class="self-center rounded-xs border border-foreground/20 block-3.5 inline-3.5"
+                      style:background-color={swatch}
+                      aria-hidden="true"
+                    ></span>
+                  {/each}
+                {/if}
                 <Proof
                   class="flex-wrap"
-                  before={shown(field, before)}
-                  after={shown(field, after)}
+                  before={shown(
+                    field,
+                    before,
+                    row.fields[`${field}_precision`]?.[0],
+                  )}
+                  after={shown(
+                    field,
+                    after,
+                    row.fields[`${field}_precision`]?.[1] ??
+                      row.fields[`${field}_precision`]?.[0],
+                  )}
                 />
               </span>
             {/each}

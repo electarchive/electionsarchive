@@ -854,7 +854,11 @@ def _periods(conn: Connection, staged: sql.Composable) -> list[dict[str, object]
         rows.append(
             {
                 "table": "party_color",
-                "key": {"party_id": row["party_id"], "valid_from": row["valid_from"]},
+                "key": {
+                    "party_id": row["party_id"],
+                    "valid_from": row["valid_from"],
+                    "valid_from_precision": row["valid_from_precision"],
+                },
                 "entity_id": row["party_id"],
                 "op": "add" if old is None else "change",
                 "fields": {
@@ -867,7 +871,11 @@ def _periods(conn: Connection, staged: sql.Composable) -> list[dict[str, object]
     rows.extend(
         {
             "table": "party_color",
-            "key": {"party_id": row["party_id"], "valid_from": row["valid_from"]},
+            "key": {
+                "party_id": row["party_id"],
+                "valid_from": row["valid_from"],
+                "valid_from_precision": row["valid_from_precision"],
+            },
             "entity_id": row["party_id"],
             "op": "drop",
             "fields": {column: [row.get(column), None] for column in compared if row.get(column) is not None},

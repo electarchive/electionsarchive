@@ -17,11 +17,15 @@
   import * as ToggleGroup from "#lib/components/ui/toggle-group/index.js";
   import {
     graphemes,
+    hex,
+    isDay,
     kindLabel,
     languages,
     noteKindLabel,
     noteKinds,
     noteLimit,
+    partySchemes,
+    period,
     personSchemes,
     schemeExample,
     schemeHref,
@@ -75,6 +79,14 @@
   let addedIds = $state<
     Array<{ key: number; scheme: Scheme | ""; value: string }>
   >([]);
+  let colorDraft = $state<
+    | { kind: "set"; from: string | null; color: string }
+    | { kind: "end"; from: string | null; to: string }
+    | null
+  >(null);
+  let newColor = $state<{ color: string; from: string; to: string } | null>(
+    null,
+  );
   let added = 0;
   let source = $state<string | null>(null);
   let mode = $state<"none" | "source" | "url" | "upload">("none");
@@ -112,6 +124,72 @@
   });
 
   const notes = $derived(data?.notes ?? []);
+  const entitySchemes = $derived(
+    data?.kind === "party" ? partySchemes : personSchemes,
+  );
+  const colors = $derived(data?.colors ?? []);
+  const colorEdit = $derived(
+    colorDraft ??
+      (newColor == null ? null : { kind: "add" as const, ...newColor }),
+  );
+  const colorProblem = $derived.by(() => {
+    if (colorEdit == null) {
+      return null;
+    }
+    if (colorEdit.kind === "set") {
+      return hex.test(colorEdit.color.trim()) ? null : m.edit_color_invalid();
+    }
+    if (
+      colorEdit.kind === "add" &&
+      colorEdit.color.trim() !== "" &&
+      !hex.test(colorEdit.color.trim())
+    ) {
+      return m.edit_color_invalid();
+    }
+    const from =
+      colorEdit.kind === "add" ? colorEdit.from.trim() : (colorEdit.from ?? "");
+    const to = colorEdit.to.trim();
+    if (
+      (colorEdit.kind === "add" && from !== "" && !isDay(from)) ||
+      (to !== "" && !isDay(to))
+    ) {
+      return m.edit_date_invalid();
+    }
+    return from !== "" && to !== "" && from >= to ? m.edit_color_order() : null;
+  });
+  const colorChange = $derived.by((): Change | null => {
+    if (colorEdit == null || colorProblem != null) {
+      return null;
+    }
+    switch (colorEdit.kind) {
+      case "set": {
+        return {
+          kind: "color_set",
+          from: colorEdit.from,
+          color: colorEdit.color.trim().toLowerCase(),
+        };
+      }
+      case "end": {
+        return colorEdit.to.trim() === ""
+          ? null
+          : {
+              kind: "color_end",
+              from: colorEdit.from,
+              to: colorEdit.to.trim(),
+            };
+      }
+      case "add": {
+        return colorEdit.color.trim() === ""
+          ? null
+          : {
+              kind: "color_add",
+              color: colorEdit.color.trim().toLowerCase(),
+              from: colorEdit.from.trim() === "" ? null : colorEdit.from.trim(),
+              to: colorEdit.to.trim() === "" ? null : colorEdit.to.trim(),
+            };
+      }
+    }
+  });
   const held = (scheme: Scheme) =>
     (data?.ids ?? []).some(
       (id) => id.scheme === scheme && !idDrops.has(`${id.scheme}:${id.value}`),
@@ -179,6 +257,9 @@
         });
       }
     }
+    if (colorChange != null) {
+      list.push(colorChange);
+    }
     return list;
   });
   const invalid = $derived(
@@ -194,9 +275,14 @@
         (item, index) =>
           idProblem(item, index) != null ||
           (item.scheme === "") !== (item.value.trim() === ""),
-      ),
+      ) ||
+      colorProblem != null,
   );
-  const required = $derived(changes.some((change) => change.kind === "name"));
+  const required = $derived(
+    changes.some(
+      (change) => change.kind === "name" || change.kind.startsWith("color_"),
+    ),
+  );
   const sources = $derived(
     (data?.sources ?? []).map((item) => ({
       value: item.id,
@@ -245,6 +331,8 @@
     addedNotes = [];
     idDrops.clear();
     addedIds = [];
+    colorDraft = null;
+    newColor = null;
     source = null;
     mode = "none";
     link = { url: "", title: "", publisher: "", kind: "" };
@@ -481,6 +569,255 @@
             </dl>
           </section>
 
+          {#if data.kind === "party"}
+            <section class="border-be px-4 py-3" aria-labelledby="edit-colors">
+              <h3 id="edit-colors" class="text-sm font-bold">
+                {m.edit_colors()}
+              </h3>
+              {#if colors.length === 0 && newColor == null}
+                <p class="mbs-1 text-sm text-muted-foreground">
+                  {m.edit_colors_empty()}
+                </p>
+              {/if}
+              <dl
+                class="mbs-2 grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-3 gap-y-1 text-sm"
+              >
+                {#each colors as color (color.valid_from ?? "")}
+                  {const draft = $derived(
+                    colorDraft?.from === color.valid_from ? colorDraft : null,
+                  )}
+                  {const locked = $derived(colorEdit != null && draft == null)}
+                  {const value = $derived(
+                    draft?.kind === "set" ? draft.color : color.color,
+                  )}
+                  {const shown = $derived(
+                    hex.test(value.trim()) ? value.trim() : color.color,
+                  )}
+                  {const dirty = $derived(
+                    draft?.kind === "set" &&
+                      value.trim().toLowerCase() !== color.color,
+                  )}
+                  {const end = $derived(
+                    draft?.kind === "end" ? draft.to : null,
+                  )}
+                  <dt class="pbs-2 text-muted-foreground">
+                    {period(
+                      color.valid_from,
+                      color.valid_from_precision,
+                      color.valid_to,
+                      color.valid_to_precision,
+                    )}
+                  </dt>
+                  <dd class="grid gap-1 py-1">
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="shrink-0 rounded-xs border border-foreground/20 block-5 inline-5"
+                        style:background-color={shown}
+                        aria-hidden="true"
+                      ></span>
+                      <Input
+                        {value}
+                        readonly={!signedIn || locked || end != null}
+                        aria-label={m.edit_color_value()}
+                        aria-invalid={dirty && colorProblem != null}
+                        autocomplete="off"
+                        spellcheck={false}
+                        maxlength={7}
+                        class="border-transparent bg-transparent px-1.5 font-figures block-8 inline-28 hover:border-input"
+                        oninput={(
+                          event: Event & { currentTarget: HTMLInputElement },
+                        ) => {
+                          const next = event.currentTarget.value;
+                          colorDraft =
+                            next.trim().toLowerCase() === color.color
+                              ? null
+                              : {
+                                  kind: "set",
+                                  from: color.valid_from,
+                                  color: next,
+                                };
+                        }}
+                      />
+                    </div>
+                    {#if dirty}
+                      <span class="ps-7 text-xs">
+                        {#if colorProblem == null}
+                          <Proof
+                            class="contrib-settle"
+                            before={color.color}
+                            after={value.trim().toLowerCase()}
+                          />
+                        {:else}
+                          <span class="text-destructive">{colorProblem}</span>
+                        {/if}
+                      </span>
+                    {:else if end != null}
+                      <div class="contrib-settle grid gap-1 ps-7">
+                        <Input
+                          value={end}
+                          placeholder="1998-01-31"
+                          inputmode="numeric"
+                          aria-label={m.edit_color_end_date()}
+                          aria-invalid={colorProblem != null}
+                          autocomplete="off"
+                          maxlength={10}
+                          class="font-figures block-8 inline-36"
+                          oninput={(
+                            event: Event & { currentTarget: HTMLInputElement },
+                          ) =>
+                            (colorDraft = {
+                              kind: "end",
+                              from: color.valid_from,
+                              to: event.currentTarget.value,
+                            })}
+                        />
+                        <span class="text-xs">
+                          {#if colorProblem != null}
+                            <span class="text-destructive">{colorProblem}</span>
+                          {:else if isDay(end.trim())}
+                            <Proof
+                              before={period(
+                                color.valid_from,
+                                color.valid_from_precision,
+                                color.valid_to,
+                                color.valid_to_precision,
+                              )}
+                              after={period(
+                                color.valid_from,
+                                color.valid_from_precision,
+                                end.trim(),
+                                "day",
+                              )}
+                            />
+                          {/if}
+                        </span>
+                      </div>
+                    {:else}
+                      <span class="block ps-7 text-xs text-muted-foreground"
+                        >{color.source ?? m.edit_no_source()}</span
+                      >
+                    {/if}
+                    {#if signedIn && !locked && !dirty}
+                      <div class="ps-5">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          class="px-2 text-xs text-muted-foreground block-7"
+                          onclick={() =>
+                            (colorDraft =
+                              end == null
+                                ? {
+                                    kind: "end",
+                                    from: color.valid_from,
+                                    to: "",
+                                  }
+                                : null)}
+                          >{end == null
+                            ? m.edit_color_end()
+                            : m.edit_color_end_cancel()}</Button
+                        >
+                      </div>
+                    {/if}
+                  </dd>
+                {/each}
+                {#if newColor != null}
+                  <dt class="pbs-2 font-semibold text-foreground">
+                    {m.edit_color_add()}
+                  </dt>
+                  <dd
+                    class="contrib-settle grid gap-2 border-s-2 border-foreground py-1 ps-2"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span
+                        class={cn(
+                          "shrink-0 rounded-xs border block-5 inline-5",
+                          {
+                            "border-foreground/20": hex.test(
+                              newColor.color.trim(),
+                            ),
+                            "border-dashed border-input": !hex.test(
+                              newColor.color.trim(),
+                            ),
+                          },
+                        )}
+                        style:background-color={hex.test(newColor.color.trim())
+                          ? newColor.color.trim()
+                          : null}
+                        aria-hidden="true"
+                      ></span>
+                      <Input
+                        bind:value={newColor.color}
+                        placeholder="#1a2b3c"
+                        aria-label={m.edit_color_value()}
+                        aria-invalid={newColor.color.trim() !== "" &&
+                          !hex.test(newColor.color.trim())}
+                        autocomplete="off"
+                        spellcheck={false}
+                        maxlength={7}
+                        class="font-figures block-8 inline-28"
+                      />
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <label class="grid gap-1 text-xs text-muted-foreground">
+                        {m.edit_color_from()}
+                        <Input
+                          bind:value={newColor.from}
+                          placeholder="1998-01-31"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          maxlength={10}
+                          class="font-figures block-8"
+                        />
+                      </label>
+                      <label class="grid gap-1 text-xs text-muted-foreground">
+                        {m.edit_color_to()}
+                        <Input
+                          bind:value={newColor.to}
+                          placeholder="2004-12-31"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          maxlength={10}
+                          class="font-figures block-8"
+                        />
+                      </label>
+                    </div>
+                    <div
+                      class="flex items-center justify-between gap-2 text-xs text-muted-foreground"
+                    >
+                      {#if colorProblem == null}
+                        <span>{m.edit_color_dates()}</span>
+                      {:else}
+                        <span class="text-destructive">{colorProblem}</span>
+                      {/if}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        class="shrink-0 px-2 text-xs block-7"
+                        onclick={() => (newColor = null)}
+                        >{m.edit_color_discard()}</Button
+                      >
+                    </div>
+                  </dd>
+                {/if}
+              </dl>
+              {#if signedIn}
+                {#if colorEdit == null}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    class="mbs-2"
+                    onclick={() => (newColor = { color: "", from: "", to: "" })}
+                    ><PlusIcon />{m.edit_color_add()}</Button
+                  >
+                {:else}
+                  <p class="mbs-2 text-xs text-pretty text-muted-foreground">
+                    {m.edit_color_one()}
+                  </p>
+                {/if}
+              {/if}
+            </section>
+          {/if}
+
           <section class="border-be px-4 py-3" aria-labelledby="edit-notes">
             <h3 id="edit-notes" class="text-sm font-bold">{m.edit_notes()}</h3>
             {#if notes.length === 0 && addedNotes.length === 0}
@@ -568,7 +905,9 @@
                 <dt class="pbs-2 font-semibold text-foreground">
                   {m.edit_note_add()}
                 </dt>
-                <dd class="contrib-settle grid gap-2 py-1">
+                <dd
+                  class="contrib-settle grid gap-2 border-s-2 border-foreground py-1 ps-2"
+                >
                   <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
                     <Select.Root
                       type="single"
@@ -731,13 +1070,15 @@
                 <dt class="pbs-2 font-semibold text-foreground">
                   {m.edit_id_add()}
                 </dt>
-                <dd class="contrib-settle grid gap-1 py-1">
+                <dd
+                  class="contrib-settle grid gap-1 border-s-2 border-foreground py-1 ps-2"
+                >
                   <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
                     <Select.Root
                       type="single"
                       value={item.scheme}
                       onValueChange={(next: string) => {
-                        const found = personSchemes.find(
+                        const found = entitySchemes.find(
                           (option) => option === next,
                         );
                         if (found != null) {
@@ -753,7 +1094,7 @@
                           : schemeLabel[scheme]()}</Select.Trigger
                       >
                       <Select.Content>
-                        {#each personSchemes as option (option)}
+                        {#each entitySchemes as option (option)}
                           <Select.Item value={option}
                             >{schemeLabel[option]()}</Select.Item
                           >
