@@ -5,7 +5,10 @@ import type { RequestHandler } from "./$types";
 const handler = new OpenAPIHandler(router);
 
 const handle: RequestHandler = async ({ request }) => {
-  const { response } = await handler.handle(request, { prefix: "/api/v1" });
+  const { response } = await handler.handle(request, {
+    prefix: "/api/v1",
+    context: { headers: request.headers },
+  });
   return response ?? new Response("Not found", { status: 404 });
 };
 

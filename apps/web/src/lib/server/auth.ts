@@ -148,7 +148,11 @@ export const auth = betterAuth({
   },
   plugins: [
     admin(),
-    apiKey({ defaultPrefix: "ea_", rateLimit: { enabled: false } }),
+    apiKey({
+      defaultPrefix: "ea_",
+      enableMetadata: true,
+      rateLimit: { enabled: false },
+    }),
     i18n({
       translations,
       defaultLocale: baseLocale,

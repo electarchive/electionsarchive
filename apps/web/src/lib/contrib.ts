@@ -233,6 +233,51 @@ export type Change =
       to: string | null;
     };
 
+export const ESCALATIONS = [
+  "unchecked",
+  "findings",
+  "prescreen",
+  "newcomer",
+  "preferred_name",
+  "large",
+  "conflict",
+] as const;
+
+export type Escalation = (typeof ESCALATIONS)[number];
+
+export const VERDICTS = [
+  "clean",
+  "spam",
+  "abuse",
+  "missing_evidence",
+  "evidence_mismatch",
+  "malformed",
+  "duplicate",
+] as const;
+
+export type Prescreen = {
+  revision: number;
+  verdict: (typeof VERDICTS)[number];
+  reason: string;
+  model: string;
+  batch: string;
+  at: string;
+};
+
+export type Prereview = {
+  revision: number;
+  summary: string;
+  facts: Array<{
+    fact: string;
+    status: "verified" | "unverified" | "contradicted";
+    note?: string;
+  }>;
+  risks: Array<string>;
+  recommendation: "approve" | "request_changes" | "reject";
+  by: string;
+  at: string;
+};
+
 export type DiffRow = {
   table: string;
   key: Record<string, string>;

@@ -1,3 +1,4 @@
+import type { SQL } from "drizzle-orm";
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import type {
@@ -5,12 +6,49 @@ import type {
   Checks,
   Diff,
   Editable,
+  Escalation,
+  Prereview,
+  Prescreen,
   ProposalState,
 } from "#lib/contrib.js";
 import { schemes } from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 
 const notify = sql`select pg_notify('proposal_job', json_build_object('kind', 'queued')::text)`;
+
+const escalations = (id: SQL) => sql`
+  (
+    select array_remove(array[
+      case when er.diff is null then 'unchecked' end,
+      case when exists (
+        select from jsonb_each_text(er.checks -> 'findings') f
+        where f.key <> 'scope.owner' and f.value::int > 0
+      ) then 'findings' end,
+      case when ep.prescreen is null or ep.prescreen ->> 'verdict' <> 'clean'
+             or (ep.prescreen ->> 'revision')::int is distinct from er.n then 'prescreen' end,
+      case when (select count(*) from proposal q
+                 where q.author_user_id = ep.author_user_id and q.state = 'published') < 3 then 'newcomer' end,
+      case when exists (
+        select from jsonb_array_elements(er.diff -> 'rows') x
+        join entity e on e.id = (x ->> 'entity_id')::uuid and e.type in ('polity', 'party')
+        left join name n on n.id::text = coalesce(x -> 'key' ->> 'id', x -> 'key' ->> 'name_id')
+        where x ->> 'table' = 'name'
+          and (n.is_preferred or coalesce(x -> 'fields' -> 'is_preferred' @> 'true', false))
+      ) then 'preferred_name' end,
+      case when jsonb_array_length(coalesce(er.diff -> 'rows', '[]')) > 500
+             or coalesce((er.diff ->> 'truncated')::boolean, false) then 'large' end,
+      case when exists (
+        select from proposal q
+        join proposal_revision qr on qr.proposal_id = q.id and qr.changeset_id = q.head_changeset_id
+        where q.id <> ep.id and q.state in ('open', 'changes_requested', 'approved')
+          and qr.diff -> 'entities' ?| array(select jsonb_array_elements_text(er.diff -> 'entities'))
+      ) then 'conflict' end
+    ], null)
+    from proposal ep
+    left join proposal_revision er on er.proposal_id = ep.id and er.changeset_id = ep.head_changeset_id
+    where ep.id = ${id}
+  )
+`;
 
 export async function roles(userId: string | undefined) {
   if (userId == null) {
@@ -463,10 +501,14 @@ export async function proposal(number: number) {
     decider: string | null;
     decision_reason: string | null;
     head_changeset_id: string | null;
+    prescreen: Prescreen | null;
+    prereview: Prereview | null;
+    escalations: Array<Escalation>;
   }>(sql`
     select p.id, p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.created_at::text, p.submitted_at::text, p.decided_at::text, d.name as decider,
-           p.decision_reason, p.head_changeset_id
+           p.decision_reason, p.head_changeset_id, p.prescreen, p.prereview,
+           ${escalations(sql`p.id`)} as escalations
     from proposal p
     left join users a on a.id = p.author_user_id
     left join users d on d.id = p.decided_by
@@ -584,12 +626,18 @@ export async function queue() {
     submitted_at: string | null;
     changes: number;
     findings: number;
+    prescreen: Prescreen["verdict"] | null;
+    recommendation: Prereview["recommendation"] | null;
+    escalations: Array<Escalation>;
   }>(sql`
     select p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.submitted_at::text,
            (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page')
               or (x ->> 'table' = 'citation' and (x ->> 'op' = 'drop' or x -> 'fields' -> 'locator' -> 1 ->> 'op' = 'cite')))::int as changes,
-           coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings
+           coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings,
+           case when (p.prescreen ->> 'revision')::int = r.n then p.prescreen ->> 'verdict' end as prescreen,
+           case when (p.prereview ->> 'revision')::int = r.n then p.prereview ->> 'recommendation' end as recommendation,
+           ${escalations(sql`p.id`)} as escalations
     from proposal p
     left join users a on a.id = p.author_user_id
     left join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
@@ -600,6 +648,40 @@ export async function queue() {
   return rows;
 }
 
+async function target(number: number) {
+  const { rows } = await db.execute<{
+    id: string;
+    state: ProposalState;
+    tier: number | null;
+    n: number | null;
+    escalations: Array<Escalation>;
+  }>(sql`
+    select p.id, p.state::text as state, p.tier, r.n, ${escalations(sql`p.id`)} as escalations
+    from proposal p
+    left join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
+    where p.number = ${number}
+  `);
+  const found = rows[0];
+  if (found == null) {
+    error(404);
+  }
+  return found;
+}
+
+const activity = (
+  proposalId: string,
+  kind: string,
+  actor: string,
+  summary: string,
+) => sql`
+  insert into activity (actor_user_id, kind, proposal_id, changeset_id, entity_ids, polity_ids, summary)
+  select ${actor}, ${kind}::activity_kind, p.id, p.head_changeset_id,
+         coalesce((select array_agg(e::uuid) from proposal_revision r, jsonb_array_elements_text(r.diff -> 'entities') e
+                   where r.proposal_id = p.id and r.changeset_id = p.head_changeset_id), '{}'),
+         array_remove(array[p.polity_id], null), format(${summary}, p.number)
+  from proposal p where p.id = ${proposalId}
+`;
+
 export async function decide({
   userId,
   number,
@@ -608,39 +690,121 @@ export async function decide({
 }: {
   userId: string;
   number: number;
-  verb: "approve" | "reject";
+  verb: "approve" | "reject" | "request_changes";
   reason: string;
 }) {
-  const [allowed, found] = await Promise.all([
-    roles(userId),
-    db.execute<{ id: string; state: ProposalState; tier: number | null }>(sql`
-      select id, state::text as state, tier from proposal where number = ${number}
-    `),
-  ]);
-  const target = found.rows[0];
-  if (target == null) {
-    error(404);
-  }
-  if (!(allowed.admin || (allowed.reviewer && target.tier === 1))) {
+  const [allowed, found] = await Promise.all([roles(userId), target(number)]);
+  if (
+    !(
+      allowed.admin ||
+      (allowed.reviewer && (verb === "request_changes" || found.tier === 1))
+    )
+  ) {
     error(403, "Only an admin can decide this proposal.");
   }
-  if (target.state !== "open") {
+  if (
+    !(
+      found.state === "open" ||
+      (verb === "reject" && found.state === "changes_requested")
+    )
+  ) {
     error(409, "This proposal is no longer open.");
   }
-  if (verb === "reject" && reason === "") {
-    error(400, "A rejection needs a reason.");
+  if (verb !== "approve" && reason === "") {
+    error(
+      400,
+      verb === "reject"
+        ? "A rejection needs a reason."
+        : "A request for changes needs a reason.",
+    );
+  }
+  if (verb === "approve" && !allowed.admin && found.escalations.length > 0) {
+    error(
+      409,
+      `This proposal needs an admin: ${found.escalations.join(", ")}.`,
+    );
   }
   await db.transaction(async (tx) => {
+    if (verb === "request_changes") {
+      await tx.execute(sql`
+        update proposal
+        set state = 'changes_requested', decision_reason = ${reason}, updated_at = now()
+        where id = ${found.id}
+      `);
+      await tx.execute(
+        activity(
+          found.id,
+          "changes_requested",
+          userId,
+          "Changes requested on proposal %s",
+        ),
+      );
+      return;
+    }
     await tx.execute(sql`
       update proposal
       set state = ${verb === "approve" ? "approved" : "open"}::proposal_state,
           decision_reason = ${reason === "" ? null : reason}, updated_at = now()
-      where id = ${target.id}
+      where id = ${found.id}
     `);
     await tx.execute(sql`
       insert into proposal_job (proposal_id, kind, requested_by, output)
-      values (${target.id}, ${verb === "approve" ? "publish" : "reject"}::proposal_job_kind, ${userId},
+      values (${found.id}, ${verb === "approve" ? "publish" : "reject"}::proposal_job_kind, ${userId},
               ${JSON.stringify(reason === "" ? {} : { reason })}::jsonb)
+    `);
+    await tx.execute(notify);
+  });
+}
+
+export async function prereview({
+  userId,
+  number,
+  review,
+}: {
+  userId: string;
+  number: number;
+  review: Omit<Prereview, "revision" | "by" | "at">;
+}) {
+  const [allowed, found] = await Promise.all([roles(userId), target(number)]);
+  if (!(allowed.admin || allowed.reviewer)) {
+    error(403);
+  }
+  if (found.state !== "open" || found.n == null) {
+    error(409, "Only an open, checked proposal takes a pre-review.");
+  }
+  const written: Prereview = {
+    ...review,
+    revision: found.n,
+    by: userId,
+    at: new Date().toISOString(),
+  };
+  await db.execute(sql`
+    update proposal set prereview = ${JSON.stringify(written)}::jsonb, updated_at = now()
+    where id = ${found.id}
+  `);
+  return written;
+}
+
+export async function revert({
+  userId,
+  number,
+  reason,
+}: {
+  userId: string;
+  number: number;
+  reason: string;
+}) {
+  const [allowed, found] = await Promise.all([roles(userId), target(number)]);
+  if (!(allowed.admin || (allowed.reviewer && found.tier === 1))) {
+    error(403, "Only an admin can revert this proposal.");
+  }
+  if (found.state !== "published") {
+    error(409, "Only a published proposal can be reverted.");
+  }
+  await db.transaction(async (tx) => {
+    await tx.execute(sql`
+      insert into proposal_job (proposal_id, kind, requested_by, output)
+      values (${found.id}, 'revert', ${userId}, ${JSON.stringify({ reason })}::jsonb)
     `);
     await tx.execute(notify);
   });
