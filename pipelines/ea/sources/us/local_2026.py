@@ -1649,6 +1649,12 @@ NE_SOURCES = {
         "https://www.hudsoncountyclerk.org/",
         "nj/jersey_city_f09.pdf",
     ),
+    "NJ-34037-s": (
+        "Sussex County Clerk",
+        "2026 School Board Election, unofficial candidate list (updated 7/27/2026)",
+        "https://www.sussex.nj.us/DocumentCenter/View/4563/2026-School-Board-Election---UNOFFICIAL-Candidate-list",
+        "nj/sussex_school.pdf",
+    ),
     "NJ-34023-s": (
         "Middlesex County Clerk",
         "General Election 2026 Official Candidates List, school offices (updated 8/31/2026)",
@@ -2398,7 +2404,9 @@ def parse() -> None:
             {
                 "county": county,
                 "contest": contest,
-                "seats": 0,
+                "seats": {"Baltimore City": 2, "Calvert": 2, "Howard": 2, "Montgomery": 1, "Queen Anne's": 1}.get(county, 0)
+                if title.startswith("Board of Education") and "District" not in where
+                else 0,
                 "name": f"{row['Candidate First Name and Middle Name']} {row['Candidate Ballot Last Name and Suffix']}",
                 "party": named,
                 "independent": independent,
