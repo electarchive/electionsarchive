@@ -63,6 +63,13 @@ REDRAWN_2026 = {
         "Congressional districts, Act 2 (S.B. 121) of the 2026 Regular Session",
         "https://redist.legis.la.gov/2026_Files/2026CONGRESSACT2.aspx",
     ),
+    "39": (
+        "OH",
+        "https://redistricting.ohio.gov/api/public/districtmaps/430/download",
+        "Ohio Redistricting Commission",
+        "Congressional plan adopted October 31, 2025, from the commission's block assignment file",
+        "https://redistricting.ohio.gov/maps",
+    ),
     "37": (
         "NC",
         "https://webservices.ncleg.gov/ViewBillDocument/2025/7667/0/SL%202025-95%20-%20Shapefile",
@@ -92,6 +99,7 @@ REDRAWN_2026 = {
         "https://opendata.gis.utah.gov/datasets/utah-us-congress-districts-2026-to-2032/about",
     ),
 }
+BLOCKS = {"39": f"{TIGER}TIGER2020PL/LAYER/TABBLOCK/2020/tl_2020_39_tabblock20.zip"}
 LEWIS = (
     "https://github.com/JeffreyBLewis/congressional-district-boundaries/archive/"
     "aba2b6b17120718782605534b4bcc6c5ab3d09e2.tar.gz"
@@ -118,6 +126,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".zip")
     raw.fetch(SOURCE, LEWIS, suffix=".tar.gz")
     for _, url, *_ in REDRAWN_2026.values():
+        raw.fetch(SOURCE, url, suffix=".zip")
+    for url in BLOCKS.values():
         raw.fetch(SOURCE, url, suffix=".zip")
 
 
@@ -160,17 +170,33 @@ def parse() -> None:
                 for name in z.namelist()
                 if "__MACOSX" not in name and not name.rsplit("/", 1)[-1].startswith("._") and "." in name
             }
-        reader = shapefile.Reader(
-            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]), encoding="latin-1"
-        )
-        crs = pyproj.CRS.from_wkt(parts["prj"].decode())
-        project = pyproj.Transformer.from_crs(crs, 4326, always_xy=True).transform
-        field = next(name for name, *_ in reader.fields if name.upper() in ("DISTRICT", "DISTRICT_I"))
-        numbers = [int(float(record[field])) for record in reader.records()]
-        shapes = shapely.coverage_simplify(
-            [shapely.ops.transform(project, shapely.geometry.shape(shape.__geo_interface__)) for shape in reader.shapes()],
-            TOLERANCE,
-        )
+        if fips in BLOCKS:
+            sheet = zipfile.ZipFile(io.BytesIO(parts["xlsx"]))
+            strings = re.findall(r"<si><t[^>]*>([^<]*)</t></si>", sheet.read("xl/sharedStrings.xml").decode())
+            assigned: dict[str, int] = {}
+            for row in re.findall(r"<row [^>]*>(.*?)</row>", sheet.read("xl/worksheets/sheet1.xml").decode(), re.S)[1:]:
+                block, district = (strings[int(value)] if 't="s"' in attrs else value for attrs, value in re.findall(r"<c r=\"[A-Z]+\d+\"([^>]*)><v>([^<]*)</v>", row))
+                assigned[block] = int(district)
+            with zipfile.ZipFile(raw.cached(SOURCE, BLOCKS[fips]).path) as z:
+                block_parts = {name.rsplit(".", 1)[1].lower(): z.read(name) for name in z.namelist() if name.endswith((".shp", ".shx", ".dbf"))}
+            blocks = shapefile.Reader(shp=io.BytesIO(block_parts["shp"]), shx=io.BytesIO(block_parts["shx"]), dbf=io.BytesIO(block_parts["dbf"]))
+            pieces: dict[int, list[shapely.Geometry]] = {}
+            for record, shape in zip(blocks.iterRecords(), blocks.iterShapes(), strict=True):
+                pieces.setdefault(assigned[record["GEOID20"]], []).append(shapely.geometry.shape(shape.__geo_interface__))
+            numbers = sorted(pieces)
+            shapes = shapely.coverage_simplify([shapely.union_all(pieces[number]) for number in numbers], TOLERANCE)
+        else:
+            reader = shapefile.Reader(
+                shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]), encoding="latin-1"
+            )
+            crs = pyproj.CRS.from_wkt(parts["prj"].decode())
+            project = pyproj.Transformer.from_crs(crs, 4326, always_xy=True).transform
+            field = next(name for name, *_ in reader.fields if name.upper() in ("DISTRICT", "DISTRICT_I"))
+            numbers = [int(float(record[field])) for record in reader.records()]
+            shapes = shapely.coverage_simplify(
+                [shapely.ops.transform(project, shapely.geometry.shape(shape.__geo_interface__)) for shape in reader.shapes()],
+                TOLERANCE,
+            )
         layers["cd120"].extend(
             (
                 {"GEOID": f"{fips}{number:02d}", "STATEFP": fips, "CD120FP": f"{number:02d}"},
