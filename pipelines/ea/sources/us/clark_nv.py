@@ -60,7 +60,7 @@ def fetch() -> None:
 
 
 CHANNELS = {"Election Day": 1, "Early Vote": 2, "Mail": 3}
-PARTY = re.compile(r"^([A-Z]{2,4}) - (.*)$")
+PARTY = re.compile(r"^([A-Z]{2,4}) ?- ?(.*)$")
 BLOCK = re.compile(r'<span id="GridView3_ctl\d+_lblOffice">')
 ROW = re.compile(r"<tr[^>]*>\s*<td[^>]*>(.*?)</td><td[^>]*>(.*?)</td>", re.S)
 
@@ -70,7 +70,7 @@ def text(fragment: str) -> str:
 
 
 def person(raw_name: str) -> str:
-    return re.sub(r"[^a-z]", "", re.sub(r"^[A-Z]{2,4} - ", "", raw_name).lower())
+    return re.sub(r"[^a-z]", "", PARTY.sub(r"\2", raw_name).lower())
 
 
 def official(code: str) -> list[dict[str, object]]:
