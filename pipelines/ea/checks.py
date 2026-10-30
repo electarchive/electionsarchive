@@ -7,6 +7,7 @@ from jsonschema import Draft7Validator
 from jsonschema.exceptions import best_match
 from psycopg import sql
 
+from ea.names import ACRONYMS, ROMAN
 from ea.store import ROOT, Connection
 
 FACTS = ("result_value", "result_flow", "value_locator")
@@ -733,6 +734,27 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
     return queries
 
 
+def _capitals(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "is_preferred" not in stage.tables.get("name", []):
+        return []
+    return [
+        (
+            "name.capitals",
+            sql.SQL(
+                """select n.entity_id, null::uuid, jsonb_build_object('text', n.text, 'lang', n.lang)
+                   from {names} n join {entities} e on e.id = n.entity_id and e.type = 'person'
+                   where n.is_preferred and exists (
+                     select from regexp_matches(n.text, '[[:alpha:]]+', 'g') w
+                     where w[1] ~ '^[[:upper:]]{{3,}}$' and w[1] <> all({known}))"""
+            ).format(
+                names=stage.staged("name"),
+                entities=stage.either("entity", "id", "type"),
+                known=sql.Literal(sorted(ACRONYMS | ROMAN)),
+            ),
+        )
+    ]
+
+
 def run(conn: Connection, stage: Stage) -> list[Finding]:
     findings: list[Finding] = []
     if "electoral_system" in stage.tables:
@@ -759,11 +781,12 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_memberships(stage),
         *_founding(stage),
         *_scope(stage),
+        *_capitals(stage),
     ]:
         findings.extend(
             Finding(
                 code,
-                "warning" if code in ("membership.overlap", "party.before_founding") else "error",
+                "warning" if code in ("membership.overlap", "party.before_founding", "name.capitals") else "error",
                 entity_id,
                 result_set_id,
                 details,
