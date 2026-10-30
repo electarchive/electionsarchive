@@ -49,9 +49,35 @@ EDITABLE: dict[str, dict[str, bool]] = {
         "valid_to": False,
         "valid_to_precision": False,
     },
+    "external_id": {"entity_id": True, "scheme": True, "value": True},
 }
 
-CITED = {"name": True, "note": False}
+CITED = {"name": True, "note": False, "external_id": False}
+
+REFERENCES = {
+    "wikidata": regex.compile(r"Q[1-9][0-9]*"),
+    "bioguide": regex.compile(r"[A-Z][0-9]{6}"),
+    "mnis": regex.compile(r"[1-9][0-9]*"),
+    "parlgov": regex.compile(r"[1-9][0-9]*"),
+}
+
+DROPS = {"name": ("name_drop", "name_id", "text"), "note": ("note_drop", "note_id", "body_md")}
+
+ROW_DROPS: dict[str, str | None] = {
+    "citation": "entity_id",
+    "label": "entity_id",
+    "party_color": "party_id",
+    "party_image": "party_id",
+    "person_image": "person_id",
+    "translation": None,
+    "alliance_member": "alliance_id",
+    "candidacy_nomination": "candidacy_id",
+    "government_party": "government_id",
+    "tenure_affiliation": "tenure_id",
+    "area_event_member": "area_id",
+    "party_relation": "from_party_id",
+    "party_affiliation": "party_id",
+}
 
 PROVENANCE = {"name": "source_id"}
 
@@ -76,13 +102,18 @@ TIERS = {
             "label",
             "party_color",
             "translation",
+            "name_drop",
+            "note_drop",
+            "external_id_drop",
         ),
         1,
     ),
     **dict.fromkeys(("result_value", "result_flow", "outcome", "seat", "body_size"), 3),
 }
 
-KEYED = {"translation": ("source_md5", "lang")}
+KEYED = {"translation": ("source_md5", "lang"), "external_id": ("scheme", "value")}
+
+ROW_DROP_TIERS = {"label": 1}
 
 
 SOURCE_KINDS = ("official_body", "aggregator", "compendium", "news_agency", "academic", "community")
@@ -111,6 +142,8 @@ class Op(TypedDict, total=False):
     op: str
     table: str
     id: str
+    key: dict[str, object]
+    reason: str
     ref: str
     values: dict[str, object]
     evidence: list[str]
@@ -320,6 +353,92 @@ def _uploaded(
     return source, proof | {"page_id": str(page)}
 
 
+def _columns(conn: Connection, table: str) -> dict[str, str]:
+    return dict(
+        conn.execute(
+            """select attname, format_type(atttypid, atttypmod) from pg_attribute
+               where attrelid = %s::regclass and attnum > 0 and not attisdropped and attgenerated = ''
+                 and attname not in ('changeset_id', 'recorded_from') order by attnum""",
+            [f"public.{table}"],
+        ).fetchall()
+    )
+
+
+def _snapshot(conn: Connection, table: str, match: dict[str, object], where: str) -> dict[str, object]:
+    kinds = _columns(conn, table)
+    if not match or match.keys() - kinds.keys():
+        raise ValueError(f"{where}: a {table} key takes {', '.join(kinds)}")
+    rows = conn.execute(
+        sql.SQL("select jsonb_build_object({}) from public.{} p where {} limit 2").format(
+            sql.SQL(", ").join(
+                sql.SQL("{}, p.{}").format(sql.Literal(column), sql.Identifier(column)) for column in kinds
+            ),
+            sql.Identifier(table),
+            sql.SQL(" and ").join(
+                [
+                    *(
+                        sql.SQL("p.{} is not distinct from ({})").format(
+                            sql.Identifier(column),
+                            sql.SQL("%(key)s -> {}").format(sql.Literal(column))
+                            if kinds[column] == "jsonb"
+                            else sql.SQL("(%(key)s ->> {})::{}").format(
+                                sql.Literal(column), sql.SQL(cast(LiteralString, kinds[column]))
+                            ),
+                        )
+                        for column in match
+                    ),
+                    *(
+                        sql.SQL("p.{} = (%(key)s ->> {})::uuid").format(sql.Identifier(column), sql.Literal(column))
+                        for column in match
+                        if kinds[column] == "uuid" and match[column] is not None
+                    ),
+                ]
+            ),
+        ),
+        {"key": Jsonb(match)},
+    ).fetchall()
+    if len(rows) != 1:
+        raise ValueError(f"{where}: {'more than one' if rows else 'no'} {table} row matches that key")
+    return cast(dict[str, object], rows[0][0])
+
+
+def _drop(conn: Connection, cs: Changeset, op: Op, where: str, reason: str) -> tuple[UUID | None, str]:
+    table = op.get("table", "")
+    if table in DROPS:
+        drop, column, text = DROPS[table]
+        id = _uuid(op.get("id"), f"{where}.id")
+        current = conn.execute(
+            sql.SQL("select entity_id, {} from public.{} where id = %s").format(
+                sql.Identifier(text), sql.Identifier(table)
+            ),
+            [id],
+        ).fetchone()
+        if current is None:
+            raise ValueError(f"{where}: {table} {id} does not exist")
+        cs.add(drop, **{column: id, "entity_id": current[0], text: current[1], "reason": reason})
+        return current[0], str(id)
+    if table == "external_id":
+        key = op.get("key") or {}
+        scheme, value = key.get("scheme"), key.get("value")
+        if scheme not in REFERENCES:
+            raise ValueError(f"{where}: only {', '.join(REFERENCES)} IDs can be dropped")
+        current = conn.execute(
+            "select entity_id from external_id where scheme = %s and value = %s", [scheme, value]
+        ).fetchone()
+        if current is None:
+            raise ValueError(f"{where}: no entity has {scheme} ID {value}")
+        cs.add("external_id_drop", entity_id=current[0], scheme=scheme, value=value, reason=reason)
+        return current[0], f"{scheme}:{value}"
+    if table in ROW_DROPS:
+        match = {"id": str(_uuid(op.get("id"), f"{where}.id"))} if "id" in op else dict(op.get("key") or {})
+        row = _snapshot(conn, table, match, where)
+        cs.add("row_drop", id=uuid7(), relation=table, key=row, reason=reason)
+        owner = ROW_DROPS[table]
+        label = str(row["id"]) if "id" in row else _dumps({column: row[column] for column in match})
+        return None if owner is None else _uuid(row[owner], f"{where}.{owner}"), label
+    raise ValueError(f"{where}: {table!r} rows cannot be dropped")
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -372,12 +491,45 @@ def compile(
                 raise ValueError(f"{where}: ref {op['ref']!r} is used twice")
             refs[op["ref"]] = uuid7()
 
+    targets: set[tuple[object, str]] = set()
+    dropped = {
+        (str((op.get("key") or {}).get("scheme")), str((op.get("key") or {}).get("value")))
+        for op in ops
+        if op.get("op") == "drop" and op.get("table") == "external_id"
+    }
     for n, op in enumerate(ops):
         where = f"ops[{n}]"
         cited = op.get("evidence") or []
         missing = [key for key in cited if key not in sources]
         if missing:
             raise ValueError(f"{where}: unknown evidence {', '.join(missing)}")
+        target = (op.get("table"), str(op.get("id") or _dumps(op.get("key"))))
+        if op.get("op") in ("set", "drop"):
+            if target in targets:
+                raise ValueError(f"{where}: {target[0]} {target[1]} is changed twice")
+            targets.add(target)
+        if op.get("op") == "drop":
+            reason = unicodedata.normalize("NFC", str(op.get("reason") or summary)).strip()
+            owner, label = _drop(conn, cs, op, where, reason)
+            for key in cited if owner is not None else []:
+                cs.add(
+                    "citation",
+                    id=uuid7(),
+                    entity_id=owner,
+                    source_id=sources[key],
+                    locator={
+                        "table": op.get("table"),
+                        "row": label,
+                        "op": "drop",
+                        **{
+                            field: evidence[key][field]
+                            for field in ("page", "region", "quote", "locator")
+                            if field in evidence[key]
+                        },
+                        **proofs.get(key, {}),
+                    },
+                )
+            continue
         if op.get("op") == "translate":
             note = str((op.get("of") or {}).get("id"))
             if any(
@@ -407,13 +559,37 @@ def compile(
             raise ValueError(f"{where}: a note is at most {NOTE_LIMIT:,} characters")
         if CITED[table] and not cited:
             raise ValueError(f"{where}: a change to {table} needs evidence")
+        if table == "external_id":
+            if op.get("op") != "add":
+                raise ValueError(f"{where}: an external ID is added or dropped, never changed")
+            scheme, value = values.get("scheme"), str(values.get("value") or "")
+            pattern = REFERENCES.get(str(scheme))
+            if pattern is None:
+                raise ValueError(f"{where}: only {', '.join(REFERENCES)} IDs can be added")
+            if not pattern.fullmatch(value):
+                raise ValueError(f"{where}: {value!r} is not a {scheme} ID")
+            held = conn.execute(
+                "select entity_id from external_id where scheme = %s and value = %s", [scheme, value]
+            ).fetchone()
+            if held is not None:
+                raise ValueError(f"{where}: {scheme} ID {value} is already on {held[0]}")
+            other = conn.execute(
+                "select value from external_id where scheme = %s and entity_id = %s",
+                [scheme, _uuid(str(values.get("entity_id")), f"{where}.entity_id")],
+            ).fetchone()
+            if other is not None and (str(scheme), other[0]) not in dropped:
+                raise ValueError(
+                    f"{where}: this entity already has {scheme} ID {other[0]}; drop it in the same proposal"
+                )
 
         match op.get("op"):
             case "add":
                 absent = [column for column, required in columns.items() if required and values.get(column) is None]
                 if absent:
                     raise ValueError(f"{where}: add {table} needs {', '.join(absent)}")
-                row: dict[str, object] = {"id": refs.get(op.get("ref", "")) or uuid7(), **values}
+                row: dict[str, object] = (
+                    values if table in KEYED else {"id": refs.get(op.get("ref", "")) or uuid7(), **values}
+                )
                 changed = [column for column in values if column != "entity_id"]
             case "set":
                 id = _uuid(op.get("id"), f"{where}.id")
@@ -457,7 +633,7 @@ def compile(
                     source_id=sources[key],
                     locator={
                         "table": table,
-                        "row": str(row["id"]),
+                        "row": str(row["id"]) if "id" in row else ":".join(str(row[c]) for c in KEYED[table]),
                         "column": column,
                         **{field: item[field] for field in ("page", "region", "quote", "locator") if field in item},
                         **proofs.get(key, {}),
@@ -501,13 +677,60 @@ def _gated(*args: str) -> None:
     )
 
 
+def _dropped(conn: Connection, table: str, staged: sql.Composable) -> list[tuple[str, dict[str, object], str | None]]:
+    if table == "row_drop":
+        return [
+            (relation, key, None if ROW_DROPS[relation] is None else str(key[ROW_DROPS[relation]]))
+            for relation, key in conn.execute(
+                sql.SQL("select relation, key from {} order by id").format(staged)
+            ).fetchall()
+        ]
+    relation = table.removesuffix("_drop")
+    return [
+        (
+            relation,
+            {
+                column: value
+                for column, value in row.items()
+                if column not in ("reason", "changeset_id", "recorded_from")
+            },
+            str(row["entity_id"]),
+        )
+        for (row,) in conn.execute(sql.SQL("select to_jsonb(s) from {} s").format(staged)).fetchall()
+    ]
+
+
 def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object], object]:
     stage = _stage(conn, changeset_id)
     shown: list[dict[str, object]] = []
     entities: set[str] = set()
     truncated = False
+    tiers = [TIERS.get(table, 2) for table in stage.tables if table != "row_drop"]
     for table, columns in stage.tables.items():
         staged = stage.staged(table)
+        if table in ("row_drop", "name_drop", "note_drop", "external_id_drop"):
+            for relation, key, owner in _dropped(conn, table, staged):
+                if table == "row_drop":
+                    tiers.append(ROW_DROP_TIERS.get(relation, 2))
+                if owner is not None:
+                    entities.add(owner)
+                if len(shown) == SHOWN:
+                    truncated = True
+                    continue
+                shown.append(
+                    {
+                        "table": relation,
+                        "key": key,
+                        "entity_id": owner,
+                        "op": "drop",
+                        "fields": {
+                            column: [value, None]
+                            for column, value in key.items()
+                            if value is not None and column not in ("entity_id", "name_id", "note_id")
+                        },
+                    }
+                )
+            continue
         if "entity_id" in columns:
             entities.update(
                 str(entity)
@@ -548,8 +771,7 @@ def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object]
                 }
             )
     checks = conn.execute("select checks from changeset where id = %s", [changeset_id]).fetchone()
-    tier = max(TIERS.get(table, 2) for table in stage.tables)
-    return tier, {"rows": shown, "truncated": truncated, "entities": sorted(entities)}, checks and checks[0]
+    return max(tiers), {"rows": shown, "truncated": truncated, "entities": sorted(entities)}, checks and checks[0]
 
 
 def _apply(folder: Path) -> str:
