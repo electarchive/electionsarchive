@@ -2275,7 +2275,9 @@
         </p>
       {/if}
       <div class="flex flex-wrap items-center gap-1">
-        <span class="pe-1 text-xs text-muted-foreground">{m.atlas_won()}</span>
+        <span class="pe-1 text-xs text-muted-foreground"
+          >{sheet.isLed ? m.atlas_led() : m.atlas_won()}</span
+        >
         {#each leads.slice(0, 6) as lead (lead.index)}
           {const item = $derived(drawn.legend[lead.index])}
           {#if item != null}

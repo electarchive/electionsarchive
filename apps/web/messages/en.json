@@ -1367,6 +1367,7 @@
   "atlas_no_comparison": "No results to compare at this level.",
   "atlas_only": "Places {name} won",
   "atlas_won": "Places won",
+  "atlas_led": "Places led",
   "atlas_shown": "{shown} of {total} shown",
   "atlas_flipped_only": "Flipped only",
   "atlas_clear": "Clear filters",

@@ -3941,7 +3941,7 @@ function mapMarkdown(data: Extract<Data, { kind: "map" }>, link: Link) {
               .join(", "),
           }),
         ]),
-    `## ${m.atlas_won()}`,
+    `## ${atlas.isLed ? m.atlas_led() : m.atlas_won()}`,
     table(
       [m.col_party(), heading],
       won

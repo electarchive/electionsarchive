@@ -4084,6 +4084,7 @@ async function atlas(input: {
             ids: Array<string>;
             place: { id: string; k: number } | null;
             owner: string;
+            isLed: boolean;
           }>(sql`
             with recursive down(id) as (
               select ${input.whole}::uuid
@@ -4095,7 +4096,8 @@ async function atlas(input: {
               join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
               join area a on a.id = pt.area_id
               where e.id = ${input.whole}::uuid limit 1
-            ) as place, coalesce(me.body_id, me.office_id) as owner
+            ) as place, coalesce(me.body_id, me.office_id) as owner,
+              bool_or(exists (select from contest nx where nx.previous_round_id = c.id)) as "isLed"
             from contest me
             join down on true
             join contest c on c.election_id = down.id
@@ -4654,6 +4656,7 @@ async function atlas(input: {
     isPending: levels.some(
       (entry) => entry.tiles == null && known.get(entry.code)?.tiles != null,
     ),
+    isLed: group?.isLed ?? false,
     isAllied: tabulated.isAllied,
     legend: legend.map((item) => ({
       key: item.key,
@@ -9212,6 +9215,7 @@ export const contests = {
         target: v.nullable(v.string()),
         estimated: v.boolean(),
         isPending: v.boolean(),
+        isLed: v.boolean(),
         isAllied: v.boolean(),
         legend: v.array(
           v.object({
