@@ -18,6 +18,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PAGE = "https://electionresults.sos.nm.gov/resultsSW.aspx?type=FED&map=CTY&eid={eid}"
 EVENTS = {
+    1: date(2014, 6, 3),
     78: date(2016, 6, 7),
     112: date(2018, 6, 5),
     2778: date(2020, 6, 2),
@@ -26,6 +27,14 @@ EVENTS = {
 }
 PARTIES = {"DEM": "democratic", "REP": "republican", "LIB": "libertarian"}
 CONTESTS: dict[tuple[int, int, str], tuple[str, int | None]] = {
+    (1, 83, "DEM"): ("senate", None),
+    (1, 83, "REP"): ("senate", None),
+    (1, 6, "DEM"): ("house", 1),
+    (1, 6, "REP"): ("house", 1),
+    (1, 7, "DEM"): ("house", 2),
+    (1, 7, "REP"): ("house", 2),
+    (1, 8, "DEM"): ("house", 3),
+    (1, 8, "REP"): ("house", 3),
     (78, 3522, "DEM"): ("house", 1),
     (78, 3522, "REP"): ("house", 1),
     (78, 3523, "DEM"): ("house", 2),
@@ -196,7 +205,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Mexico's 2016-2024 presidential, U.S. Senate, and U.S. House primaries by county",
+            summary="New Mexico's 2014-2024 presidential, U.S. Senate, and U.S. House primaries by county",
             polity="US-NM",
         )
         source = cs.source(PUBLISHER, TITLE)
