@@ -1,6 +1,7 @@
 import re
 import subprocess
 from datetime import UTC, date, datetime
+from html import unescape
 from pathlib import Path
 from uuid import UUID
 
@@ -46,6 +47,11 @@ COUNTIES = {
         "https://adamscountyco.gov/wp-content/uploads/2026/09/CR-Adams-County-2026G-TABOR-Notice-092426.pdf",
         "../MF-388/CR-Adams-County-2026G-TABOR-Notice-092426.pdf",
         "Adams County Clerk and Recorder",
+    ),
+    "08101": (
+        "https://pueblocounty.gov/clerk-and-recorder-department/sample-ballots",
+        "../MF-389/EVERYTHING v1r_0.pdf",
+        "Pueblo County Clerk and Recorder",
     ),
     "08123": (
         "https://www.weld.gov/files/sharedassets/public/v/1/departments/clerk-and-recorder/documents/elections/weld-tabor-2026-general.pdf",
@@ -255,15 +261,48 @@ def weld_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-PARSERS = {"08123": weld_rows, "08001": adams_rows, "08059": jeffco_rows, "08077": mesa_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
+PUEBLO_CUTS = (215.0, 395.0)
+PUEBLO_ISSUES = (
+    ("City of Pueblo", "2A", r"BALLOT QUESTION NO\. 2A"),
+    ("City of Pueblo", "2B", r"BALLOT QUESTION NO\. 2B"),
+    ("Pueblo City-County Library District", "6A", r"BALLOT ISSUE 6A"),
+    ("Pueblo West Metropolitan District", "6B", r"BALLOT ISSUE 6B"),
+    ("Pueblo West Metropolitan District", "6C", r"BALLOT ISSUE 6C"),
+    ("Edison Fire Protection District", "6D", r"Edison Fire Protection District Ballot Question"),
+    ("Rye Fire Protection District", "7B", r"RYE FIRE PROTECTION DISTRICT BALLOT"),
+)
+
+
+def pueblo_text(path: Path) -> str:
+    markup = subprocess.run(["pdftotext", "-f", "2", "-l", "2", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    columns: list[dict[int, list[tuple[float, str]]]] = [{} for _ in range(len(PUEBLO_CUTS) + 1)]
+    for left, top, word in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" [^>]*>([^<]*)</word>', markup):
+        column = sum(float(left) >= cut for cut in PUEBLO_CUTS)
+        columns[column].setdefault(round(float(top) / 3), []).append((float(left), unescape(word)))
+    return "\n".join(" ".join(word for _, word in sorted(words)) for column in columns for _, words in sorted(column.items()))
+
+
+def pueblo_rows(lines: list[str]) -> list[dict[str, str]]:
+    lines = [re.sub(r"^\s*[a-z]\s+(?=[A-Z])", "", line) for line in lines]
+    rows = []
+    for entity, issue, anchor in PUEBLO_ISSUES:
+        cursor = next(index for index, line in enumerate(lines) if re.search(anchor, line))
+        start = next(index for index in range(cursor, cursor + 20) if re.search(r"(?i)^\s*(?:\S+\s+)*?shall\b", lines[index]) and not re.search(r"(?i)^\s*ballot", lines[index]))
+        end = next(index for index in range(start, start + 60) if lines[index].rstrip().endswith("?"))
+        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip())).strip()
+        wording = wording.replace(" BE E PERMITTED", " BE PERMITTED").replace(", PL AND ANY", ", AND ANY")
+        rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
+    return rows
+
+
+PARSERS = {"08101": pueblo_rows, "08123": weld_rows, "08001": adams_rows, "08059": jeffco_rows, "08077": mesa_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
 
 
 def parse() -> None:
     rows = []
     for county, (url, _, _) in COUNTIES.items():
-        text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
-        ).stdout
+        path = raw.cached(SOURCE, url).path
+        text = pueblo_text(path) if county == "08101" else subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
         for row in PARSERS[county](text.replace("\f", "\n").split("\n")):
             rows.append({**row, "county": county, "url": url})
     PARSED.mkdir(parents=True, exist_ok=True)
