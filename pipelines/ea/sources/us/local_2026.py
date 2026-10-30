@@ -5254,6 +5254,18 @@ def parse() -> None:
                                 else ""
                             )
                             if (
+                                state == "NY"
+                                and not said
+                                and rest
+                                and (
+                                    sort in ("", "village", "city")
+                                    and rest[0] in ("supervisor", "highway", "assessor", "tax")
+                                    or sort == "township"
+                                    and rest[0] in ("mayor", "trustee")
+                                )
+                            ):
+                                continue
+                            if (
                                 said
                                 and (
                                     sort
