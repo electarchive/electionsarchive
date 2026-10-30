@@ -2013,6 +2013,12 @@ for key, publisher, title, url, local in (
     ("AR-05131-fort-smith", "City of Fort Smith", "Candidates for Mayor and Directors-at-Large, media notification of August 5, 2026", "https://content.govdelivery.com/accounts/ARFORTSMITH/bulletins/423bddb", "ar/fort_smith.html"),
     ("FL-12086-coral-gables", "Miami-Dade County Elections Department", "Official Sample Ballot, Coral Gables General Biennial and Special Elections, November 3, 2026", "https://www.miamidade.gov/elections/library/sample-ballots/2026-11-03-coral-gables-general-biennial-and-special-elections-sample-ballot.pdf", "fl/coral_gables.pdf"),
     ("TX-48041-college-station", "City of College Station", "General and Special Election November 3, 2026: Candidates for Office", "https://cstx-us.govstack.com/your-government/elections/", "tx/college_station.html"),
+    ("AR-05007-benton", "Benton County Clerk", "2026 Municipal Candidate Listing, General Election November 3, 2026 (updated August 5, 2026)", "https://bentoncountyar.gov/vote/wp-content/documents/sites/37/2026/08/2026-MUNICIPAL-PETITION-FILINGS.pdf", "ar/benton_municipal.pdf"),
+    ("KY-21067-lexington", "Fayette County Clerk", "Fayette County Filed Candidate Information, November 3, 2026 General Election", "https://www.fayettecountyclerk.com/web/elections/FiledCandidateInformationforWebsite.pdf", "ky/lexington.pdf"),
+    ("FL-12111-port-st-lucie", "City of Port St. Lucie", "Elections: 2026 Candidates", "https://www.cityofpsl.com/Government/Your-City-Government/Departments/City-Clerk/Elections", "fl/port_st_lucie.html"),
+    ("CA-06107-tulare", "City of Tulare", "General Municipal Election, November 3, 2026", "https://www.tulare.ca.gov/government/elections/november-3-2026-general-municipal-election", "ca/tulare.html"),
+    ("CA-06037-pomona", "City of Pomona", "2026 Elections Information", "https://www.pomonaca.gov/government/departments/city-clerk/elections-information", "ca/pomona.html"),
+    ("CA-06065-palm-desert", "City of Palm Desert", "2026 Elections: General Municipal Election, November 3, 2026", "https://www.palmdesert.gov/government/elections", "ca/palm_desert.html"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
