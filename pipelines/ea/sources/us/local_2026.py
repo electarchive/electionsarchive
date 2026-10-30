@@ -1837,6 +1837,12 @@ NE_SOURCES = {
         "https://www.mecostacounty.org/",
         "mi/mecosta.pdf",
     ),
+    "MI-26073": (
+        "Isabella County Clerk",
+        "Sample Ballots, November 3, 2026 General Election",
+        "https://www.isabellacounty.org/",
+        "mi/isabella.pdf",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
