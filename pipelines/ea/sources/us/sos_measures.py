@@ -545,6 +545,17 @@ MT_FILES = {
 }
 ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}-general.pdf"
 ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
+ND_ABSTRACTS = "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year%5C2000%20through%202008%20Statewide%20Election%20Results%5C"
+ND_OLD = {
+    date(2000, 6, 13): ("2000%5CPrimary%20Election%2006-13-2000", 4, 1),
+    date(2000, 11, 7): ("2000%5CGeneral%20Election%2011-07-2000", 1, 1),
+    date(2002, 6, 11): ("2002%5CPrimary%20Election%2006-11-2002", 2, 0),
+    date(2002, 11, 5): ("2002%5CGeneral%20Election%2011-05-2002", 3, 0),
+}
+ND_PRIMARIES = {
+    date(2006, 6, 13): ("2006%5CPrimary%20Election%2006-13-2006", 2),
+    date(2008, 6, 10): ("2008%5CPrimary%20Election%2006-10-2008", 1),
+}
 SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 SC_2010 = "https://www.enr-scvotes.org/SC/19077/39934/reports/detailxml.zip"
 GA = "https://web.archive.org/web/{}id_/http://sos.georgia.gov/elections/election_results/{}.htm"
@@ -1007,6 +1018,9 @@ def fetch() -> None:
         time.sleep(1)
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
+        time.sleep(1)
+    for name, *_ in [*ND_OLD.values(), *ND_PRIMARIES.values()]:
+        raw.fetch(SOURCE, ND_ABSTRACTS + name + ".pdf", suffix=".pdf")
         time.sleep(1)
     for line in NM_PAGES.read_text().splitlines()[1:]:
         raw.fetch(SOURCE, line.split("\t")[1], suffix=".html")
@@ -3038,16 +3052,24 @@ def south_carolina() -> list[dict[str, object]]:
 
 def north_dakota() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
-    for day, count in ND_DAYS.items():
-        url = ND.format(day.isoformat())
+    sheets = {
+        **{day: (ND.format(day.isoformat()), count, None) for day, count in ND_DAYS.items()},
+        **{day: (ND_ABSTRACTS + name + ".pdf", count, None) for day, (name, count) in ND_PRIMARIES.items()},
+        **{day: (ND_ABSTRACTS + name + ".pdf", count, at) for day, (name, count, at) in ND_OLD.items()},
+    }
+    for day, (url, count, at) in sheets.items():
         lines = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
         ).stdout.split("\n")
-        start = max(at for at, line in enumerate(lines) if re.search(r"MEASURES\s+BALLOT", line))
         table: dict[str, list[int]] = {}
+        if at is None:
+            start = max(i for i, line in enumerate(lines) if re.search(r"MEASURES\s+BALLOT", line))
+        else:
+            starts = [i for i, line in enumerate(lines) if re.match(r"[\s|]*Adams\s+\d", line)]
+            start = starts[at]
         for line in lines[start:]:
-            if figures := re.fullmatch(r"\s*([A-Za-z][A-Za-z .]+?)\s{2,}(\d[\d,. ]*)", line):
-                numbers = [int(re.sub(r"\D", "", part)) for part in figures[2].split()]
+            if figures := re.fullmatch(r"\s*([A-Za-z][A-Za-z .]+?)\s+(\d[\d,. ]*)", re.sub(r"[|\[\]_]", " ", line)):
+                numbers = [int(re.sub(r"\D", "", part)) for part in figures[2].split() if re.sub(r"\D", "", part)]
                 if len(numbers) < 2 * count:
                     continue
                 if figures[1].strip() == "Total":
