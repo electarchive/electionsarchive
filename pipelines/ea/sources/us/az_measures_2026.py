@@ -149,12 +149,22 @@ def emit() -> Path:
         )
         system = cs.key("us.electoral_system", "referendum")
         sources: dict[str, UUID] = {}
+        cities: dict[str, UUID] = {}
         for row in frame.iter_rows(named=True):
-            if row["url"] not in sources:
+            if row["city"] not in cities:
                 publisher = PUBLISHERS[row["city"]]
-                source = sources[row["url"]] = cs.source(publisher, TITLE)
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=TITLE, url=row["url"].split("#")[0])
-                cs.artifact(raw.cached(SOURCE, row["url"]), source)
+                cities[row["city"]] = cs.source(publisher, TITLE)
+                cs.add(
+                    "source",
+                    id=cities[row["city"]],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=TITLE,
+                    url=row["url"].split("#")[0],
+                )
+            if row["url"] not in sources:
+                sources[row["url"]] = cities[row["city"]]
+                cs.artifact(raw.cached(SOURCE, row["url"]), cities[row["city"]])
         parent = cs.key("us.election", f"{DAY}:AZ")
         elections: set[UUID] = set()
         kept = 0
