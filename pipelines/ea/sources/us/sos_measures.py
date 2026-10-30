@@ -347,6 +347,8 @@ IA_2008 = IA + "pdf/2008/OfficialCanvass2008General.pdf"
 IA_2010 = IA + "results/xls/2010/general/statewidepct.xlsx"
 MS = "https://web.archive.org/web/2022id_/https://www.sos.ms.gov/links/elections/results/statewide/Statewide%20Initiative%20Measure%20{}%20-%20General%20Election%202011%20Results.pdf"
 MS_2011 = ("26", "27", "31")
+AL_2010 = "http://sos.alabama.gov/sites/default/files/voter-pdfs/2010/2010GeneralResults-AllStateAndFederalOfficesAndAmendments-withoutWrite-inAppendix.pdf"
+MS_2003 = "https://sos.ms.gov/elections/electionresults/2003General/Certified%20Results/Senate%20Concurrent%20Resolution%20522.pdf"
 INBOX = DATA / "inbox" / "manual"
 KY_PAGE = "https://elect.ky.gov/results/#{}"
 KY_FILES = {
@@ -1401,6 +1403,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
     for number in MS_2011:
         raw.fetch(SOURCE, MS.format(number), suffix=".pdf")
+    raw.fetch(SOURCE, MS_2003, suffix=".pdf")
+    raw.fetch(SOURCE, AL_2010, suffix=".pdf")
     for day, file in KY_FILES.items():
         store_manual(KY_PAGE.format(day.year), file, "text/plain")
     for day, (file, _) in TN_FILES.items():
@@ -2158,6 +2162,8 @@ def alaska() -> list[dict[str, object]]:
     if district_votes != measure_votes:
         raise ValueError("AK 2000 district sums differ from the statewide results")
     for year, district, path in ak_sovc.files():
+        if year == 2000:
+            continue
         url = f"manual://MF-266/{year}/{path.name}"
         for title, _, columns in ak_sovc.read(raw.cached(ak_sovc.SOURCE, url).path, year):
             measure = re.fullmatch(r"(?:BALLOT )?MEASURE (?:NO\. |#)(\d+)\b.*", title or "")
@@ -3995,6 +4001,78 @@ def mississippi() -> list[dict[str, object]]:
     return rows
 
 
+def mississippi_2003() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, MS_2003).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    county = ""
+    counties: dict[str, dict[str, int]] = {}
+    totals: dict[str, int] = {}
+    for text_line in text.splitlines():
+        if match := re.match(r"^(\S.*?)\s*$", text_line):
+            if not re.match(r"^(MISSISSIPPI|Total Votes|AMENDMENT|COUNTY|State Totals|Wednesday)", match[1]):
+                county = match[1]
+            elif match[1] == "State Totals":
+                county = ""
+        if match := re.match(r"^\s+Amendment #1 (?:SCR 522|YES|NO).*?(YES|NO)\s+([\d,]+)\s+[\d.]+%", text_line) or re.match(
+            r"^\s+Amendment #1 (YES|NO) Senate Concurrent Res 522\s+([\d,]+)\s+[\d.]+%", text_line
+        ):
+            (counties.setdefault(county, {}) if county else totals)[match[1]] = int(match[2].replace(",", ""))
+    sums = {answer: sum(votes[answer] for votes in counties.values()) for answer in ("YES", "NO")}
+    if len(counties) != 82 or sums != totals:
+        raise ValueError(f"{MS_2003}: {len(counties)} counties add up to {sums}, not {totals}")
+    return [
+        {
+            "state": "MS",
+            "day": date(2003, 11, 4),
+            "number": "1",
+            "label": "Amendment 1",
+            "url": MS_2003,
+            "county": place,
+            "answer": answer,
+            "votes": votes[answer],
+        }
+        for place, votes in counties.items()
+        for answer in ("YES", "NO")
+    ]
+
+
+def alabama() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, AL_2010).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    counties: dict[str, list[int]] = {}
+    totals: list[int] = []
+    for page in text.split("\f"):
+        if "Statewide #1" not in page:
+            continue
+        for text_line in page.splitlines():
+            if match := re.match(r"^(Total|[A-Z][A-Za-z. ]+?)\s{2,}((?:[\d,]+\s+){7}[\d,]+)", text_line):
+                figures = [int(figure.replace(",", "")) for figure in match[2].split()]
+                if match[1] == "Total":
+                    totals = figures
+                else:
+                    counties[match[1]] = figures
+    sums = [sum(figures[index] for figures in counties.values()) for index in range(8)]
+    if len(counties) != 67 or sums != totals:
+        raise ValueError(f"{AL_2010}: {len(counties)} counties add up to {sums}, not {totals}")
+    return [
+        {
+            "state": "AL",
+            "day": date(2010, 11, 2),
+            "number": str(number),
+            "label": f"Amendment {number}",
+            "url": AL_2010,
+            "county": place,
+            "answer": answer,
+            "votes": figures[2 * (number - 1) + offset],
+        }
+        for place, figures in counties.items()
+        for number in range(1, 5)
+        for offset, answer in enumerate(("YES", "NO"))
+    ]
+
+
 def kentucky() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file in KY_FILES.items():
@@ -4680,6 +4758,8 @@ def parse() -> None:
             *wisconsin(),
             *iowa(),
             *mississippi(),
+            *mississippi_2003(),
+            *alabama(),
             *kentucky(),
             *tennessee(),
             *utah(),
