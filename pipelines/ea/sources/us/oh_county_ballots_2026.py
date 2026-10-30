@@ -18,42 +18,75 @@ DAY = date(2026, 11, 3)
 INBOX = DATA / "inbox" / "manual" / "MF-370"
 HAMILTON = "https://www.hamiltoncountyohio.gov/government/departments/board_of_elections"
 HAMILTON_FILE = INBOX / "hamilton" / "November-2026-Ballot-Issues.pdf"
-PUBLISHER = "Hamilton County Board of Elections"
-TITLE = "November 3, 2026 General Election ballot issues"
+SUMMIT = "https://www.summitcountyohio.gov/boe/election-60-day-issue-synopsis"
+SUMMIT_FILE = INBOX / "summit" / "Election_60IssueSynopsis.pdf"
+SOURCES = {
+    HAMILTON: ("Hamilton", HAMILTON_FILE, "Hamilton County Board of Elections", "November 3, 2026 General Election ballot issues"),
+    SUMMIT: ("Summit", SUMMIT_FILE, "Summit County Board of Elections", "Issue synopsis, November 3, 2026 General Election"),
+}
 
 
 def fetch() -> None:
-    try:
-        raw.cached(SOURCE, HAMILTON)
-    except LookupError:
-        raw.store(
-            SOURCE,
-            HAMILTON,
-            HAMILTON_FILE.read_bytes(),
-            suffix=".pdf",
-            retrieved_at=datetime.fromtimestamp(HAMILTON_FILE.stat().st_mtime, UTC),
-            media_type="application/pdf",
-        )
+    for url, (_, path, _, _) in SOURCES.items():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                url,
+                path.read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
 
 
-def parse() -> None:
-    text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, HAMILTON).path), "-"], capture_output=True, text=True, check=True
+def pdf(url: str, mode: str) -> str:
+    return subprocess.run(
+        ["pdftotext", mode, str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
     ).stdout.replace("\f", "\n")
-    blocks = re.split(r"^\s*\d+ (?=[A-Z][A-Z ()&,'-]+\n)", text, flags=re.M)[1:]
+
+
+def hamilton() -> list[dict[str, str]]:
     rows = []
-    for block in blocks:
+    for block in re.split(r"^\s*\d+ (?=[A-Z][A-Z ()&,'-]+\n)", pdf(HAMILTON, "-layout"), flags=re.M)[1:]:
         head, _, rest = block.partition("\n")
         entity, _, rest = rest.strip().partition("\n")
         body = re.split(r"\n\s*(?:FOR|AGAINST|YES|NO)\b", rest)[0]
         body = re.sub(r"A majority (?:affirmative|yes) vote is necessary for passage\.", "", body)
         body = re.sub(r"\s+", " ", body).strip()
         if body and re.match(r"(City|Village|Township|Hamilton County|.*School District|.*Library)", entity.strip()):
-            rows.append({"county": "Hamilton", "kind": head.strip(), "entity": entity.strip(), "text": body})
+            rows.append({"url": HAMILTON, "county": "Hamilton", "kind": head.strip(), "entity": entity.strip(), "text": body})
+    return rows
+
+
+def summit() -> list[dict[str, str]]:
+    rows = []
+    for block in re.split(r"^Issue \d+\s*$", pdf(SUMMIT, "-raw"), flags=re.M)[1:]:
+        lines = [line.strip() for line in block.strip().split("\n") if line.strip()]
+        text = re.split(r"THIS LIST IS SUBJECT", "\n".join(lines))[0].split("\n")
+        entity: list[str] = []
+        index = 0
+        while index < len(text) and not re.fullmatch(r"[A-Z ,&-]+|\([A-Z, ]+\)", text[index]):
+            entity.append(text[index])
+            index += 1
+        kind: list[str] = []
+        while index < len(text) and (re.fullmatch(r"[A-Z ,&-]+|\([A-Z, ]+\)", text[index]) or text[index].startswith(("Overlaps", "Counties", "Overlap"))):
+            kind.append(text[index])
+            index += 1
+        body = re.sub(r"\s+", " ", " ".join(text[index:])).strip()
+        if entity and body and not entity[0].startswith("STATE"):
+            rows.append(
+                {"url": SUMMIT, "county": "Summit", "kind": " ".join(kind).replace("Overlaps:", ""), "entity": " ".join(entity), "text": body}
+            )
+    return rows
+
+
+def parse() -> None:
+    frame = pl.DataFrame(hamilton() + summit())
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows)
     frame.write_parquet(PARSED / "issues.parquet")
-    print(frame.height)
+    print(frame.group_by("county").len().rows())
 
 
 def keys(name: str) -> set[str]:
@@ -82,16 +115,18 @@ def emit() -> Path:
             summary="Official ballot language for Hamilton County, Ohio local issues on the November 3, 2026 ballot",
             polity="US-OH",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=HAMILTON)
-        cs.artifact(raw.cached(SOURCE, HAMILTON), source)
+        sources: dict[str, UUID] = {}
+        for url, (_, _, publisher, title) in SOURCES.items():
+            sources[url] = cs.source(publisher, title)
+            cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
+            cs.artifact(raw.cached(SOURCE, url), sources[url])
         kept = 0
         used: set[UUID] = set()
         for row in frame.iter_rows(named=True):
             options = [c for k in keys(row["entity"]) for c in contests.get(k, []) if c[0] not in used]
-            wanted = "income tax" if "INCOME" in row["kind"] else "bond" if "BOND" in row["kind"] else "tax levy"
+            wanted = "income tax" if "INCOME" in row["kind"].upper() else "bond" if "BOND" in row["kind"].upper() else "tax levy"
             narrowed = [c for c in options if c[2].lower().startswith(wanted)]
-            if "CHARTER" in row["kind"]:
+            if "CHARTER" in row["kind"].upper():
                 narrowed = [c for c in options if c[2].lower().startswith("miscellaneous")]
             for word in ("additional", "renewal", "replacement", "decrease", "increase"):
                 if len(narrowed) > 1 and word in row["kind"].lower():
@@ -102,15 +137,15 @@ def emit() -> Path:
             contest = narrowed[0][0]
             used.add(contest)
             kept += 1
-            cs.add("citation", entity_id=contest, source_id=source)
+            cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
             cs.add(
                 "ballot_question_text",
                 contest_id=contest,
                 kind="text",
                 lang="en",
                 body=row["text"],
-                url=HAMILTON,
-                source_id=source,
+                url=row["url"],
+                source_id=sources[row["url"]],
             )
         print(f"{kept} of {frame.height} issues")
         return cs.write()
