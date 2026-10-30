@@ -299,7 +299,7 @@ NEW = {
     ),
     "LEGA PER SALVINI PREMIER - FORZA ITALIA - FRATELLI D'ITALIA": (
         "Lega per Salvini Premier – Forza Italia – Fratelli d'Italia",
-        None,
+        "Lega–FI–FdI",
         "list_vehicle",
     ),
     "L'ITALIA DEL MERIDIONE": ("L'Italia del Meridione", None, "party"),

@@ -321,6 +321,8 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("FR", "UXD", None): "5A3B5C",
     ("IT", "Azione – Italia Viva", None): "392CAA",
     ("IT", "Lega per Salvini Premier", None): "008000",
+    ("IT", "Lega – Forza Italia – Fratelli d'Italia con Giorgia Meloni", None): "0C73EE",
+    ("IT", "Lega per Salvini Premier – Forza Italia – Fratelli d'Italia", None): "0C73EE",
     ("TR", "Adalet Partisi", 1961): "D360BC",
     ("TR", "Anavatan Partisi", 2023): "FBBA00",
     ("TR", "Barış Partisi", None): "CD4A4C",
@@ -763,10 +765,14 @@ def emit() -> Path:
             )
         sourced_colors_source: dict[str, UUID] = {}
         for key, row in sourced_colors.items():
-            sourced_colors_source[key] = cs.source(row["publisher"], row["title"])
+            source = cs.source(row["publisher"], row["title"])
+            shared = source in sourced_colors_source.values()
+            sourced_colors_source[key] = source
+            if shared:
+                continue
             cs.add(
                 "source",
-                id=sourced_colors_source[key],
+                id=source,
                 kind=row["kind"],
                 publisher=row["publisher"],
                 title=row["title"],
@@ -882,7 +888,9 @@ def emit() -> Path:
                     high=span[1],
                     rank=None
                     if hand_position
-                    else min((ORDER[iso].index(name) for name in full + short if name in ORDER.get(iso, [])), default=None),
+                    else min(
+                        (ORDER[iso].index(name) for name in full + short if name in ORDER.get(iso, [])), default=None
+                    ),
                     source_id=sourced_positions_source[str(party)]
                     if hand_position
                     else None
