@@ -47,7 +47,15 @@ export async function editable(entityId: string): Promise<Editable> {
       order by shown desc, n.is_preferred desc, n.kind, n.text
     `),
     db.execute<Editable["notes"][number]>(sql`
-      select n.id, n.kind::text as kind, n.body_md, n.lang, c.published_at::text as changed
+      select n.id, n.kind::text as kind, n.body_md, n.lang, md5(n.body_md) as md5,
+             c.published_at::text as changed,
+             coalesce((
+               select json_agg(json_build_object(
+                        'lang', t.lang, 'body', t.body, 'origin', t.origin, 'stale', t.stale_from is not null
+                      ) order by t.lang)
+               from translation t
+               where t.source_md5 = md5(n.body_md)
+             ), '[]') as translations
       from note n
       left join changeset c on c.id = n.changeset_id
       where n.entity_id = ${entityId} and n.kind <> 'retired'
@@ -142,13 +150,14 @@ export async function propose({
   quote: string;
   summary: string;
 }) {
-  if (
-    evidence == null &&
-    changes.some(
-      (change) => change.kind === "name" || change.kind.startsWith("color_"),
-    )
-  ) {
-    error(400, "A name or color change needs a source.");
+  const requiresSource = (change: Change) =>
+    change.kind === "name" ||
+    change.kind.startsWith("color_") ||
+    (change.kind === "translate" && change.origin === "official");
+  const canCite = (change: Change) =>
+    change.kind !== "translate" || change.origin === "official";
+  if (evidence == null && changes.some((change) => requiresSource(change))) {
+    error(400, "A name, color, or official translation needs a source.");
   }
   if (changes.filter((change) => change.kind.startsWith("color_")).length > 1) {
     error(400, "A proposal can change one color period.");
@@ -164,6 +173,20 @@ export async function propose({
   const dropped = changes.flatMap((change) =>
     change.kind === "id_drop" ? [`${change.scheme}:${change.value}`] : [],
   );
+  const translated = changes.flatMap((change) =>
+    change.kind === "translate" ? [change] : [],
+  );
+  if (
+    translated.some((change) => noteIds.includes(change.note)) ||
+    new Set(translated.map((change) => `${change.note}:${change.lang}`))
+      .size !== translated.length
+  ) {
+    error(
+      400,
+      "Translate a note in a separate proposal from changes to its text, once per language.",
+    );
+  }
+  const seen = translated.map((change) => `${change.note}:${change.md5}`);
   const sourceId = evidence?.type === "source" ? evidence.sourceId : null;
   const uploadId = evidence?.type === "upload" ? evidence.uploadId : null;
   const { rows } = await db.execute<{ ok: boolean }>(sql`
@@ -175,6 +198,10 @@ export async function propose({
        and (select count(*) from external_id
             where scheme || ':' || value = any(${`{${dropped.join(",")}}`}::text[]) and entity_id = ${entityId})
              = ${dropped.length}
+       and (select count(*) from note
+            where id::text || ':' || md5(body_md) = any(${`{${seen.join(",")}}`}::text[])
+              and entity_id = ${entityId} and kind <> 'retired')
+             = ${new Set(seen).size}
        and (${sourceId}::uuid is null or exists (select from source where id = ${sourceId}))
        and (${uploadId}::uuid is null or exists (
          select from upload where id = ${uploadId} and owner_user_id = ${userId} and status = 'ready'
@@ -242,6 +269,15 @@ export async function propose({
       case "note_drop": {
         return { op: "drop", table: "note", id: change.id };
       }
+      case "translate": {
+        return {
+          op: "translate",
+          of: { table: "note", id: change.note },
+          lang: change.lang,
+          origin: change.origin,
+          body: change.body,
+        };
+      }
       case "id_add": {
         return {
           op: "add",
@@ -290,13 +326,14 @@ export async function propose({
       }
     }
   };
+  const isCited = cited != null && changes.some((change) => canCite(change));
   const payload = {
     summary,
     ops: changes.map((change) => ({
       ...op(change),
-      ...(cited != null && { evidence: ["e1"] }),
+      ...(isCited && canCite(change) && { evidence: ["e1"] }),
     })),
-    ...(cited != null && {
+    ...(isCited && {
       evidence: { e1: { ...cited, ...(quote !== "" && { quote }) } },
     }),
   };
@@ -387,6 +424,7 @@ export async function proposal(number: number) {
         } | null;
       }> | null;
       titles: Record<string, string> | null;
+      originals: Record<string, { body: string; lang: string }> | null;
     }>(sql`
       select r.n, r.payload, r.diff, r.checks, r.created_at::text,
              (select json_agg(json_build_object(
@@ -412,7 +450,21 @@ export async function proposal(number: number) {
                 select jsonb_array_elements_text(x -> 'fields' -> 'source_id')
                 from jsonb_array_elements(r.diff -> 'rows') x
                 where x -> 'fields' ? 'source_id'
-              )) as titles
+              )) as titles,
+             (select json_object_agg(o.md5, json_build_object('body', o.body_md, 'lang', o.lang))
+              from (
+                select distinct on (md5(x.body_md)) md5(x.body_md) as md5, x.body_md, x.lang
+                from (
+                  select id, body_md, lang from note
+                  union all
+                  select id, body_md, lang from note_history
+                ) x
+                where x.id = any(array(
+                  select (op -> 'of' ->> 'id')::uuid
+                  from jsonb_array_elements(r.payload -> 'ops') op
+                  where op ->> 'op' = 'translate'
+                ))
+              ) o) as originals
       from proposal_revision r
       where r.proposal_id = ${found.id}
       order by r.n desc

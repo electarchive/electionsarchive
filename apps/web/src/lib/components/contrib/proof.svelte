@@ -6,6 +6,7 @@
     after,
     n,
     label,
+    lang,
     class: className,
     onopen,
   }: {
@@ -13,12 +14,17 @@
     after: string | null;
     n?: number;
     label?: string;
+    lang?: string;
     class?: string;
     onopen?: () => void;
   } = $props();
 </script>
 
-<span class={cn("inline-flex items-baseline gap-1.5 font-figures", className)}>
+<span
+  class={cn("inline-flex items-baseline gap-1.5 font-figures", className)}
+  {lang}
+  dir={lang == null ? undefined : "auto"}
+>
   {#if before != null}
     <s class="text-muted-foreground decoration-foreground/50">{before}</s>
   {/if}

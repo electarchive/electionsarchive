@@ -153,6 +153,21 @@ export const graphemes = (text: string) =>
   [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)]
     .length;
 
+export const origins = ["human", "machine", "official"] as const;
+
+export type Origin = (typeof origins)[number];
+
+export const originLabel: Record<Origin, () => string> = {
+  human: m.translation_origin_human,
+  machine: m.translation_origin_machine,
+  official: m.translation_origin_official,
+};
+
+export const translationLimit = (original: string) =>
+  Math.max(noteLimit, 2 * graphemes(original));
+
+export const md5Pattern = /^[0-9a-f]{32}$/u;
+
 export type Change =
   | { kind: "name"; id: string; text: string }
   | {
@@ -163,6 +178,14 @@ export type Change =
     }
   | { kind: "note_set"; id: string; body: string }
   | { kind: "note_drop"; id: string }
+  | {
+      kind: "translate";
+      note: string;
+      md5: string;
+      lang: string;
+      origin: Origin;
+      body: string;
+    }
   | { kind: "id_add"; scheme: Scheme; value: string }
   | { kind: "id_drop"; scheme: Scheme; value: string }
   | { kind: "color_set"; from: string | null; color: string }
@@ -213,7 +236,14 @@ export type Editable = {
     kind: NoteKind;
     body_md: string;
     lang: string;
+    md5: string;
     changed: string | null;
+    translations: Array<{
+      lang: string;
+      body: string;
+      origin: Origin;
+      stale: boolean;
+    }>;
   }>;
   ids: Array<{ scheme: Scheme; value: string }>;
   kind: "party" | "person" | null;

@@ -9,6 +9,8 @@
   import {
     dated,
     noteKindLabel,
+    originLabel,
+    origins,
     precisions,
     schemeLabel,
     schemes,
@@ -79,6 +81,8 @@
     source_id: m.proposal_field_source,
     kind: m.proposal_field_kind,
     lang: m.proposal_field_lang,
+    origin: m.proposal_field_origin,
+    source_lang: m.proposal_field_source_lang,
     color: m.proposal_field_color,
     valid_from: m.proposal_field_valid_from,
     valid_to: m.proposal_field_valid_to,
@@ -88,15 +92,20 @@
     "name_id",
     "note_id",
     "scheme",
+    "source_md5",
+    "stale_from",
     "valid_from_precision",
     "valid_to_precision",
   ]);
-  const unlabeled = new Set(["text", "body_md"]);
+  const unlabeled = new Set(["text", "body_md", "body"]);
   const order = [
     "text",
     "body_md",
+    "body",
     "kind",
     "lang",
+    "source_lang",
+    "origin",
     "value",
     "color",
     "valid_from",
@@ -165,8 +174,13 @@
       case "kind": {
         return noteKind(value);
       }
-      case "lang": {
+      case "lang":
+      case "source_lang": {
         return languageName.of(value) ?? value;
+      }
+      case "origin": {
+        const found = origins.find((item) => item === value);
+        return found == null ? value : originLabel[found]();
       }
       case "valid_from":
       case "valid_to": {
@@ -289,9 +303,34 @@
                         precision(row.key.valid_from_precision),
                       ),
                     })}</span
-              >{/if}</span
+              >{/if}{#if row.table === "translation"}<span class="block text-xs"
+                >{m.proposal_translation_into({
+                  language:
+                    languageName.of(row.key.lang ?? "") ?? row.key.lang ?? "",
+                })}</span
+              >{#if row.fields.stale_from?.[1] != null}<span
+                  class="block text-xs font-semibold text-foreground"
+                  >{m.proposal_translation_outdated()}</span
+                >{/if}{/if}</span
           >
           <span class="grid gap-1">
+            {#if row.table === "translation"}
+              {const original = $derived(
+                head?.originals?.[row.key.source_md5 ?? ""],
+              )}
+              {#if original != null}
+                <span class="grid gap-0.5 border-s-2 border-border ps-2">
+                  <span class="text-xs text-muted-foreground"
+                    >{m.proposal_translation_original()}</span
+                  >
+                  <span
+                    class="text-pretty whitespace-pre-line text-muted-foreground"
+                    lang={original.lang}
+                    dir="auto">{original.body}</span
+                  >
+                </span>
+              {/if}
+            {/if}
             {#each Object.entries(row.fields)
               .filter(([field, [before, after]]) => !hidden.has(field) && (before != null || after != null))
               .toSorted(([a], [b]) => rank(a) - rank(b)) as [field, [before, after]] (field)}
@@ -320,7 +359,12 @@
                   {/each}
                 {/if}
                 <Proof
-                  class="flex-wrap"
+                  class={cn("flex-wrap", {
+                    "whitespace-pre-line": field === "body",
+                  })}
+                  lang={row.table === "translation" && field === "body"
+                    ? row.key.lang
+                    : undefined}
                   before={shown(
                     field,
                     before,

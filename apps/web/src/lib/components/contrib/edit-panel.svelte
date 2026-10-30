@@ -2,11 +2,12 @@
   import "#lib/components/contrib/contrib.css";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import LanguagesIcon from "@lucide/svelte/icons/languages";
   import PencilIcon from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import X from "@lucide/svelte/icons/x";
   import { SvelteSet } from "svelte/reactivity";
-  import type { Change, Editable, Scheme } from "#lib/contrib.js";
+  import type { Change, Editable, Origin, Scheme } from "#lib/contrib.js";
   import Proof from "#lib/components/contrib/proof.svelte";
   import UploadEvidence from "#lib/components/contrib/upload-evidence.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -24,6 +25,8 @@
     noteKindLabel,
     noteKinds,
     noteLimit,
+    originLabel,
+    origins,
     partySchemes,
     period,
     personSchemes,
@@ -34,6 +37,7 @@
     sourceKindLabel,
     sourceKinds,
     stateLabel,
+    translationLimit,
   } from "#lib/contrib.js";
   import { count } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -72,6 +76,15 @@
       key: number;
       noteKind: (typeof noteKinds)[number];
       lang: string;
+      body: string;
+    }>
+  >([]);
+  let translations = $state<
+    Array<{
+      key: number;
+      note: string;
+      lang: string | null;
+      origin: Origin;
       body: string;
     }>
   >([]);
@@ -214,6 +227,53 @@
     return null;
   };
   const tooLong = (body: string) => graphemes(body) > noteLimit;
+  const locked = (note: Editable["notes"][number]) =>
+    noteDrops.has(note.id) ||
+    (noteDrafts[note.id] ?? note.body_md).trim() !== note.body_md.trim();
+  const translationProblem = (
+    draft: (typeof translations)[number],
+  ): string | null => {
+    const note = notes.find((item) => item.id === draft.note);
+    if (note == null) {
+      return null;
+    }
+    if (locked(note)) {
+      return m.edit_translation_locked();
+    }
+    const held = note.translations.find((item) => item.lang === draft.lang);
+    if (
+      draft.origin === "machine" &&
+      held != null &&
+      held.origin !== "machine"
+    ) {
+      return m.edit_translation_machine_held();
+    }
+    if (graphemes(draft.body) > translationLimit(note.body_md)) {
+      return m.edit_translation_too_long({
+        limit: count(translationLimit(note.body_md)),
+      });
+    }
+    if (draft.lang == null && draft.body.trim() !== "") {
+      return m.edit_translation_lang_missing();
+    }
+    return null;
+  };
+  const translateNote = (note: Editable["notes"][number]) => {
+    const taken = new Set([
+      note.lang,
+      ...translations
+        .filter((draft) => draft.note === note.id)
+        .map((draft) => draft.lang),
+    ]);
+    added += 1;
+    translations.push({
+      key: added,
+      note: note.id,
+      lang: taken.has(defaultLang) ? null : defaultLang,
+      origin: "human",
+      body: "",
+    });
+  };
 
   const changes = $derived.by(() => {
     const list: Array<Change> = [];
@@ -240,6 +300,31 @@
           noteKind: note.noteKind,
           lang: note.lang,
           body: note.body.trim(),
+        });
+      }
+    }
+    for (const draft of translations) {
+      const note = notes.find((item) => item.id === draft.note);
+      const body = draft.body.trim();
+      const held = note?.translations.find((item) => item.lang === draft.lang);
+      if (
+        note != null &&
+        draft.lang != null &&
+        body !== "" &&
+        !(
+          held != null &&
+          !held.stale &&
+          held.body === body &&
+          held.origin === draft.origin
+        )
+      ) {
+        list.push({
+          kind: "translate",
+          note: note.id,
+          md5: note.md5,
+          lang: draft.lang,
+          origin: draft.origin,
+          body,
         });
       }
     }
@@ -271,6 +356,7 @@
             tooLong(noteDrafts[note.id] ?? note.body_md)),
       ) ||
       addedNotes.some((note) => tooLong(note.body)) ||
+      translations.some((draft) => translationProblem(draft) != null) ||
       addedIds.some(
         (item, index) =>
           idProblem(item, index) != null ||
@@ -280,7 +366,10 @@
   );
   const required = $derived(
     changes.some(
-      (change) => change.kind === "name" || change.kind.startsWith("color_"),
+      (change) =>
+        change.kind === "name" ||
+        change.kind.startsWith("color_") ||
+        (change.kind === "translate" && change.origin === "official"),
     ),
   );
   const sources = $derived(
@@ -329,6 +418,7 @@
     noteDrafts = {};
     noteDrops.clear();
     addedNotes = [];
+    translations = [];
     idDrops.clear();
     addedIds = [];
     colorDraft = null;
@@ -881,22 +971,212 @@
                           })}
                         {/if}
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        class="px-2 text-xs block-7"
-                        onclick={() => {
-                          if (dropped) {
-                            noteDrops.delete(note.id);
-                          } else {
-                            noteDrops.add(note.id);
-                          }
-                        }}
-                        >{dropped
-                          ? m.edit_note_keep()
-                          : m.edit_note_remove()}</Button
-                      >
+                      <span class="flex shrink-0 items-center">
+                        {#if !dropped && !dirty}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            class="px-2 text-xs block-7"
+                            onclick={() => translateNote(note)}
+                            ><LanguagesIcon />{m.edit_translate()}</Button
+                          >
+                        {/if}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          class="px-2 text-xs block-7"
+                          onclick={() => {
+                            if (dropped) {
+                              noteDrops.delete(note.id);
+                            } else {
+                              noteDrops.add(note.id);
+                            }
+                          }}
+                          >{dropped
+                            ? m.edit_note_keep()
+                            : m.edit_note_remove()}</Button
+                        >
+                      </span>
                     </div>
+                  {/if}
+                  {const drafted = $derived(
+                    translations.filter((draft) => draft.note === note.id),
+                  )}
+                  {const held = $derived(
+                    note.translations.filter(
+                      (item) =>
+                        !drafted.some((draft) => draft.lang === item.lang),
+                    ),
+                  )}
+                  {#if held.length > 0 || drafted.length > 0}
+                    <ul
+                      class="grid gap-2 border-bs border-dashed ps-1.5 pbs-2"
+                      aria-label={m.edit_translations()}
+                    >
+                      {#each held as item (item.lang)}
+                        <li class="grid gap-0.5">
+                          <div
+                            class="flex items-center justify-between gap-2 text-xs text-muted-foreground"
+                          >
+                            <span class="flex flex-wrap gap-x-2">
+                              <span class="font-semibold text-foreground"
+                                >{languageName.of(item.lang) ?? item.lang}</span
+                              >
+                              <span>{originLabel[item.origin]()}</span>
+                              {#if item.stale}
+                                <span
+                                  class="text-foreground underline decoration-dotted underline-offset-2"
+                                  >{m.edit_translation_outdated()}</span
+                                >
+                              {/if}
+                            </span>
+                            {#if signedIn && !dropped && !dirty}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                class="px-2 text-xs block-7"
+                                onclick={() => {
+                                  added += 1;
+                                  translations.push({
+                                    key: added,
+                                    note: note.id,
+                                    lang: item.lang,
+                                    origin:
+                                      item.origin === "machine"
+                                        ? "human"
+                                        : item.origin,
+                                    body: item.body,
+                                  });
+                                }}>{m.edit_translation_revise()}</Button
+                              >
+                            {/if}
+                          </div>
+                          <p
+                            class="line-clamp-3 text-pretty whitespace-pre-line"
+                            lang={item.lang}
+                            dir="auto"
+                          >
+                            {item.body}
+                          </p>
+                        </li>
+                      {/each}
+                      {#each drafted as draft (draft.key)}
+                        {const problem = $derived(translationProblem(draft))}
+                        {const replaced = $derived(
+                          note.translations.find(
+                            (item) => item.lang === draft.lang,
+                          ),
+                        )}
+                        <li
+                          class="contrib-settle grid gap-2 border-s-2 border-foreground ps-2"
+                        >
+                          <div
+                            class="grid grid-cols-[minmax(0,1fr)_auto] gap-2"
+                          >
+                            <Combobox
+                              items={languageItems.filter(
+                                (option) =>
+                                  option.value !== note.lang &&
+                                  (option.value === draft.lang ||
+                                    !drafted.some(
+                                      (other) => other.lang === option.value,
+                                    )),
+                              )}
+                              value={draft.lang}
+                              label={m.edit_translation_lang()}
+                              placeholder={m.edit_translation_lang()}
+                              search={m.edit_note_lang_search()}
+                              empty={m.edit_note_lang_empty()}
+                              onValueChange={(next: string | null) => {
+                                if (next != null) {
+                                  draft.lang = next;
+                                }
+                              }}
+                            />
+                            <Select.Root
+                              type="single"
+                              value={draft.origin}
+                              onValueChange={(next: string) => {
+                                const origin = origins.find(
+                                  (item) => item === next,
+                                );
+                                if (origin != null) {
+                                  draft.origin = origin;
+                                }
+                              }}
+                            >
+                              <Select.Trigger
+                                class="text-sm block-8"
+                                aria-label={m.edit_translation_origin()}
+                                >{originLabel[draft.origin]()}</Select.Trigger
+                              >
+                              <Select.Content>
+                                {#each origins as origin (origin)}
+                                  <Select.Item value={origin}
+                                    >{originLabel[origin]()}</Select.Item
+                                  >
+                                {/each}
+                              </Select.Content>
+                            </Select.Root>
+                          </div>
+                          {#if replaced != null}
+                            <p class="text-xs text-muted-foreground">
+                              {replaced.stale
+                                ? m.edit_translation_replaces_outdated()
+                                : m.edit_translation_replaces()}
+                            </p>
+                          {/if}
+                          <Textarea
+                            value={draft.body}
+                            lang={draft.lang ?? undefined}
+                            dir="auto"
+                            placeholder={m.edit_translation_placeholder()}
+                            aria-label={m.edit_translation_body()}
+                            aria-invalid={problem != null}
+                            class="min-block-20 md:text-sm"
+                            oninput={(
+                              event: Event & {
+                                currentTarget: HTMLTextAreaElement;
+                              },
+                            ) => (draft.body = event.currentTarget.value)}
+                          />
+                          <div
+                            class="flex items-center justify-between gap-2 text-xs text-muted-foreground"
+                          >
+                            {#if problem != null}
+                              <span class="text-pretty text-destructive"
+                                >{problem}</span
+                              >
+                            {:else if draft.origin === "official"}
+                              <span class="text-pretty"
+                                >{m.edit_translation_official()}</span
+                              >
+                            {:else if draft.origin === "machine"}
+                              <span class="text-pretty"
+                                >{m.edit_translation_machine()}</span
+                              >
+                            {:else}
+                              <span
+                                >{m.edit_note_count({
+                                  count: count(graphemes(draft.body)),
+                                  limit: count(translationLimit(note.body_md)),
+                                })}</span
+                              >
+                            {/if}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              class="shrink-0 px-2 text-xs block-7"
+                              onclick={() => {
+                                translations = translations.filter(
+                                  (other) => other.key !== draft.key,
+                                );
+                              }}>{m.edit_translation_discard()}</Button
+                            >
+                          </div>
+                        </li>
+                      {/each}
+                    </ul>
                   {/if}
                 </dd>
               {/each}
