@@ -1746,6 +1746,29 @@ def emit() -> Path:
             cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
             cs.add("name", **dict(zip(columns, row[7:], strict=True)), is_preferred=True)
             fuller.add(row[1])
+        accented = 0
+        for row in conn.execute(
+            """select distinct on (p.id) p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,
+                      f.id, f.entity_id, f.text, f.lang, f.script, f.kind, f.source_id
+               from name p join entity e on e.id = p.entity_id and e.type = 'person'
+               join changeset c on c.id = p.changeset_id
+               join name f on f.entity_id = p.entity_id and f.id <> p.id and f.lang = p.lang and not f.is_preferred
+                 and f.script is not distinct from p.script and f.valid_from is null and f.valid_to is null
+                 and f.text <> p.text and unaccent(f.text) = p.text and f.text !~ '[’‘“”ıİ]'
+               join changeset w on w.id = f.changeset_id
+               where p.is_preferred and p.valid_from is null and p.valid_to is null and p.text = unaccent(p.text)
+                 and split_part(c.pipeline, '.', 1) in ('fr', 'gb', 'ie')
+                 and split_part(w.pipeline, '.', 1) = split_part(c.pipeline, '.', 1)
+                 and not exists (select from entity_merge m where m.entity_id = p.entity_id)
+               order by p.id, f.recorded_from, f.id""",
+        ).fetchall():
+            if row[1] in fuller:
+                continue
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add("name", **dict(zip(columns, row[7:], strict=True)), is_preferred=True)
+            fuller.add(row[1])
+            accented += 1
+        print(f"{accented} preferred names take a same-polity source's accents")
         recased = 0
         for row in conn.execute(
             """select p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,
@@ -1824,4 +1847,25 @@ def emit() -> Path:
                 source_id=source,
                 is_preferred=True,
             )
+        staged = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
+        displayed = Counter()
+        for row in conn.execute(
+            """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id, c.pipeline,
+                      (select w.text from name w join changeset x on x.id = w.changeset_id
+                       where w.entity_id = n.entity_id and x.pipeline = 'wikidata_people'
+                         and lower(w.text) = lower(n.text) and w.text <> n.text limit 1)
+               from name n join entity e on e.id = n.entity_id and e.type = 'person'
+               join changeset c on c.id = n.changeset_id
+               where n.is_preferred and n.valid_from is null and n.valid_to is null
+                 and n.text ~ '[[:upper:]]{2}'
+                 and not exists (select from entity_merge m where m.entity_id = n.entity_id)""",
+        ).fetchall():
+            if row[0] in staged or row[1] in fuller or (row[1], row[3], row[4]) in initialed:
+                continue
+            if (fixed := names.display(row[2], row[3], row[8])) == row[2]:
+                continue
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": fixed}, is_preferred=True)
+            displayed[row[7]] += 1
+        print(f"{displayed.total()} preferred names in capitals take mixed case: {dict(displayed.most_common())}")
         return cs.write()
