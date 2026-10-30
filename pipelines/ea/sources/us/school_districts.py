@@ -10,11 +10,12 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.store import connect
 
-SOURCE = "us.tn_schools"
+SOURCE = "us.school_districts"
 VERSION = "1"
 URLS = [
-    f"https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_{kind}_500k.zip" for kind in ("unsd", "elsd")
+    f"https://www2.census.gov/geo/tiger/GENZ2024/shp/cb_2024_us_{kind}_500k.zip" for kind in ("unsd", "elsd", "scsd")
 ]
+STATES = {"47": "TN", "34": "NJ"}
 CENSUS = "Cartographic Boundary Files, 1:500,000 (2024)"
 
 
@@ -32,7 +33,7 @@ def emit() -> Path:
         records += [
             (str(record["GEOID"]), str(record["NAME"]), json.dumps(shape.__geo_interface__))
             for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True)
-            if record is not None and shape is not None and record["STATEFP"] == "47" and record["GEOID"] != "4799997"
+            if record is not None and shape is not None and record["STATEFP"] in STATES and (record["STATEFP"] == "34" or "_scsd_" not in url) and not str(record["GEOID"]).endswith(("99997", "99999"))
         ]
     with connect() as conn:
         shapes = pl.DataFrame(
@@ -48,13 +49,13 @@ def emit() -> Path:
         )
         taken = {
             path
-            for (path,) in conn.execute("select path from slug where path like 'us/tn/%%'").fetchall()
+            for (path,) in conn.execute("select path from slug where path like 'us/tn/%%' or path like 'us/nj/%%'").fetchall()
         }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Tennessee's school districts, with the Census Bureau's 2024 cartographic boundaries",
+            summary="School districts of Tennessee and New Jersey missing a polity, with the Census Bureau's 2024 cartographic boundaries",
             polity="US",
         )
         census = cs.source("U.S. Census Bureau", CENSUS)
@@ -70,25 +71,25 @@ def emit() -> Path:
             )
         for url in URLS:
             cs.artifact(raw.cached(SOURCE, url), census)
-        state = cs.polity("US-TN")
         counts = 0
         for code, text, geom, point in shapes.iter_rows():
+            abbreviation = STATES[code[:2]]
             polity = cs.key("us.polity", f"school:{code}")
             area = cs.area("us.school_district", code)
             if polity not in cs.minted:
                 continue
-            path = f"us/tn/{slug(text)}"
+            path = f"us/{abbreviation.lower()}/{slug(text)}"
             if path in taken:
-                raise ValueError(f"{text} would take {path}")
+                path = f"{path}-{code}"
             taken.add(path)
             cs.add("polity", id=polity, kind="school_district", iso_code=None)
             cs.add("name", entity_id=polity, text=text, lang="en", kind="official", is_preferred=True)
-            cs.add("polity_parent", polity_id=polity, parent_id=state)
+            cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{abbreviation}"))
             cs.add("slug", path=path, entity_id=polity)
             cs.add("area", id=area, scheme_code="us.school_district")
             cs.add("area_code", area_id=area, code=code, valid_from=None)
-            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", "47"))
-            cs.add("name", entity_id=area, text=f"{text}, TN", lang="en", kind="official", is_preferred=True)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", code[:2]))
+            cs.add("name", entity_id=area, text=f"{text}, {abbreviation}", lang="en", kind="official", is_preferred=True)
             cs.add("polity_territory", polity_id=polity, area_id=area)
             cs.add(
                 "area_geometry",
