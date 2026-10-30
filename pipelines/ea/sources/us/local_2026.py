@@ -1863,6 +1863,7 @@ for key, publisher, title, url, local in (
     ("UT-49041", "Sevier County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.utah.gov/pmn/files/1494267.pdf", "ut/sevier.pdf"),
     ("UT-49043", "Summit County Clerk", "2026 General Election Certification", "https://www.utah.gov/pmn/files/1483415.pdf", "ut/summit.pdf"),
     ("UT-49023", "Juab County Clerk", "2026 General Election Certification", "https://juabcounty.gov/wp-content/uploads/2026/09/2026_general_certification.pdf", "ut/juab.pdf"),
+    ("UT-49025", "Kane County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.utah.gov/pmn/files/1485015.docx", "ut/kane.docx"),
     ("UT-49017", "Garfield County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.garfield.utah.gov/files/assets/garfieldcout/v/1/documents/auditor-clerk/26gutgar_publication_2_watermark.pdf", "ut/garfield.pdf"),
     ("MO-29113", "Lincoln County Clerk", "Election Authority's Certification, General Election, November 3, 2026", "https://www.lincolncomo.gov/sample-ballots", "mo/lincoln.pdf"),
     ("MO-29145", "Newton County Clerk", "Official General Election Ballot (sample), Newton County, November 3, 2026", "https://www.ncclerk.org/electionsvoters/", "mo/newton.pdf"),
