@@ -87,6 +87,21 @@ AZ_2022 = {
     "309": ("Relating to voter identification", "Legislative Referendum", False),
     "310": ("Relating to taxation benefitting fire districts", "Legislative Referendum", False),
 }
+NY = "https://web.archive.org/web/{}id_/https://www.elections.ny.gov/NYSBOE/elections/{}"
+NY_MEASURES = {
+    (date(2014, 11, 4), "1"): ("Proposal 1", "Revising the state's redistricting procedure", True, "20221110162420", "2014/general/2014GeneralElectionProp1.xlsx"),
+    (date(2014, 11, 4), "2"): ("Proposal 2", "Permitting electronic distribution of state legislative bills", True, "20221110162406", "2014/general/2014GeneralElectionProp2.xlsx"),
+    (date(2014, 11, 4), "3"): ("Proposal 3", "The Smart Schools Bond Act of 2014", True, "20221110162404", "2014/general/2014GeneralElectionProp3.xlsx"),
+    (date(2017, 11, 7), "1"): ("Proposal 1", "Constitutional convention", False, "20210424131033", "2017/general/2017GeneralElectionProp1.xls"),
+    (date(2017, 11, 7), "2"): ("Proposal 2", "Allowing the complete or partial forfeiture of a public officer's pension if convicted of a certain type of felony", True, "20210424131041", "2017/general/2017GeneralElectionProp2.xls"),
+    (date(2017, 11, 7), "3"): ("Proposal 3", "Authorizing the use of forest preserve land for specified purposes", True, "20210424131048", "2017/general/2017GeneralElectionProp3.xls"),
+    (date(2021, 11, 2), "1"): ("Proposition 1", "Amending the apportionment and redistricting process", False, "20230111005827", "2021/General/GE2021_BallotProp1.xlsx"),
+    (date(2021, 11, 2), "2"): ("Proposition 2", "Right to clean air, clean water, and a healthful environment", True, "20230111005839", "2021/General/GE2021_BallotProp2.xlsx"),
+    (date(2021, 11, 2), "3"): ("Proposition 3", "Eliminating the ten-day advance voter registration requirement", False, "20230111005849", "2021/General/GE2021_BallotProp3.xlsx"),
+    (date(2021, 11, 2), "4"): ("Proposition 4", "Authorizing no-excuse absentee ballot voting", False, "20230111005854", "2021/General/GE2021_BallotProp4.xlsx"),
+    (date(2021, 11, 2), "5"): ("Proposition 5", "Increasing the jurisdiction of the New York City Civil Court", True, "20230111005858", "2021/General/GE2021_BallotProp5.xlsx"),
+    (date(2022, 11, 8), "1"): ("Proposition 1", "Clean Water, Clean Air, and Green Jobs Environmental Bond Act of 2022", True, "20230427193813", "2022/General/2022proposition1Results.xlsx"),
+}
 AZ_RECOUNTS = {(date(2010, 11, 2), "112"): "2010/GeneralRecount/Canvass2010Prop112.pdf"}
 AZ_COUNTIES = (
     "Apache",
@@ -875,6 +890,11 @@ PUBLISHERS = {
         "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
     ),
     "AL": ("Alabama Secretary of State", "Election results by county", "https://www.sos.alabama.gov/alabama-votes"),
+    "NY": (
+        "New York State Board of Elections",
+        "Proposal and proposition election returns",
+        "https://www.elections.ny.gov/ElectionResults.html",
+    ),
     "AZ": ("Arizona Secretary of State", "State of Arizona Official Canvass", "https://azsos.gov/elections"),
     "WA": (
         "Washington Secretary of State",
@@ -1066,6 +1086,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, SC_2010, suffix=".zip")
         else:
             raw.fetch(SOURCE, SC.format(day.year), suffix=".pdf")
+        time.sleep(1)
+    for _, _, _, stamp, path in NY_MEASURES.values():
+        raw.fetch(SOURCE, NY.format(stamp, path), suffix=Path(path).suffix)
         time.sleep(1)
     for day in ND_DAYS:
         raw.fetch(SOURCE, ND.format(day.isoformat()), suffix=".pdf")
@@ -3175,6 +3198,43 @@ def wyoming() -> list[dict[str, object]]:
     return rows
 
 
+def new_york() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for (day, number), (label, _, _, stamp, path) in NY_MEASURES.items():
+        url = NY.format(stamp, path)
+        sheet = fastexcel.read_excel(raw.cached(SOURCE, url).path).load_sheet(0, header_row=None).to_polars()
+        counties: dict[str, tuple[int, int]] = {}
+        statewide: tuple[int, int] | None = None
+        for row in sheet.rows():
+            cells = [str(cell).strip() for cell in row if cell is not None and str(cell).strip() != ""]
+            figures = [int(cell) for cell in cells[1:] if cell.isdigit()]
+            if len(cells) < 4 or len(figures) != len(cells) - 1:
+                continue
+            if cells[0] in ("Statewide Total", "Total Votes by Party"):
+                statewide = (figures[0], figures[1])
+            elif not cells[0].startswith("Total"):
+                counties[cells[0].removesuffix(" County")] = (figures[0], figures[1])
+        if len(counties) != 62 or statewide is None:
+            raise ValueError(f"{url}: {len(counties)} counties")
+        if tuple(sum(votes[side] for votes in counties.values()) for side in (0, 1)) != statewide:
+            raise ValueError(f"{url}: counties do not sum to {statewide}")
+        for county, votes in counties.items():
+            for answer, count in zip(("YES", "NO"), votes, strict=True):
+                rows.append(
+                    {
+                        "state": "NY",
+                        "day": day,
+                        "number": number,
+                        "label": label,
+                        "url": url,
+                        "county": county,
+                        "answer": answer,
+                        "votes": count,
+                    }
+                )
+    return rows
+
+
 def north_dakota() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     sheets = {
@@ -3550,6 +3610,7 @@ def parse() -> None:
             *missouri(),
             *montana(),
             *north_dakota(),
+            *new_york(),
             *wyoming(),
             *south_carolina(),
             *hawaii(),
@@ -3560,8 +3621,12 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), _ in frame.group_by("state", "day", "number", "label", maintain_order=True):
-        if (state, day.year) in (("SD", 2012), ("AZ", 2022)):
-            title, kind, passed = (SD_2012 if state == "SD" else AZ_2022)[number]
+        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022)):
+            title, kind, passed = (
+                (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
+                if state == "NY"
+                else (SD_2012 if state == "SD" else AZ_2022)[number]
+            )
             matched.append(
                 {
                     "state": state,
