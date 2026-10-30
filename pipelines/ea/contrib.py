@@ -477,7 +477,11 @@ def _check(proposal: UUID, n: int | None, requested: UUID | None, output: dict[s
         if _apply(folder) == "unchanged":
             return {"status": "unchanged"}
         tier, diff, checks = _review(conn, folder.name)
-        _supersede(conn, folder.name)
+        conn.execute(
+            sql.SQL("drop schema if exists {} cascade").format(sql.Identifier(f"cs_{folder.name.replace('-', '')}"))
+        )
+        conn.execute("delete from changeset where id = %s and status = 'pending_review'", [folder.name])
+    folder.rename(DATA / "retired" / "changesets" / folder.name)
     return {"status": "checked", "tier": tier, "diff": diff, "checks": checks}
 
 

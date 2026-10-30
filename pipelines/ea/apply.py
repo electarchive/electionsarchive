@@ -1677,7 +1677,9 @@ def revert(conn: Connection, changeset_id: str, reason: str, reviewer: str | Non
         for (table,) in conn.execute(
             """select c.relname from pg_attribute a join pg_class c on c.oid = a.attrelid
                where c.relnamespace = 'public'::regnamespace and c.relkind in ('r', 'p') and not c.relispartition
-                 and a.attname = 'changeset_id' and not a.attisdropped and c.relname not like '%\\_history'"""
+                 and a.attname = 'changeset_id' and not a.attisdropped and c.relname not like '%\\_history'
+                 and (c.relname in ('entity', 'fact_rekey')
+                      or exists (select from pg_trigger t where t.tgrelid = c.oid and t.tgname = 'ea_stamp'))"""
         ).fetchall()
     ]
     versioned = {
