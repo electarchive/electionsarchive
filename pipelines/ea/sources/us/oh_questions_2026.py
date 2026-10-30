@@ -1,4 +1,7 @@
+import io
+import json
 import re
+import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -18,23 +21,32 @@ FILE = DATA / "inbox" / "manual" / "MF-367" / "OH" / "2026-11-general-qandi.xlsx
 URL = "https://www.ohiosos.gov/elections/elections-calendar-and-results/"
 PUBLISHER = "Ohio Secretary of State"
 TITLE = "November 3, 2026 General Election: questions and issues"
+PLACES = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
+COUSUBS = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_cousubs_national.zip"
+DIRECTORY = "https://educationdata.urban.org/api/v1/school-districts/ccd/directory/2022/?fips=39"
 SCHEMES = {"Township": "us.town", "Village": "us.place", "City": "us.place", "County": "us.county", "School District": "us.school_district"}
 
 
 def fetch() -> None:
     try:
         raw.cached(SOURCE, URL)
-        return
     except LookupError:
-        pass
-    raw.store(
-        SOURCE,
-        URL,
-        FILE.read_bytes(),
-        suffix=".xlsx",
-        retrieved_at=datetime.fromtimestamp(FILE.stat().st_mtime, UTC),
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
+        raw.store(
+            SOURCE,
+            URL,
+            FILE.read_bytes(),
+            suffix=".xlsx",
+            retrieved_at=datetime.fromtimestamp(FILE.stat().st_mtime, UTC),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+    for url, suffix in ((PLACES, ".zip"), (COUSUBS, ".zip"), (DIRECTORY, ".json")):
+        raw.fetch(SOURCE, url, suffix=suffix)
+
+
+def gazetteer(url: str) -> pl.DataFrame:
+    with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+        frame = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False)
+    return frame.rename(lambda column: column.strip()).filter(pl.col("USPS") == "OH")
 
 
 def clean(value: object) -> str | None:
@@ -114,6 +126,17 @@ def emit() -> Path:
             else:
                 schools.setdefault(ceda._core(text), []).append(key)
         slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/oh/%%'").fetchall())
+        candidates: dict[tuple[str, str], list[tuple[str, str, str]]] = {}
+        for geoid, full in gazetteer(PLACES).select("GEOID", "NAME").iter_rows():
+            label = re.sub(r" (city|village|CDP)$", "", full)
+            candidates.setdefault(("place", ceda._city(label)), []).append((f"place:{geoid}", geoid, label))
+        for geoid, full in gazetteer(COUSUBS).select("GEOID", "NAME").iter_rows():
+            if full.endswith("township"):
+                candidates.setdefault(("town", geoid[:5] + ceda._core(full)), []).append((f"town:{geoid}", geoid, full.title()))
+        for entry in json.loads(raw.cached(SOURCE, DIRECTORY).path.read_text())["results"]:
+            candidates.setdefault(("school", ceda._core(entry["lea_name"])), []).append(
+                (f"school:{entry['leaid']}", entry["leaid"], entry["lea_name"])
+            )
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -129,20 +152,74 @@ def emit() -> Path:
         elections: set[UUID] = set()
         counts: dict[str, int] = {}
         kept = 0
+        taken = {path for path in slugs}
+        ohio = cs.polity("US-OH")
+        state_area = cs.area("us.state", "39")
         for row in frame.sort("kind", "county", "name", "label").iter_rows(named=True):
             name = row["name"]
+            county = counties.get(ceda._core(f"{row['county']} County"))
+            spec: list[tuple[str, str, str]] = []
+            scheme = ""
             if row["kind"] == "County":
-                code = counties.get(ceda._core(f"{name} County"))
-                key = f"us.county:{code}" if code is not None else None
+                key = f"us.county:{county}" if county is not None else None
             elif row["kind"] == "Township":
-                county = counties.get(ceda._core(f"{row['county']} County"))
-                key = towns.get((county, ceda._core(name if "Township" in name else f"{name} Township"))) if county else None
+                bare = name if "Township" in name else f"{name} Township"
+                key = towns.get((county, ceda._core(bare))) if county else None
+                spec = candidates.get(("town", (county or "") + ceda._core(bare)), [])
+                scheme = "us.town"
             elif row["kind"] == "School District":
                 options = schools.get(ceda._core(name), [])
                 key = options[0] if len(options) == 1 else None
+                spec = candidates.get(("school", ceda._core(name)), [])
+                scheme = "us.school_district"
             else:
                 options = places.get(ceda._city(name), [])
                 key = options[0] if len(options) == 1 else None
+                spec = candidates.get(("place", ceda._city(name)), [])
+                scheme = "us.place"
+            if key is None and len(spec) == 1:
+                owner, geoid, text = spec[0]
+                key = f"{scheme}:{geoid}"
+                if key not in found:
+                    polity_id = cs.key("us.polity", owner)
+                    path = f"us/oh/{slug(text)}"
+                    if path in taken:
+                        path = (
+                            f"{path}-{slug(row['county'])}-county" if scheme == "us.town" else f"{path}-city"
+                        )
+                    if path in taken:
+                        print("slug taken:", path)
+                        continue
+                    taken.add(path)
+                    area_id = cs.area(scheme, geoid)
+                    if polity_id in cs.minted:
+                        cs.add("polity", id=polity_id, kind="school_district" if scheme == "us.school_district" else "municipality", iso_code=None)
+                        cs.add("name", entity_id=polity_id, text=text, lang="en", kind="official", is_preferred=True)
+                        cs.add("polity_parent", polity_id=polity_id, parent_id=ohio)
+                        cs.add("slug", path=path, entity_id=polity_id)
+                    if area_id in cs.minted:
+                        cs.add("area", id=area_id, scheme_code=scheme)
+                        cs.add("area_code", area_id=area_id, code=geoid, valid_from=None)
+                        cs.add(
+                            "area_parent",
+                            area_id=area_id,
+                            parent_id=cs.area("us.county", geoid[:5]) if scheme == "us.town" else state_area,
+                        )
+                        cs.add("name", entity_id=area_id, text=f"{text}, OH", lang="en", kind="official", is_preferred=True)
+                    if polity_id in cs.minted:
+                        cs.add("polity_territory", polity_id=polity_id, area_id=area_id)
+                        cs.add(
+                            "reporting_unit",
+                            id=cs.unit(scheme, geoid),
+                            polity_id=polity_id,
+                            scheme_code=scheme,
+                            code=geoid,
+                            area_relation="equals",
+                            area_id=area_id,
+                            kind="standard",
+                            valid_from=None,
+                        )
+                    found[key] = (polity_id, area_id, text, path, geoid)
             if key is None or key not in found:
                 print("no polity:", row["kind"], row["county"], name)
                 continue
