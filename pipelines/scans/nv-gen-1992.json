@@ -79,8 +79,8 @@
     },
     {
      "label": "HAGELIN/TOMPKINS (NATLAW)",
-     "contest": null,
-     "candidate": ""
+     "contest": "president",
+     "candidate": "John Hagelin"
     },
     {
      "label": "MARROU/LORD (L)",
@@ -178,7 +178,7 @@
      "candidate": "Barbara F. Vucanovich"
     }
    ],
-   "dpi": 450
+   "dpi": 600
   }
  ]
 }
