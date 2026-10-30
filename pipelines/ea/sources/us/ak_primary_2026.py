@@ -24,13 +24,14 @@ FILES = {
     SUMMARY: ("2026 Primary Election summary report, official results", "application/pdf"),
 }
 CONTESTS = {
-    "U.S. Senator": ("senate", "senate", "2026 U.S. Senate primary in Alaska"),
+    "U.S. Senator": ("senate", "senate", "senate", "2026 U.S. Senate primary in Alaska"),
     "U.S. Representative": (
         "house-at-large",
         "house:0",
+        "house:0",
         "2026 U.S. House primary in Alaska's at-large congressional district",
     ),
-    "Governor / Lieutenant Governor": ("governor", "governor", "2026 gubernatorial primary in Alaska"),
+    "Governor / Lieutenant Governor": ("governor", "governor", "governor", "2026 gubernatorial primary in Alaska"),
 }
 PARTIES = {
     "REP": "Republican Party",
@@ -47,6 +48,20 @@ NOTE = (
 )
 MEASURE = "BM#1 23RCF2"
 TICKET = " The Division prints each governor and lieutenant governor ticket by surname only."
+
+
+def contest_of(title: str) -> tuple[str, str, str, str] | None:
+    if title in CONTESTS:
+        return CONTESTS[title]
+    if found := re.fullmatch(r"(House|Senate) District (\w+)", title):
+        chamber, district = found[1].lower(), found[2].lower()
+        return (
+            f"state-{chamber}-{district}",
+            f"{chamber}:{district}",
+            f"{chamber}:{district}:g",
+            f"2026 Alaska {found[1]} District {found[2]} primary",
+        )
+    return None
 
 
 def fetch() -> None:
@@ -81,7 +96,7 @@ def emit() -> Path:
     codes: dict[str, dict[str, str]] = {}
     for row in csv.DictReader(raw.cached(SOURCE, BASE + PRECINCTS).path.read_text(encoding="utf-8-sig").splitlines()):
         title = row["Contest_title"]
-        if (title not in CONTESTS and title != MEASURE) or not row["total_votes"]:
+        if (contest_of(title) is None and title != MEASURE) or not row["total_votes"]:
             continue
         place, name = row["Precinct_name"].strip(), row["candidate_name"].strip()
         if precinct := re.match(r"(\d\d-\d\d\d) ", place):
@@ -202,8 +217,9 @@ def emit() -> Path:
                 )
             return units[code]
 
-        for title, (tail, general, label) in CONTESTS.items():
-            key = f"{DAY}:AK:{general}"
+        for title, candidates in tallies.items():
+            tail, code, general, label = contest_of(title)
+            key = f"{DAY}:AK:{code}"
             contest = cs.key("us.contest", key)
             template = conn.execute(
                 """select kind, body_id, seat_id, office_id, district_area_id, boundary_set_id, magnitude, term, id
@@ -242,7 +258,7 @@ def emit() -> Path:
             }
             options: dict[str, UUID] = {}
             persons: dict[str, UUID] = {}
-            for candidate in tallies[title]:
+            for candidate in candidates:
                 if tail == "governor":
                     text = candidate.partition("/")[0].strip()
                     matches = surnames.get(words(text)[-1], set())
@@ -306,7 +322,7 @@ def emit() -> Path:
                 )
             by_place: dict[str, int] = {}
             rows = []
-            for candidate, by_unit in tallies[title].items():
+            for candidate, by_unit in candidates.items():
                 for code, votes in by_unit.items():
                     by_place[code] = by_place.get(code, 0) + votes
                     rows.append((str(result), str(unit_of(code)), str(options[candidate]), 0, 1, 0, 0, votes))
