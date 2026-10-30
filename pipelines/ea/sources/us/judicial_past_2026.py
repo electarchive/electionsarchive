@@ -1,5 +1,6 @@
 import csv
 import json
+import re
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -27,24 +28,71 @@ TITLES = {
     "Court of Appeals - Western Division": "Judge of the Court of Appeals",
     "Court of Criminal Appeals - Eastern Division": "Judge of the Court of Criminal Appeals",
 }
-STATES = {"AR": "Arkansas", "OR": "Oregon", "TN": "Tennessee"}
+STATES = {"AR": "Arkansas", "GA": "Georgia", "ID": "Idaho", "OR": "Oregon", "TN": "Tennessee"}
+EVENTS = {
+    "GA": (
+        "ga",
+        re.compile(r"(?:Justice - Supreme Court|Judge - Court of Appeals) of Georgia \((?P<seat>[^)]+)\)"),
+    ),
+    "ID": (
+        "id",
+        re.compile(r"(?:Justice of the Supreme Court|Judge of the Court of Appeals) - (?P<seat>Seat \w+)"),
+    ),
+}
 AR_DAY = date(2026, 3, 3)
-AR_PAGE = "https://arkansas.tally-enr.com/"
+PAGES = {"AR": "https://arkansas.tally-enr.com/", "GA": "https://results.sos.ga.gov/", "ID": "https://results.voteidaho.gov/"}
 OE_PAGE = "https://github.com/openelections"
 NOTE = (
     "County totals as published by the state's election authority; the county sums were checked against the statewide totals "
     "where the source gives them."
 )
-WRITE_INS = {"Write-ins", "Write-in", "Scattering"}
+PLURALITY = {"ID"}
+
+
+def is_write_in(name: str) -> bool:
+    return name.lower().startswith("write") or name == "Scattering"
 
 
 def url(state: str) -> str:
     return OE_DATA.format(state.lower(), FILES[state][1])
 
 
+def items(state: str) -> list[dict[str, object]]:
+    code, pattern = EVENTS[state]
+    listing = json.loads(raw.cached(oe.SOURCE, oe.url(code, "ballot-items")).path.read_bytes())["data"]
+    return [item for item in listing if pattern.fullmatch(item["name"][0]["text"])]
+
+
 def fetch() -> None:
     for state in FILES:
         raw.fetch(SOURCE, url(state), suffix=".csv")
+    for state, (code, _) in EVENTS.items():
+        for item in items(state):
+            raw.fetch(SOURCE, f"{oe.EV[code][0]}ballot-items/{item['id']}", suffix=".json")
+
+
+def ev_rows(state: str) -> list[dict[str, str | int]]:
+    code, pattern = EVENTS[state]
+    rows: list[dict[str, str | int]] = []
+    for item in items(state):
+        text = item["name"][0]["text"]
+        found = pattern.fullmatch(text)
+        title = "Justice of the Supreme Court" if "Supreme" in text else "Judge of the Court of Appeals"
+        detail = json.loads(raw.cached(SOURCE, f"{oe.EV[code][0]}ballot-items/{item['id']}").path.read_bytes())
+        by_candidate: dict[str, int] = defaultdict(int)
+        for county in detail["breakdownResults"]:
+            place = county["locality"]["name"][0]["text"].removesuffix(" County")
+            for option in county["ballotOptions"]:
+                name = re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip()
+                by_candidate[name] += option["voteCount"]
+                rows.append(
+                    {"state": state, "title": title, "seat": found["seat"], "county": place, "answer": "", "candidate": name, "votes": option["voteCount"]}
+                )
+        for option in detail["summaryResults"]["ballotOptions"]:
+            name = re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip()
+            if by_candidate[name] != option["voteCount"]:
+                raise ValueError(f"{state} {text} {name}: counties {by_candidate[name]} differ from statewide {option['voteCount']}")
+    return rows
 
 
 def ar_rows() -> list[dict[str, str | int]]:
@@ -99,7 +147,7 @@ def oe_rows(state: str) -> list[dict[str, str | int]]:
 
 
 def emit() -> Path:
-    rows = [*ar_rows(), *oe_rows("OR"), *oe_rows("TN")]
+    rows = [*ar_rows(), *ev_rows("GA"), *ev_rows("ID"), *oe_rows("OR"), *oe_rows("TN")]
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -112,7 +160,7 @@ def emit() -> Path:
         for code, text, id in conn.execute(
             """select u.code, n.text, u.id from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(05|41|47)'"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(05|13|16|41|47)'"""
         ).fetchall():
             counties.setdefault((code[:2], oe.plain(text)), id)
             counties[(code[:2], code)] = id
@@ -130,21 +178,21 @@ def emit() -> Path:
                from candidacy cy join contest_option o on o.id = cy.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                join name n on n.entity_id = cy.person_id and n.is_preferred
-               where x.value ~ ':(AR|OR|TN):[a-z-]*(justice|judge)'"""
+               where x.value ~ ':(AR|GA|ID|OR|TN):[a-z-]*(justice|judge)'"""
         ).fetchall():
             pool[(state, slug(text))].add(person)
-        election_keys = {"AR": "2026-03-03:AR:primary", "OR": FILES["OR"][2], "TN": FILES["TN"][2]}
+        election_keys = {"AR": "2026-03-03:AR:primary", "GA": "2026-05-19:GA:primary", "ID": "2026-05-19:ID:primary", "OR": FILES["OR"][2], "TN": FILES["TN"][2]}
         elections = {
             state: conn.execute(
                 "select entity_id from external_id where scheme = 'us.election' and value = %s", [key]
             ).fetchone()[0]
             for state, key in election_keys.items()
         }
-        days = {"AR": AR_DAY, "OR": FILES["OR"][0], "TN": FILES["TN"][0]}
+        days = {"AR": AR_DAY, "GA": FILES["OR"][0], "ID": FILES["OR"][0], "OR": FILES["OR"][0], "TN": FILES["TN"][0]}
         sources: dict[str, UUID] = {}
         for state in STATES:
-            official = state == "AR"
-            publisher = "Arkansas Secretary of State" if official else "OpenElections"
+            official = state in ("AR", "GA", "ID")
+            publisher = f"{STATES[state]} Secretary of State" if official else "OpenElections"
             title = f"{STATES[state]} {days[state]:%B %-d, %Y} election results"
             sources[state] = cs.source(publisher, title)
             cs.add(
@@ -153,13 +201,16 @@ def emit() -> Path:
                 kind="official_body" if official else "community",
                 publisher=publisher,
                 title=title,
-                url=AR_PAGE if official else OE_PAGE,
+                url=PAGES.get(state, OE_PAGE),
                 license="Public record" if official else None,
             )
-            artifact = (
-                raw.cached(oe.SOURCE, oe.url("ar", "data")) if official else raw.cached(SOURCE, url(state))
-            )
-            cs.artifact(artifact, sources[state])
+            if state == "AR":
+                cs.artifact(raw.cached(oe.SOURCE, oe.url("ar", "data")), sources[state])
+            elif state in EVENTS:
+                for item in items(state):
+                    cs.artifact(raw.cached(SOURCE, f"{oe.EV[EVENTS[state][0]][0]}ballot-items/{item['id']}"), sources[state])
+            else:
+                cs.artifact(raw.cached(SOURCE, url(state)), sources[state])
 
         def person_of(state: str, text: str) -> UUID:
             found = pool.get((state, slug(text)), set())
@@ -172,7 +223,7 @@ def emit() -> Path:
             return id
 
         retention_system = cs.key("us.electoral_system", "retention")
-        two_round = cs.key("us.electoral_system", "two_round")
+        systems = {state: cs.key("us.electoral_system", "fptp" if state in PLURALITY else "two_round") for state in STATES}
         offices: set[UUID] = set()
         groups: dict[tuple[str, str, str, str], list[dict[str, str | int]]] = defaultdict(list)
         for row in rows:
@@ -203,7 +254,7 @@ def emit() -> Path:
                 magnitude=1,
                 term="full",
                 round_number=1,
-                electoral_system_id=retention_system if retention else two_round,
+                electoral_system_id=retention_system if retention else systems[state],
                 default_result_kind="counted",
             )
             label = f"{title}{f', {seat}' if seat else ''}"
@@ -238,7 +289,7 @@ def emit() -> Path:
             for position, name in enumerate(by_choice):
                 options[name] = cs.key("us.option", f"{contest_key}:{slug(name)}")
                 is_answer = retention
-                is_writein = name in WRITE_INS
+                is_writein = is_write_in(name)
                 cs.add(
                     "contest_option",
                     id=options[name],
@@ -267,11 +318,11 @@ def emit() -> Path:
                     ballot_name=judge,
                     is_independent=False,
                 )
-            contenders = [name for name in ranked if name not in WRITE_INS]
+            contenders = [name for name in ranked if not is_write_in(name)]
             winner = contenders[0]
             if retention:
                 cs.add("outcome", result_set_id=result, option_id=options[winner], kind="won")
-            elif totals[winner] * 2 > sum(totals.values()) or len(contenders) == 1:
+            elif state in PLURALITY or totals[winner] * 2 > sum(totals.values()) or len(contenders) == 1:
                 cs.add("outcome", result_set_id=result, option_id=options[winner], kind="won")
             by_place: dict[str, int] = defaultdict(int)
             values = []
