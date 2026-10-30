@@ -2519,6 +2519,34 @@ for key, publisher, title, url, local in (
     ("KS-20147-townships", "Phillips County Clerk", "2026 Kansas General Election Candidate List", "https://www.phillipscountyks.org/elections-candidatelist", "ks/phillips_notice.html"),
     ("KS-20185-townships", "Stafford County Clerk", "Notice of General Election, November 3, 2026", "https://www.staffordcounty.org/uploads/1/3/3/6/133660997/2026_genl_newspaper_pub.pdf", "ks/stafford_notice.pdf"),
     ("KS-20191-townships", "Sumner County Clerk", "County Clerk's Notice, November 3, 2026", "https://www.co.sumner.ks.us/Candidate%20pub%202026.pdf", "ks/sumner_notice.pdf"),
+    ("OR-41007-astoria", "Clatsop County Elections", "Candidate Certification, City of Astoria, November 3, 2026", "https://www.clatsopcounty.gov/DocumentCenter/View/4600", "or/clatsop_astoria.pdf"),
+    ("OR-41007-seaside", "Clatsop County Elections", "Candidate Certification, City of Seaside, November 3, 2026", "https://www.clatsopcounty.gov/DocumentCenter/View/4574", "or/clatsop_seaside.pdf"),
+    ("OR-41007-warrenton", "Clatsop County Elections", "Candidate Certification, City of Warrenton, November 3, 2026", "https://www.clatsopcounty.gov/DocumentCenter/View/4573", "or/clatsop_warrenton.pdf"),
+    ("OR-41061-union", "Union County Clerk", "Candidate Contact List, November 3, 2026 General Election", "https://unioncountyor.gov/wp-content/uploads/2026/09/CANDIDATE-CONTACT-LIST-2026-General-Election-1.pdf", "or/union_candidates.pdf"),
+    ("KS-20005-townships", "Atchison County Clerk", "Candidate List for Ballots, November 3, 2026 General Election", "https://www.atchisoncountyks.org/", "ks/atchison_ballots.pdf"),
+    ("KS-20107-townships", "Linn County Clerk", "Notice of General Election, November 3, 2026", "https://www.linncountyks.com/", "ks/linn_notice.pdf"),
+    ("KS-20087-townships", "Jefferson County Clerk", "Candidate filings as of June 1, 2026", "https://www.jeffersoncountyks.gov/", "ks/jefferson_filings.pdf"),
+    ("KS-20043-townships", "Doniphan County Clerk", "Notice of General Election, October 1, 2026", "https://www.dpcountyks.com/", "ks/doniphan_notice.doc"),
+    ("FL-12069-lake", "Lake County Supervisor of Elections", "Current Municipal Candidates", "https://www.lakevotes.gov/", "fl/lake_municipal_candidates.html"),
+    ("FL-12103-pinellas", "Pinellas County Supervisor of Elections", "General election information, November 3, 2026", "https://www.votepinellas.gov/", "fl/pinellas_election_information.html"),
+    ("FL-12061-vero", "City of Vero Beach", "Candidates For City Council 2026", "https://www.covb.gov/", "fl/indian_river_vero_beach_council_candidates.html"),
+    ("FL-12001-alachua", "Alachua County Supervisor of Elections", "2026 Final Approved General Sample Ballot", "https://www.votealachua.gov/", "fl/alachua_sample_ballot.pdf"),
+    ("FL-12061-sebastian", "The Ballot Brief", "Sebastian City Council (two seats), November 3, 2026", "https://theballotbrief.com/state/florida/indian-river-county", "fl/indian_river_sebastian_ballotbrief_two_seats.html"),
+    ("KY-21045-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Casey County", "https://web.sos.ky.gov/ballots/Casey%202026G.pdf", "ky/ballots/CASEY.pdf"),
+    ("KY-21073-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Franklin County", "https://web.sos.ky.gov/ballots/Franklin%202026G.pdf", "ky/ballots/FRANKLIN.pdf"),
+    ("KY-21087-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Green County", "https://web.sos.ky.gov/ballots/Green%202026G.pdf", "ky/ballots/GREEN.pdf"),
+    ("KY-21127-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Lawrence County", "https://web.sos.ky.gov/ballots/Lawrence%202026G.pdf", "ky/ballots/LAWRENCE.pdf"),
+    ("KY-21139-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Livingston County", "https://web.sos.ky.gov/ballots/Livingston%202026G.pdf", "ky/ballots/LIVINGSTON.pdf"),
+    ("KY-21169-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Metcalfe County", "https://web.sos.ky.gov/ballots/Metcalfe%202026G.pdf", "ky/ballots/METCALFE.pdf"),
+    ("KY-21221-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Trigg County", "https://web.sos.ky.gov/ballots/Trigg%202026G.pdf", "ky/ballots/TRIGG.pdf"),
+    ("KY-21231-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Wayne County", "https://web.sos.ky.gov/ballots/Wayne%202026G.pdf", "ky/ballots/WAYNE.pdf"),
+    ("KY-21239-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Woodford County", "https://web.sos.ky.gov/ballots/Woodford%202026G.pdf", "ky/ballots/WOODFORD.pdf"),
+    ("IN-18003-townships", "Allen County Election Board", "2026 General Election candidate list, Allen County", "https://www.allencounty.us/", "in/allen_candidates.pdf"),
+    ("IN-18081-townships", "Johnson County Clerk", "2026 General Election candidate list, Johnson County", "https://www.johnsoncountyin.gov/", "in/johnson_candidates.pdf"),
+    ("IN-18135-townships", "Randolph County Clerk", "2026 General Election candidate list, Randolph County", "https://www.randolphcounty.in.gov/", "in/randolph_candidates.pdf"),
+    ("IN-18057-townships", "Hamilton County Election Board", "2026 General Election sample ballot, Westfield Precinct 701", "https://www.hamiltoncounty.in.gov/", "in/hamilton_westfield_ballot.pdf"),
+    ("FL-12127-volusia", "Volusia County Supervisor of Elections", "Current candidates, 2026", "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=volusia&c=volusia", "fl/volusia_candidates.html"),
+    ("OR-41059-umatilla", "Umatilla County Elections", "Contest and Candidate Listing for the November 3, 2026 General Election", "https://www.umatillacounty.gov/departments/elections/general-election/contest-and-candidate-listing-for-the-november-3-2026-general-election", "or/umatilla_candidates.html"),
     ("NE-31019-buffalo", "Buffalo County Election Commissioner", "2026 General Election Candidate List", "https://buffalocounty.ne.gov/Portals/0/adam/Content/mgWb3Nnhl0WyG-jsGQjG2A/Link/GN26%20Candidate%20List.pdf", "ne/buffalo_cities.pdf"),
     ("NE-31141-platte", "Platte County Election Commissioner", "Countywide Candidate List, General Election November 3, 2026 (August 4, 2026)", "https://plattecounty.ne.gov/wp-content/uploads/2026/08/Countywide-Candidate-List-08.04.26.pdf", "ne/platte_cities.pdf"),
     ("NE-31111-lincoln", "Lincoln County Election Commissioner", "2026 Election Candidates as of August 3, 2026", "https://lincolncountyne.gov/wp-content/uploads/2026/08/2026-Candidates-List-1.pdf", "ne/lincoln_cities.pdf"),
@@ -5644,6 +5672,10 @@ def parse() -> None:
                         ]
             for row in found:
                 template, tail = tails.get((str(row["fips"]), str(row["contest"])), (None, None))
+                if state == "NY" and tail is not None and re.fullmatch(
+                    r"NY:\d{7}:(supervisor|highway-superintendent|assessor|collector)", tail
+                ):
+                    template = tail = None
                 if row.get("tail") is not None:
                     template = tail = str(row["tail"]) if row["tail"] in exact else None
                 if key == "KY" and str(row["contest"]) in schools:
