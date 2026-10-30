@@ -5249,7 +5249,7 @@ def parse() -> None:
                                 continue
                             said = (
                                 rest[0]
-                                if not start and rest and rest[0] in ("township", "borough", "city", "town", "village")
+                                if not start and sort != "school" and rest and rest[0] in ("township", "borough", "city", "town", "village")
                                 else start[0]
                                 if start
                                 else ""
