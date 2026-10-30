@@ -18,7 +18,7 @@ import polars as pl
 
 from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import cog, govmint, mn_local
+from ea.sources.us import cog, govmint, ky_ballots, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
 
@@ -2532,21 +2532,24 @@ for key, publisher, title, url, local in (
     ("FL-12061-vero", "City of Vero Beach", "Candidates For City Council 2026", "https://www.covb.gov/", "fl/indian_river_vero_beach_council_candidates.html"),
     ("FL-12001-alachua", "Alachua County Supervisor of Elections", "2026 Final Approved General Sample Ballot", "https://www.votealachua.gov/", "fl/alachua_sample_ballot.pdf"),
     ("FL-12061-sebastian", "The Ballot Brief", "Sebastian City Council (two seats), November 3, 2026", "https://theballotbrief.com/state/florida/indian-river-county", "fl/indian_river_sebastian_ballotbrief_two_seats.html"),
-    ("KY-21045-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Casey County", "https://web.sos.ky.gov/ballots/Casey%202026G.pdf", "ky/ballots/CASEY.pdf"),
-    ("KY-21073-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Franklin County", "https://web.sos.ky.gov/ballots/Franklin%202026G.pdf", "ky/ballots/FRANKLIN.pdf"),
-    ("KY-21087-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Green County", "https://web.sos.ky.gov/ballots/Green%202026G.pdf", "ky/ballots/GREEN.pdf"),
-    ("KY-21127-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Lawrence County", "https://web.sos.ky.gov/ballots/Lawrence%202026G.pdf", "ky/ballots/LAWRENCE.pdf"),
-    ("KY-21139-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Livingston County", "https://web.sos.ky.gov/ballots/Livingston%202026G.pdf", "ky/ballots/LIVINGSTON.pdf"),
-    ("KY-21169-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Metcalfe County", "https://web.sos.ky.gov/ballots/Metcalfe%202026G.pdf", "ky/ballots/METCALFE.pdf"),
-    ("KY-21221-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Trigg County", "https://web.sos.ky.gov/ballots/Trigg%202026G.pdf", "ky/ballots/TRIGG.pdf"),
-    ("KY-21231-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Wayne County", "https://web.sos.ky.gov/ballots/Wayne%202026G.pdf", "ky/ballots/WAYNE.pdf"),
-    ("KY-21239-cities", "Kentucky Secretary of State", "2026 general election sample ballot, Woodford County", "https://web.sos.ky.gov/ballots/Woodford%202026G.pdf", "ky/ballots/WOODFORD.pdf"),
     ("IN-18003-townships", "Allen County Election Board", "2026 General Election candidate list, Allen County", "https://www.allencounty.us/", "in/allen_candidates.pdf"),
     ("IN-18081-townships", "Johnson County Clerk", "2026 General Election candidate list, Johnson County", "https://www.johnsoncountyin.gov/", "in/johnson_candidates.pdf"),
     ("IN-18135-townships", "Randolph County Clerk", "2026 General Election candidate list, Randolph County", "https://www.randolphcounty.in.gov/", "in/randolph_candidates.pdf"),
     ("IN-18057-townships", "Hamilton County Election Board", "2026 General Election sample ballot, Westfield Precinct 701", "https://www.hamiltoncounty.in.gov/", "in/hamilton_westfield_ballot.pdf"),
     ("FL-12127-volusia", "Volusia County Supervisor of Elections", "Current candidates, 2026", "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=volusia&c=volusia", "fl/volusia_candidates.html"),
     ("OR-41059-umatilla", "Umatilla County Elections", "Contest and Candidate Listing for the November 3, 2026 General Election", "https://www.umatillacounty.gov/departments/elections/general-election/contest-and-candidate-listing-for-the-november-3-2026-general-election", "or/umatilla_candidates.html"),
+    ("TX-48187-schertz", "City of Schertz", "November 3, 2026 General Election: candidate information", "https://www.schertz.com/", "tx/guadalupe_schertz_general_election.html"),
+    ("MI-26117", "Montcalm County Clerk", "Official Candidate Lists, November 3, 2026 General Election (9/9/2026)", "https://www.montcalm.us/", "mi/montcalm.pdf"),
+    ("TN-47157-shelby", "Shelby County Election Commission", "Official sample ballot, 2026 State and Federal General and Municipal Elections, November 3, 2026", "https://www.shelbyvote.com/", "tn/shelby_sample_ballot.pdf"),
+    ("TN-47125-clarksville", "Montgomery County Election Commission", "Qualified candidates, State General and City of Clarksville, November 3, 2026", "https://www.montgomerytn.gov/election", "tn/montgomery_qualified_candidates.pdf"),
+    ("WY-56023-towns", "Lincoln County Clerk", "Municipal candidate list, 2026 general election", "https://www.lincolncountywy.org/", "wy/lincoln_municipal_candidates.xlsx"),
+    ("WY-56031-towns", "Platte County Clerk", "2026 Primary Election Candidate Nominees (updated September 1, 2026), municipal offices", "https://www.plattecountywyoming.com/", "wy/platte_municipal_nominees.pdf"),
+    ("WY-56043-towns", "Washakie County Clerk", "Washakie County 2026 General Candidate Roster, municipal offices", "https://www.washakiecounty.net/", "wy/washakie_general_roster.pdf"),
+    ("WY-56045-towns", "Weston County Clerk", "Sample general election ballot, Newcastle Inside 5-1, November 3, 2026", "https://www.westoncountywy.gov/", "wy/weston_newcastle_sample_ballot.pdf"),
+    ("WY-56017-towns", "Hot Springs County Clerk", "2026 General Election sample ballots, Thermopolis precincts", "https://www.hscounty.com/", "wy/hot_springs_sample_ballots.pdf"),
+    ("WY-56001-towns", "Albany County Clerk", "Official general election sample ballots, Laramie wards 1 to 3, November 3, 2026", "https://www.albanycountywy.gov/", "wy/albany_laramie_ward1.pdf"),
+    ("WY-56009-towns", "Converse County Clerk", "Official sample ballot, Courthouse precinct (City of Douglas), November 3, 2026", "https://www.conversecounty.org/", "wy/converse_douglas_sample_ballot.pdf"),
+    ("WY-56019-towns", "Johnson County Clerk", "Sample general election ballot, Buffalo precinct 3-3, November 3, 2026", "https://www.johnsoncountywy.org/", "wy/johnson_buffalo_sample_ballot.pdf"),
     ("NE-31019-buffalo", "Buffalo County Election Commissioner", "2026 General Election Candidate List", "https://buffalocounty.ne.gov/Portals/0/adam/Content/mgWb3Nnhl0WyG-jsGQjG2A/Link/GN26%20Candidate%20List.pdf", "ne/buffalo_cities.pdf"),
     ("NE-31141-platte", "Platte County Election Commissioner", "Countywide Candidate List, General Election November 3, 2026 (August 4, 2026)", "https://plattecounty.ne.gov/wp-content/uploads/2026/08/Countywide-Candidate-List-08.04.26.pdf", "ne/platte_cities.pdf"),
     ("NE-31111-lincoln", "Lincoln County Election Commissioner", "2026 Election Candidates as of August 3, 2026", "https://lincolncountyne.gov/wp-content/uploads/2026/08/2026-Candidates-List-1.pdf", "ne/lincoln_cities.pdf"),
@@ -3291,6 +3294,7 @@ def parse() -> None:
     }
     councils: dict[tuple[str, frozenset[str]], tuple[str, int]] = {}
     warded: set[tuple[str, frozenset[str]]] = set()
+    ballot_text: dict[str, list[str]] = {}
     for county in filings["County"].unique():
         try:
             ballot_pdf = raw.cached(SOURCE, BALLOTS.format(str(county).replace(" ", "%20"))).path
@@ -3301,6 +3305,7 @@ def parse() -> None:
             .stdout.decode()
             .splitlines()
         )
+        ballot_text[str(county)] = printed
         for i, line in enumerate(printed):
             asks = re.search(r"(?i)\(?Vote ?for (?:up to )?(\w+)(?: candidates?)?\)?$", line.strip())
             if asks is None:
@@ -3332,8 +3337,8 @@ def parse() -> None:
     magnitudes: dict[tuple[str, str], int] = {}
     spellings: dict[tuple[str, frozenset[str]], str] = {}
     contests = []
-    for county, post, district, description in filings.select(
-        "County", "Office", "District", "Office Description"
+    for county, post, district, description, last_name in filings.select(
+        "County", "Office", "District", "Office Description", "Last Name"
     ).iter_rows():
         place = str(county).title().replace("Mccracken", "McCracken").replace("Mclean", "McLean")
         city = " ".join(
@@ -3344,6 +3349,8 @@ def parse() -> None:
             ).split()
         ).title()
         city = KY_CITY_SPELLINGS.get((str(county), city), city)
+        if not city and post in ("MAYOR", "CITY LEGISLATIVE BODY") and str(county) in ballot_text:
+            city = ky_ballots.city_by_candidate(ballot_text[str(county)], post == "MAYOR", str(last_name)) or ""
         if city:
             city = spellings.setdefault(
                 (str(county), coverage_tables.tokens(re.sub(r"\s+City$", "", city))),
@@ -3689,9 +3696,8 @@ def parse() -> None:
         row["state_leaid"].removeprefix("MN-"): row["leaid"]
         for row in json.loads(raw.cached(mn_local.SOURCE, mn_local.DIRECTORY).path.read_text())["results"]
     }
-    names = {
-        cells[0]: cells[1]
-        for cells in csv.reader(
+    subdivisions = list(
+        csv.reader(
             io.StringIO(
                 raw.cached(mn_local.SOURCE, mn_local.url(mn_local.COUNTIES, "MCDTbl.txt")).path.read_text(
                     encoding="utf-8", errors="replace"
@@ -3699,7 +3705,9 @@ def parse() -> None:
             ),
             delimiter=";",
         )
-    }
+    )
+    names = {cells[0]: cells[1] for cells in subdivisions}
+    subdivision_county = {cells[2]: cells[0] for cells in subdivisions}
     for key in ("MN", "MN-county", "MN-school"):
         for cells in csv.reader(
             io.StringIO(raw.cached(SOURCE, FEEDS[key][0]).path.read_text(encoding="utf-8", errors="replace")),
@@ -3713,13 +3721,11 @@ def parse() -> None:
             found = re.search(
                 r"(?i)\b(ward \d+|district \d+|position \d+|seat [a-z0-9]+|at large)\b", stem
             ) or re.search(r"(?i)\b((?!member\b)[a-z]+ district)$", stem)
-            seat = (
-                ":" + slug(re.sub(r"(?i)^at large$", "At-Large", found[1].title().replace("At Large", "At-Large")))
-                if found
-                else ""
-            )
+            shown = re.sub(r"(?i)^at large$", "At-Large", found[1].title().replace("At Large", "At-Large")) if found else ""
+            seat = f":{slug(shown)}" if found else ""
             special = ":special" if upper.startswith("SPECIAL ELECTION") else ""
             tail = None
+            claim = {}
             if key == "MN-school":
                 school = re.search(r"\((ISD|SSD) ?#\s*(\d+)\)", upper)
                 code = school and leas.get(f"{mn_local.TYPES[school[1]]}{int(school[2]):04d}")
@@ -3740,10 +3746,31 @@ def parse() -> None:
                     ),
                     None,
                 )
-                tail = held and cells[5] in codes and f"MN:{codes[cells[5]]}:{held}{seat}{special}"
+                geoid = codes.get(cells[5])
+                if held and geoid is None:
+                    county = subdivision_county.get(cells[5])
+                    city = held in ("mayor", "council")
+                    if city or county is not None:
+                        geoid = f"27{cells[5]}" if city else f"27{int(county) * 2 - 1:03d}{cells[5]}"
+                        label = [part for part in re.findall(r"\(([^)]*)\)", title) if not part.startswith("Elect")][-1]
+                        claim = {
+                            "owner": f"{'place' if city else 'town'}:{geoid}",
+                            "label": label,
+                            "office": {
+                                "mayor": "mayoral",
+                                "council": "Council",
+                                "town-board": "Town Board",
+                                "clerk": "Clerk",
+                                "treasurer": "Treasurer",
+                                "clerk-treasurer": "Clerk-Treasurer",
+                            }[held]
+                            + (f", {shown}" if shown else ""),
+                        }
+                tail = held and geoid and f"MN:{geoid}:{held}{seat}{special}"
             magnitude = re.search(r"\(ELECT (\d+)\)", upper)
             feeds[key].append(
                 {
+                    **claim,
                     "county": names.get(cells[1], "") if key == "MN-county" else "",
                     "contest": f"{names.get(cells[1], '')} County {title}"
                     if key == "MN-county"
@@ -5694,6 +5721,15 @@ def parse() -> None:
                     template = tail = None
                 if row.get("tail") is not None:
                     template = tail = str(row["tail"]) if row["tail"] in exact else None
+                    if tail is None and row.get("owner"):
+                        template, tail = "", str(row["tail"])
+                        minted[tail] = (
+                            str(row["office"]),
+                            str(row["label"]),
+                            str(row["owner"]),
+                            owned.get(str(row["owner"])) or f"us/mn/{slug(str(row['label']))}",
+                        )
+                        pinned.add(tail)
                 if key == "KY" and str(row["contest"]) in schools:
                     title, district, owner = schools[str(row["contest"])]
                     template, tail = "", f"KY:{owner.split(':')[1]}:board-of-education:{slug(title.split(', ')[1])}"
