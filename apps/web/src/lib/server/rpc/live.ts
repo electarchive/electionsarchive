@@ -1,12 +1,14 @@
 import type { SQL } from "drizzle-orm";
+import { dev } from "$app/env";
 import { openapi } from "@orpc/openapi";
-import { ORPCError } from "@orpc/server";
+import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
+import { NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 
 const LEVELS = new Set([
   "us.place",
@@ -100,7 +102,7 @@ function group(path: string) {
     return "council";
   }
   if (
-    /^(?:proposal|proposition|question|measure|amendment|constitutional-amendment|proposed-amendment|issue)/u.test(
+    /^(?:proposal|proposition|question|measure|(?:proposed-)?(?:constitutional-)?amendment|(?:statewide-)?referendum|ballot-question|initiative|issue)/u.test(
       seat,
     )
   ) {
@@ -149,8 +151,9 @@ async function sets(id: string) {
     note: string | null;
     publisher: string;
     url: string | null;
+    reported: number | null;
   }>(sql`
-    select rs.k, rs.contest_id as contest, to_char(rs.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at, c.election_id <> ${id}::uuid as outside,
+    select rs.k, rs.completeness::float8 as reported, rs.contest_id as contest, to_char(rs.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at, c.election_id <> ${id}::uuid as outside,
       (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) as scheme,
       (select n.body_md from note n where n.entity_id = rs.id and n.kind = 'methodology' limit 1) as note,
       s.publisher, s.url
@@ -277,7 +280,16 @@ function scanners(note: string | null) {
   });
 }
 
-const Input = v.object({ path: v.string() });
+const Input = v.object({
+  path: v.string(),
+  rehearsal: v.optional(
+    v.object({
+      started: v.nullable(v.number()),
+      shown: v.number(),
+      isFinal: v.boolean(),
+    }),
+  ),
+});
 
 export const live = {
   get: os
@@ -292,7 +304,62 @@ export const live = {
     .input(Input)
     .handler(async ({ input }) => {
       const found = await election(input.path);
-      const stamped = await sets(found.id);
+      const plan =
+        dev && input.rehearsal != null
+          ? {
+              ...input.rehearsal,
+              from:
+                input.rehearsal.started ??
+                Date.parse(`${found.date}T00:20:00Z`) + 86_400_000,
+              every: input.rehearsal.started == null ? 1_200_000 : 150_000,
+            }
+          : null;
+      const staged = new Map<
+        number,
+        Array<{ option: string; votes: number; full: number }>
+      >();
+      const stamped =
+        plan == null
+          ? await sets(found.id)
+          : await (async () => {
+              const frame = await rehearsal(found.id, found.date);
+              return Array.from(
+                { length: Math.min(plan.shown, NIGHT) },
+                (_, index) =>
+                  [...Map.groupBy(frame(index), (row) => row.contest)].flatMap(
+                    ([contest, rows]) => {
+                      if (rows.every((row) => row.votes === 0)) {
+                        return [];
+                      }
+                      const k = -1 - staged.size;
+                      staged.set(k, rows);
+                      let counted = 0;
+                      let full = 0;
+                      for (const row of rows) {
+                        counted += row.votes;
+                        full += row.full;
+                      }
+                      return [
+                        {
+                          k,
+                          contest,
+                          at: new Date(plan.from + index * plan.every)
+                            .toISOString()
+                            .replace(/\.\d+Z$/u, "Z"),
+                          outside: false,
+                          scheme: rows.some((row) => row.area != null)
+                            ? "us.county"
+                            : "us.state",
+                          note: null,
+                          publisher: "Rehearsal",
+                          url: null,
+                          reported: full > 0 ? counted / full : null,
+                        },
+                      ];
+                    },
+                  ),
+              ).flat();
+            })();
       if (
         stamped.length === 0 &&
         Date.parse(found.date) < Date.now() - 2 * 86_400_000
@@ -319,7 +386,7 @@ export const live = {
         .toSorted((a, b) => a.stamp.localeCompare(b.stamp));
       const settledOnly = await db.execute<{ id: string }>(sql`
         select c.id from contest c
-        where ${stamped.length > 0}::boolean and c.election_id = ${found.id}::uuid
+        where ${stamped.length > 0 && plan?.isFinal !== false}::boolean and c.election_id = ${found.id}::uuid
           and exists (select from result_set rs where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted')
       `);
       const contests = [
@@ -329,8 +396,20 @@ export const live = {
         ]),
       ];
       const [summed, settled, choices, titles, slugs] = await Promise.all([
-        totals(listed.map((row) => row.k)),
-        certified(contests),
+        plan == null
+          ? totals(listed.map((row) => row.k))
+          : [...staged].flatMap(([set, rows]) =>
+              [...Map.groupBy(rows, (row) => row.option)].map(
+                ([option, lines]) => {
+                  let votes = 0;
+                  for (const line of lines) {
+                    votes += line.votes;
+                  }
+                  return { set, option, votes };
+                },
+              ),
+            ),
+        plan?.isFinal === false ? [] : certified(contests),
         options(contests, found.date),
         names([found.id, found.polity, ...contests], found.date),
         db.execute<{ id: string; path: string }>(sql`
@@ -378,7 +457,9 @@ export const live = {
               votes[position] = row.votes;
             }
           }
-          return [{ at, level: chosen.scheme, votes }];
+          return [
+            { at, level: chosen.scheme, votes, reported: chosen.reported },
+          ];
         });
         const final = settled.filter((row) => row.contest === contest);
         const votes = own.map(() => 0);
@@ -396,7 +477,8 @@ export const live = {
           path,
           name: (titles.full.get(contest) ?? path.split("/").at(-1) ?? "")
             .replace(/^\d{4} /u, "")
-            .replace(/ election$/u, ""),
+            .replace(/ election$/u, "")
+            .replace(/^\p{Ll}/u, (letter) => letter.toUpperCase()),
           group: group(path),
           options: own.map(({ id, name, party, key, color, kind }, at) => ({
             id,
@@ -444,6 +526,7 @@ export const live = {
           date: found.date,
         },
         focus: found.rest === "" ? null : `${found.path}/${found.rest}`,
+        rehearsal: plan == null ? null : { from: plan.from, every: plan.every },
         source: {
           publisher: source?.publisher ?? "",
           url: source?.url ?? null,
@@ -454,36 +537,68 @@ export const live = {
         ),
       };
     }),
+  stamp: base
+    .input(v.object({ path: v.string(), isRehearsal: v.optional(v.boolean()) }))
+    .handler(async ({ input }) => {
+      if (dev && input.isRehearsal === true) {
+        return { newest: new Date().toISOString(), isCertified: false };
+      }
+      const found = await election(input.path);
+      const result = await db.execute<{
+        newest: string | null;
+        isCertified: boolean;
+      }>(sql`
+        select to_char(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
+          coalesce(bool_or(rs.stage in ('official', 'certified') and rs.kind = 'counted'), false) as "isCertified"
+        from contest c join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+        where c.election_id = ${found.id}::uuid
+      `);
+      return {
+        newest: result.rows[0]?.newest ?? "",
+        isCertified: result.rows[0]?.isCertified ?? false,
+      };
+    }),
   map: os
     .input(
       v.object({
         contest: v.pipe(v.string(), v.uuid()),
         at: v.nullable(v.pipe(v.string(), v.isoTimestamp())),
         level: v.picklist(["us.nyc_ed", "us.nyc_ad", "us.county"]),
+        rehearsal: v.optional(
+          v.object({ from: v.number(), every: v.number() }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
-      const picked = await db.execute<{
-        k: number;
-        at: string | null;
-        date: string;
-      }>(sql`
-        select rs.k, to_char(rs.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at, e.date_from::text as date
-        from result_set rs join election e on e.id = rs.election_id
-        where rs.contest_id = ${input.contest}::uuid and rs.status = 'active'
-          and (${input.at}::timestamptz is null and rs.is_default and rs.stage in ('official', 'certified')
-            or rs.stage in ('live', 'preliminary') and rs.as_of <= ${input.at}::timestamptz)
-          and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
-                      where v.result_set_k = rs.k and u.scheme_code = ${input.level} limit 1)
-        order by rs.as_of desc limit 1
-      `);
-      const chosen = picked.rows[0];
-      if (chosen == null) {
-        return null;
-      }
-      const scheme = input.level === "us.nyc_ad" ? "us.sldl" : input.level;
-      const [values, tiles] = await Promise.all([
-        db.execute<{
+      const plan = dev && input.at != null ? input.rehearsal : undefined;
+      let chosen: { at: string | null; date: string };
+      let values: Array<{
+        area: number;
+        id: string;
+        option: string;
+        votes: number;
+      }>;
+      if (plan == null) {
+        const picked = await db.execute<{
+          k: number;
+          at: string | null;
+          date: string;
+        }>(sql`
+          select rs.k, to_char(rs.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at, e.date_from::text as date
+          from result_set rs join election e on e.id = rs.election_id
+          where rs.contest_id = ${input.contest}::uuid and rs.status = 'active'
+            and (${input.at}::timestamptz is null and rs.stage in ('official', 'certified')
+              or rs.stage in ('live', 'preliminary') and rs.as_of <= ${input.at}::timestamptz)
+            and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+                        where v.result_set_k = rs.k and u.scheme_code = ${input.level} limit 1)
+          order by (${input.at}::timestamptz is null and rs.is_default) desc, rs.as_of desc nulls last limit 1
+        `);
+        const row = picked.rows[0];
+        if (row == null) {
+          return null;
+        }
+        chosen = row;
+        const found = await db.execute<{
           area: number;
           id: string;
           option: string;
@@ -493,38 +608,67 @@ export const live = {
           from result_value v join reporting_unit u on u.k = v.unit_k and u.scheme_code = ${input.level}
           join area a on a.id = u.area_id
           join contest_option o on o.k = v.option_k
-          where v.result_set_k = ${chosen.k} and v.measure = 1
+          where v.result_set_k = ${row.k} and v.measure = 1
           group by 1, 2, 3
-        `),
-        db.execute<{
-          tiles: string;
-          west: number;
-          south: number;
-          east: number;
-          north: number;
-        }>(sql`
-          select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
-            st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
-          from boundary_set bs, lateral (
-            select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
-            from area_geometry g join area a on a.id = g.area_id
-            where g.area_id in (select u.area_id from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = ${chosen.k})
-              and g.valid @> ${chosen.date}::date
-          ) x
-          where bs.scheme_code = ${scheme} and bs.valid @> ${chosen.date}::date
-          order by bs.valid_from desc nulls last limit 1
-        `),
-      ]);
+        `);
+        values = found.rows;
+      } else {
+        const held = await db.execute<{ election: string; date: string }>(sql`
+          select c.election_id as election, e.date_from::text as date
+          from contest c join election e on e.id = c.election_id where c.id = ${input.contest}::uuid
+        `);
+        const row = held.rows[0];
+        if (row == null) {
+          return null;
+        }
+        const frame = await rehearsal(row.election, row.date);
+        chosen = { at: input.at, date: row.date };
+        values = frame(
+          Math.round((Date.parse(input.at ?? "") - plan.from) / plan.every),
+        ).flatMap((entry) =>
+          entry.contest === input.contest &&
+          entry.area != null &&
+          entry.id != null
+            ? [
+                {
+                  area: entry.area,
+                  id: entry.id,
+                  option: entry.option,
+                  votes: entry.votes,
+                },
+              ]
+            : [],
+        );
+      }
+      const scheme = input.level === "us.nyc_ad" ? "us.sldl" : input.level;
+      const tiles = await db.execute<{
+        tiles: string;
+        west: number;
+        south: number;
+        east: number;
+        north: number;
+      }>(sql`
+        select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
+          st_xmin(x.box) as west, st_ymin(x.box) as south, st_xmax(x.box) as east, st_ymax(x.box) as north
+        from boundary_set bs, lateral (
+          select ST_Transform(ST_SetSRID(ST_Extent(${plane("g.geom", "a.scheme_code")})::geometry, 3857), 4326) as box
+          from area_geometry g join area a on a.id = g.area_id
+          where g.area_id = any(${sql.param([...new Set(values.map((row) => row.id))])}::uuid[])
+            and g.valid @> ${chosen.date}::date
+        ) x
+        where bs.scheme_code = ${scheme} and bs.valid @> ${chosen.date}::date
+        order by bs.valid_from desc nulls last limit 1
+      `);
       const frame = tiles.rows[0];
       if (frame == null) {
         return null;
       }
       const titles = await names(
-        [...new Set(values.rows.map((row) => row.id))],
+        [...new Set(values.map((row) => row.id))],
         chosen.date,
       );
-      const areas = Map.groupBy(values.rows, (row) => row.area);
-      const options = [...new Set(values.rows.map((row) => row.option))];
+      const areas = Map.groupBy(values, (row) => row.area);
+      const options = [...new Set(values.map((row) => row.option))];
       const index = new Map(
         options.map((option, position) => [option, position]),
       );
@@ -541,7 +685,8 @@ export const live = {
         units: [...areas].map(([area, rows]) => {
           const votes = options.map(() => 0);
           for (const row of rows) {
-            votes[index.get(row.option) ?? 0] = row.votes;
+            const position = index.get(row.option) ?? 0;
+            votes[position] = (votes[position] ?? 0) + row.votes;
           }
           return {
             k: area,

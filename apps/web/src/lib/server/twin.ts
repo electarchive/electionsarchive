@@ -3673,7 +3673,31 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       [...(groups.get("borough") ?? []), ...(groups.get("prosecutor") ?? [])],
     ],
     [m.live_council(), groups.get("council") ?? []],
-    [m.live_legislature(), groups.get("legislative") ?? []],
+    ...[
+      ...Map.groupBy(
+        groups.get("legislative") ?? [],
+        (race) =>
+          /\/(state-senate|state-house|assembly|house-of-delegates)-[^/]*$/u.exec(
+            race.path,
+          )?.[1] ?? "legislature",
+      ),
+    ]
+      .toSorted(
+        ([a], [b]) =>
+          Number(b === "state-senate") - Number(a === "state-senate"),
+      )
+      .map(
+        ([kind, races]) =>
+          [
+            {
+              "state-senate": m.live_state_senate(),
+              "state-house": m.live_state_house(),
+              assembly: m.live_state_assembly(),
+              "house-of-delegates": m.live_delegates(),
+            }[kind] ?? m.live_legislature(),
+            races,
+          ] as const,
+      ),
     [m.live_other(), groups.get("other") ?? []],
     [m.live_courts(), groups.get("judicial") ?? []],
   ] as const;

@@ -232,7 +232,11 @@
         <text
           x={x(mark)}
           y={BASE + 18}
-          text-anchor={mark === start ? "start" : "middle"}
+          text-anchor={mark === start
+            ? "start"
+            : mark === end && !hasFinal
+              ? "end"
+              : "middle"}
           class="fill-muted-foreground font-figures text-[0.6875rem] tabular-nums"
           >{hour.format(mark)}</text
         >

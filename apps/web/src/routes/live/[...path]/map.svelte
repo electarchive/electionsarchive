@@ -12,12 +12,16 @@
     tones,
     at,
     level,
+    rehearsal,
+    isCity,
   }: {
     contest: string;
     options: Array<{ id: string; name: string }>;
     tones: Array<string>;
     at: string | null;
     level: "us.nyc_ed" | "us.nyc_ad" | "us.county";
+    rehearsal: { from: number; every: number } | null;
+    isCity: boolean;
   } = $props();
 
   type Sheet = Awaited<ReturnType<typeof orpc.live.map.call>>;
@@ -98,7 +102,7 @@
   const focus = $derived(hover == null ? null : (rows.get(hover.k) ?? null));
 
   $effect(() => {
-    const wanted = { contest, at, level };
+    const wanted = { contest, at, level, rehearsal: rehearsal ?? undefined };
     isLoading = true;
     let isCurrent = true;
     void orpc.live.map.call(wanted).then((next) => {
@@ -257,7 +261,9 @@
         ? m.live_map_ed()
         : level === "us.nyc_ad"
           ? m.live_map_ad()
-          : m.live_map_county()}</span
+          : isCity
+            ? m.live_map_borough()
+            : m.live_map_county()}</span
     >
     {#each leaders as leader (leader)}
       <span class="flex items-center gap-1.5">

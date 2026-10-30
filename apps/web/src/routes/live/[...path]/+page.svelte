@@ -8,6 +8,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageProps } from "./$types";
   import Board from "./board.svelte";
@@ -35,7 +36,9 @@
       );
     }),
   );
-  let isPlaying = $state(false);
+  let isPlaying = $state<boolean>(false);
+  let isOffline = $state(false);
+  let now = $state(Date.now());
 
   const isFinal = $derived(hasFinal && position === frames.length);
   const time = $derived(isFinal ? null : (frames[position]?.at ?? null));
@@ -86,7 +89,7 @@
 
   const lead = $derived(
     night.races.find((race) => race.path === night.focus) ??
-      ["governor", "mayor", "senate"]
+      ["president", "governor", "mayor", "senate"]
         .map((seat) =>
           night.races.find((race) => race.path.endsWith(`/${seat}`)),
         )
@@ -128,6 +131,13 @@
       counted: count(ranked.total),
     });
   });
+  const reported = $derived(
+    lead?.series.findLast((point) => time == null || point.at <= time)
+      ?.reported ?? null,
+  );
+  const hasScanners = $derived(
+    frames.some((frame) => frame.scanners.length > 0),
+  );
   const certifiedTotal = $derived.by(() => {
     let total = 0;
     for (const value of lead?.certified?.votes ?? []) {
@@ -196,7 +206,13 @@
       return null;
     }
     if (isFinal && lead.certified != null) {
-      return { at: null, level: "us.nyc_ed" as const };
+      return {
+        at: null,
+        level:
+          (["us.nyc_ed", "us.nyc_ad"] as const).find((level) =>
+            lead.maps.some((entry) => entry.level === level),
+          ) ?? ("us.county" as const),
+      };
     }
     const reached = lead.maps.filter(
       (entry) => time == null || entry.at <= time,
@@ -240,6 +256,19 @@
     ...(groups.get("prosecutor") ?? []),
   ]);
   const courts = $derived(groups.get("judicial") ?? []);
+  const chambers = $derived(
+    [
+      ...Map.groupBy(
+        groups.get("legislative") ?? [],
+        (race) =>
+          /\/(state-senate|state-house|assembly|house-of-delegates)-[^/]*$/u.exec(
+            race.path,
+          )?.[1] ?? "legislature",
+      ),
+    ].toSorted(
+      ([a], [b]) => Number(b === "state-senate") - Number(a === "state-senate"),
+    ),
+  );
 
   function chamber(races: typeof night.races) {
     const tiles = races.map((race) => {
@@ -307,11 +336,25 @@
       return;
     }
     untrack(() => {
-      void goto(resolve(`/live/${page.params.path ?? ""}?at=${at}`), {
-        state: page.state,
-        shallow: true,
-        replace: true,
-      });
+      const query = new URLSearchParams([
+        ...[...page.url.searchParams].filter(([key]) => key !== "at"),
+        ["at", at],
+      ]);
+      void goto(
+        resolve(`/live/${page.params.path ?? ""}?${query.toString()}`),
+        { state: page.state, shallow: true, replace: true },
+      ).catch(() => undefined);
+    });
+  });
+
+  let seen = untrack(() => frames.length + Number(hasFinal));
+  $effect(() => {
+    const length = frames.length + Number(hasFinal);
+    untrack(() => {
+      if (length > seen && position === seen - 1 && !isPlaying) {
+        position = length - 1;
+      }
+      seen = length;
     });
   });
 
@@ -319,7 +362,26 @@
     if (!isLive && (hasFinal || frames.length > 0)) {
       return;
     }
-    const timer = setInterval(() => void refreshAll(), 30_000);
+    const timer = setInterval(() => {
+      now = Date.now();
+      void (async () => {
+        try {
+          const probe = await orpc.live.stamp.call({
+            path: page.params.path ?? "",
+            isRehearsal: night.rehearsal != null,
+          });
+          isOffline = false;
+          if (
+            probe.newest > (frames.at(-1)?.at ?? "") ||
+            probe.isCertified !== hasFinal
+          ) {
+            await refreshAll();
+          }
+        } catch {
+          isOffline = true;
+        }
+      })();
+    }, 30_000);
     return () => clearInterval(timer);
   });
 </script>
@@ -368,7 +430,13 @@
                 class="animate-pulse rounded-full bg-white block-1.5 inline-1.5 motion-reduce:animate-none"
               ></span>
             {/if}
-            {isLive ? m.live_live() : m.live_replay()}
+            {#if night.rehearsal != null}
+              {m.live_rehearsal()}
+            {:else if isLive}
+              {m.live_live()}
+            {:else}
+              {m.live_replay()}
+            {/if}
           </span>
         {/if}
         <a
@@ -377,9 +445,22 @@
         >
       </p>
       <h1 class="title">{m.live_title({ place: night.election.place })}</h1>
-      {#if !isLive && frames.length > 0}
+      {#if isLive && isOffline}
+        <p class="text-[0.9375rem] font-medium text-(--no) max-inline-[68ch]">
+          {m.live_offline()}
+        </p>
+      {:else if isLive && frames.length > 0 && now - newest > 3_600_000}
+        <p class="text-[0.9375rem] font-medium text-(--no) max-inline-[68ch]">
+          {m.live_stale({ time: clock.format(newest) })}
+        </p>
+      {/if}
+      {#if night.rehearsal != null}
         <p class="text-[0.9375rem] text-muted-foreground max-inline-[68ch]">
-          {m.live_replay_note()}
+          {m.live_rehearsal_note()}
+        </p>
+      {:else if !isLive && frames.length > 0}
+        <p class="text-[0.9375rem] text-muted-foreground max-inline-[68ch]">
+          {isCity ? m.live_replay_note() : m.live_replay_note_state()}
         </p>
       {/if}
     </header>
@@ -431,7 +512,27 @@
             variant="lead"
           />
           <div class="grid gap-4 border-bs border-border pbs-4">
-            {#if !isFinal}
+            {#if !isFinal && !hasScanners && reported != null}
+              <div class="grid gap-2">
+                <div class="flex items-baseline justify-between gap-3">
+                  <h3 class="text-sm font-semibold">{m.live_reporting()}</h3>
+                  <span
+                    class="font-figures text-[0.8125rem] font-semibold tabular-nums"
+                    >{percent(reported)}</span
+                  >
+                </div>
+                <span class="relative rounded-xs bg-muted block-1.5">
+                  <span
+                    class="absolute inset-s-0 inset-bs-0 inset-be-0 rounded-xs bg-foreground transition-[width] duration-700 ease-out motion-reduce:transition-none"
+                    style:width="{Math.min(100, reported * 100)}%"
+                  ></span>
+                </span>
+                <p class="text-xs text-muted-foreground max-inline-[60ch]">
+                  {m.live_reporting_note()}
+                </p>
+              </div>
+            {/if}
+            {#if !isFinal && (hasScanners || isCity)}
               <div class="grid gap-2">
                 <h3 class="text-sm font-semibold">{m.live_scanners()}</h3>
                 {#if scanners.length === 0}
@@ -493,6 +594,8 @@
               tones={leadTones}
               at={map.at}
               level={map.level}
+              rehearsal={night.rehearsal}
+              {isCity}
             />
           {:else}
             <div
@@ -603,15 +706,27 @@
           >
             <h2 {id} class="heading">{heading}</h2>
             <p class="text-[0.8125rem] text-muted-foreground tabular-nums">
-              {isFinal
-                ? m.live_council_note_final({
-                    captured: String(view.overnight),
-                    total: String(races.length),
-                  })
-                : m.live_council_note({
-                    captured: String(view.captured),
-                    total: String(races.length),
-                  })}
+              {#if !isCity}
+                {isFinal
+                  ? m.live_district_note_final({
+                      counted: String(view.overnight),
+                      total: String(races.length),
+                    })
+                  : m.live_district_note({
+                      counted: String(view.captured),
+                      total: String(races.length),
+                    })}
+              {:else if isFinal}
+                {m.live_council_note_final({
+                  captured: String(view.overnight),
+                  total: String(races.length),
+                })}
+              {:else}
+                {m.live_council_note({
+                  captured: String(view.captured),
+                  total: String(races.length),
+                })}
+              {/if}
             </p>
           </div>
           <ol
@@ -692,11 +807,18 @@
       "live-council",
       groups.get("council") ?? [],
     )}
-    {@render chamberGrid(
-      m.live_legislature(),
-      "live-legislature",
-      groups.get("legislative") ?? [],
-    )}
+    {#each chambers as [kind, races] (kind)}
+      {@render chamberGrid(
+        {
+          "state-senate": m.live_state_senate(),
+          "state-house": m.live_state_house(),
+          assembly: m.live_state_assembly(),
+          "house-of-delegates": m.live_delegates(),
+        }[kind] ?? m.live_legislature(),
+        `live-${kind}`,
+        races,
+      )}
+    {/each}
     {@render boards(
       m.live_other(),
       "live-other",
