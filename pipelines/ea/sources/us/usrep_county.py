@@ -182,11 +182,20 @@ def emit(
             )
             note = note_for(key)
             if not ties:
+                omitted = [
+                    f"{label} ({held[option]:,} votes statewide)"
+                    for option, label in conn.execute(
+                        "select id, ballot_label from contest_option where contest_id = %s", [contest]
+                    ).fetchall()
+                    if option in held and option not in totals
+                ]
                 note += (
                     f" It differs from the Federal Election Commission's compilation by {', '.join(differences)} votes."
                     if differences
-                    else " Every option printed here ties the default result set, which also holds an option this source does not print."
+                    else ""
                 )
+                if omitted:
+                    note += f" It does not print {', '.join(omitted)}, which the default result set holds, so it is not the default."
             cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
             if default:
                 for option, kind, seats in conn.execute(

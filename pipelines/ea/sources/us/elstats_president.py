@@ -10,7 +10,7 @@ from ea.sources.us.elstats import FORMER, SEARCH, TENANTS, TITLE, plain
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_president"
-VERSION = "1"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 STATES = {"CO": "08", "ID": "16", "VA": "51"}
 DAYS = {1992: "1992-11-03", 1996: "1996-11-05"}
@@ -84,7 +84,7 @@ def parse() -> None:
     if lost.height:
         print(lost.group_by("prefix", "name").agg(pl.col("votes").sum()))
     PARSED.mkdir(parents=True, exist_ok=True)
-    out = frame.filter(pl.col("county").is_not_null()).group_by("day", "district", "state", "county", "column").agg(pl.col("votes").sum())
+    out = frame.filter(pl.col("county").is_not_null()).filter(pl.col("votes").sum().over("day", "state", "column") > 0).group_by("day", "district", "state", "county", "column").agg(pl.col("votes").sum())
     out.write_parquet(PARSED / "lines.parquet")
     print(out.group_by("day", "state").agg(pl.col("county").n_unique(), pl.col("votes").sum()))
 
