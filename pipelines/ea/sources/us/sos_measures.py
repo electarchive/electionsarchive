@@ -654,6 +654,15 @@ ND_PRIMARIES = {
     date(2006, 6, 13): ("2006%5CPrimary%20Election%2006-13-2006", 2),
     date(2008, 6, 10): ("2008%5CPrimary%20Election%2006-10-2008", 1),
 }
+ND_2004_PRIMARY = (
+    date(2004, 6, 8),
+    ND_ABSTRACTS + "2004%5CPrimary%20Election%2006-08-2004",
+    ((31462, 44039), (54048, 23812)),
+)
+ND_2004_NOTE = (
+    " Only the statewide totals are recorded: the county labels in the Secretary of State's scanned abstract are too "
+    "degraded to read, so the figures are the printed Total row."
+)
 SC = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 SC_2010 = "https://www.enr-scvotes.org/SC/19077/39934/reports/detailxml.zip"
 GA = "https://web.archive.org/web/{}id_/http://sos.georgia.gov/elections/election_results/{}.htm"
@@ -1138,6 +1147,7 @@ def fetch() -> None:
     for name, *_ in [*ND_OLD.values(), *ND_PRIMARIES.values()]:
         raw.fetch(SOURCE, ND_ABSTRACTS + name + ".pdf", suffix=".pdf")
         time.sleep(1)
+    raw.fetch(SOURCE, ND_2004_PRIMARY[1] + ".pdf", suffix=".pdf")
     for line in NM_PAGES.read_text().splitlines()[1:]:
         raw.fetch(SOURCE, line.split("\t")[1], suffix=".html")
         time.sleep(1)
@@ -3471,6 +3481,28 @@ def north_dakota() -> list[dict[str, object]]:
             for county, votes in table.items()
             for side, answer in enumerate(("YES", "NO"))
         )
+    day, url, totals = ND_2004_PRIMARY
+    url += ".pdf"
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    for measure, pair in enumerate(totals):
+        for figure in pair:
+            if f"{figure:,}" not in text:
+                raise ValueError(f"ND {day}: total {figure:,} not found in the abstract")
+        rows.extend(
+            {
+                "state": "ND",
+                "day": day,
+                "number": str(measure + 1),
+                "label": f"Measure No. {measure + 1}",
+                "url": url,
+                "county": "statewide",
+                "answer": answer,
+                "votes": pair[side],
+            }
+            for side, answer in enumerate(("YES", "NO"))
+        )
     return rows
 
 
@@ -4149,7 +4181,7 @@ def emit() -> Path:
                 + (SCANNED if rows["page"].is_not_null().any() and state != "AL" else "")
                 + (GA_PRELIMINARY if preliminary else "")
                 + (
-                    (AL_2007_NOTE if state == "AL" else AK_STATEWIDE_NOTE if state == "AK" else STATEWIDE_ONLY)
+                    (AL_2007_NOTE if state == "AL" else AK_STATEWIDE_NOTE if state == "AK" else ND_2004_NOTE if state == "ND" else STATEWIDE_ONLY)
                     if (rows["county"] == "statewide").any()
                     else ""
                 ),
