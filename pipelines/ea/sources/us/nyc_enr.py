@@ -17,7 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_enr"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BASE = os.environ.get("NYC_ENR_BASE", "https://enr.boenyc.gov/")
 DAY = date.fromisoformat(os.environ.get("NYC_ENR_DAY", "2026-11-03"))
@@ -407,6 +407,7 @@ def emit():
         added: set[UUID] = set()
         unmatched: list[str] = []
         skipped = 0
+        withdrawn = 0
         emptied: list[UUID] = []
 
         def unit(level: str, borough: str | None, ad: int | None, ed: int | None) -> UUID | None:
@@ -492,7 +493,6 @@ def emit():
                 "select 1 from result_set where contest_id = %s and stage in ('official', 'certified') and status = 'active'",
                 [contest],
             ).fetchone()
-            owned = path == CITY_PATH and settled is None
             reached = (
                 None
                 if settled is None
@@ -575,6 +575,35 @@ def emit():
                     url=BASE,
                     license="Public record",
                 )
+            owned = (
+                path == CITY_PATH
+                and conn.execute(
+                    """select 1 from result_set where contest_id = %s and stage = 'preliminary' and is_default
+                       and source_id <> %s limit 1""",
+                    [contest, source],
+                ).fetchone()
+                is None
+            )
+            spans = {end: min(s for s, e in frames.items() if e == end) for end in set(frames.values())}
+            for stale, stale_as_of in conn.execute(
+                """select id, as_of from result_set where contest_id = %s and source_id = %s
+                   and stage = 'preliminary' and status = 'active'""",
+                [contest, source],
+            ).fetchall():
+                if any(first <= stale_as_of < end for end, first in spans.items()):
+                    cs.add(
+                        "result_set",
+                        id=stale,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="preliminary",
+                        kind="counted",
+                        status="withdrawn",
+                        source_id=source,
+                        as_of=stale_as_of,
+                        is_default=False,
+                    )
+                    withdrawn += 1
             ballots: dict[tuple[str, str], UUID | None] = {}
 
             for name, line in group.select("candidate", "line").unique().iter_rows():
@@ -629,9 +658,8 @@ def emit():
                 ballots[(name, line)] = child
             for (moment, level), rows in group.group_by("frame", "level", maintain_order=True):
                 default = owned and level == "ad" and moment == newest
-                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}@{moment:%Y%m%dT%H%M%S}:{level}")
+                frame_key = f"{contest_key}@{moment:%Y%m%dT%H%M%S}:{level}"
                 values: dict[tuple[UUID, UUID], int] = {}
-                trimmed = False
                 for borough, ad, ed, name, line, votes in rows.select(
                     "borough", "ad", "ed", "candidate", "line", "votes"
                 ).iter_rows():
@@ -640,16 +668,51 @@ def emit():
                     if choice is None or place is None:
                         continue
                     if reached is not None and place not in reached:
-                        trimmed = True
                         continue
                     values[(place, choice)] = votes
+                if (
+                    not values
+                    and conn.execute(
+                        "select 1 from external_id where scheme = %s and value = %s",
+                        [f"{SOURCE}.result_set", frame_key],
+                    ).fetchone()
+                    is None
+                ):
+                    continue
+                result_set = cs.key(f"{SOURCE}.result_set", frame_key)
+                stored = (
+                    None
+                    if result_set in cs.minted
+                    else conn.execute(
+                        "select k, is_default, status from result_set where id = %s", [result_set]
+                    ).fetchone()
+                )
+                if stored is not None and values == {
+                    (place, choice): int(value)
+                    for place, choice, value in conn.execute(
+                        """select u.id, o.id, v.value from result_value v join reporting_unit u on u.k = v.unit_k
+                           join contest_option o on o.k = v.option_k where v.result_set_k = %s and v.measure = 1""",
+                        [stored[0]],
+                    ).fetchall()
+                }:
+                    if stored[1] == default and stored[2] == "active":
+                        skipped += 1
+                    else:
+                        cs.add(
+                            "result_set",
+                            id=result_set,
+                            election_id=election,
+                            contest_id=contest,
+                            stage="preliminary",
+                            kind="counted",
+                            status="active",
+                            source_id=source,
+                            as_of=moment,
+                            is_default=default,
+                        )
+                    continue
                 if not values:
                     emptied.append(result_set)
-                if result_set not in cs.minted and moment != newest and not trimmed:
-                    was = conn.execute("select is_default from result_set where id = %s", [result_set]).fetchone()
-                    if was is not None and was[0] == default:
-                        skipped += 1
-                        continue
                 for key in rows["key"].unique():
                     cs.artifact(raw.cached(SOURCE, key), source)
                 cs.add(
@@ -698,7 +761,7 @@ def emit():
                     )
         for line in sorted(set(unmatched)):
             print("unmatched:", line)
-        print(f"{skipped} published sets left as they are")
+        print(f"{skipped} published sets left as they are, {withdrawn} partial frames withdrawn")
         if emptied:
             cs.manifest["scope"] = {"polity": "US", "clears": [str(id) for id in emptied]}
         return cs.write()

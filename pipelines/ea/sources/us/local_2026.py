@@ -1710,6 +1710,12 @@ NE_SOURCES = {
         "https://www.salemcountynj.gov/wp-content/uploads/2026/07/2026-Candidate-List-1.pdf",
         "nj/salem_candidates.pdf",
     ),
+    "NJ-34041-s": (
+        "Warren County Clerk",
+        "2026 School Board and Fire Commissioner Candidates",
+        "https://www.warrencountyvotes.com/elections/current-election-candidates",
+        "nj/warren_school.pdf",
+    ),
     "NJ-34001-s": (
         "Atlantic County Clerk",
         "Candidates for the 2026 School Election (8/13/2026)",
