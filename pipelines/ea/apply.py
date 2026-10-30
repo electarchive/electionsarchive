@@ -1130,7 +1130,7 @@ def _rollup(
                          select from climbed r where r.result_set_k = s.result_set_k and r.area_id = s.county_area_id))
               from units u join rs on rs.k = u.result_set_k
               where rs.district_area_id is not null and rs.allocation_parent_id is null
-                and not exists (select from climbed r where r.result_set_k = rs.k and r.area_id = rs.district_area_id)
+                and not exists (select from climbed r where r.result_set_k = rs.k and r.unit_k = u.unit_k and r.area_id = rs.district_area_id)
             ),
             coverage as (
               select m.result_set_k, m.area_id, au.expected, greatest(m.shaped, m.shapeless) as reporting
