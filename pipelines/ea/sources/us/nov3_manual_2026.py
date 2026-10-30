@@ -108,7 +108,9 @@ def emit() -> Path:
             elif entity.endswith(" Township"):
                 option = civil.town(entity, row["county"][:5])
             elif (state, entity) in SCHOOLS:
-                option = civil.mint("us.school_district", SCHOOLS[state, entity], entity)
+                option = f"us.school_district:{SCHOOLS[state, entity]}"
+                if option not in found:
+                    option = civil.mint("us.school_district", SCHOOLS[state, entity], entity)
             elif re.search(r"School District|CUSD", entity):
                 option = civil.school(entity)
             elif f"special:{row['county']}:{entity}" in found:
@@ -124,7 +126,7 @@ def emit() -> Path:
                 continue
             kept += 1
             polity, area, place, path, code = found[option]
-            election = cs.key("us.election", f"{DAY}:{state}:{code}")
+            election = civil.slugs.get(f"{path}/{DAY}-general") or cs.key("us.election", f"{DAY}:{state}:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
