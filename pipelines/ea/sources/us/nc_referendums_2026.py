@@ -110,7 +110,15 @@ def emit() -> Path:
             entity = match[1] if match else ""
             label = title.removeprefix(entity).strip().title() if entity else title.title()
             if entity.startswith(("CITY OF", "TOWN OF", "VILLAGE OF")):
-                options = names.get(ceda._city(entity), [])
+                words = re.sub(r"^(CITY|TOWN|VILLAGE) OF ", "", title).split()
+                options = next(
+                    (
+                        names[ceda._city(" ".join(words[:count]))]
+                        for count in range(len(words), 0, -1)
+                        if ceda._city(" ".join(words[:count])) in names
+                    ),
+                    [],
+                )
             else:
                 options = names.get(ceda._core(entity if entity.endswith("COUNTY") else f"{entity} COUNTY"), [])
             options = [option for option in options if option in found]
