@@ -10,7 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda
+from ea.sources.us import ceda, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.ca_measures_2026"
@@ -211,6 +211,14 @@ def emit() -> Path:
             else:
                 options = schools.get(ceda._core(place), [])
                 key = options[0] if len(options) == 1 else None
+            if key is None and "DISTRICT" in place and f"us.county:{county}" in found:
+                home = found[f"us.county:{county}"]
+                special = govmint.special(
+                    conn, cs, "CA", (home[1], home[2], home[4], home[5]), titled, slugs
+                )
+                if special is not None:
+                    key = f"us.special_district:{special[4]}"
+                    found[key] = ("us.special_district", *special)
             if key is None or key not in found:
                 print("no polity:", place, row["letter"])
                 continue

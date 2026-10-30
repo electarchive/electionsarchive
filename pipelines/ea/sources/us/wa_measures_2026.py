@@ -75,6 +75,9 @@ def parse() -> None:
     print(frame.height, "measures")
 
 
+UNMINTED = {"City of Lake Forest Park": ("5337270", "Lake Forest Park")}
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
@@ -118,8 +121,40 @@ def emit() -> Path:
             key = names.get(
                 ceda._city(place)
                 if place.startswith("City of")
-                else ceda._core(re.sub(r"\s+No\.?\s*\d+$", "", place))
+                else ceda._core(
+                    re.sub(r"\s+No\.?\s*\d+$", "", place)
+                    if "School District" in place
+                    else re.sub(r"\s+No\.?\s*(\d+)$", r" \1", place.replace("Fire Protection District", "Fire District"))
+                )
             )
+            if key is None and place in UNMINTED:
+                geoid, text = UNMINTED[place]
+                key = f"us.place:{geoid}"
+                polity_id = cs.key("us.polity", f"place:{geoid}")
+                path = f"us/wa/{slug(text)}"
+                area_id = cs.area("us.place", geoid)
+                if polity_id in cs.minted and slugs.get(path, polity_id) == polity_id:
+                    cs.add("polity", id=polity_id, kind="municipality", iso_code=None)
+                    cs.add("name", entity_id=polity_id, text=text, lang="en", kind="official", is_preferred=True)
+                    cs.add("polity_parent", polity_id=polity_id, parent_id=cs.polity("US-WA"))
+                    cs.add("slug", path=path, entity_id=polity_id)
+                    cs.add("area", id=area_id, scheme_code="us.place")
+                    cs.add("area_code", area_id=area_id, code=geoid, valid_from=None)
+                    cs.add("area_parent", area_id=area_id, parent_id=cs.area("us.state", "53"))
+                    cs.add("name", entity_id=area_id, text=f"{text}, WA", lang="en", kind="official", is_preferred=True)
+                    cs.add("polity_territory", polity_id=polity_id, area_id=area_id)
+                    cs.add(
+                        "reporting_unit",
+                        id=cs.unit("us.place", geoid),
+                        polity_id=polity_id,
+                        scheme_code="us.place",
+                        code=geoid,
+                        area_relation="equals",
+                        area_id=area_id,
+                        kind="standard",
+                        valid_from=None,
+                    )
+                found[key] = (polity_id, area_id, text, path, geoid)
             if key is None:
                 print("no polity:", place, row["number"])
                 continue
