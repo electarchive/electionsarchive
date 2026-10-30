@@ -2214,6 +2214,34 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+KY_CITY_SPELLINGS = {
+    ("BOONE", "Erlanger"): "",
+    ("BELL", "Middlesboro City Coumcil"): "Middlesboro",
+    ("BULLITT", "Lebanon Jct"): "Lebanon Junction",
+    ("HENRY", "Campbllsburg"): "Campbellsburg",
+    ("JEFFERSON", "J"): "Jeffersontown",
+    ("JEFFERSON", "Gleniew Hills"): "Glenview Hills",
+    ("JEFFERSON", "Propsect"): "Prospect",
+    ("JEFFERSON", "Mockinbird Valley"): "Mockingbird Valley",
+    ("JEFFERSON", "Moorelane"): "Moorland",
+    ("JEFFERSON", "Meadowvale"): "Meadow Vale",
+    ("JEFFERSON", "Meadowview"): "Meadowview Estates",
+    ("JEFFERSON", "Green Springs"): "Green Spring",
+    ("KENTON", "Ft Mitchell"): "Fort Mitchell",
+    ("KENTON", "Ft Wright"): "Fort Wright",
+    ("LARUE", "Hodgenvillie"): "Hodgenville",
+    ("LETCHER", "If Neon"): "Neon",
+    ("LOGAN", "Aubrun"): "Auburn",
+    ("MEADE", "Branbenburg"): "Brandenburg",
+    ("MUHLENBERG", "Drakeboro"): "Drakesboro",
+    ("OLDHAM", "Lagrange"): "La Grange",
+    ("OLDHAM", "Riverbluff"): "River Bluff",
+    ("OLDHAM", "Orchard Grass"): "Orchard Grass Hills",
+    ("PIKE", "Coal Run"): "Coal Run Village",
+    ("PULASKI", "Feruson"): "Ferguson",
+    ("TODD", "Gurthrie"): "Guthrie",
+    ("TRIMBLE", "Trimble Milton"): "Milton",
+}
 TACIT_FEEDS = {"CA-06071-s", "TX-48453-lv", "TX-48355-fb"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
@@ -2895,6 +2923,7 @@ def parse() -> None:
                 str(description or "").upper(),
             ).split()
         ).title()
+        city = KY_CITY_SPELLINGS.get((str(county), city), city)
         if city:
             city = spellings.setdefault(
                 (str(county), coverage_tables.tokens(re.sub(r"\s+City$", "", city))),
