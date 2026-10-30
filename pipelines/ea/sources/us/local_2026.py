@@ -2225,6 +2225,8 @@ for key, publisher, title, url, local in (
     ("TX-48201-harris-lc", "Harris County Clerk", "Sample ballot, November 3, 2026 General and Special Elections (League City)", "https://www.harrisvotes.com/", "tx/harris_sample.pdf"),
     ("TX-48201-harris-crosby", "Harris County Clerk", "Sample ballot, November 3, 2026 General and Special Elections (Crosby ISD)", "https://www.harrisvotes.com/", "tx/harris_sample.pdf"),
     ("TX-48355-cc", "City of Corpus Christi", "General Election Candidate List, November 3, 2026 (as of August 18, 2026)", "https://www.cctexas.com/departments/city-secretary", "tx/corpus_christi.pdf"),
+    ("TX-48121-dentonpv", "Denton County Elections", "Preview Ballot, General and Special Elections, November 3, 2026", "https://www.votedenton.gov/current-and-upcoming-election-information/", "tx/denton_preview.pdf"),
+    ("TX-48439-carroll", "Carroll Independent School District", "Order of Cancellation of Trustee Election, November 3, 2026", "https://www.tarrantcountytx.gov/en/elections/current-election-information.html", "tx/carroll_cancel.pdf"),
     ("MT-30111", "Yellowstone County Election Administrator", "November 2026 General Election Candidate List (memo to the County Commissioners, August 10, 2026)", "https://www.yellowstonecountymt.gov/BOCCDocs/2026/BOCCDIS/20260813_1601/16873_Letter_to_Commissioners_regarding_candidates.pdf", "mt/yellowstone_gen.pdf"),
     ("WV-54001", "West Virginia Secretary of State", "Barbour County General Election Sample Ballots, November 3, 2026", "https://apps.sos.wv.gov/elections/2026GeneralSampleBallots/SAMPLE%20-%20WV%20Barbour%20261103%20General%20-%2014inch.pdf", "wv/barbour_gen.pdf"),
     ("WV-54007", "West Virginia Secretary of State", "Braxton County General Election Sample Ballots, November 3, 2026", "https://apps.sos.wv.gov/elections/2026GeneralSampleBallots/SAMPLE%20-%20WV%20Braxton%20261103%20General%20-%2014inch.pdf", "wv/braxton_gen.pdf"),
@@ -2359,7 +2361,7 @@ KY_CITY_SPELLINGS = {
     ("TODD", "Gurthrie"): "Guthrie",
     ("TRIMBLE", "Trimble Milton"): "Milton",
 }
-TACIT_FEEDS = {"CA-06071-s", "TX-48453-lv", "TX-48355-fb"}
+TACIT_FEEDS = {"CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48355-fb"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
