@@ -18,7 +18,7 @@ from ea.sources.tr.ysk import INVALID, PROVINCES, REGISTERED, VALID, VOTERS, VOT
 from ea.store import DATA, connect
 
 SOURCE = "tr.tuik_secim"
-VERSION = "3"
+VERSION = "4"
 APP = "https://biruni.tuik.gov.tr/secimdagitimapp/secim.zul"
 TABLE = "Seçim çevresi ve ilçelere göre milletvekili genel seçimi sonuçları"
 REFERENDUMS = "https://biruni.tuik.gov.tr/secimdagitimapp/halkoylama.zul"
@@ -32,7 +32,7 @@ REFERENDUM_DAYS = {
     "2010": date(2010, 9, 12),
     "2017": date(2017, 4, 16),
 }
-YEARS = ("1961", "1965", "1969", "1973", "1977", "1983", "1987", "1991", "1995", "1999", "2002", "2007")
+YEARS = ("1961", "1965", "1969", "1973", "1977", "1983", "1987", "1991", "1995", "1999", "2002", "2007", "2011")
 PARSED = DATA / "parsed" / SOURCE
 MEASURES = (("Sandık", "boxes"), ("Kayıtlı", "registered"), ("Oy kullanan", "voters"), ("Geçerli", "valid"))
 PUBLISHER = "Türkiye İstatistik Kurumu"
@@ -51,6 +51,7 @@ DAYS = {
     "1999": date(1999, 4, 18),
     "2002": date(2002, 11, 3),
     "2007": date(2007, 7, 22),
+    "2011": date(2011, 6, 12),
 }
 PROVINCE_ALIASES = {
     "AFYON": "AFYONKARAHİSAR",
@@ -295,7 +296,7 @@ def parse() -> None:
             r"<script.*?</script>", "", raw.cached(SOURCE, url).path.read_bytes().decode("cp1254"), flags=re.DOTALL
         )
         table = [cells(row) for row in re.findall(r"<tr.*?</tr>", text, flags=re.DOTALL | re.IGNORECASE)]
-        title = next(row[0] for row in table if row and "Seçim" in row[0] and "Sonuçları" in row[0])
+        title = next(row[0] for row in table if row and "Seçim" in row[0] and "onuçları" in row[0])
         if year not in title:
             raise ValueError(f"{url}: title {title}")
         start = next(i for i, row in enumerate(table) if row and row[0] == title)
@@ -317,17 +318,19 @@ def parse() -> None:
                 notes.append({"year": year, "district": district, "text": " ".join(cell for cell in row if cell)})
                 continue
             if row[0]:
-                level, name = ("nation" if row[0] == "Türkiye" else "district"), row[0]
-            elif len(row) > 1 and row[1] in PARTS:
-                level = PARTS[row[1]]
-            elif len(row) > 1 and row[1]:
-                level, name = "ilce", row[1]
+                level, name = ("nation" if row[0] == "Türkiye" else "district"), row[0].removesuffix(" (*)")
             else:
-                continue
+                lead = next((i for i in range(1, len(row)) if row[i]), None)
+                if lead is None or not re.search(r"[^\d,.\s-]", row[lead]):
+                    continue
+                if row[lead] in PARTS:
+                    level = PARTS[row[lead]]
+                else:
+                    level, name = "ilce", row[lead]
             numbers = [
                 cell
-                for cell in (row[1:] if level in ("nation", "district") else row[2:])
-                if cell and not re.fullmatch(r"\(\d+\)", cell)
+                for cell in (row[1:] if row[0] else row[lead + 1 :])
+                if cell and not cell.startswith("Seçim çevresi toplamı") and not re.fullmatch(r"\(\d+\)", cell)
             ]
             if level in PARTS.values() and len(numbers) != len(columns):
                 continue
@@ -356,7 +359,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ilçe results of Turkey's general elections from 1961 to 2007 and its referendums from 1961 to 2017, "
+            summary="Ilçe results of Turkey's general elections from 1961 to 2011 and its referendums from 1961 to 2017, "
             "from TÜİK's election database",
             polity="TR",
         )
