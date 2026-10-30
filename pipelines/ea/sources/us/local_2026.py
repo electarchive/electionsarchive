@@ -2565,6 +2565,9 @@ for key, publisher, title, url, local in (
     ("AZ-04015-county", "Mohave County Elections Department", "2026 General Election County Candidates", "https://www.mohave.gov/departments/elections/2026-general-election-county-candidates/", "az/mohave_county_candidates.html"),
     ("AZ-04015-bullhead-city", "Bullhead City Clerk", "Sample Ballot, 2026 General Election (Precinct 211)", "https://www.bullheadcityaz.gov/leadership-government/elections/", "az/bullhead_sample_ballot.pdf"),
     ("AZ-04023-nogales", "Nogales City Clerk", "2026 Election Candidates, General Election November 3, 2026", "https://www.nogalesaz.gov/334/2026-Election-Candidates", "az/nogales_candidates.html"),
+    ("CA-06079-atascadero", "City of Atascadero City Clerk", "Notice of Nominees for Public Office, General Municipal Election November 3, 2026 (August 25, 2026)", "https://www.atascadero.org/", "ca/atascadero_nominees.pdf"),
+    ("CA-06079-san-luis-obispo", "City of San Luis Obispo City Clerk", "Municipal Elections: Candidate Filings for the November 3, 2026 Election", "https://www.slocity.org/government/elections", "ca/san_luis_obispo.html"),
+    ("CA-06047-atwater", "Merced County Elections", "Final Qualified Candidate List, November 3, 2026 General Election (August 25, 2026)", "https://www.countyofmerced.com/elections", "ca/atwater_qualified.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
