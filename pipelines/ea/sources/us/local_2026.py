@@ -1201,6 +1201,11 @@ FEEDS.update(
             "City of Lyons",
             "General Election Certified Candidates",
         ),
+    "OR-41043-millersburg": (
+            "https://www.millersburgoregon.gov/1469/November-2026-City-Council-Election",
+            "City of Millersburg",
+            "November 2026 City Council Election",
+        ),
         "OR-41019": (
             "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
             "Douglas County Clerk",
@@ -1393,6 +1398,7 @@ DELIVERED = {
     "OR-41043-harrisburg": DATA / "inbox" / "y26" / "or" / "harrisburg.html",
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
+    "OR-41043-millersburg": DATA / "inbox" / "y26" / "or" / "millersburg.txt",
     "OH-39165": DATA / "inbox" / "y26" / "oh" / "warren_cands.pdf",
     "OH-39041": DATA / "inbox" / "y26" / "oh" / "delaware_cands.pdf",
     "OH-39155": DATA / "inbox" / "y26" / "oh" / "trumbull_cands.pdf",
