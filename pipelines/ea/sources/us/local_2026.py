@@ -1831,6 +1831,12 @@ NE_SOURCES = {
         "https://www.lapeercounty.org/",
         "mi/lapeer_schools.doc",
     ),
+    "MI-26107": (
+        "Mecosta County Clerk",
+        "Official Candidate List, 11/03/2026 State General",
+        "https://www.mecostacounty.org/",
+        "mi/mecosta.pdf",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
