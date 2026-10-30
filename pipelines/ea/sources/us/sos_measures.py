@@ -331,6 +331,8 @@ MI_OLD_PROPOSALS = (
 )
 NC = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
 NC_DAYS = (date(2004, 11, 2), date(2010, 11, 2))
+WV = "https://web.archive.org/web/20130612072655id_/http://www.sos.wv.gov/elections/history/electionreturns/Documents/{0}/{0}%20Constitutional%20Amendment{1}.pdf"
+WV_FILES = {date(2000, 11, 7): "%20Gen", date(2002, 11, 5): "", date(2004, 11, 2): ""}
 KS = "https://sos.ks.gov/elections/22elec/"
 KS_2022 = (
     (
@@ -985,6 +987,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "WV": (
+        "West Virginia Secretary of State",
+        "Official election returns by county",
+        "https://sos.wv.gov/elections/Pages/ElectionResults.aspx",
+    ),
     "NC": (
         "North Carolina State Board of Elections",
         "Official election results by precinct",
@@ -1326,6 +1333,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    for day, suffix in WV_FILES.items():
+        raw.fetch(SOURCE, WV.format(day.year, suffix), suffix=".pdf")
+        time.sleep(1)
     for day in NC_DAYS:
         raw.fetch(SOURCE, NC.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}"), suffix=".zip")
         time.sleep(1)
@@ -3716,6 +3726,57 @@ def north_carolina() -> list[dict[str, object]]:
     return rows
 
 
+def west_virginia() -> list[dict[str, object]]:
+    heading = re.compile(r"Amendment\s*#\s*(\d+)")
+    line = re.compile(r"^\s*([A-Z][A-Za-z.' ]+?)\s{2,}([\d,]+)\s+([\d,]+)\s*$")
+    rows: list[dict[str, object]] = []
+    for day, suffix in WV_FILES.items():
+        url = WV.format(day.year, suffix)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        number = ""
+        counties: dict[str, set[str]] = {}
+        official: dict[str, tuple[int, int]] = {}
+        start = len(rows)
+        for text_line in text.splitlines():
+            found = heading.search(text_line)
+            if found:
+                number = found[1]
+                continue
+            match = line.match(text_line)
+            if match is None or match[1] == "County":
+                continue
+            if match[1] == "Totals":
+                official[number] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+                continue
+            counties.setdefault(number, set()).add(match[1])
+            for answer, votes in (("YES", match[2]), ("NO", match[3])):
+                rows.append(
+                    {
+                        "state": "WV",
+                        "day": day,
+                        "number": number,
+                        "label": f"Amendment {number}",
+                        "url": url,
+                        "county": match[1],
+                        "answer": answer,
+                        "votes": int(votes.replace(",", "")),
+                    }
+                )
+        for amendment, names in counties.items():
+            if len(names) != 55:
+                raise ValueError(f"{url} amendment {amendment}: {len(names)} counties")
+        for amendment, totals in official.items():
+            sums = tuple(
+                sum(row["votes"] for row in rows[start:] if row["number"] == amendment and row["answer"] == answer)
+                for answer in ("YES", "NO")
+            )
+            if sums != totals:
+                raise ValueError(f"{url} amendment {amendment}: counties {sums} differ from Totals {totals}")
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -4327,6 +4388,7 @@ def parse() -> None:
             *michigan_old(),
             *kansas(),
             *north_carolina(),
+            *west_virginia(),
             *utah(),
             *wyoming(),
             *south_carolina(),
