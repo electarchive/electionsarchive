@@ -133,6 +133,18 @@ DISTRICT_CALENDAR = {
         5,
         "Hood County Elections, Precinct 101 sample ballot for November 3, 2026: only City of Granbury races appear and no Granbury ISD trustee contest, with the district's last trustee election in 2025 (Places 5 to 7), https://hoodcounty.texas.gov/departments/elections_administration/sample_ballots.php",
     ),
+    ("VA", "City of Falls Church"): (
+        2,
+        1,
+        11,
+        "Virginia Department of Elections, November 3, 2026 all-offices candidate list (rev. 10-9-2026): no Falls Church city council or mayor contest appears, https://www.elections.virginia.gov/casting-a-ballot/candidate-list/november-3-2026-gen-elect-all-offices/",
+    ),
+    ("VA", "City of Galax"): (
+        2,
+        1,
+        11,
+        "Virginia Department of Elections, November 3, 2026 all-offices candidate list (rev. 10-9-2026): no Galax city council or mayor contest appears, https://www.elections.virginia.gov/casting-a-ballot/candidate-list/november-3-2026-gen-elect-all-offices/",
+    ),
     ("TX", "Killeen Independent School District"): (
         1,
         0,
