@@ -41,7 +41,7 @@ def races(
     parent = cs.key("us.election", f"{day}:{state}")
     if parent in cs.minted:
         raise SystemExit("state election missing")
-    made: dict[tuple[str, str], tuple[UUID, UUID, str, str, str]] = {}
+    made: dict[tuple[str, str], tuple[UUID, UUID, str, str, str] | None] = {}
     elections: set[UUID] = set()
     kept = 0
     for (county, district, seat_label), people in frame.group_by(["county", "district", "seat"], maintain_order=True):
@@ -56,7 +56,19 @@ def races(
                 print("no district:", district)
                 continue
             made[(county, district)] = special
-        polity, area, place, path, code = made[(county, district)]
+            rival = conn.execute(
+                """select x.value from contest c join election e on e.id = c.election_id
+                   join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+                   where e.polity_id = %s and e.date_from = %s""",
+                [special[0], day],
+            ).fetchall()
+            if any(not value.startswith(f"{day}:{state}:{special[4]}:") for (value,) in rival):
+                print("held elsewhere:", district)
+                made[(county, district)] = None
+        chosen = made[(county, district)]
+        if chosen is None:
+            continue
+        polity, area, place, path, code = chosen
         election = cs.key("us.election", f"{day}:{state}:{code}")
         if election in cs.minted and election not in elections:
             elections.add(election)

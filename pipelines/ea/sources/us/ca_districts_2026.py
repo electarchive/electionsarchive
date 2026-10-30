@@ -16,7 +16,7 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles"}
 KEPT = re.compile(
     r"FIRE|WATER|UTILITY|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
@@ -37,12 +37,12 @@ PERSON = re.compile(r"^([A-Z][^,]*?), (.+?)(?: - ([A-Z]{2,4}))?\s{3,}\S.*\s(YES|
 def full_name(label: str) -> str:
     for short, full in WORDS:
         label = re.sub(short, full, label)
-    text = cased(label).replace(" Del ", " del ").replace(" And ", " and ")
-    return text if re.search(r"\b(?:District|Authority|Agency|County)$", text) else f"{text} District"
+    text = cased(label).replace(" Del ", " del ").replace(" And ", " and ").replace(" Of ", " of ")
+    return text if re.search(r"\b(?:District|Authority|Agency)\b|County$", text) else f"{text} District"
 
 
 def feed(fips: str) -> tuple[str, str, str]:
-    if fips in local_2026.FILES:
+    if fips in local_2026.PUBLISHERS:
         return (local_2026.FILES[fips], *local_2026.PUBLISHERS[fips][1:])
     return local_2026.FEEDS[f"CA-{fips}"]
 
@@ -164,9 +164,59 @@ def sacramento() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+def los_angeles() -> list[dict[str, str | int | bool]]:
+    rows = []
+    text = lines("06037")
+    keep = False
+    expect = False
+    for index, line in enumerate(text):
+        if found := re.match(r"(\d{5})-(.+?)\s{2,}Vote for (\d+)", line):
+            more = (
+                text[index + 1]
+                if re.match(r"[A-Za-z0-9]", text[index + 1]) and not re.match(r"CONTEST|PARTY|NON", text[index + 1])
+                else ""
+            )
+            heading = " ".join(f"{found[2]} {more}".split())
+            seats = int(found[3])
+            unexpired = "SPECIAL ELECTION" in heading
+            heading = heading.replace("SPECIAL ELECTION ", "")
+            parts = re.match(
+                r"(.+?) Member, Board of (Directors|Trustees)(?:, (?:Division|Trustee Area No\.) (\d+))?",
+                heading,
+                re.IGNORECASE,
+            )
+            keep = (
+                parts is not None
+                and KEPT.search(parts[1].upper() + " LIBRARY") is not None
+                and DROPPED.search(parts[1]) is None
+            )
+            if keep:
+                body = parts[1]
+                role = "Director" if parts[2].lower() == "directors" else "Trustee"
+                seat = f"{'Trustee Area' if role == 'Trustee' else 'Division'} {int(parts[3])}" if parts[3] else ""
+            expect = False
+        elif keep and not line.strip():
+            expect = True
+        elif keep and expect and (found := re.match(r" {15,25}\*?([A-Z][A-Z .,'\"ÁÉÍÓÚÑ()-]+?)(?:\s{2,}.*)?$", line)):
+            if not re.match(r"(PARTY PREFERENCE|NON PARTISAN|NONPARTISAN)", found[1]):
+                rows.append(
+                    {
+                        "county": "Los Angeles",
+                        "district": full_name(body),
+                        "seat": seat or ("Short Term" if unexpired else ""),
+                        "role": role,
+                        "seats": seats,
+                        "name": cased(found[1]),
+                        "unexpired": unexpired,
+                    }
+                )
+            expect = False
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
