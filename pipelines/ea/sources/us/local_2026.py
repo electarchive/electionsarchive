@@ -2569,6 +2569,7 @@ for key, publisher, title, url, local in (
     ("CA-06079-san-luis-obispo", "City of San Luis Obispo City Clerk", "Municipal Elections: Candidate Filings for the November 3, 2026 Election", "https://www.slocity.org/government/elections", "ca/san_luis_obispo.html"),
     ("CA-06047-atwater", "Merced County Elections", "Final Qualified Candidate List, November 3, 2026 General Election (August 25, 2026)", "https://www.countyofmerced.com/elections", "ca/atwater_qualified.pdf"),
     ("KS-20103-townships", "Leavenworth County Clerk", "2026 General Election Candidate Publication Letter, county and township ticket", "https://www.leavenworthcounty.gov/Department/Clerk/2026%20General-Candidate%20Publication%20Letter%20-%20For%20Official%20Paper.pdf", "ks/leavenworth_notice.pdf"),
+    ("KS-20177-townships", "Shawnee County Election Office", "Candidate Filing Information, November 3, 2026 General Election", "https://candidatefiling.us/Info/Default?st=KS&s=1097283794&j=3472565347&e=1911002665&det=Y", "ks/shawnee.html"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
