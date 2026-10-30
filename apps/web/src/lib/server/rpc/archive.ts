@@ -2930,13 +2930,14 @@ async function places(
     };
   }
   const allocated = await db.execute<{
+    id: string;
     area: string;
     k: number;
     parent: string | null;
     path: string | null;
     seats: number | null;
   }>(sql`
-    select c.district_area_id as area, a.k, p.parent_id as parent, s.path,
+    select c.id, c.district_area_id as area, a.k, p.parent_id as parent, s.path,
       (
         select sum(x.seats)::int from contest_option o
         cross join lateral (
@@ -2954,6 +2955,7 @@ async function places(
     where c.allocation_parent_id = ${contest.id}::uuid
   `);
   const childPath = new Map(allocated.rows.map((row) => [row.area, row.path]));
+  const childContest = new Map(allocated.rows.map((row) => [row.area, row.id]));
   const joined = new Set(
     kids.filter((kid) => kid.isMember).map((kid) => kid.scheme),
   );
@@ -3049,7 +3051,7 @@ async function places(
       name: split.has(kid.k) ? m.map_part({ name }) : name,
       path: child ?? (base == null ? null : `${base}/${kid.segment}`),
       isContest: child != null,
-      owner: null,
+      owner: childContest.get(kid.id) ?? null,
     };
   });
   const pooled = await db.execute<{
@@ -3148,7 +3150,7 @@ async function places(
       name: nestedNames.full.get(row.area) ?? "",
       path: row.path,
       isContest: true,
-      owner: null,
+      owner: row.id,
     })),
   ];
   const crosswalk =
@@ -3611,12 +3613,15 @@ async function tabulate(
     const leader =
       lumped ?? ((running?.current?.votes ?? 0) > 0 ? (running ?? null) : null);
     const seated = elects[index]?.held;
-    const seats = new Map(
-      result.map((entry, at) => [
-        entry.key,
-        seated?.get(results[index]?.[at]?.key ?? "") ?? 0,
-      ]),
-    );
+    const seats =
+      result.length === 0
+        ? new Map(seated)
+        : new Map(
+            result.map((entry, at) => [
+              entry.key,
+              seated?.get(results[index]?.[at]?.key ?? "") ?? 0,
+            ]),
+          );
     let before: (typeof result)[number] | null = null;
     for (const entry of result) {
       if (
@@ -11849,6 +11854,7 @@ async function races(
       isOwn: boolean;
       area: string | null;
       k: number | null;
+      magnitude: number | null;
       scheme: string | null;
       noun: string | null;
       grouping: "alliance" | "party";
@@ -11905,7 +11911,7 @@ async function races(
         e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
         coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
-        a.id as area, a.k, a.scheme_code as scheme, sc.noun,
+        a.id as area, a.k, c.magnitude, a.scheme_code as scheme, sc.noun,
         case when exists (
           select from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null
         ) then 'alliance' else 'party' end as grouping
@@ -12111,10 +12117,14 @@ async function races(
                 since,
                 sample: first.id,
                 ...tabled,
-                rows: tabled.rows.map((row) => ({
-                  ...row,
-                  at: at.get(row.k) ?? null,
-                })),
+                rows: tabled.rows.map((row, index) => {
+                  const seats = districts[index]?.magnitude ?? null;
+                  return {
+                    ...row,
+                    at: at.get(row.k) ?? null,
+                    seats: seats != null && seats > 1 ? seats : null,
+                  };
+                }),
               };
             })(),
         db.execute<{ from: string; to: string }>(sisters(roots, day)),
