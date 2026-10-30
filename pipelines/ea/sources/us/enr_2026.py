@@ -79,7 +79,9 @@ NOTE = (
 
 
 def person(label: str) -> str:
-    words = [w for w in re.sub(r"[^a-z ]", " ", slug(label).replace("-", " ")).split() if w not in SUFFIXES]
+    words = [
+        w for w in re.sub(r"[^a-z ]", " ", slug(label.replace("’", "'")).replace("-", " ")).split() if w not in SUFFIXES
+    ]
     words = ["yes" if w in ("for", "yes") else "no" if w in ("against", "no") else w for w in words]
     return words[0][0] + words[-1] if len(words) > 1 else words[0] if words else ""
 
@@ -647,6 +649,13 @@ def emit():
                 "select entity_id, text from name where entity_id = any(%s)", [list(published)]
             ).fetchall():
                 titles.setdefault(contest, set()).update(slug(text).split("-"))
+            towns: dict[str, set[str]] = {}
+            for code, text in conn.execute(
+                """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
+                   where u.scheme_code = 'us.place' and u.code = any(%s)""",
+                [list({key.split(":")[2] for key, _ in published.values()})],
+            ).fetchall():
+                towns.setdefault(code, set()).update(w for w in slug(text).split("-") if len(w) > 2 and w not in STOP)
             races: dict[tuple[str, frozenset[str]], list[str]] = {}
             for (name, county), group in local.filter(pl.col("state") == state).group_by("contest", "county"):
                 people = frozenset(
@@ -654,8 +663,11 @@ def emit():
                 )
                 races.setdefault((name, people), []).append(county)
             matched = 0
+            picks = []
             for (name, people), places in races.items():
-                words = {w for w in slug(name).split("-") if w not in STOP}
+                words = {
+                    re.sub(r"^0+(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w) for w in slug(name).split("-") if w not in STOP
+                }
                 scored = []
                 for contest, (key, wanted) in published.items():
                     segment = key.split(":")[2]
@@ -664,6 +676,8 @@ def emit():
                     ):
                         continue
                     if len(places) == 1 and not re.match(r"\d|sd|house$|senate$", segment):
+                        continue
+                    if people <= {"yes", "no"} and segment in towns and not towns[segment] & words:
                         continue
                     overlap = len(people & wanted) / len(people | wanted) if people | wanted else 0
                     if overlap >= 0.6:
@@ -677,28 +691,30 @@ def emit():
                         )
                 scored.sort(key=lambda hit: (-hit[0], -hit[1]))
                 best = [hit for hit in scored if hit[:2] == scored[0][:2]] if scored else []
-                if len(best) != 1 or (people <= {"yes", "no"} and best[0][1] < 1):
+                if len(best) != 1 or ((people <= {"yes", "no"} or len(people) < 2) and best[0][1] < 1):
                     unmatched.append(
                         f"local {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if best else 'no contest'}"
                     )
                     continue
-                _, _, contest, key = best[0]
+                picks.append((best[0], name, places))
+            for (_, _, contest, key), name, places in sorted(picks, key=lambda pick: (-pick[0][0], -pick[0][1])):
                 if any(entry[1] == key for entry in work):
                     unmatched.append(f"local {state}: {name} ({', '.join(places[:2])}): duplicate of {key}")
                     continue
                 segment = key.split(":")[2]
                 place = None
-                if re.fullmatch(r"\d{7}", segment):
+                if not re.fullmatch(r"\d{5}", segment) and re.match(r"\d|sd", segment):
                     found = conn.execute(
-                        "select id from reporting_unit where scheme_code = 'us.place' and code = %s limit 1", [segment]
+                        """select u.id from reporting_unit u
+                           where u.area_id = (select district_area_id from contest where id = %s)
+                              or u.scheme_code = 'us.place' and u.code = %s
+                           order by u.scheme_code = 'us.place' and u.code = %s, u.scheme_code limit 1""",
+                        [contest, segment, segment],
                     ).fetchone()
                     if found is None:
-                        unmatched.append(f"local {state}: {name}: no place unit {segment}")
+                        unmatched.append(f"local {state}: {name}: no unit for {key}")
                         continue
                     place = found[0]
-                elif not re.fullmatch(r"\d{5}", segment) and re.match(r"\d|sd", segment):
-                    unmatched.append(f"local {state}: {name}: no unit for {key}")
-                    continue
                 matched += 1
                 work.append(
                     (
@@ -747,14 +763,16 @@ def emit():
                             option,
                             [
                                 YESNO.get(w, w)
-                                for w in re.sub(r"[^a-z ]", " ", slug(label).replace("-", " ")).split()
+                                for w in re.sub(
+                                    r"[^a-z ]", " ", slug(label.replace("’", "'")).replace("-", " ")
+                                ).split()
                                 if w not in SUFFIXES
                             ],
                         )
                     )
             ballots: dict[str, UUID] = {}
             for name, write_in in group.select("candidate", "write_in").unique().iter_rows():
-                if write_in or re.search(r"write-?in|scattering", name, re.IGNORECASE):
+                if write_in or re.search(r"write-?in|scattering|\(W\)$", name, re.IGNORECASE):
                     if scattered is None:
                         scattered = cs.key("us.option", f"{contest_key}:write_in:scattered")
                         if scattered in cs.minted:
@@ -769,7 +787,7 @@ def emit():
                     continue
                 tokens = {
                     YESNO.get(w, w)
-                    for w in re.sub(r"[^a-z ]", " ", slug(name).replace("-", " ")).split()
+                    for w in re.sub(r"[^a-z ]", " ", slug(name.replace("’", "'")).replace("-", " ")).split()
                     if w not in SUFFIXES
                 }
                 hits = sorted(
