@@ -11,7 +11,7 @@
     "start": "node build/index.js",
     "sync": "svelte-kit sync",
     "compile-paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --output-structure locale-modules --strategy cookie preferredLanguage globalVariable baseLocale",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+    "check": "export NODE_OPTIONS=--max-old-space-size=5000 && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
     "@better-auth/api-key": "catalog:",
