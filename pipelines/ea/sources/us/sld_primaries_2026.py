@@ -447,20 +447,39 @@ OK_RACE = re.compile(r"FOR STATE (SENATOR|REPRESENTATIVE) DISTRICT (\d+)")
 LEGISLATIVE = re.compile(
     r"(?P<party>REP|DEM) (?:State (?P<chamber>Senate|House)|(?P<body>Senator|Representative) in General Assembly) District (?P<district>\d+)"
 )
+STATEWIDE = {
+    "lieutenant governor": ("lieutenant-governor", "Lieutenant Governor"),
+    "attorney general": ("attorney-general", "Attorney General"),
+    "secretary of state": ("secretary-of-state", "Secretary of State"),
+    "state treasurer": ("treasurer", "Treasurer"),
+    "state controller": ("controller", "Controller"),
+    "commissioner of agriculture": ("commissioner-of-agriculture", "Commissioner of Agriculture"),
+    "commissioner of insurance": ("commissioner-of-insurance", "Commissioner of Insurance"),
+    "commissioner of labor": ("commissioner-of-labor", "Commissioner of Labor"),
+    "state school superintendent": ("school-superintendent", "School Superintendent"),
+    "superintendent of public instruction": (
+        "superintendent-of-public-instruction",
+        "Superintendent of Public Instruction",
+    ),
+    "psc - district 3": ("public-service-commissioner:district-3", "Public Service Commissioner, District 3"),
+    "psc - district 5": ("public-service-commissioner:district-5", "Public Service Commissioner, District 5"),
+}
+STATEWIDE_LABELS = "|".join(re.escape(label) for label in STATEWIDE)
 ITEMS = {
     "UT": LEGISLATIVE,
     "RI": LEGISLATIVE,
-    "GA": re.compile(r"State (?P<chamber>Senate|House) - District (?P<district>\d+) - (?P<party>Rep|Dem)"),
-    "ID": re.compile(
-        r"State (?P<body>Senator|Representative) District (?P<district>\d+)(?: Seat (?P<seat>[AB]))? - (?P<party>Republican|Democratic)"
+    "GA": re.compile(
+        r"(?:State (?P<chamber>Senate|House) - District (?P<district>\d+)|(?P<office>"
+        + STATEWIDE_LABELS
+        + r")) - (?P<party>Rep|Dem)",
+        re.I,
     ),
-}
-STATEWIDE = {
-    "Lieutenant Governor": ("lieutenant-governor", "Nevada Lieutenant Governor"),
-    "Attorney General": ("attorney-general", "Nevada Attorney General"),
-    "Secretary Of State": ("secretary-of-state", "Nevada Secretary of State"),
-    "State Treasurer": ("treasurer", "Nevada Treasurer"),
-    "State Controller": ("controller", "Nevada Controller"),
+    "ID": re.compile(
+        r"(?:State (?P<body>Senator|Representative) District (?P<district>\d+)(?: Seat (?P<seat>[AB]))?|(?P<office>"
+        + STATEWIDE_LABELS
+        + r")) - (?P<party>Republican|Democratic)",
+        re.I,
+    ),
 }
 PARTIES = {
     "dfl": ("dp", "MN:minnesota-democratic-farmer-labor-party", "Democratic–Farmer–Labor"),
@@ -1257,10 +1276,17 @@ def parse() -> None:
                         if town not in town_counties("RI"):
                             continue
                         locality = town_counties("RI")[town]
+                    statewide = STATEWIDE.get((found.groupdict().get("office") or "").lower())
                     rows.extend(
                         (
-                            "senate" if "Senat" in (found.groupdict().get("chamber") or found["body"]) else "house",
-                            found["district"]
+                            statewide[0]
+                            if statewide
+                            else "senate"
+                            if "Senat" in (found.groupdict().get("chamber") or found["body"])
+                            else "house",
+                            ""
+                            if statewide
+                            else found["district"]
                             + (f":{'AB'.index(found['seat']) + 1}" if found.groupdict().get("seat") else ""),
                             "republican" if found["party"].upper().startswith("REP") else "democratic",
                             re.sub(
@@ -1282,13 +1308,13 @@ def parse() -> None:
                 for race in county.iter("Race"):
                     found = re.fullmatch(r"State (Senate|Assembly), District\s+(\d+) \((\w+)\)", race.get("RaceTitle"))
                     office = re.fullmatch(r"(.+) \((Democratic|Republican)\)", race.get("RaceTitle"))
-                    if found is None and (office is None or office[1] not in STATEWIDE):
+                    if found is None and (office is None or office[1].lower() not in STATEWIDE):
                         continue
                     for candidate in race.iter("Candidate"):
                         last, _, first = candidate.get("CandidateName").partition(", ")
                         rows.append(
                             (
-                                found[1].lower() if found else STATEWIDE[office[1]][0],
+                                found[1].lower() if found else STATEWIDE[office[1].lower()][0],
                                 found[2] if found else "",
                                 (found or office)[3 if found else 2].lower(),
                                 f"{first} {last}".strip(),
@@ -1595,7 +1621,7 @@ def emit() -> Path:
                        left join name n on n.entity_id = co.body_id and n.is_preferred
                        where x.value ~ %s""",
                     [
-                        f"^2026-11-03:{state}:((house|senate|assembly|house-of-delegates):[0-9a-z-]+(:[0-9])?:g|[a-z-]+)$"
+                        f"^2026-11-03:{state}:((house|senate|assembly|house-of-delegates):[0-9a-z-]+(:[0-9])?:g|[a-z-]+(:district-[0-9]+)?)$"
                     ],
                 ).fetchall()
             }
@@ -1677,12 +1703,12 @@ def emit() -> Path:
                 else:
                     name(
                         contest,
-                        f"2026 {next(title for key, title in STATEWIDE.values() if key == chamber)} {label} {stage}",
+                        f"2026 {STATE_NAMES[state]} {next(title for key, title in STATEWIDE.values() if key == chamber)} {label} {stage}",
                     )
                 cs.add(
                     "slug",
                     path=f"us/{state.lower()}/{day}-{stage.replace(' ', '-')}/"
-                    + (f"state-{chamber}-{district.replace(':', '-')}-{party}" if district else f"{chamber}-{party}"),
+                    + (f"state-{chamber}-{district.replace(':', '-')}-{party}" if district else f"{chamber.replace(':', '-')}-{party}"),
                     entity_id=contest,
                 )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
