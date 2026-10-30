@@ -6388,7 +6388,13 @@ def emit() -> Path:
                     polity,
                     f"2026 {place} {title} election",
                     f"{home}/{DAY}-general/{role}"
-                    + (f"-{slug(title.split(', ', 1)[1])}" if ", " in title else "")
+                    + (
+                        f"-{slug(title.split(', ', 1)[1])}"
+                        if ", " in title
+                        else "-special"
+                        if tail.split(":")[3:4] == ["special"]
+                        else ""
+                    )
                     + ("-unexpired" if tail.endswith(":unexpired") else ""),
                     f"2026 {place} general election",
                     f"{home}/{DAY}-general",
