@@ -2736,7 +2736,7 @@ def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
     for tail, text in conn.execute(
-        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id, named)
+        """select distinct on (c.office_id, c.body_id, c.district_area_id, c.seat_id, named, x.value ~ 'at-large')
                   regexp_replace(x.value, '^[0-9-]+:', ''), n.text
            from contest c
            join election e on e.id = c.election_id
@@ -2754,7 +2754,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            where (x.value ~ %s or x.value ~ %s) and e.date_from >= '2016-01-01' and e.date_from < %s and not c.notional
                and c.party_scope_id is null and c.kind <> 'ballot_question'
                and op.kind in ('county', 'municipality', 'school_district', 'special_district')
-           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, named, e.date_from desc, x.value ~ 'at-large', x.value""",
+           order by c.office_id, c.body_id, c.district_area_id, c.seat_id, named, x.value ~ 'at-large', e.date_from desc, x.value""",
         [f"(^|:){state}:", "^ceda:" if state == "CA" else "^$", DAY],
     ):
         county = re.match(rf"{state}:(\d{{5}})(?:\d{{5}})?(?::|$)", tail)
@@ -6017,6 +6017,25 @@ def parse() -> None:
     print(frame.group_by("fips").agg(pl.col("tail").n_unique().alias("contests"), pl.len().alias("candidates")))
 
 
+COUNTY_SCOPE = re.compile(r"[A-Z]{2}:\d{5}")
+SUBCOUNTY = re.compile(
+    r"(district|precinct|division|ward|place|seat|position|zone|area|group)-([0-9]+|[a-z])(-|$)"
+    r"|constable|justice|magistrate|commissioner|council|legislature|board|commission|supervisor|attorney|solicitor"
+    r"|circuit-court-judge|judge-of-the-peace|surrogate"
+)
+COUNTY_JUDGE = re.compile(
+    r"(TX|AR):\d{5}:judge|KY:\d{5}:judge-executive|SC:\d{5}:probate-judge|MD:\d{5}:(baltimore-)?judge-of-the-orphans-court"
+    r"|NY:(?!36005|36047|36061|36081|36085)\d{5}:(court-judge|county-court-judge|family-court(-judge)?|surrogate-court-judge)"
+)
+
+
+def countywide(tail: str) -> bool:
+    role = ":".join(tail.split(":")[2:])
+    if "judge" in role or ("court" in role and "clerk" not in role):
+        return COUNTY_JUDGE.fullmatch(tail) is not None
+    return SUBCOUNTY.search(role) is None
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
     tail_set = set(frame["tail"])
@@ -6114,6 +6133,8 @@ def emit() -> Path:
         }
         created: set[str] = set()
         made: set[object] = set()
+        at_large: dict[object, tuple | None] = {}
+        freed: set[object] = set()
         homes: dict[str, str] = {}
         homeless: set[str] = set()
         special_slugs: dict[str, dict[str, UUID]] = {}
@@ -6239,7 +6260,7 @@ def emit() -> Path:
                         cs.add("office", id=holder, polity_id=polity, kind="mayor" if role == "mayor" else "other")
                         name(holder, f"Mayor of {place}" if role == "mayor" else f"{place} {title}")
                 area = whole[0]
-                if ", " in title:
+                if ", " in title and slug(title.split(", ", 1)[1]) != "at-large":
                     seat = title.split(", ", 1)[1]
                     district = f"{st}:{code}:{role}:{slug(seat)}"
                     area = cs.area("us.local_district", district)
@@ -6298,7 +6319,7 @@ def emit() -> Path:
                         cs.add("body", id=office, polity_id=polity, kind="council")
                     name(office, f"{place} {title.split(', ')[0].removeprefix('County ')}")
                 area = cs.area("us.county", county)
-                if seat:
+                if seat and slug(seat) != "at-large":
                     area = cs.area("us.local_district", tail)
                     if area in cs.minted:
                         cs.add("area", id=area, scheme_code="us.local_district")
@@ -6508,6 +6529,18 @@ def emit() -> Path:
             except ValueError:
                 key = f"{key}:reissued"
                 contest = cs.key("us.contest", key)
+            if area is not None:
+                if area not in at_large:
+                    at_large[area] = conn.execute(
+                        "select ap.parent_id from area_code c join area_parent ap on ap.area_id = c.area_id"
+                        " where c.area_id = %s and c.code ~ ':at-large$' limit 1",
+                        [area],
+                    ).fetchone()
+                if at_large[area] is not None:
+                    freed.add(area)
+                    area = at_large[area][0]
+            elif office_id is not None and COUNTY_SCOPE.fullmatch(scope) and countywide(tail):
+                area = cs.area("us.county", scope[3:])
             cs.add(
                 "contest",
                 id=contest,
@@ -6672,5 +6705,23 @@ def emit() -> Path:
             print("retiring stale contest", value)
             cs.add("entity_retirement", entity_id=contest, reason=reason)
             counts["stale contests"] += 1
+        freed |= {
+            row[0]
+            for row in conn.execute(
+                "select distinct co.district_area_id from contest co join area_code c on c.area_id = co.district_area_id"
+                " where co.id = any(%s::uuid[]) and c.code ~ ':at-large$'",
+                [emitted],
+            ).fetchall()
+        }
+        for area in freed:
+            if (
+                conn.execute(
+                    "select 1 from contest co join entity e on e.id = co.id and e.retired_by is null"
+                    " where co.district_area_id = %s and co.id <> all(%s::uuid[]) limit 1",
+                    [area, emitted],
+                ).fetchone()
+                is None
+            ):
+                cs.add("entity_retirement", entity_id=area, reason="At-large seats are held to the whole government's area.")
         print(counts)
         return cs.write()
