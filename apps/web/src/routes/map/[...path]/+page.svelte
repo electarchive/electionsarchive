@@ -1102,7 +1102,19 @@
           source: id,
           "source-layer": "areas",
           ...(near != null && { filter: near }),
-          paint: { "line-color": "var(--card)", "line-width": 1 },
+          paint: {
+            "line-color":
+              "color-mix(in oklab, var(--foreground) 13%, transparent)",
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              4,
+              0.4,
+              10,
+              0.9,
+            ],
+          },
         },
         "fills",
         { group: "sheet" },

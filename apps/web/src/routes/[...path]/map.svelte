@@ -726,6 +726,22 @@
         ? ["in", ["id"], ["literal", parted.ks]]
         : ["!", ["in", ["id"], ["literal", parted.ks]]],
   ]);
+  const around: Maplibre.ExpressionSpecification = $derived([
+    "!",
+    [
+      "in",
+      ["id"],
+      [
+        "literal",
+        [
+          ...places.rows.map((row) => row.k),
+          ...(blank ?? [])
+            .filter((entry) => !entry.isOutside)
+            .map((entry) => entry.k),
+        ],
+      ],
+    ],
+  ]);
   const skipped = $derived.by(() => {
     if (typeof view !== "number") {
       return [];
@@ -1413,7 +1429,7 @@
         id: "seam",
         type: "line",
         ...areas,
-        filter: inland,
+        filter: own == null ? inland : ["all", inland, ["!", around]],
         paint: {
           "line-color": "var(--card)",
           "line-width":
@@ -1475,6 +1491,50 @@
           },
         },
         "fills",
+      );
+      engine.add(
+        {
+          id: "rim",
+          type: "line",
+          ...areas,
+          filter: ["all", inland, around],
+          paint: {
+            "line-color":
+              "color-mix(in oklab, var(--foreground) 13%, transparent)",
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              4,
+              0.4,
+              10,
+              0.9,
+            ],
+          },
+        },
+        "lines",
+      );
+      engine.add(
+        {
+          id: "border",
+          type: "line",
+          ...ownAreas,
+          filter: beyond,
+          paint: {
+            "line-color":
+              "color-mix(in oklab, var(--foreground) 30%, transparent)",
+            "line-width": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              4,
+              0.6,
+              10,
+              1.2,
+            ],
+          },
+        },
+        "lines",
       );
       engine.add(
         {
@@ -1655,26 +1715,9 @@
     if (engine.gl == null) {
       return;
     }
-    const beyond: Maplibre.ExpressionSpecification = [
-      "!",
-      [
-        "in",
-        ["id"],
-        [
-          "literal",
-          [
-            ...places.rows.map((row) => row.k),
-            ...(blank ?? [])
-              .filter((entry) => !entry.isOutside)
-              .map((entry) => entry.k),
-          ],
-        ],
-      ],
-    ];
     basemap(engine, scheme, isBasemap && outline != null, outline ?? [], [
-      ["fill", beyond],
-      ["seam", beyond],
-      ["veil", beyond],
+      ["fill", around],
+      ["veil", around],
     ]);
   });
 
