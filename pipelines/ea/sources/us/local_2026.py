@@ -1722,6 +1722,12 @@ NE_SOURCES = {
         "https://www.passaiccountynj.org/home/showpublisheddocument/12407",
         "nj/passaic_school.pdf",
     ),
+    "NJ-34035-s": (
+        "Somerset County Clerk",
+        "2026 General Election School Board and Fire Commissioner Candidates",
+        "https://www.somersetcountynj.gov/government/elected-officials/county-clerk/election-division",
+        "nj/somerset_school.xlsx",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
