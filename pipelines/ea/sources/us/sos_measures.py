@@ -659,6 +659,13 @@ MO_DAYS = (
     date(2008, 11, 4),
     date(2010, 11, 2),
 )
+MO_PRIMARY = (
+    "https://web.archive.org/web/2015id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/CountyPrimary{}.pdf"
+)
+MO_PRIMARY_PART2 = (
+    "https://web.archive.org/web/2015id_/http://sos.mo.gov/cmsimages/ElectionResultsStatistics/CountyPrimary{}Part2.pdf"
+)
+MO_PRIMARIES = (date(2002, 8, 6), date(2004, 8, 3), date(2006, 8, 8), date(2010, 8, 3))
 MO_CODES = {"KANSAS CITY": "29095", "JACKSON": "29095", "ST LOUIS CITY": "29510", "ST LOUIS COUNTY": "29189"}
 MT = "https://sosmt.gov/"
 MT_FILES = {
@@ -1189,6 +1196,10 @@ def fetch() -> None:
         time.sleep(1)
     for day in MO_DAYS:
         for url in (MO, MO_PART2) if day.year >= 2004 else (MO,):
+            raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
+            time.sleep(1)
+    for day in MO_PRIMARIES:
+        for url in (MO_PRIMARY, MO_PRIMARY_PART2) if day.year >= 2004 else (MO_PRIMARY,):
             raw.fetch(SOURCE, url.format(day.year), suffix=".pdf")
             time.sleep(1)
     for _, _, page in OH_ISSUES:
@@ -3303,7 +3314,18 @@ def missouri() -> list[dict[str, object]]:
     )
     rows: list[dict[str, object]] = []
     for day, url in (
-        (day, url.format(day.year)) for day in MO_DAYS for url in (MO, MO_PART2) if day.year >= 2004 or url == MO
+        *(
+            (day, url.format(day.year))
+            for day in MO_DAYS
+            for url in (MO, MO_PART2)
+            if day.year >= 2004 or url == MO
+        ),
+        *(
+            (day, url.format(day.year))
+            for day in MO_PRIMARIES
+            for url in (MO_PRIMARY, MO_PRIMARY_PART2)
+            if day.year >= 2004 or url == MO_PRIMARY
+        ),
     ):
         lines = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
