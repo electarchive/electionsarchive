@@ -1,0 +1,48 @@
+code	state	counties	source
+CO:1	CO	Gilpin, Jefferson	https://www.coloradojudicial.gov/trial-courts-district
+CO:2	CO	Denver	https://www.coloradojudicial.gov/trial-courts-district
+CO:3	CO	Huerfano, Las Animas	https://www.coloradojudicial.gov/trial-courts-district
+CO:4	CO	El Paso, Teller	https://www.coloradojudicial.gov/trial-courts-district
+CO:5	CO	Clear Creek, Eagle, Lake, Summit	https://www.coloradojudicial.gov/trial-courts-district
+CO:6	CO	Archuleta, La Plata, San Juan	https://www.coloradojudicial.gov/trial-courts-district
+CO:7	CO	Delta, Gunnison, Hinsdale, Montrose, Ouray, San Miguel	https://www.coloradojudicial.gov/trial-courts-district
+CO:8	CO	Jackson, Larimer	https://www.coloradojudicial.gov/trial-courts-district
+CO:9	CO	Garfield, Pitkin, Rio Blanco	https://www.coloradojudicial.gov/trial-courts-district
+CO:10	CO	Pueblo	https://www.coloradojudicial.gov/trial-courts-district
+CO:11	CO	Chaffee, Custer, Fremont, Park	https://www.coloradojudicial.gov/trial-courts-district
+CO:12	CO	Alamosa, Conejos, Costilla, Mineral, Rio Grande, Saguache	https://www.coloradojudicial.gov/trial-courts-district
+CO:13	CO	Kit Carson, Logan, Morgan, Phillips, Sedgwick, Washington, Yuma	https://www.coloradojudicial.gov/trial-courts-district
+CO:14	CO	Grand, Moffat, Routt	https://www.coloradojudicial.gov/trial-courts-district
+CO:15	CO	Baca, Cheyenne, Kiowa, Prowers	https://www.coloradojudicial.gov/trial-courts-district
+CO:16	CO	Bent, Crowley, Otero	https://www.coloradojudicial.gov/trial-courts-district
+CO:17	CO	Adams, Broomfield	https://www.coloradojudicial.gov/trial-courts-district
+CO:18	CO	Arapahoe	https://www.coloradojudicial.gov/trial-courts-district
+CO:19	CO	Weld	https://www.coloradojudicial.gov/trial-courts-district
+CO:20	CO	Boulder	https://www.coloradojudicial.gov/trial-courts-district
+CO:21	CO	Mesa	https://www.coloradojudicial.gov/trial-courts-district
+CO:22	CO	Dolores, Montezuma	https://www.coloradojudicial.gov/trial-courts-district
+CO:23	CO	Douglas, Elbert, Lincoln	https://www.coloradojudicial.gov/trial-courts-district
+NM:1	NM	Los Alamos, Rio Arriba, Santa Fe	https://nmcourts.gov/courts-by-district/
+NM:2	NM	Bernalillo	https://nmcourts.gov/courts-by-district/
+NM:3	NM	Doña Ana	https://nmcourts.gov/courts-by-district/
+NM:4	NM	Guadalupe, Mora, San Miguel	https://nmcourts.gov/courts-by-district/
+NM:5	NM	Chaves, Eddy, Lea	https://nmcourts.gov/courts-by-district/
+NM:6	NM	Grant, Hidalgo, Luna	https://nmcourts.gov/courts-by-district/
+NM:7	NM	Catron, Socorro, Sierra, Torrance	https://nmcourts.gov/courts-by-district/
+NM:8	NM	Taos, Colfax, Union	https://nmcourts.gov/courts-by-district/
+NM:9	NM	Curry, Roosevelt	https://nmcourts.gov/courts-by-district/
+NM:10	NM	De Baca, Harding, Quay	https://nmcourts.gov/courts-by-district/
+NM:11	NM	McKinley, San Juan	https://nmcourts.gov/courts-by-district/
+NM:12	NM	Lincoln, Otero	https://nmcourts.gov/courts-by-district/
+NM:13	NM	Cibola, Sandoval, Valencia	https://nmcourts.gov/courts-by-district/
+OK:3	OK	Kiowa, Jackson, Tillman, Harmon, Greer	https://www.oscn.net/applications/oscn/DeliverDocument.asp?CiteID=67562
+OK:5	OK	Comanche, Cotton	https://www.oscn.net/applications/oscn/DeliverDocument.asp?CiteID=67562
+OK:18	OK	Pittsburg, Haskell	https://www.oscn.net/applications/oscn/DeliverDocument.asp?CiteID=67562
+FL:4	FL	Clay, Duval, Nassau	https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0026/Sections/0026.021.html
+FL:10	FL	Hardee, Highlands, Polk	https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0026/Sections/0026.021.html
+ME:3	ME	Androscoggin, Franklin, Oxford	
+ME:4	ME	Kennebec, Somerset	
+ME:5	ME	Penobscot, Piscataquis	
+ME:6	ME	Knox, Lincoln, Sagadahoc, Waldo	
+ME:7	ME	Hancock, Washington	
+AR:05021	AR	Clay, Craighead, Crittenden, Greene, Mississippi, Poinsett	
