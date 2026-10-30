@@ -342,7 +342,8 @@
         ["at", at],
       ]);
       void goto(
-        resolve(`/live/${page.params.path ?? ""}?${query.toString()}`),
+        resolve("/live/[...path]", { path: page.params.path ?? "" }) +
+          `?${query.toString()}`,
         { state: page.state, shallow: true, replace: true },
       ).catch(() => undefined);
     });
@@ -452,7 +453,7 @@
           </span>
         {/if}
         <a
-          href={resolve(`/${night.election.path}`)}
+          href={resolve("/[...path]", { path: night.election.path })}
           class="hover:text-foreground hover:underline">{day}</a
         >
       </p>
@@ -516,8 +517,9 @@
         <div class="grid content-start gap-5">
           <div class="grid gap-2">
             <h2 id="live-lead" class="heading">
-              <a href={resolve(`/${lead.path}`)} class="hover:underline"
-                >{lead.name}</a
+              <a
+                href={resolve("/[...path]", { path: lead.path })}
+                class="hover:underline">{lead.name}</a
               >
             </h2>
             {#key sentence}
@@ -762,7 +764,7 @@
             {#each view.tiles as tile (tile.race.id)}
               <li>
                 <a
-                  href={resolve(`/${tile.race.path}`)}
+                  href={resolve("/[...path]", { path: tile.race.path })}
                   title={tile.leader == null || tile.share == null
                     ? `${tile.race.name}: ${m.live_no_update()}`
                     : `${tile.race.name}: ${tile.leader.name} ${percent(tile.share)}`}

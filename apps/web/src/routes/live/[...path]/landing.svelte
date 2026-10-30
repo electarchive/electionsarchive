@@ -78,7 +78,7 @@
     {#each states as state (state.code)}
       <li>
         <a
-          href={resolve(`/live/${state.path}${query}`)}
+          href={resolve("/live/[...path]", { path: state.path }) + query}
           aria-label="{state.name}: {state.status === 'counting'
             ? m.live_landing_legend_counting()
             : state.status === 'certified'
@@ -165,7 +165,7 @@
         <tr class="border-be border-border align-middle">
           <th scope="row" class="py-2.5 pe-3 text-start font-normal">
             <a
-              href={resolve(`/live/${state.path}${query}`)}
+              href={resolve("/live/[...path]", { path: state.path }) + query}
               class="font-medium hover:underline">{state.name}</a
             >
             <span
@@ -220,7 +220,7 @@
           </td>
           <td class="py-2.5 text-end max-sm:hidden">
             <a
-              href={resolve(`/${state.path}`)}
+              href={resolve("/[...path]", { path: state.path })}
               class="text-[0.8125rem] text-muted-foreground hover:text-foreground hover:underline"
               >{m.live_ballot()}</a
             >

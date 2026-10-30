@@ -102,7 +102,7 @@
   <div class="grid gap-2">
     <div class="flex items-baseline justify-between gap-3">
       <a
-        href={resolve(`/${race.path}`)}
+        href={resolve("/[...path]", { path: race.path })}
         class="line-clamp-2 text-[0.9375rem] leading-snug font-semibold hover:underline"
         >{race.name.replace(/^.*?ballot question: /u, "")}</a
       >
@@ -162,7 +162,7 @@
     {#if variant === "compact"}
       <div class="flex items-baseline justify-between gap-3">
         <a
-          href={resolve(`/${race.path}`)}
+          href={resolve("/[...path]", { path: race.path })}
           class="text-[0.9375rem] leading-snug font-semibold hover:underline"
           >{race.name}</a
         >
