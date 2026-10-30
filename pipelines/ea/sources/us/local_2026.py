@@ -1903,6 +1903,10 @@ for key, publisher, title, url, local in (
     ("MO-29201", "Scott County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.scottcountymo.com/cmsAdmin/uploads/2/november-scott-publication-110326.pdf", "mo/scott.pdf"),
     ("MO-29113", "Lincoln County Clerk", "Election Authority's Certification, General Election, November 3, 2026", "https://www.lincolncomo.gov/sample-ballots", "mo/lincoln.pdf"),
     ("MO-29145", "Newton County Clerk", "Official General Election Ballot (sample), Newton County, November 3, 2026", "https://www.ncclerk.org/electionsvoters/", "mo/newton.pdf"),
+    ("IL-17117", "Macoupin County Clerk", "Candidate List, 2026 General Election", "https://www.macoupinvotes.gov/election-information/sample-ballot/?electionId=23", "il/macoupin_candidates.html"),
+    ("NE-31153", "Sarpy County Election Commission", "Notice of General Election, November 3, 2026", "https://www.sarpy.gov/DocumentCenter/View/9683", "ne/sarpy_notice.pdf"),
+    ("KS-20121", "Miami County Clerk", "Official Candidate List for General 2026", "https://www.miamicountyks.gov/DocumentCenter/View/15339", "ks/miami.pdf"),
+    ("KS-20079", "Harvey County Election Office", "Notice of Candidates Filed, General Election, November 3, 2026", "https://www.hvcoksvote.gov/_files/ugd/4d48e8_7e8cb25c163f48aeaca28c682929de59.pdf", "ks/harvey.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
