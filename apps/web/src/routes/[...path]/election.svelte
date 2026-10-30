@@ -1590,9 +1590,14 @@
         target.count >= 3 &&
         races.every(
           (other) =>
-            other.anchor.replace(/-\d+$/u, "") !==
-              target.anchor.replace(/-\d+$/u, "") ||
-            other.count <= target.count,
+            other.anchor.replace(
+              /-(\d+|round-\d+|by-.+|special-election)$/u,
+              "",
+            ) !==
+              target.anchor.replace(
+                /-(\d+|round-\d+|by-.+|special-election)$/u,
+                "",
+              ) || other.count <= target.count,
         )
         ? `${page.url.pathname.slice(1)}/${target.anchor}`
         : null,

@@ -712,7 +712,7 @@ export async function representative(election: string, anchor: string) {
     order by count(*) desc
   `);
   const labels = await names(found.rows.map((row) => row.owner));
-  const bare = anchor.replace(/-\d+$/u, "");
+  const bare = anchor.replace(/-(\d+|round-\d+|by-.+|special-election)$/u, "");
   const named = found.rows.map((row) => ({
     id: row.id,
     anchor: segment(labels.full.get(row.owner) ?? ""),
@@ -13690,6 +13690,19 @@ export const elections = {
         turnout(anchored?.now ?? null, anchored == null ? [] : [anchored.k]),
         turnout(anchored?.before ?? null, anchored == null ? [] : [anchored.k]),
       ]);
+      const anchors: Array<string> = [];
+      for (const [index, race] of raced.entries()) {
+        const tiers = [
+          race.round != null && race.round > 1 && `round-${race.round}`,
+          race.kind === "list_allocation" && "by-party-list",
+          race.count > 1 && race.noun !== "" && `by-${segment(race.noun)}`,
+          race.isRemainder && "special-election",
+        ].flatMap((tier) => (tier === false ? [] : `${race.anchor}-${tier}`));
+        anchors.push(
+          [race.anchor, ...tiers].find((anchor) => !anchors.includes(anchor)) ??
+            `${race.anchor}-${index + 1}`,
+        );
+      }
       const valid = Math.max(0, ...raced.map((race) => race.valid));
       const totaled = anchored == null ? undefined : turned.get(anchored.k);
       const earlier = anchored == null ? undefined : prior.get(anchored.k);
@@ -14300,11 +14313,7 @@ export const elections = {
                 council.covered >= race.size
                   ? null
                   : council.covered,
-              anchor: raced
-                .slice(0, index)
-                .some((other) => other.anchor === race.anchor)
-                ? `${race.anchor}-${index + 1}`
-                : race.anchor,
+              anchor: anchors[index] ?? race.anchor,
               results: race.results.map((row) => {
                 const own = nominations.rows
                   .filter(
