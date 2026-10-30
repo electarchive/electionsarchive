@@ -4679,7 +4679,16 @@ def parse() -> None:
 
     tsv_rows = [
         (state, number, row)
-        for state in ("oh", "fl", "ca", "nj", "counties", "ne", "states")
+        for state in (
+            "oh",
+            "fl",
+            "ca",
+            "nj",
+            "counties",
+            "ne",
+            "states",
+            *sorted(path.stem.removeprefix("local_2026_") for path in Path(__file__).parent.glob("local_2026_lane_*.tsv")),
+        )
         for number, row in enumerate(
             csv.DictReader(
                 Path(__file__).with_name(f"local_2026_{state}.tsv").read_text().splitlines(), delimiter="\t"
