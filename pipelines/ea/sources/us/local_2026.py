@@ -2208,6 +2208,9 @@ for key, publisher, title, url, local in (
     ("CA-06107-tulare", "City of Tulare", "General Municipal Election, November 3, 2026", "https://www.tulare.ca.gov/government/elections/november-3-2026-general-municipal-election", "ca/tulare.html"),
     ("CA-06037-pomona", "City of Pomona", "2026 Elections Information", "https://www.pomonaca.gov/government/departments/city-clerk/elections-information", "ca/pomona.html"),
     ("CA-06065-palm-desert", "City of Palm Desert", "2026 Elections: General Municipal Election, November 3, 2026", "https://www.palmdesert.gov/government/elections", "ca/palm_desert.html"),
+    ("OR-41033-grants-pass", "Grants Pass City Recorder", "Nonpartisan Filings for City Council Positions, General Election November 3, 2026 (certified August 26, 2026)", "https://cms9files.revize.com/josephinecountyor/City%20of%20GP%20candidates.pdf", "or/grantspass_council_nov2026_candidates.pdf"),
+    ("OR-41071-mcminnville", "City of McMinnville", "November 3, 2026 General Election", "https://www.mcminnvilleoregon.gov/cityrecorder/page/november-3-2026-general-election", "or/mcminnville_nov3_2026_election.html"),
+    ("MN-27145-st-cloud", "City of St. Cloud", "Local Election Filings", "https://ci.stcloud.mn.us/846/Local-Election-Filings", "mn/stcloud_local_election_filings.html"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
