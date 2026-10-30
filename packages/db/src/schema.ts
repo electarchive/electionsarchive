@@ -2,10 +2,13 @@ import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   index,
   integer,
   jsonb,
   pgEnum,
+  primaryKey,
+  smallint,
   snakeCase,
   text,
   timestamp,
@@ -190,5 +193,164 @@ export const savedView = snakeCase.table(
   (t) => [
     uniqueIndex("saved_view_slug_key").on(t.slug),
     index("saved_view_owner_id_idx").on(t.ownerId),
+  ],
+);
+
+export const profile = snakeCase.table("profile", {
+  userId: uuid()
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  handle: text().notNull().unique(),
+  displayName: text(),
+  bioMd: text(),
+  affiliation: text(),
+  links: jsonb().notNull().default([]),
+  licenseAcceptedAt: time(),
+  feedToken: text().unique(),
+  createdAt: time().notNull().defaultNow(),
+});
+
+export const proposalState = pgEnum("proposal_state", [
+  "draft",
+  "open",
+  "changes_requested",
+  "approved",
+  "published",
+  "rejected",
+  "withdrawn",
+  "reverted",
+]);
+
+export const proposal = snakeCase.table(
+  "proposal",
+  {
+    id: primaryId(),
+    number: integer()
+      .notNull()
+      .unique()
+      .generatedAlwaysAsIdentity({ startWith: 1000 }),
+    authorUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    agentKeyId: uuid().references(() => apikeys.id, { onDelete: "set null" }),
+    agentName: text(),
+    agentModel: text(),
+    title: text().notNull(),
+    polityId: uuid(),
+    state: proposalState().notNull().default("draft"),
+    tier: smallint(),
+    headChangesetId: uuid(),
+    draft: jsonb(),
+    prescreen: jsonb(),
+    prereview: jsonb(),
+    decidedBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    decidedAt: time(),
+    decisionReason: text(),
+    createdAt: time().notNull().defaultNow(),
+    updatedAt: timeUpdated(),
+    submittedAt: time(),
+  },
+  (t) => [
+    index("proposal_author_user_id_idx").on(t.authorUserId),
+    index("proposal_state_tier_idx").on(t.state, t.tier),
+    index("proposal_polity_id_idx").on(t.polityId),
+    check("proposal_tier_check", sql`${t.tier} between 1 and 3`),
+  ],
+);
+
+export const proposalRevision = snakeCase.table(
+  "proposal_revision",
+  {
+    proposalId: uuid()
+      .notNull()
+      .references(() => proposal.id, { onDelete: "cascade" }),
+    n: integer().notNull(),
+    changesetId: uuid(),
+    payload: jsonb().notNull(),
+    diff: jsonb(),
+    checks: jsonb(),
+    note: text(),
+    createdAt: time().notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.proposalId, t.n] }),
+    uniqueIndex("proposal_revision_changeset_id_key").on(t.changesetId),
+  ],
+);
+
+export const proposalJobKind = pgEnum("proposal_job_kind", [
+  "check",
+  "submit",
+  "publish",
+  "reject",
+  "revert",
+]);
+
+export const proposalJobStatus = pgEnum("proposal_job_status", [
+  "queued",
+  "running",
+  "done",
+  "failed",
+]);
+
+export const proposalJob = snakeCase.table(
+  "proposal_job",
+  {
+    id: primaryId(),
+    proposalId: uuid()
+      .notNull()
+      .references(() => proposal.id, { onDelete: "cascade" }),
+    revisionN: integer(),
+    kind: proposalJobKind().notNull(),
+    status: proposalJobStatus().notNull().default("queued"),
+    requestedBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    createdAt: time().notNull().defaultNow(),
+    startedAt: time(),
+    finishedAt: time(),
+    output: jsonb(),
+  },
+  (t) => [
+    index("proposal_job_queued_idx")
+      .on(t.createdAt)
+      .where(sql`${t.status} = 'queued'`),
+    index("proposal_job_proposal_id_idx").on(t.proposalId),
+  ],
+);
+
+export const activityKind = pgEnum("activity_kind", [
+  "proposal_submitted",
+  "proposal_revised",
+  "changes_requested",
+  "proposal_rejected",
+  "proposal_withdrawn",
+  "proposal_published",
+  "proposal_reverted",
+  "changeset_published",
+]);
+
+export const activity = snakeCase.table(
+  "activity",
+  {
+    id: primaryId(),
+    at: time().notNull().defaultNow(),
+    actorUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    agentKeyId: uuid().references(() => apikeys.id, { onDelete: "set null" }),
+    kind: activityKind().notNull(),
+    proposalId: uuid().references(() => proposal.id, { onDelete: "cascade" }),
+    changesetId: uuid(),
+    entityIds: uuid()
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+    polityIds: uuid()
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
+    summary: text().notNull(),
+  },
+  (t) => [
+    index("activity_at_idx").on(t.at.desc()),
+    index("activity_actor_user_id_at_idx").on(t.actorUserId, t.at.desc()),
+    index("activity_proposal_id_idx").on(t.proposalId),
+    index("activity_entity_ids_idx").using("gin", t.entityIds),
+    index("activity_polity_ids_idx").using("gin", t.polityIds),
   ],
 );
