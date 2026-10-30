@@ -1649,6 +1649,12 @@ NE_SOURCES = {
         "https://www.hudsoncountyclerk.org/",
         "nj/jersey_city_f09.pdf",
     ),
+    "CA-06071-s": (
+        "San Bernardino County Registrar of Voters",
+        "November 3, 2026 General Election: School District Appointments in Lieu of Election",
+        "https://uploads.rov.sbcounty.gov/rov/News/2026/1103/PublicNotice_AppointmentsInLieuSchools.pdf",
+        "ca/sb_in_lieu.pdf",
+    ),
     "NJ-34037-s": (
         "Sussex County Clerk",
         "2026 School Board Election, unofficial candidate list (updated 7/27/2026)",
@@ -1865,6 +1871,8 @@ for key, publisher, title, url, local in (
     ("UT-49023", "Juab County Clerk", "2026 General Election Certification", "https://juabcounty.gov/wp-content/uploads/2026/09/2026_general_certification.pdf", "ut/juab.pdf"),
     ("UT-49025", "Kane County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.utah.gov/pmn/files/1485015.docx", "ut/kane.docx"),
     ("UT-49017", "Garfield County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.garfield.utah.gov/files/assets/garfieldcout/v/1/documents/auditor-clerk/26gutgar_publication_2_watermark.pdf", "ut/garfield.pdf"),
+    ("TX-48453", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Del Valle and Manor ISD)", "https://votetravis.gov/wp-content/uploads/G26-Bedsheet-Ballot-Corrected-Final2.pdf", "tx/travis.pdf"),
+    ("TX-48221", "Tolar Independent School District", "November 2026 Tolar ISD Trustee Candidates", "https://www.tolarisd.org/district-information/school-board/elections/election-candidates", "tx/tolar.html"),
     ("MO-29113", "Lincoln County Clerk", "Election Authority's Certification, General Election, November 3, 2026", "https://www.lincolncomo.gov/sample-ballots", "mo/lincoln.pdf"),
     ("MO-29145", "Newton County Clerk", "Official General Election Ballot (sample), Newton County, November 3, 2026", "https://www.ncclerk.org/electionsvoters/", "mo/newton.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
@@ -1874,6 +1882,7 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+TACIT_FEEDS = {"CA-06071-s"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
@@ -1990,6 +1999,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            from contest c
            join election e on e.id = c.election_id
            join entity t on t.id = c.id and t.retired_by is null
+           join changeset pc on pc.id = c.changeset_id and pc.pipeline <> 'us.fl_primary_2026'
            join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
            join name n on n.entity_id = c.id and n.is_preferred and n.lang = 'en'
            left join office f on f.id = c.office_id
@@ -5145,6 +5155,7 @@ def emit() -> Path:
                left join name en on en.entity_id = el.id and en.is_preferred and en.lang = 'en'
                left join slug es on es.entity_id = el.id and es.is_current
                join external_id ex on ex.entity_id = el.id and ex.scheme = 'us.election'
+               join changeset pc on pc.id = co.changeset_id and pc.pipeline <> 'us.fl_primary_2026'
                where x.scheme = 'us.contest' and regexp_replace(x.value, '^[0-9-]+:', '') = any(%s) and el.date_from < %s
                order by x.value, el.date_from desc""",
             [tails, DAY],
@@ -5544,7 +5555,7 @@ def emit() -> Path:
                 round_number=2 if chained else 1,
                 previous_round_id=previous if chained else None,
                 electoral_system_id=system,
-                default_result_kind=result_kind,
+                default_result_kind="tacit" if str(group["feed"][0]) in TACIT_FEEDS else result_kind,
             )
             text = re.sub(r"^\d{4} ", "2026 ", title)
             if group["unexpired"][0] and term == "full":
