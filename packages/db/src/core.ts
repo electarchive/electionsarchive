@@ -871,19 +871,29 @@ export const note = pgTable("note", {
 	lang: text().default("en").notNull(),
 }, (table) => [
 	index("note_entity_idx").using("btree", table.entityId.asc().nullsLast()),
+	check("note_lang_bcp47", sql`(lang ~ '^[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?$'::text)`),
+	check("note_body_nfc", sql`(body_md IS NFC NORMALIZED)`),
 ]);
 
 export const translation = pgTable("translation", {
 	sourceMd5: text("source_md5").notNull(),
 	lang: text().notNull(),
+	sourceLang: text("source_lang").default("en").notNull(),
 	body: text().notNull(),
 	origin: translationOrigin().notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	staleFrom: text("stale_from"),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.sourceMd5, table.lang], name: "translation_pkey"}),
 	check("translation_source_md5_check", sql`(source_md5 ~ '^[0-9a-f]{32}$'::text)`),
-	check("translation_lang_check", sql`(lang <> 'en'::text)`),
+	check("translation_stale_from_check", sql`((stale_from ~ '^[0-9a-f]{32}$'::text) AND (stale_from <> source_md5))`),
+	check("translation_lang_check", sql`(lang <> source_lang)`),
+	check("translation_lang_bcp47", sql`(lang ~ '^[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?$'::text)`),
+	check("translation_source_lang_bcp47", sql`(source_lang ~ '^[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?$'::text)`),
+	check("translation_body_nfc", sql`(body IS NFC NORMALIZED)`),
+	check("translation_official_source", sql`((origin <> 'official'::translation_origin) OR (source_id IS NOT NULL))`),
 ]);
 
 export const noteDrop = pgTable("note_drop", {

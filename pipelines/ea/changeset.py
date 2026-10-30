@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import LiteralString, cast
 from uuid import NAMESPACE_URL, UUID, uuid5, uuid7
 
+import langcodes
 import polars as pl
 from psycopg import sql
 
@@ -19,6 +20,9 @@ NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
 CHUNK = 200_000
 LATE = ("name", "slug", "external_id", "note", "label", "citation", "entity_merge", "entity_retirement")
 UUID_TEXT = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
+BCP47 = re.compile(r"[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?")
+PROSE = {"note": ("body_md",), "translation": ("body",)}
+LANGS = {"note": ("lang",), "translation": ("lang", "source_lang")}
 TRANSLITERATION = str.maketrans(
     {
         "ß": "ss",
@@ -51,6 +55,13 @@ def slug(text: str) -> str:
         .decode()
         .lower(),
     ).strip("-")
+
+
+def bcp47(tag: str) -> str:
+    canonical = langcodes.standardize_tag(tag) if langcodes.tag_is_valid(tag) else ""
+    if BCP47.fullmatch(canonical) is None:
+        raise ValueError(f"language tag {tag!r} is not a valid BCP 47 language, script, and region")
+    return canonical
 
 
 class Changeset:
@@ -416,6 +427,18 @@ class Changeset:
                 ],
                 how="diagonal_relaxed",
             )
+        for table, columns in PROSE.items():
+            if table in tables:
+                tables[table] = tables[table].with_columns(
+                    pl.col(column).str.normalize("NFC") for column in columns if column in tables[table].columns
+                )
+        for table, columns in LANGS.items():
+            if table in tables:
+                tables[table] = tables[table].with_columns(
+                    pl.col(column).replace({tag: bcp47(tag) for tag in tables[table][column].drop_nulls().unique()})
+                    for column in columns
+                    if column in tables[table].columns
+                )
         if "result_set" in tables and "result_value" in tables:
             sets, values = tables["result_set"], tables["result_value"]
             sets = sets.with_columns(
