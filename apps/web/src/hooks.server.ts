@@ -35,6 +35,11 @@ const twinHandle: Handle = async ({ event, resolve }) => {
   if (response.headers.get("content-type")?.startsWith("text/html") === true) {
     response.headers.append("vary", "Accept");
   }
+  if (
+    /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/.test(event.url.pathname)
+  ) {
+    response.headers.set("cache-control", "no-store");
+  }
   return response;
 };
 

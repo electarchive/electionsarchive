@@ -56,8 +56,12 @@ function store<T>(key: string, compute: () => Promise<T>) {
   return entry;
 }
 
-export async function remember<T>(key: string, compute: () => Promise<T>) {
-  if (Date.now() - state.checked >= CHECK) {
+export async function remember<T>(
+  key: string,
+  compute: () => Promise<T>,
+  isStrict = false,
+) {
+  if (isStrict || Date.now() - state.checked >= CHECK) {
     state.checking ??= refresh();
     await state.checking;
   }
@@ -65,6 +69,11 @@ export async function remember<T>(key: string, compute: () => Promise<T>) {
   if (hit != null) {
     entries.delete(key);
     entries.set(key, hit);
+    if (isStrict && hit.version !== state.version) {
+      const next = store(key, compute);
+      entries.set(key, next);
+      return next.value as Promise<T>;
+    }
     if (hit.version !== state.version && hit.isSettled && !hit.isRenewing) {
       hit.isRenewing = true;
       const next = store(key, compute);
@@ -92,12 +101,21 @@ export async function remember<T>(key: string, compute: () => Promise<T>) {
   return entry.value as Promise<T>;
 }
 
-export const os = base.use(async ({ next, procedure }, input) => {
-  const id = procedures.get(procedure) ?? state.procedures++;
-  procedures.set(procedure, id);
-  const output = await remember(`${id}:${JSON.stringify(input)}`, async () => {
-    const result = await next();
-    return result.output;
+function cached(isStrict: boolean) {
+  return base.use(async ({ next, procedure }, input) => {
+    const id = procedures.get(procedure) ?? state.procedures++;
+    procedures.set(procedure, id);
+    const output = await remember(
+      `${id}:${JSON.stringify(input)}`,
+      async () => {
+        const result = await next();
+        return result.output;
+      },
+      isStrict,
+    );
+    return { output, context: {} };
   });
-  return { output, context: {} };
-});
+}
+
+export const os = cached(false);
+export const strict = cached(true);

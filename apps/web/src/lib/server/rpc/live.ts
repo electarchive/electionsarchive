@@ -4,7 +4,7 @@ import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { os } from "#lib/server/cache.js";
+import { os, strict } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
@@ -360,7 +360,7 @@ const Input = v.object({
 });
 
 export const live = {
-  get: os
+  get: strict
     .meta(
       openapi({
         method: "GET",
