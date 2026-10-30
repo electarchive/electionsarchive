@@ -5,9 +5,148 @@ import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import layout2010 from "#lib/server/hex/gb-pcon-2010.json";
 import layout2024 from "#lib/server/hex/gb-pcon-2024.json";
+import cartograms from "#lib/server/hex/us-cd.json";
 import { inside, latest, names, paths, refs } from "#lib/server/rpc/archive.js";
 
 const fold = (key: string) => (key.startsWith("person:") ? "independent" : key);
+
+const CARTOGRAMS = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<{
+      credit: string;
+      districts: Record<string, string>;
+      bounds: Record<string, [number, number, number, number]>;
+      points: Record<string, [number, number]>;
+      states: Record<string, string>;
+      labels: Record<string, [number, number, string]>;
+    }>("../hex/us-cd-[0-9]*.json", { eager: true, import: "default" }),
+  ).map(([file, layout]) => [file.slice(-9, -5), layout]),
+);
+const CARTOGRAM_YEARS: Record<string, number> = cartograms;
+const TILES = import.meta.glob<{
+  grids: Record<
+    string,
+    {
+      boundaries: { states: Array<[number, number, number]> };
+      labels: Record<string, [number, number, string]>;
+    }
+  >;
+  years: Record<
+    string,
+    { grid: string; hexes: Record<string, [number, number]> }
+  >;
+}>("../hex/us-cd-tiles.json", { eager: true, import: "default" })[
+  "../hex/us-cd-tiles.json"
+];
+const SHRINK = Math.sqrt((3 * Math.sqrt(3)) / 2) / 50;
+const shrink = (value: number) => Math.round(value * SHRINK * 100) / 100;
+const shrunk = (path: string) =>
+  path.replaceAll(/-?\d+/g, (number) => String(shrink(Number(number))));
+
+const unitedStates = async (id: string, within: string | undefined) => {
+  const found = await db.execute<{ k: number; code: string; year: number }>(sql`
+    with recursive tree(id) as (
+      select e.id from election e join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'us' or ps.path like 'us/%') where e.id = ${id}::uuid
+      union all
+      select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
+    )
+    select distinct a.k, ac.code, extract(year from e.date_from)::int as year
+    from contest c join tree on tree.id = c.election_id
+    join election e on e.id = c.election_id
+    join area a on a.id = c.district_area_id and a.scheme_code = 'us.cd'
+    join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
+    where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
+      and coalesce(c.magnitude, 1) = 1 and not c.notional
+      and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
+  `);
+  const first = found.rows[0];
+  if (first == null) {
+    return null;
+  }
+  const year = String(first.year - (first.year % 2));
+  const placed = TILES?.years[year];
+  const grid = placed == null ? null : TILES?.grids[placed.grid];
+  if (placed == null || grid == null) {
+    return null;
+  }
+  const drawn = CARTOGRAMS[String(CARTOGRAM_YEARS[year] ?? "")];
+  const states = new Set(found.rows.map((row) => row.code.slice(0, 2)));
+  const cells = found.rows.flatMap((row) => {
+    const hex = placed.hexes[row.code];
+    return hex == null
+      ? []
+      : [{ k: row.k, q: hex[0], r: hex[1], isApart: row.code.endsWith("98") }];
+  });
+  const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
+  const bounds = found.rows.flatMap((row) => {
+    const box = drawn?.bounds[row.code];
+    return box == null ? [] : [box];
+  });
+  const seats = new Map<string, number>();
+  const codes = Object.keys(drawn?.districts ?? {});
+  for (const code of codes) {
+    seats.set(code.slice(0, 2), (seats.get(code.slice(0, 2)) ?? 0) + 1);
+  }
+  return {
+    credit: null,
+    cells,
+    borders: [
+      {
+        isNation: true,
+        edges: grid.boundaries.states.filter(([q, r, side]) => {
+          const odd = r & 1;
+          const [nq, nr] =
+            side === 1
+              ? [q + odd, r + 1]
+              : side === 2
+                ? [q + 1, r]
+                : [q + odd, r - 1];
+          return kept.has(`${q},${r}`) && kept.has(`${nq},${nr}`);
+        }),
+      },
+    ],
+    labels: Object.entries(grid.labels).flatMap(([fips, [q, r, text]]) =>
+      states.has(fips) && states.size > 1 ? [{ q, r, text }] : [],
+    ),
+    cartogram:
+      drawn == null
+        ? null
+        : {
+            credit: drawn.credit,
+            box: [
+              Math.min(...bounds.map((box) => box[0])),
+              Math.min(...bounds.map((box) => box[1])),
+              Math.max(...bounds.map((box) => box[2])),
+              Math.max(...bounds.map((box) => box[3])),
+            ].map((value) => shrink(value)),
+            districts: found.rows.flatMap((row) => {
+              const d = drawn.districts[row.code];
+              const point = drawn.points[row.code];
+              return d == null || point == null
+                ? []
+                : [
+                    {
+                      k: row.k,
+                      d: shrunk(d),
+                      x: shrink(point[0]),
+                      y: shrink(point[1]),
+                    },
+                  ];
+            }),
+            states: Object.entries(drawn.states).flatMap(([fips, d]) =>
+              states.has(fips) ? [shrunk(d)] : [],
+            ),
+            labels: Object.entries(drawn.labels).flatMap(
+              ([fips, [x, y, text]]) =>
+                states.has(fips) &&
+                states.size > 1 &&
+                (seats.get(fips) ?? 0) > 2
+                  ? [{ x: shrink(x), y: shrink(y), text }]
+                  : [],
+            ),
+          },
+  };
+};
 
 export const seats = {
   council: os
@@ -485,7 +624,7 @@ export const seats = {
         0.5 * winners.length;
       return {
         isPartisan,
-        parties: [...colors.values()],
+        parties: [...colors],
         seats: seats
           .values()
           .toArray()
@@ -1525,7 +1664,7 @@ export const seats = {
           member: person(row.member),
           reason: row.via,
           cause: row.via == null ? row.cause : null,
-          isOther: row.isOther === true,
+          isOther: row.isOther,
           isHere: row.isHere,
         })),
       };
@@ -1548,9 +1687,14 @@ export const seats = {
     .output(
       v.nullable(
         v.object({
-          credit: v.string(),
+          credit: v.nullable(v.string()),
           cells: v.array(
-            v.object({ k: v.number(), q: v.number(), r: v.number() }),
+            v.object({
+              k: v.number(),
+              q: v.number(),
+              r: v.number(),
+              isApart: v.boolean(),
+            }),
           ),
           borders: v.array(
             v.object({
@@ -1558,10 +1702,35 @@ export const seats = {
               edges: v.array(v.array(v.number())),
             }),
           ),
+          labels: v.array(
+            v.object({ q: v.number(), r: v.number(), text: v.string() }),
+          ),
+          cartogram: v.nullable(
+            v.object({
+              credit: v.string(),
+              box: v.array(v.number()),
+              districts: v.array(
+                v.object({
+                  k: v.number(),
+                  d: v.string(),
+                  x: v.number(),
+                  y: v.number(),
+                }),
+              ),
+              states: v.array(v.string()),
+              labels: v.array(
+                v.object({ x: v.number(), y: v.number(), text: v.string() }),
+              ),
+            }),
+          ),
         }),
       ),
     )
     .handler(async ({ input }) => {
+      const american = await unitedStates(input.id, input.within);
+      if (american != null) {
+        return american;
+      }
       const found = await db.execute<{ k: number; code: string }>(sql`
         with recursive tree(id) as (
           select e.id from election e join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'gb' or ps.path like 'gb/%') where e.id = ${input.id}::uuid
@@ -1592,7 +1761,9 @@ export const seats = {
       const hexes: Record<string, Array<number>> = layout.hexes;
       const cells = found.rows.flatMap((row) => {
         const [q, r] = hexes[row.code] ?? [];
-        return q == null || r == null ? [] : [{ k: row.k, q, r }];
+        return q == null || r == null
+          ? []
+          : [{ k: row.k, q, r, isApart: false }];
       });
       const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
       return {
@@ -1609,6 +1780,8 @@ export const seats = {
                 },
               ];
         }),
+        labels: [],
+        cartogram: null,
       };
     }),
   additional: os

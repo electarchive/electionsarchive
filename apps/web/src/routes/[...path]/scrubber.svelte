@@ -188,6 +188,11 @@
       (entry) => entry.map != null && entry.places != null,
     ) ?? null,
   );
+  const hexes = createQuery(() => ({
+    ...orpc.seats.hexes.queryOptions({ input: { id: located.data?.id ?? "" } }),
+    enabled: located.data != null,
+    placeholderData: keepPreviousData,
+  }));
   const states = createQuery(() => ({
     ...orpc.elections.states.queryOptions({
       input: { id: located.data?.id ?? "" },
@@ -592,6 +597,7 @@
                   swatch(item.color, item.key),
                 )}
                 tiles={race.map.tiles}
+                hexes={hexes.data ?? null}
                 own={race.map.own}
                 nested={race.map.nested}
                 frame={race.map.frame}

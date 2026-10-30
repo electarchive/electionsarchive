@@ -25,6 +25,7 @@ CREDIT = "third-party US House layout, since removed"
 GRIDS = Path(__file__).parent / "hexgrid"
 ELECTIONS = range(1992, 2027, 2)
 INSETS = {"PR": "72", "VI": "78", "GU": "66", "AS": "60", "MP": "69"}
+POSTAL = {fips: state for state, fips in (STATE_FIPS | INSETS).items()}
 
 
 def fetch(congress: int) -> Path:
@@ -55,6 +56,12 @@ def read(path: Path) -> dict[str, BaseGeometry]:
 def code(cd: str, alone: bool) -> str:
     state, number = cd.split("-")
     return f"{STATE_FIPS[state]}{'00' if alone else number.zfill(2)}"
+
+
+def anchor(geometry: BaseGeometry) -> list[int]:
+    main = max(geometry.geoms, key=lambda part: part.area) if isinstance(geometry, MultiPolygon) else geometry
+    point = polylabel(main, 0.5)
+    return [round(point.x), round(point.y)]
 
 
 def path(geometry: BaseGeometry) -> str:
@@ -106,13 +113,20 @@ def layout(shapes: dict[str, BaseGeometry]) -> dict:
     for fips, outline in outlines.items():
         main = max(outline.geoms, key=lambda part: part.area) if isinstance(outline, MultiPolygon) else outline
         point = polylabel(main, 0.5)
-        labels[fips] = [round(point.x), round(point.y)]
-    east = max(shape.bounds[2] for shape in plane.values())
-    south = max(shape.bounds[3] for shape in plane.values())
+        labels[fips] = [round(point.x), round(point.y), POSTAL[fips]]
     return {
         "credit": CREDIT,
-        "box": [0, 0, math.ceil(east), math.ceil(south)],
         "districts": {cd: path(shape) for cd, shape in sorted(plane.items())},
+        "bounds": {
+            cd: [
+                math.floor(shape.bounds[0]),
+                math.floor(shape.bounds[1]),
+                math.ceil(shape.bounds[2]),
+                math.ceil(shape.bounds[3]),
+            ]
+            for cd, shape in sorted(plane.items())
+        },
+        "points": {cd: anchor(shape) for cd, shape in sorted(plane.items())},
         "states": {fips: path(outline) for fips, outline in outlines.items()},
         "labels": labels,
     }
@@ -212,7 +226,7 @@ def outline(cells: dict[tuple[int, int], str]) -> dict:
         mx = sum(spot[0] for spot in spots) / len(spots)
         my = sum(spot[1] for spot in spots) / len(spots)
         _, _, q, r = min(spots, key=lambda spot: (spot[0] - mx) ** 2 + (spot[1] - my) ** 2)
-        labels[fips[token]] = [q, -r]
+        labels[fips[token]] = [q, -r, token]
     return {"boundaries": {"states": edges}, "labels": dict(sorted(labels.items()))}
 
 

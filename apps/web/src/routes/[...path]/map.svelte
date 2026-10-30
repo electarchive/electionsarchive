@@ -31,7 +31,7 @@
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
-  import { SCHEMES, basemap } from "#lib/map/basemap.js";
+  import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -131,9 +131,17 @@
     up?: { name: string; path: string } | null;
     tallies?: Array<number | null> | null;
     hexes?: {
-      credit: string;
-      cells: Array<{ k: number; q: number; r: number }>;
+      credit: string | null;
+      cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
+      labels: Array<{ q: number; r: number; text: string }>;
+      cartogram: {
+        credit: string;
+        box: Array<number>;
+        districts: Array<{ k: number; d: string; x: number; y: number }>;
+        states: Array<string>;
+        labels: Array<{ x: number; y: number; text: string }>;
+      } | null;
     } | null;
   } = $props();
 
@@ -406,7 +414,7 @@
   });
 
   const overview = $derived.by(() => {
-    if (context == null || sight == null || isHexView) {
+    if (context == null || sight == null || isSummary) {
       return null;
     }
     const { extent } = context;
@@ -521,10 +529,10 @@
       [...places.rows, ...(places.districts ?? [])].map((row) => [row.k, row]),
     ),
   );
-  let isHex = $state(true);
-  const grid = $derived.by(() => {
+  let layout = $state<"map" | "cartogram" | "hexes">("hexes");
+  const isCovered = $derived.by(() => {
     if (hexes == null) {
-      return null;
+      return false;
     }
     let covered = 0;
     for (const cell of hexes.cells) {
@@ -532,17 +540,43 @@
         covered += 1;
       }
     }
-    if (covered === 0 || covered < hexes.cells.length * 0.9) {
+    return covered > 0 && covered >= hexes.cells.length * 0.9;
+  });
+  const headings: Record<string, [number, number]> = {
+    ArrowRight: [1, 0],
+    ArrowLeft: [-1, 0],
+    ArrowDown: [0, 1],
+    ArrowUp: [0, -1],
+  };
+  const framed = (left: number, top: number, right: number, bottom: number) => {
+    const width = Math.max(right - left, 24);
+    const height = Math.max(bottom - top, 16);
+    return {
+      x: (left + right - width) / 2,
+      y: (top + bottom - height) / 2,
+      width,
+      height,
+    };
+  };
+  const hexagon = (x: number, y: number) =>
+    `M${x.toFixed(3)} ${(y - 1).toFixed(3)}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z`;
+  const tiled = $derived.by(() => {
+    if (hexes == null || !isCovered) {
       return null;
     }
     const center = (q: number, r: number) => ({
       x: Math.sqrt(3) * (q + (r & 1) / 2),
       y: -1.5 * r,
     });
-    const cells = hexes.cells.map((cell) => ({
-      k: cell.k,
-      ...center(cell.q, cell.r),
-    }));
+    const cells = hexes.cells.map((cell) => {
+      const at = center(cell.q, cell.r);
+      return {
+        k: cell.k,
+        ...at,
+        d: hexagon(at.x, at.y),
+        isApart: cell.isApart,
+      };
+    });
     const corners = [
       [0, -1],
       [0.866, -0.5],
@@ -574,10 +608,14 @@
     return {
       cells,
       at: new Map(cells.map((cell) => [cell.k, cell])),
-      x: left - 1.2,
-      y: top - 1.4,
-      width: right - left + 2.4,
-      height: bottom - top + 2.8,
+      ...framed(left - 1.2, top - 1.4, right + 1.2, bottom + 1.4),
+      seam: 0.12,
+      size: 0.62,
+      credit: hexes.credit,
+      labels: hexes.labels.map((label) => ({
+        ...center(label.q, label.r),
+        text: label.text,
+      })),
       nations: line(
         hexes.borders.flatMap((border) =>
           border.isNation ? border.edges : [],
@@ -590,19 +628,50 @@
       ),
     };
   });
-  const isHexView = $derived(grid != null && isHex);
+  const drawn = $derived.by(() => {
+    const cartogram = hexes?.cartogram;
+    if (cartogram == null || !isCovered) {
+      return null;
+    }
+    const cells = cartogram.districts.map((district) => ({
+      ...district,
+      isApart: false,
+    }));
+    const [left = 0, top = 0, right = 0, bottom = 0] = cartogram.box;
+    return {
+      cells,
+      at: new Map(cells.map((cell) => [cell.k, cell])),
+      ...framed(left - 1, top - 1, right + 1, bottom + 1),
+      seam: 0.05,
+      size: 0.9,
+      credit: cartogram.credit,
+      labels: cartogram.labels,
+      nations: cartogram.states.join(""),
+      regions: "",
+    };
+  });
+  const views = $derived([
+    "map" as const,
+    ...(drawn == null ? [] : ["cartogram" as const]),
+    ...(tiled == null ? [] : ["hexes" as const]),
+  ]);
+  const grid = $derived(
+    layout === "cartogram" ? drawn : layout === "hexes" ? tiled : null,
+  );
+  const isSummary = $derived(grid != null);
   const tinted = $derived.by(() => {
     void engine.theme;
-    return isHexView
+    return isSummary
       ? new Map(fills((css) => engine.read(css)))
       : new Map<number, string>();
   });
-  const credited = $derived([
-    ...(sources ?? engine.credits),
-    ...(isHexView && hexes != null
-      ? [m.map_hex_credit({ credit: hexes.credit })]
-      : []),
-  ]);
+  const credited = $derived(
+    grid == null
+      ? (sources ?? engine.credits)
+      : grid.credit == null
+        ? []
+        : [m.map_hex_credit({ credit: grid.credit })],
+  );
   const stretch = $derived(
     grid == null ? 1 : Math.min(boxWidth / grid.width, boxHeight / grid.height),
   );
@@ -868,7 +937,7 @@
       .map((row) => row.k),
   );
   const ratio = $derived.by(() => {
-    if (isHexView && grid != null) {
+    if (isSummary && grid != null) {
       return Math.min(2, Math.max(0.6, grid.width / grid.height));
     }
     const y = (latitude: number) =>
@@ -1054,11 +1123,11 @@
 
   const spot = $derived.by(() => {
     let anchor = pointer;
-    if (anchor == null && isHexView && current != null) {
+    if (anchor == null && isSummary && current != null) {
       anchor = place(current.k);
     }
     const projected =
-      anchor == null && !isHexView && current?.at != null
+      anchor == null && !isSummary && current?.at != null
         ? engine.project(current.at)
         : null;
     if (projected != null) {
@@ -1663,7 +1732,7 @@
     if (engine.gl == null) {
       return;
     }
-    const shown = isHexView ? null : outline;
+    const shown = isSummary ? null : outline;
     const isDetailed = isBasemap;
     const polity = scheme;
     untrack(() => basemap(engine, polity, isDetailed, shown));
@@ -1986,21 +2055,25 @@
         </div>
       </div>
     {/if}
-    {#if grid != null}
+    {#if views.length > 1}
       <div class="flex" role="group" aria-label={m.map_view()}>
-        {#each [true, false] as choice (choice)}
+        {#each views as choice (choice)}
           <button
             type="button"
             class={cn(
               "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
               {
                 "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                  isHex === choice,
+                  (grid == null ? "map" : layout) === choice,
               },
             )}
-            aria-pressed={isHex === choice}
-            onclick={() => (isHex = choice)}
-            >{choice ? m.map_view_hexes() : m.map_view_map()}</button
+            aria-pressed={(grid == null ? "map" : layout) === choice}
+            onclick={() => (layout = choice)}
+            >{choice === "hexes"
+              ? m.map_view_hexes()
+              : choice === "cartogram"
+                ? m.map_view_cartogram()
+                : m.map_view_map()}</button
           >
         {/each}
       </div>
@@ -2057,11 +2130,11 @@
       class={cn(
         "transition-opacity duration-500 ease-out block-full inline-full motion-reduce:transition-none",
         { "opacity-0": !engine.isLoaded },
-        { invisible: isHexView },
+        { invisible: isSummary },
       )}
       {@attach engine.mount}
     ></div>
-    {#if isHexView && grid != null}
+    {#if isSummary && grid != null}
       <svg
         class="absolute inset-0 block-full inline-full"
         viewBox="{grid.x} {grid.y} {grid.width} {grid.height}"
@@ -2078,13 +2151,11 @@
           {const row = $derived(rows.get(cell.k))}
           <path
             class="cursor-pointer outline-none"
-            d="M{cell.x.toFixed(3)} {(cell.y - 1).toFixed(
-              3,
-            )}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z"
+            d={cell.d}
             fill={tinted.get(cell.k) ??
               "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))"}
             stroke="var(--card)"
-            stroke-width="0.12"
+            stroke-width={grid.seam}
             role="button"
             tabindex={cell.k === (focus ?? grid.cells[0]?.k) ? 0 : -1}
             aria-label={row == null
@@ -2135,23 +2206,39 @@
                 open(cell.k);
                 return;
               }
-              const step =
-                event.key === "ArrowRight" || event.key === "ArrowDown"
-                  ? 1
-                  : event.key === "ArrowLeft" || event.key === "ArrowUp"
-                    ? -1
-                    : 0;
-              if (step === 0 || order.length === 0) {
+              const [dx, dy] = headings[event.key] ?? [0, 0];
+              if (dx === 0 && dy === 0) {
                 return;
               }
               event.preventDefault();
-              const at = order.indexOf(cell.k);
-              const next =
-                order[(at + step + order.length) % order.length] ?? order[0];
-              event.currentTarget.ownerSVGElement
-                ?.querySelector<SVGPathElement>(`[data-k="${next}"]`)
-                ?.focus();
+              let next = null;
+              let best = Infinity;
+              for (const other of grid.cells) {
+                const x = other.x - cell.x;
+                const y = other.y - cell.y;
+                const distance = Math.hypot(x, y);
+                const along = (x * dx + y * dy) / distance;
+                if (along > 0.5 && distance * (2 - along) < best) {
+                  best = distance * (2 - along);
+                  next = other.k;
+                }
+              }
+              if (next != null) {
+                event.currentTarget.ownerSVGElement
+                  ?.querySelector<SVGPathElement>(`[data-k="${next}"]`)
+                  ?.focus();
+              }
             }}
+          />
+        {/each}
+        {#each grid.cells.filter((cell) => cell.isApart) as cell (cell.k)}
+          <path
+            d={cell.d}
+            fill="none"
+            stroke="var(--muted-foreground)"
+            stroke-width="0.08"
+            stroke-dasharray="0.24 0.16"
+            pointer-events="none"
           />
         {/each}
         <path
@@ -2171,13 +2258,26 @@
           stroke-linecap="round"
           pointer-events="none"
         />
+        {#each grid.size * stretch < 7 ? [] : grid.labels as label (label.text)}
+          <text
+            class="fill-foreground font-semibold"
+            x={label.x}
+            y={label.y}
+            font-size={grid.size}
+            text-anchor="middle"
+            dominant-baseline="central"
+            stroke="var(--card)"
+            stroke-width={grid.size * 0.22}
+            stroke-linejoin="round"
+            paint-order="stroke"
+            pointer-events="none">{label.text}</text
+          >
+        {/each}
         {#if focus != null && grid.at.has(focus)}
           {const cell = $derived(grid.at.get(focus))}
           {#if cell != null}
             <path
-              d="M{cell.x.toFixed(3)} {(cell.y - 1).toFixed(
-                3,
-              )}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z"
+              d={cell.d}
               fill="none"
               stroke="var(--foreground)"
               stroke-width="0.24"
@@ -2187,7 +2287,7 @@
         {/if}
       </svg>
     {/if}
-    {#if isHexView}{:else if still != null}
+    {#if isSummary}{:else if still != null}
       <img
         class="pointer-events-none absolute inset-0 object-cover block-full inline-full"
         src={still}
@@ -2225,7 +2325,7 @@
     <div
       class={cn(
         "absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border max-sm:inset-bs-auto max-sm:inset-be-2",
-        { hidden: isHexView },
+        { hidden: isSummary },
       )}
       data-export-skip
     >
@@ -2605,8 +2705,7 @@
         {:else if empty != null && notes.has(empty)}
           <span class="font-semibold text-pretty">{notes.get(empty)?.name}</span
           >
-          <span
-            class="text-xs text-pretty text-muted-foreground max-inline-[17rem]"
+          <span class="text-xs text-pretty text-muted-foreground max-inline-68"
             >{notes.get(empty)?.status}</span
           >
         {:else if empty != null}
@@ -3082,7 +3181,7 @@
       {#if approximate.length > 0}
         <p class="flex items-center gap-1.5">
           <span
-            class="border-t border-dashed border-foreground/45 inline-4"
+            class="border-bs border-dashed border-foreground/45 inline-4"
             aria-hidden="true"
           ></span>
           <Term
@@ -3105,7 +3204,7 @@
       {#if credited.length > 0}
         <p>{m.map_water_credit()}</p>
       {/if}
-      {#if !isHexView && SCHEMES.has(scheme)}
+      {#if !isSummary && SCHEMES.has(scheme)}
         <p>{m.map_basemap_credit()}</p>
       {/if}
     </div>
@@ -3465,7 +3564,7 @@
             >
             {#if tag != null}
               <span
-                class="shrink-[999] truncate text-xs text-muted-foreground min-inline-0"
+                class="shrink-999 truncate text-xs text-muted-foreground min-inline-0"
                 title={tag}>{tag}</span
               >
             {/if}
