@@ -4791,6 +4791,13 @@ def parse() -> None:
                     [town for pool in towns.values() for town in pool]
                     if state in ("OR", "IN")
                     else [
+                        town
+                        for county_code, pool in towns.items()
+                        for town in pool
+                        if county_code == str(row["fips"]) or town[1] == "school"
+                    ]
+                    if state == "MI"
+                    else [
                         (variant, *rest)
                         for full, *rest in towns.get(str(row["fips"]), [])
                         for variant in (
