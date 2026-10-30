@@ -31,6 +31,7 @@ COUNTIES = {
     "31055": ("NE", "https://www.votedouglascounty-ne.gov/", "MF-390/GN26SampleBallot.pdf"),
     "31109": ("NE", "https://www.lancaster.ne.gov/", "MF-390/LCEC General Sample Ballot.pdf"),
     "31079": ("NE", "https://files.hallcountyne.gov/", "MF-390/26GNEHALL_7_PUB.pdf"),
+    "48135": ("TX", "https://www.ectorcountytx.gov/271/Elections", "MF-392/ector/Pct. 201, 202, 203, 204.3, 206.5, 209_ybmswlfq61.pdf"),
 }
 
 
@@ -62,7 +63,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, and Nebraska, with official wording",
+            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, and Texas, with official wording",
             polity="US",
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
