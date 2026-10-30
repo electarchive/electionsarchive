@@ -385,6 +385,8 @@ def candidate_name(raw_name: str) -> str:
         return body
     last, _, first = body.partition(",")
     first, _, suffix = first.strip().partition(",")
+    if first.strip().strip(".").upper() in ("JR", "SR", "II", "III", "IV"):
+        first, suffix = suffix, first
     return " ".join(part for part in (first.strip(), last.strip(), suffix.strip()) if part)
 
 

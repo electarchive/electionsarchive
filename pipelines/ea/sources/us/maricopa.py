@@ -434,7 +434,7 @@ def parse() -> None:
                     if tail is not None
                     else body.title()
                 )
-            elif body.lower().startswith("write"):
+            elif body.lower().startswith("write") or re.search(r"print name of write|not qualified", body, re.I):
                 body = "Write-in"
             elif "," in body:
                 last, _, first = body.partition(",")
@@ -555,6 +555,17 @@ def emit() -> Path:
         ).fetchall():
             existing[(code.partition(":")[0], text.upper())] = (pid, code, path)
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/az/%'").fetchall()}
+        replaced = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s where s.is_current and s.entity_id in (
+                       select o.contest_id from contest_option o join changeset c on c.id = o.changeset_id
+                       where c.pipeline = %s and o.kind = 'candidate'
+                         and o.ballot_label ~* 'print name of write|not qualified')""",
+                [SOURCE],
+            ).fetchall()
+        }
+        taken -= replaced
         own_areas = {
             area
             for (area,) in conn.execute(
