@@ -946,10 +946,13 @@
           id: `edge:${id}`,
           type: "line",
           ...layer,
-          minzoom: rank === 0 ? MID : FINE,
+          minzoom: rank === 0 ? from : FINE,
           paint: {
             "line-color": "var(--card)",
-            "line-width": rank === 0 ? 2 : 1.25,
+            "line-width":
+              rank === 0
+                ? ["interpolate", ["linear"], ["zoom"], 3, 0.6, MID, 1, 6, 2]
+                : 1.25,
             "line-opacity": on,
           },
         },
