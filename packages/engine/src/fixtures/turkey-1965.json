@@ -6,8 +6,8 @@
       "entries": [
         { "id": "Adalet Partisi", "votes": 133799, "declared": 7 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 88229, "declared": 4 },
-        { "id": "Millet Partisi", "votes": 8628, "declared": 0 },
-        { "id": "Türkiye İşçi Partisi", "votes": 7926, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 8628, "declared": 1 },
+        { "id": "Türkiye İşçi Partisi", "votes": 7926, "declared": 0 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 5695,
@@ -51,11 +51,11 @@
       "entries": [
         { "id": "Yeni Türkiye Partisi", "votes": 30270, "declared": 1 },
         { "id": "Adalet Partisi", "votes": 14746, "declared": 1 },
-        { "id": "Cumhuriyet Halk Partisi", "votes": 13173, "declared": 0 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 13173, "declared": 1 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 8353,
-          "declared": 1
+          "declared": 0
         },
         { "id": "Türkiye İşçi Partisi", "votes": 3466, "declared": 0 },
         { "id": "Millet Partisi", "votes": 670, "declared": 0 }
@@ -235,12 +235,12 @@
       "seats": 5,
       "entries": [
         { "id": "Adalet Partisi", "votes": 75863, "declared": 3 },
-        { "id": "Cumhuriyet Halk Partisi", "votes": 32099, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 32099, "declared": 1 },
         { "id": "Millet Partisi", "votes": 5067, "declared": 0 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 4182,
-          "declared": 0
+          "declared": 1
         },
         { "id": "Türkiye İşçi Partisi", "votes": 2479, "declared": 0 }
       ]
@@ -311,8 +311,8 @@
       "entries": [
         { "id": "Adalet Partisi", "votes": 53736, "declared": 2 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 29180, "declared": 1 },
-        { "id": "Millet Partisi", "votes": 6309, "declared": 1 },
-        { "id": "Türkiye İşçi Partisi", "votes": 2891, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 6309, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2891, "declared": 1 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 1730,
@@ -325,9 +325,9 @@
       "id": "National Assembly, Elazığ",
       "seats": 5,
       "entries": [
-        { "id": "Adalet Partisi", "votes": 38111, "declared": 3 },
+        { "id": "Adalet Partisi", "votes": 38111, "declared": 2 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 31014, "declared": 2 },
-        { "id": "Yeni Türkiye Partisi", "votes": 3147, "declared": 0 },
+        { "id": "Yeni Türkiye Partisi", "votes": 3147, "declared": 1 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 2549,
@@ -461,8 +461,8 @@
       "entries": [
         { "id": "Adalet Partisi", "votes": 89569, "declared": 4 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 48358, "declared": 2 },
-        { "id": "Millet Partisi", "votes": 6265, "declared": 1 },
-        { "id": "Türkiye İşçi Partisi", "votes": 4271, "declared": 0 },
+        { "id": "Millet Partisi", "votes": 6265, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 4271, "declared": 1 },
         { "id": "Yeni Türkiye Partisi", "votes": 1950, "declared": 0 }
       ]
     },
@@ -470,20 +470,20 @@
       "id": "National Assembly, Isparta",
       "seats": 4,
       "entries": [
-        { "id": "Adalet Partisi", "votes": 48868, "declared": 2 },
+        { "id": "Adalet Partisi", "votes": 48868, "declared": 3 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 17640, "declared": 1 },
-        { "id": "Yeni Türkiye Partisi", "votes": 10086, "declared": 1 }
+        { "id": "Yeni Türkiye Partisi", "votes": 10086, "declared": 0 }
       ]
     },
     {
       "id": "National Assembly, İstanbul",
       "seats": 31,
       "entries": [
-        { "id": "Adalet Partisi", "votes": 331447, "declared": 16 },
+        { "id": "Adalet Partisi", "votes": 331447, "declared": 17 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 185479, "declared": 9 },
         { "id": "Türkiye İşçi Partisi", "votes": 49422, "declared": 2 },
         { "id": "Millet Partisi", "votes": 30471, "declared": 2 },
-        { "id": "Bağımsızlar", "votes": 11686, "declared": 1, "inert": true },
+        { "id": "Bağımsızlar", "votes": 11686, "declared": 0, "inert": true },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 9250,
@@ -525,12 +525,12 @@
       "seats": 7,
       "entries": [
         { "id": "Adalet Partisi", "votes": 90738, "declared": 4 },
-        { "id": "Cumhuriyet Halk Partisi", "votes": 29315, "declared": 1 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 29315, "declared": 2 },
         { "id": "Millet Partisi", "votes": 14385, "declared": 1 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 7466,
-          "declared": 1
+          "declared": 0
         },
         { "id": "Yeni Türkiye Partisi", "votes": 4888, "declared": 0 },
         { "id": "Bağımsızlar", "votes": 780, "declared": 0, "inert": true }
@@ -555,10 +555,10 @@
       "id": "National Assembly, Kırklareli",
       "seats": 4,
       "entries": [
-        { "id": "Adalet Partisi", "votes": 53104, "declared": 3 },
+        { "id": "Adalet Partisi", "votes": 53104, "declared": 2 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 27123, "declared": 1 },
         { "id": "Millet Partisi", "votes": 3541, "declared": 0 },
-        { "id": "Türkiye İşçi Partisi", "votes": 2716, "declared": 0 },
+        { "id": "Türkiye İşçi Partisi", "votes": 2716, "declared": 1 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 1122,
@@ -677,12 +677,12 @@
       "entries": [
         { "id": "Bağımsızlar", "votes": 46329, "declared": 0, "inert": true },
         { "id": "Adalet Partisi", "votes": 26828, "declared": 1 },
-        { "id": "Cumhuriyet Halk Partisi", "votes": 26611, "declared": 2 },
+        { "id": "Cumhuriyet Halk Partisi", "votes": 26611, "declared": 1 },
         { "id": "Yeni Türkiye Partisi", "votes": 14567, "declared": 1 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 2145,
-          "declared": 2
+          "declared": 3
         },
         { "id": "Türkiye İşçi Partisi", "votes": 1965, "declared": 0 }
       ]
@@ -952,8 +952,8 @@
       "entries": [
         { "id": "Adalet Partisi", "votes": 53761, "declared": 2 },
         { "id": "Cumhuriyet Halk Partisi", "votes": 34689, "declared": 2 },
-        { "id": "Millet Partisi", "votes": 29514, "declared": 1 },
-        { "id": "Türkiye İşçi Partisi", "votes": 7086, "declared": 1 },
+        { "id": "Millet Partisi", "votes": 29514, "declared": 2 },
+        { "id": "Türkiye İşçi Partisi", "votes": 7086, "declared": 0 },
         {
           "id": "Cumhuriyetçi Köylü Millet Partisi",
           "votes": 6147,

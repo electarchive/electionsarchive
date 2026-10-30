@@ -1012,6 +1012,9 @@ def emit() -> Path:
                     raise ValueError("publish tr.thea before tr.ysk_mv")
                 declared = cs.key(f"{SOURCE}.result_set", contest_key)
                 counted = dict(held.filter(pl.col("province") == province).select("measure", "value").iter_rows())
+                thea = cs.key("tr.thea.result_set", contest_key)
+                if thea in cs.minted:
+                    raise ValueError(f"no tr.thea result set for {contest_key}")
                 cs.add(
                     "result_set",
                     id=declared,
@@ -1022,6 +1025,7 @@ def emit() -> Path:
                     status="active",
                     source_id=source,
                     is_default=True,
+                    supersedes_id=thea,
                     completeness=None
                     if "valid" not in counted
                     else min(

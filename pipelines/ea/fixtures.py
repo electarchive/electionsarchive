@@ -84,7 +84,10 @@ def export() -> list[str]:
                    join result_set rs on rs.contest_id = c.id and rs.is_default
                    join result_value v on v.result_set_k = rs.k
                    join contest_option o on o.k = v.option_k and o.party_id is not null
-                   left join name an on an.entity_id = o.alliance_id and an.is_preferred
+                   left join lateral (
+                     select x.text from name x where x.entity_id = o.alliance_id and x.is_preferred
+                     order by x.lang = 'tr' desc limit 1
+                   ) an on true
                    where c.allocation_parent_id = %(national)s
                    group by n.text, c.magnitude, rs.id, o.id, an.text order by 1, 5 desc, 3""",
                 tree,

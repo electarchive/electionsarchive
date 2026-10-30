@@ -492,6 +492,16 @@ def emit() -> Path:
             if methodology is not None:
                 cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
 
+        superseded = {
+            id for (id,) in conn.execute("select supersedes_id from result_set where supersedes_id is not null")
+        }
+        parents = {
+            id
+            for (id,) in conn.execute(
+                "select distinct allocation_parent_id from contest where allocation_parent_id is not null"
+            )
+        }
+
         def result_set(contest_key: str, election: UUID, contest: UUID, completeness: int) -> UUID:
             id = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -501,9 +511,9 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="counted",
-                status="active",
+                status="superseded" if id in superseded else "active",
                 source_id=source,
-                is_default=True,
+                is_default=id not in superseded,
                 completeness=completeness,
             )
             return id
@@ -595,10 +605,25 @@ def emit() -> Path:
                 )
                 name(contest, "Grand National Assembly", "en")
                 cs.add("slug", path=f"{path}/parliament", entity_id=contest)
-                declared = result_set(contest_key, election, contest, 1)
-                fresh = declared in cs.minted
+                if contest in parents:
+                    cs.add(
+                        "result_set",
+                        id=cs.key(f"{SOURCE}.result_set", contest_key),
+                        election_id=election,
+                        contest_id=contest,
+                        stage="official",
+                        kind="counted",
+                        status="withdrawn",
+                        source_id=source,
+                        is_default=False,
+                        completeness=1,
+                    )
+                declared = result_set(
+                    f"{contest_key}:seats" if contest in parents else contest_key, election, contest, 1
+                )
+                fresh = declared in cs.minted and contest not in parents
                 for caveat, applies in (
-                    (PROVINCES_CAVEAT, True),
+                    (PROVINCES_CAVEAT, contest not in parents),
                     (UNFILLED_CAVEAT, year in UNFILLED),
                     (FIXED_CAVEAT, any(fixed == year for fixed, _, _ in FIXED)),
                     (SWAPPED_CAVEAT, year in SWAPPED),

@@ -90,11 +90,6 @@ METHODOLOGY = (
     "from the Official Gazette and its ilçe totals from the counting boards' consolidation reports, so the ilçes can "
     "add up to slightly different totals than the district's declared result, which stays the default."
 )
-NATIONAL = (
-    "TÜİK reports this election's ilçes by province, while the contests were held in electoral districts that split "
-    "some provinces, and it does not say which district each ilçe belonged to. Those provinces' ilçes are given "
-    "here on the national contest only."
-)
 CUSTOMS = (
     "TÜİK's district totals for 2007 include the district's share of the votes cast at customs gates; its ilçe "
     "rows do not."
@@ -581,12 +576,16 @@ def emit() -> Path:
         unmatched: set[str] = set()
         result_sets = 0
         composition: dict[date, dict[str, set[str]]] = {}
+        splits: dict[date, dict[tuple[str, str], tuple[str, list[str]]]] = {}
         with COMPOSITIONS.open() as handle:
             for row in csv.DictReader(handle, delimiter="\t"):
-                if row["split"]:
-                    continue
                 name = norm(row["ilce"]).replace(" ", "")
                 name = "MERKEZ" if name.endswith("MERKEZ") else COMPOSITION_ALIASES.get(name, name)
+                if row["split"]:
+                    splits.setdefault(date.fromisoformat(row["day"]), {}).setdefault(
+                        (row["district"][:2], name), (row["ilce"], [])
+                    )[1].append(row["district"])
+                    continue
                 composition.setdefault(date.fromisoformat(row["day"]), {}).setdefault(row["district"], set()).add(name)
         declared_totals: dict[str, dict[str, int]] = {}
         for contest_key, measure, value in conn.execute(
@@ -631,8 +630,51 @@ def emit() -> Path:
                         raise ValueError(f"{contest_key}: {len(pairs)} ilçes found for {len(names)} in the composition")
                     chosen[contest_key] = pairs
                     groups[contest_key] = sorted({district for district, _ in pairs})
-            if national_key in contests:
+            if national_key in contests and not groups:
                 groups[national_key] = sorted(held["district"].unique())
+            elif national_key in contests:
+                cs.add(
+                    "result_set",
+                    id=cs.key(f"{SOURCE}.result_set", national_key),
+                    election_id=contests[national_key][1],
+                    contest_id=contests[national_key][0],
+                    stage="alternative",
+                    kind="counted",
+                    status="withdrawn",
+                    source_id=source,
+                    is_default=False,
+                )
+            placed = {
+                pair
+                for contest_key, districts in groups.items()
+                for pair in chosen.get(contest_key)
+                or held.filter(pl.col("level") == "ilce", pl.col("district").is_in(districts))
+                .select("district", "name")
+                .iter_rows()
+            }
+            split: set[tuple[str, tuple[str, ...]]] = set()
+            for district, label in (
+                held.filter(pl.col("level") == "ilce").select("district", "name").unique().iter_rows()
+            ):
+                if (district, label) in placed:
+                    continue
+                province = norm(re.sub(r"\s*\(\d+\)$", "", district))
+                stem = norm(label.split("/")[0]).replace(" ", "")
+                stem = "MERKEZ" if stem.endswith("MERKEZ") else COMPOSITION_ALIASES.get(stem, stem)
+                found = splits.get(day, {}).get((plates[PROVINCE_ALIASES.get(province, province)], stem))
+                if found is None:
+                    raise ValueError(f"{year} {district} {label}: in no district contest")
+                split.add((found[0], tuple(found[1])))
+            for ilce, codes in split:
+                for code in codes:
+                    cs.add(
+                        "note",
+                        entity_id=contests[f"{national_key}:{code}"][0],
+                        kind="caveat",
+                        body_md=f"TÜİK prints {ilce} as one ilçe row, but the ilçe was split between electoral "
+                        "districts by mahalle, so its TÜİK figures cannot be assigned to this district and are not "
+                        "stored here.",
+                    )
             for contest_key, districts in groups.items():
                 contest, election = contests[contest_key]
                 rows = held.filter(pl.col("district").is_in(districts))
@@ -675,8 +717,6 @@ def emit() -> Path:
                         + ", ".join(off)
                         + ". The ilçe figures are stored as TÜİK prints them.",
                     )
-                if contest_key == national_key and year in ("1983", "1987"):
-                    cs.add("note", entity_id=result_set, kind="methodology", body_md=NATIONAL)
                 if year == "2007":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=CUSTOMS)
                 labels = options.get(contest, {})

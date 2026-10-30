@@ -232,7 +232,7 @@ describe("golden elections", () => {
         remainders: "national",
         districtFormulas: [{ seats: 2, formula: "hagenbach_bischoff_quota" }],
       },
-      differences: { "Türkiye İşçi Partisi": 1, Bağımsızlar: -1 },
+      differences: {},
     },
     {
       election: "1966 Senate",
