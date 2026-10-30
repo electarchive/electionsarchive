@@ -1544,6 +1544,7 @@ def emit(
         emitted: list[UUID] = []
         done: dict[str, UUID] = {}
         skipped: Counter[str] = Counter()
+        primary_winners: dict[tuple[int, str, str, str, str | None, bool], dict[str, set[str]]] = {}
         for key, rows in contests.group_by("contest_key", maintain_order=True):
             contest_key = str(key[0])
             first = rows.row(0, named=True)
@@ -1552,6 +1553,7 @@ def emit(
             )
             question = office_key == "question"
             party, primary, runoff = first["party"], first["primary"], first["runoff"]
+            series = (day.year, st, code, office_key, seat, bool(first["remainder"]))
             if f"{scheme}:{code}" not in polities:
                 skipped["no polity"] += 1
                 continue
@@ -2086,12 +2088,17 @@ def emit(
                             cs.add("person", id=person)
                         name(person, ballot)
                     tag = party or choice_party
+                    won = (
+                        primary_winners.get(series, {}).get(slug(_title(choice)), set())
+                        if tag and "," in tag
+                        else set()
+                    )
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
-                        party_id=parties.get(tag) if tag else None,
+                        party_id=parties[next(iter(won))] if len(won) == 1 else parties.get(tag) if tag else None,
                         ballot_label=ballot,
                     )
                     cs.add(
@@ -2136,7 +2143,9 @@ def emit(
                         if statute:
                             plurality[first["code"]] += 1
                             cs.add("note", entity_id=result_set, kind="methodology", body_md=PLURALITY)
-                        for _, option, _ in ranked[:cut]:
+                        for _, option, person_slug in ranked[:cut]:
+                            if primary and party:
+                                primary_winners.setdefault(series, {}).setdefault(person_slug, set()).add(party)
                             cs.add(
                                 "outcome",
                                 result_set_id=result_set,

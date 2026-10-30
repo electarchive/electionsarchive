@@ -235,6 +235,12 @@ def emit() -> Path:
         .select("date", "candidate", "party")
         .iter_rows()
     }
+    lehigh = {
+        (int(day[:4]), *_short(candidate)): party
+        for day, candidate, party in pl.read_csv(Path(__file__).with_name("alged_lehigh_party.csv"))
+        .select("date", "candidate", "party")
+        .iter_rows()
+    }
     places = pl.read_parquet(PARSED / "places.parquet")
     with connect() as conn:
         cs = Changeset(
@@ -702,7 +708,7 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         name(person, ballot)
                     persons.add(person)
-                    label = harris.get((year, *_short(ballot))) if code == "48201" else None
+                    label = {"48201": harris, "42077": lehigh}.get(code, {}).get((year, *_short(ballot)))
                     cs.add(
                         "contest_option",
                         id=option,
