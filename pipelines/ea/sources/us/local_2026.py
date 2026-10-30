@@ -2570,6 +2570,9 @@ for key, publisher, title, url, local in (
     ("CA-06047-atwater", "Merced County Elections", "Final Qualified Candidate List, November 3, 2026 General Election (August 25, 2026)", "https://www.countyofmerced.com/elections", "ca/atwater_qualified.pdf"),
     ("KS-20103-townships", "Leavenworth County Clerk", "2026 General Election Candidate Publication Letter, county and township ticket", "https://www.leavenworthcounty.gov/Department/Clerk/2026%20General-Candidate%20Publication%20Letter%20-%20For%20Official%20Paper.pdf", "ks/leavenworth_notice.pdf"),
     ("KS-20177-townships", "Shawnee County Election Office", "Candidate Filing Information, November 3, 2026 General Election", "https://candidatefiling.us/Info/Default?st=KS&s=1097283794&j=3472565347&e=1911002665&det=Y", "ks/shawnee.html"),
+    ("NE-31019-buffalo", "Buffalo County Election Commission", "Sample ballot, General Election November 3, 2026 (26GNEBUF)", "https://buffalocounty.ne.gov/county-offices/election-commission/candidate-info", "ne/buffalo_sample.pdf"),
+    ("NE-31053-dodge", "Dodge County Election Commissioner", "Sample ballot, General Election November 3, 2026 (26GNEDODGE)", "https://dodgecounty.nebraska.gov/sites/default/files/doc/Sample%20ballot%20-%20General%202026.pdf", "ne/dodge_sample.pdf"),
+    ("NE-31001-adams", "Adams County Clerk", "Sample ballot, General Election November 3, 2026 (26GNEADAMS)", "https://adamscountyne.gov/images/PDFS/Clerks/Sample_Ballot.pdf", "ne/adams_sample.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
