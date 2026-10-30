@@ -2307,7 +2307,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
            from contest c
            join election e on e.id = c.election_id
            join entity t on t.id = c.id and t.retired_by is null
-           join changeset pc on pc.id = c.changeset_id and pc.pipeline <> 'us.fl_primary_2026'
+           join changeset pc on pc.id = c.changeset_id and pc.pipeline not in ('us.fl_primary_2026', 'us.ga_boe_2026')
            join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
            join name n on n.entity_id = c.id and n.is_preferred and n.lang = 'en'
            left join office f on f.id = c.office_id
@@ -5514,7 +5514,7 @@ def emit() -> Path:
                left join name en on en.entity_id = el.id and en.is_preferred and en.lang = 'en'
                left join slug es on es.entity_id = el.id and es.is_current
                join external_id ex on ex.entity_id = el.id and ex.scheme = 'us.election'
-               join changeset pc on pc.id = co.changeset_id and pc.pipeline <> 'us.fl_primary_2026'
+               join changeset pc on pc.id = co.changeset_id and pc.pipeline not in ('us.fl_primary_2026', 'us.ga_boe_2026')
                where x.scheme = 'us.contest' and regexp_replace(x.value, '^[0-9-]+:', '') = any(%s) and el.date_from < %s
                order by x.value, el.date_from desc""",
             [tails, DAY],
