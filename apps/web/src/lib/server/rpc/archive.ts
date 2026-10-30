@@ -4322,7 +4322,7 @@ async function atlas(input: {
     levels.at(-1) ??
     null;
   const shown = level == null ? [] : (counted.get(level.code) ?? []);
-  const [labels, slugs, frame, targets, relations] = await Promise.all([
+  const [labels, slugs, frame, targets, relations, split] = await Promise.all([
     names(
       [
         contest.id,
@@ -4380,6 +4380,9 @@ async function atlas(input: {
       limit 16
     `),
     branches(day),
+    chain.length === 0
+      ? undefined
+      : parted(own.rows[0]?.scheme ?? "", area.id, day),
   ]);
   const wanted =
     input.vs == null || input.vs === "" || input.vs === "none"
@@ -4637,6 +4640,7 @@ async function atlas(input: {
     date: contest.date,
     outline: stored(known.get(own.rows[0]?.scheme ?? "")?.tiles),
     frame,
+    parted: split,
     levels: levels.map(({ rank: _rank, ...entry }) => entry),
     level: level?.code ?? null,
     parts,
@@ -9186,6 +9190,9 @@ export const contests = {
             east: v.number(),
             north: v.number(),
           }),
+        ),
+        parted: v.optional(
+          v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
         ),
         levels: v.array(
           v.object({

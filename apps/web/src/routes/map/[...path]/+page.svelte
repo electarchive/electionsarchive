@@ -1060,12 +1060,20 @@
     tinted = "";
     if (next.outline != null) {
       const id = engine.tiles(next.outline, "sheet");
+      const parted = next.parted;
+      const near: Maplibre.ExpressionSpecification | undefined =
+        parted == null
+          ? undefined
+          : parted.isOnly
+            ? ["in", ["id"], ["literal", parted.ks]]
+            : ["!", ["in", ["id"], ["literal", parted.ks]]];
       engine.add(
         {
           id: "context",
           type: "fill",
           source: id,
           "source-layer": "areas",
+          ...(near != null && { filter: near }),
           paint: {
             "fill-color":
               "color-mix(in oklab, var(--muted-foreground) 9%, var(--card))",
@@ -1080,6 +1088,7 @@
           type: "line",
           source: id,
           "source-layer": "areas",
+          ...(near != null && { filter: near }),
           paint: { "line-color": "var(--card)", "line-width": 1 },
         },
         "fills",

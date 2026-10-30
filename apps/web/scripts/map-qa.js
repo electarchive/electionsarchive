@@ -20,6 +20,12 @@ const CASES = [
     drill: { unit: "georgia", up: "United States" },
   },
   {
+    name: "us-full-texas",
+    path: "/map/us/2024-11-05-general/president/texas",
+    isFull: true,
+    drill: { unit: "texas", up: "United States" },
+  },
+  {
     name: "us-full-swing",
     path: "/map/us/2024-11-05-general/president?vs=us/2020-11-03-general/president&color=swing",
     isFull: true,
