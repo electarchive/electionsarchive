@@ -755,6 +755,22 @@ def _capitals(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _held_translations(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    if "translation" not in stage.tables:
+        return []
+    return [
+        (
+            "translation.held",
+            sql.SQL(
+                """select null::uuid, null::uuid,
+                          jsonb_build_object('source_md5', s.source_md5, 'lang', s.lang, 'held_origin', p.origin)
+                   from {} s join public.translation p using (source_md5, lang)
+                   where s.origin = 'machine' and p.origin <> 'machine'"""
+            ).format(stage.staged("translation")),
+        )
+    ]
+
+
 def run(conn: Connection, stage: Stage) -> list[Finding]:
     findings: list[Finding] = []
     if "electoral_system" in stage.tables:
@@ -782,11 +798,14 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_founding(stage),
         *_scope(stage),
         *_capitals(stage),
+        *_held_translations(stage),
     ]:
         findings.extend(
             Finding(
                 code,
-                "warning" if code in ("membership.overlap", "party.before_founding", "name.capitals") else "error",
+                "warning"
+                if code in ("membership.overlap", "party.before_founding", "name.capitals", "translation.held")
+                else "error",
                 entity_id,
                 result_set_id,
                 details,

@@ -407,6 +407,23 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 [stage.pipeline],
             )
         return
+    if table == "translation":
+        compared = [column for column in columns if column not in ("source_md5", "lang")]
+        conn.execute(
+            sql.SQL(
+                """insert into public.translation ({0}) select {0} from {1}
+                   on conflict (source_md5, lang) do update set {2}
+                   where ({3}) is distinct from ({4})
+                     and not (excluded.origin = 'machine' and translation.origin <> 'machine')"""
+            ).format(
+                listed,
+                staged,
+                sql.SQL(", ").join(sql.SQL("{0} = excluded.{0}").format(sql.Identifier(c)) for c in compared),
+                sql.SQL(", ").join(sql.SQL("translation.{}").format(sql.Identifier(c)) for c in compared),
+                sql.SQL(", ").join(sql.SQL("excluded.{}").format(sql.Identifier(c)) for c in compared),
+            )
+        )
+        return
     if table == "external_id":
         conn.execute(
             sql.SQL(
