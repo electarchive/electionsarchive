@@ -5078,7 +5078,7 @@ def parse() -> None:
                         skip = int(state == "IN" and sort == "school" and tokens[: len(lead)] != lead)
                         if stem and tokens[skip : skip + len(lead)] == lead:
                             rest = tokens[skip + len(lead) :]
-                            if rest[:1] == ["county"]:
+                            if rest[:1] == ["county"] and sort != "school":
                                 continue
                             said = (
                                 rest[0]
@@ -5203,7 +5203,7 @@ def parse() -> None:
                         else f"{slot[1].title()} {slot[2]}"
                         if state == "TX" and role == "board-of-education" and (slot := re.search(r"\b(place|position|district) (\d+)\b", post))
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
-                        if state in ("CA", "UT", "MD", "IN")
+                        if state in ("CA", "UT", "MD", "IN", "NC")
                         and (
                             area := re.search(
                                 r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
