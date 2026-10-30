@@ -18,12 +18,12 @@ PARSED = DATA / "parsed" / SOURCE
 HOST = "https://electionresults.dcboe.org"
 INFO = HOST + "/electionResults/getElectionInfo/{year}-General-Election"
 CITYWIDE = HOST + "/cityWide/getCityWide/{year}-General-Election"
-YEARS = range(2012, 2025, 2)
+YEARS = range(2010, 2025, 2)
 PUBLISHER = "District of Columbia Board of Elections"
 TITLE = "Election results"
 WARDS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5, "SIX": 6, "SEVEN": 7, "EIGHT": 8}
 CONTESTS = [
-    (r"MAYOR OF THE DISTRICT OF COLUMBIA.*", "mayor"),
+    (r"MAYOR(?: OF THE DISTRICT OF COLUMBIA.*)?", "mayor"),
     (r"CHAIRMAN OF THE COUNCIL.*", "chair"),
     (r"AT ?- ?LARGE MEMBER OF THE COUNCIL.*", "at-large"),
     (r"MEMBER OF THE COUNCIL WARD (\w+)|WARD (\w+) +MEMBER OF THE COUNCIL.*", "ward"),
@@ -42,6 +42,7 @@ PARTIES = {
     "REP": "republican-party",
     "LIB": "libertarian-party",
     "STG": "DC:d-c-statehood-green-party",
+    "GRN": "DC:d-c-statehood-green-party",
     "SWP": "socialist-workers-party",
 }
 PLACE = "1150000"
@@ -60,20 +61,34 @@ def day(year: int) -> date:
 
 
 def csv(year: int) -> str:
-    return json.loads(raw.cached(SOURCE, INFO.format(year=year)).path.read_text())["CsvLink"]
+    info = json.loads(raw.cached(SOURCE, INFO.format(year=year)).path.read_text())
+    return info["CsvLink"] or info["ExcelLink"]
+
+
+def table(year: int) -> pl.DataFrame:
+    link = csv(year)
+    path = raw.cached(SOURCE, link).path
+    if link.endswith(".xls"):
+        return (
+            pl.read_excel(path, sheet_name="Results", engine="calamine")
+            .cast(pl.String)
+            .drop("PRECINCT")
+            .rename({"CONTEST": "contestname", "pct": "precinctnumber"})
+        )
+    return pl.read_csv(path, infer_schema=False)
 
 
 def fetch() -> None:
     for year in YEARS:
         raw.fetch(SOURCE, INFO.format(year=year), suffix=".json")
-        raw.fetch(SOURCE, csv(year), suffix=".csv")
+        raw.fetch(SOURCE, csv(year), suffix=Path(csv(year)).suffix)
         raw.fetch(SOURCE, CITYWIDE.format(year=year), suffix=".json")
 
 
 def parse() -> None:
     frames = []
     for year in YEARS:
-        frame = pl.read_csv(raw.cached(SOURCE, csv(year)).path, infer_schema=False)
+        frame = table(year)
         frame = frame.rename(
             {column: re.sub(r"[^a-z]", "", column.lower()).removesuffix("number") for column in frame.columns}
         ).with_columns(pl.col(pl.String).str.strip_chars())
@@ -104,9 +119,9 @@ def parse() -> None:
             }:
                 raise ValueError(f"{year} {contest}: precinct sums differ from the citywide totals")
             ward = next((group for group in found.groups() if group), None)
-            for precinct, number, candidate, party, votes in (
+            for precinct, candidate, party, votes in (
                 lines.filter(pl.col("precinct").str.contains(r"^\d+$"), ~pl.col("candidate").str.contains("OVER|UNDER"))
-                .select("precinct", "ward", "candidate", "party", "votes")
+                .select("precinct", "candidate", "party", "votes")
                 .iter_rows()
             ):
                 code = re.match(CODES, candidate)
@@ -123,7 +138,6 @@ def parse() -> None:
                         code[1] if code else party,
                         candidate.upper() == "WRITE-IN",
                         int(precinct),
-                        int(number),
                         int(votes),
                     )
                 )
@@ -138,7 +152,6 @@ def parse() -> None:
                     "party": pl.String,
                     "writein": pl.Boolean,
                     "precinct": pl.Int32,
-                    "ward": pl.Int32,
                     "votes": pl.Int64,
                 },
                 orient="row",
