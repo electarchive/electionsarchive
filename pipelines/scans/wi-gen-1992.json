@@ -1,0 +1,163 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "Wisconsin Blue Book 1993-1994: November 3, 1992 general election by county",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A6GO4S5JO5BQTO8M#MF-393.pdf",
+  "item": "https://search.library.wisc.edu/digital/A6GO4S5JO5BQTO8M"
+ },
+ "contests": {
+  "president": {
+   "year": 1992,
+   "chamber": "president",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "WI",
+   "district": null
+  },
+  "senate": {
+   "year": 1992,
+   "chamber": "senate",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "WI",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 928,
+   "id": "928",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the United States Senator table with its seven candidate columns. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Russell D. Feingold (Dem.)",
+     "contest": "senate",
+     "candidate": "Russ Feingold"
+    },
+    {
+     "label": "William Bittner (Lib.)",
+     "contest": "senate",
+     "candidate": "William Bittner"
+    },
+    {
+     "label": "Robert W. Kasten, Jr. (Rep.)",
+     "contest": "senate",
+     "candidate": "Bob Kasten"
+    },
+    {
+     "label": "Patrick W. Johnson (Ind.)",
+     "contest": "senate",
+     "candidate": "Patrick Johnson"
+    },
+    {
+     "label": "Robert L. Kundert (Ind.)",
+     "contest": "senate",
+     "candidate": "Robert Kundert"
+    },
+    {
+     "label": "Joseph Selliken (Ind.)",
+     "contest": "senate",
+     "candidate": "Joseph Selliken"
+    },
+    {
+     "label": "Mervin A. Hanson, Sr. (Ind.)",
+     "contest": "senate",
+     "candidate": "Mervin Hanson"
+    }
+   ]
+  },
+  {
+   "page": 929,
+   "id": "929",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the vice president and president table with its seven ticket columns, in this order: Clinton, Daniels, Marrou, Hagelin, Bush, Hem, Gritz. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Bill Clinton / Al Gore (Dem.)",
+     "contest": "president",
+     "candidate": "Bill Clinton"
+    },
+    {
+     "label": "Ron Daniels / Asiba Tupahache (L&F)",
+     "contest": "president",
+     "candidate": "Ron Daniels"
+    },
+    {
+     "label": "Andre Marrou / Nancy Lord (Lib.)",
+     "contest": "president",
+     "candidate": "Andre Marrou"
+    },
+    {
+     "label": "John Hagelin / Mike Tompkins (N.L.)",
+     "contest": "president",
+     "candidate": "John Hagelin"
+    },
+    {
+     "label": "George Bush / Dan Quayle (Rep.)",
+     "contest": "president",
+     "candidate": "George Bush"
+    },
+    {
+     "label": "Eugene A. Hem / Joanne Roland (Third Party)",
+     "contest": "president",
+     "candidate": "Eugene Hem"
+    },
+    {
+     "label": "James Gritz / Cyril Minett (Ind.)",
+     "contest": "president",
+     "candidate": "James Gritz"
+    }
+   ]
+  },
+  {
+   "page": 930,
+   "id": "930",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the continuation of the vice president and president table: seven ticket columns in this order: Herer, Perot, LaRouche, Fulani, Brisben, Warren, Phillips. County names are printed at the right edge of each row, so keep each number with the county name at the end of its row. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Jack Herer / Derrick P. Grimmer (Ind.)",
+     "contest": "president",
+     "candidate": "Jack Herer"
+    },
+    {
+     "label": "Ross Perot / James Stockdale (Ind.)",
+     "contest": "president",
+     "candidate": "Ross Perot"
+    },
+    {
+     "label": "Lyndon H. LaRouche, Jr. / James L. Bevel (Ind.)",
+     "contest": "president",
+     "candidate": "Lyndon LaRouche"
+    },
+    {
+     "label": "Lenora B. Fulani / Maria Elizabeth Munoz (Ind.)",
+     "contest": "president",
+     "candidate": "Lenora Fulani"
+    },
+    {
+     "label": "J. Quinn Brisben / Barbara Garson (Ind.)",
+     "contest": "president",
+     "candidate": "J. Quinn Brisben"
+    },
+    {
+     "label": "James Warren / Willie Mae Reid (Ind.)",
+     "contest": "president",
+     "candidate": "James Warren"
+    },
+    {
+     "label": "Howard Phillips / Albion Knight (Ind.)",
+     "contest": "president",
+     "candidate": "Howard Phillips"
+    }
+   ]
+  }
+ ]
+}
