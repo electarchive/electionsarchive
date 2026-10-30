@@ -15,47 +15,122 @@ SOURCE = "us.co_tabor_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-URL = "https://www.jeffco.us/DocumentCenter/View/59081/2026-General-TABOR-Booklet-PDF"
-PUBLISHER = "Jefferson County Clerk and Recorder"
+MANUAL = DATA / "inbox" / "manual" / "MF-376"
+COUNTIES = {
+    "08059": (
+        "https://www.jeffco.us/DocumentCenter/View/59081/2026-General-TABOR-Booklet-PDF",
+        None,
+        "Jefferson County Clerk and Recorder",
+    ),
+    "08069": (
+        "https://www.larimer.gov/sites/default/files/tabor-notice-07-final.pdf",
+        "CO-Larimer/tabor-notice-07-final.pdf",
+        "Larimer County Clerk and Recorder",
+    ),
+    "08035": (
+        "https://www.douglas.co.us/documents/2026-general-election-ballot-issue-notices-booklet.pdf",
+        "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
+        "Douglas County Clerk and Recorder",
+    ),
+}
 TITLE = "TABOR notices, November 3, 2026 general election"
-COUNTY = "us.county:08059"
+ENTITY_END = re.compile(r"\s*(?:«\s*)?NOTICE OF ELECTION")
 
 
 def fetch() -> None:
-    try:
-        raw.cached(SOURCE, URL)
-    except LookupError:
-        content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", URL], capture_output=True, check=True).stdout
-        raw.store(SOURCE, URL, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    for url, file, _ in COUNTIES.values():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            if file is None:
+                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+                retrieved = datetime.now(UTC)
+            else:
+                path = MANUAL / file
+                content = path.read_bytes()
+                retrieved = datetime.fromtimestamp(path.stat().st_mtime, UTC)
+            raw.store(SOURCE, url, content, suffix=".pdf", retrieved_at=retrieved, media_type="application/pdf")
 
 
-def parse() -> None:
-    text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, URL).path), "-"], capture_output=True, text=True, check=True
-    ).stdout
-    lines = text.replace("\f", "\n").split("\n")
+def titled(text: str) -> str:
+    text = re.sub(r"\s+", " ", text).strip()
+    return text.title().replace(" Of ", " of ").replace(" Re-", " RE-") if text.isupper() else text
+
+
+def question(lines: list[str], start: int) -> str:
+    body = []
+    for follow in lines[start : start + 90]:
+        if re.match(r"^\s*(Fiscal Information|□)", follow):
+            break
+        if follow.strip():
+            body.append(follow.strip())
+        if follow.rstrip().endswith("?"):
+            break
+    return re.sub(r"\s+", " ", " ".join(body))
+
+
+def jeffco_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for index, line in enumerate(lines):
         match = re.match(r"^\s*(.+?) ((?:Ballot|Referred) (?:Issue|Question|Measure))\s+(\w+)\s*$", line)
         if match is None or match[1].startswith("Summary of"):
             continue
-        body = []
-        for follow in lines[index + 1 : index + 90]:
-            if re.match(r"^\s*Fiscal Information", follow):
-                break
-            if follow.strip():
-                body.append(follow.strip())
-            if follow.rstrip().endswith("?"):
-                break
-        rows.append(
-            {
-                "entity": match[1],
-                "label": f"{match[2]} {match[3]}",
-                "wording": re.sub(r"\s+", " ", " ".join(body)),
-            }
-        )
+        rows.append({"entity": match[1], "label": f"{match[2]} {match[3]}", "wording": question(lines, index + 1)})
+    return rows
+
+
+def larimer_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    for index, line in enumerate(lines):
+        if "TO ALL REGISTERED VOTERS" not in line:
+            continue
+        header = " ".join(follow.strip() for follow in lines[index : index + 2])
+        entity = ENTITY_END.split(header.split("«", 1)[1].replace("«", " "))[0]
+        entity = re.sub(r"\s+", " ", entity).strip()
+        mark = next(i for i in range(index, index + 12) if lines[i].strip().startswith("BALLOT ISSUE"))
+        label = next(follow.strip() for follow in lines[mark + 1 : mark + 8] if follow.strip() and "Election Date" not in follow)
+        start = next(i for i in range(mark, mark + 20) if re.match(r"^\s*Telephone", lines[i])) + 1
+        rows.append({"entity": re.sub(r", Colorado$", "", titled(entity)), "label": f"Ballot Issue {label}", "wording": question(lines, start)})
+    return rows
+
+
+def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    entity = ""
+    for index, line in enumerate(lines):
+        if line.startswith("Election Date"):
+            entity = next(
+                previous.strip()
+                for previous in reversed(lines[index - 4 : index])
+                if previous.strip() and not previous.strip().endswith(("MEASURE", "DEBT", "TAXES", "TAXES AND INCREASE DEBT"))
+                and "Counties" not in previous
+            )
+        if "Title and Text" not in line:
+            continue
+        heading = line.split(":", 1)[1].strip() or lines[index + 1].strip()
+        label = re.search(r"(?i)ballot issue (?:no\. )?(\w+)", heading) or re.search(r"Ballot Issue (\w+) Title", line)
+        start = index + 1
+        if re.search(r"(?i)ballot issue", heading) or heading.upper().startswith("REFERRED"):
+            start += 0 if line.split(":", 1)[1].strip() else 1
+        while not lines[start].strip().startswith("SHALL") and "SHALL" not in lines[start]:
+            start += 1
+        rows.append({"entity": titled(entity), "label": f"Ballot Issue {label[1].upper()}", "wording": question(lines, start)})
+    return rows
+
+
+PARSERS = {"08059": jeffco_rows, "08069": larimer_rows, "08035": douglas_rows}
+
+
+def parse() -> None:
+    rows = []
+    for county, (url, _, _) in COUNTIES.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        for row in PARSERS[county](text.replace("\f", "\n").split("\n")):
+            rows.append({**row, "county": county, "url": url})
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(rows).unique(["entity", "label"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "measures.parquet")
     print(frame.height)
 
@@ -86,28 +161,34 @@ def emit() -> Path:
             polity="US-CO",
         )
         system = cs.key("us.electoral_system", "referendum")
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL)
-        cs.artifact(raw.cached(SOURCE, URL), source)
+        sources: dict[str, UUID] = {}
+        for county, (url, _, publisher) in COUNTIES.items():
+            sources[county] = cs.source(publisher, TITLE)
+            cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            cs.artifact(raw.cached(SOURCE, url), sources[county])
         parent = cs.key("us.election", f"{DAY}:CO")
         elections: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
             entity = row["entity"]
+            county_key = f"us.county:{row['county']}"
+            source = sources[row["county"]]
             if re.match(r"(?i)(city|town) of ", entity):
                 options = names.get(ceda._city(re.sub(r"(?i)^(city|town) of ", "", entity)), [])
+            elif county_key in found and entity == found[county_key][2]:
+                options = [county_key]
             elif "school district" in entity.lower():
                 options = names.get(ceda._core(entity), [])
             else:
                 options = []
             option = options[0] if len(options) == 1 else None
-            if option is None and not options and f"special:{entity}" in found:
-                option = f"special:{entity}"
-            elif option is None and not options and COUNTY in found:
-                county, county_area, _, county_path, county_code = found[COUNTY]
+            if option is None and not options and f"special:{row['county']}:{entity}" in found:
+                option = f"special:{row['county']}:{entity}"
+            elif option is None and not options and county_key in found:
+                county, county_area, _, county_path, county_code = found[county_key]
                 minted = govmint.special(conn, cs, "CO", (county, county_area, county_path, county_code), entity, slugs)
                 if minted is not None:
-                    option = f"special:{entity}"
+                    option = f"special:{row['county']}:{entity}"
                     found[option] = minted
             if option is None:
                 print("no polity:", entity, row["label"])
@@ -168,7 +249,7 @@ def emit() -> Path:
                 kind="text",
                 lang="en",
                 body=row["wording"],
-                url=URL,
+                url=row["url"],
                 source_id=source,
             )
         print(f"{kept} of {frame.height} referenda")
