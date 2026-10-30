@@ -309,6 +309,7 @@ MI_PROPOSALS = {
     ("2020GEN", "20-1"): ("Constitutional amendment on oil and gas royalty funds for parks and conservation", "Legislative Referendum"),
     ("2020GEN", "20-2"): ("Constitutional amendment requiring a search warrant for electronic data and communications", "Legislative Referendum"),
 }
+UT_2007 = "https://vote.utah.gov/wp-content/uploads/2023/09/2007Muni_Special.pdf"
 UT_FILES = {
     date(2000, 11, 7): "2000Gen.pdf",
     date(2002, 11, 5): "2002Gen.pdf",
@@ -1256,6 +1257,7 @@ def fetch() -> None:
         for path in paths:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
+    raw.fetch(SOURCE, UT_2007, suffix=".pdf")
     for name in dict.fromkeys(file for file, _ in MI_PROPOSALS):
         raw.fetch(SOURCE, MI.format(name), suffix=".tsv")
         time.sleep(1)
@@ -3692,6 +3694,33 @@ def utah() -> list[dict[str, object]]:
                 }
                 for county, pair in votes.items()
                 for answer, value in zip(("YES", "NO"), pair, strict=True)
+            )
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, UT_2007).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    table = {
+        match[1]: (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+        for line in text.splitlines()
+        if (match := re.match(r"(\w[\w ]*?)\s+[\d,]+\s+[\d,]+\s+[\d.]+%\s+([\d,]+)\s+([\d,]+)$", line.strip()))
+    }
+    printed = table.pop("TOTAL")
+    if list(table) != list(UT_COUNTIES) or tuple(sum(votes[side] for votes in table.values()) for side in (0, 1)) != printed:
+        raise ValueError("UT 2007 referendum counties do not sum to the printed total")
+    for county, votes in table.items():
+        for answer, count in zip(("YES", "NO"), votes, strict=True):
+            rows.append(
+                {
+                    "state": "UT",
+                    "day": date(2007, 11, 6),
+                    "number": "1",
+                    "label": "Referendum 1",
+                    "url": UT_2007,
+                    "county": county,
+                    "answer": answer,
+                    "votes": count,
+                    "title": "Referendum on House Bill 148, the education voucher law (Parent Choice in Education Act)",
+                    "kind": "Popular Referendum",
+                }
             )
     return rows
 
