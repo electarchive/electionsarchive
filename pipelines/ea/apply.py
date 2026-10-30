@@ -338,6 +338,49 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         )
     if table in stage.sweeps:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.swept(table)))
+    if table == "row_drop":
+        for id, relation, key in conn.execute(
+            sql.SQL("select id::text, relation, key from {} order by id").format(staged)
+        ).fetchall():
+            kinds = dict(
+                conn.execute(
+                    """select attname, format_type(atttypid, atttypmod) from pg_attribute
+                       where attrelid = %s::regclass and attnum > 0 and not attisdropped and attgenerated = ''
+                         and attname not in ('changeset_id', 'recorded_from')""",
+                    [f"public.{relation}"],
+                ).fetchall()
+            )
+            if not kinds or set(key) != set(kinds):
+                raise ValueError(
+                    f"row_drop {id}: a {relation} key names {', '.join(sorted(kinds))}, not {', '.join(sorted(key))}"
+                )
+            same = sql.SQL(" and ").join(
+                [
+                    *(
+                        sql.SQL("p.{} is not distinct from ({})").format(
+                            sql.Identifier(column),
+                            sql.SQL("%(key)s -> {}").format(sql.Literal(column))
+                            if kind == "jsonb"
+                            else sql.SQL("(%(key)s ->> {})::{}").format(
+                                sql.Literal(column), sql.SQL(cast(LiteralString, kind))
+                            ),
+                        )
+                        for column, kind in kinds.items()
+                    ),
+                    *(
+                        sql.SQL("p.{} = (%(key)s ->> {})::uuid").format(sql.Identifier(column), sql.Literal(column))
+                        for column, kind in kinds.items()
+                        if kind == "uuid" and key[column] is not None
+                    ),
+                ]
+            )
+            dropped = conn.execute(
+                sql.SQL("delete from public.{} p where {}").format(sql.Identifier(relation), same), {"key": Jsonb(key)}
+            ).rowcount
+            if dropped == 0:
+                raise ValueError(f"row_drop {id}: no {relation} row matches {json.dumps(key, default=str)} any more")
+            if dropped > 1:
+                raise ValueError(f"row_drop {id}: {relation} key matches {dropped} rows")
     if "id" in columns:
         compared = [column for column in columns if column != "id"]
         conflict = (
@@ -883,7 +926,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         ).fetchall():
             if held != entity:
                 raise ValueError(f"note {note} is not that text on {entity}")
-            if writer != stage.pipeline:
+            if writer != stage.pipeline and stage.pipeline != "contrib":
                 raise ValueError(f"note {note} was written by {writer}, not {stage.pipeline}")
         conn.execute(sql.SQL("delete from public.note where id in (select note_id from {})").format(staged))
     if table == "option_drop":
