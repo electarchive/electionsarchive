@@ -342,6 +342,18 @@ AL_CERTS = {
     date(2006, 11, 7): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2006/statecert-2006-general-election-11-29-2006-without-write-in-appendix.pdf",
     date(2008, 11, 4): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2008/statecert-2008-general-election-11-25-2008-without-write-in-appendix.pdf",
 }
+NJ = "https://www.nj.gov/state/elections/assets/pdf/election-results/"
+NJ_FILES = {
+    date(2000, 11, 7): "2000/2000-ballot-questions-tallies.pdf",
+    date(2003, 11, 4): "2003/2003gen-elect_pubques_tally.pdf",
+    date(2005, 11, 8): "2005/2005_Official_public_questions_tallies.pdf",
+    date(2006, 11, 7): "2006/2006_official-public-question_tallies.pdf",
+    date(2007, 11, 6): "2007/2007-official-general-election-tallies(pub-ques)-12.3.07.pdf",
+    date(2008, 11, 4): "2008/2008-official-gen-elect-tallies-public-ques-120208.pdf",
+    date(2009, 11, 3): "2009/2009-official-public-question-tallies-120109.pdf",
+    date(2010, 11, 2): "2010/2010-official-gen-elect-tallies-public-question-112410.pdf",
+    date(2011, 11, 8): "2011/2011-official-gen-elect-public-question-results.pdf",
+}
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
     "1": ((189032, 50111), ((0.7028, 0.7753, 0.7186, 0.8481), (0.7028, 0.6962, 0.7186, 0.7721))),
@@ -769,6 +781,11 @@ PUBLISHERS = {
         "https://oklahoma.gov/elections/elections-results.html",
     ),
     "FL": (fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
+    "NJ": (
+        "New Jersey Division of Elections",
+        "Official general election results: public questions",
+        "https://www.nj.gov/state/elections/election-information-results.shtml",
+    ),
     "AK": (ak_sovc.PUBLISHER, ak_sovc.TITLE, "https://www.elections.alaska.gov/election-results/"),
     "OH": gov_counties.OFFICIAL["OH"][:3],
     "GA": (
@@ -995,7 +1012,7 @@ def fetch() -> None:
     for stamp, file in AL_FILES.values():
         raw.fetch(SOURCE, AL.format(stamp=stamp) + file, suffix=Path(file).suffix.lower())
         time.sleep(1)
-    for url in [*AL_CERTS.values(), AL_2007]:
+    for url in [*AL_CERTS.values(), AL_2007, *(NJ + path for path in NJ_FILES.values())]:
         raw.fetch(SOURCE, url, suffix=".pdf")
         time.sleep(1)
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
@@ -1457,6 +1474,42 @@ def alabama() -> list[dict[str, object]]:
                     "y1": y1,
                 }
             )
+    return rows
+
+
+def new_jersey() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    row = re.compile(r"^\s*(Atlantic|Bergen|Burlington|Camden|Cape May|Cumberland|Essex|Gloucester|Hudson|Hunterdon|Mercer|Middlesex|Monmouth|Morris|Ocean|Passaic|Salem|Somerset|Sussex|Union|Warren|Total)\s+([\d,]+)\s+([\d,]+)\s*$")
+    for day, path in NJ_FILES.items():
+        url = NJ + path
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        found: dict[str, dict[str, tuple[int, int]]] = {}
+        number = ""
+        for line in text.splitlines():
+            if heading := re.match(r"PUBLIC QUESTION NO\. (\d+)", line):
+                number = heading[1]
+            elif (match := row.match(line)) and number:
+                found.setdefault(number, {})[match[1]] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+        for number, table in found.items():
+            printed = table.pop("Total")
+            if len(table) != 21 or tuple(sum(votes[side] for votes in table.values()) for side in (0, 1)) != printed:
+                raise ValueError(f"NJ {day} question {number}: {len(table)} counties do not sum to {printed}")
+            for county, votes in table.items():
+                for answer, count in zip(("YES", "NO"), votes, strict=True):
+                    rows.append(
+                        {
+                            "state": "NJ",
+                            "day": day,
+                            "number": number,
+                            "label": "Public Question 1" if day.year == 2010 else "",
+                            "url": url,
+                            "county": county,
+                            "answer": answer,
+                            "votes": count,
+                        }
+                    )
     return rows
 
 
@@ -3181,6 +3234,7 @@ def parse() -> None:
             *nevada(),
             *georgia(),
             *alaska(),
+            *new_jersey(),
             *nebraska(),
             *arkansas(),
             *south_dakota(),
@@ -3254,6 +3308,8 @@ def parse() -> None:
                 "label": label,
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
+                else f"Public Question {number}"
+                if state == "NJ"
                 else entry["measure"]
                 if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK")
                 else f"Amendment No. {number}"
