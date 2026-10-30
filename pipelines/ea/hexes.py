@@ -3,6 +3,8 @@ import json
 import math
 import warnings
 from collections import Counter
+from dataclasses import dataclass
+from datetime import date
 from itertools import pairwise
 from pathlib import Path
 
@@ -26,6 +28,52 @@ GRIDS = Path(__file__).parent / "hexgrid"
 ELECTIONS = range(1992, 2027, 2)
 INSETS = {"PR": "72", "VI": "78", "GU": "66", "AS": "60", "MP": "69"}
 POSTAL = {fips: state for state, fips in (STATE_FIPS | INSETS).items()}
+PROVINCES = {
+    "10": "NL",
+    "11": "PE",
+    "12": "NS",
+    "13": "NB",
+    "24": "QC",
+    "35": "ON",
+    "46": "MB",
+    "47": "SK",
+    "48": "AB",
+    "59": "BC",
+    "60": "YT",
+    "61": "NT",
+    "62": "NU",
+}
+
+
+@dataclass(frozen=True)
+class Tiles:
+    scheme: str
+    srid: int
+    regions: dict[str, str]
+    dates: dict[int, date]
+
+
+TILES = {
+    "us-cd": Tiles("us.cd", 5070, POSTAL, {year: date(year, 11, 8) for year in ELECTIONS}),
+    "ca-fed": Tiles(
+        "ca.fed",
+        3347,
+        PROVINCES,
+        {
+            day.year: day
+            for day in [
+                date(2004, 6, 28),
+                date(2006, 1, 23),
+                date(2008, 10, 14),
+                date(2011, 5, 2),
+                date(2015, 10, 19),
+                date(2019, 10, 21),
+                date(2021, 9, 20),
+                date(2025, 4, 28),
+            ]
+        },
+    ),
+}
 
 
 def fetch(congress: int) -> Path:
@@ -195,24 +243,24 @@ def normal(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
     return [((x - mx) / spread, (y - my) / spread) for x, y in points]
 
 
-def centers(year: int) -> dict[str, tuple[float, float]]:
+def centers(tiles: Tiles, day: date) -> dict[str, tuple[float, float]]:
     with connect() as db:
         rows = db.execute(
             """
             select ac.code, st_x(p), st_y(p)
             from area a
-            join area_code ac on ac.area_id = a.id and ac.valid @> make_date(%s, 11, 8)
-            join area_geometry g on g.area_id = a.id and g.valid @> make_date(%s, 11, 8),
-            lateral st_pointonsurface(st_transform(g.geom, 5070)) p
-            where a.scheme_code = 'us.cd'
+            join area_code ac on ac.area_id = a.id and ac.valid @> %(day)s
+            join area_geometry g on g.area_id = a.id and (g.valid @> %(day)s or g.valid is null),
+            lateral st_pointonsurface(st_transform(g.geom, %(srid)s)) p
+            where a.scheme_code = %(scheme)s
             """,
-            (year, year),
+            {"day": day, "srid": tiles.srid, "scheme": tiles.scheme},
         ).fetchall()
     return {code: (x, y) for code, x, y in rows}
 
 
-def outline(cells: dict[tuple[int, int], str]) -> dict:
-    fips = STATE_FIPS | INSETS
+def outline(tiles: Tiles, cells: dict[tuple[int, int], str]) -> dict:
+    prefix = {token: code for code, token in tiles.regions.items()}
     edges = []
     for (q, r), token in sorted(cells.items()):
         for side, other in enumerate(ahead(q, r)):
@@ -226,20 +274,20 @@ def outline(cells: dict[tuple[int, int], str]) -> dict:
         mx = sum(spot[0] for spot in spots) / len(spots)
         my = sum(spot[1] for spot in spots) / len(spots)
         _, _, q, r = min(spots, key=lambda spot: (spot[0] - mx) ** 2 + (spot[1] - my) ** 2)
-        labels[fips[token]] = [q, -r, token]
+        labels[prefix[token]] = [q, -r, token]
     return {"boundaries": {"states": edges}, "labels": dict(sorted(labels.items()))}
 
 
-def tiles(year: int, cells: dict[tuple[int, int], str]) -> tuple[dict[str, list[int]], list[str]]:
-    fips = STATE_FIPS | INSETS
-    points = centers(year)
+def place(tiles: Tiles, day: date, cells: dict[tuple[int, int], str]) -> tuple[dict[str, list[int]], list[str]]:
+    prefix = {token: code for code, token in tiles.regions.items()}
+    points = centers(tiles, day)
     groups: dict[str, list[tuple[int, int]]] = {}
     for cell, token in cells.items():
         groups.setdefault(token, []).append(cell)
     hexes: dict[str, list[int]] = {}
     problems = []
     for token, spots in sorted(groups.items()):
-        codes = sorted(code for code in points if code[:2] == fips[token])
+        codes = sorted(code for code in points if code[:2] == prefix[token])
         if not codes:
             continue
         if len(codes) != len(spots):
@@ -255,16 +303,21 @@ def tiles(year: int, cells: dict[tuple[int, int], str]) -> tuple[dict[str, list[
 
 
 def build_tiles() -> str:
-    grids = {path.stem.rsplit("-", 1)[1]: grid(path) for path in sorted(GRIDS.glob("us-cd-*.txt"))}
-    years = {}
     report = []
-    for year in ELECTIONS:
-        start = max(first for first in grids if int(first) <= year)
-        hexes, problems = tiles(year, grids[start])
-        years[str(year)] = {"grid": start, "hexes": hexes}
-        report.append(f"{year} (grid {start}): {len(hexes)} placed; {'; '.join(problems) or 'ok'}")
-    built = {"layout": "odd-r", "grids": {start: outline(cells) for start, cells in grids.items()}, "years": years}
-    (OUT / "us-cd-tiles.json").write_text(json.dumps(built, separators=(",", ":")) + "\n")
+    for name, tiles in TILES.items():
+        grids = {path.stem.rsplit("-", 1)[1]: grid(path) for path in sorted(GRIDS.glob(f"{name}-*.txt"))}
+        years = {}
+        for year, day in tiles.dates.items():
+            start = max(first for first in grids if int(first) <= year)
+            hexes, problems = place(tiles, day, grids[start])
+            years[str(year)] = {"grid": start, "hexes": hexes}
+            report.append(f"{name} {year} (grid {start}): {len(hexes)} placed; {'; '.join(problems) or 'ok'}")
+        built = {
+            "layout": "odd-r",
+            "grids": {start: outline(tiles, cells) for start, cells in grids.items()},
+            "years": years,
+        }
+        (OUT / f"{name}-tiles.json").write_text(json.dumps(built, separators=(",", ":")) + "\n")
     return "\n".join(report)
 
 

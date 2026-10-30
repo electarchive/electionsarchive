@@ -1360,7 +1360,7 @@
   "twin_map_then": "Leader in {year}",
   "twin_map_levels": "Also mapped by {levels}.",
   "twin_hexes_title": "Hex map",
-  "twin_hexes_lede": "This grid is the page's Hexes view, with one cell for each {noun}. Each cell shows the letter of the party that won the seat, after the state's postal code in the US. A dash marks a seat with no result.",
+  "twin_hexes_lede": "This grid is the page's Hexes view, with one cell for each {noun}. Each cell shows the letter of the party that won the seat, after the code of its state or province where the layout groups seats that way. A dash marks a seat with no result.",
   "twin_hexes_cartogram": "The page's Cartogram view draws the {credit}. The JSON twin has its shapes under `hexes.cartogram`, keyed by `k` like the places in the results.",
   "atlas_trail": "Map area",
   "atlas_search": "Search places",

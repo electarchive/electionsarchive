@@ -1,0 +1,13 @@
+..  ..  ..  YT  ..  ..  ..  ..  NT  ..  ..  ..  ..  ..  NU
+  ..  BC  BC  BC  BC  ..  AB  AB  AB  AB  SK  SK  SK  MB  ..  ..  ..  ..  ..  ON  ..  ..  ..  ..  QC  QC  QC  QC  QC  ..  ..  NL  NL
+..  BC  BC  BC  BC  BC  BC  AB  AB  AB  AB  SK  SK  MB  MB  ..  ON  ON  ON  ON  ON  ON  ON  ..  QC  QC  QC  QC  QC  QC  QC  NL  NL  NL
+  BC  BC  BC  BC  BC  BC  AB  AB  AB  AB  AB  SK  MB  MB  MB  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  QC  NL  NL
+..  BC  BC  BC  BC  BC  BC  AB  AB  AB  AB  SK  SK  MB  MB  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  QC
+  BC  BC  BC  BC  BC  BC  AB  AB  AB  AB  AB  SK  MB  MB  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  QC  QC
+..  BC  BC  BC  BC  BC  AB  AB  AB  AB  AB  SK  SK  MB  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  QC
+  ..  ..  ..  BC  BC  BC  ..  ..  ..  ..  AB  SK  MB  MB  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  QC
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  SK  SK  MB  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  QC  NB  ..  ..  PE  PE
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  QC  NB  NB  NB  ..  PE  PE
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  QC  QC  QC  QC  QC  NB  NB  NB  ..  NS  NS  NS
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  ON  QC  ..  ..  ..  ..  NB  NB  NB  NS  NS  NS  NS  NS
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ON  ON  ON  ON  ON  ON  ON  ON  ON  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  NS  NS  NS

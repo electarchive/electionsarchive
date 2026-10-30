@@ -3678,10 +3678,9 @@ function hexMarkdown(
   const tokens = new Map(
     cells.map((cell) => {
       const row = rows.get(cell.k);
-      const state = /^us\/([a-z]{2})\//.exec(row?.path ?? "")?.[1] ?? "";
       return [
         `${cell.q},${cell.r}`,
-        `${state.toUpperCase()}${row?.leader == null ? "-" : (letters.get(row.leader) ?? "-")}`,
+        `${cell.region ?? ""}${row?.leader == null ? "-" : (letters.get(row.leader) ?? "-")}`,
       ];
     }),
   );

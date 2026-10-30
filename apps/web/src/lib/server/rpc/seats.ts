@@ -35,50 +35,81 @@ const TILES = import.meta.glob<{
     string,
     { grid: string; hexes: Record<string, [number, number]> }
   >;
-}>("../hex/us-cd-tiles.json", { eager: true, import: "default" })[
-  "../hex/us-cd-tiles.json"
-];
+}>("../hex/*-tiles.json", { eager: true, import: "default" });
+const TILE_SETS: Record<
+  string,
+  { file: string; year: (year: number) => number; isUs: boolean }
+> = {
+  "us.cd": {
+    file: "../hex/us-cd-tiles.json",
+    year: (year) => year - (year % 2),
+    isUs: true,
+  },
+  "ca.fed": {
+    file: "../hex/ca-fed-tiles.json",
+    year: (year) => year,
+    isUs: false,
+  },
+};
 const SHRINK = Math.sqrt((3 * Math.sqrt(3)) / 2) / 50;
 const shrink = (value: number) => Math.round(value * SHRINK * 100) / 100;
 const shrunk = (path: string) =>
   path.replaceAll(/-?\d+/g, (number) => String(shrink(Number(number))));
 
-const unitedStates = async (id: string, within: string | undefined) => {
-  const found = await db.execute<{ k: number; code: string; year: number }>(sql`
+const tiled = async (id: string, within: string | undefined) => {
+  const found = await db.execute<{
+    k: number;
+    code: string;
+    year: number;
+    scheme: string;
+  }>(sql`
     with recursive tree(id) as (
-      select e.id from election e join slug ps on ps.entity_id = e.polity_id and ps.is_current and (ps.path = 'us' or ps.path like 'us/%') where e.id = ${id}::uuid
+      select ${id}::uuid
       union all
       select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
     )
-    select distinct a.k, ac.code, extract(year from e.date_from)::int as year
+    select distinct a.k, ac.code, extract(year from e.date_from)::int as year, a.scheme_code as scheme
     from contest c join tree on tree.id = c.election_id
     join election e on e.id = c.election_id
-    join area a on a.id = c.district_area_id and a.scheme_code = 'us.cd'
+    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'ca.fed')
     join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
     where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
       and coalesce(c.magnitude, 1) = 1 and not c.notional
       and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
   `);
   const first = found.rows[0];
-  if (first == null) {
+  const set = first == null ? null : TILE_SETS[first.scheme];
+  const tiles = set == null ? null : TILES[set.file];
+  if (first == null || set == null || tiles == null) {
     return null;
   }
-  const year = String(first.year - (first.year % 2));
-  const placed = TILES?.years[year];
-  const grid = placed == null ? null : TILES?.grids[placed.grid];
+  const rows = found.rows.filter((row) => row.scheme === first.scheme);
+  const year = String(set.year(first.year));
+  const placed = tiles.years[year];
+  const grid = placed == null ? null : tiles.grids[placed.grid];
   if (placed == null || grid == null) {
     return null;
   }
-  const drawn = CARTOGRAMS[String(CARTOGRAM_YEARS[year] ?? "")];
-  const states = new Set(found.rows.map((row) => row.code.slice(0, 2)));
-  const cells = found.rows.flatMap((row) => {
+  const drawn = set.isUs
+    ? CARTOGRAMS[String(CARTOGRAM_YEARS[year] ?? "")]
+    : undefined;
+  const states = new Set(rows.map((row) => row.code.slice(0, 2)));
+  const cells = rows.flatMap((row) => {
     const hex = placed.hexes[row.code];
     return hex == null
       ? []
-      : [{ k: row.k, q: hex[0], r: hex[1], isApart: row.code.endsWith("98") }];
+      : [
+          {
+            k: row.k,
+            q: hex[0],
+            r: hex[1],
+            isApart: set.isUs && row.code.endsWith("98"),
+            region: grid.labels[row.code.slice(0, 2)]?.[2] ?? null,
+          },
+        ];
   });
   const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
-  const bounds = found.rows.flatMap((row) => {
+  const bounds = rows.flatMap((row) => {
     const box = drawn?.bounds[row.code];
     return box == null ? [] : [box];
   });
@@ -119,7 +150,7 @@ const unitedStates = async (id: string, within: string | undefined) => {
               Math.max(...bounds.map((box) => box[2])),
               Math.max(...bounds.map((box) => box[3])),
             ].map((value) => shrink(value)),
-            districts: found.rows.flatMap((row) => {
+            districts: rows.flatMap((row) => {
               const d = drawn.districts[row.code];
               const point = drawn.points[row.code];
               return d == null || point == null
@@ -1694,6 +1725,7 @@ export const seats = {
               q: v.number(),
               r: v.number(),
               isApart: v.boolean(),
+              region: v.nullable(v.string()),
             }),
           ),
           borders: v.array(
@@ -1727,9 +1759,9 @@ export const seats = {
       ),
     )
     .handler(async ({ input }) => {
-      const american = await unitedStates(input.id, input.within);
-      if (american != null) {
-        return american;
+      const tiledSeats = await tiled(input.id, input.within);
+      if (tiledSeats != null) {
+        return tiledSeats;
       }
       const found = await db.execute<{ k: number; code: string }>(sql`
         with recursive tree(id) as (
@@ -1763,7 +1795,7 @@ export const seats = {
         const [q, r] = hexes[row.code] ?? [];
         return q == null || r == null
           ? []
-          : [{ k: row.k, q, r, isApart: false }];
+          : [{ k: row.k, q, r, isApart: false, region: null }];
       });
       const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
       return {
