@@ -2366,8 +2366,6 @@ for key, publisher, title, url, local in (
     ("TX-48209-woodcreek", "Hays County Elections Administrator", "Combined Sample Ballot, City of Woodcreek, November 3, 2026", "manual-fetch:MF-392", "../manual/MF-392/hays/Hays County Combined Sample Ballot 11x17.pdf"),
     ("TX-48209-bearcreek", "Hays County Elections Administrator", "Combined Sample Ballot, Village of Bear Creek, November 3, 2026", "manual-fetch:MF-392", "../manual/MF-392/hays/Hays County Combined Sample Ballot 11x17.pdf"),
     ("TX-48491-jarrell", "Williamson County Elections", "Comprehensive Sample Ballot, City of Jarrell, November 3, 2026", "manual-fetch:MF-392", "../manual/MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf"),
-    ("TX-48491-pflugerville", "Williamson County Elections", "Comprehensive Sample Ballot, City of Pflugerville, November 3, 2026", "manual-fetch:MF-392", "../manual/MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf"),
-    ("TX-48167-sf", "Galveston County Elections", "Sample Ballot and Measures, Santa Fe ISD, November 3, 2026", "manual-fetch:MF-392", "../manual/MF-392/galveston/November-2026-General-Election-Ballot-and-Measures.pdf"),
     ("TX-48141-fabens", "El Paso County Elections Department", "Fabens Independent School District sample ballot, November 3, 2026", "https://www.epcounty.com/elections/", "tx/fabens_isd.pdf"),
     ("TX-48141-tornillo", "El Paso County Elections Department", "Tornillo Independent School District sample ballot, November 3, 2026", "https://www.epcounty.com/elections/", "tx/tornillo_isd.pdf"),
     ("TX-48215-weslaco", "Hidalgo County Elections Department", "Sample ballot, Weslaco city and ISD, November 3, 2026", "https://www.hidalgocounty.us/Elections", "tx/hidalgo_weslaco.pdf"),
