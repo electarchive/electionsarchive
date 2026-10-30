@@ -34,7 +34,7 @@ CODES = [
     "NICH", "OHIO", "OLDH", "OWEN", "OWSL", "PEND", "PERR", "PIKE", "POWE", "PULA", "ROBE", "ROCK", "ROWA", "RUSS", "SCOT",
     "SHEL", "SIMP", "SPEN", "TAYL", "TODD", "TRIG", "TRIM", "UNIO", "WARR", "WASH", "WAYN", "WEBS", "WHIT", "WOLF", "WOOD",
 ]  # fmt: skip
-OFFICE = re.compile(r"OFFICE: \S+\s+U\.S\. (SENATE|REPRESENTATIVE (\d+)(?:ST|ND|RD|TH) DIST)\s*$")
+OFFICE = re.compile(r"OFFICE: \S+\s+U\.S\. (SENATE|PRESIDENT|REPRESENTATIVE (\d+)(?:ST|ND|RD|TH) DIST)\s*$")
 PUBLISHER = "Kentucky State Board of Elections"
 TITLE = "Primary election results"
 
@@ -64,7 +64,7 @@ def parse() -> None:
             if "OFFICE:" in line:
                 found = OFFICE.search(line.rstrip())
                 current = (
-                    (day, "senate" if found[1] == "SENATE" else "house", int(found[2]) if found[2] else None, {})
+                    (day, {"SENATE": "senate", "PRESIDENT": "president"}.get(found[1], "house"), int(found[2]) if found[2] else None, {})
                     if found
                     else None
                 )
@@ -77,12 +77,12 @@ def parse() -> None:
                 columns = []
             elif re.match(r"\s{20,}\*[A-Z]", line):
                 columns = re.findall(r"\*([A-Z]+)", line)
-            elif columns and line.strip() and re.fullmatch(r"[\d,\s]*", line[34:]) and line[:34].strip():
-                name = re.sub(r"\s+", " ", line[:34].replace('"', "")).strip()
-                cells = [int(value.replace(",", "") or 0) for value in re.findall(r"[\d,]+", line[34:])]
+            elif columns and line.strip() and re.fullmatch(r"[\d,\s]*", line[(cut := min(34, re.search(r"\d", line + "0").start())):]) and line[:cut].strip():
+                name = re.sub(r"\s+", " ", line[:cut].replace('"', "")).strip()
+                cells = [int(value.replace(",", "") or 0) for value in re.findall(r"[\d,]+", line[cut:])]
                 if len(cells) != len(columns):
                     cells = [0] * len(columns)
-                    for match in re.finditer(r"[\d,]+", line[34:]):
+                    for match in re.finditer(r"[\d,]+", line[cut:]):
                         cells[min(len(columns) - 1, (match.end() - 1) // 8)] = int(match[0].replace(",", ""))
                 for code, value in zip(columns, cells, strict=True):
                     current[3].setdefault(name, {})[code] = value
@@ -90,7 +90,7 @@ def parse() -> None:
         known: dict[str, list[int]] = {}
         for contest, total in conn.execute(
             """select x.value, coalesce(sum(v.value), 0)::bigint
-               from external_id x join contest_option o on o.contest_id = x.entity_id and o.kind in ('candidate', 'ticket')
+               from external_id x join contest_option o on o.contest_id = x.entity_id and o.kind in ('candidate', 'ticket', 'uncommitted')
                left join result_set rs on rs.contest_id = x.entity_id and rs.is_default
                left join result_value v on v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
                where x.scheme = 'us.contest' and x.value ~ '^(2000-05-23|2002-05-28|2004-05-18|2006-05-16|2008-05-20):KY:'
