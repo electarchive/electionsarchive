@@ -1953,6 +1953,7 @@ for key, publisher, title, url, local in (
     ("UT-49023", "Juab County Clerk", "2026 General Election Certification", "https://juabcounty.gov/wp-content/uploads/2026/09/2026_general_certification.pdf", "ut/juab.pdf"),
     ("UT-49025", "Kane County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.utah.gov/pmn/files/1485015.docx", "ut/kane.docx"),
     ("UT-49017", "Garfield County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.garfield.utah.gov/files/assets/garfieldcout/v/1/documents/auditor-clerk/26gutgar_publication_2_watermark.pdf", "ut/garfield.pdf"),
+    ("TX-48085-collin-cities", "Collin County Elections Administration", "November 3, 2026 General Election Sample Ballot (Anna, Josephine, Lavon, Lowry Crossing, Princeton, Weston, and Wylie)", "https://www.collincountytx.gov/elections", "tx/collin.pdf"),
     ("TX-48453-nov-cities", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Jonestown, Lago Vista, Manor, Sunset Valley, and Volente)", "https://votetravis.gov/", "tx/travis_nov_cities.pdf"),
     ("TX-48453-tc", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Del Valle and Manor ISD)", "https://votetravis.gov/wp-content/uploads/G26-Bedsheet-Ballot-Corrected-Final2.pdf", "tx/travis.pdf"),
     ("TX-48221", "Tolar Independent School District", "November 2026 Tolar ISD Trustee Candidates", "https://www.tolarisd.org/district-information/school-board/elections/election-candidates", "tx/tolar.html"),
