@@ -507,7 +507,7 @@ def parse() -> None:
                     )
                 options.append(pl.concat(rows))
     elections = {
-        f"{year}_{kind.removesuffix('i')}_t{number}": (kind, year, number)
+        f"{year}_{'pres' if kind == 'presi' else kind}_t{number}": (kind, year, number)
         for kind in ("legi", "presi")
         for year in (2017, 2022)
         for number in (1, 2)
