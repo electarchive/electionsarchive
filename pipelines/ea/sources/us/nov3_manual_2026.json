@@ -5366,5 +5366,16 @@
   "title": "Voter-proposed budget bottom-line limits",
   "text": "Shall Section 7-1-15 of the Barrington Town Charter be amended to provide that voter-proposed ballot questions shall be limited to proposals affecting the bottom line of the municipal budget or school budget, or both, and shall not propose changes to individual line items within either the municipal or school budget?",
   "file": "RI-web/barrington-boc-booklet.pdf"
+ },
+ {
+  "state": "ND",
+  "county": "Burleigh County",
+  "county_fips": "38015",
+  "publisher": "Bismarck Public School District No. 1",
+  "place": "Bismarck Public School District No. 1",
+  "number": "Question #1",
+  "title": "School Building General Obligation Bonds",
+  "text": "Shall Bismarck Public School District No. 1 of Burleigh County, North Dakota, issue its general obligation bonds in an amount not to exceed $116,500,000 maturing within a maximum of 20 years, resulting in an estimated additional millage of 9.45 mills, equal to $9.45 on each $1,000 of taxable valuation for the first taxable year after all of the bonds are issued, for the purpose of providing funds, together with any other funds available, for Americans with Disabilities Act (ADA) compliance upgrades, to undertake facility improvements districtwide to address deferred maintenance and capital renewal needs including, but not limited to heating, ventilation, plumbing and electrical system upgrades, building envelope repairs and related infrastructure improvements, including entrances, elevators, restrooms, site circulation and other modifications necessary to improve equitable access to District facilities, together with related site work, equipment, furnishings, and incidental costs.",
+  "file": "ND-web/bps-official-ballot.pdf"
  }
 ]
