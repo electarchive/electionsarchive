@@ -410,7 +410,10 @@ export type DiffRow = {
 
 export type Polygonal =
   | { type: "Polygon"; coordinates: Array<Array<[number, number]>> }
-  | { type: "MultiPolygon"; coordinates: Array<Array<Array<[number, number]>>> };
+  | {
+      type: "MultiPolygon";
+      coordinates: Array<Array<Array<[number, number]>>>;
+    };
 
 export function extent(
   geometry: Polygonal | null,
@@ -679,3 +682,37 @@ export const findingsOf = (checks: Checks | null | undefined) =>
         label: checkLabel[code]?.(pipelines.join(", ")) ?? code,
       };
     });
+
+export type Anchor =
+  | {
+      kind: "row";
+      revision: number;
+      table: string;
+      key: Record<string, string>;
+      label: string;
+    }
+  | { kind: "evidence"; revision: number; key: string; label: string };
+
+export const anchorId = (anchor: Anchor) =>
+  anchor.kind === "evidence"
+    ? `evidence-${anchor.key}`
+    : `row-${anchor.table}-${Object.values(anchor.key).join("-")}`;
+
+export const commentLimit = 10_000;
+
+export type CommentView = {
+  id: string;
+  parent_id: string | null;
+  author: string | null;
+  handle: string | null;
+  agent_name: string | null;
+  agent_model: string | null;
+  revision_n: number | null;
+  body: string | null;
+  anchor: Anchor | null;
+  created_at: string;
+  edited_at: string | null;
+  hidden_reason: string | null;
+  hidden_by: string | null;
+  mine: boolean;
+};

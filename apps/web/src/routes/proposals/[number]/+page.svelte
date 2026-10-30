@@ -1,8 +1,12 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
+  import { page } from "$app/state";
   import type { DiffRow } from "#lib/contrib.js";
+  import type { Anchor, CommentView } from "#lib/contrib.js";
   import BoundaryMap from "#lib/components/contrib/boundary-map.svelte";
+  import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
+  import CommentItem from "#lib/components/contrib/comment-item.svelte";
   import Proof from "#lib/components/contrib/proof.svelte";
   import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -28,6 +32,7 @@
     tierLabel,
     verdictLabel,
   } from "#lib/contrib.js";
+  import { anchorId } from "#lib/contrib.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -271,6 +276,51 @@
   let reason = $state("");
   let busy = $state(false);
 
+  const roots = $derived(
+    data.comments.filter((comment) => comment.parent_id == null),
+  );
+  const replies = $derived.by(() => {
+    const found = new Map<string, Array<CommentView>>();
+    for (const comment of data.comments) {
+      if (comment.parent_id != null) {
+        found.set(comment.parent_id, [
+          ...(found.get(comment.parent_id) ?? []),
+          comment,
+        ]);
+      }
+    }
+    return found;
+  });
+  const pinned = $derived.by(() => {
+    const found = new Map<string, Array<CommentView>>();
+    for (const comment of roots) {
+      if (comment.anchor != null) {
+        const key = anchorId(comment.anchor);
+        found.set(key, [...(found.get(key) ?? []), comment]);
+      }
+    }
+    return found;
+  });
+  const canComment = $derived(
+    data.commenter === "ready" && proposal.state !== "draft",
+  );
+  let drafting = $state<string | null>(null);
+  const clip = (text: string) =>
+    text.length > 80 ? `${text.slice(0, 79)}…` : text;
+  const rowAnchor = (row: DiffRow): Anchor => {
+    const value = ["text", "body_md", "body", "value", "color"]
+      .map((field) => row.fields[field]?.[1] ?? row.fields[field]?.[0])
+      .find((item) => typeof item === "string");
+    const table = tables[row.table]?.() ?? row.table;
+    return {
+      kind: "row",
+      revision: head?.n ?? 1,
+      table: row.table,
+      key: row.key,
+      label: clip(typeof value === "string" ? `${table}: ${value}` : table),
+    };
+  };
+
   $effect(() => {
     if (!pending && (proposal.state !== "approved" || fold != null)) {
       return;
@@ -286,6 +336,41 @@
   <title>{m.proposal_title({ number: proposal.number })}</title>
   <meta name="robots" content="noindex" />
 </svelte:head>
+
+{#snippet margin(anchor: Anchor, label: string)}
+  {const key = $derived(anchorId(anchor))}
+  {const threads = $derived(pinned.get(key) ?? [])}
+  {#if threads.length > 0}
+    <div class="mbs-2 grid gap-4 border-s-2 border-foreground ps-3">
+      {#each threads as comment (comment.id)}
+        <CommentItem
+          {comment}
+          replies={replies.get(comment.id) ?? []}
+          head={head?.n ?? null}
+          canReply={canComment}
+          canModerate={data.canModerate}
+          showAnchor={false}
+        />
+      {/each}
+    </div>
+  {/if}
+  {#if drafting === key}
+    <div class="mbs-2 border-s-2 border-foreground ps-3">
+      <CommentComposer
+        action="?/comment"
+        {anchor}
+        autofocus
+        onclose={() => (drafting = null)}
+      />
+    </div>
+  {:else if canComment && head != null}
+    <button
+      type="button"
+      class="justify-self-start text-xs text-muted-foreground opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 hover:text-foreground focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+      onclick={() => (drafting = key)}>{label}</button
+    >
+  {/if}
+{/snippet}
 
 <div class="mx-auto px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
   <header class="grid gap-3">
@@ -417,8 +502,10 @@
     <h2 id="changes" class="heading">{m.proposal_changes()}</h2>
     <ul class="mbs-2 grid border-bs text-sm">
       {#each rows as row, i (i)}
+        {const anchor = $derived(rowAnchor(row))}
         <li
-          class="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-be py-2 max-sm:grid-cols-1"
+          id={anchorId(anchor)}
+          class="group grid scroll-mt-24 grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-be py-2 max-sm:grid-cols-1"
         >
           <span class="text-muted-foreground"
             >{tables[row.table]?.() ?? row.table}{#if row.op === "drop"}<span
@@ -525,6 +612,7 @@
                 {/if}
               </span>
             {/each}
+            {@render margin(anchor, m.discussion_on_change())}
           </span>
         </li>
       {/each}
@@ -653,7 +741,16 @@
       <ul class="mbs-2 grid border-bs text-sm">
         {#each head?.sources ?? [] as item (item.key)}
           {const quote = $derived(head?.payload.evidence?.[item.key]?.quote)}
-          <li class="grid gap-1 border-be py-2">
+          {const anchor = $derived<Anchor>({
+            kind: "evidence",
+            revision: head?.n ?? 1,
+            key: item.key,
+            label: clip(item.title),
+          })}
+          <li
+            id={anchorId(anchor)}
+            class="group grid scroll-mt-24 gap-1 border-be py-2"
+          >
             <span class="font-semibold">{item.title}</span>
             {#if item.url != null}
               <span
@@ -713,6 +810,7 @@
                 >{quote}</q
               >
             {/if}
+            {@render margin(anchor, m.discussion_on_source())}
           </li>
         {/each}
       </ul>
@@ -787,6 +885,55 @@
           {/each}
         </ul>
       {/if}
+    </section>
+  {/if}
+
+  {#if proposal.state !== "draft"}
+    <section class="mbs-10" aria-labelledby="discussion">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 id="discussion" class="heading">{m.discussion_heading()}</h2>
+        {#if data.comments.length > 0}
+          <span class="font-figures text-xs text-muted-foreground"
+            >{m.discussion_count({ count: data.comments.length })}</span
+          >
+        {/if}
+      </div>
+      {#if roots.length === 0}
+        <p
+          class="mbs-2 border-bs pbs-3 text-sm text-pretty text-muted-foreground"
+        >
+          {m.discussion_empty()}
+        </p>
+      {:else}
+        <ol class="mbs-2 grid border-bs">
+          {#each roots as comment (comment.id)}
+            <li class="border-be py-4">
+              <CommentItem
+                {comment}
+                replies={replies.get(comment.id) ?? []}
+                head={head?.n ?? null}
+                canReply={canComment}
+                canModerate={data.canModerate}
+              />
+            </li>
+          {/each}
+        </ol>
+      {/if}
+      <div class="mbs-4">
+        {#if canComment}
+          <CommentComposer action="?/comment" />
+        {:else if data.commenter === "signed_out"}
+          <p class="text-sm">
+            <a
+              class="underline underline-offset-2"
+              href="/sign-in?next={encodeURIComponent(page.url.pathname)}"
+              >{m.discussion_sign_in()}</a
+            >
+          </p>
+        {:else if data.commenter === "unverified"}
+          <p class="text-sm text-muted-foreground">{m.discussion_verify()}</p>
+        {/if}
+      </div>
     </section>
   {/if}
 
