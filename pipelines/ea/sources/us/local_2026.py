@@ -1819,6 +1819,12 @@ NE_SOURCES = {
         "https://www.calhouncountymi.gov/",
         "mi/calhoun.pdf",
     ),
+    "MI-26111": (
+        "Midland County Clerk",
+        "Sample Ballots, November 3, 2026 General Election",
+        "https://www.co.midland.mi.us/",
+        "mi/midland.pdf",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
