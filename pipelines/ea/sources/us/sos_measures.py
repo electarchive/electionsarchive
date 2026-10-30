@@ -168,6 +168,11 @@ DERIVED_HAND = {
     (date(2022, 11, 8), "112"): ("Measure 112", "Removes language allowing slavery and involuntary servitude as punishment for crime", "Legislative Referendum"),
     (date(2022, 11, 8), "113"): ("Measure 113", "Legislators with ten unexcused absences from floor sessions disqualified from holding next term of office", "Legislative Referendum"),
     (date(2022, 11, 8), "114"): ("Measure 114", "Requires permit to acquire firearms; police maintain permit/firearm database; criminally prohibits certain ammunition magazines", "Initiative"),
+    (date(2022, 11, 8), "1"): ("Question 1", "Court of Appeals and Court of Special Appeals: renaming", "Legislative Referendum"),
+    (date(2022, 11, 8), "2"): ("Question 2", "Eligibility to serve as a state senator or delegate: place of abode", "Legislative Referendum"),
+    (date(2022, 11, 8), "3"): ("Question 3", "Civil jury trials: amount in controversy", "Legislative Referendum"),
+    (date(2022, 11, 8), "4"): ("Question 4", "Legalization of adult use and possession of cannabis", "Legislative Referendum"),
+    (date(2022, 11, 8), "5"): ("Question 5", "Circuit Court for Howard County: judges sitting as the Orphans' Court", "Legislative Referendum"),
     (date(2012, 11, 6), "A"): ("Constitutional Amendment A", "Deposit of severance tax revenue into the Permanent State Trust Fund", "Legislative Referendum"),
     (date(2012, 11, 6), "B"): ("Constitutional Amendment B", "Property tax exemption for military personnel on active duty", "Legislative Referendum"),
     (date(2022, 11, 8), "40"): ("Advisory Vote 40", "Concerning premiums for transportation network company drivers' workers' compensation (ESHB 2076)", "Advisory Vote"),
@@ -429,6 +434,7 @@ MD_FILES = {
     date(2006, 11, 7): ("2006/results/general/Statewide_Ballot_Question_Results.html",),
     date(2008, 11, 4): tuple(f"2008/results/general/gen_detail_qresults_2008_4_000{n}S-.html" for n in (1, 2)),
     date(2010, 11, 2): tuple(f"2010/results/General/gen_detail_qresults_2010_2_000{n}S-.html" for n in (1, 2, 3)),
+    date(2022, 11, 8): tuple(f"2022/general_results/gen_detail_qresults_2022_{n}_1.html" for n in range(1, 6)),
 }
 MD_COUNTIES = frozenset(
     (
@@ -1779,7 +1785,7 @@ def maryland() -> list[dict[str, object]]:
                                 "state": "MD",
                                 "day": day,
                                 "number": str(int(number)),
-                                "label": "",
+                                "label": DERIVED_HAND.get((day, str(int(number))), ("",))[0],
                                 "url": url,
                                 "county": county,
                                 "answer": answer,
@@ -3842,7 +3848,7 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), group in frame.group_by("state", "day", "number", "label", maintain_order=True):
-        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022), ("OR", 2022), ("UT", 2012)):
+        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022), ("OR", 2022), ("UT", 2012), ("MD", 2022)):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
                 if state == "NY"
@@ -3852,7 +3858,7 @@ def parse() -> None:
                     group.filter(pl.col("answer") == "YES")["votes"].sum()
                     > group.filter(pl.col("answer") == "NO")["votes"].sum(),
                 )
-                if state in ("WA", "LA", "OR", "UT")
+                if state in ("WA", "LA", "OR", "UT", "MD")
                 else (SD_2012 if state == "SD" else AZ_2022)[number]
             )
             matched.append(
