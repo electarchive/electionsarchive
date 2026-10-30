@@ -22,6 +22,7 @@ SCHOOLS = {
     ("CA", "Julian Union High School District"): "0619110",
     ("CA", "Galt Joint Union High School District"): "0614820",
     ("CA", "Jefferson Union High School District"): "0618930",
+    ("CA", "Perris Union High School District"): "0630210",
 }
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
@@ -52,6 +53,11 @@ COUNTIES = {
     "48085": ("TX", "https://www.collincountytx.gov/Elections", "../y26/tx/collin.pdf"),
     "48121": ("TX", "https://www.dentoncounty.gov/elections", "../y26/tx/denton_preview.pdf"),
     "48141": ("TX", "https://www.epcounty.com/elections/", "../y26/tx/tornillo_isd.pdf"),
+    "06001": ("CA", "https://acvote.alamedacountyca.gov/election-information/elections", "MF-423/alameda-2026-11-03-measures.html"),
+    "06065": ("CA", "https://voteinfo.net/", "MF-423/Measure A - Riverside County Transportation Commission.pdf"),
+    "06085": ("CA", "https://vote.santaclaracounty.gov/", "MF-423/santa-clara-2026-11-03-list-of-local-measures.html"),
+    "06111": ("CA", "https://clerkrecorder.venturacounty.gov/elections/", "MF-423/ventura-2026-11-03-measures.html"),
+    "06019": ("CA", "https://www.fresnocountyca.gov/Departments/County-ClerkRegistrar-of-Voters/Elections/Election-Information/2026/November-3-2026-Consolidated-Statewide-General-Election", "MF-423/fresno-2026-11-03-measures.html"),
     "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
 }
 
