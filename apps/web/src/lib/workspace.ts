@@ -1,4 +1,5 @@
-import type { DiffRow, NameKind, Scheme } from "#lib/contrib.js";
+import type { DiffRow, NameKind, Polygonal, Scheme } from "#lib/contrib.js";
+import type { Box } from "#lib/map/engine.svelte.js";
 import {
   hex,
   isDay,
@@ -25,6 +26,7 @@ export const templates = [
   "merge",
   "lineage",
   "translate",
+  "boundaries",
   ...tables,
 ] as const;
 
@@ -102,6 +104,7 @@ export const templateTitle: Record<Template, () => string> = {
   merge: m.ws_template_merge,
   lineage: m.ws_template_lineage,
   translate: m.ws_template_translate,
+  boundaries: m.ws_template_boundaries,
   identifiers: m.ws_template_identifiers,
   names: m.ws_template_names,
   colors: m.ws_template_colors,
@@ -113,9 +116,44 @@ export const templateBody: Record<Template, () => string> = {
   merge: m.ws_template_merge_body,
   lineage: m.ws_template_lineage_body,
   translate: m.ws_template_translate_body,
+  boundaries: m.ws_template_boundaries_body,
   identifiers: m.ws_template_identifiers_body,
   names: m.ws_template_names_body,
   colors: m.ws_template_colors_body,
+};
+
+export const qualities = ["official", "osm", "academic", "digitized"] as const;
+
+export type Quality = (typeof qualities)[number];
+
+export const qualityLabel: Record<Quality, () => string> = {
+  official: m.ws_quality_official,
+  osm: m.ws_quality_osm,
+  academic: m.ws_quality_academic,
+  digitized: m.ws_quality_digitized,
+};
+
+export type Schemed = { code: string; noun: string };
+
+export type Shaped = {
+  id: string;
+  filename: string;
+  count: number;
+  bbox: [number, number, number, number] | null;
+  fields: Array<{ name: string; samples: Array<string>; unique: boolean }>;
+  map: {
+    frame: Box;
+    tiles: string | null;
+    features: Array<{
+      id: number;
+      code: string | null;
+      label: string | null;
+      area: string | null;
+      k: number | null;
+      name: string | null;
+      geometry: Polygonal | null;
+    }>;
+  } | null;
 };
 
 export const columns = {

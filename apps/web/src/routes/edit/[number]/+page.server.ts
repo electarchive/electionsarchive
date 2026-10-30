@@ -5,6 +5,7 @@ import {
   latest,
   records,
   refsOf,
+  schemed,
   sheet,
   upload,
   Workspace,
@@ -48,7 +49,10 @@ export const load: PageServerLoad = async ({
         )
       : [],
   );
-  const id = output.template === "results" ? output.evidence?.upload : null;
+  const id =
+    output.template === "results" || output.template === "boundaries"
+      ? output.evidence?.upload
+      : null;
   return {
     number,
     summary:
@@ -63,6 +67,7 @@ export const load: PageServerLoad = async ({
       ),
     ),
     upload: id == null ? null : await upload(id, locals.user.id),
+    schemes: output.template === "boundaries" ? await schemed() : [],
     check: await latest(number, "check"),
   };
 };

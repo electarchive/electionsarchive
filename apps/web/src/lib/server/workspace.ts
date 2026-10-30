@@ -1,9 +1,13 @@
 import { call, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import * as v from "valibot";
-import type { Checks, Diff, NameKind, Scheme } from "#lib/contrib.js";
+import type { Checks, Diff, NameKind, Polygonal, Scheme } from "#lib/contrib.js";
+import type { Box } from "#lib/map/engine.svelte.js";
 import type { Sheet, Upload } from "#lib/sheet.js";
-import type { Lookup } from "#lib/workspace.js";
+import type { Lookup, Schemed, Shaped } from "#lib/workspace.js";
 import {
   hex,
   languages,
@@ -15,6 +19,7 @@ import {
 } from "#lib/contrib.js";
 import { db } from "#lib/server/db/index.js";
 import { names } from "#lib/server/rpc/archive.js";
+import { plane } from "#lib/server/plane.js";
 import { router } from "#lib/server/rpc/router.js";
 import { outcomeKinds } from "#lib/sheet.js";
 import {
@@ -22,9 +27,12 @@ import {
   electionKinds,
   isRef,
   optionKinds,
+  qualities,
   questionTypes,
   relationKinds,
 } from "#lib/workspace.js";
+
+const areaScheme = /^[a-z]{2,5}(?:-[a-z0-9]+)?\.[a-z0-9_]{1,40}$/u;
 
 const Line = (max: number) =>
   v.pipe(
@@ -174,6 +182,26 @@ export const Workspace = v.variant("template", [
     evidence: Evidence,
   }),
   v.object({
+    template: v.literal("boundaries"),
+    scheme: Raw(60),
+    field: Raw(200),
+    nameField: Raw(200),
+    lang: v.nullable(v.picklist(languages)),
+    from: Raw(10),
+    to: Raw(10),
+    quality: v.picklist(qualities),
+    exclude: v.pipe(v.array(Raw(200)), v.maxLength(20_000)),
+    evidence: v.nullish(
+      v.object({
+        upload: v.nullable(Id),
+        title: Raw(500),
+        publisher: Raw(200),
+        kind: v.picklist(sourceKinds),
+      }),
+      null,
+    ),
+  }),
+  v.object({
     template: v.literal("identifiers"),
     rows: Rows({ scheme: Raw(20), value: Raw(100) }),
     evidence: Evidence,
@@ -317,6 +345,20 @@ export const Draft = v.object({
             v.maxLength(40_000),
           ),
           evidence: Cited,
+        }),
+        v.object({
+          op: v.literal("shape"),
+          scheme: v.pipe(v.string(), v.regex(areaScheme)),
+          field: Line(200),
+          name_field: v.optional(Line(200)),
+          lang: v.optional(v.picklist(languages)),
+          valid_from: v.pipe(v.string(), v.isoDate()),
+          valid_to: Day,
+          quality: v.picklist(qualities),
+          exclude: v.optional(
+            v.pipe(v.array(Line(200)), v.maxLength(20_000)),
+          ),
+          evidence: v.tuple([v.literal("e1")]),
         }),
         v.object({
           op: v.literal("drop"),
@@ -650,6 +692,119 @@ export async function sheet(id: string): Promise<Sheet> {
   };
 }
 
+export async function schemed() {
+  const { rows } = await db.execute<Schemed>(sql`
+    select s.code, s.noun from scheme s
+    where exists (select from boundary_set b where b.scheme_code = s.code)
+    order by s.code
+  `);
+  return rows;
+}
+
+export async function shapes(
+  id: string,
+  userId: string,
+  options: { scheme: string; field: string; name: string; on: string },
+): Promise<Shaped | null> {
+  const { rows } = await db.execute<{ sha256: string; filename: string }>(sql`
+    select sha256, filename from upload
+    where id = ${id} and owner_user_id = ${userId} and status = 'ready'
+  `);
+  const found = rows[0];
+  if (found == null) {
+    return null;
+  }
+  const folder = path.resolve("../../data/raw/contrib/pages", found.sha256);
+  if (!existsSync(path.join(folder, "shapes.json"))) {
+    return null;
+  }
+  const meta = JSON.parse(
+    await readFile(path.join(folder, "shapes.json"), "utf8"),
+  ) as Omit<Shaped, "id" | "filename" | "map">;
+  const shaped = { ...meta, id, filename: found.filename };
+  const known = await db.execute<{ tiles: string | null }>(sql`
+    select (select coalesce(b.tiles_key, b.scheme_code || '/' || b.vintage) from boundary_set b
+            where b.scheme_code = s.code
+            order by b.valid @> ${options.on}::date desc, b.as_of desc limit 1) as tiles
+    from scheme s where s.code = ${options.scheme}
+  `);
+  if (!areaScheme.test(options.scheme) || known.rows[0] == null) {
+    return { ...shaped, map: null };
+  }
+  const tiles = known.rows[0].tiles;
+  const preview = await readFile(path.join(folder, "preview.geojson"), "utf8");
+  const projected = await db.execute<{
+    id: number;
+    code: string | null;
+    label: string | null;
+    area: string | null;
+    k: number | null;
+    name: string | null;
+    geometry: string | null;
+    west: number;
+    south: number;
+    east: number;
+    north: number;
+  }>(sql`
+    with f as (
+      select (e ->> 'id')::int as id,
+             nullif(e -> 'properties' ->> ${options.field}, '') as code,
+             nullif(e -> 'properties' ->> ${options.name}, '') as label,
+             ST_SetSRID(ST_GeomFromGeoJSON(e -> 'geometry'), 4326) as geom
+      from json_array_elements(${preview}::json -> 'features') e
+    ),
+    p as (
+      select f.id, f.code, f.label, a.id as area, a.k,
+             (select n.text from name n where n.entity_id = a.id order by n.is_preferred desc, n.id limit 1) as name,
+             ST_Transform(${plane("f.geom", `'${options.scheme}'`)}, 4326) as geom
+      from f
+      left join lateral (
+        select a.id, a.k from area_code c join area a on a.id = c.area_id
+        where a.scheme_code = ${options.scheme} and c.code = f.code and c.valid @> ${options.on}::date
+        limit 1
+      ) a on f.code is not null
+    ),
+    box as (select ST_Extent(geom) as e from p)
+    select p.id, p.code, p.label, p.area, p.k, p.name, ST_AsGeoJSON(p.geom, 6) as geometry,
+           ST_XMin(box.e) as west, ST_YMin(box.e) as south, ST_XMax(box.e) as east, ST_YMax(box.e) as north
+    from p cross join box
+    order by p.id
+  `);
+  const first = projected.rows[0];
+  if (first == null) {
+    return { ...shaped, map: null };
+  }
+  const frame: Box = {
+    west: first.west,
+    south: first.south,
+    east: first.east,
+    north: first.north,
+  };
+  return {
+    ...shaped,
+    map: {
+      frame,
+      tiles:
+        tiles != null &&
+        existsSync(path.resolve("../../data/plane", `${tiles}.pmtiles`))
+          ? tiles
+          : null,
+      features: projected.rows.map((row) => ({
+        id: row.id,
+        code: row.code,
+        label: row.label,
+        area: row.area,
+        k: row.k,
+        name: row.name,
+        geometry:
+          row.geometry == null
+            ? null
+            : (JSON.parse(row.geometry) as Polygonal),
+      })),
+    },
+  };
+}
+
 export async function upload(id: string, userId: string) {
   const { rows } = await db.execute<Upload>(sql`
     select id, filename, pages from upload
@@ -693,6 +848,9 @@ export function refsOf(workspace: v.InferOutput<typeof Workspace>) {
     }
     case "translate": {
       return workspace.records.filter((ref) => ref.trim() !== "");
+    }
+    case "boundaries": {
+      return [];
     }
     default: {
       return workspace.rows.map((row) => row.record);

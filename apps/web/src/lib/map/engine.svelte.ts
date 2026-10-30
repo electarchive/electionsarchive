@@ -179,11 +179,16 @@ function pattern(shape: string, color: string) {
   if (pen != null) {
     pen.strokeStyle = color;
     pen.fillStyle = color;
-    pen.lineWidth = shape === "hatch" || shape === "norun" ? 1 : 2.5;
+    pen.lineWidth = shape === "absent" ? 2.5 : 1;
     pen.beginPath();
-    if (shape === "hatch") {
+    if (shape === "hatch" || shape === "cross") {
       pen.moveTo(0, 8);
       pen.lineTo(8, 0);
+      pen.stroke();
+    }
+    if (shape === "back" || shape === "cross") {
+      pen.moveTo(0, 0);
+      pen.lineTo(8, 8);
       pen.stroke();
     } else if (shape === "absent") {
       pen.moveTo(3, 2);
@@ -544,7 +549,7 @@ export class Engine {
     const ink = this.read(
       "color-mix(in oklab, var(--foreground) 32%, transparent)",
     );
-    for (const shape of ["hatch", "absent", "norun"]) {
+    for (const shape of ["hatch", "back", "cross", "absent", "norun"]) {
       if (gl.hasImage(shape)) {
         gl.updateImage(shape, pattern(shape, ink));
       } else {

@@ -1,3 +1,4 @@
+import type { Box } from "#lib/map/engine.svelte.js";
 import { date } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 
@@ -407,10 +408,59 @@ export type DiffRow = {
   };
 };
 
+export type Polygonal =
+  | { type: "Polygon"; coordinates: Array<Array<[number, number]>> }
+  | { type: "MultiPolygon"; coordinates: Array<Array<Array<[number, number]>>> };
+
+export function extent(
+  geometry: Polygonal | null,
+  box: Box | null = null,
+): Box | null {
+  if (geometry == null) {
+    return box;
+  }
+  const rings =
+    geometry.type === "Polygon"
+      ? geometry.coordinates
+      : geometry.coordinates.flat();
+  let next = box;
+  for (const ring of rings) {
+    for (const [x, y] of ring) {
+      next =
+        next == null
+          ? { west: x, south: y, east: x, north: y }
+          : {
+              west: Math.min(next.west, x),
+              south: Math.min(next.south, y),
+              east: Math.max(next.east, x),
+              north: Math.max(next.north, y),
+            };
+    }
+  }
+  return next;
+}
+
+export type Drawn = {
+  type: "FeatureCollection";
+  tiles?: Array<string>;
+  features: Array<{
+    type: "Feature";
+    properties: {
+      kind: "after" | "before" | "moved" | "overlap" | "gap" | "parent";
+      area: string | null;
+      label: string | null;
+      code: string | null;
+      status: string | null;
+    };
+    geometry: Polygonal;
+  }>;
+};
+
 export type Diff = {
   rows: Array<DiffRow>;
   truncated: boolean;
   entities: Array<string>;
+  map?: Drawn;
   fold?: {
     sets: Array<{ result_set: string; pipeline: string }>;
     cells: number;
@@ -605,6 +655,10 @@ const checkLabel: Record<string, (pipelines: string) => string> = {
   "translation.held": m.proposal_check_translation_held,
   "facts.immutable": m.proposal_check_facts_immutable,
   "reference.facts": m.proposal_check_reference_facts,
+  "geometry.valid": m.proposal_check_geometry_valid,
+  "geometry.overlap": m.proposal_check_geometry_overlap,
+  "geometry.gap": m.proposal_check_geometry_gap,
+  "geometry.parent": m.proposal_check_geometry_parent,
 };
 
 export const findingsOf = (checks: Checks | null | undefined) =>

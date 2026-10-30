@@ -62,7 +62,9 @@ def main() -> None:
     contributing.add_argument("--author", type=UUID, help="user id of the human author or key owner")
     contributing.add_argument("--agent", action="store_true", help="the author is an agent acting for --author")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
-        "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
+        "scheme",
+        nargs="?",
+        help="scheme_code prefix, such as tr or tr.il, or one set as scheme/vintage; omit to build every set",
     )
     commands.add_parser(
         "rasters", help="build one area-ID raster PMTiles archive per boundary set of 1,000 or more areas"

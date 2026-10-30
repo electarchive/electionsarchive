@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+  import Boundaries from "./boundaries.svelte";
   import Election from "./election.svelte";
   import Lineage from "./lineage.svelte";
   import Merge from "./merge.svelte";
@@ -21,6 +22,8 @@
     <Lineage {data} workspace={data.workspace} />
   {:else if data.workspace.template === "translate"}
     <Translate {data} workspace={data.workspace} />
+  {:else if data.workspace.template === "boundaries"}
+    <Boundaries {data} workspace={data.workspace} />
   {:else}
     <Table {data} workspace={data.workspace} />
   {/if}

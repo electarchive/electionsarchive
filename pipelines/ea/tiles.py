@@ -32,9 +32,10 @@ def build(prefix: str | None) -> str:
                        from area a join area_geometry g on g.area_id = a.id join source s on s.id = g.source_id
                        cross join lateral (values (s.publisher), (nullif(s.attribution, ''))) c(credit)
                        where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of and c.credit is not null)
-               from boundary_set bs where starts_with(bs.scheme_code, %s)
+               from boundary_set bs
+               where starts_with(bs.scheme_code, %s) or bs.scheme_code || '/' || bs.vintage = %s
                order by bs.scheme_code, bs.vintage""",
-            [prefix or ""],
+            [prefix or "", prefix],
         ).fetchall()
     with connect() as conn:
         mask = display.ensure(conn)

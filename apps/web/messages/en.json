@@ -3192,5 +3192,151 @@
   "ws_results_pasted": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "Pasted {countText} row.", "countPlural=*": "Pasted {countText} rows."}}],
   "ws_results_pasted_new": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} wasn't found and was added as a new place; check its code.", "countPlural=*": "{countText} weren't found and were added as new places; check their codes."}}],
   "ws_results_pasted_skipped": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} didn't fit the grid and was left out.", "countPlural=*": "{countText} didn't fit the grid and were left out."}}],
-  "ws_scan_replace_note": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "Using another file removes the box drawn on this one.", "countPlural=*": "Using another file removes the {countText} boxes drawn on this one."}}]
+  "ws_scan_replace_note": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "Using another file removes the box drawn on this one.", "countPlural=*": "Using another file removes the {countText} boxes drawn on this one."}}],
+  "ws_template_boundaries": "Boundaries",
+  "ws_template_boundaries_body": "Upload a boundary file for one set of areas, such as counties or districts. Each shape is matched to an area by its code, and the map shows what changes.",
+  "ws_quality_official": "Official",
+  "ws_quality_osm": "OpenStreetMap",
+  "ws_quality_academic": "Academic",
+  "ws_quality_digitized": "Digitized",
+  "proposal_check_geometry_valid": "Has a shape that isn't a valid polygon",
+  "proposal_check_geometry_overlap": "Has shapes that overlap their neighbors",
+  "proposal_check_geometry_gap": "Leaves gaps where areas used to be",
+  "proposal_check_geometry_parent": "Has a shape that spills outside its parent area",
+  "ws_bd_bad_date": "Write the date as YYYY-MM-DD.",
+  "ws_bd_to_before": "The end date must come after the start date.",
+  "ws_bd_click_exclude": "Click to leave it out.",
+  "ws_bd_click_include": "Click to include it.",
+  "ws_bd_diff_area": "Area",
+  "ws_bd_diff_km2": "km²",
+  "ws_bd_field": "Code field",
+  "ws_bd_field_pick": "Choose a field",
+  "ws_bd_field_unique": "unique",
+  "ws_bd_file": "Boundary file",
+  "ws_bd_file_hint": "Upload a GeoJSON file, a zipped shapefile, or a GeoPackage with one polygon layer.",
+  "ws_bd_fit": "Zoom to the whole file",
+  "ws_bd_from": "In force from",
+  "ws_bd_to": "In force until",
+  "ws_bd_to_open": "Still in force",
+  "ws_bd_include_all": "Include every shape",
+  "ws_bd_key_current": "Current boundaries",
+  "ws_bd_key_upload": "Uploaded shape",
+  "ws_bd_key_new": "New area",
+  "ws_bd_key_moved": "Moved boundary",
+  "ws_bd_key_gap": "Gap",
+  "ws_bd_key_overlap": "Overlap",
+  "ws_bd_lang": "Name language",
+  "ws_bd_lang_none": "Not set",
+  "ws_bd_lang_pick": "Choose a language",
+  "ws_bd_legend": "Map key",
+  "ws_bd_map": "Map",
+  "ws_bd_map_empty": "Upload a boundary file to see its shapes over the current boundaries.",
+  "ws_bd_map_hint": "Run checks to map moved boundaries, gaps, and overlaps.",
+  "ws_bd_map_reading": "Reading the file…",
+  "ws_bd_name_field": "Name field",
+  "ws_bd_name_none": "None",
+  "ws_bd_needs_field": "Choose the field that holds each area's code.",
+  "ws_bd_needs_file": "Upload a boundary file.",
+  "ws_bd_needs_from": "Enter the date these boundaries took effect.",
+  "ws_bd_needs_scheme": "Choose the area set this file maps.",
+  "ws_bd_needs_source": "Add the source's title and publisher.",
+  "ws_bd_no_code": "No code",
+  "ws_bd_outline_empty": "Upload a file and choose its code field to list its areas.",
+  "ws_bd_problem_all_excluded": "Every shape is left out. Include at least one.",
+  "ws_bd_problem_blank": "Some shapes have no {field}. Choose another code field, or leave those shapes out.",
+  "ws_bd_problem_lang": "Choose the language of the new areas' names.",
+  "ws_bd_quality": "Quality",
+  "ws_bd_scheme": "Area set",
+  "ws_bd_scheme_empty": "No area set matches.",
+  "ws_bd_scheme_pick": "Choose an area set",
+  "ws_bd_scheme_search": "Search area sets",
+  "ws_bd_status_blank": "No code",
+  "ws_bd_status_excluded": "Left out",
+  "ws_bd_status_matched": "Matched",
+  "ws_bd_status_new": "New",
+  "ws_bd_status_unmatched": "No match",
+  "ws_bd_tally": "{matched} matched, {added} new, {excluded} left out",
+  "ws_bd_title_placeholder": "Census 2021 boundaries",
+  "ws_bd_diff_summary": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{countText} boundary changes.",
+        "countPlural=*": "{countText} boundaries change."
+      }
+    }
+  ],
+  "ws_bd_diff_added": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{countText} new area.",
+        "countPlural=*": "{countText} new areas."
+      }
+    }
+  ],
+  "ws_bd_problem_unmatched": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{countText} code matches no area. Choose a name field to add it as a new area, or leave it out.",
+        "countPlural=*": "{countText} codes match no area. Choose a name field to add them as new areas, or leave them out."
+      }
+    }
+  ],
+  "ws_bd_problem_unnamed": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{countText} new area has no name in the name field.",
+        "countPlural=*": "{countText} new areas have no name in the name field."
+      }
+    }
+  ],
+  "ws_bd_shapes": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
+      "match": {
+        "countPlural=one": "{countText} shape",
+        "countPlural=*": "{countText} shapes"
+      }
+    }
+  ],
+  "ws_bd_key_parent": "Outside its parent area",
+  "proposal_boundaries": "Boundaries"
 }

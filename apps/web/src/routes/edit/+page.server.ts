@@ -108,6 +108,20 @@ function fresh(template: Template, record: string) {
         evidence: null,
       };
     }
+    case "boundaries": {
+      return {
+        template,
+        scheme: "",
+        field: "",
+        nameField: "",
+        lang: null,
+        from: "",
+        to: "",
+        quality: "official" as const,
+        exclude: [],
+        evidence: null,
+      };
+    }
     case "merge": {
       return {
         template,

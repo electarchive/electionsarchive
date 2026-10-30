@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import time
 import zipfile
 import zlib
@@ -194,6 +195,38 @@ def _pdf(path: Path, folder: Path) -> Iterator[tuple[int, Path, bool]]:
         yield n, folder / f"{n}.png", bool(words)
 
 
+def _shapes(path: Path, folder: Path) -> None:
+    try:
+        done = subprocess.run(
+            [
+                "prlimit",
+                f"--as={MEMORY}",
+                "--",
+                "timeout",
+                str(FILE_SECONDS),
+                sys.executable,
+                "-I",
+                "-m",
+                "ea.boundaries",
+                str(path),
+                str(folder),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError as error:
+        raise Rejected("the boundary file could not be read") from error
+    if done.returncode == 124:
+        raise Rejected("reading the boundaries took longer than 15 minutes")
+    if done.returncode == 3:
+        raise Rejected(done.stderr.strip().splitlines()[-1])
+    if done.returncode != 0:
+        raise Rejected("the boundary file could not be read")
+    for name in ("shapes.json", "preview.geojson"):
+        os.chmod(folder / name, 0o644)
+
+
 def _image(path: Path, folder: Path) -> Iterator[tuple[int, Path, bool]]:
     try:
         with Image.open(path) as image:
@@ -272,6 +305,8 @@ def _ready(conn: Connection, id: UUID, sha256: str, inbox: Path) -> None:
                 os.chmod(image, 0o644)
                 with Image.open(image) as rendered:
                     rows.append((n, f"raw/contrib/pages/{sha256}/{n}.png", rendered.width, rendered.height, text))
+        elif suffix in (".geojson", ".zip", ".gpkg"):
+            _shapes(inbox, folder)
     except BaseException:
         shutil.rmtree(folder, ignore_errors=True)
         raise

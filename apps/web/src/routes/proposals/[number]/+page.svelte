@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
   import type { DiffRow } from "#lib/contrib.js";
+  import BoundaryMap from "#lib/components/contrib/boundary-map.svelte";
   import Proof from "#lib/components/contrib/proof.svelte";
   import ScanCrop from "#lib/components/contrib/scan-crop.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -60,12 +61,16 @@
   const cells = $derived(
     (head?.diff?.rows ?? []).filter((row) => row.table === "result_value"),
   );
+  const shapes = $derived(
+    (head?.diff?.rows ?? []).filter((row) => row.table === "area_geometry"),
+  );
   let opened = $state<number | null>(null);
   const rows = $derived(
     (head?.diff?.rows ?? [])
       .filter(
         (row) =>
           row.table !== "result_value" &&
+          row.table !== "area_geometry" &&
           (!evidential.includes(row.table) ||
             (row.table === "citation" &&
               (row.op === "drop" || cites(row.fields.locator?.[1])))),
@@ -398,6 +403,15 @@
       </div>
     {/if}
   </dl>
+
+  {#if head?.diff?.map != null}
+    <section class="mbs-8" aria-labelledby="boundaries">
+      <h2 id="boundaries" class="heading">{m.proposal_boundaries()}</h2>
+      <div class="mbs-2">
+        <BoundaryMap drawn={head.diff.map} rows={shapes} />
+      </div>
+    </section>
+  {/if}
 
   <section class="mbs-8" aria-labelledby="changes">
     <h2 id="changes" class="heading">{m.proposal_changes()}</h2>

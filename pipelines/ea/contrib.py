@@ -15,11 +15,12 @@ from uuid import UUID, uuid7
 import httpx
 import polars as pl
 import regex
+import shapely
 from PIL import Image, ImageOps
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from ea import raw
+from ea import boundaries, plane, raw
 from ea.apply import _stage, apply, publish, revert
 from ea.capture import capture, resume
 from ea.changeset import Changeset, bcp47, slug
@@ -91,6 +92,10 @@ PROVENANCE = {"name": "source_id"}
 NOTE_LIMIT = 10_000
 
 ORIGINS = ("human", "machine", "official")
+
+QUALITIES = ("official", "osm", "academic", "digitized")
+
+LISTED = 5
 
 HEAVY = 50_000
 
@@ -227,6 +232,13 @@ class Op(TypedDict, total=False):
     kind: str
     date: str
     election_id: str
+    scheme: str
+    field: str
+    name_field: str
+    valid_from: str
+    valid_to: str
+    quality: str
+    exclude: list[str]
 
 
 class Payload(TypedDict, total=False):
@@ -1510,6 +1522,179 @@ def _lineage(conn: Connection, cs: Changeset, op: Op, where: str, source: UUID, 
     return party
 
 
+def _shape(
+    conn: Connection, cs: Changeset, op: Op, where: str, source: UUID, files: dict[UUID, tuple[UUID, UUID, int]]
+) -> None:
+    if source not in files:
+        raise ValueError(f"{where}: a shape cites its uploaded boundary file as its first evidence")
+    scheme = str(op.get("scheme") or "")
+    if conn.execute("select from scheme where code = %s", [scheme]).fetchone() is None:
+        raise ValueError(f"{where}: scheme {scheme!r} does not exist")
+    field = str(op.get("field") or "")
+    named = op.get("name_field")
+    lang = None if named is None else _lang(op.get("lang"), f"{where}.lang")
+    start = _day(op.get("valid_from"), f"{where}.valid_from")
+    if start is None:
+        raise ValueError(f"{where}: valid_from is required")
+    end = _day(op.get("valid_to"), f"{where}.valid_to")
+    if end is not None and end <= start:
+        raise ValueError(f"{where}: valid_to must come after valid_from")
+    quality = op.get("quality")
+    if quality not in QUALITIES:
+        raise ValueError(f"{where}: quality must be one of {', '.join(QUALITIES)}")
+    excluded = {str(code) for code in op.get("exclude") or []}
+    found = conn.execute("select storage_key from upload where id = %s", [files[source][0]]).fetchone()
+    if found is None:
+        raise ValueError(f"{where}: the boundary file is gone")
+    try:
+        features = boundaries.read(DATA / found[0])
+    except boundaries.Unreadable as error:
+        raise ValueError(f"{where}: {error}") from None
+    if not features:
+        raise ValueError(f"{where}: the boundary file has no polygons")
+    if field not in features[0][0]:
+        raise ValueError(f"{where}: the boundary file has no field {field!r}")
+    if named is not None and named not in features[0][0]:
+        raise ValueError(f"{where}: the boundary file has no field {named!r}")
+    parts: dict[str, list[shapely.Geometry]] = {}
+    labels: dict[str, str] = {}
+    blank = 0
+    for properties, geometry in features:
+        code = properties.get(field, "")
+        if not code:
+            blank += 1
+            continue
+        if code in excluded:
+            continue
+        parts.setdefault(code, []).append(geometry)
+        if named is not None and properties.get(named):
+            labels.setdefault(code, unicodedata.normalize("NFC", properties[named]).strip())
+    if blank:
+        raise ValueError(f"{where}: {blank:,} features have no {field}; exclude them or pick another field")
+    if not parts:
+        raise ValueError(f"{where}: every feature is excluded")
+    conn.execute("drop table if exists shape_in")
+    conn.execute("create temp table shape_in (code text primary key, geom geometry(MultiPolygon, 4326)) on commit drop")
+    with conn.cursor() as cursor, cursor.copy("copy shape_in (code, geom) from stdin") as copy:
+        for code, pieces in parts.items():
+            merged = pieces[0] if len(pieces) == 1 else boundaries.polygonal(shapely.union_all(pieces))
+            copy.write_row((code, shapely.to_wkb(merged, hex=True, include_srid=False)))
+    conn.execute("update shape_in set geom = st_setsrid(geom, 4326)")
+    rows = conn.execute(
+        """select s.code, a.id, encode(st_asewkb(s.geom), 'hex'),
+                  encode(st_asewkb(st_pointonsurface(s.geom)), 'hex'),
+                  exists (select from area_geometry g where g.area_id = a.id
+                          and g.valid = daterange(%(start)s, %(end)s, '[)') and g.quality = %(quality)s::geometry_quality
+                          and g.source_id = %(source)s and st_equals(g.geom, s.geom))
+           from shape_in s
+           left join (area a join area_code c on c.area_id = a.id and c.valid @> %(start)s::date)
+             on a.scheme_code = %(scheme)s and c.code = s.code
+           order by s.code""",
+        {"start": start, "end": end, "quality": quality, "source": source, "scheme": scheme},
+    ).fetchall()
+    matched = [code for code, area, *_ in rows if area is not None]
+    if len(matched) != len(set(matched)):
+        twice = sorted({code for code in matched if matched.count(code) > 1})
+        raise ValueError(f"{where}: codes {', '.join(twice[:LISTED])} match more than one {scheme} area")
+    unmatched = [code for code, area, *_ in rows if area is None]
+    if unmatched and named is None:
+        raise ValueError(
+            f"{where}: {len(unmatched):,} codes match no {scheme} area on {start}"
+            f" ({', '.join(unmatched[:LISTED])}); add them as new areas or exclude them"
+        )
+    nameless = [code for code in unmatched if not labels.get(code)]
+    if nameless:
+        raise ValueError(f"{where}: new areas {', '.join(nameless[:LISTED])} have no {named}")
+    held: dict[UUID, list[tuple[date | None, str, date | None, str, str, str | None, str, UUID]]] = {}
+    for area, *row in conn.execute(
+        """select area_id, valid_from, valid_from_precision::text, valid_to, valid_to_precision::text,
+                  encode(st_asewkb(geom), 'hex'), encode(st_asewkb(label_point), 'hex'), quality::text, source_id
+           from area_geometry where area_id = any(%s) and valid && daterange(%s, %s, '[)')""",
+        [[area for _, area, *_ in rows if area is not None], start, end],
+    ).fetchall():
+        held.setdefault(area, []).append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+    parent = _parents(conn, scheme, start) if unmatched else None
+    changed = 0
+    for code, area, geom, point, same in rows:
+        if same:
+            continue
+        changed += 1
+        if area is None:
+            area = uuid7()
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=code, valid_from=start, valid_to=end)
+            cs.add(
+                "name",
+                entity_id=area,
+                text=labels[code],
+                lang=lang,
+                kind="official",
+                is_preferred=True,
+                source_id=source,
+            )
+            if parent is not None:
+                over = conn.execute(
+                    """select a.id from area a join area_geometry g on g.area_id = a.id and g.valid @> %s::date
+                       where a.scheme_code = %s and st_covers(g.geom, %s::geometry) limit 1""",
+                    [start, parent, point],
+                ).fetchone()
+                if over is not None:
+                    cs.add("area_parent", area_id=area, parent_id=over[0], valid_from=start, valid_to=end)
+        for (
+            held_from,
+            from_precision,
+            held_to,
+            to_precision,
+            held_geom,
+            held_point,
+            held_quality,
+            held_source,
+        ) in held.get(area, []):
+            remainders = [
+                *([(held_from, from_precision, start, "day")] if held_from is None or held_from < start else []),
+                *(
+                    [(end, "day", held_to, to_precision)]
+                    if end is not None and (held_to is None or held_to > end)
+                    else []
+                ),
+            ]
+            for left, left_precision, right, right_precision in remainders:
+                cs.add(
+                    "area_geometry",
+                    area_id=area,
+                    valid_from=left,
+                    valid_from_precision=left_precision,
+                    valid_to=right,
+                    valid_to_precision=right_precision,
+                    geom=held_geom,
+                    label_point=held_point,
+                    quality=held_quality,
+                    source_id=held_source,
+                )
+        cs.add(
+            "area_geometry",
+            area_id=area,
+            valid_from=start,
+            valid_to=end,
+            geom=geom,
+            label_point=point,
+            quality=quality,
+            source_id=source,
+        )
+    if not changed:
+        raise ValueError(f"{where}: every shape matches the archive's already")
+
+
+def _parents(conn: Connection, scheme: str, on: date) -> str | None:
+    found = conn.execute(
+        """select p.scheme_code from area a join area_parent ap on ap.area_id = a.id and ap.valid @> %s::date
+           join area p on p.id = ap.parent_id where a.scheme_code = %s
+           group by 1 order by count(*) desc limit 1""",
+        [on, scheme],
+    ).fetchone()
+    return None if found is None else str(found[0])
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -1569,6 +1754,7 @@ def compile(
     merging: set[UUID] = set()
     unlinked: set[UUID] = set()
     translated: set[tuple[str, str]] = set()
+    shaped: set[str] = set()
     links: set[tuple[str, ...]] = set()
     dropped = {
         (str((op.get("key") or {}).get("scheme")), str((op.get("key") or {}).get("value")))
@@ -1782,6 +1968,14 @@ def compile(
             ):
                 raise ValueError(f"{where}: translate note {note} in a separate proposal from its edit")
             _translate(conn, cs, op, where, sources[cited[0]] if cited else None, translated)
+            continue
+        if op.get("op") == "shape":
+            if not cited:
+                raise ValueError(f"{where}: a shape needs its uploaded boundary file as evidence")
+            if str(op.get("scheme")) in shaped:
+                raise ValueError(f"{where}: upload one boundary file per scheme in a proposal")
+            shaped.add(str(op.get("scheme")))
+            _shape(conn, cs, op, where, sources[cited[0]], files)
             continue
         table = op.get("table", "")
         if table not in EDITABLE:
@@ -2144,6 +2338,164 @@ def _cells(conn: Connection, stage: Stage, limit: int) -> list[dict[str, object]
     return cells
 
 
+def _geometries(
+    conn: Connection, stage: Stage
+) -> tuple[list[dict[str, object]], dict[str, int], dict[str, list[dict[str, object]]], dict[str, object]]:
+    conn.execute("drop table if exists shape_after, shape_present")
+    conn.execute(
+        sql.SQL(
+            """create temp table shape_after on commit drop as
+               select s.area_id, a.scheme_code as scheme, s.valid_from as day, s.valid_to, s.quality::text as quality,
+                      s.geom, p.geom as before, p.quality::text as before_quality, p.valid_to as before_to,
+                      coalesce((select n.text from {names} n where n.entity_id = s.area_id
+                                order by n.is_preferred desc limit 1), c.code) as label,
+                      c.code, st_area(s.geom::geography) as km
+               from {staged} s
+               join {areas} a on a.id = s.area_id
+               left join public.area_geometry p on p.area_id = s.area_id and p.valid @> s.valid_from
+               left join lateral (select x.code from {codes} x where x.area_id = s.area_id
+                                  and daterange(x.valid_from, x.valid_to, '[)') @> s.valid_from limit 1) c on true
+               where s.valid_from is not null and not exists (
+                 select from public.area_geometry o where o.area_id = s.area_id
+                 and o.valid && daterange(s.valid_from, s.valid_to, '[)')
+                 and md5(st_asbinary(o.geom)) = md5(st_asbinary(s.geom)))"""
+        ).format(
+            staged=stage.staged("area_geometry"),
+            areas=stage.either("area", "id", "scheme_code"),
+            names=stage.either("name", "entity_id", "text", "is_preferred"),
+            codes=stage.either("area_code", "area_id", "code", "valid_from", "valid_to"),
+        )
+    )
+    conn.execute("create index on shape_after using gist (geom)")
+    conn.execute(
+        """create temp table shape_present on commit drop as
+           select area_id, scheme, day, geom from shape_after
+           union all
+           select p.area_id, s.scheme, s.day, p.geom
+           from (select scheme, day, st_extent(geom)::geometry as box from shape_after group by 1, 2) s
+           join public.area a on a.scheme_code = s.scheme
+           join public.area_geometry p on p.area_id = a.id and p.valid @> s.day and p.geom && s.box
+           where not exists (select from shape_after x where x.area_id = p.area_id)"""
+    )
+    conn.execute("create index on shape_present using gist (geom)")
+    floor = "greatest(1000, 0.0005 * least(st_area({0}::geography), st_area({1}::geography)))"
+    parents = stage.either("area_parent", "area_id", "parent_id", "valid_from", "valid_to").as_string(conn)
+    problems = conn.execute(
+        cast(
+            LiteralString,
+            f"""select 'overlap', a.area_id, o.area_id, a.scheme, st_multi(st_collectionextract(st_intersection(a.geom, o.geom), 3))
+            from shape_after a join shape_present o on o.scheme = a.scheme and o.day = a.day and o.area_id <> a.area_id
+                 and st_intersects(a.geom, o.geom)
+                 and not (o.area_id < a.area_id and exists (select from shape_after x where x.area_id = o.area_id))
+            where st_area(st_intersection(a.geom, o.geom)::geography) > {floor.format("a.geom", "o.geom")}
+            union all
+            select 'gap', null, null, g.scheme, g.geom
+            from (select b.scheme, (st_dump(st_difference(
+                    st_union(b.before),
+                    (select st_union(p.geom) from shape_present p where p.scheme = b.scheme and p.day = b.day
+                     and p.geom && st_extent(b.before)::geometry)))).geom
+                  from shape_after b where b.before is not null group by b.scheme, b.day) g
+            where st_area(g.geom::geography) > 1000
+            union all
+            select 'parent', a.area_id, ap.parent_id, a.scheme, st_multi(st_collectionextract(st_difference(a.geom, pg.geom), 3))
+            from shape_after a
+            join {parents} ap on ap.area_id = a.area_id and daterange(ap.valid_from, ap.valid_to, '[)') @> a.day
+            join public.area_geometry pg on pg.area_id = ap.parent_id and pg.valid @> a.day
+            where st_area(st_difference(a.geom, pg.geom)::geography) > 0.01 * a.km""",
+        )
+    ).fetchall()
+    findings: dict[str, int] = {}
+    examples: dict[str, list[dict[str, object]]] = {}
+    for kind, area, other, _, _ in problems:
+        code = f"geometry.{kind}"
+        findings[code] = findings.get(code, 0) + 1
+        examples.setdefault(code, [])
+        if len(examples[code]) < LISTED:
+            examples[code].append({"entity_id": area, "result_set_id": None, "details": {"other": other}})
+    rows: list[dict[str, object]] = [
+        {
+            "table": "area_geometry",
+            "key": {"area_id": area, "valid_from": day},
+            "entity_id": area,
+            "op": "add" if before is None else "change",
+            "fields": {
+                column: values
+                for column, values in {
+                    "area_km2": [None if before is None else round(float(before) / 1e6, 2), round(float(km) / 1e6, 2)],
+                    "quality": [before_quality, quality],
+                    "valid_to": [before_to, valid_to],
+                }.items()
+                if before is None or column == "area_km2" or values[0] != values[1]
+            },
+        }
+        for area, day, valid_to, quality, before, before_quality, before_to, km in conn.execute(
+            """select area_id, day, valid_to, quality, st_area(before::geography), before_quality, before_to, km
+               from shape_after order by label, area_id"""
+        ).fetchall()
+    ]
+    features: list[str] = []
+    schemes = [scheme for (scheme,) in conn.execute("select distinct scheme from shape_after").fetchall()]
+    for scheme in schemes:
+        projected = plane.sql("l.geom", scheme)
+        features.extend(
+            feature
+            for (feature,) in conn.execute(
+                cast(
+                    LiteralString,
+                    f"""with layers as (
+                      select 'after' as kind, area_id, label, code,
+                             case when before is null then 'new' else 'changed' end as status, geom
+                      from shape_after where scheme = %(scheme)s
+                      union all
+                      select 'before', area_id, label, code, null, before from shape_after
+                      where scheme = %(scheme)s and before is not null
+                      union all
+                      select 'moved', area_id, label, code, null,
+                             st_multi(st_collectionextract(st_symdifference(geom, before), 3))
+                      from shape_after where scheme = %(scheme)s and before is not null
+                      union all
+                      select (%(kinds)s::text[])[k], area_id, null, null, other::text, shape::geometry
+                      from unnest(%(k)s::int[], %(areas)s::uuid[], %(others)s::uuid[], %(geoms)s::text[])
+                           as t(k, area_id, other, shape)
+                    ),
+                    planar as (select l.*, {projected} as plane from layers l),
+                    tolerance as (select greatest(1, sqrt(st_area(st_extent(plane)::geometry)) / 1500) as t from planar)
+                    select json_build_object(
+                      'type', 'Feature',
+                      'properties', json_build_object('kind', kind, 'area', area_id, 'label', label, 'code', code,
+                                                      'status', status),
+                      'geometry', st_asgeojson(st_transform(st_setsrid(
+                                    st_simplifypreservetopology(plane, (select t from tolerance)), 3857), 4326), 6)::json)::text
+                    from planar where plane is not null and not st_isempty(plane)""",
+                ),
+                {
+                    "scheme": scheme,
+                    "kinds": ["overlap", "gap", "parent"],
+                    "k": [("overlap", "gap", "parent").index(kind) + 1 for kind, *_, at, _ in problems if at == scheme],
+                    "areas": [area for _, area, _, at, _ in problems if at == scheme],
+                    "others": [other for _, _, other, at, _ in problems if at == scheme],
+                    "geoms": [geom for *_, at, geom in problems if at == scheme],
+                },
+            ).fetchall()
+        )
+    tiles = [
+        key
+        for (key,) in conn.execute(
+            """select distinct on (s.scheme) coalesce(b.tiles_key, b.scheme_code || '/' || b.vintage)
+               from (select distinct scheme, day from shape_after) s
+               join boundary_set b on b.scheme_code = s.scheme
+               order by s.scheme, b.valid @> s.day desc, b.as_of desc"""
+        ).fetchall()
+        if (DATA / "plane" / f"{key}.pmtiles").exists()
+    ]
+    return (
+        rows,
+        findings,
+        examples,
+        {"type": "FeatureCollection", "tiles": tiles, "features": [json.loads(f) for f in features]},
+    )
+
+
 def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object], object]:
     stage = _stage(conn, changeset_id)
     shown: list[dict[str, object]] = []
@@ -2157,7 +2509,7 @@ def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object]
         tiers.append(_graded(conn, stage, cast(dict[str, int], findings or {})))
     for table, columns in stage.tables.items():
         staged = stage.staged(table)
-        if table == "value_locator":
+        if table in ("value_locator", "area_geometry"):
             continue
         if table == "result_value":
             cells = _cells(conn, stage, SHOWN - len(shown) + 1)
@@ -2244,7 +2596,17 @@ def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object]
                     "fields": fields,
                 }
             )
-    return max(tiers), {"rows": shown, "truncated": truncated, "entities": sorted(entities)}, checks
+    diff: dict[str, object] = {"rows": shown, "truncated": truncated, "entities": sorted(entities)}
+    if "area_geometry" in stage.tables:
+        rows, findings, examples, drawn = _geometries(conn, stage)
+        entities.update(str(row["entity_id"]) for row in rows)
+        diff |= {"rows": [*rows, *shown], "entities": sorted(entities), "map": drawn}
+        checks = cast(dict[str, object], checks or {})
+        checks |= {
+            "findings": cast(dict[str, int], checks.get("findings") or {}) | findings,
+            "examples": cast(dict[str, object], checks.get("examples") or {}) | examples,
+        }
+    return max(tiers), diff, checks
 
 
 def _apply(folder: Path) -> str:
@@ -2481,6 +2843,16 @@ def _publish(proposal: UUID, n: int | None, requested: UUID | None, output: dict
             publish(conn, head, str(requested))
         _close(conn, proposal, "published", cast(UUID, requested), output.get("reason"))
         _activity(conn, proposal, "proposal_published", requested, head, "Proposal %s published")
+        sets = conn.execute(
+            """select distinct bs.scheme_code || '/' || bs.vintage
+               from area_geometry g join area a on a.id = g.area_id
+               join boundary_set bs on bs.scheme_code = a.scheme_code and g.valid @> bs.as_of
+               where g.changeset_id = %s""",
+            [head],
+        ).fetchall()
+    for (boundary_set,) in sets:
+        _gated("tiles", boundary_set)
+        _gated("rasters", boundary_set)
     return {"status": "published", "changeset_id": head}
 
 
