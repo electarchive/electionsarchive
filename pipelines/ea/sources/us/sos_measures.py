@@ -70,6 +70,22 @@ AZ_FILES = {
     date(2008, 11, 4): "2008/General/Canvass2008GE.pdf",
     date(2010, 5, 18): "2010/may_Special/2010_Special_Election_Official_Canvass.pdf",
     date(2010, 11, 2): "2010/General/Canvass2010GE.pdf",
+    date(2022, 11, 8): (
+        "https://web.archive.org/web/20221205195258id_/"
+        "https://azsos.gov/sites/default/files/2022Dec05_General_Election_Canvass_Web.pdf"
+    ),
+}
+AZ_2022 = {
+    "128": ("Relating to initiative and referendum (state legislature authority)", "Legislative Referendum", False),
+    "129": ("Relating to initiative measures", "Legislative Referendum", True),
+    "130": ("Relating to property tax exemptions", "Legislative Referendum", True),
+    "131": ("Relating to the executive department", "Legislative Referendum", True),
+    "132": ("Relating to initiative and referendum measures (60% approval for tax proposals)", "Legislative Referendum", True),
+    "209": ("Relating to predatory debt collection protection", "Initiative", True),
+    "211": ("Relating to the disclosure of the original source of monies used for campaign media spending", "Initiative", True),
+    "308": ("Relating to the classification of students for tuition purposes", "Legislative Referendum", True),
+    "309": ("Relating to voter identification", "Legislative Referendum", False),
+    "310": ("Relating to taxation benefitting fire districts", "Legislative Referendum", False),
 }
 AZ_RECOUNTS = {(date(2010, 11, 2), "112"): "2010/GeneralRecount/Canvass2010Prop112.pdf"}
 AZ_COUNTIES = (
@@ -1135,7 +1151,7 @@ def fetch() -> None:
             media_type="application/pdf",
         )
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
-        raw.fetch(SOURCE, AZ + path, suffix=".pdf")
+        raw.fetch(SOURCE, path if path.startswith("https:") else AZ + path, suffix=".pdf")
         time.sleep(1)
     for stamp, election in WA_LISTS.values():
         url = WA.format(stamp) + f"results_report.aspx?e={election}&c=&c2=&t=&t2=5&p=&p2=&y="
@@ -1781,7 +1797,7 @@ def arizona() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     recounted = {(day, prop): AZ + path for (day, prop), path in AZ_RECOUNTS.items()}
     for day, path in [*AZ_FILES.items(), *((day, path) for (day, _), path in AZ_RECOUNTS.items())]:
-        url = AZ + path
+        url = path if path.startswith("https:") else AZ + path
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
         )
@@ -3544,15 +3560,15 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), _ in frame.group_by("state", "day", "number", "label", maintain_order=True):
-        if state == "SD" and day.year == 2012:
-            title, kind, passed = SD_2012[number]
+        if (state, day.year) in (("SD", 2012), ("AZ", 2022)):
+            title, kind, passed = (SD_2012 if state == "SD" else AZ_2022)[number]
             matched.append(
                 {
                     "state": state,
                     "day": day,
                     "number": number,
                     "label": label,
-                    "measure": label,
+                    "measure": label or f"Proposition {number}",
                     "title": title,
                     "type": kind,
                     "passed": passed,
