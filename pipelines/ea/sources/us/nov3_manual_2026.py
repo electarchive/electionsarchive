@@ -139,6 +139,7 @@ COUNTIES = {
     "34005": ("NJ", "https://www.co.burlington.nj.us/", "MF-438/Burlington Samples ALL Gen26.pdf"),
     "34013": ("NJ", "https://www.essexclerk.com/", "MF-438/Essex-2026-Sample-Ballots.pdf"),
     "34007": ("NJ", "https://www.camdencounty.com/", "MF-438/LAUREL_SPRINGS.pdf"),
+    "48355": ("TX", "https://www.corpuschristitx.gov/media/dhllgpuy/2026-cocc-notice-of-general-and-special-election-updated-english.pdf", "N3M-web/tx4/cc-notice.pdf"),
     "34007-coll": ("NJ", "https://www.camdencounty.com/", "MF-438/COLLINGSWOOD.pdf"),
     "34019": ("NJ", "https://www.co.hunterdon.nj.us/", "MF-440/public questions website.pdf"),
     "34021-hb": ("NJ", "https://nj-mercercounty.civicplus.com/", "MF-440/F07 Hopewell Borough General 2026.pdf"),

@@ -7280,5 +7280,27 @@
   "title": "Data centers (advisory referendum)",
   "text": "Do you support data centers in the Township of Downe. INTERPRETIVE STATEMENT “This referendum seeks to gauge the public sentiment regarding whether or not to ban all Data Centers in the Township of Downe” . By voting no on this question means that you do not what data centers in the Township of Downe.",
   "file": "MF-440/Downe-Sample-Ballot-2026-General-Election.pdf"
+ },
+ {
+  "state": "TX",
+  "county": "Nueces",
+  "county_fips": "48355",
+  "publisher": "City of Corpus Christi (ordinance ordering the November 3, 2026 election)",
+  "place": "City of Corpus Christi",
+  "file": "N3M-web/tx4/cc-notice.pdf",
+  "number": "Proposition A",
+  "title": "Continuation of the Crime Control and Prevention District",
+  "text": "Whether the Corpus Christi Crime Control and Prevention District should be continued for ten years and the crime control and prevention district sales tax should be continued for ten years."
+ },
+ {
+  "state": "TX",
+  "county": "Nueces",
+  "county_fips": "48355",
+  "publisher": "City of Corpus Christi (ordinance ordering the November 3, 2026 election)",
+  "place": "City of Corpus Christi",
+  "file": "N3M-web/tx4/cc-notice.pdf",
+  "number": "Proposition B",
+  "title": "Charter amendment regarding industrial water drought surcharge and curtailment",
+  "text": "Shall Article IX of the City Charter be amended to terminate and prohibit programs that exempt large industrial water users from drought surcharges or curtailment requirements during declared drought stages, and require large industrial water users to pay drought surcharges at rates set by the City Council in the March 2025 Drought Contingency Plan?"
  }
 ]
