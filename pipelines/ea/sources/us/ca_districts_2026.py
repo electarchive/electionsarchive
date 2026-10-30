@@ -16,7 +16,7 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside"}
 KEPT = re.compile(
     r"FIRE|WATER|UTILITY|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
@@ -214,9 +214,69 @@ def los_angeles() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+RIVERSIDE = re.compile(
+    r"^Non-Partisan DISTRICT (?P<body>.+?) (?P<role>Director|Trustee)"
+    r"(?:, (?P<seat>(?:Division|Zone|At Large) \d+))?(?:, (?P<term>Full|Short) Term)?\s*$"
+)
+
+
+def riverside() -> list[dict[str, str | int | bool]]:
+    contests: dict[tuple[str, str, str, bool], list[str]] = {}
+    incumbents: dict[tuple[str, str, str, bool], int] = {}
+    current = None
+    text = lines("06065")
+    for index, line in enumerate(text):
+        if found := RIVERSIDE.match(line):
+            current = (
+                full_name(found["body"]),
+                found["role"],
+                found["seat"] or "",
+                found["term"] == "Short",
+            )
+            contests.setdefault(current, [])
+            incumbents.setdefault(current, 0)
+        elif current is None:
+            continue
+        elif found := re.match(r"\s+Candidate\(s\):\s+(\S.*?)\s*$", line):
+            if found[1] not in contests[current]:
+                contests[current].append(found[1])
+        elif re.match(r"\s+Incumbent\(s\):", line) or re.match(
+            r" {33}\S.*\s{3,}(?:Elected|Appointed in Lieu|Appointed to Vacancy)\s*$", line
+        ):
+            incumbents[current] += 1
+        elif (
+            re.match(r" {33}\S", line)
+            and not re.match(
+                r" {33}(?:Requirements|Sigs|Declaration|Candidate|Code|Incumbent|Appointed|Director|Vacant)", line
+            )
+            and (re.match(r"\s*$", text[index - 1]) or "Shared with" in text[index - 1])
+        ):
+            name = re.sub(r"\s{2,}.*$", "", line.strip())
+            if name not in contests[current]:
+                contests[current].append(name)
+    rows = []
+    for key, names in contests.items():
+        district, role, seat, short = key
+        if len(names) < 2:
+            continue
+        for name in names:
+            rows.append(
+                {
+                    "county": "Riverside",
+                    "district": district,
+                    "seat": seat or ("Short Term" if short else ""),
+                    "role": role,
+                    "seats": max(incumbents[key], 1) if not seat else 1,
+                    "name": name,
+                    "unexpired": short,
+                }
+            )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
