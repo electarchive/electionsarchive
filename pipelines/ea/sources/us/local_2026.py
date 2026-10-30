@@ -1813,6 +1813,12 @@ NE_SOURCES = {
         "https://www.saginawcounty.com/",
         "mi/saginaw.pdf",
     ),
+    "MI-26025": (
+        "Calhoun County Clerk",
+        "Official Candidate List, 11/03/2026 State General",
+        "https://www.calhouncountymi.gov/",
+        "mi/calhoun.pdf",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
