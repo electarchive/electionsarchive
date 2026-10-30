@@ -2168,7 +2168,7 @@ def parse() -> None:
                 "tail": tail,
                 "heading": heading.strip(),
                 "seats": seats,
-                "name": cased(re.sub(r"\s+", " ", name).strip()),
+                "name": cased(re.sub(r"\s+\d{2,6}\s+\S.*$", "", re.sub(r"\s+", " ", name).strip())),
                 "party": party,
                 "independent": independent,
                 "unexpired": bool(re.search(r"(?i)unexpired", heading)),
