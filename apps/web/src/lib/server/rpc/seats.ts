@@ -27,7 +27,10 @@ const TILES = import.meta.glob<{
   grids: Record<
     string,
     {
-      boundaries: { states: Array<[number, number, number]> };
+      boundaries: {
+        states: Array<[number, number, number]>;
+        inner?: Array<[number, number, number]>;
+      };
       labels: Record<string, [number, number, string]>;
     }
   >;
@@ -38,16 +41,24 @@ const TILES = import.meta.glob<{
 }>("../hex/*-tiles.json", { eager: true, import: "default" });
 const TILE_SETS: Record<
   string,
-  { file: string; year: (year: number) => number; isUs: boolean }
+  { file: string; year: (year: number) => number; cut: number; isUs: boolean }
 > = {
   "us.cd": {
     file: "../hex/us-cd-tiles.json",
     year: (year) => year - (year % 2),
+    cut: 2,
     isUs: true,
   },
   "ca.fed": {
     file: "../hex/ca-fed-tiles.json",
     year: (year) => year,
+    cut: 3,
+    isUs: false,
+  },
+  "fr.circonscription": {
+    file: "../hex/fr-circ-tiles.json",
+    year: (year) => year,
+    cut: 2,
     isUs: false,
   },
 };
@@ -71,7 +82,7 @@ const tiled = async (id: string, within: string | undefined) => {
     select distinct a.k, ac.code, extract(year from e.date_from)::int as year, a.scheme_code as scheme
     from contest c join tree on tree.id = c.election_id
     join election e on e.id = c.election_id
-    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'ca.fed')
+    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'ca.fed', 'fr.circonscription')
     join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
     where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
       and coalesce(c.magnitude, 1) = 1 and not c.notional
@@ -93,7 +104,8 @@ const tiled = async (id: string, within: string | undefined) => {
   const drawn = set.isUs
     ? CARTOGRAMS[String(CARTOGRAM_YEARS[year] ?? "")]
     : undefined;
-  const states = new Set(rows.map((row) => row.code.slice(0, 2)));
+  const prefix = (code: string) => code.slice(0, -set.cut);
+  const states = new Set(rows.map((row) => prefix(row.code)));
   const cells = rows.flatMap((row) => {
     const hex = placed.hexes[row.code];
     return hex == null
@@ -104,7 +116,7 @@ const tiled = async (id: string, within: string | undefined) => {
             q: hex[0],
             r: hex[1],
             isApart: set.isUs && row.code.endsWith("98"),
-            region: grid.labels[row.code.slice(0, 2)]?.[2] ?? null,
+            region: grid.labels[prefix(row.code)]?.[2] ?? null,
           },
         ];
   });
@@ -122,20 +134,21 @@ const tiled = async (id: string, within: string | undefined) => {
     credit: null,
     cells,
     borders: [
-      {
-        isNation: true,
-        edges: grid.boundaries.states.filter(([q, r, side]) => {
-          const odd = r & 1;
-          const [nq, nr] =
-            side === 1
-              ? [q + odd, r + 1]
-              : side === 2
-                ? [q + 1, r]
-                : [q + odd, r - 1];
-          return kept.has(`${q},${r}`) && kept.has(`${nq},${nr}`);
-        }),
-      },
-    ],
+      { isNation: true, edges: grid.boundaries.states },
+      { isNation: false, edges: grid.boundaries.inner ?? [] },
+    ].map(({ isNation, edges }) => ({
+      isNation,
+      edges: edges.filter(([q, r, side]) => {
+        const odd = r & 1;
+        const [nq, nr] =
+          side === 1
+            ? [q + odd, r + 1]
+            : side === 2
+              ? [q + 1, r]
+              : [q + odd, r - 1];
+        return kept.has(`${q},${r}`) && kept.has(`${nq},${nr}`);
+      }),
+    })),
     labels: Object.entries(grid.labels).flatMap(([fips, [q, r, text]]) =>
       states.has(fips) && states.size > 1 ? [{ q, r, text }] : [],
     ),

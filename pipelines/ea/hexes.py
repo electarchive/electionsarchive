@@ -43,21 +43,40 @@ PROVINCES = {
     "61": "NT",
     "62": "NU",
 }
+REGIONS = {
+    "IDF": "75 77 78 91 92 93 94 95",
+    "HDF": "02 59 60 62 80",
+    "GES": "08 10 51 52 54 55 57 67 68 88",
+    "NOR": "14 27 50 61 76",
+    "BRE": "22 29 35 56",
+    "PDL": "44 49 53 72 85",
+    "CVL": "18 28 36 37 41 45",
+    "BFC": "21 25 39 58 70 71 89 90",
+    "ARA": "01 03 07 15 26 38 42 43 63 69 73 74",
+    "NAQ": "16 17 19 23 24 33 40 47 64 79 86 87",
+    "OCC": "09 11 12 30 31 32 34 46 48 65 66 81 82",
+    "PAC": "04 05 06 13 83 84",
+    "COR": "2A 2B",
+}
+DEPARTEMENTS = {code: code for codes in REGIONS.values() for code in codes.split()}
 
 
 @dataclass(frozen=True)
 class Tiles:
     scheme: str
     srid: int
+    cut: int
     regions: dict[str, str]
     dates: dict[int, date]
+    groups: dict[str, str] | None = None
 
 
 TILES = {
-    "us-cd": Tiles("us.cd", 5070, POSTAL, {year: date(year, 11, 8) for year in ELECTIONS}),
+    "us-cd": Tiles("us.cd", 5070, 2, POSTAL, {year: date(year, 11, 8) for year in ELECTIONS}),
     "ca-fed": Tiles(
         "ca.fed",
         3347,
+        3,
         PROVINCES,
         {
             day.year: day
@@ -72,6 +91,14 @@ TILES = {
                 date(2025, 4, 28),
             ]
         },
+    ),
+    "fr-circ": Tiles(
+        "fr.circonscription",
+        2154,
+        2,
+        DEPARTEMENTS,
+        {day.year: day for day in [date(2012, 6, 10), date(2017, 6, 11), date(2022, 6, 12), date(2024, 6, 30)]},
+        {code: region for region, codes in REGIONS.items() for code in codes.split()},
     ),
 }
 
@@ -261,21 +288,24 @@ def centers(tiles: Tiles, day: date) -> dict[str, tuple[float, float]]:
 
 def outline(tiles: Tiles, cells: dict[tuple[int, int], str]) -> dict:
     prefix = {token: code for code, token in tiles.regions.items()}
-    edges = []
+    groups = tiles.groups or {}
+    edges: dict[str, list[list[int]]] = {"states": [], "inner": []}
     for (q, r), token in sorted(cells.items()):
         for side, other in enumerate(ahead(q, r)):
             if other in cells and cells[other] != token:
-                edges.append([q, -r, side + 1])
-    groups: dict[str, list[tuple[float, float, int, int]]] = {}
+                group = groups.get(prefix[token])
+                inner = group is not None and group == groups.get(prefix[cells[other]])
+                edges["inner" if inner else "states"].append([q, -r, side + 1])
+    spread: dict[str, list[tuple[float, float, int, int]]] = {}
     for (q, r), token in cells.items():
-        groups.setdefault(token, []).append((*center(q, r), q, r))
+        spread.setdefault(token, []).append((*center(q, r), q, r))
     labels = {}
-    for token, spots in groups.items():
+    for token, spots in spread.items():
         mx = sum(spot[0] for spot in spots) / len(spots)
         my = sum(spot[1] for spot in spots) / len(spots)
         _, _, q, r = min(spots, key=lambda spot: (spot[0] - mx) ** 2 + (spot[1] - my) ** 2)
         labels[prefix[token]] = [q, -r, token]
-    return {"boundaries": {"states": edges}, "labels": dict(sorted(labels.items()))}
+    return {"boundaries": {name: kept for name, kept in edges.items() if kept}, "labels": dict(sorted(labels.items()))}
 
 
 def place(tiles: Tiles, day: date, cells: dict[tuple[int, int], str]) -> tuple[dict[str, list[int]], list[str]]:
@@ -287,7 +317,7 @@ def place(tiles: Tiles, day: date, cells: dict[tuple[int, int], str]) -> tuple[d
     hexes: dict[str, list[int]] = {}
     problems = []
     for token, spots in sorted(groups.items()):
-        codes = sorted(code for code in points if code[:2] == prefix[token])
+        codes = sorted(code for code in points if code[: -tiles.cut] == prefix[token])
         if not codes:
             continue
         if len(codes) != len(spots):
