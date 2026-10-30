@@ -3,7 +3,6 @@
   import PlusIcon from "@lucide/svelte/icons/plus";
   import XIcon from "@lucide/svelte/icons/x";
   import { tick, untrack } from "svelte";
-  import { SvelteMap } from "svelte/reactivity";
   import type { Cells, Column, Table } from "#lib/workspace.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
@@ -16,8 +15,6 @@
     schemeExample,
     schemeLabel,
     schemes,
-    sourceKindLabel,
-    sourceKinds,
   } from "#lib/contrib.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -41,6 +38,8 @@
     templateTitle,
   } from "#lib/workspace.js";
   import type { PageData } from "./$types";
+  import Cite from "./cite.svelte";
+  import { Records } from "./records.svelte.js";
   import { Session } from "./session.svelte.js";
   import Shell from "./shell.svelte";
 
@@ -72,8 +71,8 @@
   );
   let summary = $state(initial.summary);
   let cited = $state(initial.workspace.evidence);
-  const records = new SvelteMap<string, PageData["records"][string] | null>(
-    Object.entries(initial.records),
+  const records = new Records(initial.records, () =>
+    rows.map((row) => row.cells.record ?? ""),
   );
   let checkRows = $state<Array<number>>([]);
   let selected = $state<string | null>(null);
@@ -106,7 +105,7 @@
     return rows.map((row, index) => {
       const n = index + 1;
       const record = (row.cells.record ?? "").trim();
-      const found = record === "" ? undefined : records.get(record);
+      const found = records.get(record);
       const entity = found?.state === "found" ? found : null;
       let problem: string | null = null;
       let field: Column | null = null;
@@ -304,34 +303,6 @@
       }))
       .filter((group) => group.rows.length > 0),
   );
-
-  $effect(() => {
-    const wanted = [
-      ...new Set(rows.map((row) => (row.cells.record ?? "").trim())),
-    ].filter((ref) => ref !== "" && !records.has(ref));
-    if (wanted.length === 0) {
-      return;
-    }
-    const timer = setTimeout(() => void look(wanted), 400);
-    return () => clearTimeout(timer);
-  });
-
-  async function look(refs: Array<string>) {
-    for (const ref of refs) {
-      records.set(ref, null);
-    }
-    const response = await fetch("/edit/records", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ refs }),
-    });
-    const found = response.ok
-      ? ((await response.json()) as Record<string, PageData["records"][string]>)
-      : {};
-    for (const ref of refs) {
-      records.set(ref, found[ref] ?? { state: "missing" });
-    }
-  }
 
   async function focusRow(key: number, field: Column = "record") {
     await tick();
@@ -777,85 +748,13 @@
   {/snippet}
 
   {#snippet evidence()}
-    {#if cited == null}
-      <p class="text-pretty text-muted-foreground">
-        {needsSource[template] ? m.ws_evidence_needed() : m.ws_evidence_empty()}
-      </p>
-      {#if !isLocked}
-        <Button
-          variant="outline"
-          size="sm"
-          class="mbs-3"
-          onclick={() =>
-            (cited = {
-              url: "",
-              title: "",
-              publisher: "",
-              kind: "official_body",
-            })}><PlusIcon />{m.ws_evidence_add()}</Button
-        >
-      {/if}
-    {:else}
-      {const chosen = $derived(cited.kind)}
-      <fieldset class="contrib-settle grid gap-2" disabled={isLocked}>
-        <legend class="pbe-2 font-semibold">{m.edit_evidence()}</legend>
-        <Input
-          type="url"
-          inputmode="url"
-          bind:value={cited.url}
-          placeholder="https://"
-          aria-label={m.edit_url()}
-          maxlength={2048}
-          class="block-8"
-        />
-        <Input
-          bind:value={cited.title}
-          placeholder={m.edit_url_title_placeholder()}
-          aria-label={m.edit_url_title()}
-          maxlength={500}
-          class="block-8"
-        />
-        <Input
-          bind:value={cited.publisher}
-          placeholder={m.edit_url_publisher_placeholder()}
-          aria-label={m.edit_url_publisher()}
-          maxlength={200}
-          class="block-8"
-        />
-        <Select.Root
-          type="single"
-          value={chosen}
-          onValueChange={(next: string) => {
-            const kind = sourceKinds.find((item) => item === next);
-            if (kind != null && cited != null) {
-              cited.kind = kind;
-            }
-          }}
-        >
-          <Select.Trigger
-            class="text-sm block-8 inline-full"
-            aria-label={m.edit_url_kind()}
-            >{sourceKindLabel[chosen]()}</Select.Trigger
-          >
-          <Select.Content>
-            {#each sourceKinds as kind (kind)}
-              <Select.Item value={kind}>{sourceKindLabel[kind]()}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
-        <p class="text-xs text-pretty text-muted-foreground">
-          {m.edit_url_note()}
-        </p>
-        {#if !isLocked}
-          <Button
-            variant="ghost"
-            size="sm"
-            class="justify-self-start px-2 text-xs text-muted-foreground"
-            onclick={() => (cited = null)}>{m.ws_evidence_remove()}</Button
-          >
-        {/if}
-      </fieldset>
-    {/if}
+    <Cite
+      bind:cited
+      {isLocked}
+      empty={needsSource[template]
+        ? m.ws_evidence_needed()
+        : m.ws_evidence_empty()}
+    />
   {/snippet}
 
   {#snippet commands(act: (action: () => void) => void)}

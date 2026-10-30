@@ -42,12 +42,16 @@ export const load: PageServerLoad = async ({
   const looked = await records(
     output.template === "results"
       ? output.contests.map((contest) => contest.record)
-      : output.rows.map((row) => row.record),
+      : output.template === "merge"
+        ? output.pairs.flatMap((pair) => [pair.record, pair.into])
+        : output.rows.map((row) => row.record),
   );
   const contests = new Set(
-    Object.values(looked).flatMap((item) =>
-      item.state === "found" && item.type === "contest" ? [item.id] : [],
-    ),
+    output.template === "results"
+      ? Object.values(looked).flatMap((item) =>
+          item.state === "found" && item.type === "contest" ? [item.id] : [],
+        )
+      : [],
   );
   const id = output.template === "results" ? output.evidence?.upload : null;
   return {

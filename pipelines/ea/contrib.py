@@ -1292,6 +1292,7 @@ def compile(
 
     targets: set[tuple[object, str]] = set()
     colored: set[UUID] = set()
+    merging: set[UUID] = set()
     dropped = {
         (str((op.get("key") or {}).get("scheme")), str((op.get("key") or {}).get("value")))
         for op in ops
@@ -1407,6 +1408,44 @@ def compile(
                     evidence[key],
                     proofs.get(key, {}),
                     {"table": "result_set", "row": str(result_set), "op": op.get("op")},
+                )
+            continue
+        if op.get("op") == "merge":
+            id = _uuid(op.get("id"), f"{where}.id")
+            into = _uuid(op.get("into"), f"{where}.into")
+            if id == into:
+                raise ValueError(f"{where}: a record cannot merge into itself")
+            if id in merging:
+                raise ValueError(f"{where}: {id} is merged twice")
+            types: dict[UUID, str] = {}
+            for entity, field in ((id, "id"), (into, "into")):
+                row = conn.execute(
+                    """select type::text, retired_by is not null,
+                              exists (select from entity_merge m where m.entity_id = e.id)
+                       from entity e where id = %s""",
+                    [entity],
+                ).fetchone()
+                if row is None:
+                    raise ValueError(f"{where}.{field}: entity {entity} does not exist")
+                if row[1] or entity in cs.retired:
+                    raise ValueError(f"{where}.{field}: entity {entity} is retired")
+                if row[2]:
+                    raise ValueError(f"{where}.{field}: entity {entity} is already merged")
+                types[entity] = row[0]
+            if types[id] != types[into]:
+                raise ValueError(f"{where}: a {types[id]} cannot merge into a {types[into]}")
+            if cs.survivors.get(into, into) == id:
+                raise ValueError(f"{where}: {into} already merges into {id}")
+            merging.add(id)
+            cs.merge(id, into)
+            for key in cited:
+                _cite(
+                    cs,
+                    cs.survivors.get(into, into),
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {"table": "entity_merge", "row": str(id), "op": "merge"},
                 )
             continue
         if op.get("op") == "cite":

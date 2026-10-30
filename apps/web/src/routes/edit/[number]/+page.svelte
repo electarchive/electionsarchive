@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+  import Merge from "./merge.svelte";
   import Results from "./results.svelte";
   import Table from "./table.svelte";
 
@@ -9,6 +10,8 @@
 {#key data.number}
   {#if data.workspace.template === "results"}
     <Results {data} workspace={data.workspace} />
+  {:else if data.workspace.template === "merge"}
+    <Merge {data} workspace={data.workspace} />
   {:else}
     <Table {data} workspace={data.workspace} />
   {/if}

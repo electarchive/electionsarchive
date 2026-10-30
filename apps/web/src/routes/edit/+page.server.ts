@@ -19,7 +19,8 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
     updated_at: string;
   }>(sql`
     select p.number, p.title,
-           coalesce(jsonb_array_length(p.draft -> 'workspace' -> 'rows'), (
+           coalesce(jsonb_array_length(p.draft -> 'workspace' -> 'rows'),
+                    jsonb_array_length(p.draft -> 'workspace' -> 'pairs'), (
              select sum(jsonb_array_length(c -> 'rows'))
              from jsonb_array_elements(p.draft -> 'workspace' -> 'contests') c
            ), 0)::int as rows,
@@ -69,10 +70,16 @@ export const actions: Actions = {
                     ],
               evidence: null,
             }
-          : {
-              template,
-              rows: record === "" ? [] : [{ ...blank(template), record }],
-            },
+          : template === "merge"
+            ? {
+                template,
+                pairs: record === "" ? [] : [{ record, into: "" }],
+                evidence: null,
+              }
+            : {
+                template,
+                rows: record === "" ? [] : [{ ...blank(template), record }],
+              },
     };
     const { rows } = await db.execute<{ number: number }>(sql`
       insert into proposal (author_user_id, title, draft)

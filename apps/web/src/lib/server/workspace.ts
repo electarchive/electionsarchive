@@ -91,6 +91,14 @@ export const Workspace = v.variant("template", [
     ),
   }),
   v.object({
+    template: v.literal("merge"),
+    pairs: v.pipe(
+      v.array(v.object({ record: Raw(2048), into: Raw(2048) })),
+      v.maxLength(500),
+    ),
+    evidence: Evidence,
+  }),
+  v.object({
     template: v.literal("identifiers"),
     rows: Rows({ scheme: Raw(20), value: Raw(100) }),
     evidence: Evidence,
@@ -167,6 +175,7 @@ export const Draft = v.object({
           ),
           evidence: Cited,
         }),
+        v.object({ op: v.literal("merge"), id: Id, into: Id, evidence: Cited }),
         v.object({
           op: v.literal("add"),
           table: v.literal("party_color"),
@@ -307,8 +316,15 @@ export async function records(refs: Array<string>) {
       valid_from: string | null;
       valid_to: string | null;
     }>;
+    from: string | null;
+    to: string | null;
+    polity: string | null;
   }>(sql`
     select e.id, e.type::text as type,
+           coalesce(pe.birth_date, el.date_from, ce.date_from)::text as "from",
+           coalesce(pe.death_date, el.date_to, ce.date_to)::text as "to",
+           (select n.text from name n where n.entity_id = coalesce(el.polity_id, pa.polity_id, ce.polity_id)
+            order by n.is_preferred desc, n.id limit 1) as polity,
            exists (select from entity_merge m where m.entity_id = e.id)
              or exists (select from entity_retirement r where r.entity_id = e.id) as gone,
            coalesce((
@@ -326,6 +342,11 @@ export async function records(refs: Array<string>) {
              from party_color c where c.party_id = e.id
            ), '[]') as colors
     from entity e
+    left join person pe on pe.id = e.id
+    left join election el on el.id = e.id
+    left join party pa on pa.id = e.id
+    left join contest co on co.id = e.id
+    left join election ce on ce.id = co.election_id
     where e.id = any(${sql.param(wanted)}::uuid[])
   `);
   const { full } = await names(rows.map((row) => row.id));
@@ -347,6 +368,9 @@ export async function records(refs: Array<string>) {
               ids: entity.ids,
               names: entity.names,
               colors: entity.colors,
+              from: entity.from,
+              to: entity.to,
+              polity: entity.polity,
             };
   }
   return result;

@@ -19,12 +19,13 @@ export const tables = ["identifiers", "names", "colors"] as const;
 
 export type Table = (typeof tables)[number];
 
-export const templates = ["results", ...tables] as const;
+export const templates = ["results", "merge", ...tables] as const;
 
 export type Template = (typeof templates)[number];
 
 export const templateTitle: Record<Template, () => string> = {
   results: m.ws_template_results,
+  merge: m.ws_template_merge,
   identifiers: m.ws_template_identifiers,
   names: m.ws_template_names,
   colors: m.ws_template_colors,
@@ -32,6 +33,7 @@ export const templateTitle: Record<Template, () => string> = {
 
 export const templateBody: Record<Template, () => string> = {
   results: m.ws_template_results_body,
+  merge: m.ws_template_merge_body,
   identifiers: m.ws_template_identifiers_body,
   names: m.ws_template_names_body,
   colors: m.ws_template_colors_body,
@@ -64,6 +66,9 @@ export type Found = {
     valid_from: string | null;
     valid_to: string | null;
   }>;
+  from: string | null;
+  to: string | null;
+  polity: string | null;
 };
 
 export type Lookup =
@@ -112,12 +117,19 @@ const isFit = (type: string, scheme: Scheme) =>
       ? partyFit.includes(scheme)
       : scheme === "wikidata";
 
-export const recordKind = (type: string) =>
-  type === "person"
-    ? m.ws_kind_person()
-    : type === "party"
-      ? m.ws_kind_party()
-      : m.ws_kind_other();
+const kinds: Record<string, () => string> = {
+  person: m.ws_kind_person,
+  party: m.ws_kind_party,
+  alliance: m.ws_kind_alliance,
+  election: m.ws_kind_election,
+  contest: m.ws_kind_contest,
+  polity: m.ws_kind_polity,
+  area: m.ws_kind_area,
+  office: m.ws_kind_office,
+  body: m.ws_kind_body,
+};
+
+export const recordKind = (type: string) => (kinds[type] ?? m.ws_kind_other)();
 
 export const isBlank = (cells: Cells) =>
   Object.values(cells).every((value) => value.trim() === "");
