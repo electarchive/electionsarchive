@@ -1908,7 +1908,6 @@ for key, publisher, title, url, local in (
     ("KS-20121", "Miami County Clerk", "Official Candidate List for General 2026", "https://www.miamicountyks.gov/DocumentCenter/View/15339", "ks/miami.pdf"),
     ("KS-20079", "Harvey County Election Office", "Notice of Candidates Filed, General Election, November 3, 2026", "https://www.hvcoksvote.gov/_files/ugd/4d48e8_7e8cb25c163f48aeaca28c682929de59.pdf", "ks/harvey.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
-    ("IL-17089", "Kane County Clerk", "Candidate List, 2026 General Election", "https://applications.kanecountyil.gov/ElectionWebsite/en-US/Candidates/List/31/NP", "il/kane_candidates.html"),
     ("MO-29141", "Morgan County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.morgancountymo.gov/plugins/show_image.php?id=399", "mo/morgan.pdf"),
     ("MO-29105", "Laclede County Clerk", "Sample Ballot Style 1 (District 141), General Election, November 3, 2026", "https://lacledecountyclerk.org/whats-on-the-ballot/", "mo/laclede.pdf"),
 ):
