@@ -233,6 +233,8 @@ def emit() -> Path:
                     ballot_label=answer,
                 )
             cs.add("citation", entity_id=contest, source_id=source)
+            if "DRAFT" in row["url"]:
+                cs.add("note", entity_id=contest, kind="caveat", body_md="The wording is from the county's draft sample ballot (v4) and may change before the final ballot.")
             cs.add(
                 "ballot_question_text",
                 contest_id=contest,
