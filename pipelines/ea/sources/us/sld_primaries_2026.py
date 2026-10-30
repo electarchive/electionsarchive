@@ -1686,6 +1686,24 @@ def emit() -> Path:
                     ],
                 ).fetchall()
             }
+            if (
+                f"2026-11-03:{state}:lieutenant-governor" not in templates
+                and not conn.execute(
+                    """select 1 from external_id x join contest co on co.id = x.entity_id
+                   join changeset ch on ch.id = co.changeset_id
+                   where x.scheme = 'us.contest' and x.value ~ %s and ch.pipeline <> %s limit 1""",
+                    [f"^2026-[0-9-]+:{state}:lieutenant-governor", SOURCE],
+                ).fetchone()
+            ):
+                earlier = conn.execute(
+                    """select co.kind, co.office_id, co.body_id, co.district_area_id, co.magnitude, co.term, n.text
+                       from contest co join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
+                       left join name n on n.entity_id = co.body_id and n.is_preferred
+                       where x.value ~ %s order by x.value desc limit 1""",
+                    [f"^20[0-2][0-9]-[0-9-]+:{state}:lieutenant-governor(:[a-z]+)?$"],
+                ).fetchone()
+                if earlier is not None:
+                    templates[f"2026-11-03:{state}:lieutenant-governor"] = list(earlier)
             counties = {}
             for unit, code, text in conn.execute(
                 """select u.id, u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
