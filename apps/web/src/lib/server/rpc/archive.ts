@@ -53,7 +53,7 @@ const serial = (contest: string, election: string) =>
 
 const reached = (contest: string, election: string) =>
   sql.raw(
-    `case when ${contest}.district_area_id is null or ${contest}.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = ${election}.polity_id) then (select coalesce(array_agg(a.scheme_code || ':' || a.id::text order by a.scheme_code, a.id), '{}') from polity_territory pt join area_parent ap on ap.parent_id = pt.area_id join area a on a.id = ap.area_id where pt.polity_id = ${election}.polity_id and pt.valid @> ${election}.date_from and exists (select from result_set rs join result_rollup_sum x on x.result_set_k = rs.k and x.area_k = a.k where rs.contest_id = ${contest}.id and rs.is_default)) end`,
+    `case when ${contest}.district_area_id is null or ${contest}.district_area_id in (select pt.area_id from polity_territory pt where pt.polity_id = ${election}.polity_id) then (select coalesce(array_agg(a.scheme_code || ':' || a.id::text order by a.scheme_code, a.id), '{}') from polity_territory pt join area_parent ap on ap.parent_id = pt.area_id join area a on a.id = ap.area_id where pt.polity_id = ${election}.polity_id and pt.valid @> ${election}.date_from and a.k in (select x.area_k from result_set rs join result_rollup_sum x on x.result_set_k = rs.k where rs.contest_id = ${contest}.id and rs.is_default)) end`,
   );
 
 const MEASURES = new Map([
@@ -1044,8 +1044,9 @@ async function children(
   const joined = linked.rows[0]?.yes
     ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
       with r as materialized (
-        select distinct u.area_k from unnest(${sql.param(ks)}::int[]) as s(k)
+        select u.area_k, array_agg(u.unit_k) as units from unnest(${sql.param(ks)}::int[]) as s(k)
         join result_rollup_unit u on u.result_set_k = s.k
+        group by u.area_k
       )
       select a.id, a.k, a.scheme_code as scheme
       from r join area a on a.k = r.area_k
@@ -1054,12 +1055,8 @@ async function children(
         and a.scheme_code <> all(${sql.param([...new Set(found.rows.map((row) => row.scheme))])}::text[])
         and exists (
           select from reporting_unit ru
-          cross join lateral (
-            select from reporting_unit_area m
-            where m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date
-            limit 1
-          ) m
-          where ru.area_id = a.id
+          join reporting_unit_area m on m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date
+          where ru.k = any(r.units)
         )
     `)
     : { rows: [] };
@@ -1069,7 +1066,15 @@ async function children(
     !found.rows.some((row) => row.scheme === "world.country")
       ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
           select a.id, a.k, a.scheme_code as scheme from area a
-          where a.scheme_code = 'world.country' and ${counted}
+          where a.k = any(${sql.param(
+            (
+              await remember("countries", () =>
+                db.execute<{ k: number }>(
+                  sql`select k from area where scheme_code = 'world.country'`,
+                ),
+              )
+            ).rows.map((row) => row.k),
+          )}::int[]) and ${counted}
         `)
       : { rows: [] };
   const members = new Set(
@@ -6665,8 +6670,7 @@ export const contests = {
             c.term is not distinct from 'remainder' as "isRemainder", c.notional,
             c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
             c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
-              and c.district_area_id in (select id from later union select id from earlier) as lineage,
-            ${reached("c", "e")} as reach
+              and c.district_area_id in (select id from later union select id from earlier) as lineage
           from (
             select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
             union
@@ -6721,9 +6725,9 @@ export const contests = {
             limit 1
           ) hit
         )
-        select * from (
+        select r.*, (select ${reached("c", "e")} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
           select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.reach, r.date_from
+            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
           from roots r
           where r.id <> ${contest.root}::uuid
         ) r
@@ -10809,7 +10813,10 @@ async function redrawn(
   if (then == null || ids.length === 0) {
     return new Map<number, number>();
   }
-  const found = await db.execute<{ k: number; overlap: number }>(sql`
+  const found = await remember(
+    `redrawn:${[...ids].sort().join(",")}:${now.id}:${now.date}:${then.id}:${then.date}:${scope}`,
+    () =>
+      db.execute<{ k: number; overlap: number }>(sql`
     with picked as (
       select a.id, a.k,
         coalesce((
@@ -10843,7 +10850,8 @@ async function redrawn(
     select k, (ST_Area(ST_Intersection(a, b, 0.00001)) / greatest(ST_Area(a), ST_Area(b)))::float8 as overlap
     from paired
     where greatest(ST_Area(a), ST_Area(b)) > 0
-  `);
+  `),
+  );
   return new Map(
     found.rows
       .filter((row) => row.overlap < 0.97)
