@@ -2818,6 +2818,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
                 (len(mine & theirs) / len(mine | theirs), tail)
                 for tail, theirs, their_marks in pool[county] + pool[""]
                 if their_marks == marks
+                and not (tail.endswith(":family-court") and re.search(r"(?i)\bcounty court\b", contest))
                 and not (
                     (
                         named := re.match(
