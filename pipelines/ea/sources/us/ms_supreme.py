@@ -1,6 +1,7 @@
 import csv
 import re
 import subprocess
+import tempfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -16,6 +17,7 @@ SOURCE = "us.ms_supreme"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "manual" / "MF-357"
+INBOX_363 = DATA / "inbox" / "manual" / "MF-363"
 BASE = "https://www.sos.ms.gov/elections-voting/results/manual/"
 PUBLISHER = "Mississippi Secretary of State"
 TITLE = "Official election results by county"
@@ -29,6 +31,11 @@ PDFS = {
     "Supreme Court- District 2, Position 3.pdf": date(2012, 11, 6),
     "Supreme Court- District 3, Position 3.pdf": date(2012, 11, 6),
 }
+CERTS_2004 = {
+    "2004/CertCentral.pdf": (1, 1, ("RICHARD RAY GRINDSTAFF", "WILLIAM L. BILL WALLER")),
+    "2004/CertNorthern.pdf": (3, 3, ("WILLIAM L. BILL BAMBACH", "GEORGE C. CARLSON")),
+}
+OCR_FIXES_2004 = {("2004/CertNorthern.pdf", "tallahatchie", 0): 1437}
 SUMMARY_2016 = "Supreme Court Judge, District 1, Position 3.pdf"
 RECAP = "2016 GE Statewide Recap Report.pdf"
 CERTIFIED_2016 = {
@@ -49,13 +56,14 @@ def link(name: str) -> str:
 
 
 def fetch() -> None:
-    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016]:
+    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004]:
+        path = (INBOX_363 if name in CERTS_2004 else INBOX) / name
         raw.store(
             SOURCE,
             link(name),
-            (INBOX / name).read_bytes(),
+            path.read_bytes(),
             suffix=Path(name).suffix,
-            retrieved_at=datetime.fromtimestamp((INBOX / name).stat().st_mtime, UTC),
+            retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
             media_type="text/csv" if name in CSVS else "application/pdf",
         )
 
@@ -128,6 +136,41 @@ def parse() -> None:
                     (day, int(seat[1]), int(seat[2]), candidate, codes[re.sub(r"[^a-z]", "", county.lower())], votes)
                 )
                 sums[candidate] = sums.get(candidate, 0) + votes
+        if printed != sums:
+            raise ValueError(f"{name}: counties sum to {sums}, printed totals {printed}")
+    for name, (district, position, names) in CERTS_2004.items():
+        sums = dict.fromkeys(names, 0)
+        printed = {}
+        county = None
+        county_label = None
+        seen = 0
+        with tempfile.TemporaryDirectory() as scratch:
+            subprocess.run(
+                ["pdftoppm", "-r", "200", "-png", str(raw.cached(SOURCE, link(name)).path), f"{scratch}/page"],
+                check=True,
+            )
+            for image in sorted(Path(scratch).glob("page-*.png"))[1:]:
+                text = subprocess.run(
+                    ["tesseract", str(image), "-", "--psm", "6"], capture_output=True, text=True, check=True
+                ).stdout
+                for line in text.splitlines():
+                    votes = re.search(r"([\d,.]+),?\s+[\d.]+%[\s,.]*$", line)
+                    label = re.sub(r"[^a-z]", "", line.lower())
+                    if votes is not None:
+                        total = OCR_FIXES_2004.get((name, county_label, seen), int(re.sub(r"\D", "", votes[1])))
+                        if county is None:
+                            printed[names[seen]] = total
+                        else:
+                            rows.append((date(2004, 11, 2), district, position, names[seen], county, total))
+                            sums[names[seen]] += total
+                        seen += 1
+                    elif label == "statetotals":
+                        county = None
+                        seen = 0
+                    elif label in codes:
+                        county = codes[label]
+                        county_label = label
+                        seen = 0
         if printed != sums:
             raise ValueError(f"{name}: counties sum to {sums}, printed totals {printed}")
     lines = subprocess.run(
