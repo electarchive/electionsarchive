@@ -115,7 +115,11 @@ def emit() -> Path:
         kept = 0
         for row in frame.iter_rows(named=True):
             place = row["place"]
-            key = names.get(ceda._city(place) if place.startswith("City of") else ceda._core(place))
+            key = names.get(
+                ceda._city(place)
+                if place.startswith("City of")
+                else ceda._core(re.sub(r"\s+No\.?\s*\d+$", "", place))
+            )
             if key is None:
                 print("no polity:", place, row["number"])
                 continue
