@@ -136,7 +136,8 @@ def display(text: str, lang: str = "en", known: str | None = None) -> str:
             out.append(word)
             continue
         if not shouting and not (
-            vowel(word) and (lang != "en" or len(word) >= 4 or any(c.islower() for c in text[: run.start()]))
+            vowel(word)
+            and (lang != "en" or len(word) >= 4 or (len(word) == 3 and any(c.islower() for c in text[: run.start()])))
         ):
             out.append(word)
             continue
