@@ -7,6 +7,7 @@ import time
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
+from difflib import SequenceMatcher
 
 import polars as pl
 from psycopg.types.json import Json
@@ -893,6 +894,10 @@ ABBREVIATIONS = {
     "SCH": "SCHOOL",
     "SCHS": "SCHOOL",
     "SCHOOLS": "SCHOOL",
+    "SCHL": "SCHOOL",
+    "PUB": "PUBLIC",
+    "HGHTS": "HEIGHTS",
+    "HGTS": "HEIGHTS",
     "DIST": "DISTRICT",
     "DISTRICTS": "DISTRICT",
     "DST": "DISTRICT",
@@ -1097,6 +1102,7 @@ def cycle(weights: dict[int, int]) -> tuple[int, int] | None:
 
 def tokens(text: str) -> frozenset[str]:
     text = re.sub(r"\([^)]*\)", " ", text.upper().replace("'", "").replace("’", ""))
+    text = re.sub(r"\b(?:[A-Z]\.){2,}", lambda m: m[0].replace(".", ""), text)
     match = PREFIX.match(text)
     words = re.sub(r"[^A-Z0-9 ]", " ", (match[2] if match else text).replace("&", " AND ").replace("#", " ")).split()
     out = []
@@ -1641,6 +1647,8 @@ def build(full: bool = False) -> str:
             "TOWNSHIP",
             "AREA",
             "ELEMENTARY",
+            "JOINT",
+            "SPECIAL",
         )
     )
     for code, pid in codes.items():
@@ -1654,6 +1662,26 @@ def build(full: bool = False) -> str:
         ]
         if len(found) == 1:
             link[found[0]] = pid
+            taken.add(pid)
+    for code, pid in codes.items():
+        if pid in taken or not code.startswith("school:"):
+            continue
+        mine = {w for w in tokens(polities[pid][2]) if not w.isdigit()} - plain
+        ranked = []
+        for g in pools.get((code[7:9], "school"), []):
+            theirs = {w for w in g[2] if not w.isdigit()} - plain
+            if g[0] in link or not mine or not theirs or theirs & {"COLLEGE", "COL", "UNIVERSITY"}:
+                continue
+            small, big = sorted((mine, theirs), key=len)
+            score = (
+                0.9
+                if small < big and len(big - small) <= 2 and sum(map(len, small)) >= 5
+                else SequenceMatcher(None, "".join(sorted(mine)), "".join(sorted(theirs))).ratio()
+            )
+            ranked.append((score, g[0]))
+        ranked.sort(reverse=True)
+        if ranked and ranked[0][0] >= 0.85 and (len(ranked) == 1 or ranked[1][0] < ranked[0][0] - 0.05):
+            link[ranked[0][1]] = pid
             taken.add(pid)
     link["23508201400000"] = "cf3230d1-cf93-5584-bb33-3458b297c168"
     link["05504300800000"] = "5f1810f8-9163-5a5e-aed2-ccd9fc4b1532"
