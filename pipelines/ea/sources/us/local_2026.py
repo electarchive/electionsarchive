@@ -1909,7 +1909,6 @@ for key, publisher, title, url, local in (
     ("KS-20121", "Miami County Clerk", "Official Candidate List for General 2026", "https://www.miamicountyks.gov/DocumentCenter/View/15339", "ks/miami.pdf"),
     ("KS-20079", "Harvey County Election Office", "Notice of Candidates Filed, General Election, November 3, 2026", "https://www.hvcoksvote.gov/_files/ugd/4d48e8_7e8cb25c163f48aeaca28c682929de59.pdf", "ks/harvey.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
-    ("MO-29141", "Morgan County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.morgancountymo.gov/plugins/show_image.php?id=399", "mo/morgan.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
@@ -3842,13 +3841,6 @@ def parse() -> None:
                     "unexpired": "UNEXP" in f"{term} {post}".upper(),
                 }
             )
-
-            continue
-        feeds["NJ-34003"].append(
-            {
-                "county": "Bergen",
-            }
-        )
 
     for key, county in (("MI-26017", "Bay"), ("MI-26091", "Lenawee"), ("MI-26021", "Berrien")):
         post, seats, unexpired = "", 0, False
