@@ -1993,6 +1993,7 @@ for key, publisher, title, url, local in (
     ("IL-17055", "Franklin County Clerk", "2026 General Election Ballot", "https://franklincountyil.gov/wp-content/uploads/2026/10/2026-GE-FRANKLIN-Updated.pdf", "il/franklin.pdf"),
     ("WV-54077", "Preston County Clerk", "Sample Ballot, General Election 2026", "https://www.prestoncountyclerkwv.com/wp-content/uploads/2026/10/SAMPLE-BALLOT-Preston-WV-General-2026.pdf", "wv/preston.pdf"),
     ("IL-17199", "Williamson County Clerk", "Official Ballot, General Election, November 3, 2026", "https://www.williamsoncountyil.gov/wp-content/uploads/2026/09/sample-ballot-001.pdf", "il/williamson.pdf"),
+    ("WY-56029", "Park County Clerk", "2026 Park County general election partisan and municipal candidate filings", "https://parkcounty-wy.gov/wp-content/uploads/2026/10/General-Candidate-Filings-10.13.26.pdf", "wy/park.pdf"),
     ("IL-17099", "La Salle County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://www.lasallecountyil.gov/DocumentCenter/View/4565/Specimen-Ballot-PDF", "il/lasalle.pdf"),
     ("IL-17133", "Monroe County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.mococlerk.com/files/2026%20GE%20Publication%20Ballot.pdf", "il/monroe.pdf"),
     ("MO-29127", "Marion County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://marioncounty-mo.gov/wp-content/uploads/2026/09/November-3-2026-General-Election-Sample-Ballot.pdf", "mo/marion.pdf"),
