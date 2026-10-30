@@ -19,11 +19,49 @@ export const tables = ["identifiers", "names", "colors"] as const;
 
 export type Table = (typeof tables)[number];
 
-export const templates = ["results", "merge", ...tables] as const;
+export const templates = ["election", "results", "merge", ...tables] as const;
 
 export type Template = (typeof templates)[number];
 
+export const electionKinds = [
+  "general",
+  "by_election",
+  "primary",
+  "runoff",
+  "referendum",
+  "recall",
+  "local",
+  "special",
+] as const;
+
+export const contestKinds = [
+  "office",
+  "body_seats",
+  "list_allocation",
+  "ballot_question",
+] as const;
+
+export type ContestKind = (typeof contestKinds)[number];
+
+export const optionKinds = {
+  office: ["candidate", "write_in", "others"],
+  body_seats: ["candidate", "write_in", "others"],
+  list_allocation: ["list", "others"],
+  ballot_question: ["answer"],
+} as const satisfies Record<ContestKind, ReadonlyArray<string>>;
+
+export type OptionKind = (typeof optionKinds)[ContestKind][number];
+
+export const questionTypes = [
+  "initiative",
+  "mandatory_referendum",
+  "optional_referendum",
+  "plebiscite",
+  "recall_question",
+] as const;
+
 export const templateTitle: Record<Template, () => string> = {
+  election: m.ws_template_election,
   results: m.ws_template_results,
   merge: m.ws_template_merge,
   identifiers: m.ws_template_identifiers,
@@ -32,6 +70,7 @@ export const templateTitle: Record<Template, () => string> = {
 };
 
 export const templateBody: Record<Template, () => string> = {
+  election: m.ws_template_election_body,
   results: m.ws_template_results_body,
   merge: m.ws_template_merge_body,
   identifiers: m.ws_template_identifiers_body,
@@ -75,6 +114,12 @@ export type Lookup =
   | ({ state: "found" } & Found)
   | { state: "missing" }
   | { state: "retired" };
+
+export const isRef = (value: string) =>
+  value.includes("/") ||
+  /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu.test(
+    value.trim(),
+  );
 
 export const blank = (template: Table) =>
   Object.fromEntries(columns[template].map((column) => [column, ""]));

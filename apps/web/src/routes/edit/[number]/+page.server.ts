@@ -4,6 +4,7 @@ import { view } from "#lib/server/rpc/proposals.js";
 import {
   latest,
   records,
+  refsOf,
   sheet,
   upload,
   Workspace,
@@ -39,13 +40,7 @@ export const load: PageServerLoad = async ({
     redirect(303, `/proposals/${number}`);
   }
   const output = workspace.output;
-  const looked = await records(
-    output.template === "results"
-      ? output.contests.map((contest) => contest.record)
-      : output.template === "merge"
-        ? output.pairs.flatMap((pair) => [pair.record, pair.into])
-        : output.rows.map((row) => row.record),
-  );
+  const looked = await records(refsOf(output));
   const contests = new Set(
     output.template === "results"
       ? Object.values(looked).flatMap((item) =>

@@ -16,6 +16,13 @@ import { db } from "#lib/server/db/index.js";
 import { names } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import { outcomeKinds } from "#lib/sheet.js";
+import {
+  contestKinds,
+  electionKinds,
+  isRef,
+  optionKinds,
+  questionTypes,
+} from "#lib/workspace.js";
 
 const Line = (max: number) =>
   v.pipe(
@@ -51,6 +58,43 @@ const Page = v.pipe(v.number(), v.integer(), v.minValue(1));
 const Key = Raw(60);
 
 export const Workspace = v.variant("template", [
+  v.object({
+    template: v.literal("election"),
+    election: v.object({
+      polity: Raw(2048),
+      parent: Raw(2048),
+      kind: Raw(20),
+      date: Raw(10),
+      name: Raw(300),
+      lang: Raw(35),
+    }),
+    contests: v.pipe(
+      v.array(
+        v.object({
+          name: Raw(300),
+          kind: Raw(20),
+          question: Raw(30),
+          area: Raw(2048),
+          office: Raw(2048),
+          body: Raw(2048),
+          magnitude: Raw(4),
+          options: v.pipe(
+            v.array(
+              v.object({
+                kind: Raw(20),
+                person: Raw(2048),
+                label: Raw(300),
+                party: Raw(2048),
+              }),
+            ),
+            v.maxLength(500),
+          ),
+        }),
+      ),
+      v.maxLength(200),
+    ),
+    evidence: Evidence,
+  }),
   v.object({
     template: v.literal("results"),
     contests: v.pipe(
@@ -174,6 +218,48 @@ export const Draft = v.object({
             ),
           ),
           evidence: Cited,
+        }),
+        v.object({
+          op: v.literal("election"),
+          election: v.object({
+            polity: Id,
+            parent: v.optional(Id),
+            kind: v.picklist(electionKinds),
+            status: v.picklist(["held", "scheduled"]),
+            date: v.pipe(v.string(), v.isoDate()),
+            name: Line(300),
+            lang: v.picklist(languages),
+            contests: v.pipe(
+              v.array(
+                v.object({
+                  name: Line(300),
+                  kind: v.picklist(contestKinds),
+                  question: v.optional(v.picklist(questionTypes)),
+                  area: v.optional(Id),
+                  office: v.optional(Id),
+                  body: v.optional(Id),
+                  magnitude: v.optional(
+                    v.pipe(v.number(), v.integer(), v.minValue(1)),
+                  ),
+                  options: v.pipe(
+                    v.array(
+                      v.object({
+                        kind: v.picklist(Object.values(optionKinds).flat()),
+                        person: v.optional(Id),
+                        person_name: v.optional(Line(300)),
+                        label: v.optional(Line(300)),
+                        party: v.optional(Id),
+                      }),
+                    ),
+                    v.maxLength(500),
+                  ),
+                }),
+              ),
+              v.minLength(1),
+              v.maxLength(200),
+            ),
+          }),
+          evidence: v.tuple([v.literal("e1")]),
         }),
         v.object({ op: v.literal("merge"), id: Id, into: Id, evidence: Cited }),
         v.object({
@@ -444,4 +530,33 @@ export async function upload(id: string, userId: string) {
     where id = ${id} and owner_user_id = ${userId} and status = 'ready'
   `);
   return rows[0] ?? null;
+}
+
+export function refsOf(workspace: v.InferOutput<typeof Workspace>) {
+  switch (workspace.template) {
+    case "election": {
+      return [
+        workspace.election.polity,
+        workspace.election.parent,
+        ...workspace.contests.flatMap((contest) => [
+          contest.area,
+          contest.office,
+          contest.body,
+          ...contest.options.flatMap((option) => [
+            isRef(option.person) ? option.person : "",
+            option.party,
+          ]),
+        ]),
+      ].filter((ref) => ref.trim() !== "");
+    }
+    case "results": {
+      return workspace.contests.map((contest) => contest.record);
+    }
+    case "merge": {
+      return workspace.pairs.flatMap((pair) => [pair.record, pair.into]);
+    }
+    default: {
+      return workspace.rows.map((row) => row.record);
+    }
+  }
 }

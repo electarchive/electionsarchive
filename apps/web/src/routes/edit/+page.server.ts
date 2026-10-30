@@ -1,5 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
+import type { Template } from "#lib/workspace.js";
 import { db } from "#lib/server/db/index.js";
 import { blank, templates, templateTitle } from "#lib/workspace.js";
 import type { Actions, PageServerLoad } from "./$types";
@@ -21,7 +22,7 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
     select p.number, p.title,
            coalesce(jsonb_array_length(p.draft -> 'workspace' -> 'rows'),
                     jsonb_array_length(p.draft -> 'workspace' -> 'pairs'), (
-             select sum(jsonb_array_length(c -> 'rows'))
+             select sum(coalesce(jsonb_array_length(c -> 'rows'), jsonb_array_length(c -> 'options')))
              from jsonb_array_elements(p.draft -> 'workspace' -> 'contests') c
            ), 0)::int as rows,
            p.updated_at::text
@@ -48,39 +49,7 @@ export const actions: Actions = {
     const given = form.get("record");
     const record = typeof given === "string" ? given.trim().slice(0, 2048) : "";
     const summary = templateTitle[template]();
-    const draft = {
-      summary,
-      ops: [],
-      workspace:
-        template === "results"
-          ? {
-              template,
-              contests:
-                record === ""
-                  ? []
-                  : [
-                      {
-                        record,
-                        stage: "certified",
-                        columns: [],
-                        rows: [],
-                        printed: {},
-                        outcomes: {},
-                      },
-                    ],
-              evidence: null,
-            }
-          : template === "merge"
-            ? {
-                template,
-                pairs: record === "" ? [] : [{ record, into: "" }],
-                evidence: null,
-              }
-            : {
-                template,
-                rows: record === "" ? [] : [{ ...blank(template), record }],
-              },
-    };
+    const draft = { summary, ops: [], workspace: fresh(template, record) };
     const { rows } = await db.execute<{ number: number }>(sql`
       insert into proposal (author_user_id, title, draft)
       values (${locals.user.id}, ${summary}, ${JSON.stringify(draft)}::jsonb)
@@ -89,3 +58,55 @@ export const actions: Actions = {
     redirect(303, `/edit/${rows[0]?.number}`);
   },
 };
+
+function fresh(template: Template, record: string) {
+  switch (template) {
+    case "election": {
+      return {
+        template,
+        election: {
+          polity: record,
+          parent: "",
+          kind: "general",
+          date: "",
+          name: "",
+          lang: "en",
+        },
+        contests: [],
+        evidence: null,
+      };
+    }
+    case "results": {
+      return {
+        template,
+        contests:
+          record === ""
+            ? []
+            : [
+                {
+                  record,
+                  stage: "certified",
+                  columns: [],
+                  rows: [],
+                  printed: {},
+                  outcomes: {},
+                },
+              ],
+        evidence: null,
+      };
+    }
+    case "merge": {
+      return {
+        template,
+        pairs: record === "" ? [] : [{ record, into: "" }],
+        evidence: null,
+      };
+    }
+    default: {
+      return {
+        template,
+        rows: record === "" ? [] : [{ ...blank(template), record }],
+      };
+    }
+  }
+}

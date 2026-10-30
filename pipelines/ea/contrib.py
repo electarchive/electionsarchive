@@ -22,7 +22,7 @@ from psycopg.types.json import Jsonb
 from ea import raw
 from ea.apply import _stage, apply, publish, revert
 from ea.capture import capture, resume
-from ea.changeset import Changeset, bcp47
+from ea.changeset import Changeset, bcp47, slug
 from ea.checks import Stage
 from ea.sources import party_logos, wikidata_photos
 from ea.store import DATA, ROOT, Connection, connect
@@ -220,6 +220,8 @@ class Op(TypedDict, total=False):
     outcomes: list[Declared]
     result_set: str
     cells: list[Cell]
+    into: str
+    election: dict[str, object]
 
 
 class Payload(TypedDict, total=False):
@@ -1236,6 +1238,196 @@ def _fold(conn: Connection, payload: Payload) -> dict[str, object] | None:
     }
 
 
+ELECTION_KINDS = ("general", "by_election", "primary", "runoff", "referendum", "recall", "local", "special")
+CONTEST_KINDS = ("office", "body_seats", "list_allocation", "ballot_question")
+OPTION_KINDS: dict[str, tuple[str, ...]] = {
+    "office": ("candidate", "write_in", "others"),
+    "body_seats": ("candidate", "write_in", "others"),
+    "list_allocation": ("list", "others"),
+    "ballot_question": ("answer",),
+}
+QUESTION_TYPES = ("initiative", "mandatory_referendum", "optional_referendum", "plebiscite", "recall_question")
+
+
+def _typed(conn: Connection, cs: Changeset, value: object, where: str, kind: str) -> UUID:
+    entity = _uuid(value, where)
+    row = conn.execute(
+        """select type::text, retired_by is not null or exists (select from entity_merge m where m.entity_id = e.id)
+           from entity e where id = %s""",
+        [entity],
+    ).fetchone()
+    if row is None:
+        raise ValueError(f"{where}: entity {entity} does not exist")
+    if row[1] or entity in cs.retired:
+        raise ValueError(f"{where}: entity {entity} was merged or retired")
+    if row[0] != kind:
+        raise ValueError(f"{where}: {entity} is a {row[0]}, not a {kind}")
+    return entity
+
+
+def _text(value: object, where: str, limit: int = 300) -> str:
+    text = unicodedata.normalize("NFC", str(value or "")).strip()
+    if not text:
+        raise ValueError(f"{where} is required")
+    if _graphemes(text) > limit:
+        raise ValueError(f"{where}: at most {limit} characters")
+    return text
+
+
+def _election(conn: Connection, cs: Changeset, op: Op, where: str) -> list[UUID]:
+    spec = op.get("election") or {}
+    polity = _typed(conn, cs, spec.get("polity"), f"{where}.election.polity", "polity")
+    scope = cast(dict[str, object], cs.manifest["scope"])
+    if scope.get("polity") is None:
+        country = conn.execute(
+            """with recursive up (id, depth) as (
+                 select %s::uuid, 0
+                 union select pp.parent_id, up.depth + 1 from polity_parent pp join up on pp.polity_id = up.id
+                 where up.depth < 20
+               )
+               select p.iso_code from up join polity p using (id)
+               where p.iso_code is not null and p.iso_code not like '%%-%%' order by up.depth limit 1""",
+            [polity],
+        ).fetchone()
+        scope["polity"] = None if country is None else country[0]
+    parent = (
+        None
+        if spec.get("parent") is None
+        else _typed(conn, cs, spec.get("parent"), f"{where}.election.parent", "election")
+    )
+    kind = str(spec.get("kind"))
+    if kind not in ELECTION_KINDS:
+        raise ValueError(f"{where}.election.kind: {kind!r} is not one of {', '.join(ELECTION_KINDS)}")
+    status = str(spec.get("status"))
+    if status not in ("held", "scheduled"):
+        raise ValueError(f"{where}.election.status: {status!r} is not held or scheduled")
+    try:
+        day = date.fromisoformat(str(spec.get("date")))
+    except ValueError:
+        raise ValueError(f"{where}.election.date: {spec.get('date')!r} is not a date (YYYY-MM-DD)") from None
+    if (status == "held") != (day <= date.today()):
+        raise ValueError(f"{where}.election.status: an election on {day} is not {status}")
+    lang = _lang(spec.get("lang") or "en", f"{where}.election.lang")
+    name = _text(spec.get("name"), f"{where}.election.name")
+    root = conn.execute("select path from slug where entity_id = %s order by length(path) limit 1", [polity]).fetchone()
+    if root is None:
+        raise ValueError(f"{where}.election.polity: polity {polity} has no address")
+    path = f"{root[0]}/{day}-{kind.replace('_', '-')}"
+    held = conn.execute("select entity_id from slug where path = %s", [path]).fetchone()
+    if held is not None:
+        raise ValueError(f"{where}.election: election {held[0]} already has the address /{path}")
+    contests = cast(list[dict[str, object]], spec.get("contests") or [])
+    if not contests or len(contests) > 200:
+        raise ValueError(f"{where}.election.contests: list 1 to 200 contests")
+    election = uuid7()
+    cs.add(
+        "election",
+        id=election,
+        polity_id=polity,
+        parent_id=parent,
+        kind=kind,
+        date_from=day,
+        date_to=day,
+        date_precision="day",
+        status=status,
+    )
+    cs.add("name", entity_id=election, text=name, lang=lang, kind="official", is_preferred=True)
+    cs.add("slug", path=path, entity_id=election)
+    created = [election]
+    paths: set[str] = set()
+    for n, contest in enumerate(contests):
+        at = f"{where}.election.contests[{n}]"
+        title = _text(contest.get("name"), f"{at}.name")
+        sort = str(contest.get("kind"))
+        if sort not in CONTEST_KINDS:
+            raise ValueError(f"{at}.kind: {sort!r} is not one of {', '.join(CONTEST_KINDS)}")
+        tail = slug(title)
+        if not tail or f"{path}/{tail}" in paths:
+            raise ValueError(f"{at}.name: {title!r} needs a name that differs from the other contests")
+        paths.add(f"{path}/{tail}")
+        magnitude = contest.get("magnitude")
+        if magnitude is not None and (not isinstance(magnitude, int) or isinstance(magnitude, bool) or magnitude < 1):
+            raise ValueError(f"{at}.magnitude: {magnitude!r} is not a positive whole number")
+        id = uuid7()
+        cs.add(
+            "contest",
+            id=id,
+            election_id=election,
+            kind=sort,
+            office_id=None
+            if contest.get("office") is None
+            else _typed(conn, cs, contest.get("office"), f"{at}.office", "office"),
+            body_id=None
+            if contest.get("body") is None
+            else _typed(conn, cs, contest.get("body"), f"{at}.body", "body"),
+            district_area_id=None
+            if contest.get("area") is None
+            else _typed(conn, cs, contest.get("area"), f"{at}.area", "area"),
+            magnitude=magnitude,
+            round_number=1,
+            default_result_kind="counted",
+        )
+        cs.add("name", entity_id=id, text=title, lang=lang, kind="official", is_preferred=True)
+        cs.add("slug", path=f"{path}/{tail}", entity_id=id)
+        if sort == "ballot_question":
+            question = str(contest.get("question"))
+            if question not in QUESTION_TYPES:
+                raise ValueError(f"{at}.question: {question!r} is not one of {', '.join(QUESTION_TYPES)}")
+            cs.add("ballot_question", contest_id=id, type=question)
+        created.append(id)
+        options = cast(list[dict[str, object]], contest.get("options") or [])
+        if len(options) > 500:
+            raise ValueError(f"{at}.options: at most 500 options")
+        for k, option in enumerate(options):
+            on = f"{at}.options[{k}]"
+            variety = str(option.get("kind"))
+            if variety not in OPTION_KINDS[sort]:
+                raise ValueError(f"{on}.kind: a {sort} contest takes {', '.join(OPTION_KINDS[sort])} options")
+            party = (
+                None if option.get("party") is None else _typed(conn, cs, option.get("party"), f"{on}.party", "party")
+            )
+            person = None
+            if variety == "candidate":
+                if option.get("person") is not None:
+                    person = _typed(conn, cs, option.get("person"), f"{on}.person", "person")
+                else:
+                    person = uuid7()
+                    cs.add("person", id=person)
+                    cs.add(
+                        "name",
+                        entity_id=person,
+                        text=_text(option.get("person_name"), f"{on}.person_name"),
+                        lang=lang,
+                        kind="official",
+                        is_preferred=True,
+                    )
+                    created.append(person)
+            elif variety == "list" and party is None:
+                raise ValueError(f"{on}.party: a list option needs its party")
+            label = option.get("label")
+            choice = uuid7()
+            cs.add(
+                "contest_option",
+                id=choice,
+                contest_id=id,
+                kind=variety,
+                party_id=party,
+                ballot_position=k + 1,
+                ballot_label=None if label is None else _text(label, f"{on}.label"),
+            )
+            if person is not None:
+                cs.add(
+                    "candidacy",
+                    id=uuid7(),
+                    person_id=person,
+                    option_id=choice,
+                    role="head",
+                    member_of_party_id=party,
+                    is_independent=party is None,
+                )
+    return created
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -1409,6 +1601,21 @@ def compile(
                     proofs.get(key, {}),
                     {"table": "result_set", "row": str(result_set), "op": op.get("op")},
                 )
+            continue
+        if op.get("op") == "election":
+            if not cited:
+                raise ValueError(f"{where}: a new election needs evidence")
+            created = _election(conn, cs, op, where)
+            for entity in created:
+                for key in cited:
+                    _cite(
+                        cs,
+                        entity,
+                        sources[key],
+                        evidence[key],
+                        proofs.get(key, {}),
+                        {"op": "election"},
+                    )
             continue
         if op.get("op") == "merge":
             id = _uuid(op.get("id"), f"{where}.id")
