@@ -10,6 +10,7 @@ from collections import Counter, defaultdict
 from datetime import UTC, date, datetime
 from itertools import pairwise
 from pathlib import Path
+from uuid import UUID
 
 import fastexcel
 import httpx
@@ -17,7 +18,7 @@ import polars as pl
 
 from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import cog, mn_local
+from ea.sources.us import cog, govmint, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
 
@@ -2135,6 +2136,9 @@ for key, publisher, title, url, local in (
     ("UT-49023", "Juab County Clerk", "2026 General Election Certification", "https://juabcounty.gov/wp-content/uploads/2026/09/2026_general_certification.pdf", "ut/juab.pdf"),
     ("UT-49025", "Kane County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.utah.gov/pmn/files/1485015.docx", "ut/kane.docx"),
     ("UT-49017", "Garfield County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.garfield.utah.gov/files/assets/garfieldcout/v/1/documents/auditor-clerk/26gutgar_publication_2_watermark.pdf", "ut/garfield.pdf"),
+    ("TX-48201-harris-sd", "Harris County Clerk", "Sample ballot, November 3, 2026 General and Special Elections (special districts)", "https://www.harrisvotes.com/", "tx/harris_sample.pdf"),
+    ("TX-48085-collin-sd", "Collin County Elections Administration", "November 3, 2026 General Election Sample Ballot (special districts)", "https://www.collincountytx.gov/elections", "tx/collin.pdf"),
+    ("TX-48453-sd", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (special districts)", "https://votetravis.gov/wp-content/uploads/G26-Bedsheet-Ballot-Corrected-Final2.pdf", "tx/travis.pdf"),
     ("TX-48085-collin-cities", "Collin County Elections Administration", "November 3, 2026 General Election Sample Ballot (Anna, Josephine, Lavon, Lowry Crossing, Princeton, Weston, and Wylie)", "https://www.collincountytx.gov/elections", "tx/collin.pdf"),
     ("TX-48453-nov-cities", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Jonestown, Lago Vista, Manor, Sunset Valley, and Volente)", "https://votetravis.gov/", "tx/travis_nov_cities.pdf"),
     ("TX-48453-tc", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Del Valle and Manor ISD)", "https://votetravis.gov/wp-content/uploads/G26-Bedsheet-Ballot-Corrected-Final2.pdf", "tx/travis.pdf"),
@@ -5098,6 +5102,7 @@ def parse() -> None:
                 "office": row.get("office_name") or "",
                 "area": row.get("constituency_area") or "",
                 "mint": row.get("ward_mint") == "1",
+                "district": row.get("district") or "",
             }
         )
 
@@ -5444,6 +5449,30 @@ def parse() -> None:
             )
             used: dict[str, str] = {}
             missed: set[str] = set()
+            for row in [row for row in found if row.get("district")]:
+                display = str(row["district"])
+                office = str(row["contest"]).removeprefix(display).strip(" ,")
+                head, _, seat = office.partition(", ")
+                head = re.sub(r"^Directors?$", "Board of Directors", head)
+                tail = f"{state}:{row['fips']}-{slug(display)}:board" + (f":{slug(seat)}" if seat else "")
+                title = f"{head}, {seat}" if seat else head
+                minted[tail] = (title, display, f"special:{row['fips']}:{slug(display)}", "")
+                pinned.add(tail)
+                templated[tail] = ""
+                if used.setdefault(tail, str(row["contest"])) != row["contest"]:
+                    missed.add(f"{row['county']}: {row['contest']}")
+                    continue
+                add(
+                    key,
+                    tail,
+                    str(row["contest"]),
+                    int(str(row["seats"])),
+                    str(row["name"]),
+                    None if row["party"] is None else str(row["party"]),
+                    bool(row["independent"]),
+                    str(row.get("feed") or key),
+                )
+            found = [row for row in found if not row.get("district")]
             towns: dict[str, list[tuple[list[str], str, str, str, str]]] = defaultdict(list)
             if "-" in key and key != "MN-county" or key in ("KY", "OK", "MD", "VA", "RI", "NC", "IN"):
                 for county_code, label, owner, path, kind in [
@@ -6006,6 +6035,7 @@ def emit() -> Path:
         made: set[object] = set()
         homes: dict[str, str] = {}
         homeless: set[str] = set()
+        special_slugs: dict[str, dict[str, UUID]] = {}
         split_tails = {
             (row["fips"], row["tail"])
             for row in frame.group_by(["fips", "tail"])
@@ -6032,7 +6062,28 @@ def emit() -> Path:
                     print(f"slug taken: {tail} {home}")
                     continue
                 territory = owner.startswith("territory:")
-                polity = cs.polity(f"US-{st}") if territory else cs.key("us.polity", owner)
+                special = None
+                if owner.startswith("special:"):
+                    county = conn.execute(
+                        """select t.polity_id, t.area_id, s.path, c.code from area_code c
+                           join area a on a.id = c.area_id and a.scheme_code = 'us.county'
+                           join polity_territory t on t.area_id = a.id
+                           join polity p on p.id = t.polity_id and p.kind = 'county'
+                           join slug s on s.entity_id = p.id and s.is_current
+                           where c.code = %s limit 1""",
+                        [owner.split(":")[1]],
+                    ).fetchone()
+                    if st not in special_slugs:
+                        special_slugs[st] = dict(
+                            conn.execute("select path, entity_id from slug where path like %s", [f"us/{st.lower()}/%"]).fetchall()
+                        )
+                    special = None if county is None else govmint.special(conn, cs, st, county, place, special_slugs[st])
+                    if special is None:
+                        counts["no template"] += 1
+                        print(f"no special district: {tail} {owner}")
+                        continue
+                    home = special[3]
+                polity = special[0] if special else cs.polity(f"US-{st}") if territory else cs.key("us.polity", owner)
                 body = role not in (
                     "mayor", "vice-mayor", "supervisor", "clerk", "treasurer", "president", "judge",
                     "attorney-general", "public-auditor", "justice",
@@ -6068,7 +6119,9 @@ def emit() -> Path:
                         valid_from=None,
                     )
                 whole = (
-                    (cs.area("us.state", code),)
+                    (special[1],)
+                    if special
+                    else (cs.area("us.state", code),)
                     if territory
                     else (cs.area("us.school_district" if owner.startswith("school:") else "us.place", owner.split(":")[1]),)
                     if polity in cs.minted
