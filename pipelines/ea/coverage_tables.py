@@ -84,6 +84,12 @@ JUDICIAL = {
 KNOWN = {("GA", 2025, "statewide_exec", "general"): 2}
 SWITCHED = {("MI", "county"): (2024, (4, 0))}
 HELD_IN = {("FL", "school"): 8, ("TN", "school"): 8}
+DECIDED_EARLIER = {
+    "FL": (
+        "2026-08-18",
+        "Florida Statutes sections 100.061 and 105.051: a universal primary contest, or a nonpartisan race in which one candidate wins a majority, is decided at the primary and is left off the general election ballot",
+    ),
+}
 CANCELED = {
     "06037": (
         "Los Angeles County Registrar-Recorder/County Clerk, tentative list of canceled elections for November 3, 2026 (appointment in lieu of election due to insufficiency of candidates), https://content.lavote.gov/docs/rrcc/documents/canceled-elections-november-2026-tentative.pdf",

@@ -298,7 +298,7 @@ def measure(conn, day: str) -> dict:
     by_polity: dict[str, list[int]] = defaultdict(list)
     counties: dict[str, tuple[str, str]] = {}
     schools: dict[str, list[tuple[int, str]]] = defaultdict(list)
-    from ea.coverage_tables import CANCELED, tokens
+    from ea.coverage_tables import CANCELED, DECIDED_EARLIER, tokens
 
     for st, kind, polity, name, population, county, due in conn.execute(GOVERNMENTS_SQL, params):
         if due and kind == "school" and county in CANCELED:
@@ -390,9 +390,26 @@ def measure(conn, day: str) -> dict:
         cell["ready"] += weight if ok.get(str(cid)) else 0
         if not ok.get(str(cid)):
             gap(cell, level, st, [str(cid)], "gap_partial" if has else "gap_bare", weight)
+    decided = {
+        polity
+        for st, (early, _) in DECIDED_EARLIER.items()
+        for (polity,) in conn.execute(
+            """select distinct coalesce(b.polity_id, f.polity_id)::text from contest c
+               join election e on e.id = c.election_id
+               join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+               join result_set rs on rs.contest_id = c.id and rs.is_default and rs.status = 'active'
+               join outcome o on o.result_set_id = rs.id and o.kind = 'elected'
+               left join body b on b.id = c.body_id
+               left join office f on f.id = c.office_id
+               where e.date_from = %s and x.value like %s and coalesce(b.polity_id, f.polity_id) is not null""",
+            [early, f"{early}:{st}:%"],
+        )
+    }
     short = []
     for i, (level, st, name, population, due, polity, county) in enumerate(places):
         contests = held.get(i, [])
+        if due and not contests and str(polity) in decided:
+            contests = [(True, True)]
         if not (due or contests):
             continue
         cell = cells[(level, st)]
