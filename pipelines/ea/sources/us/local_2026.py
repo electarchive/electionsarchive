@@ -2461,6 +2461,8 @@ def parse() -> None:
                 "contest": (
                     f"{str(row['Locality']).title()} Public Schools "
                     if re.search(r"(?i)school board", title)
+                    else f"City of {str(row['Locality']).title().removesuffix(' City')} "
+                    if str(row["Locality"]).endswith(" CITY") and re.search(r"(?i)city council|mayor", title)
                     else ""
                 )
                 + f"{title} {'' if district.upper() == str(row['Locality']).upper() else district}",
