@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 from datetime import UTC, date, datetime
@@ -13,6 +14,7 @@ SOURCE = "us.ga_boe_2026"
 VERSION = "1"
 DAY = date(2026, 5, 19)
 RUNOFF = date(2026, 6, 16)
+SOS = "https://results.sos.ga.gov/results/public/api/elections/{0}-county-ga/{1}/data"
 INBOX = Path(__file__).resolve().parents[4] / "data" / "inbox" / "manual" / "MF-341"
 COUNTIES = [
     (
@@ -50,9 +52,44 @@ COUNTIES = [
         DAY,
         "local",
     ),
+    (
+        "1301230",
+        "Georgia Secretary of State",
+        SOS.format("clayton", "GeneralPrimary51926"),
+        DAY,
+        "primary",
+    ),
+    (
+        "1301230",
+        "Georgia Secretary of State",
+        SOS.format("clayton", "06162026GeneralPrimaryRunoff"),
+        RUNOFF,
+        "runoff",
+    ),
+    (
+        "1302820",
+        "Georgia Secretary of State",
+        SOS.format("henry", "GeneralPrimary51926"),
+        DAY,
+        "local",
+    ),
+    (
+        "1303930",
+        "Georgia Secretary of State",
+        SOS.format("newton", "GeneralPrimary51926"),
+        DAY,
+        "primary",
+    ),
+    (
+        "1304410",
+        "Georgia Secretary of State",
+        SOS.format("rockdale", "GeneralPrimary51926"),
+        DAY,
+        "local",
+    ),
 ]
 HEADING = re.compile(
-    r"^(?:County )?(?:BOE|Board of Education)(?: - District (?P<seat>\d+)| (?P<top>President))(?: \(\w[\w -]*\))?(?:/.*?)?(?: - (?P<party>Dem|Rep))? \(Vote for (?P<seats>\d+)\)$"
+    r"^(?:County )?(?:BOE|Board of Education)(?: - (?P<word>District|Post) (?P<seat>\d+)| (?P<top>President))(?: \(\w[\w -]*\))?(?:/.*?)?(?: - (?P<party>Dem|Rep))? \(Vote for (?P<seats>\d+)\)$"
 )
 PARTIES = {"Dem": "democratic", "Rep": "republican"}
 ROW = re.compile(r"^(?P<name>[A-Z].*?)\s{2,}(?:[\d,]+\s+)*(?P<total>[\d,]+)(?:\s+[\d.]+%)?$")
@@ -60,6 +97,9 @@ ROW = re.compile(r"^(?P<name>[A-Z].*?)\s{2,}(?:[\d,]+\s+)*(?P<total>[\d,]+)(?:\s
 
 def fetch() -> None:
     for _, _, path, _, _ in COUNTIES:
+        if path.startswith("https:"):
+            raw.fetch(SOURCE, path, suffix=".json")
+            continue
         raw.store(
             SOURCE,
             f"manual://MF-341/{path}",
@@ -87,12 +127,14 @@ def emit() -> Path:
         values: list[tuple[str, str, str, int]] = []
         contests = 0
         districts: set[str] = set()
+        people: set[object] = set()
         for code, publisher, path, day, kind in COUNTIES:
-            title = f"Official election summary report, {day:%B} {day.day}, 2026"
+            url = path if path.startswith("https:") else f"manual://MF-341/{path}"
+            title = f"Official election summary report, {day:%B} {day.day}, 2026" if url != path else f"Official results, {path.split('/')[-3].removesuffix('-county-ga').title()} County, {day:%B} {day.day}, 2026"
             source = cs.source(publisher, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=None, license=None)
-            cs.artifact(raw.cached(SOURCE, f"manual://MF-341/{path}"), source)
+                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=path if url == path else None, license=None)
+            cs.artifact(raw.cached(SOURCE, url), source)
             polity, place, base = conn.execute(
                 """select u.polity_id, n.text, s.path from reporting_unit u
                    join name n on n.entity_id = u.polity_id and n.is_preferred
@@ -100,18 +142,35 @@ def emit() -> Path:
                    where u.scheme_code = 'us.school_district' and u.code = %s""",
                 [code],
             ).fetchone()
-            text = subprocess.run(
-                ["pdftotext", "-layout", str(raw.cached(SOURCE, f"manual://MF-341/{path}").path), "-"],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout
+            if url == path:
+                items = json.loads(raw.cached(SOURCE, url).path.read_bytes())["ballotItems"]
+                text = "\n".join(
+                    line
+                    for item in items
+                    if HEADING.match(f"{item['name'][0]['text']} ({item['voteFor'][0]['text']})")
+                    for line in (
+                        f"{item['name'][0]['text']} ({item['voteFor'][0]['text']})",
+                        *(
+                            f"{option['name'][0]['text']}  {option['voteCount']}"
+                            for option in item["summaryResults"]["ballotOptions"]
+                            if not option.get("isWriteIn")
+                        ),
+                        "Total Votes",
+                    )
+                )
+            else:
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout
             races: dict[tuple[str, str | None], tuple[int, dict[str, int]]] = {}
             current: dict[str, int] | None = None
             for line in text.splitlines():
                 stripped = line.strip()
                 if found := HEADING.match(stripped):
-                    current = races.setdefault((found["seat"] or found["top"], found["party"]), (int(found["seats"]), {}))[1]
+                    current = races.setdefault((f"{found['word']} {found['seat']}" if found["seat"] else found["top"], found["party"]), (int(found["seats"]), {}))[1]
                 elif stripped.startswith("Total Votes"):
                     current = None
                 elif current is not None and (row := ROW.match(stripped)):
@@ -131,7 +190,8 @@ def emit() -> Path:
             cs.add("name", entity_id=election, text=f"2026 {place} " + (f"{kind} election" if kind != "local" else "election"), lang="en", kind="official", is_preferred=True)
             cs.add("slug", path=f"{base}/{day}-{kind}", entity_id=election)
             body = cs.key("us.body", f"GA:{code}:board-of-education")
-            if body in cs.minted:
+            if body in cs.minted and body not in people:
+                people.add(body)
                 cs.add("body", id=body, polity_id=polity, kind="council")
                 cs.add(
                     "name", entity_id=body, text=f"{place} Board of Education", lang="en", kind="official", is_preferred=True
@@ -139,14 +199,14 @@ def emit() -> Path:
             whole = cs.area("us.school_district", code)
             for (seat, party), (magnitude, votes) in races.items():
                 suffix = f"-{PARTIES[party]}" if party else ""
-                label = f"district-{seat}" if seat.isdigit() else slug(seat)
+                label = slug(seat)
                 district = f"GA:{code}:board-of-education:{label}"
                 area, unit = (
                     (cs.area("us.local_district", district), cs.unit("us.local_district", district))
-                    if seat.isdigit()
+                    if seat != "President"
                     else (whole, cs.unit("us.school_district", code))
                 )
-                if seat.isdigit() and area in cs.minted and district not in districts:
+                if seat != "President" and area in cs.minted and district not in districts:
                     districts.add(district)
                     cs.add("area", id=area, scheme_code="us.local_district")
                     cs.add("area_code", area_id=area, code=district, valid_from=None)
@@ -154,7 +214,7 @@ def emit() -> Path:
                     cs.add(
                         "name",
                         entity_id=area,
-                        text=f"{place} Board of Education, District {seat}",
+                        text=f"{place} Board of Education, {seat}",
                         lang="en",
                         kind="official",
                         is_preferred=True,
@@ -189,7 +249,7 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=contest,
-                    text=f"2026 {place} Board of Education, {seat if not seat.isdigit() else f"District {seat}"} election" + (f" ({party} primary)".replace("Dem", "Democratic").replace("Rep", "Republican") if party else "") + (" (runoff)" if previous else ""),
+                    text=f"2026 {place} Board of Education, {seat} election" + (f" ({party} primary)".replace("Dem", "Democratic").replace("Rep", "Republican") if party else "") + (" (runoff)" if previous else ""),
                     lang="en",
                     kind="official",
                     is_preferred=True,
@@ -217,7 +277,8 @@ def emit() -> Path:
                 ranked: list[tuple[int, object]] = []
                 for label, total in votes.items():
                     person = cs.key(f"{SOURCE}.person", f"{code}:{slug(label)}")
-                    if person in cs.minted:
+                    if person in cs.minted and person not in people:
+                        people.add(person)
                         cs.add("person", id=person)
                         cs.add("name", entity_id=person, text=label, lang="en", kind="official", is_preferred=True)
                     option = cs.key("us.option", f"{key}:{slug(label)}")
