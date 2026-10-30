@@ -300,7 +300,17 @@ export const live = {
           at: bucket.get(row.at) ?? row.at,
         }))
         .toSorted((a, b) => a.stamp.localeCompare(b.stamp));
-      const contests = [...new Set(listed.map((row) => row.contest))];
+      const settledOnly = await db.execute<{ id: string }>(sql`
+        select c.id from contest c
+        where c.election_id = ${found.id}::uuid
+          and exists (select from result_set rs where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted')
+      `);
+      const contests = [
+        ...new Set([
+          ...listed.map((row) => row.contest),
+          ...settledOnly.rows.map((row) => row.id),
+        ]),
+      ];
       const [summed, settled, choices, titles, slugs] = await Promise.all([
         totals(listed.map((row) => row.k)),
         certified(contests),
@@ -422,7 +432,9 @@ export const live = {
           url: source?.url ?? null,
         },
         frames,
-        races: races.filter((race) => race.series.length > 0),
+        races: races.filter(
+          (race) => race.series.length > 0 || race.certified != null,
+        ),
       };
     }),
   map: os

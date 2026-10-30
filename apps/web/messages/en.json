@@ -2350,6 +2350,7 @@
   "live_boroughs": "Borough presidents and district attorneys",
   "live_council": "City Council",
   "live_council_note": "{captured} of {total} districts had a captured update by this time.",
+  "live_council_note_final": "{captured} of {total} districts had an update captured on election night. Every district shows its certified count.",
   "live_council_legend_none": "No update yet",
   "live_council_legend_shade": "Darker tiles mean wider leads",
   "live_courts": "Judges",

@@ -566,10 +566,17 @@
         >
           <h2 id="live-council" class="heading">{m.live_council()}</h2>
           <p class="text-[0.8125rem] text-muted-foreground tabular-nums">
-            {m.live_council_note({
-              captured: String(captured),
-              total: String(council.length),
-            })}
+            {isFinal
+              ? m.live_council_note_final({
+                  captured: String(
+                    council.filter((race) => race.series.length > 0).length,
+                  ),
+                  total: String(council.length),
+                })
+              : m.live_council_note({
+                  captured: String(captured),
+                  total: String(council.length),
+                })}
           </p>
         </div>
         <ol
