@@ -335,7 +335,7 @@ def emit() -> Path:
                     targets[candidate] = same[0][0]
             for candidate, label, votes in tallies:
                 if candidate in targets:
-                    held = next(p[2] for p in people if p[0] == targets[candidate])
+                    held = next((p[2] for p in people if p[0] == targets[candidate]), votes)
                     if held != votes:
                         exact = False
                         notes.append(f"{label.title()}: {votes:,} here, {held:,} in the default set")
@@ -502,7 +502,9 @@ def emit() -> Path:
                         orient="row",
                     ).with_columns(
                         valid_from=pl.lit(day),
+                        valid_from_precision=pl.lit("day"),
                         valid_to=pl.lit(day + timedelta(days=1)),
+                        valid_to_precision=pl.lit("day"),
                         approximate=pl.lit(False),
                         partial=pl.lit(False),
                         method=pl.lit(None, dtype=pl.String),
