@@ -29,6 +29,15 @@ PDFS = {
     "Supreme Court- District 2, Position 3.pdf": date(2012, 11, 6),
     "Supreme Court- District 3, Position 3.pdf": date(2012, 11, 6),
 }
+SUMMARY_2016 = "Supreme Court Judge, District 1, Position 3.pdf"
+RECAP = "2016 GE Statewide Recap Report.pdf"
+CERTIFIED_2016 = {
+    (1, 3, "KENNY GRIFFIS"): 169084,
+    (1, 3, "JIM KITCHENS"): 198130,
+    (2, 2, "DAWN H. BEAM"): 232094,
+    (2, 2, "MICHAEL T. SHAREEF"): 113464,
+    (3, 2, "JIMMY MAXWELL"): 296384,
+}
 METHOD = (
     "County totals come from the Secretary of State's official statewide recapitulation reports and certified county summations. "
     "Mississippi elects each Supreme Court justice by district and position, so each contest covers only that district's counties."
@@ -40,7 +49,7 @@ def link(name: str) -> str:
 
 
 def fetch() -> None:
-    for name in [*CSVS, *PDFS]:
+    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016]:
         raw.store(
             SOURCE,
             link(name),
@@ -121,6 +130,60 @@ def parse() -> None:
                 sums[candidate] = sums.get(candidate, 0) + votes
         if printed != sums:
             raise ValueError(f"{name}: counties sum to {sums}, printed totals {printed}")
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, link(RECAP)).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.splitlines()
+    ordered = sorted(set(codes.values()))
+    counties: list[str] | None = None
+    done = 0
+    last: tuple[int, int, str] | None = None
+    seat: tuple[int, int] | None = None
+    sums: dict[tuple[int, int, str], int] = {}
+    printed_2016: dict[tuple[int, int, str], int] = {}
+    for index, line in enumerate(lines):
+        if line.strip().startswith("day of November 2016"):
+            seat = None
+            counties = None
+            continue
+        cells = line.split()
+        if last is not None and len(cells) == 1 and cells[0].isdigit():
+            printed_2016[last] = int(f"{printed_2016[last]}{cells[0]}")
+            last = None
+            continue
+        if cells:
+            last = None
+        if re.fullmatch(r"\s*\w+ District-Supreme Court District", line):
+            found = re.search(r"(\d)\(\w+\) Position (\d)", lines[index + 1])
+            seat = (int(found[1]), int(found[2]))
+            continue
+        if re.match(r"\s*(?:\d\(\w+\) Position|Statewide Election)", line):
+            continue
+        start = next((i for i, cell in enumerate(cells) if cell == "X" or cell.replace(",", "").isdigit()), None)
+        if start is None or not all(cell == "X" or cell.replace(",", "").isdigit() for cell in cells[start:]):
+            if re.search(r"\b(?:Position|Congressional|District|Court|Senate)\b", line) and not re.match(
+                r"\s*\d\(\w+\) Position", line
+            ):
+                seat = None
+            continue
+        if counties is None:
+            take = ordered[done : done + len(cells) - start]
+            counties = [*take, *(["TOTAL"] if len(take) < len(cells) - start else [])]
+            done = 0 if len(take) < len(cells) - start else done + len(take)
+        if seat is None:
+            continue
+        name = " ".join(cells[:start]).upper()
+        for county, cell in zip(counties, cells[start:], strict=True):
+            if county == "TOTAL" and cell != "X":
+                last = (*seat, name)
+                printed_2016[last] = int(cell.replace(",", ""))
+            elif cell != "X" and county != "TOTAL":
+                rows.append((date(2016, 11, 8), seat[0], seat[1], name, county, int(cell.replace(",", ""))))
+                sums[(*seat, name)] = sums.get((*seat, name), 0) + int(cell.replace(",", ""))
+    if sums != printed_2016 or any(sums[key] != total for key, total in CERTIFIED_2016.items()):
+        raise ValueError(f"2016 recap sums {sums} differ from the printed totals {printed_2016}")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
         rows, schema=["day", "district", "position", "candidate", "county", "votes"], orient="row"
@@ -168,7 +231,7 @@ def emit() -> Path:
                 url="https://www.sos.ms.gov/elections-voting/results",
                 license="Public record",
             )
-        for name in [*CSVS, *PDFS]:
+        for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016]:
             cs.artifact(raw.cached(SOURCE, link(name)), source)
         return {"MS": source}
 
