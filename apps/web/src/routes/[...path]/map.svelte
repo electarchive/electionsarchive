@@ -13,6 +13,7 @@
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
   import GlobeIcon from "@lucide/svelte/icons/globe";
+  import MapIcon from "@lucide/svelte/icons/map";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
@@ -30,6 +31,7 @@
   import { isHover, isTouch } from "#lib/explain.svelte.js";
   import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
+  import { SCHEMES, basemap } from "#lib/map/basemap.js";
   import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
   import { isNarrowLayout } from "#lib/narrow-layout.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -243,6 +245,8 @@
       keep({ shade: shading === shade ? null : String(shading) });
     }
   });
+  let isBasemap = $state(page.url.searchParams.get("basemap") !== "off");
+  const scheme = $derived(tiles.split(/[./]/u)[0] ?? "");
   const engine = new Engine(
     untrack(() => frame),
     (width, height) => {
@@ -1632,6 +1636,27 @@
     );
   }
 
+  let outline = $state<Array<Array<[number, number]>> | null>(
+    untrack(() => (own == null ? [] : null)),
+  );
+
+  $effect(() => {
+    if (isBasemap && own != null) {
+      void orpc.contests.outline.call({ k: own.k }).then(
+        (found) => {
+          outline = found;
+        },
+        () => {},
+      );
+    }
+  });
+
+  $effect(() => {
+    if (engine.gl != null) {
+      basemap(engine, scheme, isBasemap && outline != null, outline ?? []);
+    }
+  });
+
   $effect(() => {
     if (engine.isLoaded) {
       still = null;
@@ -2219,6 +2244,24 @@
       >
         <ScanIcon class="block-4 inline-4" />
       </button>
+      {#if SCHEMES.has(scheme)}
+        <button
+          type="button"
+          class={cn(
+            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10",
+            { "text-muted-foreground": !isBasemap },
+          )}
+          aria-label={m.map_basemap()}
+          aria-pressed={isBasemap}
+          title={m.map_basemap()}
+          onclick={() => {
+            isBasemap = !isBasemap;
+            keep({ basemap: isBasemap ? null : "off" });
+          }}
+        >
+          <MapIcon class="block-4 inline-4" />
+        </button>
+      {/if}
     </div>
     {#if segments.length > 0 || globe != null}
       <div
@@ -3049,6 +3092,9 @@
       {/each}
       {#if credited.length > 0}
         <p>{m.map_water_credit()}</p>
+      {/if}
+      {#if isBasemap && SCHEMES.has(scheme)}
+        <p>{m.map_basemap_credit()}</p>
       {/if}
     </div>
   {/if}

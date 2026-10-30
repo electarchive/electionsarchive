@@ -8883,6 +8883,51 @@ export const contests = {
         })
         .toReversed();
     }),
+  outline: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/places/{k}/outline",
+        summary:
+          "Get a place's outline, simplified and widened by a hair, as longitude and latitude on its polity's map plane: one outer ring per part, for setting the place apart from what lies around it",
+      }),
+    )
+    .input(
+      v.object({
+        k: v.pipe(
+          v.union([v.number(), v.string()]),
+          v.transform(Number),
+          v.integer(),
+        ),
+      }),
+    )
+    .output(v.array(v.array(v.tuple([v.number(), v.number()]))))
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        rings: Array<Array<[number, number]>> | null;
+      }>(sql`
+        select (
+          select json_agg((ST_AsGeoJSON(ST_ExteriorRing(e.geom), 6)::json)->'coordinates')
+          from ST_Dump(ST_ForcePolygonCW((
+            select ST_Union(ST_MakePolygon(ST_ExteriorRing(d.geom)))
+            from ST_Dump(ST_Transform(ST_SetSRID(ST_Simplify(
+              ST_Buffer(ST_SimplifyPreserveTopology(q.geom, q.t), q.t * 2, 'quad_segs=2'), q.t
+            ), 3857), 4326)) d
+          ))) e
+        ) as rings
+        from (
+          select p.geom, least(sqrt(ST_Area(p.geom)) / 2000, 250) as t from (
+            select ${plane("g.geom", "a.scheme_code")} as geom from area a
+            cross join lateral (
+              select geom from area_geometry where area_id = a.id
+              order by upper(valid) desc nulls first limit 1
+            ) g
+            where a.k = ${input.k}
+          ) p
+        ) q
+      `);
+      return found.rows[0]?.rings ?? [];
+    }),
   boundaries: os
     .meta(
       openapi({

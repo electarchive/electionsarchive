@@ -9,6 +9,7 @@ from collections import Counter
 from pathlib import Path
 
 from ea import (
+    basemap,
     cache,
     checks,
     coverage,
@@ -53,6 +54,10 @@ def main() -> None:
         nargs="?",
         help="scheme_code prefix, or one set as scheme/vintage, such as us.precinct/2024; omit to build every set",
     )
+    commands.add_parser("basemap", help="build a polity's planar basemap from the latest Protomaps build").add_argument(
+        "scheme", choices=sorted(basemap.COUNTRIES), help="polity scheme, such as us"
+    )
+    commands.add_parser("glyphs", help="build the basemap label glyphs the app serves")
     commands.add_parser("search", help="rebuild the search index from names and slugs")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("mosaics", help="rebuild the precomputed national map mosaics the app serves")
@@ -146,6 +151,10 @@ def main() -> None:
             print(tiles.build(args.scheme))
         case "rasters":
             print(rasters.build(args.scheme))
+        case "basemap":
+            print(basemap.build(args.scheme))
+        case "glyphs":
+            print(basemap.glyphs())
         case "search":
             print(search.build())
         case "parties":

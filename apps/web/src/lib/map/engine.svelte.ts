@@ -6,7 +6,7 @@ import { isHover, isTouch } from "#lib/explain.svelte.js";
 
 export type Box = { west: number; south: number; east: number; north: number };
 type Padding = { top: number; right: number; bottom: number; left: number };
-type Slot = "fills" | "lines" | "points" | "focus";
+type Slot = "fills" | "etch" | "lines" | "points" | "labels" | "focus";
 type Paint =
   Parameters<Maplibre.Map["setPaintProperty"]> extends [
     string,
@@ -33,7 +33,14 @@ type Options = {
   onMoveEnd?: () => void;
 };
 
-const SLOTS: Array<Slot> = ["fills", "lines", "points", "focus"];
+const SLOTS: Array<Slot> = [
+  "fills",
+  "etch",
+  "lines",
+  "points",
+  "labels",
+  "focus",
+];
 const CSS = /^(var|color-mix)\(/u;
 const SIZE = 512;
 const FIT = 13;
@@ -363,6 +370,7 @@ export class Engine {
         container: host,
         style: {
           version: 8,
+          glyphs: `${location.origin}/glyphs/{fontstack}/{range}.pbf`,
           sources: {},
           layers: [
             {
@@ -792,7 +800,7 @@ export class Engine {
           const text = String(
             (meta as { attribution?: unknown } | null)?.attribution ?? "",
           )
-            .replace(/Coastlines © OpenStreetMap[^\n]*/u, "")
+            .replace(/(?:Coastlines|Map data) © OpenStreetMap[^\n]*/u, "")
             .trim();
           const credits = new Set([
             ...this.credits,
@@ -818,19 +826,30 @@ export class Engine {
     }>,
     group = "",
   ) {
+    return this.shapes(
+      id,
+      {
+        type: "FeatureCollection",
+        features: places.map((place) => ({
+          type: "Feature",
+          ...(place.k == null ? {} : { id: place.k }),
+          properties: place.properties ?? {},
+          geometry: { type: "Point", coordinates: place.at },
+        })),
+      },
+      group,
+    );
+  }
+
+  shapes(
+    id: string,
+    data: Maplibre.GeoJSONSourceSpecification["data"],
+    group = "",
+  ) {
     const gl = this.gl;
     if (gl == null) {
       return id;
     }
-    const data: Maplibre.GeoJSONSourceSpecification["data"] = {
-      type: "FeatureCollection",
-      features: places.map((place) => ({
-        type: "Feature",
-        ...(place.k == null ? {} : { id: place.k }),
-        properties: place.properties ?? {},
-        geometry: { type: "Point", coordinates: place.at },
-      })),
-    };
     const source = gl.getSource(id);
     if (source?.type === "geojson") {
       void (source as Maplibre.GeoJSONSource).setData(data);

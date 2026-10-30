@@ -28,6 +28,7 @@
   --map-low: #ffffff;
   --map-rise: #4a2a87;
   --map-fall: #b35806;
+  --map-road: #15171a;
   --turnout-low: #d5ece8;
   --turnout-high: #0b4f5c;
   --popover: #ffffff;
@@ -64,6 +65,7 @@
   --map-low: #c4c8ce;
   --map-rise: #3d1f78;
   --map-fall: #9c4a04;
+  --map-road: #000000;
   --turnout-low: #cfe6e2;
   --turnout-high: #13707c;
   --popover: #1a1d20;

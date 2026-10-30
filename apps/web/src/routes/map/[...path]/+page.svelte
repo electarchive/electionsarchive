@@ -9,6 +9,7 @@
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import MapIcon from "@lucide/svelte/icons/map";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
@@ -32,6 +33,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import { SCHEMES, basemap } from "#lib/map/basemap.js";
   import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
   import Histogram from "./histogram.svelte";
 
@@ -767,6 +769,8 @@
         };
   };
 
+  let isBasemap = $state(page.url.searchParams.get("basemap") !== "off");
+  const scheme = $derived((sheet.outline ?? "").split(/[./]/u)[0] ?? "");
   const engine = new Engine(
     untrack(() => sheet.frame) ?? {
       west: -20,
@@ -1054,6 +1058,27 @@
       { group: "sheet" },
     );
   }
+
+  let outline = $state<Array<Array<[number, number]>> | null>(null);
+
+  $effect(() => {
+    const k = sheet.trail.length > 1 ? sheet.scope.k : null;
+    outline = k == null ? [] : null;
+    if (isBasemap && k != null) {
+      void orpc.contests.outline.call({ k }).then(
+        (found) => {
+          outline = found;
+        },
+        () => {},
+      );
+    }
+  });
+
+  $effect(() => {
+    if (engine.gl != null) {
+      basemap(engine, scheme, isBasemap && outline != null, outline ?? []);
+    }
+  });
 
   function build(next: Sheet) {
     engine.drop("sheet");
@@ -2567,6 +2592,22 @@
         onclick={() => engine.reset()}
         ><ScanIcon class="block-4 inline-4" /></button
       >
+      {#if SCHEMES.has(scheme)}
+        <button
+          type="button"
+          class={cn(
+            "grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary",
+            { "text-muted-foreground": !isBasemap },
+          )}
+          aria-label={m.map_basemap()}
+          aria-pressed={isBasemap}
+          title={m.map_basemap()}
+          onclick={() => {
+            isBasemap = !isBasemap;
+            keep({ basemap: isBasemap ? null : "off" });
+          }}><MapIcon class="block-4 inline-4" /></button
+        >
+      {/if}
     </div>
     {#if engine.credits.length > 0}
       <div
@@ -2589,6 +2630,9 @@
               })}
         </p>
         <p class="truncate">{m.map_water_credit()}</p>
+        {#if isBasemap && SCHEMES.has(scheme)}
+          <p class="truncate">{m.map_basemap_credit()}</p>
+        {/if}
       </div>
     {/if}
   </main>
