@@ -46,7 +46,7 @@ FILES = {
     "IA": ("ia", "2026-06-02", ["detailxlsx.zip"]),
     "MT": ("mt", "2026-06-02", ["Statewide Results.xlsx"]),
     "TX": ("tx", "2026-03-03", ["republican/CountyByCountyCanvassReport.pdf", "democratic/CountyByCountyCanvassReport.pdf"]),
-    "CA": ("ca", "2026-06-02", ["19-gov", "76-us-rep"]),
+    "CA": ("ca", "2026-06-02", ["19-gov", "76-us-rep", "46-lt-gov", "55-sos", "58-sco", "61-treasurer", "64-ag", "67-ic"]),
     "MI": ("mi", "2026-08-04", ["2026STATE_PRIMARY_MI_CENR_BY_COUNTY.txt"]),
     "PA": ("pa", "2026-05-19", ["Official_10242026022517AM.CSV"]),
     "OH": ("oh", "2026-05-05", [f"summary-level-official-results-2026-primary---{party}.xlsx" for party in ("democratic", "republican", "libertarian")]),
@@ -122,7 +122,15 @@ RCV_WINNERS = {
     ("ME", "governor", "", "republican"): ("robert-b-charles", "Robert B. Charles won the final round of the ranked-choice count, 59,873 votes to 39,499 for Benjamin T. Midgley, after six eliminations."),
     ("ME", "house", "2", "democratic"): ("matthew-g-dunlap", "Matthew G. Dunlap won the final round of the ranked-choice count, 35,924 votes to 32,555 for Joseph M. Baldacci, after two eliminations."),
 }
-OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor"}
+EXEC = {
+    "46-lt-gov": ("Lieutenant Governor", "lieutenant-governor", "lieutenant gubernatorial"),
+    "55-sos": ("Secretary of State", "secretary-of-state", "secretary of state"),
+    "58-sco": ("Controller", "controller", "controller"),
+    "61-treasurer": ("Treasurer", "treasurer", "treasurer"),
+    "64-ag": ("Attorney General", "attorney-general", "attorney general"),
+    "67-ic": ("Insurance Commissioner", "insurance-commissioner", "insurance commissioner"),
+}
+OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor", **{office: key for office, key, _ in EXEC.values()}}
 TOP_TWO = {"CA", "WA"}
 AT_LARGE = {"SD", "WY", "ND", "VT", "DE"}
 REDISTRICTED = {"TX", "CA", "NC", "UT", "MO"}
@@ -738,10 +746,10 @@ def rows(code: str, path: Path, file: str = ""):
                 for index, candidate, party in header:
                     yield {
                         "county": label,
-                        "office": "U.S. House" if district else "Governor",
+                        "office": "U.S. House" if district else EXEC[file][0] if file in EXEC else "Governor",
                         "district": district,
                         "party": CA_PARTIES.get(party.removesuffix(" (W/I)"), party.removesuffix(" (W/I)")),
-                        "candidate": candidate,
+                        "candidate": candidate.removesuffix("*"),
                         "write_in": "Y" if party.endswith("(W/I)") else "",
                         "votes": cells[index] or "",
                     }
@@ -1214,7 +1222,8 @@ def emit() -> Path:
                    from contest co join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
                    where x.value ~ '^(2026-11-03|2024-11-05):[A-Z]{2}:house:[0-9]+$'
                       or x.value ~ '^(2026-11-03|2020-11-03):[A-Z]{2}:senate$'
-                      or x.value ~ '^(2026-11-03|2022-11-08):[A-Z]{2}:governor$'"""
+                      or x.value ~ ('^(2026-11-03|2022-11-08):[A-Z]{2}:(governor|' || %s || ')$')""",
+            ["|".join(key for _, key, _ in EXEC.values())],
             ).fetchall()
         }
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "irv", "two_round", "two_round_35", "two_round_30", "top_two")}
@@ -1236,8 +1245,8 @@ def emit() -> Path:
                from candidacy cy join contest_option o on o.id = cy.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                join name n on n.entity_id = cy.person_id and n.is_preferred
-               where x.value ~ ('^20(1[4-9]|2[0-9])-[0-9-]+:(' || %s || '):(house|senate|governor)')""",
-            ['|'.join(FILES)],
+               where x.value ~ ('^20(1[4-9]|2[0-9])-[0-9-]+:(' || %s || '):(house|senate|governor|' || %s || ')')""",
+            ['|'.join(FILES), '|'.join(key for _, key, _ in EXEC.values())],
         ).fetchall():
             pool[(state, slug(text))].add(person)
         persons: dict[tuple[str, str], UUID] = {}
@@ -1357,7 +1366,7 @@ def emit() -> Path:
             for file in files:
                 for row in rows(code, raw.cached(SOURCE, url(code, file)).path, file):
                     chamber = OFFICES.get(row["office"])
-                    if chamber is None or not row["votes"].isdigit() or row["party"] not in PARTIES:
+                    if chamber is None or not row["votes"].isdigit() or row["party"] not in PARTIES or state != "CA" and chamber not in ("house", "senate", "governor"):
                         continue
                     scope = PARTIES[row["party"]][0]
                     if scope == "" and state not in TOP_TWO:
@@ -1398,16 +1407,11 @@ def emit() -> Path:
                 key_tail = chamber + (f":{district}" if district else "") + (f":{scope}" if scope else "")
                 contest_key = f"{day}:{state}:{key_tail}"
                 contest = cs.key("us.contest", contest_key)
-                template_key = {
-                    "house": f"2026-11-03:{state}:house:{district}",
-                    "senate": f"2026-11-03:{state}:senate",
-                    "governor": f"2026-11-03:{state}:governor",
-                }[chamber]
+                template_key = f"2026-11-03:{state}:{chamber}" + (f":{district}" if chamber == "house" else "")
                 fallback = {
                     "house": f"2024-11-05:{state}:house:{district}",
                     "senate": f"2020-11-03:{state}:senate",
-                    "governor": f"2022-11-08:{state}:governor",
-                }[chamber]
+                }.get(chamber, f"2022-11-08:{state}:{chamber}")
                 shapeless = template_key not in templates
                 kind, office, body, area, seat, plan, magnitude, term, result_kind = templates[
                     fallback if shapeless else template_key
@@ -1425,7 +1429,8 @@ def emit() -> Path:
                 elif chamber == "senate":
                     title_text = f"2026 U.S. Senate {scope_label + ' ' if scope else ''}{round_word} in {state_name}"
                 else:
-                    title_text = f"2026 {state_name} gubernatorial " + (
+                    adjective = next((phrase for _, key, phrase in EXEC.values() if key == chamber), "gubernatorial")
+                    title_text = f"2026 {state_name} {adjective} " + (
                         f"{scope_label} {round_word}" if scope else "top-two primary"
                     )
                 cs.add(
