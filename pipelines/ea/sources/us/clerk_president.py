@@ -59,6 +59,9 @@ VERIFIED = {
     (1980, "MI"),
     (1980, "NE"),
 }
+UNEQUAL = {
+    (1924, "NY", "robertlafollette"): ("Independent Progressive", "Socialist (La Follette)"),
+}
 ALIASES = {
     "democrat": "democratic",
     "prohibitionist": "prohibition",
@@ -83,6 +86,12 @@ def norm(text: str | None) -> str:
     text = re.sub(r"(?i)\b(party|electors?|presidential|the)\b", "", text or "").lower()
     text = re.sub(r"[^a-z]", "", text)
     return ALIASES.get(text, text)
+
+
+def line_names(label: str) -> set[str]:
+    inner = re.findall(r"\(([^()]*)\)", label)
+    head = re.sub(r"\(.*?\)", "", label).split(":")[0]
+    return {norm(head), *(norm(part) for text in inner for part in text.split("/"))} - {"", "writein"}
 
 
 def emit() -> Path:
@@ -193,21 +202,20 @@ def emit() -> Path:
                     completeness=completeness,
                 )
                 continue
-            if any(row["kind"] == "subtotal" for row in rows):
-                skipped.append(f"{tag}: subtotal lines (fusion)")
-                continue
             tickets: dict[UUID, tuple[set[str], Decimal]] = {}
+            heads: dict[UUID, str] = {}
             for option, label, okind, party, unit, measure, value in options[rs]:
                 if okind == "ticket":
                     match = re.search(r"\(([^()]*)\)\s*$", label or "")
                     tickets[option] = ({norm(part) for part in (match[1] if match else label or "").split("/")}, value)
+                    heads[option] = norm(re.sub(r"\(.*\)", "", label or ""))
             others = next((o for o, _, k, _, _, _, _ in options[rs] if k == "others"), None)
             unit = next(u for _, _, _, _, u, _, _ in options[rs])
             taken: list[dict] = []
             scatter_rows: list[dict] = []
             for row in rows:
                 label = (row["label"] or "").strip()
-                if row["votes"] is None or row["kind"] in ("total", "blank"):
+                if row["votes"] is None or row["kind"] in ("total", "blank", "subtotal"):
                     continue
                 if re.search(r"(?i)\b(blank|void|defective|spoiled|rejected)\b", label):
                     continue
@@ -220,14 +228,38 @@ def emit() -> Path:
             if any(not norm(row["label"]) for row in taken):
                 skipped.append(f"{tag}: a line with no name")
                 continue
-            matched: dict[int, UUID] = {}
-            names = []
-            for row in taken:
-                inner = re.findall(r"\(([^()]*)\)", row["label"])
-                head = re.sub(r"\(.*?\)", "", row["label"]).split(":")[0]
-                names.append(
-                    {norm(head), *(norm(part) for text in inner for part in text.split("/"))} - {"", "writein"}
+            merges: list[str] = []
+            for option, (tokens, value) in tickets.items():
+                if not value or any(row["votes"] == value for row in taken):
+                    continue
+                spare = [i for i, row in enumerate(taken) if row["votes"] not in {v for _, v in tickets.values()}]
+                found = [
+                    group
+                    for size in (2, 3)
+                    for group in itertools.combinations(spare, size)
+                    if sum(taken[i]["votes"] for i in group) == value
+                    and any((tokens | {heads[option]}) & line_names(taken[i]["label"]) for i in group)
+                ]
+                if not found and (year, state, heads[option]) in UNEQUAL:
+                    found = [
+                        tuple(i for i, row in enumerate(taken) if row["label"] in UNEQUAL[(year, state, heads[option])])
+                    ]
+                if len(found) != 1:
+                    continue
+                group = found[0]
+                total_lines = sum(taken[i]["votes"] for i in group)
+                merges.append(
+                    " and ".join(f"{taken[i]['votes']:,} on the {taken[i]['label']} line" for i in group)
+                    + (
+                        f" (Wikipedia's figure is {value:,})"
+                        if total_lines != value
+                        else ""
+                    )
                 )
+                taken[group[0]] = taken[group[0]] | {"votes": total_lines}
+                taken = [row for i, row in enumerate(taken) if i not in group[1:]]
+            matched: dict[int, UUID] = {}
+            names = [line_names(row["label"]) for row in taken]
             for option, (tokens, value) in tickets.items():
                 same = [i for i, row in enumerate(taken) if i not in matched and row["votes"] == value]
                 if len(same) > 1:
@@ -351,6 +383,15 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            if merges:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md="The book prints fusion votes on separate lines. A ticket's total here is the sum of "
+                    + "; ".join(merges)
+                    + ", which equals the figure in Wikipedia's results-by-state table.",
+                )
             if (year, state) in TIED:
                 cs.add(
                     "note",
