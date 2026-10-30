@@ -377,6 +377,19 @@
     font-size: 0.6875rem;
     line-height: 1rem;
   }
+  [data-slot="button"] kbd {
+    justify-content: center;
+    min-inline-size: 1.5em;
+    border-color: color-mix(in oklab, currentColor 35%, transparent);
+    border-block-end-width: 1px;
+    padding-block: 0.125em;
+    padding-inline: 0.3em;
+    background: none;
+    color: inherit;
+    font-size: 0.8em;
+    font-weight: 600;
+    line-height: 1;
+  }
 }
 
 html:has([data-embed]),
