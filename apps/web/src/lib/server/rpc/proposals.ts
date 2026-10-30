@@ -4,7 +4,6 @@ import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Checks, Diff, ProposalState } from "#lib/contrib.js";
-import type { keyOwner } from "#lib/server/rpc/keyed.js";
 import { db } from "#lib/server/db/index.js";
 import { Number_, reader, run, Text, writer } from "#lib/server/rpc/keyed.js";
 
@@ -44,7 +43,12 @@ const Agent = {
   agent_model: v.optional(Text(100)),
 };
 
-type Owner = NonNullable<Awaited<ReturnType<typeof keyOwner>>>;
+export type Owner = {
+  userId: string;
+  keyId: string | null;
+  agentName: string | null;
+  agentModel: string | null;
+};
 
 const payloadOf = (input: {
   summary: string;
@@ -120,7 +124,7 @@ async function owned(number: number, owner: Owner) {
   return found;
 }
 
-async function view(number: number, owner: Owner | null) {
+export async function view(number: number, owner: Owner | null) {
   const { rows } = await db.execute<{
     id: string;
     number: number;
@@ -198,6 +202,63 @@ async function view(number: number, owner: Owner | null) {
           ({ error: _error, checks: _checks, diff: _diff, ...job }) => job,
         ),
   };
+}
+
+export async function saveDraft(
+  number: number,
+  owner: Owner,
+  payload: { summary: string },
+  polity: string | null = null,
+) {
+  const found = await owned(number, owner);
+  if (found.state !== "draft" || found.head != null) {
+    error(409, "Only an unsubmitted draft can be saved.");
+  }
+  const draft = JSON.stringify(payload);
+  await db.execute(sql`
+    update proposal p set
+      draft = case when ${draft}::jsonb ? 'evidence' then jsonb_set(${draft}::jsonb, '{evidence}', coalesce((
+        select jsonb_object_agg(e.key, case
+          when o.value ->> 'url' = e.value ->> 'url' and o.value ? 'capture' and not e.value ? 'capture'
+          then e.value || jsonb_build_object('capture', o.value -> 'capture') else e.value end)
+        from jsonb_each(${draft}::jsonb -> 'evidence') e
+        left join jsonb_each(coalesce(p.draft -> 'evidence', '{}')) o on o.key = e.key
+      ), '{}')) else ${draft}::jsonb end,
+      title = coalesce(nullif(${payload.summary}, ''), title),
+      polity_id = coalesce(${polity}::uuid, polity_id), updated_at = now()
+    where id = ${found.id}
+  `);
+}
+
+export async function checkDraft(number: number, owner: Owner) {
+  const found = await owned(number, owner);
+  if (found.state !== "draft") {
+    error(
+      409,
+      "Only a draft can be checked; a revision is checked when it is submitted.",
+    );
+  }
+  if (found.busy) {
+    error(409, "A job on this proposal is still running.");
+  }
+  await queueJob(found.id, "check", owner.userId, null);
+  return view(number, owner);
+}
+
+export async function submitDraft(number: number, owner: Owner) {
+  const found = await owned(number, owner);
+  if (found.state !== "draft" || found.head != null) {
+    error(409, "This proposal is already submitted; send a revision instead.");
+  }
+  if (found.busy) {
+    error(409, "A job on this proposal is still running.");
+  }
+  await db.execute(sql`
+    insert into proposal_revision (proposal_id, n, payload)
+    select id, 1, draft from proposal where id = ${found.id}
+  `);
+  await queueJob(found.id, "submit", owner.userId, 1);
+  return view(number, owner);
 }
 
 const Filters = v.object({
@@ -320,20 +381,7 @@ export const proposals = {
     )
     .input(v.object({ number: Number_ }))
     .handler(async ({ input, context: { owner } }) =>
-      run(async () => {
-        const found = await owned(Number(input.number), owner);
-        if (found.state !== "draft") {
-          error(
-            409,
-            "Only a draft can be checked; a revision is checked when it is submitted.",
-          );
-        }
-        if (found.busy) {
-          error(409, "A job on this proposal is still running.");
-        }
-        await queueJob(found.id, "check", owner.userId, null);
-        return view(Number(input.number), owner);
-      }),
+      run(async () => checkDraft(Number(input.number), owner)),
     ),
   submit: writer
     .meta(
@@ -346,24 +394,7 @@ export const proposals = {
     )
     .input(v.object({ number: Number_ }))
     .handler(async ({ input, context: { owner } }) =>
-      run(async () => {
-        const found = await owned(Number(input.number), owner);
-        if (found.state !== "draft" || found.head != null) {
-          error(
-            409,
-            "This proposal is already submitted; send a revision instead.",
-          );
-        }
-        if (found.busy) {
-          error(409, "A job on this proposal is still running.");
-        }
-        await db.execute(sql`
-          insert into proposal_revision (proposal_id, n, payload)
-          select id, 1, draft from proposal where id = ${found.id}
-        `);
-        await queueJob(found.id, "submit", owner.userId, 1);
-        return view(Number(input.number), owner);
-      }),
+      run(async () => submitDraft(Number(input.number), owner)),
     ),
   revise: writer
     .meta(
@@ -385,11 +416,7 @@ export const proposals = {
         }
         const payload = payloadOf(input);
         if (found.state === "draft" && found.head == null) {
-          await db.execute(sql`
-            update proposal set draft = ${JSON.stringify(payload)}::jsonb, title = ${input.summary},
-                   polity_id = coalesce(${input.polity ?? null}::uuid, polity_id), updated_at = now()
-            where id = ${found.id}
-          `);
+          await saveDraft(Number(number), owner, payload, input.polity);
           await queueJob(found.id, "check", owner.userId, null);
           return view(Number(number), owner);
         }
