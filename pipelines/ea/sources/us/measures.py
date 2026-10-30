@@ -21,6 +21,7 @@ PARSED = DATA / "parsed" / SOURCE
 LAST = 2026
 STATEWIDE = {"CO": 83, "CT": 1, "ID": 19, "NH": 1, "NM": 4624, "NY": 1, "VT": 1, "VA": 1}
 MA_LIST = f"https://electionstats.state.ma.us/ballot_questions/search/year_from:1800/year_to:{LAST}"
+MA_LISTS = (MA_LIST, MA_LIST.replace("year_from:1800", "year_from:1983").replace(f"year_to:{LAST}", "year_to:2001"))
 MA_DOWNLOAD = "https://electionstats.state.ma.us/ballot_questions/download/{id}/precincts_include:0/"
 MA_ROW = re.compile(
     r'<tr id="bq-id-(\d+)"(?:(?!bq-id-).)*?<td class="year first">(\d{4})</td>\s*<td class="number">([^<]*)</td>'
@@ -116,11 +117,19 @@ def election_day(day: date) -> date:
     return date(day.year, 11, 2) + timedelta(days=(1 - date(day.year, 11, 2).weekday()) % 7)
 
 
+def ma_rows(fetch_listings: bool = False) -> list[tuple[str, ...]]:
+    rows: dict[str, tuple[str, ...]] = {}
+    for listing in MA_LISTS:
+        artifact = raw.fetch(SOURCE, listing, suffix=".html") if fetch_listings else raw.cached(SOURCE, listing)
+        for row in MA_ROW.findall(artifact.path.read_text()):
+            rows.setdefault(row[0], row)
+    return list(rows.values())
+
+
 def fetch() -> None:
     for state, district in STATEWIDE.items():
         raw.fetch(SOURCE, url(elstats.TENANTS[state][0], district), suffix=".csv")
-    listing = raw.fetch(SOURCE, MA_LIST, suffix=".html").path.read_text()
-    for id, *_ in MA_ROW.findall(listing):
+    for id, *_ in ma_rows(fetch_listings=True):
         raw.fetch(SOURCE, MA_DOWNLOAD.format(id=id), suffix=".csv")
 
 
@@ -207,9 +216,8 @@ def parse() -> None:
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
             )
         )
-    listing = raw.cached(SOURCE, MA_LIST).path.read_text()
     seen: set[str] = set()
-    for id, year, number, kind, winner in MA_ROW.findall(listing):
+    for id, year, number, kind, winner in ma_rows():
         artifact = raw.cached(SOURCE, MA_DOWNLOAD.format(id=id))
         if artifact.sha256 in seen:
             continue
@@ -312,10 +320,10 @@ def emit() -> Path:
             url="https://electionstats.state.ma.us",
             license="Public record",
         )
-        listing = raw.cached(SOURCE, MA_LIST)
-        cs.artifact(listing, sources["MA"])
+        for listing in MA_LISTS:
+            cs.artifact(raw.cached(SOURCE, listing), sources["MA"])
         seen: set[str] = set()
-        for id, *_ in MA_ROW.findall(listing.path.read_text()):
+        for id, *_ in ma_rows():
             artifact = raw.cached(SOURCE, MA_DOWNLOAD.format(id=id))
             if artifact.sha256 not in seen:
                 seen.add(artifact.sha256)
