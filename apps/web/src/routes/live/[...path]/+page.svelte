@@ -223,6 +223,46 @@
   const captured = $derived(
     council.filter((race) => states.get(race.id)?.votes != null).length,
   );
+  const tiles = $derived(
+    council.map((race) => {
+      let total = 0;
+      let best = 0;
+      let index = 0;
+      for (const [position, value] of (
+        states.get(race.id)?.votes ?? []
+      ).entries()) {
+        total += value;
+        if (value > best) {
+          best = value;
+          index = position;
+        }
+      }
+      const leader = total === 0 ? null : (race.options[index] ?? null);
+      return {
+        race,
+        leader,
+        share: total === 0 ? null : best / total,
+        tone:
+          leader == null
+            ? null
+            : (tones.get(race.id)?.[index] ?? "var(--foreground)"),
+      };
+    }),
+  );
+  const seats = $derived(
+    [
+      ...Map.groupBy(
+        tiles.filter((tile) => tile.leader != null && tile.tone != null),
+        (tile) => tile.leader?.party ?? tile.leader?.name ?? "",
+      ),
+    ]
+      .map(([name, group]) => ({
+        name,
+        tone: group[0]?.tone ?? "",
+        count: group.length,
+      }))
+      .toSorted((a, b) => b.count - a.count),
+  );
 
   const day = $derived(
     new Intl.DateTimeFormat(getLocale(), {
@@ -336,7 +376,7 @@
     {#if lead != null && leadState != null}
       <section
         aria-labelledby="live-lead"
-        class="grid gap-x-10 gap-y-6 bg-card px-3.5 pbs-6 pbe-7 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]"
+        class="grid gap-x-10 gap-y-6 bg-card px-3.5 pbs-6 pbe-7 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-[auto_1fr]"
       >
         <div class="grid content-start gap-5">
           <div class="grid gap-2">
@@ -418,7 +458,7 @@
             {/if}
           </div>
         </div>
-        <div class="grid content-start gap-2">
+        <div class="grid content-start gap-2 lg:row-span-2 lg:content-stretch">
           {#if map != null}
             <Choropleth
               contest={lead.id}
@@ -429,12 +469,41 @@
             />
           {:else}
             <div
-              class="grid aspect-[4/3.4] place-items-center rounded-sm bg-muted/40 text-sm text-muted-foreground ring-1 ring-border"
+              class="grid aspect-[4/3.4] place-items-center rounded-sm bg-muted/40 text-sm text-muted-foreground ring-1 ring-border lg:aspect-auto lg:min-block-120"
             >
               {m.live_map_waiting()}
             </div>
           {/if}
         </div>
+        {#if executive.length > 0}
+          <div
+            class="grid content-start gap-4 border-bs border-border pbs-5 lg:col-start-1"
+          >
+            <h2 id="live-citywide" class="heading">{m.live_citywide()}</h2>
+            <ul class="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              {#each executive as race (race.id)}
+                {const state = $derived(states.get(race.id))}
+                <li class="grid content-start gap-1">
+                  <Board
+                    {race}
+                    tones={tones.get(race.id) ?? []}
+                    votes={state?.votes ?? null}
+                    previous={state?.previous ?? null}
+                    isCertified={state?.isCertified ?? false}
+                    isFresh={state?.isFresh ?? false}
+                    ghost={hasFinal}
+                    variant="compact"
+                  />
+                  {#if race.outside}
+                    <p class="text-xs text-muted-foreground">
+                      {m.live_city_only()}
+                    </p>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
       </section>
     {/if}
 
@@ -481,7 +550,9 @@
       {/if}
     {/snippet}
 
-    {@render boards(m.live_citywide(), "live-citywide", executive, "compact")}
+    {#if lead == null || leadState == null}
+      {@render boards(m.live_citywide(), "live-citywide", executive, "compact")}
+    {/if}
     {@render boards(m.live_measures(), "live-measures", measures, "measure")}
     {@render boards(m.live_boroughs(), "live-boroughs", local, "compact")}
 
@@ -504,53 +575,60 @@
         <ol
           class="grid grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] gap-1"
         >
-          {#each council as race (race.id)}
-            {const state = $derived(states.get(race.id))}
-            {const share = $derived.by(() => {
-              const votes = state?.votes;
-              if (votes == null) {
-                return null;
-              }
-              let total = 0;
-              let best = 0;
-              let index = 0;
-              for (const [position, value] of votes.entries()) {
-                total += value;
-                if (value > best) {
-                  best = value;
-                  index = position;
-                }
-              }
-              return total === 0 ? null : { index, share: best / total };
-            })}
-            {const tone = $derived(
-              share == null
-                ? null
-                : (tones.get(race.id)?.[share.index] ?? "var(--foreground)"),
-            )}
+          {#each tiles as tile (tile.race.id)}
             <li>
               <a
-                href={resolve(`/${race.path}`)}
-                title={share == null
-                  ? `${race.name}: ${m.live_no_update()}`
-                  : `${race.name}: ${race.options[share.index]?.name ?? ""} ${percent(share.share)}`}
+                href={resolve(`/${tile.race.path}`)}
+                title={tile.leader == null || tile.share == null
+                  ? `${tile.race.name}: ${m.live_no_update()}`
+                  : `${tile.race.name}: ${tile.leader.name} ${percent(tile.share)}`}
                 class={cn(
                   "grid aspect-square place-items-center rounded-xs font-figures text-[0.8125rem] font-semibold tabular-nums transition-colors duration-500 motion-reduce:transition-none",
                   {
-                    "text-white": tone != null,
+                    "text-white": tile.tone != null,
                     "bg-[repeating-linear-gradient(135deg,var(--muted)_0_3px,var(--card)_3px_6px)] text-muted-foreground ring-1 ring-border ring-inset":
-                      tone == null,
+                      tile.tone == null,
                   },
                 )}
-                style:background-color={tone == null
+                style:background-color={tile.tone == null
                   ? undefined
-                  : `color-mix(in oklab, ${tone} ${Math.round(45 + 55 * Math.min(((share?.share ?? 0.5) - 0.5) / 0.4, 1))}%, var(--foreground))`}
+                  : `color-mix(in oklab, ${tile.tone} ${Math.round(45 + 55 * Math.min(((tile.share ?? 0.5) - 0.5) / 0.4, 1))}%, var(--foreground))`}
               >
-                {race.path.split("-").at(-1)}
+                {tile.race.path.split("-").at(-1)}
               </a>
             </li>
           {/each}
         </ol>
+        <ul
+          class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.8125rem] text-muted-foreground"
+        >
+          {#each seats as seat (seat.name)}
+            <li class="flex items-center gap-1.5">
+              <span
+                class="rounded-xs block-3 inline-3"
+                style:background-color={seat.tone}
+                aria-hidden="true"
+              ></span>
+              <span class="text-foreground">{seat.name}</span>
+              <span
+                class="font-figures font-semibold text-foreground tabular-nums"
+                >{seat.count}</span
+              >
+            </li>
+          {/each}
+          {#if captured < council.length || seats.length === 0}
+            <li class="flex items-center gap-1.5">
+              <span
+                class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted)_0_3px,var(--card)_3px_6px)] ring-1 ring-border block-3 inline-3 ring-inset"
+                aria-hidden="true"
+              ></span>
+              {m.live_council_legend_none()}
+            </li>
+          {/if}
+          {#if seats.length > 0}
+            <li>{m.live_council_legend_shade()}</li>
+          {/if}
+        </ul>
       </section>
     {/if}
 

@@ -234,6 +234,10 @@
               style:width="{row.share * 100}%"
               style:background-color={row.tone}
             ></div>
+            <div
+              class="absolute inset-s-1/2 -inset-bs-0.5 -inset-be-0.5 bg-foreground/25 inline-px"
+              aria-hidden="true"
+            ></div>
             {#if ghost && row.final != null && !isCertified}
               <div
                 class="absolute -inset-bs-1 -inset-be-1 -translate-x-1/2 bg-foreground inline-0.5"

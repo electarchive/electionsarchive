@@ -190,14 +190,14 @@
 
 <figure
   class={cn(
-    "grid gap-2 transition-opacity duration-300 motion-reduce:transition-none",
+    "relative grid gap-2 transition-opacity duration-300 motion-reduce:transition-none",
     { "opacity-60": isLoading && sheet != null },
   )}
   aria-busy={isLoading}
 >
   <div
     class={cn(
-      "relative aspect-[1/1.05] overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full sm:aspect-[4/3.4]",
+      "relative aspect-[1/1.05] overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full sm:aspect-[4/3.4] lg:aspect-auto lg:min-block-120",
       {
         "animate-pulse bg-muted motion-reduce:animate-none":
           (sheet == null && isLoading) || (sheet != null && !engine.isLoaded),
@@ -250,7 +250,7 @@
     {/if}
   </div>
   <figcaption
-    class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-muted-foreground"
+    class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.8125rem] text-muted-foreground sm:pointer-events-none sm:absolute sm:inset-s-2.5 sm:inset-bs-2.5 sm:z-10 sm:grid sm:justify-items-start sm:gap-1 sm:rounded-sm sm:bg-card/90 sm:px-2.5 sm:py-2 sm:ring-1 sm:ring-border sm:backdrop-blur-sm sm:max-inline-[45%]"
   >
     <span class="font-semibold text-foreground"
       >{level === "us.nyc_ed"
