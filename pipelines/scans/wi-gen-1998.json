@@ -31,7 +31,7 @@
    "page": 930,
    "id": "930",
    "orientation": "counties_down",
-   "bands": 2,
+   "bands": 1,
    "hint": "Read only the Governor and Lieutenant Governor table with its seven columns; each column is a ticket, headed by the governor's name. Rows are the 72 counties and the TOTAL row.",
    "columns": [
     {

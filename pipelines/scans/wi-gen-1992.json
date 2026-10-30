@@ -75,7 +75,7 @@
    "page": 929,
    "id": "929",
    "orientation": "counties_down",
-   "bands": 2,
+   "bands": 1,
    "hint": "Read the vice president and president table with its seven ticket columns, in this order: Clinton, Daniels, Marrou, Hagelin, Bush, Hem, Gritz. Rows are the 72 counties and the TOTAL row.",
    "columns": [
     {
