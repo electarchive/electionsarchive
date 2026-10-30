@@ -49,10 +49,14 @@ def main() -> None:
     for command in (publishing, reverting):
         command.add_argument("--reviewer", type=lambda value: str(UUID(value)), help="user id of the person deciding")
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
-    contributing = commands.add_parser("contrib", help="compile a contribution payload into a changeset folder")
-    contributing.add_argument("action", choices=("compile",))
-    contributing.add_argument("payload", type=Path, help="payload JSON, as contributions.md (Payload) describes")
-    contributing.add_argument("--author", required=True, type=UUID, help="user id of the human author or key owner")
+    contributing = commands.add_parser(
+        "contrib", help="compile a contribution payload into a changeset folder, or serve the proposal_job queue"
+    )
+    contributing.add_argument("action", choices=("compile", "serve"))
+    contributing.add_argument(
+        "payload", nargs="?", type=Path, help="payload JSON, as contributions.md (Payload) describes"
+    )
+    contributing.add_argument("--author", type=UUID, help="user id of the human author or key owner")
     contributing.add_argument("--agent", action="store_true", help="the author is an agent acting for --author")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
@@ -157,7 +161,11 @@ def main() -> None:
             )
         case "fixtures":
             print(fixtures.export())
+        case "contrib" if args.action == "serve":
+            contrib.serve()
         case "contrib":
+            if args.payload is None or args.author is None:
+                parser.error("contrib compile needs a payload and --author")
             with connect() as conn:
                 print(contrib.compile_file(conn, args.payload, args.author, "agent" if args.agent else "user"))
         case "tiles":

@@ -1,15 +1,22 @@
 import hashlib
 import json
+import shlex
+import subprocess
+import traceback
 import unicodedata
+from collections.abc import Callable
 from pathlib import Path
 from typing import Literal, LiteralString, TypedDict, cast
 from uuid import UUID, uuid7
 
+import polars as pl
 import regex
 from psycopg import sql
+from psycopg.types.json import Jsonb
 
+from ea.apply import _stage, apply, publish, revert
 from ea.changeset import Changeset, bcp47
-from ea.store import Connection
+from ea.store import DATA, ROOT, Connection, connect
 
 VERSION = "1"
 
@@ -48,6 +55,17 @@ PROVENANCE = {"name": "source_id"}
 NOTE_LIMIT = 10_000
 
 ORIGINS = ("human", "machine", "official")
+
+HEAVY = 50_000
+
+SHOWN = 2_000
+
+TIERS = {
+    **dict.fromkeys(("note", "citation", "source", "external_id", "name", "label", "party_color", "translation"), 1),
+    **dict.fromkeys(("result_value", "result_flow", "outcome", "seat", "body_size"), 3),
+}
+
+KEYED = {"translation": ("source_md5", "lang")}
 
 
 class Evidence(TypedDict, total=False):
@@ -311,4 +329,319 @@ def compile_file(conn: Connection, path: Path, author: UUID, author_kind: Author
     return compile(conn, cast(Payload, json.loads(path.read_text())), author, author_kind=author_kind)
 
 
-__all__: list[LiteralString] = ["compile", "compile_file"]
+def _dumps(value: object) -> str:
+    return json.dumps(value, default=str)
+
+
+def _rows(folder: Path) -> int:
+    return sum(pl.scan_parquet(path).select(pl.len()).collect().item() for path in folder.glob("*.parquet"))
+
+
+def _gated(*args: str) -> None:
+    subprocess.run(
+        [
+            "bash",
+            str(DATA / "logs" / "gate.sh"),
+            "systemd-run",
+            "--user",
+            "--wait",
+            "--collect",
+            "-p",
+            "MemoryHigh=5G",
+            "-p",
+            "MemoryMax=6G",
+            "-p",
+            f"WorkingDirectory={ROOT / 'pipelines'}",
+            "bash",
+            "-lc",
+            shlex.join(["uv", "run", "ea", *args]),
+        ],
+        check=True,
+    )
+
+
+def _review(conn: Connection, changeset_id: str) -> tuple[int, dict[str, object], object]:
+    stage = _stage(conn, changeset_id)
+    shown: list[dict[str, object]] = []
+    entities: set[str] = set()
+    truncated = False
+    for table, columns in stage.tables.items():
+        staged = stage.staged(table)
+        if "entity_id" in columns:
+            entities.update(
+                str(entity)
+                for (entity,) in conn.execute(sql.SQL("select distinct entity_id from {}").format(staged)).fetchall()
+            )
+        key = ("id",) if "id" in columns else KEYED.get(table, ())
+        compared = [column for column in columns if column not in key]
+        rows = conn.execute(
+            sql.SQL("select to_jsonb(s), {} from {} s {} limit %s").format(
+                sql.SQL("to_jsonb(p)") if key else sql.SQL("null::jsonb"),
+                staged,
+                sql.SQL("left join public.{} p using ({})").format(
+                    sql.Identifier(table), sql.SQL(", ").join(map(sql.Identifier, key))
+                )
+                if key
+                else sql.SQL(""),
+            ),
+            [SHOWN - len(shown) + 1],
+        ).fetchall()
+        for after, before in rows:
+            fields = {
+                column: [None if before is None else before.get(column), after.get(column)]
+                for column in compared
+                if before is None or before.get(column) != after.get(column)
+            }
+            if not fields:
+                continue
+            if len(shown) == SHOWN:
+                truncated = True
+                break
+            shown.append(
+                {
+                    "table": table,
+                    "key": {column: after[column] for column in key},
+                    "entity_id": after.get("entity_id"),
+                    "op": "add" if before is None else "change",
+                    "fields": fields,
+                }
+            )
+    checks = conn.execute("select checks from changeset where id = %s", [changeset_id]).fetchone()
+    tier = max(TIERS.get(table, 2) for table in stage.tables)
+    return tier, {"rows": shown, "truncated": truncated, "entities": sorted(entities)}, checks and checks[0]
+
+
+def _apply(folder: Path) -> str:
+    if _rows(folder) <= HEAVY:
+        return apply(folder)
+    _gated("apply", str(folder))
+    with connect() as conn:
+        status = conn.execute("select status::text from changeset where id = %s", [folder.name]).fetchone()
+    return "unchanged" if status is None else str(status[0])
+
+
+def _supersede(conn: Connection, changeset_id: str) -> None:
+    conn.execute(
+        sql.SQL("drop schema if exists {} cascade").format(sql.Identifier(f"cs_{changeset_id.replace('-', '')}"))
+    )
+    conn.execute(
+        "update changeset set status = 'superseded' where id = %s and status in ('draft', 'pending_review')",
+        [changeset_id],
+    )
+    folder = DATA / "changesets" / changeset_id
+    if folder.exists():
+        folder.rename(DATA / "retired" / "changesets" / changeset_id)
+
+
+def _activity(
+    conn: Connection, proposal: UUID, kind: str, actor: UUID | None, changeset_id: object, summary: str
+) -> None:
+    conn.execute(
+        """insert into activity (actor_user_id, agent_key_id, kind, proposal_id, changeset_id, entity_ids, polity_ids, summary)
+           select coalesce(%s, p.author_user_id), case when %s::uuid is null then p.agent_key_id end, %s, p.id, %s,
+                  coalesce((select array_agg(e::uuid) from proposal_revision r,
+                                   jsonb_array_elements_text(r.diff -> 'entities') e
+                            where r.proposal_id = p.id and r.changeset_id = %s), '{}'),
+                  array_remove(array[p.polity_id], null), format(%s, p.number)
+           from proposal p where p.id = %s""",
+        [actor, actor, kind, changeset_id, changeset_id, summary, proposal],
+    )
+
+
+def _compiled(conn: Connection, proposal: UUID, payload: object) -> Path:
+    row = conn.execute(
+        "select author_user_id, agent_key_id is not null from proposal where id = %s", [proposal]
+    ).fetchone()
+    if row is None or row[0] is None:
+        raise ValueError(f"proposal {proposal} has no author")
+    folder = compile(conn, cast(Payload, payload), row[0], author_kind="agent" if row[1] else "user", proposal=proposal)
+    conn.commit()
+    return folder
+
+
+def _payload(conn: Connection, proposal: UUID, n: int | None) -> object:
+    row = conn.execute(
+        "select payload from proposal_revision where proposal_id = %s and n = %s"
+        if n is not None
+        else "select draft from proposal where id = %s",
+        [proposal, n] if n is not None else [proposal],
+    ).fetchone()
+    if row is None or row[0] is None:
+        raise ValueError(f"proposal {proposal} has no {'revision ' + str(n) if n is not None else 'draft'}")
+    return row[0]
+
+
+def _check(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
+    with connect() as conn:
+        folder = _compiled(conn, proposal, _payload(conn, proposal, n))
+        if _apply(folder) == "unchanged":
+            return {"status": "unchanged"}
+        tier, diff, checks = _review(conn, folder.name)
+        _supersede(conn, folder.name)
+    return {"status": "checked", "tier": tier, "diff": diff, "checks": checks}
+
+
+def _submit(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
+    if n is None:
+        raise ValueError("a submit job needs revision_n")
+    with connect() as conn:
+        folder = _compiled(conn, proposal, _payload(conn, proposal, n))
+        if _apply(folder) == "unchanged":
+            conn.execute(
+                "update proposal_revision set checks = %s where proposal_id = %s and n = %s",
+                [Jsonb({"unchanged": True}), proposal, n],
+            )
+            return {"status": "unchanged"}
+        changeset_id = folder.name
+        tier, diff, checks = _review(conn, changeset_id)
+        conn.execute(
+            "update proposal_revision set changeset_id = %s, diff = %s, checks = %s where proposal_id = %s and n = %s",
+            [changeset_id, Jsonb(diff, dumps=_dumps), Jsonb(checks, dumps=_dumps), proposal, n],
+        )
+        head = conn.execute("select head_changeset_id from proposal where id = %s", [proposal]).fetchone()
+        previous = None if head is None else head[0]
+        if previous is not None:
+            _supersede(conn, str(previous))
+        conn.execute(
+            """update proposal set head_changeset_id = %s, tier = %s, state = 'open',
+                      submitted_at = coalesce(submitted_at, now()), updated_at = now()
+               where id = %s""",
+            [changeset_id, tier, proposal],
+        )
+        _activity(
+            conn,
+            proposal,
+            "proposal_submitted" if previous is None else "proposal_revised",
+            None,
+            changeset_id,
+            "Proposal %s submitted" if previous is None else "Proposal %s revised",
+        )
+    return {"status": "pending_review", "changeset_id": changeset_id, "tier": tier}
+
+
+def _decided(conn: Connection, proposal: UUID, requested: UUID | None, states: tuple[str, ...]) -> tuple[str, str]:
+    if requested is None:
+        raise ValueError("a decision needs requested_by")
+    row = conn.execute(
+        """select p.head_changeset_id::text, p.state::text, p.tier,
+                  exists (select from user_role r where r.user_id = %s and r.role = 'admin'),
+                  exists (select from user_role r where r.user_id = %s and r.role = 'reviewer'
+                          and (r.polity_scope_id is null or r.polity_scope_id = p.polity_id))
+           from proposal p where p.id = %s""",
+        [requested, requested, proposal],
+    ).fetchone()
+    if row is None or row[0] is None:
+        raise ValueError(f"proposal {proposal} has no submitted revision")
+    head, state, tier, admin, reviewer = row
+    if state not in states:
+        raise ValueError(f"proposal {proposal} is {state}, not {' or '.join(states)}")
+    if not (admin or (reviewer and tier == 1)):
+        raise ValueError(f"user {requested} may not decide a tier {tier} proposal")
+    return head, state
+
+
+def _close(conn: Connection, proposal: UUID, state: str, requested: UUID, reason: object) -> None:
+    conn.execute(
+        """update proposal set state = %s, decided_by = %s, decided_at = now(),
+                  decision_reason = coalesce(%s, decision_reason), updated_at = now()
+           where id = %s""",
+        [state, requested, reason, proposal],
+    )
+
+
+def _publish(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
+    with connect() as conn:
+        head, _ = _decided(conn, proposal, requested, ("open", "approved"))
+        if _rows(DATA / "changesets" / head) > HEAVY:
+            conn.commit()
+            _gated("publish", head, "--reviewer", str(requested))
+        else:
+            publish(conn, head, str(requested))
+        _close(conn, proposal, "published", cast(UUID, requested), output.get("reason"))
+        _activity(conn, proposal, "proposal_published", requested, head, "Proposal %s published")
+    return {"status": "published", "changeset_id": head}
+
+
+def _reverse(state: str, accepted: tuple[str, ...], activity: str, summary: str) -> Callable[..., dict[str, object]]:
+    def run(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
+        with connect() as conn:
+            head, _ = _decided(conn, proposal, requested, accepted)
+            stored = conn.execute("select decision_reason from proposal where id = %s", [proposal]).fetchone()
+            reason = output.get("reason") or (stored and stored[0])
+            if not reason:
+                raise ValueError(f"a {state} decision needs a reason")
+            if _rows(DATA / "changesets" / head) > HEAVY:
+                conn.commit()
+                _gated("revert", head, str(reason), "--reviewer", str(requested))
+            else:
+                revert(conn, head, str(reason), str(requested))
+            _close(conn, proposal, state, cast(UUID, requested), reason)
+            _activity(conn, proposal, activity, requested, head, summary)
+        return {"status": state, "changeset_id": head}
+
+    return run
+
+
+JOBS: dict[str, Callable[[UUID, int | None, UUID | None, dict[str, object]], dict[str, object]]] = {
+    "check": _check,
+    "submit": _submit,
+    "publish": _publish,
+    "reject": _reverse(
+        "rejected", ("open", "changes_requested", "approved"), "proposal_rejected", "Proposal %s rejected"
+    ),
+    "revert": _reverse("reverted", ("published",), "proposal_reverted", "Proposal %s reverted"),
+}
+
+
+def _notify(conn: Connection, job: object, proposal: object, kind: str, status: str) -> None:
+    conn.execute(
+        "select pg_notify('proposal_job', %s)",
+        [_dumps({"id": job, "proposal_id": proposal, "kind": kind, "status": status})],
+    )
+
+
+def work() -> bool:
+    with connect() as conn:
+        claimed = conn.execute(
+            """update proposal_job set status = 'running', started_at = now()
+               where id = (select id from proposal_job where status = 'queued'
+                           order by created_at for update skip locked limit 1)
+               returning id, proposal_id, revision_n, kind::text, requested_by, coalesce(output, '{}'::jsonb)"""
+        ).fetchone()
+        if claimed is None:
+            return False
+        job, proposal, n, kind, requested, output = claimed
+        _notify(conn, job, proposal, kind, "running")
+    try:
+        result = {**output, **JOBS[kind](proposal, n, requested, output)}
+        status = "done"
+    except Exception as error:  # noqa: BLE001 - a failed job is recorded and the worker carries on
+        traceback.print_exc()
+        result = {**output, "error": f"{type(error).__name__}: {error}"}
+        status = "failed"
+    with connect() as conn:
+        conn.execute(
+            "update proposal_job set status = %s, finished_at = now(), output = %s where id = %s",
+            [status, Jsonb(result, dumps=_dumps), job],
+        )
+        _notify(conn, job, proposal, kind, status)
+    print(f"{kind} {proposal} {status}", flush=True)
+    return True
+
+
+def serve() -> None:
+    with connect(autocommit=True) as listener:
+        listener.execute(
+            """update proposal_job set status = 'failed', finished_at = now(),
+                      output = coalesce(output, '{}'::jsonb) || '{"error": "interrupted by a worker restart"}'
+               where status = 'running'"""
+        )
+        listener.execute("listen proposal_job")
+        while True:
+            while work():
+                pass
+            for _ in listener.notifies(timeout=60, stop_after=1):
+                pass
+
+
+__all__: list[LiteralString] = ["compile", "compile_file", "serve", "work"]
