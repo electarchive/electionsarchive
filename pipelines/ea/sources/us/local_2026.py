@@ -1878,8 +1878,10 @@ for key, publisher, title, url, local in (
     ("UT-49023", "Juab County Clerk", "2026 General Election Certification", "https://juabcounty.gov/wp-content/uploads/2026/09/2026_general_certification.pdf", "ut/juab.pdf"),
     ("UT-49025", "Kane County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.utah.gov/pmn/files/1485015.docx", "ut/kane.docx"),
     ("UT-49017", "Garfield County Clerk", "Publication Ballot, General Election, November 3, 2026", "https://www.garfield.utah.gov/files/assets/garfieldcout/v/1/documents/auditor-clerk/26gutgar_publication_2_watermark.pdf", "ut/garfield.pdf"),
-    ("TX-48453", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Del Valle and Manor ISD)", "https://votetravis.gov/wp-content/uploads/G26-Bedsheet-Ballot-Corrected-Final2.pdf", "tx/travis.pdf"),
+    ("TX-48453-tc", "Travis County Clerk", "November 3, 2026 General Election Sample Ballot (Del Valle and Manor ISD)", "https://votetravis.gov/wp-content/uploads/G26-Bedsheet-Ballot-Corrected-Final2.pdf", "tx/travis.pdf"),
     ("TX-48221", "Tolar Independent School District", "November 2026 Tolar ISD Trustee Candidates", "https://www.tolarisd.org/district-information/school-board/elections/election-candidates", "tx/tolar.html"),
+    ("TX-48453-lv", "Lago Vista Independent School District", "Order of Cancellation of Trustee Election, November 3, 2026", "https://www.lagovistaisd.net/upload/page/0037/docs/2026%20Trustee%20Election/2026%20Order%20of%20Cancellation%20Trustee.pdf", "tx/lago_vista.pdf"),
+    ("TX-48355-fb", "Flour Bluff Independent School District", "FBISD Board of Trustee Election, November 3, 2026", "https://flourbluffschools.net/board-elections/", "tx/flour_bluff.html"),
     ("MO-29113", "Lincoln County Clerk", "Election Authority's Certification, General Election, November 3, 2026", "https://www.lincolncomo.gov/sample-ballots", "mo/lincoln.pdf"),
     ("MO-29145", "Newton County Clerk", "Official General Election Ballot (sample), Newton County, November 3, 2026", "https://www.ncclerk.org/electionsvoters/", "mo/newton.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
@@ -1889,7 +1891,7 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
-TACIT_FEEDS = {"CA-06071-s"}
+TACIT_FEEDS = {"CA-06071-s", "TX-48453-lv", "TX-48355-fb"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
@@ -4983,7 +4985,7 @@ def parse() -> None:
                         else "At-Large"
                         if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
                         else f"{slot[1].title()} {slot[2]}"
-                        if state == "TX" and role == "board-of-education" and (slot := re.search(r"\b(place|position) (\d+)\b", post))
+                        if state == "TX" and role == "board-of-education" and (slot := re.search(r"\b(place|position|district) (\d+)\b", post))
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
                         if state in ("CA", "UT", "MD", "IN")
                         and (
