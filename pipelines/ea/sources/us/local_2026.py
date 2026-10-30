@@ -3384,6 +3384,37 @@ def parse() -> None:
     for row in feeds["NJ-34015"]:
         row["seats"] = len(orders[(row["contest"], row["unexpired"])])
 
+    columns: tuple[int, ...] = ()
+    seats: dict[str, int] = defaultdict(int)
+    school: list[tuple[str, str]] = []
+    for line in text("NJ-34015", "-layout").splitlines():
+        if line.startswith("Order Slogan") and "First Name" in line:
+            columns = (line.index("District"), line.index("First Name"), line.index("Last Name"), line.index("Address"))
+            continue
+        if not columns:
+            continue
+        if not re.match(r"\s*\d+\s", line) or len(line) <= columns[0]:
+            continue
+        place = line[columns[0] : columns[1]].strip()
+        if " - " in place or not place:
+            continue
+        seats[place] += 1
+        given, family = line[columns[1] : columns[2]].strip(), line[columns[2] : columns[3]].strip()
+        if given and family and not nobody.search(f"{given} {family}"):
+            school.append((place, f"{given} {family}"))
+    for place, person in school:
+        feeds["NJ-34015"].append(
+            {
+                "county": "Gloucester",
+                "contest": f"{place.title()} Board of Education",
+                "seats": seats[place],
+                "name": cased(person),
+                "party": None,
+                "independent": False,
+                "unexpired": False,
+            }
+        )
+
     town = ""
     for line in text("NJ-34037", "-layout").splitlines():
         if found := re.match(r"([A-Z][A-Z .'-]+?)\s{2,}# Seats", line):
@@ -3840,6 +3871,22 @@ def parse() -> None:
                     "unexpired": "UNEXP" in f"{term} {post}".upper(),
                 }
             )
+
+    for cells in sheets["Local BOE"].iter_rows():
+        town, term, vote, _, first, last = (str(cell or "").strip() for cell in cells[:6])
+        if not town or town.startswith(("MUNICIPALITY", "THIS LIST", "FOR MEMBERSHIP")) or not last:
+            continue
+        feeds["NJ-34003"].append(
+            {
+                "county": "Bergen",
+                "contest": f"{town.title()} Board of Education",
+                "seats": 1 if "UNEXP" in term.upper() else NUMBERS.get(vote.title(), 1),
+                "name": cased(f"{first} {last}"),
+                "party": None,
+                "independent": False,
+                "unexpired": "UNEXP" in term.upper(),
+            }
+        )
 
     for key, county in (("MI-26017", "Bay"), ("MI-26091", "Lenawee"), ("MI-26021", "Berrien")):
         post, seats, unexpired = "", 0, False
