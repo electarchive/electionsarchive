@@ -16,6 +16,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
+SCHOOLS = {("TX", "Georgetown Independent School District"): "4820600"}
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
 COUNTIES = {
@@ -94,6 +95,8 @@ def emit() -> Path:
                 option = county_key
             elif entity.endswith(" Township"):
                 option = civil.town(entity, row["county"][:5])
+            elif (state, entity) in SCHOOLS:
+                option = civil.mint("us.school_district", SCHOOLS[state, entity], entity)
             elif re.search(r"School District|CUSD", entity):
                 option = civil.school(entity)
             elif f"special:{row['county']}:{entity}" in found:
