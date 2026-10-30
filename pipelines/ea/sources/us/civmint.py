@@ -72,8 +72,10 @@ class Civil:
             elif scheme == "us.school_district":
                 self.schools.setdefault(ceda._core(text), []).append(key)
         self.place_specs: dict[str, list[tuple[str, str]]] = {}
-        for geoid, full in gazetteer(PLACES, state).select("GEOID", "NAME").iter_rows():
+        for geoid, full in sorted(gazetteer(PLACES, state).select("GEOID", "NAME").iter_rows(), key=lambda row: row[1].endswith("CDP")):
             label = re.sub(r"^Village of | Village$", "", re.sub(r" (city|village|town|CDP)$", "", full))
+            if full.endswith("CDP") and ceda._city(label) in self.place_specs:
+                continue
             self.place_specs.setdefault(ceda._city(label), []).append((geoid, label))
         self.town_specs: dict[str, list[tuple[str, str]]] = {}
         for geoid, full in gazetteer(COUSUBS, state).select("GEOID", "NAME").iter_rows():
