@@ -17859,12 +17859,18 @@ export const polities = {
           "region",
         ].includes(polity.kind)
           ? held[0]
-          : held.find(
+          : (held.find(
               (row) =>
                 row.kind === "general" &&
                 Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") <
                   9e10,
-            )) ??
+            ) ??
+            held.find(
+              (row) =>
+                row.kind !== "primary" &&
+                Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") <
+                  9e10,
+            ))) ??
         held[0] ??
         (fallback == null
           ? null

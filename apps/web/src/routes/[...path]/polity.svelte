@@ -347,15 +347,19 @@
             entry.tiles != null,
         );
     const districts = places.districts ?? [];
+    const outline =
+      own?.tiles ??
+      bounds.find((entry) => entry.scheme === own?.scheme)?.tiles ??
+      null;
     return level?.tiles == null || own?.frame == null
       ? null
       : {
           places,
           tiles: level.tiles,
           own:
-            own.tiles == null || own.k == null
+            outline == null || own.k == null
               ? null
-              : { tiles: own.tiles, k: own.k },
+              : { tiles: outline, k: own.k },
           nested:
             inner?.tiles == null || districts.length === 0
               ? null
