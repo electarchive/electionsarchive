@@ -1,4 +1,5 @@
 import re
+import subprocess
 from collections import defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -19,10 +20,12 @@ FILE = DATA / "inbox" / "manual" / "MF-406" / "Statewide Results.xlsx"
 PUBLISHER = "Montana Secretary of State"
 PAGE = "https://electionresults.mt.gov/"
 URL = f"{PAGE}#MF-406"
+CANVASS = "https://sosmt.gov/wp-content/uploads/wpfd/preview_files/2026-Primary-State-Canvass(f0627306086b974f9ac2e416bb8125c9).pdf"
 TITLE = "Montana June 2, 2026 primary election results"
 NOTE = (
-    "Unofficial: the Secretary of State's statewide export by county, with all 728 precincts reporting, not the certified state canvass (requested as MF-418); "
-    "the county sums were checked against the TOTALS row of each race."
+    "County totals from the Secretary of State's statewide export by county, with all 728 precincts reporting. Every "
+    "race's statewide totals match the Secretary of State's 2026 primary state canvass, and the county sums were "
+    "checked against the TOTALS row of each race."
 )
 PARTIES = {
     "Republican": ("republican", "2026-06-02:MT:senate:republican"),
@@ -43,6 +46,7 @@ SHEETS = (
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, CANVASS, suffix=".pdf")
     try:
         raw.cached(SOURCE, URL)
     except LookupError:
@@ -79,8 +83,20 @@ def sheet(book: fastexcel.ExcelReader, name: str) -> tuple[list[tuple[str, str]]
     return candidates, by_county, totals
 
 
+def canvass_totals() -> set[tuple[int, ...]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, CANVASS).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    return {
+        tuple(int(cell) for cell in line.split()[1:])
+        for line in text.splitlines()
+        if re.fullmatch(r"Total(\s+\d+)+", line.strip())
+    }
+
+
 def emit() -> Path:
     book = fastexcel.read_excel(str(raw.cached(SOURCE, URL).path))
+    official = canvass_totals()
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -130,11 +146,22 @@ def emit() -> Path:
             return id
 
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=PAGE, license="Public record")
-        cs.artifact(raw.cached(SOURCE, URL), source)
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=PAGE,
+            license="Public record",
+        )
+        for url in (URL, CANVASS):
+            cs.artifact(raw.cached(SOURCE, url), source)
         made = 0
         for name, kind, number in SHEETS:
             candidates, by_county, totals = sheet(book, name)
+            if tuple(totals) not in official:
+                raise ValueError(f"{name}: totals {totals} are not in the state canvass")
             party_label = candidates[0][1]
             nonpartisan = kind == "court"
             if nonpartisan:
@@ -218,7 +245,12 @@ def emit() -> Path:
                 )
             for rank, index in enumerate(order):
                 if nonpartisan:
-                    cs.add("outcome", result_set_id=result, option_id=options[index], kind="advanced" if rank < 2 else "lost")
+                    cs.add(
+                        "outcome",
+                        result_set_id=result,
+                        option_id=options[index],
+                        kind="advanced" if rank < 2 else "lost",
+                    )
                 elif rank == 0:
                     cs.add("outcome", result_set_id=result, option_id=options[index], kind="won")
             rows = []
