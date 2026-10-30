@@ -26,7 +26,7 @@ export async function roles(userId: string | undefined) {
 }
 
 export async function editable(entityId: string): Promise<Editable> {
-  const [names, notes, ids, colors, kind, images, sources, open] =
+  const [names, notes, ids, colors, kind, images, sources, citations, open] =
     await Promise.all([
       db.execute<Editable["names"][number]>(sql`
         with shown as (
@@ -105,6 +105,18 @@ export async function editable(entityId: string): Promise<Editable> {
         order by s.title
         limit 50
       `),
+      db.execute<Editable["citations"][number]>(sql`
+        select s.id, s.title, s.publisher, s.url,
+               coalesce(array_agg(c.id::text order by c.id)
+                 filter (where ch.pipeline = 'contrib' and c.locator ->> 'op' = 'cite'), '{}') as own
+        from citation c
+        join source s on s.id = c.source_id
+        join changeset ch on ch.id = c.changeset_id
+        where c.entity_id = ${entityId}
+        group by s.id
+        order by s.title
+        limit 50
+      `),
       db.execute<Editable["open"][number]>(sql`
         select p.number, p.title, p.state::text as state
         from proposal p
@@ -127,6 +139,7 @@ export async function editable(entityId: string): Promise<Editable> {
     colors: colors.rows,
     images: images.rows,
     sources: sources.rows,
+    citations: citations.rows,
     open: open.rows,
   };
 }
@@ -169,6 +182,7 @@ export async function propose({
   const requiresSource = (change: Change) =>
     hasDates(change) ||
     change.kind === "name" ||
+    change.kind === "cite" ||
     change.kind.startsWith("color_") ||
     (change.kind === "translate" && change.origin === "official");
   const canCite = (change: Change) =>
@@ -178,15 +192,25 @@ export async function propose({
   if (evidence == null && changes.some((change) => requiresSource(change))) {
     error(
       400,
-      "A name, color, logo date, or official translation needs a source.",
+      "A name, color, logo date, citation, or official translation needs a source.",
     );
   }
-  if (evidence?.type === "upload" && changes.some((change) => hasDates(change))) {
+  if (
+    evidence?.type === "upload" &&
+    changes.some((change) => hasDates(change))
+  ) {
     error(400, "Link the page that states the logo's dates.");
   }
   if (changes.filter((change) => change.kind.startsWith("color_")).length > 1) {
     error(400, "A proposal can change one color period.");
   }
+  if (changes.filter((change) => change.kind === "cite").length > 1) {
+    error(400, "A proposal can cite one source.");
+  }
+  const hasCite = changes.some((change) => change.kind === "cite");
+  const uncited = changes.flatMap((change) =>
+    change.kind === "cite_drop" ? [change.id] : [],
+  );
   const image = changes.find((change) => change.kind === "image");
   if (changes.filter((change) => change.kind === "image").length > 1) {
     error(400, "A proposal can add one image.");
@@ -218,7 +242,11 @@ export async function propose({
   const seen = translated.map((change) => `${change.note}:${change.md5}`);
   const sourceId = evidence?.type === "source" ? evidence.sourceId : null;
   const uploadId = evidence?.type === "upload" ? evidence.uploadId : null;
-  const { rows } = await db.execute<{ ok: boolean; party: boolean }>(sql`
+  const { rows } = await db.execute<{
+    ok: boolean;
+    party: boolean;
+    held: boolean;
+  }>(sql`
     select (select count(*) from name where id = any(${`{${nameIds.join(",")}}`}::uuid[]) and entity_id = ${entityId})
              = ${nameIds.length}
        and (select count(*) from note
@@ -236,14 +264,22 @@ export async function propose({
          select from upload where id = ${uploadId} and owner_user_id = ${userId} and status = 'ready'
        ))
        and (${image == null} or exists (select from person where id = ${entityId})
-            or exists (select from party where id = ${entityId})) as ok,
-       exists (select from party where id = ${entityId}) as party
+            or exists (select from party where id = ${entityId}))
+       and (select count(*) from citation c join changeset ch on ch.id = c.changeset_id
+            where c.id = any(${`{${uncited.join(",")}}`}::uuid[]) and c.entity_id = ${entityId}
+              and ch.pipeline = 'contrib' and c.locator ->> 'op' = 'cite')
+             = ${new Set(uncited).size} as ok,
+       exists (select from party where id = ${entityId}) as party,
+       ${hasCite} and exists (select from citation where entity_id = ${entityId} and source_id = ${sourceId}::uuid) as held
   `);
   if (rows[0]?.ok !== true) {
     error(
       400,
       "Some of these changes, or the source, can't be used. They may have been removed, or the upload may still be processing.",
     );
+  }
+  if (rows[0].held) {
+    error(400, "This record already cites that source.");
   }
   const cited = (() => {
     switch (evidence?.type) {
@@ -324,6 +360,12 @@ export async function propose({
               change.to != null && { valid_to: change.to }),
           },
         };
+      }
+      case "cite": {
+        return { op: "cite", entity_id: entityId };
+      }
+      case "cite_drop": {
+        return { op: "drop", table: "citation", id: change.id };
       }
       case "id_add": {
         return {
@@ -545,7 +587,8 @@ export async function queue() {
   }>(sql`
     select p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.submitted_at::text,
-           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page'))::int as changes,
+           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page')
+              or (x ->> 'table' = 'citation' and (x ->> 'op' = 'drop' or x -> 'fields' -> 'locator' -> 1 ->> 'op' = 'cite')))::int as changes,
            coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings
     from proposal p
     left join users a on a.id = p.author_user_id

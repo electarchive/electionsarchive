@@ -60,6 +60,8 @@ const Change = v.variant("kind", [
   }),
   v.object({ kind: v.literal("note_set"), id: Uuid, body: Body }),
   v.object({ kind: v.literal("note_drop"), id: Uuid }),
+  v.object({ kind: v.literal("cite") }),
+  v.object({ kind: v.literal("cite_drop"), id: Uuid }),
   v.object({
     kind: v.literal("translate"),
     note: Uuid,

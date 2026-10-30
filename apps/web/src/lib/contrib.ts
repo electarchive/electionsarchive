@@ -220,6 +220,8 @@ export type Change =
       body: string;
     }
   | { kind: "image"; file: string; from: string | null; to: string | null }
+  | { kind: "cite" }
+  | { kind: "cite_drop"; id: string }
   | { kind: "id_add"; scheme: Scheme; value: string }
   | { kind: "id_drop"; scheme: Scheme; value: string }
   | { kind: "color_set"; from: string | null; color: string }
@@ -300,6 +302,13 @@ export type Editable = {
     source: string | null;
   }>;
   sources: Array<{ id: string; title: string; publisher: string | null }>;
+  citations: Array<{
+    id: string;
+    title: string;
+    publisher: string;
+    url: string | null;
+    own: Array<string>;
+  }>;
   open: Array<{ number: number; title: string; state: ProposalState }>;
 };
 

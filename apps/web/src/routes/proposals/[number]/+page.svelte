@@ -37,9 +37,19 @@
     revert: m.proposal_reverting,
   };
   const evidential = ["citation", "source", "source_artifact", "source_page"];
+  const cites = (locator: unknown) =>
+    typeof locator === "object" &&
+    locator != null &&
+    "op" in locator &&
+    locator.op === "cite";
   const rows = $derived(
     (head?.diff?.rows ?? [])
-      .filter((row) => !evidential.includes(row.table))
+      .filter(
+        (row) =>
+          !evidential.includes(row.table) ||
+          (row.table === "citation" &&
+            (row.op === "drop" || cites(row.fields.locator?.[1]))),
+      )
       .map((row): DiffRow =>
         row.table === "external_id" && row.op === "add"
           ? {
@@ -72,6 +82,7 @@
   });
   const tables: Record<string, () => string> = {
     name: m.proposal_table_name,
+    citation: m.proposal_table_citation,
     note: m.proposal_table_note,
     translation: m.proposal_table_translation,
     external_id: m.proposal_table_external_id,
@@ -94,7 +105,9 @@
     taken_text: m.proposal_field_taken_text,
   };
   const hidden = new Set([
+    "id",
     "entity_id",
+    "locator",
     "name_id",
     "note_id",
     "scheme",

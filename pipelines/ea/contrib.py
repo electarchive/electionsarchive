@@ -842,6 +842,21 @@ def compile(
                     {"table": op.get("table"), "row": label, "op": "image"},
                 )
             continue
+        if op.get("op") == "cite":
+            if not cited:
+                raise ValueError(f"{where}: a citation needs evidence")
+            entity = _uuid(op.get("entity_id"), f"{where}.entity_id")
+            entity = cs.survivors.get(entity, entity)
+            if entity in cs.retired or conn.execute("select from entity where id = %s", [entity]).fetchone() is None:
+                raise ValueError(f"{where}: entity {entity} does not exist")
+            for key in cited:
+                held = conn.execute(
+                    "select from citation where entity_id = %s and source_id = %s", [entity, sources[key]]
+                ).fetchone()
+                if held is not None:
+                    raise ValueError(f"{where}: this record already cites source {sources[key]}")
+                _cite(cs, entity, sources[key], evidence[key], proofs.get(key, {}), {"op": "cite"})
+            continue
         if op.get("op") == "translate":
             note = str((op.get("of") or {}).get("id"))
             if any(

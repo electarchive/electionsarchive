@@ -114,6 +114,8 @@
         free: boolean;
       }
   >({ state: "idle" });
+  let cite = $state(false);
+  const uncites = new SvelteSet<string>();
   let added = 0;
   let source = $state<string | null>(null);
   let mode = $state<"none" | "source" | "url" | "upload">("none");
@@ -470,6 +472,16 @@
     if (colorChange != null) {
       list.push(colorChange);
     }
+    if (cite) {
+      list.push({ kind: "cite" });
+    }
+    for (const citation of data?.citations ?? []) {
+      if (uncites.has(citation.id)) {
+        for (const id of citation.own) {
+          list.push({ kind: "cite_drop", id });
+        }
+      }
+    }
     if (image != null && imageName != null) {
       list.push({
         kind: "image",
@@ -506,16 +518,23 @@
       (change) =>
         (change.kind === "image" && dated) ||
         change.kind === "name" ||
+        change.kind === "cite" ||
         change.kind.startsWith("color_") ||
         (change.kind === "translate" && change.origin === "official"),
     ),
   );
   const sources = $derived(
-    (data?.sources ?? []).map((item) => ({
-      value: item.id,
-      label: item.title,
-      detail: item.publisher ?? undefined,
-    })),
+    (data?.sources ?? [])
+      .filter(
+        (item) =>
+          !cite ||
+          !(data?.citations ?? []).some((citation) => citation.id === item.id),
+      )
+      .map((item) => ({
+        value: item.id,
+        label: item.title,
+        detail: item.publisher ?? undefined,
+      })),
   );
   const modes = $derived([
     ...(required ? [] : (["none"] as const)),
@@ -562,6 +581,8 @@
     colorDraft = null;
     newColor = null;
     image = null;
+    cite = false;
+    uncites.clear();
     source = null;
     mode = "none";
     link = { url: "", title: "", publisher: "", kind: "" };
@@ -1723,6 +1744,96 @@
                   added += 1;
                   addedIds.push({ key: added, scheme: "", value: "" });
                 }}><PlusIcon />{m.edit_id_add()}</Button
+              >
+            {/if}
+          </section>
+
+          <section class="border-be px-4 py-3" aria-labelledby="edit-citations">
+            <h3 id="edit-citations" class="text-sm font-bold">
+              {m.edit_citations()}
+            </h3>
+            {#if data.citations.length === 0 && !cite}
+              <p class="mbs-1 text-sm text-muted-foreground">
+                {m.edit_citations_empty()}
+              </p>
+            {/if}
+            <ul class="mbs-2 grid gap-1.5 text-sm">
+              {#each data.citations as citation (citation.id)}
+                {const dropped = $derived(uncites.has(citation.id))}
+                <li class="flex items-start justify-between gap-2">
+                  <span
+                    class={cn("grid min-inline-0", {
+                      "contrib-settle text-muted-foreground line-through decoration-foreground/50":
+                        dropped,
+                    })}
+                  >
+                    {#if citation.url != null && !dropped}
+                      <a
+                        class="truncate underline decoration-foreground/30 underline-offset-2 hover:decoration-foreground"
+                        href={citation.url}
+                        rel="external noopener"
+                        target="_blank">{citation.title}</a
+                      >
+                    {:else}
+                      <span class="truncate">{citation.title}</span>
+                    {/if}
+                    <span class="truncate text-xs text-muted-foreground"
+                      >{citation.publisher}</span
+                    >
+                  </span>
+                  {#if signedIn && citation.own.length > 0}
+                    <span class="flex shrink-0 items-center gap-2">
+                      {#if dropped}
+                        <span class="text-xs font-semibold"
+                          >{m.edit_removed()}</span
+                        >
+                      {/if}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        class="px-2 text-xs text-muted-foreground block-7"
+                        onclick={() => {
+                          if (dropped) {
+                            uncites.delete(citation.id);
+                          } else {
+                            uncites.add(citation.id);
+                          }
+                        }}
+                        >{dropped
+                          ? m.edit_citation_keep()
+                          : m.edit_citation_remove()}</Button
+                      >
+                    </span>
+                  {/if}
+                </li>
+              {/each}
+              {#if cite}
+                <li
+                  class="contrib-settle grid gap-1 border-s-2 border-foreground py-1 ps-2"
+                >
+                  <span class="font-semibold">{m.edit_cite_new()}</span>
+                  <span class="text-xs text-pretty text-muted-foreground"
+                    >{m.edit_cite_body()}</span
+                  >
+                  <span class="flex justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="px-2 text-xs block-7"
+                      onclick={() => (cite = false)}
+                      >{m.edit_cite_discard()}</Button
+                    >
+                  </span>
+                </li>
+              {/if}
+            </ul>
+            {#if signedIn && !cite}
+              <Button
+                variant="outline"
+                size="sm"
+                class="mbs-2"
+                onclick={() => (cite = true)}
+                ><PlusIcon />{m.edit_cite()}</Button
               >
             {/if}
           </section>
