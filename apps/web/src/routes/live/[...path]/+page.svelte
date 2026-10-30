@@ -12,6 +12,7 @@
   import { cn } from "#lib/utils.js";
   import type { PageProps } from "./$types";
   import Board from "./board.svelte";
+  import Landing from "./landing.svelte";
   import Choropleth from "./map.svelte";
   import Ruler from "./ruler.svelte";
 
@@ -359,7 +360,10 @@
   });
 
   $effect(() => {
-    if (!isLive && (hasFinal || frames.length > 0)) {
+    if (
+      night.states.length > 0 ||
+      (!isLive && (hasFinal || frames.length > 0))
+    ) {
       return;
     }
     const timer = setInterval(() => {
@@ -387,7 +391,10 @@
 </script>
 
 <svelte:head>
-  <title>{m.live_title({ place: night.election.place })} | {m.wordmark()}</title
+  <title
+    >{night.states.length > 0
+      ? m.live_landing_title()
+      : m.live_title({ place: night.election.place })} | {m.wordmark()}</title
   >
   <meta
     name="description"
@@ -409,7 +416,12 @@
   />
 </svelte:head>
 
-<main class="pbe-40 sm:pbe-16">
+<main
+  class={cn("sm:pbe-16", {
+    "pbe-40": night.states.length === 0,
+    "pbe-16": night.states.length > 0,
+  })}
+>
   <article class="grid gap-px border-be bg-border">
     <header class="grid gap-2 bg-card px-3.5 pbs-4 pbe-4 sm:px-6">
       <p
@@ -444,7 +456,11 @@
           class="hover:text-foreground hover:underline">{day}</a
         >
       </p>
-      <h1 class="title">{m.live_title({ place: night.election.place })}</h1>
+      <h1 class="title">
+        {night.states.length > 0
+          ? m.live_landing_title()
+          : m.live_title({ place: night.election.place })}
+      </h1>
       {#if isLive && isOffline}
         <p class="text-[0.9375rem] font-medium text-(--no) max-inline-[68ch]">
           {m.live_offline()}
@@ -452,6 +468,11 @@
       {:else if isLive && frames.length > 0 && now - newest > 3_600_000}
         <p class="text-[0.9375rem] font-medium text-(--no) max-inline-[68ch]">
           {m.live_stale({ time: clock.format(newest) })}
+        </p>
+      {/if}
+      {#if night.states.length > 0}
+        <p class="text-[0.9375rem] text-muted-foreground max-inline-[68ch]">
+          {m.live_landing_note()}
         </p>
       {/if}
       {#if night.rehearsal != null}
@@ -481,7 +502,13 @@
       </div>
     {/if}
 
-    {#if lead != null && leadState != null}
+    {#if night.states.length > 0}
+      <Landing
+        states={night.states}
+        {isLive}
+        rehearsal={page.url.searchParams.get("rehearsal")}
+      />
+    {:else if lead != null && leadState != null}
       <section
         aria-labelledby="live-lead"
         class="grid gap-x-10 gap-y-6 bg-card px-3.5 pbs-6 pbe-7 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:grid-rows-[auto_1fr]"

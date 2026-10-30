@@ -3634,12 +3634,79 @@ function electionMarkdown(
   ].filter((block) => block !== "");
 }
 
+function landingMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
+  const latest =
+    data.states
+      .flatMap((state) => (state.newest == null ? [] : [state.newest]))
+      .toSorted((a, b) => a.localeCompare(b))
+      .at(-1) ?? "";
+  const clocks = new Map(
+    [
+      ...new Set([
+        "America/New_York",
+        ...data.states.map((state) => state.zone),
+      ]),
+    ].map((zone) => [
+      zone,
+      new Intl.DateTimeFormat(getLocale(), {
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: zone,
+        timeZoneName: "short",
+      }),
+    ]),
+  );
+  return [
+    `# ${m.live_landing_title()}`,
+    byline(
+      [{ name: data.election.name, path: data.election.path }],
+      link,
+      data.election.date,
+    ),
+    m.live_landing_twin(),
+    `**${m.live_landing_summary({
+      counting: String(
+        data.states.filter((state) => state.status !== "waiting").length,
+      ),
+      total: String(data.states.length),
+    })}${latest === "" ? "" : `. ${m.live_landing_latest({ time: clocks.get("America/New_York")?.format(Date.parse(latest)) ?? "" })}`}**`,
+    table(
+      [
+        m.live_col_state(),
+        m.live_reporting(),
+        m.live_col_races(),
+        m.live_col_updated(),
+      ],
+      data.states.map((state) => [
+        link(state.name, `live/${state.path}`),
+        state.status === "certified"
+          ? m.live_landing_legend_certified()
+          : state.status === "waiting"
+            ? m.live_landing_legend_waiting()
+            : state.reported == null
+              ? m.live_landing_legend_counting()
+              : percent(state.reported),
+        m.live_races_of({
+          counting: String(state.counting),
+          total: String(state.contests),
+        }),
+        state.newest == null
+          ? ""
+          : (clocks.get(state.zone)?.format(Date.parse(state.newest)) ?? ""),
+      ]),
+    ),
+  ];
+}
+
 function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
   const clock = new Intl.DateTimeFormat(getLocale(), {
     hour: "numeric",
     minute: "2-digit",
     timeZone: data.election.zone,
   });
+  if (data.states.length > 0) {
+    return landingMarkdown(data, link);
+  }
   const moment = (at: string) =>
     link(
       at === "final" ? m.live_certified_count() : clock.format(Date.parse(at)),

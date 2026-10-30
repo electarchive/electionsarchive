@@ -95,6 +95,18 @@ async function load(election: string, date: string) {
   });
 }
 
+export function landing(seed: string, shown: number) {
+  if (unit(`${seed}:feed`) < 0.2) {
+    return null;
+  }
+  const start = Math.floor(unit(`${seed}:start`) * 8);
+  const end = Math.min(
+    NIGHT - 2,
+    start + 6 + Math.round(unit(`${seed}:end`) * 10),
+  );
+  return shown <= start ? null : Math.min(1, (shown - start) / (end - start));
+}
+
 export async function rehearsal(election: string, date: string) {
   let rows = loaded.get(election);
   if (rows == null) {

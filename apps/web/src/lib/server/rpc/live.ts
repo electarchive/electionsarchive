@@ -8,7 +8,7 @@ import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
-import { NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
+import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 
 const LEVELS = new Set([
   "us.place",
@@ -17,6 +17,7 @@ const LEVELS = new Set([
   "us.nyc_ad",
   "us.nyc_ed",
 ]);
+const TERRITORIES = new Set(["as", "gu", "mp", "pr", "vi"]);
 const WHOLE = ["us.place", "us.state", "us.county"];
 const ZONES: Record<string, string> = {
   ct: "America/New_York",
@@ -70,6 +71,11 @@ const ZONES: Record<string, string> = {
   wa: "America/Los_Angeles",
   ak: "America/Anchorage",
   hi: "Pacific/Honolulu",
+  pr: "America/Puerto_Rico",
+  vi: "America/St_Thomas",
+  gu: "Pacific/Guam",
+  mp: "Pacific/Saipan",
+  as: "Pacific/Pago_Pago",
 };
 
 const color = (party: SQL, date: SQL) => sql`
@@ -268,6 +274,68 @@ async function options(contests: Array<string>, date: string) {
   }));
 }
 
+async function states(
+  found: { path: string; date: string; rest: string },
+  plan: { shown: number; isFinal: boolean; from: number; every: number } | null,
+) {
+  const parts = found.path.split("/");
+  if (found.rest !== "" || parts.length !== 2) {
+    return [];
+  }
+  const result = await db.execute<{
+    path: string;
+    polity: string;
+    contests: number;
+    counting: number;
+    certified: number;
+    newest: string | null;
+    reported: number | null;
+  }>(sql`
+    with kids as (
+      select e.id, s.path, e.polity_id as polity, split_part(s.path, '/', 1) || '/' || split_part(s.path, '/', 2) || '/%' as under
+      from slug s join election e on e.id = s.entity_id
+      where s.is_current and e.date_from = ${found.date}::date and s.path ~ ${`^${parts[0]}/[a-z]{2}/${parts[1]}$`}
+    )
+    select k.path, k.polity::text, count(distinct c.id)::int as contests,
+      count(distinct rs.contest_id) filter (where rs.stage in ('live', 'preliminary') and rs.as_of is not null)::int as counting,
+      count(distinct rs.contest_id) filter (where rs.stage in ('official', 'certified') and rs.kind = 'counted')::int as certified,
+      to_char(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
+      (select x.completeness::float8 from contest y join slug z on z.entity_id = y.id and z.is_current
+         join result_set x on x.contest_id = y.id and x.status = 'active' and x.stage in ('live', 'preliminary') and x.as_of is not null
+       where y.election_id = k.id
+       order by array_position(array['governor', 'senate'], split_part(z.path, '/', 4)) nulls last, x.as_of desc limit 1) as reported
+    from kids k
+    join election e on e.date_from = ${found.date}::date
+    join slug se on se.entity_id = e.id and se.is_current and se.path like k.under
+    join contest c on c.election_id = e.id
+    left join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+    group by k.id, k.path, k.polity
+  `);
+  return result.rows.map((row) => {
+    const share =
+      plan == null ? null : landing(row.path, Math.min(plan.shown, NIGHT));
+    return plan == null
+      ? row
+      : {
+          ...row,
+          counting:
+            share == null
+              ? 0
+              : Math.ceil(row.contests * Math.min(1, share * 2)),
+          certified: share != null && plan.isFinal ? row.contests : 0,
+          newest:
+            share == null
+              ? null
+              : new Date(
+                  plan.from + (Math.min(plan.shown, NIGHT) - 1) * plan.every,
+                )
+                  .toISOString()
+                  .replace(/\.\d+Z$/u, "Z"),
+          reported: share,
+        };
+  });
+}
+
 function scanners(note: string | null) {
   const list =
     /Share of scanners reported at this time: (.+)\.$/u.exec(note ?? "")?.[1] ??
@@ -360,8 +428,10 @@ export const live = {
                   ),
               ).flat();
             })();
+      const children = await states(found, plan);
       if (
         stamped.length === 0 &&
+        children.every((row) => row.counting <= 0) &&
         Date.parse(found.date) < Date.now() - 2 * 86_400_000
       ) {
         throw new ORPCError("NOT_FOUND");
@@ -411,7 +481,15 @@ export const live = {
             ),
         plan?.isFinal === false ? [] : certified(contests),
         options(contests, found.date),
-        names([found.id, found.polity, ...contests], found.date),
+        names(
+          [
+            found.id,
+            found.polity,
+            ...contests,
+            ...children.map((row) => row.polity),
+          ],
+          found.date,
+        ),
         db.execute<{ id: string; path: string }>(sql`
           select entity_id as id, path from slug where is_current and entity_id = any(${sql.param(contests)}::uuid[])
         `),
@@ -535,6 +613,33 @@ export const live = {
         races: races.filter(
           (race) => race.series.length > 0 || race.certified != null,
         ),
+        states: children
+          .map((row) => {
+            const code = row.path.split("/", 2)[1] ?? "";
+            return {
+              code,
+              name: titles.full.get(row.polity) ?? code.toUpperCase(),
+              path: row.path,
+              zone: ZONES[code] ?? "UTC",
+              status:
+                row.certified > 0 &&
+                row.certified >= row.counting &&
+                Date.now() > Date.parse(found.date)
+                  ? ("certified" as const)
+                  : row.counting > 0
+                    ? ("counting" as const)
+                    : ("waiting" as const),
+              contests: row.contests,
+              counting: row.counting,
+              newest: row.newest,
+              reported: row.reported,
+            };
+          })
+          .toSorted(
+            (a, b) =>
+              Number(TERRITORIES.has(a.code)) -
+                Number(TERRITORIES.has(b.code)) || a.name.localeCompare(b.name),
+          ),
       };
     }),
   stamp: base

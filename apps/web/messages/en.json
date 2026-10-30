@@ -2387,5 +2387,19 @@
   "live_source": "Source: {publisher}",
   "live_as_of": "As of {time}",
   "live_twin_summary": "Results as {publisher} posted them through election night, then the certified count. To see another moment, add ?at= with one of the update times below, or ?at=final for the certified count.",
-  "live_twin_updates": "Updates"
+  "live_twin_updates": "Updates",
+  "live_landing_title": "Election night results by state",
+  "live_landing_note": "Each state's count appears here as its official results site publishes it. This page checks for new results every minute. Open a state to follow its races.",
+  "live_landing_summary": "{counting} of {total} have results",
+  "live_landing_latest": "Latest update {time}",
+  "live_landing_board": "States by reporting status",
+  "live_landing_legend_waiting": "No results yet",
+  "live_landing_legend_counting": "Counting",
+  "live_landing_legend_certified": "Certified",
+  "live_col_state": "State",
+  "live_col_races": "Races with results",
+  "live_col_updated": "Latest update",
+  "live_races_of": "{counting} of {total}",
+  "live_ballot": "Ballot",
+  "live_landing_twin": "Every state's live results, as its official site publishes them. Each state's link opens its races and shows every update; add .md or .json to it for the plain-text or data version."
 }
