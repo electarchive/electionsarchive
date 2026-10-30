@@ -30,6 +30,7 @@ LA_NOT_LOCAL = re.compile(r"U\. ?S\.|PSC|BESE|State Representative|CA No")
 LA_TOWN = re.compile(
     r"(Mayor|Alderm[a-z]+(?: at Large)?|Councilman|Chief of Police) -- (?:(.+?), )?(?:City|Town|Village) of (.+)"
 )
+LA_MEASURES = {"City of Shreveport (Downtown Dev. Dist.)": "LA:2270000:measure:city-of-shreveport-proposition"}
 LA_HELD = {"Mayor": "mayor", "Alderm": "board-of-aldermen", "Councilman": "council", "Chief": "chief-of-police"}
 MN_FILES = ("local.txt", "allracesbyprecinct.txt")
 NC_URL = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{:%Y_%m_%d}/results_pct_{:%Y%m%d}.zip"
@@ -250,6 +251,9 @@ def derive(
         found = la_classify(name)
         if found:
             return [found[1]]
+        for prefix, tail in LA_MEASURES.items():
+            if name.startswith(prefix):
+                return [tail]
         town = LA_TOWN.fullmatch(name)
         if town and plain(town[3]) in places:
             held = LA_HELD[next(key for key in LA_HELD if town[1].startswith(key))]
