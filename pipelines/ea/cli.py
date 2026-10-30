@@ -5,6 +5,7 @@ import resource
 import subprocess
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 
 from ea import (
@@ -16,6 +17,7 @@ from ea import (
     coverage_tables,
     fixtures,
     layout,
+    names,
     portals,
     rasters,
     raw,
@@ -59,6 +61,10 @@ def main() -> None:
     rolling.add_argument("sets", nargs="*", type=int, help="result_set k values")
     rolling.add_argument("--affected", action="store_true", help="add every set with no rollup at its district")
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
+    commands.add_parser(
+        "capitals",
+        help="count preferred person names with an all-caps word of 3+ letters by pipeline, rows to data/logs/capitals.tsv",
+    )
     commands.add_parser(
         "coverage",
         help="measure a country's coverage against its goals and write .agents/spec/us-coverage.md or "
@@ -175,6 +181,26 @@ def main() -> None:
             with connect() as conn:
                 for relation, column, entity, into, merge, rows in checks.merged(conn):
                     print(f"{relation}.{column}: {rows} rows reference {entity}, merged into {into} by {merge}")
+        case "capitals":
+            with connect() as conn, (DATA / "logs" / "capitals.tsv").open("w", encoding="utf-8") as log:
+                counts = Counter()
+                for entity, text, lang, pipeline in conn.execute(
+                    """select n.entity_id::text, n.text, n.lang, c.pipeline from name n
+                       join entity e on e.id = n.entity_id and e.type = 'person'
+                       join changeset c on c.id = n.changeset_id
+                       where n.is_preferred and n.valid_from is null and n.valid_to is null
+                         and n.text ~ '[[:upper:]]{3}'
+                         and not exists (select from entity_merge m where m.entity_id = n.entity_id)"""
+                ):
+                    if any(
+                        len(word) >= 3 and word.isupper() and word not in names.ACRONYMS | names.ROMAN
+                        for word in names.RUN.findall(text)
+                    ):
+                        counts[pipeline] += 1
+                        log.write(f"{pipeline}\t{entity}\t{lang}\t{text}\n")
+                for pipeline, count in counts.most_common():
+                    print(f"{pipeline}\t{count}")
+                print(f"total\t{counts.total()}")
         case "rollup":
             with connect() as conn:
                 rollup(conn, args.sets, args.affected)
