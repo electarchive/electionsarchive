@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 
@@ -15,40 +16,40 @@ VERSION = "1"
 DAY = date(2026, 5, 19)
 RUNOFF = date(2026, 6, 16)
 SOS = "https://results.sos.ga.gov/results/public/api/elections/{0}-county-ga/{1}/data"
-INBOX = Path(__file__).resolve().parents[4] / "data" / "inbox" / "manual" / "MF-341"
+INBOX = Path(__file__).resolve().parents[4] / "data" / "inbox" / "manual"
 COUNTIES = [
     (
         "1302550",
         "Gwinnett County Board of Elections and Registration",
-        "Gwinnett/official-complete-election-summary-report-may-19-general-primary-nonpartisan-general-election.pdf",
+        "MF-341/Gwinnett/official-complete-election-summary-report-may-19-general-primary-nonpartisan-general-election.pdf",
         DAY,
         "local",
     ),
     (
         "1301740",
         "DeKalb County Board of Registration and Elections",
-        "DeKalb/ElectionSummaryReportRPT_05_23_19_37_OFFICIAL.pdf",
+        "MF-341/DeKalb/ElectionSummaryReportRPT_05_23_19_37_OFFICIAL.pdf",
         DAY,
         "local",
     ),
     (
         "1301740",
         "DeKalb County Board of Registration and Elections",
-        "DeKalb/ElectionSummaryReportRPT-06-23-09-09-OFFICIAL.pdf",
+        "MF-341/DeKalb/ElectionSummaryReportRPT-06-23-09-09-OFFICIAL.pdf",
         RUNOFF,
         "runoff",
     ),
     (
         "1301290",
         "Cobb County Elections and Registration",
-        "Cobb/ElectionSummaryReportRPT_0.pdf",
+        "MF-341/Cobb/ElectionSummaryReportRPT_0.pdf",
         DAY,
         "primary",
     ),
     (
         "1301020",
         "Chatham County Board of Elections",
-        "Chatham/official-and-complete-election-summary-report-05-19-2026.pdf",
+        "MF-341/Chatham/official-and-complete-election-summary-report-05-19-2026.pdf",
         DAY,
         "local",
     ),
@@ -87,10 +88,71 @@ COUNTIES = [
         DAY,
         "local",
     ),
+    (
+        "1302280",
+        "Fulton County Registration and Elections",
+        "MF-348/Fulton/summary.zip",
+        DAY,
+        "local",
+    ),
+    (
+        "1301110",
+        "Cherokee County Elections and Voter Registration",
+        "MF-348/Cherokee/ElectionSummaryReportRPT-Official-and-Complete-Results (1).pdf",
+        DAY,
+        "primary",
+    ),
+    (
+        "1302220",
+        "Forsyth County Voter Registration and Elections",
+        "MF-348/Forsyth/05-19-26-GP-and-NPGE-OfficialandCompleteElectionSummaryReportRPT.pdf",
+        DAY,
+        "primary",
+    ),
+    (
+        "1302610",
+        "Hall County Elections",
+        "MF-348/Hall/Election Summary Report Official and Complete_3.pdf",
+        DAY,
+        "primary",
+    ),
+    (
+        "1302610",
+        "Hall County Elections",
+        "MF-348/Hall/Official and Complete Election Summary Report_1.pdf",
+        RUNOFF,
+        "runoff",
+    ),
+    (
+        "1303870",
+        "Muscogee County Elections and Registrations",
+        "MF-348/Muscogee/Total Votes Results_baa168a7-c1e1-4ef6-88ba-a38e368030c4.xlsx",
+        DAY,
+        "local",
+    ),
+    (
+        "1304020",
+        "Paulding County Elections",
+        "MF-348/Paulding/Total Votes Results_f9843034-aad9-49e9-a944-ccb2b2f0a7ba.xlsx",
+        DAY,
+        "primary",
+    ),
+    (
+        "1301170",
+        "Athens-Clarke County Board of Elections",
+        "MF-348/Clarke/Total Votes Results_a3827939-039a-4b93-9b7a-34dda09ba412.xlsx",
+        DAY,
+        "local",
+    ),
 ]
 HEADING = re.compile(
-    r"^(?:County )?(?:BOE|Board of Education)(?: - (?P<word>District|Post) (?P<seat>\d+)| (?P<top>President))(?: \(\w[\w -]*\))?(?:/.*?)?(?: - (?P<party>Dem|Rep))? \(Vote for (?P<seats>\d+)\)$"
+    r"^(?:County )?(?:BOE|Board of Education)(?: - (?P<word>District|Post) (?P<seat>\d+)| - (?P<large>At Large)| (?P<top>President))(?: \(\w[\w -]*\))?(?:/.*?)?(?: - (?P<party>Dem|Rep))? \(Vote for (?P<seats>\d+)\)$"
 )
+MEDIA = {
+    ".pdf": "application/pdf",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".zip": "application/zip",
+}
 PARTIES = {"Dem": "democratic", "Rep": "republican"}
 ROW = re.compile(r"^(?P<name>[A-Z].*?)\s{2,}(?:[\d,]+\s+)*(?P<total>[\d,]+)(?:\s+[\d.]+%)?$")
 
@@ -102,11 +164,11 @@ def fetch() -> None:
             continue
         raw.store(
             SOURCE,
-            f"manual://MF-341/{path}",
+            f"manual://{path}",
             (INBOX / path).read_bytes(),
-            suffix=".pdf",
+            suffix=Path(path).suffix,
             retrieved_at=datetime.now(UTC),
-            media_type="application/pdf",
+            media_type=MEDIA[Path(path).suffix],
         )
 
 
@@ -129,7 +191,7 @@ def emit() -> Path:
         districts: set[str] = set()
         people: set[object] = set()
         for code, publisher, path, day, kind in COUNTIES:
-            url = path if path.startswith("https:") else f"manual://MF-341/{path}"
+            url = path if path.startswith("https:") else f"manual://{path}"
             title = f"Official election summary report, {day:%B} {day.day}, 2026" if url != path else f"Official results, {path.split('/')[-3].removesuffix('-county-ga').title()} County, {day:%B} {day.day}, 2026"
             source = cs.source(publisher, title)
             if source in cs.minted:
@@ -158,6 +220,27 @@ def emit() -> Path:
                         "Total Votes",
                     )
                 )
+            elif url.endswith((".xlsx", ".zip")):
+                if url.endswith(".zip"):
+                    with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                        table = pl.read_csv(archive.read("summary.csv"), encoding="utf8-lossy").rename(
+                            {"contest name": "Office Name", "choice name": "Ballot Name", "total votes": "Total"}
+                        )
+                else:
+                    table = pl.read_excel(raw.cached(SOURCE, url).path)
+                lines: list[str] = []
+                for (office,), rows in table.filter(pl.col("Office Name").str.contains("BOE")).group_by(
+                    ["Office Name"], maintain_order=True
+                ):
+                    heading = office.replace("Vote For", "Vote for")
+                    lines.append(heading if "(Vote for" in heading else f"{heading} (Vote for 1)")
+                    lines.extend(
+                        f"{row['Ballot Name']}  {row['Total']}"
+                        for row in rows.iter_rows(named=True)
+                        if row["Ballot Name"] != "Total Votes"
+                    )
+                    lines.append("Total Votes")
+                text = "\n".join(lines)
             else:
                 text = subprocess.run(
                     ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
@@ -170,7 +253,7 @@ def emit() -> Path:
             for line in text.splitlines():
                 stripped = line.strip()
                 if found := HEADING.match(stripped):
-                    current = races.setdefault((f"{found['word']} {found['seat']}" if found["seat"] else found["top"], found["party"]), (int(found["seats"]), {}))[1]
+                    current = races.setdefault((f"{found['word']} {found['seat']}" if found["seat"] else found["large"] or found["top"], found["party"]), (int(found["seats"]), {}))[1]
                 elif stripped.startswith("Total Votes"):
                     current = None
                 elif current is not None and (row := ROW.match(stripped)):
