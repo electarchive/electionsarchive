@@ -495,6 +495,13 @@ AK_STATEWIDE = {
     date(2008, 11, 4): "results (1).pdf",
     date(2010, 8, 24): "results (5).pdf",
 }
+AK_DISTRICTS = {
+    date(2002, 8, 27): "sovc{} (1).pdf",
+    date(2006, 8, 22): "hd{} (2).pdf",
+    date(2008, 8, 26): "hd{} (3).pdf",
+    date(2008, 11, 4): "hd{} (1).pdf",
+    date(2010, 8, 24): "hd{} (4).pdf",
+}
 AK_2000 = "https://web.archive.org/web/2id_/http://www.elections.alaska.gov/results/00GENR/data/results.txt"
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
@@ -1274,6 +1281,16 @@ def fetch() -> None:
             retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
             media_type="application/pdf",
         )
+    for day, pattern in AK_DISTRICTS.items():
+        for district in range(1, 41):
+            raw.store(
+                SOURCE,
+                f"manual://MF-359/{day.isoformat()}/{pattern.format(district)}",
+                (DATA / "inbox" / "manual" / "MF-359" / day.isoformat() / pattern.format(district)).read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+                media_type="application/pdf",
+            )
     for district in range(1, 41):
         raw.store(
             SOURCE,
@@ -1878,6 +1895,57 @@ def alaska() -> list[dict[str, object]]:
                             "votes": count,
                         }
                     )
+    for day, pattern in AK_DISTRICTS.items():
+        statewide = {
+            (row["number"], row["label"], row["answer"]): row["votes"]
+            for row in rows
+            if row["day"] == day and row["county"] == "statewide"
+        }
+        summed: dict[tuple[object, object, object], int] = {}
+        found: list[dict[str, object]] = []
+        for district in range(1, 41):
+            url = f"manual://MF-359/{day.isoformat()}/{pattern.format(district)}"
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+            ).stdout
+            latest: dict[tuple[str, str], list[int]] = {}
+            for page in text.split("\f"):
+                lines = page.splitlines()
+                header = next((line for line in lines[:25] if re.search(r"MEASURE NO\. \d|BOND PROPOSITION A", line)), None)
+                total = [line for line in lines if re.match(r"\s*Total\s+\d", line)]
+                if header is None or not total:
+                    continue
+                cells = [int(cell.replace(",", "")) for cell in re.findall(r"(?<![\d.])\d[\d,]*(?![\d.%])", total[-1])]
+                if cells[0] == 0:
+                    continue
+                starts = [i for i, cell in enumerate(cells) if cell == cells[0]]
+                groups = [cells[a:b] for a, b in zip(starts, [*starts[1:], len(cells)], strict=True)]
+                titles = re.split(r"\s{2,}", header.strip())
+                if len(groups) != len(titles):
+                    raise ValueError(f"{url}: {len(groups)} groups under {titles}")
+                for title, group in zip(titles, groups, strict=True):
+                    if match := re.search(r"MEASURE NO\. (\d+)|BOND PROPOSITION A", title):
+                        latest[(match[1] or "", "" if match[1] else "Bond Question")] = group
+            for (number, label), (_, votes, yes, no) in latest.items():
+                if votes != yes + no:
+                    raise ValueError(f"{url} {number or label}: {yes} + {no} != {votes}")
+                for answer, count in (("YES", yes), ("NO", no)):
+                    summed[number, label, answer] = summed.get((number, label, answer), 0) + count
+                    found.append(
+                        {
+                            "state": "AK",
+                            "day": day,
+                            "number": number,
+                            "label": label,
+                            "url": url,
+                            "county": f"{day.isoformat()}:{district:02}",
+                            "answer": answer,
+                            "votes": count,
+                        }
+                    )
+        if summed != statewide:
+            raise ValueError(f"AK {day} district sums differ from the statewide results: {summed} vs {statewide}")
+        rows = [row for row in rows if not (row["day"] == day and row["county"] == "statewide")] + found
     measure_votes: dict[int, dict[str, int]] = {}
     current = 0
     for line in raw.cached(SOURCE, AK_2000).path.read_text(encoding="latin-1").splitlines():
