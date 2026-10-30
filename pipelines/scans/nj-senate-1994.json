@@ -1,0 +1,84 @@
+{
+  "polity": "US-NJ",
+  "publisher": "New Jersey Division of Elections",
+  "authoritative": "Source: the Division of Elections' official returns by county, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "US Senate general election returns by county, New Jersey, November 8, 1994",
+  "file": {
+    "url": "https://www.nj.gov/state/elections/assets/pdf/election-results/1994/1994-general-election-results-us-senate.pdf"
+  },
+  "contests": {
+    "senate": {
+      "year": 1994,
+      "chamber": "senate",
+      "day": "1994-11-08",
+      "special": false,
+      "state": "NJ",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Frank R. Lautenberg",
+          "contest": "senate",
+          "candidate": "Frank R. Lautenberg"
+        },
+        {
+          "label": "Garabed \"Chuck\" Haytaian",
+          "contest": "senate",
+          "candidate": "Garabed \"Chuck\" Haytaian"
+        },
+        {
+          "label": "Michael P. Kelly",
+          "contest": "senate",
+          "candidate": "Michael P. Kelly"
+        },
+        {
+          "label": "Ben Grindlinger",
+          "contest": "senate",
+          "candidate": "Ben Grindlinger"
+        },
+        {
+          "label": "Richard J. Pezzullo",
+          "contest": "senate",
+          "candidate": "Richard J. Pezzullo"
+        },
+        {
+          "label": "Andrea Lippi",
+          "contest": "senate",
+          "candidate": "Andrea Lippi"
+        },
+        {
+          "label": "George Patrick Predham",
+          "contest": "senate",
+          "candidate": "George Patrick Predham"
+        }
+      ],
+      "orientation": "counties_down",
+      "hint": "Read only the printed table of county rows and the State-Wide row; ignore handwriting, stamps, and speckle."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Joanne Kuniansky",
+          "contest": "senate",
+          "candidate": "Joanne Kuniansky"
+        },
+        {
+          "label": "Arlene Gold",
+          "contest": "senate",
+          "candidate": "Arlene Gold"
+        }
+      ],
+      "orientation": "counties_down",
+      "hint": "Read only the printed table of county rows and the State-Wide row; ignore handwriting, stamps, and speckle."
+    }
+  ]
+}

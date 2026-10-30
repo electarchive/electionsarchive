@@ -169,8 +169,8 @@ BATCH_LIMIT = 200_000_000
 LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
 HALF = re.compile(r"(?<=\d)\s*(?:\.5|½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
-SUBTOTAL = re.compile(r"^(down ?state|downstate)$")
-TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
+SUBTOTAL = re.compile(r"^(down ?state|downstate|percent(age)?s?)$")
+TOTAL = re.compile(r"^(state ?wide |state |grand |county )?totals?\b|^state ?wide$|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
 EXPANDED = {"mt": "mount", "w": "west", "e": "east", "n": "north", "s": "south", "no": "north", "so": "south"}
@@ -662,7 +662,7 @@ def cells(
                     else row["label"]
                 )
                 heading = WARD.sub("", named)
-                if SUBTOTAL.match(slug(row["label"])):
+                if SUBTOTAL.match(slug(row["label"])) or row["label"].strip() in {"%", "%."}:
                     continue
                 texts = row["values"]
                 if header and slug(header[0]["label"]) and texts and re.fullmatch(r"[A-WYZa-wyz]", texts[0].strip()):

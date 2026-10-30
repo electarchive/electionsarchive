@@ -1,0 +1,96 @@
+{
+  "polity": "US-NJ",
+  "publisher": "New Jersey Division of Elections",
+  "authoritative": "Source: the Division of Elections' official returns by county, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Official New Jersey presidential election returns by county, general election November 3, 1992",
+  "file": {
+    "url": "https://www.nj.gov/state/elections/assets/pdf/election-results/1992/1992-general-election-results-president.pdf"
+  },
+  "contests": {
+    "president": {
+      "year": 1992,
+      "chamber": "president",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "NJ",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "George Bush",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "Bill Clinton",
+          "contest": "president",
+          "candidate": "Bill Clinton"
+        },
+        {
+          "label": "Ross Perot",
+          "contest": "president",
+          "candidate": "Ross Perot"
+        },
+        {
+          "label": "Andre Marrou",
+          "contest": "president",
+          "candidate": "Andre Marrou"
+        },
+        {
+          "label": "Drew Bradford",
+          "contest": "president",
+          "candidate": "Drew Bradford"
+        },
+        {
+          "label": "James Gritz",
+          "contest": "president",
+          "candidate": "James Gritz"
+        },
+        {
+          "label": "Ron Daniels",
+          "contest": "president",
+          "candidate": "Ron Daniels"
+        },
+        {
+          "label": "James Mac Warren",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "Helen Halyard",
+          "contest": "president",
+          "candidate": "Helen Halyard"
+        },
+        {
+          "label": "Lenora Fulani",
+          "contest": "president",
+          "candidate": "Lenora Fulani"
+        },
+        {
+          "label": "Howard Phillips",
+          "contest": "president",
+          "candidate": "Howard Phillips"
+        },
+        {
+          "label": "Lyndon H. LaRouche",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        },
+        {
+          "label": "John Hagelin",
+          "contest": "president",
+          "candidate": "John Hagelin"
+        }
+      ],
+      "orientation": "counties_down",
+      "hint": "Read only the printed table of county rows and the State-Wide row; ignore handwriting, stamps, and speckle."
+    }
+  ]
+}
