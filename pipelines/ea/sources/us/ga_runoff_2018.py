@@ -20,6 +20,7 @@ URL = "https://results.enr.clarityelections.com/GA/#2018-07-24-runoff"
 PUBLISHER = "Georgia Secretary of State"
 TITLE = "July 24, 2018 General Primary Runoff Election: official results by county"
 CONTESTS = {
+    "Governor - REP": "2018-07-24:GA:governor:republican",
     "Lieutenant Governor - REP": "2018-07-24:GA:lieutenant-governor:republican",
     "U.S. Representative, District 6 - DEM": "2018-07-24:GA:house:6:democratic",
     "U.S. Representative, District 7 - DEM": "2018-07-24:GA:house:7:democratic",
@@ -71,7 +72,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Georgia's July 24, 2018 primary runoffs for lieutenant governor and U.S. House districts 6 and 7 by county from the Secretary of State's results",
+            summary="Georgia's July 24, 2018 primary runoffs for governor, lieutenant governor, and U.S. House districts 6 and 7 by county from the Secretary of State's results",
             polity="US-GA",
         )
         source = cs.source(PUBLISHER, TITLE)
