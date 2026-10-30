@@ -776,20 +776,20 @@ TX-48215-lajoya	La Joya Independent School District Board of Trustees Place 1	0	
 TX-48215-lajoya	La Joya Independent School District Board of Trustees Place 2	0	Servando Ramirez		Hidalgo	1
 TX-48215-lajoya	La Joya Independent School District Board of Trustees Place 3	0	Victor M. Garza		Hidalgo	1
 TX-48215-lajoya	La Joya Independent School District Board of Trustees Place 3	0	Mary T. Hernandez		Hidalgo	1
-TX-48201-harris-lc	City of League City Mayor	0	Nick Long		Harris	1
-TX-48201-harris-lc	City of League City Mayor	0	Tom Crews		Harris	1
-TX-48201-harris-lc	City of League City Council Position 1	0	Gordon Bethel		Harris	1
-TX-48201-harris-lc	City of League City Council Position 1	0	Dinah Carpenter		Harris	1
-TX-48201-harris-lc	City of League City Council Position 1	0	Dina DuBose Driskill		Harris	1
-TX-48201-harris-lc	City of League City Council Position 2	0	Tommy Cones		Harris	1
-TX-48201-harris-lc	City of League City Council Position 2	0	Gregory Van Etten		Harris	1
-TX-48201-harris-lc	City of League City Council Position 3	1	Robert Bruce		Harris	1
-TX-48201-harris-lc	City of League City Council Position 3	1	Julius Segelquist		Harris	1
-TX-48201-harris-lc	City of League City Council Position 3	1	Seth Rowlands		Harris	1
-TX-48201-harris-lc	City of League City Council Position 6	0	Sean Doyle		Harris	1
-TX-48201-harris-lc	City of League City Council Position 6	0	Lisa Welty		Harris	1
-TX-48201-harris-lc	City of League City Council Position 7	0	Sean Saunders		Harris	1
-TX-48201-harris-lc	City of League City Council Position 7	0	Teresa Potter		Harris	1
+TX-48201-harris-lc	City of League City Mayor	0	Nick Long		Galveston	1
+TX-48201-harris-lc	City of League City Mayor	0	Tom Crews		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 1	0	Gordon Bethel		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 1	0	Dinah Carpenter		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 1	0	Dina DuBose Driskill		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 2	0	Tommy Cones		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 2	0	Gregory Van Etten		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 3	1	Robert Bruce		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 3	1	Julius Segelquist		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 3	1	Seth Rowlands		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 6	0	Sean Doyle		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 6	0	Lisa Welty		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 7	0	Sean Saunders		Galveston	1
+TX-48201-harris-lc	City of League City Council Position 7	0	Teresa Potter		Galveston	1
 TX-48201-harris-crosby	Crosby Independent School District Board of Trustees District 1	0	Karen St. Julian-Thomas		Harris	1
 TX-48201-harris-crosby	Crosby Independent School District Board of Trustees District 3	0	Viviana Killion		Harris	1
 TX-48201-harris-crosby	Crosby Independent School District Board of Trustees District 4	0	Lisa Kallies		Harris	1
@@ -928,82 +928,10 @@ KS-20045	Douglas County Commission District 4	0	Ethan Spurling	Democratic	Dougla
 KS-20045	Douglas County Commission District 5	0	Kirsten Kuhn	Libertarian	Douglas	1
 KS-20045	Douglas County Commission District 5	0	Erica Anderson	Democratic	Douglas	1
 KS-20035	Cowley County Commission District 1	0	Wayne Wilt	Republican	Cowley	1
-UT-49049-sch	Nebo School District Board of Education District 2	0	Joseph Earnest		Utah	1
-UT-49049-sch	Nebo School District Board of Education District 2	0	Scott P. Card		Utah	1
-UT-49049-sch	Nebo School District Board of Education District 4	0	Perry C. Ewell		Utah	1
-UT-49049-sch	Nebo School District Board of Education District 4	0	Rick B. Ainge		Utah	1
-UT-49049-sch	Nebo School District Board of Education District 5	0	Shannon M. Acor		Utah	1
-UT-49049-sch	Provo City School District Board of Education District 1	0	Lisa Boyce		Utah	1
-UT-49049-sch	Provo City School District Board of Education District 2	0	Melanie Hall		Utah	1
-UT-49049-sch	Provo City School District Board of Education District 3	0	Megan Van Wagenen		Utah	1
-UT-49049-sch	Provo City School District Board of Education District 4	0	Jennifer Partridge		Utah	1
-UT-49005-sch	Cache County School District Board of Education District 2	0	Roger Pulsipher		Cache	1
-UT-49005-sch	Cache County School District Board of Education District 2	0	Aaron C. Ritchey		Cache	1
-UT-49005-sch	Cache County School District Board of Education District 4	0	Randall T. Bagley		Cache	1
-UT-49005-sch	Cache County School District Board of Education District 4	0	Deidra Hartwell		Cache	1
-UT-49005-sch	Cache County School District Board of Education District 7	0	Teri Rhodes		Cache	1
-UT-49005-sch	Cache County School District Board of Education District 7	0	Mylind Fawcett		Cache	1
-UT-49005-sch	Logan City School District Board of Education District 3	0	Russell Fisher		Cache	1
-UT-49005-sch	Logan City School District Board of Education District 5	0	Cole Checketts		Cache	1
-UT-49005-sch	Logan City School District Board of Education District 5	0	Karlee Fryer		Cache	1
-UT-49011-sch	Davis School District Board of Education District 3	0	Julie Powell		Davis	1
-UT-49011-sch	Davis School District Board of Education District 3	0	Alison R. Dunn		Davis	1
-UT-49011-sch	Davis School District Board of Education District 5	0	Michelle Barber		Davis	1
-UT-49011-sch	Davis School District Board of Education District 6	0	Jane Neal		Davis	1
-UT-49011-sch	Davis School District Board of Education District 6	0	Kristen Hogan		Davis	1
-UT-49011-sch	Davis School District Board of Education District 7	0	Emily Price		Davis	1
-UT-49053-sch	Washington County School District Board of Education District 4	0	Larene Cox		Washington	1
-UT-49053-sch	Washington County School District Board of Education District 5	0	Dan C. Zaleski		Washington	1
-UT-49053-sch	Washington County School District Board of Education District 5	0	David B. Stirland		Washington	1
-UT-49053-sch	Washington County School District Board of Education District 6	0	Burke Staheli		Washington	1
-UT-49053-sch	Washington County School District Board of Education District 7	0	N. Craig Hammer		Washington	1
-GA-13067-sch	Cobb County Board of Education Post 2	0	Becky Sayler		Cobb	1
-GA-13067-sch	Cobb County Board of Education Post 4	0	David Chastain		Cobb	1
-GA-13067-sch	Cobb County Board of Education Post 4	0	Micheal Garza		Cobb	1
 GA-13245-aug	Augusta-Richmond County Commission District 3 Special Election	1	Carol J. Yancy		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 3	0	Carol J. Yancy		Richmond	1
 GA-13245-aug	Augusta-Richmond County Commission District 3 Special Election	1	Janice Ramirez		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 3	0	Janice Ramirez		Richmond	1
 GA-13245-aug	Augusta-Richmond County Commission District 3 Special Election	1	Bartley Payne		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 3	0	Bartley Payne		Richmond	1
 GA-13245-aug	Augusta-Richmond County Commission District 3 Special Election	1	Kenyatta Brown		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 3	0	Kenyatta Brown		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 2	0	Charlie Hannah		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 2	0	RaShaun Holiday		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 6	0	Charles "Chuckie" Williams		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 6	0	Edward Lowery		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 7	0	Lisa Martin		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 9	0	Delvin T. Howard		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 9	0	Thomas Gardiner		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 9	0	Venus D. Cain		Richmond	1
-GA-13245-aug	Richmond County Board of Education District 9	0	Brad Owens		Richmond	1
-UT-49035-sch	Canyons School District Board of Education District 2	0	Amber Shill		Salt Lake	1
-UT-49035-sch	Canyons School District Board of Education District 4	0	Andrew Edtl		Salt Lake	1
-UT-49035-sch	Canyons School District Board of Education District 5	0	Dennis Lagodimos		Salt Lake	1
-UT-49035-sch	Canyons School District Board of Education District 5	0	Karen Pedersen		Salt Lake	1
-UT-49035-sch	Canyons School District Board of Education District 6	0	Amanda Oaks		Salt Lake	1
-UT-49035-sch	Granite School District Board of Education District 3	0	Amber Stone		Salt Lake	1
-UT-49035-sch	Granite School District Board of Education District 5	0	Aimee Warren		Salt Lake	1
-UT-49035-sch	Granite School District Board of Education District 5	0	Dylanger McKissen		Salt Lake	1
-UT-49035-sch	Granite School District Board of Education District 6	0	Jay Blain		Salt Lake	1
-UT-49035-sch	Granite School District Board of Education District 6	0	Michelle Steenblik		Salt Lake	1
-UT-49035-sch	Granite School District Board of Education District 7	0	Kris Nguyen		Salt Lake	1
-UT-49035-sch	Jordan School District Board of Education District 2	0	Brian Barnett		Salt Lake	1
-UT-49035-sch	Jordan School District Board of Education District 2	0	Jeffrey Enquist		Salt Lake	1
-UT-49035-sch	Jordan School District Board of Education District 3	0	Suzanne Wood		Salt Lake	1
-UT-49035-sch	Jordan School District Board of Education District 7	0	Barbie Curtis		Salt Lake	1
-UT-49035-sch	Jordan School District Board of Education District 7	0	F. Masita Taufahema		Salt Lake	1
-UT-49035-sch	Murray School District Board of Education District 2	0	Kami Anderson		Salt Lake	1
-UT-49035-sch	Murray School District Board of Education District 2	0	Jessica Miller		Salt Lake	1
-UT-49035-sch	Murray School District Board of Education District 3	0	Jill Weight		Salt Lake	1
-UT-49035-sch	Murray School District Board of Education District 4	0	Elizabeth Payne		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 3	0	Jared Wright		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 3	0	Ashley Anderson		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 4	0	Amanda Finlayson		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 6	0	R. Bryan Jensen		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 6	0	Jennifer Smith		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 5	1	Sandra Buendia		Salt Lake	1
-UT-49035-sch	Salt Lake City School District Board of Education District 5	1	Annie Romano		Salt Lake	1
 KS-20037	Crawford County Commission District 1	0	Bruce Lee Blair	Republican	Crawford	1
 KS-20037	Crawford County Commission District 3	0	Carl R. Wood	Republican	Crawford	1
 KS-20037	Crawford County Commission District 3	0	Nichole Maree Hamblin	Democratic	Crawford	1
