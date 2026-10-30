@@ -35,6 +35,31 @@ def display_name(label: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+HELD: dict[UUID, dict[str, tuple[UUID, UUID, str, str]]] = {}
+
+
+def fold(name: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", re.sub(r"\bno\.? ?(?=\d)", "", name.lower()))
+
+
+def held(conn: Connection, county: UUID) -> dict[str, tuple[UUID, UUID, str, str]]:
+    if county not in HELD:
+        HELD[county] = {
+            fold(text): (polity, area, path, code)
+            for polity, area, text, path, code in conn.execute(
+                """select p.id, t.area_id, n.text, s.path, c.code from polity_parent pp
+                   join polity p on p.id = pp.polity_id and p.kind = 'special_district'
+                   join polity_territory t on t.polity_id = p.id
+                   join area_code c on c.area_id = t.area_id
+                   join name n on n.entity_id = p.id and n.is_preferred
+                   join slug s on s.entity_id = p.id
+                   where pp.parent_id = %s order by s.path desc""",
+                [county],
+            ).fetchall()
+        }
+    return HELD[county]
+
+
 def special(
     conn: Connection,
     cs: Changeset,
@@ -59,6 +84,9 @@ def special(
         if existing is None:
             return None
         return (existing[0], existing[1], display, path, existing[2])
+    twin = held(conn, county_polity).get(fold(display))
+    if twin is not None:
+        return (twin[0], twin[1], display, twin[2], twin[3])
     polity = cs.key("us.polity", f"special:{code}")
     slugs[path] = polity
     area = cs.area("us.special_district", code)
