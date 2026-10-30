@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -207,6 +208,7 @@ export const profile = snakeCase.table("profile", {
   links: jsonb().notNull().default([]),
   licenseAcceptedAt: time(),
   feedToken: text().unique(),
+  digest: boolean().notNull().default(false),
   createdAt: time().notNull().defaultNow(),
 });
 
@@ -325,6 +327,9 @@ export const activityKind = pgEnum("activity_kind", [
   "proposal_published",
   "proposal_reverted",
   "changeset_published",
+  "commented",
+  "topic_opened",
+  "topic_resolved",
 ]);
 
 export const activity = snakeCase.table(
@@ -346,6 +351,12 @@ export const activity = snakeCase.table(
       .notNull()
       .default(sql`'{}'`),
     summary: text().notNull(),
+    threadId: uuid().references(() => thread.id, { onDelete: "cascade" }),
+    commentId: uuid().references(() => comment.id, { onDelete: "cascade" }),
+    notifyUserIds: uuid()
+      .array()
+      .notNull()
+      .default(sql`'{}'`),
   },
   (t) => [
     index("activity_at_idx").on(t.at.desc()),
@@ -353,6 +364,102 @@ export const activity = snakeCase.table(
     index("activity_proposal_id_idx").on(t.proposalId),
     index("activity_entity_ids_idx").using("gin", t.entityIds),
     index("activity_polity_ids_idx").using("gin", t.polityIds),
+    index("activity_notify_user_ids_idx").using("gin", t.notifyUserIds),
+    index("activity_thread_id_idx").on(t.threadId),
+  ],
+);
+
+export const threadKind = pgEnum("thread_kind", ["proposal", "talk"]);
+
+export const threadStatus = pgEnum("thread_status", ["open", "resolved"]);
+
+export const thread = snakeCase.table(
+  "thread",
+  {
+    id: primaryId(),
+    kind: threadKind().notNull(),
+    proposalId: uuid().references(() => proposal.id, { onDelete: "cascade" }),
+    entityId: uuid(),
+    title: text(),
+    status: threadStatus().notNull().default("open"),
+    authorUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    createdAt: time().notNull().defaultNow(),
+    updatedAt: timeUpdated(),
+  },
+  (t) => [
+    check(
+      "thread_kind_check",
+      sql`case ${t.kind} when 'proposal' then ${t.proposalId} is not null and ${t.entityId} is null and ${t.title} is null else ${t.proposalId} is null and ${t.entityId} is not null and char_length(${t.title}) between 1 and 200 end`,
+    ),
+    uniqueIndex("thread_proposal_id_key").on(t.proposalId),
+    index("thread_entity_id_idx")
+      .on(t.entityId, t.updatedAt.desc())
+      .where(sql`${t.kind} = 'talk'`),
+  ],
+);
+
+export const comment = snakeCase.table(
+  "comment",
+  {
+    id: primaryId(),
+    threadId: uuid()
+      .notNull()
+      .references(() => thread.id, { onDelete: "cascade" }),
+    parentId: uuid(),
+    authorUserId: uuid().references(() => users.id, { onDelete: "set null" }),
+    agentKeyId: uuid().references(() => apikeys.id, { onDelete: "set null" }),
+    agentName: text(),
+    agentModel: text(),
+    revisionN: integer(),
+    bodyMd: text().notNull(),
+    anchor: jsonb(),
+    suggestion: jsonb(),
+    acceptedRevision: integer(),
+    createdAt: time().notNull().defaultNow(),
+    editedAt: time(),
+    hiddenBy: uuid().references(() => users.id, { onDelete: "set null" }),
+    hiddenAt: time(),
+    hiddenReason: text(),
+  },
+  (t) => [
+    foreignKey({ columns: [t.parentId], foreignColumns: [t.id] }).onDelete(
+      "cascade",
+    ),
+    check(
+      "comment_body_check",
+      sql`char_length(${t.bodyMd}) between 1 and 10000`,
+    ),
+    check(
+      "comment_hidden_check",
+      sql`(${t.hiddenAt} is null) = (${t.hiddenReason} is null)`,
+    ),
+    index("comment_thread_id_idx").on(t.threadId, t.createdAt),
+    index("comment_author_user_id_idx").on(t.authorUserId, t.createdAt.desc()),
+  ],
+);
+
+export const watchTarget = pgEnum("watch_target", [
+  "entity",
+  "polity",
+  "proposal",
+  "bounty",
+  "user",
+]);
+
+export const watch = snakeCase.table(
+  "watch",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetKind: watchTarget().notNull(),
+    targetId: uuid().notNull(),
+    descendants: boolean().notNull().default(false),
+    createdAt: time().notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.targetKind, t.targetId] }),
+    index("watch_target_idx").on(t.targetKind, t.targetId),
   ],
 );
 
