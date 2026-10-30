@@ -16,7 +16,13 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
-SCHOOLS = {("TX", "Georgetown Independent School District"): "4820600"}
+SCHOOLS = {
+    ("TX", "Georgetown Independent School District"): "4820600",
+    ("CA", "Fallbrook Union Elementary School District"): "0613500",
+    ("CA", "Julian Union High School District"): "0619110",
+    ("CA", "Galt Joint Union High School District"): "0614820",
+    ("CA", "Jefferson Union High School District"): "0618930",
+}
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
 COUNTIES = {
@@ -34,6 +40,10 @@ COUNTIES = {
     "31079": ("NE", "https://files.hallcountyne.gov/", "MF-390/26GNEHALL_7_PUB.pdf"),
     "48135": ("TX", "https://www.ectorcountytx.gov/271/Elections", "MF-392/ector/Pct. 201, 202, 203, 204.3, 206.5, 209_ybmswlfq61.pdf"),
     "04023": ("AZ", "https://www.nogalesaz.gov/336/Proposition-418---Alternative-Expenditur", "MF-404/nogales-az-2026-general-proposition-418.html"),
+    "06059": ("CA", "https://ocvote.org/elections/2026-general-election-measures-on-the-ballot", "MF-nov3-ca/orange/notice-of-election-nov2026.pdf"),
+    "06073": ("CA", "https://www.sdvote.com/content/dam/rov/en/election/nov-3-2026-gubernatorial-general-election/argument-deadline-measures.pdf", "MF-nov3-ca/san-diego/argument-deadline-measures.pdf"),
+    "06067": ("CA", "https://elections.saccounty.gov/content/vre/us/en/election-information/current-measure-information.html", "MF-nov3-ca/sacramento/current-measure-information.html"),
+    "06081": ("CA", "https://www.smcacre.gov/elections/november-3-2026-statewide-general-election", "MF-nov3-ca/san-mateo/county-amendments-resolutions.pdf"),
     "04015": ("AZ", "https://www.bullheadcityaz.gov/leadership-government/elections/", "bullhead/publicity-pamphlet-26.pdf"),
     "48209": ("TX", "https://www.hayscountytx.gov/elections", "MF-392/hays/Hays County Combined Sample Ballot 11x17.pdf"),
     "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
@@ -68,7 +78,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, and Texas, with official wording",
+            summary="Local referenda on the November 3, 2026 ballot in Arizona, New Mexico, Arkansas, Georgia, South Carolina, Nebraska, Texas, and California, with official wording",
             polity="US",
         )
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
