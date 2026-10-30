@@ -277,7 +277,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
             })
         : [],
     );
-    const [byes, tiers, chambers, known] = await Promise.all([
+    const [byes, tiers, chambers, known, hexes] = await Promise.all([
       call(router.seats.byElections, { id: found.id, within: found.scope?.id }),
       found.scope == null &&
       parts.length > 1 &&
@@ -294,6 +294,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
             ),
           ),
       call(router.coverage.known, { id: found.id }),
+      call(router.seats.hexes, { id: found.id, within: found.scope?.id }),
     ]);
     return {
       ...found,
@@ -301,6 +302,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       tiers,
       chambers: chambers.flatMap((entry) => (entry == null ? [] : [entry])),
       known,
+      hexes,
     };
   }
   if (found.kind === "contest") {
@@ -556,6 +558,7 @@ function markdown(
           data.cycle,
           data.tiers,
           data.chambers,
+          data.hexes,
           link,
         ),
         ...knownMarkdown(data.known, link, false),
@@ -2389,6 +2392,7 @@ function electionMarkdown(
   cycle: Extract<Data, { kind: "election" }>["cycle"],
   ballot: Extract<Data, { kind: "election" }>["tiers"],
   chambers: Extract<Data, { kind: "election" }>["chambers"],
+  hexes: Extract<Data, { kind: "election" }>["hexes"],
   link: Link,
 ) {
   const signed = new Intl.NumberFormat("en", { signDisplay: "exceptZero" });
@@ -3143,6 +3147,7 @@ function electionMarkdown(
                 members: count(repeat.members),
               }),
         ),
+        ...hexMarkdown(race.places, hexes),
       ];
     }),
     ...(governments.every((government) => government.isBefore)
@@ -3629,6 +3634,87 @@ function electionMarkdown(
             .join("\n"),
         ]),
   ].filter((block) => block !== "");
+}
+
+function hexMarkdown(
+  places: Extract<
+    Data,
+    { kind: "election" }
+  >["election"]["races"][number]["places"],
+  hexes: Extract<Data, { kind: "election" }>["hexes"],
+) {
+  if (places == null || hexes == null) {
+    return [];
+  }
+  const rows = new Map(places.rows.map((row) => [row.k, row]));
+  const cells = hexes.cells.filter((cell) => rows.has(cell.k));
+  if (cells.length === 0 || cells.length < hexes.cells.length * 0.9) {
+    return [];
+  }
+  const won = new Map<number, number>();
+  for (const cell of cells) {
+    const leader = rows.get(cell.k)?.leader;
+    if (leader != null) {
+      won.set(leader, (won.get(leader) ?? 0) + 1);
+    }
+  }
+  const letters = new Map<number, string>();
+  const ranked = won
+    .entries()
+    .toArray()
+    .toSorted((a, b) => b[1] - a[1]);
+  for (const [index] of ranked) {
+    const item = places.legend[index];
+    const taken = new Set(letters.values());
+    const letter =
+      [
+        ...`${item?.short ?? ""}${item?.label ?? ""}`
+          .toUpperCase()
+          .replaceAll(/[^A-Z]/gu, ""),
+        ..."123456789",
+      ].find((character) => !taken.has(character)) ?? "?";
+    letters.set(index, letter);
+  }
+  const tokens = new Map(
+    cells.map((cell) => {
+      const row = rows.get(cell.k);
+      const state = /^us\/([a-z]{2})\//.exec(row?.path ?? "")?.[1] ?? "";
+      return [
+        `${cell.q},${cell.r}`,
+        `${state.toUpperCase()}${row?.leader == null ? "-" : (letters.get(row.leader) ?? "-")}`,
+      ];
+    }),
+  );
+  const width = Math.max(...tokens.values().map((token) => token.length)) + 1;
+  const qs = cells.map((cell) => cell.q);
+  const rs = cells.map((cell) => cell.r);
+  const lines: Array<string> = [];
+  for (let r = Math.max(...rs); r >= Math.min(...rs); r -= 1) {
+    let line = (r & 1) === 1 ? " ".repeat(Math.floor(width / 2)) : "";
+    for (let q = Math.min(...qs); q <= Math.max(...qs); q += 1) {
+      line += (tokens.get(`${q},${r}`) ?? ".").padEnd(width);
+    }
+    lines.push(line.replace(/[ .]+$/u, ""));
+  }
+  return [
+    `### ${m.twin_hexes_title()}`,
+    m.twin_hexes_lede({ noun: places.levels[0]?.noun ?? "constituency" }),
+    `\`\`\`text\n${lines.join("\n")}\n\`\`\``,
+    letters
+      .entries()
+      .map(
+        ([index, letter]) =>
+          `- ${letter}: ${places.legend[index]?.label ?? ""}`,
+      )
+      .toArray()
+      .join("\n"),
+    ...(hexes.credit == null
+      ? []
+      : [m.map_hex_credit({ credit: hexes.credit })]),
+    ...(hexes.cartogram == null
+      ? []
+      : [m.twin_hexes_cartogram({ credit: hexes.cartogram.credit })]),
+  ];
 }
 
 function landingMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
