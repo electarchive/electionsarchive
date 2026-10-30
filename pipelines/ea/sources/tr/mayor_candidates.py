@@ -13,7 +13,7 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "8"
+VERSION = "9"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
 OLD = (1963, 1973)
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
@@ -194,16 +194,21 @@ def emit() -> Path:
         made = 0
         by_belde: dict[tuple[str, str], list[str]] = defaultdict(list)
         for key in contests:
-            if key.startswith(f"{DAYS[2004]}:") and contests[key][0] not in held:
-                tokens = key.removeprefix(f"{DAYS[2004]}:").removesuffix("-mayor").split("-")
-                by_belde[tokens[0], tokens[-1]].append(key)
+            if contests[key][0] not in held:
+                day, rest = key.split(":", 1)
+                by_belde[day, rest.removesuffix("-mayor").split("-")[-1]].append(key)
         wanted = {key for (_, key) in found}
         for (year, province), rows in sorted(found.items()):
             day = DAYS[year]
             contest_key = province if ":" in province else f"{day}:{province}-mayor"
-            if year == 2004 and contest_key not in contests and ":" in province:
+            if contest_key not in contests and ":" in province:
                 tokens = province.removeprefix(f"{day}:").removesuffix("-mayor").split("-")
-                hits = [key for key in by_belde[tokens[0], tokens[-1]] if key not in wanted]
+                hits = [
+                    key
+                    for key in by_belde[str(day), tokens[-1]]
+                    if key not in wanted
+                    and (key.split(":", 1)[1].startswith(tokens[0]) or tokens[0].startswith(key.split(":", 1)[1].split("-")[0]))
+                ]
                 if len(hits) == 1:
                     contest_key = hits[0]
             if contest_key not in contests:
