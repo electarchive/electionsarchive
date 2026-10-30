@@ -17,9 +17,32 @@ PARSED = DATA / "parsed" / SOURCE
 CACHE = "us.ne_usrep"
 DAYS = {1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
 BLOCKS = [
+    (1994, "governor", r"GOVERNOR LT GOVERNOR\s+GOVERNOR", 6, "position"),
     (1994, "senate", r"^\s*UNITED\s+DEMOCRAT", 3, "position"),
     (1998, "governor", r"Governor.Lt\. Governor", 3, "panels"),
 ]
+MANUAL = {
+    (1994, "governor"): {
+        "lincoln": [8913, 3731, 3, 0, 36, 0],
+        "logan": [256, 182, 0, 0, 0, 0],
+        "loup": [174, 97, 0, 0, 0, 0],
+        "madison": [7165, 2980, 7, 13, 14, 2],
+        "mcpherson": [192, 127, 0, 0, 0, 0],
+        "merrick": [2358, 894, 0, 0, 0, 0],
+        "morrill": [1257, 642, 2, 2, 0, 0],
+    }
+}
+PATCHES = {
+    (1994, "senate"): {"frontier": {2: 1}},
+    (1994, "governor"): {
+        "chase": {3: 1},
+        "gosper": {3: 1},
+        "keyapaha": {4: 1},
+        "frontier": {5: 1},
+        "nemaha": {5: 1},
+        "thurston": {5: 1},
+    }
+}
 METHOD = (
     "County totals are from the Board of State Canvassers' official report (the Nebraska Library Commission's scan, "
     "read from its text layer, columns assigned by position). A cell the scan garbled is the printed state total "
@@ -92,6 +115,10 @@ def parse() -> None:
                 for end, value in found:
                     cells[min(range(width), key=lambda i: abs(edges[i] - end))] = value
                 table[county] = cells
+        table.update(MANUAL.get((year, office), {}))
+        for county, patch in PATCHES.get((year, office), {}).items():
+            for column, value in patch.items():
+                table[county][column] = (table[county][column] or 0) + value
         print(year, office, len(table), printed, sorted(set(codes.values()) - {codes[k] for k in table}))
         for column in range(width):
             missing = [county for county, cells in table.items() if cells[column] is None]
