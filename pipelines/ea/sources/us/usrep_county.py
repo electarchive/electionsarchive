@@ -51,19 +51,21 @@ def emit(
                 f"select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '{prefix}%%'"
             ).fetchall()
         )
+        numbered = pl.col("district").cast(pl.String).str.split(":").list.first()
         split = {
             (day, county)
-            for (day, county), districts in frame.group_by("day", "county")
-            if districts["district"].n_unique() > 1
+            for (day, county), districts in frame.filter(numbered.str.contains(r"^\d+$")).group_by("day", "county")
+            if districts.select(numbered.n_unique()).item() > 1
         }
         contests = dict(
             conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s",
-                [f":{state}:" + ("(president|governor|senate)$" if statewide else "house:")],
+                [f":{state}:(house:|(president|governor|senate)(:[a-z]+)?$)"],
             )
         )
         for (day, district), rows in frame.group_by("day", "district", maintain_order=True):
-            key = f"{day}:{state}:{district}" if statewide else f"{day}:{state}:house:{district}"
+            house = not statewide and str(district).split(":")[0].isdigit()
+            key = f"{day}:{state}:house:{district}" if house else f"{day}:{state}:{district}"
             contest = contests.get(key)
             if contest is None:
                 print(f"{key}: no contest in the archive")
@@ -194,9 +196,9 @@ def emit(
                 "select district_area_id from contest where id = %s", [contest]
             ).fetchall()
             for county in rows["county"].unique():
-                if (day, county) not in split:
+                if not house or (day, county) not in split:
                     continue
-                part = f"{day[:4]}:{county}:{district}"
+                part = f"{day[:4]}:{county}:{str(district).split(':')[0]}"
                 unit_ids[county] = cs.unit("us.county_part", part)
                 if unit_ids[county] in cs.minted:
                     cs.add(
