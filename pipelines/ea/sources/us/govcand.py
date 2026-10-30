@@ -32,6 +32,7 @@ def races(
     frame: pl.DataFrame,
     source: UUID,
     state_fips: str,
+    result_kind: str = "counted",
 ) -> int:
     held = counties(conn, state_fips)
     slugs = dict(
@@ -116,7 +117,7 @@ def races(
             magnitude=first["seats"],
             round_number=1,
             electoral_system_id=system,
-            default_result_kind="counted",
+            default_result_kind=result_kind,
             term="remainder" if first["unexpired"] else "full",
         )
         cs.add(
