@@ -16,9 +16,9 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino"}
 KEPT = re.compile(
-    r"FIRE|WATER|UTILITY|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
+    r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
 DROPPED = re.compile(r"SCHL|SCHOOL|COLLEGE|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY")
 WORDS = (
@@ -274,9 +274,56 @@ def riverside() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+SAN_BERNARDINO = re.compile(
+    r"^\s+(?:Member|Director|Trustee), Board of (?P<role>Directors|Trustees)(?: Division (?P<seat>\d+))?(?P<short> - Short Term)?\s*$"
+)
+
+
+def san_bernardino() -> list[dict[str, str | int | bool]]:
+    rows = []
+    text = lines("06071")
+    contest = None
+    seats = 1
+    live = False
+    for index, line in enumerate(text):
+        if found := re.match(r"\s+Number to be elected\s+(\d+)", line):
+            body = text[index - 3].strip()
+            role = SAN_BERNARDINO.match(text[index - 2])
+            contest = (
+                role
+                if role is not None
+                and KEPT.search(body.upper())
+                and not DROPPED.search(body.upper())
+                and not re.search(r"(?i)school|san gorgonio|beaumont|indian wells|east kern", body)
+                else None
+            )
+            contest_body = body
+            seats, live = int(found[1]), False
+        elif contest is None:
+            continue
+        elif found := re.match(r"\s+Will contest appear on the ballot\s+(Yes|No)", line):
+            live = found[1] == "Yes"
+        elif live and (found := re.match(r"^([A-Z][A-Z .,'\"ÑÁÉÍÓÚ-]+?)(?: - (?:Appointed )?Incumbent)?\s*$", line)):
+            if index + 1 < len(text) and re.match(r"(Approved Ballot Designation|Mailing Address)", text[index + 1]):
+                rows.append(
+                    {
+                        "county": "San Bernardino",
+                        "district": full_name(contest_body),
+                        "seat": f"Division {contest['seat']}"
+                        if contest["seat"]
+                        else ("Short Term" if contest["short"] else ""),
+                        "role": "Director" if contest["role"] == "Directors" else "Trustee",
+                        "seats": seats,
+                        "name": cased(found[1]),
+                        "unexpired": contest["short"] is not None,
+                    }
+                )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
