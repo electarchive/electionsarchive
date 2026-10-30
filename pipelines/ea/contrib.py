@@ -1366,6 +1366,31 @@ def _reverse(state: str, accepted: tuple[str, ...], activity: str, summary: str)
     return run
 
 
+def _withdraw(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
+    with connect() as conn:
+        row = conn.execute(
+            """select p.author_user_id, p.state::text, p.head_changeset_id::text, c.status::text
+               from proposal p left join changeset c on c.id = p.head_changeset_id
+               where p.id = %s for update of p""",
+            [proposal],
+        ).fetchone()
+        if row is None:
+            raise ValueError(f"proposal {proposal} does not exist")
+        author, state, head, status = row
+        if requested is None or requested != author:
+            raise ValueError("only the author can withdraw a proposal")
+        if state == "published" or status == "published":
+            raise ValueError("this proposal is already published; open a new proposal to change it")
+        if state not in ("open", "changes_requested", "approved"):
+            raise ValueError(f"proposal {proposal} is {state}, not open, changes_requested, or approved")
+        reason = str(output.get("reason") or "withdrawn by the author")
+        if head is not None and status in ("draft", "pending_review"):
+            revert(conn, head, reason, str(requested))
+        _close(conn, proposal, "withdrawn", requested, reason)
+        _activity(conn, proposal, "proposal_withdrawn", requested, head, "Proposal %s withdrawn")
+    return {"status": "withdrawn", "changeset_id": head}
+
+
 JOBS: dict[str, Callable[[UUID, int | None, UUID | None, dict[str, object]], dict[str, object]]] = {
     "check": _check,
     "submit": _submit,
@@ -1374,6 +1399,7 @@ JOBS: dict[str, Callable[[UUID, int | None, UUID | None, dict[str, object]], dic
         "rejected", ("open", "changes_requested", "approved"), "proposal_rejected", "Proposal %s rejected"
     ),
     "revert": _reverse("reverted", ("published",), "proposal_reverted", "Proposal %s reverted"),
+    "withdraw": _withdraw,
 }
 
 

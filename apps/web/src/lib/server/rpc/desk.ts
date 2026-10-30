@@ -1,9 +1,7 @@
 import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
-import { isHttpError } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { auth } from "#lib/server/auth.js";
 import {
   decide,
   prereview,
@@ -13,66 +11,22 @@ import {
   roles,
 } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
-
-const codes: Record<number, string> = {
-  400: "BAD_REQUEST",
-  401: "UNAUTHORIZED",
-  403: "FORBIDDEN",
-  404: "NOT_FOUND",
-  409: "CONFLICT",
-};
-
-async function run<T>(work: () => Promise<T>) {
-  try {
-    return await work();
-  } catch (error_) {
-    if (isHttpError(error_)) {
-      throw new ORPCError(codes[error_.status] ?? "BAD_REQUEST", {
-        message: error_.body.message,
-      });
-    }
-    throw error_;
-  }
-}
+import { keyOwner, Number_, run, Text } from "#lib/server/rpc/keyed.js";
 
 const os = base
   .$context<{ headers: Headers }>()
   .use(async ({ context, next }) => {
-    const key = context.headers.get("x-api-key");
-    if (key == null || key === "") {
+    const owner = await keyOwner(context.headers);
+    if (owner == null) {
       throw new ORPCError("UNAUTHORIZED");
     }
-    const verified = await auth.api.verifyApiKey({ body: { key } });
-    if (!verified.valid || verified.key == null) {
-      throw new ORPCError("UNAUTHORIZED");
-    }
-    const userId = verified.key.referenceId;
-    const [allowed, owner] = await Promise.all([
-      roles(userId),
-      db.execute<{ banned: boolean }>(sql`
-        select coalesce(banned, false) and (ban_expires is null or ban_expires > now()) as banned
-        from users where id = ${userId}
-      `),
-    ]);
-    if (
-      owner.rows[0] == null ||
-      owner.rows[0].banned ||
-      !(allowed.admin || allowed.reviewer)
-    ) {
+    const allowed = await roles(owner.userId);
+    if (!(allowed.admin || allowed.reviewer)) {
       throw new ORPCError("FORBIDDEN");
     }
-    return next({ context: { userId } });
+    return next({ context: { userId: owner.userId } });
   });
 
-const Number_ = v.pipe(v.string(), v.regex(/^[1-9]\d{0,8}$/));
-const Text = (max: number) =>
-  v.pipe(
-    v.string(),
-    v.normalize("NFC"),
-    v.trim(),
-    v.minLength(1),
-    v.maxLength(max),
-  );
 const Reason = Text(2000);
 
 export const admin = {

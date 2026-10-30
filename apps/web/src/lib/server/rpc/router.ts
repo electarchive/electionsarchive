@@ -11,6 +11,7 @@ import {
 import { coverage } from "#lib/server/rpc/coverage.js";
 import { admin } from "#lib/server/rpc/desk.js";
 import { live } from "#lib/server/rpc/live.js";
+import { proposals } from "#lib/server/rpc/proposals.js";
 import { seats } from "#lib/server/rpc/seats.js";
 
 export const router = {
@@ -24,6 +25,7 @@ export const router = {
   parties,
   people,
   polities,
+  proposals,
   search,
   seats,
 };
