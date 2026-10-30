@@ -354,6 +354,42 @@ NJ_FILES = {
     date(2010, 11, 2): "2010/2010-official-gen-elect-tallies-public-question-112410.pdf",
     date(2011, 11, 8): "2011/2011-official-gen-elect-public-question-results.pdf",
 }
+MD = "https://elections.maryland.gov/elections/archive/"
+MD_FILES = {
+    date(2000, 11, 7): ("2000/results/pregnque.html",),
+    date(2002, 11, 5): ("2002/results/g_all_offices.txt",),
+    date(2006, 11, 7): ("2006/results/general/Statewide_Ballot_Question_Results.html",),
+    date(2008, 11, 4): tuple(f"2008/results/general/gen_detail_qresults_2008_4_000{n}S-.html" for n in (1, 2)),
+    date(2010, 11, 2): tuple(f"2010/results/General/gen_detail_qresults_2010_2_000{n}S-.html" for n in (1, 2, 3)),
+}
+MD_COUNTIES = frozenset(
+    (
+        "Allegany",
+        "Anne Arundel",
+        "Baltimore",
+        "Baltimore City",
+        "Calvert",
+        "Caroline",
+        "Carroll",
+        "Cecil",
+        "Charles",
+        "Dorchester",
+        "Frederick",
+        "Garrett",
+        "Harford",
+        "Howard",
+        "Kent",
+        "Montgomery",
+        "Prince George's",
+        "Queen Anne's",
+        "St. Mary's",
+        "Somerset",
+        "Talbot",
+        "Washington",
+        "Wicomico",
+        "Worcester",
+    )
+)
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
     "1": ((189032, 50111), ((0.7028, 0.7753, 0.7186, 0.8481), (0.7028, 0.6962, 0.7186, 0.7721))),
@@ -786,6 +822,11 @@ PUBLISHERS = {
         "Official general election results: public questions",
         "https://www.nj.gov/state/elections/election-information-results.shtml",
     ),
+    "MD": (
+        "Maryland State Board of Elections",
+        "Official general election results: ballot questions",
+        "https://elections.maryland.gov/elections/archive/index.html",
+    ),
     "AK": (ak_sovc.PUBLISHER, ak_sovc.TITLE, "https://www.elections.alaska.gov/election-results/"),
     "OH": gov_counties.OFFICIAL["OH"][:3],
     "GA": (
@@ -1015,6 +1056,10 @@ def fetch() -> None:
     for url in [*AL_CERTS.values(), AL_2007, *(NJ + path for path in NJ_FILES.values())]:
         raw.fetch(SOURCE, url, suffix=".pdf")
         time.sleep(1)
+    for paths in MD_FILES.values():
+        for path in paths:
+            raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
+            time.sleep(1)
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -1510,6 +1555,63 @@ def new_jersey() -> list[dict[str, object]]:
                             "votes": count,
                         }
                     )
+    return rows
+
+
+def maryland() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, paths in MD_FILES.items():
+        for path in paths:
+            url = MD + path
+            text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace")
+            found: dict[str, dict[str, tuple[int, int]]] = {}
+            if path.endswith(".txt"):
+                for line in text.splitlines():
+                    fields = [field.strip() for field in line.split("|")]
+                    if fields[0] == "Statewide Ballot Question":
+                        found.setdefault(fields[3].removeprefix("Question "), {})[fields[2].removesuffix(" County")] = (
+                            int(fields[-2]),
+                            int(fields[-1]),
+                        )
+            else:
+                cells = [
+                    cell.strip()
+                    for cell in html.unescape(re.sub(r"<[^>]+>", "|", text)).replace("\xa0", " ").split("|")
+                    if cell.strip()
+                ]
+                number = ""
+                for index, cell in enumerate(cells):
+                    if heading := re.match(r"(?:Question|Constitutional Amendment) (\d+)\b", cell):
+                        number = heading[1]
+                    elif number and index + 2 < len(cells) and re.fullmatch(r"[\d,]+", cells[index + 1]):
+                        name = cell.removesuffix(" County")
+                        total = name.lower().startswith("total")
+                        if total or name in MD_COUNTIES:
+                            yes, no = (
+                                int(re.match(r"[\d,]+", cells[index + offset])[0].replace(",", ""))
+                                for offset in (1, 2)
+                            )
+                            found.setdefault(number, {})["Total" if total else name] = (yes, no)
+            for number, table in found.items():
+                printed = table.pop("Total", None)
+                if len(table) != 24 or printed is not None and tuple(
+                    sum(votes[side] for votes in table.values()) for side in (0, 1)
+                ) != printed:
+                    raise ValueError(f"MD {day} question {number}: {len(table)} counties do not sum to {printed}")
+                for county, votes in table.items():
+                    for answer, count in zip(("YES", "NO"), votes, strict=True):
+                        rows.append(
+                            {
+                                "state": "MD",
+                                "day": day,
+                                "number": str(int(number)),
+                                "label": "",
+                                "url": url,
+                                "county": county,
+                                "answer": answer,
+                                "votes": count,
+                            }
+                        )
     return rows
 
 
@@ -3235,6 +3337,7 @@ def parse() -> None:
             *georgia(),
             *alaska(),
             *new_jersey(),
+            *maryland(),
             *nebraska(),
             *arkansas(),
             *south_dakota(),
@@ -3307,7 +3410,7 @@ def parse() -> None:
                 "number": number,
                 "label": label,
                 "measure": f"Question {number}"
-                if state in ("ME", "NV", "RI")
+                if state in ("ME", "MD", "NV", "RI")
                 else f"Public Question {number}"
                 if state == "NJ"
                 else entry["measure"]
