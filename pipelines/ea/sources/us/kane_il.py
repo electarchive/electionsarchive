@@ -1,3 +1,4 @@
+import html
 import re
 from collections.abc import Iterator, Mapping
 from datetime import date
@@ -35,14 +36,14 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     tenant = next(iter(registry))
     for day in _days():
         page = raw.cached(SOURCE, f"{HOST}/{day}/Contests/").path.read_text(errors="replace")
-        title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.search(r"<h1>(.*?)</h1>", page, re.DOTALL)[1])).strip()
+        title = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", re.search(r"<h1>(.*?)</h1>", page, re.DOTALL)[1]))).strip()
         contests = []
         for index, (text, party, body) in enumerate(CONTEST.findall(page)):
-            text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text)).strip()
+            text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text))).strip()
             vote_for = re.search(r"\(Vote for (\d+)\)", body)
             choices = []
             for name, votes in ROW.findall(body):
-                name = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", name)).strip()
+                name = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", name))).strip()
                 tagged = TAGGED.match(name)
                 choices.append(
                     {
