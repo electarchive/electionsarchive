@@ -15,7 +15,7 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange"}
 KEPT = re.compile(
     r"FIRE|WATER|UTILITY|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER"
 )
@@ -36,48 +36,87 @@ PERSON = re.compile(r"^([A-Z][^,]*?), (.+?)(?: - ([A-Z]{2,4}))?\s{3,}\S.*\s(YES|
 def full_name(label: str) -> str:
     for short, full in WORDS:
         label = re.sub(short, full, label)
-    text = cased(label).replace(" Del ", " del ")
-    return text if re.search(r"\b(?:District|Authority|Agency)$", text) else f"{text} District"
+    text = cased(label).replace(" Del ", " del ").replace(" And ", " and ")
+    return text if re.search(r"\b(?:District|Authority|Agency|County)$", text) else f"{text} District"
+
+
+def lines(fips: str) -> list[str]:
+    path = raw.cached(local_2026.SOURCE, local_2026.FILES[fips]).path
+    return (
+        subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
+        .stdout.decode()
+        .splitlines()
+    )
+
+
+def san_diego() -> list[dict[str, str | int | bool]]:
+    rows = []
+    text = lines("06073")
+    keep = False
+    for index, line in enumerate(text):
+        if found := re.match(r" Election = (YES|NO)\s+Vote for (\d+)", line):
+            heading = next(previous.strip() for previous in reversed(text[:index]) if previous.strip())
+            seats = int(found[2])
+            unexpired = "Short Term" in text[index + 1] or "(Short Term)" in heading
+            keep = found[1] == "YES" and KEPT.search(heading) is not None and DROPPED.search(heading) is None
+            seat = SEAT.match(re.sub(r"\s*\(Short Term\)", "", heading))
+            body, label = (
+                (seat[1], f"{'Zone' if 'ZONE' in heading.upper() else 'Division'} {seat[2]}") if seat else (heading, "")
+            )
+            body = re.sub(r"\s*\(.*$", "", body)
+        elif keep and (person := PERSON.match(line)) and person[4] == "YES":
+            rows.append(
+                {
+                    "county": "San Diego",
+                    "district": full_name(body),
+                    "seat": label or ("Short Term" if unexpired else ""),
+                    "role": "Director",
+                    "seats": seats,
+                    "name": cased(f"{person[2]} {person[1]}"),
+                    "unexpired": unexpired,
+                }
+            )
+    return rows
+
+
+def orange() -> list[dict[str, str | int | bool]]:
+    rows = []
+    heading = seat = role = ""
+    seats = 1
+    keep = unexpired = False
+    for line in lines("06059"):
+        if found := re.match(r"^Nonpartisan (.+) (Director|Trustee)$", line):
+            heading, role = found[1], found[2]
+            keep = re.search(r"SCHOOL|COLLEGE|^COUNTY|CITY OF|COUNCIL", heading) is None
+            seat, unexpired = "", False
+        elif keep and (found := re.match(r"^\s+\*?\s*\d{4}\s+(.+?)\s*$", line)):
+            number = re.search(r"Div(?:ision|\.)? (\d+)", found[1])
+            seat = f"Division {number[1]}" if number else ""
+            unexpired = "Short Term" in found[1]
+            if heading.startswith("MUNICIPAL WATER"):
+                heading = "Municipal Water District of Orange County"
+        elif keep and (found := re.search(r"\s(\d+)\s+\d+\s+\d+\s+ON BALLOT\s*$", line)):
+            seats = int(found[1])
+        elif keep and (found := re.fullmatch(r"(?:\s{8}Candidate\(s\):\s+| {33})([A-Z][A-Z .'\"-]{3,})", line)):
+            rows.append(
+                {
+                    "county": "Orange",
+                    "district": full_name(re.sub(r"\bDIST\.", "DISTRICT", heading)),
+                    "seat": seat or ("Short Term" if unexpired else ""),
+                    "role": role,
+                    "seats": seats,
+                    "name": cased(found[1]),
+                    "unexpired": unexpired,
+                }
+            )
+    return rows
 
 
 def parse() -> None:
-    rows = []
-    for fips, county in COUNTIES.items():
-        url = local_2026.FILES[fips]
-        path = raw.cached(local_2026.SOURCE, url).path
-        lines = (
-            subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
-            .stdout.decode()
-            .splitlines()
-        )
-        keep = False
-        for index, line in enumerate(lines):
-            if found := re.match(r" Election = (YES|NO)\s+Vote for (\d+)", line):
-                heading = next(previous.strip() for previous in reversed(lines[:index]) if previous.strip())
-                seats = int(found[2])
-                unexpired = "Short Term" in lines[index + 1] or "(Short Term)" in heading
-                keep = found[1] == "YES" and KEPT.search(heading) is not None and DROPPED.search(heading) is None
-                seat = SEAT.match(re.sub(r"\s*\(Short Term\)", "", heading))
-                body, label = (
-                    (seat[1], f"{'Zone' if 'ZONE' in heading.upper() else 'Division'} {seat[2]}")
-                    if seat
-                    else (heading, "")
-                )
-                body = re.sub(r"\s*\(.*$", "", body)
-            elif keep and (person := PERSON.match(line)) and person[4] == "YES":
-                rows.append(
-                    {
-                        "county": county,
-                        "district": full_name(body),
-                        "seat": label,
-                        "role": "Director",
-                        "seats": seats,
-                        "name": cased(f"{person[2]} {person[1]}"),
-                        "unexpired": unexpired,
-                    }
-                )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
+    frame = pl.DataFrame([*san_diego(), *orange()]).unique(
+        ["county", "district", "seat", "name"], keep="first", maintain_order=True
+    )
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.height, frame.select("county", "district").unique().height)
 
