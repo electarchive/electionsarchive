@@ -305,11 +305,22 @@ ROUNDS += [
     )
 ]
 IL_FILES = [
-    IL_URL.format(
-        f"69-{base + 10 * number}-{number}{'TH' if 10 <= number % 100 <= 20 else {1: 'ST', 2: 'ND', 3: 'RD'}.get(number % 10, 'TH')}%20{office}-2026GP.csv"
-    )
-    for office, base, seats in (("SENATE", 780, 59), ("REPRESENTATIVE", 1370, 118))
-    for number in range(1, seats + 1)
+    *(
+        IL_URL.format(
+            f"69-{base + 10 * number}-{number}{'TH' if 10 <= number % 100 <= 20 else {1: 'ST', 2: 'ND', 3: 'RD'}.get(number % 10, 'TH')}%20{office}-2026GP.csv"
+        )
+        for office, base, seats in (("SENATE", 780, 59), ("REPRESENTATIVE", 1370, 118))
+        for number in range(1, seats + 1)
+    ),
+    *(
+        IL_URL.format(f"69-{number}-{office}-2026GP.csv")
+        for number, office in (
+            (190, "ATTORNEY%20GENERAL"),
+            (200, "SECRETARY%20OF%20STATE"),
+            (210, "COMPTROLLER"),
+            (220, "TREASURER"),
+        )
+    ),
 ]
 MD_PAGES = [
     MD_URL.format(f"gen_results_2026_{office}_{number}.html")
@@ -476,6 +487,8 @@ STATEWIDE = {
     ),
     "state superintendent of education": ("superintendent-of-education", "Superintendent of Education"),
     "comptroller general": ("comptroller-general", "Comptroller General"),
+    "comptroller": ("comptroller", "Comptroller"),
+    "treasurer": ("treasurer", "Treasurer"),
     "chief financial officer": ("chief-financial-officer", "Chief Financial Officer"),
     "psc - district 3": ("public-service-commissioner:district-3", "Public Service Commissioner, District 3"),
     "psc - district 5": ("public-service-commissioner:district-5", "Public Service Commissioner, District 5"),
@@ -1200,9 +1213,11 @@ def parse() -> None:
                 with handle:
                     for row in csv.DictReader(handle):
                         found = re.fullmatch(r"(\d+)\w\w (SENATE|REPRESENTATIVE)", row["ContestName"].strip())
+                        statewide = STATEWIDE.get(row["ContestName"].strip().lower())
                         party = row["PartyName"].upper().removesuffix(" PARTY")
                         if (
                             found is None
+                            and statewide is None
                             or party not in ("DEMOCRATIC", "REPUBLICAN")
                             or row["EISCandidateID"] == "0"
                             or re.fullmatch(r"(?i)write-?ins?", row["CandidateName"].strip())
@@ -1210,8 +1225,8 @@ def parse() -> None:
                             continue
                         totals[
                             (
-                                "senate" if found[2] == "SENATE" else "house",
-                                found[1],
+                                statewide[0] if statewide else "senate" if found[2] == "SENATE" else "house",
+                                "" if statewide else found[1],
                                 party.lower(),
                                 re.sub(
                                     r"\b(?!(?:II|III|IV)\b|\w{1,2}\")([A-Z][a-z]{0,2})([A-Z])([A-Z']*)\b",
