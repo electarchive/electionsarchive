@@ -146,7 +146,7 @@ group by rc.id, rc.st, 3, 4, op.id
 """
 
 GOVERNMENTS_SQL = """
-select g.state, g.kind, g.polity_id::text, g.name, coalesce(g.population, 0), g.county,
+select g.state, g.kind, g.polity_id::text, g.name, coalesce(g.population, 0), g.county, g.id::text,
     coalesce(g.active and g.month = %(month)s and (%(year)s - g.phase) %% g.period = 0 and exists (
         select from coverage_government_year y where y.government_id = g.id and y.year = %(year)s - g.period and y.expected),
         false)
@@ -322,7 +322,7 @@ def measure(conn, day: str) -> dict:
     schools: dict[str, list[tuple[int, str]]] = defaultdict(list)
     from ea.coverage_tables import CANCELED, DECIDED_EARLIER, tokens
 
-    for st, kind, polity, name, population, county, due in conn.execute(GOVERNMENTS_SQL, params):
+    for st, kind, polity, name, population, county, government, due in conn.execute(GOVERNMENTS_SQL, params):
         if due and kind == "school" and county in CANCELED:
             due = not any(tokens(word) <= tokens(name) for word in CANCELED[county][1])
         if polity is not None:
@@ -331,7 +331,7 @@ def measure(conn, day: str) -> dict:
                 counties[polity] = (county, name.removesuffix(" County").removesuffix(" Parish"))
         if kind == "school" and county is not None:
             schools[county].append((len(places), name))
-        places.append((GOVERNMENTS[kind], st, name, population, due, polity, county))
+        places.append((GOVERNMENTS[kind], st, name, population, due, polity, county, government))
     from ea.coverage_tables import JUDICIAL
 
     judged = {st for (st,) in conn.execute(JUDGED_SQL, params)}
@@ -339,7 +339,7 @@ def measure(conn, day: str) -> dict:
     for st, period in JUDICIAL.items():
         if st in judged and st not in MARCH_JUDGES and (year - (2001 if st == "PA" else 2000)) % period == 0:
             judges[st] = len(places)
-            places.append(("judicial", st, st, 0, True, None, None))
+            places.append(("judicial", st, st, 0, True, None, None, None))
     held: dict[int, list[tuple[bool, bool]]] = defaultdict(list)
     for level in data["levels"]:
         if level.get("schedule"):
@@ -392,7 +392,7 @@ def measure(conn, day: str) -> dict:
         has = unqualified or (answers if level in ("statewide_measure", "local_measure") else candidates) >= 1
         if level == "judicial" and st not in judges:
             judges[st] = len(places)
-            places.append(("judicial", st, st, 0, False, None, None))
+            places.append(("judicial", st, st, 0, False, None, None, None))
         targets = (
             [judges[st]]
             if level == "judicial"
@@ -442,7 +442,7 @@ def measure(conn, day: str) -> dict:
         )
     }
     short = []
-    for i, (level, st, name, population, due, polity, county) in enumerate(places):
+    for i, (level, st, name, population, due, polity, county, government) in enumerate(places):
         contests = held.get(i, [])
         if due and not contests and str(polity) in decided:
             contests = [(True, True)]
@@ -465,7 +465,7 @@ def measure(conn, day: str) -> dict:
                 cell,
                 level,
                 st,
-                [polity, county],
+                [polity, government, county],
                 "gap_partial" if candidates else "gap_bare" if contests else "gap_absent",
                 1,
             )
