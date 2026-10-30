@@ -5001,6 +5001,8 @@ def parse() -> None:
                         skip = int(state == "IN" and sort == "school" and tokens[: len(lead)] != lead)
                         if stem and tokens[skip : skip + len(lead)] == lead:
                             rest = tokens[skip + len(lead) :]
+                            if rest[:1] == ["county"]:
+                                continue
                             said = (
                                 rest[0]
                                 if not start and rest and rest[0] in ("township", "borough", "city", "town", "village")
