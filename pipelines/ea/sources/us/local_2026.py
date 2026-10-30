@@ -3753,6 +3753,8 @@ def parse() -> None:
                     if city or county is not None:
                         geoid = f"27{cells[5]}" if city else f"27{int(county) * 2 - 1:03d}{cells[5]}"
                         label = [part for part in re.findall(r"\(([^)]*)\)", title) if not part.startswith("Elect")][-1]
+                        if not city and not label.endswith("Township"):
+                            label = f"{label} Township"
                         claim = {
                             "owner": f"{'place' if city else 'town'}:{geoid}",
                             "label": label,
