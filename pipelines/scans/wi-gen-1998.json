@@ -1,0 +1,114 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "Wisconsin Blue Book 1999-2000: November 3, 1998 general election by county",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A4K4QRBLSRUNJE8R#MF-395.pdf",
+  "item": "https://search.library.wisc.edu/digital/A4K4QRBLSRUNJE8R"
+ },
+ "contests": {
+  "governor": {
+   "year": 1998,
+   "chamber": "governor",
+   "day": "1998-11-03",
+   "special": false,
+   "state": "WI",
+   "district": null
+  },
+  "senate": {
+   "year": 1998,
+   "chamber": "senate",
+   "day": "1998-11-03",
+   "special": false,
+   "state": "WI",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 930,
+   "id": "930",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read only the Governor and Lieutenant Governor table with its seven columns; each column is a ticket, headed by the governor's name. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "E. Garvey / B. Lawton (Dem.)",
+     "contest": "governor",
+     "candidate": "Ed Garvey"
+    },
+    {
+     "label": "J. Mueller / J. Dean (Lib.)",
+     "contest": "governor",
+     "candidate": "Jim Mueller"
+    },
+    {
+     "label": "T. Thompson / S. McCallum (Rep.)",
+     "contest": "governor",
+     "candidate": "Tommy Thompson"
+    },
+    {
+     "label": "E. Frami / T. Rivers (Tax.)",
+     "contest": "governor",
+     "candidate": "Edward Frami"
+    },
+    {
+     "label": "J. Smith / R. Smith (WG)",
+     "contest": "governor",
+     "candidate": "Jeffrey Smith"
+    },
+    {
+     "label": "M. Mangan (Ind.)",
+     "contest": "governor",
+     "candidate": "Michael Mangan"
+    },
+    {
+     "label": "A. Muhammad / V. H. Bridges (Ind.)",
+     "contest": "governor",
+     "candidate": "Ahmad Muhammad"
+    }
+   ]
+  },
+  {
+   "page": 901,
+   "id": "901",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the November 3, 1998 United States Senator table: five candidate columns, then a County Total column that is also a column to read as its own unlabeled last column. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Russ Feingold (Dem.)",
+     "contest": "senate",
+     "candidate": "Russ Feingold"
+    },
+    {
+     "label": "Tom Ender (Lib.)",
+     "contest": "senate",
+     "candidate": "Tom Ender"
+    },
+    {
+     "label": "Mark W. Neumann (Rep.)",
+     "contest": "senate",
+     "candidate": "Mark Neumann"
+    },
+    {
+     "label": "Robert R. Raymond Hern (Tax.)",
+     "contest": "senate",
+     "candidate": "Robert Hern"
+    },
+    {
+     "label": "Eugene A. Hem (Ind.)",
+     "contest": "senate",
+     "candidate": "Eugene Hem"
+    },
+    {
+     "label": "County Total",
+     "contest": null,
+     "candidate": "County Total"
+    }
+   ]
+  }
+ ]
+}
