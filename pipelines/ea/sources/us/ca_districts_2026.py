@@ -16,9 +16,9 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara", "06001": "Alameda"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara", "06001": "Alameda", "06013": "Contra Costa"}
 KEPT = re.compile(
-    r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
+    r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
 DROPPED = re.compile(r"SCHL|SCHOOL|COLLEGE|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY")
 WORDS = (
@@ -422,9 +422,51 @@ def alameda() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+def contra_costa() -> list[dict[str, str | int | bool]]:
+    rows = []
+    page = raw.cached(local_2026.SOURCE, feed("06013")[0]).path.read_text()
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", page)))
+    text = [line.strip() for line in text.splitlines() if line.strip()]
+    seen: set[tuple[str, str, str]] = set()
+    for index, line in enumerate(text):
+        if not re.match(r"November 3, 2026, General Election\s+11/03/2026", line):
+            continue
+        title = text[index + 1]
+        if (
+            not KEPT.search(title.upper())
+            or re.search(r"(?i)school|college|east bay|dublin san ramon|city", title)
+            or not (found := re.match(r"Vote for (\d+)", text[index + 2]))
+        ):
+            continue
+        parts = re.split(r",\s+|\s+-\s+", title)
+        body = parts[0].replace("Mt.", "Mountain")
+        seat = next((f"{match[1]} {match[2]}" for part in parts if (match := re.fullmatch(r"(Division|Area|Ward|Zone) (\d+)", part))), "")
+        cursor = index + 3
+        while cursor < len(text) and not text[cursor].startswith(("Candidates", "Federal")):
+            if text[cursor + 1 : cursor + 2] and text[cursor + 1].startswith(("Party Preference", "Non partisan")):
+                key = (body, seat, text[cursor])
+                if key not in seen:
+                    seen.add(key)
+                    rows.append(
+                        {
+                            "county": "Contra Costa",
+                            "district": full_name(body),
+                            "seat": seat,
+                            "role": "Director",
+                            "seats": int(found[1]),
+                            "name": text[cursor],
+                            "unexpired": False,
+                        }
+                    )
+                cursor += 2
+            else:
+                cursor += 1
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara(), *alameda()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara(), *alameda(), *contra_costa()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
