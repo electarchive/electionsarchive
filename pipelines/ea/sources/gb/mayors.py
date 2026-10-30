@@ -15,7 +15,7 @@ from ea.sources.gb import dc_local, leap, leh
 from ea.store import DATA, connect
 
 SOURCE = "gb.mayors"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 COUNCILS = {
@@ -182,10 +182,69 @@ SCAN_NOTE = (
     "The declaration is a scanned form with handwritten figures; they were transcribed by reading the page image, "
     "and each value's box marks its cell on the form."
 )
-VOTES, INVALID = 1, 5
+VOTES, INVALID, VOTERS = 1, 5, 14
+SHARE_ONLY = 4
 MISSING = (
     "No count of second preferences was found in the council's own publications, so only the first round is given."
 )
+REFERENDUMS = Path(__file__).with_name("mayors_referendums.tsv")
+BRIEFINGS = {
+    "sn05000": (
+        (
+            "https://web.archive.org/web/20260106140017if_/"
+            "https://researchbriefings.files.parliament.uk/documents/SN05000/SN05000.pdf"
+        ),
+        "https://commonslibrary.parliament.uk/research-briefings/sn05000/",
+        "Directly-elected mayors, Research Briefing SN05000 (6 May 2025)",
+        "Appendix 3: Mayoral referendum results",
+        (
+            "Every local referendum in England and Wales on a council's executive arrangements, 2001 to 2025, with "
+            "votes for and against and turnout, from Rallings and Thrasher's British Electoral Facts and council "
+            "websites."
+        ),
+    ),
+    "cbp9228": (
+        (
+            "https://web.archive.org/web/20260822122509if_/"
+            "https://researchbriefings.files.parliament.uk/documents/CBP-9228/CBP-9228.pdf"
+        ),
+        "https://commonslibrary.parliament.uk/research-briefings/cbp-9228/",
+        "May 2021 local elections, Research Briefing CBP-9228 (20 May 2021)",
+        "5. Local referendums",
+        (
+            "The three governance referendums of 6 May 2021 (Newham, Sheffield, and Tower Hamlets), with spoilt "
+            "ballots, from the councils' results."
+        ),
+    ),
+}
+QUESTIONS = {
+    "mayor": ("Directly elected mayor", ("Yes", "No"), "A Yes vote was for a directly elected mayor."),
+    "mayor_choice": (
+        "Directly elected mayor",
+        ("Mayor and cabinet", "Leader and cabinet"),
+        "The ballot offered a directly elected mayor or a leader chosen by the councillors.",
+    ),
+    "leader": (
+        "Leader and cabinet",
+        ("Yes", "No"),
+        "A Yes vote was for a leader and cabinet in place of the directly elected mayor.",
+    ),
+    "retain_leader": (
+        "Keeping the directly elected mayor",
+        ("Keep directly elected mayor", "Change to leader and cabinet model"),
+        "The ballot asked whether to keep the directly elected mayor or change to a leader and cabinet.",
+    ),
+    "retain_committee": (
+        "Keeping the directly elected mayor",
+        ("Keep directly elected mayor", "Change to committee model"),
+        "The ballot asked whether to keep the directly elected mayor or change to a committee system.",
+    ),
+    "committee": (
+        "Committee system",
+        ("Yes", "No"),
+        "A Yes vote was for a committee system in place of the leader and cabinet.",
+    ),
+}
 
 
 def lines() -> pl.DataFrame:
@@ -221,6 +280,8 @@ def lines() -> pl.DataFrame:
 def fetch() -> None:
     for url, suffix, _, _, _, _ in ROUND2.values():
         raw.fetch(SOURCE, url, suffix=suffix)
+    for url, *_ in BRIEFINGS.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
     for page in LEAP_PAGES:
         url = LEAP.format(page)
         try:
@@ -355,7 +416,8 @@ def emit() -> Path:
             version=VERSION,
             summary="Directly elected council mayors of England, 2002 on, from Democracy Club's results where it "
             "has the ballot and Andrew Teale's Local Elections Archive Project otherwise, with the second round of "
-            "each supplementary vote count from the council's declaration where Democracy Club gives none",
+            "each supplementary vote count from the council's declaration where Democracy Club gives none, and every "
+            "council governance referendum since 2001 from the House of Commons Library",
             polity="GB",
         )
 
@@ -700,4 +762,162 @@ def emit() -> Path:
                             x1=x1,
                             y1=y1,
                         )
+        system = cs.key("gb.electoral_system", "referendum")
+        if system in cs.minted:
+            raise ValueError("publish gb.referendums first")
+        library: dict[str, UUID] = {}
+        for key, (url, page, title, _, notes) in BRIEFINGS.items():
+            library[key] = cs.source("House of Commons Library", title)
+            if library[key] in cs.minted:
+                cs.add(
+                    "source",
+                    id=library[key],
+                    kind="official_body",
+                    publisher="House of Commons Library",
+                    title=title,
+                    url=page,
+                    license="Open Parliament Licence v3.0",
+                    license_url="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/",
+                    attribution="Contains Parliamentary information licensed under the Open Parliament Licence v3.0.",
+                    notes=notes,
+                )
+                cs.artifact(raw.cached(SOURCE, url), library[key])
+        for row in pl.read_csv(
+            REFERENDUMS,
+            separator="\t",
+            schema_overrides={"day": pl.Date, "turnout": pl.Float64, "spoilt": pl.Int64},
+        ).iter_rows(named=True):
+            day, code = row["day"], row["code"]
+            title, labels, meaning = QUESTIONS[row["question"]]
+            held = (row["held"] or "").split()
+            polity = cs.key("gb.polity", code)
+            area = cs.area("gb.lad", code)
+            if {polity, area} & cs.minted:
+                raise ValueError(f"{code}: the council and its area must exist")
+            council_name, path = conn.execute(
+                "select n.text, s.path from name n join slug s on s.entity_id = n.entity_id"
+                " where n.entity_id = %s and n.is_preferred order by s.is_current desc limit 1",
+                [polity],
+            ).fetchone()
+            place = council_name.removesuffix(" City Council").removesuffix(" Council")
+            election = cs.key("gb.election", f"{day}:local:{code}")
+            if election in cs.minted:
+                national = conn.execute(
+                    "select entity_id from external_id where scheme = 'gb.election' and value = %s",
+                    [f"{day}:local:gb"],
+                ).fetchone()
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    parent_id=None if national is None else national[0],
+                    kind="referendum",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                kind = "governance" if row["question"] == "committee" else "mayoral"
+                name(election, f"{day.year} {place} {kind} referendum")
+                election_path = f"{path}/{day}-referendum"
+                cs.add("slug", path=election_path, entity_id=election)
+            else:
+                (election_path,) = conn.execute(
+                    "select path from slug where entity_id = %s order by is_current desc limit 1", [election]
+                ).fetchone()
+            unit = cs.unit("gb.lad", code)
+            if unit in cs.minted and unit not in added:
+                added.add(unit)
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=polity,
+                    scheme_code="gb.lad",
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=None,
+                )
+                name(unit, place)
+            contest_key = f"{day}:referendum:{code}"
+            contest = cs.key("gb.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="ballot_question",
+                district_area_id=area,
+                electoral_system_id=system,
+                round_number=1,
+                default_result_kind="counted",
+            )
+            cs.add(
+                "ballot_question",
+                contest_id=contest,
+                type="initiative"
+                if "petition" in held
+                else "mandatory_referendum"
+                if "mandated" in held
+                else "optional_referendum",
+            )
+            name(contest, title)
+            cs.add("slug", path=f"{election_path}/{slug(title)}", entity_id=contest)
+            context = [meaning]
+            if "petition" in held:
+                context.append("Held after a petition from local electors.")
+            if "mandated" in held:
+                context.append("Held by order of the government.")
+            if "postal" in held:
+                context.append("Voting was by post only.")
+            cs.add("note", entity_id=contest, kind="context", body_md=" ".join(context))
+            answers: list[UUID] = []
+            for position, label in enumerate(labels):
+                option = cs.key("gb.mayors.option", f"{contest_key}:{position}")
+                answers.append(option)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="answer",
+                    ballot_position=position + 1,
+                    ballot_label=label,
+                )
+            result_set = cs.key("gb.mayors.result_set", contest_key)
+            source = library[row["source"]]
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=1,
+            )
+            cs.add("citation", entity_id=result_set, source_id=source, locator={"section": BRIEFINGS[row["source"]][3]})
+            if row["caveat"] is not None:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=row["caveat"])
+            if row["first"] == row["second"]:
+                raise ValueError(f"{contest_key}: tied")
+            cs.add("outcome", result_set_id=result_set, option_id=answers[row["first"] < row["second"]], kind="won")
+            for option, measure, flags, value in (
+                (answers[0], VOTES, 0, row["first"]),
+                (answers[1], VOTES, 0, row["second"]),
+                (None, INVALID, 0, row["spoilt"]),
+                (None, VOTERS, SHARE_ONLY, None if row["turnout"] is None else round(row["turnout"] / 100, 4)),
+            ):
+                if value is not None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=flags,
+                        value=value,
+                    )
         return cs.write()

@@ -1,0 +1,68 @@
+day	code	question	first	second	turnout	spoilt	held	source	caveat
+2001-06-07	E07000158	mayor	3617	10212	63.8			sn05000	
+2001-06-28	E07000078	mayor	8083	16602	31.0		postal	sn05000	
+2001-06-28	E07000081	mayor	7731	16317	30.8		postal	sn05000	
+2001-07-12	E07000103	mayor	7636	7140	24.5		postal	sn05000	
+2001-09-20	E08000017	mayor	35453	19398	25.0		postal	sn05000	
+2001-10-04	E08000034	mayor	10169	27977	13.0			sn05000	
+2001-10-11	E08000024	mayor	9593	12209	10.0			sn05000	
+2001-10-18	E06000001	mayor	10667	10294	31.0		postal	sn05000	
+2001-10-18	E09000023	mayor	16822	15914	18.0		postal	sn05000	
+2001-10-18	E08000022	mayor	30262	22296	36.0		postal	sn05000	
+2001-10-18	E07000058	mayor	10628	11869	33.3		postal	sn05000	
+2001-10-18	E06000002	mayor	29067	5422	34.0		postal	sn05000	
+2001-10-18	E06000043	mayor	22724	37214	31.6		postal	sn05000	
+2001-11-08	E07000236	mayor	7250	9198	28.3		postal	sn05000	
+2001-11-20	E07000056	mayor	8327	11974	28.5		postal	sn05000	
+2001-12-07	E09000015	mayor	17502	23554	26.0		postal	sn05000	
+2002-01-24	E07000073	mayor	5296	15490	36.4		postal	sn05000	The Commons Library dates this referendum 24 January 2001; the Guardian gives 24 January 2002, where the Library's own chronological table places it.
+2002-01-24	E06000026	mayor	29559	42811	39.8		postal	sn05000	The Commons Library dates this referendum 24 January 2001; the Guardian gives 24 January 2002, where the Library's own chronological table places it.
+2002-01-31	E09000028	mayor	6054	13217	11.2		mandated	sn05000	
+2002-01-31	E09000025	mayor	27263	12687	25.9		postal	sn05000	
+2002-01-31	E07000047	mayor	3555	12190	41.8		postal	sn05000	
+2002-01-31	E07000112	mayor	11357	14435	36.3		postal	sn05000	
+2002-02-21	E07000002	mayor	11316	5537	15.5		petition	sn05000	
+2002-05-02	E07000195	mayor	12912	16468	31.5			sn05000	
+2002-05-02	E07000178	mayor	14692	18686	33.8		petition	sn05000	
+2002-05-02	E09000012	mayor	24697	10547	31.9		postal	sn05000	The Commons Library and the Guardian date this referendum 3 May 2002; Wikipedia gives 2 May, the day of that year's local elections.
+2002-05-02	E06000021	mayor	28601	20578	27.8		petition	sn05000	The Commons Library and the Guardian date this referendum 3 May 2002; Wikipedia gives 2 May, the day of that year's local elections.
+2002-05-02	E07000174	mayor	8973	7350	21.0		petition	sn05000	The Commons Library and the Guardian date this referendum 3 May 2002; Wikipedia gives 2 May, the day of that year's local elections.
+2002-09-26	E07000150	mayor	5351	6239	30.9		petition postal	sn05000	
+2002-12-12	E09000009	mayor	9454	11655	9.8		petition	sn05000	The Commons Library dates this referendum 11 December 2002; the Guardian and Wikipedia give 12 December.
+2004-05-20	W06000008	mayor	5308	14013	36.3		petition	sn05000	
+2005-05-05	E06000046	mayor	28786	37097	62.4			sn05000	
+2005-07-14	E06000027	mayor	18074	14682	32.1			sn05000	
+2005-07-14	E07000010	mayor	5509	17296	33.6		petition	sn05000	
+2006-05-04	E07000015	mayor	11808	18768	35.3		petition	sn05000	
+2007-09-27	E06000005	mayor	7981	11226	24.7		petition	sn05000	
+2008-07-03	E08000002	mayor	10338	15425	18.3		petition	sn05000	
+2008-10-23	E06000021	leader	21231	14592	19.2			sn05000	The Commons Library marks the result No, against its own note that a Yes vote was for a leader and cabinet; the leader and cabinet won, as the BBC reported.
+2010-05-06	E09000030	mayor	60758	39857	62.1		petition	sn05000	
+2011-05-05	E07000145	mayor	10051	15595	36.0		petition	sn05000	
+2012-01-26	E08000006	mayor	17344	13653	18.1			sn05000	
+2012-05-03	E08000025	mayor	88085	120611	27.7		mandated	sn05000	
+2012-05-03	E08000032	mayor	53949	66283	35.2		mandated	sn05000	
+2012-05-03	E06000023	mayor	41032	35880	24.1		mandated	sn05000	
+2012-05-03	E08000026	mayor	22619	39483	26.2		mandated	sn05000	
+2012-05-03	E08000035	mayor	62440	107910	30.3		mandated	sn05000	
+2012-05-03	E08000003	mayor	42677	48593	24.7		mandated	sn05000	
+2012-05-03	E08000021	mayor	24630	40089	32.0		mandated	sn05000	
+2012-05-03	E06000018	mayor	20943	28320	23.8		mandated	sn05000	
+2012-05-03	E08000019	mayor	44571	82890	32.1		mandated	sn05000	
+2012-05-03	E08000036	mayor	27610	45357	28.3		mandated	sn05000	
+2012-05-03	E08000017	retain_leader	42196	25879	30.7			sn05000	
+2012-11-15	E06000001	retain_leader	5177	7366	18.0			sn05000	
+2013-09-26	E06000002	retain_leader	8674	6455	15.1			sn05000	
+2014-05-22	E07000029	mayor	12671	5489	33.9		petition	sn05000	
+2014-05-22	E07000119	committee	11934	8706	34.2		petition	sn05000	
+2016-03-10	E06000022	mayor_choice	8054	30557	29.0		petition	sn05000	
+2016-05-05	E08000022	retain_committee	32546	23703	36.6			sn05000	Wikipedia gives 23,730 votes for the committee system.
+2016-05-05	E06000027	retain_leader	9511	15846	25.3			sn05000	
+2016-05-05	E07000052	committee	16534	8811	32.0		petition	sn05000	
+2016-10-13	E07000209	mayor	4948	20639	24.9		petition	sn05000	
+2021-05-06	E09000025	retain_committee	45960	36424	37.7	2703		cbp9228	
+2021-05-06	E09000030	retain_leader	63029	17951	41.8	3444		cbp9228	
+2021-05-06	E08000019	committee	89670	48727		1789		cbp9228	The Commons Library's 2025 briefing on directly elected mayors gives 50,516 votes against; its May 2021 elections briefing, used here, gives 48,727, which matches the 64.8 percent Yes share.
+2021-10-07	E09000008	mayor	47165	11519	21.0			sn05000	
+2022-05-05	E06000023	retain_committee	38439	56113	28.6			sn05000	The Commons Library prints the two totals in each other's columns, against the result it gives; the committee system won, as the press reported.
+2025-07-17	E06000026	mayor	18044	19840	19.1		petition	sn05000	The Commons Library prints the two totals in each other's columns, against the result it gives; No won, as the press reported.
