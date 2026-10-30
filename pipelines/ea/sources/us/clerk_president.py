@@ -129,10 +129,10 @@ def emit() -> Path:
                join slug sl on sl.entity_id = k.id and sl.path like 'us/__/%%/president'
                join source s on s.id = r.source_id
                where k.kind = 'elector_slate' and e.date_from between '1920-01-01' and '1983-12-31'
-                 and s.publisher = 'Wikipedia' and sl.path not like %s
+                 and s.publisher = 'Wikipedia'
                  and (r.is_default or exists (select 1 from result_set c join changeset ch on ch.id = c.changeset_id
                       where c.supersedes_id = r.id and ch.pipeline = %s))""",
-            ["us/me/%", SOURCE],
+            [SOURCE],
         ).fetchall():
             old[(row[0], row[1])] = row[2:]
         options: dict[UUID, list[tuple]] = defaultdict(list)
