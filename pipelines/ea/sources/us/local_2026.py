@@ -2239,6 +2239,8 @@ for key, publisher, title, url, local in (
     ("AR-05119-pulaski", "Pulaski County Election Commission", "11/3/2026 General Election Ballot Position Draw (conducted 8/24/2026)", "https://votepulaskiar.gov/wp-content/uploads/11032026_Ballot-Draw-Results.pdf", "ar/pulaski_ballot_draw.pdf"),
     ("WY-56007-towns", "Carbon County Clerk", "2026 General Election Candidates as of 09.04.2026, municipal offices", "https://carboncountywy.gov/DocumentCenter/View/8605/2026-General-Election-Candidates-as-of-090426", "wy/carbon.pdf"),
     ("WY-56025-towns", "Natrona County Clerk", "2026 General Election Candidate Roster, municipal offices", "https://www.natronacounty-wy.gov/DocumentCenter/View/13878/2026-General-Election-Candidates-Filed-PDF", "wy/natrona.pdf"),
+    ("WY-56037-towns", "Sweetwater County Clerk", "Official General Election Publishing Ballot, Sweetwater County, November 3, 2026", "https://www.sweetwatercountywy.gov/General%202026%20Publication%20Ballot.pdf?t=202610131618280", "wy/sweetwater_publication_ballot.pdf"),
+    ("ME-23031-saco", "Saco City Clerk", "Sample ballots, Wards 1-7, November 3, 2026 general and referendum election", "https://www.sacomaine.org/City%20Clerk/Elections/Sample%20Ballots/", "ne/saco.zip"),
     ("NE-31025-cass", "Cass County Clerk", "2026 Candidate Filings Received 8-3-26", "https://www.casscountyne.gov/utility/openPDF/cacone/2026_Candidate_Filings_Received_8-3-26.pdf?alt=media", "ne/cass_municipal.pdf"),
     ("OR-41071-cities", "Yamhill County Clerk", "City certifications of candidates, November 3, 2026 General Election", "https://yamhillcounty.gov/1301/November-3-2026-General-Election", "or/yamhill_cities.pdf"),
     ("OR-41011-cities", "Coos County Elections Office", "City certifications of candidates, November 3, 2026 General Election", "https://cooscounty-or.specialdistrict.org/november-3-2026-general-election", "or/coos_cities.pdf"),
@@ -5096,20 +5098,22 @@ def parse() -> None:
         cities: dict[tuple[str, frozenset[str]], list[tuple[str, str, str]]] = defaultdict(list)
         for st, geoid, full in (
             gazetteer.filter(
-                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "WY"]) & (pl.col("FUNCSTAT") == "A")
+                pl.col("USPS").is_in(["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "WY", "NY"]) & (pl.col("FUNCSTAT") == "A")
             )
             .select("USPS", "GEOID", "NAME")
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
+            if st == "KY" and label.endswith(" City"):
+                cities[(st, coverage_tables.tokens(label.removesuffix(" City")))].append((geoid, label, full))
         claimed = {
             path
-            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|wy)/[^/]+$'")
+            for (path,) in conn.execute("select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|wy|ny)/[^/]+$'")
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'WY')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'WY', 'NY')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
