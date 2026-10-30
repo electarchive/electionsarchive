@@ -90,7 +90,9 @@ def emit(
             ((county_rows,),) = conn.execute(
                 """select count(*) from result_value v join result_set r on r.k = v.result_set_k
                    join reporting_unit u on u.k = v.unit_k
-                   where r.id = %s and u.scheme_code in ('us.county', 'us.county_part')""",
+                   join changeset c on c.id = r.changeset_id
+                   where r.id = %s and u.scheme_code in ('us.county', 'us.county_part')
+                   and c.pipeline not in ('us.algara', 'us.algara_federal', 'us.icpsr')""",
                 [old[0][0]],
             ).fetchall()
             if county_rows:
@@ -122,6 +124,11 @@ def emit(
             spare = [option for option in held if option not in targets.values()]
             if len(missing) == 1 and len(spare) == 1 and sums[missing[0]] * 100 > sum(sums.values()):
                 targets[missing[0]] = spare[0]
+                missing = []
+            pooled = [option for option in spare if missing and held[option] == sum(sums[c] for c in missing)]
+            if len(pooled) == 1:
+                for column in missing:
+                    targets[column] = pooled[0]
                 missing = []
             if any(sums[column] * 100 > sum(sums.values()) for column in missing):
                 print(f"{key}: unmatched {[(c, sums[c]) for c in missing]}; held {held}")

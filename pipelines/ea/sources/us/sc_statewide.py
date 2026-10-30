@@ -11,7 +11,7 @@ from ea.sources.us.sc_report import COUNTIES, LANDING, PUBLISHER, TITLE, URL
 from ea.store import DATA, connect
 
 SOURCE = "us.sc_statewide"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 BOOKS = {1992: "1992-1993", 1998: "1997-1998"}
 DAYS = {1992: date(1992, 11, 3), 1998: date(1998, 11, 3)}
