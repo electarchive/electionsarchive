@@ -6032,6 +6032,15 @@ def parse() -> None:
             (PARSED / f"unmatched_{key}.txt").write_text("\n".join(sorted(missed)))
 
     PARSED.mkdir(parents=True, exist_ok=True)
+    uncached = set()
+    for feed in {str(row["feed"]) for row in rows}:
+        try:
+            raw.cached(SOURCE, FEEDS[feed][0] if feed in FEEDS else FILES[feed])
+        except LookupError:
+            uncached.add(feed)
+    print(f"skipped feeds with no raw cache entry: {sorted(uncached)}")
+    (PARSED / "unmatched_uncached.txt").write_text("\n".join(sorted(uncached)))
+    rows = [row for row in rows if row["feed"] not in uncached]
     frame = (
         pl.DataFrame(rows)
         .with_columns(person=pl.col("name").map_elements(slug, return_dtype=pl.String))
