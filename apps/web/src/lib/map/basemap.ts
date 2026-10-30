@@ -111,19 +111,6 @@ export function basemap(
     "etch",
   );
   if (isDetailed) {
-    add(
-      {
-        type: "line",
-        "source-layer": "rivers",
-        minzoom: 9,
-        paint: {
-          "line-color": "var(--card)",
-          "line-width": ["interpolate", ["linear"], ["zoom"], 9, 0.6, 14, 2.5],
-        },
-      },
-      "river",
-      "etch",
-    );
     for (const [kind, layer, minzoom, widths, ink] of [
       ["minor", "streets", 12.5, [12.5, 0.3, 15, 2.2], 12],
       ["tertiary", "streets", 11, [11, 0.3, 15, 2.8], 15],

@@ -13,7 +13,7 @@ from ea.store import DATA
 SOURCE = "display"
 LAND = "https://osmdata.openstreetmap.de/download/land-polygons-split-4326.zip"
 LAKES = "https://data.hydrosheds.org/file/hydrolakes/HydroLAKES_polys_v10_shp.zip"
-LAKE_KM2 = 20
+LAKE_KM2 = 1_000
 CHUNK = 200
 POINTS = 150_000
 BATCH = 20_000
@@ -22,6 +22,15 @@ ATTRIBUTION = "Coastlines © OpenStreetMap contributors (ODbL); lakes: HydroLAKE
 
 def version() -> str:
     return f"{raw.cached(SOURCE, LAND).sha256[:12]}-{raw.cached(SOURCE, LAKES).sha256[:12]}-{LAKE_KM2}"
+
+
+def lakes(bbox: tuple[float, float, float, float]) -> list[dict]:
+    raw.fetch(SOURCE, LAKES, suffix=".zip")
+    return [
+        item.shape.__geo_interface__
+        for item in _shapes(LAKES, "HydroLAKES_polys_v10").iterShapeRecords(fields=["Lake_area"], bbox=bbox)
+        if item.record["Lake_area"] >= LAKE_KM2
+    ]
 
 
 def fetch() -> None:

@@ -18,15 +18,13 @@ from shapely.geometry import Point, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.prepared import PreparedGeometry, prep
 
-from ea import raw
-from ea.display import LAKE_KM2
+from ea import display, raw
 from ea.plane import REGISTRY
 from ea.store import DATA, ROOT
 
 BUILDS = "https://build-metadata.protomaps.dev/builds.json"
 PLANET = "https://build.protomaps.com/{key}"
 ADMIN = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson"
-RIVERS = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_rivers_lake_centerlines.geojson"
 FONT = "https://github.com/google/fonts/raw/main/ofl/sofiasanssemicondensed/SofiaSansSemiCondensed%5Bwght%5D.ttf"
 WORK = DATA / "work" / "basemap"
 OUT = DATA / "plane" / "world.basemap"
@@ -46,12 +44,6 @@ COUNTRIES = {
 BANDS = {6: (0, 7), 8: (8, 9), 10: (10, 12)}
 METRO = 500_000
 MARGIN = 8
-PIXEL = 512 / 40_075_016.686
-LAKE = 200
-BANK = 2
-NEAR = 0.03
-MAJOR = 0.09
-DRY = {"basin", "swimming_pool", "dock", "fountain", "wastewater", "ditch", "drain", "moat", "canal"}
 ROADS = {
     "motorway": ("highway", 4),
     "trunk": ("highway", 5),
@@ -77,11 +69,10 @@ CUTOFF = 0.25
 zones: list[tuple[list[list[float]], list[float] | None, Transformer, list[float] | None]] = []
 land: BaseGeometry
 inside: PreparedGeometry
-majors: BaseGeometry
 
 
 def setup(scheme: str) -> None:
-    global land, inside, majors
+    global land, inside
     entry = REGISTRY["projections"][REGISTRY["schemes"][scheme]]
     zones.clear()
     for part in [*entry.get("insets", []), entry]:
@@ -96,25 +87,6 @@ def setup(scheme: str) -> None:
         ]
     ).buffer(0.02)
     inside = prep(land)
-    reach = unary_union(
-        [
-            box(w - MARGIN - 1, s - MARGIN - 1, e + MARGIN + 1, n + MARGIN + 1)
-            for zone in zones
-            for w, s, e, n in zone[0]
-        ]
-    )
-    rivers = raw.fetch("world.natural_earth", RIVERS, suffix=".geojson")
-    majors = (
-        unary_union(
-            [
-                shape(f["geometry"])
-                for f in json.loads(rivers.path.read_text())["features"]
-                if f["properties"]["featurecla"] == "River" and f["geometry"] is not None
-            ]
-        )
-        .intersection(reach)
-        .buffer(NEAR)
-    )
 
 
 def tiles(z: int, w: float, s: float, e: float, n: float) -> list[tuple[int, int, int]]:
@@ -131,22 +103,6 @@ def walk(coords, fn):
     return [walk(part, fn) for part in coords]
 
 
-def geographic(geometry: BaseGeometry, z: int, x: int, y: int) -> BaseGeometry:
-    span, extent = 2**z, 4096
-    geom = affinity.affine_transform(
-        geometry, [360 / extent / span, 0, 0, 1 / extent / span, 360 * x / span - 180, y / span]
-    )
-    return shape(
-        {
-            "type": geom.geom_type,
-            "coordinates": walk(
-                mapping(geom)["coordinates"],
-                lambda p: (p[0], math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * p[1]))))),
-            ),
-        }
-    )
-
-
 def emit(
     geometry: dict | BaseGeometry,
     z: int,
@@ -156,9 +112,8 @@ def emit(
     props: dict,
     zooms: tuple[int, int],
     outside: bool = False,
-    least: tuple[str, float] | None = None,
 ) -> str | None:
-    extent = 4096
+    span, extent = 2**z, 4096
     raw_shape = geometry if isinstance(geometry, BaseGeometry) else shape(geometry)
     if raw_shape.geom_type == "Point":
         if not (0 <= raw_shape.x < extent and 0 <= raw_shape.y < extent):
@@ -167,7 +122,22 @@ def emit(
         raw_shape = clip_by_rect(raw_shape if raw_shape.is_valid else make_valid(raw_shape), 0, 0, extent, extent)
         if raw_shape.is_empty or raw_shape.geom_type == "GeometryCollection":
             return None
-    geom = geographic(raw_shape, z, x, y)
+    geom = affinity.affine_transform(
+        raw_shape, [360 / extent / span, 0, 0, 1 / extent / span, 360 * x / span - 180, y / span]
+    )
+    geom = shape(
+        {
+            "type": geom.geom_type,
+            "coordinates": walk(
+                mapping(geom)["coordinates"],
+                lambda p: (p[0], math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * p[1]))))),
+            ),
+        }
+    )
+    return settle(geom, layer, props, zooms, outside)
+
+
+def settle(geom: BaseGeometry, layer: str, props: dict, zooms: tuple[int, int], outside: bool = False) -> str | None:
     w, s, e, n = geom.bounds
     cx, cy = (w + e) / 2, (s + n) / 2
     zone = next(
@@ -200,15 +170,6 @@ def emit(
         return [round(px, 1), round(py, 1)]
 
     planar = {"type": geom.geom_type, "coordinates": walk(mapping(geom)["coordinates"], place)}
-    if least is not None:
-        flat = shape(planar)
-        if flat.is_empty or flat.area == 0:
-            return None
-        measure, pixels = least
-        scale = math.sqrt(pixels / flat.area) if measure == "area" else pixels * flat.length / (2 * flat.area)
-        zooms = (max(zooms[0], math.ceil(math.log2(scale / PIXEL))), zooms[1])
-        if zooms[0] > zooms[1]:
-            return None
     return json.dumps(
         {
             "type": "Feature",
@@ -231,14 +192,7 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
     spare = None if rest is None else box(0, 0, 4096, 4096).difference(unary_union([box(*r) for r in rest]))
     out = []
 
-    def push(
-        geometry: dict | BaseGeometry,
-        layer: str,
-        props: dict,
-        minzoom: int,
-        outside: bool = False,
-        least: tuple[str, float] | None = None,
-    ) -> None:
+    def push(geometry: dict | BaseGeometry, layer: str, props: dict, minzoom: int, outside: bool = False) -> None:
         geometry = geometry if isinstance(geometry, BaseGeometry) else shape(geometry)
         bands = [(low, high, geometry)]
         if outside and spare is not None and not spare.is_empty:
@@ -248,7 +202,7 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
             bands.append((high + 1, 12, piece))
         for start, end, part in bands:
             if max(start, minzoom) <= end and not part.is_empty:
-                row = emit(part, z, x, y, layer, props, (max(start, minzoom), end), outside, least)
+                row = emit(part, z, x, y, layer, props, (max(start, minzoom), end), outside)
                 if row is not None:
                     out.append((layer, row))
 
@@ -290,37 +244,6 @@ def work(job: tuple[str, int, int, int, bool, list[tuple[int, int, int, int]] | 
         lines = [part for part in getattr(cut, "geoms", [cut]) if "LineString" in part.geom_type]
         if lines:
             push(unary_union(lines), "bounds", {"kind": kind}, 8 if kind == "county" else 0, True)
-    water = [] if metro else tile.get("water", {}).get("features", [])
-    side = 40_075.017 * math.cos(math.atan(math.sinh(math.pi * (1 - 2 * (y + 0.5) / 2**z)))) / 2**z / 4096
-    for feature in water:
-        p = feature["properties"]
-        detail = p.get("kind_detail")
-        if "Polygon" not in feature["geometry"]["type"] or p.get("kind") == "ocean" or detail in DRY:
-            continue
-        geometry = shape(feature["geometry"])
-        for part in getattr(geometry, "geoms", [geometry]):
-            w, s, e, n = part.bounds
-            edge = w < 0 or s < 0 or e > 4096 or n > 4096
-            big = edge or part.area * side**2 >= LAKE_KM2
-            least = ("width", BANK) if detail == "river" else ("area", LAKE / 4 if big else LAKE)
-            push(part, "water", {}, 0, True, least)
-    streams = [
-        (feature["properties"].get("name"), shape(feature["geometry"]))
-        for feature in water
-        if feature["properties"].get("kind") == "river" and "LineString" in feature["geometry"]["type"]
-    ]
-    if streams:
-        w, s, e, n = geographic(box(0, 0, 4096, 4096), z, x, y).bounds
-        near = clip_by_rect(majors, w - NEAR, s - NEAR, e + NEAR, n + NEAR)
-        for name, line in streams:
-            real = geographic(line, z, x, y)
-            push(
-                line,
-                "rivers",
-                {"river": name or "", "near": real.intersection(near).length, "length": real.length},
-                7,
-                True,
-            )
     for feature in tile.get("roads", {}).get("features", []):
         p = feature["properties"]
         if p.get("is_tunnel"):
@@ -450,7 +373,6 @@ def build(scheme: str) -> str:
     staging.mkdir(parents=True)
     files = {}
     seen: dict[str, list[tuple[float, float]]] = {}
-    along: dict[str, float] = {}
     with Pool(8, initializer=setup, initargs=(scheme,)) as pool:
         for rows in pool.imap_unordered(work, jobs, chunksize=16):
             for layer, line in rows:
@@ -461,32 +383,20 @@ def build(scheme: str) -> str:
                     if any(abs(px - a) < 4000 and abs(py - b) < 4000 for a, b in seen.get(name, [])):
                         continue
                     seen.setdefault(name, []).append((px, py))
-                if layer == "rivers":
-                    p = json.loads(line)["properties"]
-                    if p["river"] and p["near"] >= 0.8 * p["length"]:
-                        along[p["river"]] = along.get(p["river"], 0) + p["near"]
-                    layer = "streams"
                 if layer not in files:
                     files[layer] = (staging / f"{layer}.geojsons").open("w")
                 files[layer].write(line + "\n")
     for handle in files.values():
         handle.close()
-    streams = staging / "streams.geojsons"
-    if streams.exists():
-        with streams.open() as source, (staging / "rivers.geojsons").open("w") as target:
-            for line in source:
-                feature = json.loads(line)
-                p = feature["properties"]
-                if (along.get(p["river"], 0) >= MAJOR and p["near"] > 0) or (
-                    p["near"] >= 0.8 * p["length"] and p["length"] >= MAJOR / 5
-                ):
-                    feature["properties"] = {}
-                    target.write(json.dumps(feature, separators=(",", ":")) + "\n")
-        streams.unlink()
+    with (staging / "water.geojsons").open("w") as handle:
+        for lake in (lake for part in getattr(wide, "geoms", [wide]) for lake in display.lakes(part.bounds)):
+            row = settle(shape(lake), "water", {}, (0, 12), True)
+            if row is not None:
+                handle.write(row + "\n")
     OUT.mkdir(parents=True, exist_ok=True)
     sizes = []
     for name, layers, low, high in (
-        (scheme, ("earth", "bounds", "places", "water", "rivers", "roads"), 0, 12),
+        (scheme, ("earth", "bounds", "places", "water", "roads"), 0, 12),
         (f"{scheme}.metro", ("streets", "hoods"), 8, 14),
     ):
         target = OUT / f"{name}.pmtiles"
