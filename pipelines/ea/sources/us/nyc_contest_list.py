@@ -146,7 +146,6 @@ def emit():
                     seat = f"civil-court-district-{number}-{slug(county)}"
                     title = f"{ordinal} Municipal Court District, {county} County Civil Court Judge"
                     office_key = f"NY:{fips}:civil-court-district-{number}"
-                    area = None
                 office = cs.key("us.office", office_key)
                 if office in cs.minted:
                     raise ValueError(f"{title}: the office must already exist")
