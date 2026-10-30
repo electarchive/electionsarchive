@@ -20,7 +20,7 @@ from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import fl_sos, gov_counties, ri_countbook
+from ea.sources.us import ak_sovc, fl_sos, gov_counties, ri_countbook
 from ea.store import DATA, connect
 
 SOURCE = "us.sos_measures"
@@ -336,6 +336,7 @@ AL_FILES = {
     date(2002, 11, 5): ("20170706141828", "2002GeneralElectionTotals.XLS"),
     date(2003, 9, 9): ("20170706141819", "20030909countylevel.xls"),
     date(2004, 11, 2): ("20170706141810", "2004ge-countylevel_0.xls"),
+    date(2010, 11, 2): ("20170706", "2010-general-precinctLevel.zip"),
 }
 AL_COUNTIES = {
     "autauga",
@@ -497,6 +498,23 @@ GA_PAGES = {
         ("20101107190434", "2010_1102/09050", "Referendum A"),
     ),
 }
+GA_TOTALS = {
+    date(2000, 11, 7): ("20100528021925", "2000_1107/summary"),
+    date(2002, 11, 5): ("20100528031621", "2002_1105/summary"),
+    date(2004, 11, 2): ("20100515034712", "2004_1102/summary"),
+    date(2006, 11, 7): ("20100515034733", "2006_1107/swall"),
+}
+GA_2006 = (
+    "Constitutional Amendment 1",
+    "Constitutional Amendment 2",
+    "Constitutional Amendment 3",
+    "Referendum A",
+    "Referendum B",
+    "Referendum C",
+    "Referendum D",
+    "Referendum E",
+    "Referendum F",
+)
 SC_DAYS = {
     date(2000, 11, 7): 3,
     date(2002, 11, 5): 2,
@@ -634,7 +652,12 @@ SD_2012 = {
     ),
 }
 MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
-MISREPORTED = {("ME", date(2005, 11, 8), "6"), ("LA", date(2010, 10, 2), "2")}
+MISREPORTED = {
+    ("ME", date(2005, 11, 8), "6"),
+    ("LA", date(2010, 10, 2), "2"),
+    ("AL", date(2010, 11, 2), "2"),
+    ("AL", date(2010, 11, 2), "4"),
+}
 STATES = {
     "Alabama": "AL",
     "Alaska": "AK",
@@ -737,6 +760,7 @@ PUBLISHERS = {
         "https://oklahoma.gov/elections/elections-results.html",
     ),
     "FL": (fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
+    "AK": (ak_sovc.PUBLISHER, ak_sovc.TITLE, "https://www.elections.alaska.gov/election-results/"),
     "OH": gov_counties.OFFICIAL["OH"][:3],
     "GA": (
         "Georgia Secretary of State",
@@ -803,6 +827,10 @@ GA_PRELIMINARY = (
     " The county figures are the state's page as captured on November 6 or 7, 2010, before certification; the "
     "certified statewide totals, posted November 15, differ by up to 3,500 votes."
 )
+STATEWIDE_ONLY = (
+    " Only the statewide totals are recorded: the state's archived results pages for this election carry no county "
+    "table for ballot questions."
+)
 OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 
 
@@ -861,6 +889,9 @@ def tx_races(election: int) -> list[tuple[int, str]]:
 def fetch() -> None:
     for stamp, folder in NV_PAGES.values():
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
+    for stamp, page in GA_TOTALS.values():
+        raw.fetch(SOURCE, GA.format(stamp, page), suffix=".htm")
+        time.sleep(1)
     for pages in GA_PAGES.values():
         for stamp, page, _ in pages:
             raw.fetch(SOURCE, GA.format(stamp, page), suffix=".htm")
@@ -1287,7 +1318,42 @@ def alabama() -> list[dict[str, object]]:
         path = raw.cached(SOURCE, url).path
         votes: dict[tuple[str, str], dict[str, int]] = {}
         totals: dict[tuple[str, str], int] = {}
-        if file.endswith(".exe"):
+        if file.endswith(".zip"):
+            with zipfile.ZipFile(path) as archive:
+                for member in archive.namelist():
+                    county = Path(member).stem.lower()
+                    if county not in AL_COUNTIES:
+                        continue
+                    content = archive.read(member)
+                    if content.startswith(b"\xef\xbb\xbf"):
+                        namespace = "{urn:schemas-microsoft-com:office:spreadsheet}"
+                        workbook = ET.fromstring(content.decode("utf-8-sig").split("?>", 2)[2])
+                        sheets = [
+                            [
+                                [(data.text or "").strip() for data in row.iter(namespace + "Data")]
+                                for row in sheet.iter(namespace + "Row")
+                            ]
+                            for sheet in workbook.iter(namespace + "Worksheet")
+                        ]
+                    else:
+                        book = fastexcel.read_excel(content)
+                        sheets = [
+                            [
+                                [str(cell or "").strip() for cell in row]
+                                for row in book.load_sheet(name, header_row=None).to_polars().rows()
+                            ]
+                            for name in book.sheet_names
+                        ]
+                    for sheet_rows in sheets:
+                        match = re.search(r"^PROPOSED STATEWIDE AMENDMENT NUMBER \w+ \((\d+)\)", " ".join(sheet_rows[0]) if sheet_rows else "")
+                        if match is None:
+                            continue
+                        totals_row = next(row for row in sheet_rows if row[:1] == ["Totals:"])
+                        votes.setdefault((match[1], "YES"), {})[county] = int(totals_row[2])
+                        votes.setdefault((match[1], "NO"), {})[county] = int(totals_row[4])
+                        totals[(match[1], "YES")] = totals.get((match[1], "YES"), 0) + int(totals_row[2])
+                        totals[(match[1], "NO")] = totals.get((match[1], "NO"), 0) + int(totals_row[4])
+        elif file.endswith(".exe"):
             crosstab(
                 fastexcel.read_excel(zipfile.ZipFile(path).read("2000g-amend.xls")),
                 heading,
@@ -1332,6 +1398,31 @@ def alabama() -> list[dict[str, object]]:
                 }
                 for county, value in found.items()
             )
+    return rows
+
+
+def alaska() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for year, district, path in ak_sovc.files():
+        url = f"manual://MF-266/{year}/{path.name}"
+        for title, _, columns in ak_sovc.read(raw.cached(ak_sovc.SOURCE, url).path, year):
+            measure = re.fullmatch(r"(?:BALLOT )?MEASURE (?:NO\. |#)(\d+)\b.*", title or "")
+            bond = re.fullmatch(r"(?:BONDING )?PROPOSITION ([ABC])\b.*", title or "")
+            if measure is None and bond is None:
+                continue
+            for answer, column in columns:
+                rows.append(
+                    {
+                        "state": "AK",
+                        "day": ak_sovc.DAYS[year],
+                        "number": measure[1] if measure else "",
+                        "label": "" if measure else f"Bonding Proposition {bond[1]}",
+                        "url": url,
+                        "county": f"{ak_sovc.DAYS[year].isoformat()}:{district:02}",
+                        "answer": answer,
+                        "votes": column["Total"],
+                    }
+                )
     return rows
 
 
@@ -2969,6 +3060,44 @@ def georgia() -> list[dict[str, object]]:
                             "votes": count,
                         }
                     )
+    for day, (stamp, page) in GA_TOTALS.items():
+        url = GA.format(stamp, page)
+        text = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
+        text = re.sub(r"(?is)<(script|style).*?</\1>", "", text)
+        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text)))
+        if day.year == 2006:
+            found = re.findall(
+                r"(?:Constitutional Amendments|Statewide Referendums), .*?100% of precincts reporting Votes Percentage "
+                r"Yes \(Non-Partisan\) ([\d,]+) [\d.]+% No \(Non-Partisan\) ([\d,]+)",
+                text,
+            )
+            labels = GA_2006
+        else:
+            found = re.findall(
+                r"(AMENDMENT #\d|REFERENDUM [A-E]) - YES ([\d,]+) [\d.]+ % \1 - NO ([\d,]+)",
+                text,
+            )
+            labels = tuple(
+                f"Constitutional Amendment {name[-1]}" if name.startswith("AMENDMENT") else f"Referendum {name[-1]}"
+                for name, _, _ in found
+            )
+            found = [(yes, no) for _, yes, no in found]
+        if len(found) != len(labels):
+            raise ValueError(f"{url}: {len(found)} questions for {len(labels)} labels")
+        for label, (yes, no) in zip(labels, found, strict=True):
+            for answer, count in (("YES", yes), ("NO", no)):
+                rows.append(
+                    {
+                        "state": "GA",
+                        "day": day,
+                        "number": f"{page}:{label}",
+                        "label": label,
+                        "url": url,
+                        "county": "statewide",
+                        "answer": answer,
+                        "votes": int(count.replace(",", "")),
+                    }
+                )
     return rows
 
 
@@ -2992,6 +3121,7 @@ def parse() -> None:
             *rhode_island(),
             *nevada(),
             *georgia(),
+            *alaska(),
             *nebraska(),
             *arkansas(),
             *south_dakota(),
@@ -3066,7 +3196,7 @@ def parse() -> None:
                 "measure": f"Question {number}"
                 if state in ("ME", "NV", "RI")
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
@@ -3130,7 +3260,7 @@ def emit() -> Path:
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             artifacts[url] = cs.artifact(
                 raw.cached(
-                    {"FL": fl_sos.SOURCE, "RI": ri_countbook.SOURCE}.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE), url
+                    {"FL": fl_sos.SOURCE, "RI": ri_countbook.SOURCE, "AK": ak_sovc.SOURCE}.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE), url
                 ),
                 sources[state],
             )
@@ -3185,6 +3315,10 @@ def emit() -> Path:
                     f"{row['state']}:{row['county']}"
                     if row["county"] in ("uocava", "limited")
                     else row["county"]
+                    if row["state"] == "AK"
+                    else fips[row["state"]]
+                    if row["county"] == "statewide"
+                    else row["county"]
                     if row["county"].isdigit()
                     else counties.get((fips[row["state"]], re.sub(r"[^a-z]", "", row["county"].lower())))
                 ),
@@ -3194,7 +3328,7 @@ def emit() -> Path:
         missing = frame.filter(pl.col("code").is_null()).select("state", "county").unique()
         if missing.height:
             raise ValueError(f"unmatched counties: {missing.rows()}")
-        for code in frame.filter(pl.col("code").str.contains(":"))["code"].unique():
+        for code in frame.filter(pl.col("code").str.contains(":"), pl.col("state") != "AK")["code"].unique():
             if conn.execute(
                 "select 1 from reporting_unit where scheme_code = 'us.aggregate' and code = %s", [code]
             ).fetchone():
@@ -3329,7 +3463,8 @@ def emit() -> Path:
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
                 + (SCANNED if rows["page"].is_not_null().any() else "")
-                + (GA_PRELIMINARY if preliminary else ""),
+                + (GA_PRELIMINARY if preliminary else "")
+                + (STATEWIDE_ONLY if (rows["county"] == "statewide").any() else ""),
             )
             yes = int(rows.filter(pl.col("answer") == "YES")["votes"].sum())
             no = int(rows.filter(pl.col("answer") == "NO")["votes"].sum())
@@ -3344,7 +3479,16 @@ def emit() -> Path:
             )
             if result_set in cs.minted:
                 for row in rows.iter_rows(named=True):
-                    unit = cs.unit("us.aggregate" if ":" in row["code"] else "us.county", row["code"])
+                    unit = cs.unit(
+                        "us.ak_house_district"
+                        if row["state"] == "AK"
+                        else "us.aggregate"
+                        if ":" in row["code"]
+                        else "us.state"
+                        if row["county"] == "statewide"
+                        else "us.county",
+                        row["code"],
+                    )
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
