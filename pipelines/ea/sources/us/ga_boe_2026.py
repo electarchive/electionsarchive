@@ -12,20 +12,34 @@ from ea.store import connect
 SOURCE = "us.ga_boe_2026"
 VERSION = "1"
 DAY = date(2026, 5, 19)
+RUNOFF = date(2026, 6, 16)
 INBOX = Path(__file__).resolve().parents[4] / "data" / "inbox" / "manual" / "MF-341"
-COUNTIES = {
-    "1302550": (
+COUNTIES = [
+    (
+        "1302550",
         "Gwinnett County Board of Elections and Registration",
         "Gwinnett/official-complete-election-summary-report-may-19-general-primary-nonpartisan-general-election.pdf",
+        DAY,
     ),
-    "1301740": ("DeKalb County Board of Registration and Elections", "DeKalb/ElectionSummaryReportRPT_05_23_19_37_OFFICIAL.pdf"),
-}
+    (
+        "1301740",
+        "DeKalb County Board of Registration and Elections",
+        "DeKalb/ElectionSummaryReportRPT_05_23_19_37_OFFICIAL.pdf",
+        DAY,
+    ),
+    (
+        "1301740",
+        "DeKalb County Board of Registration and Elections",
+        "DeKalb/ElectionSummaryReportRPT-06-23-09-09-OFFICIAL.pdf",
+        RUNOFF,
+    ),
+]
 HEADING = re.compile(r"^County (?:BOE|Board of Education) - District (?P<seat>\d+)(?:/.*)? \(Vote for (?P<seats>\d+)\)$")
 ROW = re.compile(r"^(?P<name>[A-Z].*?)\s{2,}(?:[\d,]+\s+){4}(?P<total>[\d,]+)\s+[\d.]+%$")
 
 
 def fetch() -> None:
-    for _, path in COUNTIES.values():
+    for _, _, path, _ in COUNTIES:
         raw.store(
             SOURCE,
             f"manual://MF-341/{path}",
@@ -38,7 +52,10 @@ def fetch() -> None:
 
 def emit() -> Path:
     with connect() as conn:
-        parent_election = conn.execute("select entity_id from slug where path = 'us/ga/2026-05-19-primary'").fetchone()[0]
+        parents = {
+            day: conn.execute("select entity_id from slug where path = %s", [path]).fetchone()[0]
+            for day, path in ((DAY, "us/ga/2026-05-19-primary"), (RUNOFF, "us/ga/2026-06-16-runoff"))
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -49,8 +66,8 @@ def emit() -> Path:
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block")}
         values: list[tuple[str, str, str, int]] = []
         contests = 0
-        for code, (publisher, path) in COUNTIES.items():
-            title = "Official election summary report, May 19, 2026"
+        for code, publisher, path, day in COUNTIES:
+            title = f"Official election summary report, {day:%B} {day.day}, 2026"
             source = cs.source(publisher, title)
             if source in cs.minted:
                 cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=None, license=None)
@@ -78,20 +95,21 @@ def emit() -> Path:
                     current = None
                 elif current is not None and (row := ROW.match(stripped)):
                     current[row["name"].removesuffix("(I)").strip()] = int(row["total"].replace(",", ""))
-            election = cs.key("us.election", f"{DAY}:GA:{code}")
+            kind = "runoff" if day == RUNOFF else "local"
+            election = cs.key("us.election", f"{day}:GA:{code}")
             cs.add(
                 "election",
                 id=election,
                 polity_id=polity,
-                parent_id=parent_election,
-                kind="local",
-                date_from=DAY,
-                date_to=DAY,
+                parent_id=parents[day],
+                kind=kind,
+                date_from=day,
+                date_to=day,
                 date_precision="day",
                 status="held",
             )
-            cs.add("name", entity_id=election, text=f"2026 {place} election", lang="en", kind="official", is_preferred=True)
-            cs.add("slug", path=f"{base}/{DAY}-local", entity_id=election)
+            cs.add("name", entity_id=election, text=f"2026 {place} " + ("runoff election" if day == RUNOFF else "election"), lang="en", kind="official", is_preferred=True)
+            cs.add("slug", path=f"{base}/{day}-{kind}", entity_id=election)
             body = cs.key("us.body", f"GA:{code}:board-of-education")
             if body in cs.minted:
                 cs.add("body", id=body, polity_id=polity, kind="council")
@@ -124,7 +142,8 @@ def emit() -> Path:
                         area_id=area,
                         kind="standard",
                     )
-                key = f"{DAY}:GA:{code}:board-of-education:district-{seat}"
+                key = f"{day}:GA:{code}:board-of-education:district-{seat}"
+                previous = cs.key("us.contest", f"{DAY}:GA:{code}:board-of-education:district-{seat}") if day == RUNOFF else None
                 contest = cs.key("us.contest", key)
                 cs.add(
                     "contest",
@@ -134,7 +153,8 @@ def emit() -> Path:
                     body_id=body,
                     district_area_id=area,
                     magnitude=magnitude,
-                    round_number=1,
+                    round_number=2 if previous else 1,
+                    previous_round_id=previous,
                     electoral_system_id=systems["fptp"] if magnitude == 1 else systems["block"],
                     default_result_kind="counted",
                     term="full",
@@ -142,12 +162,12 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=contest,
-                    text=f"2026 {place} Board of Education, District {seat} election",
+                    text=f"2026 {place} Board of Education, District {seat} election" + (" (runoff)" if previous else ""),
                     lang="en",
                     kind="official",
                     is_preferred=True,
                 )
-                cs.add("slug", path=f"{base}/{DAY}-local/board-of-education-district-{seat}", entity_id=contest)
+                cs.add("slug", path=f"{base}/{day}-{kind}/board-of-education-district-{seat}", entity_id=contest)
                 result_set = cs.key(f"{SOURCE}.result_set", key)
                 cs.add(
                     "result_set",
