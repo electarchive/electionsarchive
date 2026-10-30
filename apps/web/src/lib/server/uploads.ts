@@ -6,6 +6,7 @@ import { mkdir, readFile, rename, rm } from "node:fs/promises";
 import path from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
+import * as v from "valibot";
 import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
 
@@ -16,6 +17,15 @@ const LIMIT = 200 * 1024 ** 2;
 const DAILY = 2 * 1024 ** 3;
 
 const streaming = new Set<string>();
+
+export const Filename = v.pipe(
+  v.string(),
+  v.normalize("NFC"),
+  v.trim(),
+  v.minLength(1),
+  v.maxLength(255),
+  v.regex(/^[^/\\\0]+$/),
+);
 
 export type Upload = {
   id: string;
@@ -38,12 +48,14 @@ class TooLarge extends Error {}
 
 export async function receive({
   userId,
+  keyId = null,
   filename,
   publicRecord,
   length,
   body,
 }: {
   userId: string;
+  keyId?: string | null;
   filename: string;
   publicRecord: boolean;
   length: number | null;
@@ -110,8 +122,8 @@ export async function receive({
       return await db.transaction(async (tx) => {
         const sha256 = hash.digest("hex");
         const { rows: inserted } = await tx.execute<Upload>(sql`
-          insert into upload (owner_user_id, sha256, media_type, bytes, filename, public_record)
-          values (${userId}, ${sha256}, 'application/octet-stream', ${bytes}, ${filename}, ${publicRecord})
+          insert into upload (owner_user_id, agent_key_id, sha256, media_type, bytes, filename, public_record)
+          values (${userId}, ${keyId}, ${sha256}, 'application/octet-stream', ${bytes}, ${filename}, ${publicRecord})
           on conflict (owner_user_id, sha256) do update
             set status = 'received', error = null, created_at = now(),
                 filename = excluded.filename, public_record = excluded.public_record

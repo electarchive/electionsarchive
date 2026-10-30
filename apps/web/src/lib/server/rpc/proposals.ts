@@ -1,46 +1,12 @@
 import { openapi } from "@orpc/openapi";
-import { os as base, ORPCError } from "@orpc/server";
+import { ORPCError } from "@orpc/server";
 import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Checks, Diff, ProposalState } from "#lib/contrib.js";
-import { PROJECT } from "#lib/constants.js";
+import type { keyOwner } from "#lib/server/rpc/keyed.js";
 import { db } from "#lib/server/db/index.js";
-import { createRateLimiter } from "#lib/server/ratelimit.js";
-import { keyOwner, Number_, run, Text } from "#lib/server/rpc/keyed.js";
-
-const limit = createRateLimiter({ prefix: `${PROJECT}:keys` });
-
-const os = base.$context<{ headers: Headers }>();
-
-const reader = os.use(async ({ context, next }) =>
-  next({ context: { owner: await keyOwner(context.headers) } }),
-);
-
-const writer = os.use(async ({ context, next }) => {
-  const owner = await keyOwner(context.headers);
-  if (owner == null) {
-    throw new ORPCError("UNAUTHORIZED", {
-      message: "Send your API key in the x-api-key header.",
-    });
-  }
-  const { isAllowed, retryAfter } = await limit(
-    {
-      name: "writes",
-      rules: [
-        { limit: 60, window: 60 },
-        { limit: 2000, window: 86_400 },
-      ],
-    },
-    owner.keyId,
-  );
-  if (!isAllowed) {
-    throw new ORPCError("TOO_MANY_REQUESTS", {
-      message: `A key may make 60 writes a minute and 2,000 a day. Try again in ${retryAfter} s.`,
-    });
-  }
-  return next({ context: { owner } });
-});
+import { Number_, reader, run, Text, writer } from "#lib/server/rpc/keyed.js";
 
 const Uuid = v.pipe(v.string(), v.uuid());
 

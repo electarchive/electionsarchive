@@ -1,16 +1,7 @@
 import { error } from "@sveltejs/kit";
 import * as v from "valibot";
-import { receive } from "#lib/server/uploads.js";
+import { Filename, receive } from "#lib/server/uploads.js";
 import type { RequestHandler } from "./$types";
-
-const Filename = v.pipe(
-  v.string(),
-  v.normalize("NFC"),
-  v.trim(),
-  v.minLength(1),
-  v.maxLength(255),
-  v.regex(/^[^/\\\0]+$/),
-);
 
 export const POST: RequestHandler = async ({ request, url, locals }) => {
   if (locals.user == null) {

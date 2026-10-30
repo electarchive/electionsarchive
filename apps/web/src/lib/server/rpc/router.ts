@@ -1,3 +1,4 @@
+import { agents } from "#lib/server/rpc/agents.js";
 import {
   bodies,
   contests,
@@ -13,9 +14,11 @@ import { admin } from "#lib/server/rpc/desk.js";
 import { live } from "#lib/server/rpc/live.js";
 import { proposals } from "#lib/server/rpc/proposals.js";
 import { seats } from "#lib/server/rpc/seats.js";
+import { uploads } from "#lib/server/rpc/uploads.js";
 
 export const router = {
   admin,
+  agents,
   bodies,
   contests,
   coverage,
@@ -28,6 +31,7 @@ export const router = {
   proposals,
   search,
   seats,
+  uploads,
 };
 
 export type Router = typeof router;
