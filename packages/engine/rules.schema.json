@@ -1062,6 +1062,9 @@
                   "fptp"
                 ],
                 "type": "string"
+              },
+              "pooled": {
+                "type": "boolean"
               }
             },
             "required": [
@@ -1083,6 +1086,13 @@
             }
           },
           "required": []
+        },
+        "remainderPlacement": {
+          "enum": [
+            "residual",
+            "remainder_over_quota"
+          ],
+          "type": "string"
         },
         "lists": {
           "type": "object",

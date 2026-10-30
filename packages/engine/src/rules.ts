@@ -114,11 +114,15 @@ export const rules = v.variant("formula", [
         v.object({
           seats: seatCount,
           formula: v.picklist([...quotas, "fptp"]),
+          pooled: v.optional(v.boolean()),
         }),
       ),
     ),
     remainderAccess: v.optional(
       v.object({ quotas: v.optional(seatCount), votes: v.optional(seatCount) }),
+    ),
+    remainderPlacement: v.optional(
+      v.picklist(["residual", "remainder_over_quota"]),
     ),
     lists,
     tieBreak,

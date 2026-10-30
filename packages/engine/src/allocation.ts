@@ -213,20 +213,25 @@ export function distribute(
   districts: Array<{ id: string; seats: number; entries: Array<Entry> }>,
 ): Distribution {
   const access = "remainderAccess" in rules ? rules.remainderAccess : undefined;
+  const isRelative =
+    "remainderPlacement" in rules &&
+    rules.remainderPlacement === "remainder_over_quota";
   const placed: Record<string, Record<string, number>> = {};
   const open = new Map<string, number>();
   const totals = new Map<
     string,
     { votes: number; quotas: number; residual: number }
   >();
+  const outside = new Map<string, number>();
   const residuals: Array<{ district: string; id: string; residual: number }> =
     [];
   let remaining = 0;
   let tie: Allocation["tie"];
   for (const { id: district, seats, entries } of districts) {
-    const formula =
-      rules.districtFormulas?.find((entry) => entry.seats === seats)?.formula ??
-      rules.formula;
+    const special = rules.districtFormulas?.find(
+      (entry) => entry.seats === seats,
+    );
+    const formula = special?.formula ?? rules.formula;
     let automatic: Record<string, number>;
     let quota = 0;
     if (formula === "fptp") {
@@ -242,6 +247,14 @@ export function distribute(
     }
     const placement: Record<string, number> = {};
     placed[district] = placement;
+    if (special?.pooled === false) {
+      for (const { id, inert } of entries) {
+        const won = inert ? 0 : (automatic[id] ?? 0);
+        placement[id] = won;
+        outside.set(id, (outside.get(id) ?? 0) + won);
+      }
+      continue;
+    }
     let left = seats;
     for (const { id, votes, inert } of entries) {
       const won = inert ? 0 : (automatic[id] ?? 0);
@@ -249,7 +262,12 @@ export function distribute(
       left -= won;
       const residual =
         inert || (formula === "fptp" && won > 0) ? 0 : votes - won * quota;
-      if (!inert) residuals.push({ district, id, residual });
+      if (!inert)
+        residuals.push({
+          district,
+          id,
+          residual: isRelative && quota > 0 ? residual / quota : residual,
+        });
       const total = totals.get(id) ?? { votes: 0, quotas: 0, residual: 0 };
       total.votes += votes;
       total.quotas += won;
@@ -278,6 +296,7 @@ export function distribute(
   const seats: Record<string, number> = {};
   for (const [id, { quotas }] of totals)
     seats[id] = quotas + (national.seats[id] ?? 0);
+  for (const [id, won] of outside) seats[id] = (seats[id] ?? 0) + won;
   const owed = new Map(Object.entries(national.seats));
   const order = residuals.toSorted((a, b) => b.residual - a.residual);
   for (let isMoving = true; isMoving;) {

@@ -427,6 +427,8 @@ SYSTEMS = {
             "formula": "imperiali_quota",
             "remainders": "national",
             "remainderAccess": {"quotas": 1, "votes": 300000},
+            "districtFormulas": [{"seats": 1, "formula": "fptp", "pooled": False}],
+            "remainderPlacement": "remainder_over_quota",
             "lists": {"order": "open", "vacancy": "next_by_votes"},
         },
         "Chamber of Deputies proportional representation, 1948–1993",

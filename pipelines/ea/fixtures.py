@@ -141,6 +141,54 @@ def export() -> list[str]:
                 {"districts": [{"id": d, "seats": magnitudes[d], "entries": e} for d, e in entries.items()]},
             )
 
+        camera: dict[str, dict[str, list[dict[str, object]]]] = {}
+        sizes: dict[tuple[str, str], int] = {}
+        declared: dict[str, dict[str, int]] = {}
+        for day, district, magnitude, label, votes, seats in conn.execute(
+            """select e.date_from::text, n.text, c.magnitude, o.ballot_label, sum(v.value),
+                      (select x.seats from outcome x
+                       where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null)
+               from slug s
+               join contest parent on parent.id = s.entity_id
+               join election e on e.id = parent.election_id
+               join contest c on c.allocation_parent_id = parent.id
+               join name n on n.entity_id = c.id and n.is_preferred
+               join result_set rs on rs.contest_id = c.id and rs.is_default
+               join result_value v on v.result_set_k = rs.k and v.measure = 1 and v.channel = 0
+               join contest_option o on o.k = v.option_k and o.kind = 'list'
+               where s.path ~ '^it/19[4-9][0-9]-[0-9-]+-general/chamber$'
+               group by 1, 2, 3, rs.id, o.id
+               having sum(v.value) > 0
+               order by 1, 2, 5 desc, 4"""
+        ):
+            sizes[day, district] = magnitude
+            camera.setdefault(day, {}).setdefault(district, []).append(
+                {"id": label, "votes": number(votes), "declared": seats or 0}
+            )
+        for day, label, seats in conn.execute(
+            """select e.date_from::text, o.ballot_label, x.seats
+               from slug s
+               join contest parent on parent.id = s.entity_id
+               join election e on e.id = parent.election_id
+               join result_set rs on rs.contest_id = parent.id and rs.is_default
+               join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.seats > 0
+               join contest_option o on o.id = x.option_id
+               where s.path ~ '^it/19[4-9][0-9]-[0-9-]+-general/chamber$'
+               order by 1, 3 desc, 2"""
+        ):
+            declared.setdefault(day, {})[label] = seats
+        write(
+            "italy-camera-1948-1992",
+            [
+                {
+                    "date": day,
+                    "seats": declared[day],
+                    "districts": [{"id": d, "seats": sizes[day, d], "entries": e} for d, e in districts.items()],
+                }
+                for day, districts in camera.items()
+            ],
+        )
+
         allocation, seats, allocation_rs = contest("de/2025-02-23-general/bundestag")
         election = {"allocation": allocation, "rs": allocation_rs}
         second = totals(

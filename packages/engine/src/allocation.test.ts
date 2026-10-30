@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { allocate, distribute, qualify } from "./allocation.ts";
 import germany from "./fixtures/germany-2025.json" with { type: "json" };
 import germanyEuropean from "./fixtures/germany-ep-2024.json" with { type: "json" };
+import italyCamera from "./fixtures/italy-camera-1948-1992.json" with { type: "json" };
 import turkey1965 from "./fixtures/turkey-1965.json" with { type: "json" };
 import turkey2007 from "./fixtures/turkey-2007.json" with { type: "json" };
 import turkey2011 from "./fixtures/turkey-2011.json" with { type: "json" };
@@ -258,6 +259,41 @@ describe("golden elections", () => {
       expect(distribution.tie).toBeUndefined();
       for (const [id, seats] of Object.entries(declared))
         expect(distribution.seats[id] ?? 0, id).toBe(seats);
+    });
+  }
+
+  const italyDeltas: Record<string, Record<string, number>> = {
+    "1948-04-18": { "BLOCCO NAZIONALE": -1, DC: 1 },
+    "1953-06-07": { DC: -1, PLI: 1 },
+  };
+  for (const { date, seats, districts } of italyCamera) {
+    it(`reproduces Italy's ${date} Chamber national college`, () => {
+      const distribution = distribute(
+        {
+          ...(date < "1958"
+            ? {
+                formula: "reinforced_imperiali_quota",
+                remainderAccess: { quotas: 1 },
+              }
+            : {
+                formula: "imperiali_quota",
+                remainderAccess: { quotas: 1, votes: 300_000 },
+              }),
+          remainders: "national",
+          districtFormulas: [{ seats: 1, formula: "fptp", pooled: false }],
+          remainderPlacement: "remainder_over_quota",
+        },
+        districts,
+      );
+      const declared: Record<string, number> = { ...italyDeltas[date] };
+      for (const [id, won] of Object.entries(seats))
+        declared[id] = (declared[id] ?? 0) + won;
+      expect(distribution.tie).toBeUndefined();
+      for (const id of new Set([
+        ...Object.keys(declared),
+        ...Object.keys(distribution.seats),
+      ]))
+        expect(distribution.seats[id] ?? 0, id).toBe(declared[id] ?? 0);
     });
   }
 
