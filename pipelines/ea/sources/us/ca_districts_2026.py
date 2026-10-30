@@ -1,3 +1,4 @@
+import html
 import re
 import subprocess
 from datetime import date
@@ -15,9 +16,9 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange"}
+COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento"}
 KEPT = re.compile(
-    r"FIRE|WATER|UTILITY|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER"
+    r"FIRE|WATER|UTILITY|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
 DROPPED = re.compile(r"SCHL|SCHOOL|COLLEGE|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY")
 WORDS = (
@@ -40,8 +41,14 @@ def full_name(label: str) -> str:
     return text if re.search(r"\b(?:District|Authority|Agency|County)$", text) else f"{text} District"
 
 
+def feed(fips: str) -> tuple[str, str, str]:
+    if fips in local_2026.FILES:
+        return (local_2026.FILES[fips], *local_2026.PUBLISHERS[fips][1:])
+    return local_2026.FEEDS[f"CA-{fips}"]
+
+
 def lines(fips: str) -> list[str]:
-    path = raw.cached(local_2026.SOURCE, local_2026.FILES[fips]).path
+    path = raw.cached(local_2026.SOURCE, feed(fips)[0]).path
     return (
         subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
         .stdout.decode()
@@ -112,9 +119,54 @@ def orange() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+SACRAMENTO = re.compile(
+    r"^(?P<body>.+?),? (?P<role>Director|Trustee)(?:,? (?P<seat>(?:Division|District|Ward) \d+))?(?P<short>\s*-\s*Short Term)?\s*$"
+)
+
+
+def sacramento() -> list[dict[str, str | int | bool]]:
+    rows = []
+    page = raw.cached(local_2026.SOURCE, feed("06067")[0]).path.read_text()
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", page)))
+    text = text.replace("\xa0", " ")
+    text = [line.strip() for line in text.splitlines() if line.strip()]
+    contest = None
+    seats = 1
+    live = False
+    for index, line in enumerate(text):
+        if found := re.match(r"Contest: \d+\s*-\s*(.+)$", line):
+            contest = SACRAMENTO.match(" ".join(found[1].split()))
+            if contest is not None and not KEPT.search(contest["body"].upper()):
+                contest = None
+            seats, live = 1, False
+        elif contest is None:
+            continue
+        elif found := re.match(r"Vote for (\d+)", line):
+            seats = int(found[1])
+        elif line.startswith("On Ballot:"):
+            live = line.endswith("Yes")
+        elif live and line == "Qualified" and re.fullmatch(r"\d+", text[index - 1]):
+            body = contest["body"]
+            if DROPPED.search(body.upper()) or re.search(r"(?i)^city of|school|college|^el dorado", body):
+                continue
+            seat = contest["seat"] or ""
+            rows.append(
+                {
+                    "county": "Sacramento",
+                    "district": full_name(body),
+                    "seat": seat or ("Short Term" if contest["short"] else ""),
+                    "role": contest["role"],
+                    "seats": seats,
+                    "name": cased(re.sub(r"\s{2,}.*$", "", text[index + 1])),
+                    "unexpired": contest["short"] is not None,
+                }
+            )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange()]).unique(
+    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento()]).unique(
         ["county", "district", "seat", "name"], keep="first", maintain_order=True
     )
     frame.write_parquet(PARSED / "candidates.parquet")
@@ -133,7 +185,7 @@ def emit() -> Path:
         )
         kept = 0
         for fips, county in COUNTIES.items():
-            publisher = local_2026.PUBLISHERS[fips][1:]
+            url, *publisher = feed(fips)
             source = cs.source(*publisher)
             if source in cs.minted:
                 cs.add(
@@ -142,10 +194,10 @@ def emit() -> Path:
                     kind="official_body",
                     publisher=publisher[0],
                     title=publisher[1],
-                    url=local_2026.FILES[fips],
+                    url=url,
                     license="Public record",
                 )
-            cs.artifact(raw.cached(local_2026.SOURCE, local_2026.FILES[fips]), source)
+            cs.artifact(raw.cached(local_2026.SOURCE, url), source)
             kept += govcand.races(conn, cs, SOURCE, "CA", DAY, frame.filter(pl.col("county") == county), source, "06")
         print(f"{kept} candidates")
         return cs.write()
