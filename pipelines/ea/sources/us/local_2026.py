@@ -4039,22 +4039,21 @@ def parse() -> None:
     for row in feeds["NJ-34015"]:
         row["seats"] = len(orders[(row["contest"], row["unexpired"])])
 
-    columns: tuple[int, ...] = ()
     seats: dict[str, int] = defaultdict(int)
     school: list[tuple[str, str]] = []
+    started = False
     for line in text("NJ-34015", "-layout").splitlines():
         if line.startswith("Order Slogan") and "First Name" in line:
-            columns = (line.index("District"), line.index("First Name"), line.index("Last Name"), line.index("Address"))
+            started = True
             continue
-        if not columns:
+        if not started or not re.match(r"\s*\d+\s", line):
             continue
-        if not re.match(r"\s*\d+\s", line) or len(line) <= columns[0]:
+        cells = re.split(r"\s{2,}", line.strip())
+        if len(cells) < 3 or " - " in cells[1]:
             continue
-        place = line[columns[0] : columns[1]].strip()
-        if " - " in place or not place:
-            continue
+        place = cells[1]
         seats[place] += 1
-        given, family = line[columns[1] : columns[2]].strip(), line[columns[2] : columns[3]].strip()
+        given, family = cells[2], cells[3] if len(cells) > 3 else ""
         if given and family and not nobody.search(f"{given} {family}"):
             school.append((place, f"{given} {family}"))
     for place, person in school:
@@ -5818,7 +5817,7 @@ def parse() -> None:
                         or re.search(r"(?i)\bcounty (council|commission|board district)\b", str(row["contest"])) is not None
                     )
                     and not LOCAL_BODY.search(
-                        re.sub(re.escape(place) if state in ("MD", "LA", "WY") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.I)
+                        re.sub(re.escape(place) if state in ("MD", "LA", "WY") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.IGNORECASE)
                     )
                     and (
                         "-" not in key
