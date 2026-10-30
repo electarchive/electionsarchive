@@ -1274,6 +1274,15 @@ def fetch() -> None:
             retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
             media_type="application/pdf",
         )
+    for district in range(1, 41):
+        raw.store(
+            SOURCE,
+            f"manual://MF-359/2000-11-07/sovc{district}.pdf",
+            (DATA / "inbox" / "manual" / "MF-359" / "2000-11-07" / f"sovc{district}.pdf").read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+            media_type="application/pdf",
+        )
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, path if path.startswith("https:") else AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -1880,20 +1889,40 @@ def alaska() -> list[dict[str, object]]:
                 current = 0
         elif current and (answer := re.fullmatch(r'\s+\d+ \d+ "(YES|NO)" "" 0 (\d+)', line)):
             measure_votes[current][answer[1]] = int(answer[2])
-    for number, votes in measure_votes.items():
-        for answer, count in votes.items():
-            rows.append(
-                {
-                    "state": "AK",
-                    "day": date(2000, 11, 7),
-                    "number": str(number),
-                    "label": "",
-                    "url": AK_2000,
-                    "county": "statewide",
-                    "answer": answer,
-                    "votes": count,
-                }
-            )
+    district_votes: dict[int, dict[str, int]] = {number: {"YES": 0, "NO": 0} for number in measure_votes}
+    for district in range(1, 41):
+        url = f"manual://MF-359/2000-11-07/sovc{district}.pdf"
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        triples: list[list[int]] = []
+        for page in text.split("\f"):
+            lines = page.splitlines()
+            sub = [line for line in lines if line.strip().startswith("SubTotal")]
+            pairs = sum(len(re.findall(r"\bYES\b", line)) for line in lines[:25])
+            if not sub or not pairs:
+                continue
+            cells = [int(cell.replace(",", "")) for cell in re.findall(r"(?<![\d.])\d[\d,]*(?![\d.%])", sub[-1].replace("SubTotal", ""))]
+            triples.extend(cells[len(cells) - 3 * pairs :][i : i + 3] for i in range(0, 3 * pairs, 3))
+        for number, (total, yes, no) in enumerate(triples[: len(measure_votes)], start=1):
+            if total != yes + no:
+                raise ValueError(f"AK 2000 district {district} measure {number}: {yes} + {no} != {total}")
+            for answer, count in (("YES", yes), ("NO", no)):
+                district_votes[number][answer] += count
+                rows.append(
+                    {
+                        "state": "AK",
+                        "day": date(2000, 11, 7),
+                        "number": str(number),
+                        "label": "",
+                        "url": url,
+                        "county": f"2000-11-07:{district:02}",
+                        "answer": answer,
+                        "votes": count,
+                    }
+                )
+    if district_votes != measure_votes:
+        raise ValueError("AK 2000 district sums differ from the statewide results")
     for year, district, path in ak_sovc.files():
         url = f"manual://MF-266/{year}/{path.name}"
         for title, _, columns in ak_sovc.read(raw.cached(ak_sovc.SOURCE, url).path, year):
