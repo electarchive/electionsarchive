@@ -23,6 +23,9 @@ LEVELS = (
     "local_measure",
 )
 STAGES = ("general", "primary", "runoff", "special")
+GAPS = ROOT / ".agents" / "spec" / "coverage-gaps.tsv"
+CATEGORIES = ("known_gap", "blocked", "not_applicable")
+GRAINS = ("results", "county", "precinct", "fine", "shapes", "turnout", "candidates", "dates", "party")
 LOCAL = {"county", "municipal", "school", "special_district", "local_measure"}
 ERAS = ((1789, 1823), (1824, 1899), (1900, 1966), (1967, 1999), (2000, 2015), (2016, 2025))
 LAST = date.today().year
@@ -350,7 +353,7 @@ analyze coverage_cache_measure;
 """
 
 COUNT_SQL = """
-with c as (
+create temp table cstat as
     select cc.*, cg.precinct or exists (select from fixc where fixc.id = cc.id) as precinct, cg.major, cg.county, cg.county_free, cg.any_county, exists (select from rs where rs.contest_id = cc.id) as results,
         (exists (select from sc where sc.id = cc.id) or cc.st = 'AK' and cc.level = 'state_lower')
             and exists (select from rs where rs.contest_id = cc.id and rs.whole) as single,
@@ -376,8 +379,8 @@ with c as (
         coalesce(cg.county, false) and exists (select from published p where p.st = cc.st and p.year = cc.year
             and p.level = cc.level and p.county = '' and p.finest in ('county', 'town'))
         or exists (select from pubc where pubc.id = cc.id) as published
-    from cc left join cg on cg.contest_id = cc.id
-)
+    from cc left join cg on cg.contest_id = cc.id;
+
 select st, year, level, stage, count(*), count(*) filter (where not upcoming and results),
     count(*) filter (where not upcoming and (county or precinct or major or cancelled or single)),
     count(*) filter (where not upcoming and (precinct or cancelled or published)),
@@ -391,7 +394,19 @@ select st, year, level, stage, count(*), count(*) filter (where not upcoming and
     count(*) filter (where not upcoming and published and not coalesce(precinct, false) and not coalesce(cancelled, false)),
     count(*) filter (where upcoming and exists (select from rdy where rdy.id = c.id and rdy.ok)),
     count(*) filter (where upcoming and not exists (select from rdy where rdy.id = c.id and rdy.ok))
-from c group by 1, 2, 3, 4
+from cstat c group by 1, 2, 3, 4
+"""
+
+GAPS_SQL = """
+select c.st, c.year, c.level, c.stage, c.id::text, k.election_id::text,
+    case when coalesce(c.county or c.precinct or c.major or c.cancelled or c.single, false) then null
+        when not c.results then 'bare' when coalesce(c.any_county, false) then 'partial' else 'totals' end,
+    case when coalesce(c.major, false) then 'major' when coalesce(c.county or c.single, false) then 'coarse'
+        when not c.results then 'bare' when coalesce(c.any_county, false) then 'partial' else 'totals' end
+from cstat c join contest k on k.id = c.id
+where not c.upcoming and not coalesce(c.precinct or c.cancelled or c.published, false)
+    and exists (select from gap g where g.st in ('', c.st) and g.level in ('', c.level) and g.stage in ('', c.stage)
+        and c.year between g.y0 and g.y1 and (cardinality(g.ids) = 0 or c.id = any(g.ids)))
 """
 
 PUBLISHED_SQL = """
@@ -624,6 +639,75 @@ def target(st: str, level: str, year: int) -> str:
     return "total"
 
 
+def registry() -> list[dict]:
+    if not GAPS.exists():
+        return []
+    with GAPS.open() as f:
+        rows = list(csv.DictReader((line for line in f if not line.startswith("#")), delimiter="\t"))
+    for i, row in enumerate(rows):
+        first, dash, last = row["years"].partition("-")
+        row |= {
+            "i": i,
+            "from": int(first) if first else 0,
+            "to": int(last) if last else int(first) if first and not dash else 9999,
+            "ids": row["ids"].split(),
+        }
+    return rows
+
+
+def gap(
+    rows: list[dict],
+    grains: tuple[str, ...],
+    polity: str,
+    state: str,
+    level: str,
+    stage: str,
+    year: int,
+    contest: str | None = None,
+) -> dict | None:
+    best = None
+    for row in rows:
+        if (
+            row["polity"] == polity
+            and row["grain"] in grains
+            and row["state"] in ("", state)
+            and row["level"] in ("", level)
+            and row["stage"] in ("", stage)
+            and row["from"] <= year <= row["to"]
+            and (not row["ids"] or contest in row["ids"])
+        ):
+            rank = (
+                bool(row["ids"]),
+                bool(row["state"]),
+                bool(row["stage"]),
+                bool(row["level"]),
+                row["from"] - row["to"],
+            )
+            if best is None or rank > best[0]:
+                best = (rank, row)
+    return None if best is None else best[1]
+
+
+def note(row: dict, hits: set[tuple[str, str]], count: int) -> dict:
+    return {
+        "goal": row["grain"],
+        "level": row["level"],
+        "from": row["from"] or None,
+        "to": None if row["to"] == 9999 else row["to"],
+        "note": row["reason"],
+        "category": row["category"],
+        "state": row["state"] or None,
+        "stage": row["stage"] or None,
+        "label": row["label"] or None,
+        "sources": row["sources"],
+        "checked": row["checked"] or None,
+        "ref": row["ref"] or None,
+        "count": count,
+        "contests": sorted({contest for contest, _ in hits}),
+        "elections": sorted({election for _, election in hits}),
+    }
+
+
 def owner(level: str, pipelines: set[str]) -> str:
     if any(p.startswith("us.nyc_") for p in pipelines):
         return "nyc lane"
@@ -664,6 +748,7 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
                 )
     for statement in PUBLISHED_SQL.split(";\n\n"):
         conn.execute(statement)
+    conn.execute(COUNT_SQL.split(";\n\n")[0])
     held = {
         (st, year, level, stage): {
             "held": n,
@@ -698,7 +783,7 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
             published_count,
             upcoming,
             pending,
-        ) in conn.execute(COUNT_SQL)
+        ) in conn.execute(COUNT_SQL.split(";\n\n")[-1])
     }
     conn.execute(
         "create table if not exists coverage_cache_shapes (key text primary key, signature text not null, "

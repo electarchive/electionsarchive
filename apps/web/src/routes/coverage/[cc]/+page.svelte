@@ -26,6 +26,9 @@
     US_COLUMNS,
     ERA_LABELS,
     columnGroup,
+    GAP_GRAINS,
+    gapSpan,
+    gapTried,
     weighted,
   } from "#lib/coverage.js";
   import Tone from "#routes/coverage/tone.svelte";
@@ -78,11 +81,15 @@
     units: m.coverage_reason_units_def,
     unshaped: m.coverage_reason_unshaped_def,
     undrawn: m.coverage_reason_undrawn_def,
+    knownGap: m.coverage_reason_known_gap_def,
+    blocked: m.coverage_reason_blocked_def,
   };
   const TURNOUT_REASONS: Partial<Record<Reason, () => string>> = {
     partial: m.coverage_reason_turnout_partial_def,
     coarse: m.coverage_reason_turnout_coarse_def,
     absent: m.coverage_reason_turnout_absent_def,
+    knownGap: m.coverage_reason_known_gap_def,
+    blocked: m.coverage_reason_blocked_def,
   };
   const READY = [
     {
@@ -112,10 +119,11 @@
     partial: m.coverage_country_reason_partial_def,
     totals: m.coverage_country_reason_totals_def,
     bare: m.coverage_country_reason_bare_def,
-    lost: m.coverage_country_reason_lost_def,
     absent: m.coverage_country_reason_absent_def,
     unshaped: m.coverage_country_reason_unshaped_def,
     undrawn: m.coverage_country_reason_undrawn_def,
+    knownGap: m.coverage_reason_known_gap_def,
+    blocked: m.coverage_reason_blocked_def,
   };
   const GAP_LABELS: Partial<Record<Goal, () => string>> = {
     county: m.coverage_gap_county,
@@ -157,7 +165,7 @@
       (note) =>
         note.level === level &&
         note.goal !== "fine" &&
-        note.lost == null &&
+        note.category == null &&
         note.canvass == null &&
         note.readiness == null,
     );
@@ -559,28 +567,23 @@
               </span>
             {/if}
           {/if}
-          {#if reason === "lost"}
+          {#if reason === "knownGap" || reason === "blocked"}
             {const levels = $derived(
               data.tiers
                 .find((tier) => tier.key === tierKey)
                 ?.levels.map((level) => level.key) ?? [],
             )}
-            <span class="mbs-1 grid gap-1 text-xs">
-              {#each summary.notes.filter((note) => note.lost != null && levels.includes(note.level)) as note, index (index)}
-                {const source = $derived(summary.sources[note.lost ?? ""])}
+            <span class="mbs-1 grid gap-1.5 text-xs">
+              {#each summary.notes.filter((note) => note.category === (reason === "knownGap" ? "known_gap" : "blocked") && (note.level === "" || levels.includes(note.level)) && GAP_GRAINS[goal].includes(note.goal) && (note.count ?? 0) > 0) as note, index (index)}
                 <span>
-                  <a
-                    href={source?.url}
-                    class="underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
-                    >{m.coverage_lost_span({
-                      years:
-                        note.from === note.to
-                          ? String(note.from)
-                          : `${note.from}–${note.to}`,
-                      source: source?.title ?? note.lost ?? "",
-                    })}</a
+                  <span class="font-medium">{gapSpan(note)}</span>
+                  <span class="text-muted-foreground"
+                    >({count(note.count ?? 0)})</span
                   >
-                  <span class="block text-muted-foreground">{note.note}</span>
+                  <span class="block">{note.note}</span>
+                  <span class="block text-muted-foreground"
+                    >{gapTried(note)}</span
+                  >
                 </span>
               {/each}
             </span>
@@ -588,6 +591,33 @@
         </span>
       </li>
     {/each}
+    {#if counts.inapplicable > 0}
+      {const levels = $derived(
+        data.tiers
+          .find((tier) => tier.key === tierKey)
+          ?.levels.map((level) => level.key) ?? [],
+      )}
+      <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
+        <span
+          class="mbs-1 block rounded-xs border border-muted-foreground/40 block-3 inline-3"
+        ></span>
+        <span>
+          <span class="font-semibold">{m.coverage_reason_inapplicable()}</span>
+          <span class="tabular-nums">{count(counts.inapplicable)}</span>
+          <span class="block text-xs text-muted-foreground"
+            >{m.coverage_reason_inapplicable_def()}</span
+          >
+          <span class="mbs-1 grid gap-1.5 text-xs">
+            {#each summary.notes.filter((note) => note.category === "not_applicable" && (note.level === "" || levels.includes(note.level)) && GAP_GRAINS[goal].includes(note.goal)) as note, index (index)}
+              <span>
+                <span class="font-medium">{gapSpan(note)}</span>
+                <span class="block">{note.note}</span>
+              </span>
+            {/each}
+          </span>
+        </span>
+      </li>
+    {/if}
   </ul>
 {/snippet}
 
@@ -651,15 +681,27 @@
           {m.coverage_published_of({ count: count(counts.published) })}
         </span>
       {/if}
-      {#if counts.lost > 0}
+      {#if counts.knownGap > 0}
         <span class="text-muted-foreground">
-          {m.coverage_lost_of({ count: count(counts.lost) })}
+          {m.coverage_known_gap_of({ count: count(counts.knownGap) })}
+        </span>
+      {/if}
+      {#if counts.blocked > 0}
+        <span class="text-muted-foreground">
+          {m.coverage_blocked_of({ count: count(counts.blocked) })}
+        </span>
+      {/if}
+      {#if counts.inapplicable > 0}
+        <span class="text-muted-foreground">
+          {m.coverage_inapplicable_of({ count: count(counts.inapplicable) })}
         </span>
       {/if}
       {#if !isBonus}
         <span class="text-muted-foreground">
           {m.coverage_short({
-            count: count(counts.total - counts.complete - counts.lost),
+            count: count(
+              counts.total - counts.complete - counts.knownGap - counts.blocked,
+            ),
           })}
         </span>
       {/if}

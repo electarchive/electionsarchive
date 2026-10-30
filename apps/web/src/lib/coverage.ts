@@ -313,7 +313,8 @@ export type Reason =
   | "partial"
   | "totals"
   | "bare"
-  | "lost"
+  | "knownGap"
+  | "blocked"
   | "pending"
   | "absent"
   | "units"
@@ -328,6 +329,7 @@ export type Counts = Record<
   | "icpsr"
   | "published"
   | "upcoming"
+  | "inapplicable"
   | "populationTotal"
   | "populationComplete"
   | "populationAbsent"
@@ -344,14 +346,30 @@ export const weighted = (row: Counts): Counts => ({
   bare: 0,
   icpsr: 0,
   published: 0,
-  lost: 0,
   upcoming: 0,
   pending: 0,
 });
 
 export const REASONS: Record<Goal, Array<Reason>> = {
-  county: ["complete", "pending", "partial", "totals", "bare", "absent"],
-  history: ["complete", "partial", "totals", "bare", "absent"],
+  county: [
+    "complete",
+    "pending",
+    "partial",
+    "totals",
+    "bare",
+    "absent",
+    "blocked",
+    "knownGap",
+  ],
+  history: [
+    "complete",
+    "partial",
+    "totals",
+    "bare",
+    "absent",
+    "blocked",
+    "knownGap",
+  ],
   precinct: [
     "complete",
     "pending",
@@ -361,19 +379,38 @@ export const REASONS: Record<Goal, Array<Reason>> = {
     "totals",
     "bare",
     "absent",
+    "blocked",
+    "knownGap",
   ],
   precinct_shapes: ["complete", "unshaped"],
-  shapes: ["complete", "units", "unshaped", "undrawn"],
-  shapes_history: ["complete", "units", "unshaped", "undrawn"],
-  local: ["complete", "pending", "partial", "totals", "bare", "lost", "absent"],
+  shapes: ["complete", "units", "unshaped", "undrawn", "blocked", "knownGap"],
+  shapes_history: [
+    "complete",
+    "units",
+    "unshaped",
+    "undrawn",
+    "blocked",
+    "knownGap",
+  ],
+  local: [
+    "complete",
+    "pending",
+    "partial",
+    "totals",
+    "bare",
+    "absent",
+    "blocked",
+    "knownGap",
+  ],
   national: [
     "complete",
     "pending",
     "partial",
     "totals",
     "bare",
-    "lost",
     "absent",
+    "blocked",
+    "knownGap",
   ],
   fine: [
     "complete",
@@ -382,8 +419,9 @@ export const REASONS: Record<Goal, Array<Reason>> = {
     "partial",
     "totals",
     "bare",
-    "lost",
     "absent",
+    "blocked",
+    "knownGap",
   ],
   subnational: [
     "complete",
@@ -391,8 +429,9 @@ export const REASONS: Record<Goal, Array<Reason>> = {
     "partial",
     "totals",
     "bare",
-    "lost",
     "absent",
+    "blocked",
+    "knownGap",
   ],
   referendums: [
     "complete",
@@ -400,11 +439,21 @@ export const REASONS: Record<Goal, Array<Reason>> = {
     "partial",
     "totals",
     "bare",
-    "lost",
     "absent",
+    "blocked",
+    "knownGap",
   ],
-  ep: ["complete", "pending", "partial", "totals", "bare", "lost", "absent"],
-  turnout: ["complete", "partial", "coarse", "absent"],
+  ep: [
+    "complete",
+    "pending",
+    "partial",
+    "totals",
+    "bare",
+    "absent",
+    "blocked",
+    "knownGap",
+  ],
+  turnout: ["complete", "partial", "coarse", "absent", "blocked", "knownGap"],
 };
 
 export const LABELS: Record<Reason, () => string> = {
@@ -414,7 +463,8 @@ export const LABELS: Record<Reason, () => string> = {
   partial: m.coverage_reason_partial,
   totals: m.coverage_reason_totals,
   bare: m.coverage_reason_bare,
-  lost: m.coverage_country_reason_lost,
+  knownGap: m.coverage_reason_known_gap,
+  blocked: m.coverage_reason_blocked,
   pending: m.coverage_reason_pending,
   absent: m.coverage_reason_absent,
   units: m.coverage_reason_units,
@@ -563,4 +613,90 @@ export function spans(years: Array<number>, breaks: Array<number>) {
   return runs
     .map(([from, to]) => (from === to ? String(from) : `${from}–${to}`))
     .join(", ");
+}
+
+export const CATEGORY_REASONS = {
+  known_gap: "knownGap",
+  blocked: "blocked",
+  not_applicable: "inapplicable",
+} as const;
+
+export const CATEGORY_LABELS = {
+  known_gap: m.coverage_reason_known_gap,
+  blocked: m.coverage_reason_blocked,
+  not_applicable: m.coverage_reason_inapplicable,
+};
+
+export const GRAIN_LABELS: Record<string, () => string> = {
+  results: m.coverage_grain_results,
+  county: m.coverage_grain_county,
+  precinct: m.coverage_grain_precinct,
+  fine: m.coverage_grain_fine,
+  shapes: m.coverage_grain_shapes,
+  turnout: m.coverage_grain_turnout,
+  candidates: m.coverage_grain_candidates,
+  dates: m.coverage_grain_dates,
+  party: m.coverage_grain_party,
+};
+
+export const GAP_GRAINS: Record<Goal, ReadonlyArray<string>> = {
+  county: ["results", "county"],
+  history: ["results", "county"],
+  precinct: ["results", "county", "precinct"],
+  precinct_shapes: [],
+  shapes: ["shapes"],
+  shapes_history: ["shapes"],
+  local: ["results"],
+  national: ["results"],
+  fine: ["results", "fine"],
+  subnational: ["results"],
+  referendums: ["results"],
+  ep: ["results"],
+  turnout: ["turnout"],
+};
+
+type Gap = {
+  goal: string;
+  state?: string | null;
+  from: number | null;
+  to: number | null;
+  label?: string | null;
+  note: string;
+  sources?: string;
+  checked?: string | null;
+  ref?: string | null;
+};
+
+export function gapSpan(gap: Gap) {
+  const years =
+    gap.from == null
+      ? null
+      : gap.to == null
+        ? m.coverage_gap_since({ year: String(gap.from) })
+        : gap.from === gap.to
+          ? String(gap.from)
+          : `${gap.from}–${gap.to}`;
+  return [gap.state, years, gap.label]
+    .filter((part) => part != null && part !== "")
+    .join(", ");
+}
+
+export function gapNote(gap: Gap) {
+  const grain = GRAIN_LABELS[gap.goal]?.() ?? gap.goal;
+  return gap.checked == null
+    ? `${grain}: ${gap.note}`
+    : m.coverage_gap_note({ grain, reason: gap.note, date: gap.checked });
+}
+
+export function gapTried(gap: Gap) {
+  return [
+    gap.sources == null || gap.sources === ""
+      ? null
+      : gap.checked == null
+        ? m.coverage_gap_tried_undated({ sources: gap.sources })
+        : m.coverage_gap_tried({ sources: gap.sources, date: gap.checked }),
+    gap.ref == null ? null : m.coverage_gap_ref({ ref: gap.ref }),
+  ]
+    .filter((part) => part != null)
+    .join(" ");
 }

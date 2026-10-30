@@ -8,7 +8,7 @@ import urllib.request
 from collections import defaultdict
 from datetime import date
 
-from ea import coverage_countries, readiness
+from ea import coverage, coverage_countries, readiness
 from ea.store import ROOT, connect
 
 BASE = os.environ.get("EA_BASE", "http://localhost:5173")
@@ -100,21 +100,30 @@ def database(conn) -> list[str]:
                 ).fetchone()
             ):
                 problems.append(f"finest-reported {row['state']} {row['year']} {row['level']}: no county {county}")
-    for cc in coverage_countries.countries():
-        spec = coverage_countries.load(cc)
-        for level in spec["levels"]:
-            for span in level.get("lost", []):
-                if not (span.get("quote") and span.get("note") and span.get("source") in spec["sources"]):
-                    problems.append(f"{cc} {level['key']} lost {span.get('from')}: needs a source, a quote, and a note")
-    for polity, goal, level, state, year, lost, bare in conn.execute(
-        "select polity, goal, level, state, year, lost, bare from coverage_goal where lost < 0"
-        " or lost > 0 and (polity = 'us' or goal not in ('national', 'subnational', 'local', 'referendums', 'ep', 'fine'))"
+    polities = {"us", *coverage_countries.countries()}
+    for row in coverage.registry():
+        where = f"coverage-gaps.tsv {row['polity']} {row['state']} {row['level']} {row['years']} {row['grain']}"
+        if (
+            row["polity"] not in polities
+            or row["category"] not in coverage.CATEGORIES
+            or row["grain"] not in coverage.GRAINS
+        ):
+            problems.append(f"{where}: unknown polity, category, or grain")
+        if not (row["reason"] and row["sources"] and re.fullmatch(r"\d{4}-\d{2}-\d{2}", row["checked"])):
+            problems.append(f"{where}: needs a reason, the sources tried, and the date checked")
+        if row["from"] > row["to"]:
+            problems.append(f"{where}: years run backward")
+        for contest in row["ids"]:
+            if not conn.execute("select 1 from contest where id::text = %s", [contest]).fetchone():
+                problems.append(f"{where}: no contest {contest}")
+    for polity, goal, level, state, year in conn.execute(
+        "select polity, goal, level, state, year from coverage_goal where known_gap < 0 or blocked < 0 or inapplicable < 0"
     ):
-        problems.append(f"{polity} {goal} {level} {state} {year}: lost {lost} outside a country vote goal")
+        problems.append(f"{polity} {goal} {level} {state} {year}: negative category count")
     for polity, goal, level, state, year, upcoming, pending in conn.execute(
         "select polity, goal, level, state, year, upcoming, pending from coverage_goal where upcoming < 0 or pending < 0"
         " or (upcoming > 0 or pending > 0) and year < %s"
-        " or complete + upcoming + absent + bare + totals + partial + lost + pending > total and goal <> 'readiness'",
+        " or complete + upcoming + absent + bare + totals + partial + known_gap + blocked + pending > total and goal <> 'readiness'",
         [date.today().year],
     ):
         problems.append(f"{polity} {goal} {level} {state} {year}: upcoming {upcoming} pending {pending} out of bounds")
@@ -261,7 +270,7 @@ def pages(conn) -> list[str]:
                 for n in rest["summary"]["notes"]
                 if n["level"] == key
                 and n["goal"] != "fine"
-                and n.get("lost") is None
+                and n.get("category") is None
                 and n["from"] is not None
                 and n.get("listed") is not False
             )
@@ -301,13 +310,16 @@ def pages(conn) -> list[str]:
                         "mid": (2000, 2015),
                         "late": (2016, 9999),
                     }.get(era, (0, 9999))
-                    total, complete, icpsr, published, lost, upcoming, pending = conn.execute(
-                        "select coalesce(sum(total), 0), coalesce(sum(complete + upcoming), 0), coalesce(sum(icpsr), 0),"
-                        " coalesce(sum(published), 0), coalesce(sum(lost), 0), coalesce(sum(upcoming), 0),"
-                        " coalesce(sum(pending), 0) from coverage_goal where polity = %s"
-                        " and goal = %s and level = any(%s) and year between %s and %s",
-                        [cc, goal, keys, low, high],
-                    ).fetchone()
+                    total, complete, icpsr, published, known_gap, blocked, inapplicable, upcoming, pending = (
+                        conn.execute(
+                            "select coalesce(sum(total), 0), coalesce(sum(complete + upcoming), 0), coalesce(sum(icpsr), 0),"
+                            " coalesce(sum(published), 0), coalesce(sum(known_gap), 0), coalesce(sum(blocked), 0),"
+                            " coalesce(sum(inapplicable), 0), coalesce(sum(upcoming), 0),"
+                            " coalesce(sum(pending), 0) from coverage_goal where polity = %s"
+                            " and goal = %s and level = any(%s) and year between %s and %s",
+                            [cc, goal, keys, low, high],
+                        ).fetchone()
+                    )
                     if (total, complete) != (cell["total"], cell["complete"]) and not (cc == "us" and total == 0):
                         problems.append(
                             f"{cc} {key} {level} {column}: page {cell['complete']}/{cell['total']} db {complete}/{total}"
@@ -317,8 +329,11 @@ def pages(conn) -> list[str]:
                             f"{cc} {key} {level} {column}: page icpsr {cell['icpsr']} published {cell['published']}"
                             f" db {icpsr} {published}"
                         )
-                    if lost != cell["lost"]:
-                        problems.append(f"{cc} {key} {level} {column}: page lost {cell['lost']} db {lost}")
+                    if (known_gap, blocked, inapplicable) != (cell["knownGap"], cell["blocked"], cell["inapplicable"]):
+                        problems.append(
+                            f"{cc} {key} {level} {column}: page known gap {cell['knownGap']} blocked {cell['blocked']}"
+                            f" not applicable {cell['inapplicable']} db {known_gap} {blocked} {inapplicable}"
+                        )
                     if (upcoming, pending) != (cell["upcoming"], cell["pending"]):
                         problems.append(
                             f"{cc} {key} {level} {column}: page upcoming {cell['upcoming']} pending {cell['pending']}"
@@ -326,7 +341,9 @@ def pages(conn) -> list[str]:
                         )
                     for count, phrase in (
                         (cell["upcoming"], "upcoming and ready"),
-                        (cell["lost"], "with no surviving votes"),
+                        (cell["knownGap"], "with a known gap"),
+                        (cell["blocked"], "blocked"),
+                        (cell["inapplicable"], "not applicable"),
                         (cell["icpsr"], "rely on ICPSR alone"),
                         (cell["published"], "at the finest unit published"),
                     ):

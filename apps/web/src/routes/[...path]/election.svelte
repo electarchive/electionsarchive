@@ -10,6 +10,7 @@
   import { tick, untrack } from "svelte";
   import { MediaQuery, SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
+  import { gapNote } from "#lib/coverage.js";
   import {
     count,
     date,
@@ -59,6 +60,10 @@
     cycle: Extract<PageData, { kind: "election" }>["cycle"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
   } = $props();
+
+  const known = createQuery(() =>
+    orpc.coverage.known.queryOptions({ input: { id } }),
+  );
 
   const monthDay = new Intl.DateTimeFormat(getLocale(), {
     month: "short",
@@ -2488,12 +2493,15 @@
   </section>
 {/if}
 
-{#if election.notes.length > 0}
+{#if election.notes.length > 0 || (known.data ?? []).length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.notes_title()}</h2>
     <ul class="grid gap-1.5 text-sm/snug text-muted-foreground">
       {#each election.notes as note, index (index)}
         <li class="max-inline-[72ch]">{note.body}</li>
+      {/each}
+      {#each known.data ?? [] as gap, index (index)}
+        <li class="max-inline-[72ch]">{gapNote(gap)}</li>
       {/each}
     </ul>
   </section>

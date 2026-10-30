@@ -1,5 +1,5 @@
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
@@ -305,7 +305,7 @@ def measure(conn, day: str) -> dict:
                 counties[polity] = (county, name.removesuffix(" County").removesuffix(" Parish"))
         if kind == "school" and county is not None:
             schools[county].append((len(places), name))
-        places.append((GOVERNMENTS[kind], st, name, population, due))
+        places.append((GOVERNMENTS[kind], st, name, population, due, polity, county))
     from ea.coverage_tables import JUDICIAL
 
     judged = {st for (st,) in conn.execute(JUDGED_SQL, params)}
@@ -313,7 +313,7 @@ def measure(conn, day: str) -> dict:
     for st, period in JUDICIAL.items():
         if st in judged and st not in MARCH_JUDGES and (year - (2001 if st == "PA" else 2000)) % period == 0:
             judges[st] = len(places)
-            places.append(("judicial", st, st, 0, True))
+            places.append(("judicial", st, st, 0, True, None, None))
     held: dict[int, list[tuple[bool, bool]]] = defaultdict(list)
     for level in data["levels"]:
         if level.get("schedule"):
@@ -333,14 +333,35 @@ def measure(conn, day: str) -> dict:
     units = {level["key"]: level["unit"] for level in data["levels"]} | {"local_judicial": "races"}
     cells: dict[tuple[str, str], dict] = defaultdict(
         lambda: dict.fromkeys(
-            ("exist", "candidates", "ready", "places", "population_total", "population_ready", "population_absent"), 0
+            ("exist", "candidates", "ready", "places", "population_total", "population_ready", "population_absent")
+            + ("gap_absent", "gap_bare", "gap_partial", *coverage.CATEGORIES),
+            0,
         )
     )
+    registry = [row for row in coverage.registry() if row["polity"] == "us" and row["grain"] == "candidates"]
+    reached: Counter = Counter()
+
+    def gap(cell, level, st, ids, bucket, weight):
+        found = next(
+            (
+                f
+                for f in (coverage.gap(registry, ("candidates",), "us", st, level, "", year, i) for i in ids if i)
+                if f is not None and f["ids"]
+            ),
+            None,
+        )
+        found = found or coverage.gap(registry, ("candidates",), "us", st, level, "", year)
+        if found is not None:
+            cell[found["category"]] += weight
+            cell[bucket] += weight
+            reached[found["i"]] += weight
+        return found
+
     for cid, st, level, magnitude, candidates, answers, unqualified, polity in conn.execute(OPTIONS_SQL):
         has = unqualified or (answers if level == "statewide_measure" else candidates) >= 1
         if level == "judicial" and st not in judges:
             judges[st] = len(places)
-            places.append(("judicial", st, st, 0, False))
+            places.append(("judicial", st, st, 0, False, None, None))
         targets = (
             [judges[st]]
             if level == "judicial"
@@ -363,8 +384,10 @@ def measure(conn, day: str) -> dict:
         cell["exist"] += weight
         cell["candidates"] += weight if has else 0
         cell["ready"] += weight if ok.get(str(cid)) else 0
+        if not ok.get(str(cid)):
+            gap(cell, level, st, [str(cid)], "gap_partial" if has else "gap_bare", weight)
     short = []
-    for i, (level, st, name, population, due) in enumerate(places):
+    for i, (level, st, name, population, due, polity, county) in enumerate(places):
         contests = held.get(i, [])
         if not (due or contests):
             continue
@@ -378,7 +401,20 @@ def measure(conn, day: str) -> dict:
         cell["ready"] += done
         cell["population_total"] += population
         cell["population_ready"] += population if done else 0
-        cell["population_absent"] += 0 if contests else population
+        found = (
+            None
+            if done
+            else gap(
+                cell,
+                level,
+                st,
+                [polity, county],
+                "gap_partial" if candidates else "gap_bare" if contests else "gap_absent",
+                1,
+            )
+        )
+        cell["population_total"] -= population if found is not None and found["category"] == "not_applicable" else 0
+        cell["population_absent"] += 0 if contests or found is not None else population
         if not done:
             short.append(
                 {
@@ -387,6 +423,8 @@ def measure(conn, day: str) -> dict:
                     "name": name,
                     "population": population,
                     "status": "with candidates" if candidates else "in the archive" if contests else "missing",
+                    "category": None if found is None else found["category"],
+                    "reason": None if found is None else found["reason"],
                 }
             )
     rows = []
@@ -403,24 +441,26 @@ def measure(conn, day: str) -> dict:
             }
         )
     short.sort(key=lambda place: -int(place["population"]))
-    return {"spec": data, "rows": rows, "short": short}
+    return {"spec": data, "rows": rows, "short": short, "reached": reached}
 
 
-def goals(conn, day: str) -> dict[tuple[str, str, str, int], list[int]]:
+def goals(conn, day: str) -> tuple[dict[tuple[str, str, str, int], list[int]], Counter]:
     year = int(day[:4])
     out = {}
-    for row in measure(conn, day)["rows"]:
-        values = [0] * 22
-        values[0] = row["total"]
+    measured = measure(conn, day)
+    for row in measured["rows"]:
+        values = [0] * 25
+        values[0] = row["total"] - row["not_applicable"]
         values[1] = row["ready"]
-        values[2] = row["total"] - row["exist"]
-        values[3] = row["exist"] - row["candidates"]
-        values[5] = row["candidates"] - row["ready"]
+        values[2] = row["total"] - row["exist"] - row["gap_absent"]
+        values[3] = row["exist"] - row["candidates"] - row["gap_bare"]
+        values[5] = row["candidates"] - row["ready"] - row["gap_partial"]
         values[14] = row["population_total"]
         values[15] = row["population_ready"]
         values[16] = row["population_absent"]
+        values[22], values[23], values[24] = (row[category] for category in coverage.CATEGORIES)
         out[("readiness", row["state"], row["level"], year)] = values
-    return out
+    return out, measured["reached"]
 
 
 def notes(day: str) -> tuple[list[dict], dict]:

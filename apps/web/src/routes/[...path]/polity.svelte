@@ -16,6 +16,7 @@
   import Bar from "./bar.svelte";
   import PlaceMap from "./map.svelte";
   import Holders from "./holders.svelte";
+  import Known from "./known.svelte";
   import Offices from "./offices.svelte";
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
@@ -986,6 +987,10 @@
 
 {#if polity.polities.length > 0 && !isState}
   {@render places()}
+{/if}
+
+{#if isNational}
+  <Known {id} />
 {/if}
 
 {#snippet places()}

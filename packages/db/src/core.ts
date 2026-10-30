@@ -501,13 +501,15 @@ export const coverageGoal = pgTable("coverage_goal", {
 	icpsr: integer().default(0).notNull(),
 	major: integer().default(0).notNull(),
 	published: integer().default(0).notNull(),
-	lost: integer().default(0).notNull(),
+	knownGap: integer("known_gap").default(0).notNull(),
 	upcoming: integer().default(0).notNull(),
 	pending: integer().default(0).notNull(),
 	populationTotal: bigint("population_total", { mode: "number" }).default(0).notNull(),
 	populationComplete: bigint("population_complete", { mode: "number" }).default(0).notNull(),
 	populationAbsent: bigint("population_absent", { mode: "number" }).default(0).notNull(),
 	populationEstimated: bigint("population_estimated", { mode: "number" }).default(0).notNull(),
+	blocked: integer().default(0).notNull(),
+	inapplicable: integer().default(0).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.polity, table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
 ]);

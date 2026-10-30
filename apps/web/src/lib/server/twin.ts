@@ -5,8 +5,14 @@ import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { partyOn, segments, stand } from "#lib/caucus.js";
 import { era } from "#lib/party.js";
 import {
+  CATEGORY_LABELS,
   COLUMN_LABELS,
   COUNTRY_COLUMNS,
+  GAP_GRAINS,
+  gapNote,
+  gapSpan,
+  gapTried,
+  GRAIN_LABELS,
   headline,
   levelLabel,
   READY_COUNTS,
@@ -48,6 +54,7 @@ import { comeback, verdict } from "#lib/verdict.js";
 type Data = Awaited<ReturnType<typeof load>>;
 type Ledger = InferRouterOutputs<typeof router>["contests"]["ledger"];
 type Winners = InferRouterOutputs<typeof router>["elections"]["winners"];
+type Known = InferRouterOutputs<typeof router>["coverage"]["known"];
 type Link = (name: string, path: string | null) => string;
 
 const TYPES = {
@@ -267,7 +274,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
             })
         : [],
     );
-    const [byes, tiers, chambers] = await Promise.all([
+    const [byes, tiers, chambers, known] = await Promise.all([
       call(router.seats.byElections, { id: found.id, within: found.scope?.id }),
       found.scope == null &&
       parts.length > 1 &&
@@ -283,26 +290,36 @@ async function load(segments: Array<string>, search: URLSearchParams) {
                 .catch(() => null),
             ),
           ),
+      call(router.coverage.known, { id: found.id }),
     ]);
     return {
       ...found,
       byes,
       tiers,
       chambers: chambers.flatMap((entry) => (entry == null ? [] : [entry])),
+      known,
+    };
+  }
+  if (found.kind === "contest") {
+    return {
+      ...found,
+      known: await call(router.coverage.known, { id: found.id }),
     };
   }
   if (found.kind !== "polity") {
     return found;
   }
-  const [record, holders] = await Promise.all([
+  const isNational = ["sovereign_state", "supranational"].includes(
+    found.polity.kind,
+  );
+  const [record, holders, known] = await Promise.all([
     call(router.polities.record, { id: found.id }),
-    ["sovereign_state", "supranational", "federal_unit"].includes(
-      found.polity.kind,
-    )
+    isNational || found.polity.kind === "federal_unit"
       ? null
       : call(router.polities.holders, { id: found.id }),
+    isNational ? call(router.coverage.known, { id: found.id }) : [],
   ]);
-  return { ...found, record, holders };
+  return { ...found, record, holders, known };
 }
 
 export async function twin({ request, url }: RequestEvent) {
@@ -506,7 +523,10 @@ function markdown(
       return comparisonMarkdown(data, link);
     }
     case "polity": {
-      return polityMarkdown(data.polity, data.record, data.holders, link);
+      return [
+        ...polityMarkdown(data.polity, data.record, data.holders, link),
+        ...knownMarkdown(data.known, link, true),
+      ];
     }
     case "map": {
       return mapMarkdown(data, link);
@@ -532,6 +552,7 @@ function markdown(
           data.chambers,
           link,
         ),
+        ...knownMarkdown(data.known, link, false),
         ...(winners == null || winners.rows.length === 0
           ? []
           : [
@@ -673,21 +694,90 @@ function markdown(
       ];
     }
     default: {
-      return contestMarkdown(
-        data.contest,
-        data.cycle,
-        data.handover,
-        data.additional,
-        data.successors,
-        data.statutes,
-        data.lists,
-        data.rounds,
-        data.standing,
-        link,
-        ledger,
-      );
+      return [
+        ...contestMarkdown(
+          data.contest,
+          data.cycle,
+          data.handover,
+          data.additional,
+          data.successors,
+          data.statutes,
+          data.lists,
+          data.rounds,
+          data.standing,
+          link,
+          ledger,
+        ),
+        ...knownMarkdown(data.known, link, false),
+      ];
     }
   }
+}
+
+function knownMarkdown(known: Known, link: Link, isFull: boolean) {
+  if (known.length === 0) {
+    return [];
+  }
+  if (!isFull) {
+    return [
+      `## ${m.polity_known_title()}`,
+      known.map((entry) => `- ${gapNote(entry)}`).join("\n"),
+    ];
+  }
+  return [
+    `## ${m.polity_known_title()}`,
+    m.polity_known_lede(),
+    ...Map.groupBy(
+      known,
+      (entry) =>
+        `${gapSpan({ ...entry, state: null, label: null })}|${entry.level}`,
+    )
+      .values()
+      .map((entries) => {
+        const first = entries[0];
+        const office =
+          first == null || first.level === ""
+            ? m.polity_known_all()
+            : levelLabel(first.polity, first.level);
+        const years =
+          first == null ? "" : gapSpan({ ...first, state: null, label: null });
+        return [
+          `### ${[years, office].filter((part) => part !== "").join(", ")}`,
+          entries
+            .map((entry) =>
+              [
+                `- **${GRAIN_LABELS[entry.goal]?.() ?? entry.goal}** (${CATEGORY_LABELS[entry.category]()}${[
+                  entry.state,
+                  entry.label,
+                ]
+                  .filter((part) => part != null)
+                  .map((part) => `, ${part}`)
+                  .join("")}): ${entry.note}`,
+                gapTried(entry),
+                entry.category === "not_applicable" || entry.count === 0
+                  ? ""
+                  : m.polity_known_races({ count: count(entry.count) }),
+                entry.elections
+                  .map((election) =>
+                    link(
+                      election.date == null
+                        ? election.path
+                        : date(election.date),
+                      election.path,
+                    ),
+                  )
+                  .join(", ") +
+                  (entry.more > 0
+                    ? ` ${m.polity_known_more({ count: count(entry.more) })}`
+                    : ""),
+              ]
+                .filter((part) => part !== "")
+                .join(" "),
+            )
+            .join("\n"),
+        ].join("\n\n");
+      }),
+  ];
 }
 
 const share = (row: { complete: number; total: number }) =>
@@ -727,7 +817,7 @@ function coverageMarkdown(
       (note) =>
         note.level === level &&
         note.goal !== "fine" &&
-        note.lost == null &&
+        note.category == null &&
         note.canvass == null &&
         note.readiness == null,
     );
@@ -895,14 +985,26 @@ function coverageMarkdown(
                 ...(row.published > 0
                   ? [m.coverage_published_of({ count: count(row.published) })]
                   : []),
-                ...(row.lost > 0
-                  ? [m.coverage_lost_of({ count: count(row.lost) })]
+                ...(row.knownGap > 0
+                  ? [m.coverage_known_gap_of({ count: count(row.knownGap) })]
+                  : []),
+                ...(row.blocked > 0
+                  ? [m.coverage_blocked_of({ count: count(row.blocked) })]
+                  : []),
+                ...(row.inapplicable > 0
+                  ? [
+                      m.coverage_inapplicable_of({
+                        count: count(row.inapplicable),
+                      }),
+                    ]
                   : []),
                 ...(isBonus
                   ? []
                   : [
                       m.coverage_short({
-                        count: count(row.total - row.complete - row.lost),
+                        count: count(
+                          row.total - row.complete - row.knownGap - row.blocked,
+                        ),
                       }),
                     ]),
               ].join(", ")}`,
@@ -943,26 +1045,25 @@ function coverageMarkdown(
                           `    - [${m.coverage_canvass_row({ state: note.canvass ?? "", year: String(note.from), office: levelLabel(data.polity, note.level) })}](${note.url ?? ""}). ${note.note}`,
                         ])
                     : []),
-                  ...(reason === "lost"
+                  ...(reason === "knownGap" || reason === "blocked"
                     ? summary.notes
                         .filter(
                           (note) =>
-                            note.lost != null &&
-                            tier.levels.some(
-                              (level) => level.key === note.level,
-                            ),
+                            note.category ===
+                              (reason === "knownGap"
+                                ? "known_gap"
+                                : "blocked") &&
+                            (note.level === "" ||
+                              tier.levels.some(
+                                (level) => level.key === note.level,
+                              )) &&
+                            GAP_GRAINS[item.goal].includes(note.goal) &&
+                            (note.count ?? 0) > 0,
                         )
-                        .map((note) => {
-                          const source = summary.sources[note.lost ?? ""];
-                          const span = m.coverage_lost_span({
-                            years:
-                              note.from === note.to
-                                ? String(note.from)
-                                : `${note.from}–${note.to}`,
-                            source: source?.title ?? note.lost ?? "",
-                          });
-                          return `  - ${source == null ? span : `[${span}](${source.url})`}. ${note.note}`;
-                        })
+                        .map(
+                          (note) =>
+                            `  - ${gapSpan(note)} (${count(note.count ?? 0)}): ${note.note} ${gapTried(note)}`,
+                        )
                     : []),
                 ])
                 .join("\n"),

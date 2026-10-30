@@ -1133,6 +1133,7 @@ STATE_INPUTS = (
     f"pipelines/ea/readiness/{readiness.DAY}.json",
     "pipelines/ea/sources/us/ncsl_measures.csv",
     ".agents/spec/finest-reported.csv",
+    ".agents/spec/coverage-gaps.tsv",
 )
 COUNTRY_INPUTS = (
     "pipelines/ea/coverage.py",
@@ -1140,6 +1141,7 @@ COUNTRY_INPUTS = (
     "pipelines/ea/readiness.py",
     f"pipelines/ea/readiness/{readiness.DAY}.json",
     ".agents/spec/finest-reported.csv",
+    ".agents/spec/coverage-gaps.tsv",
 )
 
 PART_SQL = """
@@ -1318,6 +1320,16 @@ def measure(st: str, members: list[dict], today: date) -> tuple[str, dict, float
     started = time.monotonic()
     with connect() as conn:
         cells = coverage.matrix(conn, [st], members, last=today.year)
+        conn.execute("create temp table gap (st text, level text, stage text, y0 int, y1 int, ids uuid[])")
+        conn.cursor().executemany(
+            "insert into gap values (%s, %s, %s, %s, %s, %s)",
+            [
+                (row["state"], row["level"], row["stage"], row["from"], row["to"], row["ids"])
+                for row in coverage.registry()
+                if row["polity"] == "us" and row["grain"] in ("results", "county", "precinct")
+            ],
+        )
+        gaps = [list(row) for row in conn.execute(coverage.GAPS_SQL)]
         units = [row for row in conn.execute(coverage.UNITS_SQL) if row[0] is not None]
         conn.execute(LOCAL_SQL)
         held: dict[str, dict[int, list]] = defaultdict(dict)
@@ -1331,7 +1343,7 @@ def measure(st: str, members: list[dict], today: date) -> tuple[str, dict, float
         turnout = list(conn.execute(TURNOUT_SQL, {"st": st}))
     return (
         st,
-        {"cells": cells, "units": units, "held": held, "shapes": shapes, "turnout": turnout},
+        {"cells": cells, "units": units, "held": held, "shapes": shapes, "turnout": turnout, "gaps": gaps},
         time.monotonic() - started,
     )
 
@@ -1468,8 +1480,20 @@ def build(full: bool = False) -> str:
             country_goals += [tuple(row) for row in rows["goals"]]
             country_polities.append(tuple(rows["polity"]))
         if not todo and "state" not in newer and not stale(("local", "")):
+            (known,) = conn.execute(
+                "select coalesce(rows -> 'known', '[]') from coverage_cache_part where stage = 'local'"
+            ).fetchone() or ([],)
             with conn.transaction():
-                coverage_countries.write(conn, country_goals, country_polities)
+                coverage_countries.write(
+                    conn,
+                    country_goals,
+                    [
+                        (*row[:9], json.dumps(json.loads(row[9]) + known, ensure_ascii=False), row[10])
+                        if row[0] == "us"
+                        else row
+                        for row in country_polities
+                    ],
+                )
                 conn.execute("update coverage_cache_part set built_at = %s where stage = 'local'", [stamp])
             return f"{len(countries)} countries rebuilt in {time.monotonic() - started:.0f}s"
         cells: list[dict] = []
@@ -1477,8 +1501,10 @@ def build(full: bool = False) -> str:
         held: dict[str, dict[int, list]] = defaultdict(dict)
         shapes: list[tuple] = []
         turnout: list[tuple] = []
+        gaps: list[list] = []
         for (rows,) in conn.execute("select rows from coverage_cache_part where stage = 'state' order by part"):
             cells += rows["cells"]
+            gaps += rows["gaps"]
             units += rows["units"]
             shapes += rows["shapes"]
             turnout += rows["turnout"]
@@ -1603,7 +1629,19 @@ def build(full: bool = False) -> str:
             link[found[0][0]] = pid
             taken.add(pid)
     plain = frozenset(
-        ("SCHOOL", "DISTRICT", "CITY", "PUBLIC", "COUNTY", "INDEPENDENT", "CONSOLIDATED", "COMMUNITY", "TOWNSHIP", "AREA", "ELEMENTARY")
+        (
+            "SCHOOL",
+            "DISTRICT",
+            "CITY",
+            "PUBLIC",
+            "COUNTY",
+            "INDEPENDENT",
+            "CONSOLIDATED",
+            "COMMUNITY",
+            "TOWNSHIP",
+            "AREA",
+            "ELEMENTARY",
+        )
     )
     for code, pid in codes.items():
         if pid in taken or not code.startswith("school:"):
@@ -1820,7 +1858,31 @@ def build(full: bool = False) -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 22)
+    registry = coverage.registry()
+    hits: dict[int, set[tuple[str, str]]] = defaultdict(set)
+    reached: Counter = Counter()
+    tags: dict[tuple, Counter] = defaultdict(Counter)
+    for st, year, level, stage, contest, election, county_bucket, precinct_bucket in gaps:
+        for goal, bucket, grains in (
+            ("county", county_bucket, ("results", "county")),
+            ("precinct", precinct_bucket, ("results", "county", "precinct") if county_bucket else ("precinct",)),
+        ):
+            found = bucket and coverage.gap(registry, grains, "us", st, level, stage, year, contest)
+            if found:
+                tags[(st, year, level, stage)][(goal, found["category"], bucket)] += 1
+                hits[found["i"]].add((contest, election))
+
+    def move(cell: list[int], index: int, n: int, found: dict | None, absent: bool = False) -> None:
+        if found is None or n <= 0:
+            return
+        reached[found["i"]] += n if found["i"] >= 0 else 0
+        if absent and found["category"] == "known_gap":
+            return
+        cell[index] -= n
+        cell[22 + coverage.CATEGORIES.index(found["category"])] += n
+        cell[0] -= n if found["category"] == "not_applicable" else 0
+
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 25)
     for st, year, level, total, complete, unshaped, unit_shapes, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -1830,7 +1892,8 @@ def build(full: bool = False) -> str:
         cell[10] += unshaped
         cell[11] += unit_shapes
         cell[12] += undrawn
-    for (st, year, level, _), c in by_key.items():
+        move(cell, 12, undrawn, coverage.gap(registry, ("shapes",), "us", st, level, "", year))
+    for (st, year, level, stage), c in by_key.items():
         if level not in STATE_LEVELS or st not in names:
             continue
         count = c["held"]
@@ -1844,9 +1907,11 @@ def build(full: bool = False) -> str:
         precinct = c["precinct"]
         major = c.get("major_only", 0)
         published = c.get("published", 0)
-        if coverage.target(st, level, year) == "total":
+        whole = coverage.target(st, level, year) == "total"
+        if whole:
             county = precinct = count - bare - upcoming - pending
             partial = totals = major = published = 0
+        tagged = tags.get((st, year, level, stage), Counter())
         if year >= 2000:
             for goal, complete, coarse in (
                 ("county", county, 0),
@@ -1866,11 +1931,23 @@ def build(full: bool = False) -> str:
                     cell[19] += published
                 else:
                     cell[13] += c.get("icpsr_only", 0)
+                grains = ("results", "county") if goal == "county" else ("results", "county", "precinct")
+                for (tag, category, bucket), n in tagged.items():
+                    if tag == goal and (bucket == "bare" or not whole):
+                        index = {"bare": 3, "totals": 4, "partial": 5, "coarse": 6, "major": 18}[bucket]
+                        move(cell, index, n, {"category": category, "i": -1})
+                move(cell, 2, base - count, coverage.gap(registry, grains, "us", st, level, stage, year), True)
         elif coverage.target(st, level, year) == "county" or level in ("state_upper", "state_lower"):
             cell = goals[("history", st, level, year)]
             for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):
                 cell[i] += value
             cell[13] += c.get("icpsr_only", 0)
+            for (tag, category, bucket), n in tagged.items():
+                if tag == "county" and (bucket == "bare" or not whole):
+                    move(cell, {"bare": 3, "totals": 4, "partial": 5}[bucket], n, {"category": category, "i": -1})
+            move(
+                cell, 2, base - count, coverage.gap(registry, ("results", "county"), "us", st, level, stage, year), True
+            )
     for st, year, n, shaped in units:
         if st in names:
             cell = goals[("precinct_shapes", st, "precinct", year)]
@@ -1886,6 +1963,7 @@ def build(full: bool = False) -> str:
         cell[2] += absent
         cell[5] += partial
         cell[6] += coarse
+        move(cell, 2, absent, coverage.gap(registry, ("turnout",), "us", st, "", kind, year))
     kinds = {g["id"]: (g["state"], g["kind"], g["population"] or 0, g["population_basis"]) for g in governments}
     for gid, year in ahead.keys() - {(row[0], row[1]) for row in years_out}:
         st, kind, population, _ = kinds[gid]
@@ -1910,7 +1988,10 @@ def build(full: bool = False) -> str:
         cell[9] += shaped
         cell[14] += population
         cell[15] += population if n > 0 else 0
-        cell[16] += population if n == 0 else 0
+        found = None if n > 0 else coverage.gap(registry, ("results",), "us", st, kind, "", year)
+        move(cell, 2, 1, found)
+        cell[16] += population if n == 0 and found is None else 0
+        cell[14] -= population if found is not None and found["category"] == "not_applicable" else 0
         cell[17] += population if population_basis in ("place", "county") else 0
 
     with connect() as conn, conn.transaction():
@@ -1950,21 +2031,38 @@ def build(full: bool = False) -> str:
                 copy.write_row(row)
         timings["local"] = time.monotonic() - clock
         clock = time.monotonic()
-        goals |= readiness.goals(conn, readiness.DAY)
+        ready, counted = readiness.goals(conn, readiness.DAY)
+        goals |= ready
+        reached.update(counted)
         timings["readiness"] = time.monotonic() - clock
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
             " turnout, precincts, shaped, unshaped, units, undrawn, icpsr, population_total, population_complete,"
-            " population_absent, population_estimated, major, published, upcoming, pending) from stdin"
+            " population_absent, population_estimated, major, published, upcoming, pending, known_gap, blocked,"
+            " inapplicable) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])
-        coverage_countries.write(conn, country_goals, country_polities)
+        known = [
+            coverage.note(row, hits[row["i"]], len({contest for contest, _ in hits[row["i"]]}) + reached[row["i"]])
+            for row in registry
+            if row["polity"] == "us"
+        ]
+        coverage_countries.write(
+            conn,
+            country_goals,
+            [
+                (*row[:9], json.dumps(json.loads(row[9]) + known, ensure_ascii=False), row[10])
+                if row[0] == "us"
+                else row
+                for row in country_polities
+            ],
+        )
         conn.execute(
-            """insert into coverage_cache_part values ('local', '', %s, %s, %s, '{}')
+            """insert into coverage_cache_part values ('local', '', %s, %s, %s, %s)
                on conflict (stage, part) do update set inputs = excluded.inputs, built_at = excluded.built_at,
-                   seconds = excluded.seconds""",
-            [wanted[("local", "")], stamp, timings["local"]],
+                   seconds = excluded.seconds, rows = excluded.rows""",
+            [wanted[("local", "")], stamp, timings["local"], Json({"known": known})],
         )
     return (
         f"{len(todo)} of {len(scope)} states and {len(countries)} of {len(coverage_countries.countries()) + 1} "

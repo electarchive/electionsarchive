@@ -7,6 +7,7 @@
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
+  import { gapNote } from "#lib/coverage.js";
   import { date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -24,6 +25,13 @@
 
   const record = createQuery(() =>
     orpc.polities.record.queryOptions({ input: { id } }),
+  );
+  const known = createQuery(() => ({
+    ...orpc.coverage.known.queryOptions({ input: { id } }),
+    enabled: isExpected,
+  }));
+  const gaps = $derived(
+    (known.data ?? []).filter((gap) => ["party", "dates"].includes(gap.goal)),
   );
 
   let chosen = $state<string | null>(null);
@@ -743,6 +751,14 @@
           </li>
         {/each}
       </ul>
+    {/if}
+    {#if gaps.length > 0}
+      <div class="grid gap-0.5 text-xs text-muted-foreground">
+        <p class="font-semibold text-foreground">{m.polity_known_record()}</p>
+        {#each gaps as gap, index (index)}
+          <p class="max-inline-[75ch]">{gapNote(gap)}</p>
+        {/each}
+      </div>
     {/if}
   </section>
 {/if}

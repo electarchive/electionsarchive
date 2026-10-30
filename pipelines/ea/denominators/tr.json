@@ -232,15 +232,6 @@
         "tr.okul",
         "tr.sandik"
       ],
-      "lost": [
-        {
-          "from": 1946,
-          "to": 1946,
-          "source": "tuik",
-          "quote": "Açıklama, p. XV: \"1946 seçimi sonuçlarına ait il bazında veri kaynağına ulaşılamadığından, seçim sonuçlarının yer aldığı tablolardan (Tablo 23), 1950-1977 yılları arasında yapılan milletvekili seçimi sonuçlarını kapsamaktadır.\" p. XII: \"Ancak “açık oy, gizli tasnif” yöntemi kullanılmış\"",
-          "note": "TÜİK, which compiled the official series, could not find any record of the 1946 votes by province, so its results tables start in 1950. The 1946 election used open voting and secret counting."
-        }
-      ],
       "elections": [
         {
           "date": "1946-07-21",

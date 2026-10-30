@@ -46,7 +46,9 @@ const counts = {
   icpsr: v.number(),
   major: v.number(),
   published: v.number(),
-  lost: v.number(),
+  knownGap: v.number(),
+  blocked: v.number(),
+  inapplicable: v.number(),
   upcoming: v.number(),
   pending: v.number(),
   populationTotal: v.number(),
@@ -73,10 +75,14 @@ const Ready = {
   absent: v.number(),
   bare: v.number(),
   partial: v.number(),
+  knownGap: v.number(),
+  blocked: v.number(),
+  inapplicable: v.number(),
   population: v.number(),
   populationReady: v.number(),
   populationAbsent: v.number(),
 };
+const CATEGORIES = ["known_gap", "blocked", "not_applicable"] as const;
 const Note = v.object({
   goal: v.string(),
   level: v.string(),
@@ -85,7 +91,14 @@ const Note = v.object({
   note: v.string(),
   held: v.optional(v.number()),
   listed: v.optional(v.boolean()),
-  lost: v.optional(v.string()),
+  category: v.optional(v.picklist(CATEGORIES)),
+  state: v.optional(v.nullable(v.string())),
+  stage: v.optional(v.nullable(v.string())),
+  label: v.optional(v.nullable(v.string())),
+  sources: v.optional(v.string()),
+  checked: v.optional(v.nullable(v.string())),
+  ref: v.optional(v.nullable(v.string())),
+  count: v.optional(v.number()),
   canvass: v.optional(v.string()),
   readiness: v.optional(v.string()),
   county: v.optional(v.nullable(v.string())),
@@ -162,10 +175,17 @@ function sum(rows: Array<Row>, spec: Spec, levels: ReadonlyArray<string>) {
         ...ZERO,
         total: total.total,
         complete:
-          total.total - total.absent - total.bare - total.lost - total.pending,
+          total.total -
+          total.absent -
+          total.bare -
+          total.knownGap -
+          total.blocked -
+          total.pending,
         absent: total.absent,
         bare: total.bare,
-        lost: total.lost,
+        knownGap: total.knownGap,
+        blocked: total.blocked,
+        inapplicable: total.inapplicable,
         upcoming: total.upcoming,
         pending: total.pending,
       }
@@ -287,7 +307,8 @@ async function summaries(polity: string | null) {
   const found = await db.execute<Polity>(sql`
     select c.polity, coalesce((select n.text from polity p join name n on n.entity_id = p.id and n.is_preferred
         where p.iso_code = upper(c.polity) order by n.lang <> 'en', n.recorded_from desc, n.id limit 1), upper(c.polity)) as name,
-      c.first, c.last, c.elections, c.contests, c.finest, c.finest_noun as "finestNoun", c.regions, c.levels, c.notes,
+      c.first, c.last, c.elections, c.contests, c.finest, c.finest_noun as "finestNoun", c.regions, c.levels,
+      (select coalesce(jsonb_agg(n - 'contests' - 'elections' order by i), '[]') from jsonb_array_elements(c.notes) with ordinality as t (n, i)) as notes,
       c.sources
     from coverage_polity c
     where ${polity}::text is null or c.polity = ${polity}
@@ -372,7 +393,7 @@ export const coverage = {
           finestNoun: polity.finestNoun,
           uncounted: polity.notes.filter(
             (note) =>
-              note.lost == null &&
+              note.category == null &&
               note.canvass == null &&
               note.readiness == null,
           ).length,
@@ -478,6 +499,7 @@ export const coverage = {
         >
       >(sql`
         select g.level, g.year, g.state, g.total, g.complete, g.absent, g.bare, g.partial,
+          g.known_gap as "knownGap", g.blocked, g.inapplicable,
           coalesce(g.population_total, 0)::float8 as population, coalesce(g.population_complete, 0)::float8 as "populationReady",
           coalesce(g.population_absent, 0)::float8 as "populationAbsent"
         from coverage_goal g
@@ -501,6 +523,9 @@ export const coverage = {
             absent: 0,
             bare: 0,
             partial: 0,
+            knownGap: 0,
+            blocked: 0,
+            inapplicable: 0,
             population: 0,
             populationReady: 0,
             populationAbsent: 0,
@@ -627,7 +652,92 @@ export const coverage = {
             group by 1
         ) r
         order by case when ${input.goal} = 'local' then r."populationTotal" - r."populationComplete"
-          else r.total - r.complete end desc, r.key desc
+          else r.total - r.complete - r."knownGap" - r.blocked end desc, r.key desc
+      `);
+      return found.rows;
+    }),
+  known: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/coverage/known",
+        summary:
+          "One country's known gaps (polity, or id for the country's own polity), or those touching one contest or election (id): what the archive cannot fill yet and why, each with its category (known_gap: every source tried is exhausted; blocked: a source exists but cannot be reached yet, with its manual fetch id; not_applicable: the grain does not exist), the period, office level, state, and grain it covers, the reason, the sources tried, the date checked, how many races it touches, and the affected elections",
+      }),
+    )
+    .input(
+      v.object({
+        polity: v.optional(Code),
+        id: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
+    .output(
+      v.array(
+        v.object({
+          polity: v.string(),
+          goal: v.string(),
+          level: v.string(),
+          state: v.nullable(v.string()),
+          stage: v.nullable(v.string()),
+          from: v.nullable(v.number()),
+          to: v.nullable(v.number()),
+          label: v.nullable(v.string()),
+          category: v.picklist(CATEGORIES),
+          note: v.string(),
+          sources: v.string(),
+          checked: v.nullable(v.string()),
+          ref: v.nullable(v.string()),
+          count: v.number(),
+          elections: v.array(
+            v.object({ path: v.string(), date: v.nullable(v.string()) }),
+          ),
+          more: v.number(),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const polity = input.polity ?? null;
+      const id = input.id ?? null;
+      if (polity == null && id == null) {
+        throw new ORPCError("BAD_REQUEST");
+      }
+      const found = await db.execute<{
+        polity: string;
+        goal: string;
+        level: string;
+        state: string | null;
+        stage: string | null;
+        from: number | null;
+        to: number | null;
+        label: string | null;
+        category: (typeof CATEGORIES)[number];
+        note: string;
+        sources: string;
+        checked: string | null;
+        ref: string | null;
+        count: number;
+        elections: Array<{ path: string; date: string | null }>;
+        more: number;
+      }>(sql`
+        select c.polity, n ->> 'goal' as goal, n ->> 'level' as level, n ->> 'state' as state, n ->> 'stage' as stage,
+          (n ->> 'from')::int as "from", (n ->> 'to')::int as "to", n ->> 'label' as label, n ->> 'category' as category,
+          n ->> 'note' as note, coalesce(n ->> 'sources', '') as sources, n ->> 'checked' as checked, n ->> 'ref' as ref,
+          coalesce((n ->> 'count')::int, 0) as count,
+          coalesce((select jsonb_agg(jsonb_build_object('path', x.path, 'date', x.date) order by x.date, x.path)
+            from (select s.path, e.date_from::text as date
+              from jsonb_array_elements_text(coalesce(n -> 'elections', '[]')) a (eid)
+              join election e on e.id = a.eid::uuid
+              join slug s on s.entity_id = e.id and s.is_current
+              order by e.date_from, s.path limit 12) x), '[]') as elections,
+          greatest(jsonb_array_length(coalesce(n -> 'elections', '[]')) - 12, 0) as more
+        from coverage_polity c cross join jsonb_array_elements(c.notes) with ordinality as t (n, i)
+          cross join (select coalesce(${polity}::text, (select lower(p.iso_code) from polity p
+            where p.id::text = ${id}::text and p.kind in ('sovereign_state', 'supranational'))) as cc) w
+        where n ? 'category'
+          and case when w.cc is not null then c.polity = w.cc and (coalesce((n ->> 'count')::int, 0) > 0
+              or n ->> 'category' = 'not_applicable' or n ->> 'goal' in ('dates', 'party'))
+            else coalesce(n -> 'contests', '[]') ? ${id}::text or coalesce(n -> 'elections', '[]') ? ${id}::text end
+        order by c.polity, (n ->> 'from')::int nulls first, n ->> 'level', n ->> 'goal', i
       `);
       return found.rows;
     }),

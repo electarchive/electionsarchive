@@ -2,12 +2,14 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { gapNote } from "#lib/coverage.js";
   import { count, date, definite, percent, points } from "#lib/format.js";
   import {
     explain,
@@ -1127,6 +1129,9 @@
             ].join(" "),
           },
     ),
+  );
+  const known = createQuery(() =>
+    orpc.coverage.known.queryOptions({ input: { id } }),
   );
   const captions = $derived([
     ...new Set(
@@ -2705,5 +2710,10 @@
         >
       </p>
     {/if}
+    {#each known.data ?? [] as gap, index (index)}
+      <p class="px-2 text-[0.8125rem] text-muted-foreground">
+        {gapNote(gap)}
+      </p>
+    {/each}
   {/if}
 {/snippet}

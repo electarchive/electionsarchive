@@ -29,7 +29,9 @@
     },
     {
       "border border-dashed border-muted-foreground/70 bg-muted":
-        reason === "lost",
+        reason === "knownGap",
+      "border border-muted-foreground/70 bg-muted bg-[repeating-linear-gradient(0deg,var(--muted-foreground)_0_1px,transparent_1px_4px)]":
+        reason === "blocked",
     },
     {
       "border border-dotted border-(--yes) bg-(--yes)/40":
