@@ -39,6 +39,7 @@ VERIFIED = {
     (1944, "GA"),
     (1944, "IA"),
     (1944, "KY"),
+    (1936, "PA"),
     (1948, "PA"),
     (1948, "WA"),
     (1960, "TN"),
@@ -61,6 +62,18 @@ VERIFIED = {
 }
 UNEQUAL = {
     (1924, "NY", "robertlafollette"): ("Independent Progressive", "Socialist (La Follette)"),
+}
+LINKED = {
+    (1924, "MA", 141225): ("Independent Progressive",),
+    (1924, "MT", 66123): ("Independent Progressive", "Farmer-Labor (La Follette)", "Socialist"),
+    (1924, "NJ", 108901): ("Independent Progressive",),
+    (1924, "OK", 46375): ("Farmer-Labor (La Follette)", "Socialist"),
+    (1924, "WV", 36723): ("Farmer-Labor (La Follette)", "Socialist (La Follette)"),
+    (1924, "PA", 307567): ("Labor (La Follette)", "Socialist (La Follette)"),
+    (1936, "PA", 67468): ("Royal Oak (Lemke)",),
+    (1948, "TX", 113776): ("States' Rights Democrats",),
+    (1948, "GA", 85135): ("States' Rights Democratic",),
+    (1976, "DE", 2437): ("Non-Partisan",),
 }
 ALIASES = {
     "democrat": "democratic",
@@ -259,6 +272,19 @@ def emit() -> Path:
                 taken[group[0]] = taken[group[0]] | {"votes": total_lines}
                 taken = [row for i, row in enumerate(taken) if i not in group[1:]]
             matched: dict[int, UUID] = {}
+            disagreements: list[str] = []
+            for option, (_, value) in tickets.items():
+                labels = LINKED.get((year, state, int(value)))
+                indexes = [i for i, row in enumerate(taken) if labels and row["label"] in labels]
+                if labels and len(indexes) == len(labels):
+                    total_lines = sum(taken[i]["votes"] for i in indexes)
+                    (merges if len(indexes) > 1 else disagreements).append(
+                        " and ".join(f"{taken[i]['votes']:,} on the {taken[i]['label']} line" for i in indexes)
+                        + (f" (Wikipedia's figure is {value:,})" if total_lines != value else "")
+                    )
+                    taken[indexes[0]] = taken[indexes[0]] | {"votes": total_lines}
+                    taken = [row for i, row in enumerate(taken) if i not in indexes[1:]]
+                    matched[indexes[0]] = option
             names = [line_names(row["label"]) for row in taken]
             for option, (tokens, value) in tickets.items():
                 same = [i for i, row in enumerate(taken) if i not in matched and row["votes"] == value]
@@ -390,7 +416,20 @@ def emit() -> Path:
                     kind="methodology",
                     body_md="The book prints fusion votes on separate lines. A ticket's total here is the sum of "
                     + "; ".join(merges)
-                    + ", which equals the figure in Wikipedia's results-by-state table.",
+                    + (
+                        "."
+                        if any("Wikipedia's figure is" in text for text in merges)
+                        else ", which equals the figure in Wikipedia's results-by-state table."
+                    ),
+                )
+            if disagreements:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md="The book prints "
+                    + "; ".join(disagreements)
+                    + ". The book's figure is stored for the ticket, and the earlier Wikipedia figure stays in the superseded set.",
                 )
             if (year, state) in TIED:
                 cs.add(

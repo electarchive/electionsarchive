@@ -1,0 +1,533 @@
+{
+  "polity": "US-TN",
+  "publisher": "Tennessee Secretary of State",
+  "authoritative": "Source: the Secretary of State's official 1998 state Senate returns by county, whose county rows add up to each printed district total; they replace Klarner's district totals.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State Senate, November 3, 1998 general election, by county",
+  "file": {
+    "url": "https://sos.tn.gov/elections/results#1998-state-senate.pdf"
+  },
+  "contests": {
+    "s1": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 1
+    },
+    "s3": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 3
+    },
+    "s5": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 5
+    },
+    "s7": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 7
+    },
+    "s8": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 8
+    },
+    "s9": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 9
+    },
+    "s11": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 11
+    },
+    "s13": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 13
+    },
+    "s15": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 15
+    },
+    "s17": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 17
+    },
+    "s19": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 19
+    },
+    "s21": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 21
+    },
+    "s23": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 23
+    },
+    "s25": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 25
+    },
+    "s27": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 27
+    },
+    "s29": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 29
+    },
+    "s31": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 31
+    },
+    "s33": {
+      "year": 1998,
+      "chamber": "state-senate",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": 33
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-1",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Tommy G. Haun",
+          "contest": "s1",
+          "candidate": "Tommy G. Haun"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s1",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 1. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 2 is Tommy G. Haun. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 1,
+      "id": "1-3",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Richard Gabriel",
+          "contest": "s3",
+          "candidate": "Richard Gabriel"
+        },
+        {
+          "label": "Rusty Crowe",
+          "contest": "s3",
+          "candidate": "Rusty Crowe"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s3",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 3. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Richard Gabriel; column 2 is Rusty Crowe. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 1,
+      "id": "1-5",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Randy McNally",
+          "contest": "s5",
+          "candidate": "Randy McNally"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s5",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 5. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 2 is Randy McNally. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 1,
+      "id": "1-7",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Richard Baker",
+          "contest": "s7",
+          "candidate": "Richard Baker"
+        },
+        {
+          "label": "Tim Burchett",
+          "contest": "s7",
+          "candidate": "Tim Burchett"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s7",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 7. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Richard Baker; column 2 is Tim Burchett. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 1,
+      "id": "1-8",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Jeff D. Bolin",
+          "contest": "s8",
+          "candidate": "Jeff D. Bolin"
+        },
+        {
+          "label": "Bill Clabough",
+          "contest": "s8",
+          "candidate": "Bill Clabough"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s8",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 8. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Jeff D. Bolin; column 2 is Bill Clabough. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 2,
+      "id": "2-9",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Donna J. Hubbard",
+          "contest": "s9",
+          "candidate": "Donna J. Hubbard"
+        },
+        {
+          "label": "Jeff Miller",
+          "contest": "s9",
+          "candidate": "Jeff Miller"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s9",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 9. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Donna J. Hubbard; column 2 is Jeff Miller. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 2,
+      "id": "2-11",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "David Fowler",
+          "contest": "s11",
+          "candidate": "David Fowler"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s11",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 11. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 2 is David Fowler. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 2,
+      "id": "2-13",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Gene Elsea",
+          "contest": "s13",
+          "candidate": "Gene Elsea"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s13",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 13. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 2 is Gene Elsea. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 2,
+      "id": "2-15",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Byron (Low Tax) Looper",
+          "contest": "s15",
+          "candidate": "Byron (Low Tax) Looper"
+        },
+        {
+          "label": "Charlotte Burks",
+          "contest": "s15",
+          "candidate": "Charlotte Burks"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s15",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 15. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 2 is Byron (Low Tax) Looper; column 3 is Charlotte Burks. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 3,
+      "id": "3-17",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Robert Rochelle",
+          "contest": "s17",
+          "candidate": "Robert Rochelle"
+        },
+        {
+          "label": "Phillip Warren",
+          "contest": "s17",
+          "candidate": "Phillip Warren"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s17",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 17. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Robert Rochelle; column 2 is Phillip Warren. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 3,
+      "id": "3-19",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Thelma Harper",
+          "contest": "s19",
+          "candidate": "Thelma Harper"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s19",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 19. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Thelma Harper. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 3,
+      "id": "3-21",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Douglas Henry, Jr.",
+          "contest": "s21",
+          "candidate": "Douglas Henry, Jr."
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s21",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 21. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Douglas Henry, Jr.. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 3,
+      "id": "3-23",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Dean Baxter",
+          "contest": "s23",
+          "candidate": "Dean Baxter"
+        },
+        {
+          "label": "Marsha Blackburn",
+          "contest": "s23",
+          "candidate": "Marsha Blackburn"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s23",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 23. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Dean Baxter; column 2 is Marsha Blackburn. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 3,
+      "id": "3-25",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Kenneth N. \"Pete\" Springer",
+          "contest": "s25",
+          "candidate": "Kenneth N. \"Pete\" Springer"
+        },
+        {
+          "label": "David Blake Lay",
+          "contest": "s25",
+          "candidate": "David Blake Lay"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s25",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 25. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Kenneth N. \"Pete\" Springer; column 2 is David Blake Lay. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 4,
+      "id": "4-27",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Joe Hip McKnight",
+          "contest": "s27",
+          "candidate": "Joe Hip McKnight"
+        },
+        {
+          "label": "Bobby Carter",
+          "contest": "s27",
+          "candidate": "Bobby Carter"
+        },
+        {
+          "label": "Harrell Carter, Jr.",
+          "contest": "s27",
+          "candidate": "Harrell Carter, Jr."
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s27",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 27. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Joe Hip McKnight; column 2 is Bobby Carter; column 3 is Harrell Carter, Jr.. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 4,
+      "id": "4-29",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "John N. Ford",
+          "contest": "s29",
+          "candidate": "John N. Ford"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s29",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 29. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is John N. Ford. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 4,
+      "id": "4-31",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Curtis Person, Jr.",
+          "contest": "s31",
+          "candidate": "Curtis Person, Jr."
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s31",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 31. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 2 is Curtis Person, Jr.. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    },
+    {
+      "page": 4,
+      "id": "4-33",
+      "orientation": "counties_down",
+      "columns": [
+        {
+          "label": "Roscoe Dixon",
+          "contest": "s33",
+          "candidate": "Roscoe Dixon"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "s33",
+          "candidate": "Write-Ins"
+        }
+      ],
+      "hint": "The page holds several district tables; read only the table headed DISTRICT 33. One row per county in that table, with one column per candidate number 1, 2, 3 across the page and the last column Write-Ins. Label each column from the CANDIDATES key of that table: column 1 is Roscoe Dixon. Columns whose candidate name is blank are zero and are left out. Include the DISTRICT TOTAL row as the total."
+    }
+  ]
+}
