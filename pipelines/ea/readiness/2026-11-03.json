@@ -40,6 +40,26 @@
       "title": "2026 General Election: Offices Up for Election",
       "publisher": "Wyoming Secretary of State",
       "url": "https://sos.wyo.gov/Elections/Docs/2026/2026_Offices_Up_for_Election.pdf"
+    },
+    "gu-sample-ballot-2026": {
+      "title": "General Election Sample Ballot, November 3, 2026",
+      "publisher": "Guam Election Commission",
+      "url": "https://gec.guam.gov/2026-general-election-info/"
+    },
+    "vi-ballot-2026": {
+      "title": "2026 General Election ballots, St. Croix and St. Thomas-St. John districts",
+      "publisher": "Elections System of the Virgin Islands",
+      "url": "https://vivote.gov/?elections=2026-general-election"
+    },
+    "as-candidates-2026": {
+      "title": "Candidates for the 2026 Midterm Election",
+      "publisher": "American Samoa Election Office",
+      "url": "https://www.aselectionoffice.gov/candidates-information/candidates-for-the-2026-midterm-election"
+    },
+    "mp-candidates-2026": {
+      "title": "2026 Certified Candidates Listing",
+      "publisher": "CNMI Commonwealth Election Commission",
+      "url": "https://www.votecnmi.gov.mp/candidate/2026-certified-candidates-listing"
     }
   },
   "levels": [
@@ -367,6 +387,18 @@
         "WI": 3,
         "WV": 1,
         "WY": 1
+      }
+    },
+    {
+      "key": "territory",
+      "unit": "seats",
+      "source": "gu-sample-ballot-2026",
+      "quote": "Seat counts as printed by each election office. Guam: Governor 1, Delegate 1, Legislature 15 (\"Mark no more than fifteen\"), Attorney General 1 (\"Mark one\"), Consolidated Commission on Utilities 3 (\"Mark no more than three\"); Education Board, mayors, and vice mayors print no count. Virgin Islands (ballot, \"Select no more than\"): Governor 1, Delegate 1, Legislature 1 at large and 7 each for St. Croix and St. Thomas-St. John, Board of Education 2 in each district, Board of Elections 3 for St. Croix, 2 for St. Thomas, and 1 for St. John. American Samoa and the Northern Marianas: Delegate 1 and, for the Northern Marianas, Governor 1; their candidate pages print no seat counts for legislatures or local offices.",
+      "states": {
+        "GU": 21,
+        "VI": 27,
+        "AS": 1,
+        "MP": 2
       }
     }
   ]
