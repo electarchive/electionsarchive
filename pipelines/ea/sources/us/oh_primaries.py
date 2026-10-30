@@ -10,7 +10,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.oh_primaries"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{}id_/https://www.ohiosos.gov/globalassets/elections/{}"
 FILES = {
@@ -41,6 +41,16 @@ MANUAL = {
     (date(2016, 3, 15), "republican"): "2016/primary/republican.xlsx",
     (date(2016, 3, 15), "green"): "2016/primary/green.xlsx",
 }
+LOCAL = {
+    (date(2024, 3, 19), "democratic"): (
+        "2024/primary/summary-level-official-results-primary-2024---democratic.xlsx",
+        DATA / "inbox" / "manual" / "MF-285" / "summary-level-official-results-primary-2024---democratic.xlsx",
+    ),
+    (date(2024, 3, 19), "republican"): (
+        "2024/primary/summary-level-results-primary-2024---republican.xlsx",
+        DATA / "inbox" / "manual" / "MF-285" / "summary-level-results-primary-2024---republican.xlsx",
+    ),
+}
 PUBLISHER = "Ohio Secretary of State"
 TITLE = "Official primary election results by county"
 
@@ -48,7 +58,7 @@ TITLE = "Official primary election results by county"
 def urls() -> dict[tuple[date, str], str]:
     return {key: WAYBACK.format(stamp, path) for key, (stamp, path) in FILES.items()} | {
         key: PORTAL.format(path) for key, path in MANUAL.items()
-    }
+    } | {key: PORTAL.format(path) for key, (path, _) in LOCAL.items()}
 
 
 def fetch() -> None:
@@ -66,6 +76,15 @@ def fetch() -> None:
                 retrieved_at=datetime(2026, 10, 23, tzinfo=UTC),
                 media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
+    for path, file in LOCAL.values():
+        raw.store(
+            SOURCE,
+            PORTAL.format(path),
+            file.read_bytes(),
+            suffix=".xlsx",
+            retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
 
 
 def parse() -> None:
@@ -176,7 +195,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ohio's House, Senate, and presidential primaries 2014–2022 by county",
+            summary="Ohio's House, Senate, and presidential primaries 2014–2024 by county",
             polity="US-OH",
         )
         source = cs.source(PUBLISHER, TITLE)
