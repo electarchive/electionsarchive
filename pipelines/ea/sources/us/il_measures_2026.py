@@ -1,3 +1,4 @@
+import html
 import re
 import subprocess
 from datetime import UTC, date, datetime
@@ -8,31 +9,129 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda, govmint
+from ea.sources.us import civmint, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.il_measures_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-URL = "https://wincoil.gov/media/attachments/2026/08/27/questions-nov-3-2026-2.pdf"
-PUBLISHER = "Winnebago County Clerk"
+MANUAL = DATA / "inbox" / "manual" / "MF-376"
 TITLE = "Referenda questions, November 3, 2026 general election"
-COUNTY = "us.county:17201"
+COUNTIES = {
+    "17201": (
+        "https://wincoil.gov/media/attachments/2026/08/27/questions-nov-3-2026-2.pdf",
+        None,
+        "Winnebago County Clerk",
+        ".pdf",
+    ),
+    "17031": (
+        "https://www.cookcountyclerkil.gov/elections/current-election-referenda",
+        "IL-Cook/il-cook-2026-11-03-referenda.html",
+        "Cook County Clerk",
+        ".html",
+    ),
+    "17113": (
+        "https://www.mcleancountyil.gov/1049/Referenda",
+        "IL-McLean/il-mclean-2026-11-03-referenda.html",
+        "McLean County Clerk",
+        ".html",
+    ),
+    "17111": (
+        "https://www.mchenrycountyil.gov/home/showpublisheddocument/20260824-public-notice-of-referendum",
+        "IL-McHenry/20260824 PUBLIC NOTICE OF REFERENDUM.pdf",
+        "McHenry County Clerk",
+        ".pdf",
+    ),
+}
+MCHENRY_LABELS = (
+    ("Home Rule", "Advisory Question: Home Rule and County Executive"),
+    ("Zoning", "Advisory Question: Local Zoning Authority"),
+    ("Limitation Law", "Increase Limiting Rate"),
+    ("Pension", "New Tax Rate for Pension Fund"),
+    ("Bonds", "Issue Bonds"),
+)
+SKIPPED = {("17111", "Community Unit School District #300")}
 
 
 def fetch() -> None:
-    try:
-        raw.cached(SOURCE, URL)
-    except LookupError:
-        content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", URL], capture_output=True, check=True).stdout
-        raw.store(SOURCE, URL, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    for url, file, _, suffix in COUNTIES.values():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            if file is None:
+                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+                retrieved = datetime.now(UTC)
+            else:
+                path = MANUAL / file
+                content = path.read_bytes()
+                retrieved = datetime.fromtimestamp(path.stat().st_mtime, UTC)
+            raw.store(SOURCE, url, content, suffix=suffix, retrieved_at=retrieved, media_type="application/pdf" if suffix == ".pdf" else "text/html")
+
+
+SCHOOL = re.compile(r"((?:[A-Z][\w\-]+ )+?(?:Combined |Community Unit |Township High |Elementary |Unit |Community High )?(?:School|Community College) District (?:Number|No\.) ?\d+\w*)")
+
+
+def full_name(entity: str, wording: str) -> str:
+    if not re.search(r"School District|CUSD|College District", entity):
+        return entity
+    match = SCHOOL.search(wording)
+    return re.sub(r"^(Shall|The) ", "", match[1]) if match is not None else entity
+
+
+def pdf_text(url: str) -> str:
+    return subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True).stdout
+
+
+def page_text(url: str) -> str:
+    return raw.cached(SOURCE, url).path.read_text()
+
+
+def cook_rows() -> list[dict[str, str]]:
+    cells = re.findall(r'<span translate="no">(.*?)</span></div><div[^>]*grow="3">(.*?)</div></div>', page_text(COUNTIES["17031"][0]), re.S)
+    rows = []
+    for head, wording in cells:
+        entity, label = html.unescape(head).split(", ", 1)
+        rows.append({"entity": entity, "label": label, "wording": re.sub(r"\s+", " ", html.unescape(wording)).strip()})
+    return rows
+
+
+def mclean_rows() -> list[dict[str, str]]:
+    page = page_text(COUNTIES["17113"][0])
+    heads = re.findall(r'data-tabname="([^"]+)"', page)
+    wordings = re.findall(r"<p>(.+?)</p><ul[^>]*><li><strong>YES", page, re.S)
+    rows = []
+    for head, wording in zip(heads, wordings, strict=True):
+        entity, label = html.unescape(head).split(" - ", 1)
+        rows.append({"entity": entity.strip(), "label": label.strip(), "wording": re.sub(r"\s+", " ", html.unescape(wording)).strip().strip("\"“”")})
+    return rows
+
+
+def mchenry_rows() -> list[dict[str, str]]:
+    rows = []
+    entity = ""
+    text = pdf_text(COUNTIES["17111"][0]).split("SUBDIVISIONS:", 1)[1]
+    for block in re.split(r"\n\s*\n", text):
+        block = re.sub(r"\s+", " ", block).strip()
+        if not block or block.startswith(("I hereby", "Dated")):
+            continue
+        if block.isupper():
+            entity = block.title().replace("Mchenry", "McHenry").replace("Of ", "of ")
+        elif not rows or rows[-1]["entity"] != entity or rows[-1]["wording"]:
+            if re.match(r"^\d\.|^\(\d\)", block):
+                rows[-1]["wording"] += " " + block
+            else:
+                rows.append({"entity": entity, "label": block, "wording": ""})
+        else:
+            rows[-1]["wording"] = block
+    for row in rows:
+        row["label"] = next(label for key, label in MCHENRY_LABELS if key in row["label"])
+        row["wording"] = row["wording"].strip("\"")
+    return rows
 
 
 def parse() -> None:
-    text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, URL).path), "-"], capture_output=True, text=True, check=True
-    ).stdout
+    text = pdf_text(COUNTIES["17201"][0])
     text = re.sub(r"(?m)^(\s*)(YES|NO)\s*$", "", text)
     text = re.sub(r"(?m)\s{20,}(YES|NO)\s*$", "", text)
     parts = re.split(r"(?m)^\s*(NON-BINDING ADVISORY PUBLIC QUESTION CONCERNING[^\n]*(?:\n\s+[A-Z ]+(?=\n))?|PROPOSITION TO INCREASE THE PROPERTY TAX LIMITING RATE)\s*$", text)
@@ -50,60 +149,59 @@ def parse() -> None:
             label = f"Advisory Question: {label}"
         wording = re.sub(r"\s+", " ", re.sub(r"(?<=\s)(YES|NO)(?=\s)", " ", wording)).strip()
         rows.append({"entity": entity, "label": label, "wording": wording})
+    tagged = [{**row, "county": "17201"} for row in rows]
+    for county, extra in (("17031", cook_rows()), ("17113", mclean_rows()), ("17111", mchenry_rows())):
+        tagged.extend({**row, "county": county} for row in extra if (county, row["entity"]) not in SKIPPED)
+    for row in tagged:
+        row["entity"] = full_name(row["entity"], row["wording"])
+        row["url"] = COUNTIES[row["county"]][0]
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(tagged).unique(["county", "entity", "label"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "measures.parquet")
-    print(frame.rows())
+    print(frame.height)
 
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
-        found: dict[str, tuple[UUID, UUID, str, str, str]] = {}
-        names: dict[str, list[str]] = {}
-        for scheme, code, polity, area, text, path in conn.execute(
-            """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
-               join area_code c on c.area_id = a.id
-               join polity_territory t on t.area_id = a.id
-               join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district')
-               join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-               join slug s on s.entity_id = p.id and s.is_current
-               where a.scheme_code in ('us.county', 'us.place', 'us.school_district') and left(c.code, 2) = '17'"""
-        ).fetchall():
-            key = f"{scheme}:{code}"
-            found[key] = (polity, area, text, path, code)
-            names.setdefault(ceda._city(text) if scheme == "us.place" else ceda._core(text), []).append(key)
-        slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/il/%%'").fetchall())
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Winnebago County, Illinois advisory questions and property tax proposition on the November 3, 2026 ballot, with official wording",
+            summary="Illinois county, municipal, school, and special district referenda (Winnebago, Cook, McLean, McHenry) on the November 3, 2026 ballot, with official wording",
             polity="US-IL",
         )
+        civil = civmint.Civil(conn, cs, "17", "IL")
+        found = civil.found
         system = cs.key("us.electoral_system", "referendum")
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL)
-        cs.artifact(raw.cached(SOURCE, URL), source)
+        sources: dict[str, UUID] = {}
+        for county, (url, _, publisher, _) in COUNTIES.items():
+            sources[county] = cs.source(publisher, TITLE)
+            cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            cs.artifact(raw.cached(SOURCE, url), sources[county])
         parent = cs.key("us.election", f"{DAY}:IL")
         elections: set[UUID] = set()
         kept = 0
         for row in frame.iter_rows(named=True):
             entity = row["entity"]
-            if re.match(r"(?i)(city|town) of ", entity):
-                options = names.get(ceda._city(re.sub(r"(?i)^(city|town) of ", "", entity)), [])
-            elif "school district" in entity.lower():
-                options = names.get(ceda._core(entity), [])
-            else:
-                options = []
-            option = options[0] if len(options) == 1 else None
-            if option is None and not options and f"special:{entity}" in found:
-                option = f"special:{entity}"
-            elif option is None and not options and COUNTY in found:
-                county, county_area, _, county_path, county_code = found[COUNTY]
-                minted = govmint.special(conn, cs, "IL", (county, county_area, county_path, county_code), entity, slugs)
+            county_key = f"us.county:{row['county']}"
+            source = sources[row["county"]]
+            option = None
+            if re.match(r"(?i)(city|town|village) of ", entity):
+                option = civil.place(re.sub(r"(?i)^(city|town|village) of ", "", entity))
+            elif county_key in found and entity == found[county_key][2]:
+                option = county_key
+            elif entity.endswith(" Township"):
+                option = civil.town(entity, row["county"][:5])
+            elif re.search(r"School District|CUSD", entity):
+                option = civil.school(entity)
+            elif f"special:{row['county']}:{entity}" in found:
+                option = f"special:{row['county']}:{entity}"
+            elif county_key in found:
+                county, county_area, _, county_path, county_code = found[county_key]
+                minted = govmint.special(conn, cs, "IL", (county, county_area, county_path, county_code), entity, civil.slugs)
                 if minted is not None:
-                    option = f"special:{entity}"
+                    option = f"special:{row['county']}:{entity}"
                     found[option] = minted
             if option is None:
                 print("no polity:", entity, row["label"])
@@ -130,10 +228,10 @@ def emit() -> Path:
             contest_key = f"{DAY}:IL:{code}:measure:{slug(label)}"
             contest = cs.key("us.contest", contest_key)
             contest_path = f"{path}/{DAY}-general/{slug(label)}"
-            if slugs.get(contest_path, contest) != contest:
+            if civil.slugs.get(contest_path, contest) != contest:
                 print("slug taken:", contest_path)
                 continue
-            slugs[contest_path] = contest
+            civil.slugs[contest_path] = contest
             cs.add(
                 "contest",
                 id=contest,
@@ -164,7 +262,7 @@ def emit() -> Path:
                 kind="text",
                 lang="en",
                 body=row["wording"],
-                url=URL,
+                url=row["url"],
                 source_id=source,
             )
         print(f"{kept} of {frame.height} referenda")
