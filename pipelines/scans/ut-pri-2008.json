@@ -1,0 +1,46 @@
+{
+ "polity": "US-UT",
+ "publisher": "Utah Lieutenant Governor's Office of Elections",
+ "title": "2008 Western States Presidential Primary official canvass by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://vote.utah.gov/wp-content/uploads/2023/09/2008WSPprimary.pdf"
+ },
+ "raw_source": "us.ut_pri_pdf",
+ "contests": {
+  "d": {
+   "year": 2008,
+   "chamber": "president:democratic",
+   "day": "2008-02-05",
+   "special": false,
+   "state": "UT",
+   "district": null
+  },
+  "r": {
+   "year": 2008,
+   "chamber": "president:republican",
+   "day": "2008-02-05",
+   "special": false,
+   "state": "UT",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "d",
+   "discover": "d",
+   "turn": 270,
+   "dpi": 200,
+   "orientation": "counties_down"
+  },
+  {
+   "page": 2,
+   "id": "r",
+   "discover": "r",
+   "turn": 270,
+   "dpi": 200,
+   "orientation": "counties_down"
+  }
+ ]
+}

@@ -38,6 +38,12 @@ COLUMNS = [
     "apache", "cochise", "coconino", "gila", "graham", "greenlee", "lapaz", "maricopa", "mohave", "navajo", "pima",
     "pinal", "santacruz", "yavapai", "yuma", "total",
 ]  # fmt: skip
+HAND = {
+    ("senate", None, "republican", "SEAN WEBSTER"): {0: 19, 1: 8, 2: 2, 3: 1, 4: 1, 5: 3, 6: 0, 7: 83, 8: 4, 9: 6, 10: 32, 11: 3, 12: 0, 13: 12, 14: 1},
+    ("house", 1, "republican", "DAVID GOWAN"): {0: 130, 2: 308, 3: 22, 4: 206, 5: 38, 7: 0, 8: 4, 9: 215, 10: 683, 11: 368, 13: 117},
+    ("house", 1, "republican", "SHAWN REDD"): {0: 182, 2: 294, 3: 31, 4: 134, 5: 12, 7: 0, 8: 2, 9: 583, 10: 482, 11: 290, 13: 88},
+    ("house", 3, "democratic", "RAUL GRIJALVA"): {7: 7917, 10: 19450, 11: 49, 12: 4132, 14: 4296},
+}  # fmt: skip
 PARTIES = {"DEM": "democratic", "REP": "republican", "LBT": "libertarian", "GRN": "green"}
 NUMBER = re.compile(r"^[\d,.'’\"]*\d[\d,.'’\"]*$")
 PARTY = re.compile(r"^\((DEM|REP|LBT|GRN|[A-Z]{3})\)$")
@@ -198,7 +204,14 @@ def parse() -> None:
                 slots = [column for column, _, _ in row["cells"]]
                 values = {column: (int(re.sub(r"\D", "", text)), box) for column, text, box in row["cells"]}
                 counted = sum(value for column, (value, _) in values.items() if column != 15)
-                if len(slots) != len(set(slots)) or 15 not in values or counted != values[15][0]:
+                if (office, district, party, row["name"]) in HAND:
+                    top, bottom = row["span"]
+                    values = {
+                        column: (value, (int(row["header"][column]) - 40, top, int(row["header"][column]) + 40, bottom))
+                        for column, value in HAND[(office, district, party, row["name"])].items()
+                    }
+                    values[15] = (sum(HAND[(office, district, party, row["name"])].values()), values[min(values)][1])
+                elif len(slots) != len(set(slots)) or 15 not in values or counted != values[15][0]:
                     values = settle(raw.cached(SOURCE, url).path, row)
                     if values is None:
                         print(
