@@ -1,0 +1,91 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "Wisconsin Blue Book 1997-1998: November 5, 1996 presidential election by county",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AV57G6QVOUSNPG8T#MF-393.pdf",
+  "item": "https://search.library.wisc.edu/digital/AV57G6QVOUSNPG8T"
+ },
+ "contests": {
+  "president": {
+   "year": 1996,
+   "chamber": "president",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "WI",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 975,
+   "id": "975",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the vice president and president by county table. The five columns are Clinton, Browne, Perot, Dole, and Phillips. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Bill Clinton / Al Gore (Dem.)",
+     "contest": "president",
+     "candidate": "Bill Clinton"
+    },
+    {
+     "label": "Harry Browne / Jo Jorgensen (Lib.)",
+     "contest": "president",
+     "candidate": "Harry Browne"
+    },
+    {
+     "label": "Ross Perot / Pat Choate (Ref.)",
+     "contest": "president",
+     "candidate": "Ross Perot"
+    },
+    {
+     "label": "Bob Dole / Jack Kemp (Rep.)",
+     "contest": "president",
+     "candidate": "Bob Dole"
+    },
+    {
+     "label": "Howard Phillips / Herbert W. Titus (Tax.)",
+     "contest": "president",
+     "candidate": "Howard Phillips"
+    }
+   ]
+  },
+  {
+   "page": 976,
+   "id": "976",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the vice president and president by county table. The five columns are Moorehead, Harris, Nader, Hagelin, and Hollis; county names are printed at the right edge of each row, so keep each number with the county name at the end of its row. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Monica Moorehead / Gloria LaRiva (Ind.)",
+     "contest": "president",
+     "candidate": "Monica Moorehead"
+    },
+    {
+     "label": "James E. Harris / Laura Garza (Ind.)",
+     "contest": "president",
+     "candidate": "James Harris"
+    },
+    {
+     "label": "Ralph Nader / Winona LaDuke (Ind.)",
+     "contest": "president",
+     "candidate": "Ralph Nader"
+    },
+    {
+     "label": "John Hagelin / Vinton D. Tompkins (Ind.)",
+     "contest": "president",
+     "candidate": "John Hagelin"
+    },
+    {
+     "label": "Mary Cal Hollis / Eric Chester (Ind.)",
+     "contest": "president",
+     "candidate": "Mary Cal Hollis"
+    }
+   ]
+  }
+ ]
+}

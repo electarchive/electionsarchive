@@ -1,0 +1,89 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "Wisconsin Blue Book 1995-1996: November 8, 1994 general election by county",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/AYPHDP7TNI56WH8E#MF-393.pdf",
+  "item": "https://search.library.wisc.edu/digital/AYPHDP7TNI56WH8E"
+ },
+ "contests": {
+  "governor": {
+   "year": 1994,
+   "chamber": "governor",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "WI",
+   "district": null
+  },
+  "senate": {
+   "year": 1994,
+   "chamber": "senate",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "WI",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 929,
+   "id": "929",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read only the Governor and Lieutenant Governor block with its five columns; ignore everything else on the page. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "C. Chvala / D. Dean (Dem.)",
+     "contest": "governor",
+     "candidate": "Chuck Chvala"
+    },
+    {
+     "label": "D. Harmon / K. Robinson (Lib.)",
+     "contest": "governor",
+     "candidate": "Darold Harmon"
+    },
+    {
+     "label": "T. Thompson / S. McCallum (Rep.)",
+     "contest": "governor",
+     "candidate": "Tommy Thompson"
+    },
+    {
+     "label": "E. Frami / M. O'Hare (Tax.)",
+     "contest": "governor",
+     "candidate": "Edward Frami"
+    },
+    {
+     "label": "Michael J. Mangan (Ind.)",
+     "contest": "governor",
+     "candidate": "Michael Mangan"
+    }
+   ]
+  },
+  {
+   "page": 932,
+   "id": "932",
+   "orientation": "counties_down",
+   "bands": 2,
+   "hint": "Read the United States Senator table with its three columns. Rows are the 72 counties and the TOTAL row.",
+   "columns": [
+    {
+     "label": "Herb Kohl (Dem.)",
+     "contest": "senate",
+     "candidate": "Herb Kohl"
+    },
+    {
+     "label": "James Dean (Lib.)",
+     "contest": "senate",
+     "candidate": "James Dean"
+    },
+    {
+     "label": "Robert T. Welch (Rep.)",
+     "contest": "senate",
+     "candidate": "Robert Welch"
+    }
+   ]
+  }
+ ]
+}
