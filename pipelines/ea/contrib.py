@@ -14,7 +14,9 @@ import regex
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
+from ea import raw
 from ea.apply import _stage, apply, publish, revert
+from ea.capture import capture
 from ea.changeset import Changeset, bcp47
 from ea.store import DATA, ROOT, Connection, connect
 
@@ -61,15 +63,26 @@ HEAVY = 50_000
 SHOWN = 2_000
 
 TIERS = {
-    **dict.fromkeys(("note", "citation", "source", "external_id", "name", "label", "party_color", "translation"), 1),
+    **dict.fromkeys(
+        ("note", "citation", "source", "source_artifact", "external_id", "name", "label", "party_color", "translation"),
+        1,
+    ),
     **dict.fromkeys(("result_value", "result_flow", "outcome", "seat", "body_size"), 3),
 }
 
 KEYED = {"translation": ("source_md5", "lang")}
 
 
+SOURCE_KINDS = ("official_body", "aggregator", "compendium", "news_agency", "academic", "community")
+
+
 class Evidence(TypedDict, total=False):
     source: str
+    url: str
+    capture: str
+    title: str
+    publisher: str
+    kind: str
     locator: object
     page: int
     region: list[float]
@@ -187,6 +200,44 @@ def _carry(conn: Connection, cs: Changeset, before: str, after: str, lang: str) 
         )
 
 
+def _linked(conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]) -> UUID:
+    title = unicodedata.normalize("NFC", str(item.get("title") or "")).strip()
+    publisher = unicodedata.normalize("NFC", str(item.get("publisher") or "")).strip()
+    if not title or not publisher:
+        raise ValueError(f"{where}: a URL needs a title and a publisher")
+    kind = item.get("kind")
+    if kind not in SOURCE_KINDS:
+        raise ValueError(f"{where}: kind must be one of {', '.join(SOURCE_KINDS)}")
+    capture = _uuid(item.get("capture"), f"{where}.capture")
+    row = conn.execute(
+        """select url, final_url, raw_sha256, raw_key, media_type, bytes, captured_at from archive_capture
+           where id = %s and status = 'captured' and owner_user_id = %s""",
+        [capture, author],
+    ).fetchone()
+    if row is None:
+        raise ValueError(f"{where}: capture {capture} is not an archived copy of this author's")
+    url, final_url, sha256, key, media_type, size, captured_at = row
+    if url != item.get("url"):
+        raise ValueError(f"{where}: capture {capture} archived {url}, not {item.get('url')}")
+    source = cs.source(publisher, title)
+    if source in cs.minted and source not in added:
+        added.add(source)
+        cs.add("source", id=source, kind=kind, publisher=publisher, title=title, url=url)
+    cs.artifact(
+        raw.Artifact(
+            source="contrib",
+            url=final_url,
+            sha256=sha256,
+            path=DATA / key,
+            retrieved_at=captured_at,
+            media_type=media_type,
+            bytes=size,
+        ),
+        source,
+    )
+    return source
+
+
 def compile(
     conn: Connection,
     payload: Payload,
@@ -206,15 +257,19 @@ def compile(
         raise ValueError(f"author {author} is not a user")
     evidence = payload.get("evidence") or {}
     sources: dict[str, UUID] = {}
-    for key, item in evidence.items():
-        if "source" not in item:
-            raise ValueError(f"evidence {key}: only existing sources are accepted until URL and upload evidence lands")
-        source = _uuid(item["source"], f"evidence {key}.source")
-        if conn.execute("select from source where id = %s", [source]).fetchone() is None:
-            raise ValueError(f"evidence {key}: source {source} does not exist")
-        sources[key] = source
-
     cs = Changeset(conn, pipeline="contrib", version=VERSION, summary=summary, polity=payload.get("polity"), kind=kind)
+    added: set[UUID] = set()
+    for key, item in evidence.items():
+        if "source" in item:
+            source = _uuid(item["source"], f"evidence {key}.source")
+            if conn.execute("select from source where id = %s", [source]).fetchone() is None:
+                raise ValueError(f"evidence {key}: source {source} does not exist")
+            sources[key] = source
+        elif "url" in item:
+            sources[key] = _linked(conn, cs, item, author, f"evidence {key}", added)
+        else:
+            raise ValueError(f"evidence {key}: needs a source or a url")
+
     cs.manifest["author_kind"] = author_kind
     cs.manifest["author_user_id"] = str(author)
     if payload.get("rationale"):
@@ -471,9 +526,34 @@ def _payload(conn: Connection, proposal: UUID, n: int | None) -> object:
     return row[0]
 
 
+def _captured(conn: Connection, proposal: UUID, n: int | None) -> object:
+    payload = cast(Payload, _payload(conn, proposal, n))
+    pending = {
+        key: item for key, item in (payload.get("evidence") or {}).items() if "url" in item and "capture" not in item
+    }
+    if not pending:
+        return payload
+    found = conn.execute("select author_user_id from proposal where id = %s", [proposal]).fetchone()
+    author = None if found is None else found[0]
+    for key, item in pending.items():
+        id, status, error = capture(conn, item["url"], author)
+        conn.commit()
+        if status != "captured":
+            raise ValueError(f"evidence {key}: {item['url']} could not be archived: {error}")
+        item["capture"] = str(id)
+    conn.execute(
+        "update proposal_revision set payload = %s where proposal_id = %s and n = %s"
+        if n is not None
+        else "update proposal set draft = %s where id = %s",
+        [Jsonb(payload), proposal, n] if n is not None else [Jsonb(payload), proposal],
+    )
+    conn.commit()
+    return payload
+
+
 def _check(proposal: UUID, n: int | None, requested: UUID | None, output: dict[str, object]) -> dict[str, object]:
     with connect() as conn:
-        folder = _compiled(conn, proposal, _payload(conn, proposal, n))
+        folder = _compiled(conn, proposal, _captured(conn, proposal, n))
         if _apply(folder) == "unchanged":
             return {"status": "unchanged"}
         tier, diff, checks = _review(conn, folder.name)
@@ -489,7 +569,7 @@ def _submit(proposal: UUID, n: int | None, requested: UUID | None, output: dict[
     if n is None:
         raise ValueError("a submit job needs revision_n")
     with connect() as conn:
-        folder = _compiled(conn, proposal, _payload(conn, proposal, n))
+        folder = _compiled(conn, proposal, _captured(conn, proposal, n))
         if _apply(folder) == "unchanged":
             conn.execute(
                 "update proposal_revision set checks = %s where proposal_id = %s and n = %s",

@@ -67,7 +67,7 @@ export async function propose({
   entityId,
   nameId,
   text,
-  sourceId,
+  evidence,
   quote,
   summary,
 }: {
@@ -75,13 +75,22 @@ export async function propose({
   entityId: string;
   nameId: string;
   text: string;
-  sourceId: string;
+  evidence:
+    | { type: "source"; sourceId: string }
+    | {
+        type: "url";
+        url: string;
+        title: string;
+        publisher: string;
+        kind: string;
+      };
   quote: string;
   summary: string;
 }) {
+  const sourceId = evidence.type === "source" ? evidence.sourceId : null;
   const { rows } = await db.execute<{ ok: boolean }>(sql`
     select exists (select from name where id = ${nameId} and entity_id = ${entityId})
-       and exists (select from source where id = ${sourceId}) as ok
+       and (${sourceId}::uuid is null or exists (select from source where id = ${sourceId})) as ok
   `);
   if (rows[0]?.ok !== true) {
     error(400, "That name or source no longer exists.");
@@ -97,7 +106,19 @@ export async function propose({
         evidence: ["e1"],
       },
     ],
-    evidence: { e1: { source: sourceId, ...(quote !== "" && { quote }) } },
+    evidence: {
+      e1: {
+        ...(evidence.type === "source"
+          ? { source: evidence.sourceId }
+          : {
+              url: evidence.url,
+              title: evidence.title,
+              publisher: evidence.publisher,
+              kind: evidence.kind,
+            }),
+        ...(quote !== "" && { quote }),
+      },
+    },
   };
   return db.transaction(async (tx) => {
     const created = await tx.execute<{ id: string; number: number }>(sql`
@@ -160,13 +181,25 @@ export async function proposal(number: number) {
       diff: Diff | null;
       checks: Checks | null;
       created_at: string;
-      sources: Array<{ key: string; id: string; title: string }> | null;
+      sources: Array<{
+        key: string;
+        title: string;
+        url: string | null;
+        captured: string | null;
+      }> | null;
       titles: Record<string, string> | null;
     }>(sql`
       select r.n, r.payload, r.diff, r.checks, r.created_at::text,
-             (select json_agg(json_build_object('key', e.key, 'id', s.id, 'title', s.title) order by e.key)
+             (select json_agg(json_build_object(
+                       'key', e.key,
+                       'title', coalesce(s.title, e.value ->> 'title'),
+                       'url', coalesce(s.url, e.value ->> 'url'),
+                       'captured', a.captured_at
+                     ) order by e.key)
               from jsonb_each(r.payload -> 'evidence') e
-              join source s on s.id::text = e.value ->> 'source') as sources,
+              left join source s on s.id::text = e.value ->> 'source'
+              left join archive_capture a on a.id::text = e.value ->> 'capture' and a.status = 'captured'
+              where s.id is not null or e.value ? 'url') as sources,
              (select json_object_agg(s.id, s.title)
               from source s
               where s.id::text in (
@@ -207,7 +240,7 @@ export async function queue() {
   }>(sql`
     select p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.submitted_at::text,
-           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' <> 'citation')::int as changes,
+           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact'))::int as changes,
            coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings
     from proposal p
     left join users a on a.id = p.author_user_id

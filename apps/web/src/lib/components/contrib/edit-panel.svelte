@@ -9,7 +9,13 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
-  import { kindLabel, stateLabel } from "#lib/contrib.js";
+  import * as Select from "#lib/components/ui/select/index.js";
+  import {
+    kindLabel,
+    sourceKindLabel,
+    sourceKinds,
+    stateLabel,
+  } from "#lib/contrib.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -28,6 +34,8 @@
   let sheet = $state<"peek" | "half" | "full">("half");
   let drafts = $state<Record<string, string>>({});
   let source = $state<string | null>(null);
+  let linking = $state(false);
+  let link = $state({ url: "", title: "", publisher: "", kind: "" });
   let quote = $state("");
   let summary = $state("");
   let submitting = $state(false);
@@ -60,9 +68,6 @@
       (name) => (drafts[name.id] ?? name.text).trim() !== name.text,
     ),
   );
-  const ready = $derived(
-    changed.length === 1 && source != null && summary.trim() !== "",
-  );
   const sources = $derived(
     (data?.sources ?? []).map((item) => ({
       value: item.id,
@@ -70,10 +75,22 @@
       detail: item.publisher ?? undefined,
     })),
   );
+  const linked = $derived(linking || sources.length === 0);
+  const chosen = $derived(sourceKinds.find((kind) => kind === link.kind));
+  const cited = $derived(
+    linked
+      ? Object.values(link).every((value) => value.trim() !== "")
+      : source != null,
+  );
+  const ready = $derived(
+    changed.length === 1 && cited && summary.trim() !== "",
+  );
 
   const close = () => {
     drafts = {};
     source = null;
+    linking = false;
+    link = { url: "", title: "", publisher: "", kind: "" };
     quote = "";
     summary = "";
     submitted = null;
@@ -85,7 +102,7 @@
   const submit = async (event: SubmitEvent) => {
     event.preventDefault();
     const [name] = changed;
-    if (!ready || name == null || source == null) {
+    if (!ready || name == null) {
       return;
     }
     submitting = true;
@@ -98,7 +115,9 @@
           entityId: entity,
           nameId: name.id,
           text: drafts[name.id],
-          sourceId: source,
+          evidence: linked
+            ? { type: "url", ...link }
+            : { type: "source", sourceId: source },
           quote,
           summary,
         }),
@@ -276,14 +295,76 @@
                       n={1}
                     />
                     <div class="mbs-2 grid gap-2 ps-1.5">
-                      <Combobox
-                        items={sources}
-                        bind:value={source}
-                        label={m.edit_evidence()}
-                        placeholder={m.edit_evidence_placeholder()}
-                        search={m.edit_evidence_search()}
-                        empty={m.edit_evidence_empty()}
-                      />
+                      {#if linked}
+                        <fieldset class="contrib-settle grid gap-2">
+                          <legend class="sr-only">{m.edit_evidence()}</legend>
+                          <Input
+                            type="url"
+                            inputmode="url"
+                            bind:value={link.url}
+                            placeholder="https://"
+                            aria-label={m.edit_url()}
+                            maxlength={2048}
+                            class="block-8"
+                          />
+                          <Input
+                            bind:value={link.title}
+                            placeholder={m.edit_url_title_placeholder()}
+                            aria-label={m.edit_url_title()}
+                            maxlength={500}
+                            class="block-8"
+                          />
+                          <div
+                            class="grid grid-cols-[minmax(0,1fr)_auto] gap-2"
+                          >
+                            <Input
+                              bind:value={link.publisher}
+                              placeholder={m.edit_url_publisher_placeholder()}
+                              aria-label={m.edit_url_publisher()}
+                              maxlength={200}
+                              class="block-8"
+                            />
+                            <Select.Root type="single" bind:value={link.kind}>
+                              <Select.Trigger
+                                class="text-sm block-8"
+                                aria-label={m.edit_url_kind()}
+                                >{chosen == null
+                                  ? m.edit_url_kind()
+                                  : sourceKindLabel[chosen]()}</Select.Trigger
+                              >
+                              <Select.Content align="end">
+                                {#each sourceKinds as kind (kind)}
+                                  <Select.Item value={kind}
+                                    >{sourceKindLabel[kind]()}</Select.Item
+                                  >
+                                {/each}
+                              </Select.Content>
+                            </Select.Root>
+                          </div>
+                          <p class="text-xs text-pretty text-muted-foreground">
+                            {m.edit_url_note()}
+                          </p>
+                        </fieldset>
+                      {:else}
+                        <Combobox
+                          items={sources}
+                          bind:value={source}
+                          label={m.edit_evidence()}
+                          placeholder={m.edit_evidence_placeholder()}
+                          search={m.edit_evidence_search()}
+                          empty={m.edit_evidence_empty()}
+                        />
+                      {/if}
+                      {#if sources.length > 0}
+                        <button
+                          type="button"
+                          class="justify-self-start text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                          onclick={() => (linking = !linking)}
+                          >{linking
+                            ? m.edit_link_back()
+                            : m.edit_link()}</button
+                        >
+                      {/if}
                       <Input
                         bind:value={quote}
                         placeholder={m.edit_quote_placeholder()}
@@ -317,8 +398,8 @@
                 {m.edit_one_at_a_time()}
               {:else if changed.length === 0}
                 {m.edit_no_change()}
-              {:else if source == null}
-                {m.edit_needs_source()}
+              {:else if !cited}
+                {linked ? m.edit_needs_link() : m.edit_needs_source()}
               {:else}
                 {m.edit_one_change()}
               {/if}

@@ -23,9 +23,20 @@
     reject: m.proposal_rejecting,
     revert: m.proposal_reverting,
   };
+  const evidential = ["citation", "source", "source_artifact"];
   const rows = $derived(
-    (head?.diff?.rows ?? []).filter((row) => row.table !== "citation"),
+    (head?.diff?.rows ?? []).filter((row) => !evidential.includes(row.table)),
   );
+  const titles = $derived.by(() => {
+    const found: Record<string, string> = { ...head?.titles };
+    for (const row of head?.diff?.rows ?? []) {
+      const title = row.fields.title?.[1];
+      if (row.table === "source" && typeof title === "string") {
+        found[row.key.id ?? ""] = title;
+      }
+    }
+    return found;
+  });
   const findings = $derived.by(() => {
     let total = 0;
     for (const value of Object.values(head?.checks?.findings ?? {})) {
@@ -73,7 +84,7 @@
       ? null
       : typeof value === "string"
         ? field === "source_id"
-          ? (head?.titles?.[value] ?? value)
+          ? (titles[value] ?? value)
           : value
         : JSON.stringify(value);
   const decided = $derived(
@@ -211,6 +222,23 @@
           {const quote = $derived(head?.payload.evidence?.[item.key]?.quote)}
           <li class="grid gap-1 border-be py-2">
             <span class="font-semibold">{item.title}</span>
+            {#if item.url != null}
+              <span
+                class="flex flex-wrap items-baseline gap-x-3 text-xs text-muted-foreground"
+              >
+                <a
+                  class="truncate underline-offset-2 min-inline-0 hover:underline"
+                  href={item.url}
+                  rel="external nofollow noopener noreferrer"
+                  target="_blank">{item.url}</a
+                >
+                {#if item.captured != null}
+                  <span class="shrink-0"
+                    >{m.proposal_archived()} · {day(item.captured)}</span
+                  >
+                {/if}
+              </span>
+            {/if}
             {#if quote != null}
               <q
                 class="border-s-2 border-border ps-2 text-pretty text-muted-foreground"

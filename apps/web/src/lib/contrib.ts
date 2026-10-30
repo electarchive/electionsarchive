@@ -75,6 +75,27 @@ export const tierLabel: Record<number, () => string> = {
   3: m.proposal_tier_3,
 };
 
+export const sourceKinds = [
+  "official_body",
+  "aggregator",
+  "compendium",
+  "news_agency",
+  "academic",
+  "community",
+] as const;
+
+export const sourceKindLabel: Record<
+  (typeof sourceKinds)[number],
+  () => string
+> = {
+  official_body: m.source_kind_official_body,
+  aggregator: m.source_kind_aggregator,
+  compendium: m.source_kind_compendium,
+  news_agency: m.source_kind_news_agency,
+  academic: m.source_kind_academic,
+  community: m.source_kind_community,
+};
+
 export const kindLabel: Record<NameKind, () => string> = {
   official: m.name_kind_official,
   native: m.name_kind_native,
