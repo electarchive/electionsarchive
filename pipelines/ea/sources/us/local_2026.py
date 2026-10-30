@@ -2029,6 +2029,9 @@ for key, publisher, title, url, local in (
     ("AR-05119-pulaski", "Pulaski County Election Commission", "11/3/2026 General Election Ballot Position Draw (conducted 8/24/2026)", "https://votepulaskiar.gov/wp-content/uploads/11032026_Ballot-Draw-Results.pdf", "ar/pulaski_ballot_draw.pdf"),
     ("WY-56007-towns", "Carbon County Clerk", "2026 General Election Candidates as of 09.04.2026, municipal offices", "https://carboncountywy.gov/DocumentCenter/View/8605/2026-General-Election-Candidates-as-of-090426", "wy/carbon.pdf"),
     ("WY-56025-towns", "Natrona County Clerk", "2026 General Election Candidate Roster, municipal offices", "https://www.natronacounty-wy.gov/DocumentCenter/View/13878/2026-General-Election-Candidates-Filed-PDF", "wy/natrona.pdf"),
+    ("NE-31025-cass", "Cass County Clerk", "2026 Candidate Filings Received 8-3-26", "https://www.casscountyne.gov/utility/openPDF/cacone/2026_Candidate_Filings_Received_8-3-26.pdf?alt=media", "ne/cass_municipal.pdf"),
+    ("OR-41071-cities", "Yamhill County Clerk", "City certifications of candidates, November 3, 2026 General Election", "https://yamhillcounty.gov/1301/November-3-2026-General-Election", "or/yamhill_cities.pdf"),
+    ("OR-41011-cities", "Coos County Elections Office", "City certifications of candidates, November 3, 2026 General Election", "https://cooscounty-or.specialdistrict.org/november-3-2026-general-election", "or/coos_cities.pdf"),
     ("AR-05007-benton", "Benton County Clerk", "2026 Municipal Candidate Listing, General Election November 3, 2026 (updated August 5, 2026)", "https://bentoncountyar.gov/vote/wp-content/documents/sites/37/2026/08/2026-MUNICIPAL-PETITION-FILINGS.pdf", "ar/benton_municipal.pdf"),
     ("KY-21067-lexington", "Fayette County Clerk", "Fayette County Filed Candidate Information, November 3, 2026 General Election", "https://www.fayettecountyclerk.com/web/elections/FiledCandidateInformationforWebsite.pdf", "ky/lexington.pdf"),
     ("FL-12111-port-st-lucie", "City of Port St. Lucie", "Elections: 2026 Candidates", "https://www.cityofpsl.com/Government/Your-City-Government/Departments/City-Clerk/Elections", "fl/port_st_lucie.html"),
@@ -5063,7 +5066,7 @@ def parse() -> None:
                         skip = int(state == "IN" and sort == "school" and tokens[: len(lead)] != lead)
                         if stem and tokens[skip : skip + len(lead)] == lead:
                             rest = tokens[skip + len(lead) :]
-                            if rest[:1] == ["county"]:
+                            if rest[:1] == ["county"] and sort != "school":
                                 continue
                             said = (
                                 rest[0]
@@ -5188,7 +5191,7 @@ def parse() -> None:
                         else f"{slot[1].title()} {slot[2]}"
                         if state == "TX" and role == "board-of-education" and (slot := re.search(r"\b(place|position|district) (\d+)\b", post))
                         else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
-                        if state in ("CA", "UT", "MD", "IN")
+                        if state in ("CA", "UT", "MD", "IN", "NC")
                         and (
                             area := re.search(
                                 r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
@@ -5231,7 +5234,7 @@ def parse() -> None:
                     and place
                     and (
                         int(str(row["seats"]) or 0) <= 1
-                        or re.search(r"(?i)\bcounty (council|commission)\b", str(row["contest"])) is not None
+                        or re.search(r"(?i)\bcounty (council|commission|board district)\b", str(row["contest"])) is not None
                     )
                     and not LOCAL_BODY.search(
                         re.sub(re.escape(place) if state in ("MD", "LA") else "^$", "", str(row["contest"]).replace("Carson City", "Carson"), flags=re.I)
