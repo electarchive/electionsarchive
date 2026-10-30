@@ -81,11 +81,14 @@ const color = (party: SQL, date: SQL) => sql`
 function group(path: string) {
   const seat = path.split("/").at(-1) ?? "";
   if (
-    /^(?:mayor|public-advocate|comptroller|governor|attorney-general)$/u.test(
+    /^(?:mayor|public-advocate|comptroller|controller|governor|lieutenant-governor|attorney-general|secretary-of-state|treasurer|auditor|superintendent|commissioner)/u.test(
       seat,
     )
   ) {
     return "executive";
+  }
+  if (/^(?:senate|house)(?:-(?:\d+|at-large|special))*$/u.test(seat)) {
+    return "federal";
   }
   if (seat.startsWith("borough-president")) {
     return "borough";
@@ -96,13 +99,24 @@ function group(path: string) {
   if (seat.startsWith("council-district")) {
     return "council";
   }
-  if (/^(?:proposal|proposition|question|measure)/u.test(seat)) {
+  if (
+    /^(?:proposal|proposition|question|measure|amendment|constitutional-amendment|proposed-amendment|issue)/u.test(
+      seat,
+    )
+  ) {
     return "measure";
   }
-  if (/court|surrogate|justice|judge/u.test(seat)) {
+  if (/court|surrogate|justice|judge|chancellor/u.test(seat)) {
     return "judicial";
   }
-  return "legislative";
+  if (
+    /^(?:state-house|state-senate|assembly|house-of-delegates|legislature)/u.test(
+      seat,
+    )
+  ) {
+    return "legislative";
+  }
+  return "other";
 }
 
 async function election(path: string) {
@@ -279,7 +293,10 @@ export const live = {
     .handler(async ({ input }) => {
       const found = await election(input.path);
       const stamped = await sets(found.id);
-      if (stamped.length === 0) {
+      if (
+        stamped.length === 0 &&
+        Date.parse(found.date) < Date.now() - 2 * 86_400_000
+      ) {
         throw new ORPCError("NOT_FOUND");
       }
       const bucket = new Map<string, string>();
@@ -302,7 +319,7 @@ export const live = {
         .toSorted((a, b) => a.stamp.localeCompare(b.stamp));
       const settledOnly = await db.execute<{ id: string }>(sql`
         select c.id from contest c
-        where c.election_id = ${found.id}::uuid
+        where ${stamped.length > 0}::boolean and c.election_id = ${found.id}::uuid
           and exists (select from result_set rs where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted')
       `);
       const contests = [

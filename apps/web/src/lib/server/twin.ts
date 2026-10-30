@@ -3645,25 +3645,37 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       at === "final" ? m.live_certified_count() : clock.format(Date.parse(at)),
       `live/${data.path}?at=${at}`,
     );
-  const groups = Map.groupBy(data.races, (race) => race.group);
+  const groups = Map.groupBy(
+    data.races.toSorted((a, b) =>
+      a.path.localeCompare(b.path, undefined, { numeric: true }),
+    ),
+    (race) => race.group,
+  );
+  const federal = groups.get("federal") ?? [];
   const sections = [
-    [m.live_citywide(), groups.get("executive") ?? []],
+    [
+      data.election.path.split("/").length > 3
+        ? m.live_citywide()
+        : m.live_statewide(),
+      groups.get("executive") ?? [],
+    ],
+    [
+      m.live_senate(),
+      federal.filter((race) => /\/senate[^/]*$/u.test(race.path)),
+    ],
+    [
+      m.live_house(),
+      federal.filter((race) => /\/house[^/]*$/u.test(race.path)),
+    ],
     [m.live_measures(), groups.get("measure") ?? []],
     [
       m.live_boroughs(),
       [...(groups.get("borough") ?? []), ...(groups.get("prosecutor") ?? [])],
     ],
-    [
-      m.live_council(),
-      (groups.get("council") ?? []).toSorted(
-        (a, b) =>
-          Number(a.path.split("-").at(-1)) - Number(b.path.split("-").at(-1)),
-      ),
-    ],
-    [
-      m.live_courts(),
-      [...(groups.get("judicial") ?? []), ...(groups.get("legislative") ?? [])],
-    ],
+    [m.live_council(), groups.get("council") ?? []],
+    [m.live_legislature(), groups.get("legislative") ?? []],
+    [m.live_other(), groups.get("other") ?? []],
+    [m.live_courts(), groups.get("judicial") ?? []],
   ] as const;
   const isFinal = data.at === "final";
   return [
@@ -3673,12 +3685,16 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       link,
       data.election.date,
     ),
-    m.live_twin_summary({
-      publisher:
-        data.source.url == null
-          ? data.source.publisher
-          : `[${data.source.publisher}](${data.source.url})`,
-    }),
+    ...(data.frames.length === 0
+      ? []
+      : [
+          m.live_twin_summary({
+            publisher:
+              data.source.url == null
+                ? data.source.publisher
+                : `[${data.source.publisher}](${data.source.url})`,
+          }),
+        ]),
     `**${data.at == null ? m.live_waiting() : isFinal ? m.live_certified_count() : m.live_as_of({ time: clock.format(Date.parse(data.at)) })}**`,
     ...(data.scanners.length === 0 || isFinal
       ? []
@@ -3742,13 +3758,19 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
             }),
           ],
     ),
-    `## ${m.live_twin_updates()}`,
-    [
-      ...data.frames.map((frame) => frame.at),
-      ...(data.races.some((race) => race.certified != null) ? ["final"] : []),
-    ]
-      .map((at) => `- ${moment(at)}${at === data.at ? " ←" : ""}`)
-      .join("\n"),
+    ...(data.frames.length === 0
+      ? []
+      : [
+          `## ${m.live_twin_updates()}`,
+          [
+            ...data.frames.map((frame) => frame.at),
+            ...(data.races.some((race) => race.certified != null)
+              ? ["final"]
+              : []),
+          ]
+            .map((at) => `- ${moment(at)}${at === data.at ? " ←" : ""}`)
+            .join("\n"),
+        ]),
   ];
 }
 

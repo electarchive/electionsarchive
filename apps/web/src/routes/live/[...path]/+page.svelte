@@ -40,7 +40,14 @@
   const isFinal = $derived(hasFinal && position === frames.length);
   const time = $derived(isFinal ? null : (frames[position]?.at ?? null));
   const newest = $derived(Date.parse(frames.at(-1)?.at ?? "0"));
-  const isLive = $derived(!hasFinal && Date.now() - newest < 12 * 3_600_000);
+  const opened = $derived(Date.parse(`${night.election.date}T00:00:00Z`));
+  const isLive = $derived(
+    !hasFinal &&
+      (frames.length > 0
+        ? Date.now() - newest < 12 * 3_600_000
+        : Date.now() > opened - 12 * 3_600_000 &&
+          Date.now() < opened + 48 * 3_600_000),
+  );
 
   const tones = $derived(
     new Map(
@@ -79,6 +86,11 @@
 
   const lead = $derived(
     night.races.find((race) => race.path === night.focus) ??
+      ["governor", "mayor", "senate"]
+        .map((seat) =>
+          night.races.find((race) => race.path.endsWith(`/${seat}`)),
+        )
+        .find((race) => race != null) ??
       night.races.find((race) => race.group === "executive") ??
       night.races[0],
   );
@@ -200,31 +212,37 @@
       : null;
   });
 
-  const groups = $derived(Map.groupBy(night.races, (race) => race.group));
-  const executive = $derived(
-    (groups.get("executive") ?? []).filter((race) => race.id !== lead?.id),
+  const groups = $derived(
+    Map.groupBy(
+      night.races
+        .filter((race) => race.id !== lead?.id)
+        .toSorted((a, b) =>
+          a.path.localeCompare(b.path, undefined, { numeric: true }),
+        ),
+      (race) => race.group,
+    ),
+  );
+  const isCity = $derived(night.election.path.split("/").length > 3);
+  const executive = $derived(groups.get("executive") ?? []);
+  const senate = $derived(
+    (groups.get("federal") ?? []).filter((race) =>
+      /\/senate[^/]*$/u.test(race.path),
+    ),
+  );
+  const house = $derived(
+    (groups.get("federal") ?? []).filter((race) =>
+      /\/house[^/]*$/u.test(race.path),
+    ),
   );
   const measures = $derived(groups.get("measure") ?? []);
   const local = $derived([
     ...(groups.get("borough") ?? []),
     ...(groups.get("prosecutor") ?? []),
   ]);
-  const council = $derived(
-    (groups.get("council") ?? []).toSorted(
-      (a, b) =>
-        Number(/(\d+)$/u.exec(a.path)?.[1] ?? 0) -
-        Number(/(\d+)$/u.exec(b.path)?.[1] ?? 0),
-    ),
-  );
-  const courts = $derived([
-    ...(groups.get("judicial") ?? []),
-    ...(groups.get("legislative") ?? []),
-  ]);
-  const captured = $derived(
-    council.filter((race) => states.get(race.id)?.votes != null).length,
-  );
-  const tiles = $derived(
-    council.map((race) => {
+  const courts = $derived(groups.get("judicial") ?? []);
+
+  function chamber(races: typeof night.races) {
+    const tiles = races.map((race) => {
       let total = 0;
       let best = 0;
       let index = 0;
@@ -241,28 +259,33 @@
       return {
         race,
         leader,
+        label: /(\d+[a-z]?)$/u.exec(race.path)?.[1] ?? "AL",
         share: total === 0 ? null : best / total,
         tone:
           leader == null
             ? null
             : (tones.get(race.id)?.[index] ?? "var(--foreground)"),
       };
-    }),
-  );
-  const seats = $derived(
-    [
-      ...Map.groupBy(
-        tiles.filter((tile) => tile.leader != null && tile.tone != null),
-        (tile) => tile.leader?.party ?? tile.leader?.name ?? "",
-      ),
-    ]
-      .map(([name, group]) => ({
-        name,
-        tone: group[0]?.tone ?? "",
-        count: group.length,
-      }))
-      .toSorted((a, b) => b.count - a.count),
-  );
+    });
+    return {
+      tiles,
+      captured: races.filter((race) => states.get(race.id)?.votes != null)
+        .length,
+      overnight: races.filter((race) => race.series.length > 0).length,
+      seats: [
+        ...Map.groupBy(
+          tiles.filter((tile) => tile.leader != null && tile.tone != null),
+          (tile) => tile.leader?.party ?? tile.leader?.name ?? "",
+        ),
+      ]
+        .map(([name, group]) => ({
+          name,
+          tone: group[0]?.tone ?? "",
+          count: group.length,
+        }))
+        .toSorted((a, b) => b.count - a.count),
+    };
+  }
 
   const day = $derived(
     new Intl.DateTimeFormat(getLocale(), {
@@ -280,7 +303,7 @@
 
   $effect(() => {
     const at = isFinal ? "final" : frames[position]?.at;
-    if (page.url.searchParams.get("at") === at) {
+    if (at == null || page.url.searchParams.get("at") === at) {
       return;
     }
     untrack(() => {
@@ -293,7 +316,7 @@
   });
 
   $effect(() => {
-    if (!isLive) {
+    if (!isLive && (hasFinal || frames.length > 0)) {
       return;
     }
     const timer = setInterval(() => void refreshAll(), 30_000);
@@ -330,48 +353,52 @@
       <p
         class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
       >
-        <span
-          class={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold",
-            {
-              "bg-(--no) text-white": isLive,
-              "bg-foreground text-background": !isLive,
-            },
-          )}
-        >
-          {#if isLive}
-            <span
-              class="animate-pulse rounded-full bg-white block-1.5 inline-1.5 motion-reduce:animate-none"
-            ></span>
-          {/if}
-          {isLive ? m.live_live() : m.live_replay()}
-        </span>
+        {#if isLive || frames.length > 0}
+          <span
+            class={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold",
+              {
+                "bg-(--no) text-white": isLive,
+                "bg-foreground text-background": !isLive,
+              },
+            )}
+          >
+            {#if isLive}
+              <span
+                class="animate-pulse rounded-full bg-white block-1.5 inline-1.5 motion-reduce:animate-none"
+              ></span>
+            {/if}
+            {isLive ? m.live_live() : m.live_replay()}
+          </span>
+        {/if}
         <a
           href={resolve(`/${night.election.path}`)}
           class="hover:text-foreground hover:underline">{day}</a
         >
       </p>
       <h1 class="title">{m.live_title({ place: night.election.place })}</h1>
-      {#if !isLive}
+      {#if !isLive && frames.length > 0}
         <p class="text-[0.9375rem] text-muted-foreground max-inline-[68ch]">
           {m.live_replay_note()}
         </p>
       {/if}
     </header>
 
-    <div
-      class="bg-card/95 px-3.5 py-2.5 backdrop-blur-md sm:sticky sm:inset-bs-0 sm:z-20 sm:px-6 sm:py-3 max-sm:fixed max-sm:inset-be-0 max-sm:z-30 max-sm:border-bs max-sm:border-border max-sm:inline-full"
-    >
-      <Ruler
-        {frames}
-        bind:position
-        bind:isPlaying
-        {hasFinal}
-        zone={night.election.zone}
-        {trace}
-        {counts}
-      />
-    </div>
+    {#if frames.length > 0}
+      <div
+        class="bg-card/95 px-3.5 py-2.5 backdrop-blur-md sm:sticky sm:inset-bs-0 sm:z-20 sm:px-6 sm:py-3 max-sm:fixed max-sm:inset-be-0 max-sm:z-30 max-sm:border-bs max-sm:border-border max-sm:inline-full"
+      >
+        <Ruler
+          {frames}
+          bind:position
+          bind:isPlaying
+          {hasFinal}
+          zone={night.election.zone}
+          {trace}
+          {counts}
+        />
+      </div>
+    {/if}
 
     {#if lead != null && leadState != null}
       <section
@@ -479,7 +506,9 @@
           <div
             class="grid content-start gap-4 border-bs border-border pbs-5 lg:col-start-1"
           >
-            <h2 id="live-citywide" class="heading">{m.live_citywide()}</h2>
+            <h2 id="live-citywide" class="heading">
+              {isCity ? m.live_citywide() : m.live_statewide()}
+            </h2>
             <ul class="grid gap-x-8 gap-y-6 sm:grid-cols-2">
               {#each executive as race (race.id)}
                 {const state = $derived(states.get(race.id))}
@@ -504,6 +533,14 @@
             </ul>
           </div>
         {/if}
+      </section>
+    {:else if night.races.length === 0}
+      <section class="bg-card px-3.5 pbs-8 pbe-10 sm:px-6">
+        <p
+          class="font-serif text-[1.375rem] leading-snug text-balance max-inline-[40ch]"
+        >
+          {m.live_waiting_night()}
+        </p>
       </section>
     {/if}
 
@@ -550,94 +587,122 @@
       {/if}
     {/snippet}
 
+    {#snippet chamberGrid(
+      heading: string,
+      id: string,
+      races: typeof night.races,
+    )}
+      {#if races.length > 0}
+        {const view = $derived(chamber(races))}
+        <section
+          aria-labelledby={id}
+          class="grid gap-3 bg-card px-3.5 pbs-5 pbe-6 sm:px-6"
+        >
+          <div
+            class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1"
+          >
+            <h2 {id} class="heading">{heading}</h2>
+            <p class="text-[0.8125rem] text-muted-foreground tabular-nums">
+              {isFinal
+                ? m.live_council_note_final({
+                    captured: String(view.overnight),
+                    total: String(races.length),
+                  })
+                : m.live_council_note({
+                    captured: String(view.captured),
+                    total: String(races.length),
+                  })}
+            </p>
+          </div>
+          <ol
+            class="grid grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] gap-1"
+          >
+            {#each view.tiles as tile (tile.race.id)}
+              <li>
+                <a
+                  href={resolve(`/${tile.race.path}`)}
+                  title={tile.leader == null || tile.share == null
+                    ? `${tile.race.name}: ${m.live_no_update()}`
+                    : `${tile.race.name}: ${tile.leader.name} ${percent(tile.share)}`}
+                  class={cn(
+                    "grid aspect-square place-items-center rounded-xs font-figures text-[0.8125rem] font-semibold tabular-nums transition-colors duration-500 motion-reduce:transition-none",
+                    {
+                      "text-white": tile.tone != null,
+                      "bg-[repeating-linear-gradient(135deg,var(--muted)_0_3px,var(--card)_3px_6px)] text-muted-foreground ring-1 ring-border ring-inset":
+                        tile.tone == null,
+                    },
+                  )}
+                  style:background-color={tile.tone == null
+                    ? undefined
+                    : `color-mix(in oklab, ${tile.tone} ${Math.round(45 + 55 * Math.min(((tile.share ?? 0.5) - 0.5) / 0.4, 1))}%, var(--foreground))`}
+                >
+                  {tile.label}
+                </a>
+              </li>
+            {/each}
+          </ol>
+          <ul
+            class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.8125rem] text-muted-foreground"
+          >
+            {#each view.seats as seat (seat.name)}
+              <li class="flex items-center gap-1.5">
+                <span
+                  class="rounded-xs block-3 inline-3"
+                  style:background-color={seat.tone}
+                  aria-hidden="true"
+                ></span>
+                <span class="text-foreground">{seat.name}</span>
+                <span
+                  class="font-figures font-semibold text-foreground tabular-nums"
+                  >{seat.count}</span
+                >
+              </li>
+            {/each}
+            {#if view.captured < races.length || view.seats.length === 0}
+              <li class="flex items-center gap-1.5">
+                <span
+                  class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted)_0_3px,var(--card)_3px_6px)] ring-1 ring-border block-3 inline-3 ring-inset"
+                  aria-hidden="true"
+                ></span>
+                {m.live_council_legend_none()}
+              </li>
+            {/if}
+            {#if view.seats.length > 0}
+              <li>{m.live_council_legend_shade()}</li>
+            {/if}
+          </ul>
+        </section>
+      {/if}
+    {/snippet}
+
     {#if lead == null || leadState == null}
-      {@render boards(m.live_citywide(), "live-citywide", executive, "compact")}
+      {@render boards(
+        isCity ? m.live_citywide() : m.live_statewide(),
+        "live-citywide",
+        executive,
+        "compact",
+      )}
     {/if}
+    {@render boards(m.live_senate(), "live-senate", senate, "compact")}
+    {@render chamberGrid(m.live_house(), "live-house", house)}
     {@render boards(m.live_measures(), "live-measures", measures, "measure")}
     {@render boards(m.live_boroughs(), "live-boroughs", local, "compact")}
-
-    {#if council.length > 0}
-      <section
-        aria-labelledby="live-council"
-        class="grid gap-3 bg-card px-3.5 pbs-5 pbe-6 sm:px-6"
-      >
-        <div
-          class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1"
-        >
-          <h2 id="live-council" class="heading">{m.live_council()}</h2>
-          <p class="text-[0.8125rem] text-muted-foreground tabular-nums">
-            {isFinal
-              ? m.live_council_note_final({
-                  captured: String(
-                    council.filter((race) => race.series.length > 0).length,
-                  ),
-                  total: String(council.length),
-                })
-              : m.live_council_note({
-                  captured: String(captured),
-                  total: String(council.length),
-                })}
-          </p>
-        </div>
-        <ol
-          class="grid grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] gap-1"
-        >
-          {#each tiles as tile (tile.race.id)}
-            <li>
-              <a
-                href={resolve(`/${tile.race.path}`)}
-                title={tile.leader == null || tile.share == null
-                  ? `${tile.race.name}: ${m.live_no_update()}`
-                  : `${tile.race.name}: ${tile.leader.name} ${percent(tile.share)}`}
-                class={cn(
-                  "grid aspect-square place-items-center rounded-xs font-figures text-[0.8125rem] font-semibold tabular-nums transition-colors duration-500 motion-reduce:transition-none",
-                  {
-                    "text-white": tile.tone != null,
-                    "bg-[repeating-linear-gradient(135deg,var(--muted)_0_3px,var(--card)_3px_6px)] text-muted-foreground ring-1 ring-border ring-inset":
-                      tile.tone == null,
-                  },
-                )}
-                style:background-color={tile.tone == null
-                  ? undefined
-                  : `color-mix(in oklab, ${tile.tone} ${Math.round(45 + 55 * Math.min(((tile.share ?? 0.5) - 0.5) / 0.4, 1))}%, var(--foreground))`}
-              >
-                {tile.race.path.split("-").at(-1)}
-              </a>
-            </li>
-          {/each}
-        </ol>
-        <ul
-          class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.8125rem] text-muted-foreground"
-        >
-          {#each seats as seat (seat.name)}
-            <li class="flex items-center gap-1.5">
-              <span
-                class="rounded-xs block-3 inline-3"
-                style:background-color={seat.tone}
-                aria-hidden="true"
-              ></span>
-              <span class="text-foreground">{seat.name}</span>
-              <span
-                class="font-figures font-semibold text-foreground tabular-nums"
-                >{seat.count}</span
-              >
-            </li>
-          {/each}
-          {#if captured < council.length || seats.length === 0}
-            <li class="flex items-center gap-1.5">
-              <span
-                class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted)_0_3px,var(--card)_3px_6px)] ring-1 ring-border block-3 inline-3 ring-inset"
-                aria-hidden="true"
-              ></span>
-              {m.live_council_legend_none()}
-            </li>
-          {/if}
-          {#if seats.length > 0}
-            <li>{m.live_council_legend_shade()}</li>
-          {/if}
-        </ul>
-      </section>
-    {/if}
+    {@render chamberGrid(
+      m.live_council(),
+      "live-council",
+      groups.get("council") ?? [],
+    )}
+    {@render chamberGrid(
+      m.live_legislature(),
+      "live-legislature",
+      groups.get("legislative") ?? [],
+    )}
+    {@render boards(
+      m.live_other(),
+      "live-other",
+      groups.get("other") ?? [],
+      "compact",
+    )}
 
     {#if courts.length > 0}
       <section class="bg-card px-3.5 pbs-4 pbe-5 sm:px-6">
@@ -676,20 +741,22 @@
       </section>
     {/if}
 
-    <footer
-      class="flex flex-wrap gap-x-6 gap-y-1 bg-card px-3.5 py-3 text-xs text-muted-foreground sm:px-6"
-    >
-      {#if night.source.url == null}
-        <span>{m.live_source({ publisher: night.source.publisher })}</span>
-      {:else}
-        <a href={night.source.url} class="hover:underline" rel="external"
-          >{m.live_source({ publisher: night.source.publisher })}</a
-        >
-      {/if}
-      {#if time != null}
-        <span>{m.live_as_of({ time: clock.format(Date.parse(time)) })}</span>
-      {/if}
-    </footer>
+    {#if night.source.publisher !== ""}
+      <footer
+        class="flex flex-wrap gap-x-6 gap-y-1 bg-card px-3.5 py-3 text-xs text-muted-foreground sm:px-6"
+      >
+        {#if night.source.url == null}
+          <span>{m.live_source({ publisher: night.source.publisher })}</span>
+        {:else}
+          <a href={night.source.url} class="hover:underline" rel="external"
+            >{m.live_source({ publisher: night.source.publisher })}</a
+          >
+        {/if}
+        {#if time != null}
+          <span>{m.live_as_of({ time: clock.format(Date.parse(time)) })}</span>
+        {/if}
+      </footer>
+    {/if}
   </article>
 </main>
 
