@@ -41,7 +41,9 @@ CLARITY = {
 EV_OFFICES = re.compile(
     r"^(?:(?P<party0>REP|DEM) )?(?:(?P<senate>(?:U\.? ?S\.? |United States )Senat(?:e|or)|Senator in Congress)"
     r"|(?P<governor>Governor)"
-    r"|(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress)\b[^\d]*(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?)"
+    r"|(?:(?:U\.? ?S\.? (?:House|Representative)s?|United States Representative|Representative in Congress)\b[^\d]*"
+    r"|Congressional District (?=\d+ - U\.? ?S\.? Representative$))"
+    r"(?P<district>\d+)(?:st|nd|rd|th)?(?:\s+Congressional)?(?:\s+District)?(?: - U\.? ?S\.? Representative)?)"
     r"\s*(?:-\s*(?P<party1>Rep|Dem|Democratic|Republican|Libertarian))?\s*$",
     re.IGNORECASE,
 )
