@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda
+from ea.sources.us import ceda, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.mi_county_2026"
@@ -22,7 +22,13 @@ COUNTIES = {
         "kent-county-mi/11032026 Candidates and Proposals_202610261659007429.pdf",
         "Kent County Clerk",
     ),
+    "26099": (
+        "https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-proposals.pdf",
+        "macomb-county-mi/elect-2026-11-03-proposals.pdf",
+        "Macomb County Clerk",
+    ),
 }
+PAGED = {"26099"}
 TITLE = "Official candidates and proposals list, November 3, 2026 general election"
 CENTERED = re.compile(r"^\s{40,}\S")
 NOISE = re.compile(r"^\s*(Updated \d|.*November 3, 2026 General Election\s+Page|Official Candidates and Proposals List|November 3, 2026 General Election\s*$)")
@@ -45,12 +51,40 @@ def fetch() -> None:
             )
 
 
+def paged_rows(county: str, url: str, text: str) -> list[dict[str, str]]:
+    rows = []
+    for page in text.split("\f"):
+        lines = [line.strip() for line in page.split("\n") if line.strip()]
+        if len(lines) < 3 or lines[0] == "STATE":
+            continue
+        if lines[0].startswith("("):
+            rows[-1]["wording"] += " " + " ".join(lines)
+            continue
+        jurisdiction = lines[0]
+        rest = lines[1:]
+        if rest[0] == "COUNTY OF MACOMB":
+            rest = rest[2:]
+        rows.append(
+            {
+                "county": county,
+                "jurisdiction": jurisdiction.title() if jurisdiction.isupper() else jurisdiction,
+                "label": rest[0].title() if rest[0].isupper() else rest[0],
+                "wording": re.sub(r"\s+", " ", " ".join(rest[1:])).strip(),
+                "url": url,
+            }
+        )
+    return rows
+
+
 def parse() -> None:
     rows = []
     for county, (url, _, _) in COUNTIES.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
         ).stdout
+        if county in PAGED:
+            rows.extend(paged_rows(county, url, text))
+            continue
         lines = [line for line in text.replace("\f", "\n").split("\n")]
         start = next(index for index, line in enumerate(lines) if line.strip() == "County Proposals")
         heads: list[str] = []
@@ -133,11 +167,21 @@ def emit() -> Path:
         kept = 0
         for row in frame.iter_rows(named=True):
             jurisdiction = row["jurisdiction"]
-            if jurisdiction.startswith(("City of", "Village of")):
-                options = names.get(ceda._city(re.sub(r"^(City|Village) of ", "", jurisdiction)), [])
+            if jurisdiction.lower().startswith(("city of", "village of")):
+                options = names.get(ceda._city(re.sub(r"(?i)^(city|village) of ", "", jurisdiction)), [])
             else:
-                options = names.get(ceda._core(jurisdiction), [])
+                options = names.get(ceda._core(re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 \1", jurisdiction)), [])
             options = [option for option in options if not option.startswith("us.town:") or option[8:13] == row["county"]]
+            if not options and re.search(r"authority|district", jurisdiction, re.IGNORECASE):
+                county_key = f"us.county:{row['county']}"
+                if county_key in found:
+                    county_polity, county_area, _, county_path, _ = found[county_key]
+                    minted = govmint.special(
+                        conn, cs, "MI", (county_polity, county_area, county_path, row["county"]), jurisdiction, slugs
+                    )
+                    if minted is not None:
+                        options = [f"us.special_district:{minted[4]}"]
+                        found[options[0]] = minted
             if len(options) != 1:
                 print("no polity:", jurisdiction, row["label"])
                 continue
