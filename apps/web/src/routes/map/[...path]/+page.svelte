@@ -847,6 +847,7 @@
     from: number,
     isDense: boolean,
     isStroked = rank < 2,
+    isTop = rank === 0,
   ) {
     const id = engine.tiles(tiles, "sheet");
     if (engine.has(`fill:${id}`)) {
@@ -946,13 +947,12 @@
           id: `edge:${id}`,
           type: "line",
           ...layer,
-          minzoom: rank === 0 ? from : FINE,
+          minzoom: isTop ? from : FINE,
           paint: {
             "line-color": "var(--card)",
-            "line-width":
-              rank === 0
-                ? ["interpolate", ["linear"], ["zoom"], 3, 0.6, MID, 1, 6, 2]
-                : 1.25,
+            "line-width": isTop
+              ? ["interpolate", ["linear"], ["zoom"], 3, 0.6, MID, 1, 6, 2]
+              : 1.25,
             "line-opacity": on,
           },
         },
@@ -1114,6 +1114,8 @@
     }
     const level = next.levels.find((entry) => entry.code === next.level);
     if (level?.tiles != null) {
+      const top = next.levels[0];
+      const frame = top?.code === level.code ? null : top?.tiles;
       index(
         next,
         tier(
@@ -1122,9 +1124,36 @@
           0,
           next.places.k.length > 400,
           !level.code.endsWith(".precinct"),
+          frame == null,
         ),
         0,
       );
+      if (frame != null) {
+        engine.add(
+          {
+            id: "frame",
+            type: "line",
+            source: engine.tiles(frame, "sheet"),
+            "source-layer": "areas",
+            paint: {
+              "line-color": "var(--card)",
+              "line-width": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                3,
+                0.6,
+                MID,
+                1,
+                6,
+                2,
+              ],
+            },
+          },
+          "lines",
+          { group: "sheet" },
+        );
+      }
       const counties = level.code.endsWith(".precinct")
         ? next.levels.find((entry) => entry.code === "us.county")
         : undefined;
