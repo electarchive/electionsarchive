@@ -1901,6 +1901,13 @@ for fips, county, page in (
         f"https://www.sos.alabama.gov/sites/default/files/sample-ballots/2026/gen/{page}.pdf",
         f"al/{county.replace('. ', '').lower()}.pdf" if county != "St. Clair" else "al/stclair.pdf",
     )
+for fips in sorted({line.split("\t")[0] for line in Path(__file__).with_name("local_2026_states.tsv").read_text().splitlines() if line.startswith("SD-")}):
+    NE_SOURCES[fips] = (
+        "South Dakota Secretary of State",
+        "Candidate List, November 3, 2026 General Election",
+        f"https://vip.sdsos.gov/candidatelist.aspx?eid=774#{fips}",
+        "sd/candidates.csv",
+    )
 for key, publisher, title, url, local in (
     ("MO-29037", "Cass County Clerk", "Sample Ballot, General Election, November 3, 2026", "https://www.casscounty.com/DocumentCenter/View/4496/November-2026-Sample-Ballotpdf", "mo/cass.pdf"),
     ("MO-29021", "Buchanan County Clerk", "Sample Ballot Style 1, General Election, November 3, 2026", "https://www.co.buchanan.mo.us/media/Document%20Center/County%20Clerk/Nov%203%202026%20Sample%20Ballots/Nov%203%202026%20Ballot%20Style%201.pdf", "mo/buchanan.pdf"),
@@ -1973,6 +1980,10 @@ for key, publisher, title, url, local in (
     ("TX-48215-ecisd", "Edinburg CISD", "School Board Candidates, November 3, 2026 Election", "https://4.files.edl.io/5137/10/16/26/141722-ce5d89de-f0e6-4db4-b79b-63f4f2091cec.pdf", "tx/edinburg.pdf"),
     ("MT-30029", "Flathead County Elections", "2026 General Election, Flathead County Offices", "https://flatheadcounty.gov/application/files/6517/8551/6200/Candidate_Information.pdf", "mt/flathead.pdf"),
     ("MT-30049", "Lewis and Clark County Clerk and Recorder", "Publication Ballot, 2026 General Election", "https://www.lccountymt.gov/files/assets/county/v/1/treasurer-clerk-and-recorder/documents/elections/sample-ballots/2026-general-publication-ballot.pdf", "mt/lewisclark.pdf"),
+    ("WY-56021", "Laramie County Clerk", "2026 General Election Candidate Roster, County Offices", "https://www.laramiecountywy.gov/files/assets/public/v/1/clerk/documents/candidate-rosters/2026/final-county-offices-candidates-general.pdf", "wy/laramie.pdf"),
+    ("WY-56025", "Natrona County Clerk", "2026 General Election Candidate Roster", "https://www.natronacounty-wy.gov/DocumentCenter/View/13878/2026-General-Election-Candidates-Filed-PDF", "wy/natrona.pdf"),
+    ("WY-56001", "Albany County Clerk", "Offices For Election and Candidates Who Have Filed, 2026", "https://www.albanycountywy.gov/DocumentCenter/View/7786", "wy/albany.html"),
+    ("MT-30067", "Park County", "2026 Park County Candidates", "https://www.parkcountymt.gov/uploads/files/pages/171/2026-County-Candidates.pdf", "mt/park.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
