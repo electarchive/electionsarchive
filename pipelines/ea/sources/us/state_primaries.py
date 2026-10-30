@@ -3710,12 +3710,18 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set"],
             ).fetchall()
         )
-        yielded = {
+        superseded = {
             result_set
             for (result_set,) in conn.execute(
                 """select r.id from result_set r join changeset g on g.id = r.changeset_id
                    where r.status = 'superseded' and g.pipeline <> %s""",
                 [SOURCE],
+            ).fetchall()
+        }
+        yielded = superseded | {
+            result_set
+            for (result_set,) in conn.execute(
+                "select id from result_set where status = 'active' and not is_default"
             ).fetchall()
         }
         keys = {
@@ -4276,7 +4282,7 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="certified",
                 kind="counted",
-                status="superseded" if result_set in yielded else "active",
+                status="superseded" if result_set in superseded else "active",
                 source_id=sources["NYC" if ed_level else state],
                 is_default=result_set not in yielded,
                 completeness=1,
