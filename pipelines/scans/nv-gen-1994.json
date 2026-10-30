@@ -1,0 +1,146 @@
+{
+ "polity": "US-NV",
+ "publisher": "Nevada Secretary of State",
+ "authoritative": "Source: the Secretary of State's official 1994 general election returns, as canvassed by the county commissioners; each county column adds up to the printed state total.",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "1994 General Election Returns by county",
+ "file": {
+  "url": "https://nvsos.gov/MF-397/NV-1994-primary-and-general.pdf"
+ },
+ "contests": {
+  "senate": {
+   "year": 1994,
+   "chamber": "senate",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "NV",
+   "district": null
+  },
+  "house1": {
+   "year": 1994,
+   "chamber": "house",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "NV",
+   "district": 1
+  },
+  "house2": {
+   "year": 1994,
+   "chamber": "house",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  },
+  "governor": {
+   "year": 1994,
+   "chamber": "governor",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "NV",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 11,
+   "id": "11",
+   "orientation": "counties_across",
+   "bands": 1,
+   "hint": "Read the US Senate, Congress District 1, Congress District 2, and Governor blocks only; leave out the registration and turnout rows.",
+   "columns": [
+    {
+     "label": "BRYAN, RICHARD H. (D)",
+     "contest": "senate",
+     "candidate": "Richard H. Bryan"
+    },
+    {
+     "label": "DAYS, BOB (L)",
+     "contest": "senate",
+     "candidate": "Bob Days"
+    },
+    {
+     "label": "FURMAN, HAL (R)",
+     "contest": "senate",
+     "candidate": "Hal Furman"
+    },
+    {
+     "label": "GRASTEIT, NEAL A. (IA)",
+     "contest": "senate",
+     "candidate": "Neal A. Grasteit"
+    },
+    {
+     "label": "NEVENICH, ANNA (IND)",
+     "contest": "senate",
+     "candidate": "Anna Nevenich"
+    },
+    {
+     "label": "NONE OF THESE CANDIDATES (senate)",
+     "contest": "senate",
+     "candidate": "None of These Candidates"
+    },
+    {
+     "label": "BILBRAY, JAMES H. (D)",
+     "contest": "house1",
+     "candidate": "James H. Bilbray"
+    },
+    {
+     "label": "ENSIGN, JOHN (R)",
+     "contest": "house1",
+     "candidate": "John Ensign"
+    },
+    {
+     "label": "WOOD, GARY (L)",
+     "contest": "house1",
+     "candidate": "Gary Wood"
+    },
+    {
+     "label": "AVERY, LOIS (NL)",
+     "contest": "house2",
+     "candidate": "Lois Avery"
+    },
+    {
+     "label": "GREESON, JANET (D)",
+     "contest": "house2",
+     "candidate": "Janet Greeson"
+    },
+    {
+     "label": "JEFFERSON, THOMAS F. (IA)",
+     "contest": "house2",
+     "candidate": "Thomas F. Jefferson"
+    },
+    {
+     "label": "VUCANOVICH, BARBARA F. (R)",
+     "contest": "house2",
+     "candidate": "Barbara F. Vucanovich"
+    },
+    {
+     "label": "GIBBONS, JIM (R)",
+     "contest": "governor",
+     "candidate": "James A. Gibbons"
+    },
+    {
+     "label": "HANSEN, DANIEL (IA)",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "MILLER, BOB (D)",
+     "contest": "governor",
+     "candidate": "Robert J. Miller"
+    },
+    {
+     "label": "SHOLTY, DENIS (L)",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "NONE OF THESE CANDIDATES (governor)",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  }
+ ]
+}

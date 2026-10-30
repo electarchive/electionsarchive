@@ -1,0 +1,149 @@
+{
+ "polity": "US-NV",
+ "publisher": "Nevada Secretary of State",
+ "authoritative": "Source: the Secretary of State's official 1996 general election returns, as canvassed by the county commissioners; each county column adds up to the printed state total.",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "1996 General Election Returns by county",
+ "file": {
+  "url": "https://nvsos.gov/MF-397/NV-1996-primary-and-general.pdf"
+ },
+ "contests": {
+  "president": {
+   "year": 1996,
+   "chamber": "president",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "NV",
+   "district": null
+  },
+  "house1": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "NV",
+   "district": 1
+  },
+  "house2": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 12,
+   "id": "12",
+   "orientation": "counties_across",
+   "turn": -90,
+   "bands": 1,
+   "hint": "Read only the President and Vice President of the United States block; leave out the registration and turnout rows.",
+   "columns": [
+    {
+     "label": "Browne/Jorgensen (L)",
+     "contest": "president",
+     "candidate": "Harry Browne"
+    },
+    {
+     "label": "Clinton/Gore (D)",
+     "contest": "president",
+     "candidate": "Bill Clinton"
+    },
+    {
+     "label": "Dole/Kemp (R)",
+     "contest": "president",
+     "candidate": "Bob Dole"
+    },
+    {
+     "label": "Hagelin/Tompkins (NL)",
+     "contest": "president",
+     "candidate": "John Hagelin"
+    },
+    {
+     "label": "Nader/LaDuke (G)",
+     "contest": "president",
+     "candidate": "Ralph Nader"
+    },
+    {
+     "label": "Perot/Choate (Ref)",
+     "contest": "president",
+     "candidate": "Ross Perot"
+    },
+    {
+     "label": "Phillips/Titus (IA)",
+     "contest": "president",
+     "candidate": "Howard Phillips"
+    },
+    {
+     "label": "None of These Candidates",
+     "contest": "president",
+     "candidate": "None of These Candidates"
+    }
+   ]
+  },
+  {
+   "page": 13,
+   "id": "13",
+   "orientation": "counties_across",
+   "turn": -90,
+   "bands": 1,
+   "hint": "Read the Congressional District One and Congressional District Two blocks only and stop after Congressional District Two; leave out every state senate block.",
+   "columns": [
+    {
+     "label": "Coffin, Bob (D)",
+     "contest": "house1",
+     "candidate": "Bob Coffin"
+    },
+    {
+     "label": "Dan, James (L)",
+     "contest": "house1",
+     "candidate": "James Dan"
+    },
+    {
+     "label": "Eidson, Richard (NL)",
+     "contest": "house1",
+     "candidate": "Richard Eidson"
+    },
+    {
+     "label": "Ensign, John (R)",
+     "contest": "house1",
+     "candidate": "John Ensign"
+    },
+    {
+     "label": "Gunderson, Ted (IA)",
+     "contest": "house1",
+     "candidate": "Ted Gunderson"
+    },
+    {
+     "label": "Avery, Lois (NL)",
+     "contest": "house2",
+     "candidate": "Lois Avery"
+    },
+    {
+     "label": "Gibbons, Jim (R)",
+     "contest": "house2",
+     "candidate": "Jim Gibbons"
+    },
+    {
+     "label": "Hansen, Dan (IA)",
+     "contest": "house2",
+     "candidate": "Dan Hansen"
+    },
+    {
+     "label": "Tomburello, Louis R. (L)",
+     "contest": "house2",
+     "candidate": "Louis R. Tomburello"
+    },
+    {
+     "label": "Wilson, Thomas \"Spike\" (D)",
+     "contest": "house2",
+     "candidate": "Thomas \"Spike\" Wilson"
+    }
+   ]
+  }
+ ]
+}

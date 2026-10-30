@@ -1,0 +1,184 @@
+{
+ "polity": "US-NV",
+ "publisher": "Nevada Secretary of State",
+ "authoritative": "Source: the Secretary of State's official 1992 general election returns, as canvassed by the county commissioners; each county column adds up to the printed state total.",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "1992 General Election Returns by county",
+ "file": {
+  "url": "https://nvsos.gov/MF-397/NV-1992-primary-and-general.pdf"
+ },
+ "contests": {
+  "president": {
+   "year": 1992,
+   "chamber": "president",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "NV",
+   "district": null
+  },
+  "senate": {
+   "year": 1992,
+   "chamber": "senate",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "NV",
+   "district": null
+  },
+  "house1": {
+   "year": 1992,
+   "chamber": "house",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "NV",
+   "district": 1
+  },
+  "house2": {
+   "year": 1992,
+   "chamber": "house",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "NV",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 20,
+   "id": "20",
+   "orientation": "counties_across",
+   "turn": -90,
+   "crop": [
+    0,
+    0.09,
+    1,
+    0.7
+   ],
+   "bands": 1,
+   "hint": "Read the president, U.S. Senate, and Representative in Congress District One and District Two blocks only, stop after Congressional District Two, and leave out the registration and turnout rows and every state senate block.",
+   "columns": [
+    {
+     "label": "BUSH/QUAYLE (R)",
+     "contest": "president",
+     "candidate": "George Bush"
+    },
+    {
+     "label": "CLINTON/GORE (D)",
+     "contest": "president",
+     "candidate": "Bill Clinton"
+    },
+    {
+     "label": "FULANI/MUNOZ (I)",
+     "contest": "president",
+     "candidate": "Lenora Fulani"
+    },
+    {
+     "label": "GRITZ/MINETT (POP)",
+     "contest": "president",
+     "candidate": "James \"Bo\" Gritz"
+    },
+    {
+     "label": "HAGELIN/TOMPKINS (NATLAW)",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "MARROU/LORD (L)",
+     "contest": "president",
+     "candidate": "Andre Marrou"
+    },
+    {
+     "label": "PEROT/STOCKDALE (I)",
+     "contest": "president",
+     "candidate": "Ross Perot"
+    },
+    {
+     "label": "PHILIPS/KNIGHT (IA)",
+     "contest": "president",
+     "candidate": "Howard Phillips"
+    },
+    {
+     "label": "NONE OF THESE CANDIDATES (president)",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "AVERY, LOIS (NAT LAW)",
+     "contest": "senate",
+     "candidate": "Lois Avery"
+    },
+    {
+     "label": "CROMWELL, H. KENT (L)",
+     "contest": "senate",
+     "candidate": "H. Kent Cromwell"
+    },
+    {
+     "label": "DAHL, DEMAR (R)",
+     "contest": "senate",
+     "candidate": "Demar Dahl"
+    },
+    {
+     "label": "GARCIA, JOE S. JR. (IA)",
+     "contest": "senate",
+     "candidate": "Joe S. Garcia Jr."
+    },
+    {
+     "label": "REID, HARRY (D)",
+     "contest": "senate",
+     "candidate": "Harry Reid"
+    },
+    {
+     "label": "TOOTLE, HARRY (POP)",
+     "contest": "senate",
+     "candidate": "Harry Tootle"
+    },
+    {
+     "label": "NONE OF THESE CANDIDATES (senate)",
+     "contest": "senate",
+     "candidate": "None of These Candidates"
+    },
+    {
+     "label": "BILBRAY, JAMES H. (D)",
+     "contest": "house1",
+     "candidate": "James H. Bilbray"
+    },
+    {
+     "label": "KJAR, SCOTT A. (L)",
+     "contest": "house1",
+     "candidate": "Scott A. Kjar"
+    },
+    {
+     "label": "PETTYJOHN, J. COY (R)",
+     "contest": "house1",
+     "candidate": "J. Coy Pettyjohn"
+    },
+    {
+     "label": "BECAN, DAN (L)",
+     "contest": "house2",
+     "candidate": "Dan Becan"
+    },
+    {
+     "label": "GOLDEN, DON (POP)",
+     "contest": "house2",
+     "candidate": "Don Golden"
+    },
+    {
+     "label": "HANSEN, DANIEL M. (IA)",
+     "contest": "house2",
+     "candidate": "Daniel M. Hansen"
+    },
+    {
+     "label": "SFERRAZZA, PETE (D)",
+     "contest": "house2",
+     "candidate": "Pete Sferrazza"
+    },
+    {
+     "label": "VUCANOVICH, BARBARA F. (R)",
+     "contest": "house2",
+     "candidate": "Barbara F. Vucanovich"
+    }
+   ],
+   "dpi": 450
+  }
+ ]
+}
