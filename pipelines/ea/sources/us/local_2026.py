@@ -1998,6 +1998,12 @@ for key, publisher, title, url, local in (
     ("WY-56025", "Natrona County Clerk", "2026 General Election Candidate Roster", "https://www.natronacounty-wy.gov/DocumentCenter/View/13878/2026-General-Election-Candidates-Filed-PDF", "wy/natrona.pdf"),
     ("WY-56001", "Albany County Clerk", "Offices For Election and Candidates Who Have Filed, 2026", "https://www.albanycountywy.gov/DocumentCenter/View/7786", "wy/albany.html"),
     ("MT-30067", "Park County", "2026 Park County Candidates", "https://www.parkcountymt.gov/uploads/files/pages/171/2026-County-Candidates.pdf", "mt/park.pdf"),
+    ("WV-54039-charleston", "City of Charleston", "2026 Election Information: Candidate Updates, November 3, 2026 General Election", "https://www.charlestonwv.gov/government/election-2026", "wv/charleston.html"),
+    ("TX-48201-baytown", "City of Baytown", "Candidates for November 3, 2026 Election", "https://baytown.org/1554/Candidates-for-November-3-2026-Election", "tx/baytown.html"),
+    ("TX-48209-kyle", "City of Kyle", "2026 Election: Submitted Candidacy Filings, Mayor and Council Districts 2 and 4", "https://www.cityofkyle.gov/city-hall/elections/2026-election/", "tx/kyle.html"),
+    ("AR-05131-fort-smith", "City of Fort Smith", "Candidates for Mayor and Directors-at-Large, media notification of August 5, 2026", "https://content.govdelivery.com/accounts/ARFORTSMITH/bulletins/423bddb", "ar/fort_smith.html"),
+    ("FL-12086-coral-gables", "Miami-Dade County Elections Department", "Official Sample Ballot, Coral Gables General Biennial and Special Elections, November 3, 2026", "https://www.miamidade.gov/elections/library/sample-ballots/2026-11-03-coral-gables-general-biennial-and-special-elections-sample-ballot.pdf", "fl/coral_gables.pdf"),
+    ("TX-48041-college-station", "City of College Station", "General and Special Election November 3, 2026: Candidates for Office", "https://cstx-us.govstack.com/your-government/elections/", "tx/college_station.html"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
 for key, (publisher, title, url, local) in NE_SOURCES.items():
