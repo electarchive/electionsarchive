@@ -1,0 +1,119 @@
+{
+  "polity": "US-TN",
+  "publisher": "Tennessee Secretary of State",
+  "authoritative": "Source: the Secretary of State's official 1998 governor returns by county, whose county rows add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "November 3, 1998 general election, governor, by county",
+  "file": {
+    "url": "https://sos.tn.gov/elections/results#1998-governor.pdf"
+  },
+  "contests": {
+    "governor": {
+      "year": 1998,
+      "chamber": "governor",
+      "day": "1998-11-03",
+      "special": false,
+      "state": "TN",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "orientation": "counties_down",
+      "hint": "One row per Tennessee county with one column per candidate across the page; the column headers are the candidate numbers 1 to 7 and Write-In's, so label each column with the candidate's printed name from the key at the top of the page (candidate 1 is John Jay Hooker, 2 Don Sundquist, 3 Lonnie L. Creech, 4 Irwin W. Gibbs, 5 George Alexander Hamilton, Sr, 6 Thomas E. Smith II, 7 Karl Smithson) and label the last column Write-Ins. Read the votes only. Include the STATE TOTAL row where it appears.",
+      "columns": [
+        {
+          "label": "John Jay Hooker",
+          "contest": "governor",
+          "candidate": "John Jay Hooker"
+        },
+        {
+          "label": "Don Sundquist",
+          "contest": "governor",
+          "candidate": "Don Sundquist"
+        },
+        {
+          "label": "Lonnie L. Creech",
+          "contest": "governor",
+          "candidate": "Lonnie L. Creech"
+        },
+        {
+          "label": "Irwin W. Gibbs",
+          "contest": "governor",
+          "candidate": "Irwin W. Gibbs"
+        },
+        {
+          "label": "George Alexander Hamilton, Sr",
+          "contest": "governor",
+          "candidate": "George Alexander Hamilton, Sr"
+        },
+        {
+          "label": "Thomas E. Smith II",
+          "contest": "governor",
+          "candidate": "Thomas E. Smith II"
+        },
+        {
+          "label": "Karl Smithson",
+          "contest": "governor",
+          "candidate": "Karl Smithson"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "governor",
+          "candidate": "Write-Ins"
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "orientation": "counties_down",
+      "hint": "One row per Tennessee county with one column per candidate across the page; the column headers are the candidate numbers 1 to 7 and Write-In's, so label each column with the candidate's printed name from the key at the top of the page (candidate 1 is John Jay Hooker, 2 Don Sundquist, 3 Lonnie L. Creech, 4 Irwin W. Gibbs, 5 George Alexander Hamilton, Sr, 6 Thomas E. Smith II, 7 Karl Smithson) and label the last column Write-Ins. Read the votes only. Include the STATE TOTAL row where it appears.",
+      "columns": [
+        {
+          "label": "John Jay Hooker",
+          "contest": "governor",
+          "candidate": "John Jay Hooker"
+        },
+        {
+          "label": "Don Sundquist",
+          "contest": "governor",
+          "candidate": "Don Sundquist"
+        },
+        {
+          "label": "Lonnie L. Creech",
+          "contest": "governor",
+          "candidate": "Lonnie L. Creech"
+        },
+        {
+          "label": "Irwin W. Gibbs",
+          "contest": "governor",
+          "candidate": "Irwin W. Gibbs"
+        },
+        {
+          "label": "George Alexander Hamilton, Sr",
+          "contest": "governor",
+          "candidate": "George Alexander Hamilton, Sr"
+        },
+        {
+          "label": "Thomas E. Smith II",
+          "contest": "governor",
+          "candidate": "Thomas E. Smith II"
+        },
+        {
+          "label": "Karl Smithson",
+          "contest": "governor",
+          "candidate": "Karl Smithson"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": "governor",
+          "candidate": "Write-Ins"
+        }
+      ]
+    }
+  ]
+}

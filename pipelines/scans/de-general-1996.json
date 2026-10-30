@@ -1,0 +1,62 @@
+{
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "authoritative": "Source: the Department of Elections' official 1996 results book, whose county columns add up to each candidate's printed state total; they replace Algara and Amlani's county rows.",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Official results of general election, 1996",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/#Presidential_General_1996.pdf"
+  },
+  "unit_scheme": "split",
+  "unit_codes": {
+    "City of Wilmington": "10003",
+    "Wilmington": "10003",
+    "Rural New Castle County": "10003",
+    "Rural New Castle": "10003",
+    "New Castle County": "10003",
+    "New Castle": "10003",
+    "Kent County": "10001",
+    "Kent": "10001",
+    "Sussex County": "10005",
+    "Sussex": "10005"
+  },
+  "contests": {
+    "president": {
+      "year": 1996,
+      "chamber": "president",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "DE",
+      "district": null
+    },
+    "governor": {
+      "year": 1996,
+      "chamber": "governor",
+      "day": "1996-11-05",
+      "special": false,
+      "state": "DE",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 4,
+      "id": "4-0",
+      "orientation": "counties_across",
+      "discover": [
+        "president"
+      ],
+      "hint": "The county columns are City of Wilmington, Rural New Castle County, Kent County, Sussex County, then Total Votes Cast; leave out the Majority column. Read only the president block (or the governor block on the governor page); every candidate line and the Total Votes Cast line is a row, and a Writeln Votes line with no figures is not a row."
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "orientation": "counties_across",
+      "discover": [
+        "governor"
+      ],
+      "hint": "The county columns are City of Wilmington, Rural New Castle County, Kent County, Sussex County, then Total Votes Cast; leave out the Majority column. Read only the president block (or the governor block on the governor page); every candidate line and the Total Votes Cast line is a row, and a Writeln Votes line with no figures is not a row."
+    }
+  ]
+}
