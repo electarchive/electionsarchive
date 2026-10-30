@@ -6,6 +6,7 @@
   import X from "@lucide/svelte/icons/x";
   import type { Editable } from "#lib/contrib.js";
   import Proof from "#lib/components/contrib/proof.svelte";
+  import UploadEvidence from "#lib/components/contrib/upload-evidence.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
@@ -34,8 +35,13 @@
   let sheet = $state<"peek" | "half" | "full">("half");
   let drafts = $state<Record<string, string>>({});
   let source = $state<string | null>(null);
-  let linking = $state(false);
+  let mode = $state<"source" | "url" | "upload">("source");
   let link = $state({ url: "", title: "", publisher: "", kind: "" });
+  let upload = $state<{
+    id: string;
+    page: number | null;
+    region: [number, number, number, number] | null;
+  } | null>(null);
   let quote = $state("");
   let summary = $state("");
   let submitting = $state(false);
@@ -75,12 +81,31 @@
       detail: item.publisher ?? undefined,
     })),
   );
-  const linked = $derived(linking || sources.length === 0);
+  const modes = $derived(
+    sources.length === 0
+      ? (["url", "upload"] as const)
+      : (["source", "url", "upload"] as const),
+  );
+  const shown = $derived(
+    mode === "source" && sources.length === 0 ? "url" : mode,
+  );
+  const modeLabel = {
+    source: m.edit_mode_source,
+    url: m.edit_mode_url,
+    upload: m.edit_mode_upload,
+  };
   const chosen = $derived(sourceKinds.find((kind) => kind === link.kind));
+  const described = $derived(
+    [link.title, link.publisher, link.kind].every(
+      (value) => value.trim() !== "",
+    ),
+  );
   const cited = $derived(
-    linked
-      ? Object.values(link).every((value) => value.trim() !== "")
-      : source != null,
+    shown === "source"
+      ? source != null
+      : shown === "url"
+        ? described && link.url.trim() !== ""
+        : described && upload != null,
   );
   const ready = $derived(
     changed.length === 1 && cited && summary.trim() !== "",
@@ -89,8 +114,9 @@
   const close = () => {
     drafts = {};
     source = null;
-    linking = false;
+    mode = "source";
     link = { url: "", title: "", publisher: "", kind: "" };
+    upload = null;
     quote = "";
     summary = "";
     submitted = null;
@@ -115,9 +141,20 @@
           entityId: entity,
           nameId: name.id,
           text: drafts[name.id],
-          evidence: linked
-            ? { type: "url", ...link }
-            : { type: "source", sourceId: source },
+          evidence:
+            shown === "source"
+              ? { type: "source", sourceId: source }
+              : shown === "url"
+                ? { type: "url", ...link }
+                : {
+                    type: "upload",
+                    uploadId: upload?.id,
+                    page: upload?.page ?? null,
+                    region: upload?.region ?? null,
+                    title: link.title,
+                    publisher: link.publisher,
+                    kind: link.kind,
+                  },
           quote,
           summary,
         }),
@@ -295,18 +332,56 @@
                       n={1}
                     />
                     <div class="mbs-2 grid gap-2 ps-1.5">
-                      {#if linked}
+                      <div
+                        class="flex gap-4 border-be text-xs"
+                        role="radiogroup"
+                        aria-label={m.edit_evidence()}
+                      >
+                        {#each modes as option (option)}
+                          <label
+                            class={cn(
+                              "-mbe-px cursor-pointer border-be-2 border-transparent pbe-1.5 text-muted-foreground hover:text-foreground has-focus-visible:text-foreground has-focus-visible:outline-[1.5px] has-focus-visible:outline-ring",
+                              {
+                                "border-foreground font-semibold text-foreground":
+                                  shown === option,
+                              },
+                            )}
+                            ><input
+                              class="sr-only"
+                              type="radio"
+                              name="edit-evidence-mode"
+                              value={option}
+                              checked={shown === option}
+                              onchange={() => (mode = option)}
+                            />{modeLabel[option]()}</label
+                          >
+                        {/each}
+                      </div>
+                      {#if shown === "source"}
+                        <Combobox
+                          items={sources}
+                          bind:value={source}
+                          label={m.edit_evidence()}
+                          placeholder={m.edit_evidence_placeholder()}
+                          search={m.edit_evidence_search()}
+                          empty={m.edit_evidence_empty()}
+                        />
+                      {:else}
                         <fieldset class="contrib-settle grid gap-2">
                           <legend class="sr-only">{m.edit_evidence()}</legend>
-                          <Input
-                            type="url"
-                            inputmode="url"
-                            bind:value={link.url}
-                            placeholder="https://"
-                            aria-label={m.edit_url()}
-                            maxlength={2048}
-                            class="block-8"
-                          />
+                          {#if shown === "url"}
+                            <Input
+                              type="url"
+                              inputmode="url"
+                              bind:value={link.url}
+                              placeholder="https://"
+                              aria-label={m.edit_url()}
+                              maxlength={2048}
+                              class="block-8"
+                            />
+                          {:else}
+                            <UploadEvidence bind:value={upload} />
+                          {/if}
                           <Input
                             bind:value={link.title}
                             placeholder={m.edit_url_title_placeholder()}
@@ -341,29 +416,14 @@
                               </Select.Content>
                             </Select.Root>
                           </div>
-                          <p class="text-xs text-pretty text-muted-foreground">
-                            {m.edit_url_note()}
-                          </p>
+                          {#if shown === "url"}
+                            <p
+                              class="text-xs text-pretty text-muted-foreground"
+                            >
+                              {m.edit_url_note()}
+                            </p>
+                          {/if}
                         </fieldset>
-                      {:else}
-                        <Combobox
-                          items={sources}
-                          bind:value={source}
-                          label={m.edit_evidence()}
-                          placeholder={m.edit_evidence_placeholder()}
-                          search={m.edit_evidence_search()}
-                          empty={m.edit_evidence_empty()}
-                        />
-                      {/if}
-                      {#if sources.length > 0}
-                        <button
-                          type="button"
-                          class="justify-self-start text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
-                          onclick={() => (linking = !linking)}
-                          >{linking
-                            ? m.edit_link_back()
-                            : m.edit_link()}</button
-                        >
                       {/if}
                       <Input
                         bind:value={quote}
@@ -399,7 +459,11 @@
               {:else if changed.length === 0}
                 {m.edit_no_change()}
               {:else if !cited}
-                {linked ? m.edit_needs_link() : m.edit_needs_source()}
+                {shown === "source"
+                  ? m.edit_needs_source()
+                  : shown === "url"
+                    ? m.edit_needs_link()
+                    : m.edit_needs_upload()}
               {:else}
                 {m.edit_one_change()}
               {/if}

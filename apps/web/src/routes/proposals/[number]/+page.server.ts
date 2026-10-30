@@ -16,8 +16,31 @@ export const load: PageServerLoad = async ({ params, locals, setHeaders }) => {
     proposal(parse(params.number)),
     roles(locals.user?.id),
   ]);
+  const viewer = locals.user?.id;
   return {
-    proposal: found,
+    proposal: {
+      ...found,
+      revisions: found.revisions.map((revision) => ({
+        ...revision,
+        sources: (revision.sources ?? []).map(({ scan, ...item }) => ({
+          ...item,
+          scan:
+            scan != null &&
+            (scan.shared ||
+              scan.owner === viewer ||
+              allowed.admin ||
+              allowed.reviewer)
+              ? {
+                  upload: scan.upload,
+                  page: scan.page,
+                  width: scan.width,
+                  height: scan.height,
+                  region: scan.region,
+                }
+              : null,
+        })),
+      })),
+    },
     canDecide:
       found.state === "open" &&
       (allowed.admin || (allowed.reviewer && found.tier === 1)),

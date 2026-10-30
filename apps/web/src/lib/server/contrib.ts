@@ -200,7 +200,16 @@ export async function proposal(number: number) {
       payload: {
         summary: string;
         rationale?: string;
-        evidence?: Record<string, { source?: string; quote?: string }>;
+        evidence?: Record<
+          string,
+          {
+            source?: string;
+            upload?: string;
+            page?: number;
+            region?: [number, number, number, number];
+            quote?: string;
+          }
+        >;
       };
       diff: Diff | null;
       checks: Checks | null;
@@ -211,6 +220,15 @@ export async function proposal(number: number) {
         url: string | null;
         captured: string | null;
         wayback: string | null;
+        scan: {
+          upload: string;
+          page: number;
+          width: number;
+          height: number;
+          region: [number, number, number, number] | null;
+          shared: boolean;
+          owner: string | null;
+        } | null;
       }> | null;
       titles: Record<string, string> | null;
     }>(sql`
@@ -220,12 +238,18 @@ export async function proposal(number: number) {
                        'title', coalesce(s.title, e.value ->> 'title'),
                        'url', coalesce(s.url, e.value ->> 'url'),
                        'captured', a.captured_at,
-                       'wayback', a.wayback_url
+                       'wayback', a.wayback_url,
+                       'scan', case when p.upload_id is not null then json_build_object(
+                         'upload', u.id, 'page', p.page_number, 'width', p.width, 'height', p.height,
+                         'region', e.value -> 'region', 'shared', u.public_record, 'owner', u.owner_user_id
+                       ) end
                      ) order by e.key)
               from jsonb_each(r.payload -> 'evidence') e
               left join source s on s.id::text = e.value ->> 'source'
               left join archive_capture a on a.id::text = e.value ->> 'capture' and a.status = 'captured'
-              where s.id is not null or e.value ? 'url') as sources,
+              left join upload u on u.id::text = e.value ->> 'upload' and u.status = 'ready'
+              left join upload_page p on p.upload_id = u.id and p.page_number::text = e.value ->> 'page'
+              where s.id is not null or e.value ? 'url' or u.id is not null) as sources,
              (select json_object_agg(s.id, s.title)
               from source s
               where s.id::text in (

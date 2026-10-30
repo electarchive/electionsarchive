@@ -247,6 +247,59 @@
                 {/if}
               </span>
             {/if}
+            {#if item.scan != null}
+              {const scan = $derived(item.scan)}
+              {const region = $derived(scan.region ?? ([0, 0, 1, 1] as const))}
+              {const left = $derived(
+                Math.max(0, region[0] - 0.12) * scan.width,
+              )}
+              {const top = $derived(
+                Math.max(0, region[1] - 0.04) * scan.height,
+              )}
+              {const across = $derived(
+                Math.min(1, region[2] + 0.12) * scan.width - left,
+              )}
+              {const down = $derived(
+                Math.min(1, region[3] + 0.04) * scan.height - top,
+              )}
+              {const href = $derived(
+                `/uploads/${scan.upload}/pages/${scan.page}`,
+              )}
+              <figure class="grid gap-1.5 pbs-1">
+                <svg
+                  class="rounded-sm bg-white ring-1 ring-border block-auto max-inline-full"
+                  width={scan.region == null ? 320 : across}
+                  viewBox="{left} {top} {across} {down}"
+                  role="img"
+                  aria-label={m.proposal_scan_alt({ page: scan.page })}
+                >
+                  <image {href} width={scan.width} height={scan.height} />
+                  {#if scan.region != null}
+                    <rect
+                      x={region[0] * scan.width - 3}
+                      y={region[1] * scan.height - 2}
+                      width={(region[2] - region[0]) * scan.width + 6}
+                      height={(region[3] - region[1]) * scan.height + 4}
+                      rx="2"
+                      class="fill-marker/55 stroke-ring mix-blend-multiply"
+                      stroke-width="1.5"
+                    />
+                  {/if}
+                </svg>
+                <figcaption
+                  class="flex flex-wrap items-baseline gap-x-3 text-xs text-muted-foreground"
+                >
+                  <span class="font-figures"
+                    >{m.proposal_scan_page({ page: scan.page })}</span
+                  >
+                  <a
+                    class="underline underline-offset-2 hover:text-foreground"
+                    {href}
+                    rel="external">{m.proposal_scan_open()}</a
+                  >
+                </figcaption>
+              </figure>
+            {/if}
             {#if quote != null}
               <q
                 class="border-s-2 border-border ps-2 text-pretty text-muted-foreground"
