@@ -1011,6 +1011,25 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    where p.entity_id = s.entity_id and not p.is_current and p.path = s.path"""
             ).format(staged)
         )
+    if table == "ballot_question_text":
+        same = sql.SQL(
+            "p.contest_id = s.contest_id and p.kind = s.kind and p.lang = s.lang and p.source_id = s.source_id"
+            " and p.url is not distinct from s.url and p.body is distinct from s.body"
+        )
+        for contest, writer in conn.execute(
+            sql.SQL(
+                "select s.contest_id::text, c.pipeline from {} s join public.ballot_question_text p on {} join changeset c on c.id = p.changeset_id where c.pipeline <> %s"
+            ).format(staged, same),
+            [stage.pipeline],
+        ).fetchall():
+            raise ValueError(
+                f"ballot_question_text for contest {contest} was written by {writer}, not {stage.pipeline}; publish a superseding source instead"
+            )
+        conn.execute(
+            sql.SQL(
+                "update public.ballot_question_text p set body = s.body from {} s where {}"
+            ).format(staged, same)
+        )
     if table in stage.drops:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.dropped(table)))
     if table in stage.temporal:
