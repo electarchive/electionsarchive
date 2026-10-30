@@ -4660,24 +4660,9 @@ WY-56021	Laramie County District Attorney	0	Sylvia Lee Hackl	Republican	Laramie	
 WY-56021	Laramie County Sheriff	0	Brian Kozak	Republican	Laramie	1
 WY-56021	Laramie County Sheriff	0	Robin Cozad	Democratic	Laramie	1
 WY-56021	Laramie County Treasurer	0	Trista Wood	Republican	Laramie	1
-WY-56025	Natrona County Assessor	0	Tammy Saulsbury	Republican	Natrona	1
-WY-56025	Natrona County Clerk	0	Tracy Good	Republican	Natrona	1
 WY-56025	Natrona County Clerk of the District Court	0	Jill Kiester	Republican	Natrona	1
-WY-56025	Natrona County Coroner	0	James L. Whipps	Republican	Natrona	1
-WY-56025	Natrona County Treasurer	0	Heather Bryan	Republican	Natrona	1
 WY-56025	Natrona County District Attorney	0	Daniel J Itzen	Republican	Natrona	1
-WY-56025	Natrona County Sheriff	0	John Harlin	Republican	Natrona	1
 MT-30067	Park County Commission District 1	0	Frank H O'Connor		Park	1
-MT-30067	Park County Commission District 1	0	Mike Story		Park	1
-MT-30067	Park County Clerk of District Court	0	Cheyenne Adler		Park	1
-MT-30067	Park County Clerk of District Court	0	OrLina Libsack		Park	1
-MT-30067	Park County Clerk and Recorder and Surveyor	0	Angeliene Gelderloos		Park	1
-MT-30067	Park County Sheriff	0	Tad Dykstra		Park	1
-MT-30067	Park County Sheriff	0	Steve Voss		Park	1
-MT-30067	Park County Coroner	0	Albert C Jenkins		Park	1
-MT-30067	Park County Attorney	0	Chad Glenn		Park	1
-MT-30067	Park County Treasurer	0	Kevin J. Larkin		Park	1
-MT-30067	Park County Justice of the Peace	0	Clay W. Herbst		Park	1
 TX-48157-fbisd	Fort Bend Independent School District Board of Trustees Position 1	0	Angie Hanan		Fort Bend	1
 TX-48157-fbisd	Fort Bend Independent School District Board of Trustees Position 1	0	Pedro Valencia		Fort Bend	1
 TX-48157-fbisd	Fort Bend Independent School District Board of Trustees Position 4	0	Dr. Shirley Rose-Gilliam		Fort Bend	1
@@ -4875,16 +4860,6 @@ WY-56003	Big Horn County Clerk	0	Lori Smallwood	Republican	Big Horn	1
 WY-56003	Big Horn County Treasurer	0	Nicole Vigil	Republican	Big Horn	1
 WY-56003	Big Horn County Assessor	0	Cozette Winters	Republican	Big Horn	1
 WY-56003	Big Horn County Clerk of the District Court	0	Serena K. Lipp	Republican	Big Horn	1
-WY-56005	Campbell County Commission	0	Scott Clem	Republican	Campbell	3
-WY-56005	Campbell County Commission	0	Sarah Farmer Edwards	Republican	Campbell	3
-WY-56005	Campbell County Commission	0	James P Ford	Republican	Campbell	3
-WY-56005	Campbell County Commission	0	Brenda Kirk	Democratic	Campbell	3
-WY-56005	Campbell County Coroner	0	Paul Wallem	Republican	Campbell	1
-WY-56005	Campbell County Attorney	0	Kyle Ferris	Republican	Campbell	1
-WY-56005	Campbell County Sheriff	0	Daniel Maul	Republican	Campbell	1
-WY-56005	Campbell County Clerk	0	Cindy Lovelace	Republican	Campbell	1
-WY-56005	Campbell County Treasurer	0	Crystal Conley	Republican	Campbell	1
-WY-56005	Campbell County Assessor	0	Erin Slattery	Republican	Campbell	1
 WY-56005	Campbell County Clerk of the District Court	0	Pamela Merchen	Republican	Campbell	1
 WY-56015	Goshen County Clerk of the District Court	0	Brandi Correa	Republican	Goshen	1
 WY-56015	Goshen County Assessor	0	Jeremy Wardell	Republican	Goshen	1
@@ -6100,9 +6075,6 @@ WV-54067	Nicholas County Commission	0	Sarah Meadows Brown	Democratic	Nicholas	1
 WV-54071	Pendleton County Commission	0	Carl Hevener	Democratic	Pendleton	1
 WV-54071	Pendleton County Commission	0	Seth S Bowers	Independent	Pendleton	1
 WV-54073	Pleasants County Commission	0	Jay Matthew Powell	Republican	Pleasants	1
-WV-54077	Preston County Clerk	1	Dave Sypolt	Republican	Preston	1
-WV-54077	Preston County Commission	0	Dale Preston McCray	Democratic	Preston	1
-WV-54077	Preston County Commission	0	Nicholas James Thorn	Republican	Preston	1
 WV-54085	Ritchie County Clerk	1	Angie Hardbarger	Republican	Ritchie	1
 WV-54085	Ritchie County Commission	0	Randall E. Riggs	Republican	Ritchie	1
 WV-54085	Ritchie County Commission	0	Stephanie Burch		Ritchie	1
@@ -6452,15 +6424,6 @@ MO-29019	Boone County Clerk	0	Brianna L. Lennon	Democratic	Boone	1
 MO-29019	Boone County Collector of Revenue	0	Brian C. McCollum	Democratic	Boone	1
 MO-29019	Boone County Prosecuting Attorney	0	Melissa "Mel" Buchanan	Democratic	Boone	1
 MO-29019	Boone County Recorder of Deeds	0	Bob Nolte	Democratic	Boone	1
-MO-29071	Franklin County Presiding Commissioner	0	Dave Schatz	Republican	Franklin	1
-MO-29071	Franklin County Presiding Commissioner	0	Richele Landa	Democratic	Franklin	1
-MO-29071	Franklin County Presiding Commissioner	0	Thomas Krausch	Libertarian	Franklin	1
-MO-29071	Franklin County Auditor	0	Anne Barry	Republican	Franklin	1
-MO-29071	Franklin County Clerk of the Circuit Court	0	Connie S. Ward	Republican	Franklin	1
-MO-29071	Franklin County Collector of Revenue	0	Doug Trentmann	Republican	Franklin	1
-MO-29071	Franklin County Clerk	0	Tim Baker	Republican	Franklin	1
-MO-29071	Franklin County Recorder of Deeds	0	Lisa Smart	Republican	Franklin	1
-MO-29071	Franklin County Prosecuting Attorney	0	Matthew Becker	Republican	Franklin	1
 IL-17005	Bond County County Clerk and Recorder	0	Brooke Weathers	Democratic	Bond	1
 IL-17005	Bond County County Treasurer	0	Colleen Camp	Republican	Bond	1
 IL-17005	Bond County Sheriff	0	Josh Hill	Republican	Bond	1
@@ -6586,8 +6549,8 @@ MO-29151	Osage County Recorder of Deeds	0	Vickie Huckstep	Democratic	Osage	1
 MO-29151	Osage County Prosecuting Attorney	0	Amanda Grellner	Republican	Osage	1
 MO-29151	Osage County Collector of Revenue	0	Denise Nolte	Republican	Osage	1
 MO-29151	Osage County Treasurer	0	Valerie Prater	Republican	Osage	1
-MT-30081	Ravalli County Commissioner	0	Stephen Kowal	Republican	Ravalli	2
-MT-30081	Ravalli County Commissioner	0	Jeff Burrows	Republican	Ravalli	2
+MT-30081	Ravalli County Commission	0	Stephen Kowal	Republican	Ravalli	2
+MT-30081	Ravalli County Commission	0	Jeff Burrows	Republican	Ravalli	2
 MT-30081	Ravalli County Clerk and Recorder and Superintendent of Schools	0	Regina Plettenberg	Republican	Ravalli	1
 MT-30081	Ravalli County Sheriff and Coroner	0	Steve Holton	Republican	Ravalli	1
 MT-30081	Ravalli County Attorney and Public Administrator	0	Bill Fulbright	Republican	Ravalli	1
