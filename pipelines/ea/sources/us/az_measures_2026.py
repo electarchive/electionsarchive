@@ -18,7 +18,11 @@ PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 INBOX = DATA / "inbox" / "manual" / "az-cities"
 URL = "https://www.azcleanelections.gov/november-3-2026/maricopa"
+MANUAL = DATA / "inbox" / "manual" / "MF-374"
 PUBLISHERS = {
+    "Mesa": "City of Mesa City Clerk",
+    "Peoria": "City of Peoria City Clerk",
+    "Tempe": "City of Tempe City Clerk",
     "Chandler": "City of Chandler City Clerk",
     "Paradise Valley": "Town of Paradise Valley Town Clerk",
 }
@@ -34,7 +38,28 @@ def pamphlet(url: str) -> str:
     return subprocess.run(["pdftotext", str(path), "-"], capture_output=True, text=True, check=True).stdout
 
 
+def specs() -> list[dict[str, str | list[str] | None]]:
+    return json.loads((INBOX / "specs.json").read_text())
+
+
+def key(spec: dict[str, str | list[str] | None]) -> str:
+    return f"{spec['page']}#{Path(str(spec['file'])).name}"
+
+
 def fetch() -> None:
+    for spec in specs():
+        try:
+            raw.cached(SOURCE, key(spec))
+        except LookupError:
+            path = MANUAL / str(spec["file"])
+            raw.store(
+                SOURCE,
+                key(spec),
+                path.read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
     for url in sorted({str(item["url"]) for item in items()}):
         try:
             raw.cached(SOURCE, url)
@@ -74,6 +99,23 @@ def parse() -> None:
                 "url": url,
             }
         )
+    for spec in specs():
+        text = re.sub(r"\s+", " ", pamphlet(key(spec)))
+        floor = text.index(str(spec["after"])) if spec["after"] is not None else 0
+        begin = re.compile(str(spec["begin"])).search(text, floor)
+        end = re.compile(str(spec["end"])).search(text, begin.end()) if begin is not None else None
+        if begin is None or end is None:
+            print("unmatched:", spec["city"], spec["title"])
+            continue
+        rows.append(
+            {
+                "city": spec["city"],
+                "label": spec["title"],
+                "wording": text[begin.start() : end.end()],
+                "options": "|".join(str(option) for option in spec["options"] or []),
+                "url": key(spec),
+            }
+        )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows)
     frame.write_parquet(PARSED / "questions.parquet")
@@ -111,7 +153,7 @@ def emit() -> Path:
             if row["url"] not in sources:
                 publisher = PUBLISHERS[row["city"]]
                 source = sources[row["url"]] = cs.source(publisher, TITLE)
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=TITLE, url=row["url"])
+                cs.add("source", id=source, kind="official_body", publisher=publisher, title=TITLE, url=row["url"].split("#")[0])
                 cs.artifact(raw.cached(SOURCE, row["url"]), source)
         parent = cs.key("us.election", f"{DAY}:AZ")
         elections: set[UUID] = set()
@@ -177,7 +219,7 @@ def emit() -> Path:
                 kind="text",
                 lang="en",
                 body=row["wording"],
-                url=row["url"],
+                url=row["url"].split("#")[0],
                 source_id=sources[row["url"]],
             )
         print(f"{kept} of {frame.height} propositions")
