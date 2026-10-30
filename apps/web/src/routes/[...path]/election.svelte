@@ -10,6 +10,7 @@
   import { tick, untrack } from "svelte";
   import { MediaQuery, SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
+  import NoteBody from "#lib/components/note-body.svelte";
   import { gapNote } from "#lib/coverage.js";
   import {
     count,
@@ -2503,7 +2504,7 @@
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.notes_title()}</h2>
     <ul class="grid gap-1.5 text-sm/snug text-muted-foreground">
       {#each election.notes as note, index (index)}
-        <li class="max-inline-[72ch]">{note.body}</li>
+        <li class="max-inline-[72ch]"><NoteBody {note} /></li>
       {/each}
       {#each known.data ?? [] as gap, index (index)}
         <li class="max-inline-[72ch]">{gapNote(gap)}</li>

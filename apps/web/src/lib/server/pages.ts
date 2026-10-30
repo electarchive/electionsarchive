@@ -1,11 +1,13 @@
 import { call, ORPCError } from "@orpc/server";
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
+import type { Prose } from "#lib/contrib.js";
 import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
 import { era } from "#lib/party.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
+import { proseColumns, proseJoin } from "#lib/server/prose.js";
 import {
   eras,
   latest,
@@ -323,11 +325,13 @@ export async function party(path: string, place: string | null = null) {
       where m.party_id = ${id}::uuid or m.party_id in (select entity_id from entity_merge where into_id = ${id}::uuid)
       order by m.valid_from nulls first, n.text
     `),
-    db.execute<{ body: string; from: string | null; to: string | null }>(sql`
-      select body_md as body, valid_from::text as from, valid_to::text as to from note
-      where kind = 'caveat'
-        and (entity_id = ${id}::uuid or entity_id in (select entity_id from entity_merge where into_id = ${id}::uuid))
-      order by valid_from nulls first
+    db.execute<Prose & { from: string | null; to: string | null }>(sql`
+      select ${proseColumns}, n.valid_from::text as from, n.valid_to::text as to
+      from note n
+      ${proseJoin("n")}
+      where n.kind = 'caveat'
+        and (n.entity_id = ${id}::uuid or n.entity_id in (select entity_id from entity_merge where into_id = ${id}::uuid))
+      order by n.valid_from nulls first
     `),
   ]);
   const home = page.party.polity?.path ?? null;

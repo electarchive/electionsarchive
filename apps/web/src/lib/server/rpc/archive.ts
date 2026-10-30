@@ -17,6 +17,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import * as v from "valibot";
+import type { Prose } from "#lib/contrib.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
@@ -29,6 +30,7 @@ import {
   projectionOf,
   spot,
 } from "#lib/server/plane.js";
+import { proseColumns, proseEntries, proseJoin } from "#lib/server/prose.js";
 
 const stored = (tiles: string | null | undefined) =>
   tiles != null &&
@@ -13204,7 +13206,7 @@ export const elections = {
         isIndirect: v.boolean(),
         breadcrumbs: v.array(Link),
         parent: v.nullable(Link),
-        notes: v.array(v.object({ kind: v.string(), body: v.string() })),
+        notes: v.array(v.object({ kind: v.string(), ...proseEntries })),
         control: v.nullable(
           v.object({
             key: v.nullable(v.string()),
@@ -13632,8 +13634,10 @@ export const elections = {
           where e.parent_id = ${input.id}::uuid and ${within}::uuid is null
             and not exists (select from entity_merge m where m.entity_id = e.id)
         `),
-        db.execute<{ kind: string; body: string }>(sql`
-          select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
+        db.execute<Prose & { kind: string }>(sql`
+          select n.kind::text, ${proseColumns} from note n
+          ${proseJoin("n")}
+          where n.entity_id = ${input.id}::uuid
         `),
         breadcrumbs(home, input.id),
         races(input.id, home, election.date, false, within != null),

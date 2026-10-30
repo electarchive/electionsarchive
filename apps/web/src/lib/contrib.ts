@@ -168,6 +168,15 @@ export const translationLimit = (original: string) =>
 
 export const md5Pattern = /^[0-9a-f]{32}$/u;
 
+export type Prose = {
+  body: string;
+  lang: string;
+  source_lang: string | null;
+  origin: Origin | null;
+  stale: boolean;
+  alternate: string | null;
+};
+
 const commonsPattern =
   /^(?:https?:\/\/commons\.(?:m\.)?wikimedia\.org\/wiki\/)?(?:(?:File|Image):)?([^/#?|[\]{}<>]+\.(?:svg|png|jpe?g|gif|tiff?|webp))$/iu;
 

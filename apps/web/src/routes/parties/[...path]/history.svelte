@@ -1,8 +1,10 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import type { Prose } from "#lib/contrib.js";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
+  import NoteBody from "#lib/components/note-body.svelte";
   import { count, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
@@ -26,7 +28,7 @@
     id: string;
     fallback: string | null;
     color: string;
-    notes: Array<{ body: string; from: string | null; to: string | null }>;
+    notes: Array<Prose & { from: string | null; to: string | null }>;
   } = $props();
 
   const PAD = { top: 16, right: 18, bottom: 26, left: 40 };
@@ -564,7 +566,7 @@
     </ol>
     {#each caveats as note (note.body)}
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[72ch]">
-        {note.body}
+        <NoteBody {note} />
       </p>
     {/each}
   </section>
