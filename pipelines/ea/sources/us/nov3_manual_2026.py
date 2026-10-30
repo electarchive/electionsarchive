@@ -50,6 +50,8 @@ COUNTIES = {
     "48167": ("TX", "https://www.galvestoncountytx.gov/our-county/county-clerk/elections", "MF-392/galveston/November-2026-General-Election-Ballot-and-Measures.pdf"),
     "48201": ("TX", "https://www.harrisvotes.com/", "../y26/tx/harris_sample.pdf"),
     "48085": ("TX", "https://www.collincountytx.gov/Elections", "../y26/tx/collin.pdf"),
+    "48121": ("TX", "https://www.dentoncounty.gov/elections", "../y26/tx/denton_preview.pdf"),
+    "48141": ("TX", "https://www.epcounty.com/elections/", "../y26/tx/tornillo_isd.pdf"),
     "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
 }
 
