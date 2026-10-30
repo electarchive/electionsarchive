@@ -2,6 +2,8 @@ import io
 import itertools
 import json
 import re
+import struct
+import subprocess
 import unicodedata
 import zipfile
 from datetime import UTC, date, datetime
@@ -19,10 +21,31 @@ from ea.sources.it.interno import key as estero_key
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/camera"
 DELIVERED = DATA / "inbox" / "manual"
+PAGES = DATA / "pages" / SOURCE
+SEAT_TABLE = Path(__file__).with_name("camera_seggi.tsv")
+SEAT_LAW = "https://www.edizionieuropee.it/LAW/HTML/17/zn39_04_00a.html"
+GAZZETTA = {
+    1948: (
+        "1948/02/06/30",
+        (
+            "Table A of Presidential Decree 26 of February 5, 1948 (Gazzetta Ufficiale 30, ordinary supplement, "
+            "February 6, 1948)"
+        ),
+    ),
+    1958: ("1958/03/17/67", "Presidential Decree 156 of 1958 (Gazzetta Ufficiale 67, March 17, 1958)"),
+    1963: ("1963/02/18/47", "Presidential Decree 65 of 1963 (Gazzetta Ufficiale 47, February 18, 1963)"),
+    1968: ("1968/03/11/67", "Presidential Decree 131 of 1968 (Gazzetta Ufficiale 67, March 11, 1968)"),
+    1972: ("1972/02/28/56", "Presidential Decree 22 of February 28, 1972 (Gazzetta Ufficiale 56, February 28, 1972)"),
+    1976: ("1976/05/04/116", "Presidential Decree 166 of May 3, 1976 (Gazzetta Ufficiale 116, May 4, 1976)"),
+    1979: ("1979/04/11/101", "Presidential Decree 118 of 1979 (Gazzetta Ufficiale 101, April 11, 1979)"),
+    1983: ("1983/05/05/122", "Presidential Decree 148 of May 5, 1983 (Gazzetta Ufficiale 122, May 5, 1983)"),
+    1987: ("1987/04/29/98", "Presidential Decree 162 of April 28, 1987 (Gazzetta Ufficiale 98, April 29, 1987)"),
+    1992: ("1992/02/07/31", "Presidential Decree 63 of February 2, 1992 (Gazzetta Ufficiale 31, February 7, 1992)"),
+}
 ELIGENDO = "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=I&tpe=A&lev0=0&levsut0=0&es0=S&ms=S"
 RIPARTIZIONE = (
     "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=E&tpe=T&lev0=0&levsut0=0"
@@ -491,6 +514,14 @@ NATIONAL_SEATS = (
 MIXED_SEATS = (
     "These are the {seats} proportional seats. The single-member deputies are counted in their own college contests."
 )
+SEATS_NOTE = "Each circoscrizione's seats are the number assigned to it by {citation}."
+GAZZETTA_NOTE = (
+    "Decrees that assigned the Chamber of Deputies' seats to each circoscrizione for the 1948 and 1958–1992 "
+    "elections, from scans of the official Gazzetta pages."
+)
+LAW_NOTE = (
+    "Text of Law 148 of March 31, 1953, whose annexed table assigned the Chamber's 590 seats to the 31 circoscrizioni."
+)
 ABROAD = (
     "Valle d'Aosta's single seat and the twelve seats elected by Italians abroad are counted in their own contests."
 )
@@ -765,6 +796,17 @@ def fetch() -> None:
             retrieved_at=datetime.fromtimestamp(page.stat().st_mtime, UTC),
             media_type="text/html",
         )
+    for year, (issue, _) in GAZZETTA.items():
+        pdf = DELIVERED / "MF-320" / f"it-camera-{year}-seggi.pdf"
+        raw.store(
+            SOURCE,
+            f"https://www.gazzettaufficiale.it/eli/gu/{issue}/sg/pdf",
+            pdf.read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime.fromtimestamp(pdf.stat().st_mtime, UTC),
+            media_type="application/pdf",
+        )
+    raw.fetch(SOURCE, SEAT_LAW, suffix=".html")
     for groups_url in GROUPS.values():
         raw.fetch(SOURCE, groups_url, suffix=".json")
     raw.fetch(SOURCE, url(NEXT), suffix=".zip")
@@ -1260,6 +1302,77 @@ def emit() -> Path:
         if chamber_record in cs.minted:
             raise ValueError("publish it.interno before it.storico")
         cs.artifact(raw.cached("it.interno", MANDATES), chamber_record)
+        state_acts = (
+            "No license stated. Official acts of the State are excluded from copyright (art. 5 of Law 633/1941)."
+        )
+        publisher, title = "Ministero della Giustizia", "Gazzetta Ufficiale della Repubblica Italiana, Serie generale"
+        gazzetta = cs.source(publisher, title)
+        cs.add(
+            "source",
+            id=gazzetta,
+            kind="official_body",
+            publisher=publisher,
+            title=title,
+            url="https://www.gazzettaufficiale.it/",
+            license=state_acts,
+            notes=GAZZETTA_NOTE,
+        )
+        publisher, title = "Edizioni Europee", "Legge 31 marzo 1953, n. 148"
+        law = cs.source(publisher, title)
+        cs.add(
+            "source",
+            id=law,
+            kind="compendium",
+            publisher=publisher,
+            title=title,
+            url=SEAT_LAW,
+            license=state_acts,
+            notes=LAW_NOTE,
+        )
+        cs.artifact(raw.cached(SOURCE, SEAT_LAW), law)
+        seat_table = pl.read_csv(SEAT_TABLE, separator="\t")
+        magnitudes = {(year, n): seats for year, n, seats in seat_table.select("year", "n", "seats").iter_rows()}
+        PAGES.mkdir(parents=True, exist_ok=True)
+        for year, number in (
+            seat_table.filter(pl.col("page").is_not_null()).select("year", "page").unique().sort("year").iter_rows()
+        ):
+            pdf = raw.cached(SOURCE, f"https://www.gazzettaufficiale.it/eli/gu/{GAZZETTA[year][0]}/sg/pdf")
+            artifact = cs.artifact(pdf, gazzetta)
+            image = PAGES / f"{pdf.sha256}-{number}.png"
+            if not image.exists():
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-r",
+                        "100",
+                        "-png",
+                        "-f",
+                        str(number),
+                        "-l",
+                        str(number),
+                        "-singlefile",
+                        str(pdf.path),
+                        str(image.with_suffix("")),
+                    ],
+                    check=True,
+                )
+            width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            cs.add(
+                "source_page",
+                id=cs.page(artifact, number),
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+        seat_notes = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'methodology' and n.body_md like 'Each circoscrizione''s seats %%'""",
+                [SOURCE],
+            ).fetchall()
+        )
         minted_countries: set[str] = set()
         restaged: dict[str, UUID] = {}
         estero_units: dict[str, UUID] = dict(
@@ -1719,6 +1832,18 @@ def emit() -> Path:
                 kind="context",
                 body_md=ELECTION_NOTE,
             )
+            if day < MATTARELLA:
+                cs.add(
+                    "note",
+                    **({"id": seat_notes[contest]} if contest in seat_notes else {}),
+                    entity_id=contest,
+                    kind="methodology",
+                    body_md=SEATS_NOTE.format(
+                        citation=GAZZETTA[year][1]
+                        if year in GAZZETTA
+                        else "the table annexed to Law 148 of March 31, 1953"
+                    ),
+                )
             counted = result_set(contest_key, election, contest)
             fresh = counted in cs.minted
             day_seats = seats.filter(pl.col("day") == day)
@@ -1806,6 +1931,7 @@ def emit() -> Path:
                     body_id=chamber,
                     district_area_id=area,
                     allocation_parent_id=contest,
+                    magnitude=magnitudes[(year, n)],
                     electoral_system_id=systems[system],
                     rules_override=override,
                     default_result_kind="counted",
