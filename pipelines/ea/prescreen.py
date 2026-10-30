@@ -42,11 +42,11 @@ Give exactly one verdict, the first that applies in this order:
 2. spam: advertising, unrelated links or text, gibberish, or a test or placeholder edit that adds nothing to the record (for example "test", "asdf", or a note that only says it should be rejected).
 3. malformed: the change cannot be what the contributor meant: values in the wrong field, broken encoding, a name in the wrong language or script for its label, a summary that contradicts the ops, or a change that does nothing useful.
 4. duplicate: another open proposal listed makes the same change to the same record.
-5. evidence_mismatch: archived evidence text is given, and the changed value (a name, a date, a figure, a color, a quote) is not in it or the text says something different. Allow for ordinary variants: diacritics, case, abbreviations, word order, and number formatting.
+5. evidence_mismatch: archived evidence text is given, and a name, date, figure, or quote that the change states is not in it or the text gives a different one. Only those four count. Allow for ordinary variants: diacritics, case, abbreviations, word order, and number formatting. Everything else a note says (causes, sequence, motives, characterizations, and context) is framing: when the text does not mention it, or words it differently without stating the opposite, give clean and mention it in the reason.
 6. missing_evidence: the change asserts a checkable fact (a name, a date, a figure, a period, a color, an identifier, or a factual claim in a note) and cites no evidence, or cites a source whose archived text we do not have and whose title gives no reason to think it supports the change. Notes that only explain the archive's own data, translations marked as machine or human, and images from Wikimedia Commons do not need evidence.
 7. clean: none of the above.
 
-The reason is one or two plain sentences a reviewer can act on: name the field or value at issue and what is wrong, or for clean, what you checked. Do not restate the verdict's definition."""
+The reason is one or two plain sentences a reviewer can act on: name the field or value at issue and what is wrong, or for clean, what you checked and any soft note for the reviewer, such as framing the source does not state. Do not restate the verdict's definition."""
 
 SCHEMA: dict[str, object] = {
     "type": "object",
