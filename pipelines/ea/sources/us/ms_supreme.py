@@ -36,6 +36,36 @@ CERTS_2004 = {
     "2004/CertNorthern.pdf": (3, 3, ("WILLIAM L. BILL BAMBACH", "GEORGE C. CARLSON")),
 }
 OCR_FIXES_2004 = {("2004/CertNorthern.pdf", "tallahatchie", 0): 1437}
+TOTALS_2018 = {
+    "Adams": 7765,
+    "Amite": 4185,
+    "Clarke": 5010,
+    "Covington": 5662,
+    "Forrest": 18355,
+    "Franklin": 2277,
+    "George": 5702,
+    "Greene": 2860,
+    "Hancock": 10026,
+    "Harrison": 41017,
+    "Jackson": 31043,
+    "Jasper": 5119,
+    "Jefferson Davis": 3439,
+    "Jones": 19384,
+    "Lamar": 16408,
+    "Lawrence": 3949,
+    "Lincoln": 10103,
+    "Marion": 7316,
+    "Pearl River": 11336,
+    "Perry": 3018,
+    "Pike": 9871,
+    "Simpson": 7042,
+    "Smith": 5135,
+    "Stone": 4112,
+    "Walthall": 3644,
+    "Wayne": 6046,
+    "Wilkinson": 1948,
+}
+COUNTY_SHEETS_2018 = [f"2018/{county} ({2 if county == 'Jefferson Davis' else 1}).pdf" for county in TOTALS_2018]
 SUMMARY_2016 = "Supreme Court Judge, District 1, Position 3.pdf"
 RECAP = "2016 GE Statewide Recap Report.pdf"
 CERTIFIED_2016 = {
@@ -56,8 +86,8 @@ def link(name: str) -> str:
 
 
 def fetch() -> None:
-    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004]:
-        path = (INBOX_363 if name in CERTS_2004 else INBOX) / name
+    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004, *COUNTY_SHEETS_2018]:
+        path = (INBOX_363 if name in CERTS_2004 or name in COUNTY_SHEETS_2018 else INBOX) / name
         raw.store(
             SOURCE,
             link(name),
@@ -173,6 +203,8 @@ def parse() -> None:
                         seen = 0
         if printed != sums:
             raise ValueError(f"{name}: counties sum to {sums}, printed totals {printed}")
+    for county, votes in TOTALS_2018.items():
+        rows.append((date(2018, 11, 6), 2, 1, "DAVID M. ISHEE", codes[re.sub(r"[^a-z]", "", county.lower())], votes))
     lines = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, link(RECAP)).path), "-"],
         capture_output=True,
@@ -274,7 +306,7 @@ def emit() -> Path:
                 url="https://www.sos.ms.gov/elections-voting/results",
                 license="Public record",
             )
-        for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016]:
+        for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004, *COUNTY_SHEETS_2018]:
             cs.artifact(raw.cached(SOURCE, link(name)), source)
         return {"MS": source}
 
