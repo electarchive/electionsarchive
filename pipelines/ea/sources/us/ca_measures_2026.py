@@ -171,6 +171,12 @@ def emit() -> Path:
             elif scheme == "us.school_district":
                 schools.setdefault(ceda._core(text), []).append(key)
         slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/ca/%%'").fetchall())
+        known = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.election' and value like %s", [f"{DAY}:CA:%"]
+            ).fetchall()
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -204,7 +210,10 @@ def emit() -> Path:
                 cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=row["url"])
                 cs.artifact(raw.cached(SOURCE, row["url"]), source)
             source = sources[row["url"]]
-            election = cs.key("us.election", f"{DAY}:CA:{'sd' if scheme == 'us.school_district' else ''}{code}")
+            election_key = f"{DAY}:CA:{code}"
+            if scheme == "us.school_district" and election_key not in known:
+                election_key = f"{DAY}:CA:sd{code}"
+            election = cs.key("us.election", election_key)
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
