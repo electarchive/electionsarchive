@@ -17,9 +17,11 @@
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import * as ToggleGroup from "#lib/components/ui/toggle-group/index.js";
   import {
+    commonsName,
     graphemes,
     hex,
     isDay,
+    isFree,
     kindLabel,
     languages,
     noteKindLabel,
@@ -100,6 +102,18 @@
   let newColor = $state<{ color: string; from: string; to: string } | null>(
     null,
   );
+  let image = $state<{ file: string; from: string; to: string } | null>(null);
+  let preview = $state<
+    | { state: "idle" | "invalid" | "looking" | "missing" | "unreachable" }
+    | {
+        state: "found";
+        name: string;
+        thumb: string;
+        license: string;
+        artist: string;
+        free: boolean;
+      }
+  >({ state: "idle" });
   let added = 0;
   let source = $state<string | null>(null);
   let mode = $state<"none" | "source" | "url" | "upload">("none");
@@ -134,6 +148,117 @@
     return () => {
       controller.abort();
     };
+  });
+
+  const imageName = $derived(image == null ? null : commonsName(image.file));
+
+  $effect(() => {
+    const file = image?.file.trim() ?? "";
+    const name = imageName;
+    if (name == null) {
+      preview = { state: file === "" ? "idle" : "invalid" };
+      return;
+    }
+    preview = { state: "looking" };
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      const query = new URLSearchParams({
+        action: "query",
+        format: "json",
+        formatversion: "2",
+        origin: "*",
+        redirects: "1",
+        prop: "imageinfo",
+        iiprop: "url|extmetadata",
+        iiurlwidth: "160",
+        iiextmetadatafilter: "License|LicenseShortName|Artist|Credit",
+        titles: `File:${name}`,
+      });
+      void fetch(`https://commons.wikimedia.org/w/api.php?${query}`, {
+        signal: controller.signal,
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error(response.statusText);
+          }
+          const body = (await response.json()) as {
+            query?: {
+              pages?: Array<{
+                title: string;
+                imageinfo?: Array<{
+                  url: string;
+                  thumburl?: string;
+                  extmetadata?: Record<string, { value: unknown }>;
+                }>;
+              }>;
+            };
+          };
+          const found = body.query?.pages?.[0];
+          const info = found?.imageinfo?.[0];
+          if (found == null || info == null) {
+            preview = { state: "missing" };
+            return;
+          }
+          const text = (key: string) =>
+            new DOMParser()
+              .parseFromString(
+                String(info.extmetadata?.[key]?.value ?? ""),
+                "text/html",
+              )
+              .body.textContent.trim();
+          const license = text("LicenseShortName");
+          preview = {
+            state: "found",
+            name: found.title.replace(/^File:/u, ""),
+            thumb: info.thumburl ?? info.url,
+            license,
+            artist: text("Artist") || text("Credit"),
+            free: isFree(text("License").toLowerCase(), license),
+          };
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) {
+            preview = { state: "unreachable" };
+          }
+        });
+    }, 350);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  });
+
+  const imageProblem = $derived.by(() => {
+    if (image == null) {
+      return null;
+    }
+    switch (preview.state) {
+      case "invalid": {
+        return m.edit_image_invalid();
+      }
+      case "missing": {
+        return m.edit_image_missing();
+      }
+      case "found": {
+        if (!preview.free) {
+          return m.edit_image_nonfree({
+            license: preview.license || m.edit_image_no_license(),
+          });
+        }
+        break;
+      }
+      case "idle":
+      case "looking":
+      case "unreachable": {
+        break;
+      }
+    }
+    const from = image.from.trim();
+    const to = image.to.trim();
+    if ((from !== "" && !isDay(from)) || (to !== "" && !isDay(to))) {
+      return m.edit_date_invalid();
+    }
+    return from !== "" && to !== "" && from >= to ? m.edit_color_order() : null;
   });
 
   const notes = $derived(data?.notes ?? []);
@@ -345,6 +470,14 @@
     if (colorChange != null) {
       list.push(colorChange);
     }
+    if (image != null && imageName != null) {
+      list.push({
+        kind: "image",
+        file: imageName,
+        from: image.from.trim() === "" ? null : image.from.trim(),
+        to: image.to.trim() === "" ? null : image.to.trim(),
+      });
+    }
     return list;
   });
   const invalid = $derived(
@@ -362,11 +495,16 @@
           idProblem(item, index) != null ||
           (item.scheme === "") !== (item.value.trim() === ""),
       ) ||
-      colorProblem != null,
+      colorProblem != null ||
+      imageProblem != null,
+  );
+  const dated = $derived(
+    image != null && (image.from.trim() !== "" || image.to.trim() !== ""),
   );
   const required = $derived(
     changes.some(
       (change) =>
+        (change.kind === "image" && dated) ||
         change.kind === "name" ||
         change.kind.startsWith("color_") ||
         (change.kind === "translate" && change.origin === "official"),
@@ -383,7 +521,7 @@
     ...(required ? [] : (["none"] as const)),
     ...(sources.length === 0 ? [] : (["source"] as const)),
     "url" as const,
-    "upload" as const,
+    ...(dated ? [] : (["upload"] as const)),
   ]);
   const shown = $derived(
     modes.find((option) => option === mode) ?? modes[0] ?? "url",
@@ -423,6 +561,7 @@
     addedIds = [];
     colorDraft = null;
     newColor = null;
+    image = null;
     source = null;
     mode = "none";
     link = { url: "", title: "", publisher: "", kind: "" };
@@ -658,6 +797,174 @@
               {/each}
             </dl>
           </section>
+
+          {#if data.kind != null}
+            {const portrait = $derived(data.kind === "person")}
+            <section class="border-be px-4 py-3" aria-labelledby="edit-images">
+              <h3 id="edit-images" class="text-sm font-bold">
+                {portrait ? m.edit_image_portrait() : m.edit_image_logo()}
+              </h3>
+              {#if data.images.length === 0 && image == null}
+                <p class="mbs-1 text-sm text-muted-foreground">
+                  {portrait
+                    ? m.edit_image_empty_portrait()
+                    : m.edit_image_empty_logo()}
+                </p>
+              {/if}
+              {#if data.images.length > 0}
+                <ul class="mbs-2 grid gap-2 text-sm">
+                  {#each data.images as item (item.path)}
+                    <li
+                      class="grid grid-cols-[4rem_minmax(0,1fr)] items-center gap-3"
+                    >
+                      <img
+                        src="/{item.path}"
+                        alt=""
+                        loading="lazy"
+                        class="rounded-xs border border-border bg-white object-contain p-1 block-16 inline-16"
+                      />
+                      <span class="grid gap-0.5 text-xs text-muted-foreground">
+                        {#if item.valid_from != null || item.valid_to != null}
+                          <span class="text-sm text-foreground"
+                            >{period(
+                              item.valid_from,
+                              item.valid_from_precision,
+                              item.valid_to,
+                              item.valid_to_precision,
+                            )}</span
+                          >
+                        {/if}
+                        {#if item.license != null}
+                          <span>{item.license}</span>
+                        {/if}
+                        {#if item.artist != null}
+                          <span class="truncate"
+                            >{m.edit_image_by({ artist: item.artist })}</span
+                          >
+                        {/if}
+                        {#if item.source_url != null}
+                          <a
+                            class="underline underline-offset-2 hover:text-foreground"
+                            href={item.source_url}
+                            rel="external noopener noreferrer"
+                            target="_blank">{m.edit_image_page()}</a
+                          >
+                        {/if}
+                      </span>
+                    </li>
+                  {/each}
+                </ul>
+              {/if}
+              {#if image != null}
+                <div
+                  class="contrib-settle mbs-2 grid gap-2 border-s-2 border-foreground ps-2 text-sm"
+                >
+                  <label class="grid gap-1 text-xs text-muted-foreground">
+                    {m.edit_image_file()}
+                    <Input
+                      bind:value={image.file}
+                      placeholder={m.edit_image_placeholder()}
+                      aria-invalid={preview.state === "invalid" ||
+                        preview.state === "missing" ||
+                        (preview.state === "found" && !preview.free)}
+                      autocomplete="off"
+                      spellcheck={false}
+                      maxlength={1000}
+                      class="text-sm block-8"
+                    />
+                  </label>
+                  {#if preview.state === "found"}
+                    <div
+                      class="grid grid-cols-[4rem_minmax(0,1fr)] items-center gap-3"
+                    >
+                      <img
+                        src={preview.thumb}
+                        alt={m.edit_image_alt({ file: preview.name })}
+                        referrerpolicy="no-referrer"
+                        class={cn(
+                          "rounded-xs border border-border bg-white object-contain p-1 block-16 inline-16",
+                          { "opacity-50 grayscale": !preview.free },
+                        )}
+                      />
+                      <span class="grid gap-0.5 text-xs text-muted-foreground">
+                        <span class="truncate text-sm text-foreground"
+                          >{preview.name}</span
+                        >
+                        <span
+                          >{preview.license || m.edit_image_no_license()}</span
+                        >
+                        {#if preview.artist !== ""}
+                          <span class="truncate"
+                            >{m.edit_image_by({ artist: preview.artist })}</span
+                          >
+                        {/if}
+                      </span>
+                    </div>
+                  {/if}
+                  {#if !portrait}
+                    <div class="grid grid-cols-2 gap-2">
+                      <label class="grid gap-1 text-xs text-muted-foreground">
+                        {m.edit_image_from()}
+                        <Input
+                          bind:value={image.from}
+                          placeholder="1998-01-31"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          maxlength={10}
+                          class="font-figures block-8"
+                        />
+                      </label>
+                      <label class="grid gap-1 text-xs text-muted-foreground">
+                        {m.edit_image_to()}
+                        <Input
+                          bind:value={image.to}
+                          placeholder="2004-12-31"
+                          inputmode="numeric"
+                          autocomplete="off"
+                          maxlength={10}
+                          class="font-figures block-8"
+                        />
+                      </label>
+                    </div>
+                  {/if}
+                  <div
+                    class="flex items-start justify-between gap-2 text-xs text-muted-foreground"
+                  >
+                    <span class="text-pretty" role="status">
+                      {#if imageProblem != null}
+                        <span class="text-destructive">{imageProblem}</span>
+                      {:else if preview.state === "looking"}
+                        {m.edit_image_looking()}
+                      {:else if preview.state === "unreachable"}
+                        {m.edit_image_unreachable()}
+                      {:else if preview.state === "idle"}
+                        {m.edit_image_hint()}
+                      {:else if dated}
+                        {m.edit_image_dates_link()}
+                      {:else if !portrait}
+                        {m.edit_image_dates()}
+                      {/if}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="shrink-0 px-2 text-xs block-7"
+                      onclick={() => (image = null)}
+                      >{m.edit_image_discard()}</Button
+                    >
+                  </div>
+                </div>
+              {:else if signedIn}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="mbs-2"
+                  onclick={() => (image = { file: "", from: "", to: "" })}
+                  ><PlusIcon />{m.edit_image_add()}</Button
+                >
+              {/if}
+            </section>
+          {/if}
 
           {#if data.kind === "party"}
             <section class="border-be px-4 py-3" aria-labelledby="edit-colors">

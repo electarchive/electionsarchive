@@ -168,6 +168,30 @@ export const translationLimit = (original: string) =>
 
 export const md5Pattern = /^[0-9a-f]{32}$/u;
 
+const commonsPattern =
+  /^(?:https?:\/\/commons\.(?:m\.)?wikimedia\.org\/wiki\/)?(?:(?:File|Image):)?([^/#?|[\]{}<>]+\.(?:svg|png|jpe?g|gif|tiff?|webp))$/iu;
+
+export const commonsName = (input: string) => {
+  const found = commonsPattern.exec(input.normalize("NFC").trim());
+  if (found?.[1] == null) {
+    return null;
+  }
+  try {
+    return decodeURIComponent(found[1]).replaceAll("_", " ").trim();
+  } catch {
+    return null;
+  }
+};
+
+const freeCode = /^(?:pd|cc0|cc-by(?:-sa)?-[0-9.]+(?:-[a-z]+)?)$/u;
+const freeName =
+  /^(?:Public domain|CC0(?: 1\.0)?|CC BY(?:-SA)? [0-9.]+(?: [A-Za-z]+)?|OGL(?: v?[0-9.]+)?|Copyrighted free use(?:-link)?|No restrictions|Attribution|PDM-owner|Licence Ouverte)$/u;
+
+export const isFree = (code: string, name: string) =>
+  !/\bnc\b|-nc-|\bnd\b|-nd-/u.test(code) &&
+  !/\bNC\b|\bND\b/u.test(name) &&
+  (freeCode.test(code) || freeName.test(name));
+
 export type Change =
   | { kind: "name"; id: string; text: string }
   | {
@@ -186,6 +210,7 @@ export type Change =
       origin: Origin;
       body: string;
     }
+  | { kind: "image"; file: string; from: string | null; to: string | null }
   | { kind: "id_add"; scheme: Scheme; value: string }
   | { kind: "id_drop"; scheme: Scheme; value: string }
   | { kind: "color_set"; from: string | null; color: string }
@@ -247,6 +272,16 @@ export type Editable = {
   }>;
   ids: Array<{ scheme: Scheme; value: string }>;
   kind: "party" | "person" | null;
+  images: Array<{
+    path: string;
+    license: string | null;
+    artist: string | null;
+    source_url: string | null;
+    valid_from: string | null;
+    valid_from_precision: Precision;
+    valid_to: string | null;
+    valid_to_precision: Precision;
+  }>;
   colors: Array<{
     color: string;
     valid_from: string | null;

@@ -26,81 +26,94 @@ export async function roles(userId: string | undefined) {
 }
 
 export async function editable(entityId: string): Promise<Editable> {
-  const [names, notes, ids, colors, kind, sources, open] = await Promise.all([
-    db.execute<Editable["names"][number]>(sql`
-      with shown as (
-        select id from name
-        where entity_id = ${entityId} and kind in ('official', 'english')
-        order by coalesce(valid @> current_date, false) desc,
-          coalesce(valid @> current_date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
-          (kind = 'english' and script = 'Latn') desc, is_preferred desc, (lang = 'en') desc,
-          (kind = 'official') desc, recorded_from desc, id
-        limit 1
-      )
-      select n.id, n.text, n.kind::text as kind, n.lang, n.script, n.is_preferred,
-             n.id in (select id from shown) as shown,
-             n.source_id, s.title as source, c.published_at::text as changed
-      from name n
-      left join source s on s.id = n.source_id
-      left join changeset c on c.id = n.changeset_id
-      where n.entity_id = ${entityId}
-      order by shown desc, n.is_preferred desc, n.kind, n.text
-    `),
-    db.execute<Editable["notes"][number]>(sql`
-      select n.id, n.kind::text as kind, n.body_md, n.lang, md5(n.body_md) as md5,
-             c.published_at::text as changed,
-             coalesce((
-               select json_agg(json_build_object(
-                        'lang', t.lang, 'body', t.body, 'origin', t.origin, 'stale', t.stale_from is not null
-                      ) order by t.lang)
-               from translation t
-               where t.source_md5 = md5(n.body_md)
-             ), '[]') as translations
-      from note n
-      left join changeset c on c.id = n.changeset_id
-      where n.entity_id = ${entityId} and n.kind <> 'retired'
-      order by n.recorded_from, n.id
-    `),
-    db.execute<Editable["ids"][number]>(sql`
-      select scheme, value
-      from external_id
-      where entity_id = ${entityId} and scheme = any(${`{${schemes.join(",")}}`}::text[])
-      order by scheme, value
-    `),
-    db.execute<Editable["colors"][number]>(sql`
-      select pc.color, pc.valid_from::text, pc.valid_from_precision::text as valid_from_precision,
-             pc.valid_to::text, pc.valid_to_precision::text as valid_to_precision, s.title as source
-      from party_color pc
-      left join source s on s.id = pc.source_id
-      where pc.party_id = ${entityId}
-      order by pc.valid_from nulls first
-    `),
-    db.execute<{ party: boolean; person: boolean }>(sql`
-      select exists (select from party where id = ${entityId}) as party,
-             exists (select from person where id = ${entityId}) as person
-    `),
-    db.execute<Editable["sources"][number]>(sql`
-      select s.id, s.title, s.publisher
-      from source s
-      where s.id in (
-        select source_id from name where entity_id = ${entityId} and source_id is not null
-        union
-        select source_id from citation where entity_id = ${entityId}
-        union
-        select source_id from party_color where party_id = ${entityId} and source_id is not null
-      )
-      order by s.title
-      limit 50
-    `),
-    db.execute<Editable["open"][number]>(sql`
-      select p.number, p.title, p.state::text as state
-      from proposal p
-      join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
-      where p.state in ('open', 'approved', 'changes_requested')
-        and r.diff -> 'entities' ? ${entityId}
-      order by p.number
-    `),
-  ]);
+  const [names, notes, ids, colors, kind, images, sources, open] =
+    await Promise.all([
+      db.execute<Editable["names"][number]>(sql`
+        with shown as (
+          select id from name
+          where entity_id = ${entityId} and kind in ('official', 'english')
+          order by coalesce(valid @> current_date, false) desc,
+            coalesce(valid @> current_date and not (lower_inf(valid) and upper_inf(valid)), false) desc,
+            (kind = 'english' and script = 'Latn') desc, is_preferred desc, (lang = 'en') desc,
+            (kind = 'official') desc, recorded_from desc, id
+          limit 1
+        )
+        select n.id, n.text, n.kind::text as kind, n.lang, n.script, n.is_preferred,
+               n.id in (select id from shown) as shown,
+               n.source_id, s.title as source, c.published_at::text as changed
+        from name n
+        left join source s on s.id = n.source_id
+        left join changeset c on c.id = n.changeset_id
+        where n.entity_id = ${entityId}
+        order by shown desc, n.is_preferred desc, n.kind, n.text
+      `),
+      db.execute<Editable["notes"][number]>(sql`
+        select n.id, n.kind::text as kind, n.body_md, n.lang, md5(n.body_md) as md5,
+               c.published_at::text as changed,
+               coalesce((
+                 select json_agg(json_build_object(
+                          'lang', t.lang, 'body', t.body, 'origin', t.origin, 'stale', t.stale_from is not null
+                        ) order by t.lang)
+                 from translation t
+                 where t.source_md5 = md5(n.body_md)
+               ), '[]') as translations
+        from note n
+        left join changeset c on c.id = n.changeset_id
+        where n.entity_id = ${entityId} and n.kind <> 'retired'
+        order by n.recorded_from, n.id
+      `),
+      db.execute<Editable["ids"][number]>(sql`
+        select scheme, value
+        from external_id
+        where entity_id = ${entityId} and scheme = any(${`{${schemes.join(",")}}`}::text[])
+        order by scheme, value
+      `),
+      db.execute<Editable["colors"][number]>(sql`
+        select pc.color, pc.valid_from::text, pc.valid_from_precision::text as valid_from_precision,
+               pc.valid_to::text, pc.valid_to_precision::text as valid_to_precision, s.title as source
+        from party_color pc
+        left join source s on s.id = pc.source_id
+        where pc.party_id = ${entityId}
+        order by pc.valid_from nulls first
+      `),
+      db.execute<{ party: boolean; person: boolean }>(sql`
+        select exists (select from party where id = ${entityId}) as party,
+               exists (select from person where id = ${entityId}) as person
+      `),
+      db.execute<Editable["images"][number]>(sql`
+        select path, license, artist, source_url, valid_from::text, valid_from_precision::text as valid_from_precision,
+               valid_to::text, valid_to_precision::text as valid_to_precision
+        from party_image
+        where party_id = ${entityId}
+        union all
+        select path, license, artist, source_url, taken_from::text, taken_from_precision::text,
+               taken_to::text, taken_to_precision::text
+        from person_image
+        where person_id = ${entityId}
+        order by valid_from nulls first, path
+      `),
+      db.execute<Editable["sources"][number]>(sql`
+        select s.id, s.title, s.publisher
+        from source s
+        where s.id in (
+          select source_id from name where entity_id = ${entityId} and source_id is not null
+          union
+          select source_id from citation where entity_id = ${entityId}
+          union
+          select source_id from party_color where party_id = ${entityId} and source_id is not null
+        )
+        order by s.title
+        limit 50
+      `),
+      db.execute<Editable["open"][number]>(sql`
+        select p.number, p.title, p.state::text as state
+        from proposal p
+        join proposal_revision r on r.proposal_id = p.id and r.changeset_id = p.head_changeset_id
+        where p.state in ('open', 'approved', 'changes_requested')
+          and r.diff -> 'entities' ? ${entityId}
+        order by p.number
+      `),
+    ]);
   return {
     names: names.rows,
     notes: notes.rows,
@@ -112,6 +125,7 @@ export async function editable(entityId: string): Promise<Editable> {
           ? "person"
           : null,
     colors: colors.rows,
+    images: images.rows,
     sources: sources.rows,
     open: open.rows,
   };
@@ -150,17 +164,32 @@ export async function propose({
   quote: string;
   summary: string;
 }) {
+  const hasDates = (change: Change) =>
+    change.kind === "image" && (change.from != null || change.to != null);
   const requiresSource = (change: Change) =>
+    hasDates(change) ||
     change.kind === "name" ||
     change.kind.startsWith("color_") ||
     (change.kind === "translate" && change.origin === "official");
   const canCite = (change: Change) =>
-    change.kind !== "translate" || change.origin === "official";
+    change.kind === "image"
+      ? hasDates(change)
+      : change.kind !== "translate" || change.origin === "official";
   if (evidence == null && changes.some((change) => requiresSource(change))) {
-    error(400, "A name, color, or official translation needs a source.");
+    error(
+      400,
+      "A name, color, logo date, or official translation needs a source.",
+    );
+  }
+  if (evidence?.type === "upload" && changes.some((change) => hasDates(change))) {
+    error(400, "Link the page that states the logo's dates.");
   }
   if (changes.filter((change) => change.kind.startsWith("color_")).length > 1) {
     error(400, "A proposal can change one color period.");
+  }
+  const image = changes.find((change) => change.kind === "image");
+  if (changes.filter((change) => change.kind === "image").length > 1) {
+    error(400, "A proposal can add one image.");
   }
   const nameIds = changes.flatMap((change) =>
     change.kind === "name" ? [change.id] : [],
@@ -189,7 +218,7 @@ export async function propose({
   const seen = translated.map((change) => `${change.note}:${change.md5}`);
   const sourceId = evidence?.type === "source" ? evidence.sourceId : null;
   const uploadId = evidence?.type === "upload" ? evidence.uploadId : null;
-  const { rows } = await db.execute<{ ok: boolean }>(sql`
+  const { rows } = await db.execute<{ ok: boolean; party: boolean }>(sql`
     select (select count(*) from name where id = any(${`{${nameIds.join(",")}}`}::uuid[]) and entity_id = ${entityId})
              = ${nameIds.length}
        and (select count(*) from note
@@ -205,7 +234,10 @@ export async function propose({
        and (${sourceId}::uuid is null or exists (select from source where id = ${sourceId}))
        and (${uploadId}::uuid is null or exists (
          select from upload where id = ${uploadId} and owner_user_id = ${userId} and status = 'ready'
-       )) as ok
+       ))
+       and (${image == null} or exists (select from person where id = ${entityId})
+            or exists (select from party where id = ${entityId})) as ok,
+       exists (select from party where id = ${entityId}) as party
   `);
   if (rows[0]?.ok !== true) {
     error(
@@ -276,6 +308,21 @@ export async function propose({
           lang: change.lang,
           origin: change.origin,
           body: change.body,
+        };
+      }
+      case "image": {
+        const owner = rows[0]?.party === true ? "party" : "person";
+        return {
+          op: "image",
+          table: `${owner}_image`,
+          values: {
+            [`${owner}_id`]: entityId,
+            file: change.file,
+            ...(owner === "party" &&
+              change.from != null && { valid_from: change.from }),
+            ...(owner === "party" &&
+              change.to != null && { valid_to: change.to }),
+          },
         };
       }
       case "id_add": {

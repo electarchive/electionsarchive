@@ -1,17 +1,21 @@
 import hashlib
+import io
 import json
 import shlex
 import subprocess
 import traceback
 import unicodedata
 from collections.abc import Callable
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Literal, LiteralString, TypedDict, cast
+from urllib.parse import unquote
 from uuid import UUID, uuid7
 
+import httpx
 import polars as pl
 import regex
+from PIL import Image, ImageOps
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
@@ -19,6 +23,7 @@ from ea import raw
 from ea.apply import _stage, apply, publish, revert
 from ea.capture import capture, resume
 from ea.changeset import Changeset, bcp47
+from ea.sources import party_logos, wikidata_photos
 from ea.store import DATA, ROOT, Connection, connect
 from ea.uploads import process, sweep
 
@@ -102,6 +107,8 @@ TIERS = {
             "name",
             "label",
             "party_color",
+            "party_image",
+            "person_image",
             "translation",
             "name_drop",
             "note_drop",
@@ -115,6 +122,13 @@ TIERS = {
 KEYED = {"translation": ("source_md5", "lang"), "external_id": ("scheme", "value")}
 
 COLOR = regex.compile(r"#[0-9a-f]{6}")
+
+COMMONS_FILE = regex.compile(
+    r"(?:https?://commons\.(?:m\.)?wikimedia\.org/wiki/)?(?:(?:File|Image):)?([^/#?|\[\]{}<>]+\.(?:svg|png|jpe?g|gif|tiff?|webp))",
+    regex.IGNORECASE,
+)
+
+IMAGES = {"party_image": ("party", "party_id"), "person_image": ("person", "person_id")}
 
 ROW_DROP_TIERS = {"label": 1}
 
@@ -361,6 +375,158 @@ def _carry(conn: Connection, cs: Changeset, before: str, after: str, lang: str) 
             source_id=source,
             stale_from=None if stale == _md5(after) else stale,
         )
+
+
+def _webp(image: Image.Image, folder: Path, quality: int) -> str:
+    buffer = io.BytesIO()
+    image.save(buffer, "WEBP", quality=quality, method=6)
+    content = buffer.getvalue()
+    name = f"{hashlib.sha256(content).hexdigest()}.webp"
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / name).write_bytes(content)
+    return name
+
+
+def _image(
+    conn: Connection, cs: Changeset, op: Op, where: str, added: set[UUID], dated_url: str | None
+) -> tuple[UUID, str]:
+    table = str(op.get("table"))
+    if op.get("op") != "image" or table not in IMAGES:
+        raise ValueError(f"{where}: image adds a party_image or a person_image")
+    kind, column = IMAGES[table]
+    values = dict(op.get("values") or {})
+    allowed = {column, "file"} | ({"valid_from", "valid_to"} if kind == "party" else set())
+    if unknown := sorted(values.keys() - allowed):
+        raise ValueError(f"{where}: an image takes no {', '.join(unknown)}")
+    owner = _uuid(values.get(column), f"{where}.values.{column}")
+    owner = cs.survivors.get(owner, owner)
+    if conn.execute(sql.SQL("select from {} where id = %s").format(sql.Identifier(kind)), [owner]).fetchone() is None:
+        raise ValueError(f"{where}: {kind} {owner} does not exist")
+    found = COMMONS_FILE.fullmatch(unicodedata.normalize("NFC", str(values.get("file") or "")).strip())
+    if found is None:
+        raise ValueError(f"{where}: give a Wikimedia Commons file name or file page URL")
+    file = unquote(found.group(1)).replace("_", " ").strip()
+    module = party_logos if kind == "party" else wikidata_photos
+    listing = raw.fetch("contrib", module._commons([file])[0], suffix=".json")
+    pages = json.loads(listing.path.read_text(encoding="utf-8"))["query"].get("pages") or []
+    page = pages[0] if pages else None
+    if page is None or "imageinfo" not in page:
+        raise ValueError(f"{where}: Wikimedia Commons has no file {file!r}")
+    info = page["imageinfo"][0]
+    meta = {key: str(value["value"]) for key, value in (info.get("extmetadata") or {}).items()}
+    license = wikidata_photos._text(meta.get("LicenseShortName", ""))
+    if not wikidata_photos._free({"code": meta.get("License", "").lower(), "license": license}):
+        raise ValueError(
+            f"{where}: {file} is under {license or 'no stated license'}; "
+            "only public domain, CC0, CC BY, and CC BY-SA files can be added"
+        )
+    page_url = str(info["descriptionurl"])
+    if conn.execute(
+        sql.SQL("select from {} where {} = %s and source_url = %s").format(
+            sql.Identifier(table), sql.Identifier(column)
+        ),
+        [owner, page_url],
+    ).fetchone():
+        raise ValueError(f"{where}: this {kind} already has {file}")
+    thumb = str(info.get("thumburl") or info["url"])
+    if httpx.URL(thumb).host not in ("upload.wikimedia.org", "thumb.wikimedia.org"):
+        raise ValueError(f"{where}: Wikimedia Commons served {file} from an unexpected host")
+    artifact = raw.fetch("contrib", thumb, suffix=Path(httpx.URL(thumb).path).suffix.lower() or ".png")
+    title = str(page["title"])
+    artist = wikidata_photos._credit(meta.get("Artist", "")) or wikidata_photos._credit(meta.get("Credit", ""))
+    source = cs.source("Wikimedia Commons", title)
+    if source in cs.minted and source not in added:
+        added.add(source)
+        cs.add(
+            "source",
+            id=source,
+            kind="community",
+            publisher="Wikimedia Commons",
+            title=title,
+            url=page_url,
+            license=license,
+            attribution=artist or None,
+        )
+    cs.artifact(listing, source)
+    cs.artifact(artifact, source)
+    uploaded = datetime.fromisoformat(info["timestamp"]) if info.get("timestamp") else None
+    with Image.open(artifact.path) as opened:
+        opened.load()
+        image = ImageOps.exif_transpose(opened)
+    if kind == "person":
+        if image.mode in ("RGBA", "LA", "P"):
+            image = image.convert("RGBA")
+            background = Image.new("RGB", image.size, "white")
+            background.paste(image, mask=image.getchannel("A"))
+            image = background
+        image = image.convert("RGB")
+        if image.width > wikidata_photos.WIDTH:
+            image = image.resize(
+                (wikidata_photos.WIDTH, round(image.height * wikidata_photos.WIDTH / image.width)),
+                Image.Resampling.LANCZOS,
+            )
+        taken, (taken_from, from_precision, taken_to, to_precision) = wikidata_photos._taken(
+            meta.get("DateTimeOriginal", "")
+        )
+        latest = None if uploaded is None else uploaded.date() + timedelta(days=2)
+        if (taken_from is not None and taken_to is not None and taken_from > taken_to) or (
+            latest is not None and taken_from is not None and taken_from > latest
+        ):
+            taken_from, from_precision, taken_to, to_precision = None, "unknown", None, "unknown"
+        if latest is not None and taken_to is not None and taken_to > latest and uploaded is not None:
+            taken_to, to_precision = uploaded.date(), "day"
+        cs.add(
+            "person_image",
+            id=uuid7(),
+            person_id=owner,
+            path=f"photos/{_webp(image, wikidata_photos.PHOTOS, 80)}",
+            license=license,
+            artist=artist or None,
+            source_url=page_url,
+            source_id=source,
+            taken_text=taken,
+            taken_from=taken_from,
+            taken_from_precision=from_precision,
+            taken_to=taken_to,
+            taken_to_precision=to_precision,
+            uploaded_at=uploaded,
+        )
+        return owner, title
+    start = _day(values.get("valid_from"), f"{where}.values.valid_from")
+    end = _day(values.get("valid_to"), f"{where}.values.valid_to")
+    if start is not None and end is not None and start >= end:
+        raise ValueError(f"{where}: valid_from must come before valid_to")
+    dated = start is not None or end is not None
+    if dated and dated_url is None:
+        raise ValueError(f"{where}: a logo's dates need evidence that links to the page stating them")
+    made = party_logos._renditions(image)
+    if made is None:
+        raise ValueError(f"{where}: {file} has nothing to show once its background is cleared")
+    mark, lockup, shape, plate, light = made
+    cs.add(
+        "party_image",
+        id=uuid7(),
+        party_id=owner,
+        path=f"logos/{_webp(lockup, party_logos.LOGOS, 90)}",
+        width=lockup.width,
+        height=lockup.height,
+        mark_path=f"logos/{_webp(mark, party_logos.LOGOS, 90)}",
+        shape=shape,
+        is_plate=plate,
+        is_light=light,
+        license=license,
+        artist=artist or None,
+        source_url=page_url,
+        source_id=source,
+        valid_from=start,
+        valid_from_precision="unknown" if start is None else "day",
+        valid_to=end,
+        valid_to_precision="unknown" if end is None else "day",
+        dated_by="source" if dated else None,
+        dated_url=dated_url if dated else None,
+        uploaded_at=uploaded,
+    )
+    return owner, title
 
 
 def _source(cs: Changeset, item: Evidence, where: str, added: set[UUID], url: str | None) -> UUID:
@@ -657,6 +823,24 @@ def compile(
                         proofs.get(key, {}),
                         {"table": "party_color", "row": label, "column": column, "op": op.get("op")},
                     )
+            continue
+        if op.get("op") == "image":
+            linked = None
+            if cited:
+                linked = str(evidence[cited[0]].get("url") or "") or None
+                if linked is None:
+                    row = conn.execute("select url from source where id = %s", [sources[cited[0]]]).fetchone()
+                    linked = None if row is None else row[0]
+            owner, label = _image(conn, cs, op, where, added, linked)
+            for key in cited:
+                _cite(
+                    cs,
+                    owner,
+                    sources[key],
+                    evidence[key],
+                    proofs.get(key, {}),
+                    {"table": op.get("table"), "row": label, "op": "image"},
+                )
             continue
         if op.get("op") == "translate":
             note = str((op.get("of") or {}).get("id"))

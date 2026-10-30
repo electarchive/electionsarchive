@@ -1,6 +1,7 @@
 import { error } from "@sveltejs/kit";
 import * as v from "valibot";
 import {
+  commonsName,
   graphemes,
   hex,
   isDay,
@@ -73,6 +74,20 @@ const Change = v.variant("kind", [
       v.maxLength(400_000),
     ),
   }),
+  v.pipe(
+    v.object({
+      kind: v.literal("image"),
+      file: v.pipe(
+        v.string(),
+        v.maxLength(1000),
+        v.transform(commonsName),
+        v.string(),
+      ),
+      from: v.nullable(Day),
+      to: v.nullable(Day),
+    }),
+    v.check(({ from, to }) => from == null || to == null || from < to),
+  ),
   Reference("id_add"),
   Reference("id_drop"),
   v.object({ kind: v.literal("color_set"), from: v.nullable(Day), color: Hex }),

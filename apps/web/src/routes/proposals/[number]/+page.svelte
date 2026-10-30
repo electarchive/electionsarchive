@@ -76,6 +76,8 @@
     translation: m.proposal_table_translation,
     external_id: m.proposal_table_external_id,
     party_color: m.proposal_table_party_color,
+    party_image: m.proposal_table_party_image,
+    person_image: m.proposal_table_person_image,
   };
   const fields: Record<string, () => string> = {
     source_id: m.proposal_field_source,
@@ -86,6 +88,10 @@
     color: m.proposal_field_color,
     valid_from: m.proposal_field_valid_from,
     valid_to: m.proposal_field_valid_to,
+    license: m.proposal_field_license,
+    artist: m.proposal_field_artist,
+    source_url: m.proposal_field_source_url,
+    taken_text: m.proposal_field_taken_text,
   };
   const hidden = new Set([
     "entity_id",
@@ -96,9 +102,25 @@
     "stale_from",
     "valid_from_precision",
     "valid_to_precision",
+    "party_id",
+    "person_id",
+    "mark_path",
+    "width",
+    "height",
+    "shape",
+    "is_plate",
+    "is_light",
+    "dated_by",
+    "dated_url",
+    "uploaded_at",
+    "taken_from",
+    "taken_from_precision",
+    "taken_to",
+    "taken_to_precision",
   ]);
-  const unlabeled = new Set(["text", "body_md", "body"]);
+  const unlabeled = new Set(["text", "body_md", "body", "path"]);
   const order = [
+    "path",
     "text",
     "body_md",
     "body",
@@ -110,6 +132,10 @@
     "color",
     "valid_from",
     "valid_to",
+    "license",
+    "artist",
+    "taken_text",
+    "source_url",
     "source_id",
   ];
   const rank = (field: string) => {
@@ -344,39 +370,54 @@
                     >{fields[field]?.() ?? field}</span
                   >
                 {/if}
-                {#if field === "color"}
-                  {const swatches = $derived(
-                    [before, after].filter(
-                      (value): value is string => typeof value === "string",
-                    ),
-                  )}
-                  {#each swatches as swatch, index (index)}
-                    <span
-                      class="self-center rounded-xs border border-foreground/20 block-3.5 inline-3.5"
-                      style:background-color={swatch}
-                      aria-hidden="true"
-                    ></span>
-                  {/each}
-                {/if}
-                <Proof
-                  class={cn("flex-wrap", {
-                    "whitespace-pre-line": field === "body",
-                  })}
-                  lang={row.table === "translation" && field === "body"
-                    ? row.key.lang
-                    : undefined}
-                  before={shown(
-                    field,
-                    before,
-                    row.fields[`${field}_precision`]?.[0],
-                  )}
-                  after={shown(
-                    field,
-                    after,
-                    row.fields[`${field}_precision`]?.[1] ??
+                {#if field === "path" && typeof after === "string"}
+                  <img
+                    src="/{after}"
+                    alt=""
+                    class="rounded-xs border border-border bg-white object-contain p-1 max-block-24 max-inline-full"
+                  />
+                {:else if field === "source_url" && typeof after === "string"}
+                  <a
+                    class="truncate underline-offset-2 min-inline-0 hover:underline"
+                    href={after}
+                    rel="external nofollow noopener noreferrer"
+                    target="_blank">{after}</a
+                  >
+                {:else}
+                  {#if field === "color"}
+                    {const swatches = $derived(
+                      [before, after].filter(
+                        (value): value is string => typeof value === "string",
+                      ),
+                    )}
+                    {#each swatches as swatch, index (index)}
+                      <span
+                        class="self-center rounded-xs border border-foreground/20 block-3.5 inline-3.5"
+                        style:background-color={swatch}
+                        aria-hidden="true"
+                      ></span>
+                    {/each}
+                  {/if}
+                  <Proof
+                    class={cn("flex-wrap", {
+                      "whitespace-pre-line": field === "body",
+                    })}
+                    lang={row.table === "translation" && field === "body"
+                      ? row.key.lang
+                      : undefined}
+                    before={shown(
+                      field,
+                      before,
                       row.fields[`${field}_precision`]?.[0],
-                  )}
-                />
+                    )}
+                    after={shown(
+                      field,
+                      after,
+                      row.fields[`${field}_precision`]?.[1] ??
+                        row.fields[`${field}_precision`]?.[0],
+                    )}
+                  />
+                {/if}
               </span>
             {/each}
           </span>
