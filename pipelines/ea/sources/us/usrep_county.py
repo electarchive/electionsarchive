@@ -26,6 +26,7 @@ def emit(
     promote: frozenset[str] = frozenset(),
     statewide: bool = False,
 ) -> Path:
+    frame = frame.with_columns(pl.lit(state).alias("state")) if "state" not in frame.columns else frame
     with connect() as conn:
         cs = Changeset(conn, pipeline=source_name, version=version, summary=summary, polity="US")
         source = cs.source(publisher, title)
@@ -51,6 +52,7 @@ def emit(
                 f"select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '{prefix}%%'"
             ).fetchall()
         )
+        states = frame["state"].unique().to_list()
         numbered = pl.col("district").cast(pl.String).str.split(":").list.first()
         split = {
             (day, county)
@@ -60,12 +62,12 @@ def emit(
         contests = dict(
             conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s",
-                [f":{state}:(house:|(president|governor|senate)(:[a-z]+)?$)"],
+                [f":({'|'.join(states)}):(house:|(president|governor|senate)(:[a-z]+)?$)"],
             )
         )
-        for (day, district), rows in frame.group_by("day", "district", maintain_order=True):
+        for (day, district, row_state), rows in frame.group_by("day", "district", "state", maintain_order=True):
             house = not statewide and str(district).split(":")[0].isdigit()
-            key = f"{day}:{state}:house:{district}" if house else f"{day}:{state}:{district}"
+            key = f"{day}:{row_state}:house:{district}" if house else f"{day}:{row_state}:{district}"
             contest = contests.get(key)
             if contest is None:
                 print(f"{key}: no contest in the archive")
@@ -204,7 +206,7 @@ def emit(
                     cs.add(
                         "reporting_unit",
                         id=unit_ids[county],
-                        polity_id=cs.polity(f"US-{state}"),
+                        polity_id=cs.polity(f"US-{row_state}"),
                         scheme_code="us.county_part",
                         code=part,
                         parent_id=units[county],
