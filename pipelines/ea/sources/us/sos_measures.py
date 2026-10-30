@@ -333,6 +333,15 @@ NC = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
 NC_DAYS = (date(2004, 11, 2), date(2010, 11, 2))
 WV = "https://web.archive.org/web/20130612072655id_/http://www.sos.wv.gov/elections/history/electionreturns/Documents/{0}/{0}%20Constitutional%20Amendment{1}.pdf"
 WV_FILES = {date(2000, 11, 7): "%20Gen", date(2002, 11, 5): "", date(2004, 11, 2): ""}
+WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
+WI_FILES = {
+    date(2000, 11, 7): ("20200114182421", "2000_Referendum_County_Returns.pdf", ("Extend Right to Vote to Adult Children of US Citizens",)),
+    date(2006, 11, 7): (
+        "20200114182227",
+        "2006_FallElection_Referendum_CountyReturns.pdf",
+        ("Definition of Marriage", "Death Penalty-Advisory"),
+    ),
+}
 KS = "https://sos.ks.gov/elections/22elec/"
 KS_2022 = (
     (
@@ -987,6 +996,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "WI": (
+        "Wisconsin Elections Commission",
+        "Canvass results by county",
+        "https://elections.wi.gov/elections-voting/results",
+    ),
     "WV": (
         "West Virginia Secretary of State",
         "Official election returns by county",
@@ -1333,6 +1347,9 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    for stamp, file, _ in WI_FILES.values():
+        raw.fetch(SOURCE, WI.format(stamp, file), suffix=".pdf")
+        time.sleep(1)
     for day, suffix in WV_FILES.items():
         raw.fetch(SOURCE, WV.format(day.year, suffix), suffix=".pdf")
         time.sleep(1)
@@ -3777,6 +3794,50 @@ def west_virginia() -> list[dict[str, object]]:
     return rows
 
 
+def wisconsin() -> list[dict[str, object]]:
+    line = re.compile(r"^\s*([A-Z][A-Za-z. ]+?) County\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$")
+    final = re.compile(r"Office Totals\s*:\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)")
+    rows: list[dict[str, object]] = []
+    for day, (stamp, file, titles) in WI_FILES.items():
+        url = WI.format(stamp, file)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        position = 0
+        counties: set[str] = set()
+        start = len(rows)
+        for text_line in text.splitlines():
+            match = line.match(text_line)
+            if match is not None:
+                counties.add(match[1])
+                for answer, votes in (("YES", match[3]), ("NO", match[4])):
+                    rows.append(
+                        {
+                            "state": "WI",
+                            "day": day,
+                            "number": str(position + 1),
+                            "label": titles[position],
+                            "url": url,
+                            "county": match[1],
+                            "answer": answer,
+                            "votes": int(votes.replace(",", "")),
+                        }
+                    )
+                continue
+            total = final.search(text_line)
+            if total is None:
+                continue
+            sums = tuple(
+                sum(row["votes"] for row in rows[start:] if row["number"] == str(position + 1) and row["answer"] == answer)
+                for answer in ("YES", "NO")
+            )
+            if len(counties) != 72 or sums != (int(total[2].replace(",", "")), int(total[3].replace(",", ""))):
+                raise ValueError(f"{url} {titles[position]}: {len(counties)} counties, sums {sums} differ from {total.groups()}")
+            counties = set()
+            position += 1
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -4389,6 +4450,7 @@ def parse() -> None:
             *kansas(),
             *north_carolina(),
             *west_virginia(),
+            *wisconsin(),
             *utah(),
             *wyoming(),
             *south_carolina(),
