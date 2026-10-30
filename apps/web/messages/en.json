@@ -1838,6 +1838,7 @@
   "cmd_palette_on": "Enable colorblind-safe colors",
   "cmd_palette_off": "Disable colorblind-safe colors",
   "cmd_copy_link": "Copy link to this view",
+  "cmd_edit": "Edit this page",
   "cmd_compare_parent": "Compare {place} with {parent}",
   "search_keys_move": "Move",
   "search_keys_open": "Open",

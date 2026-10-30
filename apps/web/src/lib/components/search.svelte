@@ -13,7 +13,9 @@
   import MapPinIcon from "@lucide/svelte/icons/map-pin";
   import MonitorIcon from "@lucide/svelte/icons/monitor";
   import MoonIcon from "@lucide/svelte/icons/moon";
+  import PencilIcon from "@lucide/svelte/icons/pencil";
   import SearchIcon from "@lucide/svelte/icons/search";
+  import SquarePenIcon from "@lucide/svelte/icons/square-pen";
   import SunIcon from "@lucide/svelte/icons/sun";
   import UserIcon from "@lucide/svelte/icons/user";
   import VoteIcon from "@lucide/svelte/icons/vote";
@@ -24,11 +26,12 @@
   import Logo from "#lib/components/logo.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import { date } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { finder } from "#lib/search.svelte.js";
+  import { editable, finder } from "#lib/search.svelte.js";
 
   const GROUPS = [
     { type: "polity", heading: m.search_group_polity, icon: MapPinIcon },
@@ -143,9 +146,30 @@
             icon: LinkIcon,
             run: () =>
               void navigator.clipboard
-                .writeText(page.url.href)
+                .writeText((page.shallow?.url ?? page.url).href)
                 .then(() => toast.success(m.export_copied())),
           },
+          ...(editable.entity == null
+            ? []
+            : [
+                {
+                  key: "edit",
+                  label: m.cmd_edit(),
+                  icon: PencilIcon,
+                  run: () => keep({ edit: "" }),
+                },
+                ...(page.data.user == null
+                  ? []
+                  : [
+                      {
+                        key: "workspace",
+                        label: m.ws_open(),
+                        icon: SquarePenIcon,
+                        run: () =>
+                          void goto(resolve(`/edit?record=${editable.entity}`)),
+                      },
+                    ]),
+              ]),
           ...(parent == null
             ? []
             : [

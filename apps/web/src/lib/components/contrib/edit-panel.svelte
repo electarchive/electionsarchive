@@ -47,6 +47,7 @@
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
+  import { editable } from "#lib/search.svelte.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -55,7 +56,9 @@
     title,
   }: { entity: string; label: string; title: string } = $props();
 
-  const open = $derived(page.url.searchParams.has("edit"));
+  const open = $derived(
+    (page.shallow?.url ?? page.url).searchParams.has("edit"),
+  );
   const signedIn = $derived(page.data.user != null);
   const locale = getLocale();
   const languageName = new Intl.DisplayNames([locale], { type: "language" });
@@ -135,6 +138,15 @@
   let badFigures = $state(false);
   let labelChanges = $state<Array<Change>>([]);
   let badLabel = $state(false);
+
+  $effect(() => {
+    editable.entity = entity;
+    return () => {
+      if (editable.entity === entity) {
+        editable.entity = null;
+      }
+    };
+  });
 
   $effect(() => {
     if (!open) {
