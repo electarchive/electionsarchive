@@ -186,6 +186,7 @@ export async function proposal(number: number) {
         title: string;
         url: string | null;
         captured: string | null;
+        wayback: string | null;
       }> | null;
       titles: Record<string, string> | null;
     }>(sql`
@@ -194,7 +195,8 @@ export async function proposal(number: number) {
                        'key', e.key,
                        'title', coalesce(s.title, e.value ->> 'title'),
                        'url', coalesce(s.url, e.value ->> 'url'),
-                       'captured', a.captured_at
+                       'captured', a.captured_at,
+                       'wayback', a.wayback_url
                      ) order by e.key)
               from jsonb_each(r.payload -> 'evidence') e
               left join source s on s.id::text = e.value ->> 'source'

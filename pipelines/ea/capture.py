@@ -1,6 +1,8 @@
+import heapq
 import ipaddress
 import mimetypes
 import socket
+import threading
 import time
 import urllib.robotparser
 from dataclasses import dataclass
@@ -9,9 +11,10 @@ from urllib.parse import urljoin, urlsplit
 from uuid import UUID
 
 import httpx
+import psycopg
 
 from ea import raw
-from ea.store import Connection
+from ea.store import Connection, connect
 
 URL_LIMIT = 2_048
 BYTES_LIMIT = 50 * 1024 * 1024
@@ -19,6 +22,9 @@ ROBOTS_LIMIT = 512 * 1024
 DEADLINE = 60.0
 HOPS = 5
 PORTS = {"http": 80, "https": 443}
+WAYBACK = "https://web.archive.org"
+WAYBACK_DELAYS = (0.0, 60.0, 300.0, 1_800.0, 7_200.0)
+WAYBACK_PACE = 5.0
 COLUMNS = ("url", "owner_user_id", "status", "error", "final_url", "raw_sha256", "raw_key", "media_type", "bytes")
 
 
@@ -119,6 +125,70 @@ def _allowed(url: str, deadline: float) -> None:
         raise Blocked("robots.txt disallows archiving this URL")
 
 
+def _snapshot(url: str, since: datetime) -> str | None:
+    with httpx.Client(timeout=httpx.Timeout(120.0), headers={"User-Agent": raw.USER_AGENT}) as client:
+        response = client.get(f"{WAYBACK}/save/{url}")
+        for header in ("content-location", "location"):
+            found = response.headers.get(header)
+            if found is not None and "/web/" in found:
+                return urljoin(WAYBACK, found)
+        if response.status_code == 429 or response.status_code >= 500:
+            response.raise_for_status()
+        stamp = since.strftime("%Y%m%d%H%M%S")
+        closest = (
+            client.get("https://archive.org/wayback/available", params={"url": url, "timestamp": stamp})
+            .raise_for_status()
+            .json()
+            .get("archived_snapshots", {})
+            .get("closest")
+        )
+    if closest is not None and closest.get("available") and str(closest.get("timestamp", "")) >= stamp:
+        return str(closest["url"]).replace("http://", "https://", 1)
+    return None
+
+
+_due: list[tuple[float, int, str, str, datetime]] = []
+_wake = threading.Condition()
+_thread: threading.Thread | None = None
+
+
+def _wayback() -> None:
+    while True:
+        with _wake:
+            while not _due or _due[0][0] > time.monotonic():
+                _wake.wait(None if not _due else _due[0][0] - time.monotonic())
+            _, attempt, id, url, since = heapq.heappop(_due)
+        try:
+            found = _snapshot(url, since)
+            if found is not None:
+                with connect() as conn:
+                    conn.execute("update archive_capture set wayback_url = %s where id = %s", [found, id])
+        except httpx.HTTPError, psycopg.Error, ValueError:
+            found = None
+        if found is None and attempt + 1 < len(WAYBACK_DELAYS):
+            _later(id, url, since, attempt + 1)
+        time.sleep(WAYBACK_PACE)
+
+
+def _later(id: str, url: str, since: datetime, attempt: int = 0) -> None:
+    global _thread
+    with _wake:
+        heapq.heappush(_due, (time.monotonic() + WAYBACK_DELAYS[attempt], attempt, id, url, since))
+        if _thread is None:
+            _thread = threading.Thread(target=_wayback, name="wayback", daemon=True)
+            _thread.start()
+        _wake.notify()
+
+
+def resume(conn: Connection) -> None:
+    for id, url, since in conn.execute(
+        """select id, url, captured_at from archive_capture
+           where status = 'captured' and wayback_url is null and captured_at > now() - interval '1 day'
+           order by captured_at"""
+    ).fetchall():
+        _later(str(id), url, since)
+
+
 _last = 0.0
 
 
@@ -166,4 +236,6 @@ def capture(conn: Connection, url: str, owner: UUID | None) -> tuple[UUID, str, 
     ).fetchone()
     if found is None:
         raise RuntimeError("the archive_capture insert returned no row")
+    if row["status"] == "captured":
+        _later(str(found[0]), url, datetime.now(UTC))
     return found[0], str(row["status"]), None if row["error"] is None else str(row["error"])

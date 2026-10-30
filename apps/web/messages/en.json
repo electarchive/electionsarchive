@@ -2455,6 +2455,7 @@
   "source_kind_academic": "Academic",
   "source_kind_community": "Community project",
   "proposal_archived": "Archived copy",
+  "proposal_wayback": "Wayback Machine copy",
   "proposal_title": "Proposal #{number}",
   "proposal_state_draft": "Draft",
   "proposal_state_open": "Open",

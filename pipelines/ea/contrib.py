@@ -16,7 +16,7 @@ from psycopg.types.json import Jsonb
 
 from ea import raw
 from ea.apply import _stage, apply, publish, revert
-from ea.capture import capture
+from ea.capture import capture, resume
 from ea.changeset import Changeset, bcp47
 from ea.store import DATA, ROOT, Connection, connect
 
@@ -200,7 +200,9 @@ def _carry(conn: Connection, cs: Changeset, before: str, after: str, lang: str) 
         )
 
 
-def _linked(conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]) -> UUID:
+def _linked(
+    conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]
+) -> tuple[UUID, dict[str, str]]:
     title = unicodedata.normalize("NFC", str(item.get("title") or "")).strip()
     publisher = unicodedata.normalize("NFC", str(item.get("publisher") or "")).strip()
     if not title or not publisher:
@@ -210,13 +212,13 @@ def _linked(conn: Connection, cs: Changeset, item: Evidence, author: UUID, where
         raise ValueError(f"{where}: kind must be one of {', '.join(SOURCE_KINDS)}")
     capture = _uuid(item.get("capture"), f"{where}.capture")
     row = conn.execute(
-        """select url, final_url, raw_sha256, raw_key, media_type, bytes, captured_at from archive_capture
+        """select url, final_url, raw_sha256, raw_key, media_type, bytes, captured_at, wayback_url from archive_capture
            where id = %s and status = 'captured' and owner_user_id = %s""",
         [capture, author],
     ).fetchone()
     if row is None:
         raise ValueError(f"{where}: capture {capture} is not an archived copy of this author's")
-    url, final_url, sha256, key, media_type, size, captured_at = row
+    url, final_url, sha256, key, media_type, size, captured_at, wayback = row
     if url != item.get("url"):
         raise ValueError(f"{where}: capture {capture} archived {url}, not {item.get('url')}")
     source = cs.source(publisher, title)
@@ -235,7 +237,7 @@ def _linked(conn: Connection, cs: Changeset, item: Evidence, author: UUID, where
         ),
         source,
     )
-    return source
+    return source, {"sha256": sha256} | ({} if wayback is None else {"wayback": wayback})
 
 
 def compile(
@@ -259,6 +261,7 @@ def compile(
     sources: dict[str, UUID] = {}
     cs = Changeset(conn, pipeline="contrib", version=VERSION, summary=summary, polity=payload.get("polity"), kind=kind)
     added: set[UUID] = set()
+    proofs: dict[str, dict[str, str]] = {}
     for key, item in evidence.items():
         if "source" in item:
             source = _uuid(item["source"], f"evidence {key}.source")
@@ -266,7 +269,7 @@ def compile(
                 raise ValueError(f"evidence {key}: source {source} does not exist")
             sources[key] = source
         elif "url" in item:
-            sources[key] = _linked(conn, cs, item, author, f"evidence {key}", added)
+            sources[key], proofs[key] = _linked(conn, cs, item, author, f"evidence {key}", added)
         else:
             raise ValueError(f"evidence {key}: needs a source or a url")
 
@@ -375,6 +378,7 @@ def compile(
                         "row": str(row["id"]),
                         "column": column,
                         **{field: item[field] for field in ("page", "region", "quote", "locator") if field in item},
+                        **proofs.get(key, {}),
                     },
                 )
     return cs.write()
@@ -721,6 +725,7 @@ def serve() -> None:
                where status = 'running'"""
         )
         listener.execute("listen proposal_job")
+        resume(listener)
         while True:
             while work():
                 pass

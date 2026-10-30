@@ -237,6 +237,14 @@
                     >{m.proposal_archived()} · {day(item.captured)}</span
                   >
                 {/if}
+                {#if item.wayback != null}
+                  <a
+                    class="shrink-0 underline underline-offset-2 hover:text-foreground"
+                    href={item.wayback}
+                    rel="external nofollow noopener noreferrer"
+                    target="_blank">{m.proposal_wayback()}</a
+                  >
+                {/if}
               </span>
             {/if}
             {#if quote != null}
