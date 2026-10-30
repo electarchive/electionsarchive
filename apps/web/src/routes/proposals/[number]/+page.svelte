@@ -23,7 +23,7 @@
     reject: m.proposal_rejecting,
     revert: m.proposal_reverting,
   };
-  const evidential = ["citation", "source", "source_artifact"];
+  const evidential = ["citation", "source", "source_artifact", "source_page"];
   const rows = $derived(
     (head?.diff?.rows ?? []).filter((row) => !evidential.includes(row.table)),
   );

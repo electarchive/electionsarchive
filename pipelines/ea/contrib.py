@@ -19,6 +19,7 @@ from ea.apply import _stage, apply, publish, revert
 from ea.capture import capture, resume
 from ea.changeset import Changeset, bcp47
 from ea.store import DATA, ROOT, Connection, connect
+from ea.uploads import process, sweep
 
 VERSION = "1"
 
@@ -64,7 +65,18 @@ SHOWN = 2_000
 
 TIERS = {
     **dict.fromkeys(
-        ("note", "citation", "source", "source_artifact", "external_id", "name", "label", "party_color", "translation"),
+        (
+            "note",
+            "citation",
+            "source",
+            "source_artifact",
+            "source_page",
+            "external_id",
+            "name",
+            "label",
+            "party_color",
+            "translation",
+        ),
         1,
     ),
     **dict.fromkeys(("result_value", "result_flow", "outcome", "seat", "body_size"), 3),
@@ -80,6 +92,7 @@ class Evidence(TypedDict, total=False):
     source: str
     url: str
     capture: str
+    upload: str
     title: str
     publisher: str
     kind: str
@@ -200,16 +213,24 @@ def _carry(conn: Connection, cs: Changeset, before: str, after: str, lang: str) 
         )
 
 
-def _linked(
-    conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]
-) -> tuple[UUID, dict[str, str]]:
+def _source(cs: Changeset, item: Evidence, where: str, added: set[UUID], url: str | None) -> UUID:
     title = unicodedata.normalize("NFC", str(item.get("title") or "")).strip()
     publisher = unicodedata.normalize("NFC", str(item.get("publisher") or "")).strip()
     if not title or not publisher:
-        raise ValueError(f"{where}: a URL needs a title and a publisher")
+        raise ValueError(f"{where}: a URL or an upload needs a title and a publisher")
     kind = item.get("kind")
     if kind not in SOURCE_KINDS:
         raise ValueError(f"{where}: kind must be one of {', '.join(SOURCE_KINDS)}")
+    source = cs.source(publisher, title)
+    if source in cs.minted and source not in added:
+        added.add(source)
+        cs.add("source", id=source, kind=kind, publisher=publisher, title=title, url=url)
+    return source
+
+
+def _linked(
+    conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]
+) -> tuple[UUID, dict[str, str]]:
     capture = _uuid(item.get("capture"), f"{where}.capture")
     row = conn.execute(
         """select url, final_url, raw_sha256, raw_key, media_type, bytes, captured_at, wayback_url from archive_capture
@@ -221,10 +242,7 @@ def _linked(
     url, final_url, sha256, key, media_type, size, captured_at, wayback = row
     if url != item.get("url"):
         raise ValueError(f"{where}: capture {capture} archived {url}, not {item.get('url')}")
-    source = cs.source(publisher, title)
-    if source in cs.minted and source not in added:
-        added.add(source)
-        cs.add("source", id=source, kind=kind, publisher=publisher, title=title, url=url)
+    source = _source(cs, item, where, added, url)
     cs.artifact(
         raw.Artifact(
             source="contrib",
@@ -238,6 +256,68 @@ def _linked(
         source,
     )
     return source, {"sha256": sha256} | ({} if wayback is None else {"wayback": wayback})
+
+
+def _uploaded(
+    conn: Connection, cs: Changeset, item: Evidence, author: UUID, where: str, added: set[UUID]
+) -> tuple[UUID, dict[str, str]]:
+    upload = _uuid(item.get("upload"), f"{where}.upload")
+    row = conn.execute(
+        """select sha256, storage_key, media_type, bytes, created_at, pages from upload
+           where id = %s and status = 'ready' and owner_user_id = %s""",
+        [upload, author],
+    ).fetchone()
+    if row is None:
+        raise ValueError(f"{where}: upload {upload} is not a ready upload of this author's")
+    sha256, key, media_type, size, created_at, pages = row
+    source = _source(cs, item, where, added, None)
+    artifact = cs.artifact(
+        raw.Artifact(
+            source="contrib",
+            url=f"upload:{sha256}",
+            sha256=sha256,
+            path=DATA / key,
+            retrieved_at=created_at,
+            media_type=media_type,
+            bytes=size,
+        ),
+        source,
+    )
+    proof = {"sha256": sha256}
+    number = item.get("page")
+    if number is None:
+        if "region" in item:
+            raise ValueError(f"{where}: a region needs a page")
+        return source, proof
+    if pages is None or not isinstance(number, int) or isinstance(number, bool) or not 1 <= number <= pages:
+        raise ValueError(f"{where}: page must be between 1 and {pages or 0}")
+    region = item.get("region")
+    if region is not None and not (
+        isinstance(region, list)
+        and len(region) == 4
+        and all(isinstance(value, int | float) and not isinstance(value, bool) and 0 <= value <= 1 for value in region)
+        and region[0] < region[2]
+        and region[1] < region[3]
+    ):
+        raise ValueError(f"{where}: region must be [x0, y0, x1, y1] fractions of the page, with x0 < x1 and y0 < y1")
+    image = conn.execute(
+        "select image_key, width, height from upload_page where upload_id = %s and page_number = %s", [upload, number]
+    ).fetchone()
+    if image is None:
+        raise ValueError(f"{where}: upload {upload} has no page {number}")
+    page = cs.page(artifact, number)
+    if page not in added:
+        added.add(page)
+        cs.add(
+            "source_page",
+            id=page,
+            artifact_id=artifact,
+            page_number=number,
+            image_key=image[0],
+            width=image[1],
+            height=image[2],
+        )
+    return source, proof | {"page_id": str(page)}
 
 
 def compile(
@@ -270,8 +350,10 @@ def compile(
             sources[key] = source
         elif "url" in item:
             sources[key], proofs[key] = _linked(conn, cs, item, author, f"evidence {key}", added)
+        elif "upload" in item:
+            sources[key], proofs[key] = _uploaded(conn, cs, item, author, f"evidence {key}", added)
         else:
-            raise ValueError(f"evidence {key}: needs a source or a url")
+            raise ValueError(f"evidence {key}: needs a source, a url, or an upload")
 
     cs.manifest["author_kind"] = author_kind
     cs.manifest["author_user_id"] = str(author)
@@ -727,7 +809,8 @@ def serve() -> None:
         listener.execute("listen proposal_job")
         resume(listener)
         while True:
-            while work():
+            sweep()
+            while work() or process():
                 pass
             for _ in listener.notifies(timeout=60, stop_after=1):
                 pass

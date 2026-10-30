@@ -15,6 +15,8 @@ const Line = (max: number) =>
     v.maxLength(max),
   );
 
+const Fraction = v.pipe(v.number(), v.minValue(0), v.maxValue(1));
+
 const Proposal = v.object({
   entityId: Uuid,
   nameId: Uuid,
@@ -29,6 +31,20 @@ const Proposal = v.object({
         v.maxLength(2048),
         v.url(),
         v.regex(/^https?:\/\//i),
+      ),
+      title: Line(500),
+      publisher: Line(200),
+      kind: v.picklist(sourceKinds),
+    }),
+    v.object({
+      type: v.literal("upload"),
+      uploadId: Uuid,
+      page: v.nullable(v.pipe(v.number(), v.integer(), v.minValue(1))),
+      region: v.nullable(
+        v.pipe(
+          v.tuple([Fraction, Fraction, Fraction, Fraction]),
+          v.check(([x0, y0, x1, y1]) => x0 < x1 && y0 < y1),
+        ),
       ),
       title: Line(500),
       publisher: Line(200),

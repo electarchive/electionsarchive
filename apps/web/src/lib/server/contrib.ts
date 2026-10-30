@@ -83,18 +83,54 @@ export async function propose({
         title: string;
         publisher: string;
         kind: string;
+      }
+    | {
+        type: "upload";
+        uploadId: string;
+        page: number | null;
+        region: [number, number, number, number] | null;
+        title: string;
+        publisher: string;
+        kind: string;
       };
   quote: string;
   summary: string;
 }) {
   const sourceId = evidence.type === "source" ? evidence.sourceId : null;
+  const uploadId = evidence.type === "upload" ? evidence.uploadId : null;
   const { rows } = await db.execute<{ ok: boolean }>(sql`
     select exists (select from name where id = ${nameId} and entity_id = ${entityId})
-       and (${sourceId}::uuid is null or exists (select from source where id = ${sourceId})) as ok
+       and (${sourceId}::uuid is null or exists (select from source where id = ${sourceId}))
+       and (${uploadId}::uuid is null or exists (
+         select from upload where id = ${uploadId} and owner_user_id = ${userId} and status = 'ready'
+       )) as ok
   `);
   if (rows[0]?.ok !== true) {
-    error(400, "That name or source no longer exists.");
+    error(
+      400,
+      "That name, source, or upload can't be used. It may have been removed, or the upload may still be processing.",
+    );
   }
+  const cited = (() => {
+    switch (evidence.type) {
+      case "source": {
+        return { source: evidence.sourceId };
+      }
+      case "url": {
+        const { type: _, ...rest } = evidence;
+        return rest;
+      }
+      case "upload": {
+        const { type: _, uploadId: upload, page, region, ...rest } = evidence;
+        return {
+          upload,
+          ...rest,
+          ...(page != null && { page }),
+          ...(region != null && { region }),
+        };
+      }
+    }
+  })();
   const payload = {
     summary,
     ops: [
@@ -106,19 +142,7 @@ export async function propose({
         evidence: ["e1"],
       },
     ],
-    evidence: {
-      e1: {
-        ...(evidence.type === "source"
-          ? { source: evidence.sourceId }
-          : {
-              url: evidence.url,
-              title: evidence.title,
-              publisher: evidence.publisher,
-              kind: evidence.kind,
-            }),
-        ...(quote !== "" && { quote }),
-      },
-    },
+    evidence: { e1: { ...cited, ...(quote !== "" && { quote }) } },
   };
   return db.transaction(async (tx) => {
     const created = await tx.execute<{ id: string; number: number }>(sql`
@@ -242,7 +266,7 @@ export async function queue() {
   }>(sql`
     select p.number, p.title, p.state::text as state, p.tier, a.name as author,
            p.submitted_at::text,
-           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact'))::int as changes,
+           (select count(*) from jsonb_array_elements(r.diff -> 'rows') x where x ->> 'table' not in ('citation', 'source', 'source_artifact', 'source_page'))::int as changes,
            coalesce((select sum(value::int) from jsonb_each_text(r.checks -> 'findings')), 0)::int as findings
     from proposal p
     left join users a on a.id = p.author_user_id
