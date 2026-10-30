@@ -1,5 +1,6 @@
 import re
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -8,7 +9,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import oe_primaries_2026 as oe
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.ks_amendment_2026"
 VERSION = "1"
@@ -16,14 +17,54 @@ BASE = "https://sos.ks.gov/elections/26elec/"
 COUNTIES = BASE + "2026-Primary-Election-Constitutional-Amendment-Precinct-Level-Results.xlsx"
 TOTALS = BASE + "2026-Primary-Election-Official-Vote-Totals.pdf"
 PAGE = "https://sos.ks.gov/elections/election-results.html"
+CANVASS = {
+    "Johnson": "johnson/PR2026 Official Final Results OU.pdf",
+    "Sedgwick": "sedgwick/election-summary-official-results.pdf",
+    "Shawnee": "shawnee/2026 Primary - Final Official Results.pdf",
+    "Wyandotte": "wyandotte/OfficialFinalResults.pdf",
+}
+INBOX = DATA / "inbox" / "manual" / "MF-410"
 PUBLISHER = "Kansas Secretary of State"
 TITLE = "Kansas August 4, 2026 primary election results"
 CONTEST_KEY = "2026-08-04:KS:question:elections-for-supreme-court-justices-amendment"
 
 
+def canvass_url(county: str) -> str:
+    return f"{PAGE}#{county.lower()}-canvass"
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, COUNTIES, suffix=".xlsx")
     raw.fetch(SOURCE, TOTALS, suffix=".pdf")
+    for county, file in CANVASS.items():
+        try:
+            raw.cached(SOURCE, canvass_url(county))
+        except LookupError:
+            raw.store(
+                SOURCE,
+                canvass_url(county),
+                (INBOX / file).read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
+                media_type="application/pdf",
+            )
+
+
+def canvassed(county: str) -> dict[str, int]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, canvass_url(county)).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    block = re.split(r"Con[a-z]*utional Amendment(?: Question)?\s*\n", text, maxsplit=1)[1]
+    found = {
+        answer.upper(): int(votes.replace(",", ""))
+        for answer, votes in re.findall(r"^(Yes|No)\s+([\d,]+)", block, re.MULTILINE)[:2]
+    }
+    if set(found) != {"YES", "NO"}:
+        raise ValueError(f"{county} amendment totals not found: {found}")
+    return found
 
 
 def statewide() -> dict[str, int]:
@@ -46,16 +87,27 @@ def emit() -> Path:
         .group_by("County", "answer")
         .agg(pl.col("Votes").sum().alias("votes"))
     )
+    frame = pl.concat(
+        [
+            frame,
+            pl.DataFrame(
+                [(county, answer, votes) for county in CANVASS for answer, votes in canvassed(county).items()],
+                schema=frame.schema,
+                orient="row",
+            ),
+        ]
+    )
     totals = statewide()
     sums = {answer: frame.filter(pl.col("answer") == answer)["votes"].sum() for answer in totals}
-    if any(sums[answer] > totals[answer] for answer in totals):
-        raise ValueError(f"county sums exceed the statewide totals {sums} {totals}")
+    gaps = {answer: sums[answer] - totals[answer] for answer in totals}
+    if any(abs(gap) > 10 for gap in gaps.values()):
+        raise ValueError(f"county sums differ from the statewide totals {sums} {totals}")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kansas's August 4, 2026 constitutional amendment on electing Supreme Court justices: the official statewide totals and the county totals in the precinct file",
+            summary="Kansas's August 4, 2026 constitutional amendment on electing Supreme Court justices: the official statewide totals and the county totals from the precinct file and four county canvasses",
             polity="US-KS",
         )
         election = conn.execute(
@@ -65,18 +117,26 @@ def emit() -> Path:
             """select u.area_id from reporting_unit u where u.scheme_code = 'us.state' and u.code = '20'"""
         ).fetchone()[0]
         system = cs.key("us.electoral_system", "referendum")
-        state_unit = conn.execute("select id from reporting_unit where scheme_code = 'us.state' and code = '20'").fetchone()[0]
+        state_unit = conn.execute(
+            "select id from reporting_unit where scheme_code = 'us.state' and code = '20'"
+        ).fetchone()[0]
         counties: dict[str, UUID] = {}
-        names: dict[str, str] = {}
         for text, id in conn.execute(
             """select n.text, u.id from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
                where u.scheme_code = 'us.county' and u.code ~ '^20'"""
         ).fetchall():
             counties[oe.plain(text)] = id
-            names[oe.plain(text)] = text
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=PAGE, license="Public record")
-        for url in (COUNTIES, TOTALS):
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=PAGE,
+            license="Public record",
+        )
+        for url in (COUNTIES, TOTALS, *map(canvass_url, CANVASS)):
             cs.artifact(raw.cached(SOURCE, url), source)
         contest = cs.key("us.contest", CONTEST_KEY)
         cs.add(
@@ -99,7 +159,11 @@ def emit() -> Path:
             is_preferred=True,
         )
         if contest in cs.minted:
-            cs.add("slug", path="us/ks/2026-08-04-primary/elections-for-supreme-court-justices-amendment", entity_id=contest)
+            cs.add(
+                "slug",
+                path="us/ks/2026-08-04-primary/elections-for-supreme-court-justices-amendment",
+                entity_id=contest,
+            )
         cs.add("citation", entity_id=contest, source_id=source)
         options = {}
         for position, answer in enumerate(("YES", "NO")):
@@ -114,7 +178,10 @@ def emit() -> Path:
             )
         official = cs.key(f"{SOURCE}.result_set", f"{CONTEST_KEY}:official")
         by_county = cs.key(f"{SOURCE}.result_set", f"{CONTEST_KEY}:county")
-        for id, default, completeness in ((official, True, 1), (by_county, False, round(sum(sums.values()) / sum(totals.values()), 4))):
+        for id, default, completeness in (
+            (official, True, 1),
+            (by_county, False, min(1, round(sum(sums.values()) / sum(totals.values()), 4))),
+        ):
             cs.add(
                 "result_set",
                 id=id,
@@ -127,15 +194,22 @@ def emit() -> Path:
                 is_default=default,
                 completeness=completeness,
             )
-        absent = sorted(text for key, text in names.items() if key not in {oe.plain(county) for county in frame["County"]})
         cs.add(
             "note",
             entity_id=by_county,
             kind="caveat",
-            body_md=f"County totals for {frame['County'].n_unique()} of Kansas's 105 counties; the Secretary of State's precinct file omits {', '.join(absent)}, so the county sums are below the official statewide totals.",
+            body_md=f"County totals for all 105 Kansas counties: 101 from the Secretary of State's precinct file and {', '.join(CANVASS)} from the counties' official final results. The county sums differ from the Secretary of State's statewide totals by {gaps['NO']:+,} for No and {gaps['YES']:+,} for Yes.",
         )
-        cs.add("outcome", result_set_id=official, option_id=options["NO" if totals["NO"] > totals["YES"] else "YES"], kind="won")
-        rows = [(str(official), str(state_unit), str(options[answer]), 0, 1, 0, 0, votes) for answer, votes in totals.items()]
+        cs.add(
+            "outcome",
+            result_set_id=official,
+            option_id=options["NO" if totals["NO"] > totals["YES"] else "YES"],
+            kind="won",
+        )
+        rows = [
+            (str(official), str(state_unit), str(options[answer]), 0, 1, 0, 0, votes)
+            for answer, votes in totals.items()
+        ]
         rows.append((str(official), str(state_unit), None, 0, 4, 0, 0, sum(totals.values())))
         place: dict[str, int] = {}
         for county, answer, votes in frame.select("County", "answer", "votes").iter_rows():
