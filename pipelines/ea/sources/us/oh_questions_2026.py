@@ -27,6 +27,9 @@ DIRECTORY = "https://educationdata.urban.org/api/v1/school-districts/ccd/directo
 SCHEMES = {"Township": "us.town", "Village": "us.place", "City": "us.place", "County": "us.county", "School District": "us.school_district"}
 
 
+WORDING: dict[str, str] = json.loads(Path(__file__).with_name("oh_franklin_wording.json").read_text())
+
+
 def fetch() -> None:
     try:
         raw.cached(SOURCE, URL)
@@ -82,13 +85,14 @@ def parse() -> None:
         name = clean(row["Subdivision Name"])
         if kind not in SCHEMES or name is None or clean(row["County"]) is None:
             continue
+        label = clean(row["Purpose"]) or clean(row["Question Type"]) or "Question"
         rows.append(
             {
                 "county": clean(row["County"]),
                 "kind": kind,
                 "name": name,
-                "text": describe(row),
-                "label": clean(row["Purpose"]) or clean(row["Question Type"]) or "Question",
+                "text": WORDING.get(f"{name}|{label}") or describe(row),
+                "label": label,
             }
         )
     PARSED.mkdir(parents=True, exist_ok=True)
