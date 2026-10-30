@@ -2359,5 +2359,7 @@
   "live_city_only": "New York City's votes only",
   "live_no_update": "No update captured by this time",
   "live_source": "Source: {publisher}",
-  "live_as_of": "As of {time}"
+  "live_as_of": "As of {time}",
+  "live_twin_summary": "Results as {publisher} posted them through election night, then the certified count. To see another moment, add ?at= with one of the update times below, or ?at=final for the certified count.",
+  "live_twin_updates": "Updates"
 }
