@@ -1,3 +1,4 @@
+import html
 import re
 from datetime import date
 from itertools import pairwise
@@ -9,6 +10,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.gb.ni_assembly import extract, fold, number
+from ea.sources.gb.ni_assembly import party_of as assembly_party
 from ea.sources.gb.ni_council import display
 from ea.store import DATA, connect
 
@@ -60,6 +62,41 @@ NAMES = {
     "Smith, WilliamWoolsey": "William Woolsey Smith",
     "Gault, William, HS": "William H. S. Gault",
     "McMAhon, Mary": "Mary McMahon",
+}
+FORUM = {
+    "Belfast East": "96eb",
+    "Belfast North": "96nb",
+    "Belfast South": "96sb",
+    "Belfast West": "96wb",
+    "East Antrim": "96ea",
+    "North Antrim": "96na",
+    "South Antrim": "96sa",
+    "North Down": "96nd",
+    "South Down": "96sd",
+    "Fermanagh and South Tyrone": "96fst",
+    "Foyle": "96foy",
+    "Lagan Valley": "96lv",
+    "East Londonderry": "96el",
+    "Mid Ulster": "96mu",
+    "Newry and Armagh": "96nanda",
+    "Strangford": "96str",
+    "West Tyrone": "96wt",
+    "Upper Bann": "96ub",
+}
+FORUM_PARTIES = {
+    "independent democratic unionist party": "Independent Democratic Unionist Party",
+    "independent chambers": "Independent Chambers",
+    "independent mcmullan": "Independent McMullan",
+    "independent templeton": "Independent Templeton",
+    "arthur templeton independent": "Independent Templeton",
+    "ulster's independent voice": "Ulster's Independent Voice",
+    "democratic partnership": "Democratic Partnership",
+    "democratic left": "Democratic Left",
+    "communist party of ireland": "Communist Party of Ireland",
+    "communist party": "Communist Party of Ireland",
+    "ulster christian democrats": "Ulster Christian Democrats",
+    "ulster christian democratic party": "Ulster Christian Democrats",
+    "ulster independence movement": "Ulster Independence",
 }
 VOTES, REGISTERED, BALLOTS, VALID, INVALID, EXHAUSTED, QUOTA = 1, 2, 3, 4, 5, 21, 26
 DAYS = {1973: date(1973, 6, 28), 1975: date(1975, 5, 1), 1982: date(1982, 10, 20), 1996: date(1996, 5, 30)}
@@ -206,6 +243,138 @@ def fetch() -> None:
         raw.fetch(SOURCE, f"{ARK}/{PAGES[year]}", suffix=".html")
     for title in MEMBERS.values():
         raw.fetch(SOURCE, WIKIPEDIA.format(title), suffix=".txt")
+    for page in [*FORUM.values(), "96cands"]:
+        raw.fetch(SOURCE, f"{ARK}/{page}.htm", suffix=".html")
+
+
+def forum_lists(page: str) -> list[tuple[str, float, list[tuple[str, bool]]]]:
+    text = raw.cached(SOURCE, f"{ARK}/{page}.htm").path.read_text(encoding="cp1252", errors="replace")
+    text = re.sub(r"(?is)<!--.*?-->|<(script|style)\b.*?</\1>", " ", text)
+    text = re.sub(r"(?i)<b\b[^>]*>", "\x01", text)
+    text = re.sub(r"(?i)</b>", "\x02", text)
+    text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text)))
+    start = text.index("elected by their parties." if page == "96cands" else "spreadsheet )") + 1
+    text = text[text.index(" ", start) : text.index("Electorate:" if page != "96cands" else "Full list of 1996", start)]
+    state = []
+    bold = False
+    for char in text:
+        bold = True if char == "\x01" else False if char == "\x02" else bold
+        state.append(bold)
+    headers = list(re.finditer(r"([A-Z][^:\x01\x02,]*?):\s*\x02?\s*(\d[\d,\s]*?)\s*\(\s*[\d.]+\s*%\)\s*\x02?:?", text))
+    found = []
+    for header, after in zip(headers, [*headers[1:], None], strict=True):
+        names = []
+        start = header.end()
+        for chunk in text[start : after.start() if after else len(text)].split(","):
+            name_ = re.sub(r"\s+", " ", re.sub(r"[\x01\x02]", " ", chunk)).strip()
+            if name_:
+                offset = start + chunk.index(name_[0])
+                names.append((name_, any(state[offset : start + len(chunk)]) and state[offset + len(name_) // 2]))
+            start += len(chunk) + 1
+        found.append((header.group(1).strip(), float(re.sub(r"\D", "", header.group(2))), names))
+    return found
+
+
+def forum_party(label: str) -> str | None:
+    key = re.sub(r"\s+", " ", label.strip().lower())
+    key = re.sub(r"^the ", "", key)
+    if key in FORUM_PARTIES:
+        return FORUM_PARTIES[key]
+    return assembly_party(label)
+
+
+def parse_forum() -> None:
+    folder = PARSED / "x1996"
+    extract(raw.cached(SOURCE, f"{ARK}/{FILES[1996]}").path, folder)
+    units = []
+    rows = []
+    for constituency, page in FORUM.items():
+        sheet = next(folder.rglob(f"fo96-{constituency.replace(' ', '-')}.xls"))
+        cells = pl.read_excel(sheet, has_header=False, infer_schema_length=0).rows()
+        seats = {}
+        labels = {}
+        facts = {}
+        for row in cells:
+            if row[0] is not None and row[0].strip().isdigit() and row[2] is not None and row[2].strip().isdigit():
+                seats[float(row[2])] = 0
+                labels[float(row[2])] = row[1].strip()
+            label = (row[2] or "").lower()
+            for key in ("polled", "electorate", "invalid", "valid"):
+                if re.search(rf"\b{key}", label) and key not in facts and row[3] is not None:
+                    facts[key] = float(row[3])
+        if len(seats) != len(labels) or facts["polled"] - facts["invalid"] != facts["valid"]:
+            raise ValueError(f"{constituency}: spreadsheet totals do not add up")
+        listed = forum_lists(page)
+        spare = [votes for votes in seats if votes not in {votes for _, votes, _ in listed}]
+        lists = []
+        added = []
+        for label, votes, names in listed:
+            if votes not in seats:
+                match = [other for other in spare if forum_party(labels[other]) == forum_party(label)]
+                if len(match) == 1:
+                    votes = match[0]
+                    spare.remove(votes)
+                else:
+                    seats[votes] = 0
+                    added.append((label, votes))
+            lists.append((label, votes, names))
+        lists += [(labels[votes], votes, []) for votes in spare]
+        if sum(votes for _, votes, _ in lists) != facts["valid"]:
+            raise ValueError(f"{constituency}: lists do not add up to the valid votes")
+        for _ in range(5):
+            seats[max(seats, key=lambda votes: votes / (seats[votes] + 1))] += 1
+        for label, votes, names in lists:
+            if sum(bold for _, bold in names) != seats[votes]:
+                raise ValueError(
+                    f"{constituency} {label}: {sum(bold for _, bold in names)} bold names, {seats[votes]} seats"
+                )
+            for position, (person, bold) in enumerate(names or [(None, False)], start=1):
+                rows.append(
+                    {
+                        "constituency": constituency,
+                        "label": label,
+                        "party": forum_party(label),
+                        "votes": votes,
+                        "seats": seats[votes],
+                        "position": position,
+                        "name": person,
+                        "elected": bold,
+                    }
+                )
+        units.append(
+            {"constituency": constituency, **facts, "added": [f"{label}|{votes:.0f}" for label, votes in added]}
+        )
+    for label, votes, names in forum_lists("96cands"):
+        won = sum(bold for _, bold in names)
+        if won not in (0, 2):
+            raise ValueError(f"regional {label}: {won} top-up members")
+        for position, (person, bold) in enumerate(names, start=1):
+            rows.append(
+                {
+                    "constituency": None,
+                    "label": label,
+                    "party": forum_party(label),
+                    "votes": votes,
+                    "seats": won,
+                    "position": position,
+                    "name": person,
+                    "elected": bold,
+                }
+            )
+    lists_frame = pl.DataFrame(rows)
+    regional = lists_frame.filter(pl.col("constituency").is_null() & pl.col("elected"))
+    if regional.height != 20:
+        raise ValueError(f"{regional.height} top-up members")
+    summed = (
+        lists_frame.filter(pl.col("constituency").is_not_null() & (pl.col("position") == 1))
+        .group_by("party")
+        .agg(pl.col("votes").sum(), pl.col("seats").sum())
+    )
+    with pl.Config(tbl_rows=-1):
+        print(summed.sort("votes", descending=True))
+    print(regional.select("label", "name"))
+    pl.DataFrame(units).write_parquet(PARSED / "forum_units.parquet")
+    lists_frame.write_parquet(PARSED / "forum_lists.parquet")
 
 
 def members(year: int) -> dict[tuple[str, str], list[tuple[str, str | None]]]:
@@ -422,6 +591,7 @@ def parse() -> None:
         )
     units_frame.write_parquet(PARSED / "units.parquet")
     lines_frame.write_parquet(PARSED / "lines.parquet")
+    parse_forum()
 
 
 def person_name(sheet: str) -> str:
@@ -437,7 +607,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Northern Ireland Assembly elections of 1973 and 1982 and the 1975 Constitutional Convention election by constituency with every STV count, from ARK",
+            summary="Northern Ireland Assembly elections of 1973 and 1982, the 1975 Constitutional Convention, and the 1996 Forum by constituency, from ARK",
             polity="GB-NIR",
         )
 
@@ -737,4 +907,183 @@ def emit() -> Path:
                         flags=0,
                         value=round(row["exhausted"], 2),
                     )
+        day = DAYS[1996]
+        forum_units = pl.read_parquet(PARSED / "forum_units.parquet")
+        forum_lists_frame = pl.read_parquet(PARSED / "forum_lists.parquet")
+        forum_source = cs.source("ARK Northern Ireland Elections", "1996 Northern Ireland Forum election")
+        cs.add(
+            "source",
+            id=forum_source,
+            kind="academic",
+            publisher="ARK Northern Ireland Elections",
+            title="1996 Northern Ireland Forum election: results and candidate lists",
+            url=f"https://www.ark.ac.uk/elections/{PAGES[1996]}",
+            attribution="Results spreadsheets and candidate lists from ARK Northern Ireland Elections (ark.ac.uk/elections).",
+        )
+        cs.artifact(raw.cached(SOURCE, f"{ARK}/{FILES[1996]}"), forum_source)
+        cs.artifact(raw.cached(SOURCE, f"{ARK}/{PAGES[1996]}"), forum_source)
+        for page in [*FORUM.values(), "96cands"]:
+            cs.artifact(raw.cached(SOURCE, f"{ARK}/{page}.htm"), forum_source)
+        body = cs.key("gb.body", "ni-forum")
+        if body in cs.minted:
+            cs.add("body", id=body, polity_id=nir, kind="unicameral")
+            name(body, "Northern Ireland Forum for Political Dialogue")
+        cs.add(
+            "body_size",
+            body_id=body,
+            seats=110,
+            valid_from=day,
+            valid_from_precision="day",
+            valid_to=date(1998, 4, 25),
+            valid_to_precision="day",
+        )
+        list_system = cs.key("gb.electoral_system", "ni-forum-list")
+        cs.add("electoral_system", id=list_system, polity_id=nir, rules={"formula": "dhondt"}, rules_version=1)
+        if list_system in cs.minted:
+            name(list_system, "Closed party lists by d'Hondt (1996 Northern Ireland Forum constituencies)")
+        election = cs.key("gb.election", f"{day}:ni-forum")
+        cs.add("election", id=election, polity_id=nir, kind="general", date_from=day, date_to=day, status="held")
+        name(election, "1996 Northern Ireland Forum election")
+        path = f"gb/northern-ireland/{day}-forum"
+        cs.add("slug", path=path, entity_id=election)
+        people: dict[str, UUID] = {}
+        regions = [(None, cs.area("gb.country", "NIR"), None)]
+        for unit_row in forum_units.iter_rows(named=True):
+            match = [
+                (code, area)
+                for (text, begin), (code, area, _) in areas.items()
+                if fold(text) == fold(unit_row["constituency"]) and begin == date(1997, 5, 1)
+            ]
+            if len(match) != 1:
+                raise ValueError(f"1996 {unit_row['constituency']}: {len(match)} Westminster areas")
+            regions.append((unit_row, match[0][1], match[0][0]))
+        for unit_row, area, code in regions:
+            label = "Northern Ireland" if unit_row is None else unit_row["constituency"]
+            contest_key = f"{day}:ni-forum:{slug(label)}"
+            contest = cs.key("gb.contest", contest_key)
+            cs.add(
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="list_allocation",
+                body_id=body,
+                district_area_id=area,
+                magnitude=20 if unit_row is None else 5,
+                round_number=1,
+                electoral_system_id=None if unit_row is None else list_system,
+                default_result_kind="counted",
+            )
+            if unit_row is None:
+                name(contest, "1996 Northern Ireland Forum election, regional top-up seats")
+                cs.add("slug", path=f"{path}/regional-list", entity_id=contest)
+            else:
+                name(contest, f"1996 Northern Ireland Forum election in {label}")
+                cs.add("slug", path=f"{path}/{slug(label)}", entity_id=contest)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                status="active",
+                source_id=forum_source,
+                is_default=True,
+                completeness=0 if unit_row is None else 1,
+            )
+            rows = forum_lists_frame.filter(
+                pl.col("constituency").is_null() if unit_row is None else pl.col("constituency") == label
+            )
+            if unit_row is None:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The ten parties with the most votes across the 18 constituencies each took two regional seats, "
+                    "filled from their regional lists. The votes are counted in the constituency contests; this contest "
+                    "holds only the regional seats and the members elected to them.",
+                )
+            else:
+                unit = cs.unit("gb.nia", code)
+                for added in unit_row["added"]:
+                    list_label, votes = added.split("|")
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=f"ARK's spreadsheet leaves out the {re.sub(r'^The ', '', list_label)} list. Its {int(votes):,} votes come from "
+                        "ARK's candidate page, and with them the lists add up to the valid votes.",
+                    )
+                for measure, amount in (
+                    (REGISTERED, unit_row["electorate"]),
+                    (BALLOTS, unit_row["polled"]),
+                    (VALID, unit_row["valid"]),
+                    (INVALID, unit_row["invalid"]),
+                ):
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=None,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        flags=0,
+                        value=amount,
+                    )
+            for list_row in rows.filter(pl.col("position") == 1).sort("votes", descending=True).iter_rows(named=True):
+                owner = party_id(list_row["party"])
+                option_key = f"{contest_key}:{slug(list_row['label'])}"
+                option = cs.key("gb.ni_bodies.option", option_key)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="list",
+                    party_id=owner,
+                    ballot_label=list_row["label"],
+                )
+                if unit_row is not None:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=VOTES,
+                        count_round=0,
+                        flags=0,
+                        value=list_row["votes"],
+                    )
+                if list_row["seats"]:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=list_row["seats"])
+                for member in rows.filter(
+                    (pl.col("label") == list_row["label"]) & pl.col("name").is_not_null()
+                ).iter_rows(named=True):
+                    person_key = f"1996:{slug(list_row['party'] or list_row['label'])}:{slug(member['name'])}"
+                    if person_key not in people:
+                        people[person_key] = cs.key("gb.ni_bodies.person", person_key)
+                        cs.add("person", id=people[person_key])
+                        name(people[person_key], member["name"])
+                    candidacy = cs.key("gb.ni_bodies.candidacy", f"{option_key}:{member['position']}")
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=people[person_key],
+                        option_id=option,
+                        role="list_member",
+                        list_position=member["position"],
+                        ballot_name=member["name"],
+                        member_of_party_id=owner,
+                        is_independent=owner is None,
+                    )
+                    if member["elected"]:
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            candidacy_id=candidacy,
+                            kind="elected",
+                        )
         return cs.write()
