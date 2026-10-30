@@ -37,6 +37,11 @@ COUNTIES = {
         None,
         "Arapahoe County Clerk and Recorder",
     ),
+    "08077": (
+        "https://www.mesacounty.us/sites/default/files/2026-09/2026%20General%20Election%20TABOR%20Booklet%20%5BADA%5D_0.pdf",
+        None,
+        "Mesa County Clerk and Recorder",
+    ),
     "08035": (
         "https://www.douglas.co.us/documents/2026-general-election-ballot-issue-notices-booklet.pdf",
         "CO-Douglas/2026-general-election-ballot-issue-notices-booklet.pdf",
@@ -127,6 +132,16 @@ def arapahoe_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
+def mesa_rows(lines: list[str]) -> list[dict[str, str]]:
+    rows = []
+    for index, line in enumerate(lines):
+        match = re.match(r"^\s*(.+?) BALLOT ISSUE\s+(\w+)\s*$", line)
+        if match is None or not any(previous.strip().startswith("Election Hours") for previous in lines[max(index - 8, 0) : index]):
+            continue
+        rows.append({"entity": titled(match[1]).replace("Palsade", "Palisade").replace("Orchard Mesa Pool", "City of Grand Junction"), "label": f"Ballot Issue {match[2]}", "wording": question(lines, index + 1)})
+    return rows
+
+
 def larimer_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for index, line in enumerate(lines):
@@ -166,7 +181,7 @@ def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-PARSERS = {"08059": jeffco_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
+PARSERS = {"08059": jeffco_rows, "08077": mesa_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
 
 
 def parse() -> None:
