@@ -1728,6 +1728,36 @@ NE_SOURCES = {
         "https://www.somersetcountynj.gov/government/elected-officials/county-clerk/election-division",
         "nj/somerset_school.xlsx",
     ),
+    "AZ-04019-s": (
+        "Pima County School Superintendent",
+        "2026 Candidate Filing",
+        "https://www.schools.pima.gov/elections/2026-candidate-filing",
+        "az/pima_schools.html",
+    ),
+    "AZ-04015-s": (
+        "Mohave County School Superintendent",
+        "2026 Candidate Filing",
+        "https://www.mohave.gov/departments/school-superintendent/documents/2026-candidate-filing/",
+        "az/mohave_schools.html",
+    ),
+    "AZ-04027-s": (
+        "Yuma County Education Service Agency",
+        "2026 Statement of Interest Filings (updated 7/7/2026)",
+        "https://yumaesa.org/documents/elections/Statement_of_Interest_Filings_copy_6.pdf",
+        "az/yuma_schools.pdf",
+    ),
+    "AZ-04005-s": (
+        "Coconino County School Superintendent",
+        "2026 Governing Board Candidates",
+        "https://www.coconino.az.gov/3224/2026-Governing-Board-Candidates",
+        "az/coconino_schools.html",
+    ),
+    "AZ-04017-s": (
+        "Navajo County School Superintendent",
+        "2026 Filed Candidates (updated July 7, 2026)",
+        "https://www.navajocountyaz.gov/816/2026-Filed-Candidates",
+        "az/navajo_schools.html",
+    ),
 }
 for county, url in {
     "Nassau": "https://www.nassaucountyny.gov/DocumentCenter/View/54522/Candidate-List-as-of-09182026",
