@@ -151,7 +151,7 @@ WA_OLD_FILES = {
 WA_BILLS = {"2901": "53", "2969": "51"}
 WA_RESULTS = "https://results.vote.wa.gov/results/"
 WA_DATES = ("20071106", "20081104", "20091103", "20101102", "20111108", "20121106", "20221108")
-WA_HAND = {
+DERIVED_HAND = {
     (date(2012, 11, 6), "1185"): ("Initiative 1185", "Concerning tax and fee increases imposed by state government", "Initiative"),
     (date(2012, 11, 6), "1240"): ("Initiative 1240", "Concerning the creation of a public charter school system", "Initiative"),
     (date(2012, 11, 6), "74"): ("Referendum Measure 74", "Concerning marriage for same-sex couples", "Popular Referendum"),
@@ -161,6 +161,9 @@ WA_HAND = {
     (date(2012, 11, 6), "1"): ("Advisory Vote 1", "Concerning a B&O tax deduction for certain financial institutions' interest on residential loans (ESSB 6635)", "Advisory Vote"),
     (date(2012, 11, 6), "2"): ("Advisory Vote 2", "Concerning expiration of a tax on possession of petroleum products (SHB 2590)", "Advisory Vote"),
     (date(2022, 11, 8), "39"): ("Advisory Vote 39", "Concerning the aircraft fuel tax (ESSB 5974)", "Advisory Vote"),
+    (date(2022, 12, 10), "1"): ("Amendment No. 1", "Requires U.S. citizenship in order to register and vote in Louisiana", "Legislative Referendum"),
+    (date(2022, 12, 10), "2"): ("Amendment No. 2", "Requires Senate confirmation of gubernatorially appointed members of the State Civil Service Commission", "Legislative Referendum"),
+    (date(2022, 12, 10), "3"): ("Amendment No. 3", "Requires Senate confirmation of certain members of the State Police Commission", "Legislative Referendum"),
     (date(2022, 11, 8), "40"): ("Advisory Vote 40", "Concerning premiums for transportation network company drivers' workers' compensation (ESHB 2076)", "Advisory Vote"),
 }
 WA_COUNTIES = (
@@ -220,6 +223,7 @@ LA_DATES = (
     "20101102",
     "20111022",
     "20111119",
+    "20221210",
 )
 OK = "https://oklahoma.gov/content/dam/ok/en/elections/election-results/"
 OK_FILES = (
@@ -2043,7 +2047,7 @@ def louisiana() -> list[dict[str, object]]:
             for (key, choice), label in answers.items():
                 if key != race:
                     continue
-                answer = {"FOR": "YES", "AGAINST": "NO"}[label.strip().upper()]
+                answer = {"FOR": "YES", "AGAINST": "NO", "YES": "YES", "NO": "NO"}[label.strip().upper()]
                 found = {
                     f"22{(int(parish['ParishValue']) - 1) * 2 + 1:03}": int(entry["VoteTotal"])
                     for parish in parishes
@@ -2057,7 +2061,7 @@ def louisiana() -> list[dict[str, object]]:
                         "state": "LA",
                         "day": date(int(day[:4]), int(day[4:6]), int(day[6:])),
                         "number": match[1],
-                        "label": "",
+                        "label": DERIVED_HAND.get((date(int(day[:4]), int(day[4:6]), int(day[6:])), match[1]), ("",))[0],
                         "url": url,
                         "county": county,
                         "answer": answer,
@@ -2168,7 +2172,7 @@ def washington() -> list[dict[str, object]]:
                     "state": "WA",
                     "day": day,
                     "number": number,
-                    "label": WA_HAND.get((day, number), ("",))[0],
+                    "label": DERIVED_HAND.get((day, number), ("",))[0],
                     "url": url,
                     "county": county,
                     "answer": answer,
@@ -3633,17 +3637,17 @@ def parse() -> None:
     words = re.compile(r"[a-z]{4,}")
     matched: list[dict[str, object]] = []
     for (state, day, number, label), group in frame.group_by("state", "day", "number", "label", maintain_order=True):
-        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022)):
+        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022)):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
                 if state == "NY"
                 else (
-                    WA_HAND[day, number][1],
-                    WA_HAND[day, number][2],
+                    DERIVED_HAND[day, number][1],
+                    DERIVED_HAND[day, number][2],
                     group.filter(pl.col("answer") == "YES")["votes"].sum()
                     > group.filter(pl.col("answer") == "NO")["votes"].sum(),
                 )
-                if state == "WA"
+                if state in ("WA", "LA")
                 else (SD_2012 if state == "SD" else AZ_2022)[number]
             )
             matched.append(
