@@ -18,8 +18,10 @@ DAY = date(2026, 11, 3)
 TITLE = "Notice of General Election, November 3, 2026: local measures"
 GARLAND = "https://garlandcountyvote.org/uploads/6/3/0/4/63045401/local_issues.pdf"
 SALINE = "https://salinecounty.org/Documents/Government/County%20Clerk/Elections/2026%20Elections/Election%20Notice%20for%20General%20Election%202026.pdf"
+PULASKI = "https://votepulaskiar.gov/wp-content/uploads/11032026_Notice-of-Election_v1.pdf"
 COUNTIES = {
     "05051": (GARLAND, "Garland County Election Commission"),
+    "05119": (PULASKI, "Pulaski County Election Commission"),
     "05125": (SALINE, "Saline County Clerk"),
 }
 ROWS = [
@@ -49,6 +51,13 @@ ROWS = [
         "entity": "City of Diamondhead",
         "label": "Issue No. 8: Diamondhead Annexation",
         "wording": "On the question of Annexation of Contiguous Territory in Hot Spring County into the City of Diamondhead as described in City Ordinance O2026-007.",
+        "answers": ("For", "Against"),
+    },
+    {
+        "county": "05119",
+        "entity": "City of Jacksonville",
+        "label": "Jacksonville Ward-Based Representation Initiative Ordinance",
+        "wording": "An initiative ordinance of The People of the City of Jacksonville to abolish the at-large voting system, establish a ward-based voting system, provide for the election of two qualified ward representatives of the City Council to represent each ward, and set forth minimum qualifications for qualified ward representatives on the City Council.",
         "answers": ("For", "Against"),
     },
     {
