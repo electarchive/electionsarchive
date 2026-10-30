@@ -1849,6 +1849,8 @@ for key, publisher, title, url, local in (
     ("MO-29027", "Callaway County Clerk", "Official Ballot Style 1, General Election, November 3, 2026", "https://callawaycountyclerk.com/wp-content/uploads/2026/09/BP-70C31_20260921_112602.pdf", "mo/callaway.pdf"),
     ("IL-17115", "Macon County Clerk", "Specimen Ballot, General Election, November 3, 2026", "https://maconcounty.illinois.gov/download/specimen-ballot/", "il/macon.pdf"),
     ("MO-29101", "Johnson County Clerk", "General Election November 3, 2026 candidates and ballot measures", "https://www.jocomo.gov/m/newsflash/Home/Detail/64", "mo/johnson.html"),
+    ("MO-29113", "Lincoln County Clerk", "Election Authority's Certification, General Election, November 3, 2026", "https://www.lincolncomo.gov/sample-ballots", "mo/lincoln.pdf"),
+    ("MO-29145", "Newton County Clerk", "Official General Election Ballot (sample), Newton County, November 3, 2026", "https://www.ncclerk.org/electionsvoters/", "mo/newton.pdf"),
     ("IL-17179", "Tazewell County Clerk", "Official Ballot, General Election, November 3, 2026", "https://tazewell-il.gov/wp-content/uploads/2026/09/Binder1.pdf", "il/tazewell_ge.pdf"),
 ):
     NE_SOURCES[key] = (publisher, title, url, local)
