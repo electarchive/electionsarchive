@@ -328,7 +328,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
 export async function twin({ request, url }: RequestEvent) {
   if (
     !["GET", "HEAD"].includes(request.method) ||
-    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og)(?:\/|\.|$)/.test(
+    /^\/(?:api|rpc|lab|_app|llms\.txt|sitemap\.xml|sitemaps|og|agents)(?:\/|\.|$)/.test(
       url.pathname,
     )
   ) {

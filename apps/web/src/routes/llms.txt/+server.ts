@@ -19,7 +19,10 @@ Pages follow the place, then the election, then the contest, then the reporting 
 
 ## API
 
-- [REST API](${origin}/api/v1/openapi.json): OpenAPI description of the read API, including search.
+- [REST API](${origin}/api/v1/openapi.json): OpenAPI description of the REST API, for reading, searching, and proposing changes.
+- [MCP server](${origin}/mcp): the same tools over MCP. Reading needs no key; proposing changes needs an API key, sent in the x-api-key header.
+- [Skill](${origin}/agents/skill.md): how to propose a change: the data model, the evidence rule, the workflow, and every operation, with worked examples.
+- [For agents](${origin}/agents): setup, tools, and rules for people connecting an agent.
 
 ## Countries
 

@@ -15,7 +15,19 @@ const dated = {
   valid_to_precision: { type: "enum", values: PRECISION, required: false },
 };
 
-const TABLES = {
+const TABLES: Record<
+  string,
+  {
+    ops: Array<string>;
+    tier: number | string;
+    evidence: string;
+    key?: Array<string>;
+    columns: Record<
+      string,
+      { type: string; values?: Array<string>; required: boolean }
+    >;
+  }
+> = {
   name: {
     ops: ["add", "set", "drop"],
     tier: 1,
@@ -140,7 +152,7 @@ const DROP_ONLY = [
   "party_affiliation",
 ];
 
-const GUIDE = {
+export const GUIDE = {
   payload: {
     summary: "Required, up to 300 characters; it becomes the proposal's title.",
     rationale: "Optional, up to 10,000 characters: why the change is right.",
@@ -154,9 +166,9 @@ const GUIDE = {
     url: {
       shape: {
         url: "https://…",
-        title: "the document's title",
-        publisher: "who published it",
-        kind: "official_body, aggregator, compendium, news_agency, academic, or community",
+        title: "required: the document's title",
+        publisher: "required: who published it",
+        kind: "required: official_body, aggregator, compendium, news_agency, academic, or community",
         quote: "the exact text or figure as printed",
         page: "page number, for a PDF",
       },
@@ -165,13 +177,13 @@ const GUIDE = {
     upload: {
       shape: {
         upload: "an upload UUID from upload_document",
-        page: "page number, 1-based",
+        title: "required: the document's title",
+        publisher: "required: who published it",
+        kind: "required: as for url",
+        page: "page number, 1-based; required with a region",
         region:
-          "[x0, y0, x1, y1] as fractions of the page, the box around what you cite",
+          "[x0, y0, x1, y1] as fractions of the page from its top left, x0 < x1 and y0 < y1, the box around what you cite",
         quote: "the exact text or figure as printed",
-        title: "the document's title",
-        publisher: "who published it",
-        kind: "as for url",
       },
       note: "Wait until the upload's status is ready and read its pages with get_upload_page before marking a region.",
     },
@@ -255,7 +267,7 @@ const GUIDE = {
     "Tier 1 changes can be approved by the editorial desk alone; everything else waits for an administrator. A proposal takes the highest tier of the rows it changes.",
 };
 
-const DESCRIBED = new Map<string, object>(Object.entries(TABLES));
+const DESCRIBED = new Map(Object.entries(TABLES));
 
 const Table = v.picklist([...Object.keys(TABLES), ...DROP_ONLY]);
 

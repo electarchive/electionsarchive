@@ -268,3 +268,11 @@ export async function handle(request: Request) {
     await server.close();
   }
 }
+
+export const tools = catalog
+  .filter((tool) => tool.access !== "admin")
+  .map((tool) => ({
+    name: tool.name,
+    description: tool.listing.description,
+    isKeyed: tool.access === "key",
+  }));

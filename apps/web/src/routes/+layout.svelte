@@ -200,6 +200,11 @@
                 ></span
               >
             </a>
+            <a
+              href={resolve("/agents")}
+              class="ms-auto underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
+              >{m.agents_nav()}</a
+            >
           </div>
         </footer>
       </div>
