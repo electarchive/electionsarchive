@@ -46,6 +46,10 @@ COUNTIES = {
     "06081": ("CA", "https://www.smcacre.gov/elections/november-3-2026-statewide-general-election", "MF-nov3-ca/san-mateo/county-amendments-resolutions.pdf"),
     "04015": ("AZ", "https://www.bullheadcityaz.gov/leadership-government/elections/", "bullhead/publicity-pamphlet-26.pdf"),
     "48209": ("TX", "https://www.hayscountytx.gov/elections", "MF-392/hays/Hays County Combined Sample Ballot 11x17.pdf"),
+    "48453": ("TX", "https://countyclerk.traviscountytx.gov/elections/", "../y26/tx/travis.pdf"),
+    "48167": ("TX", "https://www.galvestoncountytx.gov/our-county/county-clerk/elections", "MF-392/galveston/November-2026-General-Election-Ballot-and-Measures.pdf"),
+    "48201": ("TX", "https://www.harrisvotes.com/", "../y26/tx/harris_sample.pdf"),
+    "48085": ("TX", "https://www.collincountytx.gov/Elections", "../y26/tx/collin.pdf"),
     "48491": ("TX", "https://www.wilcotx.gov/elections", "MF-392/williamson/20261103 November JGSE - COMPREHENSIVE BALLOT.pdf")
 }
 
