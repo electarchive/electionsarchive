@@ -17,6 +17,8 @@ PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
 SCHOOLS = {
+    ("NJ", "Rumson School District"): "3414370",
+    ("NJ", "Washington Township School District"): "3417040",
     ("TX", "Georgetown Independent School District"): "4820600",
     ("TX", "Irving Independent School District"): "4824420",
     ("TX", "Northside Independent School District"): "4833120",
@@ -37,7 +39,6 @@ SCHOOLS = {
     ("WA", "Quillayute Valley School District No. 402"): "5307020",
     ("ID", "Genesee Joint School District No. 282"): "1601200",
     ("ID", "Highland Joint School District No. 305"): "1601440",
-    ("ID", "Moscow School District No. 281"): "1602220",
     ("ID", "Moscow School District No. 281"): "1602220",
     ("AZ", "Prescott Unified School District No. 1"): "0406730",
     ("AZ", "Wickenburg Unified School District No. 9"): "0409190",
@@ -92,7 +93,6 @@ COUNTIES = {
     "05089": ("AR", "https://irp.cdn-website.com/091beef6/files/uploaded/Ordinance+2026-07.pdf", "N3M-web/ar/ar-marion.pdf"),
     "16069": ("ID", "https://nezpercecountyelections.gov/wp-content/uploads/SampleBallot_Nov2026.pdf", "N3M-web/id/nezperce-sample-ballot.pdf"),
     "16057": ("ID", "https://www.latahcountyid.gov/auditor/elections", "MF-431/Latah/LATAH COUNTY VOTER GUIDE NOV 2026.PDF"),
-    "16057": ("ID", "https://www.latahcountyid.gov/auditor/elections", "MF-431/Latah/LATAH COUNTY VOTER GUIDE NOV 2026.PDF"),
     "35049": ("NM", "https://www.santafecountynm.gov/uploads/documents/2026_Constitutional_Amendments_and_Bond_Questions_General_Election.pdf", "N3M-web/nm/santafe-county-bond-questions.pdf"),
     "05075": ("AR", "https://www.uaex.uada.edu/business-communities/ced-blog/posts/2026/august/Lawrence%20County%20election%202026.pdf", "N3M-web/ar/ar-lawrence.pdf"),
     "05107": ("AR", "https://www.uaex.uada.edu/business-communities/ced-blog/posts/2026/august/Phillips%20County%20hospital%20election%202026.pdf", "N3M-web/ar/ar-phillips.pdf"),
@@ -118,6 +118,28 @@ COUNTIES = {
     "34029": ("NJ", "https://www.lacey-nj.org/", "N3M-web/nj/lacey-doc669.pdf"),
     "34037": ("NJ", "https://www.sussexcountyclerk.org/", "N3M-web/nj/4744.pdf"),
     "34039": ("NJ", "https://ucnj.org/board-of-elections/", "N3M-web/nj/f7.pdf"),
+    "34025-mun": ("NJ", "https://www.monmouthcountyvotes.com/", "MF-438/2026-11-03-General-Election-Questions-Municipal.pdf"),
+    "34025-boe": ("NJ", "https://www.monmouthcountyvotes.com/", "MF-438/2026-11-03-General-Election-Questions-Board-of-Education2.pdf"),
+    "34003-dumont": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/Dumont-26GEN.pdf"),
+    "34003-flakes": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/Franklin-Lakes-26GEN.pdf"),
+    "34003-nmil": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/New-Milford-26GEN.pdf"),
+    "34003-orad": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/Oradell-26GEN.pdf"),
+    "34003-pridge": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/Park-Ridge-26GEN.pdf"),
+    "34003-tenafly": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/Tenafly-26GEN.pdf"),
+    "34003-wyck": ("NJ", "https://www.bergencountyclerk.org/", "MF-438/Wyckoff-26GEN.pdf"),
+    "34017-enew": ("NJ", "https://www.hudsoncountyclerk.org/", "MF-438/2026-F02-East-Newark.pdf"),
+    "34017-gutt": ("NJ", "https://www.hudsoncountyclerk.org/", "MF-438/2026-F03-Guttenberg.pdf"),
+    "34031": ("NJ", "https://www.passaiccountynj.org/", "MF-438/Passaic 2026g Sample Pompton Lakes.pdf"),
+    "34041-allam": ("NJ", "https://www.warrencountynj.gov/", "MF-438/Allamuchy BOE Question  26 General.pdf"),
+    "34041-belv": ("NJ", "https://www.warrencountynj.gov/", "MF-438/Belvidere Public Question  26 General.pdf"),
+    "34041-mans": ("NJ", "https://www.warrencountynj.gov/", "MF-438/Mansfield Public Question  26 General.pdf"),
+    "34041": ("NJ", "https://www.warrencountynj.gov/", "MF-438/Warren County Public Question  26 General.pdf"),
+    "34035-branch": ("NJ", "https://www.co.somerset.nj.us/government/county-clerk", "MF-438/Branchburg Question 2026.docx"),
+    "34035-warren": ("NJ", "https://www.co.somerset.nj.us/government/county-clerk", "MF-438/Warren Question 2026.docx"),
+    "34005": ("NJ", "https://www.co.burlington.nj.us/", "MF-438/Burlington Samples ALL Gen26.pdf"),
+    "34013": ("NJ", "https://www.essexclerk.com/", "MF-438/Essex-2026-Sample-Ballots.pdf"),
+    "34007": ("NJ", "https://www.camdencounty.com/", "MF-438/LAUREL_SPRINGS.pdf"),
+    "34007-coll": ("NJ", "https://www.camdencounty.com/", "MF-438/COLLINGSWOOD.pdf"),
     "48439": ("TX", "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/06_NRH-1126_Notice_of_Election_Eng.pdf", "N3M-web/tx2/nrh_eng.pdf"),
     "48029-comal": ("TX", "https://elections.bexar.org/#comal-isd-order-of-bond-election", "MF-433/CISD Notice of Order of Bond Election signed with exhibits FINAL 9.16.26_1.pdf"),
     "48029-nisd": ("TX", "https://elections.bexar.org/#northside-isd-order-of-bond-election", "MF-433/Northside Independent School District-Order of Bond Election.pdf"),
@@ -184,8 +206,8 @@ def emit() -> Path:
             county_key = f"us.county:{row['county']}"
             source = sources[row["county"]]
             option = None
-            if re.match(r"(?i)(city|town|village) of ", entity):
-                bare = re.sub(r"(?i)^(city|town|village) of ", "", entity)
+            if re.match(r"(?i)(city|town|village|borough) of ", entity):
+                bare = re.sub(r"(?i)^(city|town|village|borough) of ", "", entity)
                 option = civil.place(bare) or civil.towns.get((row["county"][:5], civmint.town_core(bare)))
             elif county_key in found and entity == found[county_key][2]:
                 option = county_key
