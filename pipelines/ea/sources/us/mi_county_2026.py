@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ceda, govmint
+from ea.sources.us import civmint, govmint
 from ea.store import DATA, connect
 
 SOURCE = "us.mi_county_2026"
@@ -311,21 +311,6 @@ def parse() -> None:
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "questions.parquet")
     with connect() as conn:
-        found: dict[str, tuple[UUID, UUID, str, str, str]] = {}
-        names: dict[str, list[str]] = {}
-        for scheme, code, polity, area, text, path in conn.execute(
-            """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
-               join area_code c on c.area_id = a.id
-               join polity_territory t on t.area_id = a.id
-               join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district')
-               join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-               join slug s on s.entity_id = p.id and s.is_current
-               where a.scheme_code in ('us.county', 'us.place', 'us.town', 'us.school_district') and left(c.code, 2) = '26'"""
-        ).fetchall():
-            key = f"{scheme}:{code}"
-            found[key] = (polity, area, text, path, code)
-            names.setdefault(ceda._city(text) if scheme == "us.place" else ceda._core(text), []).append(key)
-        slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/mi/%%'").fetchall())
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -333,6 +318,9 @@ def emit() -> Path:
             summary="Michigan county, city, township, and school district proposals on the November 3, 2026 ballot, with official wording",
             polity="US-MI",
         )
+        civil = civmint.Civil(conn, cs, "26", "MI")
+        found = civil.found
+        slugs = civil.slugs
         system = cs.key("us.electoral_system", "referendum")
         sources: dict[str, UUID] = {}
         for county, (url, _, publisher) in COUNTIES.items():
@@ -344,25 +332,23 @@ def emit() -> Path:
         kept = 0
         for row in frame.iter_rows(named=True):
             jurisdiction = row["jurisdiction"]
-            if jurisdiction.lower().startswith(("city of", "village of")):
-                options = names.get(ceda._city(re.sub(r"(?i)^(city|village) of ", "", jurisdiction)), [])
-            else:
-                options = names.get(
-                    ceda._core(re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 \1", jurisdiction)), []
-                )
-            options = [
-                option for option in options if not option.startswith("us.town:") or option[8:13] == row["county"]
-            ]
-            if not options and re.search(r"authority|district", jurisdiction, re.IGNORECASE):
-                county_key = f"us.county:{row['county']}"
-                if county_key in found:
-                    county_polity, county_area, _, county_path, _ = found[county_key]
-                    minted = govmint.special(
-                        conn, cs, "MI", (county_polity, county_area, county_path, row["county"]), jurisdiction, slugs
-                    )
-                    if minted is not None:
-                        options = [f"us.special_district:{minted[4]}"]
-                        found[options[0]] = minted
+            option = None
+            county_key = f"us.county:{row['county']}"
+            if county_key in found and jurisdiction.startswith(found[county_key][2]):
+                option = county_key
+            elif jurisdiction.lower().startswith(("city of", "village of")):
+                option = civil.place(re.sub(r"(?i)^(city|village) of ", "", jurisdiction))
+            elif re.search(r"(?i)township", jurisdiction):
+                option = civil.town(re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 Township", jurisdiction), row["county"])
+            elif re.search(r"(?i)schools?\b", jurisdiction) and not re.search(r"(?i)college|agency", jurisdiction):
+                option = civil.school(jurisdiction)
+            if option is None and county_key in found and re.search(r"(?i)authority|district|college|library|agency|parks", jurisdiction):
+                county_polity, county_area, _, county_path, _ = found[county_key]
+                minted = govmint.special(conn, cs, "MI", (county_polity, county_area, county_path, row["county"]), jurisdiction, slugs)
+                if minted is not None:
+                    option = f"us.special_district:{minted[4]}"
+                    found[option] = minted
+            options = [] if option is None else [option]
             if len(options) != 1:
                 print("no polity:", jurisdiction, row["label"])
                 continue

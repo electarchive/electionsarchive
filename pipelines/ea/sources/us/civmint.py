@@ -35,6 +35,14 @@ def gazetteer(url: str, state: str) -> pl.DataFrame:
     return frame.rename(lambda column: column.strip()).filter(pl.col("USPS") == state)
 
 
+def town_core(text: str) -> str:
+    return ceda._core(re.sub(r"(?i)\bcharter\b|^township of (.+)$", r"\1", text))
+
+
+def school_core(text: str) -> str:
+    return " ".join(word for word in ceda._core(text).split() if word not in {"public", "community"})
+
+
 class Civil:
     def __init__(self, conn: Connection, cs: Changeset, fips: str, state: str) -> None:
         self.cs = cs
@@ -58,18 +66,19 @@ class Civil:
             key = f"{scheme}:{code}"
             self.found[key] = (polity, area, text, path, code)
             if scheme == "us.town":
-                self.towns[(code[:5], ceda._core(text))] = key
+                self.towns[(code[:5], town_core(text))] = key
             elif scheme == "us.place":
                 self.places.setdefault(ceda._city(text), []).append(key)
             elif scheme == "us.school_district":
                 self.schools.setdefault(ceda._core(text), []).append(key)
         self.place_specs: dict[str, list[tuple[str, str]]] = {}
         for geoid, full in gazetteer(PLACES, state).select("GEOID", "NAME").iter_rows():
-            self.place_specs.setdefault(ceda._city(re.sub(r" (city|village|town|CDP)$", "", full)), []).append((geoid, re.sub(r" (city|village|town|CDP)$", "", full)))
+            label = re.sub(r"^Village of | Village$", "", re.sub(r" (city|village|town|CDP)$", "", full))
+            self.place_specs.setdefault(ceda._city(label), []).append((geoid, label))
         self.town_specs: dict[str, list[tuple[str, str]]] = {}
         for geoid, full in gazetteer(COUSUBS, state).select("GEOID", "NAME").iter_rows():
-            if full.endswith("township"):
-                self.town_specs.setdefault(geoid[:5] + ceda._core(full), []).append((geoid, full.title()))
+            if full.lower().endswith("township"):
+                self.town_specs.setdefault(geoid[:5] + town_core(full), []).append((geoid, full.title()))
         directory = json.loads(cached(DIRECTORY.format(fips=int(fips)), ".json"))["results"]
         self.school_specs = [(entry["leaid"], entry["lea_name"]) for entry in directory]
 
@@ -81,11 +90,11 @@ class Civil:
         return self.mint("us.place", specs[0][0], specs[0][1]) if not options and len(specs) == 1 else None
 
     def town(self, name: str, county: str) -> str | None:
-        bare = name if "Township" in name else f"{name} Township"
-        key = self.towns.get((county, ceda._core(bare)))
+        bare = town_core(name if "ownship" in name else f"{name} Township")
+        key = self.towns.get((county, bare))
         if key is not None:
             return key
-        specs = self.town_specs.get(county + ceda._core(bare), [])
+        specs = self.town_specs.get(county + bare, [])
         return self.mint("us.town", specs[0][0], specs[0][1]) if len(specs) == 1 else None
 
     def school(self, name: str) -> str | None:
@@ -93,6 +102,12 @@ class Civil:
         if len(options) == 1:
             return options[0]
         match = re.search(r"(\d+\w*)$", name)
+        if match is None:
+            named = [(leaid, lea) for leaid, lea in self.school_specs if school_core(lea) == school_core(name)]
+            if len(named) != 1:
+                return None
+            key = f"us.school_district:{named[0][0]}"
+            return key if key in self.found else self.mint("us.school_district", named[0][0], named[0][1])
         first = name.split()[0].lower()
         specs = [
             (leaid, lea)

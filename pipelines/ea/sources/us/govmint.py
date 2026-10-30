@@ -82,6 +82,8 @@ def special(
             [slugs[path]],
         ).fetchone()
         if existing is None:
+            if slugs[path] in cs.minted:
+                return (slugs[path], cs.area("us.special_district", code), display, path, code)
             return None
         return (existing[0], existing[1], display, path, existing[2])
     twin = held(conn, county_polity).get(fold(display))
