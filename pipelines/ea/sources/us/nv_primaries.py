@@ -62,6 +62,14 @@ PARTIES = {
     "LIBERTARIAN": "libertarian",
     "LIB": "libertarian",
 }
+STATE_OFFICES = {
+    "GOVERNOR": "governor",
+    "LIEUTENANT GOVERNOR": "lieutenant-governor",
+    "SECRETARY OF STATE": "secretary-of-state",
+    "STATE TREASURER": "treasurer",
+    "STATE CONTROLLER": "controller",
+    "ATTORNEY GENERAL": "attorney-general",
+}
 PUBLISHER = "Nevada Secretary of State"
 TITLE = "Election results: primary election summary by county"
 
@@ -109,6 +117,10 @@ def parse() -> None:
                 chamber, number = "house", int(district[1])
             elif re.match(r"(UNITED STATES )?PRESIDENT", title):
                 chamber, number = "president", None
+            elif found := re.match(r"STATE (SENATE|ASSEMBLY), DISTRICT\s+(\d+)", title):
+                chamber, number = f"state-{found[1].lower()}", int(found[2])
+            elif office := STATE_OFFICES.get(re.sub(r"\s*\(.*", "", title)):
+                chamber, number = f"state-{office}", None
             else:
                 continue
             names = []
@@ -130,13 +142,15 @@ def parse() -> None:
                                 f"{chamber}:{PARTIES[party[1].upper()]}",
                                 number,
                                 COUNTIES[county],
-                                candidate.upper(),
+                                candidate if chamber.startswith("state-") else candidate.upper(),
                                 int(cell.replace(",", "")),
                             )
                         )
                 cursor += 3 + width
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "chamber", "district", "code", "candidate", "votes"], orient="row").with_columns(
+    frame = pl.DataFrame(rows, schema=["day", "chamber", "district", "code", "candidate", "votes"], orient="row")
+    frame.filter(pl.col("chamber").str.starts_with("state-")).write_parquet(PARSED / "state.parquet")
+    frame.filter(~pl.col("chamber").str.starts_with("state-")).with_columns(
         year=pl.col("day").dt.year().cast(pl.Int32),
         special=pl.lit(False),
         state=pl.lit("NV"),

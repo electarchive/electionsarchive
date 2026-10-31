@@ -26,6 +26,7 @@ from ea.sources.us import (
     fl_sos,
     me_legislature,
     medsl,
+    nv_primaries,
     nyc_general,
     tx_elchist,
     ut_canvass,
@@ -383,6 +384,13 @@ STATES = {
         ut_canvass.TITLE,
         "https://vote.utah.gov/historical-election-results/",
     ),
+    "NV": (
+        "32",
+        "Nevada",
+        nv_primaries.PUBLISHER,
+        nv_primaries.TITLE,
+        "https://www.nvsos.gov/sos/elections/election-information/election-results",
+    ),
     "MN": (
         "27",
         "Minnesota",
@@ -483,6 +491,11 @@ ELSTATS_METHOD = (
 MN_METHOD = (
     "Totals are the sums of the precinct rows in the Secretary of State's all-races file. The file does not mark "
     "winners, so the winner shown is the candidate with the most votes."
+)
+NV_METHOD = (
+    "Totals are the county columns of the Secretary of State's primary election summary; the none of these "
+    "candidates line is left out. The page does not mark winners, so the winner shown is the candidate with the "
+    "most votes."
 )
 JUDICIAL_METHOD = (
     "Totals are the sums of the precinct, early voting, absentee, and provisional rows in the State Board's "
@@ -1162,6 +1175,11 @@ def nyc_files() -> dict[tuple[date, str, str, str], str]:
             raise ValueError(f"{contest}: {sorted(boroughs)} files and no crossover file")
         files[contest] = boroughs.get("Crossover") or next(iter(boroughs.values()))
     return files
+
+
+def nv_name(text: str) -> str:
+    last, _, first = text.partition(", ")
+    return " ".join(part.title() for part in (first, last) if part)
 
 
 def elstats_years(state: str) -> range:
@@ -3471,6 +3489,32 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    frames.append(
+        pl.read_parquet(DATA / "parsed" / nv_primaries.SOURCE / "state.parquet")
+        .filter(pl.col("day").dt.year() >= 2016)
+        .select(
+            day="day",
+            office=pl.col("chamber").str.split(":").list.first().str.strip_prefix("state-"),
+            code=pl.col("district").cast(pl.String),
+            party=pl.col("chamber")
+            .str.split(":")
+            .list.last()
+            .map_elements(
+                lambda word: next(code for code, row in PARTIES.items() if row[1] == word), return_dtype=pl.String
+            ),
+            fips="code",
+            choice=pl.col("candidate").map_elements(nv_name, return_dtype=pl.String),
+            votes="votes",
+        )
+        .with_columns(
+            state=pl.lit("NV"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     partisan = pl.col("day").dt.year() < 2012
     frames.append(
         ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
@@ -3648,6 +3692,8 @@ def emit() -> Path:
             cs.artifact(raw.cached(ut_canvass.SOURCE, ut_canvass.BASE + path), sources["UT"])
         for path in ut_primaries.FILES.values():
             cs.artifact(raw.cached(ut_primaries.SOURCE, ut_primaries.BASE + path), sources["UT"])
+        for _, stamp, url in nv_primaries.FILES:
+            cs.artifact(raw.cached(nv_primaries.SOURCE, nv_primaries.address(stamp, url)), sources["NV"])
         for day in WA_DAYS:
             for url in (wa_local.FILES[day], wa_local.PRECINCTS.format(day=day)):
                 cs.artifact(raw.cached(wa_local.SOURCE, url), sources["WA"])
@@ -3833,6 +3879,7 @@ def emit() -> Path:
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
             *(("UT", day, None) for day in [*UT_FILES, *ut_primaries.FILES]),
+            *(("NV", day, None) for day in lines.filter(pl.col("state") == "NV").get_column("day").unique().sort()),
             *(
                 (state, day, None)
                 for state, day in lines.filter(pl.col("state").is_in(list(ELSTATS)))
@@ -3966,7 +4013,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "IA", "UT", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "IA", "UT", "NV", *ELSTATS)
                     else "two_round"
                     if state in ("TX", "SC", "AL") or (state == "FL" and day.year == 2000)
                     else "fptp"
@@ -4159,7 +4206,7 @@ def emit() -> Path:
                         wins = [(names[0], "won", WON_CONVENTION)]
                     elif tallies[0] > tallies[1] and nominated.get(names[0]):
                         wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "UT", *ELSTATS) or (
+            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "UT", "NV", *ELSTATS) or (
                 state == "FL" and day.year > 2000
             ):
                 if len(tallies) <= magnitude:
@@ -4338,6 +4385,8 @@ def emit() -> Path:
                     if state == "FL"
                     else ELSTATS_METHOD.format(publisher=STATES[state][2])
                     if state in ELSTATS
+                    else NV_METHOD
+                    if state == "NV"
                     else JUDICIAL_METHOD
                     if party == ""
                     else METHOD.format(threshold=threshold)
