@@ -676,6 +676,9 @@ TX_2022_MEASURES = {
     "2": ("Increase in the school homestead exemption to $40,000", "Legislative Referendum", True),
 }
 MS_2004_MEASURES = {"1": ("Definition of marriage", "Legislative Referendum", True)}
+IA_2022_MEASURES = {
+    "1": ("Right to keep and bear arms, with strict scrutiny review", "Legislative Referendum", True)
+}
 VT_2002_MEASURES = {"4": ("Mandatory retirement age for judges", "Legislative Referendum", True)}
 WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
 WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
@@ -698,6 +701,9 @@ MS = "https://web.archive.org/web/2022id_/https://www.sos.ms.gov/links/elections
 MS_2011 = ("26", "27", "31")
 MS_2003 = "https://sos.ms.gov/elections/electionresults/2003General/Certified%20Results/Senate%20Concurrent%20Resolution%20522.pdf"
 INBOX = DATA / "inbox" / "manual"
+IA_SOS = "https://sos.iowa.gov/elections/pdf/"
+IA_2022 = IA_SOS + "2022/general/canvsummary.pdf"
+IA_2000 = IA_SOS + "Constitutional_Question_Results.pdf"
 KY_PAGE = "https://elect.ky.gov/results/#{}"
 KY_FILES = {
     date(2000, 11, 7): "MF-429/2000-11/ky-2000-general-county-results.txt",
@@ -2446,6 +2452,8 @@ def fetch() -> None:
     for day, (file, _) in TN_FILES.items():
         store_manual(TN_PAGE.format(day.year), file, "application/pdf")
     store_manual(TN_PAGE.format(TN_1998[0].year), TN_1998[1], "application/pdf")
+    store_manual(IA_2022, "MF-493/canvsummary.pdf", "application/pdf")
+    store_manual(IA_2000, "MF-493/Constitutional_Question_Results.pdf", "application/pdf")
     raw.fetch(SOURCE, IA_2008, suffix=".pdf")
     raw.fetch(SOURCE, IA_2010, suffix=".xlsx")
     for stamp, file, _ in WI_FILES.values():
@@ -5608,6 +5616,71 @@ def iowa() -> list[dict[str, object]]:
     return rows
 
 
+def iowa_pdf_text(url: str) -> str:
+    return subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+
+
+def iowa_recent() -> list[dict[str, object]]:
+    text = iowa_pdf_text(IA_2022)
+    section = text.split("Constitutional Amendment 1", 1)[1].split("IOWA SECRETARY OF STATE", 1)[0]
+    counties: dict[str, tuple[int, int]] = {}
+    totals: tuple[int, int] | None = None
+    county = ""
+    for text_line in section.splitlines():
+        if match := re.match(r"^(\S.*?)\s+Election Day", text_line):
+            county = match[1]
+        elif match := re.match(r"^\s+Total\s+([\d,]+)\s+([\d,]+)\s", text_line):
+            pair = (int(match[1].replace(",", "")), int(match[2].replace(",", "")))
+            if county == "TOTAL":
+                totals = pair
+            else:
+                counties[county] = pair
+    if len(counties) != 99 or tuple(sum(pair[side] for pair in counties.values()) for side in (0, 1)) != totals:
+        raise ValueError(f"{IA_2022}: {len(counties)} counties do not add up to {totals}")
+    return [
+        {
+            "state": "IA",
+            "day": date(2022, 11, 8),
+            "number": "1",
+            "label": "Constitutional Amendment 1",
+            "url": IA_2022,
+            "county": county,
+            "answer": answer,
+            "votes": pair[side],
+        }
+        for county, pair in counties.items()
+        for side, answer in enumerate(("YES", "NO"))
+    ]
+
+
+def iowa_2000() -> list[dict[str, object]]:
+    text = iowa_pdf_text(IA_2000)
+    counties = {
+        match[1].strip().title(): (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+        for match in re.finditer(r"\b\d{1,2} ([A-Z][A-Z' ]+?)\s+([\d,]+)\s+([\d,]+)\s+[\d,]+", text)
+    }
+    total = re.search(r"TOTAL RESULTS\s+([\d,]+)\s+([\d,]+)", text)
+    totals = (int(total[1].replace(",", "")), int(total[2].replace(",", ""))) if total else None
+    if len(counties) != 99 or tuple(sum(pair[side] for pair in counties.values()) for side in (0, 1)) != totals:
+        raise ValueError(f"{IA_2000}: {len(counties)} counties do not add up to {totals}")
+    return [
+        {
+            "state": "IA",
+            "day": date(2000, 11, 7),
+            "number": "1",
+            "label": "Constitutional Question",
+            "url": IA_2000,
+            "county": county,
+            "answer": answer,
+            "votes": pair[side],
+        }
+        for county, pair in counties.items()
+        for side, answer in enumerate(("YES", "NO"))
+    ]
+
+
 def mississippi() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for number in MS_2011:
@@ -6803,6 +6876,8 @@ def parse() -> None:
             *texas_2022(),
             *wisconsin(),
             *iowa(),
+            *iowa_recent(),
+            *iowa_2000(),
             *mississippi(),
             *mississippi_2003(),
             *kentucky(),
@@ -6857,6 +6932,7 @@ def parse() -> None:
             ("WV", 2012),
             ("MS", 2004),
             ("VT", 2002),
+            ("IA", 2022),
         ):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
@@ -6878,6 +6954,7 @@ def parse() -> None:
                     "WV": WV_2012_MEASURES,
                     "MS": MS_2004_MEASURES,
                     "VT": VT_2002_MEASURES,
+                    "IA": IA_2022_MEASURES,
                 }.get(state, AZ_2022)[number]
             )
             matched.append(
