@@ -346,6 +346,16 @@ FEEDS = {
         "Oakland County Clerk",
         "Official Candidate List, November 3, 2026 General Election",
     ),
+    "MI-26031": (
+        "https://www.cheboygancounty.net/",
+        "Cheboygan County Clerk",
+        "Official Candidate List, 11/03/2026 State General (9/29/2026)",
+    ),
+    "MI-26047": (
+        "https://www.emmetcounty.org/",
+        "Emmet County Clerk",
+        "Candidate Listing, 11/03/2026 State General",
+    ),
     "MI-26017": (
         "https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf",
         "Bay County Clerk",
@@ -1457,6 +1467,8 @@ DELIVERED = {
     "NJ-34027": DATA / "inbox" / "y26" / "nj" / "morris.pdf",
     "NJ-34033": DATA / "inbox" / "y26" / "nj" / "salem_candidates.pdf",
     "MI-26017": DATA / "inbox" / "y26" / "mi" / "bay.pdf",
+    "MI-26031": DATA / "inbox" / "y26" / "mi" / "cheboygan.pdf",
+    "MI-26047": DATA / "inbox" / "y26" / "mi" / "emmet.pdf",
     "MI-26049": DATA / "inbox" / "y26" / "mi" / "genesee.pdf",
     "MI-26091": DATA / "inbox" / "y26" / "mi" / "lenawee.pdf",
     "MI-26163": DATA / "inbox" / "manual" / "MF-199" / "official-candidate-list_november-3-2026.pdf",
@@ -8147,12 +8159,24 @@ def parse() -> None:
             }
         )
 
-    for key, county in (("MI-26017", "Bay"), ("MI-26091", "Lenawee"), ("MI-26021", "Berrien")):
+    for key, county in (
+        ("MI-26017", "Bay"),
+        ("MI-26091", "Lenawee"),
+        ("MI-26021", "Berrien"),
+        ("MI-26031", "Cheboygan"),
+        ("MI-26047", "Emmet"),
+    ):
         post, seats, unexpired = "", 0, False
         for line in text(key, "-layout").splitlines():
             if found := re.match(r"([A-Z][A-Z0-9 .,'&/-]*?) \(([A-Z][A-Z .,'&-]+?)\)\s*$", line):
                 title = re.sub(
-                    r"^VIL ", "VILLAGE ", re.sub(r"^TWP ", "TOWNSHIP ", re.sub(r"^SCH BRD$", "SCHOOL BOARD", found[1]))
+                    r"^VIL ",
+                    "VILLAGE ",
+                    re.sub(
+                        r"^TWP ",
+                        "TOWNSHIP ",
+                        re.sub(r"^SCH BRD$", "SCHOOL BOARD", re.sub(r"^LSD BRD MEMBER$", "BOARD MEMBER", found[1])),
+                    ),
                 )
                 post = f"{found[2]} {title}"
             elif found := re.match(r"(?:(\d+) Year Term|Partial Term.*?) - Vote for not more than (\d+)", line):
