@@ -11,7 +11,7 @@ import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 
-from ea import scans
+from ea import batch, scans
 
 PROMPT = "1"
 SYSTEM = (
@@ -101,7 +101,7 @@ def number(text: str) -> int | None:
 
 
 def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.Read]:
-    model, effort, _, _ = scans.READERS[reader]
+    model, effort = scans.READERS[reader]
     manifest = cast(
         scans.Manifest,
         {
@@ -120,8 +120,7 @@ def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[
         "party as printed ('' if none), and the votes as printed; printed_total is the table's printed total or "
         "'Total vote' line exactly as printed ('' when it prints none). A candidate printed in several rows (one per "
         "party line) is one row per printed line. A volume that prints years down the page gives one table per "
-        "year and office."
-        + (f" {volume['hint']}" if "hint" in volume else "")
+        "year and office." + (f" {volume['hint']}" if "hint" in volume else "")
     )
     out: dict[str, scans.Read] = {}
     for leaf in leaves:
@@ -146,7 +145,8 @@ def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[
             span=(0.0, 1.0),
             digest=digest,
             pixels=image.width * image.height,
-            key=f"anthropic-batch:{model}/sw{PROMPT}/{effort}/{digest}",
+            image=data,
+            key=scans.key(reader, f"sw{PROMPT}", digest),
             params=MessageCreateParamsNonStreaming(
                 model=model,
                 max_tokens=32000,
@@ -225,24 +225,18 @@ def anchors(volume: Volume, found: dict[tuple[int, int, str], dict[str, object]]
     return result
 
 
-def step(name: str, mode: str = "auto") -> str:
+def step(name: str) -> str:
     volume: Volume = json.loads((scans.MANIFESTS / "volumes" / f"{name}.json").read_text())
     folder = scans.WORK / name
     folder.mkdir(parents=True, exist_ok=True)
-    state_path = folder / "state.json"
-    state: dict[str, dict[str, list[scans.Batch]]] = json.loads(state_path.read_text()) if state_path.exists() else {}
     leaves = volume["leaves"]
     reads: dict[str, dict[str, scans.Read]] = {}
     outcome: dict[str, dict[tuple[int, int, str], dict[str, object]]] = {}
-    message = ""
     for reader in ("second", "third")[: int(os.environ.get("EA_SCANS_READERS", "3")) - 1]:
         plan = requests(name, volume, reader, leaves)
-        message = scans.settle(reader, state, mode) or message
-        wanted = {custom: request for custom, request in plan.items() if scans.cached(request.key) is None}
-        message = scans.dispatch(reader, wanted, state, mode) or message
-        state_path.write_text(json.dumps(state, indent=2))
-        if any(scans.cached(request.key) is None for request in plan.values()):
-            return message or f"{reader}: waiting for the batch"
+        waiting = scans.read(f"{name}/statewide-{reader}", reader, plan)
+        if waiting is not None:
+            return waiting
         reads[reader] = plan
         outcome[reader] = tables(volume, plan)
         anchored = anchors(volume, outcome[reader])
@@ -260,7 +254,7 @@ def step(name: str, mode: str = "auto") -> str:
         )
         if not leaves:
             break
-    return finalize(name, volume, folder, outcome, message)
+    return finalize(name, volume, folder, outcome)
 
 
 def finalize(
@@ -268,7 +262,6 @@ def finalize(
     volume: Volume,
     folder: Path,
     outcome: dict[str, dict[tuple[int, int, str], dict[str, object]]],
-    message: str,
 ) -> str:
     overrides = json.loads((folder / "overrides.json").read_text()) if (folder / "overrides.json").exists() else {}
     accepted: list[str] = overrides.get("accept", [])
@@ -335,22 +328,23 @@ def finalize(
         pl.DataFrame(passed).write_parquet(folder / "tables.parquet")
     lines = [f"# {name}", ""]
     for reader in ("second", "third"):
-        _, _, price_in, price_out = scans.READERS[reader]
-        spent = 0.0
-        pages = 0
-        for request in requests(name, volume, reader, volume["leaves"]).values():
-            response = scans.cached(request.key)
-            if response is not None and isinstance(usage := response["usage"], dict):
-                spent += (usage["input_tokens"] * price_in + usage["output_tokens"] * price_out) / 1e6
-                pages += 1
+        pages = sum(
+            scans.cached(request.key) is not None
+            for request in requests(name, volume, reader, volume["leaves"]).values()
+        )
+        spent = sum(
+            batch.cost(sent)
+            for job in batch.jobs(f"{scans.SOURCE}/{name}/statewide-{reader}")
+            for sent in job["batches"]
+        )
         if pages:
-            lines += [f"## {reader}: {pages} pages, ${spent:.4f} at batch prices", ""]
+            lines += [f"## {reader}: {pages} pages, ${spent:.4f} in batches", ""]
     counts = Counter(str(row["how"]) for row in passed)
     lines += [f"- {how}: {count} rows" for how, count in counts.items()]
     lines += ["", "## review", "", *[f"- {label}" for label in review]]
     (folder / "report.md").write_text("\n".join(lines))
     contests = len({(row["office"], row["date"]) for row in passed})
-    return f"{message}; {contests} contests passed, {len(review)} tables in review; {folder / 'report.md'}"
+    return f"{contests} contests passed, {len(review)} tables in review; {folder / 'report.md'}"
 
 
 def emit(name: str) -> Path:

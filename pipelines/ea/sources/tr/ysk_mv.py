@@ -8,21 +8,18 @@ import re
 import struct
 import subprocess
 import tempfile
-import time
 from collections import Counter
-from datetime import UTC, date, datetime
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
-import anthropic
 import polars as pl
-from anthropic.types.messages import MessageBatchIndividualResponse
-from anthropic.types.messages.batch_create_params import Request
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
-from ea import raw, scan
+from ea import batch, raw, scan
 from ea.changeset import Changeset, slug
-from ea.scans import LEDGER, dollars, ledger
 from ea.sources.tr.tbmm import fold
 from ea.sources.tr.thea import PARTIES
 from ea.sources.tr.ysk import (
@@ -53,7 +50,6 @@ TABLED = {date(1961, 10, 15): (10960, date(1961, 11, 17), range(7, 14), 1)}
 EDGES = [815, 1085, 1316, 1645, 1885, 2155, 2427, 2696, 2915, 3243, 3570]
 MODEL = "claude-haiku-5-5"
 PROMPT = "1"
-STOP = 320.0
 SYSTEM = (
     "You transcribe one crop of a page of Turkey's Official Gazette (Resmî Gazete) from the 1960s or 1970s. The "
     "page prints the Supreme Election Council's results by province: a province heading, the number of registered "
@@ -324,86 +320,34 @@ def read() -> None:
     (PARSED / "crops.json").write_text(
         json.dumps([[day.isoformat(), page, column, half, digest] for day, page, column, half, digest, *_ in plan])
     )
-    state_path = PARSED / "batches.json"
-    state = json.loads(state_path.read_text()) if state_path.exists() else {}
-    api = anthropic.Anthropic()
-    for batch_id, keys in list(state.items()):
-        status = api.messages.batches.retrieve(batch_id)
-        if status.processing_status != "ended":
-            print(batch_id, status.processing_status, status.request_counts.processing, "processing")
-            continue
-        spent = 0.0
-        for line in api.get(
-            f"/v1/messages/batches/{batch_id}/results",
-            cast_to=str,
-            options={"headers": {"Accept": "application/binary"}},
-        ).splitlines():
-            result = MessageBatchIndividualResponse.model_validate_json(line)
-            if result.result.type != "succeeded":
-                print(result.custom_id, result.result.type)
-                continue
-            spent += dollars(result.result.message, 1.0)
-            raw.store(
-                SOURCE,
-                keys[result.custom_id],
-                result.result.message.model_dump_json().encode(),
-                suffix=".json",
-                retrieved_at=datetime.now(UTC),
-                media_type="application/json",
-            )
-        books = ledger()
-        books["pending"].pop(batch_id, None)
-        books["spent"][batch_id] = spent
-        LEDGER.write_text(json.dumps(books, indent=2))
-        print(batch_id, f"collected ${spent:.3f}")
-        del state[batch_id]
-    todo = [crop for crop in plan if response(crop[4]) is None]
-    print(f"{len(plan) - len(todo)} of {len(plan)} crops read")
-    if todo and not state:
-        books = ledger()
-        projected = len(todo) * 0.002
-        committed = sum(books["spent"].values()) + sum(books["pending"].values())
-        if committed + projected > STOP:
-            raise SystemExit(f"BLOCKED: budget; ${committed:.2f} committed plus ${projected:.2f} passes ${STOP}")
-        keys = {}
-        requests: list[Request] = []
-        for day, page, column, half, digest, media, data in todo:
-            custom = f"{day.year}-{page}-{column}-{half}"
-            keys[custom] = f"anthropic-batch:{MODEL}/{PROMPT}/{digest}"
-            requests.append(
-                {
-                    "custom_id": custom,
-                    "params": {
-                        "model": MODEL,
-                        "max_tokens": 16000,
-                        "system": SYSTEM,
-                        "messages": [
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "image",
-                                        "source": {
-                                            "type": "base64",
-                                            "media_type": "image/png",
-                                            "data": base64.b64encode(data).decode(),
-                                        },
-                                    },
-                                    {"type": "text", "text": "Transcribe this crop."},
-                                ],
-                            }
+    wanted: dict[str, batch.Want] = {}
+    for _, _, _, _, digest, _, data in plan:
+        wanted[f"anthropic-batch:{MODEL}/{PROMPT}/{digest}"] = (
+            MessageCreateParamsNonStreaming(
+                model=MODEL,
+                max_tokens=16000,
+                system=SYSTEM,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            ImageBlockParam(
+                                type="image",
+                                source={
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": base64.b64encode(data).decode(),
+                                },
+                            ),
+                            TextBlockParam(type="text", text="Transcribe this crop."),
                         ],
-                        "output_config": {"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
-                    },
-                }
-            )
-        created = api.messages.batches.create(requests=requests)
-        books["pending"][created.id] = projected
-        books.setdefault("when", {})[created.id] = time.time()
-        LEDGER.write_text(json.dumps(books, indent=2))
-        state[created.id] = keys
-        print("submitted", created.id, len(requests), f"projected ${projected:.2f}")
-    state_path.write_text(json.dumps(state, indent=2))
+                    }
+                ],
+                output_config={"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
+            ),
+            0.002,
+        )
+    print(batch.ensure(SOURCE, "crops", wanted)[1])
 
 
 def lines(pdf: Path, page: int, columns: int) -> list[tuple[int, list[tuple[str, tuple[float, ...]]]]]:

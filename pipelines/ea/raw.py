@@ -159,6 +159,10 @@ def _key(url: str, body: dict[str, object] | None) -> str:
     return f"{url}#{hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]}"
 
 
+def keys(source: str) -> set[str]:
+    return set(_index(source)[1])
+
+
 def cached(source: str, url: str, body: dict[str, object] | None = None) -> Artifact:
     _, index = _index(source)
     key = _key(url, body)

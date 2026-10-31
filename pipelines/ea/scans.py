@@ -8,29 +8,23 @@ import os
 import re
 import subprocess
 import tempfile
-import time
 import zipfile
 from collections import Counter
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from functools import cache
 from pathlib import Path
 from typing import Literal, NamedTuple, NotRequired, TypedDict
 from uuid import UUID
 
-import anthropic
-import httpx
 import numpy as np
 import polars as pl
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
-from anthropic.types.messages import MessageBatchIndividualResponse
-from anthropic.types.messages.batch_create_params import Request
 from PIL import Image
 from psycopg import Connection
 
-from ea import raw
+from ea import batch, raw
 from ea.changeset import Changeset
 from ea.sources.us import elstats, medsl
 from ea.store import DATA, connect
@@ -89,6 +83,7 @@ class Manifest(TypedDict):
     extend: NotRequired[bool]
     restage: NotRequired[bool]
     autorotate: NotRequired[bool]
+    caveat: NotRequired[str]
 
 
 class Header(TypedDict):
@@ -109,16 +104,9 @@ class Table(TypedDict):
     rows: list[Row]
 
 
-class Batch(TypedDict):
-    id: str
-    keys: dict[str, str]
-
-
 class Reader(NamedTuple):
     model: str
-    effort: Literal["low", "medium"]
-    price_in: float
-    price_out: float
+    effort: Literal["low", "medium", "high"]
 
 
 @dataclass
@@ -151,21 +139,18 @@ MANIFESTS = Path(__file__).resolve().parents[1] / "scans"
 WORK = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 READERS = {
-    "first": Reader("claude-haiku-5-5", "low", 0.05, 0.25),
-    "second": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
-    "third": Reader("claude-opus-5-5", "medium", 5.0, 25.0),
-    "layout": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
+    "first": Reader("claude-haiku-5-5", "low"),
+    "second": Reader("claude-haiku-5-5", "medium"),
+    "third": Reader("claude-haiku-5-5", "high"),
+    "layout": Reader("claude-haiku-5-5", "medium"),
+}
+LEGACY = {
+    "second": Reader("claude-sonnet-5-5", "medium"),
+    "third": Reader("claude-opus-5-5", "medium"),
+    "layout": Reader("claude-sonnet-5-5", "medium"),
 }
 ORDER = ("first", "second", "third")
-PRICES = {reader.model: (reader.price_in, reader.price_out) for reader in READERS.values()}
-DIRECT_FULL = 2.0
-DIRECT_THREADS = 8
-DIRECT_LIMIT = 200
-LEDGER = DATA / "scans-ledger.json"
-BUDGET = 175.0
-BILLED_FROM = "2026-10-22T00:00:00Z"
 IMAGE_LIMIT = 4_500_000
-BATCH_LIMIT = 200_000_000
 LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
 HALF = re.compile(r"(?<=\d)\s*(?:\.5|½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
@@ -213,12 +198,6 @@ SYSTEM = (
     "printed; do not leave one out. Row and column labels are copied as printed. Coordinates are integers from 0 "
     "to 1000 across the width and height of the last image, measured from its top left corner."
 )
-
-
-def client() -> anthropic.Anthropic:
-    if "ANTHROPIC_API_KEY" not in os.environ:
-        raise SystemExit("BLOCKED: ANTHROPIC_API_KEY")
-    return anthropic.Anthropic()
 
 
 def key_of(contest: Contest) -> str:
@@ -450,7 +429,8 @@ def requests(name: str, reader: str) -> dict[str, Read]:
     starts = {str(spec.get("id", spec["page"])): spec.get("start") for spec in load(name)["pages"]}
     out: dict[str, Read] = {}
     for custom, page, span, blocks, digest, pixels, image in bands(name, reader):
-        model, effort, _, _ = READERS["second" if reader == "first" and starts[page] == "second" else reader]
+        role = "second" if reader == "first" and starts[page] == "second" else reader
+        model, effort = READERS[role]
         out[custom] = Read(
             custom=custom,
             section=page,
@@ -458,7 +438,7 @@ def requests(name: str, reader: str) -> dict[str, Read]:
             digest=digest,
             pixels=pixels,
             image=image,
-            key=f"anthropic-batch:{model}/{PROMPT}/{effort}/{digest}",
+            key=key(role, PROMPT, digest),
             params=MessageCreateParamsNonStreaming(
                 model=model,
                 max_tokens=32000,
@@ -468,6 +448,21 @@ def requests(name: str, reader: str) -> dict[str, Read]:
             ),
         )
     return out
+
+
+@cache
+def held() -> set[str]:
+    return raw.keys(SOURCE)
+
+
+def key(reader: str, prompt: str, digest: str) -> str:
+    if reader in LEGACY:
+        model, effort = LEGACY[reader]
+        old = f"anthropic-batch:{model}/{prompt}/{effort}/{digest}"
+        if old in held():
+            return old
+    model, effort = READERS[reader]
+    return f"anthropic-batch:{model}/{prompt}/{effort}/{digest}"
 
 
 def cached(key: str) -> dict[str, object] | None:
@@ -793,209 +788,17 @@ def pending(name: str, reader: str, pages: set[str] | None) -> dict[str, Read]:
 
 
 def guess(reader: str, request: Read) -> float:
-    _, _, price_in, price_out = READERS[reader]
+    price_in, price_out = batch.PRICES[READERS[reader].model]
     return (min(request.pixels, 3_500_000) / 750 * price_in + 3000 * price_out) / 1e6
 
 
-def ledger() -> dict[str, dict[str, float]]:
-    return json.loads(LEDGER.read_text()) if LEDGER.exists() else {"spent": {}, "pending": {}}
-
-
-def committed(books: dict[str, dict[str, float]]) -> float:
-    entries = {**books["spent"], **books["pending"]}
-    billed = books.get("billed")
-    if billed is None:
-        return sum(entries.values())
-    if time.time() - billed["at"] > 6 * 3600:
-        raise SystemExit("BLOCKED: billing is over 6 hours old; run anthropic-batch uv run ea scans reconcile")
-    since = billed["at"] - 2 * 3600
-    recent = sum(value for key, value in entries.items() if books.get("when", {}).get(key, 0) >= since)
-    return billed["usd"] + recent
-
-
-def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list[Batch]]]) -> list[str]:
-    api = client()
-    groups: list[list[Read]] = [[]]
-    size = 0
-    for request in wanted.values():
-        weight = len(json.dumps(request.params))
-        if groups[-1] and size + weight > BATCH_LIMIT:
-            groups.append([])
-            size = 0
-        groups[-1].append(request)
-        size += weight
-    books = ledger()
-    projected = sum(guess(reader, request) for request in wanted.values())
-    total = committed(books)
-    if total + projected > BUDGET:
-        raise SystemExit(
-            f"BLOCKED: budget; ${total:.2f} spent or pending plus ${projected:.2f} projected passes ${BUDGET}"
-        )
-    print(f"projected ${projected:.3f}; ${total:.2f} spent or pending of ${BUDGET}")
-    ids: list[str] = []
-    for group in groups:
-        created = api.messages.batches.create(
-            requests=[Request(custom_id=request.custom, params=request.params) for request in group]
-        )
-        state.setdefault("batches", {}).setdefault(reader, []).append(
-            {"id": created.id, "keys": {request.custom: request.key for request in group}}
-        )
-        books["pending"][created.id] = sum(guess(reader, request) for request in group)
-        books.setdefault("when", {})[created.id] = time.time()
-        ids.append(created.id)
-    LEDGER.write_text(json.dumps(books, indent=2))
-    return ids
-
-
-def keep(key: str, message: anthropic.types.Message) -> None:
-    raw.store(
-        SOURCE,
-        key,
-        message.model_dump_json().encode(),
-        suffix=".json",
-        retrieved_at=datetime.now(UTC),
-        media_type="application/json",
+def read(job: str, reader: str, plan: dict[str, Read]) -> str | None:
+    if "EA_SCANS_CACHED" in os.environ:
+        return None
+    ready, note = batch.ensure(
+        SOURCE, job, {request.key: (request.params, guess(reader, request)) for request in plan.values()}
     )
-
-
-def dollars(message: anthropic.types.Message, rate: float) -> float:
-    price_in, price_out = PRICES[message.model]
-    usage = message.usage
-    prompt = (
-        usage.input_tokens
-        + (usage.cache_creation_input_tokens or 0) * 1.25
-        + (usage.cache_read_input_tokens or 0) * 0.1
-    )
-    return (prompt * price_in + usage.output_tokens * price_out) * rate / 1e6
-
-
-def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
-    api = client()
-    notes: list[str] = []
-    remaining = []
-    for batch in state["batches"][reader]:
-        status = api.messages.batches.retrieve(batch["id"])
-        if status.processing_status != "ended":
-            notes.append(f"{batch['id']} {status.processing_status}, {status.request_counts.processing} processing")
-            remaining.append(batch)
-            continue
-        books = ledger()
-        spent = 0.0
-        for line in api.get(
-            f"/v1/messages/batches/{batch['id']}/results",
-            cast_to=str,
-            options={"headers": {"Accept": "application/binary"}},
-        ).splitlines():
-            result = MessageBatchIndividualResponse.model_validate_json(line)
-            if result.result.type == "succeeded":
-                spent += dollars(result.result.message, 1.0)
-                keep(batch["keys"][result.custom_id], result.result.message)
-            else:
-                notes.append(f"{result.custom_id} {result.result.type}")
-        books["pending"].pop(batch["id"], None)
-        books["spent"][batch["id"]] = spent
-        LEDGER.write_text(json.dumps(books, indent=2))
-    state["batches"][reader] = remaining
-    return "; ".join(notes)
-
-
-def read_direct(reader: str, wanted: dict[str, Read]) -> str:
-    api = anthropic.Anthropic(max_retries=6, timeout=1200)
-    books = ledger()
-    projected = sum(guess(reader, request) for request in wanted.values()) * DIRECT_FULL
-    total = committed(books)
-    if total + projected > BUDGET:
-        raise SystemExit(
-            f"BLOCKED: budget; ${total:.2f} spent or pending plus ${projected:.2f} projected passes ${BUDGET}"
-        )
-
-    def call(request: Read) -> anthropic.types.Message:
-        params = request.params
-        with api.messages.stream(
-            model=params["model"],
-            max_tokens=params["max_tokens"],
-            system=params["system"],
-            messages=params["messages"],
-            output_config=params["output_config"],
-        ) as stream:
-            return stream.get_final_message()
-
-    notes: list[str] = []
-    spent = 0.0
-    done = 0
-    try:
-        with ThreadPoolExecutor(DIRECT_THREADS) as pool:
-            futures = {pool.submit(call, request): request for request in wanted.values()}
-            for future in as_completed(futures):
-                request = futures[future]
-                try:
-                    message = future.result()
-                except anthropic.APIError as error:
-                    notes.append(f"{request.custom} {type(error).__name__}: {str(error)[:300]}")
-                    continue
-                keep(request.key, message)
-                spent += dollars(message, DIRECT_FULL)
-                done += 1
-    finally:
-        books = ledger()
-        key = f"direct-{datetime.now(UTC).isoformat(timespec='seconds')}-{reader}"
-        books["spent"][key] = spent
-        books.setdefault("when", {})[key] = time.time()
-        LEDGER.write_text(json.dumps(books, indent=2))
-    return "; ".join([f"{reader}: read {done} of {len(wanted)} directly for ${spent:.3f}", *notes])
-
-
-def settle(reader: str, state: dict[str, dict[str, list[Batch]]], mode: str) -> str:
-    message = ""
-    if state.get("batches", {}).get(reader):
-        message = collect(reader, state)
-    if mode == "direct" and state.get("batches", {}).get(reader):
-        api = client()
-        books = ledger()
-        for batch in state["batches"][reader]:
-            api.messages.batches.cancel(batch["id"])
-            books["pending"].pop(batch["id"], None)
-        LEDGER.write_text(json.dumps(books, indent=2))
-        state["batches"][reader] = []
-        message = f"{reader}: canceled the waiting batch"
-    return message
-
-
-def dispatch(reader: str, todo: dict[str, Read], state: dict[str, dict[str, list[Batch]]], mode: str) -> str:
-    if not todo or state.get("batches", {}).get(reader):
-        return ""
-    if mode == "direct" or (mode == "auto" and not (reader == "first" and len(todo) > DIRECT_LIMIT)):
-        return read_direct(reader, todo)
-    return f"{reader}: submitted {len(todo)} requests in {', '.join(submit(reader, todo, state))}"
-
-
-def reconcile() -> str:
-    api = client()
-    books = ledger()
-    notes: list[str] = []
-    for batch_id in list(books["pending"]):
-        status = api.messages.batches.retrieve(batch_id)
-        if status.processing_status != "ended":
-            notes.append(f"{batch_id[-8:]} {status.processing_status}")
-            continue
-        books["pending"].pop(batch_id)
-        spent = sum(
-            dollars(result.result.message, 1.0)
-            for result in (
-                MessageBatchIndividualResponse.model_validate_json(line)
-                for line in api.get(
-                    f"/v1/messages/batches/{batch_id}/results",
-                    cast_to=str,
-                    options={"headers": {"Accept": "application/binary"}},
-                ).splitlines()
-            )
-            if result.result.type == "succeeded"
-        )
-        if spent:
-            books["spent"].setdefault(batch_id, spent)
-        notes.append(f"{batch_id[-8:]} ended, ${spent:.3f}")
-    LEDGER.write_text(json.dumps(books, indent=2))
-    return "\n".join([*notes, status_line(books)])
+    return None if ready else note
 
 
 def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int]]:
@@ -1139,19 +942,16 @@ def prepare(name: str) -> str:
     return "\n".join(out + [f"no official total held for {len(unmatched)} of {len(held)} columns", *unmatched[:20]])
 
 
-def run(name: str, mode: str = "auto") -> str:
+def run(name: str) -> str:
     manifest = load(name)
     folder = WORK / name
     folder.mkdir(parents=True, exist_ok=True)
-    state_path = folder / "state.json"
-    state: dict[str, dict[str, list[Batch]]] = json.loads(state_path.read_text()) if state_path.exists() else {}
     if not (folder / "official.json").exists():
         (folder / "official.json").write_text(json.dumps(official_totals(manifest), indent=2))
     held: dict[str, int | None] = json.loads((folder / "official.json").read_text())
     if manifest.get("halves", False):
         held = {key: None if value is None else value * 2 for key, value in held.items()}
     names = counties(manifest)
-    message = ""
     outcome: dict[str, dict[str, Series]] = {}
     redo: set[str] | None = None
     for reader in ORDER[: int(os.environ.get("EA_SCANS_READERS", len(ORDER)))]:
@@ -1177,12 +977,9 @@ def run(name: str, mode: str = "auto") -> str:
             }
             if not redo:
                 break
-        if "EA_SCANS_CACHED" not in os.environ:
-            message = settle(reader, state, mode) or message
-            message = dispatch(reader, pending(name, reader, redo), state, mode) or message
-            state_path.write_text(json.dumps(state, indent=2))
-            if pending(name, reader, redo):
-                return message or f"{reader}: waiting for the batch"
+        waiting = read(f"{name}/{reader}", reader, pending(name, reader, redo))
+        if waiting is not None:
+            return waiting
         if reader == "first" and any("discover" in spec and "columns" not in spec for spec in manifest["pages"]):
             problems = discover(manifest, folder)
             manifest = load(name)
@@ -1261,7 +1058,7 @@ def finalize(
             if seen is not None:
                 cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
             elif "value" in item:
-                cellmap[key] = (int(item["value"]), (0.0, 0.0, 1.0, 1.0))
+                cellmap[key] = (int(item["value"]), [0.0, 0.0, 1.0, 1.0])
         if how == "review" and fixes:
             target = chosen.printed if chosen.printed is not None else held.get(name)
             slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
@@ -1314,7 +1111,7 @@ def finalize(
         pl.DataFrame(passed, infer_schema_length=None).write_parquet(folder / "tables.parquet")
     lines = [f"# {manifest['name']}", ""]
     for reader in ORDER:
-        model, _, price_in, price_out = READERS[reader]
+        model = READERS[reader].model
         seen: dict[str, tuple[int, int]] = {}
         for request in requests(manifest["name"], reader).values():
             response = cached(request.key)
@@ -1322,7 +1119,11 @@ def finalize(
                 before = seen.get(request.section, (0, 0))
                 seen[request.section] = (before[0] + usage["input_tokens"], before[1] + usage["output_tokens"])
         if seen:
-            dollars = sum(i * price_in + o * price_out for i, o in seen.values()) / 1e6
+            dollars = sum(
+                batch.cost(sent)
+                for job in batch.jobs(f"{SOURCE}/{manifest['name']}/{reader}")
+                for sent in job["batches"]
+            )
             lines += [
                 f"## {reader} ({model}): {len(seen)} pages, ${dollars:.4f}, ${dollars / len(seen):.4f} per page",
                 "",
@@ -1350,72 +1151,18 @@ def status() -> str:
     out = []
     for path in sorted(MANIFESTS.glob("*.json")):
         folder = WORK / path.stem
-        state = json.loads((folder / "state.json").read_text()) if (folder / "state.json").exists() else {}
         review = json.loads((folder / "review.json").read_text()) if (folder / "review.json").exists() else None
-        waiting = {reader: len(batches) for reader, batches in state.get("batches", {}).items() if batches}
+        waiting = [
+            job["name"].removeprefix(f"{path.stem}/")
+            for job in batch.jobs(f"{SOURCE}/{path.stem}")
+            if any("ended" not in sent for sent in job["batches"])
+        ]
         out.append(
             f"{path.stem}: {f'batches waiting {waiting}, ' if waiting else ''}"
             f"{'tables' if (folder / 'tables.parquet').exists() else 'no tables yet'}"
             f"{'' if review is None else f', {len(review)} in review'}"
         )
-    out.append(status_line(ledger()))
     return "\n".join(out)
-
-
-def status_line(books: dict[str, dict[str, float]]) -> str:
-    billed = books.get("billed")
-    return (
-        f"estimate ${sum(books['spent'].values()):.2f} spent, ${sum(books['pending'].values()):.2f} pending; "
-        + (
-            f"billed ${billed['usd']:.2f} at {datetime.fromtimestamp(billed['at'], UTC):%Y-%m-%d %H:%M}Z; "
-            if billed
-            else ""
-        )
-        + f"cap check ${committed(books):.2f} of ${BUDGET}"
-    )
-
-
-def bill() -> str:
-    base = os.environ.get("ANTHROPIC_BASE_URL")
-    if base is None:
-        raise SystemExit("BLOCKED: run through the proxy (anthropic-batch uv run ea scans billed)")
-    cents: dict[str, float] = {}
-    page: str | None = None
-    while True:
-        params = [("starting_at", BILLED_FROM), ("limit", "31"), ("group_by[]", "description")]
-        if page is not None:
-            params.append(("page", page))
-        response = httpx.get(
-            f"{base}/v1/organizations/cost_report",
-            params=params,
-            headers={"x-api-key": os.environ["ANTHROPIC_API_KEY"], "anthropic-version": "2023-06-01"},
-            timeout=60,
-        )
-        if response.status_code == 403:
-            raise SystemExit("BLOCKED: no admin key stored for anthropic-batch (~/.config/anthropic-batch/admin-key)")
-        response.raise_for_status()
-        body = response.json()
-        for bucket in body["data"]:
-            for result in bucket["results"]:
-                label = result["description"] or "other"
-                cents[label] = cents.get(label, 0.0) + float(result["amount"])
-        if not body["has_more"]:
-            break
-        page = body["next_page"]
-    books = ledger()
-    books["billed"] = {"usd": sum(cents.values()) / 100, "at": time.time()}
-    LEDGER.write_text(json.dumps(books, indent=2))
-    lines = [
-        f"  {description}: ${amount / 100:.4f}"
-        for description, amount in sorted(cents.items(), key=lambda item: -item[1])
-    ]
-    return "\n".join(
-        [
-            f"billed ${books['billed']['usd']:.2f} for the whole organization since {BILLED_FROM[:10]} (daily buckets lag by some hours)",
-            f"estimate ${sum(books['spent'].values()) + sum(books['pending'].values()):.2f} (ledger, every direct and batch read this pipeline made)",
-            *lines,
-        ]
-    )
 
 
 def totals(manifest: Manifest, frame: pl.DataFrame) -> Path:

@@ -113,18 +113,22 @@ def main() -> None:
     )
     scanning.add_argument(
         "action",
-        choices=("prepare", "run", "status", "emit", "layout", "ledger", "reconcile", "statewide"),
-        help="render crops and fill held totals, advance the Message Batches steps once, list manifests, "
+        choices=("prepare", "run", "status", "emit", "layout", "statewide"),
+        help="render crops and fill held totals, advance the batch reads once, list manifests, "
         "or emit the tables that passed",
     )
     scanning.add_argument("name", nargs="?", help="manifest name, such as tribune-oh-1876")
-    scanning.add_argument(
-        "--mode",
-        choices=("auto", "direct", "batch"),
-        default="auto",
-        help="run and layout: direct reads at full price in minutes (cancels a waiting batch), batch waits at half "
-        "price, auto reads directly unless a first pass passes 200 requests",
+    batching = commands.add_parser(
+        "batch", help="Message Batches jobs, accounts, and approvals (run through anthropic-batch)"
     )
+    batching.add_argument(
+        "action",
+        choices=("status", "poll", "approve", "account", "cancel", "billed"),
+        help="show caps, approvals, and open jobs; collect ended batches; approve dollars for a job prefix; set an "
+        "account's remaining credit; cancel a job's open batches; or pull billed cost per account",
+    )
+    batching.add_argument("target", nargs="?", help="job or prefix (us.scans/al-osr-1970) or account name")
+    batching.add_argument("usd", nargs="?", type=float, help="dollars for approve or account")
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -154,19 +158,28 @@ def main() -> None:
             print(
                 scans.status()
                 if args.action == "status"
-                else scans.reconcile()
-                if args.action == "ledger"
-                else f"{scans.bill()}\n{scans.reconcile()}"
-                if args.action == "reconcile"
-                else layout.step(args.name, args.mode)
+                else layout.step(args.name)
                 if args.action == "layout"
-                else statewide.step(args.name, args.mode)
+                else statewide.step(args.name)
                 if args.action == "statewide"
                 else statewide.emit(args.name)
                 if args.action == "emit" and not (scans.MANIFESTS / f"{args.name}.json").exists()
-                else scans.run(args.name, args.mode)
-                if args.action == "run"
                 else getattr(scans, args.action)(args.name)
+            )
+        case "batch":
+            from ea import batch
+
+            needs = {"approve": 2, "account": 2, "cancel": 1}.get(args.action, 0)
+            if (needs >= 1 and args.target is None) or (needs == 2 and args.usd is None):
+                parser.error(f"batch {args.action} needs {'a target and dollars' if needs == 2 else 'a job'}")
+            print(
+                batch.approve(args.target, args.usd)
+                if args.action == "approve"
+                else batch.account(args.target, args.usd)
+                if args.action == "account"
+                else batch.cancel(args.target)
+                if args.action == "cancel"
+                else getattr(batch, args.action)()
             )
         case "fixtures":
             print(fixtures.export())

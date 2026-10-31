@@ -164,7 +164,7 @@ def instructions(volume: Volume) -> str:
 
 
 def requests(volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.Read]:
-    model, effort, _, _ = scans.READERS[reader]
+    model, effort = scans.READERS[reader]
     manifest = cast(
         scans.Manifest,
         {
@@ -197,7 +197,8 @@ def requests(volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.
             span=(0.0, 1.0),
             digest=digest,
             pixels=image.width * image.height,
-            key=f"anthropic-batch:{model}/layout{PROMPT}/{effort}/{digest}",
+            image=data,
+            key=scans.key(reader, f"layout{PROMPT}", digest),
             params=MessageCreateParamsNonStreaming(
                 model=model,
                 max_tokens=16000,
@@ -230,23 +231,17 @@ def sound(page: LayoutPage) -> bool:
     )
 
 
-def step(name: str, mode: str = "auto") -> str:
+def step(name: str) -> str:
     volume: Volume = json.loads((VOLUMES / f"{name}.json").read_text())
     folder = scans.WORK / name
     folder.mkdir(parents=True, exist_ok=True)
-    state_path = folder / "state.json"
-    state: dict[str, dict[str, list[scans.Batch]]] = json.loads(state_path.read_text()) if state_path.exists() else {}
     pages: dict[int, LayoutPage] = {}
     leaves = volume["leaves"]
-    message = ""
     for reader in ("layout", "third"):
         plan = requests(volume, reader, leaves)
-        message = scans.settle(reader, state, mode) or message
-        wanted = {custom: request for custom, request in plan.items() if scans.cached(request.key) is None}
-        message = scans.dispatch(reader, wanted, state, mode) or message
-        state_path.write_text(json.dumps(state, indent=2))
-        if any(scans.cached(request.key) is None for request in plan.values()):
-            return message or f"{reader}: waiting for the batch"
+        waiting = scans.read(f"{name}/layout-{reader}", reader, plan)
+        if waiting is not None:
+            return waiting
         leaves = []
         for request in plan.values():
             loaded = scans.parse(scans.cached(request.key))
@@ -350,12 +345,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                         contest["create"] = True
                         matched = {
                             column["label"]: scans.Column(
-                                **{
-                                    "label": column["label"],
-                                    "contest": label,
-                                    "candidate": column["name"],
-                                    "party": column["party"],
-                                }
+                                label=column["label"], contest=label, candidate=column["name"], party=column["party"]
                             )
                             for column in candidates
                         }

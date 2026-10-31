@@ -1,32 +1,27 @@
 import base64
 import io
 import json
-import os
 import subprocess
-import time
 from datetime import UTC, datetime
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import cast
 
-import anthropic
 from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
-from anthropic.types.messages import MessageBatchIndividualResponse
-from anthropic.types.messages.batch_create_params import Request
 from PIL import Image
 from psycopg import Connection
 from psycopg.types.json import Jsonb
 
+from ea import batch, raw
 from ea.store import DATA, connect
 
+SOURCE = "contrib.prescreen"
 MODEL = "claude-haiku-5-5"
-PRICE_IN, PRICE_OUT = 0.10 * 0.5, 0.50 * 0.5
+PRICE_IN, PRICE_OUT = batch.PRICES[MODEL]
 CAP = 2.0
 MAX_TOKENS = 2000
 IMAGE_TOKENS = 1600
-LEDGER = DATA / "scans-ledger.json"
-STATE = DATA / "logs" / "prescreen-batches.json"
 EVIDENCE_CHARS = 30_000
 PAYLOAD_CHARS = 60_000
 DIFF_ROWS = 200
@@ -54,9 +49,6 @@ SCHEMA: dict[str, object] = {
     "required": ["verdict", "reason"],
     "additionalProperties": False,
 }
-
-type Books = dict[str, dict[str, float]]
-type Pending = list[dict[str, object]]
 
 
 class _Text(HTMLParser):
@@ -170,9 +162,8 @@ def _evidence(conn: Connection, payload: dict[str, object]) -> tuple[list[dict[s
     return shown, images
 
 
-def _queued(conn: Connection, pending: Pending) -> list[tuple[object, ...]]:
-    waiting = {(str(p), n) for batch in pending for p, n in cast(dict[str, list[object]], batch["keys"]).values()}
-    rows = conn.execute(
+def _queued(conn: Connection) -> list[tuple[object, ...]]:
+    return conn.execute(
         """select p.id::text, r.n, p.number, p.title, p.tier, p.agent_name, p.agent_model, coalesce(f.handle, u.name),
                   r.payload, r.diff, r.checks
            from proposal p
@@ -183,7 +174,6 @@ def _queued(conn: Connection, pending: Pending) -> list[tuple[object, ...]]:
              and (p.prescreen is null or (p.prescreen ->> 'revision')::int is distinct from r.n)
            order by p.submitted_at, p.number"""
     ).fetchall()
-    return [row for row in rows if (row[0], row[1]) not in waiting]
 
 
 def _prompt(conn: Connection, row: tuple[object, ...]) -> list[TextBlockParam | ImageBlockParam]:
@@ -236,102 +226,6 @@ def _prompt(conn: Connection, row: tuple[object, ...]) -> list[TextBlockParam | 
     return content
 
 
-def _ledger() -> Books:
-    return json.loads(LEDGER.read_text()) if LEDGER.exists() else {"spent": {}, "pending": {}}
-
-
-def _spent_today(books: Books) -> float:
-    since = time.time() - 86_400
-    return sum(
-        books["spent"].get(batch, books["pending"].get(batch, 0.0))
-        for batch, at in books.get("prescreen", {}).items()
-        if at >= since
-    )
-
-
-def _record(update: dict[str, tuple[str, str, float]]) -> None:
-    books = _ledger()
-    for batch, (src, dst, usd) in update.items():
-        books.setdefault(src, {}).pop(batch, None)
-        books.setdefault(dst, {})[batch] = usd
-    LEDGER.write_text(json.dumps(books, indent=2))
-
-
-def _client() -> anthropic.Anthropic:
-    if "ANTHROPIC_API_KEY" not in os.environ:
-        raise SystemExit("BLOCKED: run through anthropic-batch")
-    return anthropic.Anthropic()
-
-
-def _pending() -> Pending:
-    return json.loads(STATE.read_text()) if STATE.exists() else []
-
-
-def _save(pending: Pending) -> None:
-    STATE.parent.mkdir(parents=True, exist_ok=True)
-    STATE.write_text(json.dumps(pending, indent=2))
-
-
-def collect(api: anthropic.Anthropic, conn: Connection, pending: Pending) -> tuple[Pending, list[str]]:
-    notes: list[str] = []
-    left: Pending = []
-    for batch in pending:
-        batch_id = str(batch["id"])
-        status = api.messages.batches.retrieve(batch_id)
-        if status.processing_status != "ended":
-            notes.append(f"{batch_id} {status.processing_status}")
-            left.append(batch)
-            continue
-        keys = cast(dict[str, list[str | int]], batch["keys"])
-        spent = 0.0
-        for line in api.get(
-            f"/v1/messages/batches/{batch_id}/results",
-            cast_to=str,
-            options={"headers": {"Accept": "application/binary"}},
-        ).splitlines():
-            result = MessageBatchIndividualResponse.model_validate_json(line)
-            proposal, n = keys[result.custom_id]
-            if result.result.type != "succeeded":
-                notes.append(f"{result.custom_id} {result.result.type}")
-                continue
-            message = result.result.message
-            usage = message.usage
-            spent += (usage.input_tokens * PRICE_IN + usage.output_tokens * PRICE_OUT) / 1e6
-            text = next((block.text for block in message.content if block.type == "text"), "")
-            try:
-                verdict = json.loads(text)
-            except json.JSONDecodeError:
-                notes.append(f"{result.custom_id} unreadable ({message.stop_reason})")
-                continue
-            if verdict.get("verdict") not in VERDICTS:
-                notes.append(f"{result.custom_id} unknown verdict")
-                continue
-            written = conn.execute(
-                """update proposal p set prescreen = %s
-                   from proposal_revision r
-                   where p.id = %s and r.proposal_id = p.id and r.changeset_id = p.head_changeset_id and r.n = %s""",
-                [
-                    Jsonb(
-                        {
-                            "revision": n,
-                            "verdict": verdict["verdict"],
-                            "reason": str(verdict.get("reason", ""))[:2000],
-                            "model": message.model,
-                            "batch": batch_id,
-                            "at": datetime.now(UTC).isoformat(),
-                        }
-                    ),
-                    proposal,
-                    n,
-                ],
-            ).rowcount
-            conn.commit()
-            notes.append(f"{result.custom_id} {verdict['verdict']}" + ("" if written else " (stale, not written)"))
-        _record({batch_id: ("pending", "spent", spent)})
-        notes.append(f"{batch_id} ended, ${spent:.4f}")
-    return left, notes
-
-
 def _cost(content: list[TextBlockParam | ImageBlockParam]) -> float:
     tokens = len(SYSTEM) / 3 + sum(
         len(str(block["text"])) / 3 if block["type"] == "text" else IMAGE_TOKENS for block in content
@@ -339,54 +233,74 @@ def _cost(content: list[TextBlockParam | ImageBlockParam]) -> float:
     return (tokens * PRICE_IN + MAX_TOKENS * PRICE_OUT) / 1e6
 
 
+def _verdict(conn: Connection, proposal: str, n: int, key: str) -> str:
+    message = json.loads(raw.cached(SOURCE, key).path.read_text())
+    text = next((block["text"] for block in message["content"] if block["type"] == "text"), "")
+    try:
+        verdict = json.loads(text)
+    except json.JSONDecodeError:
+        return f"{key} unreadable ({message['stop_reason']})"
+    if verdict.get("verdict") not in VERDICTS:
+        return f"{key} unknown verdict"
+    written = conn.execute(
+        """update proposal p set prescreen = %s
+           from proposal_revision r
+           where p.id = %s and r.proposal_id = p.id and r.changeset_id = p.head_changeset_id and r.n = %s""",
+        [
+            Jsonb(
+                {
+                    "revision": n,
+                    "verdict": verdict["verdict"],
+                    "reason": str(verdict.get("reason", ""))[:2000],
+                    "model": message["model"],
+                    "at": datetime.now(UTC).isoformat(),
+                }
+            ),
+            proposal,
+            n,
+        ],
+    ).rowcount
+    conn.commit()
+    return f"{key} {verdict['verdict']}" + ("" if written else " (stale, not written)")
+
+
 def run() -> None:
-    api = _client()
-    pending = _pending()
+    since = datetime.now(UTC).timestamp() - 86_400
+    spent = sum(batch.cost(sent) for job in batch.jobs(SOURCE) for sent in job["batches"] if sent["at"] >= since)
+    left = CAP - spent
+    held = raw.keys(SOURCE)
+    notes: list[str] = []
     with connect() as conn:
-        pending, notes = collect(api, conn, pending)
-        _save(pending)
-        queued = _queued(conn, pending)
-        if not queued:
-            notes.append("nothing queued")
-            print("; ".join(notes))
-            return
-        today = _spent_today(_ledger())
+        queued = _queued(conn)
+        wanted: dict[str, batch.Want] = {}
         projected = 0.0
-        requests: list[Request] = []
-        keys: dict[str, list[object]] = {}
         for row in queued:
+            key = f"{row[0]}/r{row[1]}"
+            if key in held:
+                continue
             content = _prompt(conn, row)
             cost = _cost(content)
-            if today + projected + cost > CAP:
-                notes.append(
-                    f"{len(queued) - len(requests)} held back by the ${CAP:.2f} daily cap (${today:.4f} today)"
-                )
+            if projected + cost > left:
+                notes.append(f"some held back by the ${CAP:.2f} daily cap (${spent:.4f} today)")
                 break
             projected += cost
-            custom_id = f"p{row[2]}-r{row[1]}"
-            keys[custom_id] = [row[0], row[1]]
-            requests.append(
-                Request(
-                    custom_id=custom_id,
-                    params=MessageCreateParamsNonStreaming(
-                        model=MODEL,
-                        max_tokens=MAX_TOKENS,
-                        system=SYSTEM,
-                        output_config={"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
-                        messages=[{"role": "user", "content": content}],
-                    ),
-                )
+            wanted[key] = (
+                MessageCreateParamsNonStreaming(
+                    model=MODEL,
+                    max_tokens=MAX_TOKENS,
+                    system=SYSTEM,
+                    output_config={"effort": "low", "format": {"type": "json_schema", "schema": SCHEMA}},
+                    messages=[{"role": "user", "content": content}],
+                ),
+                cost,
             )
-    if not requests:
-        print("; ".join(notes))
-        return
-    created = api.messages.batches.create(requests=requests)
-    books = _ledger()
-    books["pending"][created.id] = projected
-    books.setdefault("when", {})[created.id] = time.time()
-    books.setdefault("prescreen", {})[created.id] = time.time()
-    LEDGER.write_text(json.dumps(books, indent=2))
-    pending.append({"id": created.id, "keys": keys, "at": datetime.now(UTC).isoformat()})
-    _save(pending)
-    notes.append(f"submitted {created.id}: {len(requests)} proposals, ${projected:.4f} projected, ${today:.4f} today")
+        if not queued:
+            print("nothing queued")
+            return
+        notes.append(batch.ensure(SOURCE, "queue", wanted, approved=left)[1])
+        held = raw.keys(SOURCE)
+        for row in queued:
+            key = f"{row[0]}/r{row[1]}"
+            if key in held:
+                notes.append(_verdict(conn, str(row[0]), int(str(row[1])), key))
     print("; ".join(notes))
