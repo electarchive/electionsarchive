@@ -5,6 +5,7 @@ import unicodedata
 from datetime import date
 from pathlib import Path
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -44,6 +45,11 @@ CONTESTS = {
     20321: (date(2024, 5, 21), "house", 2, "libertarian"),
     20322: (date(2024, 5, 21), "house", 2, "republican"),
 }
+PAGE = "https://canvass.sos.idaho.gov/eng/contests/view/{id}"
+LEGISLATIVE = range(5843, 5912)
+HEADING = re.compile(
+    r"2020 May 19 ::\s+(Democratic|Republican) Primary :: State (?:Senate|Representative ([AB])) ::\s+District (\d+)"
+)
 PUBLISHER = "Idaho Secretary of State"
 TITLE = "State of Idaho Elections Database"
 
@@ -51,6 +57,62 @@ TITLE = "State of Idaho Elections Database"
 def fetch() -> None:
     for contest in CONTESTS:
         raw.fetch(SOURCE, BASE.format(id=contest), suffix=".csv")
+    for contest in LEGISLATIVE:
+        if heading(contest) is not None:
+            raw.fetch(SOURCE, BASE.format(id=contest), suffix=".csv")
+
+
+def heading(contest: int) -> re.Match[str] | None:
+    try:
+        page = raw.fetch(SOURCE, PAGE.format(id=contest), suffix=".html")
+    except httpx.HTTPStatusError:
+        return None
+    return HEADING.search(" ".join(page.path.read_text(encoding="utf-8", errors="ignore").split()))
+
+
+def legislative(counties: dict[tuple[str, str], str]) -> pl.DataFrame:
+    rows = []
+    for contest in LEGISLATIVE:
+        found = heading(contest)
+        if found is None:
+            continue
+        party, seat, district = found.groups()
+        table = list(
+            csv.reader(io.StringIO(raw.cached(SOURCE, BASE.format(id=contest)).path.read_text(encoding="utf-8-sig")))
+        )
+        names = [cell.split("\n")[0].strip() for cell in table[0][1:-1]]
+        for row in table[1:]:
+            fips = counties.get(("16", re.sub(r"[^a-z]", "", row[0].lower()))) if row else None
+            if fips is None:
+                continue
+            for name, cell in zip(names, row[1:-1], strict=True):
+                pooled = re.match(r"(?i)write[- ]?ins?$", name) is not None
+                rows.append(
+                    (
+                        date(2020, 5, 19),
+                        "senate" if seat is None else "house",
+                        district if seat is None else f"{district}:{'AB'.index(seat) + 1}",
+                        "DEM" if party == "Democratic" else "REP",
+                        fips,
+                        "Write-ins" if pooled else name,
+                        pooled,
+                        int(cell.replace(",", "") or 0),
+                    )
+                )
+    return (
+        pl.DataFrame(
+            rows, schema=["day", "office", "code", "party", "fips", "choice", "writein", "votes"], orient="row"
+        )
+        .group_by("day", "office", "code", "party", "fips", "choice", "writein")
+        .agg(pl.col("votes").sum())
+        .with_columns(
+            state=pl.lit("ID"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
 
 
 def parse() -> None:

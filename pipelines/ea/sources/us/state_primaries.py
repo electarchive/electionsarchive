@@ -24,6 +24,7 @@ from ea.names import initials
 from ea.sources.us import (
     elstats,
     fl_sos,
+    id_primaries,
     me_legislature,
     medsl,
     nv_primaries,
@@ -1638,6 +1639,7 @@ def parse() -> None:
                         )
                     )
                 )
+    frames.append(id_primaries.legislative(counties))
     me: list[tuple[int, str, str, str, str | None, str, str, int]] = []
     for stamp, path, office, party in ME_FILES:
         year = int(re.findall(r"20\d\d", path)[0])
