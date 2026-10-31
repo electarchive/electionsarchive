@@ -1,0 +1,43 @@
+# Census governments whose published polity name differs from the Census name; read by `ea coverage us` to link them.
+# Columns: government (Census id), county (5-digit FIPS), polity (exact published name).
+government	county	polity
+05504870200000	06095	Solano Community College District
+05401000700000	06019	Clovis Veterans Memorial District
+05403743600000	06073	Whispering Palms Community Services District
+05405651300000	06111	Channel Islands Beach Community Services District
+05404150900000	06081	Montara Water and Sanitary District
+05401053600000	06019	Selma Health Care District
+05404902800000	06097	Schell-Vista Fire Protection District
+05404951000000	06097	Gold Ridge Fire Protection District
+05404930700000	06097	Rains Creek/Hiatt Rd County Water District
+05401050400000	06019	Caruthers Community Services District
+05401071500000	06019	Sierra Kings Health Care District
+05401006400000	06019	Riverdale Public Utility District
+05403902800000	06077	Naglee Burk Irrigation District
+05403906100000	06077	Woodbridge Irrigation District
+05402703800000	06053	Soledad Community Health Care District
+05402480100000	06047	Planada Community Services District
+05402490500000	06047	Merquin County Water District
+05402150400000	06041	Muir Beach Community Services District
+05402150200000	06041	Marin City Community Services District
+05402150500000	06041	Marinwood Community Services District
+05404502900000	06089	Mountain Gate Community Services District
+05404550800000	06089	Shasta Community Services District
+05400401800000	06007	Lake Oroville Area Public Utility District
+05402701400000	06053	Gonzales Rural Fire Protection District
+05401650300000	06031	Home Garden Community Services District
+05401650400000	06031	Kettleman City Community Services District
+05405200200000	06103	Corning Healthcare District
+05401260600000	06023	South Humboldt Community Healthcare District
+05400370500000	06005	Volcano Community Service District
+05400350600000	06005	Drytown County Water District
+05400360200000	06005	Ranch House Estates Community Service District
+05401820300000	06035	Stones Bengard Community Services District
+05401890100000	06035	Little Valley Community Services District
+05401880400000	06035	Westwood Community Services District
+05400520100000	06009	Circle Xx Community Services District
+05401440300000	06027	Sierra North Community Services District
+05401460600000	06027	Keeler Community Services District
+05503880100000	06075	San Francisco Community College District
+05404202900000	06083	Santa Maria Valley Water Conservation District
+05404203000000	06083	Santa Ynez River Water Conservation District

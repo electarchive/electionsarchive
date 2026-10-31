@@ -54,14 +54,31 @@ COUNTIES = {
     "06087": "Santa Cruz",
     "06075": "San Francisco",
     "06113": "Yolo",
+    "06105": "Trinity",
+    "06093": "Siskiyou",
+    "06009": "Calaveras",
+    "06005": "Amador",
+    "06103": "Tehama",
+    "06035": "Lassen",
+    "06015": "Del Norte",
+    "06027": "Inyo",
+}
+LISTED = {
+    "06009": "CA-06009-calaveras",
+    "06005": "CA-06005-sutter-creek",
+    "06103": "CA-06103-corning",
+    "06035": "CA-06035-westwood",
+    "06093": "CA-06093-siskiyou-cities",
+    "06027": "CA-06027-bishop",
+    "06015": "CA-06015-crescent-city",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
     r"|COLLEGE|HOSPITAL|VECTOR|MOSQUITO|RESOURCE|TRANSIT|HARBOR|AIRPORT|DRAINAGE|LEVEE|LIGHTING|MEMORIAL|POLICE|PEST|RECREATION"
-    r"|OPEN SPACE|RAPID|REGIONAL|HIGHWAY|WEED|ROAD|COMMUNITY|\bPORT\b|HEATHCARE"
+    r"|OPEN SPACE|RAPID|REGIONAL|HIGHWAY|WEED|ROAD|COMMUNITY|\bPORT\b|HEATHCARE|RESORT|IMPROVEMENT|GEOLOGIC"
 )
 DROPPED = re.compile(
-    r"SCHL|SCHOOL|UNIFIED|ELEMENTARY|UNION HIGH|HIGH SCH|OFFICE OF EDUCATION|BOARD OF EDUCATION|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY|^TOWN OF|CITY OF|CITY COUNCIL|CONGRESS(?! VALLEY)|ASSEMBLY|SENATE|COMMITTEE|PLAN GRP|PLAN GROUP|COMMUNITY PLAN|SPONSOR GROUP|COUNCIL|MAYOR|CLERK|TREASURER|SHERIFF|ATTORNEY|CORONER|AUDITOR"
+    r"SCHL|SCHOOL|UNIFIED|ELEMENTARY|UNION HIGH|HIGH SCH|OFFICE OF EDUCATION|BOARD OF EDUCATION|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT(?!LAND)|^CITY|^TOWN OF|CITY OF|CITY COUNCIL|CONGRESS(?! VALLEY)|ASSEMBLY|SENATE|COMMITTEE|PLAN GRP|PLAN GROUP|COMMUNITY PLAN|SPONSOR GROUP|COUNCIL|MAYOR|CLERK|TREASURER|SHERIFF|ATTORNEY|CORONER|AUDITOR"
 )
 WORDS = (
     (r"\bMUNI\b", "MUNICIPAL"),
@@ -72,6 +89,9 @@ WORDS = (
     (r"\bSRVCS\b", "SERVICES"),
     (r"\bHEATLH\b", "HEALTH"),
     (r"\bHEATHCARE\b", "HEALTHCARE"),
+    (r"\bDIST\b", "DISTRICT"),
+    (r"\bCTY\b", "COUNTY"),
+    (r"\bREC\b", "RECREATION"),
 )
 SEAT = re.compile(
     r"^(.+?)\s+-\s+(DIV(?:ISION)?\.?|ZONE|AREA|TRUSTEE AREA|DISTRICT)\s+(?:NO\.\s+)?(\w+)(?:\s+\(Short Term\))?$",
@@ -81,15 +101,19 @@ SEAT_WORDS = {"ZONE": "Zone", "AREA": "Area", "TRUSTEE AREA": "Trustee Area", "D
 PERSON = re.compile(r"^([A-Z][^,]*?), (.+?)(?: - ([A-Z]{2,4}))?\s{3,}\S.*\s(YES|NO)\s*$")
 
 
+ALIASES: dict[str, str] = {}
+
+
 def usable(label: str) -> bool:
     return KEPT.search(label.upper()) is not None and DROPPED.search(label.upper()) is None
 
 
 def full_name(label: str) -> str:
     for short, full in WORDS:
-        label = re.sub(short, full, label)
+        label = re.sub(short, lambda found: full if found[0].isupper() else full.title(), label, flags=re.IGNORECASE)
     text = cased(label).replace(" Del ", " del ").replace(" And ", " and ").replace(" Of ", " of ")
-    return text if re.search(r"\b(?:District|Authority|Agency|System)\b|County$", text) else f"{text} District"
+    text = text if re.search(r"\b(?:District|Authority|Agency|System)\b|County$", text) else f"{text} District"
+    return ALIASES.get(text, text)
 
 
 def feed(fips: str) -> tuple[str, str, str]:
@@ -105,6 +129,12 @@ OWN = {"06111", *INBOX}
 
 
 def lines(fips: str) -> list[str]:
+    if fips in INBOX_DOCS:
+        return (
+            subprocess.run(["pdftotext", "-layout", str(inbox_doc(fips)), "-"], capture_output=True, check=True)
+            .stdout.decode()
+            .splitlines()
+        )
     url = feed(fips)[0]
     if fips in INBOX:
         try:
@@ -291,13 +321,15 @@ def los_angeles() -> list[dict[str, str | int | bool]]:
 
 
 PROOF_HEAD = re.compile(
-    r"^(?:Non-?Partisan|NONPARTISAN OFFICES) (?:DISTRICT|SCHOOL) (?P<body>.+?) (?:For )?(?P<role>Director|Trustee|Governing Board Member|Member, Board of (?:Directors|Trustees))(?P<rest>.*)$",
+    r"^(?:Non-?Partisan|NONPARTISAN OFFICES) (?:DISTRICT|SCHOOL) (?P<body>.+?) (?:For )?(?P<role>Harbor Commissioner|Director|Trustee|Governing Board Member|Member, Board of (?:Directors|Trustees))(?P<rest>.*)$",
     re.IGNORECASE,
 )
 PROOF_SEAT = re.compile(r"(Division|Zone|District Area|Trustee Area|Area|Seat|At Large)(?: No\.?)? ?(\d+)")
 
 
-def proof_list(fips: str, county: str, indent: int, qualified_only: bool = False) -> list[dict[str, str | int | bool]]:
+def proof_list(
+    fips: str, county: str, indent: int, qualified_only: bool = False, doc: str = ""
+) -> list[dict[str, str | int | bool]]:
     qualified: set[tuple[tuple[str, str, str, bool], str]] = set()
     last = None
     contests: dict[tuple[str, str, str, bool], list[str]] = {}
@@ -316,7 +348,13 @@ def proof_list(fips: str, county: str, indent: int, qualified_only: bool = False
                 if seat
                 else ("Veteran" if "Veteran" in rest else "")
             )
-            role = "Trustee" if re.search(r"trustee|governing", found["role"].lower()) else "Director"
+            role = (
+                "Commissioner"
+                if "commissioner" in found["role"].lower()
+                else "Trustee"
+                if re.search(r"trustee|governing", found["role"].lower())
+                else "Director"
+            )
             current = (
                 full_name(found["body"].replace("COMMUNITY SERVICE DISTRICT", "COMMUNITY SERVICES DISTRICT")),
                 role,
@@ -374,6 +412,7 @@ def proof_list(fips: str, county: str, indent: int, qualified_only: bool = False
                     "name": name,
                     "unexpired": short,
                     "tacit": canceled.get(key, False) and (not qualified_only or len(names) <= seats),
+                    "doc": doc,
                 }
             )
     return rows
@@ -522,6 +561,24 @@ INBOX_DOCS = {
     "06087-w": (SANTA_CRUZ_WATCH, "santacruz_watch.md", "text/markdown"),
     "06025-s": (IMPERIAL, "imperial_0820.pdf", "application/pdf"),
     "06087-s": (SANTA_CRUZ, "santacruz_contact.html", "text/html"),
+    "06083-o": (
+        (
+            "https://content.civicplus.com/api/assets/68de6016-df0c-423c-85f5-d67e98023e7a",
+            "County of Santa Barbara Elections Division",
+            "Qualified Off Ballot Contest/Candidate List for Schools and Special Districts, November 3, 2026 General Election",
+        ),
+        "santabarbara_offballot.pdf",
+        "application/pdf",
+    ),
+    "06105-s": (
+        (
+            "https://www.trinitycounty.org/DocumentCenter/View/4190",
+            "Trinity County Clerk/Recorder/Assessor",
+            "Certified List of Candidates, School and Special Districts, November 3, 2026 General Election",
+        ),
+        "trinity_certified.pdf",
+        "application/pdf",
+    ),
 }
 IMPERIAL_HEAD = re.compile(
     r"^\s*(?P<title>\S.*?)\s+-\s+Elect (?P<seats>\d+)(?:\s*\((?P<partial>Partial Term)\))?(?:\s+-\s+CANDIDATE FILING.*)?\s*$"
@@ -904,7 +961,227 @@ def kings() -> list[Row]:
 
 
 def santa_barbara() -> list[Row]:
-    return proof_list("06083-s", "Santa Barbara", 32)
+    return [
+        *proof_list("06083-s", "Santa Barbara", 32, doc="06083-s"),
+        *proof_list("06083-o", "Santa Barbara", 32, doc="06083-o"),
+    ]
+
+
+TRINITY_JUNK = {
+    "Burnt",
+    "Burnt Ranch",
+    "Ranch",
+    "Burnt Ranch Elementary",
+    "Burnt Ranch Elementary School District",
+    "Ranch Elementary School District",
+}
+TRINITY_OPEN = re.compile(r"^Open Positions:\s+(\d+)\s+Candidates Filed:\s+(\d+)\s+(NOT on|ON) Ballot$")
+
+
+def trinity() -> list[Row]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(inbox_doc("06105-s")), "-"], capture_output=True, check=True
+    ).stdout.decode()
+    body: list[str] = []
+    for page in text.split("\f"):
+        started = False
+        for raw_line in page.splitlines():
+            line = re.sub(r"\s{2,}Elementary School District.*$", "", raw_line.rstrip())
+            if raw_line.startswith("Nominee"):
+                started = True
+            elif (
+                started
+                and line.strip()
+                and " ".join(line.split()) not in TRINITY_JUNK
+                and not re.fullmatch(r"\s*\d+ of \d+", line)
+            ):
+                body.append(line)
+    opens = [index for index, line in enumerate(body) if TRINITY_OPEN.match(" ".join(line.split()))]
+    rows: list[Row] = []
+    for number, index in enumerate(opens):
+        stop = opens[number + 1] - 1 if number + 1 < len(opens) else len(body)
+        found = TRINITY_OPEN.match(" ".join(body[index].split()))
+        title = " ".join(body[index - 1].split())
+        term = re.search(r" - (Full|Short) Term$", title)
+        name = re.sub(r"\s*- (?:Full|Short) Term$", "", title).replace("&", "and").replace("Communites", "Communities")
+        if int(found[2]) == 0 or not usable(name):
+            continue
+        names = [
+            cell
+            for line in body[index + 1 : stop]
+            if re.fullmatch(r"[A-Z][A-Za-z.'’() -]+ [A-Za-z.'’()-]+", cell := re.split(r"\s{2,}", line.strip())[0])
+        ]
+        if len(names) != int(found[2]):
+            raise SystemExit(f"trinity: {title}: {len(names)} names for {found[2]} filed")
+        short = term is not None and term[1] == "Short"
+        rows.extend(
+            {
+                "county": "Trinity",
+                "district": full_name(name),
+                "seat": "Short Term" if short else "",
+                "role": "Director",
+                "seats": int(found[1]),
+                "name": candidate,
+                "unexpired": short,
+                "tacit": found[3] == "NOT on",
+                "doc": "06105-s",
+            }
+            for candidate in names
+        )
+    return rows
+
+
+SISKIYOU_HEAD = re.compile(
+    r"^(?P<title>.+?) – (?:(?P<kind>Area|Division|District) (?P<number>\w+) – )?(?P<term>Full|Short) Term – Vote for (?P<seats>\d+)$"
+)
+
+
+def siskiyou() -> list[Row]:
+    rows: list[Row] = []
+    current: re.Match[str] | None = None
+    names: list[str] = []
+
+    def flush() -> None:
+        if current is not None and names:
+            short = current["term"] == "Short"
+            label = f"{current['kind']} {current['number']}" if current["kind"] else ""
+            seats = int(current["seats"])
+            rows.extend(
+                {
+                    "county": "Siskiyou",
+                    "district": full_name(current["title"]),
+                    "seat": label or ("Short Term" if short else ""),
+                    "role": "Trustee" if "College" in current["title"] else "Director",
+                    "seats": 1 if label else seats,
+                    "name": name,
+                    "unexpired": short,
+                    "tacit": len(names) <= (1 if label else seats),
+                    "doc": LISTED["06093"],
+                }
+                for name in names
+            )
+
+    for line in lines(LISTED["06093"]):
+        line = line.strip()
+        if found := SISKIYOU_HEAD.match(line):
+            flush()
+            current, names = (found if usable(found["title"]) else None), []
+        elif current is not None and line and not line.startswith(("Ballot Designation:", "Email:", "Phone:")):
+            if not line.startswith(("Final Siskiyou", "Local Offices", "November 3", "As of")):
+                names.append(line)
+    flush()
+    return rows
+
+
+def inyo() -> list[Row]:
+    groups: dict[tuple[str, str, str], list[str]] = {}
+    filled: dict[tuple[str, str, str], int] = {}
+    section = ""
+    for line in lines(LISTED["06027"]):
+        if line.strip() in (
+            "Hospital Districts",
+            "Community Services Districts",
+            "Fire Districts",
+            "Sanitary Districts",
+        ):
+            section = line.strip()
+        elif section and (
+            found := re.match(
+                r"^\s*(?P<title>\S.*? Board Member)(?:, (?P<zone>Zone \d+))?\s{2,}(?P<term>[24])(?:\s{2,}(?P<name>\S.*?))?(?:\s{2,}\S.*)?$",
+                line,
+            )
+        ):
+            key = (found["title"].removesuffix(" Board Member"), found["zone"] or "", found["term"])
+            groups.setdefault(key, [])
+            filled[key] = filled.get(key, 0) + 1
+            if found["name"]:
+                groups[key].append(found["name"].rstrip("*").strip())
+    rows: list[Row] = []
+    for (district, zone, term), names in groups.items():
+        if names:
+            rows.extend(
+                {
+                    "county": "Inyo",
+                    "district": full_name(district),
+                    "seat": zone or ("Short Term" if term == "2" else ""),
+                    "role": "Director",
+                    "seats": filled[district, zone, term],
+                    "name": name,
+                    "unexpired": term == "2",
+                    "tacit": True,
+                    "doc": LISTED["06027"],
+                }
+                for name in names
+            )
+    return rows
+
+
+DEL_NORTE_PERSON = re.compile(r"^([A-Z][A-Z'’. -]+), (.+?)\s{3,}(?:YES|NO)\s+(YES|NO)\s+(?:YES|NO)\s*$")
+
+
+def del_norte() -> list[Row]:
+    rows: list[Row] = []
+    text = lines(LISTED["06015"])
+    current: tuple[str, int, bool, bool] | None = None
+    for index, line in enumerate(text):
+        if found := re.match(r"^\s*Election = (YES|NO)\s+Vote for (\d+)", line):
+            title = next(previous.strip() for previous in reversed(text[:index]) if previous.strip())
+            short = "Short Term" in text[index + 1]
+            current = (title, int(found[2]), short, found[1] == "NO") if usable(title) else None
+        elif current is not None and (person := DEL_NORTE_PERSON.match(line)) and person[3] == "YES":
+            title, seats, short, canceled = current
+            rows.append(
+                {
+                    "county": "Del Norte",
+                    "district": full_name(title),
+                    "seat": "Short Term" if short else "",
+                    "role": "Commissioner" if "HARBOR" in title else "Director",
+                    "seats": seats,
+                    "name": cased(f"{person[2]} {person[1]}"),
+                    "unexpired": short,
+                    "tacit": canceled,
+                    "doc": LISTED["06015"],
+                }
+            )
+    return rows
+
+
+NUMBER_WORDS = ("One", "Two", "Three", "Four", "Five", "Six", "Seven")
+LISTED_EXPAND = (
+    (r"\bCSD\b", "Community Services District"),
+    (r"\bFPD\b", "Fire Protection District"),
+    (r"\bHCD\b", "Health Care District"),
+    (r"\bPUD\b", "Public Utility District"),
+    (r"\bVMD\b", "Veterans Memorial District"),
+    (r"\bCCD\b", "Community College District"),
+    (r"\bCCWD\b", "Calaveras County Water District"),
+    (r"\bREC & PARK\b", "Recreation and Park District"),
+    (
+        r"(?i),? \bDivision (One|Two|Three|Four|Five|Six|Seven)\b",
+        lambda found: f" Division {NUMBER_WORDS.index(found[1].title()) + 1}",
+    ),
+    (r"\bST$", "Short Term"),
+)
+
+
+def tagged(rows: list[Row], key: str) -> list[Row]:
+    return [{**row, "doc": key} for row in rows]
+
+
+def calaveras() -> list[Row]:
+    return tagged(qualified_list(LISTED["06009"], "Calaveras", LISTED_EXPAND, True), LISTED["06009"])
+
+
+def amador() -> list[Row]:
+    return tagged(qualified_list(LISTED["06005"], "Amador", LISTED_EXPAND, True), LISTED["06005"])
+
+
+def tehama() -> list[Row]:
+    return tagged(qualified_list(LISTED["06103"], "Tehama", LISTED_EXPAND), LISTED["06103"])
+
+
+def lassen() -> list[Row]:
+    return tagged(qualified_list(LISTED["06035"], "Lassen", LISTED_EXPAND), LISTED["06035"])
 
 
 def stanislaus() -> list[Row]:
@@ -1356,7 +1633,11 @@ def qualified_list(
             role_found = QUALIFIED_ROLE.search(heading)
             if re.match(r"(?i)city of|county board", heading) or (role_found is None and not roleless):
                 continue
-            before = heading[: role_found.start()] if role_found else re.sub(r"\s*\(.*?\)", "", heading)
+            before = (
+                heading[: role_found.start()]
+                if role_found
+                else re.sub(r"\s*(?:\(.*?\)|-?\s*Short Term\b)", "", heading)
+            )
             rest = heading[role_found.end() :] if role_found else ""
             in_before = QUALIFIED_SEAT.search(before)
             seat = in_before or QUALIFIED_SEAT.search(rest)
@@ -1385,7 +1666,7 @@ def qualified_list(
             )
         elif current is not None and (found := QUALIFIED_CAND.match(line)):
             name = found[1] or found[2]
-            names.append(cased(name) if name.isupper() else name)
+            names.append(re.sub(r"\b(Ii|Iii|Iv)\b", lambda found: found[0].upper(), cased(name)))
     flush()
     return rows
 
@@ -1493,9 +1774,8 @@ def san_francisco() -> list[Row]:
     return rows
 
 
-def parse() -> None:
-    PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(
+def candidates() -> pl.DataFrame:
+    return pl.DataFrame(
         [
             {"tacit": False, "doc": "", **row}
             for row in [
@@ -1531,6 +1811,14 @@ def parse() -> None:
                 *napa(),
                 *solano(),
                 *santa_barbara(),
+                *trinity(),
+                *siskiyou(),
+                *inyo(),
+                *del_norte(),
+                *calaveras(),
+                *amador(),
+                *tehama(),
+                *lassen(),
                 *stanislaus(),
                 *ventura(),
                 *san_bernardino_lieu(),
@@ -1540,6 +1828,11 @@ def parse() -> None:
             ]
         ]
     ).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
+
+
+def parse() -> None:
+    PARSED.mkdir(parents=True, exist_ok=True)
+    frame = candidates()
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.height, frame.select("county", "district").unique().height)
 
@@ -1573,16 +1866,20 @@ def emit() -> Path:
             summary="California special district board races on the November 3, 2026 ballot, with candidates from county registrar candidate lists",
             polity="US-CA",
         )
-        docs = {
-            fips: (*feed(fips), SOURCE if fips in OWN else local_2026.SOURCE)
-            for fips in COUNTIES
-            if f"{fips}-s" not in INBOX_DOCS
-        } | {
-            key: (*value, SOURCE)
-            for key, value in (
-                LIEU | {"06023-s": HUMBOLDT} | {key: item[0] for key, item in INBOX_DOCS.items()}
-            ).items()
-        }
+        docs = (
+            {
+                fips: (*feed(fips), SOURCE if fips in OWN else local_2026.SOURCE)
+                for fips in COUNTIES
+                if f"{fips}-s" not in INBOX_DOCS and fips not in LISTED
+            }
+            | {key: (*feed(key), local_2026.SOURCE) for key in (*LISTED.values(), "06083-s")}
+            | {
+                key: (*value, SOURCE)
+                for key, value in (
+                    LIEU | {"06023-s": HUMBOLDT} | {key: item[0] for key, item in INBOX_DOCS.items()}
+                ).items()
+            }
+        )
         sources = {}
         for key, (url, *publisher, bucket) in docs.items():
             source = cs.source(*publisher)

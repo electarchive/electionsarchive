@@ -1207,6 +1207,13 @@ def district_rules() -> list[tuple[str, str, re.Pattern[str], str]]:
         ]
 
 
+@functools.cache
+def government_links() -> list[tuple[str, str, str]]:
+    with (ROOT / "pipelines/ea/coverage_inputs/government-links.tsv").open(newline="") as f:
+        lines = (line for line in f if not line.startswith("#"))
+        return [(row["government"], row["county"], row["polity"]) for row in csv.DictReader(lines, delimiter="\t")]
+
+
 def off_november(state: str, function: str | None, name: str) -> bool:
     kind = "" if function is None else function.split(" - ", 1)[-1].lower()
     for st, fn, pattern, group in district_rules():
@@ -1225,6 +1232,7 @@ STATE_INPUTS = (
     "pipelines/ea/coverage_inputs/finest-reported.csv",
     "pipelines/ea/coverage_inputs/coverage-gaps.tsv",
     "pipelines/ea/coverage_inputs/special-district-elections.tsv",
+    "pipelines/ea/coverage_inputs/government-links.tsv",
 )
 COUNTRY_INPUTS = (
     "pipelines/ea/coverage.py",
@@ -1720,6 +1728,16 @@ def build(full: bool = False) -> str:
                 found = [g for _, g in ranked if mine < g[2] and "COLLEGE" not in g[2] - mine]
         if len(found) == 1 and found[0][0] not in link:
             link[found[0][0]] = pid
+            taken.add(pid)
+    named = {
+        (code[8:13], polities[pid][2].casefold()): pid
+        for code, pid in codes.items()
+        if code.startswith("special:") and code[10:11] != ":"
+    }
+    for gid, county, name in government_links():
+        pid = named.get((county, name.casefold()))
+        if gid not in link and pid is not None and pid not in taken:
+            link[gid] = pid
             taken.add(pid)
     plain = frozenset(
         (
