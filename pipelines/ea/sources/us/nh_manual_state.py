@@ -311,8 +311,96 @@ LINE_FIXES = {
     4999: {"name": "John H. Lynch", "printed": 456051},
     5000: {"name": "John Stephen", "printed": 456051},
     5001: {"name": "John J. Babiarz", "town": "Grafton", "group": 2, "printed": 456051, "total_party": None},
+    256: {"name": "Robert E. Whalen", "town": "Rye"},
+    517: {"printed": 11902},
+    518: {"printed": 11902},
+    519: {"printed": 11902},
+    750: {"group": 19, "party": "d", "total_party": "d", "printed": 8708},
+    751: {"group": 19, "party": "d", "total_party": "d", "printed": 8708},
+    5509: {"votes": 3480},
+    1964: {"name": "Stephanie Powers", "town": "Keene"},
 }
 LINE_DROPS = {3594}
+LINE_ADDS = {
+    90001: {
+        "template": 1280,
+        "name": "Charles W. Chandler",
+        "town": "Northfield",
+        "votes": 1,
+        "y": (252.281806, 257.078273, 518),
+    },
+    90002: {
+        "template": 5472,
+        "name": "Gordon R. Blakeney, Jr.",
+        "town": "Concord",
+        "votes": 5,
+        "y": (348.744988, 352.298123, 514),
+    },
+    90003: {
+        "template": 5473,
+        "name": "Peter J. Spaulding",
+        "town": "Hopkinton",
+        "votes": 11,
+        "y": (381.340381, 384.895774, 514),
+    },
+    90004: {
+        "template": 2156,
+        "name": "Thomas J. Christie",
+        "town": "Manchester",
+        "votes": 11,
+        "y": (302.742213, 305.693958, 522),
+    },
+    90005: {
+        "template": 2157,
+        "name": "Jim Hawkes",
+        "town": "Manchester",
+        "votes": 1745,
+        "y": (328.020946, 331.735782, 522),
+    },
+    90006: {
+        "template": 2425,
+        "name": "James M. Yurick",
+        "town": "Somersworth",
+        "votes": 1,
+        "y": (379.746886, 382.922718, 514),
+    },
+    90007: {
+        "template": 2435,
+        "name": "Edward Palladino, Jr.",
+        "town": "Hudson",
+        "votes": 1,
+        "y": (488.725251, 491.739466, 514),
+    },
+}
+CONFIRMED = {
+    45,
+    48,
+    49,
+    251,
+    254,
+    257,
+    261,
+    508,
+    516,
+    1520,
+    1521,
+    1853,
+    1860,
+    5470,
+    5471,
+    5489,
+    5490,
+    2066,
+    2071,
+    1945,
+    1946,
+    1963,
+    2259,
+    5529,
+    2143,
+    2144,
+}
+SURNAME_ONLY = {"Warner", "Rockwell"}
 PARTY_KEYS = {"r": "republican-party", "d": "democratic-party"}
 TOWN = re.compile(r"(.+[a-z])[.,]\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
 
@@ -351,10 +439,33 @@ def second(frame: pl.DataFrame) -> pl.DataFrame:
 
 def amended(frame: pl.DataFrame) -> pl.DataFrame:
     frame = frame.filter(~pl.col("index").is_in(list(LINE_DROPS)))
-    for column in ("votes", "name", "town", "group", "printed", "total_party"):
+    added = []
+    for index, fix in LINE_ADDS.items():
+        if frame.filter(pl.col("index") == index).height:
+            continue
+        row = frame.filter(pl.col("index") == fix["template"]).row(0, named=True)
+        y0, y1, height = fix["y"]
+        added.append(
+            {
+                **row,
+                "index": index,
+                "name": fix["name"],
+                "town": fix["town"],
+                "votes": fix["votes"],
+                "digits": str(fix["votes"]),
+                "clean": True,
+                "y0": y0 / height,
+                "y1": y1 / height,
+            }
+        )
+    if added:
+        frame = pl.concat([frame, pl.DataFrame(added, schema=frame.schema)])
+    for column in ("votes", "name", "town", "party", "group", "printed", "total_party"):
         values = {index: fix[column] for index, fix in LINE_FIXES.items() if column in fix}
         frame = frame.with_columns(
-            pl.col("index").replace_strict(values, default=pl.col(column), return_dtype=frame.schema[column]).alias(column)
+            pl.col("index")
+            .replace_strict(values, default=pl.col(column), return_dtype=frame.schema[column])
+            .alias(column)
         )
     return frame
 
@@ -380,6 +491,7 @@ def arbitrated(frame: pl.DataFrame, vision: bool = True) -> pl.DataFrame:
     )
     if vision:
         frame = second(nh_manual.verified(frame.drop("added", "agrees", "printed_right", strict=False)))
+        frame = frame.with_columns(reads_agree=pl.col("reads_agree") | pl.col("index").is_in(list(CONFIRMED)))
     frame = nh_manual.blocks(frame.drop("added", "agrees", "printed_right", strict=False))
     cut = pl.col("digits").str.starts_with(",").any().over("year", "stage", "group") & ~(
         pl.col("resolved").any().over("year", "stage", "group") if vision else pl.lit(False)
@@ -555,7 +667,7 @@ class Council:
         for name, town in rows.select("name", "town").iter_rows():
             name = COUNCIL_FIXES.get(name, name)
             name = COUNCIL_FIXES.get(split(name, town)[0], split(name, town)[0])
-            labels.append(None if re.fullmatch(r"(?i)scatter\w*|write-?ins?", name) else name)
+            labels.append(None if re.fullmatch(r"(?i)scatter\w*|write-?ins?", name) or name in SURNAME_ONLY else name)
         bad = [
             label
             for label in labels
