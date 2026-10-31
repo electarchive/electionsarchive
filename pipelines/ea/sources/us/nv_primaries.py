@@ -26,6 +26,8 @@ FILES = [
     (date(2012, 6, 12), "2013", BASE + "2012STatewidePrimary/ElectionSummary.aspx"),
     (date(2014, 6, 10), "2015", BASE + "2014STatewidePrimary/ElectionSummary.aspx"),
     (date(2016, 6, 14), "2017", BASE + "2016STatewidePrimary/ElectionSummary.aspx"),
+    (date(2018, 6, 12), "20200421005258", BASE + "2018StateWidePrimary/ElectionSummary.aspx"),
+    (date(2020, 6, 9), "20250329232357", BASE + "2020StateWidePrimary/ElectionSummary.aspx"),
     (date(2022, 6, 14), "", "https://www.nvsos.gov/SOSelectionPages/results/2022StateWidePrimary/ElectionSummary.aspx"),
     (date(2024, 2, 6), "", "https://www.nvsos.gov/SOSelectionPages/results/2024PPP/ElectionSummary.aspx"),
 ]
@@ -152,7 +154,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nevada's 2000-2016 and 2022 U.S. Senate and House primaries and the 2024 presidential primary by county from the Secretary of State's election summary pages",
+            summary="Nevada's 2000-2022 U.S. Senate and House primaries and the 2024 presidential primary by county from the Secretary of State's election summary pages",
             polity="US-NV",
         )
         source = cs.source(PUBLISHER, TITLE)
