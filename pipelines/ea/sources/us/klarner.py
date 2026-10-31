@@ -939,4 +939,21 @@ def emit() -> Path | str:
                 if ours and (foreign or old != text or kept):
                     cs.add("name", id=id, entity_id=entity, text=old, lang="en", kind=kind, is_preferred=False)
                 kept = kept or (ours and old == text)
+        for wrong, right in MISDATED.items():
+            for entity, scheme, value in conn.execute(
+                """select x.entity_id, x.scheme, x.value from external_id x
+                   join changeset c on c.id = x.changeset_id and c.pipeline = %s
+                   where x.value like %s and split_part(x.value, ':', 2) = any(%s)
+                     and exists (select from external_id y where y.entity_id = x.entity_id and y.scheme = x.scheme
+                                 and y.value = replace(x.value, %s, %s))
+                   order by x.scheme, x.value""",
+                [SOURCE, f"{wrong}%", chunk.split(","), wrong, right],
+            ).fetchall():
+                cs.add(
+                    "external_id_drop",
+                    entity_id=entity,
+                    scheme=scheme,
+                    value=value,
+                    reason=f"misdated key; the entity also holds {value.replace(wrong, right)}",
+                )
         return cs.write()
