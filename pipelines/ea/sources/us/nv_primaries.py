@@ -119,8 +119,14 @@ def parse() -> None:
                 chamber, number = "house", int(district[1])
             elif re.match(r"(UNITED STATES )?PRESIDENT", title):
                 chamber, number = "president", None
-            elif found := re.match(r"STATE (SENATE|ASSEMBLY), DISTRICT\s+(\d+)", title):
-                chamber, number = f"state-{found[1].lower()}", int(found[2])
+            elif found := re.match(r"(?:STATE )?(SENATE|ASSEMBLY)[, -]+(?:(CLARK|WASHOE) )?DISTRICT\s+(\d+)", title):
+                chamber, number = f"state-{found[1].lower()}", found[3]
+                if found[1] == "SENATE" and day.year < 2012:
+                    number = f"{(found[2] or '?').lower()}-{number}"
+            elif found := re.match(
+                r"(?:STATE SENATE[, -]+)?(CAPITAL|CENTRAL NEVADA|NORTHERN) SENATORIAL DISTRICT", title
+            ):
+                chamber, number = "state-senate", f"{found[1].split()[0].lower()}-1"
             elif found := re.search(r"SUPREME COURT.*SEAT\s+([A-G])\b", title):
                 chamber, number = f"state-justice-of-the-supreme-court-seat-{found[1].lower()}", None
             elif office := STATE_OFFICES.get(re.sub(r"\s*\(.*", "", title)):
@@ -133,6 +139,7 @@ def parse() -> None:
                 names.append(tokens[cursor].upper())
                 cursor += 1
             width = len(names)
+            start = len(rows)
             while cursor + 2 + width < len(tokens) and re.fullmatch(r"[\d.]+%", tokens[cursor + 1]):
                 candidate = tokens[cursor]
                 for county, cell in zip(names, tokens[cursor + 3 : cursor + 3 + width], strict=True):
@@ -151,8 +158,18 @@ def parse() -> None:
                             )
                         )
                 cursor += 3 + width
+            if isinstance(number, str) and number.startswith("?-"):
+                live = {row[3] for row in rows[start:] if row[5] > 0}
+                place = {COUNTIES["CLARK"]: "clark", COUNTIES["WASHOE"]: "washoe"}.get(
+                    next(iter(live)) if len(live) == 1 else ""
+                )
+                rows[start:] = [(*row[:2], f"{place}-{number[2:]}", *row[3:]) for row in rows[start:]] if place else []
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows, schema=["day", "chamber", "district", "code", "candidate", "votes"], orient="row")
+    frame = pl.DataFrame(
+        [(*row[:2], None if row[2] is None else str(row[2]), *row[3:]) for row in rows],
+        schema=["day", "chamber", "district", "code", "candidate", "votes"],
+        orient="row",
+    )
     frame.filter(pl.col("chamber").str.starts_with("state-")).write_parquet(PARSED / "state.parquet")
     frame.filter(~pl.col("chamber").str.starts_with("state-")).with_columns(
         year=pl.col("day").dt.year().cast(pl.Int32),

@@ -3498,7 +3498,6 @@ def parse() -> None:
     )
     frames.append(
         pl.read_parquet(DATA / "parsed" / nv_primaries.SOURCE / "state.parquet")
-        .filter(pl.col("day").dt.year() >= 2016)
         .select(
             day="day",
             office=pl.col("chamber")
