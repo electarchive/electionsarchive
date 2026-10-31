@@ -64,7 +64,7 @@ NAMES = {
 ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
 NOISE = re.compile(r"[\^_'•■*]")
 LEADER = re.compile(r"^[.\-—•\s]+$")
-PARTY = re.compile(r",\s*(r&d|r|d|i|ind|l|lib|1)\s*\.?\s*(?:\(write-?in\))?$", re.IGNORECASE)
+PARTY = re.compile(r"(?:[,.]\s*(r&d|d&r|r|d|i|ind|l|lib|1)|\s(?-i:(r|d|l)))\s*\.?\s*(?:\(write-?in\))?$", re.IGNORECASE)
 CLEAN = re.compile(
     r"[A-Z][A-Za-z'.\-]*(?: (?:[A-Z]|de[A-Z]|(?:de|du|dupont|van|von|der|la|di) (?=[A-Z]|[a-z]+ [A-Z]))[A-Za-z'.\-]*)+(?:,? (?:Jr|Sr|II|III|IV)\.?)?"
 )
@@ -168,7 +168,7 @@ def rows(pages: dict[int, tuple[float, float, list[Word]]]) -> list[Row]:
 def number(tokens: list[Word]) -> tuple[int, bool, list[Word]] | None:
     taken: list[Word] = []
     for word in reversed(tokens):
-        if re.fullmatch(r"[\d,.\^_'•■*]+", word.text) and re.search(r"\d", word.text):
+        if (re.fullmatch(r"[\d,.\^_'•■*]+", word.text) and re.search(r"\d", word.text)) or (word.text == "," and taken):
             taken.insert(0, word)
         elif LEADER.fullmatch(word.text) and taken:
             continue
@@ -188,7 +188,7 @@ def header(text: str) -> tuple[str, str] | None:
     plain = re.sub(r"\s+", " ", text).strip()
     plain = re.sub(r"(?i)^(For\s+(?:the\s+)?)Counts'?\b", r"\1County", plain)
     plain = re.sub(
-        r"(?i)^[^\sA-Za-z]?[A-Za-z]?[-~.]?[A-Za-z]{1,3}\s+(?=(?:register|sheriff|(?:county\s+)?(?:attorney|treasurer|commissioners?))\b)",
+        r"(?i)^[^\sA-Za-z]?[A-Za-z]?[-~.'’]?[A-Za-z]{1,3}\s+(?=(?:register|sheriff|(?:county\s+)?(?:attorney|treasurer|commissioners?))\b)",
         "For ",
         plain,
     )
@@ -210,12 +210,12 @@ def header(text: str) -> tuple[str, str] | None:
         phrase = re.sub(r"\s+", " ", found[1].strip().lower())
         if len(phrase) > 4:
             for pattern, name in OFFICES:
-                if difflib.get_close_matches(phrase, NAMES[name], n=1, cutoff=0.85):
+                if difflib.get_close_matches(phrase, NAMES[name], n=1, cutoff=0.72):
                     return "office", name
         return "other", plain
-    word = re.fullmatch(r"([A-Za-z]{4,6})\s+district:?", plain, re.IGNORECASE)
+    word = re.fullmatch(r"([A-Za-z0-9\- ]{3,8})\s+di[A-Za-z,']{2,6}[:;,.\s’']*", plain, re.IGNORECASE)
     if word:
-        close = difflib.get_close_matches(word[1].lower(), list(ORDINALS), n=1, cutoff=0.7)
+        close = difflib.get_close_matches(re.sub(r"[^a-z]", "", word[1].lower()), list(ORDINALS), n=1, cutoff=0.65)
         if close:
             return "district", str(ORDINALS[close[0]])
     digit = re.fullmatch(r"district\s+(?:no\.?\s*)?(\d)\s*:?", plain, re.IGNORECASE)
@@ -254,10 +254,12 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         text = re.sub(r"(?:\s*\.){2,}", "", text).strip(" .,-")
         votes, clean, taken = value
         boxed = [*left, *taken]
-        total = re.fullmatch(r"total\s+vote\s*,?\s*(.*)", text, re.IGNORECASE)
+        total = re.fullmatch(r"(?:\W*\w{0,2}\s*)?otal\W*vote\W*(.*)", text, re.IGNORECASE)
         if total:
-            party = total[1].strip(" .,").lower() or None
-            close(votes, party[:1] if party else None)
+            letters = re.sub(r"[^a-z]", "", total[1].lower())
+            close(votes, letters[:1] if letters[:1] in ("r", "d", "l") else None)
+            return
+        if re.search(r"(?i)\bmanual\b", text):
             return
         if state["office"] is None and state["opening"] and not text.isupper():
             state.update(office="sheriff", opening=False)
@@ -271,7 +273,8 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         if not scatter:
             found = PARTY.search(text)
             if found:
-                party = "l" if found[1] == "1" else found[1].lower()
+                party = found[2] or ("l" if found[1] == "1" else found[1].lower())
+                party = "r&d" if party == "d&r" else party
                 name = text[: found.start()]
             name = re.sub(r"\(write-?in\)", "", name, flags=re.IGNORECASE).strip(" ,")
         district = state["district"]
@@ -280,6 +283,7 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
             if prefix:
                 district, name = prefix[1], prefix[2]
                 state.update(office="board of commissioners", district=district)
+            name = re.sub(r"(,\s*(?:Jr|Sr|II|III))\.*\s+(?=[A-Z])", r"\1., ", name)
             parts = [part.strip() for part in name.split(",")]
             if len(parts) > 1 and not re.fullmatch(r"(?:jr|sr|st|ii|iii|iv|2d|3d)\.?", parts[-1], re.IGNORECASE):
                 town = parts[-1]
@@ -641,7 +645,7 @@ def listed(rows: pl.DataFrame) -> str:
 
 
 def read_key(prefix: str, year: int, page: int, listing: str) -> str:
-    if prefix != "read" or year > 1998:
+    if prefix != "read":
         return f"{prefix}:{year}:{page}"
     return f"{prefix}:{year}:{page}:{hashlib.sha1(listing.encode()).hexdigest()[:8]}"
 
