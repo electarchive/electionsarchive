@@ -1592,6 +1592,85 @@ SD_PAGES = {
     date(2004, 11, 2): (SD_NEW.format("20110416214306", "pastelections_electioninfo04_GEballotquestionreturns.shtm"),),
     date(2006, 11, 7): (SD_NEW.format("20110416214157", "pastelections_electioninfo06_GEballotquestions.shtm"),),
 }
+SD_COUNTIES = (
+    "AURORA",
+    "BEADLE",
+    "BENNETT",
+    "BON HOMME",
+    "BROOKINGS",
+    "BROWN",
+    "BRULE",
+    "BUFFALO",
+    "BUTTE",
+    "CAMPBELL",
+    "CHARLES MIX",
+    "CLARK",
+    "CLAY",
+    "CODINGTON",
+    "CORSON",
+    "CUSTER",
+    "DAVISON",
+    "DAY",
+    "DEUEL",
+    "DEWEY",
+    "DOUGLAS",
+    "EDMUNDS",
+    "FALL RIVER",
+    "FAULK",
+    "GRANT",
+    "GREGORY",
+    "HAAKON",
+    "HAMLIN",
+    "HAND",
+    "HANSON",
+    "HARDING",
+    "HUGHES",
+    "HUTCHINSON",
+    "HYDE",
+    "JACKSON",
+    "JERAULD",
+    "JONES",
+    "KINGSBURY",
+    "LAKE",
+    "LAWRENCE",
+    "LINCOLN",
+    "LYMAN",
+    "MARSHALL",
+    "MCCOOK",
+    "MCPHERSON",
+    "MEADE",
+    "MELLETTE",
+    "MINER",
+    "MINNEHAHA",
+    "MOODY",
+    "PENNINGTON",
+    "PERKINS",
+    "POTTER",
+    "ROBERTS",
+    "SANBORN",
+    "SHANNON",
+    "SPINK",
+    "STANLEY",
+    "SULLY",
+    "TODD",
+    "TRIPP",
+    "TURNER",
+    "UNION",
+    "WALWORTH",
+    "YANKTON",
+    "ZIEBACH",
+)
+SD_2002_JUNE = "https://sdsos.gov/elections-voting/assets/historicalelectiondata/2002PCAE.pdf"
+SD_2002_JUNE_VOTES = {
+    "YES": (
+        83320,
+        "446 2910 423 769 3123 3894 956 150 842 300 1132 778 972 2730 183 1078 1903 836 488 323 509 544 862 406 836 759 500 765 859 550 166 3436 1491 347 317 470 354 921 1336 2181 2859 619 587 881 487 1849 243 408 14825 800 7924 203 606 826 459 287 1158 535 327 293 876 935 861 747 1740 140",
+    ),
+    "NO": (
+        97755,
+        "652 1667 624 1325 2617 5009 808 260 1375 286 1243 667 1494 3433 442 1138 1930 991 713 805 801 702 899 482 1241 674 510 831 712 433 400 2879 1416 320 324 352 227 926 1814 3039 3009 515 609 996 586 2635 304 500 16127 863 11283 669 536 1168 427 519 893 495 329 513 812 1619 1428 892 3298 269",
+    ),
+}
 SD_SCANS = {
     "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf",
     "sd-measures-2012": "https://sdsos.gov/docs/2012ElectionReturnsBooklet.pdf",
@@ -2133,6 +2212,7 @@ def fetch() -> None:
     for page in nc_2000_pages(index.path.read_text(errors="replace")):
         raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
         time.sleep(1)
+    store_manual(SD_2002_JUNE, "MF-444/2002PCAE.pdf", "application/pdf")
     store_manual(NM_2003, "MF-443/2003-special-election.pdf", "application/pdf")
     store_manual(KS_2000, "MF-446/ks-2000-general-questions-by-precinct.xls", "application/vnd.ms-excel")
     store_manual(KS_2005, "MF-446/2005_Constitutional_Amendment_results_by_county.xls", "application/vnd.ms-excel")
@@ -5715,6 +5795,28 @@ def new_mexico() -> list[dict[str, object]]:
     return rows
 
 
+def south_dakota_2002_june() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for answer, (printed, text) in SD_2002_JUNE_VOTES.items():
+        figures = [int(figure) for figure in text.split()]
+        if len(figures) != 66 or sum(figures) != printed:
+            raise ValueError(f"SD 2002 Amendment A {answer}: counties do not sum to the printed total")
+        rows.extend(
+            {
+                "state": "SD",
+                "day": date(2002, 6, 4),
+                "number": "A",
+                "label": "Constitutional Amendment A",
+                "url": SD_2002_JUNE,
+                "county": county,
+                "answer": answer,
+                "votes": votes,
+            }
+            for county, votes in zip(SD_COUNTIES, figures, strict=True)
+        )
+    return rows
+
+
 def montana() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in MT_FILES.items():
@@ -5922,6 +6024,7 @@ def parse() -> None:
             *alabama_2022(),
             *hawaii(),
             *new_mexico(),
+            *south_dakota_2002_june(),
         ],
         infer_schema_length=None,
     )
