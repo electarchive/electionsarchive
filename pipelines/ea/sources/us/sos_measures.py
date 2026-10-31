@@ -79,6 +79,25 @@ CA_1998 = {
         "Initiative",
     ),
     (date(1998, 11, 3), "11"): ("Local Sales and Use Taxes - Revenue Sharing", "Legislative Referendum"),
+    (date(2022, 11, 8), "1"): ("Constitutional Right to Reproductive Freedom", "Legislative Referendum"),
+    (date(2022, 11, 8), "26"): ("Allows In-Person Roulette, Dice Games, Sports Wagering on Tribal Lands", "Initiative"),
+    (date(2022, 11, 8), "27"): ("Allows Online and Mobile Sports Wagering Outside Tribal Lands", "Initiative"),
+    (date(2022, 11, 8), "28"): (
+        "Provides Additional Funding for Arts and Music Education in Public Schools",
+        "Initiative",
+    ),
+    (date(2022, 11, 8), "29"): (
+        "Requires On-Site Licensed Medical Professional at Kidney Dialysis Clinics and Establishes Other State Requirements",
+        "Initiative",
+    ),
+    (date(2022, 11, 8), "30"): (
+        "Provides Funding for Programs to Reduce Air Pollution and Prevent Wildfires by Increasing Tax on Personal Income Over $2 Million",
+        "Initiative",
+    ),
+    (date(2022, 11, 8), "31"): (
+        "Referendum on 2020 Law That Would Prohibit the Retail Sale of Certain Flavored Tobacco Products",
+        "Popular Referendum",
+    ),
 }
 
 CA_FILES = {
@@ -100,6 +119,7 @@ CA_FILES = {
     date(2009, 5, 19): "2009-special/ssov/1-6-summary-by-county.xls",
     date(2010, 6, 8): "2010-primary/125-props.xls",
     date(2010, 11, 2): "2010-general/88-state-ballot-measures.xls",
+    date(2022, 11, 8): "2022-general/sov/props.xlsx",
 }
 AZ = "https://web.archive.org/web/2020id_/http://apps.azsos.gov/election/"
 AZ_FILES = {
@@ -1019,6 +1039,7 @@ AK_DISTRICTS = {
     date(2010, 8, 24): "hd{} (4).pdf",
 }
 AK_2007 = "https://www.elections.alaska.gov/Core/Archive/07SPEC/data/sovc/hd{}.pdf"
+AK_2022 = "https://www.elections.alaska.gov/results/22GENR/HD{}.pdf"
 AK_2000 = "https://web.archive.org/web/2id_/http://www.elections.alaska.gov/results/00GENR/data/results.txt"
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
@@ -1102,6 +1123,7 @@ NV_PAGES = {
     date(2006, 11, 7): ("20080206205130", "2006StateWideGeneral"),
     date(2008, 11, 4): ("20090116025519", "2008StateWideGeneral"),
 }
+NV_2010 = "https://web.archive.org/web/20110226083245id_/http://www.nvsos.gov:80/SilverState2010gen/Ballots.aspx"
 NV_COUNTIES = (
     "32510",
     "32001",
@@ -1126,6 +1148,7 @@ RI_BOOKS = {
     date(2002, 11, 5): "2002-Count-Book.pdf",
     date(2004, 11, 2): "2004-Count-Book.pdf",
     date(2006, 11, 7): "2006-Count-Book.pdf",
+    date(2008, 11, 4): "2008-Count-Book.pdf",
     date(2010, 11, 2): "2010-Countbook.pdf",
 }
 NE = "https://sos.nebraska.gov/sites/default/files/doc/"
@@ -1554,6 +1577,7 @@ OH_ISSUES = [
     *((date(2005, 11, 8), str(n), f"2005ElectionsResults/05-1108Issue{n}") for n in range(1, 6)),
     *((date(2008, 11, 4), str(n), f"2008ElectionResults/issue{n}_110408") for n in (1, 2, 3, 5, 6)),
     *((date(2009, 11, 3), str(n), f"2009ElectionResults/20091103issue{n}") for n in (1, 2, 3)),
+    *((date(2010, 5, 4), str(n), f"2010results/20100504Issue{n}") for n in (1, 2)),
     *((date(2011, 11, 8), str(n), f"2011results/20111108Issue{n}") for n in (1, 2, 3)),
 ]
 NM_PAGES = Path(__file__).with_name("nm_county_pages.tsv")
@@ -1823,7 +1847,7 @@ SD_2012 = {
         False,
     ),
 }
-MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000}
+MISPRINTS = {("CA", date(2000, 11, 7), "38", "NO"): 3000, ("OH", date(2010, 5, 4), "2", "YES"): 11}
 MISREPORTED = {
     ("ME", date(2005, 11, 8), "6"),
     ("LA", date(2010, 10, 2), "2"),
@@ -2182,9 +2206,32 @@ def store_manual(url: str, file: str, media_type: str) -> None:
         )
 
 
+def fetch_unverified(url: str, suffix: str) -> None:
+    try:
+        raw.cached(SOURCE, url)
+    except LookupError:
+        response = httpx.get(
+            url, headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, verify=False, timeout=300
+        )
+        response.raise_for_status()
+        raw.store(
+            SOURCE,
+            url,
+            response.content,
+            suffix=suffix,
+            retrieved_at=datetime.now(UTC),
+            media_type=response.headers.get("content-type", "application/pdf"),
+        )
+        time.sleep(1)
+
+
 def fetch() -> None:
+    for district in range(1, 41):
+        fetch_unverified(AK_2022.format(district), ".pdf")
     for stamp, folder in NV_PAGES.values():
         raw.fetch(SOURCE, NV.format(stamp, folder), suffix=".html")
+    raw.fetch(SOURCE, NV_2010, suffix=".html")
+    raw.fetch(ri_countbook.SOURCE, ri_countbook.BASE + RI_BOOKS[date(2008, 11, 4)], suffix=".pdf")
     for stamp, page in GA_TOTALS.values():
         raw.fetch(SOURCE, GA.format(stamp, page), suffix=".htm")
         time.sleep(1)
@@ -3637,7 +3684,10 @@ def ohio_issues() -> list[dict[str, object]]:
             raise ValueError(f"OH {url}: {len(counties)} counties")
         yes_at, no_at = (3, 4) if width == 5 else (0, 1)
         counties = {name: [figures[yes_at], figures[no_at]] for name, figures in counties.items()}
-        if [sum(pair[side] for pair in counties.values()) for side in (0, 1)] != total[yes_at : no_at + 1]:
+        if [
+            sum(pair[side] for pair in counties.values()) - MISPRINTS.get(("OH", day, number, answer), 0)
+            for side, answer in enumerate(("YES", "NO"))
+        ] != total[yes_at : no_at + 1]:
             raise ValueError(f"OH {url}: counties do not add up to the total")
         rows.extend(
             {
@@ -3693,6 +3743,39 @@ def nevada() -> list[dict[str, object]]:
                 }
                 for answer, values in answers.items()
                 for county, votes in zip(NV_COUNTIES, values, strict=True)
+            )
+    return rows
+
+
+def nevada_2010() -> list[dict[str, object]]:
+    page = raw.cached(SOURCE, NV_2010).path.read_bytes().decode("latin-1")
+    figures = [
+        int(cell.replace(",", ""))
+        for cell in re.findall(r"([\d,]+) VOTES \(", re.sub(r"(?is)<[^>]+>", " ", html.unescape(page)))
+    ]
+    if len(figures) != 18 * 8:
+        raise ValueError(f"NV 2010: {len(figures)} figures")
+    state, counties = figures[:8], figures[8:]
+    rows: list[dict[str, object]] = []
+    for index in range(4):
+        for side, answer in enumerate(("YES", "NO")):
+            votes = [counties[8 * county + 2 * index + side] for county in range(17)]
+            if sum(votes) != state[2 * index + side]:
+                raise ValueError(
+                    f"NV 2010 question {index + 1} {answer}: counties do not add up to the statewide total"
+                )
+            rows.extend(
+                {
+                    "state": "NV",
+                    "day": date(2010, 11, 2),
+                    "number": str(index + 1),
+                    "label": "",
+                    "url": NV_2010,
+                    "county": county,
+                    "answer": answer,
+                    "votes": value,
+                }
+                for county, value in zip(NV_COUNTIES, votes, strict=True)
             )
     return rows
 
@@ -6055,6 +6138,39 @@ def south_dakota_2002_june() -> list[dict[str, object]]:
     return rows
 
 
+def alaska_2022() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for district in range(1, 41):
+        url = AK_2022.format(district)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        section = text[text.index("BM#1 Constitutional Convention") :]
+        total = re.search(r"State - Total\s+([\d,]+)\s+[\d.]+%\s+([\d,]+)\s+[\d.]+%\s+([\d,]+)", section)
+        yes, no, votes = (int(cell.replace(",", "")) for cell in total.groups())
+        if votes != yes + no:
+            raise ValueError(f"AK 2022 district {district}: {yes} + {no} != {votes}")
+        rows.extend(
+            {
+                "state": "AK",
+                "day": date(2022, 11, 8),
+                "number": "1",
+                "label": "Ballot Measure 1",
+                "title": "Constitutional Convention Question",
+                "kind": "Other",
+                "url": url,
+                "county": f"2022-11-08:{district:02}",
+                "answer": answer,
+                "votes": count,
+            }
+            for answer, count in (("YES", yes), ("NO", no))
+        )
+    for answer, printed in (("YES", 75723), ("NO", 180529)):
+        if sum(int(row["votes"]) for row in rows if row["answer"] == answer) != printed:
+            raise ValueError(f"AK 2022 {answer}: districts do not sum to the statewide result")
+    return rows
+
+
 def alaska_2007() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for district in range(1, 41):
@@ -6263,6 +6379,8 @@ def parse() -> None:
             *georgia(),
             *alaska(),
             *alaska_2007(),
+            *alaska_2022(),
+            *nevada_2010(),
             *new_jersey(),
             *maryland(),
             *nebraska(),
@@ -6574,7 +6692,7 @@ def emit() -> Path:
             """select p.id, u.id from reporting_unit u join polity p on p.id = u.polity_id
                where u.scheme_code = 'us.state' and p.iso_code = 'US-AK'"""
         ).fetchone()
-        for code in frame.filter(pl.col("state") == "AK", pl.col("code").str.starts_with("2007-04-03:"))[
+        for code in frame.filter(pl.col("state") == "AK", pl.col("code").str.contains(r"^\d{4}-\d\d-\d\d:"))[
             "code"
         ].unique():
             unit = cs.unit("us.ak_house_district", code)
