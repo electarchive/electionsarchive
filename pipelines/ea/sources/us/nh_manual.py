@@ -447,6 +447,30 @@ def held(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def twice(raw_lines: pl.DataFrame) -> pl.DataFrame:
+    import json
+
+    agreed: list[tuple[int, int, float, float]] = []
+    for (year, page), rows in held(raw_lines).group_by("year", "page", maintain_order=True):
+        try:
+            text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"][0]["text"]
+        except LookupError:
+            continue
+        found = re.search(r"\{.*\}", text, re.DOTALL)
+        try:
+            reply = json.loads(found[0]) if found else {}
+        except ValueError:
+            continue
+        for row in rows.iter_rows(named=True):
+            if row["clean"] and reply.get(str(row["rid"])) == row["votes"]:
+                agreed.append((year, page, row["y0"], row["x0"]))
+    return pl.DataFrame(
+        agreed,
+        schema={"year": pl.Int64, "page": pl.Int64, "y0": pl.Float64, "x0": pl.Float64},
+        orient="row",
+    ).with_columns(twice=pl.lit(True))
+
+
 def read() -> None:
     import base64
 
@@ -545,6 +569,19 @@ def emit() -> Path:
         )
         .drop("name", "town", "party")
         .unnest("fixed")
+    )
+    both = twice(raw_lines)
+    lines = (
+        lines.join(both, on=["year", "page", "y0", "x0"], how="left")
+        .with_columns(pl.col("twice").fill_null(False))
+        .with_columns(
+            agrees=pl.when(
+                pl.col("agrees").is_null()
+                & pl.col("twice").all().over("year", "stage", "county", "office", "district", "side")
+            )
+            .then(True)
+            .otherwise(pl.col("agrees"))
+        )
     )
     only = os.environ.get("NH_YEARS")
     if only:
@@ -652,6 +689,8 @@ def emit() -> Path:
             if not rows["agrees"].all():
                 report.setdefault("lines do not add to the printed total", []).append(f"{tag} {external}")
                 continue
+            if rows["twice"].all() and rows["printed"].is_null().all():
+                report.setdefault("checked by two reads", []).append(f"{tag} {external}")
             totals = rows.group_by("name", maintain_order=True).agg(pl.col("votes").sum())
             others = [option[0] for option in options if option[2] == "others"]
             if not totals["votes"].sum():
