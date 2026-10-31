@@ -1,0 +1,2 @@
+alter table row_drop drop constraint row_drop_relation_check;--> statement-breakpoint
+alter table row_drop add constraint row_drop_relation_check check (relation = ANY (ARRAY['citation'::text, 'label'::text, 'party_color'::text, 'party_image'::text, 'person_image'::text, 'translation'::text, 'alliance_member'::text, 'candidacy_nomination'::text, 'government_party'::text, 'tenure_affiliation'::text, 'area_event_member'::text, 'party_relation'::text, 'party_affiliation'::text, 'source_artifact'::text]));
