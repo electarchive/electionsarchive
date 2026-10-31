@@ -95,7 +95,8 @@ export const outside = async (
     )
     select a.k, ${insets.length === 0 ? sql`-1` : part(scheme, "g.geom")} as part,
       not ST_Covers(me.geom, ST_PointOnSurface(g.geom))
-        and ST_Area(ST_Intersection(me.geom, g.geom)) < 0.5 * ST_Area(g.geom) as "isAbroad",
+        and (not ST_Intersects(me.geom, g.geom)
+          or ST_Area(ST_Intersection(ST_MakeValid(ST_ClipByBox2D(me.geom, Box2D(g.geom))), g.geom)) < 0.5 * ST_Area(g.geom)) as "isAbroad",
       case when a.scheme_code = 'fr.departement' then (
         select c.code from area_code c where c.area_id = a.id
         order by c.valid @> ${day}::date desc limit 1

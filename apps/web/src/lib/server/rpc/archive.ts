@@ -11371,15 +11371,18 @@ async function universe(
       from base b join contest p on p.office_id = b.office_id join contest r on r.allocation_parent_id = p.id
     ),
     candidate as (
-      select a.id, a.k,
-        bool_or(er.date_from between b.date_from and coalesce(b.date_to, b.date_from)) as held
-      from base b
-      cross join peers r
+      select a.id, a.k, r.held
+      from (
+        select r.district_area_id,
+          bool_or(er.date_from between b.date_from and coalesce(b.date_to, b.date_from)) as held
+        from base b
+        cross join peers r
+        join election er on er.id = r.election_id
+        where (r.party_scope_id is null or r.party_scope_id = b.party_scope_id)
+        group by r.district_area_id
+      ) r
       join area a on a.id = r.district_area_id and a.scheme_code = ${level}
-      join election er on er.id = r.election_id
-      where (r.party_scope_id is null or r.party_scope_id = b.party_scope_id)
-        and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
-      group by a.id, a.k
+      where exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
     ),
     up(start, id, depth) as (
       select id, id, 0 from candidate
@@ -11529,8 +11532,9 @@ async function sketch(
       select distinct on (bs.scheme_code) bs.scheme_code as scheme,
         coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
         (
-          select count(distinct x.k)::int from area x join area_geometry g on g.area_id = x.id
-          where x.k = any(${sql.param(ks)}::int[]) and g.valid @> coalesce(bs.as_of, ${day}::date)
+          select count(*)::int from area x
+          where x.k = any(${sql.param(ks)}::int[])
+            and exists (select from area_geometry g where g.area_id = x.id and g.valid @> coalesce(bs.as_of, ${day}::date) offset 0)
         ) as shaped,
         array(
           select distinct c.credit from area x
@@ -11665,13 +11669,12 @@ export async function decide(ids: Array<string>) {
       where ahead.held and ahead.depth < 8
     ),
     ends as (
-      select i.id,
-        (select b.id from back b where b.root = i.id order by b.depth desc limit 1) as first,
-        (select a.id from ahead a where a.root = i.id and a.held order by a.depth desc limit 1) as final,
-        (select a.id from ahead a where a.root = i.id and not a.held limit 1) as next,
-        (select a.date::text from ahead a where a.root = i.id and not a.held limit 1) as date,
-        (select a.kind in ('general', 'local') from ahead a where a.root = i.id and not a.held limit 1) as "isGeneral"
+      select i.id, f.id as first, l.id as final, n.id as next, n.date::text as date,
+        n.kind in ('general', 'local') as "isGeneral"
       from ids i
+      left join (select distinct on (root) root, id from back order by root, depth desc) f on f.root = i.id
+      left join (select distinct on (root) root, id from ahead where held order by root, depth desc) l on l.root = i.id
+      left join (select distinct on (root) root, id, date, kind from ahead where not held order by root) n on n.root = i.id
     )
     select ends.*, coalesce((
       select fe.kind = 'primary' and le.kind in ('general', 'local')
@@ -13729,6 +13732,10 @@ export const elections = {
           before: string | null;
           year: number | null;
         }>(sql`
+          with shown as materialized (
+            select distinct y.date_from, y.kind from result_set rs join election y on y.id = rs.election_id
+            where rs.contest_id is null and ${latest("rs")}
+          )
           select a.k,
             coalesce(
               (select c.id from contest c where c.election_id = e.id and not c.notional limit 1),
@@ -13756,10 +13763,7 @@ export const elections = {
                   where t.election_id = e.id and u.election_id = x.id
                 )
               )
-              and exists (
-                select from result_set rs join election y on y.id = rs.election_id
-                where rs.contest_id is null and ${latest("rs")} and y.date_from = x.date_from and y.kind = x.kind
-              )
+              and exists (select from shown where shown.date_from = x.date_from and shown.kind = x.kind)
             order by x.date_from desc limit 1
           ) prior on true
           where e.id = ${input.id}::uuid and ${within}::uuid is null
