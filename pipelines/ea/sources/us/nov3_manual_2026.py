@@ -233,6 +233,11 @@ COUNTIES = {
         "https://cranstonri.gov/_resources/common/userfiles/file/Board%20of%20Canvassers/2026%20Election%20Items/Cranston%202026%20Voter%20Guide.pdf",
         "RI-web/cranston-voter-guide.pdf",
     ),
+    "44007-pw": (
+        "RI",
+        "https://pawtucketri.gov/wp-content/uploads/2026/10/2026-Bond-Booklet-for-webpage-1.pdf",
+        "RI-web/pawtucket-bond-booklet.pdf",
+    ),
     "44007-sm": (
         "RI",
         "https://www.smithfieldri.gov/",
