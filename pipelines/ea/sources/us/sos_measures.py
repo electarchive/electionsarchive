@@ -1602,6 +1602,7 @@ AR_TALLY = "https://results.tally-enr.com/results/arkansas/1844/FullDataFile.jso
 AR_TALLY_DAY = date(2022, 11, 8)
 AR_HISTORY = AR + "Initiatives_and_Amendments_1938-2018_1.pdf"
 AR_HIGHWAY_BONDS = date(2011, 11, 8)
+AR_HISTORY_END = 640
 AR_2022 = {
     "1": ("Convene the General Assembly in Extraordinary Session by Written Proclamation", "Legislative Referendum"),
     "2": ("Constitutional Amendment and Ballot Initiative Reform Amendment", "Legislative Referendum"),
@@ -4059,6 +4060,7 @@ def arkansas() -> list[dict[str, object]]:
         }
         for group, answer in ((1, "YES"), (2, "NO"))
     )
+    rows.extend(arkansas_history(history))
     tally = json.loads(raw.cached(SOURCE, AR_TALLY).path.read_text())
     for contest in tally["ContestData"]:
         if not (found := re.match(r"Issue No\. (\d): ", contest["ContestName"])):
@@ -4093,6 +4095,111 @@ def arkansas() -> list[dict[str, object]]:
             for side, answer in enumerate(("YES", "NO"))
         )
     return rows
+
+
+def arkansas_history(history: str) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    lines = history.replace("\f", "").split("\n")[:AR_HISTORY_END]
+    year = 0
+    cuts = (0, 0, 0)
+    vote = 0
+    block: list[tuple[str, str, str, str]] = []
+    yes: int | None = None
+    skipping = False
+    index = -1
+    while (index := index + 1) < len(lines):
+        line = lines[index]
+        if re.search(r"VOTE\s+STATEWIDE", line):
+            vote = line.index("VOTE") - 3
+            continue
+        if re.search(r"YEAR\s+PROPOSAL\s+ISSUE\s+SOURCE", line):
+            cuts = (line.index("PROPOSAL") + 10, line.index("SOURCE") - 8, vote)
+            continue
+        if re.search(r"OUTCOME\s+RESULTS", line):
+            continue
+        if (found := re.fullmatch(r"\s*(19\d\d)\s*", line)) is not None:
+            year, block, yes, skipping = int(found[1]), [], None, False
+            continue
+        if not line.strip():
+            block, yes, skipping = ([], None, False) if yes is None else (block, yes, skipping)
+            continue
+        columns = ["", "", "", ""]
+        for chunk in re.finditer(r"\S+(?:\s\S+)*", line):
+            where = sum(chunk.start() >= cut for cut in cuts)
+            columns[where] = f"{columns[where]} {chunk.group()}".strip()
+        label, title, source, outcome = columns
+        if outcome and not re.match(r"(YES|NO|No)\b", outcome):
+            block, yes, skipping = [], None, True
+            continue
+        if skipping:
+            continue
+        block.append((label, title, source, outcome))
+        if (found := re.match(r"YES\s+([\d,]+)", outcome)) is not None:
+            yes = int(found[1].replace(",", ""))
+        if (found := re.match(r"(?:NO|No)\s+([\d,]+)", outcome)) is None or yes is None:
+            continue
+        while (
+            index + 1 < len(lines) and lines[index + 1].strip() and not re.match(r"\s*(19\d\d)\s*$", lines[index + 1])
+        ):
+            following = lines[index + 1]
+            if re.search(r"VOTE\s+STATEWIDE|YEAR\s+PROPOSAL|OUTCOME\s+RESULTS", following):
+                if "VOTE" in following:
+                    vote = following.index("VOTE") - 3
+                elif "PROPOSAL" in following:
+                    cuts = (following.index("PROPOSAL") + 10, following.index("SOURCE") - 8, vote)
+                index += 1
+                continue
+            pieces = [
+                (sum(chunk.start() >= cut for cut in cuts), chunk.group())
+                for chunk in re.finditer(r"\S+(?:\s\S+)*", following)
+            ]
+            if not pieces or any(where in (0, 3) for where, _ in pieces) or all(where != 1 for where, _ in pieces):
+                break
+            block.append(
+                (
+                    "",
+                    " ".join(text for where, text in pieces if where == 1),
+                    " ".join(text for where, text in pieces if where == 2),
+                    "",
+                )
+            )
+            index += 1
+        no = int(found[1].replace(",", ""))
+        label_text = " ".join(part[0] for part in block if part[0])
+        title_text = " ".join(" ".join(part[1] for part in block if part[1]).split())
+        number = re.search(r"(?:Amendment|Act|Question|Issue)\s+(?:No\.\s*)?(\d+)", label_text)
+        if yes + no > 0:
+            kind_text = " ".join(f"{part[0]} {part[2]}" for part in block)
+            rows.extend(
+                {
+                    "state": "AR",
+                    "day": ar_general(year),
+                    "number": number[1] if number is not None else "1",
+                    "label": re.sub(
+                        r"(Question) Act",
+                        r"\1",
+                        re.sub(r"\bNo\.\s*|^Proposed\s+|\s*\(\d{4}\)|\s+of \d{4}", "", label_text),
+                    ),
+                    "url": AR_HISTORY,
+                    "county": "statewide",
+                    "answer": answer,
+                    "votes": votes,
+                    "title": title_text,
+                    "kind": "Initiative"
+                    if re.search(r"Initiat|initiative", kind_text)
+                    else "Popular Referendum"
+                    if re.search(r"Petition|order of the\s+people", kind_text)
+                    else "Legislative Referendum",
+                }
+                for answer, votes in (("YES", yes), ("NO", no))
+            )
+        block, yes = [], None
+    return rows
+
+
+def ar_general(year: int) -> date:
+    first = date(year, 11, 1)
+    return first + timedelta(days=(7 - first.weekday()) % 7 + 1)
 
 
 def south_dakota() -> list[dict[str, object]]:
