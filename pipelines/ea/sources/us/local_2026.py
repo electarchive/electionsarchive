@@ -5673,6 +5673,27 @@ for key, publisher, title, url, local in (
         "ks/kingman_notice.pdf",
     ),
     (
+        "KS-20069",
+        "Gray County Clerk",
+        "Notice of General Election, November 3, 2026",
+        "https://www.graycountyks.com/",
+        "ks/gray_notice.pdf",
+    ),
+    (
+        "KS-20069-townships",
+        "Gray County Clerk",
+        "Notice of General Election, November 3, 2026",
+        "https://www.graycountyks.com/",
+        "ks/gray_notice.pdf",
+    ),
+    (
+        "KS-20187",
+        "Stanton County Election Officer",
+        "Notice of General Election, November 3, 2026",
+        "https://www.stantoncountyks.com/",
+        "ks/stanton_notice.pdf",
+    ),
+    (
         "KS-20007",
         "Barber County",
         "PUBLIC NOTICE of candidates for the General Election of November 3, 2026",
