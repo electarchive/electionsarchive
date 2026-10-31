@@ -1,20 +1,17 @@
 import re
 import subprocess
-from datetime import UTC, date, datetime
+from datetime import UTC, datetime
 from pathlib import Path
-from uuid import UUID
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
-from ea.sources.us import govmint
-from ea.store import DATA, connect
+from ea.sources.us import district_boards
+from ea.store import DATA
 
 SOURCE = "us.ne_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-DAY = date(2026, 11, 3)
 URL = "https://sos.nebraska.gov/sites/default/files/doc/elections/2026/Final_Statewide_General_Candidate_Filing_List_9.11.26.pdf"
 PUBLISHER = "Nebraska Secretary of State"
 TITLE = "Final Statewide General Candidate List, November 3, 2026 General Election"
@@ -32,7 +29,9 @@ SEAT = re.compile(
     r"(?:Keya Paha|Gosper County|Kearney County|Lincoln County|Phelps County|Cherry|Rock|West|Buffalo|Dawson|"
     r"Lincoln|North|East|South) Subdivision)"
 )
-NOISE = re.compile(r"\bFor Board(?: of)?\b|\bBoard of\b|\b(?:Directors|Governors|Regents)\b|\bFor\b|\bSubdivision\b|\bPage\b|\bCounties\b")
+NOISE = re.compile(
+    r"\bFor Board(?: of)?\b|\bBoard of\b|\b(?:Directors|Governors|Regents)\b|\bFor\b|\bSubdivision\b|\bPage\b|\bCounties\b"
+)
 STATUS = re.compile(r"\b(Nonincumbent|Incumbent)\b")
 SPLIT = (
     ("Central Nebraska Public Power and", "Central Nebraska Public Power and Irrigation District"),
@@ -54,15 +53,11 @@ def fetch() -> None:
         content = subprocess.run(
             ["curl", "-sSL", "-m", "180", "-A", "Mozilla/5.0", URL], capture_output=True, check=True
         ).stdout
-        raw.store(
-            SOURCE, URL, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
-        )
+        raw.store(SOURCE, URL, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
 
 
 def layout(path: Path) -> list[dict[str, str | int | bool]]:
-    text = subprocess.run(
-        ["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True, text=True
-    ).stdout
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True, text=True).stdout
     entries: list[dict[str, str | int | list[str]]] = []
     current: dict[str, str | int | list[str]] | None = None
     for line in text.split("\n"):
@@ -147,142 +142,22 @@ def role(district: str) -> tuple[str, str | None]:
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
     full_term = {district: max(group["term"]) for (district,), group in frame.group_by(["district"])}
-    with connect() as conn:
-        state = conn.execute(
-            """select t.polity_id, t.area_id, 'us/ne', c.code from polity_territory t
-               join slug s on s.entity_id = t.polity_id and s.path = 'us/ne'
-               join area_code c on c.area_id = t.area_id limit 1"""
-        ).fetchone()
-        assert state is not None
-        existing: dict[str, tuple[UUID, UUID, str, str]] = {}
-        for polity, area, text, path, code in conn.execute(
-            """select p.id, t.area_id, n.text, s.path, c.code from polity p
-               join polity_territory t on t.polity_id = p.id
-               join area_code c on c.area_id = t.area_id
-               join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-               join slug s on s.entity_id = p.id and s.is_current
-               where p.kind = 'special_district' and s.path like 'us/ne/%%'"""
-        ).fetchall():
-            existing[govmint.fold(text)] = (polity, area, path, code)
-        slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/ne/%%'").fetchall())
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Nebraska natural resources district, public power district, community college, educational service unit, and other district board races on the November 3, 2026 ballot, with candidates from the Secretary of State's final statewide list",
-            polity="US-NE",
-        )
-        system = cs.key("us.electoral_system", "fptp")
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add(
-            "source",
-            id=source,
-            kind="official_body",
-            publisher=PUBLISHER,
-            title=TITLE,
-            url=URL,
-            license="Public record",
-        )
-        cs.artifact(raw.cached(SOURCE, URL), source)
-        parent = cs.key("us.election", f"{DAY}:NE")
-        made: dict[str, tuple[UUID, UUID, str, str, str]] = {}
-        elections: set[UUID] = set()
-        kept = 0
-        for (district, seat, term), people in frame.group_by(["district", "seat", "term"], maintain_order=True):
-            word, function = role(district)
-            if district not in made:
-                twin = existing.get(govmint.fold(district))
-                if twin is not None:
-                    made[district] = (twin[0], twin[1], district, twin[2], twin[3])
-                else:
-                    special = govmint.special(conn, cs, "NE", state, district, slugs, function)
-                    if special is None:
-                        print("no district:", district)
-                        continue
-                    made[district] = special
-            polity, area, place, path, code = made[district]
-            election = cs.key("us.election", f"{DAY}:NE:{code}")
-            if election in cs.minted and election not in elections:
-                elections.add(election)
-                cs.add(
-                    "election",
-                    id=election,
-                    polity_id=polity,
-                    parent_id=parent,
-                    kind="general",
-                    date_from=DAY,
-                    date_to=DAY,
-                    date_precision="day",
-                    status="scheduled",
-                )
-                cs.add(
-                    "name",
-                    entity_id=election,
-                    text=f"{DAY.year} {place} general election",
-                    lang="en",
-                    kind="official",
-                    is_preferred=True,
-                )
-                cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
-            remainder = term < full_term[district]
-            label = f"{seat} (unexpired term)" if remainder else seat
-            title = f"{place} {word} {label}"
-            token = f"{slug(word)}-{slug(seat)}" + ("-unexpired" if remainder else "")
-            owner = cs.key("us.office", f"NE:{code}:{token}")
-            contest_key = f"{DAY}:NE:{code}:{token}"
-            contest = cs.key("us.contest", contest_key)
-            contest_path = f"{path}/{DAY}-general/{token}"
-            if slugs.get(contest_path, contest) != contest:
-                print("slug taken:", contest_path)
-                continue
-            slugs[contest_path] = contest
-            if owner in cs.minted:
-                cs.add("office", id=owner, polity_id=polity, kind="other")
-                cs.add("name", entity_id=owner, text=title, lang="en", kind="official", is_preferred=True)
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="office",
-                office_id=owner,
-                district_area_id=area,
-                magnitude=int(people.row(0, named=True)["vote"]),
-                round_number=1,
-                electoral_system_id=system,
-                default_result_kind="counted",
-                term="remainder" if remainder else "full",
-            )
-            cs.add(
-                "name",
-                entity_id=contest,
-                text=f"{DAY.year} {title} election",
-                lang="en",
-                kind="official",
-                is_preferred=True,
-            )
-            if contest in cs.minted:
-                cs.add("slug", path=contest_path, entity_id=contest)
-            cs.add("citation", entity_id=contest, source_id=source, locator=None)
-            for person_row in people.iter_rows(named=True):
-                ballot = person_row["name"]
-                who = slug(ballot)
-                person = cs.key(f"{SOURCE}.person", f"{contest_key}:{who}")
-                option = cs.key("us.option", f"{contest_key}:{who}")
-                if person in cs.minted:
-                    cs.add("person", id=person)
-                    cs.add("name", entity_id=person, text=ballot, lang="en", kind="official", is_preferred=True)
-                cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=ballot)
-                candidacy = cs.key("us.candidacy", f"{contest_key}:{who}:head")
-                cs.add(
-                    "candidacy",
-                    id=candidacy,
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=ballot,
-                    is_independent=True,
-                )
-                cs.add("citation", entity_id=candidacy, source_id=source, locator=None)
-                kept += 1
-        print(f"{kept} candidates")
-        return cs.write()
+    roles = [role(district) for district in frame["district"]]
+    frame = frame.with_columns(
+        remainder=pl.Series(
+            [term < full_term[district] for term, district in zip(frame["term"], frame["district"], strict=True)]
+        ),
+        role=pl.Series([word for word, _ in roles]),
+        function=pl.Series([function for _, function in roles]),
+        county=pl.lit(None, dtype=pl.Utf8),
+    )
+    return district_boards.emit(
+        source_id=SOURCE,
+        version=VERSION,
+        state="NE",
+        summary="Nebraska natural resources district, public power district, community college, educational service unit, and other district board races on the November 3, 2026 ballot, with candidates from the Secretary of State's final statewide list",
+        publisher=PUBLISHER,
+        title=TITLE,
+        url=URL,
+        frame=frame,
+    )
