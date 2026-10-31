@@ -63,6 +63,10 @@ SCHOOLS = {
     ("ID", "Highland Joint School District No. 305"): "1601440",
     ("ID", "Moscow School District No. 281"): "1602220",
     ("AZ", "Prescott Unified School District No. 1"): "0406730",
+    ("AZ", "Vail Unified School District No. 20"): "0408850",
+    ("AZ", "Amphitheater School District No. 10"): "0400680",
+    ("AZ", "Sahuarita Unified School District No. 30"): "0407300",
+    ("AZ", "Tanque Verde Unified School District No. 13"): "0408280",
     ("AZ", "Wickenburg Unified School District No. 9"): "0409190",
     ("AZ", "Humboldt Unified School District No. 22"): "0403870",
     ("AZ", "Camp Verde Unified School District No. 28"): "0400813",
@@ -90,6 +94,16 @@ COUNTIES = {
         "AZ",
         "https://www.recorder.pima.gov/PressRelease/2026/11.3%20General%20Election%20What%20Voters%20Need%20to%20Know.pdf",
         "MF-387/pima/11.3 General Election What Voters Need to Know.pdf",
+    ),
+    "04019-insert": (
+        "AZ",
+        "https://www.recorder.pima.gov/",
+        "N3M-web/az2/pima_a.pdf",
+    ),
+    "04015-insert": (
+        "AZ",
+        "https://www.mohave.gov/",
+        "N3M-web/az2/mohave_full.pdf",
     ),
     "04021": (
         "AZ",
