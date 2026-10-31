@@ -1440,6 +1440,8 @@ DELIVERED = {
     "VT": DATA / "inbox" / "y26" / "ne" / "vt_ge_qualified_candidates_2026.xlsx",
     "CA-06095": DATA / "inbox" / "y26" / "ca" / "solano_filed_log.pdf",
     "CA-06047": DATA / "inbox" / "y26" / "ca" / "merced_final.pdf",
+    "CA-06089": DATA / "inbox" / "y26" / "ca" / "shasta.pdf",
+    "CA-06111": DATA / "inbox" / "y26" / "ca" / "ventura_0812.pdf",
     "CA-06055": DATA / "inbox" / "y26" / "ca" / "napa_qualified.pdf",
     "CA-06017": DATA / "inbox" / "y26" / "ca" / "eldorado_list.pdf",
     "CA-06053": DATA / "inbox" / "y26" / "ca" / "monterey_list.html",
