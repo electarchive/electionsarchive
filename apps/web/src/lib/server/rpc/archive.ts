@@ -972,6 +972,20 @@ async function children(
   target?: number,
   isDeep = false,
 ) {
+  return remember(
+    `children:${JSON.stringify([contest, area.id, area.k, isRoot, date, target ?? null, isDeep])}`,
+    async () => gather(contest, area, isRoot, date, target, isDeep),
+  );
+}
+
+async function gather(
+  contest: string | Array<string>,
+  area: { id: string; k: number },
+  isRoot: boolean,
+  date: string,
+  target?: number,
+  isDeep = false,
+) {
   const sets = await db.execute<{ k: number }>(sql`
     with recursive grp(id) as (
       select unnest(${sql.param([contest].flat())}::uuid[])
@@ -1053,14 +1067,16 @@ async function children(
         and (
           r.voted
           or not exists (select from me)
-          or not exists (select from area_geometry g where g.area_id = a.id)
-          or exists (
-            select from me cross join lateral (
+          or coalesce((
+            select case
+              when g.geom && me.geom then ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
+              else ST_Area(g.geom) = 0
+            end
+            from me cross join lateral (
               select g.geom from area_geometry g where g.area_id = a.id
               order by g.valid @> ${date}::date desc, upper(g.valid) desc nulls first limit 1
             ) g
-            where ST_Area(ST_Intersection(g.geom, me.geom)) >= 0.01 * ST_Area(g.geom)
-          )
+          ), true)
         )
     `);
   }
@@ -1220,6 +1236,32 @@ async function children(
   ].toSorted((a, b) =>
     a.name.localeCompare(b.name, undefined, { numeric: true }),
   );
+}
+
+async function reaches(place: string, area: string, date: string) {
+  const found = await db.execute<{ yes: boolean }>(sql`
+    select
+      not exists (select from area_geometry g where g.area_id = ${place}::uuid)
+      or not exists (select from area_geometry h where h.area_id = ${area}::uuid)
+      or exists (
+        select from area_geometry h
+        cross join lateral (
+          select from area_geometry g where g.area_id = ${place}::uuid and g.geom && h.geom limit 1
+        ) g
+        where h.area_id = ${area}::uuid
+      )
+      or exists (select from reporting_unit_area m where m.area_id = any(array[${place}::uuid]))
+      or not exists (select from area_parent p where p.area_id = ${area}::uuid and p.valid @> ${date}::date)
+      or exists (
+        select from area_parent p
+        where p.area_id = ${area}::uuid and p.valid @> ${date}::date
+          and (p.parent_id = ${place}::uuid or exists (
+            select from area_parent q where q.area_id = p.parent_id and q.parent_id = ${place}::uuid and q.valid @> ${date}::date
+          ))
+      )
+      or exists (select from area a where a.id = ${area}::uuid and a.scheme_code = 'world.country') as yes
+  `);
+  return found.rows[0]?.yes ?? true;
 }
 
 async function descend(
@@ -4992,8 +5034,10 @@ async function lean(input: {
     .slice(0, -1)
     .map((entry) => entry.segment)
     .join("/");
+  const leaning = async (args: Parameters<typeof atlas>[0]) =>
+    remember(`lean:${JSON.stringify(args)}`, async () => atlas(args));
   const measure = async (group: "option" | "alliance") => {
-    const near = await atlas({
+    const near = await leaning({
       id: input.id,
       unit: above === "" ? undefined : above,
       level: place.scheme,
@@ -5004,7 +5048,7 @@ async function lean(input: {
     const whole =
       chain.length === 1
         ? near
-        : await atlas({ id: input.id, group, isLean: true });
+        : await leaning({ id: input.id, group, isLean: true });
     const axis = whole.legend.slice(0, 2);
     const spread = (
       set: typeof near,
@@ -6954,7 +6998,8 @@ export const contests = {
           ),
           peers as (
             select c.* from me join contest c
-              on c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
+              on (c.body_id = me.body_id or c.office_id = me.office_id)
+              and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
               and c.kind = me.kind and c.round_number = me.round_number
               and c.party_scope_id is not distinct from me.party_scope_id
               and c.allocation_parent_id is null and c.district_area_id is not null and not c.notional
@@ -7531,7 +7576,8 @@ export const contests = {
                 select c.id, a.id as area, a.k, me.scheme, me.day, me.general,
                   coalesce(c.rules_override ->> 'formula', es.rules ->> 'formula', '') = 'stv' as stv
                 from me join contest c
-                  on (case when me.general is null then c.election_id = me.election_id
+                  on c.election_id = any(array[me.election_id, me.general])
+                  and (case when me.general is null then c.election_id = me.election_id
                     else c.id = me.id or (c.election_id = me.general and c.district_area_id <> me.district_area_id) end)
                   and c.kind = me.kind and c.round_number = me.round_number
                   and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
@@ -9672,6 +9718,7 @@ export const contests = {
         id: string;
         parent: string | null;
         path: string;
+        voted: boolean;
       }>(sql`
         with recursive up(id, parent) as (
           select e.id, e.parent_id from contest c join election e on e.id = c.election_id where c.id = ${contest.id}::uuid
@@ -9701,14 +9748,16 @@ export const contests = {
           select g.id, grp.top from contest g join grp on g.allocation_parent_id = grp.id
         ),
         hits as (
-          select distinct grp.top from grp
+          select grp.top, bool_or(r.voted) as voted from grp
           cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
-          where exists (
-            select 1 from result_rollup r
-            where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) offset 0
-          )
+          cross join lateral (
+            select bool_or(r.value <> 0) as voted from result_rollup r
+            where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+            having count(*) > 0
+          ) r
+          group by grp.top
         )
-        select c.id, c.parent, s.path
+        select c.id, c.parent, s.path, h.voted
         from candidates c
         join hits h on h.top = c.id
         join slug s on s.entity_id = c.id and s.is_current
@@ -9722,6 +9771,13 @@ export const contests = {
       const build = async (row: (typeof kept)[number]) => {
         const other = await find(row.id);
         if (other.place == null) {
+          return null;
+        }
+        if (
+          other.place.k !== area.k &&
+          !row.voted &&
+          !(await reaches(other.place.id, area.id, day))
+        ) {
           return null;
         }
         const kids =
