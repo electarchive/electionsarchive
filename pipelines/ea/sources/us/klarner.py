@@ -907,16 +907,16 @@ def emit() -> Path | str:
         for (scheme, value), reason in RETIRED.items():
             if (
                 value.split(":")[1] in chunk.split(",")
-                and not (
-                    scheme == "us.option"
-                    and conn.execute("select 1 from candidacy where option_id = %s", [cs.key(scheme, value)]).fetchone()
-                )
                 and (scheme, value)
                 in conn.execute(
                     """select x.scheme, x.value from external_id x join entity e on e.id = x.entity_id
                    where x.scheme = %s and x.value = %s and e.retired_by is null""",
                     [scheme, value],
                 ).fetchall()
+                and not (
+                    scheme == "us.option"
+                    and conn.execute("select 1 from candidacy where option_id = %s", [cs.key(scheme, value)]).fetchone()
+                )
             ):
                 cs.add("entity_retirement", entity_id=cs.key(scheme, value), reason=reason)
         held: dict[UUID, list[tuple[UUID, str, str, bool]]] = {}
