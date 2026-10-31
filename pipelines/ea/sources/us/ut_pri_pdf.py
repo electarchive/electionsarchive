@@ -4,6 +4,7 @@ from datetime import UTC, date, datetime
 from html import unescape
 from pathlib import Path
 
+import fastexcel
 import polars as pl
 
 from ea import raw
@@ -40,6 +41,27 @@ COLUMNS = {
     ],
 }
 PRESIDENT = "2008WSPprimary.pdf"
+SHEETS = {
+    "2010-Primary-Canvass-Reports.xls": (
+        date(2010, 6, 22),
+        {
+            4: ("senate:republican", None),
+            5: ("senate:republican", None),
+            6: ("house:democratic", 2),
+            7: ("house:democratic", 2),
+        },
+    ),
+    "2012-Primary-Canvass-Reports-1.xlsx": (
+        date(2012, 6, 26),
+        {
+            **{column: ("president:republican", None) for column in range(4, 9)},
+            9: ("senate:republican", None),
+            10: ("senate:republican", None),
+            11: ("house:democratic", 1),
+            12: ("house:democratic", 1),
+        },
+    ),
+}
 NAMES = {
     "democratic": ["Joe Biden", "Hillary Clinton", "Christopher J. Dodd", "John Edwards", "Mike Gravel", "Dennis Kucinich", "Frank Lynch", "Barack Obama", "Bill Richardson"],
     "republican": ["Rudy Giuliani", "Mike Huckabee", "Duncan Hunter", "Alan Keyes", "John McCain", "Ron Paul", "Mitt Romney", "Tom Tancredo", "Fred Thompson"],
@@ -50,6 +72,15 @@ TITLE = "Official primary results by county"
 
 
 def fetch() -> None:
+    for name in SHEETS:
+        raw.store(
+            SOURCE,
+            BASE + name,
+            (INBOX / name).read_bytes(),
+            suffix=Path(name).suffix,
+            retrieved_at=datetime.now(UTC),
+            media_type="application/vnd.ms-excel",
+        )
     for name in [*FILES, PRESIDENT]:
         raw.store(
             SOURCE,
@@ -102,6 +133,28 @@ def parse() -> None:
             counted = sum(row[5] for row in rows if row[0] == day and row[1:3] == spec[:2] and row[4] == spec[2])
             if counted != printed[column]:
                 raise ValueError(f"{name} {spec[2]}: counties sum to {counted}, printed {printed[column]}")
+    for name, (day, columns) in SHEETS.items():
+        table = list(
+            fastexcel.read_excel(raw.cached(SOURCE, BASE + name).path)
+            .load_sheet(0, header_row=None)
+            .to_polars()
+            .iter_rows()
+        )
+        header = next(row for row in table if row[0] == "COUNTY")
+        total = next(row for row in table if row[0] == "TOTAL")
+        found = []
+        for row in table:
+            code = codes.get(re.sub(r"[^a-z]", "", str(row[0]).lower()))
+            if code is None:
+                continue
+            for column, (chamber, district) in columns.items():
+                if row[column] not in (None, ""):
+                    found.append((day, chamber, district, code, header[column], int(float(row[column]))))
+        for column, (chamber, district) in columns.items():
+            counted = sum(line[5] for line in found if line[1:3] == (chamber, district) and line[4] == header[column])
+            if counted != int(float(total[column])):
+                raise ValueError(f"{name} {header[column]}: counties sum to {counted}, printed {total[column]}")
+        rows.extend(found)
     for line in Path(__file__).with_name("ut_pri_2008.tsv").read_text().splitlines():
         party, county, *cells = line.split("\t")
         code = codes[re.sub(r"[^a-z]", "", county.lower())]
@@ -136,7 +189,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Utah's 2002 and 2004 U.S. House primaries and 2008 presidential primaries by county from the Office of Elections' official canvasses",
+            summary="Utah's 2002 and 2004 U.S. House primaries, 2008 presidential primaries, and 2010 and 2012 federal primaries by county from the Office of Elections' official canvasses",
             polity="US-UT",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -150,7 +203,7 @@ def emit() -> Path:
                 url="https://vote.utah.gov/historical-election-results/",
                 license="Public record",
             )
-        for name in [*FILES, PRESIDENT]:
+        for name in [*FILES, PRESIDENT, *SHEETS]:
             cs.artifact(raw.cached(SOURCE, BASE + name), source)
         medsl.attach(
             cs,
