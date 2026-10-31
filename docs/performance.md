@@ -6,6 +6,10 @@ This page explains how the site stays fast: where results are cached, how the ca
 
 Cloudflare sits in front of the origin. Static assets under `/_app/immutable/` have content-hashed names and are sent with `cache-control: public, max-age=31536000, immutable`, so browsers and the edge keep them for a year. Pages and twins are rendered by the SvelteKit server, which answers each page from a handful of RPC procedures called in-process. A loader starts independent procedure calls together with `Promise.all`, so a contest page waits for its slowest call, not for the sum of them.
 
+Each kind of archive page (contest, election, day, and polity) is its own JavaScript chunk, loaded with a dynamic `import()`, so a contest page doesn't download the code for the other three. That cut the JavaScript a contest page preloads from about 473 kB to 240 kB gzipped.
+
+Two sections of the contest page, the ballot list and the lean chart, sit below the results and can take seconds on a cold cache. They don't hold up the page. The loader starts them once the contest is found. When the main data is ready, it returns each one as a plain value if it has already finished, and as a promise if it hasn't. SvelteKit streams a promise to the browser when it resolves, and the page renders it with `{#await}`. A warm page therefore arrives fully rendered, and a cold one shows the results first and fills in the rest. The Markdown and JSON twins wait for both.
+
 ## The procedure cache
 
 Every read procedure goes through `remember()` in `apps/web/src/lib/server/cache.ts`. A result is keyed by the procedure's name and its JSON input, and it lives in two tiers:
@@ -39,6 +43,25 @@ These patterns came out of plans that read whole tables. Each one turned a query
 - **Don't wrap indexed columns in `coalesce`.** Write `(c.body_id = x or (c.body_id is null and c.office_id = x))`, not `coalesce(c.body_id, c.office_id) = x`, so each branch can use its index.
 - **Filter before joining territories.** Find the elections you need first, then join `polity_territory` for only those.
 - **Test existence in a select list with `(select true ... limit 1)`.** The planner can turn an `exists` in a select list into a hashed subplan that reads every matching row in the table. A scalar subquery with `limit 1` always runs per row and stops at the first match.
+- **Probe geometry through its spatial index first.** Select candidate shapes with `g.geom && ST_MakeEnvelope(...)` in a subquery that ends in `offset 0`, then join `area` and filter by date. Without the optimization fence, the planner can combine the spatial index with the date index in a bitmap AND that reads hundreds of thousands of rows.
+- **Fix the leading column of a GiST key.** The keys of `area_geometry`, `area_parent`, and `reporting_unit_area` are GiST indexes on an id and a `valid` range. A probe that fixes only the date scans the whole index. Start from the ids you already have, and look up each one with a lateral subquery.
+- **Compute constant sets once.** Put a filter that doesn't depend on the row, such as the list of ICPSR sources or the dates of elections that have polity-wide results, in `= any(array(select ...))` or a materialized CTE. Then it runs once per query instead of once per row.
+- **Summarize a CTE once, not once per row.** A scalar subquery such as `(select id from ahead a where a.root = i.id order by a.depth desc limit 1)` reads the whole CTE for every row. Compute `distinct on (root)` once and join the result.
+- **Group before you test.** When thousands of rows collapse to a few hundred keys, as when every past contest of a body maps to its districts, group by the key first and run the existence checks on the grouped rows.
+- **Fetch notes by entity id.** Put the union of ids first, then fetch matching rows with a lateral lookup by `entity_id`, instead of testing `exists` against the union for every note.
+- **Run cheap geometry tests before expensive ones.** Compare bounding boxes with `&&`, or check `ST_Intersects`, before computing `ST_Intersection`. Fold "has no shape" and "overlaps" into one lookup per row instead of two. Clip a heavy shape to the other shape's bounding box with `ST_ClipByBox2D`, wrapped in `ST_MakeValid`, before intersecting them.
+- **Make `is not distinct from` joins indexable.** A join on `c.body_id is not distinct from me.body_id` can't use an index. When one side is known to be non-null, add `(c.body_id = me.body_id or c.office_id = me.office_id)` so the planner can probe both indexes, and keep the null-safe test as a filter. For a small constant set, use `= any(array[...])`.
+- **Memoize shared helpers.** A contest page runs several procedures, and each one resolves the URL path through `children()`. `children()` and the lean atlases also go through `remember()`, so a page load resolves each path once, and concurrent calls share one query.
+- **Rule out candidates before resolving them.** The ballot list checks every contest held in the same place on the same day. A cheap check drops the contests that can't list this place before the expensive path resolution runs: it checks whether the two shapes' bounding boxes overlap, whether the place sits under the contest's area, and whether reporting units link them. On a Cleveland precinct page, the test dropped 112 of 133 candidates, and the ballot went from 20 s to 5 s cold.
+
+## Indexes
+
+Every column that a page looks rows up by needs a btree index. The migration `20261031200000_lookup_indexes` added the ones that the plans showed were missing:
+
+- `source_icpsr_idx`, a partial index of the sources whose license mentions ICPSR. The withdrawn-license filter reads it in every result-set query.
+- `body_polity_idx`, `office_polity_idx`, `office_body_idx`, `tenure_body_idx`, and `polity_parent_parent_idx`, which polity and body pages use.
+
+To find another missing index, run the benchmark and then look at `seq_scan` and `seq_tup_read` in `pg_stat_user_tables`.
 
 ## Heavy geometry
 
@@ -52,11 +75,18 @@ Across the 70 predecessor pairs of the 12 heaviest districts of Canada's 2025 el
 
 The benchmark we track requests 45 representative pages one at a time against the origin, first with every cache empty and then with both tiers warm.
 
-| Change                                                                       | All 45 pages, cold | Slowest contest page, cold |
-| ---------------------------------------------------------------------------- | ------------------ | -------------------------- |
-| Before                                                                       | 98.7 s             | 34 s                       |
-| JIT off, lateral result-set lookups, lookup indexes, and the turnout rewrite | 91.4 s             | 13.7 s                     |
-| zstd, the owner predicate, and the recursive-CTE rewrites                    | 80.8 s             | 13.2 s                     |
-| Coarse geometry for overlaps                                                 | 69.0 s             | 3.0 s                      |
+| Change                                                                                      | All 45 pages, cold | Slowest contest page, cold |
+| ------------------------------------------------------------------------------------------- | ------------------ | -------------------------- |
+| Before                                                                                      | 98.7 s             | 34 s                       |
+| JIT off, lateral result-set lookups, lookup indexes, and the turnout rewrite                | 91.4 s             | 13.7 s                     |
+| zstd, the owner predicate, and the recursive-CTE rewrites                                   | 80.8 s             | 13.2 s                     |
+| Coarse geometry for overlaps                                                                | 69.0 s             | 3.0 s                      |
+| Geometry-first lookups, lookups for lateral rollups, and the six lookup indexes             | 61.6 s             | 2.85 s                     |
+| Intersects guards, grouped district lookups, and decided-race shortcuts                     | 57.4 s             | 2.83 s                     |
+| Memoized path resolution, indexable peer joins, the ballot prefilter, and streamed sections | 54.7 s             | 2.72 s                     |
 
 With both cache tiers warm, all 45 pages take 1.9 s together, and the slowest takes 0.34 s.
+
+Pages below the county level gain the most from memoization and streaming. A Cleveland precinct page in the 2016 Ohio Senate race took 25.1 s cold. It now sends its first byte after 2.2 s and finishes streaming after about 6 s. The next precinct in the same district sends its first byte after 0.8 s. A Canadian riding opened from the national map takes 1.8 s cold, where it took more than 20 s before.
+
+Most of the remaining cold time goes to reading from disk, because the database is about as large as the server's memory. The two slowest queries left are geometric. One draws the home page's world map, and its output is the same for every request, so the warm-up run caches it. The other query measures how much of a heavy district its predecessor covers, which means intersecting two shapes of about 90,000 points each. Pre-simplifying the world map changed its output, and btree indexes on `area_parent (area_id)` and `election (date_from, kind)` saved less than 10% on warm queries, so neither change was made.
