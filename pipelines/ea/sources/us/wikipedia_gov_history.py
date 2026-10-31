@@ -18,8 +18,8 @@ from ea.sources.us.wikipedia_statewide import GENERIC, SKIP, STATES
 from ea.store import DATA, connect
 
 SOURCE = "us.wikipedia_gov_history"
-VERSION = "2"
-PARSED = DATA / "parsed" / f"{SOURCE}-2"
+VERSION = "3"
+PARSED = DATA / "parsed" / f"{SOURCE}-3"
 API = "https://en.wikipedia.org/w/api.php?"
 CHUNK = 20
 
@@ -32,7 +32,6 @@ def contests() -> list[tuple[str, int, str]]:
                join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office' and o.value like 'governor:%%'
                where exists (select from result_set_history h join result_set_drop d
                              on h.id = d.result_set_id and h.superseded_by = d.changeset_id where h.contest_id = c.id)
-                 and exists (select from result_set r where r.contest_id = c.id)
                  and not exists (select from result_set r join changeset k on k.id = r.changeset_id
                                  where r.contest_id = c.id and k.pipeline = %s)
                  and not exists (select from result_set r join changeset k on k.id = r.changeset_id
@@ -161,8 +160,9 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | Non
         label = " ".join(re.findall(r"^=+\s*(.*?)\s*=+\s*$", text[: begin.start()], flags=re.MULTILINE)[-2:])
         if SKIP.search(label) or not re.search(r"candidate|votes", body[:1500], re.IGNORECASE):
             continue
-        if re.search(r"running mate|lieutenant|ticket", body[:1500], re.IGNORECASE):
+        if re.search(r"lieutenant|ticket", body[:1500], re.IGNORECASE):
             continue
+        mated = re.search(r"running mate", body[:1500], re.IGNORECASE) is not None
         rows: list[dict[str, object]] = []
         listed, total = 0, None
         for row in body.split("\n|-")[1:]:
@@ -182,6 +182,10 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | Non
             if before and re.match(r"total", before[0], re.IGNORECASE):
                 total = votes
                 continue
+            if mated:
+                if number < 3 or not row_cells[number - 2] or not row_cells[number - 3]:
+                    continue
+                before = [row_cells[number - 3], row_cells[number - 2]]
             if not before or re.match(r"majority|plurality|turnout|margin", before[-1], re.IGNORECASE):
                 continue
             listed += votes
@@ -197,6 +201,8 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | Non
             )
         if not rows:
             continue
+        rows = fuse(rows)
+        listed = sum(int(row["votes"]) for row in rows)
         reason = None
         if total is not None:
             if abs(listed - total) > max(5, total // 200):
@@ -266,6 +272,25 @@ def tickets(text: str) -> tuple[list[dict[str, object]], str | None]:
     return [], None
 
 
+def fuse(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    folded: dict[tuple[str, ...], dict[str, object]] = {}
+    for row in rows:
+        key = tuple(words(str(row["name"])))
+        if key not in folded:
+            folded[key] = dict(row)
+            continue
+        kept = folded[key]
+        if str(row["party"]).lower() == "total":
+            kept["votes"] = row["votes"]
+        elif str(kept["party"]).lower() == "total":
+            kept["party"] = row["party"]
+        else:
+            kept["votes"] = int(kept["votes"]) + int(row["votes"])
+        kept["winner"] = max(int(kept["winner"]), int(row["winner"]))
+        kept["percentage"] = None
+    return list(folded.values())
+
+
 def read(text: str) -> tuple[list[dict[str, object]], str | None]:
     boxes: list[tuple[str, int, list[dict[str, object]], str | None]] = []
     for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
@@ -298,6 +323,8 @@ def read(text: str) -> tuple[list[dict[str, object]], str | None]:
                 )
         if not rows:
             continue
+        rows = fuse(rows)
+        listed = sum(int(row["votes"]) for row in rows)
         reason = None
         if total is not None:
             if abs(listed - total) > max(5, total // 200):
