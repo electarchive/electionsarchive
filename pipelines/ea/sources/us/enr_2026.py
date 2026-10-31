@@ -668,7 +668,7 @@ def rows(state: str, url: str, path: Path):
                         "office": "governor" if office.startswith("Governor") else "house",
                         "district": district[1] if district else "",
                         "party": party,
-                        "county": cells[0],
+                        "county": "24510" if cells[0] == "Baltimore City" else cells[0],
                         "candidate": name,
                         "write_in": write_in or name.startswith("Other Write-Ins"),
                         "votes": int(votes.replace(",", "")) if votes[:1].isdigit() else 0,
