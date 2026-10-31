@@ -1,16 +1,12 @@
-import { openapi } from "@orpc/openapi";
-import { ORPCError, os as base } from "@orpc/server";
 import { dev } from "$app/env";
+import { openapi } from "@orpc/openapi";
+import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
+import type { Column, Goal } from "#lib/coverage.js";
+import { COUNTRY_TIERS, US_TIERS } from "#lib/coverage.js";
 import { os as cached } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
-import {
-  COUNTRY_TIERS,
-  US_TIERS,
-  type Column,
-  type Goal,
-} from "#lib/coverage.js";
 
 const os = dev ? base : cached;
 
@@ -233,9 +229,7 @@ function tiers(polity: string, rows: Array<Row>, levels: Polity["levels"]) {
       return {
         before_any: { goal: "history", any: true },
         before_county: tier === "legislative" ? null : { goal: "history" },
-        ...(tier === "legislative"
-          ? { before_district: { goal: "history" } }
-          : {}),
+        ...(tier === "legislative" && { before_district: { goal: "history" } }),
         before_shapes: { goal: "shapes_history" },
         since_any: { goal: "county", any: true },
         since_county: { goal: "county" },
@@ -313,6 +307,27 @@ async function summaries(polity: string | null) {
     order by c.polity = 'us' desc, c.contests desc
   `);
   return found.rows;
+}
+
+function tightestHalf(sorted: Array<[number, number]>) {
+  let total = 0;
+  for (const [, count] of sorted) {
+    total += count;
+  }
+  let best: { from: number; to: number } | null = null;
+  for (const [start, [from]] of sorted.entries()) {
+    let sum = 0;
+    for (const [to, count] of sorted.slice(start)) {
+      sum += count;
+      if (sum * 2 > total) {
+        if (best == null || to - from < best.to - best.from) {
+          best = { from, to };
+        }
+        break;
+      }
+    }
+  }
+  return best;
 }
 
 export const coverage = {
@@ -558,24 +573,8 @@ export const coverage = {
               byYear.set(row.year, (byYear.get(row.year) ?? 0) + row.unshaped);
             }
           }
-          const sorted = [...byYear.entries()].toSorted((a, b) => a[0] - b[0]);
-          let total = 0;
-          for (const [, count] of sorted) {
-            total += count;
-          }
-          let best: { from: number; to: number } | null = null;
-          for (const [start, [from]] of sorted.entries()) {
-            let sum = 0;
-            for (const [to, count] of sorted.slice(start)) {
-              sum += count;
-              if (sum * 2 > total) {
-                if (best == null || to - from < best.to - best.from) {
-                  best = { from, to };
-                }
-                break;
-              }
-            }
-          }
+          const sorted = [...byYear].toSorted((a, b) => a[0] - b[0]);
+          const best = tightestHalf(sorted);
           return best == null ? [] : [{ tier, goal, ...best }];
         }),
       );

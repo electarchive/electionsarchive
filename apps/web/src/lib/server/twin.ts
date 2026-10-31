@@ -1,32 +1,29 @@
-import type { RequestEvent } from "@sveltejs/kit";
 import type { InferRouterOutputs } from "@orpc/server";
+import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
+import type { Column, Counts, Tier } from "#lib/coverage.js";
 import { partyOn, segments, stand } from "#lib/caucus.js";
-import { era } from "#lib/party.js";
 import {
   CATEGORY_LABELS,
   COLUMN_LABELS,
+  columnGroup,
   COUNTRY_COLUMNS,
+  ERA_LABELS,
   GAP_GRAINS,
   gapNote,
   gapSpan,
   GRAIN_LABELS,
   headline,
   levelLabel,
+  measures,
   READY_COUNTS,
   READY_LEVELS,
-  measures,
   label as reasonLabel,
   REASONS,
   spans,
   TIER_LABELS,
   US_COLUMNS,
-  columnGroup,
-  ERA_LABELS,
-  type Column,
-  type Counts,
-  type Tier,
 } from "#lib/coverage.js";
 import { count, date, definite, percent, plural, points } from "#lib/format.js";
 import { logoCredit } from "#lib/logo.js";
@@ -34,6 +31,7 @@ import { covering } from "#lib/map/hexes.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
+import { era } from "#lib/party.js";
 import { AFFILIATIONS, formerly, RELATIONS } from "#lib/relations.js";
 import {
   archive,
@@ -56,6 +54,8 @@ type Ledger = InferRouterOutputs<typeof router>["contests"]["ledger"];
 type Winners = InferRouterOutputs<typeof router>["elections"]["winners"];
 type Known = InferRouterOutputs<typeof router>["coverage"]["known"];
 type Link = (name: string, path: string | null) => string;
+
+const year = (value: string | null) => value?.slice(0, 4) ?? "";
 
 const TYPES = {
   json: "application/json; charset=utf-8",
@@ -287,7 +287,7 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       partial.size > 4
         ? []
         : Promise.all(
-            partial.values().map((id) =>
+            partial.values().map(async (id) =>
               call(router.bodies.get, { id })
                 .then((body) => ({ id, body }))
                 .catch(() => null),
@@ -367,7 +367,7 @@ export async function twin({ request, url }: RequestEvent) {
     }
     const level = data.kind === "contest" ? data.contest.places?.level : null;
     const ledger =
-      data.kind !== "contest" || level == null || level.startsWith("unit:")
+      level == null || data.kind !== "contest" || level.startsWith("unit:")
         ? null
         : await call(router.contests.ledger, {
             id: data.id,
@@ -938,14 +938,14 @@ function coverageMarkdown(
     `## ${m.coverage_glance()}`,
     `${(isUs ? m.coverage_glance_hint_us : m.coverage_glance_hint_country)()} ${m.coverage_glance_none_hint()}`,
     table(
-      [m.coverage_column_kind(), ...columns.map(heading)],
+      [m.coverage_column_kind(), ...columns.map((column) => heading(column))],
       data.tiers.map((tier) => [
         TIER_LABELS[tier.key as Tier](),
         ...columns.map((column) => {
           const value = tier.cells[slot(column, tier.key)];
-          return tier.key === "precinct_shapes" &&
-            column === "precinct_2000" &&
-            value != null
+          return value != null &&
+            tier.key === "precinct_shapes" &&
+            column === "precinct_2000"
             ? `${cell(value)}, ${m.coverage_bonus().toLowerCase()}`
             : cell(value);
         }),
@@ -1127,7 +1127,7 @@ function coverageMarkdown(
             ...(isUs ? [] : [m.coverage_column_years()]),
             ...columns
               .filter((column) => slot(column, tier.key) in tier.cells)
-              .map(heading),
+              .map((column) => heading(column)),
           ],
           tier.levels.map((level) => {
             const gaps = notesFor(level.key).filter(
@@ -1522,7 +1522,7 @@ function personMarkdown(
             table(
               [m.col_name(), m.person_years(), m.col_party()],
               spells.map((spell) => [
-                `${spell.isBody ? link(spell.name, spell.path ?? `id/${spell.id}`) : link(spell.name, spell.path)}${
+                `${link(spell.name, spell.isBody ? (spell.path ?? `id/${spell.id}`) : spell.path)}${
                   "seats" in spell && spell.seats.length > 0
                     ? ` (${spell.seats
                         .map((seat) =>
@@ -2080,7 +2080,7 @@ function polityMarkdown(
               group.isFormer && holders.groups[index - 1]?.isFormer !== true
                 ? [`### ${m.holders_former()}`]
                 : [];
-            return !group.isBody && rows.length === 1 && only != null
+            return only != null && !group.isBody && rows.length === 1
               ? [
                   ...former,
                   `- **${group.name}${only.label == null ? "" : `, ${only.label}`}**: ${[only.holder, only.since, only.notes].filter((part) => part != null && part !== "").join("; ")}`,
@@ -2480,7 +2480,8 @@ function electionMarkdown(
           entry.lists += row.seats ?? 0;
         } else {
           let seats = row.seats ?? 0;
-          for (const credit of race.credits ?? []) {
+          const raceCredits = race.credits ?? [];
+          for (const credit of raceCredits) {
             if (
               row.key.startsWith("alliance:") &&
               credit.alliance === row.label
@@ -2615,7 +2616,8 @@ function electionMarkdown(
         .toSorted((a, b) => a.start.localeCompare(b.start))
         .at(-1);
       let held = 0;
-      for (const party of latest?.parties ?? []) {
+      const latestParties = latest?.parties ?? [];
+      for (const party of latestParties) {
         held += party.seats;
       }
       const size = body.sizes.find(
@@ -2647,7 +2649,8 @@ function electionMarkdown(
           }
         }
       }
-      for (const entry of found?.parties ?? unelected) {
+      const foundParties = found?.parties ?? unelected;
+      for (const entry of foundParties) {
         const label =
           entry.category === "appointed"
             ? m.seats_appointed()
@@ -3875,7 +3878,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
           }),
         ]),
     `**${data.at == null ? m.live_waiting() : isFinal ? m.live_certified_count() : m.live_as_of({ time: clock.format(Date.parse(data.at)) })}**`,
-    ...(data.scanners.length === 0 || isFinal
+    ...(isFinal || data.scanners.length === 0
       ? []
       : [
           `${m.live_scanners()}: ${data.scanners.map((entry) => `${entry.area} ${percent(entry.share / 100)}`).join(", ")}`,
@@ -3888,7 +3891,8 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
             ...races.flatMap((race) => {
               const votes = race.standing?.votes ?? null;
               let total = 0;
-              for (const value of votes ?? []) {
+              const voteList = votes ?? [];
+              for (const value of voteList) {
                 total += value;
               }
               const rows = race.options
@@ -4383,16 +4387,16 @@ function contestMarkdown(
       : [
           `## ${m.rounds_title()}`,
           ...rounds.flatMap((round, index) => {
-            const american = contest.path?.split("/")[0] === "us";
+            const isAmerican = contest.path?.split("/", 1)[0] === "us";
             const label =
               round.kind === "primary"
                 ? m.round_primary()
                 : round.kind === "runoff"
-                  ? american
+                  ? isAmerican
                     ? m.round_runoff()
                     : m.round_second()
                   : round.kind === "indirect" &&
-                      !rounds.some((other) => other.kind === "runoff")
+                      rounds.every((other) => other.kind !== "runoff")
                     ? rounds.length === 2
                       ? index === 0
                         ? m.round_electoral()
@@ -4401,10 +4405,10 @@ function contestMarkdown(
                     : round.kind === "indirect"
                       ? m.round_first()
                       : round.kind === "general"
-                        ? index === 0 && !american
+                        ? index === 0 && !isAmerican
                           ? m.round_first()
                           : m.round_general()
-                        : round.kind === "local" && american
+                        : isAmerican && round.kind === "local"
                           ? rounds.some(
                               (other, at) =>
                                 at > index && other.kind === "general",
@@ -4702,7 +4706,8 @@ function contestMarkdown(
             "| --- | --- | --- | --- |",
             ...contest.channels.map((row) => {
               let cast = 0;
-              for (const other of contest.channels ?? []) {
+              const channelList = contest.channels ?? [];
+              for (const other of channelList) {
                 cast += other.votes;
               }
               const label = CHANNEL_LABELS[row.code]();
@@ -5112,11 +5117,11 @@ function resultsMarkdown(
   const isWrittenIn =
     named.length > 0 &&
     named.every((row) => row.current?.isWriteIn === true) &&
-    !contest.rows.some(
+    contest.rows.every(
       (row) =>
-        row.current?.person == null &&
-        row.key.startsWith("party:") &&
-        (row.current?.votes ?? 0) > 0,
+        row.current?.person != null ||
+        !row.key.startsWith("party:") ||
+        (row.current?.votes ?? 0) <= 0,
     );
   const joined = new Intl.ListFormat(getLocale(), { type: "conjunction" });
   const parties = new Map(
@@ -5392,11 +5397,7 @@ function placesMarkdown(
   total: number | null,
   isTally: boolean,
 ) {
-  if (
-    places == null ||
-    places.rows.length === 0 ||
-    places.rows.every((row) => row.valid === 0)
-  ) {
+  if (places == null || places.rows.every((row) => row.valid === 0)) {
     return [];
   }
   const isCompared =
@@ -5614,13 +5615,12 @@ function sourcesMarkdown(
       return `- ${marks.length === 0 ? "" : `${marks.join(", ")}: `}${source.url == null ? source.title : `[${source.title}](${source.url})`}, ${source.publisher}${source.license == null ? "" : `. ${m.source_license({ license: source.license })}`}`;
     }),
     ...contest.citations
-      .filter(
-        (citation) =>
-          !sets.some(
-            ({ source }) =>
-              source.title === citation.title &&
-              source.publisher === citation.publisher,
-          ),
+      .filter((citation) =>
+        sets.every(
+          ({ source }) =>
+            source.title !== citation.title ||
+            source.publisher !== citation.publisher,
+        ),
       )
       .map(
         (citation) =>
@@ -5746,7 +5746,6 @@ function chamberMarkdown(
   const partyOf = new Map(
     (council?.parties ?? []).map((party) => [party.id, party.label]),
   );
-  const year = (value: string | null) => value?.slice(0, 4) ?? "";
   const latest =
     council?.elections.find((election) => !election.isMinor)?.date ?? "";
   const councilBlocks =
@@ -5961,7 +5960,7 @@ function chamberMarkdown(
                   switches,
                 ),
               ]),
-          ...(sitting.length === 0 || council != null
+          ...(council != null || sitting.length === 0
             ? []
             : [
                 `## ${(members?.isSeated === true ? m.chamber_members_title : m.chamber_members_returned)({ span: first === final ? first : m.polity_span({ first, last: final }) })}`,

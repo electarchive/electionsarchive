@@ -245,6 +245,28 @@ const british = async (id: string, within: string | undefined) => {
   };
 };
 
+const nameKey = (name: string) => {
+  const tokens = name
+    .normalize("NFD")
+    .replaceAll(/\p{M}/gu, "")
+    .toLocaleLowerCase()
+    .replaceAll(/(['"‘’“”]).*?\1|\(.*?\)/gu, " ")
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(
+      (token) =>
+        token.length > 1 && !["jr", "sr", "ii", "iii", "iv"].includes(token),
+    );
+  return tokens.length < 2
+    ? name.toLocaleLowerCase()
+    : `${tokens[0] ?? ""} ${tokens.at(-1) ?? ""}`;
+};
+const isSamePerson = (
+  a: { person: string | null; name: string },
+  b: { person: string | null; name: string },
+) =>
+  (a.person != null && a.person === b.person) ||
+  (a.name !== "" && nameKey(a.name) === nameKey(b.name));
+
 export const seats = {
   council: os
     .meta(
@@ -501,28 +523,6 @@ export const seats = {
         })
         .toArray()
         .toSorted((a, b) => a.decidedOn.localeCompare(b.decidedOn));
-      const norm = (name: string) => {
-        const tokens = name
-          .normalize("NFD")
-          .replaceAll(/\p{M}/gu, "")
-          .toLocaleLowerCase()
-          .replaceAll(/(['"‘’“”]).*?\1|\(.*?\)/gu, " ")
-          .split(/[^\p{L}\p{N}]+/u)
-          .filter(
-            (token) =>
-              token.length > 1 &&
-              !["jr", "sr", "ii", "iii", "iv"].includes(token),
-          );
-        return tokens.length < 2
-          ? name.toLocaleLowerCase()
-          : `${tokens[0] ?? ""} ${tokens.at(-1) ?? ""}`;
-      };
-      const same = (
-        a: { person: string | null; name: string },
-        b: { person: string | null; name: string },
-      ) =>
-        (a.person != null && a.person === b.person) ||
-        (a.name !== "" && norm(a.name) === norm(b.name));
       const filled = Map.groupBy(decided, (entry) => entry.election);
       let typical = 0;
       for (const rows of filled.values()) {
@@ -619,7 +619,7 @@ export const seats = {
         election.up += 1;
         election.filled.push(entry.label);
         election.runoffs += Number(entry.isRunoff);
-        const isSame = before != null && same(before, entry.winner);
+        const isSame = before != null && isSamePerson(before, entry.winner);
         if (before != null && isSame) {
           election.held += 1;
           before.wins += 1;
@@ -645,7 +645,7 @@ export const seats = {
           const kind =
             before == null
               ? ("new" as const)
-              : entry.ran.some((row) => same(row, before))
+              : entry.ran.some((row) => isSamePerson(row, before))
                 ? ("defeated" as const)
                 : ("open" as const);
           election.open += Number(kind !== "defeated");
@@ -673,7 +673,8 @@ export const seats = {
       const regular = decided.filter((entry) => !entry.isMinor);
       const spans = new Map<string, { first: number; last: number }>();
       const gaps: Array<number> = [];
-      for (const [key, rows] of Map.groupBy(regular, (entry) => entry.key)) {
+      const byKey = Map.groupBy(regular, (entry) => entry.key);
+      for (const [key, rows] of byKey) {
         const dates = [...new Set(rows.map((entry) => Date.parse(entry.date)))];
         for (let at = 1; at < dates.length; at += 1) {
           gaps.push((dates[at] ?? 0) - (dates[at - 1] ?? 0));
@@ -687,7 +688,8 @@ export const seats = {
       const start = Date.parse(regular[0]?.date ?? "") + window / 1.25 - 3.9e9;
       const sizes: Array<{ seats: number; from: string; to: string | null }> =
         [];
-      for (const day of new Set(regular.map((entry) => entry.date))) {
+      const days = new Set(regular.map((entry) => entry.date));
+      for (const day of days) {
         const at = Date.parse(day);
         if (at < start) {
           continue;
@@ -700,7 +702,7 @@ export const seats = {
         if (last?.seats === alive) {
           continue;
         }
-        if (last != null && last.from.slice(0, 4) === day.slice(0, 4)) {
+        if (last?.from.slice(0, 4) === day.slice(0, 4)) {
           sizes.pop();
         }
         const prior = sizes.at(-1);
@@ -721,7 +723,7 @@ export const seats = {
         0.5 * winners.length;
       return {
         isPartisan,
-        parties: [...colors.values()],
+        parties: colors.values().toArray(),
         seats: seats
           .values()
           .toArray()
@@ -1032,7 +1034,7 @@ export const seats = {
           held("before", b) - held("before", a) ||
           a.localeCompare(b),
       );
-      const changed = compared.filter(isMoved);
+      const changed = compared.filter((row) => isMoved(row));
       const parties = keys.filter((key) => !key.startsWith("person:"));
       const people = keys.flatMap((key) =>
         key.startsWith("person:") ? [key.slice(7)] : [],
@@ -1761,7 +1763,7 @@ export const seats = {
           member: person(row.member),
           reason: row.via,
           cause: row.via == null ? row.cause : null,
-          isOther: row.isOther === true,
+          isOther: row.isOther,
           isHere: row.isHere,
         })),
       };
