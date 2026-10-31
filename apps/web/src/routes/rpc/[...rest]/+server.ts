@@ -2,7 +2,12 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { served } from "#lib/server/rpc/router.js";
 import type { RequestHandler } from "./$types";
 
-const handler = new RPCHandler(served);
+const handler = new RPCHandler(served, {
+  allowMethods: (method, _procedure, path) =>
+    method === "GET"
+      ? path.join(".") === "live.stamp"
+      : ["POST", "PUT", "PATCH", "DELETE"].includes(method),
+});
 
 const handle: RequestHandler = async ({ request }) => {
   const { response } = await handler.handle(request, {

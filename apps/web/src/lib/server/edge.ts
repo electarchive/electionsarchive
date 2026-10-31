@@ -7,18 +7,21 @@ import { redis } from "#lib/server/redis.js";
 
 const LOCALE = "x-locale";
 
-const PERSONAL = /^\/(?:api\/auth|mcp|rpc)(?:\/|$)/u;
+const LIVE = /^\/(?:live|rpc\/live|api\/v1\/live)(?:[/.]|$)/u;
+
+const PERSONAL = /^\/(?:api\/auth|mcp|rpc(?!\/live\/stamp$))(?:\/|$)/u;
 
 const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
 
 function isShareable(
-  { cookies, locals, request, url }: RequestEvent,
+  { cookies, isDataRequest, locals, request, url }: RequestEvent,
   response: Response,
+  isLive: boolean,
 ) {
   if (
     !["GET", "HEAD"].includes(request.method) ||
     response.status !== 200 ||
-    response.headers.has("cache-control") ||
+    (response.headers.has("cache-control") && !(isLive && isDataRequest)) ||
     response.headers.has("set-cookie") ||
     locals.user != null ||
     PERSONAL.test(url.pathname) ||
@@ -36,8 +39,11 @@ function isShareable(
 }
 
 export function mark(event: RequestEvent, response: Response) {
-  if (!isShareable(event, response)) {
-    if (!response.headers.has("cache-control")) {
+  const isLive = LIVE.test(event.url.pathname);
+  if (!isShareable(event, response, isLive)) {
+    if (isLive) {
+      response.headers.set("cache-control", "no-store");
+    } else if (!response.headers.has("cache-control")) {
       response.headers.set("cache-control", "private, no-cache");
     }
     return response;
@@ -53,7 +59,9 @@ export function mark(event: RequestEvent, response: Response) {
   response.headers.set("cache-control", "no-cache");
   response.headers.set(
     "cloudflare-cdn-cache-control",
-    "public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400",
+    isLive
+      ? "public, max-age=5, stale-while-revalidate=10, stale-if-error=3600"
+      : "public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400",
   );
   return response;
 }
