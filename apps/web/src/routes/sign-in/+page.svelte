@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import { authClient } from "#lib/auth-client.js";
@@ -23,7 +24,9 @@
     <h1 class="title">
       {m.sign_in_title()}
     </h1>
-    <p class="text-[0.9375rem] text-muted-foreground">{m.sign_in_lede()}</p>
+    <p class="text-[0.9375rem] text-muted-foreground">
+      {READ_ONLY ? m.sign_in_lede_read_only() : m.sign_in_lede()}
+    </p>
   </header>
   {#if data.providers.length > 0}
     <div class="grid gap-2">

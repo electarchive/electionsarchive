@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -22,7 +23,9 @@
     <h1 class="title">
       {m.sign_up_title()}
     </h1>
-    <p class="text-[0.9375rem] text-muted-foreground">{m.sign_up_lede()}</p>
+    <p class="text-[0.9375rem] text-muted-foreground">
+      {READ_ONLY ? m.sign_up_lede_read_only() : m.sign_up_lede()}
+    </p>
   </header>
   <form
     method="POST"
