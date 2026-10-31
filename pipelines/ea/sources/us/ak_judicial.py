@@ -13,17 +13,29 @@ from ea.sources.us.retention import display
 from ea.store import DATA, connect
 
 SOURCE = "us.ak_judicial"
-VERSION = "1"
+VERSION = "2"
 INBOX = DATA / "inbox" / "manual" / "MF-454"
 URL = "https://www.elections.alaska.gov/results/"
 PUBLISHER = "Alaska Division of Elections"
 TITLE = "Official election summary report: judicial retention"
 FILES = {
+    date(2010, 11, 2): "2010/resultsOF.pdf",
+    date(2012, 11, 6): "2012/results (2).pdf",
+    date(2014, 11, 4): "2014/results (1).pdf",
+    date(2016, 11, 8): "2016/results.pdf",
     date(2020, 11, 3): "2020/ElectionSummaryReportRPT24.pdf",
     date(2022, 11, 8): "2022/ElectionSummaryReportRPT.pdf",
     date(2024, 11, 5): "2024/ElectionSummaryReport.pdf",
 }
+UNNAMED = {(2010, "Supreme Court"): "Fabe", (2010, "Court of Appeals"): "Mannheimer"}
+COLUMNS = ((0, 300), (300, 312))
 JUDGES = {
+    "Fabe": "Dana Fabe",
+    "Mannheimer": "David Mannheimer",
+    "Winfree": "Daniel Winfree",
+    "Bolger": "Joel Bolger",
+    "Stowers": "Craig Stowers",
+    "Maassen": "Peter Maassen",
     "Carney": "Susan Carney",
     "Wollenberg": "Tracey Wollenberg",
     "Harbison": "Bethany Harbison",
@@ -33,7 +45,9 @@ JUDGES = {
     "Terrell": "Timothy Terrell",
 }
 OFFICES = {"Supreme Court": "Justice of the Supreme Court", "Court of Appeals": "Judge of the Court of Appeals"}
-BLOCK = re.compile(r"^(Supreme Court|Court of Appeals) - (\S+)\s*$")
+BLOCK = re.compile(
+    r"^\s*(Supreme Court|Supreme Crt|Court of Appeals)(?:\s*-\s*(?:Justice|Judge)\s+(\S+))?\s*$", re.IGNORECASE
+)
 VOTES = re.compile(r"^(YES|NO)\s+([\d,]+)\s+[\d.]+%$")
 METHOD = (
     "A retention election asks whether a sitting judge should stay in office, with Yes and No as the only answers. "
@@ -57,27 +71,43 @@ def fetch() -> None:
             )
 
 
+def pages(path: Path, year: int) -> list[str]:
+    if year >= 2020:
+        return [
+            subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        ]
+    return [
+        subprocess.run(
+            ["pdftotext", "-layout", "-x", str(x), "-y", "0", "-W", str(width), "-H", "800", str(path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        for x, width in COLUMNS
+    ]
+
+
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
     for day in FILES:
         path = raw.cached(SOURCE, f"{URL}#{day}").path
-        text = subprocess.run(
-            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
-        ).stdout
-        current: dict[str, object] | None = None
-        for line in text.splitlines():
-            block = BLOCK.match(line)
-            if block is not None:
-                current = {"day": day, "court": block[1], "surname": block[2]}
-                continue
-            if current is None:
-                continue
-            votes = VOTES.match(line.strip())
-            if votes is not None:
-                current[votes[1].lower()] = int(votes[2].replace(",", ""))
-                if "yes" in current and "no" in current:
-                    found.append(current)
-                    current = None
+        for text in pages(path, day.year):
+            current: dict[str, object] | None = None
+            for line in text.splitlines():
+                block = BLOCK.match(line)
+                if block is not None:
+                    court = "Supreme Court" if block[1].lower().startswith("supreme") else "Court of Appeals"
+                    surname = block[2] or UNNAMED[(day.year, court)]
+                    current = {"day": day, "court": court, "surname": surname}
+                    continue
+                if current is None:
+                    continue
+                votes = VOTES.match(line.strip())
+                if votes is not None:
+                    current[votes[1].lower()] = int(votes[2].replace(",", ""))
+                    if "yes" in current and "no" in current:
+                        found.append(current)
+                        current = None
     return found
 
 
@@ -88,7 +118,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska Supreme Court and Court of Appeals retention elections 2020–2024, statewide, "
+            summary="Alaska Supreme Court and Court of Appeals retention elections 2010–2024, statewide, "
             "from the Division of Elections' official summary reports",
             polity="US-AK",
         )
