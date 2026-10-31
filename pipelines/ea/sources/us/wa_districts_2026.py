@@ -26,6 +26,7 @@ NUMBERED = {
     ("Whatcom", "Public Utility District No. 1"): "Whatcom County Public Utility District No. 1",
     ("Clallam", "Public Utility District No. 1"): "Clallam County Public Utility District No. 1",
     ("Kitsap", "Public Utility District No. 1"): "Kitsap County Public Utility District No. 1",
+    ("Klickitat", "PUBLIC UTILITY DISTRICT # 1"): "Klickitat County Public Utility District No. 1",
     ("Island", "PUBLIC UTILITY DISTRICT NO. 1"): "Snohomish County Public Utility District No. 1",
     ("Snohomish", "PUBLIC UTILITY DISTRICT NO. 1"): "Snohomish County Public Utility District No. 1",
     ("Spokane", "PUBLIC UTILITY DISTRICT 1"): "Stevens County Public Utility District No. 1",
