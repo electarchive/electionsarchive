@@ -6350,6 +6350,13 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+KY_BOARD_SEATS = {
+    "Beechwood Independent School District Board of Education": 3,
+    "Covington Independent School District Board of Education": 2,
+    "Erlanger-Elsmere Independent School District Board of Education": 3,
+    "Ludlow Independent School District Board of Education": 3,
+    "Walton-Verona Independent School District Board of Education": 3,
+}
 KY_CITY_SPELLINGS = {
     ("BOONE", "Erlanger"): "",
     ("BELL", "Middlesboro City Coumcil"): "Middlesboro",
@@ -7049,6 +7056,11 @@ def parse() -> None:
         for st, code, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows()
         if st == "21"
     }
+    independents = {
+        coverage_tables.tokens(label) - {"INDEPENDENT"}: (f"{st}{code}", label)
+        for st, code, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows()
+        if st == "21" and "Independent" in label
+    }
     schools: dict[str, tuple[str, str, str]] = {}
     spelled = {
         w: n
@@ -7121,7 +7133,25 @@ def parse() -> None:
                 re.sub(r"\bMt\b", "Mount", re.sub(r"\bSt\b", "Saint", re.sub(r"\s+City$", "", city))),
             )
         found = kentucky.get(coverage_tables.tokens(f"{place} County School District"))
-        if post in titles and (district is None) != (titles[str(post)] in ("Magistrate", "Constable", "Commissioner")):
+        described = coverage_tables.tokens(str(description or ""))
+        own = (
+            None
+            if post != "SCHOOL BOARD MEMBER" or "COUNTY" in described
+            else max((stem for stem in independents if stem <= described), key=len, default=None)
+        )
+        if own is not None:
+            code, label = independents[own]
+            base = f"{label} Board of Education"
+            if base in KY_BOARD_SEATS:
+                contest = base + (" (Unexpired Term)" if "UNEXPIRED" in described else "")
+                schools[contest] = ("Board of Education", label, f"school:{code}")
+                magnitudes[(str(county), contest)] = KY_BOARD_SEATS[base] if "UNEXPIRED" not in described else 1
+                contests.append(contest)
+            else:
+                contests.append(None)
+        elif post in titles and (district is None) != (
+            titles[str(post)] in ("Magistrate", "Constable", "Commissioner")
+        ):
             contests.append(f"{place} County {titles[str(post)]}" + (f" District {district}" if district else ""))
         elif (
             post == "SCHOOL BOARD MEMBER"
@@ -9574,7 +9604,13 @@ def parse() -> None:
                         pinned.add(tail)
                 if key == "KY" and str(row["contest"]) in schools:
                     title, district, owner = schools[str(row["contest"])]
-                    template, tail = "", f"KY:{owner.split(':')[1]}:board-of-education:{slug(title.split(', ')[1])}"
+                    template, tail = (
+                        "",
+                        f"KY:{owner.split(':')[1]}:board-of-education:{slug(title.split(', ')[1])}"
+                        if ", " in title
+                        else f"KY:{owner.split(':')[1]}:board-of-education"
+                        + (":remainder" if str(row["contest"]).endswith("(Unexpired Term)") else ""),
+                    )
                     minted[tail] = (title, district, owner, owned.get(owner) or f"us/ky/{slug(district)}")
                 if state in TERRITORIES:
                     head, _, seat = str(row["contest"]).partition(", ")
