@@ -5482,6 +5482,13 @@ for key, publisher, title, url, local in (
         "ca/loyalton_candidates.pdf",
     ),
     (
+        "NJ-34031-clifton",
+        "Passaic County Clerk",
+        "Official General Election Sample Ballot, City of Clifton, November 3, 2026",
+        "https://www.passaiccountynj.org/",
+        "nj/clifton_sample.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
