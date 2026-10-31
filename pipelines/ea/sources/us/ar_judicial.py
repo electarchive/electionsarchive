@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import unicodedata
@@ -30,8 +31,19 @@ RUNOFF = (
     "2004-11-02:AR",
     "general",
 )
+TALLY = "https://results.tally-enr.com/results/arkansas/{}/FullDataFile.json"
+ELECTIONS = {
+    1837: "2018-05-22:AR:primary",
+    1839: "2020-03-03:AR:primary",
+    1843: "2022-05-24:AR:primary",
+    1844: "2022-11-08:AR",
+    1845: "2024-03-05:AR:primary",
+}
+CONTEST = re.compile(r"^State Supreme Court (Chief|Associate) Justice,? (Position \d+)$")
+TITLE = re.compile(r"^.*?\b(?:Justice|Judge|Attorney)\s+(?=[A-Z])")
 HEADING = re.compile(r"^State Supreme Court (Chief|Associate) Justice (Position \d+)(?: \((.+?) County\))?\s*$")
 CANDIDATE = re.compile(r"^(.+?) - Non Partisan Judicial\s+([\d,]+)\s+[\d.]+%\s*$")
+HELD = {(date(2018, 11, 6), "Associate", "Position 3"), (date(2024, 11, 5), "Chief", "Position 1")}
 ALIASES = {"Jim Gunter": "James Gunter"}
 TITLES = {"Chief": "Chief Justice of the Supreme Court", "Associate": "Justice of the Supreme Court"}
 NOTE = "County totals from the Secretary of State's certification report; the statewide page agrees with their sum."
@@ -39,6 +51,33 @@ NOTE = "County totals from the Secretary of State's certification report; the st
 
 def flat(text: str) -> str:
     return re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower()).replace("saint", "st")
+
+
+def clean(name: str) -> str:
+    name = TITLE.sub("", name.strip()) if re.search(r"\b(Justice|Judge|Attorney)\b", name) else name.strip()
+    return ALIASES.get(name, name)
+
+
+def fetch() -> None:
+    for election in ELECTIONS:
+        raw.fetch(SOURCE, TALLY.format(election), suffix=".json")
+
+
+def tally(election: int) -> tuple[date, dict[tuple[str, str], dict[str | None, dict[str, int]]]]:
+    data = json.loads(raw.cached(SOURCE, TALLY.format(election)).path.read_text())
+    day = date.fromisoformat(data["ElectionInfo"]["ElectionDate"][:10])
+    found: dict[tuple[str, str], dict[str | None, dict[str, int]]] = {}
+    for contest in data["ContestData"]:
+        match = CONTEST.match(contest["ContestName"])
+        if match is None:
+            continue
+        places: dict[str | None, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        for county in contest["Counties"]:
+            for candidate in county["Candidates"]:
+                places[county["CountyName"]][clean(candidate["Name"])] += candidate["TotalVotes"]
+        places[None] = {clean(candidate["Name"]): candidate["TotalVotes"] for candidate in contest["Candidates"]}
+        found[(match[1], match[2])] = {place: dict(votes) for place, votes in places.items()}
+    return day, found
 
 
 def read(source: str, url: str) -> dict[tuple[str, str], dict[str | None, dict[str, int]]]:
@@ -66,8 +105,7 @@ def read(source: str, url: str) -> dict[tuple[str, str], dict[str | None, dict[s
         if current is None:
             continue
         if match := CANDIDATE.match(line):
-            name = re.sub(r"^(Justice|Judge)\s+", "", match[1].strip())
-            block[ALIASES.get(name, name)] = int(match[2].replace(",", ""))
+            block[clean(match[1])] = int(match[2].replace(",", ""))
         elif line and not re.match(r"(Over|Under)", line):
             close()
             current, block = None, {}
@@ -75,37 +113,56 @@ def read(source: str, url: str) -> dict[tuple[str, str], dict[str | None, dict[s
     return found
 
 
+def check(day: date, court: str, seat: str, places: dict[str | None, dict[str, int]]) -> dict[str, dict[str, int]]:
+    totals = places.pop(None, None)
+    if totals is None:
+        raise ValueError(f"{day} {court} {seat}: no statewide page")
+    summed: dict[str, int] = defaultdict(int)
+    for place in places.values():
+        for name, votes in place.items():
+            summed[name] += votes
+    if dict(summed) != totals or len(places) != 75:
+        raise ValueError(f"{day} {court} {seat}: counties {len(places)} {dict(summed)} differ from {totals}")
+    return places
+
+
 def emit() -> Path:
     contests = []
     for source, url, day, election_key, kind in (PRIMARY, RUNOFF):
         for (court, seat), places in read(source, url).items():
-            if court == "Chief" and day.month == 11:
+            if court == "Chief" and kind == "general":
                 continue
-            if None not in places:
-                raise ValueError(f"{day} {court} {seat}: no statewide page")
-            totals = places.pop(None)
-            summed: dict[str, int] = defaultdict(int)
-            for place in places.values():
-                for name, votes in place.items():
-                    summed[name] += votes
-            if dict(summed) != totals or len(places) != 75:
-                raise ValueError(f"{day} {court} {seat}: counties {len(places)} {dict(summed)} differ from {totals}")
-            contests.append((source, url, day, election_key, kind, court, seat, places))
+            contests.append((source, url, day, election_key, kind, court, seat, check(day, court, seat, places)))
+    for election, election_key in ELECTIONS.items():
+        day, found = tally(election)
+        for (court, seat), places in found.items():
+            if (day, court, seat) in HELD:
+                continue
+            kind = "general" if day.month == 11 else "primary"
+            contests.append(
+                (SOURCE, TALLY.format(election), day, election_key, kind, court, seat, check(day, court, seat, places))
+            )
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Arkansas Supreme Court 2004 nonpartisan contests by county: the May 18 preferential primary "
-            "for Chief Justice and Associate Justice Position 4, and the November 2 runoff for Position 4, "
-            "from the Secretary of State's certification reports",
+            summary="Arkansas Supreme Court nonpartisan contests by county: 2004 from the Secretary of State's "
+            "certification reports, and 2014 to 2024 from the Secretary of State's election night reporting files",
             polity="US-AR",
         )
         sources: dict[str, UUID] = {}
         for source, url, day, _, kind, *_rest in contests:
             if url in sources:
                 continue
-            title = f"{day.year} {'preferential primary and nonpartisan judicial election' if kind == 'primary' else 'general election and nonpartisan judicial runoff'} certification report"
+            if source == SOURCE:
+                title = (
+                    f"{day.year} {'general' if kind == 'general' else 'preferential primary'} election full data file"
+                )
+                page = "https://arkansas.tally-enr.com/"
+            else:
+                title = f"{day.year} {'general election and nonpartisan judicial runoff' if kind == 'general' else 'preferential primary and nonpartisan judicial election'} certification report"
+                page = "https://www.sos.arkansas.gov/elections/research/election-results"
             sources[url] = cs.source("Arkansas Secretary of State", title)
             cs.add(
                 "source",
@@ -113,7 +170,7 @@ def emit() -> Path:
                 kind="official_body",
                 publisher="Arkansas Secretary of State",
                 title=title,
-                url="https://www.sos.arkansas.gov/elections/research/election-results",
+                url=page,
                 license="Public record",
             )
             cs.artifact(raw.cached(source, url), sources[url])
@@ -122,7 +179,7 @@ def emit() -> Path:
             for text, unit in conn.execute(
                 """select n.text, u.id from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code like '05%%' and u.valid @> '2004-06-01'::date"""
+                   where u.scheme_code = 'us.county' and u.code like '05%%' and u.valid @> '2004-06-01'::date and u.valid @> '2024-06-01'::date"""
             ).fetchall()
         }
         state_area = conn.execute(
@@ -132,7 +189,15 @@ def emit() -> Path:
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/ar/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
         persons: set[str] = set()
-        first_round: dict[tuple[str, str], UUID] = {}
+        known: dict[tuple[str, str], UUID] = {}
+        for person, text in conn.execute(
+            """select cy.person_id, n.text from candidacy cy join contest_option o on o.id = cy.option_id
+               join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
+               join name n on n.entity_id = cy.person_id and n.is_preferred
+               where x.value ~ ':AR:(chief-)?justice-of-the-supreme-court:'"""
+        ).fetchall():
+            known[identity(clean(text))] = person
+        first_round: dict[tuple[int, str, str], UUID] = {}
         for _, url, day, election_key, kind, court, seat, places in sorted(contests, key=lambda item: item[2]):
             title = TITLES[court]
             office = cs.key("us.office", f"{slug(title)}:AR")
@@ -150,8 +215,8 @@ def emit() -> Path:
             contest_key = f"{day}:AR:{slug(title)}:{slug(seat)}"
             contest = cs.key("us.contest", contest_key)
             runoff = kind == "general"
-            previous = first_round.get((court, seat)) if runoff else None
-            first_round[(court, seat)] = contest
+            previous = first_round.get((day.year, court, seat)) if runoff else None
+            first_round[(day.year, court, seat)] = contest
             cs.add(
                 "contest",
                 id=contest,
@@ -175,13 +240,20 @@ def emit() -> Path:
                 kind="official",
                 is_preferred=True,
             )
-            base = f"us/ar/{day}-{'general' if runoff else 'primary'}/{slug(title)}-{slug(seat)}"
-            path, count = base, 1
-            while path in taken:
-                count += 1
-                path = f"{base}-{count}"
-            taken.add(path)
-            cs.add("slug", path=path, entity_id=contest)
+            if contest in cs.minted:
+                base = f"us/ar/{day}-{'general' if runoff else 'primary'}/{slug(title)}-{slug(seat)}"
+                path, count = base, 1
+                while path in taken:
+                    count += 1
+                    path = f"{base}-{count}"
+                taken.add(path)
+                cs.add("slug", path=path, entity_id=contest)
+            elif (
+                found := conn.execute(
+                    "select path from slug where entity_id = %s order by length(path) limit 1", [contest]
+                ).fetchone()
+            ) is not None:
+                cs.add("slug", path=found[0], entity_id=contest)
             cs.add("citation", entity_id=contest, source_id=sources[url])
             result = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -204,7 +276,7 @@ def emit() -> Path:
             for position, name in enumerate(names):
                 first, last = identity(name)
                 person_key = f"AR:{slug(first)}-{slug(last)}"
-                person = cs.key("us.retention.person", person_key)
+                person = known.get((first, last)) or cs.key("us.retention.person", person_key)
                 if person_key not in persons:
                     persons.add(person_key)
                     if person in cs.minted:
