@@ -150,14 +150,13 @@ def emit() -> Path:
         role=pl.Series([word for word, _ in roles]),
         function=pl.Series([function for _, function in roles]),
         county=pl.lit(None, dtype=pl.Utf8),
+        url=pl.lit(URL),
     )
     return district_boards.emit(
         source_id=SOURCE,
         version=VERSION,
         state="NE",
         summary="Nebraska natural resources district, public power district, community college, educational service unit, and other district board races on the November 3, 2026 ballot, with candidates from the Secretary of State's final statewide list",
-        publisher=PUBLISHER,
-        title=TITLE,
-        url=URL,
+        sources={URL: (PUBLISHER, TITLE)},
         frame=frame,
     )

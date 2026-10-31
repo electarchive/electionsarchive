@@ -29,9 +29,7 @@ def emit(
     version: str,
     state: str,
     summary: str,
-    publisher: str,
-    title: str,
-    url: str,
+    sources: dict[str, tuple[str, str]],
     frame: pl.DataFrame,
 ) -> Path:
     lower = state.lower()
@@ -52,24 +50,26 @@ def emit(
         slugs = dict(conn.execute("select path, entity_id from slug where path like %s", [f"us/{lower}/%"]).fetchall())
         cs = Changeset(conn, pipeline=source_id, version=version, summary=summary, polity=f"US-{state}")
         system = cs.key("us.electoral_system", "fptp")
-        source = cs.source(publisher, title)
-        cs.add(
-            "source",
-            id=source,
-            kind="official_body",
-            publisher=publisher,
-            title=title,
-            url=url,
-            license="Public record",
-        )
-        cs.artifact(raw.cached(source_id, url), source)
+        source_ids: dict[str, UUID] = {}
+        for url, (publisher, title) in sources.items():
+            source_ids[url] = cs.source(publisher, title)
+            cs.add(
+                "source",
+                id=source_ids[url],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license="Public record",
+            )
+            cs.artifact(raw.cached(source_id, url), source_ids[url])
         parent = cs.key("us.election", f"{DAY}:{state}")
         made: dict[str, tuple[UUID, UUID, str, str, str]] = {}
         elections: set[UUID] = set()
         kept = 0
-        keys = ["district", "seat", "remainder", "role"]
+        keys = ["district", "seat", "remainder", "role", "url"]
         for group_key, people in frame.group_by(keys, maintain_order=True):
-            district, seat, remainder, word = group_key
+            district, seat, remainder, word, _ = group_key
             first = people.row(0, named=True)
             if district not in made:
                 twin = existing.get(govmint.fold(district))
@@ -152,6 +152,7 @@ def emit(
             )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
+            source = source_ids[first["url"]]
             cs.add("citation", entity_id=contest, source_id=source, locator=None)
             for person_row in people.iter_rows(named=True):
                 ballot = person_row["name"]

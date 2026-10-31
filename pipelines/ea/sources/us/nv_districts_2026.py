@@ -94,6 +94,7 @@ def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
     frame = frame.with_columns(
         remainder=pl.lit(False),
+        url=pl.lit(URL),
         vote=pl.lit(None, dtype=pl.Int64),
         function=pl.Series(
             [next((value for pattern, value in FUNCTIONS if re.search(pattern, d)), None) for d in frame["district"]]
@@ -104,8 +105,6 @@ def emit() -> Path:
         version=VERSION,
         state="NV",
         summary="Nevada water, fire protection, general improvement, hospital, and television district board races on the November 3, 2026 ballot, with candidates from the Secretary of State's certified list",
-        publisher=PUBLISHER,
-        title=TITLE,
-        url=URL,
+        sources={URL: (PUBLISHER, TITLE)},
         frame=frame,
     )
