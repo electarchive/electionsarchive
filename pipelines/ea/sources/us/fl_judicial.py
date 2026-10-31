@@ -124,7 +124,7 @@ def emit() -> Path:
         persons: set[str] = set()
         for (day, judge), group in sorted(groups.items()):
             first, last = identity(judge)
-            person_key = f"MO:{slug(first)}-{slug(last)}"
+            person_key = f"FL:{slug(first)}-{slug(last)}"
             suffix = person_key.split(":")[1]
             shown = display(judge)
             contest_key = f"{day}:FL:{slug(TITLE_OFFICE)}:{suffix}"
