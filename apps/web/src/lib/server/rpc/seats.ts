@@ -1496,6 +1496,9 @@ export const seats = {
             : row.isIe ||
                 [...row.now, ...row.before].every(
                   (key) => !key.startsWith("person:"),
+                ) ||
+                [...row.now, ...row.before].every(
+                  (key) => fold(key) === "independent",
                 )
               ? [
                   ...new Set(
