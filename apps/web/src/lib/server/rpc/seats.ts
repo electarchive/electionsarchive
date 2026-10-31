@@ -164,7 +164,9 @@ const stated = async (id: string) => {
       sql`, `,
     )}) as s(path, scheme) on s.path = ps.path
     join area a on a.scheme_code = s.scheme
-    join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
+    cross join lateral (
+      select ac.code from area_code ac where ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null) offset 0
+    ) ac
     where e.id = ${id}::uuid
   `);
   const isUsed = found.rows.some((row) => row.isUsed);
