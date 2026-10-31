@@ -118,7 +118,9 @@ where e.date_from is not null and not c.notional
 analyze cc;
 
 update cc set year = coalesce(
-        (select 1786 + 2 * max(n) from (select min(t.from_date) as d from tenure t
+        (select 1786 + 2 * max(n) from (select min(greatest(t.from_date, case when extract(year from e.date_from)::int % 2 = 0
+                 and t.from_date < make_date(extract(year from e.date_from)::int + 1, 1, 3)
+                 then make_date(extract(year from e.date_from)::int + 1, 1, 3) end)) as d from tenure t
              join contest c on c.id = t.contest_id join election e on e.id = c.election_id
              where t.contest_id = cc.id and t.from_date > e.date_from) f
          cross join generate_series(1, 119) n
