@@ -179,6 +179,22 @@ def pending(frame: pl.DataFrame) -> pl.DataFrame:
     return frame.filter(pl.col("agrees").is_null() | ~pl.col("agrees"))
 
 
+def cached_reply(key: str) -> dict[str, object] | None:
+    from ea import raw
+
+    try:
+        text = json.loads(raw.cached(SOURCE, key).path.read_text())["content"][0]["text"]
+    except LookupError:
+        return None
+    found = re.search(r"\{.*\}", text, re.DOTALL)
+    if not found:
+        return None
+    try:
+        return json.loads(found[0])
+    except ValueError:
+        return None
+
+
 def reread() -> str:
     from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 
@@ -190,6 +206,14 @@ def reread() -> str:
     price_in, price_out = batch.PRICES["claude-haiku-5-5"]
     wanted: dict[str, batch.Want] = {}
     for (year, page), rows in frame.group_by("year", "page", maintain_order=True):
+        key = f"read:{year}:{page}"
+        older = cached_reply(key)
+        if older is not None:
+            covered = {int(line) for line in (older.get("lines") or {}) if line.isdigit()}
+            rows = rows.filter(~pl.col("index").is_in(covered))
+            if rows.is_empty():
+                continue
+            key = f"{key}:{rows['index'].min()}"
         image = folder / f"{year}-{page}.png"
         if not image.exists():
             stem = folder / f".{year}-{page}"
@@ -232,34 +256,32 @@ def reread() -> str:
                 }
             ],
         )
-        wanted[f"read:{year}:{page}"] = (params, (3500 * price_in + (200 + 14 * rows.height) * price_out) / 1e6)
+        wanted[key] = (params, (3500 * price_in + (200 + 14 * rows.height) * price_out) / 1e6)
     return batch.ensure(SOURCE, JOB, wanted)[1]
 
 
 def seen() -> tuple[dict[int, int], dict[str, int | None]]:
-    from ea import raw
-
     lines: dict[int, int] = {}
     totals: dict[str, int | None] = {}
     frame = pending(arbitrated(indexed(), vision=False))
-    for year, page in frame.select("year", "page").unique().rows():
-        try:
-            text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"][0]["text"]
-        except LookupError:
-            continue
-        found = re.search(r"\{.*\}", text, re.DOTALL)
-        if not found:
-            continue
-        try:
-            reply = json.loads(found[0])
-        except ValueError:
-            continue
-        for key, value in (reply.get("lines") or {}).items():
-            if isinstance(value, int) and key.isdigit():
-                lines[int(key)] = value
-        for key, value in (reply.get("totals") or {}).items():
-            if isinstance(value, int):
-                totals[key] = value
+    for (year, page), rows in frame.group_by("year", "page", maintain_order=True):
+        key = f"read:{year}:{page}"
+        keys = [key]
+        older = cached_reply(key)
+        if older is not None:
+            covered = {int(line) for line in (older.get("lines") or {}) if line.isdigit()}
+            unread = rows.filter(~pl.col("index").is_in(covered))
+            keys.append(f"{key}:{unread['index'].min()}")
+        for name in keys:
+            reply = cached_reply(name)
+            if reply is None:
+                continue
+            for line, value in (reply.get("lines") or {}).items():
+                if isinstance(value, int) and line.isdigit():
+                    lines.setdefault(int(line), value)
+            for block, value in (reply.get("totals") or {}).items():
+                if isinstance(value, int):
+                    totals.setdefault(block, value)
     return lines, totals
 
 
