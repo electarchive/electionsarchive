@@ -305,6 +305,14 @@ COUNCIL_FIXES = {
     "Timothy R Dillon": "Timothy P. Dillon",
     "Bernard A. Streeter. Jr.": "Bernard A. Streeter, Jr.",
 }
+LINE_FIXES = {
+    3267: {"votes": 13709},
+    3593: {"name": "Robert Kingsbury"},
+    4999: {"name": "John H. Lynch", "printed": 456051},
+    5000: {"name": "John Stephen", "printed": 456051},
+    5001: {"name": "John J. Babiarz", "town": "Grafton", "group": 2, "printed": 456051, "total_party": None},
+}
+LINE_DROPS = {3594}
 PARTY_KEYS = {"r": "republican-party", "d": "democratic-party"}
 TOWN = re.compile(r"(.+[a-z])[.,]\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
 
@@ -341,7 +349,18 @@ def second(frame: pl.DataFrame) -> pl.DataFrame:
     ).drop("key", "vision", "vision_total", "read", "vision_sum", "text_agrees")
 
 
+def amended(frame: pl.DataFrame) -> pl.DataFrame:
+    frame = frame.filter(~pl.col("index").is_in(list(LINE_DROPS)))
+    for column in ("votes", "name", "town", "group", "printed", "total_party"):
+        values = {index: fix[column] for index, fix in LINE_FIXES.items() if column in fix}
+        frame = frame.with_columns(
+            pl.col("index").replace_strict(values, default=pl.col(column), return_dtype=frame.schema[column]).alias(column)
+        )
+    return frame
+
+
 def arbitrated(frame: pl.DataFrame, vision: bool = True) -> pl.DataFrame:
+    frame = amended(frame)
     frame = nh_manual.verified(frame.drop("added", "agrees", strict=False))
     swaps: dict[int, int] = {}
     for _, rows in frame.filter(pl.col("printed").is_not_null() & ~pl.col("agrees")).group_by("year", "stage", "group"):
