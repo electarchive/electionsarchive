@@ -9069,7 +9069,9 @@ def parse() -> None:
                         fits[0][4].startswith("school:")
                         or not re.search(
                             r"\b(school|unified|college|district(?! \d)|area|primary|nominating|special)\b",
-                            re.sub(r"\bschool\b", "", " ".join(fits[0][2])) if state == "ME" else " ".join(fits[0][2]),
+                            re.sub(r"\b(school|water district)\b", "", " ".join(fits[0][2]))
+                            if state == "ME"
+                            else " ".join(fits[0][2]),
                         )
                     )
                 ):
@@ -9093,6 +9095,8 @@ def parse() -> None:
                                         "office",
                                     ),
                                     (r"^(?:town )?highway superintendent$", "highway-superintendent"),
+                                    (r"^water district trustees?$", "water-district-trustee"),
+                                    (r"^casco bay lines directors?\b", "casco-bay-lines-director"),
                                     (r"^(?:town |village )?justice$", "justice"),
                                     (r"^(?:city )?court judge$", "judge"),
                                     (r"^village president$|^president$|^president of (?:the )?council$", "president"),
@@ -9123,7 +9127,14 @@ def parse() -> None:
                         r"|\bward (f\d+)\b",
                         post,
                     )
+                    me_seated = state == "ME" and role in ("committee", "board-of-education")
                     seat = (
+                        post.partition("director")[2].strip().title()
+                        if role == "casco-bay-lines-director"
+                        else ""
+                        if role == "water-district-trustee"
+                        else None
+                    ) or (
                         (
                             f"Ward {(ward[1] or ward[2] or ward[3] or ward[5]).upper()}"
                             + (
@@ -9134,12 +9145,13 @@ def parse() -> None:
                             if ward[4] is None
                             else f"{ward[4].title()} Ward"
                         )
-                        if ward and role in ("council", "commission", "board-of-directors")
+                        if ward and (me_seated or role in ("council", "commission", "board-of-directors"))
                         else f"{other[1].title()} {other[2]}"
                         if (other := re.search(r"\b(seat|district|group|place|zone|position) (\d+)\b", post))
-                        and role in ("council", "commission", "board-of-directors")
+                        and (me_seated or role in ("council", "commission", "board-of-directors"))
                         else "At-Large"
-                        if role in ("council", "commission", "board-of-directors") and re.search(r"\bat large\b", post)
+                        if (me_seated or role in ("council", "commission", "board-of-directors"))
+                        and re.search(r"\bat large\b", post)
                         else f"{slot[1].title()} {slot[2]}"
                         if state == "TX"
                         and role == "board-of-education"
@@ -9181,6 +9193,8 @@ def parse() -> None:
                                 "judge": "Court Judge",
                                 "treasurer": "Treasurer",
                                 "president": "President",
+                                "water-district-trustee": "Water District Trustee",
+                                "casco-bay-lines-director": "Casco Bay Lines Director",
                             }[role]
                             + (f", {seat}" if seat else ""),
                             label,
