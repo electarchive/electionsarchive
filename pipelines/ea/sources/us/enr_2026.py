@@ -1,4 +1,5 @@
 import csv
+import html
 import io
 import json
 import os
@@ -75,6 +76,10 @@ IL_CITIES = {
     "CITY OF ROCKFORD": "Winnebago",
 }
 IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
+KS_CONTEST = re.compile(
+    r"(?:United States (?P<senate>Senate)|United States House of Representatives (?P<district>\d+)|(?P<governor>Governor / Lt\. Governor))"
+    r"(?: \((?P<party>\w)\))?"
+)
 MN_CONTEST = re.compile(r"(U\.S\. Representative|U\.S\. Senator|Governor & Lt Governor)(?: District (\d+))?")
 MN_OFFICES = {"U.S. Representative": "house", "U.S. Senator": "senate", "Governor & Lt Governor": "governor"}
 LA_BASE = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob="
@@ -312,6 +317,14 @@ def fetch() -> None:
                         print(f"LA: no file for race {race['ID']}")
                     else:
                         store("LA", url, content, ".csv")
+    if not ONLY or "KS" in ONLY:
+        for name in ("national.html", "statewide.html"):
+            url = f"https://www.sos.ks.gov/ent/{name}"
+            content = get(client, url)
+            if content is None or b"race-details" not in content:
+                print(f"KS: no file {name}")
+            else:
+                store("KS", url, content, ".html")
     if not ONLY or "MD" in ONLY:
         base = f"https://elections.maryland.gov/elections/{DAY.year}/general_results/"
         for name in (
@@ -523,6 +536,39 @@ def rows(state: str, url: str, path: Path):
                 "reporting": reporting or None,
                 "total": total or None,
             }
+        return
+    if state == "KS":
+        text = path.read_text(encoding="utf-8")
+        stamp = re.search(r"id = 'time-stamp' >\s*([^<]*?)\s*<", text)
+        as_of = (
+            datetime.strptime(stamp[1], "%m/%d/%Y %I:%M %p").replace(tzinfo=ZoneInfo("America/Chicago")).isoformat()
+            if stamp
+            else None
+        )
+        for block in text.split("<div class='race'>")[1:]:
+            found = KS_CONTEST.fullmatch(html.unescape(re.search(r"<h3>(.*?)</h3>", block)[1]).strip())
+            if found is None:
+                continue
+            counted = re.search(r"Precincts Reporting: (\d+) of (\d+)", block)
+            for county in re.findall(r"<area [^>]*title=\"(.*?)\" />", block, re.DOTALL):
+                tooltip = html.unescape(county)
+                for label, votes in re.findall(
+                    r"<td style='padding-right:15px'>(.*?)</td><td style='text-align:right'>([\d,]+)</td>", tooltip
+                ):
+                    named = re.fullmatch(r"([A-Z]{1,3})-(.*)", html.unescape(label).strip())
+                    yield {
+                        "office": "senate" if found["senate"] else "governor" if found["governor"] else "house",
+                        "district": found["district"] or "",
+                        "party": named[1] if named else "",
+                        "county": re.search(r"<span class='county'>(.*?) County</span>", tooltip)[1],
+                        "candidate": named[2] if named else html.unescape(label).strip(),
+                        "write_in": False,
+                        "votes": int(votes.replace(",", "")),
+                        "as_of": as_of,
+                        "reporting": int(counted[1]) if counted else None,
+                        "total": int(counted[2]) if counted else None,
+                        "scope": found["party"] or "",
+                    }
         return
     if state == "MD":
         text = path.read_text(encoding="utf-8")
