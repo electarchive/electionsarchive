@@ -5,6 +5,7 @@ import json
 import re
 import subprocess
 import tempfile
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -153,7 +154,20 @@ def reads() -> dict[tuple[str, int, str], dict[str, object]]:
 
 def fetch() -> None:
     for url in pages()["url"].drop_nulls().unique():
-        raw.fetch(SOURCE, url, suffix=".pdf")
+        if url.startswith("inbox:"):
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.store(
+                    SOURCE,
+                    url,
+                    (DATA / "inbox" / "manual" / url.removeprefix("inbox:")).read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/pdf",
+                )
+        else:
+            raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def parse() -> None:
@@ -245,16 +259,18 @@ def emit() -> Path:
             if prior:
                 source_id = prior[0][6]
             else:
-                made = cs.source(PUBLISHER, f"{TITLE} {year + 1}")
+                publisher = row["publisher"] or PUBLISHER
+                title = row["title"] or f"{TITLE} {year + 1}"
+                made = cs.source(publisher, title)
                 source_id = made
                 if made in cs.minted:
                     cs.add(
                         "source",
                         id=made,
                         kind="official_body",
-                        publisher=PUBLISHER,
-                        title=f"{TITLE} {year + 1}",
-                        url=row["url"].replace("/download/", "/details/").rsplit("/", 1)[0],
+                        publisher=publisher,
+                        title=title,
+                        url=row["details"] or row["url"].replace("/download/", "/details/").rsplit("/", 1)[0],
                         license="public domain",
                     )
             stored = find(row["origin"], row["needle"])
