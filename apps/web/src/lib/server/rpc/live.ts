@@ -9,6 +9,7 @@ import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
+import { Path } from "#lib/server/territory.js";
 
 const LEVELS = new Set([
   "us.place",
@@ -348,8 +349,8 @@ function scanners(note: string | null) {
   });
 }
 
-const Input = v.object({
-  path: v.string(),
+const Input = v.objectAsync({
+  path: Path,
   rehearsal: v.optional(
     v.object({
       started: v.nullable(v.number()),

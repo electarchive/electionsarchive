@@ -16,7 +16,7 @@ import {
   separate,
 } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
-import { canonicalTerritory } from "#lib/server/territory.js";
+import { canonicalPath } from "#lib/server/territory.js";
 import land from "#lib/server/world.txt?raw";
 
 async function found<T>(promise: Promise<T>) {
@@ -211,8 +211,8 @@ async function welcome() {
 }
 
 export async function coverage(polity: string) {
-  const canonical = canonicalTerritory(polity);
-  if (canonical != null && /^[a-z]{2}$/u.test(canonical)) {
+  const canonical = await canonicalPath(polity);
+  if (canonical !== polity) {
     redirect(308, `/coverage/${canonical}`);
   }
   if (!/^[a-z]{2}$/.test(polity)) {
@@ -884,22 +884,10 @@ export async function archive(path: string, search: URLSearchParams) {
     limit 1
   `);
   const slug = result.rows[0];
-  const [head = "", ...rest] = segments;
-  const canonical = slug == null ? canonicalTerritory(head) : null;
-  if (
-    canonical != null &&
-    (
-      await db.execute<Record<string, never>>(sql`
-        select from slug s join polity p on p.id = s.entity_id
-        where s.path = ${canonical} and s.is_current
-      `)
-    ).rows.length > 0
-  ) {
+  const canonical = slug == null ? await canonicalPath(path) : path;
+  if (canonical !== path) {
     const query = search.toString();
-    redirect(
-      308,
-      `/${[canonical, ...rest].join("/")}${query === "" ? "" : `?${query}`}`,
-    );
+    redirect(308, `/${canonical}${query === "" ? "" : `?${query}`}`);
   }
   const isDay =
     slug?.type === "polity" &&

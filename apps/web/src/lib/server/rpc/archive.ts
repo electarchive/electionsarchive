@@ -32,6 +32,7 @@ import {
   spot,
 } from "#lib/server/plane.js";
 import { proseColumns, proseEntries, proseJoin } from "#lib/server/prose.js";
+import { Path, Polity } from "#lib/server/territory.js";
 
 const byCode = (a: string, b: string) => (a < b ? -1 : Number(a > b));
 
@@ -5303,11 +5304,11 @@ export const contests = {
       }),
     )
     .input(
-      v.object({
-        path: v.string(),
+      v.objectAsync({
+        path: Path,
         key: v.nullable(v.string()),
         area: v.nullable(v.number()),
-        place: v.optional(v.nullable(v.string())),
+        place: v.optionalAsync(v.nullableAsync(Polity)),
       }),
     )
     .output(
@@ -5498,7 +5499,7 @@ export const contests = {
         summary: "Find the contest a site path names",
       }),
     )
-    .input(v.object({ path: v.string() }))
+    .input(v.objectAsync({ path: Path }))
     .output(v.object({ id: v.string() }))
     .handler(async ({ input }) => {
       const found = await db.execute<{ id: string }>(sql`
@@ -13336,7 +13337,7 @@ export const elections = {
         summary: "Find the election a site path names",
       }),
     )
-    .input(v.object({ path: v.string() }))
+    .input(v.objectAsync({ path: Path }))
     .output(v.object({ id: v.string() }))
     .handler(async ({ input }) => {
       const found = await db.execute<{ id: string }>(sql`
@@ -19867,7 +19868,7 @@ export const bodies = {
           "Find the chamber a /chambers/{polity}/{slug} path names, the polity given by its path",
       }),
     )
-    .input(v.object({ polity: v.string(), slug: v.string() }))
+    .input(v.objectAsync({ polity: Polity, slug: v.string() }))
     .output(v.object({ id: v.string(), polity: v.string() }))
     .handler(async ({ input }) => {
       const owner = await db.execute<{ id: string }>(sql`
@@ -22922,7 +22923,7 @@ export const parties = {
           "Find the party a /parties/{polity}/{slug} path names, the polity given by its path",
       }),
     )
-    .input(v.object({ polity: v.optional(v.string()), slug: v.string() }))
+    .input(v.objectAsync({ polity: v.optionalAsync(Polity), slug: v.string() }))
     .output(v.object({ id: v.string() }))
     .handler(async ({ input }) => {
       const owner =

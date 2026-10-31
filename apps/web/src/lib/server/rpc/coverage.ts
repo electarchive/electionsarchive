@@ -7,6 +7,7 @@ import type { Column, Goal } from "#lib/coverage.js";
 import { COUNTRY_TIERS, US_TIERS } from "#lib/coverage.js";
 import { os as cached } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import { Polity as PolityPath } from "#lib/server/territory.js";
 
 const os = dev ? base : cached;
 
@@ -53,7 +54,7 @@ const counts = {
   populationEstimated: v.number(),
 };
 type Counts = Record<keyof typeof counts, number>;
-const Code = v.pipe(v.string(), v.regex(/^[a-z]{2}$/));
+const Code = v.pipeAsync(PolityPath, v.regex(/^[a-z]{2}$/));
 const SUMS = sql.raw(
   Object.keys(counts)
     .map((key) => {
@@ -452,7 +453,7 @@ export const coverage = {
           "One country's coverage by tier (polity is a lowercase ISO code, or eu): national, regional, and local elections, referendums, and the European Parliament (for the US: federal, statewide, state legislative, local, and turnout), each with counts at every grain (any results, by constituency or county, finer, and map shapes; for the US split before 2000 and from 2000, with precinct results split into 2000–2015 and 2016 on; precinct shapes are their own tier, counting each precinct once per state and year, deduplicated across sources, with the target from 2016) for the tier and for each kind of election in it, plus the cited sources of the denominators and what is left uncounted; complete includes upcoming, the races still to vote that the archive holds with their candidates or options in full, and pending counts those still short of them",
       }),
     )
-    .input(v.object({ polity: Code }))
+    .input(v.objectAsync({ polity: Code }))
     .output(
       v.object({
         builtAt: v.nullable(v.string()),
@@ -596,7 +597,7 @@ export const coverage = {
       }),
     )
     .input(
-      v.object({
+      v.objectAsync({
         polity: Code,
         goal: v.picklist(GOALS),
         tier: v.optional(
@@ -663,8 +664,8 @@ export const coverage = {
       }),
     )
     .input(
-      v.object({
-        polity: v.optional(Code),
+      v.objectAsync({
+        polity: v.optionalAsync(Code),
         id: v.optional(v.pipe(v.string(), v.uuid())),
       }),
     )
