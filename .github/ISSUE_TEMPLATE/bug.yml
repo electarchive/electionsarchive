@@ -1,0 +1,28 @@
+name: Bug
+description: Something on the site, the API, the MCP server, or in the code doesn't work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: What happened
+      description: Include any error message, and a screenshot if it helps.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Where
+      description: The page URL, the API request, the MCP tool call, or the command you ran.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+  - type: input
+    attributes:
+      label: Browser or environment
+      description: For example Firefox 140 on macOS, or Node 24 on Ubuntu.

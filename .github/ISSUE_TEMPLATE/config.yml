@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Correct data on the site
+    url: https://www.electionsarchive.com
+    about: Open the page with the mistake, choose Edit, and cite your source.
+  - name: Report a vulnerability
+    url: https://github.com/electarchive/electionsarchive/security/advisories/new
+    about: Report security issues privately, not in a public issue.

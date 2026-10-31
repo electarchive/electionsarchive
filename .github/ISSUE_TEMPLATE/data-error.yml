@@ -1,0 +1,25 @@
+name: Data error
+description: A number, name, date, or shape in the archive is wrong or missing.
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: "You can usually fix this yourself: open the page with the mistake, choose Edit, and cite your source. Use this form when you can't."
+  - type: input
+    attributes:
+      label: Page
+      description: The URL of the page with the mistake.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What's wrong
+      description: What the page shows, and what it should show instead.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Source
+      description: "Where the correct value comes from: a link to an official result, a document with its page number, or a book citation."
+    validations:
+      required: true

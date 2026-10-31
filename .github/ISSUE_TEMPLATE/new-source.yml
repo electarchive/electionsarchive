@@ -1,0 +1,38 @@
+name: New source
+description: Suggest an election results source the archive doesn't have yet.
+labels: [source]
+body:
+  - type: markdown
+    attributes:
+      value: Check the polity's page on the site first to see what the archive already holds.
+  - type: input
+    attributes:
+      label: Polity and elections
+      description: "For example: Ohio county commissioners since 1998, or Chilean municipal elections."
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Source
+      description: A link to the data or to the page that describes it.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Format
+      description: CSV, Excel, PDF tables, scanned books, an API, or something else.
+  - type: textarea
+    attributes:
+      label: What it adds
+      description: Earlier years, smaller reporting units, contests that the archive lacks, or official numbers where it uses a secondary source.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: License or terms
+      description: The source's license or terms of use, if you know them.
+  - type: checkboxes
+    attributes:
+      label: Can you help?
+      options:
+        - label: I'd like to write the pipeline for this source
