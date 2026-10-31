@@ -5565,6 +5565,13 @@ for key, publisher, title, url, local in (
         "ks/barber_gn.pdf",
     ),
     (
+        "KS-20007-townships",
+        "Barber County",
+        "PUBLIC NOTICE of candidates for the General Election of November 3, 2026",
+        "https://barber.ks.gov/uploads/5/6/1/9/56198487/candidates_for_2026_general.pdf",
+        "ks/barber_gn.pdf",
+    ),
+    (
         "KS-20047",
         "Edwards County",
         "Edwards County Official Candidate List, General Election November 3, 2026",
@@ -5573,6 +5580,13 @@ for key, publisher, title, url, local in (
     ),
     (
         "KS-20135",
+        "Ness County",
+        "2026 General Election candidate page, November 3, 2026",
+        "https://www.nesscountyks.gov/election/2026-general-election",
+        "ks/ness_gn.html",
+    ),
+    (
+        "KS-20135-townships",
         "Ness County",
         "2026 General Election candidate page, November 3, 2026",
         "https://www.nesscountyks.gov/election/2026-general-election",
