@@ -478,6 +478,11 @@ COUNCIL_FIXES = {
     "Bernard A. Streeter. Jr.": "Bernard A. Streeter, Jr.",
 }
 LINE_FIXES = {
+    3506: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
+    3507: {"name": "David K. Wheeler", "town": "Milford", "party": "d", "total_party": "d", "group": 69, "printed": 3445},
+    3508: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
+    3509: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
+    91104: {"party": "d", "total_party": "d", "group": 69, "printed": 3445},
     5770: {"total_party": "d"},
     5771: {"total_party": "d"},
     5772: {"total_party": "d"},
@@ -684,6 +689,7 @@ LINE_FIXES = {
 }
 LINE_DROPS = {3594, 1456, 2912, 335, 1781, 1828, 2185, 3513, 3964, 5172}
 LINE_ADDS = {
+    91104: {"template": 3508, "name": "J. Morganstein", "town": None, "votes": 7, "y": (453.2, 461, 1000)},
     91100: {
         "template": 5753,
         "name": "Beth Funicella",
@@ -976,6 +982,10 @@ CONFIRMED = {
     3224,
     3226,
     3506,
+    3507,
+    3508,
+    3509,
+    91104,
     3587,
     2235,
     2766,
