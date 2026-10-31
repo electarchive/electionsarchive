@@ -22,8 +22,8 @@ HEADERS = {**oe.BROWSER, "Origin": "https://arkansas.tally-enr.com"}
 LISTS = "https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={}"
 FILES = "https://results.tally-enr.com/results/arkansas/{}/FullDataFile.json"
 PRELIMINARY = (
-    "The results site marks these totals unofficial. The certified canvass is requested as MF-421, and the totals "
-    "will be replaced if it differs."
+    "The results site marks these totals unofficial. The certified canvass has been requested, and the totals will be "
+    "replaced if it differs."
 )
 VIN_VIO = (
     "The results site files two contests for this election under the labels VIN and VIO. VIO is the special primary "

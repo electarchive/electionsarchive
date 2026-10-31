@@ -63,7 +63,7 @@
         "title": "Local Elections Archive Project, England and Wales council wards",
         "publisher": "Andrew Teale",
         "url": "https://andrewteale.me.uk/leap/",
-        "format": "compiled zip per year (MF-073)",
+        "format": "compiled zip per year",
         "grain": "ward",
         "effort": "election",
         "first": false,
