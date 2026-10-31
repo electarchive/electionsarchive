@@ -183,9 +183,10 @@ def cached_reply(key: str) -> dict[str, object] | None:
     from ea import raw
 
     try:
-        text = json.loads(raw.cached(SOURCE, key).path.read_text())["content"][0]["text"]
+        content = json.loads(raw.cached(SOURCE, key).path.read_text())["content"]
     except LookupError:
         return None
+    text = "".join(block.get("text", "") for block in content if block.get("type") == "text")
     found = re.search(r"\{.*\}", text, re.DOTALL)
     if not found:
         return None
@@ -490,8 +491,44 @@ LINE_FIXES = {
     751: {"group": 19, "party": "d", "total_party": "d", "printed": 8708},
     5509: {"votes": 3480},
     1964: {"name": "Stephanie Powers", "town": "Keene"},
+    675: {"printed": 8598},
+    676: {"printed": 8598},
+    678: {"printed": 8443},
+    679: {"printed": 8443},
+    683: {"printed": 10823},
+    684: {"printed": 10823},
+    685: {"printed": 10823},
+    2355: {"printed": 14182},
+    2356: {"printed": 14182},
+    2911: {"name": "David W. Parker", "town": "Gilmanton"},
+    950: {"name": "Scatter"},
+    5052: {"district": "23"},
+    5053: {"district": "23"},
+    5054: {"district": "24"},
+    5055: {"district": "24"},
+    4022: {"name": "Mark Fernald", "town": "Sharon", "group": 38, "printed": 22621},
+    4023: {"name": "Gary L. Daniels", "town": "Milford"},
+    4024: {"votes": 843},
+    4009: {"printed": None},
+    4010: {"printed": None},
+    1895: {"name": "James R. Saintjean"},
+    2101: {"name": "James R. Saintjean"},
+    2301: {"name": "James R. Saintjean"},
+    3627: {"name": "Debora B. Pignatelli"},
+    1701: {"printed": 11125},
+    90109: {"printed": 11125},
+    4640: {"printed": 14834},
+    90112: {"printed": 14834},
+    4829: {"votes": 17970, "digits": "17,970", "printed": 26696},
+    4830: {"votes": 8726, "digits": "8,726", "printed": 26696},
+    4831: {"votes": 16436, "digits": "16,436", "printed": 26749},
+    4832: {"votes": 10313, "digits": "10,313", "printed": 26749},
+    4833: {"votes": 17212, "digits": "17,212", "printed": 30089},
+    4834: {"votes": 12877, "digits": "12,877", "printed": 30089},
+    4835: {"votes": 12128, "digits": "12,128", "printed": 32016},
+    90108: {"printed": 32016},
 }
-LINE_DROPS = {3594}
+LINE_DROPS = {3594, 1456, 2912}
 LINE_ADDS = {
     90001: {
         "template": 1280,
@@ -542,8 +579,128 @@ LINE_ADDS = {
         "votes": 1,
         "y": (488.725251, 491.739466, 514),
     },
+    90101: {
+        "template": 5018,
+        "name": "Andrew J. Hosmer",
+        "town": "Laconia",
+        "votes": 7117,
+        "y": (296.556, 301.098, 527),
+    },
+    90102: {
+        "template": 5027,
+        "name": "Bob Jones",
+        "town": "Bedford",
+        "votes": 7421,
+        "y": (446.098, 450.88, 527),
+    },
+    90103: {
+        "template": 5036,
+        "name": "Tammy Marie Sickmann",
+        "town": "Londonderry",
+        "votes": 5131,
+        "y": (190.285, 195.513, 527),
+    },
+    90104: {
+        "template": 5049,
+        "name": "Peter Angerhofer",
+        "town": "Durham",
+        "votes": 7931,
+        "y": (400.907, 405.127, 527),
+    },
+    90105: {
+        "template": 5459,
+        "name": "Regina Birdsell",
+        "town": "Hampstead",
+        "votes": 11561,
+        "y": (403.509, 408.662, 529),
+    },
+    90106: {
+        "template": 5468,
+        "name": "Chris Muns",
+        "town": "Hampton",
+        "votes": 9816,
+        "y": (134.483, 139.606, 529),
+    },
+    90107: {
+        "template": 3645,
+        "name": "Burt Cohen",
+        "town": None,
+        "votes": 13888,
+        "y": (452.254, 457.024, 524),
+    },
+    90108: {
+        "template": 4835,
+        "name": "Martha Fuller Clark",
+        "town": "Portsmouth",
+        "votes": 19888,
+        "y": (173.731, 178.362, 650),
+    },
+    90109: {
+        "template": 1701,
+        "name": "Robert F. Preston",
+        "town": "Hampton",
+        "votes": 8335,
+        "y": (148.753, 155.104, 522),
+    },
+    90110: {
+        "template": 1701,
+        "name": "Vesta M. Roy",
+        "town": "Salem",
+        "votes": 7707,
+        "y": (109.453, 116.399, 522),
+        "set": {"district": "22", "group": 9001, "printed": 11211},
+    },
+    90111: {
+        "template": 1701,
+        "name": "Frederick M. Cunningham",
+        "town": "Salem",
+        "votes": 3504,
+        "y": (115.27, 121.154, 522),
+        "set": {"district": "22", "group": 9001, "printed": 11211},
+    },
+    90112: {
+        "template": 4640,
+        "name": "Elizabeth Roth",
+        "town": "Salem",
+        "votes": 7005,
+        "y": (252.167, 255.852, 510),
+    },
+    90113: {
+        "template": 4640,
+        "name": "Maggie Wood Hassan",
+        "town": "Exeter",
+        "votes": 10566,
+        "y": (272.19, 277.787, 510),
+        "set": {"district": "23", "group": 9002, "printed": 17574},
+    },
+    90114: {
+        "template": 4640,
+        "name": "Natalie Healy",
+        "town": "Exeter",
+        "votes": 7008,
+        "y": (280.138, 284.427, 510),
+        "set": {"district": "23", "group": 9002, "printed": 17574},
+    },
+    90115: {
+        "template": 4640,
+        "name": "Martha Fuller Clark",
+        "town": "Portsmouth",
+        "votes": 12189,
+        "y": (300.456, 304.454, 510),
+        "set": {"district": "24", "group": 9003, "printed": 20626},
+    },
+    90116: {
+        "template": 4640,
+        "name": "Daniel M. Hughes",
+        "town": "New Castle",
+        "votes": 8437,
+        "y": (306.673, 312.257, 510),
+        "set": {"district": "24", "group": 9003, "printed": 20626},
+    },
 }
 CONFIRMED = {
+    4009,
+    4010,
     45,
     48,
     49,
@@ -627,11 +784,12 @@ def fixed(frame: pl.DataFrame) -> pl.DataFrame:
                 "clean": True,
                 "y0": y0 / height,
                 "y1": y1 / height,
+                **fix.get("set", {}),
             }
         )
     if added:
         frame = pl.concat([frame, pl.DataFrame(added, schema=frame.schema)])
-    for column in ("votes", "name", "town", "party", "group", "printed", "total_party"):
+    for column in ("votes", "digits", "district", "name", "town", "party", "group", "printed", "total_party"):
         values = {index: fix[column] for index, fix in LINE_FIXES.items() if column in fix}
         frame = frame.with_columns(
             pl.col("index")
