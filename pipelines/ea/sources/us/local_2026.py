@@ -2,6 +2,7 @@ import csv
 import html
 import io
 import json
+import os
 import re
 import subprocess
 import unicodedata
@@ -31,6 +32,11 @@ COUSUB_GAZETTEER = (
 )
 BALLOTS = "https://web.sos.ky.gov/ballots/{}%202026G.pdf"
 PARSED = DATA / "parsed" / SOURCE
+STATES = (
+    {state.strip() for state in os.environ["LOCAL_STATES"].split(",") if state.strip()}
+    if os.environ.get("LOCAL_STATES")
+    else None
+)
 FILES = {
     "06037": "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
     "0644000": "https://cityclerk.lacity.org/election/2026_General_Municipal_Election_List_of_Certified_Candidates.pdf",
@@ -9325,6 +9331,8 @@ def parse() -> None:
                 )
         for key, found in feeds.items():
             state = key.split("-")[0]
+            if STATES is not None and state not in STATES:
+                continue
             prefix = next(fips for st, fips, _ in conn.execute(coverage.STATES_SQL) if st == state)
             places = dict(
                 conn.execute(
@@ -9927,6 +9935,17 @@ def parse() -> None:
             pinned=pl.col("tail").is_in(sorted(pinned)),
         )
     )
+    if STATES is not None:
+        held = PARSED / "candidates.parquet"
+        frame = frame.filter(pl.col("tail").str.split(":").list.first().is_in(sorted(STATES)))
+        if held.exists():
+            frame = pl.concat(
+                [
+                    pl.read_parquet(held).filter(~pl.col("tail").str.split(":").list.first().is_in(sorted(STATES))),
+                    frame,
+                ],
+                how="diagonal_relaxed",
+            )
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.group_by("fips").agg(pl.col("tail").n_unique().alias("contests"), pl.len().alias("candidates")))
 
@@ -9950,8 +9969,23 @@ def countywide(tail: str) -> bool:
     return SUBCOUNTY.search(role) is None
 
 
-def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "candidates.parquet")
+def emit() -> None:
+    whole = pl.read_parquet(PARSED / "candidates.parquet")
+    groups = whole["tail"].str.split(":").list.first()
+    present = set(groups)
+    failed = []
+    for state in sorted(present if STATES is None else present & STATES):
+        try:
+            print(f"changeset {state} {emit_state(whole.filter(groups == state), state)}")
+        except Exception as error:
+            failed.append(state)
+            print(f"failed {state}: {error!r}")
+    if failed:
+        raise SystemExit(f"failed states: {','.join(failed)}")
+
+
+def emit_state(frame: pl.DataFrame, state: str) -> Path:
+    NEW_PARTIES_ADDED.clear()
     tail_set = set(frame["tail"])
     merged = {
         row["tail"]
@@ -9980,9 +10014,10 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Local contests on the 2026-11-03 ballot, with candidates from official candidate lists and sample ballots: statewide candidate files (North Carolina), each contest matched to the same office's last contest in the archive; Los Angeles city runoffs, Cook County offices, Harris and Dallas county offices, and Miami-Dade runoffs, the San Diego and Orange county supervisor races, Maricopa County's clerk, justices of the peace, and constables, and the New York City Council District 3 special",
+            summary=f"{state}: local contests on the 2026-11-03 ballot, with candidates from official candidate lists and sample ballots: statewide candidate files (North Carolina), each contest matched to the same office's last contest in the archive; Los Angeles city runoffs, Cook County offices, Harris and Dallas county offices, and Miami-Dade runoffs, the San Diego and Orange county supervisor races, Maricopa County's clerk, justices of the peace, and constables, and the New York City Council District 3 special",
             polity="US",
         )
+        cs.manifest["scope"] = {"polity": "US", "state": state}
 
         def name(entity: object, text: str) -> None:
             if entity in cs.minted:
@@ -9992,7 +10027,7 @@ def emit() -> Path:
             """select substr(x.value, 12), x.entity_id from external_id x join changeset c on c.id = x.changeset_id
                join entity t on t.id = x.entity_id and t.retired_by is null
                where x.scheme = 'us.contest' and x.value like %s and c.pipeline = %s""",
-            [f"{DAY}:%:remainder", SOURCE],
+            [f"{DAY}:{state}:%:remainder", SOURCE],
         ).fetchall():
             if tail.removesuffix(":remainder") not in set(frame["tail"]) or tail in set(frame["tail"]):
                 continue
@@ -10635,8 +10670,10 @@ def emit() -> Path:
                join contest co on co.id = o.contest_id join election el on el.id = co.election_id
                left join candidacy ca on ca.option_id = o.id
                left join external_id x on x.entity_id = o.id and x.scheme = 'us.option'
-               where c.pipeline = %s and el.date_from = %s and o.contest_id <> all(%s::uuid[])""",
-            [SOURCE, DAY, emitted],
+               where c.pipeline = %s and el.date_from = %s and o.contest_id <> all(%s::uuid[])
+                 and exists (select from external_id sx where sx.entity_id = co.id and sx.scheme = 'us.contest'
+                             and sx.value like %s)""",
+            [SOURCE, DAY, emitted, f"{DAY}:{state}:%"],
         ).fetchall():
             print("dropping stale", value)
             if candidacy is not None:
@@ -10648,13 +10685,13 @@ def emit() -> Path:
                join election el on el.id = co.election_id
                join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
                join changeset c on c.id = x.changeset_id
-               where c.pipeline = %s and el.date_from = %s and co.id <> all(%s::uuid[])
+               where c.pipeline = %s and el.date_from = %s and co.id <> all(%s::uuid[]) and x.value like %s
                    and not exists (
                        select from contest_option o join entity oe on oe.id = o.id and oe.retired_by is null
                        join changeset oc on oc.id = o.changeset_id
                        where o.contest_id = co.id and oc.pipeline <> %s
                    )""",
-            [SOURCE, DAY, emitted, SOURCE],
+            [SOURCE, DAY, emitted, f"{DAY}:{state}:%", SOURCE],
         ).fetchall():
             print("retiring stale contest", value)
             cs.add("entity_retirement", entity_id=contest, reason=reason)
