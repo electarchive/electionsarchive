@@ -175,6 +175,26 @@ COUNTIES = {
         "https://portsmouthri.gov/DocumentCenter/View/7981/Portsmouth-Local-Ballot-Question-Explanation-2026",
         "RI-web/portsmouth-local-questions.pdf",
     ),
+    "44005-lc": (
+        "RI",
+        "https://www.littlecomptonri.org/news_detail_T28_R81.php",
+        "RI-web/littlecompton-questions.html",
+    ),
+    "44007": (
+        "RI",
+        "https://www.providenceri.gov/wp-content/uploads/2026/09/November-2026-Local-Question-Explanantions.pdf",
+        "RI-web/providence-local-questions.pdf",
+    ),
+    "44009": (
+        "RI",
+        "https://www.richmondri.gov/DocumentCenter/View/4674/Chariho-Public-Notice-1022026",
+        "RI-web/chariho-public-notice.pdf",
+    ),
+    "44009-hk": (
+        "RI",
+        "https://www.thewesterlysun.com/classifieds/community/announcements/legal/town-of-hopkinton-local-referendum-question/ad_0d68755c-52ac-5597-b590-c66345354519.html",
+        "RI-web/hopkinton-local-question-7.html",
+    ),
     "38015": (
         "ND",
         "https://www.bismarckschools.org/fs/resource-manager/view/11ac6ea4-ff0d-4486-84da-16289d7f918f",
