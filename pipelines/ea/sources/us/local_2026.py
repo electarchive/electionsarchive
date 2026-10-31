@@ -8271,7 +8271,7 @@ def parse() -> None:
             "ne",
             "states",
             *sorted(
-                path.stem.removeprefix("local_2026_") for path in Path(__file__).parent.glob("local_2026_lane_*.tsv")
+                path.stem.removeprefix("local_2026_") for path in Path(__file__).parent.glob("local_2026_nov3_*.tsv")
             ),
         )
         for number, row in enumerate(
