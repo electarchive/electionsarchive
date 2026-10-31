@@ -321,7 +321,10 @@ def emit() -> Path:
             for lang in LANGUAGES:
                 if row[f"title_{lang}"] is not None:
                     name(contest, row[f"title_{lang}"], lang, "official" if lang == "en" else "native")
-            part = slug(row["title_en"] or row["title_de"])[:60].strip("-") or f"vote-{vote}"
+            part = slug(row["title_en"] or row["title_de"])
+            if len(part) > 60:
+                part = part[:61].rsplit("-", 1)[0]
+            part = part or f"vote-{vote}"
             if part in parts[day]:
                 part = f"{part}-{vote}"
             parts[day].add(part)

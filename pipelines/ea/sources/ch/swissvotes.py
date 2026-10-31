@@ -266,7 +266,10 @@ def emit() -> Path:
             else:
                 name(contest, contest_row["titel_kurz_d"], "de")
             name(contest, contest_row["titel_kurz_f"], "fr", "native")
-            part = slug(short or contest_row["titel_kurz_d"])[:60].strip("-") or f"vote-{anr}"
+            part = slug(short or contest_row["titel_kurz_d"])
+            if len(part) > 60:
+                part = part[:61].rsplit("-", 1)[0]
+            part = part or f"vote-{anr}"
             if part in parts[day]:
                 part = f"{part}-{slug(anr)}"
             parts[day].add(part)
