@@ -249,7 +249,34 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       return results(search);
     }
   }
-  const found = await archive(segments.join("/"), search);
+  const whole = await archive(segments.join("/"), search);
+  const picked =
+    whole.kind === "election" && whole.race != null
+      ? whole.election.races.find(
+          (race) => race.anchor === whole.race?.replace(/-total$/u, ""),
+        )
+      : null;
+  const found =
+    whole.kind === "election" && picked != null
+      ? {
+          ...whole,
+          election: {
+            ...whole.election,
+            name: m.election_race_title({
+              race: picked.name,
+              election: whole.election.name,
+            }),
+            races: whole.election.races.filter((race) =>
+              whole.race?.endsWith("-total") === true
+                ? race.body === picked.body
+                : race === picked,
+            ),
+            elections: [],
+            councils: [],
+            composition: null,
+          },
+        }
+      : whole;
   if (found.kind === "election") {
     const parts = found.election.elections.filter((child) => !child.isStage);
     const partial = new Set(

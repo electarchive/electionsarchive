@@ -15,6 +15,27 @@
 
   setContext(WITHIN, () => data.within);
 
+  const visible = $derived(page.shallow?.url ?? page.url);
+  const picked = $derived.by(() => {
+    if (data.kind !== "election") {
+      return null;
+    }
+    const rest = visible.pathname.slice(data.path.length + 2);
+    return visible.pathname.startsWith(`/${data.path}/`) &&
+      data.election.races.some(
+        (race) => race.anchor === rest.replace(/-total$/u, ""),
+      )
+      ? rest
+      : null;
+  });
+  const chosen = $derived(
+    data.kind === "election" && picked != null
+      ? (data.election.races.find(
+          (race) => race.anchor === picked.replace(/-total$/u, ""),
+        )?.name ?? null)
+      : null,
+  );
+
   const crumbs = $derived(
     data.kind === "contest"
       ? [
@@ -28,6 +49,9 @@
         ? [
             ...data.election.breadcrumbs,
             ...(data.election.parent == null ? [] : [data.election.parent]),
+            ...(chosen == null
+              ? []
+              : [{ name: data.election.name, path: data.path }]),
           ]
         : data.kind === "day"
           ? data.local.breadcrumbs
@@ -41,7 +65,14 @@
       });
     }
     if (data.kind !== "contest") {
-      return data.kind === "election" ? data.election.name : data.polity.name;
+      return data.kind === "election"
+        ? chosen == null
+          ? data.election.name
+          : m.election_race_title({
+              race: chosen,
+              election: data.election.name,
+            })
+        : data.polity.name;
     }
     const name =
       data.contest.scope.noun == null
@@ -57,7 +88,7 @@
       ? `?in=${data.scope.path}`
       : "",
   );
-  const canonical = $derived(`${page.url.origin}${page.url.pathname}${query}`);
+  const canonical = $derived(`${page.url.origin}${visible.pathname}${query}`);
   const years = $derived(
     data.kind === "polity"
       ? [
@@ -72,10 +103,16 @@
     data.kind === "contest"
       ? m.meta_contest({ name: title, date: date(data.contest.election.date) })
       : data.kind === "election"
-        ? m.meta_election({
-            name: data.election.name,
-            date: date(data.election.date),
-          })
+        ? chosen == null
+          ? m.meta_election({
+              name: data.election.name,
+              date: date(data.election.date),
+            })
+          : m.election_race_meta({
+              race: chosen,
+              election: data.election.name,
+              date: date(data.election.date),
+            })
         : data.kind === "day"
           ? m.local_meta({ place: data.local.name, date: date(data.date) })
           : m.meta_polity({
@@ -129,7 +166,7 @@
     ].map(([type, suffix]) => ({
       "@type": "DataDownload",
       encodingFormat: type,
-      contentUrl: `${page.url.origin}${page.url.pathname}.${suffix}${query}`,
+      contentUrl: `${page.url.origin}${visible.pathname}.${suffix}${query}`,
     })),
   });
   const jsonld = $derived(
@@ -155,12 +192,12 @@
   <link
     rel="alternate"
     type="application/json"
-    href="{page.url.origin}{page.url.pathname}.json{query}"
+    href="{page.url.origin}{visible.pathname}.json{query}"
   />
   <link
     rel="alternate"
     type="text/markdown"
-    href="{page.url.origin}{page.url.pathname}.md{query}"
+    href="{page.url.origin}{visible.pathname}.md{query}"
   />
   {#if data.kind === "contest" && data.contest.scope.isFine}
     <meta name="robots" content="noindex" />
@@ -214,9 +251,13 @@
       {#key `${data.id}${query}`}
         <Election
           id={data.id}
+          path={data.path}
+          {query}
+          chosen={picked}
           scope={data.scope}
           election={data.election}
           cycle={data.cycle}
+          series={data.series}
           sections={data.sections}
         />
       {/key}

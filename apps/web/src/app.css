@@ -193,6 +193,59 @@
   }
 }
 
+@property --fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes fade-edges {
+  0% {
+    --fade-start: 0px;
+  }
+  8%,
+  100% {
+    --fade-start: 1.75rem;
+  }
+  0%,
+  92% {
+    --fade-end: 1.75rem;
+  }
+  100% {
+    --fade-end: 0px;
+  }
+}
+
+@utility scroll-fade-x {
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  --fade-direction: to right;
+  mask-image: linear-gradient(
+    var(--fade-direction),
+    transparent,
+    #000 var(--fade-start),
+    #000 calc(100% - var(--fade-end)),
+    transparent
+  );
+  animation: fade-edges linear both;
+  animation-timeline: scroll(self inline);
+
+  &:dir(rtl) {
+    --fade-direction: to left;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility menu {
   z-index: 50;
   border: 1px solid var(--border);

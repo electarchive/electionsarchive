@@ -16,18 +16,19 @@
 </script>
 
 <div
-  class={cn("col-span-12 grid grid-cols-12 gap-px bg-border min-inline-0", {
-    "lg:grid-rows-[auto_1fr]": isSplit && aside != null,
-  })}
+  class={cn(
+    "@container col-span-12 grid grid-cols-12 gap-px bg-border min-inline-0",
+    { "@4xl:grid-rows-[auto_1fr]": isSplit && aside != null },
+  )}
 >
   {#if results != null}
     <div
       class={cn(
         "col-span-12 flex flex-col gap-px bg-border min-inline-0 *:last:grow",
         {
-          "lg:col-span-5 xl:col-span-4": isSplit,
-          "lg:row-span-2": isSplit && aside == null,
-          "lg:col-span-8": !isSplit && aside != null,
+          "@4xl:col-span-5 @6xl:col-span-4": isSplit,
+          "@4xl:row-span-2": isSplit && aside == null,
+          "@4xl:col-span-8": !isSplit && aside != null,
         },
       )}
     >
@@ -37,11 +38,11 @@
   {#if map != null}
     <div
       class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
-        "lg:col-span-7 lg:row-span-2 xl:col-span-8": results != null,
-        "lg:col-span-8": results == null && aside != null,
+        "@4xl:col-span-7 @4xl:row-span-2 @6xl:col-span-8": results != null,
+        "@4xl:col-span-8": results == null && aside != null,
       })}
     >
-      <div class="grid gap-2 lg:sticky lg:inset-bs-3">
+      <div class="grid gap-2 @4xl:sticky @4xl:inset-bs-3">
         {@render map()}
       </div>
     </div>
@@ -49,8 +50,8 @@
   {#if aside != null}
     <div
       class={cn("col-span-12 grid bg-card min-inline-0", {
-        "lg:col-span-5 xl:col-span-4": isSplit,
-        "lg:col-span-4": !isSplit && (results != null || map != null),
+        "@4xl:col-span-5 @6xl:col-span-4": isSplit,
+        "@4xl:col-span-4": !isSplit && (results != null || map != null),
       })}
     >
       {@render aside()}

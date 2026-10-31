@@ -41,7 +41,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
-  import { unit } from "./unit.js";
+  import { MODES, unit } from "./unit.js";
 
   type Places = NonNullable<
     Extract<PageData, { kind: "contest" }>["contest"]["places"]
@@ -71,6 +71,7 @@
     shade = "winner",
     isLinked = false,
     pick,
+    onshade,
     sources = null,
     explore = null,
     neighbors = null,
@@ -114,14 +115,16 @@
       path: string;
       query: string;
       isCurrent: boolean;
+      isPending?: boolean;
     }>;
     home?: string | null;
     span: { from: string; to: string; forward: boolean } | null;
     only?: number | string | null;
     focus?: number | null;
-    shade?: "winner" | "bubbles" | number;
+    shade?: (typeof MODES)[number] | number;
     isLinked?: boolean;
     pick?: (code: string) => void;
+    onshade?: (shade: (typeof MODES)[number] | number) => void;
     sources?: Array<string> | null;
     explore?: string | null;
     neighbors?:
@@ -146,19 +149,10 @@
   const STEPS = [16, 36, 56, 78, 100];
   const SWINGS = [0.02, 0.05, 0.1];
   const COMPARED = new Set(["swing", "arrows", "flips", "turnout_change"]);
-  const MODES = [
-    "winner",
-    "split",
-    "bubbles",
-    "turnout",
-    "turnout_change",
-    "swing",
-    "arrows",
-    "flips",
-  ] as const;
 
   const uid = $props.id();
   let opening = $state<number | null>(null);
+  let going = $state<string | null>(null);
   let listing = $state<string | null>(null);
   const globe = $derived(
     levels.length > 1
@@ -247,6 +241,7 @@
     if (isLinked) {
       keep({ shade: shading === shade ? null : String(shading) });
     }
+    onshade?.(shading);
   });
   let isBasemap = $state(page.url.searchParams.get("basemap") !== "off");
   const scheme = $derived(tiles.split(/[./]/u)[0] ?? "");
@@ -1918,7 +1913,7 @@
 >
   <p id="{uid}-hint" class="sr-only">{m.map_hint()}</p>
   <div
-    class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+    class="@container flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
     data-export-skip
   >
     {#if !isDeclared}
@@ -1929,7 +1924,7 @@
       >
         <span
           id="{uid}-shading"
-          class="shrink-0 text-sm/7 font-semibold whitespace-nowrap sm:self-start"
+          class="shrink-0 text-sm/7 font-semibold whitespace-nowrap @xl:self-start"
           >{m.map_color_by()}</span
         >
         <Select.Root
@@ -1940,7 +1935,7 @@
           }}
         >
           <Select.Trigger
-            class="text-sm font-semibold min-inline-0 data-[size=default]:block-10 sm:hidden"
+            class="text-sm font-semibold min-inline-0 data-[size=default]:block-10 @xl:hidden"
             aria-labelledby="{uid}-shading"
           >
             <span class="truncate"
@@ -1994,10 +1989,12 @@
             {/if}
           </Select.Content>
         </Select.Root>
-        <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
+        <div
+          class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 @max-xl:hidden"
+        >
           {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...(isProportional ? [{ value: "split" as const, label: m.map_mode_split() }] : []), ...options.map( (option) => ({ value: option.index, label: option.name }) ), ...(extras.length > 0 ? [{ value: "more" as const, label: extra?.name ?? more }] : []), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [...(isTally ? [] : [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }]), { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
             {#if group.length > 0}
-              <div class="flex shrink-0">
+              <div class="scroll-fade-x flex max-inline-full">
                 {#each group as choice (choice.value)}
                   {#if choice.value === "more"}
                     <DropdownMenu.Root>
@@ -2092,15 +2089,26 @@
       </div>
     {/if}
     {#if tiers.length > 1}
-      <div class="flex" role="group" aria-label={m.map_level()}>
+      <div
+        class="scroll-fade-x flex max-inline-full"
+        role="group"
+        aria-label={m.map_level()}
+      >
         {#each tiers as level (level.code)}
+          {const isOn = $derived(
+            going == null ? level.isCurrent : going === level.code,
+          )}
+          {const isBusy = $derived(
+            level.isPending === true ||
+              (going === level.code && !level.isCurrent),
+          )}
           <svelte:element
             this={pick == null ? "a" : "button"}
             class={cn(
-              "-ms-px flex items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
+              "-ms-px flex items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
               {
                 "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                  level.isCurrent,
+                  isOn,
               },
             )}
             href={pick == null
@@ -2108,14 +2116,51 @@
               : undefined}
             type={pick == null ? undefined : "button"}
             role={pick == null ? undefined : "button"}
-            aria-current={pick == null && level.isCurrent ? "true" : undefined}
-            aria-pressed={pick == null ? undefined : level.isCurrent}
+            aria-current={pick == null && isOn ? "true" : undefined}
+            aria-pressed={pick == null ? undefined : isOn}
+            aria-busy={isBusy ? "true" : undefined}
             data-sveltekit-reset="false"
-            onclick={() => pick?.(level.code)}
+            onclick={(event: MouseEvent) => {
+              if (pick != null) {
+                pick(level.code);
+                return;
+              }
+              if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey ||
+                event.button !== 0 ||
+                level.isCurrent
+              ) {
+                return;
+              }
+              event.preventDefault();
+              const url = new URL(location.href);
+              const asked = new URLSearchParams(level.query);
+              for (const [key, value] of asked) {
+                if (value !== page.url.searchParams.get(key)) {
+                  url.searchParams.set(key, value);
+                }
+              }
+              url.pathname = resolve("/[...path]", { path: level.path });
+              going = level.code;
+              void goto(url, { reset: false }).finally(() => {
+                going = null;
+              });
+            }}
             >{level.label}
-            <span class="font-figures text-[0.6875rem] font-normal tabular-nums"
-              >{level.count}</span
-            ></svelte:element
+            {#if isBusy}
+              <span
+                class="animate-spin rounded-full border-2 border-current/30 border-bs-current block-3 inline-3 motion-reduce:animate-none"
+                aria-hidden="true"
+              ></span>
+            {:else}
+              <span
+                class="font-figures text-[0.6875rem] font-normal tabular-nums"
+                >{level.count}</span
+              >
+            {/if}</svelte:element
           >
         {/each}
       </div>

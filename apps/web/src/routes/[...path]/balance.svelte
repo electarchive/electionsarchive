@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import Name from "#lib/components/name.svelte";
-  import { count, percent } from "#lib/format.js";
+  import { count, initials, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Bar from "./bar.svelte";
@@ -43,6 +43,7 @@
       .slice(0, 2)
       .toSorted((a, b) => parts.indexOf(a) - parts.indexOf(b)),
   );
+  const isPictured = $derived(shown.some((part) => part.photo != null));
   const figure = (value: number) => (isCount ? count(value) : percent(value));
 </script>
 
@@ -53,7 +54,7 @@
       { "line-clamp-2 text-balance": isFull, truncate: !isFull },
     )}
   >
-    {#if part.photo == null && present.length > 2}
+    {#if part.photo == null && present.length > 2 && !(isPictured && part.person != null)}
       <span
         class="me-1.5 inline-block rounded-xs bg-(--party) align-[-0.02em] block-[0.62em] inline-[0.62em]"
       ></span>
@@ -130,6 +131,18 @@
                 width="56"
                 height="56"
               />
+            {:else if isPictured && part.person != null}
+              <span
+                class={cn(
+                  "grid shrink-0 place-items-center rounded-full bg-secondary font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-2 ring-offset-card select-none",
+                  {
+                    "text-[0.9375rem] block-12 inline-12 sm:text-base sm:block-14 sm:inline-14":
+                      isLead,
+                    "text-[0.875rem] block-11 inline-11": !isLead,
+                  },
+                )}
+                aria-hidden="true">{initials(part.label)}</span
+              >
             {/if}
             <span class="grid gap-2 min-inline-0">
               <span
@@ -142,7 +155,11 @@
                   { "ms-[-0.05em]": at === 0, "me-[-0.02em]": at === 1 },
                 )}>{figure(part.value)}</span
               >
-              {@render label(part, isLead && part.photo != null)}
+              {@render label(
+                part,
+                isLead &&
+                  (part.photo != null || (isPictured && part.person != null)),
+              )}
             </span>
           </span>
         </Name>

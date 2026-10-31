@@ -19,8 +19,13 @@
 
   const {
     series,
-  }: { series: Extract<PageData, { kind: "contest" }>["contest"]["series"] } =
-    $props();
+    label = m.series_label(),
+    all = m.series_all_label,
+  }: {
+    series: Extract<PageData, { kind: "contest" }>["contest"]["series"];
+    label?: string;
+    all?: (input: { count: number }) => string;
+  } = $props();
 
   const carried = $derived.by(() => {
     const query = new URLSearchParams(
@@ -264,7 +269,7 @@
   class={cn("flex items-stretch gap-1.5 min-inline-0", {
     "md:col-span-2": years.length > 8,
   })}
-  aria-label={m.series_label()}
+  aria-label={label}
 >
   {@render step(previous, "[", m.series_previous, ChevronLeftIcon)}
   <div
@@ -371,7 +376,7 @@
     wide
     {items}
     value={years[at]?.path ?? null}
-    label={m.series_all_label({ count: items.length })}
+    label={all({ count: items.length })}
     placeholder=""
     search={m.series_filter()}
     empty={m.series_empty()}
@@ -386,7 +391,7 @@
         {...props}
         type="button"
         class="flex shrink-0 items-center gap-1.5 rounded-sm border border-input bg-card ps-2.5 pe-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-8 hover:bg-secondary"
-        aria-label={m.series_all_label({ count: items.length })}
+        aria-label={all({ count: items.length })}
         >{m.series_all({ count: items.length })}<ChevronsUpDownIcon
           class="text-muted-foreground block-3.5 inline-3.5"
         /></button

@@ -12786,23 +12786,44 @@ async function races(
                   person: string;
                   party: string | null;
                   isIncumbent: boolean | null;
+                  isElected: boolean;
+                  isTacit: boolean;
                 }>(sql`
-                  select coalesce(fm.into_id, fc.person_id) as person, coalesce(fo.party_id, fc.member_of_party_id) as party, fc.is_incumbent as "isIncumbent"
+                  select coalesce(fm.into_id, fc.person_id) as person, coalesce(fo.party_id, fc.member_of_party_id) as party, fc.is_incumbent as "isIncumbent",
+                    exists (select from outcome x where x.result_set_id = rs.id and x.option_id = fo.id and x.kind in ('elected', 'won')) as "isElected",
+                    rs.kind is not distinct from 'tacit' as "isTacit"
                   from contest_option fo
                   join candidacy fc on fc.option_id = fo.id and fc.role = 'head'
                   left join entity_merge fm on fm.entity_id = fc.person_id
+                  left join lateral (
+                    select rs.id, rs.kind::text as kind from result_set rs
+                    where rs.contest_id = fo.contest_id and ${latest("rs")} order by rs.stage desc limit 1
+                  ) rs on true
                   where fo.contest_id = ${single.id}::uuid and fo.kind = 'candidate'
                   order by fo.ballot_position nulls last, fo.k
                 `);
-                const people = await names(
-                  found.rows.flatMap((row) =>
-                    [row.person, row.party].filter((id) => id != null),
+                const [people, colors] = await Promise.all([
+                  names(
+                    found.rows.flatMap((row) =>
+                      [row.person, row.party].filter((id) => id != null),
+                    ),
+                    date,
                   ),
-                  date,
-                );
+                  refs(
+                    found.rows.flatMap((row) => row.party ?? []),
+                    date,
+                  ),
+                ]);
                 return found.rows.map((row) => ({
                   person: row.person,
                   isIncumbent: row.isIncumbent,
+                  isElected: row.isElected,
+                  isTacit: row.isTacit,
+                  key: row.party,
+                  color:
+                    row.party == null
+                      ? null
+                      : (colors.get(row.party)?.color ?? null),
                   name: people.full.get(row.person) ?? "",
                   party:
                     row.party == null
@@ -13473,6 +13494,10 @@ export const elections = {
               v.object({
                 person: v.string(),
                 isIncumbent: v.nullable(v.boolean()),
+                isElected: v.boolean(),
+                isTacit: v.boolean(),
+                key: v.nullable(v.string()),
+                color: v.nullable(v.string()),
                 name: v.string(),
                 party: v.nullable(v.string()),
               }),
@@ -14755,6 +14780,64 @@ export const elections = {
           .toArray()
           .toSorted((a, b) => a.place.localeCompare(b.place)),
       };
+    }),
+  series: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/series",
+        summary:
+          "List the elections of the same kind in the same polity, in date order, with the given one marked current",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          date: v.nullable(v.string()),
+          year: v.nullable(v.number()),
+          path: v.nullable(v.string()),
+          name: v.string(),
+          current: v.boolean(),
+          annulled: v.boolean(),
+          isRemainder: v.boolean(),
+          notional: v.boolean(),
+          gap: v.boolean(),
+          winner: v.null(),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        date: string | null;
+        year: number | null;
+        annulled: boolean;
+      }>(sql`
+        select e.id, e.date_from::text as date, extract(year from e.date_from)::int as year,
+          e.status::text = 'annulled' as annulled
+        from election x
+        join election e on e.polity_id = x.polity_id and e.kind = x.kind
+        left join election p on p.id = e.parent_id
+        where x.id = ${input.id}::uuid
+          and (e.id = x.id or ((p.id is null or p.polity_id <> e.polity_id)
+            and not exists (select from entity_merge m where m.entity_id = e.id)))
+        order by e.date_from nulls first, e.id
+      `);
+      const ids = found.rows.map((row) => row.id);
+      const [labels, slugs] = await Promise.all([names(ids, null), paths(ids)]);
+      return found.rows.map((row) => ({
+        date: row.date,
+        year: row.year,
+        path: slugs.get(row.id) ?? null,
+        name: labels.full.get(row.id) ?? "",
+        current: row.id === input.id,
+        annulled: row.annulled,
+        isRemainder: false,
+        notional: false,
+        gap: false,
+        winner: null,
+      }));
     }),
   lead: os
     .meta(

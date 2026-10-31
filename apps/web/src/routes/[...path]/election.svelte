@@ -1,16 +1,18 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { page } from "$app/state";
-  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import ArrowLeftIcon from "@lucide/svelte/icons/arrow-left";
+  import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
   import {
     createQueries,
     createQuery,
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
-  import { MediaQuery, SvelteSet } from "svelte/reactivity";
+  import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import NoteBody from "#lib/components/note-body.svelte";
+  import { Button } from "#lib/components/ui/button/index.js";
   import { gapNote } from "#lib/coverage.js";
   import {
     count,
@@ -27,6 +29,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import type { MODES } from "./unit.js";
   import Alongside from "./alongside.svelte";
   import Balance from "./balance.svelte";
   import ByElections from "./byelections.svelte";
@@ -38,12 +41,14 @@
   import Lead from "./lead.svelte";
   import Local from "./local.svelte";
   import PlaceMap from "./map.svelte";
+  import Navigator from "./navigator.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
   import Regions from "./regions.svelte";
   import Results from "./results.svelte";
   import Road from "./road.svelte";
   import Seated from "./seated.svelte";
+  import Series from "./series.svelte";
   import States from "./states.svelte";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
@@ -53,12 +58,20 @@
     scope,
     election,
     cycle,
+    series,
     sections,
+    path,
+    query,
+    chosen,
   }: {
     id: string;
+    path: string;
+    query: string;
+    chosen: string | null;
     scope: { id: string; path: string } | null;
     election: Extract<PageData, { kind: "election" }>["election"];
     cycle: Extract<PageData, { kind: "election" }>["cycle"];
+    series: Extract<PageData, { kind: "election" }>["series"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
   } = $props();
 
@@ -300,6 +313,29 @@
     });
   });
 
+  const focus = $derived(
+    chosen == null ? -1 : ordered.findIndex((race) => race.anchor === chosen),
+  );
+  const isNavigated = $derived(ordered.length > 2 || focus !== -1);
+  const isBallot = $derived(
+    ordered.length > 2 &&
+      ordered.every((race) => race.kind === "ballot_question"),
+  );
+  const isGrid = $derived(
+    isNavigated &&
+      new Set(ordered.flatMap((race) => race.scope ?? [])).size > 1,
+  );
+  const shown = $derived(
+    isNavigated
+      ? focus === -1 && (isGrid || isBallot)
+        ? -1
+        : Math.max(focus, 0)
+      : null,
+  );
+  const head = $derived(Math.max(shown ?? 0, 0));
+  const isActive = (index: number) =>
+    shown == null ? index < 4 : index === shown;
+
   const stages = $derived(
     election.elections
       .filter((child) => child.isStage)
@@ -369,7 +405,7 @@
           race.map != null &&
           race.places != null &&
           race.results.length !== 1 &&
-          index < 4,
+          isActive(index),
         staleTime: Infinity,
         queryFn: async () => {
           const found = await orpc.contests.locate.call({ path });
@@ -397,10 +433,8 @@
     }),
   }));
   const regional = $state<Record<number, string>>({});
-  const opened = $state<Record<number, boolean>>({});
-  const wide = new MediaQuery("min-width: 40rem");
-  let isHydrated = $state(false);
   const firstRound = $state<Record<number, boolean>>({});
+  const shades = $state<Record<number, (typeof MODES)[number] | number>>({});
   const regionals = createQueries(() => ({
     queries: ordered.map((race, index) => ({
       ...orpc.elections.regional.queryOptions({
@@ -411,10 +445,81 @@
         race.sample != null &&
         race.map != null &&
         race.places != null &&
-        index < 4,
+        isActive(index),
       staleTime: Infinity,
       meta: { quiet: true },
     })),
+  }));
+  const levelled = createQueries(() => ({
+    queries: ordered.map((race, index) => {
+      const path = race.path ?? "";
+      const by = regional[index] ?? "";
+      return {
+        queryKey: ["levelled", race.path ?? race.anchor, by],
+        enabled:
+          race.path != null &&
+          race.count === 1 &&
+          race.places != null &&
+          by !== race.places.level &&
+          race.places.levels.some((level) => level.code === by),
+        staleTime: Infinity,
+        meta: { quiet: true },
+        queryFn: async () => {
+          const found = await orpc.contests.locate.call({ path });
+          const [places, bounds] = await Promise.all([
+            orpc.contests.places.call({ id: found.id, by }),
+            orpc.contests.boundaries.call({ id: found.id, level: by }),
+          ]);
+          const level = bounds.find((entry) => entry.scheme === places?.level);
+          const own = bounds.find(
+            (entry) => entry.k != null && entry.scheme !== places?.level,
+          );
+          const inner = bounds.find(
+            (entry) =>
+              entry.k == null &&
+              entry.scheme !== places?.level &&
+              entry.tiles != null,
+          );
+          const districts = places?.districts ?? [];
+          return places == null || level?.tiles == null || own?.frame == null
+            ? null
+            : {
+                places,
+                since: null,
+                world: null,
+                map: {
+                  tiles: level.tiles,
+                  own:
+                    own.tiles == null || own.k == null
+                      ? null
+                      : { tiles: own.tiles, k: own.k, parted: own.parted },
+                  nested:
+                    inner?.tiles == null || districts.length === 0
+                      ? null
+                      : {
+                          tiles: inner.tiles,
+                          ks: districts.map((row) => row.k),
+                        },
+                  frame: own.frame,
+                  blank: level.blank,
+                  outlying: level.outlying,
+                  parted: level.parted,
+                  approximate: level.approximate,
+                  shaped: null,
+                  credits: [
+                    ...new Set(
+                      [...level.sources, ...own.sources].flatMap((source) =>
+                        source.attribution == null
+                          ? [source.publisher]
+                          : [source.publisher, source.attribution],
+                      ),
+                    ),
+                  ],
+                },
+              };
+        },
+      };
+    }),
   }));
   const worlds = createQueries(() => ({
     queries: ordered.map((race, index) => ({
@@ -1234,320 +1339,871 @@
       ? races.findIndex((race) => race.body != null && race.count > 1)
       : -1,
   );
-  const isBallot = $derived(
-    races.length > 2 && races.every((race) => race.kind === "ballot_question"),
-  );
   const others = $derived(
-    isBallot ? races : races.slice(1).filter((race) => !race.isLater),
+    isNavigated
+      ? races.filter(
+          (race, index) =>
+            index !== shown && !race.isLater && (!isGrid || race.scope == null),
+        )
+      : isBallot
+        ? races
+        : races.slice(1).filter((race) => !race.isLater),
   );
-  const isFolding = $derived(isHydrated && !wide.current && races.length > 4);
-  $effect(() => {
-    isHydrated = true;
-    const spot = untrack(() =>
-      races.findIndex((race) => `#race-${race.anchor}` === location.hash),
+
+  const office = (race: (typeof races)[number]) =>
+    race.scope != null && race.name.endsWith(` (${race.scope})`)
+      ? race.name.slice(0, -race.scope.length - 3)
+      : race.name;
+  const tints = $derived(
+    new Map(
+      races.flatMap((race) => {
+        const first =
+          race.places?.legend[0] ??
+          race.places?.rows.find((row) => row.declared != null)?.declared;
+        return race.scope == null || first == null
+          ? []
+          : [
+              [
+                race.scope,
+                swatch(first.color, `party:${first.party ?? race.scope}`),
+              ],
+            ];
+      }),
+    ),
+  );
+  const listed = (people: Array<{ name: string }>) =>
+    new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
+      people.map((person) => person.name),
     );
-    if (spot > 0) {
-      opened[spot] = true;
-      void tick().then(() =>
-        document.querySelector(location.hash)?.scrollIntoView(),
-      );
-    }
+  const contested = (race: (typeof races)[number]) =>
+    (race.places?.rows ?? []).filter(
+      (row) => row.path != null && (row.valid ?? 0) > 0,
+    ).length;
+
+  const rail = $derived.by(() => {
+    const home = election.breadcrumbs.at(-1)?.name;
+    const entries = races.map((race) => {
+      const isQuestion = race.kind === "ballot_question";
+      const split = race.name.indexOf(", ");
+      const [title, rest] =
+        race.scope != null
+          ? [office(race), race.scope]
+          : split === -1
+            ? [race.name, ""]
+            : [race.name.slice(0, split), race.name.slice(split + 2)];
+      const top = race.balance.parts
+        .filter((part) => part.value > 0)
+        .toSorted((a, b) => b.value - a.value)
+        .slice(0, race.balance.isCount ? 2 : 1);
+      const item = {
+        anchor: race.anchor,
+        label: isQuestion
+          ? home != null && title.startsWith(`${home} `)
+            ? title.slice(home.length + 1)
+            : title
+          : rest === ""
+            ? title
+            : rest.charAt(0).toUpperCase() + rest.slice(1),
+        swatch: race.scope == null ? null : (tints.get(race.scope) ?? null),
+        lead: top.map((part) => ({
+          key: part.key,
+          label: part.label,
+          color: part.color,
+          value: race.balance.isCount ? count(part.value) : percent(part.value),
+        })),
+        detail: isQuestion
+          ? rest === ""
+            ? null
+            : rest
+          : top.length > 0
+            ? null
+            : race.results.length === 0 && race.field.length > 0
+              ? listed(race.field)
+              : race.count > 1
+                ? m.race_contests({ count: count(race.count) })
+                : null,
+        parts: race.balance.parts.map((part) => ({
+          key: part.key,
+          color: part.color,
+          value: part.value,
+        })),
+        total: race.balance.total,
+      };
+      return { race, isQuestion, title, rest, item };
+    });
+    return [false, true].flatMap((isQuestion) => {
+      const picked = entries.filter((entry) => entry.isQuestion === isQuestion);
+      if (picked.length === 0) {
+        return [];
+      }
+      const groups = Map.groupBy(picked, (entry) =>
+        isQuestion ? entry.race.anchor : entry.title,
+      )
+        .entries()
+        .map(([key, group]) => {
+          const lone = group.length === 1 ? group[0] : undefined;
+          if (lone != null) {
+            return {
+              key,
+              title: null,
+              head: null,
+              items: [
+                isQuestion
+                  ? lone.item
+                  : { ...lone.item, label: lone.race.name },
+              ],
+            };
+          }
+          const top = group.find((entry) => entry.rest === "");
+          return {
+            key,
+            title: group[0]?.title ?? key,
+            head: top?.item ?? null,
+            items: group
+              .filter((entry) => entry !== top)
+              .map((entry) => entry.item),
+          };
+        })
+        .toArray();
+      return [
+        {
+          key: isQuestion ? "questions" : "races",
+          title: entries.some((entry) => entry.isQuestion !== isQuestion)
+            ? isQuestion
+              ? m.election_nav_questions()
+              : m.election_nav_races()
+            : null,
+          groups,
+        },
+      ];
+    });
   });
+  const sequence = $derived(
+    rail.flatMap((section) =>
+      section.groups.flatMap((group) =>
+        [...(group.head == null ? [] : [group.head]), ...group.items].flatMap(
+          (item) => races.find((race) => race.anchor === item.anchor) ?? [],
+        ),
+      ),
+    ),
+  );
+  const grid = $derived.by(() => {
+    if (!isGrid) {
+      return null;
+    }
+    const scoped = races.filter((race) => race.scope != null);
+    const offices = [...new Set(scoped.map(office))];
+    return {
+      offices,
+      rows: [...new Set(scoped.map((race) => race.scope ?? ""))].map(
+        (party) => ({
+          party,
+          color: tints.get(party) ?? null,
+          cells: offices.map(
+            (name) =>
+              scoped.find(
+                (race) => race.scope === party && office(race) === name,
+              ) ?? null,
+          ),
+        }),
+      ),
+    };
+  });
+  const searchable = $derived(
+    election.contests.flatMap((contest) =>
+      contest.path == null || races.some((race) => race.path === contest.path)
+        ? []
+        : [{ name: contest.name, path: contest.path }],
+    ),
+  );
+
+  let pane = $state<HTMLElement>();
+  const link = (anchor: string | null) =>
+    `${resolve("/[...path]", { path: anchor == null ? path : `${path}/${anchor}` })}${query}`;
+  const select = async (anchor: string | null) => {
+    await goto(link(anchor), { shallow: true, state: {} });
+    await tick();
+    if (pane == null) {
+      return;
+    }
+    if (pane.getBoundingClientRect().top < 0) {
+      pane.scrollIntoView();
+    }
+    pane.focus({ preventScroll: true });
+  };
+  const follow = (event: MouseEvent, anchor: string | null) => {
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0
+    ) {
+      return;
+    }
+    event.preventDefault();
+    void select(anchor);
+  };
 </script>
 
-<header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
-  <h1 class="title">
-    {election.name}
-  </h1>
-  <p
-    class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
-  >
-    <time datetime={election.date}>{date(election.date)}</time>
-    {#if STATUSES[election.status] != null}
-      <span class="highlighter px-1 font-semibold text-foreground"
-        >{STATUSES[election.status]?.()}</span
-      >
+<header
+  class="col-span-12 grid gap-x-8 gap-y-3 bg-card px-3.5 pbs-4 pbe-3.5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
+>
+  <div class="grid gap-1.5 min-inline-0">
+    <h1 class="title">
+      {election.name}
+    </h1>
+    <p
+      class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
+    >
+      <time datetime={election.date}>{date(election.date)}</time>
+      {#if STATUSES[election.status] != null}
+        <span class="highlighter px-1 font-semibold text-foreground"
+          >{STATUSES[election.status]?.()}</span
+        >
+      {/if}
+    </p>
+    {#if election.coverage != null}
+      <p class="text-[0.9375rem] font-semibold">
+        {m.election_partial({
+          held: count(election.coverage.held),
+          of: count(election.coverage.of),
+          noun: election.coverage.noun,
+        })}
+      </p>
     {/if}
-  </p>
-  {#if election.coverage != null}
-    <p class="text-[0.9375rem] font-semibold">
-      {m.election_partial({
-        held: count(election.coverage.held),
-        of: count(election.coverage.of),
-        noun: election.coverage.noun,
-      })}
-    </p>
-  {/if}
-  {#if election.turnout != null}
-    {const turnout = $derived(election.turnout)}
-    {const share = $derived(turnout.voters / turnout.registered)}
-    <p
-      class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.9375rem]"
-    >
-      <span class="font-figures tabular-nums"
-        >{m.election_turnout({
-          voters: count(turnout.voters),
-          registered: count(turnout.registered),
-          share: percent(share),
-        })}</span
+    {#if election.turnout != null}
+      {const turnout = $derived(election.turnout)}
+      {const share = $derived(turnout.voters / turnout.registered)}
+      <p
+        class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.9375rem]"
       >
-      {#if turnout.earlier != null}
-        <span class="font-figures font-semibold tabular-nums"
-          >{m.turnout_since({
-            points: points(
-              share - turnout.earlier.voters / turnout.earlier.registered,
-            ),
-            year: String(turnout.earlier.year),
+        <span class="font-figures tabular-nums"
+          >{m.election_turnout({
+            voters: count(turnout.voters),
+            registered: count(turnout.registered),
+            share: percent(share),
           })}</span
         >
-      {/if}
-      {#if turnout.reporting < turnout.of}
-        <span class="text-[0.8125rem] text-muted-foreground"
-          >{m.turnout_partial({
-            reporting: String(turnout.reporting),
-            of: String(turnout.of),
-          })}</span
-        >
-      {/if}
-      {#if turnout.basis != null}
-        <span class="text-[0.8125rem] text-muted-foreground"
-          >{turnout.basis === "rejected"
-            ? m.turnout_basis_rejected()
-            : m.turnout_basis_valid()}</span
-        >
-      {/if}
-    </p>
-  {/if}
-  {#if election.control != null}
-    <p
-      class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.9375rem]"
-    >
-      <span class="inline-flex items-center gap-1.5 font-semibold">
-        {#if election.control.key != null}
-          <span
-            class="shrink-0 rounded-xs block-2.5 inline-2.5"
-            style:background={swatch(
-              election.control.color,
-              election.control.key,
-            )}
-          ></span>
+        {#if turnout.earlier != null}
+          <span class="font-figures font-semibold tabular-nums"
+            >{m.turnout_since({
+              points: points(
+                share - turnout.earlier.voters / turnout.earlier.registered,
+              ),
+              year: String(turnout.earlier.year),
+            })}</span
+          >
         {/if}
-        {election.control.label == null
-          ? m.control_none({ total: count(election.control.total) })
-          : m.control_party({
-              party: election.control.label,
-              seats: count(election.control.seats),
-              total: count(election.control.total),
-            })}
-      </span>
-      <span class="text-[0.8125rem] text-muted-foreground"
-        >{election.control.isRolled === true
-          ? m.control_rolled()
-          : m.control_derived()}</span
+        {#if turnout.reporting < turnout.of}
+          <span class="text-[0.8125rem] text-muted-foreground"
+            >{m.turnout_partial({
+              reporting: String(turnout.reporting),
+              of: String(turnout.of),
+            })}</span
+          >
+        {/if}
+        {#if turnout.basis != null}
+          <span class="text-[0.8125rem] text-muted-foreground"
+            >{turnout.basis === "rejected"
+              ? m.turnout_basis_rejected()
+              : m.turnout_basis_valid()}</span
+          >
+        {/if}
+      </p>
+    {/if}
+    {#if election.control != null}
+      <p
+        class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.9375rem]"
       >
-    </p>
+        <span class="inline-flex items-center gap-1.5 font-semibold">
+          {#if election.control.key != null}
+            <span
+              class="shrink-0 rounded-xs block-2.5 inline-2.5"
+              style:background={swatch(
+                election.control.color,
+                election.control.key,
+              )}
+            ></span>
+          {/if}
+          {election.control.label == null
+            ? m.control_none({ total: count(election.control.total) })
+            : m.control_party({
+                party: election.control.label,
+                seats: count(election.control.seats),
+                total: count(election.control.total),
+              })}
+        </span>
+        <span class="text-[0.8125rem] text-muted-foreground"
+          >{election.control.isRolled === true
+            ? m.control_rolled()
+            : m.control_derived()}</span
+        >
+      </p>
+    {/if}
+  </div>
+  {#if series.length > 1}
+    <Series
+      {series}
+      label={m.election_series_label()}
+      all={m.election_series_all_label}
+    />
   {/if}
 </header>
 
 {@render ticket()}
 
-{#if election.composition != null}
-  {const composition = $derived(election.composition)}
-  <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
-    <h2 class="text-[0.8125rem] font-bold">{m.composition_title()}</h2>
-    <table class="border-collapse text-sm inline-full sm:inline-auto">
-      <thead>
-        <tr class="border-be text-[0.8125rem] text-muted-foreground">
-          <th class="pe-6 pbe-1.5 text-start font-normal" scope="col">
-            {m.col_party()}
-          </th>
-          {#if composition.hasBefore}
-            <th class="px-2 pbe-1.5 text-end font-normal" scope="col">
-              {m.col_before()}
-            </th>
-          {/if}
-          <th class="px-2 pbe-1.5 text-end font-normal" scope="col">
-            {m.col_after()}
-          </th>
-          {#if composition.hasBefore}
-            <th class="ps-2 pbe-1.5 text-end font-normal" scope="col">
-              {m.col_change()}
-            </th>
-          {/if}
-        </tr>
-      </thead>
-      <tbody>
-        {#each composition.rows as row (row.key)}
-          <tr class="border-be border-border/60 last:border-be-0">
-            <th class="py-1.5 pe-6 text-start font-normal" scope="row">
-              <span class="inline-flex items-center gap-1.5">
-                <span
-                  class="shrink-0 rounded-xs block-2.5 inline-2.5"
-                  style:background={swatch(row.color, row.key)}
-                ></span>
-                <Name
-                  label={row.short ?? row.label}
-                  party={row.key}
-                  color={swatch(row.color, row.key)}
-                  hasSwatch={false}
-                />
-              </span>
+{#if isNavigated}
+  <div
+    class="col-span-12 flex flex-col gap-px bg-border lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]"
+  >
+    <Navigator
+      sections={rail}
+      current={focus === -1 ? null : chosen}
+      href={link}
+      select={(anchor: string | null) => void select(anchor)}
+      contests={searchable}
+    />
+    <div
+      bind:this={pane}
+      class="flex flex-col gap-px bg-border outline-none min-inline-0 after:grow after:bg-card after:content-[''] max-lg:scroll-mbs-14"
+      tabindex="-1"
+    >
+      {@render body()}
+    </div>
+  </div>
+{:else}
+  {@render body()}
+{/if}
+
+{#snippet body()}
+  {#if election.composition != null && focus === -1}
+    {const composition = $derived(election.composition)}
+    <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
+      <h2 class="text-[0.8125rem] font-bold">{m.composition_title()}</h2>
+      <table class="border-collapse text-sm inline-full sm:inline-auto">
+        <thead>
+          <tr class="border-be text-[0.8125rem] text-muted-foreground">
+            <th class="pe-6 pbe-1.5 text-start font-normal" scope="col">
+              {m.col_party()}
             </th>
             {#if composition.hasBefore}
-              <td
-                class="px-2 py-1.5 text-end font-figures text-muted-foreground tabular-nums"
-              >
-                {count(row.before ?? 0)}
-              </td>
+              <th class="px-2 pbe-1.5 text-end font-normal" scope="col">
+                {m.col_before()}
+              </th>
             {/if}
-            <td
-              class="px-2 py-1.5 text-end font-figures font-semibold tabular-nums"
-            >
-              {count(row.after)}
-            </td>
+            <th class="px-2 pbe-1.5 text-end font-normal" scope="col">
+              {m.col_after()}
+            </th>
             {#if composition.hasBefore}
-              <td class="py-1.5 ps-2 text-end font-figures tabular-nums">
-                {points((row.after - (row.before ?? 0)) / 100, 0)}
-              </td>
+              <th class="ps-2 pbe-1.5 text-end font-normal" scope="col">
+                {m.col_change()}
+              </th>
             {/if}
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  </section>
-{/if}
-
-{#if election.councils.length > 0}
-  <Councils councils={election.councils} />
-{/if}
-
-{#if races.length === 0 && election.contests.length > 0}
-  <section class="col-span-12 bg-card px-3.5 py-3">
-    <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_contests()}</h2>
-    <ul class="grid text-sm">
-      {#each election.contests as contest, index (index)}
-        <li
-          class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
-        >
-          {#if contest.path == null}
-            <span class="font-semibold">{contest.name}</span>
-          {:else}
-            <Preview class="font-semibold hover:highlighter" path={contest.path}
-              >{contest.name}</Preview
-            >
-          {/if}
-          {#if contest.children > 0}
-            <span class="shrink-0 text-[0.8125rem] text-muted-foreground"
-              >{m.election_parts({ count: contest.children })}</span
-            >
-          {/if}
-        </li>
-      {/each}
-    </ul>
-  </section>
-{/if}
-
-{#each races as race, index (index)}
-  {#if index === 0 && isBallot}
-    {@render board()}
+        </thead>
+        <tbody>
+          {#each composition.rows as row (row.key)}
+            <tr class="border-be border-border/60 last:border-be-0">
+              <th class="py-1.5 pe-6 text-start font-normal" scope="row">
+                <span class="inline-flex items-center gap-1.5">
+                  <span
+                    class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                    style:background={swatch(row.color, row.key)}
+                  ></span>
+                  <Name
+                    label={row.short ?? row.label}
+                    party={row.key}
+                    color={swatch(row.color, row.key)}
+                    hasSwatch={false}
+                  />
+                </span>
+              </th>
+              {#if composition.hasBefore}
+                <td
+                  class="px-2 py-1.5 text-end font-figures text-muted-foreground tabular-nums"
+                >
+                  {count(row.before ?? 0)}
+                </td>
+              {/if}
+              <td
+                class="px-2 py-1.5 text-end font-figures font-semibold tabular-nums"
+              >
+                {count(row.after)}
+              </td>
+              {#if composition.hasBefore}
+                <td class="py-1.5 ps-2 text-end font-figures tabular-nums">
+                  {points((row.after - (row.before ?? 0)) / 100, 0)}
+                </td>
+              {/if}
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </section>
   {/if}
-  {#if index === 0 && !isBallot && race.results.length > 0 && (race.wards ?? []).length === 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
-    {#snippet headline()}
-      <div
-        id="race-{race.anchor}"
-        class="grid scroll-mbs-4 content-start gap-1.5 bg-card px-3.5 pbs-4 pbe-3"
+
+  {#if election.councils.length > 0 && focus === -1}
+    <Councils councils={election.councils} />
+  {/if}
+
+  {#if races.length === 0 && election.contests.length > 0}
+    <section class="col-span-12 bg-card px-3.5 py-3">
+      <h2 class="mbe-1.5 text-[0.8125rem] font-bold">
+        {m.election_contests()}
+      </h2>
+      <ul class="grid text-sm">
+        {#each election.contests as contest, index (index)}
+          <li
+            class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
+          >
+            {#if contest.path == null}
+              <span class="font-semibold">{contest.name}</span>
+            {:else}
+              <Preview
+                class="font-semibold hover:highlighter"
+                path={contest.path}>{contest.name}</Preview
+              >
+            {/if}
+            {#if contest.children > 0}
+              <span class="shrink-0 text-[0.8125rem] text-muted-foreground"
+                >{m.election_parts({ count: contest.children })}</span
+              >
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+
+  {#if isNavigated && focus === -1}
+    {#if grid != null}
+      <section
+        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-4 pbe-3"
+        aria-labelledby="grid-title"
       >
         <h2
+          id="grid-title"
           class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em] text-balance"
         >
-          {race.name}
+          {m.election_grid_title()}
         </h2>
-        {#if race.lede != null}
-          {@render lede(race, true)}
+        <div class="-mx-3.5 overflow-x-auto">
+          <table class="border-collapse text-sm inline-full">
+            <thead>
+              <tr class="text-[0.8125rem] text-muted-foreground">
+                <th
+                  class="sticky inset-s-0 bg-card ps-3.5 pe-4 pbe-1.5 text-start font-normal"
+                  scope="col"
+                >
+                  {m.col_party()}
+                </th>
+                {#each grid.offices as name (name)}
+                  <th
+                    class="px-3 pbe-1.5 text-start font-semibold text-foreground min-inline-44"
+                    scope="col"
+                  >
+                    {name}
+                  </th>
+                {/each}
+              </tr>
+            </thead>
+            <tbody>
+              {#each grid.rows as row (row.party)}
+                <tr class="border-bs border-border/60">
+                  <th
+                    class="sticky inset-s-0 bg-card py-2 ps-3.5 pe-4 text-start align-top font-semibold whitespace-nowrap"
+                    scope="row"
+                  >
+                    <span class="inline-flex items-center gap-1.5">
+                      {#if row.color != null}
+                        <span
+                          class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                          style:background={row.color}
+                        ></span>
+                      {/if}
+                      {row.party}
+                    </span>
+                  </th>
+                  {#each row.cells as cell, at (at)}
+                    <td class="p-0 align-top">
+                      {#if cell == null}
+                        <span
+                          class="block px-3 py-2 text-[0.8125rem] text-muted-foreground"
+                          >{m.election_grid_none()}</span
+                        >
+                      {:else}
+                        {const top = $derived(
+                          cell.balance.parts.toSorted(
+                            (a, b) => b.value - a.value,
+                          )[0],
+                        )}
+                        {const fought = $derived(contested(cell))}
+                        <a
+                          class="grid gap-0.5 px-3 py-2 keycap hover:bg-secondary"
+                          href={link(cell.anchor)}
+                          onclick={(event) => follow(event, cell.anchor)}
+                        >
+                          {#if cell.results.length > 0 && top != null}
+                            <span class="font-semibold">{top.label}</span>
+                            <span
+                              class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                              >{cell.balance.isCount
+                                ? count(top.value)
+                                : percent(top.value)}</span
+                            >
+                          {:else if cell.count > 1}
+                            <span class="font-semibold"
+                              >{m.race_contests({
+                                count: count(cell.count),
+                              })}</span
+                            >
+                            {#if fought > 0}
+                              <span
+                                class="text-[0.8125rem] text-muted-foreground"
+                                >{m.election_grid_contested({
+                                  count: count(fought),
+                                })}</span
+                              >
+                            {/if}
+                          {:else if cell.field.length > 0}
+                            <span class="font-semibold"
+                              >{listed(cell.field)}</span
+                            >
+                            {#if cell.field.length === 1}
+                              <span
+                                class="text-[0.8125rem] text-muted-foreground"
+                                >{m.map_unopposed()}</span
+                              >
+                            {/if}
+                          {:else}
+                            <span class="text-[0.8125rem] text-muted-foreground"
+                              >{m.no_results()}</span
+                            >
+                          {/if}
+                        </a>
+                      {/if}
+                    </td>
+                  {/each}
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {/if}
+    {#if shown === -1 && others.length > 0}
+      {@render board()}
+    {/if}
+  {/if}
+
+  {#each races as race, index (index)}
+    {#if shown == null || index === shown}
+      {#if index === 0 && isBallot && shown == null}
+        {@render board()}
+      {/if}
+      {#if index === head && (shown != null || !isBallot) && race.results.length > 0 && (race.wards ?? []).length === 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
+        {#snippet headline()}
+          <div
+            id="race-{race.anchor}"
+            class="grid scroll-mbs-4 content-start gap-1.5 bg-card px-3.5 pbs-4 pbe-3"
+          >
+            <h2
+              class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em] text-balance"
+            >
+              {race.name}
+            </h2>
+            {#if race.lede != null}
+              {@render lede(race, true)}
+            {/if}
+            {@render meta(race)}
+          </div>
+        {/snippet}
+        {#snippet totals()}
+          {@render tally(race, true)}
+        {/snippet}
+        <Lead results={headline} map={totals} />
+      {:else if index === head || race.results.length !== 1}
+        <section
+          id="race-{race.anchor}"
+          class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
+        >
+          <div
+            class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
+          >
+            <h2
+              class={cn("font-[760] tracking-[-0.015em] text-balance", {
+                "text-[clamp(1.5rem,2.4vw,2rem)]/tight": index === head,
+                "text-2xl/tight": index !== head,
+              })}
+            >
+              {race.name}
+            </h2>
+            {@render meta(race)}
+          </div>
+          {#if race.lede != null && (index === head || race.isLater) && (race.wards ?? []).length === 0}
+            <p
+              class={cn("text-pretty max-inline-[64ch]", {
+                "text-[1.0625rem]": index === head,
+                "text-[0.9375rem]": index !== head,
+              })}
+            >
+              {race.lede}
+            </p>
+          {/if}
+          {#if race.results.length === 0 && !race.isPrimaries && (race.wards ?? []).length === 0}
+            {@render field(race)}
+          {/if}
+          {#if (race.wards ?? []).length > 0}
+            {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= race.outcomes.places.rows.length}
+              <div class="grid gap-2 pbs-1">
+                {#if race.map.tiles != null}
+                  <PlaceMap
+                    places={race.outcomes.places}
+                    colors={race.outcomes.tones}
+                    tiles={race.map.tiles}
+                    own={race.map.own}
+                    nested={race.map.nested}
+                    frame={race.map.frame}
+                    blank={race.map.blank ?? null}
+                    outlying={race.map.outlying ?? null}
+                    parted={race.map.parted ?? null}
+                    approximate={race.map.approximate}
+                    sources={race.map.credits}
+                    noun={race.places?.levels[0]?.noun ?? ""}
+                    votes={race.votes}
+                    names={race.outcomes.titles}
+                    levels={[]}
+                    span={null}
+                  />
+                {:else}
+                  <p
+                    class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+                  >
+                    {m.map_rebuilding()}
+                  </p>
+                {/if}
+              </div>
+            {/if}
+            {@render wards(race.wards ?? [], race.anchor, race.lede)}
+          {/if}
+        </section>
+      {/if}
+      {#if (race.wards ?? []).length === 0 && (race.results.length > 1 || race.isPrimaries || (index === head && race.results.length > 0))}
+        {#if race.electors != null && race.electors.rows.length > 0 && (races.length === 1 || index === focus)}
+          <Electors electors={race.electors} />
         {/if}
-        {@render meta(race)}
-      </div>
-    {/snippet}
-    {#snippet totals()}
-      {@render tally(race, true)}
-    {/snippet}
-    <Lead results={headline} map={totals} />
-  {:else if index === 0 || race.results.length !== 1}
-    <section
-      id="race-{race.anchor}"
-      class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
-    >
-      <div
-        class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
-      >
-        <h2
-          class={cn("font-[760] tracking-[-0.015em] text-balance", {
-            "text-[clamp(1.5rem,2.4vw,2rem)]/tight": index === 0,
-            "text-2xl/tight": index > 0,
-          })}
-        >
-          {race.name}
-        </h2>
-        {@render meta(race)}
-      </div>
-      {#if race.lede != null && (index === 0 || race.isLater) && (race.wards ?? []).length === 0}
-        <p
-          class={cn("text-pretty max-inline-[64ch]", {
-            "text-[1.0625rem]": index === 0,
-            "text-[0.9375rem]": index > 0,
-          })}
-        >
-          {race.lede}
-        </p>
-      {/if}
-      {#if race.results.length === 0 && !race.isPrimaries && (race.wards ?? []).length === 0}
-        {@render field(race)}
-      {:else if isFolding && index > 0}
-        <button
-          type="button"
-          class="mbs-1.5 mbe-2 flex items-center justify-center gap-1.5 rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-10 hover:bg-secondary"
-          aria-expanded={opened[index] === true}
-          onclick={() => (opened[index] = opened[index] !== true)}
-          >{race.results.length === 0 &&
-          (race.wards ?? []).length > 0 &&
-          (race.wards ?? []).every(
-            (row) => row.share == null && row.runoff == null,
-          )
-            ? opened[index] === true
-              ? m.race_hide_field()
-              : m.race_show_field()
-            : opened[index] === true
-              ? m.race_hide()
-              : m.race_show()}<ChevronDownIcon
-            class={cn("transition-transform block-4 inline-4", {
-              "rotate-180": opened[index] === true,
-            })}
-            aria-hidden="true"
-          /></button
-        >
-      {/if}
-      {#if (race.wards ?? []).length > 0 && (!isFolding || index === 0 || opened[index] === true)}
-        {#if race.outcomes != null && race.map != null && (race.map.shaped ?? 0) * 2 >= race.outcomes.places.rows.length}
-          <div class="grid gap-2 pbs-1">
-            {#if race.map.tiles != null}
-              <PlaceMap
-                places={race.outcomes.places}
-                colors={race.outcomes.tones}
-                tiles={race.map.tiles}
-                own={race.map.own}
-                nested={race.map.nested}
-                frame={race.map.frame}
-                blank={race.map.blank ?? null}
-                outlying={race.map.outlying ?? null}
-                parted={race.map.parted ?? null}
-                approximate={race.map.approximate}
-                sources={race.map.credits}
-                noun={race.places?.levels[0]?.noun ?? ""}
-                votes={race.votes}
-                names={race.outcomes.titles}
-                levels={[]}
-                span={null}
-              />
+        {const isSeated = $derived(
+          race.seated.length > 0 &&
+            (!race.isLone || election.parent != null) &&
+            race.electors == null &&
+            !race.isOffice &&
+            !race.isSlate &&
+            (race.kind !== "body_seats" || race.body != null),
+        )}
+        {const isMapped = $derived(
+          race.map != null &&
+            race.places != null &&
+            (isNavigated || index < 4 || race.body != null),
+        )}
+        {const target = $derived(
+          "drawn" in race
+            ? (races.find(
+                (other) => !other.isTotal && other.anchor === race.drawn,
+              ) ?? race)
+            : race,
+        )}
+        {const explore = $derived(
+          scope == null &&
+            target.path == null &&
+            target.count >= 3 &&
+            races.every(
+              (other) =>
+                other.anchor.replace(
+                  /-(?:\d+|round-\d+|by-.+|special-election)$/u,
+                  "",
+                ) !==
+                  target.anchor.replace(
+                    /-(?:\d+|round-\d+|by-.+|special-election)$/u,
+                    "",
+                  ) || other.count <= target.count,
+            )
+            ? `${path}/${target.anchor}`
+            : null,
+        )}
+        {#snippet mapped()}
+          {#if race.map != null && race.places != null}
+            {const option = $derived(regionals[index]?.data ?? null)}
+            {const picked = $derived(levelled[index]?.data ?? null)}
+            {const region = $derived(
+              regional[index] === "world.country"
+                ? (worlds[index]?.data ?? null)
+                : regional[index] === option?.places.level
+                  ? option
+                  : regional[index] === picked?.places.level
+                    ? picked
+                    : null,
+            )}
+            {const swing = $derived(
+              region == null ? (swings[index]?.data ?? null) : null,
+            )}
+            {const final = $derived(
+              region == null && firstRound[index] !== true
+                ? race.decided
+                : null,
+            )}
+            {const places = $derived(
+              region?.places ?? swing?.places ?? final?.places ?? race.places,
+            )}
+            {const shape = $derived(region?.map ?? race.map)}
+            {const asked = $derived(regional[index] ?? places.level)}
+            {const kept = $derived(shades[index])}
+            {#if race.decided != null && region == null}
+              <div
+                class="flex self-start"
+                role="group"
+                aria-label={m.map_round_label()}
+              >
+                {#each [false, true] as isFirst (isFirst)}
+                  <button
+                    type="button"
+                    class={cn(
+                      "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
+                      {
+                        "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                          (firstRound[index] === true) === isFirst,
+                      },
+                    )}
+                    aria-pressed={(firstRound[index] === true) === isFirst}
+                    onclick={() => (firstRound[index] = isFirst)}
+                    >{isFirst ? m.round_first() : m.map_round_seats()}</button
+                  >
+                {/each}
+              </div>
+            {/if}
+            {#if shape.tiles != null}
+              {#key places.level}
+                <PlaceMap
+                  {places}
+                  {explore}
+                  colors={swing == null && region == null
+                    ? (final?.tones ?? race.tones)
+                    : places.legend.map((item) => swatch(item.color, item.key))}
+                  tiles={shape.tiles}
+                  hexes={hexes.data ?? null}
+                  own={shape.own}
+                  nested={shape.nested}
+                  frame={shape.frame}
+                  blank={shape.blank ?? null}
+                  outlying={shape.outlying ?? null}
+                  parted={shape.parted ?? null}
+                  approximate={shape.approximate}
+                  sources={shape.credits}
+                  noun={places.levels.find(
+                    (entry) => entry.code === places.level,
+                  )?.noun ?? ""}
+                  isTally={race.isTally}
+                  tallies={race.electors == null ||
+                  region != null ||
+                  places.level !== race.places.level
+                    ? null
+                    : places.legend.map(
+                        (item) =>
+                          race.electors?.rows.find(
+                            (row) => row.key === item.key,
+                          )?.votes ?? null,
+                      )}
+                  votes={final == null ? race.votes : m.col_votes()}
+                  names={swing == null && region == null
+                    ? (final?.titles ?? race.titles)
+                    : places.legend.map((item) =>
+                        item.person == null
+                          ? (item.short ?? item.label)
+                          : item.label,
+                      )}
+                  levels={option?.map == null
+                    ? race.count === 1 &&
+                      race.path != null &&
+                      race.places.levels.length > 1
+                      ? race.places.levels.map((entry) => ({
+                          code: entry.code,
+                          label:
+                            entry.noun.charAt(0).toUpperCase() +
+                            entry.noun.slice(1),
+                          count: entry.count,
+                          path: "",
+                          query: "",
+                          isCurrent: entry.code === asked,
+                          isPending:
+                            entry.code === asked && asked !== places.level,
+                        }))
+                      : []
+                    : [
+                        ...[race.places, option.places].map((entry) => {
+                          const noun = entry.levels[0]?.noun ?? "";
+                          return {
+                            code: entry.level,
+                            label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                            count: entry.rows.length,
+                            path: "",
+                            query: "",
+                            isCurrent: entry.level === asked,
+                            isPending:
+                              entry.level === asked && asked !== places.level,
+                          };
+                        }),
+                        ...(option.world == null
+                          ? []
+                          : [
+                              {
+                                code: "world.country",
+                                label: "",
+                                count: option.world,
+                                path: "",
+                                query: "",
+                                isCurrent: asked === "world.country",
+                                isPending:
+                                  asked === "world.country" &&
+                                  asked !== places.level,
+                              },
+                            ]),
+                      ]}
+                  home={election.breadcrumbs[0]?.name ?? null}
+                  pick={(code: string) => (regional[index] = code)}
+                  shade={typeof kept === "number"
+                    ? (() => {
+                        const at = places.legend.findIndex(
+                          (item) => item.key === race.places?.legend[kept]?.key,
+                        );
+                        return at === -1 ? "winner" : at;
+                      })()
+                    : (kept ?? "winner")}
+                  onshade={(value) => {
+                    shades[index] =
+                      typeof value === "number"
+                        ? (race.places?.legend ?? []).findIndex(
+                            (item) => item.key === places.legend[value]?.key,
+                          )
+                        : value;
+                  }}
+                  span={swing?.span ??
+                    (region?.since != null
+                      ? {
+                          from: region.since,
+                          to: election.date?.slice(0, 4) ?? "",
+                          forward: false,
+                        }
+                      : race.count > 1 &&
+                          race.since != null &&
+                          race.places.rows.some((row) => row.prior != null)
+                        ? {
+                            from: race.since,
+                            to: election.date?.slice(0, 4) ?? "",
+                            forward: false,
+                          }
+                        : null)}
+                />
+              {/key}
             {:else}
               <p
                 class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
@@ -1555,363 +2211,271 @@
                 {m.map_rebuilding()}
               </p>
             {/if}
-          </div>
-        {/if}
-        {@render wards(race.wards ?? [], race.anchor, race.lede)}
-      {/if}
-    </section>
-  {/if}
-  {#if (race.wards ?? []).length === 0 && (race.results.length > 1 || race.isPrimaries || (index === 0 && race.results.length > 0)) && (!isFolding || index === 0 || opened[index] === true)}
-    {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
-      <Electors electors={race.electors} />
-    {/if}
-    {const isSeated = $derived(
-      race.seated.length > 0 &&
-        (!race.isLone || election.parent != null) &&
-        race.electors == null &&
-        !race.isOffice &&
-        !race.isSlate &&
-        (race.kind !== "body_seats" || race.body != null),
-    )}
-    {const isMapped = $derived(
-      race.map != null &&
-        race.places != null &&
-        (index < 4 || race.body != null),
-    )}
-    {const target = $derived(
-      "drawn" in race
-        ? (races.find(
-            (other) => !other.isTotal && other.anchor === race.drawn,
-          ) ?? race)
-        : race,
-    )}
-    {const explore = $derived(
-      scope == null &&
-        target.path == null &&
-        target.count >= 3 &&
-        races.every(
-          (other) =>
-            other.anchor.replace(
-              /-(?:\d+|round-\d+|by-.+|special-election)$/u,
-              "",
-            ) !==
-              target.anchor.replace(
-                /-(?:\d+|round-\d+|by-.+|special-election)$/u,
-                "",
-              ) || other.count <= target.count,
-        )
-        ? `${page.url.pathname.slice(1)}/${target.anchor}`
-        : null,
-    )}
-    {#snippet mapped()}
-      {#if race.map != null && race.places != null}
-        {const option = $derived(regionals[index]?.data ?? null)}
-        {const region = $derived(
-          regional[index] === "world.country"
-            ? (worlds[index]?.data ?? null)
-            : regional[index] === option?.places.level
-              ? option
-              : null,
-        )}
-        {const swing = $derived(swings[index]?.data ?? null)}
-        {const final = $derived(
-          region == null && firstRound[index] !== true ? race.decided : null,
-        )}
-        {const places = $derived(
-          region?.places ?? swing?.places ?? final?.places ?? race.places,
-        )}
-        {const shape = $derived(region?.map ?? race.map)}
-        {#if race.decided != null && region == null}
+            {const districts = $derived(
+              new Set(
+                places.rows
+                  .filter((row) => row.isPool !== true)
+                  .map((row) => row.k),
+              ).size,
+            )}
+            {#if shape.shaped != null && shape.shaped < districts}
+              <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+                {m.map_shaped({
+                  shaped: count(shape.shaped),
+                  count: count(districts),
+                })}
+              </p>
+            {/if}
+          {/if}
+        {/snippet}
+        {#snippet summary()}
           <div
-            class="flex self-start"
-            role="group"
-            aria-label={m.map_round_label()}
+            class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
           >
-            {#each [false, true] as isFirst (isFirst)}
-              <button
-                type="button"
-                class={cn(
-                  "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
-                  {
-                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                      (firstRound[index] === true) === isFirst,
-                  },
-                )}
-                aria-pressed={(firstRound[index] === true) === isFirst}
-                onclick={() => (firstRound[index] = isFirst)}
-                >{isFirst ? m.round_first() : m.map_round_seats()}</button
-              >
+            <Results
+              rows={race.rows}
+              trace={race.count === 1 ? race.path : null}
+              span={null}
+              votes={race.votes}
+              isTally={race.isTally}
+              nouns={plural(race.places?.levels[0]?.noun ?? "contest")}
+              seats={race.isLone || (race.isOffice && race.electors == null)
+                ? null
+                : race.electors == null && !race.isSlate
+                  ? m.col_seats()
+                  : m.col_electors()}
+            />
+            {#if race.unopposed != null}
+              <p class="px-1.5 pbs-1 text-[0.8125rem] text-muted-foreground">
+                {m.race_unopposed({
+                  seats: race.unopposed.seats,
+                  parties: new Intl.ListFormat(getLocale(), {
+                    type: "conjunction",
+                  }).format(
+                    race.unopposed.parties.map((party) =>
+                      m.race_unopposed_party({
+                        party:
+                          party.label === "" ? m.record_none() : party.label,
+                        seats: count(party.seats),
+                      }),
+                    ),
+                  ),
+                })}
+              </p>
+            {/if}
+            {#if race.covered != null && race.size != null}
+              <p class="px-1.5 pbs-1 text-[0.8125rem] text-muted-foreground">
+                {m.race_partial_seats({
+                  count: count(race.covered),
+                  total: count(race.size),
+                })}
+              </p>
+            {/if}
+            {#if (race.multiple ?? 0) > 0}
+              <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
+                {m.race_multiple({
+                  count: race.multiple ?? 0,
+                  noun: race.places?.levels[0]?.noun ?? "constituency",
+                  nouns: plural(race.places?.levels[0]?.noun ?? "constituency"),
+                })}
+              </p>
+            {/if}
+            {#each race.repeats ?? [] as repeat, index (index)}
+              <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
+                {repeat.people.length === 1
+                  ? m.race_repeat_one({
+                      name: repeat.people[0]?.name ?? "",
+                      count: count(repeat.people[0]?.returns ?? 0),
+                      party: definite(repeat.label),
+                      seats: count(repeat.seats),
+                      members: count(repeat.members),
+                    })
+                  : m.race_repeat_many({
+                      names: new Intl.ListFormat(getLocale(), {
+                        style: "long",
+                        type: "conjunction",
+                      }).format(repeat.people.map((person) => person.name)),
+                      party: definite(repeat.label),
+                      seats: count(repeat.seats),
+                      members: count(repeat.members),
+                    })}
+              </p>
             {/each}
           </div>
-        {/if}
-        {#if shape.tiles != null}
-          {#key places.level}
-            <PlaceMap
-              {places}
-              {explore}
-              colors={swing == null && region == null
-                ? (final?.tones ?? race.tones)
-                : places.legend.map((item) => swatch(item.color, item.key))}
-              tiles={shape.tiles}
-              hexes={hexes.data ?? null}
-              own={shape.own}
-              nested={shape.nested}
-              frame={shape.frame}
-              blank={shape.blank ?? null}
-              outlying={shape.outlying ?? null}
-              parted={shape.parted ?? null}
-              approximate={shape.approximate}
-              sources={shape.credits}
-              noun={places.levels[0]?.noun ?? ""}
-              isTally={race.isTally}
-              tallies={race.electors == null ||
-              region != null ||
-              places.level !== race.places.level
-                ? null
-                : places.legend.map(
-                    (item) =>
-                      race.electors?.rows.find((row) => row.key === item.key)
-                        ?.votes ?? null,
-                  )}
-              votes={final == null ? race.votes : m.col_votes()}
-              names={swing == null && region == null
-                ? (final?.titles ?? race.titles)
-                : places.legend.map((item) =>
-                    item.person == null
-                      ? (item.short ?? item.label)
-                      : item.label,
-                  )}
-              levels={option?.map == null
-                ? []
-                : [
-                    ...[race.places, option.places].map((entry) => {
-                      const noun = entry.levels[0]?.noun ?? "";
-                      return {
-                        code: entry.level,
-                        label: noun.charAt(0).toUpperCase() + noun.slice(1),
-                        count: entry.rows.length,
-                        path: "",
-                        query: "",
-                        isCurrent: entry.level === places.level,
-                      };
-                    }),
-                    ...(option.world == null
-                      ? []
-                      : [
-                          {
-                            code: "world.country",
-                            label: "",
-                            count: option.world,
-                            path: "",
-                            query: "",
-                            isCurrent: places.level === "world.country",
-                          },
-                        ]),
-                  ]}
-              home={election.breadcrumbs[0]?.name ?? null}
-              pick={(code: string) => (regional[index] = code)}
-              span={swing?.span ??
-                (region?.since != null
-                  ? {
-                      from: region.since,
-                      to: election.date?.slice(0, 4) ?? "",
-                      forward: false,
-                    }
-                  : race.count > 1 &&
-                      race.since != null &&
-                      race.places.rows.some((row) => row.prior != null)
-                    ? {
-                        from: race.since,
-                        to: election.date?.slice(0, 4) ?? "",
-                        forward: false,
-                      }
-                    : null)}
-            />
-          {/key}
-        {:else}
+        {/snippet}
+        {#snippet hemicycle()}
+          <Seated
+            parties={[...race.seated, ...race.lost]}
+            places={race.holders}
+            body={race.body}
+            size={race.isTier || scope != null ? null : race.size}
+            date={election.date}
+            place={race.name}
+            region={election.parent == null
+              ? null
+              : (election.breadcrumbs
+                  .filter((crumb) => crumb.path !== election.parent?.path)
+                  .at(-1)?.name ?? null)}
+            change={race.change}
+            isComplete={scope == null &&
+              !race.isTier &&
+              (race.size != null || race.count === 1)}
+            partners={race.isTier ? [] : race.partners}
+            governing={race.size === chamber?.size ? governing : []}
+            isStaggered={race.isStaggered}
+            unelected={race.unelected ?? []}
+          />
+        {/snippet}
+        <Lead
+          results={race.isPrimaries ? null : summary}
+          map={isMapped && race.map != null && race.places != null
+            ? mapped
+            : null}
+          aside={isSeated ? hemicycle : null}
+        />
+        {#if race.isNotional === true && race.change != null && race.since != null}
           <p
-            class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+            class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground"
           >
-            {m.map_rebuilding()}
+            {m.seats_change_notional({ year: race.since })}
           </p>
         {/if}
-        {const districts = $derived(
-          new Set(
-            places.rows
-              .filter((row) => row.isPool !== true)
-              .map((row) => row.k),
-          ).size,
-        )}
-        {#if shape.shaped != null && shape.shaped < districts}
-          <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
-            {m.map_shaped({
-              shaped: count(shape.shaped),
-              count: count(districts),
+        {#if race.resized != null && race.change != null && race.since != null && race.size != null}
+          <p
+            class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground"
+          >
+            {m.seats_change_resized({
+              year: race.since,
+              before: count(race.resized),
+              now: count(race.size),
             })}
           </p>
+        {/if}
+        {#if (race.straddled ?? 0) > 0}
+          <p
+            class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground"
+          >
+            {m.seats_change_straddled()}
+          </p>
+        {/if}
+        {#if race.places != null && !race.isTotal}
+          {const shown = $derived(
+            regional[index] === "world.country"
+              ? (worlds[index]?.data?.places ?? race.places)
+              : regional[index] != null &&
+                  regional[index] === regionals[index]?.data?.places.level
+                ? regionals[index].data.places
+                : regional[index] != null &&
+                    regional[index] === levelled[index]?.data?.places.level
+                  ? levelled[index].data.places
+                  : firstRound[index] === true
+                    ? race.places
+                    : (race.decided?.places ?? race.places),
+          )}
+          <Places
+            places={{
+              ...shown,
+              levels: shown.levels.filter(
+                (level) => level.code === shown.level,
+              ),
+            }}
+            span={null}
+            trace={race.count === 1 ? race.path : null}
+            publishers={[]}
+            votes={shown === race.decided?.places ? m.col_votes() : race.votes}
+            isTally={race.isTally}
+            isMapped={isMapped ||
+              races.some(
+                (other) =>
+                  "drawn" in other &&
+                  other.drawn === race.anchor &&
+                  other.map != null,
+              )}
+            limit={index === focus ? 100 : isBallot ? 5 : 10}
+          />
         {/if}
       {/if}
-    {/snippet}
-    {#snippet summary()}
-      <div
-        class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
-      >
-        <Results
-          rows={race.rows}
-          trace={race.count === 1 ? race.path : null}
-          span={null}
-          votes={race.votes}
-          isTally={race.isTally}
-          nouns={plural(race.places?.levels[0]?.noun ?? "contest")}
-          seats={race.isLone || (race.isOffice && race.electors == null)
-            ? null
-            : race.electors == null && !race.isSlate
-              ? m.col_seats()
-              : m.col_electors()}
-        />
-        {#if race.unopposed != null}
-          <p class="px-1.5 pbs-1 text-[0.8125rem] text-muted-foreground">
-            {m.race_unopposed({
-              seats: race.unopposed.seats,
-              parties: new Intl.ListFormat(getLocale(), {
-                type: "conjunction",
-              }).format(
-                race.unopposed.parties.map((party) =>
-                  m.race_unopposed_party({
-                    party: party.label === "" ? m.record_none() : party.label,
-                    seats: count(party.seats),
-                  }),
-                ),
-              ),
-            })}
-          </p>
+      {#if index === regionsAt}
+        <Regions {id} />
+      {/if}
+      {#if index === 0 && focus === -1 && others.some((other) => other.results.length > 0 || other.lede != null || other.isPrimaries) && !isBallot}
+        {@render board()}
+      {/if}
+    {/if}
+  {/each}
+
+  {#if isNavigated && focus !== -1}
+    {const at = $derived(sequence.findIndex((race) => race.anchor === chosen))}
+    {const previous = $derived(sequence[at - 1])}
+    {const following = $derived(sequence[at + 1])}
+    <nav
+      class="col-span-12 grid grid-cols-2 gap-px bg-border"
+      aria-label={m.election_nav_position({
+        index: count(at + 1),
+        count: count(sequence.length),
+      })}
+    >
+      {#each [previous, following] as neighbor, side (side)}
+        {#if neighbor == null && side === 0}
+          <a
+            class="grid content-start gap-1 bg-card px-3.5 py-3 keycap hover:bg-secondary"
+            href={link(null)}
+            onclick={(event) => follow(event, null)}
+          >
+            <span
+              class="flex items-center gap-1.5 text-[0.8125rem] text-muted-foreground"
+            >
+              <ArrowLeftIcon class="block-3.5 inline-3.5" aria-hidden="true" />
+              {m.election_nav_back()}
+            </span>
+            <span class="text-[0.9375rem] font-semibold text-pretty"
+              >{election.name}</span
+            >
+          </a>
+        {:else if neighbor == null}
+          <span class="bg-card"></span>
+        {:else}
+          <a
+            class={cn(
+              "grid content-start gap-1 bg-card px-3.5 py-3 keycap hover:bg-secondary",
+              { "text-end": side === 1 },
+            )}
+            href={link(neighbor.anchor)}
+            onclick={(event) => follow(event, neighbor.anchor)}
+          >
+            <span
+              class={cn(
+                "flex items-center gap-1.5 text-[0.8125rem] text-muted-foreground",
+                { "justify-end": side === 1 },
+              )}
+            >
+              {#if side === 0}
+                <ArrowLeftIcon
+                  class="block-3.5 inline-3.5"
+                  aria-hidden="true"
+                />
+                {m.election_nav_previous()}
+              {:else}
+                {m.election_nav_next()}
+                <ArrowRightIcon
+                  class="block-3.5 inline-3.5"
+                  aria-hidden="true"
+                />
+              {/if}
+            </span>
+            <span class="text-[0.9375rem] font-semibold text-pretty"
+              >{neighbor.name}</span
+            >
+          </a>
         {/if}
-        {#if race.covered != null && race.size != null}
-          <p class="px-1.5 pbs-1 text-[0.8125rem] text-muted-foreground">
-            {m.race_partial_seats({
-              count: count(race.covered),
-              total: count(race.size),
-            })}
-          </p>
-        {/if}
-        {#if (race.multiple ?? 0) > 0}
-          <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
-            {m.race_multiple({
-              count: race.multiple ?? 0,
-              noun: race.places?.levels[0]?.noun ?? "constituency",
-              nouns: plural(race.places?.levels[0]?.noun ?? "constituency"),
-            })}
-          </p>
-        {/if}
-        {#each race.repeats ?? [] as repeat, index (index)}
-          <p class="px-1.5 text-[0.8125rem] text-muted-foreground">
-            {repeat.people.length === 1
-              ? m.race_repeat_one({
-                  name: repeat.people[0]?.name ?? "",
-                  count: count(repeat.people[0]?.returns ?? 0),
-                  party: definite(repeat.label),
-                  seats: count(repeat.seats),
-                  members: count(repeat.members),
-                })
-              : m.race_repeat_many({
-                  names: new Intl.ListFormat(getLocale(), {
-                    style: "long",
-                    type: "conjunction",
-                  }).format(repeat.people.map((person) => person.name)),
-                  party: definite(repeat.label),
-                  seats: count(repeat.seats),
-                  members: count(repeat.members),
-                })}
-          </p>
-        {/each}
-      </div>
-    {/snippet}
-    {#snippet hemicycle()}
-      <Seated
-        parties={[...race.seated, ...race.lost]}
-        places={race.holders}
-        body={race.body}
-        size={race.isTier || scope != null ? null : race.size}
-        date={election.date}
-        place={race.name}
-        region={election.parent == null
-          ? null
-          : (election.breadcrumbs
-              .filter((crumb) => crumb.path !== election.parent?.path)
-              .at(-1)?.name ?? null)}
-        change={race.change}
-        isComplete={scope == null &&
-          !race.isTier &&
-          (race.size != null || race.count === 1)}
-        partners={race.isTier ? [] : race.partners}
-        governing={race.size === chamber?.size ? governing : []}
-        isStaggered={race.isStaggered}
-        unelected={race.unelected ?? []}
-      />
-    {/snippet}
-    <Lead
-      results={race.isPrimaries ? null : summary}
-      map={isMapped && race.map != null && race.places != null ? mapped : null}
-      aside={isSeated ? hemicycle : null}
-    />
-    {#if race.isNotional === true && race.change != null && race.since != null}
-      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
-        {m.seats_change_notional({ year: race.since })}
-      </p>
-    {/if}
-    {#if race.resized != null && race.change != null && race.since != null && race.size != null}
-      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
-        {m.seats_change_resized({
-          year: race.since,
-          before: count(race.resized),
-          now: count(race.size),
-        })}
-      </p>
-    {/if}
-    {#if (race.straddled ?? 0) > 0}
-      <p class="col-span-12 bg-card px-3.5 py-2 text-xs text-muted-foreground">
-        {m.seats_change_straddled()}
-      </p>
-    {/if}
-    {#if race.places != null && !race.isTotal}
-      {const shown = $derived(
-        regional[index] === "world.country"
-          ? (worlds[index]?.data?.places ?? race.places)
-          : regional[index] != null &&
-              regional[index] === regionals[index]?.data?.places.level
-            ? regionals[index].data.places
-            : firstRound[index] === true
-              ? race.places
-              : (race.decided?.places ?? race.places),
-      )}
-      <Places
-        places={{
-          ...shown,
-          levels: shown.levels.filter((level) => level.code === shown.level),
-        }}
-        span={null}
-        trace={race.count === 1 ? race.path : null}
-        publishers={[]}
-        votes={shown === race.decided?.places ? m.col_votes() : race.votes}
-        isTally={race.isTally}
-        isMapped={isMapped ||
-          races.some(
-            (other) =>
-              "drawn" in other &&
-              other.drawn === race.anchor &&
-              other.map != null,
-          )}
-        limit={isBallot ? 5 : 10}
-      />
-    {/if}
+      {/each}
+    </nav>
   {/if}
-  {#if index === regionsAt}
-    <Regions {id} />
+
+  {#if focus === -1}
+    {@render trailing()}
   {/if}
-  {#if index === 0 && others.some((other) => other.results.length > 0 || other.lede != null || other.isPrimaries) && !isBallot}
-    {@render board()}
-  {/if}
-{/each}
+{/snippet}
 
 {#snippet ticket()}
   {const isRoad = $derived(cycle.primaries.length > 0)}
@@ -2036,12 +2600,17 @@
             <h3
               class="text-lg/tight font-[740] tracking-[-0.012em] text-balance"
             >
-              {#if other.results.length !== 1}
+              {#if isNavigated}
                 <a
                   class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href="#race-{other.anchor}"
-                  onclick={() => (opened[races.indexOf(other)] = true)}
+                  href={link(other.anchor)}
+                  onclick={(event) => follow(event, other.anchor)}
                   >{other.name}</a
+                >
+              {:else if other.results.length !== 1}
+                <a
+                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href="#race-{other.anchor}">{other.name}</a
                 >
               {:else if other.path == null}
                 {other.name}
@@ -2246,17 +2815,42 @@
   {#if race.field.length === 0}
     <p class="text-[0.9375rem] text-muted-foreground">{m.no_results()}</p>
   {:else}
-    <ul class="grid gap-1 pbe-2 text-[0.9375rem]">
+    {#if race.field.some((entry) => entry.isTacit)}
+      <p
+        class="font-serif text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
+      >
+        {m.declared_tacit()}
+      </p>
+    {/if}
+    <ul class="grid gap-1 pbs-1 pbe-2 text-[0.9375rem]">
       {#each race.field as entry (entry.person)}
-        <li class="flex flex-wrap items-baseline gap-x-1.5">
+        <li
+          class={cn("flex flex-wrap items-center gap-x-2 gap-y-1", {
+            "rounded-xs bg-[color-mix(in_oklab,var(--party)_16%,var(--card))] px-3 py-2.5 shadow-[inset_3px_0_0_var(--party)]":
+              entry.isElected,
+          })}
+          style:--party={swatch(entry.color, entry.key ?? entry.person)}
+        >
+          {#if !entry.isElected}
+            <span
+              class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
+              aria-hidden="true"
+            ></span>
+          {/if}
           <Name
-            class="font-semibold"
+            class={cn("font-semibold", { "text-lg/snug": entry.isElected })}
             label={entry.name}
             person={entry.person}
           />
           {#if entry.party != null}
             <span class="text-[0.8125rem] text-muted-foreground"
               >{entry.party}</span
+            >
+          {/if}
+          {#if entry.isElected}
+            <span
+              class="rounded-xs bg-(--party) px-1 text-xs font-semibold knockout"
+              >{m.outcome_won()}</span
             >
           {/if}
           {#if entry.isIncumbent === true}
@@ -2278,7 +2872,24 @@
 {/snippet}
 
 {#snippet meta(race: (typeof races)[number])}
-  <p class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground">
+  <div
+    class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[0.8125rem] text-muted-foreground"
+  >
+    {#if race.path != null}
+      <Button
+        variant={shown == null ? "outline" : "default"}
+        size={shown == null ? "sm" : "default"}
+        href={resolve("/[...path]", { path: race.path })}
+        >{race.results.length === 0 &&
+        race.field.length > 0 &&
+        race.field.every((entry) => !entry.isElected && !entry.isTacit)
+          ? m.race_open_scheduled()
+          : m.race_open()}<ArrowRightIcon
+          class="transition-transform duration-150 group-hover/button:translate-x-0.5 motion-reduce:transition-none rtl:-scale-x-100"
+          aria-hidden="true"
+        /></Button
+      >
+    {/if}
     {#if race.count > 1}
       <span
         >{race.nonvoting > 0
@@ -2287,15 +2898,6 @@
               nonvoting: count(race.nonvoting),
             })
           : m.race_contests({ count: count(race.count) })}</span
-      >
-    {/if}
-    {#if race.path != null}
-      <Preview
-        class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-        path={race.path}
-        >{race.results.length === 0 && race.field.length > 0
-          ? m.race_open_scheduled()
-          : m.race_open()}</Preview
       >
     {/if}
     {#if race.first?.path != null}
@@ -2311,7 +2913,7 @@
         })}</span
       >
     {/if}
-  </p>
+  </div>
 {/snippet}
 
 {#snippet tally(race: (typeof races)[number], isLead: boolean)}
@@ -2348,167 +2950,171 @@
   </div>
 {/snippet}
 
-{#if unplaced.length > 0}
-  <section class="col-span-12 bg-card px-3.5 py-3">
-    <h2 class="text-[0.8125rem] font-bold">{m.election_unplaced()}</h2>
-    <p class="mbe-1.5 text-[0.8125rem] text-muted-foreground">
-      {m.election_unplaced_detail()}
-    </p>
-    <ul class="grid gap-x-6 text-sm sm:grid-cols-2 lg:grid-cols-3">
-      {#each unplaced as contest, index (index)}
-        <li class="border-be border-border/60 py-1.5 last:border-be-0">
-          <Preview class="font-semibold hover:highlighter" path={contest.path}
-            >{contest.name}</Preview
-          >
-        </li>
-      {/each}
-    </ul>
-  </section>
-{/if}
-
-{#if sections.local != null}
-  <Local local={sections.local} isOwn={true} />
-{/if}
-{#if sections.counties != null}
-  <Counties counties={sections.counties} />
-{/if}
-{#if scope == null}
-  <Alongside {id} />
-  <Governments {id} {chamber} />
-  {#if regionsAt === -1}
-    <Regions {id} />
-  {/if}
-{/if}
-<Gains {id} within={scope?.id} />
-<ByElections {id} within={scope?.id} />
-
-{#if isTiled}
-  <Tiers
-    {id}
-    {parts}
-    noun={partNoun ?? ""}
-    race={ordered.find((race) => race.electors != null)?.name ?? null}
-  />
-{:else if parts.length >= 40}
-  <Winners {id} {parts} />
-{:else if parts.length > 0}
-  <States {id} />
-  {#if election.seated != null}
-    {const seated = $derived(election.seated)}
-    <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
-      <div class="flex flex-wrap items-baseline justify-between gap-x-4">
-        <h2 class="text-[0.8125rem] font-bold">{m.seats_title()}</h2>
-        <p class="text-[0.8125rem] text-muted-foreground">
-          {m.seats_filled({ count: count(seated.total) })}
-        </p>
-      </div>
-      <table class="border-collapse text-sm inline-full sm:inline-auto">
-        <thead>
-          <tr class="border-be text-[0.8125rem] text-muted-foreground">
-            <th class="pe-6 pbe-1.5 text-start font-normal" scope="col">
-              {m.col_party()}
-            </th>
-            <th class="ps-2 pbe-1.5 text-end font-normal" scope="col">
-              {m.col_seats()}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each seated.parties as row, index (index)}
-            <tr class="border-be border-border/60 last:border-be-0">
-              <th class="py-1.5 pe-6 text-start font-normal" scope="row">
-                <span class="inline-flex items-center gap-1.5">
-                  <span
-                    class="shrink-0 rounded-xs block-2.5 inline-2.5"
-                    style:background={swatch(row.color, `party:${row.label}`)}
-                  ></span>
-                  {row.isIndependent
-                    ? m.seats_independents()
-                    : (row.short ?? row.label)}
-                </span>
-              </th>
-              <td
-                class="py-1.5 ps-2 text-end font-figures font-semibold tabular-nums"
-              >
-                {count(row.seats)}
-              </td>
-            </tr>
-          {/each}
-          {#if seated.others != null}
-            <tr>
-              <th
-                class="py-1.5 pe-6 text-start font-normal text-muted-foreground"
-                scope="row"
-              >
-                {m.election_seated_others({
-                  count: count(seated.others.count),
-                })}
-              </th>
-              <td
-                class="py-1.5 ps-2 text-end font-figures text-muted-foreground tabular-nums"
-              >
-                {count(seated.others.seats)}
-              </td>
-            </tr>
-          {/if}
-        </tbody>
-      </table>
+{#snippet trailing()}
+  {#if unplaced.length > 0}
+    <section class="col-span-12 bg-card px-3.5 py-3">
+      <h2 class="text-[0.8125rem] font-bold">{m.election_unplaced()}</h2>
+      <p class="mbe-1.5 text-[0.8125rem] text-muted-foreground">
+        {m.election_unplaced_detail()}
+      </p>
+      <ul class="grid gap-x-6 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        {#each unplaced as contest, index (index)}
+          <li class="border-be border-border/60 py-1.5 last:border-be-0">
+            <Preview class="font-semibold hover:highlighter" path={contest.path}
+              >{contest.name}</Preview
+            >
+          </li>
+        {/each}
+      </ul>
     </section>
   {/if}
-  <section class="col-span-12 bg-card px-3.5 py-3">
-    <h2 class="mbe-2 text-[0.8125rem] font-bold">
-      {partNoun == null
-        ? m.election_children()
-        : m.election_places({ noun: partNoun })}
-    </h2>
-    {const isDated = $derived(
-      parts.some((child) => child.date !== election.date),
-    )}
-    <ul class="grid grid-cols-2 gap-x-6 text-sm sm:grid-cols-3 lg:grid-cols-4">
-      {#each parts as child, index (index)}
-        <li
-          class="flex flex-wrap items-baseline justify-between gap-x-3 border-be border-border/60 py-1.5 min-inline-0"
-        >
-          {#if child.path == null}
-            <span class="truncate">{child.place ?? child.name}</span>
-          {:else}
-            <Preview class="truncate hover:highlighter" path={child.path}
-              >{child.place ?? child.name}</Preview
-            >
-          {/if}
-          {#if isDated}
-            <time
-              class="shrink-0 font-figures text-xs text-muted-foreground"
-              datetime={child.date}>{date(child.date)}</time
-            >
-          {/if}
-          {#if child.lead != null && child.seats != null}
-            <span class="truncate text-xs text-muted-foreground inline-full">
-              {child.lead.label === ""
-                ? m.seats_independents()
-                : child.lead.label}
-              <span class="font-figures tabular-nums"
-                >{count(child.lead.seats)}
-                {m.seats_of({ count: count(child.seats) })}</span
-              >
-            </span>
-          {/if}
-        </li>
-      {/each}
-    </ul>
-  </section>
-{/if}
 
-{#if election.notes.length > 0 || (known.data ?? []).length > 0}
-  <section class="col-span-12 bg-card px-3.5 py-3">
-    <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.notes_title()}</h2>
-    <ul class="grid gap-1.5 text-sm/snug text-muted-foreground">
-      {#each election.notes as note, index (index)}
-        <li class="max-inline-[72ch]"><NoteBody {note} /></li>
-      {/each}
-      {#each known.data ?? [] as gap, index (index)}
-        <li class="max-inline-[72ch]">{gapNote(gap)}</li>
-      {/each}
-    </ul>
-  </section>
-{/if}
+  {#if sections.local != null}
+    <Local local={sections.local} isOwn={true} />
+  {/if}
+  {#if sections.counties != null}
+    <Counties counties={sections.counties} />
+  {/if}
+  {#if scope == null}
+    <Alongside {id} />
+    <Governments {id} {chamber} />
+    {#if regionsAt === -1}
+      <Regions {id} />
+    {/if}
+  {/if}
+  <Gains {id} within={scope?.id} />
+  <ByElections {id} within={scope?.id} />
+
+  {#if isTiled}
+    <Tiers
+      {id}
+      {parts}
+      noun={partNoun ?? ""}
+      race={ordered.find((race) => race.electors != null)?.name ?? null}
+    />
+  {:else if parts.length >= 40}
+    <Winners {id} {parts} />
+  {:else if parts.length > 0}
+    <States {id} />
+    {#if election.seated != null}
+      {const seated = $derived(election.seated)}
+      <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+          <h2 class="text-[0.8125rem] font-bold">{m.seats_title()}</h2>
+          <p class="text-[0.8125rem] text-muted-foreground">
+            {m.seats_filled({ count: count(seated.total) })}
+          </p>
+        </div>
+        <table class="border-collapse text-sm inline-full sm:inline-auto">
+          <thead>
+            <tr class="border-be text-[0.8125rem] text-muted-foreground">
+              <th class="pe-6 pbe-1.5 text-start font-normal" scope="col">
+                {m.col_party()}
+              </th>
+              <th class="ps-2 pbe-1.5 text-end font-normal" scope="col">
+                {m.col_seats()}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each seated.parties as row, index (index)}
+              <tr class="border-be border-border/60 last:border-be-0">
+                <th class="py-1.5 pe-6 text-start font-normal" scope="row">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span
+                      class="shrink-0 rounded-xs block-2.5 inline-2.5"
+                      style:background={swatch(row.color, `party:${row.label}`)}
+                    ></span>
+                    {row.isIndependent
+                      ? m.seats_independents()
+                      : (row.short ?? row.label)}
+                  </span>
+                </th>
+                <td
+                  class="py-1.5 ps-2 text-end font-figures font-semibold tabular-nums"
+                >
+                  {count(row.seats)}
+                </td>
+              </tr>
+            {/each}
+            {#if seated.others != null}
+              <tr>
+                <th
+                  class="py-1.5 pe-6 text-start font-normal text-muted-foreground"
+                  scope="row"
+                >
+                  {m.election_seated_others({
+                    count: count(seated.others.count),
+                  })}
+                </th>
+                <td
+                  class="py-1.5 ps-2 text-end font-figures text-muted-foreground tabular-nums"
+                >
+                  {count(seated.others.seats)}
+                </td>
+              </tr>
+            {/if}
+          </tbody>
+        </table>
+      </section>
+    {/if}
+    <section class="col-span-12 bg-card px-3.5 py-3">
+      <h2 class="mbe-2 text-[0.8125rem] font-bold">
+        {partNoun == null
+          ? m.election_children()
+          : m.election_places({ noun: partNoun })}
+      </h2>
+      {const isDated = $derived(
+        parts.some((child) => child.date !== election.date),
+      )}
+      <ul
+        class="grid grid-cols-2 gap-x-6 text-sm sm:grid-cols-3 lg:grid-cols-4"
+      >
+        {#each parts as child, index (index)}
+          <li
+            class="flex flex-wrap items-baseline justify-between gap-x-3 border-be border-border/60 py-1.5 min-inline-0"
+          >
+            {#if child.path == null}
+              <span class="truncate">{child.place ?? child.name}</span>
+            {:else}
+              <Preview class="truncate hover:highlighter" path={child.path}
+                >{child.place ?? child.name}</Preview
+              >
+            {/if}
+            {#if isDated}
+              <time
+                class="shrink-0 font-figures text-xs text-muted-foreground"
+                datetime={child.date}>{date(child.date)}</time
+              >
+            {/if}
+            {#if child.lead != null && child.seats != null}
+              <span class="truncate text-xs text-muted-foreground inline-full">
+                {child.lead.label === ""
+                  ? m.seats_independents()
+                  : child.lead.label}
+                <span class="font-figures tabular-nums"
+                  >{count(child.lead.seats)}
+                  {m.seats_of({ count: count(child.seats) })}</span
+                >
+              </span>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+
+  {#if election.notes.length > 0 || (known.data ?? []).length > 0}
+    <section class="col-span-12 bg-card px-3.5 py-3">
+      <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.notes_title()}</h2>
+      <ul class="grid gap-1.5 text-sm/snug text-muted-foreground">
+        {#each election.notes as note, index (index)}
+          <li class="max-inline-[72ch]"><NoteBody {note} /></li>
+        {/each}
+        {#each known.data ?? [] as gap, index (index)}
+          <li class="max-inline-[72ch]">{gapNote(gap)}</li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+{/snippet}

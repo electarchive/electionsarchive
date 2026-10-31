@@ -9,6 +9,7 @@
     count,
     credit,
     definite,
+    initials,
     percent,
     points,
     precision,
@@ -546,15 +547,7 @@
         {:else if isPictured}
           <span
             class="grid shrink-0 place-items-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
-            aria-hidden="true"
-            >{row.label
-              .split(/\s+/u)
-              .filter((word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word))
-              .filter((word, index, words) =>
-                [0, words.length - 1].includes(index),
-              )
-              .map((word) => word.slice(0, 1))
-              .join("")}</span
+            aria-hidden="true">{initials(row.label)}</span
           >
         {:else}
           <span

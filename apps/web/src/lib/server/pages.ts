@@ -873,9 +873,12 @@ export async function archive(path: string, search: URLSearchParams) {
   const isDay =
     slug?.type === "polity" &&
     /^\d{4}-\d{2}-\d{2}$/u.test(path.slice(slug.path.length + 1));
+  const isRace =
+    slug?.type === "election" &&
+    /^[a-z0-9-]+$/u.test(path.slice(slug.path.length + 1));
   if (
     slug == null ||
-    (!isDay && slug.type !== "contest" && slug.path !== path)
+    (!isDay && !isRace && slug.type !== "contest" && slug.path !== path)
   ) {
     error(404);
   }
@@ -1060,6 +1063,7 @@ export async function archive(path: string, search: URLSearchParams) {
       regions,
       tiers,
       cycle,
+      series,
       alongside,
       local,
       counties,
@@ -1070,6 +1074,7 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.elections.regions, input),
         call(router.elections.tiers, input),
         call(router.elections.cycle, input),
+        call(router.elections.series, input),
         call(router.elections.alongside, input),
         scope != null || day?.date == null || day.tier !== "county"
           ? null
@@ -1085,12 +1090,24 @@ export async function archive(path: string, search: URLSearchParams) {
             }),
       ]),
     );
+    const race = unit === "" ? null : unit;
+    if (
+      race != null &&
+      election.races.every(
+        (entry) => entry.anchor !== race.replace(/-total$/u, ""),
+      )
+    ) {
+      error(404);
+    }
     return {
       kind: "election" as const,
       id: slug.entity_id,
+      path: slug.path,
+      race,
       scope,
       election,
       cycle,
+      series,
       sections: { governments, regions, tiers, alongside, local, counties },
       within,
     };

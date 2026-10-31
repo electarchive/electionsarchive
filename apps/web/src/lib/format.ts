@@ -119,3 +119,12 @@ export function plural(noun: string) {
         : `${noun}s`)
   );
 }
+
+export function initials(label: string) {
+  return label
+    .split(/\s+/u)
+    .filter((word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word))
+    .filter((word, index, words) => [0, words.length - 1].includes(index))
+    .map((word) => word.slice(0, 1))
+    .join("");
+}
