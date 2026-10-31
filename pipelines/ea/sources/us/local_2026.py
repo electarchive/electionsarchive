@@ -7038,6 +7038,7 @@ def parse() -> None:
     )
     names = {cells[0]: cells[1] for cells in subdivisions}
     subdivision_county = {cells[2]: cells[0] for cells in subdivisions}
+    first_code: dict[tuple[str, str], str] = {}
     for key in ("MN", "MN-county", "MN-school"):
         for cells in csv.reader(
             io.StringIO(raw.cached(SOURCE, FEEDS[key][0]).path.read_text(encoding="utf-8", errors="replace")),
@@ -7049,13 +7050,17 @@ def parse() -> None:
             upper = title.upper()
             stem = re.sub(r"\s*\([^)]*\)", "", title).strip()
             found = re.search(
-                r"(?i)\b(ward \d+|district \d+|position \d+|seat [a-z0-9]+|at large)\b", stem
+                r"(?i)\b(ward [a-z0-9]+|precinct \d+|district \d+|position \d+|seat [a-z0-9]+|at large)\b", stem
             ) or re.search(r"(?i)\b((?!member\b)[a-z]+ district)$", stem)
             shown = (
                 re.sub(r"(?i)^at large$", "At-Large", found[1].title().replace("At Large", "At-Large")) if found else ""
             )
             seat = f":{slug(shown)}" if found else ""
             special = ":special" if upper.startswith("SPECIAL ELECTION") else ""
+            if key == "MN" and not found:
+                first = first_code.setdefault((cells[5], stem), cells[3])
+                if first != cells[3]:
+                    seat = f":seat-{cells[3]}"
             tail = None
             claim = {}
             if key == "MN-school":
