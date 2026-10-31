@@ -28,6 +28,21 @@ WARREN = "https://www.warrencountynj.gov/#sample-ballot-washington-township-2026
 FRANKLIN = HUNTERDON % "franklin-township"
 EAST_AMWELL = HUNTERDON % "east-amwell-township"
 LAMBERTVILLE = HUNTERDON % "lambertville-city"
+WALL1 = "https://www.monmouthcountyclerk.gov/#sample-ballot-wall1-2026-general"
+WALL3 = "https://www.monmouthcountyclerk.gov/#sample-ballot-wall3-2026-general"
+TINTON1 = "https://www.monmouthcountyclerk.gov/#sample-ballot-tinton1-2026-general"
+TINTON2 = "https://www.monmouthcountyclerk.gov/#sample-ballot-tinton2-2026-general"
+MANALAPAN2 = "https://www.monmouthcountyclerk.gov/#sample-ballot-manalapan2-2026-general"
+MARLBORO1 = "https://www.monmouthcountyclerk.gov/#sample-ballot-marlboro1-2026-general"
+OCEAN1 = "https://www.monmouthcountyclerk.gov/#sample-ballot-ocean1-2026-general"
+OCEAN2 = "https://www.monmouthcountyclerk.gov/#sample-ballot-ocean2-2026-general"
+HAZLET = "https://www.monmouthcountyclerk.gov/#sample-ballot-hazlet-2026-general"
+MILLSTONE = "https://www.monmouthcountyclerk.gov/#sample-ballot-millstone-2026-general"
+PINEHILL = "https://www.camdencounty.com/#sample-ballot-pinehill-2026-general"
+WINSLOW = "https://www.camdencounty.com/#sample-ballot-winslow-2026-general"
+BERLIN = "https://www.camdencounty.com/#sample-ballot-berlin-2026-general"
+LINDENWOLD = "https://www.camdencounty.com/#sample-ballot-lindenwold-2026-general"
+CHERRYHILL = "https://www.camdencounty.com/#sample-ballot-cherryhill-2026-general"
 SOURCES = {
     BURLINGTON: (
         "Burlington County Clerk",
@@ -88,6 +103,81 @@ SOURCES = {
         "Warren County Clerk",
         "2026 General Election Ballot, Washington Township District 1, November 3, 2026",
         "manual/MF-464/Warren/2026 General ElectionWashington Townshi.pdf",
+    ),
+    WALL1: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Wall Township Fire District No. 1, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Wall-Twp-FD1.pdf",
+    ),
+    WALL3: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Wall Township Fire District No. 3, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Wall-Twp-FD3.pdf",
+    ),
+    TINTON1: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Tinton Falls Fire District No. 1, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Tinton-Falls-Boro-FD1.pdf",
+    ),
+    TINTON2: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Tinton Falls Fire District No. 2, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Tinton-Falls-Boro-FD2.pdf",
+    ),
+    MANALAPAN2: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Manalapan Township Fire District No. 2, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Manalapan-Twp-FD2.pdf",
+    ),
+    MARLBORO1: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Marlboro Township Fire District No. 1, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Marlboro-Twp-FD1.pdf",
+    ),
+    OCEAN1: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Ocean Township Fire District No. 1, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Ocean-Twp-FD1.pdf",
+    ),
+    OCEAN2: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Ocean Township Fire District No. 2, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Ocean-Twp-FD2.pdf",
+    ),
+    HAZLET: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Hazlet Township, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Hazlet-Twp.pdf",
+    ),
+    MILLSTONE: (
+        "Monmouth County Clerk",
+        "Official General Election Sample Ballot, Millstone Township, November 3, 2026",
+        "manual/MF-479/Monmouth/SB-Millstone-Twp.pdf",
+    ),
+    PINEHILL: (
+        "Camden County Clerk",
+        "Official General Election Sample Ballot, Pine Hill Borough, November 3, 2026",
+        "manual/MF-479/Camden/PINE_HILL.pdf",
+    ),
+    WINSLOW: (
+        "Camden County Clerk",
+        "Official General Election Sample Ballot, Winslow Township Ward 1, November 3, 2026",
+        "manual/MF-479/Camden/WINSLOW_W1.pdf",
+    ),
+    BERLIN: (
+        "Camden County Clerk",
+        "Official General Election Sample Ballot, Berlin Township, November 3, 2026",
+        "manual/MF-479/Camden/BERLIN_TWP.pdf",
+    ),
+    LINDENWOLD: (
+        "Camden County Clerk",
+        "Official General Election Sample Ballot, Lindenwold Borough, November 3, 2026",
+        "manual/MF-479/Camden/LINDENWOLD.pdf",
+    ),
+    CHERRYHILL: (
+        "Camden County Clerk",
+        "Official General Election Sample Ballot, Cherry Hill, November 3, 2026",
+        "manual/MF-479/Camden/CHERRY_HILL.pdf",
     ),
 }
 SEATS = (
@@ -174,6 +264,49 @@ SEATS = (
     ("Amwell Valley Fire Company", "Hunterdon", False, 2, EAST_AMWELL, ["Paul E. Carlucci"]),
     ("Lambertville Fire District No. 1", "Hunterdon", False, 1, LAMBERTVILLE, ["Nancy Bakewell"]),
     ("Washington Township Fire District No. 1", "Warren", False, 2, WARREN, ["Michael Riotto", "Karl Spolarich"]),
+    ("Wall Fire District No. 1", "Monmouth", False, 2, WALL1, ["Roy Curtis", "Logan Rogers"]),
+    ("Wall Fire District No. 3", "Monmouth", False, 2, WALL3, ["Michael Fischer", "Eric B. Olsen"]),
+    ("Tinton Falls Fire District No. 1", "Monmouth", False, 1, TINTON1, ["Cary Costa", "Angie Swaroop"]),
+    ("Tinton Falls Fire District No. 2", "Monmouth", False, 2, TINTON2, ["Spencer Maran"]),
+    ("Manalapan Fire District No. 2", "Monmouth", False, 2, MANALAPAN2, ["Timothy D. Kirkland", "Joseph Spevak"]),
+    ("Marlboro Fire District No. 1", "Monmouth", False, 2, MARLBORO1, ["Michael MacDonald", "Martin Rabinowitz"]),
+    ("Ocean Fire District No. 1", "Monmouth", False, 1, OCEAN1, ["Dimitrios Kelesidis"]),
+    ("Ocean Fire District No. 2", "Monmouth", False, 1, OCEAN2, ["Edward W. Horn", "Earl H. Gifford"]),
+    ("Hazlet Fire District No. 1", "Monmouth", False, 2, HAZLET, ["Donald Malloy", "Michael C. Storcks"]),
+    ("Millstone Fire District No. 1", "Monmouth", False, 2, MILLSTONE, ["Genevieve Semanchick", "Ronald P. Gesualdo"]),
+    (
+        "Pine Hill Borough Fire District No. 1",
+        "Camden",
+        False,
+        2,
+        PINEHILL,
+        ["James T. Wakeley", "Richard Perez", "Timothy W. Chalfant", "Christopher Harris"],
+    ),
+    (
+        "Winslow Township Fire District No. 1",
+        "Camden",
+        False,
+        2,
+        WINSLOW,
+        ["Anthony L. Church", "John Matro", "John E. (Smitty) Smith", "Brian Donovan"],
+    ),
+    ("Berlin Township Fire District No. 1", "Camden", False, 1, BERLIN, ["Joseph C. Mohan", "Michael A. Schaffer"]),
+    (
+        "Lindenwold Borough Fire District No. 1",
+        "Camden",
+        False,
+        2,
+        LINDENWOLD,
+        ["Richard J. Paul Jr.", "Michael Nolan", "Mark Wells", "Wayne Hans"],
+    ),
+    (
+        "Cherry Hill Fire District No. 13",
+        "Camden",
+        False,
+        2,
+        CHERRYHILL,
+        ["Michael Richter", "John J. Mulholland Jr.", "Rosy Arroyo"],
+    ),
 )
 
 
@@ -222,7 +355,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="NJ",
-        summary="Fire commissioner races on the November 3, 2026 ballot in Burlington, Gloucester, Hunterdon, Mercer, Somerset, and Warren County fire districts, with candidates from the county clerks' official ballots and candidate lists",
+        summary="Fire commissioner races on the November 3, 2026 ballot in Burlington, Camden, Gloucester, Hunterdon, Mercer, Monmouth, Somerset, and Warren County fire districts, with candidates from the county clerks' official ballots and candidate lists",
         sources={url: (publisher, title) for url, (publisher, title, _) in SOURCES.items()},
         frame=pl.read_parquet(PARSED / "candidates.parquet"),
     )
