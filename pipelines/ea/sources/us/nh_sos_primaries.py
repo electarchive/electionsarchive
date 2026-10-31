@@ -32,7 +32,8 @@ DAYS = {
     2022: date(2022, 9, 13),
     2024: date(2024, 9, 10),
 }
-CONTEST_DAYS = {2022: date(2022, 9, 11)}
+MISDATED = {2022: date(2022, 9, 11)}
+SYSTEMIC = ("k", "changeset_id", "recorded_from")
 GOVERNOR = {
     ("governor", 2016, "democratic"): "2016-governor-democratic.xls",
     ("governor", 2016, "republican"): "2016-sp-governor-republican.xls",
@@ -236,6 +237,16 @@ def choose(label: str, options: list[tuple[str, str]]) -> str | None:
     return None
 
 
+def move(conn, cs: Changeset, contest, election, contest_key: str, slug: str) -> None:
+    cursor = conn.execute("select * from contest where id = %s", [contest])
+    columns = [column.name for column in cursor.description]
+    for row in cursor.fetchall():
+        values = {c: v for c, v in zip(columns, row, strict=True) if c not in SYSTEMIC}
+        cs.add("contest", **{**values, "election_id": election})
+    cs.add("external_id", entity_id=contest, scheme="us.contest", value=contest_key)
+    cs.add("slug", path=f"us/nh/{contest_key[:10]}-primary/{slug}", entity_id=contest)
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "towns.parquet")
     with connect() as conn:
@@ -268,19 +279,34 @@ def emit() -> Path:
         }
         values = []
         for (office, year, party), lines in frame.group_by("office", "year", "party", maintain_order=True):
-            contest_day = CONTEST_DAYS.get(year, DAYS[year])
-            contest_key = f"{contest_day}:NH:{office}:{party}"
-            found = conn.execute(
-                """select c.id, c.election_id, (select count(*) from result_set r where r.contest_id = c.id and r.status = 'active')
-                   from external_id x join contest c on c.id = x.entity_id
-                   where x.scheme = 'us.contest' and x.value = %s""",
-                [contest_key],
-            ).fetchone()
+            contest_key = f"{DAYS[year]}:NH:{office}:{party}"
+            legacy_key = f"{MISDATED[year]}:NH:{office}:{party}" if year in MISDATED else None
+            found = None
+            for key in (contest_key, legacy_key):
+                found = (
+                    key
+                    and conn.execute(
+                        """select c.id, c.election_id,
+                              (select count(*) from result_set r join changeset w on w.id = r.changeset_id
+                               where r.contest_id = c.id and r.status = 'active' and w.pipeline <> %s)
+                       from external_id x join contest c on c.id = x.entity_id
+                       where x.scheme = 'us.contest' and x.value = %s""",
+                        [SOURCE, key],
+                    ).fetchone()
+                )
+                if found:
+                    break
             if found is None:
                 raise ValueError(f"{contest_key}: no contest on file")
             contest, election, existing = found
             if existing:
                 raise ValueError(f"{contest_key}: already has {existing} result sets")
+            target = conn.execute(
+                "select entity_id from slug where path = %s", [f"us/nh/{DAYS[year]}-primary"]
+            ).fetchone()
+            if target is not None and target[0] != election:
+                election = target[0]
+                move(conn, cs, contest, election, contest_key, f"{office}-{party}")
             options = [
                 (str(option), label)
                 for option, label, kind in conn.execute(
@@ -312,7 +338,10 @@ def emit() -> Path:
                 [label for label, option in mapping.items() if option != pool[0]]
             ):
                 raise ValueError(f"{contest_key}: two columns match one candidate")
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            prior = conn.execute(
+                "select id from result_set where contest_id = %s and source_id = %s", [contest, sources[year]]
+            ).fetchone()
+            result_set = prior[0] if prior else cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
                 id=result_set,
