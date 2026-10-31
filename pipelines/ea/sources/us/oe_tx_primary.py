@@ -46,7 +46,9 @@ def parse() -> None:
             ).select(
                 day=pl.lit(day).str.to_date(),
                 chamber=pl.concat_str(
-                    pl.when(pl.col("office") == "State Representative").then(pl.lit("house")).otherwise(pl.lit("senate")),
+                    pl.when(pl.col("office") == "State Representative")
+                    .then(pl.lit("house"))
+                    .otherwise(pl.lit("senate")),
                     pl.col("district").cast(pl.Int32).cast(pl.String),
                     pl.when(pl.col("party") == "DEM").then(pl.lit("dp")).otherwise(pl.lit("rp")),
                     separator=":",
@@ -67,7 +69,9 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         frame.with_columns(
-            measure=pl.col("candidate").str.to_uppercase().replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
+            measure=pl.col("candidate")
+            .str.to_uppercase()
+            .replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
             writein=pl.col("candidate").str.to_uppercase().is_in(list(medsl.POOLED))
             | pl.col("candidate").str.to_uppercase().str.contains("WRITE"),
         )

@@ -1,4 +1,6 @@
-import csv, json, sys
+import csv
+import json
+import sys
 from pathlib import Path
 
 D = Path(sys.argv[1])

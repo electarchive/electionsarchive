@@ -10,7 +10,9 @@ RAW = "us.sri"
 VERSION = "1"
 PUBLISHER = "Indiana Secretary of State"
 LICENSE = "Public record"
-SUMMARY = "Indiana's U.S. House and Senate primaries of 1994 by county from the Secretary of State's primary election report"
+SUMMARY = (
+    "Indiana's U.S. House and Senate primaries of 1994 by county from the Secretary of State's primary election report"
+)
 BOOK_TITLE = "Primary Election Report of the Secretary of State of the State of Indiana, 1994"
 STATE = "IN"
 FIPS = "18"

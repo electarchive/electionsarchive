@@ -20,7 +20,29 @@ URL = "https://aims.niassembly.gov.uk/mlas/details.aspx?c=2&per={}"
 API = "http://data.niassembly.gov.uk/members_json.asmx/GetAllMembers_JSON"
 UNMATCHED = DATA / "tmp" / "uk-dev" / "ni_mlas_unmatched.tsv"
 ELECTIONS = sorted(DAYS.values())
-HONORIFICS = {"mr", "mrs", "ms", "miss", "dr", "prof", "professor", "lord", "lady", "sir", "dame", "baroness", "rev", "reverend", "of", "the", "mbe", "obe", "kc", "cbe", "qc"}
+HONORIFICS = {
+    "mr",
+    "mrs",
+    "ms",
+    "miss",
+    "dr",
+    "prof",
+    "professor",
+    "lord",
+    "lady",
+    "sir",
+    "dame",
+    "baroness",
+    "rev",
+    "reverend",
+    "of",
+    "the",
+    "mbe",
+    "obe",
+    "kc",
+    "cbe",
+    "qc",
+}
 PARTIES = {
     "Democratic Unionist Party": "Democratic Unionist Party",
     "Ulster Unionist Party": "Ulster Unionist Party",
@@ -55,22 +77,339 @@ SUSPENSIONS = (
     "Spells are as the Assembly's member records print them, so one holder's continuous service can appear as several tenures split at elections."
 )
 IDS = (
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-    30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
-    57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83,
-    84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108,
-    109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130,
-    131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152,
-    153, 154, 155, 166, 172, 180, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208,
-    209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 247, 256, 258, 259, 268, 269, 271, 272, 273, 274, 277,
-    281, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306, 307,
-    308, 309, 1910, 1931, 2082, 2150, 2262, 2324, 2325, 2326, 2327, 2657, 3083, 3328, 3495, 4145, 4367, 4465,
-    4510, 4541, 5043, 5223, 5224, 5225, 5251, 5307, 5333, 5594, 5595, 5654, 5785, 5786, 5787, 5789, 5790, 5791,
-    5792, 5793, 5794, 5795, 5796, 5797, 5798, 5799, 5800, 5801, 5802, 5803, 5804, 5805, 5806, 5807, 5808, 5809,
-    5811, 6103, 6153, 6154, 6155, 6156, 6157, 6158, 6159, 6160, 6161, 6162, 6166, 6167, 6169, 6170, 6173, 6176,
-    6177, 6178, 6179, 6464, 6792, 7409, 7425, 7467, 7468, 7534, 7556, 8040, 8068, 8070, 8071, 8072, 8073, 8074,
-    8075, 8076, 8077, 8078, 8079, 8080, 8081, 8082, 8083, 8084, 8085, 8086, 8098, 8110, 8348, 8538, 8540, 8541,
-    8542, 8652, 8977, 9509, 9817, 10076, 10356,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148,
+    149,
+    150,
+    151,
+    152,
+    153,
+    154,
+    155,
+    166,
+    172,
+    180,
+    193,
+    194,
+    195,
+    196,
+    197,
+    198,
+    199,
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206,
+    207,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214,
+    215,
+    216,
+    217,
+    218,
+    219,
+    247,
+    256,
+    258,
+    259,
+    268,
+    269,
+    271,
+    272,
+    273,
+    274,
+    277,
+    281,
+    287,
+    288,
+    289,
+    290,
+    291,
+    292,
+    293,
+    294,
+    295,
+    296,
+    297,
+    298,
+    299,
+    300,
+    301,
+    302,
+    303,
+    304,
+    305,
+    306,
+    307,
+    308,
+    309,
+    1910,
+    1931,
+    2082,
+    2150,
+    2262,
+    2324,
+    2325,
+    2326,
+    2327,
+    2657,
+    3083,
+    3328,
+    3495,
+    4145,
+    4367,
+    4465,
+    4510,
+    4541,
+    5043,
+    5223,
+    5224,
+    5225,
+    5251,
+    5307,
+    5333,
+    5594,
+    5595,
+    5654,
+    5785,
+    5786,
+    5787,
+    5789,
+    5790,
+    5791,
+    5792,
+    5793,
+    5794,
+    5795,
+    5796,
+    5797,
+    5798,
+    5799,
+    5800,
+    5801,
+    5802,
+    5803,
+    5804,
+    5805,
+    5806,
+    5807,
+    5808,
+    5809,
+    5811,
+    6103,
+    6153,
+    6154,
+    6155,
+    6156,
+    6157,
+    6158,
+    6159,
+    6160,
+    6161,
+    6162,
+    6166,
+    6167,
+    6169,
+    6170,
+    6173,
+    6176,
+    6177,
+    6178,
+    6179,
+    6464,
+    6792,
+    7409,
+    7425,
+    7467,
+    7468,
+    7534,
+    7556,
+    8040,
+    8068,
+    8070,
+    8071,
+    8072,
+    8073,
+    8074,
+    8075,
+    8076,
+    8077,
+    8078,
+    8079,
+    8080,
+    8081,
+    8082,
+    8083,
+    8084,
+    8085,
+    8086,
+    8098,
+    8110,
+    8348,
+    8538,
+    8540,
+    8541,
+    8542,
+    8652,
+    8977,
+    9509,
+    9817,
+    10076,
+    10356,
 )
 
 
@@ -82,8 +421,11 @@ def fetch() -> None:
 
 def cells(chunk: str) -> list[list[str]]:
     rows = []
-    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", chunk, re.S):
-        found = [re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.unescape(cell))).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", chunk, re.DOTALL):
+        found = [
+            re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.unescape(cell))).strip()
+            for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+        ]
         if found:
             rows.append(found)
     return rows
@@ -96,7 +438,10 @@ def day(text: str) -> date | None:
 
 def page(person: int) -> dict[str, object]:
     text = raw.cached(SOURCE, URL.format(person)).path.read_text(encoding="utf-8", errors="replace")
-    marks = {label: text.find(f"<label>{label}</label>") for label in ("MLA History", "Party History", "Office/Committee History", "All Party Group History")}
+    marks = {
+        label: text.find(f"<label>{label}</label>")
+        for label in ("MLA History", "Party History", "Office/Committee History", "All Party Group History")
+    }
     ends = sorted(position for position in marks.values() if position >= 0) + [len(text)]
 
     def section(label: str) -> list[list[str]]:
@@ -113,7 +458,11 @@ def page(person: int) -> dict[str, object]:
 
 
 def tokens(name: str) -> set[str]:
-    return {{"jr": "jnr", "junior": "jnr", "sr": "snr", "senior": "snr"}.get(word, word) for word in fold(name).split() if len(word) > 1 and word not in HONORIFICS}
+    return {
+        {"jr": "jnr", "junior": "jnr", "sr": "snr", "senior": "snr"}.get(word, word)
+        for word in fold(name).split()
+        if len(word) > 1 and word not in HONORIFICS
+    }
 
 
 def squash(name: str) -> str:
@@ -127,7 +476,9 @@ def span(text: str) -> tuple[date | None, date | None]:
 
 
 def emit() -> Path:
-    members = json.loads(ET.fromstring(raw.cached(SOURCE, API).path.read_bytes()).text or "")["AllMembersList"]["Member"]
+    members = json.loads(ET.fromstring(raw.cached(SOURCE, API).path.read_bytes()).text or "")["AllMembersList"][
+        "Member"
+    ]
     api = {int(row["PersonId"]): row for row in members}
     pages = [page(person) for person in IDS]
     unmatched: list[tuple[str, str]] = []
@@ -157,7 +508,9 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, URL.format(person)), official)
         body = cs.key("gb.body", "ni-assembly")
         gb = cs.polity("GB-NIR")
-        bank: dict[tuple[int, tuple[str, ...]], list[tuple[UUID, str, UUID | None, bool, UUID, UUID]]] = defaultdict(list)
+        bank: dict[tuple[int, tuple[str, ...]], list[tuple[UUID, str, UUID | None, bool, UUID, UUID]]] = defaultdict(
+            list
+        )
         area_of: dict[tuple[int, tuple[str, ...]], UUID] = {}
         for when, district, area, contest, person, text, party, elected in conn.execute(
             """select e.date_from, an.text, c.district_area_id, c.id, ca.person_id, pn.text, o.party_id,
@@ -199,7 +552,14 @@ def emit() -> Path:
                     parties[label] = cs.key("gb.party", slug(canonical))
                     if parties[label] in cs.minted:
                         cs.add("party", id=parties[label], kind="party", polity_id=gb)
-                        cs.add("name", entity_id=parties[label], text=canonical, lang="en", kind="official", is_preferred=True)
+                        cs.add(
+                            "name",
+                            entity_id=parties[label],
+                            text=canonical,
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
             return parties[label]
 
         def term_of(when: date) -> date:
@@ -213,7 +573,10 @@ def emit() -> Path:
         for record in pages:
             ident = int(str(record["id"]))
             who = str(record["name"])
-            first, last = str(api.get(ident, {}).get("MemberFirstName", "")), str(api.get(ident, {}).get("MemberLastName", ""))
+            first, last = (
+                str(api.get(ident, {}).get("MemberFirstName", "")),
+                str(api.get(ident, {}).get("MemberLastName", "")),
+            )
             wanted = tokens(who) | tokens(f"{first} {last}")
             surname = squash(last or who.split()[-1])
             matches[ident] = {}
@@ -222,17 +585,38 @@ def emit() -> Path:
                 year = term_of(since).year
                 key = (year, seat(district))
                 ranked = sorted(
-                    ((1 if elected else 0, len(wanted & tokens(text)), person) for person, text, _, elected, _, _ in bank.get(key, []) if squash(text).endswith(surname)),
+                    (
+                        (1 if elected else 0, len(wanted & tokens(text)), person)
+                        for person, text, _, elected, _, _ in bank.get(key, [])
+                        if squash(text).endswith(surname)
+                    ),
                     reverse=True,
                 )
                 if ranked and (len(ranked) == 1 or ranked[0][:2] != ranked[1][:2]):
                     matches[ident][ranked[0][2]] = year
                     claimed[key].add(ranked[0][2])
-                elif not ranked and since - term_of(since) <= timedelta(days=21) and not status.lower().split(",")[-1].strip().startswith("replaced"):
-                    label = next((party for party, role, period in record["party"] if role == "Party Member" and span(period)[0] is not None and abs((span(period)[0] - term_of(since)).days) <= 21), None)
+                elif (
+                    not ranked
+                    and since - term_of(since) <= timedelta(days=21)
+                    and not status.lower().split(",")[-1].strip().startswith("replaced")
+                ):
+                    label = next(
+                        (
+                            party
+                            for party, role, period in record["party"]
+                            if role == "Party Member"
+                            and span(period)[0] is not None
+                            and abs((span(period)[0] - term_of(since)).days) <= 21
+                        ),
+                        None,
+                    )
                     pending[key].append((ident, party_id(label) if label is not None else None))
         for key, waiting in pending.items():
-            open_candidates = [(person, party) for person, _, party, elected, _, _ in bank.get(key, []) if elected and person not in claimed[key]]
+            open_candidates = [
+                (person, party)
+                for person, _, party, elected, _, _ in bank.get(key, [])
+                if elected and person not in claimed[key]
+            ]
             if len(waiting) == 1 and len(open_candidates) == 1 and waiting[0][1] == open_candidates[0][1]:
                 matches[waiting[0][0]][open_candidates[0][0]] = key[0]
                 totals["matched by seat and party"] += 1
@@ -243,11 +627,33 @@ def emit() -> Path:
                 owners[person].append(ident)
         for person, idents in owners.items():
             if len(idents) > 1:
-                if len({fold(f"{api.get(ident, {}).get('MemberFirstName')} {api.get(ident, {}).get('MemberLastName')}") for ident in idents}) == 1:
+                if (
+                    len(
+                        {
+                            fold(
+                                f"{api.get(ident, {}).get('MemberFirstName')} {api.get(ident, {}).get('MemberLastName')}"
+                            )
+                            for ident in idents
+                        }
+                    )
+                    == 1
+                ):
                     continue
                 scores = {
-                    ident: len(tokens(str(api.get(ident, {}).get("MemberFirstName", "")) + " " + str(api.get(ident, {}).get("MemberLastName", "")) + " " + str(next(r["name"] for r in pages if r["id"] == ident))) & tokens(text_of[person]))
-                    - len(({"jnr", "snr"} & tokens(text_of[person])) ^ ({"jnr", "snr"} & tokens(str(next(r["name"] for r in pages if r["id"] == ident)))))
+                    ident: len(
+                        tokens(
+                            str(api.get(ident, {}).get("MemberFirstName", ""))
+                            + " "
+                            + str(api.get(ident, {}).get("MemberLastName", ""))
+                            + " "
+                            + str(next(r["name"] for r in pages if r["id"] == ident))
+                        )
+                        & tokens(text_of[person])
+                    )
+                    - len(
+                        ({"jnr", "snr"} & tokens(text_of[person]))
+                        ^ ({"jnr", "snr"} & tokens(str(next(r["name"] for r in pages if r["id"] == ident))))
+                    )
                     for ident in idents
                 }
                 best = max(scores.values())
@@ -272,22 +678,42 @@ def emit() -> Path:
                 survivors[ident] = person
                 if person in cs.minted:
                     prefix = str(api.get(ident, {}).get("MemberPrefix", ""))
-                    cs.add("person", id=person, gender="male" if prefix == "Mr" else "female" if prefix in ("Mrs", "Ms", "Miss") else None)
+                    cs.add(
+                        "person",
+                        id=person,
+                        gender="male" if prefix == "Mr" else "female" if prefix in ("Mrs", "Ms", "Miss") else None,
+                    )
                     first, last = api.get(ident, {}).get("MemberFirstName"), api.get(ident, {}).get("MemberLastName")
-                    cs.add("name", entity_id=person, text=f"{first} {last}" if first else who, lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=person,
+                        text=f"{first} {last}" if first else who,
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
                     totals["minted"] += 1
             for index, (stamp, district, status) in enumerate(rows):
                 since = day(stamp)
                 begin = term_of(since)
                 following = next((election for election in ELECTIONS if election > begin), None)
-                later = [day(other[0]) for other in rows[index + 1 :] if day(other[0]) is not None and term_of(day(other[0])) == begin]
+                later = [
+                    day(other[0])
+                    for other in rows[index + 1 :]
+                    if day(other[0]) is not None and term_of(day(other[0])) == begin
+                ]
                 limit = min([*later, *([following] if following else [])]) if later or following else None
                 spells = []
                 for party, role, period in record["party"]:
                     if role != "Party Member":
                         continue
                     start, end = span(period)
-                    if start is None or start < begin - timedelta(days=3) or (limit is not None and start >= limit) or (start < since - timedelta(days=21) and since > begin + timedelta(days=21)):
+                    if (
+                        start is None
+                        or start < begin - timedelta(days=3)
+                        or (limit is not None and start >= limit)
+                        or (start < since - timedelta(days=21) and since > begin + timedelta(days=21))
+                    ):
                         continue
                     spells.append((start, end, party))
                 spells.sort(key=lambda spell: spell[0])
@@ -318,7 +744,9 @@ def emit() -> Path:
         for mandate in mandates:
             designation = str(mandate["status"]).split(",")[-1].strip()
             mandate["designation"] = designation
-            mandate["elected"] = mandate["start"] - mandate["term"] <= timedelta(days=21) and not designation.lower().startswith("replaced")
+            mandate["elected"] = mandate["start"] - mandate["term"] <= timedelta(
+                days=21
+            ) and not designation.lower().startswith("replaced")
             mandate["acquired"] = "elected" if mandate["elected"] else "co_opted"
         by_seat: dict[tuple[date, tuple[str, ...]], list[dict[str, object]]] = defaultdict(list)
         for mandate in mandates:
@@ -331,9 +759,24 @@ def emit() -> Path:
                 slots[id(mandate)] = number
             for mandate in sorted((m for m in group if not m["elected"]), key=lambda m: m["start"]):
                 named = tokens(str(mandate["designation"]).lower().removeprefix("replaced"))
-                free = [other for other in group if other is not mandate and id(other) not in {id(value) for value in replaced.values()} and other["start"] <= mandate["start"]]
-                nearby = [other for other in free if other["end"] is not None and mandate["start"] - timedelta(days=100) <= other["end"] <= mandate["start"] + timedelta(days=3)]
-                overlapping = [other for other in free if other["end"] is None or other["end"] >= mandate["start"] - timedelta(days=100)]
+                free = [
+                    other
+                    for other in group
+                    if other is not mandate
+                    and id(other) not in {id(value) for value in replaced.values()}
+                    and other["start"] <= mandate["start"]
+                ]
+                nearby = [
+                    other
+                    for other in free
+                    if other["end"] is not None
+                    and mandate["start"] - timedelta(days=100) <= other["end"] <= mandate["start"] + timedelta(days=3)
+                ]
+                overlapping = [
+                    other
+                    for other in free
+                    if other["end"] is None or other["end"] >= mandate["start"] - timedelta(days=100)
+                ]
                 narrowed = [other for other in nearby if named and named <= tokens(str(other["who"]))]
                 if len(narrowed) != 1:
                     narrowed = [other for other in overlapping if named and named <= tokens(str(other["who"]))]
@@ -347,7 +790,12 @@ def emit() -> Path:
                         predecessor["capped"] = predecessor["end"]
                         predecessor["end"] = mandate["start"] - timedelta(days=1)
                 else:
-                    unmatched.append((str(mandate["who"]), f"{mandate['since']} {mandate['district']}: co-option has {len(narrowed)} possible predecessors ({mandate['designation']})"))
+                    unmatched.append(
+                        (
+                            str(mandate["who"]),
+                            f"{mandate['since']} {mandate['district']}: co-option has {len(narrowed)} possible predecessors ({mandate['designation']})",
+                        )
+                    )
                     slots[id(mandate)] = max(slots.values(), default=0) + 1
         for mandate in mandates:
             area = area_of.get((int(mandate["year"]), seat(str(mandate["district"]))))
@@ -392,7 +840,11 @@ def emit() -> Path:
             tenure_of[str(mandate["key"])] = tenure
             end = mandate["end"]
             designation = str(mandate["designation"])
-            closes = end is not None and term_end.get(mandate["term"]) is not None and end >= term_end[mandate["term"]] - timedelta(days=3)
+            closes = (
+                end is not None
+                and term_end.get(mandate["term"]) is not None
+                and end >= term_end[mandate["term"]] - timedelta(days=3)
+            )
             reason = (
                 "term_end"
                 if closes
@@ -416,12 +868,19 @@ def emit() -> Path:
                 acquired_via=mandate["acquired"],
                 contest_id=contest_of.get((int(mandate["year"]), seat(str(mandate["district"])))),
                 ended_via=reason,
-                succeeds_tenure_id=cs.key(f"{SOURCE}.tenure", str(predecessor["key"])) if predecessor is not None else None,
+                succeeds_tenure_id=cs.key(f"{SOURCE}.tenure", str(predecessor["key"]))
+                if predecessor is not None
+                else None,
             )
             totals["tenures"] += 1
             merged_spells: list[list[object]] = []
             for start, stop, party in mandate["spells"]:
-                if merged_spells and merged_spells[-1][2] == party and merged_spells[-1][1] is not None and start <= merged_spells[-1][1] + timedelta(days=1):
+                if (
+                    merged_spells
+                    and merged_spells[-1][2] == party
+                    and merged_spells[-1][1] is not None
+                    and start <= merged_spells[-1][1] + timedelta(days=1)
+                ):
                     merged_spells[-1][1] = stop
                 else:
                     merged_spells.append([start, stop, party])
@@ -457,20 +916,30 @@ def emit() -> Path:
                     date=end,
                     date_precision="day",
                     reason=f"Member record: {designation}."
-                    + (f" The party period runs to {mandate['capped']}; the end is the day before the member who replaced them began." if "capped" in mandate else ""),
+                    + (
+                        f" The party period runs to {mandate['capped']}; the end is the day before the member who replaced them began."
+                        if "capped" in mandate
+                        else ""
+                    ),
                     source_id=official,
                 )
         offices: dict[str, UUID] = {}
         for record in pages:
             for period, position, department in record["office"]:
-                if position not in OFFICES or "Executive Office" not in department and "First Minister" not in department:
+                if (
+                    position not in OFFICES
+                    or "Executive Office" not in department
+                    and "First Minister" not in department
+                ):
                     continue
                 code, label, acting = OFFICES[position]
                 if code not in offices:
                     offices[code] = cs.key("gb.office", code)
                     if offices[code] in cs.minted:
                         cs.add("office", id=offices[code], polity_id=gb, body_id=None, kind="head_of_government")
-                        cs.add("name", entity_id=offices[code], text=label, lang="en", kind="official", is_preferred=True)
+                        cs.add(
+                            "name", entity_id=offices[code], text=label, lang="en", kind="official", is_preferred=True
+                        )
                     cs.add("note", entity_id=offices[code], kind="context", body_md=SUSPENSIONS)
                 start, stop = span(period)
                 cs.add(

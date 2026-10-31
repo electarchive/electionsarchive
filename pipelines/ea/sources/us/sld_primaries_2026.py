@@ -512,13 +512,13 @@ ITEMS = {
         r"(?:State (?P<chamber>Senate|House) - District (?P<district>\d+)|(?P<office>"
         + STATEWIDE_LABELS
         + r")) - (?P<party>Rep|Dem)",
-        re.I,
+        re.IGNORECASE,
     ),
     "ID": re.compile(
         r"(?:State (?P<body>Senator|Representative) District (?P<district>\d+)(?: Seat (?P<seat>[AB]))?|(?P<office>"
         + STATEWIDE_LABELS
         + r")) - (?P<party>Republican|Democratic)",
-        re.I,
+        re.IGNORECASE,
     ),
 }
 PARTIES = {
@@ -1225,7 +1225,15 @@ def parse() -> None:
                         or re.fullmatch(r"(?i)over votes|under votes|write-in", row["Candidate"])
                     ):
                         continue
-                    totals[(statewide[0], "", {"DEM": "democratic", "REP": "republican"}[row["Party"]], row["Candidate"], "11001")] += int(row["Votes"])
+                    totals[
+                        (
+                            statewide[0],
+                            "",
+                            {"DEM": "democratic", "REP": "republican"}[row["Party"]],
+                            row["Candidate"],
+                            "11001",
+                        )
+                    ] += int(row["Votes"])
             rows = [(*key, votes) for key, votes in totals.items()]
         if state == "IL":
             totals = defaultdict(int)
@@ -1697,7 +1705,9 @@ def emit() -> Path:
                     status="held",
                 )
                 name(election, f"2026 {STATE_NAMES[state]} primary{' runoff' if runoff else ''} election")
-                cs.add("slug", path=f"us/{state.lower()}/{day}-primary{'-runoff' if runoff else ''}", entity_id=election)
+                cs.add(
+                    "slug", path=f"us/{state.lower()}/{day}-primary{'-runoff' if runoff else ''}", entity_id=election
+                )
             templates = {
                 value: row
                 for value, *row in conn.execute(

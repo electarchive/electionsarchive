@@ -1,6 +1,11 @@
+import csv
+import itertools
 import os
-import csv, subprocess, re, sys
+import re
+import subprocess
+import sys
 from pathlib import Path
+
 from PIL import Image
 
 S = Path(os.environ["OR_WORK"])
@@ -19,12 +24,13 @@ def rd(p, box):
     path = S / "img/cells" / f"{c}-{p}-{x0}-{y0}.png"
     path.parent.mkdir(exist_ok=True)
     cr.resize((cr.width * 4, cr.height * 4)).save(path)
-    subprocess.run([str(S / "vision/vision"), str(path)], capture_output=True)
+    subprocess.run([str(S / "vision/vision"), str(path)], capture_output=True, check=False)
     v = Path(str(path) + ".vision.tsv").read_text().split("\t")[0].strip()
     t = subprocess.run(
         ["tesseract", str(path), "-", "--psm", "7", "-c", "tessedit_char_whitelist=0123456789,"],
         capture_output=True,
         text=True,
+        check=False,
     ).stdout.strip()
     return {re.sub(r"[^\d]", "", v), re.sub(r"[^\d]", "", t)}
 
@@ -62,7 +68,7 @@ for p, rs in pm.items():
         hit = [i for i, (bx, rv) in enumerate(blocks) if r[3] in rv["YES"] and r[4] in rv["NO"]]
         idx.append(hit)
     flat = [h[0] if len(h) == 1 else None for h in idx]
-    ok = None not in flat and all(b == a + 1 for a, b in zip(flat, flat[1:]))
+    ok = None not in flat and all(b == a + 1 for a, b in itertools.pairwise(flat))
     print([(b[1]["YES"], b[1]["NO"]) for b in blocks])
     print(p, len(tot), idx, "OK" if ok else "FAIL")
     if ok:
@@ -70,5 +76,4 @@ for p, rs in pm.items():
             for k in ("YES", "NO"):
                 out.append((p, r[1], r[2], k, *blocks[i][0][k]))
 with open(S / f"tr/{c}.cells", "w") as f:
-    for o in out:
-        f.write(",".join(map(str, o)) + "\n")
+    f.writelines(",".join(map(str, o)) + "\n" for o in out)

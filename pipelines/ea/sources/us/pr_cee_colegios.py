@@ -73,11 +73,16 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, URL), source)
         cs.artifact(raw.cached(SOURCE, PRECINTOS), source)
         listing = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, PRECINTOS).path), "-"], capture_output=True, check=True, text=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, PRECINTOS).path), "-"],
+            capture_output=True,
+            check=True,
+            text=True,
         ).stdout
         names = {}
         for line in listing.splitlines():
-            for name, number in re.findall(r"([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñü. ]+?)\s+(?:\d{1,2}\s+)?(\d{3})\s+(?:\d{1,2}\s+)?\d{1,2}\b", line):
+            for name, number in re.findall(
+                r"([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚÑáéíóúñü. ]+?)\s+(?:\d{1,2}\s+)?(\d{3})\s+(?:\d{1,2}\s+)?\d{1,2}\b", line
+            ):
                 names.setdefault(int(number), fold(name))
         municipios = {
             fold(text): (unit, area)

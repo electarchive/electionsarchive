@@ -43,8 +43,11 @@ def parse() -> None:
     for page in PAGES:
         text = raw.cached(SOURCE, FILE.format(page)).path.read_text(errors="replace")
         table = []
-        for row in re.findall(r"<TR[^>]*>(.*?)</TR>", text, re.S | re.I):
-            cells = [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", row, re.S | re.I)]
+        for row in re.findall(r"<TR[^>]*>(.*?)</TR>", text, re.DOTALL | re.IGNORECASE):
+            cells = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", row, re.DOTALL | re.IGNORECASE)
+            ]
             if cells := [re.sub(r"\s+", " ", cell) for cell in cells if cell]:
                 table.append(cells)
         office = table[2][0].upper()

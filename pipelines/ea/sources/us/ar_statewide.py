@@ -67,17 +67,31 @@ def parse() -> None:
             if len(filled) == 1:
                 office = OFFICES.get(str(filled[0]).strip())
                 continue
-            if office is None or row[1] is None or str(row[1]).strip() not in ("Democrat", "Republican", "Independent", "Reform", "Libertarian", "Green", "Write-In"):
+            if (
+                office is None
+                or row[1] is None
+                or str(row[1]).strip()
+                not in ("Democrat", "Republican", "Independent", "Reform", "Libertarian", "Green", "Write-In")
+            ):
                 continue
             name = re.sub(
-                r"^(?:Lt\. Governor|Secretary of State|Attorney General|Governor|Auditor of State)\s+", "", str(row[0]).strip()
+                r"^(?:Lt\. Governor|Secretary of State|Attorney General|Governor|Auditor of State)\s+",
+                "",
+                str(row[0]).strip(),
             )
             votes = [int(float(row[column])) for column in columns]
             if sum(votes) != int(float(row[total])):
                 raise ValueError(f"{day} {office} {name}: counties sum to {sum(votes)}, printed {row[total]}")
             party = str(row[1]).strip()
             rows.extend(
-                (day, office, re.sub(r"\s+", " ", name).upper(), party.upper() if party != "Democrat" else "DEMOCRATIC", header[column], count)
+                (
+                    day,
+                    office,
+                    re.sub(r"\s+", " ", name).upper(),
+                    party.upper() if party != "Democrat" else "DEMOCRATIC",
+                    header[column],
+                    count,
+                )
                 for column, count in zip(columns, votes, strict=True)
             )
     frame = pl.DataFrame(rows, schema=["day", "title", "candidate", "party", "county", "votes"], orient="row").select(
@@ -104,7 +118,12 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.lit(75),
     ).write_parquet(PARSED / "races.parquet")
-    print(frame.group_by("year", "title", "candidate", "party").agg(pl.col("votes").sum()).sort("year", "title", "votes").rows())
+    print(
+        frame.group_by("year", "title", "candidate", "party")
+        .agg(pl.col("votes").sum())
+        .sort("year", "title", "votes")
+        .rows()
+    )
 
 
 def emit() -> Path:

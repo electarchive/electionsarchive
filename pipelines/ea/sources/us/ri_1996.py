@@ -37,7 +37,6 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    import io
     import zipfile
 
     archive = zipfile.ZipFile(raw.cached(SOURCE, URL).path)

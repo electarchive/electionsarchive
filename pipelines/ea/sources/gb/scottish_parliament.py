@@ -223,7 +223,7 @@ EMB_2026_FULL = "https://www.emb.scot/downloads/file/1201/full-analysis-of-2026-
 
 
 def fetch() -> None:
-    for year, url in PAGES.items():
+    for url in PAGES.values():
         raw.fetch(SOURCE, url, suffix=".html")
         time.sleep(1)
     raw.fetch(SOURCE, ANALYSIS_2011, suffix=".xls")
@@ -332,7 +332,7 @@ def sheet(path: Path, name: str) -> list[list[str | None]]:
 
 
 def number(cell: str | None) -> int | None:
-    return None if cell is None else int(round(float(cell)))
+    return None if cell is None else round(float(cell))
 
 
 ALIASES = {

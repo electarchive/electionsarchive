@@ -56,7 +56,9 @@ def parse() -> None:
             check=True,
             text=True,
         ).stdout
-        start = [m.start() for m in re.finditer(r"Member of the U\.S\. House of Representatives\s*\n", text, re.IGNORECASE)]
+        start = [
+            m.start() for m in re.finditer(r"Member of the U\.S\. House of Representatives\s*\n", text, re.IGNORECASE)
+        ]
         names: dict[int, list[str]] = {}
         totals: dict[int, list[int]] = {}
         counts: dict[int, dict[str, list[int]]] = {}
@@ -108,7 +110,11 @@ def parse() -> None:
                     if pieces and all(PARTY.fullmatch(p) for p in pieces):
                         current = district or next((d for d in reversed(order) if not done(d)), None)
                         if current is not None and header:
-                            names[current] = [p for p in re.split(r"\s{2,}", header[-1].strip()) if p.lower() not in ("county", "candidate")]
+                            names[current] = [
+                                p
+                                for p in re.split(r"\s{2,}", header[-1].strip())
+                                if p.lower() not in ("county", "candidate")
+                            ]
                         header = []
                         continue
                     segments = list(SEGMENT.finditer(part))
@@ -129,7 +135,9 @@ def parse() -> None:
                             counts[current][counties[label]] = cells
         for district in order:
             if not names[district] or not done(district):
-                print(f"{year} District {district}: {names[district]} counties {len(counts[district])}, not summing to {totals.get(district)}, skipped")
+                print(
+                    f"{year} District {district}: {names[district]} counties {len(counts[district])}, not summing to {totals.get(district)}, skipped"
+                )
                 continue
             rows.extend(
                 (year, day, district, code, name, cells[i], "write" in name.lower() or "scatter" in name.lower())

@@ -37,7 +37,15 @@ def parse() -> None:
     rows = []
     for year, registered, voters in re.findall(r"\b((?:19|20)\d\d) ?\| ?([\d,]{9}) ?\| ?([\d,]{7,9}) ?\|", flat):
         if int(year) % 2 == 0:
-            rows.append({"state": "CT", "year": int(year), "stage": "general", "registered": number(registered), "voters": number(voters)})
+            rows.append(
+                {
+                    "state": "CT",
+                    "year": int(year),
+                    "stage": "general",
+                    "registered": number(registered),
+                    "voters": number(voters),
+                }
+            )
     frame = pl.DataFrame(rows)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
@@ -71,11 +79,19 @@ def emit() -> Path:
                 elections.setdefault((start.year, kind), []).append((value, entity_id))
             source = cs.source(publisher, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
             cs.artifact(raw.cached(SOURCE, url), source)
-            for year, stage, registered, voters in frame.filter(pl.col("state") == state).select(
-                "year", "stage", "registered", "voters"
-            ).iter_rows():
+            for year, stage, registered, voters in (
+                frame.filter(pl.col("state") == state).select("year", "stage", "registered", "voters").iter_rows()
+            ):
                 found = elections.get((year, stage), [])
                 if len(found) > 1 and stage == "general":
                     first = date(year, 11, 1)

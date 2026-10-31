@@ -25,16 +25,51 @@ PARTIES = {
     "Democratic": "democratic-party",
 }
 CONTESTS = [
-    (1974, date(1974, 11, 5), "general", "1974 Guamanian gubernatorial election", "box", "1974 Guamanian gubernatorial general election"),
-    (1974, date(1974, 11, 14), "runoff", "1974 Guamanian gubernatorial election", "box", "1974 Guamanian gubernatorial runoff election"),
+    (
+        1974,
+        date(1974, 11, 5),
+        "general",
+        "1974 Guamanian gubernatorial election",
+        "box",
+        "1974 Guamanian gubernatorial general election",
+    ),
+    (
+        1974,
+        date(1974, 11, 14),
+        "runoff",
+        "1974 Guamanian gubernatorial election",
+        "box",
+        "1974 Guamanian gubernatorial runoff election",
+    ),
     (1978, date(1978, 11, 7), "general", "1978 Guam general election", "table", "===Governor==="),
     (1990, date(1990, 11, 6), "general", "1990 Guam general election", "box", "1990 Guamanian gubernatorial election"),
     (1998, date(1998, 11, 3), "general", "1998 Guam general election", "results", "===General election==="),
     (2006, date(2006, 11, 7), "general", "2006 Guam general election", "box", "=== Gubernatorial ==="),
     (2010, date(2010, 11, 2), "general", "2010 Guam general election", "infobox", "{{Infobox election"),
-    (2014, date(2014, 11, 4), "general", "2014 Guam general election", "box", "2014 Guamanian gubernatorial general election"),
-    (2018, date(2018, 11, 6), "general", "2018 Guam general election", "box", "General election results for governor of Guam"),
-    (2022, date(2022, 11, 8), "general", "2022 Guam general election", "box", "{{Election box begin no change|title=Election results"),
+    (
+        2014,
+        date(2014, 11, 4),
+        "general",
+        "2014 Guam general election",
+        "box",
+        "2014 Guamanian gubernatorial general election",
+    ),
+    (
+        2018,
+        date(2018, 11, 6),
+        "general",
+        "2018 Guam general election",
+        "box",
+        "General election results for governor of Guam",
+    ),
+    (
+        2022,
+        date(2022, 11, 8),
+        "general",
+        "2022 Guam general election",
+        "box",
+        "{{Election box begin no change|title=Election results",
+    ),
 ]
 
 
@@ -111,7 +146,10 @@ def count(text: str) -> int:
 def parse() -> None:
     texts = {
         found["title"]: re.sub(
-            r"<ref[^>/]*/>|<ref[^>]*>.*?</ref>|<!--.*?-->", "", found["revisions"][0]["slots"]["main"]["content"], flags=re.DOTALL
+            r"<ref[^>/]*/>|<ref[^>]*>.*?</ref>|<!--.*?-->",
+            "",
+            found["revisions"][0]["slots"]["main"]["content"],
+            flags=re.DOTALL,
         )
         for found in json.loads(raw.cached(SOURCE, page(titles())).path.read_text())["query"]["pages"]
     }
@@ -148,7 +186,9 @@ def parse() -> None:
             for line in section.splitlines():
                 cells = [cell for cell in line.split("||")]
                 if len(cells) == 5 and cells[0].startswith("|align=left|"):
-                    entries.append((cells[1].split("|", 1)[1], cells[0].split("|", 2)[2], cells[2].split("|", 1)[1], cells[3]))
+                    entries.append(
+                        (cells[1].split("|", 1)[1], cells[0].split("|", 2)[2], cells[2].split("|", 1)[1], cells[3])
+                    )
         else:
             _, fields = fields_of(templates_of(text[start:])[0])
             for index in (1, 2):

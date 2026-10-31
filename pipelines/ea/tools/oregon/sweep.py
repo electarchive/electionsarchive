@@ -1,4 +1,7 @@
-import re, subprocess, sys, tempfile
+import re
+import subprocess
+import sys
+import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -35,7 +38,7 @@ SCANS = [
 
 
 def pages(name):
-    info = subprocess.run(["pdfinfo", str(SRC / f"{name}.pdf")], capture_output=True, text=True).stdout
+    info = subprocess.run(["pdfinfo", str(SRC / f"{name}.pdf")], capture_output=True, text=True, check=False).stdout
     return int(re.search(r"Pages:\s+(\d+)", info).group(1))
 
 
@@ -61,7 +64,7 @@ def ocr(job):
             check=True,
         )
         text = subprocess.run(
-            ["tesseract", str(img) + ".png", "-", "--psm", "3"], capture_output=True, text=True
+            ["tesseract", str(img) + ".png", "-", "--psm", "3"], capture_output=True, text=True, check=False
         ).stdout
     hits = sorted(set(re.findall(r"(?i)measure\s*(?:no\.?\s*)?(10[2-6])\b", text)))
     return name, page, hits, " ".join(text.split())[:160]
@@ -69,5 +72,4 @@ def ocr(job):
 
 jobs = [(n, p) for n in SCANS for p in range(1, pages(n) + 1)]
 with ThreadPoolExecutor(10) as pool, open(OUT, "w") as out:
-    for name, page, hits, head in pool.map(ocr, jobs):
-        out.write(f"{name}\t{page}\t{','.join(hits)}\t{head}\n")
+    out.writelines(f"{name}\t{page}\t{','.join(hits)}\t{head}\n" for name, page, hits, head in pool.map(ocr, jobs))

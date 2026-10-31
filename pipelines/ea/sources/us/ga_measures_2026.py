@@ -35,7 +35,7 @@ ROWS = [
         "label": "Transportation SPLOST",
         "url": "https://www.fultoncountyga.gov/-/media/2026-Election/November-3-Election/Sample-Ballot--Consolidated--Nov-32026-General--Special-Election--1082026.pdf",
         "answers": "Yes|No",
-        "wording": "Shall an additional 0.75 percent sales and use tax be imposed in that part of Fulton County, Georgia, outside of the City of Atlanta, for a period not to exceed five years for the purpose of transportation improvements and congestion reduction."
+        "wording": "Shall an additional 0.75 percent sales and use tax be imposed in that part of Fulton County, Georgia, outside of the City of Atlanta, for a period not to exceed five years for the purpose of transportation improvements and congestion reduction.",
     },
     {
         "county": "13121",
@@ -43,7 +43,7 @@ ROWS = [
         "label": "Redevelopment Powers Referendum",
         "url": "https://www.fultoncountyga.gov/-/media/2026-Election/November-3-Election/Sample-Ballot--Consolidated--Nov-32026-General--Special-Election--1082026.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the Act be approved which authorizes the City of Sandy Springs, Georgia, to exercise all redevelopment powers allowed under the ‘Redevelopment Powers Law,’ as it may be amended from time to time."
+        "wording": "Shall the Act be approved which authorizes the City of Sandy Springs, Georgia, to exercise all redevelopment powers allowed under the ‘Redevelopment Powers Law,’ as it may be amended from time to time.",
     },
     {
         "county": "13121",
@@ -51,7 +51,7 @@ ROWS = [
         "label": "Senior Homestead Exemption",
         "url": "https://www.fultoncountyga.gov/-/media/2026-Election/November-3-Election/Sample-Ballot--Consolidated--Nov-32026-General--Special-Election--1082026.pdf",
         "answers": "Yes|No",
-        "wording": "Shall persons who are 65 years of age or older by January 1, 2026 and are a resident of Palmetto, Georgia who own and occupy as a primary residence a home situated in the City of Palmetto qualify for 100% of city ad valorem tax exemption in accordance with O.C.G.A. § 48-5-48.3?"
+        "wording": "Shall persons who are 65 years of age or older by January 1, 2026 and are a resident of Palmetto, Georgia who own and occupy as a primary residence a home situated in the City of Palmetto qualify for 100% of city ad valorem tax exemption in accordance with O.C.G.A. § 48-5-48.3?",
     },
     {
         "county": "13121",
@@ -59,7 +59,7 @@ ROWS = [
         "label": "Educational Special Purpose Local Option Sales Tax (ESPLOST)",
         "url": "https://www.fultoncountyga.gov/-/media/2026-Election/November-3-Election/Sample-Ballot--Consolidated--Nov-32026-General--Special-Election--1082026.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the special one percent sales and use tax for educational purposes currently imposed in Fulton County be reimposed on July 1 2027 upon the expiration of the currently imposed tax, for not longer than 20 consecutive calendar quarters, to raise not more than $2,095,680,577.00 to be used for the following educational purposes: For the Fulton County School District: (A) for acquiring, reconfiguring and developing land for, constructing and equipping, new and replacement schools and support facilities; (B) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, support facilities and athletic facilities; (C) making technology improvements and safety and security improvements for schools and facilities; and (D) replacing, purchasing, upgrading or supplementing capital equipment as needed, including without limitation furniture, multi-year textbooks, instructional resources, physical educational equipment, band and music equipment, audio visual equipment, equipment that supports learning and similar equipment; and (E) acquiring and equipping school buses, school police vehicles, support vehicles, transportation vehicles and other capital equipment; in an amount not to exceed $1,306,195,350.00 for the Fulton County School District, all as more fully described in the Notice of Election. For the Atlanta Independent School System: (A) for acquiring, reconfiguring and developing land for, constructing and equipping, new and replacement schools and support facilities; (B) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, support facilities and athletic facilities; (C) making technology improvements and safety and security improvements for schools and facilities; (D) replacing, purchasing, upgrading or supplementing capital equipment as needed, including without limitation furniture, multi-year textbooks, instructional resources, physical educational equipment, band and music equipment, audio visual equipment, equipment that supports learning and similar equipment; and (E) acquiring and equipping school buses, school police vehicles, support vehicles, transportation vehicles and other capital equipment; at a total maximum cost of $789,485,227.00 , for the Atlanta Independent School System as more fully described in the Notice of Election. If the imposition of the tax is approved by the majority of the qualified voters residing in Fulton County, such vote shall also constitute approval of the issuance of general obligation debt of the Atlanta Independent School System in the principal amount of up to $350,000,000.00 payable from its portion of the tax for the purpose of funding all or a portion of the APS Projects located in Fulton County."
+        "wording": "Shall the special one percent sales and use tax for educational purposes currently imposed in Fulton County be reimposed on July 1 2027 upon the expiration of the currently imposed tax, for not longer than 20 consecutive calendar quarters, to raise not more than $2,095,680,577.00 to be used for the following educational purposes: For the Fulton County School District: (A) for acquiring, reconfiguring and developing land for, constructing and equipping, new and replacement schools and support facilities; (B) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, support facilities and athletic facilities; (C) making technology improvements and safety and security improvements for schools and facilities; and (D) replacing, purchasing, upgrading or supplementing capital equipment as needed, including without limitation furniture, multi-year textbooks, instructional resources, physical educational equipment, band and music equipment, audio visual equipment, equipment that supports learning and similar equipment; and (E) acquiring and equipping school buses, school police vehicles, support vehicles, transportation vehicles and other capital equipment; in an amount not to exceed $1,306,195,350.00 for the Fulton County School District, all as more fully described in the Notice of Election. For the Atlanta Independent School System: (A) for acquiring, reconfiguring and developing land for, constructing and equipping, new and replacement schools and support facilities; (B) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, support facilities and athletic facilities; (C) making technology improvements and safety and security improvements for schools and facilities; (D) replacing, purchasing, upgrading or supplementing capital equipment as needed, including without limitation furniture, multi-year textbooks, instructional resources, physical educational equipment, band and music equipment, audio visual equipment, equipment that supports learning and similar equipment; and (E) acquiring and equipping school buses, school police vehicles, support vehicles, transportation vehicles and other capital equipment; at a total maximum cost of $789,485,227.00 , for the Atlanta Independent School System as more fully described in the Notice of Election. If the imposition of the tax is approved by the majority of the qualified voters residing in Fulton County, such vote shall also constitute approval of the issuance of general obligation debt of the Atlanta Independent School System in the principal amount of up to $350,000,000.00 payable from its portion of the tax for the purpose of funding all or a portion of the APS Projects located in Fulton County.",
     },
     {
         "county": "13089",
@@ -67,7 +67,7 @@ ROWS = [
         "label": "Educational Special Purpose Local Option Sales Tax (ESPLOST)",
         "url": "https://dekalbcountyga.gov/sites/default/files/2026-09/sample-booklet.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the special one percent sales and use tax for educational purposes currently imposed in DeKalb County be reimposed on July 1, 2027, upon the expiration of the such currently imposed tax, for not longer than 20 consecutive calendar quarters, to raise not more than $1,046,154,324.00 to be used for the following educational purposes: For the DeKalb County School District: (A) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, support facilities, athletic fields and physical education facilities; (B) for acquiring and developing land for, constructing and equipping, new and replacement schools and support facilities, as well as additions to existing facilities. (C) for installing capital improvements for various existing and new schools, buildings and facilities (D) for providing hardware, software, and related infrastructure and making technology improvements; and (E) replacing, purchasing, upgrading school buses, support vehicles, and other capital equipment. in an amount not to exceed $946,773,776.00 for the DeKalb County School District, all as more fully described in the Notice of Election. If imposition of the tax is approved by a majority of the voters within the DeKalb County School District, such vote shall also constitute approval of the issuance of general obligation debt of the DeKalb County School District in the principal amount of not to exceed $500,000,000 for the purpose of funding a portion of the above projects of the DeKalb County School District. For the Atlanta Independent School System: (A) for acquiring, reconfiguring and developing land for, constructing and equipping, new and replacement schools and support facilities; (B) replacing, updating, renovating, adding to, modifying, and equipping certain critical systems, infrastructure, safety systems and non- critical if and as needed, based on the condition and identified deficiencies; (C) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, playgrounds, support facilities and athletic facilities as needed; (D) making technology improvements and safety and security improvements for schools and facilities; (E) replacing, purchasing, upgrading or supplementing capital equipment as needed, including without limitation furniture, multi-year textbooks, instructional resources, physical educational equipment, kitchen equipment, band and music equipment and equipment that supports learning; and (F) acquiring and equipping school buses, school police vehicles, support vehicles, transportation vehicles and other capital equipment; at a total maximum cost of $41,504,193.00, for the Atlanta Independent School System as more fully described in the Notice of Election. For the City of Decatur School System: (A) for the acquisition, construction, renovation, modification, addition, repair, replacement, demolition of, improvement and equipping of existing and new school buildings and other facilities, including other buildings and greenspace useful or desirable in connection therewith; (B) to acquire and install safety and technology improvements throughout the school system, including computers, systems, sensors, and related hardware and infrastructure; (C) to acquire school buses, school-related vehicles, and transportation equipment, including infrastructure for electric vehicles; (D) for school and facilities improvement, energy conservation, and maintenance projects; (E) to acquire supplemental capital equipment for the school system, including any property, real and personal, useful and desirable in connection with the projects listed in the Notice of Election; and (F) To pay the cost of acquiring certain assets that are being leased or subject to installment purchase by the City Schools of Decatur and to retire all or a portion of any outstanding general obligation debt of the City of Decatur incurred on behalf of the City Schools of Decatur for school projects in an amount not to exceed $57,876,355.00 for the City Schools of Decatur, all as more fully described in the Notice of Election."
+        "wording": "Shall the special one percent sales and use tax for educational purposes currently imposed in DeKalb County be reimposed on July 1, 2027, upon the expiration of the such currently imposed tax, for not longer than 20 consecutive calendar quarters, to raise not more than $1,046,154,324.00 to be used for the following educational purposes: For the DeKalb County School District: (A) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, support facilities, athletic fields and physical education facilities; (B) for acquiring and developing land for, constructing and equipping, new and replacement schools and support facilities, as well as additions to existing facilities. (C) for installing capital improvements for various existing and new schools, buildings and facilities (D) for providing hardware, software, and related infrastructure and making technology improvements; and (E) replacing, purchasing, upgrading school buses, support vehicles, and other capital equipment. in an amount not to exceed $946,773,776.00 for the DeKalb County School District, all as more fully described in the Notice of Election. If imposition of the tax is approved by a majority of the voters within the DeKalb County School District, such vote shall also constitute approval of the issuance of general obligation debt of the DeKalb County School District in the principal amount of not to exceed $500,000,000 for the purpose of funding a portion of the above projects of the DeKalb County School District. For the Atlanta Independent School System: (A) for acquiring, reconfiguring and developing land for, constructing and equipping, new and replacement schools and support facilities; (B) replacing, updating, renovating, adding to, modifying, and equipping certain critical systems, infrastructure, safety systems and non- critical if and as needed, based on the condition and identified deficiencies; (C) adding to, upgrading, reconfiguring, renovating, replacing, modifying and equipping existing and replacement schools, playgrounds, support facilities and athletic facilities as needed; (D) making technology improvements and safety and security improvements for schools and facilities; (E) replacing, purchasing, upgrading or supplementing capital equipment as needed, including without limitation furniture, multi-year textbooks, instructional resources, physical educational equipment, kitchen equipment, band and music equipment and equipment that supports learning; and (F) acquiring and equipping school buses, school police vehicles, support vehicles, transportation vehicles and other capital equipment; at a total maximum cost of $41,504,193.00, for the Atlanta Independent School System as more fully described in the Notice of Election. For the City of Decatur School System: (A) for the acquisition, construction, renovation, modification, addition, repair, replacement, demolition of, improvement and equipping of existing and new school buildings and other facilities, including other buildings and greenspace useful or desirable in connection therewith; (B) to acquire and install safety and technology improvements throughout the school system, including computers, systems, sensors, and related hardware and infrastructure; (C) to acquire school buses, school-related vehicles, and transportation equipment, including infrastructure for electric vehicles; (D) for school and facilities improvement, energy conservation, and maintenance projects; (E) to acquire supplemental capital equipment for the school system, including any property, real and personal, useful and desirable in connection with the projects listed in the Notice of Election; and (F) To pay the cost of acquiring certain assets that are being leased or subject to installment purchase by the City Schools of Decatur and to retire all or a portion of any outstanding general obligation debt of the City of Decatur incurred on behalf of the City Schools of Decatur for school projects in an amount not to exceed $57,876,355.00 for the City Schools of Decatur, all as more fully described in the Notice of Election.",
     },
     {
         "county": "13089",
@@ -75,7 +75,7 @@ ROWS = [
         "label": "Homestead Exemption for Senior Citizens and Disabled Persons (House Bill 1307)",
         "url": "https://dekalbcountyga.gov/sites/default/files/2026-09/sample-booklet.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the Act to incorporate the City of Brookhaven be amended so as to increase the current homestead exemption for senior citizens and disabled persons from $160,000.00 to $200,000.00?"
+        "wording": "Shall the Act to incorporate the City of Brookhaven be amended so as to increase the current homestead exemption for senior citizens and disabled persons from $160,000.00 to $200,000.00?",
     },
     {
         "county": "13089",
@@ -83,7 +83,7 @@ ROWS = [
         "label": "Annexation (Senate Bill 622)",
         "url": "https://dekalbcountyga.gov/sites/default/files/2026-09/sample-booklet.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the Act which annexes certain land into the City of Tucker be approved?"
+        "wording": "Shall the Act which annexes certain land into the City of Tucker be approved?",
     },
     {
         "county": "13067",
@@ -91,7 +91,7 @@ ROWS = [
         "label": "Special Purpose Local Option Sales Tax (SPLOST)",
         "url": "https://assets.cobbcounty.gov/files/2026-09/SAMPLE%20BALLOT%20DRAFT%20v4%20WEB.pdf",
         "answers": "Yes|No",
-        "wording": "Shall a special 1 percent sales and use tax be re-imposed in the special district of Cobb County for a period of time not to exceed six years and for the raising of an estimated amount of $1,150,000,000.00 for the purpose of funding the following for the County and the seven Municipalities in Cobb County from their respective shares, including the Cities of Acworth, Austell, Kennesaw, Mableton, Marietta, Powder Springs and Smyrna? (1) Transportation Improvements including: roadway and street paving and resurfacing; roadway and corridor redevelopment, infrastructure and safety improvements; intersection and railroad crossing improvements; sidewalk and pedestrian facilities and safety improvements; repair/replacement/rehabilitation of bridges, culverts and roadway drainage systems; traffic operations, efficiency and safety improvements; school zone and traffic calming improvements; traffic management and congestion relief improvements; traffic system (ATMS) improvements; signage and street marking improvements; transportation technology improvements, transit capital improvements, public parking improvements; and Cumberland/Town Center Community Improvement Districts transportation infrastructure improvements; and (2) Infrastructure Improvements including: water, stormwater and drainage infrastructure and system improvements and upgrades; Gateway and streetscape, signage and wayfinding improvements; E.V. vehicles and charging stations; and (3) Parks and Recreation Improvements including: parks facilities renovations, additions, improvements and equipment acquisition and upgrades; parks technology, life safety and security improvements; parks buildings renovations and improvements including mechanical system replacements and subsurface infrastructure improvements; resurfacing and repaving of parks access roadways and parking lots; synthetic turf replacement and conversion; sports complex improvements; and improvements to greenways, trails and multi-use trails; and (4) Facility Improvements including: the construction, replacement, renovation, rehabilitation, enhancement or upgrade of libraries; senior centers; public safety facilities; solid waste transfer station(s); community centers; a State Court courthouse; an Adult Detention Center Infirmary Building and related improvements; county and municipal buildings, systems and facilities; fleet replacements including maintenance and sanitation trucks and police cars; and the purchase and acquisition of real property and equipment, including public safety equipment, for such improvements, as needed; and (5) Technology Improvements including: the installation, enhancement or upgrade(s) to infrastructure technology, communication and recordkeeping systems; audio/visual systems; enhanced life safety and security improvements at public facilities; Geographic Information System; security and cyber security protection systems; enterprise systems and financial enterprise software; data management and modernization; digital access and citizen engagement system(s); digital government business systems; public safety technology upgrades; and improvements to the Countywide E-911 system; All such projects are to take place within the special district of Cobb County, including unincorporated Cobb County, and the Cities of Acworth, Austell, Kennesaw, Mableton, Marietta, Powder Springs, and Smyrna."
+        "wording": "Shall a special 1 percent sales and use tax be re-imposed in the special district of Cobb County for a period of time not to exceed six years and for the raising of an estimated amount of $1,150,000,000.00 for the purpose of funding the following for the County and the seven Municipalities in Cobb County from their respective shares, including the Cities of Acworth, Austell, Kennesaw, Mableton, Marietta, Powder Springs and Smyrna? (1) Transportation Improvements including: roadway and street paving and resurfacing; roadway and corridor redevelopment, infrastructure and safety improvements; intersection and railroad crossing improvements; sidewalk and pedestrian facilities and safety improvements; repair/replacement/rehabilitation of bridges, culverts and roadway drainage systems; traffic operations, efficiency and safety improvements; school zone and traffic calming improvements; traffic management and congestion relief improvements; traffic system (ATMS) improvements; signage and street marking improvements; transportation technology improvements, transit capital improvements, public parking improvements; and Cumberland/Town Center Community Improvement Districts transportation infrastructure improvements; and (2) Infrastructure Improvements including: water, stormwater and drainage infrastructure and system improvements and upgrades; Gateway and streetscape, signage and wayfinding improvements; E.V. vehicles and charging stations; and (3) Parks and Recreation Improvements including: parks facilities renovations, additions, improvements and equipment acquisition and upgrades; parks technology, life safety and security improvements; parks buildings renovations and improvements including mechanical system replacements and subsurface infrastructure improvements; resurfacing and repaving of parks access roadways and parking lots; synthetic turf replacement and conversion; sports complex improvements; and improvements to greenways, trails and multi-use trails; and (4) Facility Improvements including: the construction, replacement, renovation, rehabilitation, enhancement or upgrade of libraries; senior centers; public safety facilities; solid waste transfer station(s); community centers; a State Court courthouse; an Adult Detention Center Infirmary Building and related improvements; county and municipal buildings, systems and facilities; fleet replacements including maintenance and sanitation trucks and police cars; and the purchase and acquisition of real property and equipment, including public safety equipment, for such improvements, as needed; and (5) Technology Improvements including: the installation, enhancement or upgrade(s) to infrastructure technology, communication and recordkeeping systems; audio/visual systems; enhanced life safety and security improvements at public facilities; Geographic Information System; security and cyber security protection systems; enterprise systems and financial enterprise software; data management and modernization; digital access and citizen engagement system(s); digital government business systems; public safety technology upgrades; and improvements to the Countywide E-911 system; All such projects are to take place within the special district of Cobb County, including unincorporated Cobb County, and the Cities of Acworth, Austell, Kennesaw, Mableton, Marietta, Powder Springs, and Smyrna.",
     },
     {
         "county": "13067",
@@ -99,7 +99,7 @@ ROWS = [
         "label": "Redevelopment Powers Law Referendum",
         "url": "https://assets.cobbcounty.gov/files/2026-09/SAMPLE%20BALLOT%20DRAFT%20v4%20WEB.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the Act be approved which authorizes the City of Mableton, Georgia, to exercise all redevelopment powers allowed under the 'Redevelopment Powers Law,' as it may be amended from time to time?"
+        "wording": "Shall the Act be approved which authorizes the City of Mableton, Georgia, to exercise all redevelopment powers allowed under the 'Redevelopment Powers Law,' as it may be amended from time to time?",
     },
     {
         "county": "13135",
@@ -107,7 +107,7 @@ ROWS = [
         "label": "Homestead Exemption for Public Service Employees (HB 540)",
         "url": "https://www.gwinnettcounty.com/documents/d/gwinnett-county/november-3-special-election-notice-hb-540",
         "answers": "Yes|No",
-        "wording": "Shall the existing additional $2,000 homestead exemption from Gwinnett County School District ad valorem taxes for educational purposes for certain public service employees be expanded to also apply to disabled veterans and all employees of the Gwinnett County School District and the Buford City School District?"
+        "wording": "Shall the existing additional $2,000 homestead exemption from Gwinnett County School District ad valorem taxes for educational purposes for certain public service employees be expanded to also apply to disabled veterans and all employees of the Gwinnett County School District and the Buford City School District?",
     },
     {
         "county": "13051",
@@ -115,8 +115,8 @@ ROWS = [
         "label": "School Board Ad Valorem Tax Referendum",
         "url": "https://cms.chathamcountyga.gov/api/assets/elections-website/64985a67-cce4-4146-a8dd-52587318e5f2/call-for-election-tax-referendum-11-3-2026.pdf",
         "answers": "Yes|No",
-        "wording": "Shall the Act amending the adjusted base year assessed value homestead exemption from Chatham County and City of Savannah School District ad valorem taxes for educational purposes be approved so as to prevent any future increases in the adjusted base year assessed value of a homestead above the assessed value of such homestead in tax year 2025?"
-    }
+        "wording": "Shall the Act amending the adjusted base year assessed value homestead exemption from Chatham County and City of Savannah School District ad valorem taxes for educational purposes be approved so as to prevent any future increases in the adjusted base year assessed value of a homestead above the assessed value of such homestead in tax year 2025?",
+    },
 ]
 
 
@@ -126,8 +126,12 @@ def fetch() -> None:
             try:
                 raw.cached(SOURCE, url)
             except LookupError:
-                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
-                raw.store(SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+                content = subprocess.run(
+                    ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                ).stdout
+                raw.store(
+                    SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+                )
 
 
 def parse() -> None:
@@ -176,7 +180,9 @@ def emit() -> Path:
                 option = f"special:{row['county']}:{entity}"
             elif county_key in found:
                 county, county_area, _, county_path, county_code = found[county_key]
-                minted = govmint.special(conn, cs, "GA", (county, county_area, county_path, county_code), entity, civil.slugs)
+                minted = govmint.special(
+                    conn, cs, "GA", (county, county_area, county_path, county_code), entity, civil.slugs
+                )
                 if minted is not None:
                     option = f"special:{row['county']}:{entity}"
                     found[option] = minted
@@ -199,7 +205,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:GA:{code}:measure:{slug(label)}"
@@ -220,7 +233,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(row["answers"].split("|")):
@@ -234,7 +254,12 @@ def emit() -> Path:
                 )
             cs.add("citation", entity_id=contest, source_id=source)
             if "DRAFT" in row["url"]:
-                cs.add("note", entity_id=contest, kind="caveat", body_md="The wording is from the county's draft sample ballot (v4) and may change before the final ballot.")
+                cs.add(
+                    "note",
+                    entity_id=contest,
+                    kind="caveat",
+                    body_md="The wording is from the county's draft sample ballot (v4) and may change before the final ballot.",
+                )
             cs.add(
                 "ballot_question_text",
                 contest_id=contest,

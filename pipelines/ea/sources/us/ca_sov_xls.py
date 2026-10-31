@@ -88,7 +88,9 @@ def parse() -> None:
                 if row[0] and not row[0].strip().startswith("Percent") and row[0].strip() != "State Totals"
             ]
             total = next(
-                [int(row[1 + index] or 0) for index in keep] for row in cells if (row[0] or "").strip() == "State Totals"
+                [int(row[1 + index] or 0) for index in keep]
+                for row in cells
+                if (row[0] or "").strip() == "State Totals"
             )
             if len(counties) != 58 or [sum(column) for column in zip(*(v for _, v in counties), strict=True)] != total:
                 raise ValueError(f"{year} {title}: {len(counties)} counties that do not add up to the State Totals row")

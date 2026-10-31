@@ -12,7 +12,9 @@ from ea.sources.us import enr_clarity, kceb
 SOURCE = "us.stl_boe"
 VERSION = "1"
 PLATFORM = "mo_stl_boe"
-LISTING = "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/elections/results/past-years.cfm"
+LISTING = (
+    "https://www.stlouis-mo.gov/government/departments/board-election-commissioners/elections/results/past-years.cfm"
+)
 EXCLUDED = re.compile(r"(?i)precinct|pct|ward|wd\d|sovc|breakdown|28wards|unofficial")
 STATE = re.compile(
     r"(?i)^(?:for\s+)?(?:u\.?s\.?|st\.?|state|lt|secr?|secretary|governor|president and|president$|pres(?: dem| rep)?$|presidential|constitutional|amendment|"
@@ -26,7 +28,9 @@ CUMULATIVE_ROW = re.compile(
 CAST = re.compile(r"^\s*Cast Votes:.*?(\d[\d,]*)\s+100\.00%\s*$")
 
 
-COUNTY_SIDE = re.compile(r"(?i)sheriff|rec(?:order|ord)? (?:of )?deeds|circ(?:uit)? att|prosecuting att|circuit clerk|coroner")
+COUNTY_SIDE = re.compile(
+    r"(?i)sheriff|rec(?:order|ord)? (?:of )?deeds|circ(?:uit)? att|prosecuting att|circuit clerk|coroner"
+)
 SCHOOL_BOARD = re.compile(r"(?i)board of ed|bd of ed")
 REWRITES = (
     (re.compile(r"(?i)\bPRES(?:IDENT)?(?: OF)?(?: THE)? BOA(?:RD OF ALDERMEN)?\b"), "Council President"),
@@ -55,17 +59,19 @@ def _title(title: str) -> str:
 
 def _links() -> list[str]:
     page = raw.cached(SOURCE, LISTING).path.read_text(errors="replace")
-    links = {urljoin(LISTING, href) for href in re.findall(r'href="([^"]*\.pdf)"', page, re.I)}
+    links = {urljoin(LISTING, href) for href in re.findall(r'href="([^"]*\.pdf)"', page, re.IGNORECASE)}
     return sorted(link for link in links if not EXCLUDED.search(link.rsplit("/", 1)[1]))
 
 
 def _precinct_links() -> list[str]:
     page = raw.cached(SOURCE, LISTING).path.read_text(errors="replace")
-    links = {urljoin(LISTING, href) for href in re.findall(r'href="([^"]*\.pdf)"', page, re.I)}
+    links = {urljoin(LISTING, href) for href in re.findall(r'href="([^"]*\.pdf)"', page, re.IGNORECASE)}
     return sorted(
         link
         for link in links
-        if re.match(r"(?i)(?:jan|feb|mar|apr|may|jun|jul|aug|sep|nov|dec)2[3-9]-.*(?:precinct|pct)", link.rsplit("/", 1)[1])
+        if re.match(
+            r"(?i)(?:jan|feb|mar|apr|may|jun|jul|aug|sep|nov|dec)2[3-9]-.*(?:precinct|pct)", link.rsplit("/", 1)[1]
+        )
     )
 
 
@@ -82,7 +88,14 @@ def cumulative(text: str) -> Iterator[dict[str, Any]]:
     for index, line in enumerate(lines):
         if not re.match(r"^\s*Choice\s+Party\b", line) or index == 0:
             continue
-        title = next((lines[back].strip() for back in range(index - 1, max(index - 4, -1), -1) if lines[back].strip() and not lines[back].strip().startswith("Absentee Voting -")), "")
+        title = next(
+            (
+                lines[back].strip()
+                for back in range(index - 1, max(index - 4, -1), -1)
+                if lines[back].strip() and not lines[back].strip().startswith("Absentee Voting -")
+            ),
+            "",
+        )
         choices: list[dict[str, Any]] = []
         cast = None
         for other in lines[index + 1 : index + 60]:
@@ -93,7 +106,6 @@ def cumulative(text: str) -> Iterator[dict[str, Any]]:
             if not row or other.strip().startswith(("Choice", "Undervotes", "Overvotes", "Rejected")):
                 continue
             name = re.sub(r"\s+", " ", row["name"]).strip()
-            write_in = name.lower().startswith("write-in") or name.endswith("(W)")
             choices.append(
                 {
                     "text": "Write-ins" if name.lower().startswith("write-in") else name,
@@ -109,7 +121,7 @@ def cumulative(text: str) -> Iterator[dict[str, Any]]:
 def precinct(text: str) -> Iterator[dict[str, Any]]:
     merged: dict[str, dict[str, Any]] = {}
     for page in text.split("\f"):
-        found = re.search(r"^(Ward \d+ Precinct \d+)", page, re.M)
+        found = re.search(r"^(Ward \d+ Precinct \d+)", page, re.MULTILINE)
         if not found:
             continue
         for node in cumulative(page):
@@ -129,7 +141,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     precinct_days: set[Any] = set()
     for link in (*_precinct_links(), *_links()):
         path = raw.cached(SOURCE, link).path
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True).stdout.decode(errors="replace")
+        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=False).stdout.decode(
+            errors="replace"
+        )
         head = text[:4000]
         if "Election Summary Report" in head[:300]:
             parser = kceb.gems

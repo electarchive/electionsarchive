@@ -46,8 +46,22 @@ MANUAL = {
     "1918": "amanualforusege10taylgoog",
 }
 ORDINALS = {
-    51: "first", 52: "second", 53: "third", 54: "fourth", 55: "fifth", 56: "sixth", 57: "seventh", 58: "eighth",
-    59: "ninth", 60: "tieth", 61: "first", 62: "second", 63: "third", 64: "fourth", 65: "fifth", 66: "sixth",
+    51: "first",
+    52: "second",
+    53: "third",
+    54: "fourth",
+    55: "fifth",
+    56: "sixth",
+    57: "seventh",
+    58: "eighth",
+    59: "ninth",
+    60: "tieth",
+    61: "first",
+    62: "second",
+    63: "third",
+    64: "fourth",
+    65: "fifth",
+    66: "sixth",
 }
 HEADING = re.compile(r"Representatives?\s+in\s+(the\s+\S+\s+)?Congress", re.IGNORECASE)
 PARTY = re.compile(r"REPUBLICAN|DEMOCRATIC|PROGRESSIVE|PROHIBITION")

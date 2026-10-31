@@ -19,14 +19,30 @@ PIERCE = (
     ".xls",
     "application/vnd.ms-excel",
 )
-CLARK = ("https://clark.wa.gov/sites/default/files/fileuploads/Elections/2016/09/canvass_-_11-8-2016.xls", ".xls", "application/vnd.ms-excel")
+CLARK = (
+    "https://clark.wa.gov/sites/default/files/fileuploads/Elections/2016/09/canvass_-_11-8-2016.xls",
+    ".xls",
+    "application/vnd.ms-excel",
+)
 THURSTON = (
     "https://s3.us-west-2.amazonaws.com/thurstoncountywa.gov.if-us-west-2/s3fs-public/2023-02/Auditor_Results%20by%20Precinct_Nov%202016.xlsx",
     ".xlsx",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
-NAMES = ("Hillary Clinton", "Donald J. Trump", "Alyson Kennedy", "Gloria Estela La Riva", "Jill Stein", "Darrell L. Castle", "Gary Johnson")
-CLALLAM = ("https://www.clallamcountywa.gov/DocumentCenter/View/4212/Precinct-2016-General-PDF", ".pdf", "application/pdf")
+NAMES = (
+    "Hillary Clinton",
+    "Donald J. Trump",
+    "Alyson Kennedy",
+    "Gloria Estela La Riva",
+    "Jill Stein",
+    "Darrell L. Castle",
+    "Gary Johnson",
+)
+CLALLAM = (
+    "https://www.clallamcountywa.gov/DocumentCenter/View/4212/Precinct-2016-General-PDF",
+    ".pdf",
+    "application/pdf",
+)
 INBOX = Path(__file__).parents[4] / "data/inbox/manual"
 WHATCOM = (
     "https://www.whatcomcounty.us/DocumentCenter/View/24061",
@@ -53,7 +69,9 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            raw.store(SOURCE, url, path.read_bytes(), suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type)
+            raw.store(
+                SOURCE, url, path.read_bytes(), suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type
+            )
     for url, suffix, media_type in (PIERCE, CLALLAM, CLARK, THURSTON):
         try:
             raw.cached(SOURCE, url)
@@ -87,7 +105,10 @@ def emit() -> Path:
                         break
                     pierce[f"2016:WA:53011::{data[0]}"] = int(data[column])
     text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, CLALLAM[0]).path), "-"], capture_output=True, check=True, text=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, CLALLAM[0]).path), "-"],
+        capture_output=True,
+        check=True,
+        text=True,
     ).stdout
     clallam = {}
     precinct = None
@@ -101,13 +122,20 @@ def emit() -> Path:
             clallam[precinct] = section
         elif re.match(r"\s+\S.*, Vote For", line):
             section = None
-        elif section is not None and (found := re.match(r"\s+(Hillary Clinton|Donald J\. Trump|Alyson Kennedy|Gloria Estela La Riva|Jill Stein|Darrell L\. Castle|Gary Johnson|Unresolved Write-Ins)\D+?(\d+)", line)):
+        elif section is not None and (
+            found := re.match(
+                r"\s+(Hillary Clinton|Donald J\. Trump|Alyson Kennedy|Gloria Estela La Riva|Jill Stein|Darrell L\. Castle|Gary Johnson|Unresolved Write-Ins)\D+?(\d+)",
+                line,
+            )
+        ):
             section[found[1]] = int(found[2])
     with connect() as conn:
         contest, election = conn.execute(
             "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = '2016-11-08:WA:president'"
         ).fetchone()
-        option = conn.execute("select id from contest_option where contest_id = %s and ballot_label = 'Scattered'", [contest]).fetchone()[0]
+        option = conn.execute(
+            "select id from contest_option where contest_id = %s and ballot_label = 'Scattered'", [contest]
+        ).fetchone()[0]
         values = conn.execute(
             """select u.code, u.id, o.id, v.value from result_value v
                join result_set r on r.k = v.result_set_k join reporting_unit u on u.k = v.unit_k join contest_option o on o.k = v.option_k
@@ -119,7 +147,9 @@ def emit() -> Path:
         for code, unit, option_id, value in values:
             units[code] = unit
             tallies.setdefault(code, {})[option_id] = value
-        labels = dict(conn.execute("select id, ballot_label from contest_option where contest_id = %s", [contest]).fetchall())
+        labels = dict(
+            conn.execute("select id, ballot_label from contest_option where contest_id = %s", [contest]).fetchall()
+        )
         by_votes = {}
         for code, tally in tallies.items():
             if code.startswith("2016:WA:53009:"):
@@ -132,16 +162,27 @@ def emit() -> Path:
         by_tuple = {}
         for code, tally in tallies.items():
             if code.startswith("2016:WA:53067:"):
-                by_tuple.setdefault(tuple(int(next(v for o, v in tally.items() if labels[o].startswith(name))) for name in NAMES), []).append(code)
+                by_tuple.setdefault(
+                    tuple(int(next(v for o, v in tally.items() if labels[o].startswith(name))) for name in NAMES), []
+                ).append(code)
         writeins = dict(pierce)
         by_county: dict[str, dict[tuple[int, ...], list[str]]] = {}
         for code, tally in tallies.items():
             by_county.setdefault(code[8:13], {}).setdefault(
                 tuple(int(next(v for o, v in tally.items() if labels[o].startswith(name))) for name in NAMES), []
             ).append(code)
-        for sheet in pl.read_excel(raw.cached(SOURCE, WHATCOM[0]).path, has_header=False, sheet_id=0, infer_schema_length=0).values():
+        for sheet in pl.read_excel(
+            raw.cached(SOURCE, WHATCOM[0]).path, has_header=False, sheet_id=0, infer_schema_length=0
+        ).values():
             rows = sheet.rows()
-            start = next((index for index, row in enumerate(rows) if any(cell is not None and "Hillary" in str(cell) for cell in row)), None)
+            start = next(
+                (
+                    index
+                    for index, row in enumerate(rows)
+                    if any(cell is not None and "Hillary" in str(cell) for cell in row)
+                ),
+                None,
+            )
             if start is None:
                 continue
             for row in rows[start + 1 :]:
@@ -157,7 +198,7 @@ def emit() -> Path:
         po_text = raw.cached(SOURCE, PEND_OREILLE[0]).path.read_text(errors="replace")
         pend = {}
         for block in re.split(r"\n\s+(?=\d{4} [A-Z])", po_text)[1:]:
-            section = re.search(r"Pres\. & VP of US\nVote for 1\n(.*?)Over Votes", block, flags=re.S)
+            section = re.search(r"Pres\. & VP of US\nVote for 1\n(.*?)Over Votes", block, flags=re.DOTALL)
             if section is None:
                 continue
             numbers = [int(n.replace(",", "")) for n in re.findall(r"\.\s+([\d,]+)(?:\s+[\d.]+)?\s*\n", section[1])]
@@ -169,9 +210,16 @@ def emit() -> Path:
             pend[matches[0]] = numbers[7]
         writeins |= pend
         yakima_lines = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, YAKIMA[0]).path), "-"], capture_output=True, check=True, text=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, YAKIMA[0]).path), "-"],
+            capture_output=True,
+            check=True,
+            text=True,
         ).stdout.splitlines()
-        first = next(index for index, line in enumerate(yakima_lines) if index > 200 and line.strip() == "President / Vice President of the United States")
+        first = next(
+            index
+            for index, line in enumerate(yakima_lines)
+            if index > 200 and line.strip() == "President / Vice President of the United States"
+        )
         last = next(index for index in range(first, len(yakima_lines)) if yakima_lines[index].strip() == "U.S. Senator")
         yakima_skipped = []
         for line in yakima_lines[first:last]:
@@ -186,15 +234,28 @@ def emit() -> Path:
                 elif sum(numbers[:8]) > 0:
                     yakima_skipped.append(cells[0])
         print("Yakima precincts without a single match:", yakima_skipped)
-        thurston = list(pl.read_excel(raw.cached(SOURCE, THURSTON[0]).path, has_header=False, sheet_id=0).values())[0].rows()
-        start = next(index for index, row in enumerate(thurston) if any(cell is not None and "Hillary" in str(cell) for cell in row))
+        thurston = next(
+            iter(pl.read_excel(raw.cached(SOURCE, THURSTON[0]).path, has_header=False, sheet_id=0).values())
+        ).rows()
+        start = next(
+            index
+            for index, row in enumerate(thurston)
+            if any(cell is not None and "Hillary" in str(cell) for cell in row)
+        )
         for row in thurston[start + 1 :]:
             if row[0] is None or row[0] == "Precincts" or row[0] == "TOTALS":
                 break
             votes = tuple(int(row[index]) for index in range(5, 12))
             stem = re.sub(r"\s+\d{3}$", "", row[0])
-            names = {re.sub(r"[^a-z0-9]", "", name.lower()) for name in (row[0], stem, re.sub(r"\s*#\d+", "", stem), row[0].replace("#", ""))}
-            exact = [folded[name] for name in names if name in folded and by_tuple.get(votes) is not None and folded[name] in by_tuple[votes]]
+            names = {
+                re.sub(r"[^a-z0-9]", "", name.lower())
+                for name in (row[0], stem, re.sub(r"\s*#\d+", "", stem), row[0].replace("#", ""))
+            }
+            exact = [
+                folded[name]
+                for name in names
+                if name in folded and by_tuple.get(votes) is not None and folded[name] in by_tuple[votes]
+            ]
             if exact:
                 writeins[exact[0]] = int(row[12])
             elif len(by_tuple.get(votes, [])) == 1:
@@ -214,7 +275,15 @@ def emit() -> Path:
             polity="US-WA",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url="https://www.piercecountywa.gov/", license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url="https://www.piercecountywa.gov/",
+            license="Public record",
+        )
         cs.artifact(raw.cached(SOURCE, PIERCE[0]), source)
         cs.artifact(raw.cached(SOURCE, CLALLAM[0]), source)
         cs.artifact(raw.cached(SOURCE, CLARK[0]), source)
@@ -227,9 +296,21 @@ def emit() -> Path:
                where r.contest_id = %s and r.id <> %s and v.measure = 1 group by r.id, s.publisher order by (s.publisher = 'Federal Election Commission') desc, 1 desc limit 1""",
             [contest, result_set],
         ).fetchone()[0]
-        columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+        columns = (
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
+            "supersedes_id",
+        )
         for prior in conn.execute(
-            f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+            f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+            [contest, result_set],
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
         for outcome_option, kind, seats in conn.execute(
@@ -259,7 +340,27 @@ def emit() -> Path:
         )
         for code, tally in tallies.items():
             for option_id, value in tally.items():
-                cs.add("result_value", result_set_id=result_set, unit_id=units[code], option_id=option_id, channel=0, measure=1, count_round=0, flags=0, value=value)
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=units[code],
+                    option_id=option_id,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=value,
+                )
         for code, value in writeins.items():
-            cs.add("result_value", result_set_id=result_set, unit_id=units[code], option_id=option, channel=0, measure=1, count_round=0, flags=0, value=value)
+            cs.add(
+                "result_value",
+                result_set_id=result_set,
+                unit_id=units[code],
+                option_id=option,
+                channel=0,
+                measure=1,
+                count_round=0,
+                flags=0,
+                value=value,
+            )
         return cs.write()

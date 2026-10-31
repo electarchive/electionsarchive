@@ -51,7 +51,8 @@ FILES = {
     date(2016, 8, 4): WAYBACK + "https://sos-tn-gov-files.s3.amazonaws.com/2016_August_PPP_Turnout.pdf",
     date(2016, 11, 8): WAYBACK + "https://sos-tn-gov-files.s3.amazonaws.com/2016_November_PPP_Turnout.pdf",
     date(2022, 8, 4): WAYBACK + "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/2022_August_Turnout.pdf",
-    date(2024, 11, 5): WAYBACK + "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/2024%20November%20Turnout%20Report.pdf",
+    date(2024, 11, 5): WAYBACK
+    + "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/2024%20November%20Turnout%20Report.pdf",
 }
 FILES = {day: name if name.startswith("http") else BASE + name for day, name in FILES.items()}
 ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .'-]*?):?\s+([\d,]+)\s+([\d,]+)\s+([\d.]+)%")
@@ -76,7 +77,14 @@ def fetch() -> None:
                 time.sleep(30 * (attempt + 1))
                 continue
             if response.status_code == 200 and response.content[:4] == b"%PDF":
-                raw.store(SOURCE, address, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+                raw.store(
+                    SOURCE,
+                    address,
+                    response.content,
+                    suffix=".pdf",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/pdf",
+                )
                 break
             time.sleep(15 * (attempt + 1))
         else:
@@ -99,13 +107,17 @@ def parse() -> None:
             path = raw.cached(SOURCE, name).path
         except LookupError:
             continue
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
         scanned = not text.strip()
         if scanned:
             with tempfile.TemporaryDirectory() as tmp:
                 subprocess.run(["pdftoppm", "-r", "300", "-gray", str(path), f"{tmp}/p"], check=True)
                 text = "\n".join(
-                    subprocess.run(["tesseract", str(image), "-", "--psm", "6"], capture_output=True, text=True, check=True).stdout
+                    subprocess.run(
+                        ["tesseract", str(image), "-", "--psm", "6"], capture_output=True, text=True, check=True
+                    ).stdout
                     for image in sorted(Path(tmp).glob("p-*.pgm"))
                 )
         found = {}
@@ -125,7 +137,9 @@ def parse() -> None:
             if close and codes[close[0]] not in found and values[1] <= values[0]:
                 found[codes[close[0]]] = values
         got = (sum(v[0] for v in found.values()), sum(v[1] for v in found.values()))
-        ok = len(found) == 95 and (total is None or (abs(got[0] - total[0]) <= total[0] // 500 and abs(got[1] - total[1]) <= total[1] // 500))
+        ok = len(found) == 95 and (
+            total is None or (abs(got[0] - total[0]) <= total[0] // 500 and abs(got[1] - total[1]) <= total[1] // 500)
+        )
         print(f"{day}: {len(found)} counties {got} vs {total} {'ok' if ok else 'SKIPPED'}")
         if ok:
             for code, (registered, voters) in found.items():
@@ -163,11 +177,20 @@ def emit() -> Path:
         published = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'",
+                (source,),
             )
         }
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url="https://sos.tn.gov/elections/statistics", license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url="https://sos.tn.gov/elections/statistics",
+                license="Public record",
+            )
         for (day,), rows in frame.group_by("date", maintain_order=True):
             if day not in elections:
                 print(f"{day}: no election")

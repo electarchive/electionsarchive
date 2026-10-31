@@ -40,22 +40,35 @@ def parse() -> None:
     )
     rows = []
     for (office, party), (chamber, district) in CONTESTS.items():
-        for county, candidate, votes in table.filter(pl.col("office") == office, pl.col("party") == party).select(
-            "jurisdiction", "candidate", "votes"
-        ).iter_rows():
+        for county, candidate, votes in (
+            table.filter(pl.col("office") == office, pl.col("party") == party)
+            .select("jurisdiction", "candidate", "votes")
+            .iter_rows()
+        ):
             rows.append(
-                (chamber, district, codes[re.sub(r"[^a-z]", "", county.lower().removesuffix(" county"))], TITLES.sub("", candidate).upper(), int(votes))
+                (
+                    chamber,
+                    district,
+                    codes[re.sub(r"[^a-z]", "", county.lower().removesuffix(" county"))],
+                    TITLES.sub("", candidate).upper(),
+                    int(votes),
+                )
             )
     frame = pl.DataFrame(
         rows,
-        schema={"chamber": pl.String, "district": pl.Int64, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+        schema={
+            "chamber": pl.String,
+            "district": pl.Int64,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
         orient="row",
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.with_columns(
         day=pl.lit(DAY),
         year=pl.lit(2002, pl.Int32),
-        
         special=pl.lit(False),
         state=pl.lit("AR"),
         writein=pl.lit(False),
@@ -63,7 +76,11 @@ def parse() -> None:
         kind=pl.lit("county"),
         source=pl.lit("AR"),
     ).write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("chamber", "district", "candidate").agg(pl.col("votes").sum(), pl.len()).sort("chamber", "district"))
+    print(
+        frame.group_by("chamber", "district", "candidate")
+        .agg(pl.col("votes").sum(), pl.len())
+        .sort("chamber", "district")
+    )
 
 
 def emit() -> Path:

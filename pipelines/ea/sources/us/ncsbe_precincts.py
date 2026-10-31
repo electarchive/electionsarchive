@@ -35,13 +35,17 @@ def parse() -> None:
     frames = []
     for day in DAYS:
         frame = ncsbe.read(day)
-        name = pl.col("contest").str.strip_chars().str.replace_all(r"\s+", " ").str.to_uppercase().str.strip_prefix("NC ")
+        name = (
+            pl.col("contest").str.strip_chars().str.replace_all(r"\s+", " ").str.to_uppercase().str.strip_prefix("NC ")
+        )
         parts = name.str.extract_groups(ncsbe.CONTEST.pattern)
         seat = name.str.extract_groups(ncsbe.STATE)
         title = name.replace_strict(STATEWIDE, default=None)
         precinct = pl.col("precinct").str.strip_chars()
         if "precinct_abbrv" in frame.columns:
-            precinct = pl.concat_str(pl.col("precinct_abbrv").str.strip_chars(), precinct, separator=" ").str.strip_chars()
+            precinct = pl.concat_str(
+                pl.col("precinct_abbrv").str.strip_chars(), precinct, separator=" "
+            ).str.strip_chars()
         frames.append(
             frame.with_columns(parts=parts, seat=seat, title=title, name=name, place=precinct)
             .filter(
@@ -81,7 +85,13 @@ def parse() -> None:
                 countyname=pl.col("county").str.strip_chars().str.to_uppercase(),
                 place="place",
                 candidate=pl.when(pl.col("name").str.starts_with("PRESIDENT"))
-                .then(pl.col("choice").str.to_uppercase().str.replace(r"/.*$", "").str.replace(r"-[A-Z]\. .*$", "").str.strip_chars())
+                .then(
+                    pl.col("choice")
+                    .str.to_uppercase()
+                    .str.replace(r"/.*$", "")
+                    .str.replace(r"-[A-Z]\. .*$", "")
+                    .str.strip_chars()
+                )
                 .otherwise(pl.col("choice").str.to_uppercase().str.strip_chars()),
                 votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False),
             )
@@ -103,17 +113,23 @@ def parse() -> None:
             code=pl.when(pl.col("kind") == "county")
             .then("county")
             .otherwise(
-                pl.concat_str(pl.col("day").cast(pl.String), pl.lit("NC"), "county", "countyname", "place", separator=":")
+                pl.concat_str(
+                    pl.col("day").cast(pl.String), pl.lit("NC"), "county", "countyname", "place", separator=":"
+                )
             ),
         )
         .filter(pl.col("measure") > 0)
-        .group_by("year", "chamber", "day", "special", "state", "district", "kind", "code", "county", "candidate", "measure")
+        .group_by(
+            "year", "chamber", "day", "special", "state", "district", "kind", "code", "county", "candidate", "measure"
+        )
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .with_columns(source=pl.lit("NC"))
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "precincts.parquet")
-    print(frame.filter(pl.col("kind") == "precinct").group_by("year").agg(pl.col("code").n_unique()).sort("year").rows())
+    print(
+        frame.filter(pl.col("kind") == "precinct").group_by("year").agg(pl.col("code").n_unique()).sort("year").rows()
+    )
 
 
 def emit() -> Path:

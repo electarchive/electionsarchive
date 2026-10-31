@@ -79,7 +79,9 @@ def sections(lines: list[str], names: dict[str, str]) -> list[dict[str, object]]
         header: list[str] = []
         rows: list[str] = []
         j += 1
-        while j < len(lines) and not re.search(r"OFFICIAL\s+RET\S*\s+(GENERAL|DEMOCRAT|REPUBLIC|PRIMARY|RUNOFF)", lines[j]):
+        while j < len(lines) and not re.search(
+            r"OFFICIAL\s+RET\S*\s+(GENERAL|DEMOCRAT|REPUBLIC|PRIMARY|RUNOFF)", lines[j]
+        ):
             parsed = groups(lines[j]) if lines[j].strip() else None
             if parsed and parsed[0][1]:
                 rows.append(lines[j])
@@ -124,9 +126,11 @@ def parse() -> None:
         }
     frames = []
     report = []
-    for tag, ptr in POINTERS.items():
+    for ptr in POINTERS.values():
         path = raw.cached(SOURCE, URL.format(ptr=ptr)).path
-        lines = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True).stdout.splitlines()
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=False
+        ).stdout.splitlines()
         for section in sections(lines, names):
             year, office = section["year"], section["office"]
             note = f"{year} {office}"
@@ -228,7 +232,14 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, URL.format(ptr=ptr)), source)
         authoritative = "The State Election Board's printed official returns for the general election; every column adds up to the printed total."
         medsl.attach(
-            cs, conn, frame.filter(pl.col("chamber") != "president"), {"OK": source}, authoritative=authoritative, extend=True
+            cs,
+            conn,
+            frame.filter(pl.col("chamber") != "president"),
+            {"OK": source},
+            authoritative=authoritative,
+            extend=True,
         )
-        medsl.attach(cs, conn, frame.filter(pl.col("chamber") == "president"), {"OK": source}, authoritative=authoritative)
+        medsl.attach(
+            cs, conn, frame.filter(pl.col("chamber") == "president"), {"OK": source}, authoritative=authoritative
+        )
         return cs.write()

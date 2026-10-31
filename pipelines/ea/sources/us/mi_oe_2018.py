@@ -62,7 +62,16 @@ def parse() -> None:
             votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
         )
         .group_by(
-            *contest, "magnitude", "kind", "code", "county", "candidate", "party", "writein", "measure", maintain_order=True
+            *contest,
+            "magnitude",
+            "kind",
+            "code",
+            "county",
+            "candidate",
+            "party",
+            "writein",
+            "measure",
+            maintain_order=True,
         )
         .agg(pl.col("votes").sum())
     )

@@ -78,7 +78,17 @@ def parse() -> None:
     for key, total in totals.items():
         if sums[key] != total:
             raise ValueError(f"{key}: counties sum to {sums[key]}, printed {total}")
-    frame = pl.DataFrame(rows, schema={"district": pl.Int64, "party": pl.String, "candidate": pl.String, "county": pl.String, "votes": pl.Int64}, orient="row").with_columns(
+    frame = pl.DataFrame(
+        rows,
+        schema={
+            "district": pl.Int64,
+            "party": pl.String,
+            "candidate": pl.String,
+            "county": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    ).with_columns(
         code=pl.col("county").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips, default=None)
     )
     lost = frame.filter(pl.col("code").is_null())

@@ -35,9 +35,11 @@ def parse() -> None:
         (2, "republican"): ["Mark S. Zaccaria", "William J. Clegg, III", "Michael J. Gardiner", "Donald F. Robbio"],
     }
     out: list[tuple[date, str, int, str, str, int]] = []
-    for district, party in names:
+    for (district, party), candidates in names.items():
         start = next(
-            i for i, line in enumerate(lines) if re.search(rf"US CONGRESS - District {district}\s+.\s+{party.upper()[:3]}\w+ RESULTS", line)
+            i
+            for i, line in enumerate(lines)
+            if re.search(rf"US CONGRESS - District {district}\s+.\s+{party.upper()[:3]}\w+ RESULTS", line)
         )
         county = ""
         for line in lines[start + 1 : start + 60]:
@@ -47,11 +49,20 @@ def parse() -> None:
                 county = found[1]
             elif "County Total" in line:
                 numbers = [int(value) for value in re.findall(r"\d+", line.split("Total")[1])]
-                for name, votes in zip(names[(district, party)], numbers, strict=True):
+                for name, votes in zip(candidates, numbers, strict=True):
                     out.append((DAY, f"house:{party}", district, name, CODES[county], votes))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
-        out, schema={"day": pl.Date, "chamber": pl.String, "district": pl.Int16, "candidate": pl.String, "code": pl.String, "votes": pl.Int64}, orient="row"
+        out,
+        schema={
+            "day": pl.Date,
+            "chamber": pl.String,
+            "district": pl.Int16,
+            "candidate": pl.String,
+            "code": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
     ).with_columns(
         year=pl.lit(2010, dtype=pl.Int32),
         special=pl.lit(False),

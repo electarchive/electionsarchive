@@ -65,12 +65,18 @@ def parse() -> None:
     fips["dade"] = fips["miamidade"]
     frames = []
     for day in DAYS:
-        frame = pl.read_csv(
-            io.BytesIO(raw.cached(SOURCE, fl_sos.EXTRACT.format(day=day)).path.read_bytes().decode("cp1252").encode()),
-            separator="\t",
-            infer_schema_length=0,
-            quote_char=None,
-        ).filter(pl.col("RaceCode").is_in(["STR", "STS"]), pl.col("PartyCode").is_in(list(PARTIES))).unique()
+        frame = (
+            pl.read_csv(
+                io.BytesIO(
+                    raw.cached(SOURCE, fl_sos.EXTRACT.format(day=day)).path.read_bytes().decode("cp1252").encode()
+                ),
+                separator="\t",
+                infer_schema_length=0,
+                quote_char=None,
+            )
+            .filter(pl.col("RaceCode").is_in(["STR", "STS"]), pl.col("PartyCode").is_in(list(PARTIES)))
+            .unique()
+        )
         clean = [
             pl.col(column).fill_null("").str.replace_all(",", "").str.replace_all(r"\s+", " ").str.strip_chars()
             for column in ("CanNameFirst", "CanNameMiddle", "CanNameLast")
@@ -83,7 +89,10 @@ def parse() -> None:
                 post=pl.col("Juris2num").fill_null("").str.strip_chars().str.replace(r"^0+", ""),
                 party=pl.col("PartyCode").replace_strict(PARTIES),
                 code=pl.col("CountyName").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips),
-                candidate=pl.concat_str(clean, separator=" ").str.replace_all(r"\s+", " ").str.strip_chars().str.to_uppercase(),
+                candidate=pl.concat_str(clean, separator=" ")
+                .str.replace_all(r"\s+", " ")
+                .str.strip_chars()
+                .str.to_uppercase(),
                 votes=pl.col("CanVotes").cast(pl.Int64),
             )
         )

@@ -15,7 +15,13 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Hawaii Office of Elections"
 URL = "https://elections.hawaii.gov/resources/registration-voter-turnout-statistics/"
 TITLE = "Registration and Turnout Statistics"
-UNITS = {"Statewide": "15", "County of Hawaii": "15001", "City & County of Honolulu": "15003", "County of Kauai": "15007", "County of Maui": "15009"}
+UNITS = {
+    "Statewide": "15",
+    "County of Hawaii": "15001",
+    "City & County of Honolulu": "15003",
+    "County of Kauai": "15007",
+    "County of Maui": "15009",
+}
 
 
 def fetch() -> None:
@@ -30,20 +36,44 @@ def parse() -> None:
     rows = []
     for stage, heading in (("primary", "Primary Elections (1959-2024)"), ("general", "General Elections (1959-2024)")):
         start = text.rindex(heading)
-        ends = [e for e in (text.find("Elections (1959-2024)", start + len(heading)), text.find("Office of Hawaiian Affairs", start)) if e > 0]
+        ends = [
+            e
+            for e in (
+                text.find("Elections (1959-2024)", start + len(heading)),
+                text.find("Office of Hawaiian Affairs", start),
+            )
+            if e > 0
+        ]
         block = text[start : min(ends, default=len(text))]
-        parts = re.split(r"\n\s*(Statewide|County of Hawaii|County of Maui|County of Kauai|City & County of Honolulu)\s*\n", block)
+        parts = re.split(
+            r"\n\s*(Statewide|County of Hawaii|County of Maui|County of Kauai|City & County of Honolulu)\s*\n", block
+        )
         for name, body in zip(parts[1::2], parts[2::2]):
             for year, registered, voters in re.findall(r"\b((?:19|20)\d\d) ([\d,]+) ([\d,]+) [\d.]+%", body):
                 rows.append(
-                    {"stage": stage, "unit": name if name == "Statewide" else name, "year": int(year), "registered": int(registered.replace(",", "")), "voters": int(voters.replace(",", ""))}
+                    {
+                        "stage": stage,
+                        "unit": name,
+                        "year": int(year),
+                        "registered": int(registered.replace(",", "")),
+                        "voters": int(voters.replace(",", "")),
+                    }
                 )
     frame = pl.DataFrame(rows)
     counts = frame.group_by("stage", "unit").len().sort("stage", "unit")
     print(counts)
-    state = frame.filter(pl.col("unit") == "Statewide").select("stage", "year", pl.col("registered").alias("sr"), pl.col("voters").alias("sv"))
-    summed = frame.filter(pl.col("unit") != "Statewide").group_by("stage", "year").agg(pl.col("registered").sum(), pl.col("voters").sum(), pl.len().alias("n")).join(state, on=["stage", "year"])
-    print(summed.filter((pl.col("n") != 4) | (pl.col("registered") != pl.col("sr")) | (pl.col("voters") != pl.col("sv"))))
+    state = frame.filter(pl.col("unit") == "Statewide").select(
+        "stage", "year", pl.col("registered").alias("sr"), pl.col("voters").alias("sv")
+    )
+    summed = (
+        frame.filter(pl.col("unit") != "Statewide")
+        .group_by("stage", "year")
+        .agg(pl.col("registered").sum(), pl.col("voters").sum(), pl.len().alias("n"))
+        .join(state, on=["stage", "year"])
+    )
+    print(
+        summed.filter((pl.col("n") != 4) | (pl.col("registered") != pl.col("sr")) | (pl.col("voters") != pl.col("sv")))
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
 
@@ -72,7 +102,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for (year, stage), group in frame.group_by(["year", "stage"], maintain_order=True):
             found = elections.get((year, stage), [])
@@ -86,7 +124,11 @@ def emit() -> Path:
             value_key, election_id, _ = found[0]
             counties = group.filter(pl.col("unit") != "Statewide")
             state = group.filter(pl.col("unit") == "Statewide")
-            by_county = counties.height == 4 and counties["registered"].sum() == state["registered"][0] and abs(counties["voters"].sum() - state["voters"][0]) <= state["voters"][0] // 200
+            by_county = (
+                counties.height == 4
+                and counties["registered"].sum() == state["registered"][0]
+                and abs(counties["voters"].sum() - state["voters"][0]) <= state["voters"][0] // 200
+            )
             result_set = cs.key(f"{SOURCE}.result_set", value_key)
             cs.add(
                 "result_set",
@@ -100,7 +142,9 @@ def emit() -> Path:
                 is_default=election_id not in held,
                 completeness=1,
             )
-            for name, registered, voters in (counties if by_county else state).select("unit", "registered", "voters").iter_rows():
+            for name, registered, voters in (
+                (counties if by_county else state).select("unit", "registered", "voters").iter_rows()
+            ):
                 for measure, value in ((2, registered), (3, voters)):
                     cs.add(
                         "result_value",

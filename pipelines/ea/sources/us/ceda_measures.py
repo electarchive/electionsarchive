@@ -283,7 +283,9 @@ def emit() -> Path:
             letter = " ".join(dict.fromkeys(letter.split())) if letter else letter
             text = f"{day.year} {title} Measure {letter}" if letter else f"{day.year} {title} ballot measure"
             if (current := named.get(contest)) is not None and current[1] != text:
-                cs.add("name", id=current[0], entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name", id=current[0], entity_id=contest, text=text, lang="en", kind="official", is_preferred=True
+                )
             else:
                 name(contest, text)
             if contest in cs.minted:

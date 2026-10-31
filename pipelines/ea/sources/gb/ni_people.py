@@ -1,3 +1,4 @@
+import itertools
 import re
 import unicodedata
 from collections import Counter, defaultdict
@@ -15,7 +16,9 @@ LEFT = DATA / "tmp" / "uk-dev" / "ni_people_left.tsv"
 
 
 def fold(text: str) -> str:
-    plain = unicodedata.normalize("NFKD", text.replace("'", "").replace("’", "")).encode("ascii", "ignore").decode().lower()
+    plain = (
+        unicodedata.normalize("NFKD", text.replace("'", "").replace("’", "")).encode("ascii", "ignore").decode().lower()
+    )
     return " ".join(re.findall(r"[a-z0-9]+", plain.replace("&", " and ")))
 
 
@@ -42,7 +45,9 @@ def emit() -> Path:
             words = fold(re.sub(r"\(.*?\)", "", name or "")).split()
             if len(words) < 2 or party is None:
                 continue
-            owner = " ".join(re.sub(r"\b(?:of northern ireland|northern ireland|party|the|and)\b", "", fold(party)).split())
+            owner = " ".join(
+                re.sub(r"\b(?:of northern ireland|northern ireland|party|the|and)\b", "", fold(party)).split()
+            )
             groups[(f"{words[0]} {words[-1]}", fold(area), owner)].append((day, person))
         parent: dict[UUID, UUID] = {}
 
@@ -63,7 +68,7 @@ def emit() -> Path:
                 left.append((key, "two people in one election"))
                 continue
             days = sorted(by_day)
-            for before, after in zip(days, days[1:]):
+            for before, after in itertools.pairwise(days):
                 if after - before > GAP:
                     left.append((key, f"gap between {before} and {after}"))
                 else:
@@ -83,11 +88,15 @@ def emit() -> Path:
         for people in components.values():
             if len(people) < 2:
                 continue
-            survivor = max(people, key=lambda person: (spelling[person], appearances[person], -created[person].timestamp()))
+            survivor = max(
+                people, key=lambda person: (spelling[person], appearances[person], -created[person].timestamp())
+            )
             for person in people - {survivor}:
                 cs.merge(person, survivor)
                 merged += 1
         LEFT.parent.mkdir(parents=True, exist_ok=True)
         LEFT.write_text("\n".join(f"{' | '.join(key)}\t{why}" for key, why in left) + "\n", encoding="utf-8")
-        print(f"{merged} people merged into {sum(len(p) > 1 for p in components.values())} records, {len(left)} groups left ({LEFT})")
+        print(
+            f"{merged} people merged into {sum(len(p) > 1 for p in components.values())} records, {len(left)} groups left ({LEFT})"
+        )
         return cs.write()

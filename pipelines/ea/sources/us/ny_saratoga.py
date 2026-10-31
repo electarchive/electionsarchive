@@ -1,7 +1,7 @@
 import re
 import subprocess
 from collections.abc import Iterator, Mapping
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 

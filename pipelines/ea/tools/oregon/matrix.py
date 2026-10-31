@@ -1,10 +1,12 @@
+import json
 import os
-import json, re, sys
+import re
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
+from generic import D, S, check
 from words import pages
-from generic import check, D, S
 
 county, rx = sys.argv[2], sys.argv[3]
 mrx = sys.argv[4] if len(sys.argv) > 4 else r"(?i)\b(?:state )?measure\s+(10[789]|110)\b(?!-)"

@@ -16,7 +16,7 @@ PLATFORM = "oh_hamilton"
 INBOX = DATA / "inbox" / "manual" / "MF-087"
 URL = "https://votehamiltoncountyohio.gov/results/#{name}"
 FIPS = "39"
-FILE = re.compile(r"^(?:General_(?P<long>\d{4})_11|G(?:en)?(?P<short>\d{2})(?!\d))", re.I)
+FILE = re.compile(r"^(?:General_(?P<long>\d{4})_11|G(?:en)?(?P<short>\d{2})(?!\d))", re.IGNORECASE)
 PARTIES = {
     "DEMOCRATIC",
     "REPUBLICAN",

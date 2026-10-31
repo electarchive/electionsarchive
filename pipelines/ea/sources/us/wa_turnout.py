@@ -32,8 +32,11 @@ def fetch() -> None:
 def parse() -> None:
     html = raw.cached(SOURCE, URL).path.read_text(errors="replace")
     rows = []
-    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.S):
-        cells = [unescape(re.sub(r"<[^>]*>|\s+", " ", c)).strip() for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S)]
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.DOTALL):
+        cells = [
+            unescape(re.sub(r"<[^>]*>|\s+", " ", c)).strip()
+            for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL)
+        ]
         if len(cells) != 7 or not re.fullmatch(r"\d+/\d+/\d{4}", cells[0]):
             continue
         month, day, year = (int(p) for p in cells[0].split("/"))
@@ -76,7 +79,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for day, registered, voters in frame.select("date", "registered", "voters").iter_rows():
             if day not in elections:

@@ -19,10 +19,18 @@ URL = "https://www.sos.arkansas.gov/uploads/elections/1990_Election_results.pdf"
 PUBLISHER = "Arkansas Secretary of State"
 TITLE = "Arkansas Election Results 1990"
 PAGES = {
-    61: ("Lieutenant Governor", ("Jim Guy Tucker", "DEMOCRATIC", 494943), ("Kenneth \"Muskie\" Harris", "REPUBLICAN", 174587)),
-    63: ("Secretary of State", ("W. J. \"Bill\" McCuen", "DEMOCRATIC", 397465), ("Bill Kerr", "REPUBLICAN", 245370)),
+    61: (
+        "Lieutenant Governor",
+        ("Jim Guy Tucker", "DEMOCRATIC", 494943),
+        ('Kenneth "Muskie" Harris', "REPUBLICAN", 174587),
+    ),
+    63: ("Secretary of State", ('W. J. "Bill" McCuen', "DEMOCRATIC", 397465), ("Bill Kerr", "REPUBLICAN", 245370)),
     65: ("Attorney General", ("Winston Bryant", "DEMOCRATIC", 368787), ("Asa Hutchinson", "REPUBLICAN", 307609)),
-    67: ("Commissioner of State Lands", ("Charlie Daniels", "DEMOCRATIC", 417788), ("Irvin L. McKittrick", "REPUBLICAN", 202646)),
+    67: (
+        "Commissioner of State Lands",
+        ("Charlie Daniels", "DEMOCRATIC", 417788),
+        ("Irvin L. McKittrick", "REPUBLICAN", 202646),
+    ),
 }
 READ_FIXES = {(63, "pike"): (2137, 1111), (67, "saline"): (11747, 7475)}
 METHOD = (
@@ -50,11 +58,26 @@ def parse() -> None:
     with tempfile.TemporaryDirectory() as scratch:
         for page, (office, first, second) in PAGES.items():
             found: dict[str, set[tuple[int, int]]] = {}
-            for dpi, psm in ((200, "4"), (250, "6"), (300, "4"), (300, "6"), (350, "4"), (400, "4"), (400, "6"), (500, "4"), (500, "6")):
+            for dpi, psm in (
+                (200, "4"),
+                (250, "6"),
+                (300, "4"),
+                (300, "6"),
+                (350, "4"),
+                (400, "4"),
+                (400, "6"),
+                (500, "4"),
+                (500, "6"),
+            ):
                 stem = f"{scratch}/{page}_{dpi}"
-                subprocess.run(["pdftoppm", "-r", str(dpi), "-f", str(page), "-l", str(page), "-gray", "-png", pdf, stem], check=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", str(dpi), "-f", str(page), "-l", str(page), "-gray", "-png", pdf, stem],
+                    check=True,
+                )
                 image = next(Path(scratch).glob(f"{page}_{dpi}*.png"))
-                text = subprocess.run(["tesseract", str(image), "-", "--psm", psm], capture_output=True, text=True).stdout
+                text = subprocess.run(
+                    ["tesseract", str(image), "-", "--psm", psm], capture_output=True, text=True, check=False
+                ).stdout
                 for line in text.splitlines():
                     match = re.match(r"^\W*([A-Z][A-Z .]+?)\s+\W*(\d.*)$", line.strip())
                     if match is None:
@@ -66,7 +89,9 @@ def parse() -> None:
                         shares = re.findall(r"\d+[,.]\d\d(?!\d)", match[2])
                         share = float(shares[0].replace(",", ".")) if shares else None
                         if a + b == total:
-                            found.setdefault(name[0], set()).add((a, b, share is not None and abs(a / total * 100 - share) < 0.02))
+                            found.setdefault(name[0], set()).add(
+                                (a, b, share is not None and abs(a / total * 100 - share) < 0.02)
+                            )
             found = {k: {t for t in v if t[2]} or v if len({t[:2] for t in v}) > 1 else v for k, v in found.items()}
             found = {k: {t[:2] for t in v} for k, v in found.items()}
             for k, v in found.items():
@@ -76,10 +101,14 @@ def parse() -> None:
                 if fixed_page == page:
                     found[county] = {votes}
             if len(found) != 75 or any(len(v) != 1 for v in found.values()):
-                raise ValueError(f"page {page}: {len(found)} counties, ambiguous {[(k, v) for k, v in found.items() if len(v) != 1]}, missing {sorted(set(codes) - set(found))}")
+                raise ValueError(
+                    f"page {page}: {len(found)} counties, ambiguous {[(k, v) for k, v in found.items() if len(v) != 1]}, missing {sorted(set(codes) - set(found))}"
+                )
             for index, (candidate, party, total) in enumerate((first, second)):
                 if sum(next(iter(v))[index] for v in found.values()) != total:
-                    raise ValueError(f"page {page} {candidate}: counties sum to {sum(next(iter(v))[index] for v in found.values())}, printed {total}")
+                    raise ValueError(
+                        f"page {page} {candidate}: counties sum to {sum(next(iter(v))[index] for v in found.values())}, printed {total}"
+                    )
                 for name, v in found.items():
                     rows.append((office, codes[name], candidate.upper(), party, next(iter(v))[index]))
     frame = pl.DataFrame(rows, schema=["title", "county", "candidate", "party", "votes"], orient="row").select(

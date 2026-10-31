@@ -20,12 +20,44 @@ FILES = [
     (date(2020, 7, 7), "2020/2020-official-primary-results-us-house-amended-0826.pdf"),
     (date(2022, 6, 7), "2022/2022-official-primary-results-us-house.pdf"),
 ]
-NAMES = (
-    "Atlantic,Bergen,Burlington,Camden,Cape May,Cumberland,Essex,Gloucester,Hudson,Hunterdon,Mercer,Middlesex,"
-    "Monmouth,Morris,Ocean,Passaic,Salem,Somerset,Sussex,Union,Warren"
-).split(",")
+NAMES = [
+    "Atlantic",
+    "Bergen",
+    "Burlington",
+    "Camden",
+    "Cape May",
+    "Cumberland",
+    "Essex",
+    "Gloucester",
+    "Hudson",
+    "Hunterdon",
+    "Mercer",
+    "Middlesex",
+    "Monmouth",
+    "Morris",
+    "Ocean",
+    "Passaic",
+    "Salem",
+    "Somerset",
+    "Sussex",
+    "Union",
+    "Warren",
+]
 COUNTIES = {name.upper(): f"34{2 * i + 1:03}" for i, name in enumerate(NAMES)}
-ORDINALS = "First Second Third Fourth Fifth Sixth Seventh Eighth Ninth Tenth Eleventh Twelfth".split()
+ORDINALS = [
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eighth",
+    "Ninth",
+    "Tenth",
+    "Eleventh",
+    "Twelfth",
+]
 PARTIES = {"Democratic": "democratic", "Republican": "republican", "Libertarian": "libertarian", "Green": "green"}
 PUBLISHER = "New Jersey Division of Elections"
 TITLE = "Official primary election results"
@@ -47,11 +79,19 @@ def parse() -> None:
         ).stdout
         office, district, name, party = None, None, None, None
         for line in text.splitlines():
-            if found := re.match(r"\s*Candidates for (President|House of Representatives|United States Senate|U\.?S\.? Senate)", line):
-                office = "president" if found[1] == "President" else "house" if found[1].startswith("House") else "senate"
+            if found := re.match(
+                r"\s*Candidates for (President|House of Representatives|United States Senate|U\.?S\.? Senate)", line
+            ):
+                office = (
+                    "president" if found[1] == "President" else "house" if found[1].startswith("House") else "senate"
+                )
             elif found := re.match(r"(\w+) Congressional District", line):
                 district = ORDINALS.index(found[1]) + 1
-            elif line[:1].isalpha() and not re.match(r"(Name|Candidates|For PRIMARY|Total)", line) and line.rstrip().endswith(tuple(PARTIES)):
+            elif (
+                line[:1].isalpha()
+                and not re.match(r"(Name|Candidates|For PRIMARY|Total)", line)
+                and line.rstrip().endswith(tuple(PARTIES))
+            ):
                 name = re.split(r"\s+\(w\)|\s+\*|\s{2,}", line.strip(), maxsplit=1)[0]
                 party = PARTIES[line.rstrip().rsplit(" ", 1)[1]]
             elif name and (found := re.match(r"\s+(" + "|".join(COUNTIES) + r")\s.*?([\d,]+)\s*$", line)):

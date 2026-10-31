@@ -64,7 +64,12 @@ def parse() -> None:
             if "OFFICE:" in line:
                 found = OFFICE.search(line.rstrip())
                 current = (
-                    (day, {"SENATE": "senate", "PRESIDENT": "president"}.get(found[1], "house"), int(found[2]) if found[2] else None, {})
+                    (
+                        day,
+                        {"SENATE": "senate", "PRESIDENT": "president"}.get(found[1], "house"),
+                        int(found[2]) if found[2] else None,
+                        {},
+                    )
                     if found
                     else None
                 )
@@ -77,7 +82,12 @@ def parse() -> None:
                 columns = []
             elif re.match(r"\s{20,}\*[A-Z]", line):
                 columns = re.findall(r"\*([A-Z]+)", line)
-            elif columns and line.strip() and re.fullmatch(r"[\d,\s]*", line[(cut := min(34, re.search(r"\d", line + "0").start())):]) and line[:cut].strip():
+            elif (
+                columns
+                and line.strip()
+                and re.fullmatch(r"[\d,\s]*", line[(cut := min(34, re.search(r"\d", line + "0").start())) :])
+                and line[:cut].strip()
+            ):
                 name = re.sub(r"\s+", " ", line[:cut].replace('"', "")).strip()
                 cells = [int(value.replace(",", "") or 0) for value in re.findall(r"[\d,]+", line[cut:])]
                 if len(cells) != len(columns):
@@ -101,7 +111,14 @@ def parse() -> None:
     for day, chamber, district, candidates in blocks:
         sums = sorted(total for total in (sum(counts.values()) for counts in candidates.values()) if total > 0)
         base = f"{day}:KY:" + (f"house:{district}" if district else chamber)
-        party = next((p for p in ("democratic", "republican") if sorted(t for t in known.get(f"{base}:{p}", []) if t > 0) == sums), None)
+        party = next(
+            (
+                p
+                for p in ("democratic", "republican")
+                if sorted(t for t in known.get(f"{base}:{p}", []) if t > 0) == sums
+            ),
+            None,
+        )
         if party is None:
             print(f"{base}: county sums {sums} match no party's FEC totals")
             continue
@@ -112,7 +129,14 @@ def parse() -> None:
                     for name, counts in candidates.items()
                     for code, votes in counts.items()
                 ],
-                schema={"day": pl.Date, "chamber": pl.String, "district": pl.Int16, "candidate": pl.String, "code": pl.String, "votes": pl.Int64},
+                schema={
+                    "day": pl.Date,
+                    "chamber": pl.String,
+                    "district": pl.Int16,
+                    "candidate": pl.String,
+                    "code": pl.String,
+                    "votes": pl.Int64,
+                },
                 orient="row",
             )
         )

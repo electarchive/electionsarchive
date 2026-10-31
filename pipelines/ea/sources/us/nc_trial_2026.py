@@ -133,7 +133,11 @@ def emit() -> Path:
                 electoral_system_id=fptp,
                 default_result_kind="counted",
             )
-            heading = f"{title}, {label}" + (f", Seat {int(seat)}" if seat else "") + (" (Unexpired Term)" if unexpired else "")
+            heading = (
+                f"{title}, {label}"
+                + (f", Seat {int(seat)}" if seat else "")
+                + (" (Unexpired Term)" if unexpired else "")
+            )
             name(contest, f"2026 {heading} election")
             cs.add(
                 "slug",

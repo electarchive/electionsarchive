@@ -51,17 +51,24 @@ def parse() -> None:
     rows = []
     for (year, chamber), (page, names) in TABLES.items():
         path = raw.cached(SOURCE, URL.format(BOOKS[year])).path
-        text = subprocess.run(
-            ["pdftotext", "-layout", "-f", str(page), "-l", str(page), str(path), "-"],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.replace("\xad", "").replace("'", " ").splitlines()
+        text = (
+            subprocess.run(
+                ["pdftotext", "-layout", "-f", str(page), "-l", str(page), str(path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            .stdout.replace("\xad", "")
+            .replace("'", " ")
+            .splitlines()
+        )
         total = next(line for line in text if line.strip().startswith("STATE TOTAL"))
         edges = [m.end() for m in NUMBER.finditer(total[total.index("TOTAL") + 5 :])]
         offset = total.index("TOTAL") + 5
         edges = [edge + offset for edge in edges][: len(names)]
-        printed = [int(re.sub(r"[^0-9]", "", m[0].translate(FIXES))) for m in NUMBER.finditer(total[offset:])][: len(names)]
+        printed = [int(re.sub(r"[^0-9]", "", m[0].translate(FIXES))) for m in NUMBER.finditer(total[offset:])][
+            : len(names)
+        ]
         body = []
         for line in text[: text.index(total)]:
             match = re.match(r"^\s*[A-Za-z.~]{3,}[A-Za-z.~ ]*?\s{2,}(?=[\dOolIZSB&|])", line)
@@ -100,7 +107,9 @@ def emit() -> Path:
     with connect() as conn:
         codes = fp_canvass.counties(conn, "45")
         frame = frame.with_columns(
-            code=pl.col("county").map_elements(lambda name: codes[re.sub(r"[^a-z]", "", name.lower())], return_dtype=pl.String),
+            code=pl.col("county").map_elements(
+                lambda name: codes[re.sub(r"[^a-z]", "", name.lower())], return_dtype=pl.String
+            ),
             day=pl.col("year").replace_strict({year: day for year, day in DAYS.items()}, return_dtype=pl.Date),
             state=pl.lit("SC"),
             district=pl.lit(None, pl.Int16),
@@ -133,7 +142,21 @@ def emit() -> Path:
             )
         for book in BOOKS.values():
             cs.artifact(raw.cached(SOURCE, URL.format(book)), sources["SC"])
-        columns = ["year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein", "votes", "kind", "source"]
+        columns = [
+            "year",
+            "chamber",
+            "day",
+            "special",
+            "state",
+            "district",
+            "code",
+            "candidate",
+            "measure",
+            "writein",
+            "votes",
+            "kind",
+            "source",
+        ]
         medsl.attach(
             cs,
             conn,

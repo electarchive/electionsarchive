@@ -73,5 +73,13 @@ def emit() -> Path:
                           encode(st_asewkb(st_pointonsurface(st_makevalid(st_union(geom)))), 'hex') from latest""",
                 [list(counties)],
             ).fetchone()
-            cs.add("area_geometry", area_id=area, valid_from=None, geom=geom, label_point=point, quality="official", source_id=census)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=census,
+            )
         return cs.write()

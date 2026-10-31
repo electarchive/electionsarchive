@@ -2154,7 +2154,9 @@ def emit() -> Path:
         latest_plan = conn.execute(
             "select id from boundary_set where scheme_code = 'us.cd' and vintage = '119'"
         ).fetchone()[0]
-        new_plan = conn.execute("select id from boundary_set where scheme_code = 'us.cd' and vintage = '120'").fetchone()[0]
+        new_plan = conn.execute(
+            "select id from boundary_set where scheme_code = 'us.cd' and vintage = '120'"
+        ).fetchone()[0]
         sitting: dict[str, set[UUID]] = {"house": set(), "senate": set()}
         members: dict[tuple[str, str], list[list[str]]] = {}
         states = {fips: state for state, fips in FIPS.items()}

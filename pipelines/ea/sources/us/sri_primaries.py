@@ -1,8 +1,8 @@
 import difflib
 import re
+from datetime import timedelta
 from pathlib import Path
 from types import ModuleType
-from datetime import timedelta
 from uuid import UUID
 
 import polars as pl
@@ -50,7 +50,13 @@ def parse(source: ModuleType) -> None:
         ]
         scored = sorted(
             (
-                (difflib.SequenceMatcher(None, surname(str(label)), surname(name)).ratio(), contest, option, name, filed)
+                (
+                    difflib.SequenceMatcher(None, surname(str(label)), surname(name)).ratio(),
+                    contest,
+                    option,
+                    name,
+                    filed,
+                )
                 for contest, option, name, filed in pool
             ),
             reverse=True,
@@ -161,6 +167,7 @@ def emit(source: ModuleType) -> Path:
             "completeness",
             "supersedes_id",
         )
+
         def find(county: str) -> tuple[UUID, str, UUID]:
             plain = house_books._plain(county)
             return counties.get(plain) or next(v for name, v in counties.items() if name.startswith(plain))

@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
-from scan3 import run, report, tyn, at, ballots, tynp
+from scan3 import at, ballots, report, run, tyn, tynp
 
 R = range
 

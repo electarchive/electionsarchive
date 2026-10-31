@@ -1,10 +1,13 @@
+import csv
+import json
 import os
-import csv, json, re, sys
+import re
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
-from words import ocr, group, strips, reread, region
-from parsers import check, save, S, MEAS
+from parsers import MEAS, S, check, save
+from words import group, ocr, region, reread, strips
 
 D = S / "src"
 NUM = re.compile(r"^\d[\d,]*$")

@@ -24,7 +24,16 @@ OFFICES = ["President", "Governor", "U.S. Senate", "U.S. House", "United States"
 FLAWED = {"2010-11-02:VA:house:3"}
 MA_CHAMBERS = {1: "president", 3: "governor", 5: "house", 6: "senate"}
 MA_STAGES = {"General Election": False, "Special General Election": True}
-TALLIES = {"Total Votes Cast", "Undervotes", "Overvotes", "Total Ballots Cast", "Blank", "Blanks", "Over Votes", "Under Votes"}
+TALLIES = {
+    "Total Votes Cast",
+    "Undervotes",
+    "Overvotes",
+    "Total Ballots Cast",
+    "Blank",
+    "Blanks",
+    "Over Votes",
+    "Under Votes",
+}
 
 
 def search(tenant: str, year: int) -> str:
@@ -191,7 +200,10 @@ def parse() -> None:
         columns = [f"c{index}" for index, name in enumerate(names) if index >= 3 and name and name not in TALLIES]
         if special:
             keys = [
-                key for key in specials if key[:4] == str(year) and f":{chamber}" in key
+                key
+                for key in specials
+                if key[:4] == str(year)
+                and f":{chamber}" in key
                 and (chamber != "house" or f":house:{district}:" in key)
             ]
             if len(keys) != 1:

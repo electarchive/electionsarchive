@@ -463,7 +463,7 @@ def emit() -> Path:
             parties[line] = ids[0] if ids else None
             if len(ids) > 1:
                 joint[line] = ids
-        for candidacy, in conn.execute(
+        for (candidacy,) in conn.execute(
             """select distinct y.id from candidacy y join changeset h on h.id = y.changeset_id
                join candidacy_nomination n on n.candidacy_id = y.id
                join name pn on pn.entity_id = n.party_id and pn.text like '%%/%%'
@@ -471,7 +471,7 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             cs.add("entity_retirement", entity_id=candidacy, reason="Nominated by a fusion line stored as a party")
-        for stale, in conn.execute(
+        for (stale,) in conn.execute(
             """select p.id from party p join changeset h on h.id = p.changeset_id
                join entity e on e.id = p.id and e.retired_by is null
                where h.pipeline = %s and exists (select 1 from name n where n.entity_id = p.id and n.text like '%%/%%')
@@ -480,7 +480,11 @@ def emit() -> Path:
                  and not exists (select 1 from candidacy c where c.member_of_party_id = p.id)""",
             [SOURCE],
         ).fetchall():
-            cs.add("entity_retirement", entity_id=stale, reason="A fusion line stored as a party; its lines are separate parties")
+            cs.add(
+                "entity_retirement",
+                entity_id=stale,
+                reason="A fusion line stored as a party; its lines are separate parties",
+            )
 
         for day_text in sorted(frame["date"].unique()):
             day = date(int(day_text[:4]), int(day_text[4:6]), int(day_text[6:]))
@@ -1456,5 +1460,10 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             if str(option) not in staged:
-                cs.add("option_drop", option_id=option, contest_id=contest, reason="A fusion line stored as a party; its lines are separate parties")
+                cs.add(
+                    "option_drop",
+                    option_id=option,
+                    contest_id=contest,
+                    reason="A fusion line stored as a party; its lines are separate parties",
+                )
         return cs.write()

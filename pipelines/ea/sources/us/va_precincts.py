@@ -2,7 +2,7 @@ import csv
 import io
 import json
 import re
-from datetime import date, timedelta
+from datetime import timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -41,7 +41,18 @@ def search(year: int) -> str:
         "contests": {
             "candidates": [],
             "divisions": [],
-            "offices": [{"free": office} for office in ["President", "Senate", "U.S. House", "Governor", "Lieutenant Governor", "Attorney General", "State Representative"]],
+            "offices": [
+                {"free": office}
+                for office in [
+                    "President",
+                    "Senate",
+                    "U.S. House",
+                    "Governor",
+                    "Lieutenant Governor",
+                    "Attorney General",
+                    "State Representative",
+                ]
+            ],
         },
         "specialElectionsOnly": False,
         "voterStats": False,
@@ -89,7 +100,11 @@ def parse() -> None:
     tables: dict[tuple[str, str, str], tuple[int, list[list[str]]]] = {}
     for year in YEARS:
         for contest, (day, office, district) in contests(year).items():
-            table = list(csv.reader(io.StringIO(raw.cached(SOURCE, TABLE.format(contest=contest)).path.read_text(encoding="utf-8-sig"))))
+            table = list(
+                csv.reader(
+                    io.StringIO(raw.cached(SOURCE, TABLE.format(contest=contest)).path.read_text(encoding="utf-8-sig"))
+                )
+            )
             size = sum(int(value or 0) for row in table[2:3] for value in row[2:])
             if (day, office, district) not in tables or size > tables[(day, office, district)][0]:
                 tables[(day, office, district)] = (size, table)
@@ -108,7 +123,10 @@ def parse() -> None:
                     odd.append((year, contest, locality[1]))
                     continue
                 total = [int(value or 0) for value in locality[2:]]
-                tied = precincts and [sum(int(row[2 + index] or 0) for row in precincts) for index in range(len(names))] == total
+                tied = (
+                    precincts
+                    and [sum(int(row[2 + index] or 0) for row in precincts) for index in range(len(names))] == total
+                )
                 for row in precincts if tied else [locality]:
                     for name, value in zip(names, row[2:], strict=True):
                         rows.append(
@@ -139,7 +157,10 @@ def emit() -> Path:
         pl.read_parquet(PARSED / "lines.parquet")
         .with_columns(
             day=pl.col("day").str.to_date(),
-            candidate=pl.col("candidate").str.to_uppercase().str.replace(r",\s*(JR|SR|II|III|IV)\.?$", "").str.strip_chars(),
+            candidate=pl.col("candidate")
+            .str.to_uppercase()
+            .str.replace(r",\s*(JR|SR|II|III|IV)\.?$", "")
+            .str.strip_chars(),
         )
         .with_columns(
             measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
@@ -240,7 +261,9 @@ def emit() -> Path:
                 ),
                 scheme_code=pl.lit("us.precinct"),
                 code="code",
-                parent_id=pl.col("county_code").replace_strict({code: str(unit) for code, (unit, _) in counties.items()}),
+                parent_id=pl.col("county_code").replace_strict(
+                    {code: str(unit) for code, (unit, _) in counties.items()}
+                ),
                 area_relation=pl.lit("within"),
                 area_id=pl.col("county_code").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
                 kind=pl.lit("standard"),

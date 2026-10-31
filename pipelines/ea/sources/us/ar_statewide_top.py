@@ -8,7 +8,8 @@ import polars as pl
 
 from ea import raw
 from ea.sources.us import usrep_county
-from ea.sources.us.ar_statewide import FILES, METHOD, PUBLISHER, SOURCE as CACHE, TITLE
+from ea.sources.us.ar_statewide import FILES, METHOD, PUBLISHER, TITLE
+from ea.sources.us.ar_statewide import SOURCE as CACHE
 from ea.store import DATA, connect
 
 SOURCE = "us.ar_statewide_top"

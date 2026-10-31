@@ -201,9 +201,7 @@ READS = {
     1991: "the page images by a vision model (Claude Sonnet 5.5)",
     1993: "the page images by two vision models (Claude Sonnet 5.5 and Opus 5.5)",
 }
-SOLO = (
-    "Candidates' votes add up to the printed total or each row's printed percent matches its share of the sum."
-)
+SOLO = "Candidates' votes add up to the printed total or each row's printed percent matches its share of the sum."
 PAIR = "The table is loaded only where both models read every name and number the same."
 VISION = {1989: (11, 19), 1991: (5, 40), 1993: (17, 41)}
 SUFFIX = {"Jr": "Jr.", "Sr": "Sr.", "Ii": "II", "Iii": "III", "Iv": "IV"}
@@ -238,7 +236,14 @@ def parse_vision() -> list[dict[str, object]]:
                     table = {**table, "office": "Comptroller", "stage": "runoff"}
                 office = table["office"]
                 scope = re.sub(r"^(Boro|District):\s*", "", table["scope"]).strip()
-                if office not in ("Mayor", "Comptroller", "Public Advocate", "City Council President", "Borough President", "City Council"):
+                if office not in (
+                    "Mayor",
+                    "Comptroller",
+                    "Public Advocate",
+                    "City Council President",
+                    "Borough President",
+                    "City Council",
+                ):
                     continue
                 if (office in ("Borough President", "City Council")) and not scope:
                     continue
@@ -251,13 +256,21 @@ def parse_vision() -> list[dict[str, object]]:
                 percents = [float(re.sub(r"[^\d.]", "", row.get("percent") or "") or "nan") for row in table["rows"]]
                 if total is not None:
                     method = "total" if sum(votes) == total else None
-                elif sum(votes) and all(abs(100 * v / sum(votes) - p) < 0.11 for v, p in zip(votes, percents, strict=True)):
+                elif sum(votes) and all(
+                    abs(100 * v / sum(votes) - p) < 0.11 for v, p in zip(votes, percents, strict=True)
+                ):
                     method = "percent"
                 else:
                     method = None
                 if method is None and "opus" in reads:
-                    other = [t for t in reads["opus"]["tables"] if (t["office"], re.sub(r"^(Boro|District):\s*", "", t["scope"]).strip(), t["party"]) == key[1:]]
-                    if len(other) == 1 and [(person(r["candidate"]), number(r["votes"]) if r["votes"] else 0) for r in other[0]["rows"]] == [(person(r["candidate"]), v) for r, v in zip(table["rows"], votes, strict=True)]:
+                    other = [
+                        t
+                        for t in reads["opus"]["tables"]
+                        if (t["office"], re.sub(r"^(Boro|District):\s*", "", t["scope"]).strip(), t["party"]) == key[1:]
+                    ]
+                    if len(other) == 1 and [
+                        (person(r["candidate"]), number(r["votes"]) if r["votes"] else 0) for r in other[0]["rows"]
+                    ] == [(person(r["candidate"]), v) for r, v in zip(table["rows"], votes, strict=True)]:
                         method = "agree"
                 if method is None or len(table["rows"]) < 1:
                     continue
@@ -270,7 +283,11 @@ def parse_vision() -> list[dict[str, object]]:
                 {
                     "year": year,
                     "stage": stage,
-                    "office": f"council:{scope}" if office == "City Council" else f"borough-president:{slug(scope)}" if office == "Borough President" else OFFICES[office],
+                    "office": f"council:{scope}"
+                    if office == "City Council"
+                    else f"borough-president:{slug(scope)}"
+                    if office == "Borough President"
+                    else OFFICES[office],
                     "total": table["total"],
                     "candidate": person(row["candidate"]),
                     "codes": party if stage != "general" else row["party_codes"].replace(" ", ""),

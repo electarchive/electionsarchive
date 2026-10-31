@@ -18,15 +18,40 @@ BASE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/2010-201
 FILES = {
     2012: (f"{BASE}2012/2012offpriresults.pdf", date(2012, 5, 22)),
     2014: (f"{BASE}2014/2014%20Primary%20Election%20Results.pdf", date(2014, 5, 20)),
-    2020: ("https://elect.ky.gov/results/2020-2029/Documents/2020%20Primary%20Election%20Results.pdf", date(2020, 6, 23)),
-    2022: ("https://elect.ky.gov/results/2020-2029/Documents/2022%20Primary%20Election%20results.pdf", date(2022, 5, 17)),
+    2020: (
+        "https://elect.ky.gov/results/2020-2029/Documents/2020%20Primary%20Election%20Results.pdf",
+        date(2020, 6, 23),
+    ),
+    2022: (
+        "https://elect.ky.gov/results/2020-2029/Documents/2022%20Primary%20Election%20results.pdf",
+        date(2022, 5, 17),
+    ),
     2024: ("https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf", date(2024, 5, 21)),
 }
 PUBLISHER = "Kentucky Secretary of State"
 TITLE = "Official primary election results"
 SENATE_2020 = {
-    "Republican": ["Mitch McConnell", "C. Wesley Morgan", "Louis Grider", "Paul John Frangedakis", "Naren James", "Kenneth Lowndes", "Nicholas Alsager"],
-    "Democratic": ["Amy McGrath", "Charles Booker", "Mike Broihier", "Mary Ann Tobin", "Maggie Jo Hilliard", "Andrew J. Maynard", "Bennie J. Smith", "Jimmy C. Ausbrooks", "Eric Rothmuller", "John R. Sharpensteen"],
+    "Republican": [
+        "Mitch McConnell",
+        "C. Wesley Morgan",
+        "Louis Grider",
+        "Paul John Frangedakis",
+        "Naren James",
+        "Kenneth Lowndes",
+        "Nicholas Alsager",
+    ],
+    "Democratic": [
+        "Amy McGrath",
+        "Charles Booker",
+        "Mike Broihier",
+        "Mary Ann Tobin",
+        "Maggie Jo Hilliard",
+        "Andrew J. Maynard",
+        "Bennie J. Smith",
+        "Jimmy C. Ausbrooks",
+        "Eric Rothmuller",
+        "John R. Sharpensteen",
+    ],
 }
 PARTY = re.compile(r"(Republican|Democratic) Party")
 DISTRICT = re.compile(r"(\d+)(?:st|nd|rd|th) Congressional District")

@@ -33,10 +33,29 @@ CONTROL = {
     "Inwood Hill nose": ((9590, 5100), (-73.924, 40.876)),
 }
 LABELS = {
-    1: (240, 215), 2: (345, 285), 3: (590, 205), 4: (270, 425), 5: (775, 280), 6: (365, 440),
-    7: (920, 360), 8: (410, 335), 9: (1065, 425), 10: (610, 385), 11: (1160, 480), 12: (580, 445),
-    13: (1255, 540), 14: (790, 550), 15: (910, 470), 16: (885, 600), 17: (1075, 545), 18: (1045, 690),
-    19: (1210, 630), 20: (1180, 705), 21: (1355, 610), 22: (1440, 605), 23: (1670, 715),
+    1: (240, 215),
+    2: (345, 285),
+    3: (590, 205),
+    4: (270, 425),
+    5: (775, 280),
+    6: (365, 440),
+    7: (920, 360),
+    8: (410, 335),
+    9: (1065, 425),
+    10: (610, 385),
+    11: (1160, 480),
+    12: (580, 445),
+    13: (1255, 540),
+    14: (790, 550),
+    15: (910, 470),
+    16: (885, 600),
+    17: (1075, 545),
+    18: (1045, 690),
+    19: (1210, 630),
+    20: (1180, 705),
+    21: (1355, 610),
+    22: (1440, 605),
+    23: (1670, 715),
 }
 CROP = (100, 450, 1.6)
 to_m = Transformer.from_crs(4326, 32618, always_xy=True).transform
@@ -91,9 +110,7 @@ def parse() -> None:
     reach = Image.new("L", scan.size, 0)
     drawer = ImageDraw.Draw(reach)
     for part in getattr(land_m.buffer(120), "geoms", [land_m.buffer(120)]):
-        drawer.polygon(
-            [tuple(np.array([x, y, 1]) @ inverse / SCALE) for x, y in part.exterior.coords], fill=255
-        )
+        drawer.polygon([tuple(np.array([x, y, 1]) @ inverse / SCALE) for x, y in part.exterior.coords], fill=255)
     inside = np.asarray(reach) > 0
 
     seeds = np.zeros(lines.shape, np.int32)
@@ -136,7 +153,10 @@ def emit() -> Path:
         vintage = conn.execute(
             "select id from boundary_set where scheme_code = 'us.nyc_ad' and vintage = '1917'"
         ).fetchone()
-        outline = cs.source("New York Public Library", "Map of the Borough of Manhattan, showing the Assembly, Aldermanic, and Municipal Court Districts (1918)")
+        outline = cs.source(
+            "New York Public Library",
+            "Map of the Borough of Manhattan, showing the Assembly, Aldermanic, and Municipal Court Districts (1918)",
+        )
         cs.add(
             "source",
             id=outline,
@@ -179,7 +199,14 @@ def emit() -> Path:
             areas[number] = cs.area("us.nyc_ad", code, FIRST)
             cs.add("area", id=areas[number], scheme_code="us.nyc_ad")
             cs.add("area_code", area_id=areas[number], code=code, valid_from=FIRST, valid_to=LAST)
-            cs.add("name", entity_id=areas[number], text=f"Assembly District {number}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=areas[number],
+                text=f"Assembly District {number}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add(
                 "area_geometry",
                 area_id=areas[number],

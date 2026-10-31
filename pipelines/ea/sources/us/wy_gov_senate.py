@@ -74,7 +74,11 @@ def parse() -> None:
                 counties.append((row[1].strip(), cells))
     frame = pl.DataFrame(rows, schema=["day", "chamber", "code", "candidate", "votes"], orient="row")
     with pl.Config(tbl_rows=40):
-        print(frame.group_by("day", "chamber", "candidate").agg(pl.col("votes").sum(), pl.len()).sort("day", "chamber", "votes"))
+        print(
+            frame.group_by("day", "chamber", "candidate")
+            .agg(pl.col("votes").sum(), pl.len())
+            .sort("day", "chamber", "votes")
+        )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.with_columns(
         year=pl.col("day").dt.year().cast(pl.Int32),

@@ -69,12 +69,24 @@ def parse() -> None:
                 continue
             registered, voted = numbers[-2], numbers[-1]
             rows.append(
-                {"year": year, "stage": stage, "month": month, "code": codes[plain(cells[0])], "registered": registered, "voted": voted, "path": path}
+                {
+                    "year": year,
+                    "stage": stage,
+                    "month": month,
+                    "code": codes[plain(cells[0])],
+                    "registered": registered,
+                    "voted": voted,
+                    "path": path,
+                }
             )
     frame = pl.DataFrame(rows, infer_schema_length=None).filter(pl.col("voted") <= pl.col("registered"))
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "stage", "month").agg(pl.len(), pl.col("registered").sum(), pl.col("voted").sum()).sort("year", "stage"))
+    print(
+        frame.group_by("year", "stage", "month")
+        .agg(pl.len(), pl.col("registered").sum(), pl.col("voted").sum())
+        .sort("year", "stage")
+    )
 
 
 def emit() -> Path:
@@ -102,7 +114,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=BASE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=BASE,
+                license="Public record",
+            )
         total = frame.select(pl.col("code").n_unique()).item()
         for (year, stage, month, path), rows in frame.group_by("year", "stage", "month", "path", maintain_order=True):
             found = [f for f in elections.get((year, stage), []) if month in (None, f[2])]

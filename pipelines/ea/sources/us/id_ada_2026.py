@@ -15,7 +15,9 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 GUIDE = "https://adacounty.id.gov/elections/wp-content/uploads/sites/38/Ada-County-Election-Guide-NOV-2026-1.pdf"
-RESOLUTION = "https://files.smartsites.parentsquare.com/4192/new_business_supplemental_levy_election_resolution_august_2026.pdf"
+RESOLUTION = (
+    "https://files.smartsites.parentsquare.com/4192/new_business_supplemental_levy_election_resolution_august_2026.pdf"
+)
 PUBLISHER = "Ada County Elections"
 TITLE = "Ada County Election Guide, November 3, 2026 General Election"
 KUNA = "Kuna Joint School District No. 3"
@@ -25,7 +27,9 @@ CWI = "College of Western Idaho"
 
 def text(url: str) -> list[str]:
     path = raw.cached(SOURCE, url).path
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines()
+    return subprocess.run(
+        ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+    ).stdout.splitlines()
 
 
 def parse() -> None:
@@ -46,7 +50,11 @@ def parse() -> None:
             body, seat = ACHD, f"District {found[1]}"
         elif found := re.fullmatch(r"College of Western Idaho (\d+)", line):
             body, seat = CWI, f"Zone {found[1]}"
-        elif body and re.fullmatch(r"[A-Z][A-Za-zñÑ.' -]+", line) and not re.match(r"(Ada County|College|Pursuant|Party)", line):
+        elif (
+            body
+            and re.fullmatch(r"[A-Z][A-Za-zñÑ.' -]+", line)
+            and not re.match(r"(Ada County|College|Pursuant|Party)", line)
+        ):
             rows.append(
                 {
                     "county": "Ada",
@@ -92,7 +100,15 @@ def emit() -> Path:
         )
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=GUIDE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=GUIDE,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, GUIDE), source)
         kept = govcand.races(conn, cs, SOURCE, "ID", DAY, frame, source, "16")
         home = govcand.counties(conn, "16")[ceda._core("Ada County")]
@@ -104,24 +120,80 @@ def emit() -> Path:
         parent = cs.key("us.election", f"{DAY}:ID")
         election = cs.key("us.election", f"{DAY}:ID:{code}")
         if election in cs.minted:
-            cs.add("election", id=election, polity_id=polity, parent_id=parent, kind="general", date_from=DAY, date_to=DAY, date_precision="day", status="scheduled")
-            cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "election",
+                id=election,
+                polity_id=polity,
+                parent_id=parent,
+                kind="general",
+                date_from=DAY,
+                date_to=DAY,
+                date_precision="day",
+                status="scheduled",
+            )
+            cs.add(
+                "name",
+                entity_id=election,
+                text=f"{DAY.year} {place} general election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
         label = "Supplemental Levy"
         contest_key = f"{DAY}:ID:{code}:measure:{slug(label)}"
         contest = cs.key("us.contest", contest_key)
-        cs.add("contest", id=contest, election_id=election, kind="ballot_question", district_area_id=area, electoral_system_id=cs.key("us.electoral_system", "referendum"), round_number=1, default_result_kind="counted")
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="ballot_question",
+            district_area_id=area,
+            electoral_system_id=cs.key("us.electoral_system", "referendum"),
+            round_number=1,
+            default_result_kind="counted",
+        )
         cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-        cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+        cs.add(
+            "name",
+            entity_id=contest,
+            text=f"{DAY.year} {place}: {label}",
+            lang="en",
+            kind="official",
+            is_preferred=True,
+        )
         if contest in cs.minted:
             cs.add("slug", path=f"{path}/{DAY}-general/{slug(label)}", entity_id=contest)
         for position, answer in enumerate(ANSWERS):
-            cs.add("contest_option", id=cs.key("us.option", f"{contest_key}:{slug(answer[:20])}"), contest_id=contest, kind="answer", ballot_position=position + 1, ballot_label=answer)
+            cs.add(
+                "contest_option",
+                id=cs.key("us.option", f"{contest_key}:{slug(answer[:20])}"),
+                contest_id=contest,
+                kind="answer",
+                ballot_position=position + 1,
+                ballot_label=answer,
+            )
         resolution = cs.source("Kuna School District", "Supplemental Levy Election Resolution, August 2026")
         if resolution in cs.minted:
-            cs.add("source", id=resolution, kind="official_body", publisher="Kuna School District", title="Supplemental Levy Election Resolution, August 2026", url=RESOLUTION, license="Public record")
+            cs.add(
+                "source",
+                id=resolution,
+                kind="official_body",
+                publisher="Kuna School District",
+                title="Supplemental Levy Election Resolution, August 2026",
+                url=RESOLUTION,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, RESOLUTION), resolution)
         cs.add("citation", entity_id=contest, source_id=resolution)
-        cs.add("ballot_question_text", contest_id=contest, kind="text", lang="en", body=WORDING, url=RESOLUTION, source_id=resolution)
+        cs.add(
+            "ballot_question_text",
+            contest_id=contest,
+            kind="text",
+            lang="en",
+            body=WORDING,
+            url=RESOLUTION,
+            source_id=resolution,
+        )
         print(f"{kept} candidates")
         return cs.write()

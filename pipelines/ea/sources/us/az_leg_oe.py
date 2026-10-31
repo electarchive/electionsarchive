@@ -51,9 +51,8 @@ def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["AZ"]
     frames = []
-    for path in FILES:
+    for path, (day, offices, parties) in FILES.items():
         frame = pl.read_csv(io.BytesIO(raw.cached(SOURCE, url(path)).path.read_bytes()), infer_schema_length=0)
-        day, offices, parties = FILES[path]
         frame = frame.filter(pl.col("office").str.strip_chars().is_in(list(offices)))
         if parties:
             frame = frame.filter(pl.col("party").is_in(list(parties)))
@@ -70,7 +69,11 @@ def parse() -> None:
                 special=pl.lit(False),
                 state=pl.lit("AZ"),
                 district=pl.lit(None, pl.Int16),
-                code=pl.col("county").str.strip_chars().str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips),
+                code=pl.col("county")
+                .str.strip_chars()
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(fips),
                 kind=pl.lit("county"),
                 candidate=pl.col("candidate").str.strip_chars().str.to_uppercase(),
                 measure=pl.lit(1, pl.Int16),

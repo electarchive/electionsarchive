@@ -1,4 +1,3 @@
-import re
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -140,7 +139,14 @@ def emit() -> Path:
             .with_columns(
                 measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
                 writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
-                code=pl.concat_str(pl.col("day").cast(pl.String), pl.lit("LA"), "fips", pl.col("county").str.to_uppercase(), "precinct", separator=":"),
+                code=pl.concat_str(
+                    pl.col("day").cast(pl.String),
+                    pl.lit("LA"),
+                    "fips",
+                    pl.col("county").str.to_uppercase(),
+                    "precinct",
+                    separator=":",
+                ),
             )
             .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
             .filter(pl.col("measure") > 0)

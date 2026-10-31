@@ -3,6 +3,7 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
+from typing import LiteralString, cast
 
 from ea import display, plane
 from ea.store import DATA, ROOT, connect
@@ -63,7 +64,7 @@ def build(prefix: str | None) -> str:
                     query = FEATURES_SQL.format(plane=plane.sql(column, scheme_code))
                     with conn.cursor(name="features") as cursor:
                         cursor.itersize = 10_000
-                        cursor.execute(query, [mask, scheme_code, as_of])
+                        cursor.execute(cast(LiteralString, query), [mask, scheme_code, as_of])
                         for (line,) in cursor:
                             handle.write(f"{line}\n")
             subprocess.run(

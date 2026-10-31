@@ -56,7 +56,11 @@ def parse() -> None:
                 office, area = "Judge of the Civil Court - District", office.split(" - ", 2)[2]
             continue
         parts = re.split(r"\s{2,}", line.strip())
-        if office is None or not line.strip() or line.strip().startswith(("Page ", "BOARD OF", "IN THE CITY", "PRINTED", "Party\\Ind")):
+        if (
+            office is None
+            or not line.strip()
+            or line.strip().startswith(("Page ", "BOARD OF", "IN THE CITY", "PRINTED", "Party\\Ind"))
+        ):
             continue
         if office.startswith("Proposal Number"):
             if parts[0] in ("Yes", "No"):
@@ -91,7 +95,15 @@ def emit():
         referendum = cs.key("us.electoral_system", "referendum")
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
 
         def name(entity: UUID, text: str) -> None:
@@ -117,7 +129,9 @@ def emit():
             question = office_text.startswith("Proposal")
             if question and borough != "New York":
                 continue
-            rows = frame.filter(pl.col("office") == office_text, pl.col("area") == area_text, pl.col("borough") == borough)
+            rows = frame.filter(
+                pl.col("office") == office_text, pl.col("area") == area_text, pl.col("borough") == borough
+            )
             if question:
                 heading = re.sub(r"^Proposal Number \d+, a Question: ", "", office_text)
                 heading = heading.removesuffix(" - Citywide").strip()
@@ -133,10 +147,17 @@ def emit():
                 number = number[1] if number else ""
                 kind = JUDICIAL[office_text]
                 if kind == "surrogate":
-                    seat, title, office_key = f"surrogate-{slug(county)}", f"{county} County Surrogate", f"NY:{fips}:surrogate"
+                    seat, title, office_key = (
+                        f"surrogate-{slug(county)}",
+                        f"{county} County Surrogate",
+                        f"NY:{fips}:surrogate",
+                    )
                 elif kind == "supreme-court":
                     ordinal = area_text.split(" Judicial")[0]
-                    seat, title = f"supreme-court-{number}-{slug(county)}", f"{ordinal} Judicial District Supreme Court Justice"
+                    seat, title = (
+                        f"supreme-court-{number}-{slug(county)}",
+                        f"{ordinal} Judicial District Supreme Court Justice",
+                    )
                     office_key = f"NY:{fips}:supreme-court:{number}"
                 elif kind == "civil-court":
                     seat, title = f"civil-court-{slug(county)}", f"{county} County Civil Court Judge"

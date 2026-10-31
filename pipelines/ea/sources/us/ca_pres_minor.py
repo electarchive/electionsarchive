@@ -29,7 +29,9 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    sheet = fastexcel.read_excel(raw.cached(SOURCE, URL).path).load_sheet(0, header_row=None, dtypes="string").to_polars()
+    sheet = (
+        fastexcel.read_excel(raw.cached(SOURCE, URL).path).load_sheet(0, header_row=None, dtypes="string").to_polars()
+    )
     header, parties, *body = sheet.iter_rows()
     rows = []
     for row in body:

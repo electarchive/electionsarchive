@@ -71,35 +71,55 @@ def parse() -> None:
                     .replace_strict(towns[state], default=None),
                 )
             )
-    frame = pl.concat(frames).with_columns(
-        candidate=pl.col("candidate_name").fill_null("").str.replace_all(r"\s+", " ").str.strip_chars().str.to_uppercase(),
-        votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-    ).filter(pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains(r"^TOTAL |^NUMBER |^#|UNDERVOTE|OVERVOTE"))
+    frame = (
+        pl.concat(frames)
+        .with_columns(
+            candidate=pl.col("candidate_name")
+            .fill_null("")
+            .str.replace_all(r"\s+", " ")
+            .str.strip_chars()
+            .str.to_uppercase(),
+            votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+        )
+        .filter(
+            pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains(r"^TOTAL |^NUMBER |^#|UNDERVOTE|OVERVOTE")
+        )
+    )
     lost = frame.filter(pl.col("code").is_null())
     if lost.height:
         raise ValueError(f"unmatched towns: {lost.select('state', 'division_name').unique().rows()}")
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = frame.select(
-        year=pl.col("election_date").str.slice(0, 4).cast(pl.Int32),
-        chamber=pl.concat_str(pl.lit("president:"), pl.col("primary_party").str.to_lowercase()),
-        day=pl.col("election_date").str.slice(0, 10).str.to_date(),
-        special=pl.lit(False),
-        state="state",
-        district=pl.lit(None, pl.Int16),
-        code="code",
-        candidate=pl.when(pl.col("candidate").str.contains("WRITE|ALL OTHER")).then(pl.lit("WRITE-INS")).otherwise("candidate"),
-        measure=pl.lit(1, pl.Int16),
-        writein=pl.col("candidate").str.contains("WRITE|ALL OTHER"),
-        votes="votes",
-    ).group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure").agg(
-        pl.col("writein").any(), pl.col("votes").sum()
-    ).with_columns(
-        code=pl.col("code").replace(PLACES),
-        kind=pl.when(pl.col("code").is_in(list(PLACES))).then(pl.lit("place")).otherwise(pl.lit("town")),
-        source="state",
+    frame = (
+        frame.select(
+            year=pl.col("election_date").str.slice(0, 4).cast(pl.Int32),
+            chamber=pl.concat_str(pl.lit("president:"), pl.col("primary_party").str.to_lowercase()),
+            day=pl.col("election_date").str.slice(0, 10).str.to_date(),
+            special=pl.lit(False),
+            state="state",
+            district=pl.lit(None, pl.Int16),
+            code="code",
+            candidate=pl.when(pl.col("candidate").str.contains("WRITE|ALL OTHER"))
+            .then(pl.lit("WRITE-INS"))
+            .otherwise("candidate"),
+            measure=pl.lit(1, pl.Int16),
+            writein=pl.col("candidate").str.contains("WRITE|ALL OTHER"),
+            votes="votes",
+        )
+        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure")
+        .agg(pl.col("writein").any(), pl.col("votes").sum())
+        .with_columns(
+            code=pl.col("code").replace(PLACES),
+            kind=pl.when(pl.col("code").is_in(list(PLACES))).then(pl.lit("place")).otherwise(pl.lit("town")),
+            source="state",
+        )
     )
     frame.write_parquet(PARSED / "towns.parquet")
-    print(frame.group_by("state", "year", "chamber").agg(pl.col("code").n_unique(), pl.col("votes").sum()).sort("state", "year", "chamber").rows())
+    print(
+        frame.group_by("state", "year", "chamber")
+        .agg(pl.col("code").n_unique(), pl.col("votes").sum())
+        .sort("state", "year", "chamber")
+        .rows()
+    )
 
 
 def emit() -> Path:
@@ -113,7 +133,7 @@ def emit() -> Path:
             polity="US",
         )
         sources = {}
-        for state in WANTED:
+        for state, years in WANTED.items():
             _, publisher, site = elstats.TENANTS[state]
             sources[state] = cs.source(publisher, elstats.TITLE)
             if sources[state] in cs.minted:
@@ -126,7 +146,7 @@ def emit() -> Path:
                     url=site,
                     license="Public record",
                 )
-            for year in WANTED[state]:
+            for year in years:
                 cs.artifact(raw.cached(SOURCE, url(state, year)), sources[state])
         gazetteer = cs.source("U.S. Census Bureau", "2020 Gazetteer Files")
         if gazetteer in cs.minted:

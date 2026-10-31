@@ -1,5 +1,4 @@
 import difflib
-import json
 import re
 import subprocess
 from datetime import date, timedelta
@@ -20,21 +19,148 @@ TITLE = "Election Statistics, State of Kansas, general elections 1920-1986"
 LANDING = "https://cdm16884.contentdm.oclc.org/digital/collection/p16884coll129"
 URL = "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/{ptr}/download"
 POINTERS = {
-    1920: 17, 1922: 19, 1924: 21, 1926: 23, 1928: 25, 1930: 27, 1932: 29, 1934: 31, 1936: 33, 1938: 35, 1940: 37,
-    1942: 39, 1944: 41, 1946: 43, 1948: 45, 1950: 47, 1952: 49, 1954: 51, 1956: 53, 1958: 55, 1960: 57, 1962: 58,
-    1964: 59, 1966: 60, 1968: 61, 1970: 62, 1972: 63, 1974: 64, 1976: 65, 1978: 66, 1980: 67, 1982: 68, 1984: 69,
+    1920: 17,
+    1922: 19,
+    1924: 21,
+    1926: 23,
+    1928: 25,
+    1930: 27,
+    1932: 29,
+    1934: 31,
+    1936: 33,
+    1938: 35,
+    1940: 37,
+    1942: 39,
+    1944: 41,
+    1946: 43,
+    1948: 45,
+    1950: 47,
+    1952: 49,
+    1954: 51,
+    1956: 53,
+    1958: 55,
+    1960: 57,
+    1962: 58,
+    1964: 59,
+    1966: 60,
+    1968: 61,
+    1970: 62,
+    1972: 63,
+    1974: 64,
+    1976: 65,
+    1978: 66,
+    1980: 67,
+    1982: 68,
+    1984: 69,
     1986: 70,
 }
-COUNTIES = (
-    "Allen Anderson Atchison Barber Barton Bourbon Brown Butler Chase Chautauqua Cherokee Cheyenne Clark Clay Cloud "
-    "Coffey Comanche Cowley Crawford Decatur Dickinson Doniphan Douglas Edwards Elk Ellis Ellsworth Finney Ford "
-    "Franklin Geary Gove Graham Grant Gray Greeley Greenwood Hamilton Harper Harvey Haskell Hodgeman Jackson "
-    "Jefferson Jewell Johnson Kearny Kingman Kiowa Labette Lane Leavenworth Lincoln Linn Logan Lyon Marion Marshall "
-    "McPherson Meade Miami Mitchell Montgomery Morris Morton Nemaha Neosho Ness Norton Osage Osborne Ottawa Pawnee "
-    "Phillips Pottawatomie Pratt Rawlins Reno Republic Rice Riley Rooks Rush Russell Saline Scott Sedgwick Seward "
-    "Shawnee Sheridan Sherman Smith Stafford Stanton Stevens Sumner Thomas Trego Wabaunsee Wallace Washington "
-    "Wichita Wilson Woodson Wyandotte"
-).split()
+COUNTIES = [
+    "Allen",
+    "Anderson",
+    "Atchison",
+    "Barber",
+    "Barton",
+    "Bourbon",
+    "Brown",
+    "Butler",
+    "Chase",
+    "Chautauqua",
+    "Cherokee",
+    "Cheyenne",
+    "Clark",
+    "Clay",
+    "Cloud",
+    "Coffey",
+    "Comanche",
+    "Cowley",
+    "Crawford",
+    "Decatur",
+    "Dickinson",
+    "Doniphan",
+    "Douglas",
+    "Edwards",
+    "Elk",
+    "Ellis",
+    "Ellsworth",
+    "Finney",
+    "Ford",
+    "Franklin",
+    "Geary",
+    "Gove",
+    "Graham",
+    "Grant",
+    "Gray",
+    "Greeley",
+    "Greenwood",
+    "Hamilton",
+    "Harper",
+    "Harvey",
+    "Haskell",
+    "Hodgeman",
+    "Jackson",
+    "Jefferson",
+    "Jewell",
+    "Johnson",
+    "Kearny",
+    "Kingman",
+    "Kiowa",
+    "Labette",
+    "Lane",
+    "Leavenworth",
+    "Lincoln",
+    "Linn",
+    "Logan",
+    "Lyon",
+    "Marion",
+    "Marshall",
+    "McPherson",
+    "Meade",
+    "Miami",
+    "Mitchell",
+    "Montgomery",
+    "Morris",
+    "Morton",
+    "Nemaha",
+    "Neosho",
+    "Ness",
+    "Norton",
+    "Osage",
+    "Osborne",
+    "Ottawa",
+    "Pawnee",
+    "Phillips",
+    "Pottawatomie",
+    "Pratt",
+    "Rawlins",
+    "Reno",
+    "Republic",
+    "Rice",
+    "Riley",
+    "Rooks",
+    "Rush",
+    "Russell",
+    "Saline",
+    "Scott",
+    "Sedgwick",
+    "Seward",
+    "Shawnee",
+    "Sheridan",
+    "Sherman",
+    "Smith",
+    "Stafford",
+    "Stanton",
+    "Stevens",
+    "Sumner",
+    "Thomas",
+    "Trego",
+    "Wabaunsee",
+    "Wallace",
+    "Washington",
+    "Wichita",
+    "Wilson",
+    "Woodson",
+    "Wyandotte",
+]
 BY_NAME = {name.lower(): name for name in COUNTIES}
 DIGITS = str.maketrans({"G": "6", "O": "0", "o": "0", "l": "1", "I": "1", "S": "5", "B": "8", "i": "1", "|": "1"})
 ORDINALS = {"FIRST": 1, "SECOND": 2, "THIRD": 3, "FOURTH": 4, "FIFTH": 5, "SIXTH": 6, "SEVENTH": 7, "EIGHTH": 8}
@@ -56,7 +182,7 @@ def path(year: int) -> Path:
 
 
 def fetch() -> None:
-    for year, ptr in POINTERS.items():
+    for ptr in POINTERS.values():
         raw.fetch(SOURCE, URL.format(ptr=ptr), suffix=".pdf")
 
 
@@ -89,10 +215,7 @@ def split_row(line: str) -> tuple[str, list[tuple[int, int, str]]] | None:
     rest = line[rest_start:]
     stripped = rest.lstrip(" .,_-'`*:")
     offset = rest_start + (len(rest) - len(stripped))
-    found = [
-        (offset + m.start(), offset + m.end(), m.group().strip())
-        for m in re.finditer(r"\S+(?: \S+)*", stripped)
-    ]
+    found = [(offset + m.start(), offset + m.end(), m.group().strip()) for m in re.finditer(r"\S+(?: \S+)*", stripped)]
     if not found:
         return None
     return match.group(2), found
@@ -159,7 +282,7 @@ def tables(pages: list[str]) -> list[dict[str, object]]:
                 continue
             if office is None:
                 continue
-            if re.match(r"^\s*T\s*o\s*t\s*a\s*l\s*s?\b", line, re.I):
+            if re.match(r"^\s*T\s*o\s*t\s*a\s*l\s*s?\b", line, re.IGNORECASE):
                 parsed = split_row("Totals" + "   " + line.split(None, 1)[1] if len(line.split(None, 1)) > 1 else "")
                 if current is not None and "cells" in current:
                     values = [number(t) for _, _, t in parsed[1]] if parsed else []
@@ -196,8 +319,8 @@ def columns(table: dict[str, object]) -> list[tuple[str, str | None]]:
     spans: list[tuple[int, int]] = table["spans"]
     groups: list[list[tuple[int, str]]] = [[] for _ in spans]
     for start, end, text in table["header"]:
-        text = re.sub(r"C\s*o\s*u\s*n\s*t\s*i\s*e\s*s\s*\.?", "", text, flags=re.I).strip()
-        if not text or re.search(r"term|Position|Regular|Unexpired", text, re.I):
+        text = re.sub(r"C\s*o\s*u\s*n\s*t\s*i\s*e\s*s\s*\.?", "", text, flags=re.IGNORECASE).strip()
+        if not text or re.search(r"term|Position|Regular|Unexpired", text, re.IGNORECASE):
             continue
         centre = (start + end) / 2
         nearest = min(range(len(spans)), key=lambda i: abs((spans[i][0] + spans[i][1]) / 2 - centre))
@@ -219,7 +342,9 @@ def parse() -> None:
     report = []
     for year in POINTERS:
         pdf = path(year)
-        pages = subprocess.run(["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True).stdout.split("\f")
+        pages = subprocess.run(
+            ["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True, check=False
+        ).stdout.split("\f")
         day = date(year, 11, 1)
         while day.weekday() != 0:
             day += timedelta(days=1)
@@ -243,11 +368,7 @@ def parse() -> None:
             if any(not label for label, _ in labels) or len({label for label, _ in labels}) != width:
                 report.append(f"{note}: labels {labels}")
                 continue
-            bad = [
-                labels[i][0]
-                for i in range(width)
-                if sum(values[i] for _, values in cells) != totals[i]
-            ]
+            bad = [labels[i][0] for i in range(width) if sum(values[i] for _, values in cells) != totals[i]]
             if bad:
                 report.append(f"{note}: does not tie for {bad}")
                 continue

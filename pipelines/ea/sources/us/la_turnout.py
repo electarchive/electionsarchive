@@ -43,7 +43,7 @@ def parse() -> None:
     for day in days():
         try:
             stats = json.loads(raw.cached(SOURCE, blob(day, "StatsParish.htm")).path.read_text())["Stats"]["Parish"]
-        except (LookupError, ValueError, KeyError):
+        except LookupError, ValueError, KeyError:
             print(f"{day}: no stats")
             continue
         found = {}
@@ -88,7 +88,15 @@ def emit() -> Path:
         title = "Official election results"
         source = cs.source(PUBLISHER, title)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url="https://voterportal.sos.la.gov/", license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url="https://voterportal.sos.la.gov/",
+                license="Public record",
+            )
         for (day,), rows in frame.group_by("date", maintain_order=True):
             if day not in elections:
                 print(f"{day}: no election")

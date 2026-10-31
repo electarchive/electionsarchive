@@ -140,7 +140,12 @@ def parse() -> None:
             writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
             county_code=pl.col("code"),
             code=pl.concat_str(
-                pl.col("day").cast(pl.String), pl.lit("FL"), "code", pl.col("county").str.to_uppercase(), "place", separator=":"
+                pl.col("day").cast(pl.String),
+                pl.lit("FL"),
+                "code",
+                pl.col("county").str.to_uppercase(),
+                "place",
+                separator=":",
             ),
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
@@ -215,7 +220,11 @@ def emit() -> Path:
                 separator=":",
             ).is_in(list(filled))
         )
-        units = frame.group_by("code").agg(pl.col("state").first(), pl.col("county_code").first(), pl.col("day").min()).sort("code")
+        units = (
+            frame.group_by("code")
+            .agg(pl.col("state").first(), pl.col("county_code").first(), pl.col("day").min())
+            .sort("code")
+        )
         cs.frame(
             "reporting_unit",
             units.select(
@@ -225,7 +234,9 @@ def emit() -> Path:
                 ),
                 scheme_code=pl.lit("us.precinct"),
                 code="code",
-                parent_id=pl.col("county_code").replace_strict({code: str(unit) for code, (unit, _) in counties.items()}),
+                parent_id=pl.col("county_code").replace_strict(
+                    {code: str(unit) for code, (unit, _) in counties.items()}
+                ),
                 area_relation=pl.lit("within"),
                 area_id=pl.col("county_code").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
                 kind=pl.lit("standard"),

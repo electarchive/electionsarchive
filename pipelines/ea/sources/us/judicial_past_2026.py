@@ -112,12 +112,22 @@ def ev_rows(state: str) -> list[dict[str, str | int]]:
                 name = re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip()
                 by_candidate[name] += option["voteCount"]
                 rows.append(
-                    {"state": state, "title": title, "seat": found["seat"], "county": place, "answer": "", "candidate": name, "votes": option["voteCount"]}
+                    {
+                        "state": state,
+                        "title": title,
+                        "seat": found["seat"],
+                        "county": place,
+                        "answer": "",
+                        "candidate": name,
+                        "votes": option["voteCount"],
+                    }
                 )
         for option in detail["summaryResults"]["ballotOptions"]:
             name = re.sub(r"\s*\(I\)$", "", option["name"][0]["text"]).strip()
             if by_candidate[name] != option["voteCount"]:
-                raise ValueError(f"{state} {text} {name}: counties {by_candidate[name]} differ from statewide {option['voteCount']}")
+                raise ValueError(
+                    f"{state} {text} {name}: counties {by_candidate[name]} differ from statewide {option['voteCount']}"
+                )
     return rows
 
 
@@ -139,7 +149,15 @@ def wv_rows() -> list[dict[str, str | int]]:
                 votes = int(str(table[line, index + 1]))
                 by_candidate[name] += votes
                 rows.append(
-                    {"state": "WV", "title": title, "seat": seat, "county": county, "answer": "", "candidate": name, "votes": votes}
+                    {
+                        "state": "WV",
+                        "title": title,
+                        "seat": seat,
+                        "county": county,
+                        "answer": "",
+                        "candidate": name,
+                        "votes": votes,
+                    }
                 )
     return rows
 
@@ -158,7 +176,15 @@ def ar_rows() -> list[dict[str, str | int]]:
                 name = meta["choices"][choice["ChoiceID"]]["name"]
                 by_candidate[name] += choice["TotalVotes"]
                 rows.append(
-                    {"state": "AR", "title": "Justice of the Supreme Court", "seat": "Position 3", "county": fips, "answer": "", "candidate": name, "votes": choice["TotalVotes"]}
+                    {
+                        "state": "AR",
+                        "title": "Justice of the Supreme Court",
+                        "seat": "Position 3",
+                        "county": fips,
+                        "answer": "",
+                        "candidate": name,
+                        "votes": choice["TotalVotes"],
+                    }
                 )
         statewide = {choice["ChoiceID"]: choice["TotalVotes"] for choice in contest["Choices"]}
         for choice_id, total in statewide.items():
@@ -230,19 +256,33 @@ def emit() -> Path:
                where x.value ~ ':(AR|GA|ID|OR|TN|WV):[a-z-]*(justice|judge)'"""
         ).fetchall():
             pool[(state, slug(text))].add(person)
-        election_keys = {"AR": "2026-03-03:AR:primary", "GA": "2026-05-19:GA:primary", "ID": "2026-05-19:ID:primary", "OR": FILES["OR"][2], "TN": FILES["TN"][2], "WV": "2026-05-12:WV:primary"}
+        election_keys = {
+            "AR": "2026-03-03:AR:primary",
+            "GA": "2026-05-19:GA:primary",
+            "ID": "2026-05-19:ID:primary",
+            "OR": FILES["OR"][2],
+            "TN": FILES["TN"][2],
+            "WV": "2026-05-12:WV:primary",
+        }
         elections = {
             state: conn.execute(
                 "select entity_id from external_id where scheme = 'us.election' and value = %s", [key]
             ).fetchone()[0]
             for state, key in election_keys.items()
         }
-        days = {"AR": AR_DAY, "GA": FILES["OR"][0], "ID": FILES["OR"][0], "OR": FILES["OR"][0], "TN": FILES["TN"][0], "WV": WV_DAY}
+        days = {
+            "AR": AR_DAY,
+            "GA": FILES["OR"][0],
+            "ID": FILES["OR"][0],
+            "OR": FILES["OR"][0],
+            "TN": FILES["TN"][0],
+            "WV": WV_DAY,
+        }
         sources: dict[str, UUID] = {}
-        for state in STATES:
+        for state, state_name in STATES.items():
             official = state in ("AR", "GA", "ID", "WV")
-            publisher = f"{STATES[state]} Secretary of State" if official else "OpenElections"
-            title = f"{STATES[state]} {days[state]:%B %-d, %Y} election results"
+            publisher = f"{state_name} Secretary of State" if official else "OpenElections"
+            title = f"{state_name} {days[state]:%B %-d, %Y} election results"
             sources[state] = cs.source(publisher, title)
             cs.add(
                 "source",
@@ -259,7 +299,9 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, WV_URL), sources[state])
             elif state in EVENTS:
                 for item in items(state):
-                    cs.artifact(raw.cached(SOURCE, f"{oe.EV[EVENTS[state][0]][0]}ballot-items/{item['id']}"), sources[state])
+                    cs.artifact(
+                        raw.cached(SOURCE, f"{oe.EV[EVENTS[state][0]][0]}ballot-items/{item['id']}"), sources[state]
+                    )
             else:
                 cs.artifact(raw.cached(SOURCE, url(state)), sources[state])
 
@@ -274,7 +316,9 @@ def emit() -> Path:
             return id
 
         retention_system = cs.key("us.electoral_system", "retention")
-        systems = {state: cs.key("us.electoral_system", "fptp" if state in PLURALITY else "two_round") for state in STATES}
+        systems = {
+            state: cs.key("us.electoral_system", "fptp" if state in PLURALITY else "two_round") for state in STATES
+        }
         offices: set[UUID] = set()
         groups: dict[tuple[str, str, str, str], list[dict[str, str | int]]] = defaultdict(list)
         for row in rows:
@@ -294,7 +338,14 @@ def emit() -> Path:
                 offices.add(office)
                 if office in cs.minted:
                     cs.add("office", id=office, polity_id=cs.polity(f"US-{state}"), kind="other")
-                    cs.add("name", entity_id=office, text=f"{title} of {STATES[state]}", lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=office,
+                        text=f"{title} of {STATES[state]}",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
             contest = cs.key("us.contest", contest_key)
             cs.add(
                 "contest",
@@ -312,10 +363,21 @@ def emit() -> Path:
             label = f"{title}{f', {seat}' if seat else ''}"
             if retention:
                 label = f"{title} retention: {judge}"
-            cs.add("name", entity_id=contest, text=f"{days[state].year} {STATES[state]} {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{days[state].year} {STATES[state]} {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 stage = "primary" if state != "TN" else "general"
-                cs.add("slug", path=f"us/{state.lower()}/{day}-{stage}/{slug(title)}-{seat_slug}".rstrip("-"), entity_id=contest)
+                cs.add(
+                    "slug",
+                    path=f"us/{state.lower()}/{day}-{stage}/{slug(title)}-{seat_slug}".rstrip("-"),
+                    entity_id=contest,
+                )
             cs.add("citation", entity_id=contest, source_id=sources[state])
             result = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -372,9 +434,7 @@ def emit() -> Path:
                 )
             contenders = [name for name in ranked if not is_write_in(name)]
             winner = contenders[0]
-            if retention:
-                cs.add("outcome", result_set_id=result, option_id=options[winner], kind="won")
-            elif state in PLURALITY or totals[winner] * 2 > sum(totals.values()) or len(contenders) == 1:
+            if retention or state in PLURALITY or totals[winner] * 2 > sum(totals.values()) or len(contenders) == 1:
                 cs.add("outcome", result_set_id=result, option_id=options[winner], kind="won")
             by_place: dict[str, int] = defaultdict(int)
             values = []

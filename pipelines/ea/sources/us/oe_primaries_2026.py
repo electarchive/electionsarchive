@@ -1,15 +1,15 @@
 import csv
 import io
 import json
-import subprocess
 import re
+import subprocess
 import unicodedata
 import zipfile
-from xml.etree import ElementTree
 from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
+from xml.etree import ElementTree
 
 import fastexcel
 import httpx
@@ -25,7 +25,13 @@ SOURCE = "us.oe_primaries_2026"
 VERSION = "2"
 BASE = "https://raw.githubusercontent.com/openelections/openelections-data-{}/master/2026/{}"
 OK_RACES = ("12001", "12010", "12011", "12012", "12013", "12014", "13001", "13010", "13012", "13013", "13014", "13015")
-NH_FILES = [*(f"2026-sp-{race}-{party}.xlsx" for race in ("governor-summary", "us-senator-summary", "congressional-district-1", "congressional-district-2") for party in ("republican", "democratic"))]
+NH_FILES = [
+    *(
+        f"2026-sp-{race}-{party}.xlsx"
+        for race in ("governor-summary", "us-senator-summary", "congressional-district-1", "congressional-district-2")
+        for party in ("republican", "democratic")
+    )
+]
 ME_FILES = {
     "US%20Senate%20DEM%20-%20FINAL": ("U.S. Senate", "", "Democratic"),
     "US%20Senate%20REP%20-%20FINAL": ("U.S. Senate", "", "Republican"),
@@ -45,13 +51,32 @@ FILES = {
     "NV": ("nv", "2026-06-09", ["nv-2026-primary-county-results.xml"]),
     "IA": ("ia", "2026-06-02", ["detailxlsx.zip"]),
     "MT": ("mt", "2026-06-02", ["Statewide Results.xlsx"]),
-    "TX": ("tx", "2026-03-03", ["republican/CountyByCountyCanvassReport.pdf", "democratic/CountyByCountyCanvassReport.pdf"]),
-    "CA": ("ca", "2026-06-02", ["19-gov", "76-us-rep", "46-lt-gov", "55-sos", "58-sco", "61-treasurer", "64-ag", "67-ic"]),
+    "TX": (
+        "tx",
+        "2026-03-03",
+        ["republican/CountyByCountyCanvassReport.pdf", "democratic/CountyByCountyCanvassReport.pdf"],
+    ),
+    "CA": (
+        "ca",
+        "2026-06-02",
+        ["19-gov", "76-us-rep", "46-lt-gov", "55-sos", "58-sco", "61-treasurer", "64-ag", "67-ic"],
+    ),
     "MI": ("mi", "2026-08-04", ["2026STATE_PRIMARY_MI_CENR_BY_COUNTY.txt"]),
     "PA": ("pa", "2026-05-19", ["Official_10242026022517AM.CSV"]),
-    "OH": ("oh", "2026-05-05", [f"summary-level-official-results-2026-primary---{party}.xlsx" for party in ("democratic", "republican", "libertarian")]),
+    "OH": (
+        "oh",
+        "2026-05-05",
+        [
+            f"summary-level-official-results-2026-primary---{party}.xlsx"
+            for party in ("democratic", "republican", "libertarian")
+        ],
+    ),
     "WV": ("wv", "2026-05-12", ["detailxml"]),
-    "MS": ("ms", "2026-03-10", ["20260310__ms__democratic__primary__county.csv", "20260310__ms__republican__primary__county.csv"]),
+    "MS": (
+        "ms",
+        "2026-03-10",
+        ["20260310__ms__democratic__primary__county.csv", "20260310__ms__republican__primary__county.csv"],
+    ),
     "SD": ("sd", "2026-06-02", ["20260602__sd__primary__county.csv"]),
     "WY": ("wy", "2026-08-18", ["20260818__wy__primary__county.csv"]),
     "OR": ("or", "2026-05-19", ["20260519__or__primary__county.csv"]),
@@ -64,7 +89,10 @@ FILES = {
         [
             "69-150-UNITED%20STATES%20SENATOR-2026GP.csv",
             "69-180-GOVERNOR%20AND%20LIEUTENANT%20GOVERNOR-2026GP.csv",
-            *(f"69-{240 + 10 * number}-{number}{'TH' if 10 <= number % 100 <= 20 else {1: 'ST', 2: 'ND', 3: 'RD'}.get(number % 10, 'TH')}%20CONGRESS-2026GP.csv" for number in range(1, 18)),
+            *(
+                f"69-{240 + 10 * number}-{number}{'TH' if 10 <= number % 100 <= 20 else {1: 'ST', 2: 'ND', 3: 'RD'}.get(number % 10, 'TH')}%20CONGRESS-2026GP.csv"
+                for number in range(1, 18)
+            ),
         ],
     ),
     "NM": ("nm", "2026-06-02", ["nm.elstats3"]),
@@ -81,7 +109,16 @@ FILES = {
     "NE": ("ne", "2026-05-12", ["2026_Primary_Canvass_Book.pdf"]),
     "LA": ("la", "2026-05-16", ["20260516/csv/ByParish_67538.csv", "20260516/csv/ByParish_67539.csv"]),
     "RI": ("ri", "2026-09-09", ["ballot-items"]),
-    "CT": ("ct", "2026-08-11", ["111/27708/Lookupdata", "111/27708/townVotes_Electiondata", "112/28256/Lookupdata", "112/28256/townVotes_Electiondata"]),
+    "CT": (
+        "ct",
+        "2026-08-11",
+        [
+            "111/27708/Lookupdata",
+            "111/27708/townVotes_Electiondata",
+            "112/28256/Lookupdata",
+            "112/28256/townVotes_Electiondata",
+        ],
+    ),
     "AR": ("ar", "2026-03-03", ["contests", "data"]),
     "OK": ("ok", "2026-06-16", ["getelec/20260616", *(f"20260616/{race}" for race in OK_RACES)]),
     "HI": ("hi", "2026-08-08", ["cch", "coh", "cok", "com"]),
@@ -98,7 +135,11 @@ FILES = {
         "2026-06-23",
         [
             *(f"gen_detail_results_2026_1_1_{party}.html" for party in ("Democratic", "Republican")),
-            *(f"gen_detail_results_2026_4_{number}_{party}_District%20{number}.html" for number in range(1, 9) for party in ("Democratic", "Republican")),
+            *(
+                f"gen_detail_results_2026_4_{number}_{party}_District%20{number}.html"
+                for number in range(1, 9)
+                for party in ("Democratic", "Republican")
+            ),
         ],
     ),
 }
@@ -113,14 +154,101 @@ RUNOFFS = {
     "SC": ("sc", "2026-06-23", ["2026-06-23/detailxml.zip"], "2026-06-09"),
     "OK": ("ok", "2026-08-25", ["getelec/20260825", "20260825/12001", "20260825/13010"], "2026-06-16"),
 }
-FIPS = {"DC": "11", "OH": "39", "NH": "33", "WI": "55", "NV": "32", "SC": "45", "IA": "19", "MT": "30", "TX": "48", "CA": "06", "MI": "26", "PA": "42", "WV": "54", "MS": "28", "SD": "46", "WY": "56", "OR": "41", "KY": "21", "CO": "08", "AZ": "04", "TN": "47", "NC": "37", "IL": "17", "NM": "35", "NY": "36", "VA": "51", "AL": "01", "ND": "38", "MD": "24", "MN": "27", "VT": "50", "KS": "20", "GA": "13", "WA": "53", "UT": "49", "IN": "18", "FL": "12", "ID": "16", "NJ": "34", "MO": "29", "MA": "25", "DE": "10", "HI": "15", "ME": "23", "OK": "40", "AR": "05", "CT": "09", "RI": "44", "LA": "22", "NE": "31"}
-RUNOFF_SYSTEMS = {"SC": "two_round", "GA": "two_round", "TX": "two_round", "MS": "two_round", "SD": "two_round_35", "NC": "two_round_30", "OK": "two_round", "AL": "two_round", "LA": "two_round"}
+FIPS = {
+    "DC": "11",
+    "OH": "39",
+    "NH": "33",
+    "WI": "55",
+    "NV": "32",
+    "SC": "45",
+    "IA": "19",
+    "MT": "30",
+    "TX": "48",
+    "CA": "06",
+    "MI": "26",
+    "PA": "42",
+    "WV": "54",
+    "MS": "28",
+    "SD": "46",
+    "WY": "56",
+    "OR": "41",
+    "KY": "21",
+    "CO": "08",
+    "AZ": "04",
+    "TN": "47",
+    "NC": "37",
+    "IL": "17",
+    "NM": "35",
+    "NY": "36",
+    "VA": "51",
+    "AL": "01",
+    "ND": "38",
+    "MD": "24",
+    "MN": "27",
+    "VT": "50",
+    "KS": "20",
+    "GA": "13",
+    "WA": "53",
+    "UT": "49",
+    "IN": "18",
+    "FL": "12",
+    "ID": "16",
+    "NJ": "34",
+    "MO": "29",
+    "MA": "25",
+    "DE": "10",
+    "HI": "15",
+    "ME": "23",
+    "OK": "40",
+    "AR": "05",
+    "CT": "09",
+    "RI": "44",
+    "LA": "22",
+    "NE": "31",
+}
+RUNOFF_SYSTEMS = {
+    "SC": "two_round",
+    "GA": "two_round",
+    "TX": "two_round",
+    "MS": "two_round",
+    "SD": "two_round_35",
+    "NC": "two_round_30",
+    "OK": "two_round",
+    "AL": "two_round",
+    "LA": "two_round",
+}
 THRESHOLDS = {"SC": 50, "GA": 50, "TX": 50, "MS": 50, "SD": 35, "NC": 30, "OK": 50, "AL": 50, "LA": 50}
-ME_COUNTIES = {"AND": "23001", "ARO": "23003", "CUM": "23005", "FRA": "23007", "HAN": "23009", "KEN": "23011", "KNO": "23013", "LIN": "23015", "OXF": "23017", "PEN": "23019", "PIS": "23021", "SAG": "23023", "SOM": "23025", "WAL": "23027", "WAS": "23029", "YOR": "23031"}
+ME_COUNTIES = {
+    "AND": "23001",
+    "ARO": "23003",
+    "CUM": "23005",
+    "FRA": "23007",
+    "HAN": "23009",
+    "KEN": "23011",
+    "KNO": "23013",
+    "LIN": "23015",
+    "OXF": "23017",
+    "PEN": "23019",
+    "PIS": "23021",
+    "SAG": "23023",
+    "SOM": "23025",
+    "WAL": "23027",
+    "WAS": "23029",
+    "YOR": "23031",
+}
 RCV_WINNERS = {
-    ("ME", "governor", "", "democratic"): ("hannah-m-pingree", "Hannah M. Pingree won the final round of the ranked-choice count, 111,750 votes to 86,950 for Nirav D. Shah, after three eliminations."),
-    ("ME", "governor", "", "republican"): ("robert-b-charles", "Robert B. Charles won the final round of the ranked-choice count, 59,873 votes to 39,499 for Benjamin T. Midgley, after six eliminations."),
-    ("ME", "house", "2", "democratic"): ("matthew-g-dunlap", "Matthew G. Dunlap won the final round of the ranked-choice count, 35,924 votes to 32,555 for Joseph M. Baldacci, after two eliminations."),
+    ("ME", "governor", "", "democratic"): (
+        "hannah-m-pingree",
+        "Hannah M. Pingree won the final round of the ranked-choice count, 111,750 votes to 86,950 for Nirav D. Shah, after three eliminations.",
+    ),
+    ("ME", "governor", "", "republican"): (
+        "robert-b-charles",
+        "Robert B. Charles won the final round of the ranked-choice count, 59,873 votes to 39,499 for Benjamin T. Midgley, after six eliminations.",
+    ),
+    ("ME", "house", "2", "democratic"): (
+        "matthew-g-dunlap",
+        "Matthew G. Dunlap won the final round of the ranked-choice count, 35,924 votes to 32,555 for Joseph M. Baldacci, after two eliminations.",
+    ),
 }
 EXEC = {
     "46-lt-gov": ("Lieutenant Governor", "lieutenant-governor", "lieutenant gubernatorial"),
@@ -131,7 +259,12 @@ EXEC = {
     "67-ic": ("Insurance Commissioner", "insurance-commissioner", "insurance commissioner"),
     "labor": ("Labor Commissioner", "commissioner-of-the-bureau-of-labor-and-industries", "labor commissioner"),
 }
-OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Governor": "governor", **{office: key for office, key, _ in EXEC.values()}}
+OFFICES = {
+    "U.S. House": "house",
+    "U.S. Senate": "senate",
+    "Governor": "governor",
+    **{office: key for office, key, _ in EXEC.values()},
+}
 TOP_TWO = {"CA", "WA"}
 AT_LARGE = {"SD", "WY", "ND", "VT", "DE"}
 REDISTRICTED = {"TX", "CA", "NC", "UT", "MO"}
@@ -159,70 +292,261 @@ PARTIES = {
     "Prefers Constitution Party": ("constitution", "constitution-party"),
     "DFL": ("minnesota-democratic-farmer-labor", "democratic-party"),
 }
-ALIASES = {("GA", "athensclarke"): "clarke", ("MT", "lewisclark"): "lewisandclark", ("MS", "jeffdavis"): "jeffersondavis", ("MD", "baltimorecounty"): "baltimore", ("MD", "saintmarys"): "stmarys"}
-CA_PARTIES = {"NPP": "No Party Preference", "PF": "Peace and Freedom", "AIP": "American Independent", "AI": "American Independent"}
+ALIASES = {
+    ("GA", "athensclarke"): "clarke",
+    ("MT", "lewisclark"): "lewisandclark",
+    ("MS", "jeffdavis"): "jeffersondavis",
+    ("MD", "baltimorecounty"): "baltimore",
+    ("MD", "saintmarys"): "stmarys",
+}
+CA_PARTIES = {
+    "NPP": "No Party Preference",
+    "PF": "Peace and Freedom",
+    "AIP": "American Independent",
+    "AI": "American Independent",
+}
 MANUAL = {
-    "mi": (DATA / "inbox" / "manual" / "MF-063", "https://mielections.us/election/results/2026PRI_CENR.html", ".txt", "text/tab-separated-values"),
+    "mi": (
+        DATA / "inbox" / "manual" / "MF-063",
+        "https://mielections.us/election/results/2026PRI_CENR.html",
+        ".txt",
+        "text/tab-separated-values",
+    ),
     "pa": (DATA / "inbox" / "manual" / "MF-060", "https://www.electionreturns.pa.gov/", ".csv", "text/csv"),
     "sc": (DATA / "inbox" / "manual" / "MF-051", "https://scvotes.gov/", ".zip", "application/zip"),
     "scx": (DATA / "inbox" / "manual" / "MF-279", "https://scvotes.gov/", ".zip", "application/zip"),
     "scr": (DATA / "inbox" / "manual" / "MF-279-runoff", "https://scvotes.gov/", ".zip", "application/zip"),
     "ia": (DATA / "inbox" / "manual" / "MF-049", "https://sos.iowa.gov/elections/results/", ".zip", "application/zip"),
-    "mt": (DATA / "inbox" / "manual" / "MF-052", "https://electionresults.mt.gov/", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    "mt": (
+        DATA / "inbox" / "manual" / "MF-052",
+        "https://electionresults.mt.gov/",
+        ".xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ),
     "nv": (DATA / "inbox" / "manual" / "MF-053", "https://silverstateelection.nv.gov/", ".xml", "application/xml"),
-    "wi": (DATA / "inbox" / "manual" / "MF-054", "https://elections.wi.gov/election-result/2026-partisan-primary", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    "wi": (
+        DATA / "inbox" / "manual" / "MF-054",
+        "https://elections.wi.gov/election-result/2026-partisan-primary",
+        ".xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ),
     "tn": (DATA / "inbox" / "manual" / "MF-062", "https://sos.tn.gov/elections/results", ".pdf", "application/pdf"),
     "mo": (DATA / "inbox" / "manual" / "MF-059", "https://enr.sos.mo.gov/", ".html", "text/html"),
-    "nh": (DATA / "inbox" / "manual" / "MF-055", "https://www.sos.nh.gov/2026-state-primary-election-results", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-    "tx": (DATA / "inbox" / "manual" / "MF-061", "https://www.sos.state.tx.us/elections/historical/", ".pdf", "application/pdf"),
-    "oh": (DATA / "inbox" / "manual" / "MF-050", "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/", ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    "nh": (
+        DATA / "inbox" / "manual" / "MF-055",
+        "https://www.sos.nh.gov/2026-state-primary-election-results",
+        ".xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ),
+    "tx": (
+        DATA / "inbox" / "manual" / "MF-061",
+        "https://www.sos.state.tx.us/elections/historical/",
+        ".pdf",
+        "application/pdf",
+    ),
+    "oh": (
+        DATA / "inbox" / "manual" / "MF-050",
+        "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/",
+        ".xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ),
 }
-POOLED = re.compile(r"write-?ins?\b|^scattering$", re.I)
-JUNK = re.compile(r"^void$|^(under|over) ?votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.I)
+POOLED = re.compile(r"write-?ins?\b|^scattering$", re.IGNORECASE)
+JUNK = re.compile(
+    r"^void$|^(under|over) ?votes$|^\* withdrawn candidate$|^total|blank|registered voters", re.IGNORECASE
+)
 ORDINALS = {1: "st", 2: "nd", 3: "rd"}
 CAVEAT = "Held under the 2026 congressional map, which the archive has not yet loaded as a boundary set, so this contest is not yet tied to a district shape."
 OFFICIAL = {
-    "MI": ("Michigan Board of State Canvassers", "https://mielections.us/election/results/2026PRI_CENR.html", "official county results of the August 4 primary"),
-    "OH": ("Ohio Secretary of State", "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/", "official county canvass of the May 5 primary"),
-    "NH": ("New Hampshire Secretary of State", "https://www.sos.nh.gov/2026-state-primary-election-results", "county summaries for governor and U.S. Senate and town results for U.S. House, town results summed to counties"),
-    "MO": ("Missouri Secretary of State", "https://enr.sos.mo.gov/", "county pages of the state's election results site"),
-    "TN": ("Tennessee Secretary of State", "https://sos.tn.gov/elections/results", "by-county results of the August 6 primary"),
-    "WI": ("Wisconsin Elections Commission", "https://elections.wi.gov/election-result/2026-partisan-primary", "county by county report of the canvass"),
-    "NV": ("Nevada Secretary of State", "https://silverstateelection.nv.gov/", "the results site's feed for each of the 17 counties"),
-    "SC": ("South Carolina State Election Commission", "https://scvotes.gov/", "official county results of the June 9 primary and the June 23 runoff"),
+    "MI": (
+        "Michigan Board of State Canvassers",
+        "https://mielections.us/election/results/2026PRI_CENR.html",
+        "official county results of the August 4 primary",
+    ),
+    "OH": (
+        "Ohio Secretary of State",
+        "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/",
+        "official county canvass of the May 5 primary",
+    ),
+    "NH": (
+        "New Hampshire Secretary of State",
+        "https://www.sos.nh.gov/2026-state-primary-election-results",
+        "county summaries for governor and U.S. Senate and town results for U.S. House, town results summed to counties",
+    ),
+    "MO": (
+        "Missouri Secretary of State",
+        "https://enr.sos.mo.gov/",
+        "county pages of the state's election results site",
+    ),
+    "TN": (
+        "Tennessee Secretary of State",
+        "https://sos.tn.gov/elections/results",
+        "by-county results of the August 6 primary",
+    ),
+    "WI": (
+        "Wisconsin Elections Commission",
+        "https://elections.wi.gov/election-result/2026-partisan-primary",
+        "county by county report of the canvass",
+    ),
+    "NV": (
+        "Nevada Secretary of State",
+        "https://silverstateelection.nv.gov/",
+        "the results site's feed for each of the 17 counties",
+    ),
+    "SC": (
+        "South Carolina State Election Commission",
+        "https://scvotes.gov/",
+        "official county results of the June 9 primary and the June 23 runoff",
+    ),
     "IA": ("Iowa Secretary of State", "https://sos.iowa.gov/elections/results/", "official canvass by county"),
-    "MT": ("Montana Secretary of State", "https://electionresults.mt.gov/", "statewide results export by county, posted as unofficial"),
-    "TX": ("Texas Secretary of State", "https://www.sos.state.tx.us/elections/historical/", "county by county canvass reports of the March 3 primaries"),
-    "PA": ("Pennsylvania Department of State", "https://www.electionreturns.pa.gov/", "official county results from the Reporting Center"),
-    "IL": ("Illinois State Board of Elections", "https://elections.il.gov/ElectionOperations/ElectionResults.aspx", "precinct files summed to counties"),
-    "NC": ("North Carolina State Board of Elections", "https://www.ncsbe.gov/results-data", "precinct file summed to counties"),
+    "MT": (
+        "Montana Secretary of State",
+        "https://electionresults.mt.gov/",
+        "statewide results export by county, posted as unofficial",
+    ),
+    "TX": (
+        "Texas Secretary of State",
+        "https://www.sos.state.tx.us/elections/historical/",
+        "county by county canvass reports of the March 3 primaries",
+    ),
+    "PA": (
+        "Pennsylvania Department of State",
+        "https://www.electionreturns.pa.gov/",
+        "official county results from the Reporting Center",
+    ),
+    "IL": (
+        "Illinois State Board of Elections",
+        "https://elections.il.gov/ElectionOperations/ElectionResults.aspx",
+        "precinct files summed to counties",
+    ),
+    "NC": (
+        "North Carolina State Board of Elections",
+        "https://www.ncsbe.gov/results-data",
+        "precinct file summed to counties",
+    ),
     "NM": ("New Mexico Secretary of State", "https://electionresults.sos.nm.gov", "election results archive"),
     "NY": ("New York State Board of Elections", "https://results.elections.ny.gov", "election results archive"),
     "VA": ("Virginia Department of Elections", "https://historical.elections.virginia.gov", "election results archive"),
-    "VT": ("Vermont Secretary of State", "https://electionarchive.vermont.gov", "election results archive, town rows summed to counties"),
-    "MD": ("Maryland State Board of Elections", "https://elections.maryland.gov/elections/2026/primary_results/", "official county breakdown pages"),
-    "MN": ("Minnesota Secretary of State", "https://electionresultsfiles.sos.mn.gov/20260811/", "county files and precinct file summed to counties"),
-    "ME": ("Maine Secretary of State", "https://www.maine.gov/sos/cec/elec/results/index.html", "municipal and precinct files summed to counties; military and overseas ballots, reported only statewide, are not in the county figures"),
-    "OK": ("Oklahoma State Election Board", "https://results.okelections.gov/OKER/", "county results from the board's results application"),
-    "AR": ("Arkansas Secretary of State", "https://arkansas.tally-enr.com/", "county results from the state's election night reporting site"),
-    "AL": ("Alabama Secretary of State", "https://www.sos.alabama.gov/alabama-votes/voter/election-data", "county files of precinct results summed to counties"),
-    "CT": ("Connecticut Secretary of the State", "https://ctemspublic.pcctg.net/", "town results from the Election Center summed to planning regions"),
-    "RI": ("Rhode Island Board of Elections", "https://elections.ri.gov/elections/previous-election-results", "town results summed to counties"),
-    "LA": ("Louisiana Secretary of State", "https://voterportal.sos.la.gov/graphical", "parish files from the live election results site"),
-    "NE": ("Nebraska Secretary of State", "https://sos.nebraska.gov/elections", "county tables in the primary canvass book"),
-    "GA": ("Georgia Secretary of State", "https://results.sos.ga.gov", "county results from the state's election results site"),
-    "ID": ("Idaho Secretary of State", "https://voteidaho.gov", "county results from the state's election results site"),
-    "UT": ("Utah Lieutenant Governor's Office", "https://electionresults.utah.gov", "county results from the state's election results site"),
-    "WA": ("Washington Secretary of State", "https://results.votewa.gov", "county results from the state's election results site"),
-    "HI": ("Hawaii Office of Elections", "https://elections.hawaii.gov", "county results from the office's primary election reports"),
-    "DE": ("Delaware Department of Elections", "https://elections.delaware.gov/results/", "county results from the department's election night reporting"),
-    "MA": ("Massachusetts Secretary of the Commonwealth", "https://electionstats.state.ma.us", "county results from the state's election statistics archive"),
-    "FL": ("Florida Division of Elections", "https://results.elections.myflorida.com", "county results extract of official results"),
-    "IN": ("Indiana Secretary of State", "https://enr.indianavoters.in.gov", "county results from the state's election night reporting site"),
-    "NJ": ("New Jersey Division of Elections", "https://www.nj.gov/state/elections/election-information-results.shtml", "county tables in the official primary results"),
-    "CA": ("California Secretary of State", "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results/primary-election-june-2-2026/statement-vote", "Statement of Vote spreadsheets"),
-    "WV": ("West Virginia Secretary of State", "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout", "county results from the state's election night reporting export, certified snapshot of June 15, 2026"),
-    "KS": ("Kansas Secretary of State", "https://sos.ks.gov/elections/election-results.html", "precinct-level files summed to counties"),
+    "VT": (
+        "Vermont Secretary of State",
+        "https://electionarchive.vermont.gov",
+        "election results archive, town rows summed to counties",
+    ),
+    "MD": (
+        "Maryland State Board of Elections",
+        "https://elections.maryland.gov/elections/2026/primary_results/",
+        "official county breakdown pages",
+    ),
+    "MN": (
+        "Minnesota Secretary of State",
+        "https://electionresultsfiles.sos.mn.gov/20260811/",
+        "county files and precinct file summed to counties",
+    ),
+    "ME": (
+        "Maine Secretary of State",
+        "https://www.maine.gov/sos/cec/elec/results/index.html",
+        "municipal and precinct files summed to counties; military and overseas ballots, reported only statewide, are not in the county figures",
+    ),
+    "OK": (
+        "Oklahoma State Election Board",
+        "https://results.okelections.gov/OKER/",
+        "county results from the board's results application",
+    ),
+    "AR": (
+        "Arkansas Secretary of State",
+        "https://arkansas.tally-enr.com/",
+        "county results from the state's election night reporting site",
+    ),
+    "AL": (
+        "Alabama Secretary of State",
+        "https://www.sos.alabama.gov/alabama-votes/voter/election-data",
+        "county files of precinct results summed to counties",
+    ),
+    "CT": (
+        "Connecticut Secretary of the State",
+        "https://ctemspublic.pcctg.net/",
+        "town results from the Election Center summed to planning regions",
+    ),
+    "RI": (
+        "Rhode Island Board of Elections",
+        "https://elections.ri.gov/elections/previous-election-results",
+        "town results summed to counties",
+    ),
+    "LA": (
+        "Louisiana Secretary of State",
+        "https://voterportal.sos.la.gov/graphical",
+        "parish files from the live election results site",
+    ),
+    "NE": (
+        "Nebraska Secretary of State",
+        "https://sos.nebraska.gov/elections",
+        "county tables in the primary canvass book",
+    ),
+    "GA": (
+        "Georgia Secretary of State",
+        "https://results.sos.ga.gov",
+        "county results from the state's election results site",
+    ),
+    "ID": (
+        "Idaho Secretary of State",
+        "https://voteidaho.gov",
+        "county results from the state's election results site",
+    ),
+    "UT": (
+        "Utah Lieutenant Governor's Office",
+        "https://electionresults.utah.gov",
+        "county results from the state's election results site",
+    ),
+    "WA": (
+        "Washington Secretary of State",
+        "https://results.votewa.gov",
+        "county results from the state's election results site",
+    ),
+    "HI": (
+        "Hawaii Office of Elections",
+        "https://elections.hawaii.gov",
+        "county results from the office's primary election reports",
+    ),
+    "DE": (
+        "Delaware Department of Elections",
+        "https://elections.delaware.gov/results/",
+        "county results from the department's election night reporting",
+    ),
+    "MA": (
+        "Massachusetts Secretary of the Commonwealth",
+        "https://electionstats.state.ma.us",
+        "county results from the state's election statistics archive",
+    ),
+    "FL": (
+        "Florida Division of Elections",
+        "https://results.elections.myflorida.com",
+        "county results extract of official results",
+    ),
+    "IN": (
+        "Indiana Secretary of State",
+        "https://enr.indianavoters.in.gov",
+        "county results from the state's election night reporting site",
+    ),
+    "NJ": (
+        "New Jersey Division of Elections",
+        "https://www.nj.gov/state/elections/election-information-results.shtml",
+        "county tables in the official primary results",
+    ),
+    "CA": (
+        "California Secretary of State",
+        "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results/primary-election-june-2-2026/statement-vote",
+        "Statement of Vote spreadsheets",
+    ),
+    "WV": (
+        "West Virginia Secretary of State",
+        "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout",
+        "county results from the state's election night reporting export, certified snapshot of June 15, 2026",
+    ),
+    "KS": (
+        "Kansas Secretary of State",
+        "https://sos.ks.gov/elections/election-results.html",
+        "precinct-level files summed to counties",
+    ),
 }
 METHOD = "Results by county from OpenElections' 2026 primary file for {state}, a community compilation of the state's county results. Candidates who received votes are listed; write-in votes are pooled."
 OFFICIAL_METHOD = "Results by county from the {publisher} ({how}). Candidates who received votes are listed; write-in votes are pooled."
@@ -263,19 +587,27 @@ TOWN_CACHE: dict[str, dict[str, str]] = {}
 EV = {
     "ga": (
         "https://results.sos.ga.gov/results/public/api/elections/Georgia/GeneralPrimary51926/",
-        re.compile(r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"),
+        re.compile(
+            r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"
+        ),
     ),
     "ga2": (
         "https://results.sos.ga.gov/results/public/api/elections/Georgia/06162026GeneralPrimaryRunoff/",
-        re.compile(r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"),
+        re.compile(
+            r"(?:(?P<senate>US Senate)|(?P<governor>Governor)|US House of Representatives - District (?P<district>\d+)) - (?P<party>Rep|Dem)"
+        ),
     ),
     "id": (
         "https://results.voteidaho.gov/results/public/api/elections/id/may2026/",
-        re.compile(r"(?:(?P<senate>United States Senator)|(?P<governor>Governor)|United States Representative District (?P<district>\d+)) - (?P<party>Democratic|Republican|Libertarian)"),
+        re.compile(
+            r"(?:(?P<senate>United States Senator)|(?P<governor>Governor)|United States Representative District (?P<district>\d+)) - (?P<party>Democratic|Republican|Libertarian)"
+        ),
     ),
     "ri": (
         "https://electionresults.ri.gov/results/public/api/elections/RhodeIsland/RI2026StatewidePrimary/",
-        re.compile(r"(?P<party>REP|DEM) (?:(?P<senate>Senator in Congress)|(?P<governor>Governor)|Representative in Congress District (?P<district>\d+))"),
+        re.compile(
+            r"(?P<party>REP|DEM) (?:(?P<senate>Senator in Congress)|(?P<governor>Governor)|Representative in Congress District (?P<district>\d+))"
+        ),
     ),
     "ut": (
         "https://electionresults.utah.gov/results/public/api/elections/utah/Primary06232026/",
@@ -289,12 +621,55 @@ EV = {
 FL_URL = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=8/18/2026&OfficialResults=Y"
 AR_ELECTION = "7f77a178-af02-40ec-92db-c5cc50882c68"
 OK_BASE = "https://results.okelections.gov/OKERS/"
-BROWSER = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
+BROWSER = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+}
 MA_BASE = elstats.MASSACHUSETTS
 MA_OFFICES = {"3": "Governor", "5": "U.S. House", "6": "U.S. Senate"}
 NJ_URL = "https://www.nj.gov/state/elections/assets/pdf/election-results/2026/2026-official-primary-results-{}.pdf"
-NJ_COUNTIES = ["ATLANTIC", "BERGEN", "BURLINGTON", "CAMDEN", "CAPE MAY", "CUMBERLAND", "ESSEX", "GLOUCESTER", "HUDSON", "HUNTERDON", "MERCER", "MIDDLESEX", "MONMOUTH", "MORRIS", "OCEAN", "PASSAIC", "SALEM", "SOMERSET", "SUSSEX", "UNION", "WARREN"]
-NJ_ORDINALS = {word: number for number, word in enumerate(["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth"], 1)}
+NJ_COUNTIES = [
+    "ATLANTIC",
+    "BERGEN",
+    "BURLINGTON",
+    "CAMDEN",
+    "CAPE MAY",
+    "CUMBERLAND",
+    "ESSEX",
+    "GLOUCESTER",
+    "HUDSON",
+    "HUNTERDON",
+    "MERCER",
+    "MIDDLESEX",
+    "MONMOUTH",
+    "MORRIS",
+    "OCEAN",
+    "PASSAIC",
+    "SALEM",
+    "SOMERSET",
+    "SUSSEX",
+    "UNION",
+    "WARREN",
+]
+NJ_ORDINALS = {
+    word: number
+    for number, word in enumerate(
+        [
+            "First",
+            "Second",
+            "Third",
+            "Fourth",
+            "Fifth",
+            "Sixth",
+            "Seventh",
+            "Eighth",
+            "Ninth",
+            "Tenth",
+            "Eleventh",
+            "Twelfth",
+        ],
+        1,
+    )
+}
 IN_URL = "https://enr.indianavoters.in.gov/archive/2026Primary/data/{}"
 KS_URL = "https://sos.ks.gov/elections/26elec/2026-Primary-Election-{}-Precinct-Level-Results.xlsx"
 MN_URL = "https://electionresultsfiles.sos.mn.gov/20260811/{}"
@@ -330,10 +705,18 @@ def url(code: str, file: str) -> str:
     if code == "alx":
         return f"https://www.sos.alabama.gov/sites/default/files/election-data/{file}"
     if code == "ar":
-        return f"https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={AR_ELECTION}" if file == "contests" else f"https://results.tally-enr.com/results/arkansas/{AR_ELECTION}/FullDataFile.json"
+        return (
+            f"https://enr-results-api.totalresults.com/Contest/GetContestSearchList?cid=arkansas&electionID={AR_ELECTION}"
+            if file == "contests"
+            else f"https://results.tally-enr.com/results/arkansas/{AR_ELECTION}/FullDataFile.json"
+        )
     if code == "ok":
         first, _, second = file.partition("/")
-        return f"{OK_BASE}enrapi/getelec/{second}/SW/xx" if first == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{first}/{second}"
+        return (
+            f"{OK_BASE}enrapi/getelec/{second}/SW/xx"
+            if first == "getelec"
+            else f"{OK_BASE}enrapi/GetCntyResults/{first}/{second}"
+        )
     if code == "me":
         return f"https://www.maine.gov/sos/sites/maine.gov.sos/files/inline-files/{file}.xlsx"
     if code == "wv":
@@ -358,7 +741,9 @@ def url(code: str, file: str) -> str:
             finally:
                 elstats.OFFICES = offices
         return elstats.url(file, 2026)
-    return {"nc": NC_URL, "il": IL_URL, "md": MD_URL, "mn": MN_URL, "ks": KS_URL, "in": IN_URL, "nj": NJ_URL}.get(code, BASE.format(code, "{}")).format(file)
+    return {"nc": NC_URL, "il": IL_URL, "md": MD_URL, "mn": MN_URL, "ks": KS_URL, "in": IN_URL, "nj": NJ_URL}.get(
+        code, BASE.format(code, "{}")
+    ).format(file)
 
 
 def rows(code: str, path: Path, file: str = ""):
@@ -368,7 +753,10 @@ def rows(code: str, path: Path, file: str = ""):
             for row in csv.DictReader(handle, delimiter="\t", quoting=csv.QUOTE_NONE):
                 if row["OfficeDescription"] is None:
                     continue
-                found = re.match(r"(?:(\d+)\w\w DISTRICT REPRESENTATIVE IN CONGRESS|(UNITED STATES SENATOR)|(GOVERNOR))", row["OfficeDescription"])
+                found = re.match(
+                    r"(?:(\d+)\w\w DISTRICT REPRESENTATIVE IN CONGRESS|(UNITED STATES SENATOR)|(GOVERNOR))",
+                    row["OfficeDescription"],
+                )
                 if found is None:
                     continue
                 yield {
@@ -376,7 +764,11 @@ def rows(code: str, path: Path, file: str = ""):
                     "office": "U.S. House" if found[1] else "U.S. Senate" if found[2] else "Governor",
                     "district": found[1] or "",
                     "party": row["PartyDescription"].title(),
-                    "candidate": " ".join(part for part in (row["CandidateFirstName"], row["CandidateMiddleName"], row["CandidateLastName"]) if part),
+                    "candidate": " ".join(
+                        part
+                        for part in (row["CandidateFirstName"], row["CandidateMiddleName"], row["CandidateLastName"])
+                        if part
+                    ),
                     "write_in": row["WriteIn(W)/Uncommitted(Z)"],
                     "votes": row["CandidateVotes"],
                 }
@@ -384,9 +776,42 @@ def rows(code: str, path: Path, file: str = ""):
     if code == "nh":
         party = "Republican" if "republican" in file else "Democratic"
         table = pl.read_excel(path, has_header=False, infer_schema_length=0).rows()
-        header = next(row for row in table if row[1] and re.search(r",\s*[rd]\s*$", row[1], re.I))
-        towns = {**town_counties("NH"), **{plain(name): "33003" for name in ("Hale's Location", "Hart's Location", "Hadley's Purchase")}, **{plain(name): "33007" for name in ("At.& Gil. Ac. Gt.", "Bean's Grant", "Bean's Purchase", "Chandlers Purchase", "Crawford's Purchase", "Cutt's Grant", "Dix's Grant", "Erving's Location", "Green's Grant", "Low & Burbanks Grant", "Martin's Location", "Pinkham's Grant", "Sargent's Purchase", "Second College Grant", "Thompson & Meserve's ")}} if "congressional" in file else {}
-        office, district = ("Governor", "") if "governor" in file else ("U.S. Senate", "") if "senator" in file else ("U.S. House", file.rsplit("district-", 1)[1][0])
+        header = next(row for row in table if row[1] and re.search(r",\s*[rd]\s*$", row[1], re.IGNORECASE))
+        towns = (
+            {
+                **town_counties("NH"),
+                **{plain(name): "33003" for name in ("Hale's Location", "Hart's Location", "Hadley's Purchase")},
+                **{
+                    plain(name): "33007"
+                    for name in (
+                        "At.& Gil. Ac. Gt.",
+                        "Bean's Grant",
+                        "Bean's Purchase",
+                        "Chandlers Purchase",
+                        "Crawford's Purchase",
+                        "Cutt's Grant",
+                        "Dix's Grant",
+                        "Erving's Location",
+                        "Green's Grant",
+                        "Low & Burbanks Grant",
+                        "Martin's Location",
+                        "Pinkham's Grant",
+                        "Sargent's Purchase",
+                        "Second College Grant",
+                        "Thompson & Meserve's ",
+                    )
+                },
+            }
+            if "congressional" in file
+            else {}
+        )
+        office, district = (
+            ("Governor", "")
+            if "governor" in file
+            else ("U.S. Senate", "")
+            if "senator" in file
+            else ("U.S. House", file.rsplit("district-", 1)[1][0])
+        )
         totals: dict[tuple[str, str], int] = defaultdict(int)
         for row in table[table.index(header) + 1 :]:
             if row[0] is None or row[0].strip().upper() == "TOTALS":
@@ -397,32 +822,67 @@ def rows(code: str, path: Path, file: str = ""):
                 if not place:
                     continue
             for column in range(1, len(header)):
-                if header[column] and row[column] is not None and (header[column].lower().endswith((", r", ", d")) is False or header[column].lower().endswith(", r" if party == "Republican" else ", d")):
-                    totals[(place, re.sub(r",\s*[rd]$", "", header[column].strip(), flags=re.I))] += int(row[column].strip() or 0)
+                if (
+                    header[column]
+                    and row[column] is not None
+                    and (
+                        header[column].lower().endswith((", r", ", d")) is False
+                        or header[column].lower().endswith(", r" if party == "Republican" else ", d")
+                    )
+                ):
+                    totals[(place, re.sub(r",\s*[rd]$", "", header[column].strip(), flags=re.IGNORECASE))] += int(
+                        row[column].strip() or 0
+                    )
         for (place, candidate), votes in totals.items():
-            yield {"county": place, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+            yield {
+                "county": place,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
         return
     if code == "mo":
         page = path.read_text(encoding="utf-8", errors="ignore")
-        for table in re.finditer(r"<table.*?</table>", page, re.S):
-            county = re.findall(r'<option selected="selected" value="(?!750)\d+">([^<]+)', page[: table.start()])[-1].strip()
+        for table in re.finditer(r"<table.*?</table>", page, re.DOTALL):
+            county = re.findall(r'<option selected="selected" value="(?!750)\d+">([^<]+)', page[: table.start()])[
+                -1
+            ].strip()
             district = ""
-            for cells in (re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S) for row in re.findall(r"<tr.*?</tr>", table[0], re.S)):
+            for cells in (
+                re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL)
+                for row in re.findall(r"<tr.*?</tr>", table[0], re.DOTALL)
+            ):
                 text = [re.sub(r"<[^>]+>|&nbsp;", "", cell).strip() for cell in cells]
                 if len(text) == 4 and text[1] == "" and text[0]:
                     found = re.fullmatch(r"U\.S\. REPRESENTATIVE - DISTRICT (\d+)", text[0])
                     district = found[1] if found else ""
                 elif len(text) == 4 and district and text[1] in ("Republican", "Democratic"):
-                    yield {"county": county, "office": "U.S. House", "district": district, "party": text[1], "candidate": text[0], "votes": text[2].replace(",", "")}
+                    yield {
+                        "county": county,
+                        "office": "U.S. House",
+                        "district": district,
+                        "party": text[1],
+                        "candidate": text[0],
+                        "votes": text[2].replace(",", ""),
+                    }
         return
     if code == "tn":
         party = "Republican" if "Republican" in file else "Democratic"
         contest: tuple[str, str] | None = None
         candidates: dict[str, str] = {}
-        for line in subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines():
-            heading = re.fullmatch(r"\s+(?:(Governor)|(United States Senate)|United States House of Representatives District (\d+))", line)
+        for line in subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines():
+            heading = re.fullmatch(
+                r"\s+(?:(Governor)|(United States Senate)|United States House of Representatives District (\d+))", line
+            )
             if heading:
-                contest = ("Governor" if heading[1] else "U.S. Senate" if heading[2] else "U.S. House", heading[3] or "")
+                contest = (
+                    "Governor" if heading[1] else "U.S. Senate" if heading[2] else "U.S. House",
+                    heading[3] or "",
+                )
                 candidates = {}
                 continue
             if contest is None:
@@ -434,12 +894,22 @@ def rows(code: str, path: Path, file: str = ""):
             numbers = data[2].split() if data else []
             if data and len(numbers) == len(candidates) and "TOTALS" not in data[1].upper() and data[1] != "August":
                 for number, candidate in zip(numbers, candidates.values()):
-                    yield {"county": data[1], "office": contest[0], "district": contest[1], "party": party, "candidate": candidate, "votes": number.replace(",", "")}
+                    yield {
+                        "county": data[1],
+                        "office": contest[0],
+                        "district": contest[1],
+                        "party": party,
+                        "candidate": candidate,
+                        "votes": number.replace(",", ""),
+                    }
         return
     if code == "wi":
         titles = pl.read_excel(path, sheet_name="Document map", has_header=False, infer_schema_length=0).rows()
         for index, (_, sheet_title) in enumerate(titles):
-            found = re.fullmatch(r"(?:REPRESENTATIVE IN CONGRESS DISTRICT (\d+)|(GOVERNOR)|(UNITED STATES SENATOR)) - (Republican|Democratic)", sheet_title or "")
+            found = re.fullmatch(
+                r"(?:REPRESENTATIVE IN CONGRESS DISTRICT (\d+)|(GOVERNOR)|(UNITED STATES SENATOR)) - (Republican|Democratic)",
+                sheet_title or "",
+            )
             if found is None:
                 continue
             table = pl.read_excel(path, sheet_name=f"Sheet{index + 1}", has_header=False, infer_schema_length=0).rows()
@@ -462,7 +932,10 @@ def rows(code: str, path: Path, file: str = ""):
     if code == "nv":
         for county in ElementTree.parse(path).getroot().iter("County"):
             for race in county.iter("Race"):
-                found = re.fullmatch(r"(?:U\.S\. Representative in Congress, District (\d+)|(Governor)) \((Republican|Democratic)\)", race.get("RaceTitle"))
+                found = re.fullmatch(
+                    r"(?:U\.S\. Representative in Congress, District (\d+)|(Governor)) \((Republican|Democratic)\)",
+                    race.get("RaceTitle"),
+                )
                 if found is None:
                     continue
                 for candidate in race.iter("Candidate"):
@@ -499,7 +972,12 @@ def rows(code: str, path: Path, file: str = ""):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
         for contest in root.iter("Contest"):
-            found = re.fullmatch(r"(?:U\.S\.\s+(Senate)|U\.S\.\s+House of Representatives, District\s+(\d+)|(Governor))\s+-\s+(REP|DEM)", re.sub(r"\s+", " ", contest.get("text")).replace("U.S. Senate", "U.S.  Senate").replace("U.S. House", "U.S.  House"))
+            found = re.fullmatch(
+                r"(?:U\.S\.\s+(Senate)|U\.S\.\s+House of Representatives, District\s+(\d+)|(Governor))\s+-\s+(REP|DEM)",
+                re.sub(r"\s+", " ", contest.get("text"))
+                .replace("U.S. Senate", "U.S.  Senate")
+                .replace("U.S. House", "U.S.  House"),
+            )
             if found is None:
                 continue
             for choice in contest.iter("Choice"):
@@ -522,7 +1000,10 @@ def rows(code: str, path: Path, file: str = ""):
             book = archive.read("detail.xlsx")
         for sheet in fastexcel.read_excel(book).sheet_names[2:]:
             table = pl.read_excel(book, sheet_name=sheet, has_header=False, infer_schema_length=0).rows()
-            found = re.fullmatch(r"(?:United States (Senator)|United States Representative District (\d+)|(Governor)) - (Rep|Dem)\.\s*\( ?\d+\)", table[0][0] or "")
+            found = re.fullmatch(
+                r"(?:United States (Senator)|United States Representative District (\d+)|(Governor)) - (Rep|Dem)\.\s*\( ?\d+\)",
+                table[0][0] or "",
+            )
             if found is None:
                 continue
             for column, cell in enumerate(table[1]):
@@ -560,11 +1041,18 @@ def rows(code: str, path: Path, file: str = ""):
                     continue
                 if office.startswith("UNITED STATES SENATOR"):
                     chamber = "U.S. Senate"
-                elif office.startswith("UNITED STATES REPRESENTATIVE") or office.startswith("REPRESENTATIVE"):
+                elif office.startswith(("UNITED STATES REPRESENTATIVE", "REPRESENTATIVE")):
                     chamber = "U.S. House"
                 else:
                     continue
-                yield {"county": row[1], "office": chamber, "district": district[1] if district else "", "party": party, "candidate": name, "votes": row[column]}
+                yield {
+                    "county": row[1],
+                    "office": chamber,
+                    "district": district[1] if district else "",
+                    "party": party,
+                    "candidate": name,
+                    "votes": row[column],
+                }
         return
     if code == "tx":
         party = "Republican" if "republican" in file else "Democratic"
@@ -573,7 +1061,9 @@ def rows(code: str, path: Path, file: str = ""):
             for row in csv.DictReader(handle):
                 if PARTIES.get(row["party"], ("",))[0] == party.lower() and row["votes"].isdigit():
                     oe[(row["office"], row["district"])][row["candidate"]][plain(row["county"])] = int(row["votes"])
-        lines = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines()
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
         contest: tuple[str, str] | None = None
         header: list[str] = []
         columns: list[int] = []
@@ -589,23 +1079,48 @@ def rows(code: str, path: Path, file: str = ""):
             for column, counts in table.items():
                 best = min(
                     (name for name in known if name not in taken),
-                    key=lambda name: sum(abs(counts.get(county, 0) - known[name].get(county, 0)) for county in set(counts) | set(known[name])),
+                    key=lambda name: sum(
+                        abs(counts.get(county, 0) - known[name].get(county, 0))
+                        for county in set(counts) | set(known[name])
+                    ),
                     default=None,
                 )
-                distance = None if best is None else sum(abs(counts.get(county, 0) - known[best].get(county, 0)) for county in set(counts) | set(known[best]))
+                distance = (
+                    None
+                    if best is None
+                    else sum(
+                        abs(counts.get(county, 0) - known[best].get(county, 0))
+                        for county in set(counts) | set(known[best])
+                    )
+                )
                 if best is not None and distance <= 0.2 * max(sum(counts.values()), 1):
                     taken.add(best)
                     candidate = best
                 else:
                     candidate = names[column]
                 for county, votes in counts.items():
-                    yield {"county": county, "office": contest[0], "district": contest[1], "party": party, "candidate": candidate, "votes": str(votes)}
+                    yield {
+                        "county": county,
+                        "office": contest[0],
+                        "district": contest[1],
+                        "party": party,
+                        "candidate": candidate,
+                        "votes": str(votes),
+                    }
 
         for line in lines:
             heading = re.fullmatch(r"(U\. S\. SENATOR|U\. S\. REPRESENTATIVE DISTRICT (\d+)|[A-Z][A-Z .,'/&-]+)", line)
             if heading and not line.startswith(" "):
                 yield from finish()
-                contest = ("U.S. Senate", "") if heading[1] == "U. S. SENATOR" else ("U.S. House", heading[2]) if heading[2] else None if heading[1] != "GOVERNOR" else ("Governor", "")
+                contest = (
+                    ("U.S. Senate", "")
+                    if heading[1] == "U. S. SENATOR"
+                    else ("U.S. House", heading[2])
+                    if heading[2]
+                    else None
+                    if heading[1] != "GOVERNOR"
+                    else ("Governor", "")
+                )
                 columns, names, table, header, done = [], [], {}, [], False
                 continue
             if "Texas Secretary of State" in line:
@@ -626,7 +1141,12 @@ def rows(code: str, path: Path, file: str = ""):
                 for index, text in enumerate(header):
                     for word in re.finditer(r"\S+", text):
                         if not re.fullmatch(r"\[[A-Z]\]|\(I\)|County|Total|Votes", word[0]):
-                            words[min(range(len(columns)), key=lambda j: abs(columns[j] - (word.start() + word.end()) // 2))].append((index, word[0]))
+                            words[
+                                min(
+                                    range(len(columns)),
+                                    key=lambda j: abs(columns[j] - (word.start() + word.end()) // 2),
+                                )
+                            ].append((index, word[0]))
                 names = [" ".join(text for _, text in sorted(words[j])) for j in range(len(columns))]
                 if any("Total" in text for text in header):
                     columns.pop()
@@ -651,17 +1171,28 @@ def rows(code: str, path: Path, file: str = ""):
             for column in range(6, len(table[1])):
                 header = (table[1][column] or "").strip()
                 found = re.fullmatch(r"(.*?)\s*(?:\((WI)\)\*\s*)?\((R|D|L)\)", header)
-                office = re.match(r"(Governor and Lieutenant Governor|U\.S\. Senator|Representative to Congress - District (\d+))", offices[column])
+                office = re.match(
+                    r"(Governor and Lieutenant Governor|U\.S\. Senator|Representative to Congress - District (\d+))",
+                    offices[column],
+                )
                 if found is None or office is None:
                     continue
                 for county in table[4:]:
                     if county[0] is None or county[column] is None:
                         continue
-                    if office[2] and not any(int(county[other] or 0) for other in range(6, len(table[1])) if offices[other] == offices[column]):
+                    if office[2] and not any(
+                        int(county[other] or 0)
+                        for other in range(6, len(table[1]))
+                        if offices[other] == offices[column]
+                    ):
                         continue
                     yield {
                         "county": county[0],
-                        "office": "Governor" if office[1].startswith("Governor") else "U.S. Senate" if office[1].startswith("U.S.") else "U.S. House",
+                        "office": "Governor"
+                        if office[1].startswith("Governor")
+                        else "U.S. Senate"
+                        if office[1].startswith("U.S.")
+                        else "U.S. House",
                         "district": office[2] or "",
                         "party": found[3],
                         "candidate": re.split(r"\s+and\s+", re.sub(r"\s+", " ", found[1]))[0],
@@ -675,7 +1206,9 @@ def rows(code: str, path: Path, file: str = ""):
                 found = re.match(r"(\d+)\w\w Congressional District", row["District Name"])
                 yield {
                     "county": row["County Name"],
-                    "office": {"Representative in Congress": "U.S. House", "Governor": "Governor"}.get(row["Office Name"], row["Office Name"]),
+                    "office": {"Representative in Congress": "U.S. House", "Governor": "Governor"}.get(
+                        row["Office Name"], row["Office Name"]
+                    ),
                     "district": found[1] if found else "",
                     "party": row["Party Name"],
                     "candidate": row["Candidate Name"],
@@ -686,7 +1219,10 @@ def rows(code: str, path: Path, file: str = ""):
         with zipfile.ZipFile(path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
         for contest in root.iter("Contest"):
-            found = re.fullmatch(r"U\.S\. (SENATOR|HOUSE OF REPRESENTATIVES, (\d+)\w\w Congressional District) - (REP|DEM)", contest.get("text"))
+            found = re.fullmatch(
+                r"U\.S\. (SENATOR|HOUSE OF REPRESENTATIVES, (\d+)\w\w Congressional District) - (REP|DEM)",
+                contest.get("text"),
+            )
             if found is None:
                 continue
             for choice in contest.iter("Choice"):
@@ -721,11 +1257,19 @@ def rows(code: str, path: Path, file: str = ""):
             elif not label and names is None:
                 names = cells
             elif not label:
-                header = [(index, " ".join(names[index].split()), party) for index, party in enumerate(cells) if index and party and names[index]]
+                header = [
+                    (index, " ".join(names[index].split()), party)
+                    for index, party in enumerate(cells)
+                    if index and party and names[index]
+                ]
                 names = None
             elif names is not None or shifted is not None:
                 if shifted is None:
-                    header = [(index, " ".join(names[index].split()), party) for index, party in enumerate(cells) if index and party and names[index]]
+                    header = [
+                        (index, " ".join(names[index].split()), party)
+                        for index, party in enumerate(cells)
+                        if index and party and names[index]
+                    ]
                     names, shifted = None, [(label, cells)]
                 elif label.startswith("Percent"):
                     counties = [county for county, _ in shifted if not county.startswith("District Totals")]
@@ -758,27 +1302,40 @@ def rows(code: str, path: Path, file: str = ""):
     if code in ELSTATS:
         with path.open(newline="") as handle:
             for row in csv.DictReader(handle):
-                if row["election_type"].startswith("Primary") and row["division_type"] in ("County", "Locality", "City/Town"):
-                    if row["office_name"] in ELSTATS_OFFICES:
-                        yield {
-                            "county": town_counties("VT")[plain(re.sub(elstats.SUFFIXES, "", row["division_name"].lower()))] if row["division_type"] == "City/Town" else row["division_name"].removesuffix(" County"),
-                            "office": ELSTATS_OFFICES[row["office_name"]],
-                            "district": row["district_name"] if row["district_name"].isdigit() else "",
-                            "party": row["primary_party"],
-                            "candidate": row["candidate_name"].strip(),
-                            "votes": row["votes"].replace(",", "").removesuffix(".0"),
-                        }
+                if (
+                    row["election_type"].startswith("Primary")
+                    and row["division_type"]
+                    in (
+                        "County",
+                        "Locality",
+                        "City/Town",
+                    )
+                    and row["office_name"] in ELSTATS_OFFICES
+                ):
+                    yield {
+                        "county": town_counties("VT")[plain(re.sub(elstats.SUFFIXES, "", row["division_name"].lower()))]
+                        if row["division_type"] == "City/Town"
+                        else row["division_name"].removesuffix(" County"),
+                        "office": ELSTATS_OFFICES[row["office_name"]],
+                        "district": row["district_name"] if row["district_name"].isdigit() else "",
+                        "party": row["primary_party"],
+                        "candidate": row["candidate_name"].strip(),
+                        "votes": row["votes"].replace(",", "").removesuffix(".0"),
+                    }
         return
     if code == "md":
         text = path.read_text(encoding="utf-8")
         office = re.search(r"<h2>([^<]*)", text)[1].strip()
         district = re.search(r"<h3>District (\d+)", text)
         head, body = text.split("<tbody>", 1)
-        for county_row in re.findall(r"<tr>(.*?)</tr>", body, re.S):
-            cells = [re.sub(r"<[^>]*>", "", cell).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", county_row, re.S)]
+        for county_row in re.findall(r"<tr>(.*?)</tr>", body, re.DOTALL):
+            cells = [
+                re.sub(r"<[^>]*>", "", cell).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", county_row, re.DOTALL)
+            ]
             if not cells or not cells[0] or cells[0].startswith("Total"):
                 continue
-            for header, votes in zip(re.findall(r"<th scope=\"col\">(.*?)</th>", head, re.S), cells[1:]):
+            for header, votes in zip(re.findall(r"<th scope=\"col\">(.*?)</th>", head, re.DOTALL), cells[1:]):
                 name, party = (re.sub(r"<img[^>]*>", "", part).strip() for part in re.split(r"<br\s*/?>", header)[:2])
                 name = name.split(" and ")[0]
                 yield {
@@ -798,22 +1355,38 @@ def rows(code: str, path: Path, file: str = ""):
             detail = json.loads(raw.cached(SOURCE, f"{EV[code][0]}ballot-items/{item['id']}").path.read_bytes())
             groups = found.groupdict()
             for county in detail["breakdownResults"]:
-                if code == "ri" and plain(re.sub(elstats.SUFFIXES, "", county["locality"]["name"][0]["text"].lower())) not in town_counties("RI"):
+                if code == "ri" and plain(
+                    re.sub(elstats.SUFFIXES, "", county["locality"]["name"][0]["text"].lower())
+                ) not in town_counties("RI"):
                     continue
                 for option in county["ballotOptions"]:
-                    label = (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip("()") or "Prefers Democratic Party"
+                    label = (((option["party"] or {}).get("name") or [{}])[0].get("text") or "").strip(
+                        "()"
+                    ) or "Prefers Democratic Party"
                     yield {
-                        "county": town_counties("RI")[plain(re.sub(elstats.SUFFIXES, "", county["locality"]["name"][0]["text"].lower()))] if code == "ri" else county["locality"]["name"][0]["text"].removesuffix(" County"),
-                        "office": "U.S. Senate" if groups.get("senate") else "Governor" if groups.get("governor") else "U.S. House",
+                        "county": town_counties("RI")[
+                            plain(re.sub(elstats.SUFFIXES, "", county["locality"]["name"][0]["text"].lower()))
+                        ]
+                        if code == "ri"
+                        else county["locality"]["name"][0]["text"].removesuffix(" County"),
+                        "office": "U.S. Senate"
+                        if groups.get("senate")
+                        else "Governor"
+                        if groups.get("governor")
+                        else "U.S. House",
                         "district": groups.get("district") or "",
-                        "party": (groups["party"] if groups["party"] in PARTIES else groups["party"].upper()) if "party" in groups else label,
+                        "party": (groups["party"] if groups["party"] in PARTIES else groups["party"].upper())
+                        if "party" in groups
+                        else label,
                         "candidate": re.sub(r"\s*(\(I\)|\*)$", "", option["name"][0]["text"]).strip(),
                         "votes": str(option["voteCount"]),
                         "write_in": "Y" if option["isWriteIn"] else "",
                     }
         return
     if code == "hi":
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
         county = re.search(r"County of (\w+)", text)[1]
         for start, end in ((0, 62), (62, 122), (122, 400)):
             office = district = party = None
@@ -821,34 +1394,55 @@ def rows(code: str, path: Path, file: str = ""):
                 segment = line[start:end].strip()
                 found = re.fullmatch(r"(U\.S\. Representative, Dist (I+)|Governor) - ([NRD])", segment)
                 if found is not None:
-                    office, district, party = ("U.S. House", str(len(found[2])), found[3]) if found[2] else ("Governor", "", found[3])
+                    office, district, party = (
+                        ("U.S. House", str(len(found[2])), found[3]) if found[2] else ("Governor", "", found[3])
+                    )
                     continue
                 if office is None:
                     continue
                 candidate = re.fullmatch(r"(.+?)\s{2,}([\d,]+)\s+[\d.]+%", segment)
                 if candidate is not None and not candidate[1].startswith(("Blank", "Over")):
                     surname, _, given = candidate[1].partition(",")
-                    yield {"county": county, "office": office, "district": district, "party": {"R": "Republican", "D": "Democratic"}.get(party, party), "candidate": f"{given.strip()} {title(surname.strip())}".strip(), "votes": candidate[2].replace(",", "")}
+                    yield {
+                        "county": county,
+                        "office": office,
+                        "district": district,
+                        "party": {"R": "Republican", "D": "Democratic"}.get(party, party),
+                        "candidate": f"{given.strip()} {title(surname.strip())}".strip(),
+                        "votes": candidate[2].replace(",", ""),
+                    }
                 elif segment and not segment.startswith(("Blank", "Over", "Number")):
                     office = None
         return
     if code == "de":
         text = re.sub(r"\s+", " ", re.sub(r"<[^>]*>", " ", path.read_text(encoding="utf-8", errors="replace")))
         for office_label, party, body in re.findall(
-            r"(U\.S\. Senator|Representative in Congress) (Democratic|Republican) Party Candidate Name New Castle Kent Sussex State Percentage (.*?)(?= (?:[A-Z][A-Za-z.,' ]+?) (?:Democratic|Republican) Party Candidate Name|$)", text
+            r"(U\.S\. Senator|Representative in Congress) (Democratic|Republican) Party Candidate Name New Castle Kent Sussex State Percentage (.*?)(?= (?:[A-Z][A-Za-z.,' ]+?) (?:Democratic|Republican) Party Candidate Name|$)",
+            text,
         ):
             for candidate, *counts in re.findall(r"([A-Z][A-Z .'\"\-,]*?) (\d+) (\d+) (\d+) (\d+) [\d.]+", body):
                 for county, votes in zip(("New Castle", "Kent", "Sussex"), counts):
-                    yield {"county": county, "office": "U.S. Senate" if office_label.startswith("U.S.") else "U.S. House", "district": "0", "party": party, "candidate": candidate.strip(), "votes": votes}
+                    yield {
+                        "county": county,
+                        "office": "U.S. Senate" if office_label.startswith("U.S.") else "U.S. House",
+                        "district": "0",
+                        "party": party,
+                        "candidate": candidate.strip(),
+                        "votes": votes,
+                    }
         return
     if code == "ma":
         office = MA_OFFICES[next(file for file in FILES["MA"][2] if raw.cached(SOURCE, url("ma", file)).path == path)]
         for election, _, district, stage in elstats.ma_primary_rows(path.read_text()):
-            table = csv.reader(raw.cached(SOURCE, f"{MA_BASE}download/{election}/precincts_include:0/").path.open(newline=""))
+            table = csv.reader(
+                raw.cached(SOURCE, f"{MA_BASE}download/{election}/precincts_include:0/").path.open(newline="")
+            )
             header = next(table)
             next(table)
             for line in table:
-                town = re.sub(r"^([NSEW])\. ", lambda m: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[m[1]], line[0])
+                town = re.sub(
+                    r"^([NSEW])\. ", lambda m: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[m[1]], line[0]
+                )
                 if not town or town == "TOTALS":
                     continue
                 for name, votes in zip(header[3:], line[3:]):
@@ -863,14 +1457,24 @@ def rows(code: str, path: Path, file: str = ""):
                         }
         return
     if code == "nj":
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
-        office, district, candidate, party = "U.S. House" if "House of Representatives" in text else "U.S. Senate", "", None, None
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        office, district, candidate, party = (
+            "U.S. House" if "House of Representatives" in text else "U.S. Senate",
+            "",
+            None,
+            None,
+        )
         for line in text.splitlines():
             found = re.match(r"(\w+) Congressional District", line)
             if found is not None:
                 district = str(NJ_ORDINALS[found[1]])
                 continue
-            found = re.match(r"([A-Z][A-Z .'\-,]+?)(?: \(w\))?(?: \*)?\s{2,}.*\s(Democratic|Republican|Libertarian|Green|Independent)\s*$", line)
+            found = re.match(
+                r"([A-Z][A-Z .'\-,]+?)(?: \(w\))?(?: \*)?\s{2,}.*\s(Democratic|Republican|Libertarian|Green|Independent)\s*$",
+                line,
+            )
             if found is not None:
                 candidate, party = found[1].strip(), found[2]
                 continue
@@ -878,14 +1482,29 @@ def rows(code: str, path: Path, file: str = ""):
             county = next((name for name in NJ_COUNTIES if stripped.startswith(name + " ")), None)
             tally = re.search(r"\s([\d,]+)$", stripped)
             if candidate is not None and county is not None and tally is not None:
-                yield {"county": county.title(), "office": office, "district": district, "party": party, "candidate": candidate, "votes": tally[1].replace(",", "")}
+                yield {
+                    "county": county.title(),
+                    "office": office,
+                    "district": district,
+                    "party": party,
+                    "candidate": candidate,
+                    "votes": tally[1].replace(",", ""),
+                }
         return
     if code == "fl":
         seen = set()
         with path.open(newline="", encoding="utf-8-sig") as handle:
             for row in csv.DictReader(handle, delimiter="\t"):
                 office = {"USS": "U.S. Senate", "USR": "U.S. House", "GOV": "Governor"}.get(row["RaceCode"])
-                key = (row["RaceCode"], row["PartyCode"], row["Juris1num"], row["CountyCode"], row["CanNameLast"], row["CanNameFirst"], row["CanNameMiddle"])
+                key = (
+                    row["RaceCode"],
+                    row["PartyCode"],
+                    row["Juris1num"],
+                    row["CountyCode"],
+                    row["CanNameLast"],
+                    row["CanNameFirst"],
+                    row["CanNameMiddle"],
+                )
                 if office is None or key in seen or row["PartyCode"] not in ("REP", "DEM"):
                     continue
                 seen.add(key)
@@ -894,7 +1513,9 @@ def rows(code: str, path: Path, file: str = ""):
                     "office": office,
                     "district": row["Juris1num"].lstrip("0"),
                     "party": row["PartyCode"],
-                    "candidate": " ".join(part for part in (row["CanNameFirst"], row["CanNameMiddle"], row["CanNameLast"]) if part),
+                    "candidate": " ".join(
+                        part for part in (row["CanNameFirst"], row["CanNameMiddle"], row["CanNameLast"]) if part
+                    ),
                     "votes": row["CanVotes"],
                 }
         return
@@ -916,33 +1537,60 @@ def rows(code: str, path: Path, file: str = ""):
         office = party = None
         candidates: list[str] = []
         previous = ""
-        for line in subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines():
+        for line in subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines():
             stripped = line.strip().replace("✓", "")
             if stripped.startswith("Member of the United States Senate"):
                 office, party = "U.S. Senate", None
             elif stripped == "Governor":
                 office, party = "Governor", None
-            elif re.match(r"(Member of the U\.S\. House|Secretary of State$|State Treasurer$|Attorney General$|Auditor of Public Accounts$|Public Service Commission|Member of Board|Member of the State Board|Member of the Legislature|Lieutenant)", stripped):
+            elif re.match(
+                r"(Member of the U\.S\. House|Secretary of State$|State Treasurer$|Attorney General$|Auditor of Public Accounts$|Public Service Commission|Member of Board|Member of the State Board|Member of the Legislature|Lieutenant)",
+                stripped,
+            ):
                 office, party = None, None
-            found = re.fullmatch(r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination(?: \(.*\) — continued| \(.*\))?", stripped)
+            found = re.fullmatch(
+                r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination(?: \(.*\) — continued| \(.*\))?",
+                stripped,
+            )
             if found is not None:
                 party = {"Republican": "Republican", "Democratic": "Democratic"}.get(found[1])
                 candidates = []
-            elif re.match(r"(Libertarian|Legal Marijuana NOW|Democratic|Republican) Party (did not make|Nomination)", stripped):
+            elif re.match(
+                r"(Libertarian|Legal Marijuana NOW|Democratic|Republican) Party (did not make|Nomination)", stripped
+            ):
                 party = None
             elif office is not None and party is not None:
                 header = re.fullmatch(r"County\s{2,}(\S.*)", stripped)
                 if header is not None:
                     last_names = re.split(r"\s{2,}", header[1].strip())
                     last_names = last_names[: last_names.index("County")] if "County" in last_names else last_names
-                    first_names = re.split(r"\s{2,}", previous.strip().replace("✓", "")) if previous.strip() and not re.search(r"\d|Nomination|Page", previous) else []
+                    first_names = (
+                        re.split(r"\s{2,}", previous.strip().replace("✓", ""))
+                        if previous.strip() and not re.search(r"\d|Nomination|Page", previous)
+                        else []
+                    )
                     first_names = first_names[: len(last_names)]
-                    candidates = [f"{first} {last}".strip() for first, last in zip(first_names, last_names, strict=True)] if len(first_names) == len(last_names) else last_names
+                    candidates = (
+                        [f"{first} {last}".strip() for first, last in zip(first_names, last_names, strict=True)]
+                        if len(first_names) == len(last_names)
+                        else last_names
+                    )
                 elif candidates:
-                    for row in re.finditer(r"([A-Za-z][A-Za-z .'-]*?)\s{2,}((?:\d[\d,]*\s+){%d}\d[\d,]*)" % (len(candidates) - 1), stripped):
+                    for row in re.finditer(
+                        r"([A-Za-z][A-Za-z .'-]*?)\s{2,}((?:\d[\d,]*\s+){%d}\d[\d,]*)" % (len(candidates) - 1), stripped
+                    ):
                         if row[1] != "Total":
                             for candidate, votes in zip(candidates, row[2].split(), strict=True):
-                                yield {"county": row[1], "office": office, "district": "", "party": party, "candidate": candidate, "votes": votes.replace(",", "")}
+                                yield {
+                                    "county": row[1],
+                                    "office": office,
+                                    "district": "",
+                                    "party": party,
+                                    "candidate": candidate,
+                                    "votes": votes.replace(",", ""),
+                                }
             if stripped:
                 previous = line
         district = None
@@ -950,34 +1598,56 @@ def rows(code: str, path: Path, file: str = ""):
         starts: list[int] = []
         columns: list[tuple[str, list[str]]] = []
         previous = ""
-        for line in subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.splitlines():
+        for line in subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines():
             stripped = line.strip().replace("✓", "")
             found = re.fullmatch(r"Congressional District (\d) – Two Year Term", stripped)
             if found is not None:
                 district, parties, starts = found[1], [], []
-            elif district is not None and re.match(r"Governor$|Secretary of State$|State Treasurer$|Attorney General$|Auditor of Public Accounts$|Public Service Commission|Member of Board|Member of the (State Board|Nebraska)", stripped):
+            elif district is not None and re.match(
+                r"Governor$|Secretary of State$|State Treasurer$|Attorney General$|Auditor of Public Accounts$|Public Service Commission|Member of Board|Member of the (State Board|Nebraska)",
+                stripped,
+            ):
                 district = None
             elif district is None or "did not make a nomination" in stripped:
                 continue
             elif "Party Nomination" in line and "County" not in stripped:
-                parties = [(heading.start(), heading[1]) for heading in re.finditer(r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination", line)]
+                parties = [
+                    (heading.start(), heading[1])
+                    for heading in re.finditer(
+                        r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination", line
+                    )
+                ]
                 starts = []
             elif re.match(r"\s*County\s", line):
                 starts = [heading.start() for heading in re.finditer(r"County(?=\s)", line)] + [10**6]
                 columns = []
                 for index in range(len(starts) - 1):
                     names = re.split(r"\s{2,}", line[starts[index] + 6 : starts[index + 1]].replace("✓", "").strip())
-                    first_names = re.split(r"\s{2,}", previous[max(starts[index] - 2, 0) : starts[index + 1]].replace("✓", "").strip())
+                    first_names = re.split(
+                        r"\s{2,}", previous[max(starts[index] - 2, 0) : starts[index + 1]].replace("✓", "").strip()
+                    )
                     if len(first_names) == len(names) and not re.search(r"Nomination|Page|\d", previous):
                         names = [f"{first} {last}" for first, last in zip(first_names, names, strict=True)]
                     party = [name for start, name in parties if start <= starts[index] + 15]
                     columns.append((party[-1] if party else parties[0][1], names))
             elif starts and stripped:
                 for index, (party, names) in enumerate(columns):
-                    row = re.fullmatch(r"\s*([A-Za-z][A-Za-z .'-]*?)(?: \(\d+ precincts?\))?\s{2,}((?:\d[\d,]*\s*)+)\s*", line[starts[index] : starts[index + 1]])
+                    row = re.fullmatch(
+                        r"\s*([A-Za-z][A-Za-z .'-]*?)(?: \(\d+ precincts?\))?\s{2,}((?:\d[\d,]*\s*)+)\s*",
+                        line[starts[index] : starts[index + 1]],
+                    )
                     if row is not None and row[1] != "Total" and party in ("Republican", "Democratic"):
                         for candidate, votes in zip(names, row[2].split(), strict=True):
-                            yield {"county": row[1], "office": "U.S. House", "district": district, "party": party, "candidate": candidate, "votes": votes.replace(",", "")}
+                            yield {
+                                "county": row[1],
+                                "office": "U.S. House",
+                                "district": district,
+                                "party": party,
+                                "candidate": candidate,
+                                "votes": votes.replace(",", ""),
+                            }
             if stripped:
                 previous = line
         return
@@ -988,14 +1658,26 @@ def rows(code: str, path: Path, file: str = ""):
             for row in reader:
                 for column in range(2, len(header)):
                     found = re.fullmatch(r"(.*) \((\w+)\)", header[column])
-                    yield {"county": row[1], "office": "U.S. Senate", "district": "", "party": "Democratic" if row[0].endswith("Democratic Party") else "Republican", "candidate": found[1] if found is not None else header[column], "votes": row[column]}
+                    yield {
+                        "county": row[1],
+                        "office": "U.S. Senate",
+                        "district": "",
+                        "party": "Democratic" if row[0].endswith("Democratic Party") else "Republican",
+                        "candidate": found[1] if found is not None else header[column],
+                        "votes": row[column],
+                    }
         return
     if code == "ct":
         if file.endswith("Lookupdata"):
             return
-        lookup = json.loads(raw.cached(SOURCE, url(code, file.replace("townVotes_Electiondata", "Lookupdata"))).path.read_text())
+        lookup = json.loads(
+            raw.cached(SOURCE, url(code, file.replace("townVotes_Electiondata", "Lookupdata"))).path.read_text()
+        )
         regions = ct_regions()
-        counties_of = {entry["TownID"]: regions[re.sub(r"[^a-z]", "", entry["TownName"].lower())] for entry in lookup["countyTowns"]}
+        counties_of = {
+            entry["TownID"]: regions[re.sub(r"[^a-z]", "", entry["TownName"].lower())]
+            for entry in lookup["countyTowns"]
+        }
         offices = {key: value for entry in lookup["officeList"] for key, value in entry.items()}
         totals = {}
         for town, contests in json.loads(path.read_text()).items():
@@ -1005,56 +1687,121 @@ def rows(code: str, path: Path, file: str = ""):
                     for result in results:
                         for candidate_id, tally in result.items():
                             candidate = lookup["candidateIds"][candidate_id]
-                            key = (counties_of[town], "Governor" if found[1] is None else "U.S. House", found[1] or "", lookup["partyIds"][candidate["P"]]["NM"].removesuffix(" Party"), candidate["NM"])
+                            key = (
+                                counties_of[town],
+                                "Governor" if found[1] is None else "U.S. House",
+                                found[1] or "",
+                                lookup["partyIds"][candidate["P"]]["NM"].removesuffix(" Party"),
+                                candidate["NM"],
+                            )
                             totals[key] = totals.get(key, 0) + int(tally["V"])
         for (fips, office, district, party, candidate), votes in totals.items():
-            yield {"county": fips, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+            yield {
+                "county": fips,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
         return
     if code == "alx":
         with zipfile.ZipFile(path) as archive:
             for member in archive.namelist():
                 county = member.rpartition("-")[2].removesuffix(".xls").replace("_", " ")
-                for row in pl.read_excel(io.BytesIO(archive.read(member)), has_header=False, engine="calamine", infer_schema_length=0).rows()[1:]:
-                    found = re.fullmatch(r"(GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE, (\d+)\w\w CONGRESSIONAL DISTRICT) \((DEM|REP)\)", row[0].strip())
+                for row in pl.read_excel(
+                    io.BytesIO(archive.read(member)), has_header=False, engine="calamine", infer_schema_length=0
+                ).rows()[1:]:
+                    found = re.fullmatch(
+                        r"(GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE, (\d+)\w\w CONGRESSIONAL DISTRICT) \((DEM|REP)\)",
+                        row[0].strip(),
+                    )
                     if found is not None and row[2].strip() not in ("Over Votes", "Under Votes"):
-                        office = {"GOVERNOR": "Governor", "UNITED STATES SENATOR": "U.S. Senate"}.get(found[1], "U.S. House")
-                        yield {"county": county, "office": office, "district": found[2] or "", "party": "Democratic" if found[3] == "DEM" else "Republican", "candidate": row[2].strip(), "votes": str(sum(int(cell) for cell in row[3:] if cell and cell.isdigit()))}
+                        office = {"GOVERNOR": "Governor", "UNITED STATES SENATOR": "U.S. Senate"}.get(
+                            found[1], "U.S. House"
+                        )
+                        yield {
+                            "county": county,
+                            "office": office,
+                            "district": found[2] or "",
+                            "party": "Democratic" if found[3] == "DEM" else "Republican",
+                            "candidate": row[2].strip(),
+                            "votes": str(sum(int(cell) for cell in row[3:] if cell and cell.isdigit())),
+                        }
         return
     if code == "ar":
         if file == "contests":
             return
         names = json.loads(raw.cached(SOURCE, url(code, "contests")).path.read_text())["response"]["contests"]
         for contest in json.loads(path.read_text())["ContestData"]:
-            found = re.fullmatch(r"(REP|DEM) (Governor|U\.S\. Senate|U\.S\. Congress District (\d+))", names[contest["ContestID"]]["contestName"]) if contest["ContestID"] in names else None
+            found = (
+                re.fullmatch(
+                    r"(REP|DEM) (Governor|U\.S\. Senate|U\.S\. Congress District (\d+))",
+                    names[contest["ContestID"]]["contestName"],
+                )
+                if contest["ContestID"] in names
+                else None
+            )
             if found is not None:
                 office = {"Governor": "Governor", "U.S. Senate": "U.S. Senate"}.get(found[2], "U.S. House")
                 for fips, location in contest["Locations"].items():
                     for choice in location["Choices"]:
-                        yield {"county": fips, "office": office, "district": found[3] or "", "party": "Republican" if found[1] == "REP" else "Democratic", "candidate": names[contest["ContestID"]]["choices"][choice["ChoiceID"]]["name"], "votes": str(choice["TotalVotes"])}
+                        yield {
+                            "county": fips,
+                            "office": office,
+                            "district": found[3] or "",
+                            "party": "Republican" if found[1] == "REP" else "Democratic",
+                            "candidate": names[contest["ContestID"]]["choices"][choice["ChoiceID"]]["name"],
+                            "votes": str(choice["TotalVotes"]),
+                        }
         return
     if code == "ok":
         if file.startswith("getelec"):
             return
         day, _, race = file.partition("/")
-        meta = next(entry for entry in json.loads(raw.cached(SOURCE, url(code, f"getelec/{day}")).path.read_text())["races"] if str(entry["raceID"]) == race)
-        found = re.fullmatch(r"FOR (GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE DISTRICT (\d+))", meta["raceTitle"])
+        meta = next(
+            entry
+            for entry in json.loads(raw.cached(SOURCE, url(code, f"getelec/{day}")).path.read_text())["races"]
+            if str(entry["raceID"]) == race
+        )
+        found = re.fullmatch(
+            r"FOR (GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE DISTRICT (\d+))", meta["raceTitle"]
+        )
         office = {"GOVERNOR": "Governor", "UNITED STATES SENATOR": "U.S. Senate"}.get(found[1], "U.S. House")
         for county in json.loads(path.read_text())["summaryCandResults"]:
             for candidate, result in zip(meta["raceCandidates"], county["candResults"], strict=True):
-                yield {"county": f"40{2 * int(county['countyID']) - 1:03}", "office": office, "district": found[2] or "", "party": "Democratic" if meta["raceTitle2"] == "Democrat" else meta["raceTitle2"], "candidate": candidate["candName"], "votes": str(result["totalVotes"])}
+                yield {
+                    "county": f"40{2 * int(county['countyID']) - 1:03}",
+                    "office": office,
+                    "district": found[2] or "",
+                    "party": "Democratic" if meta["raceTitle2"] == "Democrat" else meta["raceTitle2"],
+                    "candidate": candidate["candName"],
+                    "votes": str(result["totalVotes"]),
+                }
         return
     if code == "me":
         office, district, party = ME_FILES[file]
         sheet = pl.read_excel(path, has_header=False, infer_schema_length=0).rows()
         header = next(index for index, row in enumerate(sheet) if "CTY" in row)
         county_column = sheet[header].index("CTY")
-        first = max(index for index, cell in enumerate(sheet[header]) if cell in ("DIS", "CTY", "Municipality", "TOWN", "WARD-PRECINCT")) + 1
+        first = (
+            max(
+                index
+                for index, cell in enumerate(sheet[header])
+                if cell in ("DIS", "CTY", "Municipality", "TOWN", "WARD-PRECINCT")
+            )
+            + 1
+        )
         candidates = {}
         for column in range(first, len(sheet[header])):
             text = " ".join((sheet[0][column] or "").split())
             if text != "" and text not in ("BLANK", "TBC"):
                 surname, _, given = text.partition(", ")
-                given, _, suffix = given.replace(",", "").rpartition(" ") if given.endswith((" III", " JR", " SR", " II")) else (given, "", "")
+                given, _, suffix = (
+                    given.replace(",", "").rpartition(" ")
+                    if given.endswith((" III", " JR", " SR", " II"))
+                    else (given, "", "")
+                )
                 candidates[column] = f"{given} {surname} {suffix}".replace("  ", " ").strip()
         totals = {}
         for row in sheet[header + 1 :]:
@@ -1063,29 +1810,72 @@ def rows(code: str, path: Path, file: str = ""):
                     key = (ME_COUNTIES[row[county_column]], candidate)
                     totals[key] = totals.get(key, 0) + int(row[column] or 0)
         for (fips, candidate), votes in totals.items():
-            yield {"county": fips, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+            yield {
+                "county": fips,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
         return
     if code == "ks":
         totals = {}
-        for county, race, candidate, party, votes in pl.read_excel(path).select("County", "Race", "Candidate", "Party", "Votes").iter_rows():
-            office = "U.S. Senate" if race == "United States Senate" else "Governor" if race.startswith("Governor") else "U.S. House"
+        for county, race, candidate, party, votes in (
+            pl.read_excel(path).select("County", "Race", "Candidate", "Party", "Votes").iter_rows()
+        ):
+            office = (
+                "U.S. Senate"
+                if race == "United States Senate"
+                else "Governor"
+                if race.startswith("Governor")
+                else "U.S. House"
+            )
             first, _, last = candidate.partition(", ")
-            name = candidate.split(" / ")[0] if office == "Governor" else f"{last} {first}".strip() if last else candidate
+            name = (
+                candidate.split(" / ")[0] if office == "Governor" else f"{last} {first}".strip() if last else candidate
+            )
             key = (county, office, race.rpartition(" ")[2] if office == "U.S. House" else "", party, name)
             totals[key] = totals.get(key, 0) + int(votes)
         for (county, office, district, party, candidate), votes in totals.items():
-            yield {"county": county, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+            yield {
+                "county": county,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
         return
     if code == "mn":
         totals = {}
         for line in path.read_text(encoding="latin-1").splitlines():
             cells = [cell.strip().strip('"').strip() for cell in line.split(";")]
-            found = re.fullmatch(r"(U\.S\. Representative|U\.S\. Senator|Governor & Lt Governor)(?: District \d+)?", cells[4]) if len(cells) > 13 else None
+            found = (
+                re.fullmatch(
+                    r"(U\.S\. Representative|U\.S\. Senator|Governor & Lt Governor)(?: District \d+)?", cells[4]
+                )
+                if len(cells) > 13
+                else None
+            )
             if found is not None:
-                key = (f"27{2 * int(cells[1]) - 1:03}", MN_OFFICES[found[1]], cells[5], cells[10], re.sub(r"\s+", " ", cells[7].split(" and ")[0]))
+                key = (
+                    f"27{2 * int(cells[1]) - 1:03}",
+                    MN_OFFICES[found[1]],
+                    cells[5],
+                    cells[10],
+                    re.sub(r"\s+", " ", cells[7].split(" and ")[0]),
+                )
                 totals[key] = totals.get(key, 0) + int(cells[13] or 0)
         for (fips, office, district, party, candidate), votes in totals.items():
-            yield {"county": fips, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+            yield {
+                "county": fips,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
         return
     if code == "il":
         totals: dict[tuple[str, str, str, str, str], int] = {}
@@ -1103,36 +1893,42 @@ def rows(code: str, path: Path, file: str = ""):
                 )
                 totals[key] = totals.get(key, 0) + int(row["VoteCount"])
         for (county, office, district, party, candidate), votes in totals.items():
-            yield {"county": county, "office": office, "district": district, "party": party, "candidate": candidate, "votes": str(votes)}
+            yield {
+                "county": county,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
         return
     if code != "nc":
         with path.open(newline="") as handle:
             yield from csv.DictReader(handle)
         return
-    with zipfile.ZipFile(path) as archive:
-        with archive.open("results_pct_20260303.txt") as handle:
-            totals: dict[tuple[str, str, str, str, str], int] = {}
-            for row in csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8"), delimiter="\t"):
-                found = NC_CONTEST.fullmatch(row["Contest Name"].strip())
-                if found is None:
-                    continue
-                key = (
-                    row["County"].title(),
-                    "U.S. Senate" if found[2] is None else "U.S. House",
-                    found[2] or "",
-                    {"REP": "REP", "DEM": "DEM", "LIB": "LIB"}.get(found[3], found[3]),
-                    row["Choice"].strip(),
-                )
-                totals[key] = totals.get(key, 0) + int(row["Total Votes"])
-            for (county, office, district, party, candidate), votes in totals.items():
-                yield {
-                    "county": county,
-                    "office": office,
-                    "district": district,
-                    "party": party,
-                    "candidate": candidate,
-                    "votes": str(votes),
-                }
+    with zipfile.ZipFile(path) as archive, archive.open("results_pct_20260303.txt") as handle:
+        totals: dict[tuple[str, str, str, str, str], int] = {}
+        for row in csv.DictReader(io.TextIOWrapper(handle, encoding="utf-8"), delimiter="\t"):
+            found = NC_CONTEST.fullmatch(row["Contest Name"].strip())
+            if found is None:
+                continue
+            key = (
+                row["County"].title(),
+                "U.S. Senate" if found[2] is None else "U.S. House",
+                found[2] or "",
+                {"REP": "REP", "DEM": "DEM", "LIB": "LIB"}.get(found[3], found[3]),
+                row["Choice"].strip(),
+            )
+            totals[key] = totals.get(key, 0) + int(row["Total Votes"])
+        for (county, office, district, party, candidate), votes in totals.items():
+            yield {
+                "county": county,
+                "office": office,
+                "district": district,
+                "party": party,
+                "candidate": candidate,
+                "votes": str(votes),
+            }
 
 
 def title(text: str) -> str:
@@ -1153,30 +1949,99 @@ def fetch() -> None:
     for code, _, names, *_ in [*FILES.values(), *RUNOFFS.values(), *(entry for _, _, entry in SPECIALS)]:
         for name in names:
             if code in MANUAL:
-                folder, link, suffix, media = MANUAL[code]
+                folder, _link, suffix, media = MANUAL[code]
                 try:
                     raw.cached(SOURCE, url(code, name))
                 except LookupError:
-                    raw.store(SOURCE, url(code, name), (folder / name).read_bytes(), suffix=suffix, retrieved_at=datetime(2026, 10, 24, tzinfo=UTC), media_type=media)
+                    raw.store(
+                        SOURCE,
+                        url(code, name),
+                        (folder / name).read_bytes(),
+                        suffix=suffix,
+                        retrieved_at=datetime(2026, 10, 24, tzinfo=UTC),
+                        media_type=media,
+                    )
                 continue
             if code == "ma":
-                for election, *_ in elstats.ma_primary_rows(raw.fetch(SOURCE, url(code, name), suffix=".html").path.read_text()):
+                for election, *_ in elstats.ma_primary_rows(
+                    raw.fetch(SOURCE, url(code, name), suffix=".html").path.read_text()
+                ):
                     raw.fetch(SOURCE, f"{MA_BASE}download/{election}/precincts_include:0/", suffix=".csv")
                 continue
             if code == "ar":
-                raw.store(SOURCE, url(code, name), httpx.get(url(code, name), headers={**BROWSER, "Origin": "https://arkansas.tally-enr.com"}, timeout=600).content, suffix=".json", retrieved_at=datetime.now(UTC), media_type="application/json")
+                raw.store(
+                    SOURCE,
+                    url(code, name),
+                    httpx.get(
+                        url(code, name), headers={**BROWSER, "Origin": "https://arkansas.tally-enr.com"}, timeout=600
+                    ).content,
+                    suffix=".json",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/json",
+                )
                 continue
             if code == "ok":
-                token = httpx.put(OK_BASE + "enrapi/login/", json={"Username": "appuser", "Password": "X098de!22k098Mgfd"}, headers=BROWSER, timeout=60).json()[1:]
-                raw.store(SOURCE, url(code, name), httpx.get(url(code, name), headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300).content, suffix=".json", retrieved_at=datetime.now(UTC), media_type="application/json")
+                token = httpx.put(
+                    OK_BASE + "enrapi/login/",
+                    json={"Username": "appuser", "Password": "X098de!22k098Mgfd"},
+                    headers=BROWSER,
+                    timeout=60,
+                ).json()[1:]
+                raw.store(
+                    SOURCE,
+                    url(code, name),
+                    httpx.get(
+                        url(code, name), headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300
+                    ).content,
+                    suffix=".json",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/json",
+                )
                 continue
             if code == "me":
-                raw.store(SOURCE, url(code, name), httpx.get(url(code, name), headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".xlsx", retrieved_at=datetime.now(UTC), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                raw.store(
+                    SOURCE,
+                    url(code, name),
+                    httpx.get(url(code, name), headers=BROWSER, follow_redirects=True, timeout=300).content,
+                    suffix=".xlsx",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                )
                 continue
             if code == "fl":
-                raw.store(SOURCE, FL_URL, httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/tab-separated-values")
+                raw.store(
+                    SOURCE,
+                    FL_URL,
+                    httpx.get(FL_URL, headers=BROWSER, follow_redirects=True, timeout=300).content,
+                    suffix=".txt",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="text/tab-separated-values",
+                )
                 continue
-            raw.fetch(SOURCE, url(code, name), suffix={"hi": ".pdf", "ne": ".pdf", "ri": ".json", "ct": ".json", "alx": ".zip", "de": ".html", "ma": ".html", "nj": ".pdf", "ks": ".xlsx", "ca": ".xlsx", "wv": ".zip", "in": ".json", "ga": ".json", "ga2": ".json", "wa": ".json", "ut": ".json", "id": ".json"}.get(code) or name[name.rindex(".") :])
+            raw.fetch(
+                SOURCE,
+                url(code, name),
+                suffix={
+                    "hi": ".pdf",
+                    "ne": ".pdf",
+                    "ri": ".json",
+                    "ct": ".json",
+                    "alx": ".zip",
+                    "de": ".html",
+                    "ma": ".html",
+                    "nj": ".pdf",
+                    "ks": ".xlsx",
+                    "ca": ".xlsx",
+                    "wv": ".zip",
+                    "in": ".json",
+                    "ga": ".json",
+                    "ga2": ".json",
+                    "wa": ".json",
+                    "ut": ".json",
+                    "id": ".json",
+                }.get(code)
+                or name[name.rindex(".") :],
+            )
     fetch_ballot_items()
 
 
@@ -1224,10 +2089,13 @@ def emit() -> Path:
                    where x.value ~ '^(2026-11-03|2024-11-05):[A-Z]{2}:house:[0-9]+$'
                       or x.value ~ '^(2026-11-03|2020-11-03):[A-Z]{2}:senate$'
                       or x.value ~ ('^(2026-11-03|2022-11-08):[A-Z]{2}:(governor|' || %s || ')$')""",
-            ["|".join(key for _, key, _ in EXEC.values())],
+                ["|".join(key for _, key, _ in EXEC.values())],
             ).fetchall()
         }
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "irv", "two_round", "two_round_35", "two_round_30", "top_two")}
+        systems = {
+            key: cs.key("us.electoral_system", key)
+            for key in ("fptp", "irv", "two_round", "two_round_35", "two_round_30", "top_two")
+        }
         counties: dict[tuple[str, str], UUID] = {}
         for code, text, id in conn.execute(
             """select u.code, n.text, u.id from reporting_unit u
@@ -1239,7 +2107,9 @@ def emit() -> Path:
             counties[(code[:2], code)] = id
             if int(code[2:]) >= 500:
                 counties[(code[:2], plain(text) + "city")] = id
-        counties[("29", "kansascity")] = conn.execute("select id from reporting_unit where scheme_code = 'us.place' and code = '2938000'").fetchone()[0]
+        counties[("29", "kansascity")] = conn.execute(
+            "select id from reporting_unit where scheme_code = 'us.place' and code = '2938000'"
+        ).fetchone()[0]
         pool: dict[tuple[str, str], set[UUID]] = defaultdict(set)
         for state, person, text in conn.execute(
             """select split_part(x.value, ':', 2), cy.person_id, n.text
@@ -1247,7 +2117,7 @@ def emit() -> Path:
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                join name n on n.entity_id = cy.person_id and n.is_preferred
                where x.value ~ ('^20(1[4-9]|2[0-9])-[0-9-]+:(' || %s || '):(house|senate|governor|' || %s || ')')""",
-            ['|'.join(FILES), '|'.join(key for _, key, _ in EXEC.values())],
+            ["|".join(FILES), "|".join(key for _, key, _ in EXEC.values())],
         ).fetchall():
             pool[(state, slug(text))].add(person)
         persons: dict[tuple[str, str], UUID] = {}
@@ -1277,42 +2147,12 @@ def emit() -> Path:
                     persons[(state, slug(text))] = id
             return persons[(state, slug(text))]
 
-        sources: dict[str, UUID] = {}
-        retired_persons: set[UUID] = set()
         held_options = {
             value
             for (value,) in conn.execute(
                 "select value from external_id where scheme = 'us.option' and value like '2026-%'"
             ).fetchall()
         }
-        sources: dict[str, UUID] = {}
-        retired_persons: set[UUID] = set()
-        persons: dict[tuple[str, str], UUID] = {}
-        parties: dict[str, UUID] = {}
-
-        def party_of(label: str | None) -> UUID | None:
-            if label not in PARTIES:
-                return None
-            key = PARTIES[label][1]
-            if key not in parties:
-                parties[key] = cs.key("us.party", key)
-                if parties[key] in cs.minted:
-                    cs.add("party", id=parties[key], kind="party", polity_id=cs.polity("US"))
-                    name(parties[key], {"no-labels-party": "No Labels Party"}[key])
-            return parties[key]
-
-        def person_of(state: str, text: str) -> UUID:
-            if (state, slug(text)) not in persons:
-                found = pool.get((state, slug(text)), set())
-                if len(found) == 1:
-                    persons[(state, slug(text))] = next(iter(found))
-                else:
-                    id = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
-                    if id in cs.minted:
-                        cs.add("person", id=id)
-                        name(id, text)
-                    persons[(state, slug(text))] = id
-            return persons[(state, slug(text))]
 
         sources: dict[tuple[str, int], UUID] = {}
         retired_persons: set[UUID] = set()
@@ -1327,7 +2167,9 @@ def emit() -> Path:
             round_slot = (state, stage_no, day)
             round_word = ("special " if special else "") + ("primary runoff" if stage_no == 2 else "primary")
             state_name = state_names[state]
-            publisher, address, how = OFFICIAL.get(state, ("OpenElections", f"https://github.com/openelections/openelections-data-{code}", ""))
+            publisher, address, how = OFFICIAL.get(
+                state, ("OpenElections", f"https://github.com/openelections/openelections-data-{code}", "")
+            )
             source_title = f"{state_name} 2026 {'U.S. Senate special ' if special else ''}primary{' runoff' if stage_no == 2 else ''} results by county"
             sources[round_slot] = cs.source(publisher, source_title)
             if sources[round_slot] in cs.minted:
@@ -1356,8 +2198,17 @@ def emit() -> Path:
                     status="held",
                 )
                 if elections[round_slot] in cs.minted:
-                    name(elections[round_slot], f"2026 {state_name} {'U.S. Senate special ' if special else ''}primary runoff election" if stage_no == 2 else f"2026 {state_name} {'U.S. Senate special ' if special else ''}primary election")
-                cs.add("slug", path=f"us/{state.lower()}/{day}-{round_word.replace(' ', '-')}", entity_id=elections[round_slot])
+                    name(
+                        elections[round_slot],
+                        f"2026 {state_name} {'U.S. Senate special ' if special else ''}primary runoff election"
+                        if stage_no == 2
+                        else f"2026 {state_name} {'U.S. Senate special ' if special else ''}primary election",
+                    )
+                cs.add(
+                    "slug",
+                    path=f"us/{state.lower()}/{day}-{round_word.replace(' ', '-')}",
+                    entity_id=elections[round_slot],
+                )
             grouped: dict[tuple[str, str, str], dict[tuple[str, str, str], dict[str, int]]] = defaultdict(
                 lambda: defaultdict(lambda: defaultdict(int))
             )
@@ -1367,7 +2218,12 @@ def emit() -> Path:
             for file in files:
                 for row in rows(code, raw.cached(SOURCE, url(code, file)).path, file):
                     chamber = OFFICES.get(row["office"])
-                    if chamber is None or not row["votes"].isdigit() or state not in ("CA", "OR") and chamber not in ("house", "senate", "governor"):
+                    if (
+                        chamber is None
+                        or not row["votes"].isdigit()
+                        or state not in ("CA", "OR")
+                        and chamber not in ("house", "senate", "governor")
+                    ):
                         continue
                     nonpartisan = state == "OR" and chamber == EXEC["labor"][1]
                     if row["party"] not in PARTIES and not nonpartisan:
@@ -1378,7 +2234,9 @@ def emit() -> Path:
                     scope_labels.setdefault(scope, row["party"])
                     district = ("0" if state in AT_LARGE else str(int(row["district"]))) if chamber == "house" else ""
                     if JUNK.search(row["candidate"].strip()):
-                        junk[(chamber, district, "" if state in TOP_TWO else scope)].add(title(row["candidate"].strip()))
+                        junk[(chamber, district, "" if state in TOP_TWO else scope)].add(
+                            title(row["candidate"].strip())
+                        )
                         continue
                     pooled = POOLED.search(row["candidate"]) is not None or row.get("write_in") == "Y"
                     label = "" if pooled or nonpartisan else row["party"]
@@ -1427,15 +2285,24 @@ def emit() -> Path:
                     number = int(district)
                     suffix = "th" if 10 <= number % 100 <= 20 else ORDINALS.get(number % 10, "th")
                     at_large = number == 0
-                    title_text = f"2026 U.S. House {scope_label + ' ' if scope else ''}{round_word} in {state_name}'s " + (
-                        "at-large congressional district" if at_large else f"{number}{suffix} congressional district"
+                    title_text = (
+                        f"2026 U.S. House {scope_label + ' ' if scope else ''}{round_word} in {state_name}'s "
+                        + (
+                            "at-large congressional district"
+                            if at_large
+                            else f"{number}{suffix} congressional district"
+                        )
                     )
                 elif chamber == "senate":
                     title_text = f"2026 U.S. Senate {scope_label + ' ' if scope else ''}{round_word} in {state_name}"
                 else:
                     adjective = next((phrase for _, key, phrase in EXEC.values() if key == chamber), "gubernatorial")
                     title_text = f"2026 {state_name} {adjective} " + (
-                        f"{scope_label} {round_word}" if scope else "top-two primary" if state in TOP_TWO else "nonpartisan primary"
+                        f"{scope_label} {round_word}"
+                        if scope
+                        else "top-two primary"
+                        if state in TOP_TWO
+                        else "nonpartisan primary"
                     )
                 cs.add(
                     "contest",
@@ -1448,13 +2315,15 @@ def emit() -> Path:
                     seat_id=seat,
                     boundary_set_id=plan,
                     magnitude=magnitude,
-                    party_scope_id=party_of(scope_labels[scope])
-                    if scope
-                    else None,
+                    party_scope_id=party_of(scope_labels[scope]) if scope else None,
                     term=term,
                     round_number=stage_no,
                     previous_round_id=cs.key("us.contest", f"{first[0]}:{state}:{key_tail}") if stage_no == 2 else None,
-                    electoral_system_id=systems["top_two"] if state in TOP_TWO else systems["irv"] if state == "ME" else systems[RUNOFF_SYSTEMS.get(state, "fptp")],
+                    electoral_system_id=systems["top_two"]
+                    if state in TOP_TWO
+                    else systems["irv"]
+                    if state == "ME"
+                    else systems[RUNOFF_SYSTEMS.get(state, "fptp")],
                     default_result_kind=result_kind,
                 )
                 name(contest, title_text)
@@ -1465,7 +2334,14 @@ def emit() -> Path:
                     + (f"-{scope}" if scope else ""),
                     entity_id=contest,
                 )
-                cs.add("note", entity_id=contest, kind="methodology", body_md=OFFICIAL_METHOD.format(publisher=publisher, how=how) if state in OFFICIAL else METHOD.format(state=state_name))
+                cs.add(
+                    "note",
+                    entity_id=contest,
+                    kind="methodology",
+                    body_md=OFFICIAL_METHOD.format(publisher=publisher, how=how)
+                    if state in OFFICIAL
+                    else METHOD.format(state=state_name),
+                )
                 if shapeless and chamber == "house" and state in REDISTRICTED:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=CAVEAT)
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -1526,16 +2402,31 @@ def emit() -> Path:
                             rcv_option = option
                 named.sort(key=lambda entry: -entry[0])
                 everyone = sum(votes for votes, _ in named)
-                if state in TOP_TWO or (stage_no == 1 and len(named) > 1 and state in THRESHOLDS and named[0][0] * 100 <= THRESHOLDS[state] * everyone):
+                if state in TOP_TWO or (
+                    stage_no == 1
+                    and len(named) > 1
+                    and state in THRESHOLDS
+                    and named[0][0] * 100 <= THRESHOLDS[state] * everyone
+                ):
                     leaders = named[:2]
                     if len(named) > 2 and named[1][0] == named[2][0]:
-                        cs.add("note", entity_id=result_set, kind="caveat", body_md="A tie for the last advancing place leaves the outcome unrecorded.")
+                        cs.add(
+                            "note",
+                            entity_id=result_set,
+                            kind="caveat",
+                            body_md="A tie for the last advancing place leaves the outcome unrecorded.",
+                        )
                         continue
                     for _, option in leaders:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", seats=None)
                 elif rcv_option is not None:
                     cs.add("outcome", result_set_id=result_set, option_id=rcv_option, kind="won", seats=None)
-                    cs.add("note", entity_id=result_set, kind="context", body_md=f"County figures are first-choice votes. {rcv[1]}")
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="context",
+                        body_md=f"County figures are first-choice votes. {rcv[1]}",
+                    )
                 elif named:
                     if len(named) > 1 and named[0][0] == named[1][0]:
                         continue

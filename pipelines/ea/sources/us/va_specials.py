@@ -31,9 +31,9 @@ def parse() -> None:
             ).fetchall()
         } | {name: code for (state, name), code in elstats.FORMER.items() if state == "VA"}
     frame = pl.concat(
-        pl.read_csv(raw.cached(SOURCE, elstats.url(TENANT, year)).path, infer_schema=False, truncate_ragged_lines=True).filter(
-            (pl.col("election_type") == kind) & (pl.col("district_name") == str(district))
-        )
+        pl.read_csv(
+            raw.cached(SOURCE, elstats.url(TENANT, year)).path, infer_schema=False, truncate_ragged_lines=True
+        ).filter((pl.col("election_type") == kind) & (pl.col("district_name") == str(district)))
         for year, kind, district in ENTRIES
     )
     division = (
@@ -45,13 +45,21 @@ def parse() -> None:
         .str.replace_all(r"\bcounty\b", "")
         .str.replace_all(r"[^a-z]", "")
     )
-    frame = frame.filter((pl.col("office_name") == "U.S. House") & (pl.col("division_type") == "Locality")).with_columns(
-        special=(pl.col("election_type") == "Special Election")
-        | ~pl.col("candidate_name").fill_null("").str.contains("Carr").any().over("contest_id"),
-        code=division.replace_strict(counties, default=None),
-        votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-        candidate=pl.col("candidate_name").fill_null("").str.replace_all(r"\s+", " ").str.strip_chars().str.to_uppercase(),
-    ).filter(pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains("TOTAL VOTES|UNDERVOTE"))
+    frame = (
+        frame.filter((pl.col("office_name") == "U.S. House") & (pl.col("division_type") == "Locality"))
+        .with_columns(
+            special=(pl.col("election_type") == "Special Election")
+            | ~pl.col("candidate_name").fill_null("").str.contains("Carr").any().over("contest_id"),
+            code=division.replace_strict(counties, default=None),
+            votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+            candidate=pl.col("candidate_name")
+            .fill_null("")
+            .str.replace_all(r"\s+", " ")
+            .str.strip_chars()
+            .str.to_uppercase(),
+        )
+        .filter(pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains("TOTAL VOTES|UNDERVOTE"))
+    )
     lost = frame.filter(pl.col("code").is_null())
     if lost.height:
         raise ValueError(f"unmatched localities: {lost['division_name'].unique().to_list()}")
@@ -84,7 +92,15 @@ def emit() -> Path:
             polity="US-VA",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=SITE, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=SITE,
+            license="Public record",
+        )
         for year in {entry[0] for entry in ENTRIES}:
             cs.artifact(raw.cached(SOURCE, elstats.url(TENANT, year)), source)
         medsl.attach(cs, conn, frame, {"VA": source}, strict=True)

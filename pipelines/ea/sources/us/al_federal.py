@@ -52,14 +52,22 @@ def parse() -> None:
             for member in archive.namelist():
                 if not member.lower().endswith((".xls", ".xlsx")):
                     continue
-                code = counties[re.sub(r"[^a-z]", "", re.sub(r".*Primary-(?:Runoff-)?|\.xlsx?$", "", member, flags=re.I).lower())]
+                code = counties[
+                    re.sub(
+                        r"[^a-z]",
+                        "",
+                        re.sub(r".*Primary-(?:Runoff-)?|\.xlsx?$", "", member, flags=re.IGNORECASE).lower(),
+                    )
+                ]
                 sheet = fastexcel.read_excel(archive.read(member)).load_sheet(0, header_row=None).to_polars()
                 for title, party, candidate, *cells in sheet.iter_rows():
                     found = RACE.fullmatch(re.sub(r"\s+", " ", title or "").strip())
                     candidate = re.sub(r"\s+", " ", candidate or "").strip()
                     if found is None or candidate in ("Over Votes", "Under Votes") or party not in ("DEM", "REP"):
                         continue
-                    office = "president" if title.startswith("PRESIDENT") else "senate" if "SENATOR" in title else "house"
+                    office = (
+                        "president" if title.startswith("PRESIDENT") else "senate" if "SENATOR" in title else "house"
+                    )
                     key = (
                         day,
                         f"{office}:{'democratic' if party == 'DEM' else 'republican'}",
@@ -67,7 +75,9 @@ def parse() -> None:
                         code,
                         candidate.upper(),
                     )
-                    tally[key] = tally.get(key, 0) + sum(int(float(cell)) for cell in cells if cell is not None and str(cell).strip())
+                    tally[key] = tally.get(key, 0) + sum(
+                        int(float(cell)) for cell in cells if cell is not None and str(cell).strip()
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(
@@ -93,7 +103,9 @@ def parse() -> None:
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
         .filter(pl.col("measure") > 0)
-        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "kind", "source")
+        .group_by(
+            "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "kind", "source"
+        )
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .write_parquet(PARSED / "counties.parquet")
     )

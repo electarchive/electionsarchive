@@ -45,11 +45,24 @@ GUTTER = re.compile(r" {3,}")
 ROMAN = {"I": 1, "II": 2}
 OLD_HEADER = re.compile(r"^\((\w+)\) (U\.S\. Senator|U\.S\. Representative(?:(?:,| -) \[D (\d)\])?)$")
 OLD_ROW = re.compile(r"^([\d,]+) (.+?) [\d.]+%$")
-OLD_PARTIES = {"R": "R", "RE": "R", "D": "D", "DE": "D", "L": "L", "LI": "L", "G": "G", "GR": "G", "N": "N", "NP": "N", "C": "C", "NL": "NL"}
+OLD_PARTIES = {
+    "R": "R",
+    "RE": "R",
+    "D": "D",
+    "DE": "D",
+    "L": "L",
+    "LI": "L",
+    "G": "G",
+    "GR": "G",
+    "N": "N",
+    "NP": "N",
+    "C": "C",
+    "NL": "NL",
+}
 
 
 def fetch() -> None:
-    for day, folder in DAYS.items():
+    for folder in DAYS.values():
         for county in COUNTIES:
             raw.fetch(SOURCE, f"{BASE}{folder}/{county}.pdf", suffix=".pdf")
 
@@ -59,7 +72,12 @@ def parse() -> None:
     for day, folder in DAYS.items():
         for county, code in COUNTIES.items():
             text = subprocess.run(
-                ["pdftotext", "-layout" if day.year <= 2020 else "-raw", str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path), "-"],
+                [
+                    "pdftotext",
+                    "-layout" if day.year <= 2020 else "-raw",
+                    str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path),
+                    "-",
+                ],
                 capture_output=True,
                 text=True,
                 check=True,
@@ -90,7 +108,9 @@ def parse() -> None:
                     elif re.match(r"^\(\w+\) ", line.strip()) or line.strip().startswith(("Councilmember", "Mayor")):
                         line = "Other - X"
                     elif row := OLD_ROW.match(line.strip()):
-                        line = "Blank Votes" if re.fullmatch(r"(BLANK|OVER) VOTES", row[2]) else f"{row[2]} {row[1]} 0.0%"
+                        line = (
+                            "Blank Votes" if re.fullmatch(r"(BLANK|OVER) VOTES", row[2]) else f"{row[2]} {row[1]} 0.0%"
+                        )
                     cells.append((0, line))
             elif day.year < 2020:
                 cells = []
@@ -109,7 +129,12 @@ def parse() -> None:
                             if re.fullmatch(r"[\d,]+\s+[\d.]+%", cell):
                                 pending = cell
                                 continue
-                            if pending and cell and not cell.startswith(("Blank Votes", "Over Votes")) and not re.search(r"\d%$|\d of \d", cell):
+                            if (
+                                pending
+                                and cell
+                                and not cell.startswith(("Blank Votes", "Over Votes"))
+                                and not re.search(r"\d%$|\d of \d", cell)
+                            ):
                                 cell = f"{cell} {pending}"
                             if cell:
                                 pending = None
@@ -117,7 +142,9 @@ def parse() -> None:
             for index, line in cells:
                 current = states.get(index)
                 if found := HEADER.match(line):
-                    office = "senate" if "Senator" in found[1] else "house" if "Representative" in found[1] else "president"
+                    office = (
+                        "senate" if "Senator" in found[1] else "house" if "Representative" in found[1] else "president"
+                    )
                     current = (
                         f"{office}:{PARTIES[found[3]]}" if found[3] in PARTIES else None,
                         ROMAN.get(found[2]) or int(found[2]) if found[2] else None,
@@ -182,7 +209,7 @@ def emit() -> Path:
             url="https://elections.hawaii.gov/resources/election-results/",
             license="Public record",
         )
-        for day, folder in DAYS.items():
+        for folder in DAYS.values():
             for county in COUNTIES:
                 cs.artifact(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf"), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"HI": source}, strict=True)

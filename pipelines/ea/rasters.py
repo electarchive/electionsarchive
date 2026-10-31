@@ -2,6 +2,7 @@ import gzip
 import json
 import math
 import time
+from typing import LiteralString, cast
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -71,12 +72,16 @@ def build(prefix: str | None) -> str:
         built = time.monotonic()
         tiles: dict[int, bytes] = {}
         with connect() as conn:
-            conn.execute(PLANE_SQL.format(plane=plane.sql("g.geom", scheme_code)), [scheme_code, as_of])
+            conn.execute(
+                cast(LiteralString, PLANE_SQL.format(plane=plane.sql("g.geom", scheme_code))), [scheme_code, as_of]
+            )
             conn.execute("create index on plane using gist (geom)")
             conn.execute("analyze plane")
-            left, bottom, right, top = conn.execute(
+            extent = conn.execute(
                 "select ST_XMin(e), ST_YMin(e), ST_XMax(e), ST_YMax(e) from (select ST_Extent(geom)::geometry e from plane) x"
             ).fetchone()
+            assert extent is not None
+            left, bottom, right, top = extent
             west, south = degrees(left, bottom)
             east, north = degrees(right, top)
             for z in range(MAX_ZOOM + 1):

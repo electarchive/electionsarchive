@@ -128,7 +128,14 @@ def emit() -> Path:
                 offices.add(office)
                 if office in cs.minted:
                     cs.add("office", id=office, polity_id=cs.polity("US-NC"), kind="other")
-                    cs.add("name", entity_id=office, text=f"{title} of North Carolina", lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=office,
+                        text=f"{title} of North Carolina",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
             suffix = f":{slug(seat)}" if seat else ""
             contest_key = f"{day}:NC:{slug(title)}{suffix}"
             contest = cs.key("us.contest", contest_key)

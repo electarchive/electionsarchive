@@ -105,7 +105,13 @@ def parse() -> None:
         sheets = books[workbook]
         for sheet, cells in sheets.items():
             year = re.search(r"(\d{2}|\d{4})\s*$", sheet.strip())
-            if (workbook, sheet) == ("easecretaryofstate1986-2010_0.xls", "Gen.98") or (workbook.startswith("eapsc") and re.search(r"9\d\s*$", sheet)) or "gen" not in sheet.lower() or year is None or not 1990 <= (1900 if int(year[1][-2:]) >= 50 else 2000) + int(year[1][-2:]) <= 2012:
+            if (
+                (workbook, sheet) == ("easecretaryofstate1986-2010_0.xls", "Gen.98")
+                or (workbook.startswith("eapsc") and re.search(r"9\d\s*$", sheet))
+                or "gen" not in sheet.lower()
+                or year is None
+                or not 1990 <= (1900 if int(year[1][-2:]) >= 50 else 2000) + int(year[1][-2:]) <= 2012
+            ):
                 continue
             text = " ".join([sheet, *(cell for row in cells[:3] for cell in row if cell)]).upper()
             header = next(
@@ -134,7 +140,10 @@ def parse() -> None:
                     if any(re.sub(r"[^a-z]", "", (row[column] or "").lower()) == "autauga" for row in cells)
                 )
                 counties = [
-                    fips[plain] for row in cells if (plain := re.sub(r"[^a-z]", "", (row[label] or "").lower()).replace("conucuh", "conecuh")) in fips
+                    fips[plain]
+                    for row in cells
+                    if (plain := re.sub(r"[^a-z]", "", (row[label] or "").lower()).replace("conucuh", "conecuh"))
+                    in fips
                 ]
                 numeric = [
                     [int(row[column] or 0) for column in block]

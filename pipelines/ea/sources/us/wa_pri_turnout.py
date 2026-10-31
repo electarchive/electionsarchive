@@ -14,7 +14,9 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://results.vote.wa.gov/results/{day:%Y%m%d}/Turnout.html"
 DAYS = [date(2014, 8, 5), date(2016, 8, 2), date(2018, 8, 7), date(2020, 8, 4), date(2022, 8, 2), date(2024, 8, 6)]
-ROW = re.compile(r'<td class="nowrap"><a href="[^"]*">([^<]+)</a>(?:<br />)?</td>\s*<td[^>]*>([\d,]+)</td>\s*<td[^>]*>([\d,]+)</td>')
+ROW = re.compile(
+    r'<td class="nowrap"><a href="[^"]*">([^<]+)</a>(?:<br />)?</td>\s*<td[^>]*>([\d,]+)</td>\s*<td[^>]*>([\d,]+)</td>'
+)
 PUBLISHER = "Washington Secretary of State"
 TITLE = "Primary election turnout"
 
@@ -28,13 +30,22 @@ def parse() -> None:
     rows: list[tuple[date, str, int, int]] = []
     for day in DAYS:
         page = raw.cached(SOURCE, URL.format(day=day)).path.read_text(encoding="utf-8", errors="replace")
-        found = [(county, int(registered.replace(",", "")), int(ballots.replace(",", ""))) for county, registered, ballots in ROW.findall(page)]
+        found = [
+            (county, int(registered.replace(",", "")), int(ballots.replace(",", "")))
+            for county, registered, ballots in ROW.findall(page)
+        ]
         total = re.search(r"Total</[^>]+>\s*<td[^>]*>([\d,]+)</td>\s*<td[^>]*>([\d,]+)</td>", page)
-        if len(found) != 39 or (sum(r for _, r, _ in found), sum(b for _, _, b in found)) != tuple(int(v.replace(",", "")) for v in total.groups()):
-            print(f"{day}: {len(found)} counties, sums {sum(r for _, r, _ in found)}, {sum(b for _, _, b in found)}, total {total and total.groups()}")
+        if len(found) != 39 or (sum(r for _, r, _ in found), sum(b for _, _, b in found)) != tuple(
+            int(v.replace(",", "")) for v in total.groups()
+        ):
+            print(
+                f"{day}: {len(found)} counties, sums {sum(r for _, r, _ in found)}, {sum(b for _, _, b in found)}, total {total and total.groups()}"
+            )
         rows.extend((day, county, registered, ballots) for county, registered, ballots in found)
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "county", "registered", "ballots"], orient="row").write_parquet(PARSED / "turnout.parquet")
+    pl.DataFrame(rows, schema=["day", "county", "registered", "ballots"], orient="row").write_parquet(
+        PARSED / "turnout.parquet"
+    )
     print(f"{len(rows)} county rows")
 
 
@@ -95,7 +106,9 @@ def emit() -> Path:
                 is_default=election not in held,
                 completeness=1,
             )
-            for county, registered, ballots in voters.filter(pl.col("day") == day).select("county", "registered", "ballots").iter_rows():
+            for county, registered, ballots in (
+                voters.filter(pl.col("day") == day).select("county", "registered", "ballots").iter_rows()
+            ):
                 for measure, value in ((2, registered), (3, ballots)):
                     cs.add(
                         "result_value",

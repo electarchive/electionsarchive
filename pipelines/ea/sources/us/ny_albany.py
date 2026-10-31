@@ -81,7 +81,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     for link in pages():
         page = raw.cached(SOURCE, link).path.read_text(errors="replace")
         stamp = TITLE.search(page)
-        body = re.search(r"<pre>(.*?)</pre>", page, re.S | re.I)
+        body = re.search(r"<pre>(.*?)</pre>", page, re.DOTALL | re.IGNORECASE)
         if body is None:
             continue
         if stamp:

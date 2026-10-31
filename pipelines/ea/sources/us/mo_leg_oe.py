@@ -53,7 +53,11 @@ def parse() -> None:
                 special=pl.lit(False),
                 state=pl.lit("MO"),
                 district=pl.lit(None, pl.Int16),
-                code=pl.col("county").str.strip_chars().str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips),
+                code=pl.col("county")
+                .str.strip_chars()
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(fips),
                 kind=pl.lit("county"),
                 candidate=pl.col("candidate").str.strip_chars().str.to_uppercase(),
                 measure=pl.lit(1, pl.Int16),

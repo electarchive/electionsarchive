@@ -153,9 +153,9 @@ def parse() -> None:
         }
         rows = stacked(grid, county) if sheet in STACKED else side(grid, county)
         frames.append(
-            pl.DataFrame(
-                rows, schema=["district", "code", "candidate", "writein", "votes"], orient="row"
-            ).with_columns(day=pl.lit(day), chamber=pl.lit(chamber))
+            pl.DataFrame(rows, schema=["district", "code", "candidate", "writein", "votes"], orient="row").with_columns(
+                day=pl.lit(day), chamber=pl.lit(chamber)
+            )
         )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
@@ -163,9 +163,7 @@ def parse() -> None:
         .with_columns(
             candidate=pl.when("writein")
             .then(pl.lit("WRITE-INS"))
-            .otherwise(
-                pl.col("candidate").str.replace(r"\s*(\(\w+\)|-\s*\w{1,3})$", "").str.to_uppercase()
-            ),
+            .otherwise(pl.col("candidate").str.replace(r"\s*(\(\w+\)|-\s*\w{1,3})$", "").str.to_uppercase()),
         )
         .group_by("day", "chamber", "district", "code", "candidate")
         .agg(pl.col("writein").any(), pl.col("votes").sum())

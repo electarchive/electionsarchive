@@ -1,4 +1,5 @@
 import collections
+import itertools
 import re
 from datetime import UTC, date, datetime, timedelta
 
@@ -21,26 +22,77 @@ COUNTY = {"York": "36061", "Bronx": "36005", "Kings": "36047", "Queens": "36081"
 NUMBER = re.compile(r"^\d{1,3}(,\d{3})*$")
 TOLERANCE = 0.001
 OFFICES = {
-    "lieutenant-governor": (84, 87, "lieutenant-governor:NY", "Lieutenant Governor", (
-        ("Thomas B. Lockwood", "democratic-party"), ("Edward Schoeneck", "republican-party"),
-        ("Chauncey J. Hamlin", "NY:progressive-party"), ("Stephen J. Mahoney", "NY:socialist"),
-        ("Charles E. Welch", None), ("Jeremiah D. Crowley", None))),
-    "secretary-of-state": (88, 90, "secretary-of-state:NY", "Secretary of State", (
-        ("Mitchell May", "democratic-party"), ("Francis M. Hugo", "republican-party"),
-        ("Sydney W. Stern", "NY:progressive-party"), ("Florence Cross Kitchelt", "NY:socialist"),
-        ("John R. Clements", None), ("Edmund Moonelis", None))),
-    "comptroller": (91, 93, "comptroller:NY", "Comptroller", (
-        ("William Sohmer", "democratic-party"), ("Eugene M. Travis", "republican-party"),
-        ("John B. Burnham", "NY:progressive-party"), ("Charles W. Noonan", "NY:socialist"),
-        ("Neil D. Cranmer", None), ("Charles E. Berns", None))),
-    "treasurer": (94, 96, "treasurer:NY", "Treasurer", (
-        ("Albert C. Carp", "democratic-party"), ("James L. Wells", "republican-party"),
-        ("Homer D. Call", "NY:progressive-party"), ("James C. Sheahan", "NY:socialist"),
-        ("Edward A. Packer", None), ("Anthony Houtenbrink", None))),
-    "attorney-general": (97, 99, "attorney-general:NY", "Attorney General", (
-        ("James A. Parsons", "democratic-party"), ("Egburt E. Woodbury", "republican-party"),
-        ("Robert H. Elder", "NY:progressive-party"), ("Frederick Haller", "NY:socialist"),
-        ("Walter T. Bliss", None), ("Edward R. O'Malley", None), ("John Hall", None))),
+    "lieutenant-governor": (
+        84,
+        87,
+        "lieutenant-governor:NY",
+        "Lieutenant Governor",
+        (
+            ("Thomas B. Lockwood", "democratic-party"),
+            ("Edward Schoeneck", "republican-party"),
+            ("Chauncey J. Hamlin", "NY:progressive-party"),
+            ("Stephen J. Mahoney", "NY:socialist"),
+            ("Charles E. Welch", None),
+            ("Jeremiah D. Crowley", None),
+        ),
+    ),
+    "secretary-of-state": (
+        88,
+        90,
+        "secretary-of-state:NY",
+        "Secretary of State",
+        (
+            ("Mitchell May", "democratic-party"),
+            ("Francis M. Hugo", "republican-party"),
+            ("Sydney W. Stern", "NY:progressive-party"),
+            ("Florence Cross Kitchelt", "NY:socialist"),
+            ("John R. Clements", None),
+            ("Edmund Moonelis", None),
+        ),
+    ),
+    "comptroller": (
+        91,
+        93,
+        "comptroller:NY",
+        "Comptroller",
+        (
+            ("William Sohmer", "democratic-party"),
+            ("Eugene M. Travis", "republican-party"),
+            ("John B. Burnham", "NY:progressive-party"),
+            ("Charles W. Noonan", "NY:socialist"),
+            ("Neil D. Cranmer", None),
+            ("Charles E. Berns", None),
+        ),
+    ),
+    "treasurer": (
+        94,
+        96,
+        "treasurer:NY",
+        "Treasurer",
+        (
+            ("Albert C. Carp", "democratic-party"),
+            ("James L. Wells", "republican-party"),
+            ("Homer D. Call", "NY:progressive-party"),
+            ("James C. Sheahan", "NY:socialist"),
+            ("Edward A. Packer", None),
+            ("Anthony Houtenbrink", None),
+        ),
+    ),
+    "attorney-general": (
+        97,
+        99,
+        "attorney-general:NY",
+        "Attorney General",
+        (
+            ("James A. Parsons", "democratic-party"),
+            ("Egburt E. Woodbury", "republican-party"),
+            ("Robert H. Elder", "NY:progressive-party"),
+            ("Frederick Haller", "NY:socialist"),
+            ("Walter T. Bliss", None),
+            ("Edward R. O'Malley", None),
+            ("John Hall", None),
+        ),
+    ),
 }
 OFFICE_NOTE = (
     "Assembly district returns for {office} from the Board of Elections' annual report canvass of the vote cast at the "
@@ -102,14 +154,16 @@ def parse() -> None:
                 continue
             label_cells = [t for t in small if abs(t[0] / 40 - label_bins[0]) <= 0.6]
             labels = sorted((t[1], t[2]) for t in label_cells)
-            height = sorted(b[0] - a[0] for a, b in zip(labels, labels[1:]))[len(labels) // 2]
+            height = sorted(b[0] - a[0] for a, b in itertools.pairwise(labels))[len(labels) // 2]
             filled = [labels[0]]
-            for (y0, n0), (y1, n1) in zip(labels, labels[1:]):
+            for (y0, n0), (y1, n1) in itertools.pairwise(labels):
                 rows_between = round((y1 - y0) / height)
                 if rows_between == 1:
                     filled[-1] = (y0, n1 - 1)
                 else:
-                    filled.extend((y0 + (y1 - y0) * k / rows_between, n1 - rows_between + k) for k in range(1, rows_between))
+                    filled.extend(
+                        (y0 + (y1 - y0) * k / rows_between, n1 - rows_between + k) for k in range(1, rows_between)
+                    )
                 filled.append((y1, n1))
             labels = filled
             rest = [t for t in segment if t not in set(label_cells) and t[0] > label_bins[0] * 40 + 60]
@@ -153,11 +207,14 @@ def parse() -> None:
                     if head_low <= y0 < head_high - 20 and abs(xx1 - x1) < 55 and re.match(r"[A-Za-z(]", w)
                 )
                 if before:
-                    header = " ".join(
-                        w
-                        for x0, y0, xx1, y1, w in words
-                        if low <= y0 < labels[0][0] - 20 and abs(xx1 - x1) < 55 and re.match(r"[A-Za-z(]", w)
-                    ) or header
+                    header = (
+                        " ".join(
+                            w
+                            for x0, y0, xx1, y1, w in words
+                            if low <= y0 < labels[0][0] - 20 and abs(xx1 - x1) < 55 and re.match(r"[A-Za-z(]", w)
+                        )
+                        or header
+                    )
                 for ad, column, cell in before + own:
                     if column == index:
                         rows.append((COUNTY_NAME[county], number, ad, index, cell, header))
@@ -177,7 +234,9 @@ def parse() -> None:
         for number in range(first, last + 1):
             words = [
                 (int(m[1]), int(m[2]), int(m[3]), int(m[4]), m[5].strip())
-                for m in re.finditer(r'data-coords="(\d+) (\d+) (\d+) (\d+)" class="ocrx_word">([^<]*)<', pages[number - 1])
+                for m in re.finditer(
+                    r'data-coords="(\d+) (\d+) (\d+) (\d+)" class="ocrx_word">([^<]*)<', pages[number - 1]
+                )
             ]
             lines: list[list] = []
             for word in sorted(words, key=lambda t: (t[1] + t[3]) / 2):
@@ -191,7 +250,12 @@ def parse() -> None:
                 line.sort(key=lambda t: t[0])
                 text = " ".join(t[4] for t in line)
                 for name, fips in (("Bronx", "36005"), ("Kings", "36047"), ("Queens", "36081"), ("Richmond", "36085")):
-                    if re.search(rf"\b{name}\b", text) and re.search(r"\b(County|of)\b", text) and "Total" not in text and len(text) < 60:
+                    if (
+                        re.search(rf"\b{name}\b", text)
+                        and re.search(r"\b(County|of)\b", text)
+                        and "Total" not in text
+                        and len(text) < 60
+                    ):
                         county = fips
                 numbers = [(t[2], int(t[4].replace(",", ""))) for t in line if NUMBER.match(t[4])]
                 label = re.match(r"^(\d{1,2}) \.+", text)
@@ -239,9 +303,9 @@ def parse() -> None:
                 total = sum(values.values())
                 for ad, value in values.items():
                     state.append((office, fips, column, ad, value, total, total in printed[fips]))
-    pl.DataFrame(state, schema=["office", "county", "column", "ad", "value", "sum", "tied"], orient="row").write_parquet(
-        PARSED / "offices.parquet"
-    )
+    pl.DataFrame(
+        state, schema=["office", "county", "column", "ad", "value", "sum", "tied"], orient="row"
+    ).write_parquet(PARSED / "offices.parquet")
 
 
 COUNTY_NAME = {fips: fips for fips in COUNTY.values()}
@@ -277,9 +341,20 @@ def emit():
             ).fetchall()
         }
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record", notes=NOTE)
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=URL,
+            license="Public record",
+            notes=NOTE,
+        )
         cs.artifact(
-            raw.store(SOURCE, URL, FILE.read_bytes(), suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html"),
+            raw.store(
+                SOURCE, URL, FILE.read_bytes(), suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html"
+            ),
             source,
         )
         result_set = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -385,7 +460,9 @@ def emit():
             is_default=False,
             completeness=None,
         )
-        cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE + "".join(f" Note: {c}." for c in caveats))
+        cs.add(
+            "note", entity_id=result_set, kind="methodology", body_md=NOTE + "".join(f" Note: {c}." for c in caveats)
+        )
         for unit, label, value in values:
             cs.add(
                 "result_value",
@@ -401,10 +478,6 @@ def emit():
         election_area, system = conn.execute(
             "select district_area_id, electoral_system_id from contest where id = %s", [contest]
         ).fetchone()
-        polity_path = conn.execute(
-            "select path from slug where entity_id = (select polity_id from office where id = (select office_id from contest where id = %s)) and is_current",
-            [contest],
-        ).fetchone()[0]
         for office, (_, _, office_key, label, candidates) in OFFICES.items():
             (office_id,) = conn.execute(
                 "select entity_id from external_id where scheme = 'us.office' and value = %s", [office_key]
@@ -424,7 +497,14 @@ def emit():
                 default_result_kind="counted",
                 term="full",
             )
-            cs.add("name", entity_id=office_contest, text=f"{DAY.year} New York {label} election", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=office_contest,
+                text=f"{DAY.year} New York {label} election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=f"us/ny/{DAY}-general/{office}", entity_id=office_contest)
             office_set = cs.key(f"{SOURCE}.result_set", f"{DAY}:NY:{office}")
             cs.add(
@@ -467,7 +547,9 @@ def emit():
             left = []
             for (fips, column), group in state.filter(pl.col("office") == office).group_by(["county", "column"]):
                 if not group["tied"][0]:
-                    left.append(f"{candidates[column][0]}'s column in {fips} is left out because its lines add up to {group['sum'][0]}, which no total printed for that county matches")
+                    left.append(
+                        f"{candidates[column][0]}'s column in {fips} is left out because its lines add up to {group['sum'][0]}, which no total printed for that county matches"
+                    )
                     continue
                 for ad, value in group.select("ad", "value").iter_rows():
                     code = f"{fips}:{ad:02d}"
@@ -498,7 +580,12 @@ def emit():
                         flags=0,
                         value=value,
                     )
-            cs.add("note", entity_id=office_set, kind="methodology", body_md=OFFICE_NOTE.format(office=label) + "".join(f" Note: {c}." for c in sorted(left)))
+            cs.add(
+                "note",
+                entity_id=office_set,
+                kind="methodology",
+                body_md=OFFICE_NOTE.format(office=label) + "".join(f" Note: {c}." for c in sorted(left)),
+            )
             print(office, "left out:", sorted(left))
         print(f"{len(options)} options, {len(units)} units, {len(values)} values; {caveats}")
         return cs.write()

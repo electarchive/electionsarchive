@@ -33,10 +33,13 @@ def parse() -> None:
             ).fetchall()
         }
     text = raw.cached(SOURCE, PAGE).path.read_text(errors="replace")
-    table = max(re.findall(r"<table.*?</table>", text, re.S), key=len)
+    table = max(re.findall(r"<table.*?</table>", text, re.DOTALL), key=len)
     lines = [
-        [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip() for cell in re.findall(r"<t[hd][^>]*>.*?</t[hd]>", line, re.S)]
-        for line in re.findall(r"<tr.*?</tr>", table, re.S)
+        [
+            re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
+            for cell in re.findall(r"<t[hd][^>]*>.*?</t[hd]>", line, re.DOTALL)
+        ]
+        for line in re.findall(r"<tr.*?</tr>", table, re.DOTALL)
     ]
     names = lines[0][2:-1]
     rows = []

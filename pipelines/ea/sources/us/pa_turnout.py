@@ -1,5 +1,4 @@
 import re
-import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -25,7 +24,12 @@ def fetch() -> None:
 def parse() -> None:
     text = raw.cached(SOURCE, URL).path.read_text().replace("\\r\\n", "\n").replace("\\n", "\n")
     rows = [
-        {"year": int(m[1]), "stage": "general", "registered": int(m[3].replace(",", "")), "voters": int(m[2].replace(",", ""))}
+        {
+            "year": int(m[1]),
+            "stage": "general",
+            "registered": int(m[3].replace(",", "")),
+            "voters": int(m[2].replace(",", "")),
+        }
         for m in ROW.finditer(text)
     ]
     frame = pl.DataFrame(rows).unique()
@@ -59,7 +63,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for year, stage, registered, voters in frame.select("year", "stage", "registered", "voters").iter_rows():
             found = elections.get((year, stage), [])

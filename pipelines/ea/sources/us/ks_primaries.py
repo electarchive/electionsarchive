@@ -40,11 +40,7 @@ def big_county(path: Path, sheet: str, county: str, fallback: int) -> list[tuple
         row for row in grid if any(TOTALS.match((cell or "").strip()) for cell in row[:3] if isinstance(cell, str))
     )
     columns = [i for i, cell in enumerate(total) if i > 0 and number(cell) is not None]
-    head = [
-        r
-        for r in range(6)
-        if all(grid[r][i] is not None and number(grid[r][i]) is None for i in columns)
-    ][-1]
+    head = [r for r in range(6) if all(grid[r][i] is not None and number(grid[r][i]) is None for i in columns)][-1]
     carried: list[list[str]] = []
     for r in range(head):
         seen = ""
@@ -108,9 +104,7 @@ def parse() -> None:
             if office == chamber
         ]
         if big:
-            wide = pl.DataFrame(
-                big, schema=["County", "chamber", "district", "Candidate", "Votes"], orient="row"
-            )
+            wide = pl.DataFrame(big, schema=["County", "chamber", "district", "Candidate", "Votes"], orient="row")
             frames.append(
                 wide.select(
                     year=pl.lit(day.year, pl.Int32),

@@ -94,7 +94,15 @@ def emit() -> Path:
             polity="US-MI",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=URL,
+            license="Public record",
+        )
         cs.artifact(raw.cached(SOURCE, URL), source)
         medsl.attach(cs, conn, frame, {"MI": source}, strict=True, authoritative=CITATION)
         return cs.write()

@@ -13,10 +13,27 @@ URL = "https://www.nj.gov/state/elections/assets/pdf/election-results/1997/1997-
 PUBLISHER = "New Jersey Division of Elections"
 TITLE = "Gubernatorial general election returns by county, November 4, 1997"
 COUNTIES = {
-    "Atlantic": "34001", "Bergen": "34003", "Burlington": "34005", "Camden": "34007", "Cape May": "34009",
-    "Cumberland": "34011", "Essex": "34013", "Gloucester": "34015", "Hudson": "34017", "Hunterdon": "34019",
-    "Mercer": "34021", "Middlesex": "34023", "Monmouth": "34025", "Morris": "34027", "Ocean": "34029",
-    "Passaic": "34031", "Salem": "34033", "Somerset": "34035", "Sussex": "34037", "Union": "34039", "Warren": "34041",
+    "Atlantic": "34001",
+    "Bergen": "34003",
+    "Burlington": "34005",
+    "Camden": "34007",
+    "Cape May": "34009",
+    "Cumberland": "34011",
+    "Essex": "34013",
+    "Gloucester": "34015",
+    "Hudson": "34017",
+    "Hunterdon": "34019",
+    "Mercer": "34021",
+    "Middlesex": "34023",
+    "Monmouth": "34025",
+    "Morris": "34027",
+    "Ocean": "34029",
+    "Passaic": "34031",
+    "Salem": "34033",
+    "Somerset": "34035",
+    "Sussex": "34037",
+    "Union": "34039",
+    "Warren": "34041",
 }
 COLUMNS = ["Whitman", "McGreevey", "Sabrin", "Pezzullo", "Hoffman", "Perrone", "Miller", "Pason", "Norton", "Ripa"]
 PRINTED = [1133394, 1107968, 114172, 34906, 10703, 6805, 2816, 2800, 2540, 2240]
@@ -77,6 +94,8 @@ def emit() -> Path:
         "34",
         pl.read_parquet(PARSED / "lines.parquet"),
         [raw.cached(SOURCE, URL)],
-        lambda key: "County totals were keyed from the Division of Elections' scanned two-page county returns; every column's 21 counties add up to the printed state total, and the eight candidates other than Whitman and McGreevey are pooled into Other votes.",
+        lambda key: (
+            "County totals were keyed from the Division of Elections' scanned two-page county returns; every column's 21 counties add up to the printed state total, and the eight candidates other than Whitman and McGreevey are pooled into Other votes."
+        ),
         statewide=True,
     )

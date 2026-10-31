@@ -19,7 +19,9 @@ FILES = {
     date(1992, 11, 3): "https://records.sos.state.or.us/ORSOSWebDrawer/Record/8411064/File/document",
     date(1994, 11, 8): "https://digitalcollections.library.oregon.gov/assets/downloadwiz/343327",
 }
-PAGE_1998 = "https://web.archive.org/web/20001018053233if_/http://www.sos.state.or.us/elections/nov398/other.info/usrep.htm"
+PAGE_1998 = (
+    "https://web.archive.org/web/20001018053233if_/http://www.sos.state.or.us/elections/nov398/other.info/usrep.htm"
+)
 METHOD_1998 = (
     "County totals are from the Secretary of State's official results page for the November 3, 1998 general "
     "election (Wayback Machine capture of 2000-10-18). Each candidate's county sum equals the district total printed "
@@ -37,9 +39,7 @@ def fetch() -> None:
         raw.cached(SOURCE, PAGE_1998)
     except LookupError:
         page = subprocess.run(["curl", "-sL", "-m", "120", PAGE_1998], capture_output=True, check=True).stdout
-        raw.store(
-            SOURCE, PAGE_1998, page, suffix=".htm", retrieved_at=datetime.now(UTC), media_type="text/html"
-        )
+        raw.store(SOURCE, PAGE_1998, page, suffix=".htm", retrieved_at=datetime.now(UTC), media_type="text/html")
     for url in FILES.values():
         try:
             raw.cached(SOURCE, url)

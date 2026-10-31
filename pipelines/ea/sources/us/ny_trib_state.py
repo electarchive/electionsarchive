@@ -92,15 +92,23 @@ def parse() -> None:
         for column, (name, _) in enumerate(spec["columns"]):
             total = sum(values[column] for values in data["counties"].values())
             if total != data["county_totals"][column] and total != spec["confirmed"].get(name):
-                left[name] = f"its county lines add up to {total:,} against the printed {data['county_totals'][column]:,}"
+                left[name] = (
+                    f"its county lines add up to {total:,} against the printed {data['county_totals'][column]:,}"
+                )
                 continue
             rows.extend((year, "county", county, column, values[column]) for county, values in data["counties"].items())
         for column in range(len(data["ad_totals"])):
             total = sum(values[column] for values in data["ads"].values())
             if total != data["ad_totals"][column]:
-                raise ValueError(f"{year} assembly district column {column}: {total} against {data['ad_totals'][column]}")
-            rows.extend((year, "ad", ad, spec["ad_columns"][column], values[column]) for ad, values in data["ads"].items())
-        pl.DataFrame(rows, schema=["year", "level", "unit", "column", "value"], orient="row").write_parquet(PARSED / f"{year}.parquet")
+                raise ValueError(
+                    f"{year} assembly district column {column}: {total} against {data['ad_totals'][column]}"
+                )
+            rows.extend(
+                (year, "ad", ad, spec["ad_columns"][column], values[column]) for ad, values in data["ads"].items()
+            )
+        pl.DataFrame(rows, schema=["year", "level", "unit", "column", "value"], orient="row").write_parquet(
+            PARSED / f"{year}.parquet"
+        )
         (PARSED / f"{year}-left.json").write_text(json.dumps(left))
         print(year, len(data["counties"]), "county lines,", len(data["ads"]), "assembly districts; left out:", left)
 
@@ -168,7 +176,14 @@ def emit() -> Path:
             )
             pdf = INBOX / f"{spec['volume']}.pdf"
             artifact = cs.artifact(
-                raw.store(SOURCE, url, pdf.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"),
+                raw.store(
+                    SOURCE,
+                    url,
+                    pdf.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/pdf",
+                ),
                 source,
             )
             pages = {}
@@ -177,7 +192,19 @@ def emit() -> Path:
                 if not image.exists():
                     PAGES.mkdir(parents=True, exist_ok=True)
                     subprocess.run(
-                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile", str(pdf), str(image.with_suffix(""))],
+                        [
+                            "pdftoppm",
+                            "-r",
+                            "100",
+                            "-png",
+                            "-f",
+                            str(number),
+                            "-l",
+                            str(number),
+                            "-singlefile",
+                            str(pdf),
+                            str(image.with_suffix("")),
+                        ],
                         check=True,
                     )
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
@@ -192,8 +219,24 @@ def emit() -> Path:
                     height=height,
                 )
             election = cs.key("us.election", f"{day}:NY")
-            cs.add("election", id=election, polity_id=newyork, kind="general", date_from=day, date_to=day, date_precision="day", status="held")
-            cs.add("name", entity_id=election, text=f"{year} New York general election", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "election",
+                id=election,
+                polity_id=newyork,
+                kind="general",
+                date_from=day,
+                date_to=day,
+                date_precision="day",
+                status="held",
+            )
+            cs.add(
+                "name",
+                entity_id=election,
+                text=f"{year} New York general election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=f"us/ny/{day}-general", entity_id=election)
             (office_id,) = conn.execute(
                 "select entity_id from external_id where scheme = 'us.office' and value = %s", [f"{spec['office']}:NY"]
@@ -214,7 +257,14 @@ def emit() -> Path:
                 default_result_kind="counted",
                 term="full",
             )
-            cs.add("name", entity_id=contest, text=f"{year} New York {spec['label']} election", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{year} New York {spec['label']} election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=f"us/ny/{day}-general/{spec['office']}", entity_id=contest)
             options = []
             for name, party_key in spec["columns"]:
@@ -225,9 +275,22 @@ def emit() -> Path:
                 cs.add("name", entity_id=person, text=name, lang="en", kind="official", is_preferred=True)
                 cs.add("contest_option", id=root, contest_id=contest, kind="candidate", ballot_label=name)
                 candidacy = cs.key("us.candidacy", f"{root_key}:head")
-                cs.add("candidacy", id=candidacy, person_id=person, option_id=root, role="head", ballot_name=name, is_independent=False)
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=root,
+                    role="head",
+                    ballot_name=name,
+                    is_independent=False,
+                )
                 if party_key is not None:
-                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("us.party", party_key), kind="nominated")
+                    cs.add(
+                        "candidacy_nomination",
+                        candidacy_id=candidacy,
+                        party_id=cs.key("us.party", party_key),
+                        kind="nominated",
+                    )
                 options.append(root)
             sets = {}
             for level, note in (("county", COUNTY_NOTE), ("ad", AD_NOTE)):
@@ -248,7 +311,16 @@ def emit() -> Path:
                     "note",
                     entity_id=sets[level],
                     kind="methodology",
-                    body_md=note.format(label=spec["label"], day=day, extra=spec["county_extra"] if level == "county" else spec["ad_extra"]) + ("".join(f" Note: {name}'s column is left out because {why}." for name, why in left.items()) if level == "county" else ""),
+                    body_md=note.format(
+                        label=spec["label"],
+                        day=day,
+                        extra=spec["county_extra"] if level == "county" else spec["ad_extra"],
+                    )
+                    + (
+                        "".join(f" Note: {name}'s column is left out because {why}." for name, why in left.items())
+                        if level == "county"
+                        else ""
+                    ),
                 )
             units: dict[str, object] = {}
             names = list(json.loads((INBOX / f"{year}.json").read_text())["counties"])
@@ -256,7 +328,11 @@ def emit() -> Path:
                 if level == "county":
                     plain = re.sub(r"[^a-z]", "", unit_name.lower())
                     unit = counties[plain]
-                    page = pages[spec["county_pages"][0] if names.index(unit_name) < spec["first_county_page"] else spec["county_pages"][1]]
+                    page = pages[
+                        spec["county_pages"][0]
+                        if names.index(unit_name) < spec["first_county_page"]
+                        else spec["county_pages"][1]
+                    ]
                 else:
                     code = f"36061:{int(unit_name):02d}" if unit_name != "AN" else "36061:AN"
                     if code not in units:
@@ -276,7 +352,14 @@ def emit() -> Path:
                         )
                     unit = units[code]
                     page = pages[spec["ad_page"]]
-                fact = {"result_set_id": sets[level], "unit_id": unit, "option_id": options[column], "channel": 0, "measure": 1, "count_round": 0}
+                fact = {
+                    "result_set_id": sets[level],
+                    "unit_id": unit,
+                    "option_id": options[column],
+                    "channel": 0,
+                    "measure": 1,
+                    "count_round": 0,
+                }
                 cs.add("result_value", **fact, flags=0, value=value)
                 cs.add("value_locator", **fact, page_id=page[0], source_id=None, x0=0, y0=0, x1=page[1], y1=page[2])
             print(year, len(units), "assembly districts,", frame.height, "values")

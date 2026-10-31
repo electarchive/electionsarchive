@@ -29,7 +29,10 @@ def fetch() -> None:
 
 def text(name: str) -> str:
     return subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + name).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + name).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
 
 
@@ -43,7 +46,13 @@ def parse() -> None:
             raise ValueError(name)
         for year, r, v in zip(range(first, first - 12, -2), registered[1].split(), voted[1].split()):
             rows.append(
-                {"year": year, "stage": stage, "registered": int(r.replace(",", "")), "voters": int(v.replace(",", "")), "file": name}
+                {
+                    "year": year,
+                    "stage": stage,
+                    "registered": int(r.replace(",", "")),
+                    "voters": int(v.replace(",", "")),
+                    "file": name,
+                }
             )
     for name in ("gec_ccr22_0.pdf", "gec_ccr24.pdf"):
         lines = text(name).splitlines()
@@ -106,10 +115,20 @@ def emit() -> Path:
         for name, title in REPORTS.items():
             source = cs.source(PUBLISHER, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=BASE + name, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=BASE + name,
+                    license="Public record",
+                )
             cs.artifact(raw.cached(SOURCE, BASE + name), source)
             sources[name] = source
-        for year, stage, registered, voters, name in frame.select("year", "stage", "registered", "voters", "file").iter_rows():
+        for year, stage, registered, voters, name in frame.select(
+            "year", "stage", "registered", "voters", "file"
+        ).iter_rows():
             found = elections.get((year, stage), [])
             if len(found) != 1:
                 print(f"{year} {stage}: {len(found)} elections")

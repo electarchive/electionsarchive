@@ -1,4 +1,5 @@
 import html
+import itertools
 import re
 import subprocess
 from datetime import date
@@ -23,7 +24,11 @@ TABLES = [
     (2014, "U.S. House"), (2016, "U.S. Senate & House"),
 ]  # fmt: skip
 VOTE = "https://vote.utah.gov/wp-content/uploads/2023/09/"
-FILES = {2002: "2002Gen.pdf", 2014: "2014-General-Canvass-Report-1-1.xlsx", 2016: "2016-General-Election-Statewide-Canvass.xlsx"}
+FILES = {
+    2002: "2002Gen.pdf",
+    2014: "2014-General-Canvass-Report-1-1.xlsx",
+    2016: "2016-General-Election-Statewide-Canvass.xlsx",
+}
 DAYS = {2002: date(2002, 11, 5), 2014: date(2014, 11, 4), 2016: date(2016, 11, 8)}
 NAMES = {
     (2002, 1): ['Craig Axford "G"', 'Rob Bishop "R"', 'Dave Thomas "D"', 'Susan Howard "WI"', 'Charles Johnston "WI"', 'Cody Judy "WI"'],
@@ -148,7 +153,7 @@ def parse() -> None:
             numbered = sorted(
                 (word[0], int(after[4]))
                 for line in lines[:header]
-                for word, after in zip(line, line[1:])
+                for word, after in itertools.pairwise(line)
                 if word[4] == "District" and after[4].isdigit()
             )
             for line in lines[top + 1 : header + 1]:
@@ -167,7 +172,9 @@ def parse() -> None:
                 pinned = NAMES[(year, table)]
                 if len(columns) != len(pinned):
                     raise ValueError(f"{year}: {len(columns)} columns for {len(pinned)} names")
-                columns = [(name, counties, printed) for name, (_, counties, printed) in zip(pinned, columns, strict=True)]
+                columns = [
+                    (name, counties, printed) for name, (_, counties, printed) in zip(pinned, columns, strict=True)
+                ]
             patterns = {frozenset(counties) for _, counties, _ in columns}
             widest = [pattern for pattern in patterns if not any(pattern < other for other in patterns)]
             if len(widest) != len(numbered):
@@ -188,7 +195,16 @@ def parse() -> None:
                 raise ValueError(f"{year} district {district} {name}: counties do not add up to {printed}")
             for county, (votes, box) in counties.items():
                 rows.append(
-                    (year, district, codes[county], re.sub(r'\s*"[^"]*"|\s*\((?:DEM|REP|LIB|CON|IAP|Unaffiliated|Write-in|[A-Z]+)\)', "", name), votes, bool(re.search(r'"WI"|(?i:write-in)', name)), table if box else None, *(box or (None,) * 4))
+                    (
+                        year,
+                        district,
+                        codes[county],
+                        re.sub(r'\s*"[^"]*"|\s*\((?:DEM|REP|LIB|CON|IAP|Unaffiliated|Write-in|[A-Z]+)\)', "", name),
+                        votes,
+                        bool(re.search(r'"WI"|(?i:write-in)', name)),
+                        table if box else None,
+                        *(box or (None,) * 4),
+                    )
                 )
     frame = pl.DataFrame(
         rows,
@@ -209,7 +225,9 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "district", "candidate", maintain_order=True).agg(pl.col("votes").sum(), pl.len()).rows())
+    print(
+        frame.group_by("year", "district", "candidate", maintain_order=True).agg(pl.col("votes").sum(), pl.len()).rows()
+    )
 
 
 def emit() -> Path:
@@ -251,11 +269,27 @@ def emit() -> Path:
                     height=height,
                 )
         frame = pl.read_parquet(PARSED / "counties.parquet")
-        for located, part in ((True, frame.filter(pl.col("page").is_not_null())), (False, frame.filter(pl.col("page").is_null()))):
+        for located, part in (
+            (True, frame.filter(pl.col("page").is_not_null())),
+            (False, frame.filter(pl.col("page").is_null())),
+        ):
             medsl.attach(
                 cs,
                 conn,
                 part.select(
+                    *(
+                        [
+                            pl.struct("year", "page")
+                            .map_elements(lambda key: pages[(key["year"], key["page"])], return_dtype=pl.String)
+                            .alias("page_id"),
+                            "x0",
+                            "y0",
+                            "x1",
+                            "y1",
+                        ]
+                        if located
+                        else []
+                    ),
                     year="year",
                     chamber=pl.lit("house"),
                     day=pl.col("year").map_elements(
@@ -271,19 +305,6 @@ def emit() -> Path:
                     votes="votes",
                     kind=pl.lit("county"),
                     source=pl.lit("UT"),
-                    *(
-                        [
-                            pl.struct("year", "page")
-                            .map_elements(lambda key: pages[(key["year"], key["page"])], return_dtype=pl.String)
-                            .alias("page_id"),
-                            "x0",
-                            "y0",
-                            "x1",
-                            "y1",
-                        ]
-                        if located
-                        else []
-                    ),
                 ),
                 {"UT": source},
                 strict=True,

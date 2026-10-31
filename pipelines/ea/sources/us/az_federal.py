@@ -52,15 +52,24 @@ def parse() -> None:
     rows = []
     for day, path in FILES.items():
         for row in json.loads(raw.cached(SOURCE, BASE + path).path.read_text()):
-            found = re.match(r"(U\.S\. Senator|President of the United States|U\.S\. Representative in Congress - District No\. (\d+)) \((\w+)\)", row["ContestName"])
+            found = re.match(
+                r"(U\.S\. Senator|President of the United States|U\.S\. Representative in Congress - District No\. (\d+)) \((\w+)\)",
+                row["ContestName"],
+            )
             name = row["ChoiceName"]
             if found is None or found[3] not in PARTIES or name.lower().startswith("write-in"):
                 continue
-            office = "senate" if found[1] == "U.S. Senator" else "president" if found[2] is None and found[1].startswith("President") else "house"
+            office = (
+                "senate"
+                if found[1] == "U.S. Senator"
+                else "president"
+                if found[2] is None and found[1].startswith("President")
+                else "house"
+            )
             rows.append(
                 (
                     day.year,
-                    f"{office}{":special" if office == "senate" and day.year == 2020 else ""}:{PARTIES[found[3]]}",
+                    f"{office}{':special' if office == 'senate' and day.year == 2020 else ''}:{PARTIES[found[3]]}",
                     day,
                     False,
                     "AZ",

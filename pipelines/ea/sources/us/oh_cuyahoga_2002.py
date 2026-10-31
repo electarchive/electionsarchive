@@ -54,7 +54,8 @@ def parse() -> None:
         row = re.fullmatch(r"(\d{4}) (.+?)\s{2,}((?:\d+\s*)+)", line.strip())
         if row is None:
             if re.search(r"[A-Z]{4}", line) and not re.search(
-                r"CITY|WARD|VILLAGE|TOWNSHIP|CONTINUED|CANVASS|OFFICIAL|GENERAL|RUN DATE|REPORT|VOTES|PERCENT|TOTAL", line
+                r"CITY|WARD|VILLAGE|TOWNSHIP|CONTINUED|CANVASS|OFFICIAL|GENERAL|RUN DATE|REPORT|VOTES|PERCENT|TOTAL",
+                line,
             ):
                 district = 0
             continue

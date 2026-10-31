@@ -1,6 +1,8 @@
 import os
-import re, sys
+import re
+import sys
 from pathlib import Path
+
 from PIL import Image, ImageDraw
 
 S = Path(os.environ["OR_WORK"])

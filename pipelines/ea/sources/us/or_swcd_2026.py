@@ -31,9 +31,18 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+            content = subprocess.run(
+                ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+            ).stdout
             suffix = ".pdf" if "pdf" in url else ".html"
-            raw.store(SOURCE, url, content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type="application/pdf" if suffix == ".pdf" else "text/html")
+            raw.store(
+                SOURCE,
+                url,
+                content,
+                suffix=suffix,
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf" if suffix == ".pdf" else "text/html",
+            )
 
 
 def parse() -> None:
@@ -83,7 +92,15 @@ def emit() -> Path:
         for url, publisher in PUBLISHERS.items():
             if publisher not in by_publisher:
                 by_publisher[publisher] = cs.source(publisher, TITLE)
-                cs.add("source", id=by_publisher[publisher], kind="official_body", publisher=publisher, title=TITLE, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=by_publisher[publisher],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=TITLE,
+                    url=url,
+                    license="Public record",
+                )
             sources[url] = by_publisher[publisher]
             cs.artifact(raw.cached(SOURCE, url), sources[url])
         parent = cs.key("us.election", f"{DAY}:OR")

@@ -43,11 +43,17 @@ def targets() -> dict[str, dict[str, str]]:
         if key in areas and areas[key][0] not in held:
             found[f"2014:{key}"] = {"year": "2014", "label": label, "url": url}
     held = {row["dea_code"]: row for row in units.filter(pl.col("year") == 2023).iter_rows(named=True)}
-    sheets = [f"{ni_council.EONI}{path}" for path in ni_council.links(ni_council.PAGE_2023, r'href="(/media/[^"]+\.pdf)"') if "result-sheet" in path]
+    sheets = [
+        f"{ni_council.EONI}{path}"
+        for path in ni_council.links(ni_council.PAGE_2023, r'href="(/media/[^"]+\.pdf)"')
+        if "result-sheet" in path
+    ]
     for key, (code, name, _) in areas.items():
         row = held.get(code)
         if row is not None:
-            if row["source_url"].endswith(".pdf") and ("does not add up" in (row["note"] or "") or "stops before" in (row["note"] or "")):
+            if row["source_url"].endswith(".pdf") and (
+                "does not add up" in (row["note"] or "") or "stops before" in (row["note"] or "")
+            ):
                 found[f"2023:{key}"] = {"year": "2023", "label": name, "url": row["source_url"]}
             continue
         urls = [url for url in sheets if key in ni_council.squeeze(url.rsplit("/", 1)[-1])]
@@ -170,7 +176,9 @@ def surname_first(printed: str) -> str:
     return f"{' '.join(words[:lead])}, {' '.join(words[lead:])}" if lead else name
 
 
-def read(model: str, key: str, target: dict[str, str], areas: dict[str, tuple[str, str, str]]) -> tuple[dict[str, object], list[dict[str, object]]]:
+def read(
+    model: str, key: str, target: dict[str, str], areas: dict[str, tuple[str, str, str]]
+) -> tuple[dict[str, object], list[dict[str, object]]]:
     message = json.loads(raw.cached(SOURCE, f"read:{model}:{key}").path.read_text())
     text = "".join(block["text"] for block in message["content"] if block["type"] == "text")
     sheet = json.loads(text[text.index("{") : text.rindex("}") + 1])
@@ -189,14 +197,30 @@ def read(model: str, key: str, target: dict[str, str], areas: dict[str, tuple[st
         candidate["totals"] = candidate["totals"][:width]
     exhausted = ([float(value or 0) for value in sheet["non_transferable"]] + [0.0] * width)[:width]
     valid = float(str(sheet["valid"]).replace(",", ""))
-    sums = {stage: sum(candidate["totals"][stage - 1] for candidate in candidates) + exhausted[stage - 1] for stage in range(1, width + 1)}
+    sums = {
+        stage: sum(candidate["totals"][stage - 1] for candidate in candidates) + exhausted[stage - 1]
+        for stage in range(1, width + 1)
+    }
     tied = ni_council.tie(sums, valid, len(candidates))
     if not tied:
         raise ValueError(f"stage 1 sums to {sums[1]} against {valid} valid")
     for candidate in candidates:
         candidate["totals"] = candidate["totals"][: len(tied)]
-    facts = {name: float(str(sheet[name]).replace(",", "")) for name in ("seats", "electorate", "polled", "valid", "invalid", "quota") if sheet.get(name) is not None}
-    unit, rows = ni_council.finish(int(target["year"]), re.sub(r"\s*\(XLS\)", "", target["label"]), facts, candidates, exhausted[: len(tied)], width, target["url"], areas)
+    facts = {
+        name: float(str(sheet[name]).replace(",", ""))
+        for name in ("seats", "electorate", "polled", "valid", "invalid", "quota")
+        if sheet.get(name) is not None
+    }
+    unit, rows = ni_council.finish(
+        int(target["year"]),
+        re.sub(r"\s*\(XLS\)", "", target["label"]),
+        facts,
+        candidates,
+        exhausted[: len(tied)],
+        width,
+        target["url"],
+        areas,
+    )
     for row in rows:
         row["page"] = row["x0"] = row["y0"] = row["x1"] = row["y1"] = None
         if row["number"] > 0 and sizes:
@@ -204,9 +228,23 @@ def read(model: str, key: str, target: dict[str, str], areas: dict[str, tuple[st
             page = int(located.get("page") or 1)
             _, pixel_width, pixel_height = sizes[min(page, len(sizes)) - 1]
             x0, y0, x1, y1 = located["bbox"]
-            row |= {"page": page, "x0": x0 / 1000 * pixel_width, "y0": y0 / 1000 * pixel_height, "x1": x1 / 1000 * pixel_width, "y1": y1 / 1000 * pixel_height}
+            row |= {
+                "page": page,
+                "x0": x0 / 1000 * pixel_width,
+                "y0": y0 / 1000 * pixel_height,
+                "x1": x1 / 1000 * pixel_width,
+                "y1": y1 / 1000 * pixel_height,
+            }
     if sizes:
-        unit["note"] = " ".join(filter(None, [unit["note"], "Each value's box is the candidate's whole row on the scanned sheet, the same for every stage; the model read rows, not cells."]))
+        unit["note"] = " ".join(
+            filter(
+                None,
+                [
+                    unit["note"],
+                    "Each value's box is the candidate's whole row on the scanned sheet, the same for every stage; the model read rows, not cells.",
+                ],
+            )
+        )
     unit["reader"] = model
     return unit, rows
 

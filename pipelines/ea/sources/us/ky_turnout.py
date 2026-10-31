@@ -15,7 +15,14 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Kentucky State Board of Elections"
 BASE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Statistics/turnout"
-DIRS = {1980: "1980-1985", 1986: "1986-1990", 1991: "1991-1995", 1996: "1996-2000", 2001: "2001-2005", 2006: "2006-2010"}
+DIRS = {
+    1980: "1980-1985",
+    1986: "1986-1990",
+    1991: "1991-1995",
+    1996: "1996-2000",
+    2001: "2001-2005",
+    2006: "2006-2010",
+}
 YEARS = {
     "gen": [*range(1982, 1996), 1996, 1998, 1999, 2000, 2002, 2003, 2004, 2006, 2007, 2008, 2010],
     "pri": [*range(1982, 1996), 1996, 1998, 1999, 2000, 2002, 2003, 2004, 2006, 2007, 2008, 2010],
@@ -49,7 +56,12 @@ def fetch() -> None:
             response = httpx.get(address, headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=60)
             response.raise_for_status()
             raw.store(
-                SOURCE, address, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+                SOURCE,
+                address,
+                response.content,
+                suffix=".pdf",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf",
             )
 
 
@@ -61,7 +73,9 @@ def parse() -> None:
     for stage, years in YEARS.items():
         for year in years:
             path = raw.cached(SOURCE, url(stage, year)).path
-            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            ).stdout
             seen = set()
             for line in text.splitlines():
                 match = ROW.match(line)
@@ -72,11 +86,23 @@ def parse() -> None:
                     print(f"{stage} {year} {match[1]}: {numbers}")
                     continue
                 seen.add(codes[plain(match[1])])
-                rows.append({"year": year, "stage": stage, "code": codes[plain(match[1])], "registered": numbers[0], "voters": numbers[1]})
+                rows.append(
+                    {
+                        "year": year,
+                        "stage": stage,
+                        "code": codes[plain(match[1])],
+                        "registered": numbers[0],
+                        "voters": numbers[1],
+                    }
+                )
     frame = pl.DataFrame(rows)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "stage").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("stage", "year"))
+    print(
+        frame.group_by("year", "stage")
+        .agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum())
+        .sort("stage", "year")
+    )
 
 
 def emit() -> Path:

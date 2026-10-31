@@ -51,8 +51,14 @@ EDITIONS = (
         "2022 Ballot Questions, New York City Racial Justice Commission",
         ADOPTED,
         (
-            ("Ballot Question #1: Add a Statement of Values to Guide Government", "add-a-statement-of-values-to-guide-government"),
-            ("Ballot Question #2: Establish a Racial Equity Office, Plan, and Commission", "establish-a-racial-equity-office-plan-and-commis"),
+            (
+                "Ballot Question #1: Add a Statement of Values to Guide Government",
+                "add-a-statement-of-values-to-guide-government",
+            ),
+            (
+                "Ballot Question #2: Establish a Racial Equity Office, Plan, and Commission",
+                "establish-a-racial-equity-office-plan-and-commis",
+            ),
             ("Ballot Question #3: Measure the True Cost of Living", "measure-the-true-cost-of-living"),
         ),
     ),
@@ -69,7 +75,10 @@ EDITIONS = (
                 "Ballot Question 3 Additional Estimates of the Cost of Proposed Laws and Updates to Budget Deadlines",
                 "additional-estimates-of-the-cost-of-proposed-law",
             ),
-            ("Ballot Question 4 More Notice and Time Before Votes on Public Safety Legislation", "more-notice-and-time-before-votes-on-public-safe"),
+            (
+                "Ballot Question 4 More Notice and Time Before Votes on Public Safety Legislation",
+                "more-notice-and-time-before-votes-on-public-safe",
+            ),
             ("Ballot Question 5 Capital Planning", "capital-planning"),
             (
                 "Ballot Question 6 Minority and Women-Owned Business Enterprises (MWBEs), Film Permits, and Archive Review Boards",
@@ -85,13 +94,22 @@ EDITIONS = (
         "Appendix A, Adopted Questions, 2025 New York City Charter Revision Commission",
         r"(?:“No” leaves [^.]*\.)",
         (
-            ("Question 2 Proposed Charter Amendment: Fast Track Affordable Housing to Build More Affordable Housing Across the City", "proposed-charter-amendment-fast-track-affordable"),
-            ("Question 3 Proposed Charter Amendment: Simplify Review of Modest Housing and Infrastructure Projects", "proposed-charter-amendment-simplify-review-of-mo"),
+            (
+                "Question 2 Proposed Charter Amendment: Fast Track Affordable Housing to Build More Affordable Housing Across the City",
+                "proposed-charter-amendment-fast-track-affordable",
+            ),
+            (
+                "Question 3 Proposed Charter Amendment: Simplify Review of Modest Housing and Infrastructure Projects",
+                "proposed-charter-amendment-simplify-review-of-mo",
+            ),
             (
                 "Question 4 Proposed Charter Amendment: Establish an Affordable Housing Appeals Board with Council, Borough, and Citywide Representation",
                 "proposed-charter-amendment-establish-an-affordab",
             ),
-            ("Question 5 Proposed Charter Amendment: Create a Digital City Map to Modernize City Operations", "proposed-charter-amendment-create-a-digital-city"),
+            (
+                "Question 5 Proposed Charter Amendment: Create a Digital City Map to Modernize City Operations",
+                "proposed-charter-amendment-create-a-digital-city",
+            ),
             (
                 "Question 6 Proposed Charter Amendment: Move Local Elections to Presidential Election Years to Increase Voter Participation",
                 "proposed-charter-amendment-move-local-elections",
@@ -119,11 +137,21 @@ def emit() -> Path:
         placed = 0
         for day, pdf, url, publisher, title, end, questions in EDITIONS:
             text = " ".join(
-                subprocess.run(["pdftotext", str(INBOX / pdf), "-"], capture_output=True, text=True, check=True).stdout.split()
+                subprocess.run(
+                    ["pdftotext", str(INBOX / pdf), "-"], capture_output=True, text=True, check=True
+                ).stdout.split()
             )
             source = cs.source(publisher, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
             for heading, name in questions:
                 head = re.search(r"\s+".join(re.escape(word) for word in heading.split()), text)
                 if head is None:

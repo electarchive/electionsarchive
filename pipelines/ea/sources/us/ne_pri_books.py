@@ -2,6 +2,7 @@ import csv
 import io
 import itertools
 import json
+import math
 import re
 import statistics
 import subprocess
@@ -11,8 +12,8 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import UUID
 
-import polars as pl
 import numpy as np
+import polars as pl
 from PIL import Image
 
 from ea import raw
@@ -126,7 +127,7 @@ def settle(year: int) -> list[dict[str, object]]:
         rows = {plain(k): (k, v) for k, v in second["rows"].items()}
         table: dict[str, list[int]] = {}
         for county, a in first["rows"].items():
-            label, b = rows[plain(county)]
+            _label, b = rows[plain(county)]
             merged = []
             for index, (x, y) in enumerate(zip(a, b, strict=True)):
                 fix = FIXES.get((year, first["page"], first.get("group"), plain(county), index))
@@ -213,9 +214,7 @@ def boxes(
             raise ValueError(f"{table['where']}: only {len(rows_y)} county labels found")
         prior, group_counties = rows_y, counties
         pairs = [(i, rows_y[c]) for i, c in enumerate(counties) if c in rows_y]
-        pitch = statistics.median(
-            (y2 - y1) / (i2 - i1) for (i1, y1), (i2, y2) in zip(pairs, pairs[1:], strict=False) if i2 != i1
-        )
+        pitch = statistics.median((y2 - y1) / (i2 - i1) for (i1, y1), (i2, y2) in itertools.pairwise(pairs) if i2 != i1)
         top = statistics.median(y - pitch * i for i, y in pairs)
         columns = len(table["columns"])
         edges: list[float] = []
@@ -239,14 +238,12 @@ def boxes(
                 edges.append(float("nan"))
         char = statistics.median((t[2] - t[0]) / len(t[4]) for t in numbers)
         for column in range(columns):
-            if edges[column] != edges[column]:
-                known = [e for e in edges if e == e]
+            if math.isnan(edges[column]):
+                known = [e for e in edges if not math.isnan(e)]
                 if not known:
                     band = [t[2] for t in numbers if top - pitch < (t[1] + t[3]) / 2 < top + len(counties) * pitch]
                     known = [statistics.median(band)]
-                step = (
-                    statistics.median(b - a for a, b in zip(known, known[1:], strict=False)) if len(known) > 1 else 90
-                )
+                step = statistics.median(b - a for a, b in itertools.pairwise(known)) if len(known) > 1 else 90
                 edges[column] = (edges[column - 1] if column else known[0] - step) + step
         for column in range(columns):
             for i, county in enumerate(counties):
@@ -322,7 +319,9 @@ def gridboxes(
             bands = round((piece[-1] - piece[0]) / pitch)
             if bands != len(piece) - 1:
                 piece = list(np.linspace(piece[0], piece[-1], bands + 1))
-            share = dark[int(piece[max(len(piece) - 5, 0)]) : int(piece[-1]) + 1, span["x0"] : span["x1"] + 1].mean(axis=0)
+            share = dark[int(piece[max(len(piece) - 5, 0)]) : int(piece[-1]) + 1, span["x0"] : span["x1"] + 1].mean(
+                axis=0
+            )
             groups: list[list[int]] = []
             for x in np.flatnonzero(share > 0.8) + span["x0"]:
                 if groups and x - groups[-1][-1] <= 4:

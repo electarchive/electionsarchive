@@ -29,11 +29,17 @@ def emit() -> Path:
     for url in URLS:
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-        reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
+        reader = shapefile.Reader(
+            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+        )
         records += [
             (str(record["GEOID"]), str(record["NAME"]), json.dumps(shape.__geo_interface__))
             for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True)
-            if record is not None and shape is not None and record["STATEFP"] in STATES and (record["STATEFP"] == "34" or "_scsd_" not in url) and not str(record["GEOID"]).endswith(("99997", "99999"))
+            if record is not None
+            and shape is not None
+            and record["STATEFP"] in STATES
+            and (record["STATEFP"] == "34" or "_scsd_" not in url)
+            and not str(record["GEOID"]).endswith(("99997", "99999"))
         ]
     with connect() as conn:
         shapes = pl.DataFrame(
@@ -42,14 +48,20 @@ def emit() -> Path:
                    from (select code, name, st_multi(st_collectionextract(st_makevalid(st_transform(
                            st_setsrid(st_geomfromgeojson(geojson), 4269), 4326)), 3)) as geom
                          from unnest(%s::text[], %s::text[], %s::text[]) as f(code, name, geojson)) shapes""",
-                [[code for code, _, _ in records], [name for _, name, _ in records], [geojson for _, _, geojson in records]],
+                [
+                    [code for code, _, _ in records],
+                    [name for _, name, _ in records],
+                    [geojson for _, _, geojson in records],
+                ],
             ).fetchall(),
             schema=["code", "name", "geom", "point"],
             orient="row",
         )
         taken = {
             path
-            for (path,) in conn.execute("select path from slug where path like 'us/tn/%%' or path like 'us/nj/%%'").fetchall()
+            for (path,) in conn.execute(
+                "select path from slug where path like 'us/tn/%%' or path like 'us/nj/%%'"
+            ).fetchall()
         }
         cs = Changeset(
             conn,
@@ -89,7 +101,9 @@ def emit() -> Path:
             cs.add("area", id=area, scheme_code="us.school_district")
             cs.add("area_code", area_id=area, code=code, valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", code[:2]))
-            cs.add("name", entity_id=area, text=f"{text}, {abbreviation}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name", entity_id=area, text=f"{text}, {abbreviation}", lang="en", kind="official", is_preferred=True
+            )
             cs.add("polity_territory", polity_id=polity, area_id=area)
             cs.add(
                 "area_geometry",

@@ -35,7 +35,7 @@ def listing(election: str) -> list[dict]:
 
 
 def fetch() -> None:
-    for election, day in ELECTIONS.items():
+    for election in ELECTIONS:
         for item in listing(election):
             if any(race.match(item["name"][0]["text"]) for race in RACES):
                 raw.fetch(SOURCE, f"{API}{election}/ballot-items/{item['id']}", suffix=".json")

@@ -1,10 +1,12 @@
+import csv
 import os
-import csv, re, sys
+import re
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
-from words import ocr, group, strips, region
-from parsers import check, S, save
+from parsers import S, check, save
+from words import group, ocr, region, strips
 
 D = Path(sys.argv[1])
 NUM = re.compile(r"^\d[\d,]*$")
@@ -31,8 +33,9 @@ def reconcile(c, mode="row", left=0.3, top=0.0):
             W, H = im.size
             crop = im.convert("L").crop((int(x0 * W), int(y0 * H), int(x1 * W), int(y1 * H)))
             crop = crop.resize((crop.width * 4, crop.height * 4))
-            from PIL import ImageFilter, ImageOps
             import subprocess
+
+            from PIL import ImageFilter, ImageOps
 
             vr, tr = [], []
             for vi, img in enumerate(
@@ -46,12 +49,13 @@ def reconcile(c, mode="row", left=0.3, top=0.0):
                 path = S / "img/cells" / f"{c}-{ip}-{x0}-{y0}-v{vi}.png"
                 path.parent.mkdir(exist_ok=True)
                 ImageOps.expand(img, 40, 255).save(path)
-                subprocess.run([str(S / "vision/vision"), str(path)], capture_output=True)
+                subprocess.run([str(S / "vision/vision"), str(path)], capture_output=True, check=False)
                 vtoks = [l.split("\t")[0].strip() for l in Path(str(path) + ".vision.tsv").read_text().splitlines()]
                 tes = subprocess.run(
                     ["tesseract", str(path), "-", "--psm", "7", "-c", "tessedit_char_whitelist=0123456789,"],
                     capture_output=True,
                     text=True,
+                    check=False,
                 ).stdout.strip()
                 vr.extend(norm(t) for t in vtoks if t)
                 tr.append(norm(tes) if tes else None)

@@ -133,11 +133,25 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
-        schema=["year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein", "votes", "kind", "source"],
+        schema=[
+            "year",
+            "chamber",
+            "day",
+            "special",
+            "state",
+            "district",
+            "code",
+            "candidate",
+            "measure",
+            "writein",
+            "votes",
+            "kind",
+            "source",
+        ],
         orient="row",
-    ).with_columns(pl.col("year").cast(pl.Int32), pl.col("district").cast(pl.Int16), pl.col("measure").cast(pl.Int16)).write_parquet(
-        PARSED / "counties.parquet"
-    )
+    ).with_columns(
+        pl.col("year").cast(pl.Int32), pl.col("district").cast(pl.Int16), pl.col("measure").cast(pl.Int16)
+    ).write_parquet(PARSED / "counties.parquet")
 
 
 def emit() -> Path:

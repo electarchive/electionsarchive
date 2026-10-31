@@ -80,27 +80,107 @@ AZ_2022 = {
     "129": ("Relating to initiative measures", "Legislative Referendum", True),
     "130": ("Relating to property tax exemptions", "Legislative Referendum", True),
     "131": ("Relating to the executive department", "Legislative Referendum", True),
-    "132": ("Relating to initiative and referendum measures (60% approval for tax proposals)", "Legislative Referendum", True),
+    "132": (
+        "Relating to initiative and referendum measures (60% approval for tax proposals)",
+        "Legislative Referendum",
+        True,
+    ),
     "209": ("Relating to predatory debt collection protection", "Initiative", True),
-    "211": ("Relating to the disclosure of the original source of monies used for campaign media spending", "Initiative", True),
+    "211": (
+        "Relating to the disclosure of the original source of monies used for campaign media spending",
+        "Initiative",
+        True,
+    ),
     "308": ("Relating to the classification of students for tuition purposes", "Legislative Referendum", True),
     "309": ("Relating to voter identification", "Legislative Referendum", False),
     "310": ("Relating to taxation benefitting fire districts", "Legislative Referendum", False),
 }
 NY = "https://web.archive.org/web/{}id_/https://www.elections.ny.gov/NYSBOE/elections/{}"
 NY_MEASURES = {
-    (date(2014, 11, 4), "1"): ("Proposal 1", "Revising the state's redistricting procedure", True, "20221110162420", "2014/general/2014GeneralElectionProp1.xlsx"),
-    (date(2014, 11, 4), "2"): ("Proposal 2", "Permitting electronic distribution of state legislative bills", True, "20221110162406", "2014/general/2014GeneralElectionProp2.xlsx"),
-    (date(2014, 11, 4), "3"): ("Proposal 3", "The Smart Schools Bond Act of 2014", True, "20221110162404", "2014/general/2014GeneralElectionProp3.xlsx"),
-    (date(2017, 11, 7), "1"): ("Proposal 1", "Constitutional convention", False, "20210424131033", "2017/general/2017GeneralElectionProp1.xls"),
-    (date(2017, 11, 7), "2"): ("Proposal 2", "Allowing the complete or partial forfeiture of a public officer's pension if convicted of a certain type of felony", True, "20210424131041", "2017/general/2017GeneralElectionProp2.xls"),
-    (date(2017, 11, 7), "3"): ("Proposal 3", "Authorizing the use of forest preserve land for specified purposes", True, "20210424131048", "2017/general/2017GeneralElectionProp3.xls"),
-    (date(2021, 11, 2), "1"): ("Proposition 1", "Amending the apportionment and redistricting process", False, "20230111005827", "2021/General/GE2021_BallotProp1.xlsx"),
-    (date(2021, 11, 2), "2"): ("Proposition 2", "Right to clean air, clean water, and a healthful environment", True, "20230111005839", "2021/General/GE2021_BallotProp2.xlsx"),
-    (date(2021, 11, 2), "3"): ("Proposition 3", "Eliminating the ten-day advance voter registration requirement", False, "20230111005849", "2021/General/GE2021_BallotProp3.xlsx"),
-    (date(2021, 11, 2), "4"): ("Proposition 4", "Authorizing no-excuse absentee ballot voting", False, "20230111005854", "2021/General/GE2021_BallotProp4.xlsx"),
-    (date(2021, 11, 2), "5"): ("Proposition 5", "Increasing the jurisdiction of the New York City Civil Court", True, "20230111005858", "2021/General/GE2021_BallotProp5.xlsx"),
-    (date(2022, 11, 8), "1"): ("Proposition 1", "Clean Water, Clean Air, and Green Jobs Environmental Bond Act of 2022", True, "20230427193813", "2022/General/2022proposition1Results.xlsx"),
+    (date(2014, 11, 4), "1"): (
+        "Proposal 1",
+        "Revising the state's redistricting procedure",
+        True,
+        "20221110162420",
+        "2014/general/2014GeneralElectionProp1.xlsx",
+    ),
+    (date(2014, 11, 4), "2"): (
+        "Proposal 2",
+        "Permitting electronic distribution of state legislative bills",
+        True,
+        "20221110162406",
+        "2014/general/2014GeneralElectionProp2.xlsx",
+    ),
+    (date(2014, 11, 4), "3"): (
+        "Proposal 3",
+        "The Smart Schools Bond Act of 2014",
+        True,
+        "20221110162404",
+        "2014/general/2014GeneralElectionProp3.xlsx",
+    ),
+    (date(2017, 11, 7), "1"): (
+        "Proposal 1",
+        "Constitutional convention",
+        False,
+        "20210424131033",
+        "2017/general/2017GeneralElectionProp1.xls",
+    ),
+    (date(2017, 11, 7), "2"): (
+        "Proposal 2",
+        "Allowing the complete or partial forfeiture of a public officer's pension if convicted of a certain type of felony",
+        True,
+        "20210424131041",
+        "2017/general/2017GeneralElectionProp2.xls",
+    ),
+    (date(2017, 11, 7), "3"): (
+        "Proposal 3",
+        "Authorizing the use of forest preserve land for specified purposes",
+        True,
+        "20210424131048",
+        "2017/general/2017GeneralElectionProp3.xls",
+    ),
+    (date(2021, 11, 2), "1"): (
+        "Proposition 1",
+        "Amending the apportionment and redistricting process",
+        False,
+        "20230111005827",
+        "2021/General/GE2021_BallotProp1.xlsx",
+    ),
+    (date(2021, 11, 2), "2"): (
+        "Proposition 2",
+        "Right to clean air, clean water, and a healthful environment",
+        True,
+        "20230111005839",
+        "2021/General/GE2021_BallotProp2.xlsx",
+    ),
+    (date(2021, 11, 2), "3"): (
+        "Proposition 3",
+        "Eliminating the ten-day advance voter registration requirement",
+        False,
+        "20230111005849",
+        "2021/General/GE2021_BallotProp3.xlsx",
+    ),
+    (date(2021, 11, 2), "4"): (
+        "Proposition 4",
+        "Authorizing no-excuse absentee ballot voting",
+        False,
+        "20230111005854",
+        "2021/General/GE2021_BallotProp4.xlsx",
+    ),
+    (date(2021, 11, 2), "5"): (
+        "Proposition 5",
+        "Increasing the jurisdiction of the New York City Civil Court",
+        True,
+        "20230111005858",
+        "2021/General/GE2021_BallotProp5.xlsx",
+    ),
+    (date(2022, 11, 8), "1"): (
+        "Proposition 1",
+        "Clean Water, Clean Air, and Green Jobs Environmental Bond Act of 2022",
+        True,
+        "20230427193813",
+        "2022/General/2022proposition1Results.xlsx",
+    ),
 }
 AZ_RECOUNTS = {(date(2010, 11, 2), "112"): "2010/GeneralRecount/Canvass2010Prop112.pdf"}
 AZ_COUNTIES = (
@@ -152,30 +232,114 @@ WA_BILLS = {"2901": "53", "2969": "51"}
 WA_RESULTS = "https://results.vote.wa.gov/results/"
 WA_DATES = ("20071106", "20081104", "20091103", "20101102", "20111108", "20121106", "20221108")
 DERIVED_HAND = {
-    (date(2012, 11, 6), "1185"): ("Initiative 1185", "Concerning tax and fee increases imposed by state government", "Initiative"),
-    (date(2012, 11, 6), "1240"): ("Initiative 1240", "Concerning the creation of a public charter school system", "Initiative"),
-    (date(2012, 11, 6), "74"): ("Referendum Measure 74", "Concerning marriage for same-sex couples", "Popular Referendum"),
+    (date(2012, 11, 6), "1185"): (
+        "Initiative 1185",
+        "Concerning tax and fee increases imposed by state government",
+        "Initiative",
+    ),
+    (date(2012, 11, 6), "1240"): (
+        "Initiative 1240",
+        "Concerning the creation of a public charter school system",
+        "Initiative",
+    ),
+    (date(2012, 11, 6), "74"): (
+        "Referendum Measure 74",
+        "Concerning marriage for same-sex couples",
+        "Popular Referendum",
+    ),
     (date(2012, 11, 6), "502"): ("Initiative 502", "Concerning marijuana", "Initiative"),
-    (date(2012, 11, 6), "8221"): ("SJR 8221", "Concerning implementing the Commission on State Debt recommendations regarding Washington's debt limit", "Legislative Referendum"),
-    (date(2012, 11, 6), "8223"): ("SJR 8223", "Concerning investments by the University of Washington and Washington State University", "Legislative Referendum"),
-    (date(2012, 11, 6), "1"): ("Advisory Vote 1", "Concerning a B&O tax deduction for certain financial institutions' interest on residential loans (ESSB 6635)", "Advisory Vote"),
-    (date(2012, 11, 6), "2"): ("Advisory Vote 2", "Concerning expiration of a tax on possession of petroleum products (SHB 2590)", "Advisory Vote"),
+    (date(2012, 11, 6), "8221"): (
+        "SJR 8221",
+        "Concerning implementing the Commission on State Debt recommendations regarding Washington's debt limit",
+        "Legislative Referendum",
+    ),
+    (date(2012, 11, 6), "8223"): (
+        "SJR 8223",
+        "Concerning investments by the University of Washington and Washington State University",
+        "Legislative Referendum",
+    ),
+    (date(2012, 11, 6), "1"): (
+        "Advisory Vote 1",
+        "Concerning a B&O tax deduction for certain financial institutions' interest on residential loans (ESSB 6635)",
+        "Advisory Vote",
+    ),
+    (date(2012, 11, 6), "2"): (
+        "Advisory Vote 2",
+        "Concerning expiration of a tax on possession of petroleum products (SHB 2590)",
+        "Advisory Vote",
+    ),
     (date(2022, 11, 8), "39"): ("Advisory Vote 39", "Concerning the aircraft fuel tax (ESSB 5974)", "Advisory Vote"),
-    (date(2022, 12, 10), "1"): ("Amendment No. 1", "Requires U.S. citizenship in order to register and vote in Louisiana", "Legislative Referendum"),
-    (date(2022, 12, 10), "2"): ("Amendment No. 2", "Requires Senate confirmation of gubernatorially appointed members of the State Civil Service Commission", "Legislative Referendum"),
-    (date(2022, 12, 10), "3"): ("Amendment No. 3", "Requires Senate confirmation of certain members of the State Police Commission", "Legislative Referendum"),
-    (date(2022, 11, 8), "111"): ("Measure 111", "State must ensure affordable healthcare access, balanced against requirement to fund schools, other essential services", "Legislative Referendum"),
-    (date(2022, 11, 8), "112"): ("Measure 112", "Removes language allowing slavery and involuntary servitude as punishment for crime", "Legislative Referendum"),
-    (date(2022, 11, 8), "113"): ("Measure 113", "Legislators with ten unexcused absences from floor sessions disqualified from holding next term of office", "Legislative Referendum"),
-    (date(2022, 11, 8), "114"): ("Measure 114", "Requires permit to acquire firearms; police maintain permit/firearm database; criminally prohibits certain ammunition magazines", "Initiative"),
-    (date(2022, 11, 8), "1"): ("Question 1", "Court of Appeals and Court of Special Appeals: renaming", "Legislative Referendum"),
-    (date(2022, 11, 8), "2"): ("Question 2", "Eligibility to serve as a state senator or delegate: place of abode", "Legislative Referendum"),
+    (date(2022, 12, 10), "1"): (
+        "Amendment No. 1",
+        "Requires U.S. citizenship in order to register and vote in Louisiana",
+        "Legislative Referendum",
+    ),
+    (date(2022, 12, 10), "2"): (
+        "Amendment No. 2",
+        "Requires Senate confirmation of gubernatorially appointed members of the State Civil Service Commission",
+        "Legislative Referendum",
+    ),
+    (date(2022, 12, 10), "3"): (
+        "Amendment No. 3",
+        "Requires Senate confirmation of certain members of the State Police Commission",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "111"): (
+        "Measure 111",
+        "State must ensure affordable healthcare access, balanced against requirement to fund schools, other essential services",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "112"): (
+        "Measure 112",
+        "Removes language allowing slavery and involuntary servitude as punishment for crime",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "113"): (
+        "Measure 113",
+        "Legislators with ten unexcused absences from floor sessions disqualified from holding next term of office",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "114"): (
+        "Measure 114",
+        "Requires permit to acquire firearms; police maintain permit/firearm database; criminally prohibits certain ammunition magazines",
+        "Initiative",
+    ),
+    (date(2022, 11, 8), "1"): (
+        "Question 1",
+        "Court of Appeals and Court of Special Appeals: renaming",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "2"): (
+        "Question 2",
+        "Eligibility to serve as a state senator or delegate: place of abode",
+        "Legislative Referendum",
+    ),
     (date(2022, 11, 8), "3"): ("Question 3", "Civil jury trials: amount in controversy", "Legislative Referendum"),
-    (date(2022, 11, 8), "4"): ("Question 4", "Legalization of adult use and possession of cannabis", "Legislative Referendum"),
-    (date(2022, 11, 8), "5"): ("Question 5", "Circuit Court for Howard County: judges sitting as the Orphans' Court", "Legislative Referendum"),
-    (date(2012, 11, 6), "A"): ("Constitutional Amendment A", "Deposit of severance tax revenue into the Permanent State Trust Fund", "Legislative Referendum"),
-    (date(2012, 11, 6), "B"): ("Constitutional Amendment B", "Property tax exemption for military personnel on active duty", "Legislative Referendum"),
-    (date(2022, 11, 8), "40"): ("Advisory Vote 40", "Concerning premiums for transportation network company drivers' workers' compensation (ESHB 2076)", "Advisory Vote"),
+    (date(2022, 11, 8), "4"): (
+        "Question 4",
+        "Legalization of adult use and possession of cannabis",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "5"): (
+        "Question 5",
+        "Circuit Court for Howard County: judges sitting as the Orphans' Court",
+        "Legislative Referendum",
+    ),
+    (date(2012, 11, 6), "A"): (
+        "Constitutional Amendment A",
+        "Deposit of severance tax revenue into the Permanent State Trust Fund",
+        "Legislative Referendum",
+    ),
+    (date(2012, 11, 6), "B"): (
+        "Constitutional Amendment B",
+        "Property tax exemption for military personnel on active duty",
+        "Legislative Referendum",
+    ),
+    (date(2022, 11, 8), "40"): (
+        "Advisory Vote 40",
+        "Concerning premiums for transportation network company drivers' workers' compensation (ESHB 2076)",
+        "Advisory Vote",
+    ),
 }
 WA_COUNTIES = (
     "Adams",
@@ -293,41 +457,113 @@ OR_ABSTRACTS = {
 }
 MI = "https://web.archive.org/web/2id_/https://mielections.us/election/results/DATA/{}_MI_CENR_BY_COUNTY.xls"
 MI_PROPOSALS = {
-    ("2004GEN", "04-1"): ("Constitutional amendment requiring voter approval of gambling and lottery expansion", "Initiative"),
-    ("2004GEN", "04-2"): ("Constitutional amendment recognizing marriage as between one man and one woman", "Initiative"),
-    ("2006GEN", "06-1"): ("Constitutional amendment dedicating use of conservation and recreation funds", "Legislative Referendum"),
+    ("2004GEN", "04-1"): (
+        "Constitutional amendment requiring voter approval of gambling and lottery expansion",
+        "Initiative",
+    ),
+    ("2004GEN", "04-2"): (
+        "Constitutional amendment recognizing marriage as between one man and one woman",
+        "Initiative",
+    ),
+    ("2006GEN", "06-1"): (
+        "Constitutional amendment dedicating use of conservation and recreation funds",
+        "Legislative Referendum",
+    ),
     ("2006GEN", "06-2"): ("Constitutional amendment banning affirmative action programs", "Initiative"),
-    ("2006GEN", "06-3"): ("Referendum on Public Act 160 of 2005, the mourning dove hunting season", "Popular Referendum"),
+    ("2006GEN", "06-3"): (
+        "Referendum on Public Act 160 of 2005, the mourning dove hunting season",
+        "Popular Referendum",
+    ),
     ("2006GEN", "06-4"): ("Constitutional amendment restricting the use of eminent domain", "Legislative Referendum"),
     ("2006GEN", "06-5"): ("Constitutional amendment establishing mandatory school funding", "Initiative"),
     ("2008GEN", "08-1"): ("Initiated law allowing the medical use of marijuana", "Initiative"),
     ("2008GEN", "08-2"): ("Constitutional amendment on human embryonic stem cell research", "Initiative"),
     ("2010GEN", "10-1"): ("Question on convening a constitutional convention", "Legislative Referendum"),
-    ("2010GEN", "10-2"): ("Constitutional amendment banning felons from certain public offices and positions", "Legislative Referendum"),
+    ("2010GEN", "10-2"): (
+        "Constitutional amendment banning felons from certain public offices and positions",
+        "Legislative Referendum",
+    ),
     ("2012GEN", "12-1"): ("Referendum on Public Act 4 of 2011, the Emergency Manager Law", "Popular Referendum"),
     ("2012GEN", "12-2"): ("Constitutional amendment protecting collective bargaining rights", "Initiative"),
     ("2012GEN", "12-3"): ("Constitutional amendment establishing a renewable energy standard", "Initiative"),
     ("2012GEN", "12-4"): ("Constitutional amendment establishing the Michigan Quality Home Care Council", "Initiative"),
-    ("2012GEN", "12-5"): ("Constitutional amendment requiring a two-thirds legislative vote or voter approval for new taxes", "Initiative"),
-    ("2012GEN", "12-6"): ("Constitutional amendment requiring voter approval for new international bridges and tunnels", "Initiative"),
+    ("2012GEN", "12-5"): (
+        "Constitutional amendment requiring a two-thirds legislative vote or voter approval for new taxes",
+        "Initiative",
+    ),
+    ("2012GEN", "12-6"): (
+        "Constitutional amendment requiring voter approval for new international bridges and tunnels",
+        "Initiative",
+    ),
     ("2014PRI", "14-1"): ("Referendum on Public Act 80 of 2014", "Popular Referendum"),
     ("2014GEN", "14-1"): ("Referendum on Public Act 520 of 2012", "Popular Referendum"),
     ("2014GEN", "14-2"): ("Referendum on Public Act 21 of 2013", "Popular Referendum"),
-    ("2015SG1", "15-1"): ("Constitutional amendment increasing the sales and use tax to fund roads and schools", "Legislative Referendum"),
+    ("2015SG1", "15-1"): (
+        "Constitutional amendment increasing the sales and use tax to fund roads and schools",
+        "Legislative Referendum",
+    ),
     ("2018GEN", "18-1"): ("Initiated law to regulate marijuana like alcohol", "Initiative"),
     ("2018GEN", "18-2"): ("Constitutional amendment creating an independent redistricting commission", "Initiative"),
     ("2018GEN", "18-3"): ("Constitutional amendment on voting rights and election administration", "Initiative"),
-    ("2020GEN", "20-1"): ("Constitutional amendment on oil and gas royalty funds for parks and conservation", "Legislative Referendum"),
-    ("2020GEN", "20-2"): ("Constitutional amendment requiring a search warrant for electronic data and communications", "Legislative Referendum"),
+    ("2020GEN", "20-1"): (
+        "Constitutional amendment on oil and gas royalty funds for parks and conservation",
+        "Legislative Referendum",
+    ),
+    ("2020GEN", "20-2"): (
+        "Constitutional amendment requiring a search warrant for electronic data and communications",
+        "Legislative Referendum",
+    ),
 }
 MI_OLD = "http://web.archive.org/web/2id_/http://miboecfr.nictusa.com/election/results/{}GEN/9000000{}.html"
 MI_OLD_PROPOSALS = (
-    (date(2000, 11, 7), "00", 1, "00-1", "Constitutional amendment permitting indirect state support of nonpublic school students", "Initiative"),
-    (date(2000, 11, 7), "00", 2, "00-2", "Constitutional amendment requiring a two-thirds legislative vote for laws affecting local governments", "Initiative"),
-    (date(2002, 11, 5), "02", 1, "02-1", "Referendum on Public Act 269 of 2001 amending the Michigan election law", "Popular Referendum"),
-    (date(2002, 11, 5), "02", 2, "02-2", "Bonds for sewage treatment, storm water, and water pollution projects", "Legislative Referendum"),
-    (date(2002, 11, 5), "02", 3, "02-3", "Constitutional amendment granting state classified employees collective bargaining with binding arbitration", "Initiative"),
-    (date(2002, 11, 5), "02", 4, "02-4", "Constitutional amendment reallocating tobacco settlement revenue", "Initiative"),
+    (
+        date(2000, 11, 7),
+        "00",
+        1,
+        "00-1",
+        "Constitutional amendment permitting indirect state support of nonpublic school students",
+        "Initiative",
+    ),
+    (
+        date(2000, 11, 7),
+        "00",
+        2,
+        "00-2",
+        "Constitutional amendment requiring a two-thirds legislative vote for laws affecting local governments",
+        "Initiative",
+    ),
+    (
+        date(2002, 11, 5),
+        "02",
+        1,
+        "02-1",
+        "Referendum on Public Act 269 of 2001 amending the Michigan election law",
+        "Popular Referendum",
+    ),
+    (
+        date(2002, 11, 5),
+        "02",
+        2,
+        "02-2",
+        "Bonds for sewage treatment, storm water, and water pollution projects",
+        "Legislative Referendum",
+    ),
+    (
+        date(2002, 11, 5),
+        "02",
+        3,
+        "02-3",
+        "Constitutional amendment granting state classified employees collective bargaining with binding arbitration",
+        "Initiative",
+    ),
+    (
+        date(2002, 11, 5),
+        "02",
+        4,
+        "02-4",
+        "Constitutional amendment reallocating tobacco settlement revenue",
+        "Initiative",
+    ),
 )
 NC = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
 NC_DAYS = (date(2004, 11, 2), date(2010, 11, 2))
@@ -335,7 +571,11 @@ WV = "https://web.archive.org/web/20130612072655id_/http://www.sos.wv.gov/electi
 WV_FILES = {date(2000, 11, 7): "%20Gen", date(2002, 11, 5): "", date(2004, 11, 2): ""}
 WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
 WI_FILES = {
-    date(2000, 11, 7): ("20200114182421", "2000_Referendum_County_Returns.pdf", ("Extend Right to Vote to Adult Children of US Citizens",)),
+    date(2000, 11, 7): (
+        "20200114182421",
+        "2000_Referendum_County_Returns.pdf",
+        ("Extend Right to Vote to Adult Children of US Citizens",),
+    ),
     date(2006, 11, 7): (
         "20200114182227",
         "2006_FallElection_Referendum_CountyReturns.pdf",
@@ -397,15 +637,43 @@ UT_FILES = {
     date(2012, 11, 6): "2012-General-Canvass-Report.xls",
 }
 UT_COUNTIES = (
-    "Beaver", "Box Elder", "Cache", "Carbon", "Daggett", "Davis", "Duchesne", "Emery", "Garfield", "Grand", "Iron",
-    "Juab", "Kane", "Millard", "Morgan", "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete", "Sevier", "Summit",
-    "Tooele", "Uintah", "Utah", "Wasatch", "Washington", "Wayne", "Weber",
+    "Beaver",
+    "Box Elder",
+    "Cache",
+    "Carbon",
+    "Daggett",
+    "Davis",
+    "Duchesne",
+    "Emery",
+    "Garfield",
+    "Grand",
+    "Iron",
+    "Juab",
+    "Kane",
+    "Millard",
+    "Morgan",
+    "Piute",
+    "Rich",
+    "Salt Lake",
+    "San Juan",
+    "Sanpete",
+    "Sevier",
+    "Summit",
+    "Tooele",
+    "Uintah",
+    "Utah",
+    "Wasatch",
+    "Washington",
+    "Wayne",
+    "Weber",
 )
 WA_HISTORY = {
     "Referendum Bill": "https://web.archive.org/web/20251017055222id_/https://apps.sos.wa.gov/elections/initiatives/statistics_referendumbills.aspx",
     "Referendum Measure": "https://web.archive.org/web/20251017055222id_/https://apps.sos.wa.gov/elections/initiatives/statistics_referendummeasures.aspx",
 }
-OR_HISTORY = "https://web.archive.org/web/20251003191748id_/https://sos.oregon.gov/blue-book/Documents/elections/initiative.pdf"
+OR_HISTORY = (
+    "https://web.archive.org/web/20251003191748id_/https://sos.oregon.gov/blue-book/Documents/elections/initiative.pdf"
+)
 OR_2022 = "https://web.archive.org/web/20221219164703id_/https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
 OR_COUNTIES = (
     "Baker",
@@ -513,8 +781,12 @@ AL_FILES = {
     date(2010, 11, 2): ("20170706", "2010-general-precinctLevel.zip"),
 }
 AL_CERTS = {
-    date(2006, 11, 7): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2006/statecert-2006-general-election-11-29-2006-without-write-in-appendix.pdf",
-    date(2008, 11, 4): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2008/statecert-2008-general-election-11-25-2008-without-write-in-appendix.pdf",
+    date(
+        2006, 11, 7
+    ): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2006/statecert-2006-general-election-11-29-2006-without-write-in-appendix.pdf",
+    date(
+        2008, 11, 4
+    ): "https://sos.alabama.gov/sites/default/files/voter-pdfs/2008/statecert-2008-general-election-11-25-2008-without-write-in-appendix.pdf",
 }
 NJ = "https://www.nj.gov/state/elections/assets/pdf/election-results/"
 NJ_FILES = {
@@ -760,11 +1032,37 @@ WY_FILES = {
     ),
 }
 WY_COUNTIES = frozenset(
-    "Albany|Big Horn|Campbell|Carbon|Converse|Crook|Fremont|Goshen|Hot Springs|Johnson|Laramie|Lincoln|Natrona|Niobrara|Park|Platte|Sheridan|Sublette|Sweetwater|Teton|Uinta|Washakie|Weston".split("|")
+    [
+        "Albany",
+        "Big Horn",
+        "Campbell",
+        "Carbon",
+        "Converse",
+        "Crook",
+        "Fremont",
+        "Goshen",
+        "Hot Springs",
+        "Johnson",
+        "Laramie",
+        "Lincoln",
+        "Natrona",
+        "Niobrara",
+        "Park",
+        "Platte",
+        "Sheridan",
+        "Sublette",
+        "Sweetwater",
+        "Teton",
+        "Uinta",
+        "Washakie",
+        "Weston",
+    ]
 )
 ND = "https://www.sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}-general.pdf"
 ND_DAYS = {date(2004, 11, 2): 1, date(2006, 11, 7): 3, date(2008, 11, 4): 4, date(2010, 11, 2): 2}
-ND_ABSTRACTS = "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year%5C2000%20through%202008%20Statewide%20Election%20Results%5C"
+ND_ABSTRACTS = (
+    "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year%5C2000%20through%202008%20Statewide%20Election%20Results%5C"
+)
 ND_OLD = {
     date(2000, 6, 13): ("2000%5CPrimary%20Election%2006-13-2000", 4, 1),
     date(2000, 11, 7): ("2000%5CGeneral%20Election%2011-07-2000", 1, 1),
@@ -827,12 +1125,54 @@ SC_DAYS = {
     date(2008, 11, 4): 3,
     date(2010, 11, 2): 4,
 }
-SC_COUNTIES = (
-    "Abbeville Aiken Allendale Anderson Bamberg Barnwell Beaufort Berkeley Calhoun Charleston Cherokee Chester "
-    "Chesterfield Clarendon Colleton Darlington Dillon Dorchester Edgefield Fairfield Florence Georgetown Greenville "
-    "Greenwood Hampton Horry Jasper Kershaw Lancaster Laurens Lee Lexington Marion Marlboro McCormick Newberry Oconee "
-    "Orangeburg Pickens Richland Saluda Spartanburg Sumter Union Williamsburg York"
-).split()
+SC_COUNTIES = [
+    "Abbeville",
+    "Aiken",
+    "Allendale",
+    "Anderson",
+    "Bamberg",
+    "Barnwell",
+    "Beaufort",
+    "Berkeley",
+    "Calhoun",
+    "Charleston",
+    "Cherokee",
+    "Chester",
+    "Chesterfield",
+    "Clarendon",
+    "Colleton",
+    "Darlington",
+    "Dillon",
+    "Dorchester",
+    "Edgefield",
+    "Fairfield",
+    "Florence",
+    "Georgetown",
+    "Greenville",
+    "Greenwood",
+    "Hampton",
+    "Horry",
+    "Jasper",
+    "Kershaw",
+    "Lancaster",
+    "Laurens",
+    "Lee",
+    "Lexington",
+    "Marion",
+    "Marlboro",
+    "McCormick",
+    "Newberry",
+    "Oconee",
+    "Orangeburg",
+    "Pickens",
+    "Richland",
+    "Saluda",
+    "Spartanburg",
+    "Sumter",
+    "Union",
+    "Williamsburg",
+    "York",
+]
 HI = "https://files.hawaii.gov/elections/files/results/{}/general/{}.pdf"
 HI_DAYS = {
     2000: date(2000, 11, 7),
@@ -1807,7 +2147,9 @@ def alabama() -> list[dict[str, object]]:
         votes: dict[tuple[str, str], dict[str, int]] = {}
         totals: dict[tuple[str, str], int] = {}
         if file.endswith(".pdf"):
-            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            ).stdout
             for page in text.split("\f"):
                 if "Constitutional Amendments" not in page:
                     continue
@@ -1855,7 +2197,10 @@ def alabama() -> list[dict[str, object]]:
                             for name in book.sheet_names
                         ]
                     for sheet_rows in sheets:
-                        match = re.search(r"^PROPOSED STATEWIDE AMENDMENT NUMBER \w+ \((\d+)\)", " ".join(sheet_rows[0]) if sheet_rows else "")
+                        match = re.search(
+                            r"^PROPOSED STATEWIDE AMENDMENT NUMBER \w+ \((\d+)\)",
+                            " ".join(sheet_rows[0]) if sheet_rows else "",
+                        )
                         if match is None:
                             continue
                         totals_row = next(row for row in sheet_rows if row[:1] == ["Totals:"])
@@ -1932,7 +2277,9 @@ def alabama() -> list[dict[str, object]]:
 
 def new_jersey() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
-    row = re.compile(r"^\s*(Atlantic|Bergen|Burlington|Camden|Cape May|Cumberland|Essex|Gloucester|Hudson|Hunterdon|Mercer|Middlesex|Monmouth|Morris|Ocean|Passaic|Salem|Somerset|Sussex|Union|Warren|Total)\s+([\d,]+)\s+([\d,]+)\s*$")
+    row = re.compile(
+        r"^\s*(Atlantic|Bergen|Burlington|Camden|Cape May|Cumberland|Essex|Gloucester|Hudson|Hunterdon|Mercer|Middlesex|Monmouth|Morris|Ocean|Passaic|Salem|Somerset|Sussex|Union|Warren|Total)\s+([\d,]+)\s+([\d,]+)\s*$"
+    )
     for day, path in NJ_FILES.items():
         url = NJ + path
         text = subprocess.run(
@@ -1944,7 +2291,10 @@ def new_jersey() -> list[dict[str, object]]:
             if heading := re.match(r"PUBLIC QUESTION NO\. (\d+)", line):
                 number = heading[1]
             elif (match := row.match(line)) and number:
-                found.setdefault(number, {})[match[1]] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+                found.setdefault(number, {})[match[1]] = (
+                    int(match[2].replace(",", "")),
+                    int(match[3].replace(",", "")),
+                )
         for number, table in found.items():
             printed = table.pop("Total")
             if len(table) != 21 or tuple(sum(votes[side] for votes in table.values()) for side in (0, 1)) != printed:
@@ -1996,15 +2346,16 @@ def maryland() -> list[dict[str, object]]:
                         total = name.lower().startswith("total")
                         if total or name in MD_COUNTIES:
                             yes, no = (
-                                int(re.match(r"[\d,]+", cells[index + offset])[0].replace(",", ""))
-                                for offset in (1, 2)
+                                int(re.match(r"[\d,]+", cells[index + offset])[0].replace(",", "")) for offset in (1, 2)
                             )
                             found.setdefault(number, {})["Total" if total else name] = (yes, no)
             for number, table in found.items():
                 printed = table.pop("Total", None)
-                if len(table) != 24 or printed is not None and tuple(
-                    sum(votes[side] for votes in table.values()) for side in (0, 1)
-                ) != printed:
+                if (
+                    len(table) != 24
+                    or printed is not None
+                    and tuple(sum(votes[side] for votes in table.values()) for side in (0, 1)) != printed
+                ):
                     raise ValueError(f"MD {day} question {number}: {len(table)} counties do not sum to {printed}")
                 for county, votes in table.items():
                     for answer, count in zip(("YES", "NO"), votes, strict=True):
@@ -2033,7 +2384,9 @@ def alaska() -> list[dict[str, object]]:
         for sheet in markup.split("<page ")[1:]:
             words = [
                 (float(x0), float(y0), html.unescape(text))
-                for x0, y0, text in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="[\d.]+" yMax="[\d.]+">(.*?)</word>', sheet)
+                for x0, y0, text in re.findall(
+                    r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="[\d.]+" yMax="[\d.]+">(.*?)</word>', sheet
+                )
             ]
             for index, (x, y, text) in enumerate(words):
                 if text == "NO." and words[index - 1][2] == "MEASURE" and index + 1 < len(words):
@@ -2048,7 +2401,9 @@ def alaska() -> list[dict[str, object]]:
                     below = sorted(
                         (w for w in words if w[2] == answer and w[1] > y and abs(w[0] - x) < 150), key=lambda w: w[1]
                     )
-                    line = sorted((w for w in words if abs(w[1] - below[0][1]) < 1 and w[0] > below[0][0]), key=lambda w: w[0])
+                    line = sorted(
+                        (w for w in words if abs(w[1] - below[0][1]) < 1 and w[0] > below[0][0]), key=lambda w: w[0]
+                    )
                     votes[answer] = int(line[0][2].replace(",", ""))
                 for answer, count in votes.items():
                     rows.append(
@@ -2074,12 +2429,17 @@ def alaska() -> list[dict[str, object]]:
         for district in range(1, 41):
             url = f"manual://MF-359/{day.isoformat()}/{pattern.format(district)}"
             text = subprocess.run(
-                ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
             ).stdout
             latest: dict[tuple[str, str], list[int]] = {}
             for page in text.split("\f"):
                 lines = page.splitlines()
-                header = next((line for line in lines[:25] if re.search(r"MEASURE NO\. \d|BOND PROPOSITION A", line)), None)
+                header = next(
+                    (line for line in lines[:25] if re.search(r"MEASURE NO\. \d|BOND PROPOSITION A", line)), None
+                )
                 total = [line for line in lines if re.match(r"\s*Total\s+\d", line)]
                 if header is None or not total:
                     continue
@@ -2138,7 +2498,10 @@ def alaska() -> list[dict[str, object]]:
             pairs = sum(len(re.findall(r"\bYES\b", line)) for line in lines[:25])
             if not sub or not pairs:
                 continue
-            cells = [int(cell.replace(",", "")) for cell in re.findall(r"(?<![\d.])\d[\d,]*(?![\d.%])", sub[-1].replace("SubTotal", ""))]
+            cells = [
+                int(cell.replace(",", ""))
+                for cell in re.findall(r"(?<![\d.])\d[\d,]*(?![\d.%])", sub[-1].replace("SubTotal", ""))
+            ]
             triples.extend(cells[len(cells) - 3 * pairs :][i : i + 3] for i in range(0, 3 * pairs, 3))
         for number, (total, yes, no) in enumerate(triples[: len(measure_votes)], start=1):
             if total != yes + no:
@@ -2413,7 +2776,9 @@ def louisiana() -> list[dict[str, object]]:
                         "state": "LA",
                         "day": date(int(day[:4]), int(day[4:6]), int(day[6:])),
                         "number": match[1],
-                        "label": DERIVED_HAND.get((date(int(day[:4]), int(day[4:6]), int(day[6:])), match[1]), ("",))[0],
+                        "label": DERIVED_HAND.get((date(int(day[:4]), int(day[4:6]), int(day[6:])), match[1]), ("",))[
+                            0
+                        ],
                         "url": url,
                         "county": county,
                         "answer": answer,
@@ -3229,7 +3594,7 @@ def washington_history() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for kind, url in WA_HISTORY.items():
         page = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace")
-        page = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", page, flags=re.S)
+        page = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", page, flags=re.DOTALL)
         text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", page)))
         parts = re.split(r"REFERENDUM (?:BILL|MEASURE) NO\. (\d+(?: [A-Z])?)", text)
         for number, block in zip(parts[1::2], parts[2::2], strict=True):
@@ -3264,7 +3629,10 @@ def washington_history() -> list[dict[str, object]]:
 
 def oregon_history() -> list[dict[str, object]]:
     lines = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, OR_HISTORY).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, OR_HISTORY).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout.split("\n")
     blocks: list[tuple[date, list[str]]] = []
     day = None
@@ -3286,10 +3654,9 @@ def oregon_history() -> list[dict[str, object]]:
         votes = None
         words = []
         for text in block:
-            if found := re.search(r"\s\*?(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)$", text):
-                if votes is None:
-                    votes = (int(found[1].replace(",", "")), int(found[2].replace(",", "")))
-                    text = text[: found.start()]
+            if (found := re.search(r"\s\*?(\d{1,3}(?:,\d{3})*)\s+(\d{1,3}(?:,\d{3})*)$", text)) and votes is None:
+                votes = (int(found[1].replace(",", "")), int(found[2].replace(",", "")))
+                text = text[: found.start()]
             words.append(text.strip())
         title = " ".join(words)
         number, title = re.match(r"(\d+[A-E]?)\.\s*(.*)", title).groups()
@@ -3448,12 +3815,7 @@ def missouri() -> list[dict[str, object]]:
     )
     rows: list[dict[str, object]] = []
     for day, url in (
-        *(
-            (day, url.format(day.year))
-            for day in MO_DAYS
-            for url in (MO, MO_PART2)
-            if day.year >= 2004 or url == MO
-        ),
+        *((day, url.format(day.year)) for day in MO_DAYS for url in (MO, MO_PART2) if day.year >= 2004 or url == MO),
         *(
             (day, url.format(day.year))
             for day in MO_PRIMARIES
@@ -3682,7 +4044,10 @@ def wyoming() -> list[dict[str, object]]:
                 raise ValueError(f"WY {day}: {len(block)} counties")
             for label, offset in spec:
                 for side in (0, 1):
-                    if printed is not None and sum(votes[offset + side] for votes in block.values()) != printed[offset + side]:
+                    if (
+                        printed is not None
+                        and sum(votes[offset + side] for votes in block.values()) != printed[offset + side]
+                    ):
                         raise ValueError(f"WY {day} {label}: counties do not sum to {printed[offset + side]}")
                 for county, votes in block.items():
                     for answer, count in zip(("YES", "NO"), votes[offset : offset + 2], strict=True):
@@ -3774,7 +4139,10 @@ def north_carolina() -> list[dict[str, object]]:
         url = NC.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}")
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             table = pl.read_csv(
-                archive.read(archive.namelist()[0]), infer_schema=False, encoding="utf8-lossy", truncate_ragged_lines=True
+                archive.read(archive.namelist()[0]),
+                infer_schema=False,
+                encoding="utf8-lossy",
+                truncate_ragged_lines=True,
             )
         if day.year == 2004:
             table = table.rename({"contest_name": "contest", "name_on_ballot": "choice", "ballot_count": "total votes"})
@@ -3892,11 +4260,17 @@ def wisconsin() -> list[dict[str, object]]:
             if total is None:
                 continue
             sums = tuple(
-                sum(row["votes"] for row in rows[start:] if row["number"] == str(position + 1) and row["answer"] == answer)
+                sum(
+                    row["votes"]
+                    for row in rows[start:]
+                    if row["number"] == str(position + 1) and row["answer"] == answer
+                )
                 for answer in ("YES", "NO")
             )
             if len(counties) != 72 or sums != (int(total[2].replace(",", "")), int(total[3].replace(",", ""))):
-                raise ValueError(f"{url} {titles[position]}: {len(counties)} counties, sums {sums} differ from {total.groups()}")
+                raise ValueError(
+                    f"{url} {titles[position]}: {len(counties)} counties, sums {sums} differ from {total.groups()}"
+                )
             counties = set()
             position += 1
     return rows
@@ -3934,7 +4308,9 @@ def iowa() -> list[dict[str, object]]:
         for county, pair in counties.items()
         for side, answer in enumerate(("YES", "NO"))
     ]
-    table = fastexcel.read_excel(str(raw.cached(SOURCE, IA_2010).path)).load_sheet_by_idx(0, header_row=None).to_polars()
+    table = (
+        fastexcel.read_excel(str(raw.cached(SOURCE, IA_2010).path)).load_sheet_by_idx(0, header_row=None).to_polars()
+    )
     table = table.rename({column: f"c{index}" for index, column in enumerate(table.columns)})
     for office, number in (("Constitutional Amendment 1", "1"), ("Constitutional Convention Question", "2")):
         sums = (
@@ -4012,9 +4388,9 @@ def mississippi_2003() -> list[dict[str, object]]:
                 county = match[1]
             elif match[1] == "State Totals":
                 county = ""
-        if match := re.match(r"^\s+Amendment #1 (?:SCR 522|YES|NO).*?(YES|NO)\s+([\d,]+)\s+[\d.]+%", text_line) or re.match(
-            r"^\s+Amendment #1 (YES|NO) Senate Concurrent Res 522\s+([\d,]+)\s+[\d.]+%", text_line
-        ):
+        if match := re.match(
+            r"^\s+Amendment #1 (?:SCR 522|YES|NO).*?(YES|NO)\s+([\d,]+)\s+[\d.]+%", text_line
+        ) or re.match(r"^\s+Amendment #1 (YES|NO) Senate Concurrent Res 522\s+([\d,]+)\s+[\d.]+%", text_line):
             (counties.setdefault(county, {}) if county else totals)[match[1]] = int(match[2].replace(",", ""))
     sums = {answer: sum(votes[answer] for votes in counties.values()) for answer in ("YES", "NO")}
     if len(counties) != 82 or sums != totals:
@@ -4046,7 +4422,10 @@ def kentucky() -> list[dict[str, object]]:
             if match := re.match(r"^\s+([A-Z][A-Z .'-]+?)\s+COUNTY REPORT OF", text_line):
                 county = match[1]
             elif match := re.match(r"^\s+Constitutional Amendment\s*#\s*(\d+)\s+([\d,]+)\s+([\d,]+)\s*$", text_line):
-                counties.setdefault(match[1], {})[county] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+                counties.setdefault(match[1], {})[county] = (
+                    int(match[2].replace(",", "")),
+                    int(match[3].replace(",", "")),
+                )
         for number, by_county in counties.items():
             if len(by_county) != 120:
                 raise ValueError(f"{file} amendment {number}: {len(by_county)} counties")
@@ -4123,7 +4502,9 @@ def kansas() -> list[dict[str, object]]:
             total = next(row for row in sheet.iter_rows() if "COUNTY TOTALS" in row)
             tallies[name.title()] = [int(total[-2]), int(total[-1])]
         for index, answer in enumerate(("YES", "NO")):
-            if sum(sides[index] for sides in tallies.values()) != printed[index] + KS_GAPS.get((day, number, answer), 0):
+            if sum(sides[index] for sides in tallies.values()) != printed[index] + KS_GAPS.get(
+                (day, number, answer), 0
+            ):
                 raise ValueError(f"{url} {answer}: counties do not sum to the printed total")
         rows.extend(
             {
@@ -4185,9 +4566,16 @@ def utah() -> list[dict[str, object]]:
             sheet = {2008: "Amendments", 2010: "Constitutional Amd.", 2012: "Constitutional Amendments"}[day.year]
             cells = [
                 [str(cell).strip() if cell is not None else "" for cell in row]
-                for row in fastexcel.read_excel(path).load_sheet_by_name(sheet, header_row=None, dtypes="string").to_polars().iter_rows()
+                for row in fastexcel.read_excel(path)
+                .load_sheet_by_name(sheet, header_row=None, dtypes="string")
+                .to_polars()
+                .iter_rows()
             ]
-            body = [row for row in cells if row[0].upper() != "COUNTY" and row[0].replace(",", "").strip() and row[1].isdigit()]
+            body = [
+                row
+                for row in cells
+                if row[0].upper() != "COUNTY" and row[0].replace(",", "").strip() and row[1].isdigit()
+            ]
             letters = [re.search(r"Amendment (?:Number )?([A-E])$", label)[1] for label in cells[0][1:] if label]
             names = [row[0] for row in body if row[0].upper() != "TOTAL"]
             total = next(row for row in body if row[0].upper() == "TOTAL")
@@ -4226,7 +4614,11 @@ def utah() -> list[dict[str, object]]:
                         number,
                         label,
                         list(UT_COUNTIES),
-                        [value for yes, no in zip(column[0], against[0], strict=True) for value in (yes[column[1]], no[against[1]])],
+                        [
+                            value
+                            for yes, no in zip(column[0], against[0], strict=True)
+                            for value in (yes[column[1]], no[against[1]])
+                        ],
                     )
                 )
         else:
@@ -4245,7 +4637,9 @@ def utah() -> list[dict[str, object]]:
                     match = re.match(r"\s*([A-Za-z]+(?: [A-Za-z]+)?)\s+([\d,%. ]+)$", row)
                     if match is None:
                         break
-                    block.append((match[1], [int(value.replace(",", "")) for value in match[2].split() if "%" not in value]))
+                    block.append(
+                        (match[1], [int(value.replace(",", "")) for value in match[2].split() if "%" not in value])
+                    )
                     if match[1].upper() == "TOTAL":
                         break
                 if not measures or block[-1][0].upper() != "TOTAL":
@@ -4291,7 +4685,10 @@ def utah() -> list[dict[str, object]]:
         if (match := re.match(r"(\w[\w ]*?)\s+[\d,]+\s+[\d,]+\s+[\d.]+%\s+([\d,]+)\s+([\d,]+)$", line.strip()))
     }
     printed = table.pop("TOTAL")
-    if list(table) != list(UT_COUNTIES) or tuple(sum(votes[side] for votes in table.values()) for side in (0, 1)) != printed:
+    if (
+        list(table) != list(UT_COUNTIES)
+        or tuple(sum(votes[side] for votes in table.values()) for side in (0, 1)) != printed
+    ):
         raise ValueError("UT 2007 referendum counties do not sum to the printed total")
     for county, votes in table.items():
         for answer, count in zip(("YES", "NO"), votes, strict=True):
@@ -4610,7 +5007,9 @@ def georgia() -> list[dict[str, object]]:
             text = raw.cached(SOURCE, url).path.read_bytes().decode("latin-1")
             text = re.sub(r"(?is)<(script|style).*?</\1>", "", text)
             tokens = [
-                found for cell in re.split(r"<[^>]+>", text) if (found := re.sub(r"\s+", " ", html.unescape(cell)).strip())
+                found
+                for cell in re.split(r"<[^>]+>", text)
+                if (found := re.sub(r"\s+", " ", html.unescape(cell)).strip())
             ]
             start = tokens.index("County")
             names, votes = [], []
@@ -4620,7 +5019,7 @@ def georgia() -> list[dict[str, object]]:
                     votes.append([])
                 elif names and re.fullmatch(r"[\d,]+", token):
                     votes[-1].append(int(token.replace(",", "")))
-                elif token.startswith("Totals") or token.startswith("Official"):
+                elif token.startswith(("Totals", "Official")):
                     break
             for name, cells in zip(names, votes, strict=True):
                 yes, no, total = cells[-3:]
@@ -4749,7 +5148,16 @@ def parse() -> None:
                 }
             )
             continue
-        if state == "NY" or (state, day.year) in (("SD", 2012), ("AZ", 2022), ("WA", 2012), ("WA", 2022), ("LA", 2022), ("OR", 2022), ("UT", 2012), ("MD", 2022)):
+        if state == "NY" or (state, day.year) in (
+            ("SD", 2012),
+            ("AZ", 2022),
+            ("WA", 2012),
+            ("WA", 2022),
+            ("LA", 2022),
+            ("OR", 2022),
+            ("UT", 2012),
+            ("MD", 2022),
+        ):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
                 if state == "NY"
@@ -4885,7 +5293,12 @@ def emit() -> Path:
         for state, url in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             artifacts[url] = cs.artifact(
                 raw.cached(
-                    {"FL": fl_sos.SOURCE, "RI": ri_countbook.SOURCE, "AK": ak_sovc.SOURCE if "MF-266" in url else SOURCE}.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE), url
+                    {
+                        "FL": fl_sos.SOURCE,
+                        "RI": ri_countbook.SOURCE,
+                        "AK": ak_sovc.SOURCE if "MF-266" in url else SOURCE,
+                    }.get(state, gov_counties.SOURCE if url == gov_counties.OH_2006 else SOURCE),
+                    url,
                 ),
                 sources[state],
             )
@@ -5003,7 +5416,12 @@ def emit() -> Path:
             election_key = next(
                 (
                     key
-                    for key in (f"{day}:{state}:referendum", f"{day}:{state}:special", f"{day}:{state}", f"{day}:{state}:primary")
+                    for key in (
+                        f"{day}:{state}:referendum",
+                        f"{day}:{state}:special",
+                        f"{day}:{state}",
+                        f"{day}:{state}:primary",
+                    )
                     if key in elections
                 ),
                 f"{day}:{state}:referendum",
@@ -5088,7 +5506,15 @@ def emit() -> Path:
                 + (SCANNED if rows["page"].is_not_null().any() and state != "AL" else "")
                 + (GA_PRELIMINARY if preliminary else "")
                 + (
-                    (AL_2007_NOTE if state == "AL" else AK_STATEWIDE_NOTE if state == "AK" else ND_2004_NOTE if state == "ND" else STATEWIDE_ONLY)
+                    (
+                        AL_2007_NOTE
+                        if state == "AL"
+                        else AK_STATEWIDE_NOTE
+                        if state == "AK"
+                        else ND_2004_NOTE
+                        if state == "ND"
+                        else STATEWIDE_ONLY
+                    )
                     if (rows["county"] == "statewide").any()
                     else ""
                 ),

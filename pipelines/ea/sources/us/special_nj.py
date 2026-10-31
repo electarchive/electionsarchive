@@ -44,7 +44,9 @@ def rows() -> list[dict[str, object]]:
                 counties[hit[1].title()] = int(hit[2].replace(",", ""))
             elif candidate is not None and (hit := re.match(r"^\s+Total\s+([\d,]+)\s*$", line)):
                 if sum(counties.values()) != int(hit[1].replace(",", "")):
-                    raise ValueError(f"NJ-{district} {day} special primary {candidate}: counties do not sum to {hit[1]}")
+                    raise ValueError(
+                        f"NJ-{district} {day} special primary {candidate}: counties do not sum to {hit[1]}"
+                    )
                 found.extend(
                     {
                         "state": "NJ",

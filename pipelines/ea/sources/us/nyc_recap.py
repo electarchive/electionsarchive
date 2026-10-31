@@ -1,8 +1,8 @@
 import json
 import re
 import subprocess
+from datetime import date, datetime
 from difflib import SequenceMatcher
-from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import quote, unquote
 from uuid import UUID
@@ -48,11 +48,14 @@ COUNTIES = "New York|Bronx|Kings|Queens|Richmond"
 SKIP = re.compile(
     r"^\s*(PUBLIC COUNTER|EMERGENCY|ABSENTEE/MILITARY|AFFIDAVIT|FEDERAL|SPECIAL PRESIDENTIAL|TOTAL BALLOTS|"
     r"TOTAL APPLICABLE BALLOTS|TOTAL VOTES|UNRECORDED|MANUAL|SCANNER|PAGE)\s{2,}|^\s*(LESS -|PAGE \d)",
-    re.I,
+    re.IGNORECASE,
 )
 LINE = re.compile(r"^\s+(.+?)\s{2,}\(?([\d,]+)\)?\s*$")
-HEADER = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9 .&-]*?) - (\d\d/\d\d/\d{4})\s*$", re.M)
-ELECTION = re.compile(r"(General|Primary Runoff|Presidential Primary|Primary|Special|Runoff)[A-Za-z ]*Election(?: \d{4})? - (\d\d/\d\d/\d{4})", re.I)
+HEADER = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9 .&-]*?) - (\d\d/\d\d/\d{4})\s*$", re.MULTILINE)
+ELECTION = re.compile(
+    r"(General|Primary Runoff|Presidential Primary|Primary|Special|Runoff)[A-Za-z ]*Election(?: \d{4})? - (\d\d/\d\d/\d{4})",
+    re.IGNORECASE,
+)
 BLOCK = re.compile(
     rf"^\s*(?:(?P<ad>Assembly District|ASSEMBLY DISTRICT) (?P<adn>\d+)|(?P<cty>{COUNTIES}) County|(?P<tot>TOTAL FOR|Total for) (?P<what>.+))\s*$"
 )
@@ -63,7 +66,7 @@ OFFICES = {
 }
 STATE_OFFICES = re.compile(
     r"GOVERNOR|ATTORNEY GENERAL|STATE COMPTROLLER|UNITED STATES SENATOR|PRESIDENT|SENATOR|ASSEMBLY|CONGRESS|COMMITTEE|LEADER|DELEGATE|CONVENTION",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -112,7 +115,7 @@ QUESTIONS = (
         "Question 3: City Elections",
         CHARTER_2003,
         "2003 Ballot Questions, New York City Charter Revision Commission",
-        'Question 3: City Elections. This proposal would amend the City Charter to establish a new system of city elections for the offices of Mayor, Public Advocate, Comptroller, Borough President, and Council member. The September primary election would be open to all voters and all candidates, regardless of party membership or independent status. The top two vote getters would compete in the November general election. In both elections, candidates could indicate their party membership or independent status on the ballot. Candidates participating in the voluntary campaign finance program, which provides public campaign funding, could not accept contributions from political parties or party committees. The new system would replace the current system of political party nominations through primary elections in which only party members may vote. The changes would take effect after the 2005 Citywide election. Shall this proposal be adopted?',
+        "Question 3: City Elections. This proposal would amend the City Charter to establish a new system of city elections for the offices of Mayor, Public Advocate, Comptroller, Borough President, and Council member. The September primary election would be open to all voters and all candidates, regardless of party membership or independent status. The top two vote getters would compete in the November general election. In both elections, candidates could indicate their party membership or independent status on the ballot. Candidates participating in the voluntary campaign finance program, which provides public campaign funding, could not accept contributions from political parties or party committees. The new system would replace the current system of political party nominations through primary elections in which only party members may vote. The changes would take effect after the 2005 Citywide election. Shall this proposal be adopted?",
     ),
     (
         "2003-11-04",
@@ -121,7 +124,7 @@ QUESTIONS = (
         "Question 4: City Purchasing",
         CHARTER_2003,
         "2003 Ballot Questions, New York City Charter Revision Commission",
-        'Question 4: City Purchasing. This proposal would amend the City Charter to: • remove from the Charter detailed requirements for specific purchasing methods; • increase qualifications for City purchasing officials; • provide for citywide coordination to enhance opportunities for small businesses and minority and women-owned businesses; • reduce required procedures for security-related contracts; • reduce impact on City contractors, including not- for-profit organizations, of delays in contracting and payment; and • consolidate financial audit requirements for City contractors. Shall this proposal be adopted?',
+        "Question 4: City Purchasing. This proposal would amend the City Charter to: • remove from the Charter detailed requirements for specific purchasing methods; • increase qualifications for City purchasing officials; • provide for citywide coordination to enhance opportunities for small businesses and minority and women-owned businesses; • reduce required procedures for security-related contracts; • reduce impact on City contractors, including not- for-profit organizations, of delays in contracting and payment; and • consolidate financial audit requirements for City contractors. Shall this proposal be adopted?",
     ),
     (
         "2003-11-04",
@@ -130,7 +133,7 @@ QUESTIONS = (
         "Question 5: Government Administration",
         CHARTER_2003,
         "2003 Ballot Questions, New York City Charter Revision Commission",
-        'Question 5: Government Administration. This proposal would amend the City Charter to: • authorize the Mayor to issue rules governing the professional conduct of administrative law judges and hearing officers in the City’s administrative tribunals, require the coordination of such tribunals, and expand the authority of the administrative tribunal of the Department of Consumer Affairs to hear all matters within the agency’s jurisdiction; • enhance the enforcement authority of the Conflicts of Interest Board by allowing increased penalties for violations of the City’s ethics laws; • replace the current sixteen member Voter Assistance Commission with a seven member panel, which would include the Public Advocate; an appointee of the Council Speaker; and five appointees (one from each borough) of the Mayor, with Council advice and consent. The coordinator of voter assistance would be appointed by the Mayor, with Council advice and Consent, instead of by the Commission; and • require annual publication only of the Mayor’s Management Report. The Preliminary Mayor’s Management Report would no longer be required. Shall this proposal be adopted?',
+        "Question 5: Government Administration. This proposal would amend the City Charter to: • authorize the Mayor to issue rules governing the professional conduct of administrative law judges and hearing officers in the City’s administrative tribunals, require the coordination of such tribunals, and expand the authority of the administrative tribunal of the Department of Consumer Affairs to hear all matters within the agency’s jurisdiction; • enhance the enforcement authority of the Conflicts of Interest Board by allowing increased penalties for violations of the City’s ethics laws; • replace the current sixteen member Voter Assistance Commission with a seven member panel, which would include the Public Advocate; an appointee of the Council Speaker; and five appointees (one from each borough) of the Mayor, with Council advice and consent. The coordinator of voter assistance would be appointed by the Mayor, with Council advice and Consent, instead of by the Commission; and • require annual publication only of the Mayor’s Management Report. The Preliminary Mayor’s Management Report would no longer be required. Shall this proposal be adopted?",
     ),
     (
         "2005-11-08",
@@ -191,13 +194,23 @@ def read(path: Path) -> dict[str, object] | None:
         found = HEADER.search("\n".join(lines[:25]))
         if found is None:
             return None
-        kind = "Primary Runoff" if "run" in found[1].lower() else "Primary" if "primary" in found[1].lower() else "General" if "general" in found[1].lower() else "Special"
+        kind = (
+            "Primary Runoff"
+            if "run" in found[1].lower()
+            else "Primary"
+            if "primary" in found[1].lower()
+            else "General"
+            if "general" in found[1].lower()
+            else "Special"
+        )
         found = (None, kind, found[2])
     else:
         found = (None, found[1].title(), found[2])
     scope = None
     for line in lines[:25]:
-        matched = re.match(rf"^({COUNTIES}) County - (.+)$", line.strip()) or re.match(r"^(Crossover) - (.+)$", line.strip())
+        matched = re.match(rf"^({COUNTIES}) County - (.+)$", line.strip()) or re.match(
+            r"^(Crossover) - (.+)$", line.strip()
+        )
         if matched:
             scope = (matched[1], matched[2])
     office = None
@@ -212,7 +225,7 @@ def read(path: Path) -> dict[str, object] | None:
             continue
         if expecting:
             stripped = line.strip()
-            if stripped and re.search(r"vote for|ELECTED|NO\. OF", stripped, re.I):
+            if stripped and re.search(r"vote for|ELECTED|NO\. OF", stripped, re.IGNORECASE):
                 expecting = False
                 if stripped != office:
                     office = stripped
@@ -221,7 +234,11 @@ def read(path: Path) -> dict[str, object] | None:
         matched = BLOCK.match(line)
         if matched:
             block = (
-                ("ad", matched["adn"]) if matched["adn"] else ("county", matched["cty"]) if matched["cty"] else ("total", matched["what"].strip())
+                ("ad", matched["adn"])
+                if matched["adn"]
+                else ("county", matched["cty"])
+                if matched["cty"]
+                else ("total", matched["what"].strip())
             )
             continue
         if block is None or office is None:
@@ -278,7 +295,15 @@ def parse() -> None:
     head_schema = {"url": pl.String, "day": pl.String, "kind": pl.String, "county": pl.String, "scope": pl.String}
     pl.DataFrame(
         entries,
-        schema={**head_schema, "office": pl.String, "bkind": pl.String, "bid": pl.String, "name": pl.String, "party": pl.String, "votes": pl.Int64},
+        schema={
+            **head_schema,
+            "office": pl.String,
+            "bkind": pl.String,
+            "bid": pl.String,
+            "name": pl.String,
+            "party": pl.String,
+            "votes": pl.Int64,
+        },
         orient="row",
     ).write_parquet(PARSED / "entries.parquet")
     for name, rows in (("totals", totals), ("ballots", ballots)):
@@ -291,7 +316,15 @@ def parse() -> None:
 
 
 def classify(office_text: str, county: str | None) -> dict[str, str | int | None] | None:
-    text = re.sub(r"\s+", " ", re.sub(r",? vote for \d+|NO\. OF CANDIDATES TO BE ELECTED \d+", "", office_text, flags=re.I)).strip().upper()
+    text = (
+        re.sub(
+            r"\s+",
+            " ",
+            re.sub(r",? vote for \d+|NO\. OF CANDIDATES TO BE ELECTED \d+", "", office_text, flags=re.IGNORECASE),
+        )
+        .strip()
+        .upper()
+    )
     text = re.sub(r"^FOR ", "", text)
     party = PARTY_SCOPE.match(text)
     bare = text[party.end() :] if party else text
@@ -302,15 +335,57 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
             pname = pname.replace("to Judicial", "to the Judicial")
         inner = matched[4]
         if (found := re.fullmatch(r"(\d+)/(\d+)", inner)) is not None:
-            return {"seat": f"party|{pname}|{int(found[2]):02d}{int(found[1]):03d}", "party": party[1], "county": None, "state": None, "area": None, "part": f"ed-{int(found[1]):03d}", "ad": int(found[2])}
-        if (found := re.fullmatch(r"(\d+)(?:ST|ND|RD|TH)? ASSEMBLY DISTRICT", inner)) or (found := re.fullmatch(r"(\d+)", inner)):
-            return {"seat": f"party|{pname}|{int(found[1]):02d}", "party": party[1], "county": None, "state": None, "area": ("us.sldl", f"NY:{int(found[1])}"), "part": None, "ad": int(found[1])}
-        if (found := re.fullmatch(r"(\d+)(?:ST|ND|RD|TH)? CONGRESSIONAL DISTRICT", inner)):
-            return {"seat": f"party|{pname}|cd{int(found[1]):02d}", "party": party[1], "county": None, "state": None, "area": ("us.cd", f"36{int(found[1]):02d}"), "part": f"nat-{int(found[1])}", "ad": None}
-        if (found := re.fullmatch(r"(?:DEMOCRATIC LEADERSHIP DISTRICT )?(\d+) ?(?:PART )?([A-Z])", inner)):
-            return {"seat": f"party|{pname}|{int(found[1]):02d}{found[2].lower()}", "party": party[1], "county": None, "state": None, "area": ("us.sldl", f"NY:{int(found[1])}"), "part": f"dl-{found[2].lower()}", "ad": int(found[1])}
-        if (found := re.fullmatch(r"(?:DEMOCRATIC LEADERSHIP DISTRICT )?(\d+)", inner)):
-            return {"seat": f"party|{pname}|{int(found[1]):02d}", "party": party[1], "county": None, "state": None, "area": ("us.sldl", f"NY:{int(found[1])}"), "part": None, "ad": int(found[1])}
+            return {
+                "seat": f"party|{pname}|{int(found[2]):02d}{int(found[1]):03d}",
+                "party": party[1],
+                "county": None,
+                "state": None,
+                "area": None,
+                "part": f"ed-{int(found[1]):03d}",
+                "ad": int(found[2]),
+            }
+        if (found := re.fullmatch(r"(\d+)(?:ST|ND|RD|TH)? ASSEMBLY DISTRICT", inner)) or (
+            found := re.fullmatch(r"(\d+)", inner)
+        ):
+            return {
+                "seat": f"party|{pname}|{int(found[1]):02d}",
+                "party": party[1],
+                "county": None,
+                "state": None,
+                "area": ("us.sldl", f"NY:{int(found[1])}"),
+                "part": None,
+                "ad": int(found[1]),
+            }
+        if found := re.fullmatch(r"(\d+)(?:ST|ND|RD|TH)? CONGRESSIONAL DISTRICT", inner):
+            return {
+                "seat": f"party|{pname}|cd{int(found[1]):02d}",
+                "party": party[1],
+                "county": None,
+                "state": None,
+                "area": ("us.cd", f"36{int(found[1]):02d}"),
+                "part": f"nat-{int(found[1])}",
+                "ad": None,
+            }
+        if found := re.fullmatch(r"(?:DEMOCRATIC LEADERSHIP DISTRICT )?(\d+) ?(?:PART )?([A-Z])", inner):
+            return {
+                "seat": f"party|{pname}|{int(found[1]):02d}{found[2].lower()}",
+                "party": party[1],
+                "county": None,
+                "state": None,
+                "area": ("us.sldl", f"NY:{int(found[1])}"),
+                "part": f"dl-{found[2].lower()}",
+                "ad": int(found[1]),
+            }
+        if found := re.fullmatch(r"(?:DEMOCRATIC LEADERSHIP DISTRICT )?(\d+)", inner):
+            return {
+                "seat": f"party|{pname}|{int(found[1]):02d}",
+                "party": party[1],
+                "county": None,
+                "state": None,
+                "area": ("us.sldl", f"NY:{int(found[1])}"),
+                "part": None,
+                "ad": int(found[1]),
+            }
         return None
     for pattern, seat in STATE_SEATS:
         if pattern.match(bare):
@@ -320,24 +395,50 @@ def classify(office_text: str, county: str | None) -> dict[str, str | int | None
     for pattern, seat in NUMBERED_SEATS:
         matched = pattern.match(bare)
         if matched:
-            return {"seat": seat, "number": int(matched[1]), "party": party[1] if party else None, "county": None, "state": 1}
+            return {
+                "seat": seat,
+                "number": int(matched[1]),
+                "party": party[1] if party else None,
+                "county": None,
+                "state": 1,
+            }
     if STATE_OFFICES.search(bare.replace("BOROUGH PRESIDENT", "")):
         return None
     for seat, pattern in OFFICES.items():
         if pattern.match(text):
             return {"seat": seat, "party": party[1] if party else None, "county": None}
-    matched = re.match(r"^(BOROUGH PRESIDENT|DISTRICT ATTORNEY|SURROGATE|JUDGE OF THE CIVIL COURT - COUNTY) \((NEW YORK|BRONX|KINGS|QUEENS|RICHMOND)\)", bare)
+    matched = re.match(
+        r"^(BOROUGH PRESIDENT|DISTRICT ATTORNEY|SURROGATE|JUDGE OF THE CIVIL COURT - COUNTY) \((NEW YORK|BRONX|KINGS|QUEENS|RICHMOND)\)",
+        bare,
+    )
     if matched:
-        return {"seat": matched[1].lower().replace(" ", "-"), "party": party[1] if party else None, "county": matched[2].title()}
+        return {
+            "seat": matched[1].lower().replace(" ", "-"),
+            "party": party[1] if party else None,
+            "county": matched[2].title(),
+        }
     matched = re.match(r"^MEMBER OF THE CITY COUNCIL \((\d+)(?: COUNCIL DISTRICT)?\)", bare)
     if matched:
         return {"seat": "council", "number": int(matched[1]), "party": party[1] if party else None, "county": None}
     matched = re.match(r"^JUSTICE OF THE SUPREME COURT \((\d+)(?:ST|ND|RD|TH)? JUDICIAL DISTRICT\)", bare)
     if matched and county not in (None, "Crossover"):
-        return {"seat": "supreme-court", "number": int(matched[1]), "party": party[1] if party else None, "county": county}
-    matched = re.match(r"^JUDGE OF THE CIVIL COURT - DISTRICT \((\d+)(?:ST|ND|RD|TH)? MUNICIPAL COURT DISTRICT - (NEW YORK|BRONX|KINGS|QUEENS|RICHMOND)\)", bare)
+        return {
+            "seat": "supreme-court",
+            "number": int(matched[1]),
+            "party": party[1] if party else None,
+            "county": county,
+        }
+    matched = re.match(
+        r"^JUDGE OF THE CIVIL COURT - DISTRICT \((\d+)(?:ST|ND|RD|TH)? MUNICIPAL COURT DISTRICT - (NEW YORK|BRONX|KINGS|QUEENS|RICHMOND)\)",
+        bare,
+    )
     if matched:
-        return {"seat": "civil-court-district", "number": int(matched[1]), "party": party[1] if party else None, "county": matched[2].title()}
+        return {
+            "seat": "civil-court-district",
+            "number": int(matched[1]),
+            "party": party[1] if party else None,
+            "county": matched[2].title(),
+        }
     return None
 
 
@@ -362,13 +463,18 @@ def emit(
     frames = []
     for office, county, found in keys:
         frames.append(
-            entries.filter((pl.col("office") == office) & (pl.col("county") == county) & (pl.col("kind").is_in(["General", "Primary", "Primary Runoff", "Presidential Primary", "Special"])))
-            .with_columns(
+            entries.filter(
+                (pl.col("office") == office)
+                & (pl.col("county") == county)
+                & (pl.col("kind").is_in(["General", "Primary", "Primary Runoff", "Presidential Primary", "Special"]))
+            ).with_columns(
                 seat=pl.lit(found["seat"], pl.String),
                 number=pl.lit(found.get("number"), pl.Int64),
                 party_scope=pl.lit(found["party"], pl.String),
                 contest_county=pl.lit(found["county"], pl.String),
-                size=pl.lit(int(next(iter(re.findall(r"(?:vote for|ELECTED) (\d+)", office, re.I)), 1)), pl.Int64),
+                size=pl.lit(
+                    int(next(iter(re.findall(r"(?:vote for|ELECTED) (\d+)", office, re.IGNORECASE)), 1)), pl.Int64
+                ),
                 area_scheme=pl.lit((found.get("area") or (None, None))[0], pl.String),
                 area_code=pl.lit((found.get("area") or (None, None))[1], pl.String),
                 part_code=pl.lit(found.get("part"), pl.String),
@@ -401,7 +507,9 @@ def emit(
         county_areas = {county: cs.area("us.county", code) for county, code in fips.items()}
         known_parties = {
             value: entity
-            for value, entity in conn.execute("select value, entity_id from external_id where scheme = 'us.party'").fetchall()
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.party'"
+            ).fetchall()
         }
         for duplicate, survivor in (
             ("NY:democratic", "democratic-party"),
@@ -475,7 +583,21 @@ def emit(
         values = []
         skipped = []
         taken = 0
-        groups = frame.select("day", "kind", "seat", "number", "party_scope", "contest_county", "area_scheme", "area_code", "part_code").unique().sort("day", "seat")
+        groups = (
+            frame.select(
+                "day",
+                "kind",
+                "seat",
+                "number",
+                "party_scope",
+                "contest_county",
+                "area_scheme",
+                "area_code",
+                "part_code",
+            )
+            .unique()
+            .sort("day", "seat")
+        )
         for day_text, kind, seat, number, scope, only_county, area_scheme, area_code, part_code in groups.iter_rows():
             day = date.fromisoformat(day_text)
             rows = frame.filter(
@@ -496,7 +618,14 @@ def emit(
             target_seat = "us-senator" if seat.startswith("us-senator") else seat
             is_party = seat.startswith("party|")
             is_state = target_seat in STATE_TARGETS
-            statewide = target_seat in ("president", "governor", "lieutenant-governor", "attorney-general", "state-comptroller", "us-senator")
+            statewide = target_seat in (
+                "president",
+                "governor",
+                "lieutenant-governor",
+                "attorney-general",
+                "state-comptroller",
+                "us-senator",
+            )
             wide = seat in ("mayor", "public-advocate", "comptroller") or statewide
             if wide and len(counties) < 5:
                 skipped.append(f"{label}: only {counties}")
@@ -510,8 +639,12 @@ def emit(
                     mine = part.filter(pl.col("bkind") == "total")
                     mine = mine.with_columns(pl.lit("county").alias("bkind"), pl.lit(county).alias("bid"))
                 for office_text in part["office"].unique():
-                    declared = totals.filter((pl.col("url") == url) & (pl.col("office") == office_text) & (pl.col("bkind") == "total"))["votes"]
-                    if declared.is_empty() or int(mine.filter(pl.col("office") == office_text)["votes"].sum()) != int(declared[-1]):
+                    declared = totals.filter(
+                        (pl.col("url") == url) & (pl.col("office") == office_text) & (pl.col("bkind") == "total")
+                    )["votes"]
+                    if declared.is_empty() or int(mine.filter(pl.col("office") == office_text)["votes"].sum()) != int(
+                        declared[-1]
+                    ):
                         tied = False
                 parts.append(mine)
             if not tied:
@@ -520,7 +653,15 @@ def emit(
             rows = pl.concat(parts)
             era = "2002" if day_text < "2012-01-01" else "2012"
             if is_state:
-                state_kind = "general" if kind == "General" else "primary" if kind in ("Primary", "Presidential Primary") else "special" if kind == "Special" else "runoff"
+                state_kind = (
+                    "general"
+                    if kind == "General"
+                    else "primary"
+                    if kind in ("Primary", "Presidential Primary")
+                    else "special"
+                    if kind == "Special"
+                    else "runoff"
+                )
                 election = None
                 if state_kind == "special":
                     election = conn.execute(
@@ -528,7 +669,13 @@ def emit(
                         "where e.polity_id = %s and e.date_from = %s and e.kind = 'special' limit 1",
                         [cs.polity("US-NY"), day],
                     ).fetchone()
-                for value in ([] if state_kind == "special" else [f"{day}:NY"] if state_kind == "general" else [f"{day}:NY:primary"]):
+                for value in (
+                    []
+                    if state_kind == "special"
+                    else [f"{day}:NY"]
+                    if state_kind == "general"
+                    else [f"{day}:NY:primary"]
+                ):
                     election = conn.execute(
                         "select x.entity_id, s.path from external_id x left join slug s on s.entity_id = x.entity_id "
                         "where x.scheme = 'us.election' and x.value = %s limit 1",
@@ -568,9 +715,16 @@ def emit(
                     continue
                 election = election[0]
             else:
-                election_kind = "primary" if kind in ("Primary", "Presidential Primary") else "special" if kind == "Special" else "runoff"
+                election_kind = (
+                    "primary"
+                    if kind in ("Primary", "Presidential Primary")
+                    else "special"
+                    if kind == "Special"
+                    else "runoff"
+                )
                 election = conn.execute(
-                    "select id from election where polity_id = %s and date_from = %s and kind in ('primary', 'runoff', 'special')", [city, day]
+                    "select id from election where polity_id = %s and date_from = %s and kind in ('primary', 'runoff', 'special')",
+                    [city, day],
                 ).fetchone()
                 if election is None:
                     election = cs.key("us.election", f"{day}:new-york-city:{election_kind}")
@@ -593,8 +747,14 @@ def emit(
                 else:
                     election = election[0]
             if not is_state:
-                election_path = conn.execute("select path from slug where entity_id = %s limit 1", [election]).fetchone()
-                election_path = election_path[0] if election_path else f"us/ny/new-york-city/{day}-{'primary' if kind == 'Primary' else 'special' if kind == 'Special' else 'runoff'}"
+                election_path = conn.execute(
+                    "select path from slug where entity_id = %s limit 1", [election]
+                ).fetchone()
+                election_path = (
+                    election_path[0]
+                    if election_path
+                    else f"us/ny/new-york-city/{day}-{'primary' if kind == 'Primary' else 'special' if kind == 'Special' else 'runoff'}"
+                )
             office = body_id = None
             area = None
             county_name = only_county
@@ -623,33 +783,75 @@ def emit(
                     "house": f"U.S. House, New York's {number} congressional district",
                     "state-senate": f"New York State Senate, District {number}",
                     "assembly": f"New York State Assembly, District {number}",
-                }.get(seat, {"president": "President", "governor": "Governor", "lieutenant-governor": "Lieutenant Governor", "attorney-general": "Attorney General", "state-comptroller": "State Comptroller"}.get(seat, "U.S. Senator"))
-                area = cs.area(scheme, "36" if scheme == "us.state" else f"36{number:02d}" if scheme == "us.cd" else f"NY:{number}")
+                }.get(
+                    seat,
+                    {
+                        "president": "President",
+                        "governor": "Governor",
+                        "lieutenant-governor": "Lieutenant Governor",
+                        "attorney-general": "Attorney General",
+                        "state-comptroller": "State Comptroller",
+                    }.get(seat, "U.S. Senator"),
+                )
+                area = cs.area(
+                    scheme, "36" if scheme == "us.state" else f"36{number:02d}" if scheme == "us.cd" else f"NY:{number}"
+                )
                 if key in BODY_KEYS:
                     body_id = cs.key("us.body", key)
                 else:
                     office = cs.key("us.office", key)
             elif seat == "mayor":
-                path, title, office, area = "mayor", "New York City Mayor", cs.key("us.office", "NY:3651000:mayor"), place
+                path, title, office, area = (
+                    "mayor",
+                    "New York City Mayor",
+                    cs.key("us.office", "NY:3651000:mayor"),
+                    place,
+                )
             elif seat in ("public-advocate", "comptroller"):
                 path, title = seat, f"New York City {seat.replace('-', ' ').title()}"
                 office, area = cs.key("us.office", f"new-york-city:{seat}"), place
             elif seat == "borough-president":
                 path, title = f"borough-president-{slug(nickname)}", f"{nickname} Borough President"
-                office, area = cs.key("us.office", f"new-york-city:borough-president:{slug(nickname)}"), county_areas[county_name]
+                office, area = (
+                    cs.key("us.office", f"new-york-city:borough-president:{slug(nickname)}"),
+                    county_areas[county_name],
+                )
             elif seat == "district-attorney":
                 path, title = f"district-attorney-{slug(county_name)}", f"{county_name} County District Attorney"
-                office, area = cs.key("us.office", f"NY:{fips[county_name]}:district-attorney"), county_areas[county_name]
+                office, area = (
+                    cs.key("us.office", f"NY:{fips[county_name]}:district-attorney"),
+                    county_areas[county_name],
+                )
             elif seat == "council":
                 path, title = f"council-district-{number}", f"New York City Council, District {number}"
                 area = cs.area("us.local_district", f"36:3651000:council:district-{number}")
                 body_id = council
             else:
                 office_key, path, title, area = {
-                    "surrogate": (f"NY:{fips[county_name]}:surrogate", f"surrogate-{slug(county_name)}", f"{county_name} County Surrogate", county_areas[county_name]),
-                    "judge-of-the-civil-court---county": (f"NY:{fips[county_name]}:civil-court", f"civil-court-{slug(county_name)}", f"{county_name} County Civil Court Judge", county_areas[county_name]),
-                    "supreme-court": (f"NY:{fips[county_name]}:supreme-court:{number}", f"supreme-court-{number}-{slug(county_name)}", f"Judicial District {number} Supreme Court Justice", county_areas[county_name]),
-                    "civil-court-district": (f"NY:{fips[county_name]}:civil-court-district-{number}", f"civil-court-district-{number}-{slug(county_name)}", f"Municipal Court District {number}, {county_name} County Civil Court Judge", None),
+                    "surrogate": (
+                        f"NY:{fips[county_name]}:surrogate",
+                        f"surrogate-{slug(county_name)}",
+                        f"{county_name} County Surrogate",
+                        county_areas[county_name],
+                    ),
+                    "judge-of-the-civil-court---county": (
+                        f"NY:{fips[county_name]}:civil-court",
+                        f"civil-court-{slug(county_name)}",
+                        f"{county_name} County Civil Court Judge",
+                        county_areas[county_name],
+                    ),
+                    "supreme-court": (
+                        f"NY:{fips[county_name]}:supreme-court:{number}",
+                        f"supreme-court-{number}-{slug(county_name)}",
+                        f"Judicial District {number} Supreme Court Justice",
+                        county_areas[county_name],
+                    ),
+                    "civil-court-district": (
+                        f"NY:{fips[county_name]}:civil-court-district-{number}",
+                        f"civil-court-district-{number}-{slug(county_name)}",
+                        f"Municipal Court District {number}, {county_name} County Civil Court Judge",
+                        None,
+                    ),
                 }[seat]
                 office = cs.key("us.office", office_key)
                 if office in cs.minted and office not in added:
@@ -658,16 +860,24 @@ def emit(
                     name(office, title)
             party = party_id(scope)[0] if scope is not None else None
             seat_path = f"{path}-{slug(scope)}" if scope else path
-            if (office is not None and office in cs.minted and office not in added) or (area is not None and area in cs.minted) or (body_id is not None and body_id in cs.minted):
+            if (
+                (office is not None and office in cs.minted and office not in added)
+                or (area is not None and area in cs.minted)
+                or (body_id is not None and body_id in cs.minted)
+            ):
                 skipped.append(f"{label}: its office or district is not in the archive")
                 continue
-            found = [] if is_party else conn.execute(
-                """select c.id from contest c join entity e on e.id = c.id and e.retired_by is null
+            found = (
+                []
+                if is_party
+                else conn.execute(
+                    """select c.id from contest c join entity e on e.id = c.id and e.retired_by is null
                    where c.election_id = %s and c.office_id is not distinct from %s and c.body_id is not distinct from %s
                    and c.district_area_id is not distinct from %s and c.party_scope_id is not distinct from %s
                    and c.changeset_id not in (select id from changeset where pipeline = %s)""",
-                [election, office, body_id, area, party, pipeline],
-            ).fetchall()
+                    [election, office, body_id, area, party, pipeline],
+                ).fetchall()
+            )
             if len(found) > 1:
                 skipped.append(f"{label}: several contests match")
                 continue
@@ -745,13 +955,20 @@ def emit(
                     default_result_kind="counted",
                     term="full",
                 )
-                name(contest, f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}")
+                name(
+                    contest,
+                    f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}",
+                )
                 cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
                 pl.col("name").str.replace_all(r"\s+", " ").alias("name")
             )
             ranked = real.group_by("name").agg(pl.col("votes").sum()).sort("votes", "name", descending=[True, False])
-            margin = magnitude > 0 and ranked.height > magnitude and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
+            margin = (
+                magnitude > 0
+                and ranked.height > magnitude
+                and ranked["votes"][magnitude - 1] == ranked["votes"][magnitude]
+            )
             roots: dict[str, UUID] = {}
             tickets: dict[tuple[str, str | None], UUID] = {}
             known: dict[tuple[str, str], UUID] = {}
@@ -762,21 +979,31 @@ def emit(
                        where o.contest_id = %s and o.parent_option_id is null and o.kind in ('candidate', 'ticket')""",
                     [contest],
                 ).fetchall():
-                    words = [w for w in re.sub(r"[^a-z ]", " ", ballot_name.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
+                    words = [
+                        w
+                        for w in re.sub(r"[^a-z ]", " ", ballot_name.lower().split("/")[0]).split()
+                        if w not in ("jr", "sr", "ii", "iii")
+                    ]
                     for token in {(words[0], words[-1]), (words[0][0], words[-1])}:
                         if token in known:
                             clash.add(token)
                         known[token] = option_id
 
             def lookup(candidate: str) -> UUID | None:
-                words = [w for w in re.sub(r"[^a-z ]", " ", candidate.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
+                words = [
+                    w
+                    for w in re.sub(r"[^a-z ]", " ", candidate.lower().split("/")[0]).split()
+                    if w not in ("jr", "sr", "ii", "iii")
+                ]
                 if len(words) < 2:
                     return None
                 rest = "".join(words[1:])
                 for token in ((words[0], words[-1]), (words[0][0], words[-1]), (words[0], rest), (words[0][0], rest)):
                     if token in known and token not in clash:
                         return known[token]
-                found = {option for (first, last), option in known.items() if words[-1] in (first, last) or rest == last}
+                found = {
+                    option for (first, last), option in known.items() if words[-1] in (first, last) or rest == last
+                }
                 if len(found) == 1:
                     return found.pop()
                 close = [
@@ -796,16 +1023,36 @@ def emit(
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and source not in added:
                 added.add(source)
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())).partition("#")[0], license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=source_title,
+                    url=next(iter(urls.values())).partition("#")[0],
+                    license="Public record",
+                )
             for url in urls.values():
                 cs.artifact(raw.cached(pipeline, url.partition("#")[0]), source)
             result_set = cs.key(f"{pipeline}.result_set", contest_key)
             declared = {}
             declared_names = []
             if attach and whole:
-                columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+                columns = (
+                    "id",
+                    "election_id",
+                    "contest_id",
+                    "stage",
+                    "kind",
+                    "status",
+                    "source_id",
+                    "as_of",
+                    "completeness",
+                    "supersedes_id",
+                )
                 for row in conn.execute(
-                    f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+                    f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+                    [contest, result_set],
                 ).fetchall():
                     cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
                 for option_id, declared_kind, declared_label in conn.execute(
@@ -817,7 +1064,9 @@ def emit(
                     [contest, result_set],
                 ).fetchall():
                     declared[option_id] = declared_kind
-                    declared_names.append((re.sub(r"[^a-z ]", "", str(declared_label).lower().split("/")[0]).split(), declared_kind))
+                    declared_names.append(
+                        (re.sub(r"[^a-z ]", "", str(declared_label).lower().split("/")[0]).split(), declared_kind)
+                    )
 
             def carried(option: UUID, label: str) -> str:
                 if option in declared:
@@ -849,17 +1098,37 @@ def emit(
             for rank, candidate in enumerate(ranked["name"]):
                 label_text = candidate.title()
                 root_key = f"{contest_key}:{slug(candidate)}"
-                words = [w for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split() if w not in ("jr", "sr", "ii", "iii")]
+                words = [
+                    w
+                    for w in re.sub(r"[^a-z ]", " ", label_text.lower().split("/")[0]).split()
+                    if w not in ("jr", "sr", "ii", "iii")
+                ]
                 if attach and (existing := lookup(label_text)) is not None:
                     roots[candidate] = existing
                     if whole and declared:
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=carried(roots[candidate], label_text))
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=roots[candidate],
+                            kind=carried(roots[candidate], label_text),
+                        )
                     continue
                 roots[candidate] = cs.key("us.option", root_key)
                 if is_party:
-                    cs.add("contest_option", id=roots[candidate], contest_id=contest, kind="candidate", ballot_label=label_text)
+                    cs.add(
+                        "contest_option",
+                        id=roots[candidate],
+                        contest_id=contest,
+                        kind="candidate",
+                        ballot_label=label_text,
+                    )
                     if not margin and whole:
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind="advanced" if rank < magnitude else "lost")
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=roots[candidate],
+                            kind="advanced" if rank < magnitude else "lost",
+                        )
                     continue
                 matched = people.get((words[0], words[-1])) if len(words) >= 2 else None
                 if matched is not None and len(matched) == 1:
@@ -870,9 +1139,24 @@ def emit(
                         made.add(person)
                         cs.add("person", id=person)
                         name(person, label_text)
-                cs.add("contest_option", id=roots[candidate], contest_id=contest, kind="candidate", party_id=party, ballot_label=label_text)
+                cs.add(
+                    "contest_option",
+                    id=roots[candidate],
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party,
+                    ballot_label=label_text,
+                )
                 head = cs.key("us.candidacy", f"{root_key}:head")
-                cs.add("candidacy", id=head, person_id=person, option_id=roots[candidate], role="head", ballot_name=label_text, is_independent=False)
+                cs.add(
+                    "candidacy",
+                    id=head,
+                    person_id=person,
+                    option_id=roots[candidate],
+                    role="head",
+                    ballot_name=label_text,
+                    is_independent=False,
+                )
                 if party is not None:
                     cs.add("candidacy_nomination", candidacy_id=head, party_id=party, kind="nominated")
                 else:
@@ -880,19 +1164,30 @@ def emit(
                         for entity in party_id(line):
                             cs.add("candidacy_nomination", candidacy_id=head, party_id=entity, kind="nominated")
                 if whole and attach and declared:
-                    cs.add("outcome", result_set_id=result_set, option_id=roots[candidate], kind=carried(roots[candidate], label_text))
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=roots[candidate],
+                        kind=carried(roots[candidate], label_text),
+                    )
                 elif not margin and whole and not attach:
                     cs.add(
                         "outcome",
                         result_set_id=result_set,
                         option_id=roots[candidate],
-                        kind=("advanced" if kind not in ("General", "Special") else "elected") if rank < magnitude else "lost",
+                        kind=("advanced" if kind not in ("General", "Special") else "elected")
+                        if rank < magnitude
+                        else "lost",
                     )
             write_in = None
             if rows.filter(pl.col("party") == "WRITE-IN").height:
-                write_in = conn.execute(
-                    "select id from contest_option where contest_id = %s and kind = 'write_in' limit 1", [contest]
-                ).fetchone() if attach else None
+                write_in = (
+                    conn.execute(
+                        "select id from contest_option where contest_id = %s and kind = 'write_in' limit 1", [contest]
+                    ).fetchone()
+                    if attach
+                    else None
+                )
                 if write_in is not None:
                     write_in = write_in[0]
                 else:
@@ -923,7 +1218,9 @@ def emit(
                         if reused is not None:
                             tickets[(candidate, line)] = reused[0]
                         else:
-                            tickets[(candidate, line)] = cs.key("us.option", f"{contest_key}:{slug(candidate)}:{slug(line)}")
+                            tickets[(candidate, line)] = cs.key(
+                                "us.option", f"{contest_key}:{slug(candidate)}:{slug(line)}"
+                            )
                             cs.add(
                                 "contest_option",
                                 id=tickets[(candidate, line)],
@@ -935,10 +1232,17 @@ def emit(
                             )
                     option = tickets[(candidate, line)]
                 summed[(unit, option)] = summed.get((unit, option), 0) + votes
-            values.extend((str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items())
+            values.extend(
+                (str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items()
+            )
             for county, bkind, bid in rows.select("county", "bkind", "bid").unique().iter_rows():
                 unit = unit_for(era, bid, county, part) if bkind == "ad" else county_units[county]
-                cast = ballots.filter((pl.col("url") == urls[county]) & (pl.col("bkind") == bkind) & (pl.col("bid") == bid) & pl.col("office").is_in(rows["office"].unique().to_list()))["votes"]
+                cast = ballots.filter(
+                    (pl.col("url") == urls[county])
+                    & (pl.col("bkind") == bkind)
+                    & (pl.col("bid") == bid)
+                    & pl.col("office").is_in(rows["office"].unique().to_list())
+                )["votes"]
                 if bkind == "ad" and not cast.is_empty():
                     values.append((str(result_set), str(unit), None, 3, int(cast[0])))
                 if magnitude == 1:
@@ -949,7 +1253,9 @@ def emit(
             day = date.fromisoformat(day_text)
             era = "2002" if day_text < "2012-01-01" else "2012"
             qrows = entries.filter(
-                (pl.col("day") == day_text) & pl.col("office").str.to_uppercase().str.contains(marker, literal=True) & (pl.col("county") != "Crossover")
+                (pl.col("day") == day_text)
+                & pl.col("office").str.to_uppercase().str.contains(marker, literal=True)
+                & (pl.col("county") != "Crossover")
             )
             urls = {}
             for county, url in qrows.select("county", "url").unique().sort("url").iter_rows():
@@ -962,7 +1268,11 @@ def emit(
             for county, url in urls.items():
                 part = qrows.filter(pl.col("url") == url)
                 mine = part.filter(pl.col("bkind") == "ad")
-                declared = totals.filter((pl.col("url") == url) & (pl.col("bkind") == "total") & pl.col("office").is_in(part["office"].unique().to_list()))["votes"]
+                declared = totals.filter(
+                    (pl.col("url") == url)
+                    & (pl.col("bkind") == "total")
+                    & pl.col("office").is_in(part["office"].unique().to_list())
+                )["votes"]
                 if mine.is_empty() or declared.is_empty() or int(mine["votes"].sum()) != int(declared[-1]):
                     skipped.append(f"{day} question {qslug}: {county} lines do not sum to the total")
                     parts = None
@@ -971,13 +1281,18 @@ def emit(
             if parts is None:
                 continue
             qrows = pl.concat(parts)
-            election = conn.execute(
-                "select id from election where polity_id = %s and date_from = %s and kind in ('local', 'general') order by kind = 'local' desc",
-                [city, day],
-            ).fetchone() or conn.execute(
-                "select entity_id from external_id where scheme = 'us.election' and value = %s", [f"{day}:NY"]
-            ).fetchone()
-            election_path = conn.execute("select path from slug where entity_id = %s limit 1", [election[0]]).fetchone()[0]
+            election = (
+                conn.execute(
+                    "select id from election where polity_id = %s and date_from = %s and kind in ('local', 'general') order by kind = 'local' desc",
+                    [city, day],
+                ).fetchone()
+                or conn.execute(
+                    "select entity_id from external_id where scheme = 'us.election' and value = %s", [f"{day}:NY"]
+                ).fetchone()
+            )
+            election_path = conn.execute(
+                "select path from slug where entity_id = %s limit 1", [election[0]]
+            ).fetchone()[0]
             contest_key = f"{day}:new-york-city:proposal-{qslug}"
             contest = cs.key("us.contest", contest_key)
             cs.add(
@@ -998,14 +1313,38 @@ def emit(
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and source not in added:
                 added.add(source)
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url=next(iter(urls.values())).partition("#")[0], license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=source_title,
+                    url=next(iter(urls.values())).partition("#")[0],
+                    license="Public record",
+                )
             for url in urls.values():
                 cs.artifact(raw.cached(pipeline, url.partition("#")[0]), source)
             text_source = cs.source("New York City Charter Revision Commission", wording_title)
             if text_source in cs.minted and text_source not in added:
                 added.add(text_source)
-                cs.add("source", id=text_source, kind="official_body", publisher="New York City Charter Revision Commission", title=wording_title, url=wording_url, license="Public record")
-            cs.add("ballot_question_text", contest_id=contest, kind="text", lang="en", body=wording, url=wording_url, source_id=text_source)
+                cs.add(
+                    "source",
+                    id=text_source,
+                    kind="official_body",
+                    publisher="New York City Charter Revision Commission",
+                    title=wording_title,
+                    url=wording_url,
+                    license="Public record",
+                )
+            cs.add(
+                "ballot_question_text",
+                contest_id=contest,
+                kind="text",
+                lang="en",
+                body=wording,
+                url=wording_url,
+                source_id=text_source,
+            )
             result_set = cs.key(f"{pipeline}.result_set", contest_key)
             cs.add(
                 "result_set",
@@ -1023,26 +1362,54 @@ def emit(
             answers = {}
             for position, answer in enumerate(("YES", "NO"), start=1):
                 answers[answer] = cs.key("us.option", f"{contest_key}:{answer.lower()}")
-                cs.add("contest_option", id=answers[answer], contest_id=contest, kind="answer", ballot_position=position, ballot_label=answer.title())
+                cs.add(
+                    "contest_option",
+                    id=answers[answer],
+                    contest_id=contest,
+                    kind="answer",
+                    ballot_position=position,
+                    ballot_label=answer.title(),
+                )
             summed = {}
             for county, bid, answer, votes in qrows.select("county", "bid", "name", "votes").iter_rows():
                 if answer.upper() not in answers:
                     continue
                 unit = unit_for(era, bid, county)
                 summed[(unit, answers[answer.upper()])] = summed.get((unit, answers[answer.upper()]), 0) + votes
-            values.extend((str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items())
+            values.extend(
+                (str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items()
+            )
             for county, bid in qrows.select("county", "bid").unique().iter_rows():
                 unit = unit_for(era, bid, county)
-                cast = ballots.filter((pl.col("url") == urls[county]) & (pl.col("bkind") == "ad") & (pl.col("bid") == bid) & pl.col("office").is_in(qrows["office"].unique().to_list()))["votes"]
+                cast = ballots.filter(
+                    (pl.col("url") == urls[county])
+                    & (pl.col("bkind") == "ad")
+                    & (pl.col("bid") == bid)
+                    & pl.col("office").is_in(qrows["office"].unique().to_list())
+                )["votes"]
                 if not cast.is_empty():
                     values.append((str(result_set), str(unit), None, 3, int(cast[0])))
-                values.append((str(result_set), str(unit), None, 4, int(qrows.filter((pl.col("county") == county) & (pl.col("bid") == bid))["votes"].sum())))
+                values.append(
+                    (
+                        str(result_set),
+                        str(unit),
+                        None,
+                        4,
+                        int(qrows.filter((pl.col("county") == county) & (pl.col("bid") == bid))["votes"].sum()),
+                    )
+                )
             taken += 1
         cs.frame(
             "result_value",
             pl.DataFrame(
                 values,
-                schema={"result_set_id": pl.String, "unit_id": pl.String, "option_id": pl.String, "measure": pl.Int16, "value": pl.Int64},
+                schema={
+                    "result_set_id": pl.String,
+                    "unit_id": pl.String,
+                    "option_id": pl.String,
+                    "measure": pl.Int16,
+                    "value": pl.Int64,
+                },
                 orient="row",
             ).with_columns(channel=pl.lit(0, pl.Int16), count_round=pl.lit(0, pl.Int16), flags=pl.lit(0, pl.Int16)),
         )

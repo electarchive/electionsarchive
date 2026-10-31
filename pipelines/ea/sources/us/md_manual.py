@@ -47,11 +47,19 @@ def parse() -> None:
         text = re.sub(r"(?i)</t[dr]>|<br\s*/?>|</p>|</h\d>", "\n", text)
         lines = [re.sub(r"\s+", " ", line).strip() for line in html.unescape(re.sub(r"<[^>]+>", " ", text)).split("\n")]
         lines = [line for line in lines if line]
-        starts = [i for i, line in enumerate(lines) if re.fullmatch(r"(?:\d+(?:ST|ND|RD|TH) )?CONGRESSIONAL DISTRICT(?: \d+)?", line)]
+        starts = [
+            i
+            for i, line in enumerate(lines)
+            if re.fullmatch(r"(?:\d+(?:ST|ND|RD|TH) )?CONGRESSIONAL DISTRICT(?: \d+)?", line)
+        ]
         for start, end in zip(starts, [*starts[1:], len(lines)]):
             district = int(re.search(r"\d+", lines[start])[0])
             block = lines[start + 1 : end]
-            first = next(i for i, line in enumerate(block) if line.endswith(" Co.") and "," not in line or line == "Baltimore City")
+            first = next(
+                i
+                for i, line in enumerate(block)
+                if line.endswith(" Co.") and "," not in line or line == "Baltimore City"
+            )
             people = []
             for line in block[:first]:
                 if "," not in line:
@@ -74,7 +82,9 @@ def parse() -> None:
             cells = {k: v for k, v in cells.items() if k.endswith("Co.") or k == "Baltimore City"}
             printed = printed or [sum(v[column] for v in cells.values()) for column in range(len(people))]
             if len(printed) != len(people) or any(len(v) != len(people) for v in cells.values()):
-                raise ValueError(f"{year} district {district}: row lengths {sorted({len(v) for v in cells.values()})} for {len(people)}")
+                raise ValueError(
+                    f"{year} district {district}: row lengths {sorted({len(v) for v in cells.values()})} for {len(people)}"
+                )
             for column, (name, writein) in enumerate(people):
                 if sum(v[column] for v in cells.values()) != printed[column]:
                     raise ValueError(f"{year} district {district} {name}: counties do not sum to the printed total")
@@ -84,7 +94,14 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
-        schema={"year": pl.Int32, "district": pl.Int16, "candidate": pl.String, "code": pl.String, "votes": pl.Int64, "writein": pl.Boolean},
+        schema={
+            "year": pl.Int32,
+            "district": pl.Int16,
+            "candidate": pl.String,
+            "code": pl.String,
+            "votes": pl.Int64,
+            "writein": pl.Boolean,
+        },
         orient="row",
     ).with_columns(
         day=pl.col("year").replace_strict({y: d for y, d in DAYS.items()}, return_dtype=pl.Date),

@@ -140,7 +140,9 @@ def parse() -> None:
                         elif not re.fullmatch(r"County|\[[A-Z]\]", word):
                             letters[column] += f" {word}"
                     columns = [
-                        (centers[index], letters[index].strip(), marks[index]) for index in range(len(centers)) if not total[index]
+                        (centers[index], letters[index].strip(), marks[index])
+                        for index in range(len(centers))
+                        if not total[index]
                     ]
                     header = []
                 county = " ".join(word for _, _, word in words if not NUMBER.fullmatch(word))
@@ -180,7 +182,9 @@ def parse() -> None:
     frame = pl.DataFrame(records)
     summed = frame.group_by("day", "party", "contest", "candidate").agg(pl.col("votes").sum())
     check = pl.DataFrame(totals).join(summed, on=["day", "party", "contest", "candidate"], how="full", suffix="_rows")
-    bad = check.filter(pl.col("votes").is_null() | pl.col("votes_rows").is_null() | (pl.col("votes") != pl.col("votes_rows")))
+    bad = check.filter(
+        pl.col("votes").is_null() | pl.col("votes_rows").is_null() | (pl.col("votes") != pl.col("votes_rows"))
+    )
     print(frame.group_by("day", "party").agg(pl.col("contest").n_unique(), pl.len()))
     print("total mismatches", bad.height)
     print(bad.head(30))
@@ -211,7 +215,7 @@ def emit() -> Path:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         state_polity = cs.polity("US-TX")
-        state_area, = conn.execute(
+        (state_area,) = conn.execute(
             "select area_id from reporting_unit where scheme_code = 'us.state' and polity_id = %s", [state_polity]
         ).fetchone()
         counties: dict[str, object] = {}
@@ -279,7 +283,9 @@ def emit() -> Path:
         sources = {}
         for (day, party), (url, _) in FILES.items():
             runoff = day == "2026-05-26"
-            text = f"2026 {party.title()} primary{' runoff' if runoff else ''} election: county by county canvass report"
+            text = (
+                f"2026 {party.title()} primary{' runoff' if runoff else ''} election: county by county canvass report"
+            )
             sources[(day, party)] = cs.source("Texas Secretary of State", text)
             if sources[(day, party)] in cs.minted:
                 cs.add(
@@ -350,9 +356,7 @@ def emit() -> Path:
                         continue
                     tail = f"house:{int(found[1])}" if found[1] else "senate"
                     frame_row = federal[f"2026-03-03:TX:{tail}:{party}"]
-                    label = (
-                        f"Texas's {ordinal(int(found[1]))} congressional district" if found[1] else "Texas"
-                    )
+                    label = f"Texas's {ordinal(int(found[1]))} congressional district" if found[1] else "Texas"
                 elif heading in STATEWIDE:
                     tail, label = STATEWIDE[heading]
                     office, area = office_of(f"{tail}:TX", state_polity, ""), state_area
@@ -366,28 +370,53 @@ def emit() -> Path:
                 elif found := re.fullmatch(r"JUDGE, COURT OF CRIMINAL APPEALS, PLACE (\d+)", heading):
                     tail = "judge-of-the-court-of-criminal-appeals"
                     office, area = office_of(f"{tail}:TX", state_polity, ""), state_area
-                    tail, label = f"{tail}:place-{found[1]}", f"Judge of the Texas Court of Criminal Appeals, Place {found[1]}"
+                    tail, label = (
+                        f"{tail}:place-{found[1]}",
+                        f"Judge of the Texas Court of Criminal Appeals, Place {found[1]}",
+                    )
                 elif found := re.fullmatch(r"MEMBER, STATE BOARD OF EDUCATION, DISTRICT (\d+)", heading):
-                    tail, label = f"state-board-of-education:{found[1]}", f"Texas State Board of Education, District {found[1]}"
-                    office, area = None, cs.area("us.local_district", f"48:state-board-of-education:district-{found[1]}")
+                    tail, label = (
+                        f"state-board-of-education:{found[1]}",
+                        f"Texas State Board of Education, District {found[1]}",
+                    )
+                    office, area = (
+                        None,
+                        cs.area("us.local_district", f"48:state-board-of-education:district-{found[1]}"),
+                    )
                     if area not in made:
                         made.add(area)
                         if area in cs.minted:
                             cs.add("area", id=area, scheme_code="us.local_district")
-                            cs.add("area_code", area_id=area, code=f"48:state-board-of-education:district-{found[1]}", valid_from=None)
+                            cs.add(
+                                "area_code",
+                                area_id=area,
+                                code=f"48:state-board-of-education:district-{found[1]}",
+                                valid_from=None,
+                            )
                             cs.add("area_parent", area_id=area, parent_id=state_area)
                             name(area, label)
-                elif found := re.fullmatch(r"(CHIEF )?JUSTICE, (\d+)(?:ST|ND|RD|TH) COURT OF APPEALS DISTRICT(?:, PLACE (\d+))?", heading):
+                elif found := re.fullmatch(
+                    r"(CHIEF )?JUSTICE, (\d+)(?:ST|ND|RD|TH) COURT OF APPEALS DISTRICT(?:, PLACE (\d+))?", heading
+                ):
                     number = int(found[2])
                     court = f"{ordinal(number)} Court of Appeals District"
                     polity, area = district_of(f"TX:coa-{number}", court)
                     title_text = "Chief Justice" if found[1] else "Justice"
-                    office = office_of(f"{slug(title_text)}-of-the-court-of-appeals:TX:coa-{number}", polity, f"{title_text}, {court}")
-                    tail = f"{slug(title_text)}-of-the-court-of-appeals:coa-{number}" + (f":place-{found[3]}" if found[3] else "")
+                    office = office_of(
+                        f"{slug(title_text)}-of-the-court-of-appeals:TX:coa-{number}", polity, f"{title_text}, {court}"
+                    )
+                    tail = f"{slug(title_text)}-of-the-court-of-appeals:coa-{number}" + (
+                        f":place-{found[3]}" if found[3] else ""
+                    )
                     label = f"{title_text}, {court}" + (f", Place {found[3]}" if found[3] else "")
-                elif found := re.fullmatch(r"DISTRICT (JUDGE|ATTORNEY), (?:(\d+)(?:ST|ND|RD|TH) JUDICIAL DISTRICT|JUDICIAL DISTRICT (\w+))", heading):
+                elif found := re.fullmatch(
+                    r"DISTRICT (JUDGE|ATTORNEY), (?:(\d+)(?:ST|ND|RD|TH) JUDICIAL DISTRICT|JUDICIAL DISTRICT (\w+))",
+                    heading,
+                ):
                     code = found[2] or found[3].lower()
-                    court = f"{ordinal(int(found[2]))} Judicial District" if found[2] else f"Judicial District {found[3]}"
+                    court = (
+                        f"{ordinal(int(found[2]))} Judicial District" if found[2] else f"Judicial District {found[3]}"
+                    )
                     polity, area = district_of(f"TX:district-{code}", court)
                     title_text = f"District {found[1].title()}"
                     office = office_of(f"{slug(title_text)}:TX:district-{code}", polity, f"{title_text}, {court}")
@@ -397,16 +426,29 @@ def emit() -> Path:
                     polity, area = district_of(f"TX:multicounty-court-at-law-{found[1]}", court)
                     office = office_of(f"judge:TX:multicounty-court-at-law-{found[1]}", polity, f"Judge, {court}")
                     tail, label = f"judge:multicounty-court-at-law-{found[1]}", f"Judge, {court}"
-                elif found := re.fullmatch(r"CRIMINAL DISTRICT (ATTORNEY|JUDGE),? (?:#(\d+) )?(.+?) COUNTY(?: NUMBER (\d+))?", heading):
+                elif found := re.fullmatch(
+                    r"CRIMINAL DISTRICT (ATTORNEY|JUDGE),? (?:#(\d+) )?(.+?) COUNTY(?: NUMBER (\d+))?", heading
+                ):
                     fips, area, county = county_areas[plain(found[3])]
                     polity = cs.key("us.polity", f"county:{fips}")
                     assert polity not in cs.minted
                     number = found[2] or found[4]
                     if found[1] == "ATTORNEY":
-                        office = office_of(f"TX:{fips}:criminal-district-attorney", polity, f"{county} County Criminal District Attorney")
-                        tail, label = f"{fips}:criminal-district-attorney", f"{county} County Criminal District Attorney"
+                        office = office_of(
+                            f"TX:{fips}:criminal-district-attorney",
+                            polity,
+                            f"{county} County Criminal District Attorney",
+                        )
+                        tail, label = (
+                            f"{fips}:criminal-district-attorney",
+                            f"{county} County Criminal District Attorney",
+                        )
                     else:
-                        office = office_of(f"TX:{fips}:criminal-district-court", polity, f"Judge, Criminal District Court, {county} County")
+                        office = office_of(
+                            f"TX:{fips}:criminal-district-court",
+                            polity,
+                            f"Judge, Criminal District Court, {county} County",
+                        )
                         tail = f"{fips}:criminal-district-court" + (f":court-{number}" if number else "")
                         label = f"Judge, {county} County Criminal District Court" + (f" No. {number}" if number else "")
                 else:
@@ -428,7 +470,12 @@ def emit() -> Path:
                 else:
                     board_seat = tail.startswith("state-board")
                     kind, body, seat, plan, magnitude, result_kind = (
-                        "body_seats" if board_seat else "office", board if board_seat else None, None, None, 1, "counted"
+                        "body_seats" if board_seat else "office",
+                        board if board_seat else None,
+                        None,
+                        None,
+                        1,
+                        "counted",
                     )
                     term = "remainder" if unexpired else "full"
                     title_text = f"2026 {party.title()} {round_word} for {label}"
@@ -545,7 +592,12 @@ def emit() -> Path:
                 everyone = sum(votes for votes, _ in standing)
                 if not runoff and len(standing) > 1 and standing[0][0] * 2 <= everyone:
                     if len(standing) > 2 and standing[1][0] == standing[2][0]:
-                        cs.add("note", entity_id=result_set, kind="caveat", body_md="A tie for the last advancing place leaves the outcome unrecorded.")
+                        cs.add(
+                            "note",
+                            entity_id=result_set,
+                            kind="caveat",
+                            body_md="A tie for the last advancing place leaves the outcome unrecorded.",
+                        )
                     else:
                         for _, option in standing[:2]:
                             cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", seats=None)

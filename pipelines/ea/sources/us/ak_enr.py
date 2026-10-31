@@ -45,7 +45,9 @@ def emit() -> Path:
         else:
             raise ValueError(f"unknown place {place}")
         writein = name.lower().startswith("write")
-        rows.append((code, kind, "WRITE-INS" if writein else name.split("/")[0].upper(), writein, int(row["total_votes"])))
+        rows.append(
+            (code, kind, "WRITE-INS" if writein else name.split("/")[0].upper(), writein, int(row["total_votes"]))
+        )
     frame = pl.DataFrame(
         rows,
         schema={"code": pl.String, "kind": pl.String, "candidate": pl.String, "writein": pl.Boolean, "votes": pl.Int64},

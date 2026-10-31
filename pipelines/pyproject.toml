@@ -36,5 +36,11 @@ module-name = "ea"
 [tool.ruff]
 line-length = 120
 
+[tool.ruff.lint]
+ignore = ["B023", "BLE001", "S112", "UP031"]
+
+[tool.ruff.lint.per-file-ignores]
+"ea/tools/**" = ["SIM115"]
+
 [dependency-groups]
 dev = ["ruff>=0.17.0", "ty>=0.0.87"]

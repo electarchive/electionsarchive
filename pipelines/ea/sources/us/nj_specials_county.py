@@ -23,7 +23,7 @@ FILES = {
 }
 COUNTY = re.compile(
     r"^\s+(Atlantic|Bergen|Burlington|Camden|Cape May|Cumberland|Essex|Gloucester|Hudson|Hunterdon|Mercer|Middlesex|Monmouth|Morris|Ocean|Passaic|Salem|Somerset|Sussex|Union|Warren)\s.*?\s([\d,]+)\s*$",
-    re.I,
+    re.IGNORECASE,
 )
 NAME = re.compile(r"^([A-Z][A-Za-z.'\-, ]+?)(?: \(w\))?(?:\s{2,}\S|\s\d|\sP\.O\.)")
 
@@ -59,13 +59,14 @@ def parse() -> None:
             elif total := re.match(r"\s*Total\s+([\d,]+)\s*$", line):
                 if candidate is not None and found:
                     if sum(votes for _, votes in found) != int(total[1].replace(",", "")):
-                        raise ValueError(f"{day} {candidate}: counties sum to {sum(v for _, v in found)}, printed {total[1]}")
+                        raise ValueError(
+                            f"{day} {candidate}: counties sum to {sum(v for _, v in found)}, printed {total[1]}"
+                        )
                     rows.extend((day, chamber, district, code, candidate, votes) for code, votes in found)
                 found = []
                 candidate = None
-            elif match := NAME.match(line):
-                if not line.startswith(("Name", "For ", "Candidates", "Tenth", "First")):
-                    candidate = re.sub(r"\s*\(w\)", "", match[1]).strip().title()
+            elif (match := NAME.match(line)) and not line.startswith(("Name", "For ", "Candidates", "Tenth", "First")):
+                candidate = re.sub(r"\s*\(w\)", "", match[1]).strip().title()
     frame = pl.DataFrame(rows, schema=["day", "chamber", "district", "code", "candidate", "votes"], orient="row")
     with pl.Config(tbl_rows=80):
         print(frame.group_by("day", "candidate").agg(pl.col("votes").sum(), pl.len()).sort("day", "votes"))

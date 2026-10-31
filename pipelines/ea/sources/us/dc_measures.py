@@ -15,8 +15,18 @@ BASE = "https://electionresults.dcboe.org/Downloads/Reports/"
 PUBLISHER = "District of Columbia Board of Elections"
 TITLE = "Election results"
 FILES = {
-    date(2018, 6, 19): (BASE + "June_19_2018_Primary_Election_Certified_Results.csv", "2018-06-19:DC:question:wikipedia:washington-d-c-initiative-77-minimum-wage-increase-for-tipped-workers", "INITIATIVE MEASURE NO. 77", "2018-06-19:DC:{}"),
-    date(2020, 11, 3): (BASE + "November_3_2020_General_Election_Certified_Results.csv", "2020-11-03:DC:question:wikipedia:washington-d-c-initiative-81-entheogenic-plants-and-fungus-measure", "INITIATIVE MEASURE NO. 81", "2020:DC:{}"),
+    date(2018, 6, 19): (
+        BASE + "June_19_2018_Primary_Election_Certified_Results.csv",
+        "2018-06-19:DC:question:wikipedia:washington-d-c-initiative-77-minimum-wage-increase-for-tipped-workers",
+        "INITIATIVE MEASURE NO. 77",
+        "2018-06-19:DC:{}",
+    ),
+    date(2020, 11, 3): (
+        BASE + "November_3_2020_General_Election_Certified_Results.csv",
+        "2020-11-03:DC:question:wikipedia:washington-d-c-initiative-81-entheogenic-plants-and-fungus-measure",
+        "INITIATIVE MEASURE NO. 81",
+        "2020:DC:{}",
+    ),
 }
 
 
@@ -31,9 +41,20 @@ def parse() -> None:
         text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig").splitlines()
         for line in csv.DictReader(text):
             if line["ContestName"].strip() == name and line["Candidate"].startswith(("YES", "NO")):
-                rows.append((day, code.format(line["PrecinctNumber"]), line["Candidate"][:3].strip(", ").upper(), int(line["Votes"])))
+                rows.append(
+                    (
+                        day,
+                        code.format(line["PrecinctNumber"]),
+                        line["Candidate"][:3].strip(", ").upper(),
+                        int(line["Votes"]),
+                    )
+                )
     frame = pl.DataFrame(rows, schema=["day", "code", "answer", "votes"], orient="row")
-    print(frame.group_by("day", "answer").agg(pl.col("votes").sum(), pl.col("code").n_unique().alias("precincts")).sort("day", "answer"))
+    print(
+        frame.group_by("day", "answer")
+        .agg(pl.col("votes").sum(), pl.col("code").n_unique().alias("precincts"))
+        .sort("day", "answer")
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "precincts.parquet")
 
@@ -72,11 +93,17 @@ def emit() -> Path:
             ).fetchall()
             options = {
                 label: option
-                for option, label in conn.execute("select id, upper(ballot_label) from contest_option where contest_id = %s", [contest]).fetchall()
+                for option, label in conn.execute(
+                    "select id, upper(ballot_label) from contest_option where contest_id = %s", [contest]
+                ).fetchall()
             }
             rows = frame.filter(pl.col("day") == day)
             counted = dict(rows.group_by("answer").agg(pl.col("votes").sum()).iter_rows())
-            print(day, counted, conn.execute("select sum(value) from result_value where result_set_k = %s", [held]).fetchone())
+            print(
+                day,
+                counted,
+                conn.execute("select sum(value) from result_value where result_set_k = %s", [held]).fetchone(),
+            )
             result_set = cs.key(f"{SOURCE}.result_set", f"{contest}:precinct")
             cs.add(
                 "result_set",
@@ -90,7 +117,13 @@ def emit() -> Path:
                 is_default=False,
                 completeness=1.0,
             )
-            existing = {code for (code,) in conn.execute("select code from reporting_unit where scheme_code = 'us.precinct' and code like %s", [f"{rows['code'][0].rsplit(':', 1)[0]}:%"]).fetchall()}
+            existing = {
+                code
+                for (code,) in conn.execute(
+                    "select code from reporting_unit where scheme_code = 'us.precinct' and code like %s",
+                    [f"{rows['code'][0].rsplit(':', 1)[0]}:%"],
+                ).fetchall()
+            }
             for code in rows["code"].unique():
                 if code not in existing:
                     cs.add(

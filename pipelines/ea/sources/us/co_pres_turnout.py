@@ -39,7 +39,9 @@ def parse() -> None:
         registered = sum(c[1] for c in counties)
         ballots = sum(c[2] for c in counties)
         assert (registered, ballots) == state, (year, registered, ballots, state)
-        rows.extend({"year": year, "contest": contest, "code": code, "registered": r, "ballots": b} for code, r, b in counties)
+        rows.extend(
+            {"year": year, "contest": contest, "code": code, "registered": r, "ballots": b} for code, r, b in counties
+        )
         print(year, len(counties), state)
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows).write_parquet(PARSED / "counties.parquet")

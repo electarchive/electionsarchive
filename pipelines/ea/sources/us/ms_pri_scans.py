@@ -3,7 +3,7 @@ import re
 import struct
 import subprocess
 from collections import Counter
-from datetime import UTC, date, datetime
+from datetime import date
 from pathlib import Path
 
 import numpy as np
@@ -27,15 +27,30 @@ COUNTIES = 82
 FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2012, "democratic"): ("Democrat%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
     (2012, "republican"): ("Republican%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
-    (2014, "democratic"): ("2014%20Democrat%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
-    (2014, "republican"): ("2014%20Republican%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
-    (2014, "democratic-runoff"): ("2014%20Democrat%20Primary%20Runoff%20Election%20Results_Certified%207%207%202014.pdf", date(2014, 6, 24)),
+    (2014, "democratic"): (
+        "2014%20Democrat%20Primary%20Election%20Results_Certified%206%2013%202014.pdf",
+        date(2014, 6, 3),
+    ),
+    (2014, "republican"): (
+        "2014%20Republican%20Primary%20Election%20Results_Certified%206%2013%202014.pdf",
+        date(2014, 6, 3),
+    ),
+    (2014, "democratic-runoff"): (
+        "2014%20Democrat%20Primary%20Runoff%20Election%20Results_Certified%207%207%202014.pdf",
+        date(2014, 6, 24),
+    ),
     (2022, "republican"): ("2022%20Republican%20Primary%20Official%20Results.pdf", date(2022, 6, 7)),
     (2022, "republican-runoff"): ("2022%20June%2028th%20Republican%20Runoff%20Final%20Results.pdf", date(2022, 6, 28)),
     (2018, "democratic"): ("2018%20Democratic%20Primary%20Certified%20Results.pdf", date(2018, 6, 5)),
     (2018, "republican"): ("2018%20Republican%20Primary%20Certified%20Results.pdf", date(2018, 6, 5)),
-    (2018, "democratic-runoff"): ("2018%20State%20Democratic%20Party%20Certified%20Primary%20Runoff%20Results.pdf", date(2018, 6, 26)),
-    (2018, "republican-runoff"): ("2018%20State%20Republican%20Party%20Certified%20Primary%20Runoff%20Results.pdf", date(2018, 6, 26)),
+    (2018, "democratic-runoff"): (
+        "2018%20State%20Democratic%20Party%20Certified%20Primary%20Runoff%20Results.pdf",
+        date(2018, 6, 26),
+    ),
+    (2018, "republican-runoff"): (
+        "2018%20State%20Republican%20Party%20Certified%20Primary%20Runoff%20Results.pdf",
+        date(2018, 6, 26),
+    ),
 }
 RULED = {(2014, "democratic"): range(2, 8)}
 ROTATED = {(2012, "republican"): range(9, 15)}
@@ -183,7 +198,12 @@ def parse() -> None:
             continue
         party = tag.rstrip("+")
         pdf = raw.cached(SOURCE, url(year, party)).path
-        pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout)[1])
+        pages = int(
+            re.search(
+                r"Pages:\s+(\d+)",
+                subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=False).stdout,
+            )[1]
+        )
         county = 0
         cleans: dict[int, np.ndarray | None] = {}
         reads: dict[tuple[int, int], Counter[int]] = {}
@@ -197,7 +217,13 @@ def parse() -> None:
             for page, count in zip(read["pages"], read["columns"]):
                 image = ms_scan.render(pdf, page, dpi=300, turn=read.get("turn", 0))
                 body = (image[read["band"][0] : read["band"][1]] < 225).mean(0)
-                found = [x for x in ms_scan.clusters(np.where(body > read["share"])[0]) if read["xmin"].get(str(page), read["xmin"]["default"]) < x < read["xmax"].get(str(page), read["xmax"]["default"])]
+                found = [
+                    x
+                    for x in ms_scan.clusters(np.where(body > read["share"])[0])
+                    if read["xmin"].get(str(page), read["xmin"]["default"])
+                    < x
+                    < read["xmax"].get(str(page), read["xmax"]["default"])
+                ]
                 pitch = float(np.median(np.diff(found)))
                 xs = [found[0]]
                 for x in found[1:]:
@@ -225,7 +251,12 @@ def parse() -> None:
             image = ms_scan.render(pdf, page, dpi=300, turn=-90 if turned is not None else 0)
             if turned is not None:
                 body = (image[520:1700] < 220).mean(0)
-                start = max(range(760, 840), key=lambda x0: sum(body[int(x0 + 161.8 * k) - 2 : int(x0 + 161.8 * k) + 3].sum() for k in range(15)))
+                start = max(
+                    range(760, 840),
+                    key=lambda x0: sum(
+                        body[int(x0 + 161.8 * k) - 2 : int(x0 + 161.8 * k) + 3].sum() for k in range(15)
+                    ),
+                )
                 xs = [start + 161.8 * k for k in range(15)]
                 found = ms_scan.words(ms_scan.erase(image))
                 heights = np.array([cy for _, cx, cy, _ in found if cx > xs[0] and 480 < cy < 1660])
@@ -236,11 +267,18 @@ def parse() -> None:
                 rows = [top + 45.35 * k for k in range(27)]
                 first = 0
                 if page == sheet[-1]:
-                    xs = xs[: max(next(i for i in range(14) if xs[i] <= cx < xs[i + 1]) for _, cx, _, _ in found if cx > xs[0]) + 2]
+                    xs = xs[
+                        : max(
+                            next(i for i in range(14) if xs[i] <= cx < xs[i + 1]) for _, cx, _, _ in found if cx > xs[0]
+                        )
+                        + 2
+                    ]
             elif ruled is not None:
                 body = (image[480:1860] < 225).mean(0)
                 xs = [x for x in ms_scan.clusters(np.where(body > 0.3)[0]) if x > 700]
-                top = next(y for y in ms_scan.clusters(np.where((image[:, 100:3900] < 200).mean(1) > 0.45)[0]) if y > 400)
+                top = next(
+                    y for y in ms_scan.clusters(np.where((image[:, 100:3900] < 200).mean(1) > 0.45)[0]) if y > 400
+                )
                 rows = [top + 60.45 * k for k in range(24)]
                 first = 0
                 if page == sheet[-1]:
@@ -269,7 +307,9 @@ def parse() -> None:
             if ruled is not None and last:
                 n = COUNTIES - county
                 for r in layout:
-                    crop = Image.fromarray(ms_scan.erase(image)[int(rows[r]) + 8 : int(rows[r + 1]) - 8, int(xs[n]) + 6 : int(xs[n]) + 232])
+                    crop = Image.fromarray(
+                        ms_scan.erase(image)[int(rows[r]) + 8 : int(rows[r + 1]) - 8, int(xs[n]) + 6 : int(xs[n]) + 232]
+                    )
                     for scale, psm in ((1, 7), (2, 7), (1, 8), (2, 8), (1, 13), (2, 13)):
                         text = ms_scan.read(crop, scale, psm, whitelist="0123456789,").replace(" ", "").replace(",", "")
                         if text.isdigit():
@@ -301,10 +341,12 @@ def parse() -> None:
                 continue
             total = printed[r].most_common(1)[0][0]
             values = {k: v.most_common(1)[0][0] for k, v in reads.items() if k[0] == r}
-            for key in values:
-                values[key] = FIXES.get((year, party, r, key[1]), values[key])
+            for key, value in values.items():
+                values[key] = FIXES.get((year, party, r, key[1]), value)
             short = total - sum(values.values())
-            print(year, party, name, total, "tied" if short == 0 else f"printed total exceeds the county sum by {short}")
+            print(
+                year, party, name, total, "tied" if short == 0 else f"printed total exceeds the county sum by {short}"
+            )
             if (year, party) in EMIT and (office, district) not in EMIT[(year, party)]:
                 continue
             for (_, index), value in values.items():
@@ -336,20 +378,37 @@ def parse() -> None:
     if len(names) != COUNTIES:
         raise ValueError(f"{len(names)} county names")
     code_of = dict(zip(names, codes))
-    for year, party in TEXTED:
+    for (year, party), (first, last) in TEXTED.items():
         pdf = raw.cached(SOURCE, url(year, party)).path
-        first, last = TEXTED[(year, party)]
-        html = subprocess.run(["pdftotext", "-bbox", "-f", str(first), "-l", str(last), str(pdf), "-"], capture_output=True, text=True, check=True).stdout
+        html = subprocess.run(
+            ["pdftotext", "-bbox", "-f", str(first), "-l", str(last), str(pdf), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
         sums: Counter[str] = Counter()
         printed: dict[str, int] = {}
         for number, body in enumerate(html.split("<page ")[1:], first):
             width, height = (float(v) for v in re.match(r'width="([\d.]+)" height="([\d.]+)"', body).groups())
-            words = [(float(a), float(b), float(c), float(d), t) for a, b, c, d, t in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', body)]
+            words = [
+                (float(a), float(b), float(c), float(d), t)
+                for a, b, c, d, t in re.findall(
+                    r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', body
+                )
+            ]
             if len(words) < 100:
                 continue
-            header = " ".join(w[4] for w in sorted((w for w in words if 105 < w[1] < 175), key=lambda w: w[0])).replace("Jeff Davis", "JeffDavis").replace("Pearl River", "PearlRiver").split()
+            header = (
+                " ".join(w[4] for w in sorted((w for w in words if 105 < w[1] < 175), key=lambda w: w[0]))
+                .replace("Jeff Davis", "JeffDavis")
+                .replace("Pearl River", "PearlRiver")
+                .split()
+            )
             total = header[-1] == "TOTAL"
-            header = [re.sub(r"[^a-z]", "", {"JeffDavis": "jeffersondavis"}.get(h, h).lower()) for h in header[: len(header) - total]]
+            header = [
+                re.sub(r"[^a-z]", "", {"JeffDavis": "jeffersondavis"}.get(h, h).lower())
+                for h in header[: len(header) - total]
+            ]
             for surname, (office, district, candidate) in TEXT_CANDIDATES.items():
                 line_y = next(w[1] for w in words if w[4] == surname)
                 cells = sorted((w for w in words if abs(w[1] - line_y) < 3 and w[0] > 260), key=lambda w: w[0])
@@ -386,7 +445,15 @@ def parse() -> None:
                 if total:
                     printed[candidate] = int(cells[-1][4].replace(",", ""))
         for candidate, count in printed.items():
-            print(year, party, candidate, count, "tied" if count == sums[candidate] else f"printed total exceeds the county sum by {count - sums[candidate]}")
+            print(
+                year,
+                party,
+                candidate,
+                count,
+                "tied"
+                if count == sums[candidate]
+                else f"printed total exceeds the county sum by {count - sums[candidate]}",
+            )
     for tag, sheet in NAMED.items():
         if tag not in PARSE_NAMED:
             continue
@@ -432,7 +499,15 @@ def parse() -> None:
                         }
                     )
         for r, (_, _, candidate) in enumerate(sheet["rows"]):
-            print(year, party, candidate, sheet["printed"][r], "tied" if sheet["printed"][r] == sums[r] else f"printed total exceeds the county sum by {sheet['printed'][r] - sums[r]}")
+            print(
+                year,
+                party,
+                candidate,
+                sheet["printed"][r],
+                "tied"
+                if sheet["printed"][r] == sums[r]
+                else f"printed total exceeds the county sum by {sheet['printed'][r] - sums[r]}",
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(out, infer_schema_length=None).with_columns(
         year=pl.col("year").cast(pl.Int32),

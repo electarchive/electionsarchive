@@ -53,7 +53,11 @@ def parse() -> None:
                     "voted": int(voted.replace(",", "")),
                 }
             )
-    frame = pl.DataFrame(rows).filter(pl.col("year") % 2 == 0, pl.col("registered") > 0, pl.col("voted") <= pl.col("registered")).unique(["code", "year"])
+    frame = (
+        pl.DataFrame(rows)
+        .filter(pl.col("year") % 2 == 0, pl.col("registered") > 0, pl.col("voted") <= pl.col("registered"))
+        .unique(["code", "year"])
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
     print(frame.group_by("year").agg(pl.len(), pl.col("registered").sum(), pl.col("voted").sum()).sort("year"))

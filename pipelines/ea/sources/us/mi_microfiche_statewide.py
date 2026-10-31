@@ -36,13 +36,28 @@ def fetch() -> None:
 def parse() -> None:
     PAGES.mkdir(parents=True, exist_ok=True)
     PARSED.mkdir(parents=True, exist_ok=True)
-    scan = pl.read_csv(Path(__file__).with_name("mi_microfiche_statewide.tsv"), separator="\t", schema_overrides={"party": pl.String})
+    scan = pl.read_csv(
+        Path(__file__).with_name("mi_microfiche_statewide.tsv"), separator="\t", schema_overrides={"party": pl.String}
+    )
     for year, page in sorted(set(zip(scan["year"], scan["page"], strict=True))):
         book = raw.cached(SOURCE, URL.format(BOOKS[year]))
         image = PAGES / f"{book.sha256}-{page}.png"
         if not image.exists():
             subprocess.run(
-                ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(book.path), str(image.with_suffix(""))],
+                [
+                    "pdftoppm",
+                    "-r",
+                    str(DPI),
+                    "-gray",
+                    "-png",
+                    "-f",
+                    str(page),
+                    "-l",
+                    str(page),
+                    "-singlefile",
+                    str(book.path),
+                    str(image.with_suffix("")),
+                ],
                 check=True,
             )
     totals = scan.group_by("year", "office", "name").agg(pl.col("votes").sum().alias("printed"))
@@ -116,7 +131,9 @@ def emit() -> Path:
         }
         if len(counties) != 83:
             raise ValueError("Michigan needs 83 counties")
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -200,7 +217,9 @@ def emit() -> Path:
                     is_independent=False,
                 )
                 totals[option] = int(cells["votes"].sum())
-                for code, votes, number, x0, y0, x1, y1 in cells.select("code", "votes", "page", "x0", "y0", "x1", "y1").iter_rows():
+                for code, votes, number, x0, y0, x1, y1 in cells.select(
+                    "code", "votes", "page", "x0", "y0", "x1", "y1"
+                ).iter_rows():
                     fact = {
                         "result_set_id": result_set,
                         "unit_id": counties[f"26{2 * code - 1:03d}"],
@@ -221,5 +240,11 @@ def emit() -> Path:
                         x1=x1 / width,
                         y1=y1 / height,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

@@ -34,7 +34,9 @@ def races() -> tuple[
     tables, beldes_old, _ = mayors_1984_1999.read()
     for (year, province, kind, _), (title, rows, _) in tables.items():
         if year in OLD:
-            municipal.append((year, [(abbreviation, label, names, votes) for abbreviation, label, names, votes in rows]))
+            municipal.append(
+                (year, [(abbreviation, label, names, votes) for abbreviation, label, names, votes in rows])
+            )
             pages[title] = mayors_1984_1999.SOURCE
         elif kind == "bb":
             found[(year, mayors_1984_1999.PROVINCES.get(province, province))] = [
@@ -60,7 +62,9 @@ def races() -> tuple[
         if len(rows) != 1:
             continue
         title, _, district, label, names, votes = rows[0]
-        found[(2004, f"{DAYS[2004]}:{province}-{'merkez' if district == province else district}-{belde}-mayor")] = [("", label, names, votes)]
+        found[(2004, f"{DAYS[2004]}:{province}-{'merkez' if district == province else district}-{belde}-mayor")] = [
+            ("", label, names, votes)
+        ]
         pages[title] = mayors_2004_2009.MAYORS
     return found, municipal, pages
 
@@ -207,7 +211,10 @@ def emit() -> Path:
                     key
                     for key in by_belde[str(day), tokens[-1]]
                     if key not in wanted
-                    and (key.split(":", 1)[1].startswith(tokens[0]) or tokens[0].startswith(key.split(":", 1)[1].split("-")[0]))
+                    and (
+                        key.split(":", 1)[1].startswith(tokens[0])
+                        or tokens[0].startswith(key.split(":", 1)[1].split("-")[0])
+                    )
                 ]
                 if len(hits) == 1:
                     contest_key = hits[0]

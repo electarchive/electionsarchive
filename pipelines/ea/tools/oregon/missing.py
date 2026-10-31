@@ -1,11 +1,14 @@
+import json
 import os
-import json, re, sys
+import re
+import sys
 from pathlib import Path
+
 from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
-from words import group
 from scan3 import between
+from words import group
 
 S = Path(os.environ["OR_WORK"])
 c, pages, x0, x1 = sys.argv[1], [int(p) for p in sys.argv[2].split(",")], float(sys.argv[3]), float(sys.argv[4])

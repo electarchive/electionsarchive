@@ -61,7 +61,9 @@ def parse() -> None:
                     current["text"] = choice[2]
             continue
         if line == line.upper() and TITLE_WORDS.search(line):
-            current = None if line.startswith("CONSTITUTIONAL AMENDMENT") else {"title": line, "options": "", "text": ""}
+            current = (
+                None if line.startswith("CONSTITUTIONAL AMENDMENT") else {"title": line, "options": "", "text": ""}
+            )
             if current is not None:
                 rows.append(current)
         elif current is not None and current["options"].count("|") == 1 and not current["options"].endswith("Against|"):
@@ -106,7 +108,10 @@ def emit() -> Path:
         kept = 0
         for row in frame.iter_rows(named=True):
             title = row["title"]
-            match = re.match(r"(.+? COUNTY|(?:CITY|TOWN|VILLAGE) OF [A-Z .'-]+?|[A-Z]+) (?=[A-Z ]*(?:BOND|LOCAL SALES|MALT|MIXED|UNFORTIFIED|ABC|BOARD|CHARTER|REFERENDUM|ELECTION))", title)
+            match = re.match(
+                r"(.+? COUNTY|(?:CITY|TOWN|VILLAGE) OF [A-Z .'-]+?|[A-Z]+) (?=[A-Z ]*(?:BOND|LOCAL SALES|MALT|MIXED|UNFORTIFIED|ABC|BOARD|CHARTER|REFERENDUM|ELECTION))",
+                title,
+            )
             entity = match[1] if match else ""
             label = title.removeprefix(entity).strip().title() if entity else title.title()
             if entity.startswith(("CITY OF", "TOWN OF", "VILLAGE OF")):
@@ -141,7 +146,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             contest_key = f"{DAY}:NC:{code}:measure:{slug(label)}"
             contest = cs.key("us.contest", contest_key)
@@ -161,7 +173,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(a for a in row["options"].split("|") if a):

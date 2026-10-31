@@ -63,10 +63,7 @@ def parse() -> None:
             )
     frame = (
         pl.DataFrame(rows)
-        .filter(
-            pl.col("official")
-            == pl.col("official").max().over("year", "chamber", "district", "code")
-        )
+        .filter(pl.col("official") == pl.col("official").max().over("year", "chamber", "district", "code"))
         .drop("official")
         .with_columns(measure=pl.lit(1, pl.Int16), writein=pl.lit(False), kind=pl.lit("county"), source=pl.lit("WV"))
     )

@@ -21,7 +21,12 @@ PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/2016id_/http://www.nvsos.gov/SOSelectionPages/results/"
 PUBLISHER = "Nevada Secretary of State"
 TITLE = "Official general election results by county"
-FOLDERS = {2002: "2002General", 2006: "2006StateWideGeneral", 2010: "2010STatewideGeneral", 2014: "2014StatewideGeneral"}
+FOLDERS = {
+    2002: "2002General",
+    2006: "2006StateWideGeneral",
+    2010: "2010STatewideGeneral",
+    2014: "2014StatewideGeneral",
+}
 COUNTIES = [
     "CarsonCity",
     "Churchill",
@@ -54,7 +59,6 @@ PARTIES = {
     "L": "LIBERTARIAN",
     "IA": "INDEPENDENT AMERICAN",
     "NL": "NATURAL LAW",
-
     "DEM": "DEMOCRATIC",
     "REP": "REPUBLICAN",
     "LIB": "LIBERTARIAN",
@@ -76,7 +80,9 @@ METHOD = (
     "County totals come from the Nevada Secretary of State's official county results pages. Each candidate's county "
     "votes add up to the statewide total on the Secretary of State's summary page."
 )
-MISSING = "The Secretary of State's pages have no row for {counties} in this race; those votes are missing from these totals."
+MISSING = (
+    "The Secretary of State's pages have no row for {counties} in this race; those votes are missing from these totals."
+)
 CLOSE = (
     "The race was within 0.5% in these totals, so no winner is recorded here; the official canvass and any recount "
     "decided it."
@@ -93,7 +99,7 @@ def fetch() -> None:
             try:
                 raw.fetch(SOURCE, url, suffix=".html")
                 return
-            except (httpx.TransportError, httpx.HTTPStatusError):
+            except httpx.TransportError, httpx.HTTPStatusError:
                 time.sleep(10 * (attempt + 1))
         raise RuntimeError(url)
 
@@ -170,7 +176,9 @@ def parse() -> None:
         if name.lower().startswith("none of these"):
             name = "None of these Candidates"
         for county, votes in zip(COUNTIES, figures, strict=False):
-            rows.append((1998, title, name, PARTIES.get(party[1], None) if party else None, votes, fips[county.lower()]))
+            rows.append(
+                (1998, title, name, PARTIES.get(party[1], None) if party else None, votes, fips[county.lower()])
+            )
     for year in FOLDERS:
         words = tokens(raw.cached(SOURCE, address(year, "ElectionSummary")).path)
         for index, word in enumerate(words):
@@ -194,7 +202,9 @@ def parse() -> None:
                 .agg(pl.col("votes").sum())["votes"]
             )
             if summed != sorted(printed):
-                raise ValueError(f"{year} {title}: county sums {summed} differ from the printed totals {sorted(printed)}")
+                raise ValueError(
+                    f"{year} {title}: county sums {summed} differ from the printed totals {sorted(printed)}"
+                )
     year = pl.col("year").cast(pl.Int32)
     frame = (
         pl.DataFrame(

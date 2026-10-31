@@ -108,7 +108,7 @@ def parse() -> None:
         rows.extend(
             (date(2008, 2, 5), f"president:{party}", None, code, candidate, int(cell))
             for candidate, cell in zip(NAMES[party], cells, strict=True)
-            )
+        )
     frame = pl.DataFrame(
         rows,
         schema={
@@ -123,7 +123,11 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("day", "chamber", "district", "candidate", maintain_order=True).agg(pl.col("votes").sum(), pl.len()).rows())
+    print(
+        frame.group_by("day", "chamber", "district", "candidate", maintain_order=True)
+        .agg(pl.col("votes").sum(), pl.len())
+        .rows()
+    )
 
 
 def emit() -> Path:

@@ -122,7 +122,9 @@ def parse() -> None:
                         if not groups:
                             office = None
                     elif len(cells) in groups:
-                        groups[len(cells)][1][counties[re.sub(r"[^a-z]", "", row[1].lower().removesuffix("county"))]] = cells
+                        groups[len(cells)][1][
+                            counties[re.sub(r"[^a-z]", "", row[1].lower().removesuffix("county"))]
+                        ] = cells
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,

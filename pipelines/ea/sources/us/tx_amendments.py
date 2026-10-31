@@ -30,15 +30,51 @@ NUMBER = re.compile(r"(?i)\bproposition\s+(\d+)\b")
 
 
 PRINTED = {
-    (2013, 1, 12): "The constitutional amendment authorizing the legislature to provide for an exemption from ad valorem taxation of all or part of the market value of the residence homestead of the surviving spouse of a member of the armed services of the United States who is killed in action.",
-    (2013, 2, 18): "The constitutional amendment eliminating an obsolete requirement for a State Medical Education Board and a State Medical Education Fund, neither of which is operational.",
-    (2013, 3, 22): "The constitutional amendment to authorize a political subdivision of this state to extend the number of days that aircraft parts that are exempt from ad valorem taxation due to their location in this state for a temporary period may be located in this state for purposes of qualifying for the tax exemption.",
-    (2013, 4, 28): "The constitutional amendment authorizing the legislature to provide for an exemption from ad valorem taxation of part of the market value of the residence homestead of a partially disabled veteran or the surviving spouse of a partially disabled veteran if the residence homestead was donated to the disabled veteran by a charitable organization.",
-    (2013, 5, 34): "The constitutional amendment to authorize the making of a reverse mortgage loan for the purchase of homestead property and to amend lender disclosures and other requirements in connection with a reverse mortgage loan.",
-    (2013, 6, 44): "The constitutional amendment providing for the creation of the State Water Implementation Fund for Texas and the State Water Implementation Revenue Fund for Texas to assist in the financing of priority projects in the state water plan to ensure the availability of adequate water resources.",
-    (2013, 7, 56): "The constitutional amendment authorizing a home-rule municipality to provide in its charter the procedure to fill a vacancy on its governing body for which the unexpired term is 12 months or less.",
-    (2013, 8, 60): "The constitutional amendment repealing Section 7, Article IX, Texas Constitution, which relates to the creation of a hospital district in Hidalgo County.",
-    (2013, 9, 64): "The constitutional amendment relating to expanding the types of sanctions that may be assessed against a judge or justice following a formal proceeding instituted by the State Commission on Judicial Conduct.",
+    (
+        2013,
+        1,
+        12,
+    ): "The constitutional amendment authorizing the legislature to provide for an exemption from ad valorem taxation of all or part of the market value of the residence homestead of the surviving spouse of a member of the armed services of the United States who is killed in action.",
+    (
+        2013,
+        2,
+        18,
+    ): "The constitutional amendment eliminating an obsolete requirement for a State Medical Education Board and a State Medical Education Fund, neither of which is operational.",
+    (
+        2013,
+        3,
+        22,
+    ): "The constitutional amendment to authorize a political subdivision of this state to extend the number of days that aircraft parts that are exempt from ad valorem taxation due to their location in this state for a temporary period may be located in this state for purposes of qualifying for the tax exemption.",
+    (
+        2013,
+        4,
+        28,
+    ): "The constitutional amendment authorizing the legislature to provide for an exemption from ad valorem taxation of part of the market value of the residence homestead of a partially disabled veteran or the surviving spouse of a partially disabled veteran if the residence homestead was donated to the disabled veteran by a charitable organization.",
+    (
+        2013,
+        5,
+        34,
+    ): "The constitutional amendment to authorize the making of a reverse mortgage loan for the purchase of homestead property and to amend lender disclosures and other requirements in connection with a reverse mortgage loan.",
+    (
+        2013,
+        6,
+        44,
+    ): "The constitutional amendment providing for the creation of the State Water Implementation Fund for Texas and the State Water Implementation Revenue Fund for Texas to assist in the financing of priority projects in the state water plan to ensure the availability of adequate water resources.",
+    (
+        2013,
+        7,
+        56,
+    ): "The constitutional amendment authorizing a home-rule municipality to provide in its charter the procedure to fill a vacancy on its governing body for which the unexpired term is 12 months or less.",
+    (
+        2013,
+        8,
+        60,
+    ): "The constitutional amendment repealing Section 7, Article IX, Texas Constitution, which relates to the creation of a hospital district in Hidalgo County.",
+    (
+        2013,
+        9,
+        64,
+    ): "The constitutional amendment relating to expanding the types of sanctions that may be assessed against a judge or justice following a formal proceeding instituted by the State Commission on Judicial Conduct.",
 }
 
 
@@ -53,7 +89,7 @@ def fetch() -> None:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
-    for year in YEARS:
+    for year, election in YEARS.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url(year)).path), "-"],
             capture_output=True,
@@ -70,7 +106,7 @@ def parse() -> None:
             rows.append(
                 {
                     "year": year,
-                    "election": YEARS[year],
+                    "election": election,
                     "proposition": proposition,
                     "page": text.count("\f", 0, found.start()) + 1,
                     "text": re.sub(r"\s+", " ", wording[0]).strip(),

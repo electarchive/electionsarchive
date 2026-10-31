@@ -36,7 +36,7 @@ ROWS = [
         "county": "05051",
         "entity": "Garland County",
         "label": "Issue No. 6: 0.625% County Road Tax Renewal",
-        "wording": "Vote FOR REFERRED ORDINANCE NO. O-26-07 or AGAINST REFERRED ORDINANCE NO. O-26-07. COUNTY-WIDE 0.625% SALES AND USE TAX. The continuation of the levy of 0.625% local sales and use Tax within the County to finance all or a portion of the costs of improvements to existing, roads, streets, and related structures, including particularly, without limitation, overpasses, underpasses, bridges and sidewalks, and any necessary land, easements, rights of way and related intersection improvements, drainage and traffic control devices and improvements therefor (collectively, the \"Improvements\"). If the question is approved, there will be a continuation of the existing levy within the County of 0.625% sales and use tax, the net collections of which after the State of Arkansas deducts its administrative charges and required rebates will be divided per capita among the County and the Municipalities within in the County pursuant to state law. The term of the sales and use tax levy shall be July 1, 2027, through June 30, 2032.",
+        "wording": 'Vote FOR REFERRED ORDINANCE NO. O-26-07 or AGAINST REFERRED ORDINANCE NO. O-26-07. COUNTY-WIDE 0.625% SALES AND USE TAX. The continuation of the levy of 0.625% local sales and use Tax within the County to finance all or a portion of the costs of improvements to existing, roads, streets, and related structures, including particularly, without limitation, overpasses, underpasses, bridges and sidewalks, and any necessary land, easements, rights of way and related intersection improvements, drainage and traffic control devices and improvements therefor (collectively, the "Improvements"). If the question is approved, there will be a continuation of the existing levy within the County of 0.625% sales and use tax, the net collections of which after the State of Arkansas deducts its administrative charges and required rebates will be divided per capita among the County and the Municipalities within in the County pursuant to state law. The term of the sales and use tax levy shall be July 1, 2027, through June 30, 2032.',
         "answers": ("For", "Against"),
     },
     {
@@ -75,13 +75,20 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+            content = subprocess.run(
+                ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+            ).stdout
             raw.store(SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
 
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([{key: value for key, value in row.items() if key != "answers"} | {"url": COUNTIES[row["county"]][0]} for row in ROWS])
+    frame = pl.DataFrame(
+        [
+            {key: value for key, value in row.items() if key != "answers"} | {"url": COUNTIES[row["county"]][0]}
+            for row in ROWS
+        ]
+    )
     frame.write_parquet(PARSED / "measures.parquet")
     print(frame.height)
 
@@ -124,7 +131,9 @@ def emit() -> Path:
                 option = f"special:{row['county']}:{entity}"
             elif county_key in found:
                 county, county_area, _, county_path, county_code = found[county_key]
-                minted = govmint.special(conn, cs, "AR", (county, county_area, county_path, county_code), entity, civil.slugs)
+                minted = govmint.special(
+                    conn, cs, "AR", (county, county_area, county_path, county_code), entity, civil.slugs
+                )
                 if minted is not None:
                     option = f"special:{row['county']}:{entity}"
                     found[option] = minted
@@ -147,7 +156,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:AR:{code}:measure:{slug(label)}"
@@ -168,7 +184,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("For", "Against")):

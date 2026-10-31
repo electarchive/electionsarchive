@@ -16,7 +16,15 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Vermont Secretary of State"
 BASE = "https://outside.vermont.gov/dept/sos/Elections_Division/election_info_resources/elections_results_data/"
 REGISTRATION = BASE + "1974-2024_voter_registration_totals.xlsx"
-REPORTS = [(2018, "general"), (2020, "general"), (2022, "general"), (2024, "general"), (2020, "primary"), (2022, "primary"), (2024, "primary")]
+REPORTS = [
+    (2018, "general"),
+    (2020, "general"),
+    (2022, "general"),
+    (2024, "general"),
+    (2020, "primary"),
+    (2022, "primary"),
+    (2024, "primary"),
+]
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
 join name n on n.entity_id = u.area_id and n.kind = 'short'
@@ -34,7 +42,9 @@ def plain(name: str) -> str:
 
 
 def fetch() -> None:
-    for address, suffix, media in [(url(y, k), ".pdf", "application/pdf") for y, k in REPORTS] + [(REGISTRATION, ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]:
+    for address, suffix, media in [(url(y, k), ".pdf", "application/pdf") for y, k in REPORTS] + [
+        (REGISTRATION, ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    ]:
         try:
             raw.cached(SOURCE, address)
             continue
@@ -51,7 +61,10 @@ def parse() -> None:
     rows = []
     for year, kind in REPORTS:
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(year, kind)).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(year, kind)).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout.replace("\x0c", "")
         day = re.search(r"Election:.*?(\d\d)/(\d\d)/(\d{4})", text)
         election_day = date(int(day[3]), int(day[1]), int(day[2]))
@@ -91,7 +104,11 @@ def parse() -> None:
     frame = pl.DataFrame(rows)
     sheet = pl.read_excel(raw.cached(SOURCE, REGISTRATION).path, sheet_id=2, has_header=False)
     state = (
-        sheet.select(pl.col("column_0").cast(pl.Int64, strict=False).alias("year"), pl.col("column_1").cast(pl.Int64, strict=False).alias("registered"), pl.col("column_2").cast(pl.Int64, strict=False).alias("voters"))
+        sheet.select(
+            pl.col("column_0").cast(pl.Int64, strict=False).alias("year"),
+            pl.col("column_1").cast(pl.Int64, strict=False).alias("registered"),
+            pl.col("column_2").cast(pl.Int64, strict=False).alias("voters"),
+        )
         .drop_nulls()
         .filter(pl.col("year") % 2 == 0)
     )

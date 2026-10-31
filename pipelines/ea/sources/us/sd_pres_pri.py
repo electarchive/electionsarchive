@@ -20,12 +20,23 @@ TITLE = "Unofficial results: 2016 Primary Election, statewide export"
 
 
 def fetch() -> None:
-    with httpx.Client(headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/124 Safari/537.36"}, timeout=90) as client:
-        form = {name: value for name, value in re.findall(r'name="(__[A-Z]+)"[^>]*value="([^"]*)"', client.get(PAGE).text)}
+    with httpx.Client(
+        headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/124 Safari/537.36"}, timeout=90
+    ) as client:
+        form = {
+            name: value for name, value in re.findall(r'name="(__[A-Z]+)"[^>]*value="([^"]*)"', client.get(PAGE).text)
+        }
         form["__EVENTTARGET"] = "ctl00$MainContent$Statewide"
         response = client.post(PAGE, data=form)
         response.raise_for_status()
-    raw.store(SOURCE, PAGE, response.content, suffix=".xlsx", retrieved_at=datetime.now(UTC), media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    raw.store(
+        SOURCE,
+        PAGE,
+        response.content,
+        suffix=".xlsx",
+        retrieved_at=datetime.now(UTC),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
 
 
 def parse() -> None:
@@ -38,10 +49,18 @@ def parse() -> None:
             ).fetchall()
         }
     rows = []
-    for sheet in pl.read_excel(raw.cached(SOURCE, PAGE).path, has_header=False, sheet_id=0, infer_schema_length=0).values():
+    for sheet in pl.read_excel(
+        raw.cached(SOURCE, PAGE).path, has_header=False, sheet_id=0, infer_schema_length=0
+    ).values():
         start = next(i for i, county in enumerate(sheet["column_1"]) if county == "County")
         title = sheet["column_0"][start]
-        party = "democratic" if title.startswith("Presidential Delegates") else "republican" if title.startswith("Delegates to Support") else None
+        party = (
+            "democratic"
+            if title.startswith("Presidential Delegates")
+            else "republican"
+            if title.startswith("Delegates to Support")
+            else None
+        )
         if party is None:
             continue
         names = [name for name in sheet.row(start)[2:] if name]
@@ -58,7 +77,10 @@ def parse() -> None:
         raise ValueError("a county appears twice for a candidate")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("party").agg(pl.col("code").n_unique()).rows(), frame.group_by("party", "candidate").agg(pl.col("votes").sum()).rows())
+    print(
+        frame.group_by("party").agg(pl.col("code").n_unique()).rows(),
+        frame.group_by("party", "candidate").agg(pl.col("votes").sum()).rows(),
+    )
 
 
 def emit() -> Path:

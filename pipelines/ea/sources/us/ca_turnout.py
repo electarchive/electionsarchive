@@ -88,12 +88,24 @@ def emit() -> Path:
         for table, (url, title, _) in FILES.items():
             source = cs.source(PUBLISHER, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
             cs.artifact(raw.cached(SOURCE, url), source)
-            for day, registered, voters in frame.filter(pl.col("table") == table).select("day", "registered", "voters").iter_rows():
+            for day, registered, voters in (
+                frame.filter(pl.col("table") == table).select("day", "registered", "voters").iter_rows()
+            ):
                 found = elections.get(day, [])
                 if not found:
-                    found = [f for d, items in elections.items() if (d.year, d.month) == (day.year, day.month) for f in items]
+                    found = [
+                        f for d, items in elections.items() if (d.year, d.month) == (day.year, day.month) for f in items
+                    ]
                 found = [f for f in found if (table == "primary") == f[0].endswith(":primary")]
                 if len(found) != 1:
                     print(f"{day} {table}: {len(found)} elections")

@@ -45,11 +45,25 @@ def parse() -> None:
                     district = int(found[2]) if found[2].isdigit() else None
                 elif office is not None:
                     rows.append(
-                        (f"{office}:{name}", district, code, html.unescape(found[3]).strip().upper(), int(found[4].replace(",", "")))
+                        (
+                            f"{office}:{name}",
+                            district,
+                            code,
+                            html.unescape(found[3]).strip().upper(),
+                            int(found[4].replace(",", "")),
+                        )
                     )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
-        rows, schema={"chamber": pl.String, "district": pl.Int16, "code": pl.String, "candidate": pl.String, "votes": pl.Int64}, orient="row"
+        rows,
+        schema={
+            "chamber": pl.String,
+            "district": pl.Int16,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
     ).with_columns(
         year=pl.lit(DAY.year, pl.Int32),
         day=pl.lit(DAY),

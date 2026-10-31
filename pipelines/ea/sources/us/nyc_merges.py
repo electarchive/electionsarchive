@@ -22,7 +22,9 @@ def emit() -> Path:
             ("us.election", "2024-11-05:NY:36081", "2024-11-05:NY:3651000"),
         ):
             ids = [
-                conn.execute("select entity_id from external_id where scheme = %s and value = %s", [scheme, value]).fetchone()[0]
+                conn.execute(
+                    "select entity_id from external_id where scheme = %s and value = %s", [scheme, value]
+                ).fetchone()[0]
                 for value in (old, new)
             ]
             cs.merge(*ids)

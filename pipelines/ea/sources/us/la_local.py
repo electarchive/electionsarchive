@@ -59,8 +59,10 @@ HEADS = [
     (r"(?:members? of )?school board(?: members?)?", "school-board", "School Board"),
     (r"(?:mem[a-z]*\.?,? )?(?:board|bd\.?) of trustees", "board-of-trustees", "Board of Trustees"),
     (
-        r"(?:(?:city |parish )?council ?(?:members?|m[ae]n|woman|persons?|ors?)?|(?:member of )?parish council"
-        r"|parish commission member|parish council member|selectman|commissioner)",
+        (
+            r"(?:(?:city |parish )?council ?(?:members?|m[ae]n|woman|persons?|ors?)?|(?:member of )?parish council"
+            r"|parish commission member|parish council member|selectman|commissioner)"
+        ),
         "council",
         "Council",
     ),
@@ -108,9 +110,9 @@ def fetch() -> None:
         response.raise_for_status()
         return None
 
-    for day, official in (lambda ordered, at: ordered[at:] + ordered[:at])(
-        days()[:: -1 if os.environ.get("LA_REVERSE") else 1], int(os.environ.get("LA_OFFSET", "0"))
-    ):
+    ordered = days()[:: -1 if os.environ.get("LA_REVERSE") else 1]
+    at = int(os.environ.get("LA_OFFSET", "0"))
+    for day, official in ordered[at:] + ordered[:at]:
         if day.year < FIRST_YEAR or not official or day >= date.today():
             continue
         try:
@@ -915,7 +917,6 @@ def emit() -> Path:
             lines = choices[(row["ckey"],)].sort("position")
             canon: dict[str, str] = {}
             first: dict[UUID, str] = {}
-            ids: dict[str, UUID] = {}
             made: dict[str, UUID] = {}
             for line in lines.iter_rows(named=True):
                 candidate = line["name"]

@@ -37,12 +37,12 @@ def parse() -> None:
     rows = []
     for party in PARTIES:
         text = raw.cached(SOURCE, PAGE.format(party=party)).path.read_text(errors="replace")
-        table = re.findall(r"<table.*?</table>", text, re.S)[0]
+        table = re.findall(r"<table.*?</table>", text, re.DOTALL)[0]
         county = None
-        for line in re.findall(r"<tr.*?</tr>", table, re.S):
+        for line in re.findall(r"<tr.*?</tr>", table, re.DOTALL):
             cells = [
                 re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
-                for cell in re.findall(r"<t[hd].*?</t[hd]>", line, re.S)
+                for cell in re.findall(r"<t[hd].*?</t[hd]>", line, re.DOTALL)
             ]
             if len(cells) == 1 and cells[0].lower() in counties:
                 county = counties[cells[0].lower()]
@@ -55,7 +55,11 @@ def parse() -> None:
         raise ValueError("a county appears twice for a candidate")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("party").agg(pl.col("code").n_unique(), pl.col("candidate").n_unique(), pl.col("votes").sum()).rows())
+    print(
+        frame.group_by("party")
+        .agg(pl.col("code").n_unique(), pl.col("candidate").n_unique(), pl.col("votes").sum())
+        .rows()
+    )
 
 
 def emit() -> Path:

@@ -67,13 +67,23 @@ def fetch() -> None:
             except LookupError:
                 pass
             page = client.get(PAGE).text
-            fields = {name: unescape(value) for name, value in re.findall(r'<input[^>]*name="(__[A-Z]+)"[^>]*value="([^"]*)"', page)}
+            fields = {
+                name: unescape(value)
+                for name, value in re.findall(r'<input[^>]*name="(__[A-Z]+)"[^>]*value="([^"]*)"', page)
+            }
             fields.update({"__EVENTTARGET": DROPDOWN, "__EVENTARGUMENT": "", DROPDOWN: str(option)})
             response = client.post(PAGE, data=fields)
             response.raise_for_status()
             if "gvTurnout" not in response.text:
                 raise ValueError(f"option {option}: no table")
-            raw.store(SOURCE, key(option), response.content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
+            raw.store(
+                SOURCE,
+                key(option),
+                response.content,
+                suffix=".html",
+                retrieved_at=datetime.now(UTC),
+                media_type="text/html",
+            )
 
 
 def parse() -> None:
@@ -142,11 +152,20 @@ def emit() -> Path:
         published = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'",
+                (source,),
             )
         }
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=PAGE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=PAGE,
+                license="Public record",
+            )
         for (year, stage), rows in frame.group_by("year", "stage", maintain_order=True):
             found = elections.get((year, stage), [])
             if len(found) != 1:

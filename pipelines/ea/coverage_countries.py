@@ -189,6 +189,7 @@ IT_REGIONS = {
 
 def region(cc: str, scheme: str | None, code: str | None, parent: str | None, election_iso: str | None) -> str:
     if cc == "eu":
+        assert election_iso is not None
         return election_iso.split("-")[0]
     if parent is not None:
         return parent.split("-", 1)[1]

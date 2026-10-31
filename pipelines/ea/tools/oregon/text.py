@@ -3,8 +3,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
+from parsers import check, generic, matrix, save
 from words import pages
-from parsers import generic, matrix, check, save
 
 D = Path(sys.argv[1])
 

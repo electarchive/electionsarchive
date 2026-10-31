@@ -15,7 +15,20 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PDF = "https://www.nj.gov/state/elections/assets/pdf/election-results/2020/2020-official-primary-results-us-house.pdf"
 DAY = date(2020, 7, 7)
-ORDINALS = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth", "Eleventh", "Twelfth"]
+ORDINALS = [
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eighth",
+    "Ninth",
+    "Tenth",
+    "Eleventh",
+    "Twelfth",
+]
 WANTED = {(2, "republican"), (4, "democratic"), (8, "democratic")}
 PUBLISHER = "New Jersey Division of Elections"
 TITLE = "2020 Primary Election Official Results: Candidates for House of Representatives"
@@ -48,11 +61,16 @@ def parse() -> None:
             continue
         if district is None or not line.strip():
             continue
-        if re.match(r"\S", line) and not re.match(r"(\d\d/\d\d/\d{4}|Candidates for|For PRIMARY|Name\s|[A-Z][A-Z ]+\(part\)|.*Counties$)", line):
+        if re.match(r"\S", line) and not re.match(
+            r"(\d\d/\d\d/\d{4}|Candidates for|For PRIMARY|Name\s|[A-Z][A-Z ]+\(part\)|.*Counties$)", line
+        ):
             candidate = re.sub(r"\s+P\.O\. BOX.*$", "", re.split(r"\s+\(w\)|\s{2,}|\s\*", line.strip())[0].strip())
             party = None
         if candidate is not None and party is None:
-            match = re.search(r"\b(Democratic|Republican|Libertarian|Green|Independent|Socialist\w*|[A-Z][a-z]+ [A-Z][a-z]+)\s*$", line)
+            match = re.search(
+                r"\b(Democratic|Republican|Libertarian|Green|Independent|Socialist\w*|[A-Z][a-z]+ [A-Z][a-z]+)\s*$",
+                line,
+            )
             if match and re.match(r"\S", line) or re.search(r"^\s*(Democratic|Republican)\s*$", line):
                 party = (match[1] if match else line.strip()).lower()
         county = re.match(r"\s{20,}(" + "|".join(order) + r")\b.*?([\d,]+)\s*$", line)

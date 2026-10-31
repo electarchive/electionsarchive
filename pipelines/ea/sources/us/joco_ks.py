@@ -14,7 +14,7 @@ SOURCE = "us.joco_ks"
 VERSION = "1"
 PLATFORM = "ks_joco"
 ARCHIVE = "https://www.jocoelection.org/archive"
-SKIPPED = re.compile(r"^(OVER|UNDER) VOTES$|^BALLOTS CAST$", re.I)
+SKIPPED = re.compile(r"^(OVER|UNDER) VOTES$|^BALLOTS CAST$", re.IGNORECASE)
 
 
 def _events() -> list[str]:
@@ -26,7 +26,7 @@ def _files() -> dict[str, str]:
     found = {}
     for event in _events():
         page = raw.fetch(SOURCE, event, suffix=".html").path.read_text(errors="replace")
-        for href in dict.fromkeys(re.findall(r'href="([^"]*\.csv)"', page, re.I)):
+        for href in dict.fromkeys(re.findall(r'href="([^"]*\.csv)"', page, re.IGNORECASE)):
             if "Committee" not in href:
                 found[event] = urljoin(event, quote(unquote(href), safe="/:%"))
                 break
@@ -47,13 +47,23 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         slug = event.rsplit("/", 1)[1]
         found = re.match(r"([a-z]+)-(\d{1,2})-(\d{4})-(.*?)(?:-\d)?$", slug)
         day = datetime.strptime(f"{found[1].title()} {found[2]} {found[3]}", "%B %d %Y").date()
-        rows = list(csv.reader(io.StringIO(raw.cached(SOURCE, link).path.read_bytes().decode("utf-8-sig", errors="replace"))))
+        rows = list(
+            csv.reader(io.StringIO(raw.cached(SOURCE, link).path.read_bytes().decode("utf-8-sig", errors="replace")))
+        )
         name_col = next(index for index, cell in enumerate(rows[0]) if cell.strip().upper() == "PRECINCT NAME")
-        first = next(index for index, row in enumerate(rows) if index > 0 and re.search(r"\d", row[name_col]) and row[name_col].upper() != "PRECINCT NAME")
+        first = next(
+            index
+            for index, row in enumerate(rows)
+            if index > 0 and re.search(r"\d", row[name_col]) and row[name_col].upper() != "PRECINCT NAME"
+        )
         titles, names = rows[0], rows[first - 1]
         columns: dict[str, list[tuple[int, str]]] = {}
         for index in range(name_col + 1, len(titles)):
-            if not titles[index].strip() or SKIPPED.match(names[index].strip()) or titles[index].upper().startswith(("REGISTERED", "BALLOTS", "TURNOUT")):
+            if (
+                not titles[index].strip()
+                or SKIPPED.match(names[index].strip())
+                or titles[index].upper().startswith(("REGISTERED", "BALLOTS", "TURNOUT"))
+            ):
                 continue
             columns.setdefault(titles[index].strip(), []).append((index, names[index].strip()))
         totals: dict[tuple[str, str], int] = {}

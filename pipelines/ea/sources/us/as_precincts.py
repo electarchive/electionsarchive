@@ -33,17 +33,42 @@ ROUND_ONE_ROWS = {
     "d17": (120, 158, 111),
 }
 FILES = [
-    (date(2016, 11, 8), "house:0", "https://aceproject.org/ero-en/misc/american-samoa-general-election-2016-results-1/at_download/file", ["amata", "chapman", "jamias", "jones", "finau"]),
+    (
+        date(2016, 11, 8),
+        "house:0",
+        "https://aceproject.org/ero-en/misc/american-samoa-general-election-2016-results-1/at_download/file",
+        ["amata", "chapman", "jamias", "jones", "finau"],
+    ),
     (
         date(2016, 11, 8),
         "governor",
         "https://web.archive.org/web/20161116104445/http://www.americansamoaelectionoffice.org/results/General%20Election%202016%20RESULTS_GOV_LT%20GOV.pdf",
         ["sunia", "moliga", "tuika"],
     ),
-    (date(2020, 11, 3), "governor", CLOUD + "2020/11/12144326/2020-GENERAL-ELECTION-RESULTS-GOVERNOR-LT.pdf", ["tofau", "talia", "lemanu", "nua"]),
-    (date(2020, 11, 3), "house:0", CLOUD + "2020/11/12144400/2020-GENERAL-ELECTION-RESULTS-DELEGATE-TO-THE-US-CONGESS.pdf", ["amata", "chapman", "crichton"]),
-    (date(2024, 11, 5), "house:0", CLOUD + "2024/11/13203015/2024-congress-tally.pdf", ["amata", "lancaster", "kuaea", "chapman"]),
-    (date(2024, 11, 19), "governor", CLOUD + "2024/11/20193857/2024-runoff-election-territorial-summary.pdf", ["lemanu", "pula"]),
+    (
+        date(2020, 11, 3),
+        "governor",
+        CLOUD + "2020/11/12144326/2020-GENERAL-ELECTION-RESULTS-GOVERNOR-LT.pdf",
+        ["tofau", "talia", "lemanu", "nua"],
+    ),
+    (
+        date(2020, 11, 3),
+        "house:0",
+        CLOUD + "2020/11/12144400/2020-GENERAL-ELECTION-RESULTS-DELEGATE-TO-THE-US-CONGESS.pdf",
+        ["amata", "chapman", "crichton"],
+    ),
+    (
+        date(2024, 11, 5),
+        "house:0",
+        CLOUD + "2024/11/13203015/2024-congress-tally.pdf",
+        ["amata", "lancaster", "kuaea", "chapman"],
+    ),
+    (
+        date(2024, 11, 19),
+        "governor",
+        CLOUD + "2024/11/20193857/2024-runoff-election-territorial-summary.pdf",
+        ["lemanu", "pula"],
+    ),
 ]
 
 
@@ -71,8 +96,10 @@ def emit() -> Path:
             polity="US-AS",
         )
         (state,) = conn.execute("select id from polity where iso_code = 'US-AS'").fetchone()
-        parent, area = conn.execute("select id, area_id from reporting_unit where scheme_code = 'us.state' and polity_id = %s", [state]).fetchone()
-        office, system_one, general = conn.execute(
+        parent, area = conn.execute(
+            "select id, area_id from reporting_unit where scheme_code = 'us.state' and polity_id = %s", [state]
+        ).fetchone()
+        office, system_one, _general = conn.execute(
             """select c.office_id, c.electoral_system_id, c.election_id from contest c
                join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = '2020-11-03:AS:governor'"""
         ).fetchone()
@@ -85,12 +112,19 @@ def emit() -> Path:
                join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = '2024-11-05:AS:house:0'"""
         ).fetchone()
         persons = {
-            "lemanu": conn.execute("select p.id from person p join name n on n.entity_id = p.id and n.text = 'Lemanu Palepoi Mauga'").fetchone()[0],
-            "vaitautolu": conn.execute("select p.id from person p join name n on n.entity_id = p.id and n.text = %s", ["I’aulualo Fa’afetai Talia"]).fetchone()[0],
+            "lemanu": conn.execute(
+                "select p.id from person p join name n on n.entity_id = p.id and n.text = 'Lemanu Palepoi Mauga'"
+            ).fetchone()[0],
+            "vaitautolu": conn.execute(
+                "select p.id from person p join name n on n.entity_id = p.id and n.text = %s",
+                ["I’aulualo Fa’afetai Talia"],
+            ).fetchone()[0],
         }
         persons["pula"] = cs.key(f"{SOURCE}.person", "pula-nikolao-pula")
         cs.add("person", id=persons["pula"])
-        cs.add("name", entity_id=persons["pula"], text="Pula Nikolao Pula", lang="en", kind="official", is_preferred=True)
+        cs.add(
+            "name", entity_id=persons["pula"], text="Pula Nikolao Pula", lang="en", kind="official", is_preferred=True
+        )
         runoff_election = cs.key("us.election", "2024-11-19:AS")
         cs.add(
             "election",
@@ -102,13 +136,22 @@ def emit() -> Path:
             date_precision="day",
             status="held",
         )
-        cs.add("name", entity_id=runoff_election, text="2024 American Samoa runoff election", lang="en", kind="official", is_preferred=True)
+        cs.add(
+            "name",
+            entity_id=runoff_election,
+            text="2024 American Samoa runoff election",
+            lang="en",
+            kind="official",
+            is_preferred=True,
+        )
         cs.add("slug", path="us/as/2024-11-19-runoff", entity_id=runoff_election)
         sources = {}
         results: dict[tuple[date, str], dict[str, dict[str, int]]] = {}
         for day, section, url, keywords in FILES:
             artifact = raw.cached(SOURCE, url)
-            text = subprocess.run(["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True
+            ).stdout
             title = f"{day.year} {'runoff' if day.month == 11 and day.day == 19 else 'general'} election results by polling district"
             if (day, section) not in sources:
                 sources[(day, section)] = cs.source(PUBLISHER, title + f" ({section})")
@@ -123,7 +166,9 @@ def emit() -> Path:
                 )
                 cs.artifact(artifact, sources[(day, section)])
             for line in text.splitlines():
-                found = re.match(r"^(?:(?P<label>[A-Za-z].*?)\s{2,})?(?P<nums>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", line.strip())
+                found = re.match(
+                    r"^(?:(?P<label>[A-Za-z].*?)\s{2,})?(?P<nums>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", line.strip()
+                )
                 if found is None:
                     continue
                 numbers = [int(number.replace(",", "")) for number in found["nums"].split()]
@@ -154,16 +199,34 @@ def emit() -> Path:
                 electoral_system_id=system_two if round_number == 2 else system_one,
                 default_result_kind="counted",
             )
-            cs.add("name", entity_id=contest, text=f"2024 American Samoa governor election, round {round_number}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"2024 American Samoa governor election, round {round_number}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=slug, entity_id=contest)
-        labels = {"pula": "Pula Nikolao Pula", "lemanu": "Lemanu Palepoi Mauga", "vaitautolu": "Vaitautolu Talia Iaulualo"}
+        labels = {
+            "pula": "Pula Nikolao Pula",
+            "lemanu": "Lemanu Palepoi Mauga",
+            "vaitautolu": "Vaitautolu Talia Iaulualo",
+        }
         options = {}
         for contest, names in ((round_one, ("pula", "lemanu", "vaitautolu")), (round_two, ("pula", "lemanu"))):
             for name in names:
                 option = cs.key("us.option", f"{contest}:{name}")
                 options[(contest, name)] = option
                 cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=labels[name])
-                cs.add("candidacy", id=cs.key("us.candidacy", f"{contest}:{name}"), person_id=persons[name], option_id=option, role="head", is_independent=True)
+                cs.add(
+                    "candidacy",
+                    id=cs.key("us.candidacy", f"{contest}:{name}"),
+                    person_id=persons[name],
+                    option_id=option,
+                    role="head",
+                    is_independent=True,
+                )
         for column, total in enumerate((3660, 4284, 2169)):
             if sum(row[column] for row in ROUND_ONE_ROWS.values()) != total:
                 raise ValueError("round one transcription does not tie to the certified totals")
@@ -180,7 +243,8 @@ def emit() -> Path:
         )
         cs.artifact(raw.cached(SOURCE, ROUND_ONE), sources[(date(2024, 11, 5), "governor")])
         results[(date(2024, 11, 5), "governor")] = {
-            f"{date(2024, 11, 5)}:AS:{code}": dict(zip(("lemanu", "pula", "vaitautolu"), row, strict=True)) for code, row in ROUND_ONE_ROWS.items()
+            f"{date(2024, 11, 5)}:AS:{code}": dict(zip(("lemanu", "pula", "vaitautolu"), row, strict=True))
+            for code, row in ROUND_ONE_ROWS.items()
         }
         units = {}
         for (day, section), districts in results.items():
@@ -194,16 +258,36 @@ def emit() -> Path:
                     "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
                     [key],
                 ).fetchone()
-            existing = conn.execute("select lower(ballot_label), id from contest_option where contest_id = %s", [contest]).fetchall()
+            existing = conn.execute(
+                "select lower(ballot_label), id from contest_option where contest_id = %s", [contest]
+            ).fetchall()
             picked = {}
             for keyword in {keyword for votes in districts.values() for keyword in votes}:
-                found = [option for label, option in existing if keyword in label] if existing else [options[(contest, keyword)]]
+                found = (
+                    [option for label, option in existing if keyword in label]
+                    if existing
+                    else [options[(contest, keyword)]]
+                )
                 if len(found) != 1:
                     raise ValueError(f"{key}: {len(found)} options for {keyword}")
                 picked[keyword] = found[0]
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:district")
-            columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
-            for prior in conn.execute(f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]).fetchall():
+            columns = (
+                "id",
+                "election_id",
+                "contest_id",
+                "stage",
+                "kind",
+                "status",
+                "source_id",
+                "as_of",
+                "completeness",
+                "supersedes_id",
+            )
+            for prior in conn.execute(
+                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+                [contest, result_set],
+            ).fetchall():
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
             ranked = sorted(picked, key=lambda keyword: -sum(votes[keyword] for votes in districts.values()))
             if existing:
@@ -235,7 +319,17 @@ def emit() -> Path:
                 is_default=True,
                 completeness=completeness,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md="Votes by polling district from the Election Office's results sheets; the central office row holds Swains Island and, where the sheet says so, absentee ballots." + (" The first-round sheet is an image published as the election-night unofficial results; its figures were transcribed by hand and each column sums to the totals the Office certified on November 12, 2024 (reported by Talanei)." if key == "2024-11-05:AS:governor" else ""))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md="Votes by polling district from the Election Office's results sheets; the central office row holds Swains Island and, where the sheet says so, absentee ballots."
+                + (
+                    " The first-round sheet is an image published as the election-night unofficial results; its figures were transcribed by hand and each column sums to the totals the Office certified on November 12, 2024 (reported by Talanei)."
+                    if key == "2024-11-05:AS:governor"
+                    else ""
+                ),
+            )
             for code, votes in districts.items():
                 if code not in units:
                     units[code] = cs.unit("us.precinct", code)

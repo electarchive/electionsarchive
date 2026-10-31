@@ -5,8 +5,16 @@ from ea import raw
 
 SOURCE = "us.elstats_specials"
 PAGES = [
-    ("https://elections.maryland.gov/elections/archive/2008/2008_special_4th_congressional_general_results.html", date(2008, 6, 17), 4),
-    ("https://elections.maryland.gov/elections/archive/2020/results/special_general/gen_detail_results_2020_3_BOT00907.html", date(2020, 4, 28), 7),
+    (
+        "https://elections.maryland.gov/elections/archive/2008/2008_special_4th_congressional_general_results.html",
+        date(2008, 6, 17),
+        4,
+    ),
+    (
+        "https://elections.maryland.gov/elections/archive/2020/results/special_general/gen_detail_results_2020_3_BOT00907.html",
+        date(2020, 4, 28),
+        7,
+    ),
 ]
 PRIMARIES = [
     (
@@ -29,10 +37,12 @@ def rows() -> list[dict[str, object]]:
     found = []
     for page, day, district, *scope in [*PAGES, *PRIMARIES]:
         header: list[tuple[str, str | None]] = []
-        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, page).path.read_text(errors="replace"), re.S | re.I):
+        for row in re.findall(
+            r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, page).path.read_text(errors="replace"), re.DOTALL | re.IGNORECASE
+        ):
             cells = [
                 re.sub(r"\s+", " ", re.sub(r"<[^>]*>", "", cell).replace("&nbsp;", " ")).strip()
-                for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, re.S | re.I)
+                for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row, re.DOTALL | re.IGNORECASE)
             ]
             if cells[:1] in (["County"], ["Jurisdiction"]):
                 header = []

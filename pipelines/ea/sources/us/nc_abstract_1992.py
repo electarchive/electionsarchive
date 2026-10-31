@@ -1,8 +1,8 @@
 import json
-from collections import Counter
 import re
 import subprocess
 import tempfile
+from collections import Counter
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -27,17 +27,54 @@ MANUAL = {4: {"WATAUGA": [8267, 8564, 690, 8593, 8209, 867]}}
 PASSES = [(120, "6"), (150, "6"), (135, "4"), (100, "6"), (110, "6"), (160, "6"), (120, "4"), (170, "6")]
 SHEETS = {
     (1, 2): [
-        ("Secretary of State", [("Rufus L. Edmisten", "DEMOCRATIC"), ("John H. Carrington", "REPUBLICAN"), ("H. R. (Dick) Parker, Jr.", "LIBERTARIAN")]),
+        (
+            "Secretary of State",
+            [
+                ("Rufus L. Edmisten", "DEMOCRATIC"),
+                ("John H. Carrington", "REPUBLICAN"),
+                ("H. R. (Dick) Parker, Jr.", "LIBERTARIAN"),
+            ],
+        ),
         ("Auditor", [("Ralph Campbell", "DEMOCRATIC"), ("J. Vernon Abernethy", "REPUBLICAN")]),
     ],
     (3, 4): [
-        ("Treasurer", [("Harlan E. Boyles", "DEMOCRATIC"), ("Betsy Young Justus", "REPUBLICAN"), ("Ron Holland", "LIBERTARIAN")]),
-        ("Superintendent of Public Instruction", [("Bob Etheridge", "DEMOCRATIC"), ("Teena S. Little", "REPUBLICAN"), ("Anna Lyon", "LIBERTARIAN")]),
+        (
+            "Treasurer",
+            [("Harlan E. Boyles", "DEMOCRATIC"), ("Betsy Young Justus", "REPUBLICAN"), ("Ron Holland", "LIBERTARIAN")],
+        ),
+        (
+            "Superintendent of Public Instruction",
+            [("Bob Etheridge", "DEMOCRATIC"), ("Teena S. Little", "REPUBLICAN"), ("Anna Lyon", "LIBERTARIAN")],
+        ),
     ],
-    (5, 6): [("Attorney General", [("Mike Easley", "DEMOCRATIC"), ("Joe Dean", "REPUBLICAN"), ("Lawrence Berry", "LIBERTARIAN")])],
-    (7, 8): [("Commissioner of Agriculture", [("James A. (Jim) Graham", "DEMOCRATIC"), ("Leo Tew", "REPUBLICAN"), ("Bob McQuigg", "LIBERTARIAN")])],
-    (9, 10): [("Commissioner of Insurance", [("Jim Long", "DEMOCRATIC"), ("Mike Causey", "REPUBLICAN"), ("Kenneth Wayne Day", "LIBERTARIAN")])],
-    (11, 12): [("Commissioner of Labor", [("Harry E. Payne, Jr.", "DEMOCRATIC"), ("Nelson F. Dollar", "REPUBLICAN"), ("Craig Springer", "LIBERTARIAN")])],
+    (5, 6): [
+        (
+            "Attorney General",
+            [("Mike Easley", "DEMOCRATIC"), ("Joe Dean", "REPUBLICAN"), ("Lawrence Berry", "LIBERTARIAN")],
+        )
+    ],
+    (7, 8): [
+        (
+            "Commissioner of Agriculture",
+            [("James A. (Jim) Graham", "DEMOCRATIC"), ("Leo Tew", "REPUBLICAN"), ("Bob McQuigg", "LIBERTARIAN")],
+        )
+    ],
+    (9, 10): [
+        (
+            "Commissioner of Insurance",
+            [("Jim Long", "DEMOCRATIC"), ("Mike Causey", "REPUBLICAN"), ("Kenneth Wayne Day", "LIBERTARIAN")],
+        )
+    ],
+    (11, 12): [
+        (
+            "Commissioner of Labor",
+            [
+                ("Harry E. Payne, Jr.", "DEMOCRATIC"),
+                ("Nelson F. Dollar", "REPUBLICAN"),
+                ("Craig Springer", "LIBERTARIAN"),
+            ],
+        )
+    ],
 }
 METHOD = (
     "County totals come from the State Board of Elections' abstract of votes cast for the Council of State at the 1992 "
@@ -58,11 +95,19 @@ def fetch() -> None:
     detail = subprocess.run(
         ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", RECORD], capture_output=True, text=True, check=True
     ).stdout
-    items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.S)[1])
+    items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.DOTALL)[1])
     for item in items:
         number = int(item["path"].rsplit("-", 1)[1])
         pdf = subprocess.run(
-            ["curl", "-sL", "-m", "120", "-A", "Mozilla/5.0", item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"])],
+            [
+                "curl",
+                "-sL",
+                "-m",
+                "120",
+                "-A",
+                "Mozilla/5.0",
+                item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"]),
+            ],
             capture_output=True,
             check=True,
         ).stdout
@@ -76,7 +121,16 @@ def read(page: int, cut: int, mode: str, width: int) -> list[tuple[str, list[int
     with tempfile.TemporaryDirectory() as folder:
         prefix = Path(folder) / "page"
         subprocess.run(
-            ["pdftoppm", "-r", "300", "-gray", "-png", "-singlefile", str(raw.cached(SOURCE, url(page)).path), str(prefix)],
+            [
+                "pdftoppm",
+                "-r",
+                "300",
+                "-gray",
+                "-png",
+                "-singlefile",
+                str(raw.cached(SOURCE, url(page)).path),
+                str(prefix),
+            ],
             check=True,
         )
         with Image.open(prefix.with_suffix(".png")) as rendered:
@@ -84,7 +138,10 @@ def read(page: int, cut: int, mode: str, width: int) -> list[tuple[str, list[int
                 prefix.with_suffix(".png")
             )
         out = subprocess.run(
-            ["tesseract", str(prefix.with_suffix(".png")), "stdout", "--psm", mode], capture_output=True, text=True, check=True
+            ["tesseract", str(prefix.with_suffix(".png")), "stdout", "--psm", mode],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
     rows = []
     for line in out.splitlines():
@@ -148,7 +205,9 @@ def parse() -> None:
                 best = max(score(combo) for combo in fits)
                 fits = [combo for combo in fits if score(combo) == best]
             if len(fits) != 1:
-                raise ValueError(f"pages {pair} column {column}: {len(fits)} readings fit the printed total {printed} ({[body[r][0] for r in weak]})")
+                raise ValueError(
+                    f"pages {pair} column {column}: {len(fits)} readings fit the printed total {printed} ({[body[r][0] for r in weak]})"
+                )
             for r, value in zip(weak, fits[0], strict=True):
                 chosen[r][column] = value
         body = [(name, chosen[r]) for r, (name, _) in enumerate(body)]
@@ -156,7 +215,9 @@ def parse() -> None:
         for office, candidates in offices:
             for offset, (candidate, party) in enumerate(candidates):
                 for name, values in body:
-                    rows.append((office, candidate, party, codes[re.sub(r"[^a-z]", "", name.lower())], values[start + offset]))
+                    rows.append(
+                        (office, candidate, party, codes[re.sub(r"[^a-z]", "", name.lower())], values[start + offset])
+                    )
             start += len(candidates)
     frame = pl.DataFrame(rows, schema=["office", "candidate", "party", "county", "votes"], orient="row").select(
         year=pl.lit(1992, pl.Int32),

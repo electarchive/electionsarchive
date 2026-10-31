@@ -28,9 +28,12 @@ def parse() -> None:
     text = raw.cached(SOURCE, URL).path.read_text()
     block = text[text.index('id="bycounty"') : text.index('id="bycountyw"')]
     rows = []
-    for party, table in re.findall(r'<h4 class="President (\w+)">.*?<tbody>(.*?)</tbody>', block, re.S):
-        for line in re.findall(r"<tr>(.*?)</tr>", table, re.S):
-            cells = [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td>(.*?)</td>", line, re.S)]
+    for party, table in re.findall(r'<h4 class="President (\w+)">.*?<tbody>(.*?)</tbody>', block, re.DOTALL):
+        for line in re.findall(r"<tr>(.*?)</tr>", table, re.DOTALL):
+            cells = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                for cell in re.findall(r"<td>(.*?)</td>", line, re.DOTALL)
+            ]
             votes = [int(cell.replace(",", "")) for cell in cells[2:6]]
             if sum(votes[:3]) != votes[3]:
                 raise ValueError(f"{cells[0]}: counties sum to {sum(votes[:3])}, state {votes[3]}")
@@ -67,7 +70,15 @@ def emit() -> Path:
             polity="US-DE",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=URL,
+            license="Public record",
+        )
         cs.artifact(raw.cached(SOURCE, URL), source)
         medsl.attach(cs, conn, frame, {"DE": source}, strict=True)
         return cs.write()

@@ -16,7 +16,7 @@ SOURCE = "us.wyco_ks"
 VERSION = "1"
 PLATFORM = "ks_wyco"
 ARCHIVE = "https://wycovoteskck.gov/election-results-archive"
-SKIPPED = re.compile(r"^(OVER|UNDER) VOTES$", re.I)
+SKIPPED = re.compile(r"^(OVER|UNDER) VOTES$", re.IGNORECASE)
 ANCHOR = re.compile(r'<a [^>]*href="([^"]+)"[^>]*>\s*([^<]*?\d{4} [^<]*? - [A-Z][a-z]+ \d{1,2}, \d{4})\s*</a>')
 
 
@@ -35,7 +35,11 @@ def _csvs() -> dict[str, tuple[str, str]]:
     found = {}
     for path, (url, label) in _events().items():
         page = raw.cached(SOURCE, url).path.read_text(errors="replace")
-        if link := re.search(r'href="([^"]*ByPrecinct[^"]*\.csv|[^"]*StatementOfVotesCast[^"]*\.csv|[^"]*SOVC[^"]*\.csv|[^"]*_Export[^"]*\.csv)"', page, re.I):
+        if link := re.search(
+            r'href="([^"]*ByPrecinct[^"]*\.csv|[^"]*StatementOfVotesCast[^"]*\.csv|[^"]*SOVC[^"]*\.csv|[^"]*_Export[^"]*\.csv)"',
+            page,
+            re.IGNORECASE,
+        ):
             found[path] = (urljoin(ARCHIVE, link[1]), label)
     return found
 
@@ -66,14 +70,20 @@ NAMES = (
     (re.compile(r"(?i)\b(?:unified government|UG)\s+sheriff\b"), "Wyandotte County Sheriff"),
     (re.compile(r"(?i)\b(?:unified government|UG)\s+chief executive/mayor\b"), "Kansas City Mayor"),
     (re.compile(r"(?i)\b(?:unified government|UG)\s+commissioner\b"), "Kansas City Council Member"),
-    (re.compile(r"(?i)\bUSD #(202|203|204|500)\b"), lambda found: f"{DISTRICTS[found[1]]} Unified School District {found[1]}"),
+    (
+        re.compile(r"(?i)\bUSD #(202|203|204|500)\b"),
+        lambda found: f"{DISTRICTS[found[1]]} Unified School District {found[1]}",
+    ),
     (re.compile(r"(?i)\bward (I{1,3}|IV)\b"), lambda found: f"Ward {len(found[1]) if found[1].upper() != 'IV' else 4}"),
     (re.compile(r"(?i)\b(mayor|city council[\w -]*?) (edwardsville|lake quivira)$"), lambda found: found[1]),
-    (re.compile(r"(?i)\bunified school district (?:no\.? ?)?(202|203|204|500)\b"), lambda found: f"{DISTRICTS[found[1]]} Unified School District {found[1]}"),
+    (
+        re.compile(r"(?i)\bunified school district (?:no\.? ?)?(202|203|204|500)\b"),
+        lambda found: f"{DISTRICTS[found[1]]} Unified School District {found[1]}",
+    ),
 )
 DISTRICTS = {"202": "Turner", "203": "Piper", "204": "Bonner Springs", "500": "Kansas City"}
 ROW = re.compile(r"^\s*(?P<name>\S.*?)[\s.]*\s(?P<total>\d[\d,]*)\s+[\d. •]*$")
-PARTY = re.compile(r"\s*\((Dem|Rep|Lib|Con|Gre|Ind)\)\s*$", re.I)
+PARTY = re.compile(r"\s*\((Dem|Rep|Lib|Con|Gre|Ind)\)\s*$", re.IGNORECASE)
 
 
 def _title(title: str) -> str:
@@ -85,7 +95,7 @@ def _title(title: str) -> str:
 def dotted(text: str, joined: bool = False) -> Iterator[dict[str, Any]]:
     lines = text.splitlines()
     for index, line in enumerate(lines):
-        if not re.match(r"^\s*\(VOTE FOR\s*\)\s*(\d+)\s*$", line, re.I) or index == 0:
+        if not re.match(r"^\s*\(VOTE FOR\s*\)\s*(\d+)\s*$", line, re.IGNORECASE) or index == 0:
             continue
         choices: list[dict[str, Any]] = []
         for other in lines[index + 1 : index + 60]:
@@ -112,7 +122,9 @@ def dotted(text: str, joined: bool = False) -> Iterator[dict[str, Any]]:
                     "places": [],
                 }
             )
-        title = next((lines[back].strip() for back in range(index - 1, max(index - 4, -1), -1) if lines[back].strip()), "")
+        title = next(
+            (lines[back].strip() for back in range(index - 1, max(index - 4, -1), -1) if lines[back].strip()), ""
+        )
         if joined:
             above = []
             for back in range(index - 1, max(index - 3, -1), -1):
@@ -126,7 +138,11 @@ def dotted(text: str, joined: bool = False) -> Iterator[dict[str, Any]]:
                     break
                 above.insert(0, candidate)
             title = " - ".join(above) or next(
-                (lines[back].strip() for back in range(index - 1, max(index - 6, -1), -1) if lines[back].strip() and not re.search(r"(?i)\.html?\[", lines[back])),
+                (
+                    lines[back].strip()
+                    for back in range(index - 1, max(index - 6, -1), -1)
+                    if lines[back].strip() and not re.search(r"(?i)\.html?\[", lines[back])
+                ),
                 "",
             )
         if choices and title:
@@ -138,12 +154,18 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     yield from _read_pdfs(tenant)
     for path, (url, label) in sorted(_csvs().items()):
         day = datetime.strptime(label.rsplit(" - ", 1)[1], "%B %d, %Y").date()
-        rows = list(csv.reader(io.StringIO(raw.cached(SOURCE, url).path.read_bytes().decode("utf-8-sig", errors="replace"))))
+        rows = list(
+            csv.reader(io.StringIO(raw.cached(SOURCE, url).path.read_bytes().decode("utf-8-sig", errors="replace")))
+        )
         titles, parties, names = rows[0], rows[1], rows[2]
         columns: dict[str, list[tuple[int, str, str | None]]] = {}
         for index in range(3, len(titles)):
             title = titles[index].strip()
-            if not title or title.upper().startswith(("REGISTERED", "BALLOTS", "TURNOUT")) or SKIPPED.match(names[index].strip()):
+            if (
+                not title
+                or title.upper().startswith(("REGISTERED", "BALLOTS", "TURNOUT"))
+                or SKIPPED.match(names[index].strip())
+            ):
                 continue
             columns.setdefault(title, []).append((index, names[index].strip(), None))
         totals: dict[tuple[str, int], int] = {}
@@ -180,7 +202,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
 
 def _read_pdfs(tenant: str) -> Iterator[dict[str, Any]]:
     for href, (url, label) in sorted(_pdfs().items()):
-        text = subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True).stdout.decode(errors="replace")
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, check=False
+        ).stdout.decode(errors="replace")
         head = text[:800]
         if "Election Summary Report" in head and "Jurisdiction Wide" in head:
             parser = kceb.gems

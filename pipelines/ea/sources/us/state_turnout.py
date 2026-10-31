@@ -56,7 +56,15 @@ def parse() -> None:
     for line in pdf_text(SERIES["OR"][3]).splitlines():
         match = re.match(r"\s*((?:19|20)\d\d)\s+([\d,]+)\s+([\d,]+)\s+[\d.]+%", line)
         if match:
-            rows.append({"state": "OR", "year": int(match[1]), "stage": "general", "registered": number(match[2]), "voters": number(match[3])})
+            rows.append(
+                {
+                    "state": "OR",
+                    "year": int(match[1]),
+                    "stage": "general",
+                    "registered": number(match[2]),
+                    "voters": number(match[3]),
+                }
+            )
     stage = None
     for line in pdf_text(SERIES["MN"][3]).splitlines():
         if "State Primary Statistics" in line:
@@ -65,14 +73,24 @@ def parse() -> None:
             stage = "general"
         match = re.match(r"\s*((?:19|20)\d\d)\s+([\d,]+)\s+([\d,]+)\s+[\d.]+%", line)
         if match and stage:
-            rows.append({"state": "MN", "year": int(match[1]), "stage": stage, "registered": None, "voters": number(match[3])})
+            rows.append(
+                {"state": "MN", "year": int(match[1]), "stage": stage, "registered": None, "voters": number(match[3])}
+            )
     text = raw.cached(SOURCE, SERIES["NC"][3]).path.read_text(encoding="utf8", errors="replace")
     text = re.sub(r"(?is)<script.*?</script>|<style.*?</style>", "", text)
     text = html.unescape(re.sub(r"(?i)</t[dh]>", "|", re.sub(r"(?i)</tr>", "\n", text)))
     for line in re.sub(r"<[^>]+>", " ", text).splitlines():
         match = re.match(r"\s*((?:19|20)\d\d) (General|Primary)\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)\s*\|", line)
         if match:
-            rows.append({"state": "NC", "year": int(match[1]), "stage": match[2].lower(), "registered": None, "voters": number(match[4])})
+            rows.append(
+                {
+                    "state": "NC",
+                    "year": int(match[1]),
+                    "stage": match[2].lower(),
+                    "registered": None,
+                    "voters": number(match[4]),
+                }
+            )
     frame = pl.DataFrame(rows, schema_overrides={"registered": pl.Int64})
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
@@ -106,11 +124,19 @@ def emit() -> Path:
                 elections.setdefault((start.year, kind), []).append((value, entity_id))
             source = cs.source(publisher, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
             cs.artifact(raw.cached(SOURCE, url), source)
-            for year, stage, registered, voters in frame.filter(pl.col("state") == state).select(
-                "year", "stage", "registered", "voters"
-            ).iter_rows():
+            for year, stage, registered, voters in (
+                frame.filter(pl.col("state") == state).select("year", "stage", "registered", "voters").iter_rows()
+            ):
                 found = elections.get((year, stage), [])
                 if len(found) > 1 and stage == "general":
                     first = date(year, 11, 1)

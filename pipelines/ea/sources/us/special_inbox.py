@@ -14,7 +14,9 @@ SOURCE = "us.elstats_specials"
 INBOX = DATA / "inbox" / "manual" / "MF-288"
 WISCONSIN = "https://elections.wi.gov/elections/election-results/results-all#County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf"
 OREGON = "https://sos.oregon.gov/elections/Pages/electionsstatistics.aspx#2011%20Special%20Primary%20Election%20Official%20Results.PDF"
-ARKANSAS = "https://www.sos.arkansas.gov/elections/research/election-results#2001_Special_Primary_US_Congress_District_3.pdf"
+ARKANSAS = (
+    "https://www.sos.arkansas.gov/elections/research/election-results#2001_Special_Primary_US_Congress_District_3.pdf"
+)
 ARKANSAS_RUNOFFS = {
     "Democratic": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-dem.zip",
     "Republican": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-rep.zip",
@@ -99,7 +101,14 @@ UTAH_2017 = {
 }
 UTAH_2017_COUNTIES = ("Carbon", "Emery", "Grand", "Salt Lake", "San Juan", "Utah", "Wasatch")
 OHIO_2005 = {
-    "Democratic": ["Paul Hackett", "Arthur Stanley Katz", "James John Parker", "Charles W. Sanders", "Jeff Sinnard", "Victoria Wells Wulsin"],
+    "Democratic": [
+        "Paul Hackett",
+        "Arthur Stanley Katz",
+        "James John Parker",
+        "Charles W. Sanders",
+        "Jeff Sinnard",
+        "Victoria Wells Wulsin",
+    ],
     "Republican": [
         "Steve Austin",
         "Tom Bemmes",
@@ -116,7 +125,9 @@ OHIO_2005 = {
 }
 OHIO_URL = "https://data.ohiosos.gov/portal/past-election-results#MF-290/{}/{}"
 FILES = {
-    WISCONSIN: INBOX / "2020-02-18" / "County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf",
+    WISCONSIN: INBOX
+    / "2020-02-18"
+    / "County%20by%20County%20Report_Representative%20in%20Congress%20District%207_Spring%20Primary_2_18_20.pdf",
     OREGON: INBOX / "2011-11-08" / "2011 Special Primary Election Official Results.PDF",
     ARKANSAS: INBOX / "2001" / "2001_Special_Primary_US_Congress_District_3.pdf",
     ARKANSAS_RUNOFFS["Democratic"]: INBOX / "2001" / "runoff24-dem.zip",
@@ -143,8 +154,24 @@ WISCONSIN_CANDIDATES = {
     "REPUBLICAN": ("Republican", ["Tom Tiffany", "Jason Church", "Michael Opela", "Scattering"]),
 }
 OREGON_CANDIDATES = {
-    "Democrat": ("Democratic", ["Dominic Hammon", "Suzanne Bonamici", "Brad Witt", "Saba Ahmed", "Brad Avakian", "Dan Strite", "Robert E Lettin", "Todd Lee Ritter", "Scattering"]),
-    "Republican": ("Republican", ["Lisa Michaels", "DR Delgado-Morgan", "Pavel Goberman", "Jim Greenfield", "Rob Cornilles", "Scattering"]),
+    "Democrat": (
+        "Democratic",
+        [
+            "Dominic Hammon",
+            "Suzanne Bonamici",
+            "Brad Witt",
+            "Saba Ahmed",
+            "Brad Avakian",
+            "Dan Strite",
+            "Robert E Lettin",
+            "Todd Lee Ritter",
+            "Scattering",
+        ],
+    ),
+    "Republican": (
+        "Republican",
+        ["Lisa Michaels", "DR Delgado-Morgan", "Pavel Goberman", "Jim Greenfield", "Rob Cornilles", "Scattering"],
+    ),
 }
 ARKANSAS_CANDIDATES = {
     "Boozman": "John Boozman",
@@ -204,7 +231,9 @@ def rows() -> list[dict[str, object]]:
         if hit := re.match(r"^REPRESENTATIVE IN CONGRESS DISTRICT 7 - (\w+)", line):
             party = hit[1]
             tally = {}
-        elif party in WISCONSIN_CANDIDATES and (hit := re.match(r"^\s*(Office Totals:|[A-Z][A-Z. ]+?)\s+([\d,]+(?:\s+[\d,]+)+)\s*$", line)):
+        elif party in WISCONSIN_CANDIDATES and (
+            hit := re.match(r"^\s*(Office Totals:|[A-Z][A-Z. ]+?)\s+([\d,]+(?:\s+[\d,]+)+)\s*$", line)
+        ):
             label, names = hit[1], WISCONSIN_CANDIDATES[party][1]
             values = [int(value.replace(",", "")) for value in hit[2].split()]
             if len(values) != len(names) + 1 or sum(values[1:]) != values[0]:
@@ -263,7 +292,15 @@ def rows() -> list[dict[str, object]]:
             else:
                 tally[hit[1]] = values
                 for column, count in zip(columns, values, strict=True):
-                    add("AR", "2001-09-25", "3", "Democratic" if party == "Democrat" else party, ARKANSAS_CANDIDATES[column], hit[1], count)
+                    add(
+                        "AR",
+                        "2001-09-25",
+                        "3",
+                        "Democratic" if party == "Democrat" else party,
+                        ARKANSAS_CANDIDATES[column],
+                        hit[1],
+                        count,
+                    )
     for party, url in ARKANSAS_RUNOFFS.items():
         with zipfile.ZipFile(io.BytesIO(raw.cached(SOURCE, url).path.read_bytes())) as archive:
             lines = archive.read("runoff24.txt").decode("latin-1").replace("|Office|", "|\nOffice|").splitlines()
@@ -286,8 +323,14 @@ def rows() -> list[dict[str, object]]:
         with zipfile.ZipFile(io.BytesIO(raw.cached(SOURCE, url).path.read_bytes())) as archive:
             workbook = ET.fromstring(archive.read("detail.xls"))
         for worksheet in workbook.iter(f"{sheet}Worksheet"):
-            table = [[cell.findtext(f"{sheet}Data") or "" for cell in row.iter(f"{sheet}Cell")] for row in worksheet.iter(f"{sheet}Row")]
-            hit = re.match(r"^U\.S\.\s+House of Representatives, District\s+(\d+) - (REP|DEM)", table[0][0] if table and table[0] else "")
+            table = [
+                [cell.findtext(f"{sheet}Data") or "" for cell in row.iter(f"{sheet}Cell")]
+                for row in worksheet.iter(f"{sheet}Row")
+            ]
+            hit = re.match(
+                r"^U\.S\.\s+House of Representatives, District\s+(\d+) - (REP|DEM)",
+                table[0][0] if table and table[0] else "",
+            )
             if hit is None or (day == "2013-03-19" and hit[2] == "REP"):
                 continue
             names = [cell for cell in table[1][2:] if cell]
@@ -301,7 +344,15 @@ def rows() -> list[dict[str, object]]:
                     continue
                 for index, name in enumerate(names):
                     sums[index] += int(line[3 + 2 * index])
-                    add("SC", "2013-03-19" if day == "2013-03-22" else day, hit[1], "Republican" if hit[2] == "REP" else "Democratic", name, line[0], int(line[3 + 2 * index]))
+                    add(
+                        "SC",
+                        "2013-03-19" if day == "2013-03-22" else day,
+                        hit[1],
+                        "Republican" if hit[2] == "REP" else "Democratic",
+                        name,
+                        line[0],
+                        int(line[3 + 2 * index]),
+                    )
                     block.append(found[-1])
             qualifiers = {names[index] for index in sorted(range(len(names)), key=sums.__getitem__)[-2:]}
             for row in block:
@@ -310,7 +361,9 @@ def rows() -> list[dict[str, object]]:
                     row["outcome"] = "Runoff"
     for day, files in OHIO.items():
         for party, name in files.items():
-            cells = pl.read_excel(raw.cached(SOURCE, OHIO_URL.format(day, name)).path, has_header=False, engine="calamine").rows()
+            cells = pl.read_excel(
+                raw.cached(SOURCE, OHIO_URL.format(day, name)).path, has_header=False, engine="calamine"
+            ).rows()
             block = []
             if day == "2005-06-14":
                 names = OHIO_2005[party]
@@ -319,7 +372,10 @@ def rows() -> list[dict[str, object]]:
                         add("OH", day, "2", party, candidate, line[0].title(), int(votes.replace(",", "")))
                         block.append(found[-1])
                 totals = [int(value.replace(",", "")) for value in cells[-1][1:]]
-                if [sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate) for candidate in names] != totals:
+                if [
+                    sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate)
+                    for candidate in names
+                ] != totals:
                     raise ValueError(f"OH-2 2005 {party}: counties do not sum")
             else:
                 county = None
@@ -331,7 +387,12 @@ def rows() -> list[dict[str, object]]:
                         last, first = candidate.split(", ")
                         add("OH", day, "5", party, f"{first} {last}", county, int(str(line[3]).replace(",", "")))
                         block.append(found[-1])
-            top = max({row["candidate_name"] for row in block}, key=lambda candidate: sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate))
+            top = max(
+                {row["candidate_name"] for row in block},
+                key=lambda candidate: sum(
+                    int(str(row["votes"])) for row in block if row["candidate_name"] == candidate
+                ),
+            )
             for row in block:
                 row["outcome"] = "Elected" if row["candidate_name"] == top else "Defeated"
     for day, (district, which, files) in OHIO_SPECIALS.items():
@@ -342,18 +403,31 @@ def rows() -> list[dict[str, object]]:
                 has_header=False,
                 engine="calamine",
             ).rows()
-            starts = [index for index, cell in enumerate(sheet[0]) if cell is not None and cell.strip().endswith(f"District {district.zfill(2)}")]
+            starts = [
+                index
+                for index, cell in enumerate(sheet[0])
+                if cell is not None and cell.strip().endswith(f"District {district.zfill(2)}")
+            ]
             start = starts[which]
-            end = next((index for index in range(start + 1, len(sheet[0])) if sheet[0][index] is not None), len(sheet[0]))
+            end = next(
+                (index for index in range(start + 1, len(sheet[0])) if sheet[0][index] is not None), len(sheet[0])
+            )
             block = []
             for column in range(start, end):
                 candidate = re.sub(r"\s*(\(WI\)\*)?\s*\([A-Z]\)$", "", str(sheet[1][column]))
                 for line in sheet[4:]:
                     add("OH", day, district, party, candidate, line[0], int(str(line[column]).replace(",", "")))
                     block.append(found[-1])
-                if sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate) != int(str(sheet[2][column]).replace(",", "")):
+                if sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate) != int(
+                    str(sheet[2][column]).replace(",", "")
+                ):
                     raise ValueError(f"OH-{district} {day} {party} {candidate}: counties do not sum")
-            top = max({row["candidate_name"] for row in block}, key=lambda candidate: sum(int(str(row["votes"])) for row in block if row["candidate_name"] == candidate))
+            top = max(
+                {row["candidate_name"] for row in block},
+                key=lambda candidate: sum(
+                    int(str(row["votes"])) for row in block if row["candidate_name"] == candidate
+                ),
+            )
             for row in block:
                 row["outcome"] = "Elected" if row["candidate_name"] == top else "Defeated"
     for day, (_, counties, tables, winners) in ARIZONA_SPECIALS.items():
@@ -375,5 +449,7 @@ def rows() -> list[dict[str, object]]:
             for other in found:
                 if other["state"] == "AR" and other["primary"] == row["primary"]:
                     totals[other["candidate_name"]] = totals.get(other["candidate_name"], 0) + int(str(other["votes"]))
-            row["outcome"] = "Runoff" if row["candidate_name"] in sorted(totals, key=totals.__getitem__)[-2:] else "Defeated"
+            row["outcome"] = (
+                "Runoff" if row["candidate_name"] in sorted(totals, key=totals.__getitem__)[-2:] else "Defeated"
+            )
     return found

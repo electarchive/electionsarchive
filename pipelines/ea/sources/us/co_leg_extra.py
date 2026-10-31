@@ -7,6 +7,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import elstats, medsl, openelections
+
 PUBLISHER = "Colorado Secretary of State"
 SITE = "https://historicalelectiondata.coloradosos.gov"
 from ea.store import DATA, connect
@@ -74,29 +75,35 @@ def parse() -> None:
     )
     office = pl.col("office_name").fill_null("").str.strip_chars()
     division = pl.col("division_name").fill_null("").str.replace(r"\s*\(.*\)$", "")
-    frame = frame.filter(
-        office.str.contains(OFFICE),
-        pl.col("division_type") == "County",
-        pl.col("district_name").str.contains(r"^\d+$"),
-    ).select(
-        day=pl.col("election_date").str.slice(0, 10),
-        chamber=pl.when(office.str.contains("(?i)senat")).then(pl.lit("senate")).otherwise(pl.lit("house")),
-        district=pl.col("district_name"),
-        party=pl.col("primary_party").fill_null(""),
-        code=division.map_elements(elstats.plain, return_dtype=pl.String)
-        .str.replace(r"(county|parish)$", "")
-        .replace_strict(counties, default=None),
-        division=division,
-        candidate=pl.col("candidate_name").fill_null("").str.to_uppercase().str.strip_chars().str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
-        votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-    ).filter(pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains(openelections.NOT_COUNTED))
+    frame = (
+        frame.filter(
+            office.str.contains(OFFICE),
+            pl.col("division_type") == "County",
+            pl.col("district_name").str.contains(r"^\d+$"),
+        )
+        .select(
+            day=pl.col("election_date").str.slice(0, 10),
+            chamber=pl.when(office.str.contains("(?i)senat")).then(pl.lit("senate")).otherwise(pl.lit("house")),
+            district=pl.col("district_name"),
+            party=pl.col("primary_party").fill_null(""),
+            code=division.map_elements(elstats.plain, return_dtype=pl.String)
+            .str.replace(r"(county|parish)$", "")
+            .replace_strict(counties, default=None),
+            division=division,
+            candidate=pl.col("candidate_name")
+            .fill_null("")
+            .str.to_uppercase()
+            .str.strip_chars()
+            .str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
+            votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+        )
+        .filter(pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains(openelections.NOT_COUNTED))
+    )
     resolved = []
     for (day, chamber, district, party), lines in frame.group_by("day", "chamber", "district", "party"):
         base = f"{day}:CO:{chamber}:{district}"
         found = {
-            key.removeprefix(base).removeprefix(":"): key
-            for key in keys
-            if key == base or key.startswith(base + ":")
+            key.removeprefix(base).removeprefix(":"): key for key in keys if key == base or key.startswith(base + ":")
         }
         suffix = {"Republican": "rp", "Democratic": "dp"}.get(party)
         pick = suffix if suffix in found else next((s for s in PREFERENCE if s in found and not party), None)
@@ -113,7 +120,9 @@ def parse() -> None:
         writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
     ).with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate")).filter(
         pl.col("measure") > 0
-    ).group_by("day", "chamber", "code", "candidate", "measure").agg(pl.col("writein").any(), pl.col("votes").sum()).with_columns(
+    ).group_by("day", "chamber", "code", "candidate", "measure").agg(
+        pl.col("writein").any(), pl.col("votes").sum()
+    ).with_columns(
         year=pl.col("day").str.slice(0, 4).cast(pl.Int32),
         day=pl.col("day").str.to_date(),
         special=pl.lit(False),
@@ -135,7 +144,15 @@ def emit() -> Path:
             polity="US-CO",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=SITE, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=SITE,
+            license="Public record",
+        )
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, search(year)), source)
         medsl.attach(cs, conn, frame, {"CO": source}, strict=True)

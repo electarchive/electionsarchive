@@ -81,9 +81,7 @@ def emit() -> Path:
         cs.add("electoral_system", id=system, polity_id=alberta, rules={"formula": "referendum"}, rules_version=1)
         name(system, "Alberta referendum")
         election = cs.key(f"{SOURCE}.election", str(DAY))
-        cs.add(
-            "election", id=election, polity_id=alberta, kind="referendum", date_from=DAY, date_to=DAY, status="held"
-        )
+        cs.add("election", id=election, polity_id=alberta, kind="referendum", date_from=DAY, date_to=DAY, status="held")
         name(election, "2026 Alberta referendum")
         cs.add("slug", path=f"ca/ab/{DAY}-referendum", entity_id=election)
         cs.add("note", entity_id=election, kind="context", body_md=NOTE)

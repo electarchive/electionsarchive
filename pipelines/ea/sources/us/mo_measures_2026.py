@@ -40,12 +40,42 @@ COUNTIES = {
     ),
 }
 LOCAL = [
-    ("29209", "Stone County Public Water Supply District No. 1", "Question", "Shall Stone County Public Water Supply District No. 1 be dissolved, its water system and related assets sold and transferred, and Missouri-American Water Company become the provider of water service to the customers formerly served by the District?"),
-    ("29209", "Village of Indian Point", "Question", "Shall the Village of Indian Point impose a city sales tax of one half of one percent (0.5%) for public safety purposes and public improvements?"),
-    ("29213", "City of Rockaway Beach", "Question", "Shall the City of Rockaway Beach, Missouri impose a local use tax at the same rate as the total local sales tax rate, currently 2 percent (2%), provided that if the local sales tax rate is reduced or raised by voter approval, the local use tax rate shall also be reduced or raised by the same action? A use tax return shall not be required to be filed by persons whose purchases from out-of-state vendors do not in total exceed two thousand dollars in any calendar year."),
-    ("29213", "Village of Taneyville", "Question", "Shall the Village of Taneyville, Missouri, impose a property tax levy of Fifty Cents ($0.50) per One Hundred Dollars ($100.00) of assessed valuation upon all taxable real property within the Village for the sole purpose of funding road maintenance and repair, and related transportation infrastructure improvements? The Tax shall remain in effect for a period of five (5) years and shall expire November 7, 2031 unless renewed or extended by approval of the voters. The Village shall be authorized to submit the tax for renewal or extension prior to its expiration."),
-    ("29213", "Western Taney County Fire Protection District", "Question 1", "Shall the number of members of the board of directors of the Western Taney County Fire Protection District be increased to five members?"),
-    ("29225", "Webster County", "Question One", "Shall the County of Webster continue to impose a countywide sales tax at the rate of one-half of one percent for a period of ten years from the date on which such renewed tax is first imposed for the purpose of continuing the fund established for the improvement and construction of roads and bridges, including the purchase of machinery and materials?"),
+    (
+        "29209",
+        "Stone County Public Water Supply District No. 1",
+        "Question",
+        "Shall Stone County Public Water Supply District No. 1 be dissolved, its water system and related assets sold and transferred, and Missouri-American Water Company become the provider of water service to the customers formerly served by the District?",
+    ),
+    (
+        "29209",
+        "Village of Indian Point",
+        "Question",
+        "Shall the Village of Indian Point impose a city sales tax of one half of one percent (0.5%) for public safety purposes and public improvements?",
+    ),
+    (
+        "29213",
+        "City of Rockaway Beach",
+        "Question",
+        "Shall the City of Rockaway Beach, Missouri impose a local use tax at the same rate as the total local sales tax rate, currently 2 percent (2%), provided that if the local sales tax rate is reduced or raised by voter approval, the local use tax rate shall also be reduced or raised by the same action? A use tax return shall not be required to be filed by persons whose purchases from out-of-state vendors do not in total exceed two thousand dollars in any calendar year.",
+    ),
+    (
+        "29213",
+        "Village of Taneyville",
+        "Question",
+        "Shall the Village of Taneyville, Missouri, impose a property tax levy of Fifty Cents ($0.50) per One Hundred Dollars ($100.00) of assessed valuation upon all taxable real property within the Village for the sole purpose of funding road maintenance and repair, and related transportation infrastructure improvements? The Tax shall remain in effect for a period of five (5) years and shall expire November 7, 2031 unless renewed or extended by approval of the voters. The Village shall be authorized to submit the tax for renewal or extension prior to its expiration.",
+    ),
+    (
+        "29213",
+        "Western Taney County Fire Protection District",
+        "Question 1",
+        "Shall the number of members of the board of directors of the Western Taney County Fire Protection District be increased to five members?",
+    ),
+    (
+        "29225",
+        "Webster County",
+        "Question One",
+        "Shall the County of Webster continue to impose a countywide sales tax at the rate of one-half of one percent for a period of ten years from the date on which such renewed tax is first imposed for the purpose of continuing the fund established for the improvement and construction of roads and bridges, including the purchase of machinery and materials?",
+    ),
 ]
 
 
@@ -71,7 +101,7 @@ def parse() -> None:
         ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
     ).stdout
     rows = []
-    for match in re.finditer(r"\n\s+Question (\d)\n\s*\n(Shall .*?\?)\n", text, re.S):
+    for match in re.finditer(r"\n\s+Question (\d)\n\s*\n(Shall .*?\?)\n", text, re.DOTALL):
         rows.append(("29077", "City of Springfield", f"Question {match[1]}", re.sub(r"\s+", " ", match[2])))
     rows.extend(LOCAL)
     frame = pl.DataFrame(
@@ -159,7 +189,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:MO:{code}:measure:{slug(label)}"
@@ -180,7 +217,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):

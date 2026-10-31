@@ -58,12 +58,15 @@ def parse() -> None:
         for line in raw.cached(SOURCE, address(year, "office")).path.read_text(errors="replace").splitlines():
             if match := re.match(r"\s*OFF/DST/DIV: (D\d\d)/", line):
                 office = match[1]
-            elif office in OFFICES and (year, office) != (2007, "D05") and (match := re.match(r"\s+([DRI])\s{2,}(\S.*?)\s{2,}[\d,]+\s+[\d.]+%", line)):
+            elif (
+                office in OFFICES
+                and (year, office) != (2007, "D05")
+                and (match := re.match(r"\s+([DRI])\s{2,}(\S.*?)\s{2,}[\d,]+\s+[\d.]+%", line))
+            ):
                 parties[(office, re.sub(r"\s+", " ", match[2]).split(" & ")[0].upper())] = PARTIES[match[1]]
         office = None
         totals: dict[tuple[str, str], int] = {}
         columns: list[str] = []
-        pending: list[tuple[str, str]] = []
         abbreviations: list[str] = []
         for line in raw.cached(SOURCE, address(year, "county")).path.read_text(errors="replace").splitlines():
             if match := re.search(r"OFFICE: (\w\d\d)/", line):
@@ -139,7 +142,12 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.lit(120),
     ).write_parquet(PARSED / "races.parquet")
-    print(frame.group_by("year", "title", "candidate", "party").agg(pl.col("votes").sum()).sort("year", "title", "votes").rows())
+    print(
+        frame.group_by("year", "title", "candidate", "party")
+        .agg(pl.col("votes").sum())
+        .sort("year", "title", "votes")
+        .rows()
+    )
     print(frame.group_by("year", "title").agg(pl.col("county").n_unique()).sort("year", "title").rows())
 
 

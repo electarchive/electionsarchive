@@ -13,7 +13,8 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.tr.mayors_2004_2009 import LICENSE, LICENSE_URL, NUMBER, REF, cell, fold
-from ea.sources.tr.ysk import INVALID, PROVINCES as PLATES, REGISTERED, VALID, VOTES, upper
+from ea.sources.tr.ysk import INVALID, REGISTERED, VALID, VOTES, upper
+from ea.sources.tr.ysk import PROVINCES as PLATES
 from ea.sources.tr.ysk_local import DAYS, party
 from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
@@ -239,7 +240,8 @@ def emit() -> Path:
 
         taken: dict[str, UUID] = dict(
             conn.execute(
-                "select path, entity_id from slug where path like any(%s)", [[f"%/{day}-local" for day in DAYS.values()]]
+                "select path, entity_id from slug where path like any(%s)",
+                [[f"%/{day}-local" for day in DAYS.values()]],
             ).fetchall()
         )
         prior = dict(conn.execute("select value, entity_id from external_id where scheme = 'tr.election'").fetchall())
@@ -269,7 +271,10 @@ def emit() -> Path:
                 paths[polity] = f"tr/{key}"
                 english[polity] = name
                 cs.add("polity", id=polity, kind="municipality", iso_code=None)
-                for text, lang, kind in ((f"{name} Municipality", "en", "official"), (f"{name} Belediyesi", "tr", "native")):
+                for text, lang, kind in (
+                    (f"{name} Municipality", "en", "official"),
+                    (f"{name} Belediyesi", "tr", "native"),
+                ):
                     cs.add("name", entity_id=polity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
                 cs.add("polity_parent", polity_id=polity, parent_id=turkey)
                 cs.add("slug", path=paths[polity], entity_id=polity)

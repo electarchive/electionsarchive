@@ -57,7 +57,7 @@ def parse() -> None:
             ).fetchall()
         }
         official: dict[tuple[str, str], tuple[str, int]] = {}
-        for party in set(party for party, _ in first):
+        for party in {party for party, _ in first}:
             for label, votes in conn.execute(
                 """select o.ballot_label, sum(v.value)::bigint from external_id e
                    join contest_option o on o.contest_id = e.entity_id and o.kind = 'candidate'

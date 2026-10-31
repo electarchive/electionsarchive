@@ -85,7 +85,12 @@ def parse() -> None:
 
 MINTED = {
     "us.place:2740418": ("us.place", "2740418", "Marble", "us/mn/marble-city"),
-    "us.school_district:2718390": ("us.school_district", "2718390", "Lynd Public School District", "us/mn/lynd-public-school-district"),
+    "us.school_district:2718390": (
+        "us.school_district",
+        "2718390",
+        "Lynd Public School District",
+        "us/mn/lynd-public-school-district",
+    ),
 }
 
 
@@ -114,9 +119,7 @@ def emit() -> Path:
         )
         system = cs.key("us.electoral_system", "referendum")
         source = cs.source(mn_local.PUBLISHER, TITLE)
-        cs.add(
-            "source", id=source, kind="official_body", publisher=mn_local.PUBLISHER, title=TITLE, url=URL
-        )
+        cs.add("source", id=source, kind="official_body", publisher=mn_local.PUBLISHER, title=TITLE, url=URL)
         cs.artifact(raw.cached(SOURCE, URL), source)
         parent = cs.key("us.election", f"{DAY}:MN")
         elections: set[UUID] = set()
@@ -126,7 +129,12 @@ def emit() -> Path:
                 continue
             polity = cs.key("us.polity", f"{scheme}:{code}")
             area = cs.area(scheme, code)
-            cs.add("polity", id=polity, kind="school_district" if scheme == "us.school_district" else "municipality", iso_code=None)
+            cs.add(
+                "polity",
+                id=polity,
+                kind="school_district" if scheme == "us.school_district" else "municipality",
+                iso_code=None,
+            )
             cs.add("name", entity_id=polity, text=text, lang="en", kind="official", is_preferred=True)
             cs.add("polity_parent", polity_id=polity, parent_id=cs.polity("US-MN"))
             cs.add("slug", path=path, entity_id=polity)
@@ -167,7 +175,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = re.sub(r"\b([A-Z][A-Z'’-]+)\b", lambda m: m[1].title() if len(m[1]) > 1 else m[1], row["stem"])
             contest_key = f"{DAY}:MN:{row['code']}:question:{slug(label)}"
@@ -188,7 +203,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             if row["headline"]:

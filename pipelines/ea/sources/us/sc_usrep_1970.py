@@ -47,7 +47,11 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
     frame.write_parquet(PARSED / "lines.parquet")
-    print(frame.group_by("day", "district").agg(pl.col("county").n_unique(), pl.col("votes").sum()).sort("day", "district"))
+    print(
+        frame.group_by("day", "district")
+        .agg(pl.col("county").n_unique(), pl.col("votes").sum())
+        .sort("day", "district")
+    )
 
 
 def emit() -> Path:

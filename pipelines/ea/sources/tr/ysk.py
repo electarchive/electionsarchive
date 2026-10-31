@@ -6086,9 +6086,9 @@ def emit() -> Path:
     president = pl.read_parquet(PARSED / "president.parquet")
     istanbul = pl.read_parquet(PARSED / "istanbul.parquet")
     tenures_2018 = pl.read_parquet(PARSED / f"tenures_{DAY_2018}.parquet")
-    tenures_2018 = pl.concat(
-        [tenures_2018, pl.DataFrame(ENDS_2018, schema=tenures_2018.schema, orient="row")]
-    ).sort("start")
+    tenures_2018 = pl.concat([tenures_2018, pl.DataFrame(ENDS_2018, schema=tenures_2018.schema, orient="row")]).sort(
+        "start"
+    )
     ranked = pl.read_parquet(PARSED / "lists.parquet")
     with connect() as conn:
         cs = Changeset(

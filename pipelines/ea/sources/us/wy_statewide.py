@@ -21,7 +21,9 @@ TITLE = "1998 Statewide Issues Abstract"
 LICENSE = "Public record"
 URL = "https://sos.wyo.gov/Elections/Docs/1998/98Results/98General/Statewide_Issues%20Abstract.pdf"
 LANDING = "https://sos.wyo.gov/Elections/State/ElectionResults.aspx"
-NAMES_URL = "https://sos.wyo.gov/Elections/Docs/1998/98Results/98_Election%20Information/98_General%20Election_Candidates.pdf"
+NAMES_URL = (
+    "https://sos.wyo.gov/Elections/Docs/1998/98Results/98_Election%20Information/98_General%20Election_Candidates.pdf"
+)
 DAY = date(1998, 11, 3)
 DPI = 150
 OFFICES = {
@@ -153,7 +155,13 @@ def emit() -> Path:
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
             cs.add(
-                "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=LANDING,
+                license=LICENSE,
             )
         artifact = cs.artifact(raw.cached(SOURCE, URL), source)
         cs.artifact(raw.cached(SOURCE, NAMES_URL), source)
@@ -166,8 +174,13 @@ def emit() -> Path:
             page = cs.page(artifact, number)
             result[key] = (page, width, height)
             cs.add(
-                "source_page", id=page, artifact_id=artifact, page_number=number,
-                image_key=f"pages/{SOURCE}/{target.name}", width=width, height=height,
+                "source_page",
+                id=page,
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{target.name}",
+                width=width,
+                height=height,
             )
         return result
 

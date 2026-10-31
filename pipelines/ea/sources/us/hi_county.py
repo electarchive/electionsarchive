@@ -15,7 +15,15 @@ SOURCE = "us.hi_county"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://files.hawaii.gov/elections/files/results/{year}/general/{county}.pdf"
-YEARS = {2000: date(2000, 11, 7), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7), 2008: date(2008, 11, 4), 2010: date(2010, 11, 2), 2012: date(2012, 11, 6), 2014: date(2014, 11, 4)}
+YEARS = {
+    2000: date(2000, 11, 7),
+    2004: date(2004, 11, 2),
+    2006: date(2006, 11, 7),
+    2008: date(2008, 11, 4),
+    2010: date(2010, 11, 2),
+    2012: date(2012, 11, 6),
+    2014: date(2014, 11, 4),
+}
 COUNTIES = {"coh": "15001", "cch": "15003", "cok": "15007", "com": "15009"}
 OHA = "trustee-of-the-office-of-hawaiian-affairs"
 PUBLISHER = "Hawaii Office of Elections"
@@ -28,8 +36,14 @@ NOISE = re.compile(
     r"^={3,}|PAGE \d|Page \d|Printed on|Final Report|FINAL SUMMARY|SUMMARY REPORT|^Number \d|Open Primary|ELECTION - |PRIMARY ELECTION|General 20|GENERAL ELECTION|Hawaii County|Honolulu|Kauai|Maui|Number To Vote"
 )
 HOUSE = re.compile(r"U\.?S\.? Rep\w*\.?(?:,| -)?\s*(?:Dist\.?\s*(I{1,2}|\d)|\[D (\d)\])\s*$", re.IGNORECASE)
-RESIDENT = re.compile(r"^(?:OHA - (HAWAII|OAHU|MAUI|KAUAI|MOLOKAI) \(1\)|(Hawaii|Oahu|Maui|Kauai|Molokai) Resident Trustee)$", re.IGNORECASE)
-AT_LARGE = re.compile(r'^(?:OHA - AT LARGE \(1\)|(?:"|&quot;)?At[- ]Large(?:"|&quot;)? Trustee(?: Number To Vote For: 3)?)$', re.IGNORECASE)
+RESIDENT = re.compile(
+    r"^(?:OHA - (HAWAII|OAHU|MAUI|KAUAI|MOLOKAI) \(1\)|(Hawaii|Oahu|Maui|Kauai|Molokai) Resident Trustee)$",
+    re.IGNORECASE,
+)
+AT_LARGE = re.compile(
+    r'^(?:OHA - AT LARGE \(1\)|(?:"|&quot;)?At[- ]Large(?:"|&quot;)? Trustee(?: Number To Vote For: 3)?)$',
+    re.IGNORECASE,
+)
 
 
 def fetch() -> None:

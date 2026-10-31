@@ -26,7 +26,7 @@ TITLE = "Georgia Election Results: official results of the general election"
 
 
 def fetch() -> None:
-    for day, (folder, pages) in ELECTIONS.items():
+    for folder, pages in ELECTIONS.values():
         for page in pages:
             url = PAGE.format(folder=folder, number=page * 100)
             try:
@@ -35,6 +35,7 @@ def fetch() -> None:
                 done = subprocess.run(
                     ["curl", "-sfL", "-m", "120", "--resolve", "web.archive.org:443:207.241.237.2", url],
                     capture_output=True,
+                    check=False,
                 )
                 if done.returncode != 0:
                     print(f"{url}: curl exited {done.returncode}, stopping; run the fetch again later")
@@ -73,12 +74,10 @@ def parse() -> None:
                 print(f"{day} page {page}: not a legislative page, skipped")
                 continue
             district = int(heading[2] or heading[4])
-            chamber = (
-                "house"
-                if heading[2]
-                else f"{'senate' if heading[3] == 'SENATOR' else 'house'}:{district}:g"
-            )
-            body = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<pre>(.*?)</pre>", text, re.S)[1])).splitlines()
+            chamber = "house" if heading[2] else f"{'senate' if heading[3] == 'SENATOR' else 'house'}:{district}:g"
+            body = html.unescape(
+                re.sub(r"<[^>]+>", "", re.search(r"<pre>(.*?)</pre>", text, re.DOTALL)[1])
+            ).splitlines()
             start = next(i for i, line in enumerate(body) if line.startswith("County"))
             ends = [found.end() for found in re.finditer(r"\S+", body[start - 2])]
             printed = [int(cell.replace(",", "")) for cell in body[start - 2].split()]
@@ -103,7 +102,9 @@ def parse() -> None:
             if summed != printed:
                 raise ValueError(f"{day} district {district}: counties sum to {summed}, printed {printed}")
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["year", "day", "chamber", "district", "code", "candidate", "votes"], orient="row").select(
+    pl.DataFrame(
+        rows, schema=["year", "day", "chamber", "district", "code", "candidate", "votes"], orient="row"
+    ).select(
         year=pl.col("year").cast(pl.Int32),
         chamber="chamber",
         day="day",
@@ -140,7 +141,7 @@ def emit() -> Path:
             url="https://sos.ga.gov/page/historical-elections-results",
             license="Public record",
         )
-        for day, (folder, pages) in ELECTIONS.items():
+        for folder, pages in ELECTIONS.values():
             for page in pages:
                 cs.artifact(raw.cached(SOURCE, PAGE.format(folder=folder, number=page * 100)), source)
         medsl.attach(cs, conn, frame, {"GA": source})

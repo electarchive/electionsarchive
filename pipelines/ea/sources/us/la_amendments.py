@@ -42,7 +42,7 @@ STAMPS = {
 }
 HEADER = re.compile(r"Proposed Amendment No\. (\d+)")
 WORDING = re.compile(r"(?:Do you support|Shall)[^?]*\?")
-ACT = re.compile(r"Act (\d+)[^\n]{0,60}\n.*?(Do you support[^?]*\?)", re.S)
+ACT = re.compile(r"Act (\d+)[^\n]{0,60}\n.*?(Do you support[^?]*\?)", re.DOTALL)
 BALLOT = re.compile(r"Ballot Language: .(Do you support[^?]*\?).")
 NUMBERED = re.compile(r"([1-4])\. (Do you support[^?]*\?)")
 NUMBER = re.compile(r"(?i)\b(?:amendment|ca)\s*(?:no\.?\s*)?(\d+)\b")
@@ -56,9 +56,7 @@ def words(text: str) -> set[str]:
 
 
 def url(day: date) -> str:
-    return (
-        f"https://web.archive.org/web/{STAMPS.get(day, 2023)}id_/https://www.sos.la.gov/ElectionsAndVoting/PublishedDocuments/{FILES[day]}.pdf"
-    )
+    return f"https://web.archive.org/web/{STAMPS.get(day, 2023)}id_/https://www.sos.la.gov/ElectionsAndVoting/PublishedDocuments/{FILES[day]}.pdf"
 
 
 def fetch() -> None:
@@ -167,7 +165,11 @@ def emit() -> Path:
         for _, act, number in scored:
             if act not in mapped and number not in mapped.values():
                 mapped[act] = number
-        rows = [(day, mapped.get(amendment, amendment), page, text) for day, amendment, page, text in rows if amendment >= 0 or amendment in mapped]
+        rows = [
+            (day, mapped.get(amendment, amendment), page, text)
+            for day, amendment, page, text in rows
+            if amendment >= 0 or amendment in mapped
+        ]
         placed = 0
         for day, amendment, page, text in rows:
             entities = contests.get((day, amendment), [])

@@ -20,11 +20,47 @@ LANDING = "https://results.vote.wa.gov/results/20081104/"
 PUBLISHER = "Washington Secretary of State"
 TITLE = "November 4, 2008 General Election Results"
 LICENSE = "Public record"
-COUNTIES = (
-    "Adams Asotin Benton Chelan Clallam Clark Columbia Cowlitz Douglas Ferry Franklin Garfield Grant GraysHarbor "
-    "Island Jefferson King Kitsap Kittitas Klickitat Lewis Lincoln Mason Okanogan Pacific PendOreille Pierce SanJuan "
-    "Skagit Skamania Snohomish Spokane Stevens Thurston Wahkiakum WallaWalla Whatcom Whitman Yakima"
-).split()
+COUNTIES = [
+    "Adams",
+    "Asotin",
+    "Benton",
+    "Chelan",
+    "Clallam",
+    "Clark",
+    "Columbia",
+    "Cowlitz",
+    "Douglas",
+    "Ferry",
+    "Franklin",
+    "Garfield",
+    "Grant",
+    "GraysHarbor",
+    "Island",
+    "Jefferson",
+    "King",
+    "Kitsap",
+    "Kittitas",
+    "Klickitat",
+    "Lewis",
+    "Lincoln",
+    "Mason",
+    "Okanogan",
+    "Pacific",
+    "PendOreille",
+    "Pierce",
+    "SanJuan",
+    "Skagit",
+    "Skamania",
+    "Snohomish",
+    "Spokane",
+    "Stevens",
+    "Thurston",
+    "Wahkiakum",
+    "WallaWalla",
+    "Whatcom",
+    "Whitman",
+    "Yakima",
+]
 OFFICES = {
     "Lt. Governor": ("lieutenant-governor", "Lieutenant Governor"),
     "Commissioner of Public Lands": ("commissioner-of-public-lands", "Commissioner of Public Lands"),
@@ -67,7 +103,9 @@ def parse() -> None:
     frame = pl.DataFrame(rows)
     printed = {
         (row["Race"], row["Candidate"].strip()): int(row["Votes"])
-        for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, SITE.format("StateExecutive")).path.read_text(encoding="utf-8-sig")))
+        for row in csv.DictReader(
+            io.StringIO(raw.cached(SOURCE, SITE.format("StateExecutive")).path.read_text(encoding="utf-8-sig"))
+        )
         if row["Race"] in OFFICES
     }
     sums = frame.group_by("office", "name").agg(pl.col("votes").sum(), pl.col("county").n_unique())
@@ -109,7 +147,9 @@ def emit() -> Path:
             return plain(words[-1])
 
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE)
+        cs.add(
+            "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE
+        )
         for county in ("StateExecutive", *COUNTIES):
             cs.artifact(raw.cached(SOURCE, SITE.format(county)), source)
         ((area,),) = conn.execute(
@@ -125,9 +165,9 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '53%%'"""
             ).fetchall()
         }
-        election = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())[
-            f"{DAY}:WA"
-        ]
+        election = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )[f"{DAY}:WA"]
         contests = {
             value
             for (value,) in conn.execute(
@@ -225,5 +265,11 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

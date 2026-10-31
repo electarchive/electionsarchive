@@ -87,14 +87,18 @@ def demographics() -> list[tuple[date, str, int, str, int, int]]:
     rows = []
     with zipfile.ZipFile(raw.cached(SOURCE, DEMOGRAPHICS).path) as outer:
         for member in sorted(outer.namelist()):
-            if member.startswith("__MACOSX") or not re.search(r"_County( \((Dem|Rep)\))?\.(pdf|zip|xlsx)$|and County\.pdf$", member):
+            if member.startswith("__MACOSX") or not re.search(
+                r"_County( \((Dem|Rep)\))?\.(pdf|zip|xlsx)$|and County\.pdf$", member
+            ):
                 continue
             content = outer.read(member)
             if member.endswith(".pdf"):
                 with tempfile.NamedTemporaryFile(suffix=".pdf") as handle:
                     handle.write(content)
                     handle.flush()
-                    text = subprocess.run(["pdftotext", "-layout", handle.name, "-"], capture_output=True, text=True, check=True).stdout
+                    text = subprocess.run(
+                        ["pdftotext", "-layout", handle.name, "-"], capture_output=True, text=True, check=True
+                    ).stdout
                 found = DATE.search(text)
                 if found is None:
                     print(f"{member}: no text layer")
@@ -154,7 +158,9 @@ def clarity() -> list[tuple[date, str, str, int, int]]:
     for name in ZIPS:
         with zipfile.ZipFile(raw.cached(SOURCE, URL.format(name)).path) as outer:
             info = next(n for n in outer.namelist() if n.endswith("info.txt"))
-            month, day_of, year = re.search(r"Election Date: (\d+)/(\d+)/(\d+)", outer.read(info).decode(errors="replace")).groups()
+            month, day_of, year = re.search(
+                r"Election Date: (\d+)/(\d+)/(\d+)", outer.read(info).decode(errors="replace")
+            ).groups()
             day = date(int(year), int(month), int(day_of))
             found, failed = [], []
             for member in sorted(n for n in outer.namelist() if n.endswith("-detailxml.zip")):
@@ -169,7 +175,9 @@ def clarity() -> list[tuple[date, str, str, int, int]]:
                 best: dict[str, int] = {}
                 for contest in root.findall("Contest"):
                     party = PARTY.search(contest.get("text"))
-                    total = sum(int(v.get("votes")) for choice in contest.findall("Choice") for v in choice.findall("VoteType"))
+                    total = sum(
+                        int(v.get("votes")) for choice in contest.findall("Choice") for v in choice.findall("VoteType")
+                    )
                     key = party[1] if party else ""
                     best[key] = max(best.get(key, 0), total)
                 floor = max(sum(v for k, v in best.items() if k), max(best.values(), default=0))
@@ -187,7 +195,9 @@ def clarity() -> list[tuple[date, str, str, int, int]]:
 def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["GA"]
-    frame = pl.DataFrame(demographics(), schema=["day", "section", "county", "name", "registered", "voters"], orient="row")
+    frame = pl.DataFrame(
+        demographics(), schema=["day", "section", "county", "name", "registered", "voters"], orient="row"
+    )
     names = dict(frame.filter(pl.col("name") != "").select("county", "name").unique().iter_rows())
     codes = {county: fips[re.sub(r"[^a-z]", "", name.lower())] for county, name in names.items()}
     assert len(codes) == len(set(codes.values())) == 159
@@ -198,9 +208,7 @@ def parse() -> None:
     frame = (
         frame.group_by("day", "county")
         .agg(pl.col("registered").max(), pl.col("voters").sum())
-        .with_columns(
-            code=pl.col("county").replace_strict(codes), measure=pl.lit(14), url=pl.lit(DEMOGRAPHICS)
-        )
+        .with_columns(code=pl.col("county").replace_strict(codes), measure=pl.lit(14), url=pl.lit(DEMOGRAPHICS))
         .drop("county")
     )
     held = set(frame["day"])
@@ -213,11 +221,15 @@ def parse() -> None:
         frame = pl.concat(
             [
                 frame,
-                pl.DataFrame(extra, schema=["day", "url", "code", "registered", "voters"], orient="row").with_columns(measure=pl.lit(3)),
+                pl.DataFrame(extra, schema=["day", "url", "code", "registered", "voters"], orient="row").with_columns(
+                    measure=pl.lit(3)
+                ),
             ],
             how="diagonal_relaxed",
         )
-    print(frame.group_by("day", "measure").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("day"))
+    print(
+        frame.group_by("day", "measure").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("day")
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
 
@@ -253,7 +265,15 @@ def emit() -> Path:
         ):
             source = cs.source(PUBLISHER, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=home, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=home,
+                    license="Public record",
+                )
             sources[url] = source
         for (day, url, measure), rows in frame.group_by("day", "url", "measure", maintain_order=True):
             if day not in elections:

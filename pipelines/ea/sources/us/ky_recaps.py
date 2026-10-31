@@ -1,10 +1,9 @@
-from datetime import date
-from pathlib import Path
 import re
 import subprocess
-from datetime import datetime, timedelta
-from uuid import UUID
+from datetime import date, datetime, timedelta
+from pathlib import Path
 from urllib.parse import quote, unquote
+from uuid import UUID
 
 import polars as pl
 
@@ -53,7 +52,7 @@ CHANNEL_PROFILES = {
     ("one", "mail-first"): (0,),
 }
 SIX_MAIL_FIRST = {"2026-primary"}
-ORDINAL = re.compile(r"(\d+)(?:st|nd|rd|th)\b", re.I)
+ORDINAL = re.compile(r"(\d+)(?:st|nd|rd|th)\b", re.IGNORECASE)
 ROW = re.compile(r"^(.*?\S)\s+(\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")
 DAYS = re.compile(r"^(\w+ \d{1,2}, \d{4})")
 CITY_OFFICES = {"MAYOR": "mayor", "COUNCILMEMBER": "council", "COMMISSIONER": "council", "COUNCIL": "council"}
@@ -66,17 +65,24 @@ COUNTY_OFFICES = {
     "CORONER": ("coroner", "Coroner"),
     "COUNTY SURVEYOR": ("county-surveyor", "County Surveyor"),
     "CIRCUIT COURT CLERK": ("circuit-court-clerk", "Circuit Court Clerk"),
-    "SOIL & WATER CONSERVATION DISTRICT SUPERVISOR": ("soil-water-supervisor", "Soil and Water Conservation District Supervisor"),
+    "SOIL & WATER CONSERVATION DISTRICT SUPERVISOR": (
+        "soil-water-supervisor",
+        "Soil and Water Conservation District Supervisor",
+    ),
 }
 SKIP = re.compile(
     r"STRAIGHT PARTY|PRESIDENT|U\.?S\.? |STATE (SENAT|REP)|GOVERNOR|ATTORNEY GENERAL|SECRETARY OF|TREASURER|AUDITOR|AGRICULTURE|"
     r"COMMONWEALTH|SUPREME|APPEALS|AMENDMENT|JUDGE - |JUDGE\b.*DIVISION|FAMILY COURT|CIRCUIT JUDGE|DISTRICT JUDGE|^(DEM|REP) (U\.S|STATE)",
-    re.I,
+    re.IGNORECASE,
 )
 
 
 def titled(word: str) -> str:
-    return word if not word.isupper() or len(word) < 2 else ("Mc" + word[2:].title() if word.startswith("MC") else word.title())
+    return (
+        word
+        if not word.isupper() or len(word) < 2
+        else ("Mc" + word[2:].title() if word.startswith("MC") else word.title())
+    )
 
 
 def candidate_name(raw_name: str) -> str:
@@ -89,11 +95,17 @@ def classify(title: str, primary_party: str | None) -> dict[str, object] | None:
     match = re.match(r"^(DEM|REP) (.*)$", text)
     if match:
         party, text = match[1], match[2]
-    if SKIP.search(text) and not re.search(r"SCHOOL BOARD|COUNCIL|MAYOR|COMMISSIONER|SHERIFF|COUNTY|CORONER|SURVEYOR|CONSTABLE|PEACE|PROPERTY", text, re.I):
+    if SKIP.search(text) and not re.search(
+        r"SCHOOL BOARD|COUNCIL|MAYOR|COMMISSIONER|SHERIFF|COUNTY|CORONER|SURVEYOR|CONSTABLE|PEACE|PROPERTY",
+        text,
+        re.IGNORECASE,
+    ):
         return None
     upper = text.upper().replace("LOUISVILLE METRO COUNCIL LOUISVILLE METRO COUNCIL", "LOUISVILLE METRO COUNCIL")
     out: dict[str, object] = {"party": party, "seat": None, "jur": None, "type": None, "label": text}
-    council = re.match(r"^(?:LOUISVILLE )?METRO COUNCIL(?: - (\d+)(?:ST|ND|RD|TH) DISTRICT)?(?: DISTRICT (\d+))?", upper)
+    council = re.match(
+        r"^(?:LOUISVILLE )?METRO COUNCIL(?: - (\d+)(?:ST|ND|RD|TH) DISTRICT)?(?: DISTRICT (\d+))?", upper
+    )
     if council:
         return {**out, "jur": "Louisville", "kind": "city", "type": "council", "seat": council[1] or council[2]}
     if upper in ("MAYOR", "LOUISVILLE MAYOR"):
@@ -103,11 +115,30 @@ def classify(title: str, primary_party: str | None) -> dict[str, object] | None:
         return {**out, "jur": "Jefferson County", "kind": "county", "type": "office", "office": office, "title": shown}
     comm = re.match(r'^COUNTY COMMISSIONER - "([A-Z])" DISTRICT', upper)
     if comm:
-        return {**out, "jur": "Jefferson County", "kind": "county", "type": "office", "office": "county-commissioner", "title": "County Commissioner", "seat": f"District {comm[1]}"}
-    for prefix, office, shown in (("CONSTABLE", "constable", "Constable"), ("JUSTICE OF THE PEACE", "justice-of-the-peace", "Justice of the Peace")):
+        return {
+            **out,
+            "jur": "Jefferson County",
+            "kind": "county",
+            "type": "office",
+            "office": "county-commissioner",
+            "title": "County Commissioner",
+            "seat": f"District {comm[1]}",
+        }
+    for prefix, office, shown in (
+        ("CONSTABLE", "constable", "Constable"),
+        ("JUSTICE OF THE PEACE", "justice-of-the-peace", "Justice of the Peace"),
+    ):
         found = re.match(rf"^{prefix} - DISTRICT (\d+)", upper)
         if found:
-            return {**out, "jur": "Jefferson County", "kind": "county", "type": "office", "office": office, "title": shown, "seat": f"District {found[1]}"}
+            return {
+                **out,
+                "jur": "Jefferson County",
+                "kind": "county",
+                "type": "office",
+                "office": office,
+                "title": shown,
+                "seat": f"District {found[1]}",
+            }
     school = re.match(r"^SCHOOL BOARD - DISTRICT (\d+)", upper)
     if school:
         return {**out, "jur": "Jefferson County School District", "kind": "school", "type": "board", "seat": school[1]}
@@ -132,7 +163,9 @@ def parse() -> None:
     rows: list[tuple[str, str, str, int, int]] = []
     for (election, _), url in links().items():
         path = raw.cached(SOURCE, url).path
-        out = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        out = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
         lines = out.split("\n")
         if len(out) < 5000:
             print(f"{election}: no text layer")
@@ -161,17 +194,49 @@ def parse() -> None:
                 keep = info is not None
                 key = (election, title)
                 if keep and key not in contests:
-                    contests[key] = {"election": election, "day": day, "primary": primary, "title": title, "seats": seats, **info}
+                    contests[key] = {
+                        "election": election,
+                        "day": day,
+                        "primary": primary,
+                        "title": title,
+                        "seats": seats,
+                        **info,
+                    }
                 while (
                     i < len(lines) - 1
-                    and not lines[i].strip().startswith(("Contest Totals", "Total Votes Cast", "Precinct Summary Results Report", "Summary Results Report"))
+                    and not lines[i]
+                    .strip()
+                    .startswith(
+                        (
+                            "Contest Totals",
+                            "Total Votes Cast",
+                            "Precinct Summary Results Report",
+                            "Summary Results Report",
+                        )
+                    )
                     and not (lines[i].strip() and lines[i + 1].strip().startswith("Vote For"))
                 ):
                     stripped = lines[i].strip()
                     found = ROW.match(stripped) if stripped and keep else None
-                    if found and not found[1].startswith(("Not Assigned", "Write-In:", "Overvotes", "Undervotes", "Over Votes", "Under Votes", "Precinct Summary", "Summary Results", "Page ")):
+                    if found and not found[1].startswith(
+                        (
+                            "Not Assigned",
+                            "Write-In:",
+                            "Overvotes",
+                            "Undervotes",
+                            "Over Votes",
+                            "Under Votes",
+                            "Precinct Summary",
+                            "Summary Results",
+                            "Page ",
+                        )
+                    ):
                         numbers = [int(n.replace(",", "")) for n in found[2].split()]
-                        profile = {1: ("one", "mail-first"), 5: ("five", "mail-first"), 6: ("six", "mail-first" if election in SIX_MAIL_FIRST else "day-first")}.get(len(numbers))
+                        profile = {
+                            1: ("one", "mail-first"),
+                            5: ("five", "mail-first"),
+                            6: ("six", "mail-first" if election in SIX_MAIL_FIRST else "day-first"),
+                        }.get(len(numbers))
                         channels = CHANNEL_PROFILES.get(profile) if profile else None
                         if channels is None:
                             raise ValueError(f"{election} {precinct} {title}: {len(numbers)} columns")
@@ -186,9 +251,9 @@ def parse() -> None:
                     i += 1
                 continue
             i += 1
-    pl.DataFrame(
-        rows, schema=["key", "precinct", "name", "channel", "votes"], orient="row"
-    ).write_parquet(PARSED / "rows.parquet")
+    pl.DataFrame(rows, schema=["key", "precinct", "name", "channel", "votes"], orient="row").write_parquet(
+        PARSED / "rows.parquet"
+    )
     pl.DataFrame(
         [{**c, "key": f"{c['election']}|{c['title']}"} for c in contests.values()],
         infer_schema_length=None,
@@ -227,7 +292,6 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=label, lang="en", kind="official", is_preferred=True)
 
         state = cs.polity("US-KY")
-        state_area = cs.area("us.state", "21")
         county_unit, county_area = conn.execute(
             "select id, area_id from reporting_unit where scheme_code = 'us.county' and code = %s", [FIPS]
         ).fetchone()
@@ -235,7 +299,15 @@ def emit() -> Path:
         parties = {code: cs.key("us.party", key) for code, key in PARTY_KEYS.items()}
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=HOST, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=HOST,
+                license="Public record",
+            )
         for url in links().values():
             cs.artifact(raw.cached(SOURCE, url), source)
 
@@ -249,9 +321,13 @@ def emit() -> Path:
                    where x.value in ('place:2148000', 'school:2102990', 'county:21111')""",
             ).fetchall()
         }
-        county_polity = existing["JEFFERSON COUNTY"][0] if "JEFFERSON COUNTY" in existing else conn.execute(
-            "select entity_id from external_id where scheme = 'us.polity' and value = 'county:21111'"
-        ).fetchone()[0]
+        county_polity = (
+            existing["JEFFERSON COUNTY"][0]
+            if "JEFFERSON COUNTY" in existing
+            else conn.execute(
+                "select entity_id from external_id where scheme = 'us.polity' and value = 'county:21111'"
+            ).fetchone()[0]
+        )
         existing["JEFFERSON COUNTY"] = (county_polity, "county:21111", "us/ky/jefferson-county")
         taken = {
             path
@@ -337,7 +413,9 @@ def emit() -> Path:
                join external_id x on x.entity_id = e.polity_id and x.scheme = 'us.polity'
                where x.value in ('place:2148000', 'school:2102990', 'county:21111')"""
         ).fetchall():
-            parts = [w for w in re.sub(r"[^a-z ]", " ", label.lower()).split() if w not in ("jr", "sr", "ii", "iii", "iv")]
+            parts = [
+                w for w in re.sub(r"[^a-z ]", " ", label.lower()).split() if w not in ("jr", "sr", "ii", "iii", "iv")
+            ]
             if len(parts) >= 2:
                 people.setdefault((parts[0], parts[-1]), []).append(person_id)
 
@@ -360,9 +438,19 @@ def emit() -> Path:
             party = row["party"]
             frame = rows.filter(pl.col("key") == row["key"])
             prefixed = frame.with_columns(
-                prefix=pl.col("name").map_elements(lambda n: (CODE.match(n) or [None, None])[1], return_dtype=pl.String),
+                prefix=pl.col("name").map_elements(
+                    lambda n: (CODE.match(n) or [None, None])[1], return_dtype=pl.String
+                ),
                 display=pl.col("name").map_elements(
-                    lambda n: "Write-in" if n == "Write-in" else "Yes" if n.upper() == "YES" else "No" if n.upper() == "NO" else candidate_name((CODE.match(n) or [None, n])[2] if CODE.match(n) else n),
+                    lambda n: (
+                        "Write-in"
+                        if n == "Write-in"
+                        else "Yes"
+                        if n.upper() == "YES"
+                        else "No"
+                        if n.upper() == "NO"
+                        else candidate_name((CODE.match(n) or [None, n])[2] if CODE.match(n) else n)
+                    ),
                     return_dtype=pl.String,
                 ),
             )
@@ -426,16 +514,30 @@ def emit() -> Path:
             magnitude = 1 if answers else row["seats"]
             contest_kind, office_id, body_id, area = "office", None, None, None
             body_title = None
-            if row["type"] in ("council", "board") or row.get("office") in ("county-commissioner", "soil-water-supervisor"):
+            if row["type"] in ("council", "board") or row.get("office") in (
+                "county-commissioner",
+                "soil-water-supervisor",
+            ):
                 if row["jur"] == "Louisville":
                     body_title, owner_key = "Louisville Metro Council", "e2ad5c3e-a37e-5428-a867-4d7d48db8809"
                     seat_label = "district"
                 elif row["jur"] == "Jefferson County School District":
-                    body_title, owner_key = "Jefferson County Board of Education", "9c031686-9489-5398-a55b-20f48b2542b0"
+                    body_title, owner_key = (
+                        "Jefferson County Board of Education",
+                        "9c031686-9489-5398-a55b-20f48b2542b0",
+                    )
                     seat_label = "district"
                 elif row["jur"] == "Jefferson County":
-                    owner_key = "8fa6da4b-9128-5178-9dc9-1fb87f181094" if row["office"] == "county-commissioner" else "304f0c28-cefd-5129-bfea-3e2e71392f49"
-                    body_title = "Jefferson County Commission" if row["office"] == "county-commissioner" else "Jefferson County Soil and Water Conservation District"
+                    owner_key = (
+                        "8fa6da4b-9128-5178-9dc9-1fb87f181094"
+                        if row["office"] == "county-commissioner"
+                        else "304f0c28-cefd-5129-bfea-3e2e71392f49"
+                    )
+                    body_title = (
+                        "Jefferson County Commission"
+                        if row["office"] == "county-commissioner"
+                        else "Jefferson County Soil and Water Conservation District"
+                    )
                     seat_label = "district"
                 else:
                     body_title = f"{shown} {'Board of Education' if row['type'] == 'board' else 'City Council'}"
@@ -445,7 +547,9 @@ def emit() -> Path:
                     if owner_key is not None:
                         owners[(pid, body_kind, body_title)] = UUID(owner_key)
                     else:
-                        found = conn.execute("select b.id from body b where b.polity_id = %s order by b.id limit 1", [pid]).fetchone()
+                        found = conn.execute(
+                            "select b.id from body b where b.polity_id = %s order by b.id limit 1", [pid]
+                        ).fetchone()
                         owner = found[0] if found else cs.key("us.body", f"KY:{key_body}:{body_kind}")
                         if found is None:
                             cs.add("body", id=owner, polity_id=pid, kind="council")
@@ -465,9 +569,20 @@ def emit() -> Path:
                     area = cs.area("us.local_district", f"21:sd2102990:board-of-education:district-{seat_text}")
                 else:
                     area = territories.get(pid)
-                contest_key = f"{day}:KY:{key_body}:{body_kind}" + (f":{slug(str(seat_text))}" if seat_text else "") + suffix
-                contest_slug = body_kind + (f"-{slug(str(seat_text))}" if seat_text else "") + (f"-{party.lower()}" if party else "")
-                contest_title = f"{day.year} {body_title}" + (f", {seat_label} {seat_text}" if seat_text else "") + " election" + (f" ({PARTY_TITLES[party]} primary)" if party else "")
+                contest_key = (
+                    f"{day}:KY:{key_body}:{body_kind}" + (f":{slug(str(seat_text))}" if seat_text else "") + suffix
+                )
+                contest_slug = (
+                    body_kind
+                    + (f"-{slug(str(seat_text))}" if seat_text else "")
+                    + (f"-{party.lower()}" if party else "")
+                )
+                contest_title = (
+                    f"{day.year} {body_title}"
+                    + (f", {seat_label} {seat_text}" if seat_text else "")
+                    + " election"
+                    + (f" ({PARTY_TITLES[party]} primary)" if party else "")
+                )
                 if row["jur"] == "Jefferson County" and row.get("office") == "county-commissioner":
                     contest_key += f":{slug(row['seat'])}"
                     contest_slug += f"-{slug(row['seat'])}"
@@ -475,10 +590,16 @@ def emit() -> Path:
             elif row["type"] in ("office", "mayor"):
                 office = "mayor" if row["type"] == "mayor" else row["office"]
                 title_ = "Mayor" if row["type"] == "mayor" else row["title"]
-                office_key = f"KY:{code.partition(':')[2].replace('place:', '')}:{office}" if row["type"] == "mayor" else f"KY:{FIPS}:{office}"
+                office_key = (
+                    f"KY:{code.partition(':')[2].replace('place:', '')}:{office}"
+                    if row["type"] == "mayor"
+                    else f"KY:{FIPS}:{office}"
+                )
                 if row["jur"] == "Louisville":
                     office_key = "KY:2148000:mayor"
-                found = conn.execute("select entity_id from external_id where scheme = 'us.office' and value = %s", [office_key]).fetchone()
+                found = conn.execute(
+                    "select entity_id from external_id where scheme = 'us.office' and value = %s", [office_key]
+                ).fetchone()
                 if (pid, office) not in owners:
                     owner = found[0] if found else cs.key("us.office", office_key)
                     if found is None:
@@ -498,8 +619,14 @@ def emit() -> Path:
                 else:
                     area = territories.get(pid)
                 contest_key = f"{day}:KY:{key_body}:{office}" + (f":{slug(seat_text)}" if seat_text else "") + suffix
-                contest_slug = office + (f"-{slug(seat_text)}" if seat_text else "") + (f"-{party.lower()}" if party else "")
-                contest_title = (f"{day.year} {shown} mayoral election" if row["type"] == "mayor" else f"{day.year} {shown} {title_}" + (f", {seat_text}" if seat_text else "") + " election") + (f" ({PARTY_TITLES[party]} primary)" if party else "")
+                contest_slug = (
+                    office + (f"-{slug(seat_text)}" if seat_text else "") + (f"-{party.lower()}" if party else "")
+                )
+                contest_title = (
+                    f"{day.year} {shown} mayoral election"
+                    if row["type"] == "mayor"
+                    else f"{day.year} {shown} {title_}" + (f", {seat_text}" if seat_text else "") + " election"
+                ) + (f" ({PARTY_TITLES[party]} primary)" if party else "")
             else:
                 contest_kind = "ballot_question"
                 contest_key = f"{day}:KY:{key_body}:measure-tax-levy"
@@ -508,7 +635,10 @@ def emit() -> Path:
                 magnitude = None
                 area = territories.get(pid)
 
-            if target is None and ((existing_election is not None and f"{existing_election[1]}/{contest_slug}" in taken) or contest_key in seen):
+            if target is None and (
+                (existing_election is not None and f"{existing_election[1]}/{contest_slug}" in taken)
+                or contest_key in seen
+            ):
                 report["exists"] = report.get("exists", 0) + 1
                 continue
             seen.add(contest_key)
@@ -524,8 +654,16 @@ def emit() -> Path:
                         elections[(day, pid)] = existing_election
                     else:
                         election = cs.key("us.election", f"{day}:KY:{key_body}")
-                        word = "primary" if row["primary"] else "general" if day.month == 11 and day.year % 2 == 0 else "local"
-                        cs.add("election", id=election, polity_id=pid, kind=word, date_from=day, date_to=day, status="held")
+                        word = (
+                            "primary"
+                            if row["primary"]
+                            else "general"
+                            if day.month == 11 and day.year % 2 == 0
+                            else "local"
+                        )
+                        cs.add(
+                            "election", id=election, polity_id=pid, kind=word, date_from=day, date_to=day, status="held"
+                        )
                         name(election, f"{day.year} {shown} {word} election")
                         elections[(day, pid)] = (election, f"{path}/{day}-{word}")
                         cs.add("slug", path=f"{path}/{day}-{word}", entity_id=election)
@@ -579,7 +717,11 @@ def emit() -> Path:
                 if target is not None:
                     wanted = {"Write-in": "write_in", "Yes": "answer", "No": "answer"}[candidate]
                     options[candidate] = next(
-                        (o for label, k, parent, o in listed if k == wanted and (wanted != "answer" or label == candidate)),
+                        (
+                            o
+                            for label, k, parent, o in listed
+                            if k == wanted and (wanted != "answer" or label == candidate)
+                        ),
                         None,
                     ) or cs.key("us.option", f"{contest_key}:{SOURCE}:{slug(candidate)}")
                     if options[candidate] in cs.minted:
@@ -594,14 +736,32 @@ def emit() -> Path:
                     continue
                 option = options[candidate] = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
                 if answers:
-                    cs.add("contest_option", id=option, contest_id=contest, kind="answer", ballot_position=position, ballot_label=candidate)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="answer",
+                        ballot_position=position,
+                        ballot_label=candidate,
+                    )
                     continue
                 if candidate == "Write-in":
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label=candidate)
                     continue
                 option_party = prefixes.get(candidate) or party
-                cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=candidate, party_id=parties.get(option_party))
-                parts = [w for w in re.sub(r"[^a-z ]", " ", candidate.lower()).split() if w not in ("jr", "sr", "ii", "iii", "iv")]
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_label=candidate,
+                    party_id=parties.get(option_party),
+                )
+                parts = [
+                    w
+                    for w in re.sub(r"[^a-z ]", " ", candidate.lower()).split()
+                    if w not in ("jr", "sr", "ii", "iii", "iv")
+                ]
                 matched = people.get((parts[0], parts[-1])) if len(parts) >= 2 else None
                 if matched is not None and len(matched) == 1:
                     person_id = matched[0]
@@ -632,12 +792,18 @@ def emit() -> Path:
             prior = None
             replaced = None
             if target is not None:
-                prior = conn.execute(f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]).fetchone()
+                prior = conn.execute(
+                    f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
+                ).fetchone()
                 if prior is not None and prior[0] == result_set:
-                    replaced = conn.execute("select supersedes_id from result_set where id = %s", [prior[0]]).fetchone()[0]
+                    replaced = conn.execute(
+                        "select supersedes_id from result_set where id = %s", [prior[0]]
+                    ).fetchone()[0]
                     prior = None
                 if prior is not None:
-                    cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded")
+                    cs.add(
+                        "result_set", **dict(zip(columns, prior, strict=True)), is_default=False, status="superseded"
+                    )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -656,7 +822,13 @@ def emit() -> Path:
             ranked = sums.filter(~pl.col("display").is_in(["Write-in"])).sort("votes", descending=True)
             tally = dict(sums.iter_rows())
             if answers:
-                winners = ["Yes"] if tally.get("Yes", 0) > tally.get("No", 0) else ["No"] if tally.get("No", 0) > tally.get("Yes", 0) else []
+                winners = (
+                    ["Yes"]
+                    if tally.get("Yes", 0) > tally.get("No", 0)
+                    else ["No"]
+                    if tally.get("No", 0) > tally.get("Yes", 0)
+                    else []
+                )
                 outcome = "won"
             else:
                 advancing = row["seats"] * (2 if row["primary"] and party is None else 1)
@@ -711,7 +883,9 @@ def emit() -> Path:
                     value=pl.col("votes"),
                 )
             )
-            report["superseded" if target is not None else "new"] = report.get("superseded" if target is not None else "new", 0) + 1
+            report["superseded" if target is not None else "new"] = (
+                report.get("superseded" if target is not None else "new", 0) + 1
+            )
 
         cs.remainders("A page footer on the recap sheets read as a candidate", pattern=r"^Precinct Summary")
         (PARSED / "supersede-misses.txt").write_text("\n".join(misses))

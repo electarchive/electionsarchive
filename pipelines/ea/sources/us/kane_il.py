@@ -36,7 +36,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     tenant = next(iter(registry))
     for day in _days():
         page = raw.cached(SOURCE, f"{HOST}/{day}/Contests/").path.read_text(errors="replace")
-        title = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", re.search(r"<h1>(.*?)</h1>", page, re.DOTALL)[1]))).strip()
+        title = re.sub(
+            r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", re.search(r"<h1>(.*?)</h1>", page, re.DOTALL)[1]))
+        ).strip()
         contests = []
         for index, (text, party, body) in enumerate(CONTEST.findall(page)):
             text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text))).strip()

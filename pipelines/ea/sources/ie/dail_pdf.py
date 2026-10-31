@@ -1,4 +1,5 @@
 import html
+import itertools
 import re
 import statistics
 import subprocess
@@ -88,7 +89,11 @@ def read_book(pdf: str) -> list[dict[str, object]]:
     for page_number, words in enumerate(read_pages(pdf), 1):
         lines = read_lines(words)
         header = next(
-            (i for i, (_, ws) in enumerate(lines) if sum(w[4] in ORDINALS for w in ws) >= 1 and len({w[4] for w in ws}) >= 1),
+            (
+                i
+                for i, (_, ws) in enumerate(lines)
+                if sum(w[4] in ORDINALS for w in ws) >= 1 and len({w[4] for w in ws}) >= 1
+            ),
             None,
         )
         if header is None:
@@ -97,7 +102,7 @@ def read_book(pdf: str) -> list[dict[str, object]]:
         if not counts:
             continue
         centers = [((w[0] + w[2]) / 2, ORDINALS.index(w[4]) + 1) for w in counts]
-        pitch = statistics.median(b[0] - a[0] for a, b in zip(centers, centers[1:])) if len(centers) > 1 else 60.0
+        pitch = statistics.median(b[0] - a[0] for a, b in itertools.pairwise(centers)) if len(centers) > 1 else 60.0
         start = centers[0][0] - pitch / 2
         head = [ws for _, ws in lines[:header]]
         text = " ".join(" ".join(w[4] for w in ws) for ws in head)
@@ -130,7 +135,8 @@ def read_book(pdf: str) -> list[dict[str, object]]:
                 left.extend(
                     w[4]
                     for w in ws
-                    if w[2] < limit and w[4] not in ("CONSTITUENCY", "OF", "NAMES", "CANDIDATES", "CANDIDATE(S)", "ELECTED")
+                    if w[2] < limit
+                    and w[4] not in ("CONSTITUENCY", "OF", "NAMES", "CANDIDATES", "CANDIDATE(S)", "ELECTED")
                 )
             name = re.sub(r"\s*-\s*", "-", " ".join(left)).strip()
             current = {
@@ -221,16 +227,15 @@ def assemble(book: dict[str, object]) -> dict[str, object]:
                 continue
             if label and not started and "," not in label:
                 continue
-            if label:
-                if index == 0:
-                    if names and "," not in label and not names[-1].endswith(")") and not cells:
-                        names[-1] = f"{names[-1]} {label}"
-                        continue
-                    started = True
-                    names.append(label)
-                    if cells and not signed:
-                        rows.append(cells)
+            if label and index == 0:
+                if names and "," not in label and not names[-1].endswith(")") and not cells:
+                    names[-1] = f"{names[-1]} {label}"
                     continue
+                started = True
+                names.append(label)
+                if cells and not signed:
+                    rows.append(cells)
+                continue
             if not label and cells and not signed and started and not finished:
                 rows.append(cells)
         if index == 0:
@@ -358,9 +363,13 @@ def read_book_2002(pdf: str) -> list[dict[str, object]]:
         if "NAMES OF CANDIDATES ELECTED" not in page or "CONSTITUENCY OF" not in page or "Transfer of" not in page:
             continue
         lines = page.splitlines()
-        header = next(i for i, line in enumerate(lines) if re.search(r"\bFirst\b", line) and "Count" in "".join(lines[i : i + 2]))
+        header = next(
+            i for i, line in enumerate(lines) if re.search(r"\bFirst\b", line) and "Count" in "".join(lines[i : i + 2])
+        )
         head = lines[:header]
-        title = next(line for line in head if "NAMES OF CANDIDATES ELECTED" in line).index("NAMES OF CANDIDATES ELECTED")
+        title = next(line for line in head if "NAMES OF CANDIDATES ELECTED" in line).index(
+            "NAMES OF CANDIDATES ELECTED"
+        )
         values: dict[str, int] = {}
         for key, label in (
             ("electorate", "TOTAL ELECTORATE"),
@@ -386,7 +395,10 @@ def read_book_2002(pdf: str) -> list[dict[str, object]]:
                     constituency = chunk
         constituency = re.sub(r"\s*-\s*", "-", constituency).strip()
         rounds = max(
-            ORDINALS.index(word) + 1 for line in lines[header : header + 2] for word in re.findall(r"[A-Z][a-z-]+", line) if word in ORDINALS
+            ORDINALS.index(word) + 1
+            for line in lines[header : header + 2]
+            for word in re.findall(r"[A-Z][a-z-]+", line)
+            if word in ORDINALS
         )
         names: list[str] = []
         series: list[dict[int, int]] = []
@@ -449,7 +461,11 @@ def rows(pdf: str, year: int, names: tuple[str, ...] = ()) -> dict[str, list[dic
     statutory: dict[str, tuple[str, int]] = {fold(n): (n, 0) for n in names}
     for words in read_pages(pdf) if not names else ():
         for _, line in read_lines(words):
-            name = " ".join(w[4] for w in line if not NUMBER.match(w[4]) and w[0] < min((x[0] for x in line if NUMBER.match(x[4])), default=0))
+            name = " ".join(
+                w[4]
+                for w in line
+                if not NUMBER.match(w[4]) and w[0] < min((x[0] for x in line if NUMBER.match(x[4])), default=0)
+            )
             figures = [w[4] for w in line if NUMBER.match(w[4])]
             if name and len(figures) >= 8 and len(figures[0]) == 1 and number(figures[1]) > 10000:
                 statutory[fold(name)] = (name.rstrip("* "), int(figures[0]))
@@ -491,7 +507,15 @@ def rows(pdf: str, year: int, names: tuple[str, ...] = ()) -> dict[str, list[dic
                 }
             )
             for count, total in candidate["series"].items():
-                counts.append({"year": year, "constituency": label, "candidate": candidate["candidate"], "count": count, "total": total})
+                counts.append(
+                    {
+                        "year": year,
+                        "constituency": label,
+                        "candidate": candidate["candidate"],
+                        "count": count,
+                        "total": total,
+                    }
+                )
         for count, value in done["nt"].items():
             printed.append({"year": year, "constituency": label, "count": count, "value": value})
     return {"units": units, "candidates": candidates, "counts": counts, "printed": printed}

@@ -41,7 +41,7 @@ PATCHES = {
         "frontier": {5: 1},
         "nemaha": {5: 1},
         "thurston": {5: 1},
-    }
+    },
 }
 METHOD = (
     "County totals are from the Board of State Canvassers' official report (the Nebraska Library Commission's scan, "
@@ -59,7 +59,9 @@ def number(token: str) -> int | None:
 
 def text(year: int) -> list[str]:
     path = raw.cached(CACHE, URL.format(year, "prim_gen")).path
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.split("\n")
+    return subprocess.run(
+        ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+    ).stdout.split("\n")
 
 
 PRESIDENT_1992 = {
@@ -160,7 +162,12 @@ def president_1992(codes: dict[str, str]) -> list[tuple[str, str, str, str, int]
                 if column is not None and value is not None:
                     cells[column] = cells.get(column, 0) + value
             if is_total:
-                print('  page', header, cells, {c: sum(r.get(c, 0) for r in pages.get(header, {}).values()) for c in cells})
+                print(
+                    "  page",
+                    header,
+                    cells,
+                    {c: sum(r.get(c, 0) for r in pages.get(header, {}).values()) for c in cells},
+                )
                 for column, value in cells.items():
                     printed[column] += value
                 break
@@ -262,7 +269,9 @@ def parse() -> None:
                 if value:
                     rows.append((str(DAYS[year]), office, codes[county], str(column), value))
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row").write_parquet(PARSED / "lines.parquet")
+    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row").write_parquet(
+        PARSED / "lines.parquet"
+    )
 
 
 RESIDENTS = (

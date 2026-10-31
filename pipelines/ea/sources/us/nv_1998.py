@@ -14,10 +14,28 @@ PARSED = DATA / "parsed" / SOURCE
 URL = "https://web.archive.org/web/20260516033022if_/https://www.nvsos.gov/sos/home/showdocument?id=192"
 DAY = "1998-11-03"
 COUNTIES = [
-    "carsoncity", "churchill", "clark", "douglas", "elko", "esmeralda", "eureka", "humboldt", "lander", "lincoln",
-    "lyon", "mineral", "nye", "pershing", "storey", "washoe", "whitepine",
+    "carsoncity",
+    "churchill",
+    "clark",
+    "douglas",
+    "elko",
+    "esmeralda",
+    "eureka",
+    "humboldt",
+    "lander",
+    "lincoln",
+    "lyon",
+    "mineral",
+    "nye",
+    "pershing",
+    "storey",
+    "washoe",
+    "whitepine",
 ]
-BLOCKS = {"senate": ("United States Senator", "Congressional District One"), "governor": ("Governor", "Lieutenant Governor")}
+BLOCKS = {
+    "senate": ("United States Senator", "Congressional District One"),
+    "governor": ("Governor", "Lieutenant Governor"),
+}
 PUBLISHER = "Nevada Secretary of State"
 TITLE = "1998 Official General Election Returns"
 METHOD = (
@@ -59,7 +77,9 @@ def parse() -> None:
             column += 1
         print(office, column, "candidates")
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row").write_parquet(PARSED / "lines.parquet")
+    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row").write_parquet(
+        PARSED / "lines.parquet"
+    )
 
 
 def emit() -> Path:

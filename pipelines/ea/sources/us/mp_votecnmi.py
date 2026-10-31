@@ -20,7 +20,19 @@ YEARS = {
     2024: date(2024, 11, 5),
 }
 MUNICIPIO = {"ED6": "69120", "ED7": "69100", "ED4D": "69085"}
-HEADINGS = ("DELEGATE TO", "GOVERNOR", "SENAT", "HOUSE OF", "MAYOR", "ATTORNEY", "BOARD OF", "COUNCIL", "JUSTICE", "INITIATIVE", "ABSENTEE")
+HEADINGS = (
+    "DELEGATE TO",
+    "GOVERNOR",
+    "SENAT",
+    "HOUSE OF",
+    "MAYOR",
+    "ATTORNEY",
+    "BOARD OF",
+    "COUNCIL",
+    "JUSTICE",
+    "INITIATIVE",
+    "ABSENTEE",
+)
 
 
 def url(year: int) -> str:
@@ -54,32 +66,55 @@ def emit() -> Path:
         municipios = {
             code: (unit, unit_area)
             for code, unit, unit_area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and polity_id = %s", [state]
+                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and polity_id = %s",
+                [state],
             ).fetchall()
         }
         office = cs.key("us.office", "governor:MP")
         if office in cs.minted:
             cs.add("office", id=office, polity_id=state, kind="governor")
-            cs.add("name", entity_id=office, text="Governor of the Northern Mariana Islands", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=office,
+                text="Governor of the Northern Mariana Islands",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
         two_round = cs.key("us.electoral_system", "two_round")
         persons = {}
         for year, day in YEARS.items():
             title = f"{year} Election Results"
             source = cs.source(PUBLISHER, title)
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=url(year), license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=url(year),
+                license="Public record",
+            )
             cs.artifact(raw.cached(SOURCE, url(year)), source)
             page = raw.cached(SOURCE, url(year)).path.read_text(encoding="utf-8", errors="replace")
             tables = {}
             units = {}
-            for found in re.finditer(r"<tr[^>]*>(?:(?!</tr>).)*?CANDIDATE/AFFIL", page, flags=re.S):
-                before = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", page[max(0, found.start() - 1500) : found.start()]))).upper()
+            for found in re.finditer(r"<tr[^>]*>(?:(?!</tr>).)*?CANDIDATE/AFFIL", page, flags=re.DOTALL):
+                before = re.sub(
+                    r"\s+",
+                    " ",
+                    html.unescape(re.sub(r"<[^>]+>", " ", page[max(0, found.start() - 1500) : found.start()])),
+                ).upper()
                 kind = max((before.rfind(heading), heading) for heading in HEADINGS)[1]
                 if kind in ("DELEGATE TO", "GOVERNOR") and kind not in tables:
                     tables[kind] = found.start()
             for kind, position in tables.items():
                 grid = []
-                for row in re.findall(r"<tr.*?</tr>", page[position:], flags=re.S):
-                    cells = [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.S)]
+                for row in re.findall(r"<tr.*?</tr>", page[position:], flags=re.DOTALL):
+                    cells = [
+                        html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                        for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.DOTALL)
+                    ]
                     if cells:
                         grid.append(cells)
                     if cells and cells[0].upper() == "TOTAL":
@@ -113,21 +148,39 @@ def emit() -> Path:
                         electoral_system_id=two_round,
                         default_result_kind="counted",
                     )
-                    cs.add("name", entity_id=contest, text=f"{year} Northern Mariana Islands governor election", lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=contest,
+                        text=f"{year} Northern Mariana Islands governor election",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
                     cs.add("slug", path=f"us/mp/{day}-general/governor", entity_id=contest)
                     options = []
                     for row in body:
                         ticket = re.sub(r"/[A-Za-z. ]+$", "", row[0]).replace("*", "")
                         names = [part.strip() for part in re.split(r"\s+&\s+|/", ticket) if part.strip()]
-                        people = [" ".join(reversed([piece.strip() for piece in name.split(",", 1)])).title() for name in names]
+                        people = [
+                            " ".join(reversed([piece.strip() for piece in name.split(",", 1)])).title()
+                            for name in names
+                        ]
                         token = slug(" ".join(people))
                         option = cs.key("us.option", f"{contest_key}:{token}")
-                        cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=" and ".join(people))
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            ballot_label=" and ".join(people),
+                        )
                         for role, label in zip(("head", "running_mate"), people, strict=False):
                             person = persons.setdefault(slug(label), cs.key(f"{SOURCE}.person", f"MP:{slug(label)}"))
                             if person in cs.minted and not any(r["id"] == person for r in cs.rows.get("person", [])):
                                 cs.add("person", id=person)
-                                cs.add("name", entity_id=person, text=label, lang="en", kind="official", is_preferred=True)
+                                cs.add(
+                                    "name", entity_id=person, text=label, lang="en", kind="official", is_preferred=True
+                                )
                             cs.add(
                                 "candidacy",
                                 id=cs.key("us.candidacy", f"{contest_key}:{token}:{role}"),
@@ -143,10 +196,14 @@ def emit() -> Path:
                         "select c.id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
                         [contest_key],
                     ).fetchone()[0]
-                    labels = conn.execute("select id, ballot_label from contest_option where contest_id = %s", [contest]).fetchall()
+                    labels = conn.execute(
+                        "select id, ballot_label from contest_option where contest_id = %s", [contest]
+                    ).fetchall()
                     options = []
                     for row in body:
-                        surname, given = (part.strip().lower() for part in row[0].split("/")[0].replace("*", "").split(",", 1))
+                        surname, given = (
+                            part.strip().lower() for part in row[0].split("/")[0].replace("*", "").split(",", 1)
+                        )
                         found = [
                             option
                             for option, label in labels
@@ -160,7 +217,18 @@ def emit() -> Path:
                 if governor:
                     completeness = 1
                 else:
-                    columns_set = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+                    columns_set = (
+                        "id",
+                        "election_id",
+                        "contest_id",
+                        "stage",
+                        "kind",
+                        "status",
+                        "source_id",
+                        "as_of",
+                        "completeness",
+                        "supersedes_id",
+                    )
                     for prior in conn.execute(
                         f"select {', '.join(columns_set)} from result_set where contest_id = %s and is_default and id <> %s",
                         [contest, result_set],
@@ -197,7 +265,14 @@ def emit() -> Path:
                     body_md="Votes by election district as published; early voting and absentee votes are separate aggregate units on their own channels where the page gives them separate columns.",
                 )
                 if governor:
-                    ranked = sorted(zip(options, (int(row[1 + columns.index("TOTAL")].replace(",", "")) for row in body), strict=True), key=lambda pair: -pair[1])
+                    ranked = sorted(
+                        zip(
+                            options,
+                            (int(row[1 + columns.index("TOTAL")].replace(",", "")) for row in body),
+                            strict=True,
+                        ),
+                        key=lambda pair: -pair[1],
+                    )
                     cs.add("outcome", result_set_id=result_set, option_id=ranked[0][0], kind="elected", seats=None)
                 has_early = any(name.startswith("EV") for name in columns)
                 for row, option in zip(body, options, strict=True):

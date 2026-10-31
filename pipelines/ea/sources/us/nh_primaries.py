@@ -66,6 +66,7 @@ def parse() -> None:
         infer_schema_length=0,
         encoding="utf8-lossy",
     ).filter(pl.col("USPS") == "NH")
+
     def norm(text: str) -> str:
         text = re.sub(r"\s*-?\s*ward\s*\d+\*?\s*$", "", text.strip().lower().replace("&", " and "))
         text = re.sub(r"['\u2019]", "", text)

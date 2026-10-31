@@ -36,7 +36,9 @@ def fetch() -> None:
 
 
 def read(source: str, url: str) -> dict[tuple[str, int], list[tuple[str, str, int]]]:
-    text = subprocess.run(["pdftotext", "-layout", str(raw.cached(source, url).path), "-"], capture_output=True, text=True, check=True).stdout
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(source, url).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
     found: dict[tuple[str, int], list[tuple[str, str, int]]] = {}
     county = "STATE"
     district: int | None = None
@@ -46,7 +48,12 @@ def read(source: str, url: str) -> dict[tuple[str, int], list[tuple[str, str, in
         elif header := re.match(r"\s*U\.S\. Representative\W+District (\d+)", line):
             district = int(header[1])
             found.setdefault((county, district), [])
-        elif re.match(r"\s{0,5}\S", line) and not re.match(r"\s*(http|\d+/\d+/\d{4}|\x0c)", line) and not ROW.fullmatch(line) and "Total Votes" not in line:
+        elif (
+            re.match(r"\s{0,5}\S", line)
+            and not re.match(r"\s*(http|\d+/\d+/\d{4}|\x0c)", line)
+            and not ROW.fullmatch(line)
+            and "Total Votes" not in line
+        ):
             district = None
         elif district is not None and (row := ROW.fullmatch(line)):
             found[(county, district)].append((row[1], row[2], int(row[3].replace(",", ""))))
@@ -75,14 +82,26 @@ def parse() -> None:
             code = keys.get(re.sub(r"[^a-z]", "", county.lower())) or codes[re.sub(r"[^a-z]", "", county.lower())]
             for label, party, votes in lines:
                 sums[(district, label)] = sums.get((district, label), 0) + votes
-                rows.append({"year": year, "district": district, "county": code, "label": label, "party": party, "votes": votes})
+                rows.append(
+                    {"year": year, "district": district, "county": code, "label": label, "party": party, "votes": votes}
+                )
         printed = {(district, label): votes for (_, district), lines in state.items() for label, _, votes in lines}
         if sums != printed:
-            raise ValueError(f"{year}: counties differ from the statewide file: {sorted(set(sums.items()) ^ set(printed.items()))}")
-    frame = pl.DataFrame(rows).group_by("year", "district", "county", "label", "party", maintain_order=True).agg(pl.col("votes").sum())
+            raise ValueError(
+                f"{year}: counties differ from the statewide file: {sorted(set(sums.items()) ^ set(printed.items()))}"
+            )
+    frame = (
+        pl.DataFrame(rows)
+        .group_by("year", "district", "county", "label", "party", maintain_order=True)
+        .agg(pl.col("votes").sum())
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "lines.parquet")
-    print(frame.group_by("year", "district").agg(pl.col("county").n_unique(), pl.col("label").n_unique()).sort("year", "district"))
+    print(
+        frame.group_by("year", "district")
+        .agg(pl.col("county").n_unique(), pl.col("label").n_unique())
+        .sort("year", "district")
+    )
 
 
 def emit() -> Path:
@@ -93,9 +112,21 @@ def emit() -> Path:
         for county_url, state_url, origin in FILES.values():
             cs.artifact(raw.cached(origin, county_url), source)
             cs.artifact(raw.cached(origin, state_url), source)
-        units = dict(conn.execute("select code, id from reporting_unit where scheme_code = 'us.county' and code like '29%%'").fetchall())
-        areas = dict(conn.execute("select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '29%%'").fetchall())
-        contests = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':MO:house:'"))
+        units = dict(
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.county' and code like '29%%'"
+            ).fetchall()
+        )
+        areas = dict(
+            conn.execute(
+                "select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '29%%'"
+            ).fetchall()
+        )
+        contests = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':MO:house:'"
+            )
+        )
         for (year, district), rows in frame.group_by("year", "district", maintain_order=True):
             day = DAYS[year]
             key = f"{day}:MO:house:{district}"
@@ -126,23 +157,46 @@ def emit() -> Path:
                 [contest, row[0]],
             ).fetchall()
             writein = [option for option, _, kind, _ in roots if kind == "write_in"]
-            rows = rows.with_columns(pl.when(pl.col("party") == "WI").then(pl.lit("write-ins")).otherwise(pl.col("label")).alias("label"))
+            rows = rows.with_columns(
+                pl.when(pl.col("party") == "WI").then(pl.lit("write-ins")).otherwise(pl.col("label")).alias("label")
+            )
             rows = rows.group_by("county", "label", maintain_order=True).agg(pl.col("votes").sum())
             totals = {label: int(g["votes"].sum()) for (label,), g in rows.group_by("label")}
             targets: dict[str, object] = {}
             for label, total in totals.items():
-                found = [option for option, _, _, value in roots if int(value) == total and option not in targets.values()]
+                found = [
+                    option for option, _, _, value in roots if int(value) == total and option not in targets.values()
+                ]
                 if len(found) == 1:
                     targets[label] = found[0]
                 elif label == "write-ins" and len(writein) == 1:
                     targets[label] = writein[0]
-            if len(targets) != len(totals) or {t for t in targets.values()} != {option for option, _, _, _ in roots} - ({writein[0]} if writein and "write-ins" not in totals else set()):
+            if len(targets) != len(totals) or {t for t in targets.values()} != {option for option, _, _, _ in roots} - (
+                {writein[0]} if writein and "write-ins" not in totals else set()
+            ):
                 print(f"{key}: {totals} against FEC {[(label, kind, int(value)) for _, label, kind, value in roots]}")
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
-                **dict(zip(("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id"), row, strict=True)),
+                **dict(
+                    zip(
+                        (
+                            "id",
+                            "election_id",
+                            "contest_id",
+                            "stage",
+                            "kind",
+                            "status",
+                            "source_id",
+                            "as_of",
+                            "completeness",
+                            "supersedes_id",
+                        ),
+                        row,
+                        strict=True,
+                    )
+                ),
                 is_default=False,
             )
             cs.add(
@@ -159,9 +213,13 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
-            for option, kind, seats in conn.execute("select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]).fetchall():
+            for option, kind, seats in conn.execute(
+                "select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]
+            ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
-            ((district_area,),) = conn.execute("select district_area_id from contest where id = %s", [contest]).fetchall()
+            ((district_area,),) = conn.execute(
+                "select district_area_id from contest where id = %s", [contest]
+            ).fetchall()
             unit_ids = dict(units)
             for code in rows["county"].unique():
                 if frame.filter((pl.col("year") == year) & (pl.col("county") == code))["district"].n_unique() < 2:
@@ -182,7 +240,13 @@ def emit() -> Path:
                         valid_from=day,
                         valid_to=day + timedelta(days=1),
                     )
-                    cs.add("reporting_unit_area", unit_id=unit_ids[code], area_id=district_area, valid_from=day, valid_to=day + timedelta(days=1))
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=unit_ids[code],
+                        area_id=district_area,
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
             for code, label, votes in rows.select("county", "label", "votes").iter_rows():
                 cs.add(
                     "result_value",

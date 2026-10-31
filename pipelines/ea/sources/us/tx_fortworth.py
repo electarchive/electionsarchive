@@ -31,13 +31,13 @@ def text(fragment: str) -> str:
 def contests(section: str) -> Iterator[dict[str, Any]]:
     title = None
     choices: list[dict[str, Any]] = []
-    for underlined, row in re.findall(r"underline;?\"?>(.*?)</span>|<tr[^>]*>(.*?)</tr>", section, flags=re.S):
+    for underlined, row in re.findall(r"underline;?\"?>(.*?)</span>|<tr[^>]*>(.*?)</tr>", section, flags=re.DOTALL):
         if underlined:
             if title is not None and choices:
                 yield {"text": title, "vote_for": 1, "choices": choices, "cast": None}
             title, choices = text(underlined), []
             continue
-        cells = [text(cell) for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.S)]
+        cells = [text(cell) for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, flags=re.DOTALL)]
         if not cells or cells[0] in ("Candidate", ""):
             continue
         underlined_row = re.search(r"underline", row)
@@ -58,7 +58,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     parts = re.split(r"(?=<h[34][^>]*>)", page)
     for tenant in registry:
         for part in parts:
-            head = re.match(r"<h[34][^>]*>(.*?)</h[34]>", part, flags=re.S)
+            head = re.match(r"<h[34][^>]*>(.*?)</h[34]>", part, flags=re.DOTALL)
             if head is None:
                 continue
             label = text(head[1])

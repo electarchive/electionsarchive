@@ -17,12 +17,24 @@ PUBLISHER = "Washington Secretary of State"
 TITLE = "Voters' Pamphlet"
 HOST = "https://www.sos.wa.gov"
 PAMPHLETS = {
-    date(2013, 11, 5): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202013.pdf",
-    date(2014, 11, 4): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202014.pdf",
-    date(2015, 11, 3): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202015.pdf",
-    date(2017, 11, 7): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202017.pdf",
-    date(2018, 11, 6): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202018.pdf",
-    date(2016, 11, 8): "https://web.archive.org/web/2017/https://www.sos.wa.gov/_assets/elections/voters%20pamphlet%202016.pdf",
+    date(
+        2013, 11, 5
+    ): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202013.pdf",
+    date(
+        2014, 11, 4
+    ): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202014.pdf",
+    date(
+        2015, 11, 3
+    ): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202015.pdf",
+    date(
+        2017, 11, 7
+    ): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202017.pdf",
+    date(
+        2018, 11, 6
+    ): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202018.pdf",
+    date(
+        2016, 11, 8
+    ): "https://web.archive.org/web/2017/https://www.sos.wa.gov/_assets/elections/voters%20pamphlet%202016.pdf",
     date(2019, 11, 5): f"{HOST}/sites/default/files/2022-05/-ED02-%2520Chelan%2520FINAL%2520low%2520res.pdf",
     date(2020, 11, 3): f"{HOST}/sites/default/files/2022-05/--ed02chelan%252cdouglas%252cgrant%252ckittitas.pdf",
     date(2021, 11, 2): f"{HOST}/sites/default/files/2022-05/--ed02-pg01-low-res-8.31.pdf",
@@ -48,7 +60,10 @@ def parse() -> None:
     rows: list[dict[str, object]] = []
     for day, link in PAMPHLETS.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         advisory = 0
         for number, page in enumerate(text.split("\f"), 1):
@@ -61,7 +76,10 @@ def parse() -> None:
                 cursor = index
                 while cursor > 0:
                     cursor -= 1
-                    if all(lines[max(cursor - gap, 0)][column:].strip() == "" for gap in range(6)) and cursor < index - 5:
+                    if (
+                        all(lines[max(cursor - gap, 0)][column:].strip() == "" for gap in range(6))
+                        and cursor < index - 5
+                    ):
                         break
                     buffer.append(lines[cursor][column:].split("   ")[0].strip())
                 joined = re.sub(r"\s+", " ", " ".join(reversed(buffer))).strip()
@@ -84,7 +102,9 @@ def parse() -> None:
                     measure = int(head[1])
                 if kind == "sjr" and statement.startswith("concerning "):
                     statement = f"The legislature has proposed a constitutional amendment {statement}"
-                rows.append({"day": day, "kind": kind, "number": measure, "page": number, "text": statement, "url": link})
+                rows.append(
+                    {"day": day, "kind": kind, "number": measure, "page": number, "text": statement, "url": link}
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows).unique(subset=["day", "kind", "text"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "wording.parquet")
@@ -131,7 +151,19 @@ def emit() -> Path:
         for index, (day, kind, number, page, statement, link) in enumerate(rows):
             if kind != "advisory":
                 continue
-            words = {word[:5] for word in re.findall(r"[a-z]{5,}", statement.lower())} - {"legis", "witho", "the", "peopl", "costi", "first", "years", "gover", "spend", "this", "tax"}
+            words = {word[:5] for word in re.findall(r"[a-z]{5,}", statement.lower())} - {
+                "legis",
+                "witho",
+                "the",
+                "peopl",
+                "costi",
+                "first",
+                "years",
+                "gover",
+                "spend",
+                "this",
+                "tax",
+            }
             scored = sorted(
                 (
                     (len(words & {word[:5] for word in re.findall(r"[a-z]{5,}", titles[entity].lower())}), n)
@@ -156,7 +188,9 @@ def emit() -> Path:
             for body_kind, body in (("text", statement), ("link", None)):
                 cs.add(
                     "ballot_question_text",
-                    id=uuid5(NAMESPACE, f"ballot_question_text\x1f{contest}\x1f{body_kind}\x1fen\x1f{source}\x1f{address}"),
+                    id=uuid5(
+                        NAMESPACE, f"ballot_question_text\x1f{contest}\x1f{body_kind}\x1fen\x1f{source}\x1f{address}"
+                    ),
                     contest_id=contest,
                     kind=body_kind,
                     lang="en",

@@ -17,12 +17,42 @@ PUBLISHER = "Oklahoma State Election Board"
 TITLE = "Election results by county, 1996 and 1998 primaries"
 BASE = "https://oklahoma.gov/elections/elections-results/election-results/"
 PAGES = [
-    ("1996-election-results/96pdsen", date(1996, 8, 27), "democratic", r"(?:DEMOCRATIC|REPUBLICAN) RACE FOR U\.S\. SENATOR"),
-    ("1996-election-results/1996-rep-race-for-us-senator", date(1996, 8, 27), "republican", r"(?:DEMOCRATIC|REPUBLICAN) RACE FOR U\.S\. SENATOR"),
-    ("1998-election-results/98dempri", date(1998, 8, 25), "democratic", r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)"),
-    ("1998-election-results/98reppri", date(1998, 8, 25), "republican", r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)"),
-    ("1998-election-results/98demrun", date(1998, 9, 15), "democratic", r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)"),
-    ("1998-election-results/98reprun", date(1998, 9, 15), "republican", r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)"),
+    (
+        "1996-election-results/96pdsen",
+        date(1996, 8, 27),
+        "democratic",
+        r"(?:DEMOCRATIC|REPUBLICAN) RACE FOR U\.S\. SENATOR",
+    ),
+    (
+        "1996-election-results/1996-rep-race-for-us-senator",
+        date(1996, 8, 27),
+        "republican",
+        r"(?:DEMOCRATIC|REPUBLICAN) RACE FOR U\.S\. SENATOR",
+    ),
+    (
+        "1998-election-results/98dempri",
+        date(1998, 8, 25),
+        "democratic",
+        r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)",
+    ),
+    (
+        "1998-election-results/98reppri",
+        date(1998, 8, 25),
+        "republican",
+        r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)",
+    ),
+    (
+        "1998-election-results/98demrun",
+        date(1998, 9, 15),
+        "democratic",
+        r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)",
+    ),
+    (
+        "1998-election-results/98reprun",
+        date(1998, 9, 15),
+        "republican",
+        r"UNITED STATES (?:SENATOR|REPRESENTATIVE, DISTRICT \d+)",
+    ),
 ]
 
 
@@ -97,7 +127,9 @@ def parse() -> None:
             if total is not None:
                 for column in range(len(candidates) + 1):
                     if sum(votes[column] for _, votes in rows) != total[column]:
-                        print(f"{label}: column {column} counties sum to {sum(votes[column] for _, votes in rows)}, printed {total[column]}")
+                        print(
+                            f"{label}: column {column} counties sum to {sum(votes[column] for _, votes in rows)}, printed {total[column]}"
+                        )
             district = re.search(r"DISTRICT (\d+)", title)
             chamber = f"{'house' if district else 'senate'}:{party}"
             for county, votes in rows:
@@ -108,7 +140,14 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         out,
-        schema={"day": pl.Date, "chamber": pl.String, "district": pl.Int16, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+        schema={
+            "day": pl.Date,
+            "chamber": pl.String,
+            "district": pl.Int16,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
         orient="row",
     ).write_parquet(PARSED / "lines.parquet")
 

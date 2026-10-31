@@ -62,12 +62,15 @@ def parse() -> None:
         day = election_day(edition - 1)
         with connect() as conn:
             held = {
-                key.rsplit(":", 1)[-1]: [int(total) for (total,) in conn.execute(
-                    """select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k and rs.is_default
+                key.rsplit(":", 1)[-1]: [
+                    int(total)
+                    for (total,) in conn.execute(
+                        """select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k and rs.is_default
                        join contest_option o on o.k = v.option_k join contest c on c.id = o.contest_id
                        where c.id = %s and v.measure = 1 and o.kind <> 'others' group by o.id""",
-                    [entity],
-                ).fetchall()]
+                        [entity],
+                    ).fetchall()
+                ]
                 for key, entity in conn.execute(
                     "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s",
                     [f"^{day}:WV:(president|governor|senate)$"],
@@ -107,7 +110,13 @@ def parse() -> None:
                         if len({office for _, office in near}) == 1:
                             assigned[column] = near[0][1]
                     if assigned:
-                        print(edition, len(current), len(figures), "ok" if ok else f"sums {sums} printed {figures}", assigned)
+                        print(
+                            edition,
+                            len(current),
+                            len(figures),
+                            "ok" if ok else f"sums {sums} printed {figures}",
+                            assigned,
+                        )
                     if ok:
                         for county, values in current.items():
                             for column, office in assigned.items():

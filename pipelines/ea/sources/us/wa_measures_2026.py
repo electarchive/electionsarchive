@@ -22,7 +22,16 @@ PUBLISHER = "King County Elections"
 TITLE = "Ballot measures, November 3, 2026 General Election"
 BROWSER = {"User-Agent": "Mozilla/5.0"}
 SAMPLES = json.loads((Path(__file__).parent / "wa_samples_2026.json").read_text())
-SAMPLE_COUNTY = {"Snohomish": "53061", "Kitsap": "53035", "Clark": "53011", "Pierce": "53053", "Thurston": "53067", "Skagit": "53057", "Spokane": "53063", "Whatcom": "53073"}
+SAMPLE_COUNTY = {
+    "Snohomish": "53061",
+    "Kitsap": "53035",
+    "Clark": "53011",
+    "Pierce": "53053",
+    "Thurston": "53067",
+    "Skagit": "53057",
+    "Spokane": "53063",
+    "Whatcom": "53073",
+}
 LOCAL = {
     "https://clark.wa.gov/elections/november-3-2026-general-special-election": "Clark/november_3_2026_general_election-sample_ballot.pdf",
     "https://www.piercecountywa.gov/328/Elections": "Pierce/Sample Ballot_15.pdf",
@@ -41,7 +50,14 @@ def download(url: str, suffix: str = ".html") -> raw.Artifact:
         pass
     if url in LOCAL:
         path = MANUAL / LOCAL[url]
-        return raw.store(SOURCE, url, path.read_bytes(), suffix=".pdf", retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC), media_type="application/pdf")
+        return raw.store(
+            SOURCE,
+            url,
+            path.read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+            media_type="application/pdf",
+        )
     response = httpx.get(url, headers=BROWSER, follow_redirects=True, timeout=120)
     response.raise_for_status()
     return raw.store(
@@ -83,7 +99,9 @@ def parse() -> None:
             r"General Election (.+?) (Proposition No\. \d+) (.+?) (The .+?|Shall .+?|Should .+?|This .+?)\s+(?:Yes No|Explanatory statement)\b",
             text,
         ):
-            rows.append({"url": url, "publisher": PUBLISHER, "place": place, "number": number, "title": title, "text": wording})
+            rows.append(
+                {"url": url, "publisher": PUBLISHER, "place": place, "number": number, "title": title, "text": wording}
+            )
         if not any(row["url"] == url for row in rows):
             print("no wording:", url)
     rows.extend(SAMPLES)
@@ -112,7 +130,12 @@ def emit() -> Path:
         ).fetchall():
             key = f"{scheme}:{code}"
             found[key] = (polity, area, text, path, code)
-            names[(scheme, text if scheme == "us.county" else ceda._core(text) if scheme != "us.place" else ceda._city(text))] = key
+            names[
+                (
+                    scheme,
+                    text if scheme == "us.county" else ceda._core(text) if scheme != "us.place" else ceda._city(text),
+                )
+            ] = key
         slugs = dict(conn.execute("select path, entity_id from slug where path like 'us/wa/%%'").fetchall())
         known = {
             value
@@ -145,7 +168,9 @@ def emit() -> Path:
             elif "School District" in place:
                 key = names.get(("us.school_district", ceda._core(re.sub(r"\s+No\.?\s*\d+$", "", place))))
             else:
-                core = ceda._core(re.sub(r"\s+No\.?\s*(\d+)$", r" \1", place.replace("Fire Protection District", "Fire District")))
+                core = ceda._core(
+                    re.sub(r"\s+No\.?\s*(\d+)$", r" \1", place.replace("Fire Protection District", "Fire District"))
+                )
                 key = names.get(("us.county", place)) or names.get(("us.special_district", core))
             if key is None and place in UNMINTED:
                 geoid, text = UNMINTED[place]
@@ -180,7 +205,9 @@ def emit() -> Path:
                 county_key = f"us.county:{home}"
                 if home is not None and county_key in found:
                     county, county_area, _, county_path, county_code = found[county_key]
-                    minted = govmint.special(conn, cs, "WA", (county, county_area, county_path, county_code), place, slugs)
+                    minted = govmint.special(
+                        conn, cs, "WA", (county, county_area, county_path, county_code), place, slugs
+                    )
                     if minted is not None:
                         key = f"special:{home}:{place}"
                         found[key] = minted
@@ -206,7 +233,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {name} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {name} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["number"]
             contest_key = f"{DAY}:WA:{code}:measure:{slug(label)}"
@@ -227,7 +261,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {name}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {name}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             cs.add("note", entity_id=contest, kind="context", body_md=row["title"])

@@ -56,15 +56,25 @@ def fetch() -> None:
         detail = subprocess.run(
             ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", record], capture_output=True, text=True, check=True
         ).stdout
-        items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.S)[1])
+        items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.DOTALL)[1])
         for item in items:
             number = int(item["path"].rsplit("-", 1)[1]) + offset
             pdf = subprocess.run(
-                ["curl", "-sL", "-m", "120", "-A", "Mozilla/5.0", item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"])],
+                [
+                    "curl",
+                    "-sL",
+                    "-m",
+                    "120",
+                    "-A",
+                    "Mozilla/5.0",
+                    item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"]),
+                ],
                 capture_output=True,
                 check=True,
             ).stdout
-            raw.store(SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+            raw.store(
+                SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+            )
 
 
 def parse() -> None:
@@ -91,7 +101,9 @@ def parse() -> None:
                 if office in HELD:
                     continue
                 if body[column].sum() != total[column].item():
-                    raise ValueError(f"{office} {candidate}: {body[column].sum()} against printed {total[column].item()}")
+                    raise ValueError(
+                        f"{office} {candidate}: {body[column].sum()} against printed {total[column].item()}"
+                    )
                 for name, votes in zip(body["county"], body[column], strict=True):
                     rows.append((office, candidate, party, codes[re.sub(r"[^a-z]", "", name.lower())], votes))
             start += len(candidates)

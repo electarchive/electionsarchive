@@ -57,7 +57,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for year, stage, registered in frame.select("year", "stage", "registered").iter_rows():
             found = [f for f in elections.get((year, stage), []) if (f[2] == 11 if stage == "general" else f[2] >= 6)]

@@ -24,7 +24,10 @@ FILES = {
     (date(2018, 11, 6), "general"): (UPLOADS + "2018GeneralReportStateCanvass.pdf", "20190101181853"),
     (date(2020, 6, 2), "primary"): (UPLOADS + "2020PrimaryReportStateCanvass.pdf", None),
     (date(2020, 11, 3), "general"): (UPLOADS + "State_Canvass_Report.pdf", None),
-    (date(2022, 11, 8), "general"): ("https://sosmt.gov/docs/769/results/49081/2022general-statecanvassreport", "20230104151335"),
+    (date(2022, 11, 8), "general"): (
+        "https://sosmt.gov/docs/769/results/49081/2022general-statecanvassreport",
+        "20230104151335",
+    ),
     (date(2024, 11, 5), "general"): (
         "https://sosmt.gov/docs/31/post-election/66775/2024-general-election-report-state-canvass",
         "20241203210537",
@@ -53,7 +56,9 @@ def fetch() -> None:
         if response.status_code != 200 and stamp is not None:
             response = httpx.get(f"https://web.archive.org/web/{stamp}id_/{url}", follow_redirects=True, timeout=90)
         response.raise_for_status()
-        raw.store(SOURCE, url, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        raw.store(
+            SOURCE, url, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+        )
 
 
 def parse() -> None:

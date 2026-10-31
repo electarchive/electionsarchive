@@ -65,7 +65,9 @@ def parse() -> None:
         }
     rows = []
     for contest, (day, kind, district, party) in CONTESTS.items():
-        table = list(csv.reader(io.StringIO(raw.cached(SOURCE, BASE.format(id=contest)).path.read_text(encoding="utf-8-sig"))))
+        table = list(
+            csv.reader(io.StringIO(raw.cached(SOURCE, BASE.format(id=contest)).path.read_text(encoding="utf-8-sig")))
+        )
         names = [" ".join(cell.split("\n")[0].split()).upper() for cell in table[0][1:-1]]
         for row in table[1:]:
             if not row:

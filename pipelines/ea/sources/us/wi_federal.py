@@ -20,15 +20,85 @@ FILES = [
     "County by County Report - 2022 Partisan Primary - Representative in Congress.xlsx",
 ]
 BROWSER = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/130 Safari/537.36"
-PARTIES = {"Democratic": "democratic", "Republican": "republican", "Libertarian": "libertarian", "Constitution": "constitution"}
-NAMES = (
-    "Adams Ashland Barron Bayfield Brown Buffalo Burnett Calumet Chippewa Clark Columbia Crawford Dane Dodge Door Douglas "
-    "Dunn Eau_Claire Florence Fond_du_Lac Forest Grant Green Green_Lake Iowa Iron Jackson Jefferson Juneau Kenosha "
-    "Kewaunee La_Crosse Lafayette Langlade Lincoln Manitowoc Marathon Marinette Marquette Milwaukee Monroe Oconto "
-    "Oneida Outagamie Ozaukee Pepin Pierce Polk Portage Price Racine Richland Rock Rusk Saint_Croix Sauk Sawyer "
-    "Shawano Sheboygan Taylor Trempealeau Vernon Vilas Walworth Washburn Washington Waukesha Waupaca Waushara "
-    "Winnebago Wood"
-).split()
+PARTIES = {
+    "Democratic": "democratic",
+    "Republican": "republican",
+    "Libertarian": "libertarian",
+    "Constitution": "constitution",
+}
+NAMES = [
+    "Adams",
+    "Ashland",
+    "Barron",
+    "Bayfield",
+    "Brown",
+    "Buffalo",
+    "Burnett",
+    "Calumet",
+    "Chippewa",
+    "Clark",
+    "Columbia",
+    "Crawford",
+    "Dane",
+    "Dodge",
+    "Door",
+    "Douglas",
+    "Dunn",
+    "Eau_Claire",
+    "Florence",
+    "Fond_du_Lac",
+    "Forest",
+    "Grant",
+    "Green",
+    "Green_Lake",
+    "Iowa",
+    "Iron",
+    "Jackson",
+    "Jefferson",
+    "Juneau",
+    "Kenosha",
+    "Kewaunee",
+    "La_Crosse",
+    "Lafayette",
+    "Langlade",
+    "Lincoln",
+    "Manitowoc",
+    "Marathon",
+    "Marinette",
+    "Marquette",
+    "Milwaukee",
+    "Monroe",
+    "Oconto",
+    "Oneida",
+    "Outagamie",
+    "Ozaukee",
+    "Pepin",
+    "Pierce",
+    "Polk",
+    "Portage",
+    "Price",
+    "Racine",
+    "Richland",
+    "Rock",
+    "Rusk",
+    "Saint_Croix",
+    "Sauk",
+    "Sawyer",
+    "Shawano",
+    "Sheboygan",
+    "Taylor",
+    "Trempealeau",
+    "Vernon",
+    "Vilas",
+    "Walworth",
+    "Washburn",
+    "Washington",
+    "Waukesha",
+    "Waupaca",
+    "Waushara",
+    "Winnebago",
+    "Wood",
+]
 CODES = {name.replace("_", " ").upper(): f"55{2 * i + 1:03}" for i, name in enumerate(NAMES)}
 CODES["MENOMINEE"] = "55078"
 CODES["ST. CROIX"] = CODES.pop("SAINT CROIX")
@@ -42,9 +112,7 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            body = subprocess.run(
-                ["curl", "-sfL", "-A", BROWSER, url], capture_output=True, check=True
-            ).stdout
+            body = subprocess.run(["curl", "-sfL", "-A", BROWSER, url], capture_output=True, check=True).stdout
             raw.store(
                 SOURCE,
                 url,

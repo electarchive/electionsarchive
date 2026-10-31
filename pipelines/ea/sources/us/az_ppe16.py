@@ -58,11 +58,22 @@ def parse() -> None:
         found: list[tuple[str, str, int]] = []
         if name in GEMS:
             for row in csv.reader(lines):
-                if len(row) >= 7 and re.search(r"pres", row[3], re.IGNORECASE) and int(row[4]) < 999990 and row[0] != "999999":
+                if (
+                    len(row) >= 7
+                    and re.search(r"pres", row[3], re.IGNORECASE)
+                    and int(row[4]) < 999990
+                    and row[0] != "999999"
+                ):
                     found.append((row[3], row[5], int(row[6])))
         elif name == "Maricopa":
             for row in csv.reader(lines, delimiter="\t"):
-                if len(row) > 9 and re.search(r"pres", row[8], re.IGNORECASE) and row[1] and row[4] != "-2" and row[9].isdigit():
+                if (
+                    len(row) > 9
+                    and re.search(r"pres", row[8], re.IGNORECASE)
+                    and row[1]
+                    and row[4] != "-2"
+                    and row[9].isdigit()
+                ):
                     found.append((row[8], row[1], int(row[9])))
         elif name == "Yavapai":
             for row in csv.reader(lines):
@@ -72,7 +83,11 @@ def parse() -> None:
             unity = name == "Graham"
             for line in lines:
                 contest = line[57:113] if unity else line[111:167]
-                if len(line) > 205 - 55 * unity and re.search(r"pres", contest, re.IGNORECASE) and "BALLOTS" not in contest:
+                if (
+                    len(line) > 205 - 55 * unity
+                    and re.search(r"pres", contest, re.IGNORECASE)
+                    and "BALLOTS" not in contest
+                ):
                     party = contest if unity else line[101:104] + contest
                     choice = line[113:151] if unity else line[167:205]
                     found.append((party, choice.strip(), int(line[11:17])))

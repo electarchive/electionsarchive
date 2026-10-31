@@ -50,7 +50,9 @@ CLASSES = (
     ("superintendent|public instruction", "superintendent"),
 )
 NAME = re.compile(r"\[\[([^\]|#]+)(?:\|[^\]]*)?\]\]")
-SKIP = re.compile(r"Party|^\d|election|Republican|Democrat|Whig|Federalist|Independent|^List |^File:|^Image:|Union|Medal|Award|Merit|Order of|Seal|Constitution|Legislature|University|College|^State of|Governor of|Lieutenant Governor of")
+SKIP = re.compile(
+    r"Party|^\d|election|Republican|Democrat|Whig|Federalist|Independent|^List |^File:|^Image:|Union|Medal|Award|Merit|Order of|Seal|Constitution|Legislature|University|College|^State of|Governor of|Lieutenant Governor of"
+)
 YEARS = re.compile(r"(\d{4})\s*(?:[–—-]|&ndash;|&mdash;|\bto\b)\s*(\d{4}|present|incumbent)?", re.IGNORECASE)
 NOTES = (
     "Terms of statewide executive offices (lieutenant governor, attorney general, secretary of state, treasurer, "
@@ -481,7 +483,15 @@ def emit() -> Path:
                 [retired],
             )
             for row in cursor.fetchall():
-                cs.add("tenure", **dict(zip([d.name for d in cursor.description], row, strict=True)), succeeds_tenure_id=None)
+                cs.add(
+                    "tenure",
+                    **dict(zip([d.name for d in cursor.description], row, strict=True)),
+                    succeeds_tenure_id=None,
+                )
         for entity in retired:
-            cs.add("entity_retirement", entity_id=entity, reason="Linked from an officeholder table but not a human in Wikidata")
+            cs.add(
+                "entity_retirement",
+                entity_id=entity,
+                reason="Linked from an officeholder table but not a human in Wikidata",
+            )
         return cs.write()

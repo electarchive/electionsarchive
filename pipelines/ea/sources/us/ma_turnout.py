@@ -29,7 +29,7 @@ def fetch() -> None:
 
 def parse() -> None:
     text = raw.cached(SOURCE, URL).path.read_text(errors="replace")
-    text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.S)
+    text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.DOTALL)
     text = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text)))
     rows = []
     cuts = [text.index(header) for header, _ in SECTIONS]
@@ -75,7 +75,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LIVE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=LIVE,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for year, stage, registered, voters in frame.select("year", "stage", "registered", "voters").iter_rows():
             found = elections.get((year, "general" if stage == "general" else "primary"), [])

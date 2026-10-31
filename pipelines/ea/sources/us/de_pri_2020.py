@@ -17,7 +17,11 @@ URL = "https://elections.delaware.gov/reports/PR2020.html"
 DAY = date(2020, 9, 15)
 PUBLISHER = "Delaware Department of Elections"
 TITLE = "2020 primary election results"
-CONTESTS = {("U.S. Senator", "Democratic"): ("senate:democratic", None), ("U.S. Senator", "Republican"): ("senate:republican", None), ("Representative in Congress", "Republican"): ("house:republican", 0)}
+CONTESTS = {
+    ("U.S. Senator", "Democratic"): ("senate:democratic", None),
+    ("U.S. Senator", "Republican"): ("senate:republican", None),
+    ("Representative in Congress", "Republican"): ("house:republican", 0),
+}
 
 
 def fetch() -> None:
@@ -37,28 +41,49 @@ def parse() -> None:
         }
     rows = []
     contest = party = None
-    for tag, body in re.findall(r"<(h3|h4|table)[^>]*>(.*?)</\1>", text, re.S):
+    for tag, body in re.findall(r"<(h3|h4|table)[^>]*>(.*?)</\1>", text, re.DOTALL):
         if tag == "h3":
             contest = html.unescape(body).strip()
         elif tag == "h4":
             party = html.unescape(body).strip()
         elif (contest, party) in CONTESTS:
             lines = [
-                [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip() for cell in re.findall(r"<t[hd].*?</t[hd]>", line, re.S)]
-                for line in re.findall(r"<tr.*?</tr>", body, re.S)
+                [
+                    re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+                    for cell in re.findall(r"<t[hd].*?</t[hd]>", line, re.DOTALL)
+                ]
+                for line in re.findall(r"<tr.*?</tr>", body, re.DOTALL)
             ]
             names = lines[0][2:-2]
             for candidate, _, *votes, _, _ in lines[1:]:
                 for name, value in zip(names, votes, strict=True):
-                    rows.append((*CONTESTS[(contest, party)], counties[name.lower()], candidate.title(), int(value.replace(",", ""))))
+                    rows.append(
+                        (
+                            *CONTESTS[(contest, party)],
+                            counties[name.lower()],
+                            candidate.title(),
+                            int(value.replace(",", "")),
+                        )
+                    )
     frame = pl.DataFrame(
         rows,
-        schema={"chamber": pl.String, "district": pl.Int16, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+        schema={
+            "chamber": pl.String,
+            "district": pl.Int16,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
         orient="row",
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("chamber", "candidate").agg(pl.col("code").n_unique(), pl.col("votes").sum()).sort("chamber", "candidate").rows())
+    print(
+        frame.group_by("chamber", "candidate")
+        .agg(pl.col("code").n_unique(), pl.col("votes").sum())
+        .sort("chamber", "candidate")
+        .rows()
+    )
 
 
 def emit() -> Path:

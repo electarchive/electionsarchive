@@ -29,7 +29,9 @@ def emit() -> Path:
         )
         sets = {
             vintage: id
-            for id, vintage in conn.execute("select id, vintage from boundary_set where scheme_code = 'ie.dail'").fetchall()
+            for id, vintage in conn.execute(
+                "select id, vintage from boundary_set where scheme_code = 'ie.dail'"
+            ).fetchall()
         }
         conn.execute("create temp table side (plan text, id uuid, k int, label text, geom geometry) on commit drop")
         for vintage in VINTAGES:
@@ -87,7 +89,9 @@ def emit() -> Path:
             linked = overlaps.filter((pl.col("of_from") >= LINKED) | (pl.col("of_to") >= LINKED))
             day = signed[later]
             for target in linked.select("to_id", "to_label").unique().sort("to_label").iter_rows(named=True):
-                parts = linked.filter((pl.col("to_id") == target["to_id"]) & (pl.col("of_to") >= LINKED)).sort("of_to", descending=True)
+                parts = linked.filter((pl.col("to_id") == target["to_id"]) & (pl.col("of_to") >= LINKED)).sort(
+                    "of_to", descending=True
+                )
                 if parts.is_empty():
                     continue
                 whole = parts.row(0, named=True)
@@ -120,12 +124,12 @@ def emit() -> Path:
                 for r in parts.iter_rows(named=True):
                     cs.add("area_event_member", event_id=event, area_id=UUID(r["from_id"]), role="from")
                 cs.add("area_event_member", event_id=event, area_id=UUID(target["to_id"]), role="to")
-            for gone in (
-                linked.select("from_id", "from_label").unique().sort("from_label").iter_rows(named=True)
-            ):
+            for gone in linked.select("from_id", "from_label").unique().sort("from_label").iter_rows(named=True):
                 if linked.filter((pl.col("from_id") == gone["from_id"]) & (pl.col("of_from") >= LINKED)).is_empty():
                     continue
-                heirs = linked.filter((pl.col("from_id") == gone["from_id"]) & (pl.col("of_from") >= LINKED)).sort("of_from", descending=True)
+                heirs = linked.filter((pl.col("from_id") == gone["from_id"]) & (pl.col("of_from") >= LINKED)).sort(
+                    "of_from", descending=True
+                )
                 if heirs.height < 2 or heirs.row(1, named=True)["of_from"] < MAJOR:
                     continue
                 event = uuid5(NAMESPACE, f"area_event\x1f{SOURCE}\x1f{later}\x1fsplit\x1f{gone['from_id']}")

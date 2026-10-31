@@ -85,7 +85,9 @@ def lines() -> list[dict[str, object]]:
                     judge = " ".join(buffer)
                     state = "rows"
                 else:
-                    buffer.append(halve(head) if re.search(r"\s{2,}", stripped) or halve(stripped) != stripped else stripped)
+                    buffer.append(
+                        halve(head) if re.search(r"\s{2,}", stripped) or halve(stripped) != stripped else stripped
+                    )
                 continue
             if state == "rows":
                 match = ROW.match(stripped)
@@ -159,7 +161,14 @@ def emit() -> Path:
         office = cs.key("us.office", office_key)
         if office in cs.minted:
             cs.add("office", id=office, polity_id=cs.polity("US-MO"), kind="other")
-            cs.add("name", entity_id=office, text=f"{TITLE_OFFICE} of Missouri", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=office,
+                text=f"{TITLE_OFFICE} of Missouri",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
         groups: dict[tuple[date, str], list[dict[str, object]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["judge"]))].append(row)

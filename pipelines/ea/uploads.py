@@ -268,7 +268,7 @@ def process() -> bool:
             _ready(conn, id, sha256, inbox)
         except Rejected as error:
             _reject(conn, id, str(error))
-        except Exception as error:  # noqa: BLE001 - a broken upload is rejected and the worker carries on
+        except Exception as error:
             _reject(conn, id, f"the upload could not be processed ({type(error).__name__})")
         finally:
             inbox.unlink(missing_ok=True)

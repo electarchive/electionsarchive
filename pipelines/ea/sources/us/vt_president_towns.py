@@ -3,7 +3,6 @@ import re
 import zipfile
 from datetime import date
 from pathlib import Path
-from uuid import UUID
 
 import polars as pl
 
@@ -44,9 +43,9 @@ def emit() -> Path:
             pl.col("division_type") == "City/Town",
         )
         .with_columns(
-            code=pl.col("division_name").map_elements(elstats.plain, return_dtype=pl.String).replace_strict(
-                towns, default=None
-            ),
+            code=pl.col("division_name")
+            .map_elements(elstats.plain, return_dtype=pl.String)
+            .replace_strict(towns, default=None),
             candidate=pl.col("candidate_name").fill_null("").str.to_uppercase().str.strip_chars(),
             votes=pl.col("votes").cast(pl.Int64, strict=False),
         )

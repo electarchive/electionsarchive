@@ -24,7 +24,17 @@ PAGES = {
 }
 PRINTED = {1994: [530, 531, 532], 1998: [561, 562, 563]}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3)}
-PRINTED_SUMS = {("1910-11-08", "7"): [22433, 21951, 382, 936], ("1918-11-05", "15"): [17826, 19133, 557], ("1918-11-05", "10"): [30080, 50400, 2981, 289], ("1918-11-05", "1"): [17184, 14255, 272, 1], ("1972-11-07", "3"): [124365, 53523, 465], ("1934-11-06", "3"): [61548, 39953, 91], ("1938-11-08", "2"): [51451, 37294, 49], ("1938-11-08", "6"): [52774, 52159, 12], ("1928-11-06", "8"): [26619, 32877]}
+PRINTED_SUMS = {
+    ("1910-11-08", "7"): [22433, 21951, 382, 936],
+    ("1918-11-05", "15"): [17826, 19133, 557],
+    ("1918-11-05", "10"): [30080, 50400, 2981, 289],
+    ("1918-11-05", "1"): [17184, 14255, 272, 1],
+    ("1972-11-07", "3"): [124365, 53523, 465],
+    ("1934-11-06", "3"): [61548, 39953, 91],
+    ("1938-11-08", "2"): [51451, 37294, 49],
+    ("1938-11-08", "6"): [52774, 52159, 12],
+    ("1928-11-06", "8"): [26619, 32877],
+}
 PAGE_FIXES = {(62628, "868"): "888"}
 TOTALS = {(1998, 7): [43416, 129746, 5639]}
 EARLY = [
@@ -54,7 +64,7 @@ NOTES = {
     "1938-11-08:MO:house:6": " The Manual prints 11 as the Socialist-Labor total, but its county rows (checked against the page image) sum to 12.",
     "1934-11-06:MO:house:3": " The Manual prints 84 as the Socialist total, but its county rows (checked against the page image) sum to 91.",
     "1972-11-07:MO:house:3": " The Manual prints 54,523 as the Republican total, which the FEC also reports, but its two printed parts (30,034 in the city and 23,489 in the county) sum to 53,523.",
-    "1992-11-03:MO:house:8": " The county rows fall short of the printed district total by 270 Republican votes; every cell was checked against the page image."
+    "1992-11-03:MO:house:8": " The county rows fall short of the printed district total by 270 Republican votes; every cell was checked against the page image.",
 }
 
 
@@ -85,13 +95,7 @@ def read_page(year: int, pointer: int) -> list[str]:
     lines = []
     for index, line in enumerate(text.splitlines()):
         line = line.strip()
-        if (
-            not line
-            or "MANUAL" in line
-            or "GENERAL ELECTION" in line
-            or line.startswith("U.S. Congress")
-            or line.startswith("November")
-        ):
+        if not line or "MANUAL" in line or "GENERAL ELECTION" in line or line.startswith(("U.S. Congress", "November")):
             continue
         if line.isdigit() and int(line) in PRINTED[year] and index < 4:
             continue
@@ -212,5 +216,10 @@ def emit() -> Path:
             for pointer in pointers
         ],
         lambda key: METHOD + NOTES.get(key, ""),
-        promote=frozenset({"1948-11-02:MO:house:3", *(f"1912-11-05:MO:house:{district}" for district in (1, 3, 4, 6, 7, 8, 9, 10, 13, 14, 15))}),
+        promote=frozenset(
+            {
+                "1948-11-02:MO:house:3",
+                *(f"1912-11-05:MO:house:{district}" for district in (1, 3, 4, 6, 7, 8, 9, 10, 13, 14, 15)),
+            }
+        ),
     )

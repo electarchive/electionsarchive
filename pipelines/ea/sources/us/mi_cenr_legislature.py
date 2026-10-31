@@ -38,7 +38,9 @@ def parse() -> None:
             raw.cached(SOURCE, FILE.format(name)).path, separator="\t", infer_schema=False, quote_char=None
         )
         primary = name.endswith("PRI")
-        seat = pl.col("OfficeDescription").str.extract(r"^(\d+)\w\w District (Representative in State Legislature|State Senator)", 1)
+        seat = pl.col("OfficeDescription").str.extract(
+            r"^(\d+)\w\w District (Representative in State Legislature|State Senator)", 1
+        )
         frames.append(
             frame.filter(
                 pl.col("OfficeCode(Text)").is_in(["07", "08"]),
@@ -50,7 +52,9 @@ def parse() -> None:
                     pl.when(pl.col("OfficeCode(Text)") == "08").then(pl.lit("house")).otherwise(pl.lit("senate")),
                     seat,
                     pl.when(primary)
-                    .then(pl.when(pl.col("PartyDescription") == "Democratic").then(pl.lit("dp")).otherwise(pl.lit("rp")))
+                    .then(
+                        pl.when(pl.col("PartyDescription") == "Democratic").then(pl.lit("dp")).otherwise(pl.lit("rp"))
+                    )
                     .otherwise(pl.lit("g")),
                     separator=":",
                 ),
@@ -66,8 +70,7 @@ def parse() -> None:
                 .replace_strict(counties, default=None),
                 candidate=pl.concat_str(
                     pl.col("CandidateFirstName"), pl.col("CandidateLastName"), separator=" ", ignore_nulls=True
-                )
-                .str.strip_chars(),
+                ).str.strip_chars(),
                 writein=pl.col("WriteIn(W)/Uncommitted(Z)").fill_null("") == "W",
                 votes=pl.col("CandidateVotes").cast(pl.Int64),
             )

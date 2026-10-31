@@ -17,7 +17,9 @@ def parse() -> None:
     for year in hi_statewide.DAYS:
         for county, code in hi_county.COUNTIES.items():
             found = 0
-            for _, entries in hi_county.blocks(raw.cached(hi_county.SOURCE, hi_county.BASE.format(year=year, county=county)).path):
+            for _, entries in hi_county.blocks(
+                raw.cached(hi_county.SOURCE, hi_county.BASE.format(year=year, county=county)).path
+            ):
                 votes = {name.upper(): count for name, count in entries if name.upper() in ("YES", "NO")}
                 if len(votes) == 2:
                     rows.extend((year, found, code, answer, count) for answer, count in votes.items())
@@ -62,14 +64,21 @@ def emit() -> Path:
         }
         taken: set[object] = set()
         for year, position in frame.select("year", "position").unique().sort("year", "position").iter_rows():
-            sums = {a: v for a, v in totals.filter((pl.col("year") == year) & (pl.col("position") == position)).select("answer", "votes").iter_rows()}
+            sums = {
+                a: v
+                for a, v in totals.filter((pl.col("year") == year) & (pl.col("position") == position))
+                .select("answer", "votes")
+                .iter_rows()
+            }
             match = held.get((year, sums["YES"], sums["NO"]))
             if match is None or match[0] in taken:
                 continue
             contest, election, _ = match
             taken.add(contest)
             options = dict(
-                conn.execute("select upper(ballot_label), id from contest_option where contest_id = %s", [contest]).fetchall()
+                conn.execute(
+                    "select upper(ballot_label), id from contest_option where contest_id = %s", [contest]
+                ).fetchall()
             )
             result_set = cs.key(f"{SOURCE}.result_set", f"{contest}:county")
             cs.add(
@@ -84,7 +93,11 @@ def emit() -> Path:
                 is_default=False,
                 completeness=1.0,
             )
-            for county, answer, votes in frame.filter((pl.col("year") == year) & (pl.col("position") == position)).select("county", "answer", "votes").iter_rows():
+            for county, answer, votes in (
+                frame.filter((pl.col("year") == year) & (pl.col("position") == position))
+                .select("county", "answer", "votes")
+                .iter_rows()
+            ):
                 cs.add(
                     "result_value",
                     result_set_id=result_set,

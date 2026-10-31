@@ -54,7 +54,7 @@ def fetch() -> None:
             parts = urlsplit(signed)
             if not parts.path.endswith((".json", "_report_official.pdf")):
                 continue
-            stable = f"{parts.scheme}://{parts.netloc}{quote(parts.path, safe="/%")}"
+            stable = f"{parts.scheme}://{parts.netloc}{quote(parts.path, safe='/%')}"
             response = httpx.get(f"{stable}?{parts.query}", timeout=120)
             response.raise_for_status()
             raw.store(

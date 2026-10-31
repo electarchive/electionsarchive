@@ -88,7 +88,10 @@ def emit() -> Path:
                join name n on n.entity_id = x.entity_id and n.is_preferred
                where x.scheme = 'us.contest' and x.value like '%%:WA:question:%%'"""
         ):
-            if "Advisory" not in name and (found := re.search(r"Initiative (?:Measure )?(?:No\. )?(\d+)", name)) is not None:
+            if (
+                "Advisory" not in name
+                and (found := re.search(r"Initiative (?:Measure )?(?:No\. )?(\d+)", name)) is not None
+            ):
                 contests.setdefault(int(found[1]), []).append((date.fromisoformat(key[:10]), entity))
         placed = 0
         for year, kind, number, title, summary in wording.iter_rows():

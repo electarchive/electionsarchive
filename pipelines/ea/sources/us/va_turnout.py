@@ -27,7 +27,13 @@ def parse() -> None:
     flat = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text)))
     rows = []
     for match in re.finditer(r"\b((?:19|20)\d\d)\*?\| ([\d,]+)\| [^|]*\| ([\d,]+)\|", flat):
-        rows.append({"year": int(match[1]), "registered": int(match[2].replace(",", "")), "voters": int(match[3].replace(",", ""))})
+        rows.append(
+            {
+                "year": int(match[1]),
+                "registered": int(match[2].replace(",", "")),
+                "voters": int(match[3].replace(",", "")),
+            }
+        )
     frame = pl.DataFrame(rows).unique("year").sort("year")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
@@ -59,7 +65,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for year, registered, voters in frame.select("year", "registered", "voters").iter_rows():
             found = elections.get(year, [])

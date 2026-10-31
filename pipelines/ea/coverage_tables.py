@@ -1943,6 +1943,7 @@ def build(full: bool = False) -> str:
                 and not g["id"].startswith("polity:")
                 and 2000 <= year <= today.year
                 and due is not None
+                and due[1] is not None
                 and (year - due[1]) % due[0] == 0
                 and (year < today.year or (g["month"] is not None and g["month"] < today.month))
             )

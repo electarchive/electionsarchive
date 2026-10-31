@@ -16,8 +16,14 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Maryland State Board of Elections"
 BASE = "https://elections.maryland.gov/press_room/"
 ELECTIONS = {
-    date(2022, 7, 19): ("2022_stats/Official_CountyAndCanvass.pdf", "2022_stats/Eligible%20Active%20Voters%20by%20County%20-%20GP22.pdf"),
-    date(2024, 5, 14): ("2024_stats/Official_CountyAndCanvass.pdf", "2024_stats/Eligible%20Active%20Voters%20by%20County%20-%20PP24.pdf"),
+    date(2022, 7, 19): (
+        "2022_stats/Official_CountyAndCanvass.pdf",
+        "2022_stats/Eligible%20Active%20Voters%20by%20County%20-%20GP22.pdf",
+    ),
+    date(2024, 5, 14): (
+        "2024_stats/Official_CountyAndCanvass.pdf",
+        "2024_stats/Eligible%20Active%20Voters%20by%20County%20-%20PP24.pdf",
+    ),
 }
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
@@ -40,11 +46,23 @@ def fetch() -> None:
                 pass
             response = httpx.get(BASE + path, headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=120)
             response.raise_for_status()
-            raw.store(SOURCE, BASE + path, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+            raw.store(
+                SOURCE,
+                BASE + path,
+                response.content,
+                suffix=".pdf",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf",
+            )
 
 
 def table(path: str, codes: dict[str, str]) -> dict[str, int]:
-    text = subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"], capture_output=True, text=True, check=True).stdout
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
     out = {}
     for line in text.split("\n"):
         match = re.match(r"^([A-Za-z.' ]+?)\s{2,}(.*\d)\s*$", line)
@@ -98,7 +116,15 @@ def emit() -> Path:
         title = "Voter Turnout and Eligible Active Voters"
         source = cs.source(PUBLISHER, title)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=BASE + "index.html", license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=BASE + "index.html",
+                license="Public record",
+            )
         for paths in ELECTIONS.values():
             for path in paths:
                 cs.artifact(raw.cached(SOURCE, BASE + path), source)

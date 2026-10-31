@@ -128,10 +128,10 @@ def parse() -> None:
         text = raw.cached(SOURCE, SITE + path).path.read_text(encoding="utf-8", errors="replace")
         found: dict[str, list[int]] = {}
         printed: list[int] | None = None
-        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, flags=re.S):
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, flags=re.DOTALL):
             cells = [
                 re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
-                for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S)
+                for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.DOTALL)
             ]
             if not cells:
                 continue
@@ -198,7 +198,12 @@ def emit() -> Path:
             title = TITLE.format(year=year)
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=LANDING,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=LANDING,
                 license=LICENSE,
             )
         for day, path, _, _ in PAGES:
@@ -214,7 +219,9 @@ def emit() -> Path:
                 "select u.code, u.id from reporting_unit u where u.scheme_code = 'us.county' and u.code like '39%%'"
             ).fetchall()
         )
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -321,5 +328,11 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

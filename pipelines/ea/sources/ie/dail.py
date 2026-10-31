@@ -1,4 +1,5 @@
 import io
+import itertools
 import json
 import re
 import unicodedata
@@ -193,7 +194,11 @@ PARTY_OVERRIDES = {
 }
 STATUTORY = {(2020, "Kildare South"): 4}
 CEANN_COMHAIRLE = {(2002, "Carlow-Kilkenny"): 5, (2007, "Cavan-Monaghan"): 5, (2011, "Louth"): 5}
-AUTOMATIC = {(2002, "Carlow-Kilkenny"): "Seamus Pattison", (2007, "Cavan-Monaghan"): "Rory O'Hanlon", (2011, "Louth"): "Seamus Kirk"}
+AUTOMATIC = {
+    (2002, "Carlow-Kilkenny"): "Seamus Pattison",
+    (2007, "Cavan-Monaghan"): "Rory O'Hanlon",
+    (2011, "Louth"): "Seamus Kirk",
+}
 HYPHENS = {
     "Laois Offaly": "Laois-Offaly",
     "Roscommon - Galway": "Roscommon-Galway",
@@ -295,7 +300,7 @@ def fetch() -> None:
 
 
 def number(cell: object) -> int:
-    return int(round(float(str(cell).replace(",", ""))))
+    return round(float(str(cell).replace(",", "")))
 
 
 def parse() -> None:
@@ -495,7 +500,7 @@ def parse() -> None:
         if first != u["valid"]:
             raise ValueError(f"{u['year']} {u['constituency']}: first preferences {first} != valid poll {u['valid']}")
         rest = [u["valid"] - s for s in sums["total"].to_list()]
-        if any(b < a or a < 0 for a, b in zip(rest, rest[1:])) or rest[0] != 0:
+        if any(b < a or a < 0 for a, b in itertools.pairwise(rest)) or rest[0] != 0:
             raise ValueError(f"{u['year']} {u['constituency']}: non-transferable papers {rest} are not cumulative")
         for row in printed:
             if (

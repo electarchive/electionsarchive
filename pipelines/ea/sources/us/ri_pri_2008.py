@@ -1,4 +1,3 @@
-import io
 import zipfile
 from datetime import date
 from pathlib import Path

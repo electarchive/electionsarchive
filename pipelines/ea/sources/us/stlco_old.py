@@ -50,7 +50,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             path = raw.cached(SOURCE, _url(code)).path
         except Exception:
             continue
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True).stdout.decode(
+        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=False).stdout.decode(
             errors="replace"
         )
         head = text[:1500]

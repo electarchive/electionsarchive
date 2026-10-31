@@ -57,9 +57,10 @@ def parse_2010(lines: list[str]) -> list[tuple]:
                 header.append(follow)
             elif m := re.match(r"^\s*County Total\s+([\d\s]+)$", follow):
                 subtotals[county] = [int(x) for x in m[1].split()]
-            elif m := re.match(r"^\s*([A-Za-z][A-Za-z .]+?)\s{2,}([\d\s]+)$", follow):
-                if m[1].strip().lower() in TOWNS:
-                    towns.setdefault(county, {})[m[1].strip().lower()] = [int(x) for x in m[2].split()]
+            elif (m := re.match(r"^\s*([A-Za-z][A-Za-z .]+?)\s{2,}([\d\s]+)$", follow)) and m[
+                1
+            ].strip().lower() in TOWNS:
+                towns.setdefault(county, {})[m[1].strip().lower()] = [int(x) for x in m[2].split()]
         label = [h for h in header if h.strip()]
         position = next(i for i, h in enumerate(label) if "MUNICIPALITY" in h)
         surnames_line = label[position].replace("MUNICIPALITY", "")
@@ -189,9 +190,12 @@ def parse() -> None:
             span = next(i for i, l in enumerate(lines) if i > 200 and "VOTE TOTALS FOR PRESIDENTIAL CANDIDATES" in l)
             end = next(i for i, l in enumerate(lines) if i > span and "RHODE ISLAND STATEWIDE PRIMARY" in l)
             columns = (
-                [("democratic", n) for n in "KERRY EDWARDS DEAN KUCINICH LIEBERMAN CLARK UNCOMMIT LAROUCHE".split()]
-                + [("republican", n) for n in "BUSH UNCOMMIT".split()]
-                + [("green", n) for n in "COBB MESPLAY UNCOMMIT".split()]
+                [
+                    ("democratic", n)
+                    for n in ["KERRY", "EDWARDS", "DEAN", "KUCINICH", "LIEBERMAN", "CLARK", "UNCOMMIT", "LAROUCHE"]
+                ]
+                + [("republican", n) for n in ["BUSH", "UNCOMMIT"]]
+                + [("green", n) for n in ["COBB", "MESPLAY", "UNCOMMIT"]]
             )
             tally: dict[tuple[str, str, str], int] = {}
             district_totals = [0] * len(columns)

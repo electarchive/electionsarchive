@@ -63,7 +63,9 @@ def read(day: date) -> pl.DataFrame:
         quote_char='"',
         truncate_ragged_lines=True,
     )
-    return frame.rename({column: COLUMNS.get(column.strip().lower(), column.strip().lower()) for column in frame.columns})
+    return frame.rename(
+        {column: COLUMNS.get(column.strip().lower(), column.strip().lower()) for column in frame.columns}
+    )
 
 
 def parse() -> None:

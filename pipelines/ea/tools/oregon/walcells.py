@@ -1,6 +1,10 @@
+import csv
 import os
-import csv, subprocess, re, sys
+import re
+import subprocess
+import sys
 from pathlib import Path
+
 from PIL import Image
 
 S = Path(os.environ["OR_WORK"])
@@ -32,12 +36,13 @@ def rd(p, box):
         path = S / "img/cells" / f"{c}-{p}-{x0}-{y0}-v{vi}.png"
         path.parent.mkdir(exist_ok=True)
         img.save(path)
-        subprocess.run([str(S / "vision/vision"), str(path)], capture_output=True)
+        subprocess.run([str(S / "vision/vision"), str(path)], capture_output=True, check=False)
         v = Path(str(path) + ".vision.tsv").read_text().split("\t")[0].strip()
         t = subprocess.run(
             ["tesseract", str(path), "-", "--psm", "7", "-c", "tessedit_char_whitelist=0123456789,"],
             capture_output=True,
             text=True,
+            check=False,
         ).stdout.strip()
         got |= {re.sub(r"[^\d]", "", v), re.sub(r"[^\d]", "", t)}
     return got
@@ -78,10 +83,10 @@ for p, rs in pm.items():
     offs = {h[0] - j for j, h in enumerate(idx) if len(h) == 1}
     part = [[i for i, (bx, rv) in enumerate(blocks) if r[3] in rv["YES"] or r[4] in rv["NO"]] for r in rs]
     offs |= {h[0] - j for j, h in enumerate(part) if len(h) == 1 and not idx[j]}
-    ok = len(offs) == 1 and all(0 <= list(offs)[0] + j < len(blocks) for j in range(len(rs)))
+    ok = len(offs) == 1 and all(0 <= next(iter(offs)) + j < len(blocks) for j in range(len(rs)))
     print(p, len(tot), idx, part, offs, "OK" if ok else "FAIL")
     if ok:
-        o = list(offs)[0]
+        o = next(iter(offs))
         for j, r in enumerate(rs):
             for k in ("YES", "NO"):
                 out.append((p, r[1], r[2], k, *blocks[o + j][0][k]))

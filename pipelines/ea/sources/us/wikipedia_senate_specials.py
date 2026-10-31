@@ -27,22 +27,54 @@ CONTESTS = [
     (date(1941, 9, 23), "MS", 2, 1941, "Mississippi", "1941 U.S. Senate special election in Mississippi", False),
     (date(1941, 11, 5), "SC", 3, 1941, "South Carolina", "1941 U.S. Senate special election in South Carolina", False),
     (date(1949, 11, 8), "NY", 3, 1949, "New York", "1949 U.S. Senate special election in New York", False),
-    (date(1946, 6, 25), "ND", 3, 1946, "North Dakota", "1946 United States Senate special election in North Dakota", False),
+    (
+        date(1946, 6, 25),
+        "ND",
+        3,
+        1946,
+        "North Dakota",
+        "1946 United States Senate special election in North Dakota",
+        False,
+    ),
     (date(1936, 11, 3), "MN", 2, 1936, "Minnesota", "Special election results", False),
     (date(1957, 4, 2), "TX", 2, 1957, "Texas", "1957 U.S. Senate special election", False),
     (date(1957, 8, 27), "WI", 1, 1957, "Wisconsin", "1957 United States Senate special election in Wisconsin", False),
-    (date(1960, 6, 28), "ND", 1, 1960, "North Dakota", "1960 United States Senate special election, North Dakota", False),
+    (
+        date(1960, 6, 28),
+        "ND",
+        1,
+        1960,
+        "North Dakota",
+        "1960 United States Senate special election, North Dakota",
+        False,
+    ),
     (date(1961, 4, 4), "TX", 2, 1961, "Texas", "1961 U.S. Senate special election primary", False),
     (date(1961, 5, 27), "TX", 2, 1961, "Texas", "1961 U.S. Senate special election", True),
     (date(1972, 1, 7), "VT", 1, 1972, "Vermont", "United States Senate special election in Vermont, 1972", False),
-    (date(1975, 9, 16), "NH", 3, 1975, "New Hampshire", "1975 United States senate Special election in New Hampshire", False),
+    (
+        date(1975, 9, 16),
+        "NH",
+        3,
+        1975,
+        "New Hampshire",
+        "1975 United States senate Special election in New Hampshire",
+        False,
+    ),
     (date(1983, 11, 8), "WA", 1, 1983, "Washington", "1983 United States Senate special election in Washington", False),
     (date(1991, 11, 5), "PA", 1, 1991, "Pennsylvania", "1991 U.S. Senate election in Pennsylvania", False),
     (date(1992, 12, 4), "ND", 1, 1992, "North Dakota", "General election results", False),
     (date(1996, 1, 30), "OR", 3, 1996, "Oregon", "General election results", False),
     (date(2010, 1, 19), "MA", 1, 2010, "Massachusetts", "2010 Massachusetts U.S. Senate special election", False),
     (date(2013, 6, 25), "MA", 2, 2013, "Massachusetts", "2013 U.S. Senate special election in Massachusetts", False),
-    (date(2013, 10, 16), "NJ", 2, 2013, "New Jersey", "United States Senate special election in New Jersey, 2013", False),
+    (
+        date(2013, 10, 16),
+        "NJ",
+        2,
+        2013,
+        "New Jersey",
+        "United States Senate special election in New Jersey, 2013",
+        False,
+    ),
     (date(2017, 12, 12), "AL", 2, 2017, "Alabama", "2017 United States Senate special election in Alabama", False),
 ]
 PARTIES = {
@@ -107,7 +139,12 @@ def parse() -> None:
                 name, fields = fields_of(member)
                 if "candidate" in name or "write-in" in name:
                     candidate = plain(fields.get("candidate", ""))
-                    if "write-in" in name or candidate.lower().startswith("write-in") or candidate == "" and "write" in fields.get("party", "").lower():
+                    if (
+                        "write-in" in name
+                        or candidate.lower().startswith("write-in")
+                        or candidate == ""
+                        and "write" in fields.get("party", "").lower()
+                    ):
                         candidate = "Write-ins"
                     elif candidate == "":
                         candidate = "Scattering"
@@ -199,7 +236,10 @@ def emit() -> Path:
                     date_precision="day",
                     status="held",
                 )
-                name(election, f"{day:%B} {day.day}, {day.year} {label} {'special runoff' if runoff else 'special'} election")
+                name(
+                    election,
+                    f"{day:%B} {day.day}, {day.year} {label} {'special runoff' if runoff else 'special'} election",
+                )
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=election)
             seat = cs.key("us.seat", f"senate:{state}:{seat_class}")
             if seat in cs.minted:

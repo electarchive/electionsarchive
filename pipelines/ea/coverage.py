@@ -4,6 +4,7 @@ import time
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
+from typing import LiteralString, cast
 
 from ea import readiness
 from ea.store import DATA, ROOT, Connection, connect
@@ -795,9 +796,11 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
         "create table if not exists coverage_cache_shapes (key text primary key, signature text not null, "
         "units integer not null, shaped integer not null)"
     )
-    shaped_signature = conn.execute(
+    shaped = conn.execute(
         "select concat_ws(':', count(*), sum(k::bigint), sum(k::bigint * k)) from ug where grain = 'precinct' and shaped"
-    ).fetchone()[0]
+    ).fetchone()
+    assert shaped is not None
+    shaped_signature = shaped[0]
     cached = {
         key: (signature, units, shaped)
         for key, signature, units, shaped in conn.execute(
@@ -957,8 +960,10 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
     )
     statements = RUNOFF_SQL.replace("{rules}", rules).split(";\n\n")
     for statement in statements[:-1]:
-        conn.execute(statement)
-    for st, year, level, share, top, next_year, next_stage, loose_year in conn.execute(statements[-1]):
+        conn.execute(cast(LiteralString, statement))
+    for st, year, level, share, top, next_year, next_stage, loose_year in conn.execute(
+        cast(LiteralString, statements[-1])
+    ):
         if next_year is not None and next_stage != "runoff":
             continue
         expected[(st, next_year or loose_year or year, level, "runoff")] += 1
@@ -1323,7 +1328,7 @@ def report(rows: list[dict], units: dict[tuple, tuple[int, int]]) -> str:
         n, shaped = units.get((None, year), (0, 0))
         cells.append(pct(shaped, n))
         cells.append(f"{sum(r['upcoming'] for r in members):,} of {ahead:,}" if ahead else "–")
-        precinct_years.append(cells)
+        precinct_years.append((year, cells))
 
     missing_rows = []
     for level in ("president", "us_house", "us_senate", "governor", "statewide_exec", "state_upper", "state_lower"):
@@ -1412,11 +1417,11 @@ Contests held at state and federal levels per year, the share of general-electio
 
 ### 2000–2015
 
-{table(["Year", "Contests", "President", "Senate", "House", "Governor", "Statewide", "Upper", "Lower", "Shaped (bonus)", "Upcoming"], [r for r in precinct_years if r[0] < 2016])}
+{table(["Year", "Contests", "President", "Senate", "House", "Governor", "Statewide", "Upper", "Lower", "Shaped (bonus)", "Upcoming"], [cells for year, cells in precinct_years if year < 2016])}
 
 ### 2016 on
 
-{table(["Year", "Contests", "President", "Senate", "House", "Governor", "Statewide", "Upper", "Lower", "Shaped", "Upcoming"], [r for r in precinct_years if r[0] >= 2016])}
+{table(["Year", "Contests", "President", "Senate", "House", "Governor", "Statewide", "Upper", "Lower", "Shaped", "Upcoming"], [cells for year, cells in precinct_years if year >= 2016])}
 
 ## For other lanes
 

@@ -162,12 +162,24 @@ def sheet_records(day: date, county: str, rows: list[list[str]]) -> list[tuple[d
                 continue
             for position in range(4, min(len(row), len(rows[3]), len(titles))):
                 title = re.sub(
-                    r"(?i)for u s representative (\d+)\w* congressional.*", r"United States Representative, District \1", titles[position]
+                    r"(?i)for u s representative (\d+)\w* congressional.*",
+                    r"United States Representative, District \1",
+                    titles[position],
                 )
                 if contest(title) is not None and rows[3][position].strip():
-                    name = re.sub(r"\s+(Democrat|Republican|Independent|Libertarian)\w*\s*$", "", rows[3][position].strip())
+                    name = re.sub(
+                        r"\s+(Democrat|Republican|Independent|Libertarian)\w*\s*$", "", rows[3][position].strip()
+                    )
                     found.append(
-                        (day, county, title, f"{row[0]}-{row[1]} {row[2].strip()}", "WRITE-INS" if name.lower() == "write-in" else name, row[position], "")
+                        (
+                            day,
+                            county,
+                            title,
+                            f"{row[0]}-{row[1]} {row[2].strip()}",
+                            "WRITE-INS" if name.lower() == "write-in" else name,
+                            row[position],
+                            "",
+                        )
                     )
         return found
     if len(rows) > 2 and rows[1][:2] == ["County ID", "Precinct"]:
@@ -184,7 +196,15 @@ def sheet_records(day: date, county: str, rows: list[list[str]]) -> list[tuple[d
                 if label and contest(offices[position]) is not None:
                     name = re.sub(r"\s+-\s+[A-Z]{1,3}$", "", label)
                     found.append(
-                        (day, county, offices[position], row[1].strip(), "WRITE-INS" if re.fullmatch(r"(?i)w\.?i\.?|write-?ins?", name) else name, row[position], "")
+                        (
+                            day,
+                            county,
+                            offices[position],
+                            row[1].strip(),
+                            "WRITE-INS" if re.fullmatch(r"(?i)w\.?i\.?|write-?ins?", name) else name,
+                            row[position],
+                            "",
+                        )
                     )
         return found
     top = next((i for i, row in enumerate(rows[:8]) if any(contest(cell) is not None for cell in row)), None)
@@ -208,7 +228,15 @@ def sheet_records(day: date, county: str, rows: list[list[str]]) -> list[tuple[d
             if label and contest(offices[position]) is not None:
                 name = re.sub(r"\s*\(\s*[A-Z ]*\)\s*$", "", label).strip()
                 found.append(
-                    (day, county, offices[position], place, "WRITE-INS" if re.fullmatch(r"(?i)w\.?i\.?", name) else name, row[position], "")
+                    (
+                        day,
+                        county,
+                        offices[position],
+                        place,
+                        "WRITE-INS" if re.fullmatch(r"(?i)w\.?i\.?", name) else name,
+                        row[position],
+                        "",
+                    )
                 )
     return found
 
@@ -348,7 +376,11 @@ def parse() -> None:
                             ):
                                 records.append((day, county, row[title], row[place], row[candidate], row[votes], ""))
                         continue
-                    header = None if rows[0][0].startswith(("FOR ", "PROPOSED ")) else next((i for i, row in enumerate(rows[:6]) if i > 0 and row and row[0] == "Precinct"), None)
+                    header = (
+                        None
+                        if rows[0][0].startswith(("FOR ", "PROPOSED "))
+                        else next((i for i, row in enumerate(rows[:6]) if i > 0 and row and row[0] == "Precinct"), None)
+                    )
                     if header is not None:
                         owner = ""
                         offices = []
@@ -445,14 +477,13 @@ def parse() -> None:
     lost = frame.filter(pl.col("county_code").is_null())
     if lost.height:
         raise ValueError(f"unmatched counties: {lost['county'].unique().to_list()}")
-    frame = (
-        frame.with_columns(
-            candidate=pl.col("choice").str.to_uppercase().str.replace(r" ?/ ?.*$", "").str.strip_chars(),
-            place=pl.col("place").str.replace_all("\x00", "").str.strip_chars(),
-        )
-        .with_columns(surname=pl.col("candidate").str.extract(r"([A-Z'\-]+)$"))
+    frame = frame.with_columns(
+        candidate=pl.col("choice").str.to_uppercase().str.replace(r" ?/ ?.*$", "").str.strip_chars(),
+        place=pl.col("place").str.replace_all("\x00", "").str.strip_chars(),
+    ).with_columns(surname=pl.col("candidate").str.extract(r"([A-Z'\-]+)$"))
+    people = ~pl.col("candidate").str.contains("WRITE|VOTES|STRAIGHT|PARTY") & ~pl.col("candidate").is_in(
+        list(medsl.PSEUDO)
     )
-    people = ~pl.col("candidate").str.contains("WRITE|VOTES|STRAIGHT|PARTY") & ~pl.col("candidate").is_in(list(medsl.PSEUDO))
     named = frame.filter((pl.col("chamber") == "house") & people & (pl.col("district") > 0))
     owners = (
         named.group_by("day", "surname", "district")
@@ -479,8 +510,7 @@ def parse() -> None:
         .drop("owner", "seat", "surname")
     )
     frame = (
-        frame
-        .with_columns(
+        frame.with_columns(
             measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
             writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
             kind=pl.when(pl.col("place").str.to_uppercase().str.contains(COUNTYWIDE))

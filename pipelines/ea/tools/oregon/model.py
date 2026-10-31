@@ -1,4 +1,5 @@
-import json, sys
+import json
+import sys
 from pathlib import Path
 
 S = Path(sys.argv[1])

@@ -154,9 +154,7 @@ def emit() -> Path:
                 "Galveston County's official canvass gives Mikal Williams 38,998 votes in the county. The Secretary of State's county return and the FEC's district total carry 33,998 there, a 5,000-vote transcription error, so the official district total understates Williams by 5,000 votes (68,606, not 63,606). The precinct set from the county's canvass counts the corrected figure.",
             ),
         ):
-            if not conn.execute(
-                "select 1 from note where entity_id = %s and body_md = %s", [entity, body]
-            ).fetchone():
+            if not conn.execute("select 1 from note where entity_id = %s and body_md = %s", [entity, body]).fetchone():
                 cs.add("note", entity_id=entity, kind=kind, body_md=body)
         for unit, option, value in values:
             cs.add(

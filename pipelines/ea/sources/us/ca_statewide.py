@@ -62,7 +62,12 @@ ITEMS = {
     1986: (date(1986, 11, 4), range(19, 24)),
 }
 VOLUMES = {
-    year: (f"https://v3.californiatargetbook.com/docs/SoV/g{year}.pdf", "https://www.californiatargetbook.com/", day, pages)
+    year: (
+        f"https://v3.californiatargetbook.com/docs/SoV/g{year}.pdf",
+        "https://www.californiatargetbook.com/",
+        day,
+        pages,
+    )
     for year, (day, pages) in ITEMS.items()
 }
 PARTIES = {
@@ -456,7 +461,32 @@ ERRATA = {
     (1994, ("insurance-commissioner", 0)),
 }
 ADDED: set[tuple[int, str]] = set()
-PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938, 1942, 1946, 1950, 1954, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994}
+PUBLISHED = {
+    1882,
+    1886,
+    1910,
+    1914,
+    1918,
+    1922,
+    1926,
+    1930,
+    1934,
+    1938,
+    1942,
+    1946,
+    1950,
+    1954,
+    1958,
+    1962,
+    1966,
+    1970,
+    1974,
+    1978,
+    1982,
+    1986,
+    1990,
+    1994,
+}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
@@ -498,7 +528,12 @@ def emit() -> Path:
             title = TITLE.format(day=day)
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=landing,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=landing,
                 license=LICENSE,
             )
             book = house_books._artifact(sys.modules[__name__], year)
@@ -539,7 +574,15 @@ def emit() -> Path:
             for (value,) in conn.execute("select value from external_id where scheme = 'us.office' and value ~ ':CA$'")
         }
         columns = (
-            "id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness",
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
             "supersedes_id",
         )
         for (year, office), rows in frame.group_by("year", "state", maintain_order=True):
@@ -557,15 +600,21 @@ def emit() -> Path:
                 if office_key not in offices_known:
                     cs.add("office", id=cs.key("us.office", office_key), polity_id=cs.polity("US-CA"), kind="other")
                     cs.add(
-                        "name", entity_id=cs.key("us.office", office_key), text=TITLES[office], lang="en",
-                        kind="official", is_preferred=True,
+                        "name",
+                        entity_id=cs.key("us.office", office_key),
+                        text=TITLES[office],
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
                     )
                     offices_known.add(office_key)
-                ((area,),) = conn.execute(
-                    """select district_area_id from contest where id = %s""", [contests[f"{day}:CA:house:1"]]
-                ).fetchall() if f"{day}:CA:house:1" in contests else conn.execute(
-                    "select area_id from polity where iso_code = 'US-CA'"
-                ).fetchall()
+                ((area,),) = (
+                    conn.execute(
+                        """select district_area_id from contest where id = %s""", [contests[f"{day}:CA:house:1"]]
+                    ).fetchall()
+                    if f"{day}:CA:house:1" in contests
+                    else conn.execute("select area_id from polity where iso_code = 'US-CA'").fetchall()
+                )
                 cs.add(
                     "contest",
                     id=contest,
@@ -580,8 +629,12 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 cs.add(
-                    "name", entity_id=contest, text=f"{year} California {TITLES[office]} election", lang="en",
-                    kind="official", is_preferred=True,
+                    "name",
+                    entity_id=contest,
+                    text=f"{year} California {TITLES[office]} election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
                 )
                 cs.add("slug", path=f"us/ca/{day}-general/{office}", entity_id=contest)
             roots: list[tuple[UUID, str]] = []

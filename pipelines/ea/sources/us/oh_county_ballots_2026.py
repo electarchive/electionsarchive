@@ -24,9 +24,24 @@ CUYAHOGA = "https://boe.cuyahogacounty.gov/"
 CUYAHOGA_FILE = INBOX / "cuyahoga" / "PDF Sample Ballot Package.pdf"
 CUYAHOGA_BOXES = ((5, 20, 195, 375), (5, 215, 175, 355), (5, 392, 215, 325), (6, 20, 195, 545), (6, 215, 190, 345))
 SOURCES = {
-    HAMILTON: ("Hamilton", HAMILTON_FILE, "Hamilton County Board of Elections", "November 3, 2026 General Election ballot issues"),
-    SUMMIT: ("Summit", SUMMIT_FILE, "Summit County Board of Elections", "Issue synopsis, November 3, 2026 General Election"),
-    CUYAHOGA: ("Cuyahoga", CUYAHOGA_FILE, "Cuyahoga County Board of Elections", "Sample ballot (Bay Village 01-A), November 3, 2026 General Election"),
+    HAMILTON: (
+        "Hamilton",
+        HAMILTON_FILE,
+        "Hamilton County Board of Elections",
+        "November 3, 2026 General Election ballot issues",
+    ),
+    SUMMIT: (
+        "Summit",
+        SUMMIT_FILE,
+        "Summit County Board of Elections",
+        "Issue synopsis, November 3, 2026 General Election",
+    ),
+    CUYAHOGA: (
+        "Cuyahoga",
+        CUYAHOGA_FILE,
+        "Cuyahoga County Board of Elections",
+        "Sample ballot (Bay Village 01-A), November 3, 2026 General Election",
+    ),
 }
 
 
@@ -53,20 +68,22 @@ def pdf(url: str, mode: str) -> str:
 
 def hamilton() -> list[dict[str, str]]:
     rows = []
-    for block in re.split(r"^\s*\d+ (?=[A-Z][A-Z ()&,'-]+\n)", pdf(HAMILTON, "-layout"), flags=re.M)[1:]:
+    for block in re.split(r"^\s*\d+ (?=[A-Z][A-Z ()&,'-]+\n)", pdf(HAMILTON, "-layout"), flags=re.MULTILINE)[1:]:
         head, _, rest = block.partition("\n")
         entity, _, rest = rest.strip().partition("\n")
         body = re.split(r"\n\s*(?:FOR|AGAINST|YES|NO)\b", rest)[0]
         body = re.sub(r"A majority (?:affirmative|yes) vote is necessary for passage\.", "", body)
         body = re.sub(r"\s+", " ", body).strip()
         if body and re.match(r"(City|Village|Township|Hamilton County|.*School District|.*Library)", entity.strip()):
-            rows.append({"url": HAMILTON, "county": "Hamilton", "kind": head.strip(), "entity": entity.strip(), "text": body})
+            rows.append(
+                {"url": HAMILTON, "county": "Hamilton", "kind": head.strip(), "entity": entity.strip(), "text": body}
+            )
     return rows
 
 
 def summit() -> list[dict[str, str]]:
     rows = []
-    for block in re.split(r"^Issue \d+\s*$", pdf(SUMMIT, "-raw"), flags=re.M)[1:]:
+    for block in re.split(r"^Issue \d+\s*$", pdf(SUMMIT, "-raw"), flags=re.MULTILINE)[1:]:
         lines = [line.strip() for line in block.strip().split("\n") if line.strip()]
         text = re.split(r"THIS LIST IS SUBJECT", "\n".join(lines))[0].split("\n")
         entity: list[str] = []
@@ -75,13 +92,22 @@ def summit() -> list[dict[str, str]]:
             entity.append(text[index])
             index += 1
         kind: list[str] = []
-        while index < len(text) and (re.fullmatch(r"[A-Z ,&-]+|\([A-Z, ]+\)", text[index]) or text[index].startswith(("Overlaps", "Counties", "Overlap"))):
+        while index < len(text) and (
+            re.fullmatch(r"[A-Z ,&-]+|\([A-Z, ]+\)", text[index])
+            or text[index].startswith(("Overlaps", "Counties", "Overlap"))
+        ):
             kind.append(text[index])
             index += 1
         body = re.sub(r"\s+", " ", " ".join(text[index:])).strip()
         if entity and body and not entity[0].startswith("STATE"):
             rows.append(
-                {"url": SUMMIT, "county": "Summit", "kind": " ".join(kind).replace("Overlaps:", ""), "entity": " ".join(entity), "text": body}
+                {
+                    "url": SUMMIT,
+                    "county": "Summit",
+                    "kind": " ".join(kind).replace("Overlaps:", ""),
+                    "entity": " ".join(entity),
+                    "text": body,
+                }
             )
     return rows
 
@@ -91,7 +117,24 @@ def cuyahoga() -> list[dict[str, str]]:
     path = str(raw.cached(SOURCE, CUYAHOGA).path)
     for page, x, width, bottom in CUYAHOGA_BOXES:
         text = subprocess.run(
-            ["pdftotext", "-f", str(page), "-l", str(page), "-layout", "-x", str(x), "-y", "135", "-W", str(width), "-H", str(bottom - 135), path, "-"],
+            [
+                "pdftotext",
+                "-f",
+                str(page),
+                "-l",
+                str(page),
+                "-layout",
+                "-x",
+                str(x),
+                "-y",
+                "135",
+                "-W",
+                str(width),
+                "-H",
+                str(bottom - 135),
+                path,
+                "-",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -100,7 +143,13 @@ def cuyahoga() -> list[dict[str, str]]:
         head, _, body = flat.partition("A majority affirmative vote is necessary for passage.")
         kind = re.sub(r"^\d+ ", "", head)
         rows.append(
-            {"url": CUYAHOGA, "county": "Cuyahoga", "kind": kind.split(" County of")[0].split(" Board of")[0].split(" Health and")[0], "entity": "Cuyahoga County", "text": body.strip()}
+            {
+                "url": CUYAHOGA,
+                "county": "Cuyahoga",
+                "kind": kind.split(" County of")[0].split(" Board of")[0].split(" Health and")[0],
+                "entity": "Cuyahoga County",
+                "text": body.strip(),
+            }
         )
     return rows
 
@@ -113,7 +162,9 @@ def parse() -> None:
 
 
 def keys(name: str) -> set[str]:
-    name = re.sub(r"^(City|Village|Township) of (.+)$", lambda m: f"{m[2]} {m[1]}" if m[1] == "Township" else m[2], name)
+    name = re.sub(
+        r"^(City|Village|Township) of (.+)$", lambda m: f"{m[2]} {m[1]}" if m[1] == "Township" else m[2], name
+    )
     return {ceda._core(name), ceda._city(name)}
 
 
@@ -147,7 +198,13 @@ def emit() -> Path:
         used: set[UUID] = set()
         for row in frame.iter_rows(named=True):
             options = [c for k in keys(row["entity"]) for c in contests.get(k, []) if c[0] not in used]
-            wanted = "income tax" if "INCOME" in row["kind"].upper() else "bond" if "BOND" in row["kind"].upper() else "tax levy"
+            wanted = (
+                "income tax"
+                if "INCOME" in row["kind"].upper()
+                else "bond"
+                if "BOND" in row["kind"].upper()
+                else "tax levy"
+            )
             narrowed = [c for c in options if c[2].lower().startswith(wanted)]
             if "CHARTER" in row["kind"].upper():
                 narrowed = [c for c in options if c[2].lower().startswith("miscellaneous")]

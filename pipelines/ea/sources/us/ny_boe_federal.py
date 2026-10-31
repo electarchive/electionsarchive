@@ -83,7 +83,9 @@ def parse() -> None:
                 check=True,
             ).stdout.split("RECAP:")[0]
             (district,) = DISTRICTS[day]
-            places = [county(place) for place in re.findall(r"Part of \w+", text.split("CANDIDATE", 1)[1].splitlines()[0])]
+            places = [
+                county(place) for place in re.findall(r"Part of \w+", text.split("CANDIDATE", 1)[1].splitlines()[0])
+            ]
             lines = []
             for found in re.finditer(r"^(?:[A-Z]{3})?\s+(\S.*?)\s{2,}((?:[\d,]+\s+)+[\d,]+)$", text, re.MULTILINE):
                 *votes, total = [int(value.replace(",", "")) for value in found[2].split()]
@@ -151,7 +153,9 @@ def parse() -> None:
             sums = dict.fromkeys(columns, 0)
             printed = None
             for end, line in enumerate(cells[top + 1 :], top + 1):
-                if re.fullmatch(r"(?i)(statewide )?total", line[0]) or re.search(r"(?i)CONGRESSIONAL DISTRICT", line[0]):
+                if re.fullmatch(r"(?i)(statewide )?total", line[0]) or re.search(
+                    r"(?i)CONGRESSIONAL DISTRICT", line[0]
+                ):
                     printed = None if re.search(r"(?i)DISTRICT", line[0]) else line
                     break
                 if not line[0] or line[0].startswith("Total") or not number(line[1]):
@@ -164,7 +168,9 @@ def parse() -> None:
                 raise ValueError(f"{day} {chamber} {district}: no printed total")
             for n, name in columns.items():
                 if number(printed[n]) and sums[n] != int(float(printed[n])):
-                    raise ValueError(f"{day} {chamber} {district} {name}: counties sum to {sums[n]}, printed {printed[n]}")
+                    raise ValueError(
+                        f"{day} {chamber} {district} {name}: counties sum to {sums[n]}, printed {printed[n]}"
+                    )
             add(chamber, day, special, district if chamber == "house" else None, lines)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, infer_schema_length=None)

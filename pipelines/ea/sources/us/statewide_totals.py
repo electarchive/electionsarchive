@@ -520,5 +520,9 @@ def emit(
         cs.pool("A scattering or write-in line in a state manual read as a candidate")
         for state in ("MI", "ND", "FL", "RI", "IA"):
             if f"{state}:party" in parties_known:
-                cs.add("entity_retirement", entity_id=cs.key("us.party", f"{state}:party"), reason="no party printed in the source")
+                cs.add(
+                    "entity_retirement",
+                    entity_id=cs.key("us.party", f"{state}:party"),
+                    reason="no party printed in the source",
+                )
         return cs.write()

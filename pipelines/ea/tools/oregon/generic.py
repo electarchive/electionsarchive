@@ -1,5 +1,7 @@
+import json
 import os
-import json, re, sys
+import re
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
@@ -11,7 +13,44 @@ tot = json.load(open(S / "tot.json"))
 want = {k.split("measure-")[1][:3]: v for k, v in tot.items()}
 FIPS = dict(
     zip(
-        "Baker Benton Clackamas Clatsop Columbia Coos Crook Curry Deschutes Douglas Gilliam Grant Harney HoodRiver Jackson Jefferson Josephine Klamath Lake Lane Lincoln Linn Malheur Marion Morrow Multnomah Polk Sherman Tillamook Umatilla Union Wallowa Wasco Washington Wheeler Yamhill".split(),
+        [
+            "Baker",
+            "Benton",
+            "Clackamas",
+            "Clatsop",
+            "Columbia",
+            "Coos",
+            "Crook",
+            "Curry",
+            "Deschutes",
+            "Douglas",
+            "Gilliam",
+            "Grant",
+            "Harney",
+            "HoodRiver",
+            "Jackson",
+            "Jefferson",
+            "Josephine",
+            "Klamath",
+            "Lake",
+            "Lane",
+            "Lincoln",
+            "Linn",
+            "Malheur",
+            "Marion",
+            "Morrow",
+            "Multnomah",
+            "Polk",
+            "Sherman",
+            "Tillamook",
+            "Umatilla",
+            "Union",
+            "Wallowa",
+            "Wasco",
+            "Washington",
+            "Wheeler",
+            "Yamhill",
+        ],
         [f"41{i:03d}" for i in range(1, 72, 2)],
     )
 )

@@ -33,7 +33,9 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+            content = subprocess.run(
+                ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+            ).stdout
             raw.store(SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
 
 
@@ -82,7 +84,9 @@ def emit() -> Path:
                 option = f"special:{row['county']}:{entity}"
             elif county_key in found:
                 county, county_area, _, county_path, county_code = found[county_key]
-                minted = govmint.special(conn, cs, "AZ", (county, county_area, county_path, county_code), entity, civil.slugs)
+                minted = govmint.special(
+                    conn, cs, "AZ", (county, county_area, county_path, county_code), entity, civil.slugs
+                )
                 if minted is not None:
                     option = f"special:{row['county']}:{entity}"
                     found[option] = minted
@@ -105,7 +109,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:AZ:{code}:measure:{slug(label)}"
@@ -126,7 +137,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):

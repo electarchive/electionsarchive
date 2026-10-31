@@ -32,7 +32,11 @@ RACES = {
     "20260616": (12002, 12004, 12005, 12006, 12007, 12008, 12009, 12040, 13006, 13009, 30001),
     "20260825": (12006, 12007, 12008, 12040, 30002, 30003),
 }
-QUESTIONS = {30001: ("initiative", "832"), 30002: ("mandatory_referendum", "844"), 30003: ("mandatory_referendum", "846")}
+QUESTIONS = {
+    30001: ("initiative", "832"),
+    30002: ("mandatory_referendum", "844"),
+    30003: ("mandatory_referendum", "846"),
+}
 NOTE = (
     "Results by county from the Oklahoma State Election Board's official results. Each candidate's county votes add "
     "up to the statewide total the Board publishes for the race."
@@ -40,12 +44,17 @@ NOTE = (
 
 
 def url(day: str, race: str) -> str:
-    return f"{OK_BASE}enrapi/getelec/{day}/SW/xx" if race == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{day}/{race}"
+    return (
+        f"{OK_BASE}enrapi/getelec/{day}/SW/xx" if race == "getelec" else f"{OK_BASE}enrapi/GetCntyResults/{day}/{race}"
+    )
 
 
 def fetch() -> None:
     token = httpx.put(
-        OK_BASE + "enrapi/login/", json={"Username": "appuser", "Password": "X098de!22k098Mgfd"}, headers=BROWSER, timeout=60
+        OK_BASE + "enrapi/login/",
+        json={"Username": "appuser", "Password": "X098de!22k098Mgfd"},
+        headers=BROWSER,
+        timeout=60,
     ).json()[1:]
     for day, races in RACES.items():
         for race in ("getelec", *map(str, races)):
@@ -53,7 +62,9 @@ def fetch() -> None:
             try:
                 raw.cached(SOURCE, target)
             except LookupError:
-                content = httpx.get(target, headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300).content
+                content = httpx.get(
+                    target, headers={**BROWSER, "Authorization": f"Bearer {token}"}, timeout=300
+                ).content
                 raw.store(
                     SOURCE,
                     target,
@@ -209,7 +220,14 @@ def emit() -> Path:
                         default_result_kind="counted",
                     )
                     cs.add("ballot_question", contest_id=contest, type=kind)
-                    cs.add("name", entity_id=contest, text=f"State Question {number}", lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=contest,
+                        text=f"State Question {number}",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
                     if contest in cs.minted:
                         prefix = "2026-06-16-primary" if day == PRIMARY else "2026-08-25-primary-runoff"
                         cs.add("slug", path=f"us/ok/{prefix}/state-question-{number}", entity_id=contest)
@@ -229,7 +247,7 @@ def emit() -> Path:
                         label = f"2026 Oklahoma {phrase} {party.capitalize()} primary{' runoff' if runoff else ''}"
                         path = f"{tail}-{party}"
                     contest = cs.key("us.contest", contest_key)
-                    first = f"{PRIMARY}{contest_key[len(str(day)):]}"
+                    first = f"{PRIMARY}{contest_key[len(str(day)) :]}"
                     scope = scopes["republican" if party is None or senate else party]
                     cs.add(
                         "contest",
@@ -314,8 +332,13 @@ def emit() -> Path:
                 for name, by_unit in by_candidate.items():
                     for fips, votes in by_unit.items():
                         by_place[fips] += votes
-                        rows.append((str(result), str(cs.unit("us.county", fips)), str(options[name]), 0, 1, 0, 0, votes))
-                rows += [(str(result), str(cs.unit("us.county", fips)), None, 0, 4, 0, 0, votes) for fips, votes in by_place.items()]
+                        rows.append(
+                            (str(result), str(cs.unit("us.county", fips)), str(options[name]), 0, 1, 0, 0, votes)
+                        )
+                rows += [
+                    (str(result), str(cs.unit("us.county", fips)), None, 0, 4, 0, 0, votes)
+                    for fips, votes in by_place.items()
+                ]
                 frame(result, rows)
                 made += 1
                 print(day, race, header, everyone)

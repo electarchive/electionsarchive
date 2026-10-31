@@ -1,3 +1,4 @@
+import itertools
 import json
 import math
 from collections.abc import Sequence
@@ -122,7 +123,7 @@ class Street:
         for line in lines:
             count = max(int(line.length // 4), 1)
             points = [line.interpolate(i / count, normalized=True).coords[0] for i in range(count + 1)]
-            for start, end in zip(points, points[1:], strict=False):
+            for start, end in itertools.pairwise(points):
                 graph.add_edge(start, end, weight=math.dist(start, end))
         parts = [list(part) for part in nx.connected_components(graph)]
         while len(parts) > 1:
@@ -212,7 +213,9 @@ def build(osm: bytes, conn: Connection) -> dict[int, str]:
         distance = np.sqrt(((nodes - end) ** 2).sum(axis=1))
         heading = end - nodes[(distance > 40) & (distance < 120)].mean(axis=0)
         heading = heading / np.linalg.norm(heading)
-        meet = unary_union([streets[key].geom, LineString([end - heading * 100, end + heading * 1500])]).intersection(shore)
+        meet = unary_union([streets[key].geom, LineString([end - heading * 100, end + heading * 1500])]).intersection(
+            shore
+        )
         points = [part for part in getattr(meet, "geoms", [meet]) if part.geom_type == "Point"]
         if key in GRID:
             return min(points, key=lambda point: point.x if side == "N" else -point.x)
@@ -242,7 +245,11 @@ def build(osm: bytes, conn: Connection) -> dict[int, str]:
         def push(point: tuple[float, float], toward: tuple[float, float]) -> tuple[float, float]:
             step = np.array(point) - np.array(toward)
             length = np.linalg.norm(step)
-            return (float(point[0] + step[0] / length * reach), float(point[1] + step[1] / length * reach)) if length else point
+            return (
+                (float(point[0] + step[0] / length * reach), float(point[1] + step[1] / length * reach))
+                if length
+                else point
+            )
 
         return LineString([push(coords[0], coords[1]), *coords, push(coords[-1], coords[-2])])
 
@@ -265,7 +272,8 @@ def build(osm: bytes, conn: Connection) -> dict[int, str]:
     while len(owner) < len(faces):
         for index in [i for i in range(len(faces)) if i not in owner]:
             shared = [
-                (faces[index].boundary.intersection(faces[other].boundary).length, ward) for other, ward in owner.items()
+                (faces[index].boundary.intersection(faces[other].boundary).length, ward)
+                for other, ward in owner.items()
             ]
             length, ward = max(shared)
             if length > 1:

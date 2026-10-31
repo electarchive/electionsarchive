@@ -61,7 +61,11 @@ def parse() -> None:
         frame.group_by("state", "day", "kind", "county", "precinct", "url", "source")
         .agg(pl.col("registered").max())
         .group_by("state", "day", "kind", "county", "url", "source")
-        .agg(pl.col("registered").sum().alias("total"), pl.col("registered").max().alias("largest"), pl.len().alias("precincts"))
+        .agg(
+            pl.col("registered").sum().alias("total"),
+            pl.col("registered").max().alias("largest"),
+            pl.len().alias("precincts"),
+        )
         .with_columns(
             registered=pl.when((pl.col("total") - 2 * pl.col("largest")).abs() <= 0.02 * pl.col("largest") + 2)
             .then("largest")
@@ -115,8 +119,15 @@ def emit() -> Path:
             summary="Registered voters by county, summed from the precinct registration rows in OpenElections' files and from Colorado's ElectionStats archive",
             polity="US",
         )
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
-        done = {value for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]).fetchall()}
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
+        done = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        }
         defaults = {
             election
             for (election,) in conn.execute(
@@ -144,7 +155,9 @@ def emit() -> Path:
             names = counties.get(state, {})
             values = {}
             ballots = {}
-            for county, registered, cast in rows.select("county", "registered", "ballots" if "ballots" in rows.columns else pl.lit(None).alias("ballots")).iter_rows():
+            for county, registered, cast in rows.select(
+                "county", "registered", "ballots" if "ballots" in rows.columns else pl.lit(None).alias("ballots")
+            ).iter_rows():
                 code = names.get(re.sub(r"(county|parish)$", "", elstats.plain(county)))
                 if code is None:
                     print(f"{key}: {county!r} has no county unit")
@@ -155,7 +168,9 @@ def emit() -> Path:
             if kind == "general":
                 survey = {
                     code: registered
-                    for code, registered in eavs.filter(pl.col("year") == day.year).select("code", "registered").iter_rows()
+                    for code, registered in eavs.filter(pl.col("year") == day.year)
+                    .select("code", "registered")
+                    .iter_rows()
                     if registered
                 }
                 for code in [c for c, v in values.items() if c in survey and not 0.5 <= v / survey[c] <= 1.5]:
@@ -181,7 +196,15 @@ def emit() -> Path:
                     )
                 sources[state] = cs.source(publisher, title)
                 if sources[state] in cs.minted:
-                    cs.add("source", id=sources[state], kind=kind, publisher=publisher, title=title, url=link, license=license)
+                    cs.add(
+                        "source",
+                        id=sources[state],
+                        kind=kind,
+                        publisher=publisher,
+                        title=title,
+                        url=link,
+                        license=license,
+                    )
             for source, url in rows.select("source", "url").unique().iter_rows():
                 if (state, url) not in artifacts:
                     artifacts.add((state, url))

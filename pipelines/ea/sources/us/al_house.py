@@ -10,7 +10,9 @@ VERSION = "1"
 PUBLISHER = "Alabama Secretary of State"
 TITLE = "General Election, {day:%B %-d, %Y}"
 LICENSE = "Public record"
-SUMMARY = "Alabama's House results by county from the Secretary of State's general election returns on the SRI microfiche"
+SUMMARY = (
+    "Alabama's House results by county from the Secretary of State's general election returns on the SRI microfiche"
+)
 STATE = "AL"
 FIPS = "01"
 ITEMS = {

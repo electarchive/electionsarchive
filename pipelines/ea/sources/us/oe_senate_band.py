@@ -41,9 +41,9 @@ def fetch() -> None:
 
 def parse() -> None:
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
-        gazetteer = pl.read_csv(io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False).filter(
-            pl.col("USPS") == "RI"
-        )
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS") == "RI")
     towns: dict[str, str] = {}
     for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
         towns.setdefault(elstats.plain(name), geoid[:5])

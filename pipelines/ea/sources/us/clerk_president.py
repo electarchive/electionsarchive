@@ -263,11 +263,7 @@ def emit() -> Path:
                 total_lines = sum(taken[i]["votes"] for i in group)
                 merges.append(
                     " and ".join(f"{taken[i]['votes']:,} on the {taken[i]['label']} line" for i in group)
-                    + (
-                        f" (Wikipedia's figure is {value:,})"
-                        if total_lines != value
-                        else ""
-                    )
+                    + (f" (Wikipedia's figure is {value:,})" if total_lines != value else "")
                 )
                 taken[group[0]] = taken[group[0]] | {"votes": total_lines}
                 taken = [row for i, row in enumerate(taken) if i not in group[1:]]

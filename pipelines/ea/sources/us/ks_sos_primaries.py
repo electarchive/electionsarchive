@@ -179,12 +179,20 @@ def rows_2016(path: Path, chamber: str) -> pl.DataFrame:
         text=True,
         check=True,
     ).stdout
-    for race, block in re.findall(r"^\s*(US SENATOR [DR]|US REP 3 [DR])\s+[DR]\n(.*?)(?=^\s*(?:US |STATE ))", page, re.MULTILINE | re.DOTALL):
+    for race, block in re.findall(
+        r"^\s*(US SENATOR [DR]|US REP 3 [DR])\s+[DR]\n(.*?)(?=^\s*(?:US |STATE ))", page, re.MULTILINE | re.DOTALL
+    ):
         if ("SENATOR" in race) != (chamber == "senate"):
             continue
         party = {"D": "Democratic", "R": "Republican"}[race[-1]]
         out.extend(
-            ("Johnson", party, None if chamber == "senate" else "3", names.get(name.split()[-1], name.title()), votes.replace(",", ""))
+            (
+                "Johnson",
+                party,
+                None if chamber == "senate" else "3",
+                names.get(name.split()[-1], name.title()),
+                votes.replace(",", ""),
+            )
             for name, votes in re.findall(r"^\s*([A-Z][A-Z .'-]+?)\s+[DR]\s+([\d,]+)\s+[\d.]+%", block, re.MULTILINE)
         )
     out.extend(

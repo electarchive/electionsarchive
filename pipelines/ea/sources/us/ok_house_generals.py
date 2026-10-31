@@ -24,7 +24,11 @@ TITLES = {
 DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
 FILES = {2000: ("usrep", "sh", "ss"), 2002: ("usrep", "rep", "sen"), 2004: ("sh", "ss"), 2006: ("usrep", "sh", "ss")}
 TITLE_LINE = re.compile(r"(UNITED STATES REPRESENTATIVE|STATE REPRESENTATIVE|STATE SENATOR), DISTRICT (\d+)")
-CHAMBERS = {"UNITED STATES REPRESENTATIVE": "house", "STATE REPRESENTATIVE": "house:{}:g", "STATE SENATOR": "senate:{}:g"}
+CHAMBERS = {
+    "UNITED STATES REPRESENTATIVE": "house",
+    "STATE REPRESENTATIVE": "house:{}:g",
+    "STATE SENATOR": "senate:{}:g",
+}
 ROW = re.compile(r"^([A-Za-z][A-Za-z .]*?):?\s{2,}([\d,]+(?:\s+[\d,]+)*)\s*$")
 
 
@@ -75,7 +79,12 @@ def parse() -> None:
                 if found[1].upper().startswith("STATE TOTAL"):
                     totals = [(m.end(), int(m[0].replace(",", ""))) for m in re.finditer(r"[\d,]+", line)]
                     break
-                places.append((counties[re.sub(r"[^a-z]", "", found[1].lower())], [int(v.replace(",", "")) for v in found[2].split()]))
+                places.append(
+                    (
+                        counties[re.sub(r"[^a-z]", "", found[1].lower())],
+                        [int(v.replace(",", "")) for v in found[2].split()],
+                    )
+                )
             ends = [end for end, _ in totals]
             labels: dict[int, list[str]] = {end: [] for end in ends}
             for line in header:

@@ -86,7 +86,9 @@ def parse() -> None:
                 left[name] = f"its district lines add up to {total} against the printed {data['totals'][column]}"
                 continue
             rows.extend((year, int(ad), column, values[column]) for ad, values in data["rows"].items())
-        pl.DataFrame(rows, schema=["year", "ad", "column", "value"], orient="row").write_parquet(PARSED / f"{year}.parquet")
+        pl.DataFrame(rows, schema=["year", "ad", "column", "value"], orient="row").write_parquet(
+            PARSED / f"{year}.parquet"
+        )
         (PARSED / f"{year}-left.json").write_text(json.dumps(left))
         print(year, len(data["rows"]), "assembly districts; left out:", left)
 
@@ -139,7 +141,14 @@ def emit() -> Path:
                 )
                 pdf = INBOX / f"{spec['volume']}.pdf"
                 artifact = cs.artifact(
-                    raw.store(SOURCE, url, pdf.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"),
+                    raw.store(
+                        SOURCE,
+                        url,
+                        pdf.read_bytes(),
+                        suffix=".pdf",
+                        retrieved_at=datetime.now(UTC),
+                        media_type="application/pdf",
+                    ),
                     source,
                 )
                 pages = {}
@@ -148,7 +157,19 @@ def emit() -> Path:
                     if not image.exists():
                         PAGES.mkdir(parents=True, exist_ok=True)
                         subprocess.run(
-                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile", str(pdf), str(image.with_suffix(""))],
+                            [
+                                "pdftoppm",
+                                "-r",
+                                "100",
+                                "-png",
+                                "-f",
+                                str(number),
+                                "-l",
+                                str(number),
+                                "-singlefile",
+                                str(pdf),
+                                str(image.with_suffix("")),
+                            ],
                             check=True,
                         )
                     width, height = struct.unpack(">II", image.read_bytes()[16:24])
@@ -176,8 +197,21 @@ def emit() -> Path:
                     cs.add("name", entity_id=person, text=name, lang="en", kind="official", is_preferred=True)
                     cs.add("contest_option", id=root, contest_id=contest, kind="candidate", ballot_label=name)
                     candidacy = cs.key("us.candidacy", f"{root_key}:head")
-                    cs.add("candidacy", id=candidacy, person_id=person, option_id=root, role="head", ballot_name=name, is_independent=False)
-                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("us.party", party_key), kind="nominated")
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=root,
+                        role="head",
+                        ballot_name=name,
+                        is_independent=False,
+                    )
+                    cs.add(
+                        "candidacy_nomination",
+                        candidacy_id=candidacy,
+                        party_id=cs.key("us.party", party_key),
+                        kind="nominated",
+                    )
                     roots[name] = (root, root_key)
                 options.append(roots[name][0])
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
@@ -193,7 +227,13 @@ def emit() -> Path:
                 is_default=False,
                 completeness=None,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE.format(office=spec["office"], day=day) + "".join(f" Note: {name}'s column is left out because {why}." for name, why in left.items()))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=NOTE.format(office=spec["office"], day=day)
+                + "".join(f" Note: {name}'s column is left out because {why}." for name, why in left.items()),
+            )
             units: dict[int, object] = {}
             for ad, column, value in frame.select("ad", "column", "value").iter_rows():
                 if ad not in units:
@@ -214,7 +254,14 @@ def emit() -> Path:
                             valid_to=day + timedelta(days=1),
                         )
                 page, width, height = pages[spec["pages"][0] if ad <= spec["split"] else spec["pages"][1]]
-                fact = {"result_set_id": result_set, "unit_id": units[ad], "option_id": options[column], "channel": 0, "measure": 1, "count_round": 0}
+                fact = {
+                    "result_set_id": result_set,
+                    "unit_id": units[ad],
+                    "option_id": options[column],
+                    "channel": 0,
+                    "measure": 1,
+                    "count_round": 0,
+                }
                 cs.add("result_value", **fact, flags=0, value=value)
                 cs.add("value_locator", **fact, page_id=page, source_id=None, x0=0, y0=0, x1=width, y1=height)
             print(year, len(units), "assembly districts,", frame.height, "values")

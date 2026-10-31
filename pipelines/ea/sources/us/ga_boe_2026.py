@@ -192,10 +192,22 @@ def emit() -> Path:
         people: set[object] = set()
         for code, publisher, path, day, kind in COUNTIES:
             url = path if path.startswith("https:") else f"manual://{path}"
-            title = f"Official election summary report, {day:%B} {day.day}, 2026" if url != path else f"Official results, {path.split('/')[-3].removesuffix('-county-ga').title()} County, {day:%B} {day.day}, 2026"
+            title = (
+                f"Official election summary report, {day:%B} {day.day}, 2026"
+                if url != path
+                else f"Official results, {path.split('/')[-3].removesuffix('-county-ga').title()} County, {day:%B} {day.day}, 2026"
+            )
             source = cs.source(publisher, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=path if url == path else None, license=None)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=path if url == path else None,
+                    license=None,
+                )
             cs.artifact(raw.cached(SOURCE, url), source)
             polity, place, base = conn.execute(
                 """select u.polity_id, n.text, s.path from reporting_unit u
@@ -253,7 +265,13 @@ def emit() -> Path:
             for line in text.splitlines():
                 stripped = line.strip()
                 if found := HEADING.match(stripped):
-                    current = races.setdefault((f"{found['word']} {found['seat']}" if found["seat"] else found["large"] or found["top"], found["party"]), (int(found["seats"]), {}))[1]
+                    current = races.setdefault(
+                        (
+                            f"{found['word']} {found['seat']}" if found["seat"] else found["large"] or found["top"],
+                            found["party"],
+                        ),
+                        (int(found["seats"]), {}),
+                    )[1]
                 elif stripped.startswith("Total Votes"):
                     current = None
                 elif current is not None and (row := ROW.match(stripped)):
@@ -270,14 +288,26 @@ def emit() -> Path:
                 date_precision="day",
                 status="held",
             )
-            cs.add("name", entity_id=election, text=f"2026 {place} " + (f"{kind} election" if kind != "local" else "election"), lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=election,
+                text=f"2026 {place} " + (f"{kind} election" if kind != "local" else "election"),
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=f"{base}/{day}-{kind}", entity_id=election)
             body = cs.key("us.body", f"GA:{code}:board-of-education")
             if body in cs.minted and body not in people:
                 people.add(body)
                 cs.add("body", id=body, polity_id=polity, kind="council")
                 cs.add(
-                    "name", entity_id=body, text=f"{place} Board of Education", lang="en", kind="official", is_preferred=True
+                    "name",
+                    entity_id=body,
+                    text=f"{place} Board of Education",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
                 )
             whole = cs.area("us.school_district", code)
             for (seat, party), (magnitude, votes) in races.items():
@@ -313,7 +343,11 @@ def emit() -> Path:
                         kind="standard",
                     )
                 key = f"{day}:GA:{code}:board-of-education:{label}{suffix}"
-                previous = cs.key("us.contest", f"{DAY}:GA:{code}:board-of-education:{label}{suffix}") if day == RUNOFF else None
+                previous = (
+                    cs.key("us.contest", f"{DAY}:GA:{code}:board-of-education:{label}{suffix}")
+                    if day == RUNOFF
+                    else None
+                )
                 contest = cs.key("us.contest", key)
                 cs.add(
                     "contest",
@@ -332,7 +366,9 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=contest,
-                    text=f"2026 {place} Board of Education, {seat} election" + (f" ({party} primary)".replace("Dem", "Democratic").replace("Rep", "Republican") if party else "") + (" (runoff)" if previous else ""),
+                    text=f"2026 {place} Board of Education, {seat} election"
+                    + (f" ({party} primary)".replace("Dem", "Democratic").replace("Rep", "Republican") if party else "")
+                    + (" (runoff)" if previous else ""),
                     lang="en",
                     kind="official",
                     is_preferred=True,
@@ -365,7 +401,14 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         cs.add("name", entity_id=person, text=label, lang="en", kind="official", is_preferred=True)
                     option = cs.key("us.option", f"{key}:{slug(label)}")
-                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=cs.key("us.party", f"{PARTIES[party]}-party") if party else None, ballot_label=label)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=cs.key("us.party", f"{PARTIES[party]}-party") if party else None,
+                        ballot_label=label,
+                    )
                     cs.add(
                         "candidacy",
                         id=cs.key("us.candidacy", f"{key}:{slug(label)}:head"),
@@ -383,7 +426,13 @@ def emit() -> Path:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", seats=None)
                 else:
                     for _, option in ranked[:magnitude]:
-                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="won" if party else "elected", seats=1)
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="won" if party else "elected",
+                            seats=1,
+                        )
                 contests += 1
         cs.frame(
             "result_value",

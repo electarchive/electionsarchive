@@ -65,7 +65,11 @@ def parse() -> None:
             and re.match(r"\s+(President of the United States|Member of the (United States Senate|U\.S\. House))", line)
         )
         end = next(
-            i for i in range(start, len(lines)) if re.match(r"\s+(State Offices|Statewide Constitutional Offices|Public Service Commissioner)\s*$", lines[i])
+            i
+            for i in range(start, len(lines))
+            if re.match(
+                r"\s+(State Offices|Statewide Constitutional Offices|Public Service Commissioner)\s*$", lines[i]
+            )
         )
         chamber, district = "", None
         tables: list[dict] = []
@@ -146,9 +150,7 @@ def parse() -> None:
                     first = [c for c in cells if c[1] == "Total"]
                     if not first:
                         continue
-                    segments = [
-                        [(c.start(2) + m.end()) for m in re.finditer(r"\d[\d,]*", c[2])] for c in first
-                    ]
+                    segments = [[(c.start(2) + m.end()) for m in re.finditer(r"\d[\d,]*", c[2])] for c in first]
                     counties_at = [int(x) for h in header if h[0] == -1 for x in h[2].split(",") if x]
                     counties_at = sorted(set(counties_at)) or [0]
                     pieces = [h for h in header if h[0] >= 0]
@@ -169,13 +171,16 @@ def parse() -> None:
                                 if not h[4]:
                                     centre = (h[0] + h[1]) / 2
                                     names[
-                                        min(range(len(anchors)), key=lambda i: abs((anchors[i][0] + anchors[i][1]) / 2 - centre))
+                                        min(
+                                            range(len(anchors)),
+                                            key=lambda i: abs((anchors[i][0] + anchors[i][1]) / 2 - centre),
+                                        )
                                     ].append((h[3], h[2]))
                         else:
                             for h in mine:
-                                names[min(range(len(columns)), key=lambda i: abs(columns[i] - (h[0] + h[1]) / 2))].append(
-                                    (h[3], h[2])
-                                )
+                                names[
+                                    min(range(len(columns)), key=lambda i: abs(columns[i] - (h[0] + h[1]) / 2))
+                                ].append((h[3], h[2]))
                         named.append([[w for _, w in sorted(p)] for p in names])
                     if len(tables) == 1 and len(segments) == 2:
                         tables[0]["names"] = [" ".join(p) for p in named[0]]

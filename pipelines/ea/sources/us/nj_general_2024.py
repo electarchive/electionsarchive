@@ -43,14 +43,29 @@ def rows(source: str, files: list[str], day: date) -> list[tuple]:
                 break
             elif found := re.match(r"(\w+) Congressional District", line):
                 district = ORDINALS.index(found[1]) + 1
-            elif line[:1].strip() and not re.match(r"(Candidates|For |\d\d/|Total|Party|\(w\))", line) and line[column:].strip():
+            elif (
+                line[:1].strip()
+                and not re.match(r"(Candidates|For |\d\d/|Total|Party|\(w\))", line)
+                and line[column:].strip()
+            ):
                 name = re.sub(r"\s+\(w\)|\s*\*", "", line[:column]).strip().strip('"').upper()
             elif re.match(r"\s+Total\b", line):
                 name = None
             elif name and (found := re.match(r"\s{40,}(" + "|".join(COUNTIES) + r")\s.*?([\d,]+)\s*$", line)):
                 out.append(
-                    (day.year, office, day, False, "NJ", district if office == "house" else None, COUNTIES[found[1]], name,
-                     1, False, int(found[2].replace(",", "")))
+                    (
+                        day.year,
+                        office,
+                        day,
+                        False,
+                        "NJ",
+                        district if office == "house" else None,
+                        COUNTIES[found[1]],
+                        name,
+                        1,
+                        False,
+                        int(found[2].replace(",", "")),
+                    )
                 )
     return out
 
@@ -58,27 +73,35 @@ def rows(source: str, files: list[str], day: date) -> list[tuple]:
 def parse() -> None:
     found = rows(SOURCE, FILES, DAY)
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(
-        found,
-        schema={
-            "year": pl.Int32,
-            "chamber": pl.String,
-            "day": pl.Date,
-            "special": pl.Boolean,
-            "state": pl.String,
-            "district": pl.Int16,
-            "code": pl.String,
-            "candidate": pl.String,
-            "measure": pl.Int16,
-            "writein": pl.Boolean,
-            "votes": pl.Int64,
-        },
-        orient="row",
-    ).group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein").agg(
-        pl.col("votes").sum()
-    ).with_columns(kind=pl.lit("county"), source=pl.lit("NJ"))
+    frame = (
+        pl.DataFrame(
+            found,
+            schema={
+                "year": pl.Int32,
+                "chamber": pl.String,
+                "day": pl.Date,
+                "special": pl.Boolean,
+                "state": pl.String,
+                "district": pl.Int16,
+                "code": pl.String,
+                "candidate": pl.String,
+                "measure": pl.Int16,
+                "writein": pl.Boolean,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        )
+        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein")
+        .agg(pl.col("votes").sum())
+        .with_columns(kind=pl.lit("county"), source=pl.lit("NJ"))
+    )
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("chamber", "district", "candidate").agg(pl.col("votes").sum(), pl.col("code").n_unique()).sort("chamber", "district", "votes").rows())
+    print(
+        frame.group_by("chamber", "district", "candidate")
+        .agg(pl.col("votes").sum(), pl.col("code").n_unique())
+        .sort("chamber", "district", "votes")
+        .rows()
+    )
 
 
 def emit() -> Path:

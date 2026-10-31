@@ -75,7 +75,7 @@ def page(url: str) -> str | None:
 
 def contests(text: str) -> list[tuple[str, str, int, dict[str, int]]]:
     found = []
-    for block in re.findall(r'<div class="table-responsive">(.*?)</div>', text, re.S):
+    for block in re.findall(r'<div class="table-responsive">(.*?)</div>', text, re.DOTALL):
         title = re.search(r'OfficeName"><h3[^>]*>(.*?)</h3>', block)
         link = re.search(r"breakdown\.aspx\?e=\d+&amp;t=(\d+)", block)
         if title is None or link is None:
@@ -85,8 +85,11 @@ def contests(text: str) -> list[tuple[str, str, int, dict[str, int]]]:
         if key is None:
             continue
         totals = {}
-        for row in re.findall(r"<tr>(.*?)</tr>", block, re.S):
-            cells = [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+        for row in re.findall(r"<tr>(.*?)</tr>", block, re.DOTALL):
+            cells = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            ]
             if len(cells) == 4 and cells[2].isdigit():
                 totals[cells[0]] = int(cells[2])
         found.append((key, name, int(link[1]), totals))
@@ -95,10 +98,15 @@ def contests(text: str) -> list[tuple[str, str, int, dict[str, int]]]:
 
 def counties(text: str) -> dict[str, dict[str, int]]:
     found = {}
-    for name, body in re.findall(r'OfficeName" colspan="3"><h3[^>]*>(.*?)</h3></td></tr>(.*?)(?=<tr class="info">|</table>)', text, re.S):
+    for name, body in re.findall(
+        r'OfficeName" colspan="3"><h3[^>]*>(.*?)</h3></td></tr>(.*?)(?=<tr class="info">|</table>)', text, re.DOTALL
+    ):
         rows = {}
-        for row in re.findall(r"<tr>(.*?)</tr>", body, re.S):
-            cells = [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+        for row in re.findall(r"<tr>(.*?)</tr>", body, re.DOTALL):
+            cells = [
+                html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            ]
             if len(cells) == 3 and cells[2].isdigit():
                 rows[cells[0]] = int(cells[2])
         found[html.unescape(name).strip()] = rows

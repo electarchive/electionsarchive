@@ -56,7 +56,10 @@ def fetch() -> None:
                 subprocess.run(
                     ["curl", "-sL", "-m", "120", "-C", "-", "-A", "Mozilla/5.0", "-o", str(target), url], check=False
                 )
-                if target.exists() and subprocess.run(["pdfinfo", str(target)], capture_output=True).returncode == 0:
+                if (
+                    target.exists()
+                    and subprocess.run(["pdfinfo", str(target)], capture_output=True, check=False).returncode == 0
+                ):
                     raw.store(
                         SOURCE,
                         url,
@@ -199,26 +202,26 @@ def parse() -> None:
                     raise ValueError(f"{year}: no county {county}")
                 for index, (candidate, party) in enumerate(names):
                     rows.append(
-                        dict(
-                            year=year,
-                            chamber=f"{chamber}:{district}:g",
-                            day=day,
-                            code=code,
-                            candidate=candidate,
-                            writein=party == "WI",
-                            votes=values[index],
-                        )
+                        {
+                            "year": year,
+                            "chamber": f"{chamber}:{district}:g",
+                            "day": day,
+                            "code": code,
+                            "candidate": candidate,
+                            "writein": party == "WI",
+                            "votes": values[index],
+                        }
                     )
                 rows.append(
-                    dict(
-                        year=year,
-                        chamber=f"{chamber}:{district}:g",
-                        day=day,
-                        code=code,
-                        candidate="WRITE-INS",
-                        writein=True,
-                        votes=values[-1],
-                    )
+                    {
+                        "year": year,
+                        "chamber": f"{chamber}:{district}:g",
+                        "day": day,
+                        "code": code,
+                        "candidate": "WRITE-INS",
+                        "writein": True,
+                        "votes": values[-1],
+                    }
                 )
     PARSED.mkdir(parents=True, exist_ok=True)
     (

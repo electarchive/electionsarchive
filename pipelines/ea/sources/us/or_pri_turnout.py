@@ -21,10 +21,12 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    text = subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, URL).path), "-"], capture_output=True, text=True, check=True).stdout
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, URL).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
     rows = [
         {"year": int(m[1]), "registered": int(m[2].replace(",", "")), "voters": int(m[3].replace(",", ""))}
-        for m in re.finditer(r"^\s*((?:19|20)\d\d)\s+([\d,]+)\s+([\d,]+)\s+[\d.]+%", text, re.M)
+        for m in re.finditer(r"^\s*((?:19|20)\d\d)\s+([\d,]+)\s+([\d,]+)\s+[\d.]+%", text, re.MULTILINE)
     ]
     frame = pl.DataFrame(rows)
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -56,7 +58,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for year, registered, voters in frame.select("year", "registered", "voters").iter_rows():
             found = elections.get(year, [])

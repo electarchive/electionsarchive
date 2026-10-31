@@ -41,7 +41,15 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=URL,
+            license="Public record",
+        )
         artifact = cs.artifact(raw.cached(SOURCE, URL), source)
         unit, area = conn.execute(
             """select u.id, u.area_id from reporting_unit u join polity_territory t on t.area_id = u.area_id
@@ -49,22 +57,53 @@ def emit() -> Path:
         ).fetchone()
         polity = cs.polity("US-VI")
         contest_key = f"{DAY}:VI:governor"
-        if conn.execute("select 1 from external_id where scheme = 'us.contest' and value = %s", [contest_key]).fetchone():
+        if conn.execute(
+            "select 1 from external_id where scheme = 'us.contest' and value = %s", [contest_key]
+        ).fetchone():
             raise ValueError("the 1978 Virgin Islands governor contest is already held")
         image = DATA / "pages" / SOURCE / f"{raw.cached(SOURCE, URL).sha256}-{PAGE}.png"
         if not image.exists():
             image.parent.mkdir(parents=True, exist_ok=True)
             subprocess.run(
-                ["pdftoppm", "-r", "100", "-png", "-f", str(PAGE), "-l", str(PAGE), "-singlefile", str(raw.cached(SOURCE, URL).path), str(image.with_suffix(""))],
+                [
+                    "pdftoppm",
+                    "-r",
+                    "100",
+                    "-png",
+                    "-f",
+                    str(PAGE),
+                    "-l",
+                    str(PAGE),
+                    "-singlefile",
+                    str(raw.cached(SOURCE, URL).path),
+                    str(image.with_suffix("")),
+                ],
                 check=True,
             )
         width, height = struct.unpack(">II", image.read_bytes()[16:24])
         if (width, height) != SIZE:
             raise ValueError(f"page size {(width, height)}")
         page = cs.page(artifact, PAGE)
-        cs.add("source_page", id=page, artifact_id=artifact, page_number=PAGE, image_key=f"pages/{SOURCE}/{image.name}", width=width, height=height)
+        cs.add(
+            "source_page",
+            id=page,
+            artifact_id=artifact,
+            page_number=PAGE,
+            image_key=f"pages/{SOURCE}/{image.name}",
+            width=width,
+            height=height,
+        )
         election = cs.key("us.election", f"{DAY}:VI")
-        cs.add("election", id=election, polity_id=polity, kind="general", date_from=DAY, date_to=DAY, date_precision="day", status="held")
+        cs.add(
+            "election",
+            id=election,
+            polity_id=polity,
+            kind="general",
+            date_from=DAY,
+            date_to=DAY,
+            date_precision="day",
+            status="held",
+        )
         name(election, "1978 Virgin Islands general election")
         cs.add("slug", path=f"us/vi/{DAY}-general", entity_id=election)
         contest = cs.key("us.contest", contest_key)
@@ -135,9 +174,25 @@ def emit() -> Path:
                     is_independent=party_key is None,
                 )
             ranked.append((votes, option))
-            fact = {"result_set_id": result_set, "unit_id": unit, "option_id": option, "channel": 0, "measure": 1, "count_round": 0}
+            fact = {
+                "result_set_id": result_set,
+                "unit_id": unit,
+                "option_id": option,
+                "channel": 0,
+                "measure": 1,
+                "count_round": 0,
+            }
             cs.add("result_value", **fact, flags=0, value=votes)
-            cs.add("value_locator", **fact, page_id=page, source_id=None, x0=box[0] / width, y0=box[1] / height, x1=box[2] / width, y1=box[3] / height)
+            cs.add(
+                "value_locator",
+                **fact,
+                page_id=page,
+                source_id=None,
+                x0=box[0] / width,
+                y0=box[1] / height,
+                x1=box[2] / width,
+                y1=box[3] / height,
+            )
         ranked.sort(key=lambda pair: -pair[0])
         cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="elected", seats=None)
         return cs.write()

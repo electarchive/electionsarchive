@@ -39,7 +39,11 @@ def url(year: int, candidate: str | None = None) -> str:
 
 
 WIDE = {"6235": ("2016-02-27", "Democratic")}
-FILES = [f"{SITE}/api/download_contest/{contest}_table.csv?split_party=false" for contest in WIDE] + [url(year) for year in YEARS] + [url(year, candidate) for year, candidate in BY_CANDIDATE.items()]
+FILES = (
+    [f"{SITE}/api/download_contest/{contest}_table.csv?split_party=false" for contest in WIDE]
+    + [url(year) for year in YEARS]
+    + [url(year, candidate) for year, candidate in BY_CANDIDATE.items()]
+)
 
 
 def fetch() -> None:
@@ -63,7 +67,9 @@ def parse() -> None:
     for file in FILES:
         if "download_contest" in file:
             day, party = WIDE[file.split("/")[-1].split("_")[0]]
-            table = pl.read_csv(raw.cached(SOURCE, file).path, has_header=False, infer_schema=False, truncate_ragged_lines=True)
+            table = pl.read_csv(
+                raw.cached(SOURCE, file).path, has_header=False, infer_schema=False, truncate_ragged_lines=True
+            )
             names = table.row(0)
             frame = pl.DataFrame(
                 [

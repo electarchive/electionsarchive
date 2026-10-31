@@ -88,7 +88,13 @@ def parse() -> None:
                     ["tesseract", str(image), "stdout", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
                 ).stdout
                 tokens = [
-                    (int(r["left"]), int(r["top"]), int(r["left"]) + int(r["width"]), int(r["top"]) + int(r["height"]), re.sub(r"\D", "", r["text"]))
+                    (
+                        int(r["left"]),
+                        int(r["top"]),
+                        int(r["left"]) + int(r["width"]),
+                        int(r["top"]) + int(r["height"]),
+                        re.sub(r"\D", "", r["text"]),
+                    )
                     for r in csv.DictReader(io.StringIO(tsv), delimiter="\t", quoting=csv.QUOTE_NONE)
                     if r["level"] == "5" and re.fullmatch(r"[-\d,.]*\d[\d,.]*", r["text"].strip())
                 ]
@@ -98,7 +104,9 @@ def parse() -> None:
                 edges: list[float] = []
                 for column in range(len(columns)):
                     expected = [str(table["rows"][c][column]) for c in counties]
-                    rights = [t[2] for t in tokens if t[4] in expected and (len(t[4]) > 1 or max(map(len, expected)) == 1)]
+                    rights = [
+                        t[2] for t in tokens if t[4] in expected and (len(t[4]) > 1 or max(map(len, expected)) == 1)
+                    ]
                     if len(rights) < len(counties) / 3:
                         break
                     common = statistics.mode(round(r / 12) for r in rights)
@@ -123,7 +131,7 @@ def parse() -> None:
                     for pitch in numpy.arange(low, high, 0.1):
                         for group in numpy.arange(5 * pitch + extra_low, 5 * pitch + extra_high, 0.5):
                             offsets = (index // 5) * group + (index % 5) * pitch
-                            for y0 in range(0, 400):
+                            for y0 in range(400):
                                 score = profile[numpy.clip((y0 + offsets).astype(int), 0, len(profile) - 1)].sum()
                                 if score > best[0]:
                                     best = (score, y0, pitch, group)
@@ -151,7 +159,9 @@ def parse() -> None:
                         sorted(merged, key=lambda run: -int(column_profile[run[0] : run[1]].sum()))[: len(columns)]
                     )
                     if len(merged) != len(columns):
-                        raise ValueError(f"{year} {group} page {page}: {len(merged)} column runs for {len(columns)} columns")
+                        raise ValueError(
+                            f"{year} {group} page {page}: {len(merged)} column runs for {len(columns)} columns"
+                        )
                     edges = [left + hi for _, hi in merged]
                     char = statistics.median(hi - lo for lo, hi in merged) / 5.5
                     found = {}
@@ -171,7 +181,9 @@ def parse() -> None:
                         lo, hi = below[-1], above[0]
                         centers[i] = centers[lo] + (centers[hi] - centers[lo]) * (i - lo) / (hi - lo)
                     else:
-                        near, far = (known[:2] if above else known[-2:][::-1]) if len(known) > 1 else (known[0], known[0])
+                        near, far = (
+                            (known[:2] if above else known[-2:][::-1]) if len(known) > 1 else (known[0], known[0])
+                        )
                         pitch = (centers[far] - centers[near]) / (far - near) if far != near else height * 1.5
                         centers[i] = centers[near] + pitch * (i - near)
                 for column in range(len(columns)):
@@ -179,7 +191,12 @@ def parse() -> None:
                         box = found.get((i, column))
                         if box is None or abs((box[1] + box[3]) / 2 - centers[i]) > height:
                             width = char * len(str(table["rows"][county][column]))
-                            box = (round(edges[column] - width), round(centers[i] - height / 2), round(edges[column]), round(centers[i] + height / 2))
+                            box = (
+                                round(edges[column] - width),
+                                round(centers[i] - height / 2),
+                                round(edges[column]),
+                                round(centers[i] + height / 2),
+                            )
                         else:
                             matched += 1
                         boxes[(county, column)] = box
@@ -239,8 +256,13 @@ def emit() -> Path:
             title = TITLE.format(day=ITEMS[year][1])
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title,
-                url=f"https://archive.org/details/{ITEMS[year][0]}", license=LICENSE,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=f"https://archive.org/details/{ITEMS[year][0]}",
+                license=LICENSE,
             )
             book = raw.cached(RAW, url(year))
             artifact = cs.artifact(book, sources[year])
@@ -272,7 +294,9 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '39%%'"""
             ).fetchall()
         }
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -390,5 +414,11 @@ def emit() -> Path:
                         x1=box[2] / width,
                         y1=box[3] / height,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

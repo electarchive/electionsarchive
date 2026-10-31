@@ -24,7 +24,7 @@ UNWANTED = re.compile(
     r"special|congress|consolidation|DistsReporting|conservative|democrat|republican|liberal|independence|working"
 )
 TOTAL = re.compile(r"(?i)total")
-ED = re.compile(r"^(?:[A-Z]{2,6}(?: \d+)? ?\d+(?:-\d+)?[A-Z]?|\d+(?:st|nd|rd|th) District\b.*)$", re.I)
+ED = re.compile(r"^(?:[A-Z]{2,6}(?: \d+)? ?\d+(?:-\d+)?[A-Z]?|\d+(?:st|nd|rd|th) District\b.*)$", re.IGNORECASE)
 COUNTY_TOTAL = re.compile(r"(?i)^(?:erie county total|office total|total|grand total)$")
 SKIP_COLUMNS = re.compile(
     r"(?i)^(?:blank|void|total|grand total|spec pres voters|fed voters|registered|blank, void.*)$"
@@ -129,11 +129,13 @@ def sheet(rows: list[list[Any]], index: int) -> dict[str, Any] | None:
             district = re.match(r"(\d+)", label)
             places.append((f"{section} {district[1]}" if district and section else label, values))
     named = " ".join(parts).upper()
-    if not re.search(r"\b(?:TOWN|CITY|VILLAGE) OF\b|\bCOUNTY\b", named):
-        if len(sections) == 1 and sections[0].upper() not in named:
-            parts.insert(0, sections[0])
-        elif len(sections) <= 12 and re.match(r"(?i)(?:town|city|village) of ", sections[0] if sections else ""):
-            parts.insert(0, sections[0])
+    if not re.search(r"\b(?:TOWN|CITY|VILLAGE) OF\b|\bCOUNTY\b", named) and (
+        len(sections) == 1
+        and sections[0].upper() not in named
+        or len(sections) <= 12
+        and re.match(r"(?i)(?:town|city|village) of ", sections[0] if sections else "")
+    ):
+        parts.insert(0, sections[0])
     return {
         "key": str(index),
         "title": parts,

@@ -97,7 +97,7 @@ def emit() -> Path:
                join name n on n.entity_id = x.entity_id and n.is_preferred
                where x.scheme = 'us.contest' and x.value like '%%:ME:question:%%'"""
         ):
-            if (found := NUMBER.findall(name)):
+            if found := NUMBER.findall(name):
                 contests.setdefault((date.fromisoformat(key[:10]), int(found[-1])), []).append(entity)
         placed = 0
         for day, question, page, text in wording.iter_rows():

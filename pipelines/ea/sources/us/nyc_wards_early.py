@@ -63,9 +63,9 @@ def parse() -> None:
     lines = pl.read_parquet(raw.parsed(mayors.SOURCE) / "lines.parquet")
     rows: list[dict[str, object]] = []
     for year in YEARS:
-        wikitext = json.loads(raw.cached(SOURCE, mayors.page(year)).path.read_text())["query"]["pages"][0][
-            "revisions"
-        ][0]["slots"]["main"]["content"]
+        wikitext = json.loads(raw.cached(SOURCE, mayors.page(year)).path.read_text())["query"]["pages"][0]["revisions"][
+            0
+        ]["slots"]["main"]["content"]
         table = next(
             match.group(0)
             for match in re.finditer(r"\{\|.*?\n\|\}", wikitext, re.DOTALL)
@@ -77,7 +77,9 @@ def parse() -> None:
             if "Total" not in head
         ]
         names = [name for name in names if name]
-        citywide = lines.filter((pl.col("year") == year) & (pl.col("stage") == "general") & (pl.col("office") == "mayor"))
+        citywide = lines.filter(
+            (pl.col("year") == year) & (pl.col("stage") == "general") & (pl.col("office") == "mayor")
+        )
         candidates = []
         for header in names:
             surname = header.split()[0].lower()
@@ -90,8 +92,7 @@ def parse() -> None:
                 continue
             body = re.sub(r"\{\{[^}]*\}\}\|?", "", match.group(2)).replace("'''", "")
             numbers = [
-                int(number.replace(",", ""))
-                for number in re.findall(r"(?<![\d.,])\d[\d,]*(?![\d,.]*%)(?!\d)", body)
+                int(number.replace(",", "")) for number in re.findall(r"(?<![\d.,])\d[\d,]*(?![\d,.]*%)(?!\d)", body)
             ]
             if len(numbers) != len(candidates) + 1 or sum(numbers[:-1]) != numbers[-1]:
                 raise ValueError(f"{year} ward {match.group(1)} does not add up: {numbers}")
@@ -110,11 +111,15 @@ def parse() -> None:
     for year, page in TRIB.items():
         left: list[str] = []
         reads = [json.loads((TRIB_INBOX / f"p{page}-{reader}.json").read_text()) for reader in ("sonnet", "opus")]
-        citywide = lines.filter((pl.col("year") == year) & (pl.col("stage") == "general") & (pl.col("office") == "mayor"))
+        citywide = lines.filter(
+            (pl.col("year") == year) & (pl.col("stage") == "general") & (pl.col("office") == "mayor")
+        )
         for position, head in enumerate(reads[0]["candidates"]):
             if head["name"] == "Sc't":
                 continue
-            surname = {"Her'ck": "Herrick", "Hoff": "Hoffman", "Robts": "Roberts"}.get(head["name"], head["name"]).lower()
+            surname = {"Her'ck": "Herrick", "Hoff": "Hoffman", "Robts": "Roberts"}.get(
+                head["name"], head["name"]
+            ).lower()
             (found,) = [c for c in citywide["candidate"] if c.split()[-1].lower() == surname]
             cells = [[int(ward["votes"][position].replace(",", "")) for ward in read["wards"]] for read in reads]
             wards = [[ward["ward"] for ward in read["wards"]] for read in reads]
@@ -141,10 +146,24 @@ def parse() -> None:
             cells = [[int(ward["votes"][position].replace(",", "")) for ward in read["wards"]] for read in reads]
             wards = [ward["ward"] for ward in reads[0]["wards"]]
             printed = [int(read["total"][position].replace(",", "")) for read in reads]
-            if cells[0] != cells[1] or wards != list(range(1, 23)) or sum(cells[0]) != printed[0] or printed[0] != printed[1]:
-                raise ValueError(f"{year} president {head['name']}: reads disagree or wards do not add up to the printed total")
+            if (
+                cells[0] != cells[1]
+                or wards != list(range(1, 23))
+                or sum(cells[0]) != printed[0]
+                or printed[0] != printed[1]
+            ):
+                raise ValueError(
+                    f"{year} president {head['name']}: reads disagree or wards do not add up to the printed total"
+                )
             president.extend(
-                {"year": year, "ward": ward, "option": head["name"], "votes": votes, "page": page, "bbox": reads[0]["bbox"]}
+                {
+                    "year": year,
+                    "ward": ward,
+                    "option": head["name"],
+                    "votes": votes,
+                    "page": page,
+                    "bbox": reads[0]["bbox"],
+                }
                 for ward, votes in zip(wards, cells[0], strict=True)
             )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -261,7 +280,9 @@ def emit() -> Path:
         }
         cs.add(
             "boundary_set",
-            id=(conn.execute("select id from boundary_set where scheme_code = 'us.nyc_ward'").fetchone() or (uuid4(),))[0],
+            id=(conn.execute("select id from boundary_set where scheme_code = 'us.nyc_ward'").fetchone() or (uuid4(),))[
+                0
+            ],
             scheme_code="us.nyc_ward",
             vintage="1855",
             valid_from=FIRST_WARD_DAY,
@@ -271,7 +292,13 @@ def emit() -> Path:
         areas = {ward: cs.area("us.nyc_ward", f"36061:{ward:02d}") for ward in range(1, 23)}
         for ward, area in areas.items():
             cs.add("area", id=area, scheme_code="us.nyc_ward")
-            cs.add("area_code", area_id=area, code=f"36061:{ward:02d}", valid_from=FIRST_WARD_DAY, valid_to=date(1871, 1, 1))
+            cs.add(
+                "area_code",
+                area_id=area,
+                code=f"36061:{ward:02d}",
+                valid_from=FIRST_WARD_DAY,
+                valid_to=date(1871, 1, 1),
+            )
             cs.add("name", entity_id=area, text=f"Ward {ward}", lang="en", kind="official", is_preferred=True)
             cs.add(
                 "area_geometry",
@@ -283,7 +310,9 @@ def emit() -> Path:
                 quality="academic",
                 source_id=outline,
             )
-            cs.add("area_parent", area_id=area, parent_id=county_area, valid_from=FIRST_WARD_DAY, valid_to=date(1871, 1, 1))
+            cs.add(
+                "area_parent", area_id=area, parent_id=county_area, valid_from=FIRST_WARD_DAY, valid_to=date(1871, 1, 1)
+            )
         for year in (*sorted(TRIB), *YEARS):
             held = tribune if year in TRIB else source
             if year not in TRIB:
@@ -317,15 +346,22 @@ def emit() -> Path:
                         "the citywide set stays the default."
                     ),
                 )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=(
-                    METHOD_TRIB.format(year=year, unlocated="" if day >= FIRST_WARD_DAY else " except that the 1854 units are unlocated")
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=(
+                    METHOD_TRIB.format(
+                        year=year,
+                        unlocated="" if day >= FIRST_WARD_DAY else " except that the 1854 units are unlocated",
+                    )
                     if year in TRIB
                     else METHOD.format(year=year)
                 ),
             )
-            for ward, candidate, votes, page, bbox in frame.filter(pl.col("year") == year).select(
-                "ward", "candidate", "votes", "page", "bbox"
-            ).iter_rows():
+            for ward, candidate, votes, page, bbox in (
+                frame.filter(pl.col("year") == year).select("ward", "candidate", "votes", "page", "bbox").iter_rows()
+            ):
                 code = f"36061:{ward:02d}"
                 unit = cs.unit("us.nyc_ward", code, day)
                 if unit not in added:
@@ -370,9 +406,12 @@ def emit() -> Path:
                 "where x.scheme = 'us.contest' and x.value = %s",
                 [f"{day}:NY:president"],
             ).fetchall()
-            options = {label.split(" (")[0].split()[-1].lower(): option for option, label in conn.execute(
-                "select id, ballot_label from contest_option where contest_id = %s", [contest]
-            ).fetchall()}
+            options = {
+                label.split(" (")[0].split()[-1].lower(): option
+                for option, label in conn.execute(
+                    "select id, ballot_label from contest_option where contest_id = %s", [contest]
+                ).fetchall()
+            }
             result_set = cs.key(f"{SOURCE}.result_set", f"president:{day}:NY:wards:36061")
             cs.add(
                 "result_set",
@@ -386,13 +425,20 @@ def emit() -> Path:
                 is_default=False,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=(
-                f"New York City's vote for President in {year} by ward, from the Tribune Almanac's table, read from the page "
-                "image by two vision models (Claude Sonnet 5.5 and Opus 5.5). A column is loaded only where both reads agree "
-                "in every ward and the 22 wards add up to the printed total row. The set covers New York County only; the "
-                "statewide sets stay the default."
-            ))
-            for ward, option, votes, bbox in president.filter(pl.col("year") == year).select("ward", "option", "votes", "bbox").iter_rows():
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=(
+                    f"New York City's vote for President in {year} by ward, from the Tribune Almanac's table, read from the page "
+                    "image by two vision models (Claude Sonnet 5.5 and Opus 5.5). A column is loaded only where both reads agree "
+                    "in every ward and the 22 wards add up to the printed total row. The set covers New York County only; the "
+                    "statewide sets stay the default."
+                ),
+            )
+            for ward, option, votes, bbox in (
+                president.filter(pl.col("year") == year).select("ward", "option", "votes", "bbox").iter_rows()
+            ):
                 code = f"36061:{ward:02d}"
                 unit = cs.unit("us.nyc_ward", code, day)
                 if unit not in added:
@@ -419,5 +465,14 @@ def emit() -> Path:
                     "count_round": 0,
                 }
                 cs.add("result_value", **fact, flags=0, value=votes)
-                cs.add("value_locator", **fact, page_id=trib_pages[page], source_id=None, x0=bbox[0], y0=bbox[1], x1=bbox[2], y1=bbox[3])
+                cs.add(
+                    "value_locator",
+                    **fact,
+                    page_id=trib_pages[page],
+                    source_id=None,
+                    x0=bbox[0],
+                    y0=bbox[1],
+                    x1=bbox[2],
+                    y1=bbox[3],
+                )
         return cs.write()

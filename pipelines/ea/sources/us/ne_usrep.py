@@ -23,7 +23,45 @@ EARLY = [
         chunk.splitlines() for chunk in Path(__file__).with_name("ne_usrep_early.txt").read_text().split("@ ")[1:]
     )
 ]
-EARLY_DAYS = {1916: date(1916, 11, 7), 1918: date(1918, 11, 5), 1920: date(1920, 11, 2), 1922: date(1922, 11, 7), 1924: date(1924, 11, 4), 1926: date(1926, 11, 2), 1928: date(1928, 11, 6), 1930: date(1930, 11, 4), 1932: date(1932, 11, 8), 1934: date(1934, 11, 6), 1936: date(1936, 11, 3), 1938: date(1938, 11, 8), 1940: date(1940, 11, 5), 1942: date(1942, 11, 3), 1944: date(1944, 11, 7), 1946: date(1946, 11, 5), 1948: date(1948, 11, 2), 1950: date(1950, 11, 7), 1952: date(1952, 11, 4), 1954: date(1954, 11, 2), 1956: date(1956, 11, 6), 1958: date(1958, 11, 4), 1960: date(1960, 11, 8), 1978: date(1978, 11, 7), 1962: date(1962, 11, 6), 1964: date(1964, 11, 3), 1966: date(1966, 11, 8), 1968: date(1968, 11, 5), 1970: date(1970, 11, 3), 1972: date(1972, 11, 7), 1974: date(1974, 11, 5), 1976: date(1976, 11, 2), 1982: date(1982, 11, 2), 1984: date(1984, 11, 6), 1986: date(1986, 11, 4), 1988: date(1988, 11, 8), 1990: date(1990, 11, 6)}
+EARLY_DAYS = {
+    1916: date(1916, 11, 7),
+    1918: date(1918, 11, 5),
+    1920: date(1920, 11, 2),
+    1922: date(1922, 11, 7),
+    1924: date(1924, 11, 4),
+    1926: date(1926, 11, 2),
+    1928: date(1928, 11, 6),
+    1930: date(1930, 11, 4),
+    1932: date(1932, 11, 8),
+    1934: date(1934, 11, 6),
+    1936: date(1936, 11, 3),
+    1938: date(1938, 11, 8),
+    1940: date(1940, 11, 5),
+    1942: date(1942, 11, 3),
+    1944: date(1944, 11, 7),
+    1946: date(1946, 11, 5),
+    1948: date(1948, 11, 2),
+    1950: date(1950, 11, 7),
+    1952: date(1952, 11, 4),
+    1954: date(1954, 11, 2),
+    1956: date(1956, 11, 6),
+    1958: date(1958, 11, 4),
+    1960: date(1960, 11, 8),
+    1978: date(1978, 11, 7),
+    1962: date(1962, 11, 6),
+    1964: date(1964, 11, 3),
+    1966: date(1966, 11, 8),
+    1968: date(1968, 11, 5),
+    1970: date(1970, 11, 3),
+    1972: date(1972, 11, 7),
+    1974: date(1974, 11, 5),
+    1976: date(1976, 11, 2),
+    1982: date(1982, 11, 2),
+    1984: date(1984, 11, 6),
+    1986: date(1986, 11, 4),
+    1988: date(1988, 11, 8),
+    1990: date(1990, 11, 6),
+}
 DAYS = {1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
 STARTS = {1992: 3361, 1994: 3194, 1996: 1859, 1998: 3033}
 METHOD = (
@@ -33,7 +71,9 @@ METHOD = (
 )
 ALIASES = {"lolip": "loup", "kihsall": "kimball", "bun": "burt"}
 TOKEN = r"[0-9OoIl&\]B.,S·]+"
-TRANSLATE = str.maketrans({"O": "0", "o": "0", "&": "6", "]": "1", "I": "1", "l": "1", "B": "8", "S": "5", "~": "", "_": "", "·": ""})
+TRANSLATE = str.maketrans(
+    {"O": "0", "o": "0", "&": "6", "]": "1", "I": "1", "l": "1", "B": "8", "S": "5", "~": "", "_": "", "·": ""}
+)
 TOTALS = {(1994, 3): [41943, 154919, 41]}
 ROWS = {
     (1994, 1, "York"): {1: 3828},
@@ -46,9 +86,15 @@ ROWS = {
     (1998, 3, "Hall"): {3: 27},
 }
 WRITEINS = {
-    (1992, 1): "Cass 8 Cuming 5 Dodge 16 Johnson 1 Madison 15 Nemaha 2 Otoe 4 Richardson 2 Saunders 12 Seward 6 Thurston 2 York 13",
+    (
+        1992,
+        1,
+    ): "Cass 8 Cuming 5 Dodge 16 Johnson 1 Madison 15 Nemaha 2 Otoe 4 Richardson 2 Saunders 12 Seward 6 Thurston 2 York 13",
     (1992, 3): "Adams 18 Clay 1 Dawes 1 Deuel 1 Lincoln 10 Platte 3 Polk 4 Red Willow 3",
-    (1994, 1): "Cass 4 Cuming 7 Dakota 2 Dixon 8 Dodge 12 Johnson 1 Lancaster 139 Madison 5 Nemaha 2 Otoe 5 Saunders 9 Seward 3 Stanton 1 Washington 10 York 6",
+    (
+        1994,
+        1,
+    ): "Cass 4 Cuming 7 Dakota 2 Dixon 8 Dodge 12 Johnson 1 Lancaster 139 Madison 5 Nemaha 2 Otoe 5 Saunders 9 Seward 3 Stanton 1 Washington 10 York 6",
     (1994, 3): "Adams 9 Chase 1 Deuel 1 Fillmore 1 Hall 8 Kimball 1 Knox 2 Lincoln 8 Platte 10",
 }
 
@@ -94,7 +140,12 @@ def parse() -> None:
     rows = []
     for year, day in DAYS.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, URL.format(year, "gen" if year < 1938 else "prim_gen")).path), "-"],
+            [
+                "pdftotext",
+                "-layout",
+                str(raw.cached(SOURCE, URL.format(year, "gen" if year < 1938 else "prim_gen")).path),
+                "-",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -109,7 +160,11 @@ def parse() -> None:
             for line in block:
                 if "TOTAL" in line:
                     line = line.split("TOTAL", 1)[0]
-                pattern = r"([A-Za-z][A-Za-z .'~]*?)\s{2,}((?:%s\s+){0,%d}%s)(?=\s{2,}|\s*$)" % (TOKEN, width - 1, TOKEN)
+                pattern = r"([A-Za-z][A-Za-z .'~]*?)\s{2,}((?:%s\s+){0,%d}%s)(?=\s{2,}|\s*$)" % (
+                    TOKEN,
+                    width - 1,
+                    TOKEN,
+                )
                 for match in re.finditer(pattern, line):
                     key = ALIASES.get(re.sub(r"[^a-z]", "", match[1].lower()), re.sub(r"[^a-z]", "", match[1].lower()))
                     close = difflib.get_close_matches(key, codes, 1, 0.7) if key else []
@@ -146,7 +201,10 @@ def parse() -> None:
         table = {
             re.sub(r"[^a-z]", "", name.lower()): cells
             for name, cells in (
-                (" ".join(word for word in line.split() if not word.isdigit() and word != "-"), [None if word == "-" else int(word) for word in line.split() if word.isdigit() or word == "-"])
+                (
+                    " ".join(word for word in line.split() if not word.isdigit() and word != "-"),
+                    [None if word == "-" else int(word) for word in line.split() if word.isdigit() or word == "-"],
+                )
                 for line in block
             )
         }

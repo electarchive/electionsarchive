@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 from ea.store import connect
 
 with connect() as c:

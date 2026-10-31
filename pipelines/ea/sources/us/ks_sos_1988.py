@@ -88,13 +88,23 @@ def parse() -> None:
                     if clean(grid[r][i])
                 ).strip()
                 district = re.search(r"District (\d+)", label)
-                columns.append((i, name, clean(grid[party][i]), int(district[1]) if district else None, "unexpired" in label.lower()))
+                columns.append(
+                    (
+                        i,
+                        name,
+                        clean(grid[party][i]),
+                        int(district[1]) if district else None,
+                        "unexpired" in label.lower(),
+                    )
+                )
             rows = []
             totals: dict[object, list[int]] = {}
             for row in grid[party + 1 :]:
                 text = clean(row[1] if chamber == "house" else row[0])
                 if text:
-                    key = re.sub(r"[^a-z]", "", re.sub(r"(?i)\s*(county)?\s*total.*$", "", text.lower().replace(" county", "")))
+                    key = re.sub(
+                        r"[^a-z]", "", re.sub(r"(?i)\s*(county)?\s*total.*$", "", text.lower().replace(" county", ""))
+                    )
                     fips = counties.get(key)
                     if fips is None:
                         raise ValueError(f"{year} {sheet}: no county {text}")

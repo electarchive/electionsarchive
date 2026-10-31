@@ -27,7 +27,9 @@ CSV24 = (date(2024, 11, 5), "https://drive.google.com/uc?export=download&id=1EZZ
 def drive_links(listing: str) -> list[str]:
     page = raw.cached(SOURCE, listing).path.read_text(encoding="utf-8", errors="replace")
     links = []
-    for href, label in re.findall(r'<a[^>]+href="https://drive\.google\.com/file/d/([^/"]+)[^"]*"[^>]*>(.*?)</a>', page, flags=re.S):
+    for href, label in re.findall(
+        r'<a[^>]+href="https://drive\.google\.com/file/d/([^/"]+)[^"]*"[^>]*>(.*?)</a>', page, flags=re.DOTALL
+    ):
         text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", label)).strip()
         if re.match(r"Precinct_", text) or re.search(r"\b\d+[A-Z]? \(", text):
             link = f"https://drive.google.com/uc?export=download&id={href}"
@@ -43,9 +45,15 @@ def fetch() -> None:
             try:
                 raw.cached(SOURCE, url)
             except LookupError:
-                body = subprocess.run(["curl", "-skL", "-m", "60", "-A", raw.USER_AGENT, "-w", "%{http_code}", url], capture_output=True, check=True).stdout
+                body = subprocess.run(
+                    ["curl", "-skL", "-m", "60", "-A", raw.USER_AGENT, "-w", "%{http_code}", url],
+                    capture_output=True,
+                    check=True,
+                ).stdout
                 if body.endswith(b"200"):
-                    raw.store(SOURCE, url, body[:-3], suffix=".htm", retrieved_at=datetime.now(UTC), media_type="text/html")
+                    raw.store(
+                        SOURCE, url, body[:-3], suffix=".htm", retrieved_at=datetime.now(UTC), media_type="text/html"
+                    )
     for _, listing in DRIVE.values():
         try:
             raw.cached(SOURCE, listing)
@@ -57,7 +65,9 @@ def fetch() -> None:
                 raw.cached(SOURCE, link)
             except LookupError:
                 body = subprocess.run(["curl", "-sL", "-m", "90", link], capture_output=True, check=True).stdout
-                raw.store(SOURCE, link, body, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+                raw.store(
+                    SOURCE, link, body, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+                )
     try:
         raw.cached(SOURCE, CSV24[1])
     except LookupError:
@@ -82,15 +92,28 @@ def emit() -> Path:
                 stripped = line.strip()
                 found = re.match(r"^\s*(?:\d+\.\s+)?(.*?)[\s.]*\s(\d[\d,]*)\s+[\d.]+\s*$", line)
                 if found and section is not None:
-                    results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip(" .")] = int(found[2].replace(",", ""))
-                elif stripped and not re.match(r"(?i)(vote for|mark no more|total|over votes|under votes|\(with|votes|registered|ballots|voter)", stripped):
+                    results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip(" .")] = int(
+                        found[2].replace(",", "")
+                    )
+                elif stripped and not re.match(
+                    r"(?i)(vote for|mark no more|total|over votes|under votes|\(with|votes|registered|ballots|voter)",
+                    stripped,
+                ):
                     lowered = stripped.lower()
-                    section = "governor" if lowered.startswith("governor") else "house:0" if lowered.startswith(("non-voting delegate", "nv delegate")) else None
+                    section = (
+                        "governor"
+                        if lowered.startswith("governor")
+                        else "house:0"
+                        if lowered.startswith(("non-voting delegate", "nv delegate"))
+                        else None
+                    )
     for year, (day, listing) in DRIVE.items():
         for link in drive_links(listing):
             artifact = raw.cached(SOURCE, link)
             artifacts.setdefault(day, []).append(artifact)
-            text = subprocess.run(["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True
+            ).stdout
             label = re.search(r"(?m)^Precinct (\S+)", text)[1]
             code = f"{year}:GU:{label}"
             section = None
@@ -98,17 +121,32 @@ def emit() -> Path:
                 stripped = line.strip()
                 found = re.match(r"^(?:(?:DEM|REP|IND|NPP)\s+)?(.*?)\s{2,}(\d[\d,]*)\s+[\d.]+%\s*$", stripped)
                 if found and section is not None and not found[1].startswith("Total Votes"):
-                    results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip()] = int(found[2].replace(",", ""))
-                elif stripped and not re.match(r"(?i)(vote for|total|overvotes|undervotes|contest totals|statistics|registered|ballots|voter|summary|precinct|guam general|guam 2020|november|report generated|official)", stripped):
+                    results.setdefault((day, section), {}).setdefault(code, {})[found[1].strip()] = int(
+                        found[2].replace(",", "")
+                    )
+                elif stripped and not re.match(
+                    r"(?i)(vote for|total|overvotes|undervotes|contest totals|statistics|registered|ballots|voter|summary|precinct|guam general|guam 2020|november|report generated|official)",
+                    stripped,
+                ):
                     lowered = stripped.lower()
-                    section = "governor" if lowered.startswith("governor") else "house:0" if lowered.startswith("non-voting delegate") else None
+                    section = (
+                        "governor"
+                        if lowered.startswith("governor")
+                        else "house:0"
+                        if lowered.startswith("non-voting delegate")
+                        else None
+                    )
     day, url = CSV24
     artifacts[day] = [raw.cached(SOURCE, url)]
     grid = list(csv.reader(artifacts[day][0].path.read_text(encoding="utf-8-sig").splitlines()))
     for row in grid[3:]:
         if not row[1].strip().isdigit():
             continue
-        names = {grid[2][index]: int(row[index] or 0) for index in range(len(row)) if grid[0][index] == "Delegate to Congress" and not grid[2][index].endswith("VOTES")}
+        names = {
+            grid[2][index]: int(row[index] or 0)
+            for index in range(len(row))
+            if grid[0][index] == "Delegate to Congress" and not grid[2][index].endswith("VOTES")
+        }
         results.setdefault((day, "house:0"), {})[f"2024:GU:{int(row[1]):04d}"] = names
     with connect() as conn:
         cs = Changeset(
@@ -128,12 +166,18 @@ def emit() -> Path:
                 "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
                 [key],
             ).fetchone()
-            labels = conn.execute("select id, lower(ballot_label), kind from contest_option where contest_id = %s", [contest]).fetchall()
+            labels = conn.execute(
+                "select id, lower(ballot_label), kind from contest_option where contest_id = %s", [contest]
+            ).fetchall()
             picked = {}
             for name in {name for votes in precincts.values() for name in votes}:
-                lowered = re.sub(r"\s*\((dem|rep|ind)\)\s*$", "", re.sub(r"^(DEM|REP|IND|NPP) ", "", name).lower()).strip()
+                lowered = re.sub(
+                    r"\s*\((dem|rep|ind)\)\s*$", "", re.sub(r"^(DEM|REP|IND|NPP) ", "", name).lower()
+                ).strip()
                 if lowered in ("write-in", "write-ins", "write-in totals"):
-                    found = [option for option, _, kind in labels if kind == "write_in"] or [option for option, label, _ in labels if "aguon" in label]
+                    found = [option for option, _, kind in labels if kind == "write_in"] or [
+                        option for option, label, _ in labels if "aguon" in label
+                    ]
                 elif lowered.startswith(("overvote", "undervote")):
                     continue
                 elif section == "governor":
@@ -150,13 +194,33 @@ def emit() -> Path:
             source_title = f"{day.year} {'Runoff' if day == date(2020, 11, 17) else 'General'} Election official results by precinct"
             source = cs.source(PUBLISHER, source_title)
             if source in cs.minted and not any(r["id"] == source for r in cs.rows.get("source", [])):
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=source_title, url="https://gec.guam.gov/", license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=source_title,
+                    url="https://gec.guam.gov/",
+                    license="Public record",
+                )
             for artifact in artifacts[day]:
                 cs.artifact(artifact, source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
-            columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+            columns = (
+                "id",
+                "election_id",
+                "contest_id",
+                "stage",
+                "kind",
+                "status",
+                "source_id",
+                "as_of",
+                "completeness",
+                "supersedes_id",
+            )
             for prior in conn.execute(
-                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+                [contest, result_set],
             ).fetchall():
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
             for option, outcome_kind, seats in conn.execute(
@@ -169,7 +233,9 @@ def emit() -> Path:
                 "select sum(v.value) from result_set r join source s on s.id = r.source_id join result_value v on v.result_set_k = r.k where r.contest_id = %s and r.id <> %s and v.measure = 1 group by r.id, s.publisher order by (s.publisher = 'Federal Election Commission') desc, 1 desc limit 1",
                 [contest, result_set],
             ).fetchone()[0]
-            counted = sum(votes for precinct in precincts.values() for name, votes in precinct.items() if name in picked)
+            counted = sum(
+                votes for precinct in precincts.values() for name, votes in precinct.items() if name in picked
+            )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -182,7 +248,12 @@ def emit() -> Path:
                 is_default=True,
                 completeness=round(float(counted) / float(official), 4),
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md="Votes by precinct from the Guam Election Commission's official precinct reports.")
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md="Votes by precinct from the Guam Election Commission's official precinct reports.",
+            )
             for code, votes in precincts.items():
                 unit = cs.unit("us.precinct", code)
                 if unit in cs.minted and not any(r["id"] == unit for r in cs.rows.get("reporting_unit", [])):

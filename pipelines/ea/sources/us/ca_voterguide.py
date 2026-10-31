@@ -48,9 +48,13 @@ def parse() -> None:
     for day in GUIDES:
         path = raw.cached(SOURCE, url(day)).path
         if day == date(2014, 11, 4):
-            layout = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            layout = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            )
             for number, page in enumerate(layout.stdout.split("\f"), 1):
-                head = re.search(r"(?m)^\s*Official Title and Summary\s+Prepared by the Attorney General\s*\n\s*\n\s*(.+)\n", page)
+                head = re.search(
+                    r"(?m)^\s*Official Title and Summary\s+Prepared by the Attorney General\s*\n\s*\n\s*(.+)\n", page
+                )
                 numbered = re.search(r"(?m)^\s*(\d{1,2})(?:\s{2,}\S.*)?$", page[:500])
                 if head is None or numbered is None:
                     continue
@@ -72,7 +76,7 @@ def parse() -> None:
         ).stdout.split("<page ")[1:]
         for number, page in enumerate(pages, 1):
             blocks: list[tuple[float, float, str]] = []
-            for x, y, body in re.findall(r'<block xMin="([\d.]+)" yMin="([\d.]+)"[^>]*>(.*?)</block>', page, re.S):
+            for x, y, body in re.findall(r'<block xMin="([\d.]+)" yMin="([\d.]+)"[^>]*>(.*?)</block>', page, re.DOTALL):
                 words = [
                     word
                     for left, word in re.findall(r'<word xMin="([\d.]+)"[^>]*>(.*?)</word>', body)

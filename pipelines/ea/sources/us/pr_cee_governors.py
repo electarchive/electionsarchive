@@ -1,4 +1,3 @@
-import csv
 import re
 import subprocess
 import tempfile
@@ -38,11 +37,145 @@ ELECTIONS = {
         "text": True,
         "cut": 0.36,
         "patch": {
-            70: [(17946, [6979, 9467, 1396, 104]), (197417, [86156, 97282, 12684, 1295]), (9723, [4685, 4677, 264, 97]), (15887, [7452, 7830, 563, 42]),],
-            71: [(15600, [7672, 6104, 1775, 149]), (182613, [88437, 83028, 10187, 1061]),],
-            72: [(1677, [730, 910, 33, 4]), (20203, [10757, 8369, 928, 149]), (14117, [6183, 7123, 733, 78]), (562, [315, 184, 63, 0]), (0, [660401, 703968, 83037, 10728]),],
+            70: [
+                (17946, [6979, 9467, 1396, 104]),
+                (197417, [86156, 97282, 12684, 1295]),
+                (9723, [4685, 4677, 264, 97]),
+                (15887, [7452, 7830, 563, 42]),
+            ],
+            71: [
+                (15600, [7672, 6104, 1775, 149]),
+                (182613, [88437, 83028, 10187, 1061]),
+            ],
+            72: [
+                (1677, [730, 910, 33, 4]),
+                (20203, [10757, 8369, 928, 149]),
+                (14117, [6183, 7123, 733, 78]),
+                (562, [315, 184, 63, 0]),
+                (0, [660401, 703968, 83037, 10728]),
+            ],
         },
-        "names": {70: ["San Juan", "San Juan", "San Juan", "San Juan", "San Juan", "Guaynabo", "Bayamón", "Bayamón", "Guaynabo", "Bayamón", "Corozal", "Naranjito", "Bayamón", "Dorado", "Toa Alta", "Toa Baja", "Cataño", "Dorado", "Toa Baja", "Manatí", "Vega Alta", "Vega Baja", "Ciales", "Jayuya", "Morovis", "Orocovis", "Arecibo", "Barceloneta", "Florida", "Manatí", "Arecibo", "Hatillo", "Camuy", "Hatillo", "Isabela", "Quebradillas"], 71: ["Aguadilla", "Moca", "Aguada", "Añasco", "Mayagüez", "Moca", "Rincón", "Mayagüez", "Hormigueros", "Las Marías", "Maricao", "Mayagüez", "San Germán", "San Sebastián", "Cabo Rojo", "Lajas", "San Germán", "Guánica", "Guayanilla", "Sabana Grande", "Yauco", "Adjuntas", "Lares", "Utuado", "Adjuntas", "Guayanilla", "Peñuelas", "Ponce", "Ponce", "Ponce", "Juana Díaz", "Santa Isabel", "Villalba", "Aibonito", "Coamo", "Salinas", "Santa Isabel", "Aguas Buenas", "Barranquitas", "Cidra", "Comerío", "Aibonito", "Cayey", "Cidra", "Guayama", "Arroyo", "Guayama", "Maunabo", "Patillas"], 72: ["Caguas", "Caguas", "Juncos", "Gurabo", "Las Piedras", "San Lorenzo", "Yabucoa", "Ceiba", "Humacao", "Las Piedras", "Naguabo", "Ceiba", "Culebra", "Fajardo", "Luquillo", "Río Grande", "Vieques", "Canóvanas", "Carolina", "Loíza", "Carolina", "San Juan", "Trujillo Alto", "Carolina", "San Juan", "Trujillo Alto", "San Juan", "Guaynabo"]},
+        "names": {
+            70: [
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "Guaynabo",
+                "Bayamón",
+                "Bayamón",
+                "Guaynabo",
+                "Bayamón",
+                "Corozal",
+                "Naranjito",
+                "Bayamón",
+                "Dorado",
+                "Toa Alta",
+                "Toa Baja",
+                "Cataño",
+                "Dorado",
+                "Toa Baja",
+                "Manatí",
+                "Vega Alta",
+                "Vega Baja",
+                "Ciales",
+                "Jayuya",
+                "Morovis",
+                "Orocovis",
+                "Arecibo",
+                "Barceloneta",
+                "Florida",
+                "Manatí",
+                "Arecibo",
+                "Hatillo",
+                "Camuy",
+                "Hatillo",
+                "Isabela",
+                "Quebradillas",
+            ],
+            71: [
+                "Aguadilla",
+                "Moca",
+                "Aguada",
+                "Añasco",
+                "Mayagüez",
+                "Moca",
+                "Rincón",
+                "Mayagüez",
+                "Hormigueros",
+                "Las Marías",
+                "Maricao",
+                "Mayagüez",
+                "San Germán",
+                "San Sebastián",
+                "Cabo Rojo",
+                "Lajas",
+                "San Germán",
+                "Guánica",
+                "Guayanilla",
+                "Sabana Grande",
+                "Yauco",
+                "Adjuntas",
+                "Lares",
+                "Utuado",
+                "Adjuntas",
+                "Guayanilla",
+                "Peñuelas",
+                "Ponce",
+                "Ponce",
+                "Ponce",
+                "Juana Díaz",
+                "Santa Isabel",
+                "Villalba",
+                "Aibonito",
+                "Coamo",
+                "Salinas",
+                "Santa Isabel",
+                "Aguas Buenas",
+                "Barranquitas",
+                "Cidra",
+                "Comerío",
+                "Aibonito",
+                "Cayey",
+                "Cidra",
+                "Guayama",
+                "Arroyo",
+                "Guayama",
+                "Maunabo",
+                "Patillas",
+            ],
+            72: [
+                "Caguas",
+                "Caguas",
+                "Juncos",
+                "Gurabo",
+                "Las Piedras",
+                "San Lorenzo",
+                "Yabucoa",
+                "Ceiba",
+                "Humacao",
+                "Las Piedras",
+                "Naguabo",
+                "Ceiba",
+                "Culebra",
+                "Fajardo",
+                "Luquillo",
+                "Río Grande",
+                "Vieques",
+                "Canóvanas",
+                "Carolina",
+                "Loíza",
+                "Carolina",
+                "San Juan",
+                "Trujillo Alto",
+                "Carolina",
+                "San Juan",
+                "Trujillo Alto",
+                "San Juan",
+                "Guaynabo",
+            ],
+        },
     },
     "1980-11-04": {
         "url": SITE + "Informe%20Estadstico/ESTADISTICAS%20DE%20LAS%20ELECCIONES%201980.pdf",
@@ -53,10 +186,143 @@ ELECTIONS = {
         "text": True,
         "cut": 0.21,
         "patch": {
-            56: [(26538, [15573, 9572, 1310, 83]), (20397, [10402, 8227, 1727, 41]), (10419, [4702, 5233, 449, 35]), (15594, [7654, 7175, 651, 114]), (15265, [6641, 7845, 738, 41]),],
-            57: [(757, [321, 398, 35, 3]), (7441, [3327, 3801, 291, 22]), (8974, [4193, 4134, 643, 4]), (18783, [8665, 8998, 1069, 51]), (7463, [4179, 3083, 184, 17]), (714, [240, 393, 80, 1]), (39636, [20378, 16063, 3084, 111]), (0, [759926, 756889, 87272, 5224]),],
+            56: [
+                (26538, [15573, 9572, 1310, 83]),
+                (20397, [10402, 8227, 1727, 41]),
+                (10419, [4702, 5233, 449, 35]),
+                (15594, [7654, 7175, 651, 114]),
+                (15265, [6641, 7845, 738, 41]),
+            ],
+            57: [
+                (757, [321, 398, 35, 3]),
+                (7441, [3327, 3801, 291, 22]),
+                (8974, [4193, 4134, 643, 4]),
+                (18783, [8665, 8998, 1069, 51]),
+                (7463, [4179, 3083, 184, 17]),
+                (714, [240, 393, 80, 1]),
+                (39636, [20378, 16063, 3084, 111]),
+                (0, [759926, 756889, 87272, 5224]),
+            ],
         },
-        "names": {56: ["San Juan", "San Juan", "San Juan", "San Juan", "San Juan", "Guaynabo", "Guaynabo", "Bayamón", "Bayamón", "Bayamón", "Bayamón", "Corozal", "Naranjito", "Toa Alta", "Toa Baja", "Toa Baja", "Dorado", "Dorado", "Cataño", "Vega Alta", "Vega Baja", "Manatí", "Manatí", "Morovis", "Orocovis", "Ciales", "Jayuya", "Barceloneta", "Florida", "Arecibo", "Arecibo", "Hatillo", "Hatillo", "Camuy", "Quebradillas", "Isabela", "Aguadilla", "Moca", "Moca", "Aguada", "Rincón", "Añasco", "Mayagüez", "Mayagüez", "Mayagüez", "San Sebastián", "Las Marías", "Maricao", "Hormigueros", "San Germán", "San Germán", "Cabo Rojo", "Lajas"], 57: ["Sabana Grande", "Guánica", "Yauco", "Guayanilla", "Guayanilla", "Lares", "Utuado", "Adjuntas", "Adjuntas", "Peñuelas", "Ponce", "Ponce", "Ponce", "Villalba", "Juana Díaz", "Santa Isabel", "Santa Isabel", "Coamo", "Salinas", "Aibonito", "Aibonito", "Barranquitas", "Comerío", "Aguas Buenas", "Cidra", "Cidra", "Cayey", "Guayama", "Guayama", "Maunabo", "Patillas", "Arroyo", "Caguas", "Caguas", "Juncos", "Gurabo", "San Lorenzo", "Yabucoa", "Las Piedras", "Las Piedras", "Humacao", "Naguabo", "Ceiba", "Ceiba", "Río Grande", "Luquillo", "Fajardo", "Culebra", "Vieques", "Canóvanas", "Loíza", "Carolina", "Carolina", "Carolina", "Trujillo Alto", "Trujillo Alto", "San Juan", "San Juan", "San Juan", "Guaynabo"]},
+        "names": {
+            56: [
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "Guaynabo",
+                "Guaynabo",
+                "Bayamón",
+                "Bayamón",
+                "Bayamón",
+                "Bayamón",
+                "Corozal",
+                "Naranjito",
+                "Toa Alta",
+                "Toa Baja",
+                "Toa Baja",
+                "Dorado",
+                "Dorado",
+                "Cataño",
+                "Vega Alta",
+                "Vega Baja",
+                "Manatí",
+                "Manatí",
+                "Morovis",
+                "Orocovis",
+                "Ciales",
+                "Jayuya",
+                "Barceloneta",
+                "Florida",
+                "Arecibo",
+                "Arecibo",
+                "Hatillo",
+                "Hatillo",
+                "Camuy",
+                "Quebradillas",
+                "Isabela",
+                "Aguadilla",
+                "Moca",
+                "Moca",
+                "Aguada",
+                "Rincón",
+                "Añasco",
+                "Mayagüez",
+                "Mayagüez",
+                "Mayagüez",
+                "San Sebastián",
+                "Las Marías",
+                "Maricao",
+                "Hormigueros",
+                "San Germán",
+                "San Germán",
+                "Cabo Rojo",
+                "Lajas",
+            ],
+            57: [
+                "Sabana Grande",
+                "Guánica",
+                "Yauco",
+                "Guayanilla",
+                "Guayanilla",
+                "Lares",
+                "Utuado",
+                "Adjuntas",
+                "Adjuntas",
+                "Peñuelas",
+                "Ponce",
+                "Ponce",
+                "Ponce",
+                "Villalba",
+                "Juana Díaz",
+                "Santa Isabel",
+                "Santa Isabel",
+                "Coamo",
+                "Salinas",
+                "Aibonito",
+                "Aibonito",
+                "Barranquitas",
+                "Comerío",
+                "Aguas Buenas",
+                "Cidra",
+                "Cidra",
+                "Cayey",
+                "Guayama",
+                "Guayama",
+                "Maunabo",
+                "Patillas",
+                "Arroyo",
+                "Caguas",
+                "Caguas",
+                "Juncos",
+                "Gurabo",
+                "San Lorenzo",
+                "Yabucoa",
+                "Las Piedras",
+                "Las Piedras",
+                "Humacao",
+                "Naguabo",
+                "Ceiba",
+                "Ceiba",
+                "Río Grande",
+                "Luquillo",
+                "Fajardo",
+                "Culebra",
+                "Vieques",
+                "Canóvanas",
+                "Loíza",
+                "Carolina",
+                "Carolina",
+                "Carolina",
+                "Trujillo Alto",
+                "Trujillo Alto",
+                "San Juan",
+                "San Juan",
+                "San Juan",
+                "Guaynabo",
+            ],
+        },
     },
     "1984-11-06": {
         "url": SITE + "Informe%20Estadstico/ESTADISTICAS%20DE%20LAS%20ELECCIONES%201984.pdf",
@@ -147,11 +413,34 @@ ELECTIONS = {
     },
 }
 COMMISSIONERS = {
-    "1984-11-06": {"pages": (74, 75, 76), "split": 3, "triple": True, "surnames": ("fuster", "famadas", "catala", "viera")},
+    "1984-11-06": {
+        "pages": (74, 75, 76),
+        "split": 3,
+        "triple": True,
+        "surnames": ("fuster", "famadas", "catala", "viera"),
+    },
     "1992-11-03": {"pages": (83, 84, 85), "split": 3, "triple": True, "surnames": ("romero", "colorado", "garcia")},
     "1996-11-05": {"pages": (91, 92, 93), "split": 3, "triple": True, "surnames": ("romero", "benitez", "rodriguez")},
     "2000-11-07": {"pages": (91, 92, 93), "split": 3, "triple": True, "surnames": ("romero", "acevedo", "rodriguez")},
-    "2004-11-02": {"pages": (90, 91, 92), "split": 3, "triple": True, "surnames": ("prats", "fortuno", "irizarry"), "settled": "The OCR misread a few cells, which were settled against the page image and the printed district rows: Moca 37 on page 90; Yauco 52, Juana Díaz 63, Villalba 65, Coamo 68, Aibonito 69, Naranjito 73, Cayey 77, Maunabo 92, and one printed district row on page 91; and Carolina 107 on page 92.", "fixes": {(90, 36): (2790, [986, 1765, 39]), (91, 5): (17857, [8688, 8644, 525]), (91, 21): (20856, [10645, 9861, 350]), (91, 30): (25744, [13788, 11006, 950]), (91, -2): (0, [132279, 131911, 6830]), (91, 45): (7685, [3647, 3768, 270]), (91, 16): (22981, [11187, 11353, 441]), (91, 18): (15616, [6991, 8369, 256]), (91, 22): (15717, [8831, 6358, 528]), (91, 26): (18266, [9858, 8028, 380])}},
+    "2004-11-02": {
+        "pages": (90, 91, 92),
+        "split": 3,
+        "triple": True,
+        "surnames": ("prats", "fortuno", "irizarry"),
+        "settled": "The OCR misread a few cells, which were settled against the page image and the printed district rows: Moca 37 on page 90; Yauco 52, Juana Díaz 63, Villalba 65, Coamo 68, Aibonito 69, Naranjito 73, Cayey 77, Maunabo 92, and one printed district row on page 91; and Carolina 107 on page 92.",
+        "fixes": {
+            (90, 36): (2790, [986, 1765, 39]),
+            (91, 5): (17857, [8688, 8644, 525]),
+            (91, 21): (20856, [10645, 9861, 350]),
+            (91, 30): (25744, [13788, 11006, 950]),
+            (91, -2): (0, [132279, 131911, 6830]),
+            (91, 45): (7685, [3647, 3768, 270]),
+            (91, 16): (22981, [11187, 11353, 441]),
+            (91, 18): (15616, [6991, 8369, 256]),
+            (91, 22): (15717, [8831, 6358, 528]),
+            (91, 26): (18266, [9858, 8028, 380]),
+        },
+    },
     "2008-11-04": {
         "pages": (95, 96, 97),
         "island": "The municipio rows also sum exactly to the island row printed on page 95.",
@@ -164,7 +453,18 @@ COMMISSIONERS = {
     },
 }
 for day, election in COMMISSIONERS.items():
-    ELECTIONS[f"{day}:commissioner"] = {key: value for key, value in ELECTIONS[day].items() if key not in ("pages", "surnames", "island", "fixes", "split")} | {"split": 2, "island": "The municipio rows sum exactly to the eight district rows, which together make up the island total."} | election
+    ELECTIONS[f"{day}:commissioner"] = (
+        {
+            key: value
+            for key, value in ELECTIONS[day].items()
+            if key not in ("pages", "surnames", "island", "fixes", "split")
+        }
+        | {
+            "split": 2,
+            "island": "The municipio rows sum exactly to the eight district rows, which together make up the island total.",
+        }
+        | election
+    )
 
 
 def fold(text: str) -> str:
@@ -191,11 +491,15 @@ def solve(rest: list[list[str]], candidates: int, slack: float = 0) -> tuple[int
                 last = found[-1].replace(",", ".")
                 if re.fullmatch(r"\d{3,4}", last):
                     last = last[:-2] + "." + last[-2:]
-                pairs.append((int(re.sub(r"\D", "", found[0])), float(last) if re.fullmatch(r"\d+\.\d\d", last) else None))
+                pairs.append(
+                    (int(re.sub(r"\D", "", found[0])), float(last) if re.fullmatch(r"\d+\.\d\d", last) else None)
+                )
             elif len(found) == 1 and re.fullmatch(r"\d\.\d\d", found[0].replace(",", ".")):
                 pairs.append((None, float(found[0].replace(",", "."))))
         cells.append(pairs)
-    totals += [round(v * 100 / pct) for pairs in cells for v, pct in pairs if v is not None and pct is not None and pct > 10]
+    totals += [
+        round(v * 100 / pct) for pairs in cells for v, pct in pairs if v is not None and pct is not None and pct > 10
+    ]
     for total, _ in Counter(totals).most_common():
         values: list[int | None] = []
         for pairs in cells:
@@ -208,9 +512,21 @@ def solve(rest: list[list[str]], candidates: int, slack: float = 0) -> tuple[int
             return total, [v for v in values if v is not None]
     return None
 
+
 PASSES = ((1, None), (2, None), (2, 150), (1, 150))
 EXTRA = ((3, None), (3, 150), (2, 120), (2, 180), (1, 180), (1, 120), (4, None), (3, 190))
-CONFUSED = {"0": "8693", "1": "74", "2": "7", "3": "85", "4": "19", "5": "9368", "6": "580", "7": "12", "8": "306957", "9": "548"}
+CONFUSED = {
+    "0": "8693",
+    "1": "74",
+    "2": "7",
+    "3": "85",
+    "4": "19",
+    "5": "9368",
+    "6": "580",
+    "7": "12",
+    "8": "306957",
+    "9": "548",
+}
 
 
 def ocr(image: Image.Image, box: tuple[int, int, int, int], digits: bool, scale: int, threshold: int | None) -> str:
@@ -223,22 +539,35 @@ def ocr(image: Image.Image, box: tuple[int, int, int, int], digits: bool, scale:
     buffer = BytesIO()
     padded.save(buffer, "PNG")
     config = ["-c", "tessedit_char_whitelist=0123456789.,"] if digits else []
-    return subprocess.run(
-        ["tesseract", "stdin", "stdout", "--psm", "7", "-l", "eng", *config],
-        input=buffer.getvalue(),
-        capture_output=True,
-        check=True,
-    ).stdout.decode().strip()
+    return (
+        subprocess.run(
+            ["tesseract", "stdin", "stdout", "--psm", "7", "-l", "eng", *config],
+            input=buffer.getvalue(),
+            capture_output=True,
+            check=True,
+        )
+        .stdout.decode()
+        .strip()
+    )
 
 
-def read_cells(image: Image.Image, cells: list[tuple[tuple[int, int, int, int], bool]], passes: tuple[tuple[int, int | None], ...]) -> list[list[str]]:
+def read_cells(
+    image: Image.Image, cells: list[tuple[tuple[int, int, int, int], bool]], passes: tuple[tuple[int, int | None], ...]
+) -> list[list[str]]:
     with ThreadPoolExecutor(12) as pool:
-        return list(pool.map(lambda cell: [ocr(image, cell[0], cell[1], *each) for each in (passes if cell[1] else passes[:2])], cells))
+        return list(
+            pool.map(
+                lambda cell: [ocr(image, cell[0], cell[1], *each) for each in (passes if cell[1] else passes[:2])],
+                cells,
+            )
+        )
 
 
 def long_runs(dark: np.ndarray, length: int, axis: int) -> np.ndarray:
     lines = dark if axis == 1 else dark.T
-    cumulative = np.concatenate([np.zeros((lines.shape[0], 1), np.int32), np.cumsum(lines, axis=1, dtype=np.int32)], axis=1)
+    cumulative = np.concatenate(
+        [np.zeros((lines.shape[0], 1), np.int32), np.cumsum(lines, axis=1, dtype=np.int32)], axis=1
+    )
     hit = (cumulative[:, length:] - cumulative[:, :-length]) >= length - 3
     delta = np.zeros((lines.shape[0], lines.shape[1] + 1), np.int32)
     delta[:, : hit.shape[1]] += hit
@@ -276,7 +605,9 @@ def variants(text: str) -> set[str]:
 
 
 def solve_row(line: list[list[str]], slack: float = 0.02) -> tuple[int, list[int], list[int]] | None:
-    totals = Counter(int(re.sub(r"\D", "", found[0])) for reading in line[0] if (found := re.findall(r"\d[\d.,]*", reading)))
+    totals = Counter(
+        int(re.sub(r"\D", "", found[0])) for reading in line[0] if (found := re.findall(r"\d[\d.,]*", reading))
+    )
     cells = [[parse_cell(reading) for reading in cell] for cell in line[1:]]
     implied = Counter(round(v * 100 / p) for cell in cells for v, p in cell if v and p and p > 10)
     tried: list[int] = []
@@ -289,7 +620,9 @@ def solve_row(line: list[list[str]], slack: float = 0.02) -> tuple[int, list[int
         for cell in cells:
             votes = Counter(v for v, _ in cell if v is not None)
             percents = Counter(p for _, p in cell if p is not None)
-            good = Counter({v: n for v, n in votes.items() if any(abs(v / total * 100 - p) <= 0.0051 for p in percents)})
+            good = Counter(
+                {v: n for v, n in votes.items() if any(abs(v / total * 100 - p) <= 0.0051 for p in percents)}
+            )
             if not good:
                 weak.append(len(values))
                 for v in votes:
@@ -318,7 +651,9 @@ def solve_triples(cells: list[list[list[str]]]) -> tuple[int, list[int], list[in
     values: list[int] = []
     weak: list[int] = []
     for index, columns in enumerate(cells):
-        reads = [Counter(int(digits) for reading in column if (digits := re.sub(r"\D", "", reading))) for column in columns]
+        reads = [
+            Counter(int(digits) for reading in column if (digits := re.sub(r"\D", "", reading))) for column in columns
+        ]
         good: Counter[int] = Counter()
         for a, na in reads[0].items():
             for b, nb in reads[1].items():
@@ -339,7 +674,9 @@ def solve_triples(cells: list[list[list[str]]]) -> tuple[int, list[int], list[in
     return sum(values), values, weak
 
 
-def read_page(image: Path, candidates: int, split: int, darkness: int = 215, triple: bool = False) -> list[dict[str, object]]:
+def read_page(
+    image: Path, candidates: int, split: int, darkness: int = 215, triple: bool = False
+) -> list[dict[str, object]]:
     gray = np.asarray(Image.open(image).convert("L"))
     lead = 1 if triple else 2
     want = lead + 1 + split * candidates
@@ -391,7 +728,11 @@ def read_page(image: Path, candidates: int, split: int, darkness: int = 215, tri
         centre = (a + b) / 2
         found = np.flatnonzero(ink[a - 22 : b + 22, x0 + 8 : x1 - 3].sum(axis=1) > 1)
         pieces = np.split(found, np.flatnonzero(np.diff(found) > 3) + 1) if len(found) else []
-        best = min((piece for piece in pieces if len(piece) > 8), key=lambda piece: abs(a - 22 + piece.mean() - centre), default=None)
+        best = min(
+            (piece for piece in pieces if len(piece) > 8),
+            key=lambda piece: abs(a - 22 + piece.mean() - centre),
+            default=None,
+        )
         if best is None:
             return a - 6, b + 6
         return a - 22 + int(best[0]) - 4, a - 22 + int(best[-1]) + 5
@@ -423,7 +764,10 @@ def read_page(image: Path, candidates: int, split: int, darkness: int = 215, tri
             if triple:
                 return [source[split * candidate : split * (candidate + 1)] for candidate in range(candidates)]
             return [source[0]] + [
-                [" ".join(source[1 + split * candidate + part][pass_] for part in range(split)) for pass_ in range(len(source[0]))]
+                [
+                    " ".join(source[1 + split * candidate + part][pass_] for part in range(split))
+                    for pass_ in range(len(source[0]))
+                ]
                 for candidate in range(candidates)
             ]
 
@@ -440,7 +784,9 @@ def read_page(image: Path, candidates: int, split: int, darkness: int = 215, tri
     return rows
 
 
-def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tuple[int, list[int]]] | None = None) -> list[dict[str, object]]:
+def read_text_page(
+    image: Path, candidates: int, cut: float = 0, patch: list[tuple[int, list[int]]] | None = None
+) -> list[dict[str, object]]:
     rows = []
     for scale in (1, 0.75, 1.25, 1.5, 0.6, 2, 0.5):
         source = Image.open(image).convert("L")
@@ -451,7 +797,10 @@ def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tup
             target = Path(folder) / "page.png"
             scaled.save(target)
             tsv = subprocess.run(
-                ["tesseract", str(target), "-", "--psm", "6", "-l", "eng", "tsv"], capture_output=True, text=True, check=True
+                ["tesseract", str(target), "-", "--psm", "6", "-l", "eng", "tsv"],
+                capture_output=True,
+                text=True,
+                check=True,
             ).stdout
         lines: dict[tuple[str, str, str], list[tuple[str, int, int, int, int]]] = {}
         for record in tsv.splitlines()[1:]:
@@ -469,10 +818,21 @@ def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tup
                     or (merged[-1][0][-1] in ",." and merged[-1][0][:-1].isdigit() and word[0][0].isdigit())
                 ):
                     last = merged.pop()
-                    merged.append((last[0] + word[0], last[1], min(last[2], word[2]), word[1] + word[3] - last[1], max(last[4], word[4])))
+                    merged.append(
+                        (
+                            last[0] + word[0],
+                            last[1],
+                            min(last[2], word[2]),
+                            word[1] + word[3] - last[1],
+                            max(last[4], word[4]),
+                        )
+                    )
                 else:
                     merged.append(word)
-            words = [(re.sub(r"^[^A-Za-zñÑ\d]+", "", word[0]), *word[1:]) if i == 0 else word for i, word in enumerate(merged)]
+            words = [
+                (re.sub(r"^[^A-Za-zñÑ\d]+", "", word[0]), *word[1:]) if i == 0 else word
+                for i, word in enumerate(merged)
+            ]
             texts = [word[0] for word in words]
             head = fold("".join(texts[:3]))
             kind = "district" if head.startswith(("TOTALESDEL", "TOTALPOR")) else "precinct"
@@ -482,33 +842,85 @@ def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tup
             if kind == "precinct" and len(digits) < 4 + candidates:
                 continue
             figures = [(word, re.sub(r"[^\d.,%]", "", word[0]).rstrip(".,")) for word in digits]
-            votes = [(word, int(re.sub(r"\D", "", figure))) for word, figure in figures if re.fullmatch(r"\d{1,3}(,\d{3})*|\d{4,6}", figure)]
+            votes = [
+                (word, int(re.sub(r"\D", "", figure)))
+                for word, figure in figures
+                if re.fullmatch(r"\d{1,3}(,\d{3})*|\d{4,6}", figure)
+            ]
             if cut:
-                votes = [(word, int(re.sub(r"\D", "", figure))) for word, figure in figures if re.fullmatch(r"\d{1,3}(,\d{3})*|\d{4,6}|\d{1,3}\.\d{3}", figure)]
+                votes = [
+                    (word, int(re.sub(r"\D", "", figure)))
+                    for word, figure in figures
+                    if re.fullmatch(r"\d{1,3}(,\d{3})*|\d{4,6}|\d{1,3}\.\d{3}", figure)
+                ]
                 for start in range(len(votes) - candidates):
                     if votes[start][1] == sum(value for _, value in votes[start + 1 : start + 1 + candidates]):
                         votes = votes[start : start + 1 + candidates]
                         break
             elif len(votes) == 2 + candidates and votes[0][1] < 200:
                 votes = votes[1:]
-            tall = [word for word, _ in votes if 15 <= word[4] <= 40] or [word for word in digits if 15 <= word[4] <= 40] or digits or words
+            tall = (
+                [word for word, _ in votes if 15 <= word[4] <= 40]
+                or [word for word in digits if 15 <= word[4] <= 40]
+                or digits
+                or words
+            )
             first = votes[0][0] if votes else words[-1]
-            name = "TOTALES" if kind == "district" else " ".join(word[0] for word in words if word[1] + word[3] <= first[1])
+            name = (
+                "TOTALES"
+                if kind == "district"
+                else " ".join(word[0] for word in words if word[1] + word[3] <= first[1])
+            )
             if len(votes) != 1 + candidates:
-                found.append({"kind": kind, "name": name, "solved": None, "boxes": [], "y": (min(w[2] for w in tall), max(w[2] + w[4] for w in tall)), "tokens": [value for _, value in votes]})
+                found.append(
+                    {
+                        "kind": kind,
+                        "name": name,
+                        "solved": None,
+                        "boxes": [],
+                        "y": (min(w[2] for w in tall), max(w[2] + w[4] for w in tall)),
+                        "tokens": [value for _, value in votes],
+                    }
+                )
                 continue
             total, counts = votes[0][1], [value for _, value in votes[1:]]
-            percents = [float("0" + figure.rstrip("%")) for _, figure in figures if re.fullmatch(r"\d{0,2}\.\d\d%?", figure)]
-            ok = sum(counts) == total and (len(percents) != candidates or all(abs(count / total * 100 - percent) <= (0.0101 if cut else 0.0051) for count, percent in zip(counts, percents, strict=True)))
+            percents = [
+                float("0" + figure.rstrip("%")) for _, figure in figures if re.fullmatch(r"\d{0,2}\.\d\d%?", figure)
+            ]
+            ok = sum(counts) == total and (
+                len(percents) != candidates
+                or all(
+                    abs(count / total * 100 - percent) <= (0.0101 if cut else 0.0051)
+                    for count, percent in zip(counts, percents, strict=True)
+                )
+            )
             boxes = [(w[1], w[2], w[1] + w[3], w[2] + w[4]) for w, _ in votes[1:]]
-            found.append({"kind": kind, "name": name, "solved": (total, counts) if ok else None, "boxes": boxes, "y": (min(w[2] for w in tall), max(w[2] + w[4] for w in tall)), "tokens": [total, *counts]})
+            found.append(
+                {
+                    "kind": kind,
+                    "name": name,
+                    "solved": (total, counts) if ok else None,
+                    "boxes": boxes,
+                    "y": (min(w[2] for w in tall), max(w[2] + w[4] for w in tall)),
+                    "tokens": [total, *counts],
+                }
+            )
         found.sort(key=lambda row: row["y"][0])
         if not rows:
             rows = found
         else:
             for index, row in enumerate(rows):
                 if row["solved"] is None:
-                    match = next((other for other in found if (cut or other["name"] == row["name"]) and other["solved"] is not None and abs(other["y"][0] - row["y"][0]) < 15), None)
+                    match = next(
+                        (
+                            other
+                            for other in found
+                            if (cut or other["name"] == row["name"])
+                            and other["solved"] is not None
+                            and abs(other["y"][0] - row["y"][0]) < 15
+                        ),
+                        None,
+                    )
                     if match is not None:
                         rows[index] = match
             if cut:
@@ -526,7 +938,11 @@ def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tup
                 kept.append(row)
         rows = kept
     for total, signature in patch or []:
-        best = max((row for row in rows if row["solved"] is None or total == 0), key=lambda row: len(set(row["tokens"]) & set(signature)), default=None)
+        best = max(
+            (row for row in rows if row["solved"] is None or total == 0),
+            key=lambda row: len(set(row["tokens"]) & set(signature)),
+            default=None,
+        )
         if best is None or len(set(best["tokens"]) & set(signature)) < 2:
             if any(row["solved"] == (total, signature) for row in rows):
                 continue
@@ -535,12 +951,18 @@ def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tup
             best["kind"] = "skip"
         else:
             best["solved"] = (total, signature)
-            best["boxes"] = [(int(source.width * cut), best["y"][0] - 8, int(source.width * 0.97), best["y"][1] + 8)] * candidates
+            best["boxes"] = [
+                (int(source.width * cut), best["y"][0] - 8, int(source.width * 0.97), best["y"][1] + 8)
+            ] * candidates
     rows = [row for row in rows if row["kind"] != "skip"]
     if cut:
         running = [0] * candidates
         for row in rows:
-            if any(running) and (row["solved"][1] == running if row["solved"] is not None else sum(token in running for token in row["tokens"]) >= candidates - 1):
+            if any(running) and (
+                row["solved"][1] == running
+                if row["solved"] is not None
+                else sum(token in running for token in row["tokens"]) >= candidates - 1
+            ):
                 row["kind"] = "district"
                 row["solved"] = (sum(running), running)
                 running = [0] * candidates
@@ -552,18 +974,44 @@ def read_text_page(image: Path, candidates: int, cut: float = 0, patch: list[tup
 def prepare(pdf: Path, number: int, election: dict[str, object], target: Path) -> None:
     with tempfile.TemporaryDirectory() as folder:
         stem = Path(folder) / "page"
-        subprocess.run(["pdftoppm", "-r", "300", "-gray", "-f", str(number), "-l", str(number), "-png", "-singlefile", str(pdf), str(stem)], check=True)
+        subprocess.run(
+            [
+                "pdftoppm",
+                "-r",
+                "300",
+                "-gray",
+                "-f",
+                str(number),
+                "-l",
+                str(number),
+                "-png",
+                "-singlefile",
+                str(pdf),
+                str(stem),
+            ],
+            check=True,
+        )
         image = Image.open(stem.with_suffix(".png")).convert("L")
     image = image.rotate(election.get("rotate", 0), expand=True)
     coarse = image.resize((image.width // 4, image.height // 4), Image.Resampling.BILINEAR)
     best = max(
         np.arange(-1.5, 1.51, 0.1),
-        key=lambda angle: (np.asarray(coarse.rotate(angle, resample=Image.Resampling.BILINEAR, fillcolor=255)) < 200).sum(axis=1).astype(float).var(),
+        key=lambda angle: (
+            (np.asarray(coarse.rotate(angle, resample=Image.Resampling.BILINEAR, fillcolor=255)) < 200)
+            .sum(axis=1)
+            .astype(float)
+            .var()
+        ),
     )
     half = image.resize((image.width // 2, image.height // 2), Image.Resampling.BILINEAR)
     best = max(
         np.arange(best - 0.1, best + 0.101, 0.02),
-        key=lambda angle: (np.asarray(half.rotate(angle, resample=Image.Resampling.BILINEAR, fillcolor=255)) < 200).sum(axis=1).astype(float).var(),
+        key=lambda angle: (
+            (np.asarray(half.rotate(angle, resample=Image.Resampling.BILINEAR, fillcolor=255)) < 200)
+            .sum(axis=1)
+            .astype(float)
+            .var()
+        ),
     )
     image.rotate(best, resample=Image.Resampling.BICUBIC, fillcolor=255).save(target)
 
@@ -578,7 +1026,18 @@ def parse() -> None:
         with tempfile.TemporaryDirectory() as folder:
             for page in election["pages"]:
                 subprocess.run(
-                    ["pdftoppm", "-r", str(election.get("dpi", 300)), "-f", str(page), "-l", str(page), "-png", str(raw.cached(SOURCE, election["url"]).path), f"{folder}/p"],
+                    [
+                        "pdftoppm",
+                        "-r",
+                        str(election.get("dpi", 300)),
+                        "-f",
+                        str(page),
+                        "-l",
+                        str(page),
+                        "-png",
+                        str(raw.cached(SOURCE, election["url"]).path),
+                        f"{folder}/p",
+                    ],
                     check=True,
                 )
                 image = next(Path(folder).glob("p-*.png"))
@@ -600,18 +1059,26 @@ def parse() -> None:
                     if solved is None:
                         raise ValueError(f"{day} {name}: row does not reconcile: {line}")
                     for index, votes in enumerate(solved[1]):
-                        rows.append({"day": day, "municipio": name, "candidate": index, "votes": votes, "total": solved[0]})
+                        rows.append(
+                            {"day": day, "municipio": name, "candidate": index, "votes": votes, "total": solved[0]}
+                        )
                 Path(image).unlink()
     PARSED.mkdir(parents=True, exist_ok=True)
     for day, election in ELECTIONS.items():
         for name, (total, votes) in election.get("manual", {}).items():
-            rows.extend({"day": day, "municipio": name, "candidate": i, "votes": v, "total": total} for i, v in enumerate(votes))
+            rows.extend(
+                {"day": day, "municipio": name, "candidate": i, "votes": v, "total": total} for i, v in enumerate(votes)
+            )
     frame = pl.DataFrame(rows)
     island = frame.filter(pl.col("municipio").str.starts_with("TOTALES"))
     frame = frame.filter(~pl.col("municipio").str.starts_with("TOTALES"))
     summed = frame.group_by("day", "candidate").agg(pl.col("votes").sum()).sort("day", "candidate")
     printed = island.select("day", "candidate", "votes").sort("day", "candidate")
-    print(summed.join(printed, on=["day", "candidate"], how="left", suffix="_printed").filter(pl.col("votes") != pl.col("votes_printed")))
+    print(
+        summed.join(printed, on=["day", "candidate"], how="left", suffix="_printed").filter(
+            pl.col("votes") != pl.col("votes_printed")
+        )
+    )
     print(frame.group_by("day").agg(pl.col("municipio").n_unique()))
     frame.write_parquet(PARSED / "municipios.parquet")
 
@@ -629,7 +1096,11 @@ def parse_precincts() -> None:
         printed = [0] * candidates
         found = [0] * candidates
         with tempfile.TemporaryDirectory() as folder:
-            pdf = Path(zipfile.ZipFile(artifact.path).extract(election["member"], folder)) if "member" in election else artifact.path
+            pdf = (
+                Path(zipfile.ZipFile(artifact.path).extract(election["member"], folder))
+                if "member" in election
+                else artifact.path
+            )
             district: list[list[int]] = []
             starts: list[int] = []
             for number in election["pages"]:
@@ -640,12 +1111,17 @@ def parse_precincts() -> None:
                     width, height = opened.size
                 ordinal = 0
                 districts = 0
-                rows_read = read_text_page(image, candidates, election.get("cut", 0), election.get("patch", {}).get(number)) if election.get("text") else read_page(image, candidates, election["split"], triple=election.get("triple", False))
+                rows_read = (
+                    read_text_page(image, candidates, election.get("cut", 0), election.get("patch", {}).get(number))
+                    if election.get("text")
+                    else read_page(image, candidates, election["split"], triple=election.get("triple", False))
+                )
                 if election.get("shaded"):
                     rows_read += [
                         row
                         for row in read_page(image, candidates, election["split"], 170)
-                        if row["kind"] == "district" and all(abs(row["y"][0] - other["y"][0]) > 15 for other in rows_read)
+                        if row["kind"] == "district"
+                        and all(abs(row["y"][0] - other["y"][0]) > 15 for other in rows_read)
                     ]
                     rows_read.sort(key=lambda row: row["y"][0])
                 for row in rows_read:
@@ -660,7 +1136,17 @@ def parse_precincts() -> None:
                         district.append(votes)
                         starts.append(len(rows))
                         rows.extend(
-                            {"day": day, "page": number, "name": row["name"], "candidate": index, "votes": value, "total": total, "box": list(row["boxes"][index]), "width": width, "height": height}
+                            {
+                                "day": day,
+                                "page": number,
+                                "name": row["name"],
+                                "candidate": index,
+                                "votes": value,
+                                "total": total,
+                                "box": list(row["boxes"][index]),
+                                "width": width,
+                                "height": height,
+                            }
                             for index, value in enumerate(votes)
                         )
                     elif row["kind"] == "district":
@@ -674,21 +1160,40 @@ def parse_precincts() -> None:
                                     (at, int(alternative))
                                     for at, votes in enumerate(district)
                                     for alternative in variants(str(votes[index]))
-                                    if len(alternative) == len(str(votes[index])) and int(alternative) - votes[index] == gap
+                                    if len(alternative) == len(str(votes[index]))
+                                    and int(alternative) - votes[index] == gap
                                 ]
                                 if gap and len(options) == 1:
                                     at, value = options[0]
-                                    print("settled", day, number, rows[starts[at]]["name"], index, district[at][index], "->", value)
+                                    print(
+                                        "settled",
+                                        day,
+                                        number,
+                                        rows[starts[at]]["name"],
+                                        index,
+                                        district[at][index],
+                                        "->",
+                                        value,
+                                    )
                                     district[at][index] = value
                                     rows[starts[at] + index]["votes"] = value
                                     sums[index] += gap
                         if row["solved"] is None or sums != row["solved"][1]:
-                            raise ValueError(f"{day} page {number}: district precinct sums {sums} against printed {row['solved']}: {district}")
+                            raise ValueError(
+                                f"{day} page {number}: district precinct sums {sums} against printed {row['solved']}: {district}"
+                            )
                         printed = [a + b for a, b in zip(printed, row["solved"][1], strict=True)]
                         found = [a + b for a, b in zip(found, sums, strict=True)]
                         district = []
                         starts = []
-        print(day, "precincts", Counter(row["day"] for row in rows)[day] // candidates, "district sums", found, "match the printed district rows")
+        print(
+            day,
+            "precincts",
+            Counter(row["day"] for row in rows)[day] // candidates,
+            "district sums",
+            found,
+            "match the printed district rows",
+        )
     pl.DataFrame(rows).write_parquet(PARSED / "precincts.parquet")
 
 
@@ -713,7 +1218,9 @@ def emit() -> Path:
             url="https://ww2.ceepur.org/Home/Estadisticas",
             license="Public record",
         )
-        artifacts = {election["url"]: cs.artifact(raw.cached(SOURCE, election["url"]), source) for election in ELECTIONS.values()}
+        artifacts = {
+            election["url"]: cs.artifact(raw.cached(SOURCE, election["url"]), source) for election in ELECTIONS.values()
+        }
         units = {
             fold(text): unit
             for text, unit in conn.execute(
@@ -724,7 +1231,9 @@ def emit() -> Path:
         if len(units) != 78:
             raise ValueError("Puerto Rico needs 78 municipios")
         contests = dict(
-            conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':PR:(governor|house:0$)'")
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':PR:(governor|house:0$)'"
+            )
         )
         days = [(day, frame.filter(pl.col("day") == day)) for day in frame["day"].unique(maintain_order=True)]
         days += [(day, precincts.filter(pl.col("day") == day)) for day in precincts["day"].unique(maintain_order=True)]
@@ -737,16 +1246,20 @@ def emit() -> Path:
             ((election_id,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             result_set = cs.key(f"{SOURCE}.result_set", key)
             if "split" in election:
-                lines = lines.with_columns(municipio=pl.col("name").map_elements(lambda text: fold(re.sub(r"\d+\W*[iIl]?$", "", text.strip())), return_dtype=pl.String))
-            canonical = {
-                name: get_close_matches(name, units, n=1, cutoff=0.7)[0]
-                for name in set(lines["municipio"])
-            }
+                lines = lines.with_columns(
+                    municipio=pl.col("name").map_elements(
+                        lambda text: fold(re.sub(r"\d+\W*[iIl]?$", "", text.strip())), return_dtype=pl.String
+                    )
+                )
+            canonical = {name: get_close_matches(name, units, n=1, cutoff=0.7)[0] for name in set(lines["municipio"])}
             lines = lines.with_columns(municipio=pl.col("municipio").replace_strict(canonical))
             if "split" in election:
                 lines = (
                     lines.with_columns(
-                        x0=pl.col("box").list.get(0), y0=pl.col("box").list.get(1), x1=pl.col("box").list.get(2), y1=pl.col("box").list.get(3)
+                        x0=pl.col("box").list.get(0),
+                        y0=pl.col("box").list.get(1),
+                        x1=pl.col("box").list.get(2),
+                        y1=pl.col("box").list.get(3),
                     )
                     .sort("page", maintain_order=True)
                     .group_by("municipio", "candidate", maintain_order=True)
@@ -763,7 +1276,9 @@ def emit() -> Path:
                 )
             names = set(lines["municipio"])
             if names - units.keys() or len(names) != 78:
-                raise ValueError(f"{key}: municipios unmatched {sorted(names - units.keys())} or missing {sorted(units.keys() - names)}")
+                raise ValueError(
+                    f"{key}: municipios unmatched {sorted(names - units.keys())} or missing {sorted(units.keys() - names)}"
+                )
             options = conn.execute(
                 "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'", [contest]
             ).fetchall()
@@ -809,7 +1324,7 @@ def emit() -> Path:
             )
             if "split" in election:
                 pages_text = ", ".join(str(number) for number in election["pages"])
-                body = f"Votes for {'Resident Commissioner' if day[0].endswith(':commissioner') else 'governor'} by municipio summed from the electoral-precinct rows of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election{' (' + election['member'].removesuffix('.pdf').title() + ')' if 'member' in election else ''}, pages {pages_text}, a table of page images read by OCR. {"Each precinct row's íntegros and otros votes sum to the printed total for each candidate" if election.get("triple") else "Each precinct row's candidate votes match its printed percentages and do not exceed its printed total"}, and the precinct rows of every senatorial district sum to that district's printed totals row for each candidate. {election['island']} Each value's locator boxes the candidate's cells for the municipio's precinct rows on the first page where they appear; the sum also includes precinct rows on later pages and in other districts. {election.get('settled', '')} Write-in and blank votes are not in the table."
+                body = f"Votes for {'Resident Commissioner' if day[0].endswith(':commissioner') else 'governor'} by municipio summed from the electoral-precinct rows of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election{' (' + election['member'].removesuffix('.pdf').title() + ')' if 'member' in election else ''}, pages {pages_text}, a table of page images read by OCR. {"Each precinct row's íntegros and otros votes sum to the printed total for each candidate" if election.get('triple') else "Each precinct row's candidate votes match its printed percentages and do not exceed its printed total"}, and the precinct rows of every senatorial district sum to that district's printed totals row for each candidate. {election['island']} Each value's locator boxes the candidate's cells for the municipio's precinct rows on the first page where they appear; the sum also includes precinct rows on later pages and in other districts. {election.get('settled', '')} Write-in and blank votes are not in the table."
             else:
                 body = f"Votes by municipio read from pages {election['pages'][0]}–{election['pages'][1]} of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election, a table of page images. Each row's candidate votes sum to its printed total and match its printed percentages. Write-in and blank votes are not in the table. The municipio rows sum to within five votes per candidate of the island totals printed on the report's last row."
             published = conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None
@@ -823,7 +1338,15 @@ def emit() -> Path:
                     page_id = cs.page(artifact, number)
                     pages[day[0], number] = page_id
                     with Image.open(image) as opened:
-                        cs.add("source_page", id=page_id, artifact_id=artifact, page_number=number, image_key=f"pages/{SOURCE}/{image.name}", width=opened.width, height=opened.height)
+                        cs.add(
+                            "source_page",
+                            id=page_id,
+                            artifact_id=artifact,
+                            page_number=number,
+                            image_key=f"pages/{SOURCE}/{image.name}",
+                            width=opened.width,
+                            height=opened.height,
+                        )
             for row in lines.iter_rows(named=True):
                 fact = {
                     "result_set_id": result_set,
@@ -834,7 +1357,12 @@ def emit() -> Path:
                     "count_round": 0,
                 }
                 located = "split" in election
-                cs.add("result_value", **fact, flags=house_books.DIGITIZED | house_books.DERIVED if located else 0, value=row["votes"])
+                cs.add(
+                    "result_value",
+                    **fact,
+                    flags=house_books.DIGITIZED | house_books.DERIVED if located else 0,
+                    value=row["votes"],
+                )
                 if located:
                     cs.add(
                         "value_locator",

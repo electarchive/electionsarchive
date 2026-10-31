@@ -339,12 +339,20 @@ def emit() -> Path:
             elif jurisdiction.lower().startswith(("city of", "village of")):
                 option = civil.place(re.sub(r"(?i)^(city|village) of ", "", jurisdiction))
             elif re.search(r"(?i)township", jurisdiction):
-                option = civil.town(re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 Township", jurisdiction), row["county"])
+                option = civil.town(
+                    re.sub(r"(?i)^(charter township|township) of (.+)$", r"\2 Township", jurisdiction), row["county"]
+                )
             elif re.search(r"(?i)schools?\b", jurisdiction) and not re.search(r"(?i)college|agency", jurisdiction):
                 option = civil.school(jurisdiction)
-            if option is None and county_key in found and re.search(r"(?i)authority|district|college|library|agency|parks", jurisdiction):
+            if (
+                option is None
+                and county_key in found
+                and re.search(r"(?i)authority|district|college|library|agency|parks", jurisdiction)
+            ):
                 county_polity, county_area, _, county_path, _ = found[county_key]
-                minted = govmint.special(conn, cs, "MI", (county_polity, county_area, county_path, row["county"]), jurisdiction, slugs)
+                minted = govmint.special(
+                    conn, cs, "MI", (county_polity, county_area, county_path, row["county"]), jurisdiction, slugs
+                )
                 if minted is not None:
                     option = f"us.special_district:{minted[4]}"
                     found[option] = minted

@@ -53,7 +53,12 @@ def parse() -> None:
             keep = []
             for index, (name, tag) in enumerate(zip(cells[0][1:], cells[1][1:], strict=True)):
                 tag = " ".join((tag or "").split())
-                if not tag or " ".join((name or "").lower().split()).startswith(SKIPPED) or "Party Vote" in tag or "Non-Party" in tag:
+                if (
+                    not tag
+                    or " ".join((name or "").lower().split()).startswith(SKIPPED)
+                    or "Party Vote" in tag
+                    or "Non-Party" in tag
+                ):
                     continue
                 if tag.split()[0] not in PARTIES:
                     raise ValueError(f"{year} {file}: unknown party {tag}")
@@ -65,14 +70,25 @@ def parse() -> None:
                 if row[0] and not row[0].strip().startswith("Percent") and row[0].strip() != "State Totals"
             ]
             total = next(
-                [int(row[1 + index] or 0) for index, *_ in keep] for row in cells if (row[0] or "").strip() == "State Totals"
+                [int(row[1 + index] or 0) for index, *_ in keep]
+                for row in cells
+                if (row[0] or "").strip() == "State Totals"
             )
             if len(counties) != 58 or [sum(column) for column in zip(*(v for _, v in counties), strict=True)] != total:
                 raise ValueError(f"{year} {file}: counties do not add up to the State Totals row")
             for county, votes in counties:
                 for (_, party, writein, candidate), value in zip(keep, votes, strict=True):
                     rows.append(
-                        (year, f"president:{party}", day, "CA", fips[re.sub(r"[^a-z]", "", county.lower())], candidate, writein, value)
+                        (
+                            year,
+                            f"president:{party}",
+                            day,
+                            "CA",
+                            fips[re.sub(r"[^a-z]", "", county.lower())],
+                            candidate,
+                            writein,
+                            value,
+                        )
                     )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(

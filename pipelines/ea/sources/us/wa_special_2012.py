@@ -15,7 +15,9 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Washington Secretary of State"
 TITLE = "November 6, 2012 general election results: Congressional District 1, one-month short term"
 URL = "https://results.vote.wa.gov/results/20121106/Congressional-District-1-One-Month-Short-Term-US-Representative_ByCounty.html"
-BLOCK = re.compile(r"\|(King|Kitsap|Snohomish|Skagit|Whatcom)\|((?:[^|]+\|\(Prefers [^|]+\)\|[\d,]+\|[\d.]+%\|)+)Total Votes\|([\d,]+)\|")
+BLOCK = re.compile(
+    r"\|(King|Kitsap|Snohomish|Skagit|Whatcom)\|((?:[^|]+\|\(Prefers [^|]+\)\|[\d,]+\|[\d.]+%\|)+)Total Votes\|([\d,]+)\|"
+)
 ROW = re.compile(r"([^|]+)\|\(Prefers [^|]+\)\|([\d,]+)\|")
 
 
@@ -24,7 +26,12 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    text = re.sub(r"<script.*?</script>|<style.*?</style>", "", raw.cached(SOURCE, URL).path.read_text(errors="ignore"), flags=re.S)
+    text = re.sub(
+        r"<script.*?</script>|<style.*?</style>",
+        "",
+        raw.cached(SOURCE, URL).path.read_text(errors="ignore"),
+        flags=re.DOTALL,
+    )
     text = re.sub(r"\s+", " ", re.sub(r"\|+", "|", re.sub(r"<[^>]+>", "|", text)))
     text = text[text.index("Results Summary") :]
     with connect() as conn:

@@ -61,9 +61,8 @@ def parse() -> None:
                                     json.dumps(shape.__geo_interface__),
                                 )
                             )
-            rows = (
-                conn.execute(
-                    """select code, min(municipality), min(label),
+            rows = conn.execute(
+                """select code, min(municipality), min(label),
                               encode(st_asewkb(g), 'hex'), encode(st_asewkb(st_pointonsurface(g)), 'hex')
                        from (
                          select code, municipality, label,
@@ -72,8 +71,7 @@ def parse() -> None:
                          from feature group by code, municipality, label
                        ) merged
                        group by code, g"""
-                ).fetchall()
-            )
+            ).fetchall()
             conn.execute("truncate feature")
             pl.DataFrame(
                 rows,
@@ -128,7 +126,9 @@ def emit() -> Path:
             cs.add("area", id=area, scheme_code="br.setor")
             cs.add("area_code", area_id=area, code=code, valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=municipalities[municipality], valid_from=None)
-            cs.add("name", entity_id=area, text=f"{district} {code[-6:]}", lang="pt", kind="official", is_preferred=True)
+            cs.add(
+                "name", entity_id=area, text=f"{district} {code[-6:]}", lang="pt", kind="official", is_preferred=True
+            )
             cs.add(
                 "area_geometry",
                 area_id=area,

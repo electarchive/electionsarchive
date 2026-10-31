@@ -46,7 +46,10 @@ def house_2008(pdf: Path) -> dict[tuple, dict[str, dict[str, int]]]:
     party = ""
     for page in range(HOUSE_PAGES[0], HOUSE_PAGES[1] + 1):
         html = subprocess.run(
-            ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", str(pdf), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", str(pdf), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         words = [(float(a), float(b), float(c), float(d), t) for a, b, c, d, t in WORD.findall(html)]
         words.sort(key=lambda w: (round((w[1] + w[3]) / 2), w[0]))
@@ -85,9 +88,15 @@ def house_2008(pdf: Path) -> dict[tuple, dict[str, dict[str, int]]]:
             else:
                 joined = text.lower()
                 step = 1
-                if index + 1 < len(words) and abs((words[index + 1][1] + words[index + 1][3]) / 2 - yc) < 3:
-                    if f"{joined} {words[index + 1][4].lower()}" in NAMES or f"{joined} {words[index + 1][4].lower()}" in PREFIXES:
-                        joined, step = f"{joined} {words[index + 1][4].lower()}", 2
+                if (
+                    index + 1 < len(words)
+                    and abs((words[index + 1][1] + words[index + 1][3]) / 2 - yc) < 3
+                    and (
+                        f"{joined} {words[index + 1][4].lower()}" in NAMES
+                        or f"{joined} {words[index + 1][4].lower()}" in PREFIXES
+                    )
+                ):
+                    joined, step = f"{joined} {words[index + 1][4].lower()}", 2
                 if joined not in NAMES and joined in PREFIXES:
                     joined = next(c.lower() for c in COUNTIES if c.lower().startswith(joined + " "))
                 if joined in NAMES:
@@ -101,7 +110,14 @@ def house_2008(pdf: Path) -> dict[tuple, dict[str, dict[str, int]]]:
             if label[2] == "TOTAL":
                 continue
             side = label[0] < 300
-            row = sorted((n for n in numbers if abs(n[2] - label[1]) < 4 and n[0] > label[0] and ((n[0] < 300) == side or not side)), key=lambda n: n[0])
+            row = sorted(
+                (
+                    n
+                    for n in numbers
+                    if abs(n[2] - label[1]) < 4 and n[0] > label[0] and ((n[0] < 300) == side or not side)
+                ),
+                key=lambda n: n[0],
+            )
             if not side:
                 row = [n for n in row if n[0] > label[0]]
             else:
@@ -127,7 +143,10 @@ def statewide_2008(pdf: Path) -> tuple[dict[tuple, dict[str, dict[str, int]]], d
     chamber, party, names = "", "", []
     for page in range(STATEWIDE_PAGES[0], STATEWIDE_PAGES[1] + 1):
         html = subprocess.run(
-            ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", str(pdf), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-f", str(page), "-l", str(page), "-bbox", str(pdf), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         words = [(float(a), float(b), float(c), float(d), t) for a, b, c, d, t in WORD.findall(html)]
         words.sort(key=lambda w: (round((w[1] + w[3]) / 2 / 3), w[0]))
@@ -140,16 +159,20 @@ def statewide_2008(pdf: Path) -> tuple[dict[tuple, dict[str, dict[str, int]]], d
                 lines.append([word])
         for line in lines:
             line.sort()
-        split = 300 if any(w[0] >= 300 and (w[4].lower() in NAMES or w[4].lower() in PREFIXES) for w in words) else 10**6
-        heading = next((i for i, line in enumerate(lines) if any(w[4] == "County" and w[0] < split for w in line)), len(lines))
+        split = (
+            300 if any(w[0] >= 300 and (w[4].lower() in NAMES or w[4].lower() in PREFIXES) for w in words) else 10**6
+        )
+        heading = next(
+            (i for i, line in enumerate(lines) if any(w[4] == "County" and w[0] < split for w in line)), len(lines)
+        )
         top = " ".join(w[4] for line in lines[:heading] for w in line)
         if "President" in top:
             chamber = "president"
         elif "Senate" in top:
             chamber = "senate"
-        if found := re.search(r"(Republican|Democratic|Nebraska|Green) Party Nomination", top):
-            party = found[1].lower()
-        elif found := re.search(r"Nonpartisan (Republican|Democratic|Nebraska|Green) Voters", top):
+        if (found := re.search(r"(Republican|Democratic|Nebraska|Green) Party Nomination", top)) or (
+            found := re.search(r"Nonpartisan (Republican|Democratic|Nebraska|Green) Voters", top)
+        ):
             party = found[1].lower()
         if heading < len(lines):
             line = lines[heading]
@@ -202,11 +225,17 @@ def statewide_2008(pdf: Path) -> tuple[dict[tuple, dict[str, dict[str, int]]], d
 
 def house_2010(pdf: Path) -> dict[tuple, dict[str, dict[str, int]]]:
     tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-    lines = subprocess.run(["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True, check=True).stdout.splitlines()
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True, check=True
+    ).stdout.splitlines()
     start = next(i for i, line in enumerate(lines) if line.startswith("Member of the U.S. House of Representatives"))
     end = next(i for i in range(start, len(lines)) if lines[i].strip() == "Governor")
     party, district, names = "", None, []
-    cell = re.compile(r"(?<![A-Za-z])(" + "|".join(sorted(map(re.escape, COUNTIES), key=len, reverse=True)) + r")\s+(\d[\d,]*(?:[ \t]+\d[\d,]*)*)")
+    cell = re.compile(
+        r"(?<![A-Za-z])("
+        + "|".join(sorted(map(re.escape, COUNTIES), key=len, reverse=True))
+        + r")\s+(\d[\d,]*(?:[ \t]+\d[\d,]*)*)"
+    )
     for position in range(start, end):
         line = lines[position]
         if found := re.match(r"\s*(Republican|Democratic) Party Nomination", line):
@@ -254,7 +283,21 @@ def parse() -> None:
             for name, by_county in by_name.items():
                 for county, votes in by_county.items():
                     code = codes[re.sub(r"[^a-z]", "", county.lower())]
-                    rows.append((day.year, f"{chamber}:{party}", day, False, "NE", district, code, name.upper(), 1, False, votes))
+                    rows.append(
+                        (
+                            day.year,
+                            f"{chamber}:{party}",
+                            day,
+                            False,
+                            "NE",
+                            district,
+                            code,
+                            name.upper(),
+                            1,
+                            False,
+                            votes,
+                        )
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(

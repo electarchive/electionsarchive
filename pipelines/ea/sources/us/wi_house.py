@@ -25,7 +25,10 @@ VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, _, _, day, pages) in ITEMS.items()
 }
-TITLES = {year: f"Wisconsin Blue Book {book}: Vote for Members of the {congress} Congress" for year, (_, book, congress, _, _) in ITEMS.items()}
+TITLES = {
+    year: f"Wisconsin Blue Book {book}: Vote for Members of the {congress} Congress"
+    for year, (_, book, congress, _, _) in ITEMS.items()
+}
 NAMES: dict[tuple[str, str], str] = {}
 ERRATA: set[tuple[int, int]] = set()
 ALIASES: dict[str, tuple[str, ...]] = {}

@@ -16,11 +16,47 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2022, 8, 2)
 URL = "https://results.vote.wa.gov/results/20220802/export/20220802_allcounties.csv"
-NAMES = (
-    "Adams,Asotin,Benton,Chelan,Clallam,Clark,Columbia,Cowlitz,Douglas,Ferry,Franklin,Garfield,Grant,Grays Harbor,"
-    "Island,Jefferson,King,Kitsap,Kittitas,Klickitat,Lewis,Lincoln,Mason,Okanogan,Pacific,Pend Oreille,Pierce,"
-    "San Juan,Skagit,Skamania,Snohomish,Spokane,Stevens,Thurston,Wahkiakum,Walla Walla,Whatcom,Whitman,Yakima"
-).split(",")
+NAMES = [
+    "Adams",
+    "Asotin",
+    "Benton",
+    "Chelan",
+    "Clallam",
+    "Clark",
+    "Columbia",
+    "Cowlitz",
+    "Douglas",
+    "Ferry",
+    "Franklin",
+    "Garfield",
+    "Grant",
+    "Grays Harbor",
+    "Island",
+    "Jefferson",
+    "King",
+    "Kitsap",
+    "Kittitas",
+    "Klickitat",
+    "Lewis",
+    "Lincoln",
+    "Mason",
+    "Okanogan",
+    "Pacific",
+    "Pend Oreille",
+    "Pierce",
+    "San Juan",
+    "Skagit",
+    "Skamania",
+    "Snohomish",
+    "Spokane",
+    "Stevens",
+    "Thurston",
+    "Wahkiakum",
+    "Walla Walla",
+    "Whatcom",
+    "Whitman",
+    "Yakima",
+]
 CODES = {re.sub(r"[^a-z]", "", name.lower()): f"53{2 * i + 1:03}" for i, name in enumerate(NAMES)}
 RACE = re.compile(r"(?i)congressional district (\d+) u\.s\. representative|(united states u\.s\. senator)")
 PUBLISHER = "Washington Secretary of State"

@@ -17,7 +17,10 @@ EIDS = range(1, 300)
 
 
 def cells(fragment: str) -> list[str]:
-    return [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", fragment, flags=re.S)]
+    return [
+        re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+        for cell in re.findall(r"<td[^>]*>(.*?)</td>", fragment, flags=re.DOTALL)
+    ]
 
 
 def fetch() -> None:
@@ -28,10 +31,10 @@ def fetch() -> None:
 
 
 def contests(page: str, kind: str) -> Iterator[dict[str, Any]]:
-    tables = re.findall(r"<table.*?</table>", page, flags=re.S)
+    tables = re.findall(r"<table.*?</table>", page, flags=re.DOTALL)
     ballots = 0
     for table in tables[1:]:
-        rows = [cells(row) for row in re.findall(r"<tr.*?</tr>", table, flags=re.S)]
+        rows = [cells(row) for row in re.findall(r"<tr.*?</tr>", table, flags=re.DOTALL)]
         rows = [row for row in rows if row]
         if not rows:
             continue
@@ -39,7 +42,11 @@ def contests(page: str, kind: str) -> Iterator[dict[str, Any]]:
             ballots += 1
             heading = re.sub(r"(?i)\bprop[o]?sition\b", "Proposition", rows[0][0])
             found = re.match(r"(?i)(?:proposition|ordinance)(?: no\.?)? ?(\w*)", heading)
-            label = f"Proposition {found[1].lstrip('0') or found[1]}".strip() if found and found[1] else f"Proposition {ballots}"
+            label = (
+                f"Proposition {found[1].lstrip('0') or found[1]}".strip()
+                if found and found[1]
+                else f"Proposition {ballots}"
+            )
             votes = [value for value in rows[2] if re.fullmatch(r"[\d,]+", value)]
             if len(votes) != 2:
                 print(f"{heading}: no yes and no totals; skipped")
@@ -85,7 +92,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                 "tenant": tenant,
                 "election": str(eid),
                 "day": day,
-                "title": f"City of Austin {kind.replace(',', ', ').replace('Run-Off', 'Runoff')} election".replace("  ", " "),
+                "title": f"City of Austin {kind.replace(',', ', ').replace('Run-Off', 'Runoff')} election".replace(
+                    "  ", " "
+                ),
                 "official": True,
                 "primary": False,
                 "contests": nodes,

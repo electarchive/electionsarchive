@@ -84,7 +84,12 @@ def parse() -> None:
     if lost.height:
         print(lost.group_by("prefix", "name").agg(pl.col("votes").sum()))
     PARSED.mkdir(parents=True, exist_ok=True)
-    out = frame.filter(pl.col("county").is_not_null()).filter(pl.col("votes").sum().over("day", "state", "column") > 0).group_by("day", "district", "state", "county", "column").agg(pl.col("votes").sum())
+    out = (
+        frame.filter(pl.col("county").is_not_null())
+        .filter(pl.col("votes").sum().over("day", "state", "column") > 0)
+        .group_by("day", "district", "state", "county", "column")
+        .agg(pl.col("votes").sum())
+    )
     out.write_parquet(PARSED / "lines.parquet")
     print(out.group_by("day", "state").agg(pl.col("county").n_unique(), pl.col("votes").sum()))
 

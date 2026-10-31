@@ -24,7 +24,11 @@ WORDS = r"\b(?:city|town|village|borough|township|municipality|cdp|county|indepe
 
 
 def fold(text: str) -> str:
-    return " ".join(re.sub(WORDS, " ", re.sub(r"[^a-z0-9 ]", " ", re.sub(r"\bsaint\b", "st", text.lower()).replace("&", " and "))).split())
+    return " ".join(
+        re.sub(
+            WORDS, " ", re.sub(r"[^a-z0-9 ]", " ", re.sub(r"\bsaint\b", "st", text.lower()).replace("&", " and "))
+        ).split()
+    )
 
 
 def town_urls() -> dict[tuple[int, str], str]:
@@ -72,7 +76,9 @@ def parse() -> None:
     for year, kind, url in sources():
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-        reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
+        reader = shapefile.Reader(
+            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+        )
         scheme = {"place": "us.place", "cousub": "us.town"}.get(kind, "us.school_district")
         for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
             geoid = str(record["GEOID"])
@@ -91,13 +97,23 @@ def parse() -> None:
             if len(found) > 1 and scheme == "us.place":
                 found = {geoid for geoid in found if kinds[geoid] != "cdp"} or found
             if len(found) > 1 and scheme == "us.school_district":
-                wanted_kind = "scsd" if "high" in (name or "").lower() else "unsd" if "unified" in (name or "").lower() else "elsd"
+                wanted_kind = (
+                    "scsd"
+                    if "high" in (name or "").lower()
+                    else "unsd"
+                    if "unified" in (name or "").lower()
+                    else "elsd"
+                )
                 found = {geoid for geoid in found if kinds[geoid] == wanted_kind} or found
-            geoid, how = (next(iter(found)), "name") if len(found) == 1 else (None, "ambiguous" if found else "unmatched")
+            geoid, how = (
+                (next(iter(found)), "name") if len(found) == 1 else (None, "ambiguous" if found else "unmatched")
+            )
         row = records.get((scheme, geoid)) if geoid else None
         rows.append((area, scheme, code, name, geoid, how, row[2] if row else None, row[3] if row else None))
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows, schema=["area", "scheme", "code", "name", "geoid", "how", "geojson", "vintage"], orient="row")
+    frame = pl.DataFrame(
+        rows, schema=["area", "scheme", "code", "name", "geoid", "how", "geojson", "vintage"], orient="row"
+    )
     frame.write_parquet(PARSED / "matches.parquet")
     print(frame.group_by("scheme", "how").len().sort("scheme", "how"))
     frame.filter(pl.col("geoid").is_null()).drop("geojson").write_csv(PARSED / "unmatched.tsv", separator="\t")
@@ -126,5 +142,13 @@ def emit() -> Path:
             [frame["area"].to_list(), frame["geojson"].to_list()],
         ).fetchall()
         for area, geom, point in shapes:
-            cs.add("area_geometry", area_id=area, valid_from=None, geom=geom, label_point=point, quality="official", source_id=census)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=census,
+            )
         return cs.write()

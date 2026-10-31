@@ -44,7 +44,12 @@ def parse() -> None:
     rows = []
     for year, day, office, heading in BLOCKS:
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE.replace("statewide", "usrep"), URL.format(year, "prim_gen")).path), "-"],
+            [
+                "pdftotext",
+                "-layout",
+                str(raw.cached(SOURCE.replace("statewide", "usrep"), URL.format(year, "prim_gen")).path),
+                "-",
+            ],
             capture_output=True,
             text=True,
             check=True,
@@ -85,7 +90,9 @@ def parse() -> None:
                 if value is not None:
                     rows.append((str(day), office, codes[county], str(column), value))
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row").write_parquet(PARSED / "lines.parquet")
+    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row").write_parquet(
+        PARSED / "lines.parquet"
+    )
 
 
 def emit() -> Path:

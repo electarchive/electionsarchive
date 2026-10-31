@@ -128,8 +128,14 @@ def parse() -> None:
         .with_columns(deposit=pl.coalesce("deposit", "candidate_deposit"))
         .drop("candidate_deposit")
     )
-    print("lists without a deposit:", options_frame.filter(pl.col("list_label").is_not_null() & pl.col("deposit").is_null()).rows())
-    print("candidates without a deposit:", options_frame.filter(pl.col("list_label").is_null() & pl.col("deposit").is_null()).rows())
+    print(
+        "lists without a deposit:",
+        options_frame.filter(pl.col("list_label").is_not_null() & pl.col("deposit").is_null()).rows(),
+    )
+    print(
+        "candidates without a deposit:",
+        options_frame.filter(pl.col("list_label").is_null() & pl.col("deposit").is_null()).rows(),
+    )
     elected = read("elected").select(
         unit=pl.when(pl.col("CODDPT").str.contains(r"^\d$")).then(pl.col("CODDPT").str.zfill(2)).otherwise("CODDPT"),
         surname=pl.col("NOMPSN"),
@@ -298,7 +304,10 @@ def emit() -> Path:
         members: dict[tuple[str, int], list[dict[str, object]]] = {}
         for row in lists.sort("position").iter_rows(named=True):
             members.setdefault((row["unit"], row["deposit"]), []).append(row)
-        winners = {(unit, surname, forename) for unit, surname, forename in elected.select("unit", "surname", "forename").iter_rows()}
+        winners = {
+            (unit, surname, forename)
+            for unit, surname, forename in elected.select("unit", "surname", "forename").iter_rows()
+        }
         seats = dict(elected.group_by("unit").len().iter_rows())
         values: list[dict[str, object]] = []
         first_rounds: dict[str, UUID] = {}
@@ -349,13 +358,25 @@ def emit() -> Path:
             unit = cs.unit("fr.departement", unit_code)
             for field, measure in ACCOUNTING.items():
                 values.append(
-                    {"result_set_id": str(result_set), "unit_id": str(unit), "option_id": None, "measure": measure, "value": row[field]}
+                    {
+                        "result_set_id": str(result_set),
+                        "unit_id": str(unit),
+                        "option_id": None,
+                        "measure": measure,
+                        "value": row[field],
+                    }
                 )
             for entry in rows.iter_rows(named=True):
                 position = entry["deposit"] or entry["index"]
                 option = cs.key(f"{SOURCE}.option", f"{key}:{position}")
                 values.append(
-                    {"result_set_id": str(result_set), "unit_id": str(unit), "option_id": str(option), "measure": 1, "value": entry["votes"]}
+                    {
+                        "result_set_id": str(result_set),
+                        "unit_id": str(unit),
+                        "option_id": str(option),
+                        "measure": 1,
+                        "value": entry["votes"],
+                    }
                 )
                 if proportional:
                     cs.add(
@@ -374,7 +395,9 @@ def emit() -> Path:
                         cs.add(
                             "candidacy",
                             id=candidacy,
-                            person_id=person_for(unit_code, member["surname"], member["forename"], member["sex"], member["born"]),
+                            person_id=person_for(
+                                unit_code, member["surname"], member["forename"], member["sex"], member["born"]
+                            ),
                             option_id=option,
                             role="head" if member["position"] == 1 else "list_member",
                             list_position=member["position"],
@@ -402,7 +425,9 @@ def emit() -> Path:
                 cs.add(
                     "candidacy",
                     id=cs.key(f"{SOURCE}.candidacy", f"{key}:{position}"),
-                    person_id=person_for(unit_code, entry["surname"], entry["forename"], entry["sex"], born.get(identity)),
+                    person_id=person_for(
+                        unit_code, entry["surname"], entry["forename"], entry["sex"], born.get(identity)
+                    ),
                     option_id=option,
                     role="head",
                     ballot_name=f"{entry['surname']} {entry['forename']}",

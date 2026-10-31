@@ -22,7 +22,9 @@ FILES = {
     date(2006, 11, 7): "2006/2006_official-senate_tallies.pdf",
     date(2008, 11, 4): "2008/2008-official-gen-elect-tallies-senate-120208.pdf",
 }
-ROW = re.compile(r"(?:^(\S.*?)\s{2,}.*?)?\b(Atlantic|Bergen|Burlington|Camden|Cape May|Cumberland|Essex|Gloucester|Hudson|Hunterdon|Mercer|Middlesex|Monmouth|Morris|Ocean|Passaic|Salem|Somerset|Sussex|Union|Warren)\b.*?\s([\d,]+)\s*$")
+ROW = re.compile(
+    r"(?:^(\S.*?)\s{2,}.*?)?\b(Atlantic|Bergen|Burlington|Camden|Cape May|Cumberland|Essex|Gloucester|Hudson|Hunterdon|Mercer|Middlesex|Monmouth|Morris|Ocean|Passaic|Salem|Somerset|Sussex|Union|Warren)\b.*?\s([\d,]+)\s*$"
+)
 
 
 def fetch() -> None:
@@ -57,7 +59,9 @@ def parse() -> None:
                 found.append((fips[match[2].lower()], int(match[3].replace(",", ""))))
             elif total := re.match(r"\s*Total\s+([\d,]+)\s*$", line):
                 if sum(votes for _, votes in found) != int(total[1].replace(",", "")) or len(found) != 21:
-                    raise ValueError(f"{day} {candidate}: {len(found)} counties sum to {sum(v for _, v in found)}, printed {total[1]}")
+                    raise ValueError(
+                        f"{day} {candidate}: {len(found)} counties sum to {sum(v for _, v in found)}, printed {total[1]}"
+                    )
                 rows.extend((day, code, candidate, votes) for code, votes in found)
                 found = []
     frame = pl.DataFrame(rows, schema=["day", "code", "candidate", "votes"], orient="row")
@@ -102,7 +106,5 @@ def emit() -> Path:
             )
         for path in FILES.values():
             cs.artifact(raw.cached(SOURCE, BASE + path), source)
-        medsl.attach(
-            cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NJ": source}, strict=True, extend=True
-        )
+        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NJ": source}, strict=True, extend=True)
         return cs.write()

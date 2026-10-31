@@ -47,7 +47,10 @@ def parse() -> None:
         if row[1] in ("Total", "Totals"):
             total = cells
         else:
-            rows.extend(("%s" % fips[re.sub(r"[^a-z]", "", row[1].lower().replace("&", "and"))], name, votes) for name, votes in zip(CANDIDATES, cells))
+            rows.extend(
+                ("{}".format(fips[re.sub(r"[^a-z]", "", row[1].lower().replace("&", "and"))]), name, votes)
+                for name, votes in zip(CANDIDATES, cells)
+            )
     frame = pl.DataFrame(rows, schema=["code", "candidate", "votes"], orient="row")
     sums = frame.group_by("candidate").agg(pl.col("votes").sum())
     for name, expected in zip(CANDIDATES, total):

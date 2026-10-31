@@ -1,4 +1,3 @@
-import io
 import json
 import re
 import zipfile
@@ -24,7 +23,13 @@ TITLE = "November 3, 2026 General Election: questions and issues"
 PLACES = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_place_national.zip"
 COUSUBS = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_cousubs_national.zip"
 DIRECTORY = "https://educationdata.urban.org/api/v1/school-districts/ccd/directory/2022/?fips=39"
-SCHEMES = {"Township": "us.town", "Village": "us.place", "City": "us.place", "County": "us.county", "School District": "us.school_district"}
+SCHEMES = {
+    "Township": "us.town",
+    "Village": "us.place",
+    "City": "us.place",
+    "County": "us.county",
+    "School District": "us.school_district",
+}
 
 
 WORDING: dict[str, str] = json.loads(Path(__file__).with_name("oh_franklin_wording.json").read_text())
@@ -136,7 +141,9 @@ def emit() -> Path:
             candidates.setdefault(("place", ceda._city(label)), []).append((f"place:{geoid}", geoid, label))
         for geoid, full in gazetteer(COUSUBS).select("GEOID", "NAME").iter_rows():
             if full.endswith("township"):
-                candidates.setdefault(("town", geoid[:5] + ceda._core(full)), []).append((f"town:{geoid}", geoid, full.title()))
+                candidates.setdefault(("town", geoid[:5] + ceda._core(full)), []).append(
+                    (f"town:{geoid}", geoid, full.title())
+                )
         for entry in json.loads(raw.cached(SOURCE, DIRECTORY).path.read_text())["results"]:
             candidates.setdefault(("school", ceda._core(entry["lea_name"])), []).append(
                 (f"school:{entry['leaid']}", entry["leaid"], entry["lea_name"])
@@ -188,16 +195,19 @@ def emit() -> Path:
                     polity_id = cs.key("us.polity", owner)
                     path = f"us/oh/{slug(text)}"
                     if path in taken:
-                        path = (
-                            f"{path}-{slug(row['county'])}-county" if scheme == "us.town" else f"{path}-city"
-                        )
+                        path = f"{path}-{slug(row['county'])}-county" if scheme == "us.town" else f"{path}-city"
                     if path in taken:
                         print("slug taken:", path)
                         continue
                     taken.add(path)
                     area_id = cs.area(scheme, geoid)
                     if polity_id in cs.minted:
-                        cs.add("polity", id=polity_id, kind="school_district" if scheme == "us.school_district" else "municipality", iso_code=None)
+                        cs.add(
+                            "polity",
+                            id=polity_id,
+                            kind="school_district" if scheme == "us.school_district" else "municipality",
+                            iso_code=None,
+                        )
                         cs.add("name", entity_id=polity_id, text=text, lang="en", kind="official", is_preferred=True)
                         cs.add("polity_parent", polity_id=polity_id, parent_id=ohio)
                         cs.add("slug", path=path, entity_id=polity_id)
@@ -209,7 +219,9 @@ def emit() -> Path:
                             area_id=area_id,
                             parent_id=cs.area("us.county", geoid[:5]) if scheme == "us.town" else state_area,
                         )
-                        cs.add("name", entity_id=area_id, text=f"{text}, OH", lang="en", kind="official", is_preferred=True)
+                        cs.add(
+                            "name", entity_id=area_id, text=f"{text}, OH", lang="en", kind="official", is_preferred=True
+                        )
                     if polity_id in cs.minted:
                         cs.add("polity_territory", polity_id=polity_id, area_id=area_id)
                         cs.add(
@@ -243,7 +255,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             counts[key] = counts.get(key, 0) + 1
@@ -266,7 +285,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):

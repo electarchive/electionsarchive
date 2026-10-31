@@ -47,7 +47,9 @@ def emit() -> Path:
             keys = [precinct, precinct.lstrip("0").zfill(5)]
             if (suffixed := re.match(r"^\d+-(\d+)-", precinct)) is not None:
                 keys.append(suffixed[1])
-            area = next((found for key in keys if (found := shapes.get(f"{day}:{state}:{county}:{key}")) is not None), None)
+            area = next(
+                (found for key in keys if (found := shapes.get(f"{day}:{state}:{county}:{key}")) is not None), None
+            )
             if area is not None:
                 rows.append((unit, area, start, end, None))
             elif (areas := yearly.get(f"{day[:4]}:{state}:{county}:{place}:{precinct}")) is not None:

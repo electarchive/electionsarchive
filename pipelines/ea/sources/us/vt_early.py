@@ -48,8 +48,10 @@ def emit() -> Path:
             )
         )
         named = pl.struct(pl.col("day").dt.strftime("%Y-%m").alias("m"), "district").map_elements(
-            lambda row: (row["m"], row["district"])
-            in {("1852-09", 3), ("1856-09", 1), ("1860-09", 2), ("1870-09", 1), ("1880-11", 3)},
+            lambda row: (
+                (row["m"], row["district"])
+                in {("1852-09", 3), ("1856-09", 1), ("1860-09", 2), ("1870-09", 1), ("1880-11", 3)}
+            ),
             return_dtype=pl.Boolean,
         )
         authoritative = "Vermont's Secretary of State publishes the town returns these sums come from."

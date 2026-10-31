@@ -188,10 +188,10 @@ def parse() -> None:
                 type=pl.col("question_type").fill_null(""),
                 winner=pl.lit(None, pl.String),
                 division=pl.concat_str(pl.lit(f"{state}:"), division),
-                code=pl.when(
-                    (pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022)
+                code=pl.when((pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022))
+                .then(
+                    division.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(regions, default=None)
                 )
-                .then(division.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(regions, default=None))
                 .when(pl.col("division_type") == "City/Town")
                 .then(
                     pl.coalesce(

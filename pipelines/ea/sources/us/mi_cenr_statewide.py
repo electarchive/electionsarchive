@@ -12,7 +12,9 @@ from ea.store import DATA, connect
 SOURCE = "us.mi_cenr_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-FILE = "http://web.archive.org/web/2020id_/http://miboecfr.nictusa.com/election/results/DATA/{}GEN_MI_CENR_BY_COUNTY.xls"
+FILE = (
+    "http://web.archive.org/web/2020id_/http://miboecfr.nictusa.com/election/results/DATA/{}GEN_MI_CENR_BY_COUNTY.xls"
+)
 YEARS = [1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014]
 PUBLISHER = "Michigan Department of State"
 TITLE = "Official general election results by county"
@@ -47,7 +49,9 @@ def parse() -> None:
         }
     frames = []
     for year in YEARS:
-        frame = pl.read_csv(raw.cached(SOURCE, FILE.format(year)).path, separator="\t", infer_schema=False, quote_char=None)
+        frame = pl.read_csv(
+            raw.cached(SOURCE, FILE.format(year)).path, separator="\t", infer_schema=False, quote_char=None
+        )
         frames.append(
             frame.filter(
                 pl.col("OfficeCode(Text)").is_in(list(OFFICES)) & pl.col("CandidateVotes").is_not_null()
@@ -87,7 +91,9 @@ def parse() -> None:
             candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"),
             party=pl.when(~pl.col("writein") & (pl.col("party") != "")).then("party"),
             title=pl.col("office").replace_strict({code: title for code, (title, _) in OFFICES.items()}),
-            magnitude=pl.col("office").replace_strict({code: seats for code, (_, seats) in OFFICES.items()}).cast(pl.Int16),
+            magnitude=pl.col("office")
+            .replace_strict({code: seats for code, (_, seats) in OFFICES.items()})
+            .cast(pl.Int16),
         )
         .group_by("year", "day", "title", "special", "magnitude", "county", "candidate", "party", "writein")
         .agg(pl.col("votes").sum())

@@ -120,14 +120,14 @@ def locate(source: ModuleType) -> None:
         spacing = min(abs(centers[a] - centers[b]) for a in centers for b in centers if a < b)
         half = 0.45 * spacing
         grid: dict[tuple[int, int], tuple[int, int, int, int]] = {}
-        for c in centers:
+        for c, center in centers.items():
             for k, (_, votes) in enumerate(lines):
                 near = [
                     box
                     for digits, box in tokens
                     if digits == str(votes[c])
                     and abs((box[1] + box[3]) / 2 - (slope * k + offset)) < 0.35 * pitch
-                    and abs((box[0] + box[2]) / 2 - centers[c]) < half
+                    and abs((box[0] + box[2]) / 2 - center) < half
                 ]
                 if near:
                     grid[(c, k)] = min(near, key=lambda box: box[2] - box[0])

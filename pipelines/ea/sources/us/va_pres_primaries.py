@@ -1,4 +1,3 @@
-import io
 import json
 from pathlib import Path
 from urllib.parse import urlencode
@@ -73,7 +72,11 @@ def parse() -> None:
     frame = frame.with_columns(
         code=division.replace_strict(counties, default=None),
         votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-        candidate=pl.col("candidate_name").fill_null("").str.replace_all(r"\s+", " ").str.strip_chars().str.to_uppercase(),
+        candidate=pl.col("candidate_name")
+        .fill_null("")
+        .str.replace_all(r"\s+", " ")
+        .str.strip_chars()
+        .str.to_uppercase(),
     ).filter(pl.col("votes").is_not_null(), ~pl.col("candidate").str.contains("TOTAL VOTES|UNDERVOTE"))
     lost = frame.filter(pl.col("code").is_null())
     if lost.height:
@@ -107,7 +110,15 @@ def emit() -> Path:
             polity="US-VA",
         )
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=SITE, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=SITE,
+            license="Public record",
+        )
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, url(year)), source)
         medsl.attach(cs, conn, frame, {"VA": source}, strict=True)

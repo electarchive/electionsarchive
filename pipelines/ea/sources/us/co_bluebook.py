@@ -131,7 +131,11 @@ def emit() -> Path:
             candidates = titles.filter(pl.col("year") == year).to_dicts()
             scored: list[tuple[float, str, int]] = []
             for key, label, _ in contests.get(year, []):
-                short = re.sub(r"^(?:Amendment|Proposition|Referendum) (?:[A-Z]{1,2}|\d+)\s*(?:\((?:STATUTORY|CONSTITUTIONAL)\))?", "", label.split(":", 1)[-1])
+                short = re.sub(
+                    r"^(?:Amendment|Proposition|Referendum) (?:[A-Z]{1,2}|\d+)\s*(?:\((?:STATUTORY|CONSTITUTIONAL)\))?",
+                    "",
+                    label.split(":", 1)[-1],
+                )
                 mine = words(short)
                 for index, candidate in enumerate(candidates):
                     theirs = words(candidate["title"])

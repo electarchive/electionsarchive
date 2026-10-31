@@ -1,10 +1,11 @@
 import os
-import re, sys
+import re
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
-from words import pages
 from parsers import check, save, val
+from words import pages
 
 D = Path(sys.argv[1])
 NUM = re.compile(r"^[\d,]+$")

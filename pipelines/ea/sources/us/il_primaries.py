@@ -449,7 +449,9 @@ def parse() -> None:
             continue
         for pick in range(2 ** len(differ) if len(differ) <= 6 else 0):
             votes_by = {k: b[k][1] if k in differ and pick >> differ.index(k) & 1 else a[k][1] for k in a}
-            if titled and all(sum(v[column] for v in votes_by.values()) == total for _, _, _, column, total, _ in titled):
+            if titled and all(
+                sum(v[column] for v in votes_by.values()) == total for _, _, _, column, total, _ in titled
+            ):
                 break
         else:
             failed.append(f"{year} {office} {district}: reads disagree on {differ} and no choice adds up")
@@ -471,9 +473,8 @@ def parse() -> None:
                     and text.startswith("UNITED")
                     or office == "house"
                     and n + 1 < len(lines)
-                    and re.split(r"[\s-]+", " ".join(w[0] for w in lines[n + 1]))[0] == next(
-                        word for word, number_ in ORDINALS.items() if number_ == district
-                    )
+                    and re.split(r"[\s-]+", " ".join(w[0] for w in lines[n + 1]))[0]
+                    == next(word for word, number_ in ORDINALS.items() if number_ == district)
                 ),
                 None,
             )

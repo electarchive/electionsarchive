@@ -63,7 +63,9 @@ def parse() -> None:
             voters = values.get(ballots_column) if ballots_column else None
             if voters is not None and registered is not None and voters >= registered:
                 voters = None
-            rows.append({"date": day, "stat": stat, "code": codes[plain(line[1])], "registered": registered, "voters": voters})
+            rows.append(
+                {"date": day, "stat": stat, "code": codes[plain(line[1])], "registered": registered, "voters": voters}
+            )
             found += 1
         print(day, found)
     frame = pl.DataFrame(rows, schema_overrides={"registered": pl.Int64, "voters": pl.Int64})

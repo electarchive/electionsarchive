@@ -2,7 +2,6 @@ import html
 import re
 import subprocess
 from collections.abc import Iterator, Mapping
-from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +34,6 @@ def keyed(text: str) -> Iterator[dict[str, Any]]:
             continue
         title = lines[index - 1].strip()
         choices: list[dict[str, Any]] = []
-        over = 0
         for other in lines[index + 1 : index + 30]:
             if not re.search(r"\d{2} = ", other):
                 if choices:
@@ -43,7 +41,7 @@ def keyed(text: str) -> Iterator[dict[str, Any]]:
                 continue
             for _, name, votes, _ in bexar.CANDIDATE.findall(other):
                 name = name.strip()
-                if re.fullmatch(r"OVER VOTES|UNDER VOTES", name, re.I):
+                if re.fullmatch(r"OVER VOTES|UNDER VOTES", name, re.IGNORECASE):
                     continue
                 choices.append({"text": name, "party": None, "total": votes.replace(",", ""), "places": []})
         if choices:
@@ -65,7 +63,9 @@ def electionware(text: str) -> Iterator[dict[str, Any]]:
                 cast = int(pair[2].replace(",", "")) if pair else None
                 break
             if pair and not stripped.startswith(("TOTAL", "Day", "Voting")):
-                choices.append({"text": pair[1].strip(), "party": None, "total": pair[2].replace(",", ""), "places": []})
+                choices.append(
+                    {"text": pair[1].strip(), "party": None, "total": pair[2].replace(",", ""), "places": []}
+                )
         if choices and cast is not None:
             yield {"text": title, "vote_for": int(re.search(r"\d+", line)[0]), "choices": choices, "cast": cast}
 
@@ -76,9 +76,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             path = raw.cached(SOURCE, bexar.FILE.format(doc)).path
             content = path.read_bytes()
             if content.startswith(b"%PDF"):
-                text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode(
-                    errors="replace"
-                )
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True
+                ).stdout.decode(errors="replace")
                 parser = electionware
             else:
                 text = html.unescape(re.sub(r"<[^>]+>", "", content.decode("latin-1")))

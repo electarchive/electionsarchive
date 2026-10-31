@@ -44,7 +44,9 @@ BOOKS = {
 }
 BLOCKS: dict[tuple[int, str], dict[str, list[list[str]]]] = {
     (1992, "democratic"): {
-        "governor": [["Rodger Belknap", "Larry Eugene Butcher", "Gaston Caperton", "Mario J. Palumbo", "Charlotte Jean Pritt"]],
+        "governor": [
+            ["Rodger Belknap", "Larry Eugene Butcher", "Gaston Caperton", "Mario J. Palumbo", "Charlotte Jean Pritt"]
+        ],
         "secretary-of-state": [["Ken Hechler", "Tom Susman"]],
         "auditor": [["Glen B. Gainer, III", "Mark Anthony Manchin"]],
         "treasurer": [["Larris Bailey"]],
@@ -96,9 +98,19 @@ SHEETS = {
 }
 SECTIONS: dict[tuple[int, str, str], list[str]] = {
     (2000, "governor", "democratic"): ["Jim Lees", "Bob Wise"],
-    (2000, "governor", "republican"): ["Larry Eugene Butcher", "Donna H. McCase", "Joseph Oliverio", "Cecil H. Underwood"],
+    (2000, "governor", "republican"): [
+        "Larry Eugene Butcher",
+        "Donna H. McCase",
+        "Joseph Oliverio",
+        "Cecil H. Underwood",
+    ],
     (2000, "governor", "libertarian"): ["Bob Myers"],
-    (2000, "secretary-of-state", "democratic"): ["Joe Manchin, III", "Bobby Nelson", "Mike Oliverio", "Charlotte Pritt"],
+    (2000, "secretary-of-state", "democratic"): [
+        "Joe Manchin, III",
+        "Bobby Nelson",
+        "Mike Oliverio",
+        "Charlotte Pritt",
+    ],
     (2000, "secretary-of-state", "libertarian"): ["Poochie Myers"],
     (2000, "auditor", "democratic"): ["Glen B. Gainer, III"],
     (2000, "treasurer", "democratic"): ["John D. Perdue"],
@@ -237,9 +249,19 @@ def parse() -> None:
         used: dict[str, int] = {}
         for index, line in enumerate(lines):
             office = HEADINGS.get(line.strip().upper())
-            if office is None or next((x for x in reversed(lines[:index]) if x.strip()), "").strip().lower() and re.fullmatch(r"total votes( for)?(\s+[\d,]+)?", re.sub(r"\s+", " ", next((x for x in reversed(lines[:index]) if x.strip()), "").strip().lower())):
+            if (
+                office is None
+                or next((x for x in reversed(lines[:index]) if x.strip()), "").strip().lower()
+                and re.fullmatch(
+                    r"total votes( for)?(\s+[\d,]+)?",
+                    re.sub(r"\s+", " ", next((x for x in reversed(lines[:index]) if x.strip()), "").strip().lower()),
+                )
+            ):
                 continue
-            ahead = next((j for j in range(index + 1, min(index + 14, len(lines))) if lines[j].strip().startswith("Barbour")), None)
+            ahead = next(
+                (j for j in range(index + 1, min(index + 14, len(lines))) if lines[j].strip().startswith("Barbour")),
+                None,
+            )
             if ahead is None or any(HEADINGS.get(x.strip().upper()) for x in lines[index + 1 : ahead]):
                 continue
             blocks = BLOCKS[(year, party)].get(office)
@@ -249,14 +271,18 @@ def parse() -> None:
             if at >= len(blocks):
                 raise ValueError(f"{year} {party} {office}: block {at + 1} at line {index + 1} has no names")
             used[office] = at + 1
-            rows += [(year, office, party, *row) for row in table(lines[ahead:], blocks[at], f"{year} {party} {office}")]
+            rows += [
+                (year, office, party, *row) for row in table(lines[ahead:], blocks[at], f"{year} {party} {office}")
+            ]
         for office, blocks in BLOCKS[(year, party)].items():
             if used.get(office) != len(blocks):
                 raise ValueError(f"{year} {party} {office}: {used.get(office)} blocks found, {len(blocks)} expected")
     for year, offices in SHEETS.items():
         for office, name in offices.items():
             lines = text(f"{SITE}{year}/{year}%20{name}%20Pri.pdf")
-            starts = [(i, PARTY_HEADING.match(line)[1].lower()) for i, line in enumerate(lines) if PARTY_HEADING.match(line)]
+            starts = [
+                (i, PARTY_HEADING.match(line)[1].lower()) for i, line in enumerate(lines) if PARTY_HEADING.match(line)
+            ]
             parties = list(dict.fromkeys(party for _, party in starts))
             for party in parties:
                 names = SECTIONS.get((year, office, party))
@@ -276,10 +302,16 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '54%%'"""
             ).fetchall()
         }
-    frame = frame.with_columns(
-        day=pl.col("year").replace_strict({y: d for y, d in DAYS.items()}, return_dtype=pl.Date),
-        code=pl.col("county").map_elements(lambda c: codes[re.sub(r"[^a-z]", "", c.lower())], return_dtype=pl.String),
-    ).drop("county").rename({"code": "county"})
+    frame = (
+        frame.with_columns(
+            day=pl.col("year").replace_strict({y: d for y, d in DAYS.items()}, return_dtype=pl.Date),
+            code=pl.col("county").map_elements(
+                lambda c: codes[re.sub(r"[^a-z]", "", c.lower())], return_dtype=pl.String
+            ),
+        )
+        .drop("county")
+        .rename({"code": "county"})
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "lines.parquet")
     print(frame.group_by("year", "office", "party", "candidate", maintain_order=True).agg(pl.col("votes").sum()).rows())
@@ -420,7 +452,9 @@ def emit() -> Path:
             ).fetchall()
             picked: dict[str, UUID] = {}
             totals: dict[UUID, int] = {}
-            for candidate, votes in lines.group_by("candidate", maintain_order=True).agg(pl.col("votes").sum()).iter_rows():
+            for candidate, votes in (
+                lines.group_by("candidate", maintain_order=True).agg(pl.col("votes").sum()).iter_rows()
+            ):
                 matches = [
                     option
                     for option, kind, label in options
@@ -507,6 +541,10 @@ def emit() -> Path:
                     value=votes,
                 )
             cs.add(
-                "outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="won", seats=None
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="won",
+                seats=None,
             )
         return cs.write()

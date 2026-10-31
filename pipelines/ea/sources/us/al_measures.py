@@ -16,7 +16,9 @@ PARSED = DATA / "parsed" / SOURCE
 FILES = {
     date(2014, 11, 4): al_precincts.BASE + "2014General-precinctLevel.zip",
     date(2016, 3, 1): al_precincts.BASE + "2016-Primary-PrecinctLevel.zip",
-    date(2020, 3, 3): "https://www.sos.alabama.gov/sites/default/files/election-data/2020-06/2020%20Primary%20Precinct%20Results.zip",
+    date(
+        2020, 3, 3
+    ): "https://www.sos.alabama.gov/sites/default/files/election-data/2020-06/2020%20Primary%20Precinct%20Results.zip",
 }
 NUMBERS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5, "SIX": 6, "SEVEN": 7}
 
@@ -30,7 +32,9 @@ def fetch() -> None:
 def parse() -> None:
     def statewide(title: str) -> tuple[str, int | None] | None:
         name = re.sub(r"\s+", " ", title.upper())
-        found = re.match(r"(?:PROPOSED )?(?:STATEWIDE AMENDMENT|STATE AMEND\.?|AMENDMENT NUMBER) ?(?:NUMBER |NO\.? ?)?(\w+)", name)
+        found = re.match(
+            r"(?:PROPOSED )?(?:STATEWIDE AMENDMENT|STATE AMEND\.?|AMENDMENT NUMBER) ?(?:NUMBER |NO\.? ?)?(\w+)", name
+        )
         if found is None or "LOCAL" in name:
             return None
         return "amendment", NUMBERS.get(found[1]) or int(re.sub(r"\D", "", found[1]) or 0)
@@ -89,7 +93,9 @@ def emit() -> Path:
                 continue
             contest, election = found[0]
             options = dict(
-                conn.execute("select upper(ballot_label), id from contest_option where contest_id = %s", [contest]).fetchall()
+                conn.execute(
+                    "select upper(ballot_label), id from contest_option where contest_id = %s", [contest]
+                ).fetchall()
             )
             result_set = cs.key(f"{SOURCE}.result_set", f"{contest}:county")
             cs.add(

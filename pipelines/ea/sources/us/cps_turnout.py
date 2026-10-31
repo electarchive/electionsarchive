@@ -14,10 +14,22 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "U.S. Census Bureau"
 BASE = "https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/"
 TABLES = {
-    "a5a": (25, "A-5a. Reported Voting for Total and Citizen Voting-Age Populations, by State for Presidential Elections"),
-    "a5b": (24, "A-5b. Reported Registration for Total and Citizen Voting-Age Populations, by State for Presidential Elections"),
-    "hst_vote03a": (25, "A-3a. Reported Voting for Total and Citizen Voting-Age Populations, by State for Congressional Elections"),
-    "hst_vote03b": (24, "A-3b. Reported Registration for Total and Citizen Voting-Age Populations, by State for Congressional Elections"),
+    "a5a": (
+        25,
+        "A-5a. Reported Voting for Total and Citizen Voting-Age Populations, by State for Presidential Elections",
+    ),
+    "a5b": (
+        24,
+        "A-5b. Reported Registration for Total and Citizen Voting-Age Populations, by State for Presidential Elections",
+    ),
+    "hst_vote03a": (
+        25,
+        "A-3a. Reported Voting for Total and Citizen Voting-Age Populations, by State for Congressional Elections",
+    ),
+    "hst_vote03b": (
+        24,
+        "A-3b. Reported Registration for Total and Citizen Voting-Age Populations, by State for Congressional Elections",
+    ),
 }
 STATES_SQL = """
 select substr(p.iso_code, 4), ac.code, n.text
@@ -68,9 +80,11 @@ def parse() -> None:
             for index, year in years.items():
                 try:
                     value = float(row[index])
-                except (TypeError, ValueError):
+                except TypeError, ValueError:
                     continue
-                rows.append({"table": table, "measure": measure, "year": year, "state": st, "fips": fips, "rate": value})
+                rows.append(
+                    {"table": table, "measure": measure, "year": year, "state": st, "fips": fips, "rate": value}
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows).sort("measure", "year", "state")
     frame.write_parquet(PARSED / "states.parquet")
@@ -88,7 +102,9 @@ def emit() -> Path:
             "survey estimates from the Census Bureau's Current Population Survey",
             polity="US",
         )
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         sources = {}
         for table, (_, name) in TABLES.items():
             title = f"Current Population Survey, November Voting and Registration Supplement, Table {name} (survey estimates)"

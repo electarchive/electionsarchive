@@ -8,7 +8,7 @@ import tempfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
-from itertools import product
+from itertools import pairwise, product
 from pathlib import Path
 from uuid import UUID
 
@@ -105,6 +105,7 @@ def read(year: int, page: int, dpi: int, psm: str) -> list[list[tuple[str, tuple
                 capture_output=True,
                 text=True,
                 env={**os.environ, "OMP_THREAD_LIMIT": "1"},
+                check=False,
             )
             if done.returncode:
                 raise RuntimeError(f"{year} page {page} {dpi} {psm}: {done.stderr}")
@@ -134,7 +135,7 @@ def read(year: int, page: int, dpi: int, psm: str) -> list[list[tuple[str, tuple
 
 
 def number(token: str) -> int | None:
-    token = token.strip("“”\"—–-_|=~")
+    token = token.strip('“”"—–-_|=~')
     token = re.sub(r"\((?:[A-Z]{3}|OEM)[^)]*\)?$", "", token)
     token = re.sub(r"(?<=\d)\.(?=\d{3}\b)", ",", token)
     if not NUMBER.fullmatch(token) or not re.search(r"\d", token):
@@ -156,7 +157,7 @@ def summary(lines: list[list[tuple[str, tuple[int, int, int, int]]]]) -> list[tu
         tail = re.search(r"(?:\b([A-Z]{3})\b[.,;|]?\s*)?[|]?\s*([\d,.]{1,12})\s+(?:\(-\)\s*|<\s*)?[.\d]*\d\s?%", text)
         if tail is None:
             continue
-        body = re.sub(r"^\W*(?:\(?(?:won|win)\)\s*)?", "", text[: tail.start()], flags=re.I)
+        body = re.sub(r"^\W*(?:\(?(?:won|win)\)\s*)?", "", text[: tail.start()], flags=re.IGNORECASE)
         name = re.split(r"\.{2,}|\s\.\s|_|[a-z]{4,}|\s{3,}|\s[a-z]{1,3}\s", body)[0].strip(" .,;|=-—")
         votes = number(tail[2].replace(".", ","))
         if name and votes is not None and len(name) > 3:
@@ -172,13 +173,14 @@ def header(lines: list[list[tuple[str, tuple[int, int, int, int]]]]) -> list[str
             return [
                 text
                 for text in after
-                if re.fullmatch(r"[A-Za-z.,'\-]{2,}", text) and text.strip(".,").upper() not in {"II", "III", "IV", "JR", "SR"}
+                if re.fullmatch(r"[A-Za-z.,'\-]{2,}", text)
+                and text.strip(".,").upper() not in {"II", "III", "IV", "JR", "SR"}
             ]
     return []
 
 
 def codes(lines: list[list[tuple[str, tuple[int, int, int, int]]]]) -> list[str]:
-    for before, words in zip(lines, lines[1:], strict=False):
+    for before, words in pairwise(lines):
         texts = [word for word, _ in words]
         if "COUNTY" in texts and any(text.startswith("PLURALITY") for text in texts):
             return [word for word, _ in before if re.fullmatch(r"[A-Z]{3}", word)]
@@ -217,14 +219,18 @@ def parse() -> None:
             )
             width = max((n for n in widths if n), key=lambda n: widths[n])
             surnames = Counter(
-                tuple(header(read(year, first, dpi, psm))) for dpi, psm in PASSES if len(header(read(year, first, dpi, psm))) == width
+                tuple(header(read(year, first, dpi, psm)))
+                for dpi, psm in PASSES
+                if len(header(read(year, first, dpi, psm))) == width
             ).most_common(1)[0][0]
             found: Counter[tuple[str, str | None, int]] = Counter()
             for dpi, psm in PASSES:
                 found.update(summary(read(year, first, dpi, psm)))
             columns: list[tuple[str, str | None, int | None]] = []
             labels = Counter(
-                tuple(codes(read(year, first, dpi, psm))) for dpi, psm in PASSES if len(codes(read(year, first, dpi, psm))) == width
+                tuple(codes(read(year, first, dpi, psm)))
+                for dpi, psm in PASSES
+                if len(codes(read(year, first, dpi, psm))) == width
             ).most_common(1)
             for index, surname in enumerate(surnames):
                 pool_ = [
@@ -324,12 +330,14 @@ def parse() -> None:
                         fits = [
                             combo
                             for combo in product(*options)
-                            if combo[0] == sorted(combo[1:], reverse=True)[0] - sorted(combo[1:], reverse=True)[1]
+                            if combo[0] == max(combo[1:]) - sorted(combo[1:], reverse=True)[1]
                         ]
                         if len(fits) == 1:
                             settled = list(fits[0])
                         else:
-                            problems.append(f"{where} {county}: plurality {settled[0]} does not fit {settled[1:]}; {len(fits)} fits")
+                            problems.append(
+                                f"{where} {county}: plurality {settled[0]} does not fit {settled[1:]}; {len(fits)} fits"
+                            )
                 grid[county] = settled
             for column, (name, party, printed) in enumerate(columns, start=1):
                 total = sum(row[column] for row in grid.values())
@@ -344,7 +352,9 @@ def parse() -> None:
                 ]
                 if len(fixes) == 1:
                     county, alt = fixes[0]
-                    problems.append(f"{where} {name}: {county} {grid[county][column]} -> {alt} to meet the printed total {printed}")
+                    problems.append(
+                        f"{where} {name}: {county} {grid[county][column]} -> {alt} to meet the printed total {printed}"
+                    )
                     grid[county][column] = alt
                 else:
                     problems.append(f"{where} {name}: counties sum to {total}, printed {printed}, {len(fixes)} repairs")
@@ -378,7 +388,13 @@ def parse() -> None:
     reads_frame = pl.DataFrame(out)
     reads_frame.write_parquet(PARSED / "reads.parquet")
     print("\n".join(problems))
-    days = {1990: date(1990, 11, 6), 1994: date(1994, 11, 8), 1998: date(1998, 11, 3), 2002: date(2002, 11, 5), 2006: date(2006, 11, 7)}
+    days = {
+        1990: date(1990, 11, 6),
+        1994: date(1994, 11, 8),
+        1998: date(1998, 11, 3),
+        2002: date(2002, 11, 5),
+        2006: date(2006, 11, 7),
+    }
     frame = reads_frame.filter(pl.col("column") > 0).select(
         year=pl.col("year").cast(pl.Int32),
         day=pl.col("year").replace_strict({y: str(d) for y, d in days.items()}),
@@ -390,7 +406,10 @@ def parse() -> None:
         kind=pl.lit("county"),
         code=pl.lit("county"),
         county="county",
-        candidate=pl.col("name").map_elements(format_name, return_dtype=pl.String).str.to_uppercase().replace({"WAIKAR": "ALAKA WAIKAR"}),
+        candidate=pl.col("name")
+        .map_elements(format_name, return_dtype=pl.String)
+        .str.to_uppercase()
+        .replace({"WAIKAR": "ALAKA WAIKAR"}),
         party=pl.col("party").replace_strict(PARTIES, default=None, return_dtype=pl.String),
         writein=pl.lit(False),
         measure=pl.lit(1, pl.Int16),
@@ -407,12 +426,17 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.lit(102),
     ).write_parquet(PARSED / "races.parquet")
-    print(frame.group_by("year", "title", "candidate", "party").agg(pl.col("votes").sum()).sort("year", "title", "votes").rows())
+    print(
+        frame.group_by("year", "title", "candidate", "party")
+        .agg(pl.col("votes").sum())
+        .sort("year", "title", "votes")
+        .rows()
+    )
 
 
 def format_name(text: str) -> str:
     text = re.sub(r"\s*,\s*", ", ", text.strip())
-    text = re.sub(r",\s*(JR|SR)\b\.?", lambda m: ", " + m[1].title() + ".", text, flags=re.I)
+    text = re.sub(r",\s*(JR|SR)\b\.?", lambda m: ", " + m[1].title() + ".", text, flags=re.IGNORECASE)
     return " ".join(word if word[0].isupper() and not word.isupper() else word.title() for word in text.split())
 
 
@@ -421,8 +445,13 @@ def emit() -> Path:
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
             cs.add(
-                "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE,
-                url=LANDING, license=LICENSE,
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=LANDING,
+                license=LICENSE,
             )
         result: dict[int, tuple[UUID, int, int]] = {}
         frame = pl.read_parquet(PARSED / "returns.parquet")
@@ -435,7 +464,15 @@ def emit() -> Path:
                 width, height = rendered.size
             page = cs.page(artifact, number_)
             result[key] = (page, width, height)
-            cs.add("source_page", id=page, artifact_id=artifact, page_number=number_, image_key=f"pages/{SOURCE}/{image_.name}", width=width, height=height)
+            cs.add(
+                "source_page",
+                id=page,
+                artifact_id=artifact,
+                page_number=number_,
+                image_key=f"pages/{SOURCE}/{image_.name}",
+                width=width,
+                height=height,
+            )
         return result
 
     def cite(cs: Changeset) -> dict[str, UUID]:

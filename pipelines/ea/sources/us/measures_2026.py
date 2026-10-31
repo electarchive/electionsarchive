@@ -93,9 +93,7 @@ def parse() -> None:
             documents[url] = [plain(text) for text in extracted] + [
                 plain(re.sub(r"(?m)^\s*\d{1,2}(\s+|$)", "", text)) for text in extracted
             ]
-        segments = [
-            plain(part) for part in re.split(r"(?<=[.?!:;—])\s+|\n", str(row["text"])) if len(plain(part)) > 3
-        ]
+        segments = [plain(part) for part in re.split(r"(?<=[.?!:;—])\s+|\n", str(row["text"])) if len(plain(part)) > 3]
         found = row["text"] is not None and any(
             all(segment in document for segment in segments)
             or all(re.sub("f[il]", "", segment) in re.sub("f[il]", "", document) for segment in segments)

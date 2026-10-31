@@ -16,7 +16,10 @@ PUBLISHER = "Alabama Secretary of State"
 URL = "https://www.sos.alabama.gov/sites/default/files/election-data/2026-07/Comprehensive%20Voter%20Turnout%201986-2024.pdf"
 TITLE = "Comprehensive Voter Turnout 1986-2024"
 MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
-HEADER = re.compile(rf"^\s*(.*(?:Primary|General|Special|Run-?off).*?)[,\s-]+({MONTHS})\s*(\d{{1,2}})?,?\s+(\d{{4}})(?:\s+-\s+.*)?\s*$", re.I)
+HEADER = re.compile(
+    rf"^\s*(.*(?:Primary|General|Special|Run-?off).*?)[,\s-]+({MONTHS})\s*(\d{{1,2}})?,?\s+(\d{{4}})(?:\s+-\s+.*)?\s*$",
+    re.IGNORECASE,
+)
 TURNOUT = re.compile(r"^\s*(?:(\d[\d,]*)\s+)?(?:Total Ballots(?: Cast)?\s+)?(\d[\d,]*) \(([\d.]+)\s*% turnout\)")
 
 

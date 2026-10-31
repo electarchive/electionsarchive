@@ -14,10 +14,15 @@ VERSION = "1"
 INBOX = Path(__file__).parents[4] / "data/inbox/manual"
 DAY = date(2022, 11, 8)
 CHICAGO = "https://www.chicagoelections.gov/election-results#2022-general-ushouse-{}"
-COOK = "https://www.cookcountyclerkil.gov/elections/results-and-election-data/election-data/precinct-canvasses#2022-11-28"
+COOK = (
+    "https://www.cookcountyclerkil.gov/elections/results-and-election-data/election-data/precinct-canvasses#2022-11-28"
+)
 DUPAGE = "https://dupageresults.gov/IL/DuPage/115972/#detail.xls"
 FILES = {
-    **{CHICAGO.format(n): (INBOX / "MF-123" / f"chicago-2022-general-ushouse-{n}.html", ".html", "text/html") for n in (3, 4, 7)},
+    **{
+        CHICAGO.format(n): (INBOX / "MF-123" / f"chicago-2022-general-ushouse-{n}.html", ".html", "text/html")
+        for n in (3, 4, 7)
+    },
     COOK: (
         INBOX / "MF-124" / "Precinct Canvass_20221128 (November).xlsx",
         ".xlsx",
@@ -39,7 +44,9 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            raw.store(SOURCE, url, path.read_bytes(), suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type)
+            raw.store(
+                SOURCE, url, path.read_bytes(), suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type
+            )
 
 
 def surname(name: str) -> str:
@@ -52,13 +59,20 @@ def emit() -> Path:
     for district in (3, 4, 7):
         text = raw.cached(SOURCE, CHICAGO.format(district)).path.read_text(errors="replace")
         body = text[text.find('id="drupal-modal"') :]
-        head = re.search(r"<thead>(.*?)</thead>", body, flags=re.S)
-        names = [name.strip() for name in re.findall(r"<th>(.*?)</th>", head[1], flags=re.S) if name.strip() not in ("Total Votes", "%")]
-        total = [int(cell.replace(",", "")) for cell in re.findall(r"<td>([\d,]+)</td>", re.search(r"<tbody>(.*?)</tbody>", body, flags=re.S)[1])][1:]
+        head = re.search(r"<thead>(.*?)</thead>", body, flags=re.DOTALL)
+        names = [
+            name.strip()
+            for name in re.findall(r"<th>(.*?)</th>", head[1], flags=re.DOTALL)
+            if name.strip() not in ("Total Votes", "%")
+        ]
+        total = [
+            int(cell.replace(",", ""))
+            for cell in re.findall(r"<td>([\d,]+)</td>", re.search(r"<tbody>(.*?)</tbody>", body, flags=re.DOTALL)[1])
+        ][1:]
         sums = [0] * len(names)
-        for ward, table in re.findall(r"<h3>Ward (\d+)</h3>\s*(<table.*?</table>)", body, flags=re.S):
-            for row in re.findall(r"<tr>\s*(<td>.*?)</tr>", table, flags=re.S):
-                cells = [cell.strip() for cell in re.findall(r"<td>(.*?)</td>", row, flags=re.S)]
+        for ward, table in re.findall(r"<h3>Ward (\d+)</h3>\s*(<table.*?</table>)", body, flags=re.DOTALL):
+            for row in re.findall(r"<tr>\s*(<td>.*?)</tr>", table, flags=re.DOTALL):
+                cells = [cell.strip() for cell in re.findall(r"<td>(.*?)</td>", row, flags=re.DOTALL)]
                 if not cells[0].isdigit():
                     continue
                 votes = [int(cell.replace(",", "")) for cell in cells[2::2]]
@@ -70,9 +84,15 @@ def emit() -> Path:
                     sums[index] += count
         if sums != total[: len(names)]:
             raise ValueError(f"Chicago {district}: sums {sums} do not tie to the printed totals {total}")
-        sheet = pl.read_excel(raw.cached(SOURCE, COOK).path, sheet_name=COOK_SHEETS[district], has_header=False, infer_schema_length=0)
+        sheet = pl.read_excel(
+            raw.cached(SOURCE, COOK).path, sheet_name=COOK_SHEETS[district], has_header=False, infer_schema_length=0
+        )
         header = sheet.row(3)
-        columns = {index: re.sub(r"^[A-Z]+ - ", "", str(cell)) for index, cell in enumerate(header) if index > 5 and cell and str(cell).strip()}
+        columns = {
+            index: re.sub(r"^[A-Z]+ - ", "", str(cell))
+            for index, cell in enumerate(header)
+            if index > 5 and cell and str(cell).strip()
+        }
         cook_sums: dict[str, int] = defaultdict(int)
         printed = {}
         for row in sheet.iter_rows():
@@ -90,10 +110,21 @@ def emit() -> Path:
         sheet = book[book.find(f'<s:Worksheet s:Name="{sheet_name}"') :]
         sheet = sheet[: sheet.find("</s:Worksheet>")]
         rows = [
-            [cell.strip() for cell in re.findall(r"<s:Data[^>]*>(.*?)</s:Data>", row, flags=re.S) if "<" not in cell]
-            for row in re.findall(r"<s:Row[^>]*>(.*?)</s:Row>", sheet, flags=re.S)
+            [
+                cell.strip()
+                for cell in re.findall(r"<s:Data[^>]*>(.*?)</s:Data>", row, flags=re.DOTALL)
+                if "<" not in cell
+            ]
+            for row in re.findall(r"<s:Row[^>]*>(.*?)</s:Row>", sheet, flags=re.DOTALL)
         ]
-        names = [name for name in re.findall(r"<s:Data[^>]*>([A-Z][^<]*)</s:Data>", re.findall(r"<s:Row[^>]*>(.*?)</s:Row>", sheet, flags=re.S)[1], flags=re.S)]
+        names = [
+            name
+            for name in re.findall(
+                r"<s:Data[^>]*>([A-Z][^<]*)</s:Data>",
+                re.findall(r"<s:Row[^>]*>(.*?)</s:Row>", sheet, flags=re.DOTALL)[1],
+                flags=re.DOTALL,
+            )
+        ]
         dupage_sums = [0] * len(names)
         printed = []
         for row in rows:
@@ -120,17 +151,31 @@ def emit() -> Path:
             "cook": "2022 General Election precinct canvass, Cook County",
             "dupage": "2022 General Election detail results, DuPage County",
         }
-        urls = {"chicago": "https://www.chicagoelections.gov/election-results", "cook": COOK, "dupage": "https://dupageresults.gov/IL/DuPage/115972/"}
+        urls = {
+            "chicago": "https://www.chicagoelections.gov/election-results",
+            "cook": COOK,
+            "dupage": "https://dupageresults.gov/IL/DuPage/115972/",
+        }
         sources = {}
         for kind, publisher in PUBLISHERS.items():
             sources[kind] = cs.source(publisher, titles[kind])
-            cs.add("source", id=sources[kind], kind="official_body", publisher=publisher, title=titles[kind], url=urls[kind], license="Public record")
+            cs.add(
+                "source",
+                id=sources[kind],
+                kind="official_body",
+                publisher=publisher,
+                title=titles[kind],
+                url=urls[kind],
+                license="Public record",
+            )
         for district in (3, 4, 7):
             cs.artifact(raw.cached(SOURCE, CHICAGO.format(district)), sources["chicago"])
         cs.artifact(raw.cached(SOURCE, COOK), sources["cook"])
         cs.artifact(raw.cached(SOURCE, DUPAGE), sources["dupage"])
         dupage_codes: dict[str, list[str]] = defaultdict(list)
-        for (code,) in conn.execute("select code from reporting_unit where scheme_code = 'us.precinct' and code like '2022:IL:17043:DUPAGE:%'").fetchall():
+        for (code,) in conn.execute(
+            "select code from reporting_unit where scheme_code = 'us.precinct' and code like '2022:IL:17043:DUPAGE:%'"
+        ).fetchall():
             dupage_codes[re.sub(r" - \d+$", "", code.removeprefix("2022:IL:17043:DUPAGE:"))].append(code)
         county_unit, county_area = conn.execute(
             "select id, area_id from reporting_unit where scheme_code = 'us.county' and code = '17043'"
@@ -141,7 +186,9 @@ def emit() -> Path:
                 "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
                 [key],
             ).fetchone()
-            labels = conn.execute("select id, ballot_label from contest_option where contest_id = %s", [contest]).fetchall()
+            labels = conn.execute(
+                "select id, ballot_label from contest_option where contest_id = %s", [contest]
+            ).fetchall()
             picked = {}
             for name in {name for votes in units.values() for name in votes}:
                 found = [option for option, label in labels if surname(label) == surname(name)]

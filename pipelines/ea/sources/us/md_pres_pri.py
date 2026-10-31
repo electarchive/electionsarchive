@@ -43,21 +43,26 @@ def parse() -> None:
     rows = []
     for year, party, url in pages():
         text = raw.cached(SOURCE, url).path.read_text(errors="replace")
-        for table in re.findall(r"<table.*?</table>", text, re.S):
+        for table in re.findall(r"<table.*?</table>", text, re.DOTALL):
             lines = [
-                [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip() for cell in re.findall(r"<t[hd].*?</t[hd]>", line, re.S)]
-                for line in re.findall(r"<tr.*?</tr>", table, re.S)
+                [
+                    re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
+                    for cell in re.findall(r"<t[hd].*?</t[hd]>", line, re.DOTALL)
+                ]
+                for line in re.findall(r"<tr.*?</tr>", table, re.DOTALL)
             ]
             if len(lines) < 20 or lines[0][0] not in ("", "Jurisdiction"):
                 continue
-            names = [re.sub(rf"\s+{PARTIES[party]}$", "", cell, flags=re.I) for cell in lines[0][1:]]
+            names = [re.sub(rf"\s+{PARTIES[party]}$", "", cell, flags=re.IGNORECASE) for cell in lines[0][1:]]
             for county, *votes in lines[1:]:
                 if county == "Totals":
                     continue
                 if len(votes) != len(names):
                     raise ValueError(f"{year} {party} {county}: {len(votes)} values for {len(names)} candidates")
                 for candidate, value in zip(names, votes, strict=True):
-                    rows.append((year, PARTIES[party], counties[county.lower()], candidate, int(value.replace(",", ""))))
+                    rows.append(
+                        (year, PARTIES[party], counties[county.lower()], candidate, int(value.replace(",", "")))
+                    )
     frame = pl.DataFrame(
         rows,
         schema={"year": pl.Int32, "party": pl.String, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
@@ -67,7 +72,12 @@ def parse() -> None:
         raise ValueError("a county appears twice for a candidate")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "party").agg(pl.col("code").n_unique(), pl.col("candidate").n_unique(), pl.col("votes").sum()).sort("year", "party").rows())
+    print(
+        frame.group_by("year", "party")
+        .agg(pl.col("code").n_unique(), pl.col("candidate").n_unique(), pl.col("votes").sum())
+        .sort("year", "party")
+        .rows()
+    )
 
 
 def emit() -> Path:

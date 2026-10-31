@@ -24,7 +24,15 @@ SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }""",
 )
 TERMS = {"1st": 1999, "2nd": 2003, "3rd": 2007, "4th": 2011, "5th": 2016, "6th": 2021, "7th": 2026}
 TITLES = re.compile(r"^(?:(?:mr|ms|mrs|miss|dr|lord|sir|rev|prof|dame|the rt hon|rt hon)\.?\s+)+")
-ALIAS = {"lothians": "lothian", "ballieston": "baillieston", "na": "", "h": "", "eileanan": "western", "an": "", "iar": "isles"}
+ALIAS = {
+    "lothians": "lothian",
+    "ballieston": "baillieston",
+    "na": "",
+    "h": "",
+    "eileanan": "western",
+    "an": "",
+    "iar": "isles",
+}
 DROPPED = {"islands", "isles", "city", "the", "and", "of"}
 UNMATCHED = DATA / "tmp" / "uk-dev" / "msp_unmatched.tsv"
 
@@ -140,7 +148,11 @@ def emit() -> Path:
                 held[item].add(person)
                 joined += 1
                 samples.append((names[person], item, "merged into the existing holder"))
-        unmatched = [(names[person], "; ".join(why)) for person, why in reasons.items() if person not in found or not found[person]]
+        unmatched = [
+            (names[person], "; ".join(why))
+            for person, why in reasons.items()
+            if person not in found or not found[person]
+        ]
         UNMATCHED.parent.mkdir(parents=True, exist_ok=True)
         UNMATCHED.write_text("\n".join(f"{name}\t{why}" for name, why in sorted(unmatched)) + "\n", encoding="utf-8")
         print(

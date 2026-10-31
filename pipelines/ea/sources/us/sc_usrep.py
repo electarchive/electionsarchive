@@ -22,21 +22,90 @@ PUBLISHER = "South Carolina State Election Commission"
 LANDING = "https://scvotes.gov/election-results/"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 DPI = 200
-BOOKS = {1974: "1974-1975", 1976: "1976-1977", 1990: "1990-1991", 1992: "1992-1993", 1994: "1994-1995", 1996: "1995-1996", 1998: "1997-1998"}
-DAYS = {1974: date(1974, 11, 5), 1976: date(1976, 11, 2), 1990: date(1990, 11, 6), 1992: date(1992, 11, 3), 1994: date(1994, 11, 8), 1996: date(1996, 11, 5), 1998: date(1998, 11, 3)}
-PAGE_RANGES = {1974: (45, 47), 1976: (33, 35), 1990: (95, 95), 1992: (82, 84), 1994: (33, 34), 1996: (44, 45), 1998: (46, 47)}
+BOOKS = {
+    1974: "1974-1975",
+    1976: "1976-1977",
+    1990: "1990-1991",
+    1992: "1992-1993",
+    1994: "1994-1995",
+    1996: "1995-1996",
+    1998: "1997-1998",
+}
+DAYS = {
+    1974: date(1974, 11, 5),
+    1976: date(1976, 11, 2),
+    1990: date(1990, 11, 6),
+    1992: date(1992, 11, 3),
+    1994: date(1994, 11, 8),
+    1996: date(1996, 11, 5),
+    1998: date(1998, 11, 3),
+}
+PAGE_RANGES = {
+    1974: (45, 47),
+    1976: (33, 35),
+    1990: (95, 95),
+    1992: (82, 84),
+    1994: (33, 34),
+    1996: (44, 45),
+    1998: (46, 47),
+}
 PAGE_ORDER = {1976: (34, 33, 35)}
 HALVES = {1974: 322.0, 1976: 322.0, 1990: 306.0}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
-    "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
-    "Charleston", "Cherokee", "Chester", "Chesterfield", "Clarendon", "Colleton", "Darlington", "Dillon",
-    "Dorchester", "Edgefield", "Fairfield", "Florence", "Georgetown", "Greenville", "Greenwood", "Hampton", "Horry",
-    "Jasper", "Kershaw", "Lancaster", "Laurens", "Lee", "Lexington", "McCormick", "Marion", "Marlboro", "Newberry",
-    "Oconee", "Orangeburg", "Pickens", "Richland", "Saluda", "Spartanburg", "Sumter", "Union", "Williamsburg", "York",
+    "Abbeville",
+    "Aiken",
+    "Allendale",
+    "Anderson",
+    "Bamberg",
+    "Barnwell",
+    "Beaufort",
+    "Berkeley",
+    "Calhoun",
+    "Charleston",
+    "Cherokee",
+    "Chester",
+    "Chesterfield",
+    "Clarendon",
+    "Colleton",
+    "Darlington",
+    "Dillon",
+    "Dorchester",
+    "Edgefield",
+    "Fairfield",
+    "Florence",
+    "Georgetown",
+    "Greenville",
+    "Greenwood",
+    "Hampton",
+    "Horry",
+    "Jasper",
+    "Kershaw",
+    "Lancaster",
+    "Laurens",
+    "Lee",
+    "Lexington",
+    "McCormick",
+    "Marion",
+    "Marlboro",
+    "Newberry",
+    "Oconee",
+    "Orangeburg",
+    "Pickens",
+    "Richland",
+    "Saluda",
+    "Spartanburg",
+    "Sumter",
+    "Union",
+    "Williamsburg",
+    "York",
 ]
 KEYS = {re.sub(r"[^a-z]", "", name.lower()): name for name in COUNTIES}
-ALIASES: dict[tuple[int, int, str], str] = {(1998, 6, "ester"): "Dorchester", (1998, 6, "nce"): "Florence", (1998, 6, "l"): "Lee"}
+ALIASES: dict[tuple[int, int, str], str] = {
+    (1998, 6, "ester"): "Dorchester",
+    (1998, 6, "nce"): "Florence",
+    (1998, 6, "l"): "Lee",
+}
 OVERRIDES: dict[tuple[int, int, str, int], int] = {
     (1976, 1, "Beaufort", 0): 8633,
     (1976, 1, "Berkeley", 0): 13192,
@@ -280,13 +349,57 @@ LAYOUT: dict[tuple[int, int], tuple[list[float], list[int]]] = {
     (1990, 4): ([395.0, 425.0, 456.0], [81927, 51338, 270]),
 }
 ORDERED: dict[tuple[int, int], list[str]] = {
-    (1974, 6): ["Clarendon", "Darlington", "Dillon", "Florence", "Georgetown", "Horry", "Lee", "Marion", "Marlboro", "Williamsburg"],
-    (1976, 1): ['Beaufort', 'Berkeley', 'Charleston', 'Colleton', 'Dorchester', 'Hampton', 'Jasper'],
-    (1976, 2): ['Allendale', 'Bamberg', 'Barnwell', 'Calhoun', 'Lexington', 'Orangeburg', 'Richland'],
-    (1976, 3): ['Abbeville', 'Aiken', 'Anderson', 'Edgefield', 'Greenwood', 'McCormick', 'Newberry', 'Oconee', 'Pickens', 'Saluda'],
-    (1976, 4): ['Greenville', 'Spartanburg'],
-    (1976, 5): ['Cherokee', 'Chester', 'Chesterfield', 'Fairfield', 'Kershaw', 'Lancaster', 'Laurens', 'Sumter', 'Union', 'York'],
-    (1976, 6): ['Clarendon', 'Darlington', 'Dillon', 'Florence', 'Georgetown', 'Horry', 'Lee', 'Marion', 'Marlboro', 'Williamsburg'],
+    (1974, 6): [
+        "Clarendon",
+        "Darlington",
+        "Dillon",
+        "Florence",
+        "Georgetown",
+        "Horry",
+        "Lee",
+        "Marion",
+        "Marlboro",
+        "Williamsburg",
+    ],
+    (1976, 1): ["Beaufort", "Berkeley", "Charleston", "Colleton", "Dorchester", "Hampton", "Jasper"],
+    (1976, 2): ["Allendale", "Bamberg", "Barnwell", "Calhoun", "Lexington", "Orangeburg", "Richland"],
+    (1976, 3): [
+        "Abbeville",
+        "Aiken",
+        "Anderson",
+        "Edgefield",
+        "Greenwood",
+        "McCormick",
+        "Newberry",
+        "Oconee",
+        "Pickens",
+        "Saluda",
+    ],
+    (1976, 4): ["Greenville", "Spartanburg"],
+    (1976, 5): [
+        "Cherokee",
+        "Chester",
+        "Chesterfield",
+        "Fairfield",
+        "Kershaw",
+        "Lancaster",
+        "Laurens",
+        "Sumter",
+        "Union",
+        "York",
+    ],
+    (1976, 6): [
+        "Clarendon",
+        "Darlington",
+        "Dillon",
+        "Florence",
+        "Georgetown",
+        "Horry",
+        "Lee",
+        "Marion",
+        "Marlboro",
+        "Williamsburg",
+    ],
 }
 ROWNAMES: dict[tuple[int, int], list[str]] = {
     (1990, 2): ["Bamberg", "Calhoun", "Lexington", "Orangeburg", "Richland"],
@@ -299,7 +412,9 @@ PRINTED: dict[tuple[int, int], list[int]] = {
     (1974, 6): [45396, 41982],
 }
 OMITTED: dict[tuple[int, int], str] = {(1974, 1): "Hampton"}
-EXTRA: dict[tuple[int, int], dict[int, tuple[str, str]]] = {(1998, 4): {1: ("Peter J. Ashy (Patriot)", "PT"), 2: ("Peter J. Ashy (Reform)", "RF")}}
+EXTRA: dict[tuple[int, int], dict[int, tuple[str, str]]] = {
+    (1998, 4): {1: ("Peter J. Ashy (Patriot)", "PT"), 2: ("Peter J. Ashy (Reform)", "RF")}
+}
 SUMMARY = "South Carolina's U.S. House general elections of 1990 and 1992 through 1998 by county from the State Election Commission's election reports"
 METHOD = (
     "County totals are read from the State Election Commission's printed election reports (scans with an OCR text layer). "
@@ -317,7 +432,20 @@ def render(year: int, page: int) -> Path:
     image = PAGES / f"{sha}-{page}.png"
     if not image.exists():
         subprocess.run(
-            ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(path), str(image.with_suffix(""))],
+            [
+                "pdftoppm",
+                "-r",
+                str(DPI),
+                "-gray",
+                "-png",
+                "-f",
+                str(page),
+                "-l",
+                str(page),
+                "-singlefile",
+                str(path),
+                str(image.with_suffix("")),
+            ],
             check=True,
         )
     return image
@@ -325,7 +453,12 @@ def render(year: int, page: int) -> Path:
 
 def lines_of(year: int, page: int, half: int | None = None) -> list[list[tuple[float, float, float, float, str]]]:
     path, _ = book_path(year)
-    xml = subprocess.run(["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"], capture_output=True, text=True, check=True).stdout
+    xml = subprocess.run(
+        ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
     namespace = {"h": "http://www.w3.org/1999/xhtml"}
     words = [
         (float(w.get("xMin")), float(w.get("yMin")), float(w.get("xMax")), float(w.get("yMax")), w.text or "")
@@ -353,13 +486,20 @@ def parse() -> None:
         last_district = 0
         done = [0, 0]
         block: list[tuple[int, list[tuple[float, float, float, float, str]]]] = []
-        for page, half in [(page, half) for page in PAGE_ORDER.get(year, range(first, last + 1)) for half in ((0, 1) if year in HALVES else (None,))]:
+        for page, half in [
+            (page, half)
+            for page in PAGE_ORDER.get(year, range(first, last + 1))
+            for half in ((0, 1) if year in HALVES else (None,))
+        ]:
             render(year, page)
             if half is not None:
                 block = []
             for line in lines_of(year, page, half):
                 text = " ".join(w[4] for w in line)
-                is_total = re.match(r"^\W*(?:[A-Za-z]+\s+){0,2}TOTALS?\b", text, re.IGNORECASE) is not None and re.search(r"\d", text) is not None
+                is_total = (
+                    re.match(r"^\W*(?:[A-Za-z]+\s+){0,2}TOTALS?\b", text, re.IGNORECASE) is not None
+                    and re.search(r"\d", text) is not None
+                )
                 if not is_total:
                     block.append((page, line))
                     continue
@@ -387,15 +527,30 @@ def parse() -> None:
                             break
                         county_words.append(word[4])
                     key = re.sub(r"[^a-z]", "", "".join(county_words).lower())
-                    if not any(re.search(r"\d", w[4]) and w[0] > 90 for w in row) or re.search(r"DISTRICT|WRITE|WINNER", " ".join(w[4] for w in row), re.IGNORECASE):
+                    if not any(re.search(r"\d", w[4]) and w[0] > 90 for w in row) or re.search(
+                        r"DISTRICT|WRITE|WINNER", " ".join(w[4] for w in row), re.IGNORECASE
+                    ):
                         continue
                     alias = ALIASES.get((year, district, key))
                     if (year, district) in ORDERED:
                         alias = next(ordered, None)
                     if not key and sum(1 for w in row if re.search(r"\d", w[4])) >= 2 and (year, district) in ROWNAMES:
                         alias = next(nameless, None)
-                    best = COUNTIES.index(alias) if alias else max(range(len(COUNTIES)), key=lambda i: difflib.SequenceMatcher(None, key, COUNTIES[i].lower()).ratio())
-                    ratio = 1.0 if alias else difflib.SequenceMatcher(None, key, COUNTIES[best].lower()).ratio() if len(key) >= 3 else 0.0
+                    best = (
+                        COUNTIES.index(alias)
+                        if alias
+                        else max(
+                            range(len(COUNTIES)),
+                            key=lambda i: difflib.SequenceMatcher(None, key, COUNTIES[i].lower()).ratio(),
+                        )
+                    )
+                    ratio = (
+                        1.0
+                        if alias
+                        else difflib.SequenceMatcher(None, key, COUNTIES[best].lower()).ratio()
+                        if len(key) >= 3
+                        else 0.0
+                    )
                     if ratio < 0.5:
                         continue
                     if scored and scored[-1][1] >= best:
@@ -431,7 +586,12 @@ def parse() -> None:
                     for column in range(len(edges)):
                         if values[column] is None and (year, district, KEYS[close[0]], column) in OVERRIDES:
                             values[column] = OVERRIDES[(year, district, KEYS[close[0]], column)]
-                            boxes[column] = [edges[column] - 40, min(w[1] for w in row), edges[column], max(w[3] for w in row)]
+                            boxes[column] = [
+                                edges[column] - 40,
+                                min(w[1] for w in row),
+                                edges[column],
+                                max(w[3] for w in row),
+                            ]
                     cells.append((KEYS[close[0]], values, boxes))
                     rows.extend(
                         {
@@ -452,7 +612,9 @@ def parse() -> None:
                     if key in OVERRIDES and int(item["year"]) == year and int(item["district"]) == district:
                         item["votes"] = OVERRIDES[key]
                 for column in range(len(edges)):
-                    mine = [r for r in rows if r["year"] == year and r["district"] == district and r["column"] == column]
+                    mine = [
+                        r for r in rows if r["year"] == year and r["district"] == district and r["column"] == column
+                    ]
                     summed = sum(int(r["votes"]) for r in mine if r["county"] != OMITTED.get((year, district)))
                     bad = [r["county"] for r in mine if int(r["votes"]) < 0]
                     if summed != printed[column] or bad:
@@ -462,11 +624,16 @@ def parse() -> None:
                         )
                 block = []
     frame = pl.DataFrame(
-        [row for row in rows if (row["year"], row["district"]) not in unresolved], schema_overrides={"box": pl.List(pl.Int64)}
+        [row for row in rows if (row["year"], row["district"]) not in unresolved],
+        schema_overrides={"box": pl.List(pl.Int64)},
     )
     frame.write_parquet(PARSED / "lines.parquet")
     print("\n".join(problems))
-    print(frame.group_by("year", "district").agg(pl.col("county").n_unique(), pl.col("column").n_unique()).sort("year", "district"))
+    print(
+        frame.group_by("year", "district")
+        .agg(pl.col("county").n_unique(), pl.col("column").n_unique())
+        .sort("year", "district")
+    )
 
 
 def emit() -> Path:
@@ -481,16 +648,40 @@ def emit() -> Path:
                 title = f"{year} Election Report"
                 sources[year] = cs.source(PUBLISHER, title)
                 if sources[year] in cs.minted:
-                    cs.add("source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=LANDING, license="Public record")
+                    cs.add(
+                        "source",
+                        id=sources[year],
+                        kind="official_body",
+                        publisher=PUBLISHER,
+                        title=title,
+                        url=LANDING,
+                        license="Public record",
+                    )
                 artifacts[year] = cs.artifact(raw.cached(BOOK_SOURCE, URL.format(BOOKS[year])), sources[year])
             image = render(year, number)
             with Image.open(image) as rendered:
                 width, height = rendered.size
             page = cs.page(artifacts[year], number)
             pages[(year, number)] = (page, width, height)
-            cs.add("source_page", id=page, artifact_id=artifacts[year], page_number=number, image_key=f"pages/{SOURCE}/{image.name}", width=width, height=height)
-        units = dict(conn.execute("select code, id from reporting_unit where scheme_code = 'us.county' and code like '45%%'").fetchall())
-        areas = dict(conn.execute("select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '45%%'").fetchall())
+            cs.add(
+                "source_page",
+                id=page,
+                artifact_id=artifacts[year],
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+        units = dict(
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.county' and code like '45%%'"
+            ).fetchall()
+        )
+        areas = dict(
+            conn.execute(
+                "select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '45%%'"
+            ).fetchall()
+        )
         names = {
             re.sub(r"[^a-z]", "", text.lower()): code
             for text, code in conn.execute(
@@ -498,7 +689,11 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '45%%'"""
             ).fetchall()
         }
-        contests = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':SC:house:'"))
+        contests = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':SC:house:'"
+            )
+        )
         made: set[object] = set()
         for (year, district), rows in frame.group_by("year", "district", maintain_order=True):
             day = DAYS[year]
@@ -533,7 +728,9 @@ def emit() -> Path:
             totals = {column: int(g["votes"].sum()) for (column,), g in rows.group_by("column")}
             targets: dict[int, object] = {}
             for column, total in totals.items():
-                found = [option for option, _, _, value in roots if int(value) == total and option not in targets.values()]
+                found = [
+                    option for option, _, _, value in roots if int(value) == total and option not in targets.values()
+                ]
                 if len(found) == 1:
                     targets[column] = found[0]
             leftover = [column for column in totals if column not in targets]
@@ -554,12 +751,19 @@ def emit() -> Path:
                     apart.append(near[0][0])
                     print(f"{key}: column {column} {totals[column]} against FEC {near[0][0]} apart")
                 elif column in extra:
-                    label, party = extra[column]
+                    label, _party = extra[column]
                     candidate = cs.key(f"{SOURCE}.person", f"SC:{re.sub(r'[^a-z]+', '-', label.lower())}")
                     if candidate in cs.minted and candidate not in made:
                         made.add(candidate)
                         cs.add("person", id=candidate)
-                        cs.add("name", entity_id=candidate, text=label.split(" (")[0], lang="en", kind="official", is_preferred=True)
+                        cs.add(
+                            "name",
+                            entity_id=candidate,
+                            text=label.split(" (")[0],
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
                     option = cs.key("us.option", f"{key}:{candidate}:{column}")
                     cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=label)
                     cs.add(
@@ -576,22 +780,48 @@ def emit() -> Path:
                     targets[column] = writein[0]
                     mismatch = True
             covered = {option for option in targets.values()}
-            if len(targets) != len(totals) or any(option not in covered for option, _, kind, _ in roots if kind != "write_in"):
-                print(f"{key}: columns {totals} against FEC {[(label, kind, int(value)) for _, label, kind, value in roots]}")
+            if len(targets) != len(totals) or any(
+                option not in covered for option, _, kind, _ in roots if kind != "write_in"
+            ):
+                print(
+                    f"{key}: columns {totals} against FEC {[(label, kind, int(value)) for _, label, kind, value in roots]}"
+                )
                 continue
             if mismatch:
                 merged = sum(total for column, total in totals.items() if targets[column] in writein)
                 mismatch = merged != next(int(value) for option, _, _, value in roots if option in writein)
                 if mismatch:
                     print(f"{key}: write-ins {merged} against FEC; non-default")
-            unprinted = sum(int(value) for option, _, kind, value in roots if kind == "write_in" and option not in covered)
+            unprinted = sum(
+                int(value) for option, _, kind, value in roots if kind == "write_in" and option not in covered
+            )
             omitted = OMITTED.get((year, district), "")
-            own = all(int(g.filter(pl.col("county") != omitted)["votes"].sum()) == int(g["printed"][0]) for _, g in rows.group_by("column"))
+            own = all(
+                int(g.filter(pl.col("county") != omitted)["votes"].sum()) == int(g["printed"][0])
+                for _, g in rows.group_by("column")
+            )
             mismatch = mismatch or (inexact and not own)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
-                **dict(zip(("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id"), row, strict=True)),
+                **dict(
+                    zip(
+                        (
+                            "id",
+                            "election_id",
+                            "contest_id",
+                            "stage",
+                            "kind",
+                            "status",
+                            "source_id",
+                            "as_of",
+                            "completeness",
+                            "supersedes_id",
+                        ),
+                        row,
+                        strict=True,
+                    )
+                ),
                 is_default=mismatch,
             )
             cs.add(
@@ -607,12 +837,40 @@ def emit() -> Path:
                 supersedes_id=row[0] if not mismatch else None,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD + (f" The book's printed district total omits {omitted} County; the county rows match the Federal Election Commission's compilation within {max(apart, default=0)} votes." if omitted else "") + (f" The Federal Election Commission's compilation differs by {', '.join(str(v) for v in apart)} votes in a candidate's total." if apart else "") + (f" The Federal Election Commission's compilation adds {unprinted} write-in votes that the book does not print." if unprinted else ""))
-            for option, kind, seats in conn.execute("select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]).fetchall():
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=METHOD
+                + (
+                    f" The book's printed district total omits {omitted} County; the county rows match the Federal Election Commission's compilation within {max(apart, default=0)} votes."
+                    if omitted
+                    else ""
+                )
+                + (
+                    f" The Federal Election Commission's compilation differs by {', '.join(str(v) for v in apart)} votes in a candidate's total."
+                    if apart
+                    else ""
+                )
+                + (
+                    f" The Federal Election Commission's compilation adds {unprinted} write-in votes that the book does not print."
+                    if unprinted
+                    else ""
+                ),
+            )
+            for option, kind, seats in conn.execute(
+                "select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]
+            ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             unit_ids = dict(units)
-            ((district_area,),) = conn.execute("select district_area_id from contest where id = %s", [contest]).fetchall()
-            split = {county for (county,), g in frame.filter(pl.col("year") == year).group_by("county") if g["district"].n_unique() > 1}
+            ((district_area,),) = conn.execute(
+                "select district_area_id from contest where id = %s", [contest]
+            ).fetchall()
+            split = {
+                county
+                for (county,), g in frame.filter(pl.col("year") == year).group_by("county")
+                if g["district"].n_unique() > 1
+            }
             for county in rows["county"].unique():
                 code = names[re.sub(r"[^a-z]", "", county.lower())]
                 if county not in split:
@@ -634,12 +892,25 @@ def emit() -> Path:
                         valid_from=day,
                         valid_to=day + timedelta(days=1),
                     )
-                    cs.add("reporting_unit_area", unit_id=unit_ids[county], area_id=district_area, valid_from=day, valid_to=day + timedelta(days=1))
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=unit_ids[county],
+                        area_id=district_area,
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
             merged: dict[tuple[str, object], list[int]] = {}
-            for county, column, votes, number, box in rows.select("county", "column", "votes", "page", "box").iter_rows():
+            for county, column, votes, number, box in rows.select(
+                "county", "column", "votes", "page", "box"
+            ).iter_rows():
                 cell = merged.setdefault((county, targets[column]), [0, number, *box])
                 if cell[0]:
-                    cell[2], cell[3], cell[4], cell[5] = min(cell[2], box[0]), min(cell[3], box[1]), max(cell[4], box[2]), max(cell[5], box[3])
+                    cell[2], cell[3], cell[4], cell[5] = (
+                        min(cell[2], box[0]),
+                        min(cell[3], box[1]),
+                        max(cell[4], box[2]),
+                        max(cell[5], box[3]),
+                    )
                 else:
                     cell[2:] = box
                 cell[0] += votes
@@ -655,5 +926,14 @@ def emit() -> Path:
                 }
                 cs.add("result_value", **fact, flags=house_books.DIGITIZED, value=votes)
                 page, width, height = pages[(year, number)]
-                cs.add("value_locator", **fact, page_id=page, source_id=None, x0=x0 / width, y0=y0 / height, x1=x1 / width, y1=y1 / height)
+                cs.add(
+                    "value_locator",
+                    **fact,
+                    page_id=page,
+                    source_id=None,
+                    x0=x0 / width,
+                    y0=y0 / height,
+                    x1=x1 / width,
+                    y1=y1 / height,
+                )
         return cs.write()

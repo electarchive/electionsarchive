@@ -60,7 +60,11 @@ def parse() -> None:
                 if line["contest name"] in CONTESTS:
                     rows.append((CONTESTS[line["contest name"]], code, line["choice name"], int(line["total votes"])))
     frame = pl.DataFrame(rows, schema=["contest", "fips", "candidate", "votes"], orient="row")
-    print(frame.group_by("contest", "candidate").agg(pl.col("votes").sum(), pl.col("fips").n_unique().alias("counties")).sort("contest", "candidate"))
+    print(
+        frame.group_by("contest", "candidate")
+        .agg(pl.col("votes").sum(), pl.col("fips").n_unique().alias("counties"))
+        .sort("contest", "candidate")
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
 
@@ -97,7 +101,9 @@ def emit() -> Path:
             if len(found) != 1:
                 raise ValueError(f"{contest_key}: {len(found)} contests matched")
             contest, election, held = found[0]
-            options = conn.execute("select id, lower(ballot_label) from contest_option where contest_id = %s", [contest]).fetchall()
+            options = conn.execute(
+                "select id, lower(ballot_label) from contest_option where contest_id = %s", [contest]
+            ).fetchall()
             held_totals = dict(
                 conn.execute(
                     "select o.id, sum(v.value) from result_value v join contest_option o on o.k = v.option_k where v.result_set_k = %s and v.measure = 1 group by 1",
@@ -111,7 +117,12 @@ def emit() -> Path:
                 if len(found_options) != 1:
                     raise ValueError(f"{contest_key}: {len(found_options)} options for {name}")
                 picked[name] = found_options[0]
-            counted = dict(frame.filter(pl.col("contest") == contest_key).group_by("candidate").agg(pl.col("votes").sum()).iter_rows())
+            counted = dict(
+                frame.filter(pl.col("contest") == contest_key)
+                .group_by("candidate")
+                .agg(pl.col("votes").sum())
+                .iter_rows()
+            )
             print(contest_key, {picked[name]: votes for name, votes in counted.items()}, held_totals)
             result_set = cs.key(f"{SOURCE}.result_set", f"{contest}:county")
             cs.add(
@@ -126,7 +137,9 @@ def emit() -> Path:
                 is_default=False,
                 completeness=1.0,
             )
-            for fips, name, votes in frame.filter(pl.col("contest") == contest_key).select("fips", "candidate", "votes").iter_rows():
+            for fips, name, votes in (
+                frame.filter(pl.col("contest") == contest_key).select("fips", "candidate", "votes").iter_rows()
+            ):
                 cs.add(
                     "result_value",
                     result_set_id=result_set,

@@ -14,7 +14,14 @@ from ea.store import DATA, connect
 SOURCE = "us.nv_leg_oe"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-DAYS = [date(2000, 11, 7), date(2002, 11, 5), date(2004, 11, 2), date(2006, 11, 7), date(2008, 11, 4), date(2010, 11, 2)]
+DAYS = [
+    date(2000, 11, 7),
+    date(2002, 11, 5),
+    date(2004, 11, 2),
+    date(2006, 11, 7),
+    date(2008, 11, 4),
+    date(2010, 11, 2),
+]
 FILE = re.compile(r"\d{4}/(\d{8})__nv__general__([a-z_]+?)(__precinct)?\.csv")
 ASSEMBLY = re.compile(r"STATE ASSEMBLY,?(?: [A-Z ]+?)?(?: DISTRICT)? (\d+)$")
 SENATE = re.compile(r"STATE SENATE,? (?:(CLARK|WASHOE) )?DISTRICT (\d+)$")
@@ -78,10 +85,16 @@ def parse() -> None:
     frame = (
         pl.DataFrame(
             rows,
-            schema={"day": pl.Date, "chamber": pl.String, "district": pl.String, "code": pl.String,
-                    "candidate": pl.String, "votes": pl.Int64},
+            schema={
+                "day": pl.Date,
+                "chamber": pl.String,
+                "district": pl.String,
+                "code": pl.String,
+                "candidate": pl.String,
+                "votes": pl.Int64,
+            },
             orient="row",
-        )  # fmt: skip
+        )
         .group_by("day", "chamber", "district", "code", "candidate")
         .agg(pl.col("votes").sum())
     )

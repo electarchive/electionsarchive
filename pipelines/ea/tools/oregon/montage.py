@@ -1,6 +1,8 @@
+import json
 import os
-import json, sys
+import sys
 from pathlib import Path
+
 from PIL import Image, ImageDraw
 
 S = Path(os.environ["OR_WORK"])

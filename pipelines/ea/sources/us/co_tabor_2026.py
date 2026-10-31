@@ -74,7 +74,9 @@ def fetch() -> None:
             raw.cached(SOURCE, url)
         except LookupError:
             if file is None:
-                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+                content = subprocess.run(
+                    ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                ).stdout
                 retrieved = datetime.now(UTC)
             else:
                 path = MANUAL / file
@@ -114,7 +116,9 @@ def elpaso_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for index, line in enumerate(lines):
         match = re.match(r"^\s*(.+?) ((?:Ballot|Referred) (?:Issue|Question|Measure))\s+(\w+)\s*$", line)
-        if match is None or not any(previous.strip().startswith("Election Hours") for previous in lines[max(index - 5, 0) : index]):
+        if match is None or not any(
+            previous.strip().startswith("Election Hours") for previous in lines[max(index - 5, 0) : index]
+        ):
             continue
         entity = f"{lines[index - 1].strip()} {match[1]}" if match[1].startswith("(") else match[1]
         rows.append({"entity": entity, "label": f"{match[2]} {match[3]}", "wording": question(lines, index + 1)})
@@ -140,10 +144,20 @@ def arapahoe_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     cursor = next(index for index, line in enumerate(lines) if "Your Voting Options" in line and "...." not in line)
     for entity, issue in ARAPAHOE_ISSUES:
-        cursor = next(index for index in range(cursor, len(lines)) if re.match(rf"^\s*(.+ )?BALLOT ISSUE {issue}\b", lines[index]))
+        cursor = next(
+            index for index in range(cursor, len(lines)) if re.match(rf"^\s*(.+ )?BALLOT ISSUE {issue}\b", lines[index])
+        )
         start = next(index for index in range(cursor, cursor + 20) if lines[index].lstrip().startswith("SHALL"))
         end = next(index for index in range(start, start + 80) if ARAPAHOE_END.match(lines[index]))
-        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start:end] if line.strip() and not line.strip().isdigit() and line.strip().upper() != entity.upper())).strip()
+        wording = re.sub(
+            r"\s+",
+            " ",
+            " ".join(
+                line.strip()
+                for line in lines[start:end]
+                if line.strip() and not line.strip().isdigit() and line.strip().upper() != entity.upper()
+            ),
+        ).strip()
         rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
     return rows
 
@@ -152,9 +166,19 @@ def mesa_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for index, line in enumerate(lines):
         match = re.match(r"^\s*(.+?) BALLOT ISSUE\s+(\w+)\s*$", line)
-        if match is None or not any(previous.strip().startswith("Election Hours") for previous in lines[max(index - 8, 0) : index]):
+        if match is None or not any(
+            previous.strip().startswith("Election Hours") for previous in lines[max(index - 8, 0) : index]
+        ):
             continue
-        rows.append({"entity": titled(match[1]).replace("Palsade", "Palisade").replace("Orchard Mesa Pool", "City of Grand Junction"), "label": f"Ballot Issue {match[2]}", "wording": question(lines, index + 1)})
+        rows.append(
+            {
+                "entity": titled(match[1])
+                .replace("Palsade", "Palisade")
+                .replace("Orchard Mesa Pool", "City of Grand Junction"),
+                "label": f"Ballot Issue {match[2]}",
+                "wording": question(lines, index + 1),
+            }
+        )
     return rows
 
 
@@ -167,9 +191,17 @@ def larimer_rows(lines: list[str]) -> list[dict[str, str]]:
         entity = ENTITY_END.split(header.split("«", 1)[1].replace("«", " "))[0]
         entity = re.sub(r"\s+", " ", entity).strip()
         mark = next(i for i in range(index, index + 12) if lines[i].strip().startswith("BALLOT ISSUE"))
-        label = next(follow.strip() for follow in lines[mark + 1 : mark + 8] if follow.strip() and "Election Date" not in follow)
+        label = next(
+            follow.strip() for follow in lines[mark + 1 : mark + 8] if follow.strip() and "Election Date" not in follow
+        )
         start = next(i for i in range(mark, mark + 20) if re.match(r"^\s*Telephone", lines[i])) + 1
-        rows.append({"entity": re.sub(r", Colorado$", "", titled(entity)), "label": f"Ballot Issue {label}", "wording": question(lines, start)})
+        rows.append(
+            {
+                "entity": re.sub(r", Colorado$", "", titled(entity)),
+                "label": f"Ballot Issue {label}",
+                "wording": question(lines, start),
+            }
+        )
     return rows
 
 
@@ -181,7 +213,8 @@ def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
             entity = next(
                 previous.strip()
                 for previous in reversed(lines[index - 4 : index])
-                if previous.strip() and not previous.strip().endswith(("MEASURE", "DEBT", "TAXES", "TAXES AND INCREASE DEBT"))
+                if previous.strip()
+                and not previous.strip().endswith(("MEASURE", "DEBT", "TAXES", "TAXES AND INCREASE DEBT"))
                 and "Counties" not in previous
             )
         if "Title and Text" not in line:
@@ -193,7 +226,9 @@ def douglas_rows(lines: list[str]) -> list[dict[str, str]]:
             start += 0 if line.split(":", 1)[1].strip() else 1
         while not lines[start].strip().startswith("SHALL") and "SHALL" not in lines[start]:
             start += 1
-        rows.append({"entity": titled(entity), "label": f"Ballot Issue {label[1].upper()}", "wording": question(lines, start)})
+        rows.append(
+            {"entity": titled(entity), "label": f"Ballot Issue {label[1].upper()}", "wording": question(lines, start)}
+        )
     return rows
 
 
@@ -222,10 +257,23 @@ def adams_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     cursor = 0
     for entity, issue in ADAMS_ISSUES:
-        cursor = next(index for index in range(cursor, len(lines)) if (match := ADAMS_HEADING.match(lines[index])) is not None and match[1] == issue and "Written" not in lines[index] and "authorized" not in lines[index])
-        start = next(index for index in range(cursor, cursor + 40) if re.match(r"^\s*(?:[A-Z][A-Z ,]*\b)?SHALL\b", lines[index]))
+        cursor = next(
+            index
+            for index in range(cursor, len(lines))
+            if (match := ADAMS_HEADING.match(lines[index])) is not None
+            and match[1] == issue
+            and "Written" not in lines[index]
+            and "authorized" not in lines[index]
+        )
+        start = next(
+            index for index in range(cursor, cursor + 40) if re.match(r"^\s*(?:[A-Z][A-Z ,]*\b)?SHALL\b", lines[index])
+        )
         end = next(index for index in range(start, start + 80) if lines[index].rstrip().endswith("?"))
-        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip() and not line.strip().isdigit())).strip()
+        wording = re.sub(
+            r"\s+",
+            " ",
+            " ".join(line.strip() for line in lines[start : end + 1] if line.strip() and not line.strip().isdigit()),
+        ).strip()
         rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
     return rows
 
@@ -252,10 +300,20 @@ def weld_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     cursor = 0
     for entity, issue in WELD_ISSUES:
-        cursor = next(index for index in range(cursor, len(lines)) if (match := WELD_HEADING.match(lines[index])) is not None and match[1] == issue and not re.search(r"(?i)written|summar|authorized|bonded", lines[index]))
+        cursor = next(
+            index
+            for index in range(cursor, len(lines))
+            if (match := WELD_HEADING.match(lines[index])) is not None
+            and match[1] == issue
+            and not re.search(r"(?i)written|summar|authorized|bonded", lines[index])
+        )
         start = next(index for index in range(cursor, cursor + 60) if re.search(r"\bSHALL\b", lines[index]))
         end = next(index for index in range(start, start + 90) if lines[index].rstrip().endswith("?"))
-        wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip() and not line.strip().isdigit())).strip()
+        wording = re.sub(
+            r"\s+",
+            " ",
+            " ".join(line.strip() for line in lines[start : end + 1] if line.strip() and not line.strip().isdigit()),
+        ).strip()
         rows.append({"entity": entity, "label": f"Ballot Issue {issue}", "wording": wording})
         cursor = end + 1
     return rows
@@ -274,12 +332,16 @@ PUEBLO_ISSUES = (
 
 
 def pueblo_text(path: Path) -> str:
-    markup = subprocess.run(["pdftotext", "-f", "2", "-l", "2", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    markup = subprocess.run(
+        ["pdftotext", "-f", "2", "-l", "2", "-bbox", str(path), "-"], capture_output=True, text=True, check=True
+    ).stdout
     columns: list[dict[int, list[tuple[float, str]]]] = [{} for _ in range(len(PUEBLO_CUTS) + 1)]
     for left, top, word in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" [^>]*>([^<]*)</word>', markup):
         column = sum(float(left) >= cut for cut in PUEBLO_CUTS)
         columns[column].setdefault(round(float(top) / 3), []).append((float(left), unescape(word)))
-    return "\n".join(" ".join(word for _, word in sorted(words)) for column in columns for _, words in sorted(column.items()))
+    return "\n".join(
+        " ".join(word for _, word in sorted(words)) for column in columns for _, words in sorted(column.items())
+    )
 
 
 def pueblo_rows(lines: list[str]) -> list[dict[str, str]]:
@@ -287,7 +349,12 @@ def pueblo_rows(lines: list[str]) -> list[dict[str, str]]:
     rows = []
     for entity, issue, anchor in PUEBLO_ISSUES:
         cursor = next(index for index, line in enumerate(lines) if re.search(anchor, line))
-        start = next(index for index in range(cursor, cursor + 20) if re.search(r"(?i)^\s*(?:\S+\s+)*?shall\b", lines[index]) and not re.search(r"(?i)^\s*ballot", lines[index]))
+        start = next(
+            index
+            for index in range(cursor, cursor + 20)
+            if re.search(r"(?i)^\s*(?:\S+\s+)*?shall\b", lines[index])
+            and not re.search(r"(?i)^\s*ballot", lines[index])
+        )
         end = next(index for index in range(start, start + 60) if lines[index].rstrip().endswith("?"))
         wording = re.sub(r"\s+", " ", " ".join(line.strip() for line in lines[start : end + 1] if line.strip())).strip()
         wording = wording.replace(" BE E PERMITTED", " BE PERMITTED").replace(", PL AND ANY", ", AND ANY")
@@ -295,14 +362,30 @@ def pueblo_rows(lines: list[str]) -> list[dict[str, str]]:
     return rows
 
 
-PARSERS = {"08101": pueblo_rows, "08123": weld_rows, "08001": adams_rows, "08059": jeffco_rows, "08077": mesa_rows, "08005": arapahoe_rows, "08041": elpaso_rows, "08069": larimer_rows, "08035": douglas_rows}
+PARSERS = {
+    "08101": pueblo_rows,
+    "08123": weld_rows,
+    "08001": adams_rows,
+    "08059": jeffco_rows,
+    "08077": mesa_rows,
+    "08005": arapahoe_rows,
+    "08041": elpaso_rows,
+    "08069": larimer_rows,
+    "08035": douglas_rows,
+}
 
 
 def parse() -> None:
     rows = []
     for county, (url, _, _) in COUNTIES.items():
         path = raw.cached(SOURCE, url).path
-        text = pueblo_text(path) if county == "08101" else subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        text = (
+            pueblo_text(path)
+            if county == "08101"
+            else subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            ).stdout
+        )
         for row in PARSERS[county](text.replace("\f", "\n").split("\n")):
             rows.append({**row, "county": county, "url": url})
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -385,7 +468,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:CO:{code}:measure:{slug(label)}"
@@ -406,7 +496,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):

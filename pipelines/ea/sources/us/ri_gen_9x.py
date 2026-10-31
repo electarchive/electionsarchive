@@ -56,11 +56,11 @@ def read(name: str, page: int, count: int, label: str) -> dict[str, list[int]]:
     printed = None
     for line in text.splitlines():
         stripped = line.strip()
-        if head := re.match(r"([A-Za-z]+)[ .]?COUNTY\b(?!\s*TOTAL)", stripped, re.IGNORECASE):
-            if head[1].lower() in COUNTIES:
-                county = head[1].lower()
-                towns.setdefault(county, [])
-                continue
+        head = re.match(r"([A-Za-z]+)[ .]?COUNTY\b(?!\s*TOTAL)", stripped, re.IGNORECASE)
+        if head and head[1].lower() in COUNTIES:
+            county = head[1].lower()
+            towns.setdefault(county, [])
+            continue
         if county is None:
             continue
         if re.match(r"STATE\s+TOTALS?", stripped, re.IGNORECASE):
@@ -69,13 +69,17 @@ def read(name: str, page: int, count: int, label: str) -> dict[str, list[int]]:
         if re.match(r"COUNTY\s+TOTALS?", stripped, re.IGNORECASE):
             totals[county] = numbers(re.sub(r"^[^\d]*", "", stripped), count)
             continue
-        if re.match(r"[A-Za-z]{4}", stripped) and (values := numbers(re.sub(r"^[A-Za-z .'~:]*[.•\s]\s", "", stripped), count)):
+        if re.match(r"[A-Za-z]{4}", stripped) and (
+            values := numbers(re.sub(r"^[A-Za-z .'~:]*[.•\s]\s", "", stripped), count)
+        ):
             towns[county].append(values)
     if printed is None or set(totals) != set(COUNTIES) or any(value is None for value in totals.values()):
         raise ValueError(f"{label}: counties {sorted(totals)} printed {printed}")
     for position, total in enumerate(printed):
         if sum(values[position] for values in totals.values()) != total:
-            raise ValueError(f"{label} column {position}: counties sum to {sum(v[position] for v in totals.values())}, printed {total}")
+            raise ValueError(
+                f"{label} column {position}: counties sum to {sum(v[position] for v in totals.values())}, printed {total}"
+            )
     for name_, rows in towns.items():
         if rows and all(sum(row[position] for row in rows) == totals[name_][position] for position in range(count)):
             continue
@@ -114,6 +118,8 @@ def emit() -> Path:
         "44",
         pl.read_parquet(PARSED / "lines.parquet"),
         [raw.cached(SOURCE, BASE + name) for name in sorted({table[0] for table in TABLES})],
-        lambda key: "County totals are from the Board of Elections' count book 'Vote by Counties' tables, whose five county totals add up to each printed state total.",
+        lambda key: (
+            "County totals are from the Board of Elections' count book 'Vote by Counties' tables, whose five county totals add up to each printed state total."
+        ),
         statewide=True,
     )

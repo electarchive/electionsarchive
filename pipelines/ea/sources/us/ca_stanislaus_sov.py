@@ -52,7 +52,11 @@ def headings(lines: list[str]) -> list[str]:
     merged: list[tuple[int, str, int]] = []
     for start, text, number in sorted(fragments):
         if merged and abs(merged[-1][0] - start) <= 4 and merged[-1][2] != number:
-            merged[-1] = (merged[-1][0], f"{merged[-1][1]} {text}" if merged[-1][2] < number else f"{text} {merged[-1][1]}", number)
+            merged[-1] = (
+                merged[-1][0],
+                f"{merged[-1][1]} {text}" if merged[-1][2] < number else f"{text} {merged[-1][1]}",
+                number,
+            )
         else:
             merged.append((start, text, number))
     return [text for _, text, _ in merged]
@@ -63,7 +67,10 @@ def parse() -> None:
     for day in DAYS:
         url = URL.format(day=day)
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], check=False, capture_output=True, text=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+            check=False,
+            capture_output=True,
+            text=True,
         ).stdout
         for page in text.split("\f"):
             lines = page.splitlines()
@@ -96,7 +103,9 @@ def parse() -> None:
                     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
-        records, schema=["day", "url", "contest", "precinct", "registered", "ballots", "candidate", "votes"], orient="row"
+        records,
+        schema=["day", "url", "contest", "precinct", "registered", "ballots", "candidate", "votes"],
+        orient="row",
     )
     frame.write_parquet(PARSED / "rows.parquet")
     print(frame.group_by("day").agg(pl.col("contest").n_unique(), pl.col("precinct").n_unique(), pl.len()).sort("day"))

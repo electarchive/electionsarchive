@@ -1,6 +1,7 @@
 import json
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
+from typing import cast
 from zoneinfo import ZoneInfo
 
 from ea import coverage, statewide_table
@@ -316,7 +317,7 @@ def measure(conn, day: str) -> dict:
     expected: dict[tuple[str, str], int] = defaultdict(int)
     listed: dict[str, set[str]] = defaultdict(set)
     params = {"year": year, "month": int(day[5:7])}
-    places: list[tuple[str, str, str, int, bool]] = []
+    places: list[tuple[str, str, str, int, bool, str | None, str | None, str | None]] = []
     by_polity: dict[str, list[int]] = defaultdict(list)
     counties: dict[str, tuple[str, str]] = {}
     schools: dict[str, list[tuple[int, str]]] = defaultdict(list)
@@ -497,7 +498,7 @@ def measure(conn, day: str) -> dict:
                 **cell,
             }
         )
-    short.sort(key=lambda place: -int(place["population"]))
+    short.sort(key=lambda place: -cast(int, place["population"]))
     return {"spec": data, "rows": rows, "short": short, "reached": reached}
 
 

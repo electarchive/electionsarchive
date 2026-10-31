@@ -23,8 +23,12 @@ def cached(url: str, suffix: str) -> bytes:
     try:
         return raw.cached(SOURCE, url).path.read_bytes()
     except LookupError:
-        content = subprocess.run(["curl", "-sSL", "-m", "180", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
-        raw.store(SOURCE, url, content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type="application/octet-stream")
+        content = subprocess.run(
+            ["curl", "-sSL", "-m", "180", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+        ).stdout
+        raw.store(
+            SOURCE, url, content, suffix=suffix, retrieved_at=datetime.now(UTC), media_type="application/octet-stream"
+        )
         return content
 
 
@@ -52,7 +56,9 @@ class Civil:
         self.places: dict[str, list[str]] = {}
         self.towns: dict[tuple[str, str], str] = {}
         self.schools: dict[str, list[str]] = {}
-        self.slugs: dict[str, UUID] = dict(conn.execute("select path, entity_id from slug where path like %s", [f"us/{state.lower()}/%"]).fetchall())
+        self.slugs: dict[str, UUID] = dict(
+            conn.execute("select path, entity_id from slug where path like %s", [f"us/{state.lower()}/%"]).fetchall()
+        )
         for scheme, code, polity, area, text, path in conn.execute(
             """select a.scheme_code, c.code, t.polity_id, a.id, n.text, s.path from area a
                join area_code c on c.area_id = a.id
@@ -72,7 +78,9 @@ class Civil:
             elif scheme == "us.school_district":
                 self.schools.setdefault(ceda._core(text), []).append(key)
         self.place_specs: dict[str, list[tuple[str, str]]] = {}
-        for geoid, full in sorted(gazetteer(PLACES, state).select("GEOID", "NAME").iter_rows(), key=lambda row: row[1].endswith("CDP")):
+        for geoid, full in sorted(
+            gazetteer(PLACES, state).select("GEOID", "NAME").iter_rows(), key=lambda row: row[1].endswith("CDP")
+        ):
             label = re.sub(r"^Village of | Village$", "", re.sub(r" (city|village|town|borough|CDP)$", "", full))
             if full.endswith("CDP") and ceda._city(label) in self.place_specs:
                 continue
@@ -128,7 +136,9 @@ class Civil:
         key = f"{scheme}:{geoid}"
         if key in self.found:
             return key
-        polity_id = cs.key("us.polity", f"{'school' if scheme == 'us.school_district' else scheme.removeprefix('us.')}:{geoid}")
+        polity_id = cs.key(
+            "us.polity", f"{'school' if scheme == 'us.school_district' else scheme.removeprefix('us.')}:{geoid}"
+        )
         path = f"us/{self.state.lower()}/{slug(text)}"
         if path in self.slugs:
             path = f"{path}-{geoid[:5]}" if scheme == "us.town" else f"{path}-{scheme.removeprefix('us.')}"
@@ -138,13 +148,22 @@ class Civil:
         self.slugs[path] = polity_id
         area_id = cs.area(scheme, geoid)
         state_polity = cs.polity(f"US-{self.state}")
-        cs.add("polity", id=polity_id, kind="school_district" if scheme == "us.school_district" else "municipality", iso_code=None)
+        cs.add(
+            "polity",
+            id=polity_id,
+            kind="school_district" if scheme == "us.school_district" else "municipality",
+            iso_code=None,
+        )
         cs.add("name", entity_id=polity_id, text=text, lang="en", kind="official", is_preferred=True)
         cs.add("polity_parent", polity_id=polity_id, parent_id=state_polity)
         cs.add("slug", path=path, entity_id=polity_id)
         cs.add("area", id=area_id, scheme_code=scheme)
         cs.add("area_code", area_id=area_id, code=geoid, valid_from=None)
-        cs.add("area_parent", area_id=area_id, parent_id=cs.area("us.county", geoid[:5]) if scheme == "us.town" else cs.area("us.state", self.fips))
+        cs.add(
+            "area_parent",
+            area_id=area_id,
+            parent_id=cs.area("us.county", geoid[:5]) if scheme == "us.town" else cs.area("us.state", self.fips),
+        )
         cs.add("name", entity_id=area_id, text=f"{text}, {self.state}", lang="en", kind="official", is_preferred=True)
         cs.add("polity_territory", polity_id=polity_id, area_id=area_id)
         cs.add(

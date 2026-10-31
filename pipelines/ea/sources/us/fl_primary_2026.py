@@ -15,14 +15,59 @@ VERSION = "1"
 DAY = date(2026, 8, 18)
 ENR = "https://enr.electionsfl.org/{county}/{election}/Summary/"
 ELECTIONS = {
-    "BAY": [4001], "ALA": [4023], "BAK": [4047], "BRE": [3995], "BRA": [4017], "CIT": [3991], "CHA": [4016],
-    "CLA": [3990], "CLM": [4020], "CLL": [4039], "DES": [3997], "DUV": [4003, 4053], "FLA": [4029], "FRA": [4028],
-    "GAD": [4009], "HAM": [4019], "GUL": [4044], "HIG": [4037], "HER": [4046], "HIL": [4002], "IND": [4032],
-    "HOL": [4040], "LAF": [4033], "JEF": [4043], "JAC": [4048], "LAK": [3996], "LEO": [3994], "LEE": [4025],
-    "LEV": [3992, 4058], "MAD": [4008], "LIB": [4049], "MRN": [4007], "MAN": [4031], "DAD": [4010], "MON": [4006],
-    "NAS": [4021], "ORA": [3998], "OKA": [4026], "OKE": [4060], "PAL": [4035], "PAS": [4045], "POL": [3999, 4000],
-    "PUT": [4013], "STJ": [4011], "STL": [4030], "SAN": [4036], "SAR": [4038], "SUM": [4056], "TAY": [4018],
-    "SUW": [4050], "VOL": [4004], "WAL": [4027], "WAS": [4034],
+    "BAY": [4001],
+    "ALA": [4023],
+    "BAK": [4047],
+    "BRE": [3995],
+    "BRA": [4017],
+    "CIT": [3991],
+    "CHA": [4016],
+    "CLA": [3990],
+    "CLM": [4020],
+    "CLL": [4039],
+    "DES": [3997],
+    "DUV": [4003, 4053],
+    "FLA": [4029],
+    "FRA": [4028],
+    "GAD": [4009],
+    "HAM": [4019],
+    "GUL": [4044],
+    "HIG": [4037],
+    "HER": [4046],
+    "HIL": [4002],
+    "IND": [4032],
+    "HOL": [4040],
+    "LAF": [4033],
+    "JEF": [4043],
+    "JAC": [4048],
+    "LAK": [3996],
+    "LEO": [3994],
+    "LEE": [4025],
+    "LEV": [3992, 4058],
+    "MAD": [4008],
+    "LIB": [4049],
+    "MRN": [4007],
+    "MAN": [4031],
+    "DAD": [4010],
+    "MON": [4006],
+    "NAS": [4021],
+    "ORA": [3998],
+    "OKA": [4026],
+    "OKE": [4060],
+    "PAL": [4035],
+    "PAS": [4045],
+    "POL": [3999, 4000],
+    "PUT": [4013],
+    "STJ": [4011],
+    "STL": [4030],
+    "SAN": [4036],
+    "SAR": [4038],
+    "SUM": [4056],
+    "TAY": [4018],
+    "SUW": [4050],
+    "VOL": [4004],
+    "WAL": [4027],
+    "WAS": [4034],
 }
 ROLES = (
     (r"^(?:board of county commissioners|county commissioner)\b", "commission"),
@@ -49,11 +94,11 @@ def races(county: str) -> list[tuple[str, str, str, bool, list[tuple[str, str, i
             continue
         for block in re.split(r'<div id="\d+" class="Race row">', page)[1:]:
             label = re.search(r"<label>([^<]*)</label>", block)
-            district = re.search(r"\bdistrict\s*(\d+)", label[1], re.I) if label else None
+            district = re.search(r"\bdistrict\s*(\d+)", label[1], re.IGNORECASE) if label else None
             if label is None or district is None:
                 continue
             name = html.unescape(label[1]).strip()
-            role = next((role for pattern, role in ROLES if re.search(pattern, name, re.I)), None)
+            role = next((role for pattern, role in ROLES if re.search(pattern, name, re.IGNORECASE)), None)
             if role is None:
                 continue
             universal = "universal" in name.lower()
@@ -61,7 +106,7 @@ def races(county: str) -> list[tuple[str, str, str, bool, list[tuple[str, str, i
             for cell, votes in re.findall(
                 r'<td class="ChoiceColumn">(.*?)<div class="DetailsFullBar">.*?class="DetailResultsColumn notranslate TotalVotes">([\d,]+)<',
                 block,
-                re.S,
+                re.DOTALL,
             ):
                 text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
                 match = re.match(r"^(.*?)\s*\(([A-Z]{3})\)$", text)
@@ -113,14 +158,18 @@ def emit() -> Path:
             for url in {url for url, *_ in rows}:
                 cs.artifact(raw.cached(SOURCE, url), source)
             for _, tail, label, universal, candidates in rows:
-                role, seat = tail.split(":")
+                _role, seat = tail.split(":")
                 parties = {party for _, party, _ in candidates}
                 if not universal and len(parties - {""}) > 1:
                     continue
-                party_slug = None if universal or not (parties & set(PARTIES)) else PARTIES[next(iter(parties & set(PARTIES)))]
+                party_slug = (
+                    None if universal or not (parties & set(PARTIES)) else PARTIES[next(iter(parties & set(PARTIES)))]
+                )
                 full = f"FL:{fips}:{tail}"
                 value = f"{DAY}:{full}" + (f":{party_slug.removesuffix('-party')}" if party_slug else "")
-                if conn.execute("select 1 from external_id where scheme = 'us.contest' and value = %s", [value]).fetchone():
+                if conn.execute(
+                    "select 1 from external_id where scheme = 'us.contest' and value = %s", [value]
+                ).fetchone():
                     counts["held"] += 1
                     continue
                 template = conn.execute(
@@ -140,7 +189,9 @@ def emit() -> Path:
                     counts["no template"] += 1
                     print("no template", full)
                     continue
-                kind, office, body, area, seat, plan, magnitude, term, system, template_election, polity, name, path = template
+                kind, office, body, area, seat, plan, magnitude, term, system, template_election, polity, name, path = (
+                    template
+                )
                 election_key = f"{DAY}:FL:{fips}"
                 if election_key not in elections:
                     found = conn.execute(
@@ -164,11 +215,20 @@ def emit() -> Path:
                             date_precision="day",
                             status="held",
                         )
-                        cs.add("name", entity_id=election, text=re.sub(r"^\d{4}", "2026", base[0]), lang="en", kind="official", is_preferred=True)
+                        cs.add(
+                            "name",
+                            entity_id=election,
+                            text=re.sub(r"^\d{4}", "2026", base[0]),
+                            lang="en",
+                            kind="official",
+                            is_preferred=True,
+                        )
                         cs.add("slug", path=re.sub(r"\d{4}-\d{2}-\d{2}", str(DAY), base[1]), entity_id=election)
                     elections[election_key] = election
                 election = elections[election_key]
-                contest_path = re.sub(r"\d{4}-\d{2}-\d{2}-\w+", f"{DAY}-general", path or "") + (f"-{party_slug.removesuffix('-party')}" if party_slug else "")
+                contest_path = re.sub(r"\d{4}-\d{2}-\d{2}-\w+", f"{DAY}-general", path or "") + (
+                    f"-{party_slug.removesuffix('-party')}" if party_slug else ""
+                )
                 if conn.execute("select 1 from slug where path = %s", [contest_path]).fetchone():
                     counts["slug taken"] += 1
                     continue
@@ -189,7 +249,9 @@ def emit() -> Path:
                     electoral_system_id=system,
                     default_result_kind="counted",
                 )
-                text = re.sub(r"^\d{4}", "2026", name or "") + (f" ({party_slug.removesuffix('-party').title()} primary)" if party_slug else "")
+                text = re.sub(r"^\d{4}", "2026", name or "") + (
+                    f" ({party_slug.removesuffix('-party').title()} primary)" if party_slug else ""
+                )
                 cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
                 cs.add("slug", path=contest_path, entity_id=contest)
                 counts["contests"] += 1
@@ -250,7 +312,9 @@ def emit() -> Path:
                         "outcome",
                         result_set_id=result_set,
                         option_id=option,
-                        kind=("elected" if decided else "advanced") if rank < (1 if decided or party_slug else 2) else "lost",
+                        kind=("elected" if decided else "advanced")
+                        if rank < (1 if decided or party_slug else 2)
+                        else "lost",
                     )
                     values.append((str(result_set), str(county_units[fips][0]), str(option), votes))
         print(counts)

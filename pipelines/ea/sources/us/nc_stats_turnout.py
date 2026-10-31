@@ -24,14 +24,18 @@ def files(keys: list[str]) -> dict[date, dict[str, str]]:
     found: dict[date, dict[str, str]] = {}
     for key in keys:
         if match := re.search(r"ENRS/(\d{4})_(\d\d)_(\d\d)/(voter|history)_stats_\d{8}\.(zip|txt)$", key):
-            found.setdefault(date(int(match[1]), int(match[2]), int(match[3])), {})[match[4]] = f"{BUCKET}/{key.removeprefix(BUCKET + '/')}"
+            found.setdefault(date(int(match[1]), int(match[2]), int(match[3])), {})[match[4]] = (
+                f"{BUCKET}/{key.removeprefix(BUCKET + '/')}"
+            )
     return found
 
 
 def fetch() -> None:
     keys, token = [], None
     while True:
-        params = {"list-type": "2", "prefix": "ENRS/", "max-keys": "1000"} | ({"continuation-token": token} if token else {})
+        params = {"list-type": "2", "prefix": "ENRS/", "max-keys": "1000"} | (
+            {"continuation-token": token} if token else {}
+        )
         body = httpx.get(BUCKET, params=params, timeout=60).text
         keys += re.findall(r"<Key>([^<]+)</Key>", body)
         token = next(iter(re.findall(r"<NextContinuationToken>([^<]+)<", body)), None)
@@ -53,12 +57,21 @@ def counts(url: str) -> pl.DataFrame | None:
     if b"\t" not in content[:500]:
         return None
     headed = content.startswith(b"county_desc")
-    frame = pl.read_csv(io.BytesIO(content), separator="\t", has_header=headed, infer_schema_length=0, quote_char=None, truncate_ragged_lines=True)
+    frame = pl.read_csv(
+        io.BytesIO(content),
+        separator="\t",
+        has_header=headed,
+        infer_schema_length=0,
+        quote_char=None,
+        truncate_ragged_lines=True,
+    )
     county, total = "county_desc", "total_voters"
     if not headed:
         dated = next(c for c in frame.columns if frame[c].str.contains(r"^\d\d/\d\d/\d{4}$").all())
         county, total = frame.columns[0], frame.columns[frame.columns.index(dated) - 1]
-    return frame.group_by(county=pl.col(county).str.strip_chars()).agg(total=pl.col(total).str.strip_chars().cast(pl.Int64).sum())
+    return frame.group_by(county=pl.col(county).str.strip_chars()).agg(
+        total=pl.col(total).str.strip_chars().cast(pl.Int64).sum()
+    )
 
 
 def parse() -> None:
@@ -78,7 +91,9 @@ def parse() -> None:
             frame = frame.drop("registered").join(registered.rename({"total": "registered"}), on="county", how="left")
         frame = frame.with_columns(
             day=pl.lit(day),
-            code=pl.col("county").map_elements(lambda name: fips[re.sub(r"[^a-z]", "", name.lower())], return_dtype=pl.String),
+            code=pl.col("county").map_elements(
+                lambda name: fips[re.sub(r"[^a-z]", "", name.lower())], return_dtype=pl.String
+            ),
             history=pl.lit(urls["history"]),
             voter=pl.lit(urls["voter"] if registered is not None else None, pl.String),
         )
@@ -114,7 +129,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url="https://dl.ncsbe.gov/?prefix=ENRS/", license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url="https://dl.ncsbe.gov/?prefix=ENRS/",
+                license="Public record",
+            )
         for (day,), rows in frame.group_by("day", maintain_order=True):
             if day not in elections:
                 continue

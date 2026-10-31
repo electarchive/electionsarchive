@@ -62,7 +62,9 @@ def parse() -> None:
     for (year, stage), address in FILES.items():
         path = raw.cached(SOURCE, address).path
         if address.endswith(".pdf"):
-            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            ).stdout
         else:
             text = path.read_text(errors="replace")
         seen = set()
@@ -75,11 +77,23 @@ def parse() -> None:
                 print(f"{stage} {year} {match[1]}: {numbers}")
                 continue
             seen.add(codes[plain(match[1])])
-            rows.append({"year": year, "stage": stage, "code": codes[plain(match[1])], "registered": numbers[0], "voters": numbers[1]})
+            rows.append(
+                {
+                    "year": year,
+                    "stage": stage,
+                    "code": codes[plain(match[1])],
+                    "registered": numbers[0],
+                    "voters": numbers[1],
+                }
+            )
     frame = pl.DataFrame(rows)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "stage").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("stage", "year"))
+    print(
+        frame.group_by("year", "stage")
+        .agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum())
+        .sort("stage", "year")
+    )
 
 
 def emit() -> Path:
@@ -121,7 +135,8 @@ def emit() -> Path:
         published = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'",
+                (source,),
             )
         }
         for (year, stage), rows in frame.group_by("year", "stage", maintain_order=True):

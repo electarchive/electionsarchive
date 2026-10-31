@@ -32,14 +32,20 @@ def fetch() -> None:
 def parse() -> None:
     frame, fips = oe_statewide.load()
     frame = frame.filter(
-        pl.any_horizontal((pl.col("state") == state) & pl.col("year").is_in(years) for state, years in SINGLE_SEAT.items())
+        pl.any_horizontal(
+            (pl.col("state") == state) & pl.col("year").is_in(years) for state, years in SINGLE_SEAT.items()
+        )
     )
     named = []
     for (office,) in frame.select("office").unique().iter_rows():
         for pattern, title in medsl_statewide.OFFICES:
             if (match := re.fullmatch(pattern, office)) and ("Justice" in title or "Judge" in title):
                 post = match.groupdict().get("seat")
-                if post and (number := re.fullmatch(r"(?:PLACE|POSITION|SEAT|COURT|- JUSTICE POSITION)? ?(?:NO\. )?#?0*(\d+)", post)):
+                if post and (
+                    number := re.fullmatch(
+                        r"(?:PLACE|POSITION|SEAT|COURT|- JUSTICE POSITION)? ?(?:NO\. )?#?0*(\d+)", post
+                    )
+                ):
                     post = number[1]
                 named.append((office, title, post))
                 break

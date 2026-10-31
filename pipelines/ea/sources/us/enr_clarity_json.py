@@ -19,7 +19,9 @@ SETTLED = timedelta(days=14)
 def _listing(row: Mapping[str, str]) -> Iterator[tuple[date, str]]:
     tenant = row["tenant"]
     listed = json.loads(raw.cached(SOURCE, f"{tenant}elections.json?v=1").path.read_bytes())
-    found = {listed_row["EID"]: datetime.strptime(listed_row["Date"].split()[0], "%m/%d/%Y").date() for listed_row in listed}
+    found = {
+        listed_row["EID"]: datetime.strptime(listed_row["Date"].split()[0], "%m/%d/%Y").date() for listed_row in listed
+    }
     for token in re.findall(r"eids=([\d@,-]+)", row["evidence"]):
         for item in token.split(","):
             eid, _, when = item.partition("@")
@@ -62,7 +64,11 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             link = max(links, key=lambda key: int(key.split("/")[-3]))
             summary = json.loads(raw.cached(SOURCE, link).path.read_bytes())
             name = next(
-                (listed["ElectionName"] for listed in json.loads(raw.cached(SOURCE, f"{tenant}elections.json?v=1").path.read_bytes()) if listed["EID"] == eid),
+                (
+                    listed["ElectionName"]
+                    for listed in json.loads(raw.cached(SOURCE, f"{tenant}elections.json?v=1").path.read_bytes())
+                    if listed["EID"] == eid
+                ),
                 "",
             )
             yield {
@@ -92,4 +98,6 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    return enr_clarity.emit(SOURCE, PLATFORM, lambda link, tenant: link.startswith(tenant) and link.endswith("sum.json"))
+    return enr_clarity.emit(
+        SOURCE, PLATFORM, lambda link, tenant: link.startswith(tenant) and link.endswith("sum.json")
+    )

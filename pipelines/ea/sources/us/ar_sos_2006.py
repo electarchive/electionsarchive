@@ -1,3 +1,4 @@
+import itertools
 import json
 import re
 import statistics
@@ -67,7 +68,8 @@ def parse() -> None:
     rows: list[dict[str, object]] = []
     for first, office in OFFICES.items():
         reads = {
-            side: [json.loads((WORK / f"read{side}" / f"{first + n}.json").read_text()) for n in (0, 1)] for side in "AB"
+            side: [json.loads((WORK / f"read{side}" / f"{first + n}.json").read_text()) for n in (0, 1)]
+            for side in "AB"
         }
         candidates = reads["A"][0]["candidates"]
         merged: list[tuple[int, list[object]]] = []
@@ -76,8 +78,8 @@ def parse() -> None:
             by_b = {r[0]: r[1:] for r in reads["B"][n]["rows"]}
             if list(by_a) != list(by_b):
                 raise ValueError(f"{office} page {first + n}: the two reads list different rows")
-            for county in by_a:
-                a, b = by_a[county], by_b[county]
+            for county, a in by_a.items():
+                b = by_b[county]
                 cells = []
                 for i, (x, y) in enumerate(zip(a, b, strict=True)):
                     if x == y:
@@ -137,6 +139,7 @@ def parse() -> None:
         sheet = frame.filter(pl.col("page") == page)
         counties = list(dict.fromkeys(sheet["county"]))
         columns = sheet["column"].max() + 1
+
         def runs(lines: numpy.ndarray) -> numpy.ndarray:
             best = numpy.zeros(lines.shape[0], dtype=int)
             for index, line in enumerate(lines):
@@ -149,7 +152,7 @@ def parse() -> None:
         left = [int(x) for x in down[numpy.r_[True, numpy.diff(down) > 8]]]
         across = numpy.flatnonzero(runs(ink) > 600)
         rules = [int(y) for y in across[numpy.r_[True, numpy.diff(across) > 8]]]
-        gaps = [b - a for a, b in zip(rules, rules[1:], strict=False)]
+        gaps = [b - a for a, b in itertools.pairwise(rules)]
         pitch = statistics.median(gaps)
         start = max(i for i, g in enumerate(gaps[:6]) if g > 1.5 * pitch) + 1 if max(gaps[:6]) > 1.5 * pitch else 0
         if len(rules) - start - 1 < len(counties) or len(left) < columns + 2:
@@ -160,7 +163,10 @@ def parse() -> None:
         for column in range(columns):
             for i, county in enumerate(counties):
                 boxes[(page, county, column)] = [
-                    left[1 + column] + 3, rules[start + i] + 3, left[2 + column] - 3, rules[start + i + 1] - 3
+                    left[1 + column] + 3,
+                    rules[start + i] + 3,
+                    left[2 + column] - 3,
+                    rules[start + i + 1] - 3,
                 ]
     frame = frame.with_columns(
         pl.struct("page", "county", "column")
@@ -192,7 +198,9 @@ def emit() -> Path:
             return plain(words[-1])
 
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE)
+        cs.add(
+            "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE
+        )
         artifact = cs.artifact(book, source)
         pages: dict[int, tuple[UUID, int, int]] = {}
         for number in sorted(set(frame["page"])):
@@ -225,10 +233,14 @@ def emit() -> Path:
         }
         if len(counties) != 75:
             raise ValueError("Arkansas needs 75 counties")
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
-            for (value,) in conn.execute("select value from external_id where scheme = 'us.contest' and value ~ '^2006-11-07:AR:'")
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value ~ '^2006-11-07:AR:'"
+            )
         }
         people: dict[str, set[UUID]] = {}
         for person, text in conn.execute(
@@ -263,7 +275,14 @@ def emit() -> Path:
                 electoral_system_id=fptp,
                 default_result_kind="counted",
             )
-            cs.add("name", entity_id=contest, text=f"2006 Arkansas {LABELS[str(office)]} election", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"2006 Arkansas {LABELS[str(office)]} election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             cs.add("slug", path=f"us/ar/{DAY}-general/{office}", entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
@@ -328,5 +347,11 @@ def emit() -> Path:
                         x1=box[2] / width,
                         y1=box[3] / height,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

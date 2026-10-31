@@ -14,7 +14,9 @@ from ea.store import DATA, connect
 SOURCE = "us.ok_ppp_2016"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-BASE = "https://oklahoma.gov/content/dam/ok/en/elections/election-results/2016-election-results/2016-ppp-election-results/"
+BASE = (
+    "https://oklahoma.gov/content/dam/ok/en/elections/election-results/2016-election-results/2016-ppp-election-results/"
+)
 DAY = date(2016, 3, 1)
 FILES = {
     "democratic": "2016-march-ppp-results-by-cd-dem.pdf",

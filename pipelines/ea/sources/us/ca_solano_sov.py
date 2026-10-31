@@ -68,7 +68,10 @@ def parse() -> None:
     rows = []
     for day, url in pdfs().items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], check=False, capture_output=True, text=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+            check=False,
+            capture_output=True,
+            text=True,
         ).stdout
         precinct = registered = ballots = contest = None
         previous = ""

@@ -22,7 +22,14 @@ FILES = {
     2002: ("2002 Primary Election Official Results.PDF", 6873551, date(2002, 5, 21), False, "Primary Election", None),
     2008: ("2008 General Election Official Results.PDF", 6873598, date(2008, 11, 4), False, "General Election", {3}),
     2010: ("2010 Primary Election Official Results.PDF", 6873663, date(2010, 5, 18), False, "Primary Election", None),
-    2012: ("2012 Special General Election Official Results.PDF", 6873732, date(2012, 1, 31), True, "Special Election", None),
+    2012: (
+        "2012 Special General Election Official Results.PDF",
+        6873732,
+        date(2012, 1, 31),
+        True,
+        "Special Election",
+        None,
+    ),
     2024: (
         "2024 November General Election Official Results(2).PDF",
         13735458,
@@ -36,7 +43,7 @@ ONLY = {2008: 1, 2024: 5}
 TITLE = re.compile(
     r"(UNITED STATES SENATOR|REPRESENTATIVE IN CONGRESS, (\d+)(?:ST|ND|RD|TH) DISTRICT)(?: (DEMOCRAT|REPUBLICAN))?"
 )
-PARTY = re.compile(r"(Democrat|Republican)", re.I)
+PARTY = re.compile(r"(Democrat|Republican)", re.IGNORECASE)
 TAG = re.compile(r"\s*\([A-Z]+\)$")
 
 
@@ -77,9 +84,17 @@ def parse() -> None:
         table: list[tuple[str, int, float, float, list[tuple[int, float, float, float, float]]]] = []
         rows: list[tuple[int, float, float, list[tuple[str, float, float, float, float]]]] = []
         for line in lines_of(raw.cached(SOURCE, url(year)).path):
-            if rows and all(NUMBER.fullmatch(w[0]) for w in line[3]) and not any(NUMBER.fullmatch(w[0]) for w in rows[-1][3]):
+            if (
+                rows
+                and all(NUMBER.fullmatch(w[0]) for w in line[3])
+                and not any(NUMBER.fullmatch(w[0]) for w in rows[-1][3])
+            ):
                 rows[-1] = (line[0], line[1], line[2], sorted([*rows[-1][3], *line[3]], key=lambda w: w[1]))
-            elif rows and all(NUMBER.fullmatch(w[0]) for w in rows[-1][3]) and not any(NUMBER.fullmatch(w[0]) for w in line[3]):
+            elif (
+                rows
+                and all(NUMBER.fullmatch(w[0]) for w in rows[-1][3])
+                and not any(NUMBER.fullmatch(w[0]) for w in line[3])
+            ):
                 rows[-1] = (rows[-1][0], rows[-1][1], rows[-1][2], sorted([*rows[-1][3], *line[3]], key=lambda w: w[1]))
             else:
                 rows.append(line)
@@ -95,7 +110,7 @@ def parse() -> None:
                 if found:
                     office = "senate" if found[1].startswith("UNITED") else "house"
                     district = int(found[2]) if found[2] else None
-                    party = found[3].lower().replace('democrat', 'democratic') if found[3] else None
+                    party = found[3].lower().replace("democrat", "democratic") if found[3] else None
                     start = not primary or party is not None
                 elif text == "US Representative":
                     office, district, party = "house", None, None
@@ -103,7 +118,7 @@ def parse() -> None:
                     district = int(ordinal[1])
                     start = not primary
                 elif lone and office is not None and (after_total or party is None):
-                    party = lone[1].lower().replace('democrat', 'democratic')
+                    party = lone[1].lower().replace("democrat", "democratic")
                     start = True
                 elif after_total:
                     office = None
@@ -123,7 +138,9 @@ def parse() -> None:
                     for text_, center, right in line:
                         slot = min(
                             range(len(slots)),
-                            key=lambda i: min(abs((values[i][1] + values[i][3]) / 2 - center), abs(values[i][3] - right)),
+                            key=lambda i: min(
+                                abs((values[i][1] + values[i][3]) / 2 - center), abs(values[i][3] - right)
+                            ),
                         )
                         slots[slot].append(text_)
                 names = []

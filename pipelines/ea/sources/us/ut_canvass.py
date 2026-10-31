@@ -58,7 +58,7 @@ def parse() -> None:
             last = next(index for index, row in enumerate(cells) if row[0].upper().startswith("TOTAL"))
             header = cells[first - 1]
             labels: dict[int, str] = {}
-            for row in cells[:first - 1]:
+            for row in cells[: first - 1]:
                 for column, text in enumerate(row):
                     if text and column > 0:
                         labels.setdefault(column, "")
@@ -85,7 +85,9 @@ def parse() -> None:
                 }
                 printed = int(float(cells[last][column] or 0))
                 if sum(counties.values()) != printed:
-                    raise ValueError(f"{name} {sheet} {candidate}: counties sum to {sum(counties.values())}, printed {printed}")
+                    raise ValueError(
+                        f"{name} {sheet} {candidate}: counties sum to {sum(counties.values())}, printed {printed}"
+                    )
                 office = "senate" if found[1] else "president" if found[3] else "house"
                 for code, votes in counties.items():
                     rows.append(
@@ -106,7 +108,11 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("day", "chamber", "district", "candidate", maintain_order=True).agg(pl.col("votes").sum(), pl.len()).rows())
+    print(
+        frame.group_by("day", "chamber", "district", "candidate", maintain_order=True)
+        .agg(pl.col("votes").sum(), pl.len())
+        .rows()
+    )
 
 
 def emit() -> Path:

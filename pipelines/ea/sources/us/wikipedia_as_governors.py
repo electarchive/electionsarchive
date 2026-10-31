@@ -189,7 +189,9 @@ def emit() -> Path:
                 body_md=f"Territory-wide votes from the English Wikipedia's article on the {year} American Samoa general election, citing the American Samoa Election Office.",
             )
             ranked: list[tuple[int, UUID]] = []
-            for candidate, mate, votes in rows.sort("position").select("candidate", "running_mate", "votes").iter_rows():
+            for candidate, mate, votes in (
+                rows.sort("position").select("candidate", "running_mate", "votes").iter_rows()
+            ):
                 token = slug(f"{candidate} {mate}")
                 option = cs.key("us.option", f"{contest_key}:{token}")
                 cs.add(

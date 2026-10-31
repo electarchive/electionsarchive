@@ -83,7 +83,10 @@ def emit() -> Path:
                 valid_to_precision=row["to_precision"] or "day",
                 source_id=sources[key],
             )
-        assembly = cs.source("Türkiye Büyük Millet Meclisi", "Türkiye Büyük Millet Meclisi: Milletvekilleri (dönem listeleri ve özgeçmiş sayfaları)")
+        assembly = cs.source(
+            "Türkiye Büyük Millet Meclisi",
+            "Türkiye Büyük Millet Meclisi: Milletvekilleri (dönem listeleri ve özgeçmiş sayfaları)",
+        )
         for person, party, start, start_precision, end, end_precision in conn.execute(
             """select t.person_id, a.party_id, a.valid_from, a.valid_from_precision, a.valid_to, a.valid_to_precision
                from tenure t join changeset c on c.id = t.changeset_id

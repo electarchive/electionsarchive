@@ -129,9 +129,7 @@ def parse() -> None:
                 if not total:
                     pending.append((words, heads, marks))
                     continue
-                anchors = sorted(
-                    (w for w in words if abs(w[1] - total[0][1]) < 1 and w[0] > 100), key=lambda w: w[0]
-                )
+                anchors = sorted((w for w in words if abs(w[1] - total[0][1]) < 1 and w[0] > 100), key=lambda w: w[0])
                 if len(heads) != len(anchors):
                     print(day, number, "columns", [h[1] for h in heads], [a[4] for a in anchors])
                     pending = []
@@ -155,7 +153,9 @@ def parse() -> None:
                         if label != ["Jurisdiction", "Wide"]:
                             table[" ".join(label)] = cells
                 pending = []
-                table["Total"] = [int(a[4].replace(",", "")) if re.fullmatch(r"[\d,]+", a[4]) else None for a in anchors]
+                table["Total"] = [
+                    int(a[4].replace(",", "")) if re.fullmatch(r"[\d,]+", a[4]) else None for a in anchors
+                ]
                 titles: list[list[float | str]] = []
                 for w in sorted(
                     (w for w in words if 80 < w[1] < 140 and w[0] > 100), key=lambda w: (round(w[1]), w[0])

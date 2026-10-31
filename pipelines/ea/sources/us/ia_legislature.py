@@ -60,7 +60,10 @@ def parse() -> None:
     rows = []
     for day in FILES:
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(day)).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(day)).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         office: str | None = None
         chamber: str | None = None
@@ -84,9 +87,15 @@ def parse() -> None:
                     header.append(line)
                 continue
             label = re.sub(r"\s+", " ", match[1]).strip()
-            cells = [(m.end(), int(m[0].replace(",", ""))) for m in re.finditer(r"\d[\d,]*", line) if m.start() >= match.start(2)]
+            cells = [
+                (m.end(), int(m[0].replace(",", "")))
+                for m in re.finditer(r"\d[\d,]*", line)
+                if m.start() >= match.start(2)
+            ]
             words = label.split(" ")
-            county = next((counties[key(" ".join(words[:n]))] for n in (3, 2, 1) if key(" ".join(words[:n])) in counties), None)
+            county = next(
+                (counties[key(" ".join(words[:n]))] for n in (3, 2, 1) if key(" ".join(words[:n])) in counties), None
+            )
             if county is not None and label.lower().endswith("election day"):
                 pending = county
                 continue
@@ -105,7 +114,11 @@ def parse() -> None:
             ends = [end for end, _ in cells]
             labels: dict[int, list[str]] = {end: [] for end in ends}
             for heading in header:
-                kept = re.sub(r"(?i)\bwrite-?\s?ins?\b|\bscattering\b", lambda m: "WRITE-INS".ljust(len(m[0]))[: len(m[0])], heading)
+                kept = re.sub(
+                    r"(?i)\bwrite-?\s?ins?\b|\bscattering\b",
+                    lambda m: "WRITE-INS".ljust(len(m[0]))[: len(m[0])],
+                    heading,
+                )
                 kept = re.sub(r"(?i)\b(?:under|over)\s+votes\b", lambda m: "BLANKS".ljust(len(m[0])), kept)
                 phrases = list(re.finditer(r"\S+(?: \S+)*", PARTY.sub(lambda m: " " * len(m[0]), kept)))
                 if len(phrases) == len(ends):
@@ -118,7 +131,11 @@ def parse() -> None:
                     if abs(column - 1 - center) < 25:
                         labels[column].append(phrase[0])
             names = [
-                "WRITE-INS" if any(t.startswith("WRITE") for t in labels[end]) else "" if any(t.startswith("BLANKS") for t in labels[end]) else " ".join(labels[end])
+                "WRITE-INS"
+                if any(t.startswith("WRITE") for t in labels[end])
+                else ""
+                if any(t.startswith("BLANKS") for t in labels[end])
+                else " ".join(labels[end])
                 for end in ends
             ]
             sums = dict.fromkeys(ends, 0)
@@ -135,7 +152,8 @@ def parse() -> None:
                 else "no candidate"
                 if not named or names[0] == "WRITE-INS"
                 else f"counties sum to {list(sums.values())}, printed {[value for _, value in cells]}"
-                if list(sums.values()) != [value for _, value in cells] or len(placed) != len({(c, e) for c, e, _ in placed})
+                if list(sums.values()) != [value for _, value in cells]
+                or len(placed) != len({(c, e) for c, e, _ in placed})
                 else None
             )
             if problem:

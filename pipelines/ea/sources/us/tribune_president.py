@@ -1,12 +1,10 @@
 import csv
 import json
-import itertools
 import re
 import subprocess
 import tempfile
 from collections import Counter, defaultdict
 from concurrent.futures import ProcessPoolExecutor
-from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from uuid import UUID
@@ -97,71 +95,71 @@ EARLY_ROWS = [s for s in ORDER if s not in ("Colorado", "Nebraska")]
 V69_ROWS = [s for s in ORDER if s != "Colorado"]
 V61_ROWS = [s for s in ORDER if s not in ("Colorado", "Kansas", "Nebraska", "Nevada", "West Virginia")]
 TABLES = {
-    "om254a": dict(
-        mask="om254",
-        page=254,
-        sha=OMNIBUS,
-        rows=EARLY,
-        y0=909,
-        last=1814,
-        total=1862,
-        x0=700,
-        x1=2035,
-        gap=0.04,
-        years=(1824, 1828, 1832, 1836),
-    ),
-    "om254b": dict(
-        mask="om254",
-        page=254,
-        sha=OMNIBUS,
-        rows=FORTIES,
-        y0=2056,
-        last=3085,
-        total=3144,
-        x0=719,
-        x1=2032,
-        gap=0.04,
-        years=(1840, 1844, 1848),
-    ),
-    "om255a": dict(
-        mask="om255",
-        page=255,
-        sha=OMNIBUS,
-        rows=MID,
-        y0=453,
-        last=1562,
-        total=1618,
-        x0=628,
-        x1=1959,
-        gap=0.04,
-        years=(1852, 1856, 1860),
-    ),
-    "om255b": dict(
-        mask="om255",
-        page=255,
-        sha=OMNIBUS,
-        rows=LATE,
-        y0=1810,
-        last=3103,
-        total=3152,
-        x0=431,
-        x1=2060,
-        gap=0.04,
-        years=(1864, 1868, 1872),
-    ),
-    "v81p95": dict(
-        mask="v81p95",
-        page=95,
-        sha=VOLUME_1881,
-        rows=ORDER,
-        y0=350,
-        last=1332,
-        total=1385,
-        x0=322,
-        x1=1457,
-        gap=0.02,
-        years=(1872, 1876, 1880),
-    ),
+    "om254a": {
+        "mask": "om254",
+        "page": 254,
+        "sha": OMNIBUS,
+        "rows": EARLY,
+        "y0": 909,
+        "last": 1814,
+        "total": 1862,
+        "x0": 700,
+        "x1": 2035,
+        "gap": 0.04,
+        "years": (1824, 1828, 1832, 1836),
+    },
+    "om254b": {
+        "mask": "om254",
+        "page": 254,
+        "sha": OMNIBUS,
+        "rows": FORTIES,
+        "y0": 2056,
+        "last": 3085,
+        "total": 3144,
+        "x0": 719,
+        "x1": 2032,
+        "gap": 0.04,
+        "years": (1840, 1844, 1848),
+    },
+    "om255a": {
+        "mask": "om255",
+        "page": 255,
+        "sha": OMNIBUS,
+        "rows": MID,
+        "y0": 453,
+        "last": 1562,
+        "total": 1618,
+        "x0": 628,
+        "x1": 1959,
+        "gap": 0.04,
+        "years": (1852, 1856, 1860),
+    },
+    "om255b": {
+        "mask": "om255",
+        "page": 255,
+        "sha": OMNIBUS,
+        "rows": LATE,
+        "y0": 1810,
+        "last": 3103,
+        "total": 3152,
+        "x0": 431,
+        "x1": 2060,
+        "gap": 0.04,
+        "years": (1864, 1868, 1872),
+    },
+    "v81p95": {
+        "mask": "v81p95",
+        "page": 95,
+        "sha": VOLUME_1881,
+        "rows": ORDER,
+        "y0": 350,
+        "last": 1332,
+        "total": 1385,
+        "x0": 322,
+        "x1": 1457,
+        "gap": 0.02,
+        "years": (1872, 1876, 1880),
+    },
 }
 
 
@@ -208,6 +206,7 @@ def read_cell(
                 ["tesseract", file.name, "-", "--psm", psm, "-c", "tessedit_char_whitelist=0123456789,."],
                 capture_output=True,
                 text=True,
+                check=False,
             ).stdout
         reads.append(re.sub(r"\D", "", out))
     return name, state, col, box, reads
@@ -239,7 +238,6 @@ def parse() -> None:
 
 def read_strip(task: tuple[str, int]) -> tuple[str, int, list[list[tuple[str, int, int]]]]:
     state, y = task
-    spec = TABLES["v81p95"]
     with Image.open(PARSED / "native" / "v81p95-mask.png") as mask:
         strip = ImageOps.invert(mask.convert("L").crop((300, y - 15, 1470, y + 15)))
     reads: list[list[tuple[str, int, int]]] = []
@@ -251,6 +249,7 @@ def read_strip(task: tuple[str, int]) -> tuple[str, int, list[list[tuple[str, in
                 ["tesseract", file.name, "-", "--psm", "7", "-c", "tessedit_char_whitelist=0123456789,. ", "tsv"],
                 capture_output=True,
                 text=True,
+                check=False,
             ).stdout
         words = []
         for line in out.splitlines()[1:]:
@@ -285,15 +284,15 @@ def parse_1881() -> None:
 
 
 PRINTS = {
-    "v65": dict(
-        mask="v65",
-        page=71,
-        sha="7b1d0b9ba2f6f8d746338dac6f2715b31792f83e2173c87119639736e13257a3",
-        rows=EARLY_ROWS,
-        y0=2287,
-        pitch=45.03,
-        total=3927,
-        cols=[
+    "v65": {
+        "mask": "v65",
+        "page": 71,
+        "sha": "7b1d0b9ba2f6f8d746338dac6f2715b31792f83e2173c87119639736e13257a3",
+        "rows": EARLY_ROWS,
+        "y0": 2287,
+        "pitch": 45.03,
+        "total": 3927,
+        "cols": [
             (553, 705),
             (758, 912),
             (930, 1089),
@@ -305,17 +304,17 @@ PRINTS = {
             (2165, 2328),
             (2338, 2499),
         ],
-        scales=((1, "7"), (1.5, "7"), (2, "7"), (1, "8")),
-    ),
-    "v61": dict(
-        mask="v61",
-        page=64,
-        sha="97638c3d6f81aaf7970d3c337f354eac04e601cc627c3191877b552cd4af2c74",
-        rows=V61_ROWS,
-        y0=1402,
-        pitch=25.1,
-        total=2239,
-        cols=[
+        "scales": ((1, "7"), (1.5, "7"), (2, "7"), (1, "8")),
+    },
+    "v61": {
+        "mask": "v61",
+        "page": 64,
+        "sha": "97638c3d6f81aaf7970d3c337f354eac04e601cc627c3191877b552cd4af2c74",
+        "rows": V61_ROWS,
+        "y0": 1402,
+        "pitch": 25.1,
+        "total": 2239,
+        "cols": [
             (293, 402),
             (413, 515),
             (527, 631),
@@ -327,17 +326,17 @@ PRINTS = {
             (1224, 1315),
             (1337, 1410),
         ],
-        scales=((3, "7"), (4, "7"), (3, "8"), (2, "7")),
-    ),
-    "v69": dict(
-        mask="v69",
-        page=92,
-        sha="41e6560af4b2f77374f49231b2f25df882f3c3c79fd06615bfb9302ffb212030",
-        rows=V69_ROWS,
-        y0=1291,
-        pitch=28.42,
-        total=2352,
-        cols=[
+        "scales": ((3, "7"), (4, "7"), (3, "8"), (2, "7")),
+    },
+    "v69": {
+        "mask": "v69",
+        "page": 92,
+        "sha": "41e6560af4b2f77374f49231b2f25df882f3c3c79fd06615bfb9302ffb212030",
+        "rows": V69_ROWS,
+        "y0": 1291,
+        "pitch": 28.42,
+        "total": 2352,
+        "cols": [
             (545, 640),
             (657, 752),
             (759, 859),
@@ -349,34 +348,34 @@ PRINTS = {
             (1417, 1515),
             (1525, 1599),
         ],
-        scales=((2, "7"), (3, "7"), (2, "8"), (4, "7")),
-    ),
-    "v85": dict(
-        mask="v85",
-        page=106,
-        turned=True,
-        sha="87164b718e158e1902728a93493d3af8e4ac286073f638e739791a346ced23d6",
-        rows=ORDER,
-        y0=354.5,
-        pitch=26.84,
-        total=1400,
-        cols=[
+        "scales": ((2, "7"), (3, "7"), (2, "8"), (4, "7")),
+    },
+    "v85": {
+        "mask": "v85",
+        "page": 106,
+        "turned": True,
+        "sha": "87164b718e158e1902728a93493d3af8e4ac286073f638e739791a346ced23d6",
+        "rows": ORDER,
+        "y0": 354.5,
+        "pitch": 26.84,
+        "total": 1400,
+        "cols": [
             (950, 1058),
             (1066, 1175),
             (1182, 1270),
             (1280, 1368),
         ],
-        scales=((2, "7"), (3, "7"), (4, "7")),
-    ),
-    "om254": dict(
-        mask="om254",
-        page=254,
-        sha="390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
-        rows=FORTIES,
-        y0=2065,
-        pitch=36.2,
-        total=3163,
-        cols=[
+        "scales": ((2, "7"), (3, "7"), (4, "7")),
+    },
+    "om254": {
+        "mask": "om254",
+        "page": 254,
+        "sha": "390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
+        "rows": FORTIES,
+        "y0": 2065,
+        "pitch": 36.2,
+        "total": 3163,
+        "cols": [
             (685, 835),
             (838, 1000),
             (1003, 1097),
@@ -387,17 +386,17 @@ PRINTS = {
             (1739, 1899),
             (1902, 2046),
         ],
-        scales=((1, "7"), (2, "7")),
-    ),
-    "om254t": dict(
-        mask="om254",
-        page=254,
-        sha="390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
-        rows=EARLY,
-        y0=905,
-        pitch=36.3,
-        total=1865,
-        cols=[
+        "scales": ((1, "7"), (2, "7")),
+    },
+    "om254t": {
+        "mask": "om254",
+        "page": 254,
+        "sha": "390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
+        "rows": EARLY,
+        "y0": 905,
+        "pitch": 36.3,
+        "total": 1865,
+        "cols": [
             (675, 805),
             (808, 935),
             (938, 1053),
@@ -409,8 +408,8 @@ PRINTS = {
             (1755, 1895),
             (1898, 2035),
         ],
-        scales=((1, "7"), (2, "7")),
-    ),
+        "scales": ((1, "7"), (2, "7")),
+    },
 }
 
 
@@ -436,6 +435,7 @@ def read_print_cell(
                 ["tesseract", file.name, "-", "--psm", psm, "-c", "tessedit_char_whitelist=0123456789,."],
                 capture_output=True,
                 text=True,
+                check=False,
             ).stdout
         reads.append(re.sub(r"\D", "", out))
     return key, state, col, box, reads

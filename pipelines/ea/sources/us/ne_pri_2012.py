@@ -48,10 +48,22 @@ def parse() -> None:
     rows = []
     for day, path in FILES.items():
         lines = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout.splitlines()
-        start = next(i for i, line in enumerate(lines) if i > 150 and re.match(r"\s+President of the United States\s*$", line))
-        end = next(i for i in range(start, len(lines)) if re.match(r"\s+(Member of the U\.S\. House of Representatives Totals|Representative in Congress . Totals)", lines[i]))
+        start = next(
+            i for i, line in enumerate(lines) if i > 150 and re.match(r"\s+President of the United States\s*$", line)
+        )
+        end = next(
+            i
+            for i in range(start, len(lines))
+            if re.match(
+                r"\s+(Member of the U\.S\. House of Representatives Totals|Representative in Congress . Totals)",
+                lines[i],
+            )
+        )
         chamber, party, district = "", "", None
         names: list[str] = []
         tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
@@ -83,7 +95,19 @@ def parse() -> None:
             for name, by_county in by_name.items():
                 for code, votes in by_county.items():
                     rows.append(
-                        (day.year, f"{chamber_}:{party_}", day, False, "NE", district_, code, name.upper(), 1, False, votes)
+                        (
+                            day.year,
+                            f"{chamber_}:{party_}",
+                            day,
+                            False,
+                            "NE",
+                            district_,
+                            code,
+                            name.upper(),
+                            1,
+                            False,
+                            votes,
+                        )
                     )
     PARSED.mkdir(parents=True, exist_ok=True)
     (

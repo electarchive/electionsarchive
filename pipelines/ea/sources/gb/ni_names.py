@@ -12,7 +12,12 @@ VERSION = "1"
 
 
 def fold(text: str) -> str:
-    plain = unicodedata.normalize("NFKD", text.replace("'", "").replace("\u2019", "")).encode("ascii", "ignore").decode().lower()
+    plain = (
+        unicodedata.normalize("NFKD", text.replace("'", "").replace("\u2019", ""))
+        .encode("ascii", "ignore")
+        .decode()
+        .lower()
+    )
     return " ".join(re.findall(r"[a-z0-9]+", plain.replace("&", " and ")))
 
 
@@ -58,11 +63,23 @@ def emit() -> Path:
                     continue
                 promote = any(row[2] for row in losers) and not best[2]
                 for name_id, text, *_ in losers:
-                    cs.add("name_drop", name_id=name_id, entity_id=person, text=text, reason="a poorer spelling of the same name")
+                    cs.add(
+                        "name_drop",
+                        name_id=name_id,
+                        entity_id=person,
+                        text=text,
+                        reason="a poorer spelling of the same name",
+                    )
                     dropped += 1
                 if promote:
                     for name_id, text, *_ in [row for row in found if row[1] == best[1]]:
-                        cs.add("name_drop", name_id=name_id, entity_id=person, text=text, reason="re-added as the preferred name")
+                        cs.add(
+                            "name_drop",
+                            name_id=name_id,
+                            entity_id=person,
+                            text=text,
+                            reason="re-added as the preferred name",
+                        )
                     cs.add("name", entity_id=person, text=best[1], lang="en", kind=best[3], is_preferred=True)
         print(f"{dropped} poorer spellings dropped")
         return cs.write()

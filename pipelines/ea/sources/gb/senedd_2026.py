@@ -30,7 +30,10 @@ PARTIES = {
     "Britain's Communist Party": ("Britain's Communist Party", "britain-s-communist-party"),
     "Socialist Labour Party": ("Socialist Labour Party", "socialist-labour-party"),
     "Social Democratic Party": ("Social Democratic Party", "social-democratic-party"),
-    "Official Monster Raving Loony Party": ("Official Monster Raving Loony Party", "official-monster-raving-loony-party"),
+    "Official Monster Raving Loony Party": (
+        "Official Monster Raving Loony Party",
+        "official-monster-raving-loony-party",
+    ),
     "Welsh Trade Unionist and Socialist Coalition": (
         "Welsh Trade Unionist and Socialist Coalition",
         "welsh-trade-unionist-and-socialist-coalition",
@@ -219,7 +222,13 @@ def emit() -> Path:
                 "select id, body_md from note where entity_id = %s and kind = 'caveat' and body_md <> %s",
                 [result_set, CAVEAT],
             ).fetchall():
-                cs.add("note_drop", note_id=note, entity_id=result_set, body_md=text, reason="replaced by the current caveat")
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=result_set,
+                    body_md=text,
+                    reason="replaced by the current caveat",
+                )
             for measure, amount in (
                 (REGISTERED, block["Electorate"]),
                 (VALID, block["Valid votes cast"]),
@@ -260,7 +269,11 @@ def emit() -> Path:
                 )
                 if row["individual"]:
                     found = known.get(fold(row["name"]), [])
-                    person = found[0] if len(found) == 1 else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(row['name'])}")
+                    person = (
+                        found[0]
+                        if len(found) == 1
+                        else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(row['name'])}")
+                    )
                     if person in cs.minted:
                         cs.add("person", id=person)
                         name(person, row["name"])
@@ -301,7 +314,9 @@ def emit() -> Path:
                 ranks[member["party"]] = ranks.get(member["party"], 0) + 1
                 option = cs.key("gb.option", f"{contest_key}:{slug(member['party'])}")
                 found = known.get(fold(member["name"]), [])
-                person = found[0] if len(found) == 1 else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(member['name'])}")
+                person = (
+                    found[0] if len(found) == 1 else cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(member['name'])}")
+                )
                 if person in cs.minted:
                     cs.add("person", id=person)
                     name(person, member["name"])
@@ -330,5 +345,11 @@ def emit() -> Path:
                     acquired_via="elected",
                     contest_id=contest,
                 )
-                cs.add("tenure_affiliation", tenure_id=tenure, kind="party", party_id=parties[PARTIES[member["party"]][1]], valid_from=DAY)
+                cs.add(
+                    "tenure_affiliation",
+                    tenure_id=tenure,
+                    kind="party",
+                    party_id=parties[PARTIES[member["party"]][1]],
+                    valid_from=DAY,
+                )
         return cs.write()

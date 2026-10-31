@@ -45,7 +45,8 @@ def parse() -> None:
         start = next(
             index
             for index, line in enumerate(lines)
-            if line.strip().isupper() and line.strip() in ("GOVERNOR", "UNITED STATES SENATOR")
+            if line.strip().isupper()
+            and line.strip() in ("GOVERNOR", "UNITED STATES SENATOR")
             and marker.lower() in " ".join(lines[index + 1 : index + 4]).lower()
         )
         counties = []

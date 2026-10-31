@@ -1,3 +1,4 @@
+import itertools
 import json
 import re
 from datetime import date
@@ -68,7 +69,9 @@ def parse() -> None:
             ).fetchall()
         rows.extend((year, *row) for row in found)
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["year", "name", "geom", "label_point"], orient="row").write_parquet(PARSED / "areas.parquet")
+    pl.DataFrame(rows, schema=["year", "name", "geom", "label_point"], orient="row").write_parquet(
+        PARSED / "areas.parquet"
+    )
 
 
 def emit() -> Path:
@@ -77,7 +80,7 @@ def emit() -> Path:
     for day, act, signed, _ in ELECTIONS.values():
         firsts[act] = (signed, min(day, firsts[act][1]) if act in firsts else day)
     acts = sorted(((act, signed, day) for act, (signed, day) in firsts.items()), key=lambda a: a[1])
-    ends = {act: following[1] for (act, _, _), following in zip(acts, acts[1:], strict=False)}
+    ends = {act: following[1] for (act, _, _), following in itertools.pairwise(acts)}
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -103,7 +106,9 @@ def emit() -> Path:
                 attribution="© Tailte Éireann, licensed under CC BY 4.0",
             )
             cs.artifact(raw.cached(SOURCE, DOWNLOAD.format(item=SETS[act][0])), source)
-            for name, geom, point in frame.filter(pl.col("year") == act).sort("name").select("name", "geom", "label_point").iter_rows():
+            for name, geom, point in (
+                frame.filter(pl.col("year") == act).sort("name").select("name", "geom", "label_point").iter_rows()
+            ):
                 area = cs.area("ie.dail", f"{act}:{slug(name)}")
                 if area in cs.minted:
                     raise ValueError(f"no {act} constituency {name} in ie.dail; publish ie.dail first")
@@ -117,5 +122,12 @@ def emit() -> Path:
                     quality="official",
                     source_id=source,
                 )
-            cs.add("boundary_set", scheme_code="ie.dail", vintage=str(act), valid_from=signed, valid_to=ends.get(act), as_of=day)
+            cs.add(
+                "boundary_set",
+                scheme_code="ie.dail",
+                vintage=str(act),
+                valid_from=signed,
+                valid_to=ends.get(act),
+                as_of=day,
+            )
         return cs.write()

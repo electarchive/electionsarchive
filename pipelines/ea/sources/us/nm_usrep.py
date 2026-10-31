@@ -85,11 +85,10 @@ def parse() -> None:
     for line in FILES:
         page = raw.cached(SOURCE, BASE + line).path.read_bytes().decode("latin-1")
         body = page[max(page.lower().find("<body"), 0) :]
-        name = re.search(r"Results for(?:<BR>|\s)+([A-Za-z .]+?)\s*</font>", body, re.I)[1]
+        name = re.search(r"Results for(?:<BR>|\s)+([A-Za-z .]+?)\s*</font>", body, re.IGNORECASE)[1]
         key = re.sub(r"[^a-z]", "", name.lower())
         key = key if key in counties else difflib.get_close_matches(key, counties, 1, 0.7)[0]
         district = 0
-        names: dict[str, int] = {}
         tokens = [re.sub(r"\s+", " ", unescape(token)).strip() for token in re.split(r"<[^>]*>", body) if token.strip()]
         district = 0
         name = None

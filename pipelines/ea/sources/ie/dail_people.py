@@ -1,3 +1,4 @@
+import itertools
 from collections import defaultdict
 from pathlib import Path
 from uuid import UUID
@@ -5,7 +6,8 @@ from uuid import UUID
 import polars as pl
 
 from ea.changeset import Changeset
-from ea.sources.ie.dail import PARSED as DAIL, fold
+from ea.sources.ie.dail import PARSED as DAIL
+from ea.sources.ie.dail import fold
 from ea.store import connect
 
 SOURCE = "ie.dail_people"
@@ -40,23 +42,22 @@ def emit() -> Path:
             by_code[row["code"]].append((row["year"], people[row["year"], row["person"]]))
         for found in by_code.values():
             found.sort(key=lambda entry: entry[0])
-            for (_, before), (_, after) in zip(found, found[1:], strict=False):
+            for (_, before), (_, after) in itertools.pairwise(found):
                 parent[find(before)] = find(after)
         solo = roster.filter(pl.col("code").is_null()).with_columns(
             place=pl.col("constituency").map_elements(fold, return_dtype=pl.String),
             owner=pl.col("party").map_elements(fold, return_dtype=pl.String),
         )
-        for before_year, after_year in zip(years, years[1:], strict=False):
+        for before_year, after_year in itertools.pairwise(years):
             ahead = solo.filter(pl.col("year") == after_year)
             for row in solo.filter(pl.col("year") == before_year).iter_rows(named=True):
                 keys = ["name", "place", "owner"]
-                same = [
-                    r
-                    for r in ahead.iter_rows(named=True)
-                    if all(r[k] == row[k] for k in keys)
-                ]
+                same = [r for r in ahead.iter_rows(named=True) if all(r[k] == row[k] for k in keys)]
                 earlier = solo.filter(
-                    (pl.col("year") == before_year) & (pl.col("name") == row["name"]) & (pl.col("place") == row["place"]) & (pl.col("owner") == row["owner"])
+                    (pl.col("year") == before_year)
+                    & (pl.col("name") == row["name"])
+                    & (pl.col("place") == row["place"])
+                    & (pl.col("owner") == row["owner"])
                 ).height
                 if len(same) == 1 and earlier == 1:
                     parent[find(people[before_year, row["person"]])] = find(people[after_year, same[0]["person"]])

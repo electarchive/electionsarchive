@@ -13,7 +13,11 @@ SOURCE = "us.pa_dos_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = [1992, 2000, 2004, 2008, 2012]
-OFFICES = {"ATT": ("attorney-general", "Attorney General"), "AUD": ("auditor-general", "Auditor General"), "TRE": ("treasurer", "Treasurer")}
+OFFICES = {
+    "ATT": ("attorney-general", "Attorney General"),
+    "AUD": ("auditor-general", "Auditor General"),
+    "TRE": ("treasurer", "Treasurer"),
+}
 PARTIES = {
     "DEM": "Democratic",
     "REP": "Republican",

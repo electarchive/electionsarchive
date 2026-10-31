@@ -55,12 +55,24 @@ def parse() -> None:
                 table.append((county.strip(), [int(value) for value in values.split()]))
             if any(len(values) != len(candidates) for _, values in table):
                 raise ValueError(f"{year} {header}: column count differs from the candidate count")
-            if total is not None and [sum(values[column] for _, values in table) for column in range(len(total))] != total:
+            if (
+                total is not None
+                and [sum(values[column] for _, values in table) for column in range(len(total))] != total
+            ):
                 print(f"{year} {header} {candidates[0]}: rows do not tie the printed totals {total}")
             for county, values in table:
                 for candidate, votes in zip(candidates, values, strict=True):
                     found = re.fullmatch(r"(.*?)\s*\((\w)\)", candidate)
-                    rows.append((day, header.strip(), PARTIES[found[2]], found[1], counties[re.sub(r"[^a-z]", "", county.lower())], votes))
+                    rows.append(
+                        (
+                            day,
+                            header.strip(),
+                            PARTIES[found[2]],
+                            found[1],
+                            counties[re.sub(r"[^a-z]", "", county.lower())],
+                            votes,
+                        )
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, schema=["day", "district", "party", "candidate", "code", "votes"], orient="row").write_parquet(
         PARSED / "lines.parquet"
@@ -93,9 +105,7 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, URL.format(page)), source)
         lines = frame.select(
             year=pl.col("day").dt.year().cast(pl.Int32),
-            chamber=pl.when(pl.col("district") == "senate")
-            .then(pl.lit("senate:"))
-            .otherwise(pl.lit("house:"))
+            chamber=pl.when(pl.col("district") == "senate").then(pl.lit("senate:")).otherwise(pl.lit("house:"))
             + pl.col("party"),
             day="day",
             special=pl.lit(False),

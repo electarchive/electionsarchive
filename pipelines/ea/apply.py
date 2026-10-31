@@ -967,12 +967,14 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 ("outcome", "option_id"),
                 ("contest_option", "parent_option_id"),
             ):
-                (rows,) = conn.execute(
+                row = conn.execute(
                     sql.SQL("select count(*) from public.{} where {} = %s").format(
                         sql.Identifier(relation), sql.Identifier(column)
                     ),
                     [option],
                 ).fetchone()
+                assert row is not None
+                (rows,) = row
                 if rows:
                     used.append(f"{relation}.{column} ({rows} rows)")
             if used:
@@ -1026,9 +1028,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 f"ballot_question_text for contest {contest} was written by {writer}, not {stage.pipeline}; publish a superseding source instead"
             )
         conn.execute(
-            sql.SQL(
-                "update public.ballot_question_text p set body = s.body from {} s where {}"
-            ).format(staged, same)
+            sql.SQL("update public.ballot_question_text p set body = s.body from {} s where {}").format(staged, same)
         )
     if table in stage.drops:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.dropped(table)))
@@ -1316,9 +1316,7 @@ def defaults(
                                         where z.result_set_k = p.{0} and z.measure = 1)
                  group by v.option_k) t"""
     picks = conn.execute(
-        cast(
-            LiteralString,
-            f"""with picked as (
+        f"""with picked as (
                   select distinct on (d.id) d.id as old, d.k as old_k, r.id as new, r.k as new_k,
                          r.stage = d.stage as same, d.contest_id,
                          exists (select from external_id x where x.scheme = 'ea.authoritative' and x.value = r.id::text)
@@ -1348,7 +1346,6 @@ def defaults(
                        array(select o.k::text from contest_option o where o.contest_id = p.contest_id
                              and o.kind in ('others', 'independents', 'none_of_the_above', 'uncommitted'))
                 from picked p""",
-        ),
         {"contests": contests},
     ).fetchall()
     flipped: list[tuple[str, str, bool]] = []

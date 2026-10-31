@@ -18,7 +18,28 @@ PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "New York State Legislature"
 TAGS = ("haiku", "sonnet", "opus", "opushi")
 COUNTY = {"New York": "36061", "Bronx": "36005", "Kings": "36047", "Queens": "36081", "Richmond": "36085"}
-ONES = ("", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth")
+ONES = (
+    "",
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth",
+    "sixth",
+    "seventh",
+    "eighth",
+    "ninth",
+    "tenth",
+    "eleventh",
+    "twelfth",
+    "thirteenth",
+    "fourteenth",
+    "fifteenth",
+    "sixteenth",
+    "seventeenth",
+    "eighteenth",
+    "nineteenth",
+)
 TENS = {"twentieth": 20, "thirtieth": 30, "twenty": 20, "thirty": 30}
 YEARS = {
     1908: {
@@ -294,12 +315,37 @@ def read(year: int, tag: str) -> pl.DataFrame:
                 continue
             current[county] = ad
             cells = whole(spec, [number(cell) for cell in row["cells"]])
-            rows.append({"county": county, "ad": ad, "ed": row["district"], "page": page, "cells": cells, "total": False})
+            rows.append(
+                {"county": county, "ad": ad, "ed": row["district"], "page": page, "cells": cells, "total": False}
+            )
         for row in data["totals"]:
             ad = ordinal(row["ad"]) if row["ad"].strip() else current.get(county)
             if ad is not None:
-                rows.append({"county": county, "ad": ad, "ed": 0, "page": page, "cells": whole(spec, [number(cell) for cell in row["cells"]]), "total": True})
-    return pl.DataFrame(rows, schema={"county": pl.Utf8, "ad": pl.Int64, "ed": pl.Int64, "page": pl.Int64, "cells": pl.List(pl.Int64), "total": pl.Boolean}) if rows else pl.DataFrame()
+                rows.append(
+                    {
+                        "county": county,
+                        "ad": ad,
+                        "ed": 0,
+                        "page": page,
+                        "cells": whole(spec, [number(cell) for cell in row["cells"]]),
+                        "total": True,
+                    }
+                )
+    return (
+        pl.DataFrame(
+            rows,
+            schema={
+                "county": pl.Utf8,
+                "ad": pl.Int64,
+                "ed": pl.Int64,
+                "page": pl.Int64,
+                "cells": pl.List(pl.Int64),
+                "total": pl.Boolean,
+            },
+        )
+        if rows
+        else pl.DataFrame()
+    )
 
 
 def parse() -> None:
@@ -327,24 +373,42 @@ def parse() -> None:
                     totals = totals[:1]
                 reason = None
                 if not totals:
-                    rows = [r for r in eds if len(r["cells"]) == spec["width"] and None not in r["cells"] and short(spec, r["county"], r["cells"]) == r["cells"][-1]]
+                    rows = [
+                        r
+                        for r in eds
+                        if len(r["cells"]) == spec["width"]
+                        and None not in r["cells"]
+                        and short(spec, r["county"], r["cells"]) == r["cells"][-1]
+                    ]
                     if rows and len({r["ed"] for r in rows}) == len(rows):
                         accepted[key] = (tag, rows)
                         failures.pop(key, None)
-                        bare.append(f"{key[0]} assembly district {key[1]}: {len(rows)} of {len(eds)} election districts")
+                        bare.append(
+                            f"{key[0]} assembly district {key[1]}: {len(rows)} of {len(eds)} election districts"
+                        )
                         continue
-                if len(totals) == 1 and not any(None in r["cells"] or len(r["cells"]) != spec["width"] for r in eds + totals):
+                if len(totals) == 1 and not any(
+                    None in r["cells"] or len(r["cells"]) != spec["width"] for r in eds + totals
+                ):
                     gaps = [sum(r["cells"][i] for r in eds) - totals[0]["cells"][i] for i in range(spec["width"])]
                     wrong = [i for i, gap in enumerate(gaps) if gap]
                     if len(wrong) == 1 and wrong[0] < spec["width"] - 1:
                         column = wrong[0]
                         misses = [r for r in eds if short(spec, r["county"], r["cells"]) != r["cells"][-1]]
-                        if misses and sum(short(spec, r["county"], r["cells"]) - r["cells"][-1] for r in misses) == gaps[column] and all(
-                            r["cells"][column] - (short(spec, r["county"], r["cells"]) - r["cells"][-1]) >= 0 for r in misses
+                        if (
+                            misses
+                            and sum(short(spec, r["county"], r["cells"]) - r["cells"][-1] for r in misses)
+                            == gaps[column]
+                            and all(
+                                r["cells"][column] - (short(spec, r["county"], r["cells"]) - r["cells"][-1]) >= 0
+                                for r in misses
+                            )
                         ):
                             for r in misses:
                                 excess = short(spec, r["county"], r["cells"]) - r["cells"][-1]
-                                fixed.append(f"{key[0]} assembly district {key[1]}, election district {r['ed']}, column {column + 1}: {r['cells'][column]} read, {r['cells'][column] - excess} used")
+                                fixed.append(
+                                    f"{key[0]} assembly district {key[1]}, election district {r['ed']}, column {column + 1}: {r['cells'][column]} read, {r['cells'][column] - excess} used"
+                                )
                                 r["cells"][column] -= excess
                 if len(totals) != 1:
                     reason = f"{len(totals)} total rows"
@@ -370,13 +434,37 @@ def parse() -> None:
         for (county, ad), (tag, records) in accepted.items():
             for r in records:
                 for index in wanted:
-                    out.append({"county": county, "ad": ad, "ed": r["ed"], "option": index, "value": r["cells"][index], "page": r["page"], "tag": tag})
+                    out.append(
+                        {
+                            "county": county,
+                            "ad": ad,
+                            "ed": r["ed"],
+                            "option": index,
+                            "value": r["cells"][index],
+                            "page": r["page"],
+                            "tag": tag,
+                        }
+                    )
         pl.DataFrame(out).write_parquet(PARSED / f"{year}.parquet")
         (PARSED / f"{year}-failures.json").write_text(
-            json.dumps({"left": {f"{c}:{a}": why for (c, a), why in sorted(failures.items())}, "off": sorted(set(off)), "fixed": sorted(set(fixed)), "bare": sorted(set(bare))}, indent=1)
+            json.dumps(
+                {
+                    "left": {f"{c}:{a}": why for (c, a), why in sorted(failures.items())},
+                    "off": sorted(set(off)),
+                    "fixed": sorted(set(fixed)),
+                    "bare": sorted(set(bare)),
+                },
+                indent=1,
+            )
         )
         counts = {c: sum(1 for k in accepted if k[0] == c) for c in COUNTY}
-        print(year, "assembly districts loaded", counts, "left out", {f"{c}:{a}": why for (c, a), why in sorted(failures.items())})
+        print(
+            year,
+            "assembly districts loaded",
+            counts,
+            "left out",
+            {f"{c}:{a}": why for (c, a), why in sorted(failures.items())},
+        )
 
 
 def emit():
@@ -412,7 +500,11 @@ def emit():
                 ).fetchall()
             }
             hathi = "." in spec["item"]
-            url = f"https://babel.hathitrust.org/cgi/pt?id={spec['item']}" if hathi else f"https://archive.org/download/{spec['item']}/{spec['item']}.pdf"
+            url = (
+                f"https://babel.hathitrust.org/cgi/pt?id={spec['item']}"
+                if hathi
+                else f"https://archive.org/download/{spec['item']}/{spec['item']}.pdf"
+            )
             source = cs.source(PUBLISHER, spec["title"])
             cs.add(
                 "source",
@@ -426,7 +518,14 @@ def emit():
             )
             pdf = INBOX / f"{spec['volume']}.pdf"
             artifact = cs.artifact(
-                raw.store(SOURCE, url, pdf.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"),
+                raw.store(
+                    SOURCE,
+                    url,
+                    pdf.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/pdf",
+                ),
                 source,
             )
             pages = {}
@@ -435,7 +534,19 @@ def emit():
                 if not image.exists():
                     PAGES.mkdir(parents=True, exist_ok=True)
                     subprocess.run(
-                        ["pdftoppm", "-r", "100", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(pdf), str(image.with_suffix(""))],
+                        [
+                            "pdftoppm",
+                            "-r",
+                            "100",
+                            "-png",
+                            "-f",
+                            str(page),
+                            "-l",
+                            str(page),
+                            "-singlefile",
+                            str(pdf),
+                            str(image.with_suffix("")),
+                        ],
                         check=True,
                     )
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
@@ -459,10 +570,23 @@ def emit():
                     cs.add("name", entity_id=person, text=name, lang="en", kind="official", is_preferred=True)
                     cs.add("contest_option", id=root, contest_id=contest, kind="candidate", ballot_label=name)
                     candidacy = cs.key("us.candidacy", f"{root_key}:head")
-                    cs.add("candidacy", id=candidacy, person_id=person, option_id=root, role="head", ballot_name=name, is_independent=False)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=root,
+                        role="head",
+                        ballot_name=name,
+                        is_independent=False,
+                    )
                     for key in (party_key, spec["extra_party"].get(name)):
                         if key is not None:
-                            cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=cs.key("us.party", key), kind="nominated")
+                            cs.add(
+                                "candidacy_nomination",
+                                candidacy_id=candidacy,
+                                party_id=cs.key("us.party", key),
+                                kind="nominated",
+                            )
                     roots[name] = (root, root_key)
                 root, root_key = roots[name]
                 if line is None:
@@ -491,10 +615,14 @@ def emit():
                 is_default=False,
                 completeness=None,
             )
-            left = "".join(f" Note: assembly district {key} is left out because of {why}." for key, why in failures["left"].items())
+            left = "".join(
+                f" Note: assembly district {key} is left out because of {why}." for key, why in failures["left"].items()
+            )
             if failures["bare"]:
                 left += (
-                    " Note: this volume prints no assembly district total for " + "; ".join(failures["bare"]) + ", so only "
+                    " Note: this volume prints no assembly district total for "
+                    + "; ".join(failures["bare"])
+                    + ", so only "
                     "election district rows whose columns add up to their printed whole number of votes are loaded, and no assembly district value is."
                 )
             if failures["fixed"]:
@@ -505,14 +633,18 @@ def emit():
                 )
             if failures["off"]:
                 left += (
-                    " Note: in " + "; ".join(failures["off"]) + ", the printed whole number of votes differs from its columns, "
+                    " Note: in "
+                    + "; ".join(failures["off"])
+                    + ", the printed whole number of votes differs from its columns, "
                     "which are loaded as printed because the assembly district's columns add up to its printed total."
                 )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=spec["note"] + left)
             ads: dict[str, object] = {}
             units: dict[str, object] = {}
             count = 0
-            for county, ad, ed, option, value, page in frame.select("county", "ad", "ed", "option", "value", "page").iter_rows():
+            for county, ad, ed, option, value, page in frame.select(
+                "county", "ad", "ed", "option", "value", "page"
+            ).iter_rows():
                 fips = "36005" if spec["bronx_in_new_york"] and county == "New York" and ad >= 31 else COUNTY[county]
                 ad_code = f"{fips}:{ad:02d}"
                 if ad_code not in ads:
@@ -552,7 +684,14 @@ def emit():
                                 valid_to=day + timedelta(days=1),
                             )
                     unit = units[code]
-                fact = {"result_set_id": result_set, "unit_id": unit, "option_id": options[option], "channel": 0, "measure": 1, "count_round": 0}
+                fact = {
+                    "result_set_id": result_set,
+                    "unit_id": unit,
+                    "option_id": options[option],
+                    "channel": 0,
+                    "measure": 1,
+                    "count_round": 0,
+                }
                 cs.add("result_value", **fact, flags=0, value=value)
                 page_id, width, height = pages[page]
                 cs.add("value_locator", **fact, page_id=page_id, source_id=None, x0=0, y0=0, x1=width, y1=height)

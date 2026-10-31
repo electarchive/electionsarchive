@@ -19,7 +19,9 @@ FIPS = "48"
 FILE = re.compile(
     r"/docs/default-source/elections/results-archive/(?P<month>[a-z]+)-(?P<day>\d+)-(?P<year>\d{4})-(?P<rest>[^/?\"]*combined[^/?\"]*accumulated[^/?\"]*)\.(?P<ext>pdf|htm|txt)"
 )
-ENTITY = re.compile(r"(?i)\b(?:city|town|village) of\b|\bISD\b|\bschool district\b|\bcollege\b|\bdistrict\b|\bMUD\b|\btownship\b")
+ENTITY = re.compile(
+    r"(?i)\b(?:city|town|village) of\b|\bISD\b|\bschool district\b|\bcollege\b|\bdistrict\b|\bMUD\b|\btownship\b"
+)
 PAIR = re.compile(r"(?<![\d,.])([\d,]+)\s+([\d.]+)\s?%")
 
 
@@ -119,8 +121,20 @@ def gems(text: str) -> Iterator[dict[str, Any]]:
         for column in columns:
             node: dict[str, Any] | None = None
             for index, line in enumerate(column):
-                if line[:1].strip() and not line.startswith(("Registered", "Summary", "General", "Early", "Election", "Collin", "Combined")) and index + 1 < len(column) and column[index + 1].strip().startswith("Total"):
-                    node = {"text": re.sub(r"\s+\(\d+\)\s*$", "", line.strip()), "vote_for": 1, "choices": [], "cast": None}
+                if (
+                    line[:1].strip()
+                    and not line.startswith(
+                        ("Registered", "Summary", "General", "Early", "Election", "Collin", "Combined")
+                    )
+                    and index + 1 < len(column)
+                    and column[index + 1].strip().startswith("Total")
+                ):
+                    node = {
+                        "text": re.sub(r"\s+\(\d+\)\s*$", "", line.strip()),
+                        "vote_for": 1,
+                        "choices": [],
+                        "cast": None,
+                    }
                     continue
                 if node is None:
                     continue
@@ -137,7 +151,9 @@ def gems(text: str) -> Iterator[dict[str, Any]]:
                     pair = PAIR.search(line)
                     if pair:
                         name = re.sub(r"\s+", " ", line[: pair.start()]).strip()
-                        node["choices"].append({"text": name, "party": None, "total": pair[1].replace(",", ""), "places": []})
+                        node["choices"].append(
+                            {"text": name, "party": None, "total": pair[1].replace(",", ""), "places": []}
+                        )
             if node is not None and node["choices"]:
                 yield node
 
@@ -179,8 +195,14 @@ def tables(text: str) -> Iterator[dict[str, Any]]:
                 node["vote_for"] = int(value)
             if label == "Total Votes" and value.isdigit():
                 node["cast"] = int(value)
-        while index + 2 < len(cells) and re.fullmatch(r"[\d,]+", cells[index + 1]) and re.fullmatch(r"[\d.]+\s*%", cells[index + 2]):
-            node["choices"].append({"text": cells[index], "party": None, "total": cells[index + 1].replace(",", ""), "places": []})
+        while (
+            index + 2 < len(cells)
+            and re.fullmatch(r"[\d,]+", cells[index + 1])
+            and re.fullmatch(r"[\d.]+\s*%", cells[index + 2])
+        ):
+            node["choices"].append(
+                {"text": cells[index], "party": None, "total": cells[index + 1].replace(",", ""), "places": []}
+            )
             index += 3
         if node["choices"]:
             yield node
@@ -193,7 +215,10 @@ def old(text: str) -> Iterator[dict[str, Any]]:
     node: dict[str, Any] | None = None
     for line in text.splitlines():
         stripped = line.strip()
-        if not stripped or re.match(r"(?i)ACCUMULATED TOTALS|Accumulated Report|\d\d:\d\d:\d\d|COLLIN COUNTY, TEXAS|Total\s+Pct|Precincts Counted|Registered Voters|Ballots Cast|BALLOTS CAST|Combined Election|Page ", stripped):
+        if not stripped or re.match(
+            r"(?i)ACCUMULATED TOTALS|Accumulated Report|\d\d:\d\d:\d\d|COLLIN COUNTY, TEXAS|Total\s+Pct|Precincts Counted|Registered Voters|Ballots Cast|BALLOTS CAST|Combined Election|Page ",
+            stripped,
+        ):
             continue
         if line[:1].strip():
             if re.match(r"(?i)vote for", stripped):
@@ -212,7 +237,12 @@ def old(text: str) -> Iterator[dict[str, Any]]:
                 if node is None or node["choices"] == [] and node["text"]:
                     entity = stripped
                 title = stripped
-            node = {"text": f"{title}, {entity}" if entity and entity not in title else title, "vote_for": 1, "choices": [], "cast": None}
+            node = {
+                "text": f"{title}, {entity}" if entity and entity not in title else title,
+                "vote_for": 1,
+                "choices": [],
+                "cast": None,
+            }
             continue
         if node is None:
             continue
@@ -234,10 +264,14 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         for day, rest, link, suffix in files():
             path = raw.cached(SOURCE, link).path
             if suffix == ".pdf":
-                text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode(
-                    errors="replace"
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True
+                ).stdout.decode(errors="replace")
+                parser = (
+                    electionware
+                    if "Electionware" in text or "Vote For" in text[:6000] and "Summary Results Report" in text[:300]
+                    else gems
                 )
-                parser = electionware if "Electionware" in text or "Vote For" in text[:6000] and "Summary Results Report" in text[:300] else gems
             else:
                 text = path.read_bytes().decode("latin-1")
                 parser = tables if "Number of Precincts" in text else old

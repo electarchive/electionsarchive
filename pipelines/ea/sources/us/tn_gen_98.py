@@ -56,7 +56,19 @@ def page_png(page: int) -> Path:
     if not target.exists():
         PAGES.mkdir(parents=True, exist_ok=True)
         subprocess.run(
-            ["pdftoppm", "-r", "300", "-f", str(page), "-l", str(page), "-png", "-singlefile", str(artifact.path), str(target.with_suffix(""))],
+            [
+                "pdftoppm",
+                "-r",
+                "300",
+                "-f",
+                str(page),
+                "-l",
+                str(page),
+                "-png",
+                "-singlefile",
+                str(artifact.path),
+                str(target.with_suffix("")),
+            ],
             check=True,
         )
     return target
@@ -71,7 +83,9 @@ def number(text: str) -> int | None:
 
 def words(image: Path) -> list[tuple[int, int, int, int, str]]:
     with tempfile.TemporaryDirectory() as folder:
-        subprocess.run(["tesseract", str(image), str(Path(folder) / "o"), "--psm", "6", "tsv"], capture_output=True, check=True)
+        subprocess.run(
+            ["tesseract", str(image), str(Path(folder) / "o"), "--psm", "6", "tsv"], capture_output=True, check=True
+        )
         with (Path(folder) / "o.tsv").open() as handle:
             return [
                 (int(r["left"]), int(r["top"]), int(r["width"]), int(r["height"]), r["text"].strip())
@@ -87,7 +101,10 @@ def reread(image: Path, word: tuple[int, int, int, int, str]) -> int:
         target = Path(folder) / "c.png"
         crop.save(target)
         out = subprocess.run(
-            ["tesseract", str(target), "-", "--psm", "8", "-c", "tessedit_char_whitelist=0123456789,"], capture_output=True, text=True
+            ["tesseract", str(target), "-", "--psm", "8", "-c", "tessedit_char_whitelist=0123456789,"],
+            capture_output=True,
+            text=True,
+            check=False,
         ).stdout.strip()
     return int(out.replace(",", "")) if NUMBER.fullmatch(out) else 0
 
@@ -116,9 +133,13 @@ def parse() -> None:
         merged: list[list[tuple[int, int, int, int, str]]] = []
         for line in lines:
             labeled = any(re.fullmatch(r"[A-Z][A-Z .'-]+", w[4]) and w[0] < 400 for w in line)
-            if merged and not any(number(w[4]) is not None for w in merged[-1]) and any(
-                re.fullmatch(r"[A-Z]{3,}", w[4]) and w[0] < 400 for w in merged[-1]
-            ) and not labeled and any(number(w[4]) is not None for w in line):
+            if (
+                merged
+                and not any(number(w[4]) is not None for w in merged[-1])
+                and any(re.fullmatch(r"[A-Z]{3,}", w[4]) and w[0] < 400 for w in merged[-1])
+                and not labeled
+                and any(number(w[4]) is not None for w in line)
+            ):
                 merged[-1] = merged[-1] + line
             else:
                 merged.append(line)
@@ -141,7 +162,9 @@ def parse() -> None:
             elif "DISTRICT TOTAL" in text:
                 printed = [
                     OVERRIDES.get((district, "TOTAL", c), number(w[4]) or (reread(image, w) if c == 5 else 0))
-                    for c, w in enumerate(w for w in line if centers[0] - 120 < w[0] < centers[5] + 150 and w[4] not in {"|", ":", ";"})
+                    for c, w in enumerate(
+                        w for w in line if centers[0] - 120 < w[0] < centers[5] + 150 and w[4] not in {"|", ":", ";"}
+                    )
                 ]
                 sums = [sum(int(r["votes"]) for r in block if r["column"] == c) for c in range(6)]
                 if len(printed) != 6 or sums != printed:
@@ -150,7 +173,12 @@ def parse() -> None:
                     print([(r["label"], r["column"], r["votes"]) for r in block if r["column"] in {0, 5}])
                 rows.extend(block)
                 block = []
-            elif centers and "CANDIDATES" not in text and not re.search(r"\bRDA\b|\bForm\b", text) and re.match(r"^\W{0,3}[A-Z][A-Z .'-]+", text):
+            elif (
+                centers
+                and "CANDIDATES" not in text
+                and not re.search(r"\bRDA\b|\bForm\b", text)
+                and re.match(r"^\W{0,3}[A-Z][A-Z .'-]+", text)
+            ):
                 label = "".join(w[4] for w in line if w[0] < centers[0] - 120 and re.search(r"[A-Za-z]", w[4]))
                 label = re.sub(r"[^a-z]", "", label.lower())
                 if label not in codes and (close := difflib.get_close_matches(label, codes, 1, 0.75)):
@@ -166,11 +194,25 @@ def parse() -> None:
                     value = number(word[4])
                     if value is None and column == 5:
                         value = reread(image, word)
-                    cells.setdefault(column, (OVERRIDES.get((district, label, column), value or 0), (word[0], word[1], right, word[1] + word[3])))
+                    cells.setdefault(
+                        column,
+                        (
+                            OVERRIDES.get((district, label, column), value or 0),
+                            (word[0], word[1], right, word[1] + word[3]),
+                        ),
+                    )
                 for column in range(6):
                     value, box = cells.get(column, (OVERRIDES.get((district, label, column), 0), (0, 0, 0, 0)))
                     block.append(
-                        {"district": district, "county": codes[label], "label": label, "column": column, "votes": value, "page": page, "box": list(box)}
+                        {
+                            "district": district,
+                            "county": codes[label],
+                            "label": label,
+                            "column": column,
+                            "votes": value,
+                            "page": page,
+                            "box": list(box),
+                        }
                     )
     if failed:
         raise ValueError("district sums differ from the printed totals")
@@ -185,7 +227,15 @@ def emit() -> Path:
         cs = Changeset(conn, pipeline=SOURCE, version=VERSION, summary=SUMMARY, polity="US")
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         artifact = cs.artifact(raw.cached(SOURCE, URL), source)
         pages: dict[int, tuple[object, int, int]] = {}
         for number_ in (1, 2, 3):
@@ -203,9 +253,21 @@ def emit() -> Path:
                 width=width,
                 height=height,
             )
-        units = dict(conn.execute("select code, id from reporting_unit where scheme_code = 'us.county' and code like '47%%'").fetchall())
-        areas = dict(conn.execute("select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '47%%'").fetchall())
-        contests = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':TN:house:'"))
+        units = dict(
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.county' and code like '47%%'"
+            ).fetchall()
+        )
+        areas = dict(
+            conn.execute(
+                "select code, area_id from reporting_unit where scheme_code = 'us.county' and code like '47%%'"
+            ).fetchall()
+        )
+        contests = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':TN:house:'"
+            )
+        )
         for (district,), rows in frame.group_by("district", maintain_order=True):
             key = f"{DAY}:TN:house:{district}"
             contest = contests.get(key)
@@ -240,7 +302,9 @@ def emit() -> Path:
             for column, total in totals.items():
                 if total == 0:
                     continue
-                found = [option for option, _, _, value in roots if int(value) == total and option not in targets.values()]
+                found = [
+                    option for option, _, _, value in roots if int(value) == total and option not in targets.values()
+                ]
                 if len(found) == 1:
                     targets[column] = found[0]
                 elif column == 5 and len(writein) == 1:
@@ -252,7 +316,24 @@ def emit() -> Path:
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
                 "result_set",
-                **dict(zip(("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id"), row, strict=True)),
+                **dict(
+                    zip(
+                        (
+                            "id",
+                            "election_id",
+                            "contest_id",
+                            "stage",
+                            "kind",
+                            "status",
+                            "source_id",
+                            "as_of",
+                            "completeness",
+                            "supersedes_id",
+                        ),
+                        row,
+                        strict=True,
+                    )
+                ),
                 is_default=False,
             )
             cs.add(
@@ -269,9 +350,13 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
-            for option, kind, seats in conn.execute("select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]).fetchall():
+            for option, kind, seats in conn.execute(
+                "select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]
+            ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
-            ((district_area,),) = conn.execute("select district_area_id from contest where id = %s", [contest]).fetchall()
+            ((district_area,),) = conn.execute(
+                "select district_area_id from contest where id = %s", [contest]
+            ).fetchall()
             unit_ids = dict(units)
             for code in rows["county"].unique():
                 if frame.filter(pl.col("county") == code)["district"].n_unique() < 2:
@@ -292,8 +377,16 @@ def emit() -> Path:
                         valid_from=DAY,
                         valid_to=DAY + timedelta(days=1),
                     )
-                    cs.add("reporting_unit_area", unit_id=unit_ids[code], area_id=district_area, valid_from=DAY, valid_to=DAY + timedelta(days=1))
-            for county, column, votes, number_, box in rows.select("county", "column", "votes", "page", "box").iter_rows():
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=unit_ids[code],
+                        area_id=district_area,
+                        valid_from=DAY,
+                        valid_to=DAY + timedelta(days=1),
+                    )
+            for county, column, votes, number_, box in rows.select(
+                "county", "column", "votes", "page", "box"
+            ).iter_rows():
                 if column not in targets:
                     continue
                 fact = {
@@ -306,5 +399,14 @@ def emit() -> Path:
                 }
                 cs.add("result_value", **fact, flags=house_books.DIGITIZED, value=votes)
                 page, width, height = pages[number_]
-                cs.add("value_locator", **fact, page_id=page, source_id=None, x0=box[0] / width, y0=box[1] / height, x1=box[2] / width, y1=box[3] / height)
+                cs.add(
+                    "value_locator",
+                    **fact,
+                    page_id=page,
+                    source_id=None,
+                    x0=box[0] / width,
+                    y0=box[1] / height,
+                    x1=box[2] / width,
+                    y1=box[3] / height,
+                )
         return cs.write()

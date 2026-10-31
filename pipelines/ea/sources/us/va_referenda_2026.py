@@ -25,17 +25,19 @@ def fetch() -> None:
     try:
         raw.cached(SOURCE, URL)
     except LookupError:
-        content = subprocess.run(["curl", "-sSL", "-m", "60", "-A", "Mozilla/5.0", URL], capture_output=True, check=True).stdout
+        content = subprocess.run(
+            ["curl", "-sSL", "-m", "60", "-A", "Mozilla/5.0", URL], capture_output=True, check=True
+        ).stdout
         raw.store(SOURCE, URL, content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
 
 
 def parse() -> None:
     page = raw.cached(SOURCE, URL).path.read_text()
     rows = []
-    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S):
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.DOTALL):
         cells = [
             re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
-            for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)
+            for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
         ]
         if len(cells) >= 6 and cells[3] in ("Locality", "District"):
             rows.append(
@@ -112,7 +114,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:VA:{code}:measure:{slug(label)}"
@@ -133,7 +142,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):

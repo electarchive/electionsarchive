@@ -20,7 +20,10 @@ SUMMARIES = {
     ),
     2004: ("https://dcboe.org/getmedia/ffa45adf-8210-4d5b-8160-4d1609feeaf0/Summary_2.pdf", ".pdf"),
     2006: ("https://dcboe.org/getmedia/77fd9c1b-bb65-473b-8c1c-4530af2e2f2f/Summary_General_2006.pdf", ".pdf"),
-    2008: ("https://dcboe.org/getmedia/a484dffd-ad98-4063-a951-5787e9cb5f85/General_08_Certified_Results_Summary_1.pdf", ".pdf"),
+    2008: (
+        "https://dcboe.org/getmedia/a484dffd-ad98-4063-a951-5787e9cb5f85/General_08_Certified_Results_Summary_1.pdf",
+        ".pdf",
+    ),
 }
 
 
@@ -38,7 +41,9 @@ def parse() -> None:
             registered = int(re.search(r"REGISTERED VOTERS - TOTAL[ .]*([\d,]+)", text)[1].replace(",", ""))
             voters = int(re.search(r"BALLOTS CAST - TOTAL[ .]*([\d,]+)", text)[1].replace(",", ""))
         else:
-            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+            ).stdout
             if year == 2004:
                 registered = int(re.search(r"Total Registration\s+([\d,]+)", text)[1].replace(",", ""))
                 voters = int(re.search(r"Total Ballots Cast\s+([\d,]+)", text)[1].replace(",", ""))
@@ -85,7 +90,15 @@ def emit() -> Path:
             title = f"Certified summary report, {year} general election"
             source = cs.source(PUBLISHER, title)
             if source in cs.minted:
-                cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
             cs.artifact(raw.cached(SOURCE, url), source)
             value_key, election_id = elections[year]
             result_set = cs.key(f"{SOURCE}.result_set", value_key)

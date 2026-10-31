@@ -80,7 +80,9 @@ def parse() -> None:
                 if sum(votes) in totals:
                     found.add(tuple(votes))
             if len(found) != 1 or (len(totals) == 2 and sum(next(iter(found))) not in totals):
-                print(f"{key} {name}: {len(found)} readings match the printed total {totals}; differing cells {differing}")
+                print(
+                    f"{key} {name}: {len(found)} readings match the printed total {totals}; differing cells {differing}"
+                )
                 continue
             if len(totals) == 2:
                 print(f"{key} {name}: the reads print totals {totals}; kept the one the counties sum to")

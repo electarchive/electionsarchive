@@ -42,16 +42,44 @@ PAGES = {
     },
 }
 TOWN_PAGES = [
-    ("barrington", "sumbarr"), ("bristol", "sumbris"), ("burrillville", "sumburr"), ("central falls", "sumcen"),
-    ("charlestown", "sumchar"), ("coventry", "sumcov"), ("cranston", "sumcran"), ("cumberland", "sumcumb"),
-    ("east greenwich", "sumegreen"), ("east providence", "sumep"), ("exeter", "sumext"), ("foster", "sumfos"),
-    ("glocester", "sumgloc"), ("hopkinton", "sumhop"), ("jamestown", "sumjames"), ("johnston", "sumjohn"),
-    ("lincoln", "sumlin"), ("little compton", "sumlcom"), ("middletown", "summid"), ("narragansett", "sumnarr"),
-    ("new shoreham", "sumnshore"), ("newport", "sumnewp"), ("north kingstown", "sumnking"),
-    ("north providence", "sumnprov"), ("north smithfield", "sumnsmith"), ("pawtucket", "sumpaw"),
-    ("portsmouth", "sumport"), ("providence", "sumprov"), ("richmond", "sumrich"), ("scituate", "sumscit"),
-    ("smithfield", "sumsmith"), ("south kingstown", "sumsking"), ("tiverton", "sumtiv"), ("warren", "sumwarr"),
-    ("warwick", "sumwarw"), ("west greenwich", "sumwgreen"), ("west warwick", "sumwwar"), ("westerly", "sumwest"),
+    ("barrington", "sumbarr"),
+    ("bristol", "sumbris"),
+    ("burrillville", "sumburr"),
+    ("central falls", "sumcen"),
+    ("charlestown", "sumchar"),
+    ("coventry", "sumcov"),
+    ("cranston", "sumcran"),
+    ("cumberland", "sumcumb"),
+    ("east greenwich", "sumegreen"),
+    ("east providence", "sumep"),
+    ("exeter", "sumext"),
+    ("foster", "sumfos"),
+    ("glocester", "sumgloc"),
+    ("hopkinton", "sumhop"),
+    ("jamestown", "sumjames"),
+    ("johnston", "sumjohn"),
+    ("lincoln", "sumlin"),
+    ("little compton", "sumlcom"),
+    ("middletown", "summid"),
+    ("narragansett", "sumnarr"),
+    ("new shoreham", "sumnshore"),
+    ("newport", "sumnewp"),
+    ("north kingstown", "sumnking"),
+    ("north providence", "sumnprov"),
+    ("north smithfield", "sumnsmith"),
+    ("pawtucket", "sumpaw"),
+    ("portsmouth", "sumport"),
+    ("providence", "sumprov"),
+    ("richmond", "sumrich"),
+    ("scituate", "sumscit"),
+    ("smithfield", "sumsmith"),
+    ("south kingstown", "sumsking"),
+    ("tiverton", "sumtiv"),
+    ("warren", "sumwarr"),
+    ("warwick", "sumwarw"),
+    ("west greenwich", "sumwgreen"),
+    ("west warwick", "sumwwar"),
+    ("westerly", "sumwest"),
     ("woonsocket", "sumwoon"),
 ]
 PAGES_2006 = "2006/generalelection/{}.php"
@@ -90,8 +118,11 @@ METHOD = (
 def cells(page: str) -> list[list[str]]:
     text = raw.cached(SOURCE, BASE + page).path.read_text(errors="replace")
     table = []
-    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, re.S | re.I):
-        values = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip() for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S | re.I)]
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, re.DOTALL | re.IGNORECASE):
+        values = [
+            re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL | re.IGNORECASE)
+        ]
         if values := [value for value in values if value]:
             table.append(values)
     return table
@@ -100,7 +131,9 @@ def cells(page: str) -> list[list[str]]:
 def person(label: str, party: str | None = None) -> tuple[str, str]:
     label = label.strip(" ,")
     if party is None:
-        match = re.search(r"[\s,(]+\(?(REP|DEM|GRE|GRN|REF|LIB|IND|MOD|CM|COO|Rep|Dem|Gre|Grn|Ref|Lib|Ind|Mod|Coo)\.?\)?$", label)
+        match = re.search(
+            r"[\s,(]+\(?(REP|DEM|GRE|GRN|REF|LIB|IND|MOD|CM|COO|Rep|Dem|Gre|Grn|Ref|Lib|Ind|Mod|Coo)\.?\)?$", label
+        )
         if match is None:
             raise ValueError(f"no party in {label!r}")
         party, label = match[1], label[: match.start()]
@@ -126,9 +159,7 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    county = {
-        re.sub(r"[^a-z]", "", town.lower()): code for code, towns in canvass.TOWNS.items() for town in towns
-    }
+    county = {re.sub(r"[^a-z]", "", town.lower()): code for code, towns in canvass.TOWNS.items() for town in towns}
     if len(county) != 39:
         raise ValueError(f"{len(county)} towns")
     rows: list[tuple[str, str, str, str, str, int]] = []
@@ -141,12 +172,15 @@ def parse() -> None:
                 start += 1
                 heads = table[start]
             names = [person(head) for head in heads]
-            body = [row for row in table[start + 1 :] if re.fullmatch(r"[A-Z .']+", row[0]) or row[0].startswith("STATE TOTAL")]
+            body = [
+                row
+                for row in table[start + 1 :]
+                if re.fullmatch(r"[A-Z .']+", row[0]) or row[0].startswith("STATE TOTAL")
+            ]
             per = len(names) // len(offices)
             totals = next(row for row in body if row[0].startswith("STATE TOTAL"))
             totals = [int(value.replace(",", "")) for value in totals[1:]]
             seen = set()
-            sums: dict[tuple[str, str], int] = {}
             for row in body:
                 if row[0].startswith("STATE TOTAL"):
                     continue
@@ -160,7 +194,9 @@ def parse() -> None:
             if len(seen) != 39:
                 raise ValueError(f"{page}: {len(seen)} towns")
             for index, (name, party) in enumerate(names):
-                summed = sum(row[5] for row in rows if row[0] == day and row[1] == offices[index // per] and row[2] == name)
+                summed = sum(
+                    row[5] for row in rows if row[0] == day and row[1] == offices[index // per] and row[2] == name
+                )
                 if summed != totals[index]:
                     raise ValueError(f"{page} {name}: towns sum to {summed}, printed {totals[index]}")
     day = "2006-11-07"
@@ -170,7 +206,9 @@ def parse() -> None:
         if line[0] in OFFICES_2006:
             heading = OFFICES_2006[line[0]]
         elif heading and len(line) == 5 and line[0] != "Candidate":
-            statewide[(heading, re.sub(r"\s+", " ", line[0]).upper())] = int(line[4].split("-")[0].replace(",", "").strip())
+            statewide[(heading, re.sub(r"\s+", " ", line[0]).upper())] = int(
+                line[4].split("-")[0].replace(",", "").strip()
+            )
         elif len(line) == 1 and line[0] not in OFFICES_2006:
             heading = None
     for (town, _), (_, page) in zip(((t, p) for t, p in TOWN_PAGES), TOWN_PAGES, strict=True):
@@ -182,7 +220,16 @@ def parse() -> None:
                 heading = None
             elif heading and len(line) == 5 and line[0] != "Candidate":
                 name, party = person(line[0], line[1])
-                rows.append((day, heading, name, party, county[re.sub(r"[^a-z]", "", town)], int(line[4].split("-")[0].replace(",", "").strip())))
+                rows.append(
+                    (
+                        day,
+                        heading,
+                        name,
+                        party,
+                        county[re.sub(r"[^a-z]", "", town)],
+                        int(line[4].split("-")[0].replace(",", "").strip()),
+                    )
+                )
     for (office, name), total in statewide.items():
         summed = sum(row[5] for row in rows if row[0] == day and row[1] == office and row[2] == name)
         if summed != total:
@@ -191,7 +238,16 @@ def parse() -> None:
         raise ValueError("no 2006 statewide offices")
     swapped = {"JOHN M. CARLEVALE": "GREEN", "CHARLES J. FOGARTY": "DEMOCRATIC"}
     rows = [
-        (row[0], row[1], row[2], swapped[row[2]] if row[0] == "1998-11-03" and row[1] == "Lieutenant Governor" and row[2] in swapped else row[3], row[4], row[5])
+        (
+            row[0],
+            row[1],
+            row[2],
+            swapped[row[2]]
+            if row[0] == "1998-11-03" and row[1] == "Lieutenant Governor" and row[2] in swapped
+            else row[3],
+            row[4],
+            row[5],
+        )
         for row in rows
     ]
     frame = (
@@ -224,7 +280,12 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.lit(5),
     ).write_parquet(PARSED / "races.parquet")
-    print(frame.group_by("year", "title", "candidate", "party").agg(pl.col("votes").sum()).sort("year", "title", "votes").rows())
+    print(
+        frame.group_by("year", "title", "candidate", "party")
+        .agg(pl.col("votes").sum())
+        .sort("year", "title", "votes")
+        .rows()
+    )
 
 
 def emit() -> Path:

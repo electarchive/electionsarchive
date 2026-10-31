@@ -212,7 +212,9 @@ CONTESTS: list[tuple[str, str, str, str, str | None, str, str, bool, str | None]
         None,
     ),
 ]
-TITLES = re.compile(r"^(REP|DEM|School Board Director|State Representative|State Senator|Representative|Senator|Sen\.|Rep\.)\s+")
+TITLES = re.compile(
+    r"^(REP|DEM|School Board Director|State Representative|State Senator|Representative|Senator|Sen\.|Rep\.)\s+"
+)
 
 
 def fetch() -> None:
@@ -419,7 +421,16 @@ def emit() -> Path:
                     totals[choice["ChoiceID"]] += choice.get("TotalVotes", 0)
                     total += choice.get("TotalVotes", 0)
                     rows.append(
-                        (str(result), str(unit), str(options[choice["ChoiceID"]]), 0, 1, 0, 0, choice.get("TotalVotes", 0))
+                        (
+                            str(result),
+                            str(unit),
+                            str(options[choice["ChoiceID"]]),
+                            0,
+                            1,
+                            0,
+                            0,
+                            choice.get("TotalVotes", 0),
+                        )
                     )
                 rows.append((str(result), str(unit), None, 0, 4, 0, 0, total))
             stated = {choice["ChoiceID"]: choice.get("TotalVotes", 0) for choice in body["Choices"]}

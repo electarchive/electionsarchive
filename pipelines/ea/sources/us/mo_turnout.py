@@ -54,7 +54,10 @@ def parse() -> None:
     rows = []
     for day, file in FILES.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, SITE + file).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, SITE + file).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         text = re.sub(r"(?i)(ST\.? LOUIS)\s*\n\s*(COUNTY)", r"\1 \2", text)
         text = re.sub(r"(?i)(CAPE)\s*\n\s*(GIRARDEAU)", r"\1 \2", text)

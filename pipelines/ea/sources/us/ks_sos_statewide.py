@@ -47,7 +47,9 @@ def parse() -> None:
         }
     rows = []
     for year in (1990, 1998):
-        with zipfile.ZipFile(io.BytesIO(raw.cached(ks_sos_1988.SOURCE, ks_sos_1988.url(year)).path.read_bytes())) as archive:
+        with zipfile.ZipFile(
+            io.BytesIO(raw.cached(ks_sos_1988.SOURCE, ks_sos_1988.url(year)).path.read_bytes())
+        ) as archive:
             book = fastexcel.read_excel(archive.read(archive.namelist()[0]))
         grid = book.load_sheet_by_name("Statewide", header_row=None).to_polars().rows()
         columns = []

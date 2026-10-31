@@ -23,7 +23,13 @@ OFFICES = {
     "Auditor of State": "Auditor",
     "Commissioner of State Lands": "Commissioner of State Lands",
 }
-PARTIES = {"Democrat": "DEMOCRATIC", "Republican": "REPUBLICAN", "Independent": "INDEPENDENT", "Green": "GREEN", "Libertarian": "LIBERTARIAN"}
+PARTIES = {
+    "Democrat": "DEMOCRATIC",
+    "Republican": "REPUBLICAN",
+    "Independent": "INDEPENDENT",
+    "Green": "GREEN",
+    "Libertarian": "LIBERTARIAN",
+}
 TITLES = r"^(?:Lt\. Governor|Governor|Land Commissioner|Auditor|Representative|Rep\.|Mayor|Senator|Sen\.|Congressman|Attorney General|Judge|Justice|Secretary of State|State Treasurer|Treasurer|State Representative|State Rep\.|Commissioner)\s+"
 METHOD = (
     "County totals come from the Secretary of State's abstract of votes cast at the 2002 general election, "
@@ -48,7 +54,9 @@ def parse() -> None:
         ["pdftotext", "-layout", str(raw.cached(SOURCE, URL).path), "-"], capture_output=True, text=True, check=True
     ).stdout
     header = re.compile(r"^(" + "|".join(OFFICES) + r")(?: \((.+?) County\))?\s*$")
-    candidate = re.compile(r"^(.+?) - (Democrat|Republican|Write-In|Independent|Green|Libertarian)\s+([\d,]+)\s+[\d.]+%\s*$")
+    candidate = re.compile(
+        r"^(.+?) - (Democrat|Republican|Write-In|Independent|Green|Libertarian)\s+([\d,]+)\s+[\d.]+%\s*$"
+    )
     office = county = None
     statewide: dict[tuple[str, str, str], int] = {}
     counties: dict[tuple[str, str, str, str], int] = {}
@@ -81,25 +89,43 @@ def parse() -> None:
             raise ValueError(f"{key}: {found} counties sum to {summed}, statewide {total}")
     if {key for key in (tuple(rest) for (*rest, _) in counties)} != set(statewide):
         raise ValueError("county sections and statewide section name different candidates")
-    frame = pl.DataFrame(rows, schema=["title", "county", "candidate", "party", "votes"], orient="row").select(
-        year=pl.lit(2002, pl.Int32),
-        day=pl.lit("2002-11-05"),
-        state=pl.lit("AR"),
-        title="title",
-        post=pl.lit(None, pl.String),
-        special=pl.lit(False),
-        magnitude=pl.lit(1, pl.Int16),
-        kind=pl.lit("county"),
-        code=pl.lit("county"),
-        county="county",
-        candidate=pl.when(pl.col("party") == "Write-In").then(pl.lit("WRITE-INS")).otherwise("candidate"),
-        party=pl.col("party").replace_strict(PARTIES, default=None),
-        writein=pl.col("party") == "Write-In",
-        measure=pl.lit(1, pl.Int16),
-        votes=pl.col("votes").cast(pl.Int64),
-    ).group_by(
-        "year", "day", "state", "title", "post", "special", "magnitude", "kind", "code", "county", "candidate", "party", "writein", "measure"
-    ).agg(pl.col("votes").sum())
+    frame = (
+        pl.DataFrame(rows, schema=["title", "county", "candidate", "party", "votes"], orient="row")
+        .select(
+            year=pl.lit(2002, pl.Int32),
+            day=pl.lit("2002-11-05"),
+            state=pl.lit("AR"),
+            title="title",
+            post=pl.lit(None, pl.String),
+            special=pl.lit(False),
+            magnitude=pl.lit(1, pl.Int16),
+            kind=pl.lit("county"),
+            code=pl.lit("county"),
+            county="county",
+            candidate=pl.when(pl.col("party") == "Write-In").then(pl.lit("WRITE-INS")).otherwise("candidate"),
+            party=pl.col("party").replace_strict(PARTIES, default=None),
+            writein=pl.col("party") == "Write-In",
+            measure=pl.lit(1, pl.Int16),
+            votes=pl.col("votes").cast(pl.Int64),
+        )
+        .group_by(
+            "year",
+            "day",
+            "state",
+            "title",
+            "post",
+            "special",
+            "magnitude",
+            "kind",
+            "code",
+            "county",
+            "candidate",
+            "party",
+            "writein",
+            "measure",
+        )
+        .agg(pl.col("votes").sum())
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "returns.parquet")
     frame.group_by(["year", "day", "state", "title", "post", "special"], maintain_order=True).agg(

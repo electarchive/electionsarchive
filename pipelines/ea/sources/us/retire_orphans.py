@@ -79,7 +79,15 @@ def emit() -> Path:
                                          where n.entity_id = p.id and w.pipeline <> all(%s))
                          and not exists (select from external_id x join changeset w on w.id = x.changeset_id
                                          where x.entity_id = p.id and w.pipeline <> %s)""",
-                    [pipeline, candidacies, candidacies, os.environ.get("RETIRE_NAMES", ""), os.environ.get("RETIRE_NAMES", ""), [pipeline, "shorts", "identity"], pipeline],
+                    [
+                        pipeline,
+                        candidacies,
+                        candidacies,
+                        os.environ.get("RETIRE_NAMES", ""),
+                        os.environ.get("RETIRE_NAMES", ""),
+                        [pipeline, "shorts", "identity"],
+                        pipeline,
+                    ],
                 ).fetchall()
             ]
             for relation, column in references:

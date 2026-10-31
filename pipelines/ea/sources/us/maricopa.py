@@ -434,7 +434,9 @@ def parse() -> None:
                     if tail is not None
                     else body.title()
                 )
-            elif body.lower().startswith("write") or re.search(r"print name of write|not qualified", body, re.I):
+            elif body.lower().startswith("write") or re.search(
+                r"print name of write|not qualified", body, re.IGNORECASE
+            ):
                 body = "Write-in"
             elif "," in body:
                 last, _, first = body.partition(",")

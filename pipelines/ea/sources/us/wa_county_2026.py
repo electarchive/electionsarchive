@@ -10,7 +10,12 @@ SOURCE = "us.wa_county_2026"
 VERSION = "1"
 DAY = date(2026, 11, 3)
 MANUAL = DATA / "inbox" / "manual" / "MF-385"
-KING = ("King County Elections", "Certified results, August 4, 2026 primary", "https://kingcounty.gov/elections", "results.pdf")
+KING = (
+    "King County Elections",
+    "Certified results, August 4, 2026 primary",
+    "https://kingcounty.gov/elections",
+    "results.pdf",
+)
 PIERCE = (
     "Pierce County Auditor",
     "Final results, August 4, 2026 primary",
@@ -24,12 +29,47 @@ WHATCOM = (
     "11.03.26 Sample Ballot_202609231409027439.pdf",
 )
 CONTESTS = (
-    (KING, "53033", "Northeast Electoral District Judge Position 1", "judge-position-1", False, ("Jan Trasen", "Bianca Tse")),
+    (
+        KING,
+        "53033",
+        "Northeast Electoral District Judge Position 1",
+        "judge-position-1",
+        False,
+        ("Jan Trasen", "Bianca Tse"),
+    ),
     (KING, "5363000", "Council District 5", "council-district-5", True, ("Nilu Jenks", "Julie Kang")),
-    (KING, "5363000", "Municipal Court Judge Position 5", "municipal-court-judge-position-5", False, ("Gabe Rothstein", "Garmon Newsom")),
-    (PIERCE, "53053", "District Court Position 7", "district-court-position-7", False, ("Pam Nogueira", "Mike Sommerfeld")),
-    (WHATCOM, "53073", "District Court Judge Position 1", "district-court-judge-position-1", False, ("Angela Anderson",)),
-    (WHATCOM, "53073", "District Court Judge Position 2", "district-court-judge-position-2", False, ("Jonathan Rands",)),
+    (
+        KING,
+        "5363000",
+        "Municipal Court Judge Position 5",
+        "municipal-court-judge-position-5",
+        False,
+        ("Gabe Rothstein", "Garmon Newsom"),
+    ),
+    (
+        PIERCE,
+        "53053",
+        "District Court Position 7",
+        "district-court-position-7",
+        False,
+        ("Pam Nogueira", "Mike Sommerfeld"),
+    ),
+    (
+        WHATCOM,
+        "53073",
+        "District Court Judge Position 1",
+        "district-court-judge-position-1",
+        False,
+        ("Angela Anderson",),
+    ),
+    (
+        WHATCOM,
+        "53073",
+        "District Court Judge Position 2",
+        "district-court-judge-position-2",
+        False,
+        ("Jonathan Rands",),
+    ),
 )
 
 
@@ -62,17 +102,29 @@ def emit() -> Path:
         for (publisher, title, url, name), code, office_title, tail, remainder, people in CONTESTS:
             if url not in sources:
                 source = sources[url] = cs.source(publisher, title)
-                cs.add("source", id=source, kind="official_body", publisher=publisher, title=title, url=url, license="Public record")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
                 cs.artifact(raw.cached(SOURCE, url), source)
             source = sources[url]
             election = cs.key("us.election", f"{DAY}:WA:{code}")
             if election in cs.minted:
                 print("no election:", code)
                 continue
-            election_path = next(path for path, entity in slugs.items() if entity == election and path.endswith(f"/{DAY}-general"))
+            election_path = next(
+                path for path, entity in slugs.items() if entity == election and path.endswith(f"/{DAY}-general")
+            )
             polity_path = election_path.removesuffix(f"/{DAY}-general")
             polity = slugs[polity_path]
-            place = conn.execute("select text from name where entity_id = %s and is_preferred and lang = 'en'", [polity]).fetchone()[0]
+            place = conn.execute(
+                "select text from name where entity_id = %s and is_preferred and lang = 'en'", [polity]
+            ).fetchone()[0]
             area = conn.execute("select area_id from polity_territory where polity_id = %s", [polity]).fetchone()[0]
             full = f"{place} {office_title}"
             owner = cs.key("us.office", f"WA:{code}:{tail}")
@@ -98,7 +150,14 @@ def emit() -> Path:
                 default_result_kind="counted",
                 term="remainder" if remainder else "full",
             )
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {full} election", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {full} election",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             cs.add("citation", entity_id=contest, source_id=source, locator=None)

@@ -41,12 +41,7 @@ def tokens(rest: str, width: int | None = None) -> list[int | None]:
     if width is not None:
         merged: list[str] = []
         for part in parts:
-            if (
-                len(parts) > width
-                and merged
-                and re.fullmatch(r"\d{1,2}", merged[-1])
-                and re.fullmatch(r"\d{3}", part)
-            ):
+            if len(parts) > width and merged and re.fullmatch(r"\d{1,2}", merged[-1]) and re.fullmatch(r"\d{3}", part):
                 merged[-1] += part
             else:
                 merged.append(part)
@@ -104,7 +99,12 @@ def parse() -> None:
             ).fetchall():
                 held.setdefault(int(votes), []).append((key.split(":", 2)[2], label, kind))
             needed = {
-                office: {label for votes, rows in held.items() for o, label, kind in rows if o == office and kind == "candidate"}
+                office: {
+                    label
+                    for votes, rows in held.items()
+                    for o, label, kind in rows
+                    if o == office and kind == "candidate"
+                }
                 for office in {o for rows in held.values() for o, _, _ in rows}
             }
             got: dict[str, dict[str, dict[str, int]]] = {}

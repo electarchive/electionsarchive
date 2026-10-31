@@ -39,9 +39,12 @@ def parse() -> None:
     rows = []
     for page, title in PAGES.items():
         text = raw.cached(SOURCE, f"{BASE}{page}.htm").path.read_text(errors="ignore")
-        table = re.findall(r"<tr.*?</tr>", text, flags=re.S)
+        table = re.findall(r"<tr.*?</tr>", text, flags=re.DOTALL)
         grid = [
-            [" ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell)).split()) for cell in re.findall(r"<td.*?</td>", row, flags=re.S)]
+            [
+                " ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell)).split())
+                for cell in re.findall(r"<td.*?</td>", row, flags=re.DOTALL)
+            ]
             for row in table
         ]
         grid = [[cell for cell in row if cell] for row in grid]

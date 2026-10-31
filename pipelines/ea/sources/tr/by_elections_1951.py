@@ -28,9 +28,7 @@ def fetch() -> None:
 
 
 def emit() -> Path:
-    album = pl.read_parquet(raw.parsed("tr.tbmm_album") / "entries.parquet").filter(
-        pl.col("term") == 9
-    )
+    album = pl.read_parquet(raw.parsed("tr.tbmm_album") / "entries.parquet").filter(pl.col("term") == 9)
     affiliations = {
         (fold(province), fold(name.split()[-1])): parties[0]
         for province, name, parties in album.select("province", "name", "parties").iter_rows()
@@ -132,7 +130,9 @@ def emit() -> Path:
                 is_default=True,
                 completeness=0,
             )
-            cs.add("citation", entity_id=declared, source_id=album_source, locator={"province": PROVINCES[int(plate) - 1]})
+            cs.add(
+                "citation", entity_id=declared, source_id=album_source, locator={"province": PROVINCES[int(plate) - 1]}
+            )
             cs.add("citation", entity_id=declared, source_id=tesav, locator={"table": "16 Eylül 1951"})
             for (_, surname), (person, preferred) in winners.items():
                 owner = party(affiliations[(province, surname)], 1951)

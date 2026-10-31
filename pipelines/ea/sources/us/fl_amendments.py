@@ -21,12 +21,18 @@ BOOKLETS = {
     date(2018, 11, 6): "https://dos.fl.gov/media/699824/constitutional-amendments-2018-general-election-english.pdf",
     date(2020, 11, 3): "https://dos.fl.gov/media/704424/constitutional-amendments-2020-general-election-english.pdf",
     date(2022, 11, 8): "https://dos.fl.gov/media/705846/eng-2022-non-booklet-format-constitutional-amend-v20220824.pdf",
-    date(2024, 11, 5): "https://dos.fl.gov/media/708428/eng-2024-booklet-constitutional-amend-v20240930-final-for-publication.pdf",
+    date(
+        2024, 11, 5
+    ): "https://dos.fl.gov/media/708428/eng-2024-booklet-constitutional-amend-v20240930-final-for-publication.pdf",
 }
-HEADER = re.compile(r"(?m)^[ \t\f]*(?:(?:NO|No)\.[ \t]*(\d+)[ \t]*\n[ \t]*(?:CONSTITUTIONAL|Constitutional) (?:AMENDMENT|Amendment|REVISION|Revision)|(?:No)\.[ \t]*(\d+)[ \t]+Constitutional,? Amendment(?:,[^\n]*)?)[ \t]*$")
+HEADER = re.compile(
+    r"(?m)^[ \t\f]*(?:(?:NO|No)\.[ \t]*(\d+)[ \t]*\n[ \t]*(?:CONSTITUTIONAL|Constitutional) (?:AMENDMENT|Amendment|REVISION|Revision)|(?:No)\.[ \t]*(\d+)[ \t]+Constitutional,? Amendment(?:,[^\n]*)?)[ \t]*$"
+)
 TITLES = re.compile(r"(?mi)^[ \t]*(?:ballot title:?|title -)[ \t]*")
 SUMMARIES = re.compile(r"(?mi)^[ \t]*(?:ballot summary:?|summary)[ \t]*:?[ \t]*$")
-ENDS = re.compile(r"(?mi)^[ \t]*(?:full text:?|text|amendment text.*|financial and state budget impact statements?.*)[ \t]*$")
+ENDS = re.compile(
+    r"(?mi)^[ \t]*(?:full text:?|text|amendment text.*|financial and state budget impact statements?.*)[ \t]*$"
+)
 
 
 def fetch() -> None:

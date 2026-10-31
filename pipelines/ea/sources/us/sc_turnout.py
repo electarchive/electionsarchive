@@ -29,7 +29,9 @@ def fetch() -> None:
         pass
     response = httpx.get(URL, headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=60)
     response.raise_for_status()
-    raw.store(SOURCE, URL, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    raw.store(
+        SOURCE, URL, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+    )
 
 
 def parse() -> None:
@@ -97,7 +99,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         for year, stage, registered, voters in frame.select("year", "stage", "registered", "voters").iter_rows():
             found = elections.get((year, stage), [])

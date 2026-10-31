@@ -17,7 +17,12 @@ PARSED = DATA / "parsed" / SOURCE
 BASE = "https://elections.wi.gov/sites/default/files/documents/County%20by%20County%20Report%20-%202022%20Partisan%20Primary%20-%20"
 FILES = {"Representative%20in%20Congress": "house", "US%20Senator": "senate"}
 DAY = date(2022, 8, 9)
-PARTIES = {"Democratic": "democratic", "Republican": "republican", "Libertarian": "libertarian", "Constitution": "constitution"}
+PARTIES = {
+    "Democratic": "democratic",
+    "Republican": "republican",
+    "Libertarian": "libertarian",
+    "Constitution": "constitution",
+}
 PUBLISHER = "Wisconsin Elections Commission"
 TITLE = "County by County Report, 2022 Partisan Primary"
 NAMES = {
@@ -74,7 +79,9 @@ def parse() -> None:
                 ordered[-1].append(w)
                 last = w[1]
             ordered = [sorted(line) for line in ordered]
-            title = next((" ".join(w[4] for w in line) for line in ordered if line[0][4] in ("REPRESENTATIVE", "UNITED")), "")
+            title = next(
+                (" ".join(w[4] for w in line) for line in ordered if line[0][4] in ("REPRESENTATIVE", "UNITED")), ""
+            )
             found = re.match(r"(?:REPRESENTATIVE IN CONGRESS DISTRICT (\d+)|UNITED STATES SENATOR) - (\w+)", title)
             if found is None and carry is None:
                 continue
@@ -107,7 +114,11 @@ def parse() -> None:
                 centers = [(w[0] + w[2]) / 2 for w in first_row]
                 heads: list[list[tuple[float, float, str]]] = [[] for _ in centers]
                 for w in words:
-                    if top - 1 <= w[1] < counties_y - 1 and w[4] not in ("County", "Votes", "Cast") and w[0] > min(c for c in centers) - 60:
+                    if (
+                        top - 1 <= w[1] < counties_y - 1
+                        and w[4] not in ("County", "Votes", "Cast")
+                        and w[0] > min(c for c in centers) - 60
+                    ):
                         if w[4].isupper() and w[4] != "SCATTERING":
                             continue
                         c = (w[0] + w[2]) / 2

@@ -3,8 +3,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
-from scan3 import blocks
 from parsers import check, save
+from scan3 import blocks
 
 c, n = sys.argv[1], int(sys.argv[2])
 rows, bad, names = blocks(c, range(1, n + 1))

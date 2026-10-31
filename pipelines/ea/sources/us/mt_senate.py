@@ -10,7 +10,9 @@ VERSION = mt_house.VERSION
 PUBLISHER = mt_house.PUBLISHER
 TITLE = mt_house.TITLE
 LICENSE = mt_house.LICENSE
-SUMMARY = "Montana's U.S. Senate results by county from the Secretary of State's statewide canvass on the SRI microfiche"
+SUMMARY = (
+    "Montana's U.S. Senate results by county from the Secretary of State's statewide canvass on the SRI microfiche"
+)
 STATE = mt_house.STATE
 FIPS = mt_house.FIPS
 ITEMS = mt_house.ITEMS

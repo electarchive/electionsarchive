@@ -21,7 +21,9 @@ def emit() -> Path:
             polity="US",
             kind="correction",
         )
-        elections = [row[0] for row in conn.execute("select id from election where date_from < '1700-01-01'").fetchall()]
+        elections = [
+            row[0] for row in conn.execute("select id from election where date_from < '1700-01-01'").fetchall()
+        ]
         contests = [
             row[0]
             for row in conn.execute(

@@ -15,7 +15,9 @@ SOURCE = "us.sc_measures_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-TITLE = "Ordinance providing for the November 3, 2026 special sales and use tax referendum, third reading, July 21, 2026"
+TITLE = (
+    "Ordinance providing for the November 3, 2026 special sales and use tax referendum, third reading, July 21, 2026"
+)
 GREENVILLE = "https://www.greenvillecounty.org/Council/_Agenda//Meetings%20of%202026/County%20Council/2026.07.21/Transportation%20Tax%20CLEAN%20for%203rd%20R.pdf"
 COUNTIES = {"45045": ((GREENVILLE,), "Greenville County Council")}
 ROWS = [
@@ -25,7 +27,7 @@ ROWS = [
         "label": "Special Sales and Use Tax, Question 1",
         "url": "https://www.greenvillecounty.org/Council/_Agenda//Meetings%20of%202026/County%20Council/2026.07.21/Transportation%20Tax%20CLEAN%20for%203rd%20R.pdf",
         "answers": "Yes|No",
-        "wording": "I approve a special sales and use tax in the amount of one percent to be imposed in Greenville County for not more than eight (8) years, or until a total of $1,100,000,000 in resulting revenue has been collected, whichever occurs first. The sales tax proceeds will be used to fund the following projects: Project (1) For financing the costs of highways, roads, streets, bridges, and other transportation-related projects facilities, and drainage facilities related thereto. $990,000,000. Project (2) For financing the costs of mass transit systems operated by Greenville County or jointly operated by the County and other governmental entities. $33,000,000. Project (3) For financing the costs of greenbelts. $77,000,000."
+        "wording": "I approve a special sales and use tax in the amount of one percent to be imposed in Greenville County for not more than eight (8) years, or until a total of $1,100,000,000 in resulting revenue has been collected, whichever occurs first. The sales tax proceeds will be used to fund the following projects: Project (1) For financing the costs of highways, roads, streets, bridges, and other transportation-related projects facilities, and drainage facilities related thereto. $990,000,000. Project (2) For financing the costs of mass transit systems operated by Greenville County or jointly operated by the County and other governmental entities. $33,000,000. Project (3) For financing the costs of greenbelts. $77,000,000.",
     },
     {
         "county": "45045",
@@ -33,8 +35,8 @@ ROWS = [
         "label": "General Obligation Bonds, Question 2",
         "url": "https://www.greenvillecounty.org/Council/_Agenda//Meetings%20of%202026/County%20Council/2026.07.21/Transportation%20Tax%20CLEAN%20for%203rd%20R.pdf",
         "answers": "Yes|No",
-        "wording": "I approve the issuance of not exceeding $150,000,000 of general obligation bonds of Greenville County, payable from the special sales and use tax described in Question 1 above, maturing over a period not to exceed eight (8) years, to fund completion of projects from among the categories described in Question 1 above."
-    }
+        "wording": "I approve the issuance of not exceeding $150,000,000 of general obligation bonds of Greenville County, payable from the special sales and use tax described in Question 1 above, maturing over a period not to exceed eight (8) years, to fund completion of projects from among the categories described in Question 1 above.",
+    },
 ]
 
 
@@ -44,8 +46,12 @@ def fetch() -> None:
             try:
                 raw.cached(SOURCE, url)
             except LookupError:
-                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
-                raw.store(SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+                content = subprocess.run(
+                    ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                ).stdout
+                raw.store(
+                    SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+                )
 
 
 def parse() -> None:
@@ -94,7 +100,9 @@ def emit() -> Path:
                 option = f"special:{row['county']}:{entity}"
             elif county_key in found:
                 county, county_area, _, county_path, county_code = found[county_key]
-                minted = govmint.special(conn, cs, "SC", (county, county_area, county_path, county_code), entity, civil.slugs)
+                minted = govmint.special(
+                    conn, cs, "SC", (county, county_area, county_path, county_code), entity, civil.slugs
+                )
                 if minted is not None:
                     option = f"special:{row['county']}:{entity}"
                     found[option] = minted
@@ -117,7 +125,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:SC:{code}:measure:{slug(label)}"
@@ -138,7 +153,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(row["answers"].split("|")):

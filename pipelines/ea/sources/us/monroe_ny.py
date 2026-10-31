@@ -22,15 +22,23 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            body = subprocess.run(["curl", "-skL", "-m", "300", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+            body = subprocess.run(
+                ["curl", "-skL", "-m", "300", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+            ).stdout
             raw.store(SOURCE, url, body, suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type)
 
 
 def emit() -> Path:
     artifact = raw.cached(SOURCE, URL)
-    lines = subprocess.run(["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True).stdout.splitlines()
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(artifact.path), "-"], capture_output=True, check=True, text=True
+    ).stdout.splitlines()
     start = next(
-        index for index, line in enumerate(lines) if line.strip() == "25TH DISTRICT" and lines[index - 1].strip() == "REPRESENTATIVE IN CONGRESS" and "DETAIL" in lines[index + 1]
+        index
+        for index, line in enumerate(lines)
+        if line.strip() == "25TH DISTRICT"
+        and lines[index - 1].strip() == "REPRESENTATIVE IN CONGRESS"
+        and "DETAIL" in lines[index + 1]
     )
     end = next(index for index in range(start, len(lines)) if re.match(r"\s*STATE SENATOR", lines[index]))
     rows: dict[str, dict[str, int]] = {}
@@ -40,17 +48,30 @@ def emit() -> Path:
         numbers = re.findall(r"\d[\d,]*", line)
         if re.match(r"^\d+\s+\d", line) and len(numbers) >= 7:
             values = [int(number.replace(",", "")) for number in numbers[1:7]]
-            rows[f"{group}:{numbers[0]}"] = dict(zip(("total", "dem", "rep", "wor", "scatter", "void"), values, strict=True))
-        elif index + 1 < len(body) and re.match(r"^\d+\s+\d", body[index + 1]) and len(re.findall(r"\d[\d,]*", body[index + 1])) >= 7 and not re.search(r"[A-Z]{4}", line):
+            rows[f"{group}:{numbers[0]}"] = dict(
+                zip(("total", "dem", "rep", "wor", "scatter", "void"), values, strict=True)
+            )
+        elif (
+            index + 1 < len(body)
+            and re.match(r"^\d+\s+\d", body[index + 1])
+            and len(re.findall(r"\d[\d,]*", body[index + 1])) >= 7
+            and not re.search(r"[A-Z]{4}", line)
+        ):
             group = re.sub(r"[^a-z0-9]+", "-", line.lower()).strip("-")
     ontario_artifact = raw.cached(SOURCE, ONTARIO)
-    for precinct in json.loads(ontario_artifact.path.read_text(encoding="utf-8"))["ballotItemWithBreakdown"]["breakdownResults"]:
+    for precinct in json.loads(ontario_artifact.path.read_text(encoding="utf-8"))["ballotItemWithBreakdown"][
+        "breakdownResults"
+    ]:
         values = {"dem": 0, "rep": 0, "wor": 0, "scatter": 0}
         for option in precinct["ballotOptions"]:
             name = option["name"][0]["text"]
             party = (option["party"] or {}).get("abbreviation")
-            values["scatter" if option["isWriteIn"] else "rep" if "Sadwick" in name else "wor" if party == "WOR" else "dem"] += option["voteCount"]
-        rows[f"ontario:{re.sub(r'[^a-z0-9]+', '-', precinct['precinct']['name'][0]['text'].lower()).strip('-')}"] = values
+            values[
+                "scatter" if option["isWriteIn"] else "rep" if "Sadwick" in name else "wor" if party == "WOR" else "dem"
+            ] += option["voteCount"]
+        rows[f"ontario:{re.sub(r'[^a-z0-9]+', '-', precinct['precinct']['name'][0]['text'].lower()).strip('-')}"] = (
+            values
+        )
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -61,13 +82,19 @@ def emit() -> Path:
         )
         (state,) = conn.execute("select id from polity where iso_code = 'US-NY'").fetchone()
         counties = {
-            code: conn.execute("select id, area_id from reporting_unit where scheme_code = 'us.county' and code = %s", [code]).fetchone() for code in ("36055", "36069")
+            code: conn.execute(
+                "select id, area_id from reporting_unit where scheme_code = 'us.county' and code = %s", [code]
+            ).fetchone()
+            for code in ("36055", "36069")
         }
         key = f"{DAY}:NY:house:25"
         contest, election = conn.execute(
-            "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s", [key]
+            "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
+            [key],
         ).fetchone()
-        labels = conn.execute("select id, lower(ballot_label) from contest_option where contest_id = %s", [contest]).fetchall()
+        labels = conn.execute(
+            "select id, lower(ballot_label) from contest_option where contest_id = %s", [contest]
+        ).fetchall()
         picked = {}
         for column, needle in PARTIES.items():
             found = [option for option, label in labels if needle in label]
@@ -76,9 +103,19 @@ def emit() -> Path:
             picked[column] = found[0]
         title = "2024 canvass book: general election results by election district"
         source = cs.source(PUBLISHER, title)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=URL, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=title,
+            url=URL,
+            license="Public record",
+        )
         cs.artifact(artifact, source)
-        ontario_source = cs.source("Ontario County Board of Elections", "2024 general election official results by election district")
+        ontario_source = cs.source(
+            "Ontario County Board of Elections", "2024 general election official results by election district"
+        )
         cs.add(
             "source",
             id=ontario_source,
@@ -90,8 +127,22 @@ def emit() -> Path:
         )
         cs.artifact(ontario_artifact, ontario_source)
         result_set = cs.key(f"{SOURCE}.result_set", f"{key}:election-district")
-        columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
-        for prior in conn.execute(f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]).fetchall():
+        columns = (
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
+            "supersedes_id",
+        )
+        for prior in conn.execute(
+            f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+            [contest, result_set],
+        ).fetchall():
             cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
         for option, outcome_kind, seats in conn.execute(
             """select o.option_id, o.kind, o.seats from outcome o
@@ -117,7 +168,12 @@ def emit() -> Path:
             is_default=True,
             completeness=round(float(counted) / float(official), 4),
         )
-        cs.add("note", entity_id=result_set, kind="methodology", body_md="Votes by election district: Monroe County from its Board of Elections' 2024 canvass book, where the city rows are grouped by legislative district, and the district's 14 election districts in Ontario County from that county's official results.")
+        cs.add(
+            "note",
+            entity_id=result_set,
+            kind="methodology",
+            body_md="Votes by election district: Monroe County from its Board of Elections' 2024 canvass book, where the city rows are grouped by legislative district, and the district's 14 election districts in Ontario County from that county's official results.",
+        )
         for code, values in rows.items():
             county = "36069" if code.startswith("ontario:") else "36055"
             parent, area = counties[county]
@@ -136,5 +192,15 @@ def emit() -> Path:
                 valid_to=DAY + timedelta(days=1),
             )
             for column, option in picked.items():
-                cs.add("result_value", result_set_id=result_set, unit_id=unit, option_id=option, channel=0, measure=1, count_round=0, flags=0, value=values[column])
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=values[column],
+                )
         return cs.write()

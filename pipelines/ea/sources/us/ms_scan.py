@@ -49,10 +49,22 @@ def read(crop: Image.Image, scale: int, psm: int, whitelist: str = "0123456789",
     padded.paste(crop, (20, 20))
     with tempfile.NamedTemporaryFile(suffix=".png") as handle:
         padded.save(handle.name)
-        command = ["tesseract", handle.name, "-", "--psm", str(psm), "-c", "load_system_dawg=0", "-c", "load_freq_dawg=0"]
+        command = [
+            "tesseract",
+            handle.name,
+            "-",
+            "--psm",
+            str(psm),
+            "-c",
+            "load_system_dawg=0",
+            "-c",
+            "load_freq_dawg=0",
+        ]
         if whitelist:
             command += ["-c", f"tessedit_char_whitelist={whitelist}"]
-        return subprocess.run(command, capture_output=True, text=True, env={"OMP_THREAD_LIMIT": "1", "PATH": "/usr/bin"}).stdout.strip()
+        return subprocess.run(
+            command, capture_output=True, text=True, env={"OMP_THREAD_LIMIT": "1", "PATH": "/usr/bin"}, check=False
+        ).stdout.strip()
 
 
 def long_runs(dark: np.ndarray, minlen: int) -> np.ndarray:
@@ -85,9 +97,17 @@ def words(image: np.ndarray, psms: tuple[int, ...] = (6, 11, 12)) -> list[tuple[
                 capture_output=True,
                 text=True,
                 env={"OMP_THREAD_LIMIT": "2", "PATH": "/usr/bin"},
+                check=False,
             ).stdout
             for line in text.splitlines()[1:]:
                 parts = line.split("\t")
                 if len(parts) == 12 and parts[0] == "5" and parts[11].strip().replace(",", "").isdigit():
-                    found.append((psm, int(parts[6]) + int(parts[8]) / 2, int(parts[7]) + int(parts[9]) / 2, parts[11].strip().replace(",", "")))
+                    found.append(
+                        (
+                            psm,
+                            int(parts[6]) + int(parts[8]) / 2,
+                            int(parts[7]) + int(parts[9]) / 2,
+                            parts[11].strip().replace(",", ""),
+                        )
+                    )
     return found

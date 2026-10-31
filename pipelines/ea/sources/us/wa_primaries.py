@@ -25,7 +25,9 @@ COUNTIES = [
     "Skagit", "Skamania", "Snohomish", "Spokane", "Stevens", "Thurston", "Wahkiakum", "WallaWalla", "Whatcom",
     "Whitman", "Yakima",
 ]  # fmt: skip
-RACE = re.compile(r"(?:U\.S\. )?Congressional District (\d+)( One Month Short Term)?(?: -)? (?:U\.S\. )?Representative|(United States U\.S\. Senator)")
+RACE = re.compile(
+    r"(?:U\.S\. )?Congressional District (\d+)( One Month Short Term)?(?: -)? (?:U\.S\. )?Representative|(United States U\.S\. Senator)"
+)
 PUBLISHER = "Washington Secretary of State"
 TITLE = "Primary election results"
 
@@ -88,13 +90,17 @@ def parse() -> None:
                         int(line["Votes"] or 0),
                     )
                 )
-        page = raw.cached(SOURCE, BASE.format(day=day) + "Turnout.html").path.read_text(encoding="utf-8", errors="replace")
+        page = raw.cached(SOURCE, BASE.format(day=day) + "Turnout.html").path.read_text(
+            encoding="utf-8", errors="replace"
+        )
         for county, registered, ballots in re.findall(
             r"<td[^>]*>\s*(?:<a[^>]*>)?\s*([A-Z][A-Za-z ]+?)\s*(?:</a>)?\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>",
             page,
         ):
             if key(county) in fips:
-                turnout.append((day, fips[key(county)], int(registered.replace(",", "")), int(ballots.replace(",", ""))))
+                turnout.append(
+                    (day, fips[key(county)], int(registered.replace(",", "")), int(ballots.replace(",", "")))
+                )
     frame = (
         pl.DataFrame(
             rows,
@@ -114,8 +120,12 @@ def parse() -> None:
     )
     keep = []
     for (day, chamber, district, special), lines in frame.group_by("day", "chamber", "district", "special"):
-        contest = f"{day}:WA:" + ("senate" if chamber == "senate" else f"house:{district}") + (":special" if special else "")
-        sums = sorted(total for total in lines.group_by("candidate").agg(pl.col("votes").sum())["votes"].to_list() if total > 0)
+        contest = (
+            f"{day}:WA:" + ("senate" if chamber == "senate" else f"house:{district}") + (":special" if special else "")
+        )
+        sums = sorted(
+            total for total in lines.group_by("candidate").agg(pl.col("votes").sum())["votes"].to_list() if total > 0
+        )
         filed = sorted(total for total in known.get(contest, []) if total > 0)
         if sums == filed:
             keep.append(lines)
@@ -161,7 +171,9 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"WA": source}, strict=True)
         units = dict(
-            conn.execute("select code, id from reporting_unit where scheme_code = 'us.county' and code like '53%%'").fetchall()
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.county' and code like '53%%'"
+            ).fetchall()
         )
         held = {
             election_id
@@ -191,7 +203,9 @@ def emit() -> Path:
                 is_default=election not in held,
                 completeness=1,
             )
-            for code, registered, ballots in voters.filter(pl.col("day") == day).select("code", "registered", "ballots").iter_rows():
+            for code, registered, ballots in (
+                voters.filter(pl.col("day") == day).select("code", "registered", "ballots").iter_rows()
+            ):
                 for measure, value in ((2, registered), (3, ballots)):
                     cs.add(
                         "result_value",

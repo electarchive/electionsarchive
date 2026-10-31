@@ -86,7 +86,11 @@ def parse() -> None:
         )
     )
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("day", "chamber", "district").agg(pl.col("votes").sum(), pl.col("code").n_unique()).sort("day", "chamber", "district"))
+    print(
+        frame.group_by("day", "chamber", "district")
+        .agg(pl.col("votes").sum(), pl.col("code").n_unique())
+        .sort("day", "chamber", "district")
+    )
 
 
 def emit() -> Path:

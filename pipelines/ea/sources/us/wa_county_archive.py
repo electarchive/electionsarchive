@@ -115,7 +115,7 @@ def pages(election: int) -> tuple[str, list[tuple[str, str]]]:
         for office, contest in re.findall(
             r'<h3 class="reset-margin">([^<]*)</h3>.*?results_report_county_breakdown\.aspx\?e=\d+&amp;t=(\d+)',
             raw.cached(SOURCE, f"{HOST}results_report.aspx?e={election}").path.read_text(errors="ignore"),
-            re.S,
+            re.DOTALL,
         )
         if (
             district := re.fullmatch(r"(U\. S\. Representative District #)(\d+)", office)
@@ -152,7 +152,8 @@ def fetch() -> None:
 
 def cells(text: str) -> list[str]:
     return [
-        html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<td[^>]*>.*?</td>", text, re.S)
+        html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+        for cell in re.findall(r"<td[^>]*>.*?</td>", text, re.DOTALL)
     ]
 
 
@@ -174,16 +175,17 @@ def parse() -> None:
         for office, url in pages(election)[1]:
             printed: dict[str, int] = {}
             block = re.search(
-                r'<h3 class="reset-margin">%s</h3>(.*?)Show County Breakdown'
-                % re.escape(
-                    f"U. S. Representative District #{office.removeprefix('house:')}"
-                    if office.startswith("house:")
-                    else next(k for k, v in OFFICES.items() if v == office)
+                r'<h3 class="reset-margin">{}</h3>(.*?)Show County Breakdown'.format(
+                    re.escape(
+                        f"U. S. Representative District #{office.removeprefix('house:')}"
+                        if office.startswith("house:")
+                        else next(k for k, v in OFFICES.items() if v == office)
+                    )
                 ),
                 main,
-                re.S,
+                re.DOTALL,
             )[1]
-            for line in re.findall(r"<tr><td class=\"ResultData\">.*?</tr>", block, re.S):
+            for line in re.findall(r"<tr><td class=\"ResultData\">.*?</tr>", block, re.DOTALL):
                 printed[cells(line)[0]] = int(next(c for c in cells(line)[1:] if c.isdigit()))
             try:
                 body = raw.cached(SOURCE, url).path.read_text(errors="ignore")
@@ -195,13 +197,13 @@ def parse() -> None:
             part: list[tuple[str, str, str, str, str, int]] = []
             unknown: set[str] = set()
             for county, table in re.findall(
-                r'<h3 class="reset-margin">([^<]*)</h3></td></tr>(.*?)(?=<tr class="info">|$)', body, re.S
+                r'<h3 class="reset-margin">([^<]*)</h3></td></tr>(.*?)(?=<tr class="info">|$)', body, re.DOTALL
             ):
                 seen.add(county)
                 code = codes.get(re.sub(r"[^a-z]", "", county.lower()))
                 if code is None:
                     unknown.add(county)
-                for line in re.findall(r"<tr><td class=\"ResultData\">.*?</tr>", table, re.S):
+                for line in re.findall(r"<tr><td class=\"ResultData\">.*?</tr>", table, re.DOTALL):
                     name, *middle, votes = cells(line)
                     party = middle[0] if middle else ""
                     part.append((str(day), office, code, name, party, int(votes)))

@@ -11,7 +11,9 @@ from ea.store import connect
 SOURCE = "us.ballot_text"
 VERSION = "1"
 WORDING = r"(?i)^(shall|should|do you|are you|would you|is it|for the|for constitutional|an act|an amendment|amendment to|every|whether)\b"
-NUMBER = re.compile(r"(?i)\b(?:amendment|proposition|question|measure|issue|referendum|ballot measure|initiative)\s*(?:no\.?\s*)?(\d+[a-z]?)\b")
+NUMBER = re.compile(
+    r"(?i)\b(?:amendment|proposition|question|measure|issue|referendum|ballot measure|initiative)\s*(?:no\.?\s*)?(\d+[a-z]?)\b"
+)
 YEAR_LISTS = "https://en.wikipedia.org/wiki/{year}_United_States_ballot_measures"
 
 
@@ -52,7 +54,9 @@ def emit() -> Path:
         ):
             if (found := NUMBER.search(text)) is not None:
                 numbered.setdefault((key[:13], found[1].upper()), []).append(key)
-        for state, day, measure, summary in pl.read_parquet(wikipedia_measures.PARSED / "summaries.parquet").iter_rows():
+        for state, day, measure, summary in pl.read_parquet(
+            wikipedia_measures.PARSED / "summaries.parquet"
+        ).iter_rows():
             printed = wikipedia_measures.DATES.get((state, measure), (day,))[0]
             if not put(
                 f"{printed}:{state}:question:wikipedia:{slug(measure)[:80]}",
@@ -68,7 +72,9 @@ def emit() -> Path:
             keys = numbered.get((f"{day}:{state}", found[1].upper()), []) if found is not None else []
             if len(keys) == 1:
                 matched += put(keys[0], "summary", summary, wikipedia, YEAR_LISTS.format(year=day.year))
-        print(f"wikipedia: {len(rows)} summaries, {matched} of {len(missed)} off-key measures matched to MEDSL's by number")
+        print(
+            f"wikipedia: {len(rows)} summaries, {matched} of {len(missed)} off-key measures matched to MEDSL's by number"
+        )
 
         sources = {
             state: cs.source(elstats.TENANTS[state][1], elstats.TITLE) for state in ("CO", "CT", "ID", "NM", "NY", "VA")

@@ -1,12 +1,14 @@
+import html
 import os
-import html, re, subprocess
+import re
+import subprocess
 from pathlib import Path
 
 
 def pages(pdf):
     xml = subprocess.run(["pdftotext", "-bbox", str(pdf), "-"], capture_output=True, text=True, check=True).stdout
     out = []
-    for m in re.finditer(r'<page width="([\d.]+)" height="([\d.]+)">(.*?)</page>', xml, re.S):
+    for m in re.finditer(r'<page width="([\d.]+)" height="([\d.]+)">(.*?)</page>', xml, re.DOTALL):
         w, h = float(m[1]), float(m[2])
         words = [
             (html.unescape(t), float(a) / w, float(b) / h, float(c) / w, float(d) / h)
@@ -109,8 +111,9 @@ def anchored(words, anchor, left=0.2):
 
 
 def strips(img, bands, cache, scale=1):
-    from PIL import Image
     from concurrent.futures import ThreadPoolExecutor
+
+    from PIL import Image
 
     im = Image.open(img)
     W, H = im.size
@@ -159,6 +162,7 @@ def strips(img, bands, cache, scale=1):
 
 def reread(img, boxes, cache):
     from PIL import Image
+
     from ea import scan
 
     W, H = Image.open(img).size
@@ -207,6 +211,7 @@ def region(img, box, cache, scale=3):
                 ["tesseract", str(path), "-", "--psm", psm, "-c", "tessedit_char_whitelist=0123456789,", "tsv"],
                 capture_output=True,
                 text=True,
+                check=False,
             ).stdout.splitlines()[1:]
         ]
         for r in rows:

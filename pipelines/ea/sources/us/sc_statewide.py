@@ -107,7 +107,9 @@ METHOD = (
 
 def page(year: int) -> list[str]:
     path = raw.cached(SOURCE.replace("statewide", "report"), URL.format(BOOKS[year])).path
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.split("\n")
+    return subprocess.run(
+        ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+    ).stdout.split("\n")
 
 
 def tokens(line: str) -> list[tuple[int, int | None]]:
@@ -180,11 +182,13 @@ def parse() -> None:
         for county, cells in keyed.items():
             for column, value in enumerate(cells):
                 if value:
-                    rows.append((str(DAYS[year]), office, codes[re.sub(r"[^A-Z]", "", county)], str(column), value, year))
+                    rows.append(
+                        (str(DAYS[year]), office, codes[re.sub(r"[^A-Z]", "", county)], str(column), value, year)
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes", "year"], orient="row").drop("year").write_parquet(
-        PARSED / "lines.parquet"
-    )
+    pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes", "year"], orient="row").drop(
+        "year"
+    ).write_parquet(PARSED / "lines.parquet")
 
 
 def method(key: tuple[str, ...]) -> str:

@@ -88,7 +88,9 @@ def parse() -> None:
                         "year": year,
                         "day": day,
                         "position": index,
-                        "candidate": re.sub(r" \([^)]*\)$", "", plain(fields[f"cand{index}"])).replace("Iturregu", "Iturregui").replace("Berríos Martínez", "Berríos"),
+                        "candidate": re.sub(r" \([^)]*\)$", "", plain(fields[f"cand{index}"]))
+                        .replace("Iturregu", "Iturregui")
+                        .replace("Berríos Martínez", "Berríos"),
                         "party": re.sub(r" \(Puerto Rico\)$", "", plain(fields.get(f"party{index}", ""))),
                         "votes": count(fields[f"votes{index}"]),
                     }

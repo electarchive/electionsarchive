@@ -36,7 +36,11 @@ LABELS = {
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(ma_empty_primaries.PARSED / "counties.parquet").select("body", "party", "day", "district").unique()
+    frame = (
+        pl.read_parquet(ma_empty_primaries.PARSED / "counties.parquet")
+        .select("body", "party", "day", "district")
+        .unique()
+    )
     with connect() as conn:
         cs = Changeset(
             conn,

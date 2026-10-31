@@ -24,7 +24,12 @@ ITEMS = {
     1866: ("bub_gb_53IwAAAAIAAJ", 1867, date(1866, 11, 6), (51,)),
     1868: ("tribunealmanacpo1869newy", 1869, date(1868, 11, 3), (61, 62, 70, 72, 73, 74, 75)),
     1878: ("vol1881tribuneal00unse", 1881, date(1878, 11, 5), (81, 82)),
-    1872: ("tribunealmanacpo18751879newy", 1877, date(1872, 11, 5), (374, 375, 349, 350, 352, 353, 361, 362, 389, 390, 392, 393)),
+    1872: (
+        "tribunealmanacpo18751879newy",
+        1877,
+        date(1872, 11, 5),
+        (374, 375, 349, 350, 352, 353, 361, 362, 389, 390, 392, 393),
+    ),
     1880: ("vol1881tribuneal00unse", 1881, date(1880, 11, 2), (81, 82)),
     1874: ("tribunealmanacpo18751879newy", 1875, date(1874, 11, 3), (76, 77, 78, 87)),
 }
@@ -35,10 +40,34 @@ VOLUMES = {
 TITLES = {year: f"The Tribune Almanac and Political Register for {volume}" for year, (_, volume, _, _) in ITEMS.items()}
 TITLES[1854] = "The Whig Almanac and United States Register for 1855"
 PARTIES = ("rep", "dem", "lib", "ind", "scat", "cons", "rad", "opp", "gbk", "pro", "lab", "ref", "peo", "tem")
-ERRATA: set[tuple[int, tuple[str, int]]] = {(1864, ("IN", 2)), (1864, ("OH", 14)), (1864, ("PA", 10)), (1864, ("PA", 13)), (1864, ("PA", 18)), (1864, ("PA", 20)), (1854, ("IA", 2)), (1876, ("NY", 14)), (1860, ("PA", 17)), (1856, ("NY", 26)), (1856, ("NY", 27)), (1858, ("NY", 31)), (1858, ("OH", 16)), (1858, ("OH", 18)), (1862, ("NY", 27)), (1862, ("PA", 16)), (1862, ("IL", 9)), (1864, ("NY", 11)), (1868, ("NY", 12)), (1868, ("NY", 14))}
+ERRATA: set[tuple[int, tuple[str, int]]] = {
+    (1864, ("IN", 2)),
+    (1864, ("OH", 14)),
+    (1864, ("PA", 10)),
+    (1864, ("PA", 13)),
+    (1864, ("PA", 18)),
+    (1864, ("PA", 20)),
+    (1854, ("IA", 2)),
+    (1876, ("NY", 14)),
+    (1860, ("PA", 17)),
+    (1856, ("NY", 26)),
+    (1856, ("NY", 27)),
+    (1858, ("NY", 31)),
+    (1858, ("OH", 16)),
+    (1858, ("OH", 18)),
+    (1862, ("NY", 27)),
+    (1862, ("PA", 16)),
+    (1862, ("IL", 9)),
+    (1864, ("NY", 11)),
+    (1868, ("NY", 12)),
+    (1868, ("NY", 14)),
+}
 NAMES: dict[tuple[str, str], str] = {("IN", "Huntingdon"): "Huntington"}
 KEYS: dict[tuple[int, str, int], str] = {}
-FORMER: dict[tuple[str, str], tuple[str, str, date]] = {("MI", "manitou"): ("Manitou", "26029", date(1895, 1, 1)), ("MI", "isleroyale"): ("Isle Royale", "26083", date(1897, 1, 1))}
+FORMER: dict[tuple[str, str], tuple[str, str, date]] = {
+    ("MI", "manitou"): ("Manitou", "26029", date(1895, 1, 1)),
+    ("MI", "isleroyale"): ("Isle Royale", "26083", date(1897, 1, 1)),
+}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1

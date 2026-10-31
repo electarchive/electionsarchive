@@ -34,7 +34,10 @@ ELECTIONS = {
             ("house", party): f"representative-to-congress---{party}"
             for party in ("democratic", "republican", "libertarian", "green", "constitution")
         }
-        | {("senate", party): f"u.-s.-senator---{party}" for party in ("democratic", "republican", "constitution", "socialist")},
+        | {
+            ("senate", party): f"u.-s.-senator---{party}"
+            for party in ("democratic", "republican", "constitution", "socialist")
+        },
     ),
 }
 PUBLISHER = "Ohio Secretary of State"

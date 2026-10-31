@@ -1,5 +1,6 @@
 import csv
 import io
+import itertools
 import json
 import re
 import statistics
@@ -87,9 +88,12 @@ def parse() -> None:
                         small = rendered.convert("L").resize((rendered.width // 4, rendered.height // 4))
                         ink = Image.fromarray((numpy.asarray(small) < 128).astype("uint8") * 255)
                         angle = max(
-                            numpy.arange(-4, 4.01, 0.1), key=lambda a: numpy.var(numpy.asarray(ink.rotate(a)).sum(axis=1))
+                            numpy.arange(-4, 4.01, 0.1),
+                            key=lambda a: numpy.var(numpy.asarray(ink.rotate(a)).sum(axis=1)),
                         )
-                        rendered.convert("L").rotate(angle, resample=Image.Resampling.BICUBIC, fillcolor=255).save(image)
+                        rendered.convert("L").rotate(angle, resample=Image.Resampling.BICUBIC, fillcolor=255).save(
+                            image
+                        )
                 with Image.open(image) as rendered:
                     clean = Path(tempfile.mkdtemp()) / "clean.png"
                     rendered.convert("L").point(lambda v: 0 if v < 110 else 255).save(clean)
@@ -97,9 +101,18 @@ def parse() -> None:
                     ["tesseract", str(clean), "stdout", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
                 ).stdout
                 tokens = [
-                    (int(r["left"]), int(r["top"]), int(r["left"]) + int(r["width"]), int(r["top"]) + int(r["height"]), r["text"])
+                    (
+                        int(r["left"]),
+                        int(r["top"]),
+                        int(r["left"]) + int(r["width"]),
+                        int(r["top"]) + int(r["height"]),
+                        r["text"],
+                    )
                     for r in csv.DictReader(io.StringIO(tsv), delimiter="\t", quoting=csv.QUOTE_NONE)
-                    if r["level"] == "5" and r["text"].strip().isdigit() and int(r["top"]) > 340 and int(r["left"]) < 1580
+                    if r["level"] == "5"
+                    and r["text"].strip().isdigit()
+                    and int(r["top"]) > 340
+                    and int(r["left"]) < 1580
                 ]
                 with Image.open(image) as rendered:
                     middle = rendered.size[0] / 2
@@ -121,7 +134,10 @@ def parse() -> None:
                 pairs = [(i, (box[1] + box[3]) / 2) for (i, _), box in found.items() if block_keys[i] != "TOTAL"]
                 if len(found) > 0.6 * columns * (len(block_keys) - 1):
                     pitch = statistics.median(
-                        (yj - yi) / (j - i) for n, (i, yi) in enumerate(pairs[::3]) for j, yj in pairs[::3][n + 1 :] if j != i
+                        (yj - yi) / (j - i)
+                        for n, (i, yi) in enumerate(pairs[::3])
+                        for j, yj in pairs[::3][n + 1 :]
+                        if j != i
                     )
                     top = statistics.median(y - pitch * i for i, y in pairs)
                 else:
@@ -132,14 +148,15 @@ def parse() -> None:
                     rules = [y for y in range(1, len(dark)) if dark[y] and not dark[y - 1]]
                     if len(rules) < 5:
                         raise ValueError(f"{year} {office} page {page}: {len(rules)} rules")
-                    pitch = statistics.median(b - a for a, b in zip(rules, rules[1:], strict=False)) / 2
+                    pitch = statistics.median(b - a for a, b in itertools.pairwise(rules)) / 2
                     guess = statistics.median(y - i * pitch for i, y in pairs)
                     near = min(range(-3, 4), key=lambda k: abs(rules[0] - pitch / 2 + k * pitch - guess))
                     top = rules[0] - pitch / 2 + near * pitch
                 found = {
                     cell: box
                     for cell, box in found.items()
-                    if block_keys[cell[0]] != "TOTAL" and abs((box[1] + box[3]) / 2 - (top + cell[0] * pitch)) < pitch / 3
+                    if block_keys[cell[0]] != "TOTAL"
+                    and abs((box[1] + box[3]) / 2 - (top + cell[0] * pitch)) < pitch / 3
                 }
                 for column in range(columns):
                     for i, key in enumerate(block_keys):
@@ -149,7 +166,12 @@ def parse() -> None:
                         if box is None:
                             y = top + i * pitch
                             width = char * len(str(table["rows"][key][column]))
-                            box = (round(edges[column] - width), round(y - pitch * 0.3), round(edges[column]), round(y + pitch * 0.3))
+                            box = (
+                                round(edges[column] - width),
+                                round(y - pitch * 0.3),
+                                round(edges[column]),
+                                round(y + pitch * 0.3),
+                            )
                         else:
                             matched += 1
                         boxes[(key, column)] = box
@@ -159,7 +181,9 @@ def parse() -> None:
             for column, candidate in enumerate(table["candidates"]):
                 summed = sum(v[column] for k, v in table["rows"].items() if k != "TOTAL")
                 if summed != printed[column]:
-                    raise ValueError(f"{year} {office} {candidate['name']}: counties sum to {summed}, printed {printed[column]}")
+                    raise ValueError(
+                        f"{year} {office} {candidate['name']}: counties sum to {summed}, printed {printed[column]}"
+                    )
                 for key in keys[1:]:
                     rows.append(
                         {
@@ -208,7 +232,12 @@ def emit() -> Path:
             title = TITLE.format(year=year)
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=LANDING,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=LANDING,
                 license=LICENSE,
             )
             book = raw.cached(SOURCE, url)
@@ -243,7 +272,9 @@ def emit() -> Path:
         }
         if len(counties) != 93:
             raise ValueError("Nebraska needs 93 counties")
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -350,5 +381,11 @@ def emit() -> Path:
                         x1=box[2] / width,
                         y1=box[3] / height,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

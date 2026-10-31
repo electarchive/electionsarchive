@@ -39,13 +39,6 @@ def parse() -> None:
                where a.scheme_code = 'us.local_district' and ac.code ~ '^51:51[0-9]{3}:board-of-supervisors:'
                  and not exists (select 1 from area_geometry g where g.area_id = a.id)"""
         ).fetchall()
-        counties = dict(
-            conn.execute(
-                """select u.code, st_area(g.geom::geography) from reporting_unit u
-                   join area_geometry g on g.area_id = u.area_id
-                   where u.scheme_code = 'us.county' and u.code like '51%%'"""
-            ).fetchall()
-        )
     bodies: dict[str, list[tuple[str, str]]] = {}
     for area, code, _ in wanted:
         _, fips, _, slug = code.split(":", 3)
@@ -107,5 +100,13 @@ def emit() -> Path:
             [frame["area"].to_list(), frame["geojson"].to_list()],
         ).fetchall()
         for area, geom, point in shapes:
-            cs.add("area_geometry", area_id=area, valid_from=None, geom=geom, label_point=point, quality="official", source_id=census)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=census,
+            )
         return cs.write()

@@ -21,9 +21,21 @@ LOS_ANGELES = "https://content.lavote.gov/docs/rrcc/documents/measures-appearing
 SAN_FRANCISCO = "https://api.sf.gov/documents/61682/Ballot_Questions_November_2026.pdf"
 SAN_BERNARDINO = "https://elections.sbcounty.gov/elections/2026/1103/measures/"
 SOURCES = {
-    SAN_BERNARDINO: ("06071", "San Bernardino County Registrar of Voters", "Measures on the November 3, 2026 ballot, notices of measures"),
-    LOS_ANGELES: ("06037", "Los Angeles County Registrar-Recorder/County Clerk", "Measures appearing on the ballot, November 3, 2026"),
-    SAN_FRANCISCO: ("06075", "San Francisco Office of the City Attorney", "Ballot questions for the November 3, 2026 election"),
+    SAN_BERNARDINO: (
+        "06071",
+        "San Bernardino County Registrar of Voters",
+        "Measures on the November 3, 2026 ballot, notices of measures",
+    ),
+    LOS_ANGELES: (
+        "06037",
+        "Los Angeles County Registrar-Recorder/County Clerk",
+        "Measures appearing on the ballot, November 3, 2026",
+    ),
+    SAN_FRANCISCO: (
+        "06075",
+        "San Francisco Office of the City Attorney",
+        "Ballot questions for the November 3, 2026 election",
+    ),
 }
 
 
@@ -31,7 +43,7 @@ def notices() -> list[tuple[str, str, str, str]]:
     listing = raw.cached(SOURCE, SAN_BERNARDINO).path.read_text(encoding="utf-8", errors="replace")
     found = []
     for row in listing.split("<tr>")[2:]:
-        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
         link = re.search(r'href="([^"]+)"', cells[0] + (cells[1] if len(cells) > 1 else "")) if cells else None
         if link is None or len(cells) < 6:
             continue
@@ -66,16 +78,14 @@ def fetch() -> None:
 
 
 def resolution(text: str) -> str | None:
-    marker = re.search(
-        r"(?:following question[^\n]*|ballot as\s+follows:?)\n", text
-    )
+    marker = re.search(r"(?:following question[^\n]*|ballot as\s+follows:?)\n", text)
     if marker is not None:
         segment = text[marker.end() : marker.end() + 2500]
     else:
         segment = text
     for candidate in re.finditer(r"[^\n](?:[^\n]|\n(?!\s*\n))*?\b[Ss]hall\b[^?]{0,1500}\?", segment):
         body = re.sub(
-            r"RESOLUTION NO\.? [\w-]+\s*PAGE \d+|\x0c|^\s*(?:YES|NO)\s*$", "", candidate.group(0), flags=re.M
+            r"RESOLUTION NO\.? [\w-]+\s*PAGE \d+|\x0c|^\s*(?:YES|NO)\s*$", "", candidate.group(0), flags=re.MULTILINE
         )
         body = re.sub(r"\s+", " ", body).strip()
         if not re.search(r"WHEREAS|RESOLVED|SECTION \d|Section \d|ADOPTED", body):
@@ -119,7 +129,7 @@ def parse() -> None:
     for letter, notice, place, threshold in notices():
         if "/Notice_" in notice:
             match = re.search(
-                r"Measure\s+[“\"]?[^”\"\n]*[”\"]?\s*\n\s*(.+?)\s*\n\s*[A-Z ]+ YES", pdf(notice), re.S
+                r"Measure\s+[“\"]?[^”\"\n]*[”\"]?\s*\n\s*(.+?)\s*\n\s*[A-Z ]+ YES", pdf(notice), re.DOTALL
             )
             found = match[1] if match is not None else None
         else:
@@ -133,7 +143,7 @@ def parse() -> None:
                 "place": place.upper(),
                 "letter": letter,
                 "threshold": f"{threshold} of the votes cast",
-                "lines": [found.strip("“”\" ")],
+                "lines": [found.strip('“”" ')],
             }
         )
     text = re.sub(r"\s+", " ", pdf(SAN_FRANCISCO))
@@ -213,9 +223,7 @@ def emit() -> Path:
                 key = options[0] if len(options) == 1 else None
             if key is None and "DISTRICT" in place and f"us.county:{county}" in found:
                 home = found[f"us.county:{county}"]
-                special = govmint.special(
-                    conn, cs, "CA", (home[1], home[2], home[4], home[5]), titled, slugs
-                )
+                special = govmint.special(conn, cs, "CA", (home[1], home[2], home[4], home[5]), titled, slugs)
                 if special is not None:
                     key = f"us.special_district:{special[4]}"
                     found[key] = ("us.special_district", *special)
@@ -246,7 +254,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {name} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {name} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             heading = row["text"].split(". ")[0][:60] if row["letter"] is None else None
             label = f"Measure {row['letter']}" if row["letter"] else heading
@@ -268,7 +283,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {name}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {name}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             if row["threshold"]:

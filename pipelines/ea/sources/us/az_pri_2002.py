@@ -95,7 +95,21 @@ def parse() -> None:
             raise ValueError(f"district {district} {name}: counties do not add up to the total")
         for county, value in zip(COUNTIES, values[:-1], strict=True):
             if value is not None:
-                rows.append((2002, f"house:{party}", DAY, False, "AZ", district, codes[re.sub(r"[^a-z]", "", county.lower())], candidate, 1, writein, value))
+                rows.append(
+                    (
+                        2002,
+                        f"house:{party}",
+                        DAY,
+                        False,
+                        "AZ",
+                        district,
+                        codes[re.sub(r"[^a-z]", "", county.lower())],
+                        candidate,
+                        1,
+                        writein,
+                        value,
+                    )
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,

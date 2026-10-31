@@ -39,10 +39,12 @@ VOLUMES = {
 ERRATA = {(1950, 7)}
 NOTES = {
     (1950, 7): (
-        "The 1950 Legislative Manual prints Carl J. Eastvold's figures for Pope, Redwood, Renville, and Stevens counties "
-        "without their leading digit (',803', ',923', '.943', and '.179'). The printed column total of 40,785 shows that "
-        "the four missing digits add up to 5, but not how they split among the four counties, so those four counties "
-        "are left out of this set entirely, with their other columns, and its totals are short of the district's.",
+        (
+            "The 1950 Legislative Manual prints Carl J. Eastvold's figures for Pope, Redwood, Renville, and Stevens counties "
+            "without their leading digit (',803', ',923', '.943', and '.179'). The printed column total of 40,785 shows that "
+            "the four missing digits add up to 5, but not how they split among the four counties, so those four counties "
+            "are left out of this set entirely, with their other columns, and its totals are short of the district's."
+        ),
     ),
 }
 ALIASES: dict[str, tuple[str, ...]] = {}

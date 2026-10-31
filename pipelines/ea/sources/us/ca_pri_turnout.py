@@ -38,7 +38,10 @@ def parse() -> None:
     rows: list[tuple[date, str, int, int]] = []
     for day, path in FILES.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         seen: dict[str, tuple[int, int]] = {}
         for line in text.splitlines():
@@ -48,10 +51,14 @@ def parse() -> None:
                 seen[found[1].strip()] = (numbers[2], numbers[5])
         total = seen.pop("State Total", None)
         if len(seen) != 58 or (total and (sum(r for r, _ in seen.values()), sum(b for _, b in seen.values())) != total):
-            print(f"{day}: {len(seen)} counties, sums {sum(r for r, _ in seen.values())}, {sum(b for _, b in seen.values())} against {total}")
+            print(
+                f"{day}: {len(seen)} counties, sums {sum(r for r, _ in seen.values())}, {sum(b for _, b in seen.values())} against {total}"
+            )
         rows.extend((day, county, registered, ballots) for county, (registered, ballots) in seen.items())
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["day", "county", "registered", "ballots"], orient="row").write_parquet(PARSED / "turnout.parquet")
+    pl.DataFrame(rows, schema=["day", "county", "registered", "ballots"], orient="row").write_parquet(
+        PARSED / "turnout.parquet"
+    )
     print(f"{len(rows)} county rows")
 
 
@@ -113,7 +120,9 @@ def emit() -> Path:
                 is_default=election not in held,
                 completeness=1,
             )
-            for county, registered, ballots in voters.filter(pl.col("day") == day).select("county", "registered", "ballots").iter_rows():
+            for county, registered, ballots in (
+                voters.filter(pl.col("day") == day).select("county", "registered", "ballots").iter_rows()
+            ):
                 for measure, value in ((2, registered), (3, ballots)):
                     cs.add(
                         "result_value",

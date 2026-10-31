@@ -164,7 +164,7 @@ def pin(source: str | None = None) -> str:
             content = (folder / str(entry["file"])).read_bytes()
             try:
                 found[key] = wikipedia.revision(key, content, datetime.fromisoformat(str(entry["retrieved_at"])))
-            except Exception as error:  # noqa: BLE001 - report and carry on; a rerun retries
+            except Exception as error:
                 print(f"{folder.name}: {key}: {error}")
                 failed += 1
                 continue

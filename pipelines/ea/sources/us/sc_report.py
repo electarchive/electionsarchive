@@ -27,11 +27,52 @@ BOOKS = {2002: "2002", 1998: "1997-1998", 1994: "1994-1995", 1990: "1990-1991"}
 DAYS = {2002: date(2002, 11, 5), 1998: date(1998, 11, 3), 1994: date(1994, 11, 8), 1990: date(1990, 11, 6)}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
-    "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
-    "Charleston", "Cherokee", "Chester", "Chesterfield", "Clarendon", "Colleton", "Darlington", "Dillon",
-    "Dorchester", "Edgefield", "Fairfield", "Florence", "Georgetown", "Greenville", "Greenwood", "Hampton", "Horry",
-    "Jasper", "Kershaw", "Lancaster", "Laurens", "Lee", "Lexington", "McCormick", "Marion", "Marlboro", "Newberry",
-    "Oconee", "Orangeburg", "Pickens", "Richland", "Saluda", "Spartanburg", "Sumter", "Union", "Williamsburg", "York",
+    "Abbeville",
+    "Aiken",
+    "Allendale",
+    "Anderson",
+    "Bamberg",
+    "Barnwell",
+    "Beaufort",
+    "Berkeley",
+    "Calhoun",
+    "Charleston",
+    "Cherokee",
+    "Chester",
+    "Chesterfield",
+    "Clarendon",
+    "Colleton",
+    "Darlington",
+    "Dillon",
+    "Dorchester",
+    "Edgefield",
+    "Fairfield",
+    "Florence",
+    "Georgetown",
+    "Greenville",
+    "Greenwood",
+    "Hampton",
+    "Horry",
+    "Jasper",
+    "Kershaw",
+    "Lancaster",
+    "Laurens",
+    "Lee",
+    "Lexington",
+    "McCormick",
+    "Marion",
+    "Marlboro",
+    "Newberry",
+    "Oconee",
+    "Orangeburg",
+    "Pickens",
+    "Richland",
+    "Saluda",
+    "Spartanburg",
+    "Sumter",
+    "Union",
+    "Williamsburg",
+    "York",
 ]
 OFFICES = {
     "lieutenant-governor": "Lieutenant Governor",
@@ -45,7 +86,12 @@ OFFICES = {
 PARTIES = {"D": "democratic-party", "R": "republican-party"}
 UNREADABLE = {(1998, 37, 7, 3): 18170}
 TABLES = [
-    (2002, 41, "lieutenant-governor", [(3, "Phil Leventis", "D"), (4, "André Bauer", "R"), (5, "Kenneth E. Curtis", "L")]),
+    (
+        2002,
+        41,
+        "lieutenant-governor",
+        [(3, "Phil Leventis", "D"), (4, "André Bauer", "R"), (5, "Kenneth E. Curtis", "L")],
+    ),
     (2002, 42, "secretary-of-state", [(0, "Rick C. Wade", "D"), (1, "Mark Hammond", "R")]),
     (2002, 42, "treasurer", [(3, "Grady L. Patterson Jr.", "D"), (4, "Greg Ryberg", "R")]),
     (2002, 43, "attorney-general", [(0, "Steve Benjamin", "D"), (1, "Henry McMaster", "R")]),
@@ -87,11 +133,27 @@ def parse() -> None:
         image = PAGES / f"{book.sha256}-{page}.png"
         if not image.exists():
             subprocess.run(
-                ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(path), str(image.with_suffix(""))],
+                [
+                    "pdftoppm",
+                    "-r",
+                    str(DPI),
+                    "-gray",
+                    "-png",
+                    "-f",
+                    str(page),
+                    "-l",
+                    str(page),
+                    "-singlefile",
+                    str(path),
+                    str(image.with_suffix("")),
+                ],
                 check=True,
             )
         xml = subprocess.run(
-            ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         namespace = {"h": "http://www.w3.org/1999/xhtml"}
         words = [
@@ -101,7 +163,10 @@ def parse() -> None:
         words.sort(key=lambda w: (w[1] + w[3]) / 2)
         lines: list[list[tuple[float, float, float, float, str]]] = []
         for word in words:
-            if lines and abs((word[1] + word[3]) / 2 - sum((w[1] + w[3]) / 2 for w in lines[-1]) / len(lines[-1])) <= 3.5:
+            if (
+                lines
+                and abs((word[1] + word[3]) / 2 - sum((w[1] + w[3]) / 2 for w in lines[-1]) / len(lines[-1])) <= 3.5
+            ):
                 lines[-1].append(word)
             else:
                 lines.append([word])
@@ -114,7 +179,9 @@ def parse() -> None:
         lines = [sorted(line) for line in merged_lines]
         total = next(i for i, line in enumerate(lines) if any(w[4] == "TOTAL" for w in line))
         edges = [w[2] for w in lines[total] if w[4] not in ("STATE", "TOTAL")]
-        printed = [int(re.sub(r"\D", "", w[4].translate(FIXES))) for w in lines[total] if w[4] not in ("STATE", "TOTAL")]
+        printed = [
+            int(re.sub(r"\D", "", w[4].translate(FIXES))) for w in lines[total] if w[4] not in ("STATE", "TOTAL")
+        ]
         cells: list[dict[int, tuple[int, list[float]]]] = []
         for line in lines[total - 46 : total]:
             merged: list[list[object]] = []
@@ -131,7 +198,10 @@ def parse() -> None:
                 column = min(range(len(edges)), key=lambda i: abs(edges[i] - float(x1)))
                 if abs(edges[column] - float(x1)) > 14 or not re.search(r"\d", str(text).translate(FIXES)):
                     continue
-                row[column] = (int(re.sub(r"\D", "", str(text).translate(FIXES))), [float(x0), float(y0), float(x1), float(y1)])
+                row[column] = (
+                    int(re.sub(r"\D", "", str(text).translate(FIXES))),
+                    [float(x0), float(y0), float(x1), float(y1)],
+                )
             cells.append(row)
         for (fixed_year, fixed_page, county_index, column), value in UNREADABLE.items():
             if (fixed_year, fixed_page) == (year, page):
@@ -162,12 +232,27 @@ def parse() -> None:
                     )
     for year in (1994, 1990):
         book = raw.cached(SOURCE, URL.format(BOOKS[year]))
-        scan = pl.read_csv(Path(__file__).with_name(f"sc_report_{year}.tsv"), separator="\t", schema_overrides={"party": pl.String})
+        scan = pl.read_csv(
+            Path(__file__).with_name(f"sc_report_{year}.tsv"), separator="\t", schema_overrides={"party": pl.String}
+        )
         for page in scan["page"].unique().to_list():
             image = PAGES / f"{book.sha256}-{page}.png"
             if not image.exists():
                 subprocess.run(
-                    ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(book.path), str(image.with_suffix(""))],
+                    [
+                        "pdftoppm",
+                        "-r",
+                        str(DPI),
+                        "-gray",
+                        "-png",
+                        "-f",
+                        str(page),
+                        "-l",
+                        str(page),
+                        "-singlefile",
+                        str(book.path),
+                        str(image.with_suffix("")),
+                    ],
                     check=True,
                 )
         totals = scan.group_by("office", "name").agg(pl.col("votes").sum().alias("printed"))
@@ -261,7 +346,9 @@ def emit() -> Path:
         }
         if len(counties) != 46:
             raise ValueError("South Carolina needs 46 counties")
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -368,5 +455,11 @@ def emit() -> Path:
                         x1=box[2] / width,
                         y1=box[3] / height,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

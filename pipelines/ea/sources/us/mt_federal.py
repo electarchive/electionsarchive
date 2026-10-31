@@ -18,7 +18,9 @@ FILES = {2020: ("https://sosmt.gov/wp-content/uploads/2020PrimaryReportStateCanv
 PUBLISHER = "Montana Secretary of State"
 TITLE = "Statewide primary election canvass"
 PARTIES = {"Democrat": "democratic", "Republican": "republican", "Green": "green", "Libertarian": "libertarian"}
-OFFICES = re.compile(r"^(PRESIDENT|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE|UNITED STATES|REPRESENTATIVE|SENATOR)\b")
+OFFICES = re.compile(
+    r"^(PRESIDENT|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE|UNITED STATES|REPRESENTATIVE|SENATOR)\b"
+)
 ROW = re.compile(r"^([A-Z][A-Za-z.&' ]+?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")
 
 
@@ -86,13 +88,18 @@ def parse() -> None:
                 if len(values) != count:
                     continue
                 for candidate, value in zip(names, values, strict=True):
-                    rows.append(
-                        (year, f"{kind}:{party}", day, fips[county], candidate, int(value[0].replace(",", "")))
-                    )
+                    rows.append((year, f"{kind}:{party}", day, fips[county], candidate, int(value[0].replace(",", ""))))
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
-        schema={"year": pl.Int32, "chamber": pl.String, "day": pl.Date, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+        schema={
+            "year": pl.Int32,
+            "chamber": pl.String,
+            "day": pl.Date,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
         orient="row",
     ).with_columns(
         special=pl.lit(False),

@@ -15,8 +15,26 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Texas Secretary of State"
 URL = "https://www.sos.state.tx.us/elections/historical/70-92.shtml"
 TITLE = "Turnout and Voter Registration Figures (1970-current)"
-MONTHS = {m: i for i, m in enumerate(
-    ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"], 1)}
+MONTHS = {
+    m: i
+    for i, m in enumerate(
+        [
+            "january",
+            "february",
+            "march",
+            "april",
+            "may",
+            "june",
+            "july",
+            "august",
+            "september",
+            "october",
+            "november",
+            "december",
+        ],
+        1,
+    )
+}
 HEADING = re.compile(r"^((?:19|20)\d\d)\s*[–-]\s*(.*)$")
 
 
@@ -50,14 +68,26 @@ def parse() -> None:
             elif label.startswith("turnout"):
                 voters = number(lines[j + 1])
         month = next((m for name, m in MONTHS.items() if name in rest), None)
-        stage = "runoff" if "runoff" in rest else "primary" if "primary" in rest else "special" if "special" in rest and month != 11 else "general"
+        stage = (
+            "runoff"
+            if "runoff" in rest
+            else "primary"
+            if "primary" in rest
+            else "special"
+            if "special" in rest and month != 11
+            else "general"
+        )
         if stage == "general":
             month = 11
-        rows.append({"year": year, "month": month, "stage": stage, "heading": line, "registered": registered, "voters": voters})
+        rows.append(
+            {"year": year, "month": month, "stage": stage, "heading": line, "registered": registered, "voters": voters}
+        )
     frame = pl.DataFrame(rows, schema_overrides={"month": pl.Int64}).filter(pl.col("voters").is_not_null())
-    frame = frame.group_by("year", "month", "stage").agg(
-        pl.col("registered").max(), pl.col("voters").sum(), pl.col("heading").first(), pl.len().alias("blocks")
-    ).sort("year", "month", "stage")
+    frame = (
+        frame.group_by("year", "month", "stage")
+        .agg(pl.col("registered").max(), pl.col("voters").sum(), pl.col("heading").first(), pl.len().alias("blocks"))
+        .sort("year", "month", "stage")
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
     print(frame)
@@ -89,11 +119,24 @@ def emit() -> Path:
         fips = "48"
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
-        for year, month, stage, registered, voters in frame.select("year", "month", "stage", "registered", "voters").iter_rows():
+        for year, month, stage, registered, voters in frame.select(
+            "year", "month", "stage", "registered", "voters"
+        ).iter_rows():
             found = [
-                f for (y, m, k), items in elections.items() if y == year and k == stage and month in (None, m) for f in items
+                f
+                for (y, m, k), items in elections.items()
+                if y == year and k == stage and month in (None, m)
+                for f in items
             ]
             if len(found) > 1 and stage == "general":
                 first = date(year, 11, 1)

@@ -37,7 +37,9 @@ def parse() -> None:
     with zipfile.ZipFile(raw.cached(SOURCE, FILES.format(day=DAY)).path) as archive:
         text = archive.read(archive.namelist()[0])
     frame = (
-        pl.read_csv(io.BytesIO(text), separator="\t", infer_schema=False, encoding="utf8-lossy", truncate_ragged_lines=True)
+        pl.read_csv(
+            io.BytesIO(text), separator="\t", infer_schema=False, encoding="utf8-lossy", truncate_ragged_lines=True
+        )
         .filter(pl.col("Contest Name").str.contains(r"^US PRESIDENT \((DEM|REP|LIB)\)$"))
         .with_columns(
             party=pl.col("Choice Party").str.strip_chars().replace_strict(PARTIES),

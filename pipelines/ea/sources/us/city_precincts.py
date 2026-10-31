@@ -830,11 +830,7 @@ def emit() -> Path:
             report["matched"] = report.get("matched", 0) + 1
             result_set = cs.key(f"{SOURCE}.result_set", str(contest))
             source_id = (
-                sources[origin]
-                if origin in sources
-                else sources[day]
-                if origin == "medsl"
-                else sources[(state, day)]
+                sources[origin] if origin in sources else sources[day] if origin == "medsl" else sources[(state, day)]
             )
             cs.add(
                 "result_set",

@@ -45,8 +45,14 @@ def parse() -> None:
         }
     rows = []
     for name, (day, party) in SHEETS.items():
-        sheet = pl.read_excel(raw.cached(SOURCE, URL).path, sheet_name=name, has_header=False, infer_schema_length=0).rows()
-        head = next(i for i, line in enumerate(sheet) if key(line[0] or "") == "county" and (line[1] or "").strip() not in ("", "Pres 12"))
+        sheet = pl.read_excel(
+            raw.cached(SOURCE, URL).path, sheet_name=name, has_header=False, infer_schema_length=0
+        ).rows()
+        head = next(
+            i
+            for i, line in enumerate(sheet)
+            if key(line[0] or "") == "county" and (line[1] or "").strip() not in ("", "Pres 12")
+        )
         names = {}
         for column, cell in enumerate(sheet[head][1:], start=1):
             if key(cell or "") in ("total", ""):
@@ -55,7 +61,15 @@ def parse() -> None:
         for line in sheet[head + 1 :]:
             if line[0] and key(line[0]) in fips:
                 for column, candidate in names.items():
-                    rows.append((day, f"president:{party}", candidate.upper(), fips[key(line[0])], int(float(line[column] or 0))))
+                    rows.append(
+                        (
+                            day,
+                            f"president:{party}",
+                            candidate.upper(),
+                            fips[key(line[0])],
+                            int(float(line[column] or 0)),
+                        )
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(

@@ -35,9 +35,7 @@ def emit() -> Path:
             kind="correction",
         )
         for entity, into in MERGES.items():
-            merged = conn.execute(
-                "select exists (select from entity_merge where entity_id = %s)", [entity]
-            ).fetchone()
+            merged = conn.execute("select exists (select from entity_merge where entity_id = %s)", [entity]).fetchone()
             if not merged[0]:
                 cs.merge(UUID(entity), UUID(into))
         return cs.write()

@@ -84,7 +84,9 @@ def parse() -> None:
                     )
             for total, state in zip(counted, item["ballotOptions"], strict=True):
                 if total != state["voteCount"]:
-                    raise ValueError(f"{day} {item['name']} {state['name']}: counties sum to {total}, state {state['voteCount']}")
+                    raise ValueError(
+                        f"{day} {item['name']} {state['name']}: counties sum to {total}, state {state['voteCount']}"
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,

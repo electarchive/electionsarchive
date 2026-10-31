@@ -16,7 +16,8 @@ PARSED = DATA / "parsed" / SOURCE
 KY = "https://elect.ky.gov"
 AL = "https://www.sos.alabama.gov/sites/default/files/election-data/"
 FILES = {
-    ("KY", date(2014, 5, 20)): KY + "/SiteCollectionDocuments/Election%20Statistics/turnout/2011-2019/voterturnoutcounty-2014P-20140922-022341.pdf",
+    ("KY", date(2014, 5, 20)): KY
+    + "/SiteCollectionDocuments/Election%20Statistics/turnout/2011-2019/voterturnoutcounty-2014P-20140922-022341.pdf",
     ("KY", date(2016, 5, 17)): KY + "/statistics/Documents/voterturnoutcounty-2016P-20160815-115948.pdf",
     ("KY", date(2018, 5, 22)): KY + "/Resources/Documents/voterturnoutcounty-2018P-20180824-072344.pdf",
     ("KY", date(2020, 6, 23)): KY + "/Resources/Documents/voterturnoutcounty-2020P-20200823-070314.pdf",
@@ -59,7 +60,9 @@ def parse() -> None:
             print(f"{state} {day}: {len(seen)} counties")
         rows.extend((state, day, county, registered, ballots) for county, (registered, ballots) in seen.items())
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows, schema=["state", "day", "county", "registered", "ballots"], orient="row").write_parquet(PARSED / "turnout.parquet")
+    pl.DataFrame(rows, schema=["state", "day", "county", "registered", "ballots"], orient="row").write_parquet(
+        PARSED / "turnout.parquet"
+    )
     print(len(rows), "county rows")
 
 
@@ -139,7 +142,9 @@ def emit() -> Path:
                         cs.add(
                             "result_value",
                             result_set_id=result_set,
-                            unit_id=UUID(str(counties[re.sub(r"[^a-z]", "", county.lower().replace("tucsaloosa", "tuscaloosa"))])),
+                            unit_id=UUID(
+                                str(counties[re.sub(r"[^a-z]", "", county.lower().replace("tucsaloosa", "tuscaloosa"))])
+                            ),
                             option_id=None,
                             channel=0,
                             measure=measure,

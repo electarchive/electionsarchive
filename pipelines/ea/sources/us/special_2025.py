@@ -68,7 +68,7 @@ def rows() -> list[dict[str, object]]:
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, check=True, text=True
         ).stdout
         names: dict[int, str] = {}
-        for number, name in re.findall(r"(\d+)\. (.+?)(?=\s{2,}|\s*$)", text, flags=re.M):
+        for number, name in re.findall(r"(\d+)\. (.+?)(?=\s{2,}|\s*$)", text, flags=re.MULTILINE):
             names[int(number)] = name
         order: list[int] = []
         totals: dict[int, int] = {}

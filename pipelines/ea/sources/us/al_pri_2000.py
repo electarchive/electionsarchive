@@ -89,7 +89,11 @@ def parse() -> None:
                 rows.append((party, name.upper(), fips[county.lower()], votes[column]))
     PARSED.mkdir(parents=True, exist_ok=True)
     (
-        pl.DataFrame(rows, schema={"party": pl.String, "candidate": pl.String, "code": pl.String, "votes": pl.Int64}, orient="row")
+        pl.DataFrame(
+            rows,
+            schema={"party": pl.String, "candidate": pl.String, "code": pl.String, "votes": pl.Int64},
+            orient="row",
+        )
         .with_columns(
             day=pl.lit(DAY),
             year=pl.lit(2000, pl.Int32),

@@ -218,7 +218,11 @@ def parse() -> None:
         for layer in LAYERS:
             features = json.loads(raw.cached(SOURCE, url(layer)).path.read_bytes())["features"]
             shapes = {
-                re.sub(r"^(district|ward)-|^0+(?=[0-9])", "", re.sub(r"[^a-z0-9]+", "-", str(f["properties"][layer["field"]]).lower()).strip("-")): f["geometry"]
+                re.sub(
+                    r"^(district|ward)-|^0+(?=[0-9])",
+                    "",
+                    re.sub(r"[^a-z0-9]+", "-", str(f["properties"][layer["field"]]).lower()).strip("-"),
+                ): f["geometry"]
                 for f in features
                 if f["geometry"] is not None
             }

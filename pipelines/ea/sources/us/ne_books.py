@@ -48,7 +48,12 @@ BOOKS = {
 }
 SPLIT = {1998: True}
 LAYOUT = {
-    1998: {"secretary-of-state": (4, None), "auditor": (5, None), "attorney-general": (6, None), "treasurer": (7, None)},
+    1998: {
+        "secretary-of-state": (4, None),
+        "auditor": (5, None),
+        "attorney-general": (6, None),
+        "treasurer": (7, None),
+    },
     1994: {
         "secretary-of-state": (9, (0.15, 0.38)),
         "auditor": (9, (0.38, 0.50)),
@@ -68,7 +73,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, ZIP, suffix=".zip")
     archive = raw.cached(SOURCE, ZIP)
     with zipfile.ZipFile(archive.path) as z:
-        for year, (_, member) in BOOKS.items():
+        for _, member in BOOKS.values():
             url = f"{ZIP}#zip2/{member}"
             try:
                 raw.cached(SOURCE, url)
@@ -102,14 +107,27 @@ def parse() -> None:
             image = PAGES / f"{artifact.sha256}-{page}.png"
             if not image.exists():
                 subprocess.run(
-                    ["pdftoppm", "-r", str(300 if year == 1998 else DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+                    [
+                        "pdftoppm",
+                        "-r",
+                        str(300 if year == 1998 else DPI),
+                        "-gray",
+                        "-png",
+                        "-f",
+                        str(page),
+                        "-l",
+                        str(page),
+                        "-singlefile",
+                    ]
                     + [str(artifact.path), str(image.with_suffix(""))],
                     check=True,
                 )
                 with Image.open(image) as rendered:
                     small = rendered.convert("L").resize((rendered.width // 4, rendered.height // 4))
                     ink = Image.fromarray((numpy.asarray(small) < 128).astype("uint8") * 255)
-                    angle = max(numpy.arange(-3, 3.01, 0.1), key=lambda a: numpy.var(numpy.asarray(ink.rotate(a)).sum(axis=1)))
+                    angle = max(
+                        numpy.arange(-3, 3.01, 0.1), key=lambda a: numpy.var(numpy.asarray(ink.rotate(a)).sum(axis=1))
+                    )
                     rendered.convert("L").rotate(angle, resample=Image.Resampling.BICUBIC, fillcolor=255).save(image)
             with Image.open(image) as rendered:
                 width = rendered.size[0]
@@ -119,7 +137,13 @@ def parse() -> None:
                 ["tesseract", str(clean), "stdout", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
             ).stdout
             tokens = [
-                (int(r["left"]), int(r["top"]), int(r["left"]) + int(r["width"]), int(r["top"]) + int(r["height"]), r["text"].replace(",", ""))
+                (
+                    int(r["left"]),
+                    int(r["top"]),
+                    int(r["left"]) + int(r["width"]),
+                    int(r["top"]) + int(r["height"]),
+                    r["text"].replace(",", ""),
+                )
                 for r in csv.DictReader(io.StringIO(tsv), delimiter="\t", quoting=csv.QUOTE_NONE)
                 if r["level"] == "5" and r["text"].replace(",", "").strip().isdigit() and int(r["top"]) > 300
             ]
@@ -147,7 +171,10 @@ def parse() -> None:
                 if len(pairs) < 0.1 * columns * len(block_keys):
                     raise ValueError(f"{year} {office}: only {len(pairs)} cells matched")
                 pitch = statistics.median(
-                    (yj - yi) / (j - i) for n, (i, yi) in enumerate(pairs[::3]) for j, yj in pairs[::3][n + 1 :] if j != i
+                    (yj - yi) / (j - i)
+                    for n, (i, yi) in enumerate(pairs[::3])
+                    for j, yj in pairs[::3][n + 1 :]
+                    if j != i
                 )
                 top = statistics.median(y - pitch * i for i, y in pairs)
                 for column in range(columns):
@@ -158,14 +185,25 @@ def parse() -> None:
                         else:
                             y = top + i * pitch
                             w = char * len(str(table["rows"][key][column]))
-                            box = (round(edges[column] - w), round(y - pitch * 0.3), round(edges[column]), round(y + pitch * 0.3))
+                            box = (
+                                round(edges[column] - w),
+                                round(y - pitch * 0.3),
+                                round(edges[column]),
+                                round(y + pitch * 0.3),
+                            )
                         boxes[(key, column)] = box
             print(year, office, f"{matched}/{len(counties) * columns} cells matched to OCR tokens")
             printed = table["rows"]["TOTAL"]
             for column, candidate in enumerate(table["candidates"]):
                 summed = sum(table["rows"][k][column] for k in counties)
-                if summed != printed[column] and (year, office, candidate["name"]) not in EXCEPTIONS and (year, office) not in EXCEPTIONS:
-                    raise ValueError(f"{year} {office} {candidate['name']}: counties sum to {summed}, printed {printed[column]}")
+                if (
+                    summed != printed[column]
+                    and (year, office, candidate["name"]) not in EXCEPTIONS
+                    and (year, office) not in EXCEPTIONS
+                ):
+                    raise ValueError(
+                        f"{year} {office} {candidate['name']}: counties sum to {summed}, printed {printed[column]}"
+                    )
                 for key in counties:
                     rows.append(
                         {
@@ -213,7 +251,12 @@ def emit() -> Path:
             title = TITLE.format(year=year)
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=LANDING,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=LANDING,
                 license=LICENSE,
             )
             artifact = cs.artifact(book(year), sources[year])
@@ -247,7 +290,9 @@ def emit() -> Path:
         }
         if len(counties) != 93:
             raise ValueError("Nebraska needs 93 counties")
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -354,5 +399,11 @@ def emit() -> Path:
                         x1=box[2] / width,
                         y1=box[3] / height,
                     )
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

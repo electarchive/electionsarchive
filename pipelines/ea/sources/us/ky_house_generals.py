@@ -23,7 +23,9 @@ FILES = {
     date(2006, 11, 7): "2006/General%20Election/STATEwidebycounty.txt",
     date(2008, 11, 4): "2008/General%20Election/STATEwide%20by%20candidate%20by%20county%20gen%2008.txt",
 }
-OFFICE = re.compile(r"OFFICE: \S+\s+(U\.S\. REPRESENTATIVE|KY REPRESENTATIVE|KY SENATOR)\s+(\d+)(?:ST|ND|RD|TH)\s+DIST?\s*$")
+OFFICE = re.compile(
+    r"OFFICE: \S+\s+(U\.S\. REPRESENTATIVE|KY REPRESENTATIVE|KY SENATOR)\s+(\d+)(?:ST|ND|RD|TH)\s+DIST?\s*$"
+)
 CHAMBERS = {"U.S. REPRESENTATIVE": "house", "KY REPRESENTATIVE": "house:{}:g", "KY SENATOR": "senate:{}:g"}
 
 

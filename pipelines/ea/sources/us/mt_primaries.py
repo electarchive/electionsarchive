@@ -55,7 +55,9 @@ def parse() -> None:
             False,
             int(total),
         )
-        for race, party, county, candidate, total in votes.group_by("RaceName", "PartyCode", "CountyName", "NameOnBallot")
+        for race, party, county, candidate, total in votes.group_by(
+            "RaceName", "PartyCode", "CountyName", "NameOnBallot"
+        )
         .agg(pl.col("Votes").sum())
         .sort("RaceName", "PartyCode", "CountyName", "NameOnBallot")
         .rows()

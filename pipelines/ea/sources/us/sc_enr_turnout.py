@@ -71,7 +71,10 @@ def parse() -> None:
                 totals[name] = totals.get(name, 0) + int(county.get("votes", "0"))
             for name, votes in totals.items():
                 floor[name] = max(floor.get(name, 0), votes)
-        units = [*root.findall("ElectionVoterTurnout/Counties/County"), *root.findall("VoterTurnout/Precincts/Precinct")]
+        units = [
+            *root.findall("ElectionVoterTurnout/Counties/County"),
+            *root.findall("VoterTurnout/Precincts/Precinct"),
+        ]
         kept = 0
         for unit in units:
             name = re.sub(r"[^a-z]", "", unit.get("name", "").lower())
@@ -79,10 +82,14 @@ def parse() -> None:
             if ballots == 0 and floor.get(name, 0) == 0:
                 continue
             if not floor.get(name, 0) <= ballots <= registered:
-                print(f"{day} {unit.get('name')}: ballots {ballots}, registered {registered}, largest contest {floor.get(name, 0)}, left out")
+                print(
+                    f"{day} {unit.get('name')}: ballots {ballots}, registered {registered}, largest contest {floor.get(name, 0)}, left out"
+                )
                 continue
             kept += 1
-            rows.append({"day": day, "kind": kind, "code": counties[name], "registered": registered, "ballots": ballots})
+            rows.append(
+                {"day": day, "kind": kind, "code": counties[name], "registered": registered, "ballots": ballots}
+            )
         print(day, kind, f"{kept} of {len(units)} counties")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows)
@@ -118,7 +125,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=SITE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=SITE,
+                license="Public record",
+            )
         for path in ELECTIONS.values():
             cs.artifact(raw.cached(SOURCE, address(path)), source)
         for (day, kind), rows in frame.group_by("day", "kind", maintain_order=True):
@@ -141,7 +156,9 @@ def emit() -> Path:
                 completeness=round(rows.height / 46, 4),
             )
             if kind == "runoff":
-                cs.add("note", id=uuid5(result_set, "registered"), entity_id=result_set, kind="methodology", body_md=RUNOFF)
+                cs.add(
+                    "note", id=uuid5(result_set, "registered"), entity_id=result_set, kind="methodology", body_md=RUNOFF
+                )
             for code, registered, ballots in rows.select("code", "registered", "ballots").iter_rows():
                 for measure, value in ((2, registered), (3, ballots)):
                     cs.add(

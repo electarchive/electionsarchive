@@ -261,7 +261,18 @@ def emit() -> Path:
                 if not target.exists():
                     target.parent.mkdir(parents=True, exist_ok=True)
                     subprocess.run(
-                        ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        [
+                            "pdftoppm",
+                            "-r",
+                            str(DPI),
+                            "-gray",
+                            "-png",
+                            "-f",
+                            str(number),
+                            "-l",
+                            str(number),
+                            "-singlefile",
+                        ]
                         + [str(cached.path), str(target.with_suffix(""))],
                         check=True,
                     )

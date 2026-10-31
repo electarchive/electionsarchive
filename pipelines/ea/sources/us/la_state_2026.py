@@ -11,7 +11,9 @@ from ea.store import connect
 
 SOURCE = "us.la_state_2026"
 VERSION = "1"
-LISTING = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob=20261103/RacesCandidates_Multiparish.htm"
+LISTING = (
+    "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob=20261103/RacesCandidates_Multiparish.htm"
+)
 PUBLISHER = "Louisiana Secretary of State"
 TITLE = "Election Results Data: November 3, 2026 races and candidates"
 SITE = "https://voterportal.sos.la.gov/ElectionResults/"
@@ -24,7 +26,9 @@ PARTIES = {"DEM": "democratic-party", "REP": "republican-party", "LBT": "liberta
 
 
 def fetch() -> None:
-    content = httpx.get(LISTING, follow_redirects=True, timeout=120, headers={"User-Agent": "electionsarchive.com"}).content
+    content = httpx.get(
+        LISTING, follow_redirects=True, timeout=120, headers={"User-Agent": "electionsarchive.com"}
+    ).content
     raw.store(SOURCE, LISTING, content, suffix=".json", retrieved_at=datetime.now(UTC), media_type="application/json")
 
 

@@ -22,7 +22,10 @@ TITLE = "Official general election results by county and precinct"
 PAGE = "https://web.archive.org/web/2008id_/http://www.app.sboe.state.nc.us/NCSBE/Elec/Results/y2000elect/enrs_contest_by_county/gov.htm"
 ZIPS = {
     date(2008, 11, 4): ("https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2008_11_04/results_pct_20081104.zip", "GOVERNOR"),
-    date(2012, 11, 6): ("https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2012_11_06/results_pct_20121106.zip", "NC GOVERNOR"),
+    date(2012, 11, 6): (
+        "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2012_11_06/results_pct_20121106.zip",
+        "NC GOVERNOR",
+    ),
 }
 SURNAMES = {"Bev Perdue": "PERDUE", "Pat McCrory": "MCCRORY", "Michael C. Munger": "MUNGER"}
 
@@ -45,8 +48,13 @@ def parse() -> None:
         }
     rows = []
     table = []
-    for row in re.findall(r"<TR[^>]*>(.*?)</TR>", raw.cached(SOURCE, PAGE).path.read_text(errors="replace"), re.S | re.I):
-        cells = [html.unescape(re.sub(r"<[^>]+>", "", cell)).strip() for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", row, re.S | re.I)]
+    for row in re.findall(
+        r"<TR[^>]*>(.*?)</TR>", raw.cached(SOURCE, PAGE).path.read_text(errors="replace"), re.DOTALL | re.IGNORECASE
+    ):
+        cells = [
+            html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+            for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", row, re.DOTALL | re.IGNORECASE)
+        ]
         if cells := [re.sub(r"\s+", " ", cell) for cell in cells if cell]:
             table.append(cells)
     names = table[4]

@@ -39,7 +39,9 @@ def emit() -> Path:
         served = defaultdict(list)
         for term in TERMS:
             for name, _, member in tbmm.members(term):
-                served[member].append((term, name, cs.survivors.get(owner[f"{term}:{member}"], owner[f"{term}:{member}"])))
+                served[member].append(
+                    (term, name, cs.survivors.get(owner[f"{term}:{member}"], owner[f"{term}:{member}"]))
+                )
         review = []
         merged = 0
         for member, terms in served.items():

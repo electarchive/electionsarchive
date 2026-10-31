@@ -55,7 +55,9 @@ def parse() -> None:
             ).fetchall()
         )
     codes = {text.lower().replace(" ", ""): code for text, code in fips.items()}
-    scan = pl.read_csv(Path(__file__).with_name("nv_microfiche_statewide.tsv"), separator="\t", schema_overrides={"party": pl.String})
+    scan = pl.read_csv(
+        Path(__file__).with_name("nv_microfiche_statewide.tsv"), separator="\t", schema_overrides={"party": pl.String}
+    )
     sums = scan.group_by("office", "name").agg(pl.col("votes").sum(), pl.col("total").first(), pl.len())
     bad = sums.filter((pl.col("votes") != pl.col("total")) | (pl.col("len") != 17))
     if bad.height:
@@ -97,7 +99,13 @@ def emit() -> Path:
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
             cs.add(
-                "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=LANDING,
+                license=LICENSE,
             )
         artifact = cs.artifact(raw.cached(SOURCE, URL), source)
         result: dict[int, tuple[UUID, int, int]] = {}
@@ -109,8 +117,13 @@ def emit() -> Path:
             page = cs.page(artifact, number)
             result[key] = (page, width, height)
             cs.add(
-                "source_page", id=page, artifact_id=artifact, page_number=number,
-                image_key=f"pages/{SOURCE}/{target.name}", width=width, height=height,
+                "source_page",
+                id=page,
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{target.name}",
+                width=width,
+                height=height,
             )
         return result
 

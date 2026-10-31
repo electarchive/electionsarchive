@@ -219,16 +219,21 @@ def emit() -> Path:
         }
         frame = frame.with_columns(
             chamber=pl.struct("day", "chamber").map_elements(
-                lambda row: next(
-                    (
-                        variant
-                        for variant in (row["chamber"], *(f"{row['chamber']}f{kind}" for kind in ("settled", "unsettled", "partunsettled")))
-                        if f"{row['day']}:NC:{variant}" in keys
-                    ),
-                    row["chamber"],
-                )
-                if row["chamber"].endswith(("dp", "rp"))
-                else row["chamber"],
+                lambda row: (
+                    next(
+                        (
+                            variant
+                            for variant in (
+                                row["chamber"],
+                                *(f"{row['chamber']}f{kind}" for kind in ("settled", "unsettled", "partunsettled")),
+                            )
+                            if f"{row['day']}:NC:{variant}" in keys
+                        ),
+                        row["chamber"],
+                    )
+                    if row["chamber"].endswith(("dp", "rp"))
+                    else row["chamber"]
+                ),
                 return_dtype=pl.String,
             )
         )

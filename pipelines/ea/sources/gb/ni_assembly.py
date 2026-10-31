@@ -3,8 +3,8 @@ import itertools
 import re
 import subprocess
 import unicodedata
-import zipfile
 import xml.etree.ElementTree as ET
+import zipfile
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -13,7 +13,6 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.gb import umit
 from ea.store import DATA, connect
 
 SOURCE = "gb.ni_assembly"
@@ -30,7 +29,10 @@ DAYS = {
     2017: date(2017, 3, 2),
     2022: date(2022, 5, 5),
 }
-ARK = {year: f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/asby/{year}.rar" for year in (1998, 2003, 2007)}
+ARK = {
+    year: f"https://web.archive.org/web/2020if_/https://www.ark.ac.uk/elections/xls/asby/{year}.rar"
+    for year in (1998, 2003, 2007)
+}
 NICVA = {
     year: f"https://raw.githubusercontent.com/NICVA/electionsni/master/{year}/{year}_archive_datapackage.zip"
     for year in (2011, 2016, 2017)
@@ -134,7 +136,11 @@ def workbook(path: Path) -> dict[int, dict[str, str | float]]:
                 continue
             column = re.match(r"[A-Z]+", cell.get("r")).group()
             rows.setdefault(int(cell.get("r")[len(column) :]), {})[column] = (
-                strings[int(value.text)] if cell.get("t") == "s" else value.text if cell.get("t") in ("str", "b") else float(value.text)
+                strings[int(value.text)]
+                if cell.get("t") == "s"
+                else value.text
+                if cell.get("t") in ("str", "b")
+                else float(value.text)
             )
     return rows
 
@@ -191,7 +197,9 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
         )
     facts: dict[str, float] = {}
     for row in rows[totals + 1 :]:
-        position = next((index for index in (3, 2, 4) if row[index] is not None and not re.match(r"[\d-]", row[index])), None)
+        position = next(
+            (index for index in (3, 2, 4) if row[index] is not None and not re.match(r"[\d-]", row[index])), None
+        )
         if position is None:
             continue
         label = row[position].strip().lower()
@@ -214,16 +222,16 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
             facts["quota"] = float(value)
     seats = int(facts["seats"])
     valid = facts.get("valid") or sum(candidate["totals"][1] for candidate in candidates)
-    quota = (facts.get("quota") if facts.get("quota") and abs(facts["quota"] - (valid // (seats + 1) + 1)) < 1 else None) or valid // (seats + 1) + 1
+    quota = (
+        facts.get("quota") if facts.get("quota") and abs(facts["quota"] - (valid // (seats + 1) + 1)) < 1 else None
+    ) or valid // (seats + 1) + 1
     for candidate in candidates:
         held = None
         for stage in stages:
             amount = candidate["totals"][stage]
             if held is not None and amount < quota - 0.01:
                 candidate["totals"][stage] = held
-            elif held is None and amount >= quota - 0.01:
-                held = amount
-            elif held is not None:
+            elif held is None and amount >= quota - 0.01 or held is not None:
                 held = amount
     for before, stage in itertools.pairwise(stages):
         column = stage_cols[stage]
@@ -235,7 +243,9 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
             and cell(candidate["row"], column - 1) not in blank + ("-",)
         ]
         previous = cell(rows[non_transferable], stage_cols[before])
-        spare = number(cell(rows[non_transferable], column)) if cell(rows[non_transferable], column) not in blank else None
+        spare = (
+            number(cell(rows[non_transferable], column)) if cell(rows[non_transferable], column) not in blank else None
+        )
         if len(gap) == 1 and spare is None and previous not in blank:
             spare = number(previous) + number(cell(rows[non_transferable], column - 1))
         if len(gap) == 1 and spare is not None:
@@ -254,7 +264,9 @@ def ark_sheet(year: int, path: Path) -> dict[str, object]:
     chosen = {candidate["name"] for candidate in candidates if candidate["elected"]}
     printed = {candidate["name"] for candidate in candidates if candidate["flagged"]}
     if len(chosen) != seats or not printed <= chosen:
-        raise ValueError(f"{year} {path.stem}: derived {sorted(chosen)} against printed {sorted(printed)} for {seats} seats")
+        raise ValueError(
+            f"{year} {path.stem}: derived {sorted(chosen)} against printed {sorted(printed)} for {seats} seats"
+        )
     exhausted = {stage: number(cell(rows[non_transferable], stage_cols[stage])) for stage in stages}
     return {"facts": facts, "candidates": candidates, "exhausted": exhausted, "stages": stages}
 
@@ -286,11 +298,19 @@ def parse() -> None:
             units.append({"year": year, "constituency": constituency, **facts})
             full_names: dict[int, str] = {}
             if year == 2007:
-                section = raw.cached(SOURCE, WIKIPEDIA.format(constituency.replace(" ", "_"))).path.read_text(encoding="utf-8")
+                section = raw.cached(SOURCE, WIKIPEDIA.format(constituency.replace(" ", "_"))).path.read_text(
+                    encoding="utf-8"
+                )
                 section = section.split("====2007====", 1)[1].split("\n====", 1)[0]
                 for block in section.split("STV Election box candidate2")[1:]:
                     line = re.search(r"\|\s*candidate\s*=\s*([^\n]*)", block)
-                    link = None if line is None else re.sub(r"\'{2,}", "", re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", line.group(1))).strip()
+                    link = (
+                        None
+                        if line is None
+                        else re.sub(
+                            r"\'{2,}", "", re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", line.group(1))
+                        ).strip()
+                    )
                     first = re.search(r"count1\s*=\s*\'*([\d,]+)", block)
                     if link and first is not None:
                         full_names[int(first.group(1).replace(",", ""))] = link
@@ -301,7 +321,9 @@ def parse() -> None:
                     or difflib.SequenceMatcher(None, fold(candidate["name"]), fold(full.split()[-1])).ratio() >= 0.6
                 ):
                     candidate["name"] = full
-                if (year, constituency, candidate["name"].split(",")[0].strip()) in {(1998, *key) for key in INDEPENDENT_UNIONISTS_1998}:
+                if (year, constituency, candidate["name"].split(",")[0].strip()) in {
+                    (1998, *key) for key in INDEPENDENT_UNIONISTS_1998
+                }:
                     candidate["party"] = "Independent Unionist"
                 for stage, value in candidate["totals"].items():
                     totals.append(
@@ -336,11 +358,27 @@ def parse() -> None:
                     "seats": facts["Number_Of_Seats"],
                 }
             )
-            people = pl.read_csv(facts_path.with_name("Candidate.csv"), infer_schema_length=0, schema_overrides={"Candidate_Id": pl.Int64})
+            people = pl.read_csv(
+                facts_path.with_name("Candidate.csv"),
+                infer_schema_length=0,
+                schema_overrides={"Candidate_Id": pl.Int64},
+            )
             people = people.with_columns(
-                *(pl.lit(None).alias(column) for column in ("Outgoing_Member", "Gender") if column not in people.columns)
+                *(
+                    pl.lit(None).alias(column)
+                    for column in ("Outgoing_Member", "Gender")
+                    if column not in people.columns
+                )
             ).select("Candidate_Id", "Outgoing_Member", "Gender")
-            for line in pl.read_csv(facts_path.with_name("Count.csv"), infer_schema_length=0, schema_overrides={"Candidate_Id": pl.Int64}).join(people, on="Candidate_Id", how="left").iter_rows(named=True):
+            for line in (
+                pl.read_csv(
+                    facts_path.with_name("Count.csv"),
+                    infer_schema_length=0,
+                    schema_overrides={"Candidate_Id": pl.Int64},
+                )
+                .join(people, on="Candidate_Id", how="left")
+                .iter_rows(named=True)
+            ):
                 totals.append(
                     {
                         "year": year,
@@ -358,11 +396,15 @@ def parse() -> None:
     first = {}
     for line in totals:
         if line["stage"] == 1:
-            first[(line["year"], line["constituency"])] = first.get((line["year"], line["constituency"]), 0.0) + line["votes"]
+            first[(line["year"], line["constituency"])] = (
+                first.get((line["year"], line["constituency"]), 0.0) + line["votes"]
+            )
     for unit in units:
         if not 2003 <= unit["year"] <= 2017:
             continue
-        page = raw.cached(SOURCE, WIKIPEDIA.format(unit["constituency"].replace(" ", "_"))).path.read_text(encoding="utf-8")
+        page = raw.cached(SOURCE, WIKIPEDIA.format(unit["constituency"].replace(" ", "_"))).path.read_text(
+            encoding="utf-8"
+        )
         found = re.search(rf"====\s*{unit['year']}\s*====(.*?)STV Election box end2(.*?)\n\}}\}}", page, re.DOTALL)
         box = {}
         if found is not None:
@@ -392,11 +434,18 @@ def parse() -> None:
         for number in range(header + len(candidates) + 1, header + len(candidates) + 40):
             if (row := rows.get(number, {})).get("D") in ("Non transferable", "Totals"):
                 tail.setdefault(row["D"], row)
-        columns = [column for column in ("E", "G", "I", "K", "M", "O", "Q", "S", "U", "W") if (tail["Totals"].get(column) or 0) > 0]
+        columns = [
+            column
+            for column in ("E", "G", "I", "K", "M", "O", "Q", "S", "U", "W")
+            if (tail["Totals"].get(column) or 0) > 0
+        ]
         valid = rows[4]["G"]
         tying = []
         for column in columns:
-            if abs(sum(row.get(column, 0) for row in candidates) + tail["Non transferable"].get(column, 0) - valid) > 0.5:
+            if (
+                abs(sum(row.get(column, 0) for row in candidates) + tail["Non transferable"].get(column, 0) - valid)
+                > 0.5
+            ):
                 break
             tying.append(column)
         cut = None if len(tying) == len(columns) else len(tying) + 1
@@ -444,7 +493,8 @@ def parse() -> None:
                 )
     print("not loaded, stages do not tie or elected not declared:", skipped)
     quotas = {
-        (unit["year"], unit["constituency"]): unit.get("quota") or unit["valid"] // (unit["seats"] + 1) + 1 for unit in units
+        (unit["year"], unit["constituency"]): unit.get("quota") or unit["valid"] // (unit["seats"] + 1) + 1
+        for unit in units
     }
     reached: set[tuple[int, str, int]] = set()
     for line in sorted(totals, key=lambda line: line["stage"]):
@@ -535,7 +585,9 @@ def display(name: str) -> str:
         words.append(word.capitalize() if word.isupper() and len(word) > 3 and "." not in word else word)
     for word in surname.split():
         if word.isupper() and len(word) > 1 and "." not in word:
-            word = re.sub(r"\b(Mc|O['’])([a-z])", lambda found: found.group(1) + found.group(2).upper(), word.capitalize())
+            word = re.sub(
+                r"\b(Mc|O['’])([a-z])", lambda found: found.group(1) + found.group(2).upper(), word.capitalize()
+            )
         words.append(word)
     return re.sub(
         r"\bO(Dowd|Neill|Connor|Hara|Loan|Brien|Donnell|Rourke|Kane|Meara|Reilly|Rawe|Fachina|Callaghan|Driscoll|Hagan)\b",
@@ -611,7 +663,13 @@ def emit() -> Path:
         sources = {}
         for year in DAYS:
             ark, official = year in ARK, year == 2022
-            publisher = "ARK Northern Ireland Elections" if ark else "Electoral Office for Northern Ireland" if official else "Elections NI (NICVA)"
+            publisher = (
+                "ARK Northern Ireland Elections"
+                if ark
+                else "Electoral Office for Northern Ireland"
+                if official
+                else "Elections NI (NICVA)"
+            )
             sources[year] = cs.source(publisher, f"Northern Ireland Assembly election {year}")
             cs.add(
                 "source",
@@ -619,12 +677,18 @@ def emit() -> Path:
                 kind="academic" if ark else "official_body" if official else "compendium",
                 publisher=publisher,
                 title=f"Northern Ireland Assembly election {year}: count by count results",
-                url=EONI_PAGE if official else "https://www.ark.ac.uk/elections/gexcel.htm" if ark else "https://www.electionsni.org/data/",
+                url=EONI_PAGE
+                if official
+                else "https://www.ark.ac.uk/elections/gexcel.htm"
+                if ark
+                else "https://www.electionsni.org/data/",
                 license="Open Government Licence v3.0" if official else None if ark else "CC BY-SA 4.0",
                 license_url=(
                     "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
                     if official
-                    else None if ark else "https://creativecommons.org/licenses/by-sa/4.0/"
+                    else None
+                    if ark
+                    else "https://creativecommons.org/licenses/by-sa/4.0/"
                 ),
                 attribution=(
                     "Result sheets from the Electoral Office for Northern Ireland, under the Open Government Licence v3.0."
@@ -754,8 +818,10 @@ def emit() -> Path:
                         f"{int(sums[0] // (seats + 1)) + 1:,}. The printed quota is left out."
                     )
                     quota = None
-                if any(after > before + 0.5 for before, after in zip(sums, sums[1:])):
-                    caveats.append("The candidates' totals rise between two stages in the source; the stage totals are stored as published.")
+                if any(after > before + 0.5 for before, after in itertools.pairwise(sums)):
+                    caveats.append(
+                        "The candidates' totals rise between two stages in the source; the stage totals are stored as published."
+                    )
                 if (year, label) == (2007, "South Antrim"):
                     caveats.append(
                         "The spreadsheet ends at count 7; count 8 (Burnside's surplus, which elected Clarke and Burns) is from ARK's "
@@ -799,9 +865,11 @@ def emit() -> Path:
                             value=amount,
                         )
                 running = dict.fromkeys(stages, 0.0)
-                for candidate in lines.select("number", "name", "party", "elected", "incumbent", "gender").unique(
-                    maintain_order=True, subset=["number"]
-                ).iter_rows(named=True):
+                for candidate in (
+                    lines.select("number", "name", "party", "elected", "incumbent", "gender")
+                    .unique(maintain_order=True, subset=["number"])
+                    .iter_rows(named=True)
+                ):
                     series = {
                         row["stage"]: row["votes"]
                         for row in lines.filter(pl.col("number") == candidate["number"]).iter_rows(named=True)
@@ -809,7 +877,9 @@ def emit() -> Path:
                     relabeled = RELABELED.get((year, candidate["name"]))
                     canonical = relabeled[0] if relabeled else party_of(candidate["party"])
                     owner = party_id(canonical)
-                    independent = canonical is None and ("independ" in candidate["party"].lower() or candidate["party"].strip() in ("", "Unionist"))
+                    independent = canonical is None and (
+                        "independ" in candidate["party"].lower() or candidate["party"].strip() in ("", "Unionist")
+                    )
                     full = display(candidate["name"]) if "," in candidate["name"] else candidate["name"]
                     option_key = f"{contest_key}:{candidate['number']}"
                     option = cs.key("gb.ni_assembly.option", option_key)
@@ -818,7 +888,14 @@ def emit() -> Path:
                         made.add(person)
                         cs.add("person", id=person, gender={"M": "male", "F": "female"}.get(candidate["gender"]))
                         name(person, full)
-                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=owner, ballot_label=full)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=owner,
+                        ballot_label=full,
+                    )
                     if relabeled:
                         cs.add("note", entity_id=option, kind="context", body_md=relabeled[1])
                     cs.add(

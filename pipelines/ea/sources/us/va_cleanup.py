@@ -21,7 +21,15 @@ def emit() -> Path:
             kind="correction",
         )
         columns = (
-            "id", "election_id", "contest_id", "stage", "kind", "source_id", "as_of", "is_default", "completeness",
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "source_id",
+            "as_of",
+            "is_default",
+            "completeness",
             "supersedes_id",
         )
         sets = conn.execute(
@@ -52,5 +60,9 @@ def emit() -> Path:
             [list(PHANTOMS)],
         ).fetchall():
             for entity in (candidacy, option, person):
-                cs.add("entity_retirement", entity_id=entity, reason=f"{label} is not on the certified ballot; a Klarner parse artifact")
+                cs.add(
+                    "entity_retirement",
+                    entity_id=entity,
+                    reason=f"{label} is not on the certified ballot; a Klarner parse artifact",
+                )
         return cs.write()

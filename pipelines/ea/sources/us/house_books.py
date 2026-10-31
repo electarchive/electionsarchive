@@ -867,7 +867,10 @@ def emit(source: ModuleType) -> Path:
                     picked[int(column)] = named[0][0]
                 elif (
                     not named
-                    and len(same := [o for o, k, _, t in known if k in ("candidate", "write_in", "ticket") and t == summed]) == 1
+                    and len(
+                        same := [o for o, k, _, t in known if k in ("candidate", "write_in", "ticket") and t == summed]
+                    )
+                    == 1
                 ):
                     picked[int(column)] = same[0]
                 elif summed == 0:
@@ -950,8 +953,16 @@ def emit(source: ModuleType) -> Path:
                         **dict(
                             zip(
                                 (
-                                    "id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of",
-                                    "completeness", "supersedes_id",
+                                    "id",
+                                    "election_id",
+                                    "contest_id",
+                                    "stage",
+                                    "kind",
+                                    "status",
+                                    "source_id",
+                                    "as_of",
+                                    "completeness",
+                                    "supersedes_id",
                                 ),
                                 row,
                                 strict=True,
@@ -965,7 +976,10 @@ def emit(source: ModuleType) -> Path:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
             if not fresh and not ties:
                 continue
-            if previous is not None and not conn.execute("select 1 from result_set where id = %s", [previous]).fetchone():
+            if (
+                previous is not None
+                and not conn.execute("select 1 from result_set where id = %s", [previous]).fetchone()
+            ):
                 cs.rows["external_id"] = [row for row in cs.rows["external_id"] if row["entity_id"] != previous]
                 previous = None
             for id, status in ((previous, "superseded"), (result_set, "active")):

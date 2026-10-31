@@ -34,7 +34,12 @@ COUNTIES = {
     "Washoe": "32031",
     "WhitePine": "32033",
 }
-PARTIES = {"Democratic": "democratic", "Republican": "republican", "Libertarian": "libertarian", "Independent American": "independent_american"}
+PARTIES = {
+    "Democratic": "democratic",
+    "Republican": "republican",
+    "Libertarian": "libertarian",
+    "Independent American": "independent_american",
+}
 PUBLISHER = "Nevada Secretary of State"
 TITLE = "Silver State primary election results"
 
@@ -48,9 +53,12 @@ def parse() -> None:
     rows = []
     for year, day in DAYS.items():
         seen = set()
-        for race in ET.fromstring(raw.cached(SOURCE, BASE.format(year=year)).path.read_bytes().decode("utf-8-sig")).iter("Race"):
+        for race in ET.fromstring(
+            raw.cached(SOURCE, BASE.format(year=year)).path.read_bytes().decode("utf-8-sig")
+        ).iter("Race"):
             found = re.fullmatch(
-                r"(United States Senator|U\.S\. Representative in Congress, District (\d+)) \(([\w ]+)\)", race.get("RaceTitle")
+                r"(United States Senator|U\.S\. Representative in Congress, District (\d+)) \(([\w ]+)\)",
+                race.get("RaceTitle"),
             )
             if found is None or found[3] not in PARTIES or race.get("RaceID") in seen:
                 continue

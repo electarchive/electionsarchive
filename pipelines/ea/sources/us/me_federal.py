@@ -70,7 +70,11 @@ def parse() -> None:
     for path, _, day, chamber, district in FILES:
         sheet = pl.read_excel(raw.cached(SOURCE, SITE + path).path, has_header=False, infer_schema_length=0)
         rows = sheet.rows()
-        head = next(i for i, row in enumerate(rows[:4]) if any(str(cell).strip().upper() in ("CTY", "COUNTY") for cell in row[:3]))
+        head = next(
+            i
+            for i, row in enumerate(rows[:4])
+            if any(str(cell).strip().upper() in ("CTY", "COUNTY") for cell in row[:3])
+        )
         county_col = next(i for i, cell in enumerate(rows[head][:3]) if str(cell).strip().upper() in ("CTY", "COUNTY"))
         names = {
             i: " ".join(str(cell).split()).upper()

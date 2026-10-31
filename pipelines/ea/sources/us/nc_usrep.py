@@ -26,7 +26,9 @@ RECORDS = {
 }
 SCANNED = {1992: range(1, 7), 1994: (1, 3, 4, 5, 6, 7)}
 
-SUMMARY = "North Carolina's U.S. House general elections of 1992 through 1998 by county from the State Board of Elections"
+SUMMARY = (
+    "North Carolina's U.S. House general elections of 1992 through 1998 by county from the State Board of Elections"
+)
 METHOD = (
     "County totals are from the State Board of Elections' abstracts of votes cast, one table per congressional "
     "district. Each candidate's county sum equals the district total printed in the abstract."

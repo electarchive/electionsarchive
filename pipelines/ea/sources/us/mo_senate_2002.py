@@ -16,7 +16,12 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Missouri Secretary of State"
 TITLE = "Official election returns, general election of November 5, 2002, by county"
 URL = "https://web.archive.org/web/2015id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/CountyGeneral2002.pdf"
-CANDIDATES = {"Carnahan, Jean": "CARNAHAN", "Talent, Jim": "TALENT", "Millay, Tamara A.": "MILLAY", "Romano, Daniel (digger)": "ROMANO"}
+CANDIDATES = {
+    "Carnahan, Jean": "CARNAHAN",
+    "Talent, Jim": "TALENT",
+    "Millay, Tamara A.": "MILLAY",
+    "Romano, Daniel (digger)": "ROMANO",
+}
 TOTALS = {"CARNAHAN": 913778, "TALENT": 935032}
 
 
@@ -44,7 +49,9 @@ def parse() -> None:
     seen = set()
     unit = ""
     for index, line in enumerate(lines):
-        if re.fullmatch(r"\s{3,8}[A-Z][A-Z .'-]+", line) and any(text.strip().startswith("Office Candidate") for text in lines[index + 1 : index + 7]):
+        if re.fullmatch(r"\s{3,8}[A-Z][A-Z .'-]+", line) and any(
+            text.strip().startswith("Office Candidate") for text in lines[index + 1 : index + 7]
+        ):
             unit = line.strip()
             seen.add(unit)
         if line.strip() != "U.S. Senator":

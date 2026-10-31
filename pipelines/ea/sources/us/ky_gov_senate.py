@@ -21,7 +21,11 @@ FILES = {
     date(2002, 11, 5): ("2002/General%20Election/2002statebycounty.txt", "A03", "senate"),
     date(2004, 11, 2): ("2004/General%20Election/2004statebyCOUNTY.txt", "A03", "senate"),
     date(2007, 11, 6): ("2007/General%20Election/statewidebyCOUNTY.txt", "D05", "governor"),
-    date(2008, 11, 4): ("2008/General%20Election/STATEwide%20by%20candidate%20by%20county%20gen%2008.txt", "A03", "senate"),
+    date(2008, 11, 4): (
+        "2008/General%20Election/STATEwide%20by%20candidate%20by%20county%20gen%2008.txt",
+        "A03",
+        "senate",
+    ),
 }
 
 
@@ -82,9 +86,14 @@ def parse() -> None:
             summed = sum(votes for name, _, votes in year_rows if name == candidate)
             if summed != total:
                 raise ValueError(f"{day} {candidate}: counties sum to {summed}, printed total {total}")
-        rows.extend((day, chamber, mapped[abbreviation], candidate, votes) for candidate, abbreviation, votes in year_rows)
+        rows.extend(
+            (day, chamber, mapped[abbreviation], candidate, votes) for candidate, abbreviation, votes in year_rows
+        )
     lines = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, PDF_2015).path), "-"], capture_output=True, check=True, text=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, PDF_2015).path), "-"],
+        capture_output=True,
+        check=True,
+        text=True,
     ).stdout.splitlines()
     surnames: list[str] = []
     counties = []

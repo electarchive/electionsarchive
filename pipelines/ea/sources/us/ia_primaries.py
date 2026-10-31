@@ -16,8 +16,19 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 MANUAL = Path.home() / "Downloads"
 BASE = "https://sos.iowa.gov/elections/pdf/{year}/primary/canvsummary.pdf"
-FILES = {2018: (date(2018, 6, 5), "ia_2018_pri_canvsummary.pdf"), 2020: (date(2020, 6, 2), "ia_2020_pri_canvsummary.pdf"), 2022: (date(2022, 6, 7), "ia_2022_pri_canvsummary.pdf")}
-PARTIES = {"Rep.": "republican", "Dem.": "democratic", "Republican": "republican", "Democratic": "democratic", "Democrat": "democratic", "Libertarian": "libertarian"}
+FILES = {
+    2018: (date(2018, 6, 5), "ia_2018_pri_canvsummary.pdf"),
+    2020: (date(2020, 6, 2), "ia_2020_pri_canvsummary.pdf"),
+    2022: (date(2022, 6, 7), "ia_2022_pri_canvsummary.pdf"),
+}
+PARTIES = {
+    "Rep.": "republican",
+    "Dem.": "democratic",
+    "Republican": "republican",
+    "Democratic": "democratic",
+    "Democrat": "democratic",
+    "Libertarian": "libertarian",
+}
 PUBLISHER = "Iowa Secretary of State"
 TITLE = "Primary election canvass summary"
 TITLE_LINE = re.compile(r"^\s+(United States Senator|United States Representative District (\d+)) - (\S+)\s*$")
@@ -59,7 +70,9 @@ def parse() -> None:
             path = raw.cached(SOURCE, BASE.format(year=year)).path
         except LookupError:
             continue
-        text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+        ).stdout
         lines = text.replace("\f", "\n").splitlines()
         contest = None
         seen: set[tuple[tuple[str, str, int | None] | None, str]] = set()
@@ -84,7 +97,9 @@ def parse() -> None:
                         if year == 2018 and "Over Votes" in later:
                             break
                     if year == 2018:
-                        stacked = sorted((h for h in header if "Write-in Candidate" not in h), key=lambda h: len(h) - len(h.lstrip()))
+                        stacked = sorted(
+                            (h for h in header if "Write-in Candidate" not in h), key=lambda h: len(h) - len(h.lstrip())
+                        )
                         tokens = " ".join(h.split("Write-in")[0] for h in stacked).split()
                         names = []
                         while tokens:
@@ -122,7 +137,19 @@ def parse() -> None:
                 continue
             for candidate, votes in zip([*names, "WRITE-INS"], values[: len(names) + 1], strict=True):
                 rows.append(
-                    (year, f"{contest[0]}:{contest[1]}", day, False, "IA", contest[2], fips[key], candidate, 1, candidate == "WRITE-INS", votes)
+                    (
+                        year,
+                        f"{contest[0]}:{contest[1]}",
+                        day,
+                        False,
+                        "IA",
+                        contest[2],
+                        fips[key],
+                        candidate,
+                        1,
+                        candidate == "WRITE-INS",
+                        votes,
+                    )
                 )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(

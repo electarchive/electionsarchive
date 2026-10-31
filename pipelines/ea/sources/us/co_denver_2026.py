@@ -26,7 +26,7 @@ ROWS = [
         "label": "Referred Question 2H",
         "url": BIB,
         "answers": "Yes|No",
-        "wording": 'Shall the Charter of the City and County of Denver be amended to expressly clarify that the Auditor’s Office may continue to enforce wage laws, worker protection laws, and other workplace rights laws in accordance with ordinances passed by City Council?',
+        "wording": "Shall the Charter of the City and County of Denver be amended to expressly clarify that the Auditor’s Office may continue to enforce wage laws, worker protection laws, and other workplace rights laws in accordance with ordinances passed by City Council?",
     },
     {
         "county": "08031",
@@ -34,7 +34,7 @@ ROWS = [
         "label": "Referred Question 2I",
         "url": BIB,
         "answers": "Yes|No",
-        "wording": 'Shall the Charter of the City and County of Denver be amended to adjust the City and County’s budget and appropriation process, and in connection therewith, allowing the City Council to adopt a two-year budget planning and adoption process and modernizing or repealing certain charter sections?',
+        "wording": "Shall the Charter of the City and County of Denver be amended to adjust the City and County’s budget and appropriation process, and in connection therewith, allowing the City Council to adopt a two-year budget planning and adoption process and modernizing or repealing certain charter sections?",
     },
     {
         "county": "08031",
@@ -42,7 +42,7 @@ ROWS = [
         "label": "Referred Question 2J",
         "url": BIB,
         "answers": "Yes|No",
-        "wording": 'Shall the Charter of the City and County of Denver be amended to modernize the Civil Service Commission and Department of Safety by removing outdated language, giving City Council the ability to add duties via code, and providing for an extension of probation when required for medical, military, or other approved leave?',
+        "wording": "Shall the Charter of the City and County of Denver be amended to modernize the Civil Service Commission and Department of Safety by removing outdated language, giving City Council the ability to add duties via code, and providing for an extension of probation when required for medical, military, or other approved leave?",
     },
     {
         "county": "08031",
@@ -50,7 +50,7 @@ ROWS = [
         "label": "Referred Question 2K",
         "url": BIB,
         "answers": "Yes|No",
-        "wording": 'Shall the City and County of Denver approve the terms of a twenty-year franchise contract, starting January 1, 2027, with Public Service Company of Colorado (Xcel Energy) to continue its program for undergrounding overhead electrical lines, maintaining infrastructure safety, and partnering with the City for emergency management coordination, and to require that Xcel Energy continue to pay the City for reasonable use of public rights-of-way and other City property necessary to provide safe and reliable utility services for the benefit of the City, its residents, and its businesses?',
+        "wording": "Shall the City and County of Denver approve the terms of a twenty-year franchise contract, starting January 1, 2027, with Public Service Company of Colorado (Xcel Energy) to continue its program for undergrounding overhead electrical lines, maintaining infrastructure safety, and partnering with the City for emergency management coordination, and to require that Xcel Energy continue to pay the City for reasonable use of public rights-of-way and other City property necessary to provide safe and reliable utility services for the benefit of the City, its residents, and its businesses?",
     },
     {
         "county": "08031",
@@ -58,7 +58,7 @@ ROWS = [
         "label": "Initiated Ordinance 311",
         "url": BIB,
         "answers": "Yes|No",
-        "wording": 'Shall the voters of the City and County of Denver adopt an ordinance prohibiting the force-feeding of birds and, in connection therewith, prohibiting the sale of products derived from force-feeding birds, including foie gras?',
+        "wording": "Shall the voters of the City and County of Denver adopt an ordinance prohibiting the force-feeding of birds and, in connection therewith, prohibiting the sale of products derived from force-feeding birds, including foie gras?",
     },
     {
         "county": "08031",
@@ -66,7 +66,7 @@ ROWS = [
         "label": "Ballot Issue 4A",
         "url": TAB,
         "answers": "Yes|No",
-        "wording": 'SHALL DENVER PUBLIC SCHOOLS (SCHOOL DISTRICT NO. 1) TAXES BE INCREASED UP TO $44 MILLION IN 2026 (FOR COLLECTION IN 2027) AND ANNUALLY THEREAFTER FOR EDUCATIONAL PURPOSES, INCLUDING, BUT NOT LIMITED TO: • INCREASING EDUCATOR PAY; • OFFERING STUDENTS MORE CAREER AND TECHNICAL EDUCATION COURSES IN HIGH DEMAND FIELDS; • STUDENT MENTAL HEALTH AND SPECIAL EDUCATION; WITH ALL SPENDING OF SUCH REVENUES REPORTED IN THE DISTRICT’S ANNUAL INDEPENDENT AUDIT PUBLISHED ON THE DISTRICT’S WEBSITE; BY THE IMPOSITION OF A MILL LEVY THAT, WHEN COMBINED WITH OTHER MILL LEVY OVERRIDES APPROVED BY DENVER VOTERS FOR THE DISTRICT’S GENERAL FUND, EQUALS THE AMOUNT PERMITTED BY SECTION 22-54-108(3)(B)(VI), BY THE LEVY OF PROPERTY TAXES AT A RATE SUFFICIENT TO PRODUCE SUCH AMOUNTS; WHICH TAXES SHALL BE DEPOSITED INTO THE GENERAL FUND OF THE DISTRICT AND SHALL BE IN ADDITION TO THE PROPERTY TAXES THAT OTHERWISE WOULD BE LEVIED FOR THE GENERAL FUND; AND SHALL INVESTMENT EARNINGS ON THE PROCEEDS OF SUCH TAXES BE TREATED AS A VOTER-APPROVED REVENUE CHANGE UNDER ARTICLE X, SECTION 20 OF THE COLORADO CONSTITUTION?',
+        "wording": "SHALL DENVER PUBLIC SCHOOLS (SCHOOL DISTRICT NO. 1) TAXES BE INCREASED UP TO $44 MILLION IN 2026 (FOR COLLECTION IN 2027) AND ANNUALLY THEREAFTER FOR EDUCATIONAL PURPOSES, INCLUDING, BUT NOT LIMITED TO: • INCREASING EDUCATOR PAY; • OFFERING STUDENTS MORE CAREER AND TECHNICAL EDUCATION COURSES IN HIGH DEMAND FIELDS; • STUDENT MENTAL HEALTH AND SPECIAL EDUCATION; WITH ALL SPENDING OF SUCH REVENUES REPORTED IN THE DISTRICT’S ANNUAL INDEPENDENT AUDIT PUBLISHED ON THE DISTRICT’S WEBSITE; BY THE IMPOSITION OF A MILL LEVY THAT, WHEN COMBINED WITH OTHER MILL LEVY OVERRIDES APPROVED BY DENVER VOTERS FOR THE DISTRICT’S GENERAL FUND, EQUALS THE AMOUNT PERMITTED BY SECTION 22-54-108(3)(B)(VI), BY THE LEVY OF PROPERTY TAXES AT A RATE SUFFICIENT TO PRODUCE SUCH AMOUNTS; WHICH TAXES SHALL BE DEPOSITED INTO THE GENERAL FUND OF THE DISTRICT AND SHALL BE IN ADDITION TO THE PROPERTY TAXES THAT OTHERWISE WOULD BE LEVIED FOR THE GENERAL FUND; AND SHALL INVESTMENT EARNINGS ON THE PROCEEDS OF SUCH TAXES BE TREATED AS A VOTER-APPROVED REVENUE CHANGE UNDER ARTICLE X, SECTION 20 OF THE COLORADO CONSTITUTION?",
     },
 ]
 
@@ -77,8 +77,12 @@ def fetch() -> None:
             try:
                 raw.cached(SOURCE, url)
             except LookupError:
-                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
-                raw.store(SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+                content = subprocess.run(
+                    ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                ).stdout
+                raw.store(
+                    SOURCE, url, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+                )
 
 
 def parse() -> None:
@@ -127,7 +131,9 @@ def emit() -> Path:
                 option = f"special:{row['county']}:{entity}"
             elif county_key in found:
                 county, county_area, _, county_path, county_code = found[county_key]
-                minted = govmint.special(conn, cs, "CO", (county, county_area, county_path, county_code), entity, civil.slugs)
+                minted = govmint.special(
+                    conn, cs, "CO", (county, county_area, county_path, county_code), entity, civil.slugs
+                )
                 if minted is not None:
                     option = f"special:{row['county']}:{entity}"
                     found[option] = minted
@@ -150,7 +156,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:CO:{code}:measure:{slug(label)}"
@@ -170,8 +183,19 @@ def emit() -> Path:
                 round_number=1,
                 default_result_kind="counted",
             )
-            cs.add("ballot_question", contest_id=contest, type="initiative" if label.startswith("Initiated") else "mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "ballot_question",
+                contest_id=contest,
+                type="initiative" if label.startswith("Initiated") else "mandatory_referendum",
+            )
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(row["answers"].split("|")):

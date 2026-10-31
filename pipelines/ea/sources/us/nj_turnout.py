@@ -14,34 +14,78 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "New Jersey Division of Elections"
 BASE = "https://www.nj.gov/state/elections/assets/pdf/election-results/"
-FILES = """1998/1998-gen-elect-reg-voter-ballots-cast.pdf 1998/1998-gen-elect-reg-voter-ballots-cast-AMENDED.pdf 1999/1999-gen-elect-reg-voters-ballots-cast.pdf
-1999/1999-primary-election-turnout-by-party.pdf 2000/2000-Primary-election-turnout-by-party.pdf 2000/2000-general-election-reg-voters-ballots-cast.pdf
-2000/2000-general-election-reg-voters-ballots-cast-amended.pdf 2001/2001gen-elect-voter_turnout.pdf 2001/2001pri-voter_registration-by-county.pdf
-2002/2002-primary-election-voter-registration-turnout.pdf 2002/2002gen-elect-voter_turnout.pdf 2003/2003genelectionchart.pdf 2003/2003primary_regs_ballotscast_.pdf
-2004/2004-Official_primary_election_turnout_04.pdf 2004/2004general_election_ballot_cast.pdf 2005/2005-general-election-chart-rev.pdf 2005/2005PrimaryTurnout7-11-05.pdf
-2006/2006-general-election-chart.pdf 2006/2006_primary_regs_ballots-cast-rev..pdf 2007/2007-Gen-Election-Ballots-cast-by-county.revised.pdf
-2007/2007-primary-election-turnout-chart.pdf 2008/2008-gen-election-ballots-cast-by-county-rev-120208.pdf 2008/2008_june-primary_regs_ballots-cast-070808.pdf
-2009/2009-gen-election-ballots-cast-by-county-112309.pdf 2010/2010-gen-election-ballots-cast-by-county-112910.pdf
-2010/2010-gen-election-ballots-cast-by-county-021711-amended-report.pdf 2010/2010-primary-election-turnout-by-party-ballots-cast-070810.pdf
-2011/2011-gen-election-ballots-cast-by-county-110811.pdf 2013/2013-official-general-election-voter-turnout.pdf
-2013/2013-official-special-general-us-senate-voter-turnout-0128.pdf 2013/2013-official-special-primary-us-senate-voter-turnout.pdf
-2014/2014-official-general-election-voter-turnout.pdf 2014/2014-official-primary-voter-turnout.pdf 2015/2015-official-general-election-voter-turnout.pdf
-2015/2015-official-primary-voter-turnout.pdf 2016/2016-official-primary-voter-turnout.pdf 2016/2016-summary-registered-voters-general-election-0131.pdf
-2017/2017-official-primary-voter-turnout.pdf 2017/2017-summary-registered-voters-general-election-1201a.pdf 2018/2018-primary-election-voter-turnout.pdf
-2018/2018-summary-registered-voters-general-election-1220.pdf 2019/2019-primary-election-voter-turnout.pdf 2019/2019-summary-registered-voters-general-election.pdf
-2020/2020-official-general-voter-turnout.pdf 2020/2020-official-primary-voter-turnout-amended-0826.pdf 2021/2021-general-election-voter-turnout.pdf
-2021/2021-primary-election-voter-turnout.pdf 2022/2022-official-general-voter-turnout.pdf 2022/2022-official-primary-voter-turnout.pdf
-2023/2023-official-general-voter-turnout.pdf 2023/2023-primary-election-voter-turnout.pdf 2024/2024-official-general-voter-turnout.pdf
-2024/2024-primary-election-voter-turnout.pdf 2024/2024-special-general-election-voter-turnout.pdf 2024/2024-special-primary-election-voter-turnout.pdf
-2025/2025-official-general-voter-turnout.pdf 2025/2025-primary-election-voter-turnout.pdf 2026/2026-primary-election-voter-turnout.pdf
-2026/2026-special-general-election-voter-turnout.pdf 2026/2026-special-primary-election-voter-turnout.pdf""".split()
+FILES = [
+    "1998/1998-gen-elect-reg-voter-ballots-cast.pdf",
+    "1998/1998-gen-elect-reg-voter-ballots-cast-AMENDED.pdf",
+    "1999/1999-gen-elect-reg-voters-ballots-cast.pdf",
+    "1999/1999-primary-election-turnout-by-party.pdf",
+    "2000/2000-Primary-election-turnout-by-party.pdf",
+    "2000/2000-general-election-reg-voters-ballots-cast.pdf",
+    "2000/2000-general-election-reg-voters-ballots-cast-amended.pdf",
+    "2001/2001gen-elect-voter_turnout.pdf",
+    "2001/2001pri-voter_registration-by-county.pdf",
+    "2002/2002-primary-election-voter-registration-turnout.pdf",
+    "2002/2002gen-elect-voter_turnout.pdf",
+    "2003/2003genelectionchart.pdf",
+    "2003/2003primary_regs_ballotscast_.pdf",
+    "2004/2004-Official_primary_election_turnout_04.pdf",
+    "2004/2004general_election_ballot_cast.pdf",
+    "2005/2005-general-election-chart-rev.pdf",
+    "2005/2005PrimaryTurnout7-11-05.pdf",
+    "2006/2006-general-election-chart.pdf",
+    "2006/2006_primary_regs_ballots-cast-rev..pdf",
+    "2007/2007-Gen-Election-Ballots-cast-by-county.revised.pdf",
+    "2007/2007-primary-election-turnout-chart.pdf",
+    "2008/2008-gen-election-ballots-cast-by-county-rev-120208.pdf",
+    "2008/2008_june-primary_regs_ballots-cast-070808.pdf",
+    "2009/2009-gen-election-ballots-cast-by-county-112309.pdf",
+    "2010/2010-gen-election-ballots-cast-by-county-112910.pdf",
+    "2010/2010-gen-election-ballots-cast-by-county-021711-amended-report.pdf",
+    "2010/2010-primary-election-turnout-by-party-ballots-cast-070810.pdf",
+    "2011/2011-gen-election-ballots-cast-by-county-110811.pdf",
+    "2013/2013-official-general-election-voter-turnout.pdf",
+    "2013/2013-official-special-general-us-senate-voter-turnout-0128.pdf",
+    "2013/2013-official-special-primary-us-senate-voter-turnout.pdf",
+    "2014/2014-official-general-election-voter-turnout.pdf",
+    "2014/2014-official-primary-voter-turnout.pdf",
+    "2015/2015-official-general-election-voter-turnout.pdf",
+    "2015/2015-official-primary-voter-turnout.pdf",
+    "2016/2016-official-primary-voter-turnout.pdf",
+    "2016/2016-summary-registered-voters-general-election-0131.pdf",
+    "2017/2017-official-primary-voter-turnout.pdf",
+    "2017/2017-summary-registered-voters-general-election-1201a.pdf",
+    "2018/2018-primary-election-voter-turnout.pdf",
+    "2018/2018-summary-registered-voters-general-election-1220.pdf",
+    "2019/2019-primary-election-voter-turnout.pdf",
+    "2019/2019-summary-registered-voters-general-election.pdf",
+    "2020/2020-official-general-voter-turnout.pdf",
+    "2020/2020-official-primary-voter-turnout-amended-0826.pdf",
+    "2021/2021-general-election-voter-turnout.pdf",
+    "2021/2021-primary-election-voter-turnout.pdf",
+    "2022/2022-official-general-voter-turnout.pdf",
+    "2022/2022-official-primary-voter-turnout.pdf",
+    "2023/2023-official-general-voter-turnout.pdf",
+    "2023/2023-primary-election-voter-turnout.pdf",
+    "2024/2024-official-general-voter-turnout.pdf",
+    "2024/2024-primary-election-voter-turnout.pdf",
+    "2024/2024-special-general-election-voter-turnout.pdf",
+    "2024/2024-special-primary-election-voter-turnout.pdf",
+    "2025/2025-official-general-voter-turnout.pdf",
+    "2025/2025-primary-election-voter-turnout.pdf",
+    "2026/2026-primary-election-voter-turnout.pdf",
+    "2026/2026-special-general-election-voter-turnout.pdf",
+    "2026/2026-special-primary-election-voter-turnout.pdf",
+]
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
 join name n on n.entity_id = u.area_id and n.kind = 'short'
 where u.scheme_code = 'us.county' and u.code like '34%'
 """
 ROW = re.compile(r"^\s*([A-Za-z. ]+?)\s*\*?\s{2,}(\d[\d,]*(?:\s+[\d,%.]+)*)\s*$")
-DATE = re.compile(r"(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(\d{4})", re.I)
+DATE = re.compile(
+    r"(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2}),?\s+(\d{4})",
+    re.IGNORECASE,
+)
 
 
 def plain(name: str) -> str:
@@ -59,7 +103,10 @@ def parse() -> None:
     rows = []
     for file in FILES:
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + file).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + file).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         found = DATE.search(" ".join(text[:900].split()))
         if found is None:
@@ -89,13 +136,26 @@ def parse() -> None:
                 counties[code] = (numbers[0], numbers[1])
         print(file, day, len(counties))
         for code, (registered, voters) in counties.items():
-            rows.append({"file": file, "date": day, "primary": primary, "code": code, "registered": registered, "voters": voters})
+            rows.append(
+                {
+                    "file": file,
+                    "date": day,
+                    "primary": primary,
+                    "code": code,
+                    "registered": registered,
+                    "voters": voters,
+                }
+            )
     frame = pl.DataFrame(rows, schema_overrides={"voters": pl.Int64})
-    frame = frame.with_columns(pl.col("file").str.contains("(?i)amended").alias("amended")).sort("amended", maintain_order=True)
+    frame = frame.with_columns(pl.col("file").str.contains("(?i)amended").alias("amended")).sort(
+        "amended", maintain_order=True
+    )
     frame = frame.unique(["date", "primary", "code"], keep="last", maintain_order=True)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("date", "primary").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("date"))
+    print(
+        frame.group_by("date", "primary").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("date")
+    )
 
 
 def emit() -> Path:

@@ -59,7 +59,8 @@ def emit() -> Path:
         ).fetchone()[0]
         names: dict[UUID, set[str]] = defaultdict(set)
         for person, text in conn.execute(
-            "select entity_id, text from name where entity_id in (select person_id from tenure where body_id = %s)", [body]
+            "select entity_id, text from name where entity_id in (select person_id from tenure where body_id = %s)",
+            [body],
         ).fetchall():
             names[person].add(squash(text))
         holders: dict[tuple[date, tuple[str, ...]], set[UUID]] = defaultdict(set)
@@ -126,5 +127,7 @@ def emit() -> Path:
                 linked += 1
         UNMATCHED.parent.mkdir(parents=True, exist_ok=True)
         UNMATCHED.write_text("\n".join(f"{name}\t{why}" for name, why in sorted(unmatched)) + "\n", encoding="utf-8")
-        print(f"{len(offered)} Wikidata members: {linked} linked, {joined} joined to an existing holder, {len(unmatched)} unmatched (listed in {UNMATCHED})")
+        print(
+            f"{len(offered)} Wikidata members: {linked} linked, {joined} joined to an existing holder, {len(unmatched)} unmatched (listed in {UNMATCHED})"
+        )
         return cs.write()

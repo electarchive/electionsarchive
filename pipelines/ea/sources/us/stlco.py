@@ -21,7 +21,7 @@ def _files() -> dict[str, str]:
     found = {}
     for code in re.findall(r"eResults/(el\d{6})/", raw.cached(SOURCE, ROOT).path.read_text(errors="replace")):
         listing = raw.fetch(SOURCE, f"{ROOT}{code}/", suffix=".html").path.read_text(errors="replace")
-        if csv_file := re.search(r'HREF="(/BOE/eResults/' + code + r'/[^"]*\.csv)"', listing, re.I):
+        if csv_file := re.search(r'HREF="(/BOE/eResults/' + code + r'/[^"]*\.csv)"', listing, re.IGNORECASE):
             found[code] = f"https://extcontent.stlouisco.com{csv_file[1]}"
     return found
 
@@ -40,7 +40,6 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     for code, link in sorted(_files().items()):
         day = date(2000 + int(code[2:4]), int(code[4:6]), int(code[6:8]))
         contests: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
-        orders: dict[str, list[str]] = defaultdict(list)
         text = raw.cached(SOURCE, link).path.read_bytes().decode("latin-1")
         for row in csv.DictReader(io.StringIO(text)):
             title = row["Contest Title"].strip()

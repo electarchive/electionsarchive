@@ -93,7 +93,13 @@ def parse() -> None:
     frame = (
         pl.DataFrame(
             rows,
-            schema={"chamber": pl.String, "district": pl.Int16, "candidate": pl.String, "code": pl.String, "votes": pl.Int64},
+            schema={
+                "chamber": pl.String,
+                "district": pl.Int16,
+                "candidate": pl.String,
+                "code": pl.String,
+                "votes": pl.Int64,
+            },
             orient="row",
         )
         .with_columns(day=pl.lit(DAY))

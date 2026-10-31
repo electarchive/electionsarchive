@@ -22,7 +22,12 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ITEM = "micro_IA40706952_0290"
 VOLUMES = {
-    1994: (f"https://archive.org/download/{ITEM}/{ITEM}.pdf", f"https://archive.org/details/{ITEM}", date(1994, 11, 8), range(2, 62)),
+    1994: (
+        f"https://archive.org/download/{ITEM}/{ITEM}.pdf",
+        f"https://archive.org/details/{ITEM}",
+        date(1994, 11, 8),
+        range(2, 62),
+    ),
 }
 OFFICES = {
     "governor": ("governor", None, "Governor"),
@@ -33,7 +38,11 @@ OFFICES = {
     "commissioner-of-insurance": ("commissioner-of-insurance", None, "Commissioner of Insurance"),
     "school-superintendent": ("school-superintendent", None, "State School Superintendent"),
     "commissioner-of-labor": ("commissioner-of-labor", None, "Commissioner of Labor"),
-    "public-service-pafford": ("public-service-commissioner", "pafford", "Public Service Commissioner (Pafford's seat)"),
+    "public-service-pafford": (
+        "public-service-commissioner",
+        "pafford",
+        "Public Service Commissioner (Pafford's seat)",
+    ),
     "public-service-rowan": ("public-service-commissioner", "rowan", "Public Service Commissioner (Rowan's seat)"),
 }
 NAMES: dict[tuple[str, str], str] = {}
@@ -73,7 +82,9 @@ def emit() -> Path:
         )
         _, landing, _, numbers = VOLUMES[1994]
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=landing, license=LICENSE)
+        cs.add(
+            "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=landing, license=LICENSE
+        )
         book = house_books._artifact(sys.modules[__name__], 1994)
         artifact = cs.artifact(book, source)
         pages: dict[int, tuple[UUID, int, int]] = {}
@@ -135,8 +146,17 @@ def emit() -> Path:
                     electoral_system_id=fptp,
                     default_result_kind="counted",
                 )
-                cs.add("name", entity_id=contest, text=f"1994 Georgia {label} election", lang="en", kind="official", is_preferred=True)
-                cs.add("slug", path=f"us/ga/{day}-general/{base}" + ("" if seat is None else f"-{seat}"), entity_id=contest)
+                cs.add(
+                    "name",
+                    entity_id=contest,
+                    text=f"1994 Georgia {label} election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+                cs.add(
+                    "slug", path=f"us/ga/{day}-general/{base}" + ("" if seat is None else f"-{seat}"), entity_id=contest
+                )
             roots = [
                 (option, text or "")
                 for option, text in conn.execute(
@@ -222,9 +242,17 @@ def emit() -> Path:
             for option, kind, seats in kept:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             if not kept:
-                cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=max(totals, key=totals.__getitem__),
+                    kind="elected",
+                    seats=1,
+                )
             for county, name, votes, number, box in rows.select("county", "label", "votes", "page", "box").iter_rows():
-                unit = counties.get(plain(county)) or next(u for text, u in counties.items() if text.startswith(plain(county)))
+                unit = counties.get(plain(county)) or next(
+                    u for text, u in counties.items() if text.startswith(plain(county))
+                )
                 fact = {
                     "result_set_id": result_set,
                     "unit_id": unit,

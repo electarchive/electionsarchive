@@ -1,7 +1,6 @@
 import re
 import unicodedata
 import zipfile
-from datetime import date
 from pathlib import Path
 from xml.etree import ElementTree
 

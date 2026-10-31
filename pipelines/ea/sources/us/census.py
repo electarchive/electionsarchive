@@ -189,27 +189,48 @@ def parse() -> None:
             sheet = zipfile.ZipFile(io.BytesIO(parts["xlsx"]))
             strings = re.findall(r"<si><t[^>]*>([^<]*)</t></si>", sheet.read("xl/sharedStrings.xml").decode())
             assigned: dict[str, int] = {}
-            for row in re.findall(r"<row [^>]*>(.*?)</row>", sheet.read("xl/worksheets/sheet1.xml").decode(), re.S)[1:]:
-                block, district = (strings[int(value)] if 't="s"' in attrs else value for attrs, value in re.findall(r"<c r=\"[A-Z]+\d+\"([^>]*)><v>([^<]*)</v>", row))
+            for row in re.findall(
+                r"<row [^>]*>(.*?)</row>", sheet.read("xl/worksheets/sheet1.xml").decode(), re.DOTALL
+            )[1:]:
+                block, district = (
+                    strings[int(value)] if 't="s"' in attrs else value
+                    for attrs, value in re.findall(r"<c r=\"[A-Z]+\d+\"([^>]*)><v>([^<]*)</v>", row)
+                )
                 assigned[block] = int(district)
             with zipfile.ZipFile(raw.cached(SOURCE, BLOCKS[fips]).path) as z:
-                block_parts = {name.rsplit(".", 1)[1].lower(): z.read(name) for name in z.namelist() if name.endswith((".shp", ".shx", ".dbf"))}
-            blocks = shapefile.Reader(shp=io.BytesIO(block_parts["shp"]), shx=io.BytesIO(block_parts["shx"]), dbf=io.BytesIO(block_parts["dbf"]))
+                block_parts = {
+                    name.rsplit(".", 1)[1].lower(): z.read(name)
+                    for name in z.namelist()
+                    if name.endswith((".shp", ".shx", ".dbf"))
+                }
+            blocks = shapefile.Reader(
+                shp=io.BytesIO(block_parts["shp"]),
+                shx=io.BytesIO(block_parts["shx"]),
+                dbf=io.BytesIO(block_parts["dbf"]),
+            )
             pieces: dict[int, list[shapely.Geometry]] = {}
             for record, shape in zip(blocks.iterRecords(), blocks.iterShapes(), strict=True):
-                pieces.setdefault(assigned[record["GEOID20"]], []).append(shapely.geometry.shape(shape.__geo_interface__))
+                pieces.setdefault(assigned[record["GEOID20"]], []).append(
+                    shapely.geometry.shape(shape.__geo_interface__)
+                )
             numbers = sorted(pieces)
             shapes = shapely.coverage_simplify([shapely.union_all(pieces[number]) for number in numbers], TOLERANCE)
         else:
             reader = shapefile.Reader(
-                shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]), encoding="latin-1"
+                shp=io.BytesIO(parts["shp"]),
+                shx=io.BytesIO(parts["shx"]),
+                dbf=io.BytesIO(parts["dbf"]),
+                encoding="latin-1",
             )
             crs = pyproj.CRS.from_wkt(parts["prj"].decode())
             project = pyproj.Transformer.from_crs(crs, 4326, always_xy=True).transform
             field = next(name for name, *_ in reader.fields if name.upper() in ("DISTRICT", "DISTRICT_I"))
             numbers = [int(float(record[field])) for record in reader.records()]
             shapes = shapely.coverage_simplify(
-                [shapely.ops.transform(project, shapely.geometry.shape(shape.__geo_interface__)) for shape in reader.shapes()],
+                [
+                    shapely.ops.transform(project, shapely.geometry.shape(shape.__geo_interface__))
+                    for shape in reader.shapes()
+                ],
                 TOLERANCE,
             )
         layers["cd120"].extend(
@@ -436,7 +457,9 @@ def parse() -> None:
             districts,
             *(
                 districts.filter(
-                    (pl.col("code").str.slice(0, 2) == fips) & (pl.col("valid_from") == CONGRESSES[119]) & pl.col("state").is_null()
+                    (pl.col("code").str.slice(0, 2) == fips)
+                    & (pl.col("valid_from") == CONGRESSES[119])
+                    & pl.col("state").is_null()
                 ).with_columns(valid_from=pl.lit(reopened), valid_to=pl.lit(None, dtype=pl.Date))
                 for fips, reopened in PRIMARY_ONLY.items()
             ),

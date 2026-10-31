@@ -13,8 +13,8 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset, slug
-from ea.sources.gb.scottish_parliament import number, sheet
 from ea.sources.gb import umit
+from ea.sources.gb.scottish_parliament import number, sheet
 from ea.store import DATA, connect
 
 SOURCE = "gb.senedd"
@@ -336,17 +336,13 @@ def fold(text: str) -> str:
     return NAMES.get(key, key)
 
 
-def pdf_lines(key: int | str) -> list[str]:
-    return subprocess.run(
-        ["pdftotext", "-layout", str(path_of(PDFS[key][1])), "-"], capture_output=True, text=True, check=True
-    ).stdout.splitlines()
-
-
 def ints(tokens: list[str]) -> list[int | None]:
     return [None if token in (".", "-", "") else int(token.replace(",", "")) for token in tokens]
 
 
-def pdf_table(lines: list[str], title: str, count: int, width: int, nth: int = 0) -> list[tuple[str, str, list[int | None]]]:
+def pdf_table(
+    lines: list[str], title: str, count: int, width: int, nth: int = 0
+) -> list[tuple[str, str, list[int | None]]]:
     starts = [index for index, line in enumerate(lines) if line.strip().startswith(title)]
     rows: list[tuple[str, str, list[int | None]]] = []
     region = ""
@@ -357,9 +353,7 @@ def pdf_table(lines: list[str], title: str, count: int, width: int, nth: int = 0
         tokens = text.split()
         tail = list(itertools.takewhile(lambda token: re.fullmatch(r"[\d,]+|\.|-", token), reversed(tokens)))
         if len(tail) >= width and len(tokens) > len(tail):
-            rows.append(
-                (region, " ".join(tokens[: len(tokens) - width]), ints(list(reversed(tokens))[:width][::-1]))
-            )
+            rows.append((region, " ".join(tokens[: len(tokens) - width]), ints(list(reversed(tokens))[:width][::-1])))
             if len(rows) == count:
                 break
             continue
@@ -382,7 +376,7 @@ def parse_members() -> list[dict[str, object]]:
                 "qid": row["p"].rsplit("/", 1)[1],
                 "name": row["pLabel"],
                 "district": row["distLabel"],
-                "start": datetime.fromisoformat(row["start"].replace("Z", "+00:00")).date(),
+                "start": datetime.fromisoformat(row["start"]).date(),
                 "party": row["partyLabel"],
             }
         )
@@ -394,7 +388,9 @@ def region_of(text: str) -> str:
     return next(region for region in REGIONS if fold(region) == key)
 
 
-def vote_rows(year: int, ballot: str, region: str, constituency: str | None, pairs: list[tuple[str, int | None]]) -> list[dict[str, object]]:
+def vote_rows(
+    year: int, ballot: str, region: str, constituency: str | None, pairs: list[tuple[str, int | None]]
+) -> list[dict[str, object]]:
     totals: dict[tuple[str, str | None, str], int] = {}
     for label, votes in pairs:
         if votes is None:
@@ -412,12 +408,23 @@ def vote_rows(year: int, ballot: str, region: str, constituency: str | None, pai
             identity = (name, key, "others" if key is None else "list")
         totals[identity] = totals.get(identity, 0) + votes
     return [
-        {"year": year, "ballot": ballot, "region": region, "constituency": constituency, "party": name, "key": key, "kind": kind, "votes": votes}
+        {
+            "year": year,
+            "ballot": ballot,
+            "region": region,
+            "constituency": constituency,
+            "party": name,
+            "key": key,
+            "kind": kind,
+            "votes": votes,
+        }
         for (name, key, kind), votes in totals.items()
     ]
 
 
-def parse_demon(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]], dict[tuple[int, str], str]]:
+def parse_demon(
+    canon: dict[str, str],
+) -> tuple[list[dict[str, object]], list[dict[str, object]], list[dict[str, object]], dict[tuple[int, str], str]]:
     text = path_of(DEMON).read_text(encoding="latin-1")
     start = text.index("BOROUGHS")
     split = text.index("REGIONAL LISTS")
@@ -433,7 +440,10 @@ def parse_demon(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[di
             continue
         parts = re.split(r"<td[^>]*>", chunk)[1:]
         columns = [
-            [html.unescape(re.sub(r"<[^>]+>", "", item)).strip() for item in re.split(r"<br\s*/?>", part.replace("</td>", ""))]
+            [
+                html.unescape(re.sub(r"<[^>]+>", "", item)).strip()
+                for item in re.split(r"<br\s*/?>", part.replace("</td>", ""))
+            ]
             for part in parts
         ]
         if not columns or columns[0][0] not in ("1999", "2003"):
@@ -443,19 +453,39 @@ def parse_demon(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[di
         if text.index(chunk) < split:
             name = re.sub(r"\s*\[\d+\]$", "", heading)
             county, _, rest = name.partition(", ")
-            name = rest if county in ("CLWYD", "DYFED", "MID GLAMORGAN", "SOUTH GLAMORGAN", "WEST GLAMORGAN", "GWENT", "GWYNEDD", "POWYS") else name.replace(", ", " ")
+            name = (
+                rest
+                if county
+                in ("CLWYD", "DYFED", "MID GLAMORGAN", "SOUTH GLAMORGAN", "WEST GLAMORGAN", "GWENT", "GWYNEDD", "POWYS")
+                else name.replace(", ", " ")
+            )
             constituency = canon[fold(name)]
             parties, counts = columns[5], ints(columns[6])
             if len(counts) != len(parties) + 1:
                 raise ValueError(f"{year} {constituency}: {len(parties)} parties, {len(counts)} counts")
-            units.append({"year": year, "ballot": "constituency", "region": None, "constituency": constituency, "electorate": electors, "cast": None, "valid": None, "rejected": None})
+            units.append(
+                {
+                    "year": year,
+                    "ballot": "constituency",
+                    "region": None,
+                    "constituency": constituency,
+                    "electorate": electors,
+                    "cast": None,
+                    "valid": None,
+                    "rejected": None,
+                }
+            )
             votes.extend(
                 vote_rows(
                     year,
                     "constituency",
                     "",
                     constituency,
-                    [(party, amount) for party, amount in zip(parties, counts[:-1], strict=True) if party != "" and amount is not None],
+                    [
+                        (party, amount)
+                        for party, amount in zip(parties, counts[:-1], strict=True)
+                        if party != "" and amount is not None
+                    ],
                 )
             )
         else:
@@ -464,10 +494,29 @@ def parse_demon(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[di
             seats = list(zip(ints(columns[8]), ints(columns[9]), strict=True))
             if not (len(parties) == len(counts) == len(seats)):
                 raise ValueError(f"{year} {region}: ragged columns")
-            units.append({"year": year, "ballot": "list", "region": region, "constituency": None, "electorate": electors, "cast": None, "valid": None, "rejected": None})
+            units.append(
+                {
+                    "year": year,
+                    "ballot": "list",
+                    "region": region,
+                    "constituency": None,
+                    "electorate": electors,
+                    "cast": None,
+                    "valid": None,
+                    "rejected": None,
+                }
+            )
             votes.extend(vote_rows(year, "list", region, None, list(zip(parties, counts, strict=True))))
             for party, (constituency_seats, list_seats) in zip(parties, seats, strict=True):
-                declared.append({"year": year, "region": region, "label": party, "constituency_seats": constituency_seats or 0, "list_seats": list_seats or 0})
+                declared.append(
+                    {
+                        "year": year,
+                        "region": region,
+                        "label": party,
+                        "constituency_seats": constituency_seats or 0,
+                        "list_seats": list_seats or 0,
+                    }
+                )
     return votes, units, declared, shares
 
 
@@ -518,8 +567,30 @@ def parse_ec2011(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[d
             if ballot == "constituency":
                 votes.extend(vote_rows(2011, ballot, region, constituency, pairs))
             else:
-                votes.extend(vote_rows(2011, ballot, region, constituency, [(label.replace("Ind-", "Ind (") + (")" if label.startswith("Ind-") else ""), amount) for label, amount in pairs]))
-            units.append({"year": 2011, "ballot": ballot, "region": region, "constituency": constituency, "electorate": number(record["Electorate"]), "cast": None, "valid": valid, "rejected": number(record["Rejected ballots"])})
+                votes.extend(
+                    vote_rows(
+                        2011,
+                        ballot,
+                        region,
+                        constituency,
+                        [
+                            (label.replace("Ind-", "Ind (") + (")" if label.startswith("Ind-") else ""), amount)
+                            for label, amount in pairs
+                        ],
+                    )
+                )
+            units.append(
+                {
+                    "year": 2011,
+                    "ballot": ballot,
+                    "region": region,
+                    "constituency": constituency,
+                    "electorate": number(record["Electorate"]),
+                    "cast": None,
+                    "valid": valid,
+                    "rejected": number(record["Rejected ballots"]),
+                }
+            )
     return votes, units
 
 
@@ -544,7 +615,18 @@ def parse_ec2016(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[d
             pairs = [("Ind" if label == "IND" else label.strip(), amount) for label, amount in pairs]
             votes.extend(vote_rows(2016, ballot, region, constituency, pairs))
             rejected = record.get("Total number of ballot papers rejected at the count")
-            units.append({"year": 2016, "ballot": ballot, "region": region, "constituency": constituency, "electorate": number(record["Electorate"]), "cast": number(record["Total ballots at the count"]), "valid": valid, "rejected": number(rejected)})
+            units.append(
+                {
+                    "year": 2016,
+                    "ballot": ballot,
+                    "region": region,
+                    "constituency": constituency,
+                    "electorate": number(record["Electorate"]),
+                    "cast": number(record["Total ballots at the count"]),
+                    "valid": valid,
+                    "rejected": number(rejected),
+                }
+            )
     return votes, units
 
 
@@ -552,8 +634,46 @@ def parse_2007(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[dic
     lines = pdf_lines(2007)
     votes: list[dict[str, object]] = []
     units: list[dict[str, object]] = []
-    const_columns = "Con Lab LD PC ED NMBP NPTRPA PV UKIP Ind1 Ind2 Ind3 Ind4 Ind5 Oth Total".split()
-    list_columns = "Con Lab LD PC BNP CPA CPB ED GP Res SA SEP SLP UKIP Ver WCP Ind1 Ind2 Oth Total".split()
+    const_columns = [
+        "Con",
+        "Lab",
+        "LD",
+        "PC",
+        "ED",
+        "NMBP",
+        "NPTRPA",
+        "PV",
+        "UKIP",
+        "Ind1",
+        "Ind2",
+        "Ind3",
+        "Ind4",
+        "Ind5",
+        "Oth",
+        "Total",
+    ]
+    list_columns = [
+        "Con",
+        "Lab",
+        "LD",
+        "PC",
+        "BNP",
+        "CPA",
+        "CPB",
+        "ED",
+        "GP",
+        "Res",
+        "SA",
+        "SEP",
+        "SLP",
+        "UKIP",
+        "Ver",
+        "WCP",
+        "Ind1",
+        "Ind2",
+        "Oth",
+        "Total",
+    ]
     electorate = {}
     section = False
     region = ""
@@ -569,22 +689,52 @@ def parse_2007(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[dic
             electorate[fold(found.group(1))] = int(found.group(2).replace(",", ""))
     for region, name, counts in pdf_table(lines, "Constituency table - Votes, including minor parties", 40, 16, nth=-1):
         constituency = canon[fold(name)]
-        pairs = [(column, amount) for column, amount in zip(const_columns, counts, strict=True) if column not in ("Oth", "Total")]
+        pairs = [
+            (column, amount)
+            for column, amount in zip(const_columns, counts, strict=True)
+            if column not in ("Oth", "Total")
+        ]
         pairs = [("Ind" if column.startswith("Ind") else column, amount) for column, amount in pairs]
         valid = counts[-1]
         if sum(amount or 0 for _, amount in pairs) != valid:
             raise ValueError(f"2007 {constituency}: party columns do not sum to {valid}")
         votes.extend(vote_rows(2007, "constituency", region, constituency, pairs))
-        units.append({"year": 2007, "ballot": "constituency", "region": region, "constituency": constituency, "electorate": electorate[fold(name)], "cast": None, "valid": valid, "rejected": None})
+        units.append(
+            {
+                "year": 2007,
+                "ballot": "constituency",
+                "region": region,
+                "constituency": constituency,
+                "electorate": electorate[fold(name)],
+                "cast": None,
+                "valid": valid,
+                "rejected": None,
+            }
+        )
     for _, name, counts in pdf_table(lines, "Regional table - Votes, including minor parties", 5, 20, nth=-1):
         region = region_of(name)
-        pairs = [(column, amount) for column, amount in zip(list_columns, counts, strict=True) if column not in ("Oth", "Total")]
+        pairs = [
+            (column, amount)
+            for column, amount in zip(list_columns, counts, strict=True)
+            if column not in ("Oth", "Total")
+        ]
         pairs = [("Ind" if column.startswith("Ind") else column, amount) for column, amount in pairs]
         valid = counts[-1]
         if sum(amount or 0 for _, amount in pairs) != valid:
             raise ValueError(f"2007 {region}: regional party columns do not sum to {valid}")
         votes.extend(vote_rows(2007, "list", region, None, pairs))
-        units.append({"year": 2007, "ballot": "list", "region": region, "constituency": None, "electorate": None, "cast": None, "valid": valid, "rejected": None})
+        units.append(
+            {
+                "year": 2007,
+                "ballot": "list",
+                "region": region,
+                "constituency": None,
+                "electorate": None,
+                "cast": None,
+                "valid": valid,
+                "rejected": None,
+            }
+        )
     return votes, units
 
 
@@ -592,7 +742,7 @@ def parse_2021(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[dic
     lines = pdf_lines(2021)
     votes: list[dict[str, object]] = []
     units: list[dict[str, object]] = []
-    columns = "Con Lab LD PC UKIP Abolish GP Oth Total Majority".split()
+    columns = ["Con", "Lab", "LD", "PC", "UKIP", "Abolish", "GP", "Oth", "Total", "Majority"]
     table = pdf_table(lines, "Table 4: Constituency Results", 40, 10, nth=-1)
     begin = [index for index, line in enumerate(lines) if line.strip().startswith("Table 5: Constituency results")][-1]
     electorates = []
@@ -604,12 +754,27 @@ def parse_2021(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[dic
             electorates.append(int(tokens[-2].replace(",", "")))
     for (region, name, counts), electorate in zip(table, electorates, strict=True):
         constituency = canon[fold(name)]
-        pairs = [(column, amount) for column, amount in zip(columns, counts, strict=True) if column not in ("Total", "Majority")]
+        pairs = [
+            (column, amount)
+            for column, amount in zip(columns, counts, strict=True)
+            if column not in ("Total", "Majority")
+        ]
         valid = counts[8]
         if sum(amount or 0 for _, amount in pairs) != valid:
             raise ValueError(f"2021 {constituency}: party columns do not sum to {valid}")
         votes.extend(vote_rows(2021, "constituency", region, constituency, pairs))
-        units.append({"year": 2021, "ballot": "constituency", "region": region, "constituency": constituency, "electorate": electorate, "cast": None, "valid": valid, "rejected": None})
+        units.append(
+            {
+                "year": 2021,
+                "ballot": "constituency",
+                "region": region,
+                "constituency": constituency,
+                "electorate": electorate,
+                "cast": None,
+                "valid": valid,
+                "rejected": None,
+            }
+        )
     begin = [index for index, line in enumerate(lines) if line.strip().startswith("Table 11: Regional table")][-1]
     by_region: dict[str, list[tuple[str, int | None]]] = {region: [] for region in REGIONS}
     totals: dict[str, int | None] = {}
@@ -632,7 +797,18 @@ def parse_2021(canon: dict[str, str]) -> tuple[list[dict[str, object]], list[dic
         if sum(amount or 0 for _, amount in pairs) != totals[region]:
             raise ValueError(f"2021 {region}: regional party columns do not sum to {totals[region]}")
         votes.extend(vote_rows(2021, "list", region, None, pairs))
-        units.append({"year": 2021, "ballot": "list", "region": region, "constituency": None, "electorate": None, "cast": None, "valid": totals[region], "rejected": None})
+        units.append(
+            {
+                "year": 2021,
+                "ballot": "list",
+                "region": region,
+                "constituency": None,
+                "electorate": None,
+                "cast": None,
+                "valid": totals[region],
+                "rejected": None,
+            }
+        )
     return votes, units
 
 
@@ -665,7 +841,9 @@ def parse() -> None:
             continue
         share = figshare[(row["year"], fold(row["constituency"]))]["shares"][SHARE_COLUMNS[row["key"]]]
         if abs(row["votes"] / totals[(row["year"], row["constituency"])] - share) > 0.0016:
-            print(f"SHARE {row['year']} {row['constituency']} {row['party']}: {row['votes']} votes is {row['votes'] / totals[(row['year'], row['constituency'])]:.4f}, Figshare {share}")
+            print(
+                f"SHARE {row['year']} {row['constituency']} {row['party']}: {row['votes']} votes is {row['votes'] / totals[(row['year'], row['constituency'])]:.4f}, Figshare {share}"
+            )
         checked += 1
     print("Election Demon shares checked against Figshare:", checked)
     ec11_votes, ec11_units = parse_ec2011(canon)
@@ -689,11 +867,30 @@ def parse() -> None:
                 problems.append(f"{year} {constituency}: no member in Wikidata")
                 continue
             member = found[0]
-            keys = {WIKIDATA_PARTIES.get(row["party"]) for row in found if row["start"] == member["start"] and row["qid"] == member["qid"]}
+            keys = {
+                WIKIDATA_PARTIES.get(row["party"])
+                for row in found
+                if row["start"] == member["start"] and row["qid"] == member["qid"]
+            }
             if top["key"] not in keys:
-                problems.append(f"{year} {constituency}: top {top['party']} ({top['key']}) vs member {member['name']} {keys}")
-            seats[top["region"]][top["key"] or "independent"] = seats[top["region"]].get(top["key"] or "independent", 0) + 1
-            elected.append({"year": year, "ballot": "constituency", "district": constituency, "region": top["region"], "qid": member["qid"], "name": member["name"], "party": top["party"], "key": top["key"]})
+                problems.append(
+                    f"{year} {constituency}: top {top['party']} ({top['key']}) vs member {member['name']} {keys}"
+                )
+            seats[top["region"]][top["key"] or "independent"] = (
+                seats[top["region"]].get(top["key"] or "independent", 0) + 1
+            )
+            elected.append(
+                {
+                    "year": year,
+                    "ballot": "constituency",
+                    "district": constituency,
+                    "region": top["region"],
+                    "qid": member["qid"],
+                    "name": member["name"],
+                    "party": top["party"],
+                    "key": top["key"],
+                }
+            )
         listed = votes.filter((pl.col("year") == year) & (pl.col("ballot") == "list") & (pl.col("kind") == "list"))
         for region in REGIONS:
             found = sorted((row for row in pool if row["district"] == region), key=lambda row: row["start"])
@@ -711,10 +908,23 @@ def parse() -> None:
                 options = {WIKIDATA_PARTIES.get(row["party"]) for row in rows} & set(by_key)
                 key = next(iter(options)) if len(options) == 1 else None
                 if len(options) != 1:
-                    problems.append(f"{year} {region}: {rows[0]['name']} party {[row['party'] for row in rows]} not a list option")
+                    problems.append(
+                        f"{year} {region}: {rows[0]['name']} party {[row['party'] for row in rows]} not a list option"
+                    )
                 actual[key or "?"] = actual.get(key or "?", 0) + 1
                 label = region_votes.filter(pl.col("key") == key)["party"].to_list()
-                elected.append({"year": year, "ballot": "list", "district": region, "region": region, "qid": rows[0]["qid"], "name": rows[0]["name"], "party": label[0] if label else None, "key": key})
+                elected.append(
+                    {
+                        "year": year,
+                        "ballot": "list",
+                        "district": region,
+                        "region": region,
+                        "qid": rows[0]["qid"],
+                        "name": rows[0]["name"],
+                        "party": label[0] if label else None,
+                        "key": key,
+                    }
+                )
             if expected != actual:
                 problems.append(f"{year} {region}: D'Hondt gives {expected}, members are {actual}")
     pl.DataFrame(elected, infer_schema_length=None).write_parquet(PARSED / "members.parquet")
@@ -810,7 +1020,9 @@ def emit() -> Path:
             return parties[key]
 
         christian = party_of("christian-party-proclaiming-christ-s-lordship", None)
-        stray = conn.execute("select entity_id from external_id where scheme = 'gb.party' and value = 'christian-party'").fetchone()
+        stray = conn.execute(
+            "select entity_id from external_id where scheme = 'gb.party' and value = 'christian-party'"
+        ).fetchone()
         if stray is not None and stray[0] != christian:
             cs.merge(stray[0], christian)
         official = 'Christian Party "Proclaiming Christ\'s Lordship"'
@@ -818,7 +1030,13 @@ def emit() -> Path:
             "select id, text from name where entity_id = %s and kind = 'official' and is_preferred and text <> %s",
             (christian, official),
         ).fetchall():
-            cs.add("name_drop", name_id=name_id, entity_id=christian, text=text, reason="The Electoral Commission register gives the party's name with its description in quotation marks.")
+            cs.add(
+                "name_drop",
+                name_id=name_id,
+                entity_id=christian,
+                text=text,
+                reason="The Electoral Commission register gives the party's name with its description in quotation marks.",
+            )
         name(christian, official)
 
         starts = sorted(ERA_STARTS)
@@ -838,13 +1056,21 @@ def emit() -> Path:
                 .unique()
                 .iter_rows(named=True)
             }
-            if len(located) != votes.filter(pl.col("year").is_in(years) & (pl.col("ballot") == "constituency"))["constituency"].n_unique():
+            if (
+                len(located)
+                != votes.filter(pl.col("year").is_in(years) & (pl.col("ballot") == "constituency"))[
+                    "constituency"
+                ].n_unique()
+            ):
                 raise ValueError(f"{era}: a constituency changes region within one boundary era")
             if era == 2026:
-                places = [("gb.senc", label, country, constituency_areas, constituency_units, None) for label in SENC_2026]
+                places = [
+                    ("gb.senc", label, country, constituency_areas, constituency_units, None) for label in SENC_2026
+                ]
             else:
                 places = [("gb.senr", label, country, region_areas, region_units, label) for label in REGIONS] + [
-                    ("gb.senc", label, None, constituency_areas, constituency_units, located[label]) for label in sorted(located)
+                    ("gb.senc", label, None, constituency_areas, constituency_units, located[label])
+                    for label in sorted(located)
                 ]
             for scheme, label, parent, areas, area_units, region in places:
                 code = f"{era}:{slug(label)}"
@@ -897,7 +1123,12 @@ def emit() -> Path:
             )
 
         def figures(result_set: UUID, unit: UUID, row: dict[str, object]) -> None:
-            for measure, field in ((REGISTERED, "electorate"), (BALLOTS, "cast"), (VALID, "valid"), (INVALID, "rejected")):
+            for measure, field in (
+                (REGISTERED, "electorate"),
+                (BALLOTS, "cast"),
+                (VALID, "valid"),
+                (INVALID, "rejected"),
+            ):
                 value(result_set, unit, None, measure, row[field])
 
         for year, day in ELECTIONS.items():
@@ -913,9 +1144,10 @@ def emit() -> Path:
             year_votes = votes.filter(pl.col("year") == year)
             year_units = units.filter(pl.col("year") == year)
             winners = members.filter((pl.col("year") == year) & (pl.col("ballot") == "constituency"))
-            seats_by_region: dict[str, dict[str, int]] = {}
 
-            for (constituency,), rows in year_votes.filter(pl.col("ballot") == "constituency").group_by("constituency", maintain_order=True):
+            for (constituency,), rows in year_votes.filter(pl.col("ballot") == "constituency").group_by(
+                "constituency", maintain_order=True
+            ):
                 contest_key = f"{day}:{slug(constituency)}"
                 contest = cs.key("gb.contest", contest_key)
                 cs.add(
@@ -947,7 +1179,13 @@ def emit() -> Path:
                 )
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
                 unit = constituency_units[(era, constituency)]
-                figures(result_set, unit, year_units.filter((pl.col("ballot") == "constituency") & (pl.col("constituency") == constituency)).row(0, named=True))
+                figures(
+                    result_set,
+                    unit,
+                    year_units.filter(
+                        (pl.col("ballot") == "constituency") & (pl.col("constituency") == constituency)
+                    ).row(0, named=True),
+                )
                 top = rows.sort("votes", descending=True).row(0, named=True)
                 member = winners.filter(pl.col("district") == constituency).row(0, named=True)
                 for line in rows.iter_rows(named=True):
@@ -1011,7 +1249,9 @@ def emit() -> Path:
                 region_votes = year_votes.filter((pl.col("ballot") == "list") & (pl.col("region") == region))
                 options: dict[str, UUID] = {}
                 by_party: dict[str, UUID] = {}
-                for line in region_votes.select("party", "key", "kind").unique(maintain_order=True).iter_rows(named=True):
+                for line in (
+                    region_votes.select("party", "key", "kind").unique(maintain_order=True).iter_rows(named=True)
+                ):
                     option = options[line["party"]] = cs.key("gb.option", f"{contest_key}:{slug(line['party'])}")
                     party = party_of(line["key"], line["party"])
                     if line["key"] is not None:
@@ -1025,7 +1265,9 @@ def emit() -> Path:
                         ballot_label=line["party"],
                     )
                 elected: dict[str, list[dict[str, object]]] = {}
-                for line in members.filter((pl.col("year") == year) & (pl.col("ballot") == "list") & (pl.col("region") == region)).iter_rows(named=True):
+                for line in members.filter(
+                    (pl.col("year") == year) & (pl.col("ballot") == "list") & (pl.col("region") == region)
+                ).iter_rows(named=True):
                     elected.setdefault(line["key"], []).append(line)
                 for key, winners_here in elected.items():
                     option = by_party[key]
@@ -1042,16 +1284,32 @@ def emit() -> Path:
                             member_of_party_id=party_of(key, line["party"]),
                             is_independent=False,
                         )
-                        cs.add("outcome", result_set_id=result_set, option_id=option, candidacy_id=candidacy, kind="elected")
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            candidacy_id=candidacy,
+                            kind="elected",
+                        )
                 if list_by_constituency:
-                    for row in year_units.filter((pl.col("ballot") == "list") & (pl.col("region") == region)).iter_rows(named=True):
+                    for row in year_units.filter((pl.col("ballot") == "list") & (pl.col("region") == region)).iter_rows(
+                        named=True
+                    ):
                         unit = constituency_units[(era, row["constituency"])]
                         figures(result_set, unit, row)
-                        for line in region_votes.filter(pl.col("constituency") == row["constituency"]).iter_rows(named=True):
+                        for line in region_votes.filter(pl.col("constituency") == row["constituency"]).iter_rows(
+                            named=True
+                        ):
                             value(result_set, unit, options[line["party"]], VOTES, line["votes"])
                 else:
                     unit = region_units[(era, region)]
-                    figures(result_set, unit, year_units.filter((pl.col("ballot") == "list") & (pl.col("region") == region)).row(0, named=True))
+                    figures(
+                        result_set,
+                        unit,
+                        year_units.filter((pl.col("ballot") == "list") & (pl.col("region") == region)).row(
+                            0, named=True
+                        ),
+                    )
                     for line in region_votes.iter_rows(named=True):
                         value(result_set, unit, options[line["party"]], VOTES, line["votes"])
         for before, after in itertools.pairwise(starts):

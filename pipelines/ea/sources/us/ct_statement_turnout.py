@@ -66,7 +66,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         for year in TOTALS:
             cs.artifact(raw.cached(SOURCE, BASE.format(year=year)), source)
         for year, registered, voters in frame.select("year", "registered", "voters").iter_rows():

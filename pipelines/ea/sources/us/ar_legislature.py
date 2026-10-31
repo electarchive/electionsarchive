@@ -78,7 +78,7 @@ def parse() -> None:
                 for column, code in counties.items():
                     try:
                         votes = int(float(line[column]))
-                    except (TypeError, ValueError):
+                    except TypeError, ValueError:
                         continue
                     rows.append((year, current[0], current[1], day, code, candidate, votes))
         else:
@@ -93,7 +93,7 @@ def parse() -> None:
                 for column, code in counties.items():
                     try:
                         votes = int(cells[column])
-                    except (IndexError, ValueError):
+                    except IndexError, ValueError:
                         continue
                     rows.append((year, current[0], current[1], day, code, candidate, votes))
     PARSED.mkdir(parents=True, exist_ok=True)

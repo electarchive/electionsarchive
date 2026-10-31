@@ -29,8 +29,11 @@ def parse() -> None:
     rows = []
     for stage, url in PAGES.items():
         text = raw.cached(SOURCE, url).path.read_text(errors="replace")
-        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, flags=re.S | re.I):
-            cells = [re.sub(r"<[^>]+>|\s+", " ", c).strip() for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.S | re.I)]
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, flags=re.DOTALL | re.IGNORECASE):
+            cells = [
+                re.sub(r"<[^>]+>|\s+", " ", c).strip()
+                for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, flags=re.DOTALL | re.IGNORECASE)
+            ]
             if len(cells) != 4 or not re.fullmatch(r"(19|20)\d\d", cells[0]):
                 continue
             rows.append(
@@ -41,7 +44,9 @@ def parse() -> None:
                     "voters": int(cells[2].replace(",", "")),
                 }
             )
-    frame = pl.DataFrame(rows, schema={"year": pl.Int64, "stage": pl.String, "registered": pl.Int64, "voters": pl.Int64})
+    frame = pl.DataFrame(
+        rows, schema={"year": pl.Int64, "stage": pl.String, "registered": pl.Int64, "voters": pl.Int64}
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
     print(frame.group_by("stage").len())

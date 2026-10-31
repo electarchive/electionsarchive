@@ -11,7 +11,12 @@ from ea.sources.us import hi_county, medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.hi_statewide"
-DAYS = hi_county.YEARS | {2016: date(2016, 11, 8), 2018: date(2018, 11, 6), 2020: date(2020, 11, 3), 2022: date(2022, 11, 8)}
+DAYS = hi_county.YEARS | {
+    2016: date(2016, 11, 8),
+    2018: date(2018, 11, 6),
+    2020: date(2020, 11, 3),
+    2022: date(2022, 11, 8),
+}
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 
@@ -26,7 +31,9 @@ def parse() -> None:
     rows = []
     for year, day in DAYS.items():
         for county, code in hi_county.COUNTIES.items():
-            for header, entries in hi_county.blocks(raw.cached(hi_county.SOURCE, hi_county.BASE.format(year=year, county=county)).path):
+            for header, entries in hi_county.blocks(
+                raw.cached(hi_county.SOURCE, hi_county.BASE.format(year=year, county=county)).path
+            ):
                 if not re.search(r"Governor and Lieutenant Governor", html.unescape(header), re.IGNORECASE):
                     continue
                 for name, votes in entries:

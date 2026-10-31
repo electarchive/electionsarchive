@@ -93,7 +93,9 @@ MISSOURI = {
     date(2024, 11, 5): "ActualResults-November52024.pdf",
 }
 ALABAMA = {
-    date(2012, 11, 6): "voter-pdfs/2012/2012GeneralResults-AllStateAndFederalOfficesAndAmendments-WithoutWrite-inAppendix.pdf",
+    date(
+        2012, 11, 6
+    ): "voter-pdfs/2012/2012GeneralResults-AllStateAndFederalOfficesAndAmendments-WithoutWrite-inAppendix.pdf",
     date(2012, 9, 18): "voter-pdfs/2012/scae-results-certified-2012-10-09.pdf",
     date(2014, 11, 4): "voter-pdfs/2014/2014GeneralResults-WithoutWriteIn.pdf",
     date(2016, 11, 8): "voter-pdfs/2016/2016-Official-General-Election-Results-Certified-2016-11-29.pdf",
@@ -112,7 +114,9 @@ ARIZONA = {
     date(2020, 11, 3): ("20231207175657", "https://azsos.gov/sites/default/files/2020_General_State_Canvass.pdf"),
 }
 MINNESOTA = {
-    date(2012, 11, 6): "https://electionresults.sos.mn.gov/Results/MediaFile_Archive/Index?erselectionId=1&mediafileid=65",
+    date(
+        2012, 11, 6
+    ): "https://electionresults.sos.mn.gov/Results/MediaFile_Archive/Index?erselectionId=1&mediafileid=65",
     date(2016, 11, 8): "https://electionresultsfiles.sos.mn.gov/20161108/ConstAmendCty.txt",
     date(2024, 11, 5): "https://electionresultsfiles.sos.mn.gov/20241105/ConstAmendCty.txt",
 }
@@ -147,7 +151,9 @@ SOUTH_CAROLINA = {
     date(2024, 11, 5): "https://www.enr-scvotes.org/SC/122436/359624/reports/detailxml.zip",
 }
 MISSISSIPPI = {
-    date(2014, 11, 4): "https://www.sos.ms.gov/elections/electionresults/2014General/certified%20results/Amendment%20Number%201%20HCR%2030.pdf"
+    date(
+        2014, 11, 4
+    ): "https://www.sos.ms.gov/elections/electionresults/2014General/certified%20results/Amendment%20Number%201%20HCR%2030.pdf"
 }
 DISTRICT = {
     date(2024, 11, 5): "https://electionresults.dcboe.org/Downloads/Reports/"
@@ -164,7 +170,14 @@ OKLAHOMA = [
     date(2023, 3, 7),
     date(2024, 11, 5),
 ]
-NEVADA = [date(2012, 11, 6), date(2014, 11, 4), date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
+NEVADA = [
+    date(2012, 11, 6),
+    date(2014, 11, 4),
+    date(2016, 11, 8),
+    date(2018, 11, 6),
+    date(2020, 11, 3),
+    date(2024, 11, 5),
+]
 MAINE = {
     date(
         2024, 11, 5
@@ -246,9 +259,15 @@ RHODE_ISLAND = {
     date(2024, 11, 5): "2025-01/Gen24EX%20%281%29.xlsx",
 }
 RHODE_ISLAND_PRECINCTS = {
-    date(2012, 11, 6): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen12.xls",
-    date(2014, 11, 4): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen14.xls",
-    date(2016, 11, 8): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen16.xls",
+    date(
+        2012, 11, 6
+    ): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen12.xls",
+    date(
+        2014, 11, 4
+    ): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen14.xls",
+    date(
+        2016, 11, 8
+    ): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen16.xls",
 }
 TENNESSEE = {
     date(2014, 11, 4): "https://sos-tn-gov-files.s3.amazonaws.com/20141104_CountyTotals_01.pdf",
@@ -301,7 +320,14 @@ NEBRASKA = {
     date(2022, 11, 8): "2022/2022%20General%20Canvass%20Book.pdf",
     date(2024, 11, 5): "2024/2024%20General%20Canvass%20Book.pdf",
 }
-ILLINOIS = {date(2012, 11, 6): 2012, date(2014, 11, 4): 2014, date(2016, 11, 8): 2016, date(2020, 11, 3): 2020, date(2022, 11, 8): 2022, date(2024, 11, 5): 2024}
+ILLINOIS = {
+    date(2012, 11, 6): 2012,
+    date(2014, 11, 4): 2014,
+    date(2016, 11, 8): 2016,
+    date(2020, 11, 3): 2020,
+    date(2022, 11, 8): 2022,
+    date(2024, 11, 5): 2024,
+}
 ILLINOIS_ADVISORY = {
     "civil penalties": "Illinois Penalties for Candidate Interference with Election Worker's Duties Advisory Question",
     "additional 3% tax": "Illinois Income Tax Advisory Question",
@@ -314,7 +340,10 @@ KENTUCKY = {
     ),
     date(2020, 11, 3): (
         "https://elect.ky.gov/results/2020-2029/Documents/2020%20General%20Election%20Results.pdf",
-        {"crime victims": "Constitutional Amendment 1", "term of Commonwealth's Attorneys": "Constitutional Amendment 2"},
+        {
+            "crime victims": "Constitutional Amendment 1",
+            "term of Commonwealth's Attorneys": "Constitutional Amendment 2",
+        },
     ),
     date(2022, 11, 8): (
         "https://elect.ky.gov/results/2020-2029/Documents/2022%20General%20Election%20Results.pdf",
@@ -392,11 +421,20 @@ CALIFORNIA = {
     date(2025, 11, 4): "2025-special/sov/csv-ballot-measure.xlsx",
 }
 NEW_JERSEY = {
-    date(2012, 11, 6): ["2012/2012-official-general-results-question1-020513", "2012/2012-official-general-results-question2-020513"],
-    date(2013, 11, 5): ["2013/2013-official-general-election-results-pq1", "2013/2013-official-general-election-results-pq2"],
+    date(2012, 11, 6): [
+        "2012/2012-official-general-results-question1-020513",
+        "2012/2012-official-general-results-question2-020513",
+    ],
+    date(2013, 11, 5): [
+        "2013/2013-official-general-election-results-pq1",
+        "2013/2013-official-general-election-results-pq2",
+    ],
     date(2014, 11, 4): ["2014/2014-official-general-public-question-1", "2014/2014-official-general-public-question-2"],
     date(2016, 11, 8): ["2016/2016-official-general-results-question1", "2016/2016-official-general-results-question2"],
-    date(2017, 11, 7): ["2017/2017-official-general-election-results-pq1", "2017/2017-official-general-election-results-pq2"],
+    date(2017, 11, 7): [
+        "2017/2017-official-general-election-results-pq1",
+        "2017/2017-official-general-election-results-pq2",
+    ],
     date(2018, 11, 6): ["2018/2018-official-general-election-results-pq1"],
     date(2019, 11, 5): ["2019/2019-official-general-results-public-question"],
     date(2020, 11, 3): [f"2020/2020-official-general-results-public-question-{n}" for n in (1, 2, 3)],
@@ -694,10 +732,14 @@ def link(state: str, day: date) -> tuple[str, str]:
     if state == "WV" and day in WV_JSON:
         return SOURCE, WAYBACK.format(WV_JSON[day][1], CLARITY_JSON.format(WV_JSON[day][0], "details"))
     if state in ("GA", "WV", "SC", "DC", "MS"):
-        entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT, "MS": MISSISSIPPI}[state].get(day, "")
+        entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT, "MS": MISSISSIPPI}[
+            state
+        ].get(day, "")
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
     if state == "WI":
-        names = sorted(path.name for path in (WISCONSIN / f"{day}").glob("*")) if (WISCONSIN / f"{day}").exists() else []
+        names = (
+            sorted(path.name for path in (WISCONSIN / f"{day}").glob("*")) if (WISCONSIN / f"{day}").exists() else []
+        )
         return SOURCE, WISCONSIN_SITE.format(day, names[0]) if names else ""
     if state == "NJ":
         return SOURCE, NEW_JERSEY_SITE.format(NEW_JERSEY[day][0]) if day in NEW_JERSEY else ""
@@ -1143,22 +1185,46 @@ def parse() -> None:
                 sheet = fastexcel.read_excel(copy.name).load_sheet(0).to_polars()
             sheet = sheet.rename(
                 {
-                    column: {"Precinct Name": "town", "City/Town": "town", "Contest Title": "office", "Contest": "office",
-                             "Office Title": "office", "Candidate Name": "answer", "Candidate": "answer"}[column]
+                    column: {
+                        "Precinct Name": "town",
+                        "City/Town": "town",
+                        "Contest Title": "office",
+                        "Contest": "office",
+                        "Office Title": "office",
+                        "Candidate Name": "answer",
+                        "Candidate": "answer",
+                    }[column]
                     for column in sheet.columns
-                    if column in ("Precinct Name", "City/Town", "Contest Title", "Contest", "Office Title", "Candidate Name", "Candidate")
+                    if column
+                    in (
+                        "Precinct Name",
+                        "City/Town",
+                        "Contest Title",
+                        "Contest",
+                        "Office Title",
+                        "Candidate Name",
+                        "Candidate",
+                    )
                 }
             )
             sheet = sheet.filter(pl.col("answer").str.contains("(?i)\\b(approve|reject)$"))
             table = (
-                sheet.with_columns(votes=pl.col("Total").cast(pl.Int64), town=pl.col("town").str.replace(r"(\s+Limited)?(\s+\d+)?$", ""))
+                sheet.with_columns(
+                    votes=pl.col("Total").cast(pl.Int64),
+                    town=pl.col("town").str.replace(r"(\s+Limited)?(\s+\d+)?$", ""),
+                )
                 .filter(pl.col("town").n_unique().over("office") > 30)
                 .group_by("town", "office", "answer")
                 .agg(pl.col("votes").sum())
                 .select(
-                    fips=pl.col("town").map_elements(elstats.plain, return_dtype=pl.String).replace_strict(towns, default=None),
+                    fips=pl.col("town")
+                    .map_elements(elstats.plain, return_dtype=pl.String)
+                    .replace_strict(towns, default=None),
                     office="office",
-                    answer=pl.col("answer").str.extract(r"(?i)(approve|reject)$").str.to_titlecase().replace({"Approve": "Approved", "Reject": "Rejected"}),
+                    answer=pl.col("answer")
+                    .str.extract(r"(?i)(approve|reject)$")
+                    .str.to_titlecase()
+                    .replace({"Approve": "Approved", "Reject": "Rejected"}),
                     votes=pl.col("votes").cast(pl.String),
                 )
             )
@@ -1630,7 +1696,10 @@ def parse() -> None:
                     for county, yes, no in re.findall(r"([A-Z][A-Za-z.' ]*?[A-Za-z.])\s{2,}([\d,]+)\s+([\d,]+)", line):
                         county = "Total" if county in ("TOTAL", "TOTALS") else county
                         if question is not None and (county == "Total" or elstats.plain(county) in names["IL"]):
-                            records.extend((county, question, answer, votes, number) for answer, votes in (("YES", yes), ("NO", no)))
+                            records.extend(
+                                (county, question, answer, votes, number)
+                                for answer, votes in (("YES", yes), ("NO", no))
+                            )
                     ended = ended or "TOTAL" in line
                 question = None if ended else question
                 ended = False
@@ -1988,9 +2057,7 @@ def parse() -> None:
                         if titled := re.search(r"(?i)Referendum\s*-\s*Question (\d+)", line):
                             section = []
                             sections.append((f"Question {titled[1]}", section))
-                        elif row := re.fullmatch(
-                            r"\s*([A-Z][A-Z .'\-]+?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line
-                        ):
+                        elif row := re.fullmatch(r"\s*([A-Z][A-Z .'\-]+?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line):
                             section.append(list(row.groups()))
                         elif matched := re.fullmatch(r"\s*Office Totals:\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line):
                             section.append(["Total", *matched.groups()])
@@ -2151,7 +2218,8 @@ def parse() -> None:
             records = []
             page = path.read_text(encoding="utf-8", errors="replace")
             for number, body in re.findall(
-                r"(?is)<(?:strong|b)>\s*(?:state\s+)?(?:ballot\s+)?question\s+no\.\s*(\d+).*?<table[^>]*>(.*?)</table>", page
+                r"(?is)<(?:strong|b)>\s*(?:state\s+)?(?:ballot\s+)?question\s+no\.\s*(\d+).*?<table[^>]*>(.*?)</table>",
+                page,
             ):
                 headers = [
                     re.sub(r"<[^>]+>|&nbsp;", "", cell).strip()
@@ -2378,7 +2446,9 @@ def parse() -> None:
                         line,
                     ):
                         title = matched[1] or matched[4]
-                    elif title and (matched := re.fullmatch(r"\s*(\S.*?)\s{2,}([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line)):
+                    elif title and (
+                        matched := re.fullmatch(r"\s*(\S.*?)\s{2,}([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line)
+                    ):
                         if matched[1].strip().upper() == "TOTAL":
                             title = None
                             continue
@@ -2502,7 +2572,9 @@ def parse() -> None:
                 body = raw.cached(SOURCE, question_url).path.read_text(errors="replace")
                 cells = [
                     cell.replace("Winner Selected", "").strip()
-                    for cell in re.sub(r"\s+", " ", re.sub(r"(?s)<(script|style)\b.*?</\1>|<[^>]+>", "|", html.unescape(body))).split("|")
+                    for cell in re.sub(
+                        r"\s+", " ", re.sub(r"(?s)<(script|style)\b.*?</\1>|<[^>]+>", "|", html.unescape(body))
+                    ).split("|")
                 ]
                 cells = [cell for cell in cells if cell]
                 rows = [
@@ -2513,11 +2585,13 @@ def parse() -> None:
                     and elstats.plain(re.sub(r"\s+County$", "", cells[i])) in names["MD"]
                 ]
                 total = [
-                    int(re.match(r"[\d,]+", cells[cells.index("Totals") + offset])[0].replace(",", "")) for offset in (1, 2)
+                    int(re.match(r"[\d,]+", cells[cells.index("Totals") + offset])[0].replace(",", ""))
+                    for offset in (1, 2)
                 ]
-                if len(rows) != 24 or [
-                    sum(int(row[column].replace(",", "")) for row in rows) for column in (1, 2)
-                ] != total:
+                if (
+                    len(rows) != 24
+                    or [sum(int(row[column].replace(",", "")) for row in rows) for column in (1, 2)] != total
+                ):
                     print(f"MD {day} question {number}: counties do not add up to the printed totals, skipped")
                     continue
                 for county, yes, no in rows:

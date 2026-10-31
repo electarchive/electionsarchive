@@ -25,7 +25,10 @@ PUBLISHERS = {
     "OH": ("Ohio Secretary of State", "Official county results of statewide issues"),
     "PA": ("Pennsylvania Department of State", "Election Returns: county results of ballot questions"),
     "GA": ("Georgia Secretary of State", "November 4, 2014 General Election: official results by county and precinct"),
-    "WV": ("West Virginia Secretary of State", "2018 General Election: official county results of constitutional amendments"),
+    "WV": (
+        "West Virginia Secretary of State",
+        "2018 General Election: official county results of constitutional amendments",
+    ),
 }
 OHIO_FILES = (
     ("MF-268/2012genissuesbycounty.xlsx", OHIO + "2012-elections-results/", "2012-11-06"),
@@ -33,8 +36,14 @@ OHIO_FILES = (
 )
 OHIO_CONTESTS = {
     ("2012-11-06", "State Issue 1"): "2012-11-06:OH:question:wikipedia:ohio-issue-1-constitutional-convention-question",
-    ("2012-11-06", "State Issue 2"): "2012-11-06:OH:question:wikipedia:ohio-issue-2-redistricting-commission-initiative",
-    ("2014-05-06", "State Issue 1"): "2014-05-06:OH:question:wikipedia:ohio-issue-1-local-public-infrastructure-bond-amendment",
+    (
+        "2012-11-06",
+        "State Issue 2",
+    ): "2012-11-06:OH:question:wikipedia:ohio-issue-2-redistricting-commission-initiative",
+    (
+        "2014-05-06",
+        "State Issue 1",
+    ): "2014-05-06:OH:question:wikipedia:ohio-issue-1-local-public-infrastructure-bond-amendment",
 }
 PENNSYLVANIA_FILES = {
     "MF-269/Official_10292026080056AM.CSV": "2016-04-26:PA:question:wikipedia:pennsylvania-philadelphia-traffic-court-abolition-amendment-proposed-constitutio",
@@ -100,7 +109,11 @@ def parse() -> None:
     rows: list[tuple[str, str, str, int, str]] = []
     for path, url, day in OHIO_FILES:
         sheet = pl.read_excel(raw.cached(SOURCE, url).path, has_header=False).rows()
-        titles = [(index, str(cell).strip().replace("\n", " ")) for index, cell in enumerate(sheet[0]) if cell is not None and "State Issue" in str(cell)]
+        titles = [
+            (index, str(cell).strip().replace("\n", " "))
+            for index, cell in enumerate(sheet[0])
+            if cell is not None and "State Issue" in str(cell)
+        ]
         for index, title in titles:
             name = re.match(r"State Issue \d+", title)[0]
             for row in sheet[2:]:
@@ -108,17 +121,26 @@ def parse() -> None:
                 if code is None:
                     continue
                 yes, no = number(row[index]), number(row[index + 1])
-                rows += [(OHIO_CONTESTS[(day, name)], code, "YES", yes, path), (OHIO_CONTESTS[(day, name)], code, "NO", no, path)]
+                rows += [
+                    (OHIO_CONTESTS[(day, name)], code, "YES", yes, path),
+                    (OHIO_CONTESTS[(day, name)], code, "NO", no, path),
+                ]
     for path, contest in PENNSYLVANIA_FILES.items():
         text = raw.cached(SOURCE, PENNSYLVANIA.format(Path(path).stem)).path.read_text(encoding="utf-8-sig")
         for line in csv.DictReader(io.StringIO(text)):
             code = fips["PA"][key(line["County Name"])]
-            rows += [(contest, code, "YES", number(line["Yes Votes"]), path), (contest, code, "NO", number(line["No Votes"]), path)]
+            rows += [
+                (contest, code, "YES", number(line["Yes Votes"]), path),
+                (contest, code, "NO", number(line["No Votes"]), path),
+            ]
     with zipfile.ZipFile(raw.cached(SOURCE, WEST_VIRGINIA).path) as archive:
         book = ET.fromstring(archive.read("detail.xls").decode("utf-8-sig").encode())
     for sheet in book.iter(SPREADSHEET + "Worksheet"):
         table = [
-            [(cell.find(SPREADSHEET + "Data").text if cell.find(SPREADSHEET + "Data") is not None else None) for cell in row.findall(SPREADSHEET + "Cell")]
+            [
+                (cell.find(SPREADSHEET + "Data").text if cell.find(SPREADSHEET + "Data") is not None else None)
+                for cell in row.findall(SPREADSHEET + "Cell")
+            ]
             for row in sheet.find(SPREADSHEET + "Table").findall(SPREADSHEET + "Row")
         ]
         title = re.match(r"Amendment No\. \d", (table[0][0] if table and table[0] else None) or "")
@@ -128,7 +150,10 @@ def parse() -> None:
             code = fips["WV"].get(key(row[0] or ""))
             if code is not None:
                 contest = WEST_VIRGINIA_CONTESTS[title[0]]
-                rows += [(contest, code, "YES", number(row[3]), "MF-270/detailxls.zip"), (contest, code, "NO", number(row[5]), "MF-270/detailxls.zip")]
+                rows += [
+                    (contest, code, "YES", number(row[3]), "MF-270/detailxls.zip"),
+                    (contest, code, "NO", number(row[5]), "MF-270/detailxls.zip"),
+                ]
     with zipfile.ZipFile(raw.cached(SOURCE, GEORGIA).path) as archive:
         for member in archive.namelist():
             if not member.endswith("-detailtxt.zip"):
@@ -146,7 +171,11 @@ def parse() -> None:
                     rows += [(contest, code, "YES", figures[5], "MF-271"), (contest, code, "NO", figures[10], "MF-271")]
                     contest = None
     frame = pl.DataFrame(rows, schema=["contest", "fips", "answer", "votes", "path"], orient="row")
-    print(frame.group_by("contest", "answer").agg(pl.col("votes").sum(), pl.col("fips").n_unique().alias("counties")).sort("contest", "answer"))
+    print(
+        frame.group_by("contest", "answer")
+        .agg(pl.col("votes").sum(), pl.col("fips").n_unique().alias("counties"))
+        .sort("contest", "answer")
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
 
@@ -172,11 +201,19 @@ def emit() -> Path:
                     kind="official_body",
                     publisher=publisher,
                     title=title,
-                    url={"OH": OHIO, "PA": "https://www.electionreturns.pa.gov/", "WV": "https://apps.sos.wv.gov/elections/results/", "GA": "https://results.enr.clarityelections.com/GA/"}[state],
+                    url={
+                        "OH": OHIO,
+                        "PA": "https://www.electionreturns.pa.gov/",
+                        "WV": "https://apps.sos.wv.gov/elections/results/",
+                        "GA": "https://results.enr.clarityelections.com/GA/",
+                    }[state],
                     license="Public record",
                 )
         for path, url in urls.items():
-            cs.artifact(raw.cached(SOURCE, url), sources[{"MF-268": "OH", "MF-269": "PA", "MF-270": "WV", "MF-271": "GA"}[path.split("/")[0]]])
+            cs.artifact(
+                raw.cached(SOURCE, url),
+                sources[{"MF-268": "OH", "MF-269": "PA", "MF-270": "WV", "MF-271": "GA"}[path.split("/")[0]]],
+            )
         for contest_key in frame["contest"].unique().sort():
             found = conn.execute(
                 """select c.id, rs.election_id, rs.k from contest c
@@ -187,14 +224,20 @@ def emit() -> Path:
             if len(found) != 1:
                 raise ValueError(f"{contest_key}: {len(found)} contests matched")
             contest, election, held = found[0]
-            options = dict(conn.execute("select upper(ballot_label), id from contest_option where contest_id = %s", [contest]).fetchall())
+            options = dict(
+                conn.execute(
+                    "select upper(ballot_label), id from contest_option where contest_id = %s", [contest]
+                ).fetchall()
+            )
             statewide = dict(
                 conn.execute(
                     "select upper(o.ballot_label), sum(v.value) from result_value v join contest_option o on o.k = v.option_k where v.result_set_k = %s and v.measure = 1 group by 1",
                     [held],
                 ).fetchall()
             )
-            counted = dict(frame.filter(pl.col("contest") == contest_key).group_by("answer").agg(pl.col("votes").sum()).iter_rows())
+            counted = dict(
+                frame.filter(pl.col("contest") == contest_key).group_by("answer").agg(pl.col("votes").sum()).iter_rows()
+            )
             print(contest_key[:60], counted, {answer: int(votes) for answer, votes in statewide.items()})
             result_set = cs.key(f"{SOURCE}.result_set", f"{contest}:county")
             cs.add(
@@ -216,7 +259,9 @@ def emit() -> Path:
                     kind="caveat",
                     body_md="County totals are the state's official canvass of this question. The statewide totals held for the question, from the English Wikipedia, differ slightly from these county sums, which are the canvassed figures.",
                 )
-            for fips, answer, votes in frame.filter(pl.col("contest") == contest_key).select("fips", "answer", "votes").iter_rows():
+            for fips, answer, votes in (
+                frame.filter(pl.col("contest") == contest_key).select("fips", "answer", "votes").iter_rows()
+            ):
                 cs.add(
                     "result_value",
                     result_set_id=result_set,

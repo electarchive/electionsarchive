@@ -1,4 +1,3 @@
-import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -112,7 +111,12 @@ def emit() -> Path:
             title = TITLE.format(day=day)
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=landing,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=landing,
                 license=LICENSE,
             )
             book = house_books._artifact(sys.modules[__name__], year)
@@ -149,7 +153,15 @@ def emit() -> Path:
             conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':NY:'")
         )
         columns = (
-            "id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness",
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
             "supersedes_id",
         )
         chosen: dict[str, UUID] = {}
@@ -178,7 +190,14 @@ def emit() -> Path:
                     electoral_system_id=fptp,
                     default_result_kind="counted",
                 )
-                cs.add("name", entity_id=contest, text=f"{year} New York {TITLES[office]} election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=contest,
+                    text=f"{year} New York {TITLES[office]} election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"us/ny/{day}-general/{office}", entity_id=contest)
             else:
                 ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
@@ -233,15 +252,19 @@ def emit() -> Path:
                     text = next(text for option, text in roots if option == root)
                 else:
                     text = NAMES.get(head, head)
-                    people = [] if head not in NAMES else conn.execute(
-                        """select distinct cd.person_id from candidacy cd
+                    people = (
+                        []
+                        if head not in NAMES
+                        else conn.execute(
+                            """select distinct cd.person_id from candidacy cd
                            join name n on n.entity_id = cd.person_id and n.is_preferred
                            join contest_option o on o.id = cd.option_id
                            join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                                 and (x.value ~ ':NY:' or x.value ~ ':president$')
                            where regexp_replace(lower(n.text), '[^a-z]', '', 'g') = %s""",
-                        [plain(text)],
-                    ).fetchall()
+                            [plain(text)],
+                        ).fetchall()
+                    )
                     person = chosen.get(plain(text)) or (
                         people[0][0] if len(people) == 1 else cs.key(f"{SOURCE}.person", f"NY:{slug(text)}")
                     )

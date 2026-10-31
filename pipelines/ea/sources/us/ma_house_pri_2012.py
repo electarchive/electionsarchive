@@ -26,7 +26,10 @@ def emit() -> Path:
         source = cs.source(elstats.MA_PUBLISHER, elstats.TITLE)
         cs.artifact(raw.cached(state_primaries.SOURCE, state_primaries.MA_DOWNLOAD.format(ELECTION)), source)
         congress = pl.read_parquet(raw.parsed(state_primaries.SOURCE) / "congress.parquet").filter(
-            pl.col("source") == "MA", pl.col("year") == 2012, pl.col("district") == 9, pl.col("chamber") == "house:republican"
+            pl.col("source") == "MA",
+            pl.col("year") == 2012,
+            pl.col("district") == 9,
+            pl.col("chamber") == "house:republican",
         )
         medsl.attach(
             cs,
@@ -37,13 +40,25 @@ def emit() -> Path:
             declared={
                 KEY: (
                     "CHRISTOPHER SHELDON",
-                    "The certified town results add up to 22,013 votes for the two candidates (Sheldon 11,046, Chaprales "
-                    "10,967). The Federal Election Commission's compilation counts 21,837 and lists Chaprales at 10,697, "
-                    "apparently transposed digits; the state certifies the result, so this set is the default.",
+                    (
+                        "The certified town results add up to 22,013 votes for the two candidates (Sheldon 11,046, Chaprales "
+                        "10,967). The Federal Election Commission's compilation counts 21,837 and lists Chaprales at 10,697, "
+                        "apparently transposed digits; the state certifies the result, so this set is the default."
+                    ),
                 )
             },
         )
-        columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "is_default", "completeness")
+        columns = (
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "is_default",
+            "completeness",
+        )
         for row in conn.execute(
             f"""select {", ".join(f"r.{column}" for column in columns)} from external_id x
                 join result_set r on r.contest_id = x.entity_id and r.is_default and r.status = 'active'

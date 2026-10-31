@@ -21,7 +21,11 @@ SUPREME = "Justice of the Wisconsin Supreme Court"
 APPEALS = "Wisconsin Court of Appeals Judge"
 # (election day, report URL, summary URL for years whose column headers are printed vertically)
 FILES: list[tuple[date, str, str | None]] = [
-    (date(2001, 4, 3), LEGACY + "2001_SpringElection_CountyResults.pdf", LEGACY + "2001_SpringElection_SummaryResults.pdf"),
+    (
+        date(2001, 4, 3),
+        LEGACY + "2001_SpringElection_CountyResults.pdf",
+        LEGACY + "2001_SpringElection_SummaryResults.pdf",
+    ),
     (date(2002, 4, 2), LEGACY + "elec02_cbc.pdf", LEGACY + "elec02_results.pdf"),
     (date(2003, 4, 1), LEGACY + "elec03_cbc.pdf", LEGACY + "elec03_results.pdf"),
     (date(2004, 4, 6), LEGACY + "cxc%25204_06_04.pdf", None),
@@ -37,11 +41,23 @@ FILES: list[tuple[date, str, str | None]] = [
     (date(2010, 4, 6), LEGACY + "spring%2520elec_cxc_appeals.pdf", None),
     (date(2011, 4, 5), WAYBACK + "County%20results_supreme%20recount.pdf", None),
     (date(2011, 4, 5), WAYBACK + "County%20results_4.5.11_appeals.pdf", None),
-    (date(2013, 4, 2), LEGACY + "County%2520Results_4.2.13%2520Spring%2520Election_Justice%2520Supreme%2520Court.pdf", None),
+    (
+        date(2013, 4, 2),
+        LEGACY + "County%2520Results_4.2.13%2520Spring%2520Election_Justice%2520Supreme%2520Court.pdf",
+        None,
+    ),
     (date(2013, 4, 2), LEGACY + "County%2520Results_4.2.13%2520Spring%2520Election_Court%2520of%2520Appeals.pdf", None),
-    (date(2014, 4, 1), LEGACY + "Results%2520by%2520County%2520Report.%25204.1.14%2520Spring%2520Election-Appeals.pdf", None),
+    (
+        date(2014, 4, 1),
+        LEGACY + "Results%2520by%2520County%2520Report.%25204.1.14%2520Spring%2520Election-Appeals.pdf",
+        None,
+    ),
     (date(2015, 4, 7), LEGACY + "County%2520Results%25204.7.15%2520Spring%2520Election.pdf", None),
-    (date(2016, 4, 5), LEGACY + "Supreme%2520Court%2520County%2520by%2520County%2520AMENDED%2520Report-Brown%2520Co.pdf", None),
+    (
+        date(2016, 4, 5),
+        LEGACY + "Supreme%2520Court%2520County%2520by%2520County%2520AMENDED%2520Report-Brown%2520Co.pdf",
+        None,
+    ),
     (date(2016, 4, 5), LEGACY + "County%2520by%2520County%2520Report-Court%2520of%2520Appeals.pdf", None),
     (date(2017, 4, 4), LEGACY + "2017%2520Spring%2520Election-Supreme%2520Court-County%2520Report.pdf", None),
     (date(2017, 4, 4), LEGACY + "2017%2520Spring%2520Election-Court%2520of%2520Appeals-County%2520Report.pdf", None),
@@ -51,8 +67,16 @@ FILES: list[tuple[date, str, str | None]] = [
     (date(2019, 4, 2), LEGACY + "Spring%2520Election%25204.2.19-CxC%2520Report-Court%2520of%2520Appeals.pdf", None),
     (date(2020, 4, 7), LEGACY + "County%2520by%2520County%2520Report_Supreme%2520Court.pdf", None),
     (date(2020, 4, 7), LEGACY + "County%2520by%2520County%2520Report_Court%2520of%2520Appeals.pdf", None),
-    (date(2021, 4, 6), LEGACY + "County%2520by%2520County%2520Report-4.6.21%2520Spring%2520Election-Court%2520of%2520Appeals.pdf", None),
-    (date(2022, 4, 5), DOCUMENTS + "2022%20Spring%20Election%20Court%20of%20Appeals%20County%20by%20County%20Results_0.pdf", None),
+    (
+        date(2021, 4, 6),
+        LEGACY + "County%2520by%2520County%2520Report-4.6.21%2520Spring%2520Election-Court%2520of%2520Appeals.pdf",
+        None,
+    ),
+    (
+        date(2022, 4, 5),
+        DOCUMENTS + "2022%20Spring%20Election%20Court%20of%20Appeals%20County%20by%20County%20Results_0.pdf",
+        None,
+    ),
     (date(2023, 2, 21), DOCUMENTS + "County%20by%20County%20Report_Spring%20Primary_Supreme%20Court_2_21_23.pdf", None),
     (date(2023, 4, 4), DOCUMENTS + "County%20by%20County%20Report_SCOWIS.pdf", None),
     (date(2023, 4, 4), DOCUMENTS + "County%20by%20County%20Report_Court%20of%20Appeals.pdf", None),
@@ -60,7 +84,10 @@ FILES: list[tuple[date, str, str | None]] = [
 ]
 WORKBOOKS: list[tuple[date, str]] = [
     (date(2025, 4, 1), DOCUMENTS + "April%201%202025%20Spring%20Election_County%20by%20County%20Report.xlsx"),
-    (date(2026, 4, 7), DOCUMENTS + "County%20by%20County%20Report_Spring%20Election%202026_All%20State%20Contests.xlsx"),
+    (
+        date(2026, 4, 7),
+        DOCUMENTS + "County%20by%20County%20Report_Spring%20Election%202026_All%20State%20Contests.xlsx",
+    ),
 ]
 DISCREPANT = {(date(2026, 4, 7), "Supreme Court"): [20, 20, 0, 0], (date(2026, 4, 7), "District 4"): [19, 19, 0]}
 SPELLED = {(date(2010, 4, 6), "District 4"): ["Edward E. Leineweber", "Brian Blanchard"]}
@@ -73,10 +100,10 @@ METHOD = (
 )
 OFFICE = re.compile(
     r"^\s*(JUSTICE OF THE SUPREME COURT|Supreme Court|COURT OF APPEALS(?: JUDGE)?[,\s-]*DISTRICT\s+(\d)|Court of Appeals,?\s+District\s+(\d))\b",
-    re.I,
+    re.IGNORECASE,
 )
 NUMBER = re.compile(r"\d[\d,]*")
-PARTY = re.compile(r"^(NP|NON|NPA|IND)\s+", re.I)
+PARTY = re.compile(r"^(NP|NON|NPA|IND)\s+", re.IGNORECASE)
 
 
 def fetch() -> None:
@@ -129,7 +156,11 @@ def sheets(url: str, plain: dict[str, str]) -> list[dict]:
         if title is None:
             continue
         match = OFFICE.match(str(title))
-        post = "Supreme Court" if match.group(2) is None and match.group(3) is None else f"District {match.group(2) or match.group(3)}"
+        post = (
+            "Supreme Court"
+            if match.group(2) is None and match.group(3) is None
+            else f"District {match.group(2) or match.group(3)}"
+        )
         entry = {"post": post, "rows": [], "totals": None, "candidates": None, "centers": None}
         for row in rows:
             label = re.sub(r"[^a-z]", "", re.sub(r"(?i)\s+county\b", "", str(row[0]).strip()).lower())
@@ -139,7 +170,12 @@ def sheets(url: str, plain: dict[str, str]) -> list[dict]:
                 entry["totals"] = [int(cell) for cell in row[1:]]
             elif label in plain and len(row) > 1:
                 entry["rows"].append((plain[label], [int(cell) for cell in row[1:]]))
-            elif entry["candidates"] is None and len(row) > 1 and not str(row[0]).startswith(("WEC", "20")) and entry["rows"] == []:
+            elif (
+                entry["candidates"] is None
+                and len(row) > 1
+                and not str(row[0]).startswith(("WEC", "20"))
+                and entry["rows"] == []
+            ):
                 names = [re.sub(r"\s+", " ", str(cell)).strip() for cell in row]
                 if names[0] not in ("NP", "County") and names[-1].upper() == "SCATTERING":
                     entry["candidates"] = [re.sub(r"(?i)\s*\(write-in\)", "", name) for name in names[:-1]]
@@ -175,7 +211,9 @@ def header_names(entry: dict) -> list[str]:
             continue
         for match in re.finditer(r"\S+(?: \S+)*", line):
             fragment = re.sub(r"\s+", " ", re.sub(r"(?i)\bscattering\b", "", match.group())).strip()
-            if not fragment or re.fullmatch(r"(?i)(NP|NON|NPA)( (NP|NON|NPA))*|Total( Votes)?( Cast)?|County|Votes Cast", fragment):
+            if not fragment or re.fullmatch(
+                r"(?i)(NP|NON|NPA)( (NP|NON|NPA))*|Total( Votes)?( Cast)?|County|Votes Cast", fragment
+            ):
                 continue
             middle = (match.start() + match.end()) / 2
             parts[min(range(len(centers)), key=lambda index: abs(centers[index] - middle))].append(fragment)
@@ -196,7 +234,9 @@ def parse() -> None:
             width = len(entry["centers"])
             sums = [sum(row[1][index] for row in entry["rows"]) for index in range(width)]
             gap = DISCREPANT.get((day, entry["post"]), [0] * width)
-            if [total - stated for total, stated in zip(sums, entry["totals"])] != gap or any(len(row[1]) != width for row in entry["rows"]):
+            if [total - stated for total, stated in zip(sums, entry["totals"])] != gap or any(
+                len(row[1]) != width for row in entry["rows"]
+            ):
                 raise ValueError(f"{day} {entry['post']}: county rows do not add up to the office total")
             if summary is not None:
                 label = "Supreme Court" if entry["post"] == "Supreme Court" else f"Court of Appeals, {entry['post']}"
@@ -282,13 +322,17 @@ def emit() -> Path:
         declared={
             "2011-04-05:WI:justice-of-the-wisconsin-supreme-court": (
                 "David T. Prosser, Jr.",
-                "These are the totals after the statewide recount, which the Government Accountability Board "
-                "certified on May 23, 2011; Prosser led by 7,004 votes, which is 0.47 percent of the votes cast.",
+                (
+                    "These are the totals after the statewide recount, which the Government Accountability Board "
+                    "certified on May 23, 2011; Prosser led by 7,004 votes, which is 0.47 percent of the votes cast."
+                ),
             ),
             "2019-04-02:WI:justice-of-the-wisconsin-supreme-court": (
                 "Brian Hagedorn",
-                "Hagedorn led by 5,981 votes, which is 0.49 percent of the votes cast; the Wisconsin Elections Commission "
-                "certified the result without a recount.",
+                (
+                    "Hagedorn led by 5,981 votes, which is 0.49 percent of the votes cast; the Wisconsin Elections Commission "
+                    "certified the result without a recount."
+                ),
             ),
         },
         season="spring election",

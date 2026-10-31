@@ -15,7 +15,7 @@ PLATFORM = "ny_westchester"
 SITE = "https://citizenparticipation.westchestercountyny.gov"
 LISTING = SITE + "/election-dates/enrollment-figures-and-election-results"
 FIPS = "36"
-LINK = re.compile(r'<a[^>]*href="([^"]+\.pdf)"[^>]*>\s*(\d{4}) General Election Canvass Book', re.I)
+LINK = re.compile(r'<a[^>]*href="([^"]+\.pdf)"[^>]*>\s*(\d{4}) General Election Canvass Book', re.IGNORECASE)
 TITLE = re.compile(r"^\s*(?:\d{4} GENERAL(?: ELECTION)?\s{3,})?(?P<title>[A-Z]\S*(?: \S+)*?)\s{3,}\d+ OF \d+\s*$")
 ROW = re.compile(r"^(?P<label>\S.*?)\s+(?P<code>\d{5,6})\s+(?P<numbers>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")
 TOTAL = re.compile(r"^\s*TOTAL:\s+(?P<numbers>\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")

@@ -71,7 +71,9 @@ def parse() -> None:
             if found[1].startswith("District Totals"):
                 totals = [(m.end(), int(m[0].replace(",", ""))) for m in re.finditer(r"[\d,]+", line)]
                 break
-            places.append((counties[re.sub(r"[^a-z]", "", found[1].lower())], [int(v.replace(",", "")) for v in found[2].split()]))
+            places.append(
+                (counties[re.sub(r"[^a-z]", "", found[1].lower())], [int(v.replace(",", "")) for v in found[2].split()])
+            )
         ends = [end for end, _ in totals]
         labels: dict[int, list[str]] = {end: [] for end in ends}
         for line in header[:-1]:

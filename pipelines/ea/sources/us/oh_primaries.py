@@ -56,9 +56,11 @@ TITLE = "Official primary election results by county"
 
 
 def urls() -> dict[tuple[date, str], str]:
-    return {key: WAYBACK.format(stamp, path) for key, (stamp, path) in FILES.items()} | {
-        key: PORTAL.format(path) for key, path in MANUAL.items()
-    } | {key: PORTAL.format(path) for key, (path, _) in LOCAL.items()}
+    return (
+        {key: WAYBACK.format(stamp, path) for key, (stamp, path) in FILES.items()}
+        | {key: PORTAL.format(path) for key, path in MANUAL.items()}
+        | {key: PORTAL.format(path) for key, (path, _) in LOCAL.items()}
+    )
 
 
 def fetch() -> None:

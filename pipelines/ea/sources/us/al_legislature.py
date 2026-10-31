@@ -114,7 +114,9 @@ def parse() -> None:
                             if votes is not None and candidate:
                                 rows.append((year, chamber, day, code, candidate, votes, writein))
             else:
-                top = next(index for index, row in enumerate(table) if sum(county(cell) is not None for cell in row) > 3)
+                top = next(
+                    index for index, row in enumerate(table) if sum(county(cell) is not None for cell in row) > 3
+                )
                 columns = {index: county(cell) for index, cell in enumerate(table[top]) if index > 3 and county(cell)}
                 chamber = ""
                 for line in table[top + 1 :]:

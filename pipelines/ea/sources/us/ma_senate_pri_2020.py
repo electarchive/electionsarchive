@@ -24,9 +24,9 @@ def fetch() -> None:
 
 def parse() -> None:
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
-        gazetteer = pl.read_csv(io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False).filter(
-            pl.col("USPS") == "MA"
-        )
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS") == "MA")
     towns: dict[str, str] = {}
     for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
         towns.setdefault(elstats.plain(name), geoid[:5])
@@ -40,7 +40,9 @@ def parse() -> None:
     for town, *cells in table.select("City/Town", *CANDIDATES, "All Others").iter_rows():
         if town == "TOTALS":
             continue
-        name = re.sub(r"^([NSEW])\. ", lambda found: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[found[1]], town)
+        name = re.sub(
+            r"^([NSEW])\. ", lambda found: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[found[1]], town
+        )
         code = towns.get(elstats.plain(name)) or towns[elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))]
         for candidate, votes in zip([*CANDIDATES.values(), "ALL OTHERS"], cells, strict=True):
             rows.append((code, candidate, int(votes.replace(",", "")), candidate == "ALL OTHERS"))

@@ -1,3 +1,4 @@
+import itertools
 import json
 import math
 import re
@@ -149,7 +150,7 @@ class Street:
         for line in lines:
             count = max(int(line.length // 5), 1)
             points = [line.interpolate(i / count, normalized=True).coords[0] for i in range(count + 1)]
-            for start, end in zip(points, points[1:], strict=False):
+            for start, end in itertools.pairwise(points):
                 graph.add_edge(start, end, weight=math.dist(start, end))
         parts = [list(part) for part in nx.connected_components(graph)]
         while len(parts) > 1:
@@ -212,7 +213,9 @@ class Brooklyn:
             if len(points) > 1 and zone.intersects(line := LineString(points)):
                 self.ways.setdefault(squash(element["tags"]["name"]), []).append(line)
         self.streets: dict[str, Street | None] = {}
-        self.legs: dict[tuple[str, tuple[float, float], tuple[float, float]], tuple[list[tuple[float, float]], float]] = {}
+        self.legs: dict[
+            tuple[str, tuple[float, float], tuple[float, float]], tuple[list[tuple[float, float]], float]
+        ] = {}
 
     def street(self, token: str) -> Street | None:
         if token not in self.streets:
@@ -255,7 +258,9 @@ class Brooklyn:
         return unique
 
     def shore(self, street: Street) -> list[tuple[float, float]]:
-        ranked = sorted((Point(node).distance(self.ring), (float(node[0]), float(node[1]))) for node in street.nodes[::2])
+        ranked = sorted(
+            (Point(node).distance(self.ring), (float(node[0]), float(node[1]))) for node in street.nodes[::2]
+        )
         found: list[tuple[float, float]] = []
         for distance, point in ranked:
             if distance > 600:
@@ -276,7 +281,9 @@ class Brooklyn:
             points = [*substring(self.ring, low, length).coords, *substring(self.ring, 0, high - length).coords]
         return (points[::-1] if reverse else points), min(forward, backward)
 
-    def leg(self, token: str, start: tuple[float, float], end: tuple[float, float]) -> tuple[list[tuple[float, float]], float]:
+    def leg(
+        self, token: str, start: tuple[float, float], end: tuple[float, float]
+    ) -> tuple[list[tuple[float, float]], float]:
         key = (token, start, end)
         if key not in self.legs:
             street = self.streets[token]
@@ -309,8 +316,13 @@ class Brooklyn:
         for i in range(count):
             one, two = streets[i], streets[(i + 1) % count]
             options.append(
-                [(0.0, 0.0)] if one is None and two is None else self.shore(two) if one is None
-                else self.shore(one) if two is None else self.crossings(one, two)
+                [(0.0, 0.0)]
+                if one is None and two is None
+                else self.shore(two)
+                if one is None
+                else self.shore(one)
+                if two is None
+                else self.crossings(one, two)
             )
         for i, hint in hints.items():
             for j in (i % count, (i - 1) % count):
@@ -343,7 +355,9 @@ class Brooklyn:
         coords: list[tuple[float, float]] = []
         for i in range(count):
             start, end = vertices[i - 1], vertices[i]
-            coords.extend(self.arc(start, end)[0] if streets[i] is None else [start, *self.leg(tokens[i], start, end)[0], end])
+            coords.extend(
+                self.arc(start, end)[0] if streets[i] is None else [start, *self.leg(tokens[i], start, end)[0], end]
+            )
         outline = Polygon(coords)
         return outline if outline.is_valid else outline.buffer(0)
 
@@ -351,7 +365,9 @@ class Brooklyn:
         clipped = {number: outline.intersection(self.main) for number, outline in outlines.items()}
         faces = [
             part
-            for face in polygonize(unary_union([*(outline.boundary for outline in clipped.values()), self.main.boundary]))
+            for face in polygonize(
+                unary_union([*(outline.boundary for outline in clipped.values()), self.main.boundary])
+            )
             for part in getattr(face.intersection(self.main), "geoms", [face.intersection(self.main)])
             if part.geom_type == "Polygon" and part.area > 20
         ]
@@ -374,12 +390,8 @@ class Brooklyn:
                     claimed += 1
             if not claimed:
                 break
-        merged = {
-            number: unary_union([faces[i] for i, held in owner.items() if held == number]) for number in outlines
-        }
-        return {
-            number: MultiPolygon(getattr(geom, "geoms", [geom])) for number, geom in merged.items()
-        }
+        merged = {number: unary_union([faces[i] for i, held in owner.items() if held == number]) for number in outlines}
+        return {number: MultiPolygon(getattr(geom, "geoms", [geom])) for number, geom in merged.items()}
 
 
 def fetch() -> None:
@@ -456,7 +468,14 @@ def emit() -> Path:
                 areas[number] = cs.area("us.nyc_ad", code, first)
                 cs.add("area", id=areas[number], scheme_code="us.nyc_ad")
                 cs.add("area_code", area_id=areas[number], code=code, valid_from=first, valid_to=last)
-                cs.add("name", entity_id=areas[number], text=f"Assembly District {number}", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=areas[number],
+                    text=f"Assembly District {number}",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add(
                     "area_geometry",
                     area_id=areas[number],

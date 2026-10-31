@@ -79,7 +79,10 @@ def parse() -> None:
     image = PAGES / "ks2010-1.png"
     PAGES.mkdir(parents=True, exist_ok=True)
     path = raw.cached(SOURCE, FILES[date(2010, 11, 2)]).path
-    subprocess.run(["pdftoppm", "-r", "200", "-f", "1", "-l", "1", "-png", "-singlefile", str(path), str(image.with_suffix(""))], check=True)
+    subprocess.run(
+        ["pdftoppm", "-r", "200", "-f", "1", "-l", "1", "-png", "-singlefile", str(path), str(image.with_suffix(""))],
+        check=True,
+    )
     tsv = subprocess.run(
         ["tesseract", str(image), "-", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
     ).stdout.splitlines()
@@ -92,7 +95,16 @@ def parse() -> None:
         ]
         if len(boxes) != 1:
             raise ValueError(f"{office} {name}: {len(boxes)} boxes for {votes}")
-        rows.append({"day": date(2010, 11, 2), "office": office, "party": party, "name": name, "votes": votes, "box": list(boxes[0])})
+        rows.append(
+            {
+                "day": date(2010, 11, 2),
+                "office": office,
+                "party": party,
+                "name": name,
+                "votes": votes,
+                "box": list(boxes[0]),
+            }
+        )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema_overrides={"box": pl.List(pl.Int64)})
     frame.write_parquet(PARSED / "lines.parquet")
@@ -131,7 +143,12 @@ def emit() -> Path:
             title = TITLE.format(year=day.year)
             sources[day] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[day], kind="official_body", publisher=PUBLISHER, title=title, url=LANDING,
+                "source",
+                id=sources[day],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=LANDING,
                 license=LICENSE,
             )
             artifact = cs.artifact(raw.cached(SOURCE, url), sources[day])
@@ -156,7 +173,9 @@ def emit() -> Path:
                join polity p on p.id = t.polity_id and p.iso_code = 'US-KS'
                where u.scheme_code = 'us.state'"""
         ).fetchall()
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -265,5 +284,11 @@ def emit() -> Path:
                         y1=box[3] / height,
                     )
                 totals[option] = votes
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
         return cs.write()

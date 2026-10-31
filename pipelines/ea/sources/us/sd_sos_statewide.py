@@ -41,7 +41,10 @@ def fetch() -> None:
 
 
 def cells(row: str) -> list[str]:
-    return [" ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell)).split()) for cell in re.findall(r"<t[dh].*?</t[dh]>", row, flags=re.S)]
+    return [
+        " ".join(html.unescape(re.sub(r"<[^>]+>", " ", cell)).split())
+        for cell in re.findall(r"<t[dh].*?</t[dh]>", row, flags=re.DOTALL)
+    ]
 
 
 def parse() -> None:
@@ -58,20 +61,26 @@ def parse() -> None:
     rows = []
     for year, url in PAGES.items():
         page = raw.cached(SOURCE, url).path.read_text(errors="ignore")
-        tables = re.findall(r"<table.*?</table>", page, flags=re.S)
-        parts = re.split(r"<table.*?</table>", page, flags=re.S)
+        tables = re.findall(r"<table.*?</table>", page, flags=re.DOTALL)
+        parts = re.split(r"<table.*?</table>", page, flags=re.DOTALL)
         sequence = []
         for index, table in enumerate(tables):
-            body = re.findall(r"<tr.*?</tr>", table, flags=re.S)
+            body = re.findall(r"<tr.*?</tr>", table, flags=re.DOTALL)
             heading = " ".join(
-                html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"<(script|style).*?</\1>", "", parts[index], flags=re.S))).split()
+                html.unescape(
+                    re.sub(r"<[^>]+>", " ", re.sub(r"<(script|style).*?</\1>", "", parts[index], flags=re.DOTALL))
+                ).split()
             )
             head = cells(body[0])
             label = head[0].lower() if head[0].lower() in OFFICES else heading.lower().rsplit("top of page ", 1)[-1]
             sequence.append((label, head, body))
         order = [label for label, _, _ in sequence]
         offices = [
-            ("State Auditor" if label == "attorney general" and order[:i].count(label) == 1 else OFFICES.get(label), head, body)
+            (
+                "State Auditor" if label == "attorney general" and order[:i].count(label) == 1 else OFFICES.get(label),
+                head,
+                body,
+            )
             for i, (label, head, body) in enumerate(sequence)
         ]
         for title, head, body in offices:

@@ -42,7 +42,10 @@ OKLAHOMA_SECTIONS = [
 
 def text(link: str, *flags: str) -> str:
     return subprocess.run(
-        ["pdftotext", "-layout", *flags, str(raw.cached(SOURCE, link).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-layout", *flags, str(raw.cached(SOURCE, link).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
 
 
@@ -93,7 +96,9 @@ def rows() -> list[dict[str, object]]:
         leaders = sorted(totals, key=lambda name: -totals[name])[: 1 if day == "2015-06-02" else 2]
         for row in found:
             if row["election_date"] == day:
-                row["outcome"] = ("Elected" if day == "2015-06-02" else "Runoff") if row["candidate_name"] in leaders else "Defeated"
+                row["outcome"] = (
+                    ("Elected" if day == "2015-06-02" else "Runoff") if row["candidate_name"] in leaders else "Defeated"
+                )
     town = ""
     for line in text(RHODE_ISLAND).splitlines():
         header = re.match(r"^Special Election 2023\s{2,}(\S.*?)\s*$", line)
@@ -109,13 +114,17 @@ def rows() -> list[dict[str, object]]:
                 "election_date": "2023-11-07",
                 "district_name": "1",
                 "candidate_name": "Write-ins" if hit[1].startswith("Write") else hit[1],
-                "candidate_party_name": {"Gabriel Amo": "Democratic", "Gerry W. Leonard, Jr.": "Republican"}.get(hit[1]),
+                "candidate_party_name": {"Gabriel Amo": "Democratic", "Gerry W. Leonard, Jr.": "Republican"}.get(
+                    hit[1]
+                ),
                 "division_name": RHODE_ISLAND_COUNTIES.get(town, "Providence"),
                 "votes": hit[2].replace(",", ""),
             }
         )
     sheet = text(OKLAHOMA)
-    for (day, primary, candidates), block in zip(OKLAHOMA_SECTIONS, re.split(r"UNITED STATES REPRESENTATIVE, DISTRICT 1", sheet)[1:], strict=True):
+    for (day, primary, candidates), block in zip(
+        OKLAHOMA_SECTIONS, re.split(r"UNITED STATES REPRESENTATIVE, DISTRICT 1", sheet)[1:], strict=True
+    ):
         for line in block.splitlines():
             hit = re.match(r"^(TULSA|WAGONER)\s+([\d,\s]+)$", line)
             if hit is None:

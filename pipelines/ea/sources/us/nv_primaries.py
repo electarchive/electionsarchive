@@ -74,21 +74,23 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, target)
         except LookupError:
-            body = (DATA / "inbox" / "manual" / "MF-024" / INBOX[url.split("/")[-2]]).read_bytes() if not stamp else subprocess.run(
-                ["curl", "-sfL", "--resolve", "web.archive.org:443:207.241.237.2", "-A", raw.USER_AGENT, target],
-                capture_output=True,
-                check=True,
-            ).stdout
-            raw.store(
-                SOURCE, target, body, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html"
+            body = (
+                (DATA / "inbox" / "manual" / "MF-024" / INBOX[url.split("/")[-2]]).read_bytes()
+                if not stamp
+                else subprocess.run(
+                    ["curl", "-sfL", "--resolve", "web.archive.org:443:207.241.237.2", "-A", raw.USER_AGENT, target],
+                    capture_output=True,
+                    check=True,
+                ).stdout
             )
+            raw.store(SOURCE, target, body, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
 
 
 def parse() -> None:
     rows = []
     for day, stamp, url in FILES:
         text = raw.cached(SOURCE, address(stamp, url)).path.read_text(encoding="utf-8", errors="ignore")
-        text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.S)
+        text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.DOTALL)
         text = re.sub(r"(\|\s*)+", "|", html.unescape(re.sub(r"<[^>]+>", "|", text)))
         tokens = [token.strip() for token in text.split("|")]
         for at, token in enumerate(tokens):
@@ -116,7 +118,10 @@ def parse() -> None:
             while cursor + 2 + width < len(tokens) and re.fullmatch(r"[\d.]+%", tokens[cursor + 1]):
                 candidate = tokens[cursor]
                 for county, cell in zip(names, tokens[cursor + 3 : cursor + 3 + width], strict=True):
-                    if cell != "N/A" and not re.match(r"(NONE OF|UNDER VOTES|OVER VOTES)" if chamber != "president" else r"(UNDER VOTES|OVER VOTES)", candidate.upper()):
+                    if cell != "N/A" and not re.match(
+                        r"(NONE OF|UNDER VOTES|OVER VOTES)" if chamber != "president" else r"(UNDER VOTES|OVER VOTES)",
+                        candidate.upper(),
+                    ):
                         rows.append(
                             (
                                 day,

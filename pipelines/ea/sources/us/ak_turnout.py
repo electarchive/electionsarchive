@@ -14,8 +14,13 @@ SOURCE = "us.ak_turnout"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Alaska Division of Elections"
-ELECTIONS = {(2022, "primary"): "22PRIM", (2022, "general"): "22GENR", (2024, "primary"): "24PRIM", (2024, "general"): "24GENR"}
-TOTAL = re.compile(r"^\s*State - Total\s+([\d,]+)(?:\s+[\d,]+)?\s+([\d,]+)\s+[\d.]+%", re.M)
+ELECTIONS = {
+    (2022, "primary"): "22PRIM",
+    (2022, "general"): "22GENR",
+    (2024, "primary"): "24PRIM",
+    (2024, "general"): "24GENR",
+}
+TOTAL = re.compile(r"^\s*State - Total\s+([\d,]+)(?:\s+[\d,]+)?\s+([\d,]+)\s+[\d.]+%", re.MULTILINE)
 
 
 def url(folder: str, district: int) -> str:
@@ -27,8 +32,12 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, address)
         except LookupError:
-            body = subprocess.run(["curl", "-sfL", "-A", "Mozilla/5.0", address], capture_output=True, check=True).stdout
-            raw.store(SOURCE, address, body, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+            body = subprocess.run(
+                ["curl", "-sfL", "-A", "Mozilla/5.0", address], capture_output=True, check=True
+            ).stdout
+            raw.store(
+                SOURCE, address, body, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+            )
 
     with ThreadPoolExecutor(4) as pool:
         list(pool.map(get, [url(folder, d) for folder in ELECTIONS.values() for d in range(1, 41)]))
@@ -39,7 +48,12 @@ def parse() -> None:
     for (year, stage), folder in ELECTIONS.items():
         registered = voters = 0
         for district in range(1, 41):
-            text = subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, url(folder, district)).path), "-"], capture_output=True, text=True, check=True).stdout
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, url(folder, district)).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
             match = TOTAL.search(text)
             if match is None:
                 raise ValueError(f"{folder} HD{district}: no total")
@@ -79,7 +93,15 @@ def emit() -> Path:
         title = "Statements of Votes Cast by House District"
         source = cs.source(PUBLISHER, title)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url="https://www.elections.alaska.gov/results/", license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url="https://www.elections.alaska.gov/results/",
+                license="Public record",
+            )
         for year, stage, registered, voters in frame.select("year", "stage", "registered", "voters").iter_rows():
             found = elections.get((year, stage), [])
             if len(found) != 1:

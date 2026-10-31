@@ -271,7 +271,9 @@ def emit() -> Path:
         system = cs.key("us.electoral_system", "fptp")
         seen: set[UUID] = set()
 
-        def city_contest(day, office_key, office_slug, office_label, source, candidates, values, grain, key_slug=None, caveats=()):
+        def city_contest(
+            day, office_key, office_slug, office_label, source, candidates, values, grain, key_slug=None, caveats=()
+        ):
             election = cs.key("us.election", f"{day}:NY:3651000")
             office = cs.key("us.office", office_key)
             if office in cs.minted:
@@ -315,7 +317,12 @@ def emit() -> Path:
                 is_default=True,
                 completeness=None,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=(NOTE if grain == "ad" else NOTE_1917) + "".join(f" Note: {c}." for c in caveats))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=(NOTE if grain == "ad" else NOTE_1917) + "".join(f" Note: {c}." for c in caveats),
+            )
             top = max(candidates, key=lambda label: candidates[label][1])
             options = {}
             for label, (party_key, _) in candidates.items():
@@ -463,7 +470,6 @@ def emit() -> Path:
                             leftover = [c for c in leftover if c not in pick]
                             break
             units: dict[tuple[date, str], UUID] = {}
-            polity = conn.execute("select id from polity where iso_code = 'US-NY'").fetchone()[0]
             city_polity = conn.execute(
                 "select o.polity_id from office o join external_id x on x.entity_id = o.id "
                 "where x.scheme = 'us.office' and x.value = 'NY:3651000:mayor'"

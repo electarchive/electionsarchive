@@ -1,5 +1,5 @@
-import re
 import html
+import re
 from datetime import date
 from pathlib import Path
 
@@ -38,10 +38,12 @@ def parse() -> None:
     counties["stmarys"] = counties["saintmarys"] if "saintmarys" in counties else counties["stmarys"]
     tallies: dict[tuple[str, str], int] = {}
     tables = 0
-    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, URL).path.read_text(errors="replace"), re.S | re.I):
+    for row in re.findall(
+        r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, URL).path.read_text(errors="replace"), re.DOTALL | re.IGNORECASE
+    ):
         cells = [
             re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
-            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S | re.I)
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL | re.IGNORECASE)
         ]
         if cells[0] == "Totals":
             tables += 1

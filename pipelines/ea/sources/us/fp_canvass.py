@@ -486,7 +486,9 @@ def iowa(conn: Connection) -> list[tuple[date, str, str, str, int]]:
                 totals = values
                 continue
             code = codes[re.sub(r"[^a-z]", "", match[1].lower())]
-            rows += [(date(2002, 11, 5), "governor", code, name, votes) for name, votes in zip(names, values, strict=False)]
+            rows += [
+                (date(2002, 11, 5), "governor", code, name, votes) for name, votes in zip(names, values, strict=False)
+            ]
     if len({row[2] for row in rows}) != 99 or totals is None:
         raise ValueError("IA governor: not 99 counties and a totals row")
     for index, name in enumerate(names):
@@ -645,12 +647,16 @@ def emit() -> Path:
                 valid_to=None,
             )
         alone = {"IA2002", "IN2022"}
-        grains = frame.filter(~pl.col("source").is_in(list(alone))).group_by("state").agg(
-            grain=pl.when((pl.col("kind") == "town").any())
-            .then(pl.lit("town"))
-            .when((pl.col("kind") == "precinct").any())
-            .then(pl.lit("precinct"))
-            .otherwise(pl.lit("county"))
+        grains = (
+            frame.filter(~pl.col("source").is_in(list(alone)))
+            .group_by("state")
+            .agg(
+                grain=pl.when((pl.col("kind") == "town").any())
+                .then(pl.lit("town"))
+                .when((pl.col("kind") == "precinct").any())
+                .then(pl.lit("precinct"))
+                .otherwise(pl.lit("county"))
+            )
         )
         authoritative = {
             "IA2002": "Algara and Amlani's set pools Hart, Campagna, and the write-ins into one line that the "

@@ -35,7 +35,9 @@ def files() -> list[tuple[int, int, Path]]:
     return found
 
 
-def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None], list[tuple[str, dict[str, int | None]]]]]:
+def read(
+    path: Path, year: int
+) -> list[tuple[str | None, dict[str, int | None], list[tuple[str, dict[str, int | None]]]]]:
     blocks: list[list] = []
     pending: list[tuple] = []
     markup = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
@@ -84,7 +86,9 @@ def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None],
                 print(path.name, "continued page has other columns")
                 continue
             edges = [a[2] + page[0] - head[0] for a, page, head in zip(anchors, page_heads, heads, strict=True)]
-            for start in sorted((w for w in page_marks if w[4] not in {"Total", "SubTotal", "State"}), key=lambda w: w[1]):
+            for start in sorted(
+                (w for w in page_marks if w[4] not in {"Total", "SubTotal", "State"}), key=lambda w: w[1]
+            ):
                 line = sorted((w for w in page_words if abs(w[1] - start[1]) < 1), key=lambda w: w[0])
                 cells: list[int | None] = [None] * len(anchors)
                 label = []
@@ -100,7 +104,9 @@ def read(path: Path, year: int) -> list[tuple[str | None, dict[str, int | None],
         table["Total"] = [int(a[4].replace(",", "")) if re.fullmatch(r"[\d,]+", a[4]) else None for a in anchors]
         titles: list[list[float | str]] = []
         banner = max((w[1] for w in words if w[1] < 140 and w[4].lower() in {"results", "(recount)"}), default=0)
-        for w in sorted((w for w in words if banner + 4 < w[1] < 140 and w[0] > 100), key=lambda w: (round(w[1]), w[0])):
+        for w in sorted(
+            (w for w in words if banner + 4 < w[1] < 140 and w[0] > 100), key=lambda w: (round(w[1]), w[0])
+        ):
             if titles and abs(w[1] - titles[-1][3]) < 2 and w[0] - titles[-1][1] < 6:
                 titles[-1][1] = w[2]
                 titles[-1][2] += f" {w[4]}"
@@ -147,7 +153,9 @@ def parse() -> None:
     names: dict[str, str] = {}
     for year, number, path in files():
         day = DAYS[year]
-        for title, counted, columns in read(raw.cached(SOURCE, f"manual://{FOLDERS[year][0]}/{year}/{path.name}").path, year):
+        for title, counted, columns in read(
+            raw.cached(SOURCE, f"manual://{FOLDERS[year][0]}/{year}/{path.name}").path, year
+        ):
             office = next((office for prefix, office in OFFICES.items() if (title or "").startswith(prefix)), None)
             seat = re.fullmatch(r"(HOUSE|SENATE) DISTRICT (\w+)", title or "")
             if office is None and year in SOVC and seat:
@@ -171,7 +179,9 @@ def parse() -> None:
                     elif precinct := re.fullmatch(r"(\d\d-\d\d\d) (.*)", place):
                         code, kind = f"{year}:AK:{precinct[1]}", "precinct"
                         names[code] = precinct[2].strip()
-                    elif aggregate := re.fullmatch(r"District (\d+)\s*- (.*)|District (\d+) (Absentee|Question|Early Voting)", place):
+                    elif aggregate := re.fullmatch(
+                        r"District (\d+)\s*- (.*)|District (\d+) (Absentee|Question|Early Voting)", place
+                    ):
                         label_kind = aggregate[2] or aggregate[4]
                         code, kind = f"AK:{year}:{number:02}:{KINDS[label_kind]}", "aggregate"
                         names[code] = f"District {number} {label_kind.lower()}"
@@ -182,33 +192,38 @@ def parse() -> None:
                         print(year, number, "place", place)
                         continue
                     rows.append((year, office, day, code, kind, candidate, writein, votes))
-    frame = pl.DataFrame(
-        rows,
-        schema={
-            "year": pl.Int32,
-            "chamber": pl.String,
-            "day": pl.Date,
-            "code": pl.String,
-            "kind": pl.String,
-            "candidate": pl.String,
-            "writein": pl.Boolean,
-            "votes": pl.Int64,
-        },
-        orient="row",
-    ).group_by("year", "chamber", "day", "code", "kind", "candidate", "writein").agg(pl.col("votes").sum()).select(
-        "year",
-        "chamber",
-        "day",
-        special=pl.lit(False),
-        state=pl.lit("AK"),
-        district=pl.when(pl.col("chamber") == "house").then(0).otherwise(None).cast(pl.Int16),
-        code="code",
-        kind="kind",
-        candidate="candidate",
-        measure=pl.lit(1, pl.Int16),
-        writein="writein",
-        votes="votes",
-        source=pl.lit("AK"),
+    frame = (
+        pl.DataFrame(
+            rows,
+            schema={
+                "year": pl.Int32,
+                "chamber": pl.String,
+                "day": pl.Date,
+                "code": pl.String,
+                "kind": pl.String,
+                "candidate": pl.String,
+                "writein": pl.Boolean,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        )
+        .group_by("year", "chamber", "day", "code", "kind", "candidate", "writein")
+        .agg(pl.col("votes").sum())
+        .select(
+            "year",
+            "chamber",
+            "day",
+            special=pl.lit(False),
+            state=pl.lit("AK"),
+            district=pl.when(pl.col("chamber") == "house").then(0).otherwise(None).cast(pl.Int16),
+            code="code",
+            kind="kind",
+            candidate="candidate",
+            measure=pl.lit(1, pl.Int16),
+            writein="writein",
+            votes="votes",
+            source=pl.lit("AK"),
+        )
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "rows.parquet")

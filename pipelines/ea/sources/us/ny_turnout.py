@@ -1,6 +1,5 @@
 import re
 import subprocess
-import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -27,13 +26,21 @@ def fetch() -> None:
 
 def parse() -> None:
     texts = [
-        subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True).stdout
+        subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
         for url in (ENROLLMENT, RETURNS)
     ]
     registered = next(
-        int(re.findall(r"[\d,]+", line)[-1].replace(",", "")) for line in texts[0].splitlines() if re.match(r"\s*Statewide Total\s+Total\s", line)
+        int(re.findall(r"[\d,]+", line)[-1].replace(",", ""))
+        for line in texts[0].splitlines()
+        if re.match(r"\s*Statewide Total\s+Total\s", line)
     )
-    voters = [int(re.findall(r"[\d,]+", line)[-1].replace(",", "")) for line in texts[1].splitlines() if line.strip().startswith("Statewide Total")][-1]
+    voters = [
+        int(re.findall(r"[\d,]+", line)[-1].replace(",", ""))
+        for line in texts[1].splitlines()
+        if line.strip().startswith("Statewide Total")
+    ][-1]
     frame = pl.DataFrame([{"year": 2008, "stage": "general", "registered": registered, "voters": voters}])
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "turnout.parquet")
@@ -65,7 +72,15 @@ def emit() -> Path:
         }
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, ENROLLMENT), source)
         cs.artifact(raw.cached(SOURCE, RETURNS), source)
         for year, stage, registered, voters in frame.select("year", "stage", "registered", "voters").iter_rows():

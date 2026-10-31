@@ -172,7 +172,7 @@ def database(conn) -> list[str]:
                 and not (part.get("quote") and part.get("source") in ready["sources"])
             ):
                 problems.append(f"readiness {level['key']}: needs a source and a quote")
-    sums: dict[tuple[str, str, int], int] = defaultdict(int)
+    sums: dict[tuple[str, str, str, int], int] = defaultdict(int)
     for polity, level, goal, year, total in conn.execute(
         "select polity, level, goal, year, sum(total) from coverage_goal where polity <> 'us' group by 1, 2, 3, 4"
     ):
@@ -381,7 +381,9 @@ def check() -> str:
         conn.commit()
         problems = database(conn) + pages(conn)
         if behind:
-            commit = conn.execute("select commit from coverage_build").fetchone()[0]
+            build = conn.execute("select commit from coverage_build").fetchone()
+            assert build is not None
+            commit = build[0]
             built = "an unstamped build" if commit is None else f"commit {commit[:12]}"
             problems.append(
                 f"STALE: the coverage tables come from {built}, which predates main's {', '.join(behind)};"

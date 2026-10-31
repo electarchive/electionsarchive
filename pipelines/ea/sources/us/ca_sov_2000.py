@@ -79,7 +79,11 @@ def parse() -> None:
         ).fetchall()
     blocks: dict[tuple[int, tuple[str, ...]], dict[str, object]] = {}
     turnout: list[dict[str, object]] = []
-    pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout)[1])  # type: ignore[index]
+    pages = int(
+        re.search(
+            r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=False).stdout
+        )[1]
+    )  # type: ignore[index]
     section: str | None = None
     district = 0
     heads: tuple[str, ...] = ()
@@ -95,9 +99,12 @@ def parse() -> None:
             section, district = "house", 0
         elif "United States Senator" in text and "County-by-County" not in text and "Summary" not in text:
             section, district = "senate", 0
-        elif number > 150 and section in {"house", "senate", "turnout"}:
-            if re.search(r"State Senators?|Member of the State Assembly|Proposition|Ballot Measures", text):
-                section = None
+        elif (
+            number > 150
+            and section in {"house", "senate", "turnout"}
+            and re.search(r"State Senators?|Member of the State Assembly|Proposition|Ballot Measures", text)
+        ):
+            section = None
         if section is None:
             continue
         for line in page:
@@ -108,14 +115,25 @@ def parse() -> None:
                 district = int(found[1])
                 continue
             tokens = tuple(word for word, _ in line)
-            if section != "turnout" and tokens and all(word in PARTIES or word in {"Others", "(W/I)"} for word in tokens):
+            if (
+                section != "turnout"
+                and tokens
+                and all(word in PARTIES or word in {"Others", "(W/I)"} for word in tokens)
+            ):
                 heads = tuple(word for word in tokens if word in PARTIES)
                 continue
             if not values or not label or label.startswith("Percent"):
                 continue
             if section == "turnout":
                 if label in counties or label == "State Totals":
-                    turnout.append({"county": label, "values": [value for value, _ in values], "boxes": [box for _, box in values], "page": number})
+                    turnout.append(
+                        {
+                            "county": label,
+                            "values": [value for value, _ in values],
+                            "boxes": [box for _, box in values],
+                            "page": number,
+                        }
+                    )
                 continue
             if len(values) not in {len(heads), len(heads) + 1}:
                 if len(values) > 1:
@@ -163,7 +181,14 @@ def parse() -> None:
                 continue
             for county, (value, box), page in cells:
                 rows.append(
-                    {"contest": contest, "option": option, "county": county, "votes": value, "page": page, "box": list(box)}
+                    {
+                        "contest": contest,
+                        "option": option,
+                        "county": county,
+                        "votes": value,
+                        "page": page,
+                        "box": list(box),
+                    }
                 )
     leftover = {contest for contest, *_ in options} - {str(row["contest"]) for row in rows}
     print(f"{len(leftover)} contests with no lines: {sorted(leftover)}")
@@ -174,7 +199,14 @@ def parse() -> None:
     print(f"{len({row['contest'] for row in keep})} contests, {len(keep)} lines, {len(stale)} stale")
     pl.DataFrame(
         [
-            {"county": row["county"], "registered": row["values"][2], "ballots": row["values"][5], "page": row["page"], "box_registered": row["boxes"][2], "box_ballots": row["boxes"][5]}
+            {
+                "county": row["county"],
+                "registered": row["values"][2],
+                "ballots": row["values"][5],
+                "page": row["page"],
+                "box_registered": row["boxes"][2],
+                "box_ballots": row["boxes"][5],
+            }
             for row in turnout
             if len(row["values"]) >= 6  # type: ignore[arg-type]
         ]
@@ -315,7 +347,9 @@ def emit() -> Path:
             totals = {
                 UUID(option): votes for option, votes in lines.group_by("option").agg(pl.col("votes").sum()).iter_rows()
             }
-            for option, county, votes, number, box in lines.select("option", "county", "votes", "page", "box").iter_rows():
+            for option, county, votes, number, box in lines.select(
+                "option", "county", "votes", "page", "box"
+            ).iter_rows():
                 fact = {
                     "result_set_id": result_set,
                     "unit_id": counties[county],
@@ -359,9 +393,11 @@ def emit() -> Path:
                     is_default=election not in held,
                     completeness=1,
                 )
-            for county, registered, ballots, number, box_registered, box_ballots in voters.filter(
-                pl.col("county") != "State Totals"
-            ).select("county", "registered", "ballots", "page", "box_registered", "box_ballots").iter_rows():
+            for county, registered, ballots, number, box_registered, box_ballots in (
+                voters.filter(pl.col("county") != "State Totals")
+                .select("county", "registered", "ballots", "page", "box_registered", "box_ballots")
+                .iter_rows()
+            ):
                 for measure, value, box in ((2, registered, box_registered), (3, ballots, box_ballots)):
                     fact = {
                         "result_set_id": result_set,

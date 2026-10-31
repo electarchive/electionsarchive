@@ -26,7 +26,9 @@ ELECTIONS = {
     date(2016, 5, 10): (22, f"{date(2016, 5, 10)}:WV:primary", "primary", 1),
 }
 PARTIES = {"D": "democratic-party", "R": "republican-party"}
-NOTE = "County totals from the West Virginia Secretary of State's Election Results Center, state and county totals file."
+NOTE = (
+    "County totals from the West Virginia Secretary of State's Election Results Center, state and county totals file."
+)
 
 
 def flat(text: str) -> str:
@@ -48,15 +50,13 @@ def lines() -> list[dict[str, object]]:
             key = (day, line["Name"], line["CountyName"])
             if key in found and line["OfficialResults"] != "Yes":
                 continue
-            found[key] = (
-                {
-                    "day": day,
-                    "candidate": re.sub(r"\s+", " ", line["Name"]).strip(),
-                    "party": line["PartyCode"],
-                    "county": line["CountyName"],
-                    "votes": int(line["Votes"] or 0),
-                }
-            )
+            found[key] = {
+                "day": day,
+                "candidate": re.sub(r"\s+", " ", line["Name"]).strip(),
+                "party": line["PartyCode"],
+                "county": line["CountyName"],
+                "votes": int(line["Votes"] or 0),
+            }
     return list(found.values())
 
 
@@ -114,7 +114,14 @@ def emit() -> Path:
         office = cs.key("us.office", office_key)
         if office in cs.minted:
             cs.add("office", id=office, polity_id=cs.polity("US-WV"), kind="other")
-            cs.add("name", entity_id=office, text=f"{TITLE_OFFICE} of West Virginia", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=office,
+                text=f"{TITLE_OFFICE} of West Virginia",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
         groups: dict[date, list[dict[str, object]]] = defaultdict(list)
         for row in rows:
             groups[row["day"]].append(row)

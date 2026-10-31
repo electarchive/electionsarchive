@@ -95,5 +95,7 @@ def emit() -> Path:
             )
         for name in NAMES:
             cs.artifact(raw.cached(SOURCE, f"{BASE}{name}.txt"), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"MN": source}, authoritative=NOTE, extend=True)
+        medsl.attach(
+            cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"MN": source}, authoritative=NOTE, extend=True
+        )
         return cs.write()

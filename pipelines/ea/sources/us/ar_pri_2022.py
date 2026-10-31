@@ -26,9 +26,7 @@ def fetch() -> None:
     try:
         raw.cached(SOURCE, URL)
     except LookupError:
-        raw.store(
-            SOURCE, URL, FILE.read_bytes(), suffix=".csv", retrieved_at=datetime.now(UTC), media_type="text/csv"
-        )
+        raw.store(SOURCE, URL, FILE.read_bytes(), suffix=".csv", retrieved_at=datetime.now(UTC), media_type="text/csv")
 
 
 def parse() -> None:
@@ -65,7 +63,13 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
-        schema={"chamber": pl.String, "district": pl.Int64, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+        schema={
+            "chamber": pl.String,
+            "district": pl.Int64,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
         orient="row",
     ).with_columns(
         year=pl.lit(2022, pl.Int32),

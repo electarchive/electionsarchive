@@ -58,15 +58,33 @@ def parse() -> None:
                         print(f"{year} general {match[1]}: {numbers}")
                         continue
                     rows.append(
-                        {"year": year, "stage": stage, "code": codes[plain(match[1])], "registered": numbers[3] + numbers[4], "voters": numbers[2]}
+                        {
+                            "year": year,
+                            "stage": stage,
+                            "code": codes[plain(match[1])],
+                            "registered": numbers[3] + numbers[4],
+                            "voters": numbers[2],
+                        }
                     )
                 else:
                     blocks = [numbers[i] for i in (0, 3, 6) if i < len(numbers)]
-                    rows.append({"year": year, "stage": stage, "code": codes[plain(match[1])], "registered": None, "voters": sum(blocks)})
+                    rows.append(
+                        {
+                            "year": year,
+                            "stage": stage,
+                            "code": codes[plain(match[1])],
+                            "registered": None,
+                            "voters": sum(blocks),
+                        }
+                    )
     frame = pl.DataFrame(rows, schema_overrides={"registered": pl.Int64}).unique(["year", "stage", "code"])
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "stage").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("year", "stage"))
+    print(
+        frame.group_by("year", "stage")
+        .agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum())
+        .sort("year", "stage")
+    )
 
 
 def emit() -> Path:
@@ -96,7 +114,13 @@ def emit() -> Path:
         source = cs.source(PUBLISHER, title)
         if source in cs.minted:
             cs.add(
-                "source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url="https://sos.iowa.gov/elections/", license="Public record"
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url="https://sos.iowa.gov/elections/",
+                license="Public record",
             )
         for (year, stage), rows in frame.group_by("year", "stage", maintain_order=True):
             found = elections.get((year, stage), [])

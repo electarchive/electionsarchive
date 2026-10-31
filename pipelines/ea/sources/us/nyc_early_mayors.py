@@ -180,9 +180,12 @@ def parse() -> None:
         ][:1]
         if year in PRIMARIES:
             seen_boxes: dict[str, int] = {}
-            for box in re.finditer(r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE):
+            for box in re.finditer(
+                r"\{\{Election box begin.*?\{\{Election box end\}\}", wikitext, re.DOTALL | re.IGNORECASE
+            ):
                 heading = re.search(
-                    r"title\s*=\s*(?:\d{4} )?(?:New York City )?(Democratic|Republican) (?:mayoral )?primary", box.group(0)
+                    r"title\s*=\s*(?:\d{4} )?(?:New York City )?(Democratic|Republican) (?:mayoral )?primary",
+                    box.group(0),
                 )
                 if heading is None:
                     continue
@@ -419,7 +422,11 @@ def emit() -> Path:
                 district_area_id=cs.area("us.place", "3651000"),
                 magnitude=1,
                 round_number=2 if runoff else 1,
-                previous_round_id=cs.key("us.contest", f"nyc_early_mayors:{PRIMARIES[year]}:primary:NY:3651000:{office_slug}{suffix}") if runoff else None,
+                previous_round_id=cs.key(
+                    "us.contest", f"nyc_early_mayors:{PRIMARIES[year]}:primary:NY:3651000:{office_slug}{suffix}"
+                )
+                if runoff
+                else None,
                 electoral_system_id=system,
                 default_result_kind="counted",
                 term="remainder" if year in SPECIALS else "full",
@@ -456,7 +463,10 @@ def emit() -> Path:
             if primary:
                 everyone = sum(votes for _, _, votes, _ in candidates)
                 top = max(candidate[2] for candidate in candidates)
-                candidates = [(*candidate[:3], candidate[2] * 2 > everyone or year == 1969 and candidate[2] == top) for candidate in candidates]
+                candidates = [
+                    (*candidate[:3], candidate[2] * 2 > everyone or year == 1969 and candidate[2] == top)
+                    for candidate in candidates
+                ]
             elif not any(won for *_, won in candidates):
                 top = max(candidates, key=lambda candidate: candidate[2])
                 candidates = [(*candidate[:3], candidate == top) for candidate in candidates]

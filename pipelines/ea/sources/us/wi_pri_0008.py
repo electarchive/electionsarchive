@@ -80,11 +80,16 @@ def fetch() -> None:
 
 def read(path: Path, page: int) -> list[list[Word]]:
     text = subprocess.run(
-        ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-bbox", "-f", str(page), "-l", str(page), str(path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
     words: list[Word] = [
         (html.unescape(m[5]), float(m[1]), float(m[2]), float(m[3]), float(m[4]))
-        for m in re.finditer(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>', text)
+        for m in re.finditer(
+            r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>', text
+        )
     ]
     words.sort(key=lambda w: (w[2] + w[4]) / 2)
     lines: list[list[Word]] = []
@@ -186,7 +191,10 @@ def parse() -> None:
                             }
                         )
                 for c, cell in enumerate(total[1]):
-                    if sums[c] != int(re.sub(r"\D", "", cell[0])) and (year, district, candidates[c][1]) not in MISPRINTED:
+                    if (
+                        sums[c] != int(re.sub(r"\D", "", cell[0]))
+                        and (year, district, candidates[c][1]) not in MISPRINTED
+                    ):
                         problems.append(f"{where} {candidates[c][1]}: sum {sums[c]} against printed {cell[0]}")
     for line in problems:
         print("PROBLEM", line)

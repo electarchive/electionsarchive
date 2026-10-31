@@ -4,8 +4,8 @@ from pathlib import Path
 import polars as pl
 
 from ea import raw
-from ea.sources.us import govcand
 from ea.changeset import Changeset
+from ea.sources.us import govcand
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_colleges_2026"
@@ -28,12 +28,22 @@ def fetch() -> None:
     try:
         raw.cached(SOURCE, URL)
     except LookupError:
-        raw.store(SOURCE, URL, FILE.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        raw.store(
+            SOURCE, URL, FILE.read_bytes(), suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+        )
 
 
 def parse() -> None:
     rows = [
-        {"county": "Travis", "district": DISTRICT, "seat": seat, "role": "Trustee", "seats": 1, "name": name, "unexpired": False}
+        {
+            "county": "Travis",
+            "district": DISTRICT,
+            "seat": seat,
+            "role": "Trustee",
+            "seats": 1,
+            "name": name,
+            "unexpired": False,
+        }
         for seat, names in RACES.items()
         for name in names
     ]
@@ -54,7 +64,15 @@ def emit() -> Path:
         )
         source = cs.source(PUBLISHER, TITLE)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=URL, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url=URL,
+                license="Public record",
+            )
         cs.artifact(raw.cached(SOURCE, URL), source)
         kept = govcand.races(conn, cs, SOURCE, "TX", DAY, frame, source, "48")
         print(f"{kept} candidates")

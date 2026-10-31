@@ -68,7 +68,11 @@ def parse() -> None:
             text = raw.cached(SOURCE, link).path.read_text(encoding="utf-8-sig", errors="replace")
             head, *body = csv.reader(text.splitlines())
             if body:
-                frames.append(pl.DataFrame(body, schema=head, orient="row").with_columns(year=pl.lit(year, pl.Int32), day=pl.lit(day)))
+                frames.append(
+                    pl.DataFrame(body, schema=head, orient="row").with_columns(
+                        year=pl.lit(year, pl.Int32), day=pl.lit(day)
+                    )
+                )
     frame = pl.concat(frames).with_columns(
         chamber=pl.when(pl.col("Office").is_in(list(OFFICES)))
         .then(
@@ -94,7 +98,11 @@ def parse() -> None:
         kind=pl.lit("county"),
         source=pl.lit("IN"),
     ).write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "Office").agg(pl.col("chamber").n_unique(), pl.col("code").n_unique()).sort("year", "Office"))
+    print(
+        frame.group_by("year", "Office")
+        .agg(pl.col("chamber").n_unique(), pl.col("code").n_unique())
+        .sort("year", "Office")
+    )
 
 
 def emit() -> Path:

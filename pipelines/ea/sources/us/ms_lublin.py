@@ -62,12 +62,16 @@ def parse() -> None:
             check=True,
         ).stdout
         token = r"(?:\d+\.?|\.)"
-        pattern = re.compile(r"^\s*(?:\d+\s+)?([A-Z][A-Z .'-]*?)\s{2,}\S.*?\s+((?:%s\s+){%d}%s)\s*$" % (token, width - 1, token))
+        pattern = re.compile(
+            r"^\s*(?:\d+\s+)?([A-Z][A-Z .'-]*?)\s{2,}\S.*?\s+((?:%s\s+){%d}%s)\s*$" % (token, width - 1, token)
+        )
         lines = []
         for line in text.splitlines():
             match = pattern.match(line)
-            if match and match[1] != "COUNTY" and not match[2].split()[-1] == ".":
-                lines.append((match[1], [None if value == "." else int(value.rstrip(".")) for value in match[2].split()]))
+            if match and match[1] != "COUNTY" and match[2].split()[-1] != ".":
+                lines.append(
+                    (match[1], [None if value == "." else int(value.rstrip(".")) for value in match[2].split()])
+                )
         sums: dict[tuple[str, int], list[int]] = {}
         printed: set[tuple[int, int]] = set()
         for name, values in lines:

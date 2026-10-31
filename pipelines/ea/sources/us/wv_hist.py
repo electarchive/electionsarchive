@@ -114,7 +114,9 @@ def text(url: str) -> str:
     ).stdout
 
 
-def table(lines: list[str], names: list[tuple[str, str]], office: str, year: int, where: str) -> list[tuple[int, str, str, str, str, int]]:
+def table(
+    lines: list[str], names: list[tuple[str, str]], office: str, year: int, where: str
+) -> list[tuple[int, str, str, str, str, int]]:
     counties: dict[str, list[int]] = {}
     totals: list[int] | None = None
     for line in lines:
@@ -157,7 +159,10 @@ def parse() -> None:
         for (index, office), nxt in zip(starts, [s[0] for s in starts[1:]] + [len(lines)], strict=True):
             section = lines[index + 1 : nxt]
             head = " ".join(line for line in section[:8] if "(" in line).replace("(Hank)", "«Hank»")
-            names = [(re.sub(r"\s+", " ", m[1]).strip().replace("«Hank»", "(Hank)"), PARTIES[m[2]]) for m in re.finditer(r"([A-Za-z.,'«» \-]+?)\s*\(([A-Z])\)", head)]
+            names = [
+                (re.sub(r"\s+", " ", m[1]).strip().replace("«Hank»", "(Hank)"), PARTIES[m[2]])
+                for m in re.finditer(r"([A-Za-z.,'«» \-]+?)\s*\(([A-Z])\)", head)
+            ]
             names = [(re.sub(r"^\*?Elected\s*", "", n).strip(), p) for n, p in names]
             rows += table(section, names, office, year, f"{year} {office}")
     for year, (_, sheets) in SHEETS.items():
@@ -165,7 +170,11 @@ def parse() -> None:
             lines = text(f"{SITE}{year}/{year}%20{name}%20Gen.pdf").splitlines()
             header = next(i for i, line in enumerate(lines) if line.strip().startswith("County"))
             first = re.split(r"\s{2,}", lines[header].strip())[1:]
-            party_line = next(line for line in lines[header + 1 : header + 4] if re.search(r"Democrat|Republican|Libertarian|Constitution|Mountain|Independent", line))
+            party_line = next(
+                line
+                for line in lines[header + 1 : header + 4]
+                if re.search(r"Democrat|Republican|Libertarian|Constitution|Mountain|Independent", line)
+            )
             parties = re.split(r"\s{2,}", party_line.strip())
             names = [(n.strip(), PARTIES[p]) for n, p in zip(first, parties, strict=True)]
             rows += table(lines[header + 1 :], names, office, year, f"{year} {office}")
@@ -203,7 +212,12 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.lit(55),
     ).write_parquet(PARSED / "races.parquet")
-    print(frame.group_by("year", "title", "candidate", "party").agg(pl.col("votes").sum()).sort("year", "title", "votes").rows())
+    print(
+        frame.group_by("year", "title", "candidate", "party")
+        .agg(pl.col("votes").sum())
+        .sort("year", "title", "votes")
+        .rows()
+    )
 
 
 def emit() -> Path:

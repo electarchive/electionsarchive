@@ -56,7 +56,11 @@ def parse() -> None:
                 workbook = fastexcel.read_excel(archive.read(name))
                 sheet = workbook.load_sheet_by_name(workbook.sheet_names[0], header_row=None).to_polars()
                 for line in sheet.iter_rows():
-                    found = OFFICE.fullmatch(str(line[0] or "")) if line[1] is not None and str(line[1]).strip() in PARTIES else None
+                    found = (
+                        OFFICE.fullmatch(str(line[0] or ""))
+                        if line[1] is not None and str(line[1]).strip() in PARTIES
+                        else None
+                    )
                     candidate = re.sub(r"\s+", " ", str(line[2] or "")).strip()
                     if found is None or candidate.lower() in ("over votes", "under votes"):
                         continue

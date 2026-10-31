@@ -53,7 +53,9 @@ def emit() -> Path:
             "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
             [KEY],
         ).fetchone()
-        labels = conn.execute("select id, lower(ballot_label) from contest_option where contest_id = %s", [contest]).fetchall()
+        labels = conn.execute(
+            "select id, lower(ballot_label) from contest_option where contest_id = %s", [contest]
+        ).fetchall()
         options = []
         for name in header[1:]:
             if name == "Write-in":
@@ -79,9 +81,21 @@ def emit() -> Path:
         )
         cs.artifact(artifact, source)
         result_set = cs.key(f"{SOURCE}.result_set", KEY)
-        columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+        columns = (
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
+            "supersedes_id",
+        )
         for prior in conn.execute(
-            f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+            f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+            [contest, result_set],
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
         for option, outcome_kind, seats in conn.execute(

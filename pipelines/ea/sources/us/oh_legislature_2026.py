@@ -132,7 +132,11 @@ def emit() -> Path:
                join name n on n.entity_id = cy.person_id and n.is_preferred
                where x.value ~ '^20[0-2][0-9]-[0-9-]+:OH:(house|senate):'"""
         ).fetchall():
-            words = [word for word in re.sub(r"[^a-z ]", "", text.lower()).split() if word not in ("jr", "sr", "ii", "iii", "iv")]
+            words = [
+                word
+                for word in re.sub(r"[^a-z ]", "", text.lower()).split()
+                if word not in ("jr", "sr", "ii", "iii", "iv")
+            ]
             if len(words) > 1:
                 pool[(words[0], words[-1])].add(person)
         counts = {"contests": 0, "candidates": 0, "matched": 0, "skipped": 0}

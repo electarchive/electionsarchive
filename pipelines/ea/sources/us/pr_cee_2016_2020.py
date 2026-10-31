@@ -29,7 +29,13 @@ CONTESTS = {
         "GOB_IND_2": "lugaro",
         "GOB_OTR": "write-ins",
     },
-    (2016, "house:0"): {"COM_PNP": "gonzalez", "COM_PPD": "ferrer", "COM_PIP": "rodriguez", "COM_PPT": "nogales", "COM_OTR": "scattered"},
+    (2016, "house:0"): {
+        "COM_PNP": "gonzalez",
+        "COM_PPD": "ferrer",
+        "COM_PIP": "rodriguez",
+        "COM_PPT": "nogales",
+        "COM_OTR": "scattered",
+    },
     (2020, "governor"): {
         "GOB_PNP": "pierluisi",
         "GOB_PPD": "delgado",
@@ -63,7 +69,9 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            body = subprocess.run(["curl", "-sfkL", "--compressed", "-A", raw.USER_AGENT, url], capture_output=True, check=True).stdout
+            body = subprocess.run(
+                ["curl", "-sfkL", "--compressed", "-A", raw.USER_AGENT, url], capture_output=True, check=True
+            ).stdout
             raw.store(SOURCE, url, body, suffix=suffix, retrieved_at=datetime.now(UTC), media_type=media_type)
 
 
@@ -78,8 +86,13 @@ def emit() -> Path:
     ]
     with zipfile.ZipFile(raw.cached(SOURCE, URL20).path) as archive:
         frames[2020] = pl.read_csv(io.BytesIO(archive.read("estatal.csv"))).to_dicts()
-    page = html.unescape(re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, BALLOTS).path.read_text(encoding="utf-8", errors="replace")))
-    names = {int(number): fold(name) for number, name in re.findall(r"\b(\d{3})\s+([A-ZÁÉÍÓÚÑa-záéíóúñü. ]+?)\s+(?:Legislativa|\s)", page)}
+    page = html.unescape(
+        re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, BALLOTS).path.read_text(encoding="utf-8", errors="replace"))
+    )
+    names = {
+        int(number): fold(name)
+        for number, name in re.findall(r"\b(\d{3})\s+([A-ZÁÉÍÓÚÑa-záéíóúñü. ]+?)\s+(?:Legislativa|\s)", page)
+    }
     with connect() as conn:
         municipios = {
             fold(text): (unit, area)
@@ -138,9 +151,13 @@ def emit() -> Path:
             day = DAYS[year]
             key = f"{day}:PR:{section}"
             contest, election = conn.execute(
-                "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s", [key]
+                "select c.id, c.election_id from contest c join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value = %s",
+                [key],
             ).fetchone()
-            labels = conn.execute("select id, translate(lower(ballot_label), 'áéíóúñü', 'aeiounu') from contest_option where contest_id = %s", [contest]).fetchall()
+            labels = conn.execute(
+                "select id, translate(lower(ballot_label), 'áéíóúñü', 'aeiounu') from contest_option where contest_id = %s",
+                [contest],
+            ).fetchall()
             options = {}
             for column, needle in columns.items():
                 found = [option for option, label in labels if needle in label]
@@ -153,9 +170,21 @@ def emit() -> Path:
             ).fetchone()[0]
             counted = sum(int(row[column] or 0) for row in frames[year] for column in columns)
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:{'unit' if year == 2016 else 'colegio'}")
-            set_columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness", "supersedes_id")
+            set_columns = (
+                "id",
+                "election_id",
+                "contest_id",
+                "stage",
+                "kind",
+                "status",
+                "source_id",
+                "as_of",
+                "completeness",
+                "supersedes_id",
+            )
             for prior in conn.execute(
-                f"select {', '.join(set_columns)} from result_set where contest_id = %s and is_default and id <> %s", [contest, result_set]
+                f"select {', '.join(set_columns)} from result_set where contest_id = %s and is_default and id <> %s",
+                [contest, result_set],
             ).fetchall():
                 cs.add("result_set", **dict(zip(set_columns, prior, strict=True)), is_default=False)
             for option, outcome_kind, seats in conn.execute(

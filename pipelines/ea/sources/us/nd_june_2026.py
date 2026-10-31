@@ -62,7 +62,15 @@ def emit() -> Path:
                and x.scheme = 'us.contest' where x.value = '2026-11-03:ND:question:constitutional-measure-no-1'"""
         ).fetchone()
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=PAGE, license="Public record")
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=TITLE,
+            url=PAGE,
+            license="Public record",
+        )
         cs.artifact(cached, source)
         key = f"{DAY}:ND:question:constitutional-measure-no-1"
         contest = cs.key("us.contest", key)
@@ -77,7 +85,14 @@ def emit() -> Path:
             default_result_kind="counted",
         )
         cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-        cs.add("name", entity_id=contest, text=f"2026 North Dakota primary {NAME}", lang="en", kind="official", is_preferred=True)
+        cs.add(
+            "name",
+            entity_id=contest,
+            text=f"2026 North Dakota primary {NAME}",
+            lang="en",
+            kind="official",
+            is_preferred=True,
+        )
         cs.add("slug", path=f"us/nd/{DAY}-primary/constitutional-measure-1", entity_id=contest)
         cs.add("citation", entity_id=contest, source_id=source)
         result = cs.key(f"{SOURCE}.result_set", key)

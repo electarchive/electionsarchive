@@ -1,12 +1,14 @@
+import csv
 import os
-import csv, sys
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(os.environ["OR_WORK"])))
 import re
-from words import ocr, region, reread
-from scan3 import hitv, S, D
+
 from parsers import check, save
+from scan3 import D, S, hitv
+from words import ocr, region, reread
 
 
 def tokens(c, p):

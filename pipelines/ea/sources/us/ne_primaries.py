@@ -49,7 +49,10 @@ def fetch() -> None:
 
 def text(path: str) -> list[str]:
     return subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout.splitlines()
 
 
@@ -58,8 +61,14 @@ def parse() -> None:
     turnout: list[tuple[date, str, int, int]] = []
     for day, path in FILES.items():
         lines = text(path)
-        start = next(i for i, line in enumerate(lines) if re.match(r"\s+(United States Senator|President of the United States)\s*$", line))
-        end = next(i for i in range(start, len(lines)) if re.match(r"\s+(Governor|Public Service Commissioner)\s*$", lines[i]))
+        start = next(
+            i
+            for i, line in enumerate(lines)
+            if re.match(r"\s+(United States Senator|President of the United States)\s*$", line)
+        )
+        end = next(
+            i for i in range(start, len(lines)) if re.match(r"\s+(Governor|Public Service Commissioner)\s*$", lines[i])
+        )
         chamber, district, party = "", None, ""
         sections: dict[tuple[str, int | None, str], dict] = {}
         header: list[str] = []
@@ -101,7 +110,9 @@ def parse() -> None:
                                     if m[0] in ("County", "Nonpartisan") or "Party" in m[0] or "Voters" in m[0]:
                                         continue
                                     center = (m.start() + m.end()) / 2
-                                    names[min(range(len(numbers)), key=lambda i: abs(section["columns"][i] - center))].append(m[0])
+                                    names[
+                                        min(range(len(numbers)), key=lambda i: abs(section["columns"][i] - center))
+                                    ].append(m[0])
                             section["names"] = [" ".join(parts) for parts in names]
                         target = section["total"]
                     else:
@@ -121,13 +132,30 @@ def parse() -> None:
                 print(f"{day} {kind} {dist} {party}: county sums {sums} against TOTAL {section['total']['sum']}")
                 continue
             for county, row in section["tally"].items():
-                frames.extend((day, kind, dist, party, name, county, row["sum"][i]) for i, name in enumerate(section["names"]))
-        registered = next(i for i, line in enumerate(lines) if re.match(r"\s+Number of Registered Voter", line) and i > 30)
-        voting = next(i for i, line in enumerate(lines) if re.match(r"\s+(Number of People Voting|Total Voting by Party)", line) and i > 30)
+                frames.extend(
+                    (day, kind, dist, party, name, county, row["sum"][i]) for i, name in enumerate(section["names"])
+                )
+        registered = next(
+            i for i, line in enumerate(lines) if re.match(r"\s+Number of Registered Voter", line) and i > 30
+        )
+        voting = next(
+            i
+            for i, line in enumerate(lines)
+            if re.match(r"\s+(Number of People Voting|Total Voting by Party)", line) and i > 30
+        )
         figures: dict[str, list[int]] = {}
-        closing = next(
-            i for i in range(voting + 1, len(lines)) if re.search(r"Voters by Location|Total Voting by Location|United States Senator|President of the United States", lines[i])
-        ) if day.year == 2002 else start
+        closing = (
+            next(
+                i
+                for i in range(voting + 1, len(lines))
+                if re.search(
+                    r"Voters by Location|Total Voting by Location|United States Senator|President of the United States",
+                    lines[i],
+                )
+            )
+            if day.year == 2002
+            else start
+        )
         for index, (lo, hi, column) in enumerate(((registered, voting, 1), (voting, closing, 0))):
             for line in lines[lo:hi]:
                 for cell in CELL.finditer(line):
@@ -140,10 +168,21 @@ def parse() -> None:
         turnout.extend((day, county, registered_, ballots) for county, (registered_, ballots) in figures.items())
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
-        frames, schema={"day": pl.Date, "kind": pl.String, "district": pl.Int16, "party": pl.String, "candidate": pl.String, "county": pl.String, "votes": pl.Int64},
-        orient="row"
+        frames,
+        schema={
+            "day": pl.Date,
+            "kind": pl.String,
+            "district": pl.Int16,
+            "party": pl.String,
+            "candidate": pl.String,
+            "county": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
     ).write_parquet(PARSED / "counties.parquet")
-    pl.DataFrame(turnout, schema=["day", "county", "registered", "ballots"], orient="row").write_parquet(PARSED / "turnout.parquet")
+    pl.DataFrame(turnout, schema=["day", "county", "registered", "ballots"], orient="row").write_parquet(
+        PARSED / "turnout.parquet"
+    )
     print(len(frames), "candidate rows;", len(turnout), "turnout rows")
 
 
@@ -189,7 +228,9 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "counties.parquet")
             .with_columns(
                 chamber=pl.col("kind") + ":" + pl.col("party"),
-                code=pl.col("county").map_elements(lambda name: counties[re.sub(r"[^a-z]", "", name.lower())][0], return_dtype=pl.String),
+                code=pl.col("county").map_elements(
+                    lambda name: counties[re.sub(r"[^a-z]", "", name.lower())][0], return_dtype=pl.String
+                ),
                 year=pl.col("day").dt.year().cast(pl.Int32),
                 special=pl.lit(False),
                 state=pl.lit("NE"),
@@ -223,7 +264,9 @@ def emit() -> Path:
                 is_default=election not in held,
                 completeness=1,
             )
-            for county, registered, ballots in voters.filter(pl.col("day") == day).select("county", "registered", "ballots").iter_rows():
+            for county, registered, ballots in (
+                voters.filter(pl.col("day") == day).select("county", "registered", "ballots").iter_rows()
+            ):
                 for measure, value in ((2, registered), (3, ballots)):
                     cs.add(
                         "result_value",

@@ -75,5 +75,13 @@ def emit() -> Path:
             [[r["area"] for r in rows], [r["geojson"] for r in rows]],
         ).fetchall()
         for area, geom, point in shapes:
-            cs.add("area_geometry", area_id=area, valid_from=None, geom=geom, label_point=point, quality="official", source_id=source)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=source,
+            )
         return cs.write()

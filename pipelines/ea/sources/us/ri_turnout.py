@@ -37,7 +37,12 @@ OLD_PRIMARIES = {
     2002: (date(2002, 9, 10), 665012, 149359),
 }
 OLD_FIXES = {
-    1998: {"littlecompton": (2675, 180), "middletown": (9993, 423), "narragansett": (11198, 1743), "scituate": (4133, 336)},
+    1998: {
+        "littlecompton": (2675, 180),
+        "middletown": (9993, 423),
+        "narragansett": (11198, 1743),
+        "scituate": (4133, 336),
+    },
 }
 ABBREVIATIONS = {"e": "east", "n": "north", "s": "south", "w": "west"}
 COUNTIES = {
@@ -50,8 +55,21 @@ COUNTIES = {
 }
 TOWN_COUNTY = {town: code for code, towns in COUNTIES.items() for town in towns.split()}
 ROW = re.compile(r"^\s*(?:\d\s+)?([A-Za-z][A-Za-z .]+?)\s+([\d,]+)\s+([\d,]+)\s+([\d.]+)\s*%")
-MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
-MONTH = re.compile("(" + "|".join(MONTHS) + r")\s+\d{1,2},?\s+\d{4}", re.I)
+MONTHS = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+]
+MONTH = re.compile("(" + "|".join(MONTHS) + r")\s+\d{1,2},?\s+\d{4}", re.IGNORECASE)
 
 
 def url(year: int) -> str:
@@ -75,11 +93,23 @@ def fetch() -> None:
             pass
         response = httpx.get(url(year), headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=300)
         response.raise_for_status()
-        raw.store(SOURCE, url(year), response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        raw.store(
+            SOURCE,
+            url(year),
+            response.content,
+            suffix=".pdf",
+            retrieved_at=datetime.now(UTC),
+            media_type="application/pdf",
+        )
 
 
 def text_of(year: int) -> list[str]:
-    result = subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, url(year)).path), "-"], capture_output=True, text=True, check=True)
+    result = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url(year)).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
     return result.stdout.replace("\x0c", "\n").split("\n")
 
 
@@ -195,7 +225,9 @@ def parse() -> None:
     state_rows = []
     for book, years in ((2018, HISTORY_YEARS), (2002, list(range(1986, 2004, 2)))):
         lines = text_of(book)
-        start = next(i for i, line in enumerate(lines) if re.match(r"(?i)\s*STATEWIDE ELIGIBILITY & VOTER TURNOUT", line))
+        start = next(
+            i for i, line in enumerate(lines) if re.match(r"(?i)\s*STATEWIDE ELIGIBILITY & VOTER TURNOUT", line)
+        )
         statewide: dict[str, list[int]] = {}
         municipal: dict[str, dict[str, list[int]]] = {}
         town = None
@@ -228,7 +260,9 @@ def parse() -> None:
             ok = eligible == state[0] and abs(cast - state[1]) <= max(60, state[1] // 200)
             print(f"history {year}: towns {eligible}/{cast} state {state} {'ok' if ok else 'mismatch'}")
             if ok and day not in elections:
-                elections[day] = {t: (municipal[t]["eligible"][index], municipal[t]["turnout"][index]) for t in municipal}
+                elections[day] = {
+                    t: (municipal[t]["eligible"][index], municipal[t]["turnout"][index]) for t in municipal
+                }
     lines = text_of(2000)
     start = next(i for i, line in enumerate(lines) if re.match(r"(?i)\s*STATEWIDE ELIGIBILITY & VOTER TURNOUT", line))
     history = {}
@@ -239,12 +273,21 @@ def parse() -> None:
     for index, year in enumerate((1982, 1984)):
         day = next((d for d, kind in days.items() if d.year == year and kind == "general"), None)
         if day is not None:
-            state_rows.append({"date": day, "registered": history["ELIGIBLE"][index], "voters": history["TURNOUT"][index]})
+            state_rows.append(
+                {"date": day, "registered": history["ELIGIBLE"][index], "voters": history["TURNOUT"][index]}
+            )
     rows = []
     for day, towns in elections.items():
         for code in COUNTIES:
             members = [v for t, v in towns.items() if TOWN_COUNTY[t] == code]
-            rows.append({"date": day, "code": code, "registered": sum(m[0] for m in members), "voters": sum(m[1] for m in members)})
+            rows.append(
+                {
+                    "date": day,
+                    "code": code,
+                    "registered": sum(m[0] for m in members),
+                    "voters": sum(m[1] for m in members),
+                }
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows)
     frame.write_parquet(PARSED / "counties.parquet")
@@ -294,7 +337,8 @@ def emit() -> Path:
         published = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'",
+                (source,),
             )
         }
         covered = set()

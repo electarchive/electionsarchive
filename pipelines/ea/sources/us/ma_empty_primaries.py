@@ -27,9 +27,9 @@ def fetch() -> None:
 
 def parse() -> None:
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
-        gazetteer = pl.read_csv(io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False).filter(
-            pl.col("USPS") == "MA"
-        )
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS") == "MA")
     towns: dict[str, str] = {}
     for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
         towns.setdefault(elstats.plain(name), geoid[:5])
@@ -56,9 +56,14 @@ def parse() -> None:
                         printed = votes
                         continue
                     name = re.sub(
-                        r"^([NSEW])\. ", lambda hit: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[hit[1]], town
+                        r"^([NSEW])\. ",
+                        lambda hit: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[hit[1]],
+                        town,
                     )
-                    code = towns.get(elstats.plain(name)) or towns[elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))]
+                    code = (
+                        towns.get(elstats.plain(name))
+                        or towns[elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))]
+                    )
                     rows.append((body, party, day, district, code, votes, election))
                     found += votes
                 if found != printed:
@@ -98,7 +103,10 @@ def emit() -> Path:
             .then(pl.col("chamber").str.replace("green-rainbow", "green"))
             .otherwise(pl.col("chamber"))
             .alias("chamber"),
-            pl.when(pl.col("year") == 2002).then(pl.col("party").str.replace("green-rainbow", "green")).otherwise(pl.col("party")).alias("party"),
+            pl.when(pl.col("year") == 2002)
+            .then(pl.col("party").str.replace("green-rainbow", "green"))
+            .otherwise(pl.col("party"))
+            .alias("party"),
         )
         held = {
             value

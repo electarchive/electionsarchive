@@ -110,11 +110,13 @@ def parse() -> None:
                 if feature is None:
                     misses.append((code, str(source["title"])))
                     continue
-                rows.append((area, code, str(source["publisher"]), str(source["title"]), url, json.dumps(feature["geometry"])))
+                rows.append(
+                    (area, code, str(source["publisher"]), str(source["title"]), url, json.dumps(feature["geometry"]))
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(
-        rows, schema=["area", "code", "publisher", "title", "url", "geojson"], orient="row"
-    ).write_parquet(PARSED / "matches.parquet")
+    pl.DataFrame(rows, schema=["area", "code", "publisher", "title", "url", "geojson"], orient="row").write_parquet(
+        PARSED / "matches.parquet"
+    )
     pl.DataFrame(misses, schema=["code", "layer"], orient="row").write_csv(PARSED / "unmatched.tsv", separator="\t")
     print(len(rows), "areas matched;", len(misses), "wanted areas missing from their layer:")
     for code, layer in misses:

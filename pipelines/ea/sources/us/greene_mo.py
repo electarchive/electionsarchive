@@ -1,7 +1,6 @@
 import json
 import re
 import subprocess
-from collections import defaultdict
 from collections.abc import Iterator, Mapping
 from datetime import datetime
 from pathlib import Path
@@ -18,7 +17,22 @@ WANTED = re.compile(r"(?i)precinct|precint")
 EXCLUDED = re.compile(r"(?i)sample|candidate|declaration|GMMOGR|pre-lat")
 
 
-ROMAN = {1: "I", 2: "II", 3: "III", 4: "IV", 5: "V", 6: "VI", 7: "VII", 8: "VIII", 9: "IX", 10: "X", 11: "XI", 12: "XII", 13: "XIII", 14: "XIV"}
+ROMAN = {
+    1: "I",
+    2: "II",
+    3: "III",
+    4: "IV",
+    5: "V",
+    6: "VI",
+    7: "VII",
+    8: "VIII",
+    9: "IX",
+    10: "X",
+    11: "XI",
+    12: "XII",
+    13: "XIII",
+    14: "XIV",
+}
 
 
 def _title(title: str) -> str:
@@ -58,7 +72,7 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
     done: set[str] = set()
     for link in _links():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"], capture_output=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"], capture_output=True, check=False
         ).stdout.decode(errors="replace")
         pages = text.split("\f")
         head = pages[0][:600]
@@ -78,7 +92,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         order: list[str] = []
         for page in pages:
             lines = [line for line in page.splitlines() if line.strip()]
-            if len(lines) < 5 or not lines[0].startswith(("Summary Results Report", "Precinct Summary Results", "Summary Precinct Results")):
+            if len(lines) < 5 or not lines[0].startswith(
+                ("Summary Results Report", "Precinct Summary Results", "Summary Precinct Results")
+            ):
                 continue
             precinct = lines[3].strip()
             for node in kceb.electionware(page):
@@ -109,7 +125,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
                     "key": str(index),
                     "text": key,
                     "vote_for": contests[key]["vote_for"],
-                    "choices": [{**choice, "total": str(choice.pop("votes"))} for choice in contests[key]["choices"].values()],
+                    "choices": [
+                        {**choice, "total": str(choice.pop("votes"))} for choice in contests[key]["choices"].values()
+                    ],
                 }
                 for index, key in enumerate(order)
             ],

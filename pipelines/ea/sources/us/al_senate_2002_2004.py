@@ -53,7 +53,9 @@ def parse() -> None:
             cells = row[first : first + len(candidates)]
             if label.strip().upper() in ("STATE TOTAL", "TOTAL"):
                 total = [int(cell) for cell in cells]
-            elif re.sub(r"[^a-z]", "", label.lower()) in counties and all(str(cell).strip().isdigit() for cell in cells):
+            elif re.sub(r"[^a-z]", "", label.lower()) in counties and all(
+                str(cell).strip().isdigit() for cell in cells
+            ):
                 found.append((counties[re.sub(r"[^a-z]", "", label.lower())], [int(cell) for cell in cells]))
         if len(found) != 67:
             raise ValueError(f"{day}: {len(found)} counties")

@@ -59,7 +59,11 @@ def parse() -> None:
         for year, district, candidate, cells in csv.reader(handle, delimiter="\t"):
             for cell in cells.split(", "):
                 name, votes = cell.rsplit(" ", 1)
-                key = name.lower() if name.lower() in counties else difflib.get_close_matches(name.lower(), counties, 1, 0.7)[0]
+                key = (
+                    name.lower()
+                    if name.lower() in counties
+                    else difflib.get_close_matches(name.lower(), counties, 1, 0.7)[0]
+                )
                 rows.append((str(DAYS[int(year)]), int(district), counties[key], candidate, int(votes)))
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")

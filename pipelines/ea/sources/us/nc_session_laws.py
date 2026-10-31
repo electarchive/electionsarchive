@@ -16,17 +16,29 @@ PUBLISHER = "North Carolina General Assembly"
 TITLE = "Session Laws"
 LAWS = {
     "2012-05-08:NC:question:wikipedia:north-carolina-amendment-1": ("2011-2012", "2011-409"),
-    "2014-11-04:NC:question:wikipedia:north-carolina-criminal-defendant-may-waive-jury-trial-amendment": ("2013-2014", "2013-300"),
+    "2014-11-04:NC:question:wikipedia:north-carolina-criminal-defendant-may-waive-jury-trial-amendment": (
+        "2013-2014",
+        "2013-300",
+    ),
     "2016-03-15:NC:question:wikipedia:north-carolina-connect-nc-public-improvement-bond": ("2015-2016", "2015-280"),
     "2018-11-06:NC:question:wikipedia:north-carolina-income-tax-cap-amendment": ("2017-2018", "2018-119"),
-    "2018-11-06:NC:question:wikipedia:north-carolina-judicial-selection-for-midterm-vacancies-amendment": ("2017-2018", "2018-132"),
-    "2018-11-06:NC:question:wikipedia:north-carolina-legislative-appointments-to-elections-board-amendment": ("2017-2018", "2018-117"),
-    "2018-11-06:NC:question:wikipedia:north-carolina-marsy-s-law-crime-victims-rights-amendment": ("2017-2018", "2018-110"),
+    "2018-11-06:NC:question:wikipedia:north-carolina-judicial-selection-for-midterm-vacancies-amendment": (
+        "2017-2018",
+        "2018-132",
+    ),
+    "2018-11-06:NC:question:wikipedia:north-carolina-legislative-appointments-to-elections-board-amendment": (
+        "2017-2018",
+        "2018-117",
+    ),
+    "2018-11-06:NC:question:wikipedia:north-carolina-marsy-s-law-crime-victims-rights-amendment": (
+        "2017-2018",
+        "2018-110",
+    ),
     "2018-11-06:NC:question:wikipedia:north-carolina-right-to-hunt-and-fish-amendment": ("2017-2018", "2018-96"),
     "2018-11-06:NC:question:wikipedia:north-carolina-voter-id-amendment": ("2017-2018", "2018-128"),
     "2024-11-05:NC:question:wikipedia:citizenship-requirement-for-voting-amendment": ("2023-2024", "2024-18"),
 }
-QUESTION = re.compile(r"\[ \] FOR\s+\[ \] AGAINST\s+(.+?)\"", re.S)
+QUESTION = re.compile(r"\[ \] FOR\s+\[ \] AGAINST\s+(.+?)\"", re.DOTALL)
 
 
 def url(session: str, law: str) -> str:

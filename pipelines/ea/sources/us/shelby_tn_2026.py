@@ -54,7 +54,9 @@ def emit() -> Path:
         elif who is not None and (row := ROW.match(stripped)):
             total = int(row["votes"].split()[-1].replace(",", "").replace("-", "0"))
             races[(who, seat or "")][row["name"].strip()] = races[(who, seat or "")].get(row["name"].strip(), 0) + total
-        elif stripped.startswith(("TABULATION", "See the accompanying")) or re.match(r"^[A-Z][A-Z ]+ (?:PRIMARY|GENERAL)", stripped):
+        elif stripped.startswith(("TABULATION", "See the accompanying")) or re.match(
+            r"^[A-Z][A-Z ]+ (?:PRIMARY|GENERAL)", stripped
+        ):
             who = seat = None
     races = {key: votes for key, votes in races.items() if any(name != "Write-In Candidates" for name in votes)}
     with connect() as conn:
@@ -130,7 +132,7 @@ def emit() -> Path:
                 )
                 name(election, f"2026 {place} election")
                 cs.add("slug", path=f"{path}/{DAY}-local", entity_id=election)
-            body =cs.key("us.body", f"TN:{code}:board-of-education")
+            body = cs.key("us.body", f"TN:{code}:board-of-education")
             if body not in bodies:
                 bodies.add(body)
                 if body in cs.minted:
@@ -176,7 +178,9 @@ def emit() -> Path:
             )
             name(contest, f"2026 {heading} election")
             cs.add(
-                "slug", path=f"{path}/{DAY}-local/board-of-education" + (f"-{slug(seat)}" if seat else ""), entity_id=contest
+                "slug",
+                path=f"{path}/{DAY}-local/board-of-education" + (f"-{slug(seat)}" if seat else ""),
+                entity_id=contest,
             )
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
@@ -203,7 +207,14 @@ def emit() -> Path:
                         cs.add("person", id=person)
                         name(person, label)
                     option = cs.key("us.option", f"{key}:{slug(label)}")
-                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=None, ballot_label=label)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=None,
+                        ballot_label=label,
+                    )
                     cs.add(
                         "candidacy",
                         id=cs.key("us.candidacy", f"{key}:{slug(label)}:head"),

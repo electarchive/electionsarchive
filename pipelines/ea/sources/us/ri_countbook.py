@@ -1,7 +1,7 @@
 import re
 import subprocess
-from difflib import get_close_matches
 from datetime import date, timedelta
+from difflib import get_close_matches
 from pathlib import Path
 
 import polars as pl
@@ -220,5 +220,7 @@ def emit() -> Path:
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
             )
-            cs.add("name", entity_id=unit, text=f"{town.title()} {precinct}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name", entity_id=unit, text=f"{town.title()} {precinct}", lang="en", kind="official", is_preferred=True
+            )
         return cs.write()

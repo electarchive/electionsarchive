@@ -18,7 +18,7 @@ ARCHIVES = SITE + "/election-info/archives"
 FIPS = "39"
 YEARS = range(2000, 2026)
 SECTION = re.compile(r">\s*((?:Primary|General|Special)[A-Za-z ]*Election)\s*<")
-LINK = re.compile(r'<a[^>]*href="(/getmedia/[^"]+)"[^>]*>(.*?)</a>', re.S)
+LINK = re.compile(r'<a[^>]*href="(/getmedia/[^"]+)"[^>]*>(.*?)</a>', re.DOTALL)
 UNWANTED = re.compile(
     r"(?i)nvra|maintenance|registration|absentee|readiness|most.?populous|pickerington|recount|summary|overlap"
 )

@@ -1,4 +1,3 @@
-import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -7,7 +6,6 @@ from uuid import UUID
 import polars as pl
 from PIL import Image
 
-from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import house_books
 from ea.store import DATA, connect
@@ -35,8 +33,20 @@ VOLUMES = {
     for year, (item, day, pages) in ITEMS.items()
 }
 OFFICES = {"president": "president", "senate": "senate", "governor": "governor"}
-ERRATA = {(1982, ("governor", 0)), (1984, ("president", 0)), (1986, ("governor", 0)), (1990, ("governor", 0)), (1988, ("turnout", 0)), (1992, ("turnout", 0)), (1994, ("turnout", 0))}
-DERIVED = {(1986, "Clermont", "Celeste"): 14246, (1994, "Guernsey", "Registered Voters"): 14166, (1992, "Henry", "Electors Voting"): 13538}
+ERRATA = {
+    (1982, ("governor", 0)),
+    (1984, ("president", 0)),
+    (1986, ("governor", 0)),
+    (1990, ("governor", 0)),
+    (1988, ("turnout", 0)),
+    (1992, ("turnout", 0)),
+    (1994, ("turnout", 0)),
+}
+DERIVED = {
+    (1986, "Clermont", "Celeste"): 14246,
+    (1994, "Guernsey", "Registered Voters"): 14166,
+    (1992, "Henry", "Electors Voting"): 13538,
+}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
@@ -70,7 +80,12 @@ def emit() -> Path:
             title = TITLE.format(day=day)
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=sources[year], kind="official_body", publisher=PUBLISHER, title=title, url=landing,
+                "source",
+                id=sources[year],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=landing,
                 license=LICENSE,
             )
             book = house_books._artifact(sys.modules[__name__], year)
@@ -105,11 +120,21 @@ def emit() -> Path:
             conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
         )
         columns = (
-            "id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness",
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
             "supersedes_id",
         )
 
-        def values(result_set: UUID, year: int, rows: pl.DataFrame, option_of: dict[str, UUID | None], measures: dict[str, int]) -> None:
+        def values(
+            result_set: UUID, year: int, rows: pl.DataFrame, option_of: dict[str, UUID | None], measures: dict[str, int]
+        ) -> None:
             for county, label, votes, number, box in rows.select("county", "label", "votes", "page", "box").iter_rows():
                 plain = house_books._plain(county)
                 unit = counties.get(plain) or next(u for name, u in counties.items() if name.startswith(plain))

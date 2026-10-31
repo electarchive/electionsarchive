@@ -4,8 +4,8 @@ import subprocess
 from collections.abc import Iterator, Mapping
 from datetime import date, datetime
 from pathlib import Path
-from urllib.parse import urljoin
 from typing import Any
+from urllib.parse import urljoin
 
 from ea import raw
 from ea.sources.us import enr_clarity
@@ -46,9 +46,11 @@ def rows() -> Iterator[tuple[date, str, str]]:
     for number in PAGES:
         page = raw.cached(SOURCE, PAGE.format(number)).path.read_text(errors="replace")
         for item in page.split('class="EAL-Item"')[1:]:
-            cells = re.findall(r'<div class="EAL-Cell">(.*?)</div>', item, flags=re.S)
+            cells = re.findall(r'<div class="EAL-Cell">(.*?)</div>', item, flags=re.DOTALL)
             links = [urljoin(ARCHIVE, html.unescape(link)) for link in re.findall(r'href="([^"]*)"', item) if link]
-            links = [link for link in links if "Archives/page" not in link and not link.lower().endswith((".htm", ".html"))]
+            links = [
+                link for link in links if "Archives/page" not in link and not link.lower().endswith((".htm", ".html"))
+            ]
             if len(cells) < 2 or not links:
                 continue
             label = html.unescape(re.sub(r"<[^>]+>", "", cells[0])).strip()
@@ -93,7 +95,11 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
                 continue
             words = re.findall(r"\d+|none|one|two|three|four|five|six|seven", heading.groupdict().get("n") or "one")
             vote_for = max((int(word) if word.isdigit() else NUMBER_WORDS[word] for word in words), default=1)
-            node = {"text": re.sub(r"\s+", " ", heading["title"]).strip(" ,-"), "vote_for": max(vote_for, 1), "choices": []}
+            node = {
+                "text": re.sub(r"\s+", " ", heading["title"]).strip(" ,-"),
+                "vote_for": max(vote_for, 1),
+                "choices": [],
+            }
             continue
         if CAST.match(line):
             pairs = PAIR.findall(line)
@@ -111,16 +117,23 @@ def contests(text: str) -> Iterator[dict[str, Any]]:
         if trailing:
             name = trailing[1]
         if name:
-            node["choices"].append({"text": name, "party": tagged[1] if tagged else trailing[2].upper() if trailing else None, "total": pairs[-1][1].replace(",", ""), "places": []})
+            node["choices"].append(
+                {
+                    "text": name,
+                    "party": tagged[1] if tagged else trailing[2].upper() if trailing else None,
+                    "total": pairs[-1][1].replace(",", ""),
+                    "places": [],
+                }
+            )
 
 
 def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]:
     for tenant in registry:
         for day, title, link in rows():
             path = raw.cached(SOURCE, link).path
-            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode(
-                errors="replace"
-            )
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True
+            ).stdout.decode(errors="replace")
             found = []
             for node in contests(text):
                 node["text"] = normalize(node["text"])
@@ -145,16 +158,28 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
 
 
 def normalize(text: str) -> str:
-    text = re.sub(r"\bI\.? ?S\.? ?D\.?(?=[\s,]|$)", "ISD", text, flags=re.I)
-    text = re.sub(r"\b(?:HC|H\.C\.) ?MUD\b|\bHCMUD\b", "Harris County MUD", text, flags=re.I)
-    text = re.sub(r"\bLSCS\b|\bLone Star College System\b", "Lone Star Community College District", text, flags=re.I)
-    text = re.sub(r"\bHCCSN?\b|\bHCC\b|\bHouston Comm(?:unity)? Col(?:lege)? Dist\w*(?: \d+)?", "Houston Community College District", text, flags=re.I)
-    text = re.sub(r"\bU D\b", "Utility District", text, flags=re.I)
-    text = re.sub(r"\bCity of W University\b", "City of West University", text, flags=re.I)
-    text = re.sub(r"^(County Commissioner(?:s Court)?,?) Precinct (\d)\b", r"\1 District \2", text, flags=re.I)
-    text = re.sub(r"\bAlder ?person\b", "Alderman", text, flags=re.I)
-    text = re.sub(r"\bREG WA\b", "Regional Water Authority", text, flags=re.I)
-    text = re.sub(r"\bDistrict (VIII|VII|VI|IV|IX|III|II|V|I)\b", lambda m: f"District {ROMAN[m[1].upper()]}", text, flags=re.I)
+    text = re.sub(r"\bI\.? ?S\.? ?D\.?(?=[\s,]|$)", "ISD", text, flags=re.IGNORECASE)
+    text = re.sub(r"\b(?:HC|H\.C\.) ?MUD\b|\bHCMUD\b", "Harris County MUD", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"\bLSCS\b|\bLone Star College System\b", "Lone Star Community College District", text, flags=re.IGNORECASE
+    )
+    text = re.sub(
+        r"\bHCCSN?\b|\bHCC\b|\bHouston Comm(?:unity)? Col(?:lege)? Dist\w*(?: \d+)?",
+        "Houston Community College District",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(r"\bU D\b", "Utility District", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bCity of W University\b", "City of West University", text, flags=re.IGNORECASE)
+    text = re.sub(r"^(County Commissioner(?:s Court)?,?) Precinct (\d)\b", r"\1 District \2", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bAlder ?person\b", "Alderman", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bREG WA\b", "Regional Water Authority", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"\bDistrict (VIII|VII|VI|IV|IX|III|II|V|I)\b",
+        lambda m: f"District {ROMAN[m[1].upper()]}",
+        text,
+        flags=re.IGNORECASE,
+    )
     return text
 
 

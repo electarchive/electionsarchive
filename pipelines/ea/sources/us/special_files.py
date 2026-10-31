@@ -7,7 +7,6 @@ from pathlib import Path
 
 import fastexcel
 import httpx
-import polars as pl
 
 from ea import raw
 from ea.store import DATA
@@ -36,13 +35,33 @@ PENNSYLVANIA_NOTE = (
     "totals are the certified ones and differ slightly from the article's."
 )
 SITES = {
-    "OH": ("Ohio Secretary of State", "Special election official canvasses", "https://data.ohiosos.gov/portal/past-election-results"),
+    "OH": (
+        "Ohio Secretary of State",
+        "Special election official canvasses",
+        "https://data.ohiosos.gov/portal/past-election-results",
+    ),
     "GA": ("Georgia Secretary of State", "Special election results", "https://results.sos.ga.gov/"),
-    "UT": ("Utah Lieutenant Governor's Office", "Special election canvasses and results", "https://electionresults.utah.gov/"),
+    "UT": (
+        "Utah Lieutenant Governor's Office",
+        "Special election canvasses and results",
+        "https://electionresults.utah.gov/",
+    ),
     "IL": ("Illinois State Board of Elections", "Election vote totals", ILLINOIS),
-    "MT": ("Montana Secretary of State", "2017 special election results", "https://electionresults.mt.gov/ResultsList.aspx?eid=15"),
-    "WI": ("Wisconsin Elections Commission", "Election results archive", "https://elections.wi.gov/elections/election-results/results-all"),
-    "PA": ("Pennsylvania Department of State", "Election returns, special elections", "https://www.electionreturns.pa.gov/"),
+    "MT": (
+        "Montana Secretary of State",
+        "2017 special election results",
+        "https://electionresults.mt.gov/ResultsList.aspx?eid=15",
+    ),
+    "WI": (
+        "Wisconsin Elections Commission",
+        "Election results archive",
+        "https://elections.wi.gov/elections/election-results/results-all",
+    ),
+    "PA": (
+        "Pennsylvania Department of State",
+        "Election returns, special elections",
+        "https://www.electionreturns.pa.gov/",
+    ),
 }
 LOADED = (
     ("MF-015", "MT", 0, date(2017, 5, 25), "Statewide Results.xlsx"),
@@ -176,14 +195,19 @@ def rows() -> list[dict[str, object]]:
                             )
                         )
             elif file.suffix == ".pdf":
-                text = subprocess.run(["pdftotext", "-layout", str(file), "-"], check=True, capture_output=True, text=True).stdout
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(file), "-"], check=True, capture_output=True, text=True
+                ).stdout
                 if day == date(2007, 7, 17):
                     for line in text.splitlines():
                         hit = re.match(r"^\s*([A-Z][A-Z .'-]*?)\s+\d+\s+\d+\s+([\d,]+)\s+([\d,]+)", line)
                         if hit is not None:
                             for name, cell in (("Paul Broun", hit[2]), ("Jim Whitehead", hit[3])):
                                 lines.append((district, hit[1].title(), "Republican", name, int(cell.replace(",", ""))))
-                    if (sum(entry[4] for entry in lines if entry[3] == "Paul Broun"), sum(entry[4] for entry in lines if entry[3] == "Jim Whitehead")) != (23529, 23135):
+                    if (
+                        sum(entry[4] for entry in lines if entry[3] == "Paul Broun"),
+                        sum(entry[4] for entry in lines if entry[3] == "Jim Whitehead"),
+                    ) != (23529, 23135):
                         raise ValueError("2007-07-17: the county rows do not sum to the printed totals")
                     continue
                 inside = False
@@ -202,9 +226,13 @@ def rows() -> list[dict[str, object]]:
                         lines.append((district, "", party(label), person(hit[1]), int(hit[4].replace(",", ""))))
             elif file.suffix == ".xlsx" and state == "MT":
                 grid = sheet(file, fastexcel.read_excel(file).sheet_names[0])
-                start = next(index for index, row in enumerate(grid) if row[0] and "UNITED STATES REPRESENTATIVE" in row[0])
+                start = next(
+                    index for index, row in enumerate(grid) if row[0] and "UNITED STATES REPRESENTATIVE" in row[0]
+                )
                 columns = [
-                    (index, *cell.split("\n")) for index, cell in enumerate(grid[start]) if cell is not None and "\n" in cell
+                    (index, *cell.split("\n"))
+                    for index, cell in enumerate(grid[start])
+                    if cell is not None and "\n" in cell
                 ]
                 sums = dict.fromkeys((entry[1] for entry in columns), 0)
                 for row in grid[start + 1 :]:
@@ -271,7 +299,9 @@ def rows() -> list[dict[str, object]]:
                         continue
                     if not re.search(r"(?i)^(u\.?s\.? )?(representative|house)", cells[1]):
                         continue
-                    hit = re.match(r"^(.*?)(?:\s*(?:-|\()\s*(Rep|Dem|Lib|Ind|NP)\)?)?$", cells[3].strip(), re.I)
+                    hit = re.match(
+                        r"^(.*?)(?:\s*(?:-|\()\s*(Rep|Dem|Lib|Ind|NP)\)?)?$", cells[3].strip(), re.IGNORECASE
+                    )
                     lines.append(
                         (district, cells[0].strip(), party(cells[5]) or party(hit[2]), person(hit[1]), int(cells[6]))
                     )
@@ -279,7 +309,13 @@ def rows() -> list[dict[str, object]]:
                 for record in csv.DictReader(io.StringIO(file.read_text(encoding="utf-8-sig"))):
                     name = record["Candidate Name"] or PENNSYLVANIA_NAMES[day][record["Party Name"]]
                     lines.append(
-                        (district, record["County Name"].title(), party(record["Party Name"]), person(name), int(record["Votes"].replace(",", "")))
+                        (
+                            district,
+                            record["County Name"].title(),
+                            party(record["Party Name"]),
+                            person(name),
+                            int(record["Votes"].replace(",", "")),
+                        )
                     )
         if not lines:
             raise ValueError(f"{day}: no lines read")
@@ -288,7 +324,11 @@ def rows() -> list[dict[str, object]]:
             totals[(line_district, name)] = totals.get((line_district, name), 0) + count
         for line_district in {entry[0] for entry in lines}:
             ranked = sorted(
-                ((name, count) for (current, name), count in totals.items() if current == line_district and name != "Write-ins"),
+                (
+                    (name, count)
+                    for (current, name), count in totals.items()
+                    if current == line_district and name != "Write-ins"
+                ),
                 key=lambda item: -item[1],
             )
             everyone = sum(count for (current, _), count in totals.items() if current == line_district)
@@ -307,7 +347,11 @@ def rows() -> list[dict[str, object]]:
                         "votes": str(count),
                         "outcome": ("Elected" if decided else "Runoff") if name in leaders else "Defeated",
                         "runoff": runoff_day,
-                        "primary": "Democratic" if relative.endswith("countydem.xlsx") else "Republican" if relative.endswith("countyrep.xlsx") else None,
+                        "primary": "Democratic"
+                        if relative.endswith("countydem.xlsx")
+                        else "Republican"
+                        if relative.endswith("countyrep.xlsx")
+                        else None,
                         "manual": mf,
                     }
                 )
@@ -357,8 +401,11 @@ def illinois_rows() -> list[dict[str, object]]:
         body = text[start : text.index("</table>", start)]
         candidates: list[tuple[str, str | None, int]] = []
         printed = 0
-        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.S):
-            cells = [re.sub(r"\s+", " ", re.sub(r"<[^>]*>|&nbsp;", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.DOTALL):
+            cells = [
+                re.sub(r"\s+", " ", re.sub(r"<[^>]*>|&nbsp;", "", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            ]
             if len(cells) < 3:
                 continue
             if cells[0] == "Vote Totals":
@@ -367,13 +414,18 @@ def illinois_rows() -> list[dict[str, object]]:
                 candidates.append((cells[0], party(cells[1]), int(cells[2].replace(",", ""))))
         if sum(count for _, _, count in candidates) != printed:
             raise ValueError(f"{day}: the candidates do not sum to the printed total")
-        names = {name: (person(name) if label is not None or count > 100 else "Write-ins", label) for name, label, count in candidates}
+        names = {
+            name: (person(name) if label is not None or count > 100 else "Write-ins", label)
+            for name, label, count in candidates
+        }
         winner = max(candidates, key=lambda entry: entry[2])[0]
         lines: list[tuple[str, str | None, str, int]] = []
         if election == 49:
             STORED.append(("IL", ILLINOIS_CSV))
             counts: dict[tuple[str, str], int] = {}
-            for record in csv.DictReader(io.StringIO(raw.cached("us.elstats_specials", ILLINOIS_CSV).path.read_text(encoding="utf-8-sig"))):
+            for record in csv.DictReader(
+                io.StringIO(raw.cached("us.elstats_specials", ILLINOIS_CSV).path.read_text(encoding="utf-8-sig"))
+            ):
                 key = (record["CandidateName"], record["JurisName"].replace("CITY OF BLOOMINGTON", "McLEAN"))
                 counts[key] = counts.get(key, 0) + int(record["VoteCount"])
             for (name, county), count in counts.items():
@@ -409,8 +461,11 @@ def illinois_primary_rows() -> list[dict[str, object]]:
         body = text[start : text.index("</table>", start)]
         candidates: list[tuple[str, str, int]] = []
         printed = 0
-        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.S):
-            cells = [re.sub(r"\s+", " ", re.sub(r"<[^>]*>|&nbsp;", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.DOTALL):
+            cells = [
+                re.sub(r"\s+", " ", re.sub(r"<[^>]*>|&nbsp;", "", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            ]
             if len(cells) < 3:
                 continue
             if cells[0] == "Vote Totals":
@@ -423,7 +478,11 @@ def illinois_primary_rows() -> list[dict[str, object]]:
         if election == 48:
             STORED.append(("IL", ILLINOIS_PRIMARY_CSV))
             counts: dict[tuple[str, str, str], int] = {}
-            for record in csv.DictReader(io.StringIO(raw.cached("us.elstats_specials", ILLINOIS_PRIMARY_CSV).path.read_text(encoding="utf-8-sig"))):
+            for record in csv.DictReader(
+                io.StringIO(
+                    raw.cached("us.elstats_specials", ILLINOIS_PRIMARY_CSV).path.read_text(encoding="utf-8-sig")
+                )
+            ):
                 if record["CandidateName"].lower().startswith("write-in"):
                     continue
                 key = (
@@ -433,8 +492,13 @@ def illinois_primary_rows() -> list[dict[str, object]]:
                 )
                 counts[key] = counts.get(key, 0) + int(record["VoteCount"])
             lines = [(name, label, county, count) for (name, label, county), count in counts.items()]
-            for name, label, count in [(person(n), l, c) for n, l, c in candidates if not n.lower().startswith("write-in")]:
-                if any(line[0] == name for line in lines) and sum(line[3] for line in lines if line[0] == name) != count:
+            for name, label, count in [
+                (person(n), l, c) for n, l, c in candidates if not n.lower().startswith("write-in")
+            ]:
+                if (
+                    any(line[0] == name for line in lines)
+                    and sum(line[3] for line in lines if line[0] == name) != count
+                ):
                     raise ValueError(f"{day}: {name} counties do not sum to {count}")
         else:
             lines = [(person(name), label, f"cd:{district}", count) for name, label, count in candidates]

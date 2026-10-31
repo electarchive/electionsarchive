@@ -99,7 +99,9 @@ def emit() -> Path:
             summary="Registered voters and turnout (the vote for the highest office) by state for the 2002 general election from the Election Assistance Commission's published tables",
             polity="US",
         )
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         held = {
             election_id
             for (election_id,) in conn.execute(
@@ -119,9 +121,9 @@ def emit() -> Path:
                     license="Public domain",
                 )
             cs.artifact(raw.cached(SOURCE, url(year)), source)
-            for st, fips, registered, voters in frame.filter(pl.col("year") == year).select(
-                "state", "fips", "registered", "voters"
-            ).iter_rows():
+            for st, fips, registered, voters in (
+                frame.filter(pl.col("year") == year).select("state", "fips", "registered", "voters").iter_rows()
+            ):
                 key = f"{day}:{st}"
                 if key not in elections:
                     print(f"{key}: no election")

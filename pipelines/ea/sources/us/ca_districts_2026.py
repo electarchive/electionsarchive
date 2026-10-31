@@ -16,7 +16,18 @@ SOURCE = "us.ca_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
-COUNTIES = {"06073": "San Diego", "06059": "Orange", "06067": "Sacramento", "06037": "Los Angeles", "06065": "Riverside", "06071": "San Bernardino", "06085": "Santa Clara", "06001": "Alameda", "06013": "Contra Costa", "06019": "Fresno"}
+COUNTIES = {
+    "06073": "San Diego",
+    "06059": "Orange",
+    "06067": "Sacramento",
+    "06037": "Los Angeles",
+    "06065": "Riverside",
+    "06071": "San Bernardino",
+    "06085": "Santa Clara",
+    "06001": "Alameda",
+    "06013": "Contra Costa",
+    "06019": "Fresno",
+}
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
 )
@@ -258,7 +269,8 @@ def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int 
         elif (
             re.match(gap + r"\S", line)
             and not re.match(
-                gap + r"(?:Requirements|Sigs|Declaration|Nomination|Candidate|Code|Incumbent|Appointed|Director|Vacant)",
+                gap
+                + r"(?:Requirements|Sigs|Declaration|Nomination|Candidate|Code|Incumbent|Appointed|Director|Vacant)",
                 line,
             )
             and (re.match(r"\s*$", text[index - 1]) or "Shared with" in text[index - 1])
@@ -399,7 +411,13 @@ ALAMEDA_KEPT = re.compile(r"(?i)water|EBMUD|sanitary|fire|park|health|irrigation
 def alameda() -> list[dict[str, str | int | bool]]:
     rows = []
     text = html.unescape(
-        re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", raw.cached(local_2026.SOURCE, feed("06001")[0]).path.read_text()))
+        re.sub(
+            r"<[^>]+>",
+            "\n",
+            re.sub(
+                r"(?s)<(script|style).*?</\1>", "", raw.cached(local_2026.SOURCE, feed("06001")[0]).path.read_text()
+            ),
+        )
     )
     text = [line.strip() for line in text.splitlines() if line.strip()]
     contest = None
@@ -412,7 +430,9 @@ def alameda() -> list[dict[str, str | int | bool]]:
                 found
                 if found is not None
                 and ALAMEDA_KEPT.search(found["body"])
-                and not re.search(r"(?i)school|college|education|city|unified|congress|assembly|senate|equalization", line)
+                and not re.search(
+                    r"(?i)school|college|education|city|unified|congress|assembly|senate|equalization", line
+                )
                 else None
             )
             seats = int(re.match(r"Vote For: (\d+)", text[index + 2])[1]) if contest is not None else 1
@@ -420,20 +440,29 @@ def alameda() -> list[dict[str, str | int | bool]]:
         if contest is None:
             continue
         name = None
-        if line == "CANDIDATE" and text[index + 1] != "BALLOT DESIGNATION":
-            name = text[index + 1]
-        elif line == "DETAILS" and text[index - 4] == "CANDIDATE":
+        if (
+            line == "CANDIDATE"
+            and text[index + 1] != "BALLOT DESIGNATION"
+            or line == "DETAILS"
+            and text[index - 4] == "CANDIDATE"
+        ):
             name = text[index + 1]
         if name is not None:
             body = ALAMEDA_NAMES.get(contest["body"], contest["body"])
-            seat = f"{'Ward' if contest['kind'] == 'Ward' else 'Area' if contest['kind'] == 'Area' else 'District' if contest['kind'] == 'District' else 'Division'} {contest['number']}" if contest["kind"] else ""
+            seat = (
+                f"{'Ward' if contest['kind'] == 'Ward' else 'Area' if contest['kind'] == 'Area' else 'District' if contest['kind'] == 'District' else 'Division'} {contest['number']}"
+                if contest["kind"]
+                else ""
+            )
             key = (body, seat, name)
             if key not in seen:
                 seen.add(key)
                 rows.append(
                     {
                         "county": "Alameda",
-                        "district": full_name(re.sub(r"\bDist\b", "District", body)) if body == contest["body"] else body,
+                        "district": full_name(re.sub(r"\bDist\b", "District", body))
+                        if body == contest["body"]
+                        else body,
                         "seat": seat or ("Short Term" if contest["short"] else ""),
                         "role": "Director",
                         "seats": seats,
@@ -462,7 +491,14 @@ def contra_costa() -> list[dict[str, str | int | bool]]:
             continue
         parts = re.split(r",\s+|\s+-\s+", title)
         body = parts[0].replace("Mt.", "Mountain")
-        seat = next((f"{match[1]} {match[2]}" for part in parts if (match := re.fullmatch(r"(Division|Area|Ward|Zone) (\d+)", part))), "")
+        seat = next(
+            (
+                f"{match[1]} {match[2]}"
+                for part in parts
+                if (match := re.fullmatch(r"(Division|Area|Ward|Zone) (\d+)", part))
+            ),
+            "",
+        )
         cursor = index + 3
         while cursor < len(text) and not text[cursor].startswith(("Candidates", "Federal")):
             if text[cursor + 1 : cursor + 2] and text[cursor + 1].startswith(("Party Preference", "Non partisan")):
@@ -488,9 +524,20 @@ def contra_costa() -> list[dict[str, str | int | bool]]:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame([*san_diego(), *orange(), *sacramento(), *los_angeles(), *riverside(), *san_bernardino(), *santa_clara(), *alameda(), *contra_costa(), *fresno()]).unique(
-        ["county", "district", "seat", "name"], keep="first", maintain_order=True
-    )
+    frame = pl.DataFrame(
+        [
+            *san_diego(),
+            *orange(),
+            *sacramento(),
+            *los_angeles(),
+            *riverside(),
+            *san_bernardino(),
+            *santa_clara(),
+            *alameda(),
+            *contra_costa(),
+            *fresno(),
+        ]
+    ).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.height, frame.select("county", "district").unique().height)
 

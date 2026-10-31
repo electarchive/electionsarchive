@@ -1,4 +1,6 @@
-import csv, os, sys
+import csv
+import os
+import sys
 
 S = os.environ["OR_WORK"]
 c = sys.argv[1]

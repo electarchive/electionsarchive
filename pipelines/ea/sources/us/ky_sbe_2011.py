@@ -1,6 +1,5 @@
 import json
 import re
-import subprocess
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -35,10 +34,10 @@ PARTIES = {
     "Adam H. Edelen": "DEMOCRATIC",
     "John T. Kemper III": "REPUBLICAN",
     "Kim C. Hay": None,
-    "L.J. \"Todd\" Hollenbach": "DEMOCRATIC",
+    'L.J. "Todd" Hollenbach': "DEMOCRATIC",
     "K.C. Crosbie": "REPUBLICAN",
     "Kenneth C. Moellman Jr.": "LIBERTARIAN",
-    "Robert \"Bob\" Farmer": "DEMOCRATIC",
+    'Robert "Bob" Farmer': "DEMOCRATIC",
     "James R. Comer": "REPUBLICAN",
 }
 METHOD = (
@@ -64,7 +63,9 @@ def parse() -> None:
     rows: list[tuple[str, str, str, int]] = []
     for first, office in OFFICES.items():
         pages = [first + n for n in range(4)]
-        reads = {side: [json.loads((WORK / f"read{side}" / f"{p:02d}.json").read_text()) for p in pages] for side in "AB"}
+        reads = {
+            side: [json.loads((WORK / f"read{side}" / f"{p:02d}.json").read_text()) for p in pages] for side in "AB"
+        }
         names = reads["A"][0]["candidates"]
         width = len(names)
         sheet: list[tuple[str, list[int | None], list[int | None], list[int | None]]] = []
@@ -77,7 +78,9 @@ def parse() -> None:
                     ocr.append((match[1], [int(c) if c else None for c in cells]))
             ours = [r for r in a["rows"]]
             theirs = [r for r in b["rows"]]
-            if [r[0].lower().replace("total votes", "total") for r in ours] != [r[0].lower().replace("total votes", "total") for r in theirs]:
+            if [r[0].lower().replace("total votes", "total") for r in ours] != [
+                r[0].lower().replace("total votes", "total") for r in theirs
+            ]:
                 raise ValueError(f"{office} page {page}: the two reads list different rows")
             by_name = {re.sub(r"[^a-z]", "", n.lower()): v for n, v in ocr}
             for ra, rb in zip(ours, theirs, strict=True):
@@ -87,7 +90,7 @@ def parse() -> None:
         body = [s for s in sheet if "total" not in s[0].lower()]
         if len(body) != 120:
             raise ValueError(f"{office}: {len(body)} counties")
-        printed = [total[1][i] if total[1][i] == total[2][i] else total[1][i] for i in range(width)]
+        printed = [total[1][i] for i in range(width)]
         resolved: dict[tuple[int, int], int] = {}
         loose: list[tuple[int, int, set[int]]] = []
         for r, (county, a, b, c) in enumerate(body):

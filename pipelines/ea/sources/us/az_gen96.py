@@ -43,7 +43,7 @@ def parse() -> None:
     html = raw.cached(SOURCE, URL).path.read_text(errors="replace")
     rows: list[dict[str, object]] = []
     for page in html.split("<!-- URL:")[1:]:
-        title = re.search(r"<TITLE>(.*?)</TITLE>", page, re.S | re.I).group(1).strip()
+        title = re.search(r"<TITLE>(.*?)</TITLE>", page, re.DOTALL | re.IGNORECASE).group(1).strip()
         if title == "U.S. PRESIDENT":
             chamber, district = "president", None
         elif (match := re.fullmatch(r"U\.S\. REPRESENTATIVE IN CONGRESS - DISTRICT NO\. (\d+)", title)) is not None:
@@ -51,8 +51,11 @@ def parse() -> None:
         else:
             continue
         table = [
-            [re.sub(r"\s+", " ", re.sub(r"<[^>]*>", " ", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S | re.I)]
-            for row in re.findall(r"<tr>(.*?)</tr>", page, re.S | re.I)
+            [
+                re.sub(r"\s+", " ", re.sub(r"<[^>]*>", " ", cell)).strip()
+                for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL | re.IGNORECASE)
+            ]
+            for row in re.findall(r"<tr>(.*?)</tr>", page, re.DOTALL | re.IGNORECASE)
         ]
         head = table[0]
         names = [cell.rsplit(" ", 1)[0].rstrip("*").strip() for cell in head[1 : head.index("Precincts")]]

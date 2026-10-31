@@ -60,7 +60,7 @@ def electionware(text: str) -> Iterator[dict[str, Any]]:
     for index, line in enumerate(lines):
         if not re.match(r"^\s*Vote For (\d+)\s*$", line) or index == 0:
             continue
-        title = re.sub(r"^FOR\s+", "", lines[index - 1].strip(), flags=re.I)
+        title = re.sub(r"^FOR\s+", "", lines[index - 1].strip(), flags=re.IGNORECASE)
         choices: list[dict[str, Any]] = []
         cast = None
         for other in lines[index + 1 : index + 80]:
@@ -68,16 +68,29 @@ def electionware(text: str) -> Iterator[dict[str, Any]]:
             if counted := CAST.match(other):
                 cast = int(counted[1].replace(",", ""))
                 break
-            if re.match(r"^(Summary Results Report|Vote For|Election Summary)\b", stripped) or stripped.endswith("Kansas City") and choices:
+            if (
+                re.match(r"^(Summary Results Report|Vote For|Election Summary)\b", stripped)
+                or stripped.endswith("Kansas City")
+                and choices
+            ):
                 break
             row = ROW.match(other)
-            if not row or stripped.startswith(("TOTAL", "Day", "Write-In:", "Not Assigned", "Overvotes", "Undervotes", "Registered")):
+            if not row or stripped.startswith(
+                ("TOTAL", "Day", "Write-In:", "Not Assigned", "Overvotes", "Undervotes", "Registered")
+            ):
                 continue
             name = "Write-ins" if stripped.startswith("Write-In Totals") else row["name"].strip()
-            party = re.match(r"^(DEM|REP|LIB|CON|GRE)\s+(.+)$", name, re.I)
+            party = re.match(r"^(DEM|REP|LIB|CON|GRE)\s+(.+)$", name, re.IGNORECASE)
             if party:
                 name = party[2]
-            choices.append({"text": name, "party": PARTIES[party[1].upper()] if party else None, "total": row["total"].replace(",", ""), "places": []})
+            choices.append(
+                {
+                    "text": name,
+                    "party": PARTIES[party[1].upper()] if party else None,
+                    "total": row["total"].replace(",", ""),
+                    "places": [],
+                }
+            )
         if choices:
             yield {"text": title, "vote_for": int(re.search(r"\d+", line)[0]), "choices": choices, "cast": cast}
 
@@ -90,7 +103,11 @@ def gems(text: str) -> Iterator[dict[str, Any]]:
             continue
         body = [line.rstrip() for line in lines[start + 1 :] if line.strip()]
         split = next(
-            (cut for cut in range(54, 68) if all(len(line) <= cut or line[cut] == " " and line[cut - 1] == " " for line in body)),
+            (
+                cut
+                for cut in range(54, 68)
+                if all(len(line) <= cut or line[cut] == " " and line[cut - 1] == " " for line in body)
+            ),
             None,
         )
         columns = [[line[:split] for line in body], [line[split:] for line in body]] if split else [body]
@@ -107,7 +124,12 @@ def gems(text: str) -> Iterator[dict[str, Any]]:
                     name = "Write-ins" if stripped.startswith("Write-in Votes") else row["name"].strip()
                     party = re.search(r"\s([A-Z]{3})\s+\d+\s+[\d.]+%$", stripped)
                     choices.append(
-                        {"text": name, "party": PARTIES.get(party[1]) if party else None, "total": row["total"], "places": []}
+                        {
+                            "text": name,
+                            "party": PARTIES.get(party[1]) if party else None,
+                            "total": row["total"],
+                            "places": [],
+                        }
                     )
                     continue
                 if counted := re.match(r"^Total Votes\s+(\d+)$", stripped):
@@ -131,7 +153,10 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         if "Summary Results Report" in head:
             parser, title = electionware, re.sub(r"\s+", " ", head.split("\n")[1]).strip()
         elif "Election Summary Report" in head[:200] and "Jurisdiction Wide" in head:
-            parser, title = gems, " ".join(line.strip() for line in head.splitlines()[:8] if "Election" in line and "Report" not in line)
+            parser, title = (
+                gems,
+                " ".join(line.strip() for line in head.splitlines()[:8] if "Election" in line and "Report" not in line),
+            )
         else:
             print(f"{link}: layout not read; skipped")
             continue
@@ -144,7 +169,11 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
         seen: set[str] = set()
         for node in parser(text):
             total = sum(int(choice["total"]) for choice in node["choices"])
-            short = parser is gems and total < (node["cast"] or 0) and not any(c["text"] == "Write-ins" for c in node["choices"])
+            short = (
+                parser is gems
+                and total < (node["cast"] or 0)
+                and not any(c["text"] == "Write-ins" for c in node["choices"])
+            )
             if node["cast"] is not None and total != node["cast"] and not short:
                 print(f"{day} {node['text']}: candidates add to {total}, printed {node['cast']}; skipped")
                 continue

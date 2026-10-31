@@ -20,7 +20,17 @@ CARMARTHENSHIRE = "https://www.sirgar.llyw.cymru/media/1228165/lacharn.pdf"
 NPT = "https://www.npt.gov.uk/32678"
 FLINTSHIRE = "https://www.flintshire.gov.uk/en/PDFFiles/Council-Democracy/Elections-22/SOPN-FCC.pdf"
 WARDS = (
-    (2021, "Shropshire Council", "E06000051", "E05008137", "Albrighton", 1, SHROPSHIRE, NOTICE, (("Nigel Peter Lumby", "conservative"),)),
+    (
+        2021,
+        "Shropshire Council",
+        "E06000051",
+        "E05008137",
+        "Albrighton",
+        1,
+        SHROPSHIRE,
+        NOTICE,
+        (("Nigel Peter Lumby", "conservative"),),
+    ),
     (
         2022,
         "Huntingdonshire District Council",
@@ -76,7 +86,17 @@ WARDS = (
         NOTICE + " The notice prints no party.",
         (("Sonia Helen Reynolds", None), ("Sarah Amber Thomas", None)),
     ),
-    (2022, "Flintshire County Council", "W06000005", "W05001581", "Caerwys", 1, FLINTSHIRE, SOPN, (("Steve Copple", "independent"),)),
+    (
+        2022,
+        "Flintshire County Council",
+        "W06000005",
+        "W05001581",
+        "Caerwys",
+        1,
+        FLINTSHIRE,
+        SOPN,
+        (("Steve Copple", "independent"),),
+    ),
     (
         2022,
         "Flintshire County Council",
@@ -104,7 +124,6 @@ def emit() -> Path:
         def name(entity: UUID, text: str, kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind=kind, is_preferred=kind == "official")
 
-        gb = cs.polity("GB")
         fptp = cs.key("gb.electoral_system", "fptp")
         block = cs.key("gb.electoral_system", "block")
         parties: dict[str, UUID | None] = {"conservative": cs.key(*umit.EXISTING["conservative"]), "independent": None}
@@ -188,7 +207,14 @@ def emit() -> Path:
                 cs.add("person", id=person)
                 name(person, person_name)
                 party = parties[party_key] if party_key is not None else None
-                cs.add("contest_option", id=option, contest_id=contest, kind="candidate", party_id=party, ballot_label=person_name)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=party,
+                    ballot_label=person_name,
+                )
                 cs.add(
                     "candidacy",
                     id=cs.key("gb.leh_unopposed.candidacy", option_key),

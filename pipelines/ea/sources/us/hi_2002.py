@@ -91,7 +91,19 @@ def emit() -> Path:
             image = PAGES / f"{stored.sha256}-1.png"
             if not image.exists():
                 subprocess.run(
-                    ["pdftoppm", "-r", "100", "-f", "1", "-l", "1", "-png", "-singlefile", str(stored.path), str(image.with_suffix(""))],
+                    [
+                        "pdftoppm",
+                        "-r",
+                        "100",
+                        "-f",
+                        "1",
+                        "-l",
+                        "1",
+                        "-png",
+                        "-singlefile",
+                        str(stored.path),
+                        str(image.with_suffix("")),
+                    ],
                     check=True,
                 )
             width, height = Image.open(image).size
@@ -131,7 +143,9 @@ def emit() -> Path:
                 for party, candidate, votes, y in reads
             )
         frame = pl.DataFrame(rows).with_columns(
-            year=pl.col("year").cast(pl.Int32), district=pl.col("district").cast(pl.Int16), measure=pl.col("measure").cast(pl.Int16)
+            year=pl.col("year").cast(pl.Int32),
+            district=pl.col("district").cast(pl.Int16),
+            measure=pl.col("measure").cast(pl.Int16),
         )
         medsl.attach(cs, conn, frame, {"HI": source}, strict=True)
         return cs.write()

@@ -989,7 +989,7 @@ PEOPLE = {
         ("us.alged.person", "35551"),
         ("us.nyc_general.person", "2023-11-07:new-york-city:council-district-20:yu-ching-james-pai"),
     ),
-    "James \"Jamie\" Davis Jr., Tensas Parish police juror, 2023 Louisiana House 21 candidate, and 2026 Senate nominee": (
+    'James "Jamie" Davis Jr., Tensas Parish police juror, 2023 Louisiana House 21 candidate, and 2026 Senate nominee': (
         ("us.sld_specials.person", "LA:james-jamie-davis-jr"),
         ("fec.candidate", "S6LA00615"),
         ("us.la_local.person", "22107:jamie-lil-stump-davis"),

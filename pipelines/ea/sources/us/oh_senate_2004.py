@@ -1,5 +1,5 @@
-import re
 import html
+import re
 from datetime import date
 from pathlib import Path
 
@@ -36,10 +36,12 @@ def parse() -> None:
         }
     tallies: dict[tuple[str, str], int] = {}
     tables = 0
-    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, URL).path.read_text(errors="replace"), re.S | re.I):
+    for row in re.findall(
+        r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, URL).path.read_text(errors="replace"), re.DOTALL | re.IGNORECASE
+    ):
         cells = [
             re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
-            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S | re.I)
+            for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL | re.IGNORECASE)
         ]
         if cells[0] == "Total":
             tables += 1
@@ -79,8 +81,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ohio's 2004 U.S. Senate general by county from the Secretary of State's official "
-            "election returns",
+            summary="Ohio's 2004 U.S. Senate general by county from the Secretary of State's official election returns",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)

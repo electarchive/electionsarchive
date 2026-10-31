@@ -93,8 +93,10 @@ ELECTIONS = {date(1961, 10, 15), date(1983, 11, 6)}
 ENDS = {
     "Hıfzı Oğuz BEKATA": (
         date(1961, 10, 15),
-        "The album dates the membership to 12 October 1975, the end of the member's Senate term; it is closed at "
-        "the 1961 election, at which the member was elected to the Senate.",
+        (
+            "The album dates the membership to 12 October 1975, the end of the member's Senate term; it is closed at "
+            "the 1961 election, at which the member was elected to the Senate."
+        ),
     )
 }
 GROUPS = {

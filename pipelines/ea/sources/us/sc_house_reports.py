@@ -31,7 +31,9 @@ CLARITY_TITLE = "{year} General Election: detail results"
 CODES = {name.upper(): f"45{2 * i + 1:03}" for i, name in enumerate(COUNTIES)}
 TITLE_LINE = re.compile(r"(?:REPRESENTATIVE IN CONGRESS|House of Representatives)\s+DISTRICT\s+0*(\d)", re.IGNORECASE)
 LEGISLATURE_LINE = re.compile(r"(SENATE|HOUS\S*\s+OF\s+\.?R\S*)\s+DISTRICT\s+0*(\d+)\s*$", re.IGNORECASE)
-CLARITY_TITLES = re.compile(r"(U\.S\. House of Representatives|State House of Representatives|State Senate) District (\d+)")
+CLARITY_TITLES = re.compile(
+    r"(U\.S\. House of Representatives|State House of Representatives|State Senate) District (\d+)"
+)
 ROW = re.compile(r"^\s*(\D*?)\s{2,}(?=\S*\d)(\S.*)$")
 SKIP = {"#", "OF", "# OF", "COUNTY", "PRECINCTS"}
 
@@ -159,9 +161,21 @@ def parse() -> None:
                         )
                     )
     for year, ranges in PAGES.items():
-        for legislature, (first, last) in ((False, ranges), *(((True, LEGISLATURE[year]),) if year in LEGISLATURE else ())):
+        for legislature, (first, last) in (
+            (False, ranges),
+            *(((True, LEGISLATURE[year]),) if year in LEGISLATURE else ()),
+        ):
             text = subprocess.run(
-                ["pdftotext", "-layout", "-f", str(first), "-l", str(last), str(raw.cached(CACHE, URL.format(year)).path), "-"],
+                [
+                    "pdftotext",
+                    "-layout",
+                    "-f",
+                    str(first),
+                    "-l",
+                    str(last),
+                    str(raw.cached(CACHE, URL.format(year)).path),
+                    "-",
+                ],
                 capture_output=True,
                 check=True,
                 text=True,
@@ -171,9 +185,20 @@ def parse() -> None:
                 if isinstance(rows, str):
                     print(f"{year} {office} {district}: {rows}, skipped")
                     continue
-                chamber = "house" if office == "house" else f"{'senate' if office == 'senate' else 'house'}:{district}:g"
+                chamber = (
+                    "house" if office == "house" else f"{'senate' if office == 'senate' else 'house'}:{district}:g"
+                )
                 out.extend(
-                    (year, DAYS[year], chamber, district if office == "house" else None, CODES[place], name, writein, votes)
+                    (
+                        year,
+                        DAYS[year],
+                        chamber,
+                        district if office == "house" else None,
+                        CODES[place],
+                        name,
+                        writein,
+                        votes,
+                    )
                     for place, name, writein, votes in rows
                 )
     PARSED.mkdir(parents=True, exist_ok=True)

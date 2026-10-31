@@ -79,7 +79,12 @@ def emit() -> Path:
             title = TITLE.format(day=day)
             source = cs.source(PUBLISHER, title)
             cs.add(
-                "source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=landing,
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=landing,
                 license=LICENSE,
             )
             book = house_books._artifact(sys.modules[__name__], year)
@@ -92,8 +97,13 @@ def emit() -> Path:
                 width, height = rendered.size
             page = cs.page(artifact, number)
             cs.add(
-                "source_page", id=page, artifact_id=artifact, page_number=number,
-                image_key=f"pages/{SOURCE}/{image.name}", width=width, height=height,
+                "source_page",
+                id=page,
+                artifact_id=artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
             )
             ((election, area),) = conn.execute(
                 """select c.election_id, c.district_area_id from contest c
@@ -108,8 +118,14 @@ def emit() -> Path:
             key = f"{day}:NY:proposal:1"
             contest = cs.key("us.contest", key)
             cs.add(
-                "contest", id=contest, election_id=election, kind="ballot_question", district_area_id=area,
-                electoral_system_id=system, round_number=1, default_result_kind="counted",
+                "contest",
+                id=contest,
+                election_id=election,
+                kind="ballot_question",
+                district_area_id=area,
+                electoral_system_id=system,
+                round_number=1,
+                default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
             name = f"{year} New York Proposal One, {PROPOSALS[year]}"
@@ -119,13 +135,25 @@ def emit() -> Path:
             for position, answer in enumerate(("Yes", "No")):
                 options[answer] = cs.key("us.option", f"{key}:{answer.lower()}")
                 cs.add(
-                    "contest_option", id=options[answer], contest_id=contest, kind="answer",
-                    ballot_position=position + 1, ballot_label=answer,
+                    "contest_option",
+                    id=options[answer],
+                    contest_id=contest,
+                    kind="answer",
+                    ballot_position=position + 1,
+                    ballot_label=answer,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", key)
             cs.add(
-                "result_set", id=result_set, election_id=election, contest_id=contest, stage="certified",
-                kind="counted", status="active", source_id=source, is_default=True, completeness=1,
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=BLANK)
             yes = int(rows.filter(pl.col("label") == "Yes")["votes"].sum())
@@ -144,7 +172,13 @@ def emit() -> Path:
                 }
                 cs.add("result_value", **fact, flags=house_books.DIGITIZED, value=votes)
                 cs.add(
-                    "value_locator", **fact, page_id=page, source_id=None,
-                    x0=box[0] / width / 3, y0=box[1] / height / 3, x1=box[2] / width / 3, y1=box[3] / height / 3,
+                    "value_locator",
+                    **fact,
+                    page_id=page,
+                    source_id=None,
+                    x0=box[0] / width / 3,
+                    y0=box[1] / height / 3,
+                    x1=box[2] / width / 3,
+                    y1=box[3] / height / 3,
                 )
         return cs.write()

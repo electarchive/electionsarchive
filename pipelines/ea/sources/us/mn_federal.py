@@ -108,5 +108,11 @@ def emit() -> Path:
         )
         for _, path in FILES:
             cs.artifact(raw.cached(SOURCE, BASE + path), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet").filter(~pl.col("writein")), {"MN": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet").filter(~pl.col("writein")),
+            {"MN": source},
+            strict=True,
+        )
         return cs.write()

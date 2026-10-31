@@ -40,7 +40,9 @@ def fetch() -> None:
             pass
         response = httpx.get(url(year), headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=60)
         response.raise_for_status()
-        raw.store(SOURCE, url(year), response.content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
+        raw.store(
+            SOURCE, url(year), response.content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html"
+        )
 
 
 def parse() -> None:

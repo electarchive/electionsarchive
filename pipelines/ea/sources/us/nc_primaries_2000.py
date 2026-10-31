@@ -54,7 +54,7 @@ def parse() -> None:
         sums = [0] * width
         printed: list[int] | None = None
         for line in lines[2:]:
-            values = [int(cell.replace(",", "")) if cell and cell.strip() else 0 for cell in line[2:2 + width]]
+            values = [int(cell.replace(",", "")) if cell and cell.strip() else 0 for cell in line[2 : 2 + width]]
             if (line[0] or line[1] or "").strip().lower() == "total":
                 printed = values
                 continue

@@ -217,7 +217,9 @@ def emit() -> Path:
                 )
             if winner is not None:
                 cs.add("outcome", result_set_id=result_set, option_id=winner, kind="elected", seats=None)
-            by_precinct = precincts.filter((pl.col("election_date") == day) & pl.col("candidate_name").is_in(list(options)))
+            by_precinct = precincts.filter(
+                (pl.col("election_date") == day) & pl.col("candidate_name").is_in(list(options))
+            )
             if by_precinct.height > 0:
                 precinct_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
                 cs.add(
@@ -232,9 +234,13 @@ def emit() -> Path:
                     is_default=False,
                     completeness=1,
                 )
-                for precinct, candidate, votes in by_precinct.select("division_name", "candidate_name", "votes").iter_rows():
+                for precinct, candidate, votes in by_precinct.select(
+                    "division_name", "candidate_name", "votes"
+                ).iter_rows():
                     precinct_unit = cs.unit("us.precinct", f"{day.year}:VI:{precinct.lower()}")
-                    if precinct_unit in cs.minted and not any(r["id"] == precinct_unit for r in cs.rows.get("reporting_unit", [])):
+                    if precinct_unit in cs.minted and not any(
+                        r["id"] == precinct_unit for r in cs.rows.get("reporting_unit", [])
+                    ):
                         cs.add(
                             "reporting_unit",
                             id=precinct_unit,

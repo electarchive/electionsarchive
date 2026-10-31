@@ -21,7 +21,10 @@ FILES = {
     date(2000, 11, 7): ("20130328145609", "Archives/2000s/2000/2000Gen/2000-GenLeg.pdf"),
     date(2002, 11, 5): ("20090402034340", "archives/2000s/2002/2002-GenLeg.pdf"),
     date(2004, 11, 2): ("20090402033852", "archives/2000s/2004/2004-GenLeg.pdf"),
-    date(2006, 11, 7): ("20090402034119", "archives/2000s/2006/elections/general/2006_Legislative_General_Final_Results.pdf"),
+    date(2006, 11, 7): (
+        "20090402034119",
+        "archives/2000s/2006/elections/general/2006_Legislative_General_Final_Results.pdf",
+    ),
     date(2008, 11, 4): ("20090402034316", "archives/2000s/2008/results/2008_Legislative_General.pdf"),
     date(2010, 11, 2): ("20101219162350", "Archives/2010s/2010/2010_General_Election_Offiical_Legislative_Canvass.pdf"),
 }
@@ -60,7 +63,10 @@ def parse() -> None:
     rows = []
     for day in FILES:
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(day)).path), "-"], capture_output=True, text=True, check=True
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(day)).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
         ).stdout
         chamber: str | None = None
         header: list[str] = []
@@ -74,7 +80,11 @@ def parse() -> None:
                 if line.strip() and not places and not JUNK.search(line):
                     header.append(line)
                 continue
-            cells = [(m.end(), int(m[0].replace(",", ""))) for m in re.finditer(r"\d[\d,]*", line) if m.start() >= match.start(2)]
+            cells = [
+                (m.end(), int(m[0].replace(",", "")))
+                for m in re.finditer(r"\d[\d,]*", line)
+                if m.start() >= match.start(2)
+            ]
             if key(match[1]) in counties:
                 places.append((counties[key(match[1])], cells))
                 continue
@@ -105,7 +115,8 @@ def parse() -> None:
                 else "a column without a name"
                 if not all(names)
                 else f"counties sum to {list(sums.values())}, printed {[value for _, value in cells]}"
-                if list(sums.values()) != [value for _, value in cells] or len(placed) != len({(c, e) for c, e, _ in placed})
+                if list(sums.values()) != [value for _, value in cells]
+                or len(placed) != len({(c, e) for c, e, _ in placed})
                 else None
             )
             if problem:

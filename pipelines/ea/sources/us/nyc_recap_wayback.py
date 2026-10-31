@@ -3,7 +3,6 @@ import os
 import re
 import subprocess
 from collections import Counter, defaultdict
-from datetime import date
 from pathlib import Path
 
 import polars as pl
@@ -189,13 +188,9 @@ def read_page(page: str) -> dict[str, object] | None:
     tail = ("SCAT" in header_text) + (unrec if "VALID" in header_text or not stars else ("SCAT" in header_text))
     first_groups = rows[0][1]
     if stars:
-        counters, valid, candidates = (
-            ([], [], [])
-            if len(first_groups) < 2
-            else (first_groups[0], first_groups[1] if len(first_groups) == 3 else [], first_groups[-1])
-        )
+        candidates = [] if len(first_groups) < 2 else first_groups[-1]
     else:
-        counters, valid, candidates = [], [], first_groups[0]
+        candidates = first_groups[0]
     if not candidates:
         return None
     ncand = len(candidates) - tail
@@ -246,7 +241,9 @@ def read_page(page: str) -> dict[str, object] | None:
         labels.append(
             {
                 "party": (above or party or "").strip(),
-                "name": (" / ".join(below) if TICKETS.search(" ".join(office)) else " ".join(below)).replace("*", "").strip(),
+                "name": (" / ".join(below) if TICKETS.search(" ".join(office)) else " ".join(below))
+                .replace("*", "")
+                .strip(),
                 "code": code,
             }
         )
@@ -343,7 +340,7 @@ def check(group: dict[str, object]) -> list[str]:
     if len(total["cands"]) != len(group["labels"]):
         problems.append(f"{len(total['cands'])} columns for {len(group['labels'])} headers")
     for r in rows:
-        spent = sum(r["cands"]) + sum(r["tail"]) if not group["unrec"] else sum(r["cands"]) + sum(r["tail"])
+        spent = sum(r["cands"]) + sum(r["tail"])
         if r["valid"] is not None and spent != r["valid"]:
             problems.append(f"row {r['label']} columns sum to {spent}, valid {r['valid']}")
     for r in rows:
@@ -476,7 +473,9 @@ def parse() -> None:
                 if signature in slot["seen"]:
                     continue
                 slot["seen"].append(signature)
-                if city_row is None and [(x["code"], x["party"].rpartition(" ")[2]) for x in slot["labels"]] != [(x["code"], x["party"].rpartition(" ")[2]) for x in labels]:
+                if city_row is None and [(x["code"], x["party"].rpartition(" ")[2]) for x in slot["labels"]] != [
+                    (x["code"], x["party"].rpartition(" ")[2]) for x in labels
+                ]:
                     skipped.append(f"{fragment} page {g['page']} {g['office'][:50]}: columns differ between blocks")
                     continue
                 total = city_row or next(r for r in g["rows"] if r["label"] == "TOTAL")
@@ -547,7 +546,9 @@ def parse() -> None:
             chosen = {key: row for key, row in rows.items() if key[0] == district}
             elected = len({row[0] for row in chosen.values() if row[2] == "ELECTED"})
             if office.startswith("JUSTICES OF THE SUPREME COURT"):
-                title = f"JUSTICE OF THE SUPREME COURT ({judicial[county]}TH JUDICIAL DISTRICT), vote for {max(elected, 1)}"
+                title = (
+                    f"JUSTICE OF THE SUPREME COURT ({judicial[county]}TH JUDICIAL DISTRICT), vote for {max(elected, 1)}"
+                )
             elif office.startswith("CIVIL COURT (COUNTY"):
                 title = f"JUDGE OF THE CIVIL COURT - COUNTY ({county.upper()}), vote for {max(elected, 1)}"
             elif office.startswith("CIVIL COURT BY"):
@@ -580,9 +581,7 @@ def parse() -> None:
         county = COUNTY_NAMES[f"{county[1]} COUNTY"]
         head = (f"{url}#{county}", "2003-11-04", "General", county, f"{county} County")
         office = f"PROPOSAL #{proposal[1]}"
-        rows = re.findall(
-            r"^(\w+)\s+(?:\d+\s+){6}\*\s+(\d+)\s+(\d+)\s+\d+\s+(\d+)\s*$", page, re.MULTILINE
-        )
+        rows = re.findall(r"^(\w+)\s+(?:\d+\s+){6}\*\s+(\d+)\s+(\d+)\s+\d+\s+(\d+)\s*$", page, re.MULTILINE)
         body = [row for row in rows if row[0] != "TOTAL"]
         total = next(row for row in rows if row[0] == "TOTAL")
         if (
@@ -594,7 +593,9 @@ def parse() -> None:
             continue
         for label, yes, no, cast in body:
             bid = str(int(re.match(r"\d+", label)[0]))
-            entries.extend([(*head, office, "ad", bid, "YES", None, int(yes)), (*head, office, "ad", bid, "NO", None, int(no))])
+            entries.extend(
+                [(*head, office, "ad", bid, "YES", None, int(yes)), (*head, office, "ad", bid, "NO", None, int(no))]
+            )
             ballots.append((*head, office, "ad", bid, int(cast)))
         totals.append((*head, office, "total", "TOTAL", int(total[1]) + int(total[2])))
     head_schema = {"url": pl.String, "day": pl.String, "kind": pl.String, "county": pl.String, "scope": pl.String}

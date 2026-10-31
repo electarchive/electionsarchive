@@ -1,3 +1,4 @@
+import itertools
 import re
 import subprocess
 from datetime import date, timedelta
@@ -55,7 +56,7 @@ def fetch() -> None:
 def parse() -> None:
     rows = []
     names = {}
-    for day, bounds in DAYS.items():
+    for day in DAYS:
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url(day)).path), "-"],
             capture_output=True,
@@ -64,7 +65,7 @@ def parse() -> None:
         ).stdout.replace("│", " ")
         overs = sorted({match.start() for line in text.splitlines() for match in OVER.finditer(line)})
         starts = [0]
-        for previous, position in zip(overs, overs[1:], strict=False):
+        for previous, position in itertools.pairwise(overs):
             if position > previous + 20:
                 starts.append(position - 8)
         precinct = None

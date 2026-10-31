@@ -104,7 +104,9 @@ def emit() -> Path:
             return plain(words[-1])
 
         source = cs.source(PUBLISHER, TITLE)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE)
+        cs.add(
+            "source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=LANDING, license=LICENSE
+        )
         cs.artifact(raw.cached(SOURCE, URL), source)
         ((area, state_code),) = conn.execute(
             """select u.area_id, u.code from reporting_unit u
@@ -112,7 +114,9 @@ def emit() -> Path:
                join polity p on p.id = t.polity_id and p.iso_code = 'US-WA'
                where u.scheme_code = 'us.state'"""
         ).fetchall()
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
         contests = {
             value
             for (value,) in conn.execute(
@@ -192,7 +196,9 @@ def emit() -> Path:
             for candidate, party, votes in lines.sort("order").select("name", "party", "votes").iter_rows():
                 probe = f"{plain(candidate.split()[0])}|{surname(candidate)}"
                 found = {person for person, seen in people.get(probe, []) if abs(seen - int(year)) <= 16}
-                person = next(iter(found)) if len(found) == 1 else cs.key(f"{SOURCE}.person", f"WA:{slug(candidate)}:{year}")
+                person = (
+                    next(iter(found)) if len(found) == 1 else cs.key(f"{SOURCE}.person", f"WA:{slug(candidate)}:{year}")
+                )
                 if person in cs.minted and person not in made:
                     made.add(person)
                     cs.add("person", id=person)
@@ -228,7 +234,13 @@ def emit() -> Path:
                     value=votes,
                 )
                 totals[option] = votes
-            cs.add("outcome", result_set_id=result_set, option_id=max(totals, key=totals.__getitem__), kind="elected", seats=1)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
             filled += 1
         print(filled, "contests")
         return cs.write()

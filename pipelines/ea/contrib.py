@@ -2939,7 +2939,7 @@ def work() -> bool:
     try:
         result = {**output, **JOBS[kind](proposal, n, requested, output)}
         status = "done"
-    except Exception as error:  # noqa: BLE001 - a failed job is recorded and the worker carries on
+    except Exception as error:
         traceback.print_exc()
         result = {**output, "error": f"{type(error).__name__}: {error}"}
         status = "failed"

@@ -1,0 +1,672 @@
+[analysis]
+allowed-unresolved-imports = ["rdata", "scipy", "skimage.**"]
+
+[[overrides]]
+include = [
+  "ea/sources/br/ibge_setores.py",
+  "ea/sources/br/lineage.py",
+  "ea/sources/ca/taylor.py",
+  "ea/sources/de/landtag.py",
+  "ea/sources/de/tenures.py",
+  "ea/sources/eu/ep2024.py",
+  "ea/sources/eu/ep_cadmus.py",
+  "ea/sources/fr/senatoriales.py",
+  "ea/sources/gb/bcs.py",
+  "ea/sources/gb/byelections.py",
+  "ea/sources/gb/census_weights.py",
+  "ea/sources/gb/counting_areas.py",
+  "ea/sources/gb/dc_local.py",
+  "ea/sources/gb/devolved_tenures.py",
+  "ea/sources/gb/ep_declarations.py",
+  "ea/sources/gb/ep_fptp.py",
+  "ea/sources/gb/ep_uk.py",
+  "ea/sources/gb/euc.py",
+  "ea/sources/gb/leap.py",
+  "ea/sources/gb/leap_scot.py",
+  "ea/sources/gb/leh.py",
+  "ea/sources/gb/leh_unopposed.py",
+  "ea/sources/gb/lineage.py",
+  "ea/sources/gb/london.py",
+  "ea/sources/gb/mayors.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/gb/ni_assembly.py",
+  "ea/sources/gb/ni_bodies.py",
+  "ea/sources/gb/ni_council.py",
+  "ea/sources/gb/ni_mlas.py",
+  "ea/sources/gb/ni_people.py",
+  "ea/sources/gb/ni_scans.py",
+  "ea/sources/gb/ni_wikidata.py",
+  "ea/sources/gb/offices.py",
+  "ea/sources/gb/ons.py",
+  "ea/sources/gb/os.py",
+  "ea/sources/gb/os_1832.py",
+  "ea/sources/gb/parlconst.py",
+  "ea/sources/gb/referendums.py",
+  "ea/sources/gb/scottish_parliament.py",
+  "ea/sources/gb/senedd.py",
+  "ea/sources/gb/senedd_2026.py",
+  "ea/sources/gb/senedd_boundaries.py",
+  "ea/sources/gb/sp_boundaries.py",
+  "ea/sources/gb/tenures.py",
+  "ea/sources/identity.py",
+  "ea/sources/ie/dail.py",
+  "ea/sources/ie/dail_pdf.py",
+  "ea/sources/it/deputati.py",
+  "ea/sources/it/referendum.py",
+  "ea/sources/it/senato.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/it/storico.py",
+  "ea/sources/it/tenures.py",
+  "ea/sources/parlgov.py",
+  "ea/sources/party_merges.py",
+  "ea/sources/tr/artvin_1964.py",
+  "ea/sources/tr/by_elections_1951.py",
+  "ea/sources/tr/die_local.py",
+  "ea/sources/tr/kurucu_meclis.py",
+  "ea/sources/tr/lineage.py",
+  "ea/sources/tr/mayors_1984_1999.py",
+  "ea/sources/tr/mayors_2009_votes.py",
+  "ea/sources/tr/mayors_2014.py",
+  "ea/sources/tr/mayors_2019.py",
+  "ea/sources/tr/mayors_2024.py",
+  "ea/sources/tr/tbmm_1920.py",
+  "ea/sources/tr/tbmm_album.py",
+  "ea/sources/tr/tkgm.py",
+  "ea/sources/tr/tuik_secim.py",
+  "ea/sources/tr/ysk_mayors.py",
+  "ea/sources/tr/ysk_provinces.py",
+  "ea/sources/tr/ysk_reruns.py",
+  "ea/sources/us/ahcb_states.py",
+  "ea/sources/us/ak_enr.py",
+  "ea/sources/us/ak_federal.py",
+  "ea/sources/us/ak_gov_precincts.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/ak_leg.py",
+  "ea/sources/us/ak_primary_2026.py",
+  "ea/sources/us/ak_sovc.py",
+  "ea/sources/us/al_legislature.py",
+  "ea/sources/us/al_measures.py",
+  "ea/sources/us/al_pri_2010.py",
+  "ea/sources/us/al_special_2026.py",
+  "ea/sources/us/algara_federal.py",
+  "ea/sources/us/ar_abstract_1990.py",
+  "ea/sources/us/ar_legislature.py",
+  "ea/sources/us/ar_measures_2026.py",
+  "ea/sources/us/ar_pri_2022.py",
+  "ea/sources/us/ar_runoffs.py",
+  "ea/sources/us/ar_sos_2006.py",
+  "ea/sources/us/ar_specials_2026.py",
+  "ea/sources/us/as_precincts.py",
+  "ea/sources/us/az_gen96.py",
+  "ea/sources/us/az_primaries.py",
+  "ea/sources/us/ballot_text.py",
+  "ea/sources/us/bexar_local.py",
+  "ea/sources/us/ca_ala_sov.py",
+  "ea/sources/us/ca_districts_2026.py",
+  "ea/sources/us/ca_la_sov.py",
+  "ea/sources/us/ca_measures_2026.py",
+  "ea/sources/us/ca_oc_sov.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/ca_pres_minor.py",
+  "ea/sources/us/ca_senate94.py",
+  "ea/sources/us/ca_sov_2000.py",
+  "ea/sources/us/ca_spi_primary.py",
+  "ea/sources/us/cage.py",
+  "ea/sources/us/calendar_2026.py",
+  "ea/sources/us/canvass.py",
+  "ea/sources/us/census.py",
+  "ea/sources/us/clark_nv.py",
+  "ea/sources/us/clerk_president.py",
+  "ea/sources/us/co_tabor_2026.py",
+  "ea/sources/us/cog.py",
+  "ea/sources/us/county_changes.py",
+  "ea/sources/us/county_measures.py",
+  "ea/sources/us/cousub_shapes.py",
+  "ea/sources/us/ct_sos_2010.py",
+  "ea/sources/us/dallas_citysec.py",
+  "ea/sources/us/dc_turnout.py",
+  "ea/sources/us/de_house.py",
+  "ea/sources/us/de_pri_2020.py",
+  "ea/sources/us/de_senate_2010.py",
+  "ea/sources/us/eavs.py",
+  "ea/sources/us/elstats_legislature.py",
+  "ea/sources/us/elstats_pri92.py",
+  "ea/sources/us/elstats_specials.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/enr_2026.py",
+  "ea/sources/us/enr_clarity.py",
+  "ea/sources/us/enr_local_2026.py",
+  "ea/sources/us/fec_2026.py",
+  "ea/sources/us/fec_dates.py",
+  "ea/sources/us/fl_judicial.py",
+  "ea/sources/us/fl_primary_2026.py",
+  "ea/sources/us/fp_canvass.py",
+  "ea/sources/us/ga_boe_2026.py",
+  "ea/sources/us/ga_runoff_2018.py",
+  "ea/sources/us/ga_sos_pages.py",
+  "ea/sources/us/ga_sos_web.py",
+  "ea/sources/us/ga_turnout.py",
+  "ea/sources/us/ga_usrep.py",
+  "ea/sources/us/gov_counties.py",
+  "ea/sources/us/guam_ecar.py",
+  "ea/sources/us/guam_gec_precincts.py",
+  "ea/sources/us/held_precincts.py",
+  "ea/sources/us/hi_county.py",
+  "ea/sources/us/hi_oe.py",
+  "ea/sources/us/house_books.py",
+  "ea/sources/us/houston_citysec.py",
+  "ea/sources/us/il_cook.py",
+  "ea/sources/us/il_cook_dupage_2022.py",
+  "ea/sources/us/il_judicial.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/il_judicial_shapes.py",
+  "ea/sources/us/il_legislature.py",
+  "ea/sources/us/il_measures_2026.py",
+  "ea/sources/us/il_primaries.py",
+  "ea/sources/us/il_specials.py",
+  "ea/sources/us/il_statewide.py",
+  "ea/sources/us/il_turnout.py",
+  "ea/sources/us/in_pri_2000.py",
+  "ea/sources/us/in_pri_9x.py",
+  "ea/sources/us/joco_ks.py",
+  "ea/sources/us/judicial_2026.py",
+  "ea/sources/us/judicial_county_shapes.py",
+  "ea/sources/us/judicial_past_2026.py",
+  "ea/sources/us/kane_2026_merge.py",
+  "ea/sources/us/kane_il.py",
+  "ea/sources/us/kceb.py",
+  "ea/sources/us/ks_amend_counties.py",
+  "ea/sources/us/ks_amendment_2026.py",
+  "ea/sources/us/ks_es.py",
+  "ea/sources/us/ks_primaries.py",
+  "ea/sources/us/ks_retention_counties.py",
+  "ea/sources/us/ks_sos_1988.py",
+  "ea/sources/us/ks_sos_generals.py",
+  "ea/sources/us/ks_sos_primaries.py",
+  "ea/sources/us/ky_leg_pri_2014.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/ky_pri_county.py",
+  "ea/sources/us/ky_recaps.py",
+  "ea/sources/us/ky_sbe_2011.py",
+  "ea/sources/us/ky_supreme.py",
+  "ea/sources/us/ky_usrep.py",
+  "ea/sources/us/la_amendments.py",
+  "ea/sources/us/la_amendments_2026.py",
+  "ea/sources/us/la_congress.py",
+  "ea/sources/us/la_federal.py",
+  "ea/sources/us/la_judicial_2026.py",
+  "ea/sources/us/la_state_2026.py",
+  "ea/sources/us/leg_canvass.py",
+  "ea/sources/us/local_2026.py",
+  "ea/sources/us/local_shapes.py",
+  "ea/sources/us/ma_council.py",
+  "ea/sources/us/ma_empty_contests.py",
+  "ea/sources/us/ma_turnout.py",
+  "ea/sources/us/maricopa.py",
+  "ea/sources/us/mayor_canvass.py",
+  "ea/sources/us/md_manual.py",
+  "ea/sources/us/md_primaries.py",
+  "ea/sources/us/me_cd2_2018.py",
+  "ea/sources/us/me_leg_xlsx.py",
+  "ea/sources/us/me_legislature.py",
+  "ea/sources/us/measure_canvass.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/medsl.py",
+  "ea/sources/us/medsl_local.py",
+  "ea/sources/us/medsl_measures.py",
+  "ea/sources/us/medsl_statewide.py",
+  "ea/sources/us/mf_questions.py",
+  "ea/sources/us/mi_county_2026.py",
+  "ea/sources/us/mi_gen96.py",
+  "ea/sources/us/mi_house8_2022.py",
+  "ea/sources/us/mi_wayne.py",
+  "ea/sources/us/mn_board.py",
+  "ea/sources/us/mn_canvass.py",
+  "ea/sources/us/mn_cd1_2022.py",
+  "ea/sources/us/mn_lrl_primaries.py",
+  "ea/sources/us/mn_manual.py",
+  "ea/sources/us/mn_sos_precincts.py",
+  "ea/sources/us/mo_amendments_2026.py",
+  "ea/sources/us/mo_gov_2004.py",
+  "ea/sources/us/mo_house.py",
+  "ea/sources/us/mo_judicial.py",
+  "ea/sources/us/mo_primaries.py",
+  "ea/sources/us/monroe_ny.py",
+  "ea/sources/us/mp_cec_archive.py",
+  "ea/sources/us/mp_votecnmi.py",
+  "ea/sources/us/ms_lublin.py",
+  "ea/sources/us/ms_pri_scans.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/ms_scan.py",
+  "ea/sources/us/ms_supreme.py",
+  "ea/sources/us/mt_canvass_primaries.py",
+  "ea/sources/us/mt_house.py",
+  "ea/sources/us/mt_primary_2026.py",
+  "ea/sources/us/nc_abstract_1988.py",
+  "ea/sources/us/nc_abstract_1992.py",
+  "ea/sources/us/nc_judicial.py",
+  "ea/sources/us/nc_judicial_shapes.py",
+  "ea/sources/us/nc_trial_2026.py",
+  "ea/sources/us/nc_usrep.py",
+  "ea/sources/us/nd_june_2026.py",
+  "ea/sources/us/nd_local.py",
+  "ea/sources/us/ne_abstract.py",
+  "ea/sources/us/ne_canvass.py",
+  "ea/sources/us/ne_pri_books.py",
+  "ea/sources/us/ne_retention.py",
+  "ea/sources/us/ne_sos.py",
+  "ea/sources/us/ne_towns.py",
+  "ea/sources/us/nh_floterials.py",
+  "ea/sources/us/nh_pri_elstats.py",
+  "ea/sources/us/nh_turnout.py",
+  "ea/sources/us/nj_house.py",
+  "ea/sources/us/nj_house_tallies.py",
+  "ea/sources/us/nj_manual.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/nj_pri_scans.py",
+  "ea/sources/us/nj_statewide.py",
+  "ea/sources/us/nm_usrep.py",
+  "ea/sources/us/nv_federal.py",
+  "ea/sources/us/nv_leg_oe.py",
+  "ea/sources/us/ny_almanac.py",
+  "ea/sources/us/ny_boe.py",
+  "ea/sources/us/ny_boe_federal.py",
+  "ea/sources/us/ny_house_canvass.py",
+  "ea/sources/us/ny_manual.py",
+  "ea/sources/us/ny_onondaga.py",
+  "ea/sources/us/ny_pres_2004.py",
+  "ea/sources/us/ny_pres_2008.py",
+  "ea/sources/us/ny_pri_2000.py",
+  "ea/sources/us/ny_primaries.py",
+  "ea/sources/us/ny_saratoga.py",
+  "ea/sources/us/ny_trib_state.py",
+  "ea/sources/us/ny_westchester.py",
+  "ea/sources/us/nyc_ad_shapes.py",
+  "ea/sources/us/nyc_annual.py",
+  "ea/sources/us/nyc_annual_1914.py",
+  "ea/sources/us/nyc_cfb.py",
+  "ea/sources/us/nyc_eagle.py",
+  "ea/sources/us/nyc_enr.py",
+  "ea/sources/us/nyc_manhattan_ad_shapes.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/nyc_merges.py",
+  "ea/sources/us/nyc_recap.py",
+  "ea/sources/us/nyc_recap_wayback.py",
+  "ea/sources/us/nyc_redbook.py",
+  "ea/sources/us/nyc_trib_ad.py",
+  "ea/sources/us/nyc_wards_early.py",
+  "ea/sources/us/nyc_wards_shapes.py",
+  "ea/sources/us/oc_precincts.py",
+  "ea/sources/us/oe_primaries_2026.py",
+  "ea/sources/us/oe_primary.py",
+  "ea/sources/us/oh_county_1990s.py",
+  "ea/sources/us/oh_cuyahoga_2002.py",
+  "ea/sources/us/oh_franklin.py",
+  "ea/sources/us/oh_hamilton.py",
+  "ea/sources/us/oh_pri_turnout.py",
+  "ea/sources/us/ok_ppp_2016.py",
+  "ea/sources/us/ok_pri_pdf.py",
+  "ea/sources/us/ok_statewide.py",
+  "ea/sources/us/ok_statewide_2026.py",
+  "ea/sources/us/ok_stats.py",
+  "ea/sources/us/or_abstract.py",
+  "ea/sources/us/or_abstract_gaps.py",
+  "ea/sources/us/or_pri_abstract.py",
+  "ea/sources/us/pa_dos_export.py",
+  "ea/sources/us/pa_dos_precincts.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/pa_dos_returns.py",
+  "ea/sources/us/party_labels.py",
+  "ea/sources/us/phila_local.py",
+  "ea/sources/us/phila_questions.py",
+  "ea/sources/us/phila_returns.py",
+  "ea/sources/us/pr_cee_2016_2020.py",
+  "ea/sources/us/pr_cee_colegios.py",
+  "ea/sources/us/pr_cee_governors.py",
+  "ea/sources/us/precinct_shapes.py",
+  "ea/sources/us/primaries.py",
+  "ea/sources/us/ri_count_statewide.py",
+  "ea/sources/us/ri_countbook.py",
+  "ea/sources/us/ri_countbook_fed.py",
+  "ea/sources/us/ri_federal.py",
+  "ea/sources/us/ri_gen_9x.py",
+  "ea/sources/us/ri_gov_senate.py",
+  "ea/sources/us/sc_legislature.py",
+  "ea/sources/us/sc_report.py",
+  "ea/sources/us/sc_statewide.py",
+  "ea/sources/us/sc_usrep.py",
+  "ea/sources/us/sd_leg_pri_2014.py",
+  "ea/sources/us/sd_legislature.py",
+  "ea/sources/us/sd_turnout.py",
+  "ea/sources/us/shelby_tn.py",
+  "ea/sources/us/shelby_tn_2026.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/sld_county_unions.py",
+  "ea/sources/us/sld_land.py",
+  "ea/sources/us/sld_primaries_2026.py",
+  "ea/sources/us/sld_shapes.py",
+  "ea/sources/us/sld_shapes_2000.py",
+  "ea/sources/us/sos_measure_files.py",
+  "ea/sources/us/sos_measures.py",
+  "ea/sources/us/special_2025.py",
+  "ea/sources/us/special_counties.py",
+  "ea/sources/us/special_files.py",
+  "ea/sources/us/special_inbox.py",
+  "ea/sources/us/special_nc.py",
+  "ea/sources/us/special_nm_1997.py",
+  "ea/sources/us/special_pdfs.py",
+  "ea/sources/us/statewide_gaps.py",
+  "ea/sources/us/statewide_offices.py",
+  "ea/sources/us/statewide_totals.py",
+  "ea/sources/us/statute_district_shapes.py",
+  "ea/sources/us/swdb_precincts.py",
+  "ea/sources/us/swdb_sov.py",
+  "ea/sources/us/tn_gen_98.py",
+  "ea/sources/us/trial_retention.py",
+  "ea/sources/us/tribune_president.py",
+  "ea/sources/us/tx_collin.py",
+  "ea/sources/us/tx_ellis.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/tx_hidalgo.py",
+  "ea/sources/us/tx_house_canvass.py",
+  "ea/sources/us/tx_primaries_2026.py",
+  "ea/sources/us/tx_sos.py",
+  "ea/sources/us/tx_tarrant.py",
+  "ea/sources/us/usrep_county.py",
+  "ea/sources/us/ut_house.py",
+  "ea/sources/us/ut_pri_pdf.py",
+  "ea/sources/us/va_pri_turnout.py",
+  "ea/sources/us/vi_archive.py",
+  "ea/sources/us/vi_precincts.py",
+  "ea/sources/us/vi_recap_1978.py",
+  "ea/sources/us/vt_turnout.py",
+  "ea/sources/us/wa_county_2026.py",
+  "ea/sources/us/wa_county_archive.py",
+  "ea/sources/us/wa_initiatives.py",
+  "ea/sources/us/wa_pamphlets.py",
+  "ea/sources/us/wa_pri_turnout.py",
+  "ea/sources/us/wa_writeins_2016.py",
+  "ea/sources/us/wi_gen_9498.py",
+  "ea/sources/us/wi_judicial.py",
+  "ea/sources/us/wi_pri_0008.py",
+  "ea/sources/us/wi_pri_9498.py",
+  "ea/sources/us/wi_primaries.py",
+  "ea/sources/us/wi_seb_leg_2004.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"
+
+[[overrides]]
+include = [
+  "ea/sources/us/wi_seb_primaries.py",
+  "ea/sources/us/wikipedia_as_governors.py",
+  "ea/sources/us/wikipedia_caucuses.py",
+  "ea/sources/us/wikipedia_governors.py",
+  "ea/sources/us/wikipedia_guam_governors.py",
+  "ea/sources/us/wikipedia_house_specials.py",
+  "ea/sources/us/wikipedia_measures.py",
+  "ea/sources/us/wikipedia_pr_commissioners.py",
+  "ea/sources/us/wikipedia_pr_governors.py",
+  "ea/sources/us/wikipedia_vi_governors.py",
+  "ea/sources/us/wv_hist_primaries.py",
+  "ea/sources/us/wv_judicial.py",
+  "ea/sources/us/wv_kanawha.py",
+  "ea/sources/us/wy_leg_2006.py",
+  "ea/sources/us/wyco_ks.py",
+  "ea/sources/wikidata_members.py",
+  "ea/tools/oregon/model.py",
+  "ea/tools/oregon/ocrall.py",
+  "ea/tools/oregon/recon.py",
+  "ea/tools/oregon/scan3.py",
+  "ea/tools/oregon/sweep.py",
+  "ea/tools/oregon/tw.py",
+  "ea/tools/oregon/walcells2.py",
+]
+
+[overrides.rules]
+conflicting-declarations = "ignore"
+index-out-of-bounds = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+invalid-return-type = "ignore"
+no-matching-overload = "ignore"
+not-iterable = "ignore"
+not-subscriptable = "ignore"
+redundant-condition = "ignore"
+unresolved-attribute = "ignore"
+unsupported-operator = "ignore"

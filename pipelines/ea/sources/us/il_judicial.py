@@ -21,9 +21,7 @@ OFFICE = re.compile(r"(\d)(?:ST|ND|RD|TH) (SUPREME|APPELLATE) - (RETAIN )?(.+?)(
 TITLES = {"SUPREME": "Justice of the Supreme Court", "APPELLATE": "Judge of the Appellate Court"}
 ORDINALS = ["1st", "2nd", "3rd", "4th", "5th"]
 PARTIES = {"DEM": "democratic-party", "REP": "republican-party"}
-TOKEN_2024 = (
-    "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Ze1iXEwZay4hPK3eAEa%2f2wcdY8MIeoGR35CWU7WliVnSXlUFjPNH9IqQEvIK0RTUwKYWFeGJqXSz"
-)
+TOKEN_2024 = "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Ze1iXEwZay4hPK3eAEa%2f2wcdY8MIeoGR35CWU7WliVnSXlUFjPNH9IqQEvIK0RTUwKYWFeGJqXSz"
 METHOD = (
     "A retention election asks whether a sitting judge should stay in office, with Yes and No as the only answers. "
     "The judge keeps the seat when Yes reaches three-fifths of the Yes and No votes."
@@ -115,10 +113,6 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '17%%'"""
             ).fetchall()
         }
-        state_area = conn.execute(
-            """select u.area_id from polity p join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
-               where p.iso_code = 'US-IL'"""
-        ).fetchone()[0]
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/il/%%'").fetchall()}
         fptp = cs.key("us.electoral_system", "fptp")
         retention_system = cs.key("us.electoral_system", "retention")
@@ -132,7 +126,13 @@ def emit() -> Path:
             if found is not None and (found[1] == text or found[2] != SOURCE):
                 return
             if found is not None:
-                cs.add("name_drop", name_id=found[0], entity_id=entity, text=found[1], reason="Name restyled from the official all-caps line")
+                cs.add(
+                    "name_drop",
+                    name_id=found[0],
+                    entity_id=entity,
+                    text=found[1],
+                    reason="Name restyled from the official all-caps line",
+                )
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         names: dict[str, str] = {}
@@ -172,7 +172,9 @@ def emit() -> Path:
             for judge, group in by_judge.items():
                 contests.append((day, district, court, True, "", judge, group))
         made = 0
-        for day, district, court, retention, seat, judge, group in sorted(contests, key=lambda item: (item[0], item[2], item[1], item[4], item[5])):
+        for day, district, court, retention, seat, judge, group in sorted(
+            contests, key=lambda item: (item[0], item[2], item[1], item[4], item[5])
+        ):
             title = TITLES[court]
             year = day.year
             office_key = f"{slug(title)}:IL"
@@ -181,7 +183,14 @@ def emit() -> Path:
                 offices.add(office)
                 if office in cs.minted:
                     cs.add("office", id=office, polity_id=cs.polity("US-IL"), kind="other")
-                    cs.add("name", entity_id=office, text=f"{title} of Illinois", lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "name",
+                        entity_id=office,
+                        text=f"{title} of Illinois",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
             if retention:
                 first, last = identity(judge)
                 person_key = f"IL:{slug(first)}-{slug(last)}"

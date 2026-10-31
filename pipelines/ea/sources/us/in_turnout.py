@@ -28,7 +28,10 @@ def listing() -> dict[tuple[int, str], str]:
     html = raw.cached(SOURCE, PAGE).path.read_text(errors="replace")
     files = {}
     for href, label in re.findall(r"(?s)<a [^>]*href=\"(/dA/[^\"]+)\"[^>]*>(.*?)</a>", html):
-        match = re.match(r"(\d{4})\s+(Primary|General) Election", re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", "", label))).strip())
+        match = re.match(
+            r"(\d{4})\s+(Primary|General) Election",
+            re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", "", label))).strip(),
+        )
         if match and int(match[1]) % 2 == 0 and int(match[1]) < 2026:
             files["https://www.in.gov" + unescape(href)] = (int(match[1]), match[2].lower())
     return {v: k for k, v in files.items()}
@@ -47,7 +50,14 @@ def fetch() -> None:
             pass
         response = httpx.get(address, headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=120)
         response.raise_for_status()
-        raw.store(SOURCE, address, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        raw.store(
+            SOURCE,
+            address,
+            response.content,
+            suffix=".pdf",
+            retrieved_at=datetime.now(UTC),
+            media_type="application/pdf",
+        )
 
 
 def parse() -> None:
@@ -61,7 +71,12 @@ def parse() -> None:
         }
     rows = []
     for (year, stage), address in sorted(listing().items()):
-        text = subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, address).path), "-"], capture_output=True, text=True, check=True).stdout
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, address).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
         found = {}
         state = None
         for line in text.replace("\x0c", "\n").splitlines():
@@ -79,9 +94,13 @@ def parse() -> None:
                     print(f"{year} {stage}: skipped {match[1]!r} {registered} {voters}")
                 continue
             found[codes[close[0]]] = (registered, voters)
-        print(f"{year} {stage}: {len(found)} counties {sum(v[0] for v in found.values())}/{sum(v[1] for v in found.values())}")
+        print(
+            f"{year} {stage}: {len(found)} counties {sum(v[0] for v in found.values())}/{sum(v[1] for v in found.values())}"
+        )
         got = (sum(v[0] for v in found.values()), sum(v[1] for v in found.values()))
-        agrees = state is None or (abs(got[0] - state[0]) <= state[0] // 1000 and abs(got[1] - state[1]) <= state[1] // 1000)
+        agrees = state is None or (
+            abs(got[0] - state[0]) <= state[0] // 1000 and abs(got[1] - state[1]) <= state[1] // 1000
+        )
         print(f"  state row {state} {'agrees' if agrees else 'DISAGREES'}")
         if len(found) >= 88 and agrees:
             for code, (registered, voters) in found.items():
@@ -118,7 +137,15 @@ def emit() -> Path:
         title = "Voter Registration and Turnout Statistics"
         source = cs.source(PUBLISHER, title)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=PAGE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=PAGE,
+                license="Public record",
+            )
         for (year, stage), rows in frame.group_by("year", "stage", maintain_order=True):
             found = elections.get((year, stage), [])
             if len(found) != 1:

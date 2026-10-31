@@ -32,7 +32,9 @@ def pages() -> Iterator[tuple[str, str]]:
 
 def reports(page: str) -> list[str]:
     body = raw.cached(SOURCE, page).path.read_text(errors="replace")
-    found = [urljoin(SITE, html.unescape(link)) for link in re.findall(r'href="([^"]*\.pdf)"', body, flags=re.I)]
+    found = [
+        urljoin(SITE, html.unescape(link)) for link in re.findall(r'href="([^"]*\.pdf)"', body, flags=re.IGNORECASE)
+    ]
     named = [link for link in dict.fromkeys(found) if CUMULATIVE.fullmatch(link.rsplit("/", 1)[-1])]
     return sorted(named, key=lambda link: link.rsplit("/", 1)[-1].lower() != "cumulative.pdf")[:1]
 
@@ -55,9 +57,9 @@ def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]
             day = datetime.strptime(f"{found['month']} {found['day']} {found['year']}", "%B %d %Y").date()
             for report in reports(page):
                 path = raw.cached(SOURCE, quote(report, safe=":/%")).path
-                text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode(
-                    errors="replace"
-                )
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True
+                ).stdout.decode(errors="replace")
                 nodes = []
                 for node in tx_harris.contests(text):
                     node["text"] = tx_harris.normalize(node["text"])

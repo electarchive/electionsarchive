@@ -60,16 +60,27 @@ def fetch() -> None:
             raw.cached(SOURCE, url)
         except LookupError:
             if file is None:
-                content = subprocess.run(["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True).stdout
+                content = subprocess.run(
+                    ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                ).stdout
                 retrieved = datetime.now(UTC)
             else:
                 path = MANUAL / file
                 content = path.read_bytes()
                 retrieved = datetime.fromtimestamp(path.stat().st_mtime, UTC)
-            raw.store(SOURCE, url, content, suffix=suffix, retrieved_at=retrieved, media_type="application/pdf" if suffix == ".pdf" else "text/html")
+            raw.store(
+                SOURCE,
+                url,
+                content,
+                suffix=suffix,
+                retrieved_at=retrieved,
+                media_type="application/pdf" if suffix == ".pdf" else "text/html",
+            )
 
 
-SCHOOL = re.compile(r"((?:[A-Z][\w\-]+ )+?(?:Combined |Community Unit |Township High |Elementary |Unit |Community High )?(?:School|Community College) District (?:Number|No\.) ?\d+\w*)")
+SCHOOL = re.compile(
+    r"((?:[A-Z][\w\-]+ )+?(?:Combined |Community Unit |Township High |Elementary |Unit |Community High )?(?:School|Community College) District (?:Number|No\.) ?\d+\w*)"
+)
 
 
 def full_name(entity: str, wording: str) -> str:
@@ -80,7 +91,9 @@ def full_name(entity: str, wording: str) -> str:
 
 
 def pdf_text(url: str) -> str:
-    return subprocess.run(["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True).stdout
+    return subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
 
 
 def page_text(url: str) -> str:
@@ -88,7 +101,11 @@ def page_text(url: str) -> str:
 
 
 def cook_rows() -> list[dict[str, str]]:
-    cells = re.findall(r'<span translate="no">(.*?)</span></div><div[^>]*grow="3">(.*?)</div></div>', page_text(COUNTIES["17031"][0]), re.S)
+    cells = re.findall(
+        r'<span translate="no">(.*?)</span></div><div[^>]*grow="3">(.*?)</div></div>',
+        page_text(COUNTIES["17031"][0]),
+        re.DOTALL,
+    )
     rows = []
     for head, wording in cells:
         entity, label = html.unescape(head).split(", ", 1)
@@ -99,11 +116,17 @@ def cook_rows() -> list[dict[str, str]]:
 def mclean_rows() -> list[dict[str, str]]:
     page = page_text(COUNTIES["17113"][0])
     heads = re.findall(r'data-tabname="([^"]+)"', page)
-    wordings = re.findall(r"<p>(.+?)</p><ul[^>]*><li><strong>YES", page, re.S)
+    wordings = re.findall(r"<p>(.+?)</p><ul[^>]*><li><strong>YES", page, re.DOTALL)
     rows = []
     for head, wording in zip(heads, wordings, strict=True):
         entity, label = html.unescape(head).split(" - ", 1)
-        rows.append({"entity": entity.strip(), "label": label.strip(), "wording": re.sub(r"\s+", " ", html.unescape(wording)).strip().strip("\"“”")})
+        rows.append(
+            {
+                "entity": entity.strip(),
+                "label": label.strip(),
+                "wording": re.sub(r"\s+", " ", html.unescape(wording)).strip().strip('"“”'),
+            }
+        )
     return rows
 
 
@@ -126,7 +149,7 @@ def mchenry_rows() -> list[dict[str, str]]:
             rows[-1]["wording"] = block
     for row in rows:
         row["label"] = next(label for key, label in MCHENRY_LABELS if key in row["label"])
-        row["wording"] = row["wording"].strip("\"")
+        row["wording"] = row["wording"].strip('"')
     return rows
 
 
@@ -134,10 +157,13 @@ def parse() -> None:
     text = pdf_text(COUNTIES["17201"][0])
     text = re.sub(r"(?m)^(\s*)(YES|NO)\s*$", "", text)
     text = re.sub(r"(?m)\s{20,}(YES|NO)\s*$", "", text)
-    parts = re.split(r"(?m)^\s*(NON-BINDING ADVISORY PUBLIC QUESTION CONCERNING[^\n]*(?:\n\s+[A-Z ]+(?=\n))?|PROPOSITION TO INCREASE THE PROPERTY TAX LIMITING RATE)\s*$", text)
+    parts = re.split(
+        r"(?m)^\s*(NON-BINDING ADVISORY PUBLIC QUESTION CONCERNING[^\n]*(?:\n\s+[A-Z ]+(?=\n))?|PROPOSITION TO INCREASE THE PROPERTY TAX LIMITING RATE)\s*$",
+        text,
+    )
     rows = []
     for head, body in zip(parts[1::2], parts[2::2], strict=True):
-        quote = re.search(r"[“\"](.+?\?)[”\"]", body, re.S)
+        quote = re.search(r"[“\"](.+?\?)[”\"]", body, re.DOTALL)
         wording = re.sub(r"\s+", " ", quote[1]).replace("NON- ", "NON-").strip()
         if head.startswith("PROPOSITION"):
             wording = re.sub(r"\s+", " ", body.split("I hereby certify")[0]).strip()
@@ -145,7 +171,9 @@ def parse() -> None:
             label = "Proposition to Increase the Property Tax Limiting Rate"
         else:
             entity = "Winnebago County"
-            label = re.sub(r"\s+", " ", head.replace("NON-BINDING ADVISORY PUBLIC QUESTION CONCERNING", "")).strip().title()
+            label = (
+                re.sub(r"\s+", " ", head.replace("NON-BINDING ADVISORY PUBLIC QUESTION CONCERNING", "")).strip().title()
+            )
             label = f"Advisory Question: {label}"
         wording = re.sub(r"\s+", " ", re.sub(r"(?<=\s)(YES|NO)(?=\s)", " ", wording)).strip()
         rows.append({"entity": entity, "label": label, "wording": wording})
@@ -199,7 +227,9 @@ def emit() -> Path:
                 option = f"special:{row['county']}:{entity}"
             elif county_key in found:
                 county, county_area, _, county_path, county_code = found[county_key]
-                minted = govmint.special(conn, cs, "IL", (county, county_area, county_path, county_code), entity, civil.slugs)
+                minted = govmint.special(
+                    conn, cs, "IL", (county, county_area, county_path, county_code), entity, civil.slugs
+                )
                 if minted is not None:
                     option = f"special:{row['county']}:{entity}"
                     found[option] = minted
@@ -222,7 +252,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="scheduled",
                 )
-                cs.add("name", entity_id=election, text=f"{DAY.year} {place} general election", lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "name",
+                    entity_id=election,
+                    text=f"{DAY.year} {place} general election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
                 cs.add("slug", path=f"{path}/{DAY}-general", entity_id=election)
             label = row["label"]
             contest_key = f"{DAY}:IL:{code}:measure:{slug(label)}"
@@ -243,7 +280,14 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
-            cs.add("name", entity_id=contest, text=f"{DAY.year} {place}: {label}", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=contest,
+                text=f"{DAY.year} {place}: {label}",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
             for position, answer in enumerate(("Yes", "No")):

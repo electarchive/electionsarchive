@@ -36,9 +36,11 @@ def lines() -> list[dict[str, object]]:
             continue
         text = raw.cached(fl_sos.SOURCE, fl_sos.EXTRACT.format(day=day)).path.read_bytes().decode("cp1252")
         frame = pl.read_csv(io.BytesIO(text.encode()), separator="\t", infer_schema_length=0, quote_char=None)
-        for race, desc, county, answer, votes in frame.filter(pl.col("RaceCode").str.contains(r"^SC\d$")).select(
-            "RaceCode", "OfficeDesc", "CountyName", "CanNameLast", "CanVotes"
-        ).iter_rows():
+        for race, desc, county, answer, votes in (
+            frame.filter(pl.col("RaceCode").str.contains(r"^SC\d$"))
+            .select("RaceCode", "OfficeDesc", "CountyName", "CanNameLast", "CanVotes")
+            .iter_rows()
+        ):
             match = SHALL.fullmatch(desc.strip())
             if match is None:
                 raise ValueError(f"{day} {race}: {desc}")
@@ -108,7 +110,14 @@ def emit() -> Path:
         office = cs.key("us.office", office_key)
         if office in cs.minted:
             cs.add("office", id=office, polity_id=cs.polity("US-FL"), kind="other")
-            cs.add("name", entity_id=office, text=f"{TITLE_OFFICE} of Florida", lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "name",
+                entity_id=office,
+                text=f"{TITLE_OFFICE} of Florida",
+                lang="en",
+                kind="official",
+                is_preferred=True,
+            )
         groups: dict[tuple[date, str], list[dict[str, object]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["judge"]))].append(row)
