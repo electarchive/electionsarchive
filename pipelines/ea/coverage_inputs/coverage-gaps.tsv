@@ -4,7 +4,6 @@
 polity	state	level	stage	years	grain	label	ids	category	reason	sources	checked	ref
 us	AL		primary	2004-2014	county	Federal primaries		known_gap	Alabama's certified results for these primaries are party filings or image scans with no county breakdown.	Alabama Secretary of State election pages; OpenElections	2026-10-29	
 us	NM	president	primary	2020	county	Libertarian presidential primary	01a13c59-fd8b-7665-8770-55b14c06e575	known_gap	The state's export lists every county as zero or suppressed for this primary.	New Mexico ElectionStats export	2026-10-29	
-us	NH	president	primary	2016-2024	county	Presidential primaries		known_gap	The town results came only from a compilation whose terms bar redistribution, so they were withdrawn; the Secretary of State's town files have not yet been loaded.	New Hampshire Secretary of State election results pages	2026-10-31	
 us	SC	us_house	special	2017	county	SC-5 special	e0c65392-ba6e-5e0a-a97f-6dcce832df03	known_gap	No county table has been found for this special election.	state election office results pages; OpenElections	2026-10-29	
 us	GA	us_house	special	2020	county	GA-5 special	a877d638-7c6a-5c89-9fb2-db2cb6a656cb	known_gap	No county table has been found for this special election.	state election office results pages; OpenElections	2026-10-29	
 us	CA	us_house		2024	county	CA-20 special and special runoff	db8af5ba-c8a6-5ab4-ac96-06993e7cb86f 8189be97-3f41-512a-a853-75d0cd0c3460	known_gap	No county table has been found for this special election.	state election office results pages; OpenElections	2026-10-29	
