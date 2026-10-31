@@ -3499,16 +3499,22 @@ async function tabulate(
   });
   const top = Math.max(0, ...stacked) + 1;
   const tier = stacked.map((n, index) => ((rows[index]?.k ?? 0) < 0 ? top : n));
+  const rooted = new Set(roots);
   const [now, then] = await Promise.all([
     Promise.all(
       Array.from({ length: top + 1 }, async (_, n) => {
         const batch = rows.filter((_row, index) => tier[index] === n);
+        const owners = batch.map((row) => row.owner);
         return load(
           roots,
           batch.map((row) => row.k),
           date ?? "infinity",
           [],
-          batch.flatMap((row) => (row.owner == null ? [] : [row.owner])),
+          owners.every(
+            (owner): owner is string => owner != null && rooted.has(owner),
+          )
+            ? owners
+            : [],
           round,
           n === top ? "pool" : facts,
         );
@@ -5995,12 +6001,13 @@ export const contests = {
           select distinct s.publisher, s.title, s.url
           from source s
           where s.id in (
-            select ct.source_id from citation ct
-            where ct.entity_id = ${contest.id}::uuid or ct.entity_id in (
-              select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
-              where o.contest_id = ${contest.id}::uuid
-            )
-          ) or s.id in (
+            select ct.source_id from citation ct where ct.entity_id = ${contest.id}::uuid
+            union all
+            select ct.source_id from contest_option o
+            join candidacy cy on cy.option_id = o.id
+            join citation ct on ct.entity_id = cy.id
+            where o.contest_id = ${contest.id}::uuid
+            union all
             select l.source_id from label l where l.entity_id = ${contest.id}::uuid and l.kind = 'ballot'
           )
           order by s.publisher, s.title
