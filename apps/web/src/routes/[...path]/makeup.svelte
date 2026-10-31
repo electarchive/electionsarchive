@@ -1086,7 +1086,7 @@
         {/if}
         {#if part.late > 0}
           <li class="flex items-center justify-between gap-3">
-            <span class="flex min-inline-0 items-center gap-1.5">
+            <span class="flex items-center gap-1.5 min-inline-0">
               <span
                 class="shrink-0 rounded-xs bg-muted block-2.5 inline-2.5"
                 style:background-image={UNDATED}

@@ -140,6 +140,9 @@ export default antfu({
     "packages/db/migrations/**/*",
     "packages/db/src/core.ts",
     "packages/db/src/core-relations.ts",
+    ".agents/**/*",
+    ".playwright-mcp/**/*",
+    "pipelines/**/*",
   ],
 })
   .append(pluginQuery.configs["flat/recommended-strict"])

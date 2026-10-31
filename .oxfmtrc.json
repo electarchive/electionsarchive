@@ -21,6 +21,10 @@
     "apps/landing/og-data.js",
     "apps/landing/public/showcase",
     "apps/landing/public/photos",
-    "packages/db/src/core-relations.ts"
+    "packages/db/src/core-relations.ts",
+    ".agents",
+    "pipelines",
+    "apps/web/src/lib/server/hex/*.json",
+    "packages/engine/rules.schema.json"
   ]
 }

@@ -58,7 +58,11 @@
     ends?: Array<{
       party: string;
       on: string;
-      kind: "closed_by_court" | "closed_by_government" | "merged_into" | "absorbed_by";
+      kind:
+        | "closed_by_court"
+        | "closed_by_government"
+        | "merged_into"
+        | "absorbed_by";
     }>;
     present?: Set<unknown> | null;
     title?: string;

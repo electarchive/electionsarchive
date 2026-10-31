@@ -416,9 +416,7 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": [
-        "rankOrdinal"
-      ],
+      "selectors": ["rankOrdinal"],
       "match": {
         "rankOrdinal=one": "{rank}st best for {name} of {count} {nouns} abroad",
         "rankOrdinal=two": "{rank}nd best for {name} of {count} {nouns} abroad",
@@ -1642,9 +1640,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} member",
         "countPlural=*": "{countText} members"
@@ -1727,7 +1723,11 @@
   ],
   "person_faithless": [
     {
-      "declarations": ["input count", "input states", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "input states",
+        "local countPlural = count: plural"
+      ],
       "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Received {count} electoral vote from a faithless elector in {states}",
@@ -1737,7 +1737,11 @@
   ],
   "person_electors": [
     {
-      "declarations": ["input count", "input states", "local countPlural = count: plural"],
+      "declarations": [
+        "input count",
+        "input states",
+        "local countPlural = count: plural"
+      ],
       "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "Received {count} electoral vote in {states}",
@@ -2468,9 +2472,48 @@
   "edit_results_invalid": "Enter numbers only, such as 1234.",
   "edit_results_discard": "Discard figures",
   "edit_results_fold": "These figures came from {pipeline}. Once approved, your correction is published when that loader reruns with it.",
-  "edit_results_hidden": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} figure broken down by voting method or count round isn't shown here.", "countPlural=*": "{countText} figures broken down by voting method or count round aren't shown here."}}],
-  "edit_results_mismatch": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} place where the candidates don't add up to valid votes", "countPlural=*": "{countText} places where the candidates don't add up to valid votes"}}],
-  "edit_results_changed": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} figure changed", "countPlural=*": "{countText} figures changed"}}],
+  "edit_results_hidden": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} figure broken down by voting method or count round isn't shown here.",
+        "countPlural=*": "{countText} figures broken down by voting method or count round aren't shown here."
+      }
+    }
+  ],
+  "edit_results_mismatch": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} place where the candidates don't add up to valid votes",
+        "countPlural=*": "{countText} places where the candidates don't add up to valid votes"
+      }
+    }
+  ],
+  "edit_results_changed": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} figure changed",
+        "countPlural=*": "{countText} figures changed"
+      }
+    }
+  ],
   "edit_preferred": "Preferred",
   "edit_shown": "Shown as the page title",
   "edit_no_source": "No source recorded",
@@ -2490,9 +2533,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} change, reviewed by the editorial desk",
         "countPlural=*": "{countText} changes, reviewed by the editorial desk"
@@ -2684,7 +2725,20 @@
   "proposal_changes": "Changes",
   "proposal_evidence": "Evidence",
   "proposal_checks_passed": "All checks passed",
-  "proposal_findings": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} finding to review", "countPlural=*": "{countText} findings to review"}}],
+  "proposal_findings": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} finding to review",
+        "countPlural=*": "{countText} findings to review"
+      }
+    }
+  ],
   "proposal_truncated": "Showing the first 2,000 changes.",
   "proposal_state_awaiting_fold": "Approved, waiting for the loader rerun",
   "proposal_state_fold_mismatch": "Approved, rerun doesn't match",
@@ -2712,8 +2766,35 @@
   "measure_voters": "Voters",
   "measure_present": "Present",
   "measure_seats": "Seats",
-  "proposal_fold_mismatch": [{"declarations": ["input count", "input pipeline", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "The rerun of {pipeline} differs from this correction in {countText} figure. The proposal stays approved until the loader is fixed and rerun.", "countPlural=*": "The rerun of {pipeline} differs from this correction in {countText} figures. The proposal stays approved until the loader is fixed and rerun."}}],
-  "proposal_results_count": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} figure", "countPlural=*": "{countText} figures"}}],
+  "proposal_fold_mismatch": [
+    {
+      "declarations": [
+        "input count",
+        "input pipeline",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "The rerun of {pipeline} differs from this correction in {countText} figure. The proposal stays approved until the loader is fixed and rerun.",
+        "countPlural=*": "The rerun of {pipeline} differs from this correction in {countText} figures. The proposal stays approved until the loader is fixed and rerun."
+      }
+    }
+  ],
+  "proposal_results_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} figure",
+        "countPlural=*": "{countText} figures"
+      }
+    }
+  ],
   "proposal_unchanged": "This revision changes nothing in the archive.",
   "proposal_published_by": "Published by {name} on {date}",
   "proposal_rejected_by": "Rejected by {name} on {date}",
@@ -2740,7 +2821,20 @@
   "review_col_changes": "Changes",
   "review_col_findings": "Findings",
   "review_col_submitted": "Submitted",
-  "review_changes": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} change", "countPlural=*": "{countText} changes"}}],
+  "review_changes": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} change",
+        "countPlural=*": "{countText} changes"
+      }
+    }
+  ],
   "proposal_prescreen": "Prescreen",
   "proposal_prescreen_waiting": "Not prescreened yet",
   "prescreen_clean": "Clean",
@@ -3186,13 +3280,104 @@
   "ws_diff_outcomes": "Outcomes",
   "ws_outline_results_empty": "Add a contest to start.",
   "ws_failure_cell": "{contest}: {place}, {column}",
-  "ws_results_figures": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} figure", "countPlural=*": "{countText} figures"}}],
-  "ws_results_boxes": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} box", "countPlural=*": "{countText} boxes"}}],
-  "ws_results_places": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} place", "countPlural=*": "{countText} places"}}],
-  "ws_results_pasted": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "Pasted {countText} row.", "countPlural=*": "Pasted {countText} rows."}}],
-  "ws_results_pasted_new": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} wasn't found and was added as a new place; check its code.", "countPlural=*": "{countText} weren't found and were added as new places; check their codes."}}],
-  "ws_results_pasted_skipped": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} didn't fit the grid and was left out.", "countPlural=*": "{countText} didn't fit the grid and were left out."}}],
-  "ws_scan_replace_note": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "Using another file removes the box drawn on this one.", "countPlural=*": "Using another file removes the {countText} boxes drawn on this one."}}],
+  "ws_results_figures": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} figure",
+        "countPlural=*": "{countText} figures"
+      }
+    }
+  ],
+  "ws_results_boxes": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} box",
+        "countPlural=*": "{countText} boxes"
+      }
+    }
+  ],
+  "ws_results_places": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} place",
+        "countPlural=*": "{countText} places"
+      }
+    }
+  ],
+  "ws_results_pasted": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Pasted {countText} row.",
+        "countPlural=*": "Pasted {countText} rows."
+      }
+    }
+  ],
+  "ws_results_pasted_new": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} wasn't found and was added as a new place; check its code.",
+        "countPlural=*": "{countText} weren't found and were added as new places; check their codes."
+      }
+    }
+  ],
+  "ws_results_pasted_skipped": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} didn't fit the grid and was left out.",
+        "countPlural=*": "{countText} didn't fit the grid and were left out."
+      }
+    }
+  ],
+  "ws_scan_replace_note": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "Using another file removes the box drawn on this one.",
+        "countPlural=*": "Using another file removes the {countText} boxes drawn on this one."
+      }
+    }
+  ],
   "ws_template_boundaries": "Boundaries",
   "ws_template_boundaries_body": "Upload a boundary file for one set of areas, such as counties or districts. Each shape is matched to an area by its code, and the map shows what changes.",
   "ws_quality_official": "Official",
@@ -3264,9 +3449,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} boundary changes.",
         "countPlural=*": "{countText} boundaries change."
@@ -3280,9 +3463,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} new area.",
         "countPlural=*": "{countText} new areas."
@@ -3296,9 +3477,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} code matches no area. Choose a name field to add it as a new area, or leave it out.",
         "countPlural=*": "{countText} codes match no area. Choose a name field to add them as new areas, or leave them out."
@@ -3312,9 +3491,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} new area has no name in the name field.",
         "countPlural=*": "{countText} new areas have no name in the name field."
@@ -3328,9 +3505,7 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": [
-        "countPlural"
-      ],
+      "selectors": ["countPlural"],
       "match": {
         "countPlural=one": "{countText} shape",
         "countPlural=*": "{countText} shapes"
@@ -3340,7 +3515,20 @@
   "ws_bd_key_parent": "Outside its parent area",
   "proposal_boundaries": "Boundaries",
   "discussion_heading": "Discussion",
-  "discussion_count": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} comment", "countPlural=*": "{countText} comments"}}],
+  "discussion_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} comment",
+        "countPlural=*": "{countText} comments"
+      }
+    }
+  ],
   "discussion_empty": "No comments yet. Ask the author a question or point out a problem; the author and reviewers will see it.",
   "discussion_comment": "Comment",
   "discussion_reply": "Reply",
@@ -3366,6 +3554,32 @@
   "discussion_on": "On {label}",
   "discussion_agent": "with {agent} ({model})",
   "discussion_body_label": "Comment text",
-  "discussion_characters_left": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} character left", "countPlural=*": "{countText} characters left"}}],
-  "discussion_replies": [{"declarations": ["input count", "local countPlural = count: plural", "local countText = count: number"], "selectors": ["countPlural"], "match": {"countPlural=one": "{countText} reply", "countPlural=*": "{countText} replies"}}]
+  "discussion_characters_left": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} character left",
+        "countPlural=*": "{countText} characters left"
+      }
+    }
+  ],
+  "discussion_replies": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} reply",
+        "countPlural=*": "{countText} replies"
+      }
+    }
+  ]
 }

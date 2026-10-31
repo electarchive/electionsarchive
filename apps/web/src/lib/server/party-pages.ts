@@ -109,23 +109,26 @@ export async function rebuild() {
   let built = 0;
   let failed = 0;
   await Promise.all(
-    Array.from({ length: Number(process.env.PARTY_PAGE_WORKERS ?? 2) }, async () => {
-      for (let id = queue.pop(); id != null; id = queue.pop()) {
-        try {
-          const read = new Date().toISOString();
-          const page = await contents(id);
-          await db.execute(sql`
+    Array.from(
+      { length: Number(process.env.PARTY_PAGE_WORKERS ?? 2) },
+      async () => {
+        for (let id = queue.pop(); id != null; id = queue.pop()) {
+          try {
+            const read = new Date().toISOString();
+            const page = await contents(id);
+            await db.execute(sql`
             insert into party_page (party_id, page, built_at)
             values (${id}::uuid, ${JSON.stringify(page)}::jsonb, ${read}::timestamptz)
             on conflict (party_id) do update set page = excluded.page, built_at = excluded.built_at
           `);
-          built += 1;
-        } catch (error) {
-          failed += 1;
-          console.error(id, error);
+            built += 1;
+          } catch (error) {
+            failed += 1;
+            console.error(id, error);
+          }
         }
-      }
-    }),
+      },
+    ),
   );
   const removed = await db.execute<Record<string, never>>(sql`
     delete from party_page

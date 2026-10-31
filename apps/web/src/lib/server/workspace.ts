@@ -4,7 +4,13 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import * as v from "valibot";
-import type { Checks, Diff, NameKind, Polygonal, Scheme } from "#lib/contrib.js";
+import type {
+  Checks,
+  Diff,
+  NameKind,
+  Polygonal,
+  Scheme,
+} from "#lib/contrib.js";
 import type { Box } from "#lib/map/engine.svelte.js";
 import type { Sheet, Upload } from "#lib/sheet.js";
 import type { Lookup, Schemed, Shaped } from "#lib/workspace.js";
@@ -355,9 +361,7 @@ export const Draft = v.object({
           valid_from: v.pipe(v.string(), v.isoDate()),
           valid_to: Day,
           quality: v.picklist(qualities),
-          exclude: v.optional(
-            v.pipe(v.array(Line(200)), v.maxLength(20_000)),
-          ),
+          exclude: v.optional(v.pipe(v.array(Line(200)), v.maxLength(20_000))),
           evidence: v.tuple([v.literal("e1")]),
         }),
         v.object({
@@ -797,9 +801,7 @@ export async function shapes(
         k: row.k,
         name: row.name,
         geometry:
-          row.geometry == null
-            ? null
-            : (JSON.parse(row.geometry) as Polygonal),
+          row.geometry == null ? null : (JSON.parse(row.geometry) as Polygonal),
       })),
     },
   };

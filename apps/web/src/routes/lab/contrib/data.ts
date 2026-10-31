@@ -57,7 +57,7 @@ export const contest = {
   ],
 } as const;
 
-export function surname(name: string) {
+function surname(name: string) {
   return name.split(" ").at(-1) ?? name;
 }
 
@@ -174,9 +174,9 @@ export function share(part: number, whole: number) {
   return whole === 0 ? "0.0" : ((part / whole) * 100).toFixed(1);
 }
 
-export type Tier = 1 | 2 | 3;
+type Tier = 1 | 2 | 3;
 
-export type Change = {
+type Change = {
   entity: string;
   field: string;
   before: string | null;
