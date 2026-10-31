@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+import tempfile
 import unicodedata
 from collections import defaultdict
 from datetime import date
@@ -31,6 +32,25 @@ RUNOFF = (
     "2004-11-02:AR",
     "general",
 )
+SOS = "https://www.sos.arkansas.gov/uploads/elections/"
+WORKBOOKS = (
+    (
+        SOS + "20070308_ARSOS_2006_Elections_Publication_Final__Revised.xls",
+        date(2006, 5, 23),
+        "2006-05-23:AR:primary",
+        "primary",
+        "2006 preferential primary and nonpartisan judicial election results publication",
+        {"Sup. Ct.": "Position 2", "Sup. Ct. 2": "Position 5"},
+    ),
+    (
+        SOS + "2010_General_Election_Results_-_Fed%2C_State_-_by_Polling_Location.xlsx",
+        date(2010, 11, 2),
+        "2010-11-02:AR",
+        "general",
+        "2010 general election and nonpartisan judicial runoff results by polling location",
+        {},
+    ),
+)
 TALLY = "https://results.tally-enr.com/results/arkansas/{}/FullDataFile.json"
 ELECTIONS = {
     1837: "2018-05-22:AR:primary",
@@ -59,6 +79,8 @@ def clean(name: str) -> str:
 
 
 def fetch() -> None:
+    for url, *_rest in WORKBOOKS:
+        raw.fetch(SOURCE, url, suffix=Path(url).suffix)
     for election in ELECTIONS:
         raw.fetch(SOURCE, TALLY.format(election), suffix=".json")
 
@@ -113,6 +135,47 @@ def read(source: str, url: str) -> dict[tuple[str, str], dict[str | None, dict[s
     return found
 
 
+def workbook(url: str, sheets: dict[str, str]) -> dict[tuple[str, str], dict[str | None, dict[str, int]]]:
+    path = raw.cached(SOURCE, url).path
+    with tempfile.TemporaryDirectory() as folder:
+        if path.suffix == ".xls":
+            subprocess.run(
+                ["soffice", "--headless", "--convert-to", "xlsx", "--outdir", folder, str(path)],
+                check=True,
+                capture_output=True,
+            )
+            path = Path(folder) / (path.stem + ".xlsx")
+        frames = pl.read_excel(path, sheet_id=0, has_header=False, infer_schema_length=0, raise_if_empty=False)
+    found: dict[tuple[str, str], dict[str | None, dict[str, int]]] = {}
+    for sheet, seat in sheets.items():
+        frame = frames[sheet]
+        names = [clean(" ".join(str(frame[3, column]).split())) for column in range(1, 3)]
+        places: dict[str | None, dict[str, int]] = {}
+        for row in frame.iter_rows():
+            label = row[0] or ""
+            if label.endswith(" County"):
+                places[label.removesuffix(" County")] = {
+                    name: int(value) for name, value in zip(names, row[1:3], strict=True)
+                }
+            elif label == "Totals":
+                places[None] = {name: int(value) for name, value in zip(names, row[1:3], strict=True)}
+        found[("Associate", seat)] = places
+    if not sheets:
+        frame = frames["Sup. Court"].slice(1)
+        grouped: dict[tuple[str, str], dict[str | None, dict[str, int]]] = {}
+        for county, _, race, _, candidate, votes in frame.iter_rows():
+            match = re.match(r"^State Supreme Court (Chief|Associate) Justice (Position \d+)$", " ".join(race.split()))
+            place = grouped.setdefault((match[1], match[2]), defaultdict(lambda: defaultdict(int)))
+            place[county.removesuffix(" County")][clean(candidate)] += int(votes)
+        for key, places in grouped.items():
+            totals: dict[str, int] = defaultdict(int)
+            for votes in places.values():
+                for name, count_ in votes.items():
+                    totals[name] += count_
+            found[key] = {**{place: dict(votes) for place, votes in places.items()}, None: dict(totals)}
+    return found
+
+
 def check(day: date, court: str, seat: str, places: dict[str | None, dict[str, int]]) -> dict[str, dict[str, int]]:
     totals = places.pop(None, None)
     if totals is None:
@@ -128,6 +191,9 @@ def check(day: date, court: str, seat: str, places: dict[str | None, dict[str, i
 
 def emit() -> Path:
     contests = []
+    for url, day, election_key, kind, _, sheets in WORKBOOKS:
+        for (court, seat), places in workbook(url, sheets).items():
+            contests.append((SOURCE, url, day, election_key, kind, court, seat, check(day, court, seat, places)))
     for source, url, day, election_key, kind in (PRIMARY, RUNOFF):
         for (court, seat), places in read(source, url).items():
             if court == "Chief" and kind == "general":
@@ -147,15 +213,19 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Arkansas Supreme Court nonpartisan contests by county: 2004 from the Secretary of State's "
-            "certification reports, and 2014 to 2024 from the Secretary of State's election night reporting files",
+            summary="Arkansas Supreme Court nonpartisan contests by county: 2004 to 2010 from the Secretary of State's "
+            "reports and workbooks, and 2014 to 2024 from the Secretary of State's election night reporting files",
             polity="US-AR",
         )
         sources: dict[str, UUID] = {}
+        titles = {url: title for url, _, _, _, title, _ in WORKBOOKS}
         for source, url, day, _, kind, *_rest in contests:
             if url in sources:
                 continue
-            if source == SOURCE:
+            if url in titles:
+                title = titles[url]
+                page = "https://www.sos.arkansas.gov/elections/research/election-results"
+            elif source == SOURCE:
                 title = (
                     f"{day.year} {'general' if kind == 'general' else 'preferential primary'} election full data file"
                 )
