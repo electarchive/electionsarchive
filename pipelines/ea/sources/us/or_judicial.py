@@ -14,8 +14,9 @@ from ea.sources.us.retention import display, identity
 from ea.store import DATA, connect
 
 SOURCE = "us.or_judicial"
-VERSION = "1"
+VERSION = "2"
 INBOX = DATA / "inbox" / "manual" / "MF-456"
+EARLY = DATA / "inbox" / "manual" / "MF-469"
 URL = "https://sos.oregon.gov/elections/pages/historical-data.aspx"
 PUBLISHER = "Oregon Secretary of State"
 TITLE = "Abstract of votes: Supreme Court and Court of Appeals"
@@ -32,8 +33,21 @@ FILES = {
     "2024 May Primary Election Official Results(2).PDF-(Preview).pdf": (date(2024, 5, 21), "primary"),
     "2024 November General Election Official Results(2).PDF-(Preview).pdf": (date(2024, 11, 5), "general"),
 }
+EARLY_FILES = {
+    "2000 Primary Election Official Results Candidates.PDF": (date(2000, 5, 16), "primary"),
+    "2000 General Election Official Results.PDF": (date(2000, 11, 7), "general"),
+    "2002 Primary Election Official Results.PDF": (date(2002, 5, 21), "primary"),
+    "2004 Primary Election Official Results Nonpartisan Offices.PDF": (date(2004, 5, 18), "primary"),
+    "2004 November General Election Official Results.PDF": (date(2004, 11, 2), "general"),
+    "2006 Primary Election Official Results.PDF": (date(2006, 5, 16), "primary"),
+    "2006 General.PDF": (date(2006, 11, 7), "general"),
+    "2008 Primary Election Official Results.PDF": (date(2008, 5, 20), "primary"),
+    "2008 General Election Official Results.PDF": (date(2008, 11, 4), "general"),
+    "2012 Primary Election Official Results.PDF": (date(2012, 5, 15), "primary"),
+}
 TITLES = {"supreme court": "Justice of the Supreme Court", "court of appeals": "Judge of the Court of Appeals"}
-HEAD = re.compile(r"^\s*Judge of the (Supreme Court|Court of Appeals)(?:,\s*Position\s+(\d+))?\s*$", re.IGNORECASE)
+HEAD = re.compile(r"^\s*JUDGE OF THE (SUPREME COURT|COURT OF APPEALS)(?:,\s*POSITION\s+(\d+))?\s*$", re.IGNORECASE)
+LEGEND = re.compile(r"\bElected\b|\bNominee\b|Abstract|Election\b|^\s*\d{4}\b", re.IGNORECASE)
 POSITION = re.compile(r"^\s*Position\s+(\d+)\s*$", re.IGNORECASE)
 ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .'-]*?)\s{2,}((?:[\d,]+\s*)+)$")
 NOTE = (
@@ -47,14 +61,14 @@ def flat(text: str) -> str:
 
 
 def fetch() -> None:
-    for name in FILES:
+    for name in [*FILES, *EARLY_FILES]:
         try:
             raw.cached(SOURCE, f"{URL}#{name}")
         except LookupError:
             raw.store(
                 SOURCE,
                 f"{URL}#{name}",
-                (INBOX / name).read_bytes(),
+                ((INBOX if name in FILES else EARLY) / name).read_bytes(),
                 suffix=".pdf",
                 retrieved_at=datetime.now(UTC),
                 media_type="application/pdf",
@@ -115,13 +129,84 @@ def contests(path: Path, swapped: bool) -> list[dict[str, object]]:
     return found
 
 
+def early(path: Path, stage: str, year: int) -> list[dict[str, object]]:
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    lines = text.splitlines()
+    found = []
+    for index, line in enumerate(lines):
+        head = HEAD.match(line)
+        if head is None:
+            continue
+        cursor = index + 1
+        while not lines[cursor].strip():
+            cursor += 1
+        if "Abstract" in lines[cursor]:
+            continue
+        position = head[2]
+        header = []
+        rows: dict[str, list[int]] = {}
+        total: list[int] = []
+        while True:
+            row = ROW.match(lines[cursor])
+            if row is not None and not LEGEND.search(lines[cursor]) and row[1].strip().lower() != "county":
+                break
+            match = POSITION.match(lines[cursor])
+            if match is not None:
+                position = match[1]
+            elif lines[cursor].strip() and not LEGEND.search(lines[cursor]):
+                header.append(lines[cursor])
+            cursor += 1
+        while True:
+            row = ROW.match(lines[cursor])
+            if row is not None:
+                numbers = [int(value.replace(",", "")) for value in row[2].split()]
+                if row[1].strip().lower() == "total":
+                    total = numbers
+                    break
+                rows[row[1].strip()] = numbers
+            cursor += 1
+        width = len(total)
+        count = width - 1
+        tokens = [
+            [t for t in split(re.sub(r"\bCounty\b|\bMisc\.?", "  ", ln)) if t.strip()] for ln in header
+        ]
+        tokens = [t for t in tokens if t]
+        if count == 1 and len(tokens) >= 2:
+            tokens = [[tokens[0][0]], [tokens[-1][0]]]
+        if len(tokens) != 2 or len(tokens[0]) != count or len(tokens[1]) != count:
+            raise ValueError(f"{path.name} {index} {position}: {header} {tokens}")
+        candidates = []
+        for family, given in zip(*tokens, strict=True):
+            stars = len(family) - len(family.lstrip("*"))
+            candidates.append(
+                {
+                    "name": f"{given.strip()} {family.lstrip('*').rstrip(',').strip()}",
+                    "elected": stars == 2 or (stars == 1 and stage == "general"),
+                }
+            )
+        candidates.append({"name": "Misc", "elected": False})
+        for county, numbers in rows.items():
+            if len(numbers) == width - 1:
+                rows[county] = [*numbers, 0]
+            elif len(numbers) != width:
+                raise ValueError(f"{path.name} {county} {numbers}")
+        for column in range(width):
+            printed = sum(numbers[column] for numbers in rows.values())
+            if printed != total[column]:
+                print("printed total differs from the county rows:", year, stage, position, column, total[column], printed)
+        found.append(
+            {"court": TITLES[head[1].lower()], "position": int(position), "candidates": candidates, "rows": rows}
+        )
+    return found
+
+
 def emit() -> Path:
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oregon Supreme Court and Court of Appeals elections 2010–2024 by county, "
+            summary="Oregon Supreme Court and Court of Appeals elections 2000–2024 by county, "
             "from the Secretary of State's abstracts of votes",
             polity="US-OR",
         )
@@ -135,7 +220,7 @@ def emit() -> Path:
             url=URL,
             license="Public record",
         )
-        for name in FILES:
+        for name in [*FILES, *EARLY_FILES]:
             cs.artifact(raw.cached(SOURCE, f"{URL}#{name}"), source)
         counties = {
             flat(text): unit
@@ -167,8 +252,9 @@ def emit() -> Path:
         offices: set[UUID] = set()
         persons: set[str] = set()
         made = 0
-        for file, (day, stage) in FILES.items():
-            for block in contests(raw.cached(SOURCE, f"{URL}#{file}").path, day.year == 2014):
+        for file, (day, stage) in {**EARLY_FILES, **FILES}.items():
+            path = raw.cached(SOURCE, f"{URL}#{file}").path
+            for block in early(path, stage, day.year) if file in EARLY_FILES else contests(path, day.year == 2014):
                 title = str(block["court"])
                 position = int(block["position"])
                 office = cs.key("us.office", f"{slug(title)}:OR")
