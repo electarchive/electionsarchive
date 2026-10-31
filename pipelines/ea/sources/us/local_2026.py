@@ -5489,6 +5489,13 @@ for key, publisher, title, url, local in (
         "nj/clifton_sample.pdf",
     ),
     (
+        "KS-20169",
+        "Saline County Election Office",
+        "2026 Saline County Candidate Filings, Official (updated 9/15/2026)",
+        "https://www.salinecountyks.gov/media/Election%20Office/GN2026%20Candidate%20List.pdf",
+        "ks/saline.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
@@ -7102,7 +7109,7 @@ def parse() -> None:
                 geoid = codes.get(cells[5])
                 if held and (geoid is None or f"MN:{geoid}:{held}{seat}{special}" not in exact):
                     county = subdivision_county.get(cells[5])
-                    city = held in ("mayor", "council")
+                    city = held in ("mayor", "council") or (geoid is not None and len(geoid) == 7)
                     if geoid is not None or city or county is not None:
                         geoid = geoid or (f"27{cells[5]}" if city else f"27{int(county) * 2 - 1:03d}{cells[5]}")
                         label = [part for part in re.findall(r"\(([^)]*)\)", title) if not part.startswith("Elect")][-1]
@@ -9693,6 +9700,13 @@ def emit() -> Path:
         ):
             if template == "" and group["owner"][0]:
                 title, place, owner, home = (str(group[column][0]) for column in ("title", "place", "owner", "home"))
+                kind, _, geoid = owner.partition(":")
+                if kind in ("school", "place", "town"):
+                    known_owner = conn.execute(
+                        "select value from external_id where scheme = 'us.polity' and value = any(%s) order by value",
+                        [[owner, f"us.{'school_district' if kind == 'school' else kind}:{geoid}"]],
+                    ).fetchone()
+                    owner = known_owner[0] if known_owner else owner
                 st, code, role = tail.split(":")[:3]
                 if owner.startswith(("school:", "place:", "town:")) and (
                     owner in homeless
