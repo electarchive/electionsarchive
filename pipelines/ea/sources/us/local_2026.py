@@ -5363,6 +5363,20 @@ for key, publisher, title, url, local in (
         "ca/tehama_qualified_0810.pdf",
     ),
     (
+        "AR-05059-hot-spring",
+        "Hot Spring County Board of Election Commissioners",
+        "Publication Ballot, 2026 General Election, November 3, 2026",
+        "https://uaex.uada.edu/business-communities/ced-blog/posts/2026/august/Bismark%20Fire%20Protection%20Association%20ballot%20election%202026.pdf",
+        "ar/hot_spring_publication_ballot.pdf",
+    ),
+    (
+        "AR-05139-union",
+        "SouthArkansasNow.com",
+        "Complete List of Candidates for Election This Fall (contested Union County races, August 13, 2026)",
+        "https://southarkansasnow.com/complete-list-of-candidates-for-election-this-fall/",
+        "ar/union_contested_candidates.html",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
