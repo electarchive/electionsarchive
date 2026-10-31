@@ -11,7 +11,7 @@ import tempfile
 import time
 import xml.etree.ElementTree as ET
 import zipfile
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -1000,6 +1000,7 @@ AK_DISTRICTS = {
     date(2008, 11, 4): "hd{} (1).pdf",
     date(2010, 8, 24): "hd{} (4).pdf",
 }
+AK_2007 = "https://www.elections.alaska.gov/Core/Archive/07SPEC/data/sovc/hd{}.pdf"
 AK_2000 = "https://web.archive.org/web/2id_/http://www.elections.alaska.gov/results/00GENR/data/results.txt"
 AL_2007 = "https://sos.alabama.gov/sites/default/files/voter-pdfs/2007/statecert-cae-canvass-06-27-2007.pdf"
 AL_2007_TOTALS = {
@@ -2213,6 +2214,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
         time.sleep(1)
     store_manual(SD_2002_JUNE, "MF-444/2002PCAE.pdf", "application/pdf")
+    for district in range(1, 41):
+        store_manual(AK_2007.format(district), f"MF-447/hd{district}.pdf", "application/pdf")
     store_manual(NM_2003, "MF-443/2003-special-election.pdf", "application/pdf")
     store_manual(KS_2000, "MF-446/ks-2000-general-questions-by-precinct.xls", "application/vnd.ms-excel")
     store_manual(KS_2005, "MF-446/2005_Constitutional_Amendment_results_by_county.xls", "application/vnd.ms-excel")
@@ -5817,6 +5820,38 @@ def south_dakota_2002_june() -> list[dict[str, object]]:
     return rows
 
 
+def alaska_2007() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for district in range(1, 41):
+        url = AK_2007.format(district)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        total = next(line for line in text.splitlines() if re.match(r"\s*Total\s+\d", line))
+        votes, yes, no = (int(cell.replace(",", "")) for cell in total.split()[-3:])
+        if votes != yes + no:
+            raise ValueError(f"AK 2007 district {district}: {yes} + {no} != {votes}")
+        rows.extend(
+            {
+                "state": "AK",
+                "day": date(2007, 4, 3),
+                "number": "",
+                "label": "Advisory Vote",
+                "title": "Advisory vote on state employment benefits for same-sex partners of public employees",
+                "kind": "Advisory Question",
+                "url": url,
+                "county": f"2007-04-03:{district:02}",
+                "answer": answer,
+                "votes": count,
+            }
+            for answer, count in (("YES", yes), ("NO", no))
+        )
+    for answer, printed in (("YES", 60896), ("NO", 54442)):
+        if sum(int(row["votes"]) for row in rows if row["answer"] == answer) != printed:
+            raise ValueError(f"AK 2007 {answer}: districts do not sum to the statewide result")
+    return rows
+
+
 def montana() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in MT_FILES.items():
@@ -5992,6 +6027,7 @@ def parse() -> None:
             *nevada(),
             *georgia(),
             *alaska(),
+            *alaska_2007(),
             *new_jersey(),
             *maryland(),
             *nebraska(),
@@ -6285,6 +6321,29 @@ def emit() -> Path:
                 area_id=area,
                 kind="aggregate",
             )
+        ak_state = conn.execute(
+            """select p.id, u.id from reporting_unit u join polity p on p.id = u.polity_id
+               where u.scheme_code = 'us.state' and p.iso_code = 'US-AK'"""
+        ).fetchone()
+        for code in frame.filter(pl.col("state") == "AK", pl.col("code").str.starts_with("2007-04-03:"))[
+            "code"
+        ].unique():
+            unit = cs.unit("us.ak_house_district", code)
+            if unit in cs.minted:
+                day = date.fromisoformat(code[:10])
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=ak_state[0],
+                    scheme_code="us.ak_house_district",
+                    code=code,
+                    parent_id=ak_state[1],
+                    area_relation="equals",
+                    area_id=cs.area("us.sldl", f"AK:{int(code[-2:])}"),
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
         elections = dict(
             conn.execute(
                 """select x.value, x.entity_id from external_id x join election e on e.id = x.entity_id
