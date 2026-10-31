@@ -1701,7 +1701,7 @@ def build(full: bool = False) -> str:
         prefix, _, rest = code.partition(":")
         if pid in taken or prefix not in ("school", "special", "place", "town", "county"):
             continue
-        county = rest[2:5] if prefix == "special" else None
+        county = rest[2:5] if prefix == "special" and rest[2:3] != ":" else None
         mine = tokens(polities[pid][2])
         pool = pools.get((rest[:2], prefix if prefix in ("school", "special") else "municipality"), [])
         if not any(w.isdigit() for w in mine):

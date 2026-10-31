@@ -140,7 +140,9 @@ def role(district: str) -> tuple[str, str | None]:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "candidates.parquet")
+    frame = pl.read_parquet(PARSED / "candidates.parquet").with_columns(
+        pl.col("district").str.replace(r"Natural Resources$", "Natural Resources District")
+    )
     full_term = {district: max(group["term"]) for (district,), group in frame.group_by(["district"])}
     roles = [role(district) for district in frame["district"]]
     frame = frame.with_columns(

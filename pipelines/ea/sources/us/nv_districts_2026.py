@@ -25,6 +25,9 @@ NAMES = (
     (r"^(.*?) Gid Board Trustee$", r"\1 General Improvement District"),
     (r"^(.*?) District Trustee$", r"\1 District"),
     (r"^(Central Lyon County Fire Protection)$", r"\1 District"),
+    (r"^Elko TV Board$", "Elko Television District"),
+    (r"^Verdi TV District$", "Verdi Television District"),
+    (r"^Mason Valley Swimming Pool General Improvement District$", "Mason Valley Swimming Pool District"),
 )
 FUNCTIONS = (
     (r"(?i)water", "water"),

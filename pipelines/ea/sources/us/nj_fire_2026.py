@@ -328,10 +328,28 @@ def fetch() -> None:
             )
 
 
+ALIASES = {
+    "Beverly City Fire District": "Beverly Fire District 1",
+    "Cinnaminson Township Fire District": "Cinnaminson Fire District 1",
+    "Eastampton Township Fire District": "Eastampton Fire District",
+    "Edgewater Park Township Fire District": "Edgewater Park Township Fire District 1",
+    "Evesham Township Fire District": "Evesham Township Fire District No 1",
+    "Hazlet Fire District No. 1": "Hazlet Township Fire District 1",
+    "Lindenwold Borough Fire District No. 1": "Lindenwold Fire District 1",
+    "Mantua Township Fire District": "Mantua Township Fire District 1",
+    "Marlboro Fire District No. 1": "Marlboro Township Fire District 1",
+    "Mount Holly Fire District": "Mount Holly Township Fire District 1",
+    "Mount Laurel Township Fire District": "Mount Laurel Fire District 1",
+    "Pennington Borough Fire District": "Pennington Borough Fire District 1",
+    "Riverside Township Fire District": "Riverside Township Fire District 1",
+    "Westville Borough Fire District": "Westville Borough Fire District 1",
+}
+
+
 def parse() -> None:
     rows = [
         {
-            "district": district,
+            "district": ALIASES.get(district, district),
             "county": county,
             "seat": "",
             "remainder": remainder,
