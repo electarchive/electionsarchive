@@ -6129,6 +6129,31 @@ def words(text: str) -> tuple[frozenset[str], frozenset[str]]:
 
 SHADOWED_TAILS = {"KS:2042875:council:at-large"}
 
+CLASH_NOISE = ROLES | {
+    "jt",
+    "joint",
+    "city",
+    "town",
+    "county",
+    "board",
+    "of",
+    "and",
+    "for",
+    "member",
+    "governing",
+    "school",
+    "district",
+    "area",
+    "trustee",
+    "education",
+}
+
+
+def other_place(mine: frozenset[str], theirs: frozenset[str]) -> bool:
+    ours = mine - theirs - CLASH_NOISE
+    others = theirs - mine - CLASH_NOISE
+    return bool(ours and others and sorted("".join(ours)) != sorted("".join(others)))
+
 
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
@@ -6181,6 +6206,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
                 (len(mine & theirs) / len(mine | theirs), tail)
                 for tail, theirs, their_marks in pool[county] + pool[""]
                 if their_marks == marks
+                and not (tail.startswith("ceda:") and other_place(mine, theirs))
                 and not (tail.endswith(":family-court") and re.search(r"(?i)\bcounty court\b", contest))
                 and not (
                     (
