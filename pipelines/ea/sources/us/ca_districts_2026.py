@@ -845,7 +845,7 @@ def sutter() -> list[Row]:
 
 
 def napa() -> list[Row]:
-    return qualified_list("06055", "Napa")
+    return qualified_list("06055", "Napa", ((r"Napa Valley College", "Napa Valley Community College"),), True)
 
 
 SOLANO_BODIES = {
@@ -1661,7 +1661,7 @@ def marin() -> list[Row]:
     rows = []
     index = start
     while index < len(text) - 1:
-        head = re.match(r"^(.+? (?:District|Authority|Agency)) Director(?:,? (.*))?$", text[index])
+        head = re.match(r"^(.+? (?:District(?: No\. \d+)?|Authority|Agency)) Director(?:,? (.*))?$", text[index])
         if not head or text[index + 1] != "Seats Open":
             index += 1
             continue
@@ -1718,14 +1718,16 @@ def san_joaquin() -> list[Row]:
 
     def flush() -> None:
         if contest is not None:
-            split = re.match(r"^(.+? (?:District|Authority|Agency)),? (.*)$", contest[1])
+            split = re.match(r"^(.+? (?:District|Authority|Agency)),?(?: (.*))?$", contest[1])
             if split and usable(split[1]):
-                rows.extend(rows_of("San Joaquin", split[1], split[2], int(contest[3]), names, contest[2] == "No"))
+                rows.extend(
+                    rows_of("San Joaquin", split[1], split[2] or "", int(contest[3]), names, contest[2] == "No")
+                )
 
     for line in lines("06077"):
         if found := SJ_HEAD.match(line):
             flush()
-            contest = found.groups() if int(found[1]) >= 5000 else None
+            contest = found.groups() if int(found[1]) >= 4000 else None
             names = []
         elif contest and (found := SJ_CAND.match(line)):
             names.append(cased(found[1]))
