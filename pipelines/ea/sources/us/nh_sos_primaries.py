@@ -81,7 +81,7 @@ def fetch() -> None:
             try:
                 raw.fetch(SOURCE, url, suffix=Path(name).suffix)
                 break
-            except (httpx.HTTPError, OSError):
+            except httpx.HTTPError, OSError:
                 time.sleep(5 * (attempt + 1))
         else:
             print(f"not fetched: {name}")
@@ -133,7 +133,9 @@ def tables(path: Path, name: str) -> dict[str, list[tuple[str, dict[str, int]]]]
             for _, line in towns:
                 for cell, votes in line.items():
                     sums[cell] = sums.get(cell, 0) + votes
-            differing = {cell: (sums.get(cell, 0), votes) for cell, votes in cells.items() if sums.get(cell, 0) != votes}
+            differing = {
+                cell: (sums.get(cell, 0), votes) for cell, votes in cells.items() if sums.get(cell, 0) != votes
+            }
             if differing:
                 raise ValueError(f"{name} {label}: rows against printed totals {differing}")
             if label.lower().startswith("summary"):
@@ -144,7 +146,9 @@ def tables(path: Path, name: str) -> dict[str, list[tuple[str, dict[str, int]]]]
     for county, towns in counties.items():
         for cell, votes in summary.get(county, {}).items():
             if sum(line.get(cell, 0) for _, line in towns) != votes:
-                print(f"{name} {county}: {cell} is {votes} on the summary sheet, {sum(line.get(cell, 0) for _, line in towns)} in the towns")
+                print(
+                    f"{name} {county}: {cell} is {votes} on the summary sheet, {sum(line.get(cell, 0) for _, line in towns)} in the towns"
+                )
     if set(summary) != set(counties):
         raise ValueError(f"{name}: summary counties {sorted(summary)} against {sorted(counties)}")
     return counties
@@ -214,12 +218,17 @@ def choose(label: str, options: list[tuple[str, str]]) -> str | None:
     if not words:
         return None
     exact = [
-        option for option, ballot in options if (parts := person(ballot)) and parts[-1] == words[-1] and parts[0][:3] == words[0][:3]
+        option
+        for option, ballot in options
+        if (parts := person(ballot)) and parts[-1] == words[-1] and parts[0][:3] == words[0][:3]
     ]
     if len(exact) == 1:
         return exact[0]
     scored = sorted(
-        ((SequenceMatcher(None, " ".join(words), " ".join(person(ballot))).ratio(), option) for option, ballot in options),
+        (
+            (SequenceMatcher(None, " ".join(words), " ".join(person(ballot))).ratio(), option)
+            for option, ballot in options
+        ),
         reverse=True,
     )
     if scored and scored[0][0] >= 0.85 and (len(scored) == 1 or scored[0][0] - scored[1][0] >= 0.1):
