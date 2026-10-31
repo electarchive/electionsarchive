@@ -20485,6 +20485,7 @@ export const bodies = {
             to: v.nullable(v.string()),
             acquired: v.nullable(v.string()),
             ended: v.nullable(v.string()),
+            category: v.picklist(["elected", "appointed", "ex_officio"]),
             isVoting: v.boolean(),
           }),
         ),
@@ -20584,9 +20585,24 @@ export const bodies = {
               sizes: Array<{ seats: number; from: string; to: string | null }>;
               acquired: string;
               ended: string | null;
+              category: "elected" | "appointed" | "ex_officio";
               isVoting: boolean;
             }>(sql`
               select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
+              with recursive chain as materialized (
+                select t.id, t.acquired_via::text as via,
+                  coalesce(t.succeeds_tenure_id, case when t.seat_id is not null then
+                    lag(t.id) over (partition by t.seat_id order by t.from_date nulls first) end) as before
+                from tenure t where t.body_id = ${input.id}::uuid
+              ),
+              kinds(id, category) as (
+                select c.id, case when c.via in ('ex_officio', 'appointed') then c.via else 'elected' end
+                from chain c
+                where c.before is null or c.via not in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+                union all
+                select c.id, k.category from kinds k join chain c on c.before = k.id
+                where c.via in ('appointed', 'acting', 'succession', 'list_replacement', 'co_opted', 'trustee')
+              )
                 t.from_precision::text as "fromPrecision",
                 (select coalesce(json_agg(json_build_object('seats', z.seats, 'from', lower(z.valid)::text,
                     'to', upper(z.valid)::text)), '[]') from body_size z where z.body_id = ${input.id}::uuid
@@ -20595,6 +20611,7 @@ export const bodies = {
                 case when t.acquired_via = 'elected' and t.contest_id is null and t.succeeds_tenure_id is not null
                   then 'by_election' else t.acquired_via::text end as acquired,
                 t.ended_via::text as ended, t.contest_id as contest,
+                coalesce(k.category, 'elected') as category,
                 s.label as seat, s.apportioned_area_id as region, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id, inherited.place) as place,
                 coalesce(a.found and a.party_id is null, false) as "isIndependent",
                 (select coalesce(json_agg(json_build_object('party', coalesce(pm.into_id, g.party_id),
@@ -20617,6 +20634,7 @@ export const bodies = {
                   where a.tenure_id = t.id and a.kind = 'party') as spells
               from tenure t
               left join seat s on s.id = t.seat_id
+              left join kinds k on k.id = t.id
               left join contest c on c.id = t.contest_id
               left join contest pc on pc.id = c.allocation_parent_id
               left join lateral (
@@ -20731,6 +20749,7 @@ export const bodies = {
               to: null,
               acquired: null,
               ended: null,
+              category: "elected" as const,
               isVoting: true,
             }));
       const parties = [
@@ -20835,6 +20854,7 @@ export const bodies = {
           to: row.to,
           acquired: row.acquired,
           ended: row.ended,
+          category: row.category,
           isVoting: row.isVoting,
         })),
         apportionment: apportionment.rows,
