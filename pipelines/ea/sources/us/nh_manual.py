@@ -246,7 +246,7 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
                 district, name = prefix[1], prefix[2]
                 state.update(office="board of commissioners", district=district)
             parts = [part.strip() for part in name.split(",")]
-            if len(parts) > 1 and not re.fullmatch(r"(?:jr|sr|ii|iii|iv|2d|3d)\.?", parts[-1], re.IGNORECASE):
+            if len(parts) > 1 and not re.fullmatch(r"(?:jr|sr|st|ii|iii|iv|2d|3d)\.?", parts[-1], re.IGNORECASE):
                 town = parts[-1]
                 name = ", ".join(parts[:-1])
         if not name:
@@ -550,7 +550,7 @@ def repair(name: str, town: str | None, party: str | None) -> tuple[str, str | N
 
 def person(name: str) -> tuple[str, str]:
     cleaned = re.sub(r"[.,]", " ", name)
-    words = [word for word in cleaned.split() if not re.fullmatch(r"(?i)jr|sr|ii|iii|iv|2d|3d", word)]
+    words = [word for word in cleaned.split() if not re.fullmatch(r"(?i)jr|sr|st|ii|iii|iv|2d|3d", word)]
     return (re.sub(r"[^a-z]", "", words[-1].lower()), words[0][:1].lower()) if words else ("", "")
 
 
@@ -618,7 +618,7 @@ def emit() -> Path:
         contests: dict[tuple[int, str, str, str | None, str | None], list[tuple[str, str]]] = {}
         for value, contest, text in conn.execute(
             """select x.value, x.entity_id, n.text from external_id x join name n on n.entity_id = x.entity_id
-               where x.scheme = 'us.contest' and x.value like 'NH:local:%%' and n.text like '%% County %% election%%'"""
+               where x.scheme = 'us.contest' and x.value ~ '(^|:)NH:' and n.text like '%% County %% election%%'"""
         ).fetchall():
             found = CONTEST.match(text)
             if found is None:
@@ -634,7 +634,7 @@ def emit() -> Path:
         for text, election, path, *rest in conn.execute(
             f"""select n.text, c.election_id, s.path, {columns} from external_id x join contest c on c.id = x.entity_id
                 join name n on n.entity_id = c.id and n.is_preferred join slug s on s.entity_id = c.id
-                where x.scheme = 'us.contest' and x.value like 'NH:local:%%' and n.text like '%% County %% election%%'"""
+                where x.scheme = 'us.contest' and x.value ~ '(^|:)NH:' and n.text like '%% County %% election%%'"""
         ).fetchall():
             found = CONTEST.match(text)
             if found is None:
@@ -715,8 +715,8 @@ def emit() -> Path:
                 minted is None
                 and conn.execute(
                     """select 1 from result_set rs join changeset c on c.id = rs.changeset_id
-                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' and c.pipeline = %s""",
-                    [contest, SOURCE],
+                   where rs.contest_id = %s and rs.is_default and rs.status = 'active'""",
+                    [contest],
                 ).fetchone()
             ):
                 continue
@@ -772,7 +772,8 @@ def emit() -> Path:
                     for option in options
                     if option[2] == "candidate"
                     and (
-                        person(option[1])[0] == mine[0]
+                        re.match(rf"{re.escape(option[1])}[.,]? +[A-Z][A-Za-z. ]+$", name)
+                        or person(option[1])[0] == mine[0]
                         or len(mine[0]) > 4
                         and difflib.SequenceMatcher(None, person(option[1])[0], mine[0]).ratio() >= 0.8
                         and person(option[1])[1] == mine[1]
@@ -785,6 +786,7 @@ def emit() -> Path:
                 if (
                     not hits
                     and CLEAN.fullmatch(name)
+                    and not re.search(r"[a-z]\. [A-Za-z]|- ", name)
                     and len(mine[0]) > 2
                     and (len(name.split()) > 2 or len(name.split()[0]) > 2)
                 ):
