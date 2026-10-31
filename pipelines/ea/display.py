@@ -17,6 +17,9 @@ LAKE_KM2 = 1_000
 CHUNK = 200
 POINTS = 150_000
 BATCH = 20_000
+COARSE = 20_000
+SCALE = 0.0002
+DRIFT = 0.005
 ATTRIBUTION = "Coastlines © OpenStreetMap contributors (ODbL); lakes: HydroLAKES (CC BY 4.0, Lehner and Grill 2013)"
 
 
@@ -161,4 +164,47 @@ def refresh(conn: Connection, scheme_code: str, as_of: date, mask: str) -> int:
         conn.commit()
         part = []
         points = 0
+    return len(todo)
+
+
+def coarsen(conn: Connection) -> int:
+    conn.execute("create schema if not exists display")
+    conn.execute(
+        """create table if not exists display.coarse (
+               area_id uuid not null,
+               valid daterange not null,
+               geom_hash text not null,
+               geom geometry(MultiPolygon, 4326),
+               primary key (area_id, valid)
+           )"""
+    )
+    conn.execute(
+        """delete from display.coarse k where not exists (
+               select from area_geometry g
+               where g.area_id = k.area_id and g.valid = k.valid and md5(ST_AsBinary(g.geom)) = k.geom_hash
+           )"""
+    )
+    todo = conn.execute(
+        """select g.area_id, g.valid from area_geometry g
+           where ST_NPoints(g.geom) > %s
+             and not exists (select from display.coarse k where k.area_id = g.area_id and k.valid = g.valid)""",
+        [COARSE],
+    ).fetchall()
+    for area_id, valid in todo:
+        conn.execute(
+            """insert into display.coarse (area_id, valid, geom_hash, geom)
+               select g.area_id, g.valid, md5(ST_AsBinary(g.geom)),
+                      case when ST_NPoints(s.geom) * 2 < ST_NPoints(g.geom)
+                           and abs(ST_Area(s.geom) / ST_Area(g.geom) - 1) < %s then s.geom end
+               from area_geometry g
+               cross join lateral (
+                   select ST_Multi(ST_CollectionExtract(ST_MakeValid(
+                       ST_Simplify(g.geom, sqrt(ST_Area(g.geom)) * %s, false), 'method=structure keepcollapsed=false'
+                   ), 3)) as geom
+               ) s
+               where g.area_id = %s and g.valid = %s
+               on conflict (area_id, valid) do nothing""",
+            [DRIFT, SCALE, area_id, valid],
+        )
+        conn.commit()
     return len(todo)

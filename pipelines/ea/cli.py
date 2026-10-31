@@ -18,6 +18,7 @@ from ea import (
     coverage_check,
     coverage_countries,
     coverage_tables,
+    display,
     fixtures,
     layout,
     names,
@@ -61,6 +62,7 @@ def main() -> None:
     )
     contributing.add_argument("--author", type=UUID, help="user id of the human author or key owner")
     contributing.add_argument("--agent", action="store_true", help="the author is an agent acting for --author")
+    commands.add_parser("coarse", help="refresh the simplified copies of heavy area geometries used for overlaps")
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme",
         nargs="?",
@@ -192,6 +194,9 @@ def main() -> None:
                 parser.error("contrib compile needs a payload and --author")
             with connect() as conn:
                 print(contrib.compile_file(conn, args.payload, args.author, "agent" if args.agent else "user"))
+        case "coarse":
+            with connect() as conn:
+                print(display.coarsen(conn))
         case "tiles":
             print(tiles.build(args.scheme))
         case "rasters":
