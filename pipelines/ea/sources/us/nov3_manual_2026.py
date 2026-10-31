@@ -154,6 +154,11 @@ COUNTIES = {
         "https://www.barrington.ri.gov/DocumentCenter/View/2978/BOC-Booklet-Questions-Info-revised-10-6",
         "RI-web/barrington-boc-booklet.pdf",
     ),
+    "44005": (
+        "RI",
+        "https://portsmouthri.gov/DocumentCenter/View/7981/Portsmouth-Local-Ballot-Question-Explanation-2026",
+        "RI-web/portsmouth-local-questions.pdf",
+    ),
     "38015": (
         "ND",
         "https://www.bismarckschools.org/fs/resource-manager/view/11ac6ea4-ff0d-4486-84da-16289d7f918f",
