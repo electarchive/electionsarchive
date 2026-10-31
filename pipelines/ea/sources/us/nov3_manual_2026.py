@@ -763,6 +763,11 @@ COUNTIES = {
         "https://www.co.falls.tx.us/upload/page/0087/ROBINSON%20ISD%20NOV%202026%20-%20Notice%20of%20Bond%20Election.pdf",
         "N3M-web/tx9/mc/robinson.pdf",
     ),
+    "48061-sbm": (
+        "TX",
+        "https://www.cameroncountytx.gov/elections/wp-content/uploads/2026/09/San-Benito-Municipal-Utility-District-No.-1-Confirmation-and-Directors-Election-09182026.pdf",
+        "N3M-web/tx9/cam/sb2.pdf",
+    ),
     "48029-sid": (
         "TX",
         "https://home.bexar.org/generalsampleballot-specialimprovementdistricts.pdf",

@@ -10514,5 +10514,16 @@
     "title": "School facility bonds",
     "text": "THIS IS A PROPERTY TAX INCREASE. The issuance of $81,210,000 of bonds by the Robinson Independent School District for constructing, renovating, improving and equipping school facilities in the District and the imposition of a tax sufficient to pay the principal of and interest on the bonds.",
     "file": "N3M-web/tx9/mc/robinson.pdf"
+  },
+  {
+    "state": "TX",
+    "county": "Cameron",
+    "county_fips": "48061-sbm",
+    "publisher": "Cameron County Elections Department (San Benito Municipal Utility District No. 1 sample ballot)",
+    "place": "San Benito Municipal Utility District No. 1",
+    "number": "Proposition A",
+    "title": "Confirmation of the district",
+    "text": "Confirmation of San Benito Municipal Utility District No. 1.",
+    "file": "N3M-web/tx9/cam/sb2.pdf"
   }
 ]
