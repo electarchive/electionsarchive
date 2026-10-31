@@ -10,25 +10,53 @@ from ea.store import DATA
 SOURCE = "us.nj_fire_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-MANUAL = DATA / "inbox" / "manual"
+INBOX = DATA / "inbox"
 BURLINGTON = "https://www.co.burlington.nj.us/#sample-ballots-2026-general"
 BOROUGH = "https://www.mercercounty.org/#sample-ballot-hopewell-borough-2026-general"
 TOWNSHIP = "https://www.mercercounty.org/#sample-ballot-hopewell-township-2026-general"
+MANTUA = "https://www.gloucestercountynj.gov/DocumentCenter/View/19674/Mantua-Township-District-10-UOCAVA-GENERAL-26"
+WASHINGTON = (
+    "https://www.gloucestercountynj.gov/DocumentCenter/View/19568/Washington-Township-District-1-UOCAVA-GENERAL-26"
+)
+WESTVILLE = (
+    "https://www.gloucestercountynj.gov/DocumentCenter/View/19513/Westville-Borough-District-1-UOCAVA-GENERAL-26"
+)
+SOMERSET = "https://www.somersetcountynj.gov/government/elected-officials/county-clerk/election-division"
 SOURCES = {
     BURLINGTON: (
         "Burlington County Clerk",
         "Official General Election Sample Ballots, November 3, 2026",
-        "MF-438/Burlington Samples ALL Gen26.pdf",
+        "manual/MF-438/Burlington Samples ALL Gen26.pdf",
     ),
     BOROUGH: (
         "Mercer County Clerk",
         "Official General Election Sample Ballot, Hopewell Borough, November 3, 2026",
-        "MF-440/F07 Hopewell Borough General 2026.pdf",
+        "manual/MF-440/F07 Hopewell Borough General 2026.pdf",
     ),
     TOWNSHIP: (
         "Mercer County Clerk",
         "Official General Election Sample Ballot, Hopewell Township, November 3, 2026",
-        "MF-440/F08 Hopewell Township General 2026.pdf",
+        "manual/MF-440/F08 Hopewell Township General 2026.pdf",
+    ),
+    MANTUA: (
+        "Gloucester County Clerk",
+        "Official General Election Ballot, Township of Mantua District 10, November 3, 2026",
+        "y26/nj/gloucester/Mantua-Township-District-10-UOCAVA-GENERAL-26.pdf",
+    ),
+    WASHINGTON: (
+        "Gloucester County Clerk",
+        "Official General Election Ballot, Township of Washington District 1, November 3, 2026",
+        "y26/nj/gloucester/Washington-Township-District-1-UOCAVA-GENERAL-26.pdf",
+    ),
+    WESTVILLE: (
+        "Gloucester County Clerk",
+        "Official General Election Ballot, Borough of Westville District 1, November 3, 2026",
+        "y26/nj/gloucester/Westville-Borough-District-1-UOCAVA-GENERAL-26.pdf",
+    ),
+    SOMERSET: (
+        "Somerset County Clerk",
+        "2026 General Election School Board and Fire Commissioner Candidates",
+        "y26/nj/somerset_school.xlsx",
     ),
 }
 SEATS = (
@@ -98,6 +126,18 @@ SEATS = (
         TOWNSHIP,
         ["Thomas Pearse-Drance", "Linda Abey", "Kevin R. Baranowski"],
     ),
+    ("Mantua Township Fire District", "Gloucester", False, 2, MANTUA, ["Nicholas A. Vacarino", "Michael S. Riggs"]),
+    (
+        "Washington Township Fire District",
+        "Gloucester",
+        False,
+        2,
+        WASHINGTON,
+        ["John J. Reisenwitz III", "Frank Stella"],
+    ),
+    ("Westville Borough Fire District", "Gloucester", False, 2, WESTVILLE, ["William Marsden", "Vincent DiCicco"]),
+    ("Westville Borough Fire District", "Gloucester", True, 1, WESTVILLE, ["Paul Mailley"]),
+    ("Hillsborough Fire District", "Somerset", False, 1, SOMERSET, ["John Lazorchak"]),
 )
 
 
@@ -106,14 +146,16 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            path = MANUAL / file
+            path = INBOX / file
             raw.store(
                 SOURCE,
                 url,
                 path.read_bytes(),
                 suffix=path.suffix,
                 retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
-                media_type="application/pdf",
+                media_type="application/pdf"
+                if path.suffix == ".pdf"
+                else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             )
 
 
@@ -144,7 +186,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="NJ",
-        summary="Fire commissioner races on the November 3, 2026 ballot in Burlington and Mercer County fire districts, with candidates from the county clerks' official sample ballots",
+        summary="Fire commissioner races on the November 3, 2026 ballot in Burlington, Gloucester, Mercer, and Somerset County fire districts, with candidates from the county clerks' official ballots and candidate lists",
         sources={url: (publisher, title) for url, (publisher, title, _) in SOURCES.items()},
         frame=pl.read_parquet(PARSED / "candidates.parquet"),
     )
