@@ -256,7 +256,7 @@ def emit() -> Path:
                 [contest],
             ).fetchall():
                 options.setdefault(kind, []).append((option, label or ""))
-            if prior:
+            if prior and not row["publisher"]:
                 source_id = prior[0][6]
             else:
                 publisher = row["publisher"] or PUBLISHER
