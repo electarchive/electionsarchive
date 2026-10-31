@@ -1116,21 +1116,6 @@
       ),
     };
   });
-  const dots = $derived({
-    type: "FeatureCollection" as const,
-    features: places.rows.flatMap((row) =>
-      row.at == null
-        ? []
-        : [
-            {
-              type: "Feature" as const,
-              id: row.k,
-              properties: {},
-              geometry: { type: "Point" as const, coordinates: row.at },
-            },
-          ],
-    ),
-  });
   const biggest = $derived(Math.max(1, ...places.rows.map((row) => row.valid)));
   const isDeclared = $derived(places.rows.every((row) => row.valid === 0));
   let isShaded = $state(false);

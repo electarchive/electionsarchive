@@ -122,9 +122,10 @@ export function segments(
       ),
       high,
     ]),
-  ].toSorted();
+  ].toSorted((a, b) => (a < b ? -1 : Number(a > b)));
   const out: Array<{ party: string | null; from: string; to: string }> = [];
-  for (const [index, from] of cuts.slice(0, -1).entries()) {
+  const starts = [...cuts.slice(0, -1).entries()];
+  for (const [index, from] of starts) {
     const party = partyOn(member, from);
     const to = cuts[index + 1] ?? high;
     const last = out.at(-1);

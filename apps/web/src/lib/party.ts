@@ -61,7 +61,7 @@ export function swatch(color: string | null | undefined, key: string) {
   if (key === "independent" && chosen == null) {
     return independent(0);
   }
-  if (chosen == null && (key === "" || key === "none" || key === "party:")) {
+  if (chosen == null && ["", "none", "party:"].includes(key)) {
     return "color-mix(in oklab, var(--muted-foreground) 20%, var(--card))";
   }
   if (chosen != null && NEUTRALS.includes(chosen)) {

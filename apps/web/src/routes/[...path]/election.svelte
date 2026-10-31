@@ -1592,11 +1592,11 @@
         races.every(
           (other) =>
             other.anchor.replace(
-              /-(\d+|round-\d+|by-.+|special-election)$/u,
+              /-(?:\d+|round-\d+|by-.+|special-election)$/u,
               "",
             ) !==
               target.anchor.replace(
-                /-(\d+|round-\d+|by-.+|special-election)$/u,
+                /-(?:\d+|round-\d+|by-.+|special-election)$/u,
                 "",
               ) || other.count <= target.count,
         )

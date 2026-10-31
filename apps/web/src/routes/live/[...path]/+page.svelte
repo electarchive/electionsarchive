@@ -525,7 +525,7 @@
             </h2>
             {#key sentence}
               <p
-                class="animate-[settle_420ms_ease-out_both] font-serif text-[1.375rem] leading-snug text-balance motion-reduce:animate-none"
+                class="animate-[settle_420ms_ease-out_both] font-serif text-[1.375rem]/snug text-balance motion-reduce:animate-none"
               >
                 {sentence}
               </p>
@@ -670,7 +670,7 @@
     {:else if night.races.length === 0}
       <section class="bg-card px-3.5 pbs-8 pbe-10 sm:px-6">
         <p
-          class="font-serif text-[1.375rem] leading-snug text-balance max-inline-[40ch]"
+          class="font-serif text-[1.375rem]/snug text-balance max-inline-[40ch]"
         >
           {m.live_waiting_night()}
         </p>

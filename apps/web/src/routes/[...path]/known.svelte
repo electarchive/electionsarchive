@@ -71,7 +71,7 @@
         <div
           class="grid gap-x-6 gap-y-1.5 border-bs border-border py-2.5 lg:grid-cols-[12rem_minmax(0,1fr)]"
         >
-          <h3 class="text-[0.8125rem] leading-snug">
+          <h3 class="text-[0.8125rem]/snug">
             <span class="font-semibold tabular-nums">{group.years}</span>
             <span class="block text-muted-foreground">{group.office}</span>
           </h3>
@@ -88,7 +88,7 @@
                 ),
               )}
               <li
-                class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2 text-[0.8125rem] leading-snug"
+                class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2 text-[0.8125rem]/snug"
               >
                 {#if entry.category === "not_applicable"}
                   <span

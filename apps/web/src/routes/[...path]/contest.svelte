@@ -1239,7 +1239,7 @@
     {/if}
     <div class="flex items-start justify-between gap-3">
       <h1 class="title" data-scope-title>
-        {(drilled ? heading : contest.name).replaceAll("—", "\u2060—")}
+        {(drilled ? heading : contest.name).replaceAll("\u2014", "\u2060—")}
       </h1>
       {#if !READ_ONLY}
         <EditPanel

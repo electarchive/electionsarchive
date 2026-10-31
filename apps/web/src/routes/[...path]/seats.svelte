@@ -1016,7 +1016,7 @@
           >
             <div
               class="scrollbar-thin [scrollbar-color:var(--input)_transparent] overflow-y-auto overscroll-y-contain py-1 ps-3.5 pe-2.5 max-block-[min(22rem,60dvh)]"
-              {@attach (node) => {
+              {@attach (node: HTMLElement) => {
                 const fade = () => {
                   const top = Math.min(node.scrollTop, 24);
                   const bottom = Math.min(
@@ -1026,8 +1026,7 @@
                   node.style.maskImage = `linear-gradient(to bottom, transparent, #000 ${top}px, #000 calc(100% - ${bottom}px), transparent)`;
                 };
                 fade();
-                node.addEventListener("scroll", fade, { passive: true });
-                return () => node.removeEventListener("scroll", fade);
+                return on(node, "scroll", fade, { passive: true });
               }}
             >
               {#if roster.every((group) => group.seat == null)}

@@ -184,9 +184,7 @@
       ? (sheet.legend.find((item) => item.key === who) ?? first)
       : null,
   );
-  const extra = $derived(
-    extras.find((item) => whom != null && item.key === whom.key) ?? null,
-  );
+  const extra = $derived(extras.find((item) => item.key === whom?.key) ?? null);
   const drawn = $derived(isDeep ? (detail.mid?.set ?? sheet) : sheet);
   const isParts = $derived(
     sheet.parts.length > 0 && sheet.places.k.includes(sheet.parts[0]?.k ?? -1),

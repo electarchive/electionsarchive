@@ -179,13 +179,14 @@
   const since = $derived(
     person.isGone ? m.person_served_from : m.person_served_now,
   );
-  const tether = TooltipPrimitive.createTether<{
+  type Tip = {
     label: string;
     color: string;
     from: string | null;
     to: string | null;
     isFromUnknown: boolean;
-  }>();
+  };
+  const tether = TooltipPrimitive.createTether<Tip>();
   const month = (value: string) =>
     new Intl.DateTimeFormat(getLocale(), {
       month: "short",
@@ -768,7 +769,7 @@
     </section>
   </article>
   <Tooltip.Root {tether} delayDuration={120}>
-    {#snippet children({ payload })}
+    {#snippet children({ payload }: { payload: Tip | null })}
       {#if payload != null}
         <Tooltip.Content
           collisionPadding={8}
