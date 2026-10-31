@@ -812,6 +812,11 @@ LIEU = {
         "San Bernardino County Registrar of Voters",
         "November 3, 2026 General Election: Special Districts Appointments in Lieu of Election",
     ),
+    "06097-lieu": (
+        "https://sonoma-county.legistar1.com/sonoma-county/attachments/c4f6c4a5-2440-48a9-820e-de3a47461463.pdf",
+        "Sonoma County Board of Supervisors",
+        "Resolution Appointing Nominees to the Office of District Director of Their Respective Special Districts, September 15, 2026",
+    ),
 }
 LIEU_NAME = re.compile(r"^(?P<name>\S.*?)\s{2,}(?:(?P<text>\S.*?)\s{2,})?(?P<term>\d) years?\s*$")
 LIEU_OFFICE = re.compile(
@@ -853,6 +858,45 @@ def san_bernardino_lieu() -> list[Row]:
         for (body, label, short), names in keyed.items()
         for name in names
     ]
+
+
+SONOMA_LIEU_SEATS = {
+    "Cazadero Community Services District": 2,
+    "Graton Community Services District": 2,
+    "Sonoma Valley Health Care District": 2,
+    "Rains Creek/Hiatt Rd County Water District": 3,
+    "Coast Life Support District": 3,
+}
+
+
+def sonoma_lieu() -> list[Row]:
+    path = raw.fetch(SOURCE, LIEU["06097-lieu"][0], suffix=".pdf").path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode()
+    rows: list[Row] = []
+    head = None
+    for line in text.splitlines():
+        if found := re.match(r"^\s+(.+?), (\d)-Year Term$", line):
+            head = (found[1], found[2] == "2")
+        elif (found := re.match(r"^\s+•\s+(\S.*)$", line)) and head is not None:
+            body, _, zone = head[0].partition(", ")
+            seats = None if head[1] else SONOMA_LIEU_SEATS.get(body)
+            rows.append(
+                {
+                    "county": "Sonoma",
+                    "district": full_name(body),
+                    "seat": zone or ("Short Term" if head[1] else ""),
+                    "role": "Director",
+                    "seats": 1 if zone else seats or 0,
+                    "name": cased(found[1].strip()).replace("Demartini", "DeMartini"),
+                    "unexpired": head[1],
+                    "tacit": True,
+                    "doc": "06097-lieu",
+                }
+            )
+    counts = {}
+    for row in rows:
+        counts[row["district"], row["seat"]] = counts.get((row["district"], row["seat"]), 0) + 1
+    return [{**row, "seats": row["seats"] or counts[row["district"], row["seat"]]} for row in rows]
 
 
 def kings() -> list[Row]:
@@ -1490,6 +1534,7 @@ def parse() -> None:
                 *stanislaus(),
                 *ventura(),
                 *san_bernardino_lieu(),
+                *sonoma_lieu(),
                 *san_francisco(),
                 *yolo(),
             ]
