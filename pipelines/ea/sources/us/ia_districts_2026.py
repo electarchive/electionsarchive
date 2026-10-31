@@ -13,6 +13,7 @@ SOURCE = "us.ia_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "y26" / "ia" / "counties"
+IMAGE_ONLY = {"Jasper", "Pottawattamie"}
 SWCD = "Soil and Water Conservation District"
 
 COUNTIES = {
@@ -111,6 +112,81 @@ COUNTIES = {
         "https://www.warrencountyia.gov/wp-content/uploads/2026/09/Federal-State-County-Candidates-Public-Measures-General-110326.pdf",
         "Warren County Auditor",
     ),
+    "Polk": (
+        "polk",
+        "https://www.polkcountyiowa.gov/county-auditor/election/",
+        "Polk County Auditor",
+    ),
+    "Story": (
+        "story",
+        "https://storycountyiowa.gov/1754/General-Election-11032026",
+        "Story County Auditor",
+    ),
+    "Dallas": (
+        "dallas",
+        "https://www.dallascountyiowa.gov/DocumentCenter/View/7620",
+        "Dallas County Auditor",
+    ),
+    "Jasper": (
+        "jasper",
+        "https://www.jaspercountyiowa.gov/elections",
+        "Jasper County Auditor",
+    ),
+    "Johnson": (
+        "johnson",
+        "https://www.johnsoncountyiowa.gov/auditor/elections",
+        "Johnson County Auditor",
+    ),
+    "Scott": (
+        "scott",
+        "https://elections.scottcountyiowa.gov/",
+        "Scott County Auditor",
+    ),
+    "Pottawattamie": (
+        "pottawattamie",
+        "https://www.pottcounty-ia.gov/elections",
+        "Pottawattamie County Auditor",
+    ),
+    "Woodbury": (
+        "woodbury",
+        "https://www.woodburycountyiowa.gov/elections",
+        "Woodbury County Auditor",
+    ),
+    "Clinton": (
+        "clinton",
+        "https://www.clintoncountyiowa.com/elections",
+        "Clinton County Auditor",
+    ),
+    "Muscatine": (
+        "muscatine",
+        "https://www.muscatinecountyiowa.gov/elections",
+        "Muscatine County Auditor",
+    ),
+    "Wapello": (
+        "wapello",
+        "https://www.wapellocounty.org/elections",
+        "Wapello County Auditor",
+    ),
+    "Boone": (
+        "boone",
+        "https://www.boonecounty.iowa.gov/elections",
+        "Boone County Auditor",
+    ),
+    "Mahaska": (
+        "mahaska",
+        "https://www.mahaskacounty.org/elections",
+        "Mahaska County Auditor",
+    ),
+    "Lee": (
+        "lee",
+        "https://www.leecountyiowa.org/elections",
+        "Lee County Auditor",
+    ),
+    "Marshall": (
+        "marshall",
+        "https://www.marshallcountyiowa.gov/elections",
+        "Marshall County Auditor",
+    ),
 }
 
 BOARDS = (
@@ -205,6 +281,83 @@ BOARDS = (
         False,
         ("Emily McCauley", "Dan Bailey", "Michael Lee White"),
     ),
+    ("Polk", "Polk County Hospital", "Trustee", 2, False, ("Emily Webb", "Abu Bakarr Sillah", "Emily Westergaard")),
+    (
+        "Polk",
+        f"Polk County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        ("Douglas R. Zehr", "Autumn L. Ogden", "Kirk Norris", "Deborah Neustadt"),
+    ),
+    (
+        "Story",
+        "Story County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Elizabeth Hertz", "Austin Vier", "Pamela Elliott Cain", "Patrick Sheets"),
+    ),
+    ("Story", f"Story County {SWCD}", "Commissioner", 2, False, ("Selden Spencer", "Stephen Riggins")),
+    (
+        "Dallas",
+        "Dallas County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Kari Boyens", "Joelle Miner", "Pat Steele", "Dennis Cochran"),
+    ),
+    (
+        "Dallas",
+        f"Dallas County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        ("Craig Fleishman", "Veronica M. Lack", "James P Beni"),
+    ),
+    ("Dallas", f"Dallas County {SWCD}", "Commissioner", 2, True, ("Ken Herring", "Jerry Vos")),
+    ("Jasper", f"Jasper County {SWCD}", "Commissioner", 2, False, ("Dave Van Waus", "Joe Otto", "Deb Wearmouth")),
+    (
+        "Johnson",
+        f"Johnson County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        ("Corey Johnson", "Alexander Schmidt", "Travis Spevacek"),
+    ),
+    (
+        "Scott",
+        f"Scott County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        ("Christine Bolte", "Marty Larson", "Chad Dexter", "Alexandra Dermody"),
+    ),
+    ("Pottawattamie", f"West Pottawattamie {SWCD}", "Commissioner", 2, False, ("Dolores Bristol", "Don Dilts")),
+    ("Woodbury", f"Woodbury County {SWCD}", "Commissioner", 2, False, ("Gary Walters",)),
+    ("Clinton", f"Clinton County {SWCD}", "Commissioner", 2, False, ("Cindy Heilmann", "John Tuthill")),
+    ("Muscatine", f"Muscatine County {SWCD}", "Commissioner", 2, False, ("Randall Eichelberger", "Robert L. Beatty")),
+    ("Wapello", f"Wapello County {SWCD}", "Commissioner", 2, False, ("Keith Lewis", "Connie Beinhart")),
+    (
+        "Boone",
+        "Boone County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Brian Reimers", "Lisa Kobernusz", "Meredith Nerem", "Robert Getschman"),
+    ),
+    ("Boone", f"Boone County {SWCD}", "Commissioner", 2, False, ("Steve Carlson", "Melissa Sturgeon-Bice")),
+    (
+        "Mahaska",
+        "Mahaska County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Joette Stout", "David Langkamp", "Marsha Riordan", "Donna Arendt"),
+    ),
+    ("Mahaska", f"Mahaska County {SWCD}", "Commissioner", 2, False, ("Steven Plate",)),
+    ("Lee", f"Lee County {SWCD}", "Commissioner", 2, False, ("Stanley Sanders", "Ralph Krogmeier")),
+    ("Marshall", f"Marshall County {SWCD}", "Commissioner", 2, False, ("Roger Lutes", "Tyler Kelley")),
 )
 
 
@@ -213,14 +366,14 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            file = INBOX / f"{stem}.pdf"
+            file = next(INBOX.glob(f"{stem}.*"))
             raw.store(
                 SOURCE,
                 url,
                 file.read_bytes(),
-                suffix=".pdf",
+                suffix=file.suffix,
                 retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
-                media_type="application/pdf",
+                media_type="text/html" if file.suffix == ".html" else "application/pdf",
             )
 
 
@@ -231,9 +384,13 @@ def squash(text: str) -> str:
 def parse() -> None:
     texts: dict[str, str] = {}
     for county, (_, url, _) in COUNTIES.items():
+        path = raw.cached(SOURCE, url).path
+        if path.suffix == ".html":
+            texts[county] = squash(re.sub(r"<[^>]+>", " ", path.read_text(errors="ignore")))
+            continue
         texts[county] = squash(
             subprocess.run(
-                ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
+                ["pdftotext", "-layout", str(path), "-"],
                 capture_output=True,
                 check=True,
                 text=True,
@@ -242,7 +399,7 @@ def parse() -> None:
     rows = []
     for county, district, role, vote, remainder, names in BOARDS:
         for name in names:
-            assert not texts[county] or squash(name) in texts[county], (county, name)
+            assert county in IMAGE_ONLY or not texts[county] or squash(name) in texts[county], (county, name)
             rows.append(
                 {
                     "district": district,
