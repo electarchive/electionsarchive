@@ -108,9 +108,9 @@ METHOD = (
     "the 2024 gains and losses against them."
 )
 SNP_NOTE = (
-    "These estimates give the SNP 48 of Scotland's 57 seats, so its nine seats in 2024 are 39 fewer, as the House of "
-    "Commons Library's results briefing (CBP-10009) gives for Scotland. Some broadcast and newspaper tallies give 38, "
-    "because they compare seats whose boundaries did not change with the party defending them at "
+    "These estimates give the SNP 48 of Scotland's 57 seats, so its nine seats in 2024 are 39 fewer than that, as "
+    "the House of Commons Library's results briefing (CBP-10009) gives for Scotland. Some broadcast and newspaper "
+    "tallies give 38, because they compare seats whose boundaries did not change with the party defending them at "
     "dissolution rather than with the notional result."
 )
 

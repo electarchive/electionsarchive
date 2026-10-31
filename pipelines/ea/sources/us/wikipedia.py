@@ -43,8 +43,8 @@ SPANS = {
 TITLE = "United States presidential election articles, results by state"
 NOTE = (
     "Votes as tabulated in the results-by-state table of the English Wikipedia's article on the election, which "
-    "cites Dubin's and Burnham's compilations for the nineteenth century. "
-    "Candidates outside the table's columns are counted under Others, and so is any gap "
+    "cites Dubin's and Burnham's compilations for the nineteenth century. Candidates outside the table's columns "
+    "are counted under Others, and so is any gap "
     "between the named candidates and the table's state total; where that total is below the candidates' sum, the "
     "sum is the total. The winners shown are the slates that carried the "
     "state; where the table splits a state's electors among candidates on its ballot, the split is kept."
