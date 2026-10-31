@@ -1231,6 +1231,26 @@ FEEDS.update(
             "City of Millersburg",
             "November 2026 City Council Election",
         ),
+        "OR-41055-wasco": (
+            "https://www.shermancountyor.gov/DocumentCenter/View/987/City-of-Wasco-Filed-Candidates",
+            "City of Wasco",
+            "Candidates for Wasco City Offices, 2026 General Election (filed with Sherman County Clerk)",
+        ),
+        "OR-41055-moro": (
+            "https://www.shermancountyor.gov/DocumentCenter/View/994/Moro-Candidates",
+            "City of Moro",
+            "Candidates for Moro City Offices, 2026 General Election (filed with Sherman County Clerk)",
+        ),
+        "OR-41055-grass-valley": (
+            "https://www.shermancountyor.gov/DocumentCenter/View/995/Grass-Valley-Candidates_Measure",
+            "City of Grass Valley",
+            "City of Grass Valley Candidate Filings, November 3, 2026 General Election (filed with Sherman County Clerk)",
+        ),
+        "OR-41055-rufus": (
+            "https://www.shermancountyor.gov/DocumentCenter/View/996/City-of-Rufus-Candidates_Measure",
+            "City of Rufus",
+            "Submission Form for 2026 City of Rufus Elections (filed with Sherman County Clerk)",
+        ),
         "OR-41019": (
             "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
             "Douglas County Clerk",
@@ -1424,6 +1444,10 @@ DELIVERED = {
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
     "OR-41043-millersburg": DATA / "inbox" / "y26" / "or" / "millersburg.txt",
+    "OR-41055-wasco": DATA / "inbox" / "y26" / "or" / "sherman_wasco.pdf",
+    "OR-41055-moro": DATA / "inbox" / "y26" / "or" / "sherman_moro.pdf",
+    "OR-41055-grass-valley": DATA / "inbox" / "y26" / "or" / "sherman_grass_valley.pdf",
+    "OR-41055-rufus": DATA / "inbox" / "y26" / "or" / "sherman_rufus.pdf",
     "OH-39165": DATA / "inbox" / "y26" / "oh" / "warren_cands.pdf",
     "OH-39041": DATA / "inbox" / "y26" / "oh" / "delaware_cands.pdf",
     "OH-39155": DATA / "inbox" / "y26" / "oh" / "trumbull_cands.pdf",
