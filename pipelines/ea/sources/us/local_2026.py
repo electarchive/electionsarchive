@@ -6331,6 +6331,20 @@ for key, publisher, title, url, local in (
         "ca/tuolumne_filing.pdf",
     ),
     (
+        "NE-31047-dawson",
+        "Dawson County Clerk",
+        "Primary Election official results, May 12, 2026, with the filed candidate fields reported by KRVN, March 3, 2026",
+        "https://countyelectionresults.nebraska.gov/election_files/Dawson/2026_Primary_official_results.pdf",
+        "ne/dawson_primary.pdf",
+    ),
+    (
+        "NE-31089-holt",
+        "Holt County Clerk",
+        "Notice of 2026 Primary Election, with offices automatically nominated to the General Election, and Primary Election official results, May 12, 2026",
+        "https://holtcounty.nebraska.gov/sites/default/files/doc/2026%20Notice%20of%20Primary%20Election%202.pdf",
+        "ne/holt_notice.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commission",
         "Sample ballot, General Election November 3, 2026 (26GNEBUF)",
