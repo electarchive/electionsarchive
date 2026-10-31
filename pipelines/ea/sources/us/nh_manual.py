@@ -280,6 +280,8 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         district = state["district"]
         if not scatter:
             prefix = re.match(r"dist(?:rict|\.)?\s*(?:no\.?\s*)?(\d)\s+(.*)", name, re.IGNORECASE)
+            if prefix and re.match(r"dist", prefix[2], re.IGNORECASE):
+                return
             if prefix:
                 district, name = prefix[1], prefix[2]
                 state.update(office="board of commissioners", district=district)
@@ -314,7 +316,11 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         out.append(entry)
         group.append(entry)
 
+    last_page = 0
     for row in all_rows:
+        if last_page and row.page - last_page > 10:
+            state.update(office=None, district=None, opening=False)
+        last_page = row.page
         found = number(row.words)
         left = (
             [word for word in row.words[: row.words.index(found[2][0])] if not LEADER.fullmatch(word.text)]
@@ -336,7 +342,14 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
             elif kind[0] == "office":
                 state.update(office=kind[1], district=None, opening=False)
             elif kind[0] == "district":
-                state["district"] = kind[1]
+                repeat = kind[1] == state["district"] and any(
+                    entry["county"] == state["county"]
+                    and entry["office"] == state["office"]
+                    and entry["run"] == state["run"]
+                    and entry["district"] == kind[1]
+                    for entry in out
+                )
+                state["district"] = str(int(kind[1]) + 1) if repeat else kind[1]
             else:
                 state.update(office=None, district=None, opening=False)
             continue
