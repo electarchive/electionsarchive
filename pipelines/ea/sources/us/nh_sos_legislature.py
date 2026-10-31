@@ -121,7 +121,7 @@ UNNAMED = {("2022-ge-house-rockingham_7.xls", 1): ["Northwood", "Nottingham", "T
 NUMERIC = re.compile(r"-?\d+|[-\u2013\u2212]+")
 DASH = re.compile(r"[-\u2013\u2212]+")
 MISSPELLED = {"Brasill": "Brassill", "Sorenson": "Sorensen"}
-ALIASES = {"atkinsonandgilmantonacgt": "atkinsonandgilmantonacademygrant"}
+ALIASES = {"atkinsonandgilmantonacgt": "atkinsonandgilmantonacademygrant", "newfield": "newfields"}
 
 
 def town(text: str) -> str:
@@ -343,16 +343,26 @@ def emit() -> Path:
                    from contest_option o where o.contest_id = %s and o.parent_option_id is null""",
                 [default, contest],
             ).fetchall()
+            rows = rows.with_columns(unit=pl.col("town").map_elements(town, return_dtype=pl.String))
+            repeats = rows.group_by("label", "unit").agg(pl.col("votes").n_unique().alias("distinct")).filter(
+                pl.col("distinct") > 1
+            )
+            if repeats.height:
+                skipped.setdefault("repeated town rows disagree", []).append(key)
+                continue
+            rows = rows.unique(["label", "unit"], keep="first", maintain_order=True)
             sums = dict(rows.group_by("label").agg(pl.col("votes").sum()).iter_rows())
             matched: dict[str, tuple[str, int]] = {}
             for label in sums:
-                if label == "BLC":
+                if label in ("BLC", "Overvotes", "Undervotes", "RECOUNT"):
                     continue
                 name = re.sub(r"\s*\(recount\)$", "", label)
-                name = re.sub(r"\s*\bw[-/]?in\.?$|,\s*[a-z]{1,3}$", "", name, flags=re.IGNORECASE)
+                name = re.sub(r"\s*\(?\bw(?:rite)?[-/]?in\.?\)?$|(?:,\s*[a-z]{1,3}|\s+[dr])(?:[/&][a-z]{1,3})*$", "", name, flags=re.IGNORECASE)
                 name = re.sub(r",?\s*\b(?:jr|sr|ii|iii|iv)\.?$", "", name, flags=re.IGNORECASE).strip()
                 if re.fullmatch(r"scat\w*", name, flags=re.IGNORECASE):
-                    hits = [o for o in options if o[2] == "write_in" and re.search(r"scatter", o[1], re.IGNORECASE)]
+                    hits = [o for o in options if o[2] == "write_in" and re.search(r"scatter|write", o[1], re.IGNORECASE)]
+                    if not hits:
+                        continue
                 else:
                     surname, _, given = name.partition(",") if county else (name.split()[-1], "", name.split()[0])
                     letters = re.sub(r"[^a-z]", "", MISSPELLED.get(surname, surname).lower())
