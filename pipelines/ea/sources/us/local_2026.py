@@ -5468,6 +5468,13 @@ for key, publisher, title, url, local in (
         "ca/glenn_certified.png",
     ),
     (
+        "CA-06115-wheatland",
+        "City of Wheatland",
+        "Who is running for Wheatland City Council? November 3, 2026 General Municipal Election",
+        "https://www.wheatland.ca.gov/DocumentCenter/View/818",
+        "ca/wheatland_candidates.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
