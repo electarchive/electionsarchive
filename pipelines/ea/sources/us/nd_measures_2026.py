@@ -17,7 +17,13 @@ PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "2026 Official Sample Ballot, General Election, November 3, 2026"
 BURLEIGH = "https://www.burleigh.gov/media/2smdvn0y/2026-official-sample-ballot.pdf"
-COUNTIES = {"38015": (BURLEIGH, "Burleigh County Auditor")}
+WARD = "https://www.wardcountynd.gov/"
+INBOX = Path(__file__).parents[4] / "data/inbox/manual/MF-504"
+FILES = {WARD: INBOX / "ward"}
+COUNTIES = {
+    "38015": (BURLEIGH, "Burleigh County Auditor"),
+    "38101": (WARD, "Ward County Auditor"),
+}
 ROWS = [
     {
         "county": "38015",
@@ -49,6 +55,12 @@ ROWS = [
         "label": "Measure No. 1",
         "wording": "Shall the City of Wilton be allowed to levy an additional one percent (1%) sales tax (pursuant to the same provision, limitations and exemption as in the Home Rule Charter), to use for water and sewer projects and project indebtedness within the City?",
     },
+    {
+        "county": "38101",
+        "entity": "Surrey Public School District No. 41",
+        "label": "Measure No. 1",
+        "wording": "Shall Surrey Public School District No. 41 of Ward and McHenry Counties, North Dakota, issue its general obligation bonds in an amount not to exceed $5,800,000 maturing within a maximum of 20 years, resulting in an estimated additional millage of 35.98 mills, equal to $35.98 on each $1,000 of taxable valuation for the first taxable year, for the purpose of providing funds, together with any other funds available, to construct a classroom addition to the existing school building to replace portable classrooms and address the breezeway between portable classrooms and the main building which does not meet fire codes, and to otherwise improve, renovate, update, construct and equip school property and make site improvements to school property.",
+    },
 ]
 
 
@@ -57,6 +69,17 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
+            if url in FILES:
+                path = next(FILES[url].glob("*.pdf"))
+                raw.store(
+                    SOURCE,
+                    url,
+                    path.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.now(UTC),
+                    media_type="application/pdf",
+                )
+                continue
             content = subprocess.run(
                 ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
             ).stdout
