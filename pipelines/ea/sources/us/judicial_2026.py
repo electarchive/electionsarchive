@@ -85,7 +85,9 @@ def emit() -> Path:
                    where p.iso_code = %s""",
                 [f"US-{state}"],
             ).fetchone()[0]
-            election = cs.key("us.election", f"2026-11-03:{state}")
+            if state == "MI" and row["court"] == "appeals":
+                area = cs.area("us.judicial_district", f"MI:appellate-{seat[0]}")
+            election =cs.key("us.election", f"2026-11-03:{state}")
             if election in cs.minted:
                 raise LookupError(f"no 2026-11-03 election for {state}")
             office = cs.key("us.office", f"{slug(title)}{'-retention' if retention else ''}:{state}")
