@@ -1,3 +1,5 @@
+import csv
+import html
 import re
 import subprocess
 from datetime import UTC, datetime
@@ -17,9 +19,39 @@ MARICOPA = "https://elections.maricopa.gov/asset/jcr:1673a1e7-bbed-4d76-94fe-ae0
 MARICOPA_FILE = (
     DATA / "inbox" / "manual" / "MF-153" / "2026 General Election Maricopa County Candidates On Ballot - Remediated.pdf"
 )
+YAVAPAI = "https://www.yavapaivotes.gov/"
+YAVAPAI_FILE = DATA / "inbox" / "manual" / "MF-500" / "yavapai" / "Special Districts.csv"
+COCHISE = "https://www.cochise.az.gov/"
+COCHISE_FILE = DATA / "inbox" / "manual" / "MF-500" / "cochise" / "az-2026-general-cochise-candidate-information.html"
 SOURCES = {
     PIMA: ("Pima County Elections Department", "2026 General Election, Candidates Filed (updated 7/21/2026)"),
     MARICOPA: ("Maricopa County Elections Department", "Official County Candidates, 2026 General Election"),
+    YAVAPAI: ("Yavapai County Elections Department", "2026 General Election, Special District Candidates"),
+    COCHISE: ("Cochise County Elections Department", "2026 Candidate Information"),
+}
+YAVAPAI_NAMES = {
+    "Ash Fork Volunteer Fire": "Ash Fork Fire District",
+    "Central Yavapai Fire": "Central Yavapai Fire District",
+    "Chino Valley Fire": "Chino Valley Fire District",
+    "Congress Fire": "Congress Fire District",
+    "Copper Canyon Fire & Medical": "Copper Canyon Fire and Medical District",
+    "Crown King Fire": "Crown King Fire District",
+    "Groom Creek Fire": "Groom Creek Fire District",
+    "Mayer Volunteer Fire": "Mayer Fire District",
+    "Peeples Valley Fire": "Peeples Valley Fire District",
+    "Sedona Fire District": "Sedona Fire District",
+    "Verde Valley Fire": "Verde Valley Fire District",
+    "Williamson Valley Fire": "Williamson Valley Fire District",
+    "Yarnell Fire": "Yarnell Fire District",
+    "Ash Fork Sanitary": "Ash Fork Sanitary District",
+    "ICR Sanitary": "ICR Sanitary District",
+    "Central Yavapai Hospital District": "Central Yavapai Hospital District",
+}
+COCHISE_NAMES = {
+    "Mescal J-Six Fire District": ("Mescal J6 Fire District", "fire-protection"),
+    "Palominas Fire District": ("Palominas Fire District", "fire-protection"),
+    "San Simon Fire District": ("San Simon Fire District", "fire-protection"),
+    "San Simon Water District": ("San Simon Water District", "water"),
 }
 PIMA_FIRE = {
     "Avra Valley Fire District": "Avra Valley Fire District",
@@ -49,6 +81,21 @@ def fetch() -> None:
             ["curl", "-sSL", "-m", "120", "-A", "Mozilla/5.0", PIMA], capture_output=True, check=True
         ).stdout
         raw.store(SOURCE, PIMA, content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    for url, file, media_type in (
+        (YAVAPAI, YAVAPAI_FILE, "text/csv"),
+        (COCHISE, COCHISE_FILE, "text/html"),
+    ):
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                url,
+                file.read_bytes(),
+                suffix=file.suffix,
+                retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+                media_type=media_type,
+            )
     try:
         raw.cached(SOURCE, MARICOPA)
     except LookupError:
@@ -124,8 +171,87 @@ def maricopa() -> list[dict[str, object]]:
     return rows
 
 
+def yavapai() -> list[dict[str, object]]:
+    seats: dict[str, int] = {}
+    people: dict[str, list[str]] = {}
+    with YAVAPAI_FILE.open(encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            district = YAVAPAI_NAMES.get(row["DISTRICT"].strip())
+            if district is None:
+                continue
+            name = re.sub(r"\s+", " ", row["Candidate Name"]).strip()
+            if name.startswith("TOTAL SEATS AVAILABLE:"):
+                seats[district] = int(name.rpartition(":")[2])
+            elif not re.search(r"\((WI|Withdrawn|WITHDRAWAL)", name, re.IGNORECASE):
+                people.setdefault(district, []).append(name)
+    return [
+        {
+            "district": district,
+            "seat": "",
+            "vote": seats[district],
+            "name": name,
+            "county": "Yavapai",
+            "url": YAVAPAI,
+            "function": district_boards_function(district),
+            "tacit": len(names) == seats[district],
+        }
+        for district, names in people.items()
+        if seats[district] > 0
+        for name in names
+    ]
+
+
+def district_boards_function(district: str) -> str:
+    for word, function in (("Fire", "fire-protection"), ("Hospital", "hospital"), ("Sanitary", "sanitation")):
+        if word in district:
+            return function
+    return "district"
+
+
+def cochise() -> list[dict[str, object]]:
+    text = re.sub(r"<[^>]+>", "\n", COCHISE_FILE.read_text(errors="replace"))
+    lines = [re.sub(r"\s+", " ", html.unescape(line)).strip() for line in text.splitlines()]
+    rows: list[dict[str, object]] = []
+    current: tuple[str, str, int] | None = None
+    names: list[str] = []
+
+    def close() -> None:
+        if current is None:
+            return
+        for name in names:
+            rows.append(
+                {
+                    "district": current[0],
+                    "seat": "",
+                    "vote": current[2],
+                    "name": name,
+                    "county": "Cochise",
+                    "url": COCHISE,
+                    "function": current[1],
+                    "tacit": len(names) == current[2],
+                }
+            )
+
+    for line in lines:
+        if not line:
+            continue
+        if heading := re.match(r"^(.+?) \(Elect (\d+)\)$", line):
+            close()
+            found = COCHISE_NAMES.get(heading[1])
+            current = None if found is None else (found[0], found[1], int(heading[2]))
+            names = []
+        elif current is not None:
+            if line.startswith(("-->", "Agendas")):
+                close()
+                current = None
+            elif "Write In" not in line:
+                names.append(line)
+    close()
+    return rows
+
+
 def parse() -> None:
-    frame = pl.DataFrame([*pima(), *maricopa()])
+    frame = pl.DataFrame([*pima(), *maricopa(), *yavapai(), *cochise()])
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "candidates.parquet")
     print(frame.height, frame["district"].n_unique())
@@ -139,7 +265,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="AZ",
-        summary="Arizona special district board races on the November 3, 2026 ballot: Pima County fire districts from the county's list of filed candidates, and the Maricopa County Special Health Care District from the county's candidates on the ballot",
+        summary="Arizona special district board races on the November 3, 2026 ballot: Pima County fire districts, the Maricopa County Special Health Care District, Yavapai County fire, sanitary, and hospital districts, and four Cochise County fire and water districts, from each county's candidate list",
         sources=SOURCES,
         frame=frame,
     )
