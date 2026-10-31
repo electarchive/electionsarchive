@@ -1885,6 +1885,8 @@ SD_2002_JUNE_VOTES = {
         "652 1667 624 1325 2617 5009 808 260 1375 286 1243 667 1494 3433 442 1138 1930 991 713 805 801 702 899 482 1241 674 510 831 712 433 400 2879 1416 320 324 352 227 926 1814 3039 3009 515 609 996 586 2635 304 500 16127 863 11283 669 536 1168 427 519 893 495 329 513 812 1619 1428 892 3298 269",
     ),
 }
+OR_2026 = "https://sos.oregon.gov/elections/Documents/2026-05-19-primary-abstract-of-votes.pdf"
+OR_2026_FILE = "MF-498/2026 May Primary Election Official Results.PDF"
 SD_2022_JUNE = "https://sdsos.gov/elections-voting/assets/Archive/2022%20Assets/2022PrimaryStateCanvassReport.pdf"
 SD_SCANS = {
     "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf",
@@ -2469,6 +2471,7 @@ def fetch() -> None:
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
     store_manual(UT_2022, UT_2022_FILE, "application/pdf")
+    store_manual(OR_2026, OR_2026_FILE, "application/pdf")
     for number in MS_2011:
         raw.fetch(SOURCE, MS.format(number), suffix=".pdf")
     raw.fetch(SOURCE, MS_2003, suffix=".pdf")
@@ -6690,6 +6693,42 @@ def south_dakota_2022_june() -> list[dict[str, object]]:
     ]
 
 
+def oregon_2026() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", "-f", "63", "-l", "63", str(raw.cached(SOURCE, OR_2026).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    if "Measure 120" not in text:
+        raise ValueError("OR 2026 Measure 120: page 63 is not the Measure 120 table")
+    lines = [
+        (match[1], int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+        for line in text.splitlines()
+        if (match := re.fullmatch(r"\s*([A-Z][A-Za-z ]*?)\s{2,}([\d,]+)\s+([\d,]+)\s*", line))
+    ]
+    total = next(line for line in lines if line[0] == "Total")
+    counties = [line for line in lines if line[0] != "Total"]
+    if len(counties) != 36 or [sum(line[side] for line in counties) for side in (1, 2)] != [total[1], total[2]]:
+        raise ValueError("OR 2026 Measure 120: counties do not sum to the printed total")
+    return [
+        {
+            "state": "OR",
+            "day": date(2026, 5, 19),
+            "number": "120",
+            "label": "Measure 120",
+            "title": "Increases fuel taxes and registration and title fees for roads, and adds a tax on wages for public transportation services",
+            "kind": "Popular Referendum",
+            "url": OR_2026,
+            "county": county,
+            "answer": answer,
+            "votes": votes,
+        }
+        for county, yes, no in counties
+        for answer, votes in (("YES", yes), ("NO", no))
+    ]
+
+
 def ohio_2022() -> list[dict[str, object]]:
     sheet = fastexcel.read_excel(raw.cached(SOURCE, OH_2022).path).load_sheet(0, header_row=None).to_polars().rows()
     (total,) = [row for row in sheet if row[0] == "Total"]
@@ -7033,6 +7072,7 @@ def parse() -> None:
             *new_mexico(),
             *south_dakota_2002_june(),
             *south_dakota_2022_june(),
+            *oregon_2026(),
             *vermont(),
         ],
         infer_schema_length=None,
