@@ -6,7 +6,7 @@
 
 **Every election in the world, down to the ballot box.**
 
-[![CI](https://github.com/electionsarchive/electionsarchive/actions/workflows/ci.yml/badge.svg)](https://github.com/electionsarchive/electionsarchive/actions/workflows/ci.yml)
+[![CI](https://github.com/electarchive/electionsarchive/actions/workflows/ci.yml/badge.svg)](https://github.com/electarchive/electionsarchive/actions/workflows/ci.yml)
 [![Code: AGPL-3.0](https://img.shields.io/badge/code-AGPL--3.0-15171a)](LICENSE)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-15171a)](https://creativecommons.org/licenses/by/4.0/)
 [![MCP server](https://img.shields.io/badge/MCP-ready-ffe03a)](https://electionsarchive.com/agents)
