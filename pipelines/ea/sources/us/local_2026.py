@@ -5995,6 +5995,27 @@ for key, publisher, title, url, local in (
         "fl/sumter_sample_ballot_bushnell_center_hill.pdf",
     ),
     (
+        "OR-41071-amity",
+        "Yamhill County Clerk",
+        "City of Amity certification of candidates, November 3, 2026 General Election",
+        "https://yamhillcounty.gov/1301/November-3-2026-General-Election",
+        "or/yamhill_amity.pdf",
+    ),
+    (
+        "OR-41071-dayton",
+        "Yamhill County Clerk",
+        "City of Dayton certification of candidates, November 3, 2026 General Election",
+        "https://yamhillcounty.gov/1301/November-3-2026-General-Election",
+        "or/yamhill_dayton.pdf",
+    ),
+    (
+        "OR-41071-county",
+        "Yamhill County Clerk",
+        "Nonpartisan county candidates, Yamhill County Clerk, November 3, 2026 General Election",
+        "https://yamhillcounty.gov/1301/November-3-2026-General-Election",
+        "or/yamhill_clerk_hinton.pdf",
+    ),
+    (
         "KS-20115",
         "Marion County Clerk",
         "Official General Election Ballots, Marion County, November 3, 2026 (sample)",
