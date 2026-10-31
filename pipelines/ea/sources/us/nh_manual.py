@@ -439,6 +439,7 @@ def render(path: Path, sha: str, number: int) -> tuple[Path, int, int]:
 
 
 READ_DPI = 150
+REREAD_DPI = 200
 READ_PROMPT = (
     "This is a page of New Hampshire county election returns. Each numbered row below names a candidate line on the page "
     "(county, office, district, candidate, town, party, and its vertical position as a fraction of the page height). "
@@ -484,15 +485,31 @@ def twice(raw_lines: pl.DataFrame) -> pl.DataFrame:
     ).with_columns(twice=pl.lit(True))
 
 
+def missed(frame: pl.DataFrame) -> pl.DataFrame:
+    return (
+        blocks(frame.filter(pl.col("county").is_not_null()))
+        .filter(~pl.col("agrees"))
+        .sort("year", "page", "y0", "x0")
+        .with_columns(rid=pl.int_range(pl.len()).over("year", "page"))
+    )
+
+
 def read() -> None:
+    request(held(pl.read_parquet(PARSED / "lines.parquet")), "county_pages", "read", READ_DPI)
+
+
+def reread() -> None:
+    request(missed(pl.read_parquet(PARSED / "lines.parquet")), "county_sums", "reread", REREAD_DPI)
+
+
+def request(frame: pl.DataFrame, job: str, prefix: str, dpi: int) -> None:
     import base64
 
     from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 
     from ea import batch
 
-    frame = held(pl.read_parquet(PARSED / "lines.parquet"))
-    folder = DATA / "tmp" / SOURCE
+    folder = DATA / "tmp" / SOURCE / str(dpi)
     folder.mkdir(parents=True, exist_ok=True)
     price_in, price_out = batch.PRICES["claude-haiku-5-5"]
     wanted: dict[str, batch.Want] = {}
@@ -501,7 +518,7 @@ def read() -> None:
         if not image.exists():
             stem = folder / f".{year}-{page}"
             subprocess.run(
-                ["pdftoppm", "-r", str(READ_DPI), "-png", "-singlefile", "-f", str(page), "-l", str(page)]
+                ["pdftoppm", "-r", str(dpi), "-png", "-singlefile", "-f", str(page), "-l", str(page)]
                 + [str(pdf(int(year))), str(stem)],
                 check=True,
             )
@@ -531,8 +548,8 @@ def read() -> None:
                 }
             ],
         )
-        wanted[f"read:{year}:{page}"] = (params, (3500 * price_in + (200 + 12 * rows.height) * price_out) / 1e6)
-    print(batch.ensure(SOURCE, "county_pages", wanted)[1])
+        wanted[f"{prefix}:{year}:{page}"] = (params, (3500 * price_in + (200 + 12 * rows.height) * price_out) / 1e6)
+    print(batch.ensure(SOURCE, job, wanted)[1])
 
 
 def repair(name: str, town: str | None, party: str | None) -> tuple[str, str | None, str | None]:
