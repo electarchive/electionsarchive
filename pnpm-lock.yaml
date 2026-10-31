@@ -263,6 +263,9 @@ catalogs:
     bits-ui:
       specifier: ^2.20.2
       version: 2.20.2
+    cldr-core:
+      specifier: 49.0.0
+      version: 49.0.0
     cn:
       specifier: ^0.5.0
       version: 0.5.0
@@ -496,6 +499,9 @@ importers:
       better-auth:
         specifier: 'catalog:'
         version: 1.7.14(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(drizzle-kit@1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@types/pg@8.23.1)(arktype@2.2.8)(pg@8.23.1)(typebox@1.3.37)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)))(drizzle-orm@1.0.0-rc.5(@types/pg@8.23.1)(arktype@2.2.8)(pg@8.23.1)(typebox@1.3.37)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7))(mongodb@7.7.0)(pg@8.23.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(solid-js@1.9.17)(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vitest@5.0.5(@types/node@24.19.2)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))
+      cldr-core:
+        specifier: 'catalog:'
+        version: 49.0.0
       drizzle-orm:
         specifier: 'catalog:'
         version: 1.0.0-rc.5(@types/pg@8.23.1)(arktype@2.2.8)(pg@8.23.1)(typebox@1.3.37)(valibot@1.5.0(typescript@6.0.3))(zod@4.6.7)
@@ -2909,6 +2915,9 @@ packages:
 
   class-validator@0.14.4:
     resolution: {integrity: sha512-AwNusCCam51q703dW82x95tOqQp6oC9HNUl724KxJJOfnKscI8dOloXFgyez7LbTTKWuRBA37FScqVbJEoq8Yw==}
+
+  cldr-core@49.0.0:
+    resolution: {integrity: sha512-2Z2dYeDO95AbKIG9dIUdZy6DD4f0hhHjTYnaHZj/9JTQ82pX5EsJlCs2BXPWi4vd1d98MwotOivh4Uthxwri4A==}
 
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -7458,6 +7467,8 @@ snapshots:
       libphonenumber-js: 1.13.15
       validator: 13.15.35
     optional: true
+
+  cldr-core@49.0.0: {}
 
   clsx@2.1.1: {}
 

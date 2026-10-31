@@ -36,6 +36,7 @@
     "@tanstack/svelte-query": "catalog:",
     "@tanstack/svelte-query-devtools": "catalog:",
     "better-auth": "catalog:",
+    "cldr-core": "catalog:",
     "drizzle-orm": "catalog:",
     "mdast-util-from-markdown": "catalog:",
     "mdast-util-gfm-autolink-literal": "catalog:",
