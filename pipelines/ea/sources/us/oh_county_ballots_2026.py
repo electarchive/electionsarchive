@@ -23,6 +23,8 @@ SUMMIT_FILE = INBOX / "summit" / "Election_60IssueSynopsis.pdf"
 CUYAHOGA = "https://boe.cuyahogacounty.gov/"
 CUYAHOGA_FILE = INBOX / "cuyahoga" / "PDF Sample Ballot Package.pdf"
 CUYAHOGA_BOXES = ((5, 20, 195, 375), (5, 215, 175, 355), (5, 392, 215, 325), (6, 20, 195, 545), (6, 215, 190, 345))
+WAYNE_FILE = "https://www.waynecountyoh.gov/wp-content/uploads/2026/09/Sample-Ballots-ALL-WATERMARK-09192026-1352.pdf"
+LORAIN_FILE = "https://www.voteloraincountyohio.gov/_files/ugd/2568d0_fd0d57cfa16c443899cf8c9653a28945.pdf"
 SOURCES = {
     HAMILTON: (
         "Hamilton",
@@ -42,11 +44,34 @@ SOURCES = {
         "Cuyahoga County Board of Elections",
         "Sample ballot (Bay Village 01-A), November 3, 2026 General Election",
     ),
+    WAYNE_FILE: (
+        "Wayne",
+        None,
+        "Wayne County Board of Elections",
+        "Sample ballots, November 3, 2026 General Election",
+    ),
+    LORAIN_FILE: (
+        "Lorain",
+        None,
+        "Lorain County Board of Elections",
+        "Ballot text, November 3, 2026 General Election",
+    ),
 }
+HELD = {HAMILTON, SUMMIT, CUYAHOGA}
+NOISE = re.compile(
+    r"^(Sample Generated|\d\d-\d\d-|Page \d+ of|VOTE BOTH SIDES|Members of the|November 3, 2026$|B A L L O\s*$|S A M P L E|\d+$)"
+)
+STOP = re.compile(r"^(YES|NO|SI|FOR\b.*|AGAINST\b.*|A FAVOR\b.*|EN CONTRA\b.*)$")
+START = re.compile(
+    r"^(?:\d+(?:\s\d)?\s+)?(?:T)?(Proposed|PROPOSED|Special Election|SPECIAL ELECTION|Advisory|ADVISORY|Local|LOCAL)\b"
+)
 
 
 def fetch() -> None:
     for url, (_, path, _, _) in SOURCES.items():
+        if path is None:
+            raw.fetch(SOURCE, url, suffix=".pdf")
+            continue
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -158,33 +183,113 @@ def cuyahoga() -> list[dict[str, str]]:
     return rows
 
 
+def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
+    lines = [line.strip() for line in lines if line.strip() and not NOISE.match(line.strip())]
+    rows = []
+    seen = set()
+    for index, line in enumerate(lines):
+        if not line.startswith("A majority affirmative vote"):
+            continue
+        head: list[str] = []
+        cursor = index - 1
+        while cursor >= 0 and len(head) < 7 and not STOP.match(lines[cursor]):
+            head.append(lines[cursor])
+            cursor -= 1
+        head.reverse()
+        for offset, text in enumerate(head):
+            if START.match(text):
+                head = head[offset:]
+                break
+        else:
+            print("no header:", county, head)
+            continue
+        head[0] = re.sub(
+            r"^(?:\d+(?:\s\d)?\s+)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)", "", head[0]
+        )
+        cursor = index + 1
+        if lines[cursor].startswith("necessary for passage"):
+            cursor += 1
+        body = []
+        while cursor < len(lines) and not STOP.match(lines[cursor]):
+            body.append(lines[cursor])
+            cursor += 1
+        text = re.sub(r"\s+", " ", " ".join(body)).strip()
+        kind = head[0] + (" " + head[1] if len(head) > 1 and head[1].startswith("(") else "")
+        key = (tuple(head), text)
+        if text and key not in seen:
+            seen.add(key)
+            rows.append({"url": url, "county": county, "kind": kind, "entity": "|".join(head[1:]), "text": text})
+    return rows
+
+
+def wayne() -> list[dict[str, str]]:
+    text = subprocess.run(
+        ["pdftotext", "-raw", str(raw.cached(SOURCE, WAYNE_FILE).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    return ballot_issues(text.split("\n"), WAYNE_FILE, "Wayne")
+
+
+def ocr(url: str) -> list[str]:
+    folder = PARSED / "ocr" / "lorain"
+    folder.mkdir(parents=True, exist_ok=True)
+    if not list(folder.glob("*.png")):
+        subprocess.run(
+            ["pdftoppm", "-r", "200", "-gray", "-png", str(raw.cached(SOURCE, url).path), str(folder / "p")], check=True
+        )
+    lines: list[str] = []
+    for image in sorted(folder.glob("*.png")):
+        out = image.with_suffix(".txt")
+        if not out.exists():
+            subprocess.run(
+                ["tesseract", str(image), str(image.with_suffix("")), "--psm", "4"], check=True, capture_output=True
+            )
+        lines += out.read_text().split("\n")
+    return lines
+
+
+def lorain() -> list[dict[str, str]]:
+    return ballot_issues(ocr(LORAIN_FILE), LORAIN_FILE, "Lorain")
+
+
 def parse() -> None:
-    frame = pl.DataFrame(hamilton() + summit() + cuyahoga())
+    frame = pl.DataFrame(hamilton() + summit() + cuyahoga() + wayne() + lorain())
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "issues.parquet")
     print(frame.group_by("county").len().rows())
 
 
 def keys(name: str) -> set[str]:
+    bare = re.sub(r"\s+Village$", "", name)
     name = re.sub(
         r"^(City|Village|Township) of (.+)$", lambda m: f"{m[2]} {m[1]}" if m[1] == "Township" else m[2], name
     )
-    return {ceda._core(name), ceda._city(name)}
+    return {ceda._core(name), ceda._city(name), ceda._core(bare), ceda._city(bare)}
 
 
 def token(note: str) -> re.Pattern[str]:
     purpose = note.split("Purpose:")[-1]
-    roman = re.search(r"Article ([IVX]+)\b", purpose)
+    roman = re.search(r"Articles? ([IVX]+)\b", purpose)
     if roman:
-        return re.compile(rf"Article {roman[1]}\b")
+        return re.compile(rf"Articles? {roman[1]}\b")
     numbers = re.findall(r"\d+(?:\.\d+)?[a-z]?", purpose)
     return re.compile(rf"(?<![\d.]){re.escape(numbers[-1])}" if numbers else "(?!)")
 
 
 def pick(row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str]]], used: set[UUID]) -> UUID | None:
-    options = [c for k in keys(row["entity"]) for c in contests.get(k, []) if c[0] not in used]
+    parts = row["entity"].split("|")
+    options: list[tuple[UUID, str, str]] = []
+    for size in range(len(parts), 0, -1):
+        for start in range(len(parts) - size + 1):
+            options += [
+                c for k in keys(" ".join(parts[start : start + size])) for c in contests.get(k, []) if c[0] not in used
+            ]
+        if options:
+            break
     kind = row["kind"].upper()
-    if any(word in kind for word in ("CHARTER", "ZONING", "GAS", "ADVISORY", "LOCAL", "LIQUOR")):
+    if any(
+        word in kind
+        for word in ("CHARTER", "ZONING", "GAS", "ADVISORY", "LOCAL", "LIQUOR", "MERGER", "ORDINANCE", "SPECIAL")
+    ):
         wanted = "miscellaneous"
     elif "INCOME" in kind:
         wanted = "income tax"
@@ -208,32 +313,65 @@ def pick(row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str]]], 
         ] or narrowed
     if len(narrowed) > 1:
         narrowed = [c for c in narrowed if token(c[2]).search(row["text"])] or narrowed
-    return narrowed[0][0] if len({c[0] for c in narrowed}) == 1 else None
+    if len(narrowed) > 1:
+        words = set(re.findall(r"[a-z]{5,}", f"{row['entity']} {row['text']}".lower()))
+        scores = sorted(
+            ((len(words & set(re.findall(r"[a-z]{5,}", c[2].split("Purpose:")[-1].lower()))), c) for c in narrowed),
+            key=lambda pair: -pair[0],
+        )
+        if scores[0][0] > scores[1][0]:
+            narrowed = [scores[0][1]]
+    if len({c[0] for c in narrowed}) != 1:
+        return None
+    note = narrowed[0][2].lower()
+    for word in ("additional", "renewal", "replacement"):
+        if word in kind.lower() and word not in note:
+            return None
+    mills = re.findall(r"([\d.]*\d) mills?\b", note)
+    if mills and re.search(r"\bmills?\b", text) and not re.search(rf"(?<![\d.]){re.escape(mills[0])} mills?\b", text):
+        return None
+    return narrowed[0][0]
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "issues.parquet")
+    frame = pl.read_parquet(PARSED / "issues.parquet").filter(~pl.col("url").is_in(HELD))
+    counties = {ceda._core(f"{county} County") for county in frame["county"]}
     with connect() as conn:
+        fips = {
+            code
+            for code, name in conn.execute(
+                """select c.code, n.text from area a
+                   join area_code c on c.area_id = a.id
+                   join polity_territory t on t.area_id = a.id
+                   join name n on n.entity_id = t.polity_id and n.is_preferred and n.lang = 'en'
+                   where a.scheme_code = 'us.county' and left(c.code, 2) = '39'"""
+            ).fetchall()
+            if ceda._core(name) in counties
+        }
         contests: dict[str, list[tuple[UUID, str, str]]] = {}
-        for contest, name, note in conn.execute(
-            """select c.id, n.text, coalesce(t.body_md, '') from contest c
+        for contest, code, name, note in conn.execute(
+            """select c.id, split_part(x.value, ':', 3), n.text, coalesce(t.body_md, '') from contest c
                join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like %s
                join election e on e.id = c.election_id
                join name n on n.entity_id = e.polity_id and n.is_preferred and n.lang = 'en'
                left join note t on t.entity_id = c.id and t.kind = 'context'""",
             [f"{DAY}:OH:%:question:%"],
         ).fetchall():
+            if len(code) == 10 and code[:5] not in fips:
+                continue
             for key in keys(name):
                 contests.setdefault(key, []).append((contest, name, note))
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Official ballot language for Hamilton, Summit, and Cuyahoga County, Ohio local issues on the November 3, 2026 ballot",
+            summary="Official ballot language for Ohio county local issues on the November 3, 2026 ballot",
             polity="US-OH",
         )
         sources: dict[str, UUID] = {}
         for url, (_, _, publisher, title) in SOURCES.items():
+            if url in HELD:
+                continue
             sources[url] = cs.source(publisher, title)
             cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
             cs.artifact(raw.cached(SOURCE, url), sources[url])
