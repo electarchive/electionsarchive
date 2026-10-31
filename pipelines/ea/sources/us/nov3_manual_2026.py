@@ -773,6 +773,11 @@ COUNTIES = {
         "https://bellmeadtx.gov/540/November-2026-Sales-Tax-Election",
         "MF-473/Agenda  packet - 07.14.2026_Redacted.pdf",
     ),
+    "48215": (
+        "TX",
+        "https://www.hidalgocounty.us/DocumentCenter/View/72989",
+        "N3M-web/tx9/hid/72989.pdf",
+    ),
     "48061-sbm": (
         "TX",
         "https://www.cameroncountytx.gov/elections/wp-content/uploads/2026/09/San-Benito-Municipal-Utility-District-No.-1-Confirmation-and-Directors-Election-09182026.pdf",
