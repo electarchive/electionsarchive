@@ -19,6 +19,7 @@ FILES = Path(__file__).with_name("nh_sos_county_files.tsv")
 WAYBACK = (
     "https://web.archive.org/web/2026id_/https://www.sos.nh.gov/sites/g/files/ehbemt561/files/inline-documents/sonh/"
 )
+ARCHIVED = "https://web.archive.org/web/2018if_/http://sos.nh.gov/WorkArea/DownloadAsset.aspx?id="
 PINNED = {"2022-ge-merrimack-county.xls": "20240114224201"}
 PUBLISHER = "New Hampshire Secretary of State"
 ALIASES = {
@@ -40,6 +41,8 @@ OFFICES = (
 
 
 def link(name: str) -> str:
+    if name.startswith("asset-"):
+        return ARCHIVED + name[6:].split(".")[0]
     return WAYBACK.replace("/web/2026id_/", f"/web/{PINNED[name]}id_/") + name if name in PINNED else WAYBACK + name
 
 
@@ -103,6 +106,7 @@ CANDIDATE = re.compile(
 )
 DATED = re.compile(r"\d{4}-\d\d-\d\d")
 WRITE_IN = re.compile(r"\bw-?in\b|write-?ins?", re.IGNORECASE)
+OTHER = r"(?i)(?:scatter\w*|write-?ins?|others?)"
 
 
 def blocks(path: Path, name: str) -> list[dict[str, object]]:
@@ -192,7 +196,7 @@ def parse() -> None:
                     (
                         entry["day"],
                         entry["stage"],
-                        entry["county"],
+                        str(block["sheet"]) if entry["county"] == "statewide" else entry["county"],
                         entry["file"],
                         str(block["title"]),
                         str(block["office"]),
@@ -230,6 +234,40 @@ def parse() -> None:
 COLUMNS = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "supersedes_id", "completeness")
 SUFFIX = re.compile(r",?\s*\b(?:jr|sr|ii|iii|iv)\b\.?$", re.IGNORECASE)
 CONTEST = re.compile(r"^(\d{4}) (\w+) County (.+?) election(?:, District (\d))?(?:, (\w+) primary)?$")
+
+
+def unbalanced(rows: pl.DataFrame) -> bool:
+    sums = rows.group_by("candidate").agg(
+        pl.col("votes").sum(), pl.col("printed").first(), pl.col("votes").first().alias("head")
+    )
+    return bool(
+        sums.filter(
+            pl.col("printed").is_not_null()
+            & (pl.col("votes") != pl.col("printed"))
+            & (pl.col("votes") - pl.col("head") != pl.col("printed"))
+        ).height
+    )
+
+
+def near(a: str, b: str) -> bool:
+    if abs(len(a) - len(b)) > 1:
+        return False
+    if len(a) == len(b):
+        return sum(x != y for x, y in zip(a, b, strict=True)) <= 1
+    short, long = sorted((a, b), key=len)
+    return any(long[:i] + long[i + 1 :] == short for i in range(len(long)))
+
+
+def alike(letters: str, label: str) -> bool:
+    other = surname(label, False).replace("rn", "m")
+    letters = letters.replace("rn", "m")
+    if other.endswith(letters) or letters.endswith(other):
+        return True
+    if len(letters) < 6:
+        return False
+    return letters in other or any(
+        near(letters, other[len(other) - size :]) for size in range(len(letters) - 1, len(letters) + 2)
+    )
 
 
 def surname(text: str, party: bool = True) -> str:
@@ -304,8 +342,7 @@ def create(
         year, county, name, district, party = key
         day = rows["day"][0]
         tag = f"{year} {county} {name} {district or ''} {party or 'general'}".replace("  ", " ")
-        sums = rows.group_by("candidate").agg(pl.col("votes").sum(), pl.col("printed").first())
-        if sums.filter(pl.col("printed").is_not_null() & (pl.col("votes") != pl.col("printed"))).height:
+        if unbalanced(rows):
             report.setdefault("towns do not add to the printed total", []).append(f"{tag} (new contest)")
             continue
         if not rows["votes"].sum():
@@ -364,12 +401,12 @@ def create(
         for position, candidate in enumerate(
             sorted(
                 rows["candidate"].unique(maintain_order=True),
-                key=lambda c: bool(WRITE_IN.search(c) or re.fullmatch(r"(?i)scatter\w*", c)),
+                key=lambda c: bool(WRITE_IN.search(c) or re.fullmatch(OTHER, c)),
             )
         ):
             option = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
             options[candidate] = option
-            if re.fullmatch(r"(?i)(?:scatter\w*|write-?ins?)", candidate) or WRITE_IN.search(candidate):
+            if re.fullmatch(OTHER, candidate) or WRITE_IN.search(candidate):
                 cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
                 continue
             letters = surname(candidate)
@@ -419,13 +456,14 @@ def emit() -> Path:
             f"{', '.join(str(year) for year in sorted(years()))}, by town, from the Secretary of State's workbooks",
             polity="US-NH",
         )
-        source = cs.source(PUBLISHER, "County office results by town, 2016-2024 general and state primary elections")
+        title = f"County office results by town, {min(years())}-{max(years())} general and state primary elections"
+        source = cs.source(PUBLISHER, title)
         cs.add(
             "source",
             id=source,
             kind="official_body",
             publisher=PUBLISHER,
-            title="County office results by town, 2016-2024 general and state primary elections",
+            title=title,
             url="https://www.sos.nh.gov/elections",
             license="Public record",
         )
@@ -525,8 +563,7 @@ def emit() -> Path:
                    from contest_option o where o.contest_id = %s and o.parent_option_id is null""",
                 [default, contest],
             ).fetchall()
-            sums = rows.group_by("candidate").agg(pl.col("votes").sum(), pl.col("printed").first())
-            if sums.filter(pl.col("printed").is_not_null() & (pl.col("votes") != pl.col("printed"))).height:
+            if unbalanced(rows):
                 report.setdefault("towns do not add to the printed total", []).append(f"{tag} {external}")
                 continue
             matched: dict[str, str] = {}
@@ -534,21 +571,19 @@ def emit() -> Path:
             failed = None
             fresh: list[str] = []
             others = [option[0] for option in options if option[2] == "others"]
-            order = sorted(rows["candidate"].unique(maintain_order=True), key=lambda name: bool(WRITE_IN.search(name)))
+            order = sorted(
+                rows["candidate"].unique(maintain_order=True),
+                key=lambda name: bool(WRITE_IN.search(name) or re.fullmatch(OTHER, name)),
+            )
             for candidate in order:
                 if re.fullmatch(r"(?i)no election", candidate):
                     failed = "no election"
                     break
-                if re.fullmatch(r"(?i)(?:scatter\w*|write-?ins?)", candidate):
+                if re.fullmatch(OTHER, candidate):
                     hits = [option for option in options if option[2] == "others"]
                 else:
                     letters = surname(WRITE_IN.sub("", candidate).strip(" ()*"))
-                    hits = [
-                        option
-                        for option in options
-                        if option[2] == "candidate"
-                        and (surname(option[1], False).endswith(letters) or letters.endswith(surname(option[1], False)))
-                    ]
+                    hits = [option for option in options if option[2] == "candidate" and alike(letters, option[1])]
                     if len(hits) > 1:
                         hits = [hit for hit in hits if hit[3]]
                         if len(hits) == 1:
@@ -560,11 +595,7 @@ def emit() -> Path:
                     ):
                         folded[candidate] = others[0]
                         continue
-                if (
-                    not hits
-                    and not candidate.lower().startswith("recount")
-                    and not re.fullmatch(r"(?i)(?:scatter\w*|write-?ins?)", candidate)
-                ):
+                if not hits and not candidate.lower().startswith("recount"):
                     fresh.append(candidate)
                     continue
                 if len(hits) != 1:
@@ -579,12 +610,12 @@ def emit() -> Path:
             if failed is None and fresh:
                 taken_positions = len(options)
                 for offset, candidate in enumerate(fresh):
-                    option = cs.key("us.option", f"{external}:{slug(candidate)}")
                     letters = surname(WRITE_IN.sub("", candidate).strip(" ()*"))
-                    if WRITE_IN.search(candidate):
-                        if others:
-                            matched[candidate] = others[0]
-                            continue
+                    if (WRITE_IN.search(candidate) or re.fullmatch(OTHER, candidate)) and others:
+                        matched[candidate] = others[0]
+                        continue
+                    option = cs.key("us.option", f"{external}:{slug(candidate)}")
+                    if WRITE_IN.search(candidate) or re.fullmatch(OTHER, candidate):
                         cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
                         others.append(str(option))
                         matched[candidate] = str(option)
