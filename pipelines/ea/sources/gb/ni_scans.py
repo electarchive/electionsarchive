@@ -3,16 +3,15 @@ import json
 import re
 import subprocess
 import time
-from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
-from anthropic.types.messages import MessageBatchIndividualResponse
-from anthropic.types.messages.batch_create_params import Request
 from PIL import Image
 
-from ea import raw, scans
+from ea import batch, raw
 from ea.sources.gb import ni_council
 from ea.store import DATA
 
@@ -22,8 +21,8 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 STATE = PARSED / "state.json"
 SHEETS = json.loads((Path(__file__).parent / "ni_scans_sheets.json").read_text())
-MODELS = ("claude-haiku-5-5", "claude-sonnet-5-5")
-STOP = 4.0
+MODELS = ("claude-haiku-5-5", "claude-sonnet-5-5", "claude-haiku-5-5-high")
+LEGACY = {"claude-sonnet-5-5"}
 PROMPT = """This is a Northern Ireland local council election count sheet (single transferable vote); the pages are in order. Transcribe it exactly as printed and answer with one JSON object and nothing else:
 {"dea": "<printed district electoral area>", "seats": n, "electorate": n, "polled": n, "valid": n, "invalid": n, "quota": n,
  "candidates": [{"name": "<name as printed>", "description": "<printed party description, or empty>", "elected": true or false,
@@ -103,29 +102,30 @@ def images(url: str) -> list[tuple[Path, int, int]]:
 
 
 def state() -> dict[str, object]:
-    return json.loads(STATE.read_text()) if STATE.exists() else {"batches": [], "reads": {}}
+    return json.loads(STATE.read_text()) if STATE.exists() else {"reads": {}}
 
 
 def submit() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     current = state()
+    reads = cast(dict[str, bool], current["reads"])
     wanted = targets()
-    books = scans.ledger()
-    api = scans.client()
-    for position, model in enumerate(MODELS):
+    held = raw.keys(SOURCE)
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    for position, label in enumerate(MODELS):
+        if label in LEGACY:
+            continue
         todo = [
             key
             for key in wanted
-            if f"{model}:{key}" not in current["reads"]
-            and (position == 0 or current["reads"].get(f"{MODELS[position - 1]}:{key}") is False)
-            and not any(key in batch["keys"].values() and batch["model"] == model for batch in current["batches"])
+            if f"read:{label}:{key}" not in held
+            and all(reads.get(f"{earlier}:{key}", earlier in LEGACY) is False for earlier in MODELS[:position])
         ]
         if not todo:
             continue
-        requests, keys, projected = [], {}, 0.0
-        price_in, price_out = scans.PRICES[model]
+        requests: dict[str, batch.Want] = {}
         for key in todo:
-            content: list[dict[str, object]] = []
+            content: list[TextBlockParam | ImageBlockParam] = []
             text = grid(wanted[key]["url"])
             if text is not None:
                 content.append({"type": "text", "text": f"Spreadsheet, tab separated, page 1:\n{text}"})
@@ -136,52 +136,27 @@ def submit() -> None:
                 continue
             for number, (path, _, _) in enumerate(pages, start=1):
                 content.append({"type": "text", "text": f"Page {number}"})
-                content.append({"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": base64.b64encode(path.read_bytes()).decode()}})
+                content.append(
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/png",
+                            "data": base64.b64encode(path.read_bytes()).decode(),
+                        },
+                    }
+                )
             content.append({"type": "text", "text": PROMPT})
-            custom = re.sub(r"[^A-Za-z0-9_-]", "-", key)
-            keys[custom] = key
-            projected += (len(content) / 2 * 1800 * price_in + 3500 * price_out) / 1e6
-            requests.append(Request(custom_id=custom, params=MessageCreateParamsNonStreaming(model=model, max_tokens=16000, thinking={"type": "between_tools"}, messages=[{"role": "user", "content": content}])))
-        total = scans.committed(books)
-        if projected > STOP or total + projected > scans.BUDGET:
-            raise SystemExit(f"BLOCKED: {model} projects ${projected:.2f}; ledger ${total:.2f}; stop ${STOP}")
-        created = api.messages.batches.create(requests=requests)
-        current["batches"].append({"id": created.id, "model": model, "keys": keys})
-        books["pending"][created.id] = projected
-        books.setdefault("when", {})[created.id] = time.time()
-        scans.LEDGER.write_text(json.dumps(books, indent=2))
-        STATE.write_text(json.dumps(current))
-        print(f"{created.id} {model}: {len(requests)} requests, projected ${projected:.2f}")
-
-
-def collect() -> None:
-    current = state()
-    api = scans.client()
-    remaining = []
-    for batch in current["batches"]:
-        status = api.messages.batches.retrieve(batch["id"])
-        if status.processing_status != "ended":
-            print(batch["id"], status.processing_status)
-            remaining.append(batch)
-            continue
-        books = scans.ledger()
-        spent = 0.0
-        for line in api.get(f"/v1/messages/batches/{batch['id']}/results", cast_to=str, options={"headers": {"Accept": "application/binary"}}).splitlines():
-            result = MessageBatchIndividualResponse.model_validate_json(line)
-            key = f"{batch['model']}:{batch['keys'][result.custom_id]}"
-            if result.result.type != "succeeded":
-                print(key, result.result.type)
-                continue
-            message = result.result.message
-            spent += scans.dollars(message, 1.0)
-            raw.store(SOURCE, f"read:{key}", message.model_dump_json().encode(), suffix=".json", retrieved_at=datetime.now(UTC), media_type="application/json")
-            current["reads"][key] = False
-        books["pending"].pop(batch["id"], None)
-        books["spent"][batch["id"]] = spent
-        scans.LEDGER.write_text(json.dumps(books, indent=2))
-        print(batch["id"], f"ended, ${spent:.3f}")
-    current["batches"] = remaining
-    STATE.write_text(json.dumps(current))
+            params = MessageCreateParamsNonStreaming(
+                model="claude-haiku-5-5",
+                max_tokens=16000,
+                thinking={"type": "between_tools"},
+                messages=[{"role": "user", "content": content}],
+            )
+            if label.endswith("-high"):
+                params["output_config"] = {"effort": "high"}
+            requests[f"read:{label}:{key}"] = (params, (len(content) / 2 * 1800 * price_in + 3500 * price_out) / 1e6)
+        print(batch.ensure(SOURCE, label, requests)[1])
 
 
 def surname_first(printed: str) -> str:
@@ -241,9 +216,10 @@ def parse() -> None:
     wanted = targets()
     areas = ni_council.area_table()
     units, totals, failed = [], [], []
+    held = raw.keys(SOURCE)
     for key, target in wanted.items():
         for model in MODELS:
-            if f"{model}:{key}" not in current["reads"]:
+            if f"read:{model}:{key}" not in held:
                 continue
             try:
                 unit, rows = read(model, key, target, areas)
