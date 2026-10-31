@@ -1,4 +1,5 @@
 import difflib
+import hashlib
 import itertools
 import os
 import re
@@ -593,7 +594,9 @@ def twice(raw_lines: pl.DataFrame) -> pl.DataFrame:
         try:
             text = "".join(
                 block.get("text", "")
-                for block in json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"]
+                for block in json.loads(
+                    raw.cached(SOURCE, read_key("read", int(year), int(page), listed(rows))).path.read_text()
+                )["content"]
             )
         except LookupError:
             continue
@@ -629,6 +632,20 @@ def reread() -> None:
     request(missed(pl.read_parquet(PARSED / "lines.parquet")), "county_sums", "reread", REREAD_DPI)
 
 
+def listed(rows: pl.DataFrame) -> str:
+    return "\n".join(
+        f"{row['rid']}: {row['county']} | {row['office']} | {row['district'] or ''} | {row['name']}"
+        f"{', ' + row['town'] if row['town'] else ''} | {row['party'] or ''} | y={row['y0']:.3f}"
+        for row in rows.iter_rows(named=True)
+    )
+
+
+def read_key(prefix: str, year: int, page: int, listing: str) -> str:
+    if prefix != "read" or year > 1998:
+        return f"{prefix}:{year}:{page}"
+    return f"{prefix}:{year}:{page}:{hashlib.sha1(listing.encode()).hexdigest()[:8]}"
+
+
 def request(frame: pl.DataFrame, job: str, prefix: str, dpi: int) -> None:
     import base64
 
@@ -650,11 +667,7 @@ def request(frame: pl.DataFrame, job: str, prefix: str, dpi: int) -> None:
                 check=True,
             )
             stem.with_suffix(".png").replace(image)
-        listing = "\n".join(
-            f"{row['rid']}: {row['county']} | {row['office']} | {row['district'] or ''} | {row['name']}"
-            f"{', ' + row['town'] if row['town'] else ''} | {row['party'] or ''} | y={row['y0']:.3f}"
-            for row in rows.iter_rows(named=True)
-        )
+        listing = listed(rows)
         params = MessageCreateParamsNonStreaming(
             model="claude-haiku-5-5",
             max_tokens=4000,
@@ -675,11 +688,18 @@ def request(frame: pl.DataFrame, job: str, prefix: str, dpi: int) -> None:
                 }
             ],
         )
-        wanted[f"{prefix}:{year}:{page}"] = (params, (3500 * price_in + (200 + 12 * rows.height) * price_out) / 1e6)
+        wanted[read_key(prefix, int(year), int(page), listing)] = (
+            params,
+            (3500 * price_in + (200 + 12 * rows.height) * price_out) / 1e6,
+        )
     print(batch.ensure(SOURCE, job, wanted)[1])
 
 
+SPELLINGS = {"Cheryl A. Bums": "Cheryl A. Burns"}
+
+
 def repair(name: str, town: str | None, party: str | None) -> tuple[str, str | None, str | None]:
+    name = SPELLINGS.get(name, name)
     found = STRANDED.fullmatch(name) if town is None else None
     if found and not re.fullmatch(r"(?:Jr|Sr|II|III|IV)", found[2]):
         return found[1], found[2], party or found[3]
