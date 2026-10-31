@@ -475,6 +475,7 @@ OK_FILES = (
     "2010-election-results/2010-general-election-results/ge-results-county-20101102.pdf",
 )
 FL_DAYS = (
+    date(2008, 1, 29),
     date(2000, 11, 7),
     date(2002, 11, 5),
     date(2004, 11, 2),
@@ -1994,6 +1995,43 @@ STATES = {
     "Wisconsin": "WI",
     "Wyoming": "WY",
 }
+NH_PDF = (
+    "https://web.archive.org/web/2024id_/https://www.sos.nh.gov/sites/g/files/ehbemt561/files/inline-documents/sonh/{}"
+)
+NH_COUNTIES = {
+    "Belknap": "001",
+    "Carroll": "003",
+    "Cheshire": "005",
+    "Coos": "007",
+    "Grafton": "009",
+    "Hillsborough": "011",
+    "Merrimack": "013",
+    "Rockingham": "015",
+    "Strafford": "017",
+    "Sullivan": "019",
+}
+NH_FILES = {
+    date(2018, 11, 6): (
+        "2018-ge-concon-questions.pdf",
+        {
+            "1": (
+                "Taxpayer standing to bring legal actions against the government",
+                "Legislative Referendum",
+            ),
+            "2": (
+                "Right to live free from governmental intrusion in private and personal information",
+                "Legislative Referendum",
+            ),
+        },
+    ),
+    date(2022, 11, 8): (
+        "2022-ge-concon-questions-remediated.pdf",
+        {
+            "1": ("Abolishing the office of register of probate", "Legislative Referendum"),
+            "2": ("Constitutional convention question", "Legislative Referendum"),
+        },
+    ),
+}
 VT_2002 = "https://web.archive.org/web/20120101000000id_/http://vermont-elections.org/elections1/2002GEConstAmdResults111102.pdf"
 PUBLISHERS = {
     "PA": (
@@ -2005,6 +2043,11 @@ PUBLISHERS = {
         "Vermont Secretary of State",
         "Constitutional amendment vote returns, November 5, 2002",
         "https://electionarchive.vermont.gov/",
+    ),
+    "NH": (
+        "New Hampshire Secretary of State",
+        "General election constitutional amendment questions",
+        "https://www.sos.nh.gov/elections/election-results",
     ),
     "IL": (
         "Illinois State Board of Elections",
@@ -2399,6 +2442,10 @@ def fetch() -> None:
         raw.fetch(SOURCE, ND_ABSTRACTS + name + ".pdf", suffix=".pdf")
         time.sleep(1)
     raw.fetch(SOURCE, ND_2004_PRIMARY[1] + ".pdf", suffix=".pdf")
+    raw.fetch(fl_sos.SOURCE, fl_sos.EXTRACT.format(day=FL_DAYS[0]), suffix=".txt")
+    for name, _ in NH_FILES.values():
+        raw.fetch(SOURCE, NH_PDF.format(name), suffix=".pdf")
+        time.sleep(1)
     for line in NM_PAGES.read_text().splitlines()[1:]:
         raw.fetch(SOURCE, line.split("\t")[1], suffix=".html")
         time.sleep(1)
@@ -6641,6 +6688,48 @@ def vermont() -> list[dict[str, object]]:
     ]
 
 
+def new_hampshire() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, (name, questions) in NH_FILES.items():
+        url = NH_PDF.format(name)
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        cells = r"([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)"
+        counties = {
+            match[1].strip(): [int(match[index].replace(",", "")) for index in range(2, 6)]
+            for match in re.finditer(
+                rf"(?m)^\s*(\w+ County|Totals)\s+{cells}\s*$",
+                text[: text.index("Constitutional Amendment Questions", 300)],
+            )
+        }
+        printed = counties.pop("Totals")
+        if len(counties) != 10:
+            raise ValueError(f"{url}: {len(counties)} counties")
+        for index, number in enumerate(("1", "2")):
+            for side in range(2):
+                if sum(tally[index * 2 + side] for tally in counties.values()) != printed[index * 2 + side]:
+                    raise ValueError(f"{url} question {number}: counties do not sum to the printed total")
+        rows.extend(
+            {
+                "state": "NH",
+                "day": day,
+                "number": number,
+                "label": f"Question {number}",
+                "title": title,
+                "kind": kind,
+                "url": url,
+                "county": f"33{NH_COUNTIES[county.removesuffix(' County')]}",
+                "answer": answer,
+                "votes": tally[index * 2 + side],
+            }
+            for index, (number, (title, kind)) in enumerate(questions.items())
+            for county, tally in counties.items()
+            for side, answer in enumerate(("YES", "NO"))
+        )
+    return rows
+
+
 def south_dakota_2002_june() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for answer, (printed, text) in SD_2002_JUNE_VOTES.items():
@@ -7080,6 +7169,7 @@ def parse() -> None:
             *south_dakota_2022_june(),
             *oregon_2026(),
             *vermont(),
+            *new_hampshire(),
         ],
         infer_schema_length=None,
     )
