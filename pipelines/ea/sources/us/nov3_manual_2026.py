@@ -71,6 +71,14 @@ SCHOOLS = {
     ("AZ", "Humboldt Unified School District No. 22"): "0403870",
     ("AZ", "Camp Verde Unified School District No. 28"): "0400813",
     ("AZ", "Cottonwood-Oak Creek Elementary School District No. 6"): "0402370",
+    ("AZ", "Bisbee Unified School District No. 2"): "0401180",
+    ("AZ", "Palominas Elementary School District No. 49"): "0405880",
+    ("AZ", "St. David Unified School District No. 21"): "0408020",
+    ("AZ", "Flagstaff Unified School District No. 1"): "0402860",
+    ("AZ", "Williams Unified School District No. 2"): "0409310",
+    ("AZ", "Payson Unified School District No. 10"): "0406070",
+    ("AZ", "Safford Unified School District No. 1"): "0407240",
+    ("AZ", "Blue Ridge Unified School District No. 32"): "0406580",
 }
 MANUAL = DATA / "inbox" / "manual"
 ROWS_FILE = Path(__file__).with_name("nov3_manual_2026.json")
@@ -171,7 +179,11 @@ COUNTIES = {
     "48085": ("TX", "https://www.collincountytx.gov/Elections", "../y26/tx/collin.pdf"),
     "48121": ("TX", "https://www.dentoncounty.gov/elections", "../y26/tx/denton_preview.pdf"),
     "48141": ("TX", "https://www.epcounty.com/elections/", "../y26/tx/tornillo_isd.pdf"),
-    "48339": ("TX", "https://elections.mctx.org/samplebal.asp?ElectionId=GEN110326&curLang=English", "../y26/tx/montgomery_sample.pdf"),
+    "48339": (
+        "TX",
+        "https://elections.mctx.org/samplebal.asp?ElectionId=GEN110326&curLang=English",
+        "../y26/tx/montgomery_sample.pdf",
+    ),
     "06001": (
         "CA",
         "https://acvote.alamedacountyca.gov/election-information/elections",
@@ -370,7 +382,11 @@ COUNTIES = {
         "https://www.dallascountyvotes.org/#university-park",
         "MF-463/dallas/CoUP-Notice-of-Special-Election-November-3-2026.pdf",
     ),
-    "48303-lc": ("TX", "https://votelubbock.gov/elections-office/news-and-legal-notices/#lubbock-cooper-isd", "MF-463/lubbock/LCISD-2026-VATRE-Notice-of-Election.pdf"),
+    "48303-lc": (
+        "TX",
+        "https://votelubbock.gov/elections-office/news-and-legal-notices/#lubbock-cooper-isd",
+        "MF-463/lubbock/LCISD-2026-VATRE-Notice-of-Election.pdf",
+    ),
     "48303-lz": (
         "TX",
         "https://votelubbock.gov/elections-office/news-and-legal-notices/#lorenzo-isd-bonds",
@@ -486,6 +502,66 @@ COUNTIES = {
         "AZ",
         "https://www.yumacountyaz.gov/government/elections#full-text-ballot-insert-2026-general",
         "MF-434/RB261266 Yuma Full Text 1126 17x11_PROOF_260831_v03.pdf",
+    ),
+    "04003-ins": (
+        "AZ",
+        "https://www.cochise.az.gov/elections",
+        "MF-503/cochise/RB261305 Cochise Full Text 11-26 17x16.5_PROOF_260831_v03.pdf",
+    ),
+    "04003-city": (
+        "AZ",
+        "https://www.bisbeeaz.gov/",
+        "MF-503/cochise/City of Bisbee FINAL PRINT FILE 2026 General Election 110326.pdf",
+    ),
+    "04005-flag": (
+        "AZ",
+        "https://www.flagstaff.az.gov/",
+        "MF-503/coconino/City of Flagstaff Informational Pamphlet - 2026 General Election.pdf",
+    ),
+    "04005-page": (
+        "AZ",
+        "https://www.cityofpage.org/",
+        "MF-503/coconino/City of Page Informational Pamphlet - 2026 General Election.pdf",
+    ),
+    "04005-fusd": (
+        "AZ",
+        "https://www.fusd1.org/",
+        "MF-503/coconino/Flagstaff USD Informational Pamphlet - 2026 General Election.pdf",
+    ),
+    "04005-wusd": (
+        "AZ",
+        "https://www.williams.k12.az.us/",
+        "MF-503/coconino/Williams USD Informational Pamphlet - 2026 General Election.pdf",
+    ),
+    "04007-ins": (
+        "AZ",
+        "https://www.gilacountyaz.gov/government/elections/",
+        "MF-503/gila/2026 Tablecloth.pdf",
+    ),
+    "04009-ins": (
+        "AZ",
+        "https://www.graham.az.gov/elections",
+        "MF-503/graham/2026 General Tablecloth_202609161326100840.pdf",
+    ),
+    "04017-ins": (
+        "AZ",
+        "https://www.navajocountyaz.gov/Departments/Elections",
+        "MF-503/navajo/264314a_tablecloth_HR_prf.pdf",
+    ),
+    "04023-ins": (
+        "AZ",
+        "https://www.santacruzcountyaz.gov/",
+        "MF-503/santa-cruz/264533a_Tablecloth_HR_prf_202609161650400208.pdf",
+    ),
+    "04013-pam": (
+        "AZ",
+        "https://elections.maricopa.gov/",
+        "MF-503/maricopa/2026 General Election Publicity Pamphlet - Maricopa County - Website Version.pdf",
+    ),
+    "04013-toll": (
+        "AZ",
+        "https://www.tollesonaz.gov/",
+        "MF-503/maricopa/City of Tolleson Publicity Pamphlet 2026 General Election.pdf",
     ),
     "04013-wick": (
         "AZ",
