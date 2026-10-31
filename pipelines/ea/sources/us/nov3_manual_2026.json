@@ -10613,5 +10613,181 @@
     "title": "Term Limit of Two Full Elected Terms of City Officials",
     "text": "Term Limit of Two Full Elected Terms of City Officials",
     "file": "N3M-web/tx9/hid/72989.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 6",
+    "title": "Town Council terms",
+    "text": "Shall Town Council terms be increased to a duration of four years on a staggered basis commencing after the November 2028 general election? (Repeals and replaces section §C-2.02)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 7",
+    "title": "Notices of public hearing",
+    "text": "Shall sections §C-2.08(6) and §C-2.13(d) be amended to include notice posting on the Town website? (Amends sections §C-2.08(6) and §C-2.13(d))",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 8",
+    "title": "Ordinances: conveyances and leases",
+    "text": "Shall the requirement of the enactment of an Ordinance for conveyances or leases of Town real estate be repealed? (Removes section §C-2.12(5))",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 9",
+    "title": "Ordinances: effective date",
+    "text": "Shall adopted Ordinances become effective upon adoption rather than after a thirty (30) day period, unless otherwise stated? (Amends section §C-2.13(c))",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 10",
+    "title": "Police Department",
+    "text": "Shall the qualifications of the Police Chief include a bachelor’s degree in criminal justice or a related field? (Amends section §C-4.04(c))",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 11",
+    "title": "Public Works and Recreation",
+    "text": "Shall the functions of the Public Works Department be modified to add “parks” and the oversight of the daily operations of the Smithfield Water Department and shall the Parks and Recreation Department be restated as the Recreation Department? (Amends sections §C-4.05 and §C-4.17)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 12",
+    "title": "Town Solicitor",
+    "text": "Shall the Town Solicitor’s role be revised to ensure consistency with State law and explicitly define required qualifications? (Amends section §C-4.06)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 13",
+    "title": "Human Services Department",
+    "text": "Shall the Director of Human Services section §C-4.09 be renamed the Human Services Department with organization, functions, and required qualifications added? (Amends section §C-4.09)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 14",
+    "title": "Building Official",
+    "text": "Shall the functions of the Building Official be modified to remove the issuance of plumbing and drainage permits? (Amends section §C-4.10)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 15",
+    "title": "Boards and Commissions",
+    "text": "Shall there be a requirement to publish notices of vacancies in Town Boards and Commissions? (Amends section §C-4.19)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 16",
+    "title": "Town Engineer",
+    "text": "Shall the Town Engineering Department be added to the Town Charter to outline the organization, functions, and required qualifications of the Town Engineer? (Creates a new section §C-4.24)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 17",
+    "title": "Municipal Library System",
+    "text": "May the Town Council establish a free Municipal Library System with locations in Esmond and Greenville overseen by a board of trustees appointed by the Town Council? (Creates a new section §C-4.25)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 18",
+    "title": "Planning and Economic Development",
+    "text": "Shall a Planning and Economic Development Department be added to the Town Charter to outline the organization, functions, and required qualifications of the Planning Director? (Creates a new section §C-4.26)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 19",
+    "title": "Capital items",
+    "text": "Shall the dollar amount for capital items be raised from amounts greater than $10,000 to amounts greater than $30,000? (Amends section §C-5.14(c)(7))",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 20",
+    "title": "Key performance indicators and independent assessment",
+    "text": "Shall the Town replace the current five (5) year audit with a system where each department tracks at least five clear performance measures and reports results every year, with trends over time? This system would also require an independent review of selected departments each year to check accuracy and recommended improvements. The independent firm shall be selected by the Budget and Financial Review Board. (Repeals and replaces §C-5.20)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007",
+    "publisher": "Smithfield Board of Canvassers",
+    "place": "Town of Smithfield",
+    "number": "Question 21",
+    "title": "Town Council and School Committee work sessions",
+    "text": "Shall the Town Council and School Committee be required to hold four joint workshop meetings per year? (Creates a new section §C-12.08)",
+    "file": "MF-481/smithfield/Smithfield State and Local Questions.pdf"
   }
 ]

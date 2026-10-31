@@ -193,6 +193,11 @@ COUNTIES = {
         "https://cranstonri.gov/_resources/common/userfiles/file/Board%20of%20Canvassers/2026%20Election%20Items/Cranston%202026%20Voter%20Guide.pdf",
         "RI-web/cranston-voter-guide.pdf",
     ),
+    "44007-sm": (
+        "RI",
+        "https://www.smithfieldri.gov/",
+        "MF-481/smithfield/Smithfield State and Local Questions.pdf",
+    ),
     "44009": (
         "RI",
         "https://www.richmondri.gov/DocumentCenter/View/4674/Chariho-Public-Notice-1022026",
