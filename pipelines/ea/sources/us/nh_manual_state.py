@@ -747,6 +747,7 @@ LINE_ADDS = {
         "set": {"district": "24", "group": 9003, "printed": 20626},
     },
 }
+ACCEPT_TOP = {"1978 general state senate 7", "2010 general state senate 1"}
 CONFIRMED = {
     956,
     957,
@@ -1499,6 +1500,9 @@ def emit():
                 else []
             )
             winners = {option for option, kind, _ in declared if kind in ("elected", "won")}
+            if tag in ACCEPT_TOP:
+                declared = [row for row in declared if row[1] not in ("elected", "won")]
+                winners = set()
             ranked = sorted(((votes, option) for option, votes in ours.items() if option not in others), reverse=True)
             if winners and (
                 len(winners) > len(ranked)
@@ -1567,7 +1571,7 @@ def emit():
             for option, kind, seats in declared:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             if (
-                template is not None
+                (template is not None or tag in ACCEPT_TOP)
                 and ranked
                 and ranked[0][0] > 0
                 and (len(ranked) == 1 or ranked[0][0] > ranked[1][0])
