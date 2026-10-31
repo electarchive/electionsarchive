@@ -277,6 +277,62 @@ function independent(row: Row): Row {
   };
 }
 
+function badge(option: Option, root: (party: string) => string) {
+  return option.party == null ? "" : root(option.party);
+}
+
+function roamers(options: Array<Option>, root: (party: string) => string) {
+  return new Set(
+    Map.groupBy(
+      options.filter(
+        (option) => option.person != null && option.kind === "ticket",
+      ),
+      (option) => option.person ?? "",
+    )
+      .entries()
+      .filter(
+        ([, runs]) =>
+          new Set(runs.map((run) => badge(run, root))).size > 1 &&
+          new Set(runs.map((run) => run.contest)).size > 1,
+      )
+      .map(([person]) => person),
+  );
+}
+
+function usual(
+  key: string,
+  found: Group,
+  roaming: Set<string>,
+  root: (party: string) => string,
+): Group {
+  if (!roaming.has(key.replace(/^person:/, ""))) {
+    return found;
+  }
+  const sums = new Map<string, number>();
+  for (const member of found.members) {
+    const label = badge(member, root);
+    sums.set(label, (sums.get(label) ?? 0) + member.votes);
+  }
+  const [top] = sums
+    .entries()
+    .toArray()
+    .toSorted((a, b) => b[1] - a[1]);
+  const lead =
+    found.members
+      .filter((member) => badge(member, root) === top?.[0])
+      .toSorted((a, b) => b.votes - a.votes)[0] ?? found.lead;
+  return {
+    ...found,
+    lead,
+    cell: {
+      ...found.cell,
+      label: lead.label,
+      person: lead.person,
+      party: lead.party,
+    },
+  };
+}
+
 export function compare(
   current: Side,
   earlier: Side | null,
@@ -344,6 +400,7 @@ export function compare(
       )
       .map((line) => root(line.party ?? "")),
   );
+  const roaming = roamers(options, root);
   const split = new Set<string>();
   const listed = Map.groupBy(
     current.options.filter(
@@ -414,6 +471,7 @@ export function compare(
       (grouping !== "party" || party == null) &&
       (match === "person" ||
         party == null ||
+        roaming.has(option.person) ||
         crowded.has(party) ||
         heads.get(`${option.contest}:${party}`)?.person !== option.person)
     ) {
@@ -450,9 +508,17 @@ export function compare(
     personal.has(option.person) && !base(option).startsWith("alliance:")
       ? `person:${option.person}`
       : base(option);
-  const now = tally(current, identify);
+  const settle = (groups: Map<string, Group>) =>
+    new Map(
+      groups
+        .entries()
+        .map(([key, group]) => [key, usual(key, group, roaming, root)]),
+    );
+  const now = settle(tally(current, identify));
   const then =
-    earlier == null ? new Map<string, Group>() : tally(earlier, identify);
+    earlier == null
+      ? new Map<string, Group>()
+      : settle(tally(earlier, identify));
   const pairs: Array<{
     key: string;
     lead: Option;
