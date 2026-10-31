@@ -4,11 +4,28 @@ This page explains how the site stays fast: where results are cached, how the ca
 
 ## How a page is served
 
-Cloudflare sits in front of the origin. Static assets under `/_app/immutable/` have content-hashed names and are sent with `cache-control: public, max-age=31536000, immutable`, so browsers and the edge keep them for a year. Pages and twins are rendered by the SvelteKit server, which answers each page from a handful of RPC procedures called in-process. A loader starts independent procedure calls together with `Promise.all`, so a contest page waits for its slowest call, not for the sum of them.
+Cloudflare sits in front of the origin and caches what the origin marks as shareable (see [The edge cache](#the-edge-cache)). Static assets under `/_app/immutable/` have content-hashed names and are sent with `cache-control: public, max-age=31536000, immutable`, so browsers and the edge keep them for a year. Pages and twins are rendered by the SvelteKit server, which answers each page from a handful of RPC procedures called in-process. A loader starts independent procedure calls together with `Promise.all`, so a contest page waits for its slowest call, not for the sum of them.
 
 Each kind of archive page (contest, election, day, and polity) is its own JavaScript chunk, loaded with a dynamic `import()`, so a contest page doesn't download the code for the other three. That cut the JavaScript a contest page preloads from about 473 kB to 240 kB gzipped.
 
 Two sections of the contest page, the ballot list and the lean chart, sit below the results and can take seconds on a cold cache. They don't hold up the page. The loader starts them once the contest is found. When the main data is ready, it returns each one as a plain value if it has already finished, and as a promise if it hasn't. SvelteKit streams a promise to the browser when it resolves, and the page renders it with `{#await}`. A warm page therefore arrives fully rendered, and a cold one shows the results first and fills in the rest. The Markdown and JSON twins wait for both.
+
+## The edge cache
+
+Cloudflare caches every response that the origin marks as shareable. `mark()` in `apps/web/src/lib/server/edge.ts` determines this as each response leaves the server. A response is shareable when it answers a GET or HEAD with a 200, sets no `cache-control` or `set-cookie` of its own, goes to a visitor who is not signed in and sent no `authorization` or `x-api-key` header, and is not under `/api/auth`, `/mcp`, or `/rpc`. A shareable response gets two headers:
+
+- `cache-control: no-cache`, so browsers keep the page but ask the edge before reusing it. The edge answers with a 304 when the page hasn't changed.
+- `cloudflare-cdn-cache-control: public, max-age=300, stale-while-revalidate=86400, stale-if-error=86400`, which only Cloudflare reads and never passes on. The edge serves its copy for five minutes. After that it keeps serving the old copy while it fetches a new one in the background, and if the origin fails, it serves the old copy for up to a day.
+
+Every other response gets `private, no-cache` unless it already set its own `cache-control`, so the edge never stores it. Live pages, their twins, and the live API send `no-store`, and a cache rule keeps them out as well.
+
+The edge keeps one copy of each URL per format and per locale. A page and its Markdown and JSON twins share a URL and differ only by the `Accept` header, so a cache rule sorts each request into `text/html`, `text/markdown`, or `application/json`. The locale comes only from the `PARAGLIDE_LOCALE` cookie, never from the URL or from `Accept-Language`. Before the cache lookup, a transform rule copies that cookie into an `x-locale` request header, and shareable responses send `vary: accept, x-locale`. A response is shareable only when `x-locale` matches the cookie and names a known locale, so a forged header or an unknown locale can't put a page into another locale's copy. Because a cached page can't depend on the browser's language, the site doesn't pick a locale from `Accept-Language`. A banner will suggest one instead once a second locale ships.
+
+Requests that carry a session cookie, an `authorization` header, or an `x-api-key` header skip the edge cache entirely: a cache rule matches them before the lookup. The origin also marks those responses private, in case a rule is ever wrong.
+
+When a new build starts, the server purges the edge cache for its own host through the Cloudflare API. It records the build in Redis, so restarts and extra instances of the same build don't purge again. The purge needs `CLOUDFLARE_ZONE_ID` and `CLOUDFLARE_PURGE_TOKEN`, an API token that can only purge the cache of that zone; without them the server skips it. Between deploys, a publish reaches visitors within about five minutes, as edge copies expire.
+
+Cloudflare keeps the origin's ETag only when no zone feature rewrites the HTML, so Email Obfuscation, Automatic HTTPS Rewrites, Replace insecure JavaScript libraries, Rocket Loader, and injected bot-detection scripts stay off. When Cloudflare compresses a page itself, it turns the ETag into a weak one, which still gets a 304 when the browser checks.
 
 ## The procedure cache
 
