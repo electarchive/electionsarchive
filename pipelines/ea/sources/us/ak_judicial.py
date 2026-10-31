@@ -13,12 +13,14 @@ from ea.sources.us.retention import display
 from ea.store import DATA, connect
 
 SOURCE = "us.ak_judicial"
-VERSION = "3"
+VERSION = "4"
 INBOX = DATA / "inbox" / "manual"
 URL = "https://www.elections.alaska.gov/results/"
 PUBLISHER = "Alaska Division of Elections"
 TITLE = "Official election summary report: judicial retention"
 FILES = {
+    date(2000, 11, 7): "MF-471/2000/results.txt",
+    date(2002, 11, 5): "MF-471/2002/results.txt",
     date(2008, 11, 4): "MF-471/2008/results (1).pdf",
     date(2010, 11, 2): "MF-454/2010/resultsOF.pdf",
     date(2012, 11, 6): "MF-454/2012/results (2).pdf",
@@ -46,6 +48,10 @@ JUDGES = {
     "Terrell": "Timothy Terrell",
     "Estaugh": "Robert Eastaugh",
     "Coats": "Robert Coats",
+    "Bryner": "Alexander Bryner",
+    "Matthews": "Warren Matthews",
+    "Stewart": "David Stewart",
+    "Carpeneti": "Walter Carpeneti",
 }
 OFFICES = {"Supreme Court": "Justice of the Supreme Court", "Court of Appeals": "Judge of the Court of Appeals"}
 BLOCK = re.compile(
@@ -69,9 +75,9 @@ def fetch() -> None:
                 SOURCE,
                 f"{URL}#{day}",
                 (INBOX / name).read_bytes(),
-                suffix=".pdf",
+                suffix=Path(name).suffix,
                 retrieved_at=datetime.now(UTC),
-                media_type="application/pdf",
+                media_type="text/plain" if name.endswith(".txt") else "application/pdf",
             )
 
 
@@ -91,10 +97,37 @@ def pages(path: Path, year: int) -> list[str]:
     ]
 
 
+TEXT_BLOCK = re.compile(r'^\d+\s+\d+\s+"(SUPREME|APPEALS)(?: CT)?[-,]\s*(\w+)"')
+TEXT_VOTES = re.compile(r'^\s+\d+\s+\d+\s+"(YES|NO)"\s+""\s+\d+\s+(\d+)\s*$')
+
+
+def text_lines(day: date, path: Path) -> list[dict[str, object]]:
+    found: list[dict[str, object]] = []
+    current: dict[str, object] | None = None
+    for line in path.read_text(errors="replace").splitlines():
+        block = TEXT_BLOCK.match(line)
+        if block is not None:
+            court = "Supreme Court" if block[1] == "SUPREME" else "Court of Appeals"
+            current = {"day": day, "court": court, "surname": block[2].title()}
+            continue
+        votes = TEXT_VOTES.match(line)
+        if current is not None and votes is not None:
+            current[votes[1].lower()] = int(votes[2])
+            if "yes" in current and "no" in current:
+                found.append(current)
+                current = None
+        elif current is not None and not line.startswith("\t"):
+            current = None
+    return found
+
+
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
     for day in FILES:
         path = raw.cached(SOURCE, f"{URL}#{day}").path
+        if path.suffix == ".txt":
+            found.extend(text_lines(day, path))
+            continue
         for text in pages(path, day.year):
             current: dict[str, object] | None = None
             for line in text.splitlines():
@@ -122,7 +155,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska Supreme Court and Court of Appeals retention elections 2008–2024, statewide, "
+            summary="Alaska Supreme Court and Court of Appeals retention elections 2000–2024, statewide, "
             "from the Division of Elections' official summary reports",
             polity="US-AK",
         )
