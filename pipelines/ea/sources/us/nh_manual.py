@@ -63,7 +63,7 @@ NAMES = {
 ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
 NOISE = re.compile(r"[\^_'•■*]")
 LEADER = re.compile(r"^[.\-—•\s]+$")
-PARTY = re.compile(r",\s*(r&d|r|d|i|ind|l|lib)\s*\.?\s*(?:\(write-?in\))?$", re.IGNORECASE)
+PARTY = re.compile(r",\s*(r&d|r|d|i|ind|l|lib|1)\s*\.?\s*(?:\(write-?in\))?$", re.IGNORECASE)
 CLEAN = re.compile(
     r"[A-Z][A-Za-z'.\-]*(?: (?:[A-Z]|de[A-Z]|(?:de|du|dupont|van|von|der|la|di) (?=[A-Z]|[a-z]+ [A-Z]))[A-Za-z'.\-]*)+(?:,? (?:Jr|Sr|II|III|IV)\.?)?"
 )
@@ -196,6 +196,11 @@ def header(text: str) -> tuple[str, str] | None:
         match = difflib.get_close_matches(county[1].upper(), COUNTIES, n=1, cutoff=0.7)
         if match:
             return "county", match[0]
+    bare = re.fullmatch(r"(.*?):", plain)
+    if bare and not re.match(r"(?i)for\b", plain):
+        for pattern, name in OFFICES:
+            if re.fullmatch(pattern, bare[1].strip(), re.IGNORECASE):
+                return "office", name
     found = re.match(r"For\s+(?:the\s+)?(.*?)[:;.]?$", plain, re.IGNORECASE)
     if found:
         for pattern, name in OFFICES:
@@ -220,7 +225,14 @@ def header(text: str) -> tuple[str, str] | None:
 
 def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
     out: list[dict[str, object]] = []
-    state: dict[str, object] = {"run": 0, "county": None, "office": None, "district": None, "seen": set()}
+    state: dict[str, object] = {
+        "run": 0,
+        "county": None,
+        "office": None,
+        "district": None,
+        "seen": set(),
+        "opening": False,
+    }
     group: list[dict[str, object]] = []
     ids = [0]
     pending: list[Word] = []
@@ -246,6 +258,8 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
             party = total[1].strip(" .,").lower() or None
             close(votes, party[:1] if party else None)
             return
+        if state["office"] is None and state["opening"] and not text.isupper():
+            state.update(office="sheriff", opening=False)
         if state["office"] is None or (text.isupper() and "," not in text):
             return
         scatter = re.fullmatch(r"scatter(?:ing)?s?", text, re.IGNORECASE)
@@ -256,7 +270,7 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         if not scatter:
             found = PARTY.search(text)
             if found:
-                party = found[1].lower()
+                party = "l" if found[1] == "1" else found[1].lower()
                 name = text[: found.start()]
             name = re.sub(r"\(write-?in\)", "", name, flags=re.IGNORECASE).strip(" ,")
         district = state["district"]
@@ -313,13 +327,13 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
                     state["run"] = int(state["run"]) + 1
                     state["seen"] = set()
                 state["seen"].add(kind[1])
-                state.update(county=kind[1], office=None, district=None)
+                state.update(county=kind[1], office=None, district=None, opening=True)
             elif kind[0] == "office":
-                state.update(office=kind[1], district=None)
+                state.update(office=kind[1], district=None, opening=False)
             elif kind[0] == "district":
                 state["district"] = kind[1]
             else:
-                state.update(office=None, district=None)
+                state.update(office=None, district=None, opening=False)
             continue
         if found and left:
             if pending and not re.search(r"[A-Za-z]{3}", left_text):
@@ -515,9 +529,9 @@ def blocks(frame: pl.DataFrame) -> pl.DataFrame:
         side=pl.when(pl.col("stage") == "general")
         .then(pl.lit(None, pl.String))
         .otherwise(
-            pl.when(pl.col("party").is_in(["r", "d"]))
+            pl.when(pl.col("party").is_in(["r", "d", "l"]))
             .then(pl.col("party"))
-            .otherwise(pl.when(pl.col("total_party").is_in(["r", "d"])).then(pl.col("total_party")))
+            .otherwise(pl.when(pl.col("total_party").is_in(["r", "d", "l"])).then(pl.col("total_party")))
         )
     )
     return frame.filter(~((pl.col("stage") == "primary") & pl.col("side").is_null()))
@@ -809,7 +823,7 @@ def emit() -> Path:
         values = []
         keyed = lines.group_by("year", "stage", "county", "office", "district", "side", maintain_order=True)
         for (year, stage, county, office, district, side), rows in keyed:
-            party = {"r": "republican", "d": "democratic"}.get(str(side)) if side else None
+            party = {"r": "republican", "d": "democratic", "l": "libertarian"}.get(str(side)) if side else None
             tag = f"{year} {county} {office} {district or ''} {party or stage}".replace("  ", " ")
             key = (int(year), str(county).lower(), str(office), district, party)
             candidates = contests.get(key) or (
