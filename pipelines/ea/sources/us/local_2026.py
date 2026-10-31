@@ -5988,6 +5988,13 @@ for key, publisher, title, url, local in (
         "in/marion_candidates.xlsx",
     ),
     (
+        "FL-12119-cities",
+        "Sumter County Supervisor of Elections",
+        "Sample Ballot, General Election, November 3, 2026 (Bushnell and Center Hill precincts)",
+        "https://elections.sumtercountyfl.gov/",
+        "fl/sumter_sample_ballot_bushnell_center_hill.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
