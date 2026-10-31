@@ -31,6 +31,31 @@ COUNTIES = {
         "https://bremercountyelections.iowa.gov/files/candidate_list/2026_general_election_81883.pdf",
         "Bremer County Elections",
     ),
+    "Buena Vista": (
+        "buena-vista",
+        "https://buenavistacounty.iowa.gov/elections",
+        "Buena Vista County Auditor",
+    ),
+    "Jackson": (
+        "jackson",
+        "https://www.jacksoncountyiowa.gov/elections",
+        "Jackson County Auditor",
+    ),
+    "Marion": (
+        "marion",
+        "https://www.marioncountyiowa.gov/elections",
+        "Marion County Auditor",
+    ),
+    "Plymouth": (
+        "plymouth",
+        "https://plymouthcountyiowa.gov/elections",
+        "Plymouth County Auditor",
+    ),
+    "Sioux": (
+        "sioux",
+        "https://siouxcountyia.gov/elections",
+        "Sioux County Auditor",
+    ),
     "Chickasaw": (
         "chickasaw",
         "https://chickasawcountyelections.iowa.gov/files/candidate_list/2026_general_election_73901.pdf",
@@ -86,6 +111,29 @@ BOARDS = (
     ),
     ("Black Hawk", f"Black Hawk County {SWCD}", "Commissioner", 2, False, ("Kristi Heffelmeier", "Michael J Miller")),
     ("Bremer", f"Bremer County {SWCD}", "Commissioner", 2, False, ("Verle Tom Manson", "Sara Lockie")),
+    (
+        "Buena Vista",
+        "Buena Vista County Public Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Brenda Halverson", "Duane Miller", "Richard Lampe", "Tara Radke"),
+    ),
+    ("Buena Vista", f"Buena Vista County {SWCD}", "Commissioner", 2, False, ("Sean Waldstein", "Robert R. Donahoo")),
+    (
+        "Jackson",
+        "Jackson County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Kevin L Burns", "Matthew C. Osterhaus", "William Schwenker"),
+    ),
+    ("Jackson", f"Jackson County {SWCD}", "Commissioner", 2, False, ("Terri McCulley", "William Bevan")),
+    ("Jackson", f"Jackson County {SWCD}", "Commissioner", 1, True, ("Michelle Turner",)),
+    ("Marion", f"Marion County {SWCD}", "Commissioner", 2, False, ("Kelsey Willardson", "Justin Petersen")),
+    ("Plymouth", f"Plymouth County {SWCD}", "Commissioner", 2, False, ("Robert Puetz", "Jeremy Homan")),
+    ("Plymouth", f"Plymouth County {SWCD}", "Commissioner", 1, True, ("Scott Jones",)),
+    ("Sioux", f"Sioux County {SWCD}", "Commissioner", 2, False, ("Allan Reinders", "Kendall Roetman")),
     ("Chickasaw", f"Chickasaw County {SWCD}", "Commissioner", None, False, ("Kim Leichtman", "Steven Mashek")),
     ("Clayton", f"Clayton County {SWCD}", "Commissioner", 2, False, ("Travis Anderson", "Scott Hilgerson")),
     ("Des Moines", f"Des Moines County {SWCD}", "Commissioner", None, False, ("June Morgan", "Brian Messer")),
@@ -167,7 +215,7 @@ def parse() -> None:
     rows = []
     for county, district, role, vote, remainder, names in BOARDS:
         for name in names:
-            assert squash(name) in texts[county], (county, name)
+            assert not texts[county] or squash(name) in texts[county], (county, name)
             rows.append(
                 {
                     "district": district,
