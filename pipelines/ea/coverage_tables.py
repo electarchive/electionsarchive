@@ -1,3 +1,5 @@
+import csv
+import functools
 import hashlib
 import json
 import re
@@ -1192,6 +1194,27 @@ def request() -> None:
 
 
 WORKERS = 8
+OFF_NOVEMBER = ("other_date", "appointed", "landowner")
+
+
+@functools.cache
+def district_rules() -> list[tuple[str, str, re.Pattern[str], str]]:
+    with (ROOT / "pipelines/ea/coverage_inputs/special-district-elections.tsv").open(newline="") as f:
+        lines = (line for line in f if not line.startswith("#"))
+        return [
+            (row["state"], row["function"], re.compile(row["name_pattern"] or ".", re.IGNORECASE), row["group"])
+            for row in csv.DictReader(lines, delimiter="\t")
+        ]
+
+
+def off_november(state: str, function: str | None, name: str) -> bool:
+    kind = "" if function is None else function.split(" - ", 1)[-1].lower()
+    for st, fn, pattern, group in district_rules():
+        if st == state and fn in ("", kind) and pattern.search(name):
+            return group in OFF_NOVEMBER
+    return False
+
+
 STATE_INPUTS = (
     "pipelines/ea/coverage.py",
     "pipelines/ea/coverage_tables.py",
@@ -1201,6 +1224,7 @@ STATE_INPUTS = (
     "pipelines/ea/sources/us/ncsl_measures.csv",
     "pipelines/ea/coverage_inputs/finest-reported.csv",
     "pipelines/ea/coverage_inputs/coverage-gaps.tsv",
+    "pipelines/ea/coverage_inputs/special-district-elections.tsv",
 )
 COUNTRY_INPUTS = (
     "pipelines/ea/coverage.py",
@@ -1813,7 +1837,8 @@ def build(full: bool = False) -> str:
                 "active": active,
                 # NJ county vocational boards are appointed by the county executive or commissioners (N.J.S.A. 18A:54-16, https://pub.njleg.state.nj.us/statutes), not elected.
                 "elected": elected
-                and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name)),
+                and not (st == "34" and kind in ("school", "dependent_school") and re.search(r"VOCATIONAL", name))
+                and not (kind == "special" and off_november(states[st][0], function, name)),
                 "polity_id": pid,
                 "held_key": held_key,
             }

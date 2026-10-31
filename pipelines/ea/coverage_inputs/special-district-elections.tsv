@@ -1,0 +1,46 @@
+# Special districts whose boards are not on the November 3 general election ballot, or whose election the archive cannot count against it: read by `ea coverage us` to drop them from the expected pool. Held results still show.
+# Columns: state (postal code), function (Census function, lowercase; blank for any), name_pattern (case-insensitive regex searched in the government name; blank for any), group, board (how the board is chosen), statute, url.
+# Groups: other_date, appointed, and landowner drop the district from expected; november and mixed keep it. The first row that matches a district decides, so keep rows come before the exclusions they override.
+# A district excluded here that the archive later loads is a sign to add a november row for it above the exclusion.
+state	function	name_pattern	group	board	statute	url
+CA		(?<!GROUND)WATER AGENCY	november	Special-act county water agencies elect directors at the November general election	Cal. Water Code Appendix (county water agency acts)	
+CA		AUTHORITY|\bAUTH\b|JOINT POWERS|\bJPA\b	appointed	Joint powers authority board of member-agency appointees	Cal. Gov. Code §§ 6500, 6508.1	https://california.public.law/codes/ca_gov't_code_section_6508.1
+CA		^(?!.*\bDIST)(?=.*\b(GROUP|GOVERNMENTS|SYSTEM|COMMISSION|FUND|ALLIANCE|ASSOCIATION|COUNCIL|COOPERATIVE|CONSORTIUM|CORPORATION|INSURANCE|PROGRAM|AGENCY)\b)	appointed	Joint powers agency or pool governed by member-agency appointees	Cal. Gov. Code §§ 6500, 6508.1	https://california.public.law/codes/ca_gov't_code_section_6508.1
+CA		RECLAMATION DIST	landowner	Landowners vote, in November of odd-numbered years	Cal. Water Code §§ 50704, 50730	https://california.public.law/codes/ca_water_code_section_50730
+CA	reclamation		landowner	Landowners vote, in November of odd-numbered years	Cal. Water Code §§ 50704, 50730	https://california.public.law/codes/ca_water_code_section_50730
+CA		WATER STORAGE	landowner	Only title holders vote; general election in March of odd-numbered years	Cal. Water Code §§ 41000, 41300	https://california.public.law/codes/ca_water_code_section_41000
+AZ		ELECTRICAL DIST|ELECTRIC DIST	landowner	Directors chosen by property-taxpayer and acreage vote	Ariz. Rev. Stat. § 48-1713	https://www.azleg.gov/ars/48/01713.htm
+AZ		AUTHORITY|PUBLIC POWER AGENCY	appointed	Joint powers body governed by member-agency appointees	Ariz. Rev. Stat. § 11-952	https://www.azleg.gov/ars/11/00952.htm
+AZ	local fire protection		november	Fire district board elected at the November general election of even-numbered years	Ariz. Rev. Stat. § 48-802	https://www.azleg.gov/ars/48/00802.htm
+AZ	irrigation		november	Qualified electors elect directors each November	Ariz. Rev. Stat. § 48-2922	https://www.azleg.gov/ars/48/02922.htm
+ID	cemeteries		other_date	Commissioners elected in odd-numbered years	Idaho Code § 27-111	https://legislature.idaho.gov/statutesrules/idstat/Title27/T27CH1/SECT27-111/
+ID	local fire protection		other_date	Commissioners elected in November of odd-numbered years	Idaho Code § 31-1410	https://legislature.idaho.gov/statutesrules/idstat/Title31/T31CH14/SECT31-1410/
+ID	parks and recreation		other_date	Directors elected in November of odd-numbered years	Idaho Code § 31-4306	https://legislature.idaho.gov/statutesrules/idstat/Title31/T31CH43/SECT31-4306/
+ID		HOSPITAL|MEDICAL CENTER|CLINIC	other_date	Trustees elected on the third Tuesday of May in odd-numbered years	Idaho Code § 39-1330	https://legislature.idaho.gov/statutesrules/idstat/Title39/T39CH13/SECT39-1330/
+ID	soil and water conservation		other_date	Supervisors elected in November of odd-numbered years	Idaho Code § 22-2721	https://legislature.idaho.gov/statutesrules/idstat/Title22/T22CH27/SECT22-2721/
+ID	libraries		other_date	Trustees elected in odd-numbered years	Idaho Code § 33-2715	https://legislature.idaho.gov/statutesrules/idstat/Title33/T33CH27/SECT33-2715/
+ID		GROUND WATER|IRRIGATION|DRAINAGE|REGIONAL SEWER BOARD	mixed	Not verified		
+ID	water supply utility		other_date	Directors elected on the third Tuesday of May in odd-numbered years	Idaho Code § 42-3211	https://legislature.idaho.gov/statutesrules/idstat/Title42/T42CH32/SECT42-3211/
+ID	sewerage		other_date	Directors elected on the third Tuesday of May in odd-numbered years	Idaho Code § 42-3211	https://legislature.idaho.gov/statutesrules/idstat/Title42/T42CH32/SECT42-3211/
+ID	sewerage and water supply		other_date	Directors elected on the third Tuesday of May in odd-numbered years	Idaho Code § 42-3211	https://legislature.idaho.gov/statutesrules/idstat/Title42/T42CH32/SECT42-3211/
+ID	highways		november	Highway district commissioners elected only at a general election in even-numbered years	Idaho Code title 40, chapter 14	https://legislature.idaho.gov/statutesrules/idstat/Title40/T40CH14/
+NE		SANITARY AND IMPROVEMENT|\bSID\b	other_date	Special election on the first Tuesday after the second Monday in September, every two years	Neb. Rev. Stat. § 31-735	https://nebraskalegislature.gov/laws/statutes.php?statute=31-735
+NE	local fire protection		other_date	Directors elected by registered voters at the annual meeting	Neb. Rev. Stat. § 35-506	https://nebraskalegislature.gov/laws/statutes.php?statute=35-506
+NE	cemeteries		other_date	Trustees elected by residents at a public meeting	Neb. Rev. Stat. § 12-913	https://nebraskalegislature.gov/laws/statutes.php?statute=12-913
+NE	irrigation		landowner	Landowners and leaseholders vote at the regular election on the first Tuesday in February	Neb. Rev. Stat. §§ 46-102, 46-112	https://nebraskalegislature.gov/laws/statutes.php?statute=46-112
+NE		DRAINAGE|DIKING|DIKE AND DRAINAGE	landowner	Owners of real estate elect supervisors at an annual meeting	Neb. Rev. Stat. §§ 31-306, 31-307	https://nebraskalegislature.gov/laws/statutes.php?statute=31-306
+NE	hospitals	AUTHORITY	appointed	County board appoints trustees from petition nominees	Neb. Rev. Stat. §§ 23-3591, 23-3592	https://nebraskalegislature.gov/laws/statutes.php?statute=23-3591
+NE	hospitals		other_date	Trustees elected at the statewide primary election	Neb. Rev. Stat. § 32-550	https://nebraskalegislature.gov/laws/statutes.php?statute=32-550
+NE		RURAL WATER	landowner	Land owners and members select directors at an annual meeting	Neb. Rev. Stat. §§ 46-1006, 46-1016	https://nebraskalegislature.gov/laws/statutes.php?statute=46-1006
+NE		INTERLOCAL|JOINT PUBLIC|ENERGY AGENCY|COOPERATIVE AGENCY|\bPOOL\b	appointed	Board of member-body appointees	Neb. Rev. Stat. §§ 13-801, 13-2501	https://nebraskalegislature.gov/laws/statutes.php?statute=13-2501
+NE		PUBLIC POWER|NATURAL RESOURCES|RECLAMATION|AIRPORT|METROPOLITAN UTILITIES	november	Directors elected at the statewide general election	Neb. Rev. Stat. §§ 32-512, 32-513, 32-516, 32-540, 32-547	https://nebraskalegislature.gov/laws/statutes.php?statute=32-512
+TX		^(HARRIS|SMITH|ORANGE) COUNTY EMERGENCY SERV	november	Commissioners elected in a county over 3 million, or bordering Lake Palestine or another state and the Gulf Intracoastal Waterway	Tex. Health & Safety Code § 775.0345	https://texas.public.law/statutes/tex._health_and_safety_code_section_775.0345
+TX		EMERGENCY SERVICE	appointed	Commissioners court appoints the board	Tex. Health & Safety Code §§ 775.034, 775.0341	https://texas.public.law/statutes/tex._health_and_safety_code_section_775.034
+TX		MHMR|MH AND MR|MENTAL|\bCENTERS?\b	appointed	Board appointed by the sponsoring agencies	Tex. Health & Safety Code §§ 534.002, 534.004	https://texas.public.law/statutes/tex._health_and_safety_code_section_534.002
+TX		HOSPITAL AUTHORITY	appointed	Governing bodies appoint the directors	Tex. Health & Safety Code § 262.012	https://texas.public.law/statutes/tex._health_and_safety_code_section_262.012
+TX		^TRAVIS COUNTY (MUD|MUNICIPAL UTILITY)|^LAKE POINTE|^WILBARGER CREEK	november	District moved its director election to November by order	Tex. Elec. Code § 41.0052	https://texas.public.law/statutes/tex._election_code_section_41.0052
+TX		SPECIAL UTILITY|\bSUD\b	mixed	Chapter 65 districts are outside the May default	Tex. Water Code § 49.103(f)	https://texas.public.law/statutes/tex._water_code_section_49.103
+TX		\b(MUD|WCID|FWSD|LID)\b|MUNICIPAL UTILITY|WATER CONTROL|FRESH WATER|WATER IMPROVEMENT|LEVEE IMPROVEMENT|UTILITY DISTRICT|DRAINAGE DISTRICT	other_date	Directors elected on the May uniform election date of even-numbered years unless the district orders otherwise	Tex. Water Code § 49.103(b)	https://texas.public.law/statutes/tex._water_code_section_49.103
+FL		COMMUNITY DEV|\bCDD\b|STEWARDSHIP	landowner	Landowners vote one vote per acre at a meeting until the district reaches 250 electors	Fla. Stat. § 190.006	http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0100-0199/0190/Sections/0190.006.html
+MT	local fire protection		mixed	Trustees elected under the special district election rules; date not confirmed	Mont. Code Ann. § 7-33-2106	https://mca.legmt.gov/bills/mca/title_0070/chapter_0330/part_0210/section_0060/0070-0330-0210-0060.html
+OK		RURAL WATER|RURAL GAS|RURAL SEWER	landowner	Participating members elect directors at the annual meeting	82 O.S. § 1324.16	https://www.oklegislature.gov/cf_pdf/2025-26%20INT/hB/HB4230%20INT.PDF
