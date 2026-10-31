@@ -9782,6 +9782,11 @@ def parse() -> None:
                                 )
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
+                                and not (
+                                    state == "CA"
+                                    and sort == "school"
+                                    and {"unified", "elementary", "union", "high"} & set(stem)
+                                )
                             ):
                                 continue
                             fits.append(
