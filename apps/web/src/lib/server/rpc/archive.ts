@@ -63,6 +63,11 @@ export const latest = (set: string) =>
     `(${set}.is_default and ${set}.stage <> 'notional' and ${licensed(set)} and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and ${licensed("later")} and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
   );
 
+export const coarse = (shape: string) =>
+  sql.raw(
+    `coalesce((select k.geom from display.coarse k where k.area_id = ${shape}.area_id and k.valid = ${shape}.valid), ${shape}.geom)`,
+  );
+
 const serial = (contest: string, election: string) =>
   sql.raw(
     `case when ${contest}.kind = 'ballot_question' then ${contest}.id::text else concat_ws(':', ${contest}.office_id, ${contest}.body_id, ${contest}.kind, ${election}.kind, case when ${contest}.previous_round_id is null then 1 else 1 + (with recursive back(id, depth) as (select ${contest}.previous_round_id, 1 union all select p.previous_round_id, back.depth + 1 from back join contest p on p.id = back.id where back.depth < 8) select count(*) from back join contest bc on bc.id = back.id join election be on be.id = bc.election_id where be.kind = ${election}.kind) end, ${contest}.party_scope_id) end`,
@@ -1065,7 +1070,7 @@ async function children(
   const linked = isSettled
     ? { rows: [] }
     : await db.execute<{ yes: boolean }>(sql`
-      select exists (select from reporting_unit_area m where m.area_id = ${area.id}::uuid) as yes
+      select exists (select from reporting_unit_area m where m.area_id = any(array[${area.id}::uuid])) as yes
     `);
   const joined = linked.rows[0]?.yes
     ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
@@ -1748,13 +1753,12 @@ async function load(
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
       select distinct coalesce(pm.into_id, n.party_id) as party, coalesce(m.into_id, cy.person_id) as person
-      from candidacy_nomination n
-      join candidacy cy on cy.id = n.candidacy_id
-      join contest_option o on o.id = cy.option_id
-      join grp on grp.id = o.contest_id
+      from (select distinct id from grp) g
+      cross join lateral (select o.id from contest_option o where o.contest_id = g.id offset 0) o
+      join candidacy cy on cy.option_id = o.id
+      join candidacy_nomination n on n.candidacy_id = cy.id and n.kind in ('endorsed', 'supported')
       left join entity_merge pm on pm.entity_id = n.party_id
       left join entity_merge m on m.entity_id = cy.person_id
-      where n.kind in ('endorsed', 'supported')
     `),
     options.rows.every((row) => row.alliance == null)
       ? { rows: [] }
@@ -6295,10 +6299,10 @@ export const contests = {
               and (
                 a.scheme_code = 'world.country'
                 or (
-                  exists (select from reporting_unit_area m where m.area_id = a.id)
+                  exists (select from reporting_unit_area m where m.area_id = any(array[a.id]))
                   and not exists (
                     select from reporting_unit_area m join reporting_unit r on r.id = m.unit_id
-                    where m.area_id = a.id and r.kind <> 'abroad_mission'
+                    where m.area_id = any(array[a.id]) and r.kind <> 'abroad_mission'
                   )
                 )
               )
@@ -6933,10 +6937,10 @@ export const contests = {
           share: number;
         }>(sql`
           with me as (
-            select c.body_id, c.office_id, c.kind, c.round_number, c.party_scope_id, c.district_area_id, e.date_from, g.geom
+            select c.body_id, c.office_id, c.kind, c.round_number, c.party_scope_id, c.district_area_id, e.date_from, g.geom, g.shape
             from contest c join election e on e.id = c.election_id
             cross join lateral (
-              select g.geom from area_geometry g
+              select g.geom, ${coarse("g")} as shape from area_geometry g
               where g.area_id = c.district_area_id and (upper(g.valid) > e.date_from or upper_inf(g.valid))
               order by lower(g.valid) nulls first limit 1
             ) g
@@ -6965,7 +6969,7 @@ export const contests = {
                       where h.area_id = x.area_id and h.valid && daterange(upper(x.valid), upper(x.valid) + 365)
                     )
                 )) as first,
-            (ST_Area(ST_Intersection(g.geom, me.geom, 0.00001)) / ST_Area(me.geom))::float8 as share
+            (ST_Area(ST_Intersection(${coarse("g")}, me.shape, 0.00001)) / ST_Area(me.shape))::float8 as share
           from me, before, peers c
           join election e on e.id = c.election_id
           join area_geometry g on g.area_id = c.district_area_id and g.valid @> e.date_from
@@ -9900,8 +9904,8 @@ export const contests = {
               union all
               select c.id from contest c join grp on c.allocation_parent_id = grp.id
             )
-            select max(e.date_from) as until from grp join contest c on c.id = grp.id join election e on e.id = c.election_id
-            having count(*) > 0
+            select max((select e.date_from from contest c join election e on e.id = c.election_id where c.id = grp.id)) as until
+            from grp having count(*) > 0
           ) u on true
           left join lateral (
             select n.id, e.date_from as date from contest n join election e on e.id = n.election_id
@@ -10808,11 +10812,16 @@ async function turnout(contest: string | null, ks: Array<number>) {
     with recursive day as (
       select e.date_from, e.kind from contest c join election e on e.id = c.election_id where c.id = ${contest}::uuid
     ),
-    sets as materialized (
-      select rs.k, rs.election_id from result_set rs
-      join election e on e.id = rs.election_id
+    held as materialized (
+      select e.id, e.polity_id, e.date_from, p.kind from election e
+      join polity p on p.id = e.polity_id
       cross join day d
-      where rs.contest_id is null and ${latest("rs")} and e.date_from = d.date_from and e.kind = d.kind
+      where e.date_from = d.date_from and e.kind = d.kind
+    ),
+    sets as materialized (
+      select rs.k, rs.election_id, h.kind from held h
+      join result_set rs on rs.election_id = h.id and rs.contest_id is null
+      where ${latest("rs")}
     ),
     facts as materialized (
       select s.k as set, s.election_id as election, ua.area_id as area, v.measure, sum(v.value)::float8 as value
@@ -10831,16 +10840,10 @@ async function turnout(contest: string | null, ks: Array<number>) {
     targets as (
       select a.k, a.id from area a where a.k = any(${sql.param(ks)}::int[])
     ),
-    kinds as materialized (
-      select distinct q.kind from sets s join election y on y.id = s.election_id join polity q on q.id = y.polity_id
-    ),
     expected as materialized (
-      select e.id as election, pt.area_id as area
-      from election e
-      join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-      join polity p on p.id = e.polity_id
-      cross join day d
-      where e.date_from = d.date_from and e.kind = d.kind and p.kind in (select kind from kinds)
+      select h.id as election, pt.area_id as area
+      from (select * from held where kind in (select kind from sets) offset 0) h
+      join polity_territory pt on pt.polity_id = h.polity_id and pt.valid @> h.date_from
     ),
     up(origin, id, depth) as (
       select distinct x.area, x.area, 0 from (select area from facts union select area from expected) x
@@ -11951,8 +11954,8 @@ async function races(
         coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
         a.id as area, a.k, c.magnitude, a.scheme_code as scheme, sc.noun,
-        case when exists (
-          select from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null
+        case when (
+          select true from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null limit 1
         ) then 'alliance' else 'party' end as grouping
       from kept k
       join contest c on c.id = k.id
@@ -12454,7 +12457,7 @@ async function races(
                 last as (
                   select max(e.date_from) as day
                   from contest c join election e on e.id = c.election_id
-                  where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
+                  where (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
                     and c.allocation_parent_id is null and c.party_scope_id is null
                     and e.kind = (select kind from same) and e.date_from < ${date}::date - 120
                 ),
@@ -12474,7 +12477,7 @@ async function races(
                     where o.contest_id = nc.id and y.value is not null
                     order by y.value desc limit 1
                   ) o
-                  where nc.notional and coalesce(nc.body_id, nc.office_id) = ${head.owner}::uuid
+                  where nc.notional and (nc.body_id = ${head.owner}::uuid or (nc.body_id is null and nc.office_id = ${head.owner}::uuid))
                     and ne.date_from between (select day from last) - 200 and (select day from last)
                 ),
                 roots as (
@@ -12482,11 +12485,11 @@ async function races(
                     (select count(*) from area_parent ap where ap.area_id = c.district_area_id and ap.valid @> e.date_from) as parents
                   from contest c join election e on e.id = c.election_id
                   left join seat st on st.id = c.seat_id
-                  where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
+                  where (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
                     and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = (select kind from same)
                     and c.notional = exists (
                       select from contest nc join election ne on ne.id = nc.election_id
-                      where nc.notional and coalesce(nc.body_id, nc.office_id) = ${head.owner}::uuid
+                      where nc.notional and (nc.body_id = ${head.owner}::uuid or (nc.body_id is null and nc.office_id = ${head.owner}::uuid))
                         and ne.date_from between (select day from last) - 200 and (select day from last)
                         and nc.district_area_id in (select k.district_area_id from contest k where k.election_id = ${head.election}::uuid)
                     )
@@ -12575,7 +12578,7 @@ async function races(
                   left join entity_merge m on m.entity_id = o.party_id
                   join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
                   join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-                  where c.election_id = ${head.election}::uuid and coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
+                  where c.election_id = ${head.election}::uuid and (c.body_id = ${head.owner}::uuid or (c.body_id is null and c.office_id = ${head.owner}::uuid))
                 )
                 select coalesce(bm.into_id, br.parent_party_id, lin.party, pm.into_id, w.party_id, ld.party_id) as party,
                   sum(w.seats)::int as seats,
@@ -16007,8 +16010,8 @@ export const elections = {
           where c.id = ${input.contest}::uuid
         )
         select c.id, e.date_from::text as date,
-          case when exists (
-            select from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null
+          case when (
+            select true from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null limit 1
           ) then 'alliance' else 'party' end as grouping
         from s, contest c
         join tree on tree.id = c.election_id

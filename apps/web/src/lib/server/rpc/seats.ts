@@ -5,7 +5,14 @@ import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import layout2010 from "#lib/server/hex/gb-pcon-2010.json";
 import layout2024 from "#lib/server/hex/gb-pcon-2024.json";
-import { inside, latest, names, paths, refs } from "#lib/server/rpc/archive.js";
+import {
+  coarse,
+  inside,
+  latest,
+  names,
+  paths,
+  refs,
+} from "#lib/server/rpc/archive.js";
 
 const fold = (key: string) => (key.startsWith("person:") ? "independent" : key);
 
@@ -855,7 +862,7 @@ export const seats = {
             select from area_geometry gp
             join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
             where gp.area_id = p.area and gp.valid @> p.drawn and gp.valid <> gn.valid
-              and ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) < 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom))
+              and ST_Area(ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001)) < 0.97 * greatest(ST_Area(${coarse("gp")}), ST_Area(${coarse("gn")}))
           ) as same
           from now n join prev p on p.area = n.area and p.magnitude = n.magnitude
           where n.body = (select body from chamber)
@@ -877,7 +884,7 @@ export const seats = {
             from prev p
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
-            cross join lateral (select ST_Intersection(gp.geom, gn.geom, 0.00001) as geom) x
+            cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
             where p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
               and (n.magnitude = 1 or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
             order by ST_Area(x.geom) desc limit 1
@@ -886,11 +893,11 @@ export const seats = {
         ),
         top as materialized (
           select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id
-          from result_set rs
+          from (select id from paired union select prior from paired) ids
+          cross join lateral (select * from result_set rs where rs.contest_id = ids.id and ${latest("rs")} offset 0) rs
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           join election e on e.id = rs.election_id
-          where ${latest("rs")} and rs.contest_id in (select id from paired union select prior from paired)
           union all
           select rs.contest_id, rs.k, e.date_from, o.id, o.k, o.party_id
           from contest nc
@@ -1204,7 +1211,7 @@ export const seats = {
               select from area_geometry gp
               join area_geometry gn on gn.area_id = t.area and gn.valid @> t.drawn
               where gp.area_id = p.area and gp.valid @> p.drawn and gp.valid <> gn.valid
-                and ST_Area(ST_Intersection(gp.geom, gn.geom, 0.00001)) < 0.97 * greatest(ST_Area(gp.geom), ST_Area(gn.geom))
+                and ST_Area(ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001)) < 0.97 * greatest(ST_Area(${coarse("gp")}), ST_Area(${coarse("gn")}))
             ) as same
             from prev p where p.area = t.area order by p.notional desc, p.drawn desc, p.day desc limit 1
           ) s on true
@@ -1213,7 +1220,7 @@ export const seats = {
             from prev p
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = t.area and gn.valid @> t.drawn
-            cross join lateral (select ST_Intersection(gp.geom, gn.geom, 0.00001) as geom) x
+            cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
             where gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
               and (not t."isIe" or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
             order by ST_Area(x.geom) desc, p.day desc limit 1
@@ -1228,7 +1235,8 @@ export const seats = {
         ),
         top as materialized (
           select rs.contest_id as contest, rs.k as set, e.date_from as day, o.id, o.k, o.party_id, coalesce(x.seats, 1) as seats, v.votes
-          from result_set rs
+          from (select id from paired union select prior from paired) ids
+          cross join lateral (select * from result_set rs where rs.contest_id = ids.id and ${latest("rs")} offset 0) rs
           join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           join election e on e.id = rs.election_id
@@ -1240,7 +1248,6 @@ export const seats = {
             ) y
             where kc.id = rs.contest_id
           ) v on true
-          where ${latest("rs")} and rs.contest_id in (select id from paired union select prior from paired)
           union all
           select rs.contest_id, rs.k, e.date_from, o.id, o.k, o.party_id, 1, o.votes
           from contest nc
@@ -1605,7 +1612,8 @@ export const seats = {
           select rs.contest_id as contest, o.k,
             coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id)::text as party,
             coalesce(mm.into_id, cy.person_id)::text as person
-          from result_set rs
+          from (select id from bys union select prior from prior) ids
+          cross join lateral (select * from result_set rs where rs.contest_id = ids.id and ${latest("rs")} offset 0) rs
           join contest_option o on o.contest_id = rs.contest_id and exists (
             select from outcome x
             where x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
@@ -1617,7 +1625,6 @@ export const seats = {
           left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
             and br.kind = 'regional_branch' and br.valid @> e.date_from
           left join entity_merge bm on bm.entity_id = br.parent_party_id
-          where ${latest("rs")} and rs.contest_id in (select id from bys union select prior from prior)
         ),
         left_seat as (
           select b.id, t.person, t.via
