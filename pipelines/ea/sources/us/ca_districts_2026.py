@@ -62,6 +62,9 @@ COUNTIES = {
     "06035": "Lassen",
     "06015": "Del Norte",
     "06027": "Inyo",
+    "06045": "Mendocino",
+    "06033": "Lake",
+    "06039": "Madera",
 }
 LISTED = {
     "06009": "CA-06009-calaveras",
@@ -555,6 +558,51 @@ YOLO_SPECIAL = (
     "Yolo County Assessor/Clerk-Recorder/Elections",
     "Candidate Filings: Special Districts, November 3, 2026 General Election",
 )
+LAKE_SPECIAL = (
+    (
+        "https://www.lakecountyca.gov/DocumentCenter/View/17509",
+        "Lake County Registrar of Voters",
+        "Candidate List, Qualified Candidates Only, School and Special Districts, November 3, 2026 General Election",
+    ),
+    "lake_special_0814.pdf",
+    "application/pdf",
+)
+LAKE_FINAL = (
+    (
+        "https://www.lakecountyca.gov/DocumentCenter/View/18067",
+        "Lake County Registrar of Voters",
+        "Candidate List, Qualified Candidates Only, School Districts, November 3, 2026 General Election",
+    ),
+    "lake_final_qualified.pdf",
+    "application/pdf",
+)
+MADERA_PROOF = (
+    (
+        "https://votemadera.com/wp-content/uploads/2026/08/List-of-Candidates-08-12-2026.pdf",
+        "Madera County Elections Division",
+        "Contest/Candidate Proof List: Contests on Ballot with Qualified Candidates, November 3, 2026 Consolidated General Election",
+    ),
+    "madera_proof_0812.pdf",
+    "application/pdf",
+)
+MENDOCINO_CERTIFICATES = (
+    (
+        "https://mendocino.granicusideas.com/meetings/590/agenda_items",
+        "Mendocino County Board of Supervisors",
+        "Certificates of Appointment under Elections Code Section 10515 for Special Districts, September 1, 2026",
+    ),
+    "mendocino_cert_10515.pdf",
+    "application/pdf",
+)
+MENDOCINO_ELECTION = (
+    (
+        "https://www.mendocinocounty.gov/government/assessor-county-clerk-recorder-registrar-of-voters/elections",
+        "Mendocino County Elections",
+        "Candidate List, To Election, November 3, 2026 General Election",
+    ),
+    "mendocino_to_election.pdf",
+    "application/pdf",
+)
 INBOX_DOCS = {
     "06113-s": (YOLO_SPECIAL, "yolo_special.html", "text/html"),
     "06113-c": (local_2026.FEEDS["CA-06113-s"], "yolo_schools.html", "text/html"),
@@ -570,6 +618,11 @@ INBOX_DOCS = {
         "santabarbara_offballot.pdf",
         "application/pdf",
     ),
+    "06033-s": LAKE_SPECIAL,
+    "06033-q": LAKE_FINAL,
+    "06039-s": MADERA_PROOF,
+    "06045-s": MENDOCINO_CERTIFICATES,
+    "06045-e": MENDOCINO_ELECTION,
     "06105-s": (
         (
             "https://www.trinitycounty.org/DocumentCenter/View/4190",
@@ -1182,6 +1235,116 @@ def tehama() -> list[Row]:
 
 def lassen() -> list[Row]:
     return tagged(qualified_list(LISTED["06035"], "Lassen", LISTED_EXPAND), LISTED["06035"])
+
+
+LAKE_EXPAND = (
+    (r"\bMendo-Lake Comm\b", "Mendocino-Lake Community"),
+    (r"\bDist\b", "District"),
+    (r"\bCo Water\b", "County Water"),
+    (r"\s*\(PT\)", " Short Term"),
+    (r"\s*-\s*4 year term", ""),
+    (r"\s*-\s*2 year term", " Short Term"),
+)
+LAKE_SEATS = {
+    ("Northshore Fire Protection District", ""): "At Large",
+    ("Northshore Fire Protection District", "Contest 7320"): "Lucerne Zone",
+    ("Northshore Fire Protection District", "Contest 7330"): "Nice Zone",
+}
+
+
+def lake() -> list[Row]:
+    special = tagged(qualified_list("06033-s", "Lake", LAKE_EXPAND), "06033-s")
+    college = [
+        row
+        for row in tagged(qualified_list("06033-q", "Lake", LAKE_EXPAND, True), "06033-q")
+        if "College" in str(row["district"])
+    ]
+    return [
+        {**row, "seat": LAKE_SEATS.get((str(row["district"]), str(row["seat"])), row["seat"])}
+        for row in [*special, *college]
+    ]
+
+
+MADERA_HEAD = re.compile(r"^NON-PARTISAN DISTRICT (.+?) Director(?:, Division (\d+))?$")
+MADERA_NAME = re.compile(r"^(?:\s+Candidate\(s\):| {20,40})\s*([A-Z][A-Z.' -]+?)\s*$")
+
+
+def madera() -> list[Row]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(inbox_doc("06039-s")), "-"], capture_output=True, check=True
+    ).stdout.decode()
+    contests: dict[tuple[str, str], list[str]] = {}
+    key: tuple[str, str] | None = None
+    for line in text.splitlines():
+        if found := MADERA_HEAD.match(line.strip()):
+            key = (full_name(cased(found[1])), f"Division {found[2]}" if found[2] else "")
+            contests.setdefault(key, [])
+        elif line.startswith("NON-PARTISAN"):
+            key = None
+        elif key is not None and (found := MADERA_NAME.match(line)) and "Requirements" not in line:
+            name = cased(found[1])
+            if name not in contests[key]:
+                contests[key].append(name)
+    return [
+        {
+            "county": "Madera",
+            "district": district,
+            "seat": seat,
+            "role": "Director",
+            "seats": len(names) if not seat else 1,
+            "name": name,
+            "unexpired": False,
+            "tacit": True,
+            "doc": "06039-s",
+        }
+        for (district, seat), names in contests.items()
+        for name in names
+    ]
+
+
+MENDOCINO_NAMES = {
+    "MENDOCINO COAST RECREATION & PARK DISTRICT": "Mendocino Coast Recreation and Park District",
+    "REDWOOD VALLEY/CALPELLA FIRE PROTECTION DISTRICT": "Redwood Valley-Calpella Fire Protection District",
+}
+
+
+def mendocino() -> list[Row]:
+    path = DATA / "inbox" / "y26" / "ca" / "mendocino_in_lieu.tsv"
+    groups: dict[tuple[str, bool], list[str]] = {}
+    for record in pl.read_csv(path, separator="\t", infer_schema_length=0).iter_rows(named=True):
+        if not record["candidate"]:
+            continue
+        groups.setdefault((record["district"], record["term_end"] == "2028"), []).append(record["candidate"])
+    rows: list[Row] = [
+        {
+            "county": "Mendocino",
+            "district": MENDOCINO_NAMES.get(district) or full_name(district),
+            "seat": "Short Term" if short else "",
+            "role": "Director",
+            "seats": len(names),
+            "name": name,
+            "unexpired": short,
+            "tacit": True,
+            "doc": "06045-s",
+        }
+        for (district, short), names in groups.items()
+        for name in names
+    ]
+    rows.extend(
+        {
+            "county": "Mendocino",
+            "district": "Potter Valley Irrigation District",
+            "seat": "Division 4",
+            "role": "Director",
+            "seats": 1,
+            "name": name,
+            "unexpired": True,
+            "tacit": False,
+            "doc": "06045-e",
+        }
+        for name in ("Steven Giuntini", "Jarred Hildebrand")
+    )
+    return rows
 
 
 def stanislaus() -> list[Row]:
@@ -1820,6 +1983,9 @@ def candidates() -> pl.DataFrame:
                 *tehama(),
                 *lassen(),
                 *stanislaus(),
+                *lake(),
+                *madera(),
+                *mendocino(),
                 *ventura(),
                 *san_bernardino_lieu(),
                 *sonoma_lieu(),
