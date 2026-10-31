@@ -478,6 +478,21 @@ COUNCIL_FIXES = {
     "Bernard A. Streeter. Jr.": "Bernard A. Streeter, Jr.",
 }
 LINE_FIXES = {
+    5770: {"total_party": "d"},
+    5771: {"total_party": "d"},
+    5772: {"total_party": "d"},
+    5773: {"total_party": "d"},
+    5832: {"name": "Christopher Sununu", "town": "Newfields", "party": "r", "votes": 61601, "digits": "61,601"},
+    5715: {"printed": 8571},
+    5716: {"printed": 8571},
+    5743: {"name": "Ray Wieczorek", "town": "Manchester", "total_party": "r", "printed": 22117},
+    5744: {"name": "Bob Bruce", "town": "Candia", "total_party": "r", "printed": 22117},
+    5745: {"name": "Bob Bruce", "town": "Candia", "group": 9101, "printed": 6567},
+    5746: {"name": "Ray Wieczorek", "town": "Manchester", "group": 9101, "printed": 6567},
+    5747: {"name": "Dave Wheeler", "town": "Milford", "printed": 19347},
+    5748: {"name": "Debora B. Pignatelli", "town": "Nashua", "printed": 19347},
+    5750: {"name": "Debora B. Pignatelli", "town": "Nashua", "votes": 10058},
+    5751: {"name": "Dave Wheeler", "town": "Milford"},
     3267: {"votes": 13709},
     3593: {"name": "Robert Kingsbury"},
     4999: {"name": "John H. Lynch", "printed": 456051},
@@ -669,6 +684,37 @@ LINE_FIXES = {
 }
 LINE_DROPS = {3594, 1456, 2912, 335, 1781, 1828, 2185, 3513, 3964, 5172}
 LINE_ADDS = {
+    91100: {
+        "template": 5753,
+        "name": "Beth Funicella",
+        "town": "Jackson",
+        "votes": 29311,
+        "y": (771.1, 776.9, 1000),
+        "set": {"party": "d"},
+    },
+    91101: {
+        "template": 5758,
+        "name": "Ray Wieczorek",
+        "town": "Manchester",
+        "votes": 54151,
+        "y": (244.2, 251, 1000),
+        "set": {"party": "r"},
+    },
+    91102: {
+        "template": 5759,
+        "name": "Dave Wheeler",
+        "town": "Milford",
+        "votes": 44171,
+        "y": (294.4, 301.5, 1000),
+        "set": {"party": "r"},
+    },
+    91103: {
+        "template": 5818,
+        "name": "Maria A. Chilson",
+        "town": "Manchester",
+        "votes": 1341,
+        "y": (105.4, 114.6, 1000),
+    },
     91024: {"template": 5329, "name": "Richard Leonard", "town": "New Durham", "votes": 1091, "y": (441, 452, 1000)},
     91025: {"template": 5356, "name": "Kevin A. Avard", "town": "Nashua", "votes": 2651, "y": (464, 475, 1000)},
     91026: {
@@ -912,6 +958,16 @@ LINE_ADDS = {
 }
 ACCEPT_TOP = {"1978 general state senate 7", "2010 general state senate 1"}
 CONFIRMED = {
+    5772,
+    5832,
+    5743,
+    5745,
+    5747,
+    5750,
+    91100,
+    91101,
+    91102,
+    91103,
     4576,
     5173,
     4149,
