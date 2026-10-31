@@ -590,31 +590,71 @@ def held(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def twice(raw_lines: pl.DataFrame) -> pl.DataFrame:
+def replies(rows: pl.DataFrame, prefix: str, year: int, page: int) -> dict[str, int | None] | None:
     import json
 
-    agreed: list[tuple[int, int, float, float]] = []
-    for (year, page), rows in held(raw_lines).group_by("year", "page", maintain_order=True):
-        try:
-            text = "".join(
-                block.get("text", "")
-                for block in json.loads(
-                    raw.cached(SOURCE, read_key("read", int(year), int(page), listed(rows))).path.read_text()
-                )["content"]
-            )
-        except LookupError:
+    try:
+        text = "".join(
+            block.get("text", "")
+            for block in json.loads(raw.cached(SOURCE, read_key(prefix, year, page, listed(rows))).path.read_text())[
+                "content"
+            ]
+        )
+    except LookupError:
+        return None
+    found = re.search(r"\{.*\}", text, re.DOTALL)
+    try:
+        return json.loads(found[0]) if found else {}
+    except ValueError:
+        return None
+
+
+BLOCK = ["year", "stage", "county", "office", "district", "side"]
+
+
+def disputed(frame: pl.DataFrame) -> pl.DataFrame:
+    parts = []
+    for (year, page), rows in held(frame).group_by("year", "page", maintain_order=True):
+        second = replies(rows, "read", int(year), int(page))
+        if second is None:
             continue
-        found = re.search(r"\{.*\}", text, re.DOTALL)
-        try:
-            reply = json.loads(found[0]) if found else {}
-        except ValueError:
+        rows = rows.with_columns(
+            miss=pl.Series(
+                [
+                    not (clean and second.get(str(rid)) == votes)
+                    for rid, clean, votes in zip(rows["rid"], rows["clean"], rows["votes"], strict=True)
+                ]
+            ),
+            second=pl.Series([second.get(str(rid)) for rid in rows["rid"]], dtype=pl.Int64),
+        )
+        parts.append(rows.filter(pl.col("miss")).drop("rid"))
+    if not parts:
+        return held(frame).clear()
+    return (
+        pl.concat(parts).sort("year", "page", "y0", "x0").with_columns(rid=pl.int_range(pl.len()).over("year", "page"))
+    )
+
+
+def twice(raw_lines: pl.DataFrame) -> pl.DataFrame:
+    agreed: list[tuple[int, int, float, float, int]] = []
+    for (year, page), rows in held(raw_lines).group_by("year", "page", maintain_order=True):
+        second = replies(rows, "read", int(year), int(page))
+        if second is None:
             continue
         for row in rows.iter_rows(named=True):
-            if row["clean"] and reply.get(str(row["rid"])) == row["votes"]:
-                agreed.append((year, page, row["y0"], row["x0"]))
+            if row["clean"] and second.get(str(row["rid"])) == row["votes"]:
+                agreed.append((year, page, row["y0"], row["x0"], row["votes"]))
+    for (year, page), rows in disputed(raw_lines).group_by("year", "page", maintain_order=True):
+        third = replies(rows, "read3", int(year), int(page))
+        if third is None:
+            continue
+        for row in rows.iter_rows(named=True):
+            value = third.get(str(row["rid"]))
+            if value is not None and value in (row["votes"], row["second"]):
+                agreed.append((year, page, row["y0"], row["x0"], value))
     return pl.DataFrame(
         agreed,
-        schema={"year": pl.Int64, "page": pl.Int64, "y0": pl.Float64, "x0": pl.Float64},
+        schema={"year": pl.Int64, "page": pl.Int64, "y0": pl.Float64, "x0": pl.Float64, "read": pl.Int64},
         orient="row",
     ).with_columns(twice=pl.lit(True))
 
@@ -632,6 +672,10 @@ def read() -> None:
     request(held(pl.read_parquet(PARSED / "lines.parquet")), "county_pages", "read", READ_DPI)
 
 
+def third() -> None:
+    request(disputed(pl.read_parquet(PARSED / "lines.parquet")), "county_third", "read3", REREAD_DPI)
+
+
 def reread() -> None:
     request(missed(pl.read_parquet(PARSED / "lines.parquet")), "county_sums", "reread", REREAD_DPI)
 
@@ -645,7 +689,7 @@ def listed(rows: pl.DataFrame) -> str:
 
 
 def read_key(prefix: str, year: int, page: int, listing: str) -> str:
-    if prefix != "read":
+    if prefix not in ("read", "read3"):
         return f"{prefix}:{year}:{page}"
     return f"{prefix}:{year}:{page}:{hashlib.sha1(listing.encode()).hexdigest()[:8]}"
 
@@ -754,7 +798,8 @@ def emit() -> Path:
     both = twice(raw_lines)
     lines = (
         lines.join(both, on=["year", "page", "y0", "x0"], how="left")
-        .with_columns(pl.col("twice").fill_null(False))
+        .with_columns(pl.col("twice").fill_null(False), votes=pl.coalesce("read", "votes"))
+        .drop("read")
         .with_columns(
             agrees=pl.when(
                 pl.col("agrees").is_null()
