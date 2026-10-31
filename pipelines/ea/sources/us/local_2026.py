@@ -5237,6 +5237,27 @@ for key, publisher, title, url, local in (
         "ky/jefferson_shively.pdf",
     ),
     (
+        "MI-26155-owosso",
+        "Shiawassee County Clerk",
+        "Official Candidate List, November 3, 2026 General Election (9/10/2026), City of Owosso",
+        "https://www.shiawassee.net/county-clerk/ballot-language-and-candidate-listing/",
+        "mi/shiawassee_nov_official.pdf",
+    ),
+    (
+        "MI-26149-sturgis",
+        "St. Joseph County Clerk",
+        "Official Candidate List, November 3, 2026 General Election (9/21/2026), City of Sturgis",
+        "https://www.stjosephcountymi.gov/",
+        "mi/st-joseph_nov_official.pdf",
+    ),
+    (
+        "MI-26021-niles",
+        "Berrien County Clerk",
+        "Unofficial Candidate List, November 3, 2026 State General (as of 9/3/2026), City of Niles",
+        "https://www.berriencounty.org/DocumentCenter/View/24628",
+        "mi/berrien_nov_unofficial.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
