@@ -18,6 +18,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.clarity_local import COUNTIES, STATES
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.oe_primaries_2026 import ALIASES, FIPS, OFFICIAL, plain, town_counties
 from ea.store import DATA, connect
 
@@ -60,6 +61,8 @@ LISTINGS = (
     "/washington",
     "/virginia",
     "Multiparish.htm",
+    "Elections.json",
+    "Version.json",
 )
 EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representatives \((\d+)(?:st|nd|rd|th) District\))")
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
@@ -80,6 +83,7 @@ KS_CONTEST = re.compile(
     r"(?:United States (?P<senate>Senate)|United States House of Representatives (?P<district>\d+)|(?P<governor>Governor / Lt\. Governor))"
     r"(?: \((?P<party>\w)\))?"
 )
+CT_OFFICE = re.compile(r"Governor and Lieutenant Governor|United States Senator|Representative in Congress (\d+)")
 MN_CONTEST = re.compile(r"(U\.S\. Representative|U\.S\. Senator|Governor & Lt Governor)(?: District (\d+))?")
 MN_OFFICES = {"U.S. Representative": "house", "U.S. Senator": "senate", "Governor & Lt Governor": "governor"}
 LA_BASE = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob="
@@ -317,6 +321,29 @@ def fetch() -> None:
                         print(f"LA: no file for race {race['ID']}")
                     else:
                         store("LA", url, content, ".csv")
+    if not ONLY or "CT" in ONLY:
+        root = "https://ctemspublic.pcctg.net/ng-app/data/"
+        listing = get(client, root + "Elections.json")
+        if listing is None:
+            print("CT: no election listing")
+        else:
+            store("CT", root + "Elections.json", listing, ".json")
+            ids = [e["ID"] for e in json.loads(listing) if e["Name"].startswith(f"{DAY:%m/%d/%Y}")]
+            if not ids:
+                print(f"CT: no election on {DAY}")
+            for id in ids:
+                version = get(client, f"{root}election/{id}/Version.json")
+                if version is None:
+                    print(f"CT: no version for election {id}")
+                    continue
+                store("CT", f"{root}election/{id}/Version.json", version, ".json")
+                base = f"{root}election/{id}/{json.loads(version)['Version']}/"
+                for name in ("Lookupdata", "election_Electiondata", "townVotes_Electiondata"):
+                    content = get(client, f"{base}{name}.json")
+                    if content is None:
+                        print(f"CT: no file {name} for election {id}")
+                    else:
+                        store("CT", f"{base}{name}.json", content, ".json")
     if not ONLY or "KS" in ONLY:
         for name in ("national.html", "statewide.html"):
             url = f"https://www.sos.ks.gov/ent/{name}"
@@ -536,6 +563,45 @@ def rows(state: str, url: str, path: Path):
                 "reporting": reporting or None,
                 "total": total or None,
             }
+        return
+    if state == "CT":
+        if not url.endswith("townVotes_Electiondata.json"):
+            return
+        pages = json.loads((PARSED / "pages.json").read_text())["CT"]
+        base = url.rsplit("/", 1)[0]
+        lookup = json.loads(raw.cached(SOURCE, pages[f"{base}/Lookupdata.json"]).path.read_bytes())
+        status = json.loads(raw.cached(SOURCE, pages[f"{base}/election_Electiondata.json"]).path.read_bytes())
+        counted = re.match(r"(\d+) of (\d+)", status["PR"])
+        regions = ct_regions()
+        region = {
+            entry["TownID"]: regions[re.sub(r"[^a-z]", "", entry["TownName"].lower())]
+            for entry in lookup["countyTowns"]
+        }
+        offices = {key: value["NM"] for entry in lookup["officeList"] for key, value in entry.items()}
+        for town, contests in json.loads(path.read_bytes()).items():
+            for office_id, results in contests.items():
+                found = CT_OFFICE.fullmatch(offices[office_id])
+                if found is None:
+                    continue
+                for result in results:
+                    for candidate_id, tally in result.items():
+                        candidate = lookup["candidateIds"][candidate_id]
+                        yield {
+                            "office": "house"
+                            if found[1]
+                            else "senate"
+                            if offices[office_id].startswith("United")
+                            else "governor",
+                            "district": found[1] or "",
+                            "party": lookup["partyIds"][candidate["P"]]["NM"].removesuffix(" Party"),
+                            "county": region[town],
+                            "candidate": candidate["NM"].split(" and ")[0],
+                            "write_in": False,
+                            "votes": int(tally["V"]),
+                            "as_of": None,
+                            "reporting": int(counted[1]),
+                            "total": int(counted[2]),
+                        }
         return
     if state == "KS":
         text = path.read_text(encoding="utf-8")
