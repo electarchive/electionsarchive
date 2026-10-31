@@ -9,6 +9,7 @@ from typing import NamedTuple
 import polars as pl
 
 from ea import raw
+from ea.changeset import slug
 from ea.store import DATA
 
 SOURCE = "us.nh_manual"
@@ -47,6 +48,9 @@ ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
 NOISE = re.compile(r"[\^_'•■*]")
 LEADER = re.compile(r"^[.\-—•\s]+$")
 PARTY = re.compile(r",\s*(r&d|r|d|i|ind|l|lib)\s*\.?\s*(?:\(write-?in\))?$", re.IGNORECASE)
+CLEAN = re.compile(r"[A-Z][A-Za-z'.\-]*(?: [A-Z][A-Za-z'.\-]*)+(?:,? (?:Jr|Sr|II|III|IV)\.?)?")
+STRANDED = re.compile(r"(.+[a-z])\. ([A-Z][a-z]+)\. (d|r)")
+TRAILING = re.compile(r"(.+?[A-Za-z.]) (d|r)")
 
 
 class Word(NamedTuple):
@@ -490,6 +494,19 @@ def read() -> None:
     print(batch.ensure(SOURCE, "county_pages", wanted)[1])
 
 
+def repair(name: str, town: str | None, party: str | None) -> tuple[str, str | None, str | None]:
+    found = STRANDED.fullmatch(name) if town is None else None
+    if found and not re.fullmatch(r"(?:Jr|Sr|II|III|IV)", found[2]):
+        return found[1], found[2], party or found[3]
+    found = TRAILING.fullmatch(name)
+    if found:
+        name, party = found[1], party or found[2]
+    found = re.fullmatch(r"(.+?),\s*([A-Z][a-z]+)", name)
+    if found and not re.fullmatch(r"(?:Jr|Sr|II|III|IV)", found[2]):
+        return found[1], town or found[2], party
+    return name, town, party
+
+
 def person(name: str) -> tuple[str, str]:
     cleaned = re.sub(r"[.,]", " ", name)
     words = [word for word in cleaned.split() if not re.fullmatch(r"(?i)jr|sr|ii|iii|iv|2d|3d", word)]
@@ -501,7 +518,30 @@ def emit() -> Path:
     from ea.sources.us.nh_sos_county import COLUMNS, CONTEST, WRITE_IN
     from ea.store import connect
 
-    lines = blocks(pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("county").is_not_null()))
+    raw_lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("county").is_not_null())
+    fixes = {
+        key: repair(*key)
+        for key in raw_lines.select("name", "town", "party").unique().iter_rows()
+        if key[0] != "Scatter"
+    }
+    lines = blocks(
+        raw_lines.with_columns(
+            pl.struct("name", "town", "party")
+            .map_elements(
+                lambda row: dict(
+                    zip(
+                        ("name", "town", "party"),
+                        fixes.get((row["name"], row["town"], row["party"]), tuple(row.values())),
+                        strict=True,
+                    )
+                ),
+                return_dtype=pl.Struct({"name": pl.String, "town": pl.String, "party": pl.String}),
+            )
+            .alias("fixed")
+        )
+        .drop("name", "town", "party")
+        .unnest("fixed")
+    )
     only = os.environ.get("NH_YEARS")
     if only:
         lines = lines.filter(pl.col("year").is_in([int(year) for year in only.split(",")]))
@@ -567,7 +607,11 @@ def emit() -> Path:
             party = {"r": "republican", "d": "democratic"}.get(str(side)) if side else None
             tag = f"{year} {county} {office} {district or ''} {party or stage}".replace("  ", " ")
             key = (int(year), str(county).lower(), str(office), district, party)
-            candidates = contests.get(key)
+            candidates = contests.get(key) or (
+                contests.get((*key[:3], "1", key[4]))
+                if office == "board of commissioners" and district is None
+                else None
+            )
             if not candidates:
                 report.setdefault("no contest", []).append(tag)
                 continue
@@ -575,16 +619,22 @@ def emit() -> Path:
                 report.setdefault("two contests", []).append(f"{tag} {[c[0] for c in candidates]}")
                 continue
             external, contest = candidates[0]
-            row = conn.execute(
-                """select rs.election_id, rs.id, min(v.count_round), rs.source_id
-                   from result_set rs join result_value v on v.result_set_k = rs.k
-                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2, 4""",
-                [contest],
-            ).fetchone()
-            if row is None:
-                report.setdefault("no default set", []).append(f"{tag} {external}")
+            if conn.execute(
+                """select 1 from result_set rs join changeset c on c.id = rs.changeset_id
+                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' and c.pipeline = %s""",
+                [contest, SOURCE],
+            ).fetchone():
                 continue
-            election, default, first, _ = row
+            election, default, first = conn.execute(
+                """select rs.election_id, rs.id, min(v.count_round)
+                   from result_set rs join result_value v on v.result_set_k = rs.k
+                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2""",
+                [contest],
+            ).fetchone() or (None, None, None)
+            first = first or 1
+            election = (
+                election or conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
+            )
             options = conn.execute(
                 """select o.id::text, o.ballot_label, o.kind,
                           coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k
@@ -600,14 +650,21 @@ def emit() -> Path:
                 continue
             totals = rows.group_by("name", maintain_order=True).agg(pl.col("votes").sum())
             others = [option[0] for option in options if option[2] == "others"]
+            if not totals["votes"].sum():
+                report.setdefault("no votes", []).append(f"{tag} {external}")
+                continue
             matched: dict[str, str] = {}
+            fresh: list[str] = []
             failed = None
             for name in totals["name"]:
                 if name == "Scatter" or WRITE_IN.search(name):
-                    if len(others) != 1:
+                    if len(others) > 1:
                         failed = f"{name}: no single others option"
                         break
-                    matched[name] = others[0]
+                    if others:
+                        matched[name] = others[0]
+                    else:
+                        fresh.append(name)
                     continue
                 mine = person(name)
                 hits = [
@@ -625,38 +682,88 @@ def emit() -> Path:
                     hits = [hit for hit in hits if person(hit[1])[1] == mine[1]] or hits
                 if len(hits) > 1:
                     hits = [hit for hit in hits if hit[3]]
+                if (
+                    not hits
+                    and CLEAN.fullmatch(name)
+                    and len(mine[0]) > 2
+                    and (len(name.split()) > 2 or len(name.split()[0]) > 2)
+                ):
+                    fresh.append(name)
+                    continue
                 if len(hits) != 1:
                     failed = f"{name} matches {[hit[1] for hit in hits]}"
                     break
                 matched[name] = hits[0][0]
+            named = [name for name in totals["name"] if name != "Scatter" and not WRITE_IN.search(name)]
+            surnames = [person(name)[0] for name in named]
+            if not failed and any(
+                person(name)[0] != "" and surnames.count(person(name)[0]) > 1 for name in fresh if name in named
+            ):
+                failed = "a new name shares a surname with another line"
+            if (
+                not failed
+                and fresh
+                and not [m for m in matched.values() if m not in others]
+                and any(option[2] == "candidate" for option in options)
+            ):
+                failed = f"no line matches the contest's options: {fresh}"
             if failed:
                 report.setdefault("candidate mismatch", []).append(f"{tag} {external}: {failed}")
                 continue
+            for offset, name in enumerate(fresh):
+                option = cs.key("us.option", f"{external}:{slug(name)}")
+                if name == "Scatter" or WRITE_IN.search(name):
+                    cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
+                    others.append(str(option))
+                    matched[name] = str(option)
+                    continue
+                human = cs.key(f"{SOURCE}.person", f"{external}:{slug(name)}")
+                cs.add("person", id=human)
+                cs.add("name", entity_id=human, text=name, lang="en", kind="official", is_preferred=True)
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    ballot_position=len(options) + offset + 1,
+                    ballot_label=name,
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("us.candidacy", f"{external}:{slug(name)}:head"),
+                    person_id=human,
+                    option_id=option,
+                    role="head",
+                    ballot_name=name,
+                    is_independent=False,
+                )
+                matched[name] = str(option)
+                report.setdefault("option added from the manual", []).append(f"{tag} {name}")
             ours: dict[str, int] = {}
             for name, votes in totals.iter_rows():
                 ours[matched[name]] = ours.get(matched[name], 0) + votes
             theirs = {option[0]: option[3] for option in options if option[3]}
-            gap = {
-                label: (theirs.get(oid, 0), ours.get(oid, 0))
-                for oid, label, _, _ in options
-                if theirs.get(oid, 0) != ours.get(oid, 0)
-            }
-            same = all(ours.get(option, 0) == theirs.get(option, 0) for option in {*ours, *theirs})
-            if not same:
+            if default is not None and any(ours.get(o, 0) != theirs.get(o, 0) for o in {*ours, *theirs}):
+                gap = {
+                    label: (theirs.get(oid, 0), ours.get(oid, 0))
+                    for oid, label, _, _ in options
+                    if theirs.get(oid, 0) != ours.get(oid, 0)
+                }
                 report.setdefault("differs from the compilation", []).append(f"{tag} {external} {gap}")
-            if not sum(ours.values()):
-                report.setdefault("no votes", []).append(f"{tag} {external}")
-                continue
             result_set = cs.key(f"{SOURCE}.result_set", external)
-            old = dict(
-                zip(
-                    COLUMNS,
-                    conn.execute(f"select {', '.join(COLUMNS)} from result_set where id = %s", [default]).fetchone(),
-                    strict=True,
+            if default is not None:
+                old = dict(
+                    zip(
+                        COLUMNS,
+                        conn.execute(
+                            f"select {', '.join(COLUMNS)} from result_set where id = %s", [default]
+                        ).fetchone(),
+                        strict=True,
+                    )
                 )
-            )
             source, artifact_id, path, sha = sources[int(year)]
-            cs.add("result_set", **old, status="superseded", is_default=False)
+            if default is not None:
+                cs.add("result_set", **old, status="superseded", is_default=False)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -671,9 +778,13 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
-            declared = conn.execute(
-                "select option_id::text, kind, seats from outcome where result_set_id = %s", [default]
-            ).fetchall()
+            declared = (
+                conn.execute(
+                    "select option_id::text, kind, seats from outcome where result_set_id = %s", [default]
+                ).fetchall()
+                if default is not None
+                else []
+            )
             winners = {option for option, kind, _ in declared if kind in ("elected", "won")}
             ranked = sorted(((votes, option) for option, votes in ours.items() if option not in others), reverse=True)
             if winners and (
@@ -739,7 +850,7 @@ def emit() -> Path:
                 )
         for reason, items in report.items():
             print(f"{len(items)}: {reason}")
-            for item in items[:25]:
+            for item in items[: int(os.environ.get("NH_SHOW", "25"))]:
                 print("   ", item)
         print(f"{len(values)} values in {len(cs.rows.get('result_set', [])) // 2} sets")
         if values:
