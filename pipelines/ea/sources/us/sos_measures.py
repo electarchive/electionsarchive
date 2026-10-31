@@ -607,8 +607,12 @@ MI_OLD_PROPOSALS = (
 )
 NC = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{}/results_pct_{}.zip"
 NC_DAYS = (date(2004, 11, 2), date(2010, 11, 2))
+NC_2000 = "https://web.archive.org/web/20100129210216id_/www.app.sboe.state.nc.us/NCSBE/Elec/Results/y2000elect/"
+NC_2002 = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2002_11_05/results_statewide_20021105.pdf"
+NC_2002_TOTALS = (1283375, 507426)
 WV = "https://web.archive.org/web/20130612072655id_/http://www.sos.wv.gov/elections/history/electionreturns/Documents/{0}/{0}%20Constitutional%20Amendment{1}.pdf"
 WV_FILES = {date(2000, 11, 7): "%20Gen", date(2002, 11, 5): "", date(2004, 11, 2): ""}
+WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
 WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
 WI_FILES = {
     date(2000, 11, 7): (
@@ -646,15 +650,95 @@ MN_FILES = {
         "Clean Water, Land and Legacy Amendment",
     ),
 }
-MN_COUNTIES = (
-    "Aitkin Anoka Becker Beltrami Benton Big_Stone Blue_Earth Brown Carlton Carver Cass Chippewa Chisago Clay Clearwater "
-    "Cook Cottonwood Crow_Wing Dakota Dodge Douglas Faribault Fillmore Freeborn Goodhue Grant Hennepin Houston Hubbard "
-    "Isanti Itasca Jackson Kanabec Kandiyohi Kittson Koochiching Lac_qui_Parle Lake Lake_of_the_Woods Le_Sueur Lincoln "
-    "Lyon McLeod Mahnomen Marshall Martin Meeker Mille_Lacs Morrison Mower Murray Nicollet Nobles Norman Olmsted "
-    "Otter_Tail Pennington Pine Pipestone Polk Pope Ramsey Red_Lake Redwood Renville Rice Rock Roseau Scott Sherburne "
-    "Sibley St._Louis Stearns Steele Stevens Swift Todd Traverse Wabasha Wadena Waseca Washington Watonwan Wilkin "
-    "Winona Wright Yellow_Medicine"
-).split()
+MN_COUNTIES = [
+    "Aitkin",
+    "Anoka",
+    "Becker",
+    "Beltrami",
+    "Benton",
+    "Big_Stone",
+    "Blue_Earth",
+    "Brown",
+    "Carlton",
+    "Carver",
+    "Cass",
+    "Chippewa",
+    "Chisago",
+    "Clay",
+    "Clearwater",
+    "Cook",
+    "Cottonwood",
+    "Crow_Wing",
+    "Dakota",
+    "Dodge",
+    "Douglas",
+    "Faribault",
+    "Fillmore",
+    "Freeborn",
+    "Goodhue",
+    "Grant",
+    "Hennepin",
+    "Houston",
+    "Hubbard",
+    "Isanti",
+    "Itasca",
+    "Jackson",
+    "Kanabec",
+    "Kandiyohi",
+    "Kittson",
+    "Koochiching",
+    "Lac_qui_Parle",
+    "Lake",
+    "Lake_of_the_Woods",
+    "Le_Sueur",
+    "Lincoln",
+    "Lyon",
+    "McLeod",
+    "Mahnomen",
+    "Marshall",
+    "Martin",
+    "Meeker",
+    "Mille_Lacs",
+    "Morrison",
+    "Mower",
+    "Murray",
+    "Nicollet",
+    "Nobles",
+    "Norman",
+    "Olmsted",
+    "Otter_Tail",
+    "Pennington",
+    "Pine",
+    "Pipestone",
+    "Polk",
+    "Pope",
+    "Ramsey",
+    "Red_Lake",
+    "Redwood",
+    "Renville",
+    "Rice",
+    "Rock",
+    "Roseau",
+    "Scott",
+    "Sherburne",
+    "Sibley",
+    "St._Louis",
+    "Stearns",
+    "Steele",
+    "Stevens",
+    "Swift",
+    "Todd",
+    "Traverse",
+    "Wabasha",
+    "Wadena",
+    "Waseca",
+    "Washington",
+    "Watonwan",
+    "Wilkin",
+    "Winona",
+    "Wright",
+    "Yellow_Medicine",
+]
 TN_PAGE = "https://sos.tn.gov/elections/election-results#{}"
 TN_FILES = {
     date(2002, 11, 5): ("MF-430/2002-11/amendments.pdf", ("1", "2")),
@@ -1185,6 +1269,20 @@ SC_DAYS = {
     date(2008, 11, 4): 3,
     date(2010, 11, 2): 4,
 }
+AL_2022_URL = (
+    "https://www.sos.alabama.gov/sites/default/files/election-data/2022-11/"
+    "Final%20Canvass%20of%20Results%20(canvassed%20by%20state%20canvassing%20board%2011-28-2022).pdf"
+)
+AL_2022 = {
+    "C": ("Recompiled Constitution Ratification Question", "Legislative Referendum", True),
+    "1": ("Allow Denial of Bail for Offenses Enumerated by State Legislature", "Legislative Referendum", True),
+}
+SC_2022 = {
+    "1": ("General Reserve Fund Increase", "Legislative Referendum", True),
+    "2": ("Capital Reserve Fund Increase", "Legislative Referendum", True),
+}
+SC_2022_FILES = {"1": 2352, "2": 2351}
+SC_ELSTATS = "https://sc.elstats.civera.com/api/download_contest/{}_table.csv?split_party=false"
 SC_COUNTIES = [
     "Abbeville",
     "Aiken",
@@ -1957,8 +2055,17 @@ def fetch() -> None:
     for day, suffix in WV_FILES.items():
         raw.fetch(SOURCE, WV.format(day.year, suffix), suffix=".pdf")
         time.sleep(1)
+    raw.fetch(SOURCE, WV_2005, suffix=".pdf")
+    raw.fetch(SOURCE, AL_2022_URL, suffix=".pdf")
+    for contest in SC_2022_FILES.values():
+        raw.fetch(SOURCE, SC_ELSTATS.format(contest), suffix=".csv")
     for day in NC_DAYS:
         raw.fetch(SOURCE, NC.format(f"{day:%Y_%m_%d}", f"{day:%Y%m%d}"), suffix=".zip")
+        time.sleep(1)
+    raw.fetch(SOURCE, NC_2002, suffix=".pdf")
+    index = raw.fetch(SOURCE, NC_2000 + "staterl.htm", suffix=".htm")
+    for page in nc_2000_pages(index.path.read_text(errors="replace")):
+        raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
         time.sleep(1)
     for _, file, *_ in KS_2022:
         raw.fetch(SOURCE, KS + file, suffix=".xlsx")
@@ -4238,6 +4345,74 @@ def missouri() -> list[dict[str, object]]:
     return rows
 
 
+def alabama_2022() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, AL_2022_URL).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split("\n")
+    start = next(at for at, line in enumerate(text) if "Proposed Statewide Amendment Number One (1)" in line)
+    end = next(at for at, line in enumerate(text) if "Proposed Statewide Amendment Number Two (2)" in line)
+    figures = re.compile(r"^(\S[A-Za-z. ]*?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$")
+    found = [match for line in text[start:end] if (match := figures.match(line))]
+    totals = next(match for match in found if match[1] == "Total")
+    counties = [match for match in found if match[1] != "Total"]
+    if len(counties) != 67:
+        raise ValueError(f"AL 2022: {len(counties)} counties")
+    rows: list[dict[str, object]] = []
+    for number, label, columns in (("C", "Constitution Ratification Question", (2, 3)), ("1", "Amendment 1", (4, 5))):
+        for at, answer in zip(columns, ("YES", "NO"), strict=True):
+            if sum(int(match[at].replace(",", "")) for match in counties) != int(totals[at].replace(",", "")):
+                raise ValueError(f"AL 2022 {label} {answer}: counties do not add up to the state total")
+            rows.extend(
+                {
+                    "state": "AL",
+                    "day": date(2022, 11, 8),
+                    "number": number,
+                    "label": label,
+                    "url": AL_2022_URL,
+                    "county": match[1],
+                    "answer": answer,
+                    "votes": int(match[at].replace(",", "")),
+                }
+                for match in counties
+            )
+    return rows
+
+
+def south_carolina_2022() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for number, contest in SC_2022_FILES.items():
+        url = SC_ELSTATS.format(contest)
+        counties: dict[str, tuple[int, int]] = {}
+        state: tuple[int, int] | None = None
+        for line in csv.reader(raw.cached(SOURCE, url).path.read_text().splitlines()):
+            if line[0] == "County":
+                counties[line[1]] = (int(line[2]), int(line[3]))
+            elif line[0] == "State":
+                state = (int(line[2]), int(line[3]))
+        if len(counties) != 46 or state is None:
+            raise ValueError(f"{url}: {len(counties)} counties")
+        if tuple(sum(votes[at] for votes in counties.values()) for at in (0, 1)) != state:
+            raise ValueError(f"{url}: counties do not add up to the state total")
+        rows.extend(
+            {
+                "state": "SC",
+                "day": date(2022, 11, 8),
+                "number": number,
+                "label": f"Amendment {number}",
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": votes[at],
+            }
+            for county, votes in counties.items()
+            for answer, at in (("YES", 0), ("NO", 1))
+        )
+    return rows
+
+
 def south_carolina() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, count in SC_DAYS.items():
@@ -4488,6 +4663,58 @@ def michigan() -> list[dict[str, object]]:
     return rows
 
 
+def nc_2000_pages(index: str) -> list[str]:
+    return re.findall(r'href="(general/[^"]+\.htm)"', index)
+
+
+def north_carolina_early() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    pages = nc_2000_pages(raw.cached(SOURCE, NC_2000 + "staterl.htm").path.read_text(errors="replace"))
+    if len(pages) != 100:
+        raise ValueError(f"NC 2000: {len(pages)} county pages")
+    for page in pages:
+        text = re.sub(
+            r"\s+", " ", re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, NC_2000 + page).path.read_text(errors="replace"))
+        )
+        county = re.search(r"County: ([A-Z .'-]+?) Election Date", text)
+        votes = re.search(r"Higher Ed\. Improvement Bonds Against ([\d,]+) \d+% For ([\d,]+) \d+%", text)
+        if county is None or votes is None:
+            raise ValueError(f"NC 2000 {page}: bond result not found")
+        rows.extend(
+            {
+                "state": "NC",
+                "day": date(2000, 11, 7),
+                "number": "1",
+                "label": "Measure",
+                "url": NC_2000 + page,
+                "county": county[1].title(),
+                "answer": answer,
+                "votes": int(votes[at].replace(",", "")),
+            }
+            for answer, at in (("YES", 2), ("NO", 1))
+        )
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, NC_2002).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    for figure in NC_2002_TOTALS:
+        if f"{figure:,}" not in text.split("CT OF APPEALS")[0]:
+            raise ValueError(f"NC 2002: total {figure:,} not found")
+    rows.extend(
+        {
+            "state": "NC",
+            "day": date(2002, 11, 5),
+            "number": "1",
+            "label": "Amendment 1",
+            "url": NC_2002,
+            "county": "statewide",
+            "answer": answer,
+            "votes": NC_2002_TOTALS[at],
+        }
+        for answer, at in (("YES", 0), ("NO", 1))
+    )
+    return rows
+
+
 def north_carolina() -> list[dict[str, object]]:
     roman = {"I": "1", "II": "2", "III": "3", "IV": "4", "V": "5"}
     rows: list[dict[str, object]] = []
@@ -4535,8 +4762,8 @@ def west_virginia() -> list[dict[str, object]]:
     heading = re.compile(r"Amendment\s*#\s*(\d+)")
     line = re.compile(r"^\s*([A-Z][A-Za-z.' ]+?)\s{2,}([\d,]+)\s+([\d,]+)\s*$")
     rows: list[dict[str, object]] = []
-    for day, suffix in WV_FILES.items():
-        url = WV.format(day.year, suffix)
+    for day, suffix in [*WV_FILES.items(), (date(2005, 6, 25), None)]:
+        url = WV_2005 if suffix is None else WV.format(day.year, suffix)
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
         ).stdout
@@ -5510,6 +5737,7 @@ def parse() -> None:
             *kansas(),
             *minnesota(),
             *north_carolina(),
+            *north_carolina_early(),
             *west_virginia(),
             *wisconsin(),
             *iowa(),
@@ -5520,6 +5748,8 @@ def parse() -> None:
             *utah(),
             *wyoming(),
             *south_carolina(),
+            *south_carolina_2022(),
+            *alabama_2022(),
             *hawaii(),
             *new_mexico(),
         ],
@@ -5552,6 +5782,8 @@ def parse() -> None:
             ("OR", 2022),
             ("UT", 2012),
             ("MD", 2022),
+            ("SC", 2022),
+            ("AL", 2022),
         ):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
@@ -5563,7 +5795,7 @@ def parse() -> None:
                     > group.filter(pl.col("answer") == "NO")["votes"].sum(),
                 )
                 if state in ("WA", "LA", "OR", "UT", "MD")
-                else (SD_2012 if state == "SD" else AZ_2022)[number]
+                else {"SD": SD_2012, "SC": SC_2022, "AL": AL_2022}.get(state, AZ_2022)[number]
             )
             matched.append(
                 {
@@ -5624,7 +5856,7 @@ def parse() -> None:
                 else f"Public Question {number}"
                 if state == "NJ"
                 else entry["measure"]
-                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY", "UT", "IA")
+                if entry["number"] or state in ("SD", "MO", "SC", "HI", "NM", "GA", "AK", "WY", "UT", "IA", "NC")
                 else f"Amendment No. {number}"
                 if state == "LA"
                 else f"Proposition {number}",
