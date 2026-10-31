@@ -1933,6 +1933,12 @@ NE_SOURCES = {
         "https://www.stjosephcountymi.gov/",
         "mi/st-joseph.pdf",
     ),
+    "MI-26115": (
+        "Monroe County Clerk",
+        "Unofficial November 2026 General Election Candidate List (updated 9/1)",
+        "https://www.monroecounty.gov/",
+        "mi/monroe.pdf",
+    ),
     "MI-26165": (
         "Wexford County Clerk",
         "Candidate List, November 3, 2026 General Election",
