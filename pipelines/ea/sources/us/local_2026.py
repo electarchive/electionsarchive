@@ -5253,6 +5253,27 @@ for key, publisher, title, url, local in (
         "mi/montcalm.pdf",
     ),
     (
+        "MI-26129",
+        "Ogemaw County Clerk",
+        "Official ballots, General Election, November 3, 2026",
+        "https://ocmi.us/clerk/elections",
+        "mi/ogemaw_nov_ballots.pdf",
+    ),
+    (
+        "MI-26043",
+        "Dickinson County Clerk",
+        "Official ballots, General Election, November 3, 2026",
+        "https://dickinsoncountymi.gov/Documents Center/Ballots/11-03-2026 Official ballot.pdf",
+        "mi/dickinson_nov_ballots.pdf",
+    ),
+    (
+        "MI-26137",
+        "Otsego County Clerk",
+        "Sample ballots by precinct, General Election, November 3, 2026",
+        "https://otsegocountymi.gov/563/November-3-2026-General-Election",
+        "mi/otsego/City of Gaylord, Ward 1, Precinct 1_1.pdf",
+    ),
+    (
         "TN-47157-shelby",
         "Shelby County Election Commission",
         "Official sample ballot, 2026 State and Federal General and Municipal Elections, November 3, 2026",
