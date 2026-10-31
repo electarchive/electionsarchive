@@ -33,12 +33,40 @@ FILES = {
         "20241203210537",
     ),
 }
+INBOX = DATA / "inbox" / "manual" / "MF-333"
+DELIVERED = {
+    (date(2008, 6, 3), "primary"): ("2008-primary/2008_State_Primary.pdf", "2008-primary-state-canvass.pdf"),
+    (date(2008, 11, 4), "general"): ("2008-general/2008_State_General.pdf", "2008-general-state-canvass.pdf"),
+    (date(2010, 6, 8), "primary"): (
+        "2010-primary/2010_Primary_Official_Statewide_Canvass.pdf",
+        "2010-primary-state-canvass.pdf",
+    ),
+    (date(2010, 11, 2), "general"): (
+        "2010-general/2010_General_Election_Official_Statewide_Canvass.pdf",
+        "2010-general-state-canvass.pdf",
+    ),
+    (date(2012, 6, 5), "primary"): (
+        "2012-primary/2012_PRIMARY_STATEWIDE_CANVASS.pdf",
+        "2012-primary-state-canvass.pdf",
+    ),
+    (date(2018, 6, 5), "primary"): (
+        "2018-primary/2018-Primary-Official-Statewide-Canvass.pdf",
+        "2018-primary-state-canvass.pdf",
+    ),
+    (date(2022, 6, 7), "primary"): (
+        "2022-primary/2022-Primary-Report-State-Canvass.pdf",
+        "2022-primary-state-canvass.pdf",
+    ),
+    (date(2024, 6, 4), "primary"): ("2024-primary/2024-Primary-State-Canvass.pdf", "2024-primary-state-canvass.pdf"),
+}
+FILES.update({key: (UPLOADS + name, None) for key, (_, name) in DELIVERED.items()})
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
 join name n on n.entity_id = u.area_id and n.kind = 'short'
 where u.scheme_code = 'us.county' and u.code like '30%'
 """
 ROW = re.compile(r"^\s*([A-Za-z.&' ]+?)\s{2,}(\d+)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+[\d.]+\s*%?\s*$")
+WIDE = re.compile(r"^\s*([A-Za-z.&' ]+?)\s{2,}\d+\s+(\d+)\s+(\d[\d,]*)\s+(\d[\d,]*)\s+\d+%(?:\s|$)")
 
 
 def plain(name: str) -> str:
@@ -46,7 +74,17 @@ def plain(name: str) -> str:
 
 
 def fetch() -> None:
-    for url, stamp in FILES.values():
+    for key, (url, stamp) in FILES.items():
+        if key in DELIVERED:
+            raw.store(
+                SOURCE,
+                url,
+                (INBOX / DELIVERED[key][0]).read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime(2026, 10, 31, tzinfo=UTC),
+                media_type="application/pdf",
+            )
+            continue
         try:
             raw.cached(SOURCE, url)
             continue
@@ -71,7 +109,7 @@ def parse() -> None:
         ).stdout
         found = {}
         for line in text.splitlines():
-            match = ROW.match(line)
+            match = ROW.match(line) or WIDE.match(line)
             if match is None or plain(match[1]) not in codes:
                 continue
             registered, voters = (int(match[i].replace(",", "")) for i in (3, 4))
