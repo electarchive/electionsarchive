@@ -31,6 +31,8 @@ Three rules govern the cache:
 
 Some sources need a different shape of request. A query API that requires a POST passes a `body=` argument to `raw.fetch` and `raw.cached`. The index keys such an entry by the URL plus a hash of the JSON body, and it stores the body, so each query becomes its own artifact. A source that a person crawls and supplies, rather than a URL the pipeline can fetch, goes into the cache through `raw.store`. Wikipedia pages are pinned to the revision current at retrieval time, so a lost file can be fetched again exactly.
 
+Files that a person downloads by hand live in `data/inbox/manual/MF-###/`, one numbered folder per download request, because the site blocks scripted downloads; the pipeline that needs them reads them from there and adds them to the cache with `raw.store`.
+
 `emit` turns the index entries it used into `source_artifact` rows in the changeset. Those rows let any published fact trace back to the file it came from.
 
 The `ea raw` command maintains the cache:

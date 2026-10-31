@@ -58,9 +58,10 @@ class Account(TypedDict):
 
 
 def client(account: str) -> anthropic.Anthropic:
-    if os.environ.get("ANTHROPIC_API_KEY") != PROXY_KEY:
-        raise SystemExit("BLOCKED: run through the proxy: anthropic-batch uv run ea ...")
-    return anthropic.Anthropic(default_headers={"x-batch-account": account}, max_retries=6)
+    if "ANTHROPIC_API_KEY" not in os.environ:
+        raise SystemExit("BLOCKED: set ANTHROPIC_API_KEY")
+    proxied = os.environ["ANTHROPIC_API_KEY"] == PROXY_KEY
+    return anthropic.Anthropic(default_headers={"x-batch-account": account} if proxied else {}, max_retries=6)
 
 
 def path(source: str, name: str) -> Path:

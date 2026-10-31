@@ -53,7 +53,7 @@ def main() -> None:
     contributing = commands.add_parser(
         "contrib",
         help="compile a contribution payload into a changeset folder, serve the proposal_job queue, "
-        "or prescreen open proposals with a Haiku batch (run through anthropic-batch)",
+        "or prescreen open proposals with a Haiku batch (set ANTHROPIC_API_KEY)",
     )
     contributing.add_argument("action", choices=("compile", "serve", "prescreen"))
     contributing.add_argument(
@@ -119,7 +119,7 @@ def main() -> None:
     )
     scanning.add_argument("name", nargs="?", help="manifest name, such as tribune-oh-1876")
     batching = commands.add_parser(
-        "batch", help="Message Batches jobs, accounts, and approvals (run through anthropic-batch)"
+        "batch", help="Message Batches jobs, accounts, and approvals (set ANTHROPIC_API_KEY)"
     )
     batching.add_argument(
         "action",
