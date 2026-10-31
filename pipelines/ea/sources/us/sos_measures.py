@@ -1376,6 +1376,60 @@ HI_MEASURES = {
     2010: {"Board of": ("2376", "HB 2376"), "Tax Rebate": ("2807", "SB 2807")},
 }
 NM_DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5)}
+NM_2003 = "https://www.sos.nm.gov/sos-archive/election-results-archive/2003-election-results/2003-special-election.pdf"
+NM_2003_COUNTIES = (
+    "Bernalillo",
+    "Catron",
+    "Chaves",
+    "Cibola",
+    "Colfax",
+    "Curry",
+    "De Baca",
+    "Doña Ana",
+    "Eddy",
+    "Grant",
+    "Guadalupe",
+    "Harding",
+    "Hidalgo",
+    "Lea",
+    "Lincoln",
+    "Los Alamos",
+    "Luna",
+    "McKinley",
+    "Mora",
+    "Otero",
+    "Quay",
+    "Rio Arriba",
+    "Roosevelt",
+    "San Juan",
+    "San Miguel",
+    "Sandoval",
+    "Santa Fe",
+    "Sierra",
+    "Socorro",
+    "Taos",
+    "Torrance",
+    "Union",
+    "Valencia",
+)
+NM_2003_VOTES = {
+    ("1", "YES"): (
+        101542,
+        "40612 225 2212 1078 986 1690 139 5702 1680 1771 359 107 181 1910 1077 1953 796 2407 470 2010 587 2193 544 4983 1941 5984 9953 573 1337 1852 620 263 3347",
+    ),
+    ("1", "NO"): (
+        83155,
+        "25003 464 3822 602 1254 2775 277 6092 3143 1680 200 159 316 2600 1296 1789 1197 806 338 3282 949 1195 1288 5216 1253 3042 6812 1051 724 970 702 482 2376",
+    ),
+    ("2", "YES"): (
+        92198,
+        "35657 191 1925 1012 990 1266 119 5597 1333 1689 362 89 198 1514 834 1677 727 2365 508 1688 515 2252 584 3693 2176 5189 10248 484 1172 2097 552 161 3334",
+    ),
+    ("2", "NO"): (
+        92003,
+        "29851 501 4084 670 1257 3206 294 6162 3474 1762 196 176 294 2996 1537 2066 1270 848 306 3600 1028 1108 1245 6451 1004 3721 6421 1129 897 710 765 586 2388",
+    ),
+}
 OH_PAGES = "https://web.archive.org/web/2012id_/http://www.sos.state.oh.us/sos/elections/Research/electResultsMain/"
 OH_ISSUES = [
     (date(2000, 11, 7), "1", "2000ElectionsResults/StateIssue1_11072000"),
@@ -1840,6 +1894,10 @@ STATEWIDE_ONLY = (
     " Only the statewide totals are recorded: the state's archived results pages for this election carry no county "
     "table for ballot questions."
 )
+NM_2003_NOTE = (
+    " The county figures were transcribed by hand from the scanned canvass certified on October 14, 2003, and each"
+    " column was checked against the canvass's printed statewide totals."
+)
 KS_2010_NOTE = (
     " Only the statewide totals are recorded, from the Secretary of State's official vote totals. The county pages "
     "the office posted are unofficial election-night returns, and the county table was never certified."
@@ -2075,6 +2133,7 @@ def fetch() -> None:
     for page in nc_2000_pages(index.path.read_text(errors="replace")):
         raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
         time.sleep(1)
+    store_manual(NM_2003, "MF-443/2003-special-election.pdf", "application/pdf")
     store_manual(KS_2000, "MF-446/ks-2000-general-questions-by-precinct.xls", "application/vnd.ms-excel")
     store_manual(KS_2005, "MF-446/2005_Constitutional_Amendment_results_by_county.xls", "application/vnd.ms-excel")
     store_manual(KS_2010, "MF-446/ks-2010-general-official-vote-totals.pdf", "application/pdf")
@@ -5636,6 +5695,23 @@ def new_mexico() -> list[dict[str, object]]:
                 }
                 for side, answer in enumerate(("YES", "NO"))
             )
+    for (number, answer), (printed, text) in NM_2003_VOTES.items():
+        figures = [int(figure) for figure in text.split()]
+        if len(figures) != 33 or sum(figures) != printed:
+            raise ValueError(f"NM 2003 Amendment {number} {answer}: counties do not sum to the printed total")
+        rows.extend(
+            {
+                "state": "NM",
+                "day": date(2003, 9, 23),
+                "number": number,
+                "label": f"Constitutional Amendment {number}",
+                "url": NM_2003,
+                "county": county,
+                "answer": answer,
+                "votes": votes,
+            }
+            for county, votes in zip(NM_2003_COUNTIES, figures, strict=True)
+        )
     return rows
 
 
@@ -6226,6 +6302,7 @@ def emit() -> Path:
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
                 + (SCANNED if rows["page"].is_not_null().any() and state != "AL" else "")
                 + (GA_PRELIMINARY if preliminary else "")
+                + (NM_2003_NOTE if (rows["url"] == NM_2003).any() else "")
                 + (
                     (
                         AL_2007_NOTE
