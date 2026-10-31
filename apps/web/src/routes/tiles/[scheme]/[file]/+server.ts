@@ -24,8 +24,9 @@ export const GET: RequestHandler = async ({ params, request }) => {
   }
   const headers = {
     "accept-ranges": "bytes",
-    "cache-control": "public, max-age=86400",
+    "cache-control": "public, max-age=300",
     "content-type": "application/vnd.pmtiles",
+    etag: `"${info.size.toString(36)}-${Math.trunc(info.mtimeMs).toString(36)}"`,
   };
   const range = /^bytes=(\d+)-(\d*)$/u.exec(request.headers.get("range") ?? "");
   if (range == null) {
