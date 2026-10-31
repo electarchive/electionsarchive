@@ -25,7 +25,15 @@ import {
   TIER_LABELS,
   US_COLUMNS,
 } from "#lib/coverage.js";
-import { count, date, definite, percent, plural, points } from "#lib/format.js";
+import {
+  count,
+  date,
+  definite,
+  natural,
+  percent,
+  plural,
+  points,
+} from "#lib/format.js";
 import { logoCredit } from "#lib/logo.js";
 import { covering } from "#lib/map/hexes.js";
 import { isDerived, MEASURES, VACANCIES } from "#lib/outcomes.js";
@@ -3834,9 +3842,7 @@ function liveMarkdown(data: Extract<Data, { kind: "live" }>, link: Link) {
       `live/${data.path}?at=${at}`,
     );
   const groups = Map.groupBy(
-    data.races.toSorted((a, b) =>
-      a.path.localeCompare(b.path, undefined, { numeric: true }),
-    ),
+    data.races.toSorted((a, b) => natural(a.path, b.path)),
     (race) => race.group,
   );
   const federal = groups.get("federal") ?? [];

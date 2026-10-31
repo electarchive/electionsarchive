@@ -10,6 +10,7 @@
     credit,
     definite,
     initials,
+    numbers,
     percent,
     points,
     precision,
@@ -800,9 +801,7 @@
         >
         {#if line.gained != null && line.gained !== 0}
           <span class="ms-1 text-[0.75rem] text-muted-foreground"
-            >{new Intl.NumberFormat(getLocale(), {
-              signDisplay: "exceptZero",
-            }).format(line.gained)}</span
+            >{numbers({ signDisplay: "exceptZero" }).format(line.gained)}</span
           >
         {/if}
       </td>

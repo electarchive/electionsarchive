@@ -1,8 +1,37 @@
 import { m } from "#lib/paraglide/messages.js";
 import { getLocale } from "#lib/paraglide/runtime.js";
 
+const numberFormats = new Map<string, Intl.NumberFormat>();
+const dateFormats = new Map<string, Intl.DateTimeFormat>();
+
+export const natural = new Intl.Collator(undefined, { numeric: true }).compare;
+
+export function numbers(options: Intl.NumberFormatOptions = {}) {
+  const locale = getLocale();
+  const key = `${locale}|${JSON.stringify(options)}`;
+  const cached = numberFormats.get(key);
+  if (cached != null) {
+    return cached;
+  }
+  const made = new Intl.NumberFormat(locale, options);
+  numberFormats.set(key, made);
+  return made;
+}
+
+export function dates(options: Intl.DateTimeFormatOptions) {
+  const locale = getLocale();
+  const key = `${locale}|${JSON.stringify(options)}`;
+  const cached = dateFormats.get(key);
+  if (cached != null) {
+    return cached;
+  }
+  const made = new Intl.DateTimeFormat(locale, options);
+  dateFormats.set(key, made);
+  return made;
+}
+
 export function count(value: number) {
-  return new Intl.NumberFormat(getLocale()).format(value);
+  return numbers().format(value);
 }
 
 export function precision(margin: number | null | undefined) {
@@ -24,7 +53,7 @@ export function percent(value: number, digits = 1) {
   ) {
     shown += 1;
   }
-  const format = new Intl.NumberFormat(getLocale(), {
+  const format = numbers({
     style: "percent",
     minimumFractionDigits: shown,
     maximumFractionDigits: shown,
@@ -36,7 +65,7 @@ export function percent(value: number, digits = 1) {
 }
 
 export function points(value: number, digits = precision(value)) {
-  return new Intl.NumberFormat(getLocale(), {
+  return numbers({
     signDisplay: "exceptZero",
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
@@ -53,16 +82,13 @@ export function date(value: string | null) {
     return value;
   }
   if (/^\d{4}-\d{2}$/u.test(value)) {
-    return new Intl.DateTimeFormat(getLocale(), {
-      month: "long",
-      year: "numeric",
-      timeZone: "UTC",
-    }).format(new Date(`${value}-01T00:00:00Z`));
+    return dates({ month: "long", year: "numeric", timeZone: "UTC" }).format(
+      new Date(`${value}-01T00:00:00Z`),
+    );
   }
-  return new Intl.DateTimeFormat(getLocale(), {
-    dateStyle: "long",
-    timeZone: "UTC",
-  }).format(new Date(`${value}T00:00:00Z`));
+  return dates({ dateStyle: "long", timeZone: "UTC" }).format(
+    new Date(`${value}T00:00:00Z`),
+  );
 }
 
 export function credit(photo: {

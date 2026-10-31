@@ -9,7 +9,7 @@
   import Name from "#lib/components/name.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Slider } from "#lib/components/ui/slider/index.js";
-  import { count, date, definite } from "#lib/format.js";
+  import { count, date, definite, natural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { era, swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -201,9 +201,7 @@
             : [[member.place, { name: member.place, path: member.path }]],
         ),
       ).values(),
-    ].toSorted((a, b) =>
-      a.name.localeCompare(b.name, undefined, { numeric: true }),
-    ),
+    ].toSorted((a, b) => natural(a.name, b.name)),
   );
   const hemicycle = $derived.by(() => {
     const near =
@@ -218,9 +216,7 @@
     const seated = Map.groupBy(
       sitting.toSorted(
         (a, b) =>
-          (a.place ?? "").localeCompare(b.place ?? "", undefined, {
-            numeric: true,
-          }) || a.name.localeCompare(b.name),
+          natural(a.place ?? "", b.place ?? "") || a.name.localeCompare(b.name),
       ),
       (member) => home(member.party),
     );

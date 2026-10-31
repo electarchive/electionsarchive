@@ -4,7 +4,7 @@
   import { page } from "$app/state";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { untrack } from "svelte";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, natural, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -233,9 +233,7 @@
     Map.groupBy(
       night.races
         .filter((race) => race.id !== lead?.id)
-        .toSorted((a, b) =>
-          a.path.localeCompare(b.path, undefined, { numeric: true }),
-        ),
+        .toSorted((a, b) => natural(a.path, b.path)),
       (race) => race.group,
     ),
   );

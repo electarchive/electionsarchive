@@ -9,7 +9,7 @@
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { extent, isDay, sourceKindLabel, sourceKinds } from "#lib/contrib.js";
-  import { count } from "#lib/format.js";
+  import { count, natural } from "#lib/format.js";
   import { ADDED, CURRENT, KEPT, sketch } from "#lib/map/boundaries.js";
   import { Engine } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -182,9 +182,7 @@
     return Object.values(grouped).toSorted(
       (a, b) =>
         order[a.status] - order[b.status] ||
-        (a.code ?? "").localeCompare(b.code ?? "", undefined, {
-          numeric: true,
-        }),
+        natural(a.code ?? "", b.code ?? ""),
     );
   });
 

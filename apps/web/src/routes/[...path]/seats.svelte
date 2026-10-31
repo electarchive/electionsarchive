@@ -8,7 +8,7 @@
   import { arrange, isUnplaced } from "#lib/caucus.js";
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
-  import { count, percent } from "#lib/format.js";
+  import { count, natural, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -118,9 +118,7 @@
                     .flatMap((party) => party.members)
                     .toSorted(
                       (a, b) =>
-                        order(a).localeCompare(order(b), undefined, {
-                          numeric: true,
-                        }) ||
+                        natural(order(a), order(b)) ||
                         (a.position ?? Infinity) - (b.position ?? Infinity),
                     ),
           },
@@ -1002,11 +1000,7 @@
               ),
             }))
             .toSorted((a, b) =>
-              (a.seat?.name ?? "").localeCompare(
-                b.seat?.name ?? "",
-                undefined,
-                { numeric: true },
-              ),
+              natural(a.seat?.name ?? "", b.seat?.name ?? ""),
             );
         })}
         <li id="{uid}-members-{party.key}" class="pbe-1.5">

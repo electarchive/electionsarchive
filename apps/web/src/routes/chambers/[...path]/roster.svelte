@@ -5,7 +5,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
-  import { count, date } from "#lib/format.js";
+  import { count, date, natural } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -202,9 +202,7 @@
         (a, b) =>
           ordered.indexOf(fold(a.party)) - ordered.indexOf(fold(b.party)) ||
           Number(a.place == null) - Number(b.place == null) ||
-          (a.place ?? "").localeCompare(b.place ?? "", undefined, {
-            numeric: true,
-          }) ||
+          natural(a.place ?? "", b.place ?? "") ||
           (a.from ?? "").localeCompare(b.from ?? ""),
       );
   });

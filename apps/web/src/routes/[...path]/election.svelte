@@ -18,6 +18,7 @@
     count,
     date,
     definite,
+    natural,
     percent,
     plural,
     points,
@@ -344,11 +345,7 @@
   const parts = $derived(
     election.elections
       .filter((child) => !child.isStage)
-      .toSorted((a, b) =>
-        (a.place ?? a.name).localeCompare(b.place ?? b.name, undefined, {
-          numeric: true,
-        }),
-      ),
+      .toSorted((a, b) => natural(a.place ?? a.name, b.place ?? b.name)),
   );
   const isTiled = $derived(
     parts.length > 1 &&

@@ -2,9 +2,8 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, numbers, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -441,7 +440,7 @@
         <dd
           class="text-end font-figures text-[0.8125rem] text-muted-foreground"
         >
-          {new Intl.NumberFormat(getLocale(), {
+          {numbers({
             style: "percent",
             signDisplay: "exceptZero",
             maximumFractionDigits: 1,

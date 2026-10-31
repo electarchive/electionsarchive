@@ -10,7 +10,7 @@
   import Term from "#lib/components/term.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, percent, plural, points } from "#lib/format.js";
+  import { count, natural, percent, plural, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";
@@ -232,7 +232,7 @@
       .toSorted((a, b) => {
         const order =
           column === "name"
-            ? a.row.name.localeCompare(b.row.name, undefined, { numeric: true })
+            ? natural(a.row.name, b.row.name)
             : a.value - b.value;
         return (
           Number(a.row.isCounted === false) -

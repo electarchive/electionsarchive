@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SvelteSet } from "svelte/reactivity";
   import type { orpc } from "#lib/rpc.js";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, natural, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -47,7 +47,7 @@
         }
         const order =
           column === "name"
-            ? a.name.localeCompare(b.name, undefined, { numeric: true })
+            ? natural(a.name, b.name)
             : (a[column] ?? -2) - (b[column] ?? -2);
         return isDescending ? -order : order;
       }),

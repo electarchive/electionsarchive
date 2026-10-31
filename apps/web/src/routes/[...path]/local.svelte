@@ -2,9 +2,8 @@
   import { resolve } from "$app/paths";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
-  import { count, percent } from "#lib/format.js";
+  import { count, dates, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Preview from "./preview.svelte";
@@ -45,7 +44,7 @@
           .slice(0, 3),
   );
   const round = (runoff: { date: string; isGeneral: boolean }) => {
-    const day = new Intl.DateTimeFormat(getLocale(), {
+    const day = dates({
       month: "long",
       day: "numeric",
       timeZone: "UTC",
