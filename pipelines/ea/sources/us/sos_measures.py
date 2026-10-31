@@ -769,6 +769,10 @@ KS_2022 = (
         (588417, 366167),
     ),
 )
+KS_2000 = "https://web.archive.org/web/20130102101017/http://www.kssos.org/elmpast/2kgqs.exe"
+KS_2005 = "https://sos.ks.gov/elections/05elec/2005_Constitutional_Amendment_results_by_county.xls"
+KS_2010 = "https://kssos.org/elections/10elec/2010_General_Election_Results.pdf"
+KS_2010_TOTALS = {"1": (720102, 95957), "2": (503143, 302966)}
 KS_GAPS = {(date(2022, 8, 2), "1", "YES"): -3, (date(2022, 8, 2), "1", "NO"): -16}
 UT_2007 = "https://vote.utah.gov/wp-content/uploads/2023/09/2007Muni_Special.pdf"
 UT_FILES = {
@@ -1836,6 +1840,10 @@ STATEWIDE_ONLY = (
     " Only the statewide totals are recorded: the state's archived results pages for this election carry no county "
     "table for ballot questions."
 )
+KS_2010_NOTE = (
+    " Only the statewide totals are recorded, from the Secretary of State's official vote totals. The county pages "
+    "the office posted are unofficial election-night returns, and the county table was never certified."
+)
 AK_STATEWIDE_NOTE = (
     " Only the statewide totals are recorded, taken from the Division of Elections' statewide results sheet. The"
     " state's per-district statements of votes cast for this election are not loaded yet."
@@ -2067,6 +2075,9 @@ def fetch() -> None:
     for page in nc_2000_pages(index.path.read_text(errors="replace")):
         raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
         time.sleep(1)
+    store_manual(KS_2000, "MF-446/ks-2000-general-questions-by-precinct.xls", "application/vnd.ms-excel")
+    store_manual(KS_2005, "MF-446/2005_Constitutional_Amendment_results_by_county.xls", "application/vnd.ms-excel")
+    store_manual(KS_2010, "MF-446/ks-2010-general-official-vote-totals.pdf", "application/pdf")
     for _, file, *_ in KS_2022:
         raw.fetch(SOURCE, KS + file, suffix=".xlsx")
         time.sleep(1)
@@ -4669,15 +4680,20 @@ def nc_2000_pages(index: str) -> list[str]:
 
 def north_carolina_early() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
-    pages = nc_2000_pages(raw.cached(SOURCE, NC_2000 + "staterl.htm").path.read_text(errors="replace"))
+    index = raw.cached(SOURCE, NC_2000 + "staterl.htm").path.read_text(errors="replace")
+    pages = nc_2000_pages(index)
+    names = dict(re.findall(r'href="(general/[^"]+\.htm)"[^>]*><i>([^<]+)</i>', index))
     if len(pages) != 100:
         raise ValueError(f"NC 2000: {len(pages)} county pages")
     for page in pages:
         text = re.sub(
             r"\s+", " ", re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, NC_2000 + page).path.read_text(errors="replace"))
         )
-        county = re.search(r"County: ([A-Z .'-]+?) Election Date", text)
-        votes = re.search(r"Higher Ed\. Improvement Bonds Against ([\d,]+) \d+% For ([\d,]+) \d+%", text)
+        county = re.search(r"County: ([A-Z .'-]+?) Election Date", text) or re.match("(.+)", names.get(page, ""))
+        votes = re.search(
+            r"Higher Ed\. Improvement Bonds Against (?:&nbsp; )?([\d,]+)(?: \d+%)? (?:&nbsp; )?For (?:&nbsp; )?([\d,]+)",
+            text,
+        )
         if county is None or votes is None:
             raise ValueError(f"NC 2000 {page}: bond result not found")
         rows.extend(
@@ -4687,7 +4703,7 @@ def north_carolina_early() -> list[dict[str, object]]:
                 "number": "1",
                 "label": "Measure",
                 "url": NC_2000 + page,
-                "county": county[1].title(),
+                "county": county[1].title().replace("Tyrell", "Tyrrell"),
                 "answer": answer,
                 "votes": int(votes[at].replace(",", "")),
             }
@@ -5140,6 +5156,83 @@ def kansas() -> list[dict[str, object]]:
             }
             for county, sides in tallies.items()
             for index, answer in enumerate(("YES", "NO"))
+        )
+    return rows
+
+
+def kansas_early() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+
+    def sheet(url: str) -> list[tuple[object, ...]]:
+        book = fastexcel.read_excel(raw.cached(SOURCE, url).path)
+        return list(book.load_sheet(0, header_row=None, dtypes="string").to_polars().iter_rows())
+
+    def add(day: date, number: str, label: str, url: str, tallies: dict[str, list[int]], printed: tuple[int, int]):
+        for index in range(2):
+            if sum(sides[index] for sides in tallies.values()) != printed[index]:
+                raise ValueError(f"{url} {label}: counties do not sum to the printed total")
+        rows.extend(
+            {
+                "state": "KS",
+                "day": day,
+                "number": number,
+                "label": label,
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": sides[index],
+            }
+            for county, sides in tallies.items()
+            for index, answer in enumerate(("YES", "NO"))
+        )
+
+    lines = sheet(KS_2000)
+    totals = next(line for line in lines if line[2] == "District Totals")
+    counties = {
+        line[0].removesuffix(" County"): [int(value) for value in line[3:7]]
+        for line in lines
+        if line[0] is not None and line[1] is None and line[2] is None
+    }
+    if len(counties) != 105:
+        raise ValueError(f"{KS_2000}: {len(counties)} counties")
+    for position, (number, label) in enumerate((("1", "Chapter 184"), ("2", "Chapter 190"))):
+        add(
+            date(2000, 11, 7),
+            number,
+            label,
+            KS_2000,
+            {county: votes[2 * position : 2 * position + 2] for county, votes in counties.items()},
+            (int(totals[3 + 2 * position]), int(totals[4 + 2 * position])),
+        )
+
+    tallies = {}
+    for line in sheet(KS_2005):
+        for column in (0, 4, 8):
+            if line[column] is not None and line[column + 1] is not None and line[column + 1].isdigit():
+                tallies[line[column].replace("Pottwatomie", "Pottawatomie")] = [
+                    int(line[column + 1]),
+                    int(line[column + 2]),
+                ]
+    printed = tallies.pop("TOTAL")
+    if len(tallies) != 105:
+        raise ValueError(f"{KS_2005}: {len(tallies)} counties")
+    add(
+        date(2005, 4, 5),
+        "",
+        "Constitutional Amendment",
+        KS_2005,
+        tallies,
+        (printed[0], printed[1]),
+    )
+
+    for number, votes in KS_2010_TOTALS.items():
+        add(
+            date(2010, 11, 2),
+            number,
+            f"Constitutional Amendment {number}",
+            KS_2010,
+            {"statewide": list(votes)},
+            votes,
         )
     return rows
 
@@ -5735,6 +5828,7 @@ def parse() -> None:
             *michigan(),
             *michigan_old(),
             *kansas(),
+            *kansas_early(),
             *minnesota(),
             *north_carolina(),
             *north_carolina_early(),
@@ -6140,6 +6234,8 @@ def emit() -> Path:
                         if state == "AK"
                         else ND_2004_NOTE
                         if state == "ND"
+                        else KS_2010_NOTE
+                        if state == "KS"
                         else STATEWIDE_ONLY
                     )
                     if (rows["county"] == "statewide").any()
