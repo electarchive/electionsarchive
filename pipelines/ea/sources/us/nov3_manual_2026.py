@@ -409,6 +409,111 @@ COUNTIES = {
         "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/08_KEL_Notice_of_Bond_Election.pdf",
         "N3M-web/tx3/kel.pdf",
     ),
+    "48113-dc": (
+        "TX",
+        "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/dallas-tx.connect.clarityelections.com/SampleBallots/2026/261103GeneralJoint/110.pdf",
+        "N3M-web/tx5/dallas-county-ballot-110.pdf",
+    ),
+    "48113-gar": (
+        "TX",
+        "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/dallas-tx.connect.clarityelections.com/SampleBallots/2026/261103GeneralJoint/130.pdf",
+        "N3M-web/tx5/dallas-county-ballot-130.pdf",
+    ),
+    "48113-wyl": (
+        "TX",
+        "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/dallas-tx.connect.clarityelections.com/SampleBallots/2026/261103GeneralJoint/134.pdf",
+        "N3M-web/tx5/dallas-county-ballot-134.pdf",
+    ),
+    "48113-mes": (
+        "TX",
+        "https://assets01.aws.connect.clarityelections.com/Assets/Connect/RootPublish/dallas-tx.connect.clarityelections.com/SampleBallots/2026/261103GeneralJoint/197.pdf",
+        "N3M-web/tx5/dallas-county-ballot-197.pdf",
+    ),
+    "48157-m244": (
+        "TX",
+        "https://www.fortbendcountytx.gov/sites/default/files/document-central/document-central/elections-documents/election-notices/2026/MUD-244_1.pdf",
+        "N3M-web/tx6/2026_MUD-244_1.pdf",
+    ),
+    "48157-w13": (
+        "TX",
+        "https://www.fortbendcountytx.gov/sites/default/files/document-central/document-central/elections-documents/election-notices/2026/WCID-13_1.pdf",
+        "N3M-web/tx6/2026_WCID-13_1.pdf",
+    ),
+    "48157-m287a": (
+        "TX",
+        "https://www.fortbendcountytx.gov/sites/default/files/document-central/document-central/elections-documents/election-notices/2026/MUD-287A.pdf",
+        "N3M-web/tx6/2026_MUD-287A.pdf",
+    ),
+    "48157-m288": (
+        "TX",
+        "https://www.fortbendcountytx.gov/sites/default/files/document-central/document-central/elections-documents/election-notices/2026/MUD-288_1.pdf",
+        "N3M-web/tx6/2026_MUD-288_1.pdf",
+    ),
+    "53025-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=13",
+        "N3M-web/wa3/c13.html",
+    ),
+    "53027-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=14",
+        "N3M-web/wa3/c14.html",
+    ),
+    "53029-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=15",
+        "N3M-web/wa3/c15.html",
+    ),
+    "53039-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=20",
+        "N3M-web/wa3/c20.html",
+    ),
+    "53045-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=23",
+        "N3M-web/wa3/c23.html",
+    ),
+    "53047-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=24",
+        "N3M-web/wa3/c24.html",
+    ),
+    "53049-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=25",
+        "N3M-web/wa3/c25.html",
+    ),
+    "53051-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=26",
+        "N3M-web/wa3/c26.html",
+    ),
+    "53055-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=28",
+        "N3M-web/wa3/c28.html",
+    ),
+    "53071-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=36",
+        "N3M-web/wa3/c36.html",
+    ),
+    "53075-vw": (
+        "WA",
+        "https://voter.votewa.gov/GenericVoterGuide.aspx?e=899&c=38",
+        "N3M-web/wa3/c38.html",
+    ),
+    "53007-ba": (
+        "WA",
+        "https://www.co.chelan.wa.us/elections/pages/november-3-2026-general-election",
+        "N3M-web/wa2/chelan_ballot.pdf",
+    ),
+    "53017-ba": (
+        "WA",
+        "https://www.douglascountywa.gov/DocumentCenter/View/13224/Sample-Ballot_Gen26",
+        "N3M-web/wa2/douglas_ballot.pdf",
+    ),
 }
 
 
@@ -460,10 +565,13 @@ def emit() -> Path:
         civils = {state: civmint.Civil(conn, cs, fips[:2], state) for fips, (state, _, _) in COUNTIES.items()}
         system = cs.key("us.electoral_system", "referendum")
         sources: dict[str, UUID] = {}
+        added: set[UUID] = set()
         for county, publisher in frame.select("county", "publisher").unique("county").iter_rows():
             _, url, _ = COUNTIES[county]
             sources[county] = cs.source(publisher, TITLE)
-            cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
+            if sources[county] not in added:
+                added.add(sources[county])
+                cs.add("source", id=sources[county], kind="official_body", publisher=publisher, title=TITLE, url=url)
             cs.artifact(raw.cached(SOURCE, url), sources[county])
         elections: set[UUID] = set()
         kept = 0
