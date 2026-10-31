@@ -65,9 +65,9 @@ export function verdict(contest: Page["contest"]) {
       contest.turnout == null || contest.turnout.registered === 0
         ? null
         : contest.turnout.voters / contest.turnout.registered;
-    return contest.quorum != null &&
+    return top?.current?.outcome === "lost" &&
+      contest.quorum != null &&
       turned != null &&
-      top?.current?.outcome === "lost" &&
       yes.test(top.label) &&
       turned <= contest.quorum
       ? m.race_lede_quorum({

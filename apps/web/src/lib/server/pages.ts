@@ -875,7 +875,7 @@ export async function archive(path: string, search: URLSearchParams) {
     /^\d{4}-\d{2}-\d{2}$/u.test(path.slice(slug.path.length + 1));
   if (
     slug == null ||
-    (slug.path !== path && slug.type !== "contest" && !isDay)
+    (!isDay && slug.type !== "contest" && slug.path !== path)
   ) {
     error(404);
   }

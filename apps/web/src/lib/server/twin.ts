@@ -943,9 +943,9 @@ function coverageMarkdown(
         TIER_LABELS[tier.key as Tier](),
         ...columns.map((column) => {
           const value = tier.cells[slot(column, tier.key)];
-          return value != null &&
-            tier.key === "precinct_shapes" &&
-            column === "precinct_2000"
+          return tier.key === "precinct_shapes" &&
+            column === "precinct_2000" &&
+            value != null
             ? `${cell(value)}, ${m.coverage_bonus().toLowerCase()}`
             : cell(value);
         }),

@@ -6,6 +6,7 @@ import italy from "./fixtures/italy-2022-lists.json" with { type: "json" };
 import zurich from "./fixtures/zurich-2023-lists.json" with { type: "json" };
 import { cover, fill, proclaim } from "./lists.ts";
 
+const byText = (a: string, b: string) => (a < b ? -1 : Number(a > b));
 const closed = {
   order: "closed",
   exhausted: "vacant",
@@ -67,11 +68,11 @@ describe("constituency winners first", () => {
         })),
       );
       const label = `${list.land} ${list.party}`;
-      expect(covered.toSorted(), label).toEqual(
+      expect(covered.toSorted(byText), label).toEqual(
         list.winners
           .filter(({ seated }) => seated)
           .map(({ id }) => id)
-          .toSorted(),
+          .toSorted(byText),
       );
       const seats = list.seats - covered.length;
       listSeats += seats;
@@ -174,9 +175,9 @@ describe("open lists", () => {
     } as const;
     for (const list of zurich.lists) {
       expect(
-        fill(rules, list.seats, list.members).elected.toSorted(),
+        fill(rules, list.seats, list.members).elected.toSorted(byText),
         list.list,
-      ).toEqual(declared(list.members).toSorted());
+      ).toEqual(declared(list.members).toSorted(byText));
     }
   });
 
@@ -203,9 +204,9 @@ describe("open lists", () => {
           list.members,
           disqualified,
           quotient,
-        ).elected.toSorted(),
+        ).elected.toSorted(byText),
         list.list,
-      ).toEqual(declared(list.members).toSorted());
+      ).toEqual(declared(list.members).toSorted(byText));
     }
   });
 });

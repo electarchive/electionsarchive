@@ -627,10 +627,10 @@ export class Engine {
             { padding, maxZoom: FIT },
           );
     if (
+      width === 0 ||
       framed == null ||
       camera?.zoom == null ||
-      camera.center == null ||
-      width === 0
+      camera.center == null
     ) {
       return;
     }

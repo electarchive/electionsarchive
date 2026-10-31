@@ -453,7 +453,7 @@ export function compare(
     }
     if (
       isPooledIndependent(option, party, match, isShared) ||
-      (option.kind === "independents" && match !== "person" && isShared)
+      (isShared && option.kind === "independents" && match !== "person")
     ) {
       return "independent";
     }

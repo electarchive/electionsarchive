@@ -61,7 +61,7 @@ export function fill(
   const tied =
     lists.order === "open" &&
     last != null &&
-    ordered[seats]?.votes === last.votes
+    last.votes === ordered[seats]?.votes
       ? ordered.filter(({ votes }) => votes === last.votes)
       : [];
   return {

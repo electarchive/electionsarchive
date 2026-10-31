@@ -125,7 +125,7 @@ function byDivisor(
     const start = isCompensatory ? won : 0;
     for (let k = start; k < start + (slope === 0 ? 1 : seats); k++) {
       const divisor =
-        rules.formula === "modified_sainte_lague" && k === 0
+        k === 0 && rules.formula === "modified_sainte_lague"
           ? rules.firstDivisor
           : slope * k + offset;
       claims.push({ id, score: votes / divisor, votes });
