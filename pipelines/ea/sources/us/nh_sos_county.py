@@ -2,12 +2,14 @@ import os
 import re
 import time
 from pathlib import Path
+from uuid import UUID
 
 import httpx
 import polars as pl
+from psycopg import Connection
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nh_sos_county"
@@ -234,6 +236,172 @@ def surname(text: str, party: bool = True) -> str:
     return re.sub(r"[^a-z]", "", text.lower())
 
 
+TITLES = {
+    "sheriff": "Sheriff",
+    "district attorney": "District Attorney",
+    "board of commissioners": "Board of Commissioners",
+}
+TEMPLATE = (
+    "kind",
+    "office_id",
+    "body_id",
+    "district_area_id",
+    "seat_id",
+    "boundary_set_id",
+    "magnitude",
+    "party_scope_id",
+    "round_number",
+    "electoral_system_id",
+    "default_result_kind",
+    "term",
+)
+
+
+def create(
+    conn: Connection,
+    cs: Changeset,
+    source: UUID,
+    missing: list[tuple[tuple[int, str, str, str | None, str | None], pl.DataFrame]],
+    report: dict[str, list[str]],
+) -> list[tuple[UUID, pl.DataFrame, dict[str, UUID]]]:
+    columns = ", ".join(f"c.{column}" for column in TEMPLATE)
+    templates: dict[tuple[str, str, str | None], dict[str, object]] = {}
+    scopes: dict[str, object] = {}
+    elections: dict[tuple[int, bool], object] = {}
+    people: dict[tuple[str, str, str], set[object]] = {}
+    labels: dict[object, str] = {}
+    for text, election, *rest in conn.execute(
+        f"""select n.text, c.election_id, {columns} from external_id x join contest c on c.id = x.entity_id
+            join name n on n.entity_id = c.id and n.is_preferred
+            where x.scheme = 'us.contest' and x.value like 'NH:local:%%' and n.text like '%% County %% election%%'"""
+    ).fetchall():
+        found = CONTEST.match(text)
+        if found is None:
+            continue
+        year, county, name, district, party = found.groups()
+        row = dict(zip(TEMPLATE, rest, strict=True))
+        templates.setdefault((county.lower(), name.lower(), district), row)
+        elections.setdefault((int(year), party is not None), election)
+        if party and row["party_scope_id"] is not None:
+            scopes.setdefault(party.lower(), row["party_scope_id"])
+    for county, name, person, label in conn.execute(
+        """select lower(split_part(split_part(n.text, ' County ', 1), ' ', 2)), lower(regexp_replace(n.text, '^\\d{4} .+? County (.+?) election.*$', '\\1')),
+                   ca.person_id, o.ballot_label
+            from external_id x join name n on n.entity_id = x.entity_id and n.is_preferred
+            join contest_option o on o.contest_id = x.entity_id and o.kind = 'candidate'
+            join candidacy ca on ca.option_id = o.id
+            where x.scheme = 'us.contest' and x.value like 'NH:local:%%' and n.text like '%% County %% election%%'"""
+    ).fetchall():
+        people.setdefault((county, name, surname(label, False)), set()).add(person)
+        labels[person] = label
+    taken = {row[0] for row in conn.execute("select path from slug where path like 'us/nh/%%-county/%%'").fetchall()}
+    frames = []
+    for key, rows in sorted(missing, key=lambda item: str(item[0])):
+        year, county, name, district, party = key
+        day = rows["day"][0]
+        tag = f"{year} {county} {name} {district or ''} {party or 'general'}".replace("  ", " ")
+        sums = rows.group_by("candidate").agg(pl.col("votes").sum(), pl.col("printed").first())
+        if sums.filter(pl.col("printed").is_not_null() & (pl.col("votes") != pl.col("printed"))).height:
+            report.setdefault("towns do not add to the printed total", []).append(f"{tag} (new contest)")
+            continue
+        if not rows["votes"].sum():
+            report.setdefault("no votes in the workbook", []).append(f"{tag} (new contest)")
+            continue
+        template = templates.get((county, name, district)) or templates.get((county, name, None))
+        election = elections.get((year, party is not None))
+        if template is None or election is None:
+            report.setdefault("no contest and no sibling to copy from", []).append(tag)
+            continue
+        template = dict(template)
+        if party is not None:
+            template["party_scope_id"] = scopes.get(party)
+            if template["party_scope_id"] is None:
+                report.setdefault("no contest and no party scope", []).append(tag)
+                continue
+        else:
+            template["party_scope_id"] = None
+        title = f"{county.title()} County {TITLES[name]}"
+        text = f"{year} {title} election" + (f", District {district}" if district else "")
+        text += f", {party.title()} primary" if party else ""
+        contest_key = (
+            f"{day}:NH:{county}:{slug(TITLES[name])}"
+            + (f"-{district}" if district else "")
+            + (f"-{party}" if party else "")
+        )
+        contest = cs.key("us.contest", contest_key)
+        cs.add("contest", id=contest, election_id=election, **template)
+        cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+        base = (
+            f"us/nh/{county}-county/{day}-{'primary' if party else 'general'}/{slug(TITLES[name])}"
+            + (f"-district-{district}" if district else "")
+            + (f"-{party}" if party else "")
+        )
+        path = base
+        if path in taken:
+            path = f"{base}-2"
+        taken.add(path)
+        cs.add("slug", path=path, entity_id=contest)
+        cs.add("citation", entity_id=contest, source_id=source)
+        result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="certified",
+            kind="counted",
+            status="active",
+            source_id=source,
+            is_default=True,
+            completeness=1,
+        )
+        cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
+        options: dict[str, UUID] = {}
+        for position, candidate in enumerate(
+            sorted(
+                rows["candidate"].unique(maintain_order=True),
+                key=lambda c: bool(WRITE_IN.search(c) or re.fullmatch(r"(?i)scatter\w*", c)),
+            )
+        ):
+            option = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
+            options[candidate] = option
+            if re.fullmatch(r"(?i)(?:scatter\w*|write-?ins?)", candidate) or WRITE_IN.search(candidate):
+                cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
+                continue
+            letters = surname(candidate)
+            known = people.get((county, name, letters), set())
+            if len(known) == 1:
+                (person,) = known
+                shown = labels[person]
+            else:
+                person = cs.key("us.nh_sos_county.person", f"{county}:{name}:{letters}")
+                shown = SUFFIX.sub(
+                    "", re.sub(r",\s*[a-z/&]{1,6}\*?$", "", candidate.strip(), flags=re.IGNORECASE)
+                ).strip(" *")
+                if person in cs.minted:
+                    cs.add("person", id=person)
+                    cs.add("name", entity_id=person, text=shown, lang="en", kind="official", is_preferred=True)
+            cs.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                ballot_position=position + 1,
+                ballot_label=shown,
+            )
+            cs.add(
+                "candidacy",
+                id=cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head"),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=shown,
+                is_independent=False,
+            )
+        frames.append((result_set, rows, options))
+    return frames
+
+
 def emit() -> Path:
     lines = pl.read_parquet(PARSED / "lines.parquet").filter(
         pl.col("office").is_not_null(), ~pl.col("candidate").str.contains(r"(?i)^(?:over|under)votes$")
@@ -304,6 +472,7 @@ def emit() -> Path:
         report: dict[str, list[str]] = {}
         values = []
         used: set[tuple[int, str, str, str | None, str | None]] = set()
+        missing: list[tuple[tuple[int, str, str, str | None, str | None], pl.DataFrame]] = []
         for key, rows in sorted(keyed.items(), key=lambda item: str(item[0])):
             year, county, name, district, party = key
             candidates = contests.get(key) or (
@@ -319,13 +488,22 @@ def emit() -> Path:
                 ]
                 candidates = spread if len(spread) == 1 else None
             if not candidates:
-                report.setdefault("no contest", []).append(tag)
+                if name in TITLES and key[4] in (None, "democratic", "republican", "libertarian"):
+                    missing.append((key, rows))
+                else:
+                    report.setdefault("no contest", []).append(tag)
                 continue
             if len(candidates) != 1:
                 report.setdefault("two contests", []).append(f"{tag} {[c[0] for c in candidates]}")
                 continue
             external, contest, _ = candidates[0]
             used.add(key)
+            if conn.execute(
+                """select 1 from result_set rs join changeset c on c.id = rs.changeset_id
+                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' and c.pipeline = %s""",
+                [contest, SOURCE],
+            ).fetchone():
+                continue
             election, default, first = conn.execute(
                 """select rs.election_id, rs.id, min(v.count_round)
                    from result_set rs join result_value v on v.result_set_k = rs.k
@@ -471,6 +649,31 @@ def emit() -> Path:
                     channel=pl.lit(0, pl.Int16),
                     measure=pl.lit(1, pl.Int16),
                     count_round=pl.lit(first, pl.Int16),
+                    flags=pl.lit(0, pl.Int16),
+                    votes=pl.col("votes"),
+                )
+                .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
+                .agg(value=pl.col("votes").sum())
+            )
+        for result_set, rows, options in create(conn, cs, source, missing, report) if missing else ():
+            county = rows["county"][0]
+            unit_codes = {}
+            for place in rows["town"].unique():
+                hit = places.get((counties[county], town(place))) or places.get((None, town(place)))
+                if hit is None:
+                    raise ValueError(f"{county}: no unit for {place!r}")
+                unit_codes[place] = hit
+            values.append(
+                rows.filter(pl.col("votes") > 0)
+                .select(
+                    result_set_id=pl.lit(str(result_set)),
+                    unit_id=pl.col("town").map_elements(
+                        lambda place, codes=unit_codes: str(cs.unit(*codes[place])), return_dtype=pl.String
+                    ),
+                    option_id=pl.col("candidate").replace_strict({c: str(o) for c, o in options.items()}),
+                    channel=pl.lit(0, pl.Int16),
+                    measure=pl.lit(1, pl.Int16),
+                    count_round=pl.lit(1, pl.Int16),
                     flags=pl.lit(0, pl.Int16),
                     votes=pl.col("votes"),
                 )
