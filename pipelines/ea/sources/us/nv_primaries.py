@@ -61,6 +61,8 @@ PARTIES = {
     "REP": "republican",
     "LIBERTARIAN": "libertarian",
     "LIB": "libertarian",
+    "NONPARTISAN": "nonpartisan",
+    "NP": "nonpartisan",
 }
 STATE_OFFICES = {
     "GOVERNOR": "governor",
@@ -119,6 +121,8 @@ def parse() -> None:
                 chamber, number = "president", None
             elif found := re.match(r"STATE (SENATE|ASSEMBLY), DISTRICT\s+(\d+)", title):
                 chamber, number = f"state-{found[1].lower()}", int(found[2])
+            elif found := re.search(r"SUPREME COURT.*SEAT\s+([A-G])\b", title):
+                chamber, number = f"state-justice-of-the-supreme-court-seat-{found[1].lower()}", None
             elif office := STATE_OFFICES.get(re.sub(r"\s*\(.*", "", title)):
                 chamber, number = f"state-{office}", None
             else:

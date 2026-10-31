@@ -498,6 +498,11 @@ NV_METHOD = (
     "candidates line is left out. The page does not mark winners, so the winner shown is the candidate with the "
     "most votes."
 )
+NV_NONPARTISAN_METHOD = (
+    "Totals are the county columns of the Secretary of State's primary election summary; the none of these "
+    "candidates line is left out. The primary is nonpartisan and the page does not mark winners, so the two shown "
+    "as advancing are the top two, who go on to the general election."
+)
 JUDICIAL_METHOD = (
     "Totals are the sums of the precinct, early voting, absentee, and provisional rows in the State Board's "
     "precinct file; votes the file reports only county-wide are kept at the county level. The primary is "
@@ -3496,13 +3501,18 @@ def parse() -> None:
         .filter(pl.col("day").dt.year() >= 2016)
         .select(
             day="day",
-            office=pl.col("chamber").str.split(":").list.first().str.strip_prefix("state-"),
+            office=pl.col("chamber")
+            .str.split(":")
+            .list.first()
+            .str.strip_prefix("state-")
+            .str.replace(r"-(seat-[a-g])$", r":$1"),
             code=pl.col("district").cast(pl.String),
             party=pl.col("chamber")
             .str.split(":")
             .list.last()
             .map_elements(
-                lambda word: next(code for code, row in PARTIES.items() if row[1] == word), return_dtype=pl.String
+                lambda word: next((code for code, row in PARTIES.items() if row[1] == word), ""),
+                return_dtype=pl.String,
             ),
             fips="code",
             choice=pl.col("candidate").map_elements(nv_name, return_dtype=pl.String),
@@ -3980,7 +3990,7 @@ def emit() -> Path:
                         None,
                     )
             kind = "runoff" if first else "primary"
-            stage = f"{'nonpartisan' if state == 'NC' and party == '' else label} primary" + (
+            stage = f"{'nonpartisan' if state in ('NC', 'NV') and party == '' else label} primary" + (
                 " runoff" if first else ""
             )
             magnitude: int = rows.select(pl.col("seats").fill_null(1).max()).item()
@@ -4387,6 +4397,8 @@ def emit() -> Path:
                     if state == "FL"
                     else ELSTATS_METHOD.format(publisher=STATES[state][2])
                     if state in ELSTATS
+                    else NV_NONPARTISAN_METHOD
+                    if state == "NV" and party == ""
                     else NV_METHOD
                     if state == "NV"
                     else JUDICIAL_METHOD
