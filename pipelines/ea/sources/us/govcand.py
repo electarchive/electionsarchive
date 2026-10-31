@@ -117,7 +117,7 @@ def races(
             magnitude=first["seats"],
             round_number=1,
             electoral_system_id=system,
-            default_result_kind=result_kind,
+            default_result_kind="tacit" if first.get("tacit") else result_kind,
             term="remainder" if first["unexpired"] else "full",
         )
         cs.add(
