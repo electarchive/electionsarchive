@@ -13,7 +13,7 @@ import polars as pl
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, medsl_state
+from ea.sources.us import medsl, medsl_state, retention_iowa
 from ea.sources.us.medsl_state_precincts import FILES, TITLES
 from ea.store import DATA, connect
 
@@ -182,6 +182,10 @@ ARIZONA_METHOD = (
 CALIFORNIA_METHOD = (
     "Statewide Yes and No votes from the summary pages of the California Secretary of State's Statement of Vote."
 )
+IOWA_METHOD = (
+    "Yes and No votes by county from the Iowa Secretary of State's canvass or judicial retention report, with the "
+    "county rows checked against the printed statewide total."
+)
 OKLAHOMA_METHOD = (
     "Statewide Yes and No votes from the Oklahoma State Election Board's official results site, captured from the "
     "page for the election day."
@@ -272,6 +276,7 @@ def fetch() -> None:
     for url in [*ARIZONA_CANVASSES.values(), *CALIFORNIA_FILES.values()]:
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, INDIANA, suffix=".html")
+    retention_iowa.fetch()
 
 
 def arizona() -> list[dict[str, object]]:
@@ -838,7 +843,7 @@ def parse() -> None:
         )
     )
     official = pl.DataFrame(
-        kansas() + oklahoma() + oklahoma_counties() + arizona() + california(),
+        kansas() + oklahoma() + oklahoma_counties() + arizona() + california() + retention_iowa.rows(),
         schema={
             "day": pl.String,
             "state": pl.String,
@@ -1017,7 +1022,7 @@ def emit() -> Path:
             version=VERSION,
             summary="Judicial retention elections for state supreme and appellate courts: MEDSL's precinct returns "
             "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024 and county totals 2000–2010, Arizona's "
-            "official canvasses of 2002, 2006, 2008, 2010, 2014, 2016, 2022, and 2024, California's Supreme Court totals of 2010, 2014, and 2018, and Indiana's 2024 outcomes from the Judicial Branch",
+            "official canvasses of 2002, 2006, 2008, 2010, 2014, 2016, 2022, and 2024, California's Supreme Court totals of 2010, 2014, and 2018, Iowa's county canvasses of 2002 through 2022, and Indiana's 2024 outcomes from the Judicial Branch",
             polity="US",
         )
 
@@ -1150,6 +1155,16 @@ def emit() -> Path:
             url="https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
             license="Public record",
         )
+        iowa_source = cs.source("Iowa Secretary of State", "Election results and statistics")
+        cs.add(
+            "source",
+            id=iowa_source,
+            kind="official_body",
+            publisher="Iowa Secretary of State",
+            title="Election results and statistics",
+            url=retention_iowa.INDEX,
+            license="Public record",
+        )
         indiana_source = cs.source("Indiana Judicial Branch", "Press release: Appellate judges retained")
         cs.add(
             "source",
@@ -1167,8 +1182,9 @@ def emit() -> Path:
             "AZ": arizona_source,
             "CA": california_source,
             "IN": indiana_source,
+            "IA": iowa_source,
         }
-        methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD, "CA": CALIFORNIA_METHOD}
+        methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD, "CA": CALIFORNIA_METHOD, "IA": IOWA_METHOD}
         artifacts = {
             url: cs.artifact(raw.cached(SOURCE, url), official_sources[state])
             for url, state in official.select("origin", "state").unique().sort("origin").iter_rows()
