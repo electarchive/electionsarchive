@@ -20,6 +20,7 @@ from ea.store import DATA, connect
 SOURCE = "us.wikipedia_gov_history"
 VERSION = "3"
 PARSED = DATA / "parsed" / f"{SOURCE}-3"
+PARTIAL = {("NY", 1870), ("NY", 1896)}
 API = "https://en.wikipedia.org/w/api.php?"
 CHUNK = 20
 
@@ -30,7 +31,8 @@ def contests() -> list[tuple[str, int, str]]:
             """select substr(p.iso_code, 4), extract(year from e.date_from)::int, c.id::text
                from contest c join election e on e.id = c.election_id join polity p on p.id = e.polity_id
                join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office' and o.value like 'governor:%%'
-               where exists (select from result_set_history h join result_set_drop d
+               where e.date_from < '2000-01-01' and e.kind = 'general'
+                 and exists (select from result_set_history h join result_set_drop d
                              on h.id = d.result_set_id and h.superseded_by = d.changeset_id where h.contest_id = c.id)
                  and not exists (select from result_set r join changeset k on k.id = r.changeset_id
                                  where r.contest_id = c.id and k.pipeline = %s)
@@ -301,10 +303,15 @@ def read(text: str) -> tuple[list[dict[str, object]], str | None]:
         if SKIP.search(label):
             continue
         rows: list[dict[str, object]] = []
-        listed, total = 0, None
+        listed, total, turnout = 0, None, None
         for name, params in members[1:]:
             digits = re.sub(r"\D", "", clean(params.get("votes", "")))
-            if name.startswith("election box total"):
+            if name.startswith("election box turnout"):
+                turnout = int(digits) if digits else None
+            elif name.startswith("election box write-in") and "candidate" not in params and digits:
+                listed += int(digits)
+                rows.append({"name": "Others", "party": None, "votes": int(digits), "winner": 0, "percentage": None})
+            elif name.startswith("election box total"):
                 total = int(digits) if digits else None
             elif name.startswith("election box") and "candidate" in params and digits:
                 listed += int(digits)
@@ -326,9 +333,11 @@ def read(text: str) -> tuple[list[dict[str, object]], str | None]:
         rows = fuse(rows)
         listed = sum(int(row["votes"]) for row in rows)
         reason = None
-        if total is not None:
-            if abs(listed - total) > max(5, total // 200):
-                reason = f"rows sum {listed}, total line {total}"
+        printed = [figure for figure in (total, turnout) if figure is not None]
+        if any(abs(listed - figure) <= max(5, figure // 200) for figure in printed):
+            pass
+        elif total is not None:
+            reason = f"rows sum {listed}, total line {total}"
         else:
             lead = max(rows, key=lambda row: row["votes"])
             percent = re.sub(r"[^\d.]", "", str(lead["percentage"] or ""))
@@ -402,7 +411,7 @@ def parse() -> None:
             ours = int(rows[index]["votes"])
             if theirs and (theirs - ours) * 100 > ours:
                 offs.append(f"{rows[index]['name']} {ours} vs {int(theirs)}")
-        if reason is not None:
+        if reason is not None and (state, year) not in PARTIAL:
             held.append((f"{year} {state}", reason))
             continue
         if offs:
