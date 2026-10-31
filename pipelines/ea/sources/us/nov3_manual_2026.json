@@ -10525,5 +10525,71 @@
     "title": "Confirmation of the district",
     "text": "Confirmation of San Benito Municipal Utility District No. 1.",
     "file": "N3M-web/tx9/cam/sb2.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007-cr",
+    "publisher": "City of Cranston",
+    "place": "City of Cranston",
+    "number": "Question 6",
+    "title": "Storm drainage improvements bonds ($4,000,000)",
+    "text": "Shall an act, passed at the 2026 session of the General Assembly, entitled “An Act authorizing the City of Cranston to finance the repair, construction, and rehabilitation of storm drains and drainage improvements, and the remediation and mitigation of drainage and flooding problems, by the issuance of not more than $4,000,000 general obligation bonds and notes therefor” be approved?",
+    "file": "RI-web/cranston-voter-guide.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007-cr",
+    "publisher": "City of Cranston",
+    "place": "City of Cranston",
+    "number": "Question 7",
+    "title": "Public buildings bonds ($2,000,000)",
+    "text": "Shall an act, passed at the 2026 session of the General Assembly, entitled “An Act authorizing the City of Cranston to finance the acquisition, demolition, construction, improvement, renovation, repair, alteration, furnishing, and equipping of public buildings in the city by the issuance of not more than $2,000,000 general obligation bonds and notes therefor” be approved?",
+    "file": "RI-web/cranston-voter-guide.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007-cr",
+    "publisher": "City of Cranston",
+    "place": "City of Cranston",
+    "number": "Question 8",
+    "title": "Playgrounds and athletic fields bonds ($4,000,000)",
+    "text": "Shall an act, passed at the 2026 session of the General Assembly, entitled “An Act authorizing the City of Cranston to finance the acquisition, construction, improvement, renovation, repair, and alteration of playgrounds, athletic fields, and related equipment in the city by the issuance of not more than $4,000,000 general obligation bonds and notes therefor” be approved?",
+    "file": "RI-web/cranston-voter-guide.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007-cr",
+    "publisher": "City of Cranston",
+    "place": "City of Cranston",
+    "number": "Question 9",
+    "title": "Streets, sidewalks, and bridges bonds ($8,000,000)",
+    "text": "Shall an act, passed at the 2026 session of the General Assembly, entitled “An Act authorizing the City of Cranston to finance the design, construction, repair, rehabilitation, and improvement of streets, sidewalks, and bridges in the city including, but not limited to, paving, drainage, traffic control devices, road maintenance equipment, safety improvements, and landscaping and all costs incidental or related thereto by the issuance of not more than $8,000,000 general obligation bonds and notes therefor” be approved?",
+    "file": "RI-web/cranston-voter-guide.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007-cr",
+    "publisher": "City of Cranston",
+    "place": "City of Cranston",
+    "number": "Question 10",
+    "title": "Fire and public safety equipment bonds ($8,000,000)",
+    "text": "Shall an act, passed at the 2026 session of the General Assembly, entitled “An Act authorizing the City of Cranston to finance the acquisition, improvement, renovation, and repair of fire and public safety equipment by the issuance of not more than $8,000,000 general obligation bonds and notes therefor” be approved?",
+    "file": "RI-web/cranston-voter-guide.pdf"
+  },
+  {
+    "state": "RI",
+    "county": "Providence County",
+    "county_fips": "44007-cr",
+    "publisher": "City of Cranston",
+    "place": "City of Cranston",
+    "number": "Question 11",
+    "title": "Schools and school facilities bonds ($25,000,000)",
+    "text": "Shall an act, passed at the 2026 session of the General Assembly, entitled “An Act authorizing the City of Cranston to issue not to exceed $25,000,000 general obligation bonds, notes, and other evidences of indebtedness to finance the purchase and/or acquisition of land and buildings, construction, renovation, improvement, alteration, repair, landscaping, furnishing, and equipping of schools and school facilities throughout the city” be approved?",
+    "file": "RI-web/cranston-voter-guide.pdf"
   }
 ]
