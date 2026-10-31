@@ -43,9 +43,14 @@ const ORDER =
 
 const STAGES = sql.raw(ORDER);
 
+const licensed = (set: string) =>
+  `not exists (select from source icpsr where icpsr.id = ${set}.source_id and icpsr.license ilike '%ICPSR%')`;
+
+export const served = (set: string) => sql.raw(licensed(set));
+
 export const latest = (set: string) =>
   sql.raw(
-    `(${set}.is_default and ${set}.stage <> 'notional' and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
+    `(${set}.is_default and ${set}.stage <> 'notional' and ${licensed(set)} and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and ${licensed("later")} and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
   );
 
 const serial = (contest: string, election: string) =>
@@ -951,7 +956,7 @@ async function children(
       union all
       select c.id from contest c join grp on c.allocation_parent_id = grp.id
     )
-    select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
+    select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
   `);
   const ks = sets.rows.map((row) => row.k);
   if (ks.length === 0) {
@@ -1446,7 +1451,7 @@ async function load(
     ),
     sets as materialized (
       select rs.k, rs.id, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
-      from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
+      from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
       ${only == null ? sql`` : sql`where rs.k = any(${sql.param(only)}::int[])`}
     ),
     picked as (
@@ -1464,7 +1469,6 @@ async function load(
         having count(*) > 0
       ) hit on true
       order by rs.contest_id, a.k,
-        exists (select from source s where s.id = rs.source_id and s.license ilike '%ICPSR%'),
         (exists (select from source s where s.id = rs.source_id and s.kind = 'official_body')
           and rs.stage not in ('preliminary', 'live')
           and exists (select from result_rollup_unit u where u.result_set_k = rs.k and u.area_k = a.k)) desc,
@@ -2793,8 +2797,8 @@ async function places(
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select rs.k, rs.is_default as "isDefault" from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
-      where rs.status = 'active'
+      select rs.k, rs.is_default as "isDefault" from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+      where rs.status = 'active' and ${served("rs")}
     `);
     const defaults = sets.rows
       .filter((row) => row.isDefault)
@@ -2994,7 +2998,7 @@ async function places(
           select rs.k from contest own
           join contest c on c.election_id = own.election_id and c.id <> own.id
             and (c.office_id = own.office_id or c.body_id = own.body_id)
-          join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+          join result_set rs on rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
           where own.id = ${contest.id}::uuid
         )
         select s.k from straddling s
@@ -3065,7 +3069,7 @@ async function places(
       select c.id from contest c join grp on c.allocation_parent_id = grp.id
     ),
     sets as materialized (
-      select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active'
+      select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active' and ${served("rs")}
     ),
     short as materialized (
       select ${isRoot && contest.id === contest.root && contest.place?.k === area.k ? sql`true` : sql`false`} and (
@@ -4205,7 +4209,7 @@ async function atlas(input: {
           where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED})
           limit 1
         ) r
-        where rs.contest_id = c.id and rs.status = 'active'
+        where rs.contest_id = c.id and rs.status = 'active' and ${served("rs")}
         limit 1
       ) hit
       where p.parent_id = any(${sql.param(shown.map((kid) => kid.id))}::uuid[])
@@ -4258,8 +4262,8 @@ async function atlas(input: {
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       ),
       sets as (
-        select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
-        where rs.status = 'active'
+        select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+        where rs.status = 'active' and ${served("rs")}
       ),
       up(id, depth) as (
         select ${area.id}::uuid, 0
@@ -5258,7 +5262,7 @@ export const contests = {
         ),
         every as (
           select rs.k, rs.source_id, rs.stage, rs.changeset_id, rs.is_default, rs.completeness, ${latest("rs")} as is_latest
-          from tree cross join lateral (select * from result_set x where x.contest_id = tree.id and x.status <> 'withdrawn' offset 0) rs
+          from tree cross join lateral (select * from result_set x where x.contest_id = tree.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
         ),
         target as (
           select ${area}::int as k where ${area}::int is not null
@@ -5268,7 +5272,6 @@ export const contests = {
           where exists (select from result_rollup_unit u where u.result_set_k = every.k and u.area_k = target.k)
             or exists (select from result_rollup_sum r where r.result_set_k = every.k and r.area_k = target.k)
           order by
-            exists (select from source s where s.id = every.source_id and s.license ilike '%ICPSR%'),
             (exists (select from source s where s.id = every.source_id and s.kind = 'official_body')
               and exists (select from result_rollup_unit u where u.result_set_k = every.k and u.area_k = target.k)) desc,
             every.is_default desc, array_position(${STAGES}, every.stage), every.completeness desc nulls last
@@ -5318,7 +5321,7 @@ export const contests = {
           select a.k from head join contest c on c.id = head.id join area a on a.id = c.district_area_id
         ),
         sets as (
-          select rs.k, rs.source_id from tree cross join lateral (select * from result_set x where x.contest_id = tree.id and x.status <> 'withdrawn' offset 0) rs where ${latest("rs")}
+          select rs.k, rs.source_id from tree cross join lateral (select * from result_set x where x.contest_id = tree.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs where ${latest("rs")}
         ),
         options as (
           select o.k from contest_option o join tree on tree.id = o.contest_id
@@ -5916,7 +5919,7 @@ export const contests = {
                   select x.area_k, x.count_round from result_rollup x
                   where x.result_set_k = rs.k and x.count_round in (1, t.last) and x.measure = any(${COUNTED}) offset 0
                 ) x
-                where rs.contest_id = ${contest.id}::uuid and rs.status = 'active'
+                where rs.contest_id = ${contest.id}::uuid and rs.status = 'active' and ${served("rs")}
               ) as "isShallow",
               case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), case when stv.seats is null then t.last else 1 end), 1), t.last) end as round,
               stv.seats,
@@ -6725,7 +6728,7 @@ export const contests = {
             cross join lateral (
               select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
             ) probe
-            where rs.contest_id = grp.id and rs.status <> 'withdrawn'
+            where rs.contest_id = grp.id and rs.status <> 'withdrawn' and ${served("rs")}
             limit 1
           ) hit
         ),
@@ -7016,17 +7019,14 @@ export const contests = {
              select a.k from contest c join area a on a.id = c.district_area_id
              where c.id = any(${sql.param(sameRace.filter((row) => row.lineage).map((row) => row.id))}::uuid[])
            ),
-           here as materialized (
-             select distinct x.result_set_k as k from area_k cross join lateral (
-               select r.result_set_k from result_rollup_sum r where r.area_k = area_k.k
-               union all
-               select r.result_set_k from result_rollup_unit r where r.area_k = area_k.k
-             ) x
-           ),
            sets as materialized (
              select grp.root, rs.k, rs.contest_id, rs.is_default, rs.stage, rs.completeness
-             from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
-             where rs.k in (select k from here)
+             from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+             where exists (
+               select from area_k
+               where exists (select from result_rollup_sum r where r.result_set_k = rs.k and r.area_k = area_k.k)
+                 or exists (select from result_rollup_unit r where r.result_set_k = rs.k and r.area_k = area_k.k)
+             )
            ),
            picked as (
              select distinct on (rs.contest_id) rs.root, rs.k, hit.area
@@ -7721,7 +7721,7 @@ export const contests = {
           return null;
         }
         const active = await db.execute<{ k: number }>(sql`
-          select k from result_set where contest_id = ${contest.id}::uuid and status = 'active'
+          select k from result_set where contest_id = ${contest.id}::uuid and status = 'active' and ${served("result_set")}
         `);
         const found = await db.execute<{ noun: string }>(sql`
           select sc.noun
@@ -8409,7 +8409,7 @@ export const contests = {
           union all
           select c.id from contest c join grp on c.allocation_parent_id = grp.id
         )
-        select rs.k from grp cross join lateral (select x.k from result_set x where x.contest_id = grp.id and x.status = 'active' offset 0) rs
+        select rs.k from grp cross join lateral (select x.k from result_set x where x.contest_id = grp.id and x.status = 'active' and ${served("x")} offset 0) rs
       `);
       const ks = sets.rows.map((row) => row.k);
       const valued = await db.execute<{ set: number; k: number }>(sql`
@@ -9662,7 +9662,7 @@ export const contests = {
         ),
         hits as (
           select distinct grp.top from grp
-          cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs
+          cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
           where exists (
             select 1 from result_rollup r
             where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) offset 0
@@ -15914,7 +15914,7 @@ export const elections = {
             cross join lateral (
               select distinct x.area_k from result_rollup x where x.result_set_k = rs.k
             ) r
-            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and rs.status = 'active'
+            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and rs.status = 'active' and ${served("rs")}
           )
           select a.scheme_code as scheme, sc.noun, array_agg(a.k order by a.k) as ks
           from hits h join area a on a.k = h.area_k join scheme sc on sc.code = a.scheme_code
@@ -17864,7 +17864,7 @@ export const polities = {
               or exists (select from polity_territory t where t.polity_id = ${input.id}::uuid and t.valid @> e.date_from)
             ) and exists (
               select 1 from result_set rs
-              where rs.contest_id = c.id and rs.status = 'active' and exists (
+              where rs.contest_id = c.id and rs.status = 'active' and ${served("rs")} and exists (
                 select from result_rollup r where r.result_set_k = rs.k and r.area_k = place.k and r.measure = any(${COUNTED}) offset 0
               ) offset 0
             )
@@ -19207,7 +19207,7 @@ export const polities = {
               where c.id = t.id offset 0
             ) c
             cross join lateral (
-              select rs.k from result_set rs where rs.contest_id = t.id and rs.status = 'active' offset 0
+              select rs.k from result_set rs where rs.contest_id = t.id and rs.status = 'active' and ${served("rs")} offset 0
             ) rs
             join place pl on (pl.since is null or c.day >= pl.since) and (pl.until is null or c.day < pl.until)
               and (c.district_area_id is null or c.district_area_id in (select u.area from ups u where u.polity = pl.polity))
@@ -20950,7 +20950,7 @@ export const people = {
         ),
         picked as (
           select distinct on (rs.contest_id) grp.root, rs.k, p.area
-          from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' offset 0) rs join placed p on p.root = grp.root
+          from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs join placed p on p.root = grp.root
           join lateral (
             select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = p.area and r.measure = any(${COUNTED}) limit 1
           ) hit on true
@@ -22434,7 +22434,7 @@ export const parties = {
             ),
             picked as materialized (
               select distinct on (rs.contest_id) t.root, rs.k, t.area
-              from tree t cross join lateral (select * from result_set x where x.contest_id = t.id and x.status <> 'withdrawn' offset 0) rs
+              from tree t cross join lateral (select * from result_set x where x.contest_id = t.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
               cross join lateral (
                 select from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
               ) hit
