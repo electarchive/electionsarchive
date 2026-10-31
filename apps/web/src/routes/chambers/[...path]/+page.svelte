@@ -98,12 +98,15 @@
       })),
     ),
   );
-  const range = $derived({
-    low: Date.parse(first) / DAY,
-    high:
-      Date.parse(members.data?.end ?? new Date().toISOString().slice(0, 10)) /
-        DAY -
-      1,
+  const range = $derived.by(() => {
+    const today = Math.floor(Date.now() / DAY);
+    const open = Date.parse(term?.start ?? first) / DAY;
+    const close = Date.parse(term?.end ?? members.data?.end ?? "") / DAY;
+    const high = Math.min(Number.isNaN(close) ? today : close - 1, today);
+    return {
+      low: Math.min(Math.max(Date.parse(first) / DAY, open), high),
+      high,
+    };
   });
   const sitting = $derived.by(() => {
     if (members.data == null) {
@@ -602,7 +605,10 @@
             min={range.low}
             max={range.high}
             step={1}
-            value={Date.parse(on) / DAY}
+            value={Math.min(
+              Math.max(Date.parse(on) / DAY, range.low),
+              range.high,
+            )}
             onValueChange={(value: number) => {
               chosen = {
                 term: term.start,

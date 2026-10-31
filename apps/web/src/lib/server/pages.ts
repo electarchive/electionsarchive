@@ -790,7 +790,13 @@ export async function chamber(path: string) {
   });
   const last = titled.at(-1);
   const [members, marks] = await Promise.all([
-    last == null ? null : call(router.bodies.members, { id, from: last.start }),
+    last == null
+      ? null
+      : call(router.bodies.members, {
+          id,
+          from: last.start,
+          until: last.end ?? undefined,
+        }),
     Promise.all(
       terms.map(
         async (term) =>
