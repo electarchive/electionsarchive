@@ -15,6 +15,7 @@ VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "y26" / "fl"
 MANUAL = DATA / "inbox" / "manual" / "MF-460"
+MANUAL_DIRS = (MANUAL, DATA / "inbox" / "manual" / "MF-184", DATA / "inbox" / "manual" / "MF-483")
 SOURCES = {
     "https://browardvotes.gov/sites/default/files/list-of-candidates-for-november-elections.pdf": (
         "Broward County Supervisor of Elections",
@@ -82,6 +83,12 @@ SOURCES = {
         "polk-2026-11-03-candidate-list.html",
         "Polk",
     ),
+    "https://www.voteosceola.gov/en-us/current-candidates/": (
+        "Osceola County Supervisor of Elections",
+        "Current Candidates, November 3, 2026 General Election",
+        "fl-osceola-2026-general-candidate-list.html",
+        "Osceola",
+    ),
 }
 DISTRICT = re.compile(
     r"(?i)community development district|water control district|improvement district|drainage district|"
@@ -100,8 +107,9 @@ def fetch() -> None:
             raw.cached(SOURCE, url)
         except LookupError:
             path = INBOX / file
-            if not path.exists():
-                path = MANUAL / file
+            for folder in MANUAL_DIRS:
+                if not path.exists():
+                    path = folder / file
             raw.store(
                 SOURCE,
                 url,
@@ -308,7 +316,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="FL",
-        summary="Florida community development, water control, drainage, improvement, and recreation district board races on the November 3, 2026 ballot, with candidates from the Broward, Brevard, Pasco, Duval, Hillsborough, Lee, Miami-Dade, Orange, Palm Beach, Pinellas, and Polk County election offices",
+        summary="Florida community development, water control, drainage, improvement, and recreation district board races on the November 3, 2026 ballot, with candidates from the Broward, Brevard, Pasco, Duval, Hillsborough, Lee, Miami-Dade, Orange, Palm Beach, Pinellas, Polk, and Osceola County election offices",
         sources={url: (publisher, title) for url, (publisher, title, _, _) in SOURCES.items()},
         frame=frame,
     )
