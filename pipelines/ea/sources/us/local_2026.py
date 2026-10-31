@@ -6490,9 +6490,21 @@ KY_BOARD_SEATS = {
     "Ludlow Independent School District Board of Education": 3,
     "Walton-Verona Independent School District Board of Education": 3,
 }
+KY_SHARED_CITIES = {
+    "21093": "21123",
+    "21121": "21235",
+    "21161": "21023",
+    "21187": "21077",
+    "21211": "21103",
+}
 KY_CITY_SPELLINGS = {
     ("BOONE", "Erlanger"): "",
-    ("BELL", "Middlesboro City Coumcil"): "Middlesboro",
+    ("BELL", "Middlesboro City Coumcil"): "Middlesborough",
+    ("BELL", "Middlesboro"): "Middlesborough",
+    ("BALLARD", "District"): "La Center",
+    ("BALLARD", "Lacenter"): "La Center",
+    ("LARUE", "Hadgenville"): "Hodgenville",
+    ("LETCHER", "Neon"): "Fleming-Neon",
     ("BULLITT", "Lebanon Jct"): "Lebanon Junction",
     ("HENRY", "Campbllsburg"): "Campbellsburg",
     ("JEFFERSON", "J"): "Jeffersontown",
@@ -6506,7 +6518,7 @@ KY_CITY_SPELLINGS = {
     ("KENTON", "Ft Mitchell"): "Fort Mitchell",
     ("KENTON", "Ft Wright"): "Fort Wright",
     ("LARUE", "Hodgenvillie"): "Hodgenville",
-    ("LETCHER", "If Neon"): "Neon",
+    ("LETCHER", "If Neon"): "Fleming-Neon",
     ("LOGAN", "Aubrun"): "Auburn",
     ("MEADE", "Branbenburg"): "Brandenburg",
     ("MUHLENBERG", "Drakeboro"): "Drakesboro",
@@ -7277,6 +7289,7 @@ def parse() -> None:
         city = KY_CITY_SPELLINGS.get((str(county), city), city)
         if not city and post in ("MAYOR", "CITY LEGISLATIVE BODY") and str(county) in ballot_text:
             city = ky_ballots.city_by_candidate(ballot_text[str(county)], post == "MAYOR", str(last_name)) or ""
+            city = KY_CITY_SPELLINGS.get((str(county), city), city)
         if city:
             city = spellings.setdefault(
                 (str(county), coverage_tables.tokens(re.sub(r"\s+City$", "", city))),
@@ -9858,7 +9871,10 @@ def parse() -> None:
                     if state == "MI"
                     else [
                         (variant, *rest)
-                        for full, *rest in towns.get(str(row["fips"]), [])
+                        for full, *rest in [
+                            *towns.get(str(row["fips"]), []),
+                            *(towns.get(KY_SHARED_CITIES.get(str(row["fips"]), ""), []) if state == "KY" else []),
+                        ]
                         for variant in ([full, [word for word in full if word != "and"]] if "and" in full else [full])
                         + (
                             [[word for word in full if word not in ("borough", "township", "city", "town", "village")]]
@@ -9907,6 +9923,7 @@ def parse() -> None:
                                     sort
                                     and said != sort
                                     and ((said, sort) != ("town", "township") or state == "IN")
+                                    and (state != "KY" or (said, sort) != ("city", "village"))
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
