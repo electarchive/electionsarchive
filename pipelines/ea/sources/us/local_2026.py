@@ -5475,6 +5475,13 @@ for key, publisher, title, url, local in (
         "ca/wheatland_candidates.pdf",
     ),
     (
+        "CA-06091-loyalton",
+        "Sierra County Elections",
+        "Sierra County Local Candidate List, November 3, 2026 General Election",
+        "https://www.sierracounty.ca.gov/",
+        "ca/loyalton_candidates.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
