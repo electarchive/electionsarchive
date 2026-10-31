@@ -665,6 +665,16 @@ MS_2004_TOTALS = (
     (957104, (0.5601, 0.7486, 0.6226, 0.7586)),
     (155648, (0.3678, 0.7767, 0.4279, 0.7867)),
 )
+TX_2022 = "https://results.texas-election.com/OfficialCanvassReport-2022-05-07"
+TX_2022_FILE = "MF-492/OfficialCanvassReport.xlsx"
+TX_2022_MEASURES = {
+    "1": (
+        "Limit on school property taxes for elderly and disabled homesteads",
+        "Legislative Referendum",
+        True,
+    ),
+    "2": ("Increase in the school homestead exemption to $40,000", "Legislative Referendum", True),
+}
 MS_2004_MEASURES = {"1": ("Definition of marriage", "Legislative Referendum", True)}
 VT_2002_MEASURES = {"4": ("Mandatory retirement age for judges", "Legislative Referendum", True)}
 WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
@@ -2059,7 +2069,7 @@ PUBLISHERS = {
         "General election results by county",
         "https://www.sos.nm.gov/sos-archive/election-results-archive/",
     ),
-    "TX": ("Texas Secretary of State", "Texas election history: returns by county, 1992–2019", TX),
+    "TX": ("Texas Secretary of State", "Texas election results: history by county and the 2022 canvass", TX),
     "CA": (
         "California Secretary of State",
         "Statement of Vote",
@@ -2189,6 +2199,10 @@ AL_2007_NOTE = (
 MS_2004_NOTE = (
     " Only the statewide totals are recorded: the figures are those printed in the Secretary of State's proclamation "
     "certifying the amendment, entered by hand from page 1; the box shown on each figure is approximate."
+)
+TX_2022_NOTE = (
+    " Only the statewide totals are recorded: the county-by-county export of the Secretary of State's results site"
+    " omits county names, so the county table cannot be read."
 )
 GA_2022_NOTE = (
     " Only the statewide totals are recorded: the Secretary of State's results export has no county figures for"
@@ -2335,6 +2349,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, AL_2010_PRIMARY, suffix=".pdf")
     raw.fetch(SOURCE, GA_2022_URL, suffix=".json")
     raw.fetch(SOURCE, MS_2004, suffix=".pdf")
+    store_manual(TX_2022, TX_2022_FILE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     for candidate in WV_2012_CANDIDATES.values():
         raw.fetch(SOURCE, WV_2012.format(candidate), suffix=".html")
     raw.fetch(SOURCE, OR_HISTORY, suffix=".pdf")
@@ -5373,6 +5388,29 @@ def mississippi_2004() -> list[dict[str, object]]:
     ]
 
 
+def texas_2022() -> list[dict[str, object]]:
+    book = fastexcel.read_excel(str(raw.cached(SOURCE, TX_2022).path))
+    sheet = book.load_sheet_by_idx(0, header_row=0).to_polars()
+    rows: list[dict[str, object]] = []
+    for office, candidate, votes in sheet.select("OFFICE NAME", "CANDIDATE NAME", "CANVASS VOTES").rows():
+        number = re.match(r"PROPOSITION NUMBER (\d+)", office)
+        if number is None:
+            raise ValueError(f"TX 2022 canvass: unexpected office {office!r}")
+        rows.append(
+            {
+                "state": "TX",
+                "day": date(2022, 5, 7),
+                "number": number[1],
+                "label": f"Proposition {number[1]}",
+                "url": TX_2022,
+                "county": "statewide",
+                "answer": {"FOR": "YES", "AGAINST": "NO"}[candidate.strip()],
+                "votes": int(votes.replace(",", "")),
+            }
+        )
+    return rows
+
+
 def georgia_2022() -> list[dict[str, object]]:
     export = json.loads(raw.cached(SOURCE, GA_2022_URL).path.read_text())
     rows: list[dict[str, object]] = []
@@ -6762,6 +6800,7 @@ def parse() -> None:
             *west_virginia_2012(),
             *mississippi_2004(),
             *georgia_2022(),
+            *texas_2022(),
             *wisconsin(),
             *iowa(),
             *mississippi(),
@@ -6814,6 +6853,7 @@ def parse() -> None:
             ("SC", 2022),
             ("AL", 2022),
             ("GA", 2022),
+            ("TX", 2022),
             ("WV", 2012),
             ("MS", 2004),
             ("VT", 2002),
@@ -6834,6 +6874,7 @@ def parse() -> None:
                     "SC": SC_2022,
                     "AL": AL_2022,
                     "GA": GA_2022_MEASURES,
+                    "TX": TX_2022_MEASURES,
                     "WV": WV_2012_MEASURES,
                     "MS": MS_2004_MEASURES,
                     "VT": VT_2002_MEASURES,
@@ -7207,6 +7248,8 @@ def emit() -> Path:
                         if state == "MS"
                         else GA_2022_NOTE
                         if state == "GA" and day.year == 2022
+                        else TX_2022_NOTE
+                        if state == "TX"
                         else AK_STATEWIDE_NOTE
                         if state == "AK"
                         else ND_2004_NOTE
