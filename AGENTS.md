@@ -9,6 +9,7 @@ Read the matching file before working in its area:
 - `docs/architecture.md`: flows, repository layout, stack, API surfaces, access, and hosting. Read it before adding a package, service, route family, or dependency.
 - `docs/data-model.md`: vocabulary, conventions, and tables. Read it before touching the database, changeset formats, or anything about results, geography, parties, people, offices, or provenance.
 - `docs/pipelines.md`: the `ea` CLI, the raw cache, apply and checks, digitization, entity resolution, and live ingestion. Read it before writing or running a pipeline.
+- `docs/performance.md`: the procedure cache, warm-up, database settings, query patterns, and coarse geometry. Read it before writing an RPC query or changing the cache.
 - `CONTRIBUTING.md`: setup, the checks CI runs, and conventions.
 
 ## Invariants

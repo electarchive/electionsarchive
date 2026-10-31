@@ -67,3 +67,5 @@ Search runs in Postgres alone: one denormalized `search_document` row per entity
 Production is one dedicated server running Postgres, Redis, the app, the API, MCP, and the live workers in Docker. Postgres and Redis listen only on private interfaces. Cloudflare sits in front as the only public way in and caches pages, twins, the API, and map tiles; `/live` pages, their twins, and the live API send `cache-control: no-store`. Bulk releases are static files on object storage behind `data.electionsarchive.com`.
 
 The SvelteKit node adapter runs with `BODY_SIZE_LIMIT=200M`, because `POST /uploads` accepts files of up to 200 MB as the raw request body. The contributions worker (`uv run ea contrib serve`) runs beside the app with the same `data/` tree, since it reads uploads and writes the files it extracts from them. It needs poppler-utils (`pdftoppm`, `pdftotext`, and `pdfinfo`) and `prlimit` on the host.
+
+To learn how pages stay fast, from the procedure cache and warm-up to the database settings and query patterns, read [performance.md](performance.md).

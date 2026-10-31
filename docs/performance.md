@@ -1,0 +1,62 @@
+# Performance
+
+This page explains how the site stays fast: where results are cached, how the cache is kept warm, which database settings matter, and which query patterns we use and avoid. Read it before you write a new RPC query or change the cache.
+
+## How a page is served
+
+Cloudflare sits in front of the origin. Static assets under `/_app/immutable/` have content-hashed names and are sent with `cache-control: public, max-age=31536000, immutable`, so browsers and the edge keep them for a year. Pages and twins are rendered by the SvelteKit server, which answers each page from a handful of RPC procedures called in-process. A loader starts independent procedure calls together with `Promise.all`, so a contest page waits for its slowest call, not for the sum of them.
+
+## The procedure cache
+
+Every read procedure goes through `remember()` in `apps/web/src/lib/server/cache.ts`. A result is keyed by the procedure's name and its JSON input, and it lives in two tiers:
+
+- **In-process.** A `Map` used as an LRU, capped at 20,000 entries or 1 GiB of serialized size, whichever comes first.
+- **Shared.** Redis, keyed by `c:<build>:<procedure>:<input>`. Values are serialized with `node:v8`, compressed with zstd, and kept for 30 days. Values larger than 64 MiB are not stored.
+
+The build id in the key means a deploy never reads results written by older code, so every deploy starts with an empty shared cache.
+
+Each entry carries the data version that was current when it was computed. The version joins today's date, the number of published and rejected changesets, the time of the latest publish, and the time of the latest coverage build. The server reads it at most every five seconds. When the version moves, a stale entry is still served right away and a background renewal recomputes it. At most four renewals run at once, so the database never gets a burst of heavy queries after a publish. Procedures built with `strict` instead of `os` never serve a stale value: they recompute before answering.
+
+## Warming
+
+Because a deploy empties the shared cache, the first visitor to each page would pay for every query. After each deploy and each database restore, a warm-up script asks the database for the pages people are most likely to open: the home page, every country, supranational body, and federal unit, their recent general elections, and every contest in each one's latest general election. It then requests each page three at a time. That is about 18,000 pages.
+
+## Database settings
+
+- **JIT is off.** Our queries are large and generated, and their plans are expensive to compile. With JIT on, one contest page spent 14 of its 34 seconds compiling.
+- `random_page_cost = 1.1` and `effective_io_concurrency = 200`, which suit SSD storage.
+- After a restore, `vacuumdb --freeze --analyze` runs with eight jobs. Freezing sets the visibility map, so index-only scans skip the heap, and analyzing gives the planner fresh statistics.
+- The web pool holds up to 32 connections and waits up to 30 seconds for one.
+- `pg_stat_statements` and `track_io_timing` are on. Rank `pg_stat_statements` by `total_exec_time` to find the next query to fix.
+
+## Query patterns
+
+These patterns came out of plans that read whole tables. Each one turned a query that took seconds into one that takes milliseconds.
+
+- **Start from a small set of ids.** When a query needs rows for a few contests, select the ids first, then fetch rows with `cross join lateral (select ... where rs.contest_id = ids.id offset 0)`. The `offset 0` keeps the planner from flattening the subquery into a hash join over the whole table.
+- **Don't join recursive CTE output back to big tables.** Postgres estimates recursive CTEs poorly, so a join from `grp` or `tree` back to `contest` or `election` often becomes a hash join over all of `contest` (about 950,000 rows) or `election` (about 220,000 rows). Fetch the extra columns with a scalar subquery or a lateral instead.
+- **Use `= any(array[x])` when an equality would pick the wrong index.** When a column is indexed by a btree and also appears, not first, in a GiST key, a plain equality can lead the planner to the GiST index. `= any(array[x])` steers it to the btree.
+- **Don't wrap indexed columns in `coalesce`.** Write `(c.body_id = x or (c.body_id is null and c.office_id = x))`, not `coalesce(c.body_id, c.office_id) = x`, so each branch can use its index.
+- **Filter before joining territories.** Find the elections you need first, then join `polity_territory` for only those.
+- **Test existence in a select list with `(select true ... limit 1)`.** The planner can turn an `exists` in a select list into a hashed subplan that reads every matching row in the table. A scalar subquery with `limit 1` always runs per row and stops at the first match.
+
+## Heavy geometry
+
+Some boundaries have more than a million points, Nunavut's among them. Intersecting two such shapes takes seconds. `ea coarse` keeps a simplified copy of every area geometry with more than 20,000 points in `display.coarse`. The tolerance is 0.0002 times the square root of the shape's area. A copy is kept only when it has fewer than half the points and its area is within 0.5% of the original; otherwise the row holds no geometry, and queries fall back to the full shape. `ea tiles` refreshes the table, and rows are dropped when their source geometry changes.
+
+The `coarse()` helper in `archive.ts` returns the simplified copy when one exists. Use it only where a share is measured against the heavy shape itself or against the larger of two shapes, such as overlap with a predecessor district. Don't use it where a share is measured against the smaller shape: simplifying a large neighbor can move a small district's share by much more than 0.5%. Filters such as `&&` and `ST_Intersects` keep using the full geometry.
+
+Across the 70 predecessor pairs of the 12 heaviest districts of Canada's 2025 election, the largest difference between coarse and exact shares was 0.00047. None changed at two decimal places, and none crossed the 1% cutoff for listing a predecessor.
+
+## Measuring
+
+The benchmark we track requests 45 representative pages one at a time against the origin, first with every cache empty and then with both tiers warm.
+
+| Change                                                                       | All 45 pages, cold | Slowest contest page, cold |
+| ---------------------------------------------------------------------------- | ------------------ | -------------------------- |
+| Before                                                                       | 98.7 s             | 34 s                       |
+| JIT off, lateral result-set lookups, lookup indexes, and the turnout rewrite | 91.4 s             | 13.7 s                     |
+| zstd, the owner predicate, and the recursive-CTE rewrites                    | 80.8 s             | 13.2 s                     |
+| Coarse geometry for overlaps                                                 | 69.0 s             | 3.0 s                      |
+
+With both cache tiers warm, all 45 pages take 1.9 s together, and the slowest takes 0.34 s.
