@@ -21,6 +21,11 @@ COUNTIES = {
         "https://adaircounty.iowa.gov/files/candidate_list/2026_general_election_81412.pdf",
         "Adair County Auditor",
     ),
+    "Benton": (
+        "benton",
+        "https://www.bentoncountyia.gov/files/auditor/soil_water_candidate_list2026_88555.pdf",
+        "Benton County Auditor",
+    ),
     "Black Hawk": (
         "black-hawk",
         "https://blackhawkcountyelections.iowa.gov/files/candidate_list/2026_general_election_39589.pdf",
@@ -35,6 +40,11 @@ COUNTIES = {
         "buena-vista",
         "https://buenavistacounty.iowa.gov/elections",
         "Buena Vista County Auditor",
+    ),
+    "Guthrie": (
+        "guthrie",
+        "https://guthriecounty.gov/files/candidate_list/2026_general_election_26810.pdf",
+        "Guthrie County Auditor",
     ),
     "Jackson": (
         "jackson",
@@ -55,6 +65,11 @@ COUNTIES = {
         "sioux",
         "https://siouxcountyia.gov/elections",
         "Sioux County Auditor",
+    ),
+    "Cerro Gordo": (
+        "cerro-gordo",
+        "https://cerrogordo.gov/files/candidate_list/2026_general_election_38511.pdf",
+        "Cerro Gordo County Auditor",
     ),
     "Chickasaw": (
         "chickasaw",
@@ -109,6 +124,7 @@ BOARDS = (
         False,
         ("Connie Hohertz", "Clark Dolch", "Jodi Bassett", "Mark Schildberg", "Bo Geidel"),
     ),
+    ("Benton", f"Benton County {SWCD}", "Commissioner", 2, False, ("Cory Cronbaugh", "Steven A. Thompson")),
     ("Black Hawk", f"Black Hawk County {SWCD}", "Commissioner", 2, False, ("Kristi Heffelmeier", "Michael J Miller")),
     ("Bremer", f"Bremer County {SWCD}", "Commissioner", 2, False, ("Verle Tom Manson", "Sara Lockie")),
     (
@@ -134,6 +150,17 @@ BOARDS = (
     ("Plymouth", f"Plymouth County {SWCD}", "Commissioner", 2, False, ("Robert Puetz", "Jeremy Homan")),
     ("Plymouth", f"Plymouth County {SWCD}", "Commissioner", 1, True, ("Scott Jones",)),
     ("Sioux", f"Sioux County {SWCD}", "Commissioner", 2, False, ("Allan Reinders", "Kendall Roetman")),
+    ("Cerro Gordo", f"Cerro Gordo County {SWCD}", "Commissioner", 2, False, ("Jill Bale", "Phillip Dougherty")),
+    (
+        "Guthrie",
+        "Guthrie County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Sheyrl Clark", "Doris Terwilliger", "Michael Underwood", "Dana Tews"),
+    ),
+    ("Guthrie", f"Guthrie County {SWCD}", "Commissioner", 2, False, ("Jamie Patrick", "Alan Wedemeyer")),
+    ("Guthrie", f"Guthrie County {SWCD}", "Commissioner", 1, True, ("Adam Ebert",)),
     ("Chickasaw", f"Chickasaw County {SWCD}", "Commissioner", None, False, ("Kim Leichtman", "Steven Mashek")),
     ("Clayton", f"Clayton County {SWCD}", "Commissioner", 2, False, ("Travis Anderson", "Scott Hilgerson")),
     ("Des Moines", f"Des Moines County {SWCD}", "Commissioner", None, False, ("June Morgan", "Brian Messer")),
