@@ -101,6 +101,7 @@ NUMBER = re.compile(r"\d[\d,]*(?:\.0+)?")
 CANDIDATE = re.compile(
     r"scatter|no election|write-?ins?|w-in|(?:over|under)votes|(?:,\s*[a-z/&]{1,6}|\s+[rdli])\.?\*?$", re.IGNORECASE
 )
+DATED = re.compile(r"\d{4}-\d\d-\d\d")
 WRITE_IN = re.compile(r"\bw-?in\b|write-?ins?", re.IGNORECASE)
 
 
@@ -110,6 +111,9 @@ def blocks(path: Path, name: str) -> list[dict[str, object]]:
         path, sheet_id=0, has_header=False, infer_schema_length=0, raise_if_empty=False
     ).items():
         grid = [[" ".join(cell.split()) if cell else "" for cell in row] for row in sheet.rows()]
+        for row in grid:
+            if DATED.match(row[0]):
+                row[0] = ""
 
         def texts(row: list[str]) -> dict[int, str]:
             return {col: cell for col, cell in enumerate(row) if col and cell and not NUMBER.fullmatch(cell)}
