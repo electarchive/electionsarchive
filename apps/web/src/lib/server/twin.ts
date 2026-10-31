@@ -11,7 +11,6 @@ import {
   GAP_GRAINS,
   gapNote,
   gapSpan,
-  gapTried,
   GRAIN_LABELS,
   headline,
   levelLabel,
@@ -778,7 +777,6 @@ function knownMarkdown(known: Known, link: Link, isFull: boolean) {
                   )
                   .map((part) => `, ${part}`)
                   .join("")}): ${entry.note}`,
-                gapTried(entry).replace(/[^.]$/u, "$&."),
                 entry.category === "not_applicable" || entry.count === 0
                   ? ""
                   : m.polity_known_races({ count: count(entry.count) }),
@@ -1090,7 +1088,7 @@ function coverageMarkdown(
                         )
                         .map(
                           (note) =>
-                            `  - ${gapSpan(note)} (${count(note.count ?? 0)}): ${note.note} ${gapTried(note)}`,
+                            `  - ${gapSpan(note)} (${count(note.count ?? 0)}): ${note.note}`,
                         )
                     : []),
                 ])

@@ -6,7 +6,6 @@
     CATEGORY_LABELS,
     CATEGORY_REASONS,
     gapSpan,
-    gapTried,
     GRAIN_LABELS,
     levelLabel,
   } from "#lib/coverage.js";
@@ -78,7 +77,6 @@
           </h3>
           <ul class="grid gap-2.5">
             {#each group.entries as entry, index (index)}
-              {const tried = $derived(gapTried(entry))}
               {const grain = $derived(
                 GRAIN_LABELS[entry.goal]?.() ?? entry.goal,
               )}
@@ -113,11 +111,6 @@
                     >
                   </p>
                   <p class="max-inline-[75ch]">{entry.note}</p>
-                  {#if tried !== ""}
-                    <p class="text-xs text-muted-foreground max-inline-[75ch]">
-                      {tried}
-                    </p>
-                  {/if}
                   {#if entry.category !== "not_applicable" && entry.count > 0}
                     <p class="text-xs tabular-nums">
                       {m.polity_known_races({ count: count(entry.count) })}

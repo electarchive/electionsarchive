@@ -28,7 +28,6 @@
     columnGroup,
     GAP_GRAINS,
     gapSpan,
-    gapTried,
   } from "#lib/coverage.js";
   import Tone from "#routes/coverage/tone.svelte";
 
@@ -577,8 +576,6 @@
                   >({count(note.count ?? 0)})</span
                 >
                 <span class="block">{note.note}</span>
-                <span class="block text-muted-foreground">{gapTried(note)}</span
-                >
               </span>
             {/snippet}
             <span class="mbs-1 grid gap-1.5 text-xs">

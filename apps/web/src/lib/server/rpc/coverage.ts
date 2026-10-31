@@ -95,9 +95,7 @@ const Note = v.object({
   state: v.optional(v.nullable(v.string())),
   stage: v.optional(v.nullable(v.string())),
   label: v.optional(v.nullable(v.string())),
-  sources: v.optional(v.string()),
   checked: v.optional(v.nullable(v.string())),
-  ref: v.optional(v.nullable(v.string())),
   count: v.optional(v.number()),
   canvass: v.optional(v.string()),
   readiness: v.optional(v.string()),
@@ -662,7 +660,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/known",
         summary:
-          "One country's known gaps (polity, or id for the country's own polity), or those touching one contest or election (id): what the archive cannot fill yet and why, each with its category (known_gap: every source tried is exhausted; blocked: a source exists but cannot be reached yet, with its manual fetch id; not_applicable: the grain does not exist), the period, office level, state, and grain it covers, the reason, the sources tried, the date checked, how many races it touches, and the affected elections",
+          "One country's known gaps (polity, or id for the country's own polity), or those touching one contest or election (id): what the archive cannot fill yet and why, each with its category (known_gap: every source tried is exhausted; blocked: a source exists but cannot be reached yet; not_applicable: the grain does not exist), the period, office level, state, and grain it covers, the reason, the date checked, how many races it touches, and the affected elections",
       }),
     )
     .input(
@@ -684,9 +682,7 @@ export const coverage = {
           label: v.nullable(v.string()),
           category: v.picklist(CATEGORIES),
           note: v.string(),
-          sources: v.string(),
           checked: v.nullable(v.string()),
-          ref: v.nullable(v.string()),
           count: v.number(),
           elections: v.array(
             v.object({
@@ -716,9 +712,7 @@ export const coverage = {
         label: string | null;
         category: (typeof CATEGORIES)[number];
         note: string;
-        sources: string;
         checked: string | null;
-        ref: string | null;
         count: number;
         elections: Array<{
           path: string;
@@ -729,7 +723,7 @@ export const coverage = {
       }>(sql`
         select c.polity, n ->> 'goal' as goal, n ->> 'level' as level, n ->> 'state' as state, n ->> 'stage' as stage,
           (n ->> 'from')::int as "from", (n ->> 'to')::int as "to", n ->> 'label' as label, n ->> 'category' as category,
-          n ->> 'note' as note, coalesce(n ->> 'sources', '') as sources, n ->> 'checked' as checked, n ->> 'ref' as ref,
+          n ->> 'note' as note, n ->> 'checked' as checked,
           coalesce((n ->> 'count')::int, 0) as count,
           coalesce((select jsonb_agg(jsonb_build_object('path', x.path, 'date', x.date, 'place', x.place) order by x.date, x.path)
             from (select s.path, e.date_from::text as date,

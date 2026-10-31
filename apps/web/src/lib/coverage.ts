@@ -658,9 +658,7 @@ type Gap = {
   to: number | null;
   label?: string | null;
   note: string;
-  sources?: string;
   checked?: string | null;
-  ref?: string | null;
 };
 
 export function gapSpan(gap: Gap) {
@@ -682,17 +680,4 @@ export function gapNote(gap: Gap) {
   return gap.checked == null
     ? `${grain}: ${gap.note}`
     : m.coverage_gap_note({ grain, reason: gap.note, date: gap.checked });
-}
-
-export function gapTried(gap: Gap) {
-  return [
-    gap.sources == null || gap.sources === ""
-      ? null
-      : gap.checked == null
-        ? m.coverage_gap_tried_undated({ sources: gap.sources })
-        : m.coverage_gap_tried({ sources: gap.sources, date: gap.checked }),
-    gap.ref == null ? null : m.coverage_gap_ref({ ref: gap.ref }),
-  ]
-    .filter((part) => part != null)
-    .join(" ");
 }
