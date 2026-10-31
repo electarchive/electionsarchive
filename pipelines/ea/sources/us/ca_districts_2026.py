@@ -50,6 +50,8 @@ COUNTIES = {
     "06055": "Napa",
     "06095": "Solano",
     "06023": "Humboldt",
+    "06025": "Imperial",
+    "06087": "Santa Cruz",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
@@ -488,6 +490,155 @@ def humboldt() -> list[Row]:
                     }
                     for name in names
                 )
+    return rows
+
+
+IMPERIAL = (
+    "https://elections.imperialcounty.org/wp-content/uploads/2026/08/CandidateStatus_Website-1-17.pdf",
+    "Imperial County Registrar of Voters",
+    "Imperial County Candidate Status, November 3, 2026 General Election (updated 08/20/2026)",
+)
+SANTA_CRUZ = (
+    "https://votescount.santacruzcountyca.gov/Home/Elections/November3,2026CaliforniaGeneralElection/ContactCandidates.aspx",
+    "Santa Cruz County Clerk and Registrar of Voters",
+    "Contact Candidates: contests that will appear on the ballot, November 3, 2026 General Election",
+)
+INBOX_DOCS = {
+    "06025-s": (IMPERIAL, "imperial_0820.pdf", "application/pdf"),
+    "06087-s": (SANTA_CRUZ, "santacruz_contact.html", "text/html"),
+}
+IMPERIAL_HEAD = re.compile(
+    r"^\s*(?P<title>\S.*?)\s+-\s+Elect (?P<seats>\d+)(?:\s*\((?P<partial>Partial Term)\))?(?:\s+-\s+CANDIDATE FILING.*)?\s*$"
+)
+IMPERIAL_SEAT = re.compile(r"^(?P<body>.*?)(?:,|\s-)\s*(?P<kind>District|Division|Trustee Area|Area) (?P<number>\d+)$")
+
+
+def inbox_doc(key: str) -> Path:
+    (url, *_), name, media_type = INBOX_DOCS[key]
+    try:
+        return raw.cached(SOURCE, url).path
+    except LookupError:
+        file = DATA / "inbox" / "y26" / "ca" / name
+        raw.store(
+            SOURCE,
+            url,
+            file.read_bytes(),
+            suffix=file.suffix,
+            retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+            media_type=media_type,
+        )
+        return raw.cached(SOURCE, url).path
+
+
+def imperial() -> list[Row]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(inbox_doc("06025-s")), "-"], capture_output=True, check=True
+    ).stdout.decode()
+    rows: list[Row] = []
+    current: tuple[str, str, str, int, bool] | None = None
+    names: list[str] = []
+    canceled = False
+
+    def flush() -> None:
+        if current is not None:
+            district, role, seat, seats, short = current
+            rows.extend(
+                {
+                    "county": "Imperial",
+                    "district": district,
+                    "seat": seat,
+                    "role": role,
+                    "seats": seats,
+                    "name": name,
+                    "unexpired": short,
+                    "tacit": canceled or len(names) <= seats,
+                    "doc": "06025-s",
+                }
+                for name in names
+            )
+
+    for line in text.splitlines():
+        if line.strip() == "BALLOT MEASURES":
+            break
+        if found := IMPERIAL_HEAD.match(line):
+            flush()
+            names = []
+            canceled = False
+            title = found["title"]
+            split = IMPERIAL_SEAT.match(title)
+            body = split["body"] if split else title
+            short = found["partial"] is not None
+            if usable(body):
+                label = f"{split['kind']} {split['number']}" if split else ""
+                current = (
+                    full_name(body),
+                    "Trustee" if "College" in body else "Director",
+                    label or ("Short Term" if short else ""),
+                    1 if label else int(found["seats"]),
+                    short,
+                )
+            else:
+                current = None
+        elif current is None:
+            continue
+        elif "NO ELECTION" in line:
+            canceled = True
+        elif (
+            line.strip()
+            and len(line) - len(line.lstrip()) < 50
+            and not re.search(r"CANDIDATE|EXTENDED|Imperial County|November 3|Updated|Indicates", line)
+        ):
+            name = re.split(r"\s{2,}", line.strip())[0].rstrip("*").strip()
+            if re.match(r"[A-Z]", name):
+                names.append(name)
+    flush()
+    return rows
+
+
+def santa_cruz() -> list[Row]:
+    markup = inbox_doc("06087-s").read_text(errors="replace")
+    markup = re.sub(r"</(?:tr|h[1-6]|p|div)>", "\n", markup).replace("</td>", " |")
+    text = html.unescape(re.sub(r"<[^>]*>", "", markup))
+    rows: list[Row] = []
+    section = ""
+    current: tuple[str, str, str, int] | None = None
+    cells: list[str] = []
+    for line in (item.strip().replace("\xa0", " ") for item in text.splitlines()):
+        if line in {
+            "Boards of Education & Community Colleges",
+            "School Districts",
+            "Fire Districts",
+            "Water Districts",
+        }:
+            section = line
+            current = None
+        elif head := re.match(r"^(.+?) ?- (?:(\d+) Seats?|(Trustee Area|Division|Area) (\d+))$", line):
+            body = head[1].strip()
+            if section != "School Districts" and usable(body):
+                label = f"{head[3]} {head[4]}" if head[3] else ""
+                current = (full_name(body), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
+                cells = []
+            else:
+                current = None
+        elif current is not None and line.endswith("|"):
+            cells.append(line.removesuffix("|").strip())
+            if len(cells) == 6:
+                if cells[0] != "Candidate Name":
+                    district, role, seat, seats = current
+                    rows.append(
+                        {
+                            "county": "Santa Cruz",
+                            "district": district,
+                            "seat": seat,
+                            "role": role,
+                            "seats": seats,
+                            "name": cells[0],
+                            "unexpired": False,
+                            "tacit": False,
+                            "doc": "06087-s",
+                        }
+                    )
+                cells = []
     return rows
 
 
@@ -1170,6 +1321,8 @@ def parse() -> None:
                 *kings(),
                 *shasta(),
                 *humboldt(),
+                *imperial(),
+                *santa_cruz(),
                 *sutter(),
                 *napa(),
                 *solano(),
@@ -1213,8 +1366,15 @@ def emit() -> Path:
             summary="California special district board races on the November 3, 2026 ballot, with candidates from county registrar candidate lists",
             polity="US-CA",
         )
-        docs = {fips: (*feed(fips), SOURCE if fips in OWN else local_2026.SOURCE) for fips in COUNTIES} | {
-            key: (*value, SOURCE) for key, value in (LIEU | {"06023-s": HUMBOLDT}).items()
+        docs = {
+            fips: (*feed(fips), SOURCE if fips in OWN else local_2026.SOURCE)
+            for fips in COUNTIES
+            if f"{fips}-s" not in INBOX_DOCS
+        } | {
+            key: (*value, SOURCE)
+            for key, value in (
+                LIEU | {"06023-s": HUMBOLDT} | {key: item[0] for key, item in INBOX_DOCS.items()}
+            ).items()
         }
         sources = {}
         for key, (url, *publisher, bucket) in docs.items():
