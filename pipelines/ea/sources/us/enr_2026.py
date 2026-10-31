@@ -312,6 +312,17 @@ def fetch() -> None:
                         print(f"LA: no file for race {race['ID']}")
                     else:
                         store("LA", url, content, ".csv")
+    if not ONLY or "MD" in ONLY:
+        base = f"https://elections.maryland.gov/elections/{DAY.year}/general_results/"
+        for name in (
+            f"gen_detail_results_{DAY.year}_1_1.html",
+            *(f"gen_detail_results_{DAY.year}_4_{n}_District%20{n}.html" for n in range(1, 9)),
+        ):
+            content = get(client, base + name)
+            if content is None or b"Vote for" not in content:
+                print(f"MD: no file {name}")
+            else:
+                store("MD", base + name, content, ".html")
     if not ONLY or "NC" in ONLY:
         url = f"https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{DAY:%Y_%m_%d}/results_pct_{DAY:%Y%m%d}.zip"
         content = get(client, url)
@@ -512,6 +523,47 @@ def rows(state: str, url: str, path: Path):
                 "reporting": reporting or None,
                 "total": total or None,
             }
+        return
+    if state == "MD":
+        text = path.read_text(encoding="utf-8")
+        office = re.search(r"<h2>\s*([^<]*?)\s*</h2>", text)[1]
+        district = re.search(r"<h3>\s*District (\d+)", text)
+        refreshed = re.search(r"Last refreshed: (\S+ \S+ [AP]M)", text)
+        counted = re.search(r"\((\d+) of (\d+) election day precincts reported\)", text)
+        as_of = (
+            datetime.strptime(refreshed[1], "%m/%d/%Y %I:%M:%S %p")
+            .replace(tzinfo=ZoneInfo("America/New_York"))
+            .isoformat()
+            if refreshed
+            else None
+        )
+        for table in re.findall(r"<table.*?</table>", text, re.DOTALL):
+            heads = []
+            for head in re.findall(r"<th[^>]*scope=\"col\"[^>]*>(.*?)</th>", table, re.DOTALL)[1:]:
+                parts = [
+                    part for part in (re.sub(r"<[^>]*>", "", p).strip() for p in re.split(r"<br\s*/?>", head)) if part
+                ]
+                heads.append((parts[0].split(" and ")[0], parts[-1] if len(parts) > 1 else "", "(Write In)" in parts))
+            for county_row in re.findall(r"<tr[^>]*>(.*?)</tr>", table, re.DOTALL):
+                cells = [
+                    re.sub(r"<[^>]*>", "", cell).strip()
+                    for cell in re.findall(r"<td[^>]*>(.*?)</td>", county_row, re.DOTALL)
+                ]
+                if not cells or cells[0].startswith("Total"):
+                    continue
+                for (name, party, write_in), votes in zip(heads, cells[1:]):
+                    yield {
+                        "office": "governor" if office.startswith("Governor") else "house",
+                        "district": district[1] if district else "",
+                        "party": party,
+                        "county": cells[0],
+                        "candidate": name,
+                        "write_in": write_in or name.startswith("Other Write-Ins"),
+                        "votes": int(votes.replace(",", "")) if votes[:1].isdigit() else 0,
+                        "as_of": as_of,
+                        "reporting": int(counted[1]) if counted else None,
+                        "total": int(counted[2]) if counted else None,
+                    }
         return
     if state == "NC":
         totals: dict[tuple[str, str, str, str], int] = {}
