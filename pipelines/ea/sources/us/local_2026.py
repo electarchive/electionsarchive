@@ -5960,6 +5960,13 @@ for key, publisher, title, url, local in (
         "ks/seward.pdf",
     ),
     (
+        "IN-18097-towns",
+        "Marion County Election Board",
+        "2026 General Election Candidates, updated September 21, 2026",
+        "https://www.indy.gov/activity/find-candidate-information",
+        "in/marion_candidates.xlsx",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
