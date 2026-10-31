@@ -734,6 +734,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         [ids],
                     )
             if kind == "polity":
+                conn.execute("delete from public.search_document where polity_id = any(%s::uuid[])", [ids])
                 for owned in ("polity_parent", "polity_territory"):
                     conn.execute(
                         sql.SQL("delete from public.{} where polity_id = any(%s::uuid[])").format(sql.Identifier(owned)),
