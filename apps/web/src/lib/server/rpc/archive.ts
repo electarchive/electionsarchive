@@ -1338,7 +1338,49 @@ export function separate(
     .keys()
     .toArray()
     .toSorted((a, b) => (weight.get(b) ?? 0) - (weight.get(a) ?? 0));
-  const placed: Array<Array<number>> = [];
+  const placed = new Map<number, Array<Array<number>>>();
+  const scale = isHued ? 0.5 : 1;
+  const cell = (at: Array<number>) =>
+    [
+      Math.floor(((at[0] ?? 0) * scale) / 0.125),
+      Math.floor((at[1] ?? 0) / 0.125),
+      Math.floor((at[2] ?? 0) / 0.125),
+    ] as const;
+  const nearest = (
+    at: Array<number>,
+    isEnough: (distance: number) => boolean,
+  ) => {
+    const [x, y, z] = cell(at);
+    let distance = Infinity;
+    for (const dx of [0, -1, 1]) {
+      for (const dy of [0, -1, 1]) {
+        for (const dz of [0, -1, 1]) {
+          for (const other of placed.get(
+            ((x + dx + 64) * 128 + y + dy + 64) * 128 + z + dz + 64,
+          ) ?? []) {
+            distance = Math.min(
+              distance,
+              Math.hypot(
+                ((at[0] ?? 0) - (other[0] ?? 0)) * scale,
+                (at[1] ?? 0) - (other[1] ?? 0),
+                (at[2] ?? 0) - (other[2] ?? 0),
+              ),
+            );
+            if (distance === 0 || isEnough(distance)) {
+              return distance;
+            }
+          }
+        }
+      }
+    }
+    return distance;
+  };
+  const variants = isHued
+    ? VARIANTS.toSorted(
+        (a, c) =>
+          Number(a[1] === 0 && a[0] !== 0) - Number(c[1] === 0 && c[0] !== 0),
+      )
+    : VARIANTS;
   for (const party of order) {
     const hex = colors.get(party) ?? "";
     if (!/^#[\da-f]{6}$/iu.test(hex)) {
@@ -1362,15 +1404,7 @@ export function separate(
     const green = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
     const blue = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
     const hue = Math.atan2(blue, green);
-    const candidates = (
-      isHued
-        ? VARIANTS.toSorted(
-            (a, c) =>
-              Number(a[1] === 0 && a[0] !== 0) -
-              Number(c[1] === 0 && c[0] !== 0),
-          )
-        : VARIANTS
-    )
+    const candidates = variants
       .filter(([step]) => shown + step >= 0.52 && shown + step <= 0.86)
       .map(([step, turn]) => {
         const lightness = shown + step;
@@ -1402,29 +1436,27 @@ export function separate(
           }
           chroma *= 0.9;
         }
-        return {
-          ...fitted,
-          kept: step === 0 && turn === 0,
-          distance: Math.min(
-            ...placed.map((other) =>
-              Math.hypot(
-                ...fitted.at.map(
-                  (value, index) =>
-                    (value - (other[index] ?? 0)) *
-                    (isHued && index === 0 ? 0.5 : 1),
-                ),
-              ),
-            ),
-          ),
-        };
+        return { ...fitted, kept: step === 0 && turn === 0 };
       });
-    const best =
-      candidates.find((candidate) => candidate.distance >= 0.1) ??
-      candidates.toSorted((a, c) => c.distance - a.distance).at(0);
+    let best = candidates.find(
+      (candidate) => nearest(candidate.at, (distance) => distance < 0.1) >= 0.1,
+    );
+    let far = -Infinity;
+    for (const candidate of best == null ? candidates : []) {
+      const distance = nearest(candidate.at, (value) => value <= far);
+      if (distance > far) {
+        far = distance;
+        best = candidate;
+      }
+    }
     if (best == null) {
       continue;
     }
-    placed.push(best.at);
+    const [x, y, z] = cell(best.at);
+    const key = ((x + 64) * 128 + y + 64) * 128 + z + 64;
+    const neighbors = placed.get(key) ?? [];
+    neighbors.push(best.at);
+    placed.set(key, neighbors);
     if (!best.kept) {
       colors.set(
         party,
@@ -2010,6 +2042,8 @@ async function load(
   }));
   const placed = Map.groupBy(picked.rows, (row) => row.area);
   const kinds = new Map(options.rows.map((row) => [row.k, row.kind]));
+  const order = new Map(options.rows.map((row, index) => [row, index]));
+  const byOption = Map.groupBy(options.rows, (row) => row.k);
   const declared = new Set(
     options.rows.filter(
       (row) => row.outcome != null && outcomes.includes(row.contest),
@@ -2047,11 +2081,19 @@ async function load(
             ? valid
             : valid + missing;
     }
+    const listed = new Set(declared);
+    for (const option of area.votes.keys()) {
+      for (const row of byOption.get(option) ?? []) {
+        listed.add(row);
+      }
+    }
     loaded.set(k, {
       side: {
         valid: total,
-        options: options.rows
-          .filter((row) => area.votes.has(row.k) || declared.has(row))
+        options: listed
+          .values()
+          .toArray()
+          .toSorted((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0))
           .map((row): Option => ({
             contest: row.contest,
             kind: row.kind,
