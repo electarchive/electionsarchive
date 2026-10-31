@@ -133,16 +133,9 @@
     tallies?: Array<number | null> | null;
     hexes?: Array<{
       credit: string | null;
-      cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
+      cells: Array<{ k: number; q: number; r: number }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
       labels: Array<{ q: number; r: number; text: string; k?: number }>;
-      cartogram: {
-        credit: string;
-        box: Array<number>;
-        districts: Array<{ k: number; d: string; x: number; y: number }>;
-        states: Array<string>;
-        labels: Array<{ x: number; y: number; text: string }>;
-      } | null;
       isPartial: boolean;
     }> | null;
   } = $props();
@@ -556,7 +549,7 @@
       ? new Map(totals.entries().filter(([, seats]) => seats > 0))
       : null;
   });
-  let layout = $state<"map" | "cartogram" | "hexes">("hexes");
+  let layout = $state<"map" | "hexes">("hexes");
   const hexed = $derived(
     covering(hexes, { has: (k) => rows.has(k), size: places.rows.length }),
   );
@@ -588,12 +581,7 @@
     });
     const cells = hexed.cells.map((cell) => {
       const at = center(cell.q, cell.r);
-      return {
-        k: cell.k,
-        ...at,
-        d: hexagon(at.x, at.y),
-        isApart: cell.isApart,
-      };
+      return { k: cell.k, ...at, d: hexagon(at.x, at.y) };
     });
     const corners = [
       [0, -1],
@@ -647,41 +635,11 @@
       ),
     };
   });
-  const drawn = $derived.by(() => {
-    const cartogram = hexed?.cartogram;
-    if (cartogram == null) {
-      return null;
-    }
-    const cells = cartogram.districts.map((district) => ({
-      ...district,
-      isApart: false,
-    }));
-    const [left = 0, top = 0, right = 0, bottom = 0] = cartogram.box;
-    return {
-      cells,
-      at: new Map(cells.map((cell) => [cell.k, cell])),
-      ...framed(left - 1, top - 1, right + 1, bottom + 1),
-      seam: 0.05,
-      size: 0.9,
-      credit: cartogram.credit,
-      labels: cartogram.labels.map(
-        (label): typeof label & { seats: number | null } => ({
-          ...label,
-          seats: null,
-        }),
-      ),
-      nations: cartogram.states.join(""),
-      regions: "",
-    };
-  });
   const views = $derived([
     "map" as const,
-    ...(drawn == null ? [] : ["cartogram" as const]),
     ...(tiled == null ? [] : ["hexes" as const]),
   ]);
-  const grid = $derived(
-    layout === "cartogram" ? drawn : layout === "hexes" ? tiled : null,
-  );
+  const grid = $derived(layout === "hexes" ? tiled : null);
   const isSummary = $derived(grid != null);
   let zoom = $state({ scale: 1, x: 0, y: 0 });
   let touches: Array<{ id: number; x: number; y: number }> = [];
@@ -2143,9 +2101,7 @@
             }}
             >{choice === "hexes"
               ? m.map_view_hexes()
-              : choice === "cartogram"
-                ? m.map_view_cartogram()
-                : m.map_view_map()}</button
+              : m.map_view_map()}</button
           >
         {/each}
       </div>
@@ -2326,16 +2282,6 @@
                   ?.focus();
               }
             }}
-          />
-        {/each}
-        {#each grid.cells.filter((cell) => cell.isApart) as cell (cell.k)}
-          <path
-            d={cell.d}
-            fill="none"
-            stroke="var(--muted-foreground)"
-            stroke-width="0.08"
-            stroke-dasharray="0.24 0.16"
-            pointer-events="none"
           />
         {/each}
         <path

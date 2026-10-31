@@ -1326,7 +1326,6 @@
   "scope_home": "Everything in {place}",
   "map_view": "Map view",
   "map_view_hexes": "Hexes",
-  "map_view_cartogram": "Cartogram",
   "map_view_map": "Map",
   "map_hex_credit": "Hex layout: {credit}",
   "map_hex_seat": "{name}, won by {winner}",
@@ -1359,7 +1358,6 @@
   "twin_map_levels": "Also mapped by {levels}.",
   "twin_hexes_title": "Hex map",
   "twin_hexes_lede": "This grid is the page's Hexes view, with one cell for each {noun}. Each cell shows the letter of the party or candidate that won it, after the code of its state, province, or department where the layout groups cells that way. A dash marks a cell with no result, such as a state that held no race for this office. The layout leaves out some seats, such as France's overseas and abroad constituencies. Those appear only in the results.",
-  "twin_hexes_cartogram": "The page's Cartogram view draws the {credit}. The JSON twin has its shapes under `hexes.cartogram`, keyed by `k` like the places in the results.",
   "atlas_trail": "Map area",
   "atlas_search": "Search places",
   "atlas_search_empty": "No loaded place matches that name",
@@ -3581,5 +3579,20 @@
         "countPlural=*": "{countText} replies"
       }
     }
-  ]
+  ],
+  "username_nav": "Username",
+  "username_title": "Username",
+  "username_lede": "Claim a username. It will appear on your contributions once they open.",
+  "username_current": "Your username is {handle}. You can change it below.",
+  "username_field": "Username",
+  "username_hint": "3 to 30 characters: lowercase letters, digits, and single hyphens. Start with a letter.",
+  "username_claim": "Claim username",
+  "username_save": "Save username",
+  "username_saved": "Saved.",
+  "username_taken": "That username is taken. Try another.",
+  "username_invalid": "Use 3 to 30 lowercase letters, digits, or single hyphens, starting with a letter and ending with a letter or digit.",
+  "username_signed_out": "Sign in to claim a username.",
+  "agents_lede_read_only": "Agents can read the whole archive through MCP or the REST API, with no key. Proposing changes opens after the preview.",
+  "agents_step_connect_read_only": "Add the MCP server to your agent's configuration. Reading needs no key. Agents without MCP can call the REST API instead.",
+  "agents_tools_note_read_only": "Every tool also has a REST endpoint."
 }
