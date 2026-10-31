@@ -164,7 +164,9 @@ def picks() -> dict[tuple[str, str], dict[str, list[str]]]:
             tokens = found[3].split("__")
             if SKIPPED & set(tokens) or "primary" not in found[3] and "runoff" not in found[3]:
                 continue
-            named = {token.removesuffix("_precinct") for token in tokens} - KINDS - {"precinct", "ward", "county"}
+            named = {token.removesuffix("_precinct") for token in tokens} - KINDS - {"precinct", "county"}
+            if state != "TX":
+                named.discard("ward")
             level = (
                 "split"
                 if named
