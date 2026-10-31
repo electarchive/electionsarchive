@@ -53,6 +53,7 @@ CREDITS = {
     "Пресс-служба Президента Российской Федерации": "Presidential Press and Information Office of Russia",
     "Қазақстан Республикасы Парламентінің Мәжілісі": "Mazhilis of the Parliament of Kazakhstan",
 }
+UNCREDITED = {"Cowboy_Pink_Williams.jpg"}
 BOILERPLATE = [
     r"Transferred from \S+ to Commons[^.]*\.",
     r"This image is available from .*",
@@ -165,7 +166,9 @@ def _infos(files: dict[str, str]) -> dict[str, dict[str, str]]:
                 "page": info["descriptionurl"],
                 "code": meta.get("License", "").lower(),
                 "license": _text(meta.get("LicenseShortName", "")),
-                "artist": _credit(meta.get("Artist", "")) or _credit(meta.get("Credit", "")),
+                "artist": "Unknown author"
+                if title.replace(" ", "_") in UNCREDITED
+                else _credit(meta.get("Artist", "")) or _credit(meta.get("Credit", "")),
                 "taken": meta.get("DateTimeOriginal", ""),
                 "uploaded": info.get("timestamp", ""),
             }

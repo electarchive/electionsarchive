@@ -29,8 +29,8 @@ EVENTS = ("caucuses", "caucus", "primary", "primaries", "convention")
 TEMPLATE = r"\{\{\s*(\d{4} ?[A-Z]{2} ?[A-Za-z]+)\s*\}\}"
 NOTE = (
     "Statewide results of presidential caucuses and party-run primaries as transcribed in the English Wikipedia's "
-    "article on each event, or in its state section of the party's results article, which cite the state parties, "
-    "news tallies, and The Green Papers."
+    "article on each event, or in its state section of the party's results article, which cite the state parties "
+    "and news tallies."
 )
 METHOD = (
     "Statewide totals from the results table in the English Wikipedia's {article}, as fetched in October 2026. "
@@ -45,6 +45,7 @@ ALIASES = {
     "Pat Buchanan": "Patrick Buchanan",
 }
 MONTHS = r"(?:January|February|March|April|May|June|July|August)"
+OFFICIAL = r"^https?://(?:[\w-]+\.)*(?:[\w-]+\.(?:gov|us)|[\w-]*(?:democrat|republican|gop)[\w-]*\.\w+|demnpl\.com|ksdp\.org|ceepur\.org)(?:[:/]|$)"
 
 
 def targets() -> list[tuple[int, str, str, str]]:
@@ -583,7 +584,7 @@ def emit() -> Path:
                 completeness=0 if measure is None else 1 if total is None else min(1, round(counted / total, 4)),
             )
             article = lines["article"][0]
-            cited = lines["cited"][0]
+            cited = lines["cited"][0] if lines["cited"][0] and re.match(OFFICIAL, lines["cited"][0]) else None
             cs.add(
                 "note",
                 entity_id=result_set,
