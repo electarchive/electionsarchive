@@ -67,9 +67,9 @@ def emit(
         made: dict[str, tuple[UUID, UUID, str, str, str]] = {}
         elections: set[UUID] = set()
         kept = 0
-        keys = ["district", "seat", "remainder", "role", "url"]
+        keys = ["district", "seat", "remainder", "role"]
         for group_key, people in frame.group_by(keys, maintain_order=True):
-            district, seat, remainder, word, _ = group_key
+            district, seat, remainder, word = group_key
             first = people.row(0, named=True)
             if district not in made:
                 twin = existing.get(govmint.fold(district))
@@ -139,7 +139,7 @@ def emit(
                 magnitude=first["vote"],
                 round_number=1,
                 electoral_system_id=system,
-                default_result_kind="counted",
+                default_result_kind="tacit" if first.get("tacit") else "counted",
                 term="remainder" if remainder else "full",
             )
             cs.add(
@@ -152,10 +152,11 @@ def emit(
             )
             if contest in cs.minted:
                 cs.add("slug", path=contest_path, entity_id=contest)
-            source = source_ids[first["url"]]
-            cs.add("citation", entity_id=contest, source_id=source, locator=None)
+            for url in people["url"].unique(maintain_order=True):
+                cs.add("citation", entity_id=contest, source_id=source_ids[url], locator=None)
             for person_row in people.iter_rows(named=True):
                 ballot = person_row["name"]
+                source = source_ids[person_row["url"]]
                 who = slug(ballot)
                 person = cs.key(f"{source_id}.person", f"{contest_key}:{who}")
                 option = cs.key("us.option", f"{contest_key}:{who}")

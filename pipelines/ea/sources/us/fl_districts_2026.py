@@ -132,6 +132,54 @@ SOURCES = {
         "fl-2026-general-volusia-voterfocus-candidates.html",
         "Volusia",
     ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=stlucie": (
+        "St. Lucie County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-stlucie-voterfocus-candidates.html",
+        "St. Lucie",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=clay": (
+        "Clay County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-clay-voterfocus-candidates.html",
+        "Clay",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=sumter": (
+        "Sumter County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-sumter-voterfocus-candidates.html",
+        "Sumter",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=flagler": (
+        "Flagler County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-flagler-voterfocus-candidates.html",
+        "Flagler",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=charlotte": (
+        "Charlotte County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-charlotte-voterfocus-candidates.html",
+        "Charlotte",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=hernando": (
+        "Hernando County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-hernando-voterfocus-candidates.html",
+        "Hernando",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=leon": (
+        "Leon County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-leon-voterfocus-candidates.html",
+        "Leon",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=bay": (
+        "Bay County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-bay-voterfocus-candidates.html",
+        "Bay",
+    ),
     "https://irp.cdn-website.com/ed388134/files/uploaded/2026_QUALIFIED_Candidates+08-18-26.pdf": (
         "St. Johns County Supervisor of Elections",
         "2026 Qualified Candidates, St. Johns County (8/18/2026)",
@@ -215,7 +263,7 @@ def brevard(url: str) -> list[dict[str, str | int | None]]:
             status = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", status)).split())
             if name != "Candidate" and "Qualified" in status and not OUT.search(status):
                 people.append(name)
-        if len(people) < 2 and not (vote and people):
+        if not people:
             continue
         for name in people:
             rows.append(
@@ -239,7 +287,7 @@ def pasco(url: str) -> list[dict[str, str | int | None]]:
         found = re.match(r"^\s*([A-Z]{3})\s+(\S.*?, .*?)\s{2,}(\S+)\s{2,}(\S.*)$", line)
         if found:
             entry = {"name": flip(found[2]), "status": found[4].strip(), "seat": ""}
-            if entry["status"].startswith("Qualified") and district:
+            if entry["status"].startswith(("Qualified", "Unopposed", "Elected")) and district:
                 rows.append({"district": district, "seat": "", "vote": 1, "name": entry["name"], "url": url})
                 entry["row"] = "1"
             continue
@@ -270,7 +318,23 @@ def clean_district(text: str) -> str:
     return " ".join(cdd(text).split())
 
 
-VOTERFOCUS = re.compile(r"(?i)\bCDD\b|community development|soil (?:and|&) water|improvement dist|fire|port of")
+VOTERFOCUS = re.compile(r"(?i)\bV?CDD\b|community development|soil (?:and|&) water|improvement dist|fire|port of")
+
+
+def split_office(office: str) -> tuple[str, str]:
+    text = re.sub(r"(?i)^Office:\s*", "", html.unescape(office).strip())
+    text = re.sub(r"(?i)\s*-\s*gen(?:eral|\.)? election only", "", text)
+    text = re.sub(r"(?i)^Supervisor,\s*", "", text)
+    text = re.sub(r"(?i)^CDD,\s*(.*?),\s*(?=(?:Seat|Group|Grp)\b)", r"\1 CDD, ", text)
+    text = re.sub(r"(?i)\bVCDD\s*#?\s*(\d+)", r"Village Community Development District No. \1", text)
+    text = re.sub(r"(?i)\bVILLAGES CDD\s*#\s*(\d+)", r"Village Community Development District No. \1", text)
+    text = re.sub(r"(?i)\s*-?\s*Board of Supervisors?\b", "", text)
+    text = re.sub(r"(?i)\bCDD\s+Supervisor\b", "CDD", text)
+    text = re.sub(r"(?i)^CDD\s*-\s*(.*?)\s*-\s*(?=Seat)", r"\1 CDD, ", text)
+    found = re.match(r"(?i)(.*?)(?:[ ,]+(?:Seat|Dist\.?|District|Group|Grp)\.?\s*|\s+-\s*|\s+)(\d+)\s*$", text)
+    if found is None:
+        return clean_district(text), ""
+    return clean_district(re.sub(r"[ ,-]+$", "", found[1])), f"Seat {found[2]}"
 
 
 def voterfocus(url: str, county: str) -> list[dict[str, str | int | None]]:
@@ -286,15 +350,14 @@ def voterfocus(url: str, county: str) -> list[dict[str, str | int | None]]:
             if name is None or status is None:
                 continue
             status_text = " ".join(html.unescape(re.sub(r"<[^>]+>", "", status[1])).split())
-            if re.search(r"-(?:Qualified|Runoff|Elected|Advanced)\)$", status_text):
+            if re.search(r"-\s*(?:Qualified|Runoff|Elected|Advanced|Unopposed)\s*\)$", status_text):
                 person = re.sub(r"\s*\([A-Z]{2,3}\)$", "", " ".join(html.unescape(name[1]).split()))
                 groups.setdefault(office, []).append(person)
     rows = []
     for office, people in groups.items():
-        if len(people) < 2:
+        if not people:
             continue
-        found = re.match(r"(?i)(.*?)(?:[ ,]+(?:Seat|Dist\.?|District|Group)\s*|\s+-\s*)(\d+)\s*$", office)
-        district, seat = (clean_district(found[1]), f"Seat {found[2]}") if found else (clean_district(office), "")
+        district, seat = split_office(office)
         district = re.sub(r"(?i)\s*-?\s*district\s*-?$", "", district) if "Soil and Water" in district else district
         district = re.sub(r"(?i)\s+dist$", " District", district)
         if district.endswith("Soil and Water Conservation"):
@@ -318,7 +381,7 @@ def lee(url: str) -> list[dict[str, str | int | None]]:
         if found is None or not re.search(r"(?i)community development|fire|erosion|mosquito|library", header):
             continue
         people = re.findall(r'<tr class="Status-Q">.*?<h4>(.*?)</h4>', part, re.DOTALL)
-        if len(people) < 2:
+        if not people:
             continue
         title = found[1].title().replace("Cc", "CC").replace("Iona-Mcgregor", "Iona-McGregor")
         if header.startswith("Community"):
@@ -387,6 +450,7 @@ def emit() -> Path:
             roles.append("Commissioner")
     frame = frame.with_columns(
         remainder=pl.lit(False),
+        tacit=pl.len().over("district", "seat") <= pl.col("vote"),
         role=pl.Series(roles),
         function=pl.Series(
             [next((value for pattern, value in FUNCTIONS if re.search(pattern, d)), None) for d in frame["district"]]
@@ -396,7 +460,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="FL",
-        summary="Florida community development, water control, drainage, improvement, and recreation district board races on the November 3, 2026 ballot, with candidates from the Broward, Brevard, Pasco, Duval, Hillsborough, Lee, Miami-Dade, Orange, Palm Beach, Pinellas, Polk, Osceola, Collier, Escambia, Lake, Manatee, Marion, Sarasota, Volusia, and St. Johns County election offices",
+        summary="Florida community development, water control, drainage, improvement, and recreation district board races on the November 3, 2026 ballot, with candidates from the Broward, Brevard, Pasco, Duval, Hillsborough, Lee, Miami-Dade, Orange, Palm Beach, Pinellas, Polk, Osceola, Collier, Escambia, Lake, Manatee, Marion, Sarasota, Volusia, St. Lucie, Clay, Sumter, Flagler, Charlotte, Hernando, Leon, Bay, and St. Johns County election offices",
         sources={url: (publisher, title) for url, (publisher, title, _, _) in SOURCES.items()},
         frame=frame,
     )
