@@ -87,10 +87,7 @@ TITLES = {
     2024: (medsl_state.TITLE, "DODOBJ"),
 }
 GUESTBOOK = {
-    "name": "",
-    "email": "",
-    "institution": "",
-    "position": "",
+    field: os.environ.get(f"EA_CONTACT_{field.upper()}", "") for field in ("name", "email", "institution", "position")
 }
 SWAPPED = {
     ("04025", "JAY MARCIA"): "MARCIA SMITH",
