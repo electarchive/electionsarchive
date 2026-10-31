@@ -47,6 +47,27 @@
           (a.first ?? NOW) - (b.first ?? NOW) || a.name.localeCompare(b.name),
       ),
   );
+  const jsonLd = $derived({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${page.url.origin}/#organization`,
+        name: m.wordmark(),
+        url: `${page.url.origin}/`,
+        logo: `${page.url.origin}/apple-touch-icon.png`,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${page.url.origin}/#website`,
+        name: m.wordmark(),
+        url: `${page.url.origin}/`,
+        description: m.home_meta_description(),
+        inLanguage: "en-US",
+        publisher: { "@id": `${page.url.origin}/#organization` },
+      },
+    ],
+  });
   const byId = $derived(new Map(listed.map((polity) => [polity.id, polity])));
   const depth = $derived.by(() => {
     const firsts = data.atlas.shapes.flatMap((shape) => {
@@ -192,11 +213,31 @@
 {/snippet}
 
 <svelte:head>
+  <title>{m.home_meta_title()}</title>
+  <meta name="description" content={m.home_meta_description()} />
+  <meta
+    name="robots"
+    content="index, follow, max-image-preview:large, max-snippet:-1"
+  />
   <link rel="canonical" href="{page.url.origin}/" />
   <meta property="og:type" content="website" />
+  <meta property="og:site_name" content={m.wordmark()} />
   <meta property="og:title" content={m.wordmark()} />
-  <meta property="og:image" content="{page.url.origin}/og/index.png" />
+  <meta property="og:description" content={m.home_meta_description()} />
+  <meta property="og:url" content="{page.url.origin}/" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content="{page.url.origin}/og.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="2400" />
+  <meta property="og:image:height" content="1260" />
+  <meta property="og:image:alt" content={m.home_og_alt()} />
+  <meta property="og:video" content="{page.url.origin}/og.mp4" />
+  <meta property="og:video:secure_url" content="{page.url.origin}/og.mp4" />
+  <meta property="og:video:type" content="video/mp4" />
+  <meta property="og:video:width" content="1920" />
+  <meta property="og:video:height" content="1008" />
   <meta name="twitter:card" content="summary_large_image" />
+  {@html `<script type="application/ld+json">${JSON.stringify(jsonLd).replaceAll("<", "\\u003c")}</script>`}
 </svelte:head>
 
 <main class="pbe-16">

@@ -147,10 +147,12 @@
 
 <svelte:head>
   <title>electionsarchive.com</title>
-  <meta
-    name="description"
-    content="Every election in ten polities, down to the finest reporting unit, with a source for every number."
-  />
+  {#if page.route.id !== "/" && page.route.id !== "/[...path]"}
+    <meta
+      name="description"
+      content="Every election in ten polities, down to the finest reporting unit, with a source for every number."
+    />
+  {/if}
   {#if embed != null}
     <base target="_blank" />
     <meta name="robots" content="noindex" />

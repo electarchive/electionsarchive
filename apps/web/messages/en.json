@@ -3613,5 +3613,8 @@
   "username_signed_out": "Sign in to claim a username.",
   "agents_lede_read_only": "Agents can read the whole archive through MCP or the REST API, with no key. Proposing changes opens after the preview.",
   "agents_step_connect_read_only": "Add the MCP server to your agent's configuration. Reading needs no key. Agents without MCP can call the REST API instead.",
-  "agents_tools_note_read_only": "Every tool also has a REST endpoint."
+  "agents_tools_note_read_only": "Every tool also has a REST endpoint.",
+  "home_meta_title": "Elections Archive: Every election in the world, down to the ballot box",
+  "home_meta_description": "A free, open archive of election results, from national totals to single precincts, reaching back to 1787.",
+  "home_og_alt": "Elections Archive: Every election in the world, down to the ballot box. Result sheets on a yellow desk show the 2008 US presidential election, the 2024 UK general election, the 2013 German federal election, the June 2019 İstanbul mayoral election, and the 2025 New York City Democratic mayoral primary, mapped by election district."
 }
