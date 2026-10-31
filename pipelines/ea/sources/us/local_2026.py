@@ -9430,32 +9430,33 @@ def parse() -> None:
             )
         cousubs: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for geoid, full in (
-            cousubs_all.filter((pl.col("USPS") == "KS") & (pl.col("FUNCSTAT") == "A"))
+            cousubs_all.filter(pl.col("USPS").is_in(["KS", "NE"]) & (pl.col("FUNCSTAT") == "A"))
             .select("GEOID", "NAME")
             .iter_rows()
         ):
-            cousubs[(geoid[:5], coverage_tables.tokens(re.sub(r" township$", "", full)))].append((geoid, full))
+            cousubs[(geoid[:5], coverage_tables.tokens(re.sub(r"(?i) township$", "", full)))].append((geoid, full))
         counties_ks = {
             code: re.sub(r" County$", "", text.rsplit(",", 1)[0])
             for code, text in conn.execute(
                 """select u.code, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'official' and n.is_preferred
-                   where u.scheme_code = 'us.county' and u.code like '20%%'"""
+                   where u.scheme_code = 'us.county' and (u.code like '20%%' or u.code like '31%%')"""
             ).fetchall()
         }
-        for county_code, label in conn.execute(
-            """select g.county, g.name from coverage_government g
-               where g.kind = 'township' and g.polity_id is null and g.state = 'KS' and g.county is not null"""
+        for state_code, county_code, label in conn.execute(
+            """select g.state, g.county, g.name from coverage_government g
+               where g.kind = 'township' and g.polity_id is null and g.state in ('KS', 'NE') and g.county is not null"""
         ).fetchall():
             hits = cousubs.get((county_code, coverage_tables.tokens(re.sub(r" Township$", "", label))), [])
             if len(hits) == 1 and county_code in counties_ks:
                 geoid, full = hits[0]
-                unowned["KS"].append(
+                unowned[state_code].append(
                     (
                         county_code,
                         full,
                         f"town:{geoid}",
-                        owned.get(f"town:{geoid}") or f"us/ks/{slug(full)}-{slug(counties_ks[county_code])}-county",
+                        owned.get(f"town:{geoid}")
+                        or f"us/{state_code.lower()}/{slug(full)}-{slug(counties_ks[county_code])}-county",
                         "township",
                     )
                 )
@@ -9752,8 +9753,8 @@ def parse() -> None:
                             if rest[0] == "school" and state == "NJ"
                             else []
                         )
-                    ]
                         + (ca_school_variants(rest[1]) if rest[0] == "school" and state == "CA" else [])
+                    ]
                 ):
                     for start in (
                         ([], *([word, "of"] for word in ("city", "village", "town", "township", "borough")))
@@ -9883,6 +9884,7 @@ def parse() -> None:
                                     ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
                                     (r"\btrustees?\b", "board-of-trustees"),
+                                    *(((r"^board$", "board"),) if state == "NE" else ()),
                                 )
                                 if re.search(pattern, post)
                                 and (
@@ -9955,6 +9957,7 @@ def parse() -> None:
                                 "council": "Council",
                                 "commission": "Commission",
                                 "board-of-trustees": "Board of Trustees",
+                                "board": "Township Board",
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
