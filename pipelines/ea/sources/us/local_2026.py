@@ -9691,7 +9691,12 @@ def parse() -> None:
                         tokens = [*tokens[len(formal) :], "schools"]
                 fits = []
                 for stem, sort, label, owner, path in (
-                    [town for pool in towns.values() for town in pool]
+                    [
+                        town
+                        for county_code, pool in towns.items()
+                        for town in pool
+                        if state != "IN" or not row["fips"] or county_code == str(row["fips"]) or town[1] == "school"
+                    ]
                     if state in ("OR", "IN")
                     else [
                         town
@@ -9749,7 +9754,7 @@ def parse() -> None:
                                 and (
                                     sort
                                     and said != sort
-                                    and (said, sort) != ("town", "township")
+                                    and ((said, sort) != ("town", "township") or state == "IN")
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
