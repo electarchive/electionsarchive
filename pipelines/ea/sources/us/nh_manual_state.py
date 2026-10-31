@@ -4,9 +4,11 @@ import json
 import os
 import re
 import subprocess
+from datetime import date
 
 import polars as pl
 
+from ea.changeset import slug
 from ea.sources.us import nh_manual
 from ea.sources.us.nh_sos_county import COLUMNS
 from ea.store import DATA
@@ -225,6 +227,23 @@ def seen() -> tuple[dict[int, int], dict[str, int | None]]:
 
 
 SUPERSEDES = ("us.wikipedia_gov_history", "us.klarner")
+COUNCIL_PLANS = {
+    1970: (None, date(1982, 1, 1), "used in the 1970-1980 elections"),
+    1982: (date(1982, 1, 1), date(1992, 1, 1), "1981 plan"),
+    1992: (date(1992, 1, 1), None, "1992 plan"),
+}
+COUNCIL_FIXES = {
+    "Earl A. Rinker III. Auburn": "Earl A. Rinker III",
+    "Earl A. Rinker HI": "Earl A. Rinker III",
+    "Earl A. Rmker IH": "Earl A. Rinker III",
+    "Raymond S, Burton": "Raymond S. Burton",
+    "Lou D'AUesandro": "Lou D'Allesandro",
+    "Lou DAllesandro": "Lou D'Allesandro",
+    "M. Edna Lamoniagne": "M. Edna Lamontagne",
+    "Albert E. PaqueLte": "Albert E. Paquette",
+    "Jean R.Wallin": "Jean R. Wallin",
+}
+PARTY_KEYS = {"r": "republican-party", "d": "democratic-party"}
 TOWN = re.compile(r"(.+[a-z])[.,]\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
 
 
@@ -314,6 +333,8 @@ def suffix(office: str, district: str | None, stage: str, side: str | None) -> s
         return f"house:{district}" if stage == "general" else f"house:{district}:{party}"
     if office == "state senate" and district:
         return f"senate:{district}:g" if stage == "general" else f"senate:{district}:{side}p"
+    if office == "executive council" and district:
+        return f"executive-council:{district}" if stage == "general" else f"executive-council:{district}:{party}"
     return None
 
 
@@ -325,6 +346,11 @@ def named(office: str, district: str | None, year: int, side: str) -> tuple[str,
             f"{year} New Hampshire Senate {party} primary, District {district}",
             f"state-senate-{district}-{lower}-primary",
         )
+    if office == "executive council":
+        return (
+            f"{year} New Hampshire Executive Council {party} primary, District {district}",
+            f"executive-council-{district}-{lower}-primary",
+        )
     if office == "us house":
         ordinal = {"1": "1st", "2": "2nd"}[str(district)]
         return (
@@ -334,9 +360,211 @@ def named(office: str, district: str | None, year: int, side: str) -> tuple[str,
     return f"{year} U.S. Senate {party} primary in New Hampshire", f"senate-{lower}"
 
 
+class Council:
+    def __init__(self, cs, conn, contests, primaries, manual, located, report) -> None:
+        self.cs, self.conn, self.contests, self.primaries = cs, conn, contests, primaries
+        self.manual, self.located, self.report = manual, located, report
+        self.body = cs.key("us.body", "NH:executive-council")
+        cs.add("body", id=self.body, polity_id=cs.polity("US-NH"), kind="council")
+        self.name(self.body, "New Hampshire Executive Council")
+        self.system = cs.key("us.electoral_system", "fptp")
+        self.state = cs.area("us.state", "33")
+        self.areas: dict[tuple[int, str], tuple[object, object]] = {}
+        self.people: dict[tuple[str, str], object] = {}
+        self.known: dict[str, set[object]] = {}
+        for label, person in conn.execute(
+            """select distinct c.ballot_name, c.person_id from candidacy c
+               join contest_option o on o.id = c.option_id
+               join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
+               where x.value ~ '^(19[6-9]\\d|20[01]\\d)-\\d\\d-\\d\\d:NH:' and c.person_id is not null"""
+        ).fetchall():
+            self.known.setdefault(label, set()).add(person)
+
+    def name(self, entity: object, text: str) -> None:
+        if entity in self.cs.minted:
+            self.cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+    def district(self, year: int, number: str) -> tuple[object, object]:
+        plan = max(start for start in COUNCIL_PLANS if start <= year)
+        if (plan, number) not in self.areas:
+            cs = self.cs
+            valid_from, valid_to, label = COUNCIL_PLANS[plan]
+            code = f"33:executive-council:{number}:{plan}"
+            area = cs.area("us.local_district", code)
+            unit = cs.unit("us.local_district", code)
+            cs.add("area", id=area, scheme_code="us.local_district")
+            cs.add("area_code", area_id=area, code=code, valid_from=valid_from, valid_to=valid_to)
+            cs.add("area_parent", area_id=area, parent_id=self.state, valid_from=valid_from, valid_to=valid_to)
+            self.name(area, f"New Hampshire Executive Council District {number} ({label})")
+            if valid_from is None:
+                cs.add(
+                    "note",
+                    entity_id=area,
+                    kind="methodology",
+                    body_md="The Manual for the General Court dates the council districts used from 1982 to a 1981 plan; this area stands for the district as used in the 1970 through 1980 elections, without checking whether it was redrawn within that decade.",
+                )
+            cs.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=cs.polity("US-NH"),
+                scheme_code="us.local_district",
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=valid_from,
+                valid_to=valid_to,
+            )
+            self.areas[(plan, number)] = (area, unit)
+        return self.areas[(plan, number)]
+
+    def person(self, label: str) -> object:
+        key = nh_manual.person(label)
+        if key not in self.people:
+            hits = self.known.get(label, set())
+            if len(hits) == 1:
+                self.people[key] = next(iter(hits))
+            else:
+                person = self.cs.key(f"{SOURCE}.person", f"executive-council:{key[0]}:{key[1]}")
+                if person in self.cs.minted:
+                    self.cs.add("person", id=person)
+                self.name(person, label)
+                self.people[key] = person
+        return self.people[key]
+
+    def election(self, value: str) -> object | None:
+        found = self.conn.execute(
+            "select entity_id from external_id where scheme = 'us.election' and value = %s", [value]
+        ).fetchone()
+        return found[0] if found else None
+
+    def load(self, year: int, stage: str, number: str, side: str | None, rows: pl.DataFrame, tag: str) -> None:
+        cs, report = self.cs, self.report
+        printed = set(rows["printed"].drop_nulls().to_list())
+        checked = (
+            (rows["agrees"].is_not_null().all() or rows["reads_agree"].all())
+            and rows["agrees"].drop_nulls().all()
+            or int(rows["votes"].sum()) in printed
+        )
+        if not checked:
+            report.setdefault("executive council: lines do not add to a printed total", []).append(tag)
+            return
+        if stage == "general":
+            governor = self.contests.get((year, "general", "governor"))
+            day = governor[0][:10] if governor else None
+            election = self.election(f"{day}:NH") if day else None
+        else:
+            day = self.primaries.get(year)
+            election = self.election(f"{day}:NH:primary") if day else None
+        if election is None:
+            report.setdefault("executive council: no election", []).append(tag)
+            return
+        labels = []
+        for name, town in rows.select("name", "town").iter_rows():
+            name = COUNCIL_FIXES.get(name, name)
+            name = COUNCIL_FIXES.get(split(name, town)[0], split(name, town)[0])
+            labels.append(None if re.fullmatch(r"(?i)scatter\w*|write-?ins?", name) else name)
+        bad = [
+            label
+            for label in labels
+            if label and (not nh_manual.CLEAN.fullmatch(label) or len(nh_manual.person(label)[0]) < 3)
+        ]
+        if bad:
+            report.setdefault("executive council: not a clean name", []).append(f"{tag}: {bad}")
+            return
+        rows = rows.with_columns(label=pl.Series(labels, dtype=pl.String))
+        external = f"{day}:NH:{suffix('executive council', number, stage, side)}"
+        contest = cs.key("us.contest", external)
+        if contest not in cs.minted:
+            default = self.conn.execute(
+                """select c.pipeline from result_set rs join changeset c on c.id = rs.changeset_id
+                   where rs.contest_id = %s and rs.is_default and rs.status = 'active'""",
+                [contest],
+            ).fetchone()
+            if default and default[0] != SOURCE:
+                report.setdefault(f"executive council: kept {default[0]}", []).append(tag)
+                return
+        area, unit = self.district(year, number)
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=self.body,
+            district_area_id=area,
+            magnitude=1,
+            term="full",
+            round_number=1,
+            electoral_system_id=self.system,
+            party_scope_id=cs.key("us.party", PARTY_KEYS[str(side)]) if stage == "primary" else None,
+            default_result_kind="counted",
+        )
+        if stage == "general":
+            text, path = (
+                f"{year} New Hampshire Executive Council election, District {number}",
+                f"executive-council-{number}",
+            )
+        else:
+            text, path = named("executive council", number, year, str(side))
+        self.name(contest, text)
+        cs.add("slug", path=f"us/nh/{day}-{stage}/{path}", entity_id=contest)
+        options: dict[str | None, object] = {}
+        tally = []
+        for position, (label, block) in enumerate(rows.group_by("label", maintain_order=True), 1):
+            label = label[0]
+            if label is None:
+                option = cs.key("us.option", f"{external}:others")
+                cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
+            else:
+                parties = set(block["party"].drop_nulls().to_list())
+                party = PARTY_KEYS.get(next(iter(parties))) if stage == "general" and len(parties) == 1 else None
+                option = cs.key("us.option", f"{external}:{slug(label)}")
+                cs.add(
+                    "contest_option",
+                    id=option,
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=cs.key("us.party", party) if party else None,
+                    ballot_position=position,
+                    ballot_label=label,
+                )
+                cs.add(
+                    "candidacy",
+                    id=cs.key("us.candidacy", f"{external}:{slug(label)}:head"),
+                    person_id=self.person(label),
+                    option_id=option,
+                    role="head",
+                    ballot_name=label,
+                    is_independent=stage == "general" and parties <= {"i", "ind"} and bool(parties),
+                )
+                tally.append((int(block["votes"].sum()), option))
+            options[label] = option
+        source = self.manual(year)[0]
+        result_set = cs.key(f"{SOURCE}.result_set", external)
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="certified",
+            kind="counted",
+            status="active",
+            source_id=source,
+            is_default=True,
+            completeness=1,
+        )
+        cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
+        ranked = sorted(tally, key=lambda entry: -entry[0])
+        if ranked and ranked[0][0] > 0 and (len(ranked) == 1 or ranked[0][0] > ranked[1][0]):
+            cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="won", seats=None)
+        for (label,), block in rows.group_by("label", maintain_order=True):
+            self.located(year, result_set, unit, options[label], int(block["votes"].sum()), block)
+        report.setdefault("executive council: loaded", []).append(tag)
+
+
 def emit():
     from ea import raw
-    from ea.changeset import Changeset, slug
+    from ea.changeset import Changeset
     from ea.store import connect
 
     lines = arbitrated(indexed())
@@ -360,7 +588,7 @@ def emit():
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Hampshire's governor, U.S. Senate, U.S. House, and State Senate returns, primaries and generals, 1970-2014, read from the statewide summaries in the Secretary of State's Manual for the General Court",
+            summary="New Hampshire's governor, U.S. Senate, U.S. House, State Senate, and Executive Council returns, primaries and generals, 1970-2014, read from the statewide summaries in the Secretary of State's Manual for the General Court",
             polity="US-NH",
         )
         contests: dict[tuple[int, str, str], tuple[str, object]] = {}
@@ -375,9 +603,76 @@ def emit():
         pages: dict[tuple[int, int], object] = {}
         report: dict[str, list[str]] = {}
         values = []
+
+        def manual(year: int) -> tuple[object, object, object, str]:
+            if year not in sources:
+                path = nh_manual.pdf(year)
+                artifact = None
+                for kind in ("_bw", "") if year != 2008 else ("",):
+                    try:
+                        artifact = raw.cached(nh_manual.SOURCE, nh_manual.link(year, kind))
+                        break
+                    except LookupError:
+                        continue
+                assert artifact is not None
+                title = f"Manual for the General Court, {year + 1}"
+                source = cs.source(nh_manual.PUBLISHER, title)
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=nh_manual.PUBLISHER,
+                    title=title,
+                    url="https://scholars.unh.edu/court/61/"
+                    if year == 2008
+                    else f"https://archive.org/details/{nh_manual.ITEMS[year]}",
+                    license="Public domain",
+                )
+                sources[year] = (source, cs.artifact(artifact, source), path, artifact.sha256)
+            return sources[year]
+
+        def located(year: int, result_set: object, unit: object, option: object, votes: int, mine: pl.DataFrame):
+            _, artifact_id, path, sha = manual(year)
+            first_page = int(mine["page"][0])
+            mine = mine.filter(pl.col("page") == first_page)
+            if (year, first_page) not in pages:
+                image, width, height = nh_manual.render(path, sha, first_page)
+                page = cs.page(artifact_id, first_page)
+                pages[(year, first_page)] = page
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=artifact_id,
+                    page_number=first_page,
+                    image_key=f"pages/{nh_manual.SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+            values.append(
+                {
+                    "result_set_id": str(result_set),
+                    "unit_id": str(unit),
+                    "option_id": str(option),
+                    "channel": 0,
+                    "measure": 1,
+                    "count_round": 0,
+                    "flags": nh_manual.DIGITIZED | (nh_manual.DERIVED if mine.height > 1 else 0),
+                    "value": votes,
+                    "page_id": str(pages[(year, first_page)]),
+                    "x0": float(mine["x0"].min()),
+                    "y0": float(mine["y0"].min()),
+                    "x1": float(mine["x1"].max()),
+                    "y1": float(mine["y1"].max()),
+                }
+            )
+
+        council = Council(cs, conn, contests, primaries, manual, located, report)
         keyed = lines.group_by("year", "stage", "office", "district", "side", maintain_order=True)
         for (year, stage, office, district, side), rows in keyed:
             tag = f"{year} {stage} {office} {district or ''} {side or ''}".strip()
+            if office == "executive council":
+                council.load(int(year), str(stage), str(district), side, rows, tag)
+                continue
             wanted = suffix(str(office), district, str(stage), side)
             found = contests.get((int(year), str(stage), wanted or ""))
             template = None
@@ -619,31 +914,7 @@ def emit():
                 )
                 if template is None:
                     report.setdefault("option added from the manual", []).append(f"{tag} {name}")
-            if int(year) not in sources:
-                path = nh_manual.pdf(int(year))
-                artifact = None
-                for kind in ("_bw", "") if year != 2008 else ("",):
-                    try:
-                        artifact = raw.cached(nh_manual.SOURCE, nh_manual.link(int(year), kind))
-                        break
-                    except LookupError:
-                        continue
-                assert artifact is not None
-                title = f"Manual for the General Court, {int(year) + 1}"
-                source = cs.source(nh_manual.PUBLISHER, title)
-                cs.add(
-                    "source",
-                    id=source,
-                    kind="official_body",
-                    publisher=nh_manual.PUBLISHER,
-                    title=title,
-                    url="https://scholars.unh.edu/court/61/"
-                    if year == 2008
-                    else f"https://archive.org/details/{nh_manual.ITEMS[int(year)]}",
-                    license="Public domain",
-                )
-                sources[int(year)] = (source, cs.artifact(artifact, source), path, artifact.sha256)
-            source, artifact_id, path, sha = sources[int(year)]
+            source = manual(int(year))[0]
             result_set = cs.key(f"{SOURCE}.result_set", external)
             if default is not None and not own:
                 old = dict(
@@ -681,38 +952,7 @@ def emit():
                 cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="won", seats=None)
             for option, votes in ours.items():
                 mine = rows.filter(pl.col("name").is_in([name for name, hit in matched.items() if hit == option]))
-                first_page = int(mine["page"][0])
-                mine = mine.filter(pl.col("page") == first_page)
-                if (int(year), first_page) not in pages:
-                    image, width, height = nh_manual.render(path, sha, first_page)
-                    page = cs.page(artifact_id, first_page)
-                    pages[(int(year), first_page)] = page
-                    cs.add(
-                        "source_page",
-                        id=page,
-                        artifact_id=artifact_id,
-                        page_number=first_page,
-                        image_key=f"pages/{nh_manual.SOURCE}/{image.name}",
-                        width=width,
-                        height=height,
-                    )
-                values.append(
-                    {
-                        "result_set_id": str(result_set),
-                        "unit_id": str(unit),
-                        "option_id": option,
-                        "channel": 0,
-                        "measure": 1,
-                        "count_round": 0,
-                        "flags": nh_manual.DIGITIZED | (nh_manual.DERIVED if mine.height > 1 else 0),
-                        "value": votes,
-                        "page_id": str(pages[(int(year), first_page)]),
-                        "x0": float(mine["x0"].min()),
-                        "y0": float(mine["y0"].min()),
-                        "x1": float(mine["x1"].max()),
-                        "y1": float(mine["y1"].max()),
-                    }
-                )
+                located(int(year), result_set, unit, option, votes, mine)
         for reason, items in report.items():
             print(f"{len(items)}: {reason}")
             for item in items[: int(os.environ.get("NH_SHOW", "25"))]:
