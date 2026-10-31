@@ -1,10 +1,11 @@
-import type { Handle } from "@sveltejs/kit/hooks";
+import type { Handle, ServerInit } from "@sveltejs/kit/hooks";
 import { building } from "$app/env";
 import { READ_ONLY } from "$app/env/public";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
+import { mark, purge } from "#lib/server/edge.js";
 import { READ_ONLY_MESSAGE } from "#lib/server/rpc/router.js";
 import { twin } from "#lib/server/twin.js";
 
@@ -65,7 +66,15 @@ const twinHandle: Handle = async ({ event, resolve }) => {
   return response;
 };
 
+const edgeHandle: Handle = async ({ event, resolve }) =>
+  mark(event, await resolve(event));
+
+export const init: ServerInit = () => {
+  setTimeout(() => void purge(), 5000);
+};
+
 export const handle: Handle = sequence(
+  edgeHandle,
   readOnlyHandle,
   paraglideHandle,
   twinHandle,

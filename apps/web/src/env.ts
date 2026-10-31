@@ -52,6 +52,16 @@ export const variables = defineEnvVars({
     ),
     description: "Redis connection string",
   },
+  CLOUDFLARE_ZONE_ID: {
+    schema: optional,
+    description:
+      "Cloudflare zone in front of the site, whose cache is purged for this host when a new build starts",
+  },
+  CLOUDFLARE_PURGE_TOKEN: {
+    schema: optional,
+    description:
+      "Cloudflare API token with Cache Purge permission on that zone",
+  },
   BASE_URL: {
     public: true,
     schema: v.pipe(v.string(), v.url("Invalid URL")),

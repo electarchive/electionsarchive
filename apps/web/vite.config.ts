@@ -27,12 +27,7 @@ export default defineConfig(({ command }) => {
           project: "./project.inlang",
           outdir: "./src/lib/paraglide",
           outputStructure: "message-modules",
-          strategy: [
-            "cookie",
-            "preferredLanguage",
-            "globalVariable",
-            "baseLocale",
-          ],
+          strategy: ["cookie", "globalVariable", "baseLocale"],
         }),
     ],
     optimizeDeps: {
