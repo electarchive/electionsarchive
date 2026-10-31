@@ -427,6 +427,8 @@ def measure(conn, day: str) -> dict:
     for st, n in conn.execute(PRIOR_MEASURES_SQL, [prior]):
         exist = cells[("local_measure", st)]["exist"] if ("local_measure", st) in cells else 0
         expected[("local_measure", st)] = max(n, exist)
+        if n > exist:
+            gap(cells[("local_measure", st)], "local_measure", st, [], "gap_absent", n - exist)
     decided = {
         polity
         for st, (early, _) in DECIDED_EARLIER.items()
