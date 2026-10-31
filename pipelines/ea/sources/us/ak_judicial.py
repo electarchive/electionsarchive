@@ -13,19 +13,20 @@ from ea.sources.us.retention import display
 from ea.store import DATA, connect
 
 SOURCE = "us.ak_judicial"
-VERSION = "2"
-INBOX = DATA / "inbox" / "manual" / "MF-454"
+VERSION = "3"
+INBOX = DATA / "inbox" / "manual"
 URL = "https://www.elections.alaska.gov/results/"
 PUBLISHER = "Alaska Division of Elections"
 TITLE = "Official election summary report: judicial retention"
 FILES = {
-    date(2010, 11, 2): "2010/resultsOF.pdf",
-    date(2012, 11, 6): "2012/results (2).pdf",
-    date(2014, 11, 4): "2014/results (1).pdf",
-    date(2016, 11, 8): "2016/results.pdf",
-    date(2020, 11, 3): "2020/ElectionSummaryReportRPT24.pdf",
-    date(2022, 11, 8): "2022/ElectionSummaryReportRPT.pdf",
-    date(2024, 11, 5): "2024/ElectionSummaryReport.pdf",
+    date(2008, 11, 4): "MF-471/2008/results (1).pdf",
+    date(2010, 11, 2): "MF-454/2010/resultsOF.pdf",
+    date(2012, 11, 6): "MF-454/2012/results (2).pdf",
+    date(2014, 11, 4): "MF-454/2014/results (1).pdf",
+    date(2016, 11, 8): "MF-454/2016/results.pdf",
+    date(2020, 11, 3): "MF-454/2020/ElectionSummaryReportRPT24.pdf",
+    date(2022, 11, 8): "MF-454/2022/ElectionSummaryReportRPT.pdf",
+    date(2024, 11, 5): "MF-454/2024/ElectionSummaryReport.pdf",
 }
 UNNAMED = {(2010, "Supreme Court"): "Fabe", (2010, "Court of Appeals"): "Mannheimer"}
 COLUMNS = ((0, 300), (300, 312))
@@ -43,10 +44,13 @@ JUDGES = {
     "Henderson": "Jennifer Henderson",
     "Allard": "Marjorie Allard",
     "Terrell": "Timothy Terrell",
+    "Estaugh": "Robert Eastaugh",
+    "Coats": "Robert Coats",
 }
 OFFICES = {"Supreme Court": "Justice of the Supreme Court", "Court of Appeals": "Judge of the Court of Appeals"}
 BLOCK = re.compile(
-    r"^\s*(Supreme Court|Supreme Crt|Court of Appeals)(?:\s*-\s*(?:Justice|Judge)\s+(\S+))?\s*$", re.IGNORECASE
+    r"^\s*(Supreme Court|Supreme Crt|Supreme CT|Court of Appeals|Appeals)(?:\s*-\s*(?:Justice|Judge)\s+(\S+)|\s+(\S+))?\s*$",
+    re.IGNORECASE,
 )
 VOTES = re.compile(r"^(YES|NO)\s+([\d,]+)\s+[\d.]+%$")
 METHOD = (
@@ -97,7 +101,7 @@ def lines() -> list[dict[str, object]]:
                 block = BLOCK.match(line)
                 if block is not None:
                     court = "Supreme Court" if block[1].lower().startswith("supreme") else "Court of Appeals"
-                    surname = block[2] or UNNAMED[(day.year, court)]
+                    surname = (block[2] or block[3] or UNNAMED[(day.year, court)]).title()
                     current = {"day": day, "court": court, "surname": surname}
                     continue
                 if current is None:
@@ -118,7 +122,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska Supreme Court and Court of Appeals retention elections 2010–2024, statewide, "
+            summary="Alaska Supreme Court and Court of Appeals retention elections 2008–2024, statewide, "
             "from the Division of Elections' official summary reports",
             polity="US-AK",
         )
