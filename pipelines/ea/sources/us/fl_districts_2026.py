@@ -16,6 +16,7 @@ PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "y26" / "fl"
 MANUAL = DATA / "inbox" / "manual" / "MF-460"
 MANUAL_DIRS = (MANUAL, DATA / "inbox" / "manual" / "MF-184", DATA / "inbox" / "manual" / "MF-483")
+STJ = "2026_QUALIFIED_Candidates+08-18-26.pdf"
 SOURCES = {
     "https://browardvotes.gov/sites/default/files/list-of-candidates-for-november-elections.pdf": (
         "Broward County Supervisor of Elections",
@@ -88,6 +89,54 @@ SOURCES = {
         "Current Candidates, November 3, 2026 General Election",
         "fl-osceola-2026-general-candidate-list.html",
         "Osceola",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=collier": (
+        "Collier County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-collier-voterfocus-candidates.html",
+        "Collier",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=escambia": (
+        "Escambia County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-escambia-voterfocus-candidates.html",
+        "Escambia",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=lake": (
+        "Lake County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-lake-voterfocus-candidates.html",
+        "Lake",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=manatee": (
+        "Manatee County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-manatee-voterfocus-candidates.html",
+        "Manatee",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=marion": (
+        "Marion County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-marion-voterfocus-candidates.html",
+        "Marion",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=sarasota": (
+        "Sarasota County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-sarasota-voterfocus-candidates.html",
+        "Sarasota",
+    ),
+    "https://www.voterfocus.com/CampaignFinance/candidate_pr.php?c=volusia": (
+        "Volusia County Supervisor of Elections",
+        "Candidate Reports, November 3, 2026 General Election",
+        "fl-2026-general-volusia-voterfocus-candidates.html",
+        "Volusia",
+    ),
+    "https://irp.cdn-website.com/ed388134/files/uploaded/2026_QUALIFIED_Candidates+08-18-26.pdf": (
+        "St. Johns County Supervisor of Elections",
+        "2026 Qualified Candidates, St. Johns County (8/18/2026)",
+        STJ,
+        "St. Johns",
     ),
 }
 DISTRICT = re.compile(
@@ -209,7 +258,9 @@ def clean_district(text: str) -> str:
     text = re.sub(r"^Supervisor,\s*|\s*-$", "", text)
     text = re.sub(r"(?i)\bDist\.?$", "District", text)
     text = re.sub(r"Community Development$", "Community Development District", text)
-    text = re.sub(r"(?i)soil (?:and|&) water conservation(?: group)?|soil (?:and|&) water", "Soil and Water Conservation", text)
+    text = re.sub(
+        r"(?i)soil (?:and|&) water conservation(?: group)?|soil (?:and|&) water", "Soil and Water Conservation", text
+    )
     text = re.sub(r"(?i)\bspec\.", "Special", text)
     text = re.sub(r"(?i)\bcont\.", "Control", text)
     text = re.sub(r"(?i)\bres\.", "Rescue", text)
@@ -222,7 +273,7 @@ def clean_district(text: str) -> str:
 VOTERFOCUS = re.compile(r"(?i)\bCDD\b|community development|soil (?:and|&) water|improvement dist|fire|port of")
 
 
-def voterfocus(url: str) -> list[dict[str, str | int | None]]:
+def voterfocus(url: str, county: str) -> list[dict[str, str | int | None]]:
     text = raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace")
     groups: dict[str, list[str]] = {}
     for part in text.split('<div class="col-xs-12 officegroup">')[1:]:
@@ -242,10 +293,15 @@ def voterfocus(url: str) -> list[dict[str, str | int | None]]:
     for office, people in groups.items():
         if len(people) < 2:
             continue
-        found = re.match(r"(.*?)[ ,]+(?:Seat|Dist\.|District|Group)\s*(\d+)\s*$", office)
+        found = re.match(r"(?i)(.*?)(?:[ ,]+(?:Seat|Dist\.?|District|Group)\s*|\s+-\s*)(\d+)\s*$", office)
         district, seat = (clean_district(found[1]), f"Seat {found[2]}") if found else (clean_district(office), "")
+        district = re.sub(r"(?i)\s*-?\s*district\s*-?$", "", district) if "Soil and Water" in district else district
+        district = re.sub(r"(?i)\s+dist$", " District", district)
         if district.endswith("Soil and Water Conservation"):
-            district += " District"
+            district = f"{county} {district} District"
+        district = " ".join(
+            word.capitalize() if word.isupper() and len(word) > 1 else word for word in district.split()
+        )
         if district.startswith("Port of Palm Beach"):
             district = "Port of Palm Beach District"
         for person in people:
@@ -279,13 +335,37 @@ def lee(url: str) -> list[dict[str, str | int | None]]:
     return rows
 
 
+def st_johns(url: str) -> list[dict[str, str | int | None]]:
+    rows = []
+    district = ""
+    seat = ""
+    for line in pdf_text(url).splitlines():
+        header = re.match(r"\s*(.*? Community Development District) – Seat (\d+) / ", line)
+        if header is not None:
+            district, seat = header[1], f"Seat {header[2]}"
+        elif not line.strip() or " / " in line:
+            district = ""
+        elif district:
+            name = re.split(r"\s{2,}", line.strip())[0]
+            rows.append({"district": district, "seat": seat, "vote": 1, "name": name, "url": url})
+    counts: dict[tuple[str, str], int] = {}
+    for row in rows:
+        key = (str(row["district"]), str(row["seat"]))
+        counts[key] = counts.get(key, 0) + 1
+    return [row for row in rows if counts[(str(row["district"]), str(row["seat"]))] > 1]
+
+
 def parse() -> None:
     rows: list[dict[str, str | int | None]] = []
     for url, (_, _, _, county) in SOURCES.items():
         file = SOURCES[url][2]
-        found = {"broward.pdf": broward, "brevard.html": brevard, "pasco.pdf": pasco}.get(file, voterfocus)(url)
-        if file.startswith("lee-"):
+        parsers = {"broward.pdf": broward, "brevard.html": brevard, "pasco.pdf": pasco, STJ: st_johns}
+        if file in parsers:
+            found = parsers[file](url)
+        elif file.startswith("lee-"):
             found = lee(url)
+        else:
+            found = voterfocus(url, county)
         for row in found:
             row["county"] = county
         rows.extend(found)
@@ -316,7 +396,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="FL",
-        summary="Florida community development, water control, drainage, improvement, and recreation district board races on the November 3, 2026 ballot, with candidates from the Broward, Brevard, Pasco, Duval, Hillsborough, Lee, Miami-Dade, Orange, Palm Beach, Pinellas, Polk, and Osceola County election offices",
+        summary="Florida community development, water control, drainage, improvement, and recreation district board races on the November 3, 2026 ballot, with candidates from the Broward, Brevard, Pasco, Duval, Hillsborough, Lee, Miami-Dade, Orange, Palm Beach, Pinellas, Polk, Osceola, Collier, Escambia, Lake, Manatee, Marion, Sarasota, Volusia, and St. Johns County election offices",
         sources={url: (publisher, title) for url, (publisher, title, _, _) in SOURCES.items()},
         frame=frame,
     )
