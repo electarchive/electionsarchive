@@ -14,6 +14,7 @@ INBOX = DATA / "inbox"
 BURLINGTON = "https://www.co.burlington.nj.us/#sample-ballots-2026-general"
 BOROUGH = "https://www.mercercounty.org/#sample-ballot-hopewell-borough-2026-general"
 TOWNSHIP = "https://www.mercercounty.org/#sample-ballot-hopewell-township-2026-general"
+PENNINGTON = "https://www.mercercounty.org/#sample-ballot-pennington-borough-2026-general"
 MANTUA = "https://www.gloucestercountynj.gov/DocumentCenter/View/19674/Mantua-Township-District-10-UOCAVA-GENERAL-26"
 WASHINGTON = (
     "https://www.gloucestercountynj.gov/DocumentCenter/View/19568/Washington-Township-District-1-UOCAVA-GENERAL-26"
@@ -42,6 +43,11 @@ SOURCES = {
         "Mercer County Clerk",
         "Official General Election Sample Ballot, Hopewell Township, November 3, 2026",
         "manual/MF-440/F08 Hopewell Township General 2026.pdf",
+    ),
+    PENNINGTON: (
+        "Mercer County Clerk",
+        "Official General Election Sample Ballot, Pennington Borough, November 3, 2026",
+        "manual/MF-476/F11 Pennington General 2026.pdf",
     ),
     MANTUA: (
         "Gloucester County Clerk",
@@ -151,6 +157,7 @@ SEATS = (
         TOWNSHIP,
         ["Thomas Pearse-Drance", "Linda Abey", "Kevin R. Baranowski"],
     ),
+    ("Pennington Borough Fire District", "Mercer", False, 2, PENNINGTON, ["Ross Dodd", "Scott T. Schaub"]),
     ("Mantua Township Fire District", "Gloucester", False, 2, MANTUA, ["Nicholas A. Vacarino", "Michael S. Riggs"]),
     (
         "Washington Township Fire District",
