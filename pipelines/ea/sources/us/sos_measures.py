@@ -43,7 +43,33 @@ NCSL_COLUMNS = (
 TX = "https://elections.sos.state.tx.us/"
 TX_ELECTIONS = (85, 95, 103, 117, 132, 133, 147, 158)
 CA = "https://elections.cdn.sos.ca.gov/sov/"
+CA_1998 = {
+    (date(1998, 6, 2), "219"): ("Ballot Measures. Application.", "Legislative Referendum"),
+    (date(1998, 6, 2), "220"): ("Courts. Superior and Municipal Court Consolidation.", "Legislative Referendum"),
+    (date(1998, 6, 2), "221"): ("Subordinate Judicial Officers. Discipline.", "Legislative Referendum"),
+    (date(1998, 6, 2), "222"): ("Murder. Peace Officer Victim. Sentence Credits.", "Legislative Referendum"),
+    (date(1998, 6, 2), "223"): ("Schools. Spending Limits on Administration.", "Initiative"),
+    (date(1998, 6, 2), "224"): ("State-Funded Design and Engineering Services.", "Initiative"),
+    (date(1998, 6, 2), "225"): ("Limiting Congressional Terms. Proposed U.S. Constitutional Amendment.", "Initiative"),
+    (date(1998, 6, 2), "226"): ("Political Contributions by Employees, Union Members, Foreign Entities.", "Initiative"),
+    (date(1998, 6, 2), "227"): ("English Language in Public Schools.", "Initiative"),
+    (date(1998, 11, 3), "1A"): ("Class Size Reduction Kindergarten-University Public Education Facilities Bond Act of 1998", "Legislative Referendum"),
+    (date(1998, 11, 3), "1"): ("Property Taxes: Contaminated Property", "Legislative Referendum"),
+    (date(1998, 11, 3), "2"): ("Transportation: Funding", "Legislative Referendum"),
+    (date(1998, 11, 3), "3"): ("Partisan Presidential Primary Elections", "Legislative Referendum"),
+    (date(1998, 11, 3), "4"): ("Trapping Practices. Bans Use of Specified Traps and Animal Poisons.", "Initiative"),
+    (date(1998, 11, 3), "5"): ("Tribal-State Gaming Compacts. Tribal Casinos.", "Initiative"),
+    (date(1998, 11, 3), "6"): ("Criminal Law. Prohibition on Slaughter of Horses and Sale of Horsemeat for Human Consumption.", "Initiative"),
+    (date(1998, 11, 3), "7"): ("Air Quality Improvement. Tax Credits.", "Initiative"),
+    (date(1998, 11, 3), "8"): ("Public Schools. Permanent Class Size Reduction. Parent-Teacher Councils. Teacher Credentialing. Pupil Suspension for Drug Possession. Chief Inspector's Office.", "Initiative"),
+    (date(1998, 11, 3), "9"): ("Electric Utilities. Assessments. Bonds.", "Initiative"),
+    (date(1998, 11, 3), "10"): ("State and County Early Childhood Development Programs. Additional Tobacco Surtax.", "Initiative"),
+    (date(1998, 11, 3), "11"): ("Local Sales and Use Taxes - Revenue Sharing", "Legislative Referendum"),
+}
+
 CA_FILES = {
+    date(1998, 6, 2): "1998-primary/1998-sov-primary.pdf",
+    date(1998, 11, 3): "1998-general/sov1998-general.pdf",
     date(2000, 3, 7): "2000-primary/measures.pdf",
     date(2000, 11, 7): "2000-general/measures.pdf",
     date(2002, 3, 5): "2002-primary/measures.xls",
@@ -2110,9 +2136,19 @@ def california() -> list[dict[str, object]]:
             text = subprocess.run(["pdftotext", "-layout", str(file), "-"], capture_output=True, text=True, check=True)
             props: list[str] = []
             pending = None
-            for line in text.stdout.splitlines():
-                if found := heading.findall(line):
-                    props = found
+            lines: list[str] = []
+            for sheet in text.stdout.split("\f"):
+                sheet_lines = sheet.splitlines()
+                if "State Ballot Measures" in text.stdout and "State Ballot Measures" not in sheet:
+                    continue
+                found = sorted((match.start(), match.group(1)) for line in sheet_lines for match in heading.finditer(line))
+                lines.append("\f" + ",".join(prop for _, prop in found))
+                lines.extend(sheet_lines)
+            for line in lines:
+                if line.startswith("\f"):
+                    props = line[1:].split(",") if len(line) > 1 else []
+                    continue
+                if line.lstrip().startswith("Proposition") and heading.search(line):
                     continue
                 low = re.sub(r"\s+", " ", line.strip().lower())
                 name = next((name for name in names if low.startswith(name)), None)
@@ -2152,7 +2188,9 @@ def california() -> list[dict[str, object]]:
                     "state": "CA",
                     "day": day,
                     "number": prop,
-                    "label": "",
+                    "label": f"Proposition {prop}" if (day, prop) in CA_1998 else "",
+                    "title": CA_1998.get((day, prop), ("", ""))[0] or None,
+                    "kind": CA_1998.get((day, prop), ("", ""))[1] or None,
                     "url": url,
                     "county": county,
                     "answer": answer,
