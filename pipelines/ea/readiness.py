@@ -376,12 +376,14 @@ def measure(conn, day: str) -> dict:
         found = next(
             (
                 f
-                for f in (coverage.gap(registry, ("candidates",), "us", st, level, "", year, i) for i in ids if i)
+                for f in (
+                    coverage.gap(registry, ("candidates",), "us", st, level, "general", year, i) for i in ids if i
+                )
                 if f is not None and f["ids"]
             ),
             None,
         )
-        found = found or coverage.gap(registry, ("candidates",), "us", st, level, "", year)
+        found = found or coverage.gap(registry, ("candidates",), "us", st, level, "general", year)
         if found is not None:
             cell[found["category"]] += weight
             cell[bucket] += weight
