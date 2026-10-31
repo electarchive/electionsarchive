@@ -13,7 +13,7 @@ SOURCE = "us.ia_districts_2026"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 INBOX = DATA / "inbox" / "y26" / "ia" / "counties"
-IMAGE_ONLY = {"Jasper", "Pottawattamie"}
+IMAGE_ONLY = {"Jasper", "Pottawattamie", "Audubon", "Emmet", "Fremont", "Lucas", "Lyon", "Palo Alto", "Taylor", "Union"}
 SWCD = "Soil and Water Conservation District"
 
 COUNTIES = {
@@ -187,6 +187,111 @@ COUNTIES = {
         "https://www.marshallcountyiowa.gov/elections",
         "Marshall County Auditor",
     ),
+    "Allamakee": (
+        "allamakee",
+        "https://allamakeecountyelections.iowa.gov/files/candidate_list/2026_general_election_76436.pdf",
+        "Allamakee County Elections",
+    ),
+    "Audubon": (
+        "audubon",
+        "https://auduboncountyia.gov/webres/File/Auditor/Election/Sample%20Ballot.pdf",
+        "Audubon County Auditor",
+    ),
+    "Cass": (
+        "cass",
+        "https://www.casscountyia.gov/wp-content/uploads/2019/10/Sample-Ballots-November-3-2026-General-Election.pdf",
+        "Cass County Auditor",
+    ),
+    "Cedar": (
+        "cedar",
+        "https://cedarcounty.iowa.gov/files/auditor/2026_candidate_list_89671.pdf",
+        "Cedar County Auditor",
+    ),
+    "Clarke": (
+        "clarke",
+        "https://clarkecounty.iowa.gov/elections/election-info/",
+        "Clarke County Auditor",
+    ),
+    "Crawford": (
+        "crawford",
+        "https://www.crawfordcounty.iowa.gov/elections/info/2026_general_election_2026_11_03/",
+        "Crawford County Auditor",
+    ),
+    "Dickinson": (
+        "dickinson",
+        "https://dickinsoncountyiowa.gov/wp-content/uploads/2026/09/2026-General-Election-Candidate-List.pdf",
+        "Dickinson County Auditor",
+    ),
+    "Emmet": (
+        "emmet",
+        "https://emmetcountyia.gov/wp-content/uploads/2026/09/Emmet-Estherville-sample-ballot.pdf",
+        "Emmet County Auditor",
+    ),
+    "Fremont": (
+        "fremont",
+        "https://www.fremontcountyia.gov/vimages/shared/vnews/stories/5cad3edf734e1/2026%20General%20Publication%20with%20signature.pdf",
+        "Fremont County Auditor",
+    ),
+    "Hancock": (
+        "hancock",
+        "https://elections.hancockcountyia.gov/files/candidate_list/2026_general_election_10233.pdf",
+        "Hancock County Auditor",
+    ),
+    "Ida": (
+        "ida",
+        "https://idacounty.iowa.gov/wp-content/uploads/2026/10/2026-General-Notice-of-Election.pdf",
+        "Ida County Auditor",
+    ),
+    "Jones": (
+        "jones",
+        "https://www.jonescountyiowaelections.gov/files/sample_ballots/20261103_anamosa_city_14043.pdf",
+        "Jones County Auditor",
+    ),
+    "Louisa": (
+        "louisa",
+        "https://elections.louisacountyia.gov/files/public_notice/2026_louisa_county_general_election_19316.pdf",
+        "Louisa County Auditor",
+    ),
+    "Lucas": (
+        "lucas",
+        "https://lucascountyelections.iowa.gov/files/sample_ballots/1197_chariton_city_hall_precinct_32914.pdf",
+        "Lucas County Auditor",
+    ),
+    "Lyon": (
+        "lyon",
+        "https://lyoncounty.iowa.gov/files/sample_ballots/1095_george_p1_23087.pdf",
+        "Lyon County Auditor",
+    ),
+    "Mills": (
+        "mills",
+        "https://www.millscountyiowa.gov/385/General-Election",
+        "Mills County Auditor",
+    ),
+    "O'Brien": (
+        "obrien",
+        "https://obriencounty.iowa.gov/wp-content/uploads/2026/09/General-Ballot-Candidates-and-Measures-1.pdf",
+        "O'Brien County Auditor",
+    ),
+    "Palo Alto": (
+        "palo-alto",
+        "https://paloaltocounty.iowa.gov/wp-content/uploads/2026/09/2026-GENERAL-ELECTION-SAMPLE-BALLOTS.pdf",
+        "Palo Alto County Auditor",
+    ),
+    "Sac": (
+        "sac",
+        "https://www.saccountyiowa.gov/files/news/notice_of_election_38682.pdf",
+        "Sac County Auditor",
+    ),
+    "Taylor": (
+        "taylor",
+        "https://taylorcounty.iowa.gov/wp-content/uploads/2026/10/Precinct-1-Sample-Ballots-2026-General-Election.pdf",
+        "Taylor County Auditor",
+    ),
+    "Union": (
+        "union",
+        "https://unioncountyiowa.gov/wp-content/uploads/2026/10/SAMPLE-BALLOTS-NOVEMBER-3-2026.pdf",
+        "Union County Auditor",
+    ),
 }
 
 BOARDS = (
@@ -358,6 +463,130 @@ BOARDS = (
     ("Mahaska", f"Mahaska County {SWCD}", "Commissioner", 2, False, ("Steven Plate",)),
     ("Lee", f"Lee County {SWCD}", "Commissioner", 2, False, ("Stanley Sanders", "Ralph Krogmeier")),
     ("Marshall", f"Marshall County {SWCD}", "Commissioner", 2, False, ("Roger Lutes", "Tyler Kelley")),
+    (
+        "Allamakee",
+        f"Allamakee County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Donald Elsbernd",
+            "Scott Dougherty",
+        ),
+    ),
+    (
+        "Audubon",
+        f"Audubon County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Jonnie Meislahn",
+            "Lora L. Anthofer",
+        ),
+    ),
+    (
+        "Cass",
+        f"Cass County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "John J. Hansen",
+            "Gregory D Zellmer",
+        ),
+    ),
+    ("Cedar", f"Cedar County {SWCD}", "Commissioner", 1, True, ("James Pelzer",)),
+    (
+        "Clarke",
+        f"Clarke County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Gabriel Crawford",
+            "Chris George",
+            "Ethan Abbott",
+        ),
+    ),
+    ("Crawford", f"Crawford County {SWCD}", "Commissioner", 2, False, ("David Gress",)),
+    ("Dickinson", f"Dickinson County {SWCD}", "Commissioner", 2, False, ("S. Vance Hjelm",)),
+    ("Emmet", f"Emmet County {SWCD}", "Commissioner", 2, False, ("Carson Glasnapp",)),
+    ("Fremont", f"Fremont County {SWCD}", "Commissioner", 2, False, ("David Carter",)),
+    ("Hancock", f"Hancock County {SWCD}", "Commissioner", 1, True, ("Chase Ulven",)),
+    ("Ida", f"Ida County {SWCD}", "Commissioner", 2, False, ("Roger Bumann",)),
+    (
+        "Jones",
+        f"Jones County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Julie Orris",
+            "Jeff Von Behren",
+        ),
+    ),
+    (
+        "Louisa",
+        f"Louisa County {SWCD}",
+        "Commissioner",
+        None,
+        False,
+        (
+            "Kathy Dice",
+            "Tim Knutson",
+        ),
+    ),
+    ("Lucas", f"Lucas County {SWCD}", "Commissioner", 2, False, ("Richard Arnold",)),
+    (
+        "Lyon",
+        f"Lyon County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Randy Warner",
+            "Dale Winkowitsch",
+            "Richard Reitsma",
+        ),
+    ),
+    (
+        "Mills",
+        f"Mills County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Carol Vinton",
+            "Stephen McGrew",
+        ),
+    ),
+    ("O'Brien", f"O'Brien County {SWCD}", "Commissioner", 2, False, ("Carmen Billick",)),
+    ("Palo Alto", f"Palo Alto County {SWCD}", "Commissioner", 2, False, ("Jerry Joyce",)),
+    (
+        "Sac",
+        f"Sac County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "James Frederick",
+            "Steven Pickhinke",
+        ),
+    ),
+    ("Taylor", f"Taylor County {SWCD}", "Commissioner", 2, False, ("Steve Wright",)),
+    ("Taylor", f"Taylor County {SWCD}", "Commissioner", 1, True, ("Ballie Walters",)),
+    (
+        "Union",
+        f"Union County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        (
+            "Cody Purdum",
+            "Roger Baker",
+        ),
+    ),
 )
 
 
