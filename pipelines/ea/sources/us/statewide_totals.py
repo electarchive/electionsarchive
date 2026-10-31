@@ -116,6 +116,8 @@ def emit(
         book = {row["id"]: row for row in sources().iter_rows(named=True)}
     if "stage" not in frame.columns:
         frame = frame.with_columns(stage=pl.lit("general"), scope=pl.lit(None, pl.String))
+    if "first" not in frame.columns:
+        frame = frame.with_columns(first=pl.lit(None, pl.String))
     runoffs = {
         (state, int(str(day)[:4]), office, scope)
         for state, day, office, scope in frame.filter(pl.col("stage") == "runoff")
@@ -330,6 +332,10 @@ def emit(
             round_key = (str(state), year, str(office), scope)
             if stage == "primary":
                 firsts[round_key] = contest
+            if stage == "runoff" and round_key not in firsts and lines["first"][0] is not None:
+                (firsts[round_key],) = conn.execute(
+                    "select entity_id from external_id where scheme = 'us.contest' and value = %s", [lines["first"][0]]
+                ).fetchone()
             cs.add(
                 "contest",
                 id=contest,
