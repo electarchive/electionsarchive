@@ -461,7 +461,10 @@ def twice(raw_lines: pl.DataFrame) -> pl.DataFrame:
     agreed: list[tuple[int, int, float, float]] = []
     for (year, page), rows in held(raw_lines).group_by("year", "page", maintain_order=True):
         try:
-            text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"][0]["text"]
+            text = "".join(
+                block.get("text", "")
+                for block in json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"]
+            )
         except LookupError:
             continue
         found = re.search(r"\{.*\}", text, re.DOTALL)
