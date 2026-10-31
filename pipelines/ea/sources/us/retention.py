@@ -5,7 +5,7 @@ import struct
 import subprocess
 import unicodedata
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -68,6 +68,30 @@ ARIZONA_COLUMNS = {
 }
 INDIANA = "https://www.in.gov/courts/news/2024/1119/"
 INDIANA_RETAINED = {"IN:loretta-rush", "IN:mark-massa", "IN:derek-molter", "IN:rudolph-pyle", "IN:peter-foley"}
+OKLAHOMA_ARCHIVE = "https://oklahoma.gov/content/dam/ok/en/elections/election-results/{0}-election-results/{0}-general-election-results/{1}{2}.pdf"
+OKLAHOMA_COUNTY_DAYS = {
+    2000: "2000-11-07",
+    2002: "2002-11-05",
+    2004: "2004-11-02",
+    2006: "2006-11-07",
+    2008: "2008-11-04",
+    2010: "2010-11-02",
+}
+OKLAHOMA_COUNTY_FILES = ("sup-ct", "civ-ct", "crimct")
+OKLAHOMA_COUNTY_2010 = (
+    "https://oklahoma.gov/content/dam/ok/en/elections/election-results/2010-election-results/"
+    "2010-general-election-results/ge-results-county-20101102.pdf"
+)
+OKLAHOMA_ROW = re.compile(r"^([A-Za-z][A-Za-z .]*?):?\s{2,}([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$")
+OKLAHOMA_COURTS = {
+    "SUPREME COURT": "supreme-court",
+    "COURT OF CIVIL APPEALS": "court-of-civil-appeals",
+    "COURT OF CRIMINAL APPEALS": "court-of-criminal-appeals",
+}
+OKLAHOMA_COUNTY_METHOD = (
+    "Yes and No votes by county from the Oklahoma State Election Board's official county results, with the county "
+    "rows checked against the printed state total."
+)
 OKLAHOMA_DAYS = ["2016-11-08", "2018-11-06", "2020-11-03", "2022-11-08", "2024-11-05"]
 ANSWERS = {"YES": "yes", "NO": "no", "YES/SI": "yes", "NO/NO": "no", "RETAIN": "yes", "REJECT": "no"}
 COURTS = [
@@ -199,7 +223,27 @@ def display(text: str) -> str:
     return re.sub(r"\b(Jr|Sr)$", r"\1.", text)
 
 
+def oklahoma_county_url(year: int, name: str) -> str:
+    return OKLAHOMA_COUNTY_2010 if year == 2010 else OKLAHOMA_ARCHIVE.format(year, str(year)[2:], name)
+
+
 def fetch() -> None:
+    inbox = DATA / "inbox" / "manual" / "MF-334"
+    for year in OKLAHOMA_COUNTY_DAYS:
+        for name in ("",) if year == 2010 else OKLAHOMA_COUNTY_FILES:
+            link = oklahoma_county_url(year, name)
+            file = inbox / ("ge-results-county-20101102.pdf" if year == 2010 else f"{str(year)[2:]}{name}.pdf")
+            try:
+                raw.cached(SOURCE, link)
+            except LookupError:
+                raw.store(
+                    SOURCE,
+                    link,
+                    file.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+                    media_type="application/pdf",
+                )
     for path in KANSAS_FILES.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
     for path in KANSAS_PRECINCTS.values():
@@ -420,6 +464,90 @@ def oklahoma() -> list[dict[str, object]]:
     return rows
 
 
+def oklahoma_counties() -> list[dict[str, object]]:
+    with connect() as conn:
+        codes = {
+            re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower()): code
+            for code, text in conn.execute(
+                """select u.code, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '40%%'"""
+            ).fetchall()
+        }
+    rows: list[dict[str, object]] = []
+    for year, day in OKLAHOMA_COUNTY_DAYS.items():
+        for file in ("",) if year == 2010 else OKLAHOMA_COUNTY_FILES:
+            link = oklahoma_county_url(year, file)
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"],
+                capture_output=True,
+                check=True,
+                text=True,
+            ).stdout
+            blocks: dict[tuple[str, str, int | None, int | None], dict[str, tuple[int, int, int]]] = {}
+            totals: dict[tuple[str, str, int | None, int | None], tuple[int, int, int]] = {}
+            heading: tuple[int | None, int | None] = (None, None)
+            key = None
+            for line in text.splitlines():
+                if found := re.search(r"DISTRICT (\d+)(?:, OFFICE (\d))?\s*$", line):
+                    heading = (int(found[1]), int(found[2]) if found[2] else None)
+                if year == 2010:
+                    found = re.match(
+                        r"Race:\s+(SUPREME COURT|COURT OF CIVIL APPEALS|COURT OF CRIMINAL APPEALS) - (.+)", line
+                    )
+                    if found:
+                        key = (OKLAHOMA_COURTS[found[1]], found[2].strip(), None, None)
+                    elif line.startswith("Race:"):
+                        key = None
+                elif found := re.match(
+                    r"Shall (.+?) of the Oklahoma (Supreme Court|Court of Civil Appeals|Court of Criminal Appeals) be retained",
+                    line,
+                ):
+                    key = (OKLAHOMA_COURTS[found[2].upper()], found[1].strip(), *heading)
+                if key is None:
+                    continue
+                row = OKLAHOMA_ROW.match(line)
+                if row is None:
+                    continue
+                cells = tuple(int(row[i].replace(",", "")) for i in (2, 3, 4))
+                if row[1].upper().startswith("STATE TOTAL"):
+                    totals[key] = cells
+                    key = None
+                else:
+                    blocks.setdefault(key, {})[codes[re.sub(r"[^a-z]", "", row[1].lower())]] = cells
+            for (court, name, number, post), places in blocks.items():
+                total = totals.get((court, name, number, post))
+                sums = tuple(sum(cells[i] for cells in places.values()) for i in range(3))
+                if total != sums or sums[0] + sums[1] != sums[2] or len(places) != 77:
+                    print(
+                        f"{day} {court} {name}: counties sum to {sums}, printed {total}, {len(places)} counties, skipped"
+                    )
+                    continue
+                for code, cells in places.items():
+                    for answer, votes in zip(("yes", "no"), cells, strict=False):
+                        rows.append(
+                            {
+                                "day": day,
+                                "state": "OK",
+                                "court": court,
+                                "number": number,
+                                "post": post,
+                                "name": name,
+                                "answer": answer,
+                                "votes": votes,
+                                "page": None,
+                                "x0": None,
+                                "y0": None,
+                                "x1": None,
+                                "y1": None,
+                                "origin": link,
+                                "county": code,
+                                "flags": 0,
+                            }
+                        )
+    return rows
+
+
 COLUMNS = [
     "year",
     "day",
@@ -620,7 +748,7 @@ def parse() -> None:
         )
     )
     official = pl.DataFrame(
-        kansas() + oklahoma() + arizona(),
+        kansas() + oklahoma() + oklahoma_counties() + arizona(),
         schema={
             "day": pl.String,
             "state": pl.String,
@@ -798,7 +926,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Judicial retention elections for state supreme and appellate courts: MEDSL's precinct returns "
-            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024, Arizona's "
+            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024 and county totals 2000–2010, Arizona's "
             "official canvasses of 2016, 2022, and 2024, and Indiana's 2024 outcomes from the Judicial Branch",
             polity="US",
         )
@@ -862,7 +990,8 @@ def emit() -> Path:
                     conn.execute(
                         """select r.id, r.election_id, r.stage, r.kind, r.source_id, r.completeness
                            from result_set r join external_id x on x.entity_id = r.contest_id
-                           where x.scheme = 'us.contest' and x.value = %s and not exists (
+                           join changeset w on w.id = r.changeset_id
+                           where x.scheme = 'us.contest' and x.value = %s and w.pipeline like 'us.medsl%%' and not exists (
                              select from external_id k where k.scheme = 'us.retention.result_set' and k.entity_id = r.id)""",
                         [key],
                     ).fetchall(),
@@ -1069,7 +1198,7 @@ def emit() -> Path:
                 f"Seat {number}"
                 if state == "KS"
                 else f"District {number}" + (f", Office {post}" if post else "")
-                if state == "OK"
+                if state == "OK" and number is not None
                 else None
             )
             if minted:
@@ -1139,7 +1268,11 @@ def emit() -> Path:
             if totals.height:
                 url = totals["origin"][0]
                 default = cs.key(f"{SOURCE}.result_set", f"{contest_key}:official")
-                note(default, "methodology", f"{METHOD} {methods[state]}")
+                note(
+                    default,
+                    "methodology",
+                    f"{METHOD} {OKLAHOMA_COUNTY_METHOD if state == 'OK' and totals['county'].null_count() == 0 else methods[state]}",
+                )
                 for item in totals.iter_rows(named=True):
                     tallies[item["answer"]] = tallies.get(item["answer"], 0) + item["votes"]
                     unit = state_units[state][0] if item["county"] is None else counties[item["county"]][0]
