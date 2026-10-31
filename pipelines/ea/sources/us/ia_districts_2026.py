@@ -272,6 +272,11 @@ COUNTIES = {
         "https://obriencounty.iowa.gov/wp-content/uploads/2026/09/General-Ballot-Candidates-and-Measures-1.pdf",
         "O'Brien County Auditor",
     ),
+    "Osceola": (
+        "osceola",
+        "https://osceolacountyia.gov/wp-content/uploads/2026/10/2026-General-Election-Notice.pdf",
+        "Osceola County Auditor",
+    ),
     "Palo Alto": (
         "palo-alto",
         "https://paloaltocounty.iowa.gov/wp-content/uploads/2026/09/2026-GENERAL-ELECTION-SAMPLE-BALLOTS.pdf",
@@ -286,6 +291,11 @@ COUNTIES = {
         "taylor",
         "https://taylorcounty.iowa.gov/wp-content/uploads/2026/10/Precinct-1-Sample-Ballots-2026-General-Election.pdf",
         "Taylor County Auditor",
+    ),
+    "Van Buren": (
+        "van-buren",
+        "https://www.vanburencounty.iowa.gov/Candidate%20Names%20%26%20Addresses.pdf",
+        "Van Buren County Auditor",
     ),
     "Union": (
         "union",
@@ -562,6 +572,8 @@ BOARDS = (
         ),
     ),
     ("O'Brien", f"O'Brien County {SWCD}", "Commissioner", 2, False, ("Carmen Billick",)),
+    ("Osceola", f"Osceola County {SWCD}", "Commissioner", 2, False, ("Dennis Monier", "Chris Slagter")),
+    ("Osceola", f"Osceola County {SWCD}", "Commissioner", 1, True, ("Tanya Dykstra",)),
     ("Palo Alto", f"Palo Alto County {SWCD}", "Commissioner", 2, False, ("Jerry Joyce",)),
     (
         "Sac",
@@ -587,6 +599,15 @@ BOARDS = (
             "Roger Baker",
         ),
     ),
+    (
+        "Van Buren",
+        "Van Buren County Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Ann McBride", "Kayla Scheuers", "Michael William Thomas", "Quenton Dodson"),
+    ),
+    ("Van Buren", f"Van Buren County {SWCD}", "Commissioner", 2, False, ("Dennis Gratz", "Rodney Peck")),
 )
 
 
