@@ -56,7 +56,9 @@ ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
 NOISE = re.compile(r"[\^_'•■*]")
 LEADER = re.compile(r"^[.\-—•\s]+$")
 PARTY = re.compile(r",\s*(r&d|r|d|i|ind|l|lib)\s*\.?\s*(?:\(write-?in\))?$", re.IGNORECASE)
-CLEAN = re.compile(r"[A-Z][A-Za-z'.\-]*(?: [A-Z][A-Za-z'.\-]*)+(?:,? (?:Jr|Sr|II|III|IV)\.?)?")
+CLEAN = re.compile(
+    r"[A-Z][A-Za-z'.\-]*(?: (?:[A-Z]|de[A-Z]|(?:de|du|dupont|van|von|der|la|di) (?=[A-Z]|[a-z]+ [A-Z]))[A-Za-z'.\-]*)+(?:,? (?:Jr|Sr|II|III|IV)\.?)?"
+)
 STRANDED = re.compile(r"(.+[a-z])\. ([A-Z][a-z]+)\. (d|r)")
 TRAILING = re.compile(r"(.+?[A-Za-z.]) (d|r)")
 

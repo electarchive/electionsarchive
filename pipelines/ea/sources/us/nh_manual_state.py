@@ -502,6 +502,15 @@ LINE_FIXES = {
     2356: {"printed": 14182},
     2911: {"name": "David W. Parker", "town": "Gilmanton"},
     950: {"name": "Scatter"},
+    1498: {"name": "Hugh J. Gallen", "town": "Littleton"},
+    1500: {"name": "Louis D'Allesandro", "town": "Manchester"},
+    1505: {"name": "Meldrim Thomson, Jr.", "town": "Orford"},
+    1590: {"name": "Betty B. Hall", "town": "Brookline"},
+    2469: {"name": "Edward C. Dupont, Jr.", "town": "Rochester"},
+    4945: {"name": "Jim Luther", "town": "Hollis"},
+    4946: {"name": "John A. Lewicke", "town": "Mason"},
+    4953: {"name": "Gary E. Lambert", "town": "Nashua"},
+    5150: {"name": "Sharon M. Carson", "town": "Londonderry"},
     5052: {"district": "23"},
     5053: {"district": "23"},
     5054: {"district": "24"},
@@ -1349,7 +1358,12 @@ def emit():
                    from contest_option o where o.contest_id = %s and o.parent_option_id is null""",
                 [default[0] if default else None, contest],
             ).fetchall()
-            others = [option[0] for option in options if option[2] in ("others", "write_in")]
+            others = [
+                option[0]
+                for option in sorted(options, key=lambda o: o[2] != "others")
+                if option[2] in ("others", "write_in")
+            ]
+            pooled = [option for option in options if option[2] == "others"]
             totals = rows.group_by("name", maintain_order=True).agg(
                 pl.col("votes").sum(), pl.col("town").drop_nulls().first(), pl.col("writein").any()
             )
@@ -1387,6 +1401,8 @@ def emit():
                     ]
                     if len(friends) == 1:
                         known[name] = (name if nh_manual.CLEAN.fullmatch(name) else friends[0][0], friends[0][1])
+                    elif writein and not nh_manual.CLEAN.fullmatch(name):
+                        matched[name] = None
                     elif not nh_manual.CLEAN.fullmatch(name) or len(mine[0]) < 3:
                         failed = f"{name} is not a clean name"
                         break
@@ -1416,11 +1432,11 @@ def emit():
                     matched[loose[0]] = option[0]
                     fresh = [name for name in fresh if name != loose[0]]
                     idle, loose = [], []
-            if not failed and idle and loose:
+            if not failed and idle and loose and default is not None:
                 failed = f"unmatched lines {loose} and unmatched options {idle}"
             if not failed and options and not [m for m in matched.values() if m and m not in others]:
                 failed = f"no line matches the contest's options: {list(totals['name'])}"
-            if not failed and None in matched.values() and len(others) > 1:
+            if not failed and None in matched.values() and len(others) > 1 and len(pooled) != 1:
                 failed = "more than one others option"
             if failed:
                 report.setdefault("candidate mismatch", []).append(f"{tag} {external}: {failed}")
