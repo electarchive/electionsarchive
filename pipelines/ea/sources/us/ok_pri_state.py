@@ -1,6 +1,7 @@
 import re
 import subprocess
 from collections import defaultdict
+from collections.abc import Callable
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -98,9 +99,9 @@ def fetch() -> None:
             )
 
 
-def pdf_text(link: str) -> list[str]:
+def pdf_text(link: str, source: str = SOURCE) -> list[str]:
     return subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, link).path), "-"], capture_output=True, check=True, text=True
+        ["pdftotext", "-layout", str(raw.cached(source, link).path), "-"], capture_output=True, check=True, text=True
     ).stdout.splitlines()
 
 
@@ -119,11 +120,11 @@ def place_cells(line: str, start: int, ends: list[int]) -> list[int]:
     return cells
 
 
-def old_header(lines: list[str], at: int) -> list[str]:
+def old_header(lines: list[str], at: int, stop: re.Pattern[str] = ELECTION_LINE) -> list[str]:
     spans = spans_of(lines[at])
     upper = []
     row = at - 1
-    while row >= 0 and lines[row].strip() and not ELECTION_LINE.search(lines[row]):
+    while row >= 0 and lines[row].strip() and not stop.search(lines[row]):
         upper.append(lines[row])
         row -= 1
     names = []
@@ -137,24 +138,34 @@ def old_header(lines: list[str], at: int) -> list[str]:
     return names
 
 
-def blocks_old(link: str) -> dict[tuple[str, int | None, str, date], dict]:
-    lines = pdf_text(link)
+def old_key(office: re.Match[str], header: re.Match[str]) -> tuple[str, int | None, str, date]:
+    day = date(int(header[4]), MONTHS[header[2]], int(header[3]))
+    return (office[1].strip(), int(office[2]) if office[2] else None, header[1].lower(), day)
+
+
+def blocks_old(
+    link: str,
+    source: str = SOURCE,
+    header_line: re.Pattern[str] = ELECTION_LINE,
+    office_line: re.Pattern[str] = OFFICE_LINE,
+    keyer: Callable[[re.Match[str], re.Match[str]], tuple[str, int | None, str, date]] = old_key,
+) -> dict[tuple[str, int | None, str, date], dict]:
+    lines = pdf_text(link, source)
     found: dict[tuple[str, int | None, str, date], dict] = {}
     key = None
     names: list[str] | None = None
     ends: list[int] = []
     for at, line in enumerate(lines):
-        header = ELECTION_LINE.search(line)
-        office = OFFICE_LINE.match(lines[at - 1]) if header and at else None
+        header = header_line.search(line)
+        office = office_line.match(lines[at - 1]) if header and at else None
         if office:
-            day = date(int(header[4]), MONTHS[header[2]], int(header[3]))
-            key = (office[1].strip(), int(office[2]) if office[2] else None, header[1].lower(), day)
+            key = keyer(office, header)
             found.setdefault(key, {"names": None, "rows": [], "total": None})
             names = None
         elif key is None:
             continue
         elif line.strip().startswith("====") and names is None:
-            names = old_header(lines, at)
+            names = old_header(lines, at, header_line)
             ends = [b for _, b in spans_of(line)]
             found[key]["names"] = found[key]["names"] or names
         elif (row := COUNTY_ROW.match(line)) and names is not None:
@@ -167,8 +178,8 @@ def blocks_old(link: str) -> dict[tuple[str, int | None, str, date], dict]:
     return found
 
 
-def blocks_2010(link: str, day: date) -> dict[tuple[str, int | None, str, date], dict]:
-    lines = pdf_text(link)
+def blocks_2010(link: str, day: date, source: str = SOURCE) -> dict[tuple[str, int | None, str, date], dict]:
+    lines = pdf_text(link, source)
     chunks: dict[tuple[str, int | None, str], list[dict]] = defaultdict(list)
     key = None
     pending: tuple[str, int | None] = ("", None)
@@ -219,37 +230,43 @@ def blocks_2010(link: str, day: date) -> dict[tuple[str, int | None, str, date],
     return found
 
 
+def checked(key: tuple, block: dict) -> dict[str, dict[str, int]]:
+    names = list(block["names"])
+    total = block["total"]
+    if names[-1].upper().endswith("VOTES"):
+        names.pop()
+        totals = total[:-1]
+        if sum(totals) != total[-1]:
+            raise ValueError(f"{key}: candidates sum to {sum(totals)}, printed {total[-1]}")
+        cells = [(county, values[:-1]) for county, values in block["rows"]]
+    else:
+        totals = total
+        cells = block["rows"]
+    sums = [sum(values[i] for _, values in cells) for i in range(len(names))]
+    if not all(names) or len(names) != len(totals) or sums != totals or any(len(v) != len(names) for _, v in cells):
+        raise ValueError(f"{key}: counties sum to {sums}, printed {totals}, names {names}")
+    return {name: {county: values[i] for county, values in cells} for i, name in enumerate(names)}
+
+
+def read(link: str) -> dict[tuple[str, int | None, str, date], dict]:
+    name = Path(link).name
+    if name.endswith("-20100727.pdf"):
+        return blocks_2010(link, date(2010, 7, 27))
+    if name.endswith("-20100824.pdf"):
+        return blocks_2010(link, date(2010, 8, 24))
+    return blocks_old(link)
+
+
 def races() -> dict[tuple[str, int | None, str, date], dict]:
     found: dict[tuple[str, int | None, str, date], dict] = {}
     for link, _, _ in files():
-        name = Path(link).name
-        if name.endswith("-20100727.pdf"):
-            part = blocks_2010(link, date(2010, 7, 27))
-        elif name.endswith("-20100824.pdf"):
-            part = blocks_2010(link, date(2010, 8, 24))
-        else:
-            part = blocks_old(link)
-        found.update(part)
+        found.update(read(link))
     kept = {}
     for key, block in found.items():
         office, _, party, _ = key
         if party not in PARTIES or not (office in OFFICES or office in ("STATE REPRESENTATIVE", "STATE SENATOR")):
             continue
-        names = list(block["names"])
-        total = block["total"]
-        if names[-1].upper().endswith("VOTES"):
-            names.pop()
-            totals = total[:-1]
-            if sum(totals) != total[-1]:
-                raise ValueError(f"{key}: candidates sum to {sum(totals)}, printed {total[-1]}")
-            cells = [(county, values[:-1]) for county, values in block["rows"]]
-        else:
-            totals = total
-            cells = block["rows"]
-        sums = [sum(values[i] for _, values in cells) for i in range(len(names))]
-        if not all(names) or len(names) != len(totals) or sums != totals or any(len(v) != len(names) for _, v in cells):
-            raise ValueError(f"{key}: counties sum to {sums}, printed {totals}, names {names}")
-        kept[key] = {name: {county: values[i] for county, values in cells} for i, name in enumerate(names)}
+        kept[key] = checked(key, block)
     return kept
 
 
