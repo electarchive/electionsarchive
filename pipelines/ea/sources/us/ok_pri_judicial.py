@@ -83,6 +83,50 @@ def ordinal(number: int) -> str:
     return f"{number}{suffix}"
 
 
+def place(
+    cs: Changeset,
+    districts: dict[str, tuple[UUID, UUID]],
+    taken: set[str],
+    state_polity: UUID,
+    state_area: UUID,
+    prefix: str,
+    number: int,
+) -> tuple[UUID, UUID]:
+    code = f"OK:{prefix}-{number}"
+    if code in districts:
+        return districts[code]
+    label = f"{ordinal(number)} {'Prosecutorial' if prefix == 'da' else 'Judicial'} District"
+    area = cs.area("us.judicial_district", code)
+    polity = cs.key("us.polity", f"judicial:{code}")
+    districts[code] = (polity, area)
+    if polity in cs.minted:
+        cs.add("polity", id=polity, kind="judicial_district", iso_code=None)
+        cs.add("name", entity_id=polity, text=f"Oklahoma {label}", lang="en", kind="official", is_preferred=True)
+        cs.add("polity_parent", polity_id=polity, parent_id=state_polity)
+        path = f"us/ok/{slug(label)}"
+        if path in taken:
+            raise ValueError(f"{label} would take {path}")
+        taken.add(path)
+        cs.add("slug", path=path, entity_id=polity)
+        cs.add("area", id=area, scheme_code="us.judicial_district")
+        cs.add("area_code", area_id=area, code=code, valid_from=None)
+        cs.add("area_parent", area_id=area, parent_id=state_area)
+        cs.add("name", entity_id=area, text=f"{label}, OK", lang="en", kind="official", is_preferred=True)
+        cs.add("polity_territory", polity_id=polity, area_id=area)
+        cs.add(
+            "reporting_unit",
+            id=cs.unit("us.judicial_district", code),
+            polity_id=polity,
+            scheme_code="us.judicial_district",
+            code=code,
+            area_relation="equals",
+            area_id=area,
+            kind="standard",
+            valid_from=None,
+        )
+    return districts[code]
+
+
 def emit() -> Path:
     loaded = legal()
     days = sorted({key[4] for key in loaded})
@@ -171,41 +215,7 @@ def emit() -> Path:
         districts: dict[str, tuple[UUID, UUID]] = {}
 
         def district(prefix: str, number: int) -> tuple[UUID, UUID]:
-            code = f"OK:{prefix}-{number}"
-            if code in districts:
-                return districts[code]
-            label = f"{ordinal(number)} {'Prosecutorial' if prefix == 'da' else 'Judicial'} District"
-            area = cs.area("us.judicial_district", code)
-            polity = cs.key("us.polity", f"judicial:{code}")
-            districts[code] = (polity, area)
-            if polity in cs.minted:
-                cs.add("polity", id=polity, kind="judicial_district", iso_code=None)
-                cs.add(
-                    "name", entity_id=polity, text=f"Oklahoma {label}", lang="en", kind="official", is_preferred=True
-                )
-                cs.add("polity_parent", polity_id=polity, parent_id=state_polity)
-                path = f"us/ok/{slug(label)}"
-                if path in taken:
-                    raise ValueError(f"{label} would take {path}")
-                taken.add(path)
-                cs.add("slug", path=path, entity_id=polity)
-                cs.add("area", id=area, scheme_code="us.judicial_district")
-                cs.add("area_code", area_id=area, code=code, valid_from=None)
-                cs.add("area_parent", area_id=area, parent_id=state_area)
-                cs.add("name", entity_id=area, text=f"{label}, OK", lang="en", kind="official", is_preferred=True)
-                cs.add("polity_territory", polity_id=polity, area_id=area)
-                cs.add(
-                    "reporting_unit",
-                    id=cs.unit("us.judicial_district", code),
-                    polity_id=polity,
-                    scheme_code="us.judicial_district",
-                    code=code,
-                    area_relation="equals",
-                    area_id=area,
-                    kind="standard",
-                    valid_from=None,
-                )
-            return districts[code]
+            return place(cs, districts, taken, state_polity, state_area, prefix, number)
 
         offices: set[UUID] = set()
         persons: set[UUID] = set()

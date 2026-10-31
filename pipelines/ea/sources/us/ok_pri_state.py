@@ -189,7 +189,10 @@ def blocks_2010(link: str, day: date, source: str = SOURCE) -> dict[tuple[str, i
             district = re.match(r"(.+?), DISTRICT NO\. (\d+)$", race[1])
             pending = (district[1], int(district[2])) if district else (race[1], None)
             key = None
-        elif line.startswith("Party:"):
+        elif line.startswith("Race:"):
+            pending = ("", None)
+            key = None
+        elif line.startswith("Party:") and pending[0]:
             key = (*pending, line.split(":", 1)[1].strip().lower())
             current = {"names": None, "rows": {}, "total": None}
             chunks[key].append(current)
