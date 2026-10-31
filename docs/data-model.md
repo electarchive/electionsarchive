@@ -130,7 +130,7 @@ The `party_affiliation` table records membership in a larger body, such as a Eur
 
 Alliances live in `alliance`, with kinds `electoral_alliance`, `joint_list`, `federation`, and `apparentement`. An option joins an alliance through `contest_option.alliance_id`.
 
-Party logos live in `party_image`. Each logo comes from a dated source statement, never from an upload date, and it carries its license and author. Only public domain, CC0, CC BY, and CC BY-SA files qualify.
+Party logos live in `party_image`. The years a logo was in use come from its Wikidata statement, from the Commons file's own description, or from a cited source, and never from the date the file was uploaded. Each logo carries its license and author. Only public domain, CC0, CC BY, and CC BY-SA files qualify.
 
 ### People and candidacies
 
@@ -166,7 +166,7 @@ A changeset is the only unit of write to the core tables. Each row records its a
 
 A payload takes one of two forms. The `ops` form holds small edits as JSON operations that people and agents submit through the API. The `artifacts` form points to Parquet files in object storage, which pipelines use for imports.
 
-The apply path loads the payload into staging, runs the checks, and then publishes the changeset in one transaction or queues it for review. A pipeline changeset from a registered official source publishes automatically when every check passes and the diff stays inside its declared scope. Everything else waits in `pending_review`.
+The apply path loads the payload into staging, runs the checks, and then publishes the changeset in one transaction or queues it for review. A pipeline changeset from a registered official source, and any `match` changeset, publishes automatically when every check passes and the diff stays inside its declared scope. Everything else waits in `pending_review`, including every changeset that a person or an agent submits.
 
 A release is every changeset published on or before its watermark. The `release` table stores the calendar-version label, the watermark changeset, an optional DOI, and a manifest.
 

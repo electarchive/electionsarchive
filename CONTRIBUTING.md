@@ -53,6 +53,8 @@ uv run ruff format --check
 uv run ty check
 ```
 
+The modules listed in `pipelines/ty.toml` were written before the type check, so ty skips some rules for them. New modules get no such exemption. When you fix the types in a listed module, delete it from the list in the same pull request.
+
 Keep each pull request to one change, and say how you checked it: the page you looked at, the command you ran, or the election whose numbers you compared.
 
 ## Conventions
