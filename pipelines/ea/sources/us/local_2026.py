@@ -7030,7 +7030,10 @@ def parse() -> None:
         if tail.split(":")[2] in ("council", "mayor", "town-board", "clerk", "treasurer", "clerk-treasurer")
     }
     leas = {
-        row["state_leaid"].removeprefix("MN-"): row["leaid"]
+        row["state_leaid"].removeprefix("MN-"): (
+            row["leaid"],
+            row["lea_name"].title() if row["lea_name"].isupper() else row["lea_name"],
+        )
         for row in json.loads(raw.cached(mn_local.SOURCE, mn_local.DIRECTORY).path.read_text())["results"]
     }
     subdivisions = list(
@@ -7072,8 +7075,14 @@ def parse() -> None:
             claim = {}
             if key == "MN-school":
                 school = re.search(r"\((ISD|SSD) ?#\s*(\d+)\)", upper)
-                code = school and leas.get(f"{mn_local.TYPES[school[1]]}{int(school[2]):04d}")
-                tail = code and f"MN:{code}:board-of-education{seat}{special}"
+                lea = school and leas.get(f"{mn_local.TYPES[school[1]]}{int(school[2]):04d}")
+                tail = lea and f"MN:{lea[0]}:board-of-education{seat}{special}"
+                if lea and tail not in exact:
+                    claim = {
+                        "owner": f"school:{lea[0]}",
+                        "label": lea[1],
+                        "office": "Board of Education" + (f", {shown}" if shown else ""),
+                    }
             elif key == "MN":
                 held = next(
                     (
