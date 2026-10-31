@@ -20,7 +20,7 @@ DAYS = [date(year, 11, day) for year, day in ((2012, 6), (2014, 4), (2016, 8), (
 PUBLISHER = "Oklahoma State Election Board"
 TITLE = "Election results: county level results"
 DOWNLOADS = DATA / "inbox" / "manual" / "MF-334"
-RACE = r"^FOR STATE (REPRESENTATIVE|SENATOR) DISTRICT (\d+)$"
+RACE = r"^FOR STATE (REPRESENTATIVE|SENATOR) DISTRICT (\d+)( \(UNEXPIRED TERM\))?$"
 
 
 def url(day: date) -> str:
@@ -66,7 +66,7 @@ def parse() -> None:
                 .then(pl.lit("senate:"))
                 .otherwise(pl.lit("house:"))
                 + description.str.extract(RACE, 2)
-                + pl.lit(":g"),
+                + pl.when(description.str.contains("UNEXPIRED")).then(pl.lit(":gs")).otherwise(pl.lit(":g")),
                 day=pl.lit(day),
                 special=pl.lit(False),
                 state=pl.lit("OK"),

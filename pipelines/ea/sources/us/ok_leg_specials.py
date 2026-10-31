@@ -192,6 +192,13 @@ def emit() -> Path:
                     for county, votes in by_county.items():
                         attached.append((day, key.split(f"{day}:OK:", 1)[1], name, county, votes))
 
+        for day in PRIMARY_DAYS:
+            for (chamber, district, party), by_candidate in races(day, True).items():
+                for name, (_, by_county) in by_candidate.items():
+                    for county, votes in by_county.items():
+                        key = f"{chamber}:{district}:{PARTIES[party][1]}pfsettled"
+                        attached.append((day, key, name, county, votes))
+
         timeline: dict[tuple[str, int], list[tuple[date, str, dict]]] = defaultdict(list)
         for day in SPECIAL_DAYS:
             for (chamber, district, party), by_candidate in races(day, True).items():

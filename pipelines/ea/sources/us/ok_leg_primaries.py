@@ -57,10 +57,10 @@ def fetch() -> None:
             )
 
 
-def races(day: date) -> dict[tuple[str, int, str], dict[str, dict[str, int]]]:
+def races(day: date) -> dict[tuple[str, int, str, bool], dict[str, dict[str, int]]]:
     with zipfile.ZipFile(raw.cached(SOURCE, url(day)).path) as archive:
         text = archive.read(archive.namelist()[0]).decode("utf8", errors="replace")
-    found: dict[tuple[str, int, str], dict[str, dict[str, int]]] = defaultdict(
+    found: dict[tuple[str, int, str, bool], dict[str, dict[str, int]]] = defaultdict(
         lambda: defaultdict(lambda: defaultdict(int))
     )
     for row in csv.DictReader(io.StringIO(text)):
@@ -68,7 +68,7 @@ def races(day: date) -> dict[tuple[str, int, str], dict[str, dict[str, int]]]:
         if match is None or row["race_party"] not in PARTIES:
             continue
         chamber = "senate" if match[1] == "SENATOR" else "house"
-        found[(chamber, int(match[2]), row["race_party"])][row["cand_name"].upper().strip()][row["county"]] += int(
+        found[(chamber, int(match[2]), row["race_party"], match[3] is not None)][row["cand_name"].upper().strip()][row["county"]] += int(
             row["cand_tot_votes"]
         )
     return found
@@ -175,18 +175,18 @@ def emit() -> Path:
         made = 0
         for day, first in PAIRS.items():
             runoff = first is not None
-            for (chamber, district, party), by_candidate in loaded[day].items():
+            for (chamber, district, party, remainder), by_candidate in loaded[day].items():
                 word, etype, label = PARTIES[party]
                 contest_key = f"{day}:OK:{chamber}:{district}:{etype}" + ("runoff" if runoff else "")
                 previous = f"{first}:OK:{chamber}:{district}:{etype}" if runoff else None
-                if runoff and (chamber, district, party) not in loaded[first]:
+                if runoff and (chamber, district, party, remainder) not in loaded[first]:
                     raise ValueError(f"{contest_key}: no first round in {first}")
                 shaped = shape(day.year, chamber, district)
                 advanced = {
                     name
                     for other, start in PAIRS.items()
                     if start == day
-                    for name in loaded[other].get((chamber, district, party), {})
+                    for name in loaded[other].get((chamber, district, party, remainder), {})
                 }
                 contest = cs.key("us.contest", contest_key)
                 body = "House of Representatives" if chamber == "house" else "Senate"
@@ -202,7 +202,7 @@ def emit() -> Path:
                     boundary_set_id=shaped[4],
                     magnitude=shaped[5],
                     party_scope_id=scope[party][0],
-                    term=shaped[6],
+                    term="remainder" if remainder else shaped[6],
                     round_number=2 if runoff else 1,
                     previous_round_id=cs.key("us.contest", previous) if runoff else None,
                     electoral_system_id=system,
