@@ -8,8 +8,9 @@ import { PROJECT } from "#lib/constants.js";
 function connect(connectionString: string) {
   const pool = new pg.Pool({
     connectionString,
+    max: 32,
     idleTimeoutMillis: 30_000,
-    connectionTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 30_000,
     statement_timeout: 300_000,
     application_name: PROJECT,
   });

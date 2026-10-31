@@ -5,6 +5,7 @@ import type { Prose } from "#lib/contrib.js";
 import { effective, stand } from "#lib/caucus.js";
 import { headline } from "#lib/coverage.js";
 import { era } from "#lib/party.js";
+import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";
@@ -88,14 +89,14 @@ async function draw() {
   };
 }
 
-const atlas = new Map<string, ReturnType<typeof draw>>();
-
 export async function home() {
-  const drawn = atlas.get("world") ?? draw();
-  atlas.set("world", drawn);
+  return remember("home", welcome);
+}
+
+async function welcome() {
   const [polities, shapes, dated, held] = await Promise.all([
     call(router.polities.list, { kinds: ["sovereign_state", "supranational"] }),
-    drawn,
+    draw(),
     db.execute<{
       id: string;
       name: string | null;
@@ -929,8 +930,18 @@ export async function archive(path: string, search: URLSearchParams) {
     };
   }
   if (slug.type === "contest") {
+    const got = call(router.contests.get, {
+      id: slug.entity_id,
+      unit,
+      by: search.get("by") ?? undefined,
+      vs: search.get("vs") ?? undefined,
+      match,
+      round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
+      group: search.get("group") ?? undefined,
+    });
     const [
       contest,
+      boundaries,
       lists,
       rounds,
       ballot,
@@ -942,15 +953,13 @@ export async function archive(path: string, search: URLSearchParams) {
       standing,
     ] = await found(
       Promise.all([
-        call(router.contests.get, {
-          id: slug.entity_id,
-          unit,
-          by: search.get("by") ?? undefined,
-          vs: search.get("vs") ?? undefined,
-          match,
-          round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
-          group: search.get("group") ?? undefined,
-        }),
+        got,
+        (async () =>
+          call(router.contests.boundaries, {
+            id: slug.entity_id,
+            unit,
+            level: (await got).places?.level,
+          }))(),
         call(router.contests.lists, { id: slug.entity_id }),
         call(router.contests.rounds, { id: slug.entity_id, unit }),
         call(router.contests.ballot, { id: slug.entity_id, unit }),
@@ -976,11 +985,6 @@ export async function archive(path: string, search: URLSearchParams) {
         })(),
       ]),
     );
-    const boundaries = await call(router.contests.boundaries, {
-      id: slug.entity_id,
-      unit,
-      level: contest.places?.level,
-    });
     const siblings = contest.scope.trail.at(-1)?.siblings;
     const level = boundaries.find(
       (entry) => entry.scheme === contest.places?.level,

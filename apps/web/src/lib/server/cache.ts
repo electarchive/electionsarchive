@@ -1,26 +1,104 @@
-import { os as base } from "@orpc/server";
+import { version as build, building } from "$app/env";
+import { os as base, Procedure } from "@orpc/server";
+import { RESP_TYPES } from "@redis/client";
 import { sql } from "drizzle-orm";
+import { Buffer } from "node:buffer";
+import { promisify } from "node:util";
+import { deserialize, serialize } from "node:v8";
+import { zstdCompress, zstdDecompress } from "node:zlib";
 import { db } from "#lib/server/db/index.js";
+import { redis } from "#lib/server/redis.js";
 
-const LIMIT = 800;
+const LIMIT = 20_000;
+const BUDGET = 1024 ** 3;
+const LARGEST = 64 * 1024 ** 2;
+const LIFETIME = 30 * 86_400;
 const CHECK = 5000;
 
-const entries = new Map<
-  string,
-  {
-    value: Promise<unknown>;
-    version: string;
-    isSettled: boolean;
-    isRenewing: boolean;
-  }
->();
-const procedures = new WeakMap<object, number>();
+const pack = promisify(zstdCompress);
+const unpack = promisify(zstdDecompress);
+
+type Entry = {
+  value: Promise<unknown>;
+  version: string;
+  size: number;
+  isSettled: boolean;
+  isRenewing: boolean;
+};
+
+const entries = new Map<string, Entry>();
+const names = new WeakMap<object, string>();
 const state: {
   version: string;
   checked: number;
   checking: Promise<void> | null;
-  procedures: number;
-} = { version: "", checked: 0, checking: null, procedures: 0 };
+  size: number;
+} = { version: "", checked: 0, checking: null, size: 0 };
+
+let shared: ReturnType<typeof connect> | null = null;
+
+function connect() {
+  return redis().withTypeMapping({ [RESP_TYPES.BLOB_STRING]: Buffer });
+}
+
+function client() {
+  if (building) {
+    return null;
+  }
+  shared ??= connect();
+  redis();
+  return shared.isReady ? shared : null;
+}
+
+client();
+
+async function recall(key: string) {
+  const reader = client();
+  if (reader == null) {
+    return null;
+  }
+  try {
+    const found = await reader.get(`c:${build}:${key}`);
+    if (found == null) {
+      return null;
+    }
+    const payload = await unpack(found);
+    const parsed: unknown = deserialize(payload);
+    if (
+      typeof parsed === "object" &&
+      parsed != null &&
+      "version" in parsed &&
+      typeof parsed.version === "string" &&
+      "value" in parsed
+    ) {
+      return {
+        version: parsed.version,
+        value: parsed.value,
+        size: payload.length,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function keep(key: string, version: string, value: unknown) {
+  try {
+    const payload = serialize({ version, value });
+    const writer = client();
+    if (writer != null && payload.length <= LARGEST) {
+      void pack(payload)
+        .then(async (packed) =>
+          writer.set(`c:${build}:${key}`, packed, { EX: LIFETIME }),
+        )
+        .catch(() => null);
+    }
+    return payload.length;
+  } catch {
+    return 0;
+  }
+}
 
 async function refresh() {
   try {
@@ -36,24 +114,113 @@ async function refresh() {
   }
 }
 
-function store<T>(key: string, compute: () => Promise<T>) {
-  const entry = {
-    value: compute() as Promise<unknown>,
+function drop(key: string) {
+  const entry = entries.get(key);
+  if (entry != null) {
+    state.size -= entry.size;
+    entries.delete(key);
+  }
+}
+
+function evict() {
+  for (const oldest of entries.keys()) {
+    if (entries.size <= LIMIT && state.size <= BUDGET) {
+      break;
+    }
+    drop(oldest);
+  }
+}
+
+function put(key: string, entry: Entry) {
+  drop(key);
+  entries.set(key, entry);
+  state.size += entry.size;
+  evict();
+}
+
+function store<T>(key: string, compute: () => Promise<T>, isStrict: boolean) {
+  const entry: Entry = {
+    value: Promise.resolve(),
     version: state.version,
+    size: 0,
     isSettled: false,
     isRenewing: false,
   };
+  let recalled = 0;
+  entry.value = (async () => {
+    const found = await recall(key);
+    if (found != null && (found.version === entry.version || !isStrict)) {
+      entry.version = found.version;
+      recalled = found.size;
+      return found.value;
+    }
+    return compute();
+  })();
   void (async () => {
     try {
-      await entry.value;
+      const value = await entry.value;
+      const isFresh = entry.version === state.version;
+      const size =
+        isFresh && recalled === 0 ? keep(key, entry.version, value) : recalled;
       entry.isSettled = true;
+      if (entries.get(key) !== entry) {
+        return;
+      }
+      entry.size = size;
+      state.size += size;
+      evict();
+      if (!isFresh) {
+        renew(key, entry, compute);
+      }
     } catch {
       if (entries.get(key) === entry) {
-        entries.delete(key);
+        drop(key);
       }
     }
   })();
   return entry;
+}
+
+const RENEWING = 4;
+const waiting: Array<() => Promise<void>> = [];
+let renewing = 0;
+
+async function drain() {
+  while (renewing < RENEWING) {
+    const task = waiting.shift();
+    if (task == null) {
+      return;
+    }
+    renewing++;
+    try {
+      await task();
+    } finally {
+      renewing--;
+    }
+  }
+}
+
+function renew(key: string, hit: Entry, compute: () => Promise<unknown>) {
+  hit.isRenewing = true;
+  waiting.push(async () => {
+    const version = state.version;
+    try {
+      const value = await compute();
+      const next: Entry = {
+        value: Promise.resolve(value),
+        version,
+        size: keep(key, version, value),
+        isSettled: true,
+        isRenewing: false,
+      };
+      if (entries.get(key) === hit) {
+        put(key, next);
+      }
+    } catch {
+      hit.isRenewing = false;
+    }
+  });
+  void drain();
 }
 
 export async function remember<T>(
@@ -70,43 +237,41 @@ export async function remember<T>(
     entries.delete(key);
     entries.set(key, hit);
     if (isStrict && hit.version !== state.version) {
-      const next = store(key, compute);
-      entries.set(key, next);
+      const next = store(key, compute, true);
+      put(key, next);
       return next.value as Promise<T>;
     }
     if (hit.version !== state.version && hit.isSettled && !hit.isRenewing) {
-      hit.isRenewing = true;
-      const next = store(key, compute);
-      void (async () => {
-        try {
-          await next.value;
-          if (entries.get(key) === hit) {
-            entries.set(key, next);
-          }
-        } catch {
-          hit.isRenewing = false;
-        }
-      })();
+      renew(key, hit, compute);
     }
     return hit.value as Promise<T>;
   }
-  const entry = store(key, compute);
-  entries.set(key, entry);
-  if (entries.size > LIMIT) {
-    const oldest = entries.keys().next().value;
-    if (oldest != null) {
-      entries.delete(oldest);
+  const entry = store(key, compute, isStrict);
+  put(key, entry);
+  return entry.value as Promise<T>;
+}
+
+export function label(
+  router: Record<string, unknown>,
+  path: Array<string> = [],
+) {
+  for (const [key, value] of Object.entries<unknown>(router)) {
+    if (value instanceof Procedure) {
+      names.set(value, [...path, key].join("."));
+    } else if (typeof value === "object" && value != null) {
+      label(Object.fromEntries(Object.entries(value)), [...path, key]);
     }
   }
-  return entry.value as Promise<T>;
 }
 
 function cached(isStrict: boolean) {
   return base.use(async ({ next, procedure }, input) => {
-    const id = procedures.get(procedure) ?? state.procedures++;
-    procedures.set(procedure, id);
+    const name = names.get(procedure);
+    if (name == null) {
+      return next();
+    }
     const output = await remember(
-      `${id}:${JSON.stringify(input)}`,
+      `${name}:${JSON.stringify(input)}`,
       async () => {
         const result = await next();
         return result.output;

@@ -1,5 +1,6 @@
 import { READ_ONLY } from "$app/env/public";
 import { ORPCError, os } from "@orpc/server";
+import { label } from "#lib/server/cache.js";
 import { agents } from "#lib/server/rpc/agents.js";
 import {
   bodies,
@@ -38,6 +39,8 @@ export const reads = {
 };
 
 export const router = { ...reads, ...contributions };
+
+label(router);
 
 export type Router = typeof router;
 
