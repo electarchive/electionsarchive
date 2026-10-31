@@ -9,7 +9,7 @@ from collections import defaultdict
 from datetime import date
 
 from ea import coverage, coverage_countries, readiness
-from ea.store import ROOT, connect
+from ea.store import connect
 
 BASE = os.environ.get("EA_BASE", "http://localhost:5173")
 US = {
@@ -84,7 +84,7 @@ def database(conn) -> list[str]:
         problems.append(
             f"{polity} {goal} {level} {state} {year}: icpsr {icpsr} and published {published} against complete {complete}"
         )
-    with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
+    with coverage.FINEST.open() as f:
         for row in csv.DictReader(f):
             county = row.get("county") or ""
             if row["finest"] not in ("none", "county", "town", "district", "precinct") or (

@@ -1,10 +1,12 @@
 import csv
+import os
 import time
 from collections import defaultdict
 from datetime import date
+from pathlib import Path
 
 from ea import readiness
-from ea.store import ROOT, Connection, connect
+from ea.store import DATA, ROOT, Connection, connect
 
 LEVELS = (
     "president",
@@ -23,7 +25,12 @@ LEVELS = (
     "local_measure",
 )
 STAGES = ("general", "primary", "runoff", "special")
-GAPS = ROOT / ".agents" / "spec" / "coverage-gaps.tsv"
+INPUTS = ROOT / "pipelines" / "ea" / "coverage_inputs"
+GAPS = INPUTS / "coverage-gaps.tsv"
+FINEST = INPUTS / "finest-reported.csv"
+REPORTS = Path(
+    os.environ.get("EA_REPORTS") or (ROOT / ".agents" / "spec" if (ROOT / ".agents").is_dir() else DATA / "reports")
+)
 CATEGORIES = ("known_gap", "blocked", "not_applicable")
 GRAINS = ("results", "county", "precinct", "fine", "shapes", "turnout", "candidates", "dates", "party")
 LOCAL = {"county", "municipal", "school", "special_district", "local_measure"}
@@ -738,9 +745,8 @@ def matrix(conn: Connection, scope: list[str], members: list[dict], last: int = 
             conn.execute("analyze uspol, pstate")
     readiness.flag(conn, "cc")
     conn.execute("create temp table published (st text, year integer, level text, county text, finest text)")
-    published = ROOT / ".agents" / "spec" / "finest-reported.csv"
-    if published.exists():
-        with published.open() as f:
+    if FINEST.exists():
+        with FINEST.open() as f:
             for row in csv.DictReader(f):
                 conn.execute(
                     "insert into published values (%s, %s, %s, %s, %s)",
@@ -1180,14 +1186,14 @@ def us() -> str:
                 total = units.get((None, year), (0, 0))
                 units[(None, year)] = (total[0] + n, total[1] + shaped)
     rows.sort(key=lambda row: (row["state"], row["year"], row["level"], row["stage"]))
-    spec = ROOT / ".agents" / "spec"
-    with (spec / "us-coverage.csv").open("w", newline="") as handle:
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    with (REPORTS / "us-coverage.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
     text = report(rows, units)
     ready = readiness.markdown(readiness.DAY)
-    (spec / "us-coverage.md").write_text(
+    (REPORTS / "us-coverage.md").write_text(
         text.replace("\n## How it is measured", f"\n{ready}\n## How it is measured", 1)
     )
     with connect() as conn:
@@ -1200,7 +1206,7 @@ def us() -> str:
     totals = [sum(row[i] for row in groups) for i in range(2, 9)]
     ranked = sorted((row for row in groups if row[2] > 0), key=lambda row: -row[2])
     held = totals[4] - totals[3]
-    (spec / "us-local-gaps.md").write_text(
+    (REPORTS / "us-local-gaps.md").write_text(
         LOCAL_GAPS_MD.format(
             today=date.today(),
             built=f"{built:%Y-%m-%d %H:%M}",

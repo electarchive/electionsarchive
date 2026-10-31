@@ -1199,16 +1199,16 @@ STATE_INPUTS = (
     "pipelines/ea/readiness.py",
     f"pipelines/ea/readiness/{readiness.DAY}.json",
     "pipelines/ea/sources/us/ncsl_measures.csv",
-    ".agents/spec/finest-reported.csv",
-    ".agents/spec/coverage-gaps.tsv",
+    "pipelines/ea/coverage_inputs/finest-reported.csv",
+    "pipelines/ea/coverage_inputs/coverage-gaps.tsv",
 )
 COUNTRY_INPUTS = (
     "pipelines/ea/coverage.py",
     "pipelines/ea/coverage_countries.py",
     "pipelines/ea/readiness.py",
     f"pipelines/ea/readiness/{readiness.DAY}.json",
-    ".agents/spec/finest-reported.csv",
-    ".agents/spec/coverage-gaps.tsv",
+    "pipelines/ea/coverage_inputs/finest-reported.csv",
+    "pipelines/ea/coverage_inputs/coverage-gaps.tsv",
 )
 
 PART_SQL = """

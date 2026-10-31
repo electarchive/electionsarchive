@@ -95,10 +95,10 @@ def main() -> None:
     )
     commands.add_parser(
         "coverage",
-        help="measure a country's coverage against its goals and write .agents/spec/us-coverage.md or "
-        ".agents/spec/coverage/{cc}-coverage.md, refresh the coverage tables the app's coverage pages read from the states and countries that changed "
+        help="measure a country's coverage against its goals and write us-coverage.md or "
+        "coverage/{cc}-coverage.md to the reports folder (EA_REPORTS), refresh the coverage tables the app's coverage pages read from the states and countries that changed "
         "(rebuild: all of them), "
-        "check them against the cited counts, the pages, their twins, and REST, or write .agents/spec/world-gaps.md",
+        "check them against the cited counts, the pages, their twins, and REST, or write world-gaps.md there",
     ).add_argument("polity", choices=("us", "refresh", "rebuild", "check", "world", *coverage_countries.countries()))
     portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
     portal.add_argument("action", choices=("census",))

@@ -18,8 +18,8 @@ INPUTS = (
     "pipelines/ea/readiness.py",
     "pipelines/ea/readiness/2026-11-03.json",
     "pipelines/ea/sources/us/ncsl_measures.csv",
-    ".agents/spec/finest-reported.csv",
-    ".agents/spec/coverage-gaps.tsv",
+    "pipelines/ea/coverage_inputs/finest-reported.csv",
+    "pipelines/ea/coverage_inputs/coverage-gaps.tsv",
 )
 GOALS = ("national", "fine", "shapes", "subnational", "local", "referendums", "ep")
 WINDOW = timedelta(days=75)
@@ -633,7 +633,7 @@ def place_of(cc: str, data: dict, area: str | None, election_iso: str | None) ->
 
 def part(conn, cc: str) -> tuple[list[tuple], tuple]:
     if cc == "us":
-        with (ROOT / ".agents" / "spec" / "finest-reported.csv").open() as f:
+        with coverage.FINEST.open() as f:
             canvass = [
                 {
                     "goal": "precinct",
@@ -707,8 +707,8 @@ def report(cc: str) -> str:
         data = measure(conn, cc)
         data["first"], data["last"], data["elections"], data["contests"], _, _ = summary(conn, cc)
     goals, elections, notes = tally(cc, data)
-    folder = ROOT / ".agents" / "spec" / "coverage"
-    folder.mkdir(exist_ok=True)
+    folder = coverage.REPORTS / "coverage"
+    folder.mkdir(parents=True, exist_ok=True)
     with (folder / f"{cc}-coverage.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(elections[0]) if elections else ["goal"])
         writer.writeheader()
@@ -965,5 +965,6 @@ def world() -> str:
             f"| {specs[span['cc']]['name']} | {labels.get((span['cc'], span['level']), span['level'])}"
             f" | {', '.join(str(y) for y in sorted(span['years']))} | {span['missing']:,} |"
         )
-    (ROOT / ".agents" / "spec" / "world-gaps.md").write_text("\n".join(lines) + "\n")
+    coverage.REPORTS.mkdir(parents=True, exist_ok=True)
+    (coverage.REPORTS / "world-gaps.md").write_text("\n".join(lines) + "\n")
     return f"world-gaps.md: {len(sourced)} sourced spans, {len(unsourced)} unsourced years"

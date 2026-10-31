@@ -12,10 +12,11 @@ from urllib.parse import urljoin, urlparse
 
 import httpx
 
+from ea import coverage
 from ea.raw import USER_AGENT
-from ea.store import ROOT, connect
+from ea.store import connect
 
-REGISTRY = ROOT / ".agents" / "spec" / "us-portals.csv"
+REGISTRY = coverage.REPORTS / "us-portals.csv"
 COLUMNS = (
     "state",
     "county_fips",
