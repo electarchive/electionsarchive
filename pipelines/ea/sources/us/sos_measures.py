@@ -650,6 +650,7 @@ MS_2004_TOTALS = (
     (155648, (0.3678, 0.7767, 0.4279, 0.7867)),
 )
 MS_2004_MEASURES = {"1": ("Definition of marriage", "Legislative Referendum", True)}
+VT_2002_MEASURES = {"4": ("Mandatory retirement age for judges", "Legislative Referendum", True)}
 WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
 WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
 WI_FILES = {
@@ -1908,7 +1909,13 @@ STATES = {
     "Wisconsin": "WI",
     "Wyoming": "WY",
 }
+VT_2002 = "https://web.archive.org/web/20120101000000id_/http://vermont-elections.org/elections1/2002GEConstAmdResults111102.pdf"
 PUBLISHERS = {
+    "VT": (
+        "Vermont Secretary of State",
+        "Constitutional amendment vote returns, November 5, 2002",
+        "https://electionarchive.vermont.gov/",
+    ),
     "IL": (
         "Illinois State Board of Elections",
         "Official vote totals",
@@ -2394,6 +2401,7 @@ def fetch() -> None:
     store_manual(SD_2002_JUNE, "MF-444/2002PCAE.pdf", "application/pdf")
     for district in range(1, 41):
         store_manual(AK_2007.format(district), f"MF-447/hd{district}.pdf", "application/pdf")
+    store_manual(VT_2002, "MF-445/2002GEConstAmdResults111102.pdf", "application/pdf")
     store_manual(NM_2003, "MF-443/2003-special-election.pdf", "application/pdf")
     store_manual(KS_2000, "MF-446/ks-2000-general-questions-by-precinct.xls", "application/vnd.ms-excel")
     store_manual(KS_2005, "MF-446/2005_Constitutional_Amendment_results_by_county.xls", "application/vnd.ms-excel")
@@ -6252,6 +6260,39 @@ def new_mexico() -> list[dict[str, object]]:
     return rows
 
 
+def vermont() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, VT_2002).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    towns: dict[str, list[int]] = {}
+    for line in text.splitlines():
+        match = re.match(r"(\d\d) \d{3} .*?\s(\d+)\s+(\d+)\s+[\d.]+\s+(\d+)\s+[\d.]+\s+\d+\s+\d+\s+\d+\s+[\d.]+$", line)
+        if match is not None:
+            tally = towns.setdefault(match[1], [0, 0])
+            tally[0] += int(match[3])
+            tally[1] += int(match[4])
+    printed = re.search(r"STATEWIDE TOTALS\s+\d+\s+(\d+)\s+[\d.]+\s+(\d+)", text)
+    if len(towns) != 14 or printed is None:
+        raise ValueError(f"{VT_2002}: {len(towns)} counties")
+    for index in range(2):
+        if sum(sides[index] for sides in towns.values()) != int(printed[1 + index]):
+            raise ValueError(f"{VT_2002}: counties do not sum to the printed statewide total")
+    return [
+        {
+            "state": "VT",
+            "day": date(2002, 11, 5),
+            "number": "4",
+            "label": "Proposal 4",
+            "url": VT_2002,
+            "county": f"500{county}",
+            "answer": answer,
+            "votes": sides[index],
+        }
+        for county, sides in towns.items()
+        for index, answer in enumerate(("YES", "NO"))
+    ]
+
+
 def south_dakota_2002_june() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for answer, (printed, text) in SD_2002_JUNE_VOTES.items():
@@ -6554,6 +6595,7 @@ def parse() -> None:
             *hawaii(),
             *new_mexico(),
             *south_dakota_2002_june(),
+            *vermont(),
         ],
         infer_schema_length=None,
     )
@@ -6589,6 +6631,7 @@ def parse() -> None:
             ("GA", 2022),
             ("WV", 2012),
             ("MS", 2004),
+            ("VT", 2002),
         ):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
@@ -6607,6 +6650,7 @@ def parse() -> None:
                     "GA": GA_2022_MEASURES,
                     "WV": WV_2012_MEASURES,
                     "MS": MS_2004_MEASURES,
+                    "VT": VT_2002_MEASURES,
                 }.get(state, AZ_2022)[number]
             )
             matched.append(
