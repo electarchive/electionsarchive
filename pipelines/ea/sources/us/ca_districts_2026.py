@@ -1482,10 +1482,12 @@ ALAMEDA_NAMES = {
     "Dublin San Ramon": "Dublin San Ramon Services District",
 }
 ALAMEDA = re.compile(
-    r"^(?:Member, Board Of Directors?, )?(?P<body>.+?)(?: Directors?)?"
+    r"^(?:Member, Board Of Directors?, )?(?P<body>.+?)(?: Directors?| Trustee)?"
     r"(?:,? (?P<kind>Ward|District|Area|Dist) #?(?P<number>\d+))?(?P<short>, Short Term)?$"
 )
-ALAMEDA_KEPT = re.compile(r"(?i)water|EBMUD|sanitary|fire|park|health|irrigation|BART|AC Transit|Dublin San Ramon")
+ALAMEDA_KEPT = re.compile(
+    r"(?i)water|EBMUD|sanitary|fire|park|health|irrigation|BART|AC Transit|Dublin San Ramon|community college"
+)
 
 
 def alameda() -> list[dict[str, str | int | bool]]:
@@ -1511,7 +1513,8 @@ def alameda() -> list[dict[str, str | int | bool]]:
                 if found is not None
                 and ALAMEDA_KEPT.search(found["body"])
                 and not re.search(
-                    r"(?i)school|college|education|city|unified|congress|assembly|senate|equalization", line
+                    r"(?i)school|(?<!community )college|education|city|unified|congress|assembly|senate|equalization",
+                    line,
                 )
                 else None
             )
@@ -1540,11 +1543,11 @@ def alameda() -> list[dict[str, str | int | bool]]:
                 rows.append(
                     {
                         "county": "Alameda",
-                        "district": full_name(re.sub(r"\bDist\b", "District", body))
+                        "district": full_name(re.sub(r"\bDist\b", "District", re.sub(r"\s+-\s+", "-", body)))
                         if body == contest["body"]
                         else body,
                         "seat": seat or ("Short Term" if contest["short"] else ""),
-                        "role": "Director",
+                        "role": "Trustee" if "College" in body else "Director",
                         "seats": seats,
                         "name": " ".join(cased(name).split()),
                         "unexpired": contest["short"] is not None,
