@@ -211,6 +211,7 @@ ELSTATS = {
 }
 ELSTATS = {state: offices for state, offices in ELSTATS.items() if state not in elstats.HELD}
 ELSTATS_YEARS = range(2000, 2023)
+ELSTATS_LAST = {"ID": 2024}
 MA_YEARS = range(1994, 2023)
 ELSTATS_DATES = {
     ("ID", date(2000, 5, 24)): date(2000, 5, 23),
@@ -1163,6 +1164,10 @@ def nyc_files() -> dict[tuple[date, str, str, str], str]:
     return files
 
 
+def elstats_years(state: str) -> range:
+    return range(ELSTATS_YEARS.start, ELSTATS_LAST.get(state, ELSTATS_YEARS.stop - 1) + 1)
+
+
 def search(state: str, office: int, year: int) -> str:
     if state == "MA":
         return f"{elstats.MASSACHUSETTS}search/year_from:{year}/year_to:{year}/office_id:{office}/stage:Primaries"
@@ -1290,7 +1295,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, CA_SOV.format(path=path.format(name)), suffix=Path(path).suffix)
     for state, offices in ELSTATS.items():
         for office in offices | (MA_FEDERAL if state == "MA" else {}):
-            for year in MA_YEARS if state == "MA" else ELSTATS_YEARS:
+            for year in MA_YEARS if state == "MA" else elstats_years(state):
                 if state != "MA":
                     raw.fetch(SOURCE, search(state, office, year), suffix=".csv")
                     continue
@@ -1373,7 +1378,7 @@ def parse() -> None:
     for state, offices in ELSTATS.items():
         fips = STATES[state][0]
         for office, body in (offices | (MA_FEDERAL if state == "MA" else {})).items():
-            for year in MA_YEARS if state == "MA" else ELSTATS_YEARS:
+            for year in MA_YEARS if state == "MA" else elstats_years(state):
                 if state == "MA":
                     days = MA_PRESIDENT if office == 1 else MA_DAYS
                     if year not in days:
@@ -3649,7 +3654,7 @@ def emit() -> Path:
         held = set()
         for state, offices in ELSTATS.items():
             for office in offices | (MA_FEDERAL if state == "MA" else {}):
-                for year in MA_YEARS if state == "MA" else ELSTATS_YEARS:
+                for year in MA_YEARS if state == "MA" else elstats_years(state):
                     if state == "MA" and year not in (MA_PRESIDENT if office == 1 else MA_DAYS):
                         continue
                     artifact = raw.cached(SOURCE, search(state, office, year))
