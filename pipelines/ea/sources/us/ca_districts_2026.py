@@ -503,7 +503,13 @@ SANTA_CRUZ = (
     "Santa Cruz County Clerk and Registrar of Voters",
     "Contact Candidates: contests that will appear on the ballot, November 3, 2026 General Election",
 )
+SANTA_CRUZ_WATCH = (
+    "https://votescount.santacruzcountyca.gov/Home/Elections/November3,2026CaliforniaGeneralElection/CandidateWatch.aspx",
+    "Santa Cruz County Clerk and Registrar of Voters",
+    "Candidate Watch: filed candidates by district, November 3, 2026 General Election",
+)
 INBOX_DOCS = {
+    "06087-w": (SANTA_CRUZ_WATCH, "santacruz_watch.md", "text/markdown"),
     "06025-s": (IMPERIAL, "imperial_0820.pdf", "application/pdf"),
     "06087-s": (SANTA_CRUZ, "santacruz_contact.html", "text/html"),
 }
@@ -639,6 +645,36 @@ def santa_cruz() -> list[Row]:
                         }
                     )
                 cells = []
+    return rows
+
+
+def santa_cruz_watch(contested: set[str]) -> list[Row]:
+    rows: list[Row] = []
+    current: tuple[str, str, str, int] | None = None
+    for line in (item.strip() for item in inbox_doc("06087-w").read_text().splitlines()):
+        if head := re.match(r"^### (.+?)(?: \(Short Term\))? - (?:(\d+) Seats?|(Division|Zone|Ward) (\w+))$", line):
+            body = head[1].strip()
+            short = "(Short Term)" in line
+            if usable(body) and full_name(body) not in contested:
+                label = f"{head[3]} {head[4]}" if head[3] else ("Short Term" if short else "")
+                current = (full_name(body), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
+            else:
+                current = None
+        elif current is not None and line.startswith("| ") and not line.startswith(("| Candidate", "| ---", "| |")):
+            district, role, seat, seats = current
+            rows.append(
+                {
+                    "county": "Santa Cruz",
+                    "district": district,
+                    "seat": seat,
+                    "role": role,
+                    "seats": seats,
+                    "name": line.split("|")[1].strip(),
+                    "unexpired": seat == "Short Term",
+                    "tacit": True,
+                    "doc": "06087-w",
+                }
+            )
     return rows
 
 
@@ -1323,6 +1359,7 @@ def parse() -> None:
                 *humboldt(),
                 *imperial(),
                 *santa_cruz(),
+                *santa_cruz_watch({row["district"] for row in santa_cruz()}),
                 *sutter(),
                 *napa(),
                 *solano(),
