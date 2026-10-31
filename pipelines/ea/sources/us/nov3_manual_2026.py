@@ -53,6 +53,9 @@ SCHOOLS = {
     ("WA", "Southside School District No. 42"): "5308220",
     ("WA", "Wenatchee School District No. 246"): "5309660",
     ("TX", "Mesquite Independent School District"): "4830390",
+    ("TX", "Bryan Independent School District"): "4811790",
+    ("TX", "Navasota Independent School District"): "4832190",
+    ("TX", "Robinson Independent School District"): "4837410",
     ("ID", "Genesee Joint School District No. 282"): "1601200",
     ("ID", "Highland Joint School District No. 305"): "1601440",
     ("ID", "Moscow School District No. 281"): "1602220",
@@ -714,6 +717,51 @@ COUNTIES = {
         "TX",
         "https://www.co.waller.tx.us/upload/page/0286/Notice%20of%20Confirmation%20Directors%20Bonds%20and%20Operation%20and%20Maintenance%20Tax%20Elections%20November%202026.pdf",
         "N3M-web/tx8/f23.pdf",
+    ),
+    "48257-ter": (
+        "TX",
+        "https://www.cityofterrell.org/DocumentCenter/View/7477/Ordinance-No-3187",
+        "N3M-web/tx9/terrell.pdf",
+    ),
+    "48041-bisd": (
+        "TX",
+        "https://elections.brazoscountytx.gov/wp-content/uploads/2026/09/BRYAN-ISD-NOV-2026-Notice-of-Voter-Approval-Tax-Rate-Election-accessible.pdf",
+        "N3M-web/tx9/BRYAN.pdf",
+    ),
+    "48041-nisd": (
+        "TX",
+        "https://elections.brazoscountytx.gov/wp-content/uploads/2026/09/Amended-Navasota-ISD-November-2026-VATRE-Notice-of-Election-English-and-Spanish-9-21-accessible.pdf",
+        "N3M-web/tx9/Navasota.pdf",
+    ),
+    "48479-lar": (
+        "TX",
+        "https://www.webbcountytx.gov/DocumentCenter/View/11708/413-02",
+        "N3M-web/tx9/w/11708.pdf",
+    ),
+    "48231-esd1": (
+        "TX",
+        "https://www.huntcounty.net/upload/page/0142/2026/Order%20of%20Election%20for%20Emergency%20Services%20District%20Number%201.pdf",
+        "N3M-web/tx9/hu/esd1.pdf",
+    ),
+    "48231-esd2": (
+        "TX",
+        "https://www.huntcounty.net/upload/page/0142/2026/Order%20of%20Election%20for%20Emergency%20Services%20District%20Number%202.pdf",
+        "N3M-web/tx9/hu/esd2.pdf",
+    ),
+    "48231-ccemud": (
+        "TX",
+        "https://www.huntcounty.net/upload/page/0142/docs/CCEMUD_NoticeofElection.pdf",
+        "N3M-web/tx9/hu/ccemud_n.pdf",
+    ),
+    "48257-poe": (
+        "TX",
+        "https://www.poetrytexas.org/_files/ugd/95337b_80b2f34315834fcdb0c31814a1bba50d.pdf",
+        "N3M-web/tx9/hu/poetry.pdf",
+    ),
+    "48309-rob": (
+        "TX",
+        "https://www.co.falls.tx.us/upload/page/0087/ROBINSON%20ISD%20NOV%202026%20-%20Notice%20of%20Bond%20Election.pdf",
+        "N3M-web/tx9/mc/robinson.pdf",
     ),
     "48029-sid": (
         "TX",
