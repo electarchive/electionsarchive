@@ -81,6 +81,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
             "unit_area_drop",
             "note_drop",
             "option_drop",
+            "result_set_drop",
         )
     }
     owners: dict[str, str] = {
@@ -987,6 +988,88 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             )
         conn.execute(sql.SQL("delete from public.contest_option where id in (select option_id from {})").format(staged))
         conn.execute(sql.SQL("delete from public.entity where id in (select option_id from {})").format(staged))
+    if table == "result_set_drop":
+        dropping: list[int] = []
+        for result_set, source, k, held, license in conn.execute(
+            sql.SQL(
+                """select s.result_set_id::text, s.source_id::text, r.k, r.source_id::text, o.license from {} s
+                   left join public.result_set r on r.id = s.result_set_id
+                   left join public.source o on o.id = r.source_id"""
+            ).format(staged)
+        ).fetchall():
+            if k is None:
+                raise ValueError(f"result set {result_set} does not exist")
+            if held != source:
+                raise ValueError(f"result set {result_set} now cites source {held}, not {source}")
+            if "icpsr" not in (license or "").lower():
+                raise ValueError(f"result set {result_set}: source {source} is not licensed from ICPSR")
+            dropping.append(k)
+        for relation, column, parent in checks.references(conn):
+            if parent == "result_set":
+                conn.execute(
+                    sql.SQL("delete from public.{} where {} = any(%s)").format(
+                        sql.Identifier(relation), sql.Identifier(column)
+                    ),
+                    [dropping],
+                )
+        touched = conn.execute(
+            sql.SQL(
+                """select election_id, contest_id, stage, bool_or(is_default) from public.result_set
+                   where id in (select result_set_id from {}) group by 1, 2, 3"""
+            ).format(staged)
+        ).fetchall()
+        earlier = set(
+            conn.execute(
+                """select distinct h.election_id, h.contest_id, h.stage from public.result_set_drop d
+                   join public.result_set_history h on h.id = d.result_set_id and h.superseded_by = d.changeset_id
+                   where h.is_default"""
+            ).fetchall()
+        )
+        groups = [
+            (election, contest, phase)
+            for election, contest, phase, default in touched
+            if default or (election, contest, phase) in earlier
+        ]
+        conn.execute("select set_config('ea.repointing', 'on', true)")
+        conn.execute(
+            sql.SQL(
+                "update public.result_set set supersedes_id = null where supersedes_id in (select result_set_id from {})"
+            ).format(staged)
+        )
+        conn.execute(sql.SQL("delete from public.result_set where id in (select result_set_id from {})").format(staged))
+        conn.execute(sql.SQL("delete from public.entity where id in (select result_set_id from {})").format(staged))
+        groups = [
+            group
+            for group in groups
+            if not conn.execute(
+                """select from public.result_set where election_id = %s and contest_id is not distinct from %s
+                     and stage = %s and is_default""",
+                list(group),
+            ).fetchone()
+        ]
+        promoted, ambiguous = 0, []
+        for election, contest, phase in groups:
+            left = [
+                id
+                for (id,) in conn.execute(
+                    """select id::text from public.result_set where election_id = %s
+                         and contest_id is not distinct from %s and stage = %s and status = 'active'""",
+                    [election, contest, phase],
+                ).fetchall()
+            ]
+            if len(left) == 1:
+                conn.execute("update public.result_set set is_default = true where id = %s", [left[0]])
+                promoted += 1
+            elif left:
+                ambiguous.append(f"{contest} {phase} ({len(left)} sets)")
+        conn.execute("select set_config('ea.repointing', 'off', true)")
+        print(
+            f"result_set_drop: dropped {len(dropping)} sets; {len(groups)} groups lost their default, "
+            f"{promoted} promoted the lone remaining set, {len(groups) - promoted - len(ambiguous)} left none, "
+            f"{len(ambiguous)} ambiguous"
+        )
+        for line in ambiguous:
+            print(f"result_set_drop: no default chosen for {line}")
     if table == "unit_area_drop":
         conn.execute(
             sql.SQL(

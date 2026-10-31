@@ -915,6 +915,17 @@ export const optionDrop = pgTable("option_drop", {
 }, (table) => [
 check("option_drop_reason_check", sql`(reason <> ''::text)`),]);
 
+export const resultSetDrop = pgTable("result_set_drop", {
+	resultSetId: uuid("result_set_id").primaryKey(),
+	sourceId: uuid("source_id").notNull(),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	index("result_set_drop_changeset_id_idx").using("btree", table.changesetId.asc().nullsLast().op("uuid_ops")),
+	check("result_set_drop_reason_check", sql`(reason <> ''::text)`),
+]);
+
 export const rowDrop = pgTable("row_drop", {
 	id: uuid().primaryKey(),
 	relation: text().notNull(),
