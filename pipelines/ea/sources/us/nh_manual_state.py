@@ -310,6 +310,16 @@ def plain(name: str) -> str:
 
 
 def split(name: str, town: str | None) -> tuple[str, str | None]:
+    name = re.sub(r"\b([A-Z]),\s+(?=[A-Z][a-z])", r"\1. ", name)
+    stranded = nh_manual.STRANDED.fullmatch(name)
+    if stranded:
+        return stranded[1], stranded[2]
+    name = re.sub(r"(?<=[a-z])[.,]?\s+(?:d|r)$", "", name)
+    if town is not None and not re.match(r"[A-Z][a-z]", town) and TOWN.fullmatch(name):
+        town = None
+    suffixed = re.fullmatch(r"(.+?),? (Jr|Sr|II|III|IV)\.?,\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)", name)
+    if suffixed:
+        return f"{suffixed[1]}, {suffixed[2]}{'.' if suffixed[2] in ('Jr', 'Sr') else ''}", suffixed[3]
     if town and re.fullmatch(r"(?i)(?:r|d|l|lib|ind)(?:\s*(?:and|&)\s*(?:r|d|l|lib|ind))*", town) and "," in name:
         name, town = (part.strip() for part in name.rsplit(",", 1))
     if town and not re.search(r"[A-Za-z]{3}", town):
@@ -805,7 +815,13 @@ def emit():
             loose = [name for name, hit in matched.items() if hit is None and name != "Scatter"] + fresh
             if not failed and len(idle) == 1 and len(loose) == 1:
                 option = next(o for o in options if o[1] == idle[0] and o[2] == "candidate")
-                if difflib.SequenceMatcher(None, plain(option[1]), plain(loose[0])).ratio() >= 0.75:
+                if (
+                    difflib.SequenceMatcher(None, plain(option[1]), plain(loose[0])).ratio() >= 0.75
+                    or difflib.SequenceMatcher(
+                        None, nh_manual.person(option[1])[0], nh_manual.person(loose[0])[0]
+                    ).ratio()
+                    >= 0.8
+                ):
                     matched[loose[0]] = option[0]
                     fresh = [name for name in fresh if name != loose[0]]
                     idle, loose = [], []
