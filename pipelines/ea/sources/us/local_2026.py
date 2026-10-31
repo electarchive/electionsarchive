@@ -7079,11 +7079,11 @@ def parse() -> None:
                     None,
                 )
                 geoid = codes.get(cells[5])
-                if held and geoid is None:
+                if held and (geoid is None or f"MN:{geoid}:{held}{seat}{special}" not in exact):
                     county = subdivision_county.get(cells[5])
                     city = held in ("mayor", "council")
-                    if city or county is not None:
-                        geoid = f"27{cells[5]}" if city else f"27{int(county) * 2 - 1:03d}{cells[5]}"
+                    if geoid is not None or city or county is not None:
+                        geoid = geoid or (f"27{cells[5]}" if city else f"27{int(county) * 2 - 1:03d}{cells[5]}")
                         label = [part for part in re.findall(r"\(([^)]*)\)", title) if not part.startswith("Elect")][-1]
                         if not city and not label.endswith("Township"):
                             label = f"{label} Township"
