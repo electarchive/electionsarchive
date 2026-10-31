@@ -18672,7 +18672,7 @@ export const polities = {
         const stored = await db.execute<{
           record: Awaited<ReturnType<typeof record>>;
         }>(sql`
-          select record from polity_record where polity_id = ${input.id}::uuid and built_at > now() - interval '8 hours'
+          select record from polity_record where polity_id = ${input.id}::uuid and built_at > (select coalesce(max(published_at), '-infinity') from changeset)
         `);
         const row = stored.rows[0];
         if (row != null) {
