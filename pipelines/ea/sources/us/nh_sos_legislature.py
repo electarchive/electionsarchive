@@ -120,7 +120,28 @@ DOUBLED = (
 UNNAMED = {("2022-ge-house-rockingham_7.xls", 1): ["Northwood", "Nottingham", "Totals"]}
 NUMERIC = re.compile(r"-?\d+|[-\u2013\u2212]+")
 DASH = re.compile(r"[-\u2013\u2212]+")
-MISSPELLED = {"Brasill": "Brassill", "Sorenson": "Sorensen"}
+MISSPELLED = {
+    "Brasill": "Brassill",
+    "Sorenson": "Sorensen",
+    "Condodometraky": "Condodemetraky",
+    "Alicia": "Alicea",
+    "Hoelizel": "Hoelzel",
+    "Majori": "Major",
+    "Hamblem": "Hamblen",
+    "Mullholland": "Mulholland",
+    "Sivalingham": "Sivalingam",
+    "Terrior": "Terrio",
+    "St. Johns": "Stjohn",
+    "Lauer-Rego": "Lauerrago",
+    "French VI": "Frenchvi vi",
+    "DiRienco": "Dirienzo",
+    "Murpy": "Murphy",
+    "Plette": "Plett",
+    "Katakiores": "Katsakiores",
+    "Bershstein": "Bershtein",
+    "LaClair": "Leclair",
+    "Mark Proulx": "Mark Proulxr",
+}
 ALIASES = {"atkinsonandgilmantonacgt": "atkinsonandgilmantonacademygrant", "newfield": "newfields"}
 
 
@@ -344,7 +365,7 @@ def emit() -> Path:
                 [default, contest],
             ).fetchall()
             rows = rows.with_columns(unit=pl.col("town").map_elements(town, return_dtype=pl.String))
-            repeats = rows.group_by("label", "unit").agg(pl.col("votes").n_unique().alias("distinct")).filter(
+            repeats = rows.filter(~pl.col("label").is_in(["RECOUNT", "Overvotes", "Undervotes"])).group_by("label", "unit").agg(pl.col("votes").n_unique().alias("distinct")).filter(
                 pl.col("distinct") > 1
             )
             if repeats.height:
@@ -357,6 +378,7 @@ def emit() -> Path:
                 if label in ("BLC", "Overvotes", "Undervotes", "RECOUNT"):
                     continue
                 name = re.sub(r"\s*\(recount\)$", "", label)
+                name = re.sub(r"^write-in\s+", "", name, flags=re.IGNORECASE)
                 name = re.sub(r"\s*\(?\bw(?:rite)?[-/]?in\.?\)?$|(?:,\s*[a-z]{1,3}|\s+[dr])(?:[/&][a-z]{1,3})*$", "", name, flags=re.IGNORECASE)
                 name = re.sub(r",?\s*\b(?:jr|sr|ii|iii|iv)\.?$", "", name, flags=re.IGNORECASE).strip()
                 if re.fullmatch(r"scat\w*", name, flags=re.IGNORECASE):
@@ -365,6 +387,8 @@ def emit() -> Path:
                         continue
                 else:
                     surname, _, given = name.partition(",") if county else (name.split()[-1], "", name.split()[0])
+                    if county and not given and re.match(r"[A-Z]\.\s", name):
+                        given, _, surname = name.partition(" ")
                     letters = re.sub(r"[^a-z]", "", MISSPELLED.get(surname, surname).lower())
                     given = re.sub(r"[^a-z]", "", given.lower())
                     words = {
@@ -379,6 +403,9 @@ def emit() -> Path:
                         for o, parts in words.items()
                         if "".join(parts).endswith(letters) and parts[0].startswith(given)
                     ]
+                    if not hits and county and " " in surname:
+                        last = re.sub(r"[^a-z]", "", surname.split()[-1].lower())
+                        hits = [o for o, parts in words.items() if parts == [last]]
                 if len(hits) != 1:
                     break
                 matched[label] = (str(hits[0][0]), hits[0][3])
@@ -440,7 +467,7 @@ def emit() -> Path:
                 continue
             skipped.setdefault("a candidate does not match", []).append(f"{key} {label}")
         for reason, keys in skipped.items():
-            print(f"{len(keys)} contests skipped: {reason}", keys[:12])
+            print(f"{len(keys)} contests skipped: {reason}", keys)
         print(f"{len(values)} sets")
         if values:
             cs.frame("result_value", pl.concat(values))
