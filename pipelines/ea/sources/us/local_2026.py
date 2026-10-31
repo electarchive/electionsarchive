@@ -7219,9 +7219,14 @@ def parse() -> None:
         if st == "21"
     }
     independents = {
-        coverage_tables.tokens(label) - {"INDEPENDENT"}: (f"{st}{code}", label)
+        frozenset(
+            "SPRINGS" if word == "SPR" else word for word in coverage_tables.tokens(label) - {"INDEPENDENT", "D"}
+        ): (
+            f"{st}{code}",
+            label,
+        )
         for st, code, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows()
-        if st == "21" and "Independent" in label
+        if st == "21" and re.search(r"(?i)\bInd(?:ep|ependent)?\b", label)
     }
     schools: dict[str, tuple[str, str, str]] = {}
     spelled = {
@@ -7233,6 +7238,7 @@ def parse() -> None:
     councils: dict[tuple[str, frozenset[str]], tuple[str, int]] = {}
     warded: set[tuple[str, frozenset[str]]] = set()
     ballot_text: dict[str, list[str]] = {}
+    board_seats: dict[frozenset[str], int] = {}
     for county in filings["County"].unique():
         try:
             ballot_pdf = raw.cached(SOURCE, BALLOTS.format(str(county).replace(" ", "%20"))).path
@@ -7244,6 +7250,15 @@ def parse() -> None:
             .splitlines()
         )
         ballot_text[str(county)] = printed
+        for name, asks in re.findall(
+            r"(?i)BOARD OF EDUCATION,?\s+([A-Za-z .'&-]{3,70}?)\s*\(Vote for ([A-Za-z]+)\)", " ".join(printed)
+        ):
+            if re.search(r"(?i)\bind", name):
+                board_seats[
+                    frozenset(
+                        "SPRINGS" if word == "SPR" else word for word in coverage_tables.tokens(name) - {"INDEPENDENT"}
+                    )
+                ] = spelled.get(asks.lower(), 0)
         for i, line in enumerate(printed):
             asks = re.search(r"(?i)\(?Vote ?for (?:up to )?(\w+)(?: candidates?)?\)?$", line.strip())
             if asks is None:
@@ -7305,10 +7320,11 @@ def parse() -> None:
         if own is not None:
             code, label = independents[own]
             base = f"{label} Board of Education"
-            if base in KY_BOARD_SEATS:
+            seats = KY_BOARD_SEATS.get(base) or board_seats.get(own)
+            if seats:
                 contest = base + (" (Unexpired Term)" if "UNEXPIRED" in described else "")
                 schools[contest] = ("Board of Education", label, f"school:{code}")
-                magnitudes[(str(county), contest)] = KY_BOARD_SEATS[base] if "UNEXPIRED" not in described else 1
+                magnitudes[(str(county), contest)] = seats if "UNEXPIRED" not in described else 1
                 contests.append(contest)
             else:
                 contests.append(None)
