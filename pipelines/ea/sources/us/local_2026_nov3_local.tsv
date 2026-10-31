@@ -3120,23 +3120,23 @@ KS-20115-townships	Menno Township Clerk	0	Dwight M Flaming	Republican	Marion	1
 KS-20115-townships	Peabody Township Clerk	0	Shawn D. Entz	Republican	Marion	1
 KS-20115-townships	West Branch Township Clerk	0	John D Unruh	Republican	Marion	1
 KS-20115-townships	Wilson Township Clerk	0	James Loewen	Republican	Marion	1
-KS-20115	Ramona Mayor	0	Carl Gehrke	Nonpartisan	Marion	1
-KS-20115	Ramona City Council	0	Mark Lockhart	Nonpartisan	Marion	2
-KS-20115	Ramona City Council	0	Paul Tucker	Nonpartisan	Marion	2
-KS-20115	Hillsboro City Council Ward 1	0	Jeffrey J. Jorgenson	Nonpartisan	Marion	1
-KS-20115	Hillsboro City Council Ward 2	0	Byron McCarty	Nonpartisan	Marion	1
-KS-20115	Burns City Council	0	Beth Bush	Nonpartisan	Marion	3
-KS-20115	Burns City Council	0	Dawn R. Hacker	Nonpartisan	Marion	3
-KS-20115	Burns City Council	0	Zeb Hatfield	Nonpartisan	Marion	3
+KS-20115-cities	Ramona Mayor	0	Carl Gehrke	Nonpartisan	Marion	1
+KS-20115-cities	Ramona City Council	0	Mark Lockhart	Nonpartisan	Marion	2
+KS-20115-cities	Ramona City Council	0	Paul Tucker	Nonpartisan	Marion	2
+KS-20115-cities	Hillsboro City Council Ward 1	0	Jeffrey J. Jorgenson	Nonpartisan	Marion	1
+KS-20115-cities	Hillsboro City Council Ward 2	0	Byron McCarty	Nonpartisan	Marion	1
+KS-20115-cities	Burns City Council	0	Beth Bush	Nonpartisan	Marion	3
+KS-20115-cities	Burns City Council	0	Dawn R. Hacker	Nonpartisan	Marion	3
+KS-20115-cities	Burns City Council	0	Zeb Hatfield	Nonpartisan	Marion	3
 KS-20013	Brown County Commission District 1	0	Richard Tesoriero	Republican	Brown	1
 KS-20013	Brown County Register of Deeds	1	Emily D. Kloepper	Republican	Brown	1
-KS-20013	Hiawatha Mayor	0	Brian Shefferd	Nonpartisan	Brown	1
-KS-20013	Hiawatha Mayor	0	Becky Shamburg	Nonpartisan	Brown	1
-KS-20013	Hiawatha City Commissioner Seat One	0	Mitch Bruning	Nonpartisan	Brown	1
-KS-20013	Fairview Mayor	0	Jessica Ann Homan	Nonpartisan	Brown	1
-KS-20013	Fairview Mayor	0	Ronald Rettele	Nonpartisan	Brown	1
-KS-20013	Fairview City Council	0	Douglas E Bletscher	Nonpartisan	Brown	2
-KS-20013	Fairview City Council	0	Jesse Davis	Nonpartisan	Brown	2
+KS-20013-cities	City of Hiawatha Mayor	0	Brian Shefferd	Nonpartisan	Brown	1
+KS-20013-cities	City of Hiawatha Mayor	0	Becky Shamburg	Nonpartisan	Brown	1
+KS-20013-cities	Hiawatha City Commissioner Seat One	0	Mitch Bruning	Nonpartisan	Brown	1
+KS-20013-cities	Fairview Mayor	0	Jessica Ann Homan	Nonpartisan	Brown	1
+KS-20013-cities	Fairview Mayor	0	Ronald Rettele	Nonpartisan	Brown	1
+KS-20013-cities	Fairview City Council	0	Douglas E Bletscher	Nonpartisan	Brown	2
+KS-20013-cities	Fairview City Council	0	Jesse Davis	Nonpartisan	Brown	2
 KS-20185	Stafford County Commission District 1	0	Jim Stanford	Republican	Stafford	1
 KS-20043	Doniphan County Commission District 1	0	Roger Hopkins	Republican	Doniphan	1
 OR-41071-county	Yamhill County Clerk	0	Keri Hinton	Nonpartisan	Yamhill	1
