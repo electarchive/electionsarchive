@@ -1,5 +1,6 @@
 import registry from "@ea/db/projections";
 import { sql } from "drizzle-orm";
+import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 
 const {
@@ -135,43 +136,71 @@ export const parted = async (scheme: string, area: string, day: string) => {
   if (insets.length === 0) {
     return;
   }
-  const found = await db.execute<{
-    k: number;
-    part: number;
-    mine: number;
-    isInside: boolean;
-  }>(sql`
-    with me as materialized (
-      select geom from area_geometry where area_id = ${area}::uuid
-      order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
-    ),
-    mine as materialized (select ${part(scheme, "me.geom")} as part from me)
-    select a.k, ${part(scheme, "g.geom")} as part, mine.part as mine, ST_Covers(me.geom, ST_PointOnSurface(g.geom)) as "isInside"
-    from (
-      select g.area_id, g.valid, g.geom from area_geometry g
-      where ${sql.raw(
-        insets
-          .flatMap((inset) => inset.within)
-          .map(
-            ([west, south, east, north]) =>
-              `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
-          )
-          .join(" or "),
-      )}
-      offset 0
-    ) g
-    join area a on a.id = g.area_id
-    cross join me
-    cross join mine
-    where a.scheme_code = ${scheme} and g.valid @> ${day}::date
-  `);
-  const mine = found.rows[0]?.mine ?? -1;
-  const ks = found.rows
-    .filter((row) =>
-      mine === -1 ? row.part !== -1 && !row.isInside : row.part === mine,
-    )
-    .map((row) => row.k);
-  return mine === -1 && ks.length === 0
-    ? undefined
-    : { isOnly: mine !== -1, ks };
+  const [rows, own] = await Promise.all([
+    remember(`parted:${scheme}:${day}`, async () => {
+      const found = await db.execute<{
+        k: number;
+        part: number;
+        x: number;
+        y: number;
+      }>(sql`
+        select a.k, ${part(scheme, "g.geom")} as part, ST_X(o.point) as x, ST_Y(o.point) as y
+        from (
+          select g.area_id, g.geom from area_geometry g
+          where (${sql.raw(
+            insets
+              .flatMap((inset) => inset.within)
+              .map(
+                ([west, south, east, north]) =>
+                  `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
+              )
+              .join(" or "),
+          )}) and g.valid @> ${day}::date
+          offset 0
+        ) g
+        join area a on a.id = g.area_id
+        cross join lateral (select ST_PointOnSurface(g.geom) as point) o
+        where a.scheme_code = ${scheme}
+      `);
+      return found.rows;
+    }),
+    db.execute<{ mine: number | null }>(sql`
+      select ${part(scheme, "me.geom")} as mine from (
+        select geom from area_geometry where area_id = ${area}::uuid
+        order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+      ) me
+    `),
+  ]);
+  if (rows.length === 0 || own.rows.length === 0) {
+    return;
+  }
+  const mine = own.rows[0]?.mine ?? -1;
+  if (mine !== -1) {
+    return {
+      isOnly: true,
+      ks: rows.filter((row) => row.part === mine).map((row) => row.k),
+    };
+  }
+  const outer = rows.filter((row) => row.part !== -1);
+  const inner =
+    outer.length === 0
+      ? new Set<number>()
+      : new Set(
+          (
+            await db.execute<{ k: number }>(sql`
+              select o.k from unnest(
+                ${sql.param(outer.map((row) => row.k))}::int[],
+                ${sql.param(outer.map((row) => row.x))}::float8[],
+                ${sql.param(outer.map((row) => row.y))}::float8[]
+              ) o(k, x, y)
+              cross join (
+                select geom from area_geometry where area_id = ${area}::uuid
+                order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+              ) me
+              where ST_Covers(me.geom, ST_Point(o.x, o.y, 4326))
+            `)
+          ).rows.map((row) => row.k),
+        );
+  const ks = outer.filter((row) => !inner.has(row.k)).map((row) => row.k);
+  return ks.length === 0 ? undefined : { isOnly: false, ks };
 };

@@ -2459,7 +2459,7 @@ async function holders(
     join result_set rs on rs.contest_id = c.id and ${latest("rs")}
     join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and (x.seats > 0 or (x.seats is null and x.kind in ('elected', 'won')))
     join contest_option o on o.id = x.option_id
-    cross join lateral (select coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as party) lp
+    cross join lateral (select coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as party offset 0) lp
     left join entity_merge pm on pm.entity_id = lp.party
     left join lateral (
       select cy.person_id, cy.list_position,
@@ -11447,7 +11447,7 @@ async function universe(
   day: string,
 ) {
   const found = await db.execute<{
-    id: string;
+    id: string | null;
     k: number;
     held: boolean;
     outside: boolean;
@@ -11488,13 +11488,6 @@ async function universe(
       select up.start, p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
       where p.valid @> ${day}::date and up.depth < 4
     ),
-    down(id, scheme, depth) as (
-      select ${area}::uuid, ''::text, 0
-      union all
-      select a.id, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
-      join area a on a.id = p.area_id
-      where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level} and not exists (select from candidate)
-    ),
     inside(id, scheme, depth) as (
       select ${area}::uuid, ''::text, 0 where exists (select from candidate)
       union all
@@ -11508,16 +11501,39 @@ async function universe(
     from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
     union
-    select a.id, a.k, true, false, false from down
-    join area a on a.id = down.id and a.scheme_code = ${level}
-    where down.depth > 0 and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
-    union
     select a.id, a.k, false, true, false from inside
     join area a on a.id = inside.id and a.scheme_code = ${level}
     where inside.depth > 0 and not exists (select from candidate c where c.id = a.id)
       and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
+    union all
+    select null, 0, false, false, false where not exists (select from candidate)
   `);
-  return found.rows;
+  const rows = found.rows.filter(
+    (row): row is typeof row & { id: string } => row.id != null,
+  );
+  return rows.length === found.rows.length
+    ? rows
+    : remember(`below:${area}:${level}:${day}`, async () => {
+        const below = await db.execute<{
+          id: string;
+          k: number;
+          held: boolean;
+          outside: boolean;
+          pending: boolean;
+        }>(sql`
+          with recursive down(id, k, scheme, depth) as (
+            select ${area}::uuid, 0, ''::text, 0
+            union all
+            select a.id, a.k, a.scheme_code, down.depth + 1 from area_parent p join down on p.parent_id = down.id
+            join area a on a.id = p.area_id
+            where p.valid @> ${day}::date and down.depth < 4 and down.scheme <> ${level}
+          )
+          select distinct id, k, true as held, false as outside, false as pending from down
+          where depth > 0 and scheme = ${level}
+            and exists (select from area_geometry g where g.area_id = down.id and g.valid @> ${day}::date)
+        `);
+        return below.rows;
+      });
 }
 
 const framed = new Map<string, ReturnType<typeof framing>>();
@@ -11556,19 +11572,22 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
         (select coalesce(c.geom, s.geom) from display.clipped c join display.meta dm on dm.mask_version = c.mask_version
           where c.area_id = s.id and c.valid = s.valid and c.geom_hash = md5(ST_AsBinary(s.geom))
             and (select size from extent) <= 400),
-        (select case when ST_IsEmpty(w.d) then null else w.d end from (
-          select ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeValid(ST_Simplify(s.geom, b.t, true)),
-            (select ST_UnaryUnion(ST_Collect(x.geom)) from water x where x.geom && s.geom)), 3)) as d
+        (select ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeValid(ST_Simplify(s.geom, b.t, true)),
+            (select ST_UnaryUnion(ST_Collect(x.geom)) from water x where x.geom && s.geom)), 3))
           from bounds b
-          where exists (select from water x where x.geom && s.geom and ST_Intersects(x.geom, s.geom))
-        ) w),
-        s.geom) as geom
+          where exists (select from water x where x.geom && s.geom and ST_Intersects(x.geom, s.geom))),
+        s.geom) as geom, s.geom as raw
       from shapes s
     ),
-    parts as (
-      select w.id, ST_Simplify(d.geom, least(greatest(ST_XMax(d.geom) - ST_XMin(d.geom), ST_YMax(d.geom) - ST_YMin(d.geom)) / 500, 0.01), true) as geom, w.scheme
+    pieces as materialized (
+      select w.id, d.geom, w.scheme, not ST_IsEmpty(w.geom) and ST_Area(d.geom) >= coalesce((select t * t from bounds), 0) as visible
       from dry w
-      cross join lateral ST_Dump(w.geom) d
+      cross join lateral ST_Dump(case when ST_IsEmpty(w.geom) then w.raw else w.geom end) d
+    ),
+    parts as (
+      select p.id, ST_Simplify(p.geom, least(greatest(ST_XMax(p.geom) - ST_XMin(p.geom), ST_YMax(p.geom) - ST_YMin(p.geom)) / 500, 0.01), true) as geom, p.scheme
+      from pieces p
+      where p.visible or not exists (select from pieces v where v.visible)
     ),
     ranked as (
       select parts.*, row_number() over (partition by id order by ST_Area(geom) desc) = 1 as anchor
@@ -15857,7 +15876,7 @@ export const elections = {
           where p.id = ${input.polity}::uuid and p.kind = 'federal_unit' and p.iso_code like 'US-%'
         ),
         govs as materialized (
-          select distinct on (e.id) e.id as election, e.polity_id, g.county, g.kind, g.population
+          select distinct on (e.id) e.id as election, e.polity_id, g.state, g.county, g.kind, g.population
           from st
           join coverage_government g on g.state = st.code
           join election e on e.polity_id = g.polity_id and e.date_from = ${input.date}::date and e.status::text <> 'annulled'
@@ -15868,7 +15887,7 @@ export const elections = {
         from govs g
         left join lateral (
           select x.polity_id, x.population from coverage_government x
-          where x.county = g.county and x.kind = 'county' limit 1
+          where x.state = g.state and x.kind = 'county' and x.county = g.county limit 1
         ) c on true
         order by c.population desc nulls last, g.kind = 'county' desc, g.kind = 'special' asc, g.population desc nulls last
       `);
@@ -21163,6 +21182,7 @@ export const people = {
           cross join lateral (
             select coalesce(cd.member_of_party_id, o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)},
               (select party_scope_id from contest where id = o.contest_id)) as party
+            offset 0
           ) lp
           left join entity_merge pm on pm.entity_id = lp.party
           where cd.person_id in (select id from ids) and cd.role in ('head', 'list_member')
