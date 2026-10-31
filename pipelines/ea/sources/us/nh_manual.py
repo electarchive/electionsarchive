@@ -689,7 +689,13 @@ def emit() -> Path:
             )
             minted = None
             if not candidates:
-                template = templates.get((key[1], key[2], key[3]))
+                lone = (
+                    district is None
+                    and key[2] == "board of commissioners"
+                    and {k[3] for k in contests if k[:3] == key[:3]} == {"1"}
+                )
+                district = "1" if lone else district
+                template = templates.get((key[1], key[2], district))
                 day = days.get((key[0], key[1], party is not None))
                 if key[2] == "board of commissioners" and district is None or template is None or day is None:
                     report.setdefault("no contest and no sibling to copy from", []).append(tag)
