@@ -180,8 +180,7 @@
   };
   const kinds = $derived(
     Object.keys(KINDS).filter(
-      (key) =>
-        key === "all" || polity.polities.some((child) => child.kind === key),
+      (key) => key === "all" || key in polity.places.sizes,
     ),
   );
   const kind = $derived(
@@ -190,14 +189,22 @@
       : (["county", "municipality"].find((key) => kinds.includes(key)) ??
           "all"),
   );
+  const listed = createQuery(() => ({
+    ...orpc.polities.get.queryOptions({ input: { id } }),
+    enabled: polity.places.isPartial && (isAllPlaces || query.trim() !== ""),
+  }));
+  const pool = $derived(listed.data?.polities ?? polity.polities);
   const children = $derived(
-    polity.polities.filter(
+    pool.filter(
       (child) =>
         (kind === "all" || child.kind === kind) &&
         child.name
           .toLocaleLowerCase()
           .includes(query.trim().toLocaleLowerCase()),
     ),
+  );
+  const size = $derived(
+    kind === "all" ? polity.places.total : (polity.places.sizes[kind] ?? 0),
   );
   const full = createQuery(() => ({
     ...orpc.polities.get.queryOptions({ input: { id, all: true } }),
@@ -720,7 +727,7 @@
 {/if}
 
 {#if isState}
-  {#if polity.polities.length > 0}
+  {#if polity.places.total > 0}
     {@render places()}
   {/if}
   {#if largest.length > 0}
@@ -849,8 +856,8 @@
 {#if polity.elections.length > 0 || polity.results.length === 0}
   <section
     class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
-      "lg:col-span-8": polity.polities.length > 0 && !isState,
-      "max-lg:order-1": isLocal && polity.polities.length > 0,
+      "lg:col-span-8": polity.places.total > 0 && !isState,
+      "max-lg:order-1": isLocal && polity.places.total > 0,
     })}
     aria-labelledby="{uid}-elections"
   >
@@ -989,7 +996,7 @@
   {@render inPlace()}
 {/if}
 
-{#if polity.polities.length > 0 && !isState}
+{#if polity.places.total > 0 && !isState}
   {@render places()}
 {/if}
 
@@ -1032,7 +1039,7 @@
         </div>
       {/if}
     </div>
-    {#if polity.polities.length > 12}
+    {#if polity.places.total > 12}
       <input
         class="rounded-sm border border-input bg-card px-2.5 text-sm block-8 placeholder:text-muted-foreground"
         type="search"
@@ -1076,12 +1083,12 @@
           </li>
         {/each}
       </ul>
-      {#if !isAllPlaces && query.trim() === "" && children.length > 20}
+      {#if !isAllPlaces && query.trim() === "" && size > 20}
         <button
           type="button"
           class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
           onclick={() => (isAllPlaces = true)}
-          >{m.places_show_more({ count: count(children.length - 20) })}</button
+          >{m.places_show_more({ count: count(size - 20) })}</button
         >
       {/if}
     {/if}
