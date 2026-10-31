@@ -17,10 +17,11 @@ from ea.store import connect
 SOURCE = "us.fl_judicial"
 VERSION = "1"
 TITLE_OFFICE = "Justice of the Supreme Court"
-SHALL = re.compile(r"Shall Justice (.+?) be retained in office\?", re.IGNORECASE)
+TITLE_DCA = "Judge of the District Court of Appeal"
+SHALL = re.compile(r"Shall (?:Justice|Judge) (.+?) be retained in office\?", re.IGNORECASE)
 METHOD = (
-    "A retention election asks whether a sitting justice should stay in office, with Yes and No as the only answers. "
-    "The justice keeps the seat when a majority votes Yes."
+    "A retention election asks whether a sitting justice or judge should stay in office, with Yes and No as the only "
+    "answers. The justice or judge keeps the seat when a majority votes Yes."
 )
 NOTE = "County totals from the Florida Division of Elections' official results extract for the general election."
 
@@ -37,7 +38,7 @@ def lines() -> list[dict[str, object]]:
         text = raw.cached(fl_sos.SOURCE, fl_sos.EXTRACT.format(day=day)).path.read_bytes().decode("cp1252")
         frame = pl.read_csv(io.BytesIO(text.encode()), separator="\t", infer_schema_length=0, quote_char=None)
         for race, desc, county, answer, votes in (
-            frame.filter(pl.col("RaceCode").str.contains(r"^SC\d$"))
+            frame.filter(pl.col("RaceCode").str.contains(r"^(?:SC\d|D[1-5]\d)$"))
             .select("RaceCode", "OfficeDesc", "CountyName", "CanNameLast", "CanVotes")
             .iter_rows()
         ):
@@ -47,6 +48,7 @@ def lines() -> list[dict[str, object]]:
             found.append(
                 {
                     "day": day,
+                    "district": None if race.startswith("SC") else int(race[1]),
                     "judge": re.sub(r"\s+", " ", match[1]).strip(),
                     "county": county,
                     "answer": "yes" if answer.strip().lower().startswith("yes") else "no",
@@ -63,7 +65,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Florida Supreme Court retention elections 2000–2012 by county, from the Division of Elections' official results extracts",
+            summary="Florida Supreme Court and District Court of Appeal retention elections 2000–2014 by county, from the Division of Elections' official results extracts",
             polity="US-FL",
         )
         source = cs.source(fl_sos.PUBLISHER, fl_sos.TITLE)
@@ -106,28 +108,34 @@ def emit() -> Path:
                 cs.add("name_drop", name_id=found[0], entity_id=entity, text=found[1], reason="Name restyled")
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        office_key = f"{slug(TITLE_OFFICE)}:FL"
-        office = cs.key("us.office", office_key)
-        if office in cs.minted:
-            cs.add("office", id=office, polity_id=cs.polity("US-FL"), kind="other")
-            cs.add(
-                "name",
-                entity_id=office,
-                text=f"{TITLE_OFFICE} of Florida",
-                lang="en",
-                kind="official",
-                is_preferred=True,
-            )
-        groups: dict[tuple[date, str], list[dict[str, object]]] = defaultdict(list)
+        offices: dict[str, UUID] = {}
+        for title in (TITLE_OFFICE, TITLE_DCA):
+            offices[title] = cs.key("us.office", f"{slug(title)}:FL")
+            if offices[title] in cs.minted:
+                cs.add("office", id=offices[title], polity_id=cs.polity("US-FL"), kind="other")
+                cs.add(
+                    "name",
+                    entity_id=offices[title],
+                    text=f"{title} of Florida",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+        districts = dict(
+            conn.execute("select c.code, c.area_id from area_code c where c.code ~ '^FL:dca-[1-5]$'").fetchall()
+        )
+        groups: dict[tuple[date, str, int | None], list[dict[str, object]]] = defaultdict(list)
         for row in rows:
-            groups[(row["day"], str(row["judge"]))].append(row)
+            groups[(row["day"], str(row["judge"]), row["district"])].append(row)
         persons: set[str] = set()
-        for (day, judge), group in sorted(groups.items()):
+        for (day, judge, district), group in sorted(groups.items(), key=lambda item: (item[0][0], item[0][1])):
+            title = TITLE_OFFICE if district is None else TITLE_DCA
+            office = offices[title]
             first, last = identity(judge)
             person_key = f"FL:{slug(first)}-{slug(last)}"
             suffix = person_key.split(":")[1]
             shown = display(judge)
-            contest_key = f"{day}:FL:{slug(TITLE_OFFICE)}:{suffix}"
+            contest_key = f"{day}:FL:{slug(title)}:{suffix}"
             contest = cs.key("us.contest", contest_key)
             election = cs.key("us.election", f"{day}:FL")
             cs.add(
@@ -136,16 +144,16 @@ def emit() -> Path:
                 election_id=election,
                 kind="office",
                 office_id=office,
-                district_area_id=state_area,
+                district_area_id=state_area if district is None else districts[f"FL:dca-{district}"],
                 term="full",
                 magnitude=1,
                 round_number=1,
                 electoral_system_id=retention_system,
                 default_result_kind="counted",
             )
-            name(contest, f"{day.year} Florida {TITLE_OFFICE} retention: {shown}")
+            name(contest, f"{day.year} Florida {title} retention: {shown}")
             if contest in cs.minted:
-                base = f"us/fl/{day}-general/{slug(TITLE_OFFICE)}-{suffix}"
+                base = f"us/fl/{day}-general/{slug(title)}-{suffix}"
                 path, count = base, 1
                 while path in taken:
                     count += 1
