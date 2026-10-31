@@ -20,6 +20,13 @@ def emit() -> Path | None:
         if not rows:
             print("the place-polity duplicates are already retired")
             return None
+        polities = [entity for entity, kind in rows if kind == "polity"]
+        units = conn.execute(
+            """select r.id, 'reporting_unit' from reporting_unit r join entity e on e.id = r.id
+               where r.polity_id = any(%s::uuid[]) and e.retired_by is null""",
+            [polities],
+        ).fetchall()
+        rows = rows + units
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -27,6 +34,6 @@ def emit() -> Path | None:
             summary="Retire duplicate Charlestown and Hopkinton ballot measure contests recorded under place polities",
             polity="US",
         )
-        for entity, kind in sorted(rows, key=lambda row: ("contest", "election", "polity").index(row[1])):
+        for entity, kind in sorted(rows, key=lambda row: ("contest", "election", "reporting_unit", "polity").index(row[1])):
             cs.add("entity_retirement", entity_id=entity, reason=REASON)
         return cs.write()
