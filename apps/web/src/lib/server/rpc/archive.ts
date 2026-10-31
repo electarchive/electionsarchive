@@ -11572,22 +11572,19 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
         (select coalesce(c.geom, s.geom) from display.clipped c join display.meta dm on dm.mask_version = c.mask_version
           where c.area_id = s.id and c.valid = s.valid and c.geom_hash = md5(ST_AsBinary(s.geom))
             and (select size from extent) <= 400),
-        (select ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeValid(ST_Simplify(s.geom, b.t, true)),
-            (select ST_UnaryUnion(ST_Collect(x.geom)) from water x where x.geom && s.geom)), 3))
+        (select case when ST_IsEmpty(w.d) then null else w.d end from (
+          select ST_Multi(ST_CollectionExtract(ST_Difference(ST_MakeValid(ST_Simplify(s.geom, b.t, true)),
+            (select ST_UnaryUnion(ST_Collect(x.geom)) from water x where x.geom && s.geom)), 3)) as d
           from bounds b
-          where exists (select from water x where x.geom && s.geom and ST_Intersects(x.geom, s.geom))),
-        s.geom) as geom, s.geom as raw
+          where exists (select from water x where x.geom && s.geom and ST_Intersects(x.geom, s.geom))
+        ) w),
+        s.geom) as geom
       from shapes s
     ),
-    pieces as materialized (
-      select w.id, d.geom, w.scheme, not ST_IsEmpty(w.geom) and ST_Area(d.geom) >= coalesce((select t * t from bounds), 0) as visible
-      from dry w
-      cross join lateral ST_Dump(case when ST_IsEmpty(w.geom) then w.raw else w.geom end) d
-    ),
     parts as (
-      select p.id, ST_Simplify(p.geom, least(greatest(ST_XMax(p.geom) - ST_XMin(p.geom), ST_YMax(p.geom) - ST_YMin(p.geom)) / 500, 0.01), true) as geom, p.scheme
-      from pieces p
-      where p.visible or not exists (select from pieces v where v.visible)
+      select w.id, ST_Simplify(d.geom, least(greatest(ST_XMax(d.geom) - ST_XMin(d.geom), ST_YMax(d.geom) - ST_YMin(d.geom)) / 500, 0.01), true) as geom, w.scheme
+      from dry w
+      cross join lateral ST_Dump(w.geom) d
     ),
     ranked as (
       select parts.*, row_number() over (partition by id order by ST_Area(geom) desc) = 1 as anchor
