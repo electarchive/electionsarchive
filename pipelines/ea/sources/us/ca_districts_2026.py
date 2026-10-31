@@ -52,6 +52,8 @@ COUNTIES = {
     "06023": "Humboldt",
     "06025": "Imperial",
     "06087": "Santa Cruz",
+    "06075": "San Francisco",
+    "06113": "Yolo",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
@@ -509,7 +511,14 @@ SANTA_CRUZ_WATCH = (
     "Santa Cruz County Clerk and Registrar of Voters",
     "Candidate Watch: filed candidates by district, November 3, 2026 General Election",
 )
+YOLO_SPECIAL = (
+    "https://elections.yolocounty.gov/424/Special-Districts",
+    "Yolo County Assessor/Clerk-Recorder/Elections",
+    "Candidate Filings: Special Districts, November 3, 2026 General Election",
+)
 INBOX_DOCS = {
+    "06113-s": (YOLO_SPECIAL, "yolo_special.html", "text/html"),
+    "06113-c": (local_2026.FEEDS["CA-06113-s"], "yolo_schools.html", "text/html"),
     "06087-w": (SANTA_CRUZ_WATCH, "santacruz_watch.md", "text/markdown"),
     "06025-s": (IMPERIAL, "imperial_0820.pdf", "application/pdf"),
     "06087-s": (SANTA_CRUZ, "santacruz_contact.html", "text/html"),
@@ -623,7 +632,12 @@ def santa_cruz() -> list[Row]:
             body = head[1].strip()
             if section != "School Districts" and usable(body):
                 label = f"{head[3]} {head[4]}" if head[3] else ""
-                current = (full_name(body.upper()), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
+                current = (
+                    full_name(body.upper()),
+                    "Trustee" if "College" in body else "Director",
+                    label,
+                    int(head[2] or 1),
+                )
                 cells = []
             else:
                 current = None
@@ -658,7 +672,12 @@ def santa_cruz_watch(contested: set[str]) -> list[Row]:
             short = "(Short Term)" in line
             if usable(body) and full_name(body.upper()) not in contested:
                 label = f"{head[3]} {head[4]}" if head[3] else ("Short Term" if short else "")
-                current = (full_name(body.upper()), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
+                current = (
+                    full_name(body.upper()),
+                    "Trustee" if "College" in body else "Director",
+                    label,
+                    int(head[2] or 1),
+                )
             else:
                 current = None
         elif current is not None and line.startswith("| ") and not line.startswith(("| Candidate", "| ---", "| |")):
@@ -1327,6 +1346,109 @@ def qualified_list(
     return rows
 
 
+def page_lines(path: Path) -> list[str]:
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", path.read_text())))
+    return [line.strip() for line in text.splitlines() if line.strip()]
+
+
+YOLO_HEAD = re.compile(
+    r"^(?P<body>.+?), (?P<role>Director|Commissioner|Governing Board Member)(?:, (?P<seat>.+?))? - (?P<ballot>ON|OFF) THE BALLOT$"
+)
+YOLO_DATE = re.compile(r"\d{1,2}/\d{1,2}/\d{2,4}")
+YOLO_OUT = re.compile(r"Declined|Withdrawn")
+
+
+def yolo() -> list[Row]:
+    rows: list[Row] = []
+    for key in ("06113-c", "06113-s"):
+        current: re.Match[str] | None = None
+        seats = 1
+        block: list[str] = []
+        for line in page_lines(inbox_doc(key)):
+            if found := YOLO_HEAD.match(line):
+                current = found if usable(found["body"]) else None
+                seats = 1
+                block = []
+            elif current is None:
+                continue
+            elif found := re.match(r"Vote for (?:no more than )?\w+ \((\d+)\)", line):
+                seats = int(found[1])
+            elif line == "Misc.":
+                block = []
+            elif (
+                line == "Qualified"
+                or YOLO_OUT.match(line)
+                or (line == "Did Not File" and not any(YOLO_DATE.fullmatch(item) for item in block))
+            ):
+                if line == "Qualified" and block:
+                    seat = current["seat"] or ""
+                    short = re.search(r"(?i)short term|unexpired", seat) is not None
+                    rows.append(
+                        {
+                            "county": "Yolo",
+                            "district": full_name(current["body"]),
+                            "seat": "Short Term" if short else seat,
+                            "role": "Commissioner"
+                            if current["role"] == "Commissioner"
+                            else "Trustee"
+                            if "College" in current["body"]
+                            else "Director",
+                            "seats": 1 if seat and not short else seats,
+                            "name": re.sub(r"\s*\((?:I|A/I|W/I)\)$", "", block[0]),
+                            "unexpired": short,
+                            "tacit": current["ballot"] == "OFF",
+                            "doc": key,
+                        }
+                    )
+                block = []
+            elif line not in ("Candidate", "County of Residence"):
+                block.append(line)
+    return rows
+
+
+SF_HEAD = re.compile(r"^(?P<title>[A-Z][^.]*?)(?: \((?P<seats>\d+) seats?\))?$")
+
+
+def san_francisco() -> list[Row]:
+    rows: list[Row] = []
+    text = page_lines(raw.cached(local_2026.SOURCE, feed("06075")[0]).path)
+    current: tuple[str, str, str, int, bool] | None = None
+    for index, line in enumerate(text):
+        after = text[index + 1] if index + 1 < len(text) else ""
+        if re.match(r"\d+ (?:people|person) (?:have|has) (?:qualified|filed)", after):
+            title = SF_HEAD.match(line)
+            current = None
+            if title is None:
+                continue
+            seats = int(title["seats"] or 1)
+            if title["title"].startswith("Community College Board"):
+                short = "Partial Term" in title["title"]
+                current = (
+                    "San Francisco Community College District",
+                    "Trustee",
+                    "Short Term" if short else "",
+                    seats,
+                    short,
+                )
+            elif found := re.match(r"BART Board, (District \d+)$", title["title"]):
+                current = (ALAMEDA_NAMES["BART"], "Director", found[1], 1, False)
+        elif current is not None and after.startswith("Declaration of Candidacy Filed"):
+            district, role, seat, seats, short = current
+            rows.append(
+                {
+                    "county": "San Francisco",
+                    "district": district,
+                    "seat": seat,
+                    "role": role,
+                    "seats": seats,
+                    "name": line,
+                    "unexpired": short,
+                    "tacit": False,
+                }
+            )
+    return rows
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
@@ -1368,6 +1490,8 @@ def parse() -> None:
                 *stanislaus(),
                 *ventura(),
                 *san_bernardino_lieu(),
+                *san_francisco(),
+                *yolo(),
             ]
         ]
     ).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
