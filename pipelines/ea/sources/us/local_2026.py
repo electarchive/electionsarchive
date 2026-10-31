@@ -5309,9 +5309,16 @@ for key, publisher, title, url, local in (
     (
         "CA-06103-corning",
         "Tehama County Elections Department",
-        "Qualified Candidate List, November 3, 2026 General Election (printed August 10, 2026)",
-        "https://www.tehama.gov/wp-content/uploads/2026/08/8.10.2026-Qualified-List-of-Candidates.pdf",
-        "ca/tehama_qualified_0810.pdf",
+        "Qualified Candidate List, November 3, 2026 General Election (printed September 3, 2026)",
+        "https://www.tehama.gov/",
+        "ca/tehama_qualified_0903.pdf",
+    ),
+    (
+        "CA-06005-sutter-creek",
+        "Amador County Elections Department",
+        "Full Local Candidate List, November 3, 2026 General Election (printed August 27, 2026)",
+        "https://www.amadorgov.org/",
+        "ca/amador_candidates_0827.pdf",
     ),
     (
         "CA-06021-willows",
