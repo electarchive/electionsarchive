@@ -60,6 +60,7 @@ Every column that a page looks rows up by needs a btree index. The migration `20
 
 - `source_icpsr_idx`, a partial index of the sources whose license mentions ICPSR. The withdrawn-license filter reads it in every result-set query.
 - `body_polity_idx`, `office_polity_idx`, `office_body_idx`, `tenure_body_idx`, and `polity_parent_parent_idx`, which polity and body pages use.
+- `contest_option_alliance_idx`, a partial index on `(alliance_id, party_id)` for the 1% of options that belong to an alliance. Counting an alliance's wins had read every option of each member party, which took up to 400 ms. It now takes under a millisecond. It is added in migration `20261031230000_alliance_option_index`.
 
 To find another missing index, run the benchmark and then look at `seq_scan` and `seq_tup_read` in `pg_stat_user_tables`.
 
@@ -70,6 +71,15 @@ Some boundaries have more than a million points, Nunavut's among them. Intersect
 The `coarse()` helper in `archive.ts` returns the simplified copy when one exists. Use it only where a share is measured against the heavy shape itself or against the larger of two shapes, such as overlap with a predecessor district. Don't use it where a share is measured against the smaller shape: simplifying a large neighbor can move a small district's share by much more than 0.5%. Filters such as `&&` and `ST_Intersects` keep using the full geometry.
 
 Across the 70 predecessor pairs of the 12 heaviest districts of Canada's 2025 election, the largest difference between coarse and exact shares was 0.00047. None changed at two decimal places, and none crossed the 1% cutoff for listing a predecessor.
+
+## Rendering and payloads
+
+The server's CPU time matters as much as the database's once the queries are fast. These patterns came out of CPU profiles of cold page loads.
+
+- **Reuse collators and formatters.** `localeCompare` with an options object builds a new ICU collator on every call, which made sorting France's 35,000 communes take 3 seconds. Sort with the shared `natural` comparator in `apps/web/src/lib/format.ts`, which wraps one `Intl.Collator` with numeric ordering. Build number and date formatters with `numbers()` and `dates()` from the same file, which keep one formatter per locale and set of options. Building an `Intl.NumberFormat` takes about 16 µs and an `Intl.DateTimeFormat` about 60 µs, while reusing one takes half a microsecond.
+- **Group rows once instead of filtering per row.** When a loop over areas needs each area's result sets, group them with `Map.groupBy` before the loop instead of calling `filter` inside it. Key nested sums by result set, so each set reads only its own entries. On the 2024 UK general election page, the per-area filters took 480 ms of CPU.
+- **Send only what the page shows.** A polity page sends the first 20 places of each kind and the 10 largest municipalities, plus the count of each kind. When someone filters the list or asks for every place, the page loads the full list from `polities.get`. The page for France went from 4 MB of HTML to 92 KB.
+- **Pack sparse arrays.** A results map is a matrix with one row per place and one column per party or independent candidate, so most cells are zero or empty. The `transport` hook in `apps/web/src/hooks.ts` encodes every array of 64 or more items where at most a quarter of the items differ from 0 or `null` as its length and the items that differ. It encodes ascending runs of integers, such as the list of columns a place lacks, as start and end pairs. The browser decodes both back to the same arrays, so components never see the encoding. The 2024 UK general election page went from 5.4 MB of HTML to 1.6 MB, or 209 kB compressed, and the 2024 US general election page went from 1.6 MB to 1.1 MB.
 
 ## Measuring
 
@@ -88,5 +98,7 @@ The benchmark we track requests 45 representative pages one at a time against th
 With both cache tiers warm, all 45 pages take 1.9 s together, and the slowest takes 0.34 s.
 
 Pages below the county level gain the most from memoization and streaming. A Cleveland precinct page in the 2016 Ohio Senate race took 25.1 s cold. It now sends its first byte after 2.2 s and finishes streaming after about 6 s. The next precinct in the same district sends its first byte after 0.8 s. A Canadian riding opened from the national map takes 1.8 s cold, where it took more than 20 s before.
+
+Polity and election pages with thousands of places gained the most from the rendering changes. France's polity page took 4.2 s cold and now takes 2.1 s. The 2024 UK general election page took 3.7 s and now takes 3.3 s. With the cache warm, both take under 0.15 s.
 
 Most of the remaining cold time goes to reading from disk, because the database is about as large as the server's memory. The two slowest queries left are geometric. One draws the home page's world map, and its output is the same for every request, so the warm-up run caches it. The other query measures how much of a heavy district its predecessor covers, which means intersecting two shapes of about 90,000 points each. Pre-simplifying the world map changed its output, and btree indexes on `area_parent (area_id)` and `election (date_from, kind)` saved less than 10% on warm queries, so neither change was made.
