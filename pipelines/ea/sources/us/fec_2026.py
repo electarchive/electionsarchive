@@ -1042,7 +1042,19 @@ def read(state: str, path: Path) -> list[tuple[str, int | None, str, str]]:
         flat = html.unescape(re.sub(r"\s*\|[\s|]*", " | ", re.sub(r"<[^>]+>", "|", path.read_text())))
         if state == "AS":
             section = flat.split("DELEGATE TO THE UNITED STATES CONGRESS", 1)[1].split("HOUSE OF REPRESENTATIVES", 1)[0]
-            return [("house", None, text, "") for text in section.strip(" |").split(" | ")]
+            filers = []
+            with zipfile.ZipFile(raw.cached(SOURCE, CN26).path) as archive:
+                for line in archive.read("cn.txt").decode("latin-1").splitlines():
+                    _, name, party, year, where, office, *_ = line.split("|")
+                    if year == "2026" and where == "AS" and office == "H":
+                        filers.append((set(re.findall(r"[a-z]+", name.lower())), party))
+            labels = {"REP": "Republican", "DEM": "Democratic", "N": "Independent"}
+            rows = []
+            for text in section.strip(" |").split(" | "):
+                words = set(re.findall(r"[a-z]+", text.lower()))
+                found = [party for names, party in filers if names <= words or words <= names]
+                rows.append(("house", None, text, labels.get(found[0], "") if len(found) == 1 else ""))
+            return rows
         tickets, delegate = flat.split("Governor & Lieutenant Governor", 1)[1].split(
             "Delegate to the U.S. House of Representatives", 1
         )
@@ -2785,7 +2797,7 @@ def emit() -> Path:
                     person_id=person,
                     option_id=option,
                     role="head",
-                    is_independent=party_id is None and state != "AS",
+                    is_independent=party_id is None,
                     is_incumbent=(
                         person in sitting[key.split(":")[2]]
                         or any(
