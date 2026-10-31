@@ -82,7 +82,7 @@
     0.05,
     0.185,
     0.49,
-    0.9
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore any heading text above it, and skip the TOTAL row.",
    "columns": [
@@ -106,7 +106,7 @@
     0.51,
     0.185,
     0.93,
-    0.9
+    0.94
    ],
    "hint": "Read only the county table in this image (Yes and No columns); ignore any heading text above it, and skip the TOTAL row.",
    "columns": [
