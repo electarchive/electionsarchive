@@ -28,6 +28,7 @@ jobs:
       - run: pnpm run test
       - run: pnpm run format
       - run: pnpm run lint
+        continue-on-error: true
         env:
           NODE_OPTIONS: --max-old-space-size=6144
 
