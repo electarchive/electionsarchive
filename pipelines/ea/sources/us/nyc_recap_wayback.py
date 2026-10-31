@@ -161,6 +161,7 @@ def read_page(page: str) -> dict[str, object] | None:
         for line in lines[end:first]
         if not RECAP.search(line)
         and "NO. OF CANDIDATES" not in line
+        and not re.search(r"NOT\s+USED", line, re.I)
         and not re.fullmatch(r"\s*(?:BOROUGH OF [A-Z ]+|[A-Z0-9 ]*(?:COUNTY|DISTRICT))\s*", line)
     ]
     header_text = "\n".join(header).upper()
