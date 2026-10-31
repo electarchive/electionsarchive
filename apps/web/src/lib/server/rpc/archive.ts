@@ -34,6 +34,14 @@ import { proseColumns, proseEntries, proseJoin } from "#lib/server/prose.js";
 
 const byCode = (a: string, b: string) => (a < b ? -1 : Number(a > b));
 
+const rowsOf = <Row>(result: { rows: Array<Row> }) => result.rows;
+
+const toFourPlaces = (value: number) => Math.round(value * 10_000) / 10_000;
+
+const isRastered = (tiles: string | null) =>
+  tiles != null &&
+  existsSync(path.resolve("../../data/plane", `${tiles}.ids.pmtiles`));
+
 const stored = (tiles: string | null | undefined) =>
   tiles != null &&
   existsSync(path.resolve("../../data/plane", `${tiles}.pmtiles`))
@@ -1051,10 +1059,10 @@ async function children(
         )
     `);
   }
-  const settled = found.rows.some(
+  const isSettled = found.rows.some(
     (row) => row.k === target && !deeper.has(row.id),
   );
-  const linked = settled
+  const linked = isSettled
     ? { rows: [] }
     : await db.execute<{ yes: boolean }>(sql`
       select exists (select from reporting_unit_area m where m.area_id = ${area.id}::uuid) as yes
@@ -1080,18 +1088,18 @@ async function children(
     : { rows: [] };
   const abroad =
     isRoot &&
-    !settled &&
+    !isSettled &&
     found.rows.every((row) => row.scheme !== "world.country")
       ? await db.execute<{ id: string; k: number; scheme: string }>(sql`
         select a.id, a.k, a.scheme_code as scheme from area a
         where a.k = any(${sql.param(
-          (
+          rowsOf(
             await remember("countries", () =>
               db.execute<{ k: number }>(
                 sql`select k from area where scheme_code = 'world.country'`,
               ),
-            )
-          ).rows.map((row) => row.k),
+            ),
+          ).map((row) => row.k),
         )}::int[]) and ${counted}
       `)
       : { rows: [] };
@@ -1423,7 +1431,7 @@ async function load(
     facts === "pool"
       ? await remember("unlocated", async () =>
           Object.fromEntries(
-            (
+            rowsOf(
               await db.execute<{ polity: string; units: Array<number> }>(sql`
                 with recursive up(k, id) as (
                   select u.k, u.polity_id from reporting_unit u where u.area_id is null
@@ -1431,8 +1439,8 @@ async function load(
                   select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
                 )
                 select id::text as polity, array_agg(k order by k) as units from up group by id
-              `)
-            ).rows.map((row) => [row.polity, row.units]),
+              `),
+            ).map((row) => [row.polity, row.units]),
           ),
         )
       : {},
@@ -1618,12 +1626,12 @@ async function load(
   const aligned = new Set(
     delegated.size === 0
       ? []
-      : (
+      : rowsOf(
           await db.execute<{ set: number }>(sql`
             select s.k as set from unnest(${sql.param([...delegated])}::int[]) as s(k)
             where exists (select from result_value v where v.result_set_k = s.k and v.measure in (17, 18))
-          `)
-        ).rows.map((row) => row.set),
+          `),
+        ).map((row) => row.set),
   );
   const optionKs = new Set(tallies.keys());
 
@@ -3104,7 +3112,7 @@ async function places(
       from jsonb_array_elements_text(${JSON.stringify(
         await remember("unlocated", async () =>
           Object.fromEntries(
-            (
+            rowsOf(
               await db.execute<{ polity: string; units: Array<number> }>(sql`
                 with recursive up(k, id) as (
                   select u.k, u.polity_id from reporting_unit u where u.area_id is null
@@ -3112,8 +3120,8 @@ async function places(
                   select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
                 )
                 select id::text as polity, array_agg(k order by k) as units from up group by id
-              `)
-            ).rows.map((row) => [row.polity, row.units]),
+              `),
+            ).map((row) => [row.polity, row.units]),
           ),
         ),
       )}::jsonb -> (
@@ -3268,12 +3276,12 @@ async function places(
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
   const contexts =
     level.code === "world.country"
-      ? (
+      ? rowsOf(
           await db.execute<{ id: string; k: number; body: string }>(sql`
             select a.id, a.k, n.body_md as body from area a join note n on n.entity_id = a.id and n.kind = 'context'
             where a.scheme_code = 'world.country'
-          `)
-        ).rows
+          `),
+        )
       : [];
   const statuses = new Map(contexts.map((row) => [row.k, row.body]));
   const placed = new Set(shown.map((kid) => kid.k));
@@ -3302,17 +3310,18 @@ async function places(
   const scoped = await db.execute<Record<string, never>>(sql`
     select from contest where id = ${contest.id}::uuid and party_scope_id is not null
   `);
-  const waiting =
+  const universeRows =
     scoped.rows.length === 0
       ? []
-      : (
-          await universe(
-            contest.id,
-            level.code,
-            area.id,
-            contest.date ?? "infinity",
-          )
-        ).filter((row) => row.pending && shown.every((kid) => kid.k !== row.k));
+      : await universe(
+          contest.id,
+          level.code,
+          area.id,
+          contest.date ?? "infinity",
+        );
+  const waiting = universeRows.filter(
+    (row) => row.pending && shown.every((kid) => kid.k !== row.k),
+  );
   const waited =
     waiting.length === 0
       ? null
@@ -3876,7 +3885,7 @@ async function tabulate(
             entry.key !== leader?.key,
         );
         const people =
-          row.isContest && !isMulti
+          !isMulti && row.isContest
             ? kept.map((item) => {
                 const cell = result.find(
                   (entry) => entry.key === item.key,
@@ -3887,7 +3896,7 @@ async function tabulate(
               })
             : [];
         const tags =
-          row.isContest && !isMulti
+          !isMulti && row.isContest
             ? kept.map((item) => {
                 const cell = result.find(
                   (entry) => entry.key === item.key,
@@ -4108,7 +4117,7 @@ async function atlas(input: {
   const picked = await find(input.id);
   const group =
     input.whole != null
-      ? ((
+      ? (rowsOf(
           await db.execute<{
             ids: Array<string>;
             place: { id: string; k: number } | null;
@@ -4136,8 +4145,8 @@ async function atlas(input: {
               and c.allocation_parent_id is null and not c.notional and c.district_area_id is not null
             where me.id = ${picked.id}::uuid
             group by me.id
-          `)
-        ).rows[0] ?? null)
+          `),
+        )[0] ?? null)
       : null;
   if (input.whole != null && (group == null || group.ids.length < 3)) {
     throw new ORPCError("NOT_FOUND");
@@ -4507,12 +4516,12 @@ async function atlas(input: {
   const districts = new Map(
     group == null
       ? []
-      : (
+      : rowsOf(
           await db.execute<{ id: string; k: number }>(sql`
             select c.id, a.k from contest c join area a on a.id = c.district_area_id
             where c.id = any(${sql.param(group.ids)}::uuid[])
-          `)
-        ).rows.map((row) => [row.k, row.id]),
+          `),
+        ).map((row) => [row.k, row.id]),
   );
   const [tabulated, at, moved] = await Promise.all([
     tabulate(
@@ -4641,12 +4650,12 @@ async function atlas(input: {
   const statuses =
     level?.code === "world.country"
       ? new Map(
-          (
+          rowsOf(
             await db.execute<{ k: number; body: string }>(sql`
               select a.k, n.body_md as body from area a join note n on n.entity_id = a.id and n.kind = 'context'
               where a.k = any(${sql.param(rows.map((row) => row.k))}::int[])
-            `)
-          ).rows.map((row) => [row.k, row.body]),
+            `),
+          ).map((row) => [row.k, row.body]),
         )
       : null;
   return {
@@ -4750,12 +4759,9 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
       group: input.group,
       isLean,
     });
-  const rastered = (tiles: string | null) =>
-    tiles != null &&
-    existsSync(path.resolve("../../data/plane", `${tiles}.ids.pmtiles`));
   const base = await load(undefined, undefined);
   const middle = base.levels.findLast(
-    (level) => level.code !== base.level && rastered(level.tiles),
+    (level) => level.code !== base.level && isRastered(level.tiles),
   );
   const units =
     base.parts.length > 0 ? base.parts.map((part) => part.unit) : [""];
@@ -4776,7 +4782,7 @@ async function mosaic(input: { id: string; vs?: string; group: Grouping }) {
         const [at, unit] = next;
         const first = unit === "" ? base : await load(unit, undefined);
         const finest = first.levels.findLast(
-          (level) => level.code !== middle?.code && rastered(level.tiles),
+          (level) => level.code !== middle?.code && isRastered(level.tiles),
         );
         if (finest != null) {
           finer[at] = {
@@ -5019,27 +5025,26 @@ async function lean(input: {
       at,
       held,
       counted,
-      margin: axis.length < 2 || at === -1 ? null : spread(near, "shares", at),
+      margin: at === -1 || axis.length < 2 ? null : spread(near, "shares", at),
     };
   };
   const asked = await measure(input.group ?? "option");
-  const chosen =
+  const allied =
     asked.group === "option" &&
     (asked.near.isAllied || asked.whole.isAllied) &&
     (asked.margin == null || asked.counted.length < asked.held.length)
-      ? await measure("alliance").then((allied) =>
-          allied.margin != null &&
-          (asked.margin == null || allied.counted.length > asked.counted.length)
-            ? allied
-            : asked,
-        )
+      ? await measure("alliance")
+      : null;
+  const chosen =
+    allied?.margin != null &&
+    (asked.margin == null || allied.counted.length > asked.counted.length)
+      ? allied
       : asked;
   const { group, near, whole, axis, spread, at, held, counted, margin } =
     chosen;
   if (margin == null) {
     throw new ORPCError("NOT_FOUND");
   }
-  const round = (value: number) => Math.round(value * 10_000) / 10_000;
   const overall = (set: typeof near) => {
     let [weighted, total] = [0, 0];
     for (const [i, valid] of set.places.valid.entries()) {
@@ -5049,7 +5054,7 @@ async function lean(input: {
         total += valid;
       }
     }
-    return total === 0 ? 0 : round(weighted / total);
+    return total === 0 ? 0 : toFourPlaces(weighted / total);
   };
   const areas = await db.execute<{ id: string; k: number }>(sql`
     select id, k from area where k = any(${sql.param(counted.map((i) => near.places.k[i] ?? -1))}::int[])
@@ -5063,7 +5068,7 @@ async function lean(input: {
   );
   const places = counted.map((i) => ({
     name: named.get(near.places.k[i] ?? -1) ?? "",
-    margin: round(spread(near, "shares", i) ?? 0),
+    margin: toFourPlaces(spread(near, "shares", i) ?? 0),
     isOwn: i === at,
   }));
   const before = spread(near, "before", at);
@@ -5077,8 +5082,8 @@ async function lean(input: {
     })),
     place: {
       name: place.name,
-      margin: round(margin),
-      before: before == null ? null : round(before),
+      margin: toFourPlaces(margin),
+      before: before == null ? null : toFourPlaces(before),
     },
     parent:
       chain.length === 1
@@ -5093,8 +5098,8 @@ async function lean(input: {
         1 +
         places.filter((entry) =>
           margin >= 0
-            ? entry.margin > round(margin)
-            : entry.margin < round(margin),
+            ? entry.margin > toFourPlaces(margin)
+            : entry.margin < toFourPlaces(margin),
         ).length,
       places: places.toSorted((a, b) => a.margin - b.margin),
     },
@@ -5109,13 +5114,13 @@ export async function rebuildMosaics(only?: Array<string>) {
   await mkdir(folder, { recursive: true });
   const listed =
     only ??
-    (
+    rowsOf(
       await db.execute<{ id: string }>(sql`
         select c.id from contest c
         where c.allocation_parent_id is null
           and exists (select from contest k where k.allocation_parent_id = c.id offset 2)
-      `)
-    ).rows.map((row) => row.id);
+      `),
+    ).map((row) => row.id);
   const ids = new Set(listed);
   if (only == null) {
     const folderNames = await readdir(folder);
@@ -5154,7 +5159,8 @@ export async function rebuildMosaics(only?: Array<string>) {
     const held = existsSync(file)
       ? (JSON.parse(await readFile(file, "utf8")) as { stamp: string })
       : null;
-    const age = held == null ? 0 : Date.now() - (await stat(file)).mtimeMs;
+    const info = held == null ? null : await stat(file);
+    const age = info == null ? 0 : Date.now() - info.mtimeMs;
     if (held?.stamp === mark && age < 86_400_000) {
       counts.kept += 1;
       continue;
@@ -5248,15 +5254,15 @@ export const contests = {
         input.area ??
         (input.place == null
           ? null
-          : ((
+          : (rowsOf(
               await db.execute<{ k: number }>(sql`
                 select a.k from slug s
                 join polity_territory pt on pt.polity_id = s.entity_id
                 join area a on a.id = pt.area_id
                 where s.path = ${input.place}
                 order by upper_inf(pt.valid) desc, upper(pt.valid) desc limit 1
-              `)
-            ).rows[0]?.k ?? null));
+              `),
+            )[0]?.k ?? null));
       const prefixes = input.path
         .split("/")
         .map((_, index, parts) => parts.slice(0, index + 1).join("/"));
@@ -6258,15 +6264,15 @@ export const contests = {
         end as status
         from k
       `);
-      const unqualified =
+      const isUnqualified =
         isRoot && sets.rows.every((row) => row.status !== "active")
-          ? (
+          ? rowsOf(
               await db.execute<{ found: boolean }>(sql`
                 select exists (
                   select from label where entity_id = ${contest.id}::uuid and kind = 'ballot' and value = 'no_candidate_qualified'
                 ) as found
-              `)
-            ).rows[0]?.found === true
+              `),
+            )[0]?.found === true
           : false;
       const listedNames = await names(
         listed.rows.flatMap((row) =>
@@ -6282,7 +6288,7 @@ export const contests = {
         ...chain.map((entry) => entry.id),
       ];
       const away = new Set(
-        (
+        rowsOf(
           await db.execute<{ id: string }>(sql`
             select a.id from area a
             where a.id = any(${sql.param(stops.filter((id) => id != null))}::uuid[])
@@ -6296,8 +6302,8 @@ export const contests = {
                   )
                 )
               )
-          `)
-        ).rows.map((row) => row.id),
+          `),
+        ).map((row) => row.id),
       );
       const trail: Array<{
         name: string;
@@ -6417,7 +6423,7 @@ export const contests = {
         checks: [],
         incumbency: standing.rows[0]?.status ?? null,
         slate:
-          listed.rows.length === 0 && !unqualified
+          !isUnqualified && listed.rows.length === 0
             ? null
             : {
                 state:
@@ -6428,7 +6434,7 @@ export const contests = {
                           90 * 86_400_000
                       ? ("counting" as const)
                       : ("unreported" as const),
-                isUnqualified: unqualified,
+                isUnqualified,
                 options: listed.rows.map((row) => ({
                   key: String(row.k),
                   kind: row.kind,
@@ -7767,8 +7773,7 @@ export const contests = {
       deeper.catch(() => null);
       const current = now.get(area.k);
       if (
-        current != null &&
-        current.side.options.every((option) => option.seats == null)
+        current?.side.options.every((option) => option.seats == null) === true
       ) {
         const declared = await db.execute<{ party: string; seats: number }>(sql`
           select coalesce(pm.into_id, o.party_id) as party, sum(r.value)::int as seats
@@ -7809,7 +7814,7 @@ export const contests = {
         const prior =
           candidates.length === 0
             ? null
-            : ((
+            : (rowsOf(
                 await db.execute<{ id: string; date: string }>(sql`
                   with recursive base as (
                     select c.id from unnest(${sql.param(candidates.map((row) => row.id))}::uuid[]) with ordinality u(id, at)
@@ -7825,8 +7830,8 @@ export const contests = {
                   select chain.id, e.date_from::text as date from chain
                   join contest c on c.id = chain.id join election e on e.id = c.election_id
                   order by chain.depth desc limit 1
-                `)
-              ).rows[0] ?? null);
+                `),
+              )[0] ?? null);
         const [held, priorSlugs] =
           prior == null
             ? [null, null]
@@ -8451,7 +8456,7 @@ export const contests = {
           ? (finest ?? []).map((row) => row.k)
           : chain.length === 0
             ? null
-            : (
+            : rowsOf(
                 await db.execute<{ k: number }>(sql`
                   with recursive down(id, depth) as (
                     select ${area.id}::uuid, 0
@@ -8467,8 +8472,8 @@ export const contests = {
                       where v.result_set_k = any(${sql.param(ks)}::int[]) and v.unit_k = u.k
                     )
                   limit ${CAP + 1}
-                `)
-              ).rows.map((row) => row.k);
+                `),
+              ).map((row) => row.k);
       if (candidates == null || candidates.length > CAP) {
         return {
           count: CAP,
@@ -10161,10 +10166,10 @@ export const contests = {
       );
       const here = focus?.id ?? contest.place?.id;
       const away =
-        lone.length === 0 || here == null
+        here == null || lone.length === 0
           ? new Set<string>()
           : new Set(
-              (
+              rowsOf(
                 await db.execute<{ id: string }>(sql`
                   select x.id from unnest(${sql.param(lone.map((row) => row.sample))}::uuid[]) as x(id)
                   join contest c on c.id = x.id
@@ -10179,8 +10184,8 @@ export const contests = {
                     where g.area_id = ${here}::uuid and g.valid @> e.date_from limit 1
                   ) h
                   where not st_relate(a.geom, h.geom, 'T********')
-                `)
-              ).rows.map((row) => row.id),
+                `),
+              ).map((row) => row.id),
             );
       const listed = day.rows.filter(
         (row) => !(row.isCurrent && row.count === 1) && !away.has(row.sample),
@@ -10371,11 +10376,9 @@ export const contests = {
               kind: row.kind,
               label:
                 isSingle &&
-                !(
-                  isScoped &&
-                  row.owner != null &&
-                  !(row.kind === "owner" && row.isPart)
-                )
+                (!isScoped ||
+                  row.owner == null ||
+                  (row.kind === "owner" && row.isPart))
                   ? plain
                   : (labels.short.get(row.owner ?? "") ??
                     labels.full.get(row.owner ?? "") ??
@@ -10383,7 +10386,7 @@ export const contests = {
               count: row.count,
               path: isSingle
                 ? (slugs.get(row.sample) ?? null)
-                : row.kind === "owner" && row.isPart && election != null
+                : election != null && row.kind === "owner" && row.isPart
                   ? (slugs.get(election) ?? hub)
                   : hub,
               anchor: isSingle
@@ -10548,7 +10551,7 @@ export const contests = {
       const isOpen =
         closed.rows.every((row) => row.kind !== "list") &&
         open.rows.some((row) => row.person != null);
-      if (closed.rows.every((row) => row.kind !== "list") && !isOpen) {
+      if (!isOpen && closed.rows.every((row) => row.kind !== "list")) {
         return null;
       }
       const found = {
@@ -11184,6 +11187,7 @@ async function explain(
     const beaten = rows.filter(
       (other) => other.votes > row.votes && other.seats < row.seats,
     );
+    const beatenLabels = beaten.map((entry) => label(entry));
     if (row.seats === 0 || beaten.length === 0) {
       continue;
     }
@@ -11237,7 +11241,7 @@ async function explain(
         (kind === "threshold" || kind === "access") && entry.kind === kind,
     );
     if (merged != null) {
-      for (const other of beaten.map(label)) {
+      for (const other of beatenLabels) {
         if (!merged.beaten.includes(other)) {
           merged.beaten.push(other);
         }
@@ -11251,8 +11255,7 @@ async function explain(
       note: kind === "note" ? row.note : null,
       percent: kind === "threshold" ? (threshold?.percent ?? null) : null,
       votes: kind === "access" ? (access?.votes ?? null) : null,
-      beaten:
-        kind === "threshold" || kind === "access" ? beaten.map(label) : [],
+      beaten: kind === "threshold" || kind === "access" ? beatenLabels : [],
       person: row.person == null ? null : (labels.full.get(row.person) ?? null),
       joined: row.joined,
       system: row.system,
@@ -12154,24 +12157,23 @@ async function races(
             })(),
         db.execute<{ from: string; to: string }>(sisters(roots, day)),
       ]);
-      const here =
-        totals.get(place.k) ??
-        (single == null && districts.length > 0
-          ? (
-              await load(
-                districts.map((row) => row.id),
-                districts.map((row) => row.k ?? 0),
-                day,
-                counted.length > 0 ? counted : roots,
-                districts.map((row) => row.id),
-                null,
-                "area",
-                new Map<number, Array<[number, number]>>(
-                  districts.map((row) => [row.k ?? 0, [[place.k, 1]]]),
-                ),
-              )
-            ).get(place.k)
-          : undefined);
+      const direct = totals.get(place.k);
+      const pooled =
+        direct == null && single == null && districts.length > 0
+          ? await load(
+              districts.map((row) => row.id),
+              districts.map((row) => row.k ?? 0),
+              day,
+              counted.length > 0 ? counted : roots,
+              districts.map((row) => row.id),
+              null,
+              "area",
+              new Map<number, Array<[number, number]>>(
+                districts.map((row) => [row.k ?? 0, [[place.k, 1]]]),
+              ),
+            )
+          : undefined;
+      const here = direct ?? pooled?.get(place.k);
       const rows = reckon(here?.side, lineage, grouping, single == null);
       const folded = Map.groupBy(rows, (row) =>
         single == null && row.cell.party != null
@@ -12200,7 +12202,7 @@ async function races(
       const won =
         single == null && head?.isOffice === true && roots.length > 1
           ? new Map(
-              (
+              rowsOf(
                 await db.execute<{ party: string | null; seats: number }>(sql`
                   select coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party, count(distinct x.option_id)::int as seats
                   from contest c
@@ -12214,8 +12216,8 @@ async function races(
                   left join entity_merge bm on bm.entity_id = br.parent_party_id
                   where c.id = any(${sql.param(roots)}::uuid[])
                   group by 1
-                `)
-              ).rows.map((row) => [
+                `),
+              ).map((row) => [
                 row.party == null
                   ? null
                   : `party:${parentOf.get(row.party) ?? row.party}`,
@@ -12224,8 +12226,8 @@ async function races(
             )
           : null;
       const credited =
-        single == null && head?.isOffice !== true && grouping === "alliance"
-          ? (
+        grouping === "alliance" && single == null && head?.isOffice !== true
+          ? rowsOf(
               await db.execute<{
                 from: string;
                 party: string;
@@ -12259,8 +12261,8 @@ async function races(
                   order by o.id, x.candidacy_id, cy.id
                 ) r
                 group by 1, 2
-              `)
-            ).rows
+              `),
+            )
           : [];
       const creditNames =
         credited.length === 0
@@ -13802,9 +13804,9 @@ export const elections = {
         (entry.reporting === entry.of || entry.voters >= valid * 0.9);
       const chamber = raced.find((race) => race.body != null)?.body ?? null;
       const pooled =
-        isCovered(totaled) || chamber == null
+        chamber == null || isCovered(totaled)
           ? []
-          : (
+          : rowsOf(
               await db.execute<{
                 isNow: boolean;
                 year: number;
@@ -13892,8 +13894,8 @@ export const elections = {
                     else 'valid' end as basis
                 from picked p join kept k on k.root = p.id
                 group by p."isNow", p.date_from
-              `)
-            ).rows.flatMap((row) =>
+              `),
+            ).flatMap((row) =>
               row.registered == null ||
               row.voters == null ||
               row.reporting === 0
@@ -13986,7 +13988,7 @@ export const elections = {
       const rolled =
         within != null || whole.rows.every((row) => !row.isStaggered)
           ? []
-          : (
+          : rowsOf(
               await db.execute<{
                 origin: string;
                 isNow: boolean;
@@ -14062,8 +14064,8 @@ export const elections = {
                   (select bool_or(w."isWhole") from wnd w where w.origin = k.origin and w."isNow" = k."isNow") as "isWhole"
                 from kept k
                 group by k.origin, k."isNow", k.party
-              `)
-            ).rows;
+              `),
+            );
       const compositions = new Map<string, Map<boolean, Map<string, number>>>();
       const rolledGroups = Map.groupBy(
         rolled,
@@ -14075,11 +14077,7 @@ export const elections = {
         for (const row of rows) {
           total += row.seats;
         }
-        if (
-          first == null ||
-          first.size !== total ||
-          (first.cycles < 3 && !first.isWhole)
-        ) {
+        if (first?.size !== total || (first.cycles < 3 && !first.isWhole)) {
           continue;
         }
         const [origin = ""] = key.split("|", 1);
@@ -14130,7 +14128,7 @@ export const elections = {
           path: slugs.get(found?.election ?? "") ?? null,
           total,
           control:
-            found?.isWhole === true && within == null
+            within == null && found?.isWhole === true
               ? {
                   key: isMajority ? top.key : null,
                   label: isMajority ? top.label : null,
@@ -14197,7 +14195,7 @@ export const elections = {
         };
       });
       const unelected = Map.groupBy(
-        (
+        rowsOf(
           await db.execute<{
             body: string;
             category: "appointed" | "ex_officio";
@@ -14224,8 +14222,8 @@ export const elections = {
               and c.from_date <= ${election.date ?? "infinity"}::date + 45
               and coalesce(c.to_date, 'infinity'::date) > ${election.date ?? "infinity"}::date + 45
             group by 1, 2 order by 2
-          `)
-        ).rows,
+          `),
+        ),
         (row) => row.body,
       );
       const isUmbrella =
@@ -14237,7 +14235,7 @@ export const elections = {
         whole.rows.every((row) => row.election !== input.id);
       const seatedRows = electionRows.rows.flatMap((row) => row.parties ?? []);
       const grouped = new Map(
-        (
+        rowsOf(
           await db.execute<{ party: string; group: string }>(sql`
             select distinct on (a.party_id) a.party_id::text as party,
               coalesce(gm.into_id, a.parent_party_id)::text as group
@@ -14248,27 +14246,24 @@ export const elections = {
               and a.valid @> ${election.date ?? "infinity"}::date + 40
               and exists (select from polity p where p.id = ${election.polity}::uuid and p.iso_code = 'EU')
             order by a.party_id, a.valid_from desc nulls last
-          `)
-        ).rows.map((row) => [row.party, row.group]),
+          `),
+        ).map((row) => [row.party, row.group]),
       );
-      const seatedRefs = new Map(
-        (
-          await Promise.all([
-            refs(
-              seatedRows.flatMap((row) => row.party ?? []),
-              election.date,
-            ),
-            refs(
-              grouped.values().toArray(),
-              election.date == null
-                ? null
-                : new Date(Date.parse(election.date) + 40 * 86_400_000)
-                    .toISOString()
-                    .slice(0, 10),
-            ),
-          ])
-        ).flatMap((found) => [...found]),
-      );
+      const seatedLookups = await Promise.all([
+        refs(
+          seatedRows.flatMap((row) => row.party ?? []),
+          election.date,
+        ),
+        refs(
+          grouped.values().toArray(),
+          election.date == null
+            ? null
+            : new Date(Date.parse(election.date) + 40 * 86_400_000)
+                .toISOString()
+                .slice(0, 10),
+        ),
+      ]);
+      const seatedRefs = new Map(seatedLookups.flatMap((found) => [...found]));
       const seatedTotals = Map.groupBy(seatedRows, (row) =>
         row.party == null
           ? row.independent
@@ -15042,7 +15037,8 @@ export const elections = {
         select c.id from election k join contest c on c.election_id = k.id and c.kind = 'office'
         where k.parent_id = ${input.id}::uuid
       `);
-      const decided = (await decide(offices.rows.map((row) => row.id)))
+      const decisions = await decide(offices.rows.map((row) => row.id));
+      const decided = decisions
         .entries()
         .filter(([id, chain]) => chain.final !== id)
         .toArray();
@@ -21124,7 +21120,7 @@ export const people = {
       const faithless =
         lone.length === 0
           ? []
-          : (
+          : rowsOf(
               await db.execute<{
                 root: string;
                 state: string;
@@ -21175,8 +21171,8 @@ export const people = {
                       and extract(year from ge.date_from) = extract(year from e.date_from)
                   )
                 order by r.value desc, a.k
-              `)
-            ).rows;
+              `),
+            );
       const unfaithful = Map.groupBy(faithless, (row) => row.root);
       const tenures = await db.execute<{
         owner: string;
@@ -21637,10 +21633,14 @@ export const people = {
             .toSorted((a, b) => a.localeCompare(b))[0] ?? "1000-01-01",
           null,
         ),
-        Promise.all(homes.map(async (polity) => chambers(polity))).then(
-          (found) =>
-            new Map(found.flat().map((peer) => [peer.id, peer.slug] as const)),
-        ),
+        (async () => {
+          const found = await Promise.all(
+            homes.map(async (polity) => chambers(polity)),
+          );
+          return new Map(
+            found.flat().map((peer) => [peer.id, peer.slug] as const),
+          );
+        })(),
         paths(homes),
       ]);
       const chamberPath = new Map(
@@ -23105,13 +23105,13 @@ export const search = {
           `);
       const state = states?.rows[0]?.name;
       const seat = Number(district?.[2]);
-      const units = (
+      const units = rowsOf(
         await db.execute<{ code: string; name: string; label: string }>(sql`
           select lower(substr(p.iso_code, 4)) as code, lower(n.text) as name, n.text as label
           from polity p join name n on n.entity_id = p.id and n.kind = 'official' and n.is_preferred
           where p.iso_code like 'US-%'
-        `)
-      ).rows;
+        `),
+      );
       const lowered = input.q.toLowerCase();
       const unit =
         district != null ||
@@ -23122,7 +23122,7 @@ export const search = {
               .filter((row) =>
                 [row.name, row.code].some((label) =>
                   new RegExp(
-                    `.(?:,\\s*|\\s+)${RegExp.escape(label)}$`,
+                    String.raw`.(?:,\s*|\s+)${RegExp.escape(label)}$`,
                     "u",
                   ).test(lowered),
                 ),
@@ -23143,7 +23143,7 @@ export const search = {
       const q =
         state == null
           ? asked
-              .replace(
+              .replaceAll(
                 /\b(?:c?isd|usd)\b/giu,
                 (word) =>
                   ({
@@ -23371,7 +23371,7 @@ export const search = {
         ...bodies.filter((row) => !row.isClose),
       ];
       const upcoming = new Map(
-        (
+        rowsOf(
           await db.execute<{ person: string; date: string; seat: string }>(sql`
             select distinct on (cy.person_id) cy.person_id as person, e.date_from::text as date, coalesce(c.office_id, c.body_id) as seat
             from candidacy cy
@@ -23380,8 +23380,8 @@ export const search = {
             join election e on e.id = c.election_id and e.kind <> 'primary' and e.status = 'scheduled' and e.date_from >= current_date
             where cy.person_id = any(${sql.param(rows.flatMap((row) => (row.type === "person" ? [row.id] : [])))}::uuid[]) and cy.role = 'head'
             order by cy.person_id, e.date_from
-          `)
-        ).rows.map((row) => [row.person, row]),
+          `),
+        ).map((row) => [row.person, row]),
       );
       const ids = rows.flatMap((row) =>
         [
@@ -23402,14 +23402,16 @@ export const search = {
         portraits(
           rows.filter((row) => row.type === "person").map((row) => row.id),
         ),
-        Promise.all(
-          [...new Set(matched.rows.map((row) => row.polity))].map(
-            async (polity) => chambers(polity),
-          ),
-        ).then(
-          (found) =>
-            new Map(found.flat().map((peer) => [peer.id, peer.slug] as const)),
-        ),
+        (async () => {
+          const found = await Promise.all(
+            [...new Set(matched.rows.map((row) => row.polity))].map(
+              async (polity) => chambers(polity),
+            ),
+          );
+          return new Map(
+            found.flat().map((peer) => [peer.id, peer.slug] as const),
+          );
+        })(),
       ]);
       const ranked = rows
         .map((row) => {
