@@ -22,6 +22,11 @@ WESTVILLE = (
     "https://www.gloucestercountynj.gov/DocumentCenter/View/19513/Westville-Borough-District-1-UOCAVA-GENERAL-26"
 )
 SOMERSET = "https://www.somersetcountynj.gov/government/elected-officials/county-clerk/election-division"
+HUNTERDON = "https://www.co.hunterdon.nj.us/clerk/#sample-ballot-%s-2026-general"
+WARREN = "https://www.warrencountynj.gov/#sample-ballot-washington-township-2026-general"
+FRANKLIN = HUNTERDON % "franklin-township"
+EAST_AMWELL = HUNTERDON % "east-amwell-township"
+LAMBERTVILLE = HUNTERDON % "lambertville-city"
 SOURCES = {
     BURLINGTON: (
         "Burlington County Clerk",
@@ -57,6 +62,26 @@ SOURCES = {
         "Somerset County Clerk",
         "2026 General Election School Board and Fire Commissioner Candidates",
         "y26/nj/somerset_school.xlsx",
+    ),
+    FRANKLIN: (
+        "Hunterdon County Clerk",
+        "Official General Election Ballot, Franklin Township District 1, November 3, 2026",
+        "manual/MF-464/Hunterdon/Franklin 1-3.pdf",
+    ),
+    EAST_AMWELL: (
+        "Hunterdon County Clerk",
+        "Official General Election Ballot, East Amwell Township District 1, November 3, 2026",
+        "manual/MF-464/Hunterdon/East Amwell 1-5.pdf",
+    ),
+    LAMBERTVILLE: (
+        "Hunterdon County Clerk",
+        "Official General Election Ballot, Lambertville City District 1, November 3, 2026",
+        "manual/MF-464/Hunterdon/Lambertville City 1-4.pdf",
+    ),
+    WARREN: (
+        "Warren County Clerk",
+        "2026 General Election Ballot, Washington Township District 1, November 3, 2026",
+        "manual/MF-464/Warren/2026 General ElectionWashington Townshi.pdf",
     ),
 }
 SEATS = (
@@ -138,6 +163,10 @@ SEATS = (
     ("Westville Borough Fire District", "Gloucester", False, 2, WESTVILLE, ["William Marsden", "Vincent DiCicco"]),
     ("Westville Borough Fire District", "Gloucester", True, 1, WESTVILLE, ["Paul Mailley"]),
     ("Hillsborough Fire District", "Somerset", False, 1, SOMERSET, ["John Lazorchak"]),
+    ("Franklin Township Fire District No. 1", "Hunterdon", False, 1, FRANKLIN, ["Charles A. Patkochis"]),
+    ("Amwell Valley Fire Company", "Hunterdon", False, 2, EAST_AMWELL, ["Paul E. Carlucci"]),
+    ("Lambertville Fire District No. 1", "Hunterdon", False, 1, LAMBERTVILLE, ["Nancy Bakewell"]),
+    ("Washington Township Fire District No. 1", "Warren", False, 2, WARREN, ["Michael Riotto", "Karl Spolarich"]),
 )
 
 
@@ -186,7 +215,7 @@ def emit() -> Path:
         source_id=SOURCE,
         version=VERSION,
         state="NJ",
-        summary="Fire commissioner races on the November 3, 2026 ballot in Burlington, Gloucester, Mercer, and Somerset County fire districts, with candidates from the county clerks' official ballots and candidate lists",
+        summary="Fire commissioner races on the November 3, 2026 ballot in Burlington, Gloucester, Hunterdon, Mercer, Somerset, and Warren County fire districts, with candidates from the county clerks' official ballots and candidate lists",
         sources={url: (publisher, title) for url, (publisher, title, _) in SOURCES.items()},
         frame=pl.read_parquet(PARSED / "candidates.parquet"),
     )
