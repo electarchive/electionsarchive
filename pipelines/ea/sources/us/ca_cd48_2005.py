@@ -1,13 +1,17 @@
+import re
+import subprocess
 from datetime import date
 from pathlib import Path
 from uuid import UUID
 
-from ea import raw
+import polars as pl
+
+from ea import precinct_code, raw
 from ea.changeset import Changeset, slug
 from ea.store import connect
 
 SOURCE = "us.ca_cd48_2005"
-VERSION = "1"
+VERSION = "2"
 PRIMARY_URL = "https://ocvote.gov/fileadmin/user_upload/sov/e26/sov.pdf"
 GENERAL_URL = "https://elections.cdn.sos.ca.gov/special-elections/2005-cd48/secd48.doc"
 GENERAL_TITLE = (
@@ -64,12 +68,59 @@ GENERAL = [
     ("Jim Gilchrist", "AI", 26507),
     ("Steven Wesley Blake", "REP", 0),
 ]
+PRECINCT_PAGES = (
+    (
+        1,
+        4,
+        [
+            "John Kelly",
+            "John Campbell",
+            "David R. Crouch",
+            "Bruce Cohen",
+            "Steve Young",
+            "Don Udall",
+            "Bea Foster",
+            "Scott Maccabe",
+            "Guy E. Mailly",
+            "Marsha A. Morris",
+            "Marilyn C. Brewer",
+            "Marshall Samuel Sanders",
+        ],
+    ),
+    (8, 11, ["Edward A. Suppe", "Tom Pallow", "Bea Tiritilli", "John Graham", "Jim Gilchrist"]),
+)
+COUNTY = "06059"
 DAYS = {"primary": date(2005, 10, 4), "general": date(2005, 12, 6)}
 NOTE = (
     "The district lies wholly within Orange County, so the county's statement of votes is the district total. "
     "Totals are the Grand Totals lines of the county's statement and the official canvass, read from their text "
     "layers; the two named write-in candidates in the primary come from the county's separate write-in tally."
 )
+
+
+def precincts() -> dict[str, dict[str, int]]:
+    path = raw.cached(SOURCE, PRIMARY_URL).path
+    found: dict[str, dict[str, int]] = {}
+    for first, last, names in PRECINCT_PAGES:
+        text = subprocess.run(
+            ["pdftotext", "-layout", "-f", str(first), "-l", str(last), str(path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        pattern = re.compile(r"^\s*(\d{5})\s+[\d,]+\s+[\d,]+\s+[\d.]+((?:\s+[\d,]+){%d})\s*$" % len(names))
+        for line in text.splitlines():
+            match = pattern.match(line)
+            if match:
+                values = [int(value.replace(",", "")) for value in match[2].split()]
+                found.setdefault(match[1], {}).update(zip(names, values, strict=True))
+    for precinct, votes in found.items():
+        if len(votes) != len(PRIMARY) - 2:
+            raise ValueError(f"precinct {precinct} is missing candidate columns")
+    for text, _, total in PRIMARY:
+        if text in found["25701"] and sum(votes[text] for votes in found.values()) != total:
+            raise ValueError(f"{text} precinct rows do not sum to the Grand Totals line")
+    return found
 
 
 def fetch() -> None:
@@ -130,6 +181,10 @@ def emit() -> Path:
         system = cs.key("us.electoral_system", "two_round")
         parties = {code: cs.key("us.party", key) for code, key in PARTIES.items()}
         created: set[UUID] = set()
+        options: dict[str, UUID] = {}
+        precinct_rows = precincts()
+        precinct_codes = {number: precinct_code.code(2005, "CA", COUNTY, number) for number in precinct_rows}
+        precinct_code.units(cs, conn, pl.Series(list(precinct_codes.values())))
         previous = None
         for number, (round_name, rows) in enumerate((("primary", PRIMARY), ("general", GENERAL)), start=1):
             day = DAYS[round_name]
@@ -195,6 +250,7 @@ def emit() -> Path:
                     party_id=parties[party_code],
                     ballot_label=text,
                 )
+                options[text] = option
                 cs.add(
                     "candidacy",
                     id=cs.key("us.candidacy", f"{key}:{person}:head"),
@@ -232,5 +288,51 @@ def emit() -> Path:
                 flags=0,
                 value=sum(votes for _, _, votes in rows),
             )
+            if round_name == "primary":
+                detail = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
+                cs.add(
+                    "result_set",
+                    id=detail,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[round_name],
+                    is_default=False,
+                    completeness=1,
+                )
+                cs.add(
+                    "note",
+                    entity_id=detail,
+                    kind="methodology",
+                    body_md="Precinct rows of the county's statement of votes. Each precinct sums the early, "
+                    "absentee, and election day ballots; the two write-in candidates have no precinct column.",
+                )
+                for number, votes in precinct_rows.items():
+                    precinct = cs.unit("us.precinct", precinct_codes[number])
+                    for text, count in votes.items():
+                        cs.add(
+                            "result_value",
+                            result_set_id=detail,
+                            unit_id=precinct,
+                            option_id=options[text],
+                            channel=0,
+                            measure=1,
+                            count_round=1,
+                            flags=0,
+                            value=count,
+                        )
+                    cs.add(
+                        "result_value",
+                        result_set_id=detail,
+                        unit_id=precinct,
+                        option_id=None,
+                        channel=0,
+                        measure=4,
+                        count_round=1,
+                        flags=0,
+                        value=sum(votes.values()),
+                    )
             previous = contest
         return cs.write()
