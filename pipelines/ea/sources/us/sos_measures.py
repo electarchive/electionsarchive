@@ -574,11 +574,27 @@ MI_PROPOSALS = {
         "Legislative Referendum",
     ),
 }
-MI_OLD = "http://web.archive.org/web/2id_/http://miboecfr.nictusa.com/election/results/{}GEN/9000000{}.html"
+MI_OLD = "http://web.archive.org/web/{}id_/http://miboecfr.nictusa.com/election/results/{}/9000000{}.html"
 MI_OLD_PROPOSALS = (
     (
+        date(2002, 8, 6),
+        "02PRI",
+        1,
+        "02-1",
+        "Constitutional amendment governing the operation of the SOCC",
+        "Legislative Referendum",
+    ),
+    (
+        date(2002, 8, 6),
+        "02PRI",
+        2,
+        "02-2",
+        "Constitutional amendment to allow the Natural Resources Trust Fund to be invested and to increase allowed spending for parks",
+        "Legislative Referendum",
+    ),
+    (
         date(2000, 11, 7),
-        "00",
+        "00GEN",
         1,
         "00-1",
         "Constitutional amendment permitting indirect state support of nonpublic school students",
@@ -586,7 +602,7 @@ MI_OLD_PROPOSALS = (
     ),
     (
         date(2000, 11, 7),
-        "00",
+        "00GEN",
         2,
         "00-2",
         "Constitutional amendment requiring a two-thirds legislative vote for laws affecting local governments",
@@ -594,7 +610,7 @@ MI_OLD_PROPOSALS = (
     ),
     (
         date(2002, 11, 5),
-        "02",
+        "02GEN",
         1,
         "02-1",
         "Referendum on Public Act 269 of 2001 amending the Michigan election law",
@@ -602,7 +618,7 @@ MI_OLD_PROPOSALS = (
     ),
     (
         date(2002, 11, 5),
-        "02",
+        "02GEN",
         2,
         "02-2",
         "Bonds for sewage treatment, storm water, and water pollution projects",
@@ -610,7 +626,7 @@ MI_OLD_PROPOSALS = (
     ),
     (
         date(2002, 11, 5),
-        "02",
+        "02GEN",
         3,
         "02-3",
         "Constitutional amendment granting state classified employees collective bargaining with binding arbitration",
@@ -618,7 +634,7 @@ MI_OLD_PROPOSALS = (
     ),
     (
         date(2002, 11, 5),
-        "02",
+        "02GEN",
         4,
         "02-4",
         "Constitutional amendment reallocating tobacco settlement revenue",
@@ -1232,6 +1248,10 @@ WY_FILES = {
         "2008/08Results/General/SW-ConstitutionalAmendments.pdf",
         [[("Constitutional Amendment A", 0), ("Constitutional Amendment B", 4)]],
     ),
+    date(2012, 11, 6): (
+        "2012/Results/General/2012_Statewide_Constitutional_Amendments.pdf",
+        [[(f"Constitutional Amendment {letter}", 0)] for letter in "ABC"],
+    ),
 }
 WY_COUNTIES = frozenset(
     [
@@ -1581,6 +1601,8 @@ NM_2003_VOTES = {
     ),
 }
 OH_PAGES = "https://web.archive.org/web/2012id_/http://www.sos.state.oh.us/sos/elections/Research/electResultsMain/"
+OH_2022 = "https://web.archive.org/web/20260114174614id_/https://www.ohiosos.gov/globalassets/elections/2022/gen/issues-summary.xlsx"
+DC_2014 = "https://electionresults.dcboe.org/Downloads/Reports/November_4_2014_General_Election_Certified_Results.pdf"
 OH_ISSUES = [
     (date(2000, 11, 7), "1", "2000ElectionsResults/StateIssue1_11072000"),
     (date(2002, 11, 5), "1", "2002Results/issue1"),
@@ -1823,9 +1845,15 @@ SD_2002_JUNE_VOTES = {
         "652 1667 624 1325 2617 5009 808 260 1375 286 1243 667 1494 3433 442 1138 1930 991 713 805 801 702 899 482 1241 674 510 831 712 433 400 2879 1416 320 324 352 227 926 1814 3039 3009 515 609 996 586 2635 304 500 16127 863 11283 669 536 1168 427 519 893 495 329 513 812 1619 1428 892 3298 269",
     ),
 }
+SD_2022_JUNE = "https://sdsos.gov/elections-voting/assets/Archive/2022%20Assets/2022PrimaryStateCanvassReport.pdf"
 SD_SCANS = {
     "sd-measures-2008": "https://sdsos.gov/elections-voting/assets/Archive/2002-2011Assets/2008OfficialGeneralElectionStateCanvass.pdf",
     "sd-measures-2012": "https://sdsos.gov/docs/2012ElectionReturnsBooklet.pdf",
+}
+WY_2012 = {
+    "A": ("Health care freedom: a constitutional right of citizens to make their own health care decisions", "Legislative Referendum", True),
+    "B": ("Right to hunt, fish, and trap", "Legislative Referendum", True),
+    "C": ("Authority of district court commissioners", "Legislative Referendum", False),
 }
 SD_2012 = {
     "M": (
@@ -2099,6 +2127,11 @@ PUBLISHERS = {
         "Official election returns",
         "https://sdsos.gov/elections-voting/election-resources/election-history/election-history-search.aspx",
     ),
+    "DC": (
+        "District of Columbia Board of Elections",
+        "Certified results",
+        "https://electionresults.dcboe.org/",
+    ),
     "ME": (
         "Maine Department of the Secretary of State",
         "Referendum election tabulations, 2000–2011",
@@ -2270,6 +2303,9 @@ def fetch() -> None:
     for name in [*SD_SHEETS.values(), *SD_PRECINCTS.values()]:
         raw.fetch(SOURCE, SD + name, suffix=".xls")
         time.sleep(1)
+    raw.fetch(SOURCE, SD_2022_JUNE, suffix=".pdf")
+    raw.fetch(SOURCE, OH_2022, suffix=".xlsx")
+    raw.fetch(SOURCE, DC_2014, suffix=".pdf")
     for url in SD_SCANS.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in (url for urls in SD_PAGES.values() for url in urls):
@@ -2430,7 +2466,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, MI.format(name), suffix=".tsv")
         time.sleep(1)
     for _, year, index, *_ in MI_OLD_PROPOSALS:
-        raw.fetch(SOURCE, MI_OLD.format(year, index), suffix=".html")
+        raw.fetch(SOURCE, MI_OLD.format(2002 if year.endswith("PRI") else 2, year, index), suffix=".html")
         time.sleep(1)
     raw.fetch(SOURCE, AK_2000, suffix=".txt")
     for path, _ in WY_FILES.values():
@@ -4448,6 +4484,9 @@ def nebraska() -> list[dict[str, object]]:
             )
     for name, path in NE_SCANS.items():
         contests = json.loads((SCANS / f"{name}.json").read_text())["contests"]
+        if not (DATA / "parsed" / "us.scans" / name / "tables.parquet").exists():
+            print(f"{name}: not read yet, skipped")
+            continue
         scanned = pl.read_parquet(DATA / "parsed" / "us.scans" / name / "tables.parquet")
         for number, contest in contests.items():
             table = scanned.filter(pl.col("contest") == number)
@@ -5893,7 +5932,7 @@ def kansas_early() -> list[dict[str, object]]:
 def michigan_old() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, year, index, number, title, kind in MI_OLD_PROPOSALS:
-        url = MI_OLD.format(year, index)
+        url = MI_OLD.format(2002 if year.endswith("PRI") else 2, year, index)
         text = re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, url).path.read_text(encoding="utf-8", errors="replace"))
         found = re.findall(r"^\s*(\d{2}) ([A-Z][A-Z. ]+?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$", text, re.MULTILINE)
         total = re.search(r"Totals\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)", text)
@@ -6364,6 +6403,98 @@ def south_dakota_2002_june() -> list[dict[str, object]]:
     return rows
 
 
+def south_dakota_2022_june() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, SD_2022_JUNE).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    section = text[text.index("Constitutional Amendment C:") :]
+    section = section[: section.index("\nTotal", section.index("\nCounty")) + 200]
+    lines = [
+        (match[1], int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+        for line in section.splitlines()
+        if (match := re.fullmatch(r"([A-Z][A-Za-z ]*?)\s{2,}([\d,]+)\s+([\d,]+)\s*", line))
+    ]
+    total = next(line for line in lines if line[0] == "Total")
+    counties = [line for line in lines if line[0] != "Total"]
+    if len(counties) != 66 or [sum(line[side] for line in counties) for side in (1, 2)] != [total[1], total[2]]:
+        raise ValueError("SD 2022 Amendment C: counties do not sum to the printed total")
+    return [
+        {
+            "state": "SD",
+            "day": date(2022, 6, 7),
+            "number": "C",
+            "label": "Constitutional Amendment C",
+            "title": "A Constitutional Amendment requiring a 60 percent vote to pass ballot measures that raise taxes or appropriate $10 million or more",
+            "kind": "Legislative Referendum",
+            "url": SD_2022_JUNE,
+            "county": county,
+            "answer": answer,
+            "votes": votes,
+        }
+        for county, yes, no in counties
+        for answer, votes in (("YES", yes), ("NO", no))
+    ]
+
+
+def ohio_2022() -> list[dict[str, object]]:
+    sheet = (
+        fastexcel.read_excel(raw.cached(SOURCE, OH_2022).path).load_sheet(0, header_row=None).to_polars().rows()
+    )
+    (total,) = [row for row in sheet if row[0] == "Total"]
+    counties = [row for row in sheet[4:] if row[0] is not None]
+    if len(counties) != 88 or [sum(int(row[side]) for row in counties) for side in (6, 7)] != [
+        int(total[6]),
+        int(total[7]),
+    ]:
+        raise ValueError("OH 2022 State Issue 1: counties do not add up to the printed total")
+    return [
+        {
+            "state": "OH",
+            "day": date(2022, 11, 8),
+            "number": "1",
+            "label": "State Issue 1",
+            "title": "To require courts to consider factors like public safety when setting the amount of bail",
+            "kind": "Legislative Referendum",
+            "url": OH_2022,
+            "county": row[0],
+            "answer": answer,
+            "votes": int(row[column]),
+        }
+        for row in counties
+        for answer, column in (("YES", 6), ("NO", 7))
+    ]
+
+
+def district_2014() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, DC_2014).path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    section = text[text.index("INITIATIVE #71 LEGALIZATION MARIJUANA") :]
+    rows: list[dict[str, object]] = []
+    for answer, heading in (("YES", "FOR INITIATIVE 71"), ("NO", "AGAINST INITIATIVE 71")):
+        figures = [int(cell.replace(",", "")) for cell in re.search(rf"^{heading}\s+(.+)$", section, re.M)[1].split()]
+        if len(figures) != 9 or sum(figures[:8]) != figures[8]:
+            raise ValueError(f"DC 2014 Initiative 71 {answer}: wards do not add up to the printed total")
+        rows.append(
+            {
+                "state": "DC",
+                "day": date(2014, 11, 4),
+                "number": "71",
+                "label": "Initiative 71",
+                "title": "Legalization of possession and cultivation of limited amounts of marijuana for personal use",
+                "kind": "Initiative",
+                "url": DC_2014,
+                "county": "statewide",
+                "answer": answer,
+                "votes": figures[8],
+            }
+        )
+    return rows
+
+
 def alaska_2022() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for district in range(1, 41):
@@ -6600,6 +6731,7 @@ def parse() -> None:
             *oklahoma(),
             *ohio(),
             *ohio_issues(),
+            *ohio_2022(),
             *rhode_island(),
             *nevada(),
             *georgia(),
@@ -6638,6 +6770,7 @@ def parse() -> None:
             *tennessee(),
             *utah(),
             *wyoming(),
+            *district_2014(),
             *south_carolina(),
             *south_carolina_2022(),
             *alabama_2022(),
@@ -6645,6 +6778,7 @@ def parse() -> None:
             *hawaii(),
             *new_mexico(),
             *south_dakota_2002_june(),
+            *south_dakota_2022_june(),
             *vermont(),
         ],
         infer_schema_length=None,
@@ -6669,6 +6803,7 @@ def parse() -> None:
             continue
         if state == "NY" or (state, day.year) in (
             ("SD", 2012),
+            ("WY", 2012),
             ("AZ", 2022),
             ("WA", 2012),
             ("WA", 2022),
@@ -6695,6 +6830,7 @@ def parse() -> None:
                 if state in ("WA", "LA", "OR", "UT", "MD")
                 else {
                     "SD": SD_2012,
+                    "WY": WY_2012,
                     "SC": SC_2022,
                     "AL": AL_2022,
                     "GA": GA_2022_MEASURES,
