@@ -5593,6 +5593,27 @@ for key, publisher, title, url, local in (
         "ne/saunders_cities.pdf",
     ),
     (
+        "CA-06033-schools",
+        "Lake County Registrar of Voters",
+        "Final Qualified Candidate List, November 3, 2026 General Election (printed October 21, 2026)",
+        "https://www.lakecountyca.gov/DocumentCenter/View/18067",
+        "ca/lake_final_qualified.pdf",
+    ),
+    (
+        "CA-06035-westwood",
+        "Lassen County Registrar of Voters",
+        "Roster of Candidates, November 3, 2026 General Election (printed August 13, 2026)",
+        "https://www.lassencounty.gov/DocumentCenter/View/3101",
+        "ca/lassen_roster_0813.pdf",
+    ),
+    (
+        "CA-06009-calaveras",
+        "Calaveras County Elections",
+        "Qualified Candidates List, November 3, 2026 General Election (updated September 2, 2026)",
+        "https://elections.calaverasgov.us/Next-Election/General-Election/Candidates-and-Measures",
+        "ca/calaveras_qualified_0902.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
