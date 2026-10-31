@@ -704,6 +704,15 @@ MS = "https://web.archive.org/web/2022id_/https://www.sos.ms.gov/links/elections
 MS_2011 = ("26", "27", "31")
 MS_2003 = "https://sos.ms.gov/elections/electionresults/2003General/Certified%20Results/Senate%20Concurrent%20Resolution%20522.pdf"
 INBOX = DATA / "inbox" / "manual"
+WI_MANUAL = "https://elections.wi.gov/sites/default/files/legacy/{}"
+WI_2003 = ("elec03_wbw_ref.pdf", "elec03_results_ref.pdf")
+WI_2005 = ("2005_SpringElection_Referendum_WardbyWard.xls", "2005_SpringEelction_Referendum_Results_Summary.pdf")
+WI_2008 = "2008_SpringElection_Referendum_CountyReturns.pdf"
+WI_MANUAL_TITLES = {
+    date(2003, 4, 1): "Right to Fish, Hunt, Trap, and Take Game",
+    date(2005, 4, 5): "Four-Year Terms for Certain County Officers",
+    date(2008, 4, 1): "Prohibit Partial Veto Authority",
+}
 IA_SOS = "https://sos.iowa.gov/elections/pdf/"
 IA_2022 = IA_SOS + "2022/general/canvsummary.pdf"
 IA_2000 = IA_SOS + "Constitutional_Question_Results.pdf"
@@ -2494,6 +2503,12 @@ def fetch() -> None:
     for page in nc_2000_pages(index.path.read_text(errors="replace")):
         raw.fetch(SOURCE, NC_2000 + page, suffix=".htm")
         time.sleep(1)
+    for name in (*WI_2003, *WI_2005, WI_2008):
+        store_manual(
+            WI_MANUAL.format(name),
+            f"MF-495/{name}",
+            "application/vnd.ms-excel" if name.endswith(".xls") else "application/pdf",
+        )
     store_manual(SD_2002_JUNE, "MF-444/2002PCAE.pdf", "application/pdf")
     for district in range(1, 41):
         store_manual(AK_2007.format(district), f"MF-447/hd{district}.pdf", "application/pdf")
@@ -5574,6 +5589,86 @@ def wisconsin() -> list[dict[str, object]]:
     return rows
 
 
+def wisconsin_manual() -> list[dict[str, object]]:
+    def pdf_text(name: str) -> str:
+        return subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, WI_MANUAL.format(name)).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+
+    def statewide(name: str) -> tuple[int, int]:
+        match = re.search(r"Winner\s+([\d,]+)\s.*?Yes.*?\n\s*([\d,]+)\s.*?No\b", pdf_text(name), re.DOTALL)
+        if match is None:
+            raise ValueError(f"{name}: no statewide totals")
+        return int(match[1].replace(",", "")), int(match[2].replace(",", ""))
+
+    counties: dict[date, dict[str, tuple[int, int]]] = {}
+    printed: dict[date, tuple[int, int]] = {}
+    name_line = re.compile(r"^\s*([A-Z][A-Za-z. ]+?) County\s*$")
+    total_line = re.compile(r"County Totals\s*:\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)")
+    current: str | None = None
+    day = date(2003, 4, 1)
+    counties[day] = {}
+    for text_line in pdf_text(WI_2003[0]).splitlines():
+        if (match := name_line.match(text_line)) is not None:
+            current = match[1]
+        elif (match := total_line.search(text_line)) is not None and current is not None:
+            counties[day][current] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+    printed[day] = statewide(WI_2003[1])
+
+    day = date(2005, 4, 5)
+    table = (
+        fastexcel.read_excel(str(raw.cached(SOURCE, WI_MANUAL.format(WI_2005[0])).path))
+        .load_sheet_by_idx(0, header_row=None)
+        .to_polars()
+    )
+    table = table.rename({column: f"c{index}" for index, column in enumerate(table.columns)})
+    sums = (
+        table.slice(2)
+        .filter(pl.col("c3") == "REF")
+        .with_columns(yes=pl.col("c17").cast(pl.Int64), no=pl.col("c18").cast(pl.Int64))
+        .group_by("c10")
+        .agg(pl.col("yes").sum(), pl.col("no").sum())
+    )
+    counties[day] = {county: (yes, no) for county, yes, no in sums.iter_rows()}
+    printed[day] = statewide(WI_2005[1])
+
+    day = date(2008, 4, 1)
+    counties[day] = {}
+    for text_line in pdf_text(WI_2008).splitlines():
+        if (
+            match := re.match(r"^\s*([A-Z][A-Za-z. ]+?) County\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*$", text_line)
+        ) is not None:
+            counties[day][match[1]] = (int(match[3].replace(",", "")), int(match[4].replace(",", "")))
+        elif (match := re.search(r"Office Totals\s*:\s*([\d,]+)\s+([\d,]+)\s+([\d,]+)", text_line)) is not None:
+            printed[day] = (int(match[2].replace(",", "")), int(match[3].replace(",", "")))
+
+    rows: list[dict[str, object]] = []
+    for day, by_county in counties.items():
+        sums_yes_no = (sum(pair[0] for pair in by_county.values()), sum(pair[1] for pair in by_county.values()))
+        if len(by_county) != 72 or sums_yes_no != printed[day]:
+            raise ValueError(f"WI {day}: {len(by_county)} counties, sums {sums_yes_no} differ from {printed[day]}")
+        rows.extend(
+            {
+                "state": "WI",
+                "day": day,
+                "number": "1",
+                "label": WI_MANUAL_TITLES[day],
+                "url": WI_MANUAL.format(
+                    WI_2003[0] if day.year == 2003 else WI_2005[0] if day.year == 2005 else WI_2008
+                ),
+                "county": county,
+                "answer": answer,
+                "votes": pair[side],
+            }
+            for county, pair in by_county.items()
+            for side, answer in enumerate(("YES", "NO"))
+        )
+    return rows
+
+
 def iowa() -> list[dict[str, object]]:
     text = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, IA_2008).path), "-"], capture_output=True, text=True, check=True
@@ -6918,6 +7013,7 @@ def parse() -> None:
             *georgia_2022(),
             *texas_2022(),
             *wisconsin(),
+            *wisconsin_manual(),
             *iowa(),
             *iowa_recent(),
             *iowa_2000(),
