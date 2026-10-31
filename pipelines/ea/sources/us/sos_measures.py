@@ -778,6 +778,7 @@ MN_COUNTIES = [
     "Yellow_Medicine",
 ]
 TN_PAGE = "https://sos.tn.gov/elections/election-results#{}"
+TN_1998 = (date(1998, 11, 3), "MF-332/amend.pdf", Path(__file__).with_name("tn_amend_1998.tsv"))
 TN_FILES = {
     date(2002, 11, 5): ("MF-430/2002-11/amendments.pdf", ("1", "2")),
     date(2006, 11, 7): ("MF-430/2006-11/RptCtyCon1andCon2.pdf", ("1", "2")),
@@ -2369,6 +2370,7 @@ def fetch() -> None:
         store_manual(MN_PAGE.format(f"{day.year}"), file, "text/plain")
     for day, (file, _) in TN_FILES.items():
         store_manual(TN_PAGE.format(day.year), file, "application/pdf")
+    store_manual(TN_PAGE.format(TN_1998[0].year), TN_1998[1], "application/pdf")
     raw.fetch(SOURCE, IA_2008, suffix=".pdf")
     raw.fetch(SOURCE, IA_2010, suffix=".xlsx")
     for stamp, file, _ in WI_FILES.values():
@@ -5614,6 +5616,33 @@ def kentucky() -> list[dict[str, object]]:
 
 def tennessee() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
+    day, _, table = TN_1998
+    printed = (526531, 240829, 680712, 85565)
+    counties = {
+        cells[0]: [int(cell) for cell in cells[1:]]
+        for cells in (line.split("\t") for line in table.read_text().splitlines())
+    }
+    if len(counties) != 95 or tuple(sum(values[index] for values in counties.values()) for index in range(4)) != printed:
+        raise ValueError(f"{table.name}: counties do not add up to the printed state totals")
+    for index, (number, title) in enumerate(
+        (("1", "Safe prisons and humane treatment of prisoners"), ("2", "Rights of crime victims"))
+    ):
+        rows.extend(
+            {
+                "state": "TN",
+                "day": day,
+                "number": number,
+                "label": f"Constitutional Amendment {number}",
+                "url": TN_PAGE.format(day.year),
+                "county": place.title(),
+                "answer": answer,
+                "votes": values[2 * index + side],
+                "title": title,
+                "kind": "Legislative Referendum",
+            }
+            for place, values in counties.items()
+            for side, answer in enumerate(("YES", "NO"))
+        )
     for day, (file, numbers) in TN_FILES.items():
         url = TN_PAGE.format(day.year)
         text = subprocess.run(
