@@ -678,6 +678,15 @@ KY_FILES = {
     date(2002, 11, 5): "MF-429/2002-11/ky-2002-general-county-results.txt",
     date(2004, 11, 2): "MF-429/2004-11/ky-2004-general-county-results.txt",
 }
+PA_PAGE = "https://www.electionreturns.pa.gov/ReportCenter/Reports#{}"
+PA_FILES = {
+    date(2001, 5, 15): "MF-457/Official_10312026035842AM.CSV",
+    date(2002, 11, 5): "MF-457/Official_10312026035800AM.CSV",
+    date(2003, 11, 4): "MF-457/Official_10312026035737AM.CSV",
+    date(2005, 5, 17): "MF-457/Official_10312026035713AM.CSV",
+    date(2006, 11, 7): "MF-457/Official_10312026035650AM.CSV",
+    date(2008, 11, 4): "MF-457/Official_10312026035606AM.CSV",
+}
 MN_PAGE = "https://electionresults.sos.mn.gov/{}"
 MN_FILES = {
     date(2006, 11, 7): (
@@ -1911,6 +1920,11 @@ STATES = {
 }
 VT_2002 = "https://web.archive.org/web/20120101000000id_/http://vermont-elections.org/elections1/2002GEConstAmdResults111102.pdf"
 PUBLISHERS = {
+    "PA": (
+        "Pennsylvania Department of State",
+        "Election returns, ballot questions by county",
+        "https://www.electionreturns.pa.gov/",
+    ),
     "VT": (
         "Vermont Secretary of State",
         "Constitutional amendment vote returns, November 5, 2002",
@@ -2375,6 +2389,8 @@ def fetch() -> None:
         store_manual(KY_PAGE.format(day.year), file, "text/plain")
     for day, (file, _) in MN_FILES.items():
         store_manual(MN_PAGE.format(f"{day.year}"), file, "text/plain")
+    for day, file in PA_FILES.items():
+        store_manual(PA_PAGE.format(day.isoformat()), file, "text/csv")
     for day, (file, _) in TN_FILES.items():
         store_manual(TN_PAGE.format(day.year), file, "application/pdf")
     store_manual(TN_PAGE.format(TN_1998[0].year), TN_1998[1], "application/pdf")
@@ -5723,6 +5739,38 @@ def minnesota() -> list[dict[str, object]]:
     return rows
 
 
+def pennsylvania() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day in PA_FILES:
+        url = PA_PAGE.format(day.isoformat())
+        tallies: dict[str, dict[str, dict[str, int]]] = {}
+        for record in csv.DictReader(raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig").splitlines()):
+            tallies.setdefault(record["Office Name"], {})[record["County Name"]] = {
+                "YES": int(record["Yes Votes"].replace(",", "")),
+                "NO": int(record["No Votes"].replace(",", "")),
+            }
+        for number, (label, counties) in enumerate(tallies.items(), 1):
+            if len(counties) != 67:
+                raise ValueError(f"{url} {label}: {len(counties)} counties")
+            rows.extend(
+                {
+                    "state": "PA",
+                    "day": day,
+                    "number": str(number),
+                    "label": label,
+                    "url": url,
+                    "county": county,
+                    "answer": answer,
+                    "votes": sides[answer],
+                    "title": label,
+                    "kind": "Legislative Referendum",
+                }
+                for county, sides in counties.items()
+                for answer in ("YES", "NO")
+            )
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -6574,6 +6622,7 @@ def parse() -> None:
             *kansas(),
             *kansas_early(),
             *minnesota(),
+            *pennsylvania(),
             *north_carolina(),
             *north_carolina_early(),
             *west_virginia(),
