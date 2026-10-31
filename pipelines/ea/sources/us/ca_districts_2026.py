@@ -27,6 +27,12 @@ COUNTIES = {
     "06001": "Alameda",
     "06013": "Contra Costa",
     "06019": "Fresno",
+    "06029": "Kern",
+    "06107": "Tulare",
+    "06097": "Sonoma",
+    "06041": "Marin",
+    "06053": "Monterey",
+    "06077": "San Joaquin",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
@@ -49,7 +55,7 @@ def full_name(label: str) -> str:
     for short, full in WORDS:
         label = re.sub(short, full, label)
     text = cased(label).replace(" Del ", " del ").replace(" And ", " and ").replace(" Of ", " of ")
-    return text if re.search(r"\b(?:District|Authority|Agency)\b|County$", text) else f"{text} District"
+    return text if re.search(r"\b(?:District|Authority|Agency|System)\b|County$", text) else f"{text} District"
 
 
 def feed(fips: str) -> tuple[str, str, str]:
@@ -226,10 +232,10 @@ def los_angeles() -> list[dict[str, str | int | bool]]:
 
 
 PROOF_HEAD = re.compile(
-    r"^(?:Non-?Partisan|NONPARTISAN OFFICES) (?:DISTRICT) (?P<body>.+?) (?P<role>Director|Trustee|Member, Board of (?:Directors|Trustees))(?P<rest>.*)$",
+    r"^(?:Non-?Partisan|NONPARTISAN OFFICES) (?:DISTRICT) (?P<body>.+?) (?:For )?(?P<role>Director|Trustee|Member, Board of (?:Directors|Trustees))(?P<rest>.*)$",
     re.IGNORECASE,
 )
-PROOF_SEAT = re.compile(r"(Division|Zone|District Area|Area|At Large)(?: No\.?)? ?(\d+)")
+PROOF_SEAT = re.compile(r"(Division|Zone|District Area|Area|Seat|At Large)(?: No\.?)? ?(\d+)")
 
 
 def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int | bool]]:
@@ -522,6 +528,146 @@ def contra_costa() -> list[dict[str, str | int | bool]]:
     return rows
 
 
+Row = dict[str, str | int | bool]
+NUMBERS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7}
+BLOCK_SEAT = re.compile(
+    r",? (?:(?:District|Division|Zone|Area|Ward|Seat) (\d+))?(?:, | - )?(Short Term|Unexpired|\d Year)?$"
+)
+
+
+def text_of(fips: str) -> list[str]:
+    body = raw.cached(local_2026.SOURCE, feed(fips)[0]).path.read_text(errors="ignore")
+    body = re.sub(r"<(script|style).*?</\1>", "", body, flags=re.DOTALL)
+    return [line.strip() for line in html.unescape(re.sub(r"<[^>]+>", "\n", body)).splitlines() if line.strip()]
+
+
+def rows_of(county: str, district: str, tail: str, seats: int, names: list[str]) -> list[Row]:
+    found = re.search(r"(?:District|Division|Zone|Area|Ward|Seat|Trustee Area) (\d+)", tail)
+    short = re.search(r"Short Term|Unexpired|2 Year", tail) is not None
+    label = found[0] if found else ("Short Term" if short else "")
+    seen = list(dict.fromkeys(names))
+    if len(seen) <= seats:
+        return []
+    return [
+        {
+            "county": county,
+            "district": full_name(district),
+            "seat": label,
+            "role": "Director",
+            "seats": 1 if found else seats,
+            "name": name,
+            "unexpired": short,
+        }
+        for name in seen
+    ]
+
+
+def sonoma() -> list[Row]:
+    text = text_of("06097")
+    rows = []
+    for index, line in enumerate(text):
+        found = re.match(r"^Director, (.+)$", line)
+        if not found or index < 1 or not text[index + 1].startswith("(Vote for"):
+            continue
+        votes = NUMBERS[text[index + 1].split()[-1].rstrip(")").lower()]
+        names = []
+        cursor = index + 5
+        while text[cursor] != "▲ TOP ▲" and not text[cursor].startswith("Director, "):
+            if text[cursor + 2] in ("County Guide", "None submitted"):
+                names.append(cased(text[cursor]))
+                cursor += 3
+            else:
+                cursor += 1
+        rows += rows_of("Sonoma", found[1], "", votes, names)
+    return rows
+
+
+def marin() -> list[Row]:
+    text = text_of("06041")
+    start = next(i for i, line in enumerate(text) if line == "Return to Top")
+    rows = []
+    index = start
+    while index < len(text) - 1:
+        head = re.match(r"^(.+? (?:District|Authority|Agency)) Director(?:,? (.*))?$", text[index])
+        if not head or text[index + 1] != "Seats Open":
+            index += 1
+            continue
+        seats = int(text[index + 6])
+        cursor = index + 8
+        while text[cursor] != "Filed" or text[cursor - 1] != "Statement":
+            cursor += 1
+        cursor += 1
+        names = []
+        expect = True
+        while text[cursor] != "Return to Top" and cursor < len(text) - 1:
+            line = text[cursor]
+            if re.fullmatch(r"\d+/\d+/\d{4}", line):
+                expect = True
+            elif expect:
+                last, _, first = line.rstrip("*").partition(", ")
+                first, _, suffix = first.partition(", ")
+                names.append(" ".join(part for part in (first, last, suffix) if part))
+                expect = False
+            cursor += 1
+        if "School" not in head[1] and "College" not in head[1]:
+            rows += rows_of("Marin", head[1], head[2] or "", seats, names)
+        index = cursor
+    return rows
+
+
+def monterey() -> list[Row]:
+    body = raw.cached(local_2026.SOURCE, feed("06053")[0]).path.read_text(errors="ignore")
+    rows = []
+    for item in re.findall(r'<div class="accordion-items.*?(?=<div class="accordion-items|\Z)', body, flags=re.DOTALL):
+        if 'data-bs-parent="#DISTRICT"' not in item:
+            continue
+        head = html.unescape(re.search(r"<button[^>]*>(.*?)</button>", item, flags=re.DOTALL)[1]).strip()
+        status = re.search(r"background-color: \w+;\">([^<]+)<", item)
+        votes = re.search(r"Vote for (?:no more than )?(\w+)", item)
+        if status is None or status[1].strip() != "On Ballot" or votes is None:
+            continue
+        seats = int(votes[1]) if votes[1].isdigit() else NUMBERS[votes[1].lower()]
+        split = re.match(r"^(.+?) (?:Director|Harbor Commissioner|Trustee)(.*)$", head, flags=re.IGNORECASE)
+        names = [html.unescape(name).strip() for name in re.findall(r"<h5[^>]*>(.*?)</h5>", item, flags=re.DOTALL)]
+        if split:
+            rows += rows_of("Monterey", split[1], split[2], seats, names)
+    return rows
+
+
+SJ_HEAD = re.compile(r"^(\d{4})\s+(.+?)\s{3,}On Ballot: (Yes|No)\s+Vote For: (\d+)")
+SJ_CAND = re.compile(r"^\s+Qualified\s+\d+\s+(\S.*?)\s{2,}Candidate Stmt")
+
+
+def san_joaquin() -> list[Row]:
+    rows = []
+    contest = None
+    names: list[str] = []
+
+    def flush() -> None:
+        if contest is not None and contest[2] == "Yes":
+            split = re.match(r"^(.+? (?:District|Authority|Agency)),? (.*)$", contest[1])
+            if split:
+                rows.extend(rows_of("San Joaquin", split[1], split[2], int(contest[3]), names))
+
+    for line in lines("06077"):
+        if found := SJ_HEAD.match(line):
+            flush()
+            contest = found.groups() if int(found[1]) >= 5000 else None
+            names = []
+        elif contest and (found := SJ_CAND.match(line)):
+            names.append(cased(found[1]))
+    flush()
+    return rows
+
+
+def kern() -> list[Row]:
+    return proof_list("06029", "Kern", 29)
+
+
+def tulare() -> list[Row]:
+    return proof_list("06107", "Tulare", 33)
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
@@ -536,6 +682,12 @@ def parse() -> None:
             *alameda(),
             *contra_costa(),
             *fresno(),
+            *kern(),
+            *tulare(),
+            *sonoma(),
+            *marin(),
+            *monterey(),
+            *san_joaquin(),
         ]
     ).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "candidates.parquet")
