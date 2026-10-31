@@ -72,6 +72,9 @@ WA_DAYS = [
     date(2020, 8, 4),
     date(2022, 8, 2),
 ]
+WA_EV = "https://results.votewa.gov/results/public/api/elections/washington/20260804/"
+WA_EV_DAY = date(2026, 8, 4)
+WA_EV_RACE = re.compile(r"State (Senator|Representative)(?: Pos\. (\d))? - Legislative District (\d+)")
 CA_SOV = "https://elections.cdn.sos.ca.gov/sov/{path}"
 CA_KINDS = [
     (r"us.?s(en|-ft)|uss", "us-senate"),
@@ -199,6 +202,7 @@ CA_DAYS = {
             "104-state-assemblymember",
         ],
     ),
+    date(2026, 6, 2): ("2026-primary/sov/{}.xlsx", ["90-state-senator", "95-state-assembly"]),
 }
 ELSTATS = {
     "CO": {13: "house", 5: "senate"},
@@ -1314,6 +1318,19 @@ def fetch() -> None:
     for day in MN_DAYS:
         for name in ("allracesbyprecinct", "PrctTbl"):
             raw.fetch(SOURCE, MN_FILES.format(day=day, name=name), suffix=".txt")
+    listing = raw.fetch(SOURCE, f"{WA_EV}ballot-items", suffix=".json")
+    for item in json.loads(listing.path.read_bytes())["data"]:
+        if WA_EV_RACE.fullmatch(item["name"][0]["text"]):
+            for attempt in range(4):
+                try:
+                    raw.fetch(SOURCE, f"{WA_EV}ballot-items/{item['id']}", suffix=".json")
+                    break
+                except httpx.HTTPStatusError as error:
+                    if error.response.status_code != 404:
+                        raise
+                    time.sleep(2 * (attempt + 1))
+            else:
+                raise ValueError(f"no Washington detail for {item['name'][0]['text']}")
     for path, names in CA_DAYS.values():
         for name in names:
             raw.fetch(SOURCE, CA_SOV.format(path=path.format(name)), suffix=Path(path).suffix)
@@ -2126,6 +2143,47 @@ def parse() -> None:
                 votes="votes",
             )
         )
+    wa_rows = []
+    listing = json.loads(raw.cached(SOURCE, f"{WA_EV}ballot-items").path.read_bytes())["data"]
+    for item in listing:
+        if not (found := WA_EV_RACE.fullmatch(item["name"][0]["text"])):
+            continue
+        detail = json.loads(raw.cached(SOURCE, f"{WA_EV}ballot-items/{item['id']}").path.read_bytes())
+        code = found[3] + (f":{found[2]}" if found[2] else "")
+        for county in detail["breakdownResults"]:
+            fips = washington.get(
+                re.sub(r"[^a-z]", "", county["locality"]["name"][0]["text"].lower().removesuffix(" county"))
+            )
+            if fips is None:
+                raise ValueError(f"unmatched Washington county {county['locality']['name'][0]['text']}")
+            for option in county["ballotOptions"]:
+                party = option["party"]["name"]
+                preference = (
+                    re.search(r"\(Prefers (.+?) ?Party\)", party[0]["text"])
+                    if party and not option["isWriteIn"]
+                    else None
+                )
+                wa_rows.append(
+                    {
+                        "state": "WA",
+                        "day": WA_EV_DAY,
+                        "office": "senate" if found[1] == "Senator" else "house",
+                        "code": code,
+                        "party": "",
+                        "label": PREFERENCES.get(re.sub(r"\s+", " ", preference[1]).strip().lower())
+                        if preference
+                        else None,
+                        "fips": fips,
+                        "scheme": "us.county",
+                        "unit": fips,
+                        "choice": "Write-ins"
+                        if option["isWriteIn"]
+                        else re.sub(r"\s+", " ", option["name"][0]["text"]).strip(),
+                        "writein": option["isWriteIn"],
+                        "votes": option["voteCount"],
+                    }
+                )
+    frames.append(pl.DataFrame(wa_rows))
     rows = []
     for day, (path, names) in CA_DAYS.items():
         for name in names:
@@ -3728,6 +3786,10 @@ def emit() -> Path:
                             if download.storage_key not in held:
                                 held.add(download.storage_key)
                                 cs.artifact(download, sources[state])
+        cs.artifact(raw.cached(SOURCE, f"{WA_EV}ballot-items"), sources["WA"])
+        for item in json.loads(raw.cached(SOURCE, f"{WA_EV}ballot-items").path.read_bytes())["data"]:
+            if WA_EV_RACE.fullmatch(item["name"][0]["text"]):
+                cs.artifact(raw.cached(SOURCE, f"{WA_EV}ballot-items/{item['id']}"), sources["WA"])
         for path, names in CA_DAYS.values():
             for file in names:
                 cs.artifact(raw.cached(SOURCE, CA_SOV.format(path=path.format(file))), sources["CA"])
@@ -3877,7 +3939,7 @@ def emit() -> Path:
         for state, day, first in [
             *(("NC", day, first) for day, first in NC_DAYS.items()),
             *(("MN", day, None) for day in MN_DAYS),
-            *(("WA", day, None) for day in WA_DAYS),
+            *(("WA", day, None) for day in [*WA_DAYS, WA_EV_DAY]),
             *(("CA", day, None) for day in CA_DAYS),
             *(("ME", day, None) for day in ME_DAYS.values()),
             *(("IL", day, None) for day in IL_DAYS.values()),
