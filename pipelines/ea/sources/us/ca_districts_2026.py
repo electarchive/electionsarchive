@@ -1,7 +1,7 @@
 import html
 import re
 import subprocess
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -45,6 +45,10 @@ COUNTIES = {
     "06083": "Santa Barbara",
     "06099": "Stanislaus",
     "06111": "Ventura",
+    "06089": "Shasta",
+    "06101": "Sutter",
+    "06055": "Napa",
+    "06095": "Solano",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
@@ -52,7 +56,7 @@ KEPT = re.compile(
     r"|OPEN SPACE|RAPID|REGIONAL|HIGHWAY|WEED|ROAD|COMMUNITY"
 )
 DROPPED = re.compile(
-    r"SCHL|SCHOOL|UNIFIED|ELEMENTARY|UNION HIGH|HIGH SCH|OFFICE OF EDUCATION|BOARD OF EDUCATION|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY|^TOWN OF|CITY OF|CITY COUNCIL|CONGRESS|ASSEMBLY|SENATE|COMMITTEE|PLAN GRP|PLAN GROUP|COMMUNITY PLAN|SPONSOR GROUP|COUNCIL|MAYOR|CLERK|TREASURER|SHERIFF|ATTORNEY|CORONER|AUDITOR"
+    r"SCHL|SCHOOL|UNIFIED|ELEMENTARY|UNION HIGH|HIGH SCH|OFFICE OF EDUCATION|BOARD OF EDUCATION|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY|^TOWN OF|CITY OF|CITY COUNCIL|CONGRESS(?! VALLEY)|ASSEMBLY|SENATE|COMMITTEE|PLAN GRP|PLAN GROUP|COMMUNITY PLAN|SPONSOR GROUP|COUNCIL|MAYOR|CLERK|TREASURER|SHERIFF|ATTORNEY|CORONER|AUDITOR"
 )
 WORDS = (
     (r"\bMUNI\b", "MUNICIPAL"),
@@ -88,11 +92,28 @@ def feed(fips: str) -> tuple[str, str, str]:
     return local_2026.FEEDS[f"CA-{fips}"]
 
 
-OWN = {"06111"}
+INBOX = {
+    "06089": "shasta.pdf",
+}
+OWN = {"06111", *INBOX}
 
 
 def lines(fips: str) -> list[str]:
-    path = raw.cached(SOURCE if fips in OWN else local_2026.SOURCE, feed(fips)[0]).path
+    url = feed(fips)[0]
+    if fips in INBOX:
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            file = DATA / "inbox" / "y26" / "ca" / INBOX[fips]
+            raw.store(
+                SOURCE,
+                url,
+                file.read_bytes(),
+                suffix=file.suffix,
+                retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
+    path = raw.cached(SOURCE if fips in OWN else local_2026.SOURCE, url).path
     return (
         subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
         .stdout.decode()
@@ -365,6 +386,107 @@ def riverside() -> list[dict[str, str | int | bool]]:
 
 def fresno() -> list[dict[str, str | int | bool]]:
     return proof_list("06019", "Fresno", 30)
+
+
+def shasta() -> list[Row]:
+    return qualified_list(
+        "06089",
+        "Shasta",
+        (
+            (r"\bBurney Fire - 2 yr\b", "Burney Fire Protection District (Short Term)"),
+            (r"\bFall River Vly Fire- 2 yr\b", "Fall River Valley Fire Protection District (Short Term)"),
+            (r"District - 2 yr\b", "District (Short Term)"),
+        ),
+        True,
+    )
+
+
+SUTTER_HEAD = re.compile(r"^([A-Z][A-Z0-9 ]+?) \((\d+) SEATS?\)( SHORT TERM)?$")
+
+
+def sutter() -> list[Row]:
+    rows: list[Row] = []
+    current: tuple[str, str, int, bool] | None = None
+    for line in lines("06101"):
+        if found := SUTTER_HEAD.match(line.strip()):
+            heading, seats = found[1], int(found[2])
+            area = re.search(r" TRUSTEE AREA (\d+)$", heading)
+            body = heading[: area.start()] if area else heading
+            current = (
+                (full_name(cased(body)), f"Trustee Area {area[1]}" if area else "", seats, found[3] is not None)
+                if usable(body)
+                else None
+            )
+        elif current is not None and (cells := re.split(r"\s{2,}", line.strip())) and len(cells) == 5:
+            district, seat, seats, short = current
+            rows.append(
+                {
+                    "county": "Sutter",
+                    "district": district,
+                    "seat": seat or ("Short Term" if short else ""),
+                    "role": "Trustee" if "College" in district else "Director",
+                    "seats": 1 if seat else seats,
+                    "name": f"{cells[1]} {cells[2]}",
+                    "unexpired": short,
+                    "tacit": False,
+                }
+            )
+    counts: dict[tuple[object, object], int] = {}
+    for row in rows:
+        counts[row["district"], row["seat"]] = counts.get((row["district"], row["seat"]), 0) + 1
+    return [{**row, "tacit": counts[row["district"], row["seat"]] <= int(row["seats"])} for row in rows]
+
+
+def napa() -> list[Row]:
+    return qualified_list("06055", "Napa")
+
+
+SOLANO_BODIES = {
+    "SOLANO COMMUNITY COLLEGE": ("Solano Community College District", "Trustee"),
+    "CORDELIA FIRE PROTECTION DISTRICT": ("Cordelia Fire Protection District", "Director"),
+    "RURAL NORTH VACAVILLE WATER DISTRICT": ("Rural North Vacaville Water District", "Director"),
+    "SOLANO IRRIGATION DISTRICT": ("Solano Irrigation District", "Director"),
+}
+SOLANO_SEAT = re.compile(r"^ (Trustee Area|Division Director) (\d+) - Vote for (\d+)\s")
+
+
+def solano() -> list[Row]:
+    rows: list[Row] = []
+    body: tuple[str, str] | None = None
+    seat, seats, ballot = "", 0, True
+    for line in lines("06095"):
+        if body is not None and not SOLANO_SEAT.match(line) and (vote := re.search(r"Vote for (\d+)", line)):
+            seats = int(vote[1])
+        if (head := re.match(r"^ ([A-Z][A-Z ]+?)(?:\s{2,}|$)", line)) and head[1] != "I":
+            body = SOLANO_BODIES.get(head[1])
+            seat, ballot = "", "OFF THE BALLOT" not in line
+            seats = 0
+        elif found := SOLANO_SEAT.match(line):
+            seat = f"{'Trustee Area' if found[1] == 'Trustee Area' else 'Division'} {found[2]}"
+            seats, ballot = int(found[3]), "OFF THE BALLOT" not in line
+        elif body is not None and re.match(r"^ [A-Z][a-z]", line) and "DID NOT FILE" not in line:
+            cells = re.split(r"\s{2,}", line.strip())
+            vote = re.search(r"Vote for (\d+)", line)
+            if vote:
+                seats = int(vote[1])
+            if len(cells) >= 2 and re.fullmatch(r"I|", cells[1]) is not None or len(cells) >= 3:
+                rows.append(
+                    {
+                        "county": "Solano",
+                        "district": body[0],
+                        "seat": seat,
+                        "role": body[1],
+                        "seats": seats,
+                        "name": cells[0],
+                        "unexpired": False,
+                        "tacit": not ballot,
+                    }
+                )
+    most: dict[tuple[object, object], int] = {}
+    for row in rows:
+        key = (row["district"], row["seat"])
+        most[key] = max(most.get(key, 0), int(row["seats"]))
+    return [{**row, "seats": most[row["district"], row["seat"]]} for row in rows]
 
 
 def merced() -> list[Row]:
@@ -839,16 +961,19 @@ def tulare() -> list[Row]:
 
 
 QUALIFIED_HEAD = re.compile(
-    r"^\s*(\d{4})\s+(.+?)\s{2,}(?:On Ballot: (Yes|No)\s+Vote [Ff]or: (\d+)|Vote for (\d+)\s+On Ballot: (Yes|No))\s*$"
+    r"^\s*(?:Contest:\s+)?(\d{4})\s+(?:-\s+)?(.+?)\s{2,}(?:On Ballot: (Yes|No)\s+Vote [Ff]or: (\d+)|Vote for\s+(\d+)\s+On Ballot: (Yes|No)|On Ballot: (Yes|No)|Vote for\s+(\d+))\s*$"
 )
 QUALIFIED_ROLE = re.compile(
     r"\b(?:Member, Board of (?:Directors|Trustees|Commissioners)|Member, Governing Board|Governing Board Members?|Directors?|Trustees?(?! Area)|Board Members?|Commissioners?)\b",
     re.IGNORECASE,
 )
 QUALIFIED_SEAT = re.compile(
-    r"(Division|Zone|Area|Ward|Seat|Subdivision|Trustee Area|TA|District)\s*(?:No\.?\s*)?(\d+)", re.IGNORECASE
+    r"(Division|Zone|Area|Ward|Seat|Subdivision|Trustee Area|TA|District)\s*(?:No\.?\s*)?(\d+|(?-i:[A-G])\b)",
+    re.IGNORECASE,
 )
-QUALIFIED_CAND = re.compile(r"^\s+Qualified:?\s+\d+\s+(\S.*?)\s{2,}Candidate Stmt")
+QUALIFIED_CAND = re.compile(
+    r"^\s+Qualified:?\s+\d+\s+(\S.*?)\s{2,}Candidate Stmt|^\s+\d+\s+Qualified\s+(\S.*?)\s{2,}(?:Yes|No)\s{2,}"
+)
 
 
 def qualified_list(
@@ -892,16 +1017,17 @@ def qualified_list(
                 continue
             before = heading[: role_found.start()] if role_found else re.sub(r"\s*\(.*?\)", "", heading)
             rest = heading[role_found.end() :] if role_found else ""
-            seat = QUALIFIED_SEAT.search(before) or QUALIFIED_SEAT.search(rest)
-            body = (before[: seat.start()] if seat and seat.start() < len(before) else before).strip(" ,-")
+            in_before = QUALIFIED_SEAT.search(before)
+            seat = in_before or QUALIFIED_SEAT.search(rest)
+            body = (before[: in_before.start()] if in_before else before).strip(" ,-")
             if not usable(body):
                 continue
             label = ""
             if seat:
                 kind = seat[1].title().replace("Ta", "Trustee Area").replace("Subdivision", "Division")
                 label = f"{kind} {seat[2]}"
-            ballot = (found[3] or found[6]) == "Yes"
-            seats = int(found[4] or found[5])
+            ballot = (found[3] or found[6] or found[7]) == "Yes"
+            seats = int(found[4] or found[5] or found[8] or 1)
             role = (
                 "Trustee"
                 if re.search(r"(?i)trustee|governing board|college", (role_found[0] if role_found else "") + body)
@@ -917,7 +1043,7 @@ def qualified_list(
                 found[1],
             )
         elif current is not None and (found := QUALIFIED_CAND.match(line)):
-            name = found[1]
+            name = found[1] or found[2]
             names.append(cased(name) if name.isupper() else name)
     flush()
     return rows
@@ -952,6 +1078,10 @@ def parse() -> None:
                 *qualified_list("06081", "San Mateo"),
                 *merced(),
                 *kings(),
+                *shasta(),
+                *sutter(),
+                *napa(),
+                *solano(),
                 *santa_barbara(),
                 *stanislaus(),
                 *ventura(),
