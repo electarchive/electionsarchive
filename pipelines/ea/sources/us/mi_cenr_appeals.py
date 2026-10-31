@@ -34,10 +34,7 @@ def era(day: date) -> int:
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
     for year in [*base.CACHED, *base.FETCHED]:
-        frame = pl.read_csv(base.path(year), separator="\t", infer_schema=False, quote_char=None).filter(
-            (pl.col("OfficeCode(Text)") == "14") & pl.col("CandidateVotes").is_not_null()
-        )
-        for row in frame.iter_rows(named=True):
+        for row in base.read(year, "14").iter_rows(named=True):
             if (row["WriteIn(W)/Uncommitted(Z)"] or "").strip() == "W":
                 continue
             name = " ".join(
@@ -71,7 +68,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Michigan Court of Appeals general election contests 1998–2020 by county and district, "
+            summary="Michigan Court of Appeals general election contests 1998–2022 by county and district, "
             "from the Department of State's official results",
             polity="US-MI",
         )

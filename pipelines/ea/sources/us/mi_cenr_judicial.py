@@ -1,7 +1,7 @@
 import re
 import unicodedata
 from collections import defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -11,12 +11,13 @@ from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import mi_cenr_statewide
 from ea.sources.us.retention import display, identity
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.mi_cenr_judicial"
 VERSION = "1"
 CACHED = [1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014]
-FETCHED = [2016, 2018, 2020]
+FETCHED = [2016, 2018, 2020, 2022]
+INBOX = DATA / "inbox" / "manual" / "MF-472"
 TITLE = "Justice of the Supreme Court"
 PARTIAL = re.compile(r"Partial Term Ending (\d\d)/(\d\d)/(\d{4})")
 SEATS = re.compile(r"\((\d+)\) Position")
@@ -43,16 +44,32 @@ def path(year: int) -> Path:
 
 def fetch() -> None:
     for year in FETCHED:
-        raw.fetch(SOURCE, url(year), suffix=".txt")
+        manual = INBOX / f"{year}STATE_GENERAL_MI_CENR_BY_COUNTY.txt"
+        if year == 2022 and manual.exists():
+            raw.store(
+                SOURCE,
+                url(year),
+                manual.read_bytes(),
+                suffix=".txt",
+                retrieved_at=datetime.fromtimestamp(manual.stat().st_mtime, UTC),
+                media_type="text/plain",
+            )
+        else:
+            raw.fetch(SOURCE, url(year), suffix=".txt")
+
+
+def read(year: int, office: str) -> pl.DataFrame:
+    frame = pl.read_csv(
+        path(year), separator="\t", infer_schema=False, quote_char=None, skip_rows=1 if year == 2022 else 0
+    )
+    frame = frame.rename({"OfficeCode(text)": "OfficeCode(Text)"}) if "OfficeCode(text)" in frame.columns else frame
+    return frame.filter((pl.col("OfficeCode(Text)") == office) & pl.col("CandidateVotes").is_not_null())
 
 
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
     for year in [*CACHED, *FETCHED]:
-        frame = pl.read_csv(path(year), separator="\t", infer_schema=False, quote_char=None).filter(
-            (pl.col("OfficeCode(Text)") == "13") & pl.col("CandidateVotes").is_not_null()
-        )
-        for row in frame.iter_rows(named=True):
+        for row in read(year, "13").iter_rows(named=True):
             if (row["WriteIn(W)/Uncommitted(Z)"] or "").strip() == "W":
                 continue
             name = " ".join(
@@ -82,7 +99,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Michigan Supreme Court general election contests 1998–2020 by county, "
+            summary="Michigan Supreme Court general election contests 1998–2022 by county, "
             "from the Department of State's official results",
             polity="US-MI",
         )
