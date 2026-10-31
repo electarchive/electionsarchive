@@ -18,7 +18,6 @@ One Postgres + PostGIS database is the source of truth. Python pipelines write t
 
 ```
 apps/web/            SvelteKit app: pages, RPC, REST, MCP, twins, feeds, embeds, and Open Graph images
-apps/landing/        Static holding page served until launch
 packages/db/         SQL migrations (the source of truth for every table) and the generated Drizzle schema
 packages/engine/     Seat allocation and referendum outcomes, with golden tests against real elections
 packages/analytics/  Comparisons between elections, change metrics, and indices

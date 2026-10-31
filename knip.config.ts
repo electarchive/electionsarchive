@@ -17,7 +17,6 @@ const config: KnipConfig = {
     },
     "packages/db": { entry: ["drizzle.pull.config.ts"] },
   },
-  ignore: ["apps/landing/**"],
   treatConfigHintsAsErrors: true,
 };
 
