@@ -362,6 +362,11 @@ FEEDS = {
         "Emmet County Clerk",
         "Candidate Listing, 11/03/2026 State General",
     ),
+    "MI-26029": (
+        "https://charlevoixcountymi.documents-on-demand.com/",
+        "Charlevoix County Clerk",
+        "Unofficial Candidate and Proposal List, 11/03/2026 State General (10/23/2026)",
+    ),
     "MI-26017": (
         "https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf",
         "Bay County Clerk",
@@ -1475,6 +1480,7 @@ DELIVERED = {
     "MI-26017": DATA / "inbox" / "y26" / "mi" / "bay.pdf",
     "MI-26031": DATA / "inbox" / "y26" / "mi" / "cheboygan.pdf",
     "MI-26047": DATA / "inbox" / "y26" / "mi" / "emmet.pdf",
+    "MI-26029": DATA / "inbox" / "y26" / "mi" / "charlevoix.pdf",
     "MI-26049": DATA / "inbox" / "y26" / "mi" / "genesee.pdf",
     "MI-26091": DATA / "inbox" / "y26" / "mi" / "lenawee.pdf",
     "MI-26163": DATA / "inbox" / "manual" / "MF-199" / "official-candidate-list_november-3-2026.pdf",
@@ -8402,6 +8408,7 @@ def parse() -> None:
         ("MI-26021", "Berrien"),
         ("MI-26031", "Cheboygan"),
         ("MI-26047", "Emmet"),
+        ("MI-26029", "Charlevoix"),
     ):
         post, seats, unexpired = "", 0, False
         for line in text(key, "-layout").splitlines():
