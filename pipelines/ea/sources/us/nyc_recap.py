@@ -1,7 +1,7 @@
 import json
 import re
 import subprocess
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import quote, unquote
@@ -451,6 +451,7 @@ def emit(
     strict: bool = False,
     questions: bool = True,
     fuller: bool = False,
+    grain: str = "ad",
 ) -> Path:
     entries = pl.read_parquet(parsed / "entries.parquet")
     totals = pl.read_parquet(parsed / "totals.parquet")
@@ -531,6 +532,24 @@ def emit(
         }
         unit_cache: dict[tuple[str, str, str, str | None], UUID] = {}
         added: set[UUID] = set()
+
+        def election_district(day: date, code: str, county: str) -> UUID:
+            unit = cs.unit("us.nyc_ed", code, day)
+            if unit in cs.minted and unit not in added:
+                added.add(unit)
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=city,
+                    scheme_code="us.nyc_ed",
+                    code=code,
+                    parent_id=county_units[county],
+                    area_relation="unlocated",
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+            return unit
 
         def party_id(line: str) -> list[UUID]:
             found = []
@@ -634,7 +653,9 @@ def emit(
             tied = True
             for county, url in urls.items():
                 part = rows.filter(pl.col("url") == url)
-                mine = part.filter(pl.col("bkind") == "ad")
+                mine = part.filter(pl.col("bkind") == grain)
+                if mine.is_empty() and grain == "ed":
+                    continue
                 if mine.is_empty():
                     mine = part.filter(pl.col("bkind") == "total")
                     mine = mine.with_columns(pl.lit("county").alias("bkind"), pl.lit(county).alias("bid"))
@@ -647,8 +668,8 @@ def emit(
                     ):
                         tied = False
                 parts.append(mine)
-            if not tied:
-                skipped.append(f"{label}: assembly district lines do not sum to the report's total")
+            if not tied or not parts:
+                skipped.append(f"{label}: {grain} lines do not sum to the report's total")
                 continue
             rows = pl.concat(parts)
             era = "2002" if day_text < "2012-01-01" else "2012"
@@ -874,8 +895,8 @@ def emit(
                     """select c.id from contest c join entity e on e.id = c.id and e.retired_by is null
                    where c.election_id = %s and c.office_id is not distinct from %s and c.body_id is not distinct from %s
                    and c.district_area_id is not distinct from %s and c.party_scope_id is not distinct from %s
-                   and c.changeset_id not in (select id from changeset where pipeline = %s)""",
-                    [election, office, body_id, area, party, pipeline],
+                   and (%s or c.changeset_id not in (select id from changeset where pipeline = %s))""",
+                    [election, office, body_id, area, party, grain == "ed", pipeline],
                 ).fetchall()
             )
             if len(found) > 1:
@@ -924,7 +945,9 @@ def emit(
                     skipped.append(f"{label}: no single default set to compare with")
                     continue
                 completeness = round(min(mine / float(prior[0][1]), 1), 4)
-                if (completeness < 0.995 and not is_state) or (mine > float(prior[0][1]) * 1.005 and not fuller):
+                if (completeness < 0.995 and not is_state) or (
+                    mine > float(prior[0][1]) * 1.005 and not fuller and grain == "ad"
+                ):
                     skipped.append(f"{label}: totals disagree ({mine} against {prior[0][1]})")
                     continue
                 whole = completeness >= 0.999 and (inside or not is_state)
@@ -960,6 +983,9 @@ def emit(
                     f"{day.year} {scope.title() + ' primary for ' if scope else ''}{title}{'' if scope else ' election'}",
                 )
                 cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
+            covers = whole
+            if grain == "ed":
+                whole = False
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
                 pl.col("name").str.replace_all(r"\s+", " ").alias("name")
             )
@@ -1034,7 +1060,7 @@ def emit(
                 )
             for url in urls.values():
                 cs.artifact(raw.cached(pipeline, url.partition("#")[0]), source)
-            result_set = cs.key(f"{pipeline}.result_set", contest_key)
+            result_set = cs.key(f"{pipeline}.result_set", contest_key + (":ed" if grain == "ed" else ""))
             declared = {}
             declared_names = []
             if attach and whole:
@@ -1092,9 +1118,9 @@ def emit(
                 status="active",
                 source_id=source,
                 is_default=whole,
-                completeness=None if is_state and not whole else completeness,
+                completeness=None if is_state and not covers else completeness,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=note + (NOTE_STATE if not whole else ""))
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=note + (NOTE_STATE if not covers else ""))
             for rank, candidate in enumerate(ranked["name"]):
                 label_text = candidate.title()
                 root_key = f"{contest_key}:{slug(candidate)}"
@@ -1200,7 +1226,13 @@ def emit(
                 .agg(pl.col("votes").sum())
                 .iter_rows()
             ):
-                unit = unit_for(era, bid, county, part) if bkind == "ad" else county_units[county]
+                unit = (
+                    election_district(day, bid, county)
+                    if bkind == "ed"
+                    else unit_for(era, bid, county, part)
+                    if bkind == "ad"
+                    else county_units[county]
+                )
                 if line == "WRITE-IN":
                     option = write_in
                 elif line is None:
@@ -1217,6 +1249,8 @@ def emit(
                         )
                         if reused is not None:
                             tickets[(candidate, line)] = reused[0]
+                        elif grain == "ed":
+                            tickets[(candidate, line)] = roots[candidate]
                         else:
                             tickets[(candidate, line)] = cs.key(
                                 "us.option", f"{contest_key}:{slug(candidate)}:{slug(line)}"
@@ -1236,20 +1270,28 @@ def emit(
                 (str(result_set), str(unit), str(option), 1, votes) for (unit, option), votes in summed.items()
             )
             for county, bkind, bid in rows.select("county", "bkind", "bid").unique().iter_rows():
-                unit = unit_for(era, bid, county, part) if bkind == "ad" else county_units[county]
+                unit = (
+                    election_district(day, bid, county)
+                    if bkind == "ed"
+                    else unit_for(era, bid, county, part)
+                    if bkind == "ad"
+                    else county_units[county]
+                )
                 cast = ballots.filter(
                     (pl.col("url") == urls[county])
                     & (pl.col("bkind") == bkind)
                     & (pl.col("bid") == bid)
                     & pl.col("office").is_in(rows["office"].unique().to_list())
                 )["votes"]
-                if bkind == "ad" and not cast.is_empty():
+                if bkind in ("ad", "ed") and not cast.is_empty():
                     values.append((str(result_set), str(unit), None, 3, int(cast[0])))
                 if magnitude == 1:
                     got = rows.filter((pl.col("county") == county) & (pl.col("bid") == bid))["votes"].sum()
                     values.append((str(result_set), str(unit), None, 4, int(got)))
             taken += 1
-        for day_text, marker, qslug, qtitle, wording_url, wording_title, wording in QUESTIONS if questions else ():
+        for day_text, marker, qslug, qtitle, wording_url, wording_title, wording in (
+            QUESTIONS if questions and grain == "ad" else ()
+        ):
             day = date.fromisoformat(day_text)
             era = "2002" if day_text < "2012-01-01" else "2012"
             qrows = entries.filter(

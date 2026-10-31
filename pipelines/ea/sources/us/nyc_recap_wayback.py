@@ -21,6 +21,13 @@ NOTE = (
     "counter, absentee and military, federal, emergency, and affidavit ballots the recap prints. A report's assembly "
     "district lines sum to its total."
 )
+NOTE_ED = (
+    "Returns from the Board of Elections' certified Statement and Return recaps, read from archived copies of the Board's "
+    "own results pages, by election district within each assembly district, one line per ballot line as New York's "
+    "fusion ballot prints them. Ballots cast are the public counter, absentee and military, federal, emergency, and "
+    "affidavit ballots the recap prints. Every election district's columns add to the assembly district line the "
+    "Board printed under them."
+)
 COUNTIES = ("NEW YORK", "BRONX", "KINGS", "QUEENS", "RICHMOND")
 LINES = {
     "YORK RIGHT TO LIFE": "RIGHT TO LIFE",
@@ -486,6 +493,9 @@ def parse() -> None:
                 elif g["grain"] == "ed":
                     ad = g["block"] or int(re.search(r"(\d+)(?:ST|ND|RD|TH) ASSEMBLY DISTRICT", str(g["office"]))[1])
                     units = [("ad", str(ad), total)]
+                    for r in g["rows"]:
+                        if r["label"] != "TOTAL":
+                            units.append(("ed", f"{ad:02d}{int(re.match(r'\d+', r['label'])[0]):03d}", r))
                 else:
                     units = [
                         ("ad", str(int(re.match(r"\d+", r["label"])[0])), r) for r in g["rows"] if r["label"] != "TOTAL"
@@ -510,7 +520,7 @@ def parse() -> None:
                     entries.append((*head, office, bkind, bid, label["name"], line, votes))
                 if has_scat and row["tail"]:
                     entries.append((*head, office, bkind, bid, "WRITE-INS", "WRITE-IN", row["tail"][0]))
-                if bkind == "ad" and row["ballots"] is not None:
+                if bkind in ("ad", "ed") and row["ballots"] is not None:
                     ballots.append((*head, office, bkind, bid, row["ballots"]))
             totals.append((*head, office, "total", "TOTAL", slot["total"]))
     url, entry = next((u, e) for u, e in sorted(index.items()) if "1999/generalElection/1999G%20Results.pdf" in u)
@@ -623,20 +633,24 @@ def parse() -> None:
 
 def emit() -> Path:
     years = tuple(os.environ.get("NYC_YEARS", "1999,2000,2001,2002,2003,2004").split(","))
+    grain = os.environ.get("NYC_GRAIN", "ad")
     folder = PARSED / "slice"
     folder.mkdir(exist_ok=True)
     offices = os.environ.get("NYC_OFFICES", "")
     for name in ("entries", "totals", "ballots"):
         pl.read_parquet(PARSED / f"{name}.parquet").filter(
-            pl.col("day").str.slice(0, 4).is_in(years), pl.col("office").str.contains(offices)
+            pl.col("day").str.slice(0, 4).is_in(years),
+            pl.col("office").str.contains(offices),
+            pl.col("bkind") != ("ed" if grain == "ad" else "ad"),
         ).write_parquet(folder / f"{name}.parquet")
     return nyc_recap.emit(
         pipeline=SOURCE,
         parsed=folder,
         version=VERSION,
-        summary=f"New York City's {', '.join(years)} contests by assembly district from the Board of Elections' certified recaps",
-        note=NOTE,
+        summary=f"New York City's {', '.join(years)} contests by {'assembly' if grain == 'ad' else 'election'} district from the Board of Elections' certified recaps",
+        note=NOTE if grain == "ad" else NOTE_ED,
         strict=not offices,
         questions=True,
         fuller=bool(offices),
+        grain=grain,
     )
