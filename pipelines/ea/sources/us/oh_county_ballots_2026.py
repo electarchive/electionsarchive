@@ -68,15 +68,19 @@ def pdf(url: str, mode: str) -> str:
 
 def hamilton() -> list[dict[str, str]]:
     rows = []
-    for block in re.split(r"^\s*\d+ (?=[A-Z][A-Z ()&,'-]+\n)", pdf(HAMILTON, "-layout"), flags=re.MULTILINE)[1:]:
-        head, _, rest = block.partition("\n")
-        entity, _, rest = rest.strip().partition("\n")
-        body = re.split(r"\n\s*(?:FOR|AGAINST|YES|NO)\b", rest)[0]
-        body = re.sub(r"A majority (?:affirmative|yes) vote is necessary for passage\.", "", body)
+    for block in re.split(r"^\s*\d+ (?=PROPOSED|LOCAL|Proposed|Local)", pdf(HAMILTON, "-layout"), flags=re.MULTILINE)[
+        1:
+    ]:
+        head, _, rest = block.partition("A majority affirmative vote is necessary for passage.")
+        lines = [line.strip() for line in head.split("\n") if line.strip()]
+        if len(lines) < 2:
+            continue
+        entity = lines[-1]
+        body = re.split(r"\n\s*(?:FOR|AGAINST|YES|NO|Yes|No)\b", rest)[0]
         body = re.sub(r"\s+", " ", body).strip()
-        if body and re.match(r"(City|Village|Township|Hamilton County|.*School District|.*Library)", entity.strip()):
+        if body:
             rows.append(
-                {"url": HAMILTON, "county": "Hamilton", "kind": head.strip(), "entity": entity.strip(), "text": body}
+                {"url": HAMILTON, "county": "Hamilton", "kind": " ".join(lines[:-1]), "entity": entity, "text": body}
             )
     return rows
 
@@ -105,7 +109,7 @@ def summit() -> list[dict[str, str]]:
                     "url": SUMMIT,
                     "county": "Summit",
                     "kind": " ".join(kind).replace("Overlaps:", ""),
-                    "entity": " ".join(entity),
+                    "entity": re.sub(r"\s*MUNICIPAL / COUNTY$", "", " ".join(entity)),
                     "text": body,
                 }
             )
@@ -168,6 +172,45 @@ def keys(name: str) -> set[str]:
     return {ceda._core(name), ceda._city(name)}
 
 
+def token(note: str) -> re.Pattern[str]:
+    purpose = note.split("Purpose:")[-1]
+    roman = re.search(r"Article ([IVX]+)\b", purpose)
+    if roman:
+        return re.compile(rf"Article {roman[1]}\b")
+    numbers = re.findall(r"\d+(?:\.\d+)?[a-z]?", purpose)
+    return re.compile(rf"(?<![\d.]){re.escape(numbers[-1])}" if numbers else "(?!)")
+
+
+def pick(row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str]]], used: set[UUID]) -> UUID | None:
+    options = [c for k in keys(row["entity"]) for c in contests.get(k, []) if c[0] not in used]
+    kind = row["kind"].upper()
+    if any(word in kind for word in ("CHARTER", "ZONING", "GAS", "ADVISORY", "LOCAL", "LIQUOR")):
+        wanted = "miscellaneous"
+    elif "INCOME" in kind:
+        wanted = "income tax"
+    elif "BOND" in kind:
+        wanted = "bond"
+    else:
+        wanted = "tax levy"
+    narrowed = [c for c in options if c[2].lower().startswith(wanted)]
+    for word in ("additional", "renewal", "replacement", "decrease", "increase"):
+        if len(narrowed) > 1 and word in kind.lower():
+            narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
+    text = row["text"].lower()
+    if len(narrowed) > 1:
+        narrowed = [
+            c
+            for c in narrowed
+            if all(
+                re.search(rf"(?<![\d.]){re.escape(m)} mills?\b", text)
+                for m in re.findall(r"([\d.]*\d) mills?\b", c[2].lower())[:1]
+            )
+        ] or narrowed
+    if len(narrowed) > 1:
+        narrowed = [c for c in narrowed if token(c[2]).search(row["text"])] or narrowed
+    return narrowed[0][0] if len({c[0] for c in narrowed}) == 1 else None
+
+
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "issues.parquet")
     with connect() as conn:
@@ -196,39 +239,31 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), sources[url])
         kept = 0
         used: set[UUID] = set()
-        for row in frame.iter_rows(named=True):
-            options = [c for k in keys(row["entity"]) for c in contests.get(k, []) if c[0] not in used]
-            wanted = (
-                "income tax"
-                if "INCOME" in row["kind"].upper()
-                else "bond"
-                if "BOND" in row["kind"].upper()
-                else "tax levy"
-            )
-            narrowed = [c for c in options if c[2].lower().startswith(wanted)]
-            if "CHARTER" in row["kind"].upper():
-                narrowed = [c for c in options if c[2].lower().startswith("miscellaneous")]
-            for word in ("additional", "renewal", "replacement", "decrease", "increase"):
-                if len(narrowed) > 1 and word in row["kind"].lower():
-                    narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
-            section = re.search(r"Section (\d+\.\d+)", row["text"])
-            if len(narrowed) > 1 and section:
-                narrowed = [c for c in narrowed if f"Section {section[1]}" in c[2]] or narrowed
-            if len({c[0] for c in narrowed}) != 1:
-                print("no match:", row["entity"], row["kind"], len(narrowed))
-                continue
-            contest = narrowed[0][0]
-            used.add(contest)
-            kept += 1
-            cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
-            cs.add(
-                "ballot_question_text",
-                contest_id=contest,
-                kind="text",
-                lang="en",
-                body=row["text"],
-                url=row["url"],
-                source_id=sources[row["url"]],
-            )
+        pending = list(frame.iter_rows(named=True))
+        progress = True
+        while pending and progress:
+            progress = False
+            deferred = []
+            for row in pending:
+                contest = pick(row, contests, used)
+                if contest is None:
+                    deferred.append(row)
+                    continue
+                progress = True
+                used.add(contest)
+                kept += 1
+                cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
+                cs.add(
+                    "ballot_question_text",
+                    contest_id=contest,
+                    kind="text",
+                    lang="en",
+                    body=row["text"],
+                    url=row["url"],
+                    source_id=sources[row["url"]],
+                )
+            pending = deferred
+        for row in pending:
+            print("no match:", row["entity"], row["kind"])
         print(f"{kept} of {frame.height} issues")
         return cs.write()
