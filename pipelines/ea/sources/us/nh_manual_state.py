@@ -527,9 +527,49 @@ LINE_FIXES = {
     4834: {"votes": 12877, "digits": "12,877", "printed": 30089},
     4835: {"votes": 12128, "digits": "12,128", "printed": 32016},
     90108: {"printed": 32016},
+    956: {"printed": None},
+    957: {"printed": None},
+    958: {"printed": None},
+    959: {"printed": None},
+    960: {"printed": None},
+    4843: {"name": "John H. Lynch", "town": "Hopkinton"},
+    4847: {"town": "Londonderry"},
+    5056: {"name": "Ovide Lamontagne", "town": "Manchester"},
+    5057: {"town": "Manchester"},
+    5058: {"name": "Jackie Cilley", "town": "Barrington"},
+    5059: {"name": "Maggie Hassan", "town": "Exeter"},
+    5060: {"name": "Bill Pearce Kennedy", "town": "Danbury"},
 }
 LINE_DROPS = {3594, 1456, 2912}
 LINE_ADDS = {
+    90201: {
+        "template": 3650,
+        "name": "Robert H. Kroepel",
+        "town": "New Durham",
+        "votes": 1103,
+        "y": (320.133, 325.938, 530),
+    },
+    90202: {
+        "template": 4846,
+        "name": "Frank Sullivan",
+        "town": "Manchester",
+        "votes": 3418,
+        "y": (356.719, 360.799, 527),
+    },
+    90203: {
+        "template": 5060,
+        "name": "Kevin H. Smith",
+        "town": "Litchfield",
+        "votes": 32396,
+        "y": (312.994, 317.915, 520),
+    },
+    90204: {
+        "template": 5263,
+        "name": "Ian Freeman",
+        "town": "Keene",
+        "votes": 1719,
+        "y": (445.056, 450.928, 529),
+    },
     90001: {
         "template": 1280,
         "name": "Charles W. Chandler",
@@ -699,6 +739,11 @@ LINE_ADDS = {
     },
 }
 CONFIRMED = {
+    956,
+    957,
+    958,
+    959,
+    960,
     4009,
     4010,
     45,
