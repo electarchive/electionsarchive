@@ -44,6 +44,7 @@ COUNTIES = {
     "06047": "Merced",
     "06083": "Santa Barbara",
     "06099": "Stanislaus",
+    "06111": "Ventura",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
@@ -87,8 +88,11 @@ def feed(fips: str) -> tuple[str, str, str]:
     return local_2026.FEEDS[f"CA-{fips}"]
 
 
+OWN = {"06111"}
+
+
 def lines(fips: str) -> list[str]:
-    path = raw.cached(local_2026.SOURCE, feed(fips)[0]).path
+    path = raw.cached(SOURCE if fips in OWN else local_2026.SOURCE, feed(fips)[0]).path
     return (
         subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
         .stdout.decode()
@@ -266,7 +270,9 @@ PROOF_HEAD = re.compile(
 PROOF_SEAT = re.compile(r"(Division|Zone|District Area|Trustee Area|Area|Seat|At Large)(?: No\.?)? ?(\d+)")
 
 
-def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int | bool]]:
+def proof_list(fips: str, county: str, indent: int, qualified_only: bool = False) -> list[dict[str, str | int | bool]]:
+    qualified: set[tuple[tuple[str, str, str, bool], str]] = set()
+    last = None
     contests: dict[tuple[str, str, str, bool], list[str]] = {}
     incumbents: dict[tuple[str, str, str, bool], int] = {}
     canceled: dict[tuple[str, str, str, bool], bool] = {}
@@ -294,6 +300,8 @@ def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int 
             incumbents.setdefault(current, 0)
         elif current is None:
             continue
+        elif last is not None and re.match(r"\s+Qualified Date:", line):
+            qualified.add(last)
         elif found := re.search(r"\s(\d+)\s+\d+\s+\d+\s+(NOT ON BALLOT|ON BALLOT)\s*$", line):
             canceled.setdefault(current, found[2] == "NOT ON BALLOT")
             votes.setdefault(current, int(found[1]))
@@ -301,6 +309,7 @@ def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int 
             name = cased(found[1]) if found[1].isupper() else found[1]
             if name not in contests[current]:
                 contests[current].append(name)
+            last = (current, name)
         elif re.match(r"\s+Incumbent\(s\):", line) or re.match(
             gap + r"\S.*\s{3,}(?:Elected|Appointed in Lieu|Appointed to Vacancy|Vacated)\s*$", line
         ):
@@ -318,9 +327,12 @@ def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int 
             name = cased(name) if name.isupper() else name
             if name not in contests[current]:
                 contests[current].append(name)
+            last = (current, name)
     rows = []
     for key, names in contests.items():
         district, role, label, short = key
+        if qualified_only:
+            names = [name for name in names if (key, name) in qualified]
         seats = 1 if label else votes.get(key) or max(incumbents[key], 1)
         if not names or DROPPED.search(district.upper()):
             continue
@@ -334,10 +346,17 @@ def proof_list(fips: str, county: str, indent: int) -> list[dict[str, str | int 
                     "seats": seats,
                     "name": name,
                     "unexpired": short,
-                    "tacit": canceled.get(key, False),
+                    "tacit": canceled.get(key, False) and (not qualified_only or len(names) <= seats),
                 }
             )
     return rows
+
+
+def ventura() -> list[dict[str, str | int | bool]]:
+    return [
+        {**row, "district": full_name(str(row["district"]).replace(" For Library District", ""))}
+        for row in proof_list("06111", "Ventura", 33, qualified_only=True)
+    ]
 
 
 def riverside() -> list[dict[str, str | int | bool]]:
@@ -935,6 +954,7 @@ def parse() -> None:
                 *kings(),
                 *santa_barbara(),
                 *stanislaus(),
+                *ventura(),
                 *san_bernardino_lieu(),
             ]
         ]
@@ -972,7 +992,7 @@ def emit() -> Path:
             summary="California special district board races on the November 3, 2026 ballot, with candidates from county registrar candidate lists",
             polity="US-CA",
         )
-        docs = {fips: (*feed(fips), local_2026.SOURCE) for fips in COUNTIES} | {
+        docs = {fips: (*feed(fips), SOURCE if fips in OWN else local_2026.SOURCE) for fips in COUNTIES} | {
             key: (*value, SOURCE) for key, value in LIEU.items()
         }
         sources = {}
