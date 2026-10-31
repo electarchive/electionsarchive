@@ -2416,6 +2416,13 @@ for key, publisher, title, url, local in (
         "tx/tolar.html",
     ),
     (
+        "TX-48453-ud",
+        "Travis County Clerk",
+        "Orders declaring unopposed candidates elected and canceling the November 3, 2026 director elections",
+        "https://votetravis.gov/resources/required-notices/",
+        "tx/travis_notices.html",
+    ),
+    (
         "TX-48453-lv",
         "Lago Vista Independent School District",
         "Order of Cancellation of Trustee Election, November 3, 2026",
@@ -5531,6 +5538,13 @@ for key, publisher, title, url, local in (
         "ne/jefferson_cities.pdf",
     ),
     (
+        "NE-31067-gage",
+        "Gage County Clerk and Election Commissioner",
+        "2026 Filings, General Election, November 3, 2026",
+        "https://gagecountyne.gov/wp-content/uploads/sites/35/2026/07/2026-filings_for_office-General-for-web-page-w-auto-adv.pdf",
+        "ne/gage_cities.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
@@ -6019,7 +6033,7 @@ KY_CITY_SPELLINGS = {
     ("TODD", "Gurthrie"): "Guthrie",
     ("TRIMBLE", "Trimble Milton"): "Milton",
 }
-TACIT_FEEDS = {"CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48355-fb"}
+TACIT_FEEDS = {"CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud", "TX-48355-fb"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
