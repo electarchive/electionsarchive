@@ -9709,57 +9709,68 @@ export const contests = {
         kept.map((row) => row.id),
         contest.date,
       );
-      const built = await Promise.all(
-        kept.map(async (row) => {
-          const other = await find(row.id);
-          if (other.place == null) {
-            return null;
-          }
-          const kids =
-            other.place.k === area.k
+      const build = async (row: (typeof kept)[number]) => {
+        const other = await find(row.id);
+        if (other.place == null) {
+          return null;
+        }
+        const kids =
+          other.place.k === area.k
+            ? []
+            : await children(row.id, other.place, true, day, area.k);
+        const unit =
+          other.place.k === area.k
+            ? ""
+            : kids.find((kid) => kid.k === area.k)?.segment;
+        if (unit == null) {
+          return null;
+        }
+        const [totals, lineage] = await Promise.all([
+          load([row.id], [area.k], day, [row.id]),
+          branches(day),
+        ]);
+        const loaded = totals.get(area.k);
+        return {
+          id: row.id,
+          name: labels.full.get(row.id) ?? "",
+          path: [row.path, unit].filter((part) => part !== "").join("/"),
+          leaders:
+            loaded == null
               ? []
-              : await children(row.id, other.place, true, day, area.k);
-          const unit =
-            other.place.k === area.k
-              ? ""
-              : kids.find((kid) => kid.k === area.k)?.segment;
-          if (unit == null) {
-            return null;
+              : compare(loaded.side, null, lineage, "party")
+                  .flatMap((entry) =>
+                    entry.current == null
+                      ? []
+                      : [
+                          {
+                            key: entry.key,
+                            label: entry.label,
+                            color: entry.color,
+                            person: entry.current.person,
+                            party: entry.current.party,
+                            votes: entry.current.votes,
+                            share: entry.current.share,
+                          },
+                        ],
+                  )
+                  .toSorted((a, b) => b.votes - a.votes)
+                  .slice(0, 2),
+        };
+      };
+      const lanes = Map.groupBy(kept, (_row, index) => index % 4)
+        .values()
+        .toArray();
+      const built = await Promise.all(
+        lanes.map(async (lane) => {
+          const done: Array<Awaited<ReturnType<typeof build>>> = [];
+          for (const row of lane) {
+            done.push(await build(row));
           }
-          const [totals, lineage] = await Promise.all([
-            load([row.id], [area.k], day, [row.id]),
-            branches(day),
-          ]);
-          const loaded = totals.get(area.k);
-          return {
-            id: row.id,
-            name: labels.full.get(row.id) ?? "",
-            path: [row.path, unit].filter((part) => part !== "").join("/"),
-            leaders:
-              loaded == null
-                ? []
-                : compare(loaded.side, null, lineage, "party")
-                    .flatMap((entry) =>
-                      entry.current == null
-                        ? []
-                        : [
-                            {
-                              key: entry.key,
-                              label: entry.label,
-                              color: entry.color,
-                              person: entry.current.person,
-                              party: entry.current.party,
-                              votes: entry.current.votes,
-                              share: entry.current.share,
-                            },
-                          ],
-                    )
-                    .toSorted((a, b) => b.votes - a.votes)
-                    .slice(0, 2),
-          };
+          return done;
         }),
       );
       return built
+        .flat()
         .filter((entry) => entry != null)
         .toSorted((a, b) =>
           a.name.localeCompare(b.name, undefined, { numeric: true }),
