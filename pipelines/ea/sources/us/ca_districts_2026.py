@@ -49,6 +49,7 @@ COUNTIES = {
     "06101": "Sutter",
     "06055": "Napa",
     "06095": "Solano",
+    "06023": "Humboldt",
 }
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
@@ -399,6 +400,95 @@ def shasta() -> list[Row]:
         ),
         True,
     )
+
+
+HUMBOLDT_BODIES = (
+    ("HUMBOLDT BAY HARBOR", "Humboldt Bay Harbor, Recreation and Conservation District"),
+    ("HUMBOLDT BAY MUNICIPAL", "Humboldt Bay Municipal Water District"),
+    ("RESORT IMPROVEMNT DST#1", "Resort Improvement District No. 1"),
+    ("SO HUMBOLDT CHD", "South Humboldt Community Healthcare District"),
+    ("GARBERVILLE SANITARY", "Garberville Sanitary District"),
+)
+HUMBOLDT_HEAD = re.compile(r"^\s*(6\d{3}) (.+?)\s*$")
+HUMBOLDT_CAND = re.compile(r"^\s*\d+ {5,}(\S.*?)\s*$")
+
+
+HUMBOLDT = local_2026.FEEDS["CA-06023-s"]
+
+
+def humboldt() -> list[Row]:
+    try:
+        raw.cached(SOURCE, HUMBOLDT[0])
+    except LookupError:
+        file = DATA / "inbox" / "y26" / "ca" / "humboldt.pdf"
+        raw.store(
+            SOURCE,
+            HUMBOLDT[0],
+            file.read_bytes(),
+            suffix=file.suffix,
+            retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
+            media_type="application/pdf",
+        )
+    path = raw.cached(SOURCE, HUMBOLDT[0]).path
+    rows: list[Row] = []
+    for page in range(1, 11):
+        for x in (0, 396):
+            text = subprocess.run(
+                [
+                    "pdftotext",
+                    "-layout",
+                    "-f",
+                    str(page),
+                    "-l",
+                    str(page),
+                    "-x",
+                    str(x),
+                    "-y",
+                    "0",
+                    "-W",
+                    "396",
+                    "-H",
+                    "612",
+                    str(path),
+                    "-",
+                ],
+                capture_output=True,
+                check=True,
+            ).stdout.decode()
+            blocks: list[tuple[tuple[str, str, bool], list[str]]] = []
+            for line in text.splitlines():
+                if found := HUMBOLDT_HEAD.match(line):
+                    label = " ".join(found[2].replace(",", " ").split())
+                    division = re.search(r"DIV(?:ISION)? (\d+)", label)
+                    short = label.endswith("2-YR")
+                    seat = f"Division {division[1]}" if division else ("Short Term" if short else "")
+                    for prefix, district in HUMBOLDT_BODIES:
+                        if label.startswith(prefix.replace(",", "")):
+                            break
+                    else:
+                        body, kind = re.split(r" (CSD|FPD)\b", found[2].split(",")[0])[:2]
+                        district = (
+                            f"{cased(body)} {'Community Services' if kind == 'CSD' else 'Fire Protection'} District"
+                        )
+                    blocks.append(((district, seat, short), []))
+                elif blocks and (found := HUMBOLDT_CAND.match(line)):
+                    blocks[-1][1].append(found[1])
+            for (district, seat, short), names in blocks:
+                rows.extend(
+                    {
+                        "county": "Humboldt",
+                        "district": district,
+                        "seat": seat,
+                        "role": "Director",
+                        "seats": 1 if seat or len(names) == 1 else len(names),
+                        "name": name,
+                        "unexpired": short,
+                        "tacit": False,
+                        "doc": "06023-s",
+                    }
+                    for name in names
+                )
+    return rows
 
 
 SUTTER_HEAD = re.compile(r"^([A-Z][A-Z0-9 ]+?) \((\d+) SEATS?\)( SHORT TERM)?$")
@@ -1079,6 +1169,7 @@ def parse() -> None:
                 *merced(),
                 *kings(),
                 *shasta(),
+                *humboldt(),
                 *sutter(),
                 *napa(),
                 *solano(),
@@ -1123,7 +1214,7 @@ def emit() -> Path:
             polity="US-CA",
         )
         docs = {fips: (*feed(fips), SOURCE if fips in OWN else local_2026.SOURCE) for fips in COUNTIES} | {
-            key: (*value, SOURCE) for key, value in LIEU.items()
+            key: (*value, SOURCE) for key, value in (LIEU | {"06023-s": HUMBOLDT}).items()
         }
         sources = {}
         for key, (url, *publisher, bucket) in docs.items():
