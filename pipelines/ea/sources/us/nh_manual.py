@@ -334,6 +334,8 @@ def fetch() -> None:
                 print(f"{year}{kind}: {error!r}")
             if year == 2008:
                 break
+    if (PARSED / "lines.parquet").exists():
+        read()
 
 
 def parse() -> None:
@@ -416,6 +418,76 @@ def render(path: Path, sha: str, number: int) -> tuple[Path, int, int]:
         stem.with_suffix(".png").replace(image)
     with Image.open(image) as opened:
         return image, *opened.size
+
+
+READ_DPI = 150
+READ_PROMPT = (
+    "This is a page of New Hampshire county election returns. Each numbered row below names a candidate line on the page "
+    "(county, office, district, candidate, town, party, and its vertical position as a fraction of the page height). "
+    "For each row, read the vote count printed on that candidate's line in the page image. Reply with only a JSON object "
+    "mapping each row number to the integer printed, or to null if the line is not on the page or the number cannot "
+    "be read. Do not add or correct numbers."
+)
+
+
+def held(frame: pl.DataFrame) -> pl.DataFrame:
+    return (
+        blocks(frame.filter(pl.col("county").is_not_null()))
+        .filter(pl.col("agrees").is_null())
+        .sort("year", "page", "y0", "x0")
+        .with_columns(rid=pl.int_range(pl.len()).over("year", "page"))
+    )
+
+
+def read() -> None:
+    import base64
+
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+    from ea import batch
+
+    frame = held(pl.read_parquet(PARSED / "lines.parquet"))
+    folder = DATA / "tmp" / SOURCE
+    folder.mkdir(parents=True, exist_ok=True)
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    wanted: dict[str, batch.Want] = {}
+    for (year, page), rows in frame.group_by("year", "page", maintain_order=True):
+        image = folder / f"{year}-{page}.png"
+        if not image.exists():
+            stem = folder / f".{year}-{page}"
+            subprocess.run(
+                ["pdftoppm", "-r", str(READ_DPI), "-png", "-singlefile", "-f", str(page), "-l", str(page)]
+                + [str(pdf(int(year))), str(stem)],
+                check=True,
+            )
+            stem.with_suffix(".png").replace(image)
+        listing = "\n".join(
+            f"{row['rid']}: {row['county']} | {row['office']} | {row['district'] or ''} | {row['name']}"
+            f"{', ' + row['town'] if row['town'] else ''} | {row['party'] or ''} | y={row['y0']:.3f}"
+            for row in rows.iter_rows(named=True)
+        )
+        params = MessageCreateParamsNonStreaming(
+            model="claude-haiku-5-5",
+            max_tokens=4000,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/png",
+                                "data": base64.b64encode(image.read_bytes()).decode(),
+                            },
+                        },
+                        {"type": "text", "text": f"{READ_PROMPT}\n\nRows:\n{listing}"},
+                    ],
+                }
+            ],
+        )
+        wanted[f"read:{year}:{page}"] = (params, (3500 * price_in + (200 + 12 * rows.height) * price_out) / 1e6)
+    print(batch.ensure(SOURCE, "county_pages", wanted)[1])
 
 
 def person(name: str) -> tuple[str, str]:
