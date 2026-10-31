@@ -120,7 +120,8 @@ def read() -> str:
 
 
 def seen(year: int, page: int) -> list[list[int | None]]:
-    text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"][0]["text"]
+    text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"]
+    text = next(b["text"] for b in text if b.get("type") == "text")
     found = re.search(r"\[.*\]", text, re.DOTALL)
     return json.loads(found[0]) if found else []
 
@@ -153,7 +154,7 @@ def emit():
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Hampshire's constitutional questions, 1970-2012, statewide Yes and No totals read from the Secretary of State's Manual for the General Court",
+            summary="New Hampshire's constitutional questions, 1970-2012, statewide Yes and No totals read from the Secretary of State's Manual for the General Court. The 1970 Question 3 figures are the returned totals on page 577; a recount printed on page 589 differs.",
             polity="US-NH",
         )
         unit = cs.unit("us.state", "33")
