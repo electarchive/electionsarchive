@@ -456,7 +456,7 @@ def emit() -> Path:
         contests: dict[tuple[int, str, str, str | None, str | None], list[tuple[str, str, str]]] = {}
         for value, contest, text in conn.execute(
             """select x.value, x.entity_id, n.text from external_id x join name n on n.entity_id = x.entity_id
-               where x.scheme = 'us.contest' and x.value like 'NH:local:%%' and n.text like '%% County %% election%%'"""
+               where x.scheme = 'us.contest' and (x.value like 'NH:local:%%' or x.value ~ '^\\d{4}-\\d\\d-\\d\\d:NH:') and n.text like '%% County %% election%%'"""
         ).fetchall():
             found = CONTEST.match(text)
             if found is None:
@@ -510,9 +510,10 @@ def emit() -> Path:
                    where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2""",
                 [contest],
             ).fetchone() or (None, None, None)
-            if default is None:
-                report.setdefault("no default set", []).append(f"{tag} {external}")
-                continue
+            first = first or 1
+            election = (
+                election or conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
+            )
             options = conn.execute(
                 """select o.id::text, o.ballot_label, o.kind,
                           coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k
@@ -527,6 +528,7 @@ def emit() -> Path:
             matched: dict[str, str] = {}
             folded: dict[str, str] = {}
             failed = None
+            fresh: list[str] = []
             others = [option[0] for option in options if option[2] == "others"]
             order = sorted(rows["candidate"].unique(maintain_order=True), key=lambda name: bool(WRITE_IN.search(name)))
             for candidate in order:
@@ -554,6 +556,13 @@ def emit() -> Path:
                     ):
                         folded[candidate] = others[0]
                         continue
+                if (
+                    not hits
+                    and not candidate.lower().startswith("recount")
+                    and not re.fullmatch(r"(?i)(?:scatter\w*|write-?ins?)", candidate)
+                ):
+                    fresh.append(candidate)
+                    continue
                 if len(hits) != 1:
                     failed = f"{candidate} matches {[hit[1] for hit in hits]}"
                     break
@@ -563,6 +572,45 @@ def emit() -> Path:
             if failed is not None:
                 report.setdefault("candidate mismatch", []).append(f"{tag} {external}: {failed}")
                 continue
+            if failed is None and fresh:
+                taken_positions = len(options)
+                for offset, candidate in enumerate(fresh):
+                    option = cs.key("us.option", f"{external}:{slug(candidate)}")
+                    letters = surname(WRITE_IN.sub("", candidate).strip(" ()*"))
+                    if WRITE_IN.search(candidate):
+                        if others:
+                            matched[candidate] = others[0]
+                            continue
+                        cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
+                        others.append(str(option))
+                        matched[candidate] = str(option)
+                        continue
+                    person = cs.key("us.nh_sos_county.person", f"{county}:{name}:{letters}")
+                    shown = SUFFIX.sub(
+                        "", re.sub(r",\s*[a-z/&]{1,6}\*?$", "", candidate.strip(), flags=re.IGNORECASE)
+                    ).strip(" *")
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        cs.add("name", entity_id=person, text=shown, lang="en", kind="official", is_preferred=True)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        ballot_position=taken_positions + offset + 1,
+                        ballot_label=shown,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{external}:{slug(candidate)}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=shown,
+                        is_independent=False,
+                    )
+                    matched[candidate] = str(option)
+                    report.setdefault("option added from the workbook", []).append(f"{tag} {candidate}")
             named = [option for option in matched.values() if option not in others]
             if len(set(named)) != len(named):
                 report.setdefault("two columns match one option", []).append(f"{tag} {external}")
@@ -599,14 +647,17 @@ def emit() -> Path:
                     raise ValueError(f"{county}: no unit for {place!r}")
                 unit_codes[place] = hit
             result_set = cs.key(f"{SOURCE}.result_set", external)
-            old = dict(
-                zip(
-                    COLUMNS,
-                    conn.execute(f"select {', '.join(COLUMNS)} from result_set where id = %s", [default]).fetchone(),
-                    strict=True,
+            if default is not None:
+                old = dict(
+                    zip(
+                        COLUMNS,
+                        conn.execute(
+                            f"select {', '.join(COLUMNS)} from result_set where id = %s", [default]
+                        ).fetchone(),
+                        strict=True,
+                    )
                 )
-            )
-            cs.add("result_set", **old, status="superseded", is_default=False)
+                cs.add("result_set", **old, status="superseded", is_default=False)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -621,9 +672,13 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
-            declared = conn.execute(
-                "select option_id::text, kind, seats from outcome where result_set_id = %s", [default]
-            ).fetchall()
+            declared = (
+                conn.execute(
+                    "select option_id::text, kind, seats from outcome where result_set_id = %s", [default]
+                ).fetchall()
+                if default is not None
+                else []
+            )
             winners = {option for option, kind, _ in declared if kind in ("elected", "won")}
             ranked = sorted((votes, option) for option, votes in ours.items() if option not in others)[::-1]
             if (
