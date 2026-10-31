@@ -305,7 +305,7 @@ def fetch() -> None:
         response = httpx.get(
             SPARQL,
             params={"query": MEMBER_QUERY},
-            headers={"Accept": "text/csv", "User-Agent": "electionsarchive/1.0 (https://electionsarchive.com)"},
+            headers={"Accept": "text/csv", "User-Agent": raw.USER_AGENT},
             timeout=300,
         )
         response.raise_for_status()
