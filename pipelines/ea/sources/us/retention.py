@@ -77,6 +77,14 @@ OKLAHOMA_COUNTY_DAYS = {
     2008: "2008-11-04",
     2010: "2010-11-02",
 }
+OKLAHOMA_SEATS_2010 = {
+    "STEVEN W. TAYLOR": (2, None),
+    "JAMES R. WINCHESTER": (5, None),
+    "DEBORAH B. BARNES": (2, 1),
+    "DOUG GABBARD II": (3, 1),
+    "JOHN F. FISCHER": (3, 2),
+    "LARRY E. JOPLIN": (4, 2),
+}
 OKLAHOMA_COUNTY_FILES = ("sup-ct", "civ-ct", "crimct")
 OKLAHOMA_COUNTY_2010 = (
     "https://oklahoma.gov/content/dam/ok/en/elections/election-results/2010-election-results/"
@@ -496,7 +504,7 @@ def oklahoma_counties() -> list[dict[str, object]]:
                         r"Race:\s+(SUPREME COURT|COURT OF CIVIL APPEALS|COURT OF CRIMINAL APPEALS) - (.+)", line
                     )
                     if found:
-                        key = (OKLAHOMA_COURTS[found[1]], found[2].strip(), None, None)
+                        key = (OKLAHOMA_COURTS[found[1]], found[2].strip(), *OKLAHOMA_SEATS_2010.get(found[2].strip(), (None, None)))
                     elif line.startswith("Race:"):
                         key = None
                 elif found := re.match(
@@ -1201,7 +1209,7 @@ def emit() -> Path:
                 if state == "OK" and number is not None
                 else None
             )
-            if minted:
+            if minted or (state == "OK" and year == 2010 and seat):
                 name(contest, f"{year} {states[state]} {title} retention: {judge}" + (f" ({seat})" if seat else ""))
                 base = f"us/{state.lower()}/{day}-general/{slug(title)}-{suffix}"
                 path, count = base, 1
