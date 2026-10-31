@@ -7,7 +7,11 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import type { Router } from "#lib/server/rpc/router.js";
 
 const client: RouterClient<Router> = createORPCClient(
-  new RPCLink({ url: "/rpc", origin: browser ? location.origin : BASE_URL }),
+  new RPCLink({
+    url: "/rpc",
+    origin: browser ? location.origin : BASE_URL,
+    ...(!browser && { fetch: async () => new Promise<Response>(() => {}) }),
+  }),
 );
 
 export const orpc = createTanstackQueryUtils(client);
