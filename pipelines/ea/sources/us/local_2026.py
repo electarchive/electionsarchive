@@ -6261,6 +6261,13 @@ for key, publisher, title, url, local in (
         "az/sierra_vista_candidates.pdf",
     ),
     (
+        "AZ-04009-county",
+        "Graham County Elections",
+        "Candidates and Propositions, 2026 General Election",
+        "https://www.graham.az.gov/498/Candidates-Propositions",
+        "az/graham_county.html",
+    ),
+    (
         "AZ-04015-county",
         "Mohave County Elections Department",
         "2026 General Election County Candidates",
