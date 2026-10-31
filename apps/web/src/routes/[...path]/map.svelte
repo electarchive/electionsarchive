@@ -18,6 +18,7 @@
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
+  import ShapesIcon from "@lucide/svelte/icons/shapes";
   import XIcon from "@lucide/svelte/icons/x";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
@@ -137,9 +138,21 @@
     tallies?: Array<number | null> | null;
     hexes?: Array<{
       credit: string | null;
-      cells: Array<{ k: number; q: number; r: number }>;
+      cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
       labels: Array<{ q: number; r: number; text: string; k?: number }>;
+      cartogram: {
+        box: Array<number>;
+        districts: Array<{
+          k: number;
+          d: string;
+          x: number;
+          y: number;
+          isApart: boolean;
+        }>;
+        states: Array<string>;
+        labels: Array<{ x: number; y: number; text: string }>;
+      } | null;
       isPartial: boolean;
     }> | null;
   } = $props();
@@ -545,7 +558,7 @@
       ? new Map(totals.entries().filter(([, seats]) => seats > 0))
       : null;
   });
-  let isHexed = $state(false);
+  let shape = $state<"cartogram" | "hexes" | null>(null);
   const hexed = $derived(
     covering(hexes, { has: (k) => rows.has(k), size: places.rows.length }),
   );
@@ -577,7 +590,12 @@
     });
     const cells = hexed.cells.map((cell) => {
       const at = center(cell.q, cell.r);
-      return { k: cell.k, ...at, d: hexagon(at.x, at.y) };
+      return {
+        k: cell.k,
+        ...at,
+        d: hexagon(at.x, at.y),
+        isApart: cell.isApart,
+      };
     });
     const corners = [
       [0, -1],
@@ -631,7 +649,31 @@
       ),
     };
   });
-  const grid = $derived(isHexed ? tiled : null);
+  const drawn = $derived.by(() => {
+    const cartogram = hexed?.cartogram;
+    if (cartogram == null) {
+      return null;
+    }
+    const [left = 0, top = 0, right = 0, bottom = 0] = cartogram.box;
+    return {
+      cells: cartogram.districts,
+      at: new Map(cartogram.districts.map((cell) => [cell.k, cell])),
+      ...framed(left - 1.5, top - 1.5, right + 1.5, bottom + 1.5),
+      seam: 0.3,
+      size: 1.9,
+      credit: null,
+      labels: cartogram.labels.map((label) => ({ ...label, seats: null })),
+      nations: cartogram.states.join(""),
+      regions: "",
+    };
+  });
+  const views = $derived([
+    ...(drawn == null ? [] : [{ name: "cartogram" as const, grid: drawn }]),
+    ...(tiled == null ? [] : [{ name: "hexes" as const, grid: tiled }]),
+  ]);
+  const grid = $derived(
+    views.find((choice) => choice.name === shape)?.grid ?? null,
+  );
   const isSummary = $derived(grid != null);
   let zoom = $state({ scale: 1, x: 0, y: 0 });
   let touches: Array<{ id: number; x: number; y: number }> = [];
@@ -2061,27 +2103,31 @@
         </div>
       </div>
     {/if}
-    {#if tiled != null}
+    {#each views as choice (choice.name)}
+      {const isOn = $derived(shape === choice.name)}
       <button
         type="button"
         class={cn(
           "flex items-center gap-1.5 rounded-sm border border-foreground/40 bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:border-foreground/70 hover:bg-secondary pointer-coarse:block-10",
           {
             "border-primary bg-primary text-primary-foreground hover:border-primary hover:bg-primary":
-              isHexed,
+              isOn,
           },
         )}
-        aria-pressed={isHexed}
+        aria-pressed={isOn}
         onclick={() => {
-          isHexed = !isHexed;
+          shape = isOn ? null : choice.name;
           zoom = { scale: 1, x: 0, y: 0 };
         }}
-        ><HexagonIcon
-          class={cn("block-3.5 inline-3.5", { "fill-current": isHexed })}
-          aria-hidden="true"
-        />{m.map_view_hexes()}</button
+        >{#if choice.name === "cartogram"}<ShapesIcon
+            class={cn("block-3.5 inline-3.5", { "fill-current": isOn })}
+            aria-hidden="true"
+          />{m.map_view_cartogram()}{:else}<HexagonIcon
+            class={cn("block-3.5 inline-3.5", { "fill-current": isOn })}
+            aria-hidden="true"
+          />{m.map_view_hexes()}{/if}</button
       >
-    {/if}
+    {/each}
     {#if tiers.length > 1}
       <div
         class="scroll-fade-x flex max-inline-full"
@@ -2229,8 +2275,10 @@
           <path
             class={cn("outline-none", { "cursor-pointer": row != null })}
             d={cell.d}
-            fill={tinted.get(cell.k) ??
-              "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))"}
+            fill={cell.isApart
+              ? `color-mix(in oklab, ${tinted.get(cell.k) ?? "var(--muted-foreground)"} 40%, var(--card))`
+              : (tinted.get(cell.k) ??
+                "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))")}
             stroke="var(--card)"
             stroke-width={grid.seam}
             role="button"

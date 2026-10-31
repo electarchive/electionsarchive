@@ -1,0 +1,28 @@
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  NY  NY  NY  VT  NH  ME
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  NY  NY  NY  NY  NH  ME  MA
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  MI  ..  MI  ..  ..  ..  ..  ..  ..  NY  NY  NY  NY  MA  MA  MA  MA
+..  ..  ..  ..  ..  WA  ..  ..  ..  ..  ..  ..  ..  ..  WI  MI  MI  MI  MI  ..  ..  ..  ..  NY  NY  NY  NY  NY  NY  MA  MA  MA  MA
+  ..  ..  ..  ..  WA  WA  WA  ..  ..  ..  ..  MN  MN  WI  WI  WI  MI  MI  MI  ..  ..  ..  NY  NY  NY  NY  NY  NY  NY  NY  CT  CT  RI
+..  ..  ..  ..  ..  WA  WA  WA  ..  ..  ..  MN  MN  MN  WI  WI  WI  MI  MI  MI  ..  ..  ..  NY  PA  PA  PA  PA  NY  NJ  NJ  CT  CT  RI
+  CA  CA  CA  CA  CA  WA  WA  WA  ..  ..  ND  MN  MN  WI  IL  IL  IL  MI  MI  OH  ..  ..  OH  PA  PA  PA  PA  PA  NJ  NJ  CT
+..  CA  CA  CA  CA  OR  OR  OR  ID  MT  SD  MN  IA  IA  IL  IL  IL  IL  IN  IN  OH  OH  OH  OH  PA  PA  PA  PA  NJ  NJ  NJ
+  CA  CA  CA  CA  CA  OR  OR  UT  ID  WY  NE  NE  IA  IA  IL  IL  IL  IN  IN  OH  OH  OH  OH  PA  PA  PA  PA  PA  NJ  NJ
+..  CA  CA  CA  CA  NV  NV  UT  UT  CO  CO  CO  NE  MO  IL  IL  IL  IL  IN  IN  OH  OH  OH  WV  VA  MD  MD  MD  MD  NJ
+  ..  CA  CA  CA  CA  NV  NV  UT  CO  CO  CO  KS  KS  MO  MO  IL  IL  IN  IN  OH  OH  OH  WV  VA  VA  MD  MD  MD  NJ  NJ
+..  CA  CA  CA  CA  CA  AZ  AZ  AZ  NM  CO  OK  KS  KS  MO  MO  IL  IL  IN  KY  KY  KY  WV  VA  VA  VA  VA  DC  MD  DE
+  ..  CA  CA  CA  CA  CA  AZ  AZ  AZ  NM  NM  OK  OK  MO  MO  MO  TN  KY  KY  KY  TN  VA  VA  VA  NC  NC  NC
+..  ..  CA  CA  CA  CA  CA  AZ  AZ  TX  TX  TX  OK  OK  AR  AR  TN  TN  TN  TN  TN  VA  NC  NC  NC  NC  NC
+  ..  ..  CA  CA  CA  CA  CA  AZ  TX  TX  TX  TX  TX  AR  AR  TN  TN  AL  GA  GA  GA  NC  NC  NC  NC  NC
+..  ..  ..  CA  CA  CA  CA  CA  TX  TX  TX  TX  TX  TX  TX  MS  MS  AL  AL  GA  GA  GA  GA  SC  SC  SC
+  ..  ..  ..  CA  CA  CA  CA  CA  TX  TX  TX  TX  TX  TX  LA  LA  MS  AL  AL  GA  GA  GA  SC  SC  SC
+..  ..  ..  ..  ..  CA  ..  ..  TX  TX  TX  TX  TX  TX  LA  LA  MS  AL  AL  GA  GA  GA  GA  FL  SC
+  ..  ..  ..  ..  ..  ..  ..  ..  TX  TX  TX  TX  TX  TX  LA  LA  FL  FL  FL  FL  FL  FL  FL
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  TX  TX  ..  ..  ..  ..  FL  FL  FL  FL  FL  FL  FL
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  TX  ..  ..  ..  ..  ..  ..  ..  FL  ..  FL  FL
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  FL  FL  FL
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  FL  FL
+..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  FL  FL
+  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  FL  FL
+..  ..  AK  ..  ..  HI  ..  MP
+  ..  ..  ..  ..  ..  HI  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  PR  ..  VI
+..  ..  ..  ..  ..  ..  ..  GU  AS

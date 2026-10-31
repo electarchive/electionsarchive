@@ -57,6 +57,8 @@ The main steps take a registry name, except `apply`, `publish`, and `revert`, wh
 - `uv run ea rollup <set>...` recomputes the area rollups of the named result sets. `--affected` rebuilds every set whose rollups are missing at its district.
 - `uv run ea coverage` measures a polity's coverage against its official goals and writes the report, with subcommands for the United States (`us`), each supported country, and the coverage tables the app reads (`refresh` and `rebuild`).
 - `uv run ea tiles [scheme]` builds one PMTiles archive per boundary set, with geometry only.
+- `uv run ea hexes` builds the maps of hex tiles that the app serves from `apps/web/src/lib/server/hex/`, placing each election's districts inside the grids in `pipelines/ea/hexgrid/`.
+- `uv run ea cartograms` rebuilds the US House cartograms and their tile grids from the district shapes, then runs `ea hexes`. It takes several minutes.
 - `uv run ea rasters [scheme]` builds a raster archive of area IDs for each boundary set of 1,000 or more areas.
 - `uv run ea basemap {br,ca,ch,de,fr,gb,ie,it,tr,us}` builds a polity's planar basemap.
 - `uv run ea search` rebuilds the search index from names and slugs. Run it after any changeset that adds or renames entities.

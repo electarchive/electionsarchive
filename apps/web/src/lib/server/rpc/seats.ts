@@ -5,6 +5,7 @@ import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import layout2010 from "#lib/server/hex/gb-pcon-2010.json";
 import layout2024 from "#lib/server/hex/gb-pcon-2024.json";
+import cartograms from "#lib/server/hex/us-cd.json";
 import {
   coarse,
   inside,
@@ -15,6 +16,19 @@ import {
 } from "#lib/server/rpc/archive.js";
 
 const fold = (key: string) => (key.startsWith("person:") ? "independent" : key);
+
+const CARTOGRAMS = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<{
+      districts: Record<string, string>;
+      bounds: Record<string, [number, number, number, number]>;
+      points: Record<string, [number, number]>;
+      states: Record<string, string>;
+      labels: Record<string, [number, number, string]>;
+    }>("../hex/us-cd-[0-9]*.json", { eager: true, import: "default" }),
+  ).map(([file, layout]) => [file.slice(-9, -5), layout]),
+);
+const CARTOGRAM_YEARS: Record<string, number> = cartograms;
 
 const TILES = import.meta.glob<{
   grids: Record<
@@ -40,6 +54,11 @@ const TILE_SETS: Record<
   string,
   { file: string; year: (year: number) => number; cut: number }
 > = {
+  "us.cd": {
+    file: "../hex/us-cd-tiles.json",
+    year: (year) => year - (year % 2),
+    cut: 2,
+  },
   "ca.fed": { file: "../hex/ca-fed-tiles.json", year: (year) => year, cut: 3 },
   "fr.circonscription": {
     file: "../hex/fr-circ-tiles.json",
@@ -76,7 +95,7 @@ const tiled = async (id: string, within: string | undefined) => {
     select distinct a.k, ac.code, extract(year from e.date_from)::int as year, a.scheme_code as scheme
     from contest c join tree on tree.id = c.election_id
     join election e on e.id = c.election_id
-    join area a on a.id = c.district_area_id and a.scheme_code in ('ca.fed', 'fr.circonscription', 'de.wahlkreis')
+    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'ca.fed', 'fr.circonscription', 'de.wahlkreis')
     join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null)
     where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
       and coalesce(c.magnitude, 1) = 1 and not c.notional
@@ -97,6 +116,8 @@ const tiled = async (id: string, within: string | undefined) => {
   }
   const prefix = (code: string) =>
     placed.regions?.[code] ?? code.slice(0, -set.cut);
+  const isApart = (code: string) =>
+    first.scheme === "us.cd" && code.endsWith("98");
   const states = new Set(rows.map((row) => prefix(row.code)));
   const cells = rows.flatMap((row) => {
     const hex = placed.hexes[row.code];
@@ -107,11 +128,20 @@ const tiled = async (id: string, within: string | undefined) => {
             k: row.k,
             q: hex[0],
             r: hex[1],
+            isApart: isApart(row.code),
             region: grid.labels[prefix(row.code)]?.[2] ?? null,
           },
         ];
   });
   const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
+  const drawn =
+    first.scheme === "us.cd"
+      ? CARTOGRAMS[String(CARTOGRAM_YEARS[year] ?? "")]
+      : undefined;
+  const bounds = rows.flatMap((row) => {
+    const box = drawn?.bounds[row.code];
+    return box == null ? [] : [box];
+  });
   return {
     credit: null,
     cells,
@@ -134,6 +164,39 @@ const tiled = async (id: string, within: string | undefined) => {
     labels: Object.entries(grid.labels).flatMap(([fips, [q, r, text]]) =>
       states.has(fips) && states.size > 1 ? [{ q, r, text }] : [],
     ),
+    cartogram:
+      drawn == null || bounds.length === 0
+        ? null
+        : {
+            box: [
+              Math.min(...bounds.map((box) => box[0])),
+              Math.min(...bounds.map((box) => box[1])),
+              Math.max(...bounds.map((box) => box[2])),
+              Math.max(...bounds.map((box) => box[3])),
+            ],
+            districts: rows.flatMap((row) => {
+              const d = drawn.districts[row.code];
+              const point = drawn.points[row.code];
+              return d == null || point == null
+                ? []
+                : [
+                    {
+                      k: row.k,
+                      d,
+                      x: point[0],
+                      y: point[1],
+                      isApart: isApart(row.code),
+                    },
+                  ];
+            }),
+            states: Object.entries(drawn.states).flatMap(([fips, d]) =>
+              states.has(fips) ? [d] : [],
+            ),
+            labels: Object.entries(drawn.labels).flatMap(
+              ([fips, [x, y, text]]) =>
+                states.has(fips) && states.size > 1 ? [{ x, y, text }] : [],
+            ),
+          },
     isPartial: false,
   };
 };
@@ -181,7 +244,7 @@ const stated = async (id: string) => {
     const hex = STATES[row.polity]?.hexes[row.code];
     return hex == null || (isUsed && !row.isUsed)
       ? []
-      : [{ k: row.k, q: hex[0], r: hex[1], region: hex[2] }];
+      : [{ k: row.k, q: hex[0], r: hex[1], isApart: false, region: hex[2] }];
   });
   return cells.length < 2
     ? null
@@ -195,6 +258,7 @@ const stated = async (id: string) => {
           text: cell.region,
           k: cell.k,
         })),
+        cartogram: null,
         isPartial: true,
       };
 };
@@ -230,7 +294,9 @@ const british = async (id: string, within: string | undefined) => {
   const hexes: Record<string, Array<number>> = layout.hexes;
   const cells = found.rows.flatMap((row) => {
     const [q, r] = hexes[row.code] ?? [];
-    return q == null || r == null ? [] : [{ k: row.k, q, r, region: null }];
+    return q == null || r == null
+      ? []
+      : [{ k: row.k, q, r, isApart: false, region: null }];
   });
   const kept = new Set(cells.map((cell) => `${cell.q},${cell.r}`));
   return {
@@ -248,6 +314,7 @@ const british = async (id: string, within: string | undefined) => {
           ];
     }),
     labels: [],
+    cartogram: null,
     isPartial: false,
   };
 };
@@ -1799,6 +1866,7 @@ export const seats = {
               k: v.number(),
               q: v.number(),
               r: v.number(),
+              isApart: v.boolean(),
               region: v.nullable(v.string()),
             }),
           ),
@@ -1814,6 +1882,24 @@ export const seats = {
               r: v.number(),
               text: v.string(),
               k: v.optional(v.number()),
+            }),
+          ),
+          cartogram: v.nullable(
+            v.object({
+              box: v.array(v.number()),
+              districts: v.array(
+                v.object({
+                  k: v.number(),
+                  d: v.string(),
+                  x: v.number(),
+                  y: v.number(),
+                  isApart: v.boolean(),
+                }),
+              ),
+              states: v.array(v.string()),
+              labels: v.array(
+                v.object({ x: v.number(), y: v.number(), text: v.string() }),
+              ),
             }),
           ),
           isPartial: v.boolean(),
