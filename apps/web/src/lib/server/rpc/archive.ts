@@ -18,6 +18,7 @@ import {
 import path from "node:path";
 import * as v from "valibot";
 import type { Prose } from "#lib/contrib.js";
+import { natural } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { era, independent } from "#lib/party.js";
 import { os, remember } from "#lib/server/cache.js";
@@ -1233,9 +1234,7 @@ async function gather(
     ...deep
       .toSorted((a, b) => a.k - b.k)
       .map((row) => shaped(row, prefixes.get(row.parent) ?? "")),
-  ].toSorted((a, b) =>
-    a.name.localeCompare(b.name, undefined, { numeric: true }),
-  );
+  ].toSorted((a, b) => natural(a.name, b.name));
 }
 
 async function reaches(place: string, area: string, date: string) {
@@ -1648,7 +1647,7 @@ async function load(
     number,
     {
       votes: Map<number, number>;
-      sums: Map<string, number>;
+      sums: Map<number, Map<string, number>>;
       main: number;
       complete: boolean;
     }
@@ -1656,14 +1655,16 @@ async function load(
   for (const row of counts) {
     const area = areas.get(row.area) ?? {
       votes: new Map<number, number>(),
-      sums: new Map<string, number>(),
+      sums: new Map<number, Map<string, number>>(),
       main: row.main,
       complete: true,
     };
     areas.set(row.area, area);
     area.complete &&= row.complete;
-    const sum = `${row.role}:${row.set}:${row.channel}`;
-    area.sums.set(sum, (area.sums.get(sum) ?? 0) + row.value);
+    const sums = area.sums.get(row.set) ?? new Map<string, number>();
+    area.sums.set(row.set, sums);
+    const sum = `${row.role}:${row.channel}`;
+    sums.set(sum, (sums.get(sum) ?? 0) + row.value);
     if (row.role === "votes") {
       area.votes.set(row.option, (area.votes.get(row.option) ?? 0) + row.value);
     }
@@ -2007,29 +2008,34 @@ async function load(
     party: row.party,
     candidate: labels.full.get(row.person) ?? "",
   }));
+  const placed = Map.groupBy(picked.rows, (row) => row.area);
+  const kinds = new Map(options.rows.map((row) => [row.k, row.kind]));
+  const declared = new Set(
+    options.rows.filter(
+      (row) => row.outcome != null && outcomes.includes(row.contest),
+    ),
+  );
   for (const [k, area] of areas) {
-    const sets = picked.rows.filter(
-      (row) => row.area === k && kept.has(`${row.k}:${row.area}`),
+    const sets = (placed.get(k) ?? []).filter((row) =>
+      kept.has(`${row.k}:${row.area}`),
     );
-    const isAnswers = options.rows.every(
-      (row) => !area.votes.has(row.k) || row.kind === "answer",
-    );
+    const isAnswers = area.votes
+      .keys()
+      .every((option) => (kinds.get(option) ?? "answer") === "answer");
     let total = 0;
     let appointed = 0;
     for (const set of sets) {
       let [valid, votes, missing] = [0, 0, 0];
-      for (const [key, value] of area.sums) {
-        const [role, k, channel] = key.split(":", 3);
-        if (k !== String(set.k)) {
-          continue;
-        }
+      const sums = area.sums.get(set.k) ?? new Map<string, number>();
+      for (const [key, value] of sums) {
+        const [role, channel] = key.split(":", 2);
         if (role === "appointed") {
           appointed += value;
         } else if (role === "valid") {
           valid += value;
         } else if (role === "votes") {
           votes += value;
-          if (!area.sums.has(`valid:${set.k}:${channel}`)) {
+          if (!sums.has(`valid:${channel}`)) {
             missing += value;
           }
         }
@@ -2045,11 +2051,7 @@ async function load(
       side: {
         valid: total,
         options: options.rows
-          .filter(
-            (row) =>
-              area.votes.has(row.k) ||
-              (row.outcome != null && outcomes.includes(row.contest)),
-          )
+          .filter((row) => area.votes.has(row.k) || declared.has(row))
           .map((row): Option => ({
             contest: row.contest,
             kind: row.kind,
@@ -2357,9 +2359,8 @@ function assign(
           list
             .toSorted(
               (a, b) =>
-                a.place.name.localeCompare(b.place.name, undefined, {
-                  numeric: true,
-                }) || (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
+                natural(a.place.name, b.place.name) ||
+                (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
             )
             .map((slot) => ({
               place: at.get(slot.place.id) ?? 0,
@@ -2974,8 +2975,7 @@ async function places(
       })
       .toSorted(
         (a, b) =>
-          Number(a.isPool) - Number(b.isPool) ||
-          a.name.localeCompare(b.name, undefined, { numeric: true }),
+          Number(a.isPool) - Number(b.isPool) || natural(a.name, b.name),
       );
     const tabulated = await tabulate(
       [contest.root],
@@ -6454,9 +6454,7 @@ export const contests = {
             name: labels.full.get(id) ?? "",
             path: slugs.get(id) ?? null,
           }))
-          .toSorted((a, b) =>
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
-          ),
+          .toSorted((a, b) => natural(a.name, b.name)),
         places: null,
         sets: sets.rows.map((row) => ({
           stage: row.stage,
@@ -7380,7 +7378,7 @@ export const contests = {
           (a, b) =>
             (a.date ?? "").localeCompare(b.date ?? "") ||
             Number(b.notional) - Number(a.notional) ||
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
+            natural(a.name, b.name),
         )
         .map((entry, index, list) => ({
           ...entry,
@@ -8696,9 +8694,7 @@ export const contests = {
             entries: entries.toSorted((a, b) =>
               entries.length > 10
                 ? b.row.valid - a.row.valid
-                : a.row.name.localeCompare(b.row.name, undefined, {
-                    numeric: true,
-                  }),
+                : natural(a.row.name, b.row.name),
             ),
           };
         })
@@ -9002,7 +8998,7 @@ export const contests = {
         select (
           select json_agg((ST_AsGeoJSON(ST_ExteriorRing(e.geom), 6)::json)->'coordinates')
           from ST_Dump(ST_ForcePolygonCW((
-            select ST_Union(ST_MakePolygon(ST_ExteriorRing(d.geom)))
+            select ST_Union(ST_MakeValid(ST_MakePolygon(ST_ExteriorRing(d.geom))))
             from ST_Dump(ST_Transform(ST_SetSRID(ST_Simplify(
               ST_Buffer(ST_SimplifyPreserveTopology(q.geom, q.t), q.t * 2, 'quad_segs=2'), q.t
             ), 3857), 4326)) d
@@ -9838,9 +9834,7 @@ export const contests = {
       return built
         .flat()
         .filter((entry) => entry != null)
-        .toSorted((a, b) =>
-          a.name.localeCompare(b.name, undefined, { numeric: true }),
-        );
+        .toSorted((a, b) => natural(a.name, b.name));
     }),
   cycle: os
     .meta(
@@ -10445,9 +10439,7 @@ export const contests = {
                 Number((b.plain ?? "").startsWith(b.county)) -
                   Number((a.plain ?? "").startsWith(a.county)) ||
                 b.row.count - a.row.count ||
-                (a.plain ?? "").localeCompare(b.plain ?? "", undefined, {
-                  numeric: true,
-                }),
+                natural(a.plain ?? "", b.plain ?? ""),
             )
             .map(({ row, isSingle, label, plain }) => ({
               kind: row.kind,
@@ -10818,7 +10810,7 @@ export const contests = {
         .toSorted(
           (a, b) =>
             Number(b.isElected) - Number(a.isElected) ||
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
+            natural(a.name, b.name),
         );
       let seats = 0;
       for (const list of lists) {
@@ -12852,11 +12844,7 @@ async function races(
                             isWon: row.isDone === true || (row.won ?? 0) > 0.5,
                           },
                   }))
-                  .toSorted((a, b) =>
-                    a.label.localeCompare(b.label, undefined, {
-                      numeric: true,
-                    }),
-                  );
+                  .toSorted((a, b) => natural(a.label, b.label));
               })(),
           single == null || results.length > 0
             ? []
@@ -13190,7 +13178,7 @@ async function races(
         Number(a.kind === "ballot_question") -
           Number(b.kind === "ballot_question") ||
         (a.kind === "ballot_question"
-          ? a.name.localeCompare(b.name, undefined, { numeric: true })
+          ? natural(a.name, b.name)
           : (weights.get(b.scope ?? null) ?? 0) -
               (weights.get(a.scope ?? null) ?? 0) ||
             a.rank - b.rank ||
@@ -13200,7 +13188,7 @@ async function races(
             a.body === b.body &&
             a.count === 1 &&
             b.count === 1
-              ? a.name.localeCompare(b.name, undefined, { numeric: true })
+              ? natural(a.name, b.name)
               : 0) ||
             b.valid - a.valid),
     )
@@ -14605,9 +14593,7 @@ export const elections = {
               path: slugs.get(row.id) ?? null,
               children: row.children,
             }))
-            .toSorted((a, b) =>
-              a.name.localeCompare(b.name, undefined, { numeric: true }),
-            ),
+            .toSorted((a, b) => natural(a.name, b.name)),
           elections: electionRows.rows
             .map((row) => ({
               name: labels.full.get(row.id) ?? "",
@@ -14630,9 +14616,7 @@ export const elections = {
                       seats: row.parties[0].seats,
                     },
             }))
-            .toSorted((a, b) =>
-              a.name.localeCompare(b.name, undefined, { numeric: true }),
-            ),
+            .toSorted((a, b) => natural(a.name, b.name)),
           seated:
             seatedTotal === 0
               ? null
@@ -15771,7 +15755,7 @@ export const elections = {
                   (a, b) =>
                     Number(!a.name.startsWith("Mayor")) -
                       Number(!b.name.startsWith("Mayor")) ||
-                    a.name.localeCompare(b.name, undefined, { numeric: true }),
+                    natural(a.name, b.name),
                 ),
               })),
           }))
@@ -16029,9 +16013,7 @@ export const elections = {
         .map((group) => ({
           name: group.name,
           path: group.path,
-          contests: group.contests.toSorted((a, b) =>
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
-          ),
+          contests: group.contests.toSorted((a, b) => natural(a.name, b.name)),
         }));
     }),
   regional: os
@@ -16604,7 +16586,7 @@ export const elections = {
               (a, b) =>
                 Number(b.isPlaced) - Number(a.isPlaced) ||
                 Number(b.isFiner) - Number(a.isFiner) ||
-                a.name.localeCompare(b.name, undefined, { numeric: true }),
+                natural(a.name, b.name),
             )
             .map(({ isPlaced: _, isFiner: __, ...entry }) => entry),
           parties: [
@@ -17750,9 +17732,7 @@ export const polities = {
                   path: slugs.get(row.latest) ?? null,
                 },
         }))
-        .toSorted((a, b) =>
-          a.name.localeCompare(b.name, undefined, { numeric: true }),
-        );
+        .toSorted((a, b) => natural(a.name, b.name));
     }),
   get: os
     .meta(
@@ -18366,9 +18346,7 @@ export const polities = {
             population: row.population,
           }))
           .filter((row) => row.name !== "")
-          .toSorted((a, b) =>
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
-          ),
+          .toSorted((a, b) => natural(a.name, b.name)),
         holdings: holdings.rows.filter((row) => row.population > 0),
         within: subdivisions.rows[0]?.within ?? 0,
         dates: sizes.length,
@@ -18389,7 +18367,7 @@ export const polities = {
                 b.date.localeCompare(a.date) ||
                 a.tier - b.tier ||
                 b.valid - a.valid ||
-                a.name.localeCompare(b.name, undefined, { numeric: true }),
+                natural(a.name, b.name),
             ),
           (race) => race.date,
         )
@@ -19250,9 +19228,8 @@ export const polities = {
                 }))
                 .toSorted(
                   (a, b) =>
-                    (a.label ?? "").localeCompare(b.label ?? "", "en", {
-                      numeric: true,
-                    }) || (a.name ?? "").localeCompare(b.name ?? ""),
+                    natural(a.label ?? "", b.label ?? "") ||
+                    (a.name ?? "").localeCompare(b.name ?? ""),
                 ),
             },
           ] as const;
