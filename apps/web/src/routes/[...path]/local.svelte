@@ -170,7 +170,7 @@
         <h3 class="text-lg/tight font-[740] tracking-[-0.012em]">
           {TIERS[tier.kind]()}
         </h3>
-        <div class="columns-[24rem] gap-x-8">
+        <div class="columns-sm gap-x-8">
           {#each isOpen || tier.governments.length <= 14 ? tier.governments : tier.governments.slice(0, 12) as government (government.path ?? government.name)}
             <div
               class={cn("grid content-start gap-1 pbe-5", {

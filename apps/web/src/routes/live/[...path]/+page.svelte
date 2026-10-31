@@ -342,8 +342,9 @@
         ["at", at],
       ]);
       void goto(
-        resolve("/live/[...path]", { path: page.params.path ?? "" }) +
-          `?${query.toString()}`,
+        `${resolve("/live/[...path]", {
+          path: page.params.path ?? "",
+        })}?${query.toString()}`,
         { state: page.state, shallow: true, replace: true },
       ).catch(() => undefined);
     });

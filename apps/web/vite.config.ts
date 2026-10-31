@@ -1,9 +1,9 @@
-import { execFileSync } from "node:child_process";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import adapter from "@sveltejs/adapter-node";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
+import { execFileSync } from "node:child_process";
 import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 

@@ -33,7 +33,7 @@
         {m.alongside_lede()}
       </p>
     </div>
-    <div class="columns-[24rem] gap-x-8">
+    <div class="columns-sm gap-x-8">
       {#each groups as group (group.path ?? group.name)}
         <div class="grid break-inside-avoid content-start gap-1 pbe-5">
           <h3 class="text-sm font-semibold">

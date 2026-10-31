@@ -2,8 +2,8 @@ import { error } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import type { Anchor, CommentView } from "#lib/contrib.js";
-import { commentLimit } from "#lib/contrib.js";
 import { PROJECT } from "#lib/constants.js";
+import { commentLimit } from "#lib/contrib.js";
 import { mentionsOf } from "#lib/markdown.js";
 import { roles } from "#lib/server/contrib.js";
 import { db } from "#lib/server/db/index.js";
@@ -87,10 +87,10 @@ export async function threadComments(
     return [];
   }
   const allowedRoles = await roles(viewer ?? undefined);
-  const moderator = allowedRoles.admin || allowedRoles.reviewer;
+  const isModerator = allowedRoles.admin || allowedRoles.reviewer;
   const { rows } = await db.execute<CommentView>(sql`
     select c.id, c.parent_id, u.name as author, p.handle, c.agent_name, c.agent_model, c.revision_n,
-           case when c.hidden_at is null or ${moderator} or c.author_user_id = ${viewer}::uuid
+           case when c.hidden_at is null or ${isModerator} or c.author_user_id = ${viewer}::uuid
                 then c.body_md end as body,
            c.anchor, c.created_at::text, c.edited_at::text, c.hidden_reason, h.name as hidden_by,
            c.author_user_id is not distinct from ${viewer}::uuid and ${viewer}::uuid is not null as mine

@@ -216,7 +216,7 @@
           {#if !isFlat}
             <button
               type="button"
-              class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 px-2 py-2 text-start inline-full hover:bg-secondary/70 sm:grid-cols-[minmax(8rem,14rem)_minmax(0,1fr)_auto]"
+              class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 p-2 text-start inline-full hover:bg-secondary/70 sm:grid-cols-[minmax(8rem,14rem)_minmax(0,1fr)_auto]"
               aria-expanded={open}
               aria-controls="{uid}-{entry.k ?? 'direct'}"
               onfocus={() => (focus = entry.k)}
@@ -342,7 +342,7 @@
                         {row.margin == null ? "" : points(row.margin)}
                       </td>
                       <td
-                        class="py-1.5 ps-2 pe-2 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
+                        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
                       >
                         {count(row.valid)}
                       </td>

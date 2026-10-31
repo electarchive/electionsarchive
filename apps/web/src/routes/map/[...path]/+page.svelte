@@ -9,10 +9,10 @@
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import MapIcon from "@lucide/svelte/icons/map";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
-  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ScanIcon from "@lucide/svelte/icons/scan";
   import SlidersHorizontalIcon from "@lucide/svelte/icons/sliders-horizontal";
   import XIcon from "@lucide/svelte/icons/x";
@@ -28,13 +28,13 @@
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, date, percent, plural, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
+  import { basemap, SCHEMES } from "#lib/map/basemap.js";
+  import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import { SCHEMES, basemap } from "#lib/map/basemap.js";
-  import { Engine, largest, proportional } from "#lib/map/engine.svelte.js";
   import Histogram from "./histogram.svelte";
 
   type Sheet = PageData["atlas"];
@@ -2424,7 +2424,7 @@
               <button
                 type="button"
                 class={cn(
-                  "min-is-0 -ms-px flex flex-1 flex-col items-center border border-input bg-card px-2 py-1 text-[0.8125rem] leading-tight font-semibold keycap first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                  "min-is-0 -ms-px flex flex-1 flex-col items-center border border-input bg-card px-2 py-1 text-[0.8125rem]/tight  font-semibold keycap first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                   {
                     "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                       level.code === sheet.level,

@@ -197,13 +197,12 @@ export const actions: Actions = {
     if (id == null || !v.is(Id, id)) {
       return fail(400, { message: "That comment isn't valid." });
     }
-    const reason =
-      form.get("restore") == null
-        ? String(form.get("reason") ?? "")
-            .normalize("NFC")
-            .trim()
-            .slice(0, 500)
-        : null;
+    const reason = !form.has("restore")
+      ? String(form.get("reason") ?? "")
+          .normalize("NFC")
+          .trim()
+          .slice(0, 500)
+      : null;
     return (
       (await attempt(async () => hideComment({ userId, id, reason }))) ?? {
         hidden: id,

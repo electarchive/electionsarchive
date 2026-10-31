@@ -375,7 +375,7 @@ for (const test of picked) {
             if (await alone.isVisible()) {
               await alone.click();
             } else {
-              const [bare, query = ""] = test.path.split("?");
+              const [bare, query = ""] = test.path.split("?", 2);
               const deep = `${bare}/${test.drill.unit}${query === "" ? "" : `?${query}`}`;
               if (!bare.endsWith(`/${test.drill.unit}`)) {
                 await page.goto(`${base}${deep}`, {

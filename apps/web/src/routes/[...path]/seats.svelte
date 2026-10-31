@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
   import { arrange, isUnplaced } from "#lib/caucus.js";
@@ -1015,7 +1015,7 @@
             style:--party={color}
           >
             <div
-              class="[scrollbar-width:thin] [scrollbar-color:var(--input)_transparent] overflow-y-auto overscroll-y-contain py-1 ps-3.5 pe-2.5 max-block-[min(22rem,60dvh)]"
+              class="scrollbar-thin [scrollbar-color:var(--input)_transparent] overflow-y-auto overscroll-y-contain py-1 ps-3.5 pe-2.5 max-block-[min(22rem,60dvh)]"
               {@attach (node) => {
                 const fade = () => {
                   const top = Math.min(node.scrollTop, 24);

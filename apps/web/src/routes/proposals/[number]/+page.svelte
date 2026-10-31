@@ -2,8 +2,7 @@
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
   import { page } from "$app/state";
-  import type { DiffRow } from "#lib/contrib.js";
-  import type { Anchor, CommentView } from "#lib/contrib.js";
+  import type { Anchor, CommentView, DiffRow } from "#lib/contrib.js";
   import BoundaryMap from "#lib/components/contrib/boundary-map.svelte";
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
   import CommentItem from "#lib/components/contrib/comment-item.svelte";
@@ -12,6 +11,7 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import {
+    anchorId,
     channelLabel,
     dated,
     escalationLabel,
@@ -32,7 +32,6 @@
     tierLabel,
     verdictLabel,
   } from "#lib/contrib.js";
-  import { anchorId } from "#lib/contrib.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -505,7 +504,7 @@
         {const anchor = $derived(rowAnchor(row))}
         <li
           id={anchorId(anchor)}
-          class="group grid scroll-mt-24 grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-be py-2 max-sm:grid-cols-1"
+          class="group grid scroll-mbs-24 grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-x-4 border-be py-2 max-sm:grid-cols-1"
         >
           <span class="text-muted-foreground"
             >{tables[row.table]?.() ?? row.table}{#if row.op === "drop"}<span
@@ -749,7 +748,7 @@
           })}
           <li
             id={anchorId(anchor)}
-            class="group grid scroll-mt-24 gap-1 border-be py-2"
+            class="group grid scroll-mbs-24 gap-1 border-be py-2"
           >
             <span class="font-semibold">{item.title}</span>
             {#if item.url != null}

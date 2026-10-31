@@ -70,13 +70,13 @@ const calm = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 const archive = (make: typeof PMTiles, key: string) => {
   let found = archives.get(key);
   if (found == null) {
-    found = new make(`${globalThis.location.origin}/tiles/${key}.pmtiles`);
+    found = new make(`${location.origin}/tiles/${key}.pmtiles`);
     archives.set(key, found);
   }
   return found;
 };
 
-function load() {
+async function load() {
   library ??= Promise.all([
     import("maplibre-gl"),
     import("pmtiles"),
@@ -141,7 +141,7 @@ function load() {
         const target = tile.ids.indexOf(Number(focus));
         const { index } = tile;
         let p = 0;
-        for (const value of target < 0 ? [] : index) {
+        for (const value of target === -1 ? [] : index) {
           if (value === target) {
             const column = p % SIZE;
             const row = (p - column) / SIZE;
@@ -186,26 +186,38 @@ function pattern(shape: string, color: string) {
       pen.lineTo(8, 0);
       pen.stroke();
     }
-    if (shape === "back" || shape === "cross") {
-      pen.moveTo(0, 0);
-      pen.lineTo(8, 8);
-      pen.stroke();
-    } else if (shape === "absent") {
-      pen.moveTo(3, 2);
-      pen.arc(2, 2, 1, 0, Math.PI * 2);
-      pen.moveTo(7, 6);
-      pen.arc(6, 6, 1, 0, Math.PI * 2);
-      pen.fill();
-    } else if (shape === "norun") {
-      for (const [from, to, at] of [
-        [1, 5, 2.5],
-        [5, 8, 6.5],
-        [0, 1, 6.5],
-      ] as const) {
-        pen.moveTo(from, at);
-        pen.lineTo(to, at);
+    switch (shape) {
+      case "back":
+      case "cross": {
+        pen.moveTo(0, 0);
+        pen.lineTo(8, 8);
+        pen.stroke();
+
+        break;
       }
-      pen.stroke();
+      case "absent": {
+        pen.moveTo(3, 2);
+        pen.arc(2, 2, 1, 0, Math.PI * 2);
+        pen.moveTo(7, 6);
+        pen.arc(6, 6, 1, 0, Math.PI * 2);
+        pen.fill();
+
+        break;
+      }
+      case "norun": {
+        for (const [from, to, at] of [
+          [1, 5, 2.5],
+          [5, 8, 6.5],
+          [0, 1, 6.5],
+        ] as const) {
+          pen.moveTo(from, at);
+          pen.lineTo(to, at);
+        }
+        pen.stroke();
+
+        break;
+      }
+      // No default
     }
   }
   return {
@@ -758,7 +770,7 @@ export class Engine {
       north: -Infinity,
     };
     for (const part of gl.querySourceFeatures(source, {
-      ...(entry.isVector ? { sourceLayer: "areas" } : {}),
+      ...(entry.isVector && { sourceLayer: "areas" }),
       filter: ["==", ["id"], k],
     })) {
       for (const pair of JSON.stringify(part.geometry).matchAll(
@@ -802,7 +814,7 @@ export class Engine {
     }
     gl.addSource(id, {
       type: "vector",
-      url: `pmtiles://${globalThis.location.origin}/tiles/${key}.pmtiles`,
+      url: `pmtiles://${location.origin}/tiles/${key}.pmtiles`,
     });
     this.#sources.set(id, { group, isVector: true });
     const { PMTiles } = kit ?? {};
@@ -845,7 +857,7 @@ export class Engine {
         type: "FeatureCollection",
         features: places.map((place) => ({
           type: "Feature",
-          ...(place.k == null ? {} : { id: place.k }),
+          ...(place.k != null && { id: place.k }),
           properties: place.properties ?? {},
           geometry: { type: "Point", coordinates: place.at },
         })),
@@ -902,7 +914,7 @@ export class Engine {
     const after =
       rank < 0
         ? undefined
-        : [...this.#layers.entries()]
+        : [...this.#layers]
             .filter(
               ([id, layer]) =>
                 layer.rank > rank && this.#slots.get(id) === slot,
@@ -960,18 +972,22 @@ export class Engine {
       return;
     }
     for (const [id, layer] of [...this.#layers].toReversed()) {
-      if (layer.group === group) {
-        gl.removeLayer(id);
-        this.#layers.delete(id);
-        this.#slots.delete(id);
+      if (layer.group !== group) {
+        continue;
       }
+
+      gl.removeLayer(id);
+      this.#layers.delete(id);
+      this.#slots.delete(id);
     }
     for (const [id, source] of this.#sources) {
-      if (source.group === group) {
-        gl.removeSource(id);
-        this.#sources.delete(id);
-        this.#painted.delete(id);
+      if (source.group !== group) {
+        continue;
       }
+
+      gl.removeSource(id);
+      this.#sources.delete(id);
+      this.#painted.delete(id);
     }
     this.#rasterKeys = this.#rasterKeys.filter((key) =>
       this.#sources.has(`ids:${key}`),
@@ -1039,7 +1055,7 @@ export class Engine {
       gl.setFeatureState(
         {
           source: last.source,
-          ...(entry.isVector ? { sourceLayer: "areas" } : {}),
+          ...(entry.isVector && { sourceLayer: "areas" }),
           id: last.k,
         },
         { [key]: false },
@@ -1049,7 +1065,7 @@ export class Engine {
     const next = source == null ? null : this.#sources.get(source);
     if (source != null && next != null && k != null) {
       gl.setFeatureState(
-        { source, ...(next.isVector ? { sourceLayer: "areas" } : {}), id: k },
+        { source, ...(next.isVector && { sourceLayer: "areas" }), id: k },
         { [key]: true },
       );
       this.#marks.set(key, { source, k });
@@ -1140,7 +1156,7 @@ export class Engine {
     }
     const ranked = (
       layers ??
-      [...this.#layers.entries()]
+      [...this.#layers]
         .filter(([, layer]) => layer.rank >= 0 && layer.spec.type !== "raster")
         .toSorted(([, a], [, b]) => b.rank - a.rank)
         .map(([id]) => id)

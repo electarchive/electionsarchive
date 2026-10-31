@@ -1,10 +1,10 @@
 <script lang="ts">
   import "#lib/components/contrib/contrib.css";
   import Checks from "#routes/lab/contrib/checks.svelte";
-  import Proof from "#lib/components/contrib/proof.svelte";
   import Scan from "#routes/lab/contrib/scan.svelte";
   import { resolve } from "$app/paths";
   import type { Box, Column } from "#routes/lab/contrib/data.js";
+  import Proof from "#lib/components/contrib/proof.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import { Input } from "#lib/components/ui/input/index.js";

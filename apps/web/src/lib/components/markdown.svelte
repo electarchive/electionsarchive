@@ -44,7 +44,7 @@
     >
   {:else if node.type === "code"}
     <pre
-      class="overflow-x-auto rounded-sm bg-muted px-3 py-2 font-mono text-xs leading-relaxed"><code
+      class="overflow-x-auto rounded-sm bg-muted px-3 py-2 font-mono text-xs/relaxed"><code
         >{node.value}</code
       ></pre>
   {:else if node.type === "blockquote"}
@@ -82,6 +82,6 @@
   {/if}
 {/snippet}
 
-<div class="grid gap-2 text-pretty break-words">
+<div class="grid gap-2 text-pretty wrap-break-word">
   {@render nodes(tree.children)}
 </div>

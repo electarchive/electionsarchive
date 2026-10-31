@@ -117,10 +117,10 @@ export async function rebuild() {
             const read = new Date().toISOString();
             const page = await contents(id);
             await db.execute(sql`
-            insert into party_page (party_id, page, built_at)
-            values (${id}::uuid, ${JSON.stringify(page)}::jsonb, ${read}::timestamptz)
-            on conflict (party_id) do update set page = excluded.page, built_at = excluded.built_at
-          `);
+              insert into party_page (party_id, page, built_at)
+              values (${id}::uuid, ${JSON.stringify(page)}::jsonb, ${read}::timestamptz)
+              on conflict (party_id) do update set page = excluded.page, built_at = excluded.built_at
+            `);
             built += 1;
           } catch (error) {
             failed += 1;

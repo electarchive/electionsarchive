@@ -373,7 +373,7 @@
       {/if}
     </p>
   </div>
-  <div class="columns-[20rem] gap-x-8">
+  <div class="columns-xs gap-x-8">
     {#each opened.has("holders") ? council.seats : council.seats.slice(0, 12) as seat (seat.key)}
       <div class="grid break-inside-avoid content-start gap-1 pbe-4">
         <h3

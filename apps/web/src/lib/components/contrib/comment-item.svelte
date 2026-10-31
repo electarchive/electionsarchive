@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { CommentView } from "#lib/contrib.js";
   import { enhance } from "$app/forms";
-  import CommentItem from "#lib/components/contrib/comment-item.svelte";
+  import type { CommentView } from "#lib/contrib.js";
   import CommentComposer from "#lib/components/contrib/comment-composer.svelte";
+  import CommentItem from "#lib/components/contrib/comment-item.svelte";
   import Markdown from "#lib/components/markdown.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
@@ -151,7 +151,7 @@
         name="reason"
         bind:value={reason}
         maxlength={500}
-        class="h-8 flex-1 text-sm min-inline-48"
+        class="flex-1 text-sm block-8 min-inline-48"
         aria-label={m.discussion_hide_reason()}
         placeholder={m.discussion_hide_reason()}
       />

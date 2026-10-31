@@ -38,7 +38,7 @@
         })}
       </p>
     </div>
-    <ol class="columns-[20rem] gap-x-8 text-sm">
+    <ol class="columns-xs gap-x-8 text-sm">
       {#each counties.counties as county (county.path ?? county.name)}
         <li
           class="grid break-inside-avoid gap-0.5 border-be border-border/60 py-2 pointer-coarse:py-2.5"

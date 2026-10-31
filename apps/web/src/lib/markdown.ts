@@ -3,7 +3,7 @@ import { fromMarkdown } from "mdast-util-from-markdown";
 import { gfmAutolinkLiteralFromMarkdown } from "mdast-util-gfm-autolink-literal";
 import { gfmAutolinkLiteral } from "micromark-extension-gfm-autolink-literal";
 
-export const HANDLE = /^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$/u;
+export const HANDLE = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/u;
 
 export function parseMarkdown(body: string): Root {
   return fromMarkdown(body, {
@@ -32,7 +32,7 @@ export type Piece =
   | { kind: "reference"; value: string };
 
 const TOKENS =
-  /(?<![\w@/])@([a-z0-9](?:[a-z0-9-]{0,28}[a-z0-9])?)(?![\w-])|(?<![\w&/])#([1-9]\d{3,8})(?!\w)/giu;
+  /(?<![\w@/])@([a-z0-9](?:[a-z0-9-]{0,28}[a-z0-9])?)(?![\w-])|(?<![\w&/])#([1-9]\d{3,8})\b/giu;
 
 export function piecesOf(text: string) {
   const pieces: Array<Piece> = [];

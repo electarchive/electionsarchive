@@ -434,17 +434,17 @@ export function apportion(
     ({ level }) => level === "list" || level === "party",
   );
   for (const { id, votes, group } of entries) {
-    const inCoalition = group != null && standing.has(group);
-    const passes = listThresholds
+    const isInCoalition = group != null && standing.has(group);
+    const isPasses = listThresholds
       .filter(
         ({ members }) =>
-          members === "any" || (members === "coalition") === inCoalition,
+          members === "any" || (members === "coalition") === isInCoalition,
       )
       .every(
         (threshold) =>
           isExempt(threshold, id, group) || reaches(votes, threshold.percent),
       );
-    if (passes) qualified.add(id);
+    if (isPasses) qualified.add(id);
   }
   for (const threshold of listThresholds) {
     if (!threshold.bestLoser) continue;

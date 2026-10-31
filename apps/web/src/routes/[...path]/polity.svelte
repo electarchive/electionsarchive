@@ -14,9 +14,9 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Bar from "./bar.svelte";
-  import PlaceMap from "./map.svelte";
   import Holders from "./holders.svelte";
   import Known from "./known.svelte";
+  import PlaceMap from "./map.svelte";
   import Offices from "./offices.svelte";
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";

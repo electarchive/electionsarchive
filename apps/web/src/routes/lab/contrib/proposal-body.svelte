@@ -1,9 +1,9 @@
 <script lang="ts">
+  import Proof from "#lib/components/contrib/proof.svelte";
   import { cn } from "#lib/utils.js";
   import type { Column, Proposal } from "./data.js";
   import { copy } from "./copy.js";
   import { columns, counties, integer, page, surnames } from "./data.js";
-  import Proof from "#lib/components/contrib/proof.svelte";
   import Scan from "./scan.svelte";
 
   const {

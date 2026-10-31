@@ -523,10 +523,10 @@ export async function chamber(path: string) {
     shared.length === 0
       ? null
       : await db.execute<{ id: string }>(sql`
-          select distinct entity_id::text as id from name
-          where entity_id = any(${sql.param(shared.filter((key) => /^[\da-f-]{36}$/u.test(key)))}::uuid[])
-            and kind in ('official', 'english') and not (lower_inf(valid) and upper_inf(valid))
-        `);
+        select distinct entity_id::text as id from name
+        where entity_id = any(${sql.param(shared.filter((key) => /^[\da-f-]{36}$/u.test(key)))}::uuid[])
+          and kind in ('official', 'english') and not (lower_inf(valid) and upper_inf(valid))
+      `);
   const renamed = new Set((naming?.rows ?? []).map((row) => row.id));
   const kin = new Map(
     groups.flatMap((group) => {
@@ -1447,7 +1447,7 @@ export async function atlasPage(path: string, search: URLSearchParams) {
       slug = held;
       break;
     }
-    const anchor = path.slice(held.path.length + 1).split("/")[0] ?? "";
+    const anchor = path.slice(held.path.length + 1).split("/", 1)[0] ?? "";
     const id =
       anchor === "" ? undefined : await representative(held.entity_id, anchor);
     if (id != null) {
