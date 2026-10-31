@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { PROJECT } from "#lib/constants.js";
 import { auth } from "#lib/server/auth.js";
-import { db } from "#lib/server/db/index.js";
+import { authDb } from "#lib/server/db/index.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
 
 const codes: Record<number, string> = {
@@ -47,7 +47,7 @@ export async function keyOwner(headers: Headers) {
     throw new ORPCError("UNAUTHORIZED");
   }
   const userId = verified.key.referenceId;
-  const { rows } = await db.execute<{ banned: boolean }>(sql`
+  const { rows } = await authDb.execute<{ banned: boolean }>(sql`
     select coalesce(banned, false) and (ban_expires is null or ban_expires > now()) as banned
     from users where id = ${userId}
   `);

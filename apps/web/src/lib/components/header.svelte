@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import {
     ArrowLeftRightIcon,
+    AtSignIcon,
     GaugeIcon,
     KeyRoundIcon,
     LayoutDashboardIcon,
@@ -140,20 +142,30 @@
             <DropdownMenu.Separator />
             <DropdownMenu.Item>
               {#snippet child({ props })}
-                <a {...props} href={resolve("/workbench")}>
-                  <LayoutDashboardIcon class="text-muted-foreground" />
-                  {m.workbench_nav()}
+                <a {...props} href={resolve("/settings/username")}>
+                  <AtSignIcon class="text-muted-foreground" />
+                  {m.username_nav()}
                 </a>
               {/snippet}
             </DropdownMenu.Item>
-            <DropdownMenu.Item>
-              {#snippet child({ props })}
-                <a {...props} href={resolve("/settings/keys")}>
-                  <KeyRoundIcon class="text-muted-foreground" />
-                  {m.keys_nav()}
-                </a>
-              {/snippet}
-            </DropdownMenu.Item>
+            {#if !READ_ONLY}
+              <DropdownMenu.Item>
+                {#snippet child({ props })}
+                  <a {...props} href={resolve("/workbench")}>
+                    <LayoutDashboardIcon class="text-muted-foreground" />
+                    {m.workbench_nav()}
+                  </a>
+                {/snippet}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item>
+                {#snippet child({ props })}
+                  <a {...props} href={resolve("/settings/keys")}>
+                    <KeyRoundIcon class="text-muted-foreground" />
+                    {m.keys_nav()}
+                  </a>
+                {/snippet}
+              </DropdownMenu.Item>
+            {/if}
             <form method="POST" action={resolve("/sign-out")}>
               <DropdownMenu.Item class="inline-full">
                 {#snippet child({ props })}

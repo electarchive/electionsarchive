@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -1240,11 +1241,13 @@
       <h1 class="title" data-scope-title>
         {(drilled ? heading : contest.name).replaceAll("—", "\u2060—")}
       </h1>
-      <EditPanel
-        entity={id}
-        label={contest.name}
-        title={m.edit_title_contest()}
-      />
+      {#if !READ_ONLY}
+        <EditPanel
+          entity={id}
+          label={contest.name}
+          title={m.edit_title_contest()}
+        />
+      {/if}
     </div>
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
@@ -1649,7 +1652,7 @@
       <h2 id="locator-title" class="text-[0.8125rem] font-bold">
         {m.map_view_map()}
       </h2>
-      <div class="max-inline-[48rem]">
+      <div class="max-inline-3xl">
         {@render locator(locating)}
       </div>
     </section>
@@ -2124,7 +2127,7 @@
     <h2 id="key-channels" class="mbe-1.5 text-[0.8125rem] font-bold">
       {m.channels_title()}
     </h2>
-    <table class="w-full max-w-3xl border-collapse text-sm">
+    <table class="border-collapse text-sm inline-full max-inline-3xl">
       <thead>
         <tr class="text-start text-xs text-muted-foreground">
           <th class="py-1 pe-3 text-start font-normal">

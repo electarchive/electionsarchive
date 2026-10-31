@@ -1,4 +1,5 @@
 import type { AnyProcedure } from "@orpc/server";
+import { READ_ONLY } from "$app/env/public";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import {
@@ -11,7 +12,7 @@ import { ValibotToJsonSchemaConverter } from "@orpc/valibot";
 import * as v from "valibot";
 import { roles } from "#lib/server/contrib.js";
 import { keyOwner } from "#lib/server/rpc/keyed.js";
-import { router } from "#lib/server/rpc/router.js";
+import { contributions, router } from "#lib/server/rpc/router.js";
 
 type Access = "read" | "key" | "admin";
 
@@ -112,6 +113,17 @@ const TOOLS: Array<{
 const INSTRUCTIONS =
   "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source. Look before you write: find IDs with search and the get_ tools, read a record's editable rows with get_editable, and check find_open_proposals so you don't duplicate work. Every change is a proposal: describe_ops explains the payload, ops, and evidence; draft_proposal compiles and checks it; submit_proposal sends it to review. Cite evidence for every fact, quoting the source exactly. Write tools need an API key from https://electionsarchive.com/settings/keys, sent as x-api-key or a Bearer token.";
 
+const READING =
+  "electionsarchive.com holds election results, candidates, parties, chambers, and boundaries, with every number traced to a source. Find IDs with search, then read records with the get_ tools. This preview is read-only: no tool changes the archive.";
+
+const closed = new Set<unknown>(
+  READ_ONLY
+    ? Object.values(contributions).flatMap((family): Array<unknown> =>
+        Object.values(family),
+      )
+    : [],
+);
+
 const converter = new ValibotToJsonSchemaConverter();
 
 const Shape = v.looseObject({
@@ -121,27 +133,29 @@ const Shape = v.looseObject({
   ),
 });
 
-const catalog = TOOLS.map((tool) => {
-  const input = tool.procedure["~orpc"].inputSchemas?.at(-1);
-  const converted: unknown =
-    input == null ? {} : converter.convert(input, "input")[0];
-  const schema = v.parse(Shape, converted);
-  const strings = new Set(
-    Object.entries(schema.properties)
-      .filter(([, property]) => property.type === "string")
-      .map(([name]) => name),
-  );
-  return {
-    ...tool,
-    strings,
-    listing: {
-      name: tool.name,
-      description:
-        tool.description ?? getOpenAPIMeta(tool.procedure)?.summary ?? "",
-      inputSchema: { ...schema, type: "object" as const },
-    },
-  };
-});
+const catalog = TOOLS.filter((tool) => !closed.has(tool.procedure)).map(
+  (tool) => {
+    const input = tool.procedure["~orpc"].inputSchemas?.at(-1);
+    const converted: unknown =
+      input == null ? {} : converter.convert(input, "input")[0];
+    const schema = v.parse(Shape, converted);
+    const strings = new Set(
+      Object.entries(schema.properties)
+        .filter(([, property]) => property.type === "string")
+        .map(([name]) => name),
+    );
+    return {
+      ...tool,
+      strings,
+      listing: {
+        name: tool.name,
+        description:
+          tool.description ?? getOpenAPIMeta(tool.procedure)?.summary ?? "",
+        inputSchema: { ...schema, type: "object" as const },
+      },
+    };
+  },
+);
 
 const byName = new Map(catalog.map((tool) => [tool.name, tool]));
 
@@ -183,7 +197,10 @@ function explain(message: string, data: unknown) {
 function build(headers: Headers, isStaff: boolean) {
   const server = new Server(
     { name: "electionsarchive", title: "electionsarchive.com", version: "1" },
-    { capabilities: { tools: {} }, instructions: INSTRUCTIONS },
+    {
+      capabilities: { tools: {} },
+      instructions: READ_ONLY ? READING : INSTRUCTIONS,
+    },
   );
   server.setRequestHandler(ListToolsRequestSchema, () => ({
     tools: catalog

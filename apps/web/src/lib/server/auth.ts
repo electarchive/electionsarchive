@@ -21,7 +21,7 @@ import { Resend } from "resend";
 import { EMAIL_FROM, PROJECT } from "#lib/constants.js";
 import { m } from "#lib/paraglide/messages.js";
 import { baseLocale, getLocale, locales } from "#lib/paraglide/runtime.js";
-import { db } from "#lib/server/db/index.js";
+import { authDb } from "#lib/server/db/index.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
 
 const authErrorMessages = {
@@ -94,7 +94,7 @@ const rateLimit = createRateLimiter({
 });
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
+  database: drizzleAdapter(authDb, {
     provider: "pg",
     usePlural: true,
     transaction: true,

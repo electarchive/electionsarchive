@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -200,12 +201,16 @@
             icon: ArrowLeftRightIcon,
             run: () => void goto(resolve("/compare")),
           },
-          {
-            key: "workbench",
-            label: m.cmd_workbench(),
-            icon: BlocksIcon,
-            run: () => void goto(resolve("/workbench")),
-          },
+          ...(READ_ONLY
+            ? []
+            : [
+                {
+                  key: "workbench",
+                  label: m.cmd_workbench(),
+                  icon: BlocksIcon,
+                  run: () => void goto(resolve("/workbench")),
+                },
+              ]),
         ],
       },
       {

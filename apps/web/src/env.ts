@@ -1,7 +1,7 @@
 import { defineEnvVars } from "@sveltejs/kit/env";
 import * as v from "valibot";
 
-const oauth = v.optional(
+const optional = v.optional(
   v.pipe(
     v.string(),
     v.transform((value) => (value === "" ? undefined : value)),
@@ -10,7 +10,6 @@ const oauth = v.optional(
 
 export const variables = defineEnvVars({
   DATABASE_URL: {
-    static: true,
     schema: v.pipe(
       v.string(),
       v.url("Invalid URL"),
@@ -18,43 +17,34 @@ export const variables = defineEnvVars({
     ),
     description: "PostgreSQL connection string",
   },
+  AUTH_DATABASE_URL: {
+    schema: optional,
+    description:
+      "PostgreSQL connection string for accounts and sessions, when they live apart from the archive",
+  },
   BETTER_AUTH_SECRET: {
-    static: true,
     schema: v.pipe(v.string(), v.nonEmpty()),
     description: "Better Auth secret key",
   },
   BETTER_AUTH_URL: {
-    static: true,
     schema: v.pipe(v.string(), v.url("Invalid URL")),
     description: "Better Auth URL",
   },
-  GITHUB_CLIENT_ID: {
-    static: true,
-    schema: oauth,
-    description: "GitHub OAuth client ID",
-  },
+  GITHUB_CLIENT_ID: { schema: optional, description: "GitHub OAuth client ID" },
   GITHUB_CLIENT_SECRET: {
-    static: true,
-    schema: oauth,
+    schema: optional,
     description: "GitHub OAuth client secret",
   },
-  GOOGLE_CLIENT_ID: {
-    static: true,
-    schema: oauth,
-    description: "Google OAuth client ID",
-  },
+  GOOGLE_CLIENT_ID: { schema: optional, description: "Google OAuth client ID" },
   GOOGLE_CLIENT_SECRET: {
-    static: true,
-    schema: oauth,
+    schema: optional,
     description: "Google OAuth client secret",
   },
   RESEND_API_KEY: {
-    static: true,
     schema: v.pipe(v.string(), v.nonEmpty()),
     description: "Resend API key",
   },
   REDIS_URL: {
-    static: true,
     schema: v.pipe(
       v.string(),
       v.url("Invalid URL"),
@@ -63,9 +53,14 @@ export const variables = defineEnvVars({
     description: "Redis connection string",
   },
   BASE_URL: {
-    static: true,
     public: true,
     schema: v.pipe(v.string(), v.url("Invalid URL")),
     description: "Base URL",
+  },
+  READ_ONLY: {
+    public: true,
+    schema: (value) => value === "1" || value === "true",
+    description:
+      "Serve the archive read-only: sign-in and usernames stay on, and every other write is refused",
   },
 });

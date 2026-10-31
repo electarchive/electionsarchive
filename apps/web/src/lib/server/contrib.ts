@@ -18,7 +18,7 @@ import {
   labelTypes,
   schemes,
 } from "#lib/contrib.js";
-import { db } from "#lib/server/db/index.js";
+import { authDb, db } from "#lib/server/db/index.js";
 
 const notify = sql`select pg_notify('proposal_job', json_build_object('kind', 'queued')::text)`;
 
@@ -60,7 +60,7 @@ export async function roles(userId: string | undefined) {
   if (userId == null) {
     return { admin: false, reviewer: false };
   }
-  const { rows } = await db.execute<{ role: "admin" | "reviewer" }>(sql`
+  const { rows } = await authDb.execute<{ role: "admin" | "reviewer" }>(sql`
     select role from user_role where user_id = ${userId}
   `);
   return {

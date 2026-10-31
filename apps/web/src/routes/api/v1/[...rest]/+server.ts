@@ -1,8 +1,8 @@
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import { router } from "#lib/server/rpc/router.js";
+import { served } from "#lib/server/rpc/router.js";
 import type { RequestHandler } from "./$types";
 
-const handler = new OpenAPIHandler(router);
+const handler = new OpenAPIHandler(served);
 
 const handle: RequestHandler = async ({ request }) => {
   const { response } = await handler.handle(request, {

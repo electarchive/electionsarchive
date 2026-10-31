@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { CopyIcon } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -17,7 +18,7 @@
           electionsarchive: {
             type: "http",
             url: mcp,
-            headers: { "x-api-key": "ea_…" },
+            ...(READ_ONLY ? {} : { headers: { "x-api-key": "ea_…" } }),
           },
         },
       },
@@ -32,12 +33,19 @@
       url: rest,
       link: { href: "/api/v1/openapi.json", label: m.agents_openapi() },
     },
-    {
-      label: m.agents_skill(),
-      url: skill,
-      link: { href: "/agents/skill.md", label: m.agents_open() },
-    },
+    ...(READ_ONLY
+      ? []
+      : [
+          {
+            label: m.agents_skill(),
+            url: skill,
+            link: { href: "/agents/skill.md", label: m.agents_open() },
+          },
+        ]),
   ]);
+  const lede = $derived(
+    READ_ONLY ? m.agents_lede_read_only() : m.agents_lede(),
+  );
   const count = new Intl.NumberFormat("en");
   const rules = $derived([
     { title: m.agents_rule_evidence_title(), body: m.agents_rule_evidence() },
@@ -61,7 +69,7 @@
 
 <svelte:head>
   <title>{m.agents_title()} | {m.wordmark()}</title>
-  <meta name="description" content={m.agents_lede()} />
+  <meta name="description" content={lede} />
 </svelte:head>
 
 <main class="mx-auto grid gap-12 px-4 pbs-6 pbe-24 max-inline-3xl max-sm:px-3">
@@ -70,7 +78,7 @@
     <p
       class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch]"
     >
-      {m.agents_lede()}
+      {lede}
     </p>
   </header>
 
@@ -112,26 +120,32 @@
   <section class="grid gap-4" aria-labelledby="setup">
     <h2 id="setup" class="heading">{m.agents_setup()}</h2>
     <ol class="grid border-bs">
-      <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
-        <span class="font-figures text-lg font-semibold">1</span>
-        <div class="grid gap-1.5">
-          <h3 class="font-semibold">{m.agents_step_key_title()}</h3>
-          <p class="text-sm text-pretty text-muted-foreground">
-            {m.agents_step_key()}
-          </p>
-          <div>
-            <Button size="sm" href="/settings/keys"
-              >{m.agents_step_key_link()}</Button
-            >
+      {#if !READ_ONLY}
+        <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
+          <span class="font-figures text-lg font-semibold">1</span>
+          <div class="grid gap-1.5">
+            <h3 class="font-semibold">{m.agents_step_key_title()}</h3>
+            <p class="text-sm text-pretty text-muted-foreground">
+              {m.agents_step_key()}
+            </p>
+            <div>
+              <Button size="sm" href="/settings/keys"
+                >{m.agents_step_key_link()}</Button
+              >
+            </div>
           </div>
-        </div>
-      </li>
+        </li>
+      {/if}
       <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
-        <span class="font-figures text-lg font-semibold">2</span>
+        <span class="font-figures text-lg font-semibold"
+          >{READ_ONLY ? 1 : 2}</span
+        >
         <div class="grid gap-1.5 min-inline-0">
           <h3 class="font-semibold">{m.agents_step_connect_title()}</h3>
           <p class="text-sm text-pretty text-muted-foreground">
-            {m.agents_step_connect()}
+            {READ_ONLY
+              ? m.agents_step_connect_read_only()
+              : m.agents_step_connect()}
           </p>
           <div class="grid gap-1.5 pbs-1">
             <div class="flex items-center justify-between gap-3">
@@ -147,31 +161,35 @@
           </div>
         </div>
       </li>
-      <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
-        <span class="font-figures text-lg font-semibold">3</span>
-        <div class="grid gap-1.5">
-          <h3 class="font-semibold">{m.agents_step_skill_title()}</h3>
-          <p class="text-sm text-pretty text-muted-foreground">
-            {m.agents_step_skill()}
-          </p>
-        </div>
-      </li>
-      <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
-        <span class="font-figures text-lg font-semibold">4</span>
-        <div class="grid gap-1.5">
-          <h3 class="font-semibold">{m.agents_step_review_title()}</h3>
-          <p class="text-sm text-pretty text-muted-foreground">
-            {m.agents_step_review()}
-          </p>
-        </div>
-      </li>
+      {#if !READ_ONLY}
+        <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
+          <span class="font-figures text-lg font-semibold">3</span>
+          <div class="grid gap-1.5">
+            <h3 class="font-semibold">{m.agents_step_skill_title()}</h3>
+            <p class="text-sm text-pretty text-muted-foreground">
+              {m.agents_step_skill()}
+            </p>
+          </div>
+        </li>
+        <li class="grid grid-cols-[2rem_1fr] gap-x-3 border-be py-4">
+          <span class="font-figures text-lg font-semibold">4</span>
+          <div class="grid gap-1.5">
+            <h3 class="font-semibold">{m.agents_step_review_title()}</h3>
+            <p class="text-sm text-pretty text-muted-foreground">
+              {m.agents_step_review()}
+            </p>
+          </div>
+        </li>
+      {/if}
     </ol>
   </section>
 
   <section class="grid gap-4" aria-labelledby="tools">
     <div class="grid gap-1">
       <h2 id="tools" class="heading">{m.agents_tools()}</h2>
-      <p class="text-sm text-muted-foreground">{m.agents_tools_note()}</p>
+      <p class="text-sm text-muted-foreground">
+        {READ_ONLY ? m.agents_tools_note_read_only() : m.agents_tools_note()}
+      </p>
     </div>
     <table class="border-bs text-sm inline-full">
       <thead class="max-sm:sr-only">
@@ -208,17 +226,21 @@
     </table>
   </section>
 
-  <section class="grid gap-4" aria-labelledby="rules">
-    <h2 id="rules" class="heading">{m.agents_rules()}</h2>
-    <dl class="grid border-bs">
-      {#each rules as rule (rule.title)}
-        <div
-          class="grid gap-x-4 gap-y-1 border-be py-3 sm:grid-cols-[8rem_1fr]"
-        >
-          <dt class="font-semibold">{rule.title}</dt>
-          <dd class="text-sm text-pretty text-muted-foreground">{rule.body}</dd>
-        </div>
-      {/each}
-    </dl>
-  </section>
+  {#if !READ_ONLY}
+    <section class="grid gap-4" aria-labelledby="rules">
+      <h2 id="rules" class="heading">{m.agents_rules()}</h2>
+      <dl class="grid border-bs">
+        {#each rules as rule (rule.title)}
+          <div
+            class="grid gap-x-4 gap-y-1 border-be py-3 sm:grid-cols-[8rem_1fr]"
+          >
+            <dt class="font-semibold">{rule.title}</dt>
+            <dd class="text-sm text-pretty text-muted-foreground">
+              {rule.body}
+            </dd>
+          </div>
+        {/each}
+      </dl>
+    </section>
+  {/if}
 </main>

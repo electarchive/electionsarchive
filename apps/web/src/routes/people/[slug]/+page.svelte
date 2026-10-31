@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { READ_ONLY } from "$app/env/public";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
@@ -438,11 +439,13 @@
               class="block-3.5 inline-3.5"
             />{m.versus_action()}</a
           >
-          <EditPanel
-            entity={data.id}
-            label={person.name}
-            title={m.edit_title_person()}
-          />
+          {#if !READ_ONLY}
+            <EditPanel
+              entity={data.id}
+              label={person.name}
+              title={m.edit_title_person()}
+            />
+          {/if}
         </div>
       </div>
       <p

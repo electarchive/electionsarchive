@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { m } from "#lib/paraglide/messages.js";
 import { auth } from "#lib/server/auth.js";
-import { db } from "#lib/server/db/index.js";
+import { authDb } from "#lib/server/db/index.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 const KEY_LIMIT = 10;
@@ -33,7 +33,7 @@ const Created = v.object({
 });
 
 async function keys(userId: string) {
-  const { rows } = await db.execute<{
+  const { rows } = await authDb.execute<{
     id: string;
     name: string | null;
     start: string | null;
