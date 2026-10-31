@@ -595,6 +595,26 @@ KY_FILES = {
     date(2002, 11, 5): "MF-429/2002-11/ky-2002-general-county-results.txt",
     date(2004, 11, 2): "MF-429/2004-11/ky-2004-general-county-results.txt",
 }
+MN_PAGE = "https://electionresults.sos.mn.gov/{}"
+MN_FILES = {
+    date(2006, 11, 7): (
+        "MF-442/mn-2006-general-constitutional-amendment-by-county.txt",
+        "Dedicate motor vehicle sales tax revenue to transportation",
+    ),
+    date(2008, 11, 4): (
+        "MF-442/mn-2008-general-constitutional-amendment-by-county.txt",
+        "Clean Water, Land and Legacy Amendment",
+    ),
+}
+MN_COUNTIES = (
+    "Aitkin Anoka Becker Beltrami Benton Big_Stone Blue_Earth Brown Carlton Carver Cass Chippewa Chisago Clay Clearwater "
+    "Cook Cottonwood Crow_Wing Dakota Dodge Douglas Faribault Fillmore Freeborn Goodhue Grant Hennepin Houston Hubbard "
+    "Isanti Itasca Jackson Kanabec Kandiyohi Kittson Koochiching Lac_qui_Parle Lake Lake_of_the_Woods Le_Sueur Lincoln "
+    "Lyon McLeod Mahnomen Marshall Martin Meeker Mille_Lacs Morrison Mower Murray Nicollet Nobles Norman Olmsted "
+    "Otter_Tail Pennington Pine Pipestone Polk Pope Ramsey Red_Lake Redwood Renville Rice Rock Roseau Scott Sherburne "
+    "Sibley St._Louis Stearns Steele Stevens Swift Todd Traverse Wabasha Wadena Waseca Washington Watonwan Wilkin "
+    "Winona Wright Yellow_Medicine"
+).split()
 TN_PAGE = "https://sos.tn.gov/elections/election-results#{}"
 TN_FILES = {
     date(2002, 11, 5): ("MF-430/2002-11/amendments.pdf", ("1", "2")),
@@ -1355,6 +1375,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "MN": (
+        "Minnesota Secretary of State",
+        "Constitutional amendment results by county",
+        "https://electionresults.sos.mn.gov/",
+    ),
     "TN": (
         "Tennessee Secretary of State",
         "Certified county results",
@@ -1745,6 +1770,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, MS_2003, suffix=".pdf")
     for day, file in KY_FILES.items():
         store_manual(KY_PAGE.format(day.year), file, "text/plain")
+    for day, (file, _) in MN_FILES.items():
+        store_manual(MN_PAGE.format(f"{day.year}"), file, "text/plain")
     for day, (file, _) in TN_FILES.items():
         store_manual(TN_PAGE.format(day.year), file, "application/pdf")
     raw.fetch(SOURCE, IA_2008, suffix=".pdf")
@@ -4484,6 +4511,42 @@ def tennessee() -> list[dict[str, object]]:
     return rows
 
 
+def minnesota() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, (file, title) in MN_FILES.items():
+        url = MN_PAGE.format(f"{day.year}")
+        tallies: dict[str, dict[str, int]] = {}
+        for line in raw.cached(SOURCE, url).path.read_text().splitlines():
+            cells = line.split(";")
+            if len(cells) < 16:
+                continue
+            side = cells[7].split()[0]
+            county = MN_COUNTIES[int(cells[1]) - 1].replace("_", " ")
+            sides = tallies.setdefault(county, {})
+            sides[side] = int(cells[13])
+            sides["total"] = int(cells[15])
+            sides["sum"] = sides.get("sum", 0) + int(cells[13])
+        if len(tallies) != 87 or any(sides["sum"] != sides["total"] for sides in tallies.values()):
+            raise ValueError(f"{file}: {len(tallies)} counties, or sides that do not add up to the printed totals")
+        rows.extend(
+            {
+                "state": "MN",
+                "day": day,
+                "number": "1",
+                "label": "Constitutional Amendment 1",
+                "url": url,
+                "county": county,
+                "answer": answer,
+                "votes": sides[answer if answer == "YES" else "NO"],
+                "title": title,
+                "kind": "Legislative Referendum",
+            }
+            for county, sides in tallies.items()
+            for answer in ("YES", "NO")
+        )
+    return rows
+
+
 def kansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, file, number, title, printed in KS_2022:
@@ -5114,6 +5177,7 @@ def parse() -> None:
             *michigan(),
             *michigan_old(),
             *kansas(),
+            *minnesota(),
             *north_carolina(),
             *west_virginia(),
             *wisconsin(),

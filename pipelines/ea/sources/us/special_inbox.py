@@ -22,10 +22,11 @@ ARKANSAS_RUNOFFS = {
     "Republican": "https://www.sos.arkansas.gov/elections/research/election-results#runoff24-rep.zip",
 }
 SOUTH_CAROLINA = {
-    "2013-03-19": ("https://www.enr-scvotes.org/SC/45550/#detail.xls", "2013-03-19/detailxls (3).zip"),
-    "2013-03-22": ("https://www.enr-scvotes.org/SC/46058/#detail.xls", "2013-03-22/detailxls (4).zip"),
-    "2017-05-02": ("https://www.enr-scvotes.org/SC/68939/#detail.xls", "2017-05-02/detailxls (2).zip"),
-    "2017-05-16": ("https://www.enr-scvotes.org/SC/69738/#detail.xls", "2017-05-16/detailxls.zip"),
+    "2013-03-19": ("https://www.enr-scvotes.org/SC/45550/#detail.xls", "MF-289/2013-03-19/detailxls (3).zip"),
+    "2013-03-22": ("https://www.enr-scvotes.org/SC/46058/#detail.xls", "MF-289/2013-03-22/detailxls (4).zip"),
+    "2013-04-02": ("https://www.enr-scvotes.org/SC/46107/116099/#detail.xls", "MF-448/detailxls.zip"),
+    "2017-05-02": ("https://www.enr-scvotes.org/SC/68939/#detail.xls", "MF-289/2017-05-02/detailxls (2).zip"),
+    "2017-05-16": ("https://www.enr-scvotes.org/SC/69738/#detail.xls", "MF-289/2017-05-16/detailxls.zip"),
 }
 OHIO = {
     "2005-06-14": {
@@ -132,7 +133,7 @@ FILES = {
     ARKANSAS: INBOX / "2001" / "2001_Special_Primary_US_Congress_District_3.pdf",
     ARKANSAS_RUNOFFS["Democratic"]: INBOX / "2001" / "runoff24-dem.zip",
     ARKANSAS_RUNOFFS["Republican"]: INBOX / "2001" / "runoff24-rep.zip",
-    **{url: INBOX.parent / "MF-289" / name for url, name in SOUTH_CAROLINA.values()},
+    **{url: INBOX.parent / name for url, name in SOUTH_CAROLINA.values()},
     **{
         OHIO_URL.format(day, name): INBOX.parent / "MF-290" / day / name
         for day, files in OHIO.items()
@@ -334,7 +335,7 @@ def rows() -> list[dict[str, object]]:
             if hit is None or (day == "2013-03-19" and hit[2] == "REP"):
                 continue
             names = [cell for cell in table[1][2:] if cell]
-            runoff = day == "2017-05-16"
+            runoff = day in ("2013-04-02", "2017-05-16")
             block = []
             sums = [0] * len(names)
             for line in table[3:]:
