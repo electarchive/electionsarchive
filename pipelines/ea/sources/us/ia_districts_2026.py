@@ -292,6 +292,26 @@ COUNTIES = {
         "https://taylorcounty.iowa.gov/wp-content/uploads/2026/10/Precinct-1-Sample-Ballots-2026-General-Election.pdf",
         "Taylor County Auditor",
     ),
+    "Hardin": (
+        "hardin",
+        "https://www.hardincountyia.gov/2026-General-election-0",
+        "Hardin County Auditor",
+    ),
+    "Kossuth": (
+        "kossuth",
+        "https://www.kossuthcounty.iowa.gov/general-election-notice-2026/",
+        "Kossuth County Auditor",
+    ),
+    "Montgomery": (
+        "montgomery",
+        "https://montgomerycountyia.gov/docview.aspx?docid=51747",
+        "Montgomery County Auditor",
+    ),
+    "Pocahontas": (
+        "pocahontas",
+        "https://pocahontascounty.iowa.gov/wp-content/uploads/2026-General-Election-Sample-Ballots.pdf",
+        "Pocahontas County Auditor",
+    ),
     "Van Buren": (
         "van-buren",
         "https://www.vanburencounty.iowa.gov/Candidate%20Names%20%26%20Addresses.pdf",
@@ -608,6 +628,33 @@ BOARDS = (
         ("Ann McBride", "Kayla Scheuers", "Michael William Thomas", "Quenton Dodson"),
     ),
     ("Van Buren", f"Van Buren County {SWCD}", "Commissioner", 2, False, ("Dennis Gratz", "Rodney Peck")),
+    ("Hardin", f"Hardin County {SWCD}", "Commissioner", 2, False, ("Jo Duncan", "John Everly")),
+    ("Kossuth", f"Kossuth County {SWCD}", "Commissioner", 2, False, ("Luke Snyder", "Nancy Bohl Bormann")),
+    (
+        "Kossuth",
+        "Kossuth County Hospital",
+        "Trustee",
+        3,
+        False,
+        ("Brenda Bormann", "Greg Penning", "Conley Nelson"),
+    ),
+    (
+        "Montgomery",
+        "Montgomery County Public Hospital",
+        "Trustee",
+        4,
+        False,
+        ("Christopher Keith Gilbert", "Jill Carter Bergstrom", "Jeffrey Focht", "Jason Poston"),
+    ),
+    (
+        "Montgomery",
+        f"Montgomery County {SWCD}",
+        "Commissioner",
+        2,
+        False,
+        ("Maggie McQuown", "Kirk Baird", "Roger Cerven"),
+    ),
+    ("Pocahontas", f"Pocahontas County {SWCD}", "Commissioner", 2, False, ("Ronald Lampe", "Brian Hoffman")),
 )
 
 
