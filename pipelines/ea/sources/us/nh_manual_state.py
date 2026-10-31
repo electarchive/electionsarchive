@@ -278,7 +278,7 @@ def arbitrated(frame: pl.DataFrame, vision: bool = True) -> pl.DataFrame:
         clean=pl.col("clean") & ~pl.col("index").is_in(list(swaps)),
     )
     if vision:
-        frame = second(nh_manual.verified(frame.drop("added", "agrees", strict=False)))
+        frame = second(nh_manual.verified(frame.drop("added", "agrees", "printed_right", strict=False)))
     frame = nh_manual.blocks(frame.drop("added", "agrees", "printed_right", strict=False))
     cut = pl.col("digits").str.starts_with(",").any().over("year", "stage", "group") & ~(
         pl.col("resolved").any().over("year", "stage", "group") if vision else pl.lit(False)
@@ -293,6 +293,11 @@ def plain(name: str) -> str:
 def split(name: str, town: str | None) -> tuple[str, str | None]:
     if town and re.fullmatch(r"(?i)(?:r|d|l|lib|ind)(?:\s*(?:and|&)\s*(?:r|d|l|lib|ind))*", town) and "," in name:
         name, town = (part.strip() for part in name.rsplit(",", 1))
+    if town and not re.search(r"[A-Za-z]{3}", town):
+        town = None
+    title = re.fullmatch(r"(Jr|Sr|II|III|IV)\.?\s+(.+)", town or "")
+    if title:
+        name, town = f"{name}, {title[1]}{'.' if title[1] in ('Jr', 'Sr') else ''}", title[2]
     found = TOWN.fullmatch(name) if town is None else None
     if found and not re.fullmatch(r"(?:Jr|Sr|II|III|IV)", found[2]):
         return found[1], found[2]
@@ -310,6 +315,23 @@ def suffix(office: str, district: str | None, stage: str, side: str | None) -> s
     if office == "state senate" and district:
         return f"senate:{district}:g" if stage == "general" else f"senate:{district}:{side}p"
     return None
+
+
+def named(office: str, district: str | None, year: int, side: str) -> tuple[str, str]:
+    party = {"r": "Republican", "d": "Democratic"}[side]
+    lower = party.lower()
+    if office == "state senate":
+        return (
+            f"{year} New Hampshire Senate {party} primary, District {district}",
+            f"state-senate-{district}-{lower}-primary",
+        )
+    if office == "us house":
+        ordinal = {"1": "1st", "2": "2nd"}[str(district)]
+        return (
+            f"{year} U.S. House {party} primary in New Hampshire's {ordinal} congressional district",
+            f"house-{district}-{lower}",
+        )
+    return f"{year} U.S. Senate {party} primary in New Hampshire", f"senate-{lower}"
 
 
 def emit():
@@ -338,7 +360,7 @@ def emit():
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Hampshire's governor and State Senate returns, 1970-2014, read from the statewide summaries in the Secretary of State's Manual for the General Court",
+            summary="New Hampshire's governor, U.S. Senate, U.S. House, and State Senate returns, primaries and generals, 1970-2014, read from the statewide summaries in the Secretary of State's Manual for the General Court",
             polity="US-NH",
         )
         contests: dict[tuple[int, str, str], tuple[str, object]] = {}
@@ -348,6 +370,7 @@ def emit():
         ).fetchall():
             month = value[5:7]
             contests[(int(value[:4]), "general" if month == "11" else "primary", value[14:])] = (value, contest)
+        primaries = {year: value[:10] for (year, stage, _), (value, _) in contests.items() if stage == "primary"}
         sources: dict[int, tuple[object, object, object, str]] = {}
         pages: dict[tuple[int, int], object] = {}
         report: dict[str, list[str]] = {}
@@ -357,6 +380,12 @@ def emit():
             tag = f"{year} {stage} {office} {district or ''} {side or ''}".strip()
             wanted = suffix(str(office), district, str(stage), side)
             found = contests.get((int(year), str(stage), wanted or ""))
+            template = None
+            if found is None and stage == "primary" and wanted and side and int(year) in primaries:
+                general = contests.get((int(year), "general", suffix(str(office), district, "general", None) or ""))
+                if general is not None:
+                    template = general[1]
+                    found = (f"{primaries[int(year)]}:NH:{wanted}", None)
             if found is None:
                 report.setdefault("no contest", []).append(tag)
                 continue
@@ -368,32 +397,55 @@ def emit():
                 report.setdefault("lines do not add to the printed total", []).append(tag)
                 continue
             default = conn.execute(
-                """select rs.id, c.pipeline, rs.election_id, min(v.count_round), array_agg(distinct v.unit_k)
+                """select rs.id, c.pipeline, rs.election_id, rs.supersedes_id, array_agg(distinct v.unit_k)
                    from result_set rs join changeset c on c.id = rs.changeset_id
                    left join result_value v on v.result_set_k = rs.k
-                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2, 3""",
-                [contest],
+                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2, 3, 4""",
+                [template or contest],
             ).fetchone()
-            if default is not None and default[1] not in SUPERSEDES:
+            if template is not None:
+                election = conn.execute(
+                    "select entity_id from external_id where scheme = 'us.election' and value = %s",
+                    [f"{primaries[int(year)]}:NH:primary"],
+                ).fetchone()
+                if default is None or election is None:
+                    report.setdefault("no unit", []).append(tag)
+                    continue
+                election = election[0]
+                units = [unit for unit in default[4] if unit is not None]
+                if len(units) != 1:
+                    report.setdefault("general has more than one unit", []).append(tag)
+                    continue
+                unit = conn.execute("select id from reporting_unit where k = %s", [units[0]]).fetchone()[0]
+                default = None
+            elif default is not None and default[1] not in (*SUPERSEDES, SOURCE):
                 report.setdefault(f"kept {default[1]}", []).append(tag)
                 continue
-            election = (
-                default[2]
-                if default
-                else conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
-            )
-            first = (default[3] if default else None) or 1
-            if default is not None:
+            own = default is not None and default[1] == SOURCE
+            if template is None and default is not None:
+                election = default[2]
                 units = [unit for unit in default[4] if unit is not None]
                 if len(units) != 1:
                     report.setdefault("default has more than one unit", []).append(tag)
                     continue
                 unit = conn.execute("select id from reporting_unit where k = %s", [units[0]]).fetchone()[0]
-            elif office in ("governor", "us senate"):
+            elif template is None and office in ("governor", "us senate"):
+                election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
                 unit = cs.unit("us.state", "33")
-            else:
+            elif template is None:
                 report.setdefault("no unit", []).append(tag)
                 continue
+            people: list[tuple[str, object]] = (
+                conn.execute(
+                    """select o.ballot_label, c.person_id from contest_option o
+                       join candidacy c on c.option_id = o.id and c.role = 'head'
+                       where o.contest_id = %s and o.kind = 'candidate'""",
+                    [template],
+                ).fetchall()
+                if template is not None
+                else []
+            )
+            known: dict[str, tuple[str, object]] = {}
             options = conn.execute(
                 """select o.id::text, o.ballot_label, o.kind,
                           coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k
@@ -433,6 +485,16 @@ def emit():
                 elif hits:
                     failed = f"{name} matches {[hit[1] for hit in hits]}"
                     break
+                elif template is not None:
+                    friends = [p for p in people if plain(p[0]) == plain(name)] or [
+                        p for p in people if nh_manual.person(p[0]) == mine
+                    ]
+                    if len(friends) == 1:
+                        known[name] = (name if nh_manual.CLEAN.fullmatch(name) else friends[0][0], friends[0][1])
+                    elif not nh_manual.CLEAN.fullmatch(name) or len(mine[0]) < 3:
+                        failed = f"{name} is not a clean name"
+                        break
+                    fresh.append(name)
                 elif stage == "primary" or writein:
                     matched[name] = None
                 elif town and nh_manual.CLEAN.fullmatch(name) and len(mine[0]) > 2:
@@ -461,6 +523,34 @@ def emit():
             if failed:
                 report.setdefault("candidate mismatch", []).append(f"{tag} {external}: {failed}")
                 continue
+            if template is not None:
+                contest = cs.key("us.contest", external)
+                shape = dict(
+                    zip(
+                        ("kind", "office_id", "body_id", "district_area_id", "seat_id", "boundary_set_id")
+                        + ("magnitude", "electoral_system_id", "term"),
+                        conn.execute(
+                            """select kind, office_id, body_id, district_area_id, seat_id, boundary_set_id, magnitude,
+                                      electoral_system_id, term from contest where id = %s""",
+                            [template],
+                        ).fetchone(),
+                        strict=True,
+                    )
+                )
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    **shape,
+                    party_scope_id=cs.key("us.party", {"r": "republican-party", "d": "democratic-party"}[str(side)]),
+                    round_number=1,
+                    default_result_kind="counted",
+                )
+                text, path = named(str(office), district, int(year), str(side))
+                if contest in cs.minted:
+                    cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+                cs.add("slug", path=f"us/nh/{primaries[int(year)]}-primary/{path}", entity_id=contest)
+                report.setdefault("contest created from the manual", []).append(tag)
             added = []
             if None in matched.values():
                 if not others:
@@ -469,7 +559,7 @@ def emit():
                     others.append(str(option))
                 matched = {name: hit or others[0] for name, hit in matched.items()}
             for name in fresh:
-                option = cs.key("us.option", f"{external}:{slug(name)}")
+                option = cs.key("us.option", f"{external}:{slug(known.get(name, (name,))[0])}")
                 added.append(("candidate", name, option))
                 matched[name] = str(option)
             ours: dict[str, int] = {}
@@ -502,27 +592,33 @@ def emit():
                 if kind == "others":
                     cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
                     continue
-                human = cs.key(f"{SOURCE}.person", f"{external}:{slug(name)}")
-                cs.add("person", id=human)
-                cs.add("name", entity_id=human, text=name, lang="en", kind="official", is_preferred=True)
+                label, human = known.get(name, (name, None))
+                if human is None:
+                    human = cs.key(
+                        f"{SOURCE}.person", f"{external.rsplit(':', 1)[0] if template else external}:{slug(name)}"
+                    )
+                    if human in cs.minted:
+                        cs.add("person", id=human)
+                        cs.add("name", entity_id=human, text=name, lang="en", kind="official", is_preferred=True)
                 cs.add(
                     "contest_option",
                     id=option,
                     contest_id=contest,
                     kind="candidate",
                     ballot_position=len(options) + offset + 1,
-                    ballot_label=name,
+                    ballot_label=label,
                 )
                 cs.add(
                     "candidacy",
-                    id=cs.key("us.candidacy", f"{external}:{slug(name)}:head"),
+                    id=cs.key("us.candidacy", f"{external}:{slug(label)}:head"),
                     person_id=human,
                     option_id=option,
                     role="head",
-                    ballot_name=name,
+                    ballot_name=label,
                     is_independent=False,
                 )
-                report.setdefault("option added from the manual", []).append(f"{tag} {name}")
+                if template is None:
+                    report.setdefault("option added from the manual", []).append(f"{tag} {name}")
             if int(year) not in sources:
                 path = nh_manual.pdf(int(year))
                 artifact = None
@@ -549,7 +645,7 @@ def emit():
                 sources[int(year)] = (source, cs.artifact(artifact, source), path, artifact.sha256)
             source, artifact_id, path, sha = sources[int(year)]
             result_set = cs.key(f"{SOURCE}.result_set", external)
-            if default is not None:
+            if default is not None and not own:
                 old = dict(
                     zip(
                         COLUMNS,
@@ -569,13 +665,20 @@ def emit():
                 kind="counted",
                 status="active",
                 source_id=source,
-                supersedes_id=default[0] if default else None,
+                supersedes_id=default[3] if own else default[0] if default else None,
                 is_default=True,
                 completeness=1,
             )
             cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
             for option, kind, seats in declared:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
+            if (
+                template is not None
+                and ranked
+                and ranked[0][0] > 0
+                and (len(ranked) == 1 or ranked[0][0] > ranked[1][0])
+            ):
+                cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="won", seats=None)
             for option, votes in ours.items():
                 mine = rows.filter(pl.col("name").is_in([name for name, hit in matched.items() if hit == option]))
                 first_page = int(mine["page"][0])
@@ -600,7 +703,7 @@ def emit():
                         "option_id": option,
                         "channel": 0,
                         "measure": 1,
-                        "count_round": first,
+                        "count_round": 0,
                         "flags": nh_manual.DIGITIZED | (nh_manual.DERIVED if mine.height > 1 else 0),
                         "value": votes,
                         "page_id": str(pages[(int(year), first_page)]),
