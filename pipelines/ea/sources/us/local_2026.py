@@ -2109,6 +2109,12 @@ for fips, county in {
         "https://www.nvsos.gov/sos/elections/election-information/2026-election-information",
         "nv/certified.pdf",
     )
+NE_SOURCES["OR-41055-county"] = (
+    "Sherman County Clerk",
+    "November 3, 2026 General Election: County Commissioner Position 2 and Treasurer",
+    "https://www.shermancountyor.gov/422/Current-Election",
+    "or/sherman_county.html",
+)
 NE_SOURCES["AR-05119"] = (
     "Pulaski County Board of Election Commissioners",
     "Notice of Election, November 3, 2026 General Election",
@@ -8993,7 +8999,8 @@ def parse() -> None:
                 "office": row.get("office_name") or "",
                 "area": row.get("constituency_area") or "",
                 "mint": row.get("ward_mint") == "1",
-                "whole": row["key"] == "MA" and "County Commissioner" in row["contest"],
+                "whole": row["key"] in ("MA", "OR-41055-county")
+                and bool(re.search(r"County (Commissioner|Treasurer)", row["contest"])),
                 "district": row.get("district") or "",
             }
         )
