@@ -292,6 +292,11 @@ WA_BILLS = {"2901": "53", "2969": "51"}
 WA_RESULTS = "https://results.vote.wa.gov/results/"
 WA_DATES = ("20071106", "20081104", "20091103", "20101102", "20111108", "20121106", "20221108")
 DERIVED_HAND = {
+    (date(2022, 11, 8), "A"): (
+        "Constitutional Amendment A",
+        "Legislature's authority to call special sessions",
+        "Legislative Referendum",
+    ),
     (date(2012, 11, 6), "1185"): (
         "Initiative 1185",
         "Concerning tax and fee increases imposed by state government",
@@ -676,9 +681,7 @@ TX_2022_MEASURES = {
     "2": ("Increase in the school homestead exemption to $40,000", "Legislative Referendum", True),
 }
 MS_2004_MEASURES = {"1": ("Definition of marriage", "Legislative Referendum", True)}
-IA_2022_MEASURES = {
-    "1": ("Right to keep and bear arms, with strict scrutiny review", "Legislative Referendum", True)
-}
+IA_2022_MEASURES = {"1": ("Right to keep and bear arms, with strict scrutiny review", "Legislative Referendum", True)}
 VT_2002_MEASURES = {"4": ("Mandatory retirement age for judges", "Legislative Referendum", True)}
 WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
 WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
@@ -856,6 +859,18 @@ KS_2010 = "https://kssos.org/elections/10elec/2010_General_Election_Results.pdf"
 KS_2010_TOTALS = {"1": (720102, 95957), "2": (503143, 302966)}
 KS_GAPS = {(date(2022, 8, 2), "1", "YES"): -3, (date(2022, 8, 2), "1", "NO"): -16}
 UT_2007 = "https://vote.utah.gov/wp-content/uploads/2023/09/2007Muni_Special.pdf"
+UT_2022 = (
+    "https://vote.utah.gov/wp-content/uploads/2022/12/Signed-2022-General-Election-State-Canvass-Certification.pdf"
+)
+UT_2022_FILE = "MF-494/Signed-2022-General-Election-State-Canvass-Certification.pdf"
+UT_2022_A = (
+    (1487, 708), (12244, 6220), (25101, 13863), (3961, 2402), (240, 154), (69354, 43759), (3931, 1798),
+    (2502, 1203), (1210, 864), (2957, 1249), (9823, 6103), (3328, 1087), (2183, 1069), (3250, 1520),
+    (3132, 1617), (449, 234), (606, 335), (220466, 124785), (2895, 2053), (6016, 3259), (4557, 2623),
+    (11836, 5974), (14175, 6519), (6643, 3018), (117429, 70568), (8328, 4076), (41400, 22172), (852, 506),
+    (45012, 27144),
+)  # fmt: skip
+UT_2022_A_TOTAL = (356882, 625367)
 UT_FILES = {
     date(2000, 11, 7): "2000Gen.pdf",
     date(2002, 11, 5): "2002Gen.pdf",
@@ -1867,7 +1882,11 @@ SD_SCANS = {
     "sd-measures-2012": "https://sdsos.gov/docs/2012ElectionReturnsBooklet.pdf",
 }
 WY_2012 = {
-    "A": ("Health care freedom: a constitutional right of citizens to make their own health care decisions", "Legislative Referendum", True),
+    "A": (
+        "Health care freedom: a constitutional right of citizens to make their own health care decisions",
+        "Legislative Referendum",
+        True,
+    ),
     "B": ("Right to hunt, fish, and trap", "Legislative Referendum", True),
     "C": ("Authority of district court commissioners", "Legislative Referendum", False),
 }
@@ -2440,6 +2459,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, MD + path, suffix=Path(path).suffix)
             time.sleep(1)
     raw.fetch(SOURCE, UT_2007, suffix=".pdf")
+    store_manual(UT_2022, UT_2022_FILE, "application/pdf")
     for number in MS_2011:
         raw.fetch(SOURCE, MS.format(number), suffix=".pdf")
     raw.fetch(SOURCE, MS_2003, suffix=".pdf")
@@ -5797,7 +5817,10 @@ def tennessee() -> list[dict[str, object]]:
         cells[0]: [int(cell) for cell in cells[1:]]
         for cells in (line.split("\t") for line in table.read_text().splitlines())
     }
-    if len(counties) != 95 or tuple(sum(values[index] for values in counties.values()) for index in range(4)) != printed:
+    if (
+        len(counties) != 95
+        or tuple(sum(values[index] for values in counties.values()) for index in range(4)) != printed
+    ):
         raise ValueError(f"{table.name}: counties do not add up to the printed state totals")
     for index, (number, title) in enumerate(
         (("1", "Safe prisons and humane treatment of prisoners"), ("2", "Rights of crime victims"))
@@ -6069,6 +6092,28 @@ def michigan_old() -> list[dict[str, object]]:
             for column, answer in ((3, "YES"), (4, "NO"))
         )
     return rows
+
+
+def utah_2022() -> list[dict[str, object]]:
+    if len(UT_2022_A) != len(UT_COUNTIES) or tuple(sum(side) for side in zip(*UT_2022_A, strict=True)) != (
+        UT_2022_A_TOTAL[1],
+        UT_2022_A_TOTAL[0],
+    ):
+        raise ValueError("UT 2022 Amendment A counties do not sum to the printed total")
+    return [
+        {
+            "state": "UT",
+            "day": date(2022, 11, 8),
+            "number": "A",
+            "label": "Constitutional Amendment A",
+            "url": UT_2022,
+            "county": county,
+            "answer": answer,
+            "votes": value,
+        }
+        for county, (against, yes) in zip(UT_COUNTIES, UT_2022_A, strict=True)
+        for answer, value in (("YES", yes), ("NO", against))
+    ]
 
 
 def utah() -> list[dict[str, object]]:
@@ -6551,9 +6596,7 @@ def south_dakota_2022_june() -> list[dict[str, object]]:
 
 
 def ohio_2022() -> list[dict[str, object]]:
-    sheet = (
-        fastexcel.read_excel(raw.cached(SOURCE, OH_2022).path).load_sheet(0, header_row=None).to_polars().rows()
-    )
+    sheet = fastexcel.read_excel(raw.cached(SOURCE, OH_2022).path).load_sheet(0, header_row=None).to_polars().rows()
     (total,) = [row for row in sheet if row[0] == "Total"]
     counties = [row for row in sheet[4:] if row[0] is not None]
     if len(counties) != 88 or [sum(int(row[side]) for row in counties) for side in (6, 7)] != [
@@ -6883,6 +6926,7 @@ def parse() -> None:
             *kentucky(),
             *tennessee(),
             *utah(),
+            *utah_2022(),
             *wyoming(),
             *district_2014(),
             *south_carolina(),
@@ -6924,6 +6968,7 @@ def parse() -> None:
             ("LA", 2022),
             ("OR", 2022),
             ("UT", 2012),
+            ("UT", 2022),
             ("MD", 2022),
             ("SC", 2022),
             ("AL", 2022),
