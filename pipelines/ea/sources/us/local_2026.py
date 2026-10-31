@@ -6051,6 +6051,27 @@ for key, publisher, title, url, local in (
         "ks/doniphan_notice.doc",
     ),
     (
+        "OR-41021-county",
+        "Gilliam County Clerk",
+        "2026 Candidate Filings, November 3, 2026 General Election",
+        "https://www.gilliamcountyor.gov/government/offices/county_clerk/elections/2026_candidate_filings.php",
+        "or/gilliam_filings.html",
+    ),
+    (
+        "OR-41055-county",
+        "Sherman County Clerk",
+        "Current Election, November 3, 2026 General Election",
+        "https://www.shermancountyor.gov/422/Current-Election",
+        "or/sherman_current_election.html",
+    ),
+    (
+        "OR-41059-county",
+        "Umatilla County Elections",
+        "Contest and candidate listing for the November 3, 2026 general election",
+        "https://www.umatillacounty.gov/departments/elections/general-election/contest-and-candidate-listing-for-the-november-3-2026-general-election",
+        "or/umatilla_candidates.html",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
