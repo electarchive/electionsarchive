@@ -22,6 +22,7 @@ TITLE = "Election results center"
 TITLE_OFFICE = "Justice of the Supreme Court"
 ELECTIONS = {
     date(2008, 11, 4): (4, f"{date(2008, 11, 4)}:WV", "general", 2),
+    date(2010, 11, 2): (6, f"{date(2010, 11, 2)}:WV", "general", 1),
     date(2012, 11, 6): (13, f"{date(2012, 11, 6)}:WV", "general", 2),
     date(2016, 5, 10): (22, f"{date(2016, 5, 10)}:WV:primary", "primary", 1),
 }
