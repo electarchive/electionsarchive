@@ -12,7 +12,9 @@ CA		WATER STORAGE	landowner	Only title holders vote; general election in March o
 AZ		ELECTRICAL DIST|ELECTRIC DIST	landowner	Directors chosen by property-taxpayer and acreage vote	Ariz. Rev. Stat. § 48-1713	https://www.azleg.gov/ars/48/01713.htm
 AZ		AUTHORITY|PUBLIC POWER AGENCY	appointed	Joint powers body governed by member-agency appointees	Ariz. Rev. Stat. § 11-952	https://www.azleg.gov/ars/11/00952.htm
 AZ	local fire protection		november	Fire district board elected at the November general election of even-numbered years	Ariz. Rev. Stat. § 48-802	https://www.azleg.gov/ars/48/00802.htm
-AZ	irrigation		november	Qualified electors elect directors each November	Ariz. Rev. Stat. § 48-2922	https://www.azleg.gov/ars/48/02922.htm
+AZ		IRRIGATION WATER DELIV|WATER DELIVERY DIST|IWDD|IRRIGATION WATER DIST	landowner	Three trustees elected biennially on the third Wednesday of November by landowners, one vote per one-fifth acre	Ariz. Rev. Stat. § 48-3444	https://www.azleg.gov/ars/48/03444.htm
+AZ		AGRICULTURAL IMPROVEMENT	other_date	Agricultural improvement district directors elected at the regular October election	Ariz. Rev. Stat. § 48-2315	https://www.azleg.gov/ars/48/02315.htm
+AZ		IRRIGATION (AND )?(DRAINAGE )?DIST|IRRIGATION & DRAINAGE	other_date	Directors elected by the district's own election on the second Tuesday after the first Monday of November (November 10, 2026), from petition candidates filed with the district board	Ariz. Rev. Stat. § 48-3011	https://www.azleg.gov/ars/48/03011.htm
 ID	cemeteries		other_date	Commissioners elected in odd-numbered years	Idaho Code § 27-111	https://legislature.idaho.gov/statutesrules/idstat/Title27/T27CH1/SECT27-111/
 ID	local fire protection		other_date	Commissioners elected in November of odd-numbered years	Idaho Code § 31-1410	https://legislature.idaho.gov/statutesrules/idstat/Title31/T31CH14/SECT31-1410/
 ID	parks and recreation		other_date	Directors elected in November of odd-numbered years	Idaho Code § 31-4306	https://legislature.idaho.gov/statutesrules/idstat/Title31/T31CH43/SECT31-4306/
