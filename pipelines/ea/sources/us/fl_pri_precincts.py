@@ -149,9 +149,7 @@ def parse() -> None:
             chamber=pl.concat_str("kind", "party", separator=":"),
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
-        .filter(
-            (pl.col("measure") > 0) & ~pl.col("candidate").str.contains(r"^(TIMES COUNTED|NUMBER OF PRECINCTS)")
-        )
+        .filter((pl.col("measure") > 0) & ~pl.col("candidate").str.contains(r"^(TIMES COUNTED|NUMBER OF PRECINCTS)"))
         .group_by("day", "chamber", "district", "code", "county_code", "candidate", "measure")
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .with_columns(

@@ -40,9 +40,7 @@ def emit() -> Path:
                     continue
                 person = cs.key("us.person", f"{SOURCE}:{tail}:{slug(candidate)}")
                 cs.add("person", id=person)
-                cs.add(
-                    "name", entity_id=person, text=candidate, lang="en", kind="official", is_preferred=True
-                )
+                cs.add("name", entity_id=person, text=candidate, lang="en", kind="official", is_preferred=True)
                 cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=candidate)
                 cs.add(
                     "candidacy",

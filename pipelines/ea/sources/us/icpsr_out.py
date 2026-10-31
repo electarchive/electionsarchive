@@ -1,6 +1,6 @@
 import os
-from uuid import uuid7
 from pathlib import Path
+from uuid import uuid7
 
 from ea.changeset import Changeset
 from ea.store import connect
@@ -33,9 +33,7 @@ def emit() -> Path | None:
 
 
 def retire_sources(conn) -> Path | None:
-    sources = conn.execute(
-        "select id from source where license ilike '%%ICPSR%%' order by id"
-    ).fetchall()
+    sources = conn.execute("select id from source where license ilike '%%ICPSR%%' order by id").fetchall()
     if not sources:
         print("no sources licensed from ICPSR remain")
         return None
@@ -60,7 +58,16 @@ def retire_sources(conn) -> Path | None:
     names = [d.name for d in conn.execute("select * from source_artifact limit 0").description]
     for row in artifacts:
         record = dict(zip(names, row))
-        cs.add("row_drop", id=uuid7(), reason=REASON, relation="source_artifact", key={c: record[c] if record[c] is None or isinstance(record[c], (int, str)) else str(record[c]) for c in columns})
+        cs.add(
+            "row_drop",
+            id=uuid7(),
+            reason=REASON,
+            relation="source_artifact",
+            key={
+                c: record[c] if record[c] is None or isinstance(record[c], (int, str)) else str(record[c])
+                for c in columns
+            },
+        )
     for (source,) in sources:
         cs.add("entity_retirement", entity_id=source, reason=REASON)
     return cs.write()
