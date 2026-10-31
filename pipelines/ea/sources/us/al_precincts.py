@@ -81,6 +81,27 @@ def xml_sheets(content: bytes) -> list[list[list[str]]]:
     return sheets
 
 
+COURTS = (
+    ("chief-justice-of-the-supreme-court", r"CHIEF JUSTICE"),
+    ("justice-of-the-supreme-court", r"SUPREME|ASSOC(?:IATE)? JUSTICE"),
+    ("judge-of-the-court-of-civil-appeals", r"CIVIL APPEALS"),
+    ("judge-of-the-court-of-criminal-appeals", r"CRIM(?:INAL|\.)? APPEALS"),
+)
+LOCAL_COURT = r"COUNTY|CO\.|CIRCUIT|CIR |DISTR|DIST\.|PROBATE|JUDICIAL"
+
+
+def judicial(name: str) -> str | None:
+    if re.search(LOCAL_COURT, name):
+        return None
+    for office, pattern in COURTS:
+        if re.search(pattern, name):
+            if office.startswith("chief"):
+                return office
+            place = re.search(r"(?:PLACE|PLA|PL)\.?\s*(?:NO\.?|#)?\s*0*(\d)|[ ,](\d)$", name)
+            return f"{office}:place-{place[1] or place[2]}" if place else f"{office}:place-?"
+    return None
+
+
 def contest(title: str) -> tuple[str, int | None] | None:
     name = re.sub(r"\s+", " ", re.sub(r"\(VOTE FOR \d+\)", "", re.sub(r"^FOR ", "", title.strip().upper()))).strip(" ,")
     name = {
@@ -138,6 +159,8 @@ def contest(title: str) -> tuple[str, int | None] | None:
         return f"house:{int(matched[1])}:g", None
     if matched := re.match(r"PUBLIC SERVICE (?:COMMISSION,? (?:PLACE|PL)\.? (?:NO\. )?|PL ?)(\d+)", name):
         return f"public-service-commissioner:place-{matched[1]}", None
+    if office := judicial(name):
+        return office, None
     return None
 
 
@@ -534,7 +557,7 @@ def parse() -> None:
         )
         .filter(pl.col("measure") > 0)
         .group_by("day", "chamber", "district", "kind", "code", "county_code", "candidate", "measure")
-        .agg(pl.col("writein").any(), pl.col("votes").sum())
+        .agg(pl.col("writein").any(), pl.col("votes").sum(), pl.col("party").first())
         .with_columns(
             year=pl.col("day").dt.year().cast(pl.Int32),
             special=pl.lit(False),
@@ -551,7 +574,9 @@ def parse() -> None:
 
 def emit() -> Path:
     year = int(os.environ["AL_YEAR"])
-    frame = pl.read_parquet(PARSED / "precincts.parquet").filter(pl.col("year") == year)
+    frame = pl.read_parquet(PARSED / "precincts.parquet").filter(
+        (pl.col("year") == year) & ~pl.col("chamber").str.contains("justice|judge")
+    )
     with connect() as conn:
         cs = Changeset(
             conn,
