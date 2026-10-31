@@ -6072,20 +6072,6 @@ for key, publisher, title, url, local in (
         "or/umatilla_candidates.html",
     ),
     (
-        "KS-20115-cities",
-        "Marion County Clerk",
-        "Official General Election Ballots, Marion County, November 3, 2026 (sample)",
-        "https://marioncoks.net/DocumentCenter/View/2220",
-        "ks/marion_ballots.pdf",
-    ),
-    (
-        "KS-20013-cities",
-        "Brown County Clerk",
-        "2026 General Candidates List",
-        "https://brcoks.org/DocumentCenter/View/2215/2026-General-Candidates-List",
-        "ks/brown_candidates.pdf",
-    ),
-    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
@@ -9622,7 +9608,7 @@ def parse() -> None:
         for st, geoid, full in (
             gazetteer.filter(
                 pl.col("USPS").is_in(
-                    ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY"]
+                    ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "WY", "NY"]
                 )
                 & (pl.col("FUNCSTAT") == "A")
             )
@@ -9636,12 +9622,12 @@ def parse() -> None:
         claimed = {
             path
             for (path,) in conn.execute(
-                "select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|ks|wy|ny)/[^/]+$'"
+                "select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|wy|ny)/[^/]+$'"
             )
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'KS', 'WY', 'NY')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'WY', 'NY')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -10066,7 +10052,9 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "KS", "WY")
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "WY")
+                        or state == "KS"
+                        and "Township" in str(row["contest"])
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC", "IL")
