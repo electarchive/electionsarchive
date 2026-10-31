@@ -21,6 +21,12 @@ SOURCE = "us.wikipedia_gov_history"
 VERSION = "3"
 PARSED = DATA / "parsed" / f"{SOURCE}-3"
 PARTIAL = {("NY", 1870), ("NY", 1896)}
+SECTIONS = {
+    ("AR", 1948): ("==General election==", "==References=="),
+    ("LA", 1979): ("==Primary election==", "==Runoff election=="),
+}
+NO_OUTCOME = {("LA", 1979)}
+INFOBOX = {("AR", 1990)}
 API = "https://en.wikipedia.org/w/api.php?"
 CHUNK = 20
 
@@ -293,14 +299,63 @@ def fuse(rows: list[dict[str, object]]) -> list[dict[str, object]]:
     return list(folded.values())
 
 
-def read(text: str) -> tuple[list[dict[str, object]], str | None]:
+def results_template(text: str) -> list[dict[str, object]]:
+    begin = re.search(r"\{\{\s*Election results\s*\n", text, re.IGNORECASE)
+    if begin is None:
+        return []
+    body = text[begin.end() : text.find("\n}}", begin.end())]
+    rows: list[dict[str, object]] = []
+    for number in range(1, 30):
+        found = re.search(rf"cand{number}=(.*?)\|party{number}=(.*?)\|votes{number}=(\d+)", body)
+        if found is None:
+            break
+        rows.append(
+            {
+                "name": clean(found[1].replace("'", "")),
+                "party": clean(found[2]),
+                "votes": int(found[3]),
+                "winner": 1 if "'''" in found[1] else 0,
+                "percentage": None,
+            }
+        )
+    return rows
+
+
+def infobox(text: str) -> tuple[list[dict[str, object]], str | None]:
+    rows: list[dict[str, object]] = []
+    for number in range(1, 10):
+        votes = re.search(rf"popular_vote{number}\s*=\s*'*([\d,]+)", text)
+        name = re.search(rf"nominee{number}\s*=\s*(.+)", text)
+        if votes is None or name is None:
+            break
+        percent = re.search(rf"percentage{number}\s*=\s*'*([\d.]+)", text)
+        party = re.search(rf"party{number}\s*=\s*(.+)", text)
+        rows.append(
+            {
+                "name": clean(name[1].replace("'", "")),
+                "party": clean(re.sub(r"\(.*?\)", "", party[1])) if party else None,
+                "votes": int(votes[1].replace(",", "")),
+                "winner": 1 if "'''" in name[1] else 0,
+                "percentage": percent[1] if percent else None,
+            }
+        )
+    listed = sum(int(row["votes"]) for row in rows)
+    if any(
+        row["percentage"] is None or abs(int(row["votes"]) * 100 / listed - float(str(row["percentage"]))) > 0.1
+        for row in rows
+    ):
+        return rows, "infobox percentages do not confirm the rows"
+    return rows, None
+
+
+def read(text: str, skip: bool = True, infobox_only: bool = False) -> tuple[list[dict[str, object]], str | None]:
     boxes: list[tuple[str, int, list[dict[str, object]], str | None]] = []
     for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
         end = re.search(r"\{\{\s*election box end\s*\}\}", text[begin.start() :], re.IGNORECASE)
         body = text[begin.start() : begin.start() + end.end()] if end else text[begin.start() :]
         members = templates(body)
         label = label_of(text, begin.start(), members[0][1] if members else {})
-        if SKIP.search(label):
+        if skip and SKIP.search(label):
             continue
         rows: list[dict[str, object]] = []
         listed, total, turnout = 0, None, None
@@ -348,6 +403,10 @@ def read(text: str) -> tuple[list[dict[str, object]], str | None]:
         boxes = tables(text)
     if not boxes:
         rows, reason = tickets(text)
+        if not rows:
+            rows, reason = results_template(text), None
+        if not rows and infobox_only:
+            rows, reason = infobox(text)
         return (rows, reason) if rows else ([], "no election box")
     label, _, rows, reason = max(boxes, key=lambda box: box[1])
     return rows, reason
@@ -378,10 +437,21 @@ def parse() -> None:
         if asked not in found:
             held.append((f"{year} {state}", "no article"))
             continue
-        rows, reason = read(strip(str(found[asked]["text"])))
+        article = strip(str(found[asked]["text"]))
+        if (state, year) in SECTIONS:
+            first, last = SECTIONS[(state, year)]
+            article = re.sub(
+                r"\{\{(?:efn|sfn)[^{}]*(?:\{\{[^{}]*\}\}[^{}]*)*\}\}",
+                "",
+                article[article.index(first) : article.index(last)],
+            )
+        rows, reason = read(article, skip=(state, year) not in SECTIONS, infobox_only=(state, year) in INFOBOX)
         if not rows:
             held.append((f"{year} {state}", reason or "no rows"))
             continue
+        if (state, year) in NO_OUTCOME:
+            for row in rows:
+                row["winner"] = 0
         if sum(row["winner"] == 1 for row in rows) > 1:
             held.append((f"{year} {state}", "more than one winning row"))
             continue
@@ -710,13 +780,14 @@ def emit() -> Path:
                     totals[option] = votes
                     if winner == 1:
                         declared = option
-            cs.add(
-                "outcome",
-                result_set_id=result_set,
-                option_id=declared if declared is not None else max(totals, key=totals.__getitem__),
-                kind="elected",
-                seats=1,
-            )
+            if (state, year) not in NO_OUTCOME:
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=declared if declared is not None else max(totals, key=totals.__getitem__),
+                    kind="elected",
+                    seats=1,
+                )
             filled += 1
         print(filled, "contests")
         return cs.write()
