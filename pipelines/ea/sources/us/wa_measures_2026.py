@@ -31,6 +31,9 @@ SAMPLE_COUNTY = {
     "Skagit": "53057",
     "Spokane": "53063",
     "Whatcom": "53073",
+    "Adams": "53001",
+    "Asotin": "53003",
+    "Columbia": "53013",
 }
 LOCAL = {
     "https://clark.wa.gov/elections/november-3-2026-general-special-election": "Clark/november_3_2026_general_election-sample_ballot.pdf",
@@ -41,6 +44,7 @@ LOCAL = {
     "https://www.whatcomcounty.us/1574": "Whatcom/11.03.26 Sample Ballot_202609231409027439.pdf",
 }
 MANUAL = DATA / "inbox" / "manual" / "MF-386"
+VOTEWA = DATA / "inbox" / "votewa_2026"
 
 
 def download(url: str, suffix: str = ".html") -> raw.Artifact:
@@ -48,6 +52,16 @@ def download(url: str, suffix: str = ".html") -> raw.Artifact:
         return raw.cached(SOURCE, url)
     except LookupError:
         pass
+    if "votewa.gov" in url:
+        path = VOTEWA / f"m{url.rsplit('/', 1)[1]}.html"
+        return raw.store(
+            SOURCE,
+            url,
+            path.read_bytes(),
+            suffix=".html",
+            retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+            media_type="text/html",
+        )
     if url in LOCAL:
         path = MANUAL / LOCAL[url]
         return raw.store(
@@ -85,7 +99,7 @@ def fetch() -> None:
     for url in details():
         download(url)
     for url in {sample["url"] for sample in SAMPLES}:
-        download(url, ".pdf")
+        download(url, ".html" if "votewa.gov" in url else ".pdf")
 
 
 def parse() -> None:
@@ -201,7 +215,14 @@ def emit() -> Path:
                     )
                 found[key] = (polity_id, area_id, text, path, geoid)
             if key is None and not place.startswith(("City of", "Town of")) and "School District" not in place:
-                home = next((fips for name, fips in SAMPLE_COUNTY.items() if name.lower() in row["url"].lower()), None)
+                home = next(
+                    (
+                        fips
+                        for name, fips in SAMPLE_COUNTY.items()
+                        if name.lower() in (row.get("county") or row["url"]).lower()
+                    ),
+                    None,
+                )
                 county_key = f"us.county:{home}"
                 if home is not None and county_key in found:
                     county, county_area, _, county_path, county_code = found[county_key]
