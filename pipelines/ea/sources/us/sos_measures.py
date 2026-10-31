@@ -1,6 +1,8 @@
+import csv
 import difflib
 import gzip
 import html
+import io
 import itertools
 import json
 import re
@@ -53,17 +55,29 @@ CA_1998 = {
     (date(1998, 6, 2), "225"): ("Limiting Congressional Terms. Proposed U.S. Constitutional Amendment.", "Initiative"),
     (date(1998, 6, 2), "226"): ("Political Contributions by Employees, Union Members, Foreign Entities.", "Initiative"),
     (date(1998, 6, 2), "227"): ("English Language in Public Schools.", "Initiative"),
-    (date(1998, 11, 3), "1A"): ("Class Size Reduction Kindergarten-University Public Education Facilities Bond Act of 1998", "Legislative Referendum"),
+    (date(1998, 11, 3), "1A"): (
+        "Class Size Reduction Kindergarten-University Public Education Facilities Bond Act of 1998",
+        "Legislative Referendum",
+    ),
     (date(1998, 11, 3), "1"): ("Property Taxes: Contaminated Property", "Legislative Referendum"),
     (date(1998, 11, 3), "2"): ("Transportation: Funding", "Legislative Referendum"),
     (date(1998, 11, 3), "3"): ("Partisan Presidential Primary Elections", "Legislative Referendum"),
     (date(1998, 11, 3), "4"): ("Trapping Practices. Bans Use of Specified Traps and Animal Poisons.", "Initiative"),
     (date(1998, 11, 3), "5"): ("Tribal-State Gaming Compacts. Tribal Casinos.", "Initiative"),
-    (date(1998, 11, 3), "6"): ("Criminal Law. Prohibition on Slaughter of Horses and Sale of Horsemeat for Human Consumption.", "Initiative"),
+    (date(1998, 11, 3), "6"): (
+        "Criminal Law. Prohibition on Slaughter of Horses and Sale of Horsemeat for Human Consumption.",
+        "Initiative",
+    ),
     (date(1998, 11, 3), "7"): ("Air Quality Improvement. Tax Credits.", "Initiative"),
-    (date(1998, 11, 3), "8"): ("Public Schools. Permanent Class Size Reduction. Parent-Teacher Councils. Teacher Credentialing. Pupil Suspension for Drug Possession. Chief Inspector's Office.", "Initiative"),
+    (date(1998, 11, 3), "8"): (
+        "Public Schools. Permanent Class Size Reduction. Parent-Teacher Councils. Teacher Credentialing. Pupil Suspension for Drug Possession. Chief Inspector's Office.",
+        "Initiative",
+    ),
     (date(1998, 11, 3), "9"): ("Electric Utilities. Assessments. Bonds.", "Initiative"),
-    (date(1998, 11, 3), "10"): ("State and County Early Childhood Development Programs. Additional Tobacco Surtax.", "Initiative"),
+    (date(1998, 11, 3), "10"): (
+        "State and County Early Childhood Development Programs. Additional Tobacco Surtax.",
+        "Initiative",
+    ),
     (date(1998, 11, 3), "11"): ("Local Sales and Use Taxes - Revenue Sharing", "Legislative Referendum"),
 }
 
@@ -1289,6 +1303,121 @@ AR_BOOKS = {
 AR_SHEETS = {date(2010, 11, 2): "2010_General_Election_Results_-_Fed%2C_State_-_by_Polling_Location.xlsx"}
 AR_PUBLICATIONS = {date(2006, 11, 7): "20070308_ARSOS_2006_Elections_Publication_Final__Revised.xls"}
 AR_VOICES = {date(2008, 11, 4): "Voices%20of%20Ark%202008-WEB2.pdf"}
+AR_TALLY = "https://results.tally-enr.com/results/arkansas/1844/FullDataFile.json"
+AR_TALLY_DAY = date(2022, 11, 8)
+AR_2022 = {
+    "1": ("Convene the General Assembly in Extraordinary Session by Written Proclamation", "Legislative Referendum"),
+    "2": ("Constitutional Amendment and Ballot Initiative Reform Amendment", "Legislative Referendum"),
+    "3": ("Arkansas Religious Freedom Amendment", "Legislative Referendum"),
+    "4": ("Adult Use of Cannabis and Licensed Commercial Cannabis Facilities", "Initiative"),
+}
+IN = "https://indianavoters.in.gov/ENRHistorical/ExportReferendumsToCSV?year={}&sortBy=&sortDir=&county={}"
+IN_DAYS = (date(2004, 11, 2), date(2010, 11, 2), date(2024, 11, 5))
+IN_QUESTIONS = {
+    "Article 10, Section 1": ("1", "Property Tax Exemptions"),
+    "Article 6, Section 2": ("2", "Terms of County Officers"),
+    "Article 5, Section 10": ("3", "Line of Gubernatorial Succession"),
+    "SHALL PROPERTY TAXES BE LIMITED": ("1", "Property Tax Cap"),
+    "remove the state superintendent": (
+        "1",
+        "Remove Superintendent of Public Instruction from the Line of Gubernatorial Succession",
+    ),
+}
+IN_ALIAS = "LA PORTE"
+IN_COUNTIES = (
+    "ADAMS",
+    "ALLEN",
+    "BARTHOLOMEW",
+    "BENTON",
+    "BLACKFORD",
+    "BOONE",
+    "BROWN",
+    "CARROLL",
+    "CASS",
+    "CLARK",
+    "CLAY",
+    "CLINTON",
+    "CRAWFORD",
+    "DAVIESS",
+    "DEARBORN",
+    "DECATUR",
+    "DEKALB",
+    "DELAWARE",
+    "DUBOIS",
+    "ELKHART",
+    "FAYETTE",
+    "FLOYD",
+    "FOUNTAIN",
+    "FRANKLIN",
+    "FULTON",
+    "GIBSON",
+    "GRANT",
+    "GREENE",
+    "HAMILTON",
+    "HANCOCK",
+    "HARRISON",
+    "HENDRICKS",
+    "HENRY",
+    "HOWARD",
+    "HUNTINGTON",
+    "JACKSON",
+    "JASPER",
+    "JAY",
+    "JEFFERSON",
+    "JENNINGS",
+    "JOHNSON",
+    "KNOX",
+    "KOSCIUSKO",
+    "LAGRANGE",
+    "LAKE",
+    "LAPORTE",
+    "LAWRENCE",
+    "MADISON",
+    "MARION",
+    "MARSHALL",
+    "MARTIN",
+    "MIAMI",
+    "MONROE",
+    "MONTGOMERY",
+    "MORGAN",
+    "NEWTON",
+    "NOBLE",
+    "OHIO",
+    "ORANGE",
+    "OWEN",
+    "PARKE",
+    "PERRY",
+    "PIKE",
+    "PORTER",
+    "POSEY",
+    "PULASKI",
+    "PUTNAM",
+    "RANDOLPH",
+    "RIPLEY",
+    "RUSH",
+    "SCOTT",
+    "SHELBY",
+    "SPENCER",
+    "ST. JOSEPH",
+    "STARKE",
+    "STEUBEN",
+    "SULLIVAN",
+    "SWITZERLAND",
+    "TIPPECANOE",
+    "TIPTON",
+    "UNION",
+    "VANDERBURGH",
+    "VERMILLION",
+    "VIGO",
+    "WABASH",
+    "WARREN",
+    "WARRICK",
+    "WASHINGTON",
+    "WAYNE",
+    "WELLS",
+    "WHITE",
+    "WHITLEY",
+)
 SD = "https://sdsos.gov/elections-voting/assets/Archive/Prior%20to%202026/"
 SD_SHEETS = {date(2000, 11, 7): "00SWgenres.xls"}
 SD_PRECINCTS = {date(2010, 11, 2): "pastelections_general2010_bqpct.xls"}
@@ -1401,6 +1530,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "IN": (
+        "Indiana Election Division",
+        "Historical election results: referendums",
+        "https://indianavoters.in.gov/ENRHistorical/ElectionResults",
+    ),
     "MN": (
         "Minnesota Secretary of State",
         "Constitutional amendment results by county",
@@ -1748,6 +1882,11 @@ def fetch() -> None:
         time.sleep(1)
     for name in AR_SHEETS.values():
         raw.fetch(SOURCE, AR + name, suffix=".xlsx")
+    raw.fetch(SOURCE, AR_TALLY, suffix=".json")
+    for day in IN_DAYS:
+        for county in ("", *IN_COUNTIES, IN_ALIAS):
+            raw.fetch(SOURCE, IN.format(day.year, county.replace(" ", "+")), suffix=".csv")
+            time.sleep(0.3)
     for name in AR_PUBLICATIONS.values():
         raw.fetch(SOURCE, AR + name, suffix=".xls")
     try:
@@ -2141,7 +2280,9 @@ def california() -> list[dict[str, object]]:
                 sheet_lines = sheet.splitlines()
                 if "State Ballot Measures" in text.stdout and "State Ballot Measures" not in sheet:
                     continue
-                found = sorted((match.start(), match.group(1)) for line in sheet_lines for match in heading.finditer(line))
+                found = sorted(
+                    (match.start(), match.group(1)) for line in sheet_lines for match in heading.finditer(line)
+                )
                 lines.append("\f" + ",".join(prop for _, prop in found))
                 lines.extend(sheet_lines)
             for line in lines:
@@ -3158,6 +3299,49 @@ def nevada() -> list[dict[str, object]]:
     return rows
 
 
+def indiana() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day in IN_DAYS:
+        tallies: dict[str, dict[str, list[int]]] = {}
+        for county in ("", *IN_COUNTIES, IN_ALIAS):
+            url = IN.format(day.year, county.replace(" ", "+"))
+            for row in csv.reader(io.StringIO(raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig"))):
+                if (
+                    row[0] == "Statewide"
+                    and row[1].startswith(f"{day:%B} {day.day}, {day.year} General")
+                    and "Amendment" in row[2]
+                ):
+                    question = next(key for key in IN_QUESTIONS if key in row[3])
+                    tallies.setdefault(question, {})["LAPORTE" if county == IN_ALIAS else county] = [
+                        int(row[4]),
+                        int(row[5]),
+                    ]
+        for question, by_county in tallies.items():
+            number, title = IN_QUESTIONS[question]
+            total = by_county.pop("")
+            if len(by_county) != 92 or [sum(sides[side] for sides in by_county.values()) for side in (0, 1)] != total:
+                raise ValueError(f"{day} Public Question {number}: counties do not add up to the statewide total")
+            rows.extend(
+                {
+                    "state": "IN",
+                    "day": day,
+                    "number": number,
+                    "label": f"Public Question {number}",
+                    "url": IN.format(
+                        day.year, (IN_ALIAS if county == "LAPORTE" and day.year < 2024 else county).replace(" ", "+")
+                    ),
+                    "county": county.title(),
+                    "answer": answer,
+                    "votes": sides[side],
+                    "title": title,
+                    "kind": "Legislative Referendum",
+                }
+                for county, sides in by_county.items()
+                for side, answer in enumerate(("YES", "NO"))
+            )
+    return rows
+
+
 def arkansas() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day, name in AR_BOOKS.items():
@@ -3329,6 +3513,39 @@ def arkansas() -> list[dict[str, object]]:
                 "votes": votes,
             }
             for race, county, answer, votes in sheet.iter_rows()
+        )
+    tally = json.loads(raw.cached(SOURCE, AR_TALLY).path.read_text())
+    for contest in tally["ContestData"]:
+        if not (found := re.match(r"Issue No\. (\d): ", contest["ContestName"])):
+            continue
+        number = found[1]
+        counted: dict[str, list[int]] = {}
+        for unit in contest["Counties"]:
+            sides = counted.setdefault(unit["CountyName"].title(), [0, 0])
+            for candidate in unit["Candidates"]:
+                sides[candidate["Name"] == "AGAINST"] += candidate["TotalVotes"]
+        total = {candidate["Name"]: candidate["TotalVotes"] for candidate in contest["Candidates"]}
+        if (
+            len(counted) != 75
+            or sum(sides[0] for sides in counted.values()) != total["FOR"]
+            or sum(sides[1] for sides in counted.values()) != total["AGAINST"]
+        ):
+            raise ValueError(f"{AR_TALLY} Issue {number}: counties do not add up to the reported totals")
+        rows.extend(
+            {
+                "state": "AR",
+                "day": AR_TALLY_DAY,
+                "number": number,
+                "label": f"Issue {number}",
+                "url": AR_TALLY,
+                "county": county,
+                "answer": answer,
+                "votes": sides[side],
+                "title": AR_2022[number][0],
+                "kind": AR_2022[number][1],
+            }
+            for county, sides in counted.items()
+            for side, answer in enumerate(("YES", "NO"))
         )
     return rows
 
@@ -5207,6 +5424,7 @@ def parse() -> None:
             *maryland(),
             *nebraska(),
             *arkansas(),
+            *indiana(),
             *south_dakota(),
             *missouri(),
             *montana(),
@@ -5353,7 +5571,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Statewide ballot measures by county, 2000–2011, from state election offices' official returns",
+            summary="Statewide ballot measures by county, 2000–2024, from state election offices' official returns",
             polity="US",
         )
 
@@ -5490,14 +5708,14 @@ def emit() -> Path:
         elections = dict(
             conn.execute(
                 """select x.value, x.entity_id from external_id x join election e on e.id = x.entity_id
-                   where x.scheme = 'us.election' and e.date_from between '2000-01-01' and '2011-12-31'"""
+                   where x.scheme = 'us.election' and e.date_from between '2000-01-01' and '2026-12-31'"""
             ).fetchall()
         )
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%'").fetchall()}
         paths = dict(
             conn.execute(
                 """select x.value, s.path from external_id x join slug s on s.entity_id = x.entity_id and s.is_current
-                   where x.scheme = 'us.election' and x.value ~ '^20(0[0-9]|1[01])-'"""
+                   where x.scheme = 'us.election' and x.value ~ '^20[0-2][0-9]-'"""
             ).fetchall()
         )
         held = dict(
