@@ -1818,7 +1818,6 @@ NJ-34031-clifton	Clifton City Member of Council	0	Joseph Kolodziej	Nonpartisan	P
 NJ-34031-clifton	Clifton City Member of Council	0	Fred Barnes	Nonpartisan	Passaic	7
 NJ-34031-clifton	Clifton City Member of Council	0	Matt Mullins	Nonpartisan	Passaic	7
 NJ-34031-clifton	Clifton City Member of Council	0	Rosie Pino	Nonpartisan	Passaic	7
-CA-06093-siskiyou-cities	Siskiyou County Board of Education Area 4	0	Michelle O’Gorman	Nonpartisan	Siskiyou	1	
 CA-06093-siskiyou-cities	Dunsmuir Joint Union High School District	0	Amanda Johnson	Nonpartisan	Siskiyou	2	
 CA-06093-siskiyou-cities	Siskiyou Union High School District Area 2	0	Kristen DeBortoli-Riccomini	Nonpartisan	Siskiyou	2	
 CA-06093-siskiyou-cities	Siskiyou Union High School District Area 2	0	Alfred H. Lugo	Nonpartisan	Siskiyou	2	
@@ -1912,10 +1911,6 @@ CA-06057-nevada-cities	Pleasant Ridge Union School District	0	Jason Erman	Nonpar
 CA-06057-nevada-cities	Pleasant Ridge Union School District	0	Peggy Fava	Nonpartisan	Nevada	3	
 CA-06057-nevada-cities	Pleasant Ridge Union School District	0	Kalea Friant	Nonpartisan	Nevada	3	
 CA-06057-nevada-cities	Pleasant Ridge Union School District	0	Kelly McKinley	Nonpartisan	Nevada	3	
-CA-06057-nevada-cities	Tahoe Truckee Unified School District Area 1	0	Craig Shaffer	Nonpartisan	Nevada	1	
-CA-06057-nevada-cities	Tahoe Truckee Unified School District Area 1	0	Patrick Mooney	Nonpartisan	Nevada	1	
-CA-06045-ukiah	Mendocino County Board of Education Trustee Area 1	0	Marilyn Puget	Nonpartisan	Mendocino	1	
-CA-06045-ukiah	Mendocino County Board of Education Trustee Area 1	0	Craig Perry	Nonpartisan	Mendocino	1	
 CA-06045-ukiah	Ukiah Unified School District Trustee Area 1	0	Beatriz "Bea" Arkin	Nonpartisan	Mendocino	1	
 CA-06045-ukiah	Ukiah Unified School District Trustee Area 1	0	Gabriel Baca Meza	Nonpartisan	Mendocino	1	
 CA-06045-ukiah	Willits Unified School District	0	Jeanne King	Nonpartisan	Mendocino	3	
@@ -1936,8 +1931,6 @@ CA-06087-cities	San Lorenzo Valley Unified School District Trustee Area 4	0	Gail
 CA-06087-cities	San Lorenzo Valley Unified School District Trustee Area 4	0	Ashleigh Hopkins	Nonpartisan	Santa Cruz	1	
 CA-06087-cities	Soquel Union Elementary School District Trustee Area 4	0	Ariel Gray	Nonpartisan	Santa Cruz	1	
 CA-06087-cities	Soquel Union Elementary School District Trustee Area 4	0	Andrea Locke	Nonpartisan	Santa Cruz	1	
-CA-06069-san-juan-bautista	San Benito County Board of Education Trustee Area 4	0	Reb Monaco	Nonpartisan	San Benito	1	
-CA-06069-san-juan-bautista	San Benito County Board of Education Trustee Area 4	0	Ed Schmidt	Nonpartisan	San Benito	1	
 CA-06069-san-juan-bautista	San Benito High School District Trustee Area 3	0	Carla Torres De Luna	Nonpartisan	San Benito	1	
 CA-06069-san-juan-bautista	San Benito High School District Trustee Area 3	0	Betsey Lemay	Nonpartisan	San Benito	1	
 CA-06069-san-juan-bautista	Hollister School District Trustee Area 5	0	Alicia Parra	Nonpartisan	San Benito	1	
@@ -2022,7 +2015,6 @@ CA-06109-tuolumne	Summerville Union High School District Governing Board Member	
 CA-06109-tuolumne	Summerville Union High School District Governing Board Member	0	Kurt Bayers	Nonpartisan	Tuolumne	3	
 CA-06109-tuolumne	Summerville Union High School District Governing Board Member	0	Casey Kerns	Nonpartisan	Tuolumne	3	
 CA-06109-tuolumne	Summerville Union High School District Governing Board Member	0	Randy Richter	Nonpartisan	Tuolumne	3	
-IN-18097-towns	Clermont Town Council	0	Frank Lemaire	Republican	Marion	0
 CA-06109-tuolumne	Columbia Union Elementary School District Governing Board Member	0	Tom Stewart	Nonpartisan	Tuolumne	3	
 CA-06109-tuolumne	Columbia Union Elementary School District Governing Board Member	0	Mary Bickley	Nonpartisan	Tuolumne	3	
 CA-06109-tuolumne	Columbia Union Elementary School District Governing Board Member	0	Jeff Wittman	Nonpartisan	Tuolumne	3	
@@ -2030,6 +2022,7 @@ CA-06109-tuolumne	Columbia Union Elementary School District Governing Board Memb
 KS-20069-townships	Cimarron Township Clerk	0	Beverly Benton	Democratic	Gray	1
 KS-20069-townships	Ingalls Township Clerk	0	Mariah Bayer	Republican	Gray	1
 KS-20069-townships	Montezuma Township Clerk	0	Jonnalee Salmans	Republican	Gray	1
+IN-18097-towns	Clermont Town Council	0	Frank Lemaire	Republican	Marion	0
 MI-26129	City of Rose City Mayor	0	Michael Samples	Nonpartisan	Ogemaw	1
 MI-26129	City of Rose City Clerk	0	Jennifer M. Hurley	Nonpartisan	Ogemaw	1
 MI-26129	City of Rose City Treasurer	0	Carol Lee Butler	Nonpartisan	Ogemaw	1
