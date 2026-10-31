@@ -198,6 +198,16 @@ COUNTIES = {
         "MF-423/fresno-2026-11-03-measures.html",
     ),
     "06013": ("CA", "https://www.cocovote.us/", "MF-427/26Nov03_Measure-Wording-List-1.pdf"),
+    "06061": (
+        "CA",
+        "https://www.placercountyelections.gov/Uploads/documents/11032026/11032026_Measures_Appear_on_Ballot.pdf",
+        "N3M-web/ca625/placer_measures.pdf",
+    ),
+    "06079": (
+        "CA",
+        "https://slocounty.ca.gov/departments/clerk-recorder/all-services/elections-and-voting/elections-conducted-by-county-of-san-luis-obispo/november-3,-2026,-general-election",
+        "N3M-web/ca625/slo_nov3.html",
+    ),
     "44001": (
         "RI",
         "https://www.barrington.ri.gov/DocumentCenter/View/2978/BOC-Booklet-Questions-Info-revised-10-6",
