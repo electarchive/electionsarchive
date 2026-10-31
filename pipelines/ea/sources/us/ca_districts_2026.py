@@ -56,7 +56,7 @@ COUNTIES = {
 KEPT = re.compile(
     r"FIRE|WATER|UTILIT|HEALTH|IRRIGATION|WASTEWATER|SERVICES|SRVCS|PARK|LIBRARY|SANITATION|SANITARY|CEMETERY|SEWER|CONSERVATION|FLOOD"
     r"|COLLEGE|HOSPITAL|VECTOR|MOSQUITO|RESOURCE|TRANSIT|HARBOR|AIRPORT|DRAINAGE|LEVEE|LIGHTING|MEMORIAL|POLICE|PEST|RECREATION"
-    r"|OPEN SPACE|RAPID|REGIONAL|HIGHWAY|WEED|ROAD|COMMUNITY"
+    r"|OPEN SPACE|RAPID|REGIONAL|HIGHWAY|WEED|ROAD|COMMUNITY|\bPORT\b|HEATHCARE"
 )
 DROPPED = re.compile(
     r"SCHL|SCHOOL|UNIFIED|ELEMENTARY|UNION HIGH|HIGH SCH|OFFICE OF EDUCATION|BOARD OF EDUCATION|COMM PLAN|PLANNING|SUPERVISORS|ASSESSOR|JUDGE|COURT|^CITY|^TOWN OF|CITY OF|CITY COUNCIL|CONGRESS(?! VALLEY)|ASSEMBLY|SENATE|COMMITTEE|PLAN GRP|PLAN GROUP|COMMUNITY PLAN|SPONSOR GROUP|COUNCIL|MAYOR|CLERK|TREASURER|SHERIFF|ATTORNEY|CORONER|AUDITOR"
@@ -69,6 +69,7 @@ WORDS = (
     (r"\bPROT\b", "PROTECTION"),
     (r"\bSRVCS\b", "SERVICES"),
     (r"\bHEATLH\b", "HEALTH"),
+    (r"\bHEATHCARE\b", "HEALTHCARE"),
 )
 SEAT = re.compile(
     r"^(.+?)\s+-\s+(DIV(?:ISION)?\.?|ZONE|AREA|TRUSTEE AREA|DISTRICT)\s+(?:NO\.\s+)?(\w+)(?:\s+\(Short Term\))?$",
@@ -622,7 +623,7 @@ def santa_cruz() -> list[Row]:
             body = head[1].strip()
             if section != "School Districts" and usable(body):
                 label = f"{head[3]} {head[4]}" if head[3] else ""
-                current = (full_name(body), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
+                current = (full_name(body.upper()), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
                 cells = []
             else:
                 current = None
@@ -655,9 +656,9 @@ def santa_cruz_watch(contested: set[str]) -> list[Row]:
         if head := re.match(r"^### (.+?)(?: \(Short Term\))? - (?:(\d+) Seats?|(Division|Zone|Ward) (\w+))$", line):
             body = head[1].strip()
             short = "(Short Term)" in line
-            if usable(body) and full_name(body) not in contested:
+            if usable(body) and full_name(body.upper()) not in contested:
                 label = f"{head[3]} {head[4]}" if head[3] else ("Short Term" if short else "")
-                current = (full_name(body), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
+                current = (full_name(body.upper()), "Trustee" if "College" in body else "Director", label, int(head[2] or 1))
             else:
                 current = None
         elif current is not None and line.startswith("| ") and not line.startswith(("| Candidate", "| ---", "| |")):
