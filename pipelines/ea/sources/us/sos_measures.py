@@ -1292,6 +1292,102 @@ SC_DAYS = {
     date(2008, 11, 4): 3,
     date(2010, 11, 2): 4,
 }
+AL_2006_PRIMARY = "https://www.sos.alabama.gov/sites/default/files/voter-pdfs/2006/ProposedAmendments-OfficialResultsCertification-06-28-2006.pdf"
+AL_2006_PRIMARY_COUNTIES = (
+    "Autauga",
+    "Baldwin",
+    "Barbour",
+    "Bibb",
+    "Blount",
+    "Bullock",
+    "Butler",
+    "Calhoun",
+    "Chambers",
+    "Cherokee",
+    "Chilton",
+    "Choctaw",
+    "Clarke",
+    "Clay",
+    "Cleburne",
+    "Coffee",
+    "Colbert",
+    "Conecuh",
+    "Coosa",
+    "Covington",
+    "Crenshaw",
+    "Cullman",
+    "Dale",
+    "Dallas",
+    "DeKalb",
+    "Elmore",
+    "Escambia",
+    "Etowah",
+    "Fayette",
+    "Franklin",
+    "Geneva",
+    "Greene",
+    "Hale",
+    "Henry",
+    "Houston",
+    "Jackson",
+    "Jefferson",
+    "Lamar",
+    "Lauderdale",
+    "Lawrence",
+    "Lee",
+    "Limestone",
+    "Lowndes",
+    "Macon",
+    "Madison",
+    "Marengo",
+    "Marion",
+    "Marshall",
+    "Mobile",
+    "Monroe",
+    "Montgomery",
+    "Morgan",
+    "Perry",
+    "Pickens",
+    "Pike",
+    "Randolph",
+    "Russell",
+    "Shelby",
+    "St. Clair",
+    "Sumter",
+    "Talladega",
+    "Tallapoosa",
+    "Tuscaloosa",
+    "Walker",
+    "Washington",
+    "Wilcox",
+    "Winston",
+)
+AL_2006_PRIMARY_VOTES = {
+    "YES": (
+        697591,
+        "8041 24153 4698 3587 9926 2197 4224 15999 5799 5703 8226 5239 7122 3808 2799 8000 10176 3744 2889 8451 3310 16557 7467 8919 11858 12296 5315 17136 5189 7647 5336 2535 3876 4258 15462 10306 89828 4798 15269 8585 10520 11480 2911 3719 35104 5272 8740 14267 48433 6353 33021 19222 3698 5304 3902 4919 3959 27481 11916 2921 12151 6941 22774 16848 5580 3213 6693",
+    ),
+    "NO": (
+        161694,
+        "1408 5364 1319 532 1400 834 847 4083 1080 748 1002 1193 1247 559 451 1202 1327 716 746 1068 567 2173 1321 2358 1703 2194 773 3158 604 985 728 1022 879 942 2763 1862 28774 573 2364 1371 3406 1805 1107 1603 12693 1170 835 2338 14981 1037 10270 4196 957 1328 809 861 1418 5808 1919 1410 2475 1407 6702 2466 920 1426 730",
+    ),
+}
+AL_2010_PRIMARY = "http://sos.alabama.gov/sites/default/files/voter-pdfs/2010/OfficialResults-CA-2010-06-01.pdf"
+AL_2010_PRIMARY_VOTES = {
+    "YES": (
+        272457,
+        "3313 11331 2336 1221 2718 1491 1833 4134 1743 1067 2527 1748 1817 1041 727 3306 4518 1091 726 1773 1069 4271 2159 5499 2145 4068 1528 5417 1786 2990 1717 1979 1266 1532 5811 2196 34451 1246 6167 3159 5853 3540 1737 2342 16906 2722 1524 3956 21345 1811 13587 8768 1732 2132 1526 1255 1946 8006 3660 2060 2959 2217 9765 4199 1436 2824 1732",
+    ),
+    "NO": (
+        408266,
+        "5761 17267 2838 2198 6360 1366 2306 6544 2240 2117 4808 2212 3319 1863 1334 5071 5097 2013 1408 3272 2134 10258 3462 3288 4483 8268 2529 8193 2896 3454 3267 812 1056 1872 8230 3640 56696 1584 6784 4402 8644 7063 1336 1532 27511 3164 2957 7873 23531 2032 16861 11787 1007 2559 2458 2381 2627 19483 8219 1586 5593 4043 11108 8704 3101 1096 3308",
+    ),
+}
+AL_2006_NOTE = (
+    " The certified Total row omits the first four counties (Autauga, Baldwin, Barbour, and Bibb) from its sums, so "
+    "the county figures add up to 738,070 yes and 170,317 no, not the printed 697,591 and 161,694; the county "
+    "figures are the ones recorded."
+)
 AL_2022_URL = (
     "https://www.sos.alabama.gov/sites/default/files/election-data/2022-11/"
     "Final%20Canvass%20of%20Results%20(canvassed%20by%20state%20canvassing%20board%2011-28-2022).pdf"
@@ -2128,6 +2224,8 @@ def fetch() -> None:
     for _, _, _, stamp, path in NY_MEASURES.values():
         raw.fetch(SOURCE, NY.format(stamp, path), suffix=Path(path).suffix)
         time.sleep(1)
+    raw.fetch(SOURCE, AL_2006_PRIMARY, suffix=".pdf")
+    raw.fetch(SOURCE, AL_2010_PRIMARY, suffix=".pdf")
     raw.fetch(SOURCE, GA_2022_URL, suffix=".json")
     raw.fetch(SOURCE, MS_2004, suffix=".pdf")
     for candidate in WV_2012_CANDIDATES.values():
@@ -4528,6 +4626,32 @@ def missouri() -> list[dict[str, object]]:
     return rows
 
 
+def alabama_primaries() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, url, votes, skipped in (
+        (date(2006, 6, 6), AL_2006_PRIMARY, AL_2006_PRIMARY_VOTES, 4),
+        (date(2010, 6, 1), AL_2010_PRIMARY, AL_2010_PRIMARY_VOTES, 0),
+    ):
+        for answer, (printed, text) in votes.items():
+            figures = [int(figure) for figure in text.split()]
+            if len(figures) != 67 or sum(figures[skipped:]) != printed:
+                raise ValueError(f"AL {day} amendment {answer}: counties do not sum to the printed total")
+            rows.extend(
+                {
+                    "state": "AL",
+                    "day": day,
+                    "number": "1",
+                    "label": "Constitutional Amendment 1" if day.year == 2006 else "Constitutional Amendment",
+                    "url": url,
+                    "county": county,
+                    "answer": answer,
+                    "votes": count,
+                }
+                for county, count in zip(AL_2006_PRIMARY_COUNTIES, figures, strict=True)
+            )
+    return rows
+
+
 def alabama_2022() -> list[dict[str, object]]:
     text = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, AL_2022_URL).path), "-"],
@@ -6172,6 +6296,7 @@ def parse() -> None:
             *south_carolina(),
             *south_carolina_2022(),
             *alabama_2022(),
+            *alabama_primaries(),
             *hawaii(),
             *new_mexico(),
             *south_dakota_2002_june(),
@@ -6588,6 +6713,7 @@ def emit() -> Path:
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
                 + (SCANNED if rows["page"].is_not_null().any() and state not in ("AL", "MS") else "")
                 + (GA_PRELIMINARY if preliminary else "")
+                + (AL_2006_NOTE if (rows["url"] == AL_2006_PRIMARY).any() else "")
                 + (NM_2003_NOTE if (rows["url"] == NM_2003).any() else "")
                 + (
                     (
