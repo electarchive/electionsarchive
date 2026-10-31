@@ -8338,6 +8338,7 @@ def parse() -> None:
                 "office": row.get("office_name") or "",
                 "area": row.get("constituency_area") or "",
                 "mint": row.get("ward_mint") == "1",
+                "whole": row["key"] == "MA" and "County Commissioner" in row["contest"],
                 "district": row.get("district") or "",
             }
         )
@@ -9068,7 +9069,7 @@ def parse() -> None:
                         fits[0][4].startswith("school:")
                         or not re.search(
                             r"\b(school|unified|college|district(?! \d)|area|primary|nominating|special)\b",
-                            " ".join(fits[0][2]),
+                            re.sub(r"\bschool\b", "", " ".join(fits[0][2])) if state == "ME" else " ".join(fits[0][2]),
                         )
                     )
                 ):
