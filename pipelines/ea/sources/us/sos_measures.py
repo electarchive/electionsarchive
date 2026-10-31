@@ -1305,12 +1305,15 @@ AR_PUBLICATIONS = {date(2006, 11, 7): "20070308_ARSOS_2006_Elections_Publication
 AR_VOICES = {date(2008, 11, 4): "Voices%20of%20Ark%202008-WEB2.pdf"}
 AR_TALLY = "https://results.tally-enr.com/results/arkansas/1844/FullDataFile.json"
 AR_TALLY_DAY = date(2022, 11, 8)
+AR_HISTORY = AR + "Initiatives_and_Amendments_1938-2018_1.pdf"
+AR_HIGHWAY_BONDS = date(2011, 11, 8)
 AR_2022 = {
     "1": ("Convene the General Assembly in Extraordinary Session by Written Proclamation", "Legislative Referendum"),
     "2": ("Constitutional Amendment and Ballot Initiative Reform Amendment", "Legislative Referendum"),
     "3": ("Arkansas Religious Freedom Amendment", "Legislative Referendum"),
     "4": ("Adult Use of Cannabis and Licensed Commercial Cannabis Facilities", "Initiative"),
 }
+IL_2010 = "https://www.elections.il.gov/Downloads/ElectionOperations/VoteTotals/2010GEOfficialVote.pdf"
 IN = "https://indianavoters.in.gov/ENRHistorical/ExportReferendumsToCSV?year={}&sortBy=&sortDir=&county={}"
 IN_DAYS = (date(2004, 11, 2), date(2010, 11, 2), date(2024, 11, 5))
 IN_QUESTIONS = {
@@ -1530,6 +1533,11 @@ STATES = {
     "Wyoming": "WY",
 }
 PUBLISHERS = {
+    "IL": (
+        "Illinois State Board of Elections",
+        "Official vote totals",
+        "https://www.elections.il.gov/ElectionOperations/ElectionVoteTotals.aspx",
+    ),
     "IN": (
         "Indiana Election Division",
         "Historical election results: referendums",
@@ -1882,7 +1890,9 @@ def fetch() -> None:
         time.sleep(1)
     for name in AR_SHEETS.values():
         raw.fetch(SOURCE, AR + name, suffix=".xlsx")
+    raw.fetch(SOURCE, IL_2010, suffix=".pdf")
     raw.fetch(SOURCE, AR_TALLY, suffix=".json")
+    raw.fetch(SOURCE, AR_HISTORY, suffix=".pdf")
     for day in IN_DAYS:
         for county in ("", *IN_COUNTIES, IN_ALIAS):
             raw.fetch(SOURCE, IN.format(day.year, county.replace(" ", "+")), suffix=".csv")
@@ -3299,6 +3309,45 @@ def nevada() -> list[dict[str, object]]:
     return rows
 
 
+def illinois() -> list[dict[str, object]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, IL_2010).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    counts = r"([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+[\d.]+%\s+[\d.]+%"
+    section = text[text.index("CONSTITUTIONAL AMENDMENT PROPOSAL") :]
+    section = section[: re.search(rf"(?m)^\s+TOTAL\s+{counts}", section).end()]
+    tallies = {
+        county.title(): (int(yes.replace(",", "")), int(no.replace(",", "")))
+        for county, _, _, yes, no in re.findall(rf"(?m)^\s*(?:[ivx]+\s+)?([A-Z][A-Za-z .'-]+?)\s+{counts}\s*$", section)
+        if county != "TOTAL"
+    }
+    total = re.search(rf"(?m)^\s+TOTAL\s+{counts}", section)
+    if len(tallies) != 102 or [sum(sides[side] for sides in tallies.values()) for side in (0, 1)] != [
+        int(total[3].replace(",", "")),
+        int(total[4].replace(",", "")),
+    ]:
+        raise ValueError("Illinois 2010 amendment: counties do not add up to the printed total")
+    return [
+        {
+            "state": "IL",
+            "day": date(2010, 11, 2),
+            "number": "1",
+            "label": "Constitutional Amendment",
+            "url": IL_2010,
+            "county": county,
+            "answer": answer,
+            "votes": sides[side],
+            "title": "Recall of the Governor",
+            "kind": "Legislative Referendum",
+        }
+        for county, sides in tallies.items()
+        for side, answer in enumerate(("YES", "NO"))
+    ]
+
+
 def indiana() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day in IN_DAYS:
@@ -3514,6 +3563,31 @@ def arkansas() -> list[dict[str, object]]:
             }
             for race, county, answer, votes in sheet.iter_rows()
         )
+    history = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, AR_HISTORY).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    bonds = re.search(
+        r"Highway Grant Anticipation and Tax\s+YES\s+([\d,]+) \(.*\n\s*Special Highway Bond.*?\s+NO\s+([\d,]+) \(",
+        history,
+    )
+    rows.extend(
+        {
+            "state": "AR",
+            "day": AR_HIGHWAY_BONDS,
+            "number": "1",
+            "label": "Referred Question",
+            "url": AR_HISTORY,
+            "county": "statewide",
+            "answer": answer,
+            "votes": int(bonds[group].replace(",", "")),
+            "title": "Arkansas Highway Financing Act of 2011",
+            "kind": "Legislative Referendum",
+        }
+        for group, answer in ((1, "YES"), (2, "NO"))
+    )
     tally = json.loads(raw.cached(SOURCE, AR_TALLY).path.read_text())
     for contest in tally["ContestData"]:
         if not (found := re.match(r"Issue No\. (\d): ", contest["ContestName"])):
@@ -5424,6 +5498,7 @@ def parse() -> None:
             *maryland(),
             *nebraska(),
             *arkansas(),
+            *illinois(),
             *indiana(),
             *south_dakota(),
             *missouri(),
