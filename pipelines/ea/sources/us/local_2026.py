@@ -5524,6 +5524,13 @@ for key, publisher, title, url, local in (
         "ks/norton_gn.pdf",
     ),
     (
+        "NE-31095-jefferson",
+        "Jefferson County Election Commissioner",
+        "General Election Candidates, August 4, 2026",
+        "https://jeffersoncounty.nebraska.gov/sites/default/files/doc/General%20Election%20Ballot%20Candidates%208-4-2026.pdf",
+        "ne/jefferson_cities.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
