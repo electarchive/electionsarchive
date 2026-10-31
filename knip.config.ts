@@ -17,7 +17,7 @@ const config: KnipConfig = {
     },
     "packages/db": { entry: ["drizzle.pull.config.ts"] },
   },
-  ignore: [".playwright-mcp/**", "apps/landing/**"],
+  ignore: ["apps/landing/**"],
   treatConfigHintsAsErrors: true,
 };
 
