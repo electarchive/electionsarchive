@@ -1,0 +1,98 @@
+state	year	name	party	votes	kind	page
+ND	1896	Briggs	R	25918	candidate	1
+ND	1896	Richardson	Fus	20690	candidate	1
+ND	1898	Fancher	R	27308	candidate	1
+ND	1898	Holmes	Fusion	19496	candidate	1
+ND	1910	C. A. Johnson	R	44555	candidate	2
+ND	1910	John Burke	D	47005	candidate	2
+ND	1910	I. S. Lampman	S	2524	candidate	2
+ND	1912	L. B. Hanna	R	39811	candidate	7
+ND	1912	F. O. Hellstrom	D	31544	candidate	7
+ND	1912	A. E. Bowen, Jr.	S	6835	candidate	7
+ND	1912	W. D. Sweet	P	9406	candidate	7
+ND	1922	A. Nestos	R.	110321	candidate	1
+ND	1922	Wm. Lemke	N. P.	81048	candidate	1
+SD	1920	W. H. McMaster	Rep.	103592	candidate	16
+SD	1920	W. W. Howes	Dem.	31870	candidate	16
+SD	1920	M. P. Bates	N. P.	48426	candidate	16
+SD	1926	Carl Gunderson	Rep.	74101	candidate	2
+SD	1926	W. J. Bulow	Dem.	87136	candidate	2
+SD	1926	Tom Ayres	F-L.	11958	candidate	2
+SD	1926	John E. Hipple	Ind.	10637	candidate	2
+KS	1946	Frank Carlson	Rep.	309064	candidate	14
+KS	1946	Harry H. Woodring	Dem.	254283	candidate	14
+KS	1946	Harry Graber	Soc.	1830	candidate	14
+KS	1946	David C. White	Prohib.	12517	candidate	14
+KS	1948	Frank Carlson	Rep.	433396	candidate	12
+KS	1948	Randolph Carpenter	Dem.	307485	candidate	12
+KS	1948	W. W. Tamplin	Soc.	2491	candidate	12
+KS	1948	N. W. Nice	Prohib.	17035	candidate	12
+KS	1956	Warren W. Shaw	Rep.	364340	candidate	14
+KS	1956	George Docking	Dem.	479701	candidate	14
+KS	1956	Harry O. Lytle	Prohib.	20894	candidate	14
+IL	1986	James R. Thompson	REP	1655849	candidate	18
+IL	1986	Adlai E. Stevenson	SOL	1256626	candidate	18
+IL	1986	No Candidate	DEM	208830	candidate	18
+IL	1986	Gary L. Shilts	LIB	15646	candidate	18
+IL	1986	Diane Roling	SWP	6843	candidate	18
+MA	1890	William E. Russell	Democratic	140507	candidate	325
+MA	1890	John Q. A. Brackett	Republican	131454	candidate	325
+MA	1890	John Blackmer	Prohibition	13554	candidate	325
+MA	1893	Louis Albert Banks	Prohibition	8556	candidate	354
+MA	1893	George H. Cary	People's Party	4885	candidate	354
+MA	1893	Frederic T. Greenhalge	Republican	192613	candidate	354
+MA	1893	Patrick F. O'Neil	Socialist Labor	2033	candidate	354
+MA	1893	John E. Russell	Democratic	156916	candidate	354
+MA	1896	Roger Wolcott	Republican	258204	candidate	381
+MA	1896	George Fred. Williams	Democratic	76901	candidate	381
+MA	1896	George Fred. Williams	Democratic Bryan N. P.	17033	candidate	381
+MA	1896	George Fred. Williams	People's Party	5907	candidate	381
+MA	1896	George Fred. Williams	no designation	3821	candidate	381
+MA	1896	Frederick O. Prince	Democratic National N. P.	14164	candidate	381
+MA	1896	Thomas C. Brophy	Socialist Labor Party	4548	candidate	381
+MA	1896	Allen Coffin	Prohibition	4472	candidate	381
+MA	1903	John L. Bates	Republican	199684	candidate	404
+MA	1903	Thomas F. Brennan	Socialist Labor	4561	candidate	404
+MA	1903	John C. Chase	Socialist	25251	candidate	404
+MA	1903	Oliver W. Cobb	Prohibition	3278	candidate	404
+MA	1903	William A. Gaston	Democratic	163700	candidate	404
+MA	1904	John Quincy Adams	Socialist	11591	candidate	396
+MA	1904	John L. Bates	Republican	198681	candidate	396
+MA	1904	Michael T. Berry	Socialist Labor	2002	candidate	396
+MA	1904	Oliver W. Cobb	Prohibition	3156	candidate	396
+MA	1904	William L. Douglas	Democratic	234670	candidate	396
+MA	1910	Eben S. Draper	Republican	194173	candidate	438
+MA	1910	Eugene N. Foss	Democratic	207647	candidate	438
+MA	1910	Eugene N. Foss	Progressive Nom. Paper	14052	candidate	438
+MA	1910	Eugene N. Foss	""	7653	candidate	438
+MA	1910	John A. Nicholls	Prohibition	3277	candidate	438
+MA	1910	Moritz E. Ruther	Socialist Labor	2613	candidate	438
+MA	1910	Daniel A. White	Socialist	11396	candidate	438
+MA	1907	Charles W. Bartlett	Anti-Merger	11194	candidate	428
+MA	1907	Thomas F. Brennan	Socialist Labor	2999	candidate	428
+MA	1907	John W. Brown	Socialist	7621	candidate	428
+MA	1907	Harvey S. Cowell	Prohibition	3810	candidate	428
+MA	1907	Curtis Guild, Jr.	Republican	188068	candidate	428
+MA	1907	Thomas L. Hisgen	Independence League	75499	candidate	428
+MA	1907	Henry M. Whitney	Democratic	70842	candidate	428
+MA	1907	Henry M. Whitney	Independent Citizens	5154	candidate	428
+MA	1907	Henry M. Whitney	Democratic Citizens Nom. Paper	6691	candidate	428
+MA	1907	Henry M. Whitney	""	1692	candidate	428
+MA	1913	Charles Sumner Bird	Progressive	127755	candidate	452
+MA	1913	Alfred H. Evans	Prohibition	2015	candidate	452
+MA	1913	Eugene N. Foss	Independent	20171	candidate	452
+MA	1913	Augustus P. Gardner	Republican	116705	candidate	452
+MA	1913	Arthur E. Reimer	Socialist Labor	1932	candidate	452
+MA	1913	David I. Walsh	Democratic	183267	candidate	452
+MA	1913	George H. Wrenn	Socialist	9025	candidate	452
+MA	1890	All others	""	11	others	325
+MA	1893	All others	""	9	others	354
+MA	1896	All others	""	14	others	381
+MA	1903	All others	""	5	others	404
+MA	1904	All others	""	7	others	396
+MA	1907	All others	""	135	others	428
+MA	1910	All others	""	20	others	438
+MA	1913	All others	""	3	others	452
+IL	1986	Charles E. Koen	""	141	candidate	18
+IL	1986	Wilbur L. Keeling	""	30	candidate	18
+IL	1986	David L. Bernabie	""	13	candidate	18
