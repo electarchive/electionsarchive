@@ -681,7 +681,7 @@
         detail={progress}
         detailFirst
         detailClass="text-lg font-bold tracking-[-0.01em]"
-        format={(value) =>
+        format={(value: string) =>
           (strict ? m.coverage_percent_complete : m.coverage_percent)({
             percent: value,
           })}
@@ -860,7 +860,7 @@
                 goal="county"
                 labels={READY_LABELS}
                 class="text-lg font-bold tracking-[-0.01em] tabular-nums inline-fit"
-                detail={(inputs) =>
+                detail={(inputs: { complete: string; total: string }) =>
                   (READY_COUNTS[row.level] ?? m.coverage_ready_of)({
                     held: inputs.complete,
                     total: inputs.total,
