@@ -54,7 +54,7 @@ const ORDER =
 const STAGES = sql.raw(ORDER);
 
 const licensed = (set: string) =>
-  `not exists (select from source icpsr where icpsr.id = ${set}.source_id and icpsr.license ilike '%ICPSR%')`;
+  `(${set}.source_id = any(array(select icpsr.id from source icpsr where icpsr.license ilike '%ICPSR%'))) is not true`;
 
 export const served = (set: string) => sql.raw(licensed(set));
 
@@ -987,17 +987,17 @@ async function children(
   const counted = sql`
     (
         exists (
-          select from unnest(${sql.param(ks)}::int[]) as s(k)
-          join result_rollup_sum r on r.result_set_k = s.k and r.area_k = a.k and r.measure = any(${COUNTED})
+          select from result_rollup_sum r
+          where r.area_k = a.k and r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
         )
         or exists (
-          select from unnest(${sql.param(ks)}::int[]) as s(k)
-          join result_rollup_unit u on u.result_set_k = s.k and u.area_k = a.k
+          select from result_rollup_unit u
           cross join lateral (
             select from result_value v
             where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
             limit 1
           ) v
+          where u.area_k = a.k and u.result_set_k = any(${sql.param(ks)}::int[])
         )
       )
   `;
@@ -1086,7 +1086,10 @@ async function children(
         and a.scheme_code <> all(${sql.param([...new Set(found.rows.map((row) => row.scheme))])}::text[])
         and exists (
           select from reporting_unit ru
-          join reporting_unit_area m on m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date
+          cross join lateral (
+            select from reporting_unit_area m
+            where m.unit_id = ru.id and m.area_id = ${area.id}::uuid and m.valid @> ${date}::date offset 0
+          ) m
           where ru.k = any(r.units)
         )
     `)
@@ -6042,10 +6045,7 @@ export const contests = {
             publisher: string | null;
           }>(sql`
             select n.kind::text, n.body_md as body, rs.k as set, s.publisher
-            from note n
-            left join result_set rs on rs.id = n.entity_id
-            left join source s on s.id = rs.source_id
-            where exists (select from (
+            from (
               select ${contest.id}::uuid as id, null::note_kind as kind
               union all
               select ${contest.election}::uuid, null
@@ -6066,7 +6066,13 @@ export const contests = {
               union all
               select cy.id, null from candidacy cy join contest_option o on o.id = cy.option_id
               where o.contest_id = ${contest.id}::uuid
-            ) w where w.id = n.entity_id and (w.kind is null or w.kind = n.kind))
+            ) w
+            cross join lateral (
+              select n.entity_id, n.kind, n.body_md from note n
+              where n.entity_id = w.id and (w.kind is null or w.kind = n.kind) offset 0
+            ) n
+            left join result_set rs on rs.id = n.entity_id
+            left join source s on s.id = rs.source_id
             order by array_position(array['caveat','context','methodology','editorial']::note_kind[], n.kind)
           `),
           db.execute<{

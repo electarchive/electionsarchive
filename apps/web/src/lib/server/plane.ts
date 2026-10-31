@@ -146,12 +146,9 @@ export const parted = async (scheme: string, area: string, day: string) => {
     ),
     mine as materialized (select ${part(scheme, "me.geom")} as part from me)
     select a.k, ${part(scheme, "g.geom")} as part, mine.part as mine, ST_Covers(me.geom, ST_PointOnSurface(g.geom)) as "isInside"
-    from area_geometry g
-    join area a on a.id = g.area_id
-    cross join me
-    cross join mine
-    where a.scheme_code = ${scheme} and g.valid @> ${day}::date
-      and (${sql.raw(
+    from (
+      select g.area_id, g.valid, g.geom from area_geometry g
+      where ${sql.raw(
         insets
           .flatMap((inset) => inset.within)
           .map(
@@ -159,7 +156,13 @@ export const parted = async (scheme: string, area: string, day: string) => {
               `g.geom && ST_MakeEnvelope(${west}, ${south}, ${east}, ${north}, 4326)`,
           )
           .join(" or "),
-      )})
+      )}
+      offset 0
+    ) g
+    join area a on a.id = g.area_id
+    cross join me
+    cross join mine
+    where a.scheme_code = ${scheme} and g.valid @> ${day}::date
   `);
   const mine = found.rows[0]?.mine ?? -1;
   const ks = found.rows
