@@ -3,6 +3,7 @@ import re
 import subprocess
 from datetime import date
 from pathlib import Path
+from uuid import UUID
 
 import polars as pl
 from psycopg import Connection
@@ -364,6 +365,55 @@ def merced() -> list[Row]:
             ),
             True,
         )
+    ]
+
+
+LIEU = {
+    "06071-lieu": (
+        "https://uploads.rov.sbcounty.gov/rov/News/2026/1103/PublicNotice_AppointmentsInLieuSpecials.pdf",
+        "San Bernardino County Registrar of Voters",
+        "November 3, 2026 General Election: Special Districts Appointments in Lieu of Election",
+    ),
+}
+LIEU_NAME = re.compile(r"^(?P<name>\S.*?)\s{2,}(?:(?P<text>\S.*?)\s{2,})?(?P<term>\d) years?\s*$")
+LIEU_OFFICE = re.compile(
+    r"^(?P<body>.+?) Member, Board of (?P<role>Directors|Trustees),?\s*(?P<rest>.*)$", re.IGNORECASE
+)
+
+
+def san_bernardino_lieu() -> list[Row]:
+    path = raw.cached(SOURCE, LIEU["06071-lieu"][0]).path
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode()
+    text = text.splitlines()
+    entries = []
+    for index, line in enumerate(text):
+        found = LIEU_NAME.match(line)
+        if found is None or line.startswith(("SPECIAL", "OCTOBER", "PAGE")):
+            continue
+        office = found["text"] or " ".join(part.strip() for part in (text[index - 1], text[index + 1]) if part.strip())
+        entries.append((found["name"].strip(), " ".join(office.split()), found["term"]))
+    keyed: dict[tuple[str, str, bool], list[str]] = {}
+    for name, office, term in entries:
+        split = LIEU_OFFICE.match(office)
+        if split is None or not usable(split["body"]):
+            continue
+        seat = re.search(r"(Division|Trustee Area) (\d+)", split["rest"])
+        short = "Short Term" in split["rest"] or term == "2"
+        keyed.setdefault((split["body"], f"{seat[1]} {seat[2]}" if seat else "", short), []).append(name)
+    return [
+        {
+            "county": "San Bernardino",
+            "district": full_name(body),
+            "seat": label or ("Short Term" if short else ""),
+            "role": "Director",
+            "seats": 1 if label else len(names),
+            "name": name,
+            "unexpired": short,
+            "tacit": True,
+            "doc": "06071-lieu",
+        }
+        for (body, label, short), names in keyed.items()
+        for name in names
     ]
 
 
@@ -858,7 +908,7 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
         [
-            {"tacit": False, **row}
+            {"tacit": False, "doc": "", **row}
             for row in [
                 *san_diego(),
                 *orange(),
@@ -885,6 +935,7 @@ def parse() -> None:
                 *kings(),
                 *santa_barbara(),
                 *stanislaus(),
+                *san_bernardino_lieu(),
             ]
         ]
     ).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
@@ -921,9 +972,11 @@ def emit() -> Path:
             summary="California special district board races on the November 3, 2026 ballot, with candidates from county registrar candidate lists",
             polity="US-CA",
         )
-        kept = 0
-        for fips, county in COUNTIES.items():
-            url, *publisher = feed(fips)
+        docs = {fips: (*feed(fips), local_2026.SOURCE) for fips in COUNTIES} | {
+            key: (*value, SOURCE) for key, value in LIEU.items()
+        }
+        sources = {}
+        for key, (url, *publisher, bucket) in docs.items():
             source = cs.source(*publisher)
             if source in cs.minted:
                 cs.add(
@@ -935,7 +988,16 @@ def emit() -> Path:
                     url=url,
                     license="Public record",
                 )
-            cs.artifact(raw.cached(local_2026.SOURCE, url), source)
-            kept += govcand.races(conn, cs, SOURCE, "CA", DAY, frame.filter(pl.col("county") == county), source, "06")
+            cs.artifact(raw.cached(bucket, url), source)
+            sources[key] = str(source)
+        names = {county: fips for fips, county in COUNTIES.items()}
+        frame = frame.with_columns(
+            pl.col("doc")
+            .replace("", None)
+            .fill_null(pl.col("county").replace_strict(names))
+            .replace_strict(sources)
+            .alias("source")
+        )
+        kept = govcand.races(conn, cs, SOURCE, "CA", DAY, frame, UUID(int=0), "06")
         print(f"{kept} candidates")
         return cs.write()

@@ -130,7 +130,12 @@ def races(
         )
         if contest in cs.minted:
             cs.add("slug", path=contest_path, entity_id=contest)
-        cs.add("citation", entity_id=contest, source_id=source, locator=None)
+        cs.add(
+            "citation",
+            entity_id=contest,
+            source_id=UUID(first["source"]) if "source" in first else source,
+            locator=None,
+        )
         for row in people.iter_rows(named=True):
             ballot = row["name"]
             token = slug(ballot)
@@ -150,6 +155,11 @@ def races(
                 ballot_name=ballot,
                 is_independent=True,
             )
-            cs.add("citation", entity_id=candidacy, source_id=source, locator=None)
+            cs.add(
+                "citation",
+                entity_id=candidacy,
+                source_id=UUID(row["source"]) if "source" in row else source,
+                locator=None,
+            )
             kept += 1
     return kept
