@@ -188,7 +188,7 @@ def header(text: str) -> tuple[str, str] | None:
     return None
 
 
-def lines(all_rows: list[Row]) -> list[dict[str, object]]:
+def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
     out: list[dict[str, object]] = []
     state: dict[str, object] = {"run": 0, "county": None, "office": None, "district": None, "seen": set()}
     group: list[dict[str, object]] = []
@@ -252,6 +252,7 @@ def lines(all_rows: list[Row]) -> list[dict[str, object]]:
             "writein": writein,
             "votes": votes,
             "clean": clean,
+            "digits": " ".join(word.text for word in taken),
             "page": row.page,
             "x0": min(w.x0 for w in boxed) / row.width,
             "y0": min(w.y0 for w in boxed) / row.height,
@@ -272,7 +273,7 @@ def lines(all_rows: list[Row]) -> list[dict[str, object]]:
             else row.words
         )
         left_text = " ".join(word.text for word in left)
-        kind = header(left_text) if left and not found else None
+        kind = heading(left_text) if left and not found else None
         if kind is not None:
             pending = []
             pending_number = None
