@@ -20,7 +20,7 @@ OFFICES = (
     (r"governor", "governor"),
     (r"united\s+states\s+senators?", "us senate"),
     (r"representatives?\s+in\s+congress", "us house"),
-    (r"(?:executive\s+)?councill?ors?", "executive council"),
+    (r"(?:[a-z]+\s+)?council(?:l?ors?)?", "executive council"),
     (r"state\s+senat\w*", "state senate"),
 )
 UNITS = [
@@ -53,7 +53,7 @@ ORDINALS = {
 
 def heading(text: str) -> tuple[str, str] | None:
     plain = re.sub(r"\s+", " ", text).strip()
-    found = re.match(r"For\s+(?:the\s+)?(.*?)[:;.]?$", plain, re.IGNORECASE)
+    found = re.match(r"For\s+(?:the\s+)?(.*?)[:;.\-]?$", plain, re.IGNORECASE)
     if found:
         for pattern, name in OFFICES:
             if re.fullmatch(pattern, found[1].strip(), re.IGNORECASE):
@@ -98,8 +98,14 @@ def mended(rows: list[nh_manual.Row]) -> list[nh_manual.Row]:
         words = list(row.words)
         if len(words) > 1 and words[0].text in ("I", "1", "l") and words[1].text == "otal":
             words = [words[0]._replace(text="Total", x1=words[1].x1), *words[2:]]
-        if words and re.fullmatch(r"[fl1I]otal", words[0].text):
+        if words and re.fullmatch(r"TotalVote,?", words[0].text):
+            words = [words[0]._replace(text="Total"), words[0]._replace(text="Vote,"), *words[1:]]
+        if words and re.fullmatch(r"[fFl1I]otal", words[0].text):
             words[0] = words[0]._replace(text="Total")
+        if len(words) > 1 and words[0].text == "Total" and re.fullmatch(r"[Vv][a-z)]{1,3}e(,?)", words[1].text):
+            words[1] = words[1]._replace(text="Vote,")
+        if len(words) > 2 and words[0].text == "Total" and re.fullmatch(r"[rd][.,]?", words[1].text):
+            words.insert(1, words[0]._replace(text="Vote,"))
         out.append(row._replace(words=words))
     return out
 
@@ -122,7 +128,36 @@ def parse() -> None:
             if frame.height:
                 frames.append(frame.with_columns(year=pl.lit(year), stage=pl.lit(stage)))
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(frames, how="diagonal_relaxed").write_parquet(PARSED / "lines.parquet")
+    stable(pl.concat(frames, how="diagonal_relaxed")).write_parquet(PARSED / "lines.parquet")
+
+
+def stable(frame: pl.DataFrame) -> pl.DataFrame:
+    if not (PARSED / "lines.parquet").exists():
+        return frame.with_row_index("index").with_columns(pl.col("index").cast(pl.Int64))
+    keys = ["year", "stage", "page", "x0", "y0", "x1", "y1"]
+    old = indexed().select(*keys, "index", pl.col("group").alias("before"))
+    assert not old.select(keys).is_duplicated().any()
+    frame = frame.join(old, on=keys, how="left", maintain_order="left")
+    top = int(old["index"].max() or 0)
+    frame = frame.with_columns(index=pl.coalesce("index", top + 1 + pl.col("index").is_null().cum_sum().cast(pl.Int64)))
+    ceiling = int(max(old["before"].max() or 0, frame["group"].max() or 0)) + 1
+    mapped: dict[tuple[int, str, int], int] = {}
+    for (year, stage), rows in frame.filter(pl.col("group").is_not_null()).group_by("year", "stage"):
+        taken: set[int] = set()
+        fresh = ceiling
+        for group, block in rows.sort("index").group_by("group", maintain_order=True):
+            before = block["before"].drop_nulls()
+            choice = int(before.mode().sort()[0]) if before.len() else None
+            if choice is None or choice in taken:
+                choice, fresh = fresh, fresh + 1
+            taken.add(choice)
+            mapped[(int(year), str(stage), int(group[0]))] = choice
+    frame = frame.with_columns(
+        group=pl.struct("year", "stage", "group").map_elements(
+            lambda row: mapped.get((row["year"], row["stage"], row["group"])), return_dtype=pl.Int64
+        )
+    )
+    return frame.drop("before").sort("index")
 
 
 READ_DPI = 150
@@ -230,7 +265,9 @@ SUPERSEDES = ("us.wikipedia_gov_history", "us.klarner")
 COUNCIL_PLANS = {
     1970: (None, date(1982, 1, 1), "used in the 1970-1980 elections"),
     1982: (date(1982, 1, 1), date(1992, 1, 1), "1981 plan"),
-    1992: (date(1992, 1, 1), None, "1992 plan"),
+    1992: (date(1992, 1, 1), date(2002, 1, 1), "1992 plan"),
+    2002: (date(2002, 1, 1), date(2012, 1, 1), "2002 plan"),
+    2012: (date(2012, 1, 1), date(2022, 1, 1), "2012 plan"),
 }
 COUNCIL_FIXES = {
     "Earl A. Rinker III. Auburn": "Earl A. Rinker III",
@@ -242,15 +279,41 @@ COUNCIL_FIXES = {
     "M. Edna Lamoniagne": "M. Edna Lamontagne",
     "Albert E. PaqueLte": "Albert E. Paquette",
     "Jean R.Wallin": "Jean R. Wallin",
+    "Earl A. Rinker IB": "Earl A. Rinker III",
+    "Ra>mond S. Burton": "Raymond S. Burton",
+    "John 1) Shea": "John D. Shea",
+    "John D. Shea. Nel.son": "John D. Shea",
+    "Bemie G. Sparks": "Bernie G. Sparks",
+    "Beth Funicclla": "Beth Funicella",
+    "Bev FFollingworth": "Bev Hollingworth",
+    "Bev Hollingvvorth": "Bev Hollingworth",
+    "Bev Hollmgworth": "Bev Hollingworth",
+    "Beverly HoUingworth": "Beverly Hollingworth",
+    "Chnstopher Sununu": "Christopher Sununu",
+    "Chuck Rolecdc Bedfofxl": "Chuck Rolecek",
+    "Colin Van Ostem": "Colin Van Ostern",
+    "Dan St Hilaire": "Dan St. Hilaire",
+    "David K. WTieeler": "David K. Wheeler",
+    "Debwa B. Pignatelli": "Debora B. Pignatelli",
+    "Kenneth E. Elevens": "Kenneth E. Blevens",
+    "MichaelJ. Baldassarre": "Michael J. Baldassarre",
+    "Nick Mart": "Nick Hart",
+    "Peter J. Spauldmg": "Peter J. Spaulding",
+    "Peter M. Estabrooks": "Peter H. Estabrooks",
+    "Ramsay McLauchian": "Ramsay McLauchlan",
+    "Robert Bums": "Robert Burns",
+    "Timothy R Dillon": "Timothy P. Dillon",
+    "Bernard A. Streeter. Jr.": "Bernard A. Streeter, Jr.",
 }
 PARTY_KEYS = {"r": "republican-party", "d": "democratic-party"}
 TOWN = re.compile(r"(.+[a-z])[.,]\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
 
 
 def indexed() -> pl.DataFrame:
-    return (
-        pl.read_parquet(PARSED / "lines.parquet").with_row_index("index").with_columns(pl.col("index").cast(pl.Int64))
-    )
+    frame = pl.read_parquet(PARSED / "lines.parquet")
+    if "index" in frame.columns:
+        return frame.select("index", pl.exclude("index"))
+    return frame.with_row_index("index").with_columns(pl.col("index").cast(pl.Int64))
 
 
 def second(frame: pl.DataFrame) -> pl.DataFrame:
@@ -604,7 +667,8 @@ def emit():
         contests: dict[tuple[int, str, str], tuple[str, object]] = {}
         for value, contest in conn.execute(
             """select value, entity_id from external_id
-               where scheme = 'us.contest' and value ~ '^(19[7-9]\\d|200\\d|201[0-4])-(09|11)-\\d\\d:NH:'"""
+               where scheme = 'us.contest' and value ~ '^(19[7-9]\\d|200\\d|201[0-4])-(09|11)-\\d\\d:NH:'
+               order by value"""
         ).fetchall():
             month = value[5:7]
             contests[(int(value[:4]), "general" if month == "11" else "primary", value[14:])] = (value, contest)
