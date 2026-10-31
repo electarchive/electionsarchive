@@ -44,6 +44,14 @@ OFFICES = (
     (r"register\s+of\s+probate", "register of probate"),
     (r"(?:county\s+)?commissioners?", "board of commissioners"),
 )
+TITLES = {
+    "sheriff": "Sheriff",
+    "district attorney": "District Attorney",
+    "treasurer": "Treasurer",
+    "register of deeds": "Register of Deeds",
+    "register of probate": "Register of Probate",
+    "board of commissioners": "Board of Commissioners",
+}
 ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
 NOISE = re.compile(r"[\^_'•■*]")
 LEADER = re.compile(r"^[.\-—•\s]+$")
@@ -543,7 +551,7 @@ def person(name: str) -> tuple[str, str]:
 
 def emit() -> Path:
     from ea.changeset import Changeset
-    from ea.sources.us.nh_sos_county import COLUMNS, CONTEST, WRITE_IN
+    from ea.sources.us.nh_sos_county import COLUMNS, CONTEST, TEMPLATE, WRITE_IN
     from ea.store import connect
 
     raw_lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("county").is_not_null())
@@ -614,6 +622,27 @@ def emit() -> Path:
             contests.setdefault(
                 (int(year), county.lower(), name.lower(), district, party.lower() if party else None), []
             ).append((value, contest))
+        templates: dict[tuple[str, str, str | None], dict[str, object]] = {}
+        scopes: dict[str, object] = {}
+        days: dict[tuple[int, str, bool], tuple[object, str]] = {}
+        columns = ", ".join(f"c.{column}" for column in TEMPLATE)
+        for text, election, path, *rest in conn.execute(
+            f"""select n.text, c.election_id, s.path, {columns} from external_id x join contest c on c.id = x.entity_id
+                join name n on n.entity_id = c.id and n.is_preferred join slug s on s.entity_id = c.id
+                where x.scheme = 'us.contest' and x.value like 'NH:local:%%' and n.text like '%% County %% election%%'"""
+        ).fetchall():
+            found = CONTEST.match(text)
+            if found is None:
+                continue
+            year, county, name, district, party = found.groups()
+            row = dict(zip(TEMPLATE, rest, strict=True))
+            templates.setdefault((county.lower(), name.lower(), district), row)
+            days.setdefault((int(year), county.lower(), party is not None), (election, path.split("/")[3][:10]))
+            if party and row["party_scope_id"] is not None:
+                scopes.setdefault(party.lower(), row["party_scope_id"])
+        taken = {
+            row[0] for row in conn.execute("select path from slug where path like 'us/nh/%%-county/%%'").fetchall()
+        }
         sources: dict[int, tuple[object, int, Path, str]] = {}
         for year in sorted(lines["year"].unique()):
             path = pdf(int(year))
@@ -653,36 +682,59 @@ def emit() -> Path:
                 if office == "board of commissioners" and district is None
                 else None
             )
+            minted = None
             if not candidates:
-                report.setdefault("no contest", []).append(tag)
-                continue
-            if len(candidates) != 1:
+                template = templates.get((key[1], key[2], key[3]))
+                day = days.get((key[0], key[1], party is not None))
+                if key[2] == "board of commissioners" and district is None or template is None or day is None:
+                    report.setdefault("no contest and no sibling to copy from", []).append(tag)
+                    continue
+                template = dict(template)
+                template["party_scope_id"] = scopes.get(party) if party else None
+                if party and template["party_scope_id"] is None:
+                    report.setdefault("no contest and no party scope", []).append(tag)
+                    continue
+                minted = (template, *day)
+                external = (
+                    f"{day[1]}:NH:{key[1]}:{slug(TITLES[key[2]])}"
+                    + (f"-{district}" if district else "")
+                    + (f"-{party}" if party else "")
+                )
+                contest = None
+            elif len(candidates) != 1:
                 report.setdefault("two contests", []).append(f"{tag} {[c[0] for c in candidates]}")
                 continue
-            external, contest = candidates[0]
-            if conn.execute(
-                """select 1 from result_set rs join changeset c on c.id = rs.changeset_id
+            else:
+                external, contest = candidates[0]
+            if (
+                minted is None
+                and conn.execute(
+                    """select 1 from result_set rs join changeset c on c.id = rs.changeset_id
                    where rs.contest_id = %s and rs.is_default and rs.status = 'active' and c.pipeline = %s""",
-                [contest, SOURCE],
-            ).fetchone():
+                    [contest, SOURCE],
+                ).fetchone()
+            ):
                 continue
-            election, default, first = conn.execute(
-                """select rs.election_id, rs.id, min(v.count_round)
-                   from result_set rs join result_value v on v.result_set_k = rs.k
-                   where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2""",
-                [contest],
-            ).fetchone() or (None, None, None)
-            first = first or 1
-            election = (
-                election or conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
-            )
-            options = conn.execute(
-                """select o.id::text, o.ballot_label, o.kind,
-                          coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k
-                                    where rs.id = %s and v.option_k = o.k and v.measure = 1), 0)::bigint
-                   from contest_option o where o.contest_id = %s and o.parent_option_id is null""",
-                [default, contest],
-            ).fetchall()
+            if minted is not None:
+                election, default, first, options = minted[1], None, 1, []
+            else:
+                election, default, first = conn.execute(
+                    """select rs.election_id, rs.id, min(v.count_round)
+                       from result_set rs join result_value v on v.result_set_k = rs.k
+                       where rs.contest_id = %s and rs.is_default and rs.status = 'active' group by 1, 2""",
+                    [contest],
+                ).fetchone() or (None, None, None)
+                first = first or 1
+                election = (
+                    election or conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
+                )
+                options = conn.execute(
+                    """select o.id::text, o.ballot_label, o.kind,
+                              coalesce((select sum(v.value) from result_value v join result_set rs on rs.k = v.result_set_k
+                                        where rs.id = %s and v.option_k = o.k and v.measure = 1), 0)::bigint
+                       from contest_option o where o.contest_id = %s and o.parent_option_id is null""",
+                    [default, contest],
+                ).fetchall()
             if rows.filter(pl.col("agrees").is_null()).height:
                 report.setdefault("no printed total", []).append(f"{tag} {external}")
                 continue
@@ -753,6 +805,25 @@ def emit() -> Path:
             if failed:
                 report.setdefault("candidate mismatch", []).append(f"{tag} {external}: {failed}")
                 continue
+            if minted is not None:
+                title = TITLES[str(office)]
+                text = f"{year} {str(county).title()} County {title} election" + (
+                    f", District {district}" if district else ""
+                )
+                text += f", {party.title()} primary" if party else ""
+                base = (
+                    f"us/nh/{str(county).lower()}-county/{minted[2]}-{'primary' if party else 'general'}/{slug(title)}"
+                    + (f"-district-{district}" if district else "")
+                    + (f"-{party}" if party else "")
+                )
+                path = base if base not in taken else f"{base}-2"
+                taken.add(path)
+                contest = cs.key("us.contest", external)
+                cs.add("contest", id=contest, election_id=election, **minted[0])
+                cs.add("name", entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+                cs.add("slug", path=path, entity_id=contest)
+                cs.add("citation", entity_id=contest, source_id=sources[int(year)][0])
+                report.setdefault("contest added from the manual", []).append(tag)
             for offset, name in enumerate(fresh):
                 option = cs.key("us.option", f"{external}:{slug(name)}")
                 if name == "Scatter" or WRITE_IN.search(name):
