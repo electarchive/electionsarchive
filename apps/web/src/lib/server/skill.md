@@ -1,21 +1,23 @@
 ---
 name: electionsarchive
-description: Read and improve electionsarchive.com, the sourced archive of election results, candidates, parties, and chambers. Use when looking up an election, contest, person, party, or chamber, or when proposing a fix or addition to the archive with evidence.
+description: Read<!-- write --> and improve<!-- /write --> electionsarchive.com, the sourced archive of election results, candidates, parties, and chambers. Use when looking up an election, contest, person, party, or chamber<!-- write -->, or when proposing a fix or addition to the archive with evidence<!-- /write -->.
 ---
 
 # electionsarchive.com for agents
 
-The archive holds election results down to the smallest reporting unit, from each country's first election to its latest, plus the people, parties, chambers, and boundaries around them. Its values decide what a good proposal looks like:
+The archive holds election results down to the smallest reporting unit, from each country's first election to its latest, plus the people, parties, chambers, and boundaries around them. Its values<!-- read --> shape every record<!-- /read --><!-- write --> decide what a good proposal looks like<!-- /write -->:
 
 - **Official sources first.** An official canvass, gazette, or election body outranks an aggregator, and an aggregator outranks a news report.
 - **Every number traced.** Each fact points to a source, and each change to the evidence behind it. A change without evidence is a guess.
-- **Declared as declared.** Outcomes and seats are stored as the authority declared them, even when arithmetic disagrees. Report the disagreement in a note; never "fix" a declared outcome to match a count.
+- **Declared as declared.** Outcomes and seats are stored as the authority declared them, even when arithmetic disagrees.<!-- write --> Report the disagreement in a note; never "fix" a declared outcome to match a count.<!-- /write -->
 
 ## Connect
 
 - **MCP**: `{{origin}}/mcp` (streamable HTTP). Read tools work without a key.
 - **REST**: `{{origin}}/api/v1`, described at `{{origin}}/api/v1/openapi.json`. Every MCP tool has a REST twin.
+<!-- write -->
 - **Key**: a person creates one at `{{origin}}/settings/keys` and gives it to you. Send it as `x-api-key: ea_…` or `Authorization: Bearer ea_…`. You act as that person: they are credited and accountable for what you submit, so work as carefully as they would.
+<!-- /write -->
 - **Pages**: every page also answers as Markdown or JSON. Add `.md` or `.json` to its URL. `{{origin}}/llms.txt` is the map.
 
 ## The data model in one page
@@ -26,8 +28,14 @@ The archive holds election results down to the smallest reporting unit, from eac
 - **Names** carry a kind (official, native, english, ballot, short, …), a language, and optional valid dates; one is preferred. **Notes** are Markdown with a kind (context, caveat, methodology, editorial) and a language. **Sources** are documents; **citations** tie a source to a record.
 - **Valid time** is when something was true in the world, with a precision (day, month, year, unknown).
 
+<!-- write -->
 Today contributors can change names, notes, external IDs (Wikidata, Bioguide, MNIS, ParlGov), party colors, party logos and portraits from Wikimedia Commons, citations, note translations, and labels (a contest where no candidate qualified, or an assessed integrity or recognition label on an election, polity, or area); can add a contest's results from a document, with outcomes and the page region of every figure; can correct figures in a published result set; and can drop rows from several linking tables. Merges, retirements, and new elections and contests are coming; until then, describe such a problem in a note proposal's rationale.
+<!-- /write -->
+<!-- read -->
+Contributions open after launch. Until then the archive is read-only: every page, REST endpoint, and MCP read tool works, and write tools return an error.
+<!-- /read -->
 
+<!-- write -->
 ## Evidence
 
 Every fact you add or change cites evidence. A proposal declares its evidence once, in a map from your own short keys to evidence items, and each op lists the keys it relies on.
@@ -302,3 +310,4 @@ Each payload goes to `draft_proposal`. IDs here are placeholders; take real ones
 | `A job on this proposal is still running.`                         | Wait, then read the result with `get_proposal`.                                                                                                                                    |
 | `A key may make 60 writes a minute…`                               | Wait the seconds the message gives.                                                                                                                                                |
 | Upload `status: rejected`                                          | Read its `error`. The archive accepts PDF, PNG, JPEG, TIFF, XLSX, ODS, CSV, GeoJSON, GeoPackage, Parquet, and zipped shapefiles; only PDFs and images get pages to cite by region. |
+<!-- /write -->
