@@ -953,6 +953,26 @@ COUNTIES = {
         "https://home.bexar.org/electionsresources/ballots/Sample_1.pdf",
         "N3M-web/tx7/bexar/styles/S1.pdf",
     ),
+    "42101": (
+        "PA",
+        "https://vote.phila.gov/media/2026G_Ballot_Questions.pdf",
+        "N3M-web/pa/phila-ballot-questions.pdf",
+    ),
+    "32003": (
+        "NV",
+        "https://www.bcnv.org/ballotquestions",
+        "N3M-web/nv/bouldercity-ballot-questions.html",
+    ),
+    "16031": (
+        "ID",
+        "https://www.cassia.gov/media/Elections/Candidate%20Filing/Candidate%20Filings%20Archive/Ballot%20Measures/2026_11_03/American%20Falls%20Joint%20School%20District%20No%20381%20Supplemental%20Levy.pdf",
+        "N3M-web/id/cassia-americanfalls-381.pdf",
+    ),
+    "16083": (
+        "ID",
+        "https://www.cassia.gov/media/Elections/Candidate%20Filing/Candidate%20Filings%20Archive/Ballot%20Measures/2026_11_03/Rock%20Creek%20Rural%20Fire%20Protection%20Levy.pdf",
+        "N3M-web/id/cassia-rockcreek-fire.pdf",
+    ),
 }
 
 
