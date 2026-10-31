@@ -65,7 +65,9 @@ ASK = {
 
 
 def pages() -> pl.DataFrame:
-    return pl.read_csv(PAGES, separator="\t", schema_overrides={"year": pl.Int64})
+    return pl.read_csv(PAGES, separator="\t", schema_overrides={"year": pl.Int64, "rotate": pl.Int64}).with_columns(
+        pl.col("rotate").fill_null(0)
+    )
 
 
 def find(source: str, needle: str) -> raw.Artifact:
@@ -75,7 +77,7 @@ def find(source: str, needle: str) -> raw.Artifact:
     return raw.cached(source, matches[0])
 
 
-def image(path: Path, page: int, dpi: int) -> bytes:
+def image(path: Path, page: int, dpi: int, rotate: int) -> bytes:
     with tempfile.TemporaryDirectory() as folder:
         stem = Path(folder) / "page"
         subprocess.run(
@@ -85,23 +87,32 @@ def image(path: Path, page: int, dpi: int) -> bytes:
         )
         with Image.open(stem.with_suffix(".png")) as rendered:
             buffer = io.BytesIO()
-            rendered.convert("L").save(buffer, "JPEG", quality=92)
+            gray = rendered.convert("L")
+            if rotate:
+                gray = gray.rotate(-rotate, expand=True)
+            gray.save(buffer, "JPEG", quality=92)
     return buffer.getvalue()
 
 
 def requests() -> dict[str, tuple[MessageCreateParamsNonStreaming, float]]:
     out: dict[str, tuple[MessageCreateParamsNonStreaming, float]] = {}
-    for state, year, origin, needle, numbers in pages().select("state", "year", "origin", "needle", "pages").iter_rows():
+    for state, year, origin, needle, numbers, rotate in (
+        pages().select("state", "year", "origin", "needle", "pages", "rotate").iter_rows()
+    ):
         stored = find(origin, needle)
         for reader, dpi in READS.items():
             blocks: list[dict[str, object]] = []
-            digest = hashlib.sha256(f"{PROMPT}{reader}{stored.sha256}{numbers}".encode()).hexdigest()
+            digest = hashlib.sha256(f"{PROMPT}{reader}{stored.sha256}{numbers}{rotate or ''}".encode()).hexdigest()
             for number in str(numbers).split(","):
-                data = image(stored.path, int(number), dpi)
+                data = image(stored.path, int(number), dpi, rotate)
                 blocks.append(
                     {
                         "type": "image",
-                        "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(data).decode()},
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/jpeg",
+                            "data": base64.b64encode(data).decode(),
+                        },
                     }
                 )
             blocks.append({"type": "text", "text": ASK[reader].format(state=state, year=year)})
@@ -133,7 +144,8 @@ def reads() -> dict[tuple[str, int, str], dict[str, object]]:
 
 
 def fetch() -> None:
-    return None
+    for url in pages()["url"].drop_nulls().unique():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def parse() -> None:
@@ -141,7 +153,9 @@ def parse() -> None:
     rows = []
     for (state, year, reader), body in reads().items():
         for position, entry in enumerate(body["candidates"]):
-            rows.append((state, year, reader, position, entry["name"], entry["party"], entry["votes"], body["printed_total"]))
+            rows.append(
+                (state, year, reader, position, entry["name"], entry["party"], entry["votes"], body["printed_total"])
+            )
     pl.DataFrame(
         rows, schema=["state", "year", "reader", "position", "name", "party", "votes", "printed_total"], orient="row"
     ).write_csv(PARSED / "reads.tsv", separator="\t")
