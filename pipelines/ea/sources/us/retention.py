@@ -40,6 +40,11 @@ KANSAS_FILES = {
 }
 OKLAHOMA = "https://results.okelections.gov/OKER/?elecDate="
 ARIZONA_CANVASSES = {
+    "2002-11-05": "https://web.archive.org/web/20260103160055id_/https://apps.azsos.gov/election/2002/General/Canvass2002GE.pdf",
+    "2006-11-07": "https://web.archive.org/web/2id_/http://apps.azsos.gov/election/2006/General/Canvass2006GE.pdf",
+    "2010-11-02": "https://web.archive.org/web/20250924053003id_/https://apps.azsos.gov/election/2010/General/Canvass2010GE.pdf",
+    "2014-11-04": "https://web.archive.org/web/20251219170112id_/https://apps.azsos.gov/election/2014/General/Canvass2014GE.pdf",
+    "2008-11-04": "https://web.archive.org/web/2id_/https://apps.azsos.gov/election/2008/General/Canvass2008GE.pdf",
     "2016-11-08": "https://web.archive.org/web/20161220192915id_/"
     "http://apps.azsos.gov/election/2016/General/Official%20Signed%20State%20Canvass.pdf",
     "2022-11-08": "https://web.archive.org/web/20221205195258id_/"
@@ -65,6 +70,11 @@ ARIZONA_COLUMNS = {
     "Yavapai": "04025",
     "Yuma": "04027",
     "TOTAL": "",
+}
+CALIFORNIA_FILES = {
+    "2010-11-02": "https://elections.cdn.sos.ca.gov/sov/2010-general/complete-sov.pdf",
+    "2014-11-04": "https://elections.cdn.sos.ca.gov/sov/2014-general/pdf/2014-complete-sov.pdf",
+    "2018-11-06": "https://elections.cdn.sos.ca.gov/sov/2018-general/sov/2018-complete-sov.pdf",
 }
 INDIANA = "https://www.in.gov/courts/news/2024/1119/"
 INDIANA_RETAINED = {"IN:loretta-rush", "IN:mark-massa", "IN:derek-molter", "IN:rudolph-pyle", "IN:peter-foley"}
@@ -169,6 +179,9 @@ ARIZONA_METHOD = (
     "Yes and No votes by county from the Arizona Secretary of State's official canvass, with each row checked "
     "against its printed total."
 )
+CALIFORNIA_METHOD = (
+    "Statewide Yes and No votes from the summary pages of the California Secretary of State's Statement of Vote."
+)
 OKLAHOMA_METHOD = (
     "Statewide Yes and No votes from the Oklahoma State Election Board's official results site, captured from the "
     "page for the election day."
@@ -256,7 +269,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
     for path in KANSAS_PRECINCTS.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".xlsx")
-    for url in ARIZONA_CANVASSES.values():
+    for url in [*ARIZONA_CANVASSES.values(), *CALIFORNIA_FILES.values()]:
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, INDIANA, suffix=".html")
 
@@ -293,9 +306,13 @@ def arizona() -> list[dict[str, object]]:
                     ]
                     continue
                 if heading := re.match(
-                    r"(Justice of the Arizona Supreme Court|Judge of the Court of Appeals Division (I+))", text
+                    r"(Justice of the Arizona Supreme Court|Judge of the Court of Appeals,? Division (I+|\d))", text
                 ):
-                    court = ("supreme-court", None) if heading[2] is None else ("court-of-appeals", len(heading[2]))
+                    court = (
+                        ("supreme-court", None)
+                        if heading[2] is None
+                        else ("court-of-appeals", int(heading[2]) if heading[2].isdigit() else len(heading[2]))
+                    )
                     continue
                 said = re.match(r"Be retained (YES|NO)\b", text, re.IGNORECASE)
                 if court is None or said is None:
@@ -355,6 +372,67 @@ def arizona() -> list[dict[str, object]]:
                             "flags": (0 if layer else 8) | (1 if repaired else 0),
                         }
                     )
+    return rows
+
+
+def california() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, url in CALIFORNIA_FILES.items():
+        pdf = raw.cached(SOURCE, url).path
+        info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+        for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+            words = scan.layer(pdf, page)
+            if not any(word == "Supreme" for word, _ in words):
+                continue
+            for left in (True, False):
+                lines: list[list[tuple[str, scan.Box]]] = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in words if (box[0] < 1275) == left),
+                    key=lambda item: (item[1][1], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][1] - box[1]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                name = ""
+                live = False
+                for line in lines:
+                    line.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in line)
+                    if re.match(r"Supreme Court (?:Associate Justice Seat \d+|Chief Justice)", text):
+                        live = True
+                        name = ""
+                        continue
+                    if not live:
+                        continue
+                    if answer := re.fullmatch(r"(Yes|No) ([\d,]+) [\d.]+%", text):
+                        votes = next((word, box) for word, box in line if re.fullmatch(r"[\d,]+", word))
+                        rows.append(
+                            {
+                                "day": day,
+                                "state": "CA",
+                                "court": "supreme-court",
+                                "number": None,
+                                "post": None,
+                                "name": name,
+                                "answer": answer[1].lower(),
+                                "votes": int(answer[2].replace(",", "")),
+                                "page": page,
+                                "x0": votes[1][0],
+                                "y0": votes[1][1],
+                                "x1": votes[1][2],
+                                "y1": votes[1][3],
+                                "origin": url,
+                                "county": None,
+                                "flags": 0,
+                            }
+                        )
+                        if answer[1] == "No":
+                            live = False
+                    elif not re.search(r"\d|Votes Percent", text):
+                        name = text
+                    elif re.search(r"^[A-Z][^\d]+ Votes Percent", text) and "Supreme" not in text:
+                        live = False
     return rows
 
 
@@ -504,7 +582,11 @@ def oklahoma_counties() -> list[dict[str, object]]:
                         r"Race:\s+(SUPREME COURT|COURT OF CIVIL APPEALS|COURT OF CRIMINAL APPEALS) - (.+)", line
                     )
                     if found:
-                        key = (OKLAHOMA_COURTS[found[1]], found[2].strip(), *OKLAHOMA_SEATS_2010.get(found[2].strip(), (None, None)))
+                        key = (
+                            OKLAHOMA_COURTS[found[1]],
+                            found[2].strip(),
+                            *OKLAHOMA_SEATS_2010.get(found[2].strip(), (None, None)),
+                        )
                     elif line.startswith("Race:"):
                         key = None
                 elif found := re.match(
@@ -756,7 +838,7 @@ def parse() -> None:
         )
     )
     official = pl.DataFrame(
-        kansas() + oklahoma() + oklahoma_counties() + arizona(),
+        kansas() + oklahoma() + oklahoma_counties() + arizona() + california(),
         schema={
             "day": pl.String,
             "state": pl.String,
@@ -935,7 +1017,7 @@ def emit() -> Path:
             version=VERSION,
             summary="Judicial retention elections for state supreme and appellate courts: MEDSL's precinct returns "
             "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024 and county totals 2000–2010, Arizona's "
-            "official canvasses of 2016, 2022, and 2024, and Indiana's 2024 outcomes from the Judicial Branch",
+            "official canvasses of 2002, 2006, 2008, 2010, 2014, 2016, 2022, and 2024, California's Supreme Court totals of 2010, 2014, and 2018, and Indiana's 2024 outcomes from the Judicial Branch",
             polity="US",
         )
 
@@ -1058,6 +1140,16 @@ def emit() -> Path:
             url="https://azsos.gov/elections/results-data",
             license="Public record",
         )
+        california_source = cs.source("California Secretary of State", "Statement of Vote, general elections")
+        cs.add(
+            "source",
+            id=california_source,
+            kind="official_body",
+            publisher="California Secretary of State",
+            title="Statement of Vote, general elections",
+            url="https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
+            license="Public record",
+        )
         indiana_source = cs.source("Indiana Judicial Branch", "Press release: Appellate judges retained")
         cs.add(
             "source",
@@ -1069,8 +1161,14 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached(SOURCE, INDIANA), indiana_source)
-        official_sources = {"KS": kansas_source, "OK": oklahoma_source, "AZ": arizona_source, "IN": indiana_source}
-        methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD}
+        official_sources = {
+            "KS": kansas_source,
+            "OK": oklahoma_source,
+            "AZ": arizona_source,
+            "CA": california_source,
+            "IN": indiana_source,
+        }
+        methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD, "CA": CALIFORNIA_METHOD}
         artifacts = {
             url: cs.artifact(raw.cached(SOURCE, url), official_sources[state])
             for url, state in official.select("origin", "state").unique().sort("origin").iter_rows()
