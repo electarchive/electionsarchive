@@ -1,4 +1,5 @@
 import os
+from uuid import uuid7
 from pathlib import Path
 
 from ea.changeset import Changeset
@@ -18,8 +19,7 @@ def emit() -> Path | None:
             [size],
         ).fetchall()
         if not sets:
-            print("no result sets licensed from ICPSR remain")
-            return None
+            return retire_sources(conn)
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -30,3 +30,37 @@ def emit() -> Path | None:
         for result_set, source in sets:
             cs.add("result_set_drop", result_set_id=result_set, source_id=source, reason=REASON)
         return cs.write()
+
+
+def retire_sources(conn) -> Path | None:
+    sources = conn.execute(
+        "select id from source where license ilike '%%ICPSR%%' order by id"
+    ).fetchall()
+    if not sources:
+        print("no sources licensed from ICPSR remain")
+        return None
+    cs = Changeset(
+        conn,
+        pipeline=SOURCE,
+        version="2",
+        summary=f"Retire {len(sources)} sources licensed from ICPSR, with their artifacts, now that no result set cites them",
+        polity="US",
+    )
+    columns = [
+        row[0]
+        for row in conn.execute(
+            """select attname from pg_attribute where attrelid = 'public.source_artifact'::regclass
+               and attnum > 0 and not attisdropped and attgenerated = '' and attname not in ('changeset_id', 'recorded_from')
+               order by attnum"""
+        ).fetchall()
+    ]
+    artifacts = conn.execute(
+        "select * from source_artifact where source_id in (select id from source where license ilike '%%ICPSR%%') order by id"
+    ).fetchall()
+    names = [d.name for d in conn.execute("select * from source_artifact limit 0").description]
+    for row in artifacts:
+        record = dict(zip(names, row))
+        cs.add("row_drop", id=uuid7(), reason=REASON, relation="source_artifact", key={c: record[c] if record[c] is None or isinstance(record[c], (int, str)) else str(record[c]) for c in columns})
+    for (source,) in sources:
+        cs.add("entity_retirement", entity_id=source, reason=REASON)
+    return cs.write()
