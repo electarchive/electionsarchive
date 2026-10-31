@@ -52,6 +52,14 @@ TITLES = {
     "register of probate": "Register of Probate",
     "board of commissioners": "Board of Commissioners",
 }
+NAMES = {
+    "sheriff": ["sheriff"],
+    "district attorney": ["attorney", "county attorney"],
+    "treasurer": ["treasurer", "county treasurer"],
+    "register of deeds": ["register of deeds"],
+    "register of probate": ["register of probate"],
+    "board of commissioners": ["commissioners", "county commissioners"],
+}
 ORDINALS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5}
 NOISE = re.compile(r"[\^_'•■*]")
 LEADER = re.compile(r"^[.\-—•\s]+$")
@@ -178,6 +186,11 @@ def number(tokens: list[Word]) -> tuple[int, bool, list[Word]] | None:
 def header(text: str) -> tuple[str, str] | None:
     plain = re.sub(r"\s+", " ", text).strip()
     plain = re.sub(r"(?i)^(For\s+(?:the\s+)?)Counts'?\b", r"\1County", plain)
+    plain = re.sub(
+        r"(?i)^[^\sA-Za-z]?[A-Za-z]?[-~.]?[A-Za-z]{1,3}\s+(?=(?:register|sheriff|(?:county\s+)?(?:attorney|treasurer|commissioners?))\b)",
+        "For ",
+        plain,
+    )
     county = re.fullmatch(r"([A-Za-z]{4,12}) COUNT[A-Z']{1,2}:?", plain, re.IGNORECASE)
     if county:
         match = difflib.get_close_matches(county[1].upper(), COUNTIES, n=1, cutoff=0.7)
@@ -188,10 +201,17 @@ def header(text: str) -> tuple[str, str] | None:
         for pattern, name in OFFICES:
             if re.fullmatch(pattern, found[1].strip(), re.IGNORECASE):
                 return "office", name
+        phrase = re.sub(r"\s+", " ", found[1].strip().lower())
+        if len(phrase) > 4:
+            for pattern, name in OFFICES:
+                if difflib.get_close_matches(phrase, NAMES[name], n=1, cutoff=0.85):
+                    return "office", name
         return "other", plain
-    word = re.fullmatch(r"(first|second|third|fourth|fifth)\s+district:?", plain, re.IGNORECASE)
+    word = re.fullmatch(r"([A-Za-z]{4,6})\s+district:?", plain, re.IGNORECASE)
     if word:
-        return "district", str(ORDINALS[word[1].lower()])
+        close = difflib.get_close_matches(word[1].lower(), list(ORDINALS), n=1, cutoff=0.7)
+        if close:
+            return "district", str(ORDINALS[close[0]])
     digit = re.fullmatch(r"district\s+(?:no\.?\s*)?(\d)\s*:?", plain, re.IGNORECASE)
     if digit:
         return "district", digit[1]
@@ -378,7 +398,100 @@ def parse() -> None:
             )
         )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(frames).write_parquet(PARSED / "lines.parquet")
+    pl.concat(frames).with_columns(ocr=pl.lit(False)).write_parquet(PARSED / "lines.parquet")
+    supplement()
+
+
+OCR_YEARS = range(1970, 1999, 2)
+OCR_DPI = 300
+
+
+def ocr_words(path: Path, sha: str, number: int) -> tuple[float, float, list[Word]]:
+    folder = PAGES / "ocr"
+    cache = folder / f"{sha}-{number}.tsv"
+    folder.mkdir(parents=True, exist_ok=True)
+    if not cache.exists():
+        stem = folder / f".{sha}-{number}"
+        subprocess.run(
+            [
+                "pdftoppm",
+                "-r",
+                str(OCR_DPI),
+                "-gray",
+                "-png",
+                "-singlefile",
+                "-f",
+                str(number),
+                "-l",
+                str(number),
+                str(path),
+                str(stem),
+            ],
+            check=True,
+        )
+        image = stem.with_suffix(".png")
+        cache.write_text(
+            subprocess.run(
+                ["tesseract", str(image), "-", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
+            ).stdout
+        )
+        image.unlink()
+    width = height = 0.0
+    found: list[Word] = []
+    for line in cache.read_text().splitlines()[1:]:
+        cells = line.split("\t")
+        if len(cells) < 12:
+            continue
+        left, top, wide, high = (float(cell) for cell in cells[6:10])
+        if cells[0] == "1":
+            width, height = wide, high
+        elif cells[0] == "5" and cells[11].strip():
+            found.append(Word(cells[11].strip(), left, top, left + wide, top + high))
+    return width, height, found
+
+
+def clusters(pages: list[int]) -> list[list[int]]:
+    out: list[list[int]] = []
+    for page in sorted(pages):
+        if out and page - out[-1][-1] <= 6:
+            out[-1].append(page)
+        else:
+            out.append([page])
+    return out
+
+
+def supplement() -> None:
+    frame = pl.read_parquet(PARSED / "lines.parquet")
+    if "ocr" in frame.columns:
+        frame = frame.filter(~pl.col("ocr"))
+    keys = ["year", "stage", "county", "office", "district", "side"]
+    known = blocks(frame.filter(pl.col("county").is_not_null())).select(keys).unique()
+    extra = []
+    for year in OCR_YEARS:
+        have = frame.filter(pl.col("year") == year)
+        if have.is_empty():
+            continue
+        path = pdf(year)
+        sha = path.stem
+        for cluster in clusters(have["page"].unique().to_list()):
+            stage = have.filter(pl.col("page").is_in(cluster))["stage"].mode()[0]
+            span = range(cluster[0] - 2, cluster[-1] + 3)
+            pages = {number: ocr_words(path, sha, number) for number in span}
+            found = pl.DataFrame(
+                [line for line in lines(rows(pages)) if line["votes"] < 10**9], infer_schema_length=None
+            )
+            if found.is_empty():
+                continue
+            new = blocks(
+                found.filter(pl.col("county").is_not_null()).with_columns(year=pl.lit(year), stage=pl.lit(stage))
+            ).join(known, on=keys, how="anti", nulls_equal=True)
+            extra.append(
+                new.drop("added", "agrees", "side", "digits", "printed_right", strict=False).with_columns(
+                    ocr=pl.lit(True)
+                )
+            )
+    base = frame.with_columns(ocr=pl.lit(False))
+    pl.concat([base, *extra], how="diagonal_relaxed").write_parquet(PARSED / "lines.parquet")
 
 
 PAGES = DATA / "pages" / SOURCE
