@@ -1232,6 +1232,7 @@ NE_SCANS = {
     "ne-measures-2006": "2006%20General.pdf",
     "ne-measures-2006-primary": "2006%20Primary.pdf",
 }
+NE_SCAN_TOTALS = {"ne-measures-2002": {"1": (186667, 244363), "2": (167255, 245139)}}
 MO = (
     "https://web.archive.org/web/2015id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/CountyGeneral{}.pdf"
 )
@@ -4554,6 +4555,11 @@ def nebraska() -> list[dict[str, object]]:
             if sorted(table["candidate"].unique()) != ["NO", "YES"] or table.height != 186:
                 print(f"{name} measure {number}: {table.height} cells passed, skipped")
                 continue
+            expected = NE_SCAN_TOTALS.get(name, {}).get(number)
+            if expected is not None:
+                summed = tuple(table.filter(pl.col("candidate") == side)["votes"].sum() for side in ("YES", "NO"))
+                if summed != expected:
+                    raise ValueError(f"{name} measure {number}: counties add up to {summed}, not {expected}")
             rows.extend(
                 {
                     "state": "NE",
