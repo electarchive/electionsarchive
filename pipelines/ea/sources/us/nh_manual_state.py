@@ -1,4 +1,6 @@
+import base64
 import difflib
+import json
 import os
 import re
 import subprocess
@@ -71,7 +73,11 @@ def heading(text: str) -> tuple[str, str] | None:
 def summaries(path) -> list[tuple[str, list[int]]]:
     layout = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
     pages = layout.split("\f")
-    starts = [number for number, text in enumerate(pages, 1) if re.search(r"(?im)^\s*For\s+Governor\s*:?\s*$", text)]
+    starts = [
+        number
+        for number, text in enumerate(pages, 1)
+        if re.search(r"(?im)^\s*For\s+Governor\s*[:;.]?\s*(?:Number\s+of\s+Votes)?\s*$", text)
+    ]
     out = []
     for start in starts:
         end = start
@@ -81,7 +87,7 @@ def summaries(path) -> list[tuple[str, list[int]]]:
             end += 1
         primary = bool(re.search(r"(?i)total\s+vote\s*,\s*[rd]\b", "\n".join(pages[start - 1 : end])))
         out.append(("primary" if primary else "general", list(range(start, end + 1))))
-    return out
+    return list({stage: (stage, pages) for stage, pages in out}.values())
 
 
 def mended(rows: list[nh_manual.Row]) -> list[nh_manual.Row]:
@@ -117,11 +123,143 @@ def parse() -> None:
     pl.concat(frames, how="diagonal_relaxed").write_parquet(PARSED / "lines.parquet")
 
 
+READ_DPI = 150
+READ_PROMPT = (
+    "This is a page of the summary of New Hampshire statewide election returns. Below are the blocks of candidate "
+    "lines this page holds, each with a block number, its office, and numbered lines (candidate and town). For each "
+    "numbered line, read the vote count printed on that candidate's line in the page image. For each block, also read "
+    "the number printed on its 'Total vote' line, or null if the page shows none for that block. Reply with only a "
+    'JSON object {"lines": {"<line number>": <integer or null>}, "totals": {"<block number>": <integer or null>}}. '
+    "Use null where the number cannot be read. Do not add, correct, or compute numbers."
+)
+JOB = "summary_pages"
+
+
+def pending(frame: pl.DataFrame) -> pl.DataFrame:
+    frame = nh_manual.blocks(frame.drop("added", "agrees", "printed_right", strict=False))
+    return frame.filter(pl.col("agrees").is_null() | ~pl.col("agrees"))
+
+
+def reread() -> str:
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+    from ea import batch
+
+    frame = pending(arbitrated(indexed(), vision=False))
+    folder = DATA / "tmp" / SOURCE
+    folder.mkdir(parents=True, exist_ok=True)
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    wanted: dict[str, batch.Want] = {}
+    for (year, page), rows in frame.group_by("year", "page", maintain_order=True):
+        image = folder / f"{year}-{page}.png"
+        if not image.exists():
+            stem = folder / f".{year}-{page}"
+            subprocess.run(
+                ["pdftoppm", "-r", str(READ_DPI), "-png", "-singlefile", "-f", str(page), "-l", str(page)]
+                + [str(nh_manual.pdf(int(year))), str(stem)],
+                check=True,
+            )
+            stem.with_suffix(".png").replace(image)
+        listing = []
+        for group, block in rows.group_by("stage", "group", maintain_order=True):
+            first = block.row(0, named=True)
+            label = " ".join(
+                str(part)
+                for part in (first["office"], first["district"], first["total_party"] or first["party"])
+                if part
+            )
+            listing.append(f"Block {block['year'][0]}{first['stage'][0]}{first['group']}: {label}")
+            listing.extend(
+                f"  Line {row['index']}: {row['name']}{', ' + row['town'] if row['town'] else ''}"
+                for row in block.iter_rows(named=True)
+            )
+        params = MessageCreateParamsNonStreaming(
+            model="claude-haiku-5-5",
+            max_tokens=3000,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/png",
+                                "data": base64.b64encode(image.read_bytes()).decode(),
+                            },
+                        },
+                        {"type": "text", "text": f"{READ_PROMPT}\n\n" + "\n".join(listing)},
+                    ],
+                }
+            ],
+        )
+        wanted[f"read:{year}:{page}"] = (params, (3500 * price_in + (200 + 14 * rows.height) * price_out) / 1e6)
+    return batch.ensure(SOURCE, JOB, wanted)[1]
+
+
+def seen() -> tuple[dict[int, int], dict[str, int | None]]:
+    from ea import raw
+
+    lines: dict[int, int] = {}
+    totals: dict[str, int | None] = {}
+    frame = pending(arbitrated(indexed(), vision=False))
+    for year, page in frame.select("year", "page").unique().rows():
+        try:
+            text = json.loads(raw.cached(SOURCE, f"read:{year}:{page}").path.read_text())["content"][0]["text"]
+        except LookupError:
+            continue
+        found = re.search(r"\{.*\}", text, re.DOTALL)
+        if not found:
+            continue
+        try:
+            reply = json.loads(found[0])
+        except ValueError:
+            continue
+        for key, value in (reply.get("lines") or {}).items():
+            if isinstance(value, int) and key.isdigit():
+                lines[int(key)] = value
+        for key, value in (reply.get("totals") or {}).items():
+            if isinstance(value, int):
+                totals[key] = value
+    return lines, totals
+
+
 SUPERSEDES = ("us.wikipedia_gov_history", "us.klarner")
 TOWN = re.compile(r"(.+[a-z])[.,]\s+([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
 
 
-def arbitrated(frame: pl.DataFrame) -> pl.DataFrame:
+def indexed() -> pl.DataFrame:
+    return (
+        pl.read_parquet(PARSED / "lines.parquet").with_row_index("index").with_columns(pl.col("index").cast(pl.Int64))
+    )
+
+
+def second(frame: pl.DataFrame) -> pl.DataFrame:
+    lines, totals = seen()
+    frame = frame.with_columns(
+        key=pl.col("year").cast(pl.String) + pl.col("stage").str.slice(0, 1) + pl.col("group").cast(pl.String),
+        vision=pl.col("index").replace_strict(lines, default=None, return_dtype=pl.Int64),
+    )
+    frame = frame.with_columns(
+        vision_total=pl.col("key").replace_strict(totals, default=None, return_dtype=pl.Int64),
+        read=pl.col("vision").is_not_null().all().over("year", "stage", "group"),
+        vision_sum=pl.col("vision").sum().over("year", "stage", "group"),
+        text_agrees=(pl.col("vision") == pl.col("votes")).all().over("year", "stage", "group"),
+    )
+    target = pl.coalesce("printed", "vision_total")
+    fixed = pl.col("read") & ~pl.coalesce("agrees", pl.lit(False)) & (pl.col("vision_sum") == target)
+    return frame.with_columns(
+        votes=pl.when(fixed).then(pl.col("vision")).otherwise(pl.col("votes")),
+        printed=pl.when(fixed).then(target).otherwise(pl.col("printed")),
+        reads_agree=pl.col("read")
+        & pl.col("text_agrees")
+        & pl.col("printed").is_null()
+        & pl.col("vision_total").is_null(),
+        resolved=fixed,
+    ).drop("key", "vision", "vision_total", "read", "vision_sum", "text_agrees")
+
+
+def arbitrated(frame: pl.DataFrame, vision: bool = True) -> pl.DataFrame:
     frame = nh_manual.verified(frame.drop("added", "agrees", strict=False))
     swaps: dict[int, int] = {}
     for _, rows in frame.filter(pl.col("printed").is_not_null() & ~pl.col("agrees")).group_by("year", "stage", "group"):
@@ -139,8 +277,12 @@ def arbitrated(frame: pl.DataFrame) -> pl.DataFrame:
         votes=pl.col("index").replace_strict(swaps, default=pl.col("votes"), return_dtype=pl.Int64),
         clean=pl.col("clean") & ~pl.col("index").is_in(list(swaps)),
     )
+    if vision:
+        frame = second(nh_manual.verified(frame.drop("added", "agrees", strict=False)))
     frame = nh_manual.blocks(frame.drop("added", "agrees", "printed_right", strict=False))
-    cut = pl.col("digits").str.starts_with(",").any().over("year", "stage", "group")
+    cut = pl.col("digits").str.starts_with(",").any().over("year", "stage", "group") & ~(
+        pl.col("resolved").any().over("year", "stage", "group") if vision else pl.lit(False)
+    )
     return frame.with_columns(agrees=pl.when(cut).then(False).otherwise(pl.col("agrees")))
 
 
@@ -175,9 +317,7 @@ def emit():
     from ea.changeset import Changeset, slug
     from ea.store import connect
 
-    lines = arbitrated(
-        pl.read_parquet(PARSED / "lines.parquet").with_row_index("index").with_columns(pl.col("index").cast(pl.Int64))
-    )
+    lines = arbitrated(indexed())
     lines = (
         lines.with_columns(
             pl.struct("name", "town")
@@ -221,10 +361,10 @@ def emit():
                 report.setdefault("no contest", []).append(tag)
                 continue
             external, contest = found
-            if rows.filter(pl.col("agrees").is_null()).height:
+            if rows.filter(pl.col("agrees").is_null()).height and not rows["reads_agree"].all():
                 report.setdefault("no printed total", []).append(tag)
                 continue
-            if not rows["agrees"].all():
+            if rows.filter(pl.col("agrees").is_not_null()).height and not rows["agrees"].all():
                 report.setdefault("lines do not add to the printed total", []).append(tag)
                 continue
             default = conn.execute(
