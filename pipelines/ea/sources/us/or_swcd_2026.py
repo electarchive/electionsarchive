@@ -22,6 +22,7 @@ PUBLISHERS = {
     "https://re.bentoncountyor.gov/current-election/candidates/": "Benton County Elections",
     "https://multco.us/file/east_multnomah_swcd_certified_candidates.pdf/download": "Oregon Department of Agriculture",
     "https://multco.us/file/west_multnomah_swcd_certified_candidates.pdf/download": "Oregon Department of Agriculture",
+    "https://www.shermancountyor.gov/DocumentCenter/View/990": "Oregon Department of Agriculture",
     "https://www.klamathswcd.gov/files/fc3f6a186/2026+Klamath+Director+Candidates.pdf": "Oregon Department of Agriculture",
 }
 
