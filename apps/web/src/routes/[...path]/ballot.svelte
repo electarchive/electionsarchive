@@ -9,7 +9,7 @@
     ballot,
     place,
   }: {
-    ballot: Extract<PageData, { kind: "contest" }>["ballot"];
+    ballot: Awaited<Extract<PageData, { kind: "contest" }>["ballot"]>;
     place: string;
   } = $props();
 

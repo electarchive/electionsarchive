@@ -337,10 +337,12 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     };
   }
   if (found.kind === "contest") {
-    return {
-      ...found,
-      known: await call(router.coverage.known, { id: found.id }),
-    };
+    const [ballot, standing, known] = await Promise.all([
+      found.ballot,
+      found.standing,
+      call(router.coverage.known, { id: found.id }),
+    ]);
+    return { ...found, ballot, standing, known };
   }
   if (found.kind !== "polity") {
     return found;

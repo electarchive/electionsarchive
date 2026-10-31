@@ -29,6 +29,14 @@ async function found<T>(promise: Promise<T>) {
   }
 }
 
+function eager<T>(promise: Promise<T>) {
+  let settled: { value: T } | null = null;
+  void promise.then((value) => {
+    settled = { value };
+  });
+  return (): T | Promise<T> => (settled == null ? promise : settled.value);
+}
+
 async function draw() {
   const result = await db.execute<{
     id: string;
@@ -939,18 +947,60 @@ export async function archive(path: string, search: URLSearchParams) {
       round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
       group: search.get("group") ?? undefined,
     });
+    const ballot = eager(
+      got
+        .then(async () =>
+          call(router.contests.ballot, { id: slug.entity_id, unit }),
+        )
+        .catch(() => []),
+    );
+    const standing = eager(
+      (async () => {
+        if (unit === "") {
+          return null;
+        }
+        try {
+          await got;
+          return await call(router.contests.lean, {
+            id: slug.entity_id,
+            unit,
+            group: search.get("group") === "alliance" ? "alliance" : undefined,
+          });
+        } catch {
+          return null;
+        }
+      })(),
+    );
+    const around = (async () => {
+      const head = await got;
+      const siblings = head.scope.trail.at(-1)?.siblings;
+      if (siblings == null || head.locator != null) {
+        return null;
+      }
+      const [places, bounds] = await Promise.all([
+        call(router.contests.places, {
+          id: siblings.contest,
+          unit: siblings.unit ?? undefined,
+          by: siblings.level,
+        }),
+        call(router.contests.boundaries, {
+          id: siblings.contest,
+          unit: siblings.unit ?? undefined,
+          level: siblings.level,
+        }),
+      ]);
+      return { places, bounds };
+    })().catch(() => null);
     const [
       contest,
       boundaries,
       lists,
       rounds,
-      ballot,
       cycle,
       handover,
       additional,
       successors,
       statutes,
-      standing,
     ] = await found(
       Promise.all([
         got,
@@ -962,62 +1012,23 @@ export async function archive(path: string, search: URLSearchParams) {
           }))(),
         call(router.contests.lists, { id: slug.entity_id }),
         call(router.contests.rounds, { id: slug.entity_id, unit }),
-        call(router.contests.ballot, { id: slug.entity_id, unit }),
         call(router.contests.cycle, { id: slug.entity_id, unit }),
         call(router.seats.change, { id: slug.entity_id }),
         call(router.seats.additional, { id: slug.entity_id }),
         call(router.seats.successors, { id: slug.entity_id }),
         call(router.seats.statutes, { id: slug.entity_id }),
-        (async () => {
-          if (unit === "") {
-            return null;
-          }
-          try {
-            return await call(router.contests.lean, {
-              id: slug.entity_id,
-              unit,
-              group:
-                search.get("group") === "alliance" ? "alliance" : undefined,
-            });
-          } catch {
-            return null;
-          }
-        })(),
       ]),
     );
-    const siblings = contest.scope.trail.at(-1)?.siblings;
     const level = boundaries.find(
       (entry) => entry.scheme === contest.places?.level,
     );
     const own = boundaries.find(
       (entry) => entry.k != null && entry.scheme !== contest.places?.level,
     );
-    const surround = await (async () => {
-      if (
-        siblings == null ||
-        contest.locator != null ||
-        (own != null && level?.tiles != null && own.frame != null)
-      ) {
-        return null;
-      }
-      try {
-        const [places, bounds] = await Promise.all([
-          call(router.contests.places, {
-            id: siblings.contest,
-            unit: siblings.unit ?? undefined,
-            by: siblings.level,
-          }),
-          call(router.contests.boundaries, {
-            id: siblings.contest,
-            unit: siblings.unit ?? undefined,
-            level: siblings.level,
-          }),
-        ]);
-        return { places, bounds };
-      } catch {
-        return null;
-      }
-    })();
+    const surround =
+      own != null && level?.tiles != null && own.frame != null
+        ? null
+        : await around;
     return {
       kind: "contest" as const,
       id: slug.entity_id,
@@ -1025,7 +1036,7 @@ export async function archive(path: string, search: URLSearchParams) {
       contest,
       lists,
       rounds,
-      ballot,
+      ballot: ballot(),
       cycle,
       handover,
       additional,
@@ -1035,7 +1046,7 @@ export async function archive(path: string, search: URLSearchParams) {
       surround,
       match,
       within,
-      standing,
+      standing: standing(),
     };
   }
   if (slug.type === "election") {

@@ -189,6 +189,15 @@ export default antfu({
     },
   })
   .append({
+    name: "local/svelte-async",
+    files: ["apps/web/**/*.svelte"],
+    languageOptions: {
+      parserOptions: {
+        svelteConfig: { compilerOptions: { experimental: { async: true } } },
+      },
+    },
+  })
+  .append({
     name: "local/prelaunch-waivers",
     rules: {
       "sonarjs/cognitive-complexity": "off",

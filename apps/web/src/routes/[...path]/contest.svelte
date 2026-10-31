@@ -2088,27 +2088,29 @@
       />
     {/if}
   {/if}
-  {#if standing != null}
-    {const ahead = $derived(standing.axis[0])}
-    {const behind = $derived(standing.axis[1])}
-    {#if ahead != null && behind != null}
-      <Standing
-        sides={[
-          { label: ahead.label, tone: swatch(ahead.color, ahead.key) },
-          { label: behind.label, tone: swatch(behind.color, behind.key) },
-        ]}
-        place={standing.place}
-        marks={[standing.parent, standing.whole].filter((mark) => mark != null)}
-        within={standing.parent?.name ?? standing.whole.name}
-        siblings={standing.siblings}
-        year={standing.previous?.date == null
-          ? null
-          : Number(standing.previous.date.slice(0, 4))}
-        isAllied={standing.group === "alliance" && grouping === "option"}
-        isAbroad={contest.scope.abroad != null}
-      />
+  {#await standing then lean}
+    {#if lean != null}
+      {const ahead = $derived(lean.axis[0])}
+      {const behind = $derived(lean.axis[1])}
+      {#if ahead != null && behind != null}
+        <Standing
+          sides={[
+            { label: ahead.label, tone: swatch(ahead.color, ahead.key) },
+            { label: behind.label, tone: swatch(behind.color, behind.key) },
+          ]}
+          place={lean.place}
+          marks={[lean.parent, lean.whole].filter((mark) => mark != null)}
+          within={lean.parent?.name ?? lean.whole.name}
+          siblings={lean.siblings}
+          year={lean.previous?.date == null
+            ? null
+            : Number(lean.previous.date.slice(0, 4))}
+          isAllied={lean.group === "alliance" && grouping === "option"}
+          isAbroad={contest.scope.abroad != null}
+        />
+      {/if}
     {/if}
-  {/if}
+  {/await}
 {/if}
 
 {#if lists != null && additional == null && !drilled}
@@ -2222,9 +2224,11 @@
   </section>
 {/if}
 
-{#if ballot.length > 0}
-  <Ballot {ballot} place={contest.scope.name} />
-{/if}
+{#await ballot then entries}
+  {#if entries.length > 0}
+    <Ballot ballot={entries} place={contest.scope.name} />
+  {/if}
+{/await}
 
 <Cycle
   day={{

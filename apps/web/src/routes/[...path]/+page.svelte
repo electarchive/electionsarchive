@@ -5,10 +5,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { WITHIN } from "#lib/party.js";
   import type { PageData } from "./$types";
-  import Contest from "./contest.svelte";
-  import Day from "./day.svelte";
-  import Election from "./election.svelte";
-  import Polity from "./polity.svelte";
   import Preview from "./preview.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -230,6 +226,7 @@
       </nav>
     {/if}
     {#if data.kind === "contest"}
+      {const Contest = $derived((await import("./contest.svelte")).default)}
       <Contest
         id={data.id}
         unit={data.unit}
@@ -248,6 +245,7 @@
         standing={data.standing}
       />
     {:else if data.kind === "election"}
+      {const Election = $derived((await import("./election.svelte")).default)}
       {#key `${data.id}${query}`}
         <Election
           id={data.id}
@@ -262,8 +260,10 @@
         />
       {/key}
     {:else if data.kind === "day"}
+      {const Day = $derived((await import("./day.svelte")).default)}
       <Day {data} />
     {:else}
+      {const Polity = $derived((await import("./polity.svelte")).default)}
       <Polity id={data.id} polity={data.polity} />
     {/if}
   </article>
