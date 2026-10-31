@@ -1251,6 +1251,26 @@ FEEDS.update(
             "City of Rufus",
             "Submission Form for 2026 City of Rufus Elections (filed with Sherman County Clerk)",
         ),
+        "OR-41063-enterprise": (
+            "https://www.co.wallowa.or.us/media/7756",
+            "City of Enterprise",
+            "2026 General Election Filed Candidates (Wallowa County Clerk, report E-023)",
+        ),
+        "OR-41063-joseph": (
+            "https://www.co.wallowa.or.us/media/7756",
+            "City of Joseph",
+            "2026 General Election Filed Candidates (Wallowa County Clerk, report E-023)",
+        ),
+        "OR-41063-lostine": (
+            "https://www.co.wallowa.or.us/media/7756",
+            "City of Lostine",
+            "2026 General Election Filed Candidates (Wallowa County Clerk, report E-023)",
+        ),
+        "OR-41063-wallowa": (
+            "https://www.co.wallowa.or.us/media/7756",
+            "City of Wallowa",
+            "2026 General Election Filed Candidates (Wallowa County Clerk, report E-023)",
+        ),
         "OR-41019": (
             "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
             "Douglas County Clerk",
@@ -1448,6 +1468,10 @@ DELIVERED = {
     "OR-41055-moro": DATA / "inbox" / "y26" / "or" / "sherman_moro.pdf",
     "OR-41055-grass-valley": DATA / "inbox" / "y26" / "or" / "sherman_grass_valley.pdf",
     "OR-41055-rufus": DATA / "inbox" / "y26" / "or" / "sherman_rufus.pdf",
+    "OR-41063-enterprise": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
+    "OR-41063-joseph": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
+    "OR-41063-lostine": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
+    "OR-41063-wallowa": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
     "OH-39165": DATA / "inbox" / "y26" / "oh" / "warren_cands.pdf",
     "OH-39041": DATA / "inbox" / "y26" / "oh" / "delaware_cands.pdf",
     "OH-39155": DATA / "inbox" / "y26" / "oh" / "trumbull_cands.pdf",
