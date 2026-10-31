@@ -2,6 +2,392 @@ import { defineRelations } from "drizzle-orm";
 import * as schema from "./core.ts";
 
 export const relations = defineRelations(schema, (r) => ({
+	activity: {
+		user: r.one.users({
+			from: r.activity.actorUserId,
+			to: r.users.id
+		}),
+		apikey: r.one.apikeys({
+			from: r.activity.agentKeyId,
+			to: r.apikeys.id
+		}),
+		changeset: r.one.changeset({
+			from: r.activity.changesetId,
+			to: r.changeset.id
+		}),
+		comment: r.one.comment({
+			from: r.activity.commentId,
+			to: r.comment.id
+		}),
+		proposal: r.one.proposal({
+			from: r.activity.proposalId,
+			to: r.proposal.id
+		}),
+		thread: r.one.thread({
+			from: r.activity.threadId,
+			to: r.thread.id
+		}),
+	},
+	users: {
+		activities: r.many.activity(),
+		archiveCaptures: r.many.archiveCapture(),
+		changesetsAuthorUserId: r.many.changeset({
+			alias: "changeset_authorUserId_users_id"
+		}),
+		changesetsReviewedBy: r.many.changeset({
+			alias: "changeset_reviewedBy_users_id"
+		}),
+		commentsAuthorUserId: r.many.comment({
+			alias: "comment_authorUserId_users_id"
+		}),
+		commentsHiddenBy: r.many.comment({
+			alias: "comment_hiddenBy_users_id"
+		}),
+		profiles: r.many.profile(),
+		proposalsAuthorUserId: r.many.proposal({
+			alias: "proposal_authorUserId_users_id"
+		}),
+		proposalsDecidedBy: r.many.proposal({
+			alias: "proposal_decidedBy_users_id"
+		}),
+		proposalsViaProposalJob: r.many.proposal({
+			alias: "proposal_id_users_id_via_proposalJob"
+		}),
+		proposalJobs: r.many.proposalJob(),
+		proposalsViaThread: r.many.proposal({
+			from: r.users.id.through(r.thread.authorUserId),
+			to: r.proposal.id.through(r.thread.proposalId),
+			alias: "users_id_proposal_id_via_thread"
+		}),
+		threads: r.many.thread(),
+		apikeys: r.many.apikeys(),
+		uploads: r.many.upload(),
+		watches: r.many.watch(),
+	},
+	apikeys: {
+		activities: r.many.activity(),
+		comments: r.many.comment(),
+		proposals: r.many.proposal(),
+		users: r.many.users({
+			from: r.apikeys.id.through(r.upload.agentKeyId),
+			to: r.users.id.through(r.upload.ownerUserId)
+		}),
+		uploads: r.many.upload(),
+	},
+	changeset: {
+		activities: r.many.activity(),
+		alliances: r.many.alliance(),
+		allianceMembers: r.many.allianceMember(),
+		areasChangesetId: r.many.area({
+			alias: "area_changesetId_changeset_id"
+		}),
+		areasViaAreaCode: r.many.area({
+			alias: "area_id_changeset_id_via_areaCode"
+		}),
+		areaCodes: r.many.areaCode(),
+		sourcesViaAreaEvent: r.many.source({
+			from: r.changeset.id.through(r.areaEvent.changesetId),
+			to: r.source.id.through(r.areaEvent.sourceId),
+			alias: "changeset_id_source_id_via_areaEvent"
+		}),
+		areaEvents: r.many.areaEvent(),
+		areaEventMembers: r.many.areaEventMember(),
+		areaGeometries: r.many.areaGeometry(),
+		areaParents: r.many.areaParent(),
+		areaUniverses: r.many.areaUniverse(),
+		contestsViaBallotQuestion: r.many.contest({
+			from: r.changeset.id.through(r.ballotQuestion.changesetId),
+			to: r.contest.id.through(r.ballotQuestion.contestId),
+			alias: "changeset_id_contest_id_via_ballotQuestion"
+		}),
+		ballotQuestions: r.many.ballotQuestion(),
+		ballotQuestionTexts: r.many.ballotQuestionText(),
+		bodiesChangesetId: r.many.body({
+			alias: "body_changesetId_changeset_id"
+		}),
+		bodyApportionments: r.many.bodyApportionment(),
+		bodyChambers: r.many.bodyChamber(),
+		bodyEvents: r.many.bodyEvent(),
+		bodiesViaBodySize: r.many.body({
+			alias: "body_id_changeset_id_via_bodySize"
+		}),
+		bodySizes: r.many.bodySize(),
+		bodiesViaBodySizePart: r.many.body({
+			alias: "body_id_changeset_id_via_bodySizePart"
+		}),
+		bodySizeParts: r.many.bodySizePart(),
+		schemesViaBoundarySet: r.many.scheme({
+			from: r.changeset.id.through(r.boundarySet.changesetId),
+			to: r.scheme.code.through(r.boundarySet.schemeCode),
+			alias: "changeset_id_scheme_code_via_boundarySet"
+		}),
+		boundarySets: r.many.boundarySet(),
+		candidacies: r.many.candidacy(),
+		candidacyNominations: r.many.candidacyNomination(),
+		userAuthorUserId: r.one.users({
+			from: r.changeset.authorUserId,
+			to: r.users.id,
+			alias: "changeset_authorUserId_users_id"
+		}),
+		userReviewedBy: r.one.users({
+			from: r.changeset.reviewedBy,
+			to: r.users.id,
+			alias: "changeset_reviewedBy_users_id"
+		}),
+		citations: r.many.citation(),
+		contestsChangesetId: r.many.contest({
+			alias: "contest_changesetId_changeset_id"
+		}),
+		contestOptions: r.many.contestOption(),
+		crosswalks: r.many.crosswalk(),
+		elections: r.many.election(),
+		electoralSystems: r.many.electoralSystem(),
+		entitiesChangesetId: r.many.entity({
+			alias: "entity_changesetId_changeset_id"
+		}),
+		entitiesRetiredBy: r.many.entity({
+			alias: "entity_retiredBy_changeset_id"
+		}),
+		entityMerges: r.many.entityMerge(),
+		entitiesViaEntityRetirement: r.many.entity({
+			from: r.changeset.id.through(r.entityRetirement.changesetId),
+			to: r.entity.id.through(r.entityRetirement.entityId),
+			alias: "changeset_id_entity_id_via_entityRetirement"
+		}),
+		entityRetirements: r.many.entityRetirement(),
+		entitiesViaEntitySubtypeDrop: r.many.entity({
+			from: r.changeset.id.through(r.entitySubtypeDrop.changesetId),
+			to: r.entity.id.through(r.entitySubtypeDrop.entityId),
+			alias: "changeset_id_entity_id_via_entitySubtypeDrop"
+		}),
+		entitySubtypeDrops: r.many.entitySubtypeDrop(),
+		entitiesViaExternalId: r.many.entity({
+			from: r.changeset.id.through(r.externalId.changesetId),
+			to: r.entity.id.through(r.externalId.entityId),
+			alias: "changeset_id_entity_id_via_externalId"
+		}),
+		externalIds: r.many.externalId(),
+		entitiesViaExternalIdDrop: r.many.entity({
+			from: r.changeset.id.through(r.externalIdDrop.changesetId),
+			to: r.entity.id.through(r.externalIdDrop.entityId),
+			alias: "changeset_id_entity_id_via_externalIdDrop"
+		}),
+		externalIdDrops: r.many.externalIdDrop(),
+		factRekeys: r.many.factRekey(),
+		financeSummaries: r.many.financeSummary(),
+		flags: r.many.flag(),
+		governments: r.many.government(),
+		governmentParties: r.many.governmentParty(),
+		sourcesViaIndicator: r.many.source({
+			from: r.changeset.id.through(r.indicator.changesetId),
+			to: r.source.id.through(r.indicator.sourceId),
+			alias: "changeset_id_source_id_via_indicator"
+		}),
+		indicators: r.many.indicator(),
+		labels: r.many.label(),
+		membershipDrops: r.many.membershipDrop(),
+		names: r.many.name(),
+		entitiesViaNameDrop: r.many.entity({
+			from: r.changeset.id.through(r.nameDrop.changesetId),
+			to: r.entity.id.through(r.nameDrop.entityId),
+			alias: "changeset_id_entity_id_via_nameDrop"
+		}),
+		nameDrops: r.many.nameDrop(),
+		entitiesViaNote: r.many.entity({
+			from: r.changeset.id.through(r.note.changesetId),
+			to: r.entity.id.through(r.note.entityId),
+			alias: "changeset_id_entity_id_via_note"
+		}),
+		notes: r.many.note(),
+		entitiesViaNoteDrop: r.many.entity({
+			from: r.changeset.id.through(r.noteDrop.changesetId),
+			to: r.entity.id.through(r.noteDrop.entityId),
+			alias: "changeset_id_entity_id_via_noteDrop"
+		}),
+		noteDrops: r.many.noteDrop(),
+		offices: r.many.office(),
+		contestsViaOptionDrop: r.many.contest({
+			from: r.changeset.id.through(r.optionDrop.changesetId),
+			to: r.contest.id.through(r.optionDrop.contestId),
+			alias: "changeset_id_contest_id_via_optionDrop"
+		}),
+		optionDrops: r.many.optionDrop(),
+		outcomes: r.many.outcome(),
+		parties: r.many.party(),
+		partyAffiliations: r.many.partyAffiliation(),
+		partyColors: r.many.partyColor(),
+		partyFoundings: r.many.partyFounding(),
+		partyImages: r.many.partyImage(),
+		partyPositions: r.many.partyPosition(),
+		partyRelations: r.many.partyRelation(),
+		entitiesViaPerson: r.many.entity({
+			from: r.changeset.id.through(r.person.changesetId),
+			to: r.entity.id.through(r.person.id),
+			alias: "changeset_id_entity_id_via_person"
+		}),
+		people: r.many.person(),
+		personImages: r.many.personImage(),
+		personPartyMemberships: r.many.personPartyMembership(),
+		entitiesViaPolity: r.many.entity({
+			from: r.changeset.id.through(r.polity.changesetId),
+			to: r.entity.id.through(r.polity.id),
+			alias: "changeset_id_entity_id_via_polity"
+		}),
+		politiesChangesetId: r.many.polity({
+			alias: "polity_changesetId_changeset_id"
+		}),
+		polityParents: r.many.polityParent(),
+		politiesViaPolityPeriod: r.many.polity({
+			from: r.changeset.id.through(r.polityPeriod.changesetId),
+			to: r.polity.id.through(r.polityPeriod.polityId),
+			alias: "changeset_id_polity_id_via_polityPeriod"
+		}),
+		polityPeriods: r.many.polityPeriod(),
+		polityRelations: r.many.polityRelation(),
+		polityTerritories: r.many.polityTerritory(),
+		proposalsHeadChangesetId: r.many.proposal({
+			alias: "proposal_headChangesetId_changeset_id"
+		}),
+		proposalsViaProposalRevision: r.many.proposal({
+			from: r.changeset.id.through(r.proposalRevision.changesetId),
+			to: r.proposal.id.through(r.proposalRevision.proposalId),
+			alias: "changeset_id_proposal_id_via_proposalRevision"
+		}),
+		proposalRevisions: r.one.proposalRevision(),
+		releases: r.many.release(),
+		reportingUnits: r.many.reportingUnit(),
+		reportingUnitAreas: r.many.reportingUnitArea(),
+		representationGaps: r.many.representationGap(),
+		resultSets: r.many.resultSet(),
+		resultSetDrops: r.many.resultSetDrop(),
+		rowDrops: r.many.rowDrop(),
+		politiesViaScheme: r.many.polity({
+			from: r.changeset.id.through(r.scheme.changesetId),
+			to: r.polity.id.through(r.scheme.polityId),
+			alias: "changeset_id_polity_id_via_scheme"
+		}),
+		schemesChangesetId: r.many.scheme({
+			alias: "scheme_changesetId_changeset_id"
+		}),
+		seats: r.many.seat(),
+		entitiesViaSlug: r.many.entity({
+			from: r.changeset.id.through(r.slug.changesetId),
+			to: r.entity.id.through(r.slug.entityId),
+			alias: "changeset_id_entity_id_via_slug"
+		}),
+		slugs: r.many.slug(),
+		entitiesViaSource: r.many.entity({
+			from: r.changeset.id.through(r.source.changesetId),
+			to: r.entity.id.through(r.source.id),
+			alias: "changeset_id_entity_id_via_source"
+		}),
+		sourcesChangesetId: r.many.source({
+			alias: "source_changesetId_changeset_id"
+		}),
+		sourcesViaSourceArtifact: r.many.source({
+			from: r.changeset.id.through(r.sourceArtifact.changesetId),
+			to: r.source.id.through(r.sourceArtifact.sourceId),
+			alias: "changeset_id_source_id_via_sourceArtifact"
+		}),
+		sourceArtifactsChangesetId: r.many.sourceArtifact({
+			alias: "sourceArtifact_changesetId_changeset_id"
+		}),
+		sourceArtifactsViaSourcePage: r.many.sourceArtifact({
+			alias: "sourceArtifact_id_changeset_id_via_sourcePage"
+		}),
+		sourcePages: r.many.sourcePage(),
+		tenures: r.many.tenure(),
+		tenureAffiliations: r.many.tenureAffiliation(),
+		tenureEvents: r.many.tenureEvent(),
+		sourcesViaTranslation: r.many.source({
+			from: r.changeset.id.through(r.translation.changesetId),
+			to: r.source.id.through(r.translation.sourceId),
+			alias: "changeset_id_source_id_via_translation"
+		}),
+		translations: r.many.translation(),
+		unitAreaDrops: r.many.unitAreaDrop(),
+	},
+	comment: {
+		activities: r.many.activity(),
+		apikey: r.one.apikeys({
+			from: r.comment.agentKeyId,
+			to: r.apikeys.id
+		}),
+		userAuthorUserId: r.one.users({
+			from: r.comment.authorUserId,
+			to: r.users.id,
+			alias: "comment_authorUserId_users_id"
+		}),
+		userHiddenBy: r.one.users({
+			from: r.comment.hiddenBy,
+			to: r.users.id,
+			alias: "comment_hiddenBy_users_id"
+		}),
+		comment: r.one.comment({
+			from: r.comment.parentId,
+			to: r.comment.id,
+			alias: "comment_parentId_comment_id"
+		}),
+		comments: r.many.comment({
+			alias: "comment_parentId_comment_id"
+		}),
+		thread: r.one.thread({
+			from: r.comment.threadId,
+			to: r.thread.id
+		}),
+	},
+	proposal: {
+		activities: r.many.activity(),
+		apikey: r.one.apikeys({
+			from: r.proposal.agentKeyId,
+			to: r.apikeys.id
+		}),
+		userAuthorUserId: r.one.users({
+			from: r.proposal.authorUserId,
+			to: r.users.id,
+			alias: "proposal_authorUserId_users_id"
+		}),
+		userDecidedBy: r.one.users({
+			from: r.proposal.decidedBy,
+			to: r.users.id,
+			alias: "proposal_decidedBy_users_id"
+		}),
+		changeset: r.one.changeset({
+			from: r.proposal.headChangesetId,
+			to: r.changeset.id,
+			alias: "proposal_headChangesetId_changeset_id"
+		}),
+		polity: r.one.polity({
+			from: r.proposal.polityId,
+			to: r.polity.id
+		}),
+		usersViaProposalJob: r.many.users({
+			from: r.proposal.id.through(r.proposalJob.proposalId),
+			to: r.users.id.through(r.proposalJob.requestedBy),
+			alias: "proposal_id_users_id_via_proposalJob"
+		}),
+		proposalJobs: r.many.proposalJob(),
+		changesets: r.many.changeset({
+			alias: "changeset_id_proposal_id_via_proposalRevision"
+		}),
+		proposalRevisions: r.many.proposalRevision(),
+		usersViaThread: r.many.users({
+			alias: "users_id_proposal_id_via_thread"
+		}),
+		threads: r.one.thread(),
+	},
+	thread: {
+		activities: r.many.activity(),
+		comments: r.many.comment(),
+		user: r.one.users({
+			from: r.thread.authorUserId,
+			to: r.users.id
+		}),
+		proposal: r.one.proposal({
+			from: r.thread.proposalId,
+			to: r.proposal.id
+		}),
+	},
 	alliance: {
 		changeset: r.one.changeset({
 			from: r.alliance.changesetId,
@@ -25,155 +411,6 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		allianceMembers: r.many.allianceMember(),
 		contestOptions: r.many.contestOption(),
-	},
-	changeset: {
-		alliances: r.many.alliance(),
-		allianceMembers: r.many.allianceMember(),
-		areasChangesetId: r.many.area({
-			alias: "area_changesetId_changeset_id"
-		}),
-		areasViaAreaCode: r.many.area({
-			alias: "area_id_changeset_id_via_areaCode"
-		}),
-		sourcesViaAreaEvent: r.many.source({
-			from: r.changeset.id.through(r.areaEvent.changesetId),
-			to: r.source.id.through(r.areaEvent.sourceId),
-			alias: "changeset_id_source_id_via_areaEvent"
-		}),
-		areaEventMembers: r.many.areaEventMember(),
-		areaGeometries: r.many.areaGeometry(),
-		areaParents: r.many.areaParent(),
-		areaUniverses: r.many.areaUniverse(),
-		contestsViaBallotQuestion: r.many.contest({
-			from: r.changeset.id.through(r.ballotQuestion.changesetId),
-			to: r.contest.id.through(r.ballotQuestion.contestId),
-			alias: "changeset_id_contest_id_via_ballotQuestion"
-		}),
-		ballotQuestionTexts: r.many.ballotQuestionText(),
-		bodiesChangesetId: r.many.body({
-			alias: "body_changesetId_changeset_id"
-		}),
-		bodyApportionments: r.many.bodyApportionment(),
-		bodyEvents: r.many.bodyEvent(),
-		bodiesViaBodySize: r.many.body({
-			alias: "body_id_changeset_id_via_bodySize"
-		}),
-		schemes: r.many.scheme({
-			from: r.changeset.id.through(r.boundarySet.changesetId),
-			to: r.scheme.code.through(r.boundarySet.schemeCode)
-		}),
-		candidacies: r.many.candidacy(),
-		candidacyNominations: r.many.candidacyNomination(),
-		citations: r.many.citation(),
-		contestsChangesetId: r.many.contest({
-			alias: "contest_changesetId_changeset_id"
-		}),
-		contestOptions: r.many.contestOption(),
-		crosswalks: r.many.crosswalk(),
-		elections: r.many.election(),
-		electoralSystems: r.many.electoralSystem(),
-		entityMerges: r.many.entityMerge(),
-		entitiesViaEntityRetirement: r.many.entity({
-			from: r.changeset.id.through(r.entityRetirement.changesetId),
-			to: r.entity.id.through(r.entityRetirement.entityId),
-			alias: "changeset_id_entity_id_via_entityRetirement"
-		}),
-		entitiesViaEntitySubtypeDrop: r.many.entity({
-			from: r.changeset.id.through(r.entitySubtypeDrop.changesetId),
-			to: r.entity.id.through(r.entitySubtypeDrop.entityId),
-			alias: "changeset_id_entity_id_via_entitySubtypeDrop"
-		}),
-		entitiesViaExternalId: r.many.entity({
-			from: r.changeset.id.through(r.externalId.changesetId),
-			to: r.entity.id.through(r.externalId.entityId),
-			alias: "changeset_id_entity_id_via_externalId"
-		}),
-		factRekeys: r.many.factRekey(),
-		financeSummaries: r.many.financeSummary(),
-		flags: r.many.flag(),
-		governments: r.many.government(),
-		governmentParties: r.many.governmentParty(),
-		sourcesViaIndicator: r.many.source({
-			from: r.changeset.id.through(r.indicator.changesetId),
-			to: r.source.id.through(r.indicator.sourceId),
-			alias: "changeset_id_source_id_via_indicator"
-		}),
-		labels: r.many.label(),
-		membershipDrops: r.many.membershipDrop(),
-		names: r.many.name(),
-		entitiesViaNameDrop: r.many.entity({
-			from: r.changeset.id.through(r.nameDrop.changesetId),
-			to: r.entity.id.through(r.nameDrop.entityId),
-			alias: "changeset_id_entity_id_via_nameDrop"
-		}),
-		entitiesViaNote: r.many.entity({
-			from: r.changeset.id.through(r.note.changesetId),
-			to: r.entity.id.through(r.note.entityId),
-			alias: "changeset_id_entity_id_via_note"
-		}),
-		entitiesViaNoteDrop: r.many.entity({
-			from: r.changeset.id.through(r.noteDrop.changesetId),
-			to: r.entity.id.through(r.noteDrop.entityId),
-			alias: "changeset_id_entity_id_via_noteDrop"
-		}),
-		offices: r.many.office(),
-		outcomes: r.many.outcome(),
-		parties: r.many.party(),
-		partyAffiliations: r.many.partyAffiliation(),
-		partyColors: r.many.partyColor(),
-		partyPositions: r.many.partyPosition(),
-		partyRelations: r.many.partyRelation(),
-		entitiesViaPerson: r.many.entity({
-			from: r.changeset.id.through(r.person.changesetId),
-			to: r.entity.id.through(r.person.id),
-			alias: "changeset_id_entity_id_via_person"
-		}),
-		personImages: r.many.personImage(),
-		personPartyMemberships: r.many.personPartyMembership(),
-		entitiesViaPolity: r.many.entity({
-			from: r.changeset.id.through(r.polity.changesetId),
-			to: r.entity.id.through(r.polity.id),
-			alias: "changeset_id_entity_id_via_polity"
-		}),
-		polityParents: r.many.polityParent(),
-		politiesViaPolityPeriod: r.many.polity({
-			from: r.changeset.id.through(r.polityPeriod.changesetId),
-			to: r.polity.id.through(r.polityPeriod.polityId),
-			alias: "changeset_id_polity_id_via_polityPeriod"
-		}),
-		polityRelations: r.many.polityRelation(),
-		polityTerritories: r.many.polityTerritory(),
-		releases: r.many.release(),
-		reportingUnits: r.many.reportingUnit(),
-		reportingUnitAreas: r.many.reportingUnitArea(),
-		representationGaps: r.many.representationGap(),
-		resultSets: r.many.resultSet(),
-		politiesViaScheme: r.many.polity({
-			from: r.changeset.id.through(r.scheme.changesetId),
-			to: r.polity.id.through(r.scheme.polityId),
-			alias: "changeset_id_polity_id_via_scheme"
-		}),
-		seats: r.many.seat(),
-		entitiesViaSlug: r.many.entity({
-			from: r.changeset.id.through(r.slug.changesetId),
-			to: r.entity.id.through(r.slug.entityId),
-			alias: "changeset_id_entity_id_via_slug"
-		}),
-		entitiesViaSource: r.many.entity({
-			from: r.changeset.id.through(r.source.changesetId),
-			to: r.entity.id.through(r.source.id),
-			alias: "changeset_id_entity_id_via_source"
-		}),
-		sourcesViaSourceArtifact: r.many.source({
-			from: r.changeset.id.through(r.sourceArtifact.changesetId),
-			to: r.source.id.through(r.sourceArtifact.sourceId),
-			alias: "changeset_id_source_id_via_sourceArtifact"
-		}),
-		sourceArtifacts: r.many.sourceArtifact(),
-		tenures: r.many.tenure(),
-		tenureAffiliations: r.many.tenureAffiliation(),
-		tenureEvents: r.many.tenureEvent(),
-		unitAreaDrops: r.many.unitAreaDrop(),
 	},
 	election: {
 		alliances: r.many.alliance(),
@@ -221,6 +458,16 @@ export const relations = defineRelations(schema, (r) => ({
 		contestOptions: r.many.contestOption(),
 		elections: r.many.election(),
 		electoralSystems: r.many.electoralSystem(),
+		changesetChangesetId: r.one.changeset({
+			from: r.entity.changesetId,
+			to: r.changeset.id,
+			alias: "entity_changesetId_changeset_id"
+		}),
+		changesetRetiredBy: r.one.changeset({
+			from: r.entity.retiredBy,
+			to: r.changeset.id,
+			alias: "entity_retiredBy_changeset_id"
+		}),
 		entityMergesEntityId: r.many.entityMerge({
 			alias: "entityMerge_entityId_entity_id"
 		}),
@@ -230,12 +477,19 @@ export const relations = defineRelations(schema, (r) => ({
 		changesetsViaEntityRetirement: r.many.changeset({
 			alias: "changeset_id_entity_id_via_entityRetirement"
 		}),
+		entityRetirements: r.many.entityRetirement(),
 		changesetsViaEntitySubtypeDrop: r.many.changeset({
 			alias: "changeset_id_entity_id_via_entitySubtypeDrop"
 		}),
+		entitySubtypeDrops: r.many.entitySubtypeDrop(),
 		changesetsViaExternalId: r.many.changeset({
 			alias: "changeset_id_entity_id_via_externalId"
 		}),
+		externalIds: r.many.externalId(),
+		changesetsViaExternalIdDrop: r.many.changeset({
+			alias: "changeset_id_entity_id_via_externalIdDrop"
+		}),
+		externalIdDrops: r.many.externalIdDrop(),
 		financeSummaries: r.many.financeSummary(),
 		flags: r.many.flag(),
 		governments: r.many.government(),
@@ -244,33 +498,44 @@ export const relations = defineRelations(schema, (r) => ({
 		changesetsViaNameDrop: r.many.changeset({
 			alias: "changeset_id_entity_id_via_nameDrop"
 		}),
+		nameDrops: r.many.nameDrop(),
 		changesetsViaNote: r.many.changeset({
 			alias: "changeset_id_entity_id_via_note"
 		}),
+		notes: r.many.note(),
 		changesetsViaNoteDrop: r.many.changeset({
 			alias: "changeset_id_entity_id_via_noteDrop"
 		}),
+		noteDrops: r.many.noteDrop(),
 		offices: r.many.office(),
 		parties: r.many.party(),
 		changesetsViaPerson: r.many.changeset({
 			alias: "changeset_id_entity_id_via_person"
 		}),
+		people: r.many.person(),
 		changesetsViaPolity: r.many.changeset({
 			alias: "changeset_id_entity_id_via_polity"
 		}),
+		politiesId: r.many.polity({
+			alias: "polity_id_entity_id"
+		}),
 		reportingUnits: r.many.reportingUnit(),
 		resultSets: r.many.resultSet(),
-		polities: r.many.polity({
+		politiesViaSearchDocument: r.many.polity({
 			from: r.entity.id.through(r.searchDocument.entityId),
-			to: r.polity.id.through(r.searchDocument.polityId)
+			to: r.polity.id.through(r.searchDocument.polityId),
+			alias: "entity_id_polity_id_via_searchDocument"
 		}),
+		searchDocuments: r.many.searchDocument(),
 		seats: r.many.seat(),
 		changesetsViaSlug: r.many.changeset({
 			alias: "changeset_id_entity_id_via_slug"
 		}),
+		slugs: r.one.slug(),
 		changesetsViaSource: r.many.changeset({
 			alias: "changeset_id_entity_id_via_source"
 		}),
+		sources: r.many.source(),
 		tenures: r.many.tenure(),
 	},
 	allianceMember: {
@@ -314,6 +579,8 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "partyAffiliation_partyId_party_id"
 		}),
 		partyColors: r.many.partyColor(),
+		partyFoundings: r.many.partyFounding(),
+		partyImages: r.many.partyImage(),
 		partyPositions: r.many.partyPosition(),
 		partyRelationsFromPartyId: r.many.partyRelation({
 			alias: "partyRelation_fromPartyId_party_id"
@@ -323,6 +590,12 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		personPartyMemberships: r.many.personPartyMembership(),
 		tenureAffiliations: r.many.tenureAffiliation(),
+	},
+	archiveCapture: {
+		user: r.one.users({
+			from: r.archiveCapture.ownerUserId,
+			to: r.users.id
+		}),
 	},
 	area: {
 		changeset: r.one.changeset({
@@ -343,6 +616,7 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.changeset.id.through(r.areaCode.changesetId),
 			alias: "area_id_changeset_id_via_areaCode"
 		}),
+		areaCodes: r.many.areaCode(),
 		areaEventMembers: r.many.areaEventMember(),
 		areaGeometries: r.many.areaGeometry(),
 		areaParentsAreaId: r.many.areaParent({
@@ -368,17 +642,41 @@ export const relations = defineRelations(schema, (r) => ({
 	},
 	scheme: {
 		areas: r.many.area(),
-		changesets: r.many.changeset(),
+		changesets: r.many.changeset({
+			alias: "changeset_id_scheme_code_via_boundarySet"
+		}),
+		boundarySets: r.many.boundarySet(),
 		crosswalks: r.many.crosswalk(),
 		reportingUnits: r.many.reportingUnit(),
+		changeset: r.one.changeset({
+			from: r.scheme.changesetId,
+			to: r.changeset.id,
+			alias: "scheme_changesetId_changeset_id"
+		}),
+		polity: r.one.polity({
+			from: r.scheme.polityId,
+			to: r.polity.id
+		}),
+	},
+	areaCode: {
+		area: r.one.area({
+			from: r.areaCode.areaId,
+			to: r.area.id
+		}),
+		changeset: r.one.changeset({
+			from: r.areaCode.changesetId,
+			to: r.changeset.id
+		}),
 	},
 	source: {
 		changesetsViaAreaEvent: r.many.changeset({
 			alias: "changeset_id_source_id_via_areaEvent"
 		}),
+		areaEvents: r.many.areaEvent(),
 		areaGeometries: r.many.areaGeometry(),
 		areaUniverses: r.many.areaUniverse(),
 		ballotQuestionTexts: r.many.ballotQuestionText(),
+		bodyChambers: r.many.bodyChamber(),
 		bodyEvents: r.many.bodyEvent(),
 		citations: r.many.citation(),
 		financeSummaries: r.many.financeSummary(),
@@ -386,20 +684,49 @@ export const relations = defineRelations(schema, (r) => ({
 		changesetsViaIndicator: r.many.changeset({
 			alias: "changeset_id_source_id_via_indicator"
 		}),
+		indicators: r.many.indicator(),
 		labels: r.many.label(),
 		names: r.many.name(),
 		partyColors: r.many.partyColor(),
+		partyFoundings: r.many.partyFounding(),
+		partyImages: r.many.partyImage(),
 		partyPositions: r.many.partyPosition(),
 		partyRelations: r.many.partyRelation(),
 		personImages: r.many.personImage(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		polityRelations: r.many.polityRelation(),
 		resultSets: r.many.resultSet(),
+		changeset: r.one.changeset({
+			from: r.source.changesetId,
+			to: r.changeset.id,
+			alias: "source_changesetId_changeset_id"
+		}),
+		entity: r.one.entity({
+			from: r.source.id,
+			to: r.entity.id
+		}),
 		changesetsViaSourceArtifact: r.many.changeset({
 			alias: "changeset_id_source_id_via_sourceArtifact"
 		}),
+		sourceArtifacts: r.many.sourceArtifact(),
 		tenureEvents: r.many.tenureEvent(),
+		changesetsViaTranslation: r.many.changeset({
+			alias: "changeset_id_source_id_via_translation"
+		}),
+		translations: r.many.translation(),
 		sourcePages: r.many.sourcePage(),
+		valueLocators: r.many.valueLocator(),
+	},
+	areaEvent: {
+		changeset: r.one.changeset({
+			from: r.areaEvent.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.areaEvent.sourceId,
+			to: r.source.id
+		}),
+		areaEventMembers: r.many.areaEventMember(),
 	},
 	areaEventMember: {
 		area: r.one.area({
@@ -414,9 +741,6 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.areaEventMember.eventId,
 			to: r.areaEvent.id
 		}),
-	},
-	areaEvent: {
-		areaEventMembers: r.many.areaEventMember(),
 	},
 	areaGeometry: {
 		area: r.one.area({
@@ -500,9 +824,10 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 	},
 	contest: {
-		changesets: r.many.changeset({
+		changesetsViaBallotQuestion: r.many.changeset({
 			alias: "changeset_id_contest_id_via_ballotQuestion"
 		}),
+		ballotQuestions: r.many.ballotQuestion(),
 		contestAllocationParentId: r.one.contest({
 			from: r.contest.allocationParentId,
 			to: r.contest.id,
@@ -561,8 +886,23 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.seat.id
 		}),
 		contestOptions: r.many.contestOption(),
+		changesetsViaOptionDrop: r.many.changeset({
+			alias: "changeset_id_contest_id_via_optionDrop"
+		}),
+		optionDrops: r.many.optionDrop(),
 		resultSets: r.many.resultSet(),
 		tenures: r.many.tenure(),
+	},
+	ballotQuestion: {
+		changeset: r.one.changeset({
+			from: r.ballotQuestion.changesetId,
+			to: r.changeset.id
+		}),
+		contest: r.one.contest({
+			from: r.ballotQuestion.contestId,
+			to: r.contest.id
+		}),
+		ballotQuestionTexts: r.many.ballotQuestionText(),
 	},
 	ballotQuestionText: {
 		changeset: r.one.changeset({
@@ -577,9 +917,6 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.ballotQuestionText.sourceId,
 			to: r.source.id
 		}),
-	},
-	ballotQuestion: {
-		ballotQuestionTexts: r.many.ballotQuestionText(),
 	},
 	body: {
 		changeset: r.one.changeset({
@@ -596,12 +933,25 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.polity.id
 		}),
 		bodyApportionments: r.many.bodyApportionment(),
+		bodyChambersBodyId: r.many.bodyChamber({
+			alias: "bodyChamber_bodyId_body_id"
+		}),
+		bodyChambersOfBodyId: r.many.bodyChamber({
+			alias: "bodyChamber_ofBodyId_body_id"
+		}),
 		bodyEvents: r.many.bodyEvent(),
-		changesets: r.many.changeset({
+		changesetsViaBodySize: r.many.changeset({
 			from: r.body.id.through(r.bodySize.bodyId),
 			to: r.changeset.id.through(r.bodySize.changesetId),
 			alias: "body_id_changeset_id_via_bodySize"
 		}),
+		bodySizes: r.many.bodySize(),
+		changesetsViaBodySizePart: r.many.changeset({
+			from: r.body.id.through(r.bodySizePart.bodyId),
+			to: r.changeset.id.through(r.bodySizePart.changesetId),
+			alias: "body_id_changeset_id_via_bodySizePart"
+		}),
+		bodySizeParts: r.many.bodySizePart(),
 		contests: r.many.contest(),
 		offices: r.many.office(),
 		representationGaps: r.many.representationGap(),
@@ -615,6 +965,16 @@ export const relations = defineRelations(schema, (r) => ({
 		governments: r.many.government(),
 		offices: r.many.office(),
 		parties: r.many.party(),
+		changeset: r.one.changeset({
+			from: r.polity.changesetId,
+			to: r.changeset.id,
+			alias: "polity_changesetId_changeset_id"
+		}),
+		entity: r.one.entity({
+			from: r.polity.id,
+			to: r.entity.id,
+			alias: "polity_id_entity_id"
+		}),
 		polityParentsParentId: r.many.polityParent({
 			alias: "polityParent_parentId_polity_id"
 		}),
@@ -624,6 +984,7 @@ export const relations = defineRelations(schema, (r) => ({
 		changesetsViaPolityPeriod: r.many.changeset({
 			alias: "changeset_id_polity_id_via_polityPeriod"
 		}),
+		polityPeriods: r.many.polityPeriod(),
 		polityRelationsFromPolityId: r.many.polityRelation({
 			alias: "polityRelation_fromPolityId_polity_id"
 		}),
@@ -631,11 +992,16 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "polityRelation_toPolityId_polity_id"
 		}),
 		polityTerritories: r.many.polityTerritory(),
+		proposals: r.many.proposal(),
 		reportingUnits: r.many.reportingUnit(),
 		changesetsViaScheme: r.many.changeset({
 			alias: "changeset_id_polity_id_via_scheme"
 		}),
-		entities: r.many.entity(),
+		schemes: r.many.scheme(),
+		entities: r.many.entity({
+			alias: "entity_id_polity_id_via_searchDocument"
+		}),
+		searchDocuments: r.many.searchDocument(),
 	},
 	bodyApportionment: {
 		area: r.one.area({
@@ -651,6 +1017,26 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.changeset.id
 		}),
 	},
+	bodyChamber: {
+		bodyBodyId: r.one.body({
+			from: r.bodyChamber.bodyId,
+			to: r.body.id,
+			alias: "bodyChamber_bodyId_body_id"
+		}),
+		changeset: r.one.changeset({
+			from: r.bodyChamber.changesetId,
+			to: r.changeset.id
+		}),
+		bodyOfBodyId: r.one.body({
+			from: r.bodyChamber.ofBodyId,
+			to: r.body.id,
+			alias: "bodyChamber_ofBodyId_body_id"
+		}),
+		source: r.one.source({
+			from: r.bodyChamber.sourceId,
+			to: r.source.id
+		}),
+	},
 	bodyEvent: {
 		body: r.one.body({
 			from: r.bodyEvent.bodyId,
@@ -663,6 +1049,43 @@ export const relations = defineRelations(schema, (r) => ({
 		source: r.one.source({
 			from: r.bodyEvent.sourceId,
 			to: r.source.id
+		}),
+	},
+	bodySize: {
+		body: r.one.body({
+			from: r.bodySize.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.bodySize.changesetId,
+			to: r.changeset.id
+		}),
+	},
+	bodySizePart: {
+		body: r.one.body({
+			from: r.bodySizePart.bodyId,
+			to: r.body.id
+		}),
+		changeset: r.one.changeset({
+			from: r.bodySizePart.changesetId,
+			to: r.changeset.id
+		}),
+	},
+	boundarySet: {
+		changeset: r.one.changeset({
+			from: r.boundarySet.changesetId,
+			to: r.changeset.id
+		}),
+		scheme: r.one.scheme({
+			from: r.boundarySet.schemeCode,
+			to: r.scheme.code
+		}),
+		contests: r.many.contest(),
+		crosswalksFromBoundarySetId: r.many.crosswalk({
+			alias: "crosswalk_fromBoundarySetId_boundarySet_id"
+		}),
+		crosswalksToBoundarySetId: r.many.crosswalk({
+			alias: "crosswalk_toBoundarySetId_boundarySet_id"
 		}),
 	},
 	candidacy: {
@@ -725,6 +1148,14 @@ export const relations = defineRelations(schema, (r) => ({
 		candidacies: r.many.candidacy(),
 		governments: r.many.government(),
 		membershipDrops: r.many.membershipDrop(),
+		changeset: r.one.changeset({
+			from: r.person.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.person.id,
+			to: r.entity.id
+		}),
 		personImages: r.many.personImage(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		tenures: r.many.tenure(),
@@ -755,15 +1186,6 @@ export const relations = defineRelations(schema, (r) => ({
 		source: r.one.source({
 			from: r.citation.sourceId,
 			to: r.source.id
-		}),
-	},
-	boundarySet: {
-		contests: r.many.contest(),
-		crosswalksFromBoundarySetId: r.many.crosswalk({
-			alias: "crosswalk_fromBoundarySetId_boundarySet_id"
-		}),
-		crosswalksToBoundarySetId: r.many.crosswalk({
-			alias: "crosswalk_toBoundarySetId_boundarySet_id"
 		}),
 	},
 	electoralSystem: {
@@ -881,6 +1303,46 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "entityMerge_intoId_entity_id"
 		}),
 	},
+	entityRetirement: {
+		changeset: r.one.changeset({
+			from: r.entityRetirement.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.entityRetirement.entityId,
+			to: r.entity.id
+		}),
+	},
+	entitySubtypeDrop: {
+		changeset: r.one.changeset({
+			from: r.entitySubtypeDrop.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.entitySubtypeDrop.entityId,
+			to: r.entity.id
+		}),
+	},
+	externalId: {
+		changeset: r.one.changeset({
+			from: r.externalId.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.externalId.entityId,
+			to: r.entity.id
+		}),
+	},
+	externalIdDrop: {
+		changeset: r.one.changeset({
+			from: r.externalIdDrop.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.externalIdDrop.entityId,
+			to: r.entity.id
+		}),
+	},
 	factRekey: {
 		changeset: r.one.changeset({
 			from: r.factRekey.changesetId,
@@ -972,14 +1434,22 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.party.id
 		}),
 	},
+	indicator: {
+		changeset: r.one.changeset({
+			from: r.indicator.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.indicator.sourceId,
+			to: r.source.id
+		}),
+		indicatorValues: r.many.indicatorValue(),
+	},
 	indicatorValue: {
 		indicator: r.one.indicator({
 			from: r.indicatorValue.indicatorId,
 			to: r.indicator.id
 		}),
-	},
-	indicator: {
-		indicatorValues: r.many.indicatorValue(),
 	},
 	label: {
 		changeset: r.one.changeset({
@@ -1021,6 +1491,46 @@ export const relations = defineRelations(schema, (r) => ({
 		source: r.one.source({
 			from: r.name.sourceId,
 			to: r.source.id
+		}),
+	},
+	nameDrop: {
+		changeset: r.one.changeset({
+			from: r.nameDrop.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.nameDrop.entityId,
+			to: r.entity.id
+		}),
+	},
+	note: {
+		changeset: r.one.changeset({
+			from: r.note.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.note.entityId,
+			to: r.entity.id
+		}),
+	},
+	noteDrop: {
+		changeset: r.one.changeset({
+			from: r.noteDrop.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.noteDrop.entityId,
+			to: r.entity.id
+		}),
+	},
+	optionDrop: {
+		changeset: r.one.changeset({
+			from: r.optionDrop.changesetId,
+			to: r.changeset.id
+		}),
+		contest: r.one.contest({
+			from: r.optionDrop.contestId,
+			to: r.contest.id
 		}),
 	},
 	outcome: {
@@ -1068,6 +1578,34 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		source: r.one.source({
 			from: r.partyColor.sourceId,
+			to: r.source.id
+		}),
+	},
+	partyFounding: {
+		changeset: r.one.changeset({
+			from: r.partyFounding.changesetId,
+			to: r.changeset.id
+		}),
+		party: r.one.party({
+			from: r.partyFounding.partyId,
+			to: r.party.id
+		}),
+		source: r.one.source({
+			from: r.partyFounding.sourceId,
+			to: r.source.id
+		}),
+	},
+	partyImage: {
+		changeset: r.one.changeset({
+			from: r.partyImage.changesetId,
+			to: r.changeset.id
+		}),
+		party: r.one.party({
+			from: r.partyImage.partyId,
+			to: r.party.id
+		}),
+		source: r.one.source({
+			from: r.partyImage.sourceId,
 			to: r.source.id
 		}),
 	},
@@ -1157,6 +1695,16 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "polityParent_polityId_polity_id"
 		}),
 	},
+	polityPeriod: {
+		changeset: r.one.changeset({
+			from: r.polityPeriod.changesetId,
+			to: r.changeset.id
+		}),
+		polity: r.one.polity({
+			from: r.polityPeriod.polityId,
+			to: r.polity.id
+		}),
+	},
 	polityRelation: {
 		changeset: r.one.changeset({
 			from: r.polityRelation.changesetId,
@@ -1189,6 +1737,32 @@ export const relations = defineRelations(schema, (r) => ({
 		polity: r.one.polity({
 			from: r.polityTerritory.polityId,
 			to: r.polity.id
+		}),
+	},
+	profile: {
+		user: r.one.users({
+			from: r.profile.userId,
+			to: r.users.id
+		}),
+	},
+	proposalJob: {
+		proposal: r.one.proposal({
+			from: r.proposalJob.proposalId,
+			to: r.proposal.id
+		}),
+		user: r.one.users({
+			from: r.proposalJob.requestedBy,
+			to: r.users.id
+		}),
+	},
+	proposalRevision: {
+		changeset: r.one.changeset({
+			from: r.proposalRevision.changesetId,
+			to: r.changeset.id
+		}),
+		proposal: r.one.proposal({
+			from: r.proposalRevision.proposalId,
+			to: r.proposal.id
 		}),
 	},
 	release: {
@@ -1265,11 +1839,69 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.changeset.id
 		}),
 	},
+	resultSetDrop: {
+		changeset: r.one.changeset({
+			from: r.resultSetDrop.changesetId,
+			to: r.changeset.id
+		}),
+	},
+	rowDrop: {
+		changeset: r.one.changeset({
+			from: r.rowDrop.changesetId,
+			to: r.changeset.id
+		}),
+	},
+	searchDocument: {
+		entity: r.one.entity({
+			from: r.searchDocument.entityId,
+			to: r.entity.id
+		}),
+		polity: r.one.polity({
+			from: r.searchDocument.polityId,
+			to: r.polity.id
+		}),
+	},
+	slug: {
+		changeset: r.one.changeset({
+			from: r.slug.changesetId,
+			to: r.changeset.id
+		}),
+		entity: r.one.entity({
+			from: r.slug.entityId,
+			to: r.entity.id
+		}),
+	},
 	sourceArtifact: {
+		changeset: r.one.changeset({
+			from: r.sourceArtifact.changesetId,
+			to: r.changeset.id,
+			alias: "sourceArtifact_changesetId_changeset_id"
+		}),
+		source: r.one.source({
+			from: r.sourceArtifact.sourceId,
+			to: r.source.id
+		}),
 		changesets: r.many.changeset({
 			from: r.sourceArtifact.id.through(r.sourcePage.artifactId),
-			to: r.changeset.id.through(r.sourcePage.changesetId)
+			to: r.changeset.id.through(r.sourcePage.changesetId),
+			alias: "sourceArtifact_id_changeset_id_via_sourcePage"
 		}),
+		sourcePages: r.many.sourcePage(),
+	},
+	sourcePage: {
+		sourceArtifact: r.one.sourceArtifact({
+			from: r.sourcePage.artifactId,
+			to: r.sourceArtifact.id
+		}),
+		changeset: r.one.changeset({
+			from: r.sourcePage.changesetId,
+			to: r.changeset.id
+		}),
+		sources: r.many.source({
+			from: r.sourcePage.id.through(r.valueLocator.pageId),
+			to: r.source.id.through(r.valueLocator.sourceId)
+		}),
+		valueLocators: r.many.valueLocator(),
 	},
 	statewideOfficeYear: {
 		office: r.one.office({
@@ -1353,6 +1985,16 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.tenure.id
 		}),
 	},
+	translation: {
+		changeset: r.one.changeset({
+			from: r.translation.changesetId,
+			to: r.changeset.id
+		}),
+		source: r.one.source({
+			from: r.translation.sourceId,
+			to: r.source.id
+		}),
+	},
 	unitAreaDrop: {
 		area: r.one.area({
 			from: r.unitAreaDrop.areaId,
@@ -1367,10 +2009,37 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.reportingUnit.id
 		}),
 	},
-	sourcePage: {
-		sources: r.many.source({
-			from: r.sourcePage.id.through(r.valueLocator.pageId),
-			to: r.source.id.through(r.valueLocator.sourceId)
+	upload: {
+		apikey: r.one.apikeys({
+			from: r.upload.agentKeyId,
+			to: r.apikeys.id
+		}),
+		user: r.one.users({
+			from: r.upload.ownerUserId,
+			to: r.users.id
+		}),
+		uploadPages: r.many.uploadPage(),
+	},
+	uploadPage: {
+		upload: r.one.upload({
+			from: r.uploadPage.uploadId,
+			to: r.upload.id
+		}),
+	},
+	valueLocator: {
+		sourcePage: r.one.sourcePage({
+			from: r.valueLocator.pageId,
+			to: r.sourcePage.id
+		}),
+		source: r.one.source({
+			from: r.valueLocator.sourceId,
+			to: r.source.id
+		}),
+	},
+	watch: {
+		user: r.one.users({
+			from: r.watch.userId,
+			to: r.users.id
 		}),
 	},
 }))
