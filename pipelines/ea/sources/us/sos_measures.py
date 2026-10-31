@@ -612,6 +612,24 @@ NC_2002 = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2002_11_05/results_statewi
 NC_2002_TOTALS = (1283375, 507426)
 WV = "https://web.archive.org/web/20130612072655id_/http://www.sos.wv.gov/elections/history/electionreturns/Documents/{0}/{0}%20Constitutional%20Amendment{1}.pdf"
 WV_FILES = {date(2000, 11, 7): "%20Gen", date(2002, 11, 5): "", date(2004, 11, 2): ""}
+WV_2012 = "https://apps.sos.wv.gov/elections/results/candidate.aspx?candidate={}&eid=13&type=OFFICIAL&year=2012"
+WV_2012_CANDIDATES = {"YES": 10806, "NO": 10807}
+WV_2012_MEASURES = {"1": ("Repeal the two consecutive term limitation for sheriffs", "Legislative Referendum", False)}
+GA_2022_URL = "https://results.sos.ga.gov/cdn/results/Georgia/export-2022NovGen.json"
+GA_2022_MEASURES = {
+    "A": ("Statewide property tax exemption for equipment used by timber producers", "Legislative Referendum", True),
+    "B": (
+        "Expand the statewide property tax exemption for agricultural equipment and farm products held by certain entities",
+        "Legislative Referendum",
+        True,
+    ),
+}
+MS_2004 = "https://www.sos.ms.gov/content/documents/Elections/results/2004HC56.pdf"
+MS_2004_TOTALS = (
+    (957104, (0.5601, 0.7486, 0.6226, 0.7586)),
+    (155648, (0.3678, 0.7767, 0.4279, 0.7867)),
+)
+MS_2004_MEASURES = {"1": ("Definition of marriage", "Legislative Referendum", True)}
 WV_2005 = WV.split("Documents/")[0] + "Documents/2005%20-%20Special/2005%20Special%20Election.pdf"
 WI = "https://web.archive.org/web/{}id_/https://elections.wi.gov/sites/elections.wi.gov/files/{}"
 WI_FILES = {
@@ -1991,6 +2009,14 @@ AL_2007_NOTE = (
     "degraded to read, so the figures are the printed Total row, entered by hand from page 3; the box shown on each "
     "figure is approximate."
 )
+MS_2004_NOTE = (
+    " Only the statewide totals are recorded: the figures are those printed in the Secretary of State's proclamation "
+    "certifying the amendment, entered by hand from page 1; the box shown on each figure is approximate."
+)
+GA_2022_NOTE = (
+    " Only the statewide totals are recorded: the Secretary of State's results export has no county figures for"
+    " Emanuel County on this question, so the county table cannot be completed."
+)
 OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 
 
@@ -2102,6 +2128,10 @@ def fetch() -> None:
     for _, _, _, stamp, path in NY_MEASURES.values():
         raw.fetch(SOURCE, NY.format(stamp, path), suffix=Path(path).suffix)
         time.sleep(1)
+    raw.fetch(SOURCE, GA_2022_URL, suffix=".json")
+    raw.fetch(SOURCE, MS_2004, suffix=".pdf")
+    for candidate in WV_2012_CANDIDATES.values():
+        raw.fetch(SOURCE, WV_2012.format(candidate), suffix=".html")
     raw.fetch(SOURCE, OR_HISTORY, suffix=".pdf")
     for url in WA_HISTORY.values():
         raw.fetch(SOURCE, url, suffix=".html")
@@ -4916,6 +4946,87 @@ def north_carolina() -> list[dict[str, object]]:
     return rows
 
 
+def west_virginia_2012() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for answer, candidate in WV_2012_CANDIDATES.items():
+        url = WV_2012.format(candidate)
+        text = html.unescape(re.sub(r"<[^>]+>", " ", raw.cached(SOURCE, url).path.read_text(errors="replace")))
+        table = re.sub(r"\s+", " ", text[text.index("CONSTITUTIONAL AMENDMENT") :])
+        counties = re.findall(r"([A-Z][A-Za-z]+) ([\d,]+) ([\d,]+) [\d.]+% ([\d,]+)", table)
+        total = int(counties[0][3].replace(",", ""))
+        if len(counties) != 55 or sum(int(county[1].replace(",", "")) for county in counties) != total:
+            raise ValueError(f"{url}: {len(counties)} counties do not add up to {total}")
+        rows.extend(
+            {
+                "state": "WV",
+                "day": date(2012, 11, 6),
+                "number": "1",
+                "label": "Amendment 1",
+                "url": url,
+                "county": county[0],
+                "answer": answer,
+                "votes": int(county[1].replace(",", "")),
+            }
+            for county in counties
+        )
+    return rows
+
+
+def mississippi_2004() -> list[dict[str, object]]:
+    return [
+        {
+            "state": "MS",
+            "day": date(2004, 11, 2),
+            "number": "1",
+            "label": "Amendment 1",
+            "url": MS_2004,
+            "county": "statewide",
+            "answer": answer,
+            "votes": votes,
+            "page": 1,
+            "x0": box[0],
+            "y0": box[1],
+            "x1": box[2],
+            "y1": box[3],
+        }
+        for answer, (votes, box) in zip(("YES", "NO"), MS_2004_TOTALS, strict=True)
+    ]
+
+
+def georgia_2022() -> list[dict[str, object]]:
+    export = json.loads(raw.cached(SOURCE, GA_2022_URL).path.read_text())
+    rows: list[dict[str, object]] = []
+    for letter in GA_2022_MEASURES:
+        name = f"Statewide Referendum Question {letter}"
+        found: dict[str, dict[str, int]] = {}
+        for county in export["localResults"]:
+            for item in county["ballotItems"]:
+                if item["name"] == name:
+                    found[county["name"].removesuffix(" County")] = {
+                        option["name"].upper(): option["voteCount"] for option in item["ballotOptions"]
+                    }
+        state = next(item for item in export["results"]["ballotItems"] if item["name"] == name)
+        for option in state["ballotOptions"]:
+            answer = option["name"].upper()
+            complete = len(found) == 159 and sum(votes[answer] for votes in found.values()) == option["voteCount"]
+            if len(found) == 159 and not complete:
+                raise ValueError(f"GA 2022 referendum {letter} {answer}: counties do not add up to the state total")
+            for county, votes in found.items() if complete else (("statewide", {answer: option["voteCount"]}),):
+                rows.append(
+                    {
+                        "state": "GA",
+                        "day": date(2022, 11, 8),
+                        "number": letter,
+                        "label": f"Referendum {letter}",
+                        "url": GA_2022_URL,
+                        "county": county,
+                        "answer": answer,
+                        "votes": votes[answer],
+                    }
+                )
+    return rows
+
+
 def west_virginia() -> list[dict[str, object]]:
     heading = re.compile(r"Amendment\s*#\s*(\d+)")
     line = re.compile(r"^\s*([A-Z][A-Za-z.' ]+?)\s{2,}([\d,]+)\s+([\d,]+)\s*$")
@@ -6047,6 +6158,9 @@ def parse() -> None:
             *north_carolina(),
             *north_carolina_early(),
             *west_virginia(),
+            *west_virginia_2012(),
+            *mississippi_2004(),
+            *georgia_2022(),
             *wisconsin(),
             *iowa(),
             *mississippi(),
@@ -6093,6 +6207,9 @@ def parse() -> None:
             ("MD", 2022),
             ("SC", 2022),
             ("AL", 2022),
+            ("GA", 2022),
+            ("WV", 2012),
+            ("MS", 2004),
         ):
             title, kind, passed = (
                 (NY_MEASURES[day, number][1], "Legislative Referendum", NY_MEASURES[day, number][2])
@@ -6104,7 +6221,14 @@ def parse() -> None:
                     > group.filter(pl.col("answer") == "NO")["votes"].sum(),
                 )
                 if state in ("WA", "LA", "OR", "UT", "MD")
-                else {"SD": SD_2012, "SC": SC_2022, "AL": AL_2022}.get(state, AZ_2022)[number]
+                else {
+                    "SD": SD_2012,
+                    "SC": SC_2022,
+                    "AL": AL_2022,
+                    "GA": GA_2022_MEASURES,
+                    "WV": WV_2012_MEASURES,
+                    "MS": MS_2004_MEASURES,
+                }.get(state, AZ_2022)[number]
             )
             matched.append(
                 {
@@ -6462,13 +6586,17 @@ def emit() -> Path:
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
-                + (SCANNED if rows["page"].is_not_null().any() and state != "AL" else "")
+                + (SCANNED if rows["page"].is_not_null().any() and state not in ("AL", "MS") else "")
                 + (GA_PRELIMINARY if preliminary else "")
                 + (NM_2003_NOTE if (rows["url"] == NM_2003).any() else "")
                 + (
                     (
                         AL_2007_NOTE
                         if state == "AL"
+                        else MS_2004_NOTE
+                        if state == "MS"
+                        else GA_2022_NOTE
+                        if state == "GA" and day.year == 2022
                         else AK_STATEWIDE_NOTE
                         if state == "AK"
                         else ND_2004_NOTE
