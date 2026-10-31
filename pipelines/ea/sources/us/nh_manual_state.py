@@ -1,10 +1,12 @@
 import base64
 import difflib
+import functools
 import json
 import os
 import re
 import subprocess
 from datetime import date
+from pathlib import Path
 
 import polars as pl
 
@@ -261,6 +263,153 @@ def seen() -> tuple[dict[int, int], dict[str, int | None]]:
     return lines, totals
 
 
+NAME_BLOCKS = (
+    (1970, "general", "governor", "", ""),
+    (1972, "primary", "us senate", "", "d"),
+    (1972, "primary", "state senate", "21", "d"),
+    (1972, "general", "governor", "", ""),
+    (1974, "general", "state senate", "24", ""),
+    (1976, "primary", "state senate", "16", "d"),
+    (1976, "general", "governor", "", ""),
+    (1976, "general", "state senate", "24", ""),
+    (1982, "primary", "governor", "", "d"),
+    (1982, "primary", "state senate", "8", "r"),
+    (1982, "primary", "state senate", "11", "d"),
+    (1984, "primary", "state senate", "2", "r"),
+    (1988, "primary", "state senate", "6", "d"),
+    (1988, "primary", "state senate", "24", "r"),
+    (1988, "general", "state senate", "12", ""),
+    (1990, "primary", "us senate", "", "r"),
+    (1990, "primary", "us senate", "", "d"),
+    (1990, "primary", "state senate", "3", "r"),
+    (1990, "primary", "state senate", "24", "d"),
+    (1992, "primary", "governor", "", "r"),
+    (1992, "primary", "us house", "2", "d"),
+    (1994, "primary", "state senate", "23", "d"),
+    (1996, "primary", "state senate", "4", "r"),
+    (1996, "primary", "state senate", "13", "r"),
+    (1996, "primary", "state senate", "23", "r"),
+    (1998, "primary", "state senate", "23", "r"),
+    (2000, "primary", "state senate", "11", "d"),
+    (2000, "primary", "state senate", "23", "r"),
+    (2000, "general", "state senate", "12", ""),
+    (2006, "primary", "state senate", "21", "r"),
+    (2006, "primary", "state senate", "24", "r"),
+    (2010, "primary", "state senate", "1", "r"),
+    (2010, "primary", "state senate", "1", "d"),
+    (2010, "primary", "state senate", "5", "r"),
+    (2010, "primary", "state senate", "5", "d"),
+    (2010, "primary", "state senate", "7", "r"),
+    (2010, "primary", "state senate", "12", "r"),
+    (2010, "primary", "state senate", "12", "d"),
+    (2010, "primary", "state senate", "13", "d"),
+    (2010, "general", "state senate", "22", ""),
+    (2012, "primary", "state senate", "1", "r"),
+    (2012, "primary", "state senate", "1", "d"),
+    (2012, "primary", "state senate", "3", "d"),
+    (2012, "primary", "state senate", "13", "r"),
+    (2012, "primary", "state senate", "13", "d"),
+    (2012, "primary", "state senate", "16", "d"),
+)
+NAME_JOB = "block_names"
+NAME_PROMPT = (
+    "This is a page of the summary of New Hampshire statewide election returns. Below are the candidate lines of one "
+    "contest on it, each with a number and the text a scanner made of it, which may be garbled or incomplete. For each "
+    "numbered line, read from the page image the candidate's name as printed (the person's full name only: no town, "
+    "party letter, or vote count), the town printed beside it or null, and the vote count printed on that line. Reply "
+    'with only a JSON object {"lines": {"<line number>": {"name": <string or null>, "town": <string or null>, '
+    '"votes": <integer or null>}}}. Use null where the page does not show it. Do not guess, correct, or complete names.'
+)
+
+
+def block_rows(frame: pl.DataFrame, block: tuple[int, str, str, str, str]) -> pl.DataFrame:
+    year, stage, office, district, side = block
+    return frame.filter(
+        (pl.col("year") == year)
+        & (pl.col("stage") == stage)
+        & (pl.col("office") == office)
+        & (pl.col("district").fill_null("") == district)
+        & (pl.col("side").fill_null("") == side)
+    )
+
+
+def page_image(year: int, page: int) -> Path:
+    folder = DATA / "tmp" / SOURCE
+    folder.mkdir(parents=True, exist_ok=True)
+    image = folder / f"{year}-{page}.png"
+    if not image.exists():
+        stem = folder / f".{year}-{page}"
+        subprocess.run(
+            ["pdftoppm", "-r", str(READ_DPI), "-png", "-singlefile", "-f", str(page), "-l", str(page)]
+            + [str(nh_manual.pdf(year)), str(stem)],
+            check=True,
+        )
+        stem.with_suffix(".png").replace(image)
+    return image
+
+
+def read_names() -> str:
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+    from ea import batch
+
+    frame = nh_manual.blocks(fixed(indexed()))
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    wanted: dict[str, batch.Want] = {}
+    for block in NAME_BLOCKS:
+        rows = block_rows(frame, block)
+        pages = sorted(rows["page"].unique().to_list())
+        listing = "\n".join(
+            f"Line {row['index']}: {row['name']}, {row['town'] or ''}" for row in rows.iter_rows(named=True)
+        )
+        content: list[dict[str, object]] = [
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": "image/png",
+                    "data": base64.b64encode(page_image(block[0], page).read_bytes()).decode(),
+                },
+            }
+            for page in pages
+        ]
+        content.append({"type": "text", "text": f"{NAME_PROMPT}\n\n{listing}"})
+        params = MessageCreateParamsNonStreaming(
+            model="claude-haiku-5-5", max_tokens=1500, messages=[{"role": "user", "content": content}]
+        )
+        wanted[f"names:{block[0]}:{rows['index'].min()}"] = (
+            params,
+            (3500 * len(pages) * price_in + (100 + 40 * rows.height) * price_out) / 1e6,
+        )
+    return batch.ensure(SOURCE, NAME_JOB, wanted)[1]
+
+
+@functools.cache
+def names_seen() -> dict[int, tuple[str | None, str | None, int | None]]:
+    from ea import raw
+
+    frame = nh_manual.blocks(fixed(indexed()))
+    found: dict[int, tuple[str | None, str | None, int | None]] = {}
+    for block in NAME_BLOCKS:
+        rows = block_rows(frame, block)
+        try:
+            text = raw.cached(SOURCE, f"names:{block[0]}:{rows['index'].min()}").path.read_text()
+            text = "".join(part["text"] for part in json.loads(text)["content"] if part.get("type") == "text")
+        except LookupError:
+            continue
+        match = re.search(r"\{.*\}", text, re.DOTALL)
+        if not match:
+            continue
+        try:
+            reply = json.loads(match[0])
+        except ValueError:
+            continue
+        for key, entry in (reply.get("lines") or {}).items():
+            if key.isdigit() and isinstance(entry, dict):
+                found[int(key)] = (entry.get("name"), entry.get("town"), entry.get("votes"))
+    return found
+
+
 SUPERSEDES = ("us.wikipedia_gov_history", "us.klarner")
 COUNCIL_PLANS = {
     1970: (None, date(1982, 1, 1), "used in the 1970-1980 elections"),
@@ -437,7 +586,7 @@ def second(frame: pl.DataFrame) -> pl.DataFrame:
     ).drop("key", "vision", "vision_total", "read", "vision_sum", "text_agrees")
 
 
-def amended(frame: pl.DataFrame) -> pl.DataFrame:
+def fixed(frame: pl.DataFrame) -> pl.DataFrame:
     frame = frame.filter(~pl.col("index").is_in(list(LINE_DROPS)))
     added = []
     for index, fix in LINE_ADDS.items():
@@ -468,6 +617,28 @@ def amended(frame: pl.DataFrame) -> pl.DataFrame:
             .alias(column)
         )
     return frame
+
+
+def amended(frame: pl.DataFrame) -> pl.DataFrame:
+    frame = fixed(frame)
+    read = names_seen()
+    if not read:
+        return frame
+    replaced = {
+        index: (name.strip(), town.strip() if town else None)
+        for index, votes in frame.select("index", "votes").iter_rows()
+        if index in read
+        for name, town, seen_votes in [read[index]]
+        if seen_votes == votes and name and nh_manual.CLEAN.fullmatch(name.strip())
+    }
+    return frame.with_columns(
+        name=pl.col("index").replace_strict(
+            {index: pair[0] for index, pair in replaced.items()}, default=pl.col("name"), return_dtype=pl.String
+        ),
+        town=pl.col("index").replace_strict(
+            {index: pair[1] for index, pair in replaced.items()}, default=pl.col("town"), return_dtype=pl.String
+        ),
+    )
 
 
 def arbitrated(frame: pl.DataFrame, vision: bool = True) -> pl.DataFrame:
