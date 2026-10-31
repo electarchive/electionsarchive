@@ -1001,8 +1001,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 raise ValueError(f"result set {result_set} does not exist")
             if held != source:
                 raise ValueError(f"result set {result_set} now cites source {held}, not {source}")
-            if "icpsr" not in (license or "").lower():
-                raise ValueError(f"result set {result_set}: source {source} is not licensed from ICPSR")
+            if not any(term in (license or "").lower() for term in ("icpsr", "held out of releases")):
+                raise ValueError(f"result set {result_set}: source {source} is not withdrawn for licensing")
             dropping.append(k)
         for relation, column, parent in checks.references(conn):
             if parent == "result_set":
