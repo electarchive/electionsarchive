@@ -733,6 +733,12 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         sql.SQL("delete from public.{} where body_id = any(%s::uuid[])").format(sql.Identifier(owned)),
                         [ids],
                     )
+            if kind == "polity":
+                for owned in ("polity_parent", "polity_territory"):
+                    conn.execute(
+                        sql.SQL("delete from public.{} where polity_id = any(%s::uuid[])").format(sql.Identifier(owned)),
+                        [ids],
+                    )
             if kind == "area":
                 for owned in ("area_code", "area_geometry"):
                     conn.execute(
