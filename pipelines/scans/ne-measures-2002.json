@@ -1,0 +1,126 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.sos_measures",
+ "title": "2002 General Election Canvass",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2002%20General.pdf"
+ },
+ "contests": {
+  "1": {
+   "year": 2002,
+   "chamber": "question-1",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "2": {
+   "year": 2002,
+   "chamber": "question-2",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 77,
+   "id": "1l",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.135,
+    0.49,
+    0.9
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore any heading text above it, and skip the TOTAL row.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "1",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "1",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 77,
+   "id": "1r",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.135,
+    0.93,
+    0.9
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore any heading text above it, and skip the TOTAL row.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "1",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "1",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 78,
+   "id": "2l",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.185,
+    0.49,
+    0.9
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore any heading text above it, and skip the TOTAL row.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "2",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "2",
+     "candidate": "NO"
+    }
+   ]
+  },
+  {
+   "page": 78,
+   "id": "2r",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.185,
+    0.93,
+    0.9
+   ],
+   "hint": "Read only the county table in this image (Yes and No columns); ignore any heading text above it, and skip the TOTAL row.",
+   "columns": [
+    {
+     "label": "Yes",
+     "contest": "2",
+     "candidate": "YES"
+    },
+    {
+     "label": "No",
+     "contest": "2",
+     "candidate": "NO"
+    }
+   ]
+  }
+ ]
+}

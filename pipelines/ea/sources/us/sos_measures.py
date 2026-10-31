@@ -1172,6 +1172,7 @@ NE_BOOKS = {
 }
 NE_SCANS = {
     "ne-measures-2000": "elections/2000/2000%20General.pdf",
+    "ne-measures-2002": "2002%20General.pdf",
     "ne-measures-2006": "2006%20General.pdf",
     "ne-measures-2006-primary": "2006%20Primary.pdf",
 }
