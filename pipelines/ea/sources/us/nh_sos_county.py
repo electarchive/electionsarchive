@@ -71,7 +71,7 @@ def office(label: str, title: str) -> str | None:
     district = re.fullmatch(r"dist(?:rict)?(?:no)?(\d)", letters)
     if district:
         return f"board of commissioners:{district[1]}"
-    if letters.startswith("countycommissioner"):
+    if letters.startswith("countycommissioner") or letters.endswith("countycommissioners"):
         return "board of commissioners"
     for prefix, name in OFFICES:
         if letters.startswith(prefix):
@@ -139,29 +139,32 @@ def blocks(path: Path, name: str) -> list[dict[str, object]]:
                 if line[0].upper().startswith("TOTAL"):
                     break
             total = body.pop() if body and body[-1][0].upper().startswith("TOTAL") else None
+            last: dict[str, object] | None = None
             for col, candidate in names.items():
                 group = max((label for label in labels if label <= col), default=min(labels))
                 if not any(col < len(line) and NUMBER.fullmatch(line[col]) for line in body):
                     continue
-                found.append(
-                    {
-                        "file": name,
-                        "sheet": sheet_name,
-                        "title": title,
-                        "heading": " ".join(" ".join(row) for row in grid[:3]).lower(),
-                        "office": labels[group],
-                        "candidate": candidate,
-                        "column": col,
-                        "rows": [
-                            (line[0], int(float(line[col].replace(",", ""))))
-                            for line in body
-                            if col < len(line) and NUMBER.fullmatch(line[col])
-                        ],
-                        "total": int(float(total[col].replace(",", "")))
-                        if total and col < len(total) and NUMBER.fullmatch(total[col])
-                        else None,
-                    }
-                )
+                if last is not None and candidate.lower().startswith("recount"):
+                    found.remove(last)
+                    candidate = str(last["candidate"])
+                last = {
+                    "file": name,
+                    "sheet": sheet_name,
+                    "title": title,
+                    "heading": " ".join(" ".join(row) for row in grid[:3]).lower(),
+                    "office": labels[group],
+                    "candidate": candidate,
+                    "column": col,
+                    "rows": [
+                        (line[0], int(float(line[col].replace(",", ""))))
+                        for line in body
+                        if col < len(line) and NUMBER.fullmatch(line[col])
+                    ],
+                    "total": int(float(total[col].replace(",", "")))
+                    if total and col < len(total) and NUMBER.fullmatch(total[col])
+                    else None,
+                }
+                found.append(last)
     return found
 
 
@@ -672,7 +675,7 @@ def emit() -> Path:
                 report.setdefault(
                     "differs: the compilation counts each city's wards twice" if twice else "differs: unexplained", []
                 ).append(f"{tag} {external} {gap}")
-            if not rows["votes"].sum():
+            if not rows["votes"].sum() and rows["printed"].is_null().any():
                 report.setdefault("no votes in the workbook", []).append(f"{tag} {external}")
                 continue
             unit_codes: dict[str, tuple[str, str]] = {}
