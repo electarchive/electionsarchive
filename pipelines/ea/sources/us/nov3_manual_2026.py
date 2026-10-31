@@ -157,6 +157,7 @@ COUNTIES = {
     "48085": ("TX", "https://www.collincountytx.gov/Elections", "../y26/tx/collin.pdf"),
     "48121": ("TX", "https://www.dentoncounty.gov/elections", "../y26/tx/denton_preview.pdf"),
     "48141": ("TX", "https://www.epcounty.com/elections/", "../y26/tx/tornillo_isd.pdf"),
+    "48339": ("TX", "https://elections.mctx.org/samplebal.asp?ElectionId=GEN110326&curLang=English", "../y26/tx/montgomery_sample.pdf"),
     "06001": (
         "CA",
         "https://acvote.alamedacountyca.gov/election-information/elections",
