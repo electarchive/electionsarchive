@@ -18,8 +18,8 @@ from ea.sources.us.wikipedia_statewide import GENERIC, SKIP, STATES
 from ea.store import DATA, connect
 
 SOURCE = "us.wikipedia_gov_history"
-VERSION = "1"
-PARSED = DATA / "parsed" / SOURCE
+VERSION = "2"
+PARSED = DATA / "parsed" / f"{SOURCE}-2"
 API = "https://en.wikipedia.org/w/api.php?"
 CHUNK = 20
 
@@ -30,11 +30,16 @@ def contests() -> list[tuple[str, int, str]]:
             """select substr(p.iso_code, 4), extract(year from e.date_from)::int, c.id::text
                from contest c join election e on e.id = c.election_id join polity p on p.id = e.polity_id
                join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office' and o.value like 'governor:%%'
-               where exists (select from result_set r join source s on s.id = r.source_id
-                             where r.contest_id = c.id and s.license ilike '%%ICPSR%%')
-                 and not exists (select from result_set r join source s on s.id = r.source_id
-                                 where r.contest_id = c.id and coalesce(s.license, '') not ilike '%%ICPSR%%')
-               order by 1, 2"""
+               where exists (select from result_set_history h join result_set_drop d
+                             on h.id = d.result_set_id and h.superseded_by = d.changeset_id where h.contest_id = c.id)
+                 and exists (select from result_set r where r.contest_id = c.id)
+                 and not exists (select from result_set r join changeset k on k.id = r.changeset_id
+                                 where r.contest_id = c.id and k.pipeline = %s)
+                 and not exists (select from result_set r join changeset k on k.id = r.changeset_id
+                                 where r.contest_id = c.id and r.is_default
+                                   and coalesce(r.completeness, 1) >= 0.98 and k.pipeline not like 'us.nyc%%')
+               order by 1, 2""",
+            [SOURCE],
         ).fetchall()
 
 
@@ -205,6 +210,62 @@ def tables(text: str) -> list[tuple[str, int, list[dict[str, object]], str | Non
     return boxes
 
 
+def tickets(text: str) -> tuple[list[dict[str, object]], str | None]:
+    for begin in re.finditer(r"^\{\|", text, re.MULTILINE):
+        end = text.find("\n|}", begin.start())
+        body = text[begin.start() : end if end != -1 else len(text)]
+        if not re.search(r"^\|\+.*state election results", body, re.IGNORECASE | re.MULTILINE):
+            continue
+        parts = body.split("\n|-")
+        labels = [
+            re.sub(
+                r"\s*tickets?\s*$", "", clean(re.sub(r"\{\{[^}]*\}\}", "", line.split("|", 2)[-1])), flags=re.IGNORECASE
+            )
+            for line in parts[1].split("\n")
+            if line.startswith("! colspan")
+        ]
+        row = next(
+            (part for part in parts[2:] if re.search(r"^\|\s*(?:\[\[Governor of.*|Governor)\s*$", part, re.MULTILINE)),
+            None,
+        )
+        if row is None or not labels:
+            continue
+        found: list[str] = []
+        for line in row.split("\n")[1:]:
+            if line.startswith("|") and not line.startswith("|-"):
+                found.append(
+                    re.sub(r"^(?:\s*align=\"?\w+\"?\s*\|)?", "", re.sub(r"^\|(?:[^|]*\{\{[^}]*\}\}\s*\|)?", "", line))
+                )
+        pairs = list(zip(found[1::2], found[2::2], strict=False))
+        merged: dict[str, dict[str, object]] = {}
+        for label, (name, votes) in zip(labels, pairs, strict=False):
+            digits = re.sub(r"\D", "", re.sub(r"\{\{efn.*", "", votes))
+            person = clean(re.sub(r"\{\{efn.*", "", name).replace("'''", ""))
+            if not person or not digits:
+                continue
+            if person in merged:
+                merged[person]["votes"] = int(merged[person]["votes"]) + int(digits)
+                continue
+            merged[person] = {
+                "name": person,
+                "party": label,
+                "votes": int(digits),
+                "winner": 1 if "'''" in name else 0,
+                "percentage": None,
+            }
+        rows = list(merged.values())
+        if not rows:
+            continue
+        reason = None
+        ranked = sorted((int(row["votes"]) for row in rows), reverse=True)
+        for rank, number in enumerate(("1", "2")):
+            printed = re.search(rf"popular_vote{number}\s*=\s*'*([\d,]+)", text)
+            if printed is not None and int(printed[1].replace(",", "")) != ranked[rank]:
+                reason = f"infobox shows {printed[1]} for rank {number}, table {ranked[rank]}"
+        return rows, reason
+    return [], None
+
+
 def read(text: str) -> tuple[list[dict[str, object]], str | None]:
     boxes: list[tuple[str, int, list[dict[str, object]], str | None]] = []
     for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
@@ -250,7 +311,8 @@ def read(text: str) -> tuple[list[dict[str, object]], str | None]:
     if not boxes:
         boxes = tables(text)
     if not boxes:
-        return [], "no election box"
+        rows, reason = tickets(text)
+        return (rows, reason) if rows else ([], "no election box")
     label, _, rows, reason = max(boxes, key=lambda box: box[1])
     return rows, reason
 
@@ -275,7 +337,6 @@ def parse() -> None:
     lines: list[dict[str, object]] = []
     held: list[tuple[str, str]] = []
     disagree: list[tuple[str, str]] = []
-    rescued: list[tuple[str, str]] = []
     for state, year, contest in targets:
         asked = title(state, year)
         if asked not in found:
@@ -308,30 +369,15 @@ def parse() -> None:
             ]
             if len(near) == 1 and near[0][0] not in matched.values():
                 matched[index] = near[0][0]
-        total = sum(int(row["votes"]) for row in rows)
-        mine_total = sum(int(option[4]) for option in mine if option[4] is not None)
         offs = []
         for index, option in matched.items():
             theirs = next(o[4] for o in mine if o[0] == option)
             ours = int(rows[index]["votes"])
-            if theirs and abs(theirs - ours) * 100 > ours:
+            if theirs and (theirs - ours) * 100 > ours:
                 offs.append(f"{rows[index]['name']} {ours} vs {int(theirs)}")
-        if mine_total and abs(mine_total - total) * 100 > total:
-            offs.append(f"total {total} vs {mine_total}")
         if reason is not None:
-            close = [
-                index
-                for index, option in matched.items()
-                if (theirs := next(o[4] for o in mine if o[0] == option))
-                and abs(theirs - int(rows[index]["votes"])) * 100 <= int(rows[index]["votes"])
-            ]
-            sums = re.match(r"rows sum (\d+), total line (\d+)", reason)
-            near_total = sums is not None and abs(int(sums[1]) - int(sums[2])) * 100 <= 3 * int(sums[2])
-            leader = max(range(len(rows)), key=lambda index: int(rows[index]["votes"]))
-            if not (close and len(close) == len(matched) and leader in close and (near_total or sums is None)):
-                held.append((f"{year} {state}", reason))
-                continue
-            rescued.append((f"{year} {state}", reason))
+            held.append((f"{year} {state}", reason))
+            continue
         if offs:
             disagree.append((f"{year} {state}", "; ".join(offs)))
         for index, row in enumerate(rows):
@@ -352,7 +398,7 @@ def parse() -> None:
                     "winner": row["winner"],
                     "kind": kind,
                     "option": matched.get(index),
-                    "caveat": reason,
+                    "caveat": "; ".join(offs) or None,
                 }
             )
     frame = pl.DataFrame(
@@ -377,20 +423,19 @@ def parse() -> None:
     pl.DataFrame(disagree, schema=["subject", "differences"], orient="row").write_csv(
         PARSED / "disagree.tsv", separator="\t"
     )
-    pl.DataFrame(rescued, schema=["subject", "reason"], orient="row").write_csv(PARSED / "rescued.tsv", separator="\t")
     print(
-        f"{frame['contest'].n_unique()} contests, {len(held)} held back, {len(disagree)} disagree with the county sums,",
+        f"{frame['contest'].n_unique()} contests, {len(held)} held back, {len(disagree)} exceed the printed totals,",
         f"{frame.filter(pl.col('option').is_not_null()).height} lines matched to existing options of {frame.height}",
     )
 
 
+CAVEAT = "Some candidates' figures printed in the article are lower than the partial returns the archive holds for the same contest ({offs}); an official canvass will settle which is right."
 TITLE = "Gubernatorial election articles, general election results"
 NOTE = (
     "Statewide totals from the election box or results table in the English Wikipedia's article on this "
     "gubernatorial election, read from the article revision cited in the source. Wikipedia ranks below an official "
     "canvass, which will supersede this set."
 )
-CAVEAT = "The printed candidate rows do not agree with the article's own total or percentages ({reason}); each candidate's figure agrees within 1 percent with the county returns the archive held before this set."
 
 
 def emit() -> Path:
@@ -532,11 +577,8 @@ def emit() -> Path:
                         catalog.setdefault(f"{plain(text.split()[0])}|{surname(text)}", []).append((person, seen))
                 people[state] = catalog
             result_set = cs.key(f"{SOURCE}.result_set", ckey)
-            replaced = None
             for prior in priors.get(str(contest_id), []):
                 cs.add("result_set", **dict(zip(columns, prior, strict=True)), is_default=False)
-                replaced = prior[0]
-            caveat = lines["caveat"][0]
             cs.add(
                 "result_set",
                 id=result_set,
@@ -547,17 +589,17 @@ def emit() -> Path:
                 status="active",
                 source_id=sources_made[asked],
                 is_default=True,
-                completeness=None if caveat is not None else 1,
-                supersedes_id=replaced,
+                completeness=1,
+                supersedes_id=None,
             )
+            if (caveat := lines["caveat"][0]) is not None:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=CAVEAT.format(offs=caveat))
             cs.add(
                 "note",
                 entity_id=result_set,
                 kind="methodology",
                 body_md=f"{NOTE} Article revision {int(lines['revid'][0])}.",
             )
-            if caveat is not None:
-                cs.add("note", entity_id=result_set, kind="caveat", body_md=CAVEAT.format(reason=caveat))
             totals: dict[UUID, int] = {}
             declared: UUID | None = None
             spare = {kind: list(options) for kind, options in pools.get(str(contest_id), {}).items()}
