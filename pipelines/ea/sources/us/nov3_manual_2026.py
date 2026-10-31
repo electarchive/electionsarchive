@@ -17,6 +17,15 @@ PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
 SCHOOLS = {
+    ("TX", "Nixon-Smiley Consolidated Independent School District"): "4832740",
+    ("TX", "Poth Independent School District"): "4835550",
+    ("TX", "Stockdale Independent School District"): "4841610",
+    ("TX", "Falls City Independent School District"): "4819020",
+    ("TX", "Leon Independent School District"): "4827180",
+    ("TX", "Weimar Independent School District"): "4844820",
+    ("TX", "Graham Independent School District"): "4821360",
+    ("TX", "Tulia Independent School District"): "4843320",
+    ("TX", "Groom Independent School District"): "4821840",
     ("NJ", "Rumson School District"): "3414370",
     ("NJ", "Washington Township School District"): "3417040",
     ("TX", "Georgetown Independent School District"): "4820600",
@@ -525,6 +534,186 @@ COUNTIES = {
         "WA",
         "https://www.douglascountywa.gov/DocumentCenter/View/13224/Sample-Ballot_Gen26",
         "N3M-web/wa2/douglas_ballot.pdf",
+    ),
+    "48439-frh15": (
+        "TX",
+        "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_orders/FRH_Election_Orders.zip#ord-2026-15",
+        "N3M-web/tx7/tarrant/frh_pdf/ord15.pdf",
+    ),
+    "48439-frh16": (
+        "TX",
+        "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_orders/FRH_Election_Orders.zip#ord-2026-16",
+        "N3M-web/tx7/tarrant/frh_pdf/ord16.pdf",
+    ),
+    "48439-tfw3": (
+        "TX",
+        "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/Notice_of_Elction_TFW003.pdf",
+        "N3M-web/tx7/tarrant/Notice_of_Elction_TFW003.pdf",
+    ),
+    "48439-ptc": (
+        "TX",
+        "https://www.tarrantcountytx.gov/content/dam/main/elections/2026/1126/notices/entity_notices/Notice_of%20Election_P-TC_MUD_1.pdf",
+        "N3M-web/tx7/tarrant/Notice_of_Election_P-TC_MUD_1.pdf",
+    ),
+    "48061-bro": (
+        "TX",
+        "https://www.cameroncountytx.gov/elections/wp-content/uploads/2026/10/NOTICE-OF-ELECTION.pdf",
+        "N3M-web/tx8/f15.pdf",
+    ),
+    "48097-gai": (
+        "TX",
+        "https://www.gainesville.tx.us/DocumentCenter/View/12791/1623-08-2026---Order-of-November-2026-Charter-Election",
+        "N3M-web/tx8/f27.pdf",
+    ),
+    "48027-kil": (
+        "TX",
+        "https://www.killeentexas.gov/DocumentCenter/View/14507/1-16f-NOTICE-OF-1132026-Special-Election-PDF",
+        "N3M-web/tx8/f38.pdf",
+    ),
+    "48257-for": (
+        "TX",
+        "https://www.forneytx.gov/DocumentCenter/View/10470/Notice-of-Bond-Election---November-3-2026---English-signed",
+        "N3M-web/tx8/f36.pdf",
+    ),
+    "48139-mid": (
+        "TX",
+        "https://www.midlothian.tx.us/1097/November-3-2026---Special-Election",
+        "N3M-web/tx8/f33.html",
+    ),
+    "48041-bry": (
+        "TX",
+        "https://media-002-us.cdn.govstack.com/bryantx-004-us/media/4gmbxkvi/notice-of-special-election-2026-signed.pdf",
+        "N3M-web/tx8/f03.pdf",
+    ),
+    "48147-leo": (
+        "TX",
+        "https://www.co.fannin.tx.us/upload/page/7064/City%20of%20Leonard%20-%20notice%20-%20English.pdf",
+        "N3M-web/tx8/f19.pdf",
+    ),
+    "48177-ns": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/1033/Nixon-Smiley%20CISD%20November%202026%20-%20Notice%20of%20Election.pdf",
+        "N3M-web/tx8/f06.pdf",
+    ),
+    "48493-poth": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/2254/docs/Elections/11.03.2026%20General/Poth%20ISD%20Notice%20of%20Election%20%20English.pdf",
+        "N3M-web/tx8/f08.pdf",
+    ),
+    "48493-stk": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/2254/docs/Elections/11.03.2026%20General/Stockdale%20ISD%20order.pdf",
+        "N3M-web/tx8/f09.pdf",
+    ),
+    "48255-fc": (
+        "TX",
+        "https://www.co.karnes.tx.us/upload/page/1033/2026%20Falls%20City%20ISD%20Notice%20of%20Election.pdf",
+        "N3M-web/tx8/f20.pdf",
+    ),
+    "48289-leon": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/4964/11032026/Leon%20ISD%20-%20Bond%20Election%20Order%20Nov%202026%20English.pdf",
+        "N3M-web/tx8/f12.pdf",
+    ),
+    "48089-wei": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/6210/26-11-3/Weimar%20ISD%20November%202026%20Bond%20Election%20Order.pdf",
+        "N3M-web/tx8/f13.pdf",
+    ),
+    "48503-gra": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/2592/Graham%20ISD%20November%202026%20Bond%20Election%20%20Election%20Order.pdf",
+        "N3M-web/tx8/f10.pdf",
+    ),
+    "48097-vv": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/3107/docs/2026/November3/ValleyViewISDNoticeofElection26.pdf",
+        "N3M-web/tx8/f11.pdf",
+    ),
+    "48437-tul": (
+        "TX",
+        "https://www.co.swisher.tx.us/upload/page/7290/2026/Tulia%20ISD%202026%20VATRE%20Notice%20of%20Election%20ENGLISH.pdf",
+        "N3M-web/tx8/f22.pdf",
+    ),
+    "48065-gro": (
+        "TX",
+        "https://www.co.carson.tx.us/upload/page/1423/2026/2026%20Nov/11032026%20notice%20of%20gisd%20tax%20rate%20election.pdf",
+        "N3M-web/tx8/f17.pdf",
+    ),
+    "48161-fhd": (
+        "TX",
+        "https://www.co.navarro.tx.us/upload/page/0134/docs/Elections/2026/Nov3/Fairfield%20Hospital%20District%20Notice%20of%20Election.pdf",
+        "N3M-web/tx8/f21.pdf",
+    ),
+    "48497-wesd3": (
+        "TX",
+        "https://www.co.wise.tx.us/DocumentCenter/View/7959/Notice-of-Special-Election---ESD-No-3",
+        "N3M-web/tx8/f26.pdf",
+    ),
+    "48355-nesd1": (
+        "TX",
+        "https://www.annavillefire.com/files/3f50f7cfd/Notice+of+Election_Publication_all+language.pdf",
+        "N3M-web/tx8/f14.pdf",
+    ),
+    "48467-vzesd2": (
+        "TX",
+        "https://www.vanzandtcounty.org/upload/page/12440/2026/vzcesd_2_4003_notice_of_election_publication_all_language_002.pdf",
+        "N3M-web/tx8/f28.pdf",
+    ),
+    "48483-wesd1": (
+        "TX",
+        "https://www.wheelercounty.texas.gov/upload/page/0104/2026/2026-11-03/ESD/ESD-Order.pdf",
+        "N3M-web/tx8/f29.pdf",
+    ),
+    "48457-tesd3": (
+        "TX",
+        "https://img1.wsimg.com/blobby/go/3a994b69-8076-4945-bf02-ff38eaf01bc8/downloads/b268676d-2fd1-47ef-b66a-f75419ac4cbe/ESD-3%20Notice%20of%20Election.pdf",
+        "N3M-web/tx8/f05.pdf",
+    ),
+    "48477-wash": (
+        "TX",
+        "https://newtools.cira.state.tx.us/upload/page/10698/2026/2026%2011%2003/Notice%20of%20Bond%20Election%20Washington%20Co%20Nov%202026.pdf",
+        "N3M-web/tx8/f07.pdf",
+    ),
+    "48481-wcid2": (
+        "TX",
+        "https://www.co.wharton.tx.us/upload/page/7008/Wharton%20WCID%20No.%202%20Notice%20of%20Election%202026.pdf",
+        "N3M-web/tx8/f25.pdf",
+    ),
+    "48055-chm": (
+        "TX",
+        "https://elections.caldwellcounty.texas.gov/files/elections-site/public-documents/2026-nov-3-general/Chisholm%20MUD%20No%201_Notice%20of%20Election.pdf",
+        "N3M-web/tx8/f04.pdf",
+    ),
+    "48473-w69": (
+        "TX",
+        "https://www.co.waller.tx.us/upload/page/0286/WAL069%20Notice%20of%20Elec%20FINAL%20VERSION.pdf",
+        "N3M-web/tx8/f24.pdf",
+    ),
+    "48473-w70": (
+        "TX",
+        "https://www.co.waller.tx.us/upload/page/0286/Notice%20of%20Confirmation%20Directors%20Bonds%20and%20Operation%20and%20Maintenance%20Tax%20Elections%20November%202026.pdf",
+        "N3M-web/tx8/f23.pdf",
+    ),
+    "48029-sid": (
+        "TX",
+        "https://home.bexar.org/generalsampleballot-specialimprovementdistricts.pdf",
+        "N3M-web/tx7/bexar/sid.pdf",
+    ),
+    "48029-sa": (
+        "TX",
+        "https://home.bexar.org/electionsresources/ballots/Sample_1.pdf#city-of-san-antonio",
+        "N3M-web/tx7/bexar/styles/S1.pdf",
+    ),
+    "48029-ec": (
+        "TX",
+        "https://home.bexar.org/electionsresources/ballots/Sample_129.pdf",
+        "N3M-web/tx7/bexar/styles/S129.pdf",
+    ),
+    "48029-saisd": (
+        "TX",
+        "https://home.bexar.org/electionsresources/ballots/Sample_1.pdf",
+        "N3M-web/tx7/bexar/styles/S1.pdf",
     ),
 }
 
