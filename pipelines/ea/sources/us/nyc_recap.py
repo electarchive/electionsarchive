@@ -984,7 +984,7 @@ def emit(
                 )
                 cs.add("slug", path=f"{election_path}/{seat_path}", entity_id=contest)
             covers = whole
-            if grain == "ed":
+            if grain == "ed" and attach:
                 whole = False
             real = rows.filter(pl.col("party").is_null() | (pl.col("party") != "WRITE-IN")).with_columns(
                 pl.col("name").str.replace_all(r"\s+", " ").alias("name")
