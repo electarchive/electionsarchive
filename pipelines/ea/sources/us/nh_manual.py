@@ -85,7 +85,7 @@ def candidate_pages(pdf: Path) -> list[int]:
         if re.search(
             r"For\s+(the\s+)?(Sheriff|County\s+Attorney|Attorney|Register\s+of\s+Deeds|Treasurer)", text, re.IGNORECASE
         )
-        and re.search(r"[A-Z]{4,} COUNTY|COUNTY OFFICES", text)
+        and re.search(rf"[A-Z]{{4,}} COUNTY|COUNTY OFFICES|(?im:^\s*(?:{'|'.join(COUNTIES)})\s+COUNTY\s*:?\s*$)", text)
     ]
     keep = set(hits)
     for left, right in itertools.pairwise(hits):
@@ -167,9 +167,12 @@ def number(tokens: list[Word]) -> tuple[int, bool, list[Word]] | None:
 
 def header(text: str) -> tuple[str, str] | None:
     plain = re.sub(r"\s+", " ", text).strip()
-    county = re.fullmatch(rf"({'|'.join(COUNTIES)}) COUNTY:?", plain, re.IGNORECASE)
+    plain = re.sub(r"(?i)^(For\s+(?:the\s+)?)Counts'?\b", r"\1County", plain)
+    county = re.fullmatch(r"([A-Za-z]{4,12}) COUNT[A-Z']{1,2}:?", plain, re.IGNORECASE)
     if county:
-        return "county", county[1].upper()
+        match = difflib.get_close_matches(county[1].upper(), COUNTIES, n=1, cutoff=0.7)
+        if match:
+            return "county", match[0]
     found = re.match(r"For\s+(?:the\s+)?(.*?)[:;.]?$", plain, re.IGNORECASE)
     if found:
         for pattern, name in OFFICES:
