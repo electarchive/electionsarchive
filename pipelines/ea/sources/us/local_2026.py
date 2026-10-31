@@ -5384,6 +5384,13 @@ for key, publisher, title, url, local in (
         "ar/union_contested_candidates.html",
     ),
     (
+        "FL-12113-milton",
+        "Santa Rosa County Supervisor of Elections",
+        "Sample Ballot, General Election, November 3, 2026",
+        "https://www.votesantarosa.gov/",
+        "fl/santa_rosa_sample_ballot_general_2026.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
