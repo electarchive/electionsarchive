@@ -13,6 +13,7 @@
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
   import GlobeIcon from "@lucide/svelte/icons/globe";
+  import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -544,7 +545,7 @@
       ? new Map(totals.entries().filter(([, seats]) => seats > 0))
       : null;
   });
-  let layout = $state<"map" | "hexes">("hexes");
+  let isHexed = $state(false);
   const hexed = $derived(
     covering(hexes, { has: (k) => rows.has(k), size: places.rows.length }),
   );
@@ -630,11 +631,7 @@
       ),
     };
   });
-  const views = $derived([
-    "map" as const,
-    ...(tiled == null ? [] : ["hexes" as const]),
-  ]);
-  const grid = $derived(layout === "hexes" ? tiled : null);
+  const grid = $derived(isHexed ? tiled : null);
   const isSummary = $derived(grid != null);
   let zoom = $state({ scale: 1, x: 0, y: 0 });
   let touches: Array<{ id: number; x: number; y: number }> = [];
@@ -2064,29 +2061,26 @@
         </div>
       </div>
     {/if}
-    {#if views.length > 1}
-      <div class="flex" role="group" aria-label={m.map_view()}>
-        {#each views as choice (choice)}
-          <button
-            type="button"
-            class={cn(
-              "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
-              {
-                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                  (grid == null ? "map" : layout) === choice,
-              },
-            )}
-            aria-pressed={(grid == null ? "map" : layout) === choice}
-            onclick={() => {
-              layout = choice;
-              zoom = { scale: 1, x: 0, y: 0 };
-            }}
-            >{choice === "hexes"
-              ? m.map_view_hexes()
-              : m.map_view_map()}</button
-          >
-        {/each}
-      </div>
+    {#if tiled != null}
+      <button
+        type="button"
+        class={cn(
+          "flex items-center gap-1.5 rounded-sm border border-foreground/40 bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:border-foreground/70 hover:bg-secondary pointer-coarse:block-10",
+          {
+            "border-primary bg-primary text-primary-foreground hover:border-primary hover:bg-primary":
+              isHexed,
+          },
+        )}
+        aria-pressed={isHexed}
+        onclick={() => {
+          isHexed = !isHexed;
+          zoom = { scale: 1, x: 0, y: 0 };
+        }}
+        ><HexagonIcon
+          class={cn("block-3.5 inline-3.5", { "fill-current": isHexed })}
+          aria-hidden="true"
+        />{m.map_view_hexes()}</button
+      >
     {/if}
     {#if tiers.length > 1}
       <div
