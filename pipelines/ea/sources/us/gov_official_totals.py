@@ -2,16 +2,20 @@ import base64
 import hashlib
 import io
 import json
+import re
 import subprocess
 import tempfile
 from pathlib import Path
+from uuid import UUID
 
 import polars as pl
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from PIL import Image
 
 from ea import batch, raw
-from ea.store import DATA
+from ea.changeset import Changeset, slug
+from ea.sources.us.statewide_totals import PARTIES
+from ea.store import DATA, connect
 
 SOURCE = "us.gov_official_totals"
 VERSION = "1"
@@ -20,6 +24,10 @@ MODEL = "claude-haiku-5-5"
 PROMPT = "1"
 READS = {"a": 150, "b": 200}
 PAGES = Path(__file__).with_name("gov_official_totals_pages.tsv")
+VERIFIED = Path(__file__).with_name("gov_official_totals_verified.tsv")
+DPI = 100
+PUBLISHER = "Commonwealth of Massachusetts, Secretary of the Commonwealth"
+TITLE = "Manual for the Use of the General Court"
 SCHEMA: dict[str, object] = {
     "type": "object",
     "properties": {
@@ -160,3 +168,222 @@ def parse() -> None:
         rows, schema=["state", "year", "reader", "position", "name", "party", "votes", "printed_total"], orient="row"
     ).write_csv(PARSED / "reads.tsv", separator="\t")
     print(len(rows), "lines read")
+
+
+NOTE = (
+    "Statewide candidate totals as printed in the official volume, transcribed twice from the page image and "
+    "checked against the printed totals and the other sources the archive holds. Lines of one candidate printed "
+    "under several ticket labels are added together."
+)
+
+
+def surname(text: str) -> str:
+    parts = [part for part in re.sub(r"[^a-z ]", "", text.lower()).split() if part not in ("jr", "sr", "iii", "ii")]
+    return parts[-1] if parts else ""
+
+
+def emit() -> Path:
+    frame = pl.read_csv(VERIFIED, separator="\t", schema_overrides={"year": pl.Int64, "votes": pl.Int64}).with_columns(
+        pl.col("party").fill_null("")
+    )
+    book = pages().with_columns(pl.col("year").cast(pl.Int64))
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Governor statewide totals for contests with only partial or no official sets, from official volumes",
+            polity="US",
+        )
+        columns = (
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
+            "supersedes_id",
+        )
+        state_units = {
+            code: unit
+            for code, unit in conn.execute(
+                """select substr(p.iso_code, 4), u.code from reporting_unit u
+                   join polity_territory t on t.area_id = u.area_id
+                   join polity p on p.id = t.polity_id and p.iso_code like 'US-%%'
+                   where u.scheme_code = 'us.state'"""
+            ).fetchall()
+        }
+        filled = 0
+        for (state, year), lines in frame.group_by("state", "year", maintain_order=True):
+            state = str(state)
+            year = int(year)
+            row = book.filter((pl.col("state") == state) & (pl.col("year") == year)).row(0, named=True)
+            contest, election, ckey = conn.execute(
+                """select c.id, c.election_id, min(k.value) from contest c
+                   join election e on e.id = c.election_id join polity p on p.id = e.polity_id
+                   join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
+                     and o.value like 'governor:%%'
+                   join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
+                   where p.iso_code = %s and extract(year from e.date_from) = %s group by 1, 2""",
+                [f"US-{state}", year],
+            ).fetchone()
+            prior = conn.execute(
+                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
+            ).fetchall()
+            options: dict[str, list[tuple[UUID, str]]] = {}
+            for option, kind, label, current in conn.execute(
+                """select o.id, o.kind::text, o.ballot_label,
+                          exists (select from result_value v join result_set r on r.k = v.result_set_k
+                                  where v.option_k = o.k and r.is_default) from contest_option o
+                   where o.contest_id = %s order by 4 desc, o.id""",
+                [contest],
+            ).fetchall():
+                options.setdefault(kind, []).append((option, label or ""))
+            if prior:
+                source_id = prior[0][6]
+            else:
+                made = cs.source(PUBLISHER, f"{TITLE} {year + 1}")
+                source_id = made
+                if made in cs.minted:
+                    cs.add(
+                        "source",
+                        id=made,
+                        kind="official_body",
+                        publisher=PUBLISHER,
+                        title=f"{TITLE} {year + 1}",
+                        url=row["url"].replace("/download/", "/details/").rsplit("/", 1)[0],
+                        license="public domain",
+                    )
+            stored = find(row["origin"], row["needle"])
+            artifact = cs.artifact(stored, source_id)
+            number = int(lines["page"][0])
+            page = cs.page(artifact, number)
+            if page in cs.minted:
+                target = DATA / "pages" / SOURCE / f"{stored.path.stem}-{number}.png"
+                if not target.exists():
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(number), "-l", str(number)]
+                        + ["-singlefile", str(stored.path), str(target.with_suffix(""))],
+                        check=True,
+                    )
+                with Image.open(target) as rendered:
+                    width, height = rendered.size
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{target.name}",
+                    width=width,
+                    height=height,
+                )
+            result_set = cs.key(f"{SOURCE}.result_set", ckey)
+            for old in prior:
+                cs.add("result_set", **dict(zip(columns, old, strict=True)), is_default=False)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source_id,
+                is_default=True,
+                completeness=1,
+                supersedes_id=prior[0][0] if prior else None,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            unit = cs.unit("us.state", state_units[state])
+            totals: dict[UUID, int] = {}
+            taken: set[UUID] = set()
+            order: list[str] = []
+            sums: dict[str, tuple[str, str, int]] = {}
+            for name, party, votes, kind in lines.select("name", "party", "votes", "kind").iter_rows():
+                if kind == "others":
+                    sums[f"{kind}:{name}"] = (name, party, votes)
+                    order.append(f"{kind}:{name}")
+                    continue
+                if name not in sums:
+                    sums[name] = (name, party, 0)
+                    order.append(name)
+                sums[name] = (name, sums[name][1], sums[name][2] + votes)
+            for entry in order:
+                name, party, votes = sums[entry]
+                if entry.startswith("others:"):
+                    spare = [o for o, _ in options.get("others", []) if o not in taken]
+                    if spare:
+                        option = spare[0]
+                    else:
+                        option = cs.key("us.option", f"{ckey}:official-others")
+                        cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others")
+                else:
+                    found = [o for o, label in options.get("candidate", []) if surname(label) == surname(name)]
+                    if found:
+                        option = found[0]
+                    else:
+                        person = cs.key(f"{SOURCE}.person", f"{state}:{slug(name)}:{year}")
+                        cs.add("person", id=person)
+                        cs.add("name", entity_id=person, text=name, lang="en", kind="official", is_preferred=True)
+                        national = PARTIES.get(party.lower().removesuffix(" party"))
+                        option = cs.key("us.option", f"{ckey}:{person}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=cs.key("us.party", national) if national else None,
+                            ballot_label=name,
+                        )
+                        cs.add(
+                            "candidacy",
+                            id=cs.key("us.candidacy", f"{ckey}:{person}:head"),
+                            person_id=person,
+                            option_id=option,
+                            role="head",
+                            ballot_name=name,
+                            is_independent=False,
+                        )
+                taken.add(option)
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=8,
+                    value=votes,
+                )
+                cs.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    page_id=page,
+                    source_id=None,
+                    x0=0.0,
+                    y0=0.0,
+                    x1=1.0,
+                    y1=1.0,
+                )
+                if not entry.startswith("others:"):
+                    totals[option] = votes
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=max(totals, key=totals.__getitem__),
+                kind="elected",
+                seats=1,
+            )
+            filled += 1
+        print(filled, "contests")
+        return cs.write()
