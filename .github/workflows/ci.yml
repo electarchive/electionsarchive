@@ -28,6 +28,8 @@ jobs:
       - run: pnpm run test
       - run: pnpm run format
       - run: pnpm run lint
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
 
   pipelines:
     runs-on: ubuntu-latest
