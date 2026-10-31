@@ -773,6 +773,11 @@ COUNTIES = {
         "https://www.co.falls.tx.us/upload/page/0087/ROBINSON%20ISD%20NOV%202026%20-%20Notice%20of%20Bond%20Election.pdf",
         "N3M-web/tx9/mc/robinson.pdf",
     ),
+    "48309-wlv": (
+        "TX",
+        "https://www.mclennan.gov/1350/November-3-2026-Joint-General-Election",
+        "MF-478/WLVMMD Notice of Confirmation, Bond, Directors, and Maintenance Tax Election - November 2026 (18997).pdf",
+    ),
     "48309-bel": (
         "TX",
         "https://bellmeadtx.gov/540/November-2026-Sales-Tax-Election",
