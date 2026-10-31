@@ -203,6 +203,11 @@ COUNTIES = {
         "https://www.richmondri.gov/DocumentCenter/View/4674/Chariho-Public-Notice-1022026",
         "RI-web/chariho-public-notice.pdf",
     ),
+    "44009-ch": (
+        "RI",
+        "https://www.charlestownri.gov/",
+        "MF-480/charlestown/October_2026_Pipeline_-6(1).pdf",
+    ),
     "44009-hk": (
         "RI",
         "https://www.thewesterlysun.com/classifieds/community/announcements/legal/town-of-hopkinton-local-referendum-question/ad_0d68755c-52ac-5597-b590-c66345354519.html",
@@ -886,7 +891,8 @@ def emit() -> Path:
             option = None
             if re.match(r"(?i)(city|town|village|borough) of ", entity):
                 bare = re.sub(r"(?i)^(city|town|village|borough) of ", "", entity)
-                option = civil.place(bare) or civil.towns.get((row["county"][:5], civmint.town_core(bare)))
+                town = civil.towns.get((row["county"][:5], civmint.town_core(bare)))
+                option = town if state == "RI" and town is not None else civil.place(bare) or town
             elif county_key in found and entity == found[county_key][2]:
                 option = county_key
             elif entity.endswith(" Township"):
