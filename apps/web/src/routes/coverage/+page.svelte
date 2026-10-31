@@ -2,14 +2,15 @@
   import { invalidateAll } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { count, percent } from "#lib/format.js";
+  import { count } from "#lib/format.js";
   import { cn } from "#lib/utils.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import type { PageData } from "./$types";
   import type { CountryTier, Tier } from "#lib/coverage.js";
-  import { COUNTRY_TIERS, TIER_LABELS } from "#lib/coverage.js";
-  import Tone from "./tone.svelte";
+  import { COUNTRY_TIERS, headline, STRICT, TIER_LABELS } from "#lib/coverage.js";
+  import Bar from "./bar.svelte";
+  import Share from "./share.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -132,34 +133,24 @@
                             >{m.coverage_cell_none()}</span
                           >
                         {:else}
-                          <span class="font-semibold"
-                            >{percent(
-                              tier.cell.complete / tier.cell.total,
-                              1,
-                            )}</span
+                          <Share
+                            counts={tier.cell}
+                            goal={headline(polity.polity, tier.key).goal}
+                            polity={polity.polity}
+                            strict={STRICT.includes(
+                              headline(polity.polity, tier.key).column,
+                            ) && tier.key !== "precinct_shapes"}
+                            detail={m.coverage_cell_of}
+                            class="font-semibold inline-fit"
+                            detailClass="text-xs text-muted-foreground inline-fit"
                           >
-                          <span
-                            aria-hidden="true"
-                            class="flex overflow-hidden rounded-xs bg-muted block-1 max-inline-28"
-                          >
-                            <span
-                              class="block-full"
-                              style:inline-size="{(tier.cell.complete /
-                                tier.cell.total) *
-                                100}%"
-                            >
-                              <Tone
-                                reason="complete"
-                                class="block block-full inline-full"
-                              />
-                            </span>
-                          </span>
-                          <span class="text-xs text-muted-foreground"
-                            >{m.coverage_cell_of({
-                              complete: count(tier.cell.complete),
-                              total: count(tier.cell.total),
-                            })}</span
-                          >
+                            <Bar
+                              counts={tier.cell}
+                              goal={headline(polity.polity, tier.key).goal}
+                              polity={polity.polity}
+                              class="block-1 max-inline-28"
+                            />
+                          </Share>
                         {/if}
                       </div>
                     {/each}

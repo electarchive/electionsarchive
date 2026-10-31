@@ -9,6 +9,7 @@ import {
   COLUMN_LABELS,
   columnGroup,
   COUNTRY_COLUMNS,
+  covered,
   ERA_LABELS,
   GAP_GRAINS,
   gapNote,
@@ -22,6 +23,7 @@ import {
   label as reasonLabel,
   REASONS,
   spans,
+  STRICT,
   TIER_LABELS,
   US_COLUMNS,
 } from "#lib/coverage.js";
@@ -845,9 +847,9 @@ function knownMarkdown(known: Known, link: Link, isFull: boolean) {
   ];
 }
 
-const share = (row: { complete: number; total: number }) =>
-  m.coverage_percent({
-    percent: percent(row.complete / Math.max(1, row.total), 1),
+const share = (counts: Counts, strict: boolean) =>
+  (strict ? m.coverage_percent_complete : m.coverage_percent)({
+    percent: percent(covered(counts, strict) / Math.max(1, counts.total), 1),
   });
 
 function coverageMarkdown(
@@ -871,12 +873,14 @@ function coverageMarkdown(
     isUs
       ? `${columnGroup(column)()}, ${COLUMN_LABELS[column]().toLowerCase()}`
       : COLUMN_LABELS[column]();
-  const cell = (counts: Counts | null | undefined) =>
+  const cell = (counts: Counts | null | undefined, strict: boolean) =>
     counts == null
       ? "–"
       : counts.total === 0
         ? m.coverage_cell_none()
-        : `${percent(counts.complete / counts.total, 1)} (${m.coverage_cell_of({ complete: count(counts.complete), total: count(counts.total) })})`;
+        : `${percent(covered(counts, strict) / counts.total, 1)} (${m.coverage_cell_of({ complete: count(covered(counts, strict)), total: count(counts.total) })})`;
+  const strictly = (column: Column, tier: string) =>
+    STRICT.includes(column) && tier !== "precinct_shapes";
   const notesFor = (level: string) =>
     summary.notes.filter(
       (note) =>
@@ -938,7 +942,7 @@ function coverageMarkdown(
               data.readiness.filter((row) => row.level === level),
             ).map((row) => [
               levelLabel(data.polity, row.level),
-              `${percent(row.complete / Math.max(1, row.total), 1)} (${(READY_COUNTS[row.level] ?? m.coverage_ready_of)({ complete: count(row.complete), total: count(row.total) })})`,
+              `${percent(covered(row) / Math.max(1, row.total), 1)} (${(READY_COUNTS[row.level] ?? m.coverage_ready_of)({ held: count(covered(row)), total: count(row.total), ready: count(row.complete) })})`,
               count(row.partial),
               count(row.bare),
               count(row.absent),
@@ -983,8 +987,8 @@ function coverageMarkdown(
           return tier.key === "precinct_shapes" &&
             column === "precinct_2000" &&
             value != null
-            ? `${cell(value)}, ${m.coverage_bonus().toLowerCase()}`
-            : cell(value);
+            ? `${cell(value, false)}, ${m.coverage_bonus().toLowerCase()}`
+            : cell(value, strictly(column, tier.key));
         }),
       ]),
     ),
@@ -1028,7 +1032,7 @@ function coverageMarkdown(
           return [
             [
               `**${item.title()}**: ${[
-                `${progress({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+                `${progress({ complete: count(covered(row, strictly(item.column, tier.key))), total: count(row.total) })}, ${share(row, strictly(item.column, tier.key))}`,
                 ...(isWeighted
                   ? [
                       m.coverage_progress_local_population({
@@ -1190,7 +1194,12 @@ function coverageMarkdown(
                   ]),
               ...columns
                 .filter((column) => slot(column, tier.key) in tier.cells)
-                .map((column) => cell(level.cells[slot(column, tier.key)])),
+                .map((column) =>
+                  cell(
+                    level.cells[slot(column, tier.key)],
+                    strictly(column, tier.key),
+                  ),
+                ),
             ];
           }),
         ),
@@ -1259,7 +1268,12 @@ function coverageMarkdown(
                             row.path,
                           ),
                       count(row.total - row.complete),
-                      share(row),
+                      share(
+                        row,
+                        ["county", "precinct", "fine"].includes(
+                          headline(data.polity, tier.key).goal,
+                        ),
+                      ),
                     ]),
                   ),
                 ]),
@@ -1313,7 +1327,7 @@ function overviewMarkdown(
         polity.tiers
           .map(
             (tier) =>
-              `${TIER_LABELS[tier.key as Tier]()}: ${tier.cell == null || tier.cell.total === 0 ? m.coverage_cell_none() : `${percent(tier.cell.complete / tier.cell.total, 1)} (${m.coverage_cell_of({ complete: count(tier.cell.complete), total: count(tier.cell.total) })})`}`,
+              `${TIER_LABELS[tier.key as Tier]()}: ${tier.cell == null || tier.cell.total === 0 ? m.coverage_cell_none() : `${percent(covered(tier.cell, STRICT.includes(headline(polity.polity, tier.key).column) && tier.key !== "precinct_shapes") / tier.cell.total, 1)} (${m.coverage_cell_of({ complete: count(covered(tier.cell, STRICT.includes(headline(polity.polity, tier.key).column) && tier.key !== "precinct_shapes")), total: count(tier.cell.total) })})`}`,
           )
           .join("; "),
         polity.first == null || polity.last == null

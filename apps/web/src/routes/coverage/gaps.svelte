@@ -4,13 +4,14 @@
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
-  import { count, percent } from "#lib/format.js";
+  import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { Counts, Goal } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
+  import Share from "./share.svelte";
   import Self from "./gaps.svelte";
   import { levelLabel } from "#lib/coverage.js";
 
@@ -142,15 +143,22 @@
     </span>
     <span role="gridcell" class="grid gap-1">
       <span class="truncate text-xs text-muted-foreground">
+        <Share
+          counts={row}
+          {goal}
+          {polity}
+          strict={goal === "county" || goal === "precinct" || goal === "fine"}
+        />
         {[
-          percent(row.complete / Math.max(1, row.total), 1),
           ...(row.knownGap > 0
             ? [m.coverage_known_gap_of({ count: count(row.knownGap) })]
             : []),
           ...(row.blocked > 0
             ? [m.coverage_blocked_of({ count: count(row.blocked) })]
             : []),
-        ].join(" · ")}
+        ]
+          .map((part) => ` · ${part}`)
+          .join("")}
       </span>
       <Bar counts={row} {goal} {polity} class="block-2" />
     </span>

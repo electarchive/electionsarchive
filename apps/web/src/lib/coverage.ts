@@ -444,6 +444,53 @@ export const REASONS: Record<Goal, Array<Reason>> = {
   turnout: ["complete", "partial", "coarse", "absent", "blocked", "knownGap"],
 };
 
+export function columnGoal(tier: string, column: Column): Goal {
+  if (tier === "local" || tier === "turnout" || tier === "precinct_shapes") {
+    return tier;
+  }
+  if (column === "fine" || column === "shapes") {
+    return column;
+  }
+  if (column === "any" || column === "constituency") {
+    return COUNTRY_GOALS.find((goal) => goal === tier) ?? "national";
+  }
+  if (column === "before_shapes") {
+    return "shapes_history";
+  }
+  if (column === "since_shapes") {
+    return "shapes";
+  }
+  if (column === "precinct_2000" || column === "precinct_2016") {
+    return "precinct";
+  }
+  return column.startsWith("before") ? "history" : "county";
+}
+
+const MISSING: Array<Reason> = ["absent", "unshaped", "undrawn"];
+
+export const STRICT: ReadonlyArray<Column> = [
+  "before_county",
+  "before_district",
+  "since_county",
+  "precinct_2000",
+  "precinct_2016",
+  "fine",
+];
+
+export function covered(
+  counts: Partial<Record<Reason, number>> & { total: number },
+  strict = false,
+) {
+  if (strict) {
+    return counts.complete ?? 0;
+  }
+  let missing = 0;
+  for (const reason of MISSING) {
+    missing += counts[reason] ?? 0;
+  }
+  return counts.total - missing;
+}
+
 export const LABELS: Record<Reason, () => string> = {
   complete: m.coverage_reason_complete,
   major: m.coverage_reason_major,

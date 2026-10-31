@@ -2,6 +2,8 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -28,7 +30,10 @@
     columnGroup,
     GAP_GRAINS,
     gapSpan,
+    columnGoal,
+    STRICT,
   } from "#lib/coverage.js";
+  import Share from "#routes/coverage/share.svelte";
   import Tone from "#routes/coverage/tone.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -110,7 +115,26 @@
       label: m.coverage_ready_absent,
       definition: m.coverage_ready_absent_def,
     },
+    {
+      reason: "blocked",
+      label: m.coverage_reason_blocked,
+      definition: m.coverage_reason_blocked_def,
+    },
+    {
+      reason: "knownGap",
+      label: m.coverage_reason_known_gap,
+      definition: m.coverage_reason_known_gap_def,
+    },
   ] as const;
+  const READY_LABELS = Object.fromEntries(
+    READY.map((part) => [part.reason, part.label]),
+  );
+  const readyTether = TooltipPrimitive.createTether<string>();
+  const gapTether = TooltipPrimitive.createTether<{
+    part: (typeof READY)[number];
+    state: string;
+    count: number;
+  }>();
   const COUNTRY_REASONS: Partial<Record<Reason, () => string>> = {
     pending: m.coverage_reason_pending_def,
     coarse: m.coverage_country_reason_coarse_def,
@@ -261,26 +285,22 @@
     <span class="text-xs text-muted-foreground">{m.coverage_cell_none()}</span>
   {:else}
     <span class="grid gap-0.5 tabular-nums">
-      <span class="font-semibold"
-        >{percent(counts.complete / counts.total, 1)}</span
+      <Share
+        {counts}
+        goal={columnGoal(tierKey, column)}
+        polity={data.polity}
+        strict={STRICT.includes(column) && tierKey !== "precinct_shapes"}
+        detail={m.coverage_cell_of}
+        class="font-semibold inline-fit"
+        detailClass="text-xs text-muted-foreground inline-fit"
       >
-      <span
-        aria-hidden="true"
-        class="flex overflow-hidden rounded-xs bg-muted block-1 max-inline-24"
-      >
-        <span
-          class="block-full"
-          style:inline-size="{(counts.complete / counts.total) * 100}%"
-        >
-          <Tone reason="complete" class="block block-full inline-full" />
-        </span>
-      </span>
-      <span class="text-xs text-muted-foreground"
-        >{m.coverage_cell_of({
-          complete: count(counts.complete),
-          total: count(counts.total),
-        })}</span
-      >
+        <Bar
+          {counts}
+          goal={columnGoal(tierKey, column)}
+          polity={data.polity}
+          class="block-1 max-inline-24"
+        />
+      </Share>
       {#if tierKey === "precinct_shapes" && column === "precinct_2000"}
         <span class="text-xs text-muted-foreground">{m.coverage_bonus()}</span>
       {/if}
@@ -641,6 +661,7 @@
   progress: (inputs: { complete: string; total: string }) => string,
   tierKey: string,
   isBonus: boolean,
+  strict: boolean,
 )}
   {const isWeighted = $derived(goal === "local" && counts.populationTotal > 0)}
   {const shown = $derived(isBonus ? { ...counts, unshaped: 0 } : counts)}
@@ -652,17 +673,20 @@
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-sm tabular-nums"
     >
-      <span class="text-lg font-bold tracking-[-0.01em]">
-        {progress({
-          complete: count(counts.complete),
-          total: count(counts.total),
-        })}
-      </span>
-      <span class="text-muted-foreground">
-        {m.coverage_percent({
-          percent: percent(counts.complete / Math.max(1, counts.total), 1),
-        })}
-      </span>
+      <Share
+        {counts}
+        {goal}
+        polity={data.polity}
+        {strict}
+        detail={progress}
+        detailFirst
+        detailClass="text-lg font-bold tracking-[-0.01em]"
+        format={(value) =>
+          (strict ? m.coverage_percent_complete : m.coverage_percent)({
+            percent: value,
+          })}
+        class="text-muted-foreground"
+      />
       {#if counts.upcoming > 0}
         <span class="text-muted-foreground">
           {m.coverage_upcoming_of({ count: count(counts.upcoming) })}
@@ -831,41 +855,55 @@
               <span class="text-sm font-semibold"
                 >{levelLabel(data.polity, row.level)}</span
               >
-              <span class="text-lg font-bold tracking-[-0.01em] tabular-nums"
-                >{percent(row.complete / Math.max(1, row.total), 1)}</span
+              <Share
+                counts={row}
+                goal="county"
+                labels={READY_LABELS}
+                class="text-lg font-bold tracking-[-0.01em] tabular-nums inline-fit"
+                detail={(inputs) =>
+                  (READY_COUNTS[row.level] ?? m.coverage_ready_of)({
+                    held: inputs.complete,
+                    total: inputs.total,
+                    ready: count(row.complete),
+                  })}
+                detailClass="text-xs text-muted-foreground tabular-nums inline-fit"
               >
-              <span
-                role="img"
-                aria-label={READY.filter((part) => row[part.reason] > 0)
-                  .map((part) =>
-                    m.coverage_count({
-                      label: part.label(),
-                      count: count(row[part.reason]),
-                    }),
-                  )
-                  .join(", ")}
-                class="flex overflow-hidden rounded-xs bg-muted block-2.5 max-inline-56"
-              >
-                {#each READY.filter((part) => row[part.reason] > 0) as part (part.reason)}
-                  <span
-                    class="block-full"
-                    style:inline-size="{(row[part.reason] /
-                      Math.max(1, row.total)) *
-                      100}%"
-                  >
-                    <Tone
-                      reason={part.reason}
-                      class="block block-full inline-full"
-                    />
-                  </span>
-                {/each}
-              </span>
-              <span class="text-xs text-muted-foreground tabular-nums"
-                >{(READY_COUNTS[row.level] ?? m.coverage_ready_of)({
-                  complete: count(row.complete),
-                  total: count(row.total),
-                })}</span
-              >
+                <span
+                  role="img"
+                  aria-label={READY.filter((part) => row[part.reason] > 0)
+                    .map((part) =>
+                      m.coverage_count({
+                        label: part.label(),
+                        count: count(row[part.reason]),
+                      }),
+                    )
+                    .join(", ")}
+                  class="flex overflow-hidden rounded-xs bg-muted block-2.5 max-inline-56"
+                >
+                  {#each READY.filter((part) => row[part.reason] > 0) as part (part.reason)}
+                    <Tooltip.Trigger
+                      tether={readyTether}
+                      payload={`${row.level}:${part.reason}`}
+                      tabindex={-1}
+                    >
+                      {#snippet child({ props })}
+                        <span
+                          {...props}
+                          class="block-full"
+                          style:inline-size="{(row[part.reason] /
+                            Math.max(1, row.total)) *
+                            100}%"
+                        >
+                          <Tone
+                            reason={part.reason}
+                            class="block block-full inline-full"
+                          />
+                        </span>
+                      {/snippet}
+                    </Tooltip.Trigger>
+                  {/each}
+                </span>
+              </Share>
               {#if row.population > 0}
                 <span class="text-xs text-muted-foreground tabular-nums"
                   >{m.coverage_ready_population({
@@ -885,12 +923,47 @@
                     {m.coverage_ready_states()} ({count(short.length)})
                   </summary>
                   <ul
-                    class="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-3 gap-y-0.5 pbs-1.5 tabular-nums"
+                    class={cn("grid gap-x-3 gap-y-0.5 pbs-1.5 tabular-nums", {
+                      "grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))]":
+                        row.knownGap + row.blocked === 0,
+                      "grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))]":
+                        row.knownGap + row.blocked > 0,
+                    })}
                   >
                     {#each short as state (state.state)}
-                      <li>
-                        <span class="font-semibold">{state.state}</span>
-                        {count(state.complete)}/{count(state.total)}
+                      <li class="flex flex-wrap items-center gap-x-1.5">
+                        <span
+                          ><span class="font-semibold">{state.state}</span>
+                          {count(state.complete)}/{count(state.total)}</span
+                        >
+                        {#each READY.filter((part) => (part.reason === "knownGap" || part.reason === "blocked") && state[part.reason] > 0) as part (part.reason)}
+                          <Tooltip.Trigger
+                            tether={gapTether}
+                            payload={{
+                              part,
+                              state: state.state,
+                              count: state[part.reason],
+                            }}
+                          >
+                            {#snippet child({ props })}
+                              <span
+                                {...props}
+                                role="img"
+                                aria-label={m.coverage_count({
+                                  label: part.label(),
+                                  count: count(state[part.reason]),
+                                })}
+                                class="inline-flex cursor-help items-center gap-0.5 text-muted-foreground"
+                              >
+                                <Tone
+                                  reason={part.reason}
+                                  class="rounded-xs block-2 inline-2"
+                                />
+                                {count(state[part.reason])}
+                              </span>
+                            {/snippet}
+                          </Tooltip.Trigger>
+                        {/each}
                       </li>
                     {/each}
                   </ul>
@@ -899,6 +972,47 @@
             </li>
           {/each}
         </ul>
+        <Tooltip.Root tether={gapTether} delayDuration={80}>
+          {#snippet children({ payload })}
+            {#if payload != null}
+              <Tooltip.Content
+                collisionPadding={8}
+                class="grid gap-0.5 leading-snug max-inline-72"
+              >
+                <span class="font-semibold">{payload.part.label()}</span>
+                <span class="tabular-nums"
+                  >{`${payload.state} · ${count(payload.count)}`}</span
+                >
+                <span>{payload.part.definition()}</span>
+              </Tooltip.Content>
+            {/if}
+          {/snippet}
+        </Tooltip.Root>
+        <Tooltip.Root tether={readyTether} delayDuration={80}>
+          {#snippet children({ payload })}
+            {const row = $derived(
+              data.readiness.find(
+                (found) => payload?.startsWith(`${found.level}:`) ?? false,
+              ),
+            )}
+            {const part = $derived(
+              READY.find(
+                (found) => payload === `${row?.level}:${found.reason}`,
+              ),
+            )}
+            {#if row != null && part != null}
+              <Tooltip.Content
+                collisionPadding={8}
+                class="grid gap-0.5 leading-snug"
+              >
+                <span class="font-semibold">{part.label()}</span>
+                <span class="tabular-nums"
+                  >{`${count(row[part.reason])} · ${percent(row[part.reason] / Math.max(1, row.total), 1)}`}</span
+                >
+              </Tooltip.Content>
+            {/if}
+          {/snippet}
+        </Tooltip.Root>
         <ul class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           {#each READY as part (part.reason)}
             <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
@@ -1062,6 +1176,8 @@
                       row.key,
                       item.goal === "precinct_shapes" &&
                         item.column === "precinct_2000",
+                      STRICT.includes(item.column) &&
+                        item.goal !== "precinct_shapes",
                     )}
                   {/each}
                 </div>
