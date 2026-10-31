@@ -396,6 +396,30 @@
       column.parts.map((part) => ({ ...part, column: column.index })),
     ),
   );
+  const drawn = $derived.by(() => {
+    const kept: typeof slices = [];
+    let widest = 0;
+    for (const part of slices) {
+      const last = kept.at(-1);
+      const wide = part.x1 - part.x0;
+      if (
+        last == null ||
+        last.column !== part.column ||
+        part.x0 - last.x0 >= 1
+      ) {
+        kept.push(part);
+        widest = wide;
+        continue;
+      }
+      kept[kept.length - 1] = {
+        ...(wide > widest ? part : last),
+        x0: last.x0,
+        x1: part.x1,
+      };
+      widest = Math.max(widest, wide);
+    }
+    return kept;
+  });
   const groups = $derived(
     [...blocks.keys()].toSorted(
       (a, b) => (blocks.get(a) ?? 0) - (blocks.get(b) ?? 0),
@@ -406,9 +430,9 @@
       ...order.map((party) => ({ party, isGroup: false })),
       ...groups.map((party) => ({ party, isGroup: true })),
     ].map(({ party, isGroup }) => {
-      const runs = slices.map((part, index) => {
-        const before = slices[index - 1];
-        const after = slices[index + 1];
+      const runs = drawn.map((part, index) => {
+        const before = drawn[index - 1];
+        const after = drawn[index + 1];
         const column = columns[part.column];
         const ease = Math.min(
           5,
@@ -432,13 +456,20 @@
         };
       });
       const joined: Array<typeof runs> = [];
-      for (const run of runs) {
+      let isOpen = false;
+      for (const [index, run] of runs.entries()) {
+        const near = [runs[index - 1], run, runs[index + 1]];
+        if (near.every((entry) => entry == null || entry.y0 === entry.y1)) {
+          isOpen = false;
+          continue;
+        }
         const group = joined.at(-1);
-        if (group == null || group.at(-1)?.joinsAfter !== true) {
+        if (!isOpen || group == null || group.at(-1)?.joinsAfter !== true) {
           joined.push([run]);
         } else {
           group.push(run);
         }
+        isOpen = true;
       }
       let d = "";
       for (const group of joined) {
@@ -576,7 +607,13 @@
       .toSorted((a, b) => b.seats - a.seats),
   );
   const steps = $derived(
-    slices.filter((entry) => entry.step != null).map((entry) => entry.x0),
+    new Set(
+      slices
+        .filter((entry) => entry.step != null)
+        .map((entry) => Math.round(entry.x0 * 2) / 2),
+    )
+      .values()
+      .toArray(),
   );
   const current = $derived(selected ?? hovered ?? columns.length - 1);
   const pick = (index: number) => {
@@ -765,7 +802,7 @@
       </pattern>
     </defs>
     <g>
-      {#each slices.filter((entry) => entry.empty > 0) as entry, index (index)}
+      {#each drawn.filter((entry) => entry.empty > 0) as entry, index (index)}
         <rect
           x={entry.x0}
           y={entry.vacant.y1}
@@ -775,7 +812,7 @@
           opacity="0.55"
         />
       {/each}
-      {#each slices.filter((entry) => entry.late > 0) as entry, index (index)}
+      {#each drawn.filter((entry) => entry.late > 0) as entry, index (index)}
         <rect
           x={entry.x0}
           y={entry.undated.y1}
