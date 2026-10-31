@@ -6528,6 +6528,23 @@ def other_place(mine: frozenset[str], theirs: frozenset[str]) -> bool:
     return bool(ours and others and sorted("".join(ours)) != sorted("".join(others)))
 
 
+def ca_school_variants(label: str) -> list[list[str]]:
+    words = [
+        word
+        for word in re.findall(
+            r"[a-z0-9]+",
+            unicodedata.normalize("NFKD", label)
+            .encode("ascii", "ignore")
+            .decode()
+            .lower()
+            .replace("'", "")
+            .replace("&", " and "),
+        )
+        if word not in ("school", "schools", "district") and not word.isdigit()
+    ]
+    return [words, [word for word in words if word != "joint"]]
+
+
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
     pool: dict[str, list[tuple[str, frozenset[str], frozenset[str]]]] = defaultdict(list)
     for tail, text in conn.execute(
@@ -9578,7 +9595,7 @@ def parse() -> None:
                                 for town in others
                                 if town[1] == "school"
                                 and tuple(town[0]) not in own
-                                and f"{town[4]}/2026-11-03-general" not in held
+                                and (other is None or f"{town[4]}/2026-11-03-general" not in held)
                             ),
                         ]
             for row in found:
@@ -9715,6 +9732,7 @@ def parse() -> None:
                             else []
                         )
                     ]
+                        + (ca_school_variants(rest[1]) if rest[0] == "school" and state == "CA" else [])
                 ):
                     for start in (
                         ([], *([word, "of"] for word in ("city", "village", "town", "township", "borough")))
