@@ -397,6 +397,16 @@ def emit() -> Path:
             ).fetchall()
         )
         prior = dict(conn.execute("select value, entity_id from external_id where scheme = 'tr.election'").fetchall())
+        elsewhere = {
+            (cs.survivors.get(polity, polity), day): election
+            for polity, day, election in conn.execute(
+                """select e.polity_id, e.date_from, e.id from election e
+                   join contest c on c.election_id = e.id join office o on o.id = c.office_id and o.kind = 'mayor'
+                   join changeset ch on ch.id = e.changeset_id
+                   where ch.pipeline <> %s and e.polity_id is not null""",
+                [SOURCE],
+            ).fetchall()
+        }
         skipped: list[tuple[str, str, str]] = []
         made: set[str] = set()
         placed: dict[tuple[UUID, date], UUID] = {}
@@ -471,8 +481,10 @@ def emit() -> Path:
             if unknown is not None:
                 skipped.append((str(year), label, f"unknown party {unknown}"))
                 continue
-            if taken.get(f"{paths[polity]}/{day}-local", prior.get(contest_key)) != prior.get(contest_key):
-                moved[contest_key] = taken[f"{paths[polity]}/{day}-local"]
+            if (polity, day) in elsewhere or taken.get(
+                f"{paths[polity]}/{day}-local", prior.get(contest_key)
+            ) != prior.get(contest_key):
+                moved[contest_key] = elsewhere.get((polity, day)) or taken[f"{paths[polity]}/{day}-local"]
                 skipped.append((str(year), label, "election already held"))
                 continue
             election = cs.key("tr.election", contest_key)
