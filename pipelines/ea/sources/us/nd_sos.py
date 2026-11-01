@@ -753,7 +753,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="North Dakota's president, U.S. Senate, governor, and other statewide offices by county "
-            "1944–1998 from the Secretary of State's official abstracts",
+            "1940–1998 from the Secretary of State's official abstracts",
             polity="US",
         )
 
