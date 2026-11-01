@@ -10943,7 +10943,9 @@ def parse() -> None:
                         re.sub(
                             re.escape(place) if state in ("MD", "LA", "WY") else "^$",
                             "",
-                            str(row["contest"]).replace("Carson City", "Carson"),
+                            re.sub(
+                                r"(?i)\bcounty school superintendent\b", "County Superintendent", str(row["contest"])
+                            ).replace("Carson City", "Carson"),
                             flags=re.IGNORECASE,
                         )
                     )
@@ -10956,7 +10958,11 @@ def parse() -> None:
                     title = re.sub(
                         rf"(?i)^\s*(?:{re.escape(place)}(?:\s+county)?|{re.escape(place.removesuffix(' County'))}(?:\s+county)?)\s+",
                         "",
-                        re.sub(r"\s+", " ", str(row["contest"])).strip(),
+                        re.sub(
+                            r"(?i)\bcounty school superintendent\b",
+                            "County Superintendent of Schools",
+                            re.sub(r"\s+", " ", str(row["contest"])).strip(),
+                        ),
                     )
                     title = re.sub(
                         r"\b(Of|The|And|At)\b",
