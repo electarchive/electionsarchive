@@ -338,7 +338,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       ? swingWeight ** 2 / sum(swings.map((row) => row.weight ** 2))
       : 0;
   const swingError = Math.max(
-    0.012,
+    0.02,
     spread / Math.sqrt(Math.max(1, effective)) + 0.05 * (1 - coverage),
   );
   const others = (unit: Unit) =>
@@ -354,6 +354,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
   }));
   for (let draw = 0; draw < DRAWS; draw += 1) {
     const drawSwing = swing + swingError * gaussian(random);
+    const late = (0.015 + 0.06 * (1 - coverage)) * gaussian(random);
     const drawRatio =
       ratio * Math.exp(0.06 * (1 - coverage) * gaussian(random));
     let votesA = 0;
@@ -383,6 +384,7 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
           1,
           lean * observed +
             (1 - lean) * prior2 +
+            late +
             (0.03 + 0.07 * (1 - unit.reporting)) * gaussian(random),
         ),
       );
