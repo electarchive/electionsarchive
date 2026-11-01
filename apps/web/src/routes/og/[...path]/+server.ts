@@ -1,10 +1,12 @@
 import { Resvg } from "@resvg/resvg-js";
 import { error, isHttpError, isRedirect } from "@sveltejs/kit";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import satori from "satori";
 import { date, percent } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
+import { remember } from "#lib/server/cache.js";
 import { archive, home, party, person } from "#lib/server/pages.js";
 import type { RequestHandler } from "./$types";
 
@@ -192,6 +194,20 @@ export const GET: RequestHandler = async ({ params, url }) => {
     }
     throw error_;
   }
+  const png = await remember(
+    `og:v2:${createHash("sha256").update(JSON.stringify(found)).digest("base64url")}`,
+    async () => render(found),
+  );
+  return new Response(png, {
+    headers: {
+      "content-type": "image/png",
+      "cache-control":
+        "public, max-age=86400, stale-while-revalidate=604800, stale-if-error=604800",
+    },
+  });
+};
+
+async function render(found: Awaited<ReturnType<typeof card>>) {
   const bars = found.bars.slice(0, 3);
   const svg = await satori(
     h(
@@ -352,10 +368,12 @@ export const GET: RequestHandler = async ({ params, url }) => {
     ) as Parameters<typeof satori>[0],
     { width: 1200, height: 630, fonts: await fonts },
   );
-  return new Response(new Uint8Array(new Resvg(svg).render().asPng()), {
-    headers: {
-      "content-type": "image/png",
-      "cache-control": "public, max-age=86400",
-    },
-  });
-};
+  return new Uint8Array(
+    new Resvg(svg, {
+      fitTo: { mode: "width", value: 2400 },
+      font: { loadSystemFonts: false },
+    })
+      .render()
+      .asPng(),
+  );
+}

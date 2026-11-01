@@ -7,6 +7,7 @@
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import Name from "#lib/components/name.svelte";
+  import ShareImage from "#lib/components/share-image.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, credit, date, percent } from "#lib/format.js";
@@ -387,12 +388,12 @@
   <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
   <meta property="og:type" content="profile" />
   <meta property="og:title" content={person.name} />
-  <meta
-    property="og:image"
-    content="{page.url.origin}/og{page.url.pathname}.png"
-  />
-  <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
+
+<ShareImage
+  src="{page.url.origin}/og{page.url.pathname}.png"
+  alt={person.name}
+/>
 
 <main class="pbe-16">
   <article

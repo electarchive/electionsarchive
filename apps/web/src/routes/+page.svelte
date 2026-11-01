@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import SearchIcon from "@lucide/svelte/icons/search";
   import { MediaQuery } from "svelte/reactivity";
+  import ShareImage from "#lib/components/share-image.svelte";
   import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { finder, summon } from "#lib/search.svelte.js";
@@ -143,24 +144,22 @@
   />
   <link rel="canonical" href="{page.url.origin}/" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content={m.wordmark()} />
   <meta property="og:title" content={m.wordmark()} />
   <meta property="og:description" content={m.home_meta_description()} />
   <meta property="og:url" content="{page.url.origin}/" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="{page.url.origin}/og.png" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:width" content="2400" />
-  <meta property="og:image:height" content="1260" />
-  <meta property="og:image:alt" content={m.home_og_alt()} />
   <meta property="og:video" content="{page.url.origin}/og.mp4" />
   <meta property="og:video:secure_url" content="{page.url.origin}/og.mp4" />
   <meta property="og:video:type" content="video/mp4" />
   <meta property="og:video:width" content="1920" />
   <meta property="og:video:height" content="1008" />
-  <meta name="twitter:card" content="summary_large_image" />
   {@html `<script type="application/ld+json">${JSON.stringify(jsonLd).replaceAll("<", "\\u003c")}</script>`}
 </svelte:head>
+
+<ShareImage
+  src="{page.url.origin}/og.jpg"
+  alt={m.home_og_alt()}
+  type="image/jpeg"
+/>
 
 <main class="grid pbe-16">
   <header

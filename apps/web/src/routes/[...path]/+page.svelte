@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { setContext } from "svelte";
+  import ShareImage from "#lib/components/share-image.svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { WITHIN } from "#lib/party.js";
@@ -184,11 +185,6 @@
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
-  <meta
-    property="og:image"
-    content="{page.url.origin}/og{page.url.pathname}.png"
-  />
-  <meta name="twitter:card" content="summary_large_image" />
   <link
     rel="alternate"
     type="application/json"
@@ -206,6 +202,8 @@
     >{jsonld}</svelte:element
   >
 </svelte:head>
+
+<ShareImage src="{page.url.origin}/og{page.url.pathname}.png" alt={title} />
 
 <main class="pbe-16">
   <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">

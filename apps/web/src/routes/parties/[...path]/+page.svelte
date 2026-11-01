@@ -8,6 +8,7 @@
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import Logo from "#lib/components/logo.svelte";
   import Name from "#lib/components/name.svelte";
+  import ShareImage from "#lib/components/share-image.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -118,12 +119,12 @@
   />
   <meta property="og:type" content="profile" />
   <meta property="og:title" content={party.name} />
-  <meta
-    property="og:image"
-    content="{page.url.origin}/og{page.url.pathname}.png"
-  />
-  <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
+
+<ShareImage
+  src="{page.url.origin}/og{page.url.pathname}.png"
+  alt={party.name}
+/>
 
 <main class="pbe-16">
   <article
