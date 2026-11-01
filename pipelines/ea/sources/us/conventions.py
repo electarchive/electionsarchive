@@ -376,11 +376,14 @@ TABLES += [
         party="democratic",
     ),
     *leaves("officialproceed00demo", "1864", {"": (43,)}, party="democratic"),
-    *ballots(
-        "officialpr00demo",
-        "1860",
-        {n: (start, min(start + 1, 93)) for n, start in CHARLESTON.items()},
-        party="democratic",
+    *(
+        spec | {"transcribed": "conventions_charleston.tsv"}
+        for spec in ballots(
+            "officialpr00demo",
+            "1860",
+            {n: (start, min(start + 1, 93)) for n, start in CHARLESTON.items()},
+            party="democratic",
+        )
     ),
     *leaves("officialpr00demo", "1860", {"baltimore-b1": (168,), "baltimore-b2": (173,)}, party="democratic"),
     *leaves("officialproceedi00indemo", "1856", {"b13": (41,), "b14": (42,)}, party="democratic"),
@@ -432,6 +435,11 @@ FIRST_1864 = (
     "and California then cast their votes for McClellan and Ohio revised its vote to 15 for McClellan and 6 for "
     "Seymour before the result was announced; the revised ballot, stored here, is the one the convention declared."
 )
+CHARLESTON_RULING = (
+    "The Chair ruled that a nomination needed two-thirds of the full convention of 303, or 202 votes, though "
+    "most of the delegations of eight Southern states had withdrawn and about 252 votes were cast. No candidate "
+    "reached 202 in the 57 ballots, and on May 3 the convention adjourned to meet again in Baltimore."
+)
 PROCEEDINGS = [
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
@@ -458,6 +466,7 @@ PROCEEDINGS = [
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
+    {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 5, 3)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)), "deciding": None, "required": 202, "caveat": CHARLESTON_RULING},
     {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
     {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
     {"party": "democratic", "tables": {1: "1872:democratic"}, "title": DNC + "at Baltimore, July 9, 1872", "publisher": "Rockwell & Churchill", "city": "Baltimore", "days": (date(1872, 7, 9), date(1872, 7, 10)), "ballots": {1: date(1872, 7, 10)}, "deciding": 1, "caveat": "The scattering list prints 'Groesbeck 2' on its own line under 'West Virginia, blank 2', without a state; those 2 votes are not stored."},
@@ -593,6 +602,15 @@ CANDIDATES = {
     "democratic:James Buchanan": ("James Buchanan", "Q12325"),
     "democratic:Franklin Pierce": ("Franklin Pierce", "Q12312"),
     "democratic:F. Pierce": ("Franklin Pierce", "Q12312"),
+    "1860:democratic:Douglas": ("Stephen A. Douglas", "Q433174"),
+    "1860:democratic:Guthrie": ("James Guthrie", "Q1680480"),
+    "1860:democratic:Hunter": ("Robert M. T. Hunter", "Q1355895"),
+    "1860:democratic:Johnson": ("Andrew Johnson", "Q8612"),
+    "1860:democratic:Lane": ("Joseph Lane", "Q372848"),
+    "1860:democratic:Dickinson": ("Daniel S. Dickinson", "Q1162460"),
+    "1860:democratic:Davis": ("Jefferson Davis", "Q162269"),
+    "1860:democratic:Toucey": ("Isaac Toucey", "Q881600"),
+    "1860:democratic:Pearce": ("James Pearce", "Q368739"),
     "democratic:Stephen A. Douglas": ("Stephen A. Douglas", "Q433174"),
     "democratic:Lewis Cass": ("Lewis Cass", "Q503119"),
     "democratic:George B. McClellan": ("George B. McClellan", "Q310192"),
@@ -1464,6 +1482,169 @@ MISPRINTS = {
         ),
         {"column Pierce": (283, 279, "the state figures add to 279")},
     ),
+    "1860:democratic:b1": (
+        "The printed Guthrie total is 35, against 35½ in the state figures. The rows are stored as printed.",
+        {"column Guthrie": (35, 35.5, "the state figures add to 35½")},
+    ),
+    "1860:democratic:b2": (
+        (
+            "The table prints no New Jersey row, Massachusetts's row prints Douglas 6½ and Hunter 5½, or 12 of its "
+            "13 votes, and Indiana's prints Douglas 18 for a delegation of 13. The printed totals give Douglas 147, "
+            "Guthrie 36½, and Davis 1, against 152, 29½, and none in the state figures. The rows are stored as "
+            "printed."
+        ),
+        {
+            "column Douglas": (147, 152, "the state figures add to 152"),
+            "column Guthrie": (36.5, 29.5, "the state figures add to 29½"),
+            "column Davis": (1, 0, "no state figure gives Davis a vote"),
+        },
+    ),
+    "1860:democratic:b3": (
+        (
+            "The printed totals give Douglas 148½, Guthrie 42, Dickinson 6½, and Hunter 36, against 145½, 40, 7½, "
+            "and 40 in the state figures. The rows are stored as printed."
+        ),
+        {
+            "column Douglas": (148.5, 145.5, "the state figures add to 145½"),
+            "column Guthrie": (42, 40, "the state figures add to 40"),
+            "column Dickinson": (6.5, 7.5, "the state figures add to 7½"),
+            "column Hunter": (36, 40, "the state figures add to 40"),
+        },
+    ),
+    "1860:democratic:b5": (
+        (
+            "North Carolina's row prints Guthrie 1 and Hunter 9, but the printed totals of Douglas 149½ and Guthrie "
+            "37½ count that vote for Douglas, as North Carolina gave it on the ballots before and after. The rows "
+            "are stored as printed."
+        ),
+        {
+            "column Douglas": (149.5, 148.5, "the state figures add to 148½"),
+            "column Guthrie": (37.5, 38.5, "the state figures add to 38½"),
+        },
+    ),
+    "1860:democratic:b6": (
+        (
+            "Pennsylvania's row prints Guthrie's figure in broken type, as '0 1 2'. It is stored as 9½, the figure "
+            "the delegation of 27 and the printed Guthrie total of 39½ both need."
+        ),
+        {},
+    ),
+    "1860:democratic:b9": (
+        (
+            "Massachusetts's row prints Douglas 7, Hunter 4, and Davis 1½, or 12½ of its 13 votes. The printed "
+            "totals give Douglas 150½, Guthrie 41, Hunter 39½, and Davis 1, against 149½, 41½, 39, and 1½ in the "
+            "state figures. The rows are stored as printed."
+        ),
+        {
+            "column Douglas": (150.5, 149.5, "the state figures add to 149½"),
+            "column Guthrie": (41, 41.5, "the state figures add to 41½"),
+            "column Hunter": (39.5, 39, "the state figures add to 39"),
+            "column Davis": (1, 1.5, "the state figures add to 1½"),
+        },
+    ),
+    "1860:democratic:b15": (
+        (
+            "Pennsylvania's row prints Douglas 9½, Guthrie 12, Hunter 3, and Lane 2¼, a quarter vote short of its "
+            "27, and the printed Lane total is 20½. The rows are stored as printed."
+        ),
+        {"column Lane": (20.5, 20.25, "the state figures add to 20¼")},
+    ),
+    "1860:democratic:b16": (
+        (
+            "Connecticut's row prints Douglas 3 and Guthrie 2½, half a vote short of its 6, and the printed Douglas "
+            "total is 150. The rows are stored as printed."
+        ),
+        {"column Douglas": (150, 149.5, "the state figures add to 149½")},
+    ),
+    "1860:democratic:b21": (
+        (
+            "Wisconsin's row prints Douglas 4 for a delegation of 5, and the printed Douglas total is 150½. The rows "
+            "are stored as printed."
+        ),
+        {"column Douglas": (150.5, 149.5, "the state figures add to 149½")},
+    ),
+    "1860:democratic:b23": (
+        (
+            "Pennsylvania's row prints Douglas 9½, Guthrie 12½, Hunter 2, and Lane 2½, or 26½ of its 27 votes, and "
+            "the printed Hunter total of 25 is half a vote more than the state figures. The rows are stored as printed."
+        ),
+        {"column Hunter": (25, 24.5, "the state figures add to 24½")},
+    ),
+    "1860:democratic:b26": (
+        (
+            "Maryland's row prints Douglas 4, Hunter 4, and Lane 1, or 9 votes for a delegation of 8, and Minnesota's "
+            "prints Douglas 3 and Lane 1. The printed totals give Douglas 151½, Johnson 12, and Lane 9, against "
+            "150½, 11, and 11 in the state figures. The rows are stored as printed."
+        ),
+        {
+            "column Douglas": (151.5, 150.5, "the state figures add to 150½"),
+            "column Johnson": (12, 11, "the state figures add to 11"),
+            "column Lane": (9, 11, "the state figures add to 11"),
+        },
+    ),
+    "1860:democratic:b32": (
+        "The printed Guthrie total is 47¼, against 47½ in the state figures. The rows are stored as printed.",
+        {"column Guthrie": (47.25, 47.5, "the state figures add to 47½")},
+    ),
+    "1860:democratic:b35": (
+        "The printed Guthrie total is 47¼, against 47½ in the state figures. The rows are stored as printed.",
+        {"column Guthrie": (47.25, 47.5, "the state figures add to 47½")},
+    ),
+    "1860:democratic:b37": (
+        (
+            "Tennessee's row prints Douglas 1, Guthrie 10½, and Johnson ¼, a quarter vote short of its 12, and the "
+            "printed Johnson total is ½. The rows are stored as printed."
+        ),
+        {"column Johnson": (0.5, 0.25, "the state figures add to ¼")},
+    ),
+    "1860:democratic:b41": (
+        (
+            "Connecticut's row prints Douglas 3¼ and Guthrie 2½, a quarter vote short of its 6, and the printed "
+            "Douglas total is 151½. The rows are stored as printed."
+        ),
+        {"column Douglas": (151.5, 151.25, "the state figures add to 151¼")},
+    ),
+    "1860:democratic:b43": (
+        (
+            "Maryland's row prints Douglas 4 and Hunter 4, but the printed totals of Guthrie 65½ and Hunter 16 count "
+            "its 4 for Guthrie, as Maryland gave them on the ballots before and after. The rows are stored as printed."
+        ),
+        {
+            "column Guthrie": (65.5, 61.5, "the state figures add to 61½"),
+            "column Hunter": (16, 20, "the state figures add to 20"),
+        },
+    ),
+    "1860:democratic:b52": (
+        (
+            "Massachusetts's row prints Douglas 6, Hunter 6, and Davis 1, but the printed totals of Guthrie 65½ and "
+            "Hunter 16 count its 6 for Guthrie, as Massachusetts gave them on the 51st ballot. The rows are stored as "
+            "printed."
+        ),
+        {
+            "column Guthrie": (65.5, 59.5, "the state figures add to 59½"),
+            "column Hunter": (16, 22, "the state figures add to 22"),
+        },
+    ),
+    "1860:democratic:b53": (
+        (
+            "Massachusetts's row prints Douglas 6, Hunter 6, and Davis 1, as on the 52nd ballot, but the printed "
+            "totals of Guthrie 65½ and Hunter 16 count its 6 for Guthrie. The rows are stored as printed."
+        ),
+        {
+            "column Guthrie": (65.5, 59.5, "the state figures add to 59½"),
+            "column Hunter": (16, 22, "the state figures add to 22"),
+        },
+    ),
+    "1860:democratic:b54": (
+        (
+            "Massachusetts's row prints Douglas 6, Hunter 6, and Davis 1, but the printed totals of Guthrie 61 and "
+            "Hunter 20½ count its 6 for Guthrie. The rows are stored as printed."
+        ),
+        {
+            "column Guthrie": (61, 55, "the state figures add to 55"),
+            "column Hunter": (20.5, 26.5, "the state figures add to 26½"),
+        },
+    ),
     "1884:republican:b1": (
         (
             "The printed totals give John Sherman 30 votes and Hawley 13, against 31 and 12 in the state rows, "
@@ -1688,7 +1869,7 @@ def region(spec: dict[str, object], leaf: int) -> str | None:
 
 def skipped(spec: dict[str, object], leaf: int, scatter: bool) -> bool:
     only = spec.get("reads", {}).get(leaf)
-    return (scatter and not spec.get("scatter")) or (not scatter and bool(spec.get("bycandidate"))) or (only is not None and only != ("scatter" if scatter else "table"))
+    return "transcribed" in spec or (scatter and not spec.get("scatter")) or (not scatter and bool(spec.get("bycandidate"))) or (only is not None and only != ("scatter" if scatter else "table"))
 
 
 def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
@@ -1748,7 +1929,34 @@ def scattered(label: str) -> str:
     return LABELS.get(label, label)
 
 
+def transcribed(spec: dict[str, object]) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
+    rows = pl.read_csv(Path(__file__).with_name(str(spec["transcribed"])), separator="\t").filter(
+        pl.col("ballot") == spec["ballot"]
+    )
+    cells, totals, problems = [], {}, []
+    for row in rows.iter_rows(named=True):
+        if row["state"] == "TOTAL":
+            totals[row["candidate"]] = float(row["votes"])
+            continue
+        if row["leaf"] not in spec["leaves"]:
+            problems.append(f"leaf {row['leaf']}: {row['state']} lies outside the ballot's leaves")
+        cells.append(
+            {
+                "table": spec["table"],
+                "state": row["state"],
+                "column": row["candidate"],
+                "value": float(row["votes"]),
+                "leaf": row["leaf"],
+                "sha256": scan(spec, row["leaf"]).sha256,
+                "box": [row["x0"], row["y0"], row["x1"], row["y1"]],
+            }
+        )
+    return cells, totals, problems
+
+
 def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
+    if "transcribed" in spec:
+        return transcribed(spec)
     cells: list[dict[str, object]] = []
     totals: dict[str, float] = {}
     shifted: dict[str, float] = {}
@@ -2330,7 +2538,9 @@ def emit() -> Path:
                     total = cells.filter(pl.col("column") == "votes")["value"].sum()
                 else:
                     total = None
-                if total is None:
+                if "required" in convention:
+                    required = convention["required"]
+                elif total is None:
                     required = None
                 elif rule == "two-thirds":
                     required = -(-int(total) * 2 // 3)
