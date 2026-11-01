@@ -10886,6 +10886,7 @@ def parse() -> None:
                                         "council",
                                     ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
+                                    *(((r"^trustee$", "trustee"), (r"^board$", "township-board")) if state == "IN" else ()),
                                     (r"\btrustees?\b", "board-of-trustees"),
                                     *(((r"^board$", "board"),) if state in ("IN", "NE") else ()),
                                 )
@@ -10998,6 +10999,8 @@ def parse() -> None:
                                 "commission": "Commission",
                                 "board-of-trustees": "Board of Trustees",
                                 "board": "Township Board",
+                                "township-board": "Township Board",
+                                "trustee": "Trustee",
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
