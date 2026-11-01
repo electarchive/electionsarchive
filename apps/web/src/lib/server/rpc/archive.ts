@@ -150,10 +150,11 @@ const POOL = sql`
   ) then 'abroad_aggregate' else u.kind::text end
 `;
 const FACTS = {
-  area: (set: SQL, area: SQL) =>
+  area: (set: SQL, area: SQL, _units?: SQL, round: number | null = null) =>
     sql`
       select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete, r.channel
-            from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area} offset 0
+            from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area}
+              ${round == null ? sql`` : sql`and r.count_round = ${round}::int`} offset 0
     `,
   pool: (set: SQL, area: SQL, units: SQL) =>
     sql`
@@ -1544,6 +1545,156 @@ export function separate(
   }
 }
 
+async function stepped(
+  picked: Array<{ k: number; area: number }>,
+  step: number,
+  facts: keyof typeof FACTS,
+  units: SQL,
+) {
+  const pairs = sql`unnest(${sql.param(picked.map((row) => row.k))}::int[], ${sql.param(picked.map((row) => row.area))}::int[]) as p(set, area)`;
+  const [frame, gone, rows] = await Promise.all([
+    remember(
+      `frame:${createHash("sha1")
+        .update(JSON.stringify([facts, picked.map((row) => [row.k, row.area])]))
+        .digest("hex")}`,
+      async () =>
+        rowsOf(
+          await db.execute<{
+            kind: string;
+            set: number | null;
+            area: number | null;
+            main: number | null;
+            option: number | null;
+            rank: number | null;
+          }>(sql`
+            with fetched as materialized (
+              select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round, r.value::float8 as value
+              from ${pairs}
+              join lateral (${FACTS[facts](sql`p.set`, sql`p.area`, units)}) r on true
+              where r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure = 2
+            ),
+            spans as materialized (
+              select set, area, measure, min(count_round) as opening from fetched group by 1, 2, 3
+            ),
+            mains as materialized (
+              select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from spans group by area
+            ),
+            ranks as (
+              select f.option, sum(f.value) filter (where f.count_round = s.opening and f.measure = m.main) as rank
+              from fetched f
+              join spans s on s.set = f.set and s.area = f.area and s.measure = f.measure
+              join mains m on m.area = f.area
+              group by f.option
+            ),
+            whole as (
+              select distinct on (x.option_k) x.option_k as option, x.value::float8 as total
+              from (select distinct set from spans) s
+              join result_set rs on rs.k = s.set
+              join contest c on c.id = rs.contest_id
+              join area a on a.id = c.district_area_id
+              cross join lateral (
+                select y.option_k, y.measure, y.count_round, y.value from result_rollup y
+                where y.result_set_k = s.set and y.area_k = a.k and y.measure = any(${COUNTED}) and y.option_k <> 0
+                offset 0
+              ) x
+              order by x.option_k, array_position(${COUNTED}, x.measure), x.count_round
+            )
+            select 'main' as kind, null::int as set, area, main, null::int as option, null::float8 as rank from mains
+            union all
+            select 'kept', s.set, s.area, null, null, null
+            from spans s join mains m on m.area = s.area
+            group by s.set, s.area having bool_or(s.measure = m.main)
+            union all
+            select 'rank', null, null, null, r.option, coalesce(w.total, r.rank)::float8
+            from ranks r left join whole w on w.option = r.option where r.rank is not null or w.total is not null
+          `),
+        ),
+      true,
+    ),
+    Promise.all(
+      [...new Set(picked.map((row) => row.k))].map(async (k) =>
+        (
+          await remember(
+            `gone:${k}`,
+            async () =>
+              rowsOf(
+                await db.execute<{ option: number; round: number }>(sql`
+                  select r.option_k as option, r.count_round as round
+                  from (
+                    select x.option_k, x.count_round, x.value from result_rollup x
+                    where x.result_set_k = ${k}::int and x.measure = any(${COUNTED})
+                    offset 0
+                  ) r
+                  group by 1, 2 having max(r.value) = 0
+                `),
+              ),
+            true,
+          )
+        ).flatMap((row) => (row.round === step ? [`${k}:${row.option}`] : [])),
+      ),
+    ),
+    db.execute<{
+      set: number;
+      area: number;
+      option: number;
+      measure: number;
+      value: number;
+      complete: boolean;
+      channel: number;
+    }>(sql`
+      select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.value::float8 as value, r.complete, r.channel
+      from ${pairs}
+      join lateral (${facts === "area" ? FACTS.area(sql`p.set`, sql`p.area`, units, step) : FACTS[facts](sql`p.set`, sql`p.area`, units)}) r on true
+      where r.count_round = ${step}::int and (r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure = 2)
+    `),
+  ]);
+  const mains = new Map(
+    frame.flatMap((row) =>
+      row.kind === "main" ? [[row.area, row.main] as const] : [],
+    ),
+  );
+  const kept = new Set(
+    frame.flatMap((row) =>
+      row.kind === "kept" ? [`${row.set}:${row.area}`] : [],
+    ),
+  );
+  const out = new Set(gone.flat());
+  return [
+    ...rows.rows.flatMap(({ measure, ...row }) => {
+      const main = mains.get(row.area);
+      const role =
+        measure === main
+          ? "votes"
+          : measure === 2 && main === 11
+            ? "appointed"
+            : null;
+      return main == null ||
+        role == null ||
+        !kept.has(`${row.set}:${row.area}`) ||
+        out.has(`${row.set}:${row.option}`)
+        ? []
+        : [{ ...row, role, main, rank: 0 }];
+    }),
+    ...frame.flatMap((row) =>
+      row.kind === "rank" && row.option != null && row.rank != null
+        ? [
+            {
+              set: 0,
+              area: 0,
+              option: row.option,
+              role: "rank",
+              main: 0,
+              value: 0,
+              complete: true,
+              rank: row.rank,
+              channel: 0,
+            },
+          ]
+        : [],
+    ),
+  ];
+}
+
 async function load(
   roots: Array<string>,
   areaKs: Array<number>,
@@ -1658,77 +1809,72 @@ async function load(
   if (picked.rows.length === 0) {
     return loaded;
   }
-  const rollup = await db.execute<{
-    set: number;
-    area: number;
-    option: number;
-    role: string;
-    main: number;
-    value: number;
-    complete: boolean;
-    rank: number;
-    channel: number;
-  }>(sql`
-    with fetched as materialized (
-      select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
-        r.value::float8 as value, r.complete, r.channel,
-        coalesce(${step}::int, case when p.single and ${!isFirst}
-          then max(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)
-          else min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) end) as first,
-        min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening,
-        p.single and ${!isFirst}
-          and max(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k)
-            > min(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k) as late
-      from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[], ${sql.param(picked.rows.map((row) => row.single))}::boolean[]) as p(set, area, single)
-      join lateral (${FACTS[facts](sql`p.set`, sql`p.area`, units)}) r on true
-      where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4 and ${step}::int is null))
-    ),
-    mains as materialized (
-      select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
-    ),
-    gone as materialized (
-      select r.result_set_k as set, r.option_k as option
-      from unnest(${sql.param([...new Set(picked.rows.map((row) => row.k))])}::int[]) as s(k) cross join lateral (
-        select x.result_set_k, x.option_k, x.value from result_rollup x
-        where ${step}::int is not null and x.result_set_k = s.k and x.measure = any(${COUNTED}) and x.count_round = ${step}::int
-        offset 0
-      ) r
-      group by 1, 2 having max(r.value) = 0
-    ),
-    flagged as (
-      select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.set, f.area) as kept,
-        sum(f.value) filter (where f.count_round = f.opening and f.measure = m.main) over (partition by f.option) as rank
-      from fetched f join mains m on m.area = f.area
-    ),
-    whole as (
-      select distinct on (x.option_k) x.option_k as option, x.value::float8 as total
-      from (select distinct set from fetched) s
-      join result_set rs on rs.k = s.set
-      join contest c on c.id = rs.contest_id
-      join area a on a.id = c.district_area_id
-      cross join lateral (
-        select y.option_k, y.measure, y.count_round, y.value from result_rollup y
-        where y.result_set_k = s.set and y.area_k = a.k and y.measure = any(${COUNTED}) and y.option_k <> 0
-        offset 0
-      ) x
-      order by x.option_k, array_position(${COUNTED}, x.measure), x.count_round
-    )
-    select r.set, r.area, r.option, x.role, r.main, r.value, r.complete, 0::float8 as rank, r.channel
-    from flagged r
-    cross join lateral (
-      select case
-        when r.measure = r.main then 'votes'
-        when r.measure = 4 and r.main = 1 then 'valid'
-        when r.measure = 2 and r.main = 11 then 'appointed'
-      end as role
-    ) x
-    where r.kept and r.count_round = r.first and x.role is not null and not (r.late and x.role = 'valid')
-      and not exists (select from gone g where g.set = r.set and g.option = r.option)
-    union all
-    select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, coalesce(w.total, r.rank)::float8, 0
-    from flagged r left join whole w on w.option = r.option where r.rank is not null or w.total is not null
-  `);
-  const counts = rollup.rows
+  const rollup =
+    step == null
+      ? rowsOf(
+          await db.execute<{
+            set: number;
+            area: number;
+            option: number;
+            role: string;
+            main: number;
+            value: number;
+            complete: boolean;
+            rank: number;
+            channel: number;
+          }>(sql`
+            with fetched as materialized (
+              select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
+                r.value::float8 as value, r.complete, r.channel,
+                case when p.single and ${!isFirst}
+                  then max(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)
+                  else min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) end as first,
+                min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening,
+                p.single and ${!isFirst}
+                  and max(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k)
+                    > min(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k) as late
+              from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[], ${sql.param(picked.rows.map((row) => row.single))}::boolean[]) as p(set, area, single)
+              join lateral (${FACTS[facts](sql`p.set`, sql`p.area`, units)}) r on true
+              where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4))
+            ),
+            mains as materialized (
+              select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
+            ),
+            flagged as (
+              select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.set, f.area) as kept,
+                sum(f.value) filter (where f.count_round = f.opening and f.measure = m.main) over (partition by f.option) as rank
+              from fetched f join mains m on m.area = f.area
+            ),
+            whole as (
+              select distinct on (x.option_k) x.option_k as option, x.value::float8 as total
+              from (select distinct set from fetched) s
+              join result_set rs on rs.k = s.set
+              join contest c on c.id = rs.contest_id
+              join area a on a.id = c.district_area_id
+              cross join lateral (
+                select y.option_k, y.measure, y.count_round, y.value from result_rollup y
+                where y.result_set_k = s.set and y.area_k = a.k and y.measure = any(${COUNTED}) and y.option_k <> 0
+                offset 0
+              ) x
+              order by x.option_k, array_position(${COUNTED}, x.measure), x.count_round
+            )
+            select r.set, r.area, r.option, x.role, r.main, r.value, r.complete, 0::float8 as rank, r.channel
+            from flagged r
+            cross join lateral (
+              select case
+                when r.measure = r.main then 'votes'
+                when r.measure = 4 and r.main = 1 then 'valid'
+                when r.measure = 2 and r.main = 11 then 'appointed'
+              end as role
+            ) x
+            where r.kept and r.count_round = r.first and x.role is not null and not (r.late and x.role = 'valid')
+            union all
+            select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, coalesce(w.total, r.rank)::float8, 0
+            from flagged r left join whole w on w.option = r.option where r.rank is not null or w.total is not null
+          `),
+        )
+      : await stepped(picked.rows, step, facts, units);
+  const counts = rollup
     .filter((row) => row.role !== "rank")
     .flatMap((row) =>
       (spread?.get(row.area) ?? [[row.area, 1] as const]).map(
@@ -1746,7 +1892,7 @@ async function load(
     .values()
     .toArray();
   const tallies = new Map(
-    rollup.rows
+    rollup
       .filter((row) => row.role === "rank")
       .map((row) => [row.option, row.rank]),
   );
@@ -11587,17 +11733,26 @@ async function turnout(contest: string | null, ks: Array<number>) {
 }
 
 async function anchors(ks: Array<number>, day: string) {
-  const points = await db.execute<{ k: number; x: number; y: number }>(sql`
-    select k, ST_X(p) as x, ST_Y(p) as y from (
-      select distinct on (a.k) a.k,
-        ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p
-      from area a join area_geometry g on g.area_id = a.id
-      where a.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date
-      order by a.k
-    ) x where p is not null
-  `);
+  const points = await remember(
+    `anchors:${createHash("sha1")
+      .update(JSON.stringify([day, ks.toSorted((a, b) => a - b)]))
+      .digest("hex")}`,
+    async () =>
+      rowsOf(
+        await db.execute<{ k: number; x: number; y: number }>(sql`
+          select k, ST_X(p) as x, ST_Y(p) as y from (
+            select distinct on (a.k) a.k,
+              ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p
+            from area a join area_geometry g on g.area_id = a.id
+            where a.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date
+            order by a.k
+          ) x where p is not null
+        `),
+      ),
+    true,
+  );
   return new Map(
-    points.rows.map((row) => [row.k, [row.x, row.y] as [number, number]]),
+    points.map((row) => [row.k, [row.x, row.y] as [number, number]]),
   );
 }
 
