@@ -24089,6 +24089,139 @@ export const parties = {
     }),
 };
 
+const SEARCH_TYPES = [
+  "polity",
+  "body",
+  "election",
+  "contest",
+  "party",
+  "person",
+] as const;
+
+let chamberIndex: {
+  at: number;
+  rows: Promise<
+    Array<{ id: string; polity: string; names: Array<string>; members: number }>
+  >;
+} | null = null;
+
+async function chamberRows() {
+  if (chamberIndex != null && Date.now() - chamberIndex.at < 3_600_000) {
+    return chamberIndex.rows;
+  }
+  const previous = chamberIndex?.rows;
+  const rows = db
+    .execute<{
+      id: string;
+      polity: string;
+      names: Array<string>;
+      members: number;
+    }>(
+      sql`
+        select b.id, b.polity_id as polity, array_agg(lower(unaccent(n.text))) as names,
+          coalesce(t.members, 0)::int as members
+        from body b join name n on n.entity_id = b.id
+        left join (select body_id, count(*) as members from tenure group by body_id) t on t.body_id = b.id
+        where b.kind <> 'electoral_college'
+        group by b.id, t.members
+      `,
+    )
+    .then((found) => found.rows);
+  chamberIndex = { at: Date.now(), rows: previous ?? rows };
+  void rows
+    .then((ready) => {
+      chamberIndex = { at: Date.now(), rows: Promise.resolve(ready) };
+    })
+    .catch(() => {
+      chamberIndex = previous == null ? null : { at: 0, rows: previous };
+    });
+  return chamberIndex.rows;
+}
+
+function trigrams(text: string) {
+  const grams = new Set<string>();
+  for (const word of text.split(/[^\p{L}\p{N}]+/u)) {
+    if (word !== "") {
+      const padded = `  ${word} `;
+      for (let at = 0; at + 3 <= padded.length; at++) {
+        grams.add(padded.slice(at, at + 3));
+      }
+    }
+  }
+  return grams;
+}
+
+function similarity(a: Set<string>, b: string) {
+  const other = trigrams(b);
+  let shared = 0;
+  for (const gram of a) {
+    if (other.has(gram)) {
+      shared++;
+    }
+  }
+  return shared / (a.size + other.size - shared || 1);
+}
+
+async function chamberHits(folded: string) {
+  const grams = trigrams(folded);
+  const bound = new RegExp(
+    String.raw`(?:^|[^\p{L}\p{N}])${RegExp.escape(folded)}`,
+    "u",
+  );
+  const hits: Array<{
+    id: string;
+    polity: string;
+    members: number;
+    isWord: boolean;
+    isClose: boolean;
+  }> = [];
+  for (const row of await chamberRows()) {
+    let isWord: boolean | null = null;
+    let isClose = false;
+    for (const name of row.names) {
+      if (name.includes(folded)) {
+        isWord = isWord === true || bound.test(name);
+        isClose ||= similarity(grams, name) >= 0.3;
+      }
+    }
+    if (isWord != null) {
+      hits.push({
+        id: row.id,
+        polity: row.polity,
+        members: row.members,
+        isWord,
+        isClose,
+      });
+    }
+  }
+  return hits
+    .toSorted(
+      (a, b) => Number(b.isWord) - Number(a.isWord) || b.members - a.members,
+    )
+    .slice(0, 4);
+}
+
+function fold(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replaceAll(/\p{M}/gu, "")
+    .replaceAll(
+      /[øłıđßæœþ]/gu,
+      (letter) =>
+        ({
+          ø: "o",
+          ł: "l",
+          ı: "i",
+          đ: "d",
+          ß: "ss",
+          æ: "ae",
+          œ: "oe",
+          þ: "th",
+        })[letter] ?? letter,
+    );
+}
+
 export const search = {
   query: os
     .meta(
@@ -24111,6 +24244,19 @@ export const search = {
             v.maxValue(50),
           ),
           12,
+        ),
+        types: v.optional(
+          v.pipe(
+            v.union([
+              v.array(v.picklist(SEARCH_TYPES)),
+              v.pipe(
+                v.string(),
+                v.transform((text) => text.split(",")),
+                v.array(v.picklist(SEARCH_TYPES)),
+              ),
+            ]),
+            v.minLength(1),
+          ),
         ),
       }),
     )
@@ -24137,6 +24283,7 @@ export const search = {
       if (input.q === "") {
         return [];
       }
+      const kinds = input.types ?? SEARCH_TYPES;
       const ALIASES: Record<string, string> = {
         uk: "united kingdom",
         gb: "united kingdom",
@@ -24152,23 +24299,26 @@ export const search = {
         "washington dc": "district of columbia",
       };
       const district = /^([a-z]{2})[-\s]?(\d{1,2}|al)$/iu.exec(input.q);
-      const states =
+      const [states, units] = await Promise.all([
         district == null
           ? null
-          : await db.execute<{ name: string }>(sql`
+          : db.execute<{ name: string }>(sql`
             select n.text as name from polity p join name n on n.entity_id = p.id and n.kind = 'official'
             where p.iso_code = ${`US-${district[1]?.toUpperCase() ?? ""}`}
             order by n.is_preferred desc, n.recorded_from desc, n.id limit 1
-          `);
+          `),
+        remember("search.units", async () =>
+          rowsOf(
+            await db.execute<{ code: string; name: string; label: string }>(sql`
+              select lower(substr(p.iso_code, 4)) as code, lower(n.text) as name, n.text as label
+              from polity p join name n on n.entity_id = p.id and n.kind = 'official' and n.is_preferred
+              where p.iso_code like 'US-%'
+            `),
+          ),
+        ),
+      ]);
       const state = states?.rows[0]?.name;
       const seat = Number(district?.[2]);
-      const units = rowsOf(
-        await db.execute<{ code: string; name: string; label: string }>(sql`
-          select lower(substr(p.iso_code, 4)) as code, lower(n.text) as name, n.text as label
-          from polity p join name n on n.entity_id = p.id and n.kind = 'official' and n.is_preferred
-          where p.iso_code like 'US-%'
-        `),
-      );
       const lowered = input.q.toLowerCase();
       const unit =
         district != null ||
@@ -24197,6 +24347,7 @@ export const search = {
               )
               .replace(/[,\s]+$/u, "");
       const room = unit == null ? input.limit : 50;
+      const depth = Math.max(80, room * 3);
       const q =
         state == null
           ? asked
@@ -24223,194 +24374,192 @@ export const search = {
                 ? "at-large"
                 : `${seat}${{ one: "st", two: "nd", few: "rd", other: "th", zero: "th", many: "th" }[new Intl.PluralRules("en", { type: "ordinal" }).select(seat)]}`
             } congressional district`;
-      const bodyRows = db.execute<{
-        id: string;
-        polity: string;
-        isClose: boolean;
-      }>(sql`
-        with q as (select lower(unaccent(${q})) as t),
-        seated as (select body_id, count(*) as members from tenure group by body_id)
-        select b.id, b.polity_id as polity,
-          bool_or(
-            lower(unaccent(n.text)) like '%' || q.t || '%'
-            and similarity(q.t, lower(unaccent(n.text))) >= 0.3
-          ) as "isClose"
-        from body b join name n on n.entity_id = b.id cross join q
-        left join seated on seated.body_id = b.id
-        where b.kind <> 'electoral_college' and (
-          lower(unaccent(n.text)) like '%' || q.t || '%' or q.t <% lower(unaccent(n.text))
-        )
-        group by b.id, b.polity_id, seated.members
-        order by max(word_similarity(q.t, lower(unaccent(n.text)))) desc,
-          coalesce(seated.members, 0) desc
-        limit 4
-      `);
-      const found = await db.execute<{
-        id: string;
-        type: string;
-        target: string | null;
-        context: string | null;
-        date: string | null;
-        boost: number | null;
-        office: string | null;
-        isExecutive: boolean | null;
-        matched: boolean;
-      }>(sql`
-        with q as (select lower(unaccent(${q})) as t),
-        terms as (
-          select to_tsquery('simple', string_agg(quote_literal(w) || case when n = last then ':*' else '' end, ' & ' order by n)) as tq
-          from (
-            select w, n, max(n) over () as last
-            from q, regexp_split_to_table(q.t, '\\s+') with ordinality as t(w, n) where w <> ''
-          ) words
-        ),
-        strict as materialized (
-          select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + 0.5 * (d.tsv @@ plainto_tsquery('simple', q.t))::int + d.rank_boost * 0.15 as score, true as matched,
-            d.tsv @@ plainto_tsquery('simple', q.t) as exact
-          from search_document d, q, terms
-          where d.tsv @@ terms.tq
-        ),
-        hits as (
-          select * from strict
-          union all
-          select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15, false, false
-          from search_document d, q, terms
-          where q.t <% d.text and not d.tsv @@ terms.tq
-            and (select count(*) from (select from strict limit ${room * 2}) enough) < ${room * 2}
-        ),
-        pool as (select * from hits order by score desc limit ${q.length < 3 ? 1000 : 50_000}),
-        seats as (
-          select c.id, array_agg(t.polity_id) as polities
-          from pool h join contest c on c.id = h.entity_id join election el on el.id = c.election_id
-          join polity_territory t on t.area_id = c.district_area_id
-          where h.type = 'contest' and el.date_from >= coalesce(lower(t.valid), '-infinity') and el.date_from < coalesce(upper(t.valid), 'infinity')
-          group by c.id
-        ),
-        tiered as (
-          select h.entity_id, h.type, h.matched, coalesce(el.polity_id, case when h.type = 'polity' then h.entity_id end) as polity_id, el.date_from, h.score
-            + case
-              when not h.matched then 0
-              when h.type = 'polity' then 0.75 * h.exact::int
-              when h.type = 'election' then (el.kind = 'general' and q.t ~ '\\m\\d{4}\\M')::int
-              when h.type = 'party' then coalesce((
-                select (0.75 * h.exact::int * least(1, greatest(0, d.rank_boost - 2) / 1.5) + 0.3 * greatest(0, d.rank_boost - 2))
-                from search_document d where d.entity_id = h.entity_id), 0)
-              when h.type = 'person' then coalesce((
-                select 0.75 * h.exact::int * least(1, greatest(0, d.rank_boost - 2) / 3)
-                from search_document d where d.entity_id = h.entity_id), 0)
-              when h.type <> 'contest' or c.kind = 'ballot_question' or c.allocation_parent_id is not null then 0
-              when f.whole then
-                (0.5 + 0.3 * (
-                  coalesce(o.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor'), false)
-                  or c.kind = 'elector_slate' or f.federal
-                )::int) * case when el.kind in ('primary', 'caucus') then 0.5 else 1 end
-              when f.federal then 0.25
-              else 0
-            end as score
-          from pool h cross join q
-          left join contest c on h.type = 'contest' and c.id = h.entity_id
-          left join election el on el.id = coalesce(c.election_id, case when h.type = 'election' then h.entity_id end)
-          left join body b on b.id = c.body_id
-          left join office o on o.id = c.office_id
-          left join polity_territory pt on pt.polity_id = el.polity_id and pt.valid @> el.date_from
-          left join seats on seats.id = c.id
+      const typed = kinds.filter((kind) => kind !== "body");
+      const spoken = fold(q).split(/\s+/u);
+      const prefixed =
+        spoken.length > 1 && (spoken.at(-1)?.length ?? 0) < 3
+          ? sql`d.tsv @@ terms.known and (d.tsv @@ terms.tq) is true`
+          : sql`d.tsv @@ terms.tq`;
+      const [matched, found] = await Promise.all([
+        kinds.includes("body") && fold(q).length >= 2
+          ? chamberHits(fold(q))
+          : [],
+        db.execute<{
+          id: string;
+          type: string;
+          target: string | null;
+          context: string | null;
+          date: string | null;
+          boost: number | null;
+          office: string | null;
+          isExecutive: boolean | null;
+          matched: boolean;
+        }>(sql`
+          with q as (select lower(unaccent(${q})) as t),
+          terms as (
+            select to_tsquery('simple', string_agg(quote_literal(w) || case when n = last then ':*' else '' end, ' & ' order by n)) as tq,
+              plainto_tsquery('simple', q.t) as pq,
+              to_tsquery('simple', string_agg(quote_literal(w), ' & ' order by n) filter (where n < last)) as known
+            from q, (
+              select w, n, max(n) over () as last
+              from q, regexp_split_to_table(q.t, '\\s+') with ordinality as t(w, n) where w <> ''
+            ) words
+            group by q.t
+          ),
+          picked as materialized (
+            select entity_id from (
+              select d.entity_id, row_number() over (partition by d.type order by d.tsv @@ terms.pq desc, d.rank_boost desc, length(d.text)) as n
+              from search_document d, terms
+              where ${prefixed} and d.type::text = any(${sql.param(typed)}::text[])
+            ) ranked
+            where n <= ${depth}
+          ),
+          strict as materialized (
+            select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + 0.5 * (d.tsv @@ terms.pq)::int + d.rank_boost * 0.15 as score, true as matched,
+              d.tsv @@ terms.pq as exact, d.rank_boost
+            from picked p join search_document d on d.entity_id = p.entity_id, q, terms
+          ),
+          fuzzy as materialized (
+            select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15 as score, false as matched, false as exact, d.rank_boost
+            from search_document d, q, terms
+            where length(q.t) >= 4 and q.t <% d.text and not d.tsv @@ terms.tq
+              and d.type::text = any(${sql.param(typed)}::text[])
+              and (select count(*) from strict) < ${room * 2}
+            order by word_similarity(q.t, d.text) desc, d.rank_boost desc limit 40
+          ),
+          pool as materialized (
+            select * from strict union all select * from fuzzy
+          ),
+          seats as (
+            select c.id, array_agg(t.polity_id) as polities
+            from pool h join contest c on c.id = h.entity_id join election el on el.id = c.election_id
+            join polity_territory t on t.area_id = c.district_area_id
+            where h.type = 'contest' and el.date_from >= coalesce(lower(t.valid), '-infinity') and el.date_from < coalesce(upper(t.valid), 'infinity')
+            group by c.id
+          ),
+          tiered as materialized (
+            select h.entity_id, h.type, h.matched, coalesce(el.polity_id, case when h.type = 'polity' then h.entity_id end) as polity_id, el.date_from, h.score
+              + case
+                when not h.matched then 0
+                when h.type = 'polity' then 0.75 * h.exact::int
+                when h.type = 'election' then (el.kind = 'general' and q.t ~ '\\m\\d{4}\\M')::int
+                when h.type = 'party' then 0.75 * h.exact::int * least(1, greatest(0, h.rank_boost - 2) / 1.5) + 0.3 * greatest(0, h.rank_boost - 2)
+                when h.type = 'person' then 0.75 * h.exact::int * least(1, greatest(0, h.rank_boost - 2) / 3)
+                when h.type <> 'contest' or c.kind = 'ballot_question' or c.allocation_parent_id is not null then 0
+                when f.whole then
+                  (0.5 + 0.3 * (
+                    coalesce(o.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor'), false)
+                    or c.kind = 'elector_slate' or f.federal
+                  )::int + 0.02 * coalesce(o.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor'), false)::int) * case when el.kind in ('primary', 'caucus') then 0.5 else 1 end
+                when f.federal then 0.25
+                else 0
+              end as score
+            from pool h cross join q
+            left join contest c on h.type = 'contest' and c.id = h.entity_id
+            left join election el on el.id = coalesce(c.election_id, case when h.type = 'election' then h.entity_id end)
+            left join body b on b.id = c.body_id
+            left join office o on o.id = c.office_id
+            left join seats on seats.id = c.id
+            cross join lateral (
+              select
+                c.district_area_id is null or seats.id is not null or exists (
+                  select from polity_territory pt
+                  where pt.polity_id = el.polity_id and pt.valid @> el.date_from and pt.area_id = c.district_area_id
+                ) as whole,
+                exists (
+                  select from polity_parent p1 left join polity_parent p2 on p2.polity_id = p1.parent_id
+                  where b.polity_id in (p1.parent_id, p2.parent_id)
+                    and (p1.polity_id = el.polity_id or p1.polity_id = any(seats.polities))
+                ) as federal
+            ) f
+            order by score desc nulls last, el.date_from desc nulls last limit 120
+          ),
+          top as (
+            select t.entity_id, t.type, t.matched, t.score
+              + (t.matched and q.t like '% %' and exists (
+                select from name n where n.entity_id = t.entity_id and n.kind <> 'short' and lower(unaccent(n.text)) = q.t
+              ))::int
+              + case
+                when not t.matched then 0
+                when t.type = 'person' then coalesce((
+                  select 0.1 * ln(1 + count(*)) + 0.15 * bool_or(tn.office_id is not null)::int
+                  from tenure tn where tn.person_id = t.entity_id), 0)
+                  + 0.2 * exists (select from external_id z where z.entity_id = t.entity_id and z.scheme = 'wikidata')::int
+                  + coalesce((
+                  select 0.2 * greatest(0, least(1, (extract(year from max(e.date_from)) - 1850) / 176))
+                  from candidacy cy join contest_option o on o.id = cy.option_id
+                  join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+                  where cy.person_id = t.entity_id), 0)
+                when t.polity_id is not null then coalesce((
+                  select case when y.kind in ('sovereign_state', 'supranational') then 0.3 when y.kind = 'federal_unit' then 0.25 end
+                  from polity y where y.id = t.polity_id), (
+                  select least(0.3, greatest(0, 0.1 * (log(greatest(max(g.population), 1)) - 4)))
+                  from coverage_government g where g.polity_id = t.polity_id), 0)
+                else 0
+              end as score
+            from tiered t cross join q
+            order by score desc nulls last, t.date_from desc nulls last limit ${room * 2}
+          )
+          select top.entity_id as id, top.type::text as type, top.matched, x.target, x.context,
+            coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date,
+            case when top.type = 'person' then (select d.rank_boost from search_document d where d.entity_id = top.entity_id) end as boost,
+            best.id as office, best.rank >= 2 as "isExecutive"
+          from top
+          left join lateral (
+              select held.id, held.rank from (
+                select coalesce(c.office_id, c.body_id) as id, el.date_from as at,
+                  case when f.kind = 'mayor' then 0 when f.kind = 'other' then 2 when fp.kind in ('sovereign_state', 'supranational') then 3
+                    when f.id is not null then 2 when b.kind = 'upper_house' then 1 else 0 end as rank
+                from candidacy cy
+                join outcome oc on oc.option_id = cy.option_id and oc.kind in ('elected', 'won')
+                  and (oc.kind = 'elected' or not exists (select from outcome w where w.result_set_id = oc.result_set_id and w.seats > oc.seats))
+                join contest_option o on o.id = cy.option_id
+                join contest c on c.id = o.contest_id and c.party_scope_id is null
+                join election el on el.id = c.election_id and el.kind <> 'primary'
+                left join office f on f.id = c.office_id left join polity fp on fp.id = f.polity_id
+                left join body b on b.id = c.body_id left join polity bp on bp.id = b.polity_id
+                where cy.person_id = top.entity_id and cy.role = 'head' and (
+                  (f.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor')
+                    or f.kind = 'other' and fp.kind in ('sovereign_state', 'supranational')) and el.polity_id = f.polity_id
+                  or f.id is null and b.kind in ('upper_house', 'lower_house', 'unicameral') and bp.kind = 'sovereign_state')
+                union all
+                select t.office_id, t.from_date, case when fp.kind in ('sovereign_state', 'supranational') then 3 else 2 end
+                from tenure t join office f on f.id = t.office_id join polity fp on fp.id = f.polity_id
+                where t.person_id = top.entity_id and f.kind in ('head_of_state', 'head_of_government', 'governor')
+              ) held
+              order by held.rank desc, held.at desc nulls last
+              limit 1) best on top.type = 'person'
           cross join lateral (
             select
-              c.district_area_id is null or c.district_area_id = pt.area_id or seats.id is not null as whole,
-              exists (
-                select from polity_parent p1 left join polity_parent p2 on p2.polity_id = p1.parent_id
-                where b.polity_id in (p1.parent_id, p2.parent_id)
-                  and (p1.polity_id = el.polity_id or p1.polity_id = any(seats.polities))
-              ) as federal
-          ) f
-          order by score desc nulls last, el.date_from desc nulls last limit 200
-        ),
-        top as (
-          select t.entity_id, t.type, t.matched, t.score
-            + (t.matched and q.t like '% %' and exists (
-              select from name n where n.entity_id = t.entity_id and n.kind <> 'short' and lower(unaccent(n.text)) = q.t
-            ))::int
-            + case
-              when not t.matched then 0
-              when t.type = 'person' then coalesce((
-                select 0.1 * ln(1 + count(*)) + 0.15 * bool_or(tn.office_id is not null)::int
-                from tenure tn where tn.person_id = t.entity_id), 0)
-                + 0.2 * exists (select from external_id z where z.entity_id = t.entity_id and z.scheme = 'wikidata')::int
-                + coalesce((
-                select 0.2 * greatest(0, least(1, (extract(year from max(e.date_from)) - 1850) / 176))
-                from candidacy cy join contest_option o on o.id = cy.option_id
-                join contest c on c.id = o.contest_id join election e on e.id = c.election_id
-                where cy.person_id = t.entity_id), 0)
-              when t.polity_id is not null then coalesce((
-                select case when y.kind in ('sovereign_state', 'supranational') then 0.3 when y.kind = 'federal_unit' then 0.25 end
-                from polity y where y.id = t.polity_id), (
-                select least(0.3, greatest(0, 0.1 * (log(greatest(max(g.population), 1)) - 4)))
-                from coverage_government g where g.polity_id = t.polity_id), 0)
-              else 0
-            end as score
-          from tiered t cross join q
-          order by score desc nulls last, t.date_from desc nulls last limit ${room * 2}
-        )
-        select top.entity_id as id, top.type::text as type, top.matched, x.target, x.context,
-          coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date,
-          case when top.type = 'person' then (select d.rank_boost from search_document d where d.entity_id = top.entity_id) end as boost,
-          best.id as office, best.rank >= 2 as "isExecutive"
-        from top
-        left join lateral (
-            select held.id, held.rank from (
-              select coalesce(c.office_id, c.body_id) as id, el.date_from as at,
-                case when f.kind = 'mayor' then 0 when f.kind = 'other' then 2 when fp.kind in ('sovereign_state', 'supranational') then 3
-                  when f.id is not null then 2 when b.kind = 'upper_house' then 1 else 0 end as rank
-              from candidacy cy
-              join outcome oc on oc.option_id = cy.option_id and oc.kind in ('elected', 'won')
-                and (oc.kind = 'elected' or not exists (select from outcome w where w.result_set_id = oc.result_set_id and w.seats > oc.seats))
-              join contest_option o on o.id = cy.option_id
-              join contest c on c.id = o.contest_id and c.party_scope_id is null
-              join election el on el.id = c.election_id and el.kind <> 'primary'
-              left join office f on f.id = c.office_id left join polity fp on fp.id = f.polity_id
-              left join body b on b.id = c.body_id left join polity bp on bp.id = b.polity_id
-              where cy.person_id = top.entity_id and cy.role = 'head' and (
-                (f.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor')
-                  or f.kind = 'other' and fp.kind in ('sovereign_state', 'supranational')) and el.polity_id = f.polity_id
-                or f.id is null and b.kind in ('upper_house', 'lower_house', 'unicameral') and bp.kind = 'sovereign_state')
-              union all
-              select t.office_id, t.from_date, case when fp.kind in ('sovereign_state', 'supranational') then 3 else 2 end
-              from tenure t join office f on f.id = t.office_id join polity fp on fp.id = f.polity_id
-              where t.person_id = top.entity_id and f.kind in ('head_of_state', 'head_of_government', 'governor')
-            ) held
-            order by held.rank desc, held.at desc nulls last
-            limit 1) best on top.type = 'person'
-        cross join lateral (
-          select
-            case top.type
-              when 'person' then (
-                select case when c.kind = 'list_allocation' then c.id else coalesce(c.allocation_parent_id, c.id) end
-                from candidacy cy
-                join contest_option o on o.id = cy.option_id join contest c on c.id = o.contest_id
-                join election e on e.id = c.election_id
-                where cy.person_id = top.entity_id order by o.kind = 'write_in', extract(year from e.date_from) desc nulls last,
-                  e.kind = 'indirect', e.date_from desc limit 1)
-              when 'party' then (
-                select top.entity_id where exists (
-                  select from contest_option o join contest c on c.id = o.contest_id
-                  where o.party_id = top.entity_id and c.allocation_parent_id is null))
-              else top.entity_id
-            end as target,
-            case top.type
-              when 'contest' then (select c.election_id from contest c where c.id = top.entity_id)
-              when 'election' then (select coalesce(e.parent_id, e.polity_id) from election e where e.id = top.entity_id)
-              when 'polity' then (select pp.parent_id from polity_parent pp where pp.polity_id = top.entity_id limit 1)
-              when 'party' then (select polity_id from party where id = top.entity_id)
-            end as context,
-            case top.type
-              when 'contest' then (select e.date_from from contest c join election e on e.id = c.election_id where c.id = top.entity_id)
-              when 'election' then (select date_from from election where id = top.entity_id)
-            end as date
-        ) x
-        order by top.score desc, x.date desc nulls last
-      `);
-      const matched = await bodyRows;
-      const bodies = matched.rows.map((row) => ({
+              case top.type
+                when 'person' then (
+                  select case when c.kind = 'list_allocation' then c.id else coalesce(c.allocation_parent_id, c.id) end
+                  from candidacy cy
+                  join contest_option o on o.id = cy.option_id join contest c on c.id = o.contest_id
+                  join election e on e.id = c.election_id
+                  where cy.person_id = top.entity_id order by o.kind = 'write_in', extract(year from e.date_from) desc nulls last,
+                    e.kind = 'indirect', e.date_from desc limit 1)
+                when 'party' then (
+                  select top.entity_id where exists (
+                    select from contest_option o join contest c on c.id = o.contest_id
+                    where o.party_id = top.entity_id and c.allocation_parent_id is null))
+                else top.entity_id
+              end as target,
+              case top.type
+                when 'contest' then (select c.election_id from contest c where c.id = top.entity_id)
+                when 'election' then (select coalesce(e.parent_id, e.polity_id) from election e where e.id = top.entity_id)
+                when 'polity' then (select pp.parent_id from polity_parent pp where pp.polity_id = top.entity_id limit 1)
+                when 'party' then (select polity_id from party where id = top.entity_id)
+              end as context,
+              case top.type
+                when 'contest' then (select e.date_from from contest c join election e on e.id = c.election_id where c.id = top.entity_id)
+                when 'election' then (select date_from from election where id = top.entity_id)
+              end as date
+          ) x
+          order by top.score desc, x.date desc nulls last
+        `),
+      ]);
+      const bodies = matched.map((row) => ({
         id: row.id,
         type: "body",
         target: row.id,
@@ -24427,52 +24576,85 @@ export const search = {
         ...found.rows.filter((row) => row.target != null),
         ...bodies.filter((row) => !row.isClose),
       ];
-      const upcoming = new Map(
-        rowsOf(
-          await db.execute<{ person: string; date: string; seat: string }>(sql`
-            select distinct on (cy.person_id) cy.person_id as person, e.date_from::text as date, coalesce(c.office_id, c.body_id) as seat
-            from candidacy cy
-            join contest_option o on o.id = cy.option_id
-            join contest c on c.id = o.contest_id and c.party_scope_id is null and coalesce(c.office_id, c.body_id) is not null
-            join election e on e.id = c.election_id and e.kind <> 'primary' and e.status = 'scheduled' and e.date_from >= current_date
-            where cy.person_id = any(${sql.param(rows.flatMap((row) => (row.type === "person" ? [row.id] : [])))}::uuid[]) and cy.role = 'head'
-            order by cy.person_id, e.date_from
-          `),
-        ).map((row) => [row.person, row]),
+      const people = rows.flatMap((row) =>
+        row.type === "person" ? [row.id] : [],
+      );
+      const parties = rows.flatMap((row) =>
+        row.type === "party" ? [row.id] : [],
       );
       const ids = rows.flatMap((row) =>
-        [
-          row.id,
-          row.target,
-          row.context,
-          row.office,
-          upcoming.get(row.id)?.seat,
-        ].filter((id) => id != null),
+        [row.id, row.target, row.context, row.office].filter(
+          (id) => id != null,
+        ),
       );
-      const [labels, slugs, faces, peers] = await Promise.all([
-        names(
-          ids,
-          null,
-          rows.filter((row) => row.type === "person").map((row) => row.id),
-        ),
-        paths(ids),
-        portraits(
-          rows.filter((row) => row.type === "person").map((row) => row.id),
-        ),
-        (async () => {
-          const found = await Promise.all(
-            [...new Set(matched.rows.map((row) => row.polity))].map(
-              async (polity) => chambers(polity),
+      const [upcoming, labels, slugs, faces, peers, marks, colors, located] =
+        await Promise.all([
+          db
+            .execute<{ person: string; date: string; seat: string }>(sql`
+              select distinct on (cy.person_id) cy.person_id as person, e.date_from::text as date, coalesce(c.office_id, c.body_id) as seat
+              from candidacy cy
+              join contest_option o on o.id = cy.option_id
+              join contest c on c.id = o.contest_id and c.party_scope_id is null and coalesce(c.office_id, c.body_id) is not null
+              join election e on e.id = c.election_id and e.kind <> 'primary' and e.status = 'scheduled' and e.date_from >= current_date
+              where cy.person_id = any(${sql.param(people)}::uuid[]) and cy.role = 'head'
+              order by cy.person_id, e.date_from
+            `)
+            .then(
+              async (found) =>
+                [
+                  new Map(rowsOf(found).map((row) => [row.person, row])),
+                  await names(found.rows.map((row) => row.seat)),
+                ] as const,
             ),
-          );
-          return new Map(
-            found.flat().map((peer) => [peer.id, peer.slug] as const),
-          );
-        })(),
-      ]);
+          names(ids, null, people),
+          paths(ids),
+          portraits(people),
+          Promise.all(
+            [...new Set(matched.map((row) => row.polity))].map(async (polity) =>
+              chambers(polity),
+            ),
+          ).then(
+            (found) =>
+              new Map(
+                found.flat().map((peer) => [peer.id, peer.slug] as const),
+              ),
+          ),
+          logos(parties, null),
+          db.execute<{ id: string; color: string }>(sql`
+            select distinct on (pc.party_id) pc.party_id as id, pc.color from party_color pc
+            where pc.party_id = any(${sql.param(parties)}::uuid[])
+            order by pc.party_id, upper_inf(pc.valid) desc, upper(pc.valid) desc
+          `),
+          Promise.all(
+            people.map(async (id) => {
+              const { path } = await call(entities.path, { id });
+              return [id, path] as const;
+            }),
+          ).then((found) => new Map(found)),
+        ]);
+      const [ballots, seatLabels] = upcoming;
+      const unitCode = (row: { context: string | null }) =>
+        units.find(
+          (entry) =>
+            entry.code ===
+            /^us\/([a-z]{2})\/./u.exec(slugs.get(row.context ?? "") ?? "")?.[1],
+        )?.label;
+      const isNamed = (row: { type: string; name: string }) =>
+        !["person", "party"].includes(row.type) &&
+        (segment(row.name) === segment(q) ||
+          (row.type === "polity" &&
+            segment(row.name.replace(/^City of /u, "")) === segment(q)) ||
+          (row.type === "polity" &&
+            !row.name.includes(" ") &&
+            segment(row.name.split("-", 1)[0] ?? "") === segment(q)));
+      const isLocal = (row: { path: string | null }) =>
+        unit != null &&
+        (row.path === `us/${unit.code}` ||
+          row.path?.startsWith(`us/${unit.code}/`) === true ||
+          row.path?.includes(`/us/${unit.code}/`) === true);
       const ranked = rows
         .map((row) => {
-          const next = upcoming.get(row.id);
+          const next = ballots.get(row.id);
           return {
             id: row.id,
             type: row.type,
@@ -24494,15 +24676,7 @@ export const search = {
                       : row.target
                     : row.context) ?? "",
                 ),
-                row.type === "body"
-                  ? units.find(
-                      (entry) =>
-                        entry.code ===
-                        /^us\/([a-z]{2})\/./u.exec(
-                          slugs.get(row.context ?? "") ?? "",
-                        )?.[1],
-                    )?.label
-                  : undefined,
+                row.type === "body" ? unitCode(row) : undefined,
               ]
                 .filter((part) => part != null)
                 .join(", ") || null,
@@ -24512,78 +24686,28 @@ export const search = {
             ballot:
               next == null
                 ? null
-                : { date: next.date, label: labels.full.get(next.seat) ?? "" },
+                : {
+                    date: next.date,
+                    label: seatLabels.full.get(next.seat) ?? "",
+                  },
             boost: row.boost,
             isSimilar: !row.matched,
           };
         })
         .filter((row) => row.path != null && row.name !== "")
-        .toSorted(
-          (a, b) =>
-            Number(
-              !["person", "party"].includes(b.type) &&
-                (segment(b.name) === segment(q) ||
-                  (b.type === "polity" &&
-                    segment(b.name.replace(/^City of /u, "")) === segment(q)) ||
-                  (b.type === "polity" &&
-                    !b.name.includes(" ") &&
-                    segment(b.name.split("-", 1)[0] ?? "") === segment(q))),
-            ) -
-            Number(
-              !["person", "party"].includes(a.type) &&
-                (segment(a.name) === segment(q) ||
-                  (a.type === "polity" &&
-                    segment(a.name.replace(/^City of /u, "")) === segment(q)) ||
-                  (a.type === "polity" &&
-                    !a.name.includes(" ") &&
-                    segment(a.name.split("-", 1)[0] ?? "") === segment(q))),
-            ),
-        )
-        .toSorted((a, b) =>
-          unit == null
-            ? 0
-            : Number(
-                b.path === `us/${unit.code}` ||
-                  b.path?.startsWith(`us/${unit.code}/`) === true ||
-                  b.path?.includes(`/us/${unit.code}/`) === true,
-              ) -
-              Number(
-                a.path === `us/${unit.code}` ||
-                  a.path?.startsWith(`us/${unit.code}/`) === true ||
-                  a.path?.includes(`/us/${unit.code}/`) === true,
-              ),
-        )
+        .toSorted((a, b) => Number(isNamed(b)) - Number(isNamed(a)))
+        .toSorted((a, b) => Number(isLocal(b)) - Number(isLocal(a)))
         .slice(0, input.limit);
-      const people = ranked.filter((row) => row.type === "person");
-      const [first, second] = people;
+      const [first, second] = ranked.filter((row) => row.type === "person");
       const words = segment(q).split("-");
       const best =
         first != null &&
-        (first.boost ?? 0) >= 4 &&
+        (first.boost ?? 0) >= 3 &&
         (second?.boost ?? 0) <= (first.boost ?? 0) - 1 &&
         words.every((word) => segment(first.name).split("-").includes(word))
           ? first
           : null;
-      const parties = ranked
-        .filter((row) => row.type === "party")
-        .map((row) => row.id);
-      const [marks, colors] = await Promise.all([
-        logos(parties, null),
-        db.execute<{ id: string; color: string }>(sql`
-          select distinct on (pc.party_id) pc.party_id as id, pc.color from party_color pc
-          where pc.party_id = any(${sql.param(parties)}::uuid[])
-          order by pc.party_id, upper_inf(pc.valid) desc, upper(pc.valid) desc
-        `),
-      ]);
       const painted = new Map(colors.rows.map((row) => [row.id, row.color]));
-      const located = new Map(
-        await Promise.all(
-          people.map(async (row) => {
-            const { path } = await call(entities.path, { id: row.id });
-            return [row.id, path] as const;
-          }),
-        ),
-      );
       return [
         ...(best == null ? [] : [best]),
         ...ranked.filter((row) => row !== best),

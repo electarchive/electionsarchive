@@ -1954,6 +1954,30 @@
   "search_keys_move": "Move",
   "search_keys_open": "Open",
   "search_keys_close": "Close",
+  "search_scope_all": "All",
+  "search_scope_label": "Search in",
+  "search_count": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} result",
+        "countPlural=*": "{countText} results"
+      }
+    }
+  ],
+  "search_error": "Search didn’t answer. Check your connection and try again.",
+  "search_retry": "Try again",
+  "search_keys_scope": "Filter",
+  "search_keys_tab": "New tab",
+  "search_keys_commands": "Commands only",
+  "search_examples": "Try",
+  "search_widen": "Search everything for “{query}”",
+  "search_short": "Keep typing to search the archive.",
   "map_sheet_close": "Close",
   "map_pick_touch": "Tap a place to see its results.",
   "scrubber_previous": "Previous election",
