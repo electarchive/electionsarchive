@@ -163,12 +163,14 @@ TABLES = [
 ]
 
 
-def volume(item: str, year: str, offset: int, back: int, pages: dict[str, int | list[int]]) -> list[dict[str, object]]:
+def volume(
+    item: str, year: str, offset: int, back: int, pages: dict[str, int | list[int]], party: str = "republican"
+) -> list[dict[str, object]]:
     specs = []
     for name, found in pages.items():
         found = [found] if isinstance(found, int) else found
         leaves = sorted({page - offset - step for page in found for step in range(back + 1)})
-        specs.append({"table": f"{year}:republican:{name}", "item": item, "leaves": tuple(leaves)})
+        specs.append({"table": f"{year}:{party}:{name}", "item": item, "leaves": tuple(leaves)})
     return specs
 
 
@@ -276,6 +278,23 @@ TABLES += [
     *volume("presidentialelec00repu", "1868", 0, 2, {"p98": 98}),
     *volume("proceedingsoffir00inrepu", "1856-64", 0, 2, {f"p{page}": page for page in (135, 163, 171, 234, 250)}),
 ]
+DNC = [
+    ("proceedingsofde00demo", "1852", {f"p{page}": page for page in range(30, 69)}),
+    ("officialproceedi00indemo", "1856", {f"p{page}": page for page in range(38, 48)}),
+    ("officialpr00demo", "1860", {f"p{page}": page for page in (*range(77, 96), *range(166, 177), 188)}),
+    ("officialproceed00demo", "1864", {f"p{page}": page for page in (44, 53)}),
+    ("officialproceedi00demo", "1868", {f"p{page}": page for page in range(77, 155)}),
+    ("officialproceed01convgoog", "1872", {f"p{page}": page for page in (57, 66, 72)}),
+    ("officialproc00demo", "1876", {f"p{page}": page for page in (24, *range(168, 175))}),
+    ("officialp00demo", "1880", {f"p{page}": page for page in range(132, 143)}),
+    ("officialproceedi0000demo_u0f5", "1884", {f"p{page}": page for page in range(265, 272)}),
+    ("cu31924002684375", "1892", {f"p{page}": page for page in (*range(181, 185), *range(200, 204))}),
+    ("officialproce00de", "1896", {f"p{page}": page for page in (*range(344, 362), *range(379, 396))}),
+    ("official00demo", "1900", {f"p{page}": page for page in (166, 167, 204, 205)}),
+    ("officialreportof00demoiala", "1912", {f"p{page}": page for page in range(204, 371)}),
+]
+for _item, _year, _pages in DNC:
+    TABLES += volume(_item, _year, 0, 1, _pages, "democratic")
 PROCEEDINGS = [
     {"table": "1968:republican:final", "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballot": date(1968, 8, 7)},
     {"table": "1972:republican", "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballot": date(1972, 8, 22)},
