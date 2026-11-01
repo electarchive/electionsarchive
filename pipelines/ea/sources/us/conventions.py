@@ -431,6 +431,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in (3, 4, 5)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
     {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47)}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
     {"party": "democratic", "tables": {1: "1904:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention held in St. Louis, Missouri, July 6, 7, 8, and 9, 1904", "publisher": "University of Kentucky Libraries, ExploreUK", "city": "St. Louis", "days": (date(1904, 7, 6), date(1904, 7, 9)), "ballots": {1: date(1904, 7, 9)}, "deciding": 1, "caveat": "Ohio's 46 votes for Parker stand under the unit rule: a poll of the delegation gave Parker 28, Hearst 6, McClellan 9, Cockrell 2, and Olney 1, and the chair let the announced vote stand. The table is the roll after the Idaho, Nevada, West Virginia, and Washington delegations changed their votes."},
+    {"party": "democratic", "tables": {1: "1920:democratic:b1", 44: "1920:democratic:b44"}, "title": "Official report of the proceedings of the Democratic national convention, held in San Francisco, California, June 28, 29, 30, July 1, 2, 3, 5, and 6, 1920, resulting in the nomination of Hon. James M. Cox (of Ohio) for president and Hon. Franklin D. Roosevelt (of New York) for vice-president", "publisher": "Bookwalter-Ball Printing Co.", "city": "San Francisco", "days": (date(1920, 6, 28), date(1920, 7, 6)), "ballots": {1: date(1920, 7, 2), 44: date(1920, 7, 6)}, "deciding": 44, "acclamation": True},
     {"party": "democratic", "tables": {1: "1924:democratic:b1"}, "title": "Official report of the proceedings of the Democratic National Convention held in Madison Square Garden, New York City, June 24, 25, 26, 27, 28, 30, July 1, 2, 3, 4, 5, 7, 8, and 9, 1924, resulting in the nomination of John W. Davis (of West Virginia) for president and Charles W. Bryan (of Nebraska) for vice-president", "publisher": "Bookwalter-Ball-Greathouse Printing Co.", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": {1: date(1924, 6, 30)}, "deciding": 103},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
@@ -592,6 +593,25 @@ CANDIDATES = {
     "democratic:Timmerman": ("George Bell Timmerman Jr.", "Q362853"),
     "democratic:Lausche": ("Frank J. Lausche", "Q888606"),
     "democratic:McCormack": ("John W. McCormack", "Q377602"),
+    "1920:democratic:McAdoo": ("William G. McAdoo", "Q741058"),
+    "1920:democratic:Cox": ("James M. Cox", "Q440117"),
+    "1920:democratic:Palmer": ("A. Mitchell Palmer", "Q1354363"),
+    "1920:democratic:Cummings": ("Homer S. Cummings", None),
+    "1920:democratic:Gerard": ("James W. Gerard", None),
+    "1920:democratic:Owen": ("Robert L. Owen", "Q456154"),
+    "1920:democratic:Hitchcock": ("Gilbert M. Hitchcock", "Q1487231"),
+    "1920:democratic:Meredith": ("Edwin T. Meredith", None),
+    "1920:democratic:Smith": ("Alfred E. Smith", "Q430714"),
+    "1920:democratic:Edwards": ("Edward I. Edwards", "Q436902"),
+    "1920:democratic:Davis": ("John W. Davis", "Q1332779"),
+    "1920:democratic:Glass": ("Carter Glass", "Q1045879"),
+    "1920:democratic:Simmons": ("Furnifold M. Simmons", "Q1475074"),
+    "1920:democratic:Harrison": ("Francis Burton Harrison", "Q612408"),
+    "1920:democratic:Williams": ("John Sharp Williams", "Q1701734"),
+    "1920:democratic:Wood": ("Leonard Wood", None),
+    "1920:democratic:Hearst": ("William Randolph Hearst", "Q294931"),
+    "1920:democratic:Colby": ("Bainbridge Colby", None),
+    "1920:democratic:Daniels": ("Josephus Daniels", None),
     "1924:democratic:McAdoo": ("William G. McAdoo", "Q741058"),
     "1924:democratic:Smith": ("Alfred E. Smith", "Q430714"),
     "1924:democratic:Underwood": ("Oscar W. Underwood", "Q454609"),
@@ -742,7 +762,7 @@ COLUMNS = {
         "Not voting",
     ),
 }
-LABELS = {"Washbarne": "Washburne", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer"}
+LABELS = {"Washbarne": "Washburne", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer", "Owens": "Owen"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1904:democratic": [
@@ -768,7 +788,7 @@ CORRECTIONS = {
         (504, "MN", (0.573, 0.692, 0.900, 0.704), {"votes": 24, "McAdoo": 15, "Cox": 8, "not voting": 1}, "24 held, 23 recorded; Cox was then declared the nominee by acclamation, and no totals were announced"),
         (504, "MO", (0.573, 0.722, 0.900, 0.734), {"votes": 36, "McAdoo": 17, "Cox": 18, "not voting": 1}, "36 held, 35 recorded; Cox was then declared the nominee by acclamation, and no totals were announced"),
         (505, "PA", (0.494, 0.316, 0.900, 0.328), {"votes": 76, "McAdoo": 4, "Cox": 68, "Palmer": 1, "Davis": 2, "not voting": 1}, "76 held, 75 recorded; Cox was then declared the nominee by acclamation, and no totals were announced"),
-        (505, "SD", (0.494, 0.361, 0.900, 0.373), {"votes": 10, "McAdoo": 3, "Cox": 5, "Owens": 1, "not voting": 1}, "10 held, 9 recorded; Cox was then declared the nominee by acclamation, and no totals were announced"),
+        (505, "SD", (0.494, 0.361, 0.900, 0.373), {"votes": 10, "McAdoo": 3, "Cox": 5, "Owen": 1, "not voting": 1}, "10 held, 9 recorded; Cox was then declared the nominee by acclamation, and no totals were announced"),
         (505, "TN", (0.56, 0.374, 0.61, 0.39), {"Cox": 0}, "a stray mark in the Cox cell; Tennessee's 24 are all for Davis"),
     ],
     "1924:democratic:b1": [
@@ -2296,7 +2316,7 @@ def emit() -> Path:
                     )
                 if number == convention["deciding"]:
                     winner = max(totals, key=lambda column: totals[column])
-                    if rule == "two-thirds" and totals[winner] < required:
+                    if rule == "two-thirds" and totals[winner] < required and not convention.get("acclamation"):
                         raise ValueError(f"{spec['table']}: {winner} has {totals[winner]:g} of {required} needed")
                     cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         cs.frame(
