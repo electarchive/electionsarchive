@@ -17,6 +17,7 @@ const REGULAR = ["Sofia Sans Semi Condensed Regular"];
 const STRONG = ["Sofia Sans Semi Condensed SemiBold"];
 const HALO = "color-mix(in oklab, var(--card) 88%, transparent)";
 const VEIL = 0.6;
+const drawn = new WeakMap<Engine, string>();
 
 export function basemap(
   engine: Engine,
@@ -25,6 +26,14 @@ export function basemap(
   outline: Array<Array<[number, number]>> | null,
   isBoxed = false,
 ) {
+  const key = JSON.stringify([scheme, isDetailed, outline, isBoxed]);
+  if (
+    drawn.get(engine) === key &&
+    engine.gl?.getLayer("basemap:earth") != null
+  ) {
+    return;
+  }
+  drawn.set(engine, key);
   engine.drop("basemap");
   if (outline == null || !SCHEMES.has(scheme)) {
     return;
