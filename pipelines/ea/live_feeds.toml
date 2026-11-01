@@ -45,6 +45,7 @@ url = "https://voteidaho.gov"
 id = "us.enr_2026.il"
 adapter = "us.enr_2026"
 params = { state = "IL" }
+poller = "muktedir"
 publisher = "Illinois State Board of Elections"
 url = "https://elections.il.gov/ElectionOperations/ElectionResults.aspx"
 

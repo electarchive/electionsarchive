@@ -190,7 +190,7 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         if only and state not in only:
             continue
         listing = get(client, f"{base}elections.json")
-        if listing is None:
+        if listing is None or not listing.lstrip().startswith(b"["):
             print(f"{state}: no election listing")
             continue
         store(state, f"{base}elections.json", listing, ".json")
@@ -379,12 +379,20 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         else:
             store("NC", url, content, ".zip")
     if not only or "IN" in only:
-        url = f"https://enr.indianavoters.in.gov/archive/{DAY.year}General/data/OffCatC_1005_B.json"
-        content = get(client, url)
-        if content is None:
-            print("IN: no house file")
+        for base in (
+            "https://enr.indianavoters.in.gov/site/data/",
+            f"https://enr.indianavoters.in.gov/archive/{DAY.year}General/data/",
+        ):
+            settings = get(client, f"{base}settings.json")
+            found = json.loads(settings.decode("utf-8-sig"))["Root"] if settings else {}
+            if found.get("CurrentElection") == f"{DAY:%m/%d/%Y}" and found.get("ElectionType") == "G":
+                url = f"{base}OffCatC_1005_{found['VersionType']}.json"
+                content = get(client, url)
+                if content is not None:
+                    store("IN", url, content, ".json")
+                break
         else:
-            store("IN", url, content, ".json")
+            print("IN: no general settings")
     if not only or "PA" in only:
         if DAY not in PA_ELECTION:
             listing = get(client, f"{PA_API}GetAllElections?methodName=GetAllElections")
