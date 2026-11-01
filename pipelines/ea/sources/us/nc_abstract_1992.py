@@ -1,3 +1,4 @@
+import base64
 import json
 import re
 import subprocess
@@ -16,15 +17,35 @@ from ea.sources.us import medsl_statewide
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_abstract_1992"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 WORK = DATA / "work" / "nc92"
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of votes cast for Council of State at the general election held on November 3, 1992"
 RECORD = "https://digital.ncdcr.gov/Documents/Detail/4199403"
+RECORD_GOVERNOR = "https://digital.ncdcr.gov/Documents/Detail/4199520"
+RECORD_LIEUTENANT = "https://digital.ncdcr.gov/Documents/Detail/4199518"
+RECORDS = ((RECORD, 0), (RECORD_GOVERNOR, 12), (RECORD_LIEUTENANT, 14))
 DAY = date(1992, 11, 3)
 MANUAL = {4: {"WATAUGA": [8267, 8564, 690, 8593, 8209, 867]}}
-PASSES = [(120, "6"), (150, "6"), (135, "4"), (100, "6"), (110, "6"), (160, "6"), (120, "4"), (170, "6")]
+PASSES = [
+    (120, "6", 300),
+    (150, "6", 300),
+    (135, "4", 300),
+    (100, "6", 300),
+    (110, "6", 300),
+    (160, "6", 300),
+    (120, "4", 300),
+    (170, "6", 300),
+]
+SEEN = {13, 14, 15, 16}
+VARIANTS = (200, 300)
+PROMPT = (
+    "This is a typed table of county vote totals from a North Carolina State Board of Elections abstract. "
+    "Transcribe every county row and the final TOTAL row, if present on this page, exactly as printed. "
+    'Answer with only a JSON array of arrays: ["COUNTY NAME", votes for first column, second column, third column]. '
+    "Votes are integers without commas."
+)
 SHEETS = {
     (1, 2): [
         (
@@ -65,6 +86,22 @@ SHEETS = {
             [("Jim Long", "DEMOCRATIC"), ("Mike Causey", "REPUBLICAN"), ("Kenneth Wayne Day", "LIBERTARIAN")],
         )
     ],
+    (13, 14): [
+        (
+            "Governor",
+            [
+                ("James B. (Jim) Hunt, Jr.", "DEMOCRATIC"),
+                ("Jim Gardner", "REPUBLICAN"),
+                ("Scott Raleigh McLaughlin", "LIBERTARIAN"),
+            ],
+        )
+    ],
+    (15, 16): [
+        (
+            "Lieutenant Governor",
+            [("Dennis A. Wicker", "DEMOCRATIC"), ("Art Pope", "REPUBLICAN"), ("Jeanette C. Small", "LIBERTARIAN")],
+        )
+    ],
     (11, 12): [
         (
             "Commissioner of Labor",
@@ -77,14 +114,15 @@ SHEETS = {
     ],
 }
 METHOD = (
-    "County totals come from the State Board of Elections' abstract of votes cast for the Council of State at the 1992 "
+    "County totals come from the State Board of Elections' abstract of votes cast for governor, lieutenant governor, and the Council of State at the 1992 "
     "general election (a typed scan), read by two OCR passes with disagreements settled by the printed state total "
     "of each column."
 )
 
 
 def url(page: int) -> str:
-    return f"{RECORD}#page-{page:02d}"
+    record, offset = next(entry for entry in reversed(RECORDS) if page > entry[1])
+    return f"{record}#page-{page - offset:02d}"
 
 
 def addresses() -> list[str]:
@@ -92,30 +130,38 @@ def addresses() -> list[str]:
 
 
 def fetch() -> None:
-    detail = subprocess.run(
-        ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", RECORD], capture_output=True, text=True, check=True
-    ).stdout
-    items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.DOTALL)[1])
-    for item in items:
-        number = int(item["path"].rsplit("-", 1)[1])
-        pdf = subprocess.run(
-            [
-                "curl",
-                "-sL",
-                "-m",
-                "120",
-                "-A",
-                "Mozilla/5.0",
-                item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"]),
-            ],
-            capture_output=True,
-            check=True,
+    for record, offset in RECORDS:
+        detail = subprocess.run(
+            ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", record], capture_output=True, text=True, check=True
         ).stdout
-        raw.store(SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.DOTALL)[1])
+        for item in items:
+            number = int(item["path"].rsplit("-", 1)[1]) + offset
+            pdf = subprocess.run(
+                [
+                    "curl",
+                    "-sL",
+                    "-m",
+                    "120",
+                    "-A",
+                    "Mozilla/5.0",
+                    item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"]),
+                ],
+                capture_output=True,
+                check=True,
+            ).stdout
+            raw.store(
+                SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
+            )
+    print(scan())
 
 
-def read(page: int, cut: int, mode: str, width: int) -> list[tuple[str, list[int]]]:
-    cache = WORK / "reads" / f"{page:02d}-{cut}-{mode}-{width}.json"
+def read(page: int, cut: int, mode: str, dpi: int, width: int) -> list[tuple[str, list[int]]]:
+    cache = (
+        WORK
+        / "reads"
+        / (f"{page:02d}-{cut}-{mode}-{width}.json" if dpi == 300 else f"{page:02d}-{cut}-{mode}-{dpi}-{width}.json")
+    )
     if cache.exists():
         return [(name, values) for name, values in json.loads(cache.read_text())]
     with tempfile.TemporaryDirectory() as folder:
@@ -124,7 +170,7 @@ def read(page: int, cut: int, mode: str, width: int) -> list[tuple[str, list[int
             [
                 "pdftoppm",
                 "-r",
-                "300",
+                str(dpi),
                 "-gray",
                 "-png",
                 "-singlefile",
@@ -134,9 +180,8 @@ def read(page: int, cut: int, mode: str, width: int) -> list[tuple[str, list[int
             check=True,
         )
         with Image.open(prefix.with_suffix(".png")) as rendered:
-            ImageOps.autocontrast(rendered.convert("L"), cutoff=2).point(lambda v: 0 if v < cut else 255).save(
-                prefix.with_suffix(".png")
-            )
+            gray = ImageOps.autocontrast(rendered.convert("L"), cutoff=2)
+            (gray.point(lambda v: 0 if v < cut else 255) if cut > 0 else gray).save(prefix.with_suffix(".png"))
         out = subprocess.run(
             ["tesseract", str(prefix.with_suffix(".png")), "stdout", "--psm", mode],
             capture_output=True,
@@ -172,8 +217,12 @@ def parse() -> None:
         merged: list[tuple[str, list[Counter[int]]]] = []
         for page in pair:
             readings: dict[str, list[list[int]]] = {}
-            for cut, mode in PASSES:
-                for name, values in read(page, cut, mode, width):
+            passes = [(dpi, seen(page, dpi)) for dpi in VARIANTS] if page in SEEN else []
+            passes += [(0, read(page, cut, mode, dpi, width)) for cut, mode, dpi in PASSES if page not in SEEN]
+            for _, rows in passes:
+                for name, values in rows:
+                    if len(values) != width:
+                        continue
                     if name != "TOTAL" and re.sub(r"[^a-z]", "", name.lower()) not in codes:
                         continue
                     readings.setdefault(re.sub(r"[^A-Z]", "", name), []).append(values)
@@ -267,9 +316,67 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="North Carolina's 1992 secretary of state, auditor, treasurer, superintendent of public instruction, "
+        summary="North Carolina's 1992 governor, lieutenant governor, secretary of state, auditor, treasurer, superintendent of public instruction, "
         "attorney general, and commissioners of agriculture, insurance, and labor by county from the State Board of "
         "Elections' abstract of votes cast",
         cite=cite,
         method=METHOD,
+        supersede=True,
     )
+
+
+def key(page: int, dpi: int) -> str:
+    return f"seen:{page}:{dpi}"
+
+
+def scan() -> str:
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+    from ea import batch
+
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    wanted: dict[str, batch.Want] = {}
+    for page in sorted(SEEN):
+        for dpi in VARIANTS:
+            with tempfile.TemporaryDirectory() as folder:
+                prefix = Path(folder) / "page"
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-r",
+                        str(dpi),
+                        "-gray",
+                        "-png",
+                        "-singlefile",
+                        str(raw.cached(SOURCE, url(page)).path),
+                        str(prefix),
+                    ],
+                    check=True,
+                )
+                data = base64.b64encode(prefix.with_suffix(".png").read_bytes()).decode()
+            params = MessageCreateParamsNonStreaming(
+                model="claude-haiku-5-5",
+                max_tokens=4000,
+                thinking={"type": "disabled"},
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": data}},
+                            {"type": "text", "text": PROMPT},
+                        ],
+                    }
+                ],
+            )
+            wanted[key(page, dpi)] = (params, (6000 * price_in + 2500 * price_out) / 1e6)
+    return batch.ensure(SOURCE, "seen", wanted)[1]
+
+
+def seen(page: int, dpi: int) -> list[tuple[str, list[int]]]:
+    blocks = json.loads(raw.cached(SOURCE, key(page, dpi)).path.read_text())["content"]
+    text = next(block["text"] for block in blocks if block.get("type") == "text")
+    found = re.search(r"\[.*\]", text, re.DOTALL)
+    return [
+        (str(row[0]).upper(), [int(str(v).replace(",", "")) for v in row[1:]])
+        for row in (json.loads(found[0]) if found else [])
+    ]
