@@ -10909,84 +10909,102 @@ async function turnout(contest: string | null, ks: Array<number>) {
       { registered: number; voters: number; reporting: number; of: number }
     >();
   }
-  const found = await db.execute<{
-    k: number;
-    registered: number | null;
-    voters: number | null;
-    reporting: number;
-    of: number;
-  }>(sql`
-    with recursive day as (
-      select e.date_from, e.kind from contest c join election e on e.id = c.election_id where c.id = ${contest}::uuid
-    ),
-    held as materialized (
-      select e.id, e.polity_id, e.date_from, p.kind from election e
-      join polity p on p.id = e.polity_id
-      cross join day d
-      where e.date_from = d.date_from and e.kind = d.kind
-    ),
-    sets as materialized (
-      select rs.k, rs.election_id, h.kind from held h
-      join result_set rs on rs.election_id = h.id and rs.contest_id is null
-      where ${latest("rs")}
-    ),
-    facts as materialized (
-      select s.k as set, s.election_id as election, ua.area_id as area, v.measure, sum(v.value)::float8 as value
-      from sets s
-      join result_value v on v.result_set_k = s.k and v.option_k = 0 and v.measure in (2, 3, 14) and v.count_round = 0
-      join reporting_unit ru on ru.k = v.unit_k
-      cross join lateral (
-        select coalesce(ru.area_id, (
-          select x.area_id from reporting_unit_area x where x.unit_id = ru.id
-          order by x.valid @> (select date_from from day) desc limit 1
-        )) as area_id
-      ) ua
-      where ua.area_id is not null
-      group by 1, 2, 3, 4
-    ),
-    targets as (
-      select a.k, a.id from area a where a.k = any(${sql.param(ks)}::int[])
-    ),
-    expected as materialized (
-      select h.id as election, pt.area_id as area
-      from (select * from held where kind in (select kind from sets) offset 0) h
-      join polity_territory pt on pt.polity_id = h.polity_id and pt.valid @> h.date_from
-    ),
-    up(origin, id, depth) as (
-      select distinct x.area, x.area, 0 from (select area from facts union select area from expected) x
-      union all
-      select up.origin, p.parent_id, up.depth + 1 from up
-      join area_parent p on p.area_id = up.id and p.valid @> (select date_from from day)
-      where up.depth < 5
-    ),
-    tallied as (
-      select t.k, f.election, f.set, f.measure, sum(f.value) as value
-      from targets t
-      join up on up.id = t.id
-      join facts f on f.area = up.origin
-      group by 1, 2, 3, 4
-    ),
-    best as (
-      select k, election, max(value) filter (where measure = 2) as registered,
-        coalesce(max(value) filter (where measure = 14), max(value) filter (where measure = 3)) as voters
-      from tallied group by 1, 2
-    )
-    select k,
-      sum(registered) filter (where registered > 0 and voters <= registered) as registered,
-      sum(voters) filter (where registered > 0 and voters <= registered) as voters,
-      count(*) filter (where registered > 0 and voters <= registered)::int as reporting,
-      greatest(count(*), (
-        select count(distinct x.election) from targets t join up on up.id = t.id
-        join expected x on x.area = up.origin
-        where t.k = best.k and x.area <> t.id
-      ))::int as of
-    from best group by k
+  const day = await db.execute<{ date: string; kind: string }>(sql`
+    select e.date_from::text as date, e.kind::text as kind from contest c
+    join election e on e.id = c.election_id where c.id = ${contest}::uuid
   `);
+  const held = day.rows[0];
+  if (held == null) {
+    return new Map<
+      number,
+      { registered: number; voters: number; reporting: number; of: number }
+    >();
+  }
+  const found = await remember(
+    `turnout:${held.date}:${held.kind}`,
+    async () => {
+      const tallied = await db.execute<{
+        k: number;
+        registered: number;
+        voters: number;
+        reporting: number;
+        of: number;
+      }>(sql`
+        with recursive day as (
+          select e.date_from, e.kind from contest c join election e on e.id = c.election_id where c.id = ${contest}::uuid
+        ),
+        held as materialized (
+          select e.id, e.polity_id, e.date_from, p.kind from election e
+          join polity p on p.id = e.polity_id
+          cross join day d
+          where e.date_from = d.date_from and e.kind = d.kind
+        ),
+        sets as materialized (
+          select rs.k, rs.election_id, h.kind from held h
+          join result_set rs on rs.election_id = h.id and rs.contest_id is null
+          where ${latest("rs")}
+        ),
+        facts as materialized (
+          select s.k as set, s.election_id as election, ua.area_id as area, v.measure, sum(v.value)::float8 as value
+          from sets s
+          join result_value v on v.result_set_k = s.k and v.option_k = 0 and v.measure in (2, 3, 14) and v.count_round = 0
+          join reporting_unit ru on ru.k = v.unit_k
+          cross join lateral (
+            select coalesce(ru.area_id, (
+              select x.area_id from reporting_unit_area x where x.unit_id = ru.id
+              order by x.valid @> (select date_from from day) desc limit 1
+            )) as area_id
+          ) ua
+          where ua.area_id is not null
+          group by 1, 2, 3, 4
+        ),
+        expected as materialized (
+          select h.id as election, pt.area_id as area
+          from (select * from held where kind in (select kind from sets) offset 0) h
+          join polity_territory pt on pt.polity_id = h.polity_id and pt.valid @> h.date_from
+        ),
+        up(origin, id, depth) as (
+          select distinct x.area, x.area, 0 from (select area from facts union select area from expected) x
+          union all
+          select up.origin, p.parent_id, up.depth + 1 from up
+          join area_parent p on p.area_id = up.id and p.valid @> (select date_from from day)
+          where up.depth < 5
+        ),
+        tallied as (
+          select up.id, f.election, f.set, f.measure, sum(f.value) as value
+          from up
+          join facts f on f.area = up.origin
+          group by 1, 2, 3, 4
+        ),
+        best as (
+          select id, election, max(value) filter (where measure = 2) as registered,
+            coalesce(max(value) filter (where measure = 14), max(value) filter (where measure = 3)) as voters
+          from tallied group by 1, 2
+        ),
+        owed as (
+          select up.id, count(distinct x.election) as n from up
+          join expected x on x.area = up.origin
+          where x.area <> up.id
+          group by 1
+        )
+        select a.k,
+          sum(registered) filter (where registered > 0 and voters <= registered) as registered,
+          sum(voters) filter (where registered > 0 and voters <= registered) as voters,
+          count(*) filter (where registered > 0 and voters <= registered)::int as reporting,
+          greatest(count(*), coalesce(max(owed.n), 0))::int as of
+        from best join area a on a.id = best.id left join owed on owed.id = best.id
+        group by a.k
+        having sum(registered) filter (where registered > 0 and voters <= registered) is not null
+          and sum(voters) filter (where registered > 0 and voters <= registered) is not null
+      `);
+      return tallied.rows;
+    },
+  );
+  const wanted = new Set(ks);
   return new Map(
-    found.rows.flatMap((row) =>
-      row.registered == null || row.voters == null
-        ? []
-        : [
+    found.flatMap((row) =>
+      wanted.has(row.k)
+        ? [
             [
               row.k,
               {
@@ -10996,7 +11014,8 @@ async function turnout(contest: string | null, ks: Array<number>) {
                 of: row.of,
               },
             ],
-          ],
+          ]
+        : [],
     ),
   );
 }
