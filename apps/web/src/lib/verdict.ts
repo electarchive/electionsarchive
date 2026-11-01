@@ -257,17 +257,58 @@ export function verdict(contest: Page["contest"]) {
         (!row.key.startsWith("kind:") || row.key.startsWith("kind:candidate:")),
     )
     .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0));
-  if (next == null && top?.current != null) {
+  const pool = contest.rows
+    .filter(
+      (row) =>
+        /^kind:(?:write_in|others|none_of_the_above|uncommitted)/u.test(
+          row.key,
+        ) && (row.current?.votes ?? 0) > 0,
+    )
+    .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0))[0];
+  const rival =
+    top?.current == null ||
+    pool?.current == null ||
+    pool.current.share <= (next?.current?.share ?? 0) ||
+    (next == null &&
+      !top.current.isWriteIn &&
+      pool.key.startsWith("kind:write_in") &&
+      pool.current.share < top.current.share)
+      ? null
+      : pool;
+  if (next == null && rival == null && top?.current != null) {
     return (
       ["won", "elected"].includes(top.current.outcome ?? "")
         ? m.race_lede_unopposed
         : m.race_lede_unopposed_led
     )({ party: definite(named(top), true) });
   }
-  if (top?.current == null || next?.current == null) {
+  const runner = rival ?? next;
+  if (top?.current == null || runner?.current == null) {
     return null;
   }
+  const against =
+    rival == null
+      ? definite(named(runner))
+      : rival.key.startsWith("kind:write_in")
+        ? m.race_pool_write_ins()
+        : rival.key.startsWith("kind:others")
+          ? m.race_pool_others()
+          : named(rival);
   const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
+  if (rival?.current != null && rival.current.share > top.current.share) {
+    return (
+      isWon
+        ? m.race_lede_pool_won
+        : next == null
+          ? m.race_lede_pool
+          : m.race_lede_pool_most
+    )({
+      party: definite(named(top), true),
+      share: percent(top.current.share),
+      pool: against,
+      other: percent(rival.current.share),
+    });
+  }
   const noun = (
     {
       state_delegate_equivalents: m.noun_state_delegate_equivalents,
@@ -279,8 +320,8 @@ export function verdict(contest: Page["contest"]) {
       party: definite(named(top), true),
       votes: count(top.current.votes),
       noun: noun(),
-      runner: definite(named(next)),
-      other: count(next.current.votes),
+      runner: against,
+      other: count(runner.current.votes),
     });
   }
   const written = contest.rows.filter((row) => row.current?.person != null);
@@ -299,7 +340,7 @@ export function verdict(contest: Page["contest"]) {
     (row) => row.current?.outcome === "withdrew",
   );
   const lede = (
-    isWon && withdrew?.key === next.key
+    isWon && withdrew?.key === runner.key
       ? m.race_lede_won_withdrew
       : isWon
         ? m.race_lede_won
@@ -308,12 +349,15 @@ export function verdict(contest: Page["contest"]) {
     party: definite(named(top), true),
     share: percent(
       top.current.share,
-      precision(top.current.share - next.current.share),
+      precision(top.current.share - runner.current.share),
     ),
-    margin: points(top.current.share - next.current.share).replace(/^\+/u, ""),
-    runner: definite(named(next)),
+    margin: points(top.current.share - runner.current.share).replace(
+      /^\+/u,
+      "",
+    ),
+    runner: against,
   });
-  return isWon && withdrew != null && withdrew.key !== next.key
+  return isWon && withdrew != null && withdrew.key !== runner.key
     ? `${lede} ${m.race_lede_withdrew({ name: definite(named(withdrew), true) })}`
     : lede;
 }

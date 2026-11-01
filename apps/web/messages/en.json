@@ -55,7 +55,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} seat filled, no parties recorded",
         "countPlural=*": "{countText} seats filled, no parties recorded"
@@ -69,7 +71,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} seat filled",
         "countPlural=*": "{countText} seats filled"
@@ -114,7 +118,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} election",
         "countPlural=*": "{countText} elections"
@@ -148,8 +154,13 @@
   "col_final_ballot": "Final ballot",
   "delegates_primary": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delegate, chosen in the primary",
         "countPlural=*": "{count} delegates, chosen in the primary"
@@ -158,8 +169,13 @@
   ],
   "delegates_caucus": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delegate, chosen by the caucuses",
         "countPlural=*": "{count} delegates, chosen by the caucuses"
@@ -168,8 +184,13 @@
   ],
   "delegates_convention": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delegate, chosen by the state convention",
         "countPlural=*": "{count} delegates, chosen by the state convention"
@@ -178,8 +199,13 @@
   ],
   "delegates_unbound": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} delegate, unbound",
         "countPlural=*": "{count} delegates, all unbound"
@@ -263,7 +289,9 @@
         "input year",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 by-election was held in this parliament, before the {year} general election.",
         "countPlural=*": "{count} by-elections were held in this parliament, before the {year} general election."
@@ -272,8 +300,13 @@
   ],
   "byes_lede_open": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 by-election has been held in this parliament so far.",
         "countPlural=*": "{count} by-elections have been held in this parliament so far."
@@ -282,8 +315,13 @@
   ],
   "byes_changed": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 seat changed hands.",
         "countPlural=*": "{count} seats changed hands."
@@ -469,7 +507,9 @@
         "input nouns",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": ["rankOrdinal"],
+      "selectors": [
+        "rankOrdinal"
+      ],
       "match": {
         "rankOrdinal=one": "{rank}st best for {name} of {count} {nouns} abroad",
         "rankOrdinal=two": "{rank}nd best for {name} of {count} {nouns} abroad",
@@ -514,7 +554,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} {groups} has no results beyond those already shown above, so it isn't listed here.",
         "countPlural=*": "{countText} {groups} have no results beyond those already shown above, so they aren't listed here."
@@ -560,7 +602,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -569,8 +613,13 @@
   ],
   "map_electoral": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} electoral vote",
         "countPlural=*": "{count} electoral votes"
@@ -613,7 +662,9 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{party} won {count} seat in {where}",
         "countPlural=*": "{party} won {count} seats in {where}"
@@ -654,8 +705,13 @@
   "check_votes_valid_unit": "{name}: votes add up to {votes}, but {valid} valid ballots are reported",
   "checks_turnout": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} unit reports more ballots than registered voters",
         "countPlural=*": "{count} units report more ballots than registered voters"
@@ -664,8 +720,13 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} unit reports votes that don't add up to its valid ballots",
         "countPlural=*": "{count} units report votes that don't add up to their valid ballots"
@@ -677,8 +738,13 @@
   "election_unplaced_detail": "These contests, such as university seats, have no geographic area and are excluded from the table and map.",
   "election_parts": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} part",
         "countPlural=*": "{count} parts"
@@ -711,7 +777,9 @@
         "input parties",
         "local seatsPlural = seats: plural"
       ],
-      "selectors": ["seatsPlural"],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "1 seat was returned unopposed, so no votes were cast in it: {parties}.",
         "seatsPlural=*": "{seats} seats were returned unopposed, so no votes were cast in them: {parties}."
@@ -726,7 +794,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "1 {noun} returned more than one member. Its voters could cast more than one vote, so the totals count votes, not voters.",
         "countPlural=*": "{count} {nouns} returned more than one member. Their voters could cast more than one vote, so the totals count votes, not voters."
@@ -746,6 +816,11 @@
   "race_lede_primaries": "Primaries in {count} districts.",
   "race_lede_won": "{party} won with {share} of the vote, {margin} points ahead of {runner}.",
   "race_lede_write_ins": "{name} got the most write-in votes: {votes} of {total}.",
+  "race_lede_pool": "{party} got {share} of the vote; {pool} took {other}.",
+  "race_lede_pool_most": "{party} got {share} of the vote, more than any other named candidate or party; {pool} took {other}.",
+  "race_lede_pool_won": "{party} won with {share} of the vote; {pool} took {other}.",
+  "race_pool_write_ins": "write-ins for other people",
+  "race_pool_others": "the other candidates combined",
   "race_lede_withdrew": "{name} withdrew before the runoff.",
   "race_lede_measure_passed": "Passed with {share} voting yes.",
   "race_lede_measure_failed": "Failed with {share} voting no.",
@@ -766,8 +841,13 @@
   "race_contests_nonvoting": "{count} contests, including {nonvoting} nonvoting delegate races",
   "race_contests": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} contest",
         "countPlural=*": "{count} contests"
@@ -837,7 +917,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} local government",
         "countPlural=*": "{countText} local governments"
@@ -851,7 +933,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} county",
         "countPlural=*": "{countText} counties"
@@ -1007,8 +1091,13 @@
   "lists_title": "Candidate lists",
   "lists_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} seat filled from ranked party lists",
         "seatsPlural=*": "{seats} seats filled from ranked party lists"
@@ -1019,8 +1108,13 @@
   "lists_unranked_title": "Members elected",
   "lists_unranked_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} seat filled from party lists. The source names only the elected members, not the full ranked lists.",
         "seatsPlural=*": "{seats} seats filled from party lists. The source names only the elected members, not the full ranked lists."
@@ -1030,8 +1124,13 @@
   "lists_open_title": "Candidates by list",
   "lists_open_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} seat filled from open party lists, with each list's candidates ranked by personal votes",
         "seatsPlural=*": "{seats} seats filled from open party lists, with each list's candidates ranked by personal votes"
@@ -1041,8 +1140,13 @@
   "col_members": "Members elected",
   "lists_all": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "All {count} list",
         "countPlural=*": "All {count} lists"
@@ -1053,8 +1157,13 @@
   "lists_collapse": "Show top of lists",
   "lists_more": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} more candidate",
         "countPlural=*": "{count} more candidates"
@@ -1063,8 +1172,13 @@
   ],
   "lists_seats": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} seat",
         "countPlural=*": "{count} seats"
@@ -1155,7 +1269,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} race on the ballot",
         "countPlural=*": "{countText} races on the ballot"
@@ -1235,7 +1351,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} seat won",
         "countPlural=*": "{countText} seats won"
@@ -1252,7 +1370,10 @@
         "local seatsText = seats: number",
         "local officesText = offices: number"
       ],
-      "selectors": ["seatsPlural", "officesPlural"],
+      "selectors": [
+        "seatsPlural",
+        "officesPlural"
+      ],
       "match": {
         "seatsPlural=one, officesPlural=one": "{seatsText} seat, {officesText} office won",
         "seatsPlural=one, officesPlural=*": "{seatsText} seat, {officesText} offices won",
@@ -1458,7 +1579,9 @@
         "input place",
         "local rankOrdinal = rank: plural type=ordinal"
       ],
-      "selectors": ["rankOrdinal"],
+      "selectors": [
+        "rankOrdinal"
+      ],
       "match": {
         "rankOrdinal=one": "{rank}st best for {name} of {count} {nouns} in {place}",
         "rankOrdinal=two": "{rank}nd best for {name} of {count} {nouns} in {place}",
@@ -1576,8 +1699,13 @@
   "tiers_tile_tacit": "{place}: {party} won {seats} of {total} seats, {tacit} of them declared unopposed",
   "tiers_tacit": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} seat was declared unopposed, with no vote held.",
         "countPlural=*": "{count} seats were declared unopposed, with no vote held."
@@ -1664,7 +1792,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} seat up",
         "countPlural=*": "{countText} seats up"
@@ -1717,7 +1847,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} member",
         "countPlural=*": "{countText} members"
@@ -1790,8 +1922,13 @@
   "person_majority": "Majority {count}",
   "person_scattered": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Also received write-in votes in {count} contest",
         "countPlural=*": "Also received write-in votes in {count} contests"
@@ -1805,7 +1942,9 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Received {count} electoral vote from a faithless elector in {states}",
         "countPlural=*": "Received {count} electoral votes from faithless electors in {states}"
@@ -1819,7 +1958,9 @@
         "input states",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Received {count} electoral vote in {states}",
         "countPlural=*": "Received {count} electoral votes in {states}"
@@ -2415,7 +2556,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} win",
         "countPlural=*": "{countText} wins"
@@ -2577,7 +2720,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} figure broken down by voting method or count round isn't shown here.",
         "countPlural=*": "{countText} figures broken down by voting method or count round aren't shown here."
@@ -2591,7 +2736,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} place where the candidates don't add up to valid votes",
         "countPlural=*": "{countText} places where the candidates don't add up to valid votes"
@@ -2605,7 +2752,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} figure changed",
         "countPlural=*": "{countText} figures changed"
@@ -2631,7 +2780,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} change, reviewed by the editorial desk",
         "countPlural=*": "{countText} changes, reviewed by the editorial desk"
@@ -2830,7 +2981,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} finding to review",
         "countPlural=*": "{countText} findings to review"
@@ -2872,7 +3025,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "The rerun of {pipeline} differs from this correction in {countText} figure. The proposal stays approved until the loader is fixed and rerun.",
         "countPlural=*": "The rerun of {pipeline} differs from this correction in {countText} figures. The proposal stays approved until the loader is fixed and rerun."
@@ -2886,7 +3041,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} figure",
         "countPlural=*": "{countText} figures"
@@ -2926,7 +3083,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} change",
         "countPlural=*": "{countText} changes"
@@ -3146,7 +3305,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} row",
         "countPlural=*": "{countText} rows"
@@ -3385,7 +3546,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} figure",
         "countPlural=*": "{countText} figures"
@@ -3399,7 +3562,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} box",
         "countPlural=*": "{countText} boxes"
@@ -3413,7 +3578,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} place",
         "countPlural=*": "{countText} places"
@@ -3427,7 +3594,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Pasted {countText} row.",
         "countPlural=*": "Pasted {countText} rows."
@@ -3441,7 +3610,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} wasn't found and was added as a new place; check its code.",
         "countPlural=*": "{countText} weren't found and were added as new places; check their codes."
@@ -3455,7 +3626,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} didn't fit the grid and was left out.",
         "countPlural=*": "{countText} didn't fit the grid and were left out."
@@ -3469,7 +3642,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "Using another file removes the box drawn on this one.",
         "countPlural=*": "Using another file removes the {countText} boxes drawn on this one."
@@ -3547,7 +3722,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} boundary changes.",
         "countPlural=*": "{countText} boundaries change."
@@ -3561,7 +3738,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} new area.",
         "countPlural=*": "{countText} new areas."
@@ -3575,7 +3754,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} code matches no area. Choose a name field to add it as a new area, or leave it out.",
         "countPlural=*": "{countText} codes match no area. Choose a name field to add them as new areas, or leave them out."
@@ -3589,7 +3770,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} new area has no name in the name field.",
         "countPlural=*": "{countText} new areas have no name in the name field."
@@ -3603,7 +3786,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} shape",
         "countPlural=*": "{countText} shapes"
@@ -3620,7 +3805,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} comment",
         "countPlural=*": "{countText} comments"
@@ -3659,7 +3846,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} character left",
         "countPlural=*": "{countText} characters left"
@@ -3673,7 +3862,9 @@
         "local countPlural = count: plural",
         "local countText = count: number"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{countText} reply",
         "countPlural=*": "{countText} replies"
@@ -3714,6 +3905,7 @@
   "night_dial_range": "{low} to {high}",
   "night_dial_settled": "{name} won",
   "night_dial_tie": "Tied",
+  "night_dial_unavailable": "No estimate for this race, because there is no earlier result here to compare with.",
   "night_dial_waiting": "The estimate starts once votes come in.",
   "night_feed_added": "{count} votes added",
   "night_feed_all": "Show all {count} updates",
@@ -3724,7 +3916,6 @@
   "night_feed_title": "Updates",
   "night_head_before": "Polls close at {time}",
   "night_head_counting": "{name} leads by {margin} points with {count} votes counted",
-  "night_dial_unavailable": "No estimate for this race, because there is no earlier result here to compare with.",
   "night_head_estimating": "{name} leads by {margin} points with about {share} of the expected vote counted",
   "night_head_tied": "Tied with {count} votes counted",
   "night_head_waiting": "Waiting for the first votes",
@@ -3744,10 +3935,12 @@
   "night_legend_shift": "Change in margin since the last election",
   "night_majority": "Majority",
   "night_map_bubbles": "Votes",
+  "night_map_close": "Close",
   "night_map_counted": "Counted",
   "night_map_lead": "Lead",
   "night_map_modes": "Map view",
   "night_map_none": "No map for this race",
+  "night_map_open": "All races in {place}",
   "night_map_remaining": "Left",
   "night_map_shift": "Shift",
   "night_method": "Counts are unofficial until certified. The estimate compares each county's count with its last result to project the votes still out, and shows an 80% range.",
@@ -3755,22 +3948,26 @@
   "night_nation_balance": "{won} won, {leading} leading",
   "night_nation_certified": "Certified",
   "night_nation_chance": "{name} {chance} to win",
-  "night_map_close": "Close",
   "night_nation_closest": "Closest races",
+  "night_closings_local": "Local closing time",
+  "night_closings_zone": "Times are in your time zone, {zone}.",
   "night_nation_closings": "Poll closings",
   "night_nation_counting": "Races counting",
   "night_nation_governor": "Governor",
-  "night_map_open": "All races in {place}",
   "night_nation_house": "House",
   "night_nation_latest": "Last update",
   "night_nation_legend": "Darker shades show bigger leads. Select a state to see its races.",
   "night_nation_legend_reporting": "Darker shades show more of the vote counted. Select a state to see its races.",
+  "night_house_layout": "House map layout",
+  "night_house_shapes": "Map",
+  "night_house_hexes": "Hexagons",
+  "night_house_legend": "Darker shades show bigger leads. Select a district to see its race.",
+  "night_house_map": "Map of House districts by leader",
+  "night_house_hexes_label": "Hexagon map of House districts, one hexagon per district",
   "night_nation_map": "Map of states by {view}",
   "night_nation_none": "No race here",
   "night_nation_reporting": "Reporting",
   "night_nation_seats": "{count} seats",
-  "night_closings_local": "Local closing time",
-  "night_closings_zone": "Times are in your time zone, {zone}.",
   "night_nation_senate": "Senate",
   "night_nation_state": "State",
   "night_nation_states": "States reporting",
@@ -3778,12 +3975,6 @@
   "night_nation_title": "Election night",
   "night_nation_views": "Map view",
   "night_nation_waiting": "Waiting",
-  "night_house_layout": "House map layout",
-  "night_house_shapes": "Map",
-  "night_house_hexes": "Hexagons",
-  "night_house_legend": "Darker shades show bigger leads. Select a district to see its race.",
-  "night_house_map": "Map of House districts by leader",
-  "night_house_hexes_label": "Hexagon map of House districts, one hexagon per district",
   "night_no_party": "No party",
   "night_note_certified": "These results are certified.",
   "night_note_close": "This race is within half a point.",
@@ -3797,17 +3988,6 @@
   "night_note_stale": "No new votes in {minutes} minutes.",
   "night_note_withdrawn": "The update from {time} was withdrawn.",
   "night_others": "{count} others",
-  "night_precincts": "{reporting} of {expected} precincts",
-  "night_rail_house": "House {district}",
-  "night_rail_label": "Races in this state",
-  "night_source": "Source:",
-  "night_status_before": "Before polls close",
-  "night_status_certified": "Certified",
-  "night_status_live": "Live",
-  "night_status_offline": "Offline",
-  "night_table_all": "Show all {count} counties",
-  "night_table_base": "Last time",
-  "night_table_counted": "Counted",
   "night_place_baseline": "Last time here: {margin}",
   "night_place_counted": "{share} counted here",
   "night_place_lede": "Last time, this county cast {share} of the statewide vote.",
@@ -3848,13 +4028,24 @@
   "night_local_waiting": "No votes yet",
   "night_local_shortcut": "Press / to search",
   "night_place_whole": "Whole county",
-  "night_table_county": "County",
+  "night_precincts": "{reporting} of {expected} precincts",
   "night_races_counted": "{share} counted",
   "night_races_counties": "Largest counties",
   "night_races_house": "House, {count} districts",
   "night_races_leads": "{name} leads by {margin}",
   "night_races_waiting": "{count} waiting",
   "night_races_won": "{name} won",
+  "night_rail_house": "House {district}",
+  "night_rail_label": "Races in this state",
+  "night_source": "Source:",
+  "night_status_before": "Before polls close",
+  "night_status_certified": "Certified",
+  "night_status_live": "Live",
+  "night_status_offline": "Offline",
+  "night_table_all": "Show all {count} counties",
+  "night_table_base": "Last time",
+  "night_table_counted": "Counted",
+  "night_table_county": "County",
   "night_table_fewer": "Show fewer",
   "night_table_margin": "Margin",
   "night_table_search": "Find a county",
@@ -4208,8 +4399,8 @@
   "method_limit_types": "Vote types. Most county feeds report only totals, so the model infers how late votes lean from the way counts move, not from batches labeled as mail or election-day votes.",
   "method_limit_precincts": "Precincts reported. We do not yet store each county's share of precincts reported, so the model judges whether a county is finished from its count alone.",
   "method_limit_baseline": "Races without a usable baseline. Alaska has no county-level history, uncontested races have nothing to compare against, and candidates whose party has no earlier result fall back to the count alone.",
-  "method_limit_traits": "Demographics below the county. The demographic figures are a few years old and cover whole counties, so New England towns and other places that report results below the county level get no demographic effect.",
   "method_limit_pause": "Long pauses. A big county that stops counting with many ballots left can look finished, and the model then underestimates how many votes are still out. The replay above shows this near the end of the count.",
+  "method_limit_traits": "Demographics below the county. The demographic figures are a few years old and cover whole counties, so New England towns and other places that report results below the county level get no demographic effect.",
   "method_score_of": "{count} of {total}",
   "method_limit_order": "Simulated count order. The replays use real county results, but the order of the count is simulated, so they test the method rather than replaying any one night exactly. We also replayed the 2020 presidential count in Florida, Georgia, North Carolina, and Pennsylvania as it was actually reported through the night."
 }
