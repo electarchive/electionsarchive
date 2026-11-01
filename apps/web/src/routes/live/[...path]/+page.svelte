@@ -19,7 +19,9 @@
 
   const election = $derived(data.election);
   const race = $derived(
-    election.races.find((entry) => entry.slug === data.focus) ?? null,
+    data.ballot == null
+      ? (election.races.find((entry) => entry.slug === data.focus) ?? null)
+      : null,
   );
   const focused = $derived(
     race == null ? null : summarize(race, data.estimates[race.id] ?? null),

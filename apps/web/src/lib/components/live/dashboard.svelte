@@ -42,6 +42,7 @@
   import Explorer from "./dashboard/explorer.svelte";
   import Flip from "./dashboard/flip.svelte";
   import Ladder from "./dashboard/ladder.svelte";
+  import Picker from "./dashboard/picker.svelte";
   import Pulse from "./dashboard/pulse.svelte";
   import Hexes from "./hexes.svelte";
   import Locals from "./locals.svelte";
@@ -87,7 +88,7 @@
   let view = $state<Chamber>("senate");
   let mode = $state<Mode>("lead");
   let hovered = $state<string | null>(null);
-  let layout = $state<"shapes" | "hexes">("shapes");
+  let layout = $state<"shapes" | "hexes">("hexes");
   let probe = $state<string | null>(null);
 
   const NAMES: Record<Chamber, () => string> = {
@@ -265,7 +266,10 @@
   function strength(summary: Summary) {
     const option = summary.winner ?? summary.leader;
     if (option == null) {
-      return WAITING;
+      const held = seatById.get(summary.race.id)?.held ?? null;
+      return held == null
+        ? WAITING
+        : `color-mix(in oklab, ${tint(held)} 24%, var(--background))`;
     }
     const share =
       summary.winner == null
@@ -683,6 +687,30 @@
       {/if}
     </dl>
   </header>
+
+  <section
+    class="grid gap-5 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[17rem_minmax(0,36rem)] lg:gap-12"
+    aria-labelledby="night-pick"
+  >
+    <div class="grid content-start gap-2">
+      <h2 id="night-pick" class="heading text-lg!">{m.night_pick_title()}</h2>
+      <p class="text-sm text-pretty text-muted-foreground">
+        {m.night_pick_hint()}
+      </p>
+      <p class="text-xs text-pretty text-muted-foreground">
+        {m.night_pick_legend()}
+      </p>
+    </div>
+    <Picker
+      {codes}
+      labels={nation?.labels ?? {}}
+      senate={(code: string) => of(code, "senate")[0]}
+      governor={(code: string) => of(code, "governor")[0]}
+      counted={reported}
+      color={strength}
+      {href}
+    />
+  </section>
 
   {#if chambers != null && pair != null}
     <div class="grid gap-px bg-border lg:grid-cols-3">

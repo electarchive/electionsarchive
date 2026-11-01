@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { LiveElection, LiveEstimate } from "@ea/analytics/live";
+  import type { Ballot } from "#lib/server/live-ballot.js";
   import type { LivePage } from "#lib/server/live-page.js";
   import Dashboard from "#lib/components/live/dashboard.svelte";
   import Place from "#lib/components/live/place.svelte";
   import Race from "#lib/components/live/race.svelte";
   import Races from "#lib/components/live/races.svelte";
+  import State from "#lib/components/live/state.svelte";
   import { placeName, placeSlug } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
   import { remainder, standing } from "#lib/live/standing.js";
@@ -19,7 +21,7 @@
     at = $bindable(),
     isFinal = $bindable(),
   }: {
-    data: LivePage;
+    data: LivePage & { ballot?: Ballot | null };
     election: LiveElection;
     estimates: Record<string, LiveEstimate>;
     clock: number;
@@ -102,6 +104,14 @@
     control={data.control}
     forecasts={data.shown.forecasts}
     {clock}
+    {isOffline}
+  />
+{:else if data.ballot != null}
+  <State
+    {election}
+    {estimates}
+    ballot={data.ballot}
+    geography={data.geography}
     {isOffline}
   />
 {:else}
