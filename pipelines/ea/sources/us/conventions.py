@@ -304,15 +304,17 @@ TABLES += [
         "item": "proceedingsoffir00inrepu",
         "leaves": (58,),
         "columns": (None, "Fremont", "McLean", "Banks", "Sumner", "Seward"),
+        "electors": True,
     },
     {
         "table": "1856:republican:formal",
         "item": "proceedingsoffir00inrepu",
         "leaves": (63,),
         "columns": (None, "Fremont", "McLean", "Seward"),
+        "electors": True,
     },
     {"table": "1864:republican", "item": "proceedingsoffir00inrepu", "leaves": (236, 237, 238), "narrated": True},
-    {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (38, 39, 40, 41), "narrated": True},
+    {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (42,), "columns": ("votes", "Grant")},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
 DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (212, 213, 214), (217, 218), (219, 220), (221, 222), (222, 223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (260, 261, 262), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (323, 324, 325), (327, 328), (330, 331), (331, 332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
@@ -862,6 +864,15 @@ CORRECTIONS = {
         (182, "NC", (0.483, 0.577, 0.82, 0.589), {"Cleveland": 10 / 3, "Campbell": 0, "Morrison": 1}, "3⅓ for Cleveland and 1 in the Morrison column, which the delegation of 22 and the printed totals count"),
         (182, "MD", (0.437, 0.424, 0.481, 0.435), {"not voting": 0.5}, "16 held, 15½ recorded; 909½ of 910 votes cast"),
     ],
+    "1864:republican": [
+        (236, "ME", (0.1, 0.619, 0.4, 0.645), {"votes": 14}, "Maine casts her entire vote, 14 votes"),
+        (236, "NH", (0.1, 0.649, 0.4, 0.747), {"votes": 10}, "New Hampshire casts her ten votes"),
+        (236, "VT", (0.1, 0.751, 0.4, 0.784), {"votes": 10}, "Vermont's vote of ten"),
+        (236, "MA", (0.1, 0.783, 0.4, 0.812), {"votes": 24}, "Massachusetts's twenty-four"),
+        (236, "RI", (0.1, 0.82, 0.4, 0.844), {"votes": 8}, "Rhode Island casts her entire eight votes"),
+        (236, "CT", (0.1, 0.85, 0.4, 0.881), {"votes": 12}, "Connecticut gives her twelve votes"),
+        (239, "CA", (0.77, 0.3, 0.815, 0.314), {"Lincoln": 7}, "the Secretary's announced table gives California 7 for Lincoln; the roll as called says ten"),
+    ],
     "1864:democratic": [
         (43, "NH", (0.707, 0.425, 0.821, 0.435), {"George B. McClellan": 5}, "a broken 5; New Hampshire held 5"),
         (43, "MA", (0.707, 0.446, 0.821, 0.456), {"George B. McClellan": 12}, "12; Massachusetts held 12"),
@@ -913,6 +924,7 @@ CORRECTIONS = {
     ],
 }  # fmt: skip
 TOTALS = {
+    "1864:republican": {"Lincoln": 484, "Grant": 22},
     "1904:democratic": {
         "Parker": 679,
         "Hearst": 181,
@@ -966,6 +978,25 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1856:republican:informal": (
+        (
+            "The Proceedings print the New Hampshire row as 15 for Fremont and 14 for McLean, against a delegation "
+            "of 15 (three delegates for each of the state's five electoral votes); it is stored as printed. Without "
+            "the 14, McLean's total would be 190. No totals are printed with the table."
+        ),
+        {},
+    ),
+    "1864:republican": (
+        (
+            "California is stored as the Secretary's announced table gives it, 7 for Lincoln, though the roll as "
+            "called records California casting ten votes. The announced total of 484 for Lincoln, of 506 cast, "
+            "does not match the table's state figures, which add to 494."
+        ),
+        {
+            "CA": (10, 7, "7 announced for Lincoln against the ten California cast on the call"),
+            "column Lincoln": (484, 494, "the state figures add to 494"),
+        },
+    ),
     "1920:democratic:b1": (
         (
             "The Official Proceedings print this ballot's table with internal inconsistencies, stored as printed: "
@@ -1209,6 +1240,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                 for column in header
             )
         )
+        if spec.get("electors") and len(roles) == len(header) + 1:
+            roles = roles[1:]
         if len(roles) != len(header):
             problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
             continue
@@ -1252,7 +1285,13 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                 problems.append(f"leaf {leaf}: unknown row {row['label']!r}")
                 continue
             for role, column, value in zip(roles, header, values, strict=True):
-                if role is None and code is not None and not column["label"].strip() and value.strip(" .…"):
+                if (
+                    role is None
+                    and code is not None
+                    and not spec.get("electors")
+                    and not column["label"].strip()
+                    and value.strip(" .…")
+                ):
                     problems.append(f"leaf {leaf}: {row['label']} has {value!r} under an unlabeled column")
                 if role is None or (not value.strip() and roles.count(role) > 1):
                     continue
