@@ -354,8 +354,9 @@ TABLES += [
     {
         "table": "1868:democratic:b22",
         "item": "officialproceedi00demo",
-        "leaves": (153, 154, 155, 156, 157),
+        "leaves": (152, 155, 156, 157, 158),
         "ballot": 22,
+        "narrated": True,
     },
     *leaves("officialproceed00demo", "1864", {"": (43,)}, party="democratic"),
     *ballots(
