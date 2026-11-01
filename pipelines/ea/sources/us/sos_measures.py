@@ -475,6 +475,29 @@ OK_FILES = (
     "2008-election-results/2008-general-election-results/08sq.pdf",
     "2010-election-results/2010-general-election-results/ge-results-county-20101102.pdf",
 )
+OK_HISTORY = "https://oklahoma.gov/content/dam/ok/en/elections/election-results/"
+OK_HISTORY_FILES = (
+    "results-prior-to-1980/1907-1912-results.pdf",
+    "results-prior-to-1980/1914-1916-results.pdf",
+    "results-prior-to-1980/1918-1920-results.pdf",
+    "results-prior-to-1980/1922-1926-results.pdf",
+    "results-prior-to-1980/1928-1932-results.pdf",
+    "results-prior-to-1980/1934-1938-results.pdf",
+    "results-prior-to-1980/1940-1944-results.pdf",
+    "results-prior-to-1980/1946-1950-results.pdf",
+    "results-prior-to-1980/1952-1956-results.pdf",
+    "results-prior-to-1980/1958-1966-results.pdf",
+    "results-prior-to-1980/1968-1974-results.pdf",
+    "results-prior-to-1980/1976-1978-results.pdf",
+    "1980-election-results/1980-results.pdf",
+    "1982-election-results/1982-results.pdf",
+    "1984-election-results/1984-results.pdf",
+    "1986-election-results/1986-results.pdf",
+    "1988-election-resuls/1988-results.pdf",
+    "1989-election-results/1990-results.pdf",
+    "1992-election-results/1992-results.pdf",
+    "1996-election-results/1996-general-summary-results.pdf",
+)
 FL_DAYS = (
     date(2008, 1, 29),
     date(2000, 11, 7),
@@ -2672,6 +2695,9 @@ def fetch() -> None:
     for path in OK_FILES:
         raw.fetch(SOURCE, OK + path, suffix=".pdf")
         time.sleep(1)
+    for path in OK_HISTORY_FILES:
+        raw.fetch(SOURCE, OK_HISTORY + path, suffix=".pdf")
+        time.sleep(1)
     for url in dict.fromkeys([*(url for urls in OR_ABSTRACTS.values() for url in urls), OR_2022]):
         raw.fetch(SOURCE, url, suffix=".htm" if url.endswith(".htm") else ".pdf")
         time.sleep(1)
@@ -3773,6 +3799,66 @@ def oklahoma() -> list[dict[str, object]]:
                 }
                 for county, (yes, no) in found.items()
                 for answer, value in (("YES", yes), ("NO", no))
+            )
+    return rows
+
+
+def oklahoma_history() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    date_line = re.compile(
+        r"(?:[A-Za-z ,.-]*?)?(January|February|March|April|May|June|July|August|September|October|November|December)"
+        r"\s+(\d{1,2}),\s*(\d{4})",
+        re.IGNORECASE,
+    )
+    for path in OK_HISTORY_FILES:
+        url = OK_HISTORY + path
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.replace("\f", "\n")
+        day = None
+        current: dict[str, object] | None = None
+        blocks: list[dict[str, object]] = []
+        for line in text.splitlines():
+            stripped = line.strip()
+            if match := re.match(r"STATE QUESTION (?:NO\.? ?)?(\d+)\s*(.*)$", stripped):
+                current = {"day": day, "number": match[1], "head": match[2], "body": []}
+                blocks.append(current)
+            elif len(stripped) < 70 and (when := date_line.fullmatch(stripped)):
+                day = datetime.strptime(f"{when[1].title()} {when[2]} {when[3]}", "%B %d %Y").date()
+                current = None
+            elif current is not None:
+                current["body"].append(stripped)  # type: ignore[union-attr]
+        for block in blocks:
+            body = "\n".join(block["body"])  # type: ignore[arg-type]
+            yes = re.search(r"(?i)\bYes\.{2,}\s*([\d,]+)", body) or re.search(r"FOR THE [A-Z]+-YES\s+NOP\s+([\d,]+)", body)
+            no = re.search(r"(?i)\bNo\.{2,}\s*([\d,]+)", body) or re.search(r"AGAINST THE [A-Z]+-NO\s+NOP\s+([\d,]+)", body)
+            if block["day"] is None:
+                raise ValueError(f"{url} SQ {block['number']}: no election date")
+            if yes is None or no is None:
+                print(f"ok_history: {url.rsplit('/', 1)[-1]} SQ {block['number']}: no totals")
+                continue
+            head = str(block["head"])
+            kind = (
+                "Initiative"
+                if "INITIATIVE" in head
+                else "Popular Referendum"
+                if "REFERENDUM PETITION" in head
+                else "Legislative Referendum"
+            )
+            rows.extend(
+                {
+                    "state": "OK",
+                    "day": block["day"],
+                    "number": block["number"],
+                    "label": f"State Question {block['number']}",
+                    "title": f"State Question {block['number']}",
+                    "kind": kind,
+                    "url": url,
+                    "county": "statewide",
+                    "answer": answer,
+                    "votes": int(found[1].replace(",", "")),
+                }
+                for answer, found in (("YES", yes), ("NO", no))
             )
     return rows
 
@@ -7182,6 +7268,7 @@ def parse() -> None:
             *georgia_2022(),
             *texas_2022(),
             *california_totals(),
+            *oklahoma_history(),
             *wisconsin(),
             *wisconsin_manual(),
             *iowa(),
