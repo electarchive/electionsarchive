@@ -196,6 +196,8 @@ def county_pages(pdf: Path, early: bool = False) -> list[int]:
             continue
         if named >= 40 and "tota" in low:
             found.append(page)
+    if early and found:
+        return list(range(max(1, found[0] - 1), min(found[-1] + 1, text.count("\f")) + 1))
     return found
 
 
