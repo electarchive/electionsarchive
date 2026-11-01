@@ -3,6 +3,7 @@ import re
 import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
+from urllib.parse import urlparse
 from uuid import UUID
 
 import polars as pl
@@ -25,6 +26,9 @@ CUYAHOGA = "https://boe.cuyahogacounty.gov/"
 CUYAHOGA_FILE = INBOX / "cuyahoga" / "PDF Sample Ballot Package.pdf"
 CUYAHOGA_BOXES = ((5, 20, 195, 375), (5, 215, 175, 355), (5, 392, 215, 325), (6, 20, 195, 545), (6, 215, 190, 345))
 WAYNE_FILE = "https://www.waynecountyoh.gov/wp-content/uploads/2026/09/Sample-Ballots-ALL-WATERMARK-09192026-1352.pdf"
+FRANKLIN = "https://vote.franklincountyohio.gov"
+FRANKLIN_PAGE = f"{FRANKLIN}/election-info/2026"
+FRANKLIN_DIR = INBOX / "franklin" / "notices"
 LORAIN_FILE = "https://www.voteloraincountyohio.gov/_files/ugd/2568d0_fd0d57cfa16c443899cf8c9653a28945.pdf"
 SOURCES = {
     HAMILTON: (
@@ -62,6 +66,11 @@ NOISE = re.compile(
     r"^(Sample Generated|\d\d-\d\d-|Page \d+ of|VOTE BOTH SIDES|Members of the|November 3, 2026$|B A L L O\s*$|S A M P L E|\d+$)"
 )
 STOP = re.compile(r"^(YES|NO|SI|FOR\b.*|AGAINST\b.*|A FAVOR\b.*|EN CONTRA\b.*)$")
+HINTS = {
+    "Worthington-Charter-Amendment-Referendum-Petition-Signature-Requirement-(by-Petition)": "Charter Amendment: 1.05 - Petition",
+    "Worthington-Charter-Amendment-Referendum-Petition-Signature-Requirement-(Commission)": "Charter Amendment: Section 1.05 - Commission",
+    "Worthington-Charter-Amendment-Effective-Date-of-Ordinances-(Commission)": "Charter Amendment: 1.04, 2.17, 2.19",
+}
 ALIASES = {"Stark County District Library": "Stark County"}
 COUNTY_OF = {"Stark County District Library": "Stark"}
 SCHOOLS = "us.oh_questions_2026"
@@ -88,6 +97,75 @@ def fetch() -> None:
                 retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
                 media_type="application/pdf",
             )
+    fetch_franklin()
+
+
+def franklin_notices() -> list[str]:
+    html = raw.cached(SOURCE, FRANKLIN_PAGE).path.read_text()
+    return sorted({FRANKLIN + path for path in re.findall(r'href="(/getmedia/[^"]*Notice-of-Election[^"]*)"', html)})
+
+
+def franklin() -> list[dict[str, str]]:
+    rows = []
+    for url in franklin_notices():
+        text = re.sub(r"\s+", " ", pdf(url, "-layout"))
+        if "3rd day of November, 2026" not in text:
+            continue
+        entity = None
+        for pattern in (
+            r"vote of the people of (?:the )?(.+?) at the",
+            r"Resolution of the (?:Township Trustees|City Council|Council) of (?:the )?(.+?) (?:of Franklin County, )?Ohio",
+            r"Board of Education of the (.+? School District)",
+        ):
+            found = re.search(pattern, text)
+            if found:
+                entity = re.sub(r"(?: of Franklin County)?(?:, Ohio)?$", "", found[1]).strip(" ,")
+                break
+        question = re.search(r"the question of:? (.+?) The polls for the election", text)
+        if entity is None or question is None:
+            print("unparsed notice:", url)
+            continue
+        body = question[1].strip()
+        heading = text.split("R.C.")[0].lower()
+        if "bonds" in heading:
+            kind = "BOND"
+        elif "tax levy" in heading:
+            kind = "TAX LEVY " + " ".join(
+                word
+                for word in ("additional", "renewal", "replacement", "decrease", "increase")
+                if word in body[:600].lower()
+            )
+        elif "bonds" in body.lower() and "tax" in body.lower():
+            kind = "COMBINATION"
+        elif "zoning" in body.lower():
+            kind = "ZONING"
+        elif "aggregation" in url.lower():
+            kind = "GAS"
+        else:
+            kind = "CHARTER"
+        rows.append(
+            {
+                "url": url,
+                "county": "Franklin",
+                "kind": kind,
+                "entity": entity,
+                "text": body,
+                "hint": next((h for k, h in HINTS.items() if k in url), ""),
+            }
+        )
+    return rows
+
+
+def fetch_franklin() -> None:
+    try:
+        raw.cached(SOURCE, FRANKLIN_PAGE)
+    except LookupError:
+        raw.fetch(SOURCE, FRANKLIN_PAGE, suffix=".html")
+    for url in franklin_notices():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def pdf(url: str, mode: str) -> str:
@@ -257,7 +335,7 @@ def lorain() -> list[dict[str, str]]:
 
 
 def parse() -> None:
-    frame = pl.DataFrame(hamilton() + summit() + cuyahoga() + wayne() + lorain())
+    frame = pl.DataFrame(hamilton() + summit() + cuyahoga() + wayne() + lorain() + franklin(), infer_schema_length=None)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "issues.parquet")
     print(frame.group_by("county").len().rows())
@@ -295,12 +373,16 @@ def pick(
         if options:
             break
     options = [c for c in options if c[3] in ("", fips)]
+    if row.get("hint"):
+        options = [c for c in options if row["hint"] in c[2]]
     kind = row["kind"].upper()
     if any(
         word in kind
         for word in ("CHARTER", "ZONING", "GAS", "ADVISORY", "LOCAL", "LIQUOR", "MERGER", "ORDINANCE", "SPECIAL")
     ):
         wanted = "miscellaneous"
+    elif "COMBINATION" in kind:
+        wanted = "combination"
     elif "INCOME" in kind:
         wanted = "income tax"
     elif "BOND" in kind:
@@ -414,7 +496,12 @@ def emit() -> Path:
                     continue
                 kept += 1
                 if row["url"] not in sources:
-                    _, _, publisher, title = SOURCES[row["url"]]
+                    _, _, publisher, title = SOURCES.get(row["url"]) or (
+                        "",
+                        None,
+                        "Franklin County Board of Elections",
+                        f"Notice of election: {re.sub(r'-+', ' ', urlparse(row['url']).path.rsplit('/', 1)[-1].removeprefix('Notice-of-Election-'))}, November 3, 2026 General Election",
+                    )
                     sources[row["url"]] = cs.source(publisher, title)
                     cs.add(
                         "source",

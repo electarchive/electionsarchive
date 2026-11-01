@@ -97,6 +97,27 @@ ADDED: list[dict[str, str]] = [
         "label": "Liquor permit D6, Sunday sale, Cuyahoga Falls precinct 4-C",
         "text": f"{LIQUOR}: Sunday sale at a bar. Purpose: Liquor permit D6, Sunday sale, Cuyahoga Falls precinct 4-C.",
     },
+    {
+        "county": "Franklin",
+        "kind": "School District",
+        "name": "South-Western City School District",
+        "label": "School construction",
+        "text": "Bond Issue: $220000000, 38 years, beginning 2026. Purpose: School construction.",
+    },
+    {
+        "county": "Franklin",
+        "kind": "Township",
+        "name": "Hamilton",
+        "label": "Road maintenance",
+        "text": "Tax Levy, additional: 0.8 mills, continuing, beginning 2026. Purpose: Road maintenance.",
+    },
+    {
+        "county": "Franklin",
+        "kind": "Township",
+        "name": "Sharon",
+        "label": "Road maintenance",
+        "text": "Tax Levy, additional: 2.46 mills, continuing, beginning 2026. Purpose: Road maintenance.",
+    },
 ]
 
 
