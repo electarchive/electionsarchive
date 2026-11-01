@@ -423,11 +423,16 @@ PROCEEDINGS = [
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
     {"tables": {n: f"1876:republican:b{n}" for n in range(1, 8)}, "ordinal": "Sixth", "city": "Cincinnati", "days": (date(1876, 6, 14), date(1876, 6, 16)), "ballots": dict.fromkeys(range(1, 8), date(1876, 6, 16)), "deciding": 7, "held": 7},
-    {"tables": {3: "1884:republican:b3"}, "ordinal": "Eighth", "city": "Chicago", "days": (date(1884, 6, 3), date(1884, 6, 6)), "ballots": dict.fromkeys(range(1, 5), date(1884, 6, 6)), "deciding": 4},
+    {"tables": {n: f"1884:republican:b{n}" for n in range(1, 5)}, "ordinal": "Eighth", "city": "Chicago", "days": (date(1884, 6, 3), date(1884, 6, 6)), "ballots": dict.fromkeys(range(1, 5), date(1884, 6, 6)), "deciding": 4},
     {"tables": {n: f"1880:republican:b{n}" for n in range(1, 37)}, "ordinal": "Seventh", "city": "Chicago", "days": (date(1880, 6, 2), date(1880, 6, 8)), "ballots": dict.fromkeys(range(1, 29), date(1880, 6, 7)) | dict.fromkeys(range(29, 37), date(1880, 6, 8)), "deciding": 36, "held": 36},
     {"tables": {n: f"1888:republican:b{n}" for n in (2, 3, 4, 5, 6, 7, 8)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8},
     {"tables": {1: "1896:republican"}, "ordinal": "Eleventh", "city": "St. Louis", "days": (date(1896, 6, 16), date(1896, 6, 18)), "ballots": {1: date(1896, 6, 18)}, "deciding": 1, "caveat": "The table gives no votes held by each delegation, so none are stored. Its footnotes say the delegations of Colorado and Idaho had bolted the convention, Montana's other five votes were four blank and one for J. Donald Cameron, three of Nevada's delegates were absent, and one New York vote was passed; those votes are not in the table's columns and are not stored."},
     {"tables": {1: "1900:republican"}, "ordinal": "Twelfth", "city": "Philadelphia", "days": (date(1900, 6, 19), date(1900, 6, 21)), "ballots": {1: date(1900, 6, 21)}, "deciding": 1},
+    {"tables": {1: "1892:republican"}, "ordinal": "Tenth", "city": "Minneapolis", "days": (date(1892, 6, 7), date(1892, 6, 10)), "ballots": {1: date(1892, 6, 10)}, "deciding": 1},
+    {"tables": {1: "1904:republican"}, "ordinal": "Thirteenth", "city": "Chicago", "days": (date(1904, 6, 21), date(1904, 6, 23)), "ballots": {1: date(1904, 6, 23)}, "deciding": 1},
+    {"tables": {1: "1908:republican"}, "ordinal": "Fourteenth", "city": "Chicago", "days": (date(1908, 6, 16), date(1908, 6, 19)), "ballots": {1: date(1908, 6, 19)}, "deciding": 1},
+    {"tables": {1: "1912:republican"}, "ordinal": "Fifteenth", "city": "Chicago", "days": (date(1912, 6, 18), date(1912, 6, 22)), "ballots": {1: date(1912, 6, 22)}, "deciding": 1},
+    {"tables": {n: f"1916:republican:b{n}" for n in (1, 2)}, "ordinal": "Sixteenth", "city": "Chicago", "days": (date(1916, 6, 7), date(1916, 6, 10)), "ballots": dict.fromkeys(range(1, 4), date(1916, 6, 10)), "deciding": 3},
     {"tables": {1: "1924:republican"}, "ordinal": "Eighteenth", "city": "Cleveland", "days": (date(1924, 6, 10), date(1924, 6, 12)), "ballots": {1: date(1924, 6, 12)}, "deciding": 1},
     {"tables": {1: "1928:republican"}, "ordinal": "Nineteenth", "city": "Kansas City", "days": (date(1928, 6, 12), date(1928, 6, 15)), "ballots": {1: date(1928, 6, 14)}, "deciding": 1},
     {"tables": {1: "1968:republican:final"}, "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballots": {1: date(1968, 8, 7)}, "deciding": 1},
@@ -483,6 +488,23 @@ CANDIDATES = {
     "republican:du Pont": ("T. Coleman du Pont", "Q2383282"),
     "republican:La Follette": ("Robert M. La Follette", "Q878682"),
     "republican:Johnson": ("Hiram W. Johnson", "Q143644"),
+    "1904:republican:For Theodore Roosevelt": ("Theodore Roosevelt", "Q33866"),
+    "republican:Roosevelt": ("Theodore Roosevelt", "Q33866"),
+    "republican:Taft": ("William Howard Taft", "Q35648"),
+    "republican:Cannon": ("Joseph G. Cannon", "Q984248"),
+    "republican:Fairbanks": ("Charles W. Fairbanks", "Q270539"),
+    "republican:Fairbank": ("Charles W. Fairbanks", "Q270539"),
+    "republican:LaFollette": ("Robert M. La Follette", "Q878682"),
+    "republican:Charles E. Hughes": ("Charles E. Hughes", "Q313252"),
+    "republican:Cummins": ("Albert B. Cummins", "Q377161"),
+    "republican:Root": ("Elihu Root", "Q220619"),
+    "republican:Weeks": ("John W. Weeks", "Q1371272"),
+    "republican:Burton": ("Theodore E. Burton", "Q252449"),
+    "republican:Brumbaugh": ("Martin G. Brumbaugh", "Q658426"),
+    "republican:Willis": ("Frank B. Willis", None),
+    "republican:McCall": ("Samuel W. McCall", None),
+    "republican:Wanamaker": ("John Wanamaker", None),
+    "republican:Lodge": ("Henry Cabot Lodge", None),
     "republican:Hoover": ("Herbert Hoover", "Q35236"),
     "republican:Lowden": ("Frank O. Lowden", "Q584973"),
     "republican:Curtis": ("Charles Curtis", "Q271023"),
@@ -685,7 +707,7 @@ CANDIDATES = {
     "1948:democratic:McNutt": ("Paul V. McNutt", "Q887892"),
 }
 UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippine Islands", "CZ": "Canal Zone"}
-ABSTAINED = {"votes", "Abstention", "not voting", "Not voting", "Not Voting", "Not Voting or Absent", "Absent"}
+ABSTAINED = {"votes", "Present and Not Voting", "Abstention", "not voting", "Not voting", "Not Voting", "Not Voting or Absent", "Absent"}
 OFFICIAL = (
     "The roll call of the states on the presidential nomination, as tabulated in {}, read from the scanned volume "
     "page by page. Each delegation's total is the votes it held, abstentions included; abstentions are that total less the "
