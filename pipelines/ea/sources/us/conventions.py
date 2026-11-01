@@ -2,7 +2,7 @@ import base64
 import json
 import re
 from datetime import UTC, date, datetime
-from itertools import pairwise
+from itertools import pairwise, product
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -175,9 +175,12 @@ def volume(
     return specs
 
 
-def ballots(item: str, year: str, windows: dict[int, tuple[int, int]]) -> list[dict[str, object]]:
+def ballots(
+    item: str, year: str, windows: dict[int, tuple[int, int]], scatter: bool = False
+) -> list[dict[str, object]]:
     return [
         {
+            **({"scatter": True} if scatter else {}),
             "table": f"{year}:republican" if len(windows) == 1 else f"{year}:republican:b{n}",
             "item": item,
             "leaves": tuple(range(low, high + 1)),
@@ -187,9 +190,14 @@ def ballots(item: str, year: str, windows: dict[int, tuple[int, int]]) -> list[d
     ]
 
 
-def leaves(item: str, year: str, found: dict[str, tuple[int, ...]]) -> list[dict[str, object]]:
+def leaves(item: str, year: str, found: dict[str, tuple[int, ...]], scatter: bool = False) -> list[dict[str, object]]:
     return [
-        {"table": f"{year}:republican" if name == "" else f"{year}:republican:{name}", "item": item, "leaves": spec}
+        {
+            **({"scatter": True} if scatter else {}),
+            "table": f"{year}:republican" if name == "" else f"{year}:republican:{name}",
+            "item": item,
+            "leaves": spec,
+        }
         for name, spec in found.items()
     ]
 
@@ -211,9 +219,10 @@ TABLES += [
             "b9": (262, 263),
             "b10": (269,),
         },
+        scatter=True,
     ),
-    *leaves("officialreportsi00repuiala", "1916", {"b1": (212,)}),
-    *ballots("officialreportsi00repuiala", "1916", {2: (214, 216), 3: (216, 220)}),
+    *leaves("officialreportsi00repuiala", "1916", {"b1": (212,)}, scatter=True),
+    *ballots("officialreportsi00repuiala", "1916", {2: (214, 216), 3: (216, 220)}, scatter=True),
     *ballots("officialreportfi00repuiala", "1912", {1: (442, 448)}),
     *ballots("officialreporto00repu", "1908", {1: (236, 242)}),
     *ballots("officialproceedi00repuiala", "1904", {1: (209, 214)}),
@@ -335,6 +344,19 @@ NARRATED = (
     "are stated, put them in a first column labeled 'Votes'. If the page holds no announcements, return an empty "
     "header and no rows."
 )
+SCATTER = (
+    "This page is from the official report of the proceedings of a national party convention. After the "
+    "tabulation of a ballot for president, a paragraph lists the votes that were not tabulated above, one entry "
+    "per candidate, naming the states that cast them (for example 'COLEMAN DU PONT: 5 votes from Delaware, 1 vote "
+    "from Maine'), and may list the delegations not voting. Read only the entries for candidates. Return one row "
+    "per candidate entry, labeled with the candidate's surname as printed ('du Pont', 'La Follette'), with the "
+    "vertical extent of that entry's lines on the page as y0 and y1. The header lists the states named in any "
+    "entry, in the order first named, each with x0 0 and x1 1000. Each row's values hold one string per header "
+    "column, in the same order: the votes that candidate had from that state as digits (a fraction such as 1/2 "
+    "after any whole number), empty where the state cast none for that candidate. Where an entry gives the votes of "
+    "a state without a number ('the 6 votes of Delaware'), use that number. Leave out totals and the "
+    "delegations not voting. If the page holds no such paragraph, return an empty header and no rows."
+)
 ABBREVIATIONS = {
     "ala": "AL", "ariz": "AZ", "ark": "AR", "calif": "CA", "cal": "CA", "colo": "CO", "conn": "CT", "del": "DE",
     "dc": "DC", "fla": "FL", "ga": "GA", "ill": "IL", "ind": "IN", "kans": "KS", "kan": "KS", "ky": "KY", "la": "LA",
@@ -365,15 +387,19 @@ def fetch() -> None:
         for leaf in spec["leaves"]:
             image = raw.fetch(SOURCE, LEAF.format(item=spec["item"], leaf=leaf), suffix=".jpg")
             data = base64.b64encode(image.path.read_bytes()).decode()
-            for effort in READS.values():
+            for effort, scatter in product(READS.values(), (False, True)):
+                if scatter and not spec.get("scatter"):
+                    continue
                 ask = (
-                    NARRATED
+                    SCATTER
+                    if scatter
+                    else NARRATED
                     if spec.get("narrated")
                     else ROLL
                     if spec.get("ballot") is None
                     else ROLL + BALLOT.format(ordinal(spec["ballot"]))
                 )
-                wanted[read_key(effort, image.sha256, variant(spec))] = (
+                wanted[read_key(effort, image.sha256, variant(spec, scatter))] = (
                     MessageCreateParamsNonStreaming(
                         model="claude-haiku-5-5",
                         max_tokens=16000,
@@ -397,7 +423,9 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
-def variant(spec: dict[str, object]) -> str | None:
+def variant(spec: dict[str, object], scatter: bool = False) -> str | None:
+    if scatter:
+        return "s"
     if spec.get("narrated"):
         return "n"
     return None if spec.get("ballot") is None else f"b{spec['ballot']}"
@@ -430,11 +458,13 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
     cells: list[dict[str, object]] = []
     totals: dict[str, float] = {}
     problems: list[str] = []
-    for leaf in spec["leaves"]:
+    for leaf, scatter in product(spec["leaves"], (False, True)):
+        if scatter and not spec.get("scatter"):
+            continue
         image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
         try:
             response = json.loads(
-                raw.cached(SOURCE, read_key(effort, image.sha256, spec.get("ballot"))).path.read_text()
+                raw.cached(SOURCE, read_key(effort, image.sha256, variant(spec, scatter))).path.read_text()
             )
         except LookupError:
             problems.append(f"leaf {leaf}: not read")
@@ -442,6 +472,35 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
         text = next((block["text"] for block in response["content"] if block["type"] == "text"), "{}")
         read = json.loads(text)
         header = read["header"]
+        if scatter:
+            for column in header:
+                if place(column["label"]) is None:
+                    problems.append(f"leaf {leaf}: unknown state {column['label']!r}")
+            for row in read["rows"]:
+                if len(row["values"]) != len(header):
+                    problems.append(f"leaf {leaf}: {row['label']} has {len(row['values'])} cells")
+                    continue
+                for column, value in zip(header, row["values"], strict=True):
+                    code = place(column["label"])
+                    if code is None or not value.strip():
+                        continue
+                    try:
+                        figure = number(value)
+                    except ValueError:
+                        problems.append(f"leaf {leaf}: {column['label']} {row['label']} reads {value!r}")
+                        continue
+                    cells.append(
+                        {
+                            "table": spec["table"],
+                            "state": code,
+                            "column": row["label"].strip(),
+                            "value": figure,
+                            "leaf": leaf,
+                            "sha256": image.sha256,
+                            "box": [0.0, row["y0"] / 1000, 1.0, row["y1"] / 1000],
+                        }
+                    )
+            continue
         roles = spec.get("columns") or tuple(
             "votes" if re.search(r"vote|delegate", column["label"], re.IGNORECASE) else column["label"].strip()
             for column in header
