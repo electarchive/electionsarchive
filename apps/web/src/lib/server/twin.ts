@@ -3717,6 +3717,26 @@ function electionMarkdown(
                   .join("\n"),
               ]),
         ]),
+    ...(cycle == null || cycle.reruns.length === 0
+      ? []
+      : [
+          `## ${m.rounds_title()}`,
+          table(
+            [m.col_election(), m.col_date(), m.col_place()],
+            cycle.reruns.map((entry) => [
+              link(
+                entry.isRerun
+                  ? m.rerun_round()
+                  : entry.isAnnulled
+                    ? m.rerun_annulled()
+                    : m.rerun_original(),
+                entry.isCurrent ? null : entry.path,
+              ),
+              entry.date == null ? null : date(entry.date),
+              entry.places.join(", ") || null,
+            ]),
+          ),
+        ]),
     ...(ballot == null || ballot.tiers.length === 0
       ? []
       : [

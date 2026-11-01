@@ -26,6 +26,8 @@
       label: string;
       date: string | null;
       path: string | null;
+      isCurrent?: boolean;
+      place?: string;
     }>;
     paint?: Map<string, string>;
     more?: Snippet;
@@ -168,13 +170,13 @@
               local: general.local,
             },
           ]),
-      ...after.map((stage) => ({
+      ...after.map(({ place, ...stage }) => ({
         ...stage,
         until: null,
-        isCurrent: false,
+        isCurrent: stage.isCurrent ?? false,
         isMinor: false,
         leaders: [],
-        local: null,
+        local: place == null ? null : { place, path: null, isCurrent: false },
       })),
     ].toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
     const order = (a: (typeof early)[number], b: (typeof early)[number]) =>

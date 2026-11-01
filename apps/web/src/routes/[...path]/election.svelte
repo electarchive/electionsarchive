@@ -2484,43 +2484,44 @@
   {/if}
 {/snippet}
 
-{#snippet ticket()}
+{#snippet road(isBelow: boolean)}
   {const isRoad = $derived(cycle.primaries.length > 0)}
-  {#if stages.length > 0 && !isRoad}
-    <section class="col-span-12 bg-card px-3.5 py-3">
-      <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_stages()}</h2>
-      <ul class="grid text-sm">
-        {#each stages as child, index (index)}
-          <li
-            class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
-          >
-            {#if child.path == null}
-              <span>{child.name}</span>
-            {:else}
-              <Preview class="hover:highlighter" path={child.path}
-                >{child.name}</Preview
-              >
-            {/if}
-            <time
-              class="shrink-0 font-figures text-xs text-muted-foreground"
-              datetime={child.date}>{date(child.date)}</time
-            >
-          </li>
-        {/each}
-      </ul>
-    </section>
-  {/if}
+  {const reruns = $derived(
+    cycle.reruns.map((entry) => ({
+      id: entry.id,
+      label: entry.isRerun
+        ? m.rerun_round()
+        : entry.isAnnulled
+          ? m.rerun_annulled()
+          : m.rerun_original(),
+      date: entry.date,
+      path: entry.path,
+      isCurrent: entry.isCurrent,
+      place:
+        entry.places.length === 0
+          ? undefined
+          : entry.places.length > 4
+            ? m.rerun_places({ count: count(entry.places.length) })
+            : new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
+                entry.places,
+              ),
+    })),
+  )}
 
   <Road
+    {isBelow}
     rounds={[]}
-    after={isRoad
-      ? stages.map((child) => ({
-          id: child.path ?? child.name,
-          label: child.name.replace(/^\d{4} /u, ""),
-          date: child.date,
-          path: child.path,
-        }))
-      : []}
+    after={[
+      ...(isRoad
+        ? stages.map((child) => ({
+            id: child.path ?? child.name,
+            label: child.name.replace(/^\d{4} /u, ""),
+            date: child.date,
+            path: child.path,
+          }))
+        : []),
+      ...reruns,
+    ]}
     cycle={{
       primaries: cycle.primaries.map((primary) => ({
         ...primary,
@@ -2529,7 +2530,7 @@
         local: null,
       })),
       general:
-        cycle.general == null
+        cycle.general == null || reruns.length > 0
           ? null
           : {
               ...cycle.general,
@@ -2589,6 +2590,36 @@
       {/if}
     {/snippet}
   </Road>
+{/snippet}
+
+{#snippet ticket()}
+  {const isRoad = $derived(cycle.primaries.length > 0)}
+  {#if stages.length > 0 && !isRoad}
+    <section class="col-span-12 bg-card px-3.5 py-3">
+      <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_stages()}</h2>
+      <ul class="grid text-sm">
+        {#each stages as child, index (index)}
+          <li
+            class="flex items-baseline justify-between gap-4 border-be border-border/60 py-1.5 last:border-be-0"
+          >
+            {#if child.path == null}
+              <span>{child.name}</span>
+            {:else}
+              <Preview class="hover:highlighter" path={child.path}
+                >{child.name}</Preview
+              >
+            {/if}
+            <time
+              class="shrink-0 font-figures text-xs text-muted-foreground"
+              datetime={child.date}>{date(child.date)}</time
+            >
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+
+  {@render road(false)}
 {/snippet}
 
 {#snippet board()}
@@ -2964,6 +2995,8 @@
 {/snippet}
 
 {#snippet trailing()}
+  {@render road(true)}
+
   {#if unplaced.length > 0}
     <section class="col-span-12 bg-card px-3.5 py-3">
       <h2 class="text-[0.8125rem] font-bold">{m.election_unplaced()}</h2>

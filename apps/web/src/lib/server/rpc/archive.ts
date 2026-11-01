@@ -71,6 +71,11 @@ export const latest = (set: string) =>
     `(${set}.is_default and ${set}.stage <> 'notional' and ${licensed(set)} and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and ${licensed("later")} and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
   );
 
+const umbrella = (election: string) =>
+  sql.raw(
+    `(select min(o.parent_id::text)::uuid from election c join election o on o.id = c.rerun_of_id where c.parent_id = ${election}.id having count(distinct o.parent_id) = 1 and count(*) = (select count(*) from election d where d.parent_id = ${election}.id))`,
+  );
+
 export const coarse = (shape: string) =>
   sql.raw(
     `coalesce((select k.geom from display.coarse k where k.area_id = ${shape}.area_id and k.valid = ${shape}.valid), ${shape}.geom)`,
@@ -8162,8 +8167,18 @@ export const contests = {
       const bySegment = new Map(
         chain.map((entry) => [entry.id, entry.segment]),
       );
+      const reran = await db.execute<{ id: string; root: string | null }>(sql`
+        select e.id, coalesce(e.rerun_of_id, ${umbrella("e")}) as root
+        from election e
+        where e.id = any(${sql.param(sameRace.map((row) => row.election))}::uuid[])
+          and e.status::text <> 'annulled'
+      `);
+      const redone = new Set(reran.rows.flatMap((row) => row.root ?? []));
       const entries = [
-        ...sameRace.map((row) => {
+        ...sameRace.flatMap((row) => {
+          if (row.status === "annulled" && redone.has(row.election)) {
+            return [];
+          }
           const spot = row.counted
             ? located.rows.find((entry) => entry.root === row.id)
             : undefined;
@@ -15566,7 +15581,7 @@ export const elections = {
         method: "GET",
         path: "/elections/{id}/cycle",
         summary:
-          "Trace an election's cycle: the primaries and caucuses held for its general election, in the polity and in each of its states or regions, and that general election",
+          "Trace an election's cycle: the primaries and caucuses held for its general election, in the polity and in each of its states or regions, that general election, and the election it reran or the reruns held for it",
       }),
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
@@ -15605,9 +15620,46 @@ export const elections = {
             ),
           }),
         ),
+        reruns: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            path: v.nullable(v.string()),
+            date: v.nullable(v.string()),
+            isCurrent: v.boolean(),
+            isAnnulled: v.boolean(),
+            isRerun: v.boolean(),
+            places: v.array(v.string()),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
+      const family = await db.execute<{
+        id: string;
+        date: string | null;
+        isAnnulled: boolean;
+        isRerun: boolean;
+        places: Array<string>;
+      }>(sql`
+        with x as materialized (
+          select coalesce(e.rerun_of_id, ${umbrella("e")}, e.id) as root
+          from election e where e.id = ${input.id}::uuid
+        )
+        select r.id, r.date_from::text as date, r.status::text = 'annulled' as "isAnnulled", false as "isRerun",
+          '{}'::uuid[] as places
+        from x join election r on r.id = x.root
+        union all
+        select e.id, e.date_from::text, e.status::text = 'annulled', true, '{}'::uuid[]
+        from x join election e on e.rerun_of_id = x.root
+        union all
+        select e.id, e.date_from::text, e.status::text = 'annulled', true,
+          array(select c.polity_id from election c where c.parent_id = e.id)
+        from x join election r on r.id = x.root
+        join election e on e.polity_id = r.polity_id and e.kind = r.kind
+          and e.date_from > r.date_from and e.date_from <= r.date_from + 400
+        where ${umbrella("e")} = r.id
+      `);
       const found = await db.execute<{
         id: string;
         polity: string | null;
@@ -15715,7 +15767,30 @@ export const elections = {
       ]);
       const party = (id: string | null) =>
         id == null ? null : (colors.get(id) ?? null);
+      const kin = family.rows.length > 1 ? family.rows : [];
+      const [called, linked] = await Promise.all([
+        names(
+          [...kin.map((row) => row.id), ...kin.flatMap((row) => row.places)],
+          kin[0]?.date ?? null,
+        ),
+        paths(kin.map((row) => row.id)),
+      ]);
       return {
+        reruns: kin
+          .map((row) => ({
+            id: row.id,
+            name: called.full.get(row.id) ?? "",
+            path: linked.get(row.id) ?? null,
+            date: row.date,
+            isCurrent: row.id === input.id,
+            isAnnulled: row.isAnnulled,
+            isRerun: row.isRerun,
+            places: row.places
+              .map((place) => called.full.get(place) ?? "")
+              .filter((place) => place !== "")
+              .toSorted((a, b) => a.localeCompare(b)),
+          }))
+          .toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? "")),
         general:
           general == null
             ? null
@@ -15805,9 +15880,10 @@ export const elections = {
         date: string | null;
         year: number | null;
         annulled: boolean;
+        root: string | null;
       }>(sql`
         select e.id, e.date_from::text as date, extract(year from e.date_from)::int as year,
-          e.status::text = 'annulled' as annulled
+          e.status::text = 'annulled' as annulled, coalesce(e.rerun_of_id, ${umbrella("e")}) as root
         from election x
         join election e on e.polity_id = x.polity_id and e.kind = x.kind
         left join election p on p.id = e.parent_id
@@ -15816,20 +15892,44 @@ export const elections = {
             and not exists (select from entity_merge m where m.entity_id = e.id)))
         order by e.date_from nulls first, e.id
       `);
+      const listed = new Map(found.rows.map((row) => [row.id, row]));
+      const head = (row: (typeof found.rows)[number]) => {
+        let at = row;
+        const seen = new Set([at.id]);
+        while (at.root != null && !seen.has(at.root)) {
+          const next = listed.get(at.root);
+          if (next == null) {
+            break;
+          }
+          seen.add(next.id);
+          at = next;
+        }
+        return at;
+      };
       const ids = found.rows.map((row) => row.id);
       const [labels, slugs] = await Promise.all([names(ids, null), paths(ids)]);
-      return found.rows.map((row) => ({
-        date: row.date,
-        year: row.year,
-        path: slugs.get(row.id) ?? null,
-        name: labels.full.get(row.id) ?? "",
-        current: row.id === input.id,
-        annulled: row.annulled,
-        isRemainder: false,
-        notional: false,
-        gap: false,
-        winner: null,
-      }));
+      return Map.groupBy(found.rows, (row) => head(row).id)
+        .entries()
+        .map(([root, group]) => {
+          const first = listed.get(root) ?? group[0];
+          const shown =
+            first?.annulled === true
+              ? (group.findLast((row) => !row.annulled) ?? first)
+              : first;
+          return {
+            date: first?.date ?? null,
+            year: first?.year ?? null,
+            path: slugs.get(shown?.id ?? "") ?? null,
+            name: labels.full.get(shown?.id ?? "") ?? "",
+            current: group.some((row) => row.id === input.id),
+            annulled: shown?.annulled ?? false,
+            isRemainder: false,
+            notional: false,
+            gap: false,
+            winner: null,
+          };
+        })
+        .toArray();
     }),
   lead: os
     .meta(
