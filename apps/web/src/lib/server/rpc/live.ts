@@ -574,36 +574,65 @@ async function baselines(
   );
 }
 
+async function geography(
+  contests: Array<{ id: string; path: string; district: string | null }>,
+  date: string,
+) {
+  const house = contests.filter((row) => /\/house-[^/]+$/u.test(row.path));
+  const statewide = contests.filter(
+    (row) => !house.includes(row) && TOP.test(row.path.split("/").at(-1) ?? ""),
+  );
+  const result = await db.execute<{ contest: string; unit: string }>(sql`
+    with h as (
+      select c.id as contest, g.geom from contest c
+      join area_geometry g on g.area_id = c.district_area_id and g.valid @> ${date}::date
+      where c.id = any(${sql.param(house.map((row) => row.id))}::uuid[])
+    )
+    select c.id as contest, u.id as unit from contest c
+    join reporting_unit s on s.area_id = c.district_area_id and s.scheme_code = 'us.state' and s.valid @> ${date}::date
+    join reporting_unit u on u.parent_id = s.id and u.scheme_code = 'us.county' and u.valid @> ${date}::date
+    where c.id = any(${sql.param(statewide.map((row) => row.id))}::uuid[])
+    union
+    select h.contest, u.id from h
+    join area_geometry cg on cg.geom && h.geom and cg.valid @> ${date}::date
+    join reporting_unit u on u.area_id = cg.area_id and u.scheme_code = 'us.county' and u.valid @> ${date}::date
+    where st_area(st_intersection(cg.geom, h.geom)) > 0.005 * st_area(cg.geom)
+  `);
+  return result.rows;
+}
+
 async function night(
   found: { id: string; path: string; date: string; rest: string },
   picked: Array<{ id: string; path: string; district: string | null }>,
   detail: "race" | "state" | "national",
 ) {
   const contests = picked.map((row) => row.id);
-  const [frames, choices, incumbents, settled, prior] = await Promise.all([
-    db.execute<{
-      k: number;
-      contest: string;
-      at: string;
-      reporting: number | null;
-      expected: number | null;
-      publisher: string;
-      url: string | null;
-    }>(sql`
+  const [frames, choices, incumbents, settled, prior, drawn] =
+    await Promise.all([
+      db.execute<{
+        k: number;
+        contest: string;
+        at: string;
+        reporting: number | null;
+        expected: number | null;
+        publisher: string;
+        url: string | null;
+      }>(sql`
       select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
         f.reporting, f.expected, d.publisher, d.url
       from live.frame f join live.feed d on d.id = f.feed_id
       where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active'
       order by f.as_of
     `),
-    options(contests, found.date),
-    db.execute<{ option: string }>(sql`
+      options(contests, found.date),
+      db.execute<{ option: string }>(sql`
       select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
       where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
     `),
-    certified(contests),
-    baselines(picked, found.date),
-  ]);
+      certified(contests),
+      baselines(picked, found.date),
+      detail === "national" ? [] : geography(picked, found.date),
+    ]);
   const values = await db.execute<{
     k: number;
     unit: string;
@@ -619,6 +648,7 @@ async function night(
     ...new Set([
       ...values.rows.map((row) => row.unit),
       ...prior.map((row) => row.unit),
+      ...drawn.map((row) => row.unit),
     ]),
   ];
   const held = await db.execute<{
@@ -664,6 +694,7 @@ async function night(
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
   const priorBy = Map.groupBy(prior, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
+  const drawnBy = Map.groupBy(drawn, (row) => row.contest);
   const built = picked.map((row): LiveRace => {
     const own = choices.filter((choice) => choice.contest === row.id);
     const index = new Map(own.map((choice, position) => [choice.id, position]));
@@ -671,7 +702,9 @@ async function night(
     const raceFrames: Array<LiveFrame> = [];
     const counts: Array<LiveUnitCount> = [];
     const last = new Map<string, string>();
-    const seen = new Set<string>();
+    const seen = new Set<string>(
+      (drawnBy.get(row.id) ?? []).map((line) => line.unit),
+    );
     for (const frame of mine) {
       const totals = own.map(() => 0);
       const byUnit = new Map<string, Array<number>>();
