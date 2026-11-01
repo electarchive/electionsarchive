@@ -402,6 +402,12 @@ TABLES += [
     {"table": "1944:democratic", "htid": "uc1.$b619006", "leaves": (125, 126, 127, 128, 129, 130), "narrated": True},
     {"table": "1956:democratic", "htid": "uc1.$b619008", "leaves": (463, 464)},
 ]
+FIRST_1864 = (
+    "The proceedings print two tabulations of the one ballot. As first called (page 43), the roll gave George B. "
+    "McClellan 174, Thomas H. Seymour 38, Horatio Seymour 12, Charles O'Conor \u00bd, and 1\u00bd blank, of 226. Kentucky "
+    "and California then cast their votes for McClellan and Ohio revised its vote to 15 for McClellan and 6 for "
+    "Seymour before the result was announced; the revised ballot, stored here, is the one the convention declared."
+)
 PROCEEDINGS = [
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
@@ -422,7 +428,7 @@ PROCEEDINGS = [
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
-    {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1},
+    {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
     {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
     {"party": "democratic", "tables": {1: "1876:democratic:b1", 2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2},
     {"party": "democratic", "tables": {2: "1880:democratic:b2"}, "title": DNC + "in Cincinnati, O., June 22d, 23d, and 24th, 1880", "publisher": "Daily Journal Book and Job Rooms", "city": "Cincinnati", "days": (date(1880, 6, 22), date(1880, 6, 24)), "ballots": {1: date(1880, 6, 23), 2: date(1880, 6, 24)}, "deciding": 2, "held": 2},
