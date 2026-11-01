@@ -150,6 +150,8 @@ def page(title: str) -> str:
 
 
 LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
+HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
+INBOX = DATA / "inbox" / "manual" / "MF-557"
 RNC = "sim_republican-national-convention-proceedings_{}"
 TABLES = [
     {"table": "1968:republican:first", "item": RNC.format("august-5-8-1968"), "leaves": (409, 410)},
@@ -325,7 +327,15 @@ TABLES += [
         "item": "officialproceedi00indemo",
         "leaves": tuple(range(45, 58)),
         "narrated": True,
+        "only": True,
     },
+]
+TABLES += [
+    {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295)},
+    {"table": "1920:democratic:b44", "htid": "mdp.39015030799285", "leaves": (504, 505)},
+    {"table": "1924:democratic:b1", "htid": "mdp.39015030799251", "leaves": (356, 357, 358)},
+    {"table": "1948:democratic", "htid": "mdp.39015030799574", "leaves": tuple(range(314, 325)), "narrated": True},
+    {"table": "1956:democratic", "htid": "uc1.$b619008", "leaves": (463, 464)},
 ]
 PROCEEDINGS = [
     {"table": "1968:republican:final", "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballot": date(1968, 8, 7)},
@@ -670,10 +680,42 @@ CORRECTIONS = {
         (44, "OH", (0.334, 0.379, 0.378, 0.387), {"Stephen A. Douglas": 6.5}, "6½, which the delegation of 23 and the Douglas total of 118½ count"),
     ],
     "1856:democratic:b17": [
-        (45, "ME", (0.12, 0.865, 0.72, 0.89), {"votes": 8}, "Maine cast her eight votes for James Buchanan; she held 8"),
+        (45, "ME", (0.05, 0.865, 0.95, 0.89), {"votes": 8, "James Buchanan": 8}, "cast 8 votes for James Buchanan"),
+        (46, "NH", (0.05, 0.25, 0.95, 0.285), {"votes": 5, "James Buchanan": 5}, "cast 5 votes for James Buchanan"),
+        (46, "VT", (0.05, 0.65, 0.95, 0.69), {"votes": 5, "James Buchanan": 5}, "cast 5 votes for James Buchanan"),
+        (46, "MA", (0.05, 0.84, 0.95, 0.88), {"votes": 13, "James Buchanan": 13}, "cast 13 votes for James Buchanan"),
+        (57, "RI", (0.07, 0.575, 0.95, 0.64), {"votes": 4, "James Buchanan": 4}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 4"),
+        (47, "CT", (0.05, 0.28, 0.95, 0.305), {"votes": 6, "James Buchanan": 6}, "cast 6 votes for James Buchanan"),
+        (57, "NY", (0.07, 0.575, 0.95, 0.64), {"votes": 35, "James Buchanan": 35}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 35"),
+        (48, "NJ", (0.05, 0.125, 0.95, 0.145), {"votes": 7, "James Buchanan": 7}, "cast 7 votes for James Buchanan"),
+        (57, "PA", (0.07, 0.575, 0.95, 0.64), {"votes": 27, "James Buchanan": 27}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 27"),
+        (49, "DE", (0.05, 0.565, 0.95, 0.595), {"votes": 3, "James Buchanan": 3}, "cast 3 votes for James Buchanan"),
+        (49, "MD", (0.05, 0.565, 0.95, 0.595), {"votes": 8, "James Buchanan": 8}, "cast 8 votes for James Buchanan"),
+        (49, "VA", (0.05, 0.565, 0.95, 0.595), {"votes": 15, "James Buchanan": 15}, "cast 15 votes for James Buchanan"),
+        (50, "NC", (0.05, 0.41, 0.95, 0.44), {"votes": 10, "James Buchanan": 10}, "cast 10 votes for James Buchanan"),
+        (50, "SC", (0.05, 0.655, 0.95, 0.69), {"votes": 8, "James Buchanan": 8}, "cast 8 votes for James Buchanan"),
+        (57, "GA", (0.07, 0.575, 0.95, 0.64), {"votes": 10, "James Buchanan": 10}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 10"),
+        (57, "AL", (0.07, 0.575, 0.95, 0.64), {"votes": 9, "James Buchanan": 9}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 9"),
+        (51, "MS", (0.05, 0.81, 0.95, 0.835), {"votes": 7, "James Buchanan": 7}, "cast 7 votes for James Buchanan"),
+        (51, "LA", (0.05, 0.88, 0.95, 0.91), {"votes": 6, "James Buchanan": 6}, "cast 6 votes for James Buchanan"),
+        (52, "OH", (0.05, 0.405, 0.95, 0.435), {"votes": 23, "James Buchanan": 23}, "cast 23 votes for James Buchanan"),
+        (52, "KY", (0.05, 0.5, 0.95, 0.525), {"votes": 12, "James Buchanan": 12}, "cast 12 votes for James Buchanan"),
+        (57, "TN", (0.07, 0.575, 0.95, 0.64), {"votes": 12, "James Buchanan": 12}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 12"),
+        (52, "IN", (0.05, 0.815, 0.95, 0.84), {"votes": 13, "James Buchanan": 13}, "cast 13 votes for James Buchanan"),
+        (53, "IL", (0.05, 0.355, 0.95, 0.385), {"votes": 11, "James Buchanan": 11}, "cast 11 votes for James Buchanan"),
+        (57, "MO", (0.07, 0.575, 0.95, 0.64), {"votes": 9, "James Buchanan": 9}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 9"),
+        (55, "AR", (0.05, 0.225, 0.95, 0.25), {"votes": 4, "James Buchanan": 4}, "cast 4 votes for James Buchanan"),
+        (55, "MI", (0.05, 0.275, 0.95, 0.295), {"votes": 6, "James Buchanan": 6}, "cast 6 votes for James Buchanan"),
+        (55, "FL", (0.05, 0.31, 0.95, 0.33), {"votes": 3, "James Buchanan": 3}, "cast 3 votes for James Buchanan"),
+        (55, "TX", (0.05, 0.705, 0.95, 0.73), {"votes": 4, "James Buchanan": 4}, "cast 4 votes for James Buchanan"),
+        (55, "IA", (0.05, 0.73, 0.95, 0.75), {"votes": 4, "James Buchanan": 4}, "cast 4 votes for James Buchanan"),
+        (55, "WI", (0.05, 0.75, 0.95, 0.77), {"votes": 5, "James Buchanan": 5}, "cast 5 votes for James Buchanan"),
+        (57, "CA", (0.07, 0.575, 0.95, 0.64), {"votes": 4, "James Buchanan": 4}, "the president announced 296 votes for James Buchanan as the whole vote cast, and the delegation held 4"),
     ],
 }  # fmt: skip
 TOTALS = {
+    "1856:democratic:b7": {"James Buchanan": 143.5},
+    "1856:democratic:b17": {"James Buchanan": 296},
     "1912:democratic:b4": {"Marshall": 31, "Kern": 2},
     "1912:democratic:b15": {"Harmon": 29},
     "1912:democratic:b40": {"Not voting": 0.5},
@@ -699,7 +741,7 @@ def fetch() -> None:
     wanted: dict[str, batch.Want] = {}
     for spec in TABLES:
         for leaf in spec["leaves"]:
-            image = raw.fetch(SOURCE, LEAF.format(item=spec["item"], leaf=leaf), suffix=".jpg")
+            image = scan(spec, leaf, fetch=True)
             data = base64.b64encode(cropped(image.path, spec.get("crop"))).decode()
             for effort, scatter in product(READS.values(), (False, True)):
                 if scatter and not spec.get("scatter"):
@@ -735,6 +777,33 @@ def fetch() -> None:
                     (3000 * price_in + 4000 * price_out) / 1e6,
                 )
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
+
+
+def scan(spec: dict[str, object], leaf: int, fetch: bool = False) -> raw.Artifact:
+    if "htid" not in spec:
+        url = LEAF.format(item=spec["item"], leaf=leaf)
+        return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
+    url = HATHI.format(htid=spec["htid"], leaf=leaf)
+    try:
+        cached = raw.cached(SOURCE, url)
+        if cached.path.stat().st_size or not fetch:
+            return cached
+    except LookupError:
+        if not fetch:
+            raise
+    import subprocess
+    import tempfile
+
+    (pdf,) = (INBOX / str(spec["htid"]).replace("$", "")).glob(f"*-{leaf}-*.pdf")
+    with tempfile.TemporaryDirectory() as folder:
+        out = Path(folder) / "page"
+        subprocess.run(
+            ["pdftoppm", "-r", "300", "-gray", "-jpeg", "-jpegopt", "quality=90", "-singlefile", str(pdf), str(out)],
+            check=True,
+        )
+        image = out.with_suffix(".jpg").read_bytes()
+    retrieved = datetime.fromtimestamp(pdf.stat().st_mtime, UTC)
+    return raw.store(SOURCE, url, image, suffix=".jpg", retrieved_at=retrieved, media_type="image/jpeg")
 
 
 def cropped(path: Path, crop: str | None) -> bytes:
@@ -805,7 +874,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
     for leaf, scatter in product(spec["leaves"], (False, True)):
         if scatter and not spec.get("scatter"):
             continue
-        image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
+        image = scan(spec, leaf)
         try:
             response = json.loads(
                 raw.cached(SOURCE, read_key(effort, image.sha256, variant(spec, scatter, leaf))).path.read_text()
@@ -932,8 +1001,10 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
     if shifted and totals.get("votes", held) != held:
         totals = shifted
     totals |= TOTALS.get(spec["table"], {})
+    if spec.get("only"):
+        cells = []
     for leaf, code, box, figures, _ in CORRECTIONS.get(spec["table"], ()):
-        image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
+        image = scan(spec, leaf)
         cells = [cell for cell in cells if cell["state"] != code or cell["column"] not in figures]
         cells += [
             {
@@ -987,7 +1058,7 @@ def parse() -> None:
         if not failures:
             frames.append(pl.DataFrame(placed))
             for leaf in spec["leaves"]:
-                image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
+                image = scan(spec, leaf)
                 with Image.open(image.path) as opened:
                     opened.convert("L").resize((800, round(800 * opened.height / opened.width))).save(
                         PAGES / f"{image.sha256}-{leaf}.png"
@@ -1237,7 +1308,7 @@ def emit() -> Path:
             )
             pages = {}
             for leaf in spec["leaves"]:
-                image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
+                image = scan(spec, leaf)
                 artifact = cs.artifact(image, source)
                 pages[leaf] = cs.page(artifact, leaf)
                 render = PAGES / f"{image.sha256}-{leaf}.png"
