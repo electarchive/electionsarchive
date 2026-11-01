@@ -116,11 +116,21 @@ from (
 ) d
 """
 
-SWAP_SQL = """
+STALE_SQL = """
+delete from search_document d
+where not exists (
+    select from search_build b
+    where b.entity_id = d.entity_id and b.type = d.type and b.polity_id is not distinct from d.polity_id
+        and b.text = d.text and b.rank_boost::real = d.rank_boost
+)
+"""
+
+FRESH_SQL = """
 insert into search_document (entity_id, type, polity_id, text, tsv, rank_boost)
 select b.entity_id, b.type, b.polity_id, b.text, b.tsv, b.rank_boost
 from search_build b join entity e on e.id = b.entity_id and e.retired_by is null
-where not exists (select from entity_merge m where m.entity_id = b.entity_id)
+where not exists (select from search_document d where d.entity_id = b.entity_id)
+    and not exists (select from entity_merge m where m.entity_id = b.entity_id)
     and (b.polity_id is null or exists (
         select from polity p join entity pe on pe.id = p.id and pe.retired_by is null
         where p.id = b.polity_id and not exists (select from entity_merge m where m.entity_id = p.id)
@@ -138,8 +148,9 @@ def build() -> str:
             conn.execute(f"reset enable_{scan}")
         conn.execute("analyze search_size")
         conn.execute(BUILD_SQL)
+        conn.execute("analyze search_build")
         conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
-        conn.execute("delete from search_document")
-        inserted = conn.execute(SWAP_SQL).rowcount
+        deleted = conn.execute(STALE_SQL).rowcount
+        inserted = conn.execute(FRESH_SQL).rowcount
         conn.execute("analyze search_document")
-    return f"{inserted} search documents in {time.monotonic() - started:.0f}s"
+    return f"{deleted} search documents removed and {inserted} written in {time.monotonic() - started:.0f}s"
