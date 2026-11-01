@@ -22,9 +22,7 @@ HAMILTON = "https://www.hamiltoncountyohio.gov/government/departments/board_of_e
 HAMILTON_FILE = INBOX / "hamilton" / "November-2026-Ballot-Issues.pdf"
 SUMMIT = "https://www.summitcountyohio.gov/boe/election-60-day-issue-synopsis"
 SUMMIT_FILE = INBOX / "summit" / "Election_60IssueSynopsis.pdf"
-CUYAHOGA = "https://boe.cuyahogacounty.gov/"
-CUYAHOGA_FILE = INBOX / "cuyahoga" / "PDF Sample Ballot Package.pdf"
-CUYAHOGA_BOXES = ((5, 20, 195, 375), (5, 215, 175, 355), (5, 392, 215, 325), (6, 20, 195, 545), (6, 215, 190, 345))
+CUYAHOGA = "https://boe.cuyahogacounty.gov/elections/GetDocumentById/0ed80c8b-5b7d-46d5-b60f-91a47eea555b/"
 WAYNE_FILE = "https://www.waynecountyoh.gov/wp-content/uploads/2026/09/Sample-Ballots-ALL-WATERMARK-09192026-1352.pdf"
 FRANKLIN = "https://vote.franklincountyohio.gov"
 FRANKLIN_PAGE = f"{FRANKLIN}/election-info/2026"
@@ -45,9 +43,9 @@ SOURCES = {
     ),
     CUYAHOGA: (
         "Cuyahoga",
-        CUYAHOGA_FILE,
+        None,
         "Cuyahoga County Board of Elections",
-        "Sample ballot (Bay Village 01-A), November 3, 2026 General Election",
+        "Issues list, November 3, 2026 General Election",
     ),
     WAYNE_FILE: (
         "Wayne",
@@ -225,42 +223,36 @@ def summit() -> list[dict[str, str]]:
 
 
 def cuyahoga() -> list[dict[str, str]]:
+    text = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, CUYAHOGA).path), "-"], capture_output=True, text=True, check=True
+    ).stdout.replace("\f", "\n")
     rows = []
-    path = str(raw.cached(SOURCE, CUYAHOGA).path)
-    for page, x, width, bottom in CUYAHOGA_BOXES:
-        text = subprocess.run(
-            [
-                "pdftotext",
-                "-f",
-                str(page),
-                "-l",
-                str(page),
-                "-layout",
-                "-x",
-                str(x),
-                "-y",
-                "135",
-                "-W",
-                str(width),
-                "-H",
-                str(bottom - 135),
-                path,
-                "-",
-            ],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout
-        flat = re.sub(r"\s+", " ", text).strip()
-        head, _, body = flat.partition("A majority affirmative vote is necessary for passage.")
-        kind = re.sub(r"^\d+ ", "", head)
+    for block in re.split(r"^\d+\s+[A-Z0-9]{5,6}\s{2,}", text, flags=re.MULTILINE)[1:]:
+        head, _, rest = block.partition("\n")
+        if "COUNTY WIDE" in head and "Constitutional" in rest:
+            continue
+        place = re.sub(r"\s*-\d\d-\s*[A-Z]$", "", head.strip())
+        chunks = re.split(r"\n\s*\n", re.split(r"^\s*\w+ Issues / Asuntos", rest, flags=re.MULTILINE)[0])
+        chunks = [c for c in chunks if c.strip() and not re.fullmatch(r"\s*Page \d+ of \d+\s*", c)]
+        paragraphs = [re.sub(r"\s+", " ", c).strip() for c in chunks]
+        spanish = next((i for i, p in enumerate(paragraphs) if p.startswith("Se requiere")), None)
+        if spanish is None or spanish < 4 or not paragraphs[1].startswith("A majority affirmative"):
+            print("cuyahoga skipped:", head.strip())
+            continue
+        lines = [line.strip() for line in chunks[0].splitlines() if line.strip()]
+        if lines[0].startswith(("Special", "Local", "Advisory")):
+            kind, entity = " ".join(lines), place
+        else:
+            count = 2 if len(lines) > 1 and lines[1].startswith("(") else 1
+            kind, entity = " ".join(lines[:count]), "|".join([*lines[count:], place])
+            entity = entity.replace("County of Cuyahoga", "Cuyahoga County")
         rows.append(
             {
                 "url": CUYAHOGA,
                 "county": "Cuyahoga",
-                "kind": kind.split(" County of")[0].split(" Board of")[0].split(" Health and")[0],
-                "entity": "Cuyahoga County",
-                "text": body.strip(),
+                "kind": kind,
+                "entity": entity,
+                "text": " ".join(paragraphs[2 : spanish - 1]),
             }
         )
     return rows
@@ -351,6 +343,10 @@ def keys(name: str) -> set[str]:
 
 def token(note: str) -> re.Pattern[str]:
     purpose = note.split("Purpose:")[-1]
+    section = re.search(r"Article ([IVX]+), Section ([\d.]*\d)(?:\s*\((\w)\))?", purpose)
+    if section:
+        tail = rf"\s*\({section[3]}\)" if section[3] else r"(?![\d.]|\s*\()"
+        return re.compile(rf"Article {section[1]}, Section {re.escape(section[2])}{tail}", re.IGNORECASE)
     roman = re.search(r"Articles? ([IVX]+)\b", purpose)
     if roman:
         return re.compile(rf"Articles? {roman[1]}\b")
@@ -440,10 +436,9 @@ def emit() -> Path:
             ).fetchall()
             if ceda._core(name) in counties
         }
-        home = {
-            entry["leaid"]: str(entry["county_code"])
-            for entry in json.loads(raw.cached(SCHOOLS, DIRECTORY).path.read_text())["results"]
-        }
+        directory = json.loads(raw.cached(SCHOOLS, DIRECTORY).path.read_text())["results"]
+        home = {entry["leaid"]: str(entry["county_code"]) for entry in directory}
+        leas = {entry["leaid"]: entry["lea_name"].lower() for entry in directory}
         contests: dict[str, list[tuple[UUID, str, str, str]]] = {}
         for contest, code, name, note in conn.execute(
             """select c.id, split_part(x.value, ':', 3), n.text, coalesce(t.body_md, '') from contest c
@@ -453,6 +448,8 @@ def emit() -> Path:
                left join note t on t.entity_id = c.id and t.kind = 'context'""",
             [f"{DAY}:OH:%:question:%"],
         ).fetchall():
+            if len(code) == 7 and code in leas and name.split()[0].lower() not in leas[code]:
+                home.pop(code, None)
             if len(code) == 10:
                 home[code] = code[:5]
             elif len(code) == 5:
