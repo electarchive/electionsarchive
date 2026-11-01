@@ -269,7 +269,10 @@ def summit() -> list[dict[str, str]]:
 
 def cuyahoga() -> list[dict[str, str]]:
     text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, CUYAHOGA).path), "-"], capture_output=True, text=True, check=True
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, CUYAHOGA).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout.replace("\f", "\n")
     rows = []
     for block in re.split(r"^\d+\s+[A-Z0-9]{5,6}\s{2,}", text, flags=re.MULTILINE)[1:]:
@@ -324,7 +327,9 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
             print("no header:", county, head)
             continue
         head[0] = re.sub(
-            r"^(?:Sample\s*)*(?:#?\d+\.?(?:\s\d)?\s*)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)", "", head[0]
+            r"^(?:Sample\s*)*(?:#?\d+\.?(?:\s\d)?\s*)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)",
+            "",
+            head[0],
         )
         cursor = index + 1
         if lines[cursor].startswith("necessary for passage"):
@@ -416,7 +421,9 @@ def stark() -> list[dict[str, str]]:
             if re.match(rf"(an? )?{word}|.{{0,40}}\b{word}\b", lower):
                 kind += f" ({word.title()})"
                 break
-        rows.append({"url": key, "county": county, "kind": kind, "entity": entity, "text": body, **mf_meta(county, path)})
+        rows.append(
+            {"url": key, "county": county, "kind": kind, "entity": entity, "text": body, **mf_meta(county, path)}
+        )
     return rows
 
 
@@ -436,6 +443,35 @@ def keys(name: str) -> set[str]:
         r"^(City|Village|Township) of (.+)$", lambda m: f"{m[2]} {m[1]}" if m[1] == "Township" else m[2], name
     )
     return {ceda._core(name), ceda._city(name), ceda._core(bare), ceda._city(bare)}
+
+
+ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
+
+
+def arabic(numeral: str) -> int:
+    total = 0
+    for index, letter in enumerate(numeral):
+        value = ROMAN[letter]
+        total += -value if index + 1 < len(numeral) and ROMAN[numeral[index + 1]] > value else value
+    return total
+
+
+def references(text: str) -> str:
+    article = re.search(r"Article ([IVX]+)\b", text)
+    if article is None:
+        return text
+    extra = []
+    added = re.search(r"add Section (\d+)\s*\((\w)\)", text)
+    if added:
+        extra.append(f"Article {article[1]}, Section {added[1]}({added[2]})")
+    item = re.search(r"(Item|Sections?) (\d+)(?:\.([A-Z]))?(?: and (\d+))?", text[article.end() :])
+    if item:
+        number = arabic(article[1])
+        width = 1 if item[1] == "Item" else 2
+        for part in (item[2], item[4]):
+            if part:
+                extra.append(f"{number}.{part.zfill(width)}{item[3] or ''}")
+    return " ".join([text, *extra])
 
 
 def token(note: str) -> re.Pattern[str]:
@@ -497,7 +533,7 @@ def pick(
             )
         ] or narrowed
     if len(narrowed) > 1:
-        narrowed = [c for c in narrowed if token(c[2]).search(row["text"])] or narrowed
+        narrowed = [c for c in narrowed if token(c[2]).search(references(row["text"]))] or narrowed
     if len(narrowed) > 1:
         words = set(re.findall(r"[a-z]{5,}", f"{row['entity']} {row['text']}".lower()))
         scores = sorted(

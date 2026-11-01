@@ -219,6 +219,124 @@ ADDED: list[dict[str, str]] = [
 ]
 
 
+CUYAHOGA_LIQUOR: list[tuple[str, str, str, str]] = [
+    (
+        "City",
+        "Cleveland",
+        "Sunday sales of wine and mixed beverages, 2976, Inc., Chillie's Beverage & Deli",
+        "Sunday sales of wine and mixed beverages at a carryout and grocery store. Purpose: 2976, Inc., dba Chillie's Beverage & Deli, 2976 East 116th Street, Cleveland.",
+    ),
+    (
+        "City",
+        "Cleveland",
+        "Sunday sales of wine and mixed beverages, Aarjun Krupa, Old Brooklyn Food Mart",
+        "Sunday sales of wine and mixed beverages at a carryout and grocery store. Purpose: Aarjun Krupa, L.L.C., dba Old Brooklyn Food Mart, 4785 Pearl Road, Cleveland.",
+    ),
+    (
+        "City",
+        "Cleveland",
+        "Sunday sales of beer, Haba Inc, Sunoco One Stop",
+        "Sunday sales of beer at a convenience store and gas station. Purpose: Haba Inc, dba Sunoco One Stop, 4402 Lorain Avenue, Cleveland.",
+    ),
+    (
+        "City",
+        "Cleveland",
+        "Sunday sales of wine and mixed beverages, Sadguru 1 Krupa, Memphis Mart",
+        "Sunday sales of wine and mixed beverages at a carryout and grocery store. Purpose: Sadguru 1 Krupa, L.L.C., dba Memphis Mart, 6226 Memphis Avenue, Cleveland.",
+    ),
+    (
+        "City",
+        "Cleveland",
+        "Sunday sales of wine and mixed beverages, Jaspreet, Inc., Convenient Food Mart",
+        "Sunday sales of wine and mixed beverages at a carryout and grocery store. Purpose: Jaspreet, Inc., dba Convenient Food Mart, 12520 Lorain Avenue, Cleveland.",
+    ),
+    (
+        "City",
+        "Cleveland",
+        "Sunday sales of wine and mixed beverages, Shivay CFM, Convenient Food Mart",
+        "Sunday sales of wine and mixed beverages at a carryout and grocery store. Purpose: Shivay CFM, L.L.C., dba Convenient Food Mart, 3753 Pearl Road, Cleveland.",
+    ),
+    (
+        "City",
+        "Parma Heights",
+        "Sunday sales of wine, mixed beverages, and spirituous liquor, Matador Parma, Santo Matador Street Tacos",
+        "Sunday sales of wine, mixed beverages, and spirituous liquor at a restaurant. Purpose: Matador Parma LLC, dba Santo Matador Street Tacos, 6699 West 130th Street, Parma Heights.",
+    ),
+    (
+        "City",
+        "Parma Heights",
+        "Sunday sales of wine and mixed beverages, 12215 Gas LLC, Heights Bar and Grill",
+        "Sunday sales of wine and mixed beverages at a convenience store and gas station. Purpose: 12215 Gas LLC, dba Heights Bar and Grill, 12215 Huffman Road, Parma Heights.",
+    ),
+    (
+        "City",
+        "South Euclid",
+        "Spirituous liquor, VMPR, Green Luxury Loft",
+        "Weekday sales of spirituous liquor at a wedding and event venue, D3 and D5 permits. Purpose: VMPR, L.L.C., dba Green Luxury Loft, 800 South Green Road, South Euclid.",
+    ),
+    (
+        "City",
+        "South Euclid",
+        "Sunday sales of wine, mixed beverages, and spirituous liquor, VMPR, Green Luxury Loft",
+        "Sunday sales of wine, mixed beverages, and spirituous liquor at a wedding and event venue, D-6 permit. Purpose: VMPR, L.L.C., dba Green Luxury Loft, 800 South Green Road, South Euclid.",
+    ),
+    (
+        "City",
+        "Bay Village",
+        "Sunday sales of beer, wine, and mixed beverages, BAYarts",
+        "Sunday sales of beer, wine, and mixed beverages at a nonprofit arts organization. Purpose: BAYarts, 28601 and 28795 Lake Road, Bay Village.",
+    ),
+    (
+        "City",
+        "Maple Heights",
+        "Sunday sales of wine, mixed beverages, and spirituous liquor, Dunham Inn",
+        "Sunday sales of wine, mixed beverages, and spirituous liquor at a bar. Purpose: Dunham Inn, L.L.C., 6140 Dunham Road, Maple Heights.",
+    ),
+    (
+        "City",
+        "Shaker Heights",
+        "Sunday sales of wine and mixed beverages, Shivay 22, Shaker Smoke & Beverage",
+        "Sunday sales of wine and mixed beverages at a carryout and grocery store. Purpose: Shivay 22, L.L.C., dba Shaker Smoke & Beverage, 3753 Lee Road, Shaker Heights.",
+    ),
+    (
+        "City",
+        "University Heights",
+        "Sunday sales of wine and mixed beverages, Trader Joe's East",
+        "Sunday sales of wine and mixed beverages at a grocery store. Purpose: Trader Joe's East Inc., dba Trader Joe's, 2643 Warrensville Center Road, University Heights.",
+    ),
+]
+ADDED += [
+    {
+        "county": "Cuyahoga",
+        "kind": kind,
+        "name": name,
+        "label": label,
+        "text": f"{LIQUOR}: {text}",
+    }
+    for kind, name, label, text in CUYAHOGA_LIQUOR
+]
+ADDED += [
+    {
+        "county": "Cuyahoga",
+        "kind": "Village",
+        "name": "Oakwood",
+        "geoid": "3957750",
+        "label": f"Charter Amendment: Section {section}",
+        "text": f"Miscellaneous. Purpose: Charter Amendment: Section {section}.",
+    }
+    for section in ("6.06", "6.07", "7.01", "7.03", "7.04", "7.07", "7.08", "7.14", "10.11", "13.07", "13.08")
+]
+ADDED.append(
+    {
+        "county": "Cuyahoga",
+        "kind": "City",
+        "name": "Olmsted Falls",
+        "label": "Tax on income, increase to 2 percent",
+        "text": "Income tax, increase: 2 percent, beginning 2027. Purpose: General municipal operations, new equipment, extension and enlargement of municipal services and facilities, and capital improvements.",
+    }
+)
+
+
 WORDING: dict[str, str] = json.loads(Path(__file__).with_name("oh_franklin_wording.json").read_text())
 
 
@@ -285,9 +403,10 @@ def parse() -> None:
                 "name": name,
                 "text": WORDING.get(f"{name}|{label}") or describe(row),
                 "label": label,
+                "geoid": "",
             }
         )
-    rows += ADDED
+    rows += [{"geoid": "", **row} for row in ADDED]
     PARSED.mkdir(parents=True, exist_ok=True)
     out = pl.DataFrame(rows)
     out.write_parquet(PARSED / "questions.parquet")
@@ -379,8 +498,11 @@ def emit() -> Path:
                 scheme = "us.school_district"
             else:
                 options = places.get(ceda._city(name), [])
-                key = options[0] if len(options) == 1 else None
                 spec = candidates.get(("place", ceda._city(name)), [])
+                if row["geoid"]:
+                    options = [o for o in options if o == f"us.place:{row['geoid']}"]
+                    spec = [s for s in spec if s[1] == row["geoid"]]
+                key = options[0] if len(options) == 1 else None
                 scheme = "us.place"
             if key is None and len(spec) == 1:
                 owner, geoid, text = spec[0]
