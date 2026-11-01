@@ -28,7 +28,7 @@ from ea.sources.tr.ysk_local import own_area, own_areas
 from ea.store import DATA, connect
 
 SOURCE = "tr.die_local"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 LIBRARY = "https://kutuphane.tuik.gov.tr/pdf"
@@ -1078,6 +1078,33 @@ SPELLINGS_1973 = {
     "Içel": "Merkez",
     "İçel": "Merkez",
 }
+LABELS_1963_1973 = {
+    ("04", "Doğubeyazıt"): "Doğubayazıt",
+    ("04", "Doğu Bayazit"): "Doğubayazıt",
+    ("06", "Ş. Koçhisar"): "Şereflikoçhisar",
+    ("06", "Elmadağı"): "Elmadağ",
+    ("06", "Izılcahamam"): "Kızılcahamam",
+    ("11", "Bozhüyük"): "Bozüyük",
+    ("16", "M. Kemal Paşa"): "Mustafakemalpaşa",
+    ("16", "M. Kemalpaşa"): "Mustafakemalpaşa",
+    ("17", "OBzcaada"): "Bozcaada",
+    ("18", "Apraklı"): "Yapraklı",
+    ("28", "Ey Nesil"): "Eynesil",
+    ("28", "Şebikarahisar"): "Şebinkarahisar",
+    ("30", "Şemdinni"): "Şemdinli",
+    ("31", "Samandağı"): "Samandağ",
+    ("31", "Samandağı Ni"): "Samandağ",
+    ("32", "Eğridir"): "Eğirdir",
+    ("34", "Ümıaniye"): "Ümraniye",
+    ("35", "Seferhisar"): "Seferihisar",
+    ("38", "Sanz"): "Sarız",
+    ("39", "MBabaeski"): "Babaeski",
+    ("40", "Çiçekdağ"): "Çiçekdağı",
+    ("45", "Göıdes"): "Gördes",
+    ("48", "Bodıum"): "Bodrum",
+    ("53", "Aıdeşen"): "Ardeşen",
+    ("62", "Çemişkezek"): "Çemişgezek",
+}
 KEYS = {
     "AP": "adalet-partisi-1961",
     "CHP": "cumhuriyet-halk-partisi",
@@ -1198,6 +1225,18 @@ def emit() -> Path:
         for old, new in pairs:
             cs.renamed[new] = old
             cs.renamed[f"{new[:4]}:{new[11:]}"] = f"{old[:4]}:{old[11:]}"
+        relabeled = list(
+            pl.read_csv(
+                Path(__file__).with_name("die_local_relabeled.tsv"), separator="\t", infer_schema=False
+            ).iter_rows()
+        )
+        printed_keys = {new: old for old, new in relabeled}
+        relinked: set[str] = set()
+        taken = dict(
+            conn.execute(
+                "select path, entity_id from slug where path ~ '^tr/.*/(1963-11-17|1973-12-09)-local(/mayor)?$'"
+            ).fetchall()
+        )
 
         def name(entity: UUID, text: str, lang: str = "tr", kind: str = "official") -> None:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
@@ -1418,7 +1457,7 @@ def emit() -> Path:
                                 kind="aggregate",
                             )
                             name(unit, title(label))
-                        resolved[(plate, label)] = (unit, label)
+                        resolved[(plate, label)] = (unit, LABELS_1963_1973.get((plate, label), label))
                     else:
                         area, text = hit
                         if area not in equals:
@@ -1436,7 +1475,7 @@ def emit() -> Path:
                                 kind="aggregate",
                             )
                             name(equals[area], title(text))
-                        resolved[(plate, label)] = (equals[area], text)
+                        resolved[(plate, label)] = (equals[area], LABELS_1963_1973.get((plate, text), text))
                 return resolved[(plate, label)][0]
 
             local = cs.key("tr.election", f"{day}:local")
@@ -1487,17 +1526,22 @@ def emit() -> Path:
                 office = cs.key("tr.office", f"{key}-mayor")
                 if key not in polities:
                     polities.add(key)
+                    relinked.add(key)
                     cs.add("polity", id=polity, kind="municipality", iso_code=None)
                     name(polity, f"{english} Municipality", "en")
                     name(polity, f"{english} Belediyesi", kind="native")
                     cs.add("polity_parent", polity_id=polity, parent_id=turkey)
+                    cs.add("slug", path=path, entity_id=polity)
+                elif f"{day}:{key}" in printed_keys and key not in relinked:
+                    relinked.add(key)
                     cs.add("slug", path=path, entity_id=polity)
                 if office in cs.minted and office not in offices:
                     offices.add(office)
                     cs.add("office", id=office, polity_id=polity, kind="mayor")
                     name(office, f"Mayor of {english}", "en")
                     name(office, f"{english} Belediye Başkanı", kind="native")
-                election = cs.key("tr.election", f"{day}:{key}-mayor")
+                ident = printed_keys.get(f"{day}:{key}", f"{day}:{key}")
+                election = cs.key("tr.election", f"{ident}-mayor")
                 cs.add(
                     "election",
                     id=election,
@@ -1510,9 +1554,12 @@ def emit() -> Path:
                 )
                 name(election, f"{year} {english} mayoral election", "en")
                 name(election, f"{year} {english} Belediye Başkanlığı Seçimi", kind="native")
-                cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
-                contest_key = f"{day}:{key}-mayor"
+                if taken.get(f"{path}/{day}-local", election) == election:
+                    cs.add("slug", path=f"{path}/{day}-local", entity_id=election)
+                contest_key = f"{ident}-mayor"
                 contest = cs.key("tr.contest", contest_key)
+                if ident != f"{day}:{key}":
+                    cs.add("external_id", entity_id=contest, scheme="tr.contest", value=f"{day}:{key}-mayor")
                 cs.add(
                     "contest",
                     id=contest,
@@ -1528,7 +1575,8 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 name(contest, f"Mayor of {english}", "en")
-                cs.add("slug", path=f"{path}/{day}-local/mayor", entity_id=contest)
+                if taken.get(f"{path}/{day}-local/mayor", contest) == contest:
+                    cs.add("slug", path=f"{path}/{day}-local/mayor", entity_id=contest)
                 declared = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
                     "result_set",
@@ -1622,7 +1670,7 @@ def emit() -> Path:
                         kind="caveat",
                         body_md=SUSPECT_1973.format(mayor=person_name, party=party_names[label]),
                     )
-                person = cs.key(f"{SOURCE}.person", f"{year}:{key}")
+                person = cs.key(f"{SOURCE}.person", f"{year}:{ident[11:]}")
                 if person in cs.minted:
                     cs.add("person", id=person)
                     name(person, person_name)
@@ -1895,7 +1943,7 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
-        for old, new in pairs:
+        for old, new in [*pairs, *relabeled]:
             before, after = old[11:], new[11:]
             if before != after and before in mine and mine[before] not in holders:
                 cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
@@ -1920,12 +1968,23 @@ def emit() -> Path:
                 ).fetchall():
                     cs.add("entity_retirement", entity_id=person, reason=reason)
         used = set(facts["unit_id"].unique())
-        for (unit,) in conn.execute(
-            """select ru.id::text from reporting_unit ru join changeset ch on ch.id = ru.changeset_id
-               where ch.pipeline = %s""",
+        fixes = {
+            f"{slug(PROVINCES[int(plate) - 1])}-{slug(printed)}": f"{slug(PROVINCES[int(plate) - 1])}-{slug(label)}"
+            for (plate, printed), label in LABELS_1963_1973.items()
+        }
+        for unit, scheme, code in conn.execute(
+            """select ru.id::text, ru.scheme_code, ru.code from reporting_unit ru
+               join changeset ch on ch.id = ru.changeset_id
+               where ch.pipeline = %s and not exists (select from entity_merge m where m.entity_id = ru.id)""",
             [SOURCE],
         ).fetchall():
-            if unit not in used:
+            if unit in used:
+                continue
+            prefix = max((f for f in fixes if code == f or code.startswith(f"{f}-")), key=len, default=None)
+            into = None if prefix is None else cs.unit(scheme, fixes[prefix] + code[len(prefix) :])
+            if into is not None and str(into) in used:
+                cs.merge(UUID(unit), into)
+            else:
                 cs.add(
                     "entity_retirement",
                     entity_id=unit,
