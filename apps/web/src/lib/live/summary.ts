@@ -6,7 +6,6 @@ import type {
   LiveRace,
 } from "@ea/analytics/live";
 import { count, percent } from "#lib/format.js";
-import { calibrate } from "#lib/live/calibrate.js";
 import { lead, stamp } from "#lib/live/format.js";
 import { ranked, sum } from "#lib/live/standing.js";
 import { m } from "#lib/paraglide/messages.js";
@@ -26,8 +25,10 @@ export type Summary = {
   at: string | null;
 };
 
-export function summarize(race: LiveRace, found: LiveEstimate | null): Summary {
-  const estimate = found == null ? null : calibrate(found);
+export function summarize(
+  race: LiveRace,
+  estimate: LiveEstimate | null,
+): Summary {
   const frame = race.frames.at(-1) ?? null;
   const totals =
     race.certified?.totals ?? frame?.totals ?? race.options.map(() => 0);

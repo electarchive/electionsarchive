@@ -235,10 +235,11 @@ async function options(contests: Array<string>, date: string) {
     person: string | null;
     ballot: string | null;
     party: string | null;
+    family: string | null;
     color: string | null;
   }>(sql`
     select o.id, o.contest_id as contest, o.kind::text, o.ballot_label as label, ca.person_id as person, ca.ballot_name as ballot,
-      line.party, ${color(sql`line.party`, sql`${date}::date`)} as color
+      line.party, coalesce(a.parent_party_id, line.party) as family, ${color(sql`line.party`, sql`${date}::date`)} as color
     from contest_option o left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
     left join lateral (
       select x.party_id as party from contest_option x
@@ -250,6 +251,7 @@ async function options(contests: Array<string>, date: string) {
         exists (select from party_color pc where pc.party_id = x.party_id) desc, x.k
       limit 1
     ) line on true
+    left join party_affiliation a on a.party_id = line.party and a.kind = 'regional_branch' and a.valid @> ${date}::date
     where o.contest_id = any(${sql.param(contests)}::uuid[]) and o.parent_option_id is null
   `);
   const people = found.rows.flatMap((row) =>
@@ -281,6 +283,7 @@ async function options(contests: Array<string>, date: string) {
       row.party == null
         ? `${row.kind}:${(row.label ?? "").toLowerCase()}`
         : `party:${row.party}`,
+    family: row.kind === "write_in" ? null : row.family,
     color: row.color,
   }));
 }
@@ -413,6 +416,14 @@ const CLOSES: Record<string, number> = {
   ak: 1500,
 };
 const TOP = /^(?:senate(?:-special)?|governor|house-(?:\d+|at-large))$/u;
+const STATEWIDE = [
+  "senate",
+  "senate-special",
+  "governor",
+  "lieutenant-governor",
+  "attorney-general",
+  "secretary-of-state",
+];
 const done = new Map<
   string,
   { key: string; value: Awaited<ReturnType<typeof night>> }
@@ -517,14 +528,21 @@ async function baselines(
   const wanted = contests.map((row) => {
     const parts = row.path.split("/");
     const seat = parts.at(-1) ?? "";
+    const at = (suffix: string, name: string) =>
+      `${parts[0]}/${parts[1]}/${suffix}/${name}`;
     return {
       ...row,
-      paths: generals.rows.map(
-        ({ suffix }) =>
-          `${parts[0]}/${parts[1]}/${suffix}/${seat.startsWith("house") ? seat : "president"}`,
-      ),
+      seats: seat.startsWith("house")
+        ? generals.rows.map(({ suffix }) => at(suffix, seat))
+        : [],
+      presidents: generals.rows.map(({ suffix }) => at(suffix, "president")),
     };
   });
+  const scaling = ratios(
+    wanted,
+    date,
+    generals.rows.map((row) => row.suffix),
+  );
   const candidates = await db.execute<{
     path: string;
     id: string;
@@ -532,23 +550,34 @@ async function baselines(
   }>(sql`
     select s.path, c.id, c.district_area_id as district
     from slug s join contest c on c.id = s.entity_id
-    where s.path = any(${sql.param([...new Set(wanted.flatMap((row) => row.paths))])}::text[]) and s.is_current
+    where s.path = any(${sql.param([...new Set(wanted.flatMap((row) => [...row.seats, ...row.presidents]))])}::text[]) and s.is_current
       and exists (select from result_set rs where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted')
   `);
   const byPath = new Map(candidates.rows.map((row) => [row.path, row]));
   const pairs = wanted.flatMap((row) => {
-    const prior = row.paths
+    const seat = row.seats
       .map((path) => byPath.get(path))
-      .find(
-        (candidate) =>
-          candidate != null &&
-          (candidate.path.endsWith("/president") ||
-            candidate.district === row.district),
-      );
-    return prior == null ? [] : [{ contest: row.id, prior: prior.id }];
+      .find((candidate) => candidate?.district === row.district);
+    const president = row.presidents
+      .map((path) => byPath.get(path))
+      .find((candidate) => candidate != null);
+    return [
+      ...(seat == null
+        ? []
+        : [{ contest: row.id, prior: seat.id, kind: "seat" as const }]),
+      ...(president == null
+        ? []
+        : [
+            {
+              contest: row.id,
+              prior: president.id,
+              kind: "president" as const,
+            },
+          ]),
+    ];
   });
   if (pairs.length === 0) {
-    return [];
+    return { lines: [], ratios: await scaling };
   }
   const picked = await db.execute<{ prior: string; k: number }>(sql`
     select p.id as prior, x.k from unnest(${sql.param([...new Set(pairs.map((row) => row.prior))])}::uuid[]) as p(id) cross join lateral (
@@ -568,24 +597,125 @@ async function baselines(
     with counted as materialized (
       select v.result_set_k as k, v.unit_k, v.option_k, v.value from result_value v
       where v.result_set_k = any(${sql.param(picked.rows.map((row) => row.k))}::int[]) and v.measure = 1
+    ), lines as (
+      select c.option_k, sum(c.value) as votes from counted c group by 1
+    ), lead as (
+      select distinct on (top.id) top.id as top, coalesce(top.party_id, o.party_id) as party
+      from lines l join contest_option o on o.k = l.option_k
+      join contest_option top on top.id = coalesce(o.parent_option_id, o.id)
+      order by top.id, top.party_id is null, l.votes desc
     )
     select c.k, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit,
-      coalesce(top.party_id, o.party_id) as party, sum(c.value)::float8 as votes
+      coalesce(a.parent_party_id, lead.party) as party, sum(c.value)::float8 as votes
     from counted c join reporting_unit u on u.k = c.unit_k
       and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
     join contest_option o on o.k = c.option_k
-    join contest_option top on top.id = coalesce(o.parent_option_id, o.id)
+    join lead on lead.top = coalesce(o.parent_option_id, o.id)
+    left join party_affiliation a on a.party_id = lead.party and a.kind = 'regional_branch' and a.valid @> ${date}::date
     group by 1, 2, 3
   `);
   const byPrior = Map.groupBy(found.rows, (row) => priorOf.get(row.k) ?? "");
-  return pairs.flatMap((pair) =>
-    (byPrior.get(pair.prior) ?? []).map((row) => ({
-      contest: pair.contest,
-      unit: row.unit,
-      party: row.party,
-      votes: row.votes,
-    })),
+  return {
+    lines: pairs.flatMap((pair) =>
+      (byPrior.get(pair.prior) ?? []).map((row) => ({
+        contest: pair.contest,
+        kind: pair.kind,
+        unit: row.unit,
+        party: row.party,
+        votes: row.votes,
+      })),
+    ),
+    ratios: await scaling,
+  };
+}
+
+const scaled = new Map<string, Promise<Map<string, number>>>();
+
+async function load(state: string, midterm: string, presidential: string) {
+  const paths = [
+    `${state}/${presidential}/president`,
+    ...STATEWIDE.map((seat) => `${state}/${midterm}/${seat}`),
+  ];
+  const result = await db.execute<{
+    unit: string;
+    midterm: number | null;
+    presidential: number | null;
+  }>(sql`
+    with chosen as (
+      select c.id, split_part(s.path, '/', 3) = ${midterm} as midterm
+      from slug s join contest c on c.id = s.entity_id
+      where s.path = any(${sql.param(paths)}::text[]) and s.is_current
+    ), sets as (
+      select ch.midterm, x.k from chosen ch cross join lateral (
+        select rs.k from result_set rs
+        where rs.contest_id = ch.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
+          and (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
+        order by rs.is_default desc, rs.stage = 'certified' desc limit 1
+      ) x
+    ), totals as (
+      select s.k, s.midterm, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit, sum(v.value)::float8 as votes
+      from sets s join result_value v on v.result_set_k = s.k and v.measure = 1
+      join reporting_unit u on u.k = v.unit_k
+        and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
+      group by 1, 2, 3
+    )
+    select unit, max(votes) filter (where midterm) as midterm, max(votes) filter (where not midterm) as presidential
+    from totals group by unit
+  `);
+  const ratio = new Map<string, number>();
+  for (const row of result.rows) {
+    if (
+      row.midterm != null &&
+      row.presidential != null &&
+      row.presidential > 0
+    ) {
+      ratio.set(row.unit, row.midterm / row.presidential);
+    }
+  }
+  return ratio;
+}
+
+async function scale(state: string, midterm: string, presidential: string) {
+  const key = `${state}/${midterm}/${presidential}`;
+  const held = scaled.get(key);
+  if (held != null) {
+    return held;
+  }
+  const running = load(state, midterm, presidential);
+  scaled.set(key, running);
+  try {
+    return await running;
+  } catch (error) {
+    scaled.delete(key);
+    throw error;
+  }
+}
+
+async function ratios(
+  contests: Array<{ path: string }>,
+  date: string,
+  suffixes: Array<string>,
+) {
+  const year = Number(date.slice(0, 4));
+  const midterm = suffixes.find((suffix) => suffix.startsWith(`${year - 4}-`));
+  const presidential = suffixes.find((suffix) =>
+    suffix.startsWith(`${year - 6}-`),
   );
+  const ratio = new Map<string, number>();
+  if (year % 4 !== 2 || midterm == null || presidential == null) {
+    return ratio;
+  }
+  const states = new Set(
+    contests.map((row) => row.path.split("/").slice(0, 2).join("/")),
+  );
+  for (const part of await Promise.all(
+    [...states].map(async (state) => scale(state, midterm, presidential)),
+  )) {
+    for (const [unit, value] of part) {
+      ratio.set(unit, value);
+    }
+  }
+  return ratio;
 }
 
 async function geography(
@@ -662,7 +792,7 @@ async function night(
   const unitIds = [
     ...new Set([
       ...values.rows.map((row) => row.unit),
-      ...prior.map((row) => row.unit),
+      ...prior.lines.map((row) => row.unit),
       ...drawn.map((row) => row.unit),
     ]),
   ];
@@ -707,7 +837,7 @@ async function night(
   );
   const byFrame = Map.groupBy(values.rows, (row) => row.k);
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
-  const priorBy = Map.groupBy(prior, (row) => row.contest);
+  const priorBy = Map.groupBy(prior.lines, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
   const drawnBy = Map.groupBy(drawn, (row) => row.contest);
   const built = picked.map((row): LiveRace => {
@@ -754,38 +884,130 @@ async function night(
         }
       }
     }
-    const partyIndex = new Map(
-      own.flatMap((choice, position) =>
-        choice.key.startsWith("party:")
-          ? [[choice.key.slice(6), position] as const]
-          : [],
-      ),
+    const lines = priorBy.get(row.id) ?? [];
+    const seats = lines.filter((line) => line.kind === "seat");
+    const reach = new Set(
+      seats.length > 0
+        ? seats.map((line) => line.unit)
+        : (drawnBy.get(row.id) ?? []).map((line) => line.unit),
     );
-    const baseline = [
-      ...Map.groupBy(priorBy.get(row.id) ?? [], (line) => line.unit),
-    ].flatMap(([unit, lines]) => {
-      let turnout = 0;
-      const shares = own.map(() => 0);
-      for (const line of lines) {
-        turnout += line.votes;
-        const position =
-          line.party == null ? undefined : partyIndex.get(line.party);
-        if (position != null) {
-          shares[position] = (shares[position] ?? 0) + line.votes;
+    const house = /\/house-[^/]+$/u.test(row.path);
+    const presidents = lines.filter(
+      (line) => line.kind === "president" && (!house || reach.has(line.unit)),
+    );
+    const latest = raceFrames.at(-1)?.totals ?? [];
+    const allot = (source: typeof lines) => {
+      let all = 0;
+      const byParty = new Map<string, number>();
+      for (const line of source) {
+        all += line.votes;
+        if (line.party != null) {
+          byParty.set(line.party, (byParty.get(line.party) ?? 0) + line.votes);
         }
       }
-      if (turnout <= 0) {
-        return [];
+      const credit = new Map<string, Array<number>>();
+      for (const [position, choice] of own.entries()) {
+        if (choice.family != null) {
+          credit.set(choice.family, [
+            ...(credit.get(choice.family) ?? []),
+            position,
+          ]);
+        }
       }
+      const free = own.flatMap((choice, position) =>
+        choice.kind !== "write_in" &&
+        (choice.family == null ||
+          (byParty.get(choice.family) ?? 0) < 0.05 * all)
+          ? [position]
+          : [],
+      );
+      const orphan = [...byParty]
+        .filter(([party]) => !credit.has(party))
+        .toSorted((x, y) => y[1] - x[1])[0];
+      if (orphan != null && orphan[1] >= 0.15 * all) {
+        const stand =
+          free.length === 1
+            ? free[0]
+            : free
+                .toSorted((x, y) => (latest[y] ?? 0) - (latest[x] ?? 0))
+                .find((position) => (latest[position] ?? 0) > 0);
+        if (stand != null) {
+          credit.set(orphan[0], [stand]);
+        }
+      }
+      const overall = own.map(() => 0);
+      const units = new Map<
+        string,
+        { turnout: number; shares: Array<number> }
+      >();
+      for (const [unit, unitLines] of Map.groupBy(
+        source,
+        (line) => line.unit,
+      )) {
+        let turnout = 0;
+        const shares = own.map(() => 0);
+        for (const line of unitLines) {
+          turnout += line.votes;
+          const positions =
+            line.party == null ? [] : (credit.get(line.party) ?? []);
+          for (const position of positions) {
+            shares[position] =
+              (shares[position] ?? 0) + line.votes / positions.length;
+            overall[position] =
+              (overall[position] ?? 0) + line.votes / positions.length;
+          }
+        }
+        if (turnout > 0) {
+          units.set(unit, {
+            turnout,
+            shares: shares.map((votes) => votes / turnout),
+          });
+        }
+      }
+      return {
+        units,
+        usable:
+          all > 0 && overall.filter((votes) => votes >= 0.05 * all).length >= 2,
+      };
+    };
+    const fromSeat = allot(seats);
+    const chosen =
+      fromSeat.usable || presidents.length === 0
+        ? fromSeat.units
+        : allot(presidents).units;
+    const grouped = [...chosen].map(
+      ([unit, value]) =>
+        [
+          unit,
+          {
+            shares: value.shares,
+            turnout: fromSeat.units.get(unit)?.turnout ?? value.turnout,
+          },
+        ] as const,
+    );
+    let midterm = 0;
+    let presidential = 0;
+    for (const [unit, value] of grouped) {
+      const ratio = prior.ratios.get(unit);
+      if (ratio != null) {
+        midterm += value.turnout * ratio;
+        presidential += value.turnout;
+      }
+    }
+    const fallback = presidential > 0 ? midterm / presidential : null;
+    const baseline = grouped.map(([unit, value]) => {
       seen.add(unit);
-      return [
-        {
-          unitId: unit,
-          label: unitOf.get(unit)?.name ?? "",
-          turnout,
-          shares: shares.map((votes) => votes / turnout),
-        },
-      ];
+      return {
+        unitId: unit,
+        label: unitOf.get(unit)?.name ?? "",
+        turnout: value.turnout,
+        shares: value.shares,
+        ...(fallback != null && {
+          expected:
+            value.turnout *
+            Math.min(1.6, Math.max(0.3, prior.ratios.get(unit) ?? fallback)),
+        }),
+      };
     });
     const final = settledBy.get(row.id) ?? [];
     const certifiedTotals = own.map(() => 0);

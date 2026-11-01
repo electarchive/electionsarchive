@@ -1,6 +1,5 @@
 import type { LiveEstimate, LiveRace } from "@ea/analytics/live";
 import { estimate } from "@ea/analytics/live";
-import { calibrate } from "#lib/live/calibrate.js";
 import { pair, sum, toward } from "#lib/live/standing.js";
 
 export type Point = {
@@ -27,7 +26,7 @@ export function estimateAt(race: LiveRace, at: string | null) {
   if (held != null) {
     return held;
   }
-  const value = calibrate(estimate({ race, at: stamp === "" ? null : stamp }));
+  const value = estimate({ race, at: stamp === "" ? null : stamp });
   kept.set(id, value);
   if (kept.size > 4000) {
     kept.delete(kept.keys().next().value ?? "");
