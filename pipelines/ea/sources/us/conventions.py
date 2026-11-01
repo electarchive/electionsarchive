@@ -271,7 +271,7 @@ TABLES += [
     {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (38, 39, 40, 41), "narrated": True},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
-DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (213, 214), (217, 218), (219, 220), (221, 222), (223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (261, 262), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (324, 325), (327, 328), (330, 331), (332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
+DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (212, 213, 214), (217, 218), (219, 220), (221, 222), (222, 223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (261,), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (323, 324, 325), (327, 328), (330, 331), (332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
 DNC_1868 = (78, 80, 83, 86, 99, 102, 109, 112, 114, 117, 119, 122, 125, 127, 130, 132, 135, 138, 147, 150, 152)  # fmt: skip
 TABLES += [
     *(
@@ -279,9 +279,9 @@ TABLES += [
             "table": f"1912:democratic:b{n}",
             "item": "officialreportof00demoiala",
             "leaves": found,
-            "parts": {found[0]: "tail"} if found[0] in previous else {},
+            "parts": {leaf: "head" for leaf in found if leaf in after}
+            | {leaf: f"b{n}" for leaf in found if leaf in previous or (n, leaf) == (40, 333)},
         }
-        | ({"parts": {found[-1]: "head"}} if found[-1] in after else {})
         for n, (previous, found, after) in enumerate(
             zip(((),) + DNC_1912[:-1], DNC_1912, DNC_1912[1:] + ((),), strict=True), start=1
         )
@@ -605,7 +605,7 @@ def fetch() -> None:
                     if spec.get("ballot") is None
                     else ROLL + BALLOT.format(ordinal(spec["ballot"]))
                 )
-                wanted[read_key(effort, image.sha256, variant(spec, scatter))] = (
+                wanted[read_key(effort, image.sha256, variant(spec, scatter, leaf))] = (
                     MessageCreateParamsNonStreaming(
                         model="claude-haiku-5-5",
                         max_tokens=16000,
@@ -629,9 +629,11 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
-def variant(spec: dict[str, object], scatter: bool = False) -> str | None:
+def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
     if scatter:
         return "s"
+    if spec.get("parts", {}).get(leaf, "head") != "head":
+        return spec["parts"][leaf]
     if spec.get("narrated"):
         return "n"
     return None if spec.get("ballot") is None else f"b{spec['ballot']}"
@@ -682,7 +684,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
         image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
         try:
             response = json.loads(
-                raw.cached(SOURCE, read_key(effort, image.sha256, variant(spec, scatter))).path.read_text()
+                raw.cached(SOURCE, read_key(effort, image.sha256, variant(spec, scatter, leaf))).path.read_text()
             )
         except LookupError:
             problems.append(f"leaf {leaf}: not read")
@@ -733,12 +735,13 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
             continue
         rows = read["rows"]
-        if part := spec.get("parts", {}).get(leaf):
-            end = next(
-                (i + 1 for i, row in enumerate(rows) if re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE)),
-                len(rows),
-            )
-            rows = rows[:end] if part == "head" else rows[end:]
+        if spec.get("parts", {}).get(leaf) == "head":
+            rows = rows[
+                : next(
+                    (i + 1 for i, row in enumerate(rows) if re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE)),
+                    len(rows),
+                )
+            ]
         seen: dict[str | None, int] = {}
         for row in rows:
             values = row["values"]
