@@ -425,7 +425,7 @@ PROCEEDINGS = [
     {"tables": {n: f"1876:republican:b{n}" for n in range(1, 8)}, "ordinal": "Sixth", "city": "Cincinnati", "days": (date(1876, 6, 14), date(1876, 6, 16)), "ballots": dict.fromkeys(range(1, 8), date(1876, 6, 16)), "deciding": 7, "held": 7},
     {"tables": {n: f"1884:republican:b{n}" for n in range(1, 5)}, "ordinal": "Eighth", "city": "Chicago", "days": (date(1884, 6, 3), date(1884, 6, 6)), "ballots": dict.fromkeys(range(1, 5), date(1884, 6, 6)), "deciding": 4},
     {"tables": {n: f"1880:republican:b{n}" for n in range(1, 37)}, "ordinal": "Seventh", "city": "Chicago", "days": (date(1880, 6, 2), date(1880, 6, 8)), "ballots": dict.fromkeys(range(1, 29), date(1880, 6, 7)) | dict.fromkeys(range(29, 37), date(1880, 6, 8)), "deciding": 36, "held": 36},
-    {"tables": {n: f"1888:republican:b{n}" for n in (2, 3, 4, 5, 6, 7, 8)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8},
+    {"tables": {n: f"1888:republican:b{n}" for n in (1, 2, 3, 4, 5, 6, 7, 8)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8},
     {"tables": {1: "1896:republican"}, "ordinal": "Eleventh", "city": "St. Louis", "days": (date(1896, 6, 16), date(1896, 6, 18)), "ballots": {1: date(1896, 6, 18)}, "deciding": 1, "caveat": "The table gives no votes held by each delegation, so none are stored. Its footnotes say the delegations of Colorado and Idaho had bolted the convention, Montana's other five votes were four blank and one for J. Donald Cameron, three of Nevada's delegates were absent, and one New York vote was passed; those votes are not in the table's columns and are not stored."},
     {"tables": {1: "1900:republican"}, "ordinal": "Twelfth", "city": "Philadelphia", "days": (date(1900, 6, 19), date(1900, 6, 21)), "ballots": {1: date(1900, 6, 21)}, "deciding": 1},
     {"tables": {1: "1892:republican"}, "ordinal": "Tenth", "city": "Minneapolis", "days": (date(1892, 6, 7), date(1892, 6, 10)), "ballots": {1: date(1892, 6, 10)}, "deciding": 1},
@@ -1092,6 +1092,9 @@ CORRECTIONS = {
     ],
     "1888:republican:b1": [
         (376, "GA", (0.343, 0.712, 0.377, 0.723), {"not voting": 1}, "24 held, 23 recorded; 831 of 832 votes cast"),
+        (376, "AL", (0.03, 0.640, 0.90, 0.651), {"Allison": 0, "Fitler": 0, "Gresham": 0, "Hawley": 0, "Ingalls": 0, "Phelps": 0, "Rusk": 0, "Blaine": 0, "Lincoln": 0, "McKinley": 0, "Depew": 1, "Harrison": 1, "Sherman": 12, "Alger": 6}, "row read from the page"),
+        (376, "AR", (0.03, 0.655, 0.90, 0.666), {"Allison": 0, "Fitler": 0, "Gresham": 1, "Hawley": 0, "Ingalls": 10, "Phelps": 0, "Rusk": 0, "Blaine": 0, "Lincoln": 0, "McKinley": 0, "Depew": 0, "Harrison": 1, "Sherman": 2, "Alger": 0}, "row read from the page"),
+        (376, "CA", (0.03, 0.661, 0.90, 0.672), {"Allison": 0, "Fitler": 0, "Gresham": 0, "Hawley": 0, "Ingalls": 0, "Phelps": 0, "Rusk": 0, "Blaine": 16, "Lincoln": 0, "McKinley": 0, "Depew": 0, "Harrison": 0, "Sherman": 0, "Alger": 0}, "row read from the page"),
     ],
     "1888:republican:b2": [
         (380, "GA", (0.423, 0.311, 0.459, 0.321), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
