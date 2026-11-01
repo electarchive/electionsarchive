@@ -102,6 +102,7 @@ def fetch() -> None:
     for url, file, media_type in (
         (YAVAPAI, YAVAPAI_FILE, "text/csv"),
         (COCHISE, COCHISE_FILE, "text/html"),
+        (COCONINO, COCONINO_FILE, "text/html"),
     ):
         try:
             raw.cached(SOURCE, url)
