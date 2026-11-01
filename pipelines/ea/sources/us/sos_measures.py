@@ -22,7 +22,8 @@ from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import ak_sovc, fl_sos, gov_counties, ri_countbook
+from ea.sources.us import ak_sovc, ca_catb, fl_sos, gov_counties, ri_countbook
+from ea.sources.us.ca_catb_totals import CA_CATB_INITIATIVES, CA_CATB_REFERENDA, CA_CATB_TITLES, CA_CATB_TOTALS
 from ea.sources.us.ca_totals import CA_INITIATIVES, CA_TITLES, CA_TOTALS
 from ea.store import DATA, connect
 
@@ -2316,6 +2317,11 @@ CA_TOTALS_NOTE = (
     " Only the statewide totals are recorded: they were entered by hand from the Secretary of State's scanned Statement"
     " of Vote, which prints each measure's yes and no votes, and the box shown on each figure is approximate."
 )
+CA_CATB_NOTE = (
+    " Only the statewide totals are recorded, from the Secretary of State's Statement of Vote as reproduced by the"
+    " California Target Book. Each figure was read from the scanned page by machine, checked against a second reading, and"
+    " confirmed by eye wherever the two differed; the box shown on each figure is approximate."
+)
 NM_2003_NOTE = (
     " The county figures were transcribed by hand from the scanned canvass certified on October 14, 2003, and each"
     " column was checked against the canvass's printed statewide totals."
@@ -2489,6 +2495,20 @@ def fetch() -> None:
     for rows in CA_TOTALS.values():
         for url in {row[3] for row in rows}:
             raw.fetch(SOURCE, url, suffix=".pdf")
+    for rows in CA_CATB_TOTALS.values():
+        for url in {row[3] for row in rows}:
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                artifact = raw.cached(ca_catb.SOURCE, url)
+                raw.store(
+                    SOURCE,
+                    url,
+                    artifact.path.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=artifact.retrieved_at,
+                    media_type="application/pdf",
+                )
     store_manual(TX_2022, TX_2022_FILE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     for candidate in WV_2012_CANDIDATES.values():
         raw.fetch(SOURCE, WV_2012.format(candidate), suffix=".html")
@@ -5747,6 +5767,40 @@ def california_totals() -> list[dict[str, object]]:
     return rows
 
 
+def california_catb() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, entries in CA_CATB_TOTALS.items():
+        for number, yes, no, url, page, yes_box, no_box in entries:
+            kind = (
+                "Initiative"
+                if (day, number) in CA_CATB_INITIATIVES
+                else "Popular Referendum"
+                if (day, number) in CA_CATB_REFERENDA
+                else "Legislative Referendum"
+            )
+            for answer, votes, box in (("YES", yes, yes_box), ("NO", no, no_box)):
+                rows.append(
+                    {
+                        "state": "CA",
+                        "day": day,
+                        "number": number,
+                        "label": f"Proposition {number}",
+                        "title": CA_CATB_TITLES[day, number],
+                        "kind": kind,
+                        "url": url,
+                        "county": "statewide",
+                        "answer": answer,
+                        "votes": votes,
+                        "page": page,
+                        "x0": box[0],
+                        "y0": box[1],
+                        "x1": box[2],
+                        "y1": box[3],
+                    }
+                )
+    return rows
+
+
 def georgia_2022() -> list[dict[str, object]]:
     export = json.loads(raw.cached(SOURCE, GA_2022_URL).path.read_text())
     rows: list[dict[str, object]] = []
@@ -7384,6 +7438,7 @@ def parse() -> None:
             *georgia_2022(),
             *texas_2022(),
             *california_totals(),
+            *california_catb(),
             *oklahoma_history(),
             *oklahoma_history_pages(),
             *wisconsin(),
@@ -7845,6 +7900,8 @@ def emit() -> Path:
                         if state == "GA" and day.year == 2022
                         else TX_2022_NOTE
                         if state == "TX"
+                        else CA_CATB_NOTE
+                        if state == "CA" and day.year < 1990
                         else CA_TOTALS_NOTE
                         if state == "CA" and day.year < 1998
                         else AK_STATEWIDE_NOTE
