@@ -10623,7 +10623,13 @@ def parse() -> None:
                         ]
                         for variant in ([full, [word for word in full if word != "and"]] if "and" in full else [full])
                         + (
-                            [[word for word in full if word not in ("borough", "township", "city", "town", "village")]]
+                            [
+                                [
+                                    word
+                                    for word in full
+                                    if word not in ("borough", "township", "twp", "city", "town", "village")
+                                ]
+                            ]
                             if rest[0] == "school" and state == "NJ"
                             else []
                         )
