@@ -1,4 +1,5 @@
 import base64
+import io
 import json
 import re
 import unicodedata
@@ -308,13 +309,23 @@ TABLES += [
     *leaves("officialproceed00demo", "1864", {"": (43,)}, party="democratic"),
     *leaves("officialpr00demo", "1860", {"baltimore-b1": (168,), "baltimore-b2": (173,)}, party="democratic"),
     *leaves("officialproceedi00indemo", "1856", {"b13": (41,), "b14": (42,)}, party="democratic"),
-    *ballots(
-        "officialproceedi00indemo",
-        "1856",
-        {n: ((n - 1) // 4 + 38,) * 2 for n in range(1, 13)} | {15: (44, 44), 16: (44, 44)},
-        party="democratic",
+    *(
+        spec | {"crop": ("tl", "tr", "bl", "br")[(spec["ballot"] - 1) % 4]}
+        if spec["ballot"] in (2, 6, 7, 8, 9, 12)
+        else spec
+        for spec in ballots(
+            "officialproceedi00indemo",
+            "1856",
+            {n: ((n - 1) // 4 + 38,) * 2 for n in range(1, 13)} | {15: (44, 44), 16: (44, 44)},
+            party="democratic",
+        )
     ),
-    {"table": "1856:democratic:b17", "item": "officialproceedi00indemo", "leaves": (45, 46), "narrated": True},
+    {
+        "table": "1856:democratic:b17",
+        "item": "officialproceedi00indemo",
+        "leaves": tuple(range(45, 58)),
+        "narrated": True,
+    },
 ]
 PROCEEDINGS = [
     {"table": "1968:republican:final", "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballot": date(1968, 8, 7)},
@@ -346,6 +357,12 @@ FIRST_1968 = (
     "the convention declared."
 )
 READS = {"a": "low", "b": "medium"}
+QUADRANTS = {
+    "tl": (0.0, 0.04, 0.5, 0.525),
+    "tr": (0.5, 0.04, 1.0, 0.525),
+    "bl": (0.0, 0.515, 0.5, 0.98),
+    "br": (0.5, 0.515, 1.0, 0.98),
+}
 PROMPT = "1"
 BALLOT = (
     " Read only the tabulation of the {} ballot for the presidential nomination (where the convention took a "
@@ -649,6 +666,12 @@ CORRECTIONS = {
     "1856:democratic:b13": [
         (41, "KY", (0.632, 0.37, 0.672, 0.378), {"Stephen A. Douglas": 7.5}, "7½, which the delegation of 12 and the Douglas total of 63 count"),
     ],
+    "1856:democratic:b15": [
+        (44, "OH", (0.334, 0.379, 0.378, 0.387), {"Stephen A. Douglas": 6.5}, "6½, which the delegation of 23 and the Douglas total of 118½ count"),
+    ],
+    "1856:democratic:b17": [
+        (45, "ME", (0.12, 0.865, 0.72, 0.89), {"votes": 8}, "Maine cast her eight votes for James Buchanan; she held 8"),
+    ],
 }  # fmt: skip
 TOTALS = {
     "1912:democratic:b4": {"Marshall": 31, "Kern": 2},
@@ -677,7 +700,7 @@ def fetch() -> None:
     for spec in TABLES:
         for leaf in spec["leaves"]:
             image = raw.fetch(SOURCE, LEAF.format(item=spec["item"], leaf=leaf), suffix=".jpg")
-            data = base64.b64encode(image.path.read_bytes()).decode()
+            data = base64.b64encode(cropped(image.path, spec.get("crop"))).decode()
             for effort, scatter in product(READS.values(), (False, True)):
                 if scatter and not spec.get("scatter"):
                     continue
@@ -687,7 +710,7 @@ def fetch() -> None:
                     else NARRATED
                     if spec.get("narrated")
                     else ROLL
-                    if spec.get("ballot") is None
+                    if spec.get("ballot") is None or spec.get("crop")
                     else ROLL + BALLOT.format(ordinal(spec["ballot"]))
                 )
                 wanted[read_key(effort, image.sha256, variant(spec, scatter, leaf))] = (
@@ -714,9 +737,25 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
+def cropped(path: Path, crop: str | None) -> bytes:
+    if crop is None:
+        return path.read_bytes()
+    from PIL import Image
+
+    with Image.open(path) as image:
+        x0, y0, x1, y1 = QUADRANTS[crop]
+        out = io.BytesIO()
+        image.crop(
+            (round(x0 * image.width), round(y0 * image.height), round(x1 * image.width), round(y1 * image.height))
+        ).save(out, "JPEG", quality=95)
+        return out.getvalue()
+
+
 def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
     if scatter:
         return "s"
+    if spec.get("crop"):
+        return f"b{spec['ballot']}{spec['crop']}"
     if spec.get("parts", {}).get(leaf, "head") != "head":
         return spec["parts"][leaf]
     if spec.get("narrated"):
@@ -820,6 +859,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
             continue
         rows = read["rows"]
+        x0, y0, x1, y1 = QUADRANTS.get(spec.get("crop"), (0.0, 0.0, 1.0, 1.0))
         if spec.get("parts", {}).get(leaf) == "head":
             rows = rows[
                 : next(
@@ -880,7 +920,12 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         "value": figure,
                         "leaf": leaf,
                         "sha256": image.sha256,
-                        "box": [column["x0"] / 1000, row["y0"] / 1000, column["x1"] / 1000, row["y1"] / 1000],
+                        "box": [
+                            round(x0 + column["x0"] / 1000 * (x1 - x0), 4),
+                            round(y0 + row["y0"] / 1000 * (y1 - y0), 4),
+                            round(x0 + column["x1"] / 1000 * (x1 - x0), 4),
+                            round(y0 + row["y1"] / 1000 * (y1 - y0), 4),
+                        ],
                     }
                 )
     held = sum(cell["value"] for cell in cells if cell["column"] == "votes")
