@@ -39,7 +39,11 @@ TITLES = {
     "supreme": "Justice of the Supreme Court",
     "chief": "Chief Justice of the Supreme Court",
     "tax": "Judge of the Tax Court",
+    "appeals": "Judge of the Court of Appeals",
 }
+STATEWIDE = {"Statewide", "Fifth District"}
+HELD_OUT = {(2010, "Fifth District")}
+ORDINALS = {"First": 1, "Second": 2, "Third": 3, "Fourth": 4, "Fifth": 5}
 METHOD = (
     "A retention election asks whether a sitting judge should stay in office, with Yes and No as the only answers. "
     "The judge keeps the seat when a majority votes Yes."
@@ -60,6 +64,7 @@ class Judge(NamedTuple):
     yes: int
     no: int
     url: str
+    district: str = ""
 
 
 def fetch() -> None:
@@ -168,21 +173,31 @@ def indiana() -> list[Judge]:
             page += 1
             for row in rows:
                 kind = row["ReferendumType"] or ""
-                if (row["District"] or "").strip() != "Statewide" or not re.search(r"Supreme|Tax Court", kind):
+                district = re.sub(r"[-\s]+$", "", (row["District"] or "").strip())
+                appeals = "Appeals" in kind
+                if not appeals and (district != "Statewide" or not re.search(r"Supreme|Tax Court", kind)):
                     continue
-                judge = re.search(r"Shall (?:Justice|Judge) (.+?),? be retained", row["Question"])
+                if (year, district) in HELD_OUT:
+                    continue
+                judge = re.search(
+                    r"Shall (?:Justice|Judge) (.+?),? be retained", row["Question"].strip('" '), re.IGNORECASE
+                )
                 if judge is None:
                     raise ValueError(row["Question"])
+                name = judge[1].strip().strip('"')
+                if name.isupper():
+                    name = name.title()
                 day = datetime.strptime(" ".join(row["ElectionType"].split()[:3]), "%B %d, %Y").date()
                 found.append(
                     Judge(
                         "IN",
                         day,
-                        TITLES["tax" if "Tax" in kind else "supreme"],
-                        judge[1].strip(),
+                        TITLES["appeals" if appeals else "tax" if "Tax" in kind else "supreme"],
+                        name,
                         int(row["PositiveResult"]),
                         int(row["NegativeResult"]),
                         key,
+                        "" if district in STATEWIDE or not appeals else district,
                     )
                 )
     return found
@@ -196,7 +211,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Statewide judicial retention elections from official results: California Supreme Court 2002, "
-            "2006, and 2022, and Indiana Supreme Court and Tax Court 2002 to 2022",
+            "2006, and 2022, and Indiana Supreme Court, Tax Court, and Court of Appeals 2002 to 2022",
             polity="US",
         )
         states = {
@@ -228,6 +243,34 @@ def emit() -> Path:
                 url=page,
                 license="Public record",
             )
+        districts: dict[str, UUID] = {}
+
+        def electorate(state: str, label: str) -> UUID:
+            if not label:
+                return states[state][1]
+            if label.split()[0] in ORDINALS:
+                code = f"IN:coa-{ORDINALS[label.split()[0]]}-before-2018"
+                text = f"{label} of the Court of Appeals before 2018"
+            else:
+                counties = label.split(", ")
+                code = f"IN:coa-{slug(counties[0])}-{slug(counties[-1])}-{len(counties)}"
+                text = f"Court of Appeals district of {len(counties)} counties, {counties[0]} to {counties[-1]}"
+            if code not in districts:
+                districts[code] = cs.area("us.judicial_district", code)
+                if districts[code] in cs.minted:
+                    cs.add("area", id=districts[code], scheme_code="us.judicial_district")
+                    cs.add("area_code", area_id=districts[code], code=code, valid_from=None)
+                    cs.add("area_parent", area_id=districts[code], parent_id=states[state][1])
+                    cs.add(
+                        "name",
+                        entity_id=districts[code],
+                        text=f"{text}, {state_names[state]}",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
+            return districts[code]
+
         artifacts: set[str] = set()
         persons: set[str] = set()
         offices: set[str] = set()
@@ -265,7 +308,7 @@ def emit() -> Path:
                 election_id=election,
                 kind="office",
                 office_id=office,
-                district_area_id=states[state][1],
+                district_area_id=electorate(state, row.district),
                 term="full",
                 magnitude=1,
                 round_number=1,
