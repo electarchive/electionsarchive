@@ -133,7 +133,7 @@ OKLAHOMA_COUNTY_METHOD = (
     "Yes and No votes by county from the Oklahoma State Election Board's official county results, with the county "
     "rows checked against the printed state total."
 )
-OKLAHOMA_CSV_DAYS = ["2012-11-06", "2014-11-04"]
+OKLAHOMA_CSV_DAYS = ["2012-11-06", "2014-11-04", "2016-11-08", "2018-11-06", "2020-11-03", "2022-11-08", "2024-11-05"]
 OKLAHOMA_SEATS_2012 = {
     "NOMA D. GURICH": (3, None),
     "YVONNE KAUGER": (4, None),
@@ -339,19 +339,6 @@ def fetch() -> None:
                     retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
                     media_type="application/pdf",
                 )
-    for day in OKLAHOMA_CSV_DAYS:
-        link = ok_county.url(date.fromisoformat(day))
-        try:
-            raw.cached(SOURCE, link)
-        except LookupError:
-            raw.store(
-                SOURCE,
-                link,
-                raw.cached(ok_county.SOURCE, link).path.read_bytes(),
-                suffix=".zip",
-                retrieved_at=datetime.now(UTC),
-                media_type="application/zip",
-            )
     for path in KANSAS_FILES.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
     for url, name in KANSAS_SCANNED.values():
@@ -810,7 +797,7 @@ def oklahoma_csv() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for day in OKLAHOMA_CSV_DAYS:
         link = ok_county.url(date.fromisoformat(day))
-        with zipfile.ZipFile(raw.cached(SOURCE, link).path) as archive:
+        with zipfile.ZipFile(raw.cached(ok_county.SOURCE, link).path) as archive:
             lines = list(csv.DictReader(archive.read(archive.namelist()[0]).decode("utf-8-sig").splitlines()))
         races: dict[str, dict[str, dict[str, int]]] = {}
         for line in lines:
@@ -822,11 +809,11 @@ def oklahoma_csv() -> list[dict[str, object]]:
         for description, answers in races.items():
             found = re.fullmatch(
                 r"(SUPREME COURT|COURT OF CIVIL APPEALS|COURT OF CRIMINAL APPEALS)(?: DISRICT| DISTRICT)? ?(\d+)?"
-                r"(?: - OFFICE (\d))? - (.+)",
+                r"(?: - OFFICE (\d))?(?: - (.+))?",
                 description,
             )
             assert found is not None, description
-            name = found[4].strip()
+            name = found[4].strip() if found[4] else None
             number, post = (
                 (int(found[2]), int(found[3]) if found[3] else None) if found[2] else OKLAHOMA_SEATS_2012[name]
             )
