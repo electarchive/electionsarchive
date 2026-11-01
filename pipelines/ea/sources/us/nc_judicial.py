@@ -21,7 +21,8 @@ TITLES = {
     "justice": "Justice of the Supreme Court",
     "appeals": "Judge of the Court of Appeals",
 }
-SEAT = re.compile(r"\(\s*(.+?)(?: Seat)?\s*\)\s*$|- (.+?) Seat\s*$", re.IGNORECASE)
+SEAT = re.compile(r"\(\s*(.+?)(?: Seat)?\s*\)\s*$|- (.+?) Seat\s*$|Seat 0*(\d+)$", re.IGNORECASE)
+DAYS = [*ncsbe.DAYS, date(2022, 11, 8), date(2024, 11, 5)]
 NOTE = "County totals summed from the North Carolina State Board of Elections' official precinct results file for the general election."
 
 
@@ -29,13 +30,20 @@ def flat(text: str) -> str:
     return re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
 
 
+def fetch() -> None:
+    for day in DAYS[len(ncsbe.DAYS) :]:
+        raw.fetch(ncsbe.SOURCE, ncsbe.FILES.format(day=day), suffix=".zip")
+
+
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
-    for day in ncsbe.DAYS:
+    for day in DAYS:
         frame = ncsbe.read(day)
         party = next(column for column in ("party_cd", "party", "choice party") if column in frame.columns)
         frame = frame.filter(
-            pl.col("contest").str.to_uppercase().str.contains("SUPREME|CHIEF JUSTICE|ASSOC JUSTICE|APPEALS")
+            pl.col("contest")
+            .str.to_uppercase()
+            .str.contains("SUPREME|CHIEF JUSTICE|ASSOC JUSTICE|APPEALS" if day in ncsbe.DAYS else "COURT OF APPEALS")
             & ~pl.col("contest").str.contains("IRV")
         )
         for contest, choice, code, county, votes in (
@@ -49,7 +57,7 @@ def lines() -> list[dict[str, object]]:
             match = SEAT.search(contest)
             seat = ""
             if court != "chief" and match is not None:
-                seat = (match[1] or match[2]).strip().title()
+                seat = f"Seat {match[3]}" if match[3] else (match[1] or match[2]).strip().title()
             found.append(
                 {
                     "day": day,
@@ -71,7 +79,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Carolina Supreme Court and Court of Appeals general election contests 2000–2014 by county, "
+            summary="North Carolina Supreme Court and Court of Appeals general election contests 2000–2014, and the "
+            "Court of Appeals in 2022 and 2024, by county, "
             "from the State Board of Elections' official precinct results",
             polity="US-NC",
         )
@@ -85,7 +94,7 @@ def emit() -> Path:
             url="https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
             license="Public record",
         )
-        for day in ncsbe.DAYS:
+        for day in DAYS:
             cs.artifact(raw.cached(ncsbe.SOURCE, ncsbe.FILES.format(day=day)), source)
         counties = {
             flat(text): unit
@@ -153,7 +162,7 @@ def emit() -> Path:
                 electoral_system_id=fptp,
                 default_result_kind="counted",
             )
-            label = f"{title}" + (f" ({seat} seat)" if seat else "")
+            label = f"{title}" + (f" ({seat})" if seat.startswith("Seat ") else f" ({seat} seat)" if seat else "")
             name(contest, f"{day.year} North Carolina {label}")
             if contest in cs.minted:
                 base = f"us/nc/{day}-general/{slug(title)}" + (f"-{slug(seat)}" if seat else "")
