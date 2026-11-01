@@ -2,6 +2,7 @@ import csv
 import functools
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -12,6 +13,7 @@ from datetime import date, datetime
 from difflib import SequenceMatcher
 
 import polars as pl
+import psycopg
 from psycopg.types.json import Json
 
 from ea import coverage, coverage_countries, raw, readiness, statewide_table
@@ -19,6 +21,7 @@ from ea.sources.us.clerk import LEGISLATORS
 from ea.store import ROOT, connect
 
 LOCK = 7_302_019
+UUID = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 STATE_LEVELS = (
     "president",
     "us_senate",
@@ -1402,7 +1405,11 @@ def refresh(full: bool = False) -> str:
                 commit = subprocess.run(
                     ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
                 ).stdout.strip()
-                built.append(build(full))
+                try:
+                    built.append(attempt(full))
+                except BaseException:
+                    conn.execute("update coverage_build set started_at = built_at")
+                    raise
                 full = False
                 conn.execute(
                     "update coverage_build set built_at = %s, commit = %s, inputs = %s",
@@ -1415,6 +1422,20 @@ def refresh(full: bool = False) -> str:
                 return "; ".join(built)
 
 
+def attempt(full: bool) -> str:
+    if "lock_timeout" not in os.environ.get("PGOPTIONS", ""):
+        os.environ["PGOPTIONS"] = f"{os.environ.get('PGOPTIONS', '')} -c lock_timeout=60s".strip()
+    for wait in (60, 120, 300, 600, 900, 0):
+        try:
+            return build(full)
+        except psycopg.errors.LockNotAvailable as error:
+            if not wait:
+                raise
+            print(f"coverage: {error.diag.message_primary}; retrying in {wait}s", file=sys.stderr)
+            time.sleep(wait)
+    raise AssertionError
+
+
 def measure(st: str, members: list[dict], today: date) -> tuple[str, dict, float]:
     started = time.monotonic()
     with connect() as conn:
@@ -1423,7 +1444,14 @@ def measure(st: str, members: list[dict], today: date) -> tuple[str, dict, float
         conn.cursor().executemany(
             "insert into gap values (%s, %s, %s, %s, %s, %s)",
             [
-                (row["state"], row["level"], row["stage"], row["from"], row["to"], row["ids"])
+                (
+                    row["state"],
+                    row["level"],
+                    row["stage"],
+                    row["from"],
+                    row["to"],
+                    [i for i in row["ids"] if UUID.fullmatch(i)],
+                )
                 for row in coverage.registry()
                 if row["polity"] == "us" and row["grain"] in ("results", "county", "precinct")
             ],
@@ -2161,7 +2189,8 @@ def build(full: bool = False) -> str:
 
     with connect() as conn, conn.transaction():
         conn.execute("delete from coverage_goal where polity = 'us'")
-        conn.execute("truncate coverage_government_year, coverage_government")
+        conn.execute("delete from coverage_government_year")
+        conn.execute("delete from coverage_government")
         with conn.cursor().copy(
             "copy coverage_government (id, state, county, kind, name, function, population, population_basis, active,"
             " polity_id, period, phase, month, basis) from stdin"
