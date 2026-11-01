@@ -1237,11 +1237,6 @@ FEEDS.update(
             "City of Millersburg",
             "November 2026 City Council Election",
         ),
-        "OR-41015-gold-beach": (
-            "https://www.goldbeachoregon.gov/index.asp?SEC=45A33D13-25D1-43A0-A2D4-35A62BC4E8D8",
-            "City of Gold Beach",
-            "Candidate filings for Council Positions 1 and 3, November 3, 2026 General Election",
-        ),
         "OR-41055-wasco": (
             "https://www.shermancountyor.gov/DocumentCenter/View/987/City-of-Wasco-Filed-Candidates",
             "City of Wasco",
@@ -1510,7 +1505,6 @@ DELIVERED = {
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
     "OR-41043-millersburg": DATA / "inbox" / "y26" / "or" / "millersburg.txt",
-    "OR-41015-gold-beach": DATA / "inbox" / "y26" / "or" / "gold_beach.pdf",
     "OR-41055-wasco": DATA / "inbox" / "y26" / "or" / "sherman_wasco.pdf",
     "OR-41055-moro": DATA / "inbox" / "y26" / "or" / "sherman_moro.pdf",
     "OR-41055-grass-valley": DATA / "inbox" / "y26" / "or" / "sherman_grass_valley.pdf",
@@ -6609,20 +6603,6 @@ for key, publisher, title, url, local in (
         "General Election 11/03/2026: Filed Candidates",
         "https://lakecountyor.org/government/general_election_11-03-2026.php",
         "or/lake_cities.html",
-    ),
-    (
-        "OR-41015-districts",
-        "Curry County Clerk",
-        "Candidate Register, November 3, 2026 General Election (Harbor Water P.U.D.)",
-        "https://www.co.curry.or.us/",
-        "or/curry_candidate_register.pdf",
-    ),
-    (
-        "OR-41065-districts",
-        "Wasco County Clerk",
-        "2026 General Election: Filed Candidates (Chenowith Water People's Utility District)",
-        "https://www.co.wasco.or.us/",
-        "or/wasco_districts.html",
     ),
     (
         "OR-41015-brookings",
