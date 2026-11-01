@@ -464,8 +464,109 @@ CORRECTIONS = {
     "1920:republican:b5": [
         (247, "MA", (0.636, 0.438, 0.677, 0.448), {"Johnson": 0}, "printed under Johnson but left out of the Johnson total; the rest of the delegation went to Coolidge"),
     ],
+    "1868:democratic:b1": [
+        (78, "KS", (0.759, 0.604, 0.873, 0.613), {"Hendricks": 0.5, "R. Johnson": 0}, "the half vote sits in the Hendricks column, whose printed total of 2½ counts it"),
+    ],
+    "1868:democratic:b2": [
+        (80, "KS", (0.723, 0.604, 0.841, 0.614), {"Hendricks": 0.5, "R. Johnson": 0}, "the half vote sits in the Hendricks column, whose printed total of 2 counts it"),
+    ],
+    "1868:democratic:b3": [
+        (83, "WI", (0.715, 0.867, 0.793, 0.875), {"Doolittle": 8, "Hendricks": 0}, "the figure sits in the Doolittle column, whose printed total of 12 counts it"),
+    ],
+    "1868:democratic:b4": [
+        (86, "DE", (0.866, 0.54, 0.906, 0.554), {"Seymour": 0}, "the cell is empty; a speck beside its dots reads as a figure"),
+        (86, "MD", (0.671, 0.642, 0.751, 0.656), {"Hendricks": 0.5, "Doolittle": 0}, "the half vote sits in the Hendricks column, whose printed total of 11½ counts it"),
+        (86, "MI", (0.748, 0.662, 0.829, 0.676), {"R. Johnson": 8, "Blair": 0}, "the figure sits in the R. Johnson column, whose printed total of 8 counts it"),
+    ],
+    "1868:democratic:b5": [
+        (99, "NY", (0.554, 0.724, 0.628, 0.732), {"Church": 33, "Packer": 0}, "the figure sits in the Church column, whose printed total of 33 counts it"),
+        (99, "NC", (0.592, 0.734, 0.669, 0.742), {"Packer": 1, "A. Johnson": 0}, "the figure sits in the Packer column, whose printed total of 27 counts it"),
+        (99, "MD", (0.633, 0.627, 0.709, 0.635), {"A. Johnson": 1, "Doolittle": 0}, "the figure sits in the A. Johnson column, whose printed total of 24 counts it"),
+    ],
+    "1868:democratic:b6": [
+        (102, "NC", (0.568, 0.746, 0.607, 0.754), {"Pendleton": 0.5}, "printed 1½ beside 8½ for Hendricks in a delegation of 9; the Pendleton total of 122½ counts ½"),
+        (102, "NH", (0.806, 0.717, 0.887, 0.725), {"Hendricks": 0.5, "Blair": 0}, "the half vote sits in the Hendricks column, whose printed total of 30 counts it"),
+        (102, "MO", (0.446, 0.688, 0.487, 0.696), {"not voting": 0.5}, "11 held, 10½ recorded; 316½ of 317 votes cast"),
+    ],
+    "1868:democratic:b8": [
+        (112, "TX", (0.5, 0.817, 0.533, 0.825), {"Hancock": 6}, "a broken 6; the delegation of 6 and the Hancock total of 28 count 6"),
+        (112, "NH", (0.796, 0.721, 0.86, 0.729), {"Hendricks": 0.5, "Blair": 0}, "the half vote sits in the Hendricks column, whose printed total of 75 counts it"),
+    ],
+    "1868:democratic:b9": [
+        (114, "IN", (0.319, 0.561, 0.355, 0.569), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b11": [
+        (119, "IN", (0.537, 0.562, 0.577, 0.57), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b12": [
+        (122, "IN", (0.432, 0.586, 0.471, 0.595), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+        (122, "PA", (0.555, 0.78, 0.63, 0.789), {"Packer": 26, "Parker": 0}, "the figure sits in the Packer column, whose printed total of 26 counts it"),
+    ],
+    "1868:democratic:b13": [
+        (125, "IN", (0.487, 0.566, 0.518, 0.574), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b14": [
+        (127, "IN", (0.62, 0.567, 0.661, 0.573), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b15": [
+        (130, "CA", (0.587, 0.519, 0.623, 0.527), {"not voting": 0.5}, "5 held, 4½ recorded; the footnote prints ½ not voting"),
+        (130, "IN", (0.587, 0.577, 0.623, 0.585), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b16": [
+        (132, "CA", (0.489, 0.529, 0.526, 0.537), {"not voting": 0.5}, "5 held, 4½ recorded; the footnote prints ½ not voting"),
+        (132, "IN", (0.489, 0.586, 0.526, 0.594), {"not voting": 0.5}, "13 held, 12½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b17": [
+        (135, "KY", (0.546, 0.575, 0.583, 0.583), {"not voting": 0.5}, "11 held, 10½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1868:democratic:b18": [
+        (138, "KY", (0.523, 0.609, 0.561, 0.617), {"Hancock": 4.5}, "4½, which the delegation of 11 and the Hancock total of 144½ count"),
+        (138, "MD", (0.523, 0.638, 0.561, 0.646), {"Hancock": 6.5}, "6½, which the delegation of 7 and the Hancock total of 144½ count"),
+    ],
+    "1868:democratic:b19": [
+        (147, "NV", (0.77, 0.675, 0.836, 0.683), {"Field": 3, "Chase": 0}, "the figure sits in the Field column, whose printed total of 15 counts it"),
+        (147, "KY", (0.54, 0.578, 0.564, 0.586), {"not voting": 1}, "11 held, 10 recorded; the footnote prints 1 not voting"),
+    ],
+    "1868:democratic:b20": [
+        (150, "RI", (0.656, 0.768, 0.718, 0.78), {"Doolittle": 4, "Hendricks": 0}, "the figure sits in the Doolittle column, whose printed total of 12 counts it"),
+        (150, "WI", (0.656, 0.836, 0.718, 0.848), {"Doolittle": 8, "Hendricks": 0}, "the figure sits in the Doolittle column, whose printed total of 12 counts it"),
+        (150, "NH", (0.695, 0.7, 0.718, 0.712), {"Hendricks": 0.5}, "printed 1½ beside 4½ for Hancock in a delegation of 5; the Hendricks total of 121 counts ½"),
+        (150, "KY", (0.533, 0.593, 0.556, 0.605), {"not voting": 0.5}, "11 held, 10½ recorded; the footnote prints ½ not voting"),
+        (150, "MA", (0.533, 0.632, 0.556, 0.644), {"not voting": 1}, "12 held, 11 recorded; the footnote prints 1 not voting"),
+    ],
+    "1868:democratic:b21": [
+        (152, "TN", (0.48, 0.792, 0.502, 0.8), {"not voting": 0.5}, "10 held, 9½ recorded; the footnote prints ½ not voting"),
+    ],
+    "1884:democratic:b1": [
+        (266, "DE", (0.433, 0.294, 0.536, 0.306), {"Bayard": 6, "McDonald": 0}, "the figure sits in the Bayard column, whose printed total of 170 counts it"),
+        (266, "NJ", (0.536, 0.536, 0.632, 0.548), {"Randall": 11, "Thurman": 0}, "the figure sits in the Randall column, whose printed total of 78 counts it"),
+        (266, "WA", (0.584, 0.804, 0.632, 0.816), {"Randall": 1}, "the figure sits in the Randall column, whose printed total of 78 counts it"),
+    ],
+    "1892:democratic": [
+        (182, "NC", (0.483, 0.577, 0.82, 0.589), {"Cleveland": 10 / 3, "Campbell": 0, "Morrison": 1}, "3⅓ for Cleveland and 1 in the Morrison column, which the delegation of 22 and the printed totals count"),
+        (182, "MD", (0.437, 0.424, 0.481, 0.435), {"not voting": 0.5}, "16 held, 15½ recorded; 909½ of 910 votes cast"),
+    ],
+    "1864:democratic": [
+        (43, "NH", (0.707, 0.425, 0.821, 0.435), {"George B. McClellan": 5}, "a broken 5; New Hampshire held 5"),
+        (43, "MA", (0.707, 0.446, 0.821, 0.456), {"George B. McClellan": 12}, "12; Massachusetts held 12"),
+        (43, "CT", (0.707, 0.467, 0.821, 0.477), {"George B. McClellan": 6}, "printed 9; Connecticut held 6, and the announced 202½ for McClellan counts 6"),
+        (43, "DE", (0.836, 0.510, 0.95, 0.520), {"Thomas H. Seymour": 3}, "printed 2; Delaware held 3, and the announced 23½ for Seymour, with 202½ for McClellan, makes the full 226"),
+    ],
+    "1860:democratic:baltimore-b1": [
+        (168, "MA", (0.179, 0.788, 0.213, 0.797), {"Stephen A. Douglas": 10}, "printed 19 and corrected by hand to 10 in the scanned copy; the Douglas total of 173½ counts 10"),
+        (168, "PA", (0.401, 0.833, 0.435, 0.842), {"Horatio Seymour": 1}, "1, which the Seymour total counts"),
+    ],
+    "1856:democratic:b13": [
+        (41, "KY", (0.632, 0.37, 0.672, 0.378), {"Stephen A. Douglas": 7.5}, "7½, which the delegation of 12 and the Douglas total of 63 count"),
+    ],
 }  # fmt: skip
-TOTALS = {"1920:republican:b10": {"Harding": 692.2, "Johnson": 80.8}}
+TOTALS = {
+    "1920:republican:b10": {"Harding": 692.2, "Johnson": 80.8},
+    "1868:democratic:b1": {"Hancock": 33.5},
+    "1868:democratic:b6": {"Blair": 5},
+    "1868:democratic:b21": {"Hoffman": 0.5},
+    "1864:democratic": {"Thomas H. Seymour": 23.5},
+}
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
 PAGES = DATA / "pages" / SOURCE
 FRACTION = re.compile(r"\s*(?:([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])|1/2|'/2|\.5)$")
@@ -565,6 +666,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
     cells: list[dict[str, object]] = []
     totals: dict[str, float] = {}
     problems: list[str] = []
+    fixed = {(code, column) for _, code, _, figures, _ in CORRECTIONS.get(spec["table"], ()) for column in figures}
     for leaf, scatter in product(spec["leaves"], (False, True)):
         if scatter and not spec.get("scatter"):
             continue
@@ -629,7 +731,9 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             code = place(row["label"])
             seen[code] = seen.get(code, 0) + 1
             code = RELABEL.get((spec["table"], leaf, code, seen[code]), code)
-            if code is None and not re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE):
+            if code is None and re.match(r"^\s*(territories|necessary to a choice)\b", row["label"], re.IGNORECASE):
+                continue
+            if code is None and not re.match(r"^\s*(totals?\b|$)", row["label"], re.IGNORECASE):
                 problems.append(f"leaf {leaf}: unknown row {row['label']!r}")
                 continue
             for role, column, value in zip(roles, header, row["values"], strict=True):
@@ -638,7 +742,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                 try:
                     figure = number(value)
                 except ValueError:
-                    problems.append(f"leaf {leaf}: {row['label']} {role} reads {value!r}")
+                    if (code, role) not in fixed:
+                        problems.append(f"leaf {leaf}: {row['label']} {role} reads {value!r}")
                     continue
                 if code is None:
                     totals[role] = figure
