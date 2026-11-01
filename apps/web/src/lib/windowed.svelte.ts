@@ -36,23 +36,34 @@ const scrolls = (element: Element) =>
 
 const engine = <S extends HTMLElement | Window>(
   virtualizer: Virtualizer<S, HTMLElement>,
-): Engine => ({
-  mount: () => {
-    const stop = virtualizer._didMount();
-    virtualizer._willUpdate();
-    return stop;
-  },
-  measure: (node) => {
-    virtualizer.measureElement(node);
-  },
-  read: (config) => {
-    virtualizer.setOptions({ ...virtualizer.options, ...config });
-    return {
-      items: virtualizer.getVirtualItems(),
-      total: virtualizer.getTotalSize(),
-    };
-  },
-});
+): Engine => {
+  const queued = new Set<HTMLElement>();
+  return {
+    mount: () => {
+      const stop = virtualizer._didMount();
+      virtualizer._willUpdate();
+      return stop;
+    },
+    measure: (node) => {
+      if (queued.size === 0) {
+        queueMicrotask(() => {
+          for (const each of queued) {
+            virtualizer.measureElement(each);
+          }
+          queued.clear();
+        });
+      }
+      queued.add(node);
+    },
+    read: (config) => {
+      virtualizer.setOptions({ ...virtualizer.options, ...config });
+      return {
+        items: virtualizer.getVirtualItems(),
+        total: virtualizer.getTotalSize(),
+      };
+    },
+  };
+};
 
 export class Windowed<T> {
   #version = $state(0);
@@ -194,7 +205,6 @@ export class Windowed<T> {
           : top - owner.getBoundingClientRect().top + owner.scrollTop,
       );
     };
-    update();
     node.style.overflowAnchor = "none";
     for (
       let element: HTMLElement | null = node;

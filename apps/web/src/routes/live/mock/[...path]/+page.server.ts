@@ -4,6 +4,9 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
   setHeaders({ "x-robots-tag": "noindex, nofollow" });
-  const found = await livePage(params.path, null);
-  return { ...found, ballot: await liveBallot(found) };
+  const [found, ballot] = await Promise.all([
+    livePage(params.path, null),
+    liveBallot(params.path),
+  ]);
+  return { ...found, ballot };
 };

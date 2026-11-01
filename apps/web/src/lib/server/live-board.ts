@@ -138,9 +138,10 @@ export async function house(electionId: string, date: string) {
       union all
       select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
     )
-    select distinct a.id, ac.code from contest c join tree on tree.id = c.election_id
-    join area a on a.id = c.district_area_id and a.scheme_code = 'us.cd'
-    join area_code ac on ac.area_id = a.id
+    select a.id, ac.code from area a join area_code ac on ac.area_id = a.id
+    where a.scheme_code = 'us.cd'
+      and exists (select from contest c join tree on tree.id = c.election_id where c.district_area_id = a.id)
+    order by a.id, ac.code
   `);
   const ids = found.rows.map((row) => row.id);
   const load =
@@ -214,18 +215,32 @@ export async function control(
     .map((race) => race.id);
   const [held, kept] = await Promise.all([
     db.execute<{ contest: string; person: string; party: string | null }>(sql`
-      with held as (
-        select c.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won
-        from contest c
-        join lateral (
-          select t.id, t.person_id, t.contest_id from tenure t left join seat s on s.id = t.seat_id
-          where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
-            and (t.seat_id = c.seat_id or t.office_id = c.office_id
-              or (c.seat_id is null and c.office_id is null and t.body_id = c.body_id and (s.district_area_id = c.district_area_id
-                or exists (select from area_code x join area_code y on y.code = x.code where x.area_id = s.district_area_id and y.area_id = c.district_area_id))))
-          order by t.from_date desc limit 1
-        ) t on true
-        where c.id = any(${sql.param(ids)}::uuid[])
+      with up as materialized (
+        select c.id, c.seat_id, c.office_id, c.body_id, c.district_area_id from contest c where c.id = any(${sql.param(ids)}::uuid[])
+      ),
+      sitting as materialized (
+        select t.id, t.person_id, t.contest_id, t.seat_id, t.office_id, t.body_id, t.from_date, s.district_area_id
+        from tenure t left join seat s on s.id = t.seat_id
+        where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
+      ),
+      held as (
+        select distinct on (m.contest) m.contest, m.tenure, m.person, m.won from (
+          select u.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won, t.from_date
+          from up u join sitting t on t.seat_id = u.seat_id
+          union all
+          select u.id, t.id, t.person_id, t.contest_id, t.from_date
+          from up u join sitting t on t.office_id = u.office_id
+          union all
+          select u.id, t.id, t.person_id, t.contest_id, t.from_date
+          from up u cross join lateral (
+            select u.district_area_id as area_id
+            union
+            select x.area_id from area_code y join area_code x on x.code = y.code where y.area_id = u.district_area_id
+          ) a
+          join sitting t on t.body_id = u.body_id and t.district_area_id = a.area_id
+          where u.seat_id is null and u.office_id is null
+        ) m
+        order by m.contest, m.from_date desc
       )
       select h.contest, h.person, coalesce(
         (select ta.party_id from tenure_affiliation ta where ta.tenure_id = h.tenure and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
@@ -325,3 +340,4 @@ export async function control(
 }
 
 export type Control = Awaited<ReturnType<typeof control>>;
+export type House = Awaited<ReturnType<typeof house>>;

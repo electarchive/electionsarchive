@@ -1,9 +1,9 @@
 import { sql } from "drizzle-orm";
 import type { Geography } from "#lib/live/standing.js";
-import type { LivePage } from "#lib/server/live-page.js";
 import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import { geography } from "#lib/server/live-board.js";
+import { night } from "#lib/server/live-page.js";
 import { names } from "#lib/server/rpc/archive.js";
 
 export type BallotTier =
@@ -469,14 +469,12 @@ export type BallotLocals = NonNullable<
   Awaited<ReturnType<typeof ballotLocals>>
 >;
 
-export async function liveBallot(page: LivePage) {
-  const { election } = page;
-  if (
-    page.isRace ||
-    page.place != null ||
-    election.slug.split("/").length !== 3 ||
-    !election.slug.startsWith("us/")
-  ) {
+export async function liveBallot(path: string) {
+  if (path.split("/").length !== 3 || !path.startsWith("us/")) {
+    return null;
+  }
+  const { election } = await night(path);
+  if (election.slug !== path) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
@@ -492,13 +490,15 @@ export async function liveBallot(page: LivePage) {
       found.contests.filter((entry) => entry.contest.area != null),
       (entry) => (entry.tier === "house" ? "house" : (entry.chamber ?? "")),
     );
-    const maps: Record<string, Geography | null> = {};
-    for (const [key, list] of groups) {
-      const ids = [
-        ...new Set(list.flatMap((entry) => entry.contest.area ?? [])),
-      ];
-      maps[key] = await geography(ids, election.date, ids, false);
-    }
+    const drawn = await Promise.all(
+      [...groups].map(async ([key, list]) => {
+        const ids = [
+          ...new Set(list.flatMap((entry) => entry.contest.area ?? [])),
+        ];
+        return [key, await geography(ids, election.date, ids, false)] as const;
+      }),
+    );
+    const maps: Record<string, Geography | null> = Object.fromEntries(drawn);
     return { state, name: stateName, ...found, maps, locals };
   });
 }

@@ -2,6 +2,7 @@ import type {
   LiveElection,
   LiveFrame,
   LiveOffice,
+  LiveOption,
   LiveRace,
   LiveUnitCount,
 } from "@ea/analytics/live";
@@ -13,7 +14,7 @@ import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
-import { os } from "#lib/server/cache.js";
+import { os, remember } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
 import counties from "#lib/server/county-traits.json";
 import { db } from "#lib/server/db/index.js";
@@ -705,10 +706,13 @@ async function load(state: string, midterm: string, presidential: string) {
           rs.is_default desc, rs.stage = 'certified' desc limit 1
       ) x
     ), totals as (
-      select s.k, s.midterm, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit, sum(v.value)::float8 as votes
+      select s.k, s.midterm, u.unit, sum(v.value)::float8 as votes
       from sets s join result_value v on v.result_set_k = s.k and v.measure = 1
-      join reporting_unit u on u.k = v.unit_k
-        and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
+      cross join lateral (
+        select case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit from reporting_unit u
+        where u.k = v.unit_k and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
+        offset 0
+      ) u
       group by 1, 2, 3
     )
     select unit, max(votes) filter (where midterm) as midterm, max(votes) filter (where not midterm) as presidential
@@ -805,7 +809,7 @@ async function night(
   shown: { results: boolean; forecasts: boolean },
 ) {
   const contests = picked.map((row) => row.id);
-  const [frames, choices, incumbents, settled, prior, drawn, placed] =
+  const [frames, { choices, incumbents, settled, prior, drawn, placed }] =
     await Promise.all([
       db.execute<{
         k: number;
@@ -822,15 +826,31 @@ async function night(
         where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active' and ${shown.results}::boolean
         order by f.as_of
       `),
-      options(contests, found.date),
-      db.execute<{ option: string }>(sql`
-        select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
-        where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
-      `),
-      certified(contests),
-      baselines(picked, found.date),
-      detail === "national" ? [] : geography(picked, found.date),
-      jurisdictions(contests),
+      remember(
+        `live:fixed:v1:${found.path}|${found.rest}|${detail}`,
+        async () => {
+          const [choices, incumbents, settled, prior, drawn, placed] =
+            await Promise.all([
+              options(contests, found.date),
+              db.execute<{ option: string }>(sql`
+                select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
+                where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
+              `),
+              certified(contests),
+              baselines(picked, found.date),
+              detail === "national" ? [] : geography(picked, found.date),
+              jurisdictions(contests),
+            ]);
+          return {
+            choices,
+            incumbents: incumbents.rows,
+            settled,
+            prior,
+            drawn,
+            placed,
+          };
+        },
+      ),
     ]);
   const values = await db.execute<{
     k: number;
@@ -878,7 +898,7 @@ async function night(
     ),
     names(parties, found.date),
   ]);
-  const sitting = new Set(incumbents.rows.map((row) => row.option));
+  const sitting = new Set(incumbents.map((row) => row.option));
   const unitOf = new Map(
     held.rows.map((row) => [
       row.id,
@@ -902,6 +922,7 @@ async function night(
   const priorBy = Map.groupBy(prior.lines, (row) => row.contest);
   const settledBy = Map.groupBy(settled, (row) => row.contest);
   const drawnBy = Map.groupBy(drawn, (row) => row.contest);
+  const badges = new Map<string, NonNullable<LiveOption["party"]>>();
   const built = picked.map((row): LiveRace => {
     const own = choices.filter((choice) => choice.contest === row.id);
     const index = new Map(own.map((choice, position) => [choice.id, position]));
@@ -1064,11 +1085,12 @@ async function night(
         unitId: unit,
         label: unitOf.get(unit)?.name ?? "",
         turnout: value.turnout,
-        shares: value.shares,
+        shares: value.shares.map((share) => Math.round(share * 1e6) / 1e6),
         ...(fallback != null && {
-          expected:
+          expected: Math.round(
             value.turnout *
-            Math.min(1.6, Math.max(0.3, prior.ratios.get(unit) ?? fallback)),
+              Math.min(1.6, Math.max(0.3, prior.ratios.get(unit) ?? fallback)),
+          ),
         }),
         ...(traits != null && { traits }),
       };
@@ -1117,28 +1139,36 @@ async function night(
         const party = choice.key.startsWith("party:")
           ? choice.key.slice(6)
           : null;
+        if (party == null) {
+          return {
+            id: choice.id,
+            label: choice.name,
+            party: null,
+            isWriteIn: choice.kind === "write_in",
+            isIncumbent: sitting.has(choice.id),
+          };
+        }
+        const name = partyNames.full.get(party) ?? choice.party ?? "";
+        const color =
+          choice.color ??
+          ((tally[at] ?? 0) >= top * 0.05
+            ? (UNAFFILIATED[
+                Number.parseInt(party.slice(-4), 16) % UNAFFILIATED.length
+              ] ?? "#8a8a8a")
+            : "#8a8a8a");
+        const shared = `${party}|${name}|${color}`;
+        const entry = badges.get(shared) ?? {
+          id: party,
+          name,
+          short:
+            partyNames.short.get(party) ?? partyNames.full.get(party) ?? "",
+          color,
+        };
+        badges.set(shared, entry);
         return {
           id: choice.id,
           label: choice.name,
-          party:
-            party == null
-              ? null
-              : {
-                  id: party,
-                  name: partyNames.full.get(party) ?? choice.party ?? "",
-                  short:
-                    partyNames.short.get(party) ??
-                    partyNames.full.get(party) ??
-                    "",
-                  color:
-                    choice.color ??
-                    ((tally[at] ?? 0) >= top * 0.05
-                      ? (UNAFFILIATED[
-                          Number.parseInt(party.slice(-4), 16) %
-                            UNAFFILIATED.length
-                        ] ?? "#8a8a8a")
-                      : "#8a8a8a"),
-                },
+          party: entry,
           isWriteIn: choice.kind === "write_in",
           isIncumbent: sitting.has(choice.id),
         };

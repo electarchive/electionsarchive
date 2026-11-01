@@ -11,6 +11,7 @@
   import type { Chamber, Control, Seat } from "#lib/live/nation.js";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
+  import type { House } from "#lib/server/live-board.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { isHover } from "#lib/explain.svelte.js";
@@ -54,7 +55,6 @@
     election,
     estimates,
     nation,
-    house,
     control,
     clock,
     isOffline,
@@ -66,16 +66,6 @@
       map: Geography;
       codes: Record<string, string>;
       labels: Record<string, string>;
-    } | null;
-    house: {
-      map: Geography | null;
-      codes: Record<string, string>;
-      cartogram: {
-        box: [number, number, number, number];
-        districts: Array<{ key: string; d: string; x: number; y: number }>;
-        states: Array<string>;
-        labels: Array<{ x: number; y: number; text: string }>;
-      } | null;
     } | null;
     control: Control | null;
     clock: number;
@@ -92,6 +82,46 @@
   let hovered = $state<string | null>(null);
   let layout = $state<"shapes" | "hexes">("hexes");
   let probe = $state<string | null>(null);
+  let house = $state<House | null>(null);
+  let housePath: string | null = null;
+
+  async function loadHouse(path: string) {
+    if (housePath === path) {
+      return;
+    }
+    housePath = path;
+    house = null;
+    try {
+      const response = await fetch(`/live/house/${path}`);
+      if (!response.ok) {
+        throw new Error(String(response.status));
+      }
+      const found = (await response.json()) as House;
+      if (housePath === path) {
+        house = found;
+      }
+    } catch {
+      if (housePath === path) {
+        housePath = null;
+      }
+    }
+  }
+
+  $effect(() => {
+    const path = election.slug;
+    if (view === "house") {
+      void loadHouse(path);
+      return;
+    }
+    if ("requestIdleCallback" in window) {
+      const id = requestIdleCallback(() => void loadHouse(path), {
+        timeout: 4000,
+      });
+      return () => cancelIdleCallback(id);
+    }
+    const timer = setTimeout(() => void loadHouse(path), 2000);
+    return () => clearTimeout(timer);
+  });
 
   const NAMES: Record<Chamber, () => string> = {
     senate: m.night_nation_senate,
