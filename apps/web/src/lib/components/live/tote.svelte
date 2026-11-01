@@ -62,9 +62,7 @@
     };
   });
   const isProjected = $derived(
-    estimate != null &&
-      estimate.status !== "waiting" &&
-      estimate.status !== "too-early",
+    estimate?.status === "estimating" || estimate?.status === "settled",
   );
 </script>
 

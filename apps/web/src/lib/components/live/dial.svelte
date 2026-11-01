@@ -37,6 +37,12 @@
       (estimate.status === "estimating" || estimate.status === "settled"),
   );
   const isSettled = $derived(estimate?.status === "settled");
+  const idle = $derived.by(() => {
+    if (estimate?.status === "unavailable") {
+      return m.night_dial_unavailable();
+    }
+    return isWaiting ? m.night_dial_waiting() : m.night_dial_early();
+  });
   const p = $derived(
     estimate == null || a == null
       ? 0.5
@@ -215,7 +221,7 @@
       role="img"
       aria-label={isLive && favored != null
         ? m.night_dial_aria({ name: favored.label, chance: percent(chance, 0) })
-        : m.night_dial_waiting()}
+        : idle}
     >
       <div
         class="flex items-center justify-between gap-3 text-xs font-semibold"
@@ -286,7 +292,7 @@
           ? m.night_dial_settled({ name: favored.label })
           : m.night_dial_chance({ name: favored.label })}
       {:else}
-        {isWaiting ? m.night_dial_waiting() : m.night_dial_early()}
+        {idle}
       {/if}
     </p>
     <figure class="grid gap-1 pbs-1">
@@ -388,7 +394,7 @@
         role="img"
         aria-label={isLive && a != null
           ? m.night_dial_dots_aria({ count: count(winsA), name: a.label })
-          : m.night_dial_waiting()}
+          : idle}
       >
         <rect
           x="0"
