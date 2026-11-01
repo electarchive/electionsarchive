@@ -1,4 +1,5 @@
 import csv
+import difflib
 import json
 import re
 import time
@@ -20,7 +21,7 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "7"
+VERSION = "8"
 YEARS = (1963, 1968, 1973, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 UNMERGED = Path(__file__).with_name("mayors_1984_1999_unmerged.tsv")
@@ -74,6 +75,13 @@ def fetch(years: tuple[int, ...] = YEARS) -> None:
                         raise
                     time.sleep(20)
             time.sleep(1)
+
+
+def fits(path: str, province: str, central: str) -> bool:
+    district = path.split("/")[2]
+    return (district == "merkez" and path.split("/")[1] == province) or bool(
+        set(district.split("-")) & set(central.split("-"))
+    )
 
 
 def number(text: str) -> int | None:
@@ -206,16 +214,6 @@ def emit() -> Path:
                    from external_id e where e.scheme = 'tr.party'"""
             ).fetchall()
         )
-        namesakes: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
-        for office, person, text in conn.execute(
-            """select c.office_id, ca.person_id, n.text from candidacy ca
-               join contest_option co on co.id = ca.option_id join contest c on c.id = co.contest_id
-               join name n on n.entity_id = ca.person_id
-               join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
-               where c.kind = 'office'"""
-        ).fetchall():
-            namesakes[(office, fold(text))].add(person)
-
         abbreviations: dict[tuple[int, str], str] = {}
         for (year, _, _, _), (_, rows, _) in tables.items():
             for abbreviation, party_text, _, _ in rows:
@@ -229,11 +227,14 @@ def emit() -> Path:
             ).fetchall()
         }
         held_beldes: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
+        held_ilces: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
         for value, path in conn.execute(
             """select x.value, s.path from external_id x join slug s on s.entity_id = x.entity_id and s.is_current
-               where x.scheme = 'tr.polity' and s.path ~ '^tr/[^/]+/[^/]+/[^/]+$'"""
+               where x.scheme = 'tr.polity' and s.path ~ '^tr/[^/]+/[^/]+(/[^/]+)?$'"""
         ).fetchall():
-            held_beldes[(path.split("/")[1], path.split("/")[3])][path] = value
+            parts = path.split("/")
+            (held_beldes if len(parts) == 4 else held_ilces)[(parts[1], parts[-1])][path] = value
+        latest = dict(conn.execute("select polity_id, max(date_from) from election group by polity_id").fetchall())
         matches: dict[str, tuple[str, dict[str, str]]] = {}
         races: list[tuple[int, list[str], str, str, list[Row], dict[str, int]]] = []
         for (year, province, kind, name), (page_title, rows, totals) in tables.items():
@@ -250,31 +251,111 @@ def emit() -> Path:
             keys = [f"{province}-{central}-{slug(name)}", f"{province}-{slug(name)}", f"{province}-merkez-{slug(name)}"]
             if keys[0] in mine:
                 family = (province, *SUCCESSORS.get(province, ()))
+                words = [slug(part) for part in re.split(r"[()/,-]", name) if slug(part)]
                 found = {
                     path: value for place in family for path, value in held_beldes.get((place, slug(name)), {}).items()
                 }
+                for held in (held_beldes, held_ilces):
+                    if not found:
+                        found = {
+                            path: value
+                            for place in family
+                            for word in words
+                            for path, value in held.get((place, word), {}).items()
+                        }
                 if not found:
-                    found = {
-                        path: value
-                        for place in family
-                        for part in re.split(r"[()/,-]", name)
-                        if slug(part)
-                        for path, value in held_beldes.get((place, slug(part)), {}).items()
-                    }
-                if len(found) > 1 and len({path.split("/")[3] for path in found}) == 1:
-                    found = {path: value for path, value in found.items() if path.split("/")[2] == central} or found
-                matches[keys[0]] = (name, found)
+                    scored = [
+                        (difflib.SequenceMatcher(None, word, belde).ratio(), path, value)
+                        for (place, belde), held in held_beldes.items()
+                        if place in family
+                        for path, value in held.items()
+                        if fits(path, province, central)
+                        for word in words
+                        if len(word) >= 6
+                    ]
+                    best = max((ratio for ratio, _, _ in scored), default=0)
+                    found = {path: value for ratio, path, value in scored if ratio == best >= 0.88}
+                pool = found
+                if len(pool) > 1 and all(path.count("/") == 3 for path in pool):
+                    pool = {path: value for path, value in pool.items() if fits(path, province, central)}
+                    pool = {path: value for path, value in pool.items() if path.split("/")[2] == central} or pool
+                if len(pool) > 1:
+                    held_on = {path: latest.get(cs.key("tr.polity", value)) or date.min for path, value in pool.items()}
+                    pool = {path: value for path, value in pool.items() if held_on[path] == max(held_on.values())}
+                matches[keys[0]] = (name, pool if len(pool) == 1 else found)
             races.append((year, keys, entries[0][0], name, [("", entries[0][1], entries[0][2], entries[0][3])], {}))
 
-        mayors: dict[UUID, list[UUID]] = defaultdict(list)
-        for polity_id, office_id in conn.execute("select polity_id, id from office where kind = 'mayor'").fetchall():
-            mayors[polity_id].append(office_id)
         for value, (_, found) in matches.items():
             if len(found) == 1:
-                target = cs.key("tr.polity", next(iter(found.values())))
-                cs.merge(cs.key("tr.polity", value), target)
-                if len(mayors[target]) == 1:
-                    cs.merge(cs.key("tr.office", f"{value}-mayor"), mayors[target][0])
+                cs.merge(cs.key("tr.polity", value), cs.key("tr.polity", next(iter(found.values()))))
+        mayors: dict[UUID, dict[UUID, bool]] = defaultdict(dict)
+        for polity_id, office_id, ours in conn.execute(
+            """select o.polity_id, o.id, c.pipeline = %s from office o join changeset c on c.id = o.changeset_id
+               join entity e on e.id = o.id and e.retired_by is null
+               where o.kind = 'mayor' and not exists (select from entity_merge m where m.entity_id = o.id)
+                 and exists (select from external_id x where x.entity_id = o.id and x.scheme = 'tr.office')""",
+            [SOURCE],
+        ).fetchall():
+            mayors[cs.survivors.get(polity_id, polity_id)][office_id] = ours
+        for offices in mayors.values():
+            theirs = [office for office, ours in offices.items() if not ours]
+            into = theirs[0] if len(theirs) == 1 else None if theirs else min(offices)
+            for office, ours in offices.items():
+                if ours and into is not None and office != into:
+                    cs.merge(office, into)
+        careers: dict[tuple[UUID, str], dict[UUID, tuple[bool, set[int], set[UUID]]]] = defaultdict(dict)
+        for office_id, person_id, text, year, contest_id, ours in conn.execute(
+            """with held as (
+                 select c.office_id, ca.person_id, e.date_from on_day, c.id contest_id from candidacy ca
+                 join contest_option co on co.id = ca.option_id join contest c on c.id = co.contest_id
+                 join election e on e.id = c.election_id
+                 union all
+                 select office_id, person_id, from_date, null from tenure)
+               select h.office_id, h.person_id, n.text, extract(year from h.on_day)::int, h.contest_id, c.pipeline = %s
+               from held h join office o on o.id = h.office_id and o.kind = 'mayor'
+               join entity e on e.id = h.person_id and e.retired_by is null
+               join person p on p.id = h.person_id join changeset c on c.id = p.changeset_id
+               join name n on n.entity_id = p.id and n.is_preferred
+               where h.on_day is not null
+                 and exists (select from external_id x where x.entity_id = o.id and x.scheme = 'tr.office')
+                 and not exists (select from entity_merge m where m.entity_id = p.id)""",
+            [SOURCE],
+        ).fetchall():
+            career = careers[(cs.survivors.get(office_id, office_id), fold(text))].setdefault(
+                person_id, (ours, set(), set())
+            )
+            career[1].add(year)
+            if contest_id is not None:
+                career[2].add(contest_id)
+        for people in careers.values():
+            theirs = [person for person, (ours, _, _) in people.items() if not ours]
+            if len(people) < 2 or len(theirs) > 1:
+                continue
+            into = theirs[0] if theirs else min(people, key=lambda person: min(people[person][1]))
+            pending = [person for person in people if person != into]
+            while pending:
+                near = [
+                    person
+                    for person in pending
+                    if not people[person][2] & people[into][2]
+                    and min(abs(a - b) for a in people[person][1] for b in people[into][1]) <= 7
+                ]
+                if not near:
+                    break
+                for person in near:
+                    cs.merge(person, into)
+                    people[into][1].update(people[person][1])
+                    people[into][2].update(people[person][2])
+                    pending.remove(person)
+        namesakes: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
+        for office, person, text in conn.execute(
+            """select c.office_id, ca.person_id, n.text from candidacy ca
+               join contest_option co on co.id = ca.option_id join contest c on c.id = co.contest_id
+               join name n on n.entity_id = ca.person_id
+               join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
+               where c.kind = 'office'"""
+        ).fetchall():
+            namesakes[(cs.survivors.get(office, office), fold(text))].add(cs.survivors.get(person, person))
         with UNMERGED.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
             writer.writerow(("place", "name", "candidates"))
@@ -641,7 +722,8 @@ def emit() -> Path:
                    where other.person_id = cy.person_id and oo.contest_id <> all(%s::uuid[]))""",
             [f"{SOURCE}.person", list(retiring), list(retiring)],
         ).fetchall():
-            cs.add("entity_retirement", entity_id=person, reason=reason)
+            if UUID(person) not in cs.survivors:
+                cs.add("entity_retirement", entity_id=person, reason=reason)
         used = {row["unit_id"] for row in results}
         for (unit,) in conn.execute(
             """select ru.id::text from reporting_unit ru join changeset ch on ch.id = ru.changeset_id

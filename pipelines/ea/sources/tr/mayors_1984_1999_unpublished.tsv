@@ -76,11 +76,14 @@ year	race	reason
 1963	1963 ankara-kirikkale-yahsihan Yahşihan	contest already held
 1963	1963 ankara-nallihan Nallıhan	contest already held
 1963	1963 ankara-polatli Polatlı	contest already held
+1963	1963 ankara-sereflikochisar-agacoren Ağaçören	contest already held
+1963	1963 ankara-sereflikochisar-cikinagil-evren Çıkınağıl (Evren)	contest already held
 1963	1963 ankara-sereflikochisar-sariyahsi Sarıyahşi	contest already held
 1963	1963 ankara-sulakyurt Sulakyurt	contest already held
 1963	1963 antalya antalya	contest already held
 1963	1963 antalya-akseki Akseki	contest already held
 1963	1963 antalya-alanya Alanya	contest already held
+1963	1963 antalya-alanya-aydinkent-ibradi Aydınkent (İbradı)	contest already held
 1963	1963 antalya-elmali Elmalı	contest already held
 1963	1963 antalya-finike Finike	contest already held
 1963	1963 antalya-finike-turuncova Turunçova	contest already held
@@ -207,11 +210,14 @@ year	race	reason
 1963	1963 denizli denizli	contest already held
 1963	1963 denizli-acipayam Acıpayam	contest already held
 1963	1963 denizli-acipayam-akalan Akalan	contest already held
+1963	1963 denizli-acipayam-kizilhisar-serinhisar Kızılhisar (Serinhisar)	contest already held
 1963	1963 denizli-acipayam-yatagan Yatağan	contest already held
 1963	1963 denizli-buldan Buldan	contest already held
 1963	1963 denizli-cal Çal	contest already held
+1963	1963 denizli-cal-akkent-zeyve Akkent (Zeyve)	contest already held
 1963	1963 denizli-cal-bekilli Bekilli	contest already held
 1963	1963 denizli-cal-bogazici Boğaziçi	contest already held
+1963	1963 denizli-cal-dedekoy-baklan Dedeköy (Baklan)	contest already held
 1963	1963 denizli-cal-denizler Denizler	contest already held
 1963	1963 denizli-cal-hancalar Hançalar	contest already held
 1963	1963 denizli-cal-isabey İsabey	contest already held
@@ -283,6 +289,7 @@ year	race	reason
 1963	1963 erzurum-hinis Hınıs	contest already held
 1963	1963 erzurum-horasan Horasan	contest already held
 1963	1963 erzurum-ispir İspir	contest already held
+1963	1963 erzurum-ispir-norgah-pazaryolu Norgah (Pazaryolu)	contest already held
 1963	1963 erzurum-karayazi Karayazı	contest already held
 1963	1963 erzurum-merkez-ilica Ilıca	contest already held
 1963	1963 erzurum-narman Narman	contest already held
@@ -292,6 +299,7 @@ year	race	reason
 1963	1963 erzurum-senkaya Şenkaya	contest already held
 1963	1963 erzurum-tekman Tekman	contest already held
 1963	1963 erzurum-tortum Tortum	contest already held
+1963	1963 erzurum-tortum-azort-uzundere Azort (Uzundere)	contest already held
 1963	1963 eskisehir eskisehir	contest already held
 1963	1963 eskisehir-cifteler Çifteler	contest already held
 1963	1963 eskisehir-mahmudiye Mahmudiye	contest already held
@@ -305,6 +313,7 @@ year	race	reason
 1963	1963 gaziantep-araban Araban	contest already held
 1963	1963 gaziantep-islahiye İslahiye	contest already held
 1963	1963 gaziantep-nizip Nizip	contest already held
+1963	1963 gaziantep-nizip-barak-karkamis Barak (Karkamış)	contest already held
 1963	1963 gaziantep-oguzeli Oğuzeli	contest already held
 1963	1963 gaziantep-yavuzeli Yavuzeli	contest already held
 1963	1963 giresun giresun	contest already held
@@ -343,6 +352,7 @@ year	race	reason
 1963	1963 isparta isparta	contest already held
 1963	1963 isparta-atabey Atabey	contest already held
 1963	1963 isparta-atabey-islamkoy İslamköy	contest already held
+1963	1963 isparta-egirdir-aksu-anamas Aksu (Anamas)	contest already held
 1963	1963 isparta-gelendost Gelendost	contest already held
 1963	1963 isparta-keciborlu Keçiborlu	contest already held
 1963	1963 isparta-keciborlu-kilic Kılıç	contest already held
@@ -420,6 +430,7 @@ year	race	reason
 1963	1963 kayseri-develi Develi	contest already held
 1963	1963 kayseri-develi-zile Zile	contest already held
 1963	1963 kayseri-felahiye Felahiye	contest already held
+1963	1963 kayseri-felahiye-cukur-ozvatan Çukur (Özvatan)	contest already held
 1963	1963 kayseri-incesu İncesu	contest already held
 1963	1963 kayseri-incesu-kiziloren Kızılören	contest already held
 1963	1963 kayseri-merkez-erciyes Erciyes	contest already held
@@ -486,6 +497,7 @@ year	race	reason
 1963	1963 konya-cumra-akoren Akören	contest already held
 1963	1963 konya-cumra-alibeyhuyugu Alibeyhüyüğü	contest already held
 1963	1963 konya-cumra-icericumra İçeriçumra	contest already held
+1963	1963 konya-cumra-karasenir-karasinir Karasenir (Karasınır)	contest already held
 1963	1963 konya-cumra-karkin Karkın	contest already held
 1963	1963 konya-doganhisar Doğanhisar	contest already held
 1963	1963 konya-doganhisar-baskoy Başköy	contest already held
@@ -494,7 +506,10 @@ year	race	reason
 1963	1963 konya-ermenek Ermenek	contest already held
 1963	1963 konya-ermenek-goktepe Göktepe	contest already held
 1963	1963 konya-hadim Hadim	contest already held
+1963	1963 konya-hadim-argithani Argıthanı	contest already held
 1963	1963 konya-karaman Karaman	contest already held
+1963	1963 konya-karaman-yesildere-ibrala Yeşildere (İbrala)	contest already held
+1963	1963 konya-karaman-yollarbasi-illisira Yollarbaşı (İllisıra)	contest already held
 1963	1963 konya-karapinar Karapınar	contest already held
 1963	1963 konya-karapinar-emirgazi Emirgazi	contest already held
 1963	1963 konya-kulu Kulu	contest already held
@@ -525,17 +540,22 @@ year	race	reason
 1963	1963 malatya-akcadag Akçadağ	contest already held
 1963	1963 malatya-arguvan Arguvan	contest already held
 1963	1963 malatya-darende Darende	contest already held
+1963	1963 malatya-darende-balaban-gerimter Balaban (Gerimter)	contest already held
 1963	1963 malatya-dogansehir Doğanşehir	contest already held
 1963	1963 malatya-dogansehir-erkenek Erkenek	contest already held
 1963	1963 malatya-dogansehir-polat Polat	contest already held
 1963	1963 malatya-dogansehir-surgu Sürgü	contest already held
 1963	1963 malatya-hekimhan Hekimhan	contest already held
 1963	1963 malatya-hekimhan-hasancelebi Hasançelebi	contest already held
+1963	1963 malatya-merkez-eskimalatya-battalgazi Eskimalatya (Battalgazi)	contest already held
+1963	1963 malatya-merkez-konak-yukaribanazi Konak (Yukarıbanazı)	contest already held
+1963	1963 malatya-puturge-doganyol-keferdiz Doğanyol (Keferdiz)	contest already held
 1963	1963 malatya-yesilyurt Yeşilyurt	contest already held
 1963	1963 malatya-yesilyurt-gunduzbey Gündüzbey	contest already held
 1963	1963 manisa manisa	contest already held
 1963	1963 manisa-akhisar Akhisar	contest already held
 1963	1963 manisa-akhisar-suleymanli Süleymanlı	contest already held
+1963	1963 manisa-akhisar-yayakoy-palamut Yayaköy (Palamut)	contest already held
 1963	1963 manisa-alasehir Alaşehir	contest already held
 1963	1963 manisa-demirci Demirci	contest already held
 1963	1963 manisa-gordes Gördes	contest already held
@@ -572,6 +592,7 @@ year	race	reason
 1963	1963 mersin-silifke Silifke	contest already held
 1963	1963 mersin-silifke-tasucu Taşucu	contest already held
 1963	1963 mersin-tarsus Tarsus	contest already held
+1963	1963 mersin-tarsus-namrun-camliyayla Namrun (Çamlıyayla)	contest already held
 1963	1963 mersin-tarsus-yenice Yenice	contest already held
 1963	1963 mugla mugla	contest already held
 1963	1963 mugla-bodrum Bodrum	contest already held
@@ -585,6 +606,7 @@ year	race	reason
 1963	1963 mugla-ula Ula	contest already held
 1963	1963 mugla-yatagan Yatağan	contest already held
 1963	1963 mugla-yatagan-kavaklidere Kavaklıdere	contest already held
+1963	1963 mugla-yatagan-turgut-leyne Turgut (Leyne)	contest already held
 1963	1963 mus-bulanik Bulanık	contest already held
 1963	1963 mus-malazgirt Malazgirt	contest already held
 1963	1963 mus-varto Varto	contest already held
@@ -646,6 +668,7 @@ year	race	reason
 1963	1963 sakarya-karasu-kocaali Kocaali	contest already held
 1963	1963 sakarya-karasu-sinanoglu Sinanoğlu	contest already held
 1963	1963 sakarya-merkez-arifiye Arifiye	contest already held
+1963	1963 sakarya-merkez-buyuksogutlu-sogutlu Büyüksöğütlü (Söğütlü)	contest already held
 1963	1963 sakarya-merkez-erenler Erenler	contest already held
 1963	1963 sakarya-merkez-serdivan Serdivan	contest already held
 1963	1963 sakarya-sapanca Sapanca	contest already held
@@ -728,6 +751,7 @@ year	race	reason
 1963	1963 trabzon-arakli Araklı	contest already held
 1963	1963 trabzon-arsin Arsin	contest already held
 1963	1963 trabzon-caykara Çaykara	contest already held
+1963	1963 trabzon-caykara-kondu-dernekpazari Kondu (Dernekpazarı)	contest already held
 1963	1963 trabzon-macka Maçka	contest already held
 1963	1963 trabzon-of Of	contest already held
 1963	1963 trabzon-surmene Sürmene	contest already held
@@ -760,6 +784,7 @@ year	race	reason
 1963	1963 yozgat-akdagmadeni Akdağmadeni	contest already held
 1963	1963 yozgat-bogazliyan Boğazlıyan	contest already held
 1963	1963 yozgat-bogazliyan-bektasli Bektaşlı	contest already held
+1963	1963 yozgat-bogazliyan-fakili-yenifakili Fakılı (Yenifakılı)	contest already held
 1963	1963 yozgat-bogazliyan-uzunlu Uzunlu	contest already held
 1963	1963 yozgat-cayiralan Çayıralan	contest already held
 1963	1963 yozgat-cayiralan-buyukkisla Büyükkışla	contest already held
@@ -853,6 +878,7 @@ year	race	reason
 1973	1973 afyonkarahisar-merkez-anitkaya Anıtkaya	contest already held
 1973	1973 afyonkarahisar-merkez-cobanlar Çobanlar	contest already held
 1973	1973 afyonkarahisar-merkez-isiklar Işıklar	contest already held
+1973	1973 afyonkarahisar-merkez-sulumenli-beskuyu Sülümenli (Beşkuyu)	contest already held
 1973	1973 afyonkarahisar-sandikli Sandıklı	contest already held
 1973	1973 afyonkarahisar-sandikli-akharim Akharım	contest already held
 1973	1973 afyonkarahisar-sandikli-ballik Ballık	contest already held
@@ -860,6 +886,7 @@ year	race	reason
 1973	1973 afyonkarahisar-sandikli-karadirek Karadirek	contest already held
 1973	1973 afyonkarahisar-sandikli-kiziloren Kızılören	contest already held
 1973	1973 afyonkarahisar-sandikli-yavaslar Yavaşlar	contest already held
+1973	1973 afyonkarahisar-sincanli-sinanpasa-nuhkoy Nuhköy	contest already held
 1973	1973 afyonkarahisar-suhut Şuhut	contest already held
 1973	1973 afyonkarahisar-suhut-balcikhisar Balçıkhisar	contest already held
 1973	1973 afyonkarahisar-suhut-karaadilli Karaadilli	contest already held
@@ -889,10 +916,13 @@ year	race	reason
 1973	1973 amasya-merzifon-kayaduzu Kayadüzü	contest already held
 1973	1973 amasya-suluova Suluova	contest already held
 1973	1973 amasya-tasova Taşova	contest already held
+1973	1973 amasya-tasova-alparslan-yolbasi Alparslan (Yolbaşı)	contest already held
 1973	1973 amasya-tasova-caydibi Çaydibi	contest already held
 1973	1973 amasya-tasova-destek Destek	contest already held
 1973	1973 amasya-tasova-esencay Esençay	contest already held
 1973	1973 amasya-tasova-golbeyli Gölbeyli	contest already held
+1973	1973 amasya-tasova-ulucay-tekke Uluçay (Tekke)	contest already held
+1973	1973 amasya-tasova-ulukoy-sannu Uluköy (Sannu)	contest already held
 1973	1973 ankara-ayas Ayaş	contest already held
 1973	1973 ankara-ayas-sinanli Sinanlı	contest already held
 1973	1973 ankara-bala Balâ	contest already held
@@ -926,6 +956,8 @@ year	race	reason
 1973	1973 ankara-nallihan Nallıhan	contest already held
 1973	1973 ankara-nallihan-sariyar Sarıyar	contest already held
 1973	1973 ankara-polatli Polatlı	contest already held
+1973	1973 ankara-sereflikochisar-agacoren Ağaçören	contest already held
+1973	1973 ankara-sereflikochisar-cikinagil-evren Çıkınağıl (Evren)	contest already held
 1973	1973 ankara-sereflikochisar-sariyahsi Sarıyahşi	contest already held
 1973	1973 ankara-sulakyurt Sulakyurt	contest already held
 1973	1973 antalya antalya	contest already held
@@ -943,6 +975,7 @@ year	race	reason
 1973	1973 antalya-gundogmus Gündoğmuş	contest already held
 1973	1973 antalya-gundogmus-guzelbag Güzelbağ	contest already held
 1973	1973 antalya-kas Kaş	contest already held
+1973	1973 antalya-kas-zumrutkaya-demre Zümrütkaya (Demre)	contest already held
 1973	1973 antalya-korkuteli Korkuteli	contest already held
 1973	1973 antalya-korkuteli-bozova Bozova	contest already held
 1973	1973 antalya-korkuteli-comakli Çomaklı	contest already held
@@ -962,6 +995,7 @@ year	race	reason
 1973	1973 artvin-arhavi Arhavi	contest already held
 1973	1973 artvin-borcka Borçka	contest already held
 1973	1973 artvin-borcka-damar Damar	contest already held
+1973	1973 artvin-borcka-goktas-murgul Göktaş (Murgul)	contest already held
 1973	1973 artvin-hopa Hopa	contest already held
 1973	1973 artvin-savsat Şavşat	contest already held
 1973	1973 artvin-yusufeli Yusufeli	contest already held
@@ -971,6 +1005,7 @@ year	race	reason
 1973	1973 aydin-bozdogan-yazikent Yazıkent	contest already held
 1973	1973 aydin-cine Çine	contest already held
 1973	1973 aydin-cine-akcaova Akçaova	contest already held
+1973	1973 aydin-cine-demircidere-karpuzlu Demircidere (Karpuzlu)	contest already held
 1973	1973 aydin-germencik Germencik	contest already held
 1973	1973 aydin-germencik-hidirbeyli Hıdırbeyli	contest already held
 1973	1973 aydin-germencik-mursalli Mursallı	contest already held
@@ -984,6 +1019,7 @@ year	race	reason
 1973	1973 aydin-kusadasi-davutlar Davutlar	contest already held
 1973	1973 aydin-kuyucak Kuyucak	contest already held
 1973	1973 aydin-kuyucak-basaran Başaran	contest already held
+1973	1973 aydin-kuyucak-burhaniye-buharkent Burhaniye (Buharkent)	contest already held
 1973	1973 aydin-kuyucak-pamukoren Pamukören	contest already held
 1973	1973 aydin-merkez-acarlar Acarlar	contest already held
 1973	1973 aydin-merkez-incirliova İncirliova	contest already held
@@ -1013,10 +1049,12 @@ year	race	reason
 1973	1973 balikesir-bigadic Bigadiç	contest already held
 1973	1973 balikesir-bigadic-iskelekoy İskeleköy	contest already held
 1973	1973 balikesir-burhaniye Burhaniye	contest already held
+1973	1973 balikesir-burhaniye-armutova-gomec Armutova (Gömeç)	contest already held
 1973	1973 balikesir-burhaniye-pelitkoy Pelitköy	contest already held
 1973	1973 balikesir-dursunbey Dursunbey	contest already held
 1973	1973 balikesir-edremit Edremit	contest already held
 1973	1973 balikesir-edremit-altinoluk Altınoluk	contest already held
+1973	1973 balikesir-edremit-armutova-gomec Armutova (Gömeç)	contest already held
 1973	1973 balikesir-erdek Erdek	contest already held
 1973	1973 balikesir-erdek-marmara Marmara	contest already held
 1973	1973 balikesir-gonen Gönen	contest already held
@@ -1177,6 +1215,7 @@ year	race	reason
 1973	1973 denizli-acipayam-dariveren Darıveren	contest already held
 1973	1973 denizli-acipayam-dodurgalar Dodurgalar	contest already held
 1973	1973 denizli-acipayam-kelekci Kelekçi	contest already held
+1973	1973 denizli-acipayam-kizilhisar-serinhisar Kızılhisar (Serinhisar)	contest already held
 1973	1973 denizli-acipayam-yatagan Yatağan	contest already held
 1973	1973 denizli-acipayam-yazir Yazır	contest already held
 1973	1973 denizli-acipayam-yesilyuva Yeşilyuva	contest already held
@@ -1266,11 +1305,13 @@ year	race	reason
 1973	1973 elazig-sivrice Sivrice	contest already held
 1973	1973 erzincan erzincan	contest already held
 1973	1973 erzincan-cayirli Çayırlı	contest already held
+1973	1973 erzincan-cayirli-karakulak-otlukbeli Karakulak (Otlukbeli)	contest already held
 1973	1973 erzincan-ilic İliç	contest already held
 1973	1973 erzincan-kemah Kemah	contest already held
 1973	1973 erzincan-kemaliye Kemaliye	contest already held
 1973	1973 erzincan-refahiye Refahiye	contest already held
 1973	1973 erzincan-tercan Tercan	contest already held
+1973	1973 erzincan-tercan-cadirkaya-pekeric Çadırkaya (Pekeriç)	contest already held
 1973	1973 erzincan-tercan-mercan Mercan	contest already held
 1973	1973 erzurum erzurum	contest already held
 1973	1973 erzurum-askale Aşkale	contest already held
@@ -1360,7 +1401,9 @@ year	race	reason
 1973	1973 hatay-altinozu Altınözü	contest already held
 1973	1973 hatay-dortyol Dörtyol	contest already held
 1973	1973 hatay-dortyol-kuzuculu Kuzuculu	contest already held
+1973	1973 hatay-dortyol-yakacik-payas Yakacık (Payas)	contest already held
 1973	1973 hatay-dortyol-yesil Yeşil	contest already held
+1973	1973 hatay-dortyol-yesilkent-erzin Yeşilkent (Erzin)	contest already held
 1973	1973 hatay-hassa Hassa	contest already held
 1973	1973 hatay-hassa-aktepe Aktepe	contest already held
 1973	1973 hatay-iskenderun İskenderun	contest already held
@@ -1413,6 +1456,7 @@ year	race	reason
 1973	1973 istanbul-kartal-yakacik Yakacık	contest already held
 1973	1973 istanbul-sile Şile	contest already held
 1973	1973 istanbul-silivri Silivri	contest already held
+1973	1973 istanbul-silivri-celaliye-kamiloba Celaliye (Kamiloba)	contest already held
 1973	1973 istanbul-silivri-degirmenkoy Değirmenköy	contest already held
 1973	1973 istanbul-silivri-selimpasa Selimpaşa	contest already held
 1973	1973 istanbul-yalova Yalova	contest already held
@@ -1440,6 +1484,7 @@ year	race	reason
 1973	1973 izmir-kemalpasa-yukarikizilca Yukarıkızılca	contest already held
 1973	1973 izmir-kinik Kınık	contest already held
 1973	1973 izmir-kinik-poyracik Poyracık	contest already held
+1973	1973 izmir-kinik-yayla-yayakoy Yayla (Yayaköy)	contest already held
 1973	1973 izmir-kiraz Kiraz	contest already held
 1973	1973 izmir-menemen Menemen	contest already held
 1973	1973 izmir-menemen-aliaga Aliağa	contest already held
@@ -1455,6 +1500,7 @@ year	race	reason
 1973	1973 izmir-seferihisar Seferihisar	contest already held
 1973	1973 izmir-selcuk Selçuk	contest already held
 1973	1973 izmir-tire Tire	contest already held
+1973	1973 izmir-tire-gokcenli-kahrat Gökçenli (Kahrat)	contest already held
 1973	1973 izmir-torbali Torbalı	contest already held
 1973	1973 izmir-torbali-pancar Pancar	contest already held
 1973	1973 izmir-torbali-yazibasi Yazıbaşı	contest already held
@@ -1520,6 +1566,7 @@ year	race	reason
 1973	1973 kayseri-felahiye Felahiye	contest already held
 1973	1973 kayseri-felahiye-buyuktoraman Büyüktoraman	contest already held
 1973	1973 kayseri-incesu İncesu	contest already held
+1973	1973 kayseri-incesu-kiziloren-kizilviran Kızılören (Kızılviran)	contest already held
 1973	1973 kayseri-incesu-suksun Süksün	contest already held
 1973	1973 kayseri-merkez-argincik Argıncık	contest already held
 1973	1973 kayseri-merkez-erkilet Erkilet	contest already held
@@ -1534,6 +1581,7 @@ year	race	reason
 1973	1973 kayseri-pinarbasi Pınarbaşı	contest already held
 1973	1973 kayseri-sarioglan Sarıoğlan	contest already held
 1973	1973 kayseri-sarioglan-ciftlik Çiftlik	contest already held
+1973	1973 kayseri-sariz-yalakkoy Yalakköy	contest already held
 1973	1973 kayseri-tomarza Tomarza	contest already held
 1973	1973 kayseri-tomarza-ozluce Özlüce	contest already held
 1973	1973 kayseri-yahyali Yahyalı	contest already held
@@ -1590,11 +1638,17 @@ year	race	reason
 1973	1973 konya-beysehir Beyşehir	contest already held
 1973	1973 konya-beysehir-derebucak Derebucak	contest already held
 1973	1973 konya-beysehir-doganbey Doğanbey	contest already held
+1973	1973 konya-beysehir-gencek Gencek	contest already held
 1973	1973 konya-beysehir-huglu Huğlu	contest already held
 1973	1973 konya-beysehir-huyuk Hüyük	contest already held
+1973	1973 konya-beysehir-kireli Kıreli	contest already held
 1973	1973 konya-beysehir-kurucaova Kurucaova	contest already held
+1973	1973 konya-beysehir-mahremli-kayabasi Mahremli (Kayabaşı)	contest already held
+1973	1973 konya-beysehir-selki Selki	contest already held
 1973	1973 konya-beysehir-ustunler Üstünler	contest already held
+1973	1973 konya-beysehir-uzumlu-manastir Üzümlü (Manastır)	contest already held
 1973	1973 konya-beysehir-yenidogan Yenidoğan	contest already held
+1973	1973 konya-beysehir-yesildag-kasakli Yeşildağ (Kasaklı)	contest already held
 1973	1973 konya-bozkir Bozkır	contest already held
 1973	1973 konya-bozkir-ahirli Ahırlı	contest already held
 1973	1973 konya-bozkir-akkise Akkise	contest already held
@@ -1608,6 +1662,7 @@ year	race	reason
 1973	1973 konya-cumra Çumra	contest already held
 1973	1973 konya-cumra-akoren Akören	contest already held
 1973	1973 konya-cumra-dinek Dinek	contest already held
+1973	1973 konya-cumra-karasenir-karasinir Karasenir (Karasınır)	contest already held
 1973	1973 konya-doganhisar Doğanhisar	contest already held
 1973	1973 konya-doganhisar-ayaslar Ayaslar	contest already held
 1973	1973 konya-doganhisar-baskoy Başköy	contest already held
@@ -1620,9 +1675,11 @@ year	race	reason
 1973	1973 konya-eregli-kutoren Kutören	contest already held
 1973	1973 konya-ermenek Ermenek	contest already held
 1973	1973 konya-ermenek-basyayla Başyayla	contest already held
+1973	1973 konya-ermenek-goktepe-fariske Göktepe (Fariske)	contest already held
 1973	1973 konya-ermenek-kazanci Kazancı	contest already held
 1973	1973 konya-ermenek-sariveliler Sarıveliler	contest already held
 1973	1973 konya-hadim Hadim	contest already held
+1973	1973 konya-hadim-balcilar-alata Balcılar (Alata)	contest already held
 1973	1973 konya-hadim-cetmi Çetmi	contest already held
 1973	1973 konya-hadim-dedemli Dedemli	contest already held
 1973	1973 konya-hadim-korualan Korualan	contest already held
@@ -1639,10 +1696,12 @@ year	race	reason
 1973	1973 konya-karaman-akcasehir Akçaşehir	contest already held
 1973	1973 konya-karaman-suduragi Sudurağı	contest already held
 1973	1973 konya-karaman-taskale Taşkale	contest already held
+1973	1973 konya-karaman-yollarbasi-ilisira Yollarbaşı (İlisıra)	contest already held
 1973	1973 konya-karapinar Karapınar	contest already held
 1973	1973 konya-karapinar-emirgazi Emirgazi	contest already held
 1973	1973 konya-kulu Kulu	contest already held
 1973	1973 konya-kulu-kozanli Kozanlı	contest already held
+1973	1973 konya-kulu-tavsancali-omerhanli Tavşancalı (Ömerhanlı)	contest already held
 1973	1973 konya-kulu-zincirlikuyu Zincirlikuyu	contest already held
 1973	1973 konya-merkez-basarakavak Başarakavak	contest already held
 1973	1973 konya-merkez-ciftlikozu Çiftliközü	contest already held
@@ -1663,6 +1722,7 @@ year	race	reason
 1973	1973 konya-seydisehir-tarasci Taraşçı	contest already held
 1973	1973 konya-yunak Yunak	contest already held
 1973	1973 konya-yunak-celtik Çeltik	contest already held
+1973	1973 konya-yunak-gokpinar Gökpınar	contest already held
 1973	1973 konya-yunak-turgut Turgut	contest already held
 1973	1973 konya-yunak-yukaripiribeyli Yukarıpiribeyli	contest already held
 1973	1973 kutahya kutahya	contest already held
@@ -1698,6 +1758,7 @@ year	race	reason
 1973	1973 malatya-darende Darende	contest already held
 1973	1973 malatya-darende-asagiulupinar Aşağıulupınar	contest already held
 1973	1973 malatya-darende-ayvali Ayvalı	contest already held
+1973	1973 malatya-darende-balaban-gerimter Balaban (Gerimter)	contest already held
 1973	1973 malatya-darende-kuluncak Kuluncak	contest already held
 1973	1973 malatya-dogansehir Doğanşehir	contest already held
 1973	1973 malatya-dogansehir-erkenek Erkenek	contest already held
@@ -1710,6 +1771,7 @@ year	race	reason
 1973	1973 malatya-merkez-dilek Dilek	contest already held
 1973	1973 malatya-merkez-eskimalatya Eskimalatya	contest already held
 1973	1973 malatya-merkez-hanimciftligi Hanımçiftliği	contest already held
+1973	1973 malatya-merkez-konak-yukaribanazi Konak (Yukarıbanazı)	contest already held
 1973	1973 malatya-merkez-yaygin Yaygın	contest already held
 1973	1973 malatya-merkez-yesiltepe Yeşiltepe	contest already held
 1973	1973 malatya-yesilyurt Yeşilyurt	contest already held
@@ -1783,6 +1845,7 @@ year	race	reason
 1973	1973 mersin-erdemli-kargipinari Kargıpınarı	contest already held
 1973	1973 mersin-erdemli-kocahasanli Kocahasanlı	contest already held
 1973	1973 mersin-erdemli-limonlu Limonlu	contest already held
+1973	1973 mersin-erdemli-tomuk-elvanli Tömük (Elvanlı)	contest already held
 1973	1973 mersin-merkez-arslankoy Arslanköy	contest already held
 1973	1973 mersin-merkez-gozne Gözne	contest already held
 1973	1973 mersin-merkez-mezitli Mezitli	contest already held
@@ -1801,6 +1864,7 @@ year	race	reason
 1973	1973 mugla-fethiye-seki Seki	contest already held
 1973	1973 mugla-fethiye-yesiluzumlu Yeşilüzümlü	contest already held
 1973	1973 mugla-koycegiz Köyceğiz	contest already held
+1973	1973 mugla-koycegiz-dalyan Dalyan	contest already held
 1973	1973 mugla-koycegiz-ortaca Ortaca	contest already held
 1973	1973 mugla-marmaris Marmaris	contest already held
 1973	1973 mugla-merkez-bayir Bayır	contest already held
@@ -1840,8 +1904,10 @@ year	race	reason
 1973	1973 nevsehir-merkez-tatlarin Tatlarin	contest already held
 1973	1973 nevsehir-merkez-uchisar Uçhisar	contest already held
 1973	1973 nevsehir-urgup Ürgüp	contest already held
+1973	1973 nevsehir-urgup-basdere-baskoy Başdere (Başköy)	contest already held
 1973	1973 nevsehir-urgup-mustafapasa Mustafapaşa	contest already held
 1973	1973 nevsehir-urgup-ortahisar Ortahisar	contest already held
+1973	1973 nigde-aksaray-agacli-gulagac Ağaçlı (Gülağaç)	contest already held
 1973	1973 nigde-aksaray-altinkaya Altınkaya	contest already held
 1973	1973 nigde-aksaray-demirci Demirci	contest already held
 1973	1973 nigde-aksaray-eskil Eskil	contest already held
@@ -1849,11 +1915,13 @@ year	race	reason
 1973	1973 nigde-aksaray-gulpinar Gülpınar	contest already held
 1973	1973 nigde-aksaray-guzelyurt Güzelyurt	contest already held
 1973	1973 nigde-aksaray-helvadere Helvadere	contest already held
+1973	1973 nigde-aksaray-ihlara-yesilkoy Ihlara (Yeşilköy)	contest already held
 1973	1973 nigde-aksaray-incesu İncesu	contest already held
 1973	1973 nigde-aksaray-sultanhani Sultanhanı	contest already held
 1973	1973 nigde-aksaray-taspinar Taşpınar	contest already held
 1973	1973 nigde-aksaray-yenikent Yenikent	contest already held
 1973	1973 nigde-aksaray-yesilova Yeşilova	contest already held
+1973	1973 nigde-aksaray-yesiltepe-kirgil Yeşiltepe (Kırgıl)	contest already held
 1973	1973 nigde-bor Bor	contest already held
 1973	1973 nigde-bor-bahceli Bahçeli	contest already held
 1973	1973 nigde-bor-cukurkuyu Çukurkuyu	contest already held
@@ -1883,9 +1951,11 @@ year	race	reason
 1973	1973 ordu-fatsa-bolaman Bolaman	contest already held
 1973	1973 ordu-fatsa-catalpinar Çatalpınar	contest already held
 1973	1973 ordu-fatsa-eskikoy Eskiköy	contest already held
+1973	1973 ordu-fatsa-sarmasik-ilica Sarmaşık (Ilıca)	contest already held
 1973	1973 ordu-fatsa-yalikoy Yalıköy	contest already held
 1973	1973 ordu-golkoy Gölköy	contest already held
 1973	1973 ordu-golkoy-gurgentepe Gürgentepe	contest already held
+1973	1973 ordu-golkoy-isiktepe Işıktepe	contest already held
 1973	1973 ordu-korgan Korgan	contest already held
 1973	1973 ordu-korgan-tepealan Tepealan	contest already held
 1973	1973 ordu-kumru Kumru	contest already held
@@ -1894,6 +1964,7 @@ year	race	reason
 1973	1973 ordu-mesudiye Mesudiye	contest already held
 1973	1973 ordu-mesudiye-yesilce Yeşilce	contest already held
 1973	1973 ordu-persembe Perşembe	contest already held
+1973	1973 ordu-persembe-doganli-medreseonu Doğanlı (Medreseönü)	contest already held
 1973	1973 ordu-ulubey Ulubey	contest already held
 1973	1973 ordu-unye Ünye	contest already held
 1973	1973 ordu-unye-caybasi Çaybaşı	contest already held
@@ -1911,6 +1982,7 @@ year	race	reason
 1973	1973 rize-merkez-guneysu Güneysu	contest already held
 1973	1973 rize-merkez-kendirli Kendirli	contest already held
 1973	1973 rize-pazar Pazar	contest already held
+1973	1973 rize-pazar-ortakoy-hemsin Ortaköy (Hemşin)	contest already held
 1973	1973 sakarya sakarya	contest already held
 1973	1973 sakarya-akyazi Akyazı	contest already held
 1973	1973 sakarya-akyazi-akpurcek Akpürçek	contest already held
@@ -1924,11 +1996,13 @@ year	race	reason
 1973	1973 sakarya-karasu Karasu	contest already held
 1973	1973 sakarya-karasu-daricayiri Darıçayırı	contest already held
 1973	1973 sakarya-karasu-kocaali Kocaali	contest already held
+1973	1973 sakarya-karasu-lahna-ortakoy Lahna (Ortaköy)	contest already held
 1973	1973 sakarya-karasu-sinanoglu Sinanoğlu	contest already held
 1973	1973 sakarya-kaynarca Kaynarca	contest already held
 1973	1973 sakarya-merkez-arifiye Arifiye	contest already held
 1973	1973 sakarya-merkez-erenler Erenler	contest already held
 1973	1973 sakarya-merkez-ferizli Ferizli	contest already held
+1973	1973 sakarya-merkez-golkent Gölkent	contest already held
 1973	1973 sakarya-merkez-serdivan Serdivan	contest already held
 1973	1973 sakarya-merkez-sogutlu Söğütlü	contest already held
 1973	1973 sakarya-sapanca Sapanca	contest already held
@@ -1937,6 +2011,7 @@ year	race	reason
 1973	1973 samsun-alacam Alaçam	contest already held
 1973	1973 samsun-alacam-yakakent Yakakent	contest already held
 1973	1973 samsun-bafra Bafra	contest already held
+1973	1973 samsun-bafra-ballica-19-mayis Ballıca (19 Mayıs)	contest already held
 1973	1973 samsun-bafra-kolay Kolay	contest already held
 1973	1973 samsun-carsamba Çarşamba	contest already held
 1973	1973 samsun-havza Havza	contest already held
@@ -2019,7 +2094,9 @@ year	race	reason
 1973	1973 tokat tokat	contest already held
 1973	1973 tokat-almus Almus	contest already held
 1973	1973 tokat-almus-akarcay Akarçay	contest already held
+1973	1973 tokat-almus-cevreli-muhat Çevreli (Muhat)	contest already held
 1973	1973 tokat-artova Artova	contest already held
+1973	1973 tokat-artova-arabacimusa-yesilyurt Arabacımusa (Yeşilyurt)	contest already held
 1973	1973 tokat-erbaa Erbaa	contest already held
 1973	1973 tokat-erbaa-degirmenli Değirmenli	contest already held
 1973	1973 tokat-erbaa-kocak Koçak	contest already held
@@ -2037,6 +2114,7 @@ year	race	reason
 1973	1973 tokat-turhal-senyurt Şenyurt	contest already held
 1973	1973 tokat-turhal-uzumoren Üzümören	contest already held
 1973	1973 tokat-zile Zile	contest already held
+1973	1973 tokat-zile-yildiztepe-boztepe Yıldıztepe (Boztepe)	contest already held
 1973	1973 trabzon trabzon	contest already held
 1973	1973 trabzon-akcaabat Akçaabat	contest already held
 1973	1973 trabzon-akcaabat-akcakoy Akçaköy	contest already held
@@ -2047,6 +2125,7 @@ year	race	reason
 1973	1973 trabzon-arsin Arsin	contest already held
 1973	1973 trabzon-caykara Çaykara	contest already held
 1973	1973 trabzon-caykara-atakoy Ataköy	contest already held
+1973	1973 trabzon-caykara-dernekpazari-kondu Dernekpazarı (Kondu)	contest already held
 1973	1973 trabzon-caykara-karacam Karaçam	contest already held
 1973	1973 trabzon-caykara-uzungol Uzungöl	contest already held
 1973	1973 trabzon-macka Maçka	contest already held
@@ -2158,6 +2237,7 @@ year	race	reason
 1989	1989 istanbul istanbul	contest already held
 1989	1989 izmir izmir	contest already held
 1989	1989 kayseri kayseri	contest already held
+1989	1989 kayseri-bunyan-suksun Süksün	contest already held
 1989	1989 konya konya	contest already held
 1994	1994 adana adana	contest already held
 1994	1994 ankara ankara	contest already held
@@ -2189,89 +2269,41 @@ year	race	reason
 1999	1999 konya konya	contest already held
 1999	1999 mersin icel	contest already held
 1999	1999 samsun samsun	contest already held
-1963	1963 ankara-sereflikochisar-agacoren Ağaçören	election already held
-1963	1963 ankara-sereflikochisar-cikinagil-evren Çıkınağıl (Evren)	election already held
-1963	1963 antalya-alanya-aydinkent-ibradi Aydınkent (İbradı)	election already held
-1963	1963 denizli-acipayam-kizilhisar-serinhisar Kızılhisar (Serinhisar)	election already held
-1963	1963 denizli-cal-akkent-zeyve Akkent (Zeyve)	election already held
-1963	1963 denizli-cal-dedekoy-baklan Dedeköy (Baklan)	election already held
-1963	1963 erzurum-ispir-norgah-pazaryolu Norgah (Pazaryolu)	election already held
-1963	1963 erzurum-tortum-azort-uzundere Azort (Uzundere)	election already held
-1963	1963 gaziantep-nizip-barak-karkamis Barak (Karkamış)	election already held
-1963	1963 isparta-egirdir-aksu-anamas Aksu (Anamas)	election already held
-1963	1963 kayseri-felahiye-cukur-ozvatan Çukur (Özvatan)	election already held
-1963	1963 konya-cumra-karasenir-karasinir Karasenir (Karasınır)	election already held
-1963	1963 konya-hadim-argithani Argıthanı	election already held
-1963	1963 konya-karaman-yesildere-ibrala Yeşildere (İbrala)	election already held
-1963	1963 konya-karaman-yollarbasi-illisira Yollarbaşı (İllisıra)	election already held
-1963	1963 malatya-darende-balaban-gerimter Balaban (Gerimter)	election already held
-1963	1963 malatya-merkez-eskimalatya-battalgazi Eskimalatya (Battalgazi)	election already held
-1963	1963 malatya-merkez-konak-yukaribanazi Konak (Yukarıbanazı)	election already held
-1963	1963 malatya-puturge-doganyol-keferdiz Doğanyol (Keferdiz)	election already held
-1963	1963 manisa-akhisar-yayakoy-palamut Yayaköy (Palamut)	election already held
+1963	1963 denizli-civril-bulgaz-gurpinar Bulgaz (Gürpınar)	election already held
+1963	1963 konya-beysehir-balkanda-imrenler Balkanda (İmrenler)	election already held
+1963	1963 malatya-merkez-bahcebasi-orduzu Bahçebaşı (Orduzu)	election already held
 1963	1963 mersin-merkez-gozne Gözne	election already held
-1963	1963 mersin-tarsus-namrun-camliyayla Namrun (Çamlıyayla)	election already held
-1963	1963 mugla-yatagan-turgut-leyne Turgut (Leyne)	election already held
-1963	1963 sakarya-merkez-buyuksogutlu-sogutlu Büyüksöğütlü (Söğütlü)	election already held
-1963	1963 trabzon-caykara-kondu-dernekpazari Kondu (Dernekpazarı)	election already held
-1963	1963 yozgat-bogazliyan-fakili-yenifakili Fakılı (Yenifakılı)	election already held
-1973	1973 afyonkarahisar-merkez-sulumenli-beskuyu Sülümenli (Beşkuyu)	election already held
-1973	1973 afyonkarahisar-sincanli-sinanpasa-nuhkoy Nuhköy	election already held
-1973	1973 amasya-tasova-alparslan-yolbasi Alparslan (Yolbaşı)	election already held
-1973	1973 amasya-tasova-ulucay-tekke Uluçay (Tekke)	election already held
-1973	1973 amasya-tasova-ulukoy-sannu Uluköy (Sannu)	election already held
-1973	1973 ankara-sereflikochisar-agacoren Ağaçören	election already held
-1973	1973 ankara-sereflikochisar-cikinagil-evren Çıkınağıl (Evren)	election already held
-1973	1973 antalya-kas-zumrutkaya-demre Zümrütkaya (Demre)	election already held
-1973	1973 artvin-borcka-goktas-murgul Göktaş (Murgul)	election already held
-1973	1973 aydin-cine-demircidere-karpuzlu Demircidere (Karpuzlu)	election already held
-1973	1973 aydin-kuyucak-burhaniye-buharkent Burhaniye (Buharkent)	election already held
-1973	1973 balikesir-burhaniye-armutova-gomec Armutova (Gömeç)	election already held
-1973	1973 balikesir-edremit-armutova-gomec Armutova (Gömeç)	election already held
-1973	1973 denizli-acipayam-kizilhisar-serinhisar Kızılhisar (Serinhisar)	election already held
-1973	1973 erzincan-cayirli-karakulak-otlukbeli Karakulak (Otlukbeli)	election already held
-1973	1973 erzincan-tercan-cadirkaya-pekeric Çadırkaya (Pekeriç)	election already held
-1973	1973 hatay-dortyol-yakacik-payas Yakacık (Payas)	election already held
-1973	1973 hatay-dortyol-yesilkent-erzin Yeşilkent (Erzin)	election already held
-1973	1973 istanbul-silivri-celaliye-kamiloba Celaliye (Kamiloba)	election already held
-1973	1973 izmir-kinik-yayla-yayakoy Yayla (Yayaköy)	election already held
-1973	1973 izmir-tire-gokcenli-kahrat Gökçenli (Kahrat)	election already held
-1973	1973 kayseri-incesu-kiziloren-kizilviran Kızılören (Kızılviran)	election already held
-1973	1973 kayseri-sariz-yalakkoy Yalakköy	election already held
-1973	1973 konya-beysehir-gencek Gencek	election already held
-1973	1973 konya-beysehir-kireli Kıreli	election already held
-1973	1973 konya-beysehir-mahremli-kayabasi Mahremli (Kayabaşı)	election already held
-1973	1973 konya-beysehir-selki Selki	election already held
-1973	1973 konya-beysehir-uzumlu-manastir Üzümlü (Manastır)	election already held
-1973	1973 konya-beysehir-yesildag-kasakli Yeşildağ (Kasaklı)	election already held
-1973	1973 konya-cumra-karasenir-karasinir Karasenir (Karasınır)	election already held
-1973	1973 konya-ermenek-goktepe-fariske Göktepe (Fariske)	election already held
-1973	1973 konya-hadim-balcilar-alata Balcılar (Alata)	election already held
-1973	1973 konya-karaman-yollarbasi-ilisira Yollarbaşı (İlisıra)	election already held
-1973	1973 konya-kulu-tavsancali-omerhanli Tavşancalı (Ömerhanlı)	election already held
-1973	1973 konya-yunak-gokpinar Gökpınar	election already held
-1973	1973 malatya-darende-balaban-gerimter Balaban (Gerimter)	election already held
-1973	1973 malatya-merkez-konak-yukaribanazi Konak (Yukarıbanazı)	election already held
-1973	1973 mersin-erdemli-tomuk-elvanli Tömük (Elvanlı)	election already held
-1973	1973 mugla-koycegiz-dalyan Dalyan	election already held
-1973	1973 nevsehir-urgup-basdere-baskoy Başdere (Başköy)	election already held
-1973	1973 nigde-aksaray-agacli-gulagac Ağaçlı (Gülağaç)	election already held
-1973	1973 nigde-aksaray-ihlara-yesilkoy Ihlara (Yeşilköy)	election already held
-1973	1973 nigde-aksaray-yesiltepe-kirgil Yeşiltepe (Kırgıl)	election already held
-1973	1973 ordu-fatsa-sarmasik-ilica Sarmaşık (Ilıca)	election already held
-1973	1973 ordu-golkoy-isiktepe Işıktepe	election already held
-1973	1973 ordu-persembe-doganli-medreseonu Doğanlı (Medreseönü)	election already held
-1973	1973 rize-pazar-ortakoy-hemsin Ortaköy (Hemşin)	election already held
-1973	1973 sakarya-karasu-lahna-ortakoy Lahna (Ortaköy)	election already held
-1973	1973 sakarya-merkez-golkent Gölkent	election already held
-1973	1973 samsun-bafra-ballica-19-mayis Ballıca (19 Mayıs)	election already held
-1973	1973 tokat-almus-cevreli-muhat Çevreli (Muhat)	election already held
-1973	1973 tokat-artova-arabacimusa-yesilyurt Arabacımusa (Yeşilyurt)	election already held
-1973	1973 tokat-zile-yildiztepe-boztepe Yıldıztepe (Boztepe)	election already held
-1973	1973 trabzon-caykara-dernekpazari-kondu Dernekpazarı (Kondu)	election already held
-1989	1989 kayseri-bunyan-suksun Süksün	election already held
-1968	1968 konya-cumra-guneybag-elmasun Güneybağ (Elmasun)	no area
-1973	1973 konya-cumra-guneybag-elmasun Güneybağ (Elmasun)	no area
+1963	1963 mugla-fethiye-gunlukbasi-foca Günlükbaşı (Foça)	election already held
+1963	1963 siirt-merkez-tillo-aydinlar Tillo (Aydınlar)	election already held
+1973	1973 afyonkarahisar-sincanli-sinanpasa-ahmetpasa-cigiltepe Ahmetpaşa (Çiğiltepe)	election already held
+1973	1973 afyonkarahisar-sincanli-sinanpasa-duzagac Düzağaç	election already held
+1973	1973 afyonkarahisar-sincanli-sinanpasa-serban Serban	election already held
+1973	1973 afyonkarahisar-sincanli-sinanpasa-tasoluk Taşoluk	election already held
+1973	1973 afyonkarahisar-sincanli-sinanpasa-tinaztepe-senir Tınaztepe (Senir)	election already held
+1973	1973 balikesir-ivrindi-kourucu Kourucu	election already held
+1973	1973 burdur-golhisar-dirmil-altinyayla Dirmil (Altınyayla)	election already held
+1973	1973 bursa-iznik-elbeyi Elbeyi	election already held
+1973	1973 denizli-civril-gumussu-homa Gümüşsu (Homa)	election already held
+1973	1973 erzincan-merkez-uzumlu-cimin Üzümlü (Cimin)	election already held
+1973	1973 erzincan-tercan-kargin-altunkent Kargın (Altunkent)	election already held
+1973	1973 erzurum-ispir-camlikaya-hunut Çamlıkaya (Hunut)	election already held
+1973	1973 eskisehir-saricakaya-mihalgazi-gumele Mihalgazi (Gümele)	election already held
+1973	1973 eskisehir-sivrihisar-gunyuzu-kozagac Günyüzü (Kozağaç)	election already held
+1973	1973 gaziantep-nizip-uluyatir-mizar Uluyatır (Mizar)	election already held
+1973	1973 giresun-bulancak-piraziz-eren Piraziz (Eren)	election already held
+1973	1973 isparta-egirdir-aksu-yenice Aksu (Yenice)	election already held
+1973	1973 izmir-kemalpasa-bagyurdu-parsa Bağyurdu (Parsa)	election already held
+1973	1973 kayseri-merkez-gesi-bagyurdu Gesi (Bağyurdu)	election already held
+1973	1973 kayseri-merkez-tasoren-agirnas Taşören (Ağırnas)	election already held
+1973	1973 kocaeli-merkez-aslanbey Aslanbey	election already held
+1973	1973 konya-beysehir-cavuscu-cavus Çavuşçu (Çavuş)	election already held
+1973	1973 konya-beysehir-cetmi-akcabelen Çetmi (Akçabelen)	election already held
+1973	1973 konya-cihanbeyli-altinekin-zivarik Altınekin (Zivarık)	election already held
+1973	1973 konya-cumra-guneybag-elmasun Güneybağ (Elmasun)	election already held
+1973	1973 konya-merkez-bilecik-yukselen Bilecik (Yükselen)	election already held
+1973	1973 konya-merkez-demirkent-ismil Demirkent (İsmil)	election already held
+1973	1973 mugla-koycegiz-dalaman-karacali Dalaman (Karaçalı)	election already held
+1973	1973 mugla-merkez-yesilyurt-pisi Yeşilyurt (Pisi)	election already held
 1963	1963 ankara-ankara Ankara	no municipality
 1963	1963 aydin-aydin Aydın	no municipality
 1963	1963 istanbul-istanbul İstanbul	no municipality
@@ -2339,3 +2371,4 @@ year	race	reason
 1994	1994 ordu-korgan-cayiralan Çayıralan	second table for the same municipality
 1999	1999 canakkale-merkez-kumkale Kumkale	unknown party Demokratik Sol Partii
 1968	1968 kocaeli kocaeli	unknown party Millî Nizam Partisi
+1968	1968 konya-cumra-guneybag-elmasun Güneybağ (Elmasun)	unknown party Millî Selamet Partisi
