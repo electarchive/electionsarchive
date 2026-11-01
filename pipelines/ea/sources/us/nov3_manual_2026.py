@@ -1013,6 +1013,126 @@ COUNTIES = {
         "https://www.cassia.gov/media/Elections/Candidate%20Filing/Candidate%20Filings%20Archive/Ballot%20Measures/2026_11_03/Rock%20Creek%20Rural%20Fire%20Protection%20Levy.pdf",
         "N3M-web/id/cassia-rockcreek-fire.pdf",
     ),
+    "48027-tem": (
+        "TX",
+        "https://www.bellcountytx.com/county_government/elections/#48027-tem",
+        "MF-501/Bell/City of Temple - Resolution calling bond election.pdf",
+    ),
+    "48187-mud17": (
+        "TX",
+        "https://www.co.guadalupe.tx.us/page/elections#48187-mud17",
+        "MF-501/Guadalupe/1 - Notice of Election_Guadalupe MUD 17 ENGSPA rev 9-15-26.pdf",
+    ),
+    "48187-mud16": (
+        "TX",
+        "https://www.co.guadalupe.tx.us/page/elections#48187-mud16",
+        "MF-501/Guadalupe/GC 16.pdf",
+    ),
+    "48187-ltr": (
+        "TX",
+        "https://www.co.guadalupe.tx.us/page/elections#48187-ltr",
+        "MF-501/Guadalupe/Liberty Trails MUD.pdf",
+    ),
+    "48187-brd": (
+        "TX",
+        "https://www.co.guadalupe.tx.us/page/elections#48187-brd",
+        "MF-501/Guadalupe/Notice of Election - English and Spanish - Bolton Road MUD.pdf",
+    ),
+    "48187-seg": (
+        "TX",
+        "https://www.co.guadalupe.tx.us/page/elections#48187-seg",
+        "MF-501/Guadalupe/seguin isd.pdf",
+    ),
+    "48291-lib": (
+        "TX",
+        "https://www.libertycountytx.gov/page/elections#48291-lib",
+        "MF-501/Liberty/City of Liberty Notice of Special Election 11-3-2026.pdf",
+    ),
+    "48291-hul": (
+        "TX",
+        "https://www.libertycountytx.gov/page/elections#48291-hul",
+        "MF-501/Liberty/2026.08.27 Hull Fresh Water Supply District Notice of Election.pdf",
+    ),
+    "48291-bb": (
+        "TX",
+        "https://www.libertycountytx.gov/page/elections#48291-bb",
+        "MF-501/Liberty/Liberty County Sample Ballots.pdf",
+    ),
+    "48291-lg1": (
+        "TX",
+        "https://www.libertycountytx.gov/page/elections#48291-lg1",
+        "MF-501/Liberty/Liberty Grand MUD 1 - Notice of Election.pdf",
+    ),
+    "48291-lg1a": (
+        "TX",
+        "https://www.libertycountytx.gov/page/elections#48291-lg1a",
+        "MF-501/Liberty/Liberty Grand MUD 1A - Notice of Election.pdf",
+    ),
+    "48091-wid3b": (
+        "TX",
+        "https://www.co.comal.tx.us/Elections.htm#48091-wid3b",
+        "MF-501/Comal/Comal County WID No. 3B Notice of Confirmation, Directors, Bonds, Operation and Maintenance.pdf",
+    ),
+    "48397-fate": (
+        "TX",
+        "https://www.rockwallcountytexas.com/193/Elections#48397-fate",
+        "MF-501/Rockwall/General-Election-Comprehensive-Sample-Ballot-11.03.2026.pdf",
+    ),
+    "48367-wp": (
+        "TX",
+        "https://www.parkercountytx.com/166/Elections#48367-wp",
+        "MF-501/Parker/BS 18.pdf",
+    ),
+    "48441-abi": (
+        "TX",
+        "https://www.taylorcountytexas.org/elections#48441-abi",
+        "MF-501/Taylor/Style 3.pdf",
+    ),
+    "48245-ned": (
+        "TX",
+        "https://www.co.jefferson.tx.us/elections/#48245-ned",
+        "MF-501/Jefferson/Nov-2026-Sample-Ballot.pdf",
+    ),
+    "48251-cle": (
+        "TX",
+        "https://www.johnsoncountytx.org/departments/elections#48251-cle",
+        "MF-501/Johnson/Comm 4  PCT 21 CLE.pdf",
+    ),
+    "48021": (
+        "TX",
+        "https://www.co.bastrop.tx.us/page/bastrop.elections#48021",
+        "MF-501/Bastrop/Complete_with_Docusign_Order_a_Special_Elect.pdf",
+    ),
+    "48021-bas": (
+        "TX",
+        "https://www.co.bastrop.tx.us/page/bastrop.elections#48021-bas",
+        "MF-501/Bastrop/Executed-Order-of-Election_City-of-Bastrop.pdf",
+    ),
+    "48021-smi": (
+        "TX",
+        "https://www.co.bastrop.tx.us/page/bastrop.elections#48021-smi",
+        "MF-501/Bastrop/Signed-Resolution-2026-07-577-Calling-a-Special-Election_COS.pdf",
+    ),
+    "48021-esd2": (
+        "TX",
+        "https://www.co.bastrop.tx.us/page/bastrop.elections#48021-esd2",
+        "MF-501/Bastrop/Order-Calling-ELection-Regarding-Annexation-Colorado-Bend-LLC-2026-06-16-signed_ESD2.pdf",
+    ),
+    "48021-bisd": (
+        "TX",
+        "https://www.co.bastrop.tx.us/page/bastrop.elections#48021-bisd",
+        "MF-501/Bastrop/Order-of-Election_BISD.pdf",
+    ),
+    "48329-mcud": (
+        "TX",
+        "https://www.co.midland.tx.us/157/Elections#48329-mcud",
+        "MF-501/Midland/Generic-Sample-Ballot-for-Midland-County-Voters-1-1.pdf",
+    ),
+    "48329": (
+        "TX",
+        "https://www.co.midland.tx.us/157/Elections#48329",
+        "MF-501/Midland/Generic-Sample-Ballot-for-Midland-County-Voters-Living-in-City-of-Odessa-1.pdf",
+    ),
 }
 
 
