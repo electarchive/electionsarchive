@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "14"
+VERSION = "15"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -143,6 +143,24 @@ MATCHES: dict[tuple[str, str], str | None] = {
     ("GB", "Independent Labour Party"): "Q1507913",
     ("GB", "Independent Labour"): None,
     ("US-CO", "Farmer-Labor Party"): None,
+    ("GB", "United Ulster Unionist"): "Q7893627",
+    ("GB", "Duma Polska = Polish Pride"): "Q56279571",
+    ("GB", "Redbridge Independents"): "Q139741307",
+    ("GB", "Unionist Party of Northern Ireland"): "Q7886826",
+    ("GB", "All-for-Ireland"): "Q4728352",
+    ("GB", "Ulster Liberal"): "Q7879983",
+    ("GB", "Forward Wales"): "Q384261",
+    ("GB", "Republican Labour"): "Q7314601",
+    ("GB", "Chesterfield And North Derbyshire Independents (CANDI)"): "Q126433112",
+    ("GB", "Glasgow First"): "Q5566807",
+    ("GB", "Russellite Unionist"): "Q7381900",
+    ("GB", "Protestant Unionist"): "Q7251625",
+    ("GB", "Democratic Partnership"): "Q5255672",
+    ("GB", "Black Country Party"): "Q134937030",
+    ("GB", "Horwich & Blackrod First Independents"): "Q65040780",
+    ("DE", "UNABHÄNGIGE ARBEITER-PARTEI (Deutsche Sozialisten)"): "Q2492232",
+    ("CA-BC", "CentreBC"): "Q135759425",
+    ("CA", "United Party of Canada (UP)"): "Q135475223",
 }
 INHERITED: dict[tuple[str, str], str] = {
     ("FR", "ENS"): "Q109929254",
