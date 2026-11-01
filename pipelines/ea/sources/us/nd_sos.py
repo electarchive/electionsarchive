@@ -22,11 +22,13 @@ HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-r
 PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
+    1948: "1948-11-02-general",
     1950: "1950-11-07-general",
     1954: "1954-11-02-general",
     1958: "1958-11-04-general",
     1960: "1960-11-08-general",
     1964: "1964-11-03-general",
+    1966: "1966-11-08-general",
     1962: "1962-11-06-general",
     1970: "1970-11-03-general",
     1974: "1974-11-05-general",
@@ -43,11 +45,13 @@ DAYS = {
     1994: date(1994, 11, 8),
     1996: date(1996, 11, 5),
     1998: date(1998, 11, 3),
+    1948: date(1948, 11, 2),
     1950: date(1950, 11, 7),
     1954: date(1954, 11, 2),
     1958: date(1958, 11, 4),
     1960: date(1960, 11, 8),
     1964: date(1964, 11, 3),
+    1966: date(1966, 11, 8),
     1962: date(1962, 11, 6),
     1970: date(1970, 11, 3),
     1974: date(1974, 11, 5),
@@ -140,6 +144,28 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             27: ("public-service-commissioner", "Susan Wefald", "REP"),
             28: ("tax-commissioner", "Bob Hanson", "DEM"),
             29: ("tax-commissioner", "Rick Clayburgh", "REP"),
+        },
+    ),
+    1948: (
+        0,
+        {
+            7: ("lieutenant-governor", "C. P. Dahl", None),
+            8: ("lieutenant-governor", "J. W. Matejcek", None),
+            9: ("lieutenant-governor", "Otto Otteson", None),
+            10: ("secretary-of-state", "Thomas Hall", None),
+            11: ("secretary-of-state", "Ellen F. Mayoue", None),
+            12: ("auditor", "Berta E. Baker", None),
+            13: ("auditor", "Byron Krantz", None),
+            14: ("treasurer", "Albert Jacobson", None),
+            15: ("treasurer", "Lawrence Knoke", None),
+            16: ("attorney-general", "Wallace E. Warner", None),
+            17: ("attorney-general", "Thos. D. Morrow", None),
+            18: ("insurance-commissioner", "Otto Krueger", None),
+            19: ("insurance-commissioner", "J. Arthur Engen", None),
+            20: ("commissioner-of-agriculture", "Math Dahl", None),
+            21: ("commissioner-of-agriculture", "J. B. Mertes", None),
+            22: ("public-service-commissioner", "Elmer W. Cart", None),
+            23: ("public-service-commissioner", "Douglas Dahlin", None),
         },
     ),
     1950: (
@@ -253,6 +279,17 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             29: ("commissioner-of-agriculture", "Isak Hystad", "DEM"),
             30: ("public-service-commissioner", "Dean Miller", "REP"),
             31: ("public-service-commissioner", "Bruce Hagen", "DEM"),
+        },
+    ),
+    1966: (
+        0,
+        {
+            6: ("public-service-commissioner", "B. C. Thompson", "DEM"),
+            7: ("public-service-commissioner", "Richard Elkin", "REP"),
+            8: ("justice-of-the-supreme-court", "William S. Murray", None),
+            9: ("justice-of-the-supreme-court", "Wm. L. Paulson", None),
+            10: ("commissioner-of-labor", "Earl W. Anderson", None),
+            11: ("commissioner-of-labor", "Orville W. Hagen", None),
         },
     ),
     1970: (
@@ -375,9 +412,10 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
         },
     ),
 }
-NUMBER = r"[\dIl][\dIl,.?]*['`’:;]?"
+NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
-ERRATA = {(1950, "A. J. Jensen")}
+EDGES = {1966: 100}
+ERRATA = {(1950, "A. J. Jensen"), (1966, "B. C. Thompson")}
 TYPOS = {"mclntosh": "mcintosh"}
 READ_1964: dict[tuple[str, int], int] = {
     ("lamoure", 17): 1713,
@@ -418,6 +456,7 @@ TITLES = {
     "public-service-commissioner": "Public Service Commissioner",
     "tax-commissioner": "Tax Commissioner",
     "commissioner-of-labor": "Labor Commissioner",
+    "justice-of-the-supreme-court": "Justice of the Supreme Court",
 }
 
 
@@ -464,7 +503,8 @@ def parse() -> None:
         ]
         first = next(w for w in words if w[4].upper() == "ADAMS" and w[0] < 300)
         edge = (
-            -20
+            EDGES.get(year)
+            or -20
             + min(w[0] for w in words if abs(w[1] - first[1]) < 3 and w[0] > first[2] and re.fullmatch(NUMBER, w[4]))
             if year in FILES
             else 125
@@ -507,17 +547,24 @@ def parse() -> None:
             )
 
         def value(text: str) -> int:
-            return int(re.sub(r"[Il]", "1", text).replace(",", "").replace(".", "").replace("?", "0").rstrip("'`’:;"))
+            return int(
+                re.sub(r"[Il]", "1", text)
+                .replace("S", "0")
+                .replace("o", "0")
+                .replace(",", "")
+                .replace(".", "")
+                .replace("?", "0")
+                .replace("<", "")
+                .rstrip("'`’:;")
+            )
 
         cells: dict[tuple[int, int], int] = {}
         unreadable: set[tuple[int, int]] = set()
         if year in BANDED:
             bands: list[list[tuple]] = []
-            for w in sorted(
-                (w for w in numbers if w[1] > lines[0][0] - 8), key=lambda w: (w[1] + w[3]) / 2
-            ):
+            for w in sorted((w for w in numbers if w[1] > lines[0][0] - 8), key=lambda w: (w[1] + w[3]) / 2):
                 if bands and (w[1] + w[3]) / 2 - bands[-1][-1][1] < 2.4:
-                    bands[-1].append(((w[0], (w[1] + w[3]) / 2, w[2], w[3], w[4])))
+                    bands[-1].append((w[0], (w[1] + w[3]) / 2, w[2], w[3], w[4]))
                 else:
                     bands.append([(w[0], (w[1] + w[3]) / 2, w[2], w[3], w[4])])
             bands = [band for band in bands if len(band) > 3]
@@ -590,7 +637,7 @@ def parse() -> None:
                     pi, pj, matched = back[(i, j)]
                     if matched is not None:
                         cells[(matched, column)] = value(members[pi][4])
-                        if "?" in members[pi][4] or re.search(r",\d{1,2}$", members[pi][4]):
+                        if re.search(r"[?<So]", members[pi][4]) or re.search(r",\d{1,2}$", members[pi][4]):
                             unreadable.add((matched, column))
                     i, j = pi, pj
         else:
@@ -637,7 +684,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="North Dakota's president, U.S. Senate, governor, and other statewide offices by county "
-            "1992–1998 from the Secretary of State's official abstracts",
+            "1948–1998 from the Secretary of State's official abstracts",
             polity="US",
         )
 
