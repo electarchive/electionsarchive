@@ -27,6 +27,12 @@ FILES = {
 }
 MANUAL = "https://www.sos.mo.gov/cmsimages/bluebook/{}/7_Elec.pdf"
 MANUALS = {
+    date(2004, 11, 2): (
+        "2005-2006",
+        "36-36",
+        ["Richard B. Teitelman"],
+        "https://www.sos.mo.gov/cmsimages/bluebook/2005-2006/0627-0790.pdf",
+    ),
     date(2006, 11, 7): (
         "2007-2008",
         "26-27",
@@ -99,7 +105,8 @@ def manual_lines() -> list[dict[str, object]]:
         start = next(
             i
             for i, line in enumerate(text)
-            if re.search(r"Missouri Supreme Court|Supreme Court—General", line) or line.strip() == judges[0]
+            if re.search(r"Missouri Supreme Court|Supreme Court—General|Supreme Court Judges—General", line)
+            or line.strip() == judges[0]
         )
         width = 2 * len(judges)
         seen: dict[str, list[int]] = {}
