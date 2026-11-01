@@ -599,11 +599,22 @@ async function baselines(
       where v.result_set_k = any(${sql.param(picked.rows.map((row) => row.k))}::int[]) and v.measure = 1
     ), lines as (
       select c.option_k, sum(c.value) as votes from counted c group by 1
-    ), lead as (
-      select distinct on (top.id) top.id as top, coalesce(top.party_id, o.party_id) as party
+    ), tops as (
+      select distinct coalesce(o.parent_option_id, o.id) as id
       from lines l join contest_option o on o.k = l.option_k
-      join contest_option top on top.id = coalesce(o.parent_option_id, o.id)
-      order by top.id, top.party_id is null, l.votes desc
+    ), reach as (
+      select x.party_id, count(*) as n from contest_option x
+      where x.party_id in (
+        select line.party_id from tops t join contest_option line on line.parent_option_id = t.id
+      )
+      group by 1
+    ), lead as (
+      select distinct on (top.id) top.id as top, coalesce(top.party_id, line.party_id) as party
+      from tops t join contest_option top on top.id = t.id
+      left join contest_option line on top.party_id is null and line.parent_option_id = top.id and line.party_id is not null
+      left join lines l on l.option_k = line.k
+      left join reach r on r.party_id = line.party_id
+      order by top.id, l.votes desc nulls last, r.n desc nulls last
     )
     select c.k, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit,
       coalesce(a.parent_party_id, lead.party) as party, sum(c.value)::float8 as votes
