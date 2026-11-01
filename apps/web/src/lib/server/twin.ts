@@ -37,6 +37,7 @@ import {
   points,
 } from "#lib/format.js";
 import { stamp } from "#lib/live/format.js";
+import methodology from "#lib/live/methodology.json";
 import { sum } from "#lib/live/standing.js";
 import { logoCredit } from "#lib/logo.js";
 import { covering } from "#lib/map/hexes.js";
@@ -241,6 +242,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   }
   if (head === "coverage" && rest.length === 1) {
     return coverage(rest[0] ?? "");
+  }
+  if (head === "live" && rest.join("/") === "methodology") {
+    return { kind: "methodology" as const, ...methodology };
   }
   if (head === "live" && rest.length > 0) {
     return livePage(rest.join("/"), search.get("at"));
@@ -556,6 +560,9 @@ function markdown(
     }
     case "coverage": {
       return coverageMarkdown(data, link);
+    }
+    case "methodology": {
+      return methodologyMarkdown(data);
     }
     case "coverage_overview": {
       return overviewMarkdown(data, link);
@@ -3660,6 +3667,148 @@ function electionMarkdown(
         ]),
     ...hexMarkdown(states?.places ?? null, hexes),
   ].filter((block) => block !== "");
+}
+
+function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {
+  const three = (value: number | undefined) => (value ?? 0).toFixed(3);
+  const measures = [
+    [
+      m.method_score_brier(),
+      (side: 0 | 1, row: typeof data.score.all) => three(row.brier[side]),
+    ],
+    [
+      m.method_score_log(),
+      (side: 0 | 1, row: typeof data.score.all) => three(row.log[side]),
+    ],
+    [
+      m.method_score_error(),
+      (side: 0 | 1, row: typeof data.score.all) =>
+        points(row.error[side] ?? 0, 1).replace(/^[+−]/u, ""),
+    ],
+    [
+      m.method_score_cover(),
+      (side: 0 | 1, row: typeof data.score.all) =>
+        percent(row.cover[side] ?? 0, 0),
+    ],
+    [
+      m.method_score_turnout(),
+      (side: 0 | 1, row: typeof data.score.all) =>
+        percent(row.turnout[side] ?? 0),
+    ],
+    [
+      m.method_score_turnout_cover(),
+      (side: 0 | 1, row: typeof data.score.all) =>
+        percent(row.turnoutCover[side] ?? 0, 0),
+    ],
+    [
+      m.method_score_miss(),
+      (side: 0 | 1, row: typeof data.score.all) =>
+        m.method_score_of({
+          count: count(row.miss[side]?.[0] ?? 0),
+          total: count(row.miss[side]?.[1] ?? 0),
+        }),
+    ],
+  ] as const;
+  return [
+    `# ${m.method_title()}`,
+    m.method_lede(),
+    `## ${m.method_hero_title()}`,
+    m.method_hero_caption(),
+    m.method_hero_miss(),
+    `## ${m.method_how_title()}`,
+    m.method_how_body(),
+    [
+      [m.method_step_baseline_title(), m.method_step_baseline()],
+      [m.method_step_turnout_title(), m.method_step_turnout()],
+      [m.method_step_swing_title(), m.method_step_swing()],
+      [m.method_step_simulate_title(), m.method_step_simulate()],
+      [m.method_step_report_title(), m.method_step_report()],
+    ]
+      .map(
+        ([title, body], position) => `${position + 1}. **${title}.** ${body}`,
+      )
+      .join("\n"),
+    `## ${m.method_turnout_title()}`,
+    m.method_turnout_body(),
+    m.method_turnout_body_more(),
+    `## ${m.method_margin_title()}`,
+    m.method_margin_body(),
+    [
+      m.method_margin_uniform(),
+      m.method_margin_stronghold(),
+      m.method_margin_size(),
+      m.method_margin_order(),
+    ]
+      .map((line) => `- ${line}`)
+      .join("\n"),
+    m.method_margin_body_more(),
+    `## ${m.method_order_title()}`,
+    m.method_order_body(),
+    `- ${m.method_order_shift()}\n- ${m.method_order_tail()}`,
+    table(
+      ["", m.method_order_chart()],
+      [
+        ...data.tails.map(([state, share]) => [
+          String(state).toUpperCase(),
+          points(Number(share)).replace(/^\+/u, ""),
+        ]),
+        [m.method_order_other(), points(data.other).replace(/^\+/u, "")],
+      ],
+    ),
+    `## ${m.method_ranges_title()}`,
+    m.method_ranges_body(),
+    m.method_ranges_status(),
+    `## ${m.method_testing_title()}`,
+    m.method_testing_body({ races: count(data.races) }),
+    m.method_testing_summary({
+      current: three(data.score.all.brier[0]),
+      previous: three(data.score.all.brier[1]),
+      error: points(data.score.all.error[0] ?? 0, 1).replace(/^[+−]/u, ""),
+    }),
+    table(
+      [
+        m.method_counted_axis(),
+        `${m.method_brier_chart()}: ${m.method_current()}`,
+        m.method_previous(),
+        `${m.method_cover_chart()}: ${m.method_current()}`,
+        m.method_previous(),
+      ],
+      data.checkpoints.map((row) => [
+        percent(row.q, 0),
+        three(row.brier[0]),
+        three(row.brier[1]),
+        percent(row.cover[0] ?? 0, 0),
+        percent(row.cover[1] ?? 0, 0),
+      ]),
+    ),
+    `### ${m.method_score_title()}`,
+    table(
+      [
+        m.method_score_metric(),
+        `${m.method_score_all()}: ${m.method_current()}`,
+        m.method_previous(),
+        `${m.method_score_close()}: ${m.method_current()}`,
+        m.method_previous(),
+      ],
+      measures.map(([label, show]) => [
+        label,
+        show(0, data.score.all),
+        show(1, data.score.all),
+        show(0, data.score.close),
+        show(1, data.score.close),
+      ]),
+    ),
+    `## ${m.method_limits_title()}`,
+    [
+      m.method_limit_pause(),
+      m.method_limit_types(),
+      m.method_limit_precincts(),
+      m.method_limit_baseline(),
+      m.method_limit_order(),
+    ]
+      .map((line) => `- ${line}`)
+      .join("\n"),
+  ];
 }
 
 function hexMarkdown(
