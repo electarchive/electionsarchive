@@ -14,6 +14,9 @@ const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
 const WRITABLE =
   /^\/(?:api\/auth|rpc|api\/v1|mcp|sign-in|sign-up|sign-out|settings\/username)(?:\/|$)/u;
 
+const PRELOADED =
+  /\/sofia-sans-semi-condensed-latin-wght-normal\.[\w-]+\.woff2$/u;
+
 const SHUT =
   /^\/api\/auth\/(?:api-key|admin|update-user|change-email|delete-user)(?:\/|$)/u;
 
@@ -38,6 +41,10 @@ const paraglideHandle: Handle = async ({ event, resolve }) =>
         {
           transformPageChunk: ({ html }) =>
             html.replace("%lang%", () => locale),
+          preload: ({ type, path }) =>
+            type === "js" ||
+            type === "css" ||
+            (type === "font" && PRELOADED.test(path)),
         },
       ),
   );
