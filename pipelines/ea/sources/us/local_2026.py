@@ -6463,6 +6463,13 @@ for key, publisher, title, url, local in (
         "ks/harper.pdf",
     ),
     (
+        "KS-20077-townships",
+        "Harper County Clerk",
+        "General Election Sample Ballot, November 3, 2026",
+        "https://www.harpercountyks.gov/_files/ugd/e0b4f1_e8204facf47c4dac9dd07b8f5fe3e522.pdf",
+        "ks/harper.pdf",
+    ),
+    (
         "KS-20099",
         "Labette County Clerk",
         "2026 General Election Sample Ballots",
