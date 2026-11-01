@@ -28,6 +28,26 @@ DELIVERED = DATA / "inbox" / "manual"
 PAGES = DATA / "pages" / SOURCE
 SEAT_TABLE = Path(__file__).with_name("camera_seggi.tsv")
 SEAT_LAW = "https://www.edizionieuropee.it/LAW/HTML/17/zn39_04_00a.html"
+REVISIONS = {
+    date(1948, 4, 18): (
+        "https://legislature.camera.it/_dati/leg01/lavori/stampati/pdf/007_008001.pdf",
+        (
+            "Relazione della Giunta delle elezioni sulla elezione contestata per il Collegio Unico Nazionale "
+            "(Giovanni Tanasco), Doc. VII, n. 8, I legislatura"
+        ),
+        datetime(1949, 10, 11, tzinfo=UTC),
+        {15: {"PRI": 1}, 19: {"BLOCCO NAZIONALE": 1}},
+        {"BLOCCO NAZIONALE": 1, "DC": -1},
+    ),
+    date(1953, 6, 7): (
+        "https://legislature.camera.it/_dati/leg02/lavori/stenografici/sed0184/sed0184.pdf",
+        "Resoconto stenografico della seduta pomeridiana del 28 luglio 1954, II legislatura",
+        datetime(1954, 7, 28, tzinfo=UTC),
+        {6: {"DC": 1}},
+        {"DC": 1, "PLI": -1},
+    ),
+}
+MISATTRIBUTED = {(date(1948, 4, 18), 8): {"UNITA' SOCIALISTA": -1, "FR.DEMOCR.POPOLARE": 1}}
 GAZZETTA = {
     1948: (
         "1948/02/06/30",
@@ -513,6 +533,30 @@ NATIONAL_SEATS = (
     "Seats are each list's national total from Eligendo's historical results, which count the deputies elected from "
     "the national remainder college. The open-data archive marks only {elected} of the {seats} deputies as elected."
 )
+PROCLAIMED = (
+    "Seats here are as first proclaimed. The Chamber of Deputies later changed some of them after its elections "
+    "committee rechecked the count, and the revised seats are in the court-revised result."
+)
+REVISED = {
+    1948: (
+        "In 1949 the Chamber of Deputies changed two seats after its elections committee rechecked the count in Pisa "
+        "and Roma. In Pisa the Republicans reached a full quota, so on July 16, 1949 the Chamber annulled Ferruccio "
+        "Parri's national-college seat and Mary Chiesa Tibaldi took the new Pisa seat. In Roma the committee counted "
+        "1,272 more votes for the Blocco Nazionale, enough for a full quota: Guglielmo Giannini took that seat, and "
+        "the Christian Democrats lost their last national-college seat. The seats follow the committee's report "
+        "(Doc. VII, n. 8). The votes are the count before these changes."
+    ),
+    1953: (
+        "On July 28, 1954 the Chamber of Deputies annulled the election of Giuseppe Alpino, a Liberal deputy for "
+        "Torino-Novara-Vercelli, and proclaimed Antonio Cavalli, a Christian Democrat, deputy for Brescia-Bergamo, on "
+        "its elections committee's report (Doc. X, n. 1). The votes are the count before this change."
+    ),
+}
+MISATTRIBUTED_NOTE = (
+    "Eligendo's page for this circoscrizione gives its ninth seat to Unità Socialista. The ministry's own list of "
+    "elected candidates marks Giuseppe Ferrandi of the Fronte Democratico Popolare as elected instead, and the votes "
+    "give the Fronte a full quota, so the seat is stored that way."
+)
 MIXED_SEATS = (
     "These are the {seats} proportional seats. The single-member deputies are counted in their own college contests."
 )
@@ -809,6 +853,8 @@ def fetch() -> None:
             media_type="application/pdf",
         )
     raw.fetch(SOURCE, SEAT_LAW, suffix=".html")
+    for address, *_ in REVISIONS.values():
+        raw.fetch(SOURCE, address, suffix=".pdf")
     for groups_url in GROUPS.values():
         raw.fetch(SOURCE, groups_url, suffix=".json")
     raw.fetch(SOURCE, url(NEXT), suffix=".zip")
@@ -1332,6 +1378,20 @@ def emit() -> Path:
             notes=LAW_NOTE,
         )
         cs.artifact(raw.cached(SOURCE, SEAT_LAW), law)
+        revision_sources: dict[date, UUID] = {}
+        for day, (address, title, *_) in REVISIONS.items():
+            record = cs.source("Camera dei deputati", title)
+            cs.add(
+                "source",
+                id=record,
+                kind="official_body",
+                publisher="Camera dei deputati",
+                title=title,
+                url=address,
+                license=state_acts,
+            )
+            cs.artifact(raw.cached(SOURCE, address), record)
+            revision_sources[day] = record
         seat_table = pl.read_csv(SEAT_TABLE, separator="\t")
         magnitudes = {(year, n): seats for year, n, seats in seat_table.select("year", "n", "seats").iter_rows()}
         PAGES.mkdir(parents=True, exist_ok=True)
@@ -1386,6 +1446,17 @@ def emit() -> Path:
                 """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
                    where c.pipeline = %s and n.kind = 'caveat'
                      and (n.body_md like 'The archive marks %%' or n.body_md like 'Valle d''Aosta''s single seat is %%')""",
+                [SOURCE],
+            ).fetchall()
+        )
+        revision_notes = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'methodology'
+                     and (n.body_md like 'Seats here are as first proclaimed%%'
+                          or n.body_md like 'In 1949 the Chamber of Deputies changed two seats%%'
+                          or n.body_md like 'On July 28, 1954 the Chamber of Deputies annulled%%'
+                          or n.body_md like 'Eligendo''s page for this circoscrizione%%')""",
                 [SOURCE],
             ).fetchall()
         )
@@ -1552,6 +1623,33 @@ def emit() -> Path:
                 completeness=completeness,
             )
             return id
+
+        def revised_set(key: str, election: UUID, contest: UUID, day: date) -> UUID:
+            id = cs.key(f"{SOURCE}.result_set", f"{key}:revised")
+            cs.add(
+                "result_set",
+                id=id,
+                election_id=election,
+                contest_id=contest,
+                stage="court_revised",
+                kind="counted",
+                status="active",
+                source_id=revision_sources[day],
+                as_of=REVISIONS[day][2],
+                is_default=True,
+                completeness=0,
+            )
+            note_once(id, REVISED[day.year])
+            return id
+
+        def note_once(entity: UUID, body: str) -> None:
+            cs.add(
+                "note",
+                **({"id": revision_notes[entity]} if entity in revision_notes else {}),
+                entity_id=entity,
+                kind="methodology",
+                body_md=body,
+            )
 
         colleges: dict[str, tuple[UUID, UUID]] = {}
 
@@ -1850,6 +1948,13 @@ def emit() -> Path:
             fresh = counted in cs.minted
             day_seats = seats.filter(pl.col("day") == day)
             won = dict(day_seats.select("label", "seats").iter_rows())
+            final = dict(won)
+            revised = None
+            if day in REVISIONS:
+                for label, gained in REVISIONS[day][4].items():
+                    won[label] -= gained
+                revised = revised_set(contest_key, election, contest, day)
+                note_once(counted, PROCLAIMED)
             if day < MATTARELLA and day_seats["archived"].sum() < magnitude:
                 cs.add(
                     "note",
@@ -1909,8 +2014,10 @@ def emit() -> Path:
                     alliance_id=coalition_of.get(slug(label)),
                     ballot_label=label,
                 )
-                if label in won:
+                if won.get(label):
                     cs.add("outcome", result_set_id=counted, option_id=option, kind="won", seats=won[label])
+                if revised is not None and final.get(label):
+                    cs.add("outcome", result_set_id=revised, option_id=option, kind="won", seats=final[label])
                 if fresh:
                     for region, votes in (
                         day_lists.filter((pl.col("label") == label) & (pl.col("votes") > 0))
@@ -1945,7 +2052,16 @@ def emit() -> Path:
                 fresh = child_set in cs.minted
                 if fresh:
                     value_row(child_set, unit, None, VALID, int(rows["votes"].sum()))
-                for label, votes, seated in rows.select("label", "votes", "seats").sort("label").iter_rows():
+                fixed = MISATTRIBUTED.get((day, n), {})
+                if fixed:
+                    note_once(child_set, MISATTRIBUTED_NOTE)
+                gains = REVISIONS[day][3].get(n, {}) if day in REVISIONS else {}
+                child_revised = revised_set(child_key, election, child, day) if gains else None
+                if gains:
+                    note_once(child_set, PROCLAIMED)
+                for label, votes, final in rows.select("label", "votes", "seats").sort("label").iter_rows():
+                    final += fixed.get(label, 0)
+                    seated = final - gains.get(label, 0)
                     option = cs.key("it.option", f"{child_key}:{slug(label)}")
                     cs.add(
                         "contest_option",
@@ -1957,6 +2073,8 @@ def emit() -> Path:
                     )
                     if seated:
                         cs.add("outcome", result_set_id=child_set, option_id=option, kind="won", seats=seated)
+                    if child_revised is not None and final:
+                        cs.add("outcome", result_set_id=child_revised, option_id=option, kind="won", seats=final)
                     if fresh and votes:
                         value_row(child_set, unit, option, VOTES, votes)
 

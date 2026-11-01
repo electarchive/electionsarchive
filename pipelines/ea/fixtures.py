@@ -173,7 +173,7 @@ def export() -> list[str]:
                from slug s
                join contest parent on parent.id = s.entity_id
                join election e on e.id = parent.election_id
-               join result_set rs on rs.contest_id = parent.id and rs.is_default
+               join result_set rs on rs.contest_id = parent.id and rs.is_default and rs.stage = 'official'
                join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.seats > 0
                join contest_option o on o.id = x.option_id
                where s.path ~ '^it/19[4-9][0-9]-[0-9-]+-general/chamber$'
