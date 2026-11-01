@@ -34,8 +34,8 @@ GENERALS = {
 METHOD = (
     "The nominee as the party's national convention declared after its roll call of the states, from the English "
     "Wikipedia's article on the convention, pinned to the revision current when it was fetched. The nominee is the "
-    "head of the party's ticket in that year's general election. The delegates' votes in the roll call are not "
-    "recorded here, so this result set holds the declared outcome only."
+    "head of the party's ticket in that year's general election. This result set holds the declared outcome only; "
+    "where the archive has the roll call, each state's delegate votes sit in a separate ballot result set."
 )
 
 
@@ -172,5 +172,19 @@ def emit() -> Path:
                         f"{incumbent[1]} won the primaries and caucuses but withdrew from the race on July 21, 2024, "
                         f"before the roll call, and the delegates pledged to him nominated {label}."
                     ),
+                )
+        current = {row["body_md"] for row in cs.rows["note"]}
+        for note, entity, text in conn.execute(
+            """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
+               where n.entity_id = any(%s) and n.kind = 'methodology' and c.pipeline = %s""",
+            [[row["id"] for row in cs.rows["result_set"]], SOURCE],
+        ).fetchall():
+            if text not in current:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=text,
+                    reason="A re-emit writes the result set's methodology afresh.",
                 )
         return cs.write()
