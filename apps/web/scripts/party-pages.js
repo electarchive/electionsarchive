@@ -13,5 +13,7 @@ try {
 } finally {
   const { db } = await server.ssrLoadModule("/src/lib/server/db/index.ts");
   await db.$client.end();
+  const { redis } = await server.ssrLoadModule("/src/lib/server/redis.ts");
+  redis().unref();
   await server.close();
 }
