@@ -797,11 +797,38 @@ def districts(
 
 
 def path(shape: BaseGeometry) -> str:
-    rings = []
-    for poly in getattr(shape, "geoms", [shape]):
-        for ring in [poly.exterior, *poly.interiors]:
-            rings.append("M" + "L".join(f"{x:.2f} {y:.2f}".replace(".00", "") for x, y in ring.coords[:-1]) + "Z")
-    return "".join(rings)
+    return encode(
+        [
+            [(round(float(f"{x:.2f}") * 100), round(float(f"{y:.2f}") * 100)) for x, y in ring.coords[:-1]]
+            for poly in getattr(shape, "geoms", [shape])
+            for ring in [poly.exterior, *poly.interiors]
+        ]
+    )
+
+
+def encode(rings: list[list[tuple[int, int]]]) -> str:
+    out = []
+    for ring in rings:
+        last = ""
+        command = ""
+        for at, (x, y) in enumerate(ring):
+            if at == 0:
+                step, values = "M", [x, y]
+            else:
+                dx, dy = x - ring[at - 1][0], y - ring[at - 1][1]
+                step, values = ("h", [dx]) if dy == 0 else ("v", [dy]) if dx == 0 else ("l", [dx, dy])
+            if step != command:
+                out.append(step)
+                command, last = step, ""
+            for value in values:
+                text = f"{value / 100:.2f}".rstrip("0").rstrip(".")
+                text = text.replace("0.", ".", 1) if text.startswith(("0.", "-0.")) else text
+                if last and not (text.startswith("-") or (text.startswith(".") and "." in last)):
+                    out.append(" ")
+                out.append(text)
+                last = text
+        out.append("z")
+    return "".join(out)
 
 
 def union(cells: Iterable[Cell]) -> BaseGeometry:
