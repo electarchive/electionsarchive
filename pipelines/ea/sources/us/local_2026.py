@@ -1413,6 +1413,13 @@ LOCAL_BODY = re.compile(
 )
 IN_ALIASES = (
     (r"^centerpoint town\b", "center point town", None),
+    (r"^anderson school board\b", "anderson community school corporation school board", None),
+    (r"^lewis cass school board\b", "lewis cass schools school board", None),
+    (r"^msd of shakamak\b", "shakamak schools metropolitan school district school board", None),
+    (r"^northwestern school board\b", "northwestern school corporation school board", None),
+    (r"^porter township school board\b", "porter township school corporation school board", None),
+    (r"^scott county school board\b", "scott county school district 1 school board", None),
+    (r"^south spencer school board\b", "south spencer county school corporation school board", None),
     (r"^demotte town\b", "de motte town", None),
     (r"^fairview town\b", "fairview park town", None),
     (r"^uc cc joint\b", "union college corner joint", None),
@@ -10879,7 +10886,7 @@ def parse() -> None:
                                     ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
                                     (r"\btrustees?\b", "board-of-trustees"),
-                                    *(((r"^board$", "board"),) if state == "NE" else ()),
+                                    *(((r"^board$", "board"),) if state in ("IN", "NE") else ()),
                                 )
                                 if re.search(pattern, post)
                                 and (
