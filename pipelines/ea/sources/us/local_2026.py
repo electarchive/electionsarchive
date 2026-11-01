@@ -6166,6 +6166,27 @@ for key, publisher, title, url, local in (
         "or/gilliam_filings.html",
     ),
     (
+        "OR-41021-condon",
+        "City of Condon",
+        "Elections, Positions Open for the November 3, 2026 General Election",
+        "https://cityofcondon.com/elections/",
+        "or/gilliam_condon.html",
+    ),
+    (
+        "OR-41021-arlington",
+        "City of Arlington",
+        "Candidates for Arlington City Council General Elections, November 2026",
+        "https://www.cityofarlingtonoregon.com/",
+        "or/gilliam_arlington.pdf",
+    ),
+    (
+        "OR-41021-lonerock",
+        "Gilliam County Clerk",
+        "November 3, 2026 General Election Candidate Filings",
+        "https://www.gilliamcountyor.gov/government/offices/county_clerk/elections/2026_candidate_filings.php",
+        "or/gilliam_cities_filings.pdf",
+    ),
+    (
         "OR-41055-county",
         "Sherman County Clerk",
         "Current Election, November 3, 2026 General Election",
