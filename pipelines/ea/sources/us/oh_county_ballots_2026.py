@@ -35,6 +35,9 @@ MF = DATA / "inbox" / "manual" / "MF-540"
 MF_LOOKUP = (
     "Ashtabula Athens Tuscarawas Mahoning Licking Perry Clark Greene Harrison Geauga Richland Fulton Portage Lucas"
 ).split()
+MF_555 = DATA / "inbox" / "manual" / "MF-555"
+MF_555_COUNTIES = ["Meigs", "Medina"]
+MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
 MONTGOMERY_KEY = "https://lookup.boe.ohio.gov/vtrapp/montgomery/ballotlist.aspx#sample-ballots.zip"
@@ -95,8 +98,8 @@ SOURCES = {
 NOISE = re.compile(
     r"^(Sample Generated|\d\d-\d\d-|Page \d+ of|VOTE BOTH SIDES|Members of the|November 3, 2026$|B A L L O\s*$|S A M P L E|\d+$)"
 )
-STOP = re.compile(r"^(YES|NO|SI|FOR\b.*|AGAINST\b.*|A FAVOR\b.*|EN CONTRA\b.*)$")
-OPTION = re.compile(r"^(?:For|Against)\b")
+STOP = re.compile(r"^(YES|NO|SI|PAGE \d+ OF.*|FOR\b.*|AGAINST\b.*|A FAVOR\b.*|EN CONTRA\b.*)$")
+OPTION = re.compile(r"^(?:For|Against)\b", re.IGNORECASE)
 HINTS = {
     "Worthington-Charter-Amendment-Referendum-Petition-Signature-Requirement-(by-Petition)": "Charter Amendment: 1.05 - Petition",
     "Worthington-Charter-Amendment-Referendum-Petition-Signature-Requirement-(Commission)": "Charter Amendment: Section 1.05 - Commission",
@@ -159,7 +162,7 @@ def mf_files() -> list[tuple[str, Path]]:
     return [
         (county, path)
         for county in [*MF_SAMPLES, "Stark"]
-        for path in sorted((MF / county.lower()).glob("*.pdf"))
+        for path in sorted(((MF_555 if county in MF_555_COUNTIES else MF) / county.lower()).glob("*.pdf"))
         if county != "Stark" or "legal ad" in path.name
     ]
 
@@ -349,6 +352,12 @@ def body_text(body: list[str]) -> str:
     return " ".join(body).strip()
 
 
+def opens_issue(lines: list[str], cursor: int) -> bool:
+    return START.match(lines[cursor]) is not None and any(
+        line.startswith("A majority affirmative vote") for line in lines[cursor + 1 : cursor + 5]
+    )
+
+
 def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
     lines = [line.strip() for line in lines if line.strip() and not NOISE.match(line.strip())]
     rows = []
@@ -381,8 +390,11 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
                 cursor = ahead + 1
                 body.append(re.sub(r"^.*?passage\.?\s*", "", lines[ahead], count=1))
                 break
-        while cursor < len(lines) and not STOP.match(lines[cursor]):
-            if not (body_text(body) == "" and OPTION.match(lines[cursor])):
+        while cursor < len(lines):
+            leading = body_text(body) == "" and OPTION.match(lines[cursor])
+            if not leading and (STOP.match(lines[cursor]) or opens_issue(lines, cursor)):
+                break
+            if not leading:
                 body.append(lines[cursor])
             cursor += 1
         text = re.sub(r"\s+", " ", " ".join(body)).strip()
