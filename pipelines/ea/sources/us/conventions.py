@@ -392,11 +392,17 @@ TABLES += [
     {"table": "1956:democratic", "htid": "uc1.$b619008", "leaves": (463, 464)},
 ]
 PROCEEDINGS = [
-    {"table": "1968:republican:final", "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballot": date(1968, 8, 7)},
-    {"table": "1972:republican", "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballot": date(1972, 8, 22)},
-    {"table": "1976:republican", "ordinal": "Thirty-First", "city": "Kansas City", "days": (date(1976, 8, 16), date(1976, 8, 19)), "ballot": date(1976, 8, 18)},
-    {"table": "1980:republican", "ordinal": "Thirty-Second", "city": "Detroit", "days": (date(1980, 7, 14), date(1980, 7, 17)), "ballot": date(1980, 7, 16)},
-    {"table": "1984:republican", "ordinal": "Thirty-Third", "city": "Dallas", "days": (date(1984, 8, 20), date(1984, 8, 23)), "ballot": date(1984, 8, 22)},
+    {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
+    {"tables": {n: f"1876:republican:b{n}" for n in (1, 2, 3, 5, 6, 7)}, "ordinal": "Sixth", "city": "Cincinnati", "days": (date(1876, 6, 14), date(1876, 6, 16)), "ballots": dict.fromkeys(range(1, 8), date(1876, 6, 16)), "deciding": 7, "held": 7},
+    {"tables": {3: "1884:republican:b3"}, "ordinal": "Eighth", "city": "Chicago", "days": (date(1884, 6, 3), date(1884, 6, 6)), "ballots": dict.fromkeys(range(1, 5), date(1884, 6, 6)), "deciding": 4},
+    {"tables": {n: f"1888:republican:b{n}" for n in (2, 3, 5, 7)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8},
+    {"tables": {1: "1896:republican"}, "ordinal": "Eleventh", "city": "St. Louis", "days": (date(1896, 6, 16), date(1896, 6, 18)), "ballots": {1: date(1896, 6, 18)}, "deciding": 1, "caveat": "The table gives no votes held by each delegation, so none are stored. Its footnotes say the delegations of Colorado and Idaho had bolted the convention, Montana's other five votes were four blank and one for J. Donald Cameron, three of Nevada's delegates were absent, and one New York vote was passed; those votes are not in the table's columns and are not stored."},
+    {"tables": {1: "1900:republican"}, "ordinal": "Twelfth", "city": "Philadelphia", "days": (date(1900, 6, 19), date(1900, 6, 21)), "ballots": {1: date(1900, 6, 21)}, "deciding": 1},
+    {"tables": {1: "1968:republican:final"}, "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballots": {1: date(1968, 8, 7)}, "deciding": 1},
+    {"tables": {1: "1972:republican"}, "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballots": {1: date(1972, 8, 22)}, "deciding": 1},
+    {"tables": {1: "1976:republican"}, "ordinal": "Thirty-First", "city": "Kansas City", "days": (date(1976, 8, 16), date(1976, 8, 19)), "ballots": {1: date(1976, 8, 18)}, "deciding": 1},
+    {"tables": {1: "1980:republican"}, "ordinal": "Thirty-Second", "city": "Detroit", "days": (date(1980, 7, 14), date(1980, 7, 17)), "ballots": {1: date(1980, 7, 16)}, "deciding": 1},
+    {"tables": {1: "1984:republican"}, "ordinal": "Thirty-Third", "city": "Dallas", "days": (date(1984, 8, 20), date(1984, 8, 23)), "ballots": {1: date(1984, 8, 22)}, "deciding": 1},
 ]  # fmt: skip
 CANDIDATES = {
     "Nixon": ("Richard M. Nixon", "Q9588"),
@@ -408,12 +414,52 @@ CANDIDATES = {
     "Anderson": ("John B. Anderson", "Q936548"),
     "Bush": ("George Bush", "Q23505"),
     "Armstrong": ("Anne Armstrong", None),
+    "Grant": ("Ulysses S. Grant", "Q34836"),
+    "Blaine": ("James G. Blaine", "Q448778"),
+    "Morton": ("Oliver P. Morton", "Q880811"),
+    "1896:Morton": ("Levi P. Morton", "Q298997"),
+    "Bristow": ("Benjamin H. Bristow", None),
+    "Conkling": ("Roscoe Conkling", "Q5611358"),
+    "Hayes": ("Rutherford B. Hayes", "Q35686"),
+    "Hartranft": ("John F. Hartranft", "Q373157"),
+    "Jewell": ("Marshall Jewell", "Q880411"),
+    "Wheeler": ("William A. Wheeler", "Q310835"),
+    "Washburne": ("Elihu B. Washburne", "Q731492"),
+    "Arthur": ("Chester A. Arthur", "Q35498"),
+    "Edmunds": ("George F. Edmunds", "Q1507329"),
+    "Logan": ("John A. Logan", "Q954410"),
+    "J. Sherman": ("John Sherman", "Q445392"),
+    "Sherman": ("John Sherman", "Q445392"),
+    "W. T. Sherman": ("William T. Sherman", None),
+    "Hawley": ("Joseph R. Hawley", "Q240188"),
+    "Lincoln": ("Robert T. Lincoln", None),
+    "Alger": ("Russell A. Alger", "Q880655"),
+    "Gresham": ("Walter Q. Gresham", "Q1402324"),
+    "Depew": ("Chauncey M. Depew", "Q5088222"),
+    "Harrison": ("Benjamin Harrison", "Q35678"),
+    "Allison": ("William B. Allison", "Q5552354"),
+    "Rusk": ("Jeremiah M. Rusk", "Q887084"),
+    "Phelps": ("William Walter Phelps", "Q2580976"),
+    "Ingalls": ("John J. Ingalls", "Q433158"),
+    "McKinley": ("William McKinley", "Q35041"),
+    "For William McKinley": ("William McKinley", "Q35041"),
+    "Miller": ("Warner Miller", "Q2549479"),
+    "Foraker": ("Joseph B. Foraker", "Q881341"),
+    "Haymond": ("Creed Haymond", None),
+    "Reed": ("Thomas B. Reed", "Q2094078"),
+    "Quay": ("Matthew S. Quay", "Q6059259"),
 }
+UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippine Islands"}
+ABSTAINED = {"votes", "Abstention", "not voting", "Not voting"}
 OFFICIAL = (
     "The roll call of the states on the presidential nomination, as tabulated in the official report of the "
     "convention's proceedings published by the Republican National Committee, read from the scanned volume page by "
     "page. Each delegation's total is the votes it held, abstentions included; abstentions are that total less the "
     "votes recorded for candidates."
+)
+HELD = (
+    " The table gives no votes held by each delegation; each delegation's total here is the votes it cast on {}, "
+    "on which every delegate voted."
 )
 FIRST_1968 = (
     "The proceedings print two tabulations of the one ballot. As first called, the roll gave {}. Delegations then "
@@ -1349,7 +1395,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the 1968 to 1984 Republican and the 2016 and 2020 national conventions",
+            summary="The roll call of the states at the 1868 to 1900 and 1968 to 1984 Republican and the 2016 and 2020 national conventions",
             polity="US",
         )
 
@@ -1522,6 +1568,23 @@ def emit() -> Path:
                     winner = next(label for label in labels if label.endswith(convention["nominee"]))
                     cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         rolls = pl.read_parquet(DATA / "parsed" / SOURCE / "rollcalls.parquet")
+
+        def unit(code: str) -> UUID:
+            if code not in units and code in UNPLACED:
+                units[code] = cs.unit("us.state", code)
+                if units[code] in cs.minted:
+                    cs.add(
+                        "reporting_unit",
+                        id=units[code],
+                        polity_id=us,
+                        scheme_code="us.state",
+                        code=code,
+                        area_relation="unlocated",
+                        kind="standard",
+                    )
+                    name(units[code], UNPLACED[code])
+            return units[code]
+
         republican = cs.key("us.party", "republican-party")
         people = dict(
             conn.execute(
@@ -1531,11 +1594,15 @@ def emit() -> Path:
                 [[qid for _, qid in CANDIDATES.values() if qid]],
             ).fetchall()
         )
+        added = set()
         for convention in PROCEEDINGS:
-            spec = next(spec for spec in TABLES if spec["table"] == convention["table"])
             first, last = convention["days"]
-            day = convention["ballot"]
-            cells = rolls.filter(pl.col("table") == spec["table"])
+            year = first.year
+            specs = {
+                n: next(spec for spec in TABLES if spec["table"] == ballot)
+                for n, ballot in convention["tables"].items()
+            }
+            item = next(iter(specs.values()))["item"]
             title = f"Official Report of the Proceedings of the {convention['ordinal']} Republican National Convention"
             source = cs.source("Republican National Committee", title)
             cs.add(
@@ -1544,24 +1611,27 @@ def emit() -> Path:
                 kind="official_body",
                 publisher="Republican National Committee",
                 title=title,
-                url=f"https://archive.org/details/{spec['item']}",
+                url=f"https://archive.org/details/{item}",
             )
             pages = {}
-            for leaf in spec["leaves"]:
-                image = scan(spec, leaf)
-                artifact = cs.artifact(image, source)
-                pages[leaf] = cs.page(artifact, leaf)
-                render = PAGES / f"{image.sha256}-{leaf}.png"
-                with Image.open(render) as opened:
-                    cs.add(
-                        "source_page",
-                        id=pages[leaf],
-                        artifact_id=artifact,
-                        page_number=leaf,
-                        image_key=f"pages/{SOURCE}/{render.name}",
-                        width=opened.width,
-                        height=opened.height,
-                    )
+            for spec in specs.values():
+                for leaf in spec["leaves"]:
+                    if leaf in pages:
+                        continue
+                    image = scan(spec, leaf)
+                    artifact = cs.artifact(image, source)
+                    pages[leaf] = cs.page(artifact, leaf)
+                    render = PAGES / f"{image.sha256}-{leaf}.png"
+                    with Image.open(render) as opened:
+                        cs.add(
+                            "source_page",
+                            id=pages[leaf],
+                            artifact_id=artifact,
+                            page_number=leaf,
+                            image_key=f"pages/{SOURCE}/{render.name}",
+                            width=opened.width,
+                            height=opened.height,
+                        )
             election = cs.key("us.election", f"{first}:republican-national-convention")
             cs.add(
                 "election",
@@ -1573,124 +1643,160 @@ def emit() -> Path:
                 date_to=last,
                 status="held",
             )
-            name(election, f"{first.year} Republican National Convention")
+            name(election, f"{year} Republican National Convention")
             path = f"us/{first}-republican-national-convention"
             cs.add("slug", path=path, entity_id=election)
-            key = f"{first}:president:republican:convention:1"
-            contest = cs.key("us.contest", key)
-            held = cells.filter(pl.col("column") == "votes")["value"].sum()
-            required = int(held) // 2 + 1
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=election,
-                kind="office",
-                office_id=cs.key("us.office", "president"),
-                party_scope_id=republican,
-                district_area_id=nation,
-                magnitude=1,
-                round_number=1,
-                previous_round_id=None,
-                electoral_system_id=system,
-                rules_override={"required": required},
-                default_result_kind="counted",
-            )
-            name(contest, "Presidential nomination, ballot 1")
-            cs.add("slug", path=f"{path}/ballot-1", entity_id=contest)
-            result_set = cs.key(f"{SOURCE}.result_set", key)
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=True,
-                completeness=1,
-                as_of=datetime.combine(day, datetime.min.time(), UTC),
-            )
-            cs.add(
-                "note",
-                entity_id=result_set,
-                kind="methodology",
-                body_md=OFFICIAL + f" The convention met in {convention['city']} and voted on {day:%B %-d, %Y}; "
-                f"{required:,} votes, a majority of the delegates, were needed to nominate.",
-            )
-            if "first" in convention:
-                _, printed, _ = table(next(s for s in TABLES if s["table"] == convention["first"]), "low")
-                ranked = sorted(((v, k) for k, v in printed.items() if k != "votes" and v), reverse=True)
-                cs.add(
-                    "note",
-                    entity_id=result_set,
-                    kind="caveat",
-                    body_md=FIRST_1968.format(
-                        ", ".join(f"{k} {v:,.0f}" for v, k in ranked[:-1])
-                        + f", and {ranked[-1][1]} {ranked[-1][0]:,.0f}"
-                    ),
-                )
-            totals = {
-                column: total
-                for column, total in cells.group_by("column").agg(pl.col("value").sum()).iter_rows()
-                if column not in {"votes", "Abstention"} and total
-            }
-            ballot_options = {}
-            for column in totals:
-                label, qid = CANDIDATES[column]
-                slug = re.sub(r"[^a-z]+", "-", label.lower()).strip("-")
-                if qid is None:
-                    person = cs.key("us.person", slug)
-                    if person in cs.minted:
-                        cs.add("person", id=person)
-                        name(person, label)
+            held = None
+            if "held" in convention:
+                full = rolls.filter(pl.col("table") == convention["tables"][convention["held"]])
+                held = dict(full.group_by("state").agg(pl.col("value").sum()).iter_rows())
+                for ballot in convention["tables"].values():
+                    cast = rolls.filter(pl.col("table") == ballot).group_by("state").agg(pl.col("value").sum())
+                    for state, value in cast.iter_rows():
+                        if value > held.get(state, 0):
+                            raise ValueError(f"{ballot}: {state} cast {value:g}, more than {held.get(state, 0):g}")
+            previous = None
+            for number, spec in specs.items():
+                day = convention["ballots"][number]
+                cells = rolls.filter(pl.col("table") == spec["table"])
+                if cells.is_empty():
+                    raise ValueError(f"{spec['table']} did not pass its checks")
+                key = f"{first}:president:republican:convention:{number}"
+                contest = cs.key("us.contest", key)
+                if held is not None:
+                    total = sum(held.values())
+                elif "votes" in set(cells["column"]):
+                    total = cells.filter(pl.col("column") == "votes")["value"].sum()
                 else:
-                    person = people[qid]
-                option = ballot_options[column] = cs.key("us.option", f"{key}:{slug}")
+                    total = None
+                required = None if total is None else int(total) // 2 + 1
                 cs.add(
-                    "contest_option",
-                    id=option,
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=cs.key("us.office", "president"),
+                    party_scope_id=republican,
+                    district_area_id=nation,
+                    magnitude=1,
+                    round_number=number,
+                    previous_round_id=previous,
+                    electoral_system_id=system,
+                    rules_override=None if required is None else {"required": required},
+                    default_result_kind="counted",
+                )
+                previous = contest
+                name(contest, f"Presidential nomination, ballot {number}")
+                cs.add("slug", path=f"{path}/ballot-{number}", entity_id=contest)
+                result_set = cs.key(f"{SOURCE}.result_set", key)
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
                     contest_id=contest,
-                    kind="candidate",
-                    party_id=republican,
-                    ballot_label=label,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
+                    as_of=datetime.combine(day, datetime.min.time(), UTC),
                 )
-                cs.add(
-                    "candidacy",
-                    id=cs.key("us.candidacy", f"{key}:{slug}:head"),
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=label,
-                    is_independent=False,
+                method = OFFICIAL
+                if held is not None:
+                    deciding = (
+                        "the ballot"
+                        if len(convention["ballots"]) == 1
+                        else f"the {('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')[convention['held'] - 1]} ballot"
+                    )
+                    method += HELD.format(deciding)
+                method += f" The convention met in {convention['city']} and voted on {day:%B %-d, %Y}"
+                method += (
+                    "."
+                    if required is None
+                    else f"; {required:,} votes, a majority of the delegates, were needed to nominate."
                 )
-            for cell in cells.iter_rows(named=True):
-                if cell["column"] == "votes":
-                    option, measure = None, DELEGATION
-                elif cell["column"] in ballot_options and cell["value"]:
-                    option, measure = str(ballot_options[cell["column"]]), VOTES
-                else:
-                    continue
-                unit = units[cell["state"]]
-                values.append((str(result_set), str(unit), option, measure, cell["value"]))
-                x0, y0, x1, y1 = cell["box"]
-                cs.add(
-                    "value_locator",
-                    result_set_id=result_set,
-                    unit_id=unit,
-                    option_id=option,
-                    channel=0,
-                    measure=measure,
-                    count_round=0,
-                    page_id=pages[cell["leaf"]],
-                    source_id=None,
-                    x0=x0,
-                    y0=y0,
-                    x1=x1,
-                    y1=y1,
-                )
-            winner = max(totals, key=lambda column: totals[column])
-            cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
+                if "caveat" in convention:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=convention["caveat"])
+                if "first" in convention:
+                    _, printed, _ = table(next(s for s in TABLES if s["table"] == convention["first"]), "low")
+                    ranked = sorted(((v, k) for k, v in printed.items() if k != "votes" and v), reverse=True)
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=FIRST_1968.format(
+                            ", ".join(f"{k} {v:,.0f}" for v, k in ranked[:-1])
+                            + f", and {ranked[-1][1]} {ranked[-1][0]:,.0f}"
+                        ),
+                    )
+                totals = {
+                    column: total
+                    for column, total in cells.group_by("column").agg(pl.col("value").sum()).iter_rows()
+                    if column not in ABSTAINED and total
+                }
+                ballot_options = {}
+                for column in totals:
+                    label, qid = CANDIDATES.get(f"{year}:{column}") or CANDIDATES[column]
+                    slug = re.sub(r"[^a-z]+", "-", label.lower()).strip("-")
+                    if qid is None:
+                        person = cs.key("us.person", slug)
+                        if person in cs.minted and person not in added:
+                            added.add(person)
+                            cs.add("person", id=person)
+                            name(person, label)
+                    else:
+                        person = people[qid]
+                    option = ballot_options[column] = cs.key("us.option", f"{key}:{slug}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=republican,
+                        ballot_label=label,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{key}:{slug}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=label,
+                        is_independent=False,
+                    )
+                if held is not None:
+                    for state, value in held.items():
+                        values.append((str(result_set), str(unit(state)), None, DELEGATION, value))
+                for cell in cells.iter_rows(named=True):
+                    if cell["column"] == "votes":
+                        option, measure = None, DELEGATION
+                    elif cell["column"] in ballot_options and cell["value"]:
+                        option, measure = str(ballot_options[cell["column"]]), VOTES
+                    else:
+                        continue
+                    where = unit(cell["state"])
+                    values.append((str(result_set), str(where), option, measure, cell["value"]))
+                    x0, y0, x1, y1 = cell["box"]
+                    cs.add(
+                        "value_locator",
+                        result_set_id=result_set,
+                        unit_id=where,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=0,
+                        page_id=pages[cell["leaf"]],
+                        source_id=None,
+                        x0=x0,
+                        y0=y0,
+                        x1=x1,
+                        y1=y1,
+                    )
+                if number == convention["deciding"]:
+                    winner = max(totals, key=lambda column: totals[column])
+                    cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         cs.frame(
             "result_value",
             pl.DataFrame(
