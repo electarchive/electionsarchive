@@ -1564,7 +1564,11 @@ def emit(
             aliases = {
                 owner_key,
                 f"{st}:{code}:"
-                + {"commissioners-court": "commission", "council": "city-council"}.get(office_key, office_key),
+                + {
+                    "commissioners-court": "commission",
+                    "council": "city-council",
+                    "board-of-trustees": "township-board",
+                }.get(office_key, office_key),
             }
             if not question and contest_key in keyed and "whole" in rows.columns and rows["whole"].all():
                 existing = cs.key("us.contest", contest_key)
