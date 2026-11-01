@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
@@ -178,23 +179,37 @@
       </span>
     {/each}
   {:else if entry.winner != null}
-    <span class="flex items-baseline gap-1.5">
-      <span
-        class="shrink-0 self-center rounded-xs block-2 inline-2"
-        style:background-color={entry.color}
-      ></span>
-      <span class="flex-1">{entry.winner.label}</span>
-      {#if entry.winner.total > 0}
-        <span class="font-figures text-xs tabular-nums opacity-70"
-          >{entry.winner.measure === "electoral_votes"
-            ? m.series_electoral({
-                votes: count(entry.winner.votes),
-                total: count(entry.winner.total),
-              })
-            : percent(entry.winner.share)}</span
+    {const total = $derived(entry.winner.total)}
+    {const isElectoral = $derived(entry.winner.measure === "electoral_votes")}
+    <ul class="grid gap-0.5">
+      {#each [entry.winner, ...entry.winner.others] as option, index (index)}
+        <li
+          class={cn("flex items-baseline gap-1.5", {
+            "font-semibold": option.won,
+          })}
         >
-      {/if}
-    </span>
+          <span
+            class="shrink-0 self-center rounded-xs block-2 inline-2"
+            style:background-color={swatch(option.color, option.key)}
+          ></span>
+          <span class="truncate min-inline-0">{option.label}</span>
+          {#if option.won}
+            <CheckIcon
+              class="shrink-0 self-center block-3 inline-3"
+              aria-hidden="true"
+            /><span class="sr-only">{m.outcome_won()}</span>
+          {/if}
+          {#if total > 0}
+            <span
+              class="ms-auto ps-2 font-figures text-xs tabular-nums opacity-70"
+              >{isElectoral
+                ? count(option.votes)
+                : percent(option.votes / total)}</span
+            >
+          {/if}
+        </li>
+      {/each}
+    </ul>
   {/if}
 {/snippet}
 
@@ -213,7 +228,12 @@
         {/if}
       </span>
       {#if entry.date != null}
-        <span class="font-figures text-xs opacity-70">{date(entry.date)}</span>
+        <span class="flex justify-between gap-3 text-xs opacity-70">
+          <span class="font-figures">{date(entry.date)}</span>
+          {#if entry.winner?.measure === "electoral_votes" && (entry.winner.seats?.length ?? 0) < 2}
+            <span>{m.measure_electoral_votes()}</span>
+          {/if}
+        </span>
       {/if}
       {@render winner(entry)}
       {#if entry.gap != null}
