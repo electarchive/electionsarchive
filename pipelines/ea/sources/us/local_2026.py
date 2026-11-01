@@ -38,6 +38,7 @@ STATES = (
     if os.environ.get("LOCAL_STATES")
     else None
 )
+GROUPS = None if STATES is None else STATES | ({"ceda"} if "CA" in STATES else set())
 FILES = {
     "06037": "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
     "0644000": "https://cityclerk.lacity.org/election/2026_General_Municipal_Election_List_of_Certified_Candidates.pdf",
@@ -7375,6 +7376,22 @@ def other_place(mine: frozenset[str], theirs: frozenset[str]) -> bool:
     return bool(ours and others and sorted("".join(ours)) != sorted("".join(others)))
 
 
+CA_SCHOOL_KINDS = {
+    "joint",
+    "jt",
+    "union",
+    "unified",
+    "elementary",
+    "high",
+    "city",
+    "school",
+    "schools",
+    "district",
+    "sch",
+    "dist",
+}
+
+
 def ca_school_variants(label: str) -> list[list[str]]:
     words = [
         word
@@ -7389,7 +7406,13 @@ def ca_school_variants(label: str) -> list[list[str]]:
         )
         if word not in ("school", "schools", "district") and not word.isdigit()
     ]
-    return [words, [word for word in words if word != "joint"], [word for word in words if word != "union"]]
+    return [
+        words,
+        *(
+            [word for word in words if word not in drop]
+            for drop in ({"joint"}, {"union"}, {"elementary"}, {"union", "elementary"})
+        ),
+    ]
 
 
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
@@ -10182,6 +10205,7 @@ def parse() -> None:
                 [f"{DAY}:%", SOURCE],
             )
         } | {str(row["tail"]) for row in rows}
+        prior_taken = set(taken)
         state_used: set[str] = set()
         county_used: set[str] = set()
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
@@ -10505,10 +10529,14 @@ def parse() -> None:
                     held = {
                         path
                         for (path,) in conn.execute(
-                            "select path from slug where path ~ '^us/ca/[^/]+/2026-11-03-general$'"
+                            """select s.path from slug s join entity en on en.id = s.entity_id
+                               join changeset cs on cs.id = en.changeset_id
+                               where s.path ~ '^us/ca/[^/]+/2026-11-03-general$' and cs.pipeline <> %s""",
+                            [SOURCE],
                         )
                     }
                     pools = dict(towns)
+                    own_owners = {county_code: {town[3] for town in pool} for county_code, pool in pools.items()}
                     for county_code, pool in pools.items():
                         own = {tuple(town[0]) for town in pool if town[1] == "school"}
                         towns[county_code] = [
@@ -10810,6 +10838,24 @@ def parse() -> None:
                             rest = tokens[skip + len(lead) :]
                             if rest[:1] == ["county"] and sort != "school":
                                 continue
+                            if (
+                                state == "CA"
+                                and sort == "school"
+                                and (
+                                    rest[:1] == ["joint"]
+                                    and "joint" not in label.lower()
+                                    or rest[:1] == ["unified"]
+                                    and "unified" not in label.lower()
+                                    and str(row["fips"]) == "06053"
+                                    or rest[:1]
+                                    and rest[0] not in CA_SCHOOL_KINDS
+                                    and (
+                                        "union" in set(re.findall(r"[a-z]+", label.lower())) - set(stem)
+                                        or owner not in own_owners.get(str(row["fips"]), ())
+                                    )
+                                )
+                            ):
+                                continue
                             said = (
                                 rest[0]
                                 if not start
@@ -10887,6 +10933,10 @@ def parse() -> None:
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
                     fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    fits = [fit for fit in fits if ("elementary" in fit[3].lower()) == ("elementary" in tokens)] or fits
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    fits = [fit for fit in fits if fit[4] in own_owners.get(str(row["fips"]), ())] or fits
                 if (
                     state == "NJ"
                     and row.get("tail") is None
@@ -10908,7 +10958,9 @@ def parse() -> None:
                     and (
                         fits[0][4].startswith("school:")
                         or not re.search(
-                            r"\b(school|unified|college|district(?! \d)|area|primary|nominating|special)\b",
+                            r"\b(school|unified|college|district(?! (?:\d+|[a-f](?: |$)))|area|primary|nominating|special)\b"
+                            if state == "CA"
+                            else r"\b(school|unified|college|district(?! \d)|area|primary|nominating|special)\b",
                             re.sub(r"\b(school|water district)\b", "", " ".join(fits[0][2]))
                             if state == "ME"
                             else " ".join(fits[0][2]),
@@ -11011,8 +11063,15 @@ def parse() -> None:
                             else f"{ward[4].title()} Ward"
                         )
                         if ward and (me_seated or role in ("council", "commission", "board-of-directors"))
-                        else f"{other[1].title()} {other[2]}"
-                        if (other := re.search(r"\b(seat|district|group|place|zone|position) (\d+)\b", post))
+                        else f"{other[1].title()} {other[2].upper()}"
+                        if (
+                            other := re.search(
+                                r"\b(seat|district|group|place|zone|position) (\d+|[a-f](?= |$))"
+                                if state == "CA"
+                                else r"\b(seat|district|group|place|zone|position) (\d+)\b",
+                                post,
+                            )
+                        )
                         and (me_seated or role in ("council", "commission", "board-of-directors"))
                         else "At-Large"
                         if (me_seated or role in ("council", "commission", "board-of-directors"))
@@ -11205,6 +11264,11 @@ def parse() -> None:
                     or tail is None
                     or tail in taken
                     and not (state == "IN" and tail in state_used and tail not in county_used)
+                    and not (
+                        state == "CA"
+                        and tail not in prior_taken
+                        and re.search(r"(?i)school|unified|education", str(row["contest"]))
+                    )
                     or used.setdefault(tail, str(row["contest"])) != row["contest"]
                 ):
                     missed.add(f"{row['county']}: {row['contest']}")
@@ -11251,11 +11315,11 @@ def parse() -> None:
     )
     if STATES is not None:
         held = PARSED / "candidates.parquet"
-        frame = frame.filter(pl.col("tail").str.split(":").list.first().is_in(sorted(STATES)))
+        frame = frame.filter(pl.col("tail").str.split(":").list.first().is_in(sorted(GROUPS)))
         if held.exists():
             frame = pl.concat(
                 [
-                    pl.read_parquet(held).filter(~pl.col("tail").str.split(":").list.first().is_in(sorted(STATES))),
+                    pl.read_parquet(held).filter(~pl.col("tail").str.split(":").list.first().is_in(sorted(GROUPS))),
                     frame,
                 ],
                 how="diagonal_relaxed",
@@ -11288,7 +11352,7 @@ def emit() -> None:
     groups = whole["tail"].str.split(":").list.first()
     present = set(groups)
     failed = []
-    for state in sorted(present if STATES is None else present & STATES):
+    for state in sorted(present if GROUPS is None else present & GROUPS):
         try:
             print(f"changeset {state} {emit_state(whole.filter(groups == state), state)}")
         except Exception as error:
