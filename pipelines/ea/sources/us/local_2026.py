@@ -6258,6 +6258,13 @@ for key, publisher, title, url, local in (
         "NJ-34029-np",
         "Ocean County Clerk",
         "2026 General Election Official Non-Partisan Candidate Certification Sheet (updated 9-14-2026)",
+    (
+        "UT-49035-magna",
+        "Magna Water District",
+        "Magna Water District Trustee Election, November 3, 2026",
+        "https://www.utah.gov/pmn/sitemap/notice/1105731.html",
+        "ut/magna_notice.html",
+    ),
         "https://www.co.ocean.nj.us/WebContentFiles/d603176a-4d26-4c13-baa1-27433121818d.pdf",
         "nj/ocean_nonpartisan.pdf",
     ),
