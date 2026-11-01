@@ -50,7 +50,21 @@ MF_555_COUNTIES = [
     "Preble",
     "Putnam",
 ]
-MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES]
+MF_559 = DATA / "inbox" / "manual" / "MF-559"
+MF_559_COUNTIES = [
+    "Morrow",
+    "Holmes",
+    "Madison",
+    "Knox",
+    "Hocking",
+    "Muskingum",
+    "Ottawa",
+    "Huron",
+    "Marion",
+    "Scioto",
+    "Pike",
+]
+MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES, *MF_559_COUNTIES]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
 MONTGOMERY_KEY = "https://lookup.boe.ohio.gov/vtrapp/montgomery/ballotlist.aspx#sample-ballots.zip"
@@ -171,11 +185,17 @@ def fetch() -> None:
             )
 
 
+def mf_dir(county: str) -> Path:
+    if county in MF_559_COUNTIES:
+        return MF_559
+    return MF_555 if county in MF_555_COUNTIES else MF
+
+
 def mf_files() -> list[tuple[str, Path]]:
     return [
         (county, path)
         for county in [*MF_SAMPLES, "Stark"]
-        for path in sorted(((MF_555 if county in MF_555_COUNTIES else MF) / county.lower()).glob("*.pdf"))
+        for path in sorted((mf_dir(county) / county.lower()).glob("*.pdf"))
         if county != "Stark" or "legal ad" in path.name
     ]
 
