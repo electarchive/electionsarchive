@@ -6394,6 +6394,13 @@ for key, publisher, title, url, local in (
         "az/bullhead_sample_ballot.pdf",
     ),
     (
+        "AZ-04015-lake-havasu",
+        "Lake Havasu City Clerk",
+        "2026 General Election Candidates",
+        "https://www.lhcaz.gov/213/Elections-Voting",
+        "az/lake_havasu_candidates.html",
+    ),
+    (
         "AZ-04023-nogales",
         "Nogales City Clerk",
         "2026 Election Candidates, General Election November 3, 2026",
