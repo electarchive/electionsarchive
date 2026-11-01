@@ -17,6 +17,7 @@
     after = [],
     paint = new Map(),
     more,
+    isBelow = false,
   }: {
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
     cycle: Pick<Cycle, "primaries" | "general">;
@@ -28,6 +29,7 @@
     }>;
     paint?: Map<string, string>;
     more?: Snippet;
+    isBelow?: boolean;
   } = $props();
 
   const uid = $props.id();
@@ -326,10 +328,18 @@
 
 {#if road.main.length + road.minor.length + road.late.length > 1}
   <nav
-    class="col-span-12 grid gap-2 bg-card px-3.5 py-3"
+    class={cn("col-span-12 grid gap-2 bg-card px-3.5 py-3", {
+      "max-sm:hidden": !isBelow,
+      "sm:hidden": isBelow,
+    })}
     aria-labelledby="{uid}-title"
   >
-    <h2 id="{uid}-title" class="sr-only">{m.rounds_title()}</h2>
+    <h2
+      id="{uid}-title"
+      class={cn("text-[0.8125rem] font-bold", { "sr-only": !isBelow })}
+    >
+      {m.rounds_title()}
+    </h2>
     <ol
       class="grid grid-cols-[0.5rem_max-content_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-sm sm:grid-cols-[0.5rem_max-content_max-content_minmax(0,1fr)] sm:gap-x-4"
     >

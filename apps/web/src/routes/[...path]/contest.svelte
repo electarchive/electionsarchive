@@ -1499,57 +1499,62 @@
   {/if}
 </header>
 
-<Road
-  {rounds}
-  {cycle}
-  paint={new Map(
-    contest.rows.flatMap((row) =>
-      row.current?.person == null
-        ? []
-        : [[row.current.person, swatch(row.color, row.key)]],
-    ),
-  )}
->
-  {#snippet more()}
-    {#if cycle.others.length > 0}
-      <details class="text-[0.8125rem]">
-        <summary
-          class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
-        >
-          {m.cycle_others()}
-          <span class="font-figures tabular-nums"
-            >{count(cycle.others.length)}</span
+{#snippet road(isBelow: boolean)}
+  <Road
+    {isBelow}
+    {rounds}
+    {cycle}
+    paint={new Map(
+      contest.rows.flatMap((row) =>
+        row.current?.person == null
+          ? []
+          : [[row.current.person, swatch(row.color, row.key)]],
+      ),
+    )}
+  >
+    {#snippet more()}
+      {#if cycle.others.length > 0}
+        <details class="text-[0.8125rem]">
+          <summary
+            class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
           >
-        </summary>
-        <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
-          {#each cycle.others as other (other.party.id)}
-            <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
-              <Name
-                class="truncate font-medium"
-                label={other.party.label}
-                color={other.party.color}
-              />
-              <span class="flex flex-wrap gap-x-2.5">
-                {#each other.races as race, index (index)}
-                  {#if race.path == null || race.isCurrent}
-                    <span class={cn({ "font-semibold": race.isCurrent })}
-                      >{race.place}</span
-                    >
-                  {:else}
-                    <Preview
-                      class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                      path={race.path}>{race.place}</Preview
-                    >
-                  {/if}
-                {/each}
-              </span>
-            </li>
-          {/each}
-        </ul>
-      </details>
-    {/if}
-  {/snippet}
-</Road>
+            {m.cycle_others()}
+            <span class="font-figures tabular-nums"
+              >{count(cycle.others.length)}</span
+            >
+          </summary>
+          <ul class="mbs-1.5 grid gap-x-6 gap-y-1 xl:grid-cols-2">
+            {#each cycle.others as other (other.party.id)}
+              <li class="grid gap-x-3 sm:grid-cols-[9.5rem_minmax(0,1fr)]">
+                <Name
+                  class="truncate font-medium"
+                  label={other.party.label}
+                  color={other.party.color}
+                />
+                <span class="flex flex-wrap gap-x-2.5">
+                  {#each other.races as race, index (index)}
+                    {#if race.path == null || race.isCurrent}
+                      <span class={cn({ "font-semibold": race.isCurrent })}
+                        >{race.place}</span
+                      >
+                    {:else}
+                      <Preview
+                        class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                        path={race.path}>{race.place}</Preview
+                      >
+                    {/if}
+                  {/each}
+                </span>
+              </li>
+            {/each}
+          </ul>
+        </details>
+      {/if}
+    {/snippet}
+  </Road>
+{/snippet}
+
+{@render road(false)}
 
 {#snippet locator(shown: NonNullable<typeof locating>)}
   {#key here}
@@ -2360,6 +2365,8 @@
     </ul>
   </section>
 {/if}
+
+{@render road(true)}
 
 {#await ballot then entries}
   {#if entries.length > 0}
