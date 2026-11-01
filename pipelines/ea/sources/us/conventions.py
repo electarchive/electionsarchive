@@ -446,11 +446,12 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
     {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
     {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
+    {"party": "democratic", "tables": {1: "1872:democratic"}, "title": DNC + "at Baltimore, July 9, 1872", "publisher": "Rockwell & Churchill", "city": "Baltimore", "days": (date(1872, 7, 9), date(1872, 7, 10)), "ballots": {1: date(1872, 7, 10)}, "deciding": 1, "caveat": "The scattering list prints 'Groesbeck 2' on its own line under 'West Virginia, blank 2', without a state; those 2 votes are not stored."},
     {"party": "democratic", "tables": {1: "1876:democratic:b1", 2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2},
-    {"party": "democratic", "tables": {2: "1880:democratic:b2"}, "title": DNC + "in Cincinnati, O., June 22d, 23d, and 24th, 1880", "publisher": "Daily Journal Book and Job Rooms", "city": "Cincinnati", "days": (date(1880, 6, 22), date(1880, 6, 24)), "ballots": {1: date(1880, 6, 23), 2: date(1880, 6, 24)}, "deciding": 2, "held": 2},
-    {"party": "democratic", "tables": {1: "1884:democratic:b1"}, "title": DNC + "in Chicago, Ill., July 8th, 9th, 10th and 11th, 1884", "publisher": "Nabu Press", "city": "Chicago", "days": (date(1884, 7, 8), date(1884, 7, 11)), "ballots": {1: date(1884, 7, 10), 2: date(1884, 7, 11)}, "deciding": 2},
+    {"party": "democratic", "tables": {1: "1880:democratic:b1", 2: "1880:democratic:b2"}, "title": DNC + "in Cincinnati, O., June 22d, 23d, and 24th, 1880", "publisher": "Daily Journal Book and Job Rooms", "city": "Cincinnati", "days": (date(1880, 6, 22), date(1880, 6, 24)), "ballots": {1: date(1880, 6, 23), 2: date(1880, 6, 24)}, "deciding": 2, "held": 2},
+    {"party": "democratic", "tables": {1: "1884:democratic:b1", 2: "1884:democratic:b2"}, "title": DNC + "in Chicago, Ill., July 8th, 9th, 10th and 11th, 1884", "publisher": "Nabu Press", "city": "Chicago", "days": (date(1884, 7, 8), date(1884, 7, 11)), "ballots": {1: date(1884, 7, 10), 2: date(1884, 7, 11)}, "deciding": 2, "shifted": True, "caveat": "Cleveland's count here is the second roll call as called, short of the two-thirds needed; delegations then changed their votes before the nomination was declared, and those changes are not stored in the table."},
     {"party": "democratic", "tables": {1: "1892:democratic"}, "title": DNC + "in Chicago, Ill., June 21st, 22nd and 23rd, 1892", "publisher": "Cameron, Amberg & Co.", "city": "Chicago", "days": (date(1892, 6, 21), date(1892, 6, 23)), "ballots": {1: date(1892, 6, 22)}, "deciding": 1},
-    {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in (3, 4, 5)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
+    {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in range(1, 6)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
     {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47)}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
     {"party": "democratic", "tables": {1: "1904:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention held in St. Louis, Missouri, July 6, 7, 8, and 9, 1904", "publisher": "University of Kentucky Libraries, ExploreUK", "city": "St. Louis", "days": (date(1904, 7, 6), date(1904, 7, 9)), "ballots": {1: date(1904, 7, 9)}, "deciding": 1, "caveat": "Ohio's 46 votes for Parker stand under the unit rule: a poll of the delegation gave Parker 28, Hearst 6, McClellan 9, Cockrell 2, and Olney 1, and the chair let the announced vote stand. The table is the roll after the Idaho, Nevada, West Virginia, and Washington delegations changed their votes."},
     {"party": "democratic", "tables": {1: "1920:democratic:b1", 44: "1920:democratic:b44"}, "title": "Official report of the proceedings of the Democratic national convention, held in San Francisco, California, June 28, 29, 30, July 1, 2, 3, 5, and 6, 1920, resulting in the nomination of Hon. James M. Cox (of Ohio) for president and Hon. Franklin D. Roosevelt (of New York) for vice-president", "publisher": "Bookwalter-Ball Printing Co.", "city": "San Francisco", "days": (date(1920, 6, 28), date(1920, 7, 6)), "ballots": {1: date(1920, 7, 2), 44: date(1920, 7, 6)}, "deciding": 44, "acclamation": True},
@@ -597,6 +598,17 @@ CANDIDATES = {
     "democratic:T. Ewing, Jr": ("Thomas Ewing Jr.", "Q3525101"),
     "democratic:Tilden": ("Samuel J. Tilden", "Q281566"),
     "democratic:Allen": ("William Allen", "Q880659"),
+    "democratic:Ewing": ("Thomas Ewing Jr.", "Q3525101"),
+    "democratic:Jewett": ("Hugh J. Jewett", "Q5883292"),
+    "democratic:Lothrop": ("George V. N. Lothrop", "Q5545421"),
+    "democratic:Loveland": ("William A. H. Loveland", "Q8003964"),
+    "democratic:Payne": ("Henry B. Payne", "Q1606477"),
+    "democratic:Pennoyer": ("Sylvester Pennoyer", "Q1591582"),
+    "democratic:Teller": ("Henry M. Teller", "Q1575475"),
+    "democratic:Tillman": ("Benjamin Tillman", "Q736903"),
+    "republican:Fitler": ("Edwin H. Fitler", "Q5346510"),
+    "democratic:Horace Greeley": ("Horace Greeley", "Q436790"),
+    "democratic:Black": ("Jeremiah S. Black", "Q742459"),
     "democratic:Bayard": ("Thomas F. Bayard", "Q708034"),
     "democratic:Thurman": ("Allen G. Thurman", "Q1850376"),
     "democratic:Broadhead": ("James O. Broadhead", "Q1680065"),
@@ -2398,7 +2410,7 @@ def emit() -> Path:
                     )
                 if number == convention["deciding"]:
                     winner = max(totals, key=lambda column: totals[column])
-                    if rule == "two-thirds" and totals[winner] < required and not convention.get("acclamation"):
+                    if rule == "two-thirds" and required is not None and totals[winner] < required and not (convention.get("acclamation") or convention.get("shifted")):
                         raise ValueError(f"{spec['table']}: {winner} has {totals[winner]:g} of {required} needed")
                     cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         cs.frame(
