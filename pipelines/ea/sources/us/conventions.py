@@ -177,12 +177,12 @@ def volume(
 
 
 def ballots(
-    item: str, year: str, windows: dict[int, tuple[int, int]], scatter: bool = False
+    item: str, year: str, windows: dict[int, tuple[int, int]], scatter: bool = False, party: str = "republican"
 ) -> list[dict[str, object]]:
     return [
         {
             **({"scatter": True} if scatter else {}),
-            "table": f"{year}:republican" if len(windows) == 1 else f"{year}:republican:b{n}",
+            "table": f"{year}:{party}" if len(windows) == 1 else f"{year}:{party}:b{n}",
             "item": item,
             "leaves": tuple(range(low, high + 1)),
             "ballot": n,
@@ -191,11 +191,13 @@ def ballots(
     ]
 
 
-def leaves(item: str, year: str, found: dict[str, tuple[int, ...]], scatter: bool = False) -> list[dict[str, object]]:
+def leaves(
+    item: str, year: str, found: dict[str, tuple[int, ...]], scatter: bool = False, party: str = "republican"
+) -> list[dict[str, object]]:
     return [
         {
             **({"scatter": True} if scatter else {}),
-            "table": f"{year}:republican" if name == "" else f"{year}:republican:{name}",
+            "table": f"{year}:{party}" if name == "" else f"{year}:{party}:{name}",
             "item": item,
             "leaves": spec,
         }
@@ -269,23 +271,45 @@ TABLES += [
     {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (38, 39, 40, 41), "narrated": True},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
-DNC = [
-    ("proceedingsofde00demo", "1852", {f"p{page}": page for page in range(30, 69)}),
-    ("officialproceedi00indemo", "1856", {f"p{page}": page for page in range(38, 48)}),
-    ("officialpr00demo", "1860", {f"p{page}": page for page in (*range(77, 96), *range(166, 177), 188)}),
-    ("officialproceed00demo", "1864", {f"p{page}": page for page in (44, 53)}),
-    ("officialproceedi00demo", "1868", {f"p{page}": page for page in range(77, 155)}),
-    ("officialproceed01convgoog", "1872", {f"p{page}": page for page in (57, 66, 72)}),
-    ("officialproc00demo", "1876", {f"p{page}": page for page in (24, *range(168, 175))}),
-    ("officialp00demo", "1880", {f"p{page}": page for page in range(132, 143)}),
-    ("officialproceedi0000demo_u0f5", "1884", {f"p{page}": page for page in range(265, 272)}),
-    ("cu31924002684375", "1892", {f"p{page}": page for page in (*range(181, 185), *range(200, 204))}),
-    ("officialproce00de", "1896", {f"p{page}": page for page in (*range(344, 362), *range(379, 396))}),
-    ("official00demo", "1900", {f"p{page}": page for page in (166, 167, 204, 205)}),
-    ("officialreportof00demoiala", "1912", {f"p{page}": page for page in range(204, 371)}),
+DNC_1912 = (203, 207, 211, 212, 217, 219, 221, 222, 225, 227, 230, 233, 237, 248, 250, 253, 257, 259, 260, 262, 266, 270, 272, 276, 278, 283, 293, 297, 305, 308, 311, 312, 315, 318, 320, 322, 323, 327, 330, 331, 333, 336, 344, 348, 351, 358)  # fmt: skip
+DNC_1868 = (78, 80, 83, 86, 99, 102, 109, 112, 114, 117, 119, 122, 125, 127, 130, 132, 135, 138, 147, 150, 152)  # fmt: skip
+TABLES += [
+    *ballots(
+        "officialreportof00demoiala",
+        "1912",
+        {n: (page, min(page + 2, after)) for n, (page, after) in enumerate(pairwise((*DNC_1912, 361)), start=1)},
+        party="democratic",
+    ),
+    *leaves("official00demo", "1900", {"": (165, 166, 167)}, party="democratic"),
+    *leaves("officialproce00de", "1896", {"b5": (346,)}, party="democratic"),
+    *leaves("cu31924002684375", "1892", {"": (182,)}, party="democratic"),
+    *leaves("officialproceedi0000demo_u0f5", "1884", {"b1": (266,)}, party="democratic"),
+    *leaves("officialp00demo", "1880", {"b2": (139,)}, party="democratic"),
+    *leaves("officialproc00demo", "1876", {"b2": (167,)}, party="democratic"),
+    *leaves("officialproceed01convgoog", "1872", {"": (66,)}, party="democratic"),
+    *leaves(
+        "officialproceedi00demo",
+        "1868",
+        {f"b{n}": (leaf,) for n, leaf in enumerate(DNC_1868, start=1)},
+        party="democratic",
+    ),
+    {
+        "table": "1868:democratic:b22",
+        "item": "officialproceedi00demo",
+        "leaves": (153, 154, 155, 156, 157),
+        "ballot": 22,
+    },
+    *leaves("officialproceed00demo", "1864", {"": (43,)}, party="democratic"),
+    *leaves("officialpr00demo", "1860", {"baltimore-b1": (168,), "baltimore-b2": (173,)}, party="democratic"),
+    *leaves("officialproceedi00indemo", "1856", {"b13": (41,), "b14": (42,)}, party="democratic"),
+    *ballots(
+        "officialproceedi00indemo",
+        "1856",
+        {n: ((n - 1) // 4 + 38,) * 2 for n in range(1, 13)} | {15: (44, 44), 16: (44, 44)},
+        party="democratic",
+    ),
+    {"table": "1856:democratic:b17", "item": "officialproceedi00indemo", "leaves": (45, 46), "narrated": True},
 ]
-for _item, _year, _pages in DNC:
-    TABLES += volume(_item, _year, 0, 1, _pages, "democratic")
 PROCEEDINGS = [
     {"table": "1968:republican:final", "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballot": date(1968, 8, 7)},
     {"table": "1972:republican", "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballot": date(1972, 8, 22)},
@@ -383,8 +407,9 @@ COLUMNS = {
         "Roosevelt",
     ),
     "1920:republican:b5": ("votes", "Wood", "Lowden", None, "Johnson", "Harding", "Sproul"),
+    "1900:democratic": ("votes", "Bryan"),
 }
-LABELS = {"Washbarne": "Washburne"}
+LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1876:republican:b2": [
@@ -519,10 +544,21 @@ def place(label: str) -> str | None:
 
 def number(cell: str) -> float:
     text = cell.strip().replace(",", "")
+    if re.fullmatch(r"[\dIl]+", text):
+        text = text.replace("I", "1").replace("l", "1")
     fraction = FRACTION.search(text)
     text = re.sub(r"^[\s.\-—–·*…]+", "", text[: fraction.start()] if fraction else text)
     part = (unicodedata.numeric(fraction[1]) if fraction[1] else 0.5) if fraction else 0.0
     return (float(text) if text else 0.0) + part
+
+
+def candidate(label: str, table: str) -> str:
+    label = label.strip().rstrip(".:")
+    if ":democratic" in table:
+        label = re.sub(r"^For\s+", "", label)
+        if sum(ch.isupper() for ch in label) > sum(ch.islower() for ch in label):
+            label = label.title()
+    return LABELS.get(label, label)
 
 
 def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
@@ -577,8 +613,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             or COLUMNS.get(spec["table"])
             or tuple(
                 "votes"
-                if re.search(r"vote|delegate", column["label"], re.IGNORECASE)
-                else LABELS.get(label := column["label"].strip().rstrip("."), label)
+                if re.search(r"vote|delegate|whole|^\s*total\.?\s*$", column["label"], re.IGNORECASE)
+                else candidate(column["label"], spec["table"])
                 for column in header
             )
         )
