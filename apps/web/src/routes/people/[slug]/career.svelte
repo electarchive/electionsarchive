@@ -46,10 +46,10 @@
           entry.outcome === "elected" ||
           entry.outcome === "won" ||
           entry.outcome === "advanced",
-        tint: swatch(
-          entry.party?.color ?? null,
-          entry.party == null ? "" : `party:${entry.party.id}`,
-        ),
+        tint:
+          entry.party == null
+            ? "var(--muted-foreground)"
+            : swatch(entry.party.color, `party:${entry.party.id}`),
       }))
       .toSorted((a, b) => a.at - b.at),
   );

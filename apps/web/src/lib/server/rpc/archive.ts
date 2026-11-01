@@ -23701,13 +23701,19 @@ export const people = {
             (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
                 and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
-                and e2.kind in ('general', 'local') and e2.date_from > e.date_from + 60),
+                and e2.kind in ('general', 'local') and e2.date_from > e.date_from + 60
+                and (not r.retention or exists (
+                  select from candidacy cy2 join contest_option o2 on o2.id = cy2.option_id
+                  where o2.contest_id = c2.id and cy2.person_id = any(r.people)))),
             e.date_from + (e.date_from - (
               select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
                 and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
                 and e2.kind in ('general', 'local') and e2.date_from < e.date_from - 60
                 and e2.date_from > e.date_from - 3650
+                and (not r.retention or exists (
+                  select from candidacy cy2 join contest_option o2 on o2.id = cy2.option_id
+                  where o2.contest_id = c2.id and cy2.person_id = any(r.people)))
             )),
             (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
               where c.body_id is not null and c2.body_id = c.body_id and c2.office_id is not distinct from c.office_id
@@ -23717,10 +23723,15 @@ export const people = {
         cross join lateral (
           select case when c.kind = 'office' then coalesce(c.office_id, c.body_id) else coalesce(c.body_id, c.office_id) end as owner
         ) o
+        cross join lateral (
+          select bool_and(co.kind = 'answer') as retention, array_agg(cy.person_id) as people
+          from contest_option co left join candidacy cy on cy.option_id = co.id
+          where co.contest_id = c.id
+        ) r
         where c.id = any(${sql.param([...won])}::uuid[]) and c.party_scope_id is null
           and (c.body_id is not null or c.office_id is not null)
           and e.kind in ('general', 'by_election', 'special', 'runoff', 'local')
-        order by 1, e.date_from
+        order by o.owner, e.date_from
       `);
       const terms = merge(
         wins.rows.filter((row) => !seated.has(row.owner)),

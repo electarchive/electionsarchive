@@ -271,7 +271,7 @@
                     held.party == null
                       ? held.isIndependent
                         ? swatch(null, "independent")
-                        : swatch(null, "none")
+                        : "var(--muted-foreground)"
                       : swatch(held.party.color, `party:${held.party.id}`),
                   )}
                   {const start = $derived(
@@ -325,6 +325,7 @@
                       "rounded-full border border-(--party) bg-(--party)/35":
                         note != null,
                     })}
+                    style:--party="var(--muted-foreground)"
                   ></span>
                 {/each}
               </span>
@@ -624,10 +625,12 @@
                       <span
                         class="block-full"
                         style:inline-size="{entry.share * 100}%"
-                        style:background-color={swatch(
-                          entry.party?.color ?? null,
-                          entry.party == null ? "" : `party:${entry.party.id}`,
-                        )}
+                        style:background-color={entry.party == null
+                          ? "var(--muted-foreground)"
+                          : swatch(
+                              entry.party.color,
+                              `party:${entry.party.id}`,
+                            )}
                       ></span>
                     </span>
                   {/if}
