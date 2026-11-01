@@ -6611,6 +6611,20 @@ for key, publisher, title, url, local in (
         "or/lake_cities.html",
     ),
     (
+        "OR-41015-districts",
+        "Curry County Clerk",
+        "Candidate Register, November 3, 2026 General Election (Harbor Water P.U.D.)",
+        "https://www.co.curry.or.us/",
+        "or/curry_candidate_register.pdf",
+    ),
+    (
+        "OR-41065-districts",
+        "Wasco County Clerk",
+        "2026 General Election: Filed Candidates (Chenowith Water People's Utility District)",
+        "https://www.co.wasco.or.us/",
+        "or/wasco_districts.html",
+    ),
+    (
         "OR-41015-brookings",
         "City of Brookings",
         "General Election 2026 Information",
