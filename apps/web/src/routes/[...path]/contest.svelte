@@ -1266,25 +1266,19 @@
 <header
   class="col-span-12 grid gap-x-8 gap-y-3 bg-card px-3.5 pbs-4 pbe-3.5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
 >
-  <div class="grid gap-1.5 min-inline-0">
+  <div class="col-start-1 row-start-1 grid gap-1.5 min-inline-0 md:row-span-2">
     {#if drilled && contest.path != null}
       <Preview
-        class="justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+        class={cn(
+          "justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground",
+          { "max-md:pe-20": !READ_ONLY },
+        )}
         path={contest.path}>{contest.name}</Preview
       >
     {/if}
-    <div class="flex items-start justify-between gap-3">
-      <h1 class="title" data-scope-title>
-        {(drilled ? heading : contest.name).replaceAll("\u2014", "\u2060—")}
-      </h1>
-      {#if !READ_ONLY}
-        <EditPanel
-          entity={id}
-          label={contest.name}
-          title={m.edit_title_contest()}
-        />
-      {/if}
-    </div>
+    <h1 class={cn("title", { "max-md:pe-20": !READ_ONLY })} data-scope-title>
+      {(drilled ? heading : contest.name).replaceAll("\u2014", "\u2060—")}
+    </h1>
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
     >
@@ -1374,6 +1368,17 @@
       <Wording wording={contest.wording} />
     {/if}
   </div>
+  {#if !READ_ONLY}
+    <div
+      class="col-start-1 row-start-1 self-start justify-self-end md:col-start-2"
+    >
+      <EditPanel
+        entity={id}
+        label={contest.name}
+        title={m.edit_title_contest()}
+      />
+    </div>
+  {/if}
   {#if contest.series.length > 1}
     <Series series={contest.series} />
   {/if}
