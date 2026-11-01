@@ -19,6 +19,7 @@ import shapefile
 
 from ea import portals, raw
 from ea.changeset import Changeset, slug
+from ea.offices import Offices
 from ea.store import DATA, connect
 
 SOURCE = "us.enr_clarity"
@@ -1534,6 +1535,7 @@ def emit(
                 slug(_title(label)) for label in labels["choice"].unique().to_list() if label != "Write-ins"
             }
         owners: set[UUID] = set()
+        offices = Offices(conn)
         elections: set[UUID] = set()
         persons: set[UUID] = set()
         districts: set[str] = set()
@@ -1851,13 +1853,18 @@ def emit(
                     if st == "NY" and place.endswith(" County")
                     else f"{place} {first['office']}"
                 )
-                owner = cs.key("us.body" if first["body"] else "us.office", owner_key)
+                office_kind = "mayor" if office_key == "mayor" else "other"
+                owner = (
+                    cs.key("us.body", owner_key)
+                    if first["body"]
+                    else offices.key(cs, owner_key, polity, office_kind, office_title)
+                )
                 if owner in cs.minted and owner not in owners:
                     owners.add(owner)
                     if first["body"]:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
-                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if office_key == "mayor" else "other")
+                        cs.add("office", id=owner, polity_id=polity, kind=office_kind)
                     name(owner, office_title)
                 if seat and (
                     seat.startswith(("Ward", "District", "Precinct", "Region", "Zone"))

@@ -16,6 +16,7 @@ from psycopg.rows import dict_row
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.coverage_tables import tokens
+from ea.offices import Offices
 from ea.sources.licenses import UNLICENSED
 from ea.sources.us import cog
 from ea.sources.us.electionsfl import FIPS as FLORIDA
@@ -1838,6 +1839,7 @@ def emit() -> Path:
             raise ValueError("the fptp, block, and two_round systems must already exist")
 
         owners: dict[tuple[str, str], UUID] = {}
+        offices = Offices(conn)
         untyped = dict(
             conn.execute(
                 """select o.id, o.polity_id from office o join changeset c on c.id = o.changeset_id
@@ -2119,10 +2121,14 @@ def emit() -> Path:
                 if key == "council" and (survivor[2] or "").endswith("Board of Commissioners"):
                     name(survivor[0], office_title)
             if (body_code, key) not in owners:
-                owner = owners[(body_code, key)] = cs.key(
-                    "us.body" if body else "us.office", f"{state}:{body_code}:{key}"
-                )
                 mayoral = key == "mayor" and bool(row["stem"] or office_title.startswith("Mayor of "))
+                owner = owners[(body_code, key)] = (
+                    cs.key("us.body", f"{state}:{body_code}:{key}")
+                    if body
+                    else offices.key(
+                        cs, f"{state}:{body_code}:{key}", polity, "mayor" if mayoral else "other", office_title
+                    )
+                )
                 if owner in cs.minted:
                     if body:
                         cs.add("body", id=owner, polity_id=polity, kind="council")

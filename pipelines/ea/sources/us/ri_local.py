@@ -10,6 +10,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.offices import Offices
 from ea.store import DATA, connect
 
 SOURCE = "us.ri_local"
@@ -304,6 +305,7 @@ def emit() -> Path:
                 earlier[(info["path"], slug(info["text"]), info["seat"], key[0].year)] = keys[key]
         elections: dict[tuple[date, str], UUID] = {}
         owners: dict[tuple[str, str], UUID] = {}
+        offices = Offices(conn)
         persons: dict[UUID, str] = {}
         minted: dict[str, date] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
@@ -346,13 +348,19 @@ def emit() -> Path:
                 heading = f"{heading}: {title_case(text)}" if heading and text else heading or title_case(text)
             office = "question" if question else canonical
             if not question and (path, office) not in owners:
-                owner = owners[(path, office)] = cs.key("us.body" if body else "us.office", f"RI:{code}:{office}")
+                office_kind = "mayor" if office == "mayor" else "other"
+                title = f"{place} {heading}" if office != "mayor" else f"Mayor of {place}"
+                owner = owners[(path, office)] = (
+                    cs.key("us.body", f"RI:{code}:{office}")
+                    if body
+                    else offices.key(cs, f"RI:{code}:{office}", polity, office_kind, title)
+                )
                 if owner in cs.minted:
                     if body:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
-                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if office == "mayor" else "other")
-                    name(owner, f"{place} {heading}" if office != "mayor" else f"Mayor of {place}")
+                        cs.add("office", id=owner, polity_id=polity, kind=office_kind)
+                    name(owner, title)
             if (day, path) not in elections and f"{path}/{day}-{election_kind}" in foreign["election"]:
                 elections[(day, path)] = foreign["election"][f"{path}/{day}-{election_kind}"]
             if (day, path) not in elections:

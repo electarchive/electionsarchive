@@ -14,6 +14,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset, slug
+from ea.offices import Offices
 from ea.store import DATA, connect
 
 SOURCE = "us.nd_local"
@@ -255,6 +256,7 @@ def emit() -> Path:
             return f"special:{slug(area)}", seat
 
         owners: dict[tuple[str, str], UUID] = {}
+        offices = Offices(conn)
         persons: dict[UUID, str] = {}
         elections: dict[tuple[date, str, str], UUID] = {}
         districts: set[str] = set()
@@ -411,12 +413,17 @@ def emit() -> Path:
                 heading = title_case(re.split(r"[:.]", item["name"], maxsplit=1)[0])[:90]
             office = "question" if question else slug(text)
             if not question and (code, office) not in owners:
-                owner = owners[(code, office)] = cs.key("us.body" if body else "us.office", f"ND:{code}:{office}")
+                office_kind = "mayor" if office == "mayor" else "other"
+                owner = owners[(code, office)] = (
+                    cs.key("us.body", f"ND:{code}:{office}")
+                    if body
+                    else offices.key(cs, f"ND:{code}:{office}", polity, office_kind, f"{place} {heading}")
+                )
                 if owner in cs.minted:
                     if body:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
-                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if office == "mayor" else "other")
+                        cs.add("office", id=owner, polity_id=polity, kind=office_kind)
                     name(owner, f"{place} {heading}")
             if (day, code, election_kind) not in elections and f"{path}/{day}-{election_kind}" in foreign["election"]:
                 elections[(day, code, election_kind)] = foreign["election"][f"{path}/{day}-{election_kind}"]

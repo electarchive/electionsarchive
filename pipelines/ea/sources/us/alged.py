@@ -12,6 +12,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.offices import Offices
 from ea.store import DATA, connect
 
 SOURCE = "us.alged"
@@ -412,6 +413,7 @@ def emit() -> Path:
 
         frame = frame.with_columns(fips=pl.col("fips").replace(aliases))
         owners: set[UUID] = set()
+        offices = Offices(conn)
         elections: set[UUID] = set()
         persons: set[UUID] = set()
         districts: set[str] = set()
@@ -483,7 +485,11 @@ def emit() -> Path:
                 role = PROSECUTORS.get(usps, "District Attorney")
                 key, title, kind = slug(role), f"{place} {role}", "other"
             title = TITLES.get((code, key), re.sub(r"\b(County|Parish|City) \1\b", r"\1", title))
-            owner = cs.key("us.office" if kind else "us.body", f"{usps}:{code}:{key}")
+            owner = (
+                offices.key(cs, f"{usps}:{code}:{key}", polity, kind, title)
+                if kind
+                else cs.key("us.body", f"{usps}:{code}:{key}")
+            )
             if owner in cs.minted and owner not in owners:
                 if kind:
                     cs.add("office", id=owner, polity_id=polity, kind=kind)

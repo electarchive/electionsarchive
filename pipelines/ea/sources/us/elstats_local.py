@@ -12,6 +12,7 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.offices import Offices
 from ea.sources.us import elstats
 from ea.sources.us.alged import PLACES, SCHOOLS
 from ea.sources.us.alged import SOURCE as ALGED
@@ -747,6 +748,7 @@ def emit() -> Path:
         minted: dict[str, date] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
         owners: set[UUID] = set()
+        offices = Offices(conn)
         elections: set[UUID] = set()
         persons: set[UUID] = set()
         districts: set[str] = set()
@@ -784,7 +786,11 @@ def emit() -> Path:
                 title = f"{place} {'Town' if state == 'VA' and len(code) == 7 or len(code) == 10 else 'City'} Council"
             else:
                 title = f"{place} {role}"
-            owner = cs.key("us.office" if kind else "us.body", f"{state}:{code}:{key}")
+            owner = (
+                offices.key(cs, f"{state}:{code}:{key}", polity, kind, title)
+                if kind
+                else cs.key("us.body", f"{state}:{code}:{key}")
+            )
             if (owner, day.year, day.month) in covered or (owner, day.year, None) in covered:
                 skipped += 1
                 continue
