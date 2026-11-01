@@ -675,6 +675,12 @@
     views.find((choice) => choice.name === shape)?.grid ?? null,
   );
   const isSummary = $derived(grid != null);
+  const heading = $derived(
+    going ?? levels.find((level) => level.isPending === true)?.code ?? null,
+  );
+  const isLocked = $derived(
+    opening != null || heading != null || (!isSummary && !engine.isLoaded),
+  );
   let zoom = $state({ scale: 1, x: 0, y: 0 });
   let touches: Array<{ id: number; x: number; y: number }> = [];
   const pinch = (
@@ -1216,6 +1222,33 @@
     return index;
   }
 
+  function travel(event: MouseEvent, level: (typeof levels)[number]) {
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.button !== 0 ||
+      level.isCurrent ||
+      going != null
+    ) {
+      return;
+    }
+    event.preventDefault();
+    const url = new URL(location.href);
+    const asked = new URLSearchParams(level.query);
+    for (const [key, value] of asked) {
+      if (value !== page.url.searchParams.get(key)) {
+        url.searchParams.set(key, value);
+      }
+    }
+    url.pathname = resolve("/[...path]", { path: level.path });
+    going = level.code;
+    void goto(url, { reset: false }).finally(() => {
+      going = null;
+    });
+  }
+
   function open(k: number, path = rows.get(k)?.path, layer = tiles) {
     if (path == null) {
       return;
@@ -1436,7 +1469,7 @@
   const keys = (node: HTMLElement) => {
     node.tabIndex = 0;
     const offKey = on(node, "keydown", (event) => {
-      if (event.target !== node) {
+      if (event.target !== node || isLocked) {
         return;
       }
       if (event.key === "Enter" && focus != null) {
@@ -2165,29 +2198,7 @@
                 pick(level.code);
                 return;
               }
-              if (
-                event.metaKey ||
-                event.ctrlKey ||
-                event.shiftKey ||
-                event.altKey ||
-                event.button !== 0 ||
-                level.isCurrent
-              ) {
-                return;
-              }
-              event.preventDefault();
-              const url = new URL(location.href);
-              const asked = new URLSearchParams(level.query);
-              for (const [key, value] of asked) {
-                if (value !== page.url.searchParams.get(key)) {
-                  url.searchParams.set(key, value);
-                }
-              }
-              url.pathname = resolve("/[...path]", { path: level.path });
-              going = level.code;
-              void goto(url, { reset: false }).finally(() => {
-                going = null;
-              });
+              travel(event, level);
             }}
             >{level.label}
             {#if isBusy}
@@ -2431,10 +2442,17 @@
         {m.map_loading()}
       </p>
     {/if}
-    {#if opening != null}
+    {#if isLocked}
+      <div
+        class="absolute inset-0 z-30 cursor-progress"
+        aria-hidden="true"
+        data-export-skip
+      ></div>
+    {/if}
+    {#if opening != null || heading != null}
       <p
         class={cn(
-          "pointer-events-none absolute inset-x-0 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit",
+          "pointer-events-none absolute inset-x-0 z-40 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit",
           {
             "inset-be-3": remote.length === 0,
             "inset-be-11 pointer-coarse:inset-be-14": remote.length > 0,
@@ -2447,9 +2465,12 @@
           class="animate-spin rounded-full border-2 border-border border-bs-foreground block-3.5 inline-3.5 motion-reduce:animate-none"
           aria-hidden="true"
         ></span>
-        {m.map_opening({
-          place: rows.get(opening)?.name ?? besides.get(opening)?.name ?? "",
-        })}
+        {opening == null
+          ? m.map_loading()
+          : m.map_opening({
+              place:
+                rows.get(opening)?.name ?? besides.get(opening)?.name ?? "",
+            })}
       </p>
     {/if}
     <div
@@ -2700,6 +2721,10 @@
                 path: target.path,
               })}
               data-sveltekit-reset="false"
+              aria-busy={heading === target.code || heading === globe.code
+                ? "true"
+                : undefined}
+              onclick={(event: MouseEvent) => travel(event, target)}
             >
               {@render traveler(globe, target)}
             </a>
@@ -2707,6 +2732,9 @@
             <button
               type="button"
               class="pointer-events-auto flex items-center gap-1.5 rounded-sm bg-card/95 ps-2 pe-2.5 text-xs font-semibold shadow-menu ring-1 ring-border block-7 hover:bg-secondary pointer-coarse:block-10"
+              aria-busy={heading === target.code || heading === globe.code
+                ? "true"
+                : undefined}
               onclick={() => pick?.(target.code)}
             >
               {@render traveler(globe, target)}
@@ -2816,7 +2844,7 @@
         ></a
       >
     {/if}
-    {#if opening == null && (current != null || (pointer != null && (empty != null || beside != null)))}
+    {#if !isLocked && (current != null || (pointer != null && (empty != null || beside != null)))}
       <div
         class={cn(
           "pointer-events-none absolute inset-s-0 inset-bs-0 grid gap-1.5 rounded-sm bg-card/95 px-3 py-2.5 shadow-menu ring-1 ring-border max-sm:hidden",
@@ -3495,7 +3523,8 @@
   world: (typeof levels)[number],
   target: (typeof levels)[number],
 )}
-  {#if world.isCurrent}
+  {const isThere = $derived(world.isCurrent && heading !== world.code)}
+  {#if isThere}
     <ArrowLeftIcon
       class="text-muted-foreground block-3.5 inline-3.5"
       aria-hidden="true"
@@ -3507,13 +3536,18 @@
     />
   {/if}
   <span
-    >{world.isCurrent
+    >{isThere
       ? home == null
         ? target.label
         : m.map_world_back({ place: home })
       : m.map_world()}</span
   >
-  {#if !world.isCurrent}
+  {#if heading === world.code || heading === target.code}
+    <span
+      class="animate-spin rounded-full border-2 border-current/30 border-bs-current block-3 inline-3 motion-reduce:animate-none"
+      aria-hidden="true"
+    ></span>
+  {:else if !isThere}
     <span class="font-figures font-normal text-muted-foreground tabular-nums"
       >{count(world.count)}</span
     >
