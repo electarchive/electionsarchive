@@ -35,6 +35,7 @@ FILES = {
     1984: "1984-11-06-general",
     1986: "1986-11-04-general",
     1988: "1988-11-08-general",
+    1990: "1990-11-06-general",
 }
 DAYS = {
     1992: date(1992, 11, 3),
@@ -54,6 +55,7 @@ DAYS = {
     1984: date(1984, 11, 6),
     1986: date(1986, 11, 4),
     1988: date(1988, 11, 8),
+    1990: date(1990, 11, 6),
 }
 COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
     1992: (
@@ -328,6 +330,15 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             29: ("commissioner-of-agriculture", "Harley McLain", "IND"),
             30: ("public-service-commissioner", "Bruce Hagen", "DEM"),
             31: ("public-service-commissioner", "Leslie Volochenko", "REP"),
+        },
+    ),
+    1990: (
+        0,
+        {
+            4: ("public-service-commissioner", "Floyd Stromme", "DEM"),
+            5: ("public-service-commissioner", "Dale Sandstrom", "REP"),
+            6: ("commissioner-of-labor", "Craig Hagen", None),
+            7: ("commissioner-of-labor", 'S. F. "Buckshot" Hoffner', None),
         },
     ),
     1998: (
