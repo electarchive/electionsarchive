@@ -4548,5 +4548,96 @@
   "night_explorer_over": "over {name}",
   "night_explorer_empty": "No race matches these filters.",
   "night_explorer_independent": "Independent",
-  "night_tip_held": "Held by {party}: {name}"
+  "night_tip_held": "Held by {party}: {name}",
+  "seatflow_rounds_title": "How the seats were decided",
+  "seatflow_votes_title": "Constituency vote and list vote",
+  "seatflow_both": "Both rounds",
+  "seatflow_flow_top": "First place after the first round",
+  "seatflow_flow_bottom": "Seat won",
+  "seatflow_flow_outright": "Won in the first round",
+  "seatflow_flow_runoff": "Won in the runoff",
+  "seatflow_flow_pair": "Led by {from}, won by {to}",
+  "seatflow_flow_from": "Led by {from} after the first round",
+  "seatflow_flow_to": "Won by {to}",
+  "seatflow_flow_count": "{outright} won outright, {runoffs} in the runoff",
+  "seatflow_col_led": "Led",
+  "seatflow_col_outright": "Won outright",
+  "seatflow_col_advanced": "Into runoff",
+  "seatflow_col_withdrew": "Withdrew",
+  "seatflow_col_won": "Won",
+  "seatflow_col_behind": "From behind",
+  "seatflow_won_of": "{won} of {stood}",
+  "seatflow_col_constituency_vote": "Constituency vote",
+  "seatflow_col_list_vote": "List vote",
+  "seatflow_col_constituency": "Constituency",
+  "seatflow_bar_rounds": "Bars show seats won in the first round (solid) and in the runoff (light).",
+  "seatflow_bar_votes": "Bars show constituency seats (solid) and list seats (light).",
+  "seatflow_matchups_title": "Runoff matchups",
+  "seatflow_field": "{size}-way runoffs",
+  "seatflow_field_one": "Runoffs with one candidate left",
+  "seatflow_matchup_wins": "{party} won {count}",
+  "seatflow_rounds_lede": "{decided} of the {size} seats were decided in the first round. The other {runoffs} went to a runoff.",
+  "seatflow_votes_lede": "{seated} of the {seats} seats went to constituency winners; the other {list} were filled from party lists.",
+  "seatflow_unseated_title": "Constituency winners without a seat",
+  "seatflow_unseated_count": "{count} not seated",
+  "map_view_winners": "{noun} winners",
+  "map_view_list": "List vote",
+  "seatflow_rounds_comebacks": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "In {countText} runoff, the first-round leader lost.",
+        "countPlural=*": "In {countText} runoffs, the first-round leader lost."
+      }
+    }
+  ],
+  "seatflow_votes_unseated": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} constituency winner didn't get a seat, because their party's list vote didn't cover it.",
+        "countPlural=*": "{countText} constituency winners didn't get a seat, because their party's list vote didn't cover them."
+      }
+    }
+  ],
+  "seatflow_withdrew": [
+    {
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} qualified candidate withdrew before the runoff.",
+        "countPlural=*": "{countText} qualified candidates withdrew before the runoff."
+      }
+    }
+  ],
+  "seatflow_shrunk": [
+    {
+      "declarations": [
+        "input count",
+        "input from",
+        "input to",
+        "local countPlural = count: plural",
+        "local countText = count: number"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{countText} runoff went from {from} candidates to {to}",
+        "countPlural=*": "{countText} runoffs went from {from} candidates to {to}"
+      }
+    }
+  ]
 }

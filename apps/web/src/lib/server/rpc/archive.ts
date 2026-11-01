@@ -15989,6 +15989,521 @@ export const elections = {
           .map(({ depth: _, ...race }) => race),
       };
     }),
+  ledger: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/ledger",
+        summary:
+          "Follow an election's single-member contests from the first round to the last: each party's votes, places led, seats won outright, runoffs reached and withdrawn from, and runoff wins, the runoff matchups, and the winners left without a seat",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
+    .output(
+      v.nullable(
+        v.object({
+          kind: v.picklist(["rounds", "votes"]),
+          body: v.string(),
+          path: v.nullable(v.string()),
+          size: v.number(),
+          rounds: v.array(
+            v.object({
+              id: v.string(),
+              date: v.nullable(v.string()),
+              path: v.nullable(v.string()),
+              count: v.number(),
+            }),
+          ),
+          decided: v.number(),
+          runoffs: v.number(),
+          withdrew: v.number(),
+          comebacks: v.number(),
+          parties: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+              votes: v.number(),
+              share: v.number(),
+              led: v.number(),
+              won: v.number(),
+              seated: v.number(),
+              advanced: v.number(),
+              withdrew: v.number(),
+              runoff: v.nullable(
+                v.object({
+                  votes: v.number(),
+                  share: v.number(),
+                  stood: v.number(),
+                  won: v.number(),
+                  comebacks: v.number(),
+                }),
+              ),
+            }),
+          ),
+          matchups: v.array(
+            v.object({
+              keys: v.array(v.string()),
+              count: v.number(),
+              wins: v.array(v.object({ key: v.string(), count: v.number() })),
+            }),
+          ),
+          shrunk: v.array(
+            v.object({ from: v.number(), to: v.number(), count: v.number() }),
+          ),
+          flows: v.array(
+            v.object({
+              from: v.string(),
+              to: v.string(),
+              count: v.number(),
+              isRunoff: v.boolean(),
+            }),
+          ),
+          unseated: v.array(
+            v.object({
+              person: v.string(),
+              name: v.string(),
+              place: v.string(),
+              path: v.nullable(v.string()),
+              key: v.string(),
+              share: v.number(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const held = await db.execute<{ hub: string; date: string | null }>(sql`
+        select case when e.kind = 'runoff' and e.parent_id is not null then e.parent_id else e.id end as hub,
+          e.date_from::text as date
+        from election e where e.id = ${input.id}::uuid
+      `);
+      const hub = held.rows[0];
+      if (hub == null) {
+        return null;
+      }
+      const found = await db.execute<{
+        first: string;
+        body: string;
+        contest: string;
+        election: string;
+        date: string | null;
+        area: string | null;
+        isFirst: boolean;
+        party: string | null;
+        votes: number;
+        outcome: Array<string> | null;
+        person: string | null;
+        isListed: boolean;
+      }>(sql`
+        with recursive tree(id) as (
+          select ${hub.hub}::uuid
+          union all
+          select k.id from election k join tree on k.parent_id = tree.id
+        ),
+        firsts as materialized (
+          select c.id, c.body_id
+          from contest c join tree t on t.id = c.election_id join election e on e.id = c.election_id
+          where c.kind = 'body_seats' and not c.notional and c.previous_round_id is null and c.body_id is not null
+            and c.district_area_id is not null and e.kind <> 'runoff'
+            and not exists (select from entity_merge m where m.entity_id = c.id)
+        ),
+        pairs as materialized (
+          select f.id as first, f.body_id as body, n.id as second
+          from firsts f
+          left join lateral (
+            select n.id from contest n join election ne on ne.id = n.election_id
+            where n.previous_round_id = f.id and ne.kind = 'runoff' and ne.status::text not in ('canceled', 'annulled')
+            order by ne.date_from, n.id limit 1
+          ) n on true
+        ),
+        chosen as materialized (
+          select p.body, exists (
+            select from contest l join tree t on t.id = l.election_id
+            where l.body_id = p.body and l.kind = 'list_allocation' and l.allocation_parent_id is null
+          ) as listed, count(p.second) as runoffs, count(*) as size, (select count(*) from firsts) as total
+          from pairs p
+          group by p.body
+          order by count(*) desc, count(p.second) desc
+          limit 1
+        ),
+        sets as materialized (
+          select p.first, p.body, c.id as contest, c.election_id as election, c.district_area_id as area,
+            c.id = p.first as "isFirst", rs.id, rs.k
+          from pairs p
+          join chosen h on h.body = p.body and h.size * 2 >= h.total and (h.listed or h.runoffs >= greatest(2, h.size * 0.1))
+          join contest c on c.id in (p.first, p.second)
+          cross join lateral (
+            select rs.id, rs.k from result_set rs where rs.contest_id = c.id and ${latest("rs")} offset 0
+          ) rs
+        ),
+        units as materialized (
+          select s.k, v.unit_k from sets s
+          cross join lateral (
+            select distinct v.unit_k from result_value v
+            where v.result_set_k = s.k and v.measure = 1 and v.channel = 0 and v.count_round = 0
+          ) v
+        ),
+        tops as materialized (
+          select n.k, n.unit_k from units n join reporting_unit u on u.k = n.unit_k
+          where u.parent_id is null or not exists (
+            select from units m join reporting_unit pu on pu.k = m.unit_k where m.k = n.k and pu.id = u.parent_id
+          )
+        )
+        select s.first, s.body, s.contest, s.election, e.date_from::text as date, s.area, s."isFirst",
+          coalesce(pm.into_id, o.party_id) as party,
+          coalesce((
+            select sum(v.value) from tops t
+            join result_value v on v.result_set_k = t.k and v.unit_k = t.unit_k and v.option_k = o.k
+              and v.measure = 1 and v.channel = 0 and v.count_round = 0
+            where t.k = s.k
+          ), 0)::float8 as votes,
+          x.kinds as outcome,
+          case when 'won' = any(x.kinds) and not 'elected' = any(x.kinds) then (
+            select cy.person_id from candidacy cy where cy.option_id = o.id order by cy.role, cy.id limit 1
+          ) end as person,
+          (select h.listed from chosen h) as "isListed"
+        from sets s
+        join election e on e.id = s.election
+        join contest_option o on o.contest_id = s.contest
+        left join entity_merge pm on pm.entity_id = o.party_id
+        left join lateral (
+          select array_agg(x.kind::text) as kinds from outcome x where x.result_set_id = s.id and x.option_id = o.id
+        ) x on true
+      `);
+      const rows = found.rows;
+      const hasRunoffs = rows.some((row) => !row.isFirst);
+      if (
+        rows.length === 0 ||
+        (!hasRunoffs && rows.every((row) => !row.isListed))
+      ) {
+        return null;
+      }
+      const day = hub.date ?? "infinity";
+      const parentOf = new Map(
+        (await branches(day)).map((row) => [row.from, row.to]),
+      );
+      const keyOf = (party: string | null) =>
+        party == null ? "independent" : `party:${parentOf.get(party) ?? party}`;
+      type Tally = {
+        votes: number;
+        led: number;
+        won: number;
+        seated: number;
+        advanced: number;
+        withdrew: number;
+        runoff: {
+          votes: number;
+          stood: number;
+          won: number;
+          comebacks: number;
+        };
+      };
+      const tallies = new Map<string, Tally>();
+      const tally = (key: string) => {
+        const known = tallies.get(key);
+        if (known != null) {
+          return known;
+        }
+        const fresh: Tally = {
+          votes: 0,
+          led: 0,
+          won: 0,
+          seated: 0,
+          advanced: 0,
+          withdrew: 0,
+          runoff: { votes: 0, stood: 0, won: 0, comebacks: 0 },
+        };
+        tallies.set(key, fresh);
+        return fresh;
+      };
+      let [total, runoffTotal, decided, runoffs, withdrew, comebacks] = [
+        0, 0, 0, 0, 0, 0,
+      ];
+      const matchups = new Map<
+        string,
+        { keys: Array<string>; count: number; wins: Map<string, number> }
+      >();
+      const shrunk = new Map<
+        string,
+        { from: number; to: number; count: number }
+      >();
+      const flows = new Map<
+        string,
+        { from: string; to: string; count: number; isRunoff: boolean }
+      >();
+      const flow = (from: string, to: string, isRunoff: boolean) => {
+        const step = `${from} ${to} ${isRunoff}`;
+        const known = flows.get(step) ?? { from, to, count: 0, isRunoff };
+        known.count += 1;
+        flows.set(step, known);
+      };
+      const unseated: Array<{
+        person: string;
+        contest: string;
+        area: string | null;
+        key: string;
+        share: number;
+      }> = [];
+      const leading = (entries: Array<(typeof rows)[number]>) =>
+        entries.toSorted((a, b) => b.votes - a.votes)[0];
+      for (const group of Map.groupBy(rows, (row) => row.first).values()) {
+        const first = group.filter((row) => row.isFirst);
+        const second = group.filter((row) => !row.isFirst);
+        let valid = 0;
+        for (const row of first) {
+          valid += row.votes;
+        }
+        total += valid;
+        const leader = leading(first);
+        if (leader != null && leader.votes > 0) {
+          tally(keyOf(leader.party)).led += 1;
+        }
+        let isDecided = false;
+        let qualified = 0;
+        for (const row of first) {
+          const entry = tally(keyOf(row.party));
+          const kinds = row.outcome ?? [];
+          entry.votes += row.votes;
+          if (kinds.includes("elected") || kinds.includes("won")) {
+            entry.won += 1;
+            isDecided = true;
+          }
+          if (kinds.includes("elected")) {
+            entry.seated += 1;
+          } else if (kinds.includes("won") && row.person != null) {
+            unseated.push({
+              person: row.person,
+              contest: row.contest,
+              area: row.area,
+              key: keyOf(row.party),
+              share: valid > 0 ? row.votes / valid : 0,
+            });
+          }
+          if (kinds.includes("advanced")) {
+            entry.advanced += 1;
+            qualified += 1;
+          }
+          if (kinds.includes("withdrew")) {
+            entry.withdrew += 1;
+            withdrew += 1;
+            qualified += 1;
+          }
+        }
+        if (isDecided && second.length === 0) {
+          decided += 1;
+          const seated = first.find((row) =>
+            (row.outcome ?? []).some(
+              (kind) => kind === "elected" || kind === "won",
+            ),
+          );
+          if (leader != null && seated != null) {
+            flow(keyOf(leader.party), keyOf(seated.party), false);
+          }
+        }
+        if (second.length === 0) {
+          continue;
+        }
+        runoffs += 1;
+        for (const row of second) {
+          const entry = tally(keyOf(row.party)).runoff;
+          entry.votes += row.votes;
+          entry.stood += 1;
+          runoffTotal += row.votes;
+        }
+        const winner =
+          second.find((row) =>
+            (row.outcome ?? []).some(
+              (kind) => kind === "elected" || kind === "won",
+            ),
+          ) ?? null;
+        if (winner != null) {
+          const entry = tally(keyOf(winner.party)).runoff;
+          entry.won += 1;
+          if (leader != null) {
+            flow(keyOf(leader.party), keyOf(winner.party), true);
+          }
+          if (leader != null && keyOf(leader.party) !== keyOf(winner.party)) {
+            entry.comebacks += 1;
+            comebacks += 1;
+          }
+        }
+        const keys = second.map((row) => keyOf(row.party));
+        const signature = keys.toSorted((a, b) => a.localeCompare(b)).join(" ");
+        const matchup = matchups.get(signature) ?? {
+          keys,
+          count: 0,
+          wins: new Map<string, number>(),
+        };
+        matchup.count += 1;
+        if (winner != null) {
+          const key = keyOf(winner.party);
+          matchup.wins.set(key, (matchup.wins.get(key) ?? 0) + 1);
+        }
+        matchups.set(signature, matchup);
+        const from = Math.max(qualified, second.length);
+        const step = `${from}:${second.length}`;
+        const known = shrunk.get(step) ?? { from, to: second.length, count: 0 };
+        known.count += 1;
+        shrunk.set(step, known);
+      }
+      if (!hasRunoffs) {
+        const listed = await db.execute<{
+          party: string | null;
+          seats: number;
+        }>(sql`
+          with recursive tree(id) as (
+            select ${hub.hub}::uuid
+            union all
+            select k.id from election k join tree on k.parent_id = tree.id
+          )
+          select coalesce(pm.into_id, o.party_id) as party, sum(x.seats)::int as seats
+          from contest l join tree t on t.id = l.election_id
+          join result_set rs on rs.contest_id = l.id and ${latest("rs")}
+          cross join lateral (
+            select x.option_id, max(coalesce(x.seats, 1)) as seats from outcome x
+            where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            group by x.option_id
+          ) x
+          join contest_option o on o.id = x.option_id
+          left join entity_merge pm on pm.entity_id = o.party_id
+          where l.body_id = ${rows[0]?.body ?? null}::uuid and l.kind = 'list_allocation' and l.allocation_parent_id is null
+          group by 1
+        `);
+        const allotted = new Map<string, number>();
+        for (const row of listed.rows) {
+          const key = keyOf(row.party);
+          allotted.set(key, (allotted.get(key) ?? 0) + row.seats);
+        }
+        if (
+          tallies
+            .entries()
+            .some(([key, entry]) => entry.seated > (allotted.get(key) ?? 0))
+        ) {
+          return null;
+        }
+      }
+      const partyIds = [
+        ...tallies
+          .keys()
+          .flatMap((key) => (key.startsWith("party:") ? [key.slice(6)] : [])),
+      ];
+      const firstIds = new Map(
+        rows.filter((row) => row.isFirst).map((row) => [row.election, row]),
+      );
+      const secondIds = new Map(
+        rows.filter((row) => !row.isFirst).map((row) => [row.election, row]),
+      );
+      const elections = [...firstIds.values(), ...secondIds.values()];
+      const [refsOf, contestPaths, electionPaths, labels] = await Promise.all([
+        refs(partyIds, hub.date),
+        paths(unseated.map((row) => row.contest)),
+        paths([...elections.map((row) => row.election), hub.hub]),
+        names(
+          unseated.flatMap((row) => [
+            row.person,
+            ...(row.area == null ? [] : [row.area]),
+          ]),
+          hub.date,
+        ),
+      ]);
+      const sizes = Map.groupBy(rows, (row) => `${row.election}:${row.first}`);
+      const counts = new Map<string, number>();
+      for (const key of sizes.keys()) {
+        const election = key.split(":", 1)[0] ?? "";
+        counts.set(election, (counts.get(election) ?? 0) + 1);
+      }
+      const parties = [...tallies]
+        .map(([key, entry]) => {
+          const ref = refsOf.get(key.slice(6));
+          return {
+            key,
+            label: key === "independent" ? "" : (ref?.label ?? ""),
+            short: ref?.short ?? null,
+            color: ref?.color ?? null,
+            votes: entry.votes,
+            share: total > 0 ? entry.votes / total : 0,
+            led: entry.led,
+            won: entry.won,
+            seated: entry.seated,
+            advanced: entry.advanced,
+            withdrew: entry.withdrew,
+            runoff: hasRunoffs
+              ? {
+                  ...entry.runoff,
+                  share: runoffTotal > 0 ? entry.runoff.votes / runoffTotal : 0,
+                }
+              : null,
+          };
+        })
+        .filter(
+          (entry) =>
+            entry.votes > 0 || entry.won > 0 || (entry.runoff?.stood ?? 0) > 0,
+        )
+        .toSorted(
+          (a, b) =>
+            b.won + (b.runoff?.won ?? 0) - (a.won + (a.runoff?.won ?? 0)) ||
+            b.votes - a.votes,
+        );
+      const rank = new Map(parties.map((entry, index) => [entry.key, index]));
+      const byRank = (a: string, b: string) =>
+        (rank.get(a) ?? Infinity) - (rank.get(b) ?? Infinity);
+      return {
+        kind: hasRunoffs ? ("rounds" as const) : ("votes" as const),
+        body: rows[0]?.body ?? "",
+        path: electionPaths.get(hub.hub) ?? null,
+        size: new Set(rows.map((row) => row.first)).size,
+        rounds: hasRunoffs
+          ? elections
+              .map((row) => ({
+                id: row.election,
+                date: row.date,
+                path: electionPaths.get(row.election) ?? null,
+                count: counts.get(row.election) ?? 0,
+              }))
+              .toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""))
+          : [],
+        decided,
+        runoffs,
+        withdrew,
+        comebacks,
+        parties,
+        matchups: [...matchups.values()]
+          .map((entry) => ({
+            keys: entry.keys.toSorted(byRank),
+            count: entry.count,
+            wins: [...entry.wins]
+              .map(([key, count]) => ({ key, count }))
+              .toSorted((a, b) => b.count - a.count || byRank(a.key, b.key)),
+          }))
+          .toSorted(
+            (a, b) =>
+              a.keys.length - b.keys.length ||
+              b.count - a.count ||
+              a.keys.join(" ").localeCompare(b.keys.join(" ")),
+          ),
+        shrunk: [...shrunk.values()].toSorted(
+          (a, b) => a.from - b.from || a.to - b.to,
+        ),
+        flows: [...flows.values()].toSorted(
+          (a, b) =>
+            byRank(a.from, b.from) ||
+            byRank(a.to, b.to) ||
+            Number(a.isRunoff) - Number(b.isRunoff),
+        ),
+        unseated: unseated
+          .map((row) => ({
+            person: row.person,
+            name: labels.full.get(row.person) ?? "",
+            place: labels.full.get(row.area ?? "") ?? "",
+            path: contestPaths.get(row.contest) ?? null,
+            key: row.key,
+            share: row.share,
+          }))
+          .toSorted((a, b) => b.share - a.share),
+      };
+    }),
   series: os
     .meta(
       openapi({

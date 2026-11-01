@@ -2560,6 +2560,146 @@ function councilsMarkdown(
   ];
 }
 
+function seatflowMarkdown(
+  ledger: Extract<Data, { kind: "election" }>["sections"]["ledger"] | null,
+  link: Link,
+) {
+  if (ledger == null) {
+    return [];
+  }
+  const name = (key: string) => {
+    const party = ledger.parties.find((entry) => entry.key === key);
+    return key === "independent"
+      ? m.seats_independents()
+      : (party?.short ?? party?.label ?? "");
+  };
+  if (ledger.kind === "rounds") {
+    return [
+      `## ${m.seatflow_rounds_title()}`,
+      [
+        m.seatflow_rounds_lede({
+          decided: count(ledger.decided),
+          size: count(ledger.size),
+          runoffs: count(ledger.runoffs),
+        }),
+        ...(ledger.comebacks > 0
+          ? [m.seatflow_rounds_comebacks({ count: ledger.comebacks })]
+          : []),
+        ...(ledger.withdrew > 0
+          ? [m.seatflow_withdrew({ count: ledger.withdrew })]
+          : []),
+      ].join(" "),
+      ledger.rounds
+        .map((round, index) =>
+          link(
+            index === 0
+              ? m.round_first()
+              : index === 1
+                ? m.round_second()
+                : m.round_number({ round: index + 1 }),
+            round.path,
+          ),
+        )
+        .join(", "),
+      table(
+        [
+          m.col_party(),
+          m.col_share(),
+          m.seatflow_col_led(),
+          m.seatflow_col_outright(),
+          m.seatflow_col_advanced(),
+          m.seatflow_col_withdrew(),
+          `${m.round_second()}: ${m.col_share()}`,
+          `${m.round_second()}: ${m.seatflow_col_won()}`,
+          m.seatflow_col_behind(),
+          m.col_seats(),
+        ],
+        ledger.parties
+          .filter(
+            (party) =>
+              party.won + (party.runoff?.won ?? 0) > 0 || party.share >= 0.01,
+          )
+          .map((party) => [
+            name(party.key),
+            percent(party.share),
+            party.led,
+            party.won,
+            party.advanced,
+            party.withdrew,
+            party.runoff == null ? null : percent(party.runoff.share),
+            party.runoff == null
+              ? null
+              : m.seatflow_won_of({
+                  won: count(party.runoff.won),
+                  stood: count(party.runoff.stood),
+                }),
+            party.runoff?.comebacks ?? null,
+            party.won + (party.runoff?.won ?? 0),
+          ]),
+      ),
+      `### ${m.seatflow_matchups_title()}`,
+      table(
+        [m.col_party(), m.election_contests(), m.seatflow_col_won()],
+        ledger.matchups.map((matchup) => [
+          matchup.keys.map((key) => name(key)).join(", "),
+          matchup.count,
+          matchup.wins
+            .map((win) =>
+              m.seatflow_matchup_wins({
+                party: name(win.key),
+                count: count(win.count),
+              }),
+            )
+            .join(", "),
+        ]),
+      ),
+    ];
+  }
+  let seated = 0;
+  for (const party of ledger.parties) {
+    seated += party.seated;
+  }
+  return [
+    `## ${m.seatflow_votes_title()}`,
+    m.seatflow_votes_unseated({ count: ledger.unseated.length }),
+    table(
+      [
+        m.col_party(),
+        m.seatflow_col_constituency_vote(),
+        m.col_constituency_seats(),
+      ],
+      ledger.parties
+        .filter((party) => party.won > 0 || party.share >= 0.01)
+        .map((party) => [
+          name(party.key),
+          percent(party.share),
+          party.won === party.seated
+            ? party.won
+            : `${count(party.won)} (${m.seatflow_unseated_count({ count: count(party.won - party.seated) })})`,
+        ]),
+    ),
+    ...(ledger.unseated.length === 0 || seated === 0
+      ? []
+      : [
+          `### ${m.seatflow_unseated_title()}`,
+          table(
+            [
+              m.col_name(),
+              m.seatflow_col_constituency(),
+              m.col_party(),
+              m.col_share(),
+            ],
+            ledger.unseated.map((row) => [
+              row.name,
+              link(row.place, row.path),
+              name(row.key),
+              percent(row.share),
+            ]),
+          ),
+        ]),
+  ];
+}
+
 function electionMarkdown(
   election: Extract<Data, { kind: "election" }>["election"],
   {
@@ -2568,6 +2708,7 @@ function electionMarkdown(
     alongside,
     local,
     counties,
+    ledger,
   }: Extract<Data, { kind: "election" }>["sections"],
   byes: Extract<Data, { kind: "election" }>["byes"],
   cycle: Extract<Data, { kind: "election" }>["cycle"],
@@ -3335,6 +3476,7 @@ function electionMarkdown(
         ...hexMarkdown(race.places, hexes),
       ];
     }),
+    ...seatflowMarkdown(ledger ?? null, link),
     ...(governments.every((government) => government.isBefore)
       ? []
       : [

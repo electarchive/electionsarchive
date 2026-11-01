@@ -139,17 +139,20 @@
     href={href(item.anchor)}
     aria-current={isCurrent ? "page" : undefined}
     class={cn(
-      "grid gap-1 border-s-2 border-transparent py-1.5 pe-3.5 keycap hover:bg-secondary focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-foreground",
-      { "ps-3": !isNested, "ps-6": isNested },
+      "grid gap-1 border-s-2 border-transparent py-1.5 ps-3 pe-3.5 keycap hover:bg-secondary focus-visible:relative focus-visible:z-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-foreground",
       { "border-foreground bg-secondary": isCurrent },
     )}
     onclick={(event) => choose(event, item.anchor)}
   >
     <span
-      class={cn("flex items-center gap-1.5 text-pretty", {
-        "text-sm/snug font-semibold": !isHead,
-        "text-[0.8125rem]/snug font-bold": isHead,
-      })}
+      class={cn(
+        "flex items-center gap-1.5 text-pretty",
+        {
+          "text-sm/snug font-semibold": !isHead,
+          "text-[0.8125rem]/snug font-bold": isHead,
+        },
+        { "ps-3": isNested },
+      )}
     >
       {#if item.swatch != null}
         <span
@@ -161,22 +164,27 @@
     </span>
     {#if item.detail != null}
       <span
-        class="line-clamp-2 text-[0.8125rem]/snug text-pretty text-muted-foreground"
-        >{item.detail}</span
+        class={cn(
+          "line-clamp-2 text-[0.8125rem]/snug text-pretty text-muted-foreground",
+          { "ps-3": isNested },
+        )}>{item.detail}</span
       >
     {/if}
     {#if item.lead.length > 0}
       <span
-        class="flex items-baseline gap-x-2.5 text-[0.8125rem] text-muted-foreground min-inline-0"
+        class={cn("grid gap-x-4 text-[0.8125rem] text-muted-foreground", {
+          "grid-cols-2": item.lead.length > 1,
+        })}
       >
         {#each item.lead as part (part.key)}
-          <span class="flex items-baseline gap-1 min-inline-0">
+          <span class="flex items-baseline gap-1.5 min-inline-0">
             <span
               class="shrink-0 self-center rounded-[1px] block-2 inline-2"
               style:background={part.color}
             ></span>
-            <span class="truncate">{part.label}</span>
-            <span class="shrink-0 font-figures text-foreground tabular-nums"
+            <span class="truncate" title={part.label}>{part.label}</span>
+            <span
+              class="ms-auto shrink-0 font-figures text-foreground tabular-nums"
               >{part.value}</span
             >
           </span>

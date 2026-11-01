@@ -51,6 +51,7 @@
   import Road from "./road.svelte";
   import SameDay from "./same-day.svelte";
   import Seated from "./seated.svelte";
+  import Seatflow from "./seatflow.svelte";
   import Series from "./series.svelte";
   import States from "./states.svelte";
   import Sweep from "./sweep.svelte";
@@ -124,7 +125,8 @@
     annulled: m.election_annulled,
   };
 
-  const ordered = $derived.by(() => {
+  const ledger = $derived(sections.ledger ?? null);
+  const arranged = $derived.by(() => {
     const grouped = Map.groupBy(election.races, (race) => race.scope)
       .values()
       .flatMap((group) => [
@@ -324,6 +326,53 @@
       ];
     });
   });
+  const tucked = $derived.by(() => {
+    if (
+      ledger == null ||
+      (ledger.kind === "votes" &&
+        arranged.some((race) => race.isTotal && race.body === ledger.body))
+    ) {
+      return new Map<string, string>();
+    }
+    const fellows = arranged.filter(
+      (race) => race.body === ledger.body && !race.isTotal,
+    );
+    const host = fellows.find((race) =>
+      ledger.kind === "rounds"
+        ? (race.round ?? 1) === 1
+        : race.kind === "list_allocation",
+    );
+    return new Map(
+      fellows.flatMap((race) =>
+        host == null ||
+        race === host ||
+        (ledger.kind === "rounds"
+          ? !race.isFolded || (race.round ?? 1) === 1
+          : race.kind !== "body_seats" || race.count < 2)
+          ? []
+          : [[race.anchor, host.anchor]],
+      ),
+    );
+  });
+  const ordered = $derived(
+    arranged
+      .filter((race) => !tucked.has(race.anchor))
+      .map((race) => ({
+        ...race,
+        partner:
+          tucked
+            .entries()
+            .find(([, host]) => host === race.anchor)
+            ?.at(0) ?? null,
+      })),
+  );
+  const folded = $derived(
+    new Set(
+      ledger?.kind === "rounds"
+        ? ledger.rounds.flatMap((round) => round.path ?? [])
+        : [],
+    ),
+  );
 
   const focus = $derived(
     chosen == null ? -1 : ordered.findIndex((race) => race.anchor === chosen),
@@ -353,12 +402,12 @@
 
   const stages = $derived(
     election.elections
-      .filter((child) => child.isStage)
+      .filter((child) => child.isStage && !folded.has(child.path ?? ""))
       .toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? "")),
   );
   const parts = $derived(
     election.elections
-      .filter((child) => !child.isStage)
+      .filter((child) => !child.isStage && !folded.has(child.path ?? ""))
       .toSorted((a, b) => natural(a.place ?? a.name, b.place ?? b.name)),
   );
   const isTiled = $derived(
@@ -373,7 +422,7 @@
 
   const unplaced = $derived.by(() => {
     const placed = new Set(
-      ordered.flatMap((race) => [
+      arranged.flatMap((race) => [
         ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
         ...(race.path == null ? [] : [race.path]),
       ]),
@@ -444,12 +493,9 @@
     }),
   }));
   const regional = $state<Record<number, string>>({});
-  const firstRound = $state<Record<number, boolean>>({});
-  const roundOptions = $derived([
-    { value: "seats", label: m.map_round_seats() },
-    { value: "first", label: m.round_first() },
-  ]);
+  const facets = $state<Record<number, string>>({});
   const shades = $state<Record<number, (typeof MODES)[number] | number>>({});
+  const paired = $state<Record<number, (typeof MODES)[number] | number>>({});
   const regionals = createQueries(() => ({
     queries: ordered.map((race, index) => ({
       ...orpc.elections.regional.queryOptions({
@@ -672,8 +718,13 @@
       : row.label;
   const unfolded = new SvelteSet<string>();
 
-  const races = $derived(
-    ordered.map((race) => {
+  const built = $derived(
+    [
+      ...ordered,
+      ...arranged
+        .filter((race) => tucked.has(race.anchor))
+        .map((race) => ({ ...race, partner: null })),
+    ].map((race) => {
       const winners = race.results.filter((row) => (row.seats ?? 0) > 0);
       let total = 0;
       for (const row of winners) {
@@ -828,9 +879,9 @@
       const isRound =
         race.round != null &&
         race.count > 1 &&
-        ordered.some(
+        arranged.some(
           (other) =>
-            other !== race &&
+            other.anchor !== race.anchor &&
             other.name === race.name &&
             other.round !== race.round,
         );
@@ -937,7 +988,7 @@
         race.places != null
       ) {
         const level = race.places.level;
-        const later = ordered
+        const later = arranged
           .filter(
             (other) =>
               other.name === race.name &&
@@ -1348,6 +1399,57 @@
               }),
       };
     }),
+  );
+  const races = $derived(built.slice(0, ordered.length));
+  const partners = $derived(
+    new Map(built.slice(ordered.length).map((race) => [race.anchor, race])),
+  );
+  const views = $derived(
+    races.map((race, index) => {
+      const partner =
+        race.partner == null ? null : (partners.get(race.partner) ?? null);
+      const isPaired =
+        partner?.map != null && partner.places != null && race.places != null;
+      const noun = partner?.places?.levels[0]?.noun ?? "";
+      const options = [
+        ...(race.decided == null
+          ? []
+          : [
+              { value: "seats", label: m.map_round_seats() },
+              { value: "first", label: m.round_first() },
+            ]),
+        ...(!isPaired
+          ? []
+          : (partner.round ?? 1) > 1
+            ? [
+                {
+                  value: "partner",
+                  label:
+                    partner.round === 2
+                      ? m.round_second()
+                      : m.round_number({ round: partner.round ?? 2 }),
+                },
+              ]
+            : [
+                {
+                  value: "partner",
+                  label: m.map_view_winners({
+                    noun: noun.charAt(0).toUpperCase() + noun.slice(1),
+                  }),
+                },
+                { value: "own", label: m.map_view_list() },
+              ]),
+      ];
+      const facet = facets[index] ?? options[0]?.value ?? "own";
+      return {
+        partner: isPaired && facet === "partner" ? partner : null,
+        options,
+        facet,
+      };
+    }),
+  );
+  const seatflowAt = $derived(
+    ledger == null ? -1 : races.findIndex((race) => race.body === ledger.body),
   );
   const regionsAt = $derived(
     scope == null
@@ -2073,10 +2175,9 @@
             {const swing = $derived(
               region == null ? (swings[index]?.data ?? null) : null,
             )}
+            {const view = $derived(views[index])}
             {const final = $derived(
-              region == null && firstRound[index] !== true
-                ? race.decided
-                : null,
+              region == null && view?.facet === "seats" ? race.decided : null,
             )}
             {const places = $derived(
               region?.places ?? swing?.places ?? final?.places ?? race.places,
@@ -2084,17 +2185,58 @@
             {const shape = $derived(region?.map ?? race.map)}
             {const asked = $derived(regional[index] ?? places.level)}
             {const kept = $derived(shades[index])}
-            {#if race.decided != null && region == null}
+            {#if view != null && view.options.length > 1 && region == null}
               <Segmented
                 class="self-start"
-                options={roundOptions}
-                value={firstRound[index] === true ? "first" : "seats"}
+                options={view.options}
+                value={view.facet}
                 label={m.map_round_label()}
-                onValueChange={(next: string) =>
-                  (firstRound[index] = next === "first")}
+                onValueChange={(next: string) => (facets[index] = next)}
               />
             {/if}
-            {#if shape.tiles != null}
+            {#if view?.partner?.map != null && view.partner.places != null}
+              {const other = $derived(view.partner)}
+              {#if other.map?.tiles != null && other.places != null}
+                <PlaceMap
+                  places={other.places}
+                  colors={other.tones}
+                  tiles={other.map.tiles}
+                  hexes={hexes.data ?? null}
+                  own={other.map.own}
+                  nested={other.map.nested}
+                  frame={other.map.frame}
+                  blank={other.map.blank ?? null}
+                  outlying={other.map.outlying ?? null}
+                  parted={other.map.parted ?? null}
+                  approximate={other.map.approximate}
+                  sources={other.map.credits}
+                  noun={other.places.levels[0]?.noun ?? ""}
+                  isTally={other.isTally}
+                  votes={other.votes}
+                  names={other.titles}
+                  levels={[]}
+                  home={election.breadcrumbs[0]?.name ?? null}
+                  shade={paired[index] ?? "winner"}
+                  onshade={(value) => {
+                    paired[index] = value;
+                  }}
+                  span={other.since != null &&
+                  other.places.rows.some((row) => row.prior != null)
+                    ? {
+                        from: other.since,
+                        to: election.date?.slice(0, 4) ?? "",
+                        forward: false,
+                      }
+                    : null}
+                />
+              {:else}
+                <p
+                  class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-pretty text-muted-foreground block-[min(24rem,50svh)]"
+                >
+                  {m.map_rebuilding()}
+                </p>
+              {/if}
+            {:else if shape.tiles != null}
               {#key places.level}
                 <PlaceMap
                   {places}
@@ -2371,6 +2513,9 @@
             {m.seats_change_straddled()}
           </p>
         {/if}
+        {#if ledger != null && index === seatflowAt}
+          <Seatflow {ledger} rows={race.results} {path} />
+        {/if}
         {#if race.places != null && !race.isTotal}
           {const shown = $derived(
             regional[index] === "world.country"
@@ -2381,9 +2526,10 @@
                 : regional[index] != null &&
                     regional[index] === levelled[index]?.data?.places.level
                   ? levelled[index].data.places
-                  : firstRound[index] === true
-                    ? race.places
-                    : (race.decided?.places ?? race.places),
+                  : (views[index]?.partner?.places ??
+                    (views[index]?.facet === "first"
+                      ? race.places
+                      : (race.decided?.places ?? race.places))),
           )}
           <Places
             places={{
@@ -2393,9 +2539,15 @@
               ),
             }}
             span={null}
-            trace={race.count === 1 ? race.path : null}
+            trace={race.count === 1 && shown !== views[index]?.partner?.places
+              ? race.path
+              : null}
             publishers={[]}
-            votes={shown === race.decided?.places ? m.col_votes() : race.votes}
+            votes={shown === race.decided?.places
+              ? m.col_votes()
+              : shown === views[index]?.partner?.places
+                ? views[index].partner.votes
+                : race.votes}
             isTally={race.isTally}
             isMapped={isMapped ||
               races.some(

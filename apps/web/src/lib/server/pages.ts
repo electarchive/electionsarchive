@@ -1293,6 +1293,7 @@ export async function archive(path: string, search: URLSearchParams) {
       local,
       counties,
       winners,
+      ledger,
     ] = await found(
       Promise.all([
         call(router.elections.get, { ...input, within: scope?.id }),
@@ -1318,6 +1319,9 @@ export async function archive(path: string, search: URLSearchParams) {
         scope != null || day?.isLocal !== true
           ? null
           : call(router.elections.winners, input),
+        scope == null
+          ? call(router.elections.ledger, input).catch(() => null)
+          : null,
       ]),
     );
     const race = unit === "" ? null : unit;
@@ -1347,6 +1351,7 @@ export async function archive(path: string, search: URLSearchParams) {
         local,
         counties,
         winners,
+        ledger,
       },
       within,
     };
