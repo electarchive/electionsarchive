@@ -6495,6 +6495,20 @@ for key, publisher, title, url, local in (
         "az/graham_county.html",
     ),
     (
+        "AZ-04013-county",
+        "Maricopa County Elections Department",
+        "Official County Candidates, 2026 General Election",
+        FILES["04013"],
+        "../manual/MF-153/2026 General Election Maricopa County Candidates On Ballot - Remediated.pdf",
+    ),
+    (
+        "AZ-04019-cc",
+        "Pima County School Superintendent",
+        "2026 Pima County School District Governing Board Election Cancellations, November 3, 2026 General Election",
+        "https://www.schools.pima.gov/elections/canceled-elections/",
+        "az/pima_canceled.html",
+    ),
+    (
         "AZ-04015-county",
         "Mohave County Elections Department",
         "2026 General Election County Candidates",

@@ -1,4 +1,4 @@
-key	contest	unexpired	name	party	county	seats
+key	contest	unexpired	name	party	county	seats	district
 SD-46005	Beadle Conservation District Supervisor	0	Scott Hamilton	Nonpartisan	Beadle	2
 SD-46005	Beadle Conservation District Supervisor	0	Mark Goldammer	Nonpartisan	Beadle	2
 SD-46007	Bennett County Conservation District Supervisor	0	Gloria Claussen	Nonpartisan	Bennett	1
@@ -112,3 +112,30 @@ UT-49005	Cache Water District Board Logan 3	0	Mark A Anderson	Nonpartisan	Cache	
 UT-49005	Cache Water District Board Northeast District 5	0	Burdette Barker	Nonpartisan	Cache	1
 UT-49005	Cache Water District Board South 6	0	Scott H Clark	Nonpartisan	Cache	1
 UT-49005	Cache Water District Board Southeast District 7	0	Bethany Neilson	Nonpartisan	Cache	1
+AZ-04013-county	Maricopa County Community College District Governing Board	0	John David Crow	Nonpartisan	Maricopa	1	
+AZ-04013-county	Maricopa County Community College District Governing Board	0	Judy Schwiebert	Nonpartisan	Maricopa	1	
+AZ-04013-county	Maricopa County Community College District Governing Board District 3	0	William "Bill" Sandweg	Nonpartisan	Maricopa	1	
+AZ-04013-county	Maricopa County Community College District Governing Board District 3	0	Susan Hightower Winder	Nonpartisan	Maricopa	1	
+AZ-04013-county	Maricopa County Community College District Governing Board District 4	0	Ryan Caracciolo	Nonpartisan	Maricopa	1	
+AZ-04013-county	Maricopa County Community College District Governing Board District 4	0	Donna J Davis	Nonpartisan	Maricopa	1	
+AZ-04013-county	Maricopa County Community College District Governing Board District 4	0	Jack Hastings	Nonpartisan	Maricopa	1	
+AZ-04019-cc	Pima County Community College District Governing Board, District 1	0	Nicole Barraza	Nonpartisan	Pima	1	Pima County Community College District
+AZ-04025-s	Yavapai County Community College District Governing Board, District 4	0	Linda Gray	Nonpartisan	Yavapai	1	Yavapai County Community College District
+AZ-04025-s	Yavapai County Community College District Governing Board, District 4	0	Ryan Jones	Nonpartisan	Yavapai	1	Yavapai County Community College District
+AZ-04025-s	Yavapai County Community College District Governing Board, District 4	0	Kara Woods	Nonpartisan	Yavapai	1	Yavapai County Community College District
+AZ-04025-s	Yavapai County Community College District Governing Board, District 5	0	Steve Bracety	Nonpartisan	Yavapai	1	Yavapai County Community College District
+AZ-04025-s	Yavapai County Community College District Governing Board, District 5	0	Jonathan Oliver	Nonpartisan	Yavapai	1	Yavapai County Community College District
+AZ-04005-s	Coconino County Community College District Governing Board, District 1	0	Nathaniel "Nat" White	Nonpartisan	Coconino	1	Coconino County Community College District
+AZ-04005-s	Coconino County Community College District Governing Board, District 4	0	Patrick Hurley	Nonpartisan	Coconino	1	Coconino County Community College District
+AZ-04005-s	Coconino County Community College District Governing Board, District 5	0	Joseph Smith	Nonpartisan	Coconino	1	Coconino County Community College District
+AZ-04007-s	Gila Community College District Governing Board, District 1	0	Connie Cockrell	Nonpartisan	Gila	1	Gila Community College District
+AZ-04007-s	Gila Community College District Governing Board, District 2	0	Katrina Sacco	Nonpartisan	Gila	1	Gila Community College District
+AZ-04007-s	Gila Community College District Governing Board, District 3	0	Mickie Nye	Nonpartisan	Gila	1	Gila Community College District
+AZ-04023-s	Santa Cruz County Provisional Community College District Governing Board, Precinct 1	0	Robert Rojas	Nonpartisan	Santa Cruz	1	Santa Cruz County Provisional Community College District
+AZ-04023-s	Santa Cruz County Provisional Community College District Governing Board, Precinct 3	0	Melisa Lunderville	Nonpartisan	Santa Cruz	1	Santa Cruz County Provisional Community College District
+AZ-04023-s	Santa Cruz County Provisional Community College District Governing Board, Precinct 4	0	Homero Lopez	Nonpartisan	Santa Cruz	1	Santa Cruz County Provisional Community College District
+AZ-04023-s	Santa Cruz County Provisional Community College District Governing Board, Precinct 5	0	No Candidate Filed	Nonpartisan	Santa Cruz	1	Santa Cruz County Provisional Community College District
+AZ-04015-county	Mohave County Community College District Governing Board, District 2	0	Robert S. Arp	Nonpartisan	Mohave	1	Mohave County Community College District
+AZ-04015-county	Mohave County Community College District Governing Board, District 5	0	Diane Singer	Nonpartisan	Mohave	1	Mohave County Community College District
+AZ-04021	Pinal County Community College District Governing Board, District 5	0	Doug Coleman	Nonpartisan	Pinal	1	Pinal County Community College District
+AZ-04021	Pinal County Community College District Governing Board, District 5	0	Kim Grady	Nonpartisan	Pinal	1	Pinal County Community College District
