@@ -7217,6 +7217,7 @@ KY_SHARED_CITIES = {
     "21187": "21077",
     "21211": "21103",
     "05049": "05135 05065",
+    "31063": "31047",
 }
 KY_CITY_SPELLINGS = {
     ("BOONE", "Erlanger"): "",
@@ -10397,6 +10398,8 @@ def parse() -> None:
             .iter_rows()
         ):
             label = re.sub(r" (city|town|village)$", "", full)
+            if st == "NE" and label == "De Witt":
+                label = "DeWitt"
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
             if st == "KY" and label.endswith(" City"):
                 cities[(st, coverage_tables.tokens(label.removesuffix(" City")))].append((geoid, label, full))
@@ -10742,6 +10745,7 @@ def parse() -> None:
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
+                    tokens = re.sub(r"^bloomington township\b", "east bloomington township", " ".join(tokens)).split()
                     tokens = re.sub(
                         r"^richardson county school district (1|23|29|70)\b",
                         lambda m: {
@@ -10890,9 +10894,12 @@ def parse() -> None:
                         town
                         for county_code, pool in towns.items()
                         for town in pool
-                        if county_code == str(row["fips"]) or town[1] == "school"
+                        if county_code == str(row["fips"])
+                        or town[1] == "school"
+                        or state == "NE"
+                        and county_code in KY_SHARED_CITIES.get(str(row["fips"]), "").split()
                     ]
-                    if state == "MI"
+                    if state in ("MI", "NE")
                     else [
                         (variant, *rest)
                         for full, *rest in [
