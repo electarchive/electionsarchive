@@ -5554,11 +5554,11 @@ function placesMarkdown(
         m.col_name(),
         m.col_leader(),
         isTally ? m.col_votes() : m.col_share(),
-        ...(hasDelegates ? [m.col_delegates()] : []),
-        ...(hasFinal ? [m.col_final_ballot()] : []),
         ...(hasMargin ? [m.col_margin()] : []),
         ...(isCompared ? [m.col_share_in({ year: then }), m.col_change()] : []),
         m.stat_valid(),
+        ...(hasDelegates ? [m.col_delegates()] : []),
+        ...(hasFinal ? [m.col_final_ballot()] : []),
       ],
       places.rows.map((row) => {
         const before =
@@ -5621,9 +5621,6 @@ function placesMarkdown(
                   : voted(row.delegates.final, row.delegates.total),
               ]
             : []),
-              ]
-            : []),
-          row.valid === 0 && row.declared != null ? null : count(row.valid),
         ];
       }),
     ),
