@@ -1,5 +1,13 @@
+import type {
+  LiveElection,
+  LiveFrame,
+  LiveOffice,
+  LiveRace,
+  LiveUnitCount,
+} from "@ea/analytics/live";
 import type { SQL } from "drizzle-orm";
 import { dev } from "$app/env";
+import { estimate } from "@ea/analytics/live";
 import { openapi } from "@orpc/openapi";
 import { os as base, ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
@@ -349,6 +357,502 @@ function scanners(note: string | null) {
   });
 }
 
+const CLOSES: Record<string, number> = {
+  ga: 1140,
+  in: 1140,
+  ky: 1140,
+  sc: 1140,
+  vt: 1140,
+  va: 1140,
+  nc: 1170,
+  oh: 1170,
+  wv: 1170,
+  al: 1200,
+  ct: 1200,
+  de: 1200,
+  dc: 1200,
+  fl: 1200,
+  il: 1200,
+  me: 1200,
+  md: 1200,
+  ma: 1200,
+  ms: 1200,
+  mo: 1200,
+  nh: 1200,
+  nj: 1200,
+  ok: 1200,
+  pa: 1200,
+  ri: 1200,
+  tn: 1200,
+  ar: 1230,
+  az: 1260,
+  co: 1260,
+  ia: 1260,
+  ks: 1260,
+  la: 1260,
+  mi: 1260,
+  mn: 1260,
+  ne: 1260,
+  nm: 1260,
+  ny: 1260,
+  sd: 1260,
+  tx: 1260,
+  wi: 1260,
+  wy: 1260,
+  mt: 1320,
+  nv: 1320,
+  nd: 1320,
+  ut: 1320,
+  ca: 1380,
+  id: 1380,
+  or: 1380,
+  wa: 1380,
+  hi: 1440,
+  ak: 1500,
+};
+const TOP = /^(?:senate(?:-special)?|governor|house-(?:\d+|at-large))$/u;
+const done = new Map<
+  string,
+  { key: string; value: Awaited<ReturnType<typeof night>> }
+>();
+const pending = new Map<
+  string,
+  { key: string; value: Promise<Awaited<ReturnType<typeof night>>> }
+>();
+
+function office(seat: string): LiveOffice {
+  if (seat.startsWith("senate")) {
+    return "senate";
+  }
+  if (seat.startsWith("house")) {
+    return "house";
+  }
+  return seat === "governor" ? "governor" : "other";
+}
+
+function eastern(date: string, minutes: number) {
+  const noon = new Date(`${date}T12:00:00Z`);
+  const shown = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    hourCycle: "h23",
+  }).format(noon);
+  const offset = 12 - Number(shown);
+  return new Date(noon.getTime() + (minutes - 720 + offset * 60) * 60_000)
+    .toISOString()
+    .replace(/\.\d+Z$/u, "Z");
+}
+
+async function races(found: {
+  id: string;
+  path: string;
+  date: string;
+  rest: string;
+}) {
+  const isNational = found.path.split("/").length === 2;
+  const result =
+    found.rest === ""
+      ? await db.execute<{
+          id: string;
+          path: string;
+          district: string | null;
+        }>(sql`
+          with recursive tree as (
+            select id, 0 as depth from election where id = ${found.id}::uuid
+            union all
+            select e.id, t.depth + 1 from election e join tree t on e.parent_id = t.id where t.depth < ${isNational ? 1 : 3}
+          ),
+          top as (
+            select c.id from tree t join contest c on c.election_id = t.id
+            join slug s on s.entity_id = c.id and s.is_current
+            where t.depth = ${isNational ? 1 : 0} and s.path ~ '^[a-z]+/[a-z]{2}/[^/]+/[^/]+$' and split_part(s.path, '/', 4) ~ ${TOP.source}
+          ),
+          fed as (
+            select distinct f.contest_id as id from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
+            where f.status = 'active' and not ${isNational}::boolean
+          )
+          select c.id, s.path, c.district_area_id as district
+          from contest c join slug s on s.entity_id = c.id and s.is_current
+          where c.id in (select id from top union select id from fed)
+        `)
+      : await db.execute<{
+          id: string;
+          path: string;
+          district: string | null;
+        }>(sql`
+          select c.id, s.path, c.district_area_id as district
+          from slug s join contest c on c.id = s.entity_id
+          where s.path = ${`${found.path}/${found.rest}`} and s.is_current
+        `);
+  return result.rows;
+}
+
+async function baselines(
+  contests: Array<{ id: string; path: string; district: string | null }>,
+  date: string,
+) {
+  const country = contests[0]?.path.split("/", 1)[0] ?? "";
+  const generals = await db.execute<{ suffix: string }>(sql`
+    select split_part(s.path, '/', 2) as suffix
+    from election e join slug s on s.entity_id = e.id and s.is_current
+    where e.polity_id = (select x.polity_id from slug y join election x on x.id = y.entity_id where y.path = ${`${country}/${date}-general`})
+      and e.date_from < ${date}::date and e.date_from > ${date}::date - 4400
+      and s.path ~ '^[a-z]+/[0-9]{4}-[0-9]{2}-[0-9]{2}-general$'
+    order by e.date_from desc
+  `);
+  const wanted = contests.map((row) => {
+    const parts = row.path.split("/");
+    const seat = parts.at(-1) ?? "";
+    return {
+      ...row,
+      paths: generals.rows.map(
+        ({ suffix }) =>
+          `${parts[0]}/${parts[1]}/${suffix}/${seat.startsWith("house") ? seat : "president"}`,
+      ),
+    };
+  });
+  const candidates = await db.execute<{
+    path: string;
+    id: string;
+    district: string | null;
+  }>(sql`
+    select s.path, c.id, c.district_area_id as district
+    from slug s join contest c on c.id = s.entity_id
+    where s.path = any(${sql.param([...new Set(wanted.flatMap((row) => row.paths))])}::text[]) and s.is_current
+      and exists (select from result_set rs where rs.contest_id = c.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted')
+  `);
+  const byPath = new Map(candidates.rows.map((row) => [row.path, row]));
+  const pairs = wanted.flatMap((row) => {
+    const prior = row.paths
+      .map((path) => byPath.get(path))
+      .find(
+        (candidate) =>
+          candidate != null &&
+          (candidate.path.endsWith("/president") ||
+            candidate.district === row.district),
+      );
+    return prior == null ? [] : [{ contest: row.id, prior: prior.id }];
+  });
+  if (pairs.length === 0) {
+    return [];
+  }
+  const picked = await db.execute<{ prior: string; k: number }>(sql`
+    select p.id as prior, x.k from unnest(${sql.param([...new Set(pairs.map((row) => row.prior))])}::uuid[]) as p(id) cross join lateral (
+      select rs.k from result_set rs
+      where rs.contest_id = p.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
+        and (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
+      order by rs.is_default desc, rs.stage = 'certified' desc limit 1
+    ) x
+  `);
+  const priorOf = new Map(picked.rows.map((row) => [row.k, row.prior]));
+  const found = await db.execute<{
+    k: number;
+    unit: string;
+    party: string | null;
+    votes: number;
+  }>(sql`
+    with counted as materialized (
+      select v.result_set_k as k, v.unit_k, v.option_k, v.value from result_value v
+      where v.result_set_k = any(${sql.param(picked.rows.map((row) => row.k))}::int[]) and v.measure = 1
+    )
+    select c.k, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit,
+      coalesce(top.party_id, o.party_id) as party, sum(c.value)::float8 as votes
+    from counted c join reporting_unit u on u.k = c.unit_k
+      and (u.scheme_code = 'us.county' or u.scheme_code = 'us.county_part' and u.parent_id is not null)
+    join contest_option o on o.k = c.option_k
+    join contest_option top on top.id = coalesce(o.parent_option_id, o.id)
+    group by 1, 2, 3
+  `);
+  const byPrior = Map.groupBy(found.rows, (row) => priorOf.get(row.k) ?? "");
+  return pairs.flatMap((pair) =>
+    (byPrior.get(pair.prior) ?? []).map((row) => ({
+      contest: pair.contest,
+      unit: row.unit,
+      party: row.party,
+      votes: row.votes,
+    })),
+  );
+}
+
+async function night(
+  found: { id: string; path: string; date: string; rest: string },
+  picked: Array<{ id: string; path: string; district: string | null }>,
+  detail: "race" | "state" | "national",
+) {
+  const contests = picked.map((row) => row.id);
+  const [frames, choices, incumbents, settled, prior] = await Promise.all([
+    db.execute<{
+      k: number;
+      contest: string;
+      at: string;
+      reporting: number | null;
+      expected: number | null;
+      publisher: string;
+      url: string | null;
+    }>(sql`
+      select f.k, f.contest_id as contest, to_char(f.as_of at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as at,
+        f.reporting, f.expected, d.publisher, d.url
+      from live.frame f join live.feed d on d.id = f.feed_id
+      where f.contest_id = any(${sql.param(contests)}::uuid[]) and f.status = 'active'
+      order by f.as_of
+    `),
+    options(contests, found.date),
+    db.execute<{ option: string }>(sql`
+      select ca.option_id as option from candidacy ca join contest_option o on o.id = ca.option_id
+      where o.contest_id = any(${sql.param(contests)}::uuid[]) and ca.role = 'head' and ca.is_incumbent
+    `),
+    certified(contests),
+    baselines(picked, found.date),
+  ]);
+  const values = await db.execute<{
+    k: number;
+    unit: string;
+    option: string;
+    votes: number;
+  }>(sql`
+    select v.frame_k as k, v.unit_id as unit, coalesce(o.parent_option_id, o.id) as option, sum(v.votes)::float8 as votes
+    from live.value v join contest_option o on o.id = v.option_id
+    where v.frame_k = any(${sql.param(frames.rows.map((row) => row.k))}::bigint[])
+    group by 1, 2, 3
+  `);
+  const unitIds = [
+    ...new Set([
+      ...values.rows.map((row) => row.unit),
+      ...prior.map((row) => row.unit),
+    ]),
+  ];
+  const held = await db.execute<{
+    id: string;
+    area: string | null;
+    scheme: string;
+    parent: string | null;
+  }>(sql`
+    select id, area_id as area, scheme_code as scheme, parent_id as parent from reporting_unit where id = any(${sql.param(unitIds)}::uuid[])
+  `);
+  const parties = [
+    ...new Set(
+      choices.flatMap((choice) =>
+        choice.key.startsWith("party:") ? [choice.key.slice(6)] : [],
+      ),
+    ),
+  ];
+  const [titles, partyNames] = await Promise.all([
+    names(
+      [
+        found.id,
+        ...contests,
+        ...held.rows.flatMap((row) => (row.area == null ? [] : [row.area])),
+      ],
+      found.date,
+    ),
+    names(parties, found.date),
+  ]);
+  const sitting = new Set(incumbents.rows.map((row) => row.option));
+  const unitOf = new Map(
+    held.rows.map((row) => [
+      row.id,
+      {
+        id: row.id,
+        areaId: row.area,
+        name: (row.area == null ? null : titles.full.get(row.area)) ?? "",
+        scheme: row.scheme,
+        parentId: row.parent,
+      },
+    ]),
+  );
+  const byFrame = Map.groupBy(values.rows, (row) => row.k);
+  const byContest = Map.groupBy(frames.rows, (row) => row.contest);
+  const priorBy = Map.groupBy(prior, (row) => row.contest);
+  const settledBy = Map.groupBy(settled, (row) => row.contest);
+  const built = picked.map((row): LiveRace => {
+    const own = choices.filter((choice) => choice.contest === row.id);
+    const index = new Map(own.map((choice, position) => [choice.id, position]));
+    const mine = byContest.get(row.id) ?? [];
+    const raceFrames: Array<LiveFrame> = [];
+    const counts: Array<LiveUnitCount> = [];
+    const last = new Map<string, string>();
+    const seen = new Set<string>();
+    for (const frame of mine) {
+      const totals = own.map(() => 0);
+      const byUnit = new Map<string, Array<number>>();
+      for (const value of byFrame.get(frame.k) ?? []) {
+        const position = index.get(value.option);
+        if (position == null) {
+          continue;
+        }
+        totals[position] = (totals[position] ?? 0) + value.votes;
+        const votes = byUnit.get(value.unit) ?? own.map(() => 0);
+        votes[position] = (votes[position] ?? 0) + value.votes;
+        byUnit.set(value.unit, votes);
+      }
+      raceFrames.push({
+        at: frame.at,
+        totals,
+        reporting: frame.reporting,
+        expected: frame.expected,
+      });
+      for (const [unit, votes] of byUnit) {
+        seen.add(unit);
+        const key = votes.join(",");
+        if (last.get(unit) !== key) {
+          last.set(unit, key);
+          counts.push({
+            unitId: unit,
+            at: frame.at,
+            votes,
+            reporting: null,
+            expected: null,
+          });
+        }
+      }
+    }
+    const partyIndex = new Map(
+      own.flatMap((choice, position) =>
+        choice.key.startsWith("party:")
+          ? [[choice.key.slice(6), position] as const]
+          : [],
+      ),
+    );
+    const baseline = [
+      ...Map.groupBy(priorBy.get(row.id) ?? [], (line) => line.unit),
+    ].flatMap(([unit, lines]) => {
+      let turnout = 0;
+      const shares = own.map(() => 0);
+      for (const line of lines) {
+        turnout += line.votes;
+        const position =
+          line.party == null ? undefined : partyIndex.get(line.party);
+        if (position != null) {
+          shares[position] = (shares[position] ?? 0) + line.votes;
+        }
+      }
+      if (turnout <= 0) {
+        return [];
+      }
+      seen.add(unit);
+      return [
+        {
+          unitId: unit,
+          label: unitOf.get(unit)?.name ?? "",
+          turnout,
+          shares: shares.map((votes) => votes / turnout),
+        },
+      ];
+    });
+    const final = settledBy.get(row.id) ?? [];
+    const certifiedTotals = own.map(() => 0);
+    for (const line of final) {
+      const position = index.get(line.option);
+      if (position != null) {
+        certifiedTotals[position] = line.votes;
+      }
+    }
+    const tally = raceFrames.at(-1)?.totals ?? certifiedTotals;
+    const top = Math.max(0, ...tally);
+    const parts = row.path.split("/");
+    const seat = parts.at(-1) ?? "";
+    const source = mine.at(-1);
+    return {
+      id: row.id,
+      slug: row.path,
+      title: (titles.full.get(row.id) ?? seat)
+        .replace(/^\d{4} /u, "")
+        .replace(/ election$/u, "")
+        .replace(/^\p{Ll}/u, (letter) => letter.toUpperCase()),
+      office: office(seat),
+      state: parts[1] ?? "",
+      district: /^house-(.+)$/u.exec(seat)?.[1] ?? null,
+      options: own.map((choice, at) => {
+        const party = choice.key.startsWith("party:")
+          ? choice.key.slice(6)
+          : null;
+        return {
+          id: choice.id,
+          label: choice.name,
+          party:
+            party == null
+              ? null
+              : {
+                  id: party,
+                  name: partyNames.full.get(party) ?? choice.party ?? "",
+                  short:
+                    partyNames.short.get(party) ??
+                    partyNames.full.get(party) ??
+                    "",
+                  color:
+                    choice.color ??
+                    ((tally[at] ?? 0) >= top * 0.05
+                      ? (UNAFFILIATED[
+                          Number.parseInt(party.slice(-4), 16) %
+                            UNAFFILIATED.length
+                        ] ?? "#8a8a8a")
+                      : "#8a8a8a"),
+                },
+          isWriteIn: choice.kind === "write_in",
+          isIncumbent: sitting.has(choice.id),
+        };
+      }),
+      units: [...seen].flatMap((unit) => {
+        const known = unitOf.get(unit);
+        return known == null ? [] : [known];
+      }),
+      frames: raceFrames,
+      counts,
+      baseline,
+      certified:
+        final.length === 0
+          ? null
+          : {
+              totals: certifiedTotals,
+              winners: own.flatMap((choice) =>
+                final.some((line) => line.option === choice.id && line.elected)
+                  ? [choice.id]
+                  : [],
+              ),
+            },
+      source: { publisher: source?.publisher ?? "", url: source?.url ?? null },
+    };
+  });
+  const states = [...new Set(built.map((race) => race.state))].toSorted(
+    (a, b) => a.localeCompare(b),
+  );
+  let newest: string | null = null;
+  for (const frame of frames.rows) {
+    if (newest == null || frame.at > newest) {
+      newest = frame.at;
+    }
+  }
+  const kept = (race: LiveRace) =>
+    detail === "race" || (detail === "state" && race.office !== "other");
+  const election: LiveElection = {
+    id: found.id,
+    slug: found.path,
+    title: titles.full.get(found.id) ?? found.path,
+    date: found.date,
+    pollClose: states.flatMap((state) => {
+      const minutes = CLOSES[state];
+      return minutes == null
+        ? []
+        : [{ state, at: eastern(found.date, minutes) }];
+    }),
+    newest,
+    isCertified:
+      built.length > 0 && built.every((race) => race.certified != null),
+    races: built.map((race) =>
+      kept(race) ? race : { ...race, units: [], counts: [], baseline: [] },
+    ),
+  };
+  return {
+    election,
+    estimates: Object.fromEntries(
+      built.map((race) => {
+        const value = estimate({ race, at: null });
+        return [race.id, kept(race) ? value : { ...value, units: [] }];
+      }),
+    ),
+  };
+}
+
 const Input = v.objectAsync({
   path: Path,
   rehearsal: v.optional(
@@ -643,6 +1147,63 @@ export const live = {
           ),
       };
     }),
+  election: base
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/live/election",
+        summary:
+          "Unofficial election night counts as the official feeds publish them: each race's running totals and county counts at every update, the prior result the estimate compares against, and the estimate itself",
+      }),
+    )
+    .input(v.objectAsync({ path: Path }))
+    .handler(async ({ input }) => {
+      const found = await election(input.path);
+      const picked = await races(found);
+      if (picked.length === 0) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const stamp = await db.execute<{ key: string }>(sql`
+        select coalesce(max(k), 0)::text || '|' || count(*)::text || '|' || coalesce(max(as_of)::text, '') as key
+        from live.frame where contest_id = any(${sql.param(picked.map((row) => row.id))}::uuid[]) and status = 'active'
+      `);
+      const key = stamp.rows[0]?.key ?? "";
+      const ready = done.get(input.path);
+      if (ready?.key === key) {
+        return ready.value;
+      }
+      let running = pending.get(input.path);
+      if (running?.key !== key) {
+        const value = night(
+          found,
+          picked,
+          found.rest !== ""
+            ? "race"
+            : found.path.split("/").length === 2
+              ? "national"
+              : "state",
+        );
+        running = { key, value };
+        pending.set(input.path, running);
+        value
+          .then((result) => {
+            done.delete(input.path);
+            done.set(input.path, { key, value: result });
+            if (done.size > 64) {
+              done.delete(done.keys().next().value ?? "");
+            }
+          })
+          .catch((error: unknown) => {
+            console.error(error);
+          })
+          .finally(() => {
+            if (pending.get(input.path)?.value === value) {
+              pending.delete(input.path);
+            }
+          });
+      }
+      return ready?.value ?? running.value;
+    }),
   stamp: base
     .input(v.object({ path: v.string(), isRehearsal: v.optional(v.boolean()) }))
     .handler(async ({ input }) => {
@@ -654,9 +1215,18 @@ export const live = {
         newest: string | null;
         isCertified: boolean;
       }>(sql`
-        select to_char(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
+        with recursive tree as (
+          select id, 0 as depth from election where id = ${found.id}::uuid
+          union all
+          select e.id, t.depth + 1 from election e join tree t on e.parent_id = t.id where t.depth < 3
+        ),
+        frames as (
+          select max(f.as_of) as newest from live.frame f join contest c on c.id = f.contest_id join tree t on t.id = c.election_id
+          where f.status = 'active'
+        )
+        select to_char(greatest(max(rs.as_of) filter (where rs.stage in ('live', 'preliminary')), (select newest from frames)) at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as newest,
           coalesce(bool_or(rs.stage in ('official', 'certified') and rs.kind = 'counted'), false) as "isCertified"
-        from contest c join result_set rs on rs.contest_id = c.id and rs.status = 'active'
+        from contest c left join result_set rs on rs.contest_id = c.id and rs.status = 'active'
         where c.election_id = ${found.id}::uuid
       `);
       return {
