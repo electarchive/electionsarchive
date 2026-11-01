@@ -6619,6 +6619,13 @@ for key, publisher, title, url, local in (
         "ne/holt_notice.pdf",
     ),
     (
+        "NE-31059-fillmore",
+        "Fillmore County Clerk",
+        "Primary Election official results, May 12, 2026 (Heartland School Board: seven candidates, six advance)",
+        "https://countyelectionresults.nebraska.gov/election_files/Fillmore/2026_Primary_official_results.pdf",
+        "ne/fillmore_primary.pdf",
+    ),
+    (
         "NE-31013-box-butte",
         "Box Butte County Clerk",
         "Primary Election official results, May 12, 2026",
