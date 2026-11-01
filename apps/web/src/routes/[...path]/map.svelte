@@ -1798,7 +1798,7 @@
 
   $effect(() => {
     if (own != null) {
-      void orpc.contests.outline.call({ k: own.k }).then(
+      void orpc.contests.outline.call({ k: own.k, tiles: own.tiles }).then(
         (found) => {
           outline = found;
         },

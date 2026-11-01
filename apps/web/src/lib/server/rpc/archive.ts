@@ -9087,6 +9087,7 @@ export const contests = {
           v.transform(Number),
           v.integer(),
         ),
+        tiles: v.optional(v.string()),
       }),
     )
     .output(v.array(v.array(v.tuple([v.number(), v.number()]))))
@@ -9108,7 +9109,10 @@ export const contests = {
             select ${plane("g.geom", "a.scheme_code")} as geom from area a
             cross join lateral (
               select geom from area_geometry where area_id = a.id
-              order by upper(valid) desc nulls first limit 1
+              order by valid @> (
+                select bs.as_of from boundary_set bs
+                where coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) = ${input.tiles ?? null}
+              ) desc nulls last, upper(valid) desc nulls first limit 1
             ) g
             where a.k = ${input.k}
           ) p
@@ -11616,7 +11620,10 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     with shapes as (
       select a.id, a.scheme_code as scheme, g.valid, g.geom
       from area a
-      join area_geometry g on g.area_id = a.id and g.valid @> ${day}::date
+      cross join lateral (
+        select g.valid, g.geom from area_geometry g where g.area_id = a.id
+        order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
+      ) g
       where ${ks.length === 0 ? sql`a.id = ${area}::uuid` : sql`a.k = any(${sql.param(ks)}::int[])`}
     ),
     extent as materialized (
