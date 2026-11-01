@@ -5,6 +5,7 @@ import json
 import os
 import re
 import subprocess
+import traceback
 import unicodedata
 import zipfile
 from collections import Counter, defaultdict
@@ -11504,6 +11505,18 @@ def countywide(tail: str) -> bool:
     return SUBCOUNTY.search(role) is None
 
 
+def drop_external_ids(cs: Changeset, entity: UUID, value: str | None = None) -> None:
+    rows = [
+        row
+        for row in cs.rows.get("external_id", [])
+        if row["entity_id"] != entity or (value is not None and row["value"] != value)
+    ]
+    if rows:
+        cs.rows["external_id"] = rows
+    else:
+        cs.rows.pop("external_id", None)
+
+
 def emit() -> None:
     whole = pl.read_parquet(PARSED / "candidates.parquet")
     groups = whole["tail"].str.split(":").list.first()
@@ -11514,6 +11527,7 @@ def emit() -> None:
             print(f"changeset {state} {emit_state(whole.filter(groups == state), state)}")
         except Exception as error:
             failed.append(state)
+            traceback.print_exc()
             print(f"failed {state}: {error!r}")
     if failed:
         raise SystemExit(f"failed states: {','.join(failed)}")
@@ -12070,17 +12084,11 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             ).fetchone()
             if holder is not None and holder[0] != contest:
                 cs.minted.discard(contest)
-                cs.rows["external_id"] = [row for row in cs.rows["external_id"] if row["entity_id"] != contest]
-                if not cs.rows["external_id"]:
-                    del cs.rows["external_id"]
+                drop_external_ids(cs, contest)
                 counts["held slug"] = counts.get("held slug", 0) + 1
                 continue
             if contest in seen_contests:
-                cs.rows["external_id"] = [
-                    row for row in cs.rows["external_id"] if not (row["entity_id"] == contest and row["value"] == key)
-                ]
-                if not cs.rows["external_id"]:
-                    del cs.rows["external_id"]
+                drop_external_ids(cs, contest, key)
                 counts["duplicate"] = counts.get("duplicate", 0) + 1
                 print(f"duplicate contest: {tail} {path}")
                 continue
