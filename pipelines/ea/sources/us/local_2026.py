@@ -10507,6 +10507,8 @@ def parse() -> None:
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
+                if state == "MI":
+                    tokens = re.sub(r"\bausable\b", "au sable", " ".join(tokens)).split()
                 nj_multi = False
                 if state == "NJ":
                     joined = " ".join(tokens)
@@ -10715,7 +10717,7 @@ def parse() -> None:
                 ):
                     _, _, rest, label, owner, path = fits[0]
                     post = " ".join(
-                        re.sub(r"\b(member|members|of the|partial term|full term)\b", " ", " ".join(rest)).split()
+                        re.sub(r"\b(member|members|of the|partial term|full term|unexpired term)\b", " ", " ".join(rest)).split()
                     )
                     post = post.replace("receiver of taxes", "tax collector")
                     role = (
@@ -10825,6 +10827,19 @@ def parse() -> None:
                         and (chair := re.search(r"\b(president|subdistrict \w+)\b", post))
                         else ""
                     )
+                    if (
+                        state == "MI"
+                        and role == "board-of-education"
+                        and (term := re.search(r"(?i)^(.*?)\s+(\d+) year term$", str(row["contest"])))
+                        and any(
+                            (other := re.search(r"(?i)^(.*?)\s+(\d+) year term$", str(sibling["contest"])))
+                            and other[1] == term[1]
+                            and other[2] != term[2]
+                            for sibling in found
+                            if sibling["fips"] == row["fips"]
+                        )
+                    ):
+                        seat = f"{term[2]} Year Term"
                     if role is not None:
                         code = owner.split(":", 1)[1]
                         template, tail = "", f"{state}:{code}:{role}" + (f":{slug(seat)}" if seat else "")
@@ -10922,6 +10937,8 @@ def parse() -> None:
                             for word in re.sub(r"(?i)\bby commissioner district district\b", "District", title).split()
                         ),
                     )
+                    if row["unexpired"]:
+                        title = re.sub(r"(?i)\s*\bunexpired term$", "", title)
                     template, tail = "", f"{state}:{row['fips']}:{slug(title)}"
                     minted[tail] = (title, place, "", "")
                 if tail is not None and not row["unexpired"]:
