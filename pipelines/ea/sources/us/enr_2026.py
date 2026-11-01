@@ -108,6 +108,8 @@ NOTE = (
     "ballots are counted and until the canvass certifies them; the certified canvass will publish as a separate result set."
 )
 
+WRITE_IN = re.compile(r"write-?in|scattering|\(W\)$", re.IGNORECASE)
+
 
 def office_name(text: str) -> str:
     found = EV_MEMBER.fullmatch(text.strip())
@@ -924,7 +926,8 @@ def plan(
                where o.parent_option_id is null and o.kind <> 'write_in' and o.contest_id = any(%s)""",
             [list(published)],
         ).fetchall():
-            published[contest][1].add(person(label))
+            if not WRITE_IN.search(label):
+                published[contest][1].add(person(label))
         for contest, text in conn.execute(
             "select entity_id, text from name where entity_id = any(%s)", [list(published)]
         ).fetchall():
@@ -939,13 +942,15 @@ def plan(
         races: dict[tuple[str, frozenset[str]], list[str]] = {}
         for (name, county), group in local.filter(pl.col("state") == state).group_by("contest", "county"):
             people = frozenset(
-                person(candidate) for candidate in group.filter(~pl.col("write_in"))["candidate"].unique()
+                person(candidate)
+                for candidate in group.filter(~pl.col("write_in"))["candidate"].unique()
+                if candidate and not WRITE_IN.search(candidate)
             )
             races.setdefault((name, people), []).append(county)
         matched = 0
         picks = []
-        for (name, people), places in races.items():
-            words = {re.sub(r"^0+(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w) for w in slug(name).split("-") if w not in STOP}
+
+        def choose(people: frozenset[str], words: set[str], places: list[str]):
             scored = []
             for contest, (key, wanted) in published.items():
                 segment = key.split(":")[2]
@@ -957,7 +962,7 @@ def plan(
                     continue
                 if people <= {"yes", "no"} and segment in towns and not towns[segment] & words:
                     continue
-                overlap = len(people & wanted) / len(people | wanted) if people | wanted else 0
+                overlap = len(people & wanted) / len(people | wanted) if people | wanted else 1
                 if overlap >= 0.6:
                     scored.append(
                         (
@@ -969,12 +974,23 @@ def plan(
                     )
             scored.sort(key=lambda hit: (-hit[0], -hit[1]))
             best = [hit for hit in scored if hit[:2] == scored[0][:2]] if scored else []
-            if len(best) != 1 or ((people <= {"yes", "no"} or len(people) < 2) and best[0][1] < 1):
-                unmatched.append(
-                    f"local {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if best else 'no contest'}"
-                )
+            if len(best) == 1 and not ((people <= {"yes", "no"} or len(people) < 2) and best[0][1] < 1):
+                return best, True
+            return best, False
+
+        for (name, people), places in races.items():
+            words = {re.sub(r"^0+(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w) for w in slug(name).split("-") if w not in STOP}
+            best, ok = choose(people, words, places)
+            if ok:
+                picks.append((best[0], name, places))
                 continue
-            picks.append((best[0], name, places))
+            split = [([place], choose(people, words, [place])) for place in places] if len(places) > 1 else []
+            if split and all(found[1] for _, found in split):
+                picks.extend((found[0][0], name, place) for place, found in split)
+                continue
+            unmatched.append(
+                f"local {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if best else 'no contest'}"
+            )
         for (_, _, contest, key), name, places in sorted(picks, key=lambda pick: (-pick[0][0], -pick[0][1])):
             if any(entry[1] == key for entry in work):
                 unmatched.append(f"local {state}: {name} ({', '.join(places[:2])}): duplicate of {key}")
@@ -1032,7 +1048,7 @@ def plan(
                 )
         ballots: dict[str, UUID] = {}
         for name, write_in in group.select("candidate", "write_in").unique().iter_rows():
-            if write_in or re.search(r"write-?in|scattering|\(W\)$", name, re.IGNORECASE):
+            if write_in or WRITE_IN.search(name):
                 if scattered is None:
                     scattered = scatter(contest_key, contest)
                 if scattered is not None:
