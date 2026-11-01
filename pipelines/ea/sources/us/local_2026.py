@@ -19,6 +19,7 @@ import polars as pl
 
 from ea import coverage, coverage_tables, raw
 from ea.changeset import Changeset, slug
+from ea.offices import Offices
 from ea.sources.us import cog, govmint, ky_ballots, mn_local
 from ea.sources.us.sld_primaries_2026 import cased
 from ea.store import DATA, connect
@@ -1271,6 +1272,41 @@ FEEDS.update(
             "City of Wallowa",
             "2026 General Election Filed Candidates (Wallowa County Clerk, report E-023)",
         ),
+        "OR-41023-canyon-city": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "Town of Canyon City",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
+        "OR-41023-dayville": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "City of Dayville",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
+        "OR-41023-john-day": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "City of John Day",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
+        "OR-41023-long-creek": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "City of Long Creek",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
+        "OR-41023-monument": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "City of Monument",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
+        "OR-41023-mount-vernon": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "City of Mount Vernon",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
+        "OR-41023-prairie-city": (
+            "https://grantcountyoregon.net/543/List-of-Candidate-Filings",
+            "City of Prairie City",
+            "List of Candidate Filings, November 3, 2026 general election (Grant County Clerk)",
+        ),
         "OR-41019": (
             "https://www.douglascountyor.gov/DocumentCenter/View/30712/Nov-2026-Ballot-Content-Report-E-019",
             "Douglas County Clerk",
@@ -1472,6 +1508,13 @@ DELIVERED = {
     "OR-41063-joseph": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
     "OR-41063-lostine": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
     "OR-41063-wallowa": DATA / "inbox" / "y26" / "or" / "wallowa_filing.pdf",
+    "OR-41023-canyon-city": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
+    "OR-41023-dayville": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
+    "OR-41023-john-day": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
+    "OR-41023-long-creek": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
+    "OR-41023-monument": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
+    "OR-41023-mount-vernon": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
+    "OR-41023-prairie-city": DATA / "inbox" / "manual" / "MF-528" / "or-grant-2026-general-candidate-filings.html",
     "OH-39165": DATA / "inbox" / "y26" / "oh" / "warren_cands.pdf",
     "OH-39041": DATA / "inbox" / "y26" / "oh" / "delaware_cands.pdf",
     "OH-39155": DATA / "inbox" / "y26" / "oh" / "trumbull_cands.pdf",
@@ -6072,6 +6115,20 @@ for key, publisher, title, url, local in (
         "or/umatilla_candidates.html",
     ),
     (
+        "KS-20115-cities",
+        "Marion County Clerk",
+        "Official General Election Ballots, Marion County, November 3, 2026 (sample)",
+        "https://marioncoks.net/DocumentCenter/View/2220",
+        "ks/marion_ballots.pdf",
+    ),
+    (
+        "KS-20013-cities",
+        "Brown County Clerk",
+        "2026 General Candidates List",
+        "https://brcoks.org/DocumentCenter/View/2215/2026-General-Candidates-List",
+        "ks/brown_candidates.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
@@ -9685,7 +9742,7 @@ def parse() -> None:
         for st, geoid, full in (
             gazetteer.filter(
                 pl.col("USPS").is_in(
-                    ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "WY", "NY"]
+                    ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY"]
                 )
                 & (pl.col("FUNCSTAT") == "A")
             )
@@ -9699,12 +9756,12 @@ def parse() -> None:
         claimed = {
             path
             for (path,) in conn.execute(
-                "select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|wy|ny)/[^/]+$'"
+                "select path from slug where path ~ '^us/(or|fl|mi|ky|ok|nv|ar|az|md|la|in|ne|ks|wy|ny)/[^/]+$'"
             )
         }
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'WY', 'NY')"""
+               where g.kind = 'municipality' and g.polity_id is null and g.county is not null and g.state in ('OR', 'FL', 'MI', 'KY', 'OK', 'NV', 'AR', 'AZ', 'MD', 'LA', 'IN', 'NE', 'KS', 'WY', 'NY')"""
         ).fetchall():
             hits = cities.get((st, coverage_tables.tokens(label)), [])
             if len(hits) == 1:
@@ -10131,9 +10188,7 @@ def parse() -> None:
                 if (
                     template is None
                     and (
-                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "WY")
-                        or state == "KS"
-                        and "Township" in str(row["contest"])
+                        state in ("NJ", "MI", "FL", "OR", "NV", "AR", "NY", "RI", "ME", "MA", "IN", "NE", "KS", "WY")
                         or state in ("KY", "OK")
                         and str(row["contest"]).startswith("City of ")
                         or state in ("CA", "TX", "UT", "AZ", "MD", "VA", "NC", "IL")
@@ -10536,6 +10591,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         }
         created: set[str] = set()
         made: set[object] = set()
+        offices = Offices(conn)
         at_large: dict[object, tuple | None] = {}
         homes: dict[str, str] = {}
         homeless: set[str] = set()
@@ -10666,7 +10722,17 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     counts["no template"] += 1
                     print(f"no territory: {tail} {owner}")
                     continue
-                holder = cs.key("us.body" if body else "us.office", f"{st}:{code}:{role}")
+                holder = (
+                    cs.key("us.body", f"{st}:{code}:{role}")
+                    if body
+                    else offices.key(
+                        cs,
+                        f"{st}:{code}:{role}",
+                        polity,
+                        "mayor" if role == "mayor" else "other",
+                        f"Mayor of {place}" if role == "mayor" else f"{place} {title}",
+                    )
+                )
                 if holder in cs.minted and holder not in made:
                     made.add(holder)
                     if body:
@@ -10746,7 +10812,11 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 seats = int(group["seats"][0] or 1)
                 seat = title.split(", ", 1)[1] if group["pinned"][0] else None
                 holder = tail.rsplit(":", 1)[0] if seat else tail
-                office = cs.key("us.office" if seats == 1 else "us.body", holder)
+                office = (
+                    offices.key(cs, holder, polity, "other", f"{place} {title.split(', ')[0].removeprefix('County ')}")
+                    if seats == 1
+                    else cs.key("us.body", holder)
+                )
                 if office in cs.minted and office not in made:
                     made.add(office)
                     if seats == 1:
