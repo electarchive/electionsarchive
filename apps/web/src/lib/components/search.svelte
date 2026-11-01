@@ -6,6 +6,9 @@
   import { on } from "svelte/events";
   import { m } from "#lib/paraglide/messages.js";
   import { finder } from "#lib/search.svelte.js";
+  import { cn } from "#lib/utils.js";
+
+  const { class: className }: { class?: string } = $props();
 
   const STORE = "ea:recent";
 
@@ -76,16 +79,22 @@
 
 <button
   type="button"
-  class="flex items-center gap-2 rounded-sm border border-input bg-card ps-2.5 pe-1.5 text-sm text-muted-foreground block-8 hover:bg-secondary hover:text-foreground"
+  class={cn(
+    "group/search flex items-center gap-2.5 rounded-sm border border-input bg-card ps-3 pe-2 text-start text-sm text-muted-foreground transition-colors block-9 min-inline-0 hover:border-foreground/40 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring",
+    className,
+  )}
   aria-haspopup="dialog"
   onpointerenter={load}
   onfocus={load}
   onclick={() => (finder.isOpen = true)}
 >
-  <SearchIcon class="block-4 inline-4" />
-  <span class="max-sm:sr-only">{m.search_open()}</span>
+  <SearchIcon class="shrink-0 text-foreground block-4 inline-4" />
+  <span class="flex-1 truncate min-inline-0 sm:hidden">{m.search_open()}</span>
+  <span class="flex-1 truncate min-inline-0 max-sm:hidden"
+    >{m.search_page_placeholder()}</span
+  >
   <kbd
-    class="rounded-xs border border-input px-1 font-figures text-[0.6875rem] keycap max-sm:hidden"
+    class="shrink-0 rounded-xs border border-input px-1 font-figures text-[0.6875rem] keycap max-md:hidden"
     >⌘K</kbd
   >
 </button>

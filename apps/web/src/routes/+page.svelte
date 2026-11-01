@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import SearchIcon from "@lucide/svelte/icons/search";
+  import { MediaQuery } from "svelte/reactivity";
   import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { finder } from "#lib/search.svelte.js";
@@ -20,6 +21,8 @@
     { term: "Swiss referendums", hint: m.home_try_swiss() },
   ];
   const DAY = 86_400_000;
+
+  const isNarrow = new MediaQuery("max-width: 40rem");
 
   const jsonLd = $derived({
     "@context": "https://schema.org",
@@ -193,7 +196,9 @@
             type="search"
             name="q"
             autocomplete="off"
-            placeholder={m.home_search_cta()}
+            placeholder={isNarrow.current
+              ? m.home_search_cta_short()
+              : m.home_search_cta()}
           />
           <kbd class="text-xs text-muted-foreground max-sm:hidden">⌘K</kbd>
           <button
