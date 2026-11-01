@@ -137,6 +137,11 @@ INBOX = {
 OWN = {"06111", *INBOX}
 
 
+WRAPPED_HEAD = re.compile(
+    r"(Contest: \d{4} - [^\n]*?Governing Board)\s*\n\s+Vote for\s*\n\s+Member,\s*\n\s+(\d+) (TRA \d+)\s+(On Ballot: \w+)"
+)
+
+
 def lines(fips: str) -> list[str]:
     if fips in INBOX_DOCS:
         text = subprocess.run(
@@ -158,11 +163,8 @@ def lines(fips: str) -> list[str]:
                 media_type="application/pdf",
             )
     path = raw.cached(SOURCE if fips in OWN else local_2026.SOURCE, url).path
-    return (
-        subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
-        .stdout.decode()
-        .splitlines()
-    )
+    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode()
+    return WRAPPED_HEAD.sub(r"\1 Member, \3   Vote for \2   \4", text).splitlines()
 
 
 def san_diego() -> list[dict[str, str | int | bool]]:
@@ -553,6 +555,11 @@ SANTA_CRUZ = (
     "Santa Cruz County Clerk and Registrar of Voters",
     "Contact Candidates: contests that will appear on the ballot, November 3, 2026 General Election",
 )
+NEVADA = (
+    "https://www.nevadacountyca.gov/CivicAlerts.aspx?AID=local-candidates-announced-for-november-ballot",
+    "Nevada County Elections",
+    "Local Candidates Announced for November Ballot, posted August 13, 2026",
+)
 SANTA_CRUZ_WATCH = (
     "https://votescount.santacruzcountyca.gov/Home/Elections/November3,2026CaliforniaGeneralElection/CandidateWatch.aspx",
     "Santa Cruz County Clerk and Registrar of Voters",
@@ -621,6 +628,16 @@ INBOX_DOCS = {
     "06113-c": (local_2026.FEEDS["CA-06113-s"], "yolo_schools.html", "text/html"),
     "06087-w": (SANTA_CRUZ_WATCH, "santacruz_watch.md", "text/markdown"),
     "06025-s": (IMPERIAL, "imperial_0820.pdf", "application/pdf"),
+    "06071-schools": (
+        (
+            "https://uploads.rov.sbcounty.gov/rov/News/2026/1103/PublicNotice_AppointmentsInLieuSchools.pdf",
+            "San Bernardino County Registrar of Voters",
+            "November 3, 2026 General Election: School District Appointments in Lieu of Election",
+        ),
+        "sb_in_lieu.pdf",
+        "application/pdf",
+    ),
+    "06057-s": (NEVADA, "nevada_candidates.html", "text/html"),
     "06087-s": (SANTA_CRUZ, "santacruz_contact.html", "text/html"),
     "06083-o": (
         (
@@ -1050,44 +1067,59 @@ LIEU = {
 }
 LIEU_NAME = re.compile(r"^(?P<name>\S.*?)\s{2,}(?:(?P<text>\S.*?)\s{2,})?(?P<term>\d) years?\s*$")
 LIEU_OFFICE = re.compile(
-    r"^(?P<body>.+?) Member, Board of (?P<role>Directors|Trustees),?\s*(?P<rest>.*)$", re.IGNORECASE
+    r"^(?P<body>.+?) Member,? (?:Board of (?:Directors|Trustees)|Governing Board),?\s*(?P<rest>.*)$", re.IGNORECASE
 )
 
 
+def lieu_name(name: str) -> str:
+    last, _, first = name.partition(", ")
+    return cased(f"{first} {last}") if name.isupper() and first else name
+
+
 def san_bernardino_lieu() -> list[Row]:
-    path = raw.cached(SOURCE, LIEU["06071-lieu"][0]).path
-    text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True).stdout.decode()
-    text = text.splitlines()
-    entries = []
-    for index, line in enumerate(text):
-        found = LIEU_NAME.match(line)
-        if found is None or line.startswith(("SPECIAL", "OCTOBER", "PAGE")):
-            continue
-        office = found["text"] or " ".join(part.strip() for part in (text[index - 1], text[index + 1]) if part.strip())
-        entries.append((found["name"].strip(), " ".join(office.split()), found["term"]))
-    keyed: dict[tuple[str, str, bool], list[str]] = {}
-    for name, office, term in entries:
-        split = LIEU_OFFICE.match(office)
-        if split is None or not usable(split["body"]):
-            continue
-        seat = re.search(r"(Division|Trustee Area) (\d+)", split["rest"])
-        short = "Short Term" in split["rest"] or term == "2"
-        keyed.setdefault((split["body"], f"{seat[1]} {seat[2]}" if seat else "", short), []).append(name)
-    return [
-        {
-            "county": "San Bernardino",
-            "district": full_name(body),
-            "seat": label or ("Short Term" if short else ""),
-            "role": "Director",
-            "seats": 1 if label else len(names),
-            "name": name,
-            "unexpired": short,
-            "tacit": True,
-            "doc": "06071-lieu",
-        }
-        for (body, label, short), names in keyed.items()
-        for name in names
-    ]
+    rows: list[Row] = []
+    for key, path in (
+        ("06071-lieu", raw.cached(SOURCE, LIEU["06071-lieu"][0]).path),
+        ("06071-schools", inbox_doc("06071-schools")),
+    ):
+        text = (
+            subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, check=True)
+            .stdout.decode()
+            .splitlines()
+        )
+        entries = []
+        for index, line in enumerate(text):
+            found = LIEU_NAME.match(line.removeprefix(" "))
+            if found is None or line.startswith(("SPECIAL", "OCTOBER", "PAGE", "SCHOOL")):
+                continue
+            office = found["text"] or " ".join(
+                part.strip() for part in (text[index - 1], text[index + 1]) if part.strip()
+            )
+            entries.append((lieu_name(found["name"].strip()), " ".join(office.split()), found["term"]))
+        keyed: dict[tuple[str, str, bool], list[str]] = {}
+        for name, office, term in entries:
+            split = LIEU_OFFICE.match(office)
+            if split is None or not usable(split["body"]):
+                continue
+            seat = re.search(r"(Division|Trustee Area|Area) (\w+)", split["rest"])
+            short = "Short Term" in split["rest"] or term == "2"
+            keyed.setdefault((split["body"], f"{seat[1]} {seat[2]}" if seat else "", short), []).append(name)
+        rows += [
+            {
+                "county": "San Bernardino",
+                "district": full_name(body),
+                "seat": label or ("Short Term" if short else ""),
+                "role": "Trustee" if "College" in body else "Director",
+                "seats": 1 if label else len(names),
+                "name": name,
+                "unexpired": short,
+                "tacit": True,
+                "doc": key,
+            }
+            for (body, label, short), names in keyed.items()
+            for name in names
+        ]
+    return rows
 
 
 SONOMA_LIEU_SEATS = {
@@ -1781,13 +1813,48 @@ def sonoma() -> list[Row]:
     return rows
 
 
+NEVADA_LINE = re.compile(r"^(?P<head>.+?), vote for (?P<seats>\w+)(?:, full term)? \((?P<names>.+)\)$")
+
+
+def nevada() -> list[Row]:
+    rows: list[Row] = []
+    for line in page_lines(inbox_doc("06057-s")):
+        found = NEVADA_LINE.match(line)
+        if found is None:
+            continue
+        seat = re.search(r"(?:,| ) ?(Trustee Area|Division) (\d+)$", found["head"])
+        body = found["head"][: seat.start()] if seat else found["head"]
+        if not usable(body):
+            continue
+        votes = found["seats"].lower()
+        rows += [
+            {
+                "county": "Nevada",
+                "district": full_name(body),
+                "seat": f"{seat[1]} {seat[2]}" if seat else "",
+                "role": "Trustee" if "College" in body else "Director",
+                "seats": int(votes) if votes.isdigit() else NUMBERS[votes],
+                "name": name,
+                "unexpired": False,
+                "tacit": False,
+                "doc": "06057-s",
+            }
+            for name in (item.strip(" ,") for item in found["names"].split(", "))
+            if name
+        ]
+    return rows
+
+
 def marin() -> list[Row]:
     text = text_of("06041")
     start = next(i for i, line in enumerate(text) if line == "Return to Top")
     rows = []
     index = start
     while index < len(text) - 1:
-        head = re.match(r"^(.+? (?:District(?: No\. \d+)?|Authority|Agency)) Director(?:,? (.*))?$", text[index])
+        head = re.match(
+            r"^(.+? (?:District(?: No\. \d+)?|Authority|Agency)) (?:Director|Governing Board Member)(?:,? (.*))?$",
+            text[index],
+        )
         if not head or text[index + 1] != "Seats Open":
             index += 1
             continue
@@ -1808,8 +1875,11 @@ def marin() -> list[Row]:
                 names.append(" ".join(part for part in (first, last, suffix) if part))
                 expect = False
             cursor += 1
-        if "School" not in head[1] and "College" not in head[1]:
-            rows += rows_of("Marin", head[1], head[2] or "", seats, names)
+        if "School" not in head[1]:
+            rows += [
+                {**row, "role": "Trustee" if "College" in head[1] else row["role"]}
+                for row in rows_of("Marin", head[1], head[2] or "", seats, names)
+            ]
         index = cursor
     return rows
 
@@ -1877,7 +1947,7 @@ QUALIFIED_ROLE = re.compile(
     re.IGNORECASE,
 )
 QUALIFIED_SEAT = re.compile(
-    r"(Division|Zone|Area|Ward|Seat|Subdivision|Trustee Area|TA|District)\s*(?:No\.?\s*)?(\d+|(?-i:[A-G])\b)",
+    r"(Division|Zone|Area|Ward|Seat|Subdivision|Trustee Area|TRA|TA|District)\s*(?:No\.?\s*)?(\d+|(?-i:[A-G])\b)",
     re.IGNORECASE,
 )
 QUALIFIED_CAND = re.compile(
@@ -1915,7 +1985,10 @@ def qualified_list(
                 )
 
     for line in lines(fips):
-        if found := QUALIFIED_HEAD.match(line):
+        if line.startswith("Contest:") and not QUALIFIED_HEAD.match(line):
+            flush()
+            current, names = None, []
+        elif found := QUALIFIED_HEAD.match(line):
             flush()
             current, names = None, []
             heading = " ".join(found[2].split())
@@ -1937,7 +2010,13 @@ def qualified_list(
                 continue
             label = ""
             if seat:
-                kind = seat[1].title().replace("Ta", "Trustee Area").replace("Subdivision", "Division")
+                kind = (
+                    seat[1]
+                    .title()
+                    .replace("Ta", "Trustee Area")
+                    .replace("Tra", "Trustee Area")
+                    .replace("Subdivision", "Division")
+                )
                 label = f"{kind} {seat[2]}"
             ballot = (found[3] or found[6] or found[7]) == "Yes"
             seats = int(found[4] or found[5] or found[8] or 1)
@@ -2268,6 +2347,7 @@ def candidates() -> pl.DataFrame:
                 *amador(),
                 *tehama(),
                 *lassen(),
+                *nevada(),
                 *stanislaus(),
                 *lake(),
                 *madera(),
