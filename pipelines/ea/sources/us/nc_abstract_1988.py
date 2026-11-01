@@ -1,6 +1,8 @@
+import base64
 import json
 import re
 import subprocess
+import tempfile
 from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
@@ -13,7 +15,7 @@ from ea.sources.us import medsl_statewide
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_abstract_1988"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of votes cast for Council of State at the general election held on November 8, 1988"
@@ -21,6 +23,16 @@ RECORD = "https://digital.ncdcr.gov/Documents/Detail/4199398"
 RECORD_GOVERNOR = "https://digital.ncdcr.gov/Documents/Detail/4199437"
 DAY = date(1988, 11, 8)
 HELD: set[str] = set()
+GOVERNOR = ("Governor", [("Robert B. Jordan III", "DEMOCRATIC"), ("James G. Martin", "REPUBLICAN")])
+VARIANTS = (200, 300)
+PROMPT = (
+    "This is a typed table of county vote totals from a North Carolina State Board of Elections abstract. "
+    "Transcribe every county row and the final TOTAL row, if present on this page, exactly as printed, "
+    "using only the first two numeric columns (the governor's race: Jordan, then Martin). "
+    "Where a figure is crossed out with a handwritten replacement, give the handwritten figure. "
+    'Answer with only a JSON array of arrays: ["COUNTY NAME", Jordan votes, Martin votes]. '
+    "Votes are integers without commas."
+)
 SHEETS = {
     (1, 2): [
         ("Secretary of State", [("Rufus L. Edmisten", "DEMOCRATIC"), ("John H. Carrington", "REPUBLICAN")]),
@@ -37,7 +49,7 @@ SHEETS = {
     ],
 }
 METHOD = (
-    "County totals come from the State Board of Elections' abstract of votes cast for the Council of State at the 1988 "
+    "County totals come from the State Board of Elections' abstract of votes cast for the governor and Council of State at the 1988 "
     "general election (a dot-matrix scan), transcribed from page images in two independent reads and checked so that "
     "every candidate's county sum equals the printed state total."
 )
@@ -75,6 +87,64 @@ def fetch() -> None:
             raw.store(
                 SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf"
             )
+    print(scan())
+
+
+def key(page: int, dpi: int) -> str:
+    return f"seen:{page}:{dpi}"
+
+
+def scan() -> str:
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+    from ea import batch
+
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    wanted: dict[str, batch.Want] = {}
+    for page in (5, 6):
+        for dpi in VARIANTS:
+            with tempfile.TemporaryDirectory() as folder:
+                prefix = Path(folder) / "page"
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-r",
+                        str(dpi),
+                        "-gray",
+                        "-png",
+                        "-singlefile",
+                        str(raw.cached(SOURCE, url(page)).path),
+                        str(prefix),
+                    ],
+                    check=True,
+                )
+                data = base64.b64encode(prefix.with_suffix(".png").read_bytes()).decode()
+            params = MessageCreateParamsNonStreaming(
+                model="claude-haiku-5-5",
+                max_tokens=4000,
+                thinking={"type": "disabled"},
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": data}},
+                            {"type": "text", "text": PROMPT},
+                        ],
+                    }
+                ],
+            )
+            wanted[key(page, dpi)] = (params, (6000 * price_in + 2500 * price_out) / 1e6)
+    return batch.ensure(SOURCE, "seen", wanted)[1]
+
+
+def seen(page: int, dpi: int) -> dict[str, list[int]]:
+    blocks = json.loads(raw.cached(SOURCE, key(page, dpi)).path.read_text())["content"]
+    text = next(block["text"] for block in blocks if block.get("type") == "text")
+    found = re.search(r"\[.*\]", text, re.DOTALL)
+    return {
+        str(row[0]).upper(): [int(str(v).replace(",", "")) for v in row[1:]]
+        for row in (json.loads(found[0]) if found else [])
+    }
 
 
 def parse() -> None:
@@ -107,6 +177,25 @@ def parse() -> None:
                 for name, votes in zip(body["county"], body[column], strict=True):
                     rows.append((office, candidate, party, codes[re.sub(r"[^a-z]", "", name.lower())], votes))
             start += len(candidates)
+    reads = [{**seen(5, dpi), **seen(6, dpi)} for dpi in VARIANTS]
+    printed = next(read.get("TOTAL") for read in reads if "TOTAL" in read)
+    governor: dict[str, list[int]] = {}
+    bad = []
+    for name in table.filter(pl.col("page").is_in((5, 6)) & (pl.col("county") != "TOTAL"))["county"]:
+        first, second = (read.get(name) for read in reads)
+        if first is None or first != second:
+            bad.append((name, first, second))
+        else:
+            governor[name] = first
+    if bad or printed is None:
+        raise ValueError(f"governor reads disagree: {bad}")
+    for offset, (candidate, party) in enumerate(GOVERNOR[1]):
+        if sum(v[offset] for v in governor.values()) != printed[offset]:
+            raise ValueError(
+                f"Governor {candidate}: {sum(v[offset] for v in governor.values())} against printed {printed[offset]}"
+            )
+        for name, values in governor.items():
+            rows.append((GOVERNOR[0], candidate, party, codes[re.sub(r"[^a-z]", "", name.lower())], values[offset]))
     frame = pl.DataFrame(rows, schema=["office", "candidate", "party", "county", "votes"], orient="row").select(
         year=pl.lit(1988, pl.Int32),
         day=pl.lit(str(DAY)),
@@ -155,7 +244,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="North Carolina's 1988 lieutenant governor, secretary of state, auditor, treasurer, superintendent of public instruction, "
+        summary="North Carolina's 1988 governor, lieutenant governor, secretary of state, auditor, treasurer, superintendent of public instruction, "
         "attorney general, and commissioners of agriculture, insurance, and labor by county from the State Board of "
         "Elections' abstract of votes cast",
         cite=cite,
