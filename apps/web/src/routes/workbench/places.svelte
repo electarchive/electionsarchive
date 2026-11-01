@@ -15,7 +15,7 @@
     hovered = $bindable(),
   }: {
     contest: Awaited<ReturnType<typeof orpc.contests.get.call>>;
-    focus: { key: string; label: string } | null;
+    focus: { key: string; label: string; color: string | null } | null;
     picked: SvelteSet<string>;
     hovered: string | null;
   } = $props();
@@ -54,6 +54,16 @@
         return isDescending ? -order : order;
       }),
   );
+  const tint = $derived(
+    focus == null ? "var(--foreground)" : swatch(focus.color, focus.key),
+  );
+  const widest = $derived.by(() => {
+    let most = 0.001;
+    for (const row of rows) {
+      most = Math.max(most, Math.abs(row.change ?? 0));
+    }
+    return most;
+  });
   const visible = $derived(isAll ? rows : rows.slice(0, 100));
   const windowed = new Windowed(() => ({
     items: visible,
@@ -179,15 +189,49 @@
                 >
               </span>
             </td>
-            <td
-              class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5"
-              >{percent(row.share)}</td
-            >
+            <td class="px-2.5 sm:px-3.5">
+              <span class="flex items-center justify-end gap-2">
+                <span
+                  class="relative bg-muted block-1.5 inline-14 max-sm:hidden"
+                  aria-hidden="true"
+                  ><span
+                    class="absolute inset-y-0 inset-s-0"
+                    style:inline-size="{row.share * 100}%"
+                    style:background-color={tint}
+                  ></span></span
+                >
+                <span
+                  class="text-end font-figures text-[0.8125rem] tabular-nums min-inline-12"
+                  >{percent(row.share)}</span
+                >
+              </span>
+            </td>
             {#if contest.target != null}
-              <td
-                class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5"
-                >{row.change == null ? "" : points(row.change)}</td
-              >
+              <td class="px-2.5 sm:px-3.5">
+                {#if row.change != null}
+                  <span class="flex items-center justify-end gap-2">
+                    <span
+                      class="relative block-2.5 inline-16 max-sm:hidden"
+                      aria-hidden="true"
+                      ><span
+                        class="absolute inset-y-0 inset-s-1/2 bg-border inline-px"
+                      ></span><span
+                        class={cn("absolute inset-y-0.5", {
+                          "inset-s-1/2": row.change >= 0,
+                          "inset-e-1/2 bg-muted-foreground": row.change < 0,
+                        })}
+                        style:inline-size="{(Math.abs(row.change) / widest) *
+                          50}%"
+                        style:background-color={row.change >= 0 ? tint : null}
+                      ></span></span
+                    >
+                    <span
+                      class="text-end font-figures text-[0.8125rem] tabular-nums min-inline-11"
+                      >{points(row.change)}</span
+                    >
+                  </span>
+                {/if}
+              </td>
             {/if}
             <td
               class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5 max-sm:hidden"
