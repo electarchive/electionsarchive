@@ -65,6 +65,12 @@ COUNTIES = {
     "06045": "Mendocino",
     "06033": "Lake",
     "06039": "Madera",
+    "06011": "Colusa",
+    "06051": "Mono",
+    "06115": "Yuba",
+    "06091": "Sierra",
+    "06109": "Tuolumne",
+    "06069": "San Benito",
 }
 LISTED = {
     "06009": "CA-06009-calaveras",
@@ -133,11 +139,10 @@ OWN = {"06111", *INBOX}
 
 def lines(fips: str) -> list[str]:
     if fips in INBOX_DOCS:
-        return (
-            subprocess.run(["pdftotext", "-layout", str(inbox_doc(fips)), "-"], capture_output=True, check=True)
-            .stdout.decode()
-            .splitlines()
-        )
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(inbox_doc(fips)), "-"], capture_output=True, check=True
+        ).stdout.decode()
+        return re.sub(r"(?<=[a-z])(Vote for)", r"  \1", text).splitlines()
     url = feed(fips)[0]
     if fips in INBOX:
         try:
@@ -603,6 +608,14 @@ MENDOCINO_ELECTION = (
     "mendocino_to_election.pdf",
     "application/pdf",
 )
+
+
+def manual(
+    folder: str, name: str, url: str, publisher: str, title: str, media_type: str = "application/pdf"
+) -> tuple[tuple[str, str, str], str, str]:
+    return (url, publisher, title), f"manual/{folder}/{name}", media_type
+
+
 INBOX_DOCS = {
     "06113-s": (YOLO_SPECIAL, "yolo_special.html", "text/html"),
     "06113-c": (local_2026.FEEDS["CA-06113-s"], "yolo_schools.html", "text/html"),
@@ -623,6 +636,87 @@ INBOX_DOCS = {
     "06039-s": MADERA_PROOF,
     "06045-s": MENDOCINO_CERTIFICATES,
     "06045-e": MENDOCINO_ELECTION,
+    "06011-s": manual(
+        "MF-530",
+        "2026 Nov Candidate Watch_202608171247463221.pdf",
+        "https://www.countyofcolusaca.gov/1092/Elections",
+        "Colusa County Clerk-Recorder",
+        "Candidate Filing Status Report, November 3, 2026 General Election",
+    ),
+    "06011-n": manual(
+        "MF-530",
+        "NOTICE OF ELECTION November 3, 2026   General Election.pdf",
+        "https://www.countyofcolusaca.gov/1091/Notices",
+        "Colusa County Clerk-Recorder",
+        "Notice of Election, November 3, 2026 General Election",
+    ),
+    "06051-s": manual(
+        "MF-531",
+        "mono-2026-general-candidates.html",
+        "https://monocounty.ca.gov/2493/Candidates",
+        "Mono County Elections",
+        "Local Candidates List for the November 3, 2026 General Election",
+        "text/html",
+    ),
+    "06051-g": manual(
+        "MF-531",
+        "candidates_guide_nov_3_2026_general_v2.pdf",
+        "https://monocounty.ca.gov/2493/Candidates#candidates_guide_nov_3_2026_general_v2",
+        "Mono County Elections",
+        "Candidate's Guide, November 3, 2026 General Election",
+    ),
+    "06115-s": manual(
+        "MF-532",
+        "LocalCandidateList.pdf",
+        "https://www.yuba.gov/departments/elections/upcoming_election.php",
+        "Yuba County Clerk-Recorder",
+        "Candidate Filing Status Report, November 3, 2026 General Election",
+    ),
+    "06115-n": manual(
+        "MF-532",
+        "WEB_NOE.pdf",
+        "https://www.yuba.gov/departments/elections/upcoming_election.php#notice-of-election",
+        "Yuba County Clerk-Recorder",
+        "Notice of Election, November 3, 2026 General Election",
+    ),
+    "06091-s": manual(
+        "MF-535",
+        "Sierra County Local Candidate List_202609281142594073.pdf",
+        "https://www.sierracounty.ca.gov/804/Upcoming-Elections",
+        "Sierra County Clerk-Recorder",
+        "Local Candidate List, November 3, 2026 General Election",
+    ),
+    "06091-n": manual(
+        "MF-535",
+        "Election Press Release.pdf",
+        "https://www.sierracounty.ca.gov/804/Upcoming-Elections#election-press-release",
+        "Sierra County Clerk-Recorder",
+        "Offices on the Ballot, November 3, 2026 General Election",
+    ),
+    "06109-s": (
+        (
+            "https://www.tuolumnecounty.ca.gov/",
+            "Tuolumne County Elections Department",
+            "Candidate Filing Report, November 3, 2026 General Election (as of September 16, 2026)",
+        ),
+        "tuolumne_filing.pdf",
+        "application/pdf",
+    ),
+    "06069-s": manual(
+        "MF-538",
+        "cfmr037_rosterofcandidates 08312026.pdf",
+        "https://www.sanbenitocounty-ca-cre.gov/elections/candidates-campaigns/list-of-candidates-november-2026",
+        "San Benito County Registrar of Voters",
+        "Roster of Candidates, November 3, 2026 General Election",
+    ),
+    "06069-n": manual(
+        "MF-538",
+        "san-benito-2026-11-03-statewide-general-election.html",
+        "https://www.sanbenitocounty-ca-cre.gov/elections/candidates-campaigns/november-3-2026-statewide-general-election",
+        "San Benito County Registrar of Voters",
+        "Contests and Important Information, November 3, 2026 Statewide General Election",
+        "text/html",
+    ),
     "06105-s": (
         (
             "https://www.trinitycounty.org/DocumentCenter/View/4190",
@@ -644,7 +738,7 @@ def inbox_doc(key: str) -> Path:
     try:
         return raw.cached(SOURCE, url).path
     except LookupError:
-        file = DATA / "inbox" / "y26" / "ca" / name
+        file = DATA / "inbox" / (name if name.startswith("manual/") else f"y26/ca/{name}")
         raw.store(
             SOURCE,
             url,
@@ -1942,6 +2036,115 @@ def san_francisco() -> list[Row]:
     return rows
 
 
+LISTED_BOARDS = (
+    (
+        "Colusa",
+        "06011-s",
+        (
+            ("Arbuckle Park and Recreation District", "", 3, ("Kade Wilson",)),
+            ("Maxwell Park and Recreation District", "", 3, ("Kyle Miller", "Crystal Hill")),
+            ("Arbuckle Public Utility District", "", 3, ("Johnathan Ring", "Kevin Wood")),
+            ("Arbuckle College City Fire Protection District", "", 2, ("David Burgess",)),
+            ("Bear Valley Indian Valley Fire Protection District", "", 2, ("Francis Elliott", "Bridget Kaplan")),
+            ("Maxwell Fire Protection District", "", 3, ("Allen Beck",)),
+        ),
+    ),
+    (
+        "Mono",
+        "06051-s",
+        (
+            (
+                "Southern Mono Healthcare District",
+                "",
+                2,
+                ("Joanne Hunt", "Sophie Bidet", "Yuri Parisky", "Matthew Hall", "Daniel Ranson"),
+            ),
+        ),
+    ),
+    (
+        "Yuba",
+        "06115-s",
+        (
+            ("Dobbins Oregon House Fire Protection District", "", 2, ("Dustin Strain", "Bart Young", "Meghan Hill")),
+            ("Linda County Water District", "Division 1", 1, ("Richard Brannan", "Samuel Fuhrer")),
+            ("Linda County Water District", "Division 5", 1, ("Gordon Stevens", "Ransom Shackelford")),
+            ("Olivehurst Public Utility District", "Division 2", 1, ("John Floe", "Tom McWhorter")),
+            ("Olivehurst Public Utility District", "Division 3", 1, ("Mary Jane Griego", "John Jones")),
+            ("Smartsville Fire Protection District", "", 2, ("John Fuschich", "Daniel Zuber", "Vaughn O’Malley")),
+        ),
+    ),
+    (
+        "Sierra",
+        "06091-s",
+        (
+            ("Alleghany County Water District", "", 3, ("Robbin DeWeese",)),
+            ("Sierra City Fire Protection District", "", 2, ("Sigurd Ostrom",)),
+            ("Eastern Plumas Healthcare District", "", 3, ("Robert Duncan", "Andy Genasci", "Marcia Hughes")),
+        ),
+    ),
+    (
+        "Tuolumne",
+        "06109-s",
+        (
+            (
+                "Groveland Community Services District",
+                "",
+                3,
+                (
+                    "John Armstrong",
+                    "Robert Swan",
+                    "Bruce M. Thompson",
+                    "Donald Felts",
+                    "Bruce Dudley",
+                    "Robert W. Turney Sr",
+                    "Steve Perreira",
+                ),
+            ),
+            ("Tuolumne Utilities District", "Division 1", 1, ("Tom Crosby", "Ron W. Ringen")),
+        ),
+    ),
+)
+SAN_BENITO_EXPAND = (
+    (r"^Aromas Water District", "Aromas County Water District"),
+    (r"^Sunnyslope Water", "Sunnyslope County Water"),
+    (r"^Tres Pinos Water", "Tres Pinos County Water"),
+    (r"^Aromas Fire Dist\.", "Aromas Tri-County Fire Protection District"),
+)
+
+
+def listed_boards() -> list[Row]:
+    rows = []
+    for county, key, boards in LISTED_BOARDS:
+        text = " ".join(" ".join(page_lines(inbox_doc(key)) if key == "06051-s" else lines(key)).split()).casefold()
+        for district, seat, seats, names in boards:
+            for name in names:
+                assert name.casefold() in text, (county, name)
+                rows.append(
+                    {
+                        "county": county,
+                        "district": district,
+                        "seat": seat,
+                        "role": "Commissioner" if "Fire" in district else "Director",
+                        "seats": seats,
+                        "name": name,
+                        "unexpired": False,
+                        "tacit": len(names) <= seats,
+                        "doc": key,
+                    }
+                )
+    return rows
+
+
+def san_benito() -> list[Row]:
+    return [
+        row
+        for row in tagged(
+            qualified_list("06069-s", "San Benito", (*LISTED_EXPAND, *SAN_BENITO_EXPAND), True), "06069-s"
+        )
+        if "College" not in str(row["district"])
+    ]
+
+
 def candidates() -> pl.DataFrame:
     return pl.DataFrame(
         [
@@ -1961,7 +2164,7 @@ def candidates() -> pl.DataFrame:
                 *tulare(),
                 *sonoma(),
                 *marin(),
-                *monterey(),
+                *[row for row in monterey() if row["district"] != "Aromas Water District"],
                 *san_joaquin(),
                 *qualified_list("06007", "Butte"),
                 *qualified_list("06017", "El Dorado"),
@@ -1996,6 +2199,8 @@ def candidates() -> pl.DataFrame:
                 *sonoma_lieu(),
                 *san_francisco(),
                 *yolo(),
+                *listed_boards(),
+                *san_benito(),
             ]
         ]
     ).unique(["county", "district", "seat", "name"], keep="first", maintain_order=True)
@@ -2053,6 +2258,8 @@ def emit() -> Path:
         )
         sources = {}
         for key, (url, *publisher, bucket) in docs.items():
+            if key in INBOX_DOCS:
+                inbox_doc(key)
             source = cs.source(*publisher)
             if source in cs.minted:
                 cs.add(
