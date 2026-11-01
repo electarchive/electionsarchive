@@ -4116,7 +4116,7 @@
   "method_contents": "On this page",
   "method_hero_title": "One count, replayed",
   "method_hero_caption": "Pennsylvania's 2020 presidential race, using each county's final result, counted in a simulated order with election-day votes first and mail ballots last. The dotted line is the margin among the votes counted so far. The shaded band is our 80% range for the final margin, and the solid line is its middle.",
-  "method_hero_miss": "Late in this replay, Montgomery County paused with more than 100,000 mail ballots still to count. The model read the county as finished, so from 90% of the vote counted, the range missed the final margin at all but one checkpoint. The model had no way to see those uncounted ballots.",
+  "method_hero_miss": "Late in this replay, Montgomery County paused with more than 100,000 mail ballots still to count. The model read the county as finished, so from 88% of the vote counted, the range missed the final margin at every checkpoint. The model had no way to see those uncounted ballots.",
   "method_hero_final": "Final result",
   "method_hero_counted": "Margin in votes counted",
   "method_hero_estimate": "Estimated final margin",

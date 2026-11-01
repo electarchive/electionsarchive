@@ -93,6 +93,9 @@ export type EstimateInput = { race: LiveRace; at: string | null };
 const MODEL = {
   draws: 500,
   spread: 0.12,
+  sizeRef: 20_000,
+  sizeExp: 0.1,
+  sizeLow: 0.3,
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
@@ -138,6 +141,7 @@ type Unit = {
   features: Array<number>;
   traits: Array<number> | null;
   settled: number;
+  sigma: number;
   hasBaseline: boolean;
 };
 
@@ -335,6 +339,7 @@ function units(race: LiveRace, at: string | null) {
           ? 1
           : MODEL.moving
         : 1,
+      sigma: MODEL.spread,
       hasBaseline: base != null && base.turnout > 0,
     });
   }
@@ -383,6 +388,9 @@ function units(race: LiveRace, at: string | null) {
             : (value - middle) / deviation;
         }),
       ];
+      unit.sigma =
+        MODEL.spread *
+        clamp((MODEL.sizeRef / unit.expected) ** MODEL.sizeExp, MODEL.sizeLow, 1);
     }
   }
   return { found, a, b };
@@ -404,7 +412,7 @@ function logcdf(x: number) {
 }
 
 function components(unit: Unit, tau: number, pi: number) {
-  const sigma = MODEL.spread;
+  const sigma = unit.sigma;
   const ell = Math.log(unit.total / unit.expected) - tau;
   const p = clamp(pi * unit.settled, 1e-6, 1 - 1e-6);
   const mu = -ell - sigma * sigma;
@@ -484,7 +492,7 @@ function turnout(found: Array<Unit>, spread: number) {
       if (unit.total <= 0) {
         return (
           unit.expected *
-          Math.exp(tau + surge + MODEL.spread * gaussian(random))
+          Math.exp(tau + surge + unit.sigma * gaussian(random))
         );
       }
       const { done, open, mu } = components(unit, tau, PIS[cell % PIS.length]!);
@@ -494,7 +502,7 @@ function turnout(found: Array<Unit>, spread: number) {
           (1 + MODEL.spike * -Math.log(Math.max(random(), Number.EPSILON)))
         );
       }
-      return unit.total * Math.exp(truncated(mu, MODEL.spread, random));
+      return unit.total * Math.exp(truncated(mu, unit.sigma, random));
     },
   };
 }
