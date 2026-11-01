@@ -98,5 +98,12 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached(SOURCE, URL), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"AR": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet"),
+            {"AR": source},
+            strict=True,
+            partial="the Secretary of State's export totals, which match its statewide rows, fall a few percent short of the FEC's reported primary totals",
+        )
         return cs.write()
