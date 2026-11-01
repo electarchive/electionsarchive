@@ -10180,6 +10180,17 @@ def parse() -> None:
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
+                if state == "IN":
+                    tokens = re.sub(
+                        r"^(elkhart (?=goshen|baugo|concord|middlebury|fairfield)|delaware (?=cowan|daleville))",
+                        "",
+                        " ".join(tokens),
+                    )
+                    tokens = re.sub(
+                        r"^community school corporation of eastern hancock(?: school board| schools)?",
+                        "eastern hancock county school board",
+                        re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
+                    ).split()
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
                 for formal in (
@@ -10328,6 +10339,7 @@ def parse() -> None:
                             (
                                 role
                                 for pattern, role in (
+                                    (r"^clerk treasurer$", "clerk-treasurer"),
                                     (
                                         (
                                             r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator)$"
@@ -10355,7 +10367,7 @@ def parse() -> None:
                                 )
                                 if re.search(pattern, post)
                                 and (
-                                    role in ("office", "president")
+                                    role in ("office", "president", "clerk-treasurer")
                                     or not re.search(r"president|clerk|tax|collector|fire|library", post)
                                 )
                             ),
@@ -10428,6 +10440,7 @@ def parse() -> None:
                                 "board-of-directors": "Board of Directors",
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
+                                "clerk-treasurer": "Clerk-Treasurer",
                                 "moderator": "Moderator",
                                 "administrator": "Administrator",
                                 "collector": "Tax Collector",
@@ -11330,10 +11343,3 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             counts["stale contests"] += 1
         print(counts)
         return cs.write()
-    (
-        "UT-49035-magna",
-        "Magna Water District",
-        "Magna Water District Trustee Election, November 3, 2026",
-        "https://www.utah.gov/pmn/sitemap/notice/1105731.html",
-        "ut/magna_notice.html",
-    ),
