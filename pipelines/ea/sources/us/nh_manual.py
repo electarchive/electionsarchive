@@ -1096,6 +1096,12 @@ def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
     return pl.concat(parts)
 
 
+@functools.cache
+def aliases() -> list[dict[str, str]]:
+    frame = pl.read_csv(Path(__file__).with_name("nh_manual_aliases.tsv"), separator="\t", infer_schema=False)
+    return [{key: value or "" for key, value in row.items()} for row in frame.iter_rows(named=True)]
+
+
 def amended(lines: pl.DataFrame) -> pl.DataFrame:
     fixes = pl.read_csv(
         Path(__file__).with_name("nh_manual_fixes.tsv"),
@@ -1447,6 +1453,24 @@ def emit() -> Path:
                 continue
             if rows["twice"].all() and rows["printed"].is_null().all():
                 report.setdefault("checked by two reads", []).append(f"{tag} {external}")
+            overrides = [
+                alias
+                for alias in aliases()
+                if (alias["year"], alias["county"], alias["office"], alias["side"])
+                == (str(year), str(county), str(office), str(side or ""))
+            ]
+            for alias in overrides:
+                if alias["action"] == "drop":
+                    rows = rows.filter(pl.col("name") != alias["printed"])
+                elif alias["action"] == "rename":
+                    rows = rows.with_columns(
+                        pl.when(pl.col("name") == alias["printed"])
+                        .then(pl.lit(alias["name"]))
+                        .otherwise(pl.col("name"))
+                        .alias("name")
+                    )
+            forced = {alias["printed"] for alias in overrides if alias["action"] == "new"}
+            accepted = any(alias["action"] == "accept" for alias in overrides)
             totals = rows.group_by("name", maintain_order=True).agg(pl.col("votes").sum())
             others = [option[0] for option in options if option[2] == "others"]
             if not totals["votes"].sum():
@@ -1465,6 +1489,9 @@ def emit() -> Path:
                     else:
                         fresh.append(name)
                     continue
+                if name in forced:
+                    fresh.append(name)
+                    continue
                 mine = person(name)
                 hits = [
                     option
@@ -1480,6 +1507,8 @@ def emit() -> Path:
                     )
                 ]
                 exact = [option for option in options if option[2] == "candidate" and same_person(option[1], name)]
+                if len(exact) > 1:
+                    exact = [option for option in exact if option[1] == name] or exact
                 if len(exact) == 1:
                     hits = exact
                 if len(hits) > 1:
@@ -1508,6 +1537,7 @@ def emit() -> Path:
                 failed = "a new name shares a surname with another line"
             if (
                 not failed
+                and not accepted
                 and fresh
                 and not [m for m in matched.values() if m not in others]
                 and any(option[2] == "candidate" for option in options)
