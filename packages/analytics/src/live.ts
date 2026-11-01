@@ -37,6 +37,7 @@ export type LiveBaseline = {
   turnout: number;
   shares: Array<number>;
   expected?: number;
+  traits?: Array<number>;
 };
 
 export type LiveRace = {
@@ -95,7 +96,7 @@ const MODEL = {
   partial: 0.05,
   residual: 0.04,
   spike: 0.003,
-  priors: { swing: 0.1, slope: 0.15, size: 0.015, order: 0.06 },
+  priors: { swing: 0.1, slope: 0.15, size: 0.015, order: 0.06, trait: 0.015 },
   turnout: 0.12,
   drift: 0.06,
   quiet: 15,
@@ -124,7 +125,6 @@ const TAILS: Record<string, number> = {
 
 const TAUS = 41;
 const PIS = [0.05, 0.2, 0.4, 0.6, 0.8, 0.95];
-const WIDTH = 4;
 
 type Unit = {
   id: string;
@@ -135,7 +135,8 @@ type Unit = {
   early: { total: number; margin: number } | null;
   expected: number;
   prior: number;
-  size: number;
+  features: Array<number>;
+  traits: Array<number> | null;
   settled: number;
   hasBaseline: boolean;
 };
@@ -282,7 +283,7 @@ function units(race: LiveRace, at: string | null) {
   const [a, b] = pair(race, latest);
   const pooled =
     byUnit.has(race.id) && race.baseline.every((row) => row.unitId !== race.id);
-  const rows = pooled
+  const rows: Array<LiveBaseline> = pooled
     ? [
         {
           unitId: race.id,
@@ -327,7 +328,8 @@ function units(race: LiveRace, at: string | null) {
       early: list == null ? null : early(list, a, b),
       expected: base == null ? 0 : (base.expected ?? base.turnout) / (1 + tail),
       prior: base == null ? 0 : (base.shares[a] ?? 0) - (base.shares[b] ?? 0),
-      size: 0,
+      features: [],
+      traits: base?.traits ?? null,
       settled: changed.has(id)
         ? (clock - Date.parse(changed.get(id)!)) / 60_000 >= MODEL.quiet
           ? 1
@@ -349,8 +351,38 @@ function units(race: LiveRace, at: string | null) {
         ),
       ) / weight,
     );
+    const width = Math.max(0, ...sized.map((unit) => unit.traits?.length ?? 0));
+    const scales = Array.from({ length: width }, (_, index) => {
+      const known = sized.filter((unit) => unit.traits?.[index] != null);
+      const total = sum(known.map((unit) => unit.expected));
+      const middle =
+        total > 0
+          ? sum(known.map((unit) => unit.expected * unit.traits![index]!)) /
+            total
+          : 0;
+      const deviation =
+        total > 0
+          ? Math.sqrt(
+              sum(
+                known.map(
+                  (unit) =>
+                    unit.expected * (unit.traits![index]! - middle) ** 2,
+                ),
+              ) / total,
+            )
+          : 0;
+      return { middle, deviation };
+    });
     for (const unit of sized) {
-      unit.size = spread > 0 ? (Math.log(unit.expected) - mean) / spread : 0;
+      unit.features = [
+        spread > 0 ? (Math.log(unit.expected) - mean) / spread : 0,
+        ...scales.map(({ middle, deviation }, index) => {
+          const value = unit.traits?.[index];
+          return value == null || deviation <= 0
+            ? 0
+            : (value - middle) / deviation;
+        }),
+      ];
     }
   }
   return { found, a, b };
@@ -472,7 +504,7 @@ function solve(
   vector: Array<number>,
   random: (() => number) | null,
 ) {
-  const n = WIDTH;
+  const n = vector.length;
   const lower = new Float64Array(n * n);
   for (let i = 0; i < n; i += 1) {
     for (let j = 0; j <= i; j += 1) {
@@ -513,6 +545,15 @@ function partial(fraction: number) {
   );
 }
 
+function predict(coefficients: Float64Array, unit: Unit, center: number) {
+  let value =
+    unit.prior + coefficients[0]! + coefficients[1]! * (unit.prior - center);
+  for (let index = 2; index < coefficients.length - 1; index += 1) {
+    value += coefficients[index]! * (unit.features[index - 2] ?? 0);
+  }
+  return value;
+}
+
 function fit(
   found: Array<Unit>,
   totals: Array<number>,
@@ -520,42 +561,36 @@ function fit(
   residual: Array<number>,
   random: (() => number) | null,
 ) {
-  const { swing, slope, size, order } = MODEL.priors;
-  const matrix = [
-    1 / swing ** 2,
-    0,
-    0,
-    0,
-    0,
-    1 / slope ** 2,
-    0,
-    0,
-    0,
-    0,
-    1 / size ** 2,
-    0,
-    0,
-    0,
-    0,
-    1 / order ** 2,
-  ];
-  const vector = [0, 0, 0, 0];
+  const { swing, slope, size, order, trait } = MODEL.priors;
+  const traits = Math.max(1, ...found.map((unit) => unit.features.length)) - 1;
+  const priors = [swing, slope, size];
+  for (let index = 0; index < traits; index += 1) {
+    priors.push(trait);
+  }
+  priors.push(order);
+  const width = priors.length;
+  const matrix = Array.from({ length: width * width }, (_, index) =>
+    index % (width + 1) === 0 ? 1 / priors[index / (width + 1)]! ** 2 : 0,
+  );
+  const vector = priors.map(() => 0);
   const add = (row: Array<number>, y: number, variance: number) => {
     const w = 1 / variance;
-    for (let i = 0; i < WIDTH; i += 1) {
+    for (let i = 0; i < width; i += 1) {
       vector[i] = vector[i]! + w * row[i]! * y;
-      for (let j = 0; j < WIDTH; j += 1) {
-        matrix[i * WIDTH + j] = matrix[i * WIDTH + j]! + w * row[i]! * row[j]!;
+      for (let j = 0; j < width; j += 1) {
+        matrix[i * width + j] = matrix[i * width + j]! + w * row[i]! * row[j]!;
       }
     }
   };
+  const features = (unit: Unit) =>
+    Array.from({ length: traits + 1 }, (_, index) => unit.features[index] ?? 0);
   for (const [index, unit] of found.entries()) {
     if (!unit.hasBaseline || unit.total <= 0) {
       continue;
     }
     const fraction = Math.min(1, unit.total / totals[index]!);
     add(
-      [1, unit.prior - center, unit.size, 1 - fraction],
+      [1, unit.prior - center, ...features(unit), 1 - fraction],
       unit.margin - unit.prior,
       residual[index]! ** 2 + partial(fraction),
     );
@@ -566,7 +601,7 @@ function fit(
         (unit.margin * unit.total - unit.early.margin * unit.early.total) /
         (unit.total - unit.early.total);
       add(
-        [0, 0, 0, fraction],
+        [...priors.slice(1).map(() => 0), fraction],
         unit.early.margin - increment,
         MODEL.partial ** 2 * (1 / Math.max(first, 0.05) + 1 / step),
       );
@@ -668,11 +703,8 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
       continue;
     }
     const predicted =
-      unit.prior +
-      first[0]! +
-      first[1]! * (unit.prior - center) +
-      first[2]! * unit.size +
-      first[3]! * (1 - Math.min(1, fraction));
+      predict(first, unit, center) +
+      first.at(-1)! * (1 - Math.min(1, fraction));
     squares +=
       Math.max(
         0,
@@ -724,29 +756,21 @@ export function estimate({ race, at }: EstimateInput): LiveEstimate {
         );
       }
     }
-    const [swing, slope, size, order] = fit(
-      found,
-      totals,
-      center,
-      residuals,
-      random,
-    );
+    const coefficients = fit(found, totals, center, residuals, random);
+    const order = coefficients.at(-1)!;
     let votes = 0;
     let all = 0;
     for (const [index, unit] of found.entries()) {
       const final = totals[index]!;
       const fraction = Math.min(1, unit.total / final);
       const prior = unit.hasBaseline
-        ? unit.prior +
-          swing! +
-          slope! * (unit.prior - center) +
-          size! * unit.size
+        ? predict(coefficients, unit, center)
         : unit.margin;
       const priorVariance = residuals[index]! ** 2;
       let margin: number;
       if (unit.total > 0) {
         const noise = partial(fraction);
-        const observed = unit.margin - order! * (1 - fraction);
+        const observed = unit.margin - order * (1 - fraction);
         const precision = 1 / priorVariance + (noise > 0 ? 1 / noise : 1e12);
         const mean =
           (prior / priorVariance +

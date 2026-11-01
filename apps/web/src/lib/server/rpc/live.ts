@@ -15,11 +15,14 @@ import { sql } from "drizzle-orm";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { roles } from "#lib/server/contrib.js";
+import counties from "#lib/server/county-traits.json";
 import { db } from "#lib/server/db/index.js";
 import { plane } from "#lib/server/plane.js";
 import { names, UNAFFILIATED } from "#lib/server/rpc/archive.js";
 import { landing, NIGHT, rehearsal } from "#lib/server/rpc/rehearsal.js";
 import { Path } from "#lib/server/territory.js";
+
+const TRAITS: Record<string, Array<number>> = counties;
 
 const LEVELS = new Set([
   "us.place",
@@ -847,10 +850,11 @@ async function night(
   const held = await db.execute<{
     id: string;
     area: string | null;
+    code: string;
     scheme: string;
     parent: string | null;
   }>(sql`
-    select id, area_id as area, scheme_code as scheme, parent_id as parent from reporting_unit where id = any(${sql.param(unitIds)}::uuid[])
+    select id, code, area_id as area, scheme_code as scheme, parent_id as parent from reporting_unit where id = any(${sql.param(unitIds)}::uuid[])
   `);
   const parties = [
     ...new Set(
@@ -883,6 +887,12 @@ async function night(
         parentId: row.parent,
       },
     ]),
+  );
+  const traitsOf = new Map(
+    held.rows.flatMap((row) => {
+      const traits = row.scheme === "us.county" ? TRAITS[row.code] : undefined;
+      return traits == null ? [] : [[row.id, traits] as const];
+    }),
   );
   const byFrame = Map.groupBy(values.rows, (row) => row.k);
   const byContest = Map.groupBy(frames.rows, (row) => row.contest);
@@ -1046,6 +1056,7 @@ async function night(
     const fallback = presidential > 0 ? midterm / presidential : null;
     const baseline = grouped.map(([unit, value]) => {
       seen.add(unit);
+      const traits = traitsOf.get(unit);
       return {
         unitId: unit,
         label: unitOf.get(unit)?.name ?? "",
@@ -1056,6 +1067,7 @@ async function night(
             value.turnout *
             Math.min(1.6, Math.max(0.3, prior.ratios.get(unit) ?? fallback)),
         }),
+        ...(traits != null && { traits }),
       };
     });
     const final = settledBy.get(row.id) ?? [];

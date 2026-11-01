@@ -50,6 +50,7 @@
     m.method_margin_uniform(),
     m.method_margin_stronghold(),
     m.method_margin_size(),
+    m.method_margin_traits(),
     m.method_margin_order(),
   ];
   const limits = [
@@ -57,6 +58,7 @@
     m.method_limit_types(),
     m.method_limit_precincts(),
     m.method_limit_baseline(),
+    m.method_limit_traits(),
     m.method_limit_order(),
   ];
 
