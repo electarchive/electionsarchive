@@ -6520,6 +6520,20 @@ for key, publisher, title, url, local in (
         "ne/scotts_bluff_cities_2.pdf",
     ),
     (
+        "NE-31081-hamilton",
+        "Hamilton County Clerk",
+        "Sample ballot, General Election November 3, 2026",
+        "https://www.hamiltoncounty.ne.gov/",
+        "ne/hamilton.pdf",
+    ),
+    (
+        "NE-31147-richardson",
+        "Richardson County Clerk",
+        "Sample ballot, General Election November 3, 2026",
+        "https://www.richardsoncounty.ne.gov/",
+        "ne/richardson.pdf",
+    ),
+    (
         "CA-06109-tuolumne",
         "Tuolumne County Elections Department",
         "Candidate Filing Report, November 3, 2026 General Election (as of September 16, 2026)",
