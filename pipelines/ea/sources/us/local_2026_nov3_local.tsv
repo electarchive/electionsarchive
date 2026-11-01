@@ -2247,6 +2247,8 @@ NE-31107-knox	Western Township Board	0	James F. Vesely	Nonpartisan	Knox	3
 NE-31017-brown	City of Ainsworth Mayor	0	Kevin Wayne Shaul	Nonpartisan	Brown	1
 NE-31017-brown	City of Ainsworth City Council	0	Dustin A. Barthel	Nonpartisan	Brown	2
 NE-31017-brown	City of Ainsworth City Council	0	Bradley C Fiala	Nonpartisan	Brown	2
+NE-31017-brown	City of Long Pine City Council	0	Bryan J Sanford	Nonpartisan	Brown	2
+NE-31017-brown	City of Long Pine City Council	0	Michael Stogner	Nonpartisan	Brown	2
 NE-31017-brown	Village of Johnstown Board of Trustees	0	Pamela Lynn Clay	Nonpartisan	Brown	0
 NE-31017-brown	Village of Johnstown Board of Trustees	0	Jimmy Ferguson	Nonpartisan	Brown	0
 NE-31017-brown	Village of Johnstown Board of Trustees	0	Ruth L. Trobee	Nonpartisan	Brown	0
@@ -2555,6 +2557,14 @@ KS-20007-townships	Lake City Township Clerk	0	Russell B. Lake III	Republican	Bar
 KS-20007-townships	Medicine Lodge Township Clerk	0	Ted Colborn	Republican	Barber	1
 KS-20007-townships	Mingona Township Clerk	0	Jeff Clarke	Republican	Barber	1
 KS-20007-townships	Sharon Township Clerk	0	Jeff England	Republican	Barber	1
+KS-20007-townships	Sun City Township Clerk	0	Teena Thurber	Republican	Barber	1
+KS-20007-townships	Turkey Creek Township Clerk	0	Sammye Hoss	Republican	Barber	1
+KS-20007-townships	Valley Township Clerk	0	Andrew Waggoner	Republican	Barber	1
+KS-20135-townships	Bazine Township Clerk	0	Rick Dean Grose	Republican	Ness	1
+KS-20135-townships	Center Township Clerk	0	Kyle Antenen	Republican	Ness	1
+KS-20135-townships	Eden Township Clerk	0	Clayton Johnson	Republican	Ness	1
+KS-20135-townships	Johnson Township Clerk	0	Alvera Davison	Republican	Ness	1
+KS-20135-townships	Nevada Township Clerk	0	Nate McDaniel	Republican	Ness	1
 NE-31041-custer	Anselmo-Merna Public Schools Board of Education	0	Tom Griffith	Nonpartisan	Custer	3
 NE-31041-custer	Anselmo-Merna Public Schools Board of Education	0	Jacob Parsons	Nonpartisan	Custer	3
 NE-31041-custer	Anselmo-Merna Public Schools Board of Education	0	Rodney D. Lamb	Nonpartisan	Custer	3
@@ -3093,6 +3103,8 @@ MI-26137	Johannesburg-Lewiston Area Schools Board Member	0	Heather Dixon	Nonpart
 MI-26137	Johannesburg-Lewiston Area Schools Board Member	0	Nancy A. Kussrow	Nonpartisan	Otsego	3
 MI-26137	Johannesburg-Lewiston Area Schools Board Member	0	Michael D. Vogt	Nonpartisan	Otsego	3
 MI-26137	Vanderbilt Area Schools Board Member	0	Gina Lopshire	Nonpartisan	Otsego	3
+OR-41071-county	Yamhill County Clerk	0	Keri Hinton	Nonpartisan	Yamhill	1
+OR-41071-county	Yamhill County Clerk	0	Cindy Johnson	Nonpartisan	Yamhill	1
 KS-20115	Marion County Commission District 1	0	Kent D. Becker	Republican	Marion	1
 KS-20115	Marion County Commission District 4	0	Randall M Eitzen	Democratic	Marion	1
 KS-20115	Marion County Commission District 4	0	Greg Wyatt	Republican	Marion	1
@@ -3110,27 +3122,25 @@ KS-20115-townships	Menno Township Clerk	0	Dwight M Flaming	Republican	Marion	1
 KS-20115-townships	Peabody Township Clerk	0	Shawn D. Entz	Republican	Marion	1
 KS-20115-townships	West Branch Township Clerk	0	John D Unruh	Republican	Marion	1
 KS-20115-townships	Wilson Township Clerk	0	James Loewen	Republican	Marion	1
-KS-20115	Ramona Mayor	0	Carl Gehrke	Nonpartisan	Marion	1
-KS-20115	Ramona City Council	0	Mark Lockhart	Nonpartisan	Marion	2
-KS-20115	Ramona City Council	0	Paul Tucker	Nonpartisan	Marion	2
-KS-20115	Hillsboro City Council Ward 1	0	Jeffrey J. Jorgenson	Nonpartisan	Marion	1
-KS-20115	Hillsboro City Council Ward 2	0	Byron McCarty	Nonpartisan	Marion	1
-KS-20115	Burns City Council	0	Beth Bush	Nonpartisan	Marion	3
-KS-20115	Burns City Council	0	Dawn R. Hacker	Nonpartisan	Marion	3
-KS-20115	Burns City Council	0	Zeb Hatfield	Nonpartisan	Marion	3
+KS-20115-cities	Ramona Mayor	0	Carl Gehrke	Nonpartisan	Marion	1
+KS-20115-cities	Ramona City Council	0	Mark Lockhart	Nonpartisan	Marion	2
+KS-20115-cities	Ramona City Council	0	Paul Tucker	Nonpartisan	Marion	2
+KS-20115-cities	Hillsboro City Council Ward 1	0	Jeffrey J. Jorgenson	Nonpartisan	Marion	1
+KS-20115-cities	Hillsboro City Council Ward 2	0	Byron McCarty	Nonpartisan	Marion	1
+KS-20115-cities	Burns City Council	0	Beth Bush	Nonpartisan	Marion	3
+KS-20115-cities	Burns City Council	0	Dawn R. Hacker	Nonpartisan	Marion	3
+KS-20115-cities	Burns City Council	0	Zeb Hatfield	Nonpartisan	Marion	3
 KS-20013	Brown County Commission District 1	0	Richard Tesoriero	Republican	Brown	1
 KS-20013	Brown County Register of Deeds	1	Emily D. Kloepper	Republican	Brown	1
-KS-20013	Hiawatha Mayor	0	Brian Shefferd	Nonpartisan	Brown	1
-KS-20013	Hiawatha Mayor	0	Becky Shamburg	Nonpartisan	Brown	1
-KS-20013	Hiawatha City Commissioner Seat One	0	Mitch Bruning	Nonpartisan	Brown	1
-KS-20013	Fairview Mayor	0	Jessica Ann Homan	Nonpartisan	Brown	1
-KS-20013	Fairview Mayor	0	Ronald Rettele	Nonpartisan	Brown	1
-KS-20013	Fairview City Council	0	Douglas E Bletscher	Nonpartisan	Brown	2
-KS-20013	Fairview City Council	0	Jesse Davis	Nonpartisan	Brown	2
+KS-20013-cities	City of Hiawatha Mayor	0	Brian Shefferd	Nonpartisan	Brown	1
+KS-20013-cities	City of Hiawatha Mayor	0	Becky Shamburg	Nonpartisan	Brown	1
+KS-20013-cities	Hiawatha City Commissioner Seat One	0	Mitch Bruning	Nonpartisan	Brown	1
+KS-20013-cities	Fairview Mayor	0	Jessica Ann Homan	Nonpartisan	Brown	1
+KS-20013-cities	Fairview Mayor	0	Ronald Rettele	Nonpartisan	Brown	1
+KS-20013-cities	Fairview City Council	0	Douglas E Bletscher	Nonpartisan	Brown	2
+KS-20013-cities	Fairview City Council	0	Jesse Davis	Nonpartisan	Brown	2
 KS-20185	Stafford County Commission District 1	0	Jim Stanford	Republican	Stafford	1
 KS-20043	Doniphan County Commission District 1	0	Roger Hopkins	Republican	Doniphan	1
-OR-41071-county	Yamhill County Clerk	0	Keri Hinton	Nonpartisan	Yamhill	1
-OR-41071-county	Yamhill County Clerk	0	Cindy Johnson	Nonpartisan	Yamhill	1
 OR-41021-county	Gilliam County Sheriff	0	Mike Walker	Nonpartisan	Gilliam	1
 OR-41021-county	Gilliam County Clerk	0	Mary A. Reser	Nonpartisan	Gilliam	1
 OR-41021-county	Gilliam County Clerk	0	Ellen Wagenaar	Nonpartisan	Gilliam	1
@@ -3145,6 +3155,12 @@ AZ-04015-lake-havasu	City of Lake Havasu City Council Member	0	Neil Tinsley	Nonp
 NE-31013-box-butte	Box Butte County Clerk of the District Court	0	Molly Ridgeway	Republican	Box Butte	1
 NE-31013-box-butte	City of Alliance City Council	0	Randall Hitchcock	Nonpartisan	Box Butte	2
 NE-31013-box-butte	City of Alliance City Council	0	Scott Yates	Nonpartisan	Box Butte	2
+NE-31013-box-butte	Alliance Public Schools Board of Education District 6	0	Timothy Richey	Nonpartisan	Box Butte	2
+NE-31013-box-butte	Alliance Public Schools Board of Education District 6	0	Edison Red Nest III	Nonpartisan	Box Butte	2
+NE-31013-box-butte	Hemingford School Board District 10 Ward A	0	Micki Votruba	Nonpartisan	Box Butte	1
+NE-31013-box-butte	Hemingford School Board District 10 Ward B	0	Justin Ansley	Nonpartisan	Box Butte	1
+NE-31013-box-butte	Hemingford School Board District 10 Ward C	0	Blanche Randolph	Nonpartisan	Box Butte	1
+NE-31013-box-butte	Village of Hemingford Board of Trustees	0	Taryn J. Wood	Nonpartisan	Box Butte	2
 NE-31029-chase	Chase County Sheriff	0	Rob D. Browning	Republican	Chase	1
 NE-31035-clay	Clay County Clerk of the District Court	0	Ceirra Carlson	Republican	Clay	1
 NE-31035-clay	Clay County Assessor	0	Shelly Ives	Republican	Clay	1
@@ -3155,12 +3171,6 @@ NE-31057-dundy	Dundy County Commissioner District 2	0	Tom Richard	Republican	Dun
 NE-31143-polk	Polk County Sheriff	0	Eric L. Allen	Republican	Polk	1
 NE-31143-polk	City of Stromsburg Mayor	0	Johanna Nielsen	Nonpartisan	Polk	1
 NE-31143-polk	City of Stromsburg Mayor	0	Kenneth Everingham	Nonpartisan	Polk	1
-NE-31013-box-butte	Alliance Public Schools Board of Education District 6	0	Timothy Richey	Nonpartisan	Box Butte	2
-NE-31013-box-butte	Alliance Public Schools Board of Education District 6	0	Edison Red Nest III	Nonpartisan	Box Butte	2
-NE-31013-box-butte	Hemingford School Board District 10 Ward A	0	Micki Votruba	Nonpartisan	Box Butte	1
-NE-31013-box-butte	Hemingford School Board District 10 Ward B	0	Justin Ansley	Nonpartisan	Box Butte	1
-NE-31013-box-butte	Hemingford School Board District 10 Ward C	0	Blanche Randolph	Nonpartisan	Box Butte	1
-NE-31013-box-butte	Village of Hemingford Board of Trustees	0	Taryn J. Wood	Nonpartisan	Box Butte	2
 NE-31175-valley	Valley County Sheriff	0	Mark A. Hogue	Republican	Valley	1
 NE-31137-phelps	Phelps County Clerk	0	Sally Fox	Republican	Phelps	1
 NE-31137-phelps	Phelps County Clerk of the District Court	0	Jennifer L. Nelson	Republican	Phelps	1
@@ -3249,6 +3259,9 @@ NE-31157-scotts-bluff	Scottsbluff Board of Education	0	Rob Polk	Nonpartisan	Scot
 NE-31157-scotts-bluff	Scottsbluff Board of Education	0	Tory W. Schwartz	Nonpartisan	Scotts Bluff	3
 NE-31157-scotts-bluff	Scottsbluff Board of Education	0	Mark Lang	Nonpartisan	Scotts Bluff	3
 NE-31157-scotts-bluff	Scottsbluff Board of Education	0	Matt Fleming	Nonpartisan	Scotts Bluff	3
+NE-31157-scotts-bluff	City of Scottsbluff City Council	0	Betsy Vidlak	Nonpartisan	Scotts Bluff	3
+NE-31157-scotts-bluff	City of Scottsbluff City Council	0	Matt Salomon	Nonpartisan	Scotts Bluff	3
+NE-31157-scotts-bluff	City of Scottsbluff City Council	0	Reginald N. Preston	Nonpartisan	Scotts Bluff	3
 NE-31081-hamilton	Hamilton County Commissioner District 1	0	Nicole Sabell	Republican	Hamilton	1
 NE-31081-hamilton	Hamilton County Commissioner District 2	0	Andrew Holtorf	Republican	Hamilton	1
 NE-31081-hamilton	Hamilton County Commissioner District 5	0	Francis D. McDonald	Republican	Hamilton	1
@@ -3259,9 +3272,6 @@ NE-31081-hamilton	Hamilton County Clerk of the District Court	0	Wendy Dethlefs	R
 NE-31081-hamilton	Hamilton County Surveyor	0	Adam Goertzen	Republican	Hamilton	1
 NE-31081-hamilton	Hamilton County Treasurer	0	Joann M. Griffith	Republican	Hamilton	1
 NE-31081-hamilton	Hamilton County Sheriff	0	Jeromy McCoy	Republican	Hamilton	1
-NE-31157-scotts-bluff	City of Scottsbluff City Council	0	Betsy Vidlak	Nonpartisan	Scotts Bluff	3
-NE-31157-scotts-bluff	City of Scottsbluff City Council	0	Matt Salomon	Nonpartisan	Scotts Bluff	3
-NE-31157-scotts-bluff	City of Scottsbluff City Council	0	Reginald N. Preston	Nonpartisan	Scotts Bluff	3
 NE-31081-hamilton	City of Aurora Mayor	0	Harlan Schafer	Nonpartisan	Hamilton	1
 NE-31081-hamilton	City of Aurora City Council Ward 1	0	Jannelle Seim	Nonpartisan	Hamilton	1
 NE-31081-hamilton	City of Aurora City Council Ward 2	0	Kirk W. Handrup	Nonpartisan	Hamilton	1
@@ -3317,16 +3327,6 @@ NE-31081-hamilton	Giltner Public Schools Board of Education	0	Kelly Schelkopf	No
 NE-31081-hamilton	Giltner Public Schools Board of Education	0	Brandon Hunnicutt	Nonpartisan	Hamilton	3
 NE-31081-hamilton	Giltner Public Schools Board of Education	0	Logan Rath	Nonpartisan	Hamilton	3
 NE-31081-hamilton	Giltner Public Schools Board of Education	0	Mandy Eastman	Nonpartisan	Hamilton	3
-NE-31147-richardson	City of Falls City City Council Ward 1	0	Don Ferguson	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Falls City City Council Ward 1	0	Mark Lowe	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Falls City City Council Ward 2	0	Sean Nolte	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Falls City City Council Ward 2	0	Robert D. Olberding	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Falls City City Council Ward 3	0	John Nixon	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Falls City City Council Ward 4	0	Rick Lemerond	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Falls City City Council Ward 4	0	Bing Bindrum	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Humboldt Mayor	0	Jan Wilhelm	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Humboldt Mayor	0	Kevin Burnison	Nonpartisan	Richardson	1
-NE-31147-richardson	City of Humboldt City Council Ward 1	0	Jaymie Nolte	Nonpartisan	Richardson	1
 NE-31147-richardson	Richardson County Commissioner District 1	0	Shawn Fouraker	Republican	Richardson	1
 NE-31147-richardson	Richardson County Assessor	0	Kimberly L. Riggs	Republican	Richardson	1
 NE-31147-richardson	Richardson County Attorney	0	Samantha Scheitel	Republican	Richardson	1
@@ -3337,6 +3337,16 @@ NE-31147-richardson	Richardson County Surveyor	0	Robert Tichy	Republican	Richard
 NE-31147-richardson	Richardson County Treasurer	0	Amanda Bartek-Ramsey	Republican	Richardson	1
 NE-31147-richardson	City of Falls City Mayor	0	Kenny Killingsworth	Nonpartisan	Richardson	1
 NE-31147-richardson	City of Falls City Mayor	0	Kevin Malone	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 1	0	Don Ferguson	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 1	0	Mark Lowe	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 2	0	Sean Nolte	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 2	0	Robert D. Olberding	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 3	0	John Nixon	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 4	0	Rick Lemerond	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Falls City City Council Ward 4	0	Bing Bindrum	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Humboldt Mayor	0	Jan Wilhelm	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Humboldt Mayor	0	Kevin Burnison	Nonpartisan	Richardson	1
+NE-31147-richardson	City of Humboldt City Council Ward 1	0	Jaymie Nolte	Nonpartisan	Richardson	1
 NE-31147-richardson	City of Humboldt City Council Ward 1	0	Barbara J. Dettmann	Nonpartisan	Richardson	1
 NE-31147-richardson	City of Humboldt City Council Ward 2	0	Richard Davis	Nonpartisan	Richardson	1
 NE-31147-richardson	Village of Barada Board of Trustees	0	Elaina J. Strecker	Nonpartisan	Richardson	2
@@ -3661,8 +3671,6 @@ NJ-34025	Howell Township Board of Education	0	Ira Thor	Nonpartisan	Monmouth	3
 NJ-34025	Howell Township Board of Education	0	Martianne Degliuomini	Nonpartisan	Monmouth	3
 AZ-04003-s	Cochise Technology District Governing Board	0	Rosa Aguallo	Nonpartisan	Cochise	6
 AZ-04003-s	Cochise Technology District Governing Board	0	Clint Sanborn	Nonpartisan	Cochise	6
-AZ-04003-s	Cochise Technology District Governing Board	0	Rosa Aguallo	Nonpartisan	Cochise	6
-AZ-04003-s	Cochise Technology District Governing Board	0	Clint Sanborn	Nonpartisan	Cochise	6
 AZ-04027	Southwest Technical Education District of Yuma Governing Board	0	Clint Harrington	Nonpartisan	Yuma	0
 AZ-04027	Southwest Technical Education District of Yuma Governing Board	0	Sarah Berner	Nonpartisan	Yuma	0
 AZ-04027	Southwest Technical Education District of Yuma Governing Board	0	Sharon Taylor	Nonpartisan	Yuma	0
@@ -3678,6 +3686,8 @@ AZ-04012-s	La Paz County Justice of the Peace	0	Tiffany Dyer	Republican	La Paz	1
 AZ-04012-s	La Paz County Constable	0	John Hoge	Democratic	La Paz	1
 AZ-04011	Greenlee County Clerk of the Superior Court	0	Madeline Montoya	Democratic	Greenlee	1
 AZ-04011	Greenlee County Justice of the Peace Precinct 2	0	Mindy Claridge	Republican	Greenlee	1
+AZ-04005-williams	City of Williams Council Member	0	Michelle Campbell	Nonpartisan	Coconino	1
+AZ-04005-williams	City of Williams Council Member	0	Jeremy Peasley	Nonpartisan	Coconino	1
 RI-summary	Cranston City Council Ward 1	0	Avery Therese Mangahas	Democratic	Providence	1
 RI-summary	Cranston City Council Ward 2	0	Sara Jane Haupt	Democratic	Providence	1
 RI-summary	Cranston City Council City-Wide	0	Kristen Elizabeth Haroian	Democratic	Providence	0
@@ -3745,6 +3755,20 @@ RI-summary	Smithfield Town Council	0	Rachel S. Toppi	Republican	Providence	0
 RI-summary	West Greenwich Regional School Committee	0	Donna Marie Gamache Griffiths	Independent	Kent	0
 RI-summary	Woonsocket Mayor	0	Christopher Alan Beauchamp	Nonpartisan	Providence	1
 RI-summary	Woonsocket Mayor	0	Daniel Mark Gendron	Nonpartisan	Providence	1
+AZ-04003-county	Cochise County Recorder	0	Billy Cloud	Republican	Cochise	1
+AZ-04003-county	Cochise County Clerk of the Superior Court	0	Amy Hunley	Republican	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 1	0	Janus Poppe	Democratic	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 2	0	Christopher Crucilla	Republican	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 2	0	Juan Flores	Democratic	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 3	0	Randy Judd	Republican	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 4	0	Trevor Ward	Republican	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 5	0	Kenneth Curfman	Republican	Cochise	1
+AZ-04003-county	Cochise County Justice of the Peace Precinct 6	0	Ruben Adame	Democratic	Cochise	1
+AZ-04003-county	Cochise County Constable Precinct 3	0	Jon Drummond	Republican	Cochise	1
+AZ-04003-county	Cochise County Constable Precinct 5	0	Melissa Wirthlin	Republican	Cochise	1
+AZ-04003-county	Cochise County Superior Court Judge Division 1	0	Joel Larson	Democratic	Cochise	1
+AZ-04003-county	Cochise County Superior Court Judge Division 2	0	Deana Champagne	Republican	Cochise	1
+AZ-04003-county	Cochise County Superior Court Judge Division 3	0	David Thorn	Republican	Cochise	1
 MI-26135	Fairview Area Schools Board Member	0	Gary R. Wnuk	Nonpartisan	Oscoda	3
 MI-26135	Fairview Area Schools Board Member	0	Michael Alchin	Nonpartisan	Oscoda	3
 MI-26135	Fairview Area Schools Board Member	0	David Miron	Nonpartisan	Oscoda	3
@@ -3782,3 +3806,21 @@ KS-20047-townships	South Brown Township Clerk	0	Pat Janssen	Republican	Edwards	1
 KS-20047-townships	Trenton Township Clerk	0	Shelli Heinz	Republican	Edwards	1
 KS-20047-townships	Wayne Township Clerk	0	Bobi Cross	Republican	Edwards	1
 KS-20125-townships	Sycamore Township Clerk	0	Jamie Dewitt	Republican	Montgomery	1
+KS-20021-cities	Baxter Springs City Council Ward 1	0	William Parkison	Nonpartisan	Cherokee	1
+KS-20021-cities	Baxter Springs City Council Ward 2	0	Daniel Spaulding	Nonpartisan	Cherokee	1
+KS-20021-cities	Baxter Springs City Council Ward 3	0	Nathan E Turner	Nonpartisan	Cherokee	1
+KS-20021-cities	Columbus City Council Ward 1	0	Laura Epler	Nonpartisan	Cherokee	1
+KS-20021-cities	Columbus City Council Ward 3	0	Hollie Damrill	Nonpartisan	Cherokee	1
+KS-20021-cities	Columbus City Council Ward 5	0	Kathy Doherty	Nonpartisan	Cherokee	1
+KS-20021-cities	Columbus Hospital Board Trustee Position 1	0	Corey Tedlock	Nonpartisan	Cherokee	1
+KS-20125-cities	Caney City Council	0	Justin Lyons	Nonpartisan	Montgomery	
+KS-20125-cities	Caney City Council	0	Bart Gulick	Nonpartisan	Montgomery	
+KS-20125-cities	Caney City Council	0	Jesse Hilyard	Nonpartisan	Montgomery	
+KS-20125-cities	Caney City Council	0	Jeff Culver	Nonpartisan	Montgomery	
+KS-20125-cities	Caney City Council	0	Debora Wood	Nonpartisan	Montgomery	
+KS-20125-cities	Caney City Council	0	Elizabeth L. Burch	Nonpartisan	Montgomery	
+KS-20125-cities	Caney City Council	0	Becky J. Dye	Nonpartisan	Montgomery	
+KS-20077-townships	Township 1 Township Clerk	0	Aaron Smith	Republican	Harper	1
+KS-20077-townships	Township 2 Township Clerk	0	Mary Waldschmidt	Republican	Harper	1
+KS-20077-townships	Township 3 Township Clerk	0	Inslee Albright	Republican	Harper	1
+KS-20077-townships	Township 5 Township Clerk	0	Clyde Ghere	Republican	Harper	1
