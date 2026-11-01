@@ -21,13 +21,14 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ITEMS = {
     1990: ("micro_IA40706939_0340", date(1990, 11, 6), (2, 3, 4, 5)),
+    1994: ("micro_IA40706953_0275", date(1994, 11, 8), (2, 3, 4, 5, 6, 7)),
 }
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()
 }
-OFFICES = {"senate": "senate", "governor": "governor"}
-ERRATA = {(1990, ("senate", 0))}
+OFFICES = {"senate": "senate", "governor": "governor", "unexpired": "senate:special"}
+ERRATA = {(1990, ("senate", 0)), (1994, ("governor", 0))}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = False
@@ -60,6 +61,8 @@ def emit() -> Path:
         for year, (url, landing, day, numbers) in VOLUMES.items():
             title = TITLE.format(day=day)
             sources[year] = cs.source(PUBLISHER, title)
+            if conn.execute("select 1 from result_set where source_id = %s limit 1", [sources[year]]).fetchone():
+                continue
             cs.add(
                 "source",
                 id=sources[year],
@@ -88,6 +91,7 @@ def emit() -> Path:
                     width=width,
                     height=height,
                 )
+        pages_years = {y for y, _ in pages}
         counties: dict[str, UUID] = {
             house_books._plain(text): unit
             for text, unit in conn.execute(
@@ -146,6 +150,8 @@ def emit() -> Path:
                 )
 
         for (year, kind), rows in frame.group_by("year", "state", maintain_order=True):
+            if int(year) not in pages_years:
+                continue
             day = VOLUMES[int(year)][2]
             key = f"{day:%Y-%m-%d}:TN:{OFFICES[str(kind)]}"
             ((contest, election),) = conn.execute(
