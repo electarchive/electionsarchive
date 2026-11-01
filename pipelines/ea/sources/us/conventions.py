@@ -1124,6 +1124,10 @@ CORRECTIONS = {
         (213, "TN", (0.1, 0.330, 0.9, 0.362), {"Absent": 0.5}, "listed as absent below the tabulation"),
         (213, "PA", (0.1, 0.330, 0.9, 0.362), {"Absent": 1}, "listed as absent below the tabulation"),
     ],
+    "1916:republican:b3": [
+        (235, "NH", (0.440, 0.183, 0.500, 0.197), {"Hughes": 8}, "8, all of the delegation for Hughes; a speck follows the figure"),
+        (235, "VA", (0.520, 0.419, 0.580, 0.433), {"Roosevelt": 0}, "none for Roosevelt: the row's 15 votes are all for Hughes, and the printed Roosevelt total of 18½ leaves the 15 printed under his name uncounted"),
+    ],
     "1916:republican:b2": [
         (216, "PA", (0.0, 0.276, 1.0, 0.288), {"Absent": 1}, "listed as absent below the tabulation"),
         (216, "CA", (0.0, 0.276, 1.0, 0.288), {"Absent": 1}, "listed as absent below the tabulation"),
