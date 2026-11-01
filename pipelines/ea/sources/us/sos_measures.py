@@ -23,6 +23,13 @@ from PIL import Image
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import ak_sovc, ca_catb, fl_sos, gov_counties, ri_countbook
+from ea.sources.us.ca_catb_early import (
+    CA_CATB_EARLY,
+    CA_CATB_EARLY_INITIATIVES,
+    CA_CATB_EARLY_REFERENDA,
+    CA_CATB_EARLY_TITLES,
+    CA_CATB_LABELS,
+)
 from ea.sources.us.ca_catb_totals import CA_CATB_INITIATIVES, CA_CATB_REFERENDA, CA_CATB_TITLES, CA_CATB_TOTALS
 from ea.sources.us.ca_totals import CA_INITIATIVES, CA_TITLES, CA_TOTALS
 from ea.store import DATA, connect
@@ -2537,7 +2544,7 @@ def fetch() -> None:
     for rows in CA_TOTALS.values():
         for url in {row[3] for row in rows}:
             raw.fetch(SOURCE, url, suffix=".pdf")
-    for rows in CA_CATB_TOTALS.values():
+    for rows in (CA_CATB_TOTALS | CA_CATB_EARLY).values():
         for url in {row[3] for row in rows}:
             try:
                 raw.cached(SOURCE, url)
@@ -5849,13 +5856,14 @@ def california_totals() -> list[dict[str, object]]:
 
 def california_catb() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
-    for day, entries in CA_CATB_TOTALS.items():
+    titles = CA_CATB_TITLES | CA_CATB_EARLY_TITLES
+    for day, entries in (CA_CATB_TOTALS | CA_CATB_EARLY).items():
         for number, yes, no, url, page, yes_box, no_box in entries:
             kind = (
                 "Initiative"
-                if (day, number) in CA_CATB_INITIATIVES
+                if (day, number) in CA_CATB_INITIATIVES | CA_CATB_EARLY_INITIATIVES
                 else "Popular Referendum"
-                if (day, number) in CA_CATB_REFERENDA
+                if (day, number) in CA_CATB_REFERENDA | CA_CATB_EARLY_REFERENDA
                 else "Legislative Referendum"
             )
             for answer, votes, box in (("YES", yes, yes_box), ("NO", no, no_box)):
@@ -5864,8 +5872,8 @@ def california_catb() -> list[dict[str, object]]:
                         "state": "CA",
                         "day": day,
                         "number": number,
-                        "label": f"Proposition {number}",
-                        "title": CA_CATB_TITLES[day, number],
+                        "label": CA_CATB_LABELS.get((day, number), f"Proposition {number}"),
+                        "title": titles[day, number],
                         "kind": kind,
                         "url": url,
                         "county": "statewide",
