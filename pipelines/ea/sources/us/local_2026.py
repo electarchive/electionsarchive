@@ -4178,6 +4178,20 @@ for key, publisher, title, url, local in (
         "../manual/MF-392/hays/Hays County Combined Sample Ballot 11x17.pdf",
     ),
     (
+        "TX-48209-sd",
+        "Hays County Elections Administrator",
+        "Combined Sample Ballot, Crystal Clear Special Utility District and Hays Trinity Groundwater Conservation District, November 3, 2026",
+        "manual-fetch:MF-523",
+        "../manual/MF-523/Hays County Combined Sample Ballot 11x17.pdf",
+    ),
+    (
+        "TX-48209-udc",
+        "Hays County Elections Administrator",
+        "Certifications of unopposed candidates and orders of cancellation, November 3, 2026 district elections",
+        "manual-fetch:MF-523",
+        "../manual/MF-523/EAA - Certification of Unopposed Candidates.pdf",
+    ),
+    (
         "TX-48491-jarrell",
         "Williamson County Elections",
         "Comprehensive Sample Ballot, City of Jarrell, November 3, 2026",
@@ -6836,7 +6850,7 @@ KY_CITY_SPELLINGS = {
     ("TODD", "Gurthrie"): "Guthrie",
     ("TRIMBLE", "Trimble Milton"): "Milton",
 }
-TACIT_FEEDS = {"CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud", "TX-48355-fb"}
+TACIT_FEEDS = {"TX-48209-udc", "CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud", "TX-48355-fb"}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
