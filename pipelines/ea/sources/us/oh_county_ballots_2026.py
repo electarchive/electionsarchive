@@ -36,7 +36,20 @@ MF_LOOKUP = (
     "Ashtabula Athens Tuscarawas Mahoning Licking Perry Clark Greene Harrison Geauga Richland Fulton Portage Lucas"
 ).split()
 MF_555 = DATA / "inbox" / "manual" / "MF-555"
-MF_555_COUNTIES = ["Meigs", "Medina"]
+MF_555_COUNTIES = [
+    "Meigs",
+    "Medina",
+    "Adams",
+    "Belmont",
+    "Clinton",
+    "Columbiana",
+    "Delaware",
+    "Erie",
+    "Guernsey",
+    "Lake",
+    "Preble",
+    "Putnam",
+]
 MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
