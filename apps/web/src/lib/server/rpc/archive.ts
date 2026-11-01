@@ -86,6 +86,9 @@ const MEASURES = new Map([
   [11, "electoral_votes"],
   [12, "state_delegate_equivalents"],
   [27, "caucus_delegates"],
+  [28, "pledged_delegates"],
+  [29, "automatic_delegates"],
+  [30, "delegation"],
 ]);
 const KINDS = ["shared", "each", "combined"] as const;
 const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
