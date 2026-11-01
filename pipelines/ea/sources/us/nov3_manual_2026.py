@@ -1136,7 +1136,14 @@ COUNTIES = {
 }
 
 
+def check_counties() -> None:
+    unmapped = sorted({row["county_fips"] for row in json.loads(ROWS_FILE.read_text())} - set(COUNTIES))
+    if unmapped:
+        raise ValueError(f"nov3_manual_2026.json keys with no COUNTIES entry: {', '.join(unmapped)}")
+
+
 def fetch() -> None:
+    check_counties()
     for _, url, file in COUNTIES.values():
         try:
             raw.cached(SOURCE, url)
@@ -1154,6 +1161,7 @@ def fetch() -> None:
 
 
 def parse() -> None:
+    check_counties()
     PARSED.mkdir(parents=True, exist_ok=True)
     rows = [
         {
@@ -1172,6 +1180,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
+    check_counties()
     frame = pl.read_parquet(PARSED / "measures.parquet")
     with connect() as conn:
         cs = Changeset(
