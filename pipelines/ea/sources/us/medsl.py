@@ -735,6 +735,7 @@ def attach(
     declared: dict[str, tuple[str, str]] | None = None,
     empty: bool = False,
     restage: bool = False,
+    accepted: frozenset[str] = frozenset(),
 ) -> None:
     declared = declared or {}
     tag = str(cs.manifest["pipeline"])
@@ -934,7 +935,12 @@ def attach(
         if overcounted and authoritative is None:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
             continue
-        if undercounted and (strict or authoritative is None and ":" in chamber) and (partial is None or held_back):
+        if (
+            undercounted
+            and key not in accepted
+            and (strict or authoritative is None and ":" in chamber)
+            and (partial is None or held_back)
+        ):
             print(f"{key}: a candidate's county sum falls short of the FEC total, skipped")
             continue
         pooled = tallies.with_columns(

@@ -171,6 +171,7 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "counties.parquet"),
             {"NE": source},
             strict=True,
+            accepted=frozenset({"2012-11-06:NE:legislature:41:g"}),
             authoritative="Source: the Secretary of State's canvass book, whose county rows add up to each candidate's printed total.",
         )
         return cs.write()
