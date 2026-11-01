@@ -37,6 +37,7 @@ METHOD = (
     "National delegates appear as seats won where the table gives the actual count, not an estimate."
 )
 CONVENTIONS = {
+    (2008, "Republican", "AS"),
     (2008, "Republican", "WY"),
     (2016, "Republican", "AS"),
     (2016, "Republican", "CO"),
