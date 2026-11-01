@@ -12484,7 +12484,7 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
       join anchors x on x.id = p.id
       where ST_Area(p.geom) >= x.area * 0.05 or ST_DWithin(p.geom, x.hull, 2)
     ),
-    framed as (
+    framed as materialized (
       select ST_Transform(ST_SetSRID(ST_Extent(${plane("geom", "scheme")})::geometry, 3857), 4326) as box
       from kept
     )
