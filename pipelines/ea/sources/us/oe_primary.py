@@ -295,7 +295,7 @@ def parse() -> None:
                     .then(pl.lit("president"))
                     .when(
                         (office.str.contains(openelections.SENATE.pattern) | (office == "senate") & (state == "WI"))
-                        & ~office.str.contains("state")
+                        & ~office.str.contains(r"\bstate\b")
                     )
                     .then(
                         pl.when(office.str.contains("special|unexpired"))
