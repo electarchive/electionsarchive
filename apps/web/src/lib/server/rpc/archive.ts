@@ -12645,7 +12645,7 @@ export async function decide(ids: Array<string>) {
       select id, id, 0 from ids
       union all
       select back.root, c.previous_round_id, back.depth + 1 from back join contest c on c.id = back.id
-      where c.previous_round_id is not null and back.depth < 8
+      where c.previous_round_id is not null and back.depth < 64
     ),
     ahead(root, id, depth, held, date, kind) as (
       select id, id, 0, true, null::date, null::text from ids
@@ -12660,7 +12660,7 @@ export async function decide(ids: Array<string>) {
         where n.previous_round_id = ahead.id and ne.status::text not in ('canceled', 'annulled')
         order by ne.date_from, n.round_number desc, n.id limit 1
       ) n
-      where ahead.held and ahead.depth < 8
+      where ahead.held and ahead.depth < 64
     ),
     ends as (
       select i.id, f.id as first, l.id as final, n.id as next, n.date::text as date,
