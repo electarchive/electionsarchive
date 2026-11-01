@@ -36,6 +36,13 @@ METHOD = (
     "Statewide totals from the results table in the English Wikipedia's {article}, as fetched in October 2026. "
     "National delegates appear as seats won where the table gives the actual count, not an estimate."
 )
+CONVENTIONS = {
+    (2008, "Republican", "WY"),
+    (2016, "Republican", "AS"),
+    (2016, "Republican", "CO"),
+    (2016, "Republican", "GU"),
+    (2016, "Republican", "ND"),
+}
 VOTES = {(2004, "Democratic", "NM"), (2016, "Democratic", "KS"), (2008, "Democratic", "ND"), (2008, "Republican", "ME")}
 ALIASES = {
     "Joe Lieberman": "Joseph Lieberman",
@@ -384,7 +391,7 @@ def parse() -> None:
             kind = (
                 "uncommitted"
                 if re.match(
-                    r"uncommitted|noncommitted|no preference|uninstructed|undecided|undeclared",
+                    r"uncommitted|unbound|noncommitted|no preference|uninstructed|undecided|undeclared",
                     candidate,
                     re.IGNORECASE,
                 )
@@ -530,10 +537,11 @@ def emit() -> Path:
                 held += 1
                 continue
             day = lines["day"][0]
-            caucus = bool(lines["caucus"][0])
+            convention = (year, party, state) in CONVENTIONS and measure is None
+            caucus = bool(lines["caucus"][0]) and not convention
             nation, umbrella = nations[(year, lower)]
             place = PLACES[state]
-            event = "caucuses" if caucus else "presidential-primary"
+            event = "caucuses" if caucus or convention else "presidential-primary"
             election_key = f"{day}:{state}:{lower}-{event}"
             election = cs.key("us.election", election_key)
             cs.add(
@@ -541,12 +549,14 @@ def emit() -> Path:
                 id=election,
                 polity_id=cs.polity(f"US-{state}"),
                 parent_id=umbrella,
-                kind="caucus" if caucus else "primary",
+                kind="indirect" if convention else "caucus" if caucus else "primary",
                 date_from=day,
                 date_to=day,
                 status="held",
             )
-            title = f"{year} {place} {party} " + ("caucuses" if caucus else "presidential primary")
+            title = f"{year} {place} {party} " + (
+                "convention" if convention else "caucuses" if caucus else "presidential primary"
+            )
             name(election, title)
             cs.add("slug", path=f"us/{state.lower()}/{day}-{lower}-{event}", entity_id=election)
             contest_key = f"{day}:{state}:president:{lower}"
@@ -592,7 +602,11 @@ def emit() -> Path:
                 body_md=(
                     METHOD.format(article=article)
                     + {
-                        None: " The caucus reported national delegates only, so no votes are recorded.",
+                        None: (
+                            " The convention reported national delegates only, so no votes are recorded."
+                            if convention
+                            else " The caucus reported national delegates only, so no votes are recorded."
+                        ),
                         1: "",
                         12: " Iowa Democrats report state delegate equivalents, not votes.",
                         17: (
@@ -620,7 +634,7 @@ def emit() -> Path:
                     kind="caveat",
                     body_md=f"The article's total line counts {total - counted:,.0f} more than its candidate rows.",
                 )
-            for candidate, kind_of, number, delegates, final, convention in lines.select(
+            for candidate, kind_of, number, delegates, final, tier_votes in lines.select(
                 "candidate", "kind", "value", "delegates", "final", "convention"
             ).iter_rows():
                 option_key = f"{contest_key}:{slug(candidate)}"
@@ -631,11 +645,11 @@ def emit() -> Path:
                     contest_id=contest,
                     kind=kind_of,
                     party_id=cs.key("us.party", f"{lower}-party") if kind_of == "candidate" else None,
-                    ballot_label=candidate,
+                    ballot_label="Unbound" if convention and kind_of == "uncommitted" else candidate,
                 )
                 if number is not None and measure is not None:
                     values.append((str(result_set), str(units[state]), str(option), number, measure))
-                for extra, code in ((final, 18), (convention, measures.get("caucus_delegates"))):
+                for extra, code in ((final, 18), (tier_votes, measures.get("caucus_delegates"))):
                     if extra is not None and code is not None:
                         values.append((str(result_set), str(units[state]), str(option), extra, code))
                 if delegates:
