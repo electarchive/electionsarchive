@@ -11158,18 +11158,15 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                 seats = int(group["seats"][0] or 1)
                 seat = title.split(", ", 1)[1] if group["pinned"][0] else None
                 holder = tail.rsplit(":", 1)[0] if seat else tail
-                office = (
-                    offices.key(cs, holder, polity, "other", f"{place} {title.split(', ')[0].removeprefix('County ')}")
-                    if seats == 1
-                    else cs.key("us.body", holder)
-                )
+                held = f"{place} {(title if seats == 1 and seat is None else title.split(', ')[0]).removeprefix('County ')}"
+                office = offices.key(cs, holder, polity, "other", held) if seats == 1 else cs.key("us.body", holder)
                 if office in cs.minted and office not in made:
                     made.add(office)
                     if seats == 1:
                         cs.add("office", id=office, polity_id=polity, kind="other")
                     else:
                         cs.add("body", id=office, polity_id=polity, kind="council")
-                    name(office, f"{place} {title.split(', ')[0].removeprefix('County ')}")
+                    name(office, held)
                 area = cs.area("us.county", county)
                 if seat and slug(seat) != "at-large":
                     area = cs.area("us.local_district", tail)
