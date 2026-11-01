@@ -1041,7 +1041,7 @@ def plan(
             continue
         work.append((state, contest_key, found[0], group, None))
     for state in local["state"].unique(maintain_order=True):
-        published: dict[UUID, tuple[str, set[str]]] = {}
+        published: dict[UUID, tuple[list[str], set[str]]] = {}
         titles: dict[UUID, set[str]] = {}
         held: dict[UUID, tuple[UUID | None, datetime]] = {}
         statewide: set[UUID] = set()
@@ -1058,7 +1058,7 @@ def plan(
             [f"{DAY}:{state}:%"],
         ).fetchall():
             if not re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
-                published[id] = (key, set())
+                published.setdefault(id, ([], set()))[0].append(key)
                 held[id] = (area, recorded)
                 if level:
                     statewide.add(id)
@@ -1091,7 +1091,7 @@ def plan(
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
                where u.scheme_code = 'us.place' and u.code = any(%s)""",
-            [list({key.split(":")[2] for key, _ in published.values()})],
+            [list({key.split(":")[2] for keys, _ in published.values() for key in keys})],
         ).fetchall():
             towns.setdefault(code, set()).update(
                 w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | {"township", "charter", "village"}
@@ -1113,7 +1113,9 @@ def plan(
             people: frozenset[str], words: set[str], places: list[str], wide: bool, seat: tuple[str, str] | None = None
         ):
             scored = []
-            for contest, (key, wanted) in published.items():
+            for contest, key, wanted in (
+                (contest, key, wanted) for contest, (keys, wanted) in published.items() for key in keys
+            ):
                 segment = key.split(":")[2]
                 if wide:
                     if contest not in statewide or (seat and seats.get(contest, seat) != seat):
@@ -1230,7 +1232,7 @@ def plan(
             """select o.id, o.kind, coalesce(case when o.kind = 'answer' then o.ballot_label end, ca.ballot_name, o.ballot_label, '')
                from contest_option o
                left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
-               where o.contest_id = %s and o.parent_option_id is null""",
+               where o.contest_id = %s and o.parent_option_id is null order by o.id""",
             [contest],
         ).fetchall()
         named: list[tuple[UUID, list[str]]] = []
@@ -1238,7 +1240,7 @@ def plan(
         for option, kind, label in options:
             if kind == "write_in":
                 scattered = option
-            else:
+            elif all(words != terms(label) for _, words in named):
                 named.append((option, terms(label)))
         ballots: dict[str, UUID] = {}
         for name, write_in in group.select("candidate", "write_in").unique().iter_rows():
