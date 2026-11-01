@@ -13,10 +13,14 @@ from ea.sources.tr.ysk_mayors import page
 from ea.store import connect
 
 SOURCE = "tr.mayor_candidates"
-VERSION = "9"
+VERSION = "10"
 TITLE = "Turkish Wikipedia: per-province Türkiye yerel seçimleri articles, metropolitan mayoral tables"
 OLD = (1963, 1973)
 CHANGES = Path(__file__).with_name("mayor_candidates_unpublished.tsv")
+
+
+def independent(abbreviation: str, label: str, names: str) -> bool:
+    return fold(abbreviation or label).startswith(("bgmsz", "bagimsiz")) or fold(names) == ""
 
 
 def fetch() -> None:
@@ -114,9 +118,10 @@ def emit() -> Path:
         ).fetchall():
             if value.rsplit(":", 2)[0] in contests:
                 stable.setdefault(contest, value.rsplit(":", 2)[0])
-        primary = dict(stable)
-        for key, (contest, _) in contests.items():
-            primary.setdefault(contest, key)
+        primary = {contest: key for key, (contest, _) in contests.items()}
+        for contest, key in stable.items():
+            if key != primary[contest]:
+                cs.renamed[primary[contest]] = key
         declared: dict[UUID, UUID] = {}
         sets: dict[int, UUID] = {}
         for k, set_id, contest in conn.execute(
@@ -159,8 +164,9 @@ def emit() -> Path:
         winners = dict(
             conn.execute(
                 """select t.contest_id, t.person_id from tenure t join changeset cs on cs.id = t.changeset_id
-                   where t.contest_id = any(%s) and cs.pipeline <> %s""",
-                [[contest for contest, _ in contests.values()], SOURCE],
+                   where t.contest_id = any(%s) and cs.pipeline <> %s
+                     and not exists (select from external_id x where x.entity_id = t.id and x.scheme = %s)""",
+                [[contest for contest, _ in contests.values()], SOURCE, f"{SOURCE}.tenure"],
             ).fetchall()
         )
         held = {
@@ -176,19 +182,33 @@ def emit() -> Path:
         for key, (contest, _) in contests.items():
             if primary[contest] == key and contest not in held and by_votes[contest] and int(key[:4]) in (*OLD, 2004):
                 index[(int(key[:4]), max(by_votes[contest]))].append(key)
-        claimed: Counter[str] = Counter()
-        matched: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
-        for year, rows in municipal:
-            votes = {row[3] for row in rows if row[3] > 0}
-            hits = [
-                key
-                for key in index.get((year, max(votes, default=0)), [])
-                if len(votes) > 1 and votes <= set(by_votes[contests[key][0]])
-            ]
-            if len(hits) == 1:
-                matched[(year, hits[0])] = rows
-                claimed[hits[0]] += 1
-        found.update({key: rows for key, rows in matched.items() if claimed[key[1]] == 1})
+        taken = {key for (_, key) in found}
+        placed: set[int] = set()
+        for loose in (False, True):
+            claimed: Counter[str] = Counter()
+            matched: dict[tuple[int, str], tuple[int, list[tuple[str, str, str, int]]]] = {}
+            for table, (year, rows) in enumerate(municipal):
+                votes = {row[3] for row in rows if row[3] > 0}
+                parties = {row[3] for row in rows if row[3] > 0 and not independent(*row[:3])}
+                hits = [
+                    key
+                    for key in index.get((year, max(votes, default=0)), [])
+                    if key not in taken
+                    and (
+                        len(parties) > 1
+                        and len(parties - set(by_votes[contests[key][0]])) <= (1 if len(parties) > 2 else 0)
+                        if loose
+                        else len(votes) > 1 and votes <= set(by_votes[contests[key][0]])
+                    )
+                ]
+                if table not in placed and len(hits) == 1:
+                    matched[(year, hits[0])] = (table, rows)
+                    claimed[hits[0]] += 1
+            for (year, key), (table, rows) in matched.items():
+                if claimed[key] == 1:
+                    found[(year, key)] = rows
+                    taken.add(key)
+                    placed.add(table)
         offices: dict[tuple[UUID, str], set[UUID]] = defaultdict(set)
         for office, person, text in conn.execute(
             """select t.office_id, t.person_id, n.text from tenure t join name n on n.entity_id = t.person_id
@@ -240,7 +260,7 @@ def emit() -> Path:
                 skipped.append((str(year), province, "no contest"))
                 continue
             contest, office = contests[contest_key]
-            contest_key = stable.get(contest, contest_key)
+            contest_key = primary[contest]
             if contest in held:
                 skipped.append((str(year), province, "contest already has candidacies"))
                 continue
@@ -252,9 +272,8 @@ def emit() -> Path:
                     party_id = option_party[option]
                     existing = votes
                 else:
-                    independent = fold(abbreviation or label).startswith(("bgmsz", "bagimsiz")) or fold(names) == ""
                     owner = None
-                    if not independent:
+                    if not independent(abbreviation, label, names):
                         for candidate in (label, upper(label), abbreviation):
                             try:
                                 owner = party(candidate, year)
@@ -359,7 +378,12 @@ def emit() -> Path:
                             valid_to=end,
                             valid_to_precision="month",
                         )
-                    cs.add("citation", entity_id=tenure, source_id=wiki, locator={"contest": contest_key})
+                    cs.add(
+                        "citation",
+                        entity_id=tenure,
+                        source_id=wiki,
+                        locator={"contest": stable.get(contest, contest_key)},
+                    )
         restaged = [str(row["id"]) for table in ("candidacy", "tenure") for row in cs.rows.get(table, [])]
         referenced = {str(row["person_id"]) for table in ("candidacy", "tenure") for row in cs.rows.get(table, [])}
         for (person,) in conn.execute(
