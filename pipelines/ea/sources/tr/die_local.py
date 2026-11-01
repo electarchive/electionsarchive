@@ -28,7 +28,7 @@ from ea.sources.tr.ysk_local import own_area, own_areas
 from ea.store import DATA, connect
 
 SOURCE = "tr.die_local"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 LIBRARY = "https://kutuphane.tuik.gov.tr/pdf"
@@ -414,7 +414,7 @@ NOISE = re.compile(r"[^\wçğıöşüÇĞİÖŞÜâîûÂÎÛ().\- ]")
 def tidy(text: str) -> tuple[str, str | None, bool]:
     bucak = "B.M" in text or "B. M" in text
     text = re.sub(r"\(\s*B\s*\.\s*M\s*\.?\s*\)", "", text)
-    text = NOISE.sub(" ", text)
+    text = re.sub(r"^\s*\d+[.,]\w*\s+", "", NOISE.sub(" ", text))
     alias = None
     found = re.search(r"\(([^)]+)\)", text)
     if found:
@@ -1248,6 +1248,7 @@ def emit() -> Path:
         )
         matched: list[str] = []
         minted_ilce: list[str] = []
+        spoken: dict[UUID, str] = {}
         areas = {unit: area for area, unit in equals.items()}
         spans = own_areas(conn)
         polities = {value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'")}
@@ -1674,6 +1675,8 @@ def emit() -> Path:
                 if person in cs.minted:
                     cs.add("person", id=person)
                     name(person, person_name)
+                else:
+                    spoken[person] = person_name
                 candidacy = cs.key("tr.candidacy", f"{contest_key}:1")
                 cs.add(
                     "candidacy",
@@ -1989,5 +1992,34 @@ def emit() -> Path:
                     "entity_retirement",
                     entity_id=unit,
                     reason="A 1963 or 1973 reporting unit the archive no longer uses, after re-reading which ilçe each town was in.",
+                )
+        for name_id, entity, text in conn.execute(
+            """select n.id::text, n.entity_id, n.text from name n join changeset ch on ch.id = n.changeset_id
+               where ch.pipeline = %s and n.is_preferred and n.entity_id = any(%s::uuid[])""",
+            [SOURCE, list(spoken)],
+        ).fetchall():
+            if text != spoken[entity]:
+                name(entity, spoken[entity])
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=entity,
+                    text=text,
+                    reason="A percentage from the next column read into the mayor's name.",
+                )
+        notes = {(str(row["entity_id"]), row["body_md"]) for row in cs.rows.get("note", [])}
+        noted = {entity for entity, _ in notes}
+        for note, entity, body in conn.execute(
+            """select n.id::text, n.entity_id::text, n.body_md from note n join changeset ch on ch.id = n.changeset_id
+               where ch.pipeline = %s and n.kind <> 'retired'""",
+            [SOURCE],
+        ).fetchall():
+            if entity in noted and (entity, body) not in notes:
+                cs.add(
+                    "note_drop",
+                    note_id=note,
+                    entity_id=entity,
+                    body_md=body,
+                    reason="Replaced by a corrected note after the archive re-read the mayor's name.",
                 )
         return cs.write()
