@@ -1868,4 +1868,24 @@ def emit() -> Path:
             cs.add("name", **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": fixed}, is_preferred=True)
             displayed[row[7]] += 1
         print(f"{displayed.total()} preferred names in capitals take mixed case: {dict(displayed.most_common())}")
+        respaced = {row["id"] for row in cs.rows.get("name", []) if row.get("id") is not None}
+        for row in cs.rows.get("name", []):
+            if row.get("is_preferred") and row.get("id") is None:
+                row["text"] = " ".join(str(row["text"]).split())
+                respaced.add(row["entity_id"])
+        spaced = 0
+        for row in conn.execute(
+            r"""select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from name n
+                where n.is_preferred and n.valid_from is null and n.valid_to is null and n.text ~ '\s\s|^\s|\s$|[^ \S]'
+                  and not exists (select from entity_merge m where m.entity_id = n.entity_id)""",
+        ).fetchall():
+            if row[0] in respaced or row[1] in respaced:
+                continue
+            cs.add(
+                "name",
+                **dict(zip(columns, row[:7], strict=True)) | {"id": None, "text": " ".join(row[2].split())},
+                is_preferred=True,
+            )
+            spaced += 1
+        print(f"{spaced} preferred names lose doubled or stray spaces")
         return cs.write()
