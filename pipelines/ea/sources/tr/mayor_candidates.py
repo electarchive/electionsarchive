@@ -100,9 +100,23 @@ def emit() -> Path:
                join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
                join changeset cs on cs.id = c.changeset_id
                where cs.pipeline in ('tr.ysk_local', 'tr.ysk_mayors', 'tr.die_local', 'tr.mayors_1984_1999') and c.kind = 'office'
-                 and x.value ~ '^(1963-11-17|1973-12-09|1984-03-25|1989-03-26|1994-03-27|1999-04-18|2004-03-28):.*-mayor$'"""
+                 and x.value ~ '^(1963-11-17|1973-12-09|1984-03-25|1989-03-26|1994-03-27|1999-04-18|2004-03-28):.*-mayor$'
+               order by x.changeset_id, x.value"""
         ).fetchall():
             contests[key] = (contest, office)
+        stable: dict[UUID, str] = {}
+        for contest, value in conn.execute(
+            """select o.contest_id, x.value from candidacy ca join contest_option o on o.id = ca.option_id
+               join external_id x on x.entity_id = ca.id and x.scheme = 'tr.candidacy'
+               join changeset cs on cs.id = ca.changeset_id
+               where cs.pipeline = %s and o.contest_id = any(%s) order by x.value""",
+            [SOURCE, [contest for contest, _ in contests.values()]],
+        ).fetchall():
+            if value.rsplit(":", 2)[0] in contests:
+                stable.setdefault(contest, value.rsplit(":", 2)[0])
+        primary = dict(stable)
+        for key, (contest, _) in contests.items():
+            primary.setdefault(contest, key)
         declared: dict[UUID, UUID] = {}
         sets: dict[int, UUID] = {}
         for k, set_id, contest in conn.execute(
@@ -144,8 +158,9 @@ def emit() -> Path:
                 by_votes[contest][int(tally[k])] = option
         winners = dict(
             conn.execute(
-                "select contest_id, person_id from tenure where contest_id = any(%s)",
-                [[contest for contest, _ in contests.values()]],
+                """select t.contest_id, t.person_id from tenure t join changeset cs on cs.id = t.changeset_id
+                   where t.contest_id = any(%s) and cs.pipeline <> %s""",
+                [[contest for contest, _ in contests.values()], SOURCE],
             ).fetchall()
         )
         held = {
@@ -159,7 +174,7 @@ def emit() -> Path:
         }
         index: dict[tuple[int, int], list[str]] = defaultdict(list)
         for key, (contest, _) in contests.items():
-            if contest not in held and by_votes[contest] and int(key[:4]) in (*OLD, 2004):
+            if primary[contest] == key and contest not in held and by_votes[contest] and int(key[:4]) in (*OLD, 2004):
                 index[(int(key[:4]), max(by_votes[contest]))].append(key)
         claimed: Counter[str] = Counter()
         matched: dict[tuple[int, str], list[tuple[str, str, str, int]]] = {}
@@ -181,16 +196,19 @@ def emit() -> Path:
             [[office for _, office in contests.values()]],
         ).fetchall():
             offices[(office, fold(text))].add(person)
-        known: dict[str, set[UUID]] = defaultdict(set)
+        known: dict[tuple[str, str], set[UUID]] = defaultdict(set)
         national: dict[str, set[UUID]] = defaultdict(set)
-        for person, text, tbmm in conn.execute(
+        for person, text, tbmm, provinces in conn.execute(
             """select n.entity_id, n.text, exists (select 1 from tenure t where t.person_id = n.entity_id
-                      and t.body_id = (select entity_id from external_id where scheme = 'tr.body' and value = 'tbmm'))
+                      and t.body_id = (select entity_id from external_id where scheme = 'tr.body' and value = 'tbmm')),
+                      array(select distinct split_part(s.path, '/', 2) from tenure t join office o on o.id = t.office_id
+                            join slug s on s.entity_id = o.polity_id and s.is_current where t.person_id = n.entity_id)
                from name n where n.entity_id in (
                    select t.person_id from tenure t join changeset cs on cs.id = t.changeset_id
                    where cs.pipeline like 'tr.%%')"""
         ).fetchall():
-            known[fold(text)].add(person)
+            for province in provinces:
+                known[(province, fold(text))].add(person)
             if tbmm:
                 national[fold(text)].add(person)
 
@@ -198,7 +216,7 @@ def emit() -> Path:
         made = 0
         by_belde: dict[tuple[str, str], list[str]] = defaultdict(list)
         for key in contests:
-            if contests[key][0] not in held:
+            if contests[key][0] not in held and primary[contests[key][0]] == key:
                 day, rest = key.split(":", 1)
                 by_belde[day, rest.removesuffix("-mayor").split("-")[-1]].append(key)
         wanted = {key for (_, key) in found}
@@ -222,6 +240,7 @@ def emit() -> Path:
                 skipped.append((str(year), province, "no contest"))
                 continue
             contest, office = contests[contest_key]
+            contest_key = stable.get(contest, contest_key)
             if contest in held:
                 skipped.append((str(year), province, "contest already has candidacies"))
                 continue
@@ -258,14 +277,34 @@ def emit() -> Path:
                         skipped.append((str(year), province, f"{abbreviation}: {votes} against {existing}"))
                         continue
                 name = names.split("; ")[0].strip()
-                matches = offices.get((office, fold(name))) or national.get(fold(name)) or known.get(fold(name), set())
+                unknown = fold(name) in ("", "*", "bilinmiyor")
+                region = contest_key.split(":", 1)[1].split("-")[0]
+                nearby = {
+                    region,
+                    *mayors_1984_1999.SUCCESSORS.get(region, ()),
+                    *(parent for parent, kids in mayors_1984_1999.SUCCESSORS.items() if region in kids),
+                }
+                matches = (
+                    set()
+                    if unknown
+                    else (
+                        offices.get((office, fold(name)))
+                        or national.get(fold(name))
+                        or {person for place in nearby for person in known.get((place, fold(name)), set())}
+                    )
+                )
                 is_winner = (abbreviation, label, names, votes) == leader and not tied
                 if is_winner and winners.get(contest) is not None:
                     matches = {winners[contest]}
                 if len(matches) == 1:
                     person = next(iter(matches))
                 else:
-                    person = cs.key(f"{SOURCE}.person", f"{contest_key}:{slug(name)}")
+                    person = cs.key(
+                        f"{SOURCE}.person",
+                        f"{contest_key}:{slug(abbreviation)}:{slug(name)}"
+                        if unknown
+                        else f"{contest_key}:{slug(name)}",
+                    )
                     if len(matches) > 1:
                         skipped.append((str(year), province, f"{name}: {len(matches)} namesakes, new person"))
                     if person in cs.minted:
@@ -321,6 +360,21 @@ def emit() -> Path:
                             valid_to_precision="month",
                         )
                     cs.add("citation", entity_id=tenure, source_id=wiki, locator={"contest": contest_key})
+        restaged = [str(row["id"]) for table in ("candidacy", "tenure") for row in cs.rows.get(table, [])]
+        referenced = {str(row["person_id"]) for table in ("candidacy", "tenure") for row in cs.rows.get(table, [])}
+        for (person,) in conn.execute(
+            """select p.id::text from person p join changeset ch on ch.id = p.changeset_id
+               where ch.pipeline = %s and not exists (select from entity_merge m where m.entity_id = p.id)
+                 and not exists (select from candidacy c where c.person_id = p.id and c.id <> all(%s::uuid[]))
+                 and not exists (select from tenure t where t.person_id = p.id and t.id <> all(%s::uuid[]))""",
+            [SOURCE, restaged, restaged],
+        ).fetchall():
+            if person not in referenced:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=person,
+                    reason="A candidate the archive minted before it matched the name to a person it already held.",
+                )
         with CHANGES.open("w", encoding="utf-8") as handle:
             handle.write("year\tprovince\treason\n")
             for row in skipped:
