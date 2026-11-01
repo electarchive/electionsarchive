@@ -1413,6 +1413,8 @@ LOCAL_BODY = re.compile(
 )
 IN_ALIASES = (
     (r"^centerpoint town\b", "center point town", None),
+    (r"^monroe city\b", "monroe city", "Monroe City"),
+    (r"^(zanesville town clerk treasurer) wells allen$", r"\1", None),
     (r"^anderson school board\b", "anderson community school corporation school board", None),
     (r"^lewis cass school board\b", "lewis cass schools school board", None),
     (r"^msd of shakamak\b", "shakamak schools metropolitan school district school board", None),
