@@ -2,6 +2,7 @@ import base64
 import json
 import re
 from datetime import UTC, date, datetime
+from itertools import pairwise
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -174,109 +175,70 @@ def volume(
     return specs
 
 
+def ballots(item: str, year: str, windows: dict[int, tuple[int, int]]) -> list[dict[str, object]]:
+    return [
+        {
+            "table": f"{year}:republican" if len(windows) == 1 else f"{year}:republican:b{n}",
+            "item": item,
+            "leaves": tuple(range(low, high + 1)),
+            "ballot": n,
+        }
+        for n, (low, high) in windows.items()
+    ]
+
+
+def leaves(item: str, year: str, found: dict[str, tuple[int, ...]]) -> list[dict[str, object]]:
+    return [
+        {"table": f"{year}:republican" if name == "" else f"{year}:republican:{name}", "item": item, "leaves": spec}
+        for name, spec in found.items()
+    ]
+
+
+ROLL_1880 = (214, 219, 223, 224, 226, 227, 229, 230, 232, 233, 235, 238, 239, 241, 242, 244, 246, 247, 251, 252, 254, 255, 257, 258, 260, 262, 264, 266, 269, 276, 279, 281, 282, 284, 286, 287, 290)  # fmt: skip
 TABLES += [
-    *volume(
+    *leaves(
         "officialreportof00repuiala",
         "1920",
-        1,
-        1,
         {
-            "b1": [228, 231],
-            "b2": [233, 234],
-            "b3": [236, 237],
-            "b4": [241, 242],
-            "b5": 248,
-            "b6": [249, 250],
-            "b7": [253, 254],
-            "b8": [260, 261],
-            "b9": [263, 264],
-            "b10": 270,
+            "b1": (227, 230),
+            "b2": (232, 233),
+            "b3": (235,),
+            "b4": (240, 241),
+            "b5": (247,),
+            "b6": (248, 249),
+            "b7": (252, 253),
+            "b8": (259, 260),
+            "b9": (262, 263),
+            "b10": (269,),
         },
     ),
-    *volume("officialreportsi00repuiala", "1916", 0, 1, {"b1": 213, "b2": 215, "b3": 216}),
-    *volume(
-        "officialreportfi00repuiala", "1912", 0, 2, {"p220": 220, "p224": 224, "p232": 232, "p257": 257, "p427": 427}
-    ),
-    *volume("officialreporto00repu", "1908", 0, 2, {"p150": 150, "p181": 181}),
-    *volume("officialproceedi00repuiala", "1904", 0, 2, {"p171": 171}),
-    *volume("12threpubnaticon00blumrich", "1900", 0, 2, {"p158": 158}),
-    *volume("officialproceedi00repu", "1896", 0, 2, {"p133": 133}),
-    *volume("proceedingsoften00repu", "1892", 0, 2, {"p89": 89, "p92": 92}),
-    *volume(
-        "officialproceedi00repu_0",
-        "1888",
-        1,
-        1,
-        {
-            "b1": 381,
-            "b2": 385,
-            "b3": 389,
-            "b4": 396,
-            "b5": 398,
-            "b6": 408,
-            "b7": 411,
-            "b8": 416,
-        },
-    ),
-    *volume("proceedingsofeig00repu", "1884", 0, 1, {"b1": 146, "b2": 154, "b3": 159, "b4": 162}),
-    *volume(
+    *leaves("officialreportsi00repuiala", "1916", {"b1": (212,)}),
+    *ballots("officialreportsi00repuiala", "1916", {2: (214, 216), 3: (216, 220)}),
+    *ballots("officialreportfi00repuiala", "1912", {1: (442, 448)}),
+    *ballots("officialreporto00repu", "1908", {1: (236, 242)}),
+    *ballots("officialproceedi00repuiala", "1904", {1: (209, 214)}),
+    *leaves("12threpubnaticon00blumrich", "1900", {"": (157,)}),
+    *leaves("officialproceedi00repu", "1896", {"": (132,)}),
+    *ballots("proceedingsoften00repu", "1892", {1: (144, 150)}),
+    *leaves("officialproceedi00repu_0", "1888", {"b1": (380,), "b2": (383, 384), "b5": (397,), "b7": (410,)}),
+    *ballots("officialproceedi00repu_0", "1888", {3: (386, 393), 4: (394, 396), 6: (406, 408), 8: (416, 418)}),
+    *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
+    *ballots("proceedingsofeig00repu", "1884", {1: (148, 152), 2: (153, 157), 4: (165, 176)}),
+    *ballots(
         "proceedingsofrep00inrepu",
         "1880",
-        0,
-        2,
         {
-            f"p{page}": page
-            for page in (
-                176,
-                221,
-                225,
-                226,
-                228,
-                229,
-                231,
-                232,
-                234,
-                235,
-                237,
-                241,
-                243,
-                248,
-                253,
-                254,
-                256,
-                260,
-                262,
-                266,
-                268,
-                269,
-                271,
-                281,
-                283,
-                284,
-                286,
-                288,
-                312,
-            )
+            n: (page, min(max(after, page + 1), page + 4))
+            for n, (page, after) in enumerate(pairwise(ROLL_1880), start=1)
         },
     ),
-    *volume(
+    *leaves(
         "proceedingsrepu00nelsgoog",
         "1876",
-        0,
-        1,
-        {
-            "b1": 84,
-            "b2": 87,
-            "b3": 100,
-            "b4": 102,
-            "b5": 104,
-            "b6": 106,
-            "b7": 109,
-        },
+        {"b1": (84,), "b2": (87,), "b5": (103, 104), "b6": (105, 106), "b7": (108, 109)},
     ),
-    *volume("presidentialele00conggoog", "1872", 0, 2, {"p34": 34}),
-    *volume("presidentialelec00repu", "1868", 0, 2, {"p98": 98}),
-    *volume("proceedingsoffir00inrepu", "1856-64", 0, 2, {f"p{page}": page for page in (135, 163, 171, 234, 250)}),
+    *ballots("proceedingsrepu00nelsgoog", "1876", {3: (100, 101), 4: (101, 102)}),
+    {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
 DNC = [
     ("proceedingsofde00demo", "1852", {f"p{page}": page for page in range(30, 69)}),
@@ -326,6 +288,14 @@ FIRST_1968 = (
 )
 READS = {"a": "low", "b": "medium"}
 PROMPT = "1"
+BALLOT = (
+    " Read only the tabulation of the {} ballot for the presidential nomination (where the convention took a "
+    "single ballot, the roll call that nominated the candidate for president). The page may hold only the beginning "
+    "or the end of that tabulation, or none of it; rows at the top of the page that continue a table from the "
+    "previous page belong to the ballot before the first one captioned on this page. Leave out every other "
+    "ballot's tabulation, any poll of a single delegation by name, and any vote of yeas and nays on a motion. If no "
+    "part of that ballot's tabulation is on this page, return an empty header and no rows."
+)
 ROLL = (
     "This page is from the official report of the proceedings of a national party convention. Read the tabulation "
     "of the ballot for president: one row per state or territory, in the order printed, including any totals row "
@@ -343,7 +313,9 @@ ABBREVIATIONS = {
     "ndak": "ND", "okla": "OK", "ore": "OR", "oreg": "OR", "pa": "PA", "pr": "PR", "ri": "RI", "sc": "SC",
     "sd": "SD", "sdak": "SD", "tenn": "TN", "tex": "TX", "vt": "VT", "va": "VA", "vi": "VI", "wash": "WA",
     "wva": "WV", "wis": "WI", "wisc": "WI", "wyo": "WY", "virginislands": "VI", "puertorico": "PR",
-    "districtofcolumbia": "DC", "canalzone": "CZ", "nocar": "NC", "nodak": "ND", "socar": "SC", "sodak": "SD",
+    "districtofcolumbia": "DC", "distofcolumbia": "DC", "portorico": "PR", "philippineislands": "PH",
+    "philippines": "PH", "phillippines": "PH", "dakota": "DT", "indianterritory": "IT", "dalaware": "DE",
+    "southsarolina": "SC", "canalzone": "CZ", "nocar": "NC", "nodak": "ND", "socar": "SC", "sodak": "SD",
 }  # fmt: skip
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
 PAGES = DATA / "pages" / SOURCE
@@ -364,7 +336,8 @@ def fetch() -> None:
             image = raw.fetch(SOURCE, LEAF.format(item=spec["item"], leaf=leaf), suffix=".jpg")
             data = base64.b64encode(image.path.read_bytes()).decode()
             for effort in READS.values():
-                wanted[read_key(effort, image.sha256)] = (
+                ask = ROLL if spec.get("ballot") is None else ROLL + BALLOT.format(ordinal(spec["ballot"]))
+                wanted[read_key(effort, image.sha256, spec.get("ballot"))] = (
                     MessageCreateParamsNonStreaming(
                         model="claude-haiku-5-5",
                         max_tokens=16000,
@@ -377,7 +350,7 @@ def fetch() -> None:
                                         "type": "image",
                                         "source": {"type": "base64", "media_type": "image/jpeg", "data": data},
                                     },
-                                    {"type": "text", "text": ROLL},
+                                    {"type": "text", "text": ask},
                                 ],
                             }
                         ],
@@ -388,8 +361,13 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
-def read_key(effort: str, digest: str) -> str:
-    return f"anthropic-batch:claude-haiku-5-5/{PROMPT}/{effort}/{digest}"
+def read_key(effort: str, digest: str, ballot: object = None) -> str:
+    prompt = PROMPT if ballot is None else f"{PROMPT}b{ballot}"
+    return f"anthropic-batch:claude-haiku-5-5/{prompt}/{effort}/{digest}"
+
+
+def ordinal(n: int) -> str:
+    return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
 
 
 def place(label: str) -> str | None:
@@ -401,7 +379,7 @@ def number(cell: str) -> float:
     text = cell.strip().replace(",", "")
     half = HALF.search(text)
     text = text[: half.start()] if half else text
-    if text in {"", "-", "—", "–", ".", "·", "*"} and not half:
+    if re.fullmatch(r"[\s.\-—–·*…]*", text) and not half:
         return 0.0
     return (float(text) if text else 0.0) + (0.5 if half else 0.0)
 
@@ -413,7 +391,9 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
     for leaf in spec["leaves"]:
         image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
         try:
-            response = json.loads(raw.cached(SOURCE, read_key(effort, image.sha256)).path.read_text())
+            response = json.loads(
+                raw.cached(SOURCE, read_key(effort, image.sha256, spec.get("ballot"))).path.read_text()
+            )
         except LookupError:
             problems.append(f"leaf {leaf}: not read")
             continue
@@ -474,8 +454,12 @@ def parse() -> None:
         other = {(cell["state"], cell["column"]): cell["value"] for cell in second}
         disagree = sorted(key for key in values.keys() | other.keys() if values.get(key) != other.get(key))
         failures = [*problems, *others, *(f"reads disagree on {state} {column}" for state, column in disagree)]
+        if len(values) != len(first):
+            failures.append(f"{len(first) - len(values)} cells read twice")
         held = {state for state, _ in values}
         for state in sorted(held):
+            if (state, "votes") not in values and not any(column == "votes" for _, column in values):
+                continue
             votes = values.get((state, "votes"), 0)
             cast = sum(value for (code, column), value in values.items() if code == state and column != "votes")
             if votes != cast:
