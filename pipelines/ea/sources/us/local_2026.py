@@ -10575,10 +10575,10 @@ def parse() -> None:
                         ),
                     )
                     in_pin = None
-                    for pattern, repl, pinned in IN_ALIASES:
+                    for pattern, repl, alias_pin in IN_ALIASES:
                         if re.search(pattern, tokens):
                             tokens = re.sub(pattern, repl, tokens)
-                            in_pin = pinned
+                            in_pin = alias_pin
                             break
                     tokens = tokens.split()
                 if tokens[:3] == ["governing", "board", "member"]:
