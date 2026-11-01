@@ -19,7 +19,6 @@
     "superintendent-of-public-instruction": "State Superintendent of Public Instruction",
     "commissioner-of-insurance": "Commissioner of Insurance"
   },
-  "hint": "Read only general election tables; skip primary election tables. Each statewide office is one table with county rows; copy the state total row as printed_total.",
   "leaves": [
     16,
     18,
@@ -32,5 +31,6 @@
     61,
     62,
     63
-  ]
+  ],
+  "totals": true
 }

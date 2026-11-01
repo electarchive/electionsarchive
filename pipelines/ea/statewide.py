@@ -14,6 +14,20 @@ from anthropic.types.message_create_params import MessageCreateParamsNonStreamin
 from ea import batch, scans
 
 PROMPT = "1"
+TOTALS_PROMPT = "t1"
+TOTALS = (
+    "This page comes from {title}. Each table of statewide returns has one row per county and one column per candidate "
+    "(or one row per candidate), and ends with a Totals row for the state. List a table for one of these offices (office "
+    "key: description): {wanted}, only when this page prints that table's Totals row; a table that continues past this "
+    "page without its Totals row is left out, and any other office is office 'other'. For each such table: year is the "
+    "election year of the returns; title is its heading as printed, with the term when the page splits terms; candidates "
+    "lists each candidate with the name as printed (without a town of residence), the party as printed ('' if none), and "
+    "the votes in the Totals row for that candidate, never a county's figure; printed_total is a printed total of all "
+    "votes for the office when the page prints one, else ''. When the columns come in groups for an unexpired or short "
+    "term and a regular term, give each group its own table, with the term in its title. Read general election tables "
+    "only; skip primary tables."
+)
+UNEXPIRED = re.compile(r"unexpired|short term|vacanc", re.IGNORECASE)
 SYSTEM = (
     "You transcribe statewide election returns printed in a scanned volume into JSON. Copy every name, party, and "
     "vote count exactly as printed, with the digits and separators the page uses. Never compute, correct, or fill "
@@ -83,6 +97,7 @@ class Volume(TypedDict):
     create: NotRequired[bool]
     autorotate: NotRequired[bool]
     hint: NotRequired[str]
+    totals: NotRequired[bool]
 
 
 def offices(volume: Volume) -> dict[str, str]:
@@ -113,14 +128,18 @@ def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[
     )
     wanted = "; ".join(f"{key}: {text}" for key, text in offices(volume).items())
     text = (
-        f"This page comes from {volume['title']}. List every table of statewide returns for these offices (office "
-        f"key: description): {wanted}. A table for any other office is office 'other'. For each table: year is the "
-        "election year the table's returns are for (the year of the whole page when it prints one election); title "
-        "is its heading as printed; candidates lists every row of the table in order with the name as printed (without a town of residence), the "
-        "party as printed ('' if none), and the votes as printed; printed_total is the table's printed total or "
-        "'Total vote' line exactly as printed ('' when it prints none). A candidate printed in several rows (one per "
-        "party line) is one row per printed line. A volume that prints years down the page gives one table per "
-        "year and office." + (f" {volume['hint']}" if "hint" in volume else "")
+        TOTALS.format(title=volume["title"], wanted=wanted)
+        if volume.get("totals")
+        else (
+            f"This page comes from {volume['title']}. List every table of statewide returns for these offices (office "
+            f"key: description): {wanted}. A table for any other office is office 'other'. For each table: year is the "
+            "election year the table's returns are for (the year of the whole page when it prints one election); title "
+            "is its heading as printed; candidates lists every row of the table in order with the name as printed (without a town of residence), the "
+            "party as printed ('' if none), and the votes as printed; printed_total is the table's printed total or "
+            "'Total vote' line exactly as printed ('' when it prints none). A candidate printed in several rows (one per "
+            "party line) is one row per printed line. A volume that prints years down the page gives one table per "
+            "year and office." + (f" {volume['hint']}" if "hint" in volume else "")
+        )
     )
     out: dict[str, scans.Read] = {}
     for leaf in leaves:
@@ -146,7 +165,7 @@ def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[
             digest=digest,
             pixels=image.width * image.height,
             image=data,
-            key=scans.key(reader, f"sw{PROMPT}", digest),
+            key=scans.key(reader, f"sw{TOTALS_PROMPT if volume.get('totals') else PROMPT}", digest),
             params=MessageCreateParamsNonStreaming(
                 model=model,
                 max_tokens=32000,
@@ -167,6 +186,8 @@ def tables(volume: Volume, reads: dict[str, scans.Read]) -> dict[tuple[int, int,
         for table in cast(list[dict[str, object]], cast(dict[str, object], loaded)["tables"]):
             office = str(table["office"])
             if office not in offices(volume):
+                continue
+            if volume.get("totals") and UNEXPIRED.search(str(table["title"])):
                 continue
             year = int(cast(int, table["year"])) or volume.get("year", 0)
             merged: dict[str, dict[str, object]] = {}
@@ -293,6 +314,21 @@ def finalize(
             and anchored_second.get(year, False)
             and not first["bad"]
             and not second["bad"]
+            and {r["name"]: r["votes"] for r in cast(list[dict[str, object]], first["candidates"])}
+            == {r["name"]: r["votes"] for r in cast(list[dict[str, object]], second["candidates"])}
+        ) or (
+            volume.get("totals")
+            and first is not None
+            and second is not None
+            and not first["bad"]
+            and not second["bad"]
+            and len(cast(list[object], first["candidates"])) >= 2
+            and sum(
+                cast(int, r["votes"])
+                for r in cast(list[dict[str, object]], first["candidates"])
+                if not BLANK.search(str(r["name"]))
+            )
+            >= 50000
             and {r["name"]: r["votes"] for r in cast(list[dict[str, object]], first["candidates"])}
             == {r["name"]: r["votes"] for r in cast(list[dict[str, object]], second["candidates"])}
         ):
