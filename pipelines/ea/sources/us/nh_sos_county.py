@@ -1,5 +1,7 @@
+import html
 import os
 import re
+import subprocess
 import time
 from pathlib import Path
 from uuid import UUID
@@ -20,7 +22,10 @@ WAYBACK = (
     "https://web.archive.org/web/2026id_/https://www.sos.nh.gov/sites/g/files/ehbemt561/files/inline-documents/sonh/"
 )
 ARCHIVED = "https://web.archive.org/web/2018if_/http://sos.nh.gov/WorkArea/DownloadAsset.aspx?id="
-PINNED = {"2022-ge-merrimack-county.xls": "20240114224201"}
+PINNED = {
+    "2022-ge-merrimack-county.xls": "20240114224201",
+    "2018-sp-county-offices-sullivan-libertarian.pdf": "20240821033614",
+}
 PUBLISHER = "New Hampshire Secretary of State"
 ALIASES = {
     "atkandgilmacgrant": "atkinsongilmantonacademygrant",
@@ -109,12 +114,112 @@ WRITE_IN = re.compile(r"\bw-?in\b|write-?ins?", re.IGNORECASE)
 OTHER = r"(?i)(?:scatter\w*|write-?ins?|others?)"
 
 
+def pdf_grids(path: Path) -> list[tuple[str, list[list[str]]]]:
+    text = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
+    words = sorted(
+        (float(y0), float(x0), float(x1), html.unescape(word))
+        for x0, y0, x1, word in re.findall(
+            r'xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="[\d.]+">([^<]*)<', text
+        )
+    )
+    lines: list[list[tuple[float, float, str]]] = []
+    top = -99.0
+    for y0, x0, x1, word in words:
+        if y0 - top > 2.5:
+            lines.append([])
+            top = y0
+        lines[-1].append((x0, x1, word))
+    cells: list[list[tuple[float, float, str]]] = []
+    for line in lines:
+        merged: list[tuple[float, float, str]] = []
+        for x0, x1, word in sorted(set(line)):
+            if merged and x0 - merged[-1][1] < 8:
+                merged[-1] = (merged[-1][0], x1, f"{merged[-1][2]} {word}")
+            else:
+                merged.append((x0, x1, word))
+        if merged[0][0] < 30 and sum(1 for c in merged if NUMBER.fullmatch(c[2])) > 2:
+            merged = [c for index, c in enumerate(merged) if index == 0 or NUMBER.fullmatch(c[2]) or c[2] == "-"]
+        if len(merged) == 1 and merged[0][2] in ("No", "Election"):
+            continue
+        if merged not in cells:
+            cells.append(merged)
+
+    def is_body(line: list[tuple[float, float, str]]) -> bool:
+        return line[0][0] < 30 and len(line) > 1 and all(NUMBER.fullmatch(c[2]) or c[2] == "-" for c in line[1:])
+
+    grids: list[tuple[str, list[list[str]]]] = []
+    header: list[list[tuple[float, float, str]]] = []
+    body: list[list[tuple[float, float, str]]] = []
+    for line in [*cells, [(0.0, 0.0, "")]]:
+        if is_body(line) or (body and line[0][0] < 30 and line[0][2].upper().startswith("TOTAL")):
+            body.append(line)
+            continue
+        if body:
+            names = [c for c in header[-1] if c[0] >= 30]
+            columns: list[float] = []
+            for x0 in sorted(c[0] for row in body for c in row[1:] if NUMBER.fullmatch(c[2])):
+                if not columns or x0 - columns[-1] > 6:
+                    columns.append(x0)
+            if len(names) != len(columns):
+                raise ValueError(f"{len(names)} names {[c[2] for c in names]} against {len(columns)} number columns")
+            width = len(names) + 1
+            rows = []
+            for row in header:
+                out = [""] * width
+                if row is header[-1]:
+                    for index, c in enumerate(names):
+                        out[index + 1] = c[2]
+                else:
+                    centers = [(c[0] + c[1]) / 2 for c in names]
+                    for c in row:
+                        if c[0] < 30:
+                            out[0] = c[2]
+                            continue
+                        near = min(range(len(names)), key=lambda i: abs(centers[i] - (c[0] + c[1]) / 2))
+                        out[near + 1 if len(row) > 1 else 1] = c[2]
+                rows.append(out)
+            above = header[-2] if len(header) > 1 else []
+            labels = [c for c in above if c[0] >= 30]
+            if len(labels) > 1 and len(rows) > 1:
+                out = [""] * width
+                out[0] = " ".join(c[2] for c in above if c[0] < 30)
+                centers = [(c[0] + c[1]) / 2 for c in names]
+                owner = [
+                    min(range(len(labels)), key=lambda k: abs((labels[k][0] + labels[k][1]) / 2 - m)) for m in centers
+                ]
+                for k, c in enumerate(labels):
+                    first = next((i for i, o in enumerate(owner) if o == k), None)
+                    if first is not None:
+                        out[first + 1] = c[2]
+                rows[-2] = out
+            for row in body:
+                out = [""] * width
+                out[0] = row[0][2]
+                for c in row[1:]:
+                    index = min(range(len(columns)), key=lambda i: abs(columns[i] - c[0]))
+                    if abs(columns[index] - c[0]) <= 6 and NUMBER.fullmatch(c[2]):
+                        out[index + 1] = c[2]
+                rows.append(out)
+            grids.append((f"table{len(grids) + 1}", rows))
+            header, body = [], []
+        header.append(line)
+    return grids
+
+
 def blocks(path: Path, name: str) -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
-    for sheet_name, sheet in pl.read_excel(
-        path, sheet_id=0, has_header=False, infer_schema_length=0, raise_if_empty=False
-    ).items():
-        grid = [[" ".join(cell.split()) if cell else "" for cell in row] for row in sheet.rows()]
+    sheets = (
+        pdf_grids(path)
+        if path.suffix == ".pdf"
+        else [
+            (sheet_name, [[cell if cell else "" for cell in row] for row in sheet.rows()])
+            for sheet_name, sheet in pl.read_excel(
+                path, sheet_id=0, has_header=False, infer_schema_length=0, raise_if_empty=False
+            ).items()
+        ]
+    )
+    for sheet_name, raw_grid in sheets:
+        grid = [[" ".join(cell.split()) if cell else "" for cell in row] for row in raw_grid]
         for row in grid:
             if DATED.match(row[0]):
                 row[0] = ""
