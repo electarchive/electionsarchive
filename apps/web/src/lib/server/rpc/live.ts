@@ -535,7 +535,10 @@ async function baselines(
       seats: seat.startsWith("house")
         ? generals.rows.map(({ suffix }) => at(suffix, seat))
         : [],
-      presidents: generals.rows.map(({ suffix }) => at(suffix, "president")),
+      presidents:
+        parts.length === 4 && (TOP.test(seat) || STATEWIDE.includes(seat))
+          ? generals.rows.map(({ suffix }) => at(suffix, "president"))
+          : [],
     };
   });
   const scaling = ratios(
