@@ -11042,7 +11042,8 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         for row in conn.execute(
             """select distinct on (x.value) regexp_replace(x.value, '^[0-9-]+:', ''), co.id, co.kind, co.office_id, co.body_id,
                       co.district_area_id, co.seat_id, co.boundary_set_id, co.magnitude, co.term, co.electoral_system_id,
-                      co.default_result_kind, el.date_from, el.polity_id, n.text, s.path, en.text, es.path,
+                      co.default_result_kind, el.date_from, el.polity_id, n.text, s.path, en.text,
+                      coalesce(es.path, regexp_replace(s.path, '/[^/]+$', '')),
                       regexp_replace(ex.value, '^[0-9-]+:', '')
                from external_id x join contest co on co.id = x.entity_id join entity e on e.id = co.id and e.retired_by is null
                join election el on el.id = co.election_id
