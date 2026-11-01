@@ -66,7 +66,25 @@ MF_559_COUNTIES = [
 ]
 MF_561 = DATA / "inbox" / "manual" / "MF-561"
 MF_561_COUNTIES = ["Darke"]
-MF_LOOKUP = [*MF_LOOKUP, *MF_555_COUNTIES, *MF_559_COUNTIES, *MF_561_COUNTIES]
+MF_562 = DATA / "inbox" / "manual" / "MF-562"
+MF_562_COUNTIES = [
+    "Defiance",
+    "Fairfield",
+    "Fayette",
+    "Gallia",
+    "Hancock",
+    "Hardin",
+    "Henry",
+    "Highland",
+    "Jackson",
+]
+MF_LOOKUP = [
+    *MF_LOOKUP,
+    *MF_555_COUNTIES,
+    *MF_559_COUNTIES,
+    *MF_561_COUNTIES,
+    *MF_562_COUNTIES,
+]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
 MONTGOMERY_KEY = "https://lookup.boe.ohio.gov/vtrapp/montgomery/ballotlist.aspx#sample-ballots.zip"
@@ -188,6 +206,8 @@ def fetch() -> None:
 
 
 def mf_dir(county: str) -> Path:
+    if county in MF_562_COUNTIES:
+        return MF_562
     if county in MF_561_COUNTIES:
         return MF_561
     if county in MF_559_COUNTIES:
