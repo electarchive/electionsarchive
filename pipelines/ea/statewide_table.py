@@ -89,6 +89,8 @@ def schedule(conn: Connection, last: int = LAST) -> list[tuple]:
             "tax-commissioner",
         ):
             years -= {1994, 1998, 2002}
+        if st == "ID" and key == "controller":
+            years -= {1990, 1994}
         if st == "IN" and key == "superintendent-of-public-instruction":
             years = {year for year in years if year <= 2016}
         if st == "GA" and key == "public-service-commissioner":
