@@ -291,14 +291,14 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "governors.parquet")
+    frame = pl.read_parquet(PARSED / "governors.parquet").filter(~pl.col("state").is_in(list(HELD)))
     overcounted = set(pl.read_parquet(PARSED / "overcounted.parquet").select("state", "day", "primary").iter_rows())
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Governor elections from the state archives of Colorado, Connecticut, Idaho, New Hampshire, New Mexico, Vermont, and Virginia, by county or town",
+            summary="Governor elections from the state archives of Colorado, Connecticut, Idaho, New Mexico, Vermont, and Virginia, by county or town",
             polity="US",
         )
 
@@ -378,11 +378,11 @@ def emit() -> Path:
             cs.add(
                 "source",
                 id=sources[state],
-                kind="aggregator" if state in HELD else "official_body",
+                kind="official_body",
                 publisher=publisher,
                 title=TITLE,
                 url=site,
-                license=HELD.get(state, "Public record"),
+                license="Public record",
             )
             for years in WINDOWS.get(state, [(1700, 2026)]):
                 cs.artifact(raw.cached(SOURCE, url(state, years)), sources[state])
@@ -409,7 +409,9 @@ def emit() -> Path:
             text = (label or "").split("/")[0].strip()
             if text.lower() in UNAFFILIATED or not text:
                 return None
-            if text.lower() == "republican" and year < 1854:
+            if NATIONAL.get(text.lower()) == "democratic-party" and year < 1825:
+                era = "democratic-republican-party"
+            elif text.lower() == "republican" and year < 1854:
                 era = (
                     "democratic-republican-party"
                     if year < 1825
