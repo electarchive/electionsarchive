@@ -34,6 +34,9 @@
     seed,
     planned,
     marks,
+    date,
+    from,
+    to,
     scenario = $bindable(),
     edges = $bindable(),
     clock = $bindable(),
@@ -43,6 +46,9 @@
     seed: Seed;
     planned: Plan;
     marks: Array<number>;
+    date: string;
+    from: number;
+    to: number;
     scenario: Scenario;
     edges: Array<Edge>;
     clock: number;
@@ -113,13 +119,11 @@
   let speed = $state<Speed>(60);
   let panel = $state<Panel | null>(null);
 
-  const first = $derived(planned.start);
-  const last = $derived(planned.end + 2 * 60 * MINUTE);
+  const first = $derived(from);
+  const last = $derived(to + 2 * 60 * MINUTE);
   const a = $derived(seed.race.options[planned.pair[0]]);
   const b = $derived(seed.race.options[planned.pair[1]]);
-  const midnight = $derived(
-    Date.parse(`${seed.election.date}T00:00:00Z`) + 29 * 60 * MINUTE,
-  );
+  const midnight = $derived(Date.parse(`${date}T00:00:00Z`) + 29 * 60 * MINUTE);
   const truthTotals = $derived(
     seed.race.options.map((_, option) =>
       sum(planned.truth.map((row) => row[option] ?? 0)),
@@ -620,7 +624,7 @@
             type="button"
             class="rounded-sm p-1.5 hover:highlighter"
             aria-label={m.night_tool_end()}
-            onclick={() => go(planned.end)}
+            onclick={() => go(to)}
             ><ChevronLastIcon
               class="block-4 inline-4"
               aria-hidden="true"

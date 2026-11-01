@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import SearchIcon from "@lucide/svelte/icons/search";
   import XIcon from "@lucide/svelte/icons/x";
   import type { Local, LocalKind, LocalSort } from "#lib/live/local.js";
@@ -7,6 +6,7 @@
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { percent } from "#lib/format.js";
   import { tone } from "#lib/live/format.js";
+  import { liveLinks } from "#lib/live/links.js";
   import {
     arrange,
     fold,
@@ -27,6 +27,8 @@
     labels?: Record<string, string>;
     isNation?: boolean;
   } = $props();
+
+  const toLive = liveLinks();
 
   const PAGE = 30;
   const KINDS: Array<{ value: LocalKind; label: () => string }> = [
@@ -113,7 +115,7 @@
   }
 
   function href(local: Local) {
-    return resolve("/live/[...path]", { path: local.summary.race.slug });
+    return toLive(local.summary.race.slug);
   }
 
   function verdict(local: Local) {

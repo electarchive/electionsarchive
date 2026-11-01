@@ -35,11 +35,7 @@ export type EdgeKind =
 
 export type Edge = { kind: EdgeKind; at: number };
 
-export type Seed = {
-  election: Omit<LiveElection, "races" | "newest" | "isCertified">;
-  race: LiveRace;
-  closes: Record<string, number>;
-};
+export type Seed = { race: LiveRace; close: number; side: 1 | -1 };
 
 type Event = {
   at: number;
@@ -62,7 +58,16 @@ export type Plan = {
 };
 
 export const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
 const STAMP = 2 * MINUTE;
+const SIZES: Record<LiveRace["office"], number> = {
+  senate: 2_400_000,
+  governor: 2_400_000,
+  house: 290_000,
+  other: 24_000,
+};
+
+const MAJOR = /democrat|republican/iu;
 
 export const DEFAULT_SCENARIO: Scenario = {
   seed: 2026,
@@ -74,10 +79,33 @@ export const DEFAULT_SCENARIO: Scenario = {
   pace: 1,
 };
 
+function leans(race: LiveRace) {
+  const [a] = pair(race);
+  return /democrat/iu.test(race.options[a]?.party?.name ?? "") ? 1 : -1;
+}
+
 export function start(seed: Seed): Scenario {
-  const [a] = pair(seed.race);
-  const isBlue = /democrat/iu.test(seed.race.options[a]?.party?.name ?? "");
-  return { ...DEFAULT_SCENARIO, earlyLean: isBlue ? 16 : -16 };
+  return { ...DEFAULT_SCENARIO, earlyLean: 16 * leans(seed.race) };
+}
+
+export function seeds(election: LiveElection, lead: string | null) {
+  const fallback = Date.parse(`${election.date}T23:00:00Z`) + 2 * HOUR;
+  const closes = new Map(
+    election.pollClose.map((entry) => [entry.state, Date.parse(entry.at)]),
+  );
+  const races = election.races.map((race) => ({
+    ...race,
+    frames: [],
+    counts: [],
+    certified: null,
+  }));
+  const anchor = races.find((race) => race.id === lead) ?? races[0];
+  const side = anchor == null ? 1 : leans(anchor);
+  return races.map((race): Seed => ({
+    race,
+    close: closes.get(race.state) ?? fallback,
+    side: leans(race) === side ? 1 : -1,
+  }));
 }
 
 function split(total: number, parts: number, random: () => number) {
@@ -98,36 +126,53 @@ function tilt(shares: Array<number>, [a, b]: [number, number], by: number) {
   return normalize(next);
 }
 
+function cells(race: LiveRace, random: ReturnType<typeof stream>) {
+  const known = new Map(race.baseline.map((row) => [row.unitId, row]));
+  const turnouts = race.baseline
+    .map((row) => row.turnout)
+    .toSorted((x, y) => x - y);
+  const typical = turnouts[Math.floor(turnouts.length / 2)];
+  const length = Math.max(1, race.units.length);
+  const parts =
+    typical == null
+      ? split(SIZES[race.office] * (0.5 + random.next()), length, random.next)
+      : [];
+  const shares = normalize(
+    race.options.map(
+      (option) =>
+        (MAJOR.test(option.party?.name ?? "") ? 6 : 0.5) *
+        (0.7 + random.next() * 0.6),
+    ),
+  );
+  return Array.from({ length }, (_, index) => {
+    const base = known.get(race.units[index]?.id ?? "");
+    return base == null
+      ? { turnout: typical ?? parts[index] ?? 0, shares }
+      : { turnout: base.turnout, shares: normalize(base.shares) };
+  });
+}
+
 export function plan(seed: Seed, scenario: Scenario): Plan {
-  const { race } = seed;
+  const { race, close, side } = seed;
   const random = stream(hash(`${scenario.seed}:${race.id}`));
   const two = pair(race);
-  const close = Math.min(
-    ...Object.values(seed.closes),
-    Date.parse(`${seed.election.date}T23:00:00Z`) + 2 * 3_600_000,
-  );
-  const sizes = race.baseline.map((row) => row.turnout);
-  const sorted = sizes.toSorted((x, y) => y - x);
+  const all = cells(race, random);
+  const sorted = all.map((cell) => cell.turnout).toSorted((x, y) => y - x);
   const large = sorted[3] ?? 0;
   const medium = sorted[Math.min(sorted.length - 1, 20)] ?? 0;
+  const latest =
+    all.length > 3 ? all.findIndex((cell) => cell.turnout === sorted[0]) : -1;
   const events: Array<Event> = [];
   const truth: Array<Array<number>> = [];
   const precincts: Array<number> = [];
   const regional = random.normal() * 0.012;
-  const ranks = race.units.map(() => random.next());
-  for (const [index, unit] of race.units.entries()) {
-    const base = race.baseline.find((row) => row.unitId === unit.id);
-    const options = race.options.length;
-    const turnoutBase = base?.turnout ?? 0;
-    const shares =
-      base == null
-        ? race.options.map(() => 1 / options)
-        : normalize(base.shares);
+  const ranks = all.map(() => random.next());
+  for (const [index, { turnout: turnoutBase, shares }] of all.entries()) {
     const isLarge = turnoutBase >= large;
     const isMedium = !isLarge && turnoutBase >= medium;
-    const isLate = /wayne/iu.test(unit.name);
+    const isLate = index === latest;
     const swing =
-      scenario.swing / 100 +
+      (side * scenario.swing) / 100 +
       random.normal() * 0.022 +
       (isLarge ? regional : -regional);
     const truthShares = tilt(shares, two, swing * 2);
@@ -143,13 +188,13 @@ export function plan(seed: Seed, scenario: Scenario): Plan {
       0.8,
       Math.max(0.25, scenario.earlyShare * (1 + random.normal() * 0.1)),
     );
-    const lean = scenario.earlyLean / 100;
+    const lean = (side * scenario.earlyLean) / 100;
     const earlyShares = tilt(truthShares, two, 2 * lean * (1 - early));
     const dayShares = tilt(truthShares, two, -2 * lean * early);
     const tail = 0.006 + random.next() * 0.006;
     const earlyVotes = votes * early;
     const dayVotes = votes * (1 - early) * (1 - tail);
-    const opens = seed.closes[unit.id] ?? close;
+    const opens = close;
     const speed = scenario.pace;
     const order = scenario.order;
     const sizeRank = isLarge ? 2 : isMedium ? 1 : 0;
@@ -228,7 +273,7 @@ export function plan(seed: Seed, scenario: Scenario): Plan {
     events,
     truth,
     precincts,
-    start: close - 2 * 3_600_000,
+    start: close - 2 * HOUR,
     close,
     end,
     certifiedAt: end + 60 * MINUTE,
@@ -396,18 +441,15 @@ function apply(planned: Plan, edges: Array<Edge>, now: number) {
 
 const iso = (at: number) => new Date(at).toISOString().replace(/\.\d+Z$/u, "Z");
 
-export function snapshot(
-  seed: Seed,
-  planned: Plan,
-  edges: Array<Edge>,
-  now: number,
-): LiveElection {
-  const { race } = seed;
-  const events = apply(planned, edges, now).filter(
-    (event) => event.kind === "late" || event.at <= now,
-  );
-  const cumulative = race.units.map(() => race.options.map(() => 0));
-  const reported = race.units.map(() => 0);
+export type Run = { seed: Seed; planned: Plan };
+
+function tally(
+  { seed: { race }, planned }: Run,
+  events: Array<Event>,
+  isCertified: boolean,
+): LiveRace {
+  const cumulative = planned.truth.map(() => race.options.map(() => 0));
+  const reported = planned.truth.map(() => 0);
   const frames: Array<LiveFrame> = [];
   const counts: Array<LiveUnitCount> = [];
   const expectedAll = sum(planned.precincts);
@@ -454,8 +496,6 @@ export function snapshot(
       expected: expectedAll,
     });
   }
-  const certifiedEdge = edges.find((edge) => edge.kind === "certified");
-  const isCertified = certifiedEdge != null && now >= certifiedEdge.at;
   const finalTotals = race.options.map((_, option) =>
     Math.round(sum(planned.truth.map((row) => row[option] ?? 0))),
   );
@@ -463,27 +503,70 @@ export function snapshot(
     .map((value, option) => ({ value, option }))
     .toSorted((x, y) => y.value - x.value);
   return {
-    ...seed.election,
-    newest: frames.at(-1)?.at ?? null,
-    isCertified,
-    races: [
-      {
-        ...race,
-        frames,
-        counts,
-        certified: isCertified
-          ? {
-              totals: finalTotals,
-              winners: [race.options[order[0]?.option ?? 0]?.id ?? ""],
-            }
-          : null,
-      },
-    ],
+    ...race,
+    frames,
+    counts,
+    certified: isCertified
+      ? {
+          totals: finalTotals,
+          winners: [race.options[order[0]?.option ?? 0]?.id ?? ""],
+        }
+      : null,
   };
 }
 
-export function stamps(planned: Plan, edges: Array<Edge>, now: number) {
+function happened(
+  run: Run,
+  lead: string | null,
+  edges: Array<Edge>,
+  now: number,
+) {
+  return run.seed.race.id === lead
+    ? apply(run.planned, edges, now)
+    : run.planned.events;
+}
+
+export function replay(
+  election: LiveElection,
+  runs: Array<Run>,
+  lead: string | null,
+  edges: Array<Edge>,
+  now: number,
+): LiveElection {
+  const certifiedEdge = edges.find((edge) => edge.kind === "certified");
+  const isCertified = certifiedEdge != null && now >= certifiedEdge.at;
+  const races = runs.map((run) =>
+    tally(
+      run,
+      happened(run, lead, edges, now).filter(
+        (event) => event.kind === "late" || event.at <= now,
+      ),
+      isCertified,
+    ),
+  );
+  const newest = races
+    .flatMap((race) => race.frames.at(-1)?.at ?? [])
+    .toSorted((x, y) => x.localeCompare(y))
+    .at(-1);
+  return {
+    ...election,
+    newest: newest ?? null,
+    isCertified: isCertified && races.length > 0,
+    races,
+  };
+}
+
+export function stamps(
+  runs: Array<Run>,
+  lead: string | null,
+  edges: Array<Edge>,
+  now: number,
+) {
   return [
-    ...new Set(apply(planned, edges, now).map((event) => event.at)),
+    ...new Set(
+      runs.flatMap((run) =>
+        happened(run, lead, edges, now).map((event) => event.at),
+      ),
+    ),
   ].toSorted((x, y) => x - y);
 }

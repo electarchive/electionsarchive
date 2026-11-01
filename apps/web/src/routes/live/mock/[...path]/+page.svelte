@@ -1,33 +1,71 @@
 <script lang="ts">
+  import type { LiveElection } from "@ea/analytics/live";
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import type { Edge } from "#lib/live/simulate.js";
-  import Race from "#lib/components/live/race.svelte";
+  import Night from "#lib/components/live/night.svelte";
+  import { estimateAt } from "#lib/live/history.js";
+  import { mockLinks } from "#lib/live/links.js";
   import { localize } from "#lib/live/prefs.svelte.js";
-  import { plan, snapshot, stamps, start } from "#lib/live/simulate.js";
+  import {
+    DEFAULT_SCENARIO,
+    MINUTE,
+    plan,
+    replay,
+    seeds,
+    stamps,
+    start,
+  } from "#lib/live/simulate.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageProps } from "./$types";
   import Toolbar from "./toolbar.svelte";
 
   const { data }: PageProps = $props();
 
-  const seed = $derived(data.seed);
-  let scenario = $state(untrack(() => start(data.seed)));
+  mockLinks();
+
+  const lead = $derived(
+    (
+      data.election.races.find((race) => race.slug === data.focus) ??
+      data.election.races.find((race) => race.office === "senate") ??
+      data.election.races.find((race) => race.office === "governor") ??
+      data.election.races[0]
+    )?.id ?? null,
+  );
+  const seeded = $derived(seeds(data.election, lead));
+  let scenario = $state(
+    untrack(() => {
+      const anchor = seeded.find((seed) => seed.race.id === lead);
+      return anchor == null ? DEFAULT_SCENARIO : start(anchor);
+    }),
+  );
   let edges = $state<Array<Edge>>([]);
   let isOffline = $state(false);
-  const planned = $derived(plan(seed, scenario));
-  let clock = $state(
-    untrack(() => plan(data.seed, start(data.seed)).close - 5 * 60_000),
-  );
-  let held = $state.raw<ReturnType<typeof snapshot> | null>(null);
   let at = $state<string | null>(null);
   let isFinal = $state(true);
+  let held = $state.raw<LiveElection | null>(null);
+
+  const runs = $derived(
+    seeded.map((seed) => ({ seed, planned: plan(seed, scenario) })),
+  );
+  const leading = $derived(
+    runs.find((run) => run.seed.race.id === lead) ?? null,
+  );
+  const from = $derived(Math.min(...runs.map((run) => run.planned.start)));
+  const to = $derived(Math.max(...runs.map((run) => run.planned.end)));
+  let clock = $state(
+    untrack(() => (leading?.planned.close ?? Date.now()) - 5 * MINUTE),
+  );
 
   const quantum = $derived(Math.floor(clock / 30_000) * 30_000);
-  const live = $derived(snapshot(seed, planned, edges, quantum));
+  const live = $derived(replay(data.election, runs, lead, edges, quantum));
   const election = $derived(isOffline && held != null ? held : live);
-  const race = $derived(election.races[0]);
-  const marks = $derived(stamps(planned, edges, planned.end));
+  const estimates = $derived(
+    Object.fromEntries(
+      election.races.map((race) => [race.id, estimateAt(race, null)]),
+    ),
+  );
+  const marks = $derived(stamps(runs, lead, edges, to));
 
   $effect(() => {
     if (!isOffline) {
@@ -45,26 +83,29 @@
 </svelte:head>
 
 <main class="pbe-72 sm:pbe-56">
-  {#if race != null}
-    <Race
-      {election}
-      {race}
-      geography={data.geography}
-      {clock}
-      {isOffline}
-      bind:at
-      bind:isFinal
-    />
-  {/if}
+  <Night
+    data={{ ...data, shown: { results: true, forecasts: true } }}
+    {election}
+    {estimates}
+    {clock}
+    {isOffline}
+    bind:at
+    bind:isFinal
+  />
 </main>
 
-<Toolbar
-  {seed}
-  {planned}
-  {marks}
-  bind:scenario
-  bind:edges
-  bind:clock
-  bind:isOffline
-  bind:at
-/>
+{#if leading != null}
+  <Toolbar
+    seed={leading.seed}
+    planned={leading.planned}
+    {marks}
+    date={data.election.date}
+    {from}
+    {to}
+    bind:scenario
+    bind:edges
+    bind:clock
+    bind:isOffline
+    bind:at
+  />
+{/if}

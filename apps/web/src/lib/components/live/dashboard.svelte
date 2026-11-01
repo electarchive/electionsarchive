@@ -5,7 +5,6 @@
     LiveOffice,
   } from "@ea/analytics/live";
   import { goto } from "$app/navigation";
-  import { resolve } from "$app/paths";
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
@@ -22,6 +21,7 @@
     tone,
     zoneName,
   } from "#lib/live/format.js";
+  import { liveLinks } from "#lib/live/links.js";
   import { party, summarize, tally } from "#lib/live/summary.js";
   import { ZONES } from "#lib/live/zones.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -60,6 +60,8 @@
     isOffline: boolean;
     forecasts?: boolean;
   } = $props();
+
+  const toLive = liveLinks();
 
   type View = "senate" | "governor" | "house" | "reporting";
 
@@ -242,13 +244,13 @@
   );
 
   function href(code: string): string {
-    return resolve("/live/[...path]", {
-      path: `${election.slug.split("/")[0]}/${code}/${election.slug.split("/")[1]}`,
-    });
+    return toLive(
+      `${election.slug.split("/")[0]}/${code}/${election.slug.split("/")[1]}`,
+    );
   }
 
   function raceHref(summary: Summary) {
-    return resolve("/live/[...path]", { path: summary.race.slug });
+    return toLive(summary.race.slug);
   }
 
   function name(code: string) {

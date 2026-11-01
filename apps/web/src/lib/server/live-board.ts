@@ -1,13 +1,9 @@
-import { call } from "@orpc/server";
 import { sql } from "drizzle-orm";
-import type { Seed } from "#lib/live/simulate.js";
 import type { Geography } from "#lib/live/standing.js";
-import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 import america from "#lib/server/hex/us-cd.json";
 import { plane, spot } from "#lib/server/plane.js";
 import { names } from "#lib/server/rpc/archive.js";
-import { router } from "#lib/server/rpc/router.js";
 
 export async function geography(
   areaIds: Array<string>,
@@ -201,44 +197,4 @@ export async function house(electionId: string, date: string) {
             ),
           },
   };
-}
-
-const MOCK = {
-  path: "us/mi/2026-11-03-general",
-  close: "2026-11-04T01:00:00Z",
-  central: /^(?:gogebic|iron|dickinson|menominee)\b/iu,
-};
-
-async function seed(): Promise<{ seed: Seed; geography: Geography | null }> {
-  const { election } = await call(router.live.election, { path: MOCK.path });
-  const race = election.races.find((entry) => entry.office === "senate");
-  if (race == null) {
-    throw new Error("no senate race");
-  }
-  const closes: Record<string, number> = {};
-  for (const unit of race.units) {
-    closes[unit.id] =
-      Date.parse(MOCK.close) + (MOCK.central.test(unit.name) ? 3_600_000 : 0);
-  }
-  return {
-    seed: {
-      election: {
-        id: election.id,
-        slug: election.slug,
-        title: election.title,
-        date: election.date,
-        pollClose: [{ state: "mi", at: MOCK.close }],
-      },
-      race: { ...race, frames: [], counts: [], certified: null },
-      closes,
-    },
-    geography: await geography(
-      race.units.flatMap((unit) => (unit.areaId == null ? [] : [unit.areaId])),
-      election.date,
-    ),
-  };
-}
-
-export async function mock() {
-  return remember("live:mock:v2:mi-senate", seed);
 }

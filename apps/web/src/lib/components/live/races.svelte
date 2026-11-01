@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { LiveOption, LiveRace } from "@ea/analytics/live";
-  import { resolve } from "$app/paths";
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
+  import { liveLinks } from "#lib/live/links.js";
   import { tally } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -24,6 +24,8 @@
       counted: number | null;
     }>;
   } = $props();
+
+  const toLive = liveLinks();
 
   const houses = $derived(
     summaries.filter((entry) => entry.race.office === "house"),
@@ -123,7 +125,7 @@
         {const option = $derived(entry.winner ?? entry.leader)}
         <li class="lg:inline-40">
           <a
-            href={resolve("/live/[...path]", { path: entry.race.slug })}
+            href={toLive(entry.race.slug)}
             aria-current={isCurrent ? "page" : undefined}
             class={cn(
               "grid gap-1.5 rounded-sm px-3 py-2 ring-1 ring-border transition-colors hover:bg-secondary",
@@ -200,7 +202,7 @@
           {const color = $derived(fill(entry))}
           <li>
             <a
-              href={resolve("/live/[...path]", { path: entry.race.slug })}
+              href={toLive(entry.race.slug)}
               aria-current={isCurrent ? "page" : undefined}
               aria-label="{title(entry.race)}: {status(entry)}"
               class={cn(

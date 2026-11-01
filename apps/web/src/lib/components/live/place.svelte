@@ -4,7 +4,6 @@
     LiveEstimate,
     LiveRace,
   } from "@ea/analytics/live";
-  import { resolve } from "$app/paths";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import { count, percent } from "#lib/format.js";
@@ -16,6 +15,7 @@
     surname,
     tone,
   } from "#lib/live/format.js";
+  import { liveLinks } from "#lib/live/links.js";
   import { remainder, standing, sum } from "#lib/live/standing.js";
   import { closing, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -38,6 +38,8 @@
     clock: number;
     isOffline?: boolean;
   } = $props();
+
+  const toLive = liveLinks();
 
   const ORDER = { senate: 0, governor: 1, house: 2, other: 3 };
 
@@ -127,9 +129,7 @@
     const found = counties.get(unitId);
     return found == null || unitId === place.id
       ? null
-      : resolve("/live/[...path]", {
-          path: `${election.slug}/place/${placeSlug(found)}`,
-        });
+      : toLive(`${election.slug}/place/${placeSlug(found)}`);
   }
 
   function title(race: LiveRace) {
@@ -183,7 +183,7 @@
         {/if}
       </span>
       <a
-        href={resolve("/live/[...path]", { path: election.slug })}
+        href={toLive(election.slug)}
         class="font-semibold text-foreground underline-offset-2 hover:underline"
         >{election.title}</a
       >
@@ -251,7 +251,7 @@
           <li class="grid gap-2 rounded-sm p-3 ring-1 ring-border">
             <div class="flex items-baseline justify-between gap-3">
               <a
-                href={resolve("/live/[...path]", { path: entry.race.slug })}
+                href={toLive(entry.race.slug)}
                 class="text-[0.9375rem] font-semibold underline-offset-2 hover:underline"
                 >{title(entry.race)}</a
               >

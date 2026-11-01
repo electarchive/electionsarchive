@@ -4,13 +4,13 @@
     LiveEstimate,
     LiveRace,
   } from "@ea/analytics/live";
-  import { resolve } from "$app/paths";
   import { untrack } from "svelte";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import { count, percent } from "#lib/format.js";
   import { clock, lead, placeSlug, stamp } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
+  import { liveLinks } from "#lib/live/links.js";
   import { standing, sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -46,6 +46,8 @@
     forecasts?: boolean;
   } = $props();
 
+  const toLive = liveLinks();
+
   const RECOUNT: Record<string, number> = { mi: 2000 };
 
   let mode = $state<Mode>("lead");
@@ -62,9 +64,7 @@
     const name = counties.get(unitId);
     return base == null || name == null
       ? null
-      : resolve("/live/[...path]", {
-          path: `${base}/place/${placeSlug(name)}`,
-        });
+      : toLive(`${base}/place/${placeSlug(name)}`);
   }
   let selected = $state<string | null>(null);
   let hovered = $state<string | null>(null);

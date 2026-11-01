@@ -1,23 +1,16 @@
 <script lang="ts">
   import { refreshAll, replaceState } from "$app/navigation";
-  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { untrack } from "svelte";
-  import Dashboard from "#lib/components/live/dashboard.svelte";
-  import Place from "#lib/components/live/place.svelte";
-  import Race from "#lib/components/live/race.svelte";
-  import Races from "#lib/components/live/races.svelte";
-  import { placeName, placeSlug, stamp } from "#lib/live/format.js";
+  import Night from "#lib/components/live/night.svelte";
+  import { placeName, stamp } from "#lib/live/format.js";
   import { localize } from "#lib/live/prefs.svelte.js";
-  import { remainder, standing } from "#lib/live/standing.js";
   import { closing, describe, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
   import type { PageProps } from "./$types";
 
   const { data }: PageProps = $props();
-
-  const ORDER = { senate: 0, governor: 1, house: 2, other: 3 };
 
   let clock = $state(Date.now());
   let isOffline = $state(false);
@@ -28,56 +21,6 @@
   const race = $derived(
     election.races.find((entry) => entry.slug === data.focus) ?? null,
   );
-  const rail = $derived(
-    election.races
-      .map((entry) => summarize(entry, data.estimates[entry.id] ?? null))
-      .toSorted(
-        (a, b) =>
-          ORDER[a.race.office] - ORDER[b.race.office] ||
-          Number.parseInt(a.race.district ?? "0", 10) -
-            Number.parseInt(b.race.district ?? "0", 10) ||
-          a.race.title.localeCompare(b.race.title),
-      ),
-  );
-
-  const anchor = $derived(
-    race != null && race.office !== "house"
-      ? race
-      : (election.races.find((entry) => entry.office === "senate") ??
-          election.races.find((entry) => entry.office === "governor") ??
-          null),
-  );
-  const counties = $derived.by(() => {
-    if (anchor == null) {
-      return [];
-    }
-    const now = standing(anchor, { at: null, isFinal: true });
-    const estimate = data.estimates[anchor.id] ?? null;
-    return [...now.units.values()]
-      .filter((row) => row.unit.scheme === "us.county")
-      .toSorted(
-        (x, y) =>
-          (y.baseline?.turnout ?? y.total) - (x.baseline?.turnout ?? x.total),
-      )
-      .slice(0, 6)
-      .map((row) => {
-        const rest = remainder(row, estimate, anchor.options, now.pair);
-        return {
-          id: row.unit.id,
-          name: placeName(row.unit.name),
-          href: resolve("/live/[...path]", {
-            path: `${election.slug}/place/${placeSlug(row.unit.name)}`,
-          }),
-          leader:
-            row.leader == null ? null : (anchor.options[row.leader] ?? null),
-          margin: row.margin,
-          counted:
-            row.total > 0
-              ? Math.min(1, row.total / Math.max(1, rest.expected))
-              : null,
-        };
-      });
-  });
   const focused = $derived(
     race == null ? null : summarize(race, data.estimates[race.id] ?? null),
   );
@@ -229,43 +172,13 @@
 </svelte:head>
 
 <main class="sm:pbe-16">
-  {#if data.place != null}
-    <Place
-      {election}
-      estimates={data.estimates}
-      place={data.place}
-      geography={data.geography}
-      {clock}
-      {isOffline}
-    />
-  {:else if data.focus == null}
-    <Dashboard
-      {election}
-      estimates={data.estimates}
-      nation={data.nation}
-      house={data.house}
-      forecasts={data.shown.forecasts}
-      {clock}
-      {isOffline}
-    />
-  {:else}
-    {#if rail.length > 1 || counties.length > 0}
-      <Races summaries={rail} current={data.focus} {counties} />
-    {/if}
-    {#if race != null}
-      {#key race.id}
-        <Race
-          {election}
-          {race}
-          geography={data.geography}
-          base={election.slug}
-          {clock}
-          {isOffline}
-          forecasts={data.shown.forecasts}
-          bind:at
-          bind:isFinal
-        />
-      {/key}
-    {/if}
-  {/if}
+  <Night
+    {data}
+    {election}
+    estimates={data.estimates}
+    {clock}
+    {isOffline}
+    bind:at
+    bind:isFinal
+  />
 </main>
