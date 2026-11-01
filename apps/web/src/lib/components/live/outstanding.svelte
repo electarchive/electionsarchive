@@ -6,6 +6,7 @@
   import { sum, toward } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import MethodLink from "./method-link.svelte";
 
   let {
     options,
@@ -74,7 +75,10 @@
 
 <section class="grid gap-3" aria-busy={estimate == null}>
   <header class="grid gap-1">
-    <h3 class="heading text-lg!">{m.night_left_title()}</h3>
+    <div class="flex items-center gap-1.5">
+      <h3 class="heading text-lg!">{m.night_left_title()}</h3>
+      <MethodLink section="turnout" />
+    </div>
     {#if estimate != null && left >= 1}
       <p class="text-sm text-muted-foreground">
         {m.night_left_summary({ count: compact(left) })}

@@ -7,6 +7,7 @@
   import { toward } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import MethodLink from "./method-link.svelte";
 
   const {
     options,
@@ -89,7 +90,10 @@
 </script>
 
 <section class="grid gap-4" aria-labelledby="field-title">
-  <h2 id="field-title" class="heading text-lg!">{m.night_field_title()}</h2>
+  <div class="flex items-center gap-1.5">
+    <h2 id="field-title" class="heading text-lg!">{m.night_field_title()}</h2>
+    <MethodLink section="how" />
+  </div>
   <table class="border-collapse text-[0.875rem] inline-full">
     <thead>
       <tr class="text-xs text-muted-foreground">
@@ -242,7 +246,10 @@
 
   {#if shareIn != null}
     <div class="grid gap-2 border-bs border-border pbs-4">
-      <h3 class="text-sm font-semibold">{m.night_field_basis()}</h3>
+      <div class="flex items-center gap-1">
+        <h3 class="text-sm font-semibold">{m.night_field_basis()}</h3>
+        <MethodLink section="turnout" />
+      </div>
       <dl
         class="grid gap-2 text-[0.8125rem] sm:grid-cols-[minmax(0,22rem)_minmax(0,28rem)_3.5rem] sm:items-center sm:gap-x-4"
       >

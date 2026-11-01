@@ -6,6 +6,7 @@
   import { compact, lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import MethodLink from "./method-link.svelte";
 
   const {
     options,
@@ -213,9 +214,12 @@
   aria-busy={isWaiting}
 >
   <div class="grid content-start gap-2.5">
-    <h2 id="dial-title" class="text-[0.8125rem] font-semibold">
-      {m.night_dial_title()}
-    </h2>
+    <div class="flex items-center gap-1">
+      <h2 id="dial-title" class="text-[0.8125rem] font-semibold">
+        {m.night_dial_title()}
+      </h2>
+      <MethodLink section="ranges" />
+    </div>
     <div
       class="grid gap-2"
       role="img"

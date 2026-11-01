@@ -6,6 +6,7 @@
   import { sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import MethodLink from "./method-link.svelte";
 
   const {
     options,
@@ -250,7 +251,10 @@
 
 <figure class="grid gap-4">
   <figcaption class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-    <span class="heading text-lg!">{m.night_trend_title()}</span>
+    <span class="flex items-center gap-1.5">
+      <span class="heading text-lg!">{m.night_trend_title()}</span>
+      <MethodLink section="ranges" />
+    </span>
     <span
       class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground"
     >
