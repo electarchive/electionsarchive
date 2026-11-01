@@ -767,9 +767,9 @@ def rows(state: str, url: str, path: Path):
                     "candidate": candidate["candName"].title(),
                     "write_in": False,
                     "votes": int(result["totalVotes"]),
-                    "as_of": datetime.fromisoformat(stored["lastUpdate"])
-                    .replace(tzinfo=ZoneInfo("America/Chicago"))
-                    .isoformat(),
+                    "as_of": updated.isoformat()
+                    if (updated := datetime.fromisoformat(stored["lastUpdate"])).tzinfo
+                    else updated.replace(tzinfo=ZoneInfo("America/Chicago")).isoformat(),
                     "reporting": None,
                     "total": None,
                     "scope": race["raceTitle2"]

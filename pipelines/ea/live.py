@@ -4,7 +4,7 @@ import time
 import tomllib
 import traceback
 from concurrent.futures import Future, ThreadPoolExecutor
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -84,6 +84,9 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
         frames: list[tuple[UUID, datetime, dict[tuple[UUID, UUID], int], tuple[int, int]]] = []
         for _, contest_key, contest, sums, reporting, stamp in tallies:
             as_of = datetime.fromisoformat(str(stamp)) if stamp else fetched_at
+            if as_of.tzinfo is None or as_of > fetched_at + timedelta(minutes=10):
+                issue(conn, feed, "stamp", f"{contest_key}: feed stamp {stamp} read as the fetch time")
+                as_of = fetched_at
             if not any(sums.values()):
                 continue
             previous = conn.execute(
