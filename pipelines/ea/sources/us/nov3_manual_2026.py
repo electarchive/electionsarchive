@@ -208,6 +208,30 @@ COUNTIES = {
         "https://slocounty.ca.gov/departments/clerk-recorder/all-services/elections-and-voting/elections-conducted-by-county-of-san-luis-obispo/november-3,-2026,-general-election",
         "N3M-web/ca625/slo_nov3.html",
     ),
+    "06097": (
+        "CA",
+        "https://sonomacounty.gov/administrative-support-and-fiscal-services/registrar-of-voters/elections/november-3-2026-general-election-local-measures-that-were-filed",
+        "MF-541/sonoma/SoCo_Nov2026GenElec_9311_MeasAB_SoCoJrCollDist_Bond_EN.pdf",
+    ),
+    "06041": (
+        "CA",
+        "https://www.marincounty.gov/departments/elections/november-3-2026-general-election/information-about-measures-110326/list-measures-110326",
+        "MF-541/marin/marin-2026-11-03-measures.html",
+    ),
+    "06053": (
+        "CA",
+        "https://www.countyofmonterey.gov/government/departments-i-z/elections",
+        "MF-541/monterey/monterey-2026-11-03-list-of-local-measures.html",
+    ),
+    "06029": ("CA", "https://www.kernvote.com/", "MF-541/kern/Kern County Measure Letter Assignments.pdf"),
+    "06107": ("CA", "https://tularecounty.ca.gov/elections/", "MF-541/tulare/tulare-2026-11-03-measures.html"),
+    "06077": ("CA", "https://www.sjcrov.org/", "MF-541/san-joaquin/sj-composite-eng-(1).pdf"),
+    "06095": (
+        "CA",
+        "https://www.solanocounty.gov/government/registrar-voters",
+        "MF-541/solano/Notice_of_Measures.pdf",
+    ),
+    "06083": ("CA", "https://sbcvote.com/", "MF-541/santa-barbara/bt000040.pdf"),
     "44001": (
         "RI",
         "https://www.barrington.ri.gov/DocumentCenter/View/2978/BOC-Booklet-Questions-Info-revised-10-6",
