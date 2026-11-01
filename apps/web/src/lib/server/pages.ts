@@ -48,13 +48,23 @@ function ahead(
   if (count == null || count.last < 2 || looking >= 2) {
     return;
   }
-  const keys = new Set(
-    [count.round + 1, count.round - 1, count.last]
-      .filter((round) => round >= 1 && round <= count.last)
-      .map((round) => (round === count.initial ? 0 : round))
-      .filter((round) => round !== asked),
-  );
-  if (keys.size === 0) {
+  const rest = Array.from({ length: count.last }, (_, index) => index + 1);
+  const keys = [
+    ...new Set(
+      [
+        count.round + 1,
+        count.round - 1,
+        count.last,
+        ...rest.toSorted(
+          (a, b) => Math.abs(a - count.round) - Math.abs(b - count.round),
+        ),
+      ]
+        .filter((round) => round >= 1 && round <= count.last)
+        .map((round) => (round === count.initial ? 0 : round))
+        .filter((round) => round !== asked),
+    ),
+  ].slice(0, 12);
+  if (keys.length === 0) {
     return;
   }
   looking++;

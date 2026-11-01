@@ -38,6 +38,12 @@ const byCode = (a: string, b: string) => (a < b ? -1 : Number(a > b));
 
 const rowsOf = <Row>(result: { rows: Array<Row> }) => result.rows;
 
+const across = async <T>(
+  isCounted: boolean,
+  key: () => string,
+  compute: () => Promise<T>,
+) => (isCounted ? remember(key(), compute, true) : compute());
+
 const toFourPlaces = (value: number) => Math.round(value * 10_000) / 10_000;
 
 const isRastered = (tiles: string | null) =>
@@ -1583,60 +1589,72 @@ async function load(
         )
       : {},
   )}::jsonb`;
-  const picked = await db.execute<{
-    area: number;
-    k: number;
-    contest: string;
-    root: string;
-    stage: string;
-    status: string;
-    completeness: number | null;
-    is_default: boolean;
-    single: boolean;
-    kind: string;
-    publisher: string;
-    title: string;
-    url: string | null;
-    license: string | null;
-    attribution: string | null;
-    unreconciled: v.InferOutput<typeof Unreconciled> | null;
-  }>(sql`
-    with recursive grp(id, root) as (
-      select id, id from unnest(${sql.param(roots)}::uuid[]) as r(id)
-      union all
-      select c.id, grp.root from contest c join grp on c.allocation_parent_id = grp.id
-    ),
-    sets as materialized (
-      select rs.k, rs.id, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
-      from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
-      ${only == null ? sql`` : sql`where rs.k = any(${sql.param(only)}::int[])`}
-    ),
-    picked as (
-      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.id, rs.contest_id as contest, rs.root, rs.stage, rs.status,
-        rs.completeness, rs.is_default, rs.source_id
-      from sets rs
-      ${
+  const picked = {
+    rows: await across(
+      step != null,
+      () =>
+        `picked:${createHash("sha1")
+          .update(JSON.stringify([roots, areaKs, owners, only, facts]))
+          .digest("hex")}`,
+      async () =>
+        rowsOf(
+          await db.execute<{
+            area: number;
+            k: number;
+            contest: string;
+            root: string;
+            stage: string;
+            status: string;
+            completeness: number | null;
+            is_default: boolean;
+            single: boolean;
+            kind: string;
+            publisher: string;
+            title: string;
+            url: string | null;
+            license: string | null;
+            attribution: string | null;
+            unreconciled: v.InferOutput<typeof Unreconciled> | null;
+          }>(sql`
+            with recursive grp(id, root) as (
+              select id, id from unnest(${sql.param(roots)}::uuid[]) as r(id)
+              union all
+              select c.id, grp.root from contest c join grp on c.allocation_parent_id = grp.id
+            ),
+            sets as materialized (
+              select rs.k, rs.id, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
+              from grp cross join lateral (select * from result_set x where x.contest_id = grp.id and x.status <> 'withdrawn' and ${served("x")} offset 0) rs
+              ${only == null ? sql`` : sql`where rs.k = any(${sql.param(only)}::int[])`}
+            ),
+            picked as (
+              select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.id, rs.contest_id as contest, rs.root, rs.stage, rs.status,
+                rs.completeness, rs.is_default, rs.source_id
+              from sets rs
+              ${
         owners.length === 0
           ? sql`cross join unnest(${sql.param(areaKs)}::int[]) as a(k)`
           : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = rs.root`
       }
-      join lateral (
-        select count(distinct f.option_k) filter (where f.option_k <> 0) as options
-        from (${FACTS[facts](sql`rs.k`, sql`a.k`, units)}) f where f.measure = any(${COUNTED}) and f.value > 0
-        having count(*) > 0
-      ) hit on true
-      order by rs.contest_id, a.k,
-        (exists (select from source s where s.id = rs.source_id and s.kind = 'official_body')
-          and rs.stage not in ('preliminary', 'live')
-          and exists (select from result_rollup_unit u where u.result_set_k = rs.k and u.area_k = a.k)) desc,
-        rs.is_default desc, array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
-    )
-    select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
-      coalesce((select c.magnitude from contest c where c.id = p.contest), 1) <= 1 as single,
-      s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
-      (select f.details from flag f where f.result_set_id = p.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
-    from picked p join source s on s.id = p.source_id
-  `);
+              join lateral (
+                select count(distinct f.option_k) filter (where f.option_k <> 0) as options
+                from (${FACTS[facts](sql`rs.k`, sql`a.k`, units)}) f where f.measure = any(${COUNTED}) and f.value > 0
+                having count(*) > 0
+              ) hit on true
+              order by rs.contest_id, a.k,
+                (exists (select from source s where s.id = rs.source_id and s.kind = 'official_body')
+                  and rs.stage not in ('preliminary', 'live')
+                  and exists (select from result_rollup_unit u where u.result_set_k = rs.k and u.area_k = a.k)) desc,
+                rs.is_default desc, array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
+            )
+            select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
+              coalesce((select c.magnitude from contest c where c.id = p.contest), 1) <= 1 as single,
+              s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
+              (select f.details from flag f where f.result_set_id = p.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
+            from picked p join source s on s.id = p.source_id
+          `),
+        ),
+    ),
+  };
   if (picked.rows.length === 0) {
     return loaded;
   }
@@ -3570,68 +3588,91 @@ async function places(
       owner: childContest.get(kid.id) ?? null,
     };
   });
-  const pooled = await db.execute<{
-    pool: (typeof POOLS)[number];
-    isPlaced: boolean;
-    channels: Array<number>;
-  }>(sql`
-    with recursive grp(id) as (
-      select ${contest.root}::uuid
-      union all
-      select c.id from contest c join grp on c.allocation_parent_id = grp.id
-    ),
-    sets as materialized (
-      select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active' and ${served("rs")}
-    ),
-    short as materialized (
-      select ${isRoot && contest.id === contest.root && contest.place?.k === area.k ? sql`true` : sql`false`} and (
-        select sum(r.value) from sets cross join lateral (
-          select r.value from result_rollup r
-          where r.result_set_k = sets.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
-        ) r
-      ) > (
-        select coalesce(sum(r.value), 0) from sets cross join unnest(${sql.param(shown.map((kid) => kid.k))}::int[]) as kid(k) cross join lateral (
-          select r.value from result_rollup r
-          where r.result_set_k = sets.k and r.area_k = kid.k and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
-        ) r
-      ) as "isShort"
-    )
-    select u.pool, u."isPlaced", array_agg(distinct u.channel) as channels from (
-      select ${POOL} as pool, false as "isPlaced", (
-        select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
-      ) as channel
-      from jsonb_array_elements_text(${JSON.stringify(
-        await remember("unlocated", async () =>
-          Object.fromEntries(
-            rowsOf(
-              await db.execute<{ polity: string; units: Array<number> }>(sql`
-                with recursive up(k, id) as (
-                  select u.k, u.polity_id from reporting_unit u where u.area_id is null
-                  union
-                  select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
-                )
-                select id::text as polity, array_agg(k order by k) as units from up group by id
-              `),
-            ).map((row) => [row.polity, row.units]),
+  const pooled = await across(
+    round != null,
+    () =>
+      `pooled:${createHash("sha1")
+        .update(
+          JSON.stringify([
+            contest.root,
+            contest.id,
+            isRoot,
+            contest.place?.k ?? null,
+            area.k,
+            area.id,
+            shown.map((kid) => kid.k),
+          ]),
+        )
+        .digest("hex")}`,
+    async () =>
+      rowsOf(
+        await db.execute<{
+          pool: (typeof POOLS)[number];
+          isPlaced: boolean;
+          channels: Array<number>;
+        }>(sql`
+          with recursive grp(id) as (
+            select ${contest.root}::uuid
+            union all
+            select c.id from contest c join grp on c.allocation_parent_id = grp.id
           ),
-        ),
-      )}::jsonb -> (
-        select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
-      )) as uk(k)
-      join reporting_unit u on u.k = uk.k::int
-      where (select "isShort" from short) and ${POOLED}
-        and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
-      union all
-      select ${POOL}, true, (
-        select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
-      )
-      from reporting_unit u
-      where u.area_id = ${area.id}::uuid and ${PLACED}
-        and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
-    ) u
-    group by 1, 2
-  `);
-  const pools = pooled.rows
+          sets as materialized (
+            select rs.k from grp join result_set rs on rs.contest_id = grp.id and rs.status = 'active' and ${served("rs")}
+          ),
+          short as materialized (
+            select ${isRoot && contest.id === contest.root && contest.place?.k === area.k ? sql`true` : sql`false`} and (
+              select sum(r.value) from sets cross join lateral (
+                select r.value from result_rollup r
+                where r.result_set_k = sets.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
+              ) r
+            ) > (
+              select coalesce(sum(r.value), 0) from sets cross join unnest(${sql.param(shown.map((kid) => kid.k))}::int[]) as kid(k) cross join lateral (
+                select r.value from result_rollup r
+                where r.result_set_k = sets.k and r.area_k = kid.k and r.measure = any(${COUNTED}) and r.option_k <> 0 offset 0
+              ) r
+            ) as "isShort"
+          )
+          select u.pool, u."isPlaced", array_agg(distinct u.channel) as channels from (
+            select ${POOL} as pool, false as "isPlaced", (
+              select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
+            ) as channel
+            from jsonb_array_elements_text(${JSON.stringify(
+              await remember("unlocated", async () =>
+                Object.fromEntries(
+                  rowsOf(
+                    await db.execute<{
+                      polity: string;
+                      units: Array<number>;
+                    }>(sql`
+                      with recursive up(k, id) as (
+                        select u.k, u.polity_id from reporting_unit u where u.area_id is null
+                        union
+                        select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
+                      )
+                      select id::text as polity, array_agg(k order by k) as units from up group by id
+                    `),
+                  ).map((row) => [row.polity, row.units]),
+                ),
+              ),
+            )}::jsonb -> (
+              select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
+            )) as uk(k)
+            join reporting_unit u on u.k = uk.k::int
+            where (select "isShort" from short) and ${POOLED}
+              and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
+            union all
+            select ${POOL}, true, (
+              select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
+            )
+            from reporting_unit u
+            where u.area_id = ${area.id}::uuid and ${PLACED}
+              and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
+          ) u
+          group by 1, 2
+        `),
+      ),
+  );
+  const pools = pooled
     .filter(() => level.code !== "world.country")
     .map((row) => ({ ...row, index: POOLS.indexOf(row.pool) }))
     .toSorted(
@@ -7127,251 +7168,259 @@ export const contests = {
         return withLogos(page, contest.date);
       }
 
-      const covering = await db.execute<{
-        id: string;
-        series: string;
-        election: string;
-        indirect: boolean;
-        date: string | null;
-        year: number | null;
-        status: string;
-        isRemainder: boolean;
-        counted: boolean;
-        own: boolean;
-        lineage: boolean;
-        notional: boolean;
-        reach: Array<string> | null;
-      }>(sql`
-        with recursive anc(id) as (
-          select ${area.id}::uuid
-          union
-          select p.parent_id from area_parent p join anc on p.area_id = anc.id
-        ),
-        later(id) as (
-          select ${contest.place?.id ?? null}::uuid
-          union
-          select x.id from later cross join lateral (
-            select t.area_id as id from area_event_member f
-            join area_event e on e.id = f.event_id and e.kind = 'boundary_changed'
-            join area_event_member t on t.event_id = e.id and t.role = 'to'
-              and (
-                (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
-                or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
-                or exists (
-                  select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
-                  where gf.area_id = f.area_id and gt.area_id = t.area_id
-                    and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
-                )
+      const covering = await across(
+        last > 1,
+        () =>
+          `covering:${area.id}:${contest.place?.id ?? ""}:${contest.root}:${path?.split("/").at(-1) ?? ""}:${area.k}`,
+        async () =>
+          rowsOf(
+            await db.execute<{
+              id: string;
+              series: string;
+              election: string;
+              indirect: boolean;
+              date: string | null;
+              year: number | null;
+              status: string;
+              isRemainder: boolean;
+              counted: boolean;
+              own: boolean;
+              lineage: boolean;
+              notional: boolean;
+              reach: Array<string> | null;
+            }>(sql`
+              with recursive anc(id) as (
+                select ${area.id}::uuid
+                union
+                select p.parent_id from area_parent p join anc on p.area_id = anc.id
+              ),
+              later(id) as (
+                select ${contest.place?.id ?? null}::uuid
+                union
+                select x.id from later cross join lateral (
+                  select t.area_id as id from area_event_member f
+                  join area_event e on e.id = f.event_id and e.kind = 'boundary_changed'
+                  join area_event_member t on t.event_id = e.id and t.role = 'to'
+                    and (
+                      (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
+                      or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
+                      or exists (
+                        select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
+                        where gf.area_id = f.area_id and gt.area_id = t.area_id
+                          and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                      )
+                    )
+                  where f.area_id = later.id and f.role = 'from'
+                  union
+                  select b.id from area a
+                  join crosswalk_weight f on f.from_k = a.k and f.weight >= 0.5
+                  join crosswalk fc on fc.id = f.crosswalk_id and fc.method = 'area'
+                  join boundary_set bf on bf.id = fc.from_boundary_set_id
+                  join boundary_set bt on bt.id = fc.to_boundary_set_id and bt.valid_from > bf.valid_from
+                  join crosswalk_weight r on r.from_k = f.to_k and r.to_k = a.k and r.weight >= 0.5
+                  join crosswalk rc on rc.id = r.crosswalk_id and rc.method = 'area'
+                    and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
+                  join area b on b.k = f.to_k
+                  where a.id = later.id
+                  union
+                  select b.id from area a
+                  join crosswalk c on c.method in ('exact', 'area', 'population')
+                  join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
+                  join boundary_set bt on bt.id = c.to_boundary_set_id and bt.valid_from > bf.valid_from
+                  join crosswalk_weight w on w.crosswalk_id = c.id and w.from_k = a.k
+                  join area b on b.k = w.to_k
+                  where a.id = later.id
+                    and (
+                      w.weight >= 0.5
+                      or exists (
+                        select from crosswalk rc
+                        join crosswalk_weight r on r.crosswalk_id = rc.id and r.from_k = w.to_k and r.to_k = a.k and r.weight >= 0.5
+                        where rc.from_boundary_set_id = c.to_boundary_set_id and rc.to_boundary_set_id = c.from_boundary_set_id
+                          and rc.method = c.method
+                      )
+                    )
+                    and (
+                      exists (
+                        select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                        where na.entity_id = a.id
+                      )
+                      or c.method = 'exact' and exists (
+                        select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                        where ga.area_id = a.id
+                          and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                      )
+                    )
+                  union
+                  select b.id from area a
+                  join crosswalk c on c.method = 'exact'
+                  join boundary_set bt on bt.id = c.to_boundary_set_id and bt.scheme_code = a.scheme_code
+                  join boundary_set bf on bf.id = c.from_boundary_set_id and bf.valid_from > bt.valid_from
+                  join crosswalk_weight w on w.crosswalk_id = c.id and w.to_k = a.k and w.weight >= 0.5
+                  join area b on b.k = w.from_k
+                  where a.id = later.id
+                    and (
+                      exists (
+                        select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                        where na.entity_id = a.id
+                      )
+                      or c.method = 'exact' and exists (
+                        select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                        where ga.area_id = a.id
+                          and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                      )
+                    )
+                ) x
+              ),
+              earlier(id) as (
+                select ${contest.place?.id ?? null}::uuid
+                union
+                select x.id from earlier cross join lateral (
+                  select f.area_id as id from area_event_member t
+                  join area_event e on e.id = t.event_id and e.kind = 'boundary_changed'
+                  join area_event_member f on f.event_id = e.id and f.role = 'from'
+                    and (
+                      (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
+                      or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
+                      or exists (
+                        select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
+                        where gf.area_id = f.area_id and gt.area_id = t.area_id
+                          and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
+                      )
+                    )
+                  where t.area_id = earlier.id and t.role = 'to'
+                  union
+                  select b.id from area a
+                  join crosswalk_weight f on f.from_k = a.k and f.weight >= 0.5
+                  join crosswalk fc on fc.id = f.crosswalk_id and fc.method = 'area'
+                  join boundary_set bf on bf.id = fc.from_boundary_set_id
+                  join boundary_set bt on bt.id = fc.to_boundary_set_id and bt.valid_from < bf.valid_from
+                  join crosswalk_weight r on r.from_k = f.to_k and r.to_k = a.k and r.weight >= 0.5
+                  join crosswalk rc on rc.id = r.crosswalk_id and rc.method = 'area'
+                    and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
+                  join area b on b.k = f.to_k
+                  where a.id = earlier.id
+                  union
+                  select b.id from area a
+                  join crosswalk c on c.method in ('exact', 'area', 'population')
+                  join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
+                  join boundary_set bt on bt.id = c.to_boundary_set_id and bt.valid_from < bf.valid_from
+                  join crosswalk_weight w on w.crosswalk_id = c.id and w.from_k = a.k
+                  join area b on b.k = w.to_k
+                  where a.id = earlier.id
+                    and (
+                      w.weight >= 0.5
+                      or exists (
+                        select from crosswalk rc
+                        join crosswalk_weight r on r.crosswalk_id = rc.id and r.from_k = w.to_k and r.to_k = a.k and r.weight >= 0.5
+                        where rc.from_boundary_set_id = c.to_boundary_set_id and rc.to_boundary_set_id = c.from_boundary_set_id
+                          and rc.method = c.method
+                      )
+                    )
+                    and (
+                      exists (
+                        select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                        where na.entity_id = a.id
+                      )
+                      or c.method = 'exact' and exists (
+                        select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                        where ga.area_id = a.id
+                          and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                      )
+                    )
+                  union
+                  select b.id from area a
+                  join crosswalk c on c.method = 'exact'
+                  join boundary_set bt on bt.id = c.to_boundary_set_id and bt.scheme_code = a.scheme_code
+                  join boundary_set bf on bf.id = c.from_boundary_set_id and bf.valid_from < bt.valid_from
+                  join crosswalk_weight w on w.crosswalk_id = c.id and w.to_k = a.k and w.weight >= 0.5
+                  join area b on b.k = w.from_k
+                  where a.id = earlier.id
+                    and (
+                      exists (
+                        select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
+                        where na.entity_id = a.id
+                      )
+                      or c.method = 'exact' and exists (
+                        select from area_geometry ga join area_geometry gb on gb.area_id = b.id
+                        where ga.area_id = a.id
+                          and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
+                      )
+                    )
+                ) x
+              ),
+              roots as (
+                select c.id, ${serial("c", "e")} as series,
+                  e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
+                  c.term is not distinct from 'remainder' as "isRemainder", c.notional,
+                  c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
+                  c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
+                    and c.district_area_id in (select id from later union select id from earlier) as lineage
+                from (
+                  select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
+                  union
+                  select x.id from contest x where x.district_area_id = ${contest.place?.id ?? null}::uuid and x.allocation_parent_id is null
+                  union
+                  select x.id from contest x
+                  where x.district_area_id in (select id from later union select id from earlier) and x.allocation_parent_id is null
+                  union
+                  select x.id from polity_territory pt
+                  join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
+                  join contest x on x.election_id = y.id
+                  where pt.area_id in (select id from anc) and x.district_area_id is null and x.allocation_parent_id is null
+                    and y.kind <> 'by_election'
+                    and not exists (
+                      select from contest z
+                      where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
+                        and z.district_area_id is not null and z.allocation_parent_id is null
+                    )
+                  union
+                  select x.id from contest r
+                  join contest x on x.body_id = r.body_id and x.district_area_id is null and x.allocation_parent_id is null
+                  join slug sx on sx.entity_id = x.id and sx.is_current
+                  where r.id = ${contest.root}::uuid and r.district_area_id is null and r.body_id is not null
+                    and substring(sx.path from '[^/]+$') = ${path?.split("/").at(-1) ?? ""}
+                ) hit
+                cross join lateral (select c.* from contest c where c.id = hit.id offset 0) c
+                cross join lateral (select e.* from election e where e.id = c.election_id offset 0) e
+              ),
+              grp(root, id) as materialized (
+                select id, id from roots
+                union all
+                select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
+              ),
+              tallied as materialized (
+                select distinct grp.root from grp
+                cross join lateral (
+                  select from result_set rs
+                  cross join lateral (
+                    select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
+                  ) probe
+                  where rs.contest_id = grp.id and rs.status <> 'withdrawn' and ${served("rs")}
+                  limit 1
+                ) hit
+              ),
+              decided as materialized (
+                select distinct grp.root from grp
+                cross join lateral (
+                  select from contest_option o
+                  join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
+                  join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+                  where o.contest_id = grp.id
+                  limit 1
+                ) hit
               )
-            where f.area_id = later.id and f.role = 'from'
-            union
-            select b.id from area a
-            join crosswalk_weight f on f.from_k = a.k and f.weight >= 0.5
-            join crosswalk fc on fc.id = f.crosswalk_id and fc.method = 'area'
-            join boundary_set bf on bf.id = fc.from_boundary_set_id
-            join boundary_set bt on bt.id = fc.to_boundary_set_id and bt.valid_from > bf.valid_from
-            join crosswalk_weight r on r.from_k = f.to_k and r.to_k = a.k and r.weight >= 0.5
-            join crosswalk rc on rc.id = r.crosswalk_id and rc.method = 'area'
-              and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
-            join area b on b.k = f.to_k
-            where a.id = later.id
-            union
-            select b.id from area a
-            join crosswalk c on c.method in ('exact', 'area', 'population')
-            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
-            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.valid_from > bf.valid_from
-            join crosswalk_weight w on w.crosswalk_id = c.id and w.from_k = a.k
-            join area b on b.k = w.to_k
-            where a.id = later.id
-              and (
-                w.weight >= 0.5
-                or exists (
-                  select from crosswalk rc
-                  join crosswalk_weight r on r.crosswalk_id = rc.id and r.from_k = w.to_k and r.to_k = a.k and r.weight >= 0.5
-                  where rc.from_boundary_set_id = c.to_boundary_set_id and rc.to_boundary_set_id = c.from_boundary_set_id
-                    and rc.method = c.method
-                )
-              )
-              and (
-                exists (
-                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
-                  where na.entity_id = a.id
-                )
-                or c.method = 'exact' and exists (
-                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
-                  where ga.area_id = a.id
-                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
-                )
-              )
-            union
-            select b.id from area a
-            join crosswalk c on c.method = 'exact'
-            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.scheme_code = a.scheme_code
-            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.valid_from > bt.valid_from
-            join crosswalk_weight w on w.crosswalk_id = c.id and w.to_k = a.k and w.weight >= 0.5
-            join area b on b.k = w.from_k
-            where a.id = later.id
-              and (
-                exists (
-                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
-                  where na.entity_id = a.id
-                )
-                or c.method = 'exact' and exists (
-                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
-                  where ga.area_id = a.id
-                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
-                )
-              )
-          ) x
-        ),
-        earlier(id) as (
-          select ${contest.place?.id ?? null}::uuid
-          union
-          select x.id from earlier cross join lateral (
-            select f.area_id as id from area_event_member t
-            join area_event e on e.id = t.event_id and e.kind = 'boundary_changed'
-            join area_event_member f on f.event_id = e.id and f.role = 'from'
-              and (
-                (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'from') = 1
-                or (select count(*) from area_event_member n where n.event_id = e.id and n.role = 'to') = 1
-                or exists (
-                  select from area_geometry gf join area_geometry gt on gf.geom && gt.geom
-                  where gf.area_id = f.area_id and gt.area_id = t.area_id
-                    and ST_Area(ST_Intersection(gf.geom, gt.geom)) > 0.05 * least(ST_Area(gf.geom), ST_Area(gt.geom))
-                )
-              )
-            where t.area_id = earlier.id and t.role = 'to'
-            union
-            select b.id from area a
-            join crosswalk_weight f on f.from_k = a.k and f.weight >= 0.5
-            join crosswalk fc on fc.id = f.crosswalk_id and fc.method = 'area'
-            join boundary_set bf on bf.id = fc.from_boundary_set_id
-            join boundary_set bt on bt.id = fc.to_boundary_set_id and bt.valid_from < bf.valid_from
-            join crosswalk_weight r on r.from_k = f.to_k and r.to_k = a.k and r.weight >= 0.5
-            join crosswalk rc on rc.id = r.crosswalk_id and rc.method = 'area'
-              and rc.from_boundary_set_id = fc.to_boundary_set_id and rc.to_boundary_set_id = fc.from_boundary_set_id
-            join area b on b.k = f.to_k
-            where a.id = earlier.id
-            union
-            select b.id from area a
-            join crosswalk c on c.method in ('exact', 'area', 'population')
-            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.scheme_code = a.scheme_code
-            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.valid_from < bf.valid_from
-            join crosswalk_weight w on w.crosswalk_id = c.id and w.from_k = a.k
-            join area b on b.k = w.to_k
-            where a.id = earlier.id
-              and (
-                w.weight >= 0.5
-                or exists (
-                  select from crosswalk rc
-                  join crosswalk_weight r on r.crosswalk_id = rc.id and r.from_k = w.to_k and r.to_k = a.k and r.weight >= 0.5
-                  where rc.from_boundary_set_id = c.to_boundary_set_id and rc.to_boundary_set_id = c.from_boundary_set_id
-                    and rc.method = c.method
-                )
-              )
-              and (
-                exists (
-                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
-                  where na.entity_id = a.id
-                )
-                or c.method = 'exact' and exists (
-                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
-                  where ga.area_id = a.id
-                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
-                )
-              )
-            union
-            select b.id from area a
-            join crosswalk c on c.method = 'exact'
-            join boundary_set bt on bt.id = c.to_boundary_set_id and bt.scheme_code = a.scheme_code
-            join boundary_set bf on bf.id = c.from_boundary_set_id and bf.valid_from < bt.valid_from
-            join crosswalk_weight w on w.crosswalk_id = c.id and w.to_k = a.k and w.weight >= 0.5
-            join area b on b.k = w.from_k
-            where a.id = earlier.id
-              and (
-                exists (
-                  select from name na join name nb on nb.entity_id = b.id and lower(nb.text) = lower(na.text)
-                  where na.entity_id = a.id
-                )
-                or c.method = 'exact' and exists (
-                  select from area_geometry ga join area_geometry gb on gb.area_id = b.id
-                  where ga.area_id = a.id
-                    and least(ST_Area(ga.geom), ST_Area(gb.geom)) >= 0.5 * greatest(ST_Area(ga.geom), ST_Area(gb.geom))
-                )
-              )
-          ) x
-        ),
-        roots as (
-          select c.id, ${serial("c", "e")} as series,
-            e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
-            c.term is not distinct from 'remainder' as "isRemainder", c.notional,
-            c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own,
-            c.district_area_id is distinct from ${contest.place?.id ?? null}::uuid
-              and c.district_area_id in (select id from later union select id from earlier) as lineage
-          from (
-            select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
-            union
-            select x.id from contest x where x.district_area_id = ${contest.place?.id ?? null}::uuid and x.allocation_parent_id is null
-            union
-            select x.id from contest x
-            where x.district_area_id in (select id from later union select id from earlier) and x.allocation_parent_id is null
-            union
-            select x.id from polity_territory pt
-            join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
-            join contest x on x.election_id = y.id
-            where pt.area_id in (select id from anc) and x.district_area_id is null and x.allocation_parent_id is null
-              and y.kind <> 'by_election'
-              and not exists (
-                select from contest z
-                where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
-                  and z.district_area_id is not null and z.allocation_parent_id is null
-              )
-            union
-            select x.id from contest r
-            join contest x on x.body_id = r.body_id and x.district_area_id is null and x.allocation_parent_id is null
-            join slug sx on sx.entity_id = x.id and sx.is_current
-            where r.id = ${contest.root}::uuid and r.district_area_id is null and r.body_id is not null
-              and substring(sx.path from '[^/]+$') = ${path?.split("/").at(-1) ?? ""}
-          ) hit
-          cross join lateral (select c.* from contest c where c.id = hit.id offset 0) c
-          cross join lateral (select e.* from election e where e.id = c.election_id offset 0) e
-        ),
-        grp(root, id) as materialized (
-          select id, id from roots
-          union all
-          select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
-        ),
-        tallied as materialized (
-          select distinct grp.root from grp
-          cross join lateral (
-            select from result_set rs
-            cross join lateral (
-              select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
-            ) probe
-            where rs.contest_id = grp.id and rs.status <> 'withdrawn' and ${served("rs")}
-            limit 1
-          ) hit
-        ),
-        decided as materialized (
-          select distinct grp.root from grp
-          cross join lateral (
-            select from contest_option o
-            join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-            join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
-            where o.contest_id = grp.id
-            limit 1
-          ) hit
-        )
-        select r.*, (select ${reached("c", "e")} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
-          select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
-          from roots r
-          where r.id <> ${contest.root}::uuid
-        ) r
-        where r.counted or (r.id in (select root from decided)
-          and not (r.own and ${contest.place?.id ?? null}::uuid not in (select id from anc)))
-        order by r.date_from desc nulls last, r.id
-      `);
+              select r.*, (select ${reached("c", "e")} from contest c join election e on e.id = c.election_id where c.id = r.id) as reach from (
+                select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
+                  r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.lineage, r.notional, r.date_from
+                from roots r
+                where r.id <> ${contest.root}::uuid
+              ) r
+              where r.counted or (r.id in (select root from decided)
+                and not (r.own and ${contest.place?.id ?? null}::uuid not in (select id from anc)))
+              order by r.date_from desc nulls last, r.id
+            `),
+          ),
+      );
       const gaps = await db.execute<{ stop: string }>(sql`
         select upper(g.valid)::text as stop from area_geometry g
         where g.area_id = ${area.id}::uuid and upper(g.valid) is not null
@@ -7401,7 +7450,7 @@ export const contests = {
             ? ""
             : found.join("|");
       const here = scope(mine.rows[0]?.reach);
-      const kept = covering.rows.filter((row) => {
+      const kept = covering.filter((row) => {
         const there = scope(row.reach);
         return (
           there == null ||
@@ -8342,25 +8391,32 @@ export const contests = {
         if (!isRoot || grid == null || grid.rows.length === 0) {
           return null;
         }
-        const active = await db.execute<{ k: number }>(sql`
-          select k from result_set where contest_id = ${contest.id}::uuid and status = 'active' and ${served("result_set")}
-        `);
-        const found = await db.execute<{ noun: string }>(sql`
-          select sc.noun
-          from (
-            select distinct unit_k from result_value
-            where result_set_k = any(${sql.param(active.rows.map((row) => row.k))}::int[])
-          ) x
-          join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within' and ru.kind = 'standard'
-          join scheme sc on sc.code = ru.scheme_code
-          where ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
-            and sc.rank > (select rank from scheme where code = ${grid.level})
-          group by sc.noun, sc.rank
-          having count(*) > ${grid.rows.length}
-          order by sc.rank desc
-          limit 1
-        `);
-        return found.rows[0]?.noun ?? null;
+        return across(
+          last > 1,
+          () =>
+            `deeper:${contest.id}:${grid.level}:${grid.levels.map((level) => level.code).join(",")}:${grid.rows.length}`,
+          async () => {
+            const active = await db.execute<{ k: number }>(sql`
+              select k from result_set where contest_id = ${contest.id}::uuid and status = 'active' and ${served("result_set")}
+            `);
+            const found = await db.execute<{ noun: string }>(sql`
+              select sc.noun
+              from (
+                select distinct unit_k from result_value
+                where result_set_k = any(${sql.param(active.rows.map((row) => row.k))}::int[])
+              ) x
+              join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within' and ru.kind = 'standard'
+              join scheme sc on sc.code = ru.scheme_code
+              where ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
+                and sc.rank > (select rank from scheme where code = ${grid.level})
+              group by sc.noun, sc.rank
+              having count(*) > ${grid.rows.length}
+              order by sc.rank desc
+              limit 1
+            `);
+            return found.rows[0]?.noun ?? null;
+          },
+        );
       })();
       deeper.catch(() => null);
       const current = now.get(area.k);
