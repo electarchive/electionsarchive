@@ -7,6 +7,7 @@ import struct
 import subprocess
 import sys
 import unicodedata
+import zipfile
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
@@ -16,7 +17,7 @@ import polars as pl
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, medsl_state, retention_iowa, retention_montana
+from ea.sources.us import medsl, medsl_state, ok_county, retention_iowa, retention_montana
 from ea.sources.us.medsl_state_precincts import FILES, TITLES
 from ea.store import DATA, connect
 
@@ -131,6 +132,25 @@ OKLAHOMA_COURTS = {
 OKLAHOMA_COUNTY_METHOD = (
     "Yes and No votes by county from the Oklahoma State Election Board's official county results, with the county "
     "rows checked against the printed state total."
+)
+OKLAHOMA_CSV_DAYS = ["2012-11-06", "2014-11-04"]
+OKLAHOMA_SEATS_2012 = {
+    "NOMA D. GURICH": (3, None),
+    "YVONNE KAUGER": (4, None),
+    "JAMES E. EDMONDSON": (7, None),
+    "DOUGLAS L. COMBS": (8, None),
+    "CLANCY SMITH": (1, None),
+    "ARLENE JOHNSON": (4, None),
+    "DAVID B. LEWIS": (5, None),
+    "P. THOMAS THORNBRUGH": (3, 1),
+    "WILLIAM C. HETHERINGTON, JR.": (4, 1),
+    "KENNETH L. BUETTNER": (5, 1),
+    "ROBERT BOBBY BELL": (5, 2),
+    "E. BAY MITCHELL, III": (6, 1),
+}
+OKLAHOMA_CSV_METHOD = (
+    "Yes and No votes by county from the Oklahoma State Election Board's official county results file, with the "
+    "state total summed from the 77 county rows."
 )
 OKLAHOMA_DAYS = ["2016-11-08", "2018-11-06", "2020-11-03", "2022-11-08", "2024-11-05"]
 ANSWERS = {"YES": "yes", "NO": "no", "YES/SI": "yes", "NO/NO": "no", "RETAIN": "yes", "REJECT": "no"}
@@ -295,6 +315,19 @@ def fetch() -> None:
                     retrieved_at=datetime.fromtimestamp(file.stat().st_mtime, UTC),
                     media_type="application/pdf",
                 )
+    for day in OKLAHOMA_CSV_DAYS:
+        link = ok_county.url(date.fromisoformat(day))
+        try:
+            raw.cached(SOURCE, link)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                link,
+                raw.cached(ok_county.SOURCE, link).path.read_bytes(),
+                suffix=".zip",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/zip",
+            )
     for path in KANSAS_FILES.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
     for url, name in KANSAS_SCANNED.values():
@@ -652,9 +685,9 @@ def oklahoma() -> list[dict[str, object]]:
     return rows
 
 
-def oklahoma_counties() -> list[dict[str, object]]:
+def oklahoma_county_codes() -> dict[str, str]:
     with connect() as conn:
-        codes = {
+        return {
             re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower()): code
             for code, text in conn.execute(
                 """select u.code, n.text from reporting_unit u
@@ -662,6 +695,10 @@ def oklahoma_counties() -> list[dict[str, object]]:
                    where u.scheme_code = 'us.county' and u.code like '40%%'"""
             ).fetchall()
         }
+
+
+def oklahoma_counties() -> list[dict[str, object]]:
+    codes = oklahoma_county_codes()
     rows: list[dict[str, object]] = []
     for year, day in OKLAHOMA_COUNTY_DAYS.items():
         for file in ("",) if year == 2010 else OKLAHOMA_COUNTY_FILES:
@@ -737,6 +774,62 @@ def oklahoma_counties() -> list[dict[str, object]]:
                                 "flags": 0,
                             }
                         )
+    return rows
+
+
+def oklahoma_method(totals: pl.DataFrame) -> str:
+    return OKLAHOMA_CSV_METHOD if totals["day"][0] in OKLAHOMA_CSV_DAYS else OKLAHOMA_COUNTY_METHOD
+
+
+def oklahoma_csv() -> list[dict[str, object]]:
+    codes = oklahoma_county_codes()
+    rows: list[dict[str, object]] = []
+    for day in OKLAHOMA_CSV_DAYS:
+        link = ok_county.url(date.fromisoformat(day))
+        with zipfile.ZipFile(raw.cached(SOURCE, link).path) as archive:
+            lines = list(csv.DictReader(archive.read(archive.namelist()[0]).decode("utf-8-sig").splitlines()))
+        races: dict[str, dict[str, dict[str, int]]] = {}
+        for line in lines:
+            description = re.sub(r"\s+", " ", line["race_description"]).strip()
+            if re.match(r"(SUPREME COURT|COURT OF CIVIL APPEALS|COURT OF CRIMINAL APPEALS)\b", description):
+                races.setdefault(description, {}).setdefault(line["cand_name"].strip().lower(), {})[
+                    codes[re.sub(r"[^a-z]", "", line["county"].lower())]
+                ] = int(line["cand_tot_votes"])
+        for description, answers in races.items():
+            found = re.fullmatch(
+                r"(SUPREME COURT|COURT OF CIVIL APPEALS|COURT OF CRIMINAL APPEALS)(?: DISRICT| DISTRICT)? ?(\d+)?"
+                r"(?: - OFFICE (\d))? - (.+)",
+                description,
+            )
+            assert found is not None, description
+            name = found[4].strip()
+            number, post = (
+                (int(found[2]), int(found[3]) if found[3] else None) if found[2] else OKLAHOMA_SEATS_2012[name]
+            )
+            if set(answers) != {"yes", "no"} or any(len(places) != 77 for places in answers.values()):
+                raise ValueError(f"{day} {description}: {[(key, len(places)) for key, places in answers.items()]}")
+            for answer, places in answers.items():
+                for code, votes in places.items():
+                    rows.append(
+                        {
+                            "day": day,
+                            "state": "OK",
+                            "court": OKLAHOMA_COURTS[found[1]],
+                            "number": number,
+                            "post": post,
+                            "name": name,
+                            "answer": answer,
+                            "votes": votes,
+                            "page": None,
+                            "x0": None,
+                            "y0": None,
+                            "x1": None,
+                            "y1": None,
+                            "origin": link,
+                            "county": code,
+                            "flags": 0,
+                        }
+                    )
     return rows
 
 
@@ -910,6 +1003,7 @@ def parse() -> None:
         + kansas_scanned()
         + oklahoma()
         + oklahoma_counties()
+        + oklahoma_csv()
         + arizona()
         + california()
         + retention_iowa.rows()
@@ -1189,7 +1283,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Judicial retention elections for state supreme and appellate courts: MEDSL's precinct returns "
-            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024 and county totals 2000–2010, Arizona's "
+            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024 and county totals 2000–2014, Arizona's "
             "official canvasses of 2002, 2006, 2008, 2010, 2014, 2016, 2022, and 2024, California's Supreme Court totals of 2010, 2014, and 2018, Iowa's county canvasses of 2002 through 2022, Montana's county canvasses of 2008 through 2012, and Indiana's 2024 outcomes from the Judicial Branch",
             polity="US",
         )
@@ -1579,7 +1673,7 @@ def emit() -> Path:
                 note(
                     default,
                     "methodology",
-                    f"{METHOD} {OKLAHOMA_COUNTY_METHOD if state == 'OK' and totals['county'].null_count() == 0 else methods[state]}",
+                    f"{METHOD} {oklahoma_method(totals) if state == 'OK' and totals['county'].null_count() == 0 else methods[state]}",
                 )
                 for item in totals.iter_rows(named=True):
                     tallies[item["answer"]] = tallies.get(item["answer"], 0) + item["votes"]
