@@ -10666,7 +10666,7 @@ def parse() -> None:
                                     sort
                                     and said != sort
                                     and ((said, sort) != ("town", "township") or state == "IN")
-                                    and (state != "KY" or (said, sort) != ("city", "village"))
+                                    and (state not in ("KY", "OR") or (said, sort) != ("city", "village"))
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
@@ -10683,6 +10683,8 @@ def parse() -> None:
                                 )
                             ):
                                 continue
+                            if state == "OR" and start and sort == "village" and rest[:1] == ["village"]:
+                                rest = rest[1:]
                             fits.append(
                                 (len(stem), bool(said), rest[1:] if said and not start else rest, label, owner, path)
                             )
