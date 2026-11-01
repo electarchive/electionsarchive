@@ -1160,32 +1160,71 @@ async function gather(
   const tops = found.rows.filter(
     (row) => !members.has(row.id) && !deeper.has(row.id),
   );
-  const below =
+  const level = sql`
+    select s.code from scheme s
+    where s.kind = 'administrative' and s.rank = (
+      select max(x.rank) + 1 from scheme x
+      where x.code = any(${sql.param([...new Set(tops.map((row) => row.scheme))])}::text[])
+    )
+  `;
+  const parents = sql`${sql.param(tops.map((row) => row.id))}::uuid[]`;
+  const sized =
     isDeep && isRoot && tops.length > 1 && tops.length <= 200
-      ? await db.execute<{
+      ? (
+          await db.execute<{ kids: number; facts: number }>(sql`
+            select
+              (select count(*) from (select from area_parent p where p.parent_id = any(${parents}) limit 5000) z)::int as kids,
+              (select count(*) from (
+                select r.area_k from result_rollup_sum r
+                where r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
+                union all
+                select u.area_k from result_rollup_unit u where u.result_set_k = any(${sql.param(ks)}::int[])
+                limit 5000
+              ) z)::int as facts
+          `)
+        ).rows[0]
+      : undefined;
+  const below =
+    sized == null || sized.kids === 0
+      ? { rows: [] }
+      : await db.execute<{
           id: string;
           k: number;
           scheme: string;
           parent: string;
-        }>(sql`
-          select a.id, a.k, a.scheme, a.parent from (
-            select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
-            from area_parent p join area a on a.id = p.area_id
-            where p.parent_id = any(${sql.param(tops.map((row) => row.id))}::uuid[])
-              and p.valid @> ${date}::date
-              and a.scheme_code in (
-                select s.code from scheme s
-                where s.kind = 'administrative' and s.rank = (
-                  select max(x.rank) + 1 from scheme x
-                  where x.code = any(${sql.param([...new Set(tops.map((row) => row.scheme))])}::text[])
+        }>(
+          sized.facts < sized.kids
+            ? sql`
+              select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
+              from (
+                select r.area_k as k from result_rollup_sum r
+                where r.result_set_k = any(${sql.param(ks)}::int[]) and r.measure = any(${COUNTED})
+                union
+                select u.area_k from result_rollup_unit u
+                where u.result_set_k = any(${sql.param(ks)}::int[]) and exists (
+                  select from result_value v
+                  where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
                 )
-              )
-              and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
-            offset 0
-          ) a
-          where ${counted}
-        `)
-      : { rows: [] };
+              ) r
+              join area a on a.k = r.k
+              join area_parent p on p.area_id = a.id and p.valid @> ${date}::date
+              where p.parent_id = any(${parents})
+                and a.scheme_code in (${level})
+                and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
+            `
+            : sql`
+              select a.id, a.k, a.scheme, a.parent from (
+                select a.id, a.k, a.scheme_code as scheme, p.parent_id as parent
+                from area_parent p join area a on a.id = p.area_id
+                where p.parent_id = any(${parents})
+                  and p.valid @> ${date}::date
+                  and a.scheme_code in (${level})
+                  and exists (select from boundary_set bs where bs.scheme_code = a.scheme_code and bs.valid @> ${date}::date)
+                offset 0
+              ) a
+              where ${counted}
+            `,
+        );
   const deep = Map.groupBy(below.rows, (row) => row.scheme)
     .values()
     .filter((rows) => rows.length > tops.length && rows.length <= 10_000)
