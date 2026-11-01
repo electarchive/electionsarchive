@@ -85,6 +85,7 @@ MISSPELLED = {
     ("NY", "genessee"): "genesee",
     ("NM", "doaana"): "donaana",
     ("MS", "jeffersondav"): "jeffersondavis",
+    ("MS", "jeffdavis"): "jeffersondavis",
     ("SD", "shannon"): "oglalalakota",
     ("SD", "butet"): "butte",
     ("SD", "potetr"): "potter",

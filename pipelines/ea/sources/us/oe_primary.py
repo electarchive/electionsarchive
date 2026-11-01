@@ -17,7 +17,7 @@ from ea.store import DATA, connect
 
 SOURCE = "us.oe_primary"
 VERSION = "2"
-PARSED = DATA / "parsed" / SOURCE
+PARSED = DATA / "parsed" / SOURCE / os.environ.get("OE_STATES", "all").replace(",", "-")
 NAME = re.compile(r"(?:.*/)?(\d{8})__([a-zA-Z]{2})__(.+)\.csv")
 KINDS = {
     "primary",
@@ -129,9 +129,10 @@ def held(conn: Connection, precinct: bool) -> set[str]:
             """select e.value from external_id e where e.scheme = 'us.contest' and e.value ~ %s
                and exists (select 1 from result_set rs join source s on s.id = rs.source_id
                            where rs.contest_id = e.entity_id and s.publisher <> 'Federal Election Commission'
+                             and not (%s and exists (select 1 from changeset c where c.id = rs.changeset_id and c.pipeline = %s))
                              and (not %s or exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
                                                     where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')))""",
-            [TARGET, precinct],
+            [TARGET, bool(os.environ.get("OE_REEMIT")), SOURCE, precinct],
         ).fetchall()
     }
 
@@ -620,8 +621,9 @@ def emit() -> Path:
                         if (f"{state}:{grain}", artifact.storage_key) not in stored:
                             stored.add((f"{state}:{grain}", artifact.storage_key))
                             cs.artifact(artifact, sources[f"{state}:{grain}"])
-        medsl.attach(cs, conn, counties, sources)
-        medsl.attach(cs, conn, precincts, sources, grain="precinct")
+        restage = bool(os.environ.get("OE_REEMIT"))
+        medsl.attach(cs, conn, counties, sources, restage=restage)
+        medsl.attach(cs, conn, precincts, sources, grain="precinct", restage=restage)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         units = {
             code: (unit, area)
