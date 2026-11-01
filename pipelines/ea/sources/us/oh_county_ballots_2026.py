@@ -89,6 +89,18 @@ MF_563_COUNTIES = [
     "Paulding",
     "Pickaway",
 ]
+MF_564 = DATA / "inbox" / "manual" / "MF-564"
+MF_564_COUNTIES = [
+    "Ross",
+    "Seneca",
+    "Shelby",
+    "Union",
+    "Van Wert",
+    "Warren",
+    "Washington",
+    "Williams",
+    "Wyandot",
+]
 MF_LOOKUP = [
     *MF_LOOKUP,
     *MF_555_COUNTIES,
@@ -96,6 +108,7 @@ MF_LOOKUP = [
     *MF_561_COUNTIES,
     *MF_562_COUNTIES,
     *MF_563_COUNTIES,
+    *MF_564_COUNTIES,
 ]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
@@ -218,6 +231,8 @@ def fetch() -> None:
 
 
 def mf_dir(county: str) -> Path:
+    if county in MF_564_COUNTIES:
+        return MF_564
     if county in MF_563_COUNTIES:
         return MF_563
     if county in MF_562_COUNTIES:
@@ -233,14 +248,14 @@ def mf_files() -> list[tuple[str, Path]]:
     return [
         (county, path)
         for county in [*MF_SAMPLES, "Stark"]
-        for path in sorted((mf_dir(county) / county.lower()).glob("*.pdf"))
+        for path in sorted((mf_dir(county) / county.lower().replace(" ", "")).glob("*.pdf"))
         if county != "Stark" or "legal ad" in path.name
     ]
 
 
 def mf_page(county: str) -> str:
     if county in MF_LOOKUP:
-        return f"https://lookup.boe.ohio.gov/vtrapp/{county.lower()}/ballotlist.aspx"
+        return f"https://lookup.boe.ohio.gov/vtrapp/{county.lower().replace(" ", "")}/ballotlist.aspx"
     return f"https://www.boe.ohio.gov/{county.lower()}"
 
 
