@@ -898,6 +898,39 @@ TOTALS = {
     "1868:democratic:b21": {"Hoffman": 0.5},
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
+MISPRINTS = {
+    "1920:democratic:b1": (
+        (
+            "The Official Proceedings print this ballot's table with internal inconsistencies, stored as printed: "
+            "the Delaware, California, Maine, Michigan, Minnesota, Missouri, and Tennessee rows do not add to the "
+            "delegation's vote, and the printed totals for Palmer, Edwards, Davis, Colby, and Daniels do not match "
+            "the state figures. No second official source has been found to settle them."
+        ),
+        {
+            "DE": (6, 8, "4 for McAdoo and 4 for Marshall against a delegation of 6"),
+            "CA": (26, 25, "the row prints 25 of the delegation's 26"),
+            "ME": (12, 13, "the row prints 13 against a delegation of 12"),
+            "MI": (30, 29, "the row prints 29 of the delegation's 30"),
+            "MN": (24, 23, "the row prints 23 of the delegation's 24"),
+            "MO": (36, 35, "the row prints 35 of the delegation's 36"),
+            "TN": (24, 23, "the row prints 23 of the delegation's 24"),
+            "column Palmer": (256, 254, "the printed total exceeds the state figures by 2"),
+            "column Edwards": (42, 46, "the state figures exceed the printed total by 4"),
+            "column Davis": (32, 30, "the printed total exceeds the state figures by 2"),
+            "column Colby": (1, 0, "a printed total of 1 with no state figure"),
+            "column Daniels": (1, 0, "a printed total of 1 with no state figure"),
+        },
+    ),
+    "1920:democratic:b44": (
+        (
+            "The Official Proceedings print this ballot's table with an internal inconsistency, stored as printed: "
+            "the Virginia row (2½, 18½, 2½, and 1½) adds to 25 against a delegation of 24. No totals were "
+            "announced, because Cox was declared the nominee by acclamation, and no second official source has "
+            "been found to settle it."
+        ),
+        {"VA": (24, 25, "2½, 18½, 2½, and 1½ against a delegation of 24")},
+    ),
+}
 NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
 PAGES = DATA / "pages" / SOURCE
 FRACTION = re.compile(r"\s*(?:([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])|1/2|'/2|\.5)$")
@@ -1223,16 +1256,17 @@ def parse() -> None:
         if len(values) != len(first):
             failures.append(f"{len(first) - len(values)} cells read twice")
         held = {state for state, _ in values}
+        allowed = MISPRINTS.get(spec["table"], ("", {}))[1]
         for state in sorted(held):
             if (state, "votes") not in values and not any(column == "votes" for _, column in values):
                 continue
             votes = values.get((state, "votes"), 0)
             cast = sum(value for (code, column), value in values.items() if code == state and column != "votes")
-            if abs(votes - cast) > 1e-6:
+            if abs(votes - cast) > 1e-6 and allowed.get(state, ())[:2] != (votes, cast):
                 failures.append(f"{state}: {cast:g} cast of {votes:g} held")
         for column, total in printed.items():
             summed = sum(value for (_, name), value in values.items() if name == column)
-            if abs(summed - total) > 1e-6:
+            if abs(summed - total) > 1e-6 and allowed.get(f"column {column}", ())[:2] != (total, summed):
                 failures.append(f"column {column}: states sum to {summed:g}, printed total {total:g}")
         placed = next((read for read in (first, second) if read and all(max(cell["box"]) <= 1 for cell in read)), None)
         if placed is None:
