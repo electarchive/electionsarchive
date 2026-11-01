@@ -7167,6 +7167,7 @@ KY_BOARD_SEATS = {
     "Anchorage Independent Schools Board of Education": 3,
     "Campbellsville Independent School District Board of Education": 3,
 }
+NJ_SCHOOL_PINS = {("34023", "Monroe Twp Sch Dist"): "3410500", ("34035", "Franklin Twp Sch Dist"): "3405490"}
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
@@ -10240,6 +10241,8 @@ def parse() -> None:
                     if code_st == county_code[:2] and core and frozenset(theirs - generic) == core
                     for hit in found
                 ]
+            if pin := NJ_SCHOOL_PINS.get((county_code, label)):
+                hits = [hit for found in index.values() for hit in found if hit[0] == pin]
             alike = [hit for hit in hits if coverage_tables.tokens(hit[1]) == mine]
             if len(alike or hits) == 1:
                 code, district = (alike or hits)[0]
@@ -10673,8 +10676,7 @@ def parse() -> None:
                         (r"^hanover park regional\b", "hanover park high"),
                         (r"^west morris regional\b", "west morris high"),
                         (r"^manchester regional high school\b", "passaic manchester regional high school"),
-                        (r"^bridgewater raritan raritan\b", "bridgewater raritan"),
-                        (r"^becton regional\b", "carlstadt east rutherford regional"),
+                                        (r"^becton regional\b", "carlstadt east rutherford regional"),
                         (r"^ramapo indian hills regional high school\b", "ramapo indian hill regional"),
                         (
                             r"^scotch plains township board of education$",
