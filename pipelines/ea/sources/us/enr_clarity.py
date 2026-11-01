@@ -10,7 +10,7 @@ from datetime import date, datetime, timedelta
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid5
 from xml.etree import ElementTree
 
 import httpx
@@ -18,7 +18,7 @@ import polars as pl
 import shapefile
 
 from ea import portals, raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.offices import Offices
 from ea.store import DATA, connect
 
@@ -828,10 +828,10 @@ def parse(
             .iter_rows()
         ):
             canonical[(code, legacy)] = (
-                legacy
-                if legacy in codes
-                else code
+                code
                 if code in codes
+                else legacy
+                if legacy in codes
                 else named.setdefault((code[:2], slug(display)), code)
             )
         table = table.with_columns(
@@ -1001,7 +1001,7 @@ def _district(text: str, pattern: str, kind: str, noun: str, county_name: str, c
     if kind == "college" and re.search(r"\bACC\b|AUSTIN", text):
         head, noun = "AUSTIN", "Community College District"
     display = f"{_title(head)} {noun}" + (f" {number[1]}" if number else "")
-    if kind == "reclamation" and (not clean or re.search(r"METROPOLITAN|GREATER CHICAGO", text)):
+    if kind == "reclamation" and re.search(r"METROPOLITAN|GREATER CHICAGO", text):
         display = "Metropolitan Water Reclamation District of Greater Chicago"
     return display, seat
 
@@ -1020,6 +1020,8 @@ def _classify(
     plain = re.sub(r"\bAT- LARGE\b", "AT-LARGE", plain)
     if st in ("IL", "MI"):
         plain = re.sub(r"\b(\d+) (DISTRICT|DIST)\b", r"\2 \1", plain)
+    if st != "TX" and re.search(r"\bESD\b", plain):
+        return None
     if st == "NY":
         plain = re.sub(r"\s+", " ", TERM.sub(" ", plain))
         plain = re.sub(r"\b(\d+) (WARD|DISTRICT|DIST)\b", r"\2 \1", plain)
@@ -1607,6 +1609,14 @@ def emit(
                 slug(_title(label)) for label in labels["choice"].unique().to_list() if label != "Write-ins"
             }
         owners: set[UUID] = set()
+        respell = {
+            entity
+            for (entity,) in conn.execute(
+                """select n.entity_id from name n join changeset g on g.id = n.changeset_id
+                   where g.pipeline = %s and n.is_preferred and n.text like '%%  %%'""",
+                [source],
+            ).fetchall()
+        }
         offices = Offices(conn)
         elections: set[UUID] = set()
         persons: set[UUID] = set()
@@ -1761,6 +1771,9 @@ def emit(
                     for _, option_id, _ in matched[:cut]:
                         cs.add("outcome", result_set_id=result_set, option_id=option_id, kind="elected", seats=1)
                 skipped["whole set added to a held contest"] += 1
+                continue
+            if uuid5(NAMESPACE, f"external_id:us.contest\x1f{contest_key}") in cs.retired:
+                skipped["retired"] += 1
                 continue
             if (
                 contest_key in held
@@ -1923,7 +1936,7 @@ def emit(
                 office_title = (
                     f"Mayor of {place}"
                     if office_key == "mayor"
-                    else f"{place} {party_name} {first['office']}"
+                    else " ".join(part for part in (place, party_name, str(first["office"])) if part)
                     if office_key in PARTY_KEYS
                     else f"{place} {str(first['office']).removeprefix('County ')}"
                     if st == "NY" and place.endswith(" County")
@@ -1940,11 +1953,11 @@ def emit(
                     if first["body"]
                     else offices.key(cs, owner_key, polity, office_kind, office_title)
                 )
-                if owner in cs.minted and owner not in owners:
+                if (owner in cs.minted or owner in respell) and owner not in owners:
                     owners.add(owner)
-                    if first["body"]:
+                    if owner in cs.minted and first["body"]:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
-                    else:
+                    elif owner in cs.minted:
                         cs.add("office", id=owner, polity_id=polity, kind=office_kind)
                     name(owner, office_title)
                 if seat and (
