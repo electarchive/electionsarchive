@@ -749,12 +749,13 @@ async function ratios(
   suffixes: Array<string>,
 ) {
   const year = Number(date.slice(0, 4));
-  const midterm = suffixes.find((suffix) => suffix.startsWith(`${year - 4}-`));
+  const back = year - 4;
+  const midterm = suffixes.find((suffix) => suffix.startsWith(`${back}-`));
   const presidential = suffixes.find((suffix) =>
-    suffix.startsWith(`${year - 6}-`),
+    suffix.startsWith(`${back - (back % 4)}-`),
   );
   const ratio = new Map<string, number>();
-  if (year % 4 !== 2 || midterm == null || presidential == null) {
+  if (year % 4 === 0 || midterm == null || presidential == null) {
     return ratio;
   }
   const states = new Set(
