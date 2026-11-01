@@ -440,6 +440,13 @@ CHARLESTON_RULING = (
     "most of the delegations of eight Southern states had withdrawn and about 252 votes were cast. No candidate "
     "reached 202 in the 57 ballots, and on May 3 the convention adjourned to meet again in Baltimore."
 )
+BALTIMORE_RULING = (
+    "The convention, reassembled in Baltimore, voted by the delegates present, 190\u00bd on the first ballot and 194\u00bd on the "
+    "second. The Chair held that the original rule, two-thirds of the votes cast, governed and that the Charleston "
+    "instruction to count 202 had not changed it; the needed figure stored here is two-thirds of the votes cast on "
+    "the ballot. After the second ballot the convention resolved that Douglas, having received two-thirds of all the "
+    "votes given, was the regular nominee, and the President declared him nominated by the unanimous vote of the convention."
+)
 PROCEEDINGS = [
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
@@ -466,7 +473,7 @@ PROCEEDINGS = [
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
-    {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 5, 3)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)), "deciding": None, "required": 202, "caveat": CHARLESTON_RULING},
+    {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)} | {58: "1860:democratic:baltimore-b1", 59: "1860:democratic:baltimore-b2"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 6, 23)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)) | dict.fromkeys((58, 59), date(1860, 6, 23)), "deciding": 59, "cities": dict.fromkeys((58, 59), "Baltimore"), "required": dict.fromkeys(range(1, 58), 202) | {58: 127, 59: 130}, "caveat": dict.fromkeys(range(1, 58), CHARLESTON_RULING) | dict.fromkeys((58, 59), BALTIMORE_RULING)},
     {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
     {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
     {"party": "democratic", "tables": {1: "1872:democratic"}, "title": DNC + "at Baltimore, July 9, 1872", "publisher": "Rockwell & Churchill", "city": "Baltimore", "days": (date(1872, 7, 9), date(1872, 7, 10)), "ballots": {1: date(1872, 7, 10)}, "deciding": 1, "caveat": "The scattering list prints 'Groesbeck 2' on its own line under 'West Virginia, blank 2', without a state; those 2 votes are not stored."},
@@ -611,6 +618,13 @@ CANDIDATES = {
     "1860:democratic:Davis": ("Jefferson Davis", "Q162269"),
     "1860:democratic:Toucey": ("Isaac Toucey", "Q881600"),
     "1860:democratic:Pearce": ("James Pearce", "Q368739"),
+    "1860:democratic:Stephen A. Douglas": ("Stephen A. Douglas", "Q433174"),
+    "1860:democratic:James Guthrie": ("James Guthrie", "Q1680480"),
+    "1860:democratic:Daniel S. Dickinson": ("Daniel S. Dickinson", "Q1162460"),
+    "1860:democratic:Horatio Seymour": ("Horatio Seymour", "Q887320"),
+    "1860:democratic:John C. Breckinridge": ("John C. Breckinridge", None),
+    "1860:democratic:Henry A. Wise": ("Henry A. Wise", None),
+    "1860:democratic:Thomas S. Bocock": ("Thomas S. Bocock", None),
     "democratic:Stephen A. Douglas": ("Stephen A. Douglas", "Q433174"),
     "democratic:Lewis Cass": ("Lewis Cass", "Q503119"),
     "democratic:George B. McClellan": ("George B. McClellan", "Q310192"),
@@ -2540,6 +2554,8 @@ def emit() -> Path:
                     total = None
                 if "required" in convention:
                     required = convention["required"]
+                    if isinstance(required, dict):
+                        required = required[number]
                 elif total is None:
                     required = None
                 elif rule == "two-thirds":
@@ -2586,7 +2602,7 @@ def emit() -> Path:
                         else f"the {('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')[convention['held'] - 1]} ballot"
                     )
                     method += HELD.format(deciding)
-                method += f" The convention met in {convention['city']} and " + (
+                method += f" The convention met in {convention.get('cities', {}).get(number, convention['city'])} and " + (
                     f"took this ballot in its session of {day:%B %-d, %Y}"
                     if party == "democratic"
                     else f"voted on {day:%B %-d, %Y}"
@@ -2599,7 +2615,11 @@ def emit() -> Path:
                 )
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
                 if "caveat" in convention:
-                    cs.add("note", entity_id=result_set, kind="caveat", body_md=convention["caveat"])
+                    caveat = convention["caveat"]
+                    if isinstance(caveat, dict):
+                        caveat = caveat.get(number)
+                    if caveat is not None:
+                        cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
                 if spec["table"] in MISPRINTS:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=MISPRINTS[spec["table"]][0])
                 if "first" in convention:
