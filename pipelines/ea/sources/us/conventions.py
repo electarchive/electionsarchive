@@ -463,6 +463,29 @@ CORRECTIONS = {
     "1912:democratic:b23": [
         (273, "VT", (0.754, 0.649, 0.777, 0.665), {"Bryan": 0, "Foss": 8}, "8, printed in the Bryan column; the printed totals (Bryan 1, Foss 45) count it for Foss"),
     ],
+    "1912:democratic:b26": [
+        (283, "MT", (0.397, 0.65, 0.901, 0.666), {'votes': 8, 'Clark': 3, 'Wilson': 5}, "as printed; one read stops at Missouri"),
+        (283, "NE", (0.397, 0.668, 0.901, 0.684), {'votes': 16, 'Clark': 2, 'Wilson': 14}, "as printed; one read stops at Missouri"),
+        (283, "NV", (0.397, 0.686, 0.901, 0.702), {'votes': 6, 'Clark': 6}, "as printed; one read stops at Missouri"),
+        (283, "NH", (0.397, 0.704, 0.901, 0.72), {'votes': 8, 'Clark': 3, 'Wilson': 5}, "as printed; one read stops at Missouri"),
+        (283, "NJ", (0.397, 0.722, 0.901, 0.738), {'votes': 28, 'Clark': 4, 'Wilson': 24}, "as printed; one read stops at Missouri"),
+        (283, "NM", (0.397, 0.74, 0.901, 0.756), {'votes': 8, 'Clark': 8}, "as printed; one read stops at Missouri"),
+        (283, "NY", (0.397, 0.758, 0.901, 0.774), {'votes': 90, 'Clark': 90}, "as printed; one read stops at Missouri"),
+        (283, "NC", (0.397, 0.776, 0.901, 0.792), {'votes': 24, 'Wilson': 20, 'Underwood': 4}, "as printed; one read stops at Missouri"),
+        (283, "ND", (0.397, 0.794, 0.901, 0.81), {'votes': 10, 'Wilson': 10}, "as printed; one read stops at Missouri"),
+        (283, "OH", (0.397, 0.812, 0.901, 0.828), {'votes': 48, 'Wilson': 19, 'Harmon': 29}, "as printed; one read stops at Missouri"),
+        (283, "OK", (0.397, 0.83, 0.901, 0.846), {'votes': 20, 'Clark': 10, 'Wilson': 10}, "as printed; one read stops at Missouri"),
+        (283, "OR", (0.397, 0.848, 0.901, 0.864), {'votes': 10, 'Clark': 1, 'Wilson': 9}, "as printed; one read stops at Missouri"),
+        (283, "PA", (0.397, 0.866, 0.901, 0.882), {'votes': 76, 'Clark': 5, 'Wilson': 71}, "as printed; one read stops at Missouri"),
+        (283, "RI", (0.397, 0.884, 0.901, 0.9), {'votes': 10, 'Clark': 10}, "as printed; one read stops at Missouri"),
+        (283, "SC", (0.397, 0.902, 0.901, 0.918), {'votes': 18, 'Wilson': 18}, "as printed; one read stops at Missouri"),
+        (283, "SD", (0.397, 0.92, 0.901, 0.936), {'votes': 10, 'Wilson': 10}, "as printed; one read stops at Missouri"),
+        (283, "TN", (0.397, 0.938, 0.901, 0.954), {'votes': 24, 'Clark': 12, 'Wilson': 10, 'Underwood': 2}, "as printed; one read stops at Missouri"),
+    ],
+    "1912:democratic:b33": [
+        (315, "AL", (0.42, 0.483, 0.7, 0.499), {"votes": 24, "Underwood": 24}, "24 and 24; one read adds a cell to the row"),
+        (315, "MD", (0.42, 0.784, 0.92, 0.8), {"votes": 16, "Clark": 10.5, "Wilson": 5, "Not Voting": 0.5}, "16, 10½, 5, and ½; one read adds a cell to the row"),
+    ],
     "1912:democratic:b28": [
         (297, "MO", (0.56, 0.808, 0.6, 0.825), {"Wilson": 0}, "a stray mark; Missouri's 36 are all for Clark"),
         (298, "TX", (0.465, 0.423, 0.495, 0.435), {"Clark": 0, "Wilson": 40}, "40, printed in the Clark column; the printed totals (Clark 468½, Wilson 437½) count it for Wilson"),
@@ -823,7 +846,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             if len(values) == len(header) + 1 and not values[-1].strip(" .…"):
                 values = values[:-1]
             if len(values) != len(header):
-                problems.append(f"leaf {leaf}: {row['label']} has {len(values)} cells")
+                if not any(code == place(row["label"]) for code, _ in fixed):
+                    problems.append(f"leaf {leaf}: {row['label']} has {len(values)} cells")
                 continue
             code = place(row["label"])
             seen[code] = seen.get(code, 0) + 1
