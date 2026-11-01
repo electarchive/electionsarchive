@@ -245,6 +245,7 @@
         statutes={data.statutes}
         boundaries={data.boundaries}
         crowned={data.crowned}
+        sameDay={data.sameDay}
         surround={data.surround}
         match={data.match}
         standing={data.standing}
@@ -261,6 +262,7 @@
           election={data.election}
           cycle={data.cycle}
           series={data.series}
+          sameDay={data.sameDay}
           sections={data.sections}
         />
       {/key}

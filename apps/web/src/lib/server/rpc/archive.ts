@@ -15852,6 +15852,143 @@ export const elections = {
           .toSorted((a, b) => a.place.localeCompare(b.place)),
       };
     }),
+  races: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/races",
+        summary:
+          "List the races held on the same day for the same place as an election, a contest, or a contest narrowed to one of its units: the place's own contests and the wider contests narrowed to it, each with the path that opens it there",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid(), v.toLowerCase()),
+        contest: v.optional(v.pipe(v.string(), v.uuid(), v.toLowerCase())),
+        unit: v.optional(v.string()),
+      }),
+    )
+    .output(
+      v.object({
+        place: v.string(),
+        races: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            path: v.string(),
+            isOwn: v.boolean(),
+            isCurrent: v.boolean(),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const contest = input.contest == null ? null : await find(input.contest);
+      const chain = contest == null ? [] : await descend(contest, input.unit);
+      const held = await db.execute<{
+        hub: string;
+        date: string | null;
+        area: { id: string; k: number } | null;
+      }>(sql`
+        select coalesce(e.parent_id, e.id) as hub, e.date_from::text as date,
+          case when a.id is not null then json_build_object('id', a.id, 'k', a.k) end as area
+        from election e
+        left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+        left join area a on a.id = pt.area_id
+        where e.id = ${input.id}::uuid
+      `);
+      const election = held.rows[0];
+      const area = chain.at(-1) ?? contest?.place ?? election?.area;
+      if (election == null || area == null) {
+        return { place: "", races: [] };
+      }
+      const date = election.date ?? "infinity";
+      const unit = chain.map((kid) => kid.segment).join("/");
+      const above = await db.execute<{ id: string; depth: number }>(sql`
+        with recursive up(id, depth) as (
+          select ${area.id}::uuid, 0
+          union
+          select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
+          where p.valid @> ${date}::date and up.depth < 8
+        )
+        select id, min(depth)::int as depth from up group by id
+      `);
+      const depth = new Map(above.rows.map((row) => [row.id, row.depth]));
+      const found = await db.execute<{
+        id: string;
+        place: { id: string; k: number };
+      }>(sql`
+        select c.id, json_build_object('id', a.id, 'k', a.k) as place
+        from election e
+        join contest c on c.election_id = e.id and c.allocation_parent_id is null and c.kind::text <> 'ballot_question'
+        left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+        join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+        where (e.id = ${election.hub}::uuid or e.parent_id = ${election.hub}::uuid)
+          and e.date_from is not distinct from ${election.date}::date
+          and a.id = any(${sql.param([...depth.keys()])}::uuid[])
+          and not exists (select from entity_merge m where m.entity_id = c.id)
+      `);
+      const routed = await Promise.all(
+        found.rows.map(async (row) => {
+          const segments: Array<string> = [];
+          let current = row.place;
+          while (current.id !== area.id && segments.length < 8) {
+            const level = depth.get(current.id) ?? 0;
+            const kids = await children(
+              [row.id],
+              current,
+              segments.length === 0,
+              date,
+            );
+            const kid = kids.find(
+              (entry) => (depth.get(entry.id) ?? level) < level,
+            );
+            if (kid == null) {
+              return [];
+            }
+            segments.push(kid.segment);
+            current = kid;
+          }
+          return current.id === area.id
+            ? [
+                {
+                  ...row,
+                  depth: depth.get(row.place.id) ?? 0,
+                  unit: segments.join("/"),
+                },
+              ]
+            : [];
+        }),
+      );
+      const races = routed.flat();
+      const ids = races.map((row) => row.id);
+      const [labels, slugs, place] = await Promise.all([
+        names(ids, election.date),
+        paths(ids),
+        names([area.id], election.date),
+      ]);
+      return {
+        place: place.full.get(area.id) ?? "",
+        races: races
+          .flatMap((row) => {
+            const path = slugs.get(row.id);
+            return path == null
+              ? []
+              : [
+                  {
+                    id: row.id,
+                    name: labels.full.get(row.id) ?? "",
+                    path: row.unit === "" ? path : `${path}/${row.unit}`,
+                    isOwn: row.depth === 0,
+                    isCurrent: row.id === input.contest && row.unit === unit,
+                    depth: row.depth,
+                  },
+                ];
+          })
+          .toSorted((a, b) => a.depth - b.depth || a.name.localeCompare(b.name))
+          .map(({ depth: _, ...race }) => race),
+      };
+    }),
   series: os
     .meta(
       openapi({

@@ -997,6 +997,7 @@
   ],
   "alongside_title": "Also on the ballot",
   "alongside_lede": "Contests held the same day by other governments that cover all or part of this area.",
+  "same_day_title": "On the ballot in {place}",
   "col_holder": "Holder",
   "col_since": "Since",
   "polity_largest_cities": "Largest cities",

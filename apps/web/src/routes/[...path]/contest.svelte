@@ -52,6 +52,7 @@
   import Preview from "./preview.svelte";
   import Results from "./results.svelte";
   import Road from "./road.svelte";
+  import SameDay from "./same-day.svelte";
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
@@ -78,6 +79,7 @@
     match,
     standing,
     crowned,
+    sameDay,
   }: {
     id: string;
     unit: string;
@@ -95,6 +97,7 @@
     match: string;
     standing: Extract<PageData, { kind: "contest" }>["standing"];
     crowned: Extract<PageData, { kind: "contest" }>["crowned"];
+    sameDay: Extract<PageData, { kind: "contest" }>["sameDay"];
   } = $props();
 
   const DAY: Record<string, (place: string) => string> = {
@@ -1532,6 +1535,9 @@
         {/if}
       </ol>
     </nav>
+  {/if}
+  {#if sameDay != null && sameDay.races.length > 1}
+    <SameDay place={sameDay.place} races={sameDay.races} />
   {/if}
 </header>
 

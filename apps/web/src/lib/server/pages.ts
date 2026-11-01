@@ -1198,23 +1198,29 @@ export async function archive(path: string, search: URLSearchParams) {
     ahead(contest.count, input.round, async (round) =>
       call(router.contests.get, { ...input, round }),
     );
-    const crowned =
-      contest.kind === "body_seats" &&
-      unit === "" &&
-      (contest.places?.rows.length ?? 0) === 0
-        ? await db
-            .execute<{ id: string }>(
-              sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
-            )
-            .then(async ({ rows }) =>
-              rows[0] == null
-                ? null
-                : call(router.elections.winners, {
-                    id: rows[0].id,
-                    contest: slug.entity_id,
-                  }),
-            )
-        : null;
+    const parent = (
+      await db.execute<{ id: string }>(
+        sql`select election_id as id from contest where id = ${slug.entity_id}::uuid`,
+      )
+    ).rows[0]?.id;
+    const [crowned, sameDay] =
+      parent == null
+        ? [null, null]
+        : await Promise.all([
+            contest.kind === "body_seats" &&
+            unit === "" &&
+            (contest.places?.rows.length ?? 0) === 0
+              ? call(router.elections.winners, {
+                  id: parent,
+                  contest: slug.entity_id,
+                })
+              : null,
+            call(router.elections.races, {
+              id: parent,
+              contest: slug.entity_id,
+              unit,
+            }).catch(() => null),
+          ]);
     return {
       kind: "contest" as const,
       id: slug.entity_id,
@@ -1243,6 +1249,7 @@ export async function archive(path: string, search: URLSearchParams) {
               maps: crowned.maps,
               since: crowned.before?.date.slice(0, 4) ?? null,
             },
+      sameDay,
     };
   }
   if (slug.type === "election") {
@@ -1282,6 +1289,7 @@ export async function archive(path: string, search: URLSearchParams) {
       cycle,
       series,
       alongside,
+      sameDay,
       local,
       counties,
       winners,
@@ -1294,6 +1302,7 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.elections.cycle, input),
         call(router.elections.series, input),
         call(router.elections.alongside, input),
+        call(router.elections.races, input).catch(() => null),
         scope != null || day?.date == null || day.tier !== "county"
           ? null
           : call(router.elections.local, {
@@ -1329,6 +1338,7 @@ export async function archive(path: string, search: URLSearchParams) {
       election,
       cycle,
       series,
+      sameDay,
       sections: {
         governments,
         regions,

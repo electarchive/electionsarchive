@@ -703,6 +703,9 @@ function markdown(
           data.states,
           link,
         ),
+        ...(data.sameDay?.races.some((race) => !race.isOwn) === true
+          ? sameDayMarkdown(data.sameDay, link)
+          : []),
         ...knownMarkdown(data.known, link, false),
         ...(winners == null || winners.tiers.length === 0
           ? []
@@ -862,10 +865,25 @@ function markdown(
           link,
           ledger,
         ),
+        ...(data.sameDay != null && data.sameDay.races.length > 1
+          ? sameDayMarkdown(data.sameDay, link)
+          : []),
         ...knownMarkdown(data.known, link, false),
       ];
     }
   }
+}
+
+function sameDayMarkdown(
+  sameDay: NonNullable<Extract<Data, { kind: "contest" }>["sameDay"]>,
+  link: Link,
+) {
+  return [
+    `## ${m.same_day_title({ place: sameDay.place })}`,
+    sameDay.races
+      .map((race) => `- ${link(race.name, race.isCurrent ? null : race.path)}`)
+      .join("\n"),
+  ];
 }
 
 function knownMarkdown(known: Known, link: Link, isFull: boolean) {

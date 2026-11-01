@@ -49,6 +49,7 @@
   import Regions from "./regions.svelte";
   import Results from "./results.svelte";
   import Road from "./road.svelte";
+  import SameDay from "./same-day.svelte";
   import Seated from "./seated.svelte";
   import Series from "./series.svelte";
   import States from "./states.svelte";
@@ -62,6 +63,7 @@
     election,
     cycle,
     series,
+    sameDay,
     sections,
     path,
     query,
@@ -75,6 +77,7 @@
     election: Extract<PageData, { kind: "election" }>["election"];
     cycle: Extract<PageData, { kind: "election" }>["cycle"];
     series: Extract<PageData, { kind: "election" }>["series"];
+    sameDay: Extract<PageData, { kind: "election" }>["sameDay"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
   } = $props();
 
@@ -1660,6 +1663,9 @@
       label={m.election_series_label()}
       all={m.election_series_all_label}
     />
+  {/if}
+  {#if sameDay != null && sameDay.races.some((race) => !race.isOwn)}
+    <SameDay place={sameDay.place} races={sameDay.races} />
   {/if}
 </header>
 
