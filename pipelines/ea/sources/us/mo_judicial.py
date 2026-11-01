@@ -2,7 +2,7 @@ import re
 import subprocess
 import unicodedata
 from collections import defaultdict
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -25,6 +25,27 @@ FILES = {
     date(2022, 11, 8): "ActualResults-November82022.pdf",
     date(2024, 11, 5): "ActualResults-November52024.pdf",
 }
+MANUAL = "https://www.sos.mo.gov/cmsimages/bluebook/{}/7_Elec.pdf"
+MANUALS = {
+    date(2006, 11, 7): (
+        "2007-2008",
+        "26-27",
+        ["William Ray Price Jr.", "Mary R. Russell", "Stephen N. Limbaugh Jr."],
+        "http://www.sos.mo.gov/cmsimages/bluebook/2007-2008/7_Elec.pdf",
+    ),
+    date(2008, 11, 4): (
+        "2009-2010",
+        "17-18",
+        ["Patricia Breckenridge"],
+        "https://www.sos.mo.gov/cmsimages/bluebook/2009-2010/7_Elec.pdf",
+    ),
+    date(2010, 11, 2): (
+        "2011-2012",
+        "21-22",
+        ["Zel Fischer"],
+        "http://www.sos.mo.gov/cmsimages/bluebook/2011-2012/7_Elec.pdf",
+    ),
+}
 PUBLISHER = "Missouri Secretary of State"
 TITLE = "Official election results"
 TITLE_OFFICE = "Justice of the Supreme Court"
@@ -46,6 +67,76 @@ def flat(text: str) -> str:
 def fetch() -> None:
     for name in FILES.values():
         raw.fetch(SOURCE, BASE + name, suffix=".pdf")
+    for _, _, _, url in MANUALS.values():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            body = subprocess.run(
+                ["curl", "-sL", "-m", "180", f"https://web.archive.org/web/2020if_/{url}"],
+                capture_output=True,
+                check=True,
+            ).stdout
+            raw.store(
+                SOURCE,
+                url,
+                body,
+                suffix=".pdf",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf",
+            )
+
+
+def manual_lines() -> list[dict[str, object]]:
+    found: list[dict[str, object]] = []
+    for day, (_, pages, judges, url) in MANUALS.items():
+        first, last = pages.split("-")
+        text = subprocess.run(
+            ["pdftotext", "-f", first, "-l", last, "-raw", str(raw.cached(SOURCE, url).path), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+        start = next(
+            i
+            for i, line in enumerate(text)
+            if re.search(r"Missouri Supreme Court|Supreme Court—General", line) or line.strip() == judges[0]
+        )
+        width = 2 * len(judges)
+        seen: dict[str, list[int]] = {}
+        printed: list[int] | None = None
+        for line in text[start:]:
+            line = re.sub(
+                r"OFFICIAL MANUAL.*$", "", re.sub(r"(,\d{3})\d{3} OFFICIAL MANUAL", r"\1 OFFICIAL MANUAL", line.strip())
+            )
+            for name, figures in re.findall(r"([A-Z][A-Z .'-]*?[A-Z]) ((?:\d[\d,]* ?)+)", line):
+                values = [int(value.replace(",", "")) for value in figures.split()]
+                if len(values) != width:
+                    continue
+                if name == "TOTAL":
+                    printed = values
+                elif name in seen and seen[name] != values:
+                    raise ValueError(f"{day} {name}: {seen[name]} and {values}")
+                else:
+                    seen[name] = values
+            if printed is not None and len(seen) == 116:
+                break
+        sums = [sum(values[column] for values in seen.values()) for column in range(width)]
+        if printed is None or sums != printed or len(seen) != 116:
+            raise ValueError(f"{day}: {len(seen)} rows sum to {sums}, printed {printed}")
+        for name, values in seen.items():
+            for index, judge in enumerate(judges):
+                found.append(
+                    {
+                        "day": day,
+                        "judge": judge,
+                        "county": {"ST LOUIS COUNTY": "St. Louis", "KANSAS CITY": "Kansas City"}.get(
+                            name.replace(".", ""), name
+                        ),
+                        "yes": values[2 * index],
+                        "no": values[2 * index + 1],
+                    }
+                )
+    return found
 
 
 def halve(text: str) -> str:
@@ -109,7 +200,7 @@ def lines() -> list[dict[str, object]]:
 
 
 def emit() -> Path:
-    rows = lines()
+    rows = [*manual_lines(), *lines()]
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -130,6 +221,8 @@ def emit() -> Path:
         )
         for name in FILES.values():
             cs.artifact(raw.cached(SOURCE, BASE + name), source)
+        for _, _, _, url in MANUALS.values():
+            cs.artifact(raw.cached(SOURCE, url), source)
         counties = {
             ("stlouiscity" if code == "29510" else flat(text)): unit
             for text, unit, code in conn.execute(

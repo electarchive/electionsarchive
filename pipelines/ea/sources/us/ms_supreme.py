@@ -35,6 +35,8 @@ CERTS_2004 = {
     "2004/CertCentral.pdf": (1, 1, ("RICHARD RAY GRINDSTAFF", "WILLIAM L. BILL WALLER")),
     "2004/CertNorthern.pdf": (3, 3, ("WILLIAM L. BILL BAMBACH", "GEORGE C. CARLSON")),
 }
+REGISTER_2008 = "2008/Supreme Court.pdf"
+REGISTER_2008_URL = "https://da.mdah.ms.gov/series-files/sos/s0107/2008/pdf/Supreme%20Court.pdf"
 OCR_FIXES_2004 = {("2004/CertNorthern.pdf", "tallahatchie", 0): 1437}
 TOTALS_2018 = {
     "Adams": 7765,
@@ -82,12 +84,16 @@ METHOD = (
 
 
 def link(name: str) -> str:
+    if name == REGISTER_2008:
+        return REGISTER_2008_URL
     return f"{BASE}{name.replace(' ', '%20')}"
 
 
 def fetch() -> None:
-    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004, *COUNTY_SHEETS_2018]:
-        path = (INBOX_363 if name in CERTS_2004 or name in COUNTY_SHEETS_2018 else INBOX) / name
+    for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004, *COUNTY_SHEETS_2018, REGISTER_2008]:
+        path = (
+            INBOX_363 if name in CERTS_2004 or name in COUNTY_SHEETS_2018 or name == REGISTER_2008 else INBOX
+        ) / name
         raw.store(
             SOURCE,
             link(name),
@@ -203,6 +209,63 @@ def parse() -> None:
                         seen = 0
         if printed != sums:
             raise ValueError(f"{name}: counties sum to {sums}, printed totals {printed}")
+    lines = subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, link(REGISTER_2008)).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.splitlines()
+    merged = []
+    for line in lines:
+        if "7455Election" in line:
+            line = "                  Randy 'Bubba' Pierce                       7455               49.20%"
+        overlap = re.match(r"\s+Supreme Court Justice\s+(\d+\s+[\d.]+%\s*)$", line)
+        if overlap is not None and merged and not re.search(r"\d%", merged[-1]):
+            merged[-1] = f"{merged[-1].rstrip()}   {overlap[1]}"
+        else:
+            merged.append(line)
+    seat = None
+    closed = False
+    county = None
+    sums = {}
+    printed = {}
+    for line in [*merged, "Supreme Court, District 0"]:
+        header = re.search(r"Supreme Court, District (\d) .*?, Position (\d)|Supreme Court, District 0", line)
+        if header is not None:
+            county = None
+            now = None if header[1] is None else (int(header[1]), int(header[2]))
+            if now != seat:
+                if seat is not None and sums != printed[seat]:
+                    raise ValueError(f"2008 {seat}: counties sum to {sums}, printed totals {printed[seat]}")
+                seat = now
+                closed = False
+                sums = {}
+                if seat is not None:
+                    printed[seat] = {}
+            continue
+        if re.search(r"District 0\d Total", line):
+            county = None
+            closed = True
+            continue
+        if re.match(r"\s+Total for County\s+\d+\s*$", line):
+            county = None
+            continue
+        found = re.match(r"^(\S.*?\s{2,}|\s+)(\S.*?)\s{2,}(\d+)\s+[\d.]+%\s*$", line)
+        if found is None or seat is None or closed or found[2] == "CANDIDATE":
+            continue
+        if found[1].strip():
+            county = found[1].strip()
+        candidate = found[2].upper()
+        if seat == (3, 2) and county == "Tishomingo":
+            candidate = {"GENE BARTON": "DAVID CHANDLER", "ANN HANNAFORD LAMAR": "CHARLES 'CHUCK' EASLEY"}[candidate]
+        votes = int(found[3])
+        if county is None:
+            printed[seat][candidate] = votes
+        else:
+            rows.append(
+                (date(2008, 11, 4), seat[0], seat[1], candidate, codes[re.sub(r"[^a-z]", "", county.lower())], votes)
+            )
+            sums[candidate] = sums.get(candidate, 0) + votes
     for county, votes in TOTALS_2018.items():
         rows.append((date(2018, 11, 6), 2, 1, "DAVID M. ISHEE", codes[re.sub(r"[^a-z]", "", county.lower())], votes))
     lines = subprocess.run(
@@ -306,7 +369,7 @@ def emit() -> Path:
                 url="https://www.sos.ms.gov/elections-voting/results",
                 license="Public record",
             )
-        for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004, *COUNTY_SHEETS_2018]:
+        for name in [*CSVS, *PDFS, RECAP, SUMMARY_2016, *CERTS_2004, *COUNTY_SHEETS_2018, REGISTER_2008]:
             cs.artifact(raw.cached(SOURCE, link(name)), source)
         return {"MS": source}
 
