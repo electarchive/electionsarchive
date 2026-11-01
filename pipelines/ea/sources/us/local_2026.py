@@ -10120,6 +10120,7 @@ def parse() -> None:
         ).fetchall():
             label = {
                 "Rowan County Sch": "Rowan-Salisbury Schools",
+                "Croswell Lex Comm Sch Dist": "Croswell-Lexington Community School District",
                 "Southeastern Cass County School District": "Lewis Cass Schools",
                 "Northwestrn Consolidated School District": "Northwestern Consolidated School Corporation",
                 "Union County School Corporation": "Union County-College Corner Joint School District",
@@ -10515,7 +10516,15 @@ def parse() -> None:
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "MI":
-                    tokens = re.sub(r"\bausable\b", "au sable", " ".join(tokens)).split()
+                    tokens = re.sub(
+                        r"^walkerville public schools\b",
+                        "walkerville rural schools",
+                        re.sub(
+                            r"^mason county (central|eastern)\b",
+                            r"mason \1",
+                            re.sub(r"\bausable\b", "au sable", " ".join(tokens)),
+                        ),
+                    ).split()
                 nj_multi = False
                 if state == "NJ":
                     joined = " ".join(tokens)
@@ -10757,6 +10766,7 @@ def parse() -> None:
                         re.sub(r"\b(member|members|of the|partial term|full term|unexpired term)\b", " ", " ".join(rest)).split()
                     )
                     post = post.replace("receiver of taxes", "tax collector")
+                    post = re.sub(r"^(?:(?:city|village|township|town) ){2,}", "", post)
                     role = (
                         "board-of-education"
                         if owner.startswith("school:")
