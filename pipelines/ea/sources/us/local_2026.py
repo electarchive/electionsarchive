@@ -7167,7 +7167,22 @@ KY_BOARD_SEATS = {
     "Anchorage Independent Schools Board of Education": 3,
     "Campbellsville Independent School District Board of Education": 3,
 }
-NJ_SCHOOL_PINS = {("34023", "Monroe Twp Sch Dist"): "3410500", ("34035", "Franklin Twp Sch Dist"): "3405490"}
+NJ_SCHOOL_PINS = {
+    ("34023", "Monroe Twp Sch Dist"): "3410500",
+    ("34035", "Franklin Twp Sch Dist"): "3405490",
+    ("34041", "Franklin Twp Sch Dist"): "3405520",
+    ("34041", "Greenwich Twp Sch Dist"): "3406210",
+    ("34041", "Mansfield Twp Sch Dist"): "3409540",
+    ("34011", "Greenwich Twp Sch Dist"): "3406150",
+    ("34011", "Lawrence Twp Sch Dist"): "3408370",
+}
+NJ_EXTRA_SCHOOLS = (
+    ("34025", "3401140", "Avon Borough School District"),
+    ("34025", "3407650", "Interlaken Borough School District"),
+    ("34025", "3415150", "Lake Como Borough School District"),
+    ("34001", "3408671", "Longport Borough School District"),
+    ("34007", "3407080", "Hi-Nella Borough School District"),
+)
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
@@ -10255,6 +10270,16 @@ def parse() -> None:
                         "school",
                     )
                 )
+        for county_code, code, district in NJ_EXTRA_SCHOOLS:
+            unowned["NJ"].append(
+                (
+                    county_code,
+                    district,
+                    f"school:{code}",
+                    owned.get(f"school:{code}") or f"us/nj/{slug(district)}",
+                    "school",
+                )
+            )
         with zipfile.ZipFile(raw.fetch(SOURCE, GAZETTEER, suffix=".zip").path) as archive:
             gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).rename(
                 lambda column: column.strip()
