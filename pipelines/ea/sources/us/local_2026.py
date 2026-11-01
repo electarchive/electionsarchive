@@ -5394,6 +5394,69 @@ for key, publisher, title, url, local in (
         "in/597/18049/fulton_sample.pdf",
     ),
     (
+        "IN-18011-townships",
+        "Boone County Clerk",
+        "2026 General Election sample ballots, all precincts, Boone County",
+        "https://boonecounty.in.gov/wp-content/uploads/2026/09/INBOOG26_AllPcts_InfinityS-1.pdf",
+        "in/597/18011/INBOOG26_AllPcts.pdf",
+    ),
+    (
+        "IN-18019-schools",
+        "Clark County Clerk",
+        "Sample ballots, November 2026 General Election, Clark County",
+        "https://www.in.gov/counties/clarkcountyclerkofcourts/voting-and-elections/files/Sample-Ballots-November-2026.pdf",
+        "in/597/18019/clark_sample_nov2026.pdf",
+    ),
+    (
+        "IN-18073-townships",
+        "Jasper County Clerk",
+        "2026 General Election sample ballots, Jasper County",
+        "https://www.jaspercountyin.gov/government/forms/department-documents/county-clerk/voting-elections/865-2026-general-election-sample-ballots/file",
+        "in/597/18073/jasper_sample.pdf",
+    ),
+    (
+        "IN-18177-townships",
+        "Wayne County Clerk",
+        "2026 General Election sample ballots, Wayne County",
+        "https://waynecounty.in.gov/clerk/election/SampleBallotsGeneral2026.pdf",
+        "in/597/18177/wayne_sample.pdf",
+    ),
+    (
+        "IN-18113-avilla",
+        "Noble County Clerk",
+        "2026 General Election sample ballot, Allen 25 In Town, Noble County",
+        "https://www.in.gov/counties/noble/files/2026-general-election-sample-balllots/P25IN.pdf",
+        "in/597/18113/P25IN.pdf",
+    ),
+    (
+        "IN-18113-albion",
+        "Noble County Clerk",
+        "2026 General Election sample ballot, Albion 28 In Town, Noble County",
+        "https://www.in.gov/counties/noble/files/2026-general-election-sample-balllots/P28IN.pdf",
+        "in/597/18113/P28IN.pdf",
+    ),
+    (
+        "IN-18113-cromwell",
+        "Noble County Clerk",
+        "2026 General Election sample ballot, Sparta 2 In Town, Noble County",
+        "https://www.in.gov/counties/noble/files/2026-general-election-sample-balllots/P2IN.pdf",
+        "in/597/18113/P2IN.pdf",
+    ),
+    (
+        "IN-18033-townships",
+        "DeKalb County Clerk",
+        "2026 General Election sample ballot, Grant 1, DeKalb County",
+        "https://www.co.dekalb.in.us/egov/apps/document/center.egov?view=item&id=10143",
+        "in/597/18033/sample_10143.pdf",
+    ),
+    (
+        "IN-18063-townships",
+        "Hendricks County Clerk",
+        "2026 General Ballot List, Hendricks County (updated 08/14/2026)",
+        "https://www.co.hendricks.in.us/egov/apps/document/center.egov?view=item&id=12690",
+        "in/597/18063/hendricks_ballot_list.pdf",
+    ),
+    (
         "MI-26135",
         "Oscoda County Clerk",
         "Candidate Filings for November 3, 2026 General Election, Oscoda County",
@@ -10374,7 +10437,11 @@ def parse() -> None:
                     tokens = re.sub(
                         r"^community school corporation of eastern hancock(?: school board| schools)?",
                         "eastern hancock county school board",
-                        re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
+                        re.sub(
+                            r"^kankakee valley",
+                            "kankakee valeey corporatn",
+                            re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
+                        ),
                     ).split()
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
