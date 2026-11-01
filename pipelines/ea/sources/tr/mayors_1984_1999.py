@@ -21,7 +21,7 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "14"
+VERSION = "15"
 YEARS = (1963, 1968, 1973, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
 UNMERGED = Path(__file__).with_name("mayors_1984_1999_unmerged.tsv")
@@ -53,12 +53,22 @@ SUCCESSORS = {
     "zonguldak": ("bartin", "karabuk"),
 }
 APART = {
+    "afyonkarahisar-dinar:hasan-mutlu",
+    "afyonkarahisar-ihsaniye-bozhuyuk:sukru-yilmaz",
     "balikesir-balya:mahmut-sari",
     "balikesir-susurluk:yusuf-akin",
     "burdur-bucak-kocaaliler:recep-ozcan",
     "burdur-bucak:mehmet-topay",
+    "cankiri-ilgaz:mustafa-er",
     "edirne-meric:mustafa-aksoy",
+    "gaziantep-sahinbey:mehmet-karakaya",
     "gaziantep-sehitkamil-aril:ahmet-pehlivan",
+    "kahramanmaras-nurhak:yusuf-gunes",
+    "kutahya-gediz-erdogmus:ramazan-taskin",
+    "mardin-savur:mustafa-kavak",
+    "osmaniye:mehmet-gurbuz",
+    "usak-ulubey-haskoy:suleyman-guler",
+    "yozgat-kadisehri:hasan-akin",
 }
 TOWNS = {
     "adiyaman-merkez-komurkoy": "tr/adiyaman/merkez/komur",
@@ -66,6 +76,7 @@ TOWNS = {
     "afyonkarahisar-sincanli-sinanpasa-guneykoy": "tr/afyonkarahisar/sinanpasa/guney",
     "ankara-camlidere-karagedik": "tr/ankara/golbasi/karagedik",
     "ankara-camlidere-kutludugun": "tr/ankara/mamak/kutludugun",
+    "ankara-sereflikochisar-bogazkoy": "tr/aksaray/sariyahsi/bogazkoy",
     "canakkale-yenice-kalkin": "tr/canakkale/yenice/kalkim",
     "gumushane-aydintepe-arpali": "tr/bayburt/merkez/arpali",
     "isparta-gelendost-yakakoy": "tr/isparta/gelendost/yaka",
@@ -73,12 +84,13 @@ TOWNS = {
     "izmir-bergama-ayazkent": "tr/izmir/bergama/ayaskent",
     "izmir-kinik-yaya": "tr/izmir/kinik/yayakent",
     "izmir-kinik-yayakoy": "tr/izmir/kinik/yayakent",
-    "kars-hanak-ortakoy": "tr/kars/hanak/ortakent",
+    "kars-hanak-ortakoy": "tr/ardahan/hanak/ortakent",
     "kayseri-merkez-anarat": "tr/kayseri/kocasinan/amarat",
     "kayseri-sarioglan-ciftlikkoy": "tr/kayseri/sarioglan/ciftlik",
     "kirsehir-kaman-savcili": "tr/kirsehir/kaman/savcilibuyukoba",
     "kirsehir-kaman-savcilioba": "tr/kirsehir/kaman/savcilibuyukoba",
     "konya-beysehir-cavus": "tr/konya/huyuk/cavus",
+    "konya-merkez-derebent": "tr/konya/derbent",
     "kutahya-simav-demircikoy": "tr/kutahya/simav/demirci",
     "malatya-akcadag-yukarikozluca": "tr/malatya/akcadag/kozluca",
     "mugla-merkez-bayirkoy": "tr/mugla/merkez/bayir",

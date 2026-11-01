@@ -681,6 +681,7 @@ year	race	reason
 1963	1963 mugla-koycegiz Köyceğiz	contest already held
 1963	1963 mugla-koycegiz-ortaca Ortaca	contest already held
 1963	1963 mugla-marmaris Marmaris	contest already held
+1963	1963 mugla-merkez-bayirkoy Bayırköy	contest already held
 1963	1963 mugla-merkez-yerkesik Yerkesik	contest already held
 1963	1963 mugla-milas Milas	contest already held
 1963	1963 mugla-ula Ula	contest already held
@@ -2405,9 +2406,17 @@ year	race	reason
 1999	1999 konya konya	contest already held
 1999	1999 mersin icel	contest already held
 1999	1999 samsun samsun	contest already held
+1963	1963 bursa-keles Keles	election already held
 1963	1963 mersin-merkez-gozne Gözne	election already held
-1963	1963 mugla-merkez-bayirkoy Bayırköy	election already held
+1963	1963 nigde-aksaray-gelveri-guzelyurt Gelveri (Güzelyurt)	election already held
+1973	1973 bursa-keles Keles	election already held
+1973	1973 kahramanmaras-goksun Göksun	election already held
+1973	1973 kars-cildir-yakinsu Yakınsu	election already held
+1973	1973 kirklareli-kofcaz Kofçaz	election already held
 1973	1973 konya-cumra-guneybag-elmasun Güneybağ (Elmasun)	election already held
+1973	1973 konya-ermenek-guneyyurt-gargana Güneyyurt (Gargana)	election already held
+1973	1973 nigde-bor-akmanlar Akmanlar	election already held
+1973	1973 ordu-fatsa-sariyakup Sarıyakup	election already held
 1963	1963 ankara-ankara Ankara	no municipality
 1963	1963 aydin-aydin Aydın	no municipality
 1963	1963 istanbul-istanbul İstanbul	no municipality
