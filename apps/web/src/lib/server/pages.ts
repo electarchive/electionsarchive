@@ -1668,6 +1668,9 @@ export async function livePage(path: string, at: string | null) {
         office: race.office,
         state: race.state,
         district: race.district,
+        jurisdiction: race.jurisdiction ?? null,
+        seats: race.seats ?? 1,
+        isMeasure: race.isMeasure ?? false,
         options: race.options.map((option) => ({
           label: option.label,
           party: option.party?.short ?? option.party?.name ?? null,

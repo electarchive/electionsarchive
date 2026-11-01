@@ -29,6 +29,19 @@ const LEVELS = new Set([
   "us.nyc_ed",
 ]);
 const TERRITORIES = new Set(["as", "gu", "mp", "pr", "vi"]);
+const JURISDICTIONS: Record<
+  string,
+  NonNullable<LiveRace["jurisdiction"]>["kind"]
+> = {
+  county: "county",
+  region: "state",
+  municipality: "municipal",
+  submunicipal: "municipal",
+  school_district: "school",
+  special_district: "special",
+  judicial_district: "judicial",
+  federal_unit: "state",
+};
 const WHOLE = ["us.place", "us.state", "us.county"];
 const ZONES: Record<string, string> = {
   ct: "America/New_York",
@@ -286,6 +299,26 @@ async function options(contests: Array<string>, date: string) {
     family: row.kind === "write_in" ? null : row.family,
     color: row.color,
   }));
+}
+
+async function jurisdictions(contests: Array<string>) {
+  const found = await db.execute<{
+    contest: string;
+    polity: string;
+    kind: string;
+    scheme: string | null;
+    seats: number | null;
+  }>(sql`
+    select c.id as contest, p.id as polity, p.kind::text as kind, a.scheme_code as scheme,
+      case when b.kind = 'electoral_college' then 1 else c.magnitude end as seats
+    from contest c join election e on e.id = c.election_id
+    left join body b on b.id = c.body_id
+    left join office o on o.id = c.office_id
+    join polity p on p.id = coalesce(b.polity_id, o.polity_id, e.polity_id)
+    left join area a on a.id = c.district_area_id
+    where c.id = any(${sql.param(contests)}::uuid[])
+  `);
+  return new Map(found.rows.map((row) => [row.contest, row]));
 }
 
 async function states(
@@ -766,7 +799,7 @@ async function night(
   shown: { results: boolean; forecasts: boolean },
 ) {
   const contests = picked.map((row) => row.id);
-  const [frames, choices, incumbents, settled, prior, drawn] =
+  const [frames, choices, incumbents, settled, prior, drawn, placed] =
     await Promise.all([
       db.execute<{
         k: number;
@@ -791,6 +824,7 @@ async function night(
       certified(contests),
       baselines(picked, found.date),
       detail === "national" ? [] : geography(picked, found.date),
+      jurisdictions(contests),
     ]);
   const values = await db.execute<{
     k: number;
@@ -830,6 +864,7 @@ async function night(
       [
         found.id,
         ...contests,
+        ...placed.values().map((row) => row.polity),
         ...held.rows.flatMap((row) => (row.area == null ? [] : [row.area])),
       ],
       found.date,
@@ -1036,6 +1071,13 @@ async function night(
     const parts = row.path.split("/");
     const seat = parts.at(-1) ?? "";
     const source = mine.at(-1);
+    const where = placed.get(row.id);
+    const kind =
+      where == null
+        ? undefined
+        : where.scheme === "us.judicial_district"
+          ? "judicial"
+          : JURISDICTIONS[where.kind];
     return {
       id: row.id,
       slug: row.path,
@@ -1046,6 +1088,16 @@ async function night(
       office: office(seat),
       state: parts[1] ?? "",
       district: /^house-(.+)$/u.exec(seat)?.[1] ?? null,
+      jurisdiction:
+        where == null || kind == null
+          ? null
+          : { name: titles.full.get(where.polity) ?? "", kind },
+      seats: where?.seats ?? 1,
+      isMeasure:
+        own.some((choice) => choice.kind === "answer") &&
+        own.every(
+          (choice) => choice.kind === "answer" || choice.kind === "write_in",
+        ),
       options: own.map((choice, at) => {
         const party = choice.key.startsWith("party:")
           ? choice.key.slice(6)
@@ -1106,8 +1158,7 @@ async function night(
       newest = frame.at;
     }
   }
-  const kept = (race: LiveRace) =>
-    detail === "race" || (detail === "state" && race.office !== "other");
+  const kept = detail !== "national";
   const election: LiveElection = {
     id: found.id,
     slug: found.path,
@@ -1123,7 +1174,7 @@ async function night(
     isCertified:
       built.length > 0 && built.every((race) => race.certified != null),
     races: built.map((race) =>
-      kept(race) ? race : { ...race, units: [], counts: [], baseline: [] },
+      kept ? race : { ...race, units: [], counts: [], baseline: [] },
     ),
   };
   return {
@@ -1132,7 +1183,7 @@ async function night(
     estimates: Object.fromEntries(
       (shown.forecasts ? built : []).map((race) => {
         const value = estimate({ race, at: null });
-        return [race.id, kept(race) ? value : { ...value, units: [] }];
+        return [race.id, kept ? value : { ...value, units: [] }];
       }),
     ),
   };
