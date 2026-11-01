@@ -1386,7 +1386,12 @@ def tehama() -> list[Row]:
 
 
 def lassen() -> list[Row]:
-    return tagged(qualified_list(LISTED["06035"], "Lassen", LISTED_EXPAND), LISTED["06035"])
+    return [
+        {**row, "seats": 2}
+        if row["district"].startswith("Lassen Community College") and row["seat"] == "Trustee Area 1"
+        else row
+        for row in tagged(qualified_list(LISTED["06035"], "Lassen", LISTED_EXPAND), LISTED["06035"])
+    ]
 
 
 LAKE_EXPAND = (
