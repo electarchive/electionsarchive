@@ -6484,6 +6484,20 @@ for key, publisher, title, url, local in (
         "ks/montgomery.pdf",
     ),
     (
+        "KS-20125-cities",
+        "Montgomery County Election Officer",
+        "Certification of Candidates and Notice of General Election, November 3, 2026",
+        "https://www.mgcountyks.org/DocumentCenter/View/1518/Notice-of-General-Election-Nov-3rd-20260001",
+        "ks/montgomery.pdf",
+    ),
+    (
+        "KS-20021-cities",
+        "Cherokee County Clerk",
+        "General Sample Ballots, November 3, 2026",
+        "https://cherokeecountyks.gov/main/images/documents/County-Clerk/Sample-Ballots/11-3-26_General_Sample_Ballots.pdf",
+        "ks/cherokee.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
