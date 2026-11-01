@@ -150,6 +150,7 @@ def page(title: str) -> str:
 
 
 LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
+EXPLOREUK = "https://exploreuk.uky.edu/dips/{item}/data/books_b92_77_27211776_{item}/{leaf:04d}.jpg"
 HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
 INBOX = DATA / "inbox" / "manual" / "MF-557"
 RNC = "sim_republican-national-convention-proceedings_{}"
@@ -331,6 +332,7 @@ TABLES += [
     },
 ]
 TABLES += [
+    {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
     {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295)},
     {"table": "1920:democratic:b44", "htid": "mdp.39015030799285", "leaves": (504, 505)},
     {"table": "1924:democratic:b1", "htid": "mdp.39015030799251", "leaves": (356, 357, 358)},
@@ -780,6 +782,9 @@ def fetch() -> None:
 
 
 def scan(spec: dict[str, object], leaf: int, fetch: bool = False) -> raw.Artifact:
+    if "uky" in spec:
+        url = EXPLOREUK.format(item=spec["uky"], leaf=leaf)
+        return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
     if "htid" not in spec:
         url = LEAF.format(item=spec["item"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
