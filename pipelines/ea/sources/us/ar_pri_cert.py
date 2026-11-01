@@ -22,7 +22,7 @@ FILES = {
 }
 PARTIES = {"Democrat": "democratic", "Republican": "republican"}
 TITLES = re.compile(
-    r"^(?:U\.S\. Senator|Sen\.|State Senator|State Representative|Representative|Congressman|Congresswoman)\s+"
+    r"^(?:President|U\.S\. Senator|Sen\.|State Senator|State Representative|Representative|Congressman|Congresswoman)\s+"
 )
 PUBLISHER = "Arkansas Secretary of State"
 TITLE = "Preferential primary certification reports by county"
@@ -81,7 +81,8 @@ def parse() -> None:
                     contest = line
                     continue
             elif found := re.fullmatch(
-                r"(U\.S\. Senate|U\.S\. Congress District 0\d) - (Democrat|Republican) \((.+) County\)", line
+                r"(U\.S\. President|U\.S\. Senate|U\.S\. Congress District 0\d) - (Democrat|Republican) \((.+) County\)",
+                line,
             ):
                 contest, party = found[1], PARTIES[found[2]]
                 county = codes[re.sub(r"\W", "", found[3]).lower().replace("saint", "st")]
@@ -130,7 +131,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Arkansas's 2002 and 2004 U.S. Senate and House primaries by county from the Secretary of State's certification reports; the files were saved from Wayback captures by a person in a browser, because the live copies are truncated",
+            summary="Arkansas's 2002 and 2004 U.S. Senate and House primaries and 2004 presidential primaries by county from the Secretary of State's certification reports; the files were saved from Wayback captures by a person in a browser, because the live copies are truncated",
             polity="US-AR",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -150,7 +151,11 @@ def emit() -> Path:
             conn,
             pl.read_parquet(PARSED / "counties.parquet").select(
                 year=pl.col("day").dt.year().cast(pl.Int32),
-                chamber=pl.when(pl.col("district").is_null()).then(pl.lit("senate:")).otherwise(pl.lit("house:"))
+                chamber=pl.when(pl.col("contest") == "U.S. President")
+                .then(pl.lit("president:"))
+                .when(pl.col("district").is_null())
+                .then(pl.lit("senate:"))
+                .otherwise(pl.lit("house:"))
                 + pl.col("party"),
                 day="day",
                 special=pl.lit(False),
