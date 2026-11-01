@@ -15,7 +15,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_1920"
-VERSION = "4"
+VERSION = "5"
 TITLE_ALBUM = "TBMM Albümü 1920-2010, 1. Cilt (1920-1950)"
 TITLE_TUIK = "Milletvekili Genel Seçimleri, 1923-2011"
 PARSED = DATA / "parsed" / SOURCE
@@ -689,6 +689,13 @@ def emit() -> Path:
             print("count differs", line)
 
         digits = re.compile(r"\d+")
+        shouted = re.compile(r"(?<!\w)(?=\w*[A-ZÇĞİÖŞÜ]{2})[A-ZÇĞİÖŞÜi]+(?!\w)")
+
+        def clean(text: str) -> str:
+            return title(shouted.sub(lambda word: word[0].replace("i", "İ"), digits.sub("", text)).strip())
+
+        regrouped: dict[UUID, set[str]] = {}
+        regrouped_names: dict[UUID, str] = {}
         written: set[UUID] = set()
         made = Counter()
         for row in entries.iter_rows(named=True):
@@ -701,6 +708,16 @@ def emit() -> Path:
                 "tr.tbmm_album.person",
                 f"{fold(row['registered'] or row['name'])}:{fold(row['birthplace'] or '')}:{row['born']}",
             )
+            shown, registered = row["name"], row["registered"]
+            if not shown and registered is not None:
+                grouped = re.match(r"^\(?(.*?)\s*\(([^()]*)\)$", f"({registered})")
+                assert grouped is not None
+                shown, registered = re.sub(r"[()]", "", grouped[1]), grouped[2]
+            raw_names = {title(digits.sub("", text).strip()) for text in (row["name"], row["registered"]) if text}
+            names = {clean(text) for text in (shown, registered) if text}
+            if person not in cs.minted and names != raw_names:
+                regrouped[person] = names
+                regrouped_names[person] = clean(shown)
             if person in cs.minted and person not in written:
                 written.add(person)
                 died = None if row["died"] is None else date.fromisoformat(row["died"])
@@ -712,12 +729,12 @@ def emit() -> Path:
                     death_date=died,
                     death_precision="day",
                 )
-                for text, preferred in ((row["name"], True), (row["registered"], False)):
-                    if text is not None:
+                for text, preferred in ((shown, True), (registered, False)):
+                    if text:
                         cs.add(
                             "name",
                             entity_id=person,
-                            text=title(digits.sub("", text).strip()),
+                            text=clean(text),
                             lang="tr",
                             kind="official",
                             is_preferred=preferred,
@@ -799,6 +816,30 @@ def emit() -> Path:
                     valid_from=start,
                     valid_from_precision="day" if exact else "unknown",
                     valid_to=ended,
+                )
+        held = conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset ch on ch.id = n.changeset_id
+               where ch.pipeline = %s and n.entity_id = any(%s::uuid[])""",
+            [SOURCE, list(regrouped)],
+        ).fetchall()
+        for person, texts in regrouped.items():
+            for text in texts - {held_text for _, entity, held_text in held if entity == person}:
+                cs.add(
+                    "name",
+                    entity_id=person,
+                    text=text,
+                    lang="tr",
+                    kind="official",
+                    is_preferred=text == regrouped_names[person],
+                )
+        for name_id, entity, text in held:
+            if text not in regrouped[entity]:
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=entity,
+                    text=text,
+                    reason="Split at the wrong parenthesis or misread the capitals when the album's name was read.",
                 )
         for key, count in sorted(made.items()):
             print(key, count)
