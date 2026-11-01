@@ -1768,6 +1768,12 @@ NE_SOURCES = {
         "https://vote.sos.ri.gov/Candidates",
         "ne/ri_towns.zip",
     ),
+    "RI-summary": (
+        "Rhode Island Secretary of State",
+        "2026 General Election Candidates by city or town, candidate search summaries as of October 31, 2026",
+        "https://vote.sos.ri.gov/Candidates/CandidateSearchSummary?Election=18144",
+        "ne/ri_summaries.zip",
+    ),
     "NJ-34011-s": (
         "Cumberland County Clerk",
         "2026 General Election Sample Ballots by municipality",
