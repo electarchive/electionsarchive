@@ -293,9 +293,13 @@ def lines() -> list[dict[str, object]]:
         state = "idle"
         buffer: list[str] = []
         judge = ""
+        office = TITLE_OFFICE
+        table: list[dict[str, object]] = []
         for line in text.splitlines():
             stripped = line.strip()
-            if "Missouri Supreme Court" in stripped:
+            title = re.search(r"Court of Appeals\W+(?:- )?(Eastern|Southern|Western) District", stripped)
+            if "Missouri Supreme Court" in stripped or title is not None:
+                office = TITLE_OFFICE if title is None else f"Judge of the Court of Appeals, {title[1]} District"
                 state, buffer, judge = "name", [], ""
                 continue
             if state == "name":
@@ -319,12 +323,19 @@ def lines() -> list[dict[str, object]]:
                 if match is None:
                     state = "idle"
                     continue
+                yes, no, total = (int(match[k].replace(",", "")) for k in (2, 3, 4))
+                if yes + no != total:
+                    raise ValueError(f"{day} {judge} {match[1]}: {yes} + {no} is not {total}")
                 if match[1] == "Total":
+                    if (sum(int(r["yes"]) for r in table), sum(int(r["no"]) for r in table)) != (yes, no):
+                        raise ValueError(f"{day} {judge}: rows do not sum to the printed total")
+                    found.extend(table)
+                    table = []
                     continue
-                found.append(
+                table.append(
                     {
                         "day": day,
-                        "office": TITLE_OFFICE,
+                        "office": office,
                         "judge": re.sub(r"\s+", " ", judge).strip(),
                         "county": match[1].strip(),
                         "yes": int(match[2].replace(",", "")),
@@ -341,7 +352,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Missouri Supreme Court retention elections 2000–2024 and Court of Appeals retention elections 2004–2010 by county, from the Secretary of State's official results",
+            summary="Missouri Supreme Court retention elections 2000–2024 and Court of Appeals retention elections 2004–2024 by county, from the Secretary of State's official results",
             polity="US-MO",
         )
         source = cs.source(PUBLISHER, TITLE)
