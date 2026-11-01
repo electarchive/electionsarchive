@@ -6222,6 +6222,13 @@ for key, publisher, title, url, local in (
         "ks/brown_candidates.pdf",
     ),
     (
+        "AZ-04005-williams",
+        "Coconino County Elections",
+        "Sample ballot, General Election November 3, 2026",
+        "https://www.coconino.az.gov/elections",
+        "az/coconino_ballot.html",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
