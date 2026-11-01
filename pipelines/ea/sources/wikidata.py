@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "16"
+VERSION = "17"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -80,6 +80,10 @@ THRESHOLD = 4
 SPLIT = r"\s[-–—]\s"
 LINKED = ("party", "federation", "parliamentary_group", "independent_group")
 MATCHES: dict[tuple[str, str], str | None] = {
+    ("BR", "Partido Social Trabalhista"): "Q28678919",
+    ("BR", "Partido da Democracia Cristã"): "Q65160541",
+    ("CA", "Progressive"): "Q2112263",
+    ("GB", "Loughton Residents Association"): "Q24965757",
     ("US", "Forward Party"): "Q108816586",
     ("US-CO", "Forward Party"): None,
     ("US-PA", "Forward Party"): None,
