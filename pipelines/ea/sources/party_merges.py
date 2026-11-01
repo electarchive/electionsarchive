@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "party_merges"
-VERSION = "4"
+VERSION = "5"
 MERGES = {
     "330bfd15-7970-5a47-9c1a-cb2b2632b5d7": "bc509349-9b70-5653-a994-69f2077ef882",
     "9fab4680-3011-5c3a-bd33-bdc6e96693aa": "8788ac83-2ebc-584d-9382-d46868efd147",
@@ -18,6 +18,26 @@ MERGES = {
     "ac8b37ef-f631-5d97-b065-59307c4e3402": "ce2006d2-f0ae-5fc6-9279-3a6e924bd4a0",
     "01a13b7e-b158-7755-a39c-0b4a8f4ada26": "e5a44fd1-55cf-51c8-b70c-f4c8c4d4a6ad",
     "14a3aef4-1f43-5cd1-904b-3c4a6206c502": "64e4d6a9-f3a2-5eda-bd8f-59803a21612e",
+    "3f27c6e1-6b07-5510-8c74-45adb2ce7457": "a9f92f6d-9811-5505-a2a0-0d2fb1bc215a",
+    "8db41a1d-44a9-5ed7-b11b-e58fbb23bbfb": "01a14094-d257-77f4-bbc1-a316db3bfbcf",
+    "ea04ea55-3200-5f6f-b769-e55946be80b2": "01a13bd3-6475-7344-8c51-dd4e83da5222",
+    "a825c1b4-6379-5a19-a886-b916941eb40b": "01a13bd3-6475-7344-8c51-dd4e83da5222",
+    "33df97c3-a596-5f59-9227-566ea74ed0b4": "2dfc0b3d-4e23-5e14-be27-8ef91f43ec0e",
+    "71dcaef2-5c40-5330-bcff-4a189d59b390": "9ff51d01-f13d-5af8-a876-a27595afa4cf",
+    "307180d2-65f3-5d40-bca4-5b0b89a563f7": "fcb086d6-ef40-5c4e-a62e-033854b073b0",
+    "44181406-b19c-5f07-be95-cb0f9ac9f927": "17b3b0b1-cad3-5b22-b701-5f305e071e1a",
+    "9742278a-80f2-5b3e-bccb-85b01ccc04eb": "2bca7926-fdd3-5e9a-889a-531b32e96ca9",
+    "64d503ff-6822-5568-8d37-06c86211e567": "046c7191-aaf2-55a8-960c-4a8e33428415",
+    "e60c72cd-0457-5fdb-a8b7-6c8d5f51c8fe": "f146df91-9888-5470-b138-7d334cbe7a44",
+    "a496e345-32ca-534e-9066-e93761f2ef12": "8fec2942-7902-5d0f-a36e-e458ca59a8bd",
+    "43ff1f53-68cb-5197-b6bd-16d8cd8fabdb": "33660a26-d195-50a2-a505-f90a9daecb58",
+    "3beb1778-439f-5a65-9379-7b954d034e4d": "5e5b8165-c3f0-5100-b4f4-f9adf152939c",
+    "173e73c7-d409-5766-b02e-2afa20f9d131": "5e5b8165-c3f0-5100-b4f4-f9adf152939c",
+    "bfcd31ea-ea34-57fd-94f3-7bf76181fc9b": "6b4ce92d-96d9-5ed5-8ffd-5afcbdbc1e2b",
+    "90245201-a954-50a9-b791-de21681cdc31": "e89ca231-79ad-5b9a-b319-0f9579491659",
+    "16ed9ee8-671c-5fb0-bbc3-8c6effc6bc66": "f531cf55-0cff-5e42-b0b4-5f366ff4b5b6",
+    "decadb53-e730-5947-928d-f2cbffccc144": "933c685f-6756-5684-bcce-171ac6c0c8a9",
+    "9e9cf478-d831-50fb-8604-1dcbe00ef89e": "f5fe8cbc-050a-5762-937e-4129dc87e975",
 }
 
 
