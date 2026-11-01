@@ -132,6 +132,11 @@
   const comparing = $derived(
     span != null && places.rows.some((row) => row.earlier != null),
   );
+  const SOURCE_TAGS = {
+    ballot: m.delegates_tag_ballot,
+    pledged: m.delegates_tag_pledged,
+    declared: m.delegates_tag_declared,
+  };
   const listed = $derived([...places.rows, ...(places.districts ?? [])]);
   const isDelegated = $derived(listed.some((row) => row.delegates != null));
   const column = $derived(
@@ -1078,6 +1083,16 @@
                     </span>
                   {:else if at === 0 && row.delegates != null}
                     {count(row.delegates.total)}
+                  {/if}
+                  {#if at === 0 && row.delegates != null}
+                    <span class="block text-[0.6875rem] text-muted-foreground">
+                      {SOURCE_TAGS[row.delegates.source]()}
+                      {#if row.delegates.pledged?.[0] != null}
+                        {m.delegates_pledged_beside({
+                          pledged: `${titles[row.delegates.pledged[0][0]]} ${m.delegates_of({ votes: count(row.delegates.pledged[0][1]), total: count(row.delegates.total) })}`,
+                        })}
+                      {/if}
+                    </span>
                   {/if}
                 </td>
               {/each}

@@ -11330,3 +11330,10 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             counts["stale contests"] += 1
         print(counts)
         return cs.write()
+    (
+        "UT-49035-magna",
+        "Magna Water District",
+        "Magna Water District Trustee Election, November 3, 2026",
+        "https://www.utah.gov/pmn/sitemap/notice/1105731.html",
+        "ut/magna_notice.html",
+    ),

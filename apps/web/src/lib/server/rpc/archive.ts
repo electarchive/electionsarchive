@@ -581,6 +581,8 @@ const PlaceRow = v.pipe(
         total: v.number(),
         first: v.array(v.tuple([v.number(), v.number()])),
         final: v.nullable(v.array(v.tuple([v.number(), v.number()]))),
+        source: v.picklist(["ballot", "pledged", "declared"]),
+        pledged: v.nullable(v.array(v.tuple([v.number(), v.number()]))),
       }),
     ),
     isCounted: v.optional(v.boolean()),
@@ -3232,6 +3234,7 @@ async function delegations(root: string, ks: Array<number>) {
       source: "ballot" | "pledged" | "declared";
       first: Array<Pick>;
       final: Array<Pick> | null;
+      pledged: Array<Pick> | null;
       ballots: number;
     }
   >();
@@ -3259,6 +3262,10 @@ async function delegations(root: string, ks: Array<number>) {
         source: entry.source,
         first: entry.picks,
         final: entry.source === "ballot" ? (last?.picks ?? null) : null,
+        pledged:
+          entry.source === "ballot"
+            ? (pledges?.picks ?? (declared.length > 0 ? declared : null))
+            : null,
         ballots: ballots.length,
       });
     }
@@ -3981,6 +3988,8 @@ async function places(
             total: entry.total,
             first: indexed(entry.first),
             final: entry.final == null ? null : indexed(entry.final),
+            source: entry.source,
+            pledged: entry.pledged == null ? null : indexed(entry.pledged),
           },
         };
   };

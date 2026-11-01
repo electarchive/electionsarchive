@@ -5600,12 +5600,18 @@ function placesMarkdown(
                 before == null || row.leader == null
                   ? null
                   : points((row.shares[row.leader] ?? 0) - before),
+              ]
+            : []),
+          row.valid === 0 && row.declared != null ? null : count(row.valid),
           ...(hasDelegates
             ? [
                 row.delegates == null
                   ? null
-                  : (voted(row.delegates.first, row.delegates.total) ??
-                    count(row.delegates.total)),
+                  : `${voted(row.delegates.first, row.delegates.total) ?? count(row.delegates.total)} (${{ ballot: m.delegates_tag_ballot, pledged: m.delegates_tag_pledged, declared: m.delegates_tag_declared }[row.delegates.source]()}${
+                      voted(row.delegates.pledged, row.delegates.total) == null
+                        ? ""
+                        : `; ${m.delegates_pledged_beside({ pledged: voted(row.delegates.pledged, row.delegates.total) ?? "" })}`
+                    })`,
               ]
             : []),
           ...(hasFinal
