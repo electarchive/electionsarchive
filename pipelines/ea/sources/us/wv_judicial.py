@@ -2,10 +2,8 @@ import csv
 import io
 import re
 import unicodedata
-import xml.etree.ElementTree as ET
-import zipfile
 from collections import defaultdict
-from datetime import UTC, date, datetime
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
@@ -14,7 +12,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
-from ea.store import DATA, connect
+from ea.store import connect
 
 SOURCE = "us.wv_judicial"
 VERSION = "1"
@@ -28,14 +26,6 @@ ELECTIONS = {
     date(2012, 11, 6): (13, f"{date(2012, 11, 6)}:WV", "general", 2),
     date(2016, 5, 10): (22, f"{date(2016, 5, 10)}:WV:primary", "primary", 1),
 }
-INBOX = DATA / "inbox" / "manual" / "MF-565"
-CLARITY_URL = "https://sos.wv.gov/elections/Pages/ElectionResults.aspx#{day}"
-CLARITY = {
-    date(2018, 11, 6): (f"{date(2018, 11, 6)}:WV", "general", "2018-general/detailxls (1).zip"),
-    date(2020, 6, 9): (f"{date(2020, 6, 9)}:WV:primary", "primary", "2020/detailxls (2).zip"),
-    date(2024, 5, 14): (f"{date(2024, 5, 14)}:WV:primary", "primary", "2024/detailxls (3).zip"),
-}
-SHEET = "{urn:schemas-microsoft-com:office:spreadsheet}"
 PARTIES = {"D": "democratic-party", "R": "republican-party"}
 NOTE = (
     "County totals from the West Virginia Secretary of State's Election Results Center, state and county totals file."
@@ -49,67 +39,6 @@ def flat(text: str) -> str:
 def fetch() -> None:
     for eid, *_ in ELECTIONS.values():
         raw.fetch(SOURCE, URL.format(eid=eid), suffix=".csv")
-    for day, (_, _, file) in CLARITY.items():
-        try:
-            raw.cached(SOURCE, CLARITY_URL.format(day=day))
-        except LookupError:
-            raw.store(
-                SOURCE,
-                CLARITY_URL.format(day=day),
-                (INBOX / file).read_bytes(),
-                suffix=".zip",
-                retrieved_at=datetime.fromtimestamp((INBOX / file).stat().st_mtime, UTC),
-                media_type="application/zip",
-            )
-
-
-def sheets(day: date) -> list[tuple[str, list[list[str]]]]:
-    with zipfile.ZipFile(raw.cached(SOURCE, CLARITY_URL.format(day=day)).path) as archive:
-        tree = ET.fromstring(archive.read("detail.xls").decode("utf-8-sig"))
-    found = []
-    for sheet in tree.iter(SHEET + "Worksheet"):
-        rows = []
-        for row in sheet.iter(SHEET + "Row"):
-            cells: list[str] = []
-            for cell in row.findall(SHEET + "Cell"):
-                index = cell.get(SHEET + "Index")
-                while index is not None and len(cells) < int(index) - 1:
-                    cells.append("")
-                data = cell.find(SHEET + "Data")
-                cells.append(data.text or "" if data is not None else "")
-            rows.append(cells)
-        found.append((sheet.get(SHEET + "Name") or "", rows))
-    return found
-
-
-def clarity_lines() -> list[dict[str, object]]:
-    found = []
-    for day in CLARITY:
-        for _, rows in sheets(day):
-            title = rows[0][0] if rows and rows[0] else ""
-            if "JUSTICE OF THE SUPREME COURT OF APPEALS" not in title.upper():
-                continue
-            division = re.search(r"DIVISION (\d)", title.upper())
-            if division is None:
-                raise ValueError(title)
-            names = [re.sub(r"\s+", " ", name).strip() for name in rows[1] if name]
-            columns = [column for column, head in enumerate(rows[2]) if head == "Total Votes"]
-            for row in rows[3:]:
-                if row[0] == "Total:":
-                    break
-                for name, column in zip(names, columns, strict=True):
-                    found.append(
-                        {
-                            "day": day,
-                            "division": int(division[1]),
-                            "remainder": "UNEXPIRED" in title.upper(),
-                            "candidate": name,
-                            "party": "",
-                            "county": row[0],
-                            "votes": int(row[column] or 0),
-                        }
-                    )
-    return found
 
 
 def lines() -> list[dict[str, object]]:
@@ -124,14 +53,12 @@ def lines() -> list[dict[str, object]]:
                 continue
             found[key] = {
                 "day": day,
-                "division": 0,
-                "remainder": False,
                 "candidate": re.sub(r"\s+", " ", line["Name"]).strip(),
                 "party": line["PartyCode"],
                 "county": line["CountyName"],
                 "votes": int(line["Votes"] or 0),
             }
-    return [*found.values(), *clarity_lines()]
+    return list(found.values())
 
 
 def emit() -> Path:
@@ -141,8 +68,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="West Virginia Supreme Court of Appeals elections 2008 to 2024 by county, "
-            "from the Secretary of State's Election Results Center and results reports",
+            summary="West Virginia Supreme Court of Appeals elections 2008, 2012, and 2016 by county, "
+            "from the Secretary of State's Election Results Center",
             polity="US-WV",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -157,8 +84,6 @@ def emit() -> Path:
         )
         for eid, *_ in ELECTIONS.values():
             cs.artifact(raw.cached(SOURCE, URL.format(eid=eid)), source)
-        for day in CLARITY:
-            cs.artifact(raw.cached(SOURCE, CLARITY_URL.format(day=day)), source)
         counties = {
             flat(text): unit
             for text, unit in conn.execute(
@@ -198,20 +123,14 @@ def emit() -> Path:
                 kind="official",
                 is_preferred=True,
             )
-        groups: dict[tuple[date, int], list[dict[str, object]]] = defaultdict(list)
+        groups: dict[date, list[dict[str, object]]] = defaultdict(list)
         for row in rows:
-            groups[(row["day"], row["division"])].append(row)
+            groups[row["day"]].append(row)
         persons: set[str] = set()
-        for (day, division), group in sorted(groups.items()):
-            if division:
-                election_key, kind, _ = CLARITY[day]
-                seats = 1
-            else:
-                _, election_key, kind, seats = ELECTIONS[day]
-            title = f"{TITLE_OFFICE}, Division {division}" if division else TITLE_OFFICE
-            title_slug = slug(title)
+        for day, group in sorted(groups.items()):
+            _, election_key, kind, seats = ELECTIONS[day]
             election = cs.key("us.election", election_key)
-            contest_key = f"{day}:WV:{title_slug}"
+            contest_key = f"{day}:WV:{slug(TITLE_OFFICE)}"
             contest = cs.key("us.contest", contest_key)
             cs.add(
                 "contest",
@@ -220,15 +139,15 @@ def emit() -> Path:
                 kind="office",
                 office_id=office,
                 district_area_id=state_area,
-                term="remainder" if group[0]["remainder"] else "full",
+                term="full",
                 magnitude=seats,
                 round_number=1,
                 electoral_system_id=systems["block" if seats > 1 else "fptp"],
                 default_result_kind="counted",
             )
-            name(contest, f"{day.year} West Virginia {title}")
+            name(contest, f"{day.year} West Virginia {TITLE_OFFICE}")
             if contest in cs.minted:
-                base = f"us/wv/{day}-{kind}/{title_slug}"
+                base = f"us/wv/{day}-{kind}/{slug(TITLE_OFFICE)}"
                 path, count = base, 1
                 while path in taken:
                     count += 1
