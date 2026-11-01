@@ -21,18 +21,19 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ITEMS = {
     1990: ("micro_IA40706939_0340", date(1990, 11, 6), (2, 3, 4, 5)),
+    1992: ("micro_IA40706946_0247", date(1992, 11, 3), (3, 4, 5)),
     1994: ("micro_IA40706953_0275", date(1994, 11, 8), (2, 3, 4, 5, 6, 7)),
 }
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()
 }
-OFFICES = {"senate": "senate", "governor": "governor", "unexpired": "senate:special"}
-ERRATA = {(1990, ("senate", 0)), (1994, ("governor", 0))}
+OFFICES = {"president": "president", "senate": "senate", "governor": "governor", "unexpired": "senate:special"}
+ERRATA = {(1990, ("senate", 0)), (1992, ("president", 0)), (1994, ("governor", 0))}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = False
-TURNED: set[tuple[int, int]] = set()
+TURNED: set[tuple[int, int]] = {(1992, 3), (1992, 4), (1992, 5)}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
@@ -63,7 +64,7 @@ def emit() -> Path:
             sources[year] = cs.source(PUBLISHER, title)
             if conn.execute(
                 """select 1 from result_set r join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-                   where r.source_id = %s and x.value ~ ':TN:(governor|senate)' limit 1""",
+                   where r.source_id = %s and x.value ~ ':TN:(governor|senate|president)' limit 1""",
                 [sources[year]],
             ).fetchone():
                 continue
@@ -125,7 +126,7 @@ def emit() -> Path:
                 plain = house_books._plain(county)
                 unit = counties.get(plain) or next(u for name, u in counties.items() if name.startswith(plain))
                 option = option_of.get(label)
-                if label not in measures and option is None:
+                if votes < 0 or (label not in measures and option is None):
                     continue
                 fact = {
                     "result_set_id": result_set,
