@@ -1146,7 +1146,7 @@ def parse_state(only: str, inputs: list[tuple[int, Path]], official: pl.DataFram
     )
     variants: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     for state, name, mixed in [
-        *official.filter(pl.col("answer") == "yes").select("state", "name", pl.lit(True)).iter_rows(),
+        *official.filter((pl.col("answer") == "yes") & pl.col("name").is_not_null()).select("state", "name", pl.lit(True)).iter_rows(),
         *frame.filter(pl.col("name").is_not_null()).select("state", "name", pl.lit(False)).unique().iter_rows(),
     ]:
         first, last = identity(name)
@@ -1185,9 +1185,16 @@ def parse_state(only: str, inputs: list[tuple[int, Path]], official: pl.DataFram
         official.select(
             pl.col("day").str.slice(0, 4).cast(pl.Int32).alias("year"), "state", "court", "number", "post", "person"
         )
+        .filter(pl.col("person").is_not_null())
         .unique()
         .filter(pl.len().over("year", "state", "court", "number", "post") == 1)
         .rename({"person": "official"})
+    )
+    official = (
+        official.with_columns(year=pl.col("day").str.slice(0, 4).cast(pl.Int32))
+        .join(filled, on=["year", "state", "court", "number", "post"], how="left", nulls_equal=True)
+        .with_columns(person=pl.coalesce("person", "official"))
+        .drop("year", "official")
     )
     frame = frame.join(filled, on=["year", "state", "court", "number", "post"], how="left", nulls_equal=True)
     frame = frame.with_columns(person=pl.coalesce("person", "official"))
