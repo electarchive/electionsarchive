@@ -24,6 +24,7 @@
   import Standing from "#lib/components/standing.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
   import { count, date, percent, plural, points } from "#lib/format.js";
@@ -86,6 +87,17 @@
   });
   const sheet = $derived(loaded.sheet);
   const grouped = $derived(asked.endsWith("|alliance"));
+  const levelOptions = $derived(
+    sheet.levels.map((level) => ({
+      value: level.code,
+      label: level.noun.charAt(0).toUpperCase() + level.noun.slice(1),
+      count: count(level.count),
+    })),
+  );
+  const groupOptions = $derived([
+    { value: "group", label: m.group_option() },
+    { value: "alliance", label: m.group_alliance() },
+  ]);
   let isLoading = $state(false);
   let pending = $state(0);
 
@@ -2417,30 +2429,16 @@
           <span class="text-xs font-semibold text-muted-foreground"
             >{m.map_level()}</span
           >
-          <div class="flex overflow-x-auto pbe-px">
-            {#each sheet.levels as level (level.code)}
-              <button
-                type="button"
-                class={cn(
-                  "min-is-0 -ms-px flex flex-1 flex-col items-center border border-input bg-card px-2 py-1 text-[0.8125rem]/tight  font-semibold keycap first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                  {
-                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                      level.code === sheet.level,
-                  },
-                )}
-                aria-pressed={level.code === sheet.level}
-                onclick={() => {
-                  const [where = "", , vs = ""] = asked.split("|");
-                  move(where, level.code, vs === "" ? null : vs);
-                }}
-                >{level.noun.charAt(0).toUpperCase() + level.noun.slice(1)}
-                <span
-                  class="font-figures text-[0.6875rem] font-normal tabular-nums"
-                  >{count(level.count)}</span
-                ></button
-              >
-            {/each}
-          </div>
+          <Segmented
+            options={levelOptions}
+            value={sheet.level ?? undefined}
+            onValueChange={(next: string) => {
+              const [where = "", , vs = ""] = asked.split("|");
+              move(where, next, vs === "" ? null : vs);
+            }}
+            label={m.map_level()}
+            fill
+          />
         </div>
       {:else if isParts && mosaic == null && mid != null && drawn === sheet}
         <p class="text-xs text-muted-foreground">
@@ -2452,30 +2450,20 @@
           <span class="text-xs font-semibold text-muted-foreground"
             >{m.group_label()}</span
           >
-          <div class="flex">
-            {#each [{ isAlliance: false, label: m.group_option() }, { isAlliance: true, label: m.group_alliance() }] as choice (choice.label)}
-              <button
-                type="button"
-                class={cn(
-                  "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                  {
-                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                      choice.isAlliance === grouped,
-                  },
-                )}
-                aria-pressed={choice.isAlliance === grouped}
-                onclick={() => {
-                  const [where = "", level = "", vs = ""] = asked.split("|");
-                  move(
-                    where,
-                    level === "" ? null : level,
-                    vs === "" ? null : vs,
-                    choice.isAlliance ? "alliance" : null,
-                  );
-                }}>{choice.label}</button
-              >
-            {/each}
-          </div>
+          <Segmented
+            options={groupOptions}
+            value={grouped ? "alliance" : "group"}
+            onValueChange={(next: string) => {
+              const [where = "", level = "", vs = ""] = asked.split("|");
+              move(
+                where,
+                level === "" ? null : level,
+                vs === "" ? null : vs,
+                next === "alliance" ? "alliance" : null,
+              );
+            }}
+            label={m.group_label()}
+          />
         </div>
       {/if}
     </section>

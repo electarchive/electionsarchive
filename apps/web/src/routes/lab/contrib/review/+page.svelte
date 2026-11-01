@@ -6,6 +6,7 @@
   import type { Proposal } from "#routes/lab/contrib/data.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Dialog from "#lib/components/ui/dialog/index.js";
+  import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import { cn } from "#lib/utils.js";
   import { copy } from "#routes/lab/contrib/copy.js";
@@ -67,6 +68,13 @@
   );
   const deskToday = $derived(
     proposals.filter((p) => p.tier === 1 && p.desk === "approve").length + 58,
+  );
+  const queueOptions = $derived(
+    tabs.map(([value, label, test]) => ({
+      value,
+      label,
+      count: pending.filter(test).length,
+    })),
   );
 
   const verbs: Record<Verdict, string> = {
@@ -152,28 +160,14 @@
     <p class="text-sm text-muted-foreground">{copy.desk_today(deskToday)}</p>
   </div>
 
-  <div
-    class="mbs-5 flex flex-wrap items-center gap-x-1 gap-y-2 border-be text-sm max-sm:border-be-0"
-  >
-    <nav
-      class="flex gap-x-1 overflow-x-auto whitespace-nowrap max-sm:border-be max-sm:inline-full"
-      aria-label={copy.review_title}
-    >
-      {#each tabs as [key, label, test] (key)}
-        {const n = $derived(pending.filter(test).length)}
-        <button
-          type="button"
-          aria-current={queue === key ? "page" : undefined}
-          class={cn("px-2 py-1.5", {
-            "font-semibold shadow-[inset_0_-2px_0_var(--foreground)]":
-              queue === key,
-            "text-muted-foreground hover:text-foreground": queue !== key,
-          })}
-          onclick={() => (queue = key)}
-          >{label} <span class="font-figures">{n}</span></button
-        >
-      {/each}
-    </nav>
+  <div class="mbs-5 flex flex-wrap items-center gap-x-1 gap-y-2 text-sm">
+    <Tabs
+      options={queueOptions}
+      bind:value={queue}
+      id="review-queue"
+      label={copy.review_title}
+      class="max-sm:inline-full"
+    />
     <input
       id="review-filter"
       bind:value={filter}

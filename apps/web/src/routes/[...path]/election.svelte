@@ -13,6 +13,7 @@
   import Name from "#lib/components/name.svelte";
   import NoteBody from "#lib/components/note-body.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { gapNote } from "#lib/coverage.js";
   import {
     count,
@@ -431,6 +432,10 @@
   }));
   const regional = $state<Record<number, string>>({});
   const firstRound = $state<Record<number, boolean>>({});
+  const roundOptions = $derived([
+    { value: "seats", label: m.map_round_seats() },
+    { value: "first", label: m.round_first() },
+  ]);
   const shades = $state<Record<number, (typeof MODES)[number] | number>>({});
   const regionals = createQueries(() => ({
     queries: ordered.map((race, index) => ({
@@ -2056,27 +2061,14 @@
             {const asked = $derived(regional[index] ?? places.level)}
             {const kept = $derived(shades[index])}
             {#if race.decided != null && region == null}
-              <div
-                class="flex self-start"
-                role="group"
-                aria-label={m.map_round_label()}
-              >
-                {#each [false, true] as isFirst (isFirst)}
-                  <button
-                    type="button"
-                    class={cn(
-                      "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
-                      {
-                        "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                          (firstRound[index] === true) === isFirst,
-                      },
-                    )}
-                    aria-pressed={(firstRound[index] === true) === isFirst}
-                    onclick={() => (firstRound[index] = isFirst)}
-                    >{isFirst ? m.round_first() : m.map_round_seats()}</button
-                  >
-                {/each}
-              </div>
+              <Segmented
+                class="self-start"
+                options={roundOptions}
+                value={firstRound[index] === true ? "first" : "seats"}
+                label={m.map_round_label()}
+                onValueChange={(next: string) =>
+                  (firstRound[index] = next === "first")}
+              />
             {/if}
             {#if shape.tiles != null}
               {#key places.level}

@@ -13,12 +13,14 @@
   import SettingsIcon from "@lucide/svelte/icons/settings-2";
   import { onMount } from "svelte";
   import { on } from "svelte/events";
+  import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Board, Cell, Kind, Panel } from "#lib/live/board/layout.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Dialog from "#lib/components/ui/dialog/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import {
     COLUMNS,
     forget,
@@ -75,6 +77,20 @@
     mode: "move" | "resize";
   } | null>(null);
   let isArranging = $state(false);
+  const MODES = $derived<Array<SegmentedOption<"view" | "arrange">>>([
+    {
+      value: "view",
+      label: m.board_view(),
+      icon: EyeIcon,
+      title: `${m.board_view()} (E)`,
+    },
+    {
+      value: "arrange",
+      label: m.board_arrange(),
+      icon: LayoutGridIcon,
+      title: `${m.board_arrange()} (E)`,
+    },
+  ]);
   let isPresenting = $state(false);
   let isAdding = $state(false);
   let target = $state<{ x: number; y: number } | null>(null);
@@ -512,34 +528,16 @@
     </div>
     <div class="ms-auto flex items-center gap-1">
       {#if !isPresenting && !isStacked}
-        <div
-          class="me-1 flex rounded-sm bg-muted p-0.5"
-          role="group"
-          aria-label={m.board_mode()}
-        >
-          {#each [{ value: false, name: m.board_view(), Icon: EyeIcon }, { value: true, name: m.board_arrange(), Icon: LayoutGridIcon }] as option (option.value)}
-            {const isOn = $derived(isArranging === option.value)}
-            <button
-              type="button"
-              class={cn(
-                "flex items-center gap-1.5 rounded-xs px-2 py-1 font-semibold transition-colors",
-                {
-                  "bg-background text-foreground shadow-xs": isOn,
-                  "text-muted-foreground hover:text-foreground": !isOn,
-                },
-              )}
-              aria-pressed={isOn}
-              title="{option.name} (E)"
-              onclick={() => {
-                isArranging = option.value;
-                hover = null;
-              }}
-            >
-              <option.Icon class="block-3.5 inline-3.5" aria-hidden="true" />
-              {option.name}
-            </button>
-          {/each}
-        </div>
+        <Segmented
+          class="me-1"
+          options={MODES}
+          value={isArranging ? "arrange" : "view"}
+          label={m.board_mode()}
+          onValueChange={(next: "view" | "arrange") => {
+            isArranging = next === "arrange";
+            hover = null;
+          }}
+        />
         {#if isArranging}
           <Button
             size="icon"

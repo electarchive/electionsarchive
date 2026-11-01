@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
+  import type { ComponentProps } from "svelte";
   import MapIcon from "@lucide/svelte/icons/map";
   import XIcon from "@lucide/svelte/icons/x";
   import { untrack } from "svelte";
@@ -9,6 +10,7 @@
     Standing,
     UnitStanding,
   } from "#lib/live/standing.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, percent } from "#lib/format.js";
   import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
   import { prefs } from "#lib/live/prefs.svelte.js";
@@ -17,6 +19,7 @@
   import { Engine } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import MethodLink from "./method-link.svelte";
 
   let {
     geography,
@@ -26,6 +29,7 @@
     modes = ["lead", "bubbles", "shift", "counted", "remaining"],
     title,
     caption,
+    help,
     anchor = null,
     href,
     mode = $bindable("lead"),
@@ -39,6 +43,7 @@
     modes?: Array<Mode>;
     title?: string;
     caption?: string;
+    help?: ComponentProps<typeof MethodLink>["section"];
     anchor?: string | null;
     href?: (unitId: string) => string | null;
     mode?: Mode;
@@ -53,7 +58,13 @@
     { id: "counted", label: m.night_map_counted },
     { id: "remaining", label: m.night_map_remaining },
   ];
-  const choices = $derived(LABELS.filter((entry) => modes.includes(entry.id)));
+  const choices = $derived(
+    LABELS.flatMap((entry) =>
+      modes.includes(entry.id)
+        ? [{ value: entry.id, label: entry.label() }]
+        : [],
+    ),
+  );
 
   const byArea = $derived(
     new Map(
@@ -477,31 +488,19 @@
     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 min-block-8"
   >
     {#if title != null}
-      <h2 class="text-base font-[720] tracking-tight">{title}</h2>
+      <h2 class="flex items-center gap-1 text-base font-[720] tracking-tight">
+        {title}
+        {#if help != null}
+          <MethodLink section={help} />
+        {/if}
+      </h2>
     {/if}
     {#if choices.length > 1}
-      <div
-        role="radiogroup"
-        aria-label={m.night_map_modes()}
-        class="flex gap-0.5 rounded-sm bg-muted p-0.5"
-      >
-        {#each choices as entry (entry.id)}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={mode === entry.id}
-            class={cn(
-              "rounded-xs px-2.5 py-1 text-[0.8125rem] font-semibold transition-colors",
-              {
-                "bg-background text-foreground shadow-xs": mode === entry.id,
-                "text-muted-foreground hover:text-foreground":
-                  mode !== entry.id,
-              },
-            )}
-            onclick={() => (mode = entry.id)}>{entry.label()}</button
-          >
-        {/each}
-      </div>
+      <Segmented
+        options={choices}
+        bind:value={mode}
+        label={m.night_map_modes()}
+      />
     {:else if mode === "remaining"}
       <span class="flex items-center gap-3 text-xs text-muted-foreground">
         <span class="flex items-center gap-1.5"

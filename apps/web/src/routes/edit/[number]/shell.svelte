@@ -5,6 +5,7 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
+  import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { tierLabel } from "#lib/contrib.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -46,6 +47,17 @@
     ["checks", m.ws_tab_checks],
     ["evidence", m.ws_tab_evidence],
   ] as const;
+
+  const tabOptions = $derived(
+    tabs.map(([value, label]) => ({
+      value,
+      label: label(),
+      count:
+        value === "checks" && session.findingCount > 0
+          ? session.findingCount
+          : undefined,
+    })),
+  );
 
   const check = $derived(session.check);
 
@@ -139,27 +151,14 @@
       class="grid grid-rows-[auto_minmax(0,1fr)] border-bs lg:border-s lg:border-bs-0 lg:min-block-0"
       aria-label={m.ws_inspector()}
     >
-      <div class="flex gap-1 border-be px-3 pbs-2" role="tablist">
-        {#each tabs as [key, label] (key)}
-          <button
-            type="button"
-            role="tab"
-            id="ws-tab-{key}"
-            aria-selected={session.tab === key}
-            aria-controls="ws-panel"
-            class={cn("px-2 py-1.5", {
-              "font-semibold shadow-[inset_0_-2px_0_var(--foreground)]":
-                session.tab === key,
-              "text-muted-foreground hover:text-foreground":
-                session.tab !== key,
-            })}
-            onclick={() => (session.tab = key)}
-            >{label()}{#if key === "checks" && session.findingCount > 0}<span
-                class="ms-1 font-figures">{session.findingCount}</span
-              >{/if}</button
-          >
-        {/each}
-      </div>
+      <Tabs
+        options={tabOptions}
+        bind:value={session.tab}
+        id="ws-tab"
+        label={m.ws_inspector()}
+        panel="ws-panel"
+        class="px-3 pbs-2"
+      />
       <div
         id="ws-panel"
         class="overflow-y-auto p-4"

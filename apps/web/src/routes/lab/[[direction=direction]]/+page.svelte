@@ -6,6 +6,8 @@
   import { mode, setMode, userPrefersMode } from "mode-watcher";
   import { MediaQuery } from "svelte/reactivity";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { Tabs } from "#lib/components/ui/tabs/index.js";
   import Chamber from "./chamber.svelte";
   import { copy } from "./copy.js";
   import Indelible from "./indelible.svelte";
@@ -63,6 +65,12 @@
     ["dark", copy.lab_dark],
   ] as const;
 
+  const directionOptions = directions.map(([value, label]) => ({
+    value,
+    label,
+  }));
+  const themeOptions = themes.map(([value, label]) => ({ value, label }));
+
   const about = $derived(
     directions.find(([key]) => key === direction)?.[2] ?? "",
   );
@@ -95,35 +103,23 @@
   <div class="lab-bar">
     <div class="lab-group">
       <span class="lab-title">{copy.lab_title}</span>
-      <div class="lab-tabs" role="tablist" aria-label={copy.lab_title}>
-        {#each directions as [key, label] (key)}
-          <button
-            type="button"
-            role="tab"
-            class="lab-tab"
-            aria-selected={direction === key}
-            onclick={() => choose(key)}
-          >
-            {label}
-          </button>
-        {/each}
-      </div>
+      <Tabs
+        options={directionOptions}
+        value={direction}
+        id="lab-direction"
+        label={copy.lab_title}
+        onValueChange={choose}
+      />
       <span class="lab-about">{about}</span>
     </div>
     <div class="lab-group">
-      <div class="lab-tabs" role="radiogroup" aria-label={copy.lab_theme}>
-        {#each themes as [key, label] (key)}
-          <button
-            type="button"
-            role="radio"
-            class="lab-tab"
-            aria-checked={userPrefersMode.current === key}
-            onclick={() => view.transition(() => setMode(key))}
-          >
-            {label}
-          </button>
-        {/each}
-      </div>
+      <Segmented
+        options={themeOptions}
+        value={userPrefersMode.current}
+        label={copy.lab_theme}
+        onValueChange={(next: (typeof themes)[number][0]) =>
+          view.transition(() => setMode(next))}
+      />
       <DropdownMenu.Root>
         <DropdownMenu.Trigger class="lab-effects">
           {copy.lab_effects}
@@ -192,28 +188,6 @@
     font-weight: 600;
   }
 
-  .lab-tabs {
-    display: inline-flex;
-    padding: 2px;
-    border-radius: 7px;
-    background: rgb(128 128 128 / 0.18);
-  }
-
-  .lab-tab {
-    padding: 3px 10px;
-    border-radius: 5px;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-  }
-
-  .lab-tab[aria-selected="true"],
-  .lab-tab[aria-checked="true"] {
-    background: var(--surface);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
-  }
-
-  .lab-tab:focus-visible,
   :global(.lab-effects):focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 1px;

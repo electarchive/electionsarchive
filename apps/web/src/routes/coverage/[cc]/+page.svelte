@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -244,6 +245,24 @@
     grain != null && options.includes(grain)
       ? grain
       : (options[0] ?? headline(data.polity, tab).goal),
+  );
+  const tierOptions = $derived(
+    data.tiers.map((row) => ({
+      value: row.key,
+      label: TIER_LABELS[row.key as Tier](),
+    })),
+  );
+  const goalOptions = $derived(
+    options.map((option) => ({
+      value: option,
+      label: (option === "shapes"
+        ? isUs
+          ? m.coverage_gap_shapes
+          : m.coverage_gap_country_shapes
+        : option === tab && !isUs
+          ? m.coverage_gap_constituency
+          : (GAP_LABELS[option] ?? m.coverage_gap_local))(),
+    })),
   );
   let order = $state<"gap" | "name">("gap");
 
@@ -1455,84 +1474,29 @@
                 ? m.coverage_where_hint_flat
                 : m.coverage_where_hint_country)()}
           </p>
-          <div
-            role="group"
-            aria-label={m.coverage_where_tiers()}
-            class="flex overflow-x-auto rounded-sm border border-border p-0.5 text-sm inline-fit max-inline-full min-inline-0"
-          >
-            {#each data.tiers as option (option.key)}
-              <button
-                type="button"
-                aria-pressed={tab === option.key}
-                class={cn(
-                  "shrink-0 rounded-[3px] px-2 whitespace-nowrap block-7 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
-                  {
-                    "bg-foreground text-background": tab === option.key,
-                    "text-muted-foreground hover:text-foreground":
-                      tab !== option.key,
-                  },
-                )}
-                onclick={() => (picked = option.key)}
-                >{TIER_LABELS[option.key as Tier]()}</button
-              >
-            {/each}
-          </div>
+          <Segmented
+            options={tierOptions}
+            value={tab}
+            onValueChange={(next: string) => (picked = next)}
+            label={m.coverage_where_tiers()}
+          />
           <div class="flex flex-wrap items-center gap-2">
             {#if options.length > 1}
-              <div
-                role="group"
-                aria-label={m.coverage_goal_tabs()}
-                class="flex overflow-x-auto rounded-sm border border-border p-0.5 text-sm max-inline-full min-inline-0"
-              >
-                {#each options as option (option)}
-                  <button
-                    type="button"
-                    aria-pressed={goal === option}
-                    class={cn(
-                      "shrink-0 rounded-[3px] px-2 whitespace-nowrap block-7 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
-                      {
-                        "bg-foreground text-background": goal === option,
-                        "text-muted-foreground hover:text-foreground":
-                          goal !== option,
-                      },
-                    )}
-                    onclick={() => (grain = option)}
-                    >{(option === "shapes"
-                      ? isUs
-                        ? m.coverage_gap_shapes
-                        : m.coverage_gap_country_shapes
-                      : option === tab && !isUs
-                        ? m.coverage_gap_constituency
-                        : (GAP_LABELS[option] ??
-                          m.coverage_gap_local))()}</button
-                  >
-                {/each}
-              </div>
+              <Segmented
+                options={goalOptions}
+                value={goal}
+                onValueChange={(next: Goal) => (grain = next)}
+                label={m.coverage_goal_tabs()}
+              />
             {/if}
-            <div
-              role="group"
-              aria-label={m.coverage_sort()}
-              class="flex rounded-sm border border-border p-0.5 text-sm inline-fit"
-            >
-              {#each ["gap", "name"] as const as option (option)}
-                <button
-                  type="button"
-                  aria-pressed={order === option}
-                  class={cn(
-                    "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
-                    {
-                      "bg-foreground text-background": order === option,
-                      "text-muted-foreground hover:text-foreground":
-                        order !== option,
-                    },
-                  )}
-                  onclick={() => (order = option)}
-                  >{option === "gap"
-                    ? m.coverage_sort_gap()
-                    : m.coverage_sort_name()}</button
-                >
-              {/each}
-            </div>
+            <Segmented
+              options={[
+                { value: "gap", label: m.coverage_sort_gap() },
+                { value: "name", label: m.coverage_sort_name() },
+              ]}
+              bind:value={order}
+              label={m.coverage_sort()}
+            />
           </div>
           <p class="text-xs text-muted-foreground max-inline-[80ch]">
             {m.coverage_column_note()}

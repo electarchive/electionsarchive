@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LiveOption, LiveRace } from "@ea/analytics/live";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
+  import MethodLink from "#lib/components/live/method-link.svelte";
   import { percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -66,6 +67,7 @@
         style:color={tone(favorite)}>{percent(odds, 0)}</span
       >
       <span class="truncate font-semibold">{favorite?.label}</span>
+      <span class="ms-auto self-center"><MethodLink section="ranges" /></span>
     </p>
     <div class="flex overflow-hidden rounded-full block-2.5" aria-hidden="true">
       <span

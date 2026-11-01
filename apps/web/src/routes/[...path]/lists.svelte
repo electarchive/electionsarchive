@@ -1,6 +1,7 @@
 <script lang="ts">
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -28,6 +29,10 @@
 
   const winners = $derived(lists.lists.filter((list) => list.seats > 0));
   const isPickable = $derived(lists.isRanked || lists.isOpen);
+  const listModeOptions = $derived([
+    { value: "winners", label: m.lists_winners() },
+    { value: "all", label: m.lists_all({ count: lists.lists.length }) },
+  ]);
   const shown = $derived(
     (isAll && isPickable) || winners.length === 0 ? lists.lists : winners,
   );
@@ -92,25 +97,12 @@
     </div>
     <div class="flex flex-wrap items-center gap-2">
       {#if isPickable && winners.length > 0 && winners.length < lists.lists.length}
-        <div class="flex" role="group" aria-label={m.lists_title()}>
-          {#each [false, true] as value (value)}
-            <button
-              type="button"
-              class={cn(
-                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    isAll === value,
-                },
-              )}
-              aria-pressed={isAll === value}
-              onclick={() => (isAll = value)}
-              >{value
-                ? m.lists_all({ count: lists.lists.length })
-                : m.lists_winners()}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={listModeOptions}
+          value={isAll ? "all" : "winners"}
+          label={m.lists_title()}
+          onValueChange={(next: string) => (isAll = next === "all")}
+        />
       {/if}
       {#if isTruncated || isFull}
         <button

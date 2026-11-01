@@ -3,6 +3,7 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -57,6 +58,13 @@
         (a.from ?? "").localeCompare(b.from ?? ""),
     ),
   );
+  const leadingLinks = $derived(
+    leading.map((sibling) => ({
+      value: sibling.id,
+      label: sibling.name,
+      href: resolve("/[...path]", { path: sibling.path }),
+    })),
+  );
   const former = $derived(
     siblings
       .filter((sibling) => !sitting.includes(sibling))
@@ -110,25 +118,13 @@
   };
 </script>
 
-<nav
-  class="flex items-stretch gap-2 max-sm:inline-full"
-  aria-label={m.record_tabs()}
->
-  <div class="flex min-inline-0 max-sm:flex-1">
-    {#each leading as sibling (sibling.id)}
-      <a
-        class={cn(
-          "-ms-px flex items-center justify-center border border-input bg-card px-2.5 py-1 text-center text-[0.8125rem]/tight font-semibold text-balance keycap min-block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary max-sm:flex-1",
-          {
-            "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-              sibling.id === current,
-          },
-        )}
-        aria-current={sibling.id === current ? "page" : undefined}
-        href={resolve("/[...path]", { path: sibling.path })}>{sibling.name}</a
-      >
-    {/each}
-  </div>
+<div class="flex items-stretch gap-2 max-sm:inline-full">
+  <Segmented
+    options={leadingLinks}
+    value={current}
+    label={m.record_tabs()}
+    class="min-inline-0 max-sm:flex-1"
+  />
   {#if former.length > 0}
     <DropdownMenu.Root>
       <DropdownMenu.Trigger
@@ -222,4 +218,4 @@
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   {/if}
-</nav>
+</div>

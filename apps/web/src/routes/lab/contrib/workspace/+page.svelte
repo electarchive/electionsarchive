@@ -8,6 +8,7 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
+  import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { cn } from "#lib/utils.js";
   import { copy } from "#routes/lab/contrib/copy.js";
   import {
@@ -115,6 +116,13 @@
 
   const findings = $derived(
     checks.filter((line) => line.state !== "passed").length,
+  );
+  const tabOptions = $derived(
+    tabs.map(([value, label]) => ({
+      value,
+      label,
+      count: value === "checks" && findings > 0 ? findings : undefined,
+    })),
   );
 
   const marks = $derived([
@@ -267,7 +275,7 @@
           {marks}
           {selected}
           alt={copy.ws_scan_alt}
-          class="rounded-[2px] border xl:sticky xl:inset-bs-4"
+          class="rounded-xs border xl:sticky xl:inset-bs-4"
           onselect={pick}
         />
       </section>
@@ -301,7 +309,7 @@
                     <input
                       id="ws-{id}"
                       class={cn(
-                        "field rounded-[2px] bg-transparent px-2 text-end font-figures block-7 inline-full",
+                        "field rounded-xs bg-transparent px-2 text-end font-figures block-7 inline-full",
                         {
                           "border-transparent hover:border-input":
                             !flagged && selected !== id,
@@ -369,24 +377,13 @@
       class="grid grid-rows-[auto_minmax(0,1fr)] border-bs lg:border-s lg:border-bs-0 lg:min-block-0"
       aria-label={copy.ws_inspector}
     >
-      <div class="flex gap-1 border-be px-3 pbs-2" role="tablist">
-        {#each tabs as [key, label] (key)}
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === key}
-            class={cn("px-2 py-1.5", {
-              "font-semibold shadow-[inset_0_-2px_0_var(--foreground)]":
-                tab === key,
-              "text-muted-foreground hover:text-foreground": tab !== key,
-            })}
-            onclick={() => (tab = key)}
-            >{label}{#if key === "checks" && findings > 0}<span
-                class="ms-1 font-figures">{findings}</span
-              >{/if}</button
-          >
-        {/each}
-      </div>
+      <Tabs
+        options={tabOptions}
+        bind:value={tab}
+        id="ws-tab"
+        label={copy.ws_inspector}
+        class="px-3 pbs-2"
+      />
       <div class="overflow-y-auto p-4" role="tabpanel">
         {#if tab === "diff"}
           <p class="text-muted-foreground">{copy.ws_diff_summary}</p>
@@ -433,7 +430,7 @@
               marks={[{ id: "cell", box, label: county.name }]}
               selected="cell"
               alt={copy.crop_alt(county.name)}
-              class="mbs-2 rounded-[2px] border"
+              class="mbs-2 rounded-xs border"
             />
             <p class="mbs-2 font-figures text-xs text-muted-foreground">
               {copy.ws_box(box.map((n) => n.toFixed(3)).join(", "))}

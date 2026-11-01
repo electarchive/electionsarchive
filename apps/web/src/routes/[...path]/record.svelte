@@ -6,6 +6,7 @@
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import Name from "#lib/components/name.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { gapNote } from "#lib/coverage.js";
   import { date, percent } from "#lib/format.js";
@@ -13,7 +14,6 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { cn } from "#lib/utils.js";
   import Makeup from "./makeup.svelte";
 
   const { id, isExpected = false }: { id: string; isExpected?: boolean } =
@@ -45,6 +45,9 @@
         point.parties.some((party) => party.party != null),
       ),
     ),
+  );
+  const tabOptions = $derived(
+    series.map((entry) => ({ value: entry.id, label: entry.name })),
   );
   const parties = $derived(
     new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
@@ -393,25 +396,15 @@
           </Select.Content>
         </Select.Root>
       {:else if series.length > 1}
-        <div class="flex flex-wrap" role="group" aria-label={m.record_tabs()}>
-          {#each series as entry (entry.id)}
-            <button
-              type="button"
-              class={cn(
-                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    entry.id === current?.id,
-                },
-              )}
-              aria-pressed={entry.id === current?.id}
-              onclick={() => {
-                chosen = entry.id;
-                hovered = null;
-              }}>{entry.name}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={tabOptions}
+          value={current?.id}
+          label={m.record_tabs()}
+          onValueChange={(next: string) => {
+            chosen = next;
+            hovered = null;
+          }}
+        />
       {/if}
     </div>
     {#if current == null}

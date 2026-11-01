@@ -9,6 +9,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { fits } from "#lib/fits.js";
   import { count, natural, percent, plural, points } from "#lib/format.js";
@@ -212,16 +213,13 @@
     return Math.max(0.0001, sizes[Math.floor(sizes.length * 0.9)] ?? 0);
   });
   const filtered = $derived.by(() => {
-    const [needle = "", ...names] = [
-      query.trim(),
-      ...listed.map((row) => row.name),
-    ].map((text) =>
+    const fold = (text: string) =>
       text
         .replaceAll("ı", "i")
         .toLowerCase()
         .normalize("NFKD")
-        .replaceAll(/\p{M}/gu, ""),
-    );
+        .replaceAll(/\p{M}/gu, "");
+    const needle = fold(query.trim());
     const sorted = listed
       .map((row, index) => ({
         row,
@@ -241,7 +239,7 @@
                     ? (row.delegates?.final?.[0]?.[1] ?? -1)
                     : (moves[index]?.shift ?? -Infinity),
         match:
-          (names[index] ?? "").includes(needle) &&
+          (needle === "" || fold(row.name).includes(needle)) &&
           (only == null ||
             (only === "flip" && moves[index]?.flip != null) ||
             only === row.leader ||
@@ -321,6 +319,16 @@
       })
         .toString()
         .replaceAll("%2F", "/"),
+    })),
+  );
+  const levelOptions = $derived(
+    levels.map((level) => ({
+      value: level.code,
+      label: level.label,
+      count: level.count,
+      href: resolve(`/[...path]?${level.query}`, {
+        path: page.url.pathname.slice(1),
+      }),
     })),
   );
   const isSolo = $derived(
@@ -570,28 +578,11 @@
       />
     {/if}
     {#if levels.length > 1 && !isMapped}
-      <div class="flex" role="group" aria-label={m.places_level()}>
-        {#each levels as level (level.code)}
-          <a
-            class={cn(
-              "-ms-px flex items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-              {
-                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                  level.code === places.level,
-              },
-            )}
-            href={resolve(`/[...path]?${level.query}`, {
-              path: page.url.pathname.slice(1),
-            })}
-            aria-current={level.code === places.level ? "true" : undefined}
-            data-sveltekit-reset="false"
-            >{level.label}
-            <span class="font-figures text-[0.6875rem] font-normal tabular-nums"
-              >{level.count}</span
-            ></a
-          >
-        {/each}
-      </div>
+      <Segmented
+        options={levelOptions}
+        value={places.level}
+        label={m.places_level()}
+      />
     {/if}
     {#if places.rows.length > 12}
       <Input

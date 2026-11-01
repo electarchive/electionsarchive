@@ -2,9 +2,9 @@
   import Makeup from "#routes/[...path]/makeup.svelte";
   import { page } from "$app/state";
   import Export from "#lib/components/export.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { cn } from "#lib/utils.js";
 
   let {
     terms,
@@ -101,23 +101,15 @@
         {/if}
       </p>
     </div>
-    <div class="flex" role="group" aria-label={m.chamber_scale()}>
-      {#each [false, true] as share (share)}
-        <button
-          type="button"
-          class={cn(
-            "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-            {
-              "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                isShare === share,
-            },
-          )}
-          aria-pressed={isShare === share}
-          onclick={() => (isShare = share)}
-          >{share ? m.chamber_scale_share() : m.chamber_scale_seats()}</button
-        >
-      {/each}
-    </div>
+    <Segmented
+      options={[
+        { value: "seats", label: m.chamber_scale_seats() },
+        { value: "share", label: m.chamber_scale_share() },
+      ]}
+      value={isShare ? "share" : "seats"}
+      onValueChange={(next: "seats" | "share") => (isShare = next === "share")}
+      label={m.chamber_scale()}
+    />
   </div>
   <Makeup
     {terms}

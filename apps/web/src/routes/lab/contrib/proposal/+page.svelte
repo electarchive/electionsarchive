@@ -4,6 +4,8 @@
   import { resolve } from "$app/paths";
   import * as AlertDialog from "#lib/components/ui/alert-dialog/index.js";
   import { Button } from "#lib/components/ui/button/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import { cn } from "#lib/utils.js";
   import { copy } from "#routes/lab/contrib/copy.js";
@@ -69,6 +71,13 @@
     ["changes", copy.decide_changes],
     ["reject", copy.decide_reject],
   ] as const;
+  const decisionOptions = decisions.map(([value, label]) => ({ value, label }));
+
+  const revisions = [
+    ["current", copy.revision_current],
+    ["since", copy.revision_since],
+  ] as const;
+  const revisionOptions = revisions.map(([value, label]) => ({ value, label }));
 
   function post() {
     if (draft.trim() === "") return;
@@ -137,33 +146,12 @@
     <p class="text-sm text-muted-foreground">{copy.byline}</p>
   </header>
 
-  <div
-    class="mbs-6 flex flex-wrap items-center gap-1 border-be text-sm"
-    role="tablist"
-  >
-    <button
-      type="button"
-      role="tab"
-      aria-selected={view === "current"}
-      class={cn("px-2 py-1.5", {
-        "font-semibold shadow-[inset_0_-2px_0_var(--foreground)]":
-          view === "current",
-        "text-muted-foreground hover:text-foreground": view !== "current",
-      })}
-      onclick={() => (view = "current")}>{copy.revision_current}</button
-    >
-    <button
-      type="button"
-      role="tab"
-      aria-selected={view === "since"}
-      class={cn("px-2 py-1.5", {
-        "font-semibold shadow-[inset_0_-2px_0_var(--foreground)]":
-          view === "since",
-        "text-muted-foreground hover:text-foreground": view !== "since",
-      })}
-      onclick={() => (view = "since")}>{copy.revision_since}</button
-    >
-  </div>
+  <Tabs
+    options={revisionOptions}
+    bind:value={view}
+    id="proposal-revision"
+    class="mbs-6"
+  />
 
   <div class="mbs-5">
     <ProposalBody {proposal} since={view === "since"} />
@@ -220,26 +208,12 @@
   >
     <h2 id="decision" class="heading">{copy.decision_title}</h2>
     {#if phase === "open"}
-      <div
-        class="mbs-3 flex flex-wrap gap-1"
-        role="radiogroup"
-        aria-label={copy.decision_title}
-      >
-        {#each decisions as [key, label] (key)}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={decision === key}
-            class={cn("rounded-sm border px-3 py-1.5 text-sm", {
-              "border-foreground font-semibold shadow-[inset_0_-2px_0_var(--foreground)]":
-                decision === key,
-              "border-input text-muted-foreground hover:text-foreground":
-                decision !== key,
-            })}
-            onclick={() => (decision = key)}>{label}</button
-          >
-        {/each}
-      </div>
+      <Segmented
+        class="mbs-3"
+        options={decisionOptions}
+        bind:value={decision}
+        label={copy.decision_title}
+      />
       <Textarea
         class="mbs-3"
         bind:value={reason}

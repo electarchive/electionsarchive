@@ -15,9 +15,9 @@
   import { Button } from "#lib/components/ui/button/index.js";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
-  import * as ToggleGroup from "#lib/components/ui/toggle-group/index.js";
   import {
     commonsName,
     graphemes,
@@ -578,6 +578,9 @@
     url: m.edit_mode_url,
     upload: m.edit_mode_upload,
   };
+  const modeOptions = $derived(
+    modes.map((option) => ({ value: option, label: modeLabel[option]() })),
+  );
   const chosen = $derived(sourceKinds.find((kind) => kind === link.kind));
   const described = $derived(
     [link.title, link.publisher, link.kind].every(
@@ -1903,28 +1906,14 @@
               <h3 id="edit-evidence" class="text-sm font-bold">
                 {m.edit_evidence()}
               </h3>
-              <ToggleGroup.Root
-                type="single"
-                variant="outline"
-                size="sm"
-                class="grid auto-cols-fr grid-flow-col inline-full"
-                aria-label={m.edit_evidence()}
+              <Segmented
+                options={modeOptions}
                 value={shown}
-                onValueChange={(next: string) => {
-                  const found = modes.find((option) => option === next);
-                  if (found != null) {
-                    mode = found;
-                  }
-                }}
-              >
-                {#each modes as option (option)}
-                  <ToggleGroup.Item
-                    value={option}
-                    class="px-1.5 text-xs text-muted-foreground data-[state=on]:font-semibold data-[state=on]:text-foreground"
-                    >{modeLabel[option]()}</ToggleGroup.Item
-                  >
-                {/each}
-              </ToggleGroup.Root>
+                label={m.edit_evidence()}
+                size="sm"
+                fill
+                onValueChange={(next: (typeof modes)[number]) => (mode = next)}
+              />
               {#if shown === "none"}
                 <p class="text-xs text-pretty text-muted-foreground">
                   {m.edit_evidence_optional()}

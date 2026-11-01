@@ -16,6 +16,7 @@
     Scenario,
     Seed,
   } from "#lib/live/simulate.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, percent } from "#lib/format.js";
   import {
     clock as clockOf,
@@ -402,27 +403,14 @@
         </div>
         <div class="grid gap-1 text-xs sm:col-span-2">
           <span class="font-semibold">{m.night_tool_order()}</span>
-          <div
-            class="flex flex-wrap gap-1"
-            role="radiogroup"
-            aria-label={m.night_tool_order()}
-          >
-            {#each ORDERS as order (order.id)}
-              <button
-                type="button"
-                role="radio"
-                aria-checked={scenario.order === order.id}
-                class={cn("rounded-sm border px-2.5 py-1 font-semibold", {
-                  "border-foreground bg-foreground text-background":
-                    scenario.order === order.id,
-                  "border-border hover:highlighter":
-                    scenario.order !== order.id,
-                })}
-                onclick={() => (scenario.order = order.id)}
-                >{order.label()}</button
-              >
-            {/each}
-          </div>
+          <Segmented
+            options={ORDERS.map((order) => ({
+              value: order.id,
+              label: order.label(),
+            }))}
+            bind:value={scenario.order}
+            label={m.night_tool_order()}
+          />
         </div>
       </section>
     {:else if panel === "edges"}
@@ -650,24 +638,15 @@
             })}</span
           >
         </span>
-        <div
-          class="flex rounded-sm border border-border p-0.5"
-          role="radiogroup"
-          aria-label={m.night_tool_speed_label()}
-        >
-          {#each SPEEDS as option (option.id)}
-            <button
-              type="button"
-              role="radio"
-              aria-checked={speed === option.id}
-              class={cn("rounded-xs px-2 py-0.5 text-xs font-semibold", {
-                "bg-foreground text-background": speed === option.id,
-                "hover:highlighter": speed !== option.id,
-              })}
-              onclick={() => (speed = option.id)}>{option.label()}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          size="sm"
+          options={SPEEDS.map((option) => ({
+            value: option.id,
+            label: option.label(),
+          }))}
+          bind:value={speed}
+          label={m.night_tool_speed_label()}
+        />
         <div class="flex flex-wrap gap-1 text-xs">
           <button
             type="button"

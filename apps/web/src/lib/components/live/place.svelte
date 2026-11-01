@@ -17,9 +17,10 @@
     tone,
   } from "#lib/live/format.js";
   import { remainder, standing, sum } from "#lib/live/standing.js";
-  import { closing } from "#lib/live/summary.js";
+  import { closing, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Locals from "./locals.svelte";
   import LiveMap from "./map.svelte";
 
   const {
@@ -56,10 +57,20 @@
           a.title.localeCompare(b.title),
       ),
   );
+  const locals = $derived(
+    ballot.flatMap((race) =>
+      race.office === "other"
+        ? [summarize(race, estimates[race.id] ?? null)]
+        : [],
+    ),
+  );
   const rows = $derived(
-    ballot.map((race) => {
+    ballot.flatMap((race) => {
+      if (race.office === "other") {
+        return [];
+      }
       const now = standing(race, { at: null, isFinal: true });
-      return { race, now, row: now.units.get(place.id) ?? null };
+      return [{ race, now, row: now.units.get(place.id) ?? null }];
     }),
   );
   const isSplit = $derived(
@@ -310,6 +321,10 @@
       </ul>
     </section>
   </section>
+
+  {#if locals.length > 0}
+    <Locals summaries={locals} />
+  {/if}
 
   <footer
     class="grid gap-1 bg-background px-4 py-5 text-xs text-muted-foreground sm:px-8"

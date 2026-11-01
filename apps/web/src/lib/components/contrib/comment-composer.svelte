@@ -4,6 +4,7 @@
   import type { Anchor } from "#lib/contrib.js";
   import Markdown from "#lib/components/markdown.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
+  import { Tabs } from "#lib/components/ui/tabs/index.js";
   import { Textarea } from "#lib/components/ui/textarea/index.js";
   import { commentLimit } from "#lib/contrib.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -30,6 +31,8 @@
     autofocus?: boolean;
     onclose?: () => void;
   } = $props();
+
+  const tabsId = $props.id();
 
   let body = $state(untrack(() => initial));
   let previewing = $state(false);
@@ -78,25 +81,17 @@
   {#if id != null}
     <input type="hidden" name="id" value={id} />
   {/if}
-  <div class="flex items-baseline gap-4 border-be text-xs" role="tablist">
-    {#each [false, true] as preview (preview)}
-      <button
-        type="button"
-        role="tab"
-        aria-selected={previewing === preview}
-        class={cn(
-          "-mbe-px border-be-2 border-transparent pbe-1 text-muted-foreground",
-          {
-            "border-foreground font-semibold text-foreground":
-              previewing === preview,
-          },
-          { "hover:text-foreground": previewing !== preview },
-        )}
-        onclick={() => (previewing = preview)}
-        >{preview ? m.discussion_preview() : m.discussion_write()}</button
-      >
-    {/each}
-  </div>
+  <Tabs
+    id={tabsId}
+    label={m.discussion_body_label()}
+    size="sm"
+    options={[
+      { value: "write", label: m.discussion_write() },
+      { value: "preview", label: m.discussion_preview() },
+    ]}
+    value={previewing ? "preview" : "write"}
+    onValueChange={(next: string) => (previewing = next === "preview")}
+  />
   <Textarea
     bind:ref={field}
     bind:value={body}

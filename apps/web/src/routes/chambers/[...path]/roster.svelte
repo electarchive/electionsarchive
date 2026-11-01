@@ -5,6 +5,7 @@
   import { MediaQuery } from "svelte/reactivity";
   import { ARRIVALS, DEPARTURES } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, date, natural } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -350,22 +351,16 @@
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5">
       <h2 class="text-[0.8125rem] font-bold">{m.chamber_changes()}</h2>
       {#if events.length > 0 && switches.length > 0}
-        <div class="flex" role="group" aria-label={m.chamber_changes()}>
-          {#each [["all", m.chamber_changes_all()], ["seats", m.chamber_changes_seats()], ["party", m.chamber_changes_party()]] as const as [value, text] (value)}
-            <button
-              type="button"
-              class={cn(
-                "-ms-px flex items-center border border-input bg-card px-2 text-xs font-semibold keycap block-6 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    kind === value,
-                },
-              )}
-              aria-pressed={kind === value}
-              onclick={() => (kind = value)}>{text}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={[
+            { value: "all", label: m.chamber_changes_all() },
+            { value: "seats", label: m.chamber_changes_seats() },
+            { value: "party", label: m.chamber_changes_party() },
+          ]}
+          bind:value={kind}
+          label={m.chamber_changes()}
+          size="sm"
+        />
       {/if}
     </div>
     {#if feed.length === 0}

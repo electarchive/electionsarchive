@@ -5,12 +5,12 @@
   import { page } from "$app/state";
   import MapIcon from "@lucide/svelte/icons/map";
   import { createQuery } from "@tanstack/svelte-query";
-  import { Tooltip as TooltipPrimitive } from "bits-ui";
   import EditPanel from "#lib/components/contrib/edit-panel.svelte";
   import Name from "#lib/components/name.svelte";
   import Standing from "#lib/components/standing.svelte";
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { gapNote } from "#lib/coverage.js";
   import { count, date, definite, percent, points } from "#lib/format.js";
@@ -160,8 +160,6 @@
     elector_slate: m.col_electors,
     delegate_allocation: m.col_delegates,
   };
-
-  const tether = TooltipPrimitive.createTether<string>();
 
   const single = $derived.by(() => {
     if (contest.chamber?.link == null) {
@@ -650,12 +648,30 @@
       return [];
     }
     const median =
-      rows.toSorted((a, b) => a.valid - b.valid)[Math.floor(rows.length / 2)]
-        ?.valid ?? 0;
+      Float64Array.from(rows, (row) => row.valid).sort()[
+        Math.floor(rows.length / 2)
+      ] ?? 0;
+    const best = (
+      pool: typeof rows,
+      size: number,
+      compare: (a: (typeof rows)[number], b: (typeof rows)[number]) => number,
+    ) => {
+      const kept: typeof rows = [];
+      for (const row of pool) {
+        const last = kept.at(-1);
+        if (kept.length === size && last != null && compare(row, last) >= 0) {
+          continue;
+        }
+        const at = kept.findIndex((other) => compare(row, other) < 0);
+        kept.splice(at === -1 ? kept.length : at, 0, row);
+        kept.length = Math.min(kept.length, size);
+      }
+      return kept;
+    };
     const sizable = rows.filter((row) => row.valid >= median / 10);
     const largest = {
       label: m.key_largest(),
-      rows: rows.toSorted((a, b) => b.valid - a.valid).slice(0, 3),
+      rows: best(rows, 3, (a, b) => b.valid - a.valid),
       value: (row: (typeof rows)[number]) => count(row.valid),
     };
     if (titles.length < 2) {
@@ -664,9 +680,7 @@
     return [
       {
         label: m.key_closest(),
-        rows: sizable
-          .toSorted((a, b) => (a.margin ?? 0) - (b.margin ?? 0))
-          .slice(0, 3),
+        rows: best(sizable, 3, (a, b) => (a.margin ?? 0) - (b.margin ?? 0)),
         value: (row: (typeof rows)[number]) =>
           isTally
             ? row.shares
@@ -681,14 +695,12 @@
         .filter((index) => titles[index] != null)
         .map((index) => ({
           label: m.key_strongest({ name: titles[index] ?? "" }),
-          rows: sizable
-            .toSorted((a, b) =>
-              isTally
-                ? (b.shares[index] ?? 0) * b.valid -
-                  (a.shares[index] ?? 0) * a.valid
-                : (b.shares[index] ?? 0) - (a.shares[index] ?? 0),
-            )
-            .slice(0, 1),
+          rows: best(sizable, 1, (a, b) =>
+            isTally
+              ? (b.shares[index] ?? 0) * b.valid -
+                (a.shares[index] ?? 0) * a.valid
+              : (b.shares[index] ?? 0) - (a.shares[index] ?? 0),
+          ),
           value: (row: (typeof rows)[number]) =>
             isTally
               ? count(Math.round((row.shares[index] ?? 0) * row.valid))
@@ -1102,6 +1114,22 @@
         suffix: text === "" ? ("" as const) : (`?${text}` as const),
       };
     }),
+  );
+  const matchOptions = $derived(
+    matches.map((option) => ({
+      value: option.value,
+      label: option.label,
+      tip: option.detail,
+      href: resolve(`/[...path]?${option.query}`, { path: here }),
+    })),
+  );
+  const groupingOptions = $derived(
+    groupings.map((option) => ({
+      value: option.value,
+      label: option.label,
+      tip: option.detail,
+      href: resolve(`/[...path]${option.suffix}`, { path: here }),
+    })),
   );
   const below = $derived.by(() => {
     const places = placed;
@@ -2094,91 +2122,23 @@
       {/if}
     </div>
     {#if !question}
-      <div
-        class="flex items-center gap-2.5"
-        role="group"
-        aria-labelledby="match-label"
-      >
-        <span id="match-label" class="text-sm font-semibold"
-          >{m.match_label()}</span
-        >
-        <div class="flex">
-          <Tooltip.Root disableCloseOnTriggerClick {tether} delayDuration={300}>
-            {#snippet children({ payload })}
-              {#each matches as option (option.value)}
-                <Tooltip.Trigger {tether} payload={option.detail}>
-                  {#snippet child({ props })}
-                    <a
-                      {...props}
-                      type={undefined}
-                      class={cn(
-                        "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                        {
-                          "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                            option.value === match,
-                        },
-                      )}
-                      href={resolve(`/[...path]?${option.query}`, {
-                        path: here,
-                      })}
-                      aria-current={option.value === match ? "true" : undefined}
-                      data-sveltekit-reset="false">{option.label}</a
-                    >
-                  {/snippet}
-                </Tooltip.Trigger>
-              {/each}
-              <Tooltip.Content
-                collisionPadding={8}
-                class="leading-snug max-inline-64">{payload}</Tooltip.Content
-              >
-            {/snippet}
-          </Tooltip.Root>
-        </div>
+      <div class="flex items-center gap-2.5">
+        <span class="text-sm font-semibold">{m.match_label()}</span>
+        <Segmented
+          options={matchOptions}
+          value={match}
+          label={m.match_label()}
+        />
       </div>
     {/if}
     {#if contest.current.isAllied || grouping === "alliance"}
-      <div
-        class="flex items-center gap-2.5"
-        role="group"
-        aria-labelledby="group-label"
-      >
-        <span id="group-label" class="text-sm font-semibold"
-          >{m.group_label()}</span
-        >
-        <div class="flex">
-          <Tooltip.Root disableCloseOnTriggerClick {tether} delayDuration={300}>
-            {#snippet children({ payload })}
-              {#each groupings as option (option.value)}
-                <Tooltip.Trigger {tether} payload={option.detail}>
-                  {#snippet child({ props })}
-                    <a
-                      {...props}
-                      type={undefined}
-                      class={cn(
-                        "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                        {
-                          "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                            option.value === grouping,
-                        },
-                      )}
-                      href={resolve(`/[...path]${option.suffix}`, {
-                        path: here,
-                      })}
-                      aria-current={option.value === grouping
-                        ? "true"
-                        : undefined}
-                      data-sveltekit-reset="false">{option.label}</a
-                    >
-                  {/snippet}
-                </Tooltip.Trigger>
-              {/each}
-              <Tooltip.Content
-                collisionPadding={8}
-                class="leading-snug max-inline-64">{payload}</Tooltip.Content
-              >
-            {/snippet}
-          </Tooltip.Root>
-        </div>
+      <div class="flex items-center gap-2.5">
+        <span class="text-sm font-semibold">{m.group_label()}</span>
+        <Segmented
+          options={groupingOptions}
+          value={grouping}
+          label={m.group_label()}
+        />
       </div>
     {/if}
   </div>

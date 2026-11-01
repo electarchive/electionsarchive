@@ -8,9 +8,11 @@
   import { resolve } from "$app/paths";
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
+  import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { percent } from "#lib/format.js";
   import {
     clock as clockOf,
@@ -25,6 +27,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Hexes from "./hexes.svelte";
+  import Locals from "./locals.svelte";
   import Nation from "./nation.svelte";
 
   const {
@@ -65,12 +68,22 @@
   let layout = $state<"shapes" | "hexes">("shapes");
   let probe = $state<string | null>(null);
 
-  const VIEWS: Array<{ id: View; label: () => string }> = [
-    { id: "senate", label: m.night_nation_senate },
-    { id: "governor", label: m.night_nation_governor },
-    { id: "house", label: m.night_nation_house },
-    { id: "reporting", label: m.night_nation_reporting },
-  ];
+  const NAMES: Record<View, () => string> = {
+    senate: m.night_nation_senate,
+    governor: m.night_nation_governor,
+    house: m.night_nation_house,
+    reporting: m.night_nation_reporting,
+  };
+  const VIEWS = $derived<Array<SegmentedOption<View>>>(
+    (["senate", "governor", "house", "reporting"] as const).map((value) => ({
+      value,
+      label: NAMES[value](),
+    })),
+  );
+  const LAYOUTS = $derived<Array<SegmentedOption<"shapes" | "hexes">>>([
+    { value: "shapes", label: m.night_house_shapes(), icon: MapIcon },
+    { value: "hexes", label: m.night_house_hexes(), icon: HexagonIcon },
+  ]);
   const MUTED =
     "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
   const WAITING =
@@ -86,6 +99,9 @@
     [...byState.keys()].toSorted((a, b) =>
       (nation?.labels[a] ?? a).localeCompare(nation?.labels[b] ?? b),
     ),
+  );
+  const locals = $derived(
+    summaries.filter((summary) => summary.race.office === "other"),
   );
   const office = $derived<LiveOffice>(view === "reporting" ? "senate" : view);
   const counting = $derived(
@@ -403,55 +419,17 @@
   >
     <div class="grid content-start gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <div
-          role="radiogroup"
-          aria-label={m.night_nation_views()}
-          class="flex flex-wrap gap-1"
-        >
-          {#each VIEWS as entry (entry.id)}
-            <button
-              type="button"
-              role="radio"
-              aria-checked={view === entry.id}
-              class={cn(
-                "rounded-xs px-2.5 py-1 text-[0.8125rem] font-semibold transition-colors",
-                {
-                  "bg-primary text-primary-foreground": view === entry.id,
-                  "text-muted-foreground hover:highlighter hover:text-foreground":
-                    view !== entry.id,
-                },
-              )}
-              onclick={() => (view = entry.id)}>{entry.label()}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={VIEWS}
+          bind:value={view}
+          label={m.night_nation_views()}
+        />
         {#if view === "house" && hasShapes && hasHexes}
-          <div
-            role="radiogroup"
-            aria-label={m.night_house_layout()}
-            class="flex gap-0.5 rounded-sm p-0.5 ring-1 ring-border"
-          >
-            {#each [{ id: "shapes" as const, label: m.night_house_shapes(), Icon: MapIcon }, { id: "hexes" as const, label: m.night_house_hexes(), Icon: HexagonIcon }] as entry (entry.id)}
-              <button
-                type="button"
-                role="radio"
-                aria-checked={layout === entry.id}
-                class={cn(
-                  "inline-flex items-center gap-1.5 rounded-xs px-2 py-0.5 text-[0.8125rem] font-semibold transition-colors",
-                  {
-                    "bg-secondary text-foreground": layout === entry.id,
-                    "text-muted-foreground hover:text-foreground":
-                      layout !== entry.id,
-                  },
-                )}
-                onclick={() => (layout = entry.id)}
-                ><entry.Icon
-                  class="block-3.5 inline-3.5"
-                  aria-hidden="true"
-                />{entry.label}</button
-              >
-            {/each}
-          </div>
+          <Segmented
+            options={LAYOUTS}
+            bind:value={layout}
+            label={m.night_house_layout()}
+          />
         {/if}
       </div>
       {#if view === "house" && house != null && (hasShapes || hasHexes)}
@@ -489,9 +467,7 @@
           geography={nation.map}
           codes={nation.codes}
           {colors}
-          label={m.night_nation_map({
-            view: VIEWS.find((entry) => entry.id === view)?.label() ?? "",
-          })}
+          label={m.night_nation_map({ view: NAMES[view]() })}
           bind:hovered
           onPick={async (code: string) => goto(href(code))}
           {tip}
@@ -510,7 +486,7 @@
       {#if view !== "reporting"}
         <section class="grid gap-2">
           <h2 class="heading text-lg!">
-            {VIEWS.find((entry) => entry.id === view)?.label()}
+            {NAMES[view]()}
           </h2>
           <div
             class="flex overflow-hidden rounded-xs bg-muted block-5"
@@ -782,4 +758,12 @@
       </table>
     </div>
   </section>
+
+  {#if locals.length > 0}
+    <Locals
+      summaries={locals}
+      labels={nation?.labels}
+      isNation={nation != null}
+    />
+  {/if}
 </article>

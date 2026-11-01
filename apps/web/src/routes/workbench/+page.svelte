@@ -24,6 +24,7 @@
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -152,6 +153,12 @@
     placeholderData: keepPreviousData,
   }));
   const current = $derived(spec == null ? null : (contest.data ?? null));
+  const levelOptions = $derived(
+    (current?.places?.levels ?? []).map((level) => ({
+      value: level.code,
+      label: level.noun,
+    })),
+  );
   const legend = $derived(current?.places?.legend ?? []);
   const focused = $derived(
     legend.find((entry) => entry.key === focus) ?? legend[0] ?? null,
@@ -503,23 +510,15 @@
                   >{m.workbench_visibility()}</legend
                 >
                 <input type="hidden" name="visibility" value={visibility} />
-                <div class="flex" role="group">
-                  {#each [{ value: "private", label: m.workbench_private }, { value: "unlisted", label: m.workbench_unlisted }] as const as option (option.value)}
-                    <button
-                      type="button"
-                      class={cn(
-                        "-ms-px flex flex-1 items-center justify-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                        {
-                          "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                            visibility === option.value,
-                        },
-                      )}
-                      aria-pressed={visibility === option.value}
-                      onclick={() => (visibility = option.value)}
-                      >{option.label()}</button
-                    >
-                  {/each}
-                </div>
+                <Segmented
+                  options={[
+                    { value: "private", label: m.workbench_private() },
+                    { value: "unlisted", label: m.workbench_unlisted() },
+                  ]}
+                  bind:value={visibility}
+                  label={m.workbench_visibility()}
+                  fill
+                />
               </fieldset>
               <div class="flex items-center justify-between gap-2">
                 {#if data.view?.isOwner === true}
@@ -656,25 +655,15 @@
         }}>{m.workbench_compare()}</button
       >
       {#if (current?.places?.levels.length ?? 0) > 1}
-        <div class="flex" role="group" aria-label={m.workbench_level()}>
-          {#each current?.places?.levels ?? [] as level (level.code)}
-            <button
-              type="button"
-              class={cn(
-                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    level.code === current?.places?.level,
-                },
-              )}
-              aria-pressed={level.code === current?.places?.level}
-              onclick={() => {
-                selector.level = level.code;
-                picked.clear();
-              }}>{level.noun}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={levelOptions}
+          value={current?.places?.level}
+          onValueChange={(next: string) => {
+            selector.level = next;
+            picked.clear();
+          }}
+          label={m.workbench_level()}
+        />
       {/if}
       <div class="ms-auto flex flex-wrap items-center gap-2">
         {#if picked.size > 0}

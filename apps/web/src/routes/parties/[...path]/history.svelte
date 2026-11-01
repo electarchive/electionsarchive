@@ -5,6 +5,7 @@
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import NoteBody from "#lib/components/note-body.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
@@ -67,6 +68,13 @@
   );
   const active = $derived(
     series.find((entry) => entry.id === chosen) ?? series[0],
+  );
+  const seriesOptions = $derived(
+    series.map((entry) => ({
+      value: entry.id,
+      label: entry.name,
+      count: entry.points.length,
+    })),
   );
   const caveats = $derived(
     notes.filter(
@@ -258,28 +266,15 @@
       </dl>
     </div>
     {#if series.length > 1}
-      <div class="flex flex-wrap gap-1.5" role="group">
-        {#each series as entry (entry.id)}
-          <button
-            type="button"
-            class={cn(
-              "flex items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
-              { "marked bg-secondary font-semibold": entry === active },
-            )}
-            aria-pressed={entry === active}
-            onclick={() => {
-              chosen = entry.id;
-              hovered = null;
-            }}
-          >
-            {entry.name}
-            <span
-              class="font-figures text-xs text-muted-foreground tabular-nums"
-              >{entry.points.length}</span
-            >
-          </button>
-        {/each}
-      </div>
+      <Segmented
+        options={seriesOptions}
+        value={active.id}
+        onValueChange={(next: string) => {
+          chosen = next;
+          hovered = null;
+        }}
+        label={m.party_history_title()}
+      />
     {/if}
     <Measured
       bind:width

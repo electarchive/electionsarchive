@@ -423,6 +423,7 @@
           modes={["remaining"]}
           title={m.night_map_left_title()}
           caption={m.night_map_left_caption()}
+          help="turnout"
           mode="remaining"
           {href}
           bind:selected

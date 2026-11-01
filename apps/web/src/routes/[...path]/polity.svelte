@@ -6,6 +6,7 @@
   import { createQuery } from "@tanstack/svelte-query";
   import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -152,6 +153,9 @@
       (key) => key === "all" || sorts.some((election) => election.sort === key),
     ),
   );
+  const filterOptions = $derived(
+    present.map((key) => ({ value: key, label: FILTERS[key]?.() ?? key })),
+  );
   const years = $derived(
     Map.groupBy(
       sorts.filter((election) => filter === "all" || election.sort === filter),
@@ -189,6 +193,9 @@
       ? picked
       : (["county", "municipality"].find((key) => kinds.includes(key)) ??
           "all"),
+  );
+  const kindOptions = $derived(
+    kinds.map((key) => ({ value: key, label: KINDS[key]?.() ?? key })),
   );
   const listed = createQuery(() => ({
     ...orpc.polities.get.queryOptions({ input: { id } }),
@@ -873,22 +880,11 @@
         {m.polity_elections()}
       </h2>
       {#if present.length > 2}
-        <div class="flex" role="group" aria-label={m.polity_filter_label()}>
-          {#each present as key (key)}
-            <button
-              type="button"
-              class={cn(
-                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    filter === key,
-                },
-              )}
-              aria-pressed={filter === key}
-              onclick={() => (filter = key)}>{FILTERS[key]?.()}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={filterOptions}
+          bind:value={filter}
+          label={m.polity_filter_label()}
+        />
       {/if}
     </div>
     {#if polity.elections.length === 0}
@@ -1028,22 +1024,12 @@
             : m.polity_subdivisions()}
       </h2>
       {#if kinds.length > 2}
-        <div class="flex" role="group" aria-label={m.polity_kind_label()}>
-          {#each kinds as key (key)}
-            <button
-              type="button"
-              class={cn(
-                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    kind === key,
-                },
-              )}
-              aria-pressed={kind === key}
-              onclick={() => (picked = key)}>{KINDS[key]?.()}</button
-            >
-          {/each}
-        </div>
+        <Segmented
+          options={kindOptions}
+          value={kind}
+          label={m.polity_kind_label()}
+          onValueChange={(next: string) => (picked = next)}
+        />
       {/if}
     </div>
     {#if polity.places.total > 12}

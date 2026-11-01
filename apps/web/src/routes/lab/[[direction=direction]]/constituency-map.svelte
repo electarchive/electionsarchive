@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Combobox } from "#lib/components/ui/combobox/index.js";
+  import { Segmented } from "#lib/components/ui/segmented/index.js";
   import type { LabView } from "./view.svelte.js";
   import { copy } from "./copy.js";
   import {
@@ -27,6 +28,8 @@
     ["turnout", copy.mode_turnout],
   ] as const;
 
+  const modeOptions = modes.map(([value, label]) => ({ value, label }));
+
   const shapes = $derived(
     constituencies.map((entry) => {
       if (view.mode === "turnout") {
@@ -51,18 +54,12 @@
 
 <div class="cmap">
   <div class="cmap-bar">
-    <div class="cmap-modes" role="group" aria-label={copy.map_title}>
-      {#each modes as [mode, label] (mode)}
-        <button
-          type="button"
-          class={{ "cmap-mode": true, active: view.mode === mode }}
-          aria-pressed={view.mode === mode}
-          onclick={() => view.setMode(mode)}
-        >
-          {label}
-        </button>
-      {/each}
-    </div>
+    <Segmented
+      options={modeOptions}
+      value={view.mode}
+      label={copy.map_title}
+      onValueChange={(next: (typeof modes)[number][0]) => view.setMode(next)}
+    />
     <Combobox
       class="cmap-picker"
       items={pickerItems}
@@ -134,30 +131,6 @@
     gap: 8px;
   }
 
-  .cmap-modes {
-    display: inline-flex;
-    gap: 2px;
-    padding: 2px;
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-sm);
-    background: var(--surface-2);
-  }
-
-  .cmap-mode {
-    padding: 3px 9px;
-    border-radius: calc(var(--radius-sm) - 2px);
-    color: var(--muted);
-    font: 500 12.5px/1.3 var(--font-ui);
-    cursor: pointer;
-  }
-
-  .cmap-mode.active {
-    background: var(--surface);
-    color: var(--ink);
-    box-shadow: 0 0 0 1px var(--rule);
-  }
-
-  .cmap-mode:focus-visible,
   .cmap-bar :global(.cmap-picker) {
     inline-size: 15rem;
     max-inline-size: 100%;
