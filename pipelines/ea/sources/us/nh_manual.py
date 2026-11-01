@@ -801,6 +801,58 @@ def reread_votes(raw_lines: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+NAMES_PROMPT = (
+    "This is a page of New Hampshire county election returns. Each numbered row below is a candidate line on the page "
+    "(county, office, district, the name and town as an earlier text extraction gave them, party, and its vertical "
+    "position as a fraction of the page height). The extraction may have dropped part of the name, run the name into "
+    "the town, or garbled letters. For each row, copy the candidate's name and town exactly as printed on that line "
+    "of the page image: full given names, initials, surname, and suffix, without correcting spelling. Reply with only "
+    'a JSON object mapping each row number to {"name": "...", "town": "..." or null}, or to null if the line is not '
+    "on the page or cannot be read. Do not guess a name that is not printed."
+)
+
+
+def named(frame: pl.DataFrame) -> pl.DataFrame:
+    wanted = pl.read_csv(
+        Path(__file__).with_name("nh_manual_names.tsv"),
+        separator="\t",
+        schema_overrides={"district": pl.String, "side": pl.String},
+    ).with_columns(pl.col("district").fill_null(""), pl.col("side").fill_null(""))
+    rows = (
+        blocks(frame.filter(pl.col("county").is_not_null()))
+        .with_columns(want_district=pl.col("district").fill_null(""), want_side=pl.col("side").fill_null(""))
+        .join(
+            wanted.rename({"district": "want_district", "side": "want_side"}),
+            on=["year", "county", "office", "want_side"],
+        )
+        .filter((pl.col("want_district") == pl.col("want_district_right")) | (pl.col("want_district") == ""))
+    )
+    return (
+        rows.sort("year", "page", "y0", "x0")
+        .unique(["year", "page", "y0", "x0"], keep="first", maintain_order=True)
+        .with_columns(rid=pl.int_range(pl.len()).over("year", "page"))
+    )
+
+
+def name_reads(raw_lines: pl.DataFrame) -> dict[tuple[int, int, float, float], tuple[str, str | None]]:
+    found: dict[tuple[int, int, float, float], tuple[str, str | None]] = {}
+    for (year, page), rows in named(raw_lines).group_by("year", "page", maintain_order=True):
+        reply = replies(rows, "names", int(year), int(page))
+        for row in rows.iter_rows(named=True):
+            read = (reply or {}).get(str(row["rid"]))
+            if isinstance(read, dict) and isinstance(read.get("name"), str) and read["name"].strip():
+                town = read.get("town")
+                found[(int(year), int(page), row["y0"], row["x0"])] = (
+                    read["name"].strip(),
+                    town.strip() if isinstance(town, str) and town.strip() else None,
+                )
+    return found
+
+
+def names() -> None:
+    request(named(pl.read_parquet(PARSED / "lines.parquet")), "county_names", "names", REREAD_DPI)
+
+
 def read() -> None:
     request(held(pl.read_parquet(PARSED / "lines.parquet")), "county_pages", "read", READ_DPI)
 
@@ -822,7 +874,7 @@ def listed(rows: pl.DataFrame) -> str:
 
 
 def read_key(prefix: str, year: int, page: int, listing: str) -> str:
-    if prefix not in ("read", "read3"):
+    if prefix not in ("read", "read3", "names"):
         return f"{prefix}:{year}:{page}"
     return f"{prefix}:{year}:{page}:{hashlib.sha1(listing.encode()).hexdigest()[:8]}"
 
@@ -864,7 +916,10 @@ def request(frame: pl.DataFrame, job: str, prefix: str, dpi: int) -> None:
                                 "data": base64.b64encode(image.read_bytes()).decode(),
                             },
                         },
-                        {"type": "text", "text": f"{READ_PROMPT}\n\nRows:\n{listing}"},
+                        {
+                            "type": "text",
+                            "text": f"{NAMES_PROMPT if prefix == 'names' else READ_PROMPT}\n\nRows:\n{listing}",
+                        },
                     ],
                 }
             ],
@@ -946,6 +1001,32 @@ def emit() -> Path:
     from ea.store import connect
 
     raw_lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("county").is_not_null())
+    reads = name_reads(raw_lines)
+    if reads:
+        raw_lines = (
+            raw_lines.join(
+                pl.DataFrame(
+                    [(*key, *value) for key, value in reads.items()],
+                    schema={
+                        "year": pl.Int32,
+                        "page": pl.Int64,
+                        "y0": pl.Float64,
+                        "x0": pl.Float64,
+                        "read_name": pl.String,
+                        "read_town": pl.String,
+                    },
+                    orient="row",
+                ),
+                on=["year", "page", "y0", "x0"],
+                how="left",
+            )
+            .with_columns(
+                name=pl.coalesce("read_name", "name"),
+                town=pl.when(pl.col("read_name").is_not_null()).then(pl.col("read_town")).otherwise(pl.col("town")),
+                tail=pl.when(pl.col("read_name").is_not_null()).then(None).otherwise(pl.col("tail")),
+            )
+            .drop("read_name", "read_town")
+        )
     TOWNS.update(
         raw_lines.filter(pl.col("tail").is_null() & pl.col("town").str.contains(r"^[A-Z][a-z]+(?: [A-Z][a-z]+)?$"))[
             "town"
