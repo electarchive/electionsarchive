@@ -270,3 +270,7 @@ year	page	y0	op	beside_y0	name	town	votes
 2006	198	0.35377	relabel		d		1519
 2004	285	0.7718	relabel		d		8
 2012	278	0.75804	relabel		d		7
+1990	155	0.197604	drop				
+1992	274	0.68202	relabel		l		10
+1992	274	0.694371	relabel		l		10
+1992	274	0.706154	relabel		l		10

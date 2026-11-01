@@ -214,9 +214,14 @@ def header(text: str) -> tuple[str, str] | None:
                 return "office", name
         phrase = re.sub(r"\s+", " ", found[1].strip().lower())
         if len(phrase) > 4:
-            for pattern, name in OFFICES:
-                if difflib.get_close_matches(phrase, NAMES[name], n=1, cutoff=0.72):
-                    return "office", name
+            scored = [
+                (difflib.SequenceMatcher(None, phrase, alias).ratio(), name)
+                for name, aliases in NAMES.items()
+                for alias in aliases
+            ]
+            best = max(scored)
+            if best[0] >= 0.72:
+                return "office", best[1]
         return "other", plain
     word = re.fullmatch(r"([A-Za-z0-9\- ]{3,8})\s+di[A-Za-z,']{2,6}[:;,.\s’']*", plain, re.IGNORECASE)
     if word:
