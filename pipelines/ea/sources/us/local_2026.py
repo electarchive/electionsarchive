@@ -2068,6 +2068,12 @@ NE_SOURCES = {
         "https://www.barrycounty.org/departments_and_officials/officials/county_clerk/elections.php",
         "mi/barry.pdf",
     ),
+    "MI-26109": (
+        "Menominee County Clerk",
+        "Sample ballots for the Menominee Township, Gourley Township, and Harris Township precincts, November 3, 2026",
+        "https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/",
+        "mi/menominee.pdf",
+    ),
     "MI-26121": (
         "Muskegon County Clerk",
         "Unofficial Candidate List, November 3, 2026 General Election (updated 10/31)",
@@ -2085,6 +2091,12 @@ NE_SOURCES = {
         "Official Monroe County School District Candidates, November 3, 2026",
         "https://co.monroe.mi.us/409/Elections",
         "mi/monroe_schools.pdf",
+    ),
+    "MI-26019": (
+        "Benzie County Clerk",
+        "Official Candidate List, 11/03/2026 State General",
+        "https://www.benzieco.net/government/elections/",
+        "mi/benzie.pdf",
     ),
     "MI-26165": (
         "Wexford County Clerk",
