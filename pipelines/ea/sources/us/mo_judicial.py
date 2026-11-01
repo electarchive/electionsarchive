@@ -64,9 +64,52 @@ MANUALS = {
         "http://www.sos.mo.gov/cmsimages/bluebook/2011-2012/7_Elec.pdf",
     ),
 }
+APPEALS = {
+    date(2004, 11, 2): (
+        "37-39",
+        [
+            (
+                "Eastern",
+                [
+                    "Clifford H. Ahrens",
+                    "Kathianne Knaup Crane",
+                    "Patricia L. Cohen",
+                    "Booker T. Shaw",
+                    "Glenn A. Norton",
+                ],
+            ),
+            ("Southern", ["John E. Parrish", "James K. Prewitt", "Kenneth W. Shrum"]),
+            ("Western", ["Patricia Breckenridge", "Paul M. Spinden"]),
+        ],
+    ),
+    date(2006, 11, 7): (
+        "28-30",
+        [
+            ("Eastern", ["Kenneth M. Romines", "Nannette A. Baker"]),
+            ("Southern", ["Phillip R. Garrison", "Jeffrey W. Bates"]),
+            ("Western", ["Joseph M. Ellis", "James Smart Jr.", "Harold Lowenstein"]),
+        ],
+    ),
+    date(2008, 11, 4): (
+        "18-19",
+        [
+            ("Eastern", ["Robert G. Dowd Jr.", "Kurt S. Odenwald", "Roy L. Richter"]),
+            ("Southern", ["Gary W. Lynch", "Daniel E. Scott"]),
+        ],
+    ),
+    date(2010, 11, 2): (
+        "22-24",
+        [
+            ("Eastern", ["Mary Kathryn Hoff"]),
+            ("Southern", ["Bob Barney", "Don E. Burrell"]),
+            ("Western", ["Victor C. Howard", "James Edward Welsh", "Alok Ahuja", "Mark D. Pfeiffer", "Karen Mitchell"]),
+        ],
+    ),
+}
 PUBLISHER = "Missouri Secretary of State"
 TITLE = "Official election results"
 TITLE_OFFICE = "Justice of the Supreme Court"
+COUNTY_NAMES = {"ST LOUIS COUNTY": "St. Louis", "KANSAS CITY": "Kansas City"}
 ROW = re.compile(r"^([A-Za-z][A-Za-z.'\- ]*?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)$")
 METHOD = (
     "Under the Missouri Plan a judge keeps the seat when a majority votes Yes in the retention election, "
@@ -155,14 +198,78 @@ def manual_lines() -> list[dict[str, object]]:
                 found.append(
                     {
                         "day": day,
+                        "office": TITLE_OFFICE,
                         "judge": judge,
-                        "county": {"ST LOUIS COUNTY": "St. Louis", "KANSAS CITY": "Kansas City"}.get(
-                            name.replace(".", ""), name
-                        ),
+                        "county": COUNTY_NAMES.get(name.replace(".", ""), name),
                         "yes": values[2 * index],
                         "no": values[2 * index + 1],
                     }
                 )
+    return found
+
+
+NUMBERS = r"\d[\d,]*"
+
+
+def appeals_lines() -> list[dict[str, object]]:
+    found: list[dict[str, object]] = []
+    for day, (pages, districts) in APPEALS.items():
+        first, last = pages.split("-")
+        url = MANUALS[day][3]
+        text = subprocess.run(
+            ["pdftotext", "-f", first, "-l", last, "-raw", str(raw.cached(SOURCE, url).path), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+        pending = ""
+        rows: dict[str, list[int]] = {}
+        index = 0
+        widths = [2 * len(judges) for _, judges in districts]
+        done: list[tuple[dict[str, list[int]], list[int]]] = []
+        for line in text:
+            line = re.sub(r"OFFICIAL MANUAL.*$", "", re.sub(r"\d{4} GENERAL ELECTION RESULTS \d+", "", line)).strip()
+            if index >= len(widths):
+                break
+            line = re.sub(r"(?<=\d)(?=[A-Z])", " ", line)
+            match = re.fullmatch(rf"((?:[A-Z][A-Z.'-]*\s*)*?)\s*((?:{NUMBERS}\s*)+)", line)
+            if match is not None:
+                values = [int(value.replace(",", "")) for value in match[2].split()]
+                if len(values) == widths[index]:
+                    name = f"{pending} {match[1]}".strip()
+                    pending = ""
+                    if name == "TOTAL":
+                        done.append((rows, values))
+                        rows = {}
+                        index += 1
+                    elif name in rows:
+                        raise ValueError(f"{day} {name} repeated")
+                    else:
+                        rows[name] = values
+                    continue
+                if len(values) < widths[index] and re.fullmatch(r"[A-Z][A-Z .'-]*", match[1]) is None:
+                    pending = ""
+                continue
+            if re.fullmatch(r"[A-Z][A-Z .'-]*", line) and not re.fullmatch(r"(?:(?:YES|NO)\s*)+|TOTAL", line):
+                pending = f"{pending} {line}".strip()
+            else:
+                pending = ""
+        for (district, judges), (table, printed) in zip(districts, done, strict=True):
+            sums = [sum(values[column] for values in table.values()) for column in range(2 * len(judges))]
+            if sums != printed:
+                raise ValueError(f"{day} {district}: {len(table)} rows sum to {sums}, printed {printed}")
+            for name, values in table.items():
+                for position, judge in enumerate(judges):
+                    found.append(
+                        {
+                            "day": day,
+                            "office": f"Judge of the Court of Appeals, {district} District",
+                            "judge": judge,
+                            "county": COUNTY_NAMES.get(name.replace(".", ""), name),
+                            "yes": values[2 * position],
+                            "no": values[2 * position + 1],
+                        }
+                    )
     return found
 
 
@@ -217,6 +324,7 @@ def lines() -> list[dict[str, object]]:
                 found.append(
                     {
                         "day": day,
+                        "office": TITLE_OFFICE,
                         "judge": re.sub(r"\s+", " ", judge).strip(),
                         "county": match[1].strip(),
                         "yes": int(match[2].replace(",", "")),
@@ -227,13 +335,13 @@ def lines() -> list[dict[str, object]]:
 
 
 def emit() -> Path:
-    rows = [*manual_lines(), *lines()]
+    rows = [*manual_lines(), *appeals_lines(), *lines()]
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Missouri Supreme Court retention elections 2012–2024 by county, from the Secretary of State's official results",
+            summary="Missouri Supreme Court retention elections 2000–2024 and Court of Appeals retention elections 2004–2010 by county, from the Secretary of State's official results",
             polity="US-MO",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -277,29 +385,30 @@ def emit() -> Path:
                 cs.add("name_drop", name_id=found[0], entity_id=entity, text=found[1], reason="Name restyled")
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        office_key = f"{slug(TITLE_OFFICE)}:MO"
-        office = cs.key("us.office", office_key)
-        if office in cs.minted:
-            cs.add("office", id=office, polity_id=cs.polity("US-MO"), kind="other")
-            cs.add(
-                "name",
-                entity_id=office,
-                text=f"{TITLE_OFFICE} of Missouri",
-                lang="en",
-                kind="official",
-                is_preferred=True,
-            )
-        groups: dict[tuple[date, str], list[dict[str, object]]] = defaultdict(list)
+        offices: dict[str, UUID] = {}
+        for title in sorted({str(row["office"]) for row in rows}):
+            office = offices[title] = cs.key("us.office", f"{slug(title)}:MO")
+            if office in cs.minted:
+                cs.add("office", id=office, polity_id=cs.polity("US-MO"), kind="other")
+                cs.add(
+                    "name",
+                    entity_id=office,
+                    text=f"{title} of Missouri",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+        groups: dict[tuple[date, str, str], list[dict[str, object]]] = defaultdict(list)
         for row in rows:
-            groups[(row["day"], str(row["judge"]))].append(row)
+            groups[(row["day"], str(row["office"]), str(row["judge"]))].append(row)
         persons: set[str] = set()
         made = 0
-        for (day, judge), group in sorted(groups.items()):
+        for (day, title, judge), group in sorted(groups.items()):
             first, last = identity(judge)
             person_key = f"MO:{slug(first)}-{slug(last)}"
             suffix = person_key.split(":")[1]
             shown = display(judge)
-            contest_key = f"{day}:MO:{slug(TITLE_OFFICE)}:{suffix}"
+            contest_key = f"{day}:MO:{slug(title)}:{suffix}"
             contest = cs.key("us.contest", contest_key)
             election = cs.key("us.election", f"{day}:MO")
             cs.add(
@@ -307,7 +416,7 @@ def emit() -> Path:
                 id=contest,
                 election_id=election,
                 kind="office",
-                office_id=office,
+                office_id=offices[title],
                 district_area_id=state_area,
                 term="full",
                 magnitude=1,
@@ -315,9 +424,9 @@ def emit() -> Path:
                 electoral_system_id=retention_system,
                 default_result_kind="counted",
             )
-            name(contest, f"{day.year} Missouri {TITLE_OFFICE} retention: {shown}")
+            name(contest, f"{day.year} Missouri {title} retention: {shown}")
             if contest in cs.minted:
-                base = f"us/mo/{day}-general/{slug(TITLE_OFFICE)}-{suffix}"
+                base = f"us/mo/{day}-general/{slug(title)}-{suffix}"
                 path, count = base, 1
                 while path in taken:
                     count += 1
