@@ -21,7 +21,7 @@ from ea.sources.tr.ysk import (
     VOTES,
     upper,
 )
-from ea.sources.tr.ysk_local import own_area, own_areas
+from ea.sources.tr.ysk_local import own_area, own_areas, successors
 from ea.sources.tr.ysk_local import party as local_party
 from ea.store import connect
 
@@ -188,7 +188,7 @@ def parse() -> None:
     frame.write_parquet(PARSED / "mayors_2004.parquet")
 
 
-VERSION = "6"
+VERSION = "7"
 DAY_2004 = date(2004, 3, 28)
 PAGE_2004 = "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html"
 METHOD_2004 = (
@@ -257,6 +257,7 @@ def emit() -> Path:
             ).fetchall()
         }
         spans = own_areas(conn)
+        later = successors()
         held = {
             value: cs.survivors.get(entity, entity)
             for value, entity in conn.execute(
@@ -403,6 +404,10 @@ def emit() -> Path:
             if area is None:
                 raise ValueError(f"no 2004 ilçe area for {key} ({lookup})")
             polity = cs.key("tr.polity", key)
+            if path in later:
+                found.append(key)
+                path = later[path]
+                polity = cs.key("tr.polity", path[3:].replace("/", "-"))
             absorbed = {held[option] for option in found} - {polity}
             for other in sorted(absorbed):
                 cs.merge(other, polity)
