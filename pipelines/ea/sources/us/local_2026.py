@@ -7166,6 +7166,14 @@ for key, (publisher, title, url, local) in NE_SOURCES.items():
     PUBLISHERS[key] = (key[:2], publisher, title)
     FILES[key] = url
     DELIVERED[key] = DATA / "inbox" / "y26" / local
+KY_PRINTED_BOARDS = (
+    ("Harrison", 1, False, ("Laura Norcross",)),
+    ("Harrison", 2, False, ("Mary June Brunker",)),
+    ("Harrison", 4, True, ("Mike Meyer",)),
+    ("Elliott", 3, False, ("Elisha Roseberry", "Adam Weddington")),
+    ("Elliott", 4, False, ('Keith "Smiley" Mason', "Brittany Riggs Kissinger")),
+    ("Elliott", 5, False, ("Brent Sturgill",)),
+)
 KY_BOARD_SEATS = {
     "Beechwood Independent School District Board of Education": 3,
     "Covington Independent School District Board of Education": 2,
@@ -8179,6 +8187,27 @@ def parse() -> None:
                     "party": named,
                     "independent": independent,
                     "unexpired": row["Unexpired"] is not None,
+                }
+            )
+
+    for county, district, unexpired, names in KY_PRINTED_BOARDS:
+        found = kentucky.get(coverage_tables.tokens(f"{county} County School District"))
+        if found is None:
+            continue
+        contest = f"{county} County Board of Education, Educational District {district}" + (
+            " (Unexpired Term)" if unexpired else ""
+        )
+        schools[contest] = (f"Board of Education, Educational District {district}", found[1], f"school:{found[0]}")
+        for name in names:
+            feeds["KY"].append(
+                {
+                    "county": county,
+                    "contest": contest,
+                    "seats": 1,
+                    "name": name,
+                    "party": None,
+                    "independent": False,
+                    "unexpired": unexpired,
                 }
             )
 
