@@ -17,10 +17,14 @@ SOURCE = "us.mi_cenr_judicial"
 VERSION = "1"
 CACHED = [1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014]
 FETCHED = [2016, 2018, 2020, 2022]
-INBOX = DATA / "inbox" / "manual" / "MF-472"
+APPEALS_ONLY = [2024]
+INBOX = {
+    2022: DATA / "inbox" / "manual" / "MF-472",
+    2024: DATA / "inbox" / "manual" / "MF-572",
+}
 TITLE = "Justice of the Supreme Court"
-PARTIAL = re.compile(r"Partial Term Ending (\d\d)/(\d\d)/(\d{4})")
-SEATS = re.compile(r"\((\d+)\) Position")
+PARTIAL = re.compile(r"Partial Term Ending (\d+)/(\d+)/(\d{4})", re.IGNORECASE)
+SEATS = re.compile(r"\((\d+)\) Positions?", re.IGNORECASE)
 NOTE = (
     "County totals from the Michigan Department of State's official general election results by county. "
     "Candidates are nominated by party conventions but stand on the nonpartisan section of the ballot, and voters "
@@ -43,9 +47,9 @@ def path(year: int) -> Path:
 
 
 def fetch() -> None:
-    for year in FETCHED:
-        manual = INBOX / f"{year}STATE_GENERAL_MI_CENR_BY_COUNTY.txt"
-        if year == 2022 and manual.exists():
+    for year in [*FETCHED, *APPEALS_ONLY]:
+        manual = INBOX[year] / f"{year}STATE_GENERAL_MI_CENR_BY_COUNTY.txt" if year in INBOX else None
+        if manual is not None and manual.exists():
             raw.store(
                 SOURCE,
                 url(year),
@@ -60,7 +64,7 @@ def fetch() -> None:
 
 def read(year: int, office: str) -> pl.DataFrame:
     frame = pl.read_csv(
-        path(year), separator="\t", infer_schema=False, quote_char=None, skip_rows=1 if year == 2022 else 0
+        path(year), separator="\t", infer_schema=False, quote_char=None, skip_rows=1 if year in INBOX else 0
     )
     frame = frame.rename({"OfficeCode(text)": "OfficeCode(Text)"}) if "OfficeCode(text)" in frame.columns else frame
     return frame.filter((pl.col("OfficeCode(Text)") == office) & pl.col("CandidateVotes").is_not_null())

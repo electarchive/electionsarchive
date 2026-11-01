@@ -18,7 +18,7 @@ VERSION = "1"
 TITLE = "Judge of Court of Appeals"
 ORDINALS = {1: "1st", 2: "2nd", 3: "3rd", 4: "4th"}
 ERAS = [(None, date(2002, 1, 1)), (date(2002, 1, 1), date(2012, 1, 1)), (date(2012, 1, 1), None)]
-SEATS = re.compile(r"\((\d+)\) Position")
+SEATS = re.compile(r"\((\d+)\) Positions?", re.IGNORECASE)
 NOTE = (
     "County totals from the Michigan Department of State's official general election results by county, "
     "summed over the counties of the district as it stood that year. Candidates are nominated by party conventions "
@@ -33,8 +33,8 @@ def era(day: date) -> int:
 
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
-    for year in [*base.CACHED, *base.FETCHED]:
-        for row in base.read(year, "14").iter_rows(named=True):
+    for year in [*base.CACHED, *base.FETCHED, *base.APPEALS_ONLY]:
+        for row in base.read(year, "47" if year in base.APPEALS_ONLY else "14").iter_rows(named=True):
             if (row["WriteIn(W)/Uncommitted(Z)"] or "").strip() == "W":
                 continue
             name = " ".join(
@@ -68,7 +68,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Michigan Court of Appeals general election contests 1998–2022 by county and district, "
+            summary="Michigan Court of Appeals general election contests 1998–2024 by county and district, "
             "from the Department of State's official results",
             polity="US-MI",
         )
@@ -83,7 +83,7 @@ def emit() -> Path:
             license="Public record",
         )
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
-        for year in [*base.CACHED, *base.FETCHED]:
+        for year in [*base.CACHED, *base.FETCHED, *base.APPEALS_ONLY]:
             raw_source = mi_cenr_statewide.SOURCE if year in base.CACHED else base.SOURCE
             cs.artifact(raw.cached(raw_source, base.url(year)), source)
         county_units = {}
