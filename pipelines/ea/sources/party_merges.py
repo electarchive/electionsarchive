@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "party_merges"
-VERSION = "6"
+VERSION = "7"
 MERGES = {
     "330bfd15-7970-5a47-9c1a-cb2b2632b5d7": "bc509349-9b70-5653-a994-69f2077ef882",
     "9fab4680-3011-5c3a-bd33-bdc6e96693aa": "8788ac83-2ebc-584d-9382-d46868efd147",
@@ -46,6 +46,9 @@ MERGES = {
     "b3b0a83f-55da-5600-a49c-c96af2f37dba": "01a13ba1-d3a6-7084-b7c4-4e6f52f34575",
     "3a3f4d1a-b29e-56d5-a13d-28d8cbb573ff": "01a13ba1-d3a6-7084-b7c4-4e6f52f34575",
     "01a14094-d257-77f4-bbc1-a318134dab58": "01a14094-d257-77f4-bbc1-a3191ff76419",
+    "c51441df-526d-5109-b48b-d69af65f7dd7": "207da6fd-e181-5fd7-83c6-202e1f0eada4",
+    "fad5cc87-aafa-5e47-b375-6502cd206062": "96cd0476-7b40-573b-ad74-f9b5bf23a179",
+    "304a8f10-2cdf-5f52-8f26-a1aee4887c2e": "94e46dda-3153-5f4a-9572-e7a182477c0a",
 }
 
 
