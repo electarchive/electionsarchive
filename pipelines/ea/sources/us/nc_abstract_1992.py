@@ -27,7 +27,7 @@ RECORD_GOVERNOR = "https://digital.ncdcr.gov/Documents/Detail/4199520"
 RECORD_LIEUTENANT = "https://digital.ncdcr.gov/Documents/Detail/4199518"
 RECORDS = ((RECORD, 0), (RECORD_GOVERNOR, 12), (RECORD_LIEUTENANT, 14))
 DAY = date(1992, 11, 3)
-MANUAL = {4: {"WATAUGA": [8267, 8564, 690, 8593, 8209, 867]}}
+MANUAL = {4: {"WATAUGA": [8267, 8564, 690, 8593, 8209, 867]}, 15: {"GASTON": [27684, 29199, 3257]}}
 PASSES = [
     (120, "6", 300),
     (150, "6", 300),
@@ -219,8 +219,8 @@ def parse() -> None:
             readings: dict[str, list[list[int]]] = {}
             passes = [(dpi, seen(page, dpi)) for dpi in VARIANTS] if page in SEEN else []
             passes += [(0, read(page, cut, mode, dpi, width)) for cut, mode, dpi in PASSES if page not in SEEN]
-            for _, rows in passes:
-                for name, values in rows:
+            for _, found_rows in passes:
+                for name, values in found_rows:
                     if len(values) != width:
                         continue
                     if name != "TOTAL" and re.sub(r"[^a-z]", "", name.lower()) not in codes:
