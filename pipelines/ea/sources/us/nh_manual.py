@@ -1490,6 +1490,13 @@ def emit() -> Path:
                         .alias("name")
                     )
             forced = {alias["printed"] for alias in overrides if alias["action"] == "new"}
+            replaced = [
+                option
+                for option in options
+                if option[2] == "candidate"
+                and any(alias["action"] == "replace" and alias["printed"] == option[1] for alias in overrides)
+            ]
+            options = [option for option in options if option not in replaced]
             accepted = any(alias["action"] == "accept" for alias in overrides)
             totals = rows.group_by("name", maintain_order=True).agg(pl.col("votes").sum())
             others = [option[0] for option in options if option[2] == "others"]
@@ -1587,6 +1594,10 @@ def emit() -> Path:
                 cs.add("slug", path=path, entity_id=contest)
                 cs.add("citation", entity_id=contest, source_id=sources[int(year)][0])
                 report.setdefault("contest added from the manual", []).append(tag)
+            for option, label, _, _ in replaced:
+                for (candidacy,) in conn.execute("select id from candidacy where option_id = %s", [option]).fetchall():
+                    cs.add("entity_retirement", entity_id=candidacy, reason="The manual prints another candidate")
+                cs.add("option_drop", option_id=option, contest_id=contest, reason="The manual prints another candidate")
             for offset, name in enumerate(fresh):
                 option = cs.key("us.option", f"{external}:{slug(name)}")
                 if name == "Scatter" or WRITE_IN.search(name):
