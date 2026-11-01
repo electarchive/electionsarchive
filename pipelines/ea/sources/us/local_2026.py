@@ -10790,6 +10790,24 @@ def parse() -> None:
                             rest = tokens[skip + len(lead) :]
                             if rest[:1] == ["county"] and sort != "school":
                                 continue
+                            if (
+                                state == "CA"
+                                and sort == "school"
+                                and (
+                                    rest[:1] == ["joint"]
+                                    and "joint" not in label.lower()
+                                    or rest[:1] == ["unified"]
+                                    and "unified" not in label.lower()
+                                    and str(row["fips"]) == "06053"
+                                    or rest[:1]
+                                    and rest[0] not in CA_SCHOOL_KINDS
+                                    and (
+                                        "union" in set(re.findall(r"[a-z]+", label.lower())) - set(stem)
+                                        or owner not in own_owners.get(str(row["fips"]), ())
+                                    )
+                                )
+                            ):
+                                continue
                             said = (
                                 rest[0]
                                 if not start
