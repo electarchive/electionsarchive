@@ -10162,6 +10162,8 @@ def parse() -> None:
                 [f"{DAY}:%", SOURCE],
             )
         } | {str(row["tail"]) for row in rows}
+        state_used: set[str] = set()
+        county_used: set[str] = set()
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
             index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
@@ -10197,6 +10199,7 @@ def parse() -> None:
                 "Santa Cruz Valley School District 35": "Santa Cruz Valley Unified District",
                 "Fredonia-Moccasin Bi-County School District 6": "Fredonia-Moccasin Unified District",
                 "Solomonville School District 5": "Solomon Elementary District",
+                "Kankakee Valeey School Corporatn": "Kankakee Valley School Corporation",
                 "Coconino Association For Vocation Industry & Technology(caviat)": "Coconino Association for Vocation Industry and Technology",
                 "Western Arizona Vocational District #50": "Western Arizona Vocational District",
                 "Southwest Technical Education District of Yuma (stedy)": "Southwest Technical Education District of Yuma",
@@ -10675,11 +10678,7 @@ def parse() -> None:
                     tokens = re.sub(
                         r"^community school corporation of eastern hancock(?: school board| schools)?",
                         "eastern hancock county school board",
-                        re.sub(
-                            r"^kankakee valley",
-                            "kankakee valeey corporatn",
-                            re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
-                        ),
+                        re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
                     )
                     in_pin = None
                     for pattern, repl, alias_pin in IN_ALIASES:
@@ -11113,6 +11112,7 @@ def parse() -> None:
                     template is None
                     or tail is None
                     or tail in taken
+                    and not (state == "IN" and tail in state_used and tail not in county_used)
                     or used.setdefault(tail, str(row["contest"])) != row["contest"]
                 ):
                     missed.add(f"{row['county']}: {row['contest']}")
@@ -11129,6 +11129,7 @@ def parse() -> None:
                     str(row.get("feed") or key),
                 )
             taken |= set(used)
+            (state_used if key == state else county_used).update(used)
             print(f"{key}: {len(used)} contests matched, {len(missed)} not matched")
             (PARSED / f"unmatched_{key}.txt").parent.mkdir(parents=True, exist_ok=True)
             (PARSED / f"unmatched_{key}.txt").write_text("\n".join(sorted(missed)))
