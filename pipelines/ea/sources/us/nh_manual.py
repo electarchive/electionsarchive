@@ -995,12 +995,43 @@ def misread(option: str, name: str) -> bool:
     )
 
 
+def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
+    added = pl.read_csv(
+        Path(__file__).with_name("nh_manual_lines.tsv"), separator="\t", schema_overrides={"beside_y0": pl.Float64}
+    )
+    parts = []
+    for row in added.iter_rows(named=True):
+        beside = raw_lines.filter(
+            (pl.col("year") == row["year"])
+            & (pl.col("page") == row["page"])
+            & ((pl.col("y0") - row["beside_y0"]).abs() < 1e-5)
+        ).head(1)
+        parts.append(
+            beside.with_columns(
+                name=pl.lit(row["name"]),
+                town=pl.lit(row["town"]),
+                votes=pl.lit(row["votes"], dtype=pl.Int64),
+                clean=pl.lit(True),
+                digits=pl.lit(f"{row['votes']:,}"),
+                x0=pl.lit(row["x0"]),
+                y0=pl.lit(row["y0"]),
+                x1=pl.lit(row["x1"]),
+                y1=pl.lit(row["y1"]),
+                writein=pl.lit(False),
+                tail=pl.lit(None, dtype=pl.String),
+                party=pl.lit(None, dtype=pl.String),
+            )
+        )
+    return pl.concat(parts)
+
+
 def emit() -> Path:
     from ea.changeset import Changeset
     from ea.sources.us.nh_sos_county import COLUMNS, CONTEST, TEMPLATE, WRITE_IN
     from ea.store import connect
 
     raw_lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("county").is_not_null())
+    raw_lines = pl.concat([raw_lines, page_lines(raw_lines)], how="diagonal_relaxed")
     reads = name_reads(raw_lines)
     if reads:
         raw_lines = (
