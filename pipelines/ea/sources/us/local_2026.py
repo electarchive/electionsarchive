@@ -6229,6 +6229,20 @@ for key, publisher, title, url, local in (
         "az/coconino_ballot.html",
     ),
     (
+        "CA-06027-schools",
+        "Inyo County Elections",
+        "Local Candidates List, November 3, 2026 Consolidated General Election",
+        "https://www.inyocounty.us/",
+        "ca/597/06027/inyo_list.pdf",
+    ),
+    (
+        "CA-06115-schools",
+        "Yuba County Elections",
+        "Candidate Filing Status Report, November 3, 2026 General Election",
+        "https://yuba.gov/Documents/Departments/Departments%20E%20to%20K/Elections/Upcoming%20Election/Candidate%20Statements/LocalCandidateList.pdf",
+        "ca/597/06115/lcl.pdf",
+    ),
+    (
         "NE-31019-buffalo",
         "Buffalo County Election Commissioner",
         "2026 General Election Candidate List",
