@@ -1,0 +1,59 @@
+<script lang="ts">
+  import type { LiveOffice } from "@ea/analytics/live";
+  import type { Desk } from "#lib/live/board/desk.svelte.js";
+  import { short, strength } from "#lib/live/board/labels.js";
+  import { lead, surname } from "#lib/live/format.js";
+  import { cn } from "#lib/utils.js";
+
+  const { desk, office = "senate" }: { desk: Desk; office?: LiveOffice } =
+    $props();
+
+  const isHouse = $derived(office === "house");
+  const tiles = $derived(
+    [...desk.feed.summaries.values()]
+      .filter((summary) => summary.race.office === office)
+      .toSorted(
+        (a, b) =>
+          a.race.state.localeCompare(b.race.state) ||
+          Number(a.race.district ?? 0) - Number(b.race.district ?? 0) ||
+          a.race.slug.localeCompare(b.race.slug),
+      ),
+  );
+
+  function describe(summary: (typeof tiles)[number]) {
+    const option = summary.winner ?? summary.leader;
+    return option == null
+      ? short(summary.race)
+      : `${short(summary.race)}: ${surname(option)} +${lead(summary.margin)}`;
+  }
+</script>
+
+<ul
+  class={cn("grid gap-0.5", {
+    "grid-cols-[repeat(auto-fill,minmax(0.6875rem,1fr))]": isHouse,
+    "grid-cols-[repeat(auto-fill,minmax(2.25rem,1fr))]": !isHouse,
+  })}
+>
+  {#each tiles as summary (summary.race.id)}
+    {const isPicked = $derived(desk.selected?.id === summary.race.id)}
+    {const isWon = $derived(summary.winner != null)}
+    <li>
+      <button
+        type="button"
+        class={cn(
+          "grid place-content-center rounded-xs font-semibold uppercase outline-offset-1 transition-[background-color] duration-500 inline-full motion-reduce:transition-none",
+          { "aspect-square": isHouse, "text-[0.6875em] block-6": !isHouse },
+          { "text-white": isWon, "text-foreground": !isWon },
+          { "outline-2 outline-foreground": isPicked },
+        )}
+        style:background-color={strength(summary)}
+        title={describe(summary)}
+        aria-label={describe(summary)}
+        aria-pressed={isPicked}
+        onclick={() => desk.select(summary.race.slug)}
+      >
+        {#if !isHouse}{summary.race.state}{/if}
+      </button>
+    </li>
+  {/each}
+</ul>

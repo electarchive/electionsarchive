@@ -244,6 +244,7 @@
       estimates={data.estimates}
       nation={data.nation}
       house={data.house}
+      forecasts={data.shown.forecasts}
       {clock}
       {isOffline}
     />
@@ -260,6 +261,7 @@
           base={election.slug}
           {clock}
           {isOffline}
+          forecasts={data.shown.forecasts}
           bind:at
           bind:isFinal
         />

@@ -51,6 +51,7 @@
   "devDependencies": {
     "@inlang/paraglide-js": "catalog:",
     "@lucide/svelte": "catalog:",
+    "@neodrag/svelte": "catalog:",
     "@prgm/sveltekit-progress-bar": "catalog:",
     "@sveltejs/adapter-node": "catalog:",
     "@sveltejs/kit": "catalog:",

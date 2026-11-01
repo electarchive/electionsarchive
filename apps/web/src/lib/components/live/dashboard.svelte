@@ -10,6 +10,7 @@
   import MapIcon from "@lucide/svelte/icons/map";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
+  import BoardLink from "#lib/components/live/board-link.svelte";
   import { percent } from "#lib/format.js";
   import {
     clock as clockOf,
@@ -33,6 +34,7 @@
     house,
     clock,
     isOffline,
+    forecasts = true,
   }: {
     election: LiveElection;
     estimates: Record<string, LiveEstimate>;
@@ -53,6 +55,7 @@
     } | null;
     clock: number;
     isOffline: boolean;
+    forecasts?: boolean;
   } = $props();
 
   type View = "senate" | "governor" | "house" | "reporting";
@@ -359,8 +362,12 @@
           >{m.night_updated({ time: stamp(newest) })}</span
         >
       {/if}
+      <BoardLink election={election.slug} />
     </p>
     <h1 class="title text-balance">{m.night_nation_title()}</h1>
+    {#if !forecasts}
+      <p class="text-sm text-muted-foreground">{m.board_forecast_off()}</p>
+    {/if}
     <dl class="flex flex-wrap gap-x-8 gap-y-2">
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>

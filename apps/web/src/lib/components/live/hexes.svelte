@@ -7,6 +7,7 @@
     label,
     hovered = $bindable(null),
     href,
+    onPick,
     tip,
   }: {
     cartogram: {
@@ -19,6 +20,7 @@
     label: string;
     hovered?: string | null;
     href: (key: string) => string | null;
+    onPick?: (key: string) => void;
     tip: Snippet<[string]>;
   } = $props();
 
@@ -61,6 +63,12 @@
         href={link ?? undefined}
         aria-label={district.key.toUpperCase()}
         onpointermove={(event) => track(event, district.key)}
+        onclick={(event) => {
+          if (onPick != null) {
+            event.preventDefault();
+            onPick(district.key);
+          }
+        }}
         onfocus={() => (hovered = district.key)}
         onblur={() => (hovered = null)}
       >

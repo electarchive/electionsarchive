@@ -27,6 +27,7 @@ catalog:
   "@inlang/paraglide-js": ^2.29.2
   "@lucide/svelte": ^1.61.0
   "@modelcontextprotocol/sdk": ^1.32.2
+  "@neodrag/svelte": 3.0.0-next.12
   "@orpc/client": 2.0.0-beta.46
   "@orpc/openapi": 2.0.0-beta.46
   "@orpc/server": 2.0.0-beta.46

@@ -6,6 +6,7 @@
   } from "@ea/analytics/live";
   import { resolve } from "$app/paths";
   import type { Geography, Mode } from "#lib/live/standing.js";
+  import BoardLink from "#lib/components/live/board-link.svelte";
   import { count, percent } from "#lib/format.js";
   import {
     lead,
@@ -180,6 +181,7 @@
           >{m.night_updated({ time: stamp(newest) })}</span
         >
       {/if}
+      <BoardLink election={election.slug} />
     </p>
     <h1 class="title text-balance">{name}</h1>
     {#if share != null}

@@ -1,8 +1,13 @@
 <script lang="ts">
-  import type { LiveElection, LiveRace } from "@ea/analytics/live";
+  import type {
+    LiveElection,
+    LiveEstimate,
+    LiveRace,
+  } from "@ea/analytics/live";
   import { resolve } from "$app/paths";
   import { untrack } from "svelte";
   import type { Geography, Mode } from "#lib/live/standing.js";
+  import BoardLink from "#lib/components/live/board-link.svelte";
   import { count, percent } from "#lib/format.js";
   import { clock, lead, placeSlug, stamp } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
@@ -17,6 +22,7 @@
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
   import Trend from "./trend.svelte";
+  import Withheld from "./withheld.svelte";
 
   let {
     election,
@@ -27,6 +33,7 @@
     at = $bindable(null),
     isOffline = false,
     isFinal = $bindable(true),
+    forecasts = true,
   }: {
     election: LiveElection;
     race: LiveRace;
@@ -36,6 +43,7 @@
     at?: string | null;
     isOffline?: boolean;
     isFinal?: boolean;
+    forecasts?: boolean;
   } = $props();
 
   const RECOUNT: Record<string, number> = { mi: 2000 };
@@ -72,12 +80,28 @@
   );
   const options = $derived(race.options);
   const pair = $derived(now.pair);
-  const estimate = $derived(
+  const modeled = $derived(
     now.isFinal
       ? estimateAt(race, null)
       : estimateAt({ ...race, certified: null }, view),
   );
-  const points = $derived(history(race, null));
+  const estimate: LiveEstimate = $derived(
+    forecasts
+      ? modeled
+      : {
+          ...modeled,
+          status: "unavailable",
+          expectedTotal: {
+            low: modeled.counted,
+            mid: modeled.counted,
+            high: modeled.counted,
+          },
+          margin: { low: 0, mid: 0, high: 0 },
+          winProbability: {},
+          units: [],
+        },
+  );
+  const points = $derived(forecasts ? history(race, null) : []);
   const upto = $derived(
     view == null ? points : points.filter((point) => point.at <= view),
   );
@@ -90,7 +114,7 @@
   );
   const opens = $derived(closes - 3_600_000);
   const isWaiting = $derived(now.total === 0);
-  const isLive = $derived(estimate.status === "estimating" && !now.isFinal);
+  const isLive = $derived(modeled.status === "estimating" && !now.isFinal);
   const newest = $derived(race.frames.at(-1)?.at ?? null);
   const signed = $derived(
     now.total > 0
@@ -338,6 +362,7 @@
           >{m.night_updated({ time: stamp(view ?? newest) })}</span
         >
       {/if}
+      <BoardLink election={election.slug} race={race.slug} />
     </p>
     <h1 class="title text-balance">{race.title}</h1>
     <p
@@ -389,19 +414,21 @@
         bind:selected
         bind:hovered
       />
-      <LiveMap
-        {geography}
-        {options}
-        {now}
-        {estimate}
-        modes={["remaining"]}
-        title={m.night_map_left_title()}
-        caption={m.night_map_left_caption()}
-        mode="remaining"
-        {href}
-        bind:selected
-        bind:hovered
-      />
+      <Withheld isOff={!forecasts}>
+        <LiveMap
+          {geography}
+          {options}
+          {now}
+          {estimate}
+          modes={["remaining"]}
+          title={m.night_map_left_title()}
+          caption={m.night_map_left_caption()}
+          mode="remaining"
+          {href}
+          bind:selected
+          bind:hovered
+        />
+      </Withheld>
     </section>
   {:else}
     <section
@@ -425,16 +452,20 @@
 
   {#if race.certified == null || !now.isFinal}
     <section class="grid gap-10 bg-background px-4 py-6 sm:px-8">
-      <Dial
-        {options}
-        {pair}
-        {estimate}
-        history={upto}
-        counted={signed}
-        {isWaiting}
-      />
+      <Withheld isOff={!forecasts}>
+        <Dial
+          {options}
+          {pair}
+          {estimate}
+          history={upto}
+          counted={signed}
+          {isWaiting}
+        />
+      </Withheld>
       {#if isLive}
-        <Field {options} {now} {estimate} {winners} />
+        <Withheld isOff={!forecasts}>
+          <Field {options} {now} {estimate} {winners} />
+        </Withheld>
       {/if}
     </section>
   {/if}
@@ -458,14 +489,16 @@
     <section
       class="grid gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
     >
-      <Outstanding
-        {options}
-        {now}
-        {estimate}
-        {href}
-        bind:selected
-        bind:hovered
-      />
+      <Withheld isOff={!forecasts}>
+        <Outstanding
+          {options}
+          {now}
+          {estimate}
+          {href}
+          bind:selected
+          bind:hovered
+        />
+      </Withheld>
       <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
     </section>
   {/if}

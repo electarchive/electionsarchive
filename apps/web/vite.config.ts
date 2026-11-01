@@ -30,6 +30,7 @@ export default defineConfig(({ command }) => {
           strategy: ["cookie", "globalVariable", "baseLocale"],
         }),
     ],
+    server: { allowedHosts: [".ts.net"] },
     optimizeDeps: {
       include: [
         "@lucide/svelte/icons/*",

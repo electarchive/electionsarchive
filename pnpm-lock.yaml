@@ -200,6 +200,9 @@ catalogs:
     '@modelcontextprotocol/sdk':
       specifier: ^1.32.2
       version: 1.32.2
+    '@neodrag/svelte':
+      specifier: 3.0.0-next.12
+      version: 3.0.0-next.12
     '@orpc/client':
       specifier: 2.0.0-beta.46
       version: 2.0.0-beta.46
@@ -545,6 +548,9 @@ importers:
       '@lucide/svelte':
         specifier: 'catalog:'
         version: 1.61.0(svelte@5.57.3(@typescript-eslint/types@8.71.2))
+      '@neodrag/svelte':
+        specifier: 'catalog:'
+        version: 3.0.0-next.12(@neodrag/core@3.0.0-next.12)(svelte@5.57.3(@typescript-eslint/types@8.71.2))
       '@prgm/sveltekit-progress-bar':
         specifier: 'catalog:'
         version: 3.0.2(@sveltejs/kit@3.1.0(@sveltejs/vite-plugin-svelte@7.3.1(svelte@5.57.3(@typescript-eslint/types@8.71.2))(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))(typescript@6.0.3)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)))(svelte@5.57.3(@typescript-eslint/types@8.71.2))
@@ -1404,6 +1410,15 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
+
+  '@neodrag/core@3.0.0-next.12':
+    resolution: {integrity: sha512-NInKt94ePpmwFJZveemnoQYLCL0X8QsdTVTXm/d71SPWitnr8af6fErZMFUCGXJFMEI06JWKgPUjNRMOQDx2Sg==}
+
+  '@neodrag/svelte@3.0.0-next.12':
+    resolution: {integrity: sha512-Ie10p/izZntnQ4zoZt3a+JA45UYGL5t9x9Efz+by8osx7uzcaVcF4uu4kiMzE4aFi1qaYhcQaQ8yyfL5K6ZzMg==}
+    peerDependencies:
+      '@neodrag/core': 3.0.0-next.12
+      svelte: ^3 || ^4 || ^5
 
   '@noble/ciphers@2.4.0':
     resolution: {integrity: sha512-AnjFn0Jv92laAkvMrghlFZq4qQCIN/4DxFV/eooqtC2YTjB7kBeLMS2T9KJX4Dn+ZVXLOwK0lSgqDtx9gvxtiw==}
@@ -6337,6 +6352,13 @@ snapshots:
       '@emnapi/runtime': 1.11.2
       '@tybys/wasm-util': 0.10.4
     optional: true
+
+  '@neodrag/core@3.0.0-next.12': {}
+
+  '@neodrag/svelte@3.0.0-next.12(@neodrag/core@3.0.0-next.12)(svelte@5.57.3(@typescript-eslint/types@8.71.2))':
+    dependencies:
+      '@neodrag/core': 3.0.0-next.12
+      svelte: 5.57.3(@typescript-eslint/types@8.71.2)
 
   '@noble/ciphers@2.4.0': {}
 
