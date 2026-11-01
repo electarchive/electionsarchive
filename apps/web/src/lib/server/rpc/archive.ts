@@ -123,6 +123,7 @@ const POOLS = [
 const POOLED = sql`
   u.area_relation = 'unlocated' and (u.kind <> 'standard' or u.parent_id is null)
 `;
+const UNIT_BASE = 1 << 30;
 const POOLED_NAMES: Record<(typeof POOLS)[number], () => string> = {
   abroad_mission: m.places_pool_abroad,
   customs_gate: m.places_pool_customs,
@@ -164,7 +165,10 @@ const FACTS = {
       )) as uk(k)
       cross join lateral (select * from reporting_unit y where y.k = uk.k::int offset 0) u
       cross join lateral (select * from result_value x where x.result_set_k = ${set} and x.unit_k = u.k offset 0) v
-      where (-(${area}) - 1) / 16 = 0 and ${POOLED} and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
+      where ${POOLED} and (
+          (-(${area}) - 1) / 16 = 0 and u.kind <> 'standard' and ${POOL} = (${sql.param([...POOLS])}::text[])[(-(${area}) - 1) % 16 + 1]
+          or u.kind = 'standard' and u.k = -(${area}) - ${sql.raw(String(UNIT_BASE))}
+        )
         and not exists (
           select from reporting_unit c join result_value w on w.result_set_k = ${set} and w.unit_k = c.k where c.parent_id = u.id
           offset 0
@@ -3756,6 +3760,7 @@ async function places(
             area.k,
             area.id,
             shown.map((kid) => kid.k),
+            "units",
           ]),
         )
         .digest("hex")}`,
@@ -3764,6 +3769,8 @@ async function places(
         await db.execute<{
           pool: (typeof POOLS)[number];
           isPlaced: boolean;
+          unit: number | null;
+          label: string | null;
           channels: Array<number>;
         }>(sql`
           with recursive grp(id) as (
@@ -3787,8 +3794,8 @@ async function places(
               ) r
             ) as "isShort"
           )
-          select u.pool, u."isPlaced", array_agg(distinct u.channel) as channels from (
-            select ${POOL} as pool, false as "isPlaced", (
+          select u.pool, u."isPlaced", u.unit, u.label, array_agg(distinct u.channel) as channels from (
+            select ${POOL} as pool, false as "isPlaced", null::int as unit, null::text as label, (
               select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
             ) as channel
             from jsonb_array_elements_text(${JSON.stringify(
@@ -3813,7 +3820,35 @@ async function places(
               select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
             )) as uk(k)
             join reporting_unit u on u.k = uk.k::int
-            where (select "isShort" from short) and ${POOLED}
+            where (select "isShort" from short) and ${POOLED} and u.kind <> 'standard'
+              and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
+            union all
+            select ${POOL}, false, u.k, (
+              select n.text from name n where n.entity_id = u.id order by n.is_preferred desc, (n.lang = 'en') desc, n.text limit 1
+            ), null::int
+            from jsonb_array_elements_text(${JSON.stringify(
+              await remember("unlocated", async () =>
+                Object.fromEntries(
+                  rowsOf(
+                    await db.execute<{
+                      polity: string;
+                      units: Array<number>;
+                    }>(sql`
+                      with recursive up(k, id) as (
+                        select u.k, u.polity_id from reporting_unit u where u.area_id is null
+                        union
+                        select up.k, p.parent_id from polity_parent p join up on p.polity_id = up.id
+                      )
+                      select id::text as polity, array_agg(k order by k) as units from up group by id
+                    `),
+                  ).map((row) => [row.polity, row.units]),
+                ),
+              ),
+            )}::jsonb -> (
+              select e.polity_id::text from contest c join election e on e.id = c.election_id where c.id = ${contest.root}::uuid
+            )) as uk(k)
+            join reporting_unit u on u.k = uk.k::int
+            where (select "isShort" from short) and ${POOLED} and u.kind = 'standard'
               and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
             union all
             select ${POOL}, true, (
@@ -3823,7 +3858,7 @@ async function places(
             where u.area_id = ${area.id}::uuid and ${PLACED}
               and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
           ) u
-          group by 1, 2
+          group by 1, 2, 3, 4
         `),
       ),
   );
@@ -3831,15 +3866,24 @@ async function places(
     .filter(() => level.code !== "world.country")
     .map((row) => ({ ...row, index: POOLS.indexOf(row.pool) }))
     .toSorted(
-      (a, b) => Number(a.isPlaced) - Number(b.isPlaced) || a.index - b.index,
+      (a, b) =>
+        Number(a.isPlaced) - Number(b.isPlaced) ||
+        Number(a.unit != null) - Number(b.unit != null) ||
+        a.index - b.index ||
+        (a.label ?? "").localeCompare(b.label ?? ""),
     )
     .map((row) => ({
-      k: -((row.isPlaced ? area.k * 16 : 0) + row.index + 1),
-      name: (
-        (row.index >= POOLS.indexOf("aggregate") && row.channels.length === 1
-          ? POOLED_CHANNELS[row.channels[0] ?? 0]
-          : null) ?? POOLED_NAMES[row.pool]
-      )(),
+      k:
+        row.unit != null
+          ? -(UNIT_BASE + row.unit)
+          : -((row.isPlaced ? area.k * 16 : 0) + row.index + 1),
+      name:
+        row.label ??
+        (
+          (row.index >= POOLS.indexOf("aggregate") && row.channels.length === 1
+            ? POOLED_CHANNELS[row.channels[0] ?? 0]
+            : null) ?? POOLED_NAMES[row.pool]
+        )(),
       path: null,
       isContest: false,
       isCounted: false,
