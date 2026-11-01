@@ -291,7 +291,7 @@ def parse() -> None:
                 frame.select(
                     state=pl.lit(state),
                     day=pl.lit(day),
-                    office=pl.when(office.str.contains(r"^presiden"))
+                    office=pl.when(office.str.contains(r"^(u\.?\s?s\.?\s+)?presiden"))
                     .then(pl.lit("president"))
                     .when(
                         (office.str.contains(openelections.SENATE.pattern) | (office == "senate") & (state == "WI"))
