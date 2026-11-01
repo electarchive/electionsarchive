@@ -6626,6 +6626,13 @@ for key, publisher, title, url, local in (
         "ne/box_butte_primary.pdf",
     ),
     (
+        "NE-31013-box-butte",
+        "Alliance Times-Herald",
+        "2026 Primary Election Approaching Fast (candidate filings in Box Butte County, March 25, 2026)",
+        "https://alliancetimes.com/2026-primary-election-approaching-fast/",
+        "ne/box_butte_filings.html",
+    ),
+    (
         "NE-31029-chase",
         "Chase County Clerk",
         "Primary Election official results, May 12, 2026",
