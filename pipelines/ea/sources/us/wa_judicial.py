@@ -27,7 +27,7 @@ LIVE_POSITIONS = {
     date(2010, 11, 2): (1, 5, 6),
     date(2012, 11, 6): (2, 8, 9),
 }
-LEGACY_ELECTIONS = {date(2000, 11, 7): 20, date(2002, 11, 5): 4}
+LEGACY_ELECTIONS = {date(2000, 11, 7): 20, date(2002, 11, 5): 4, date(2004, 11, 2): 67, date(2006, 11, 7): 134}
 METHOD = (
     "County totals are from the Secretary of State's official results for the general election; "
     "each candidate's county sum equals the printed state total."
