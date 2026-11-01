@@ -1572,6 +1572,8 @@ DELIVERED = {
     "MI-26031": DATA / "inbox" / "y26" / "mi" / "cheboygan.pdf",
     "MI-26047": DATA / "inbox" / "y26" / "mi" / "emmet.pdf",
     "MI-26029": DATA / "inbox" / "y26" / "mi" / "charlevoix.pdf",
+    "MI-26157": DATA / "inbox" / "y26" / "mi" / "tuscola.pdf",
+    "MI-26015": DATA / "inbox" / "y26" / "mi" / "barry.pdf",
     "MI-26049": DATA / "inbox" / "y26" / "mi" / "genesee.pdf",
     "MI-26091": DATA / "inbox" / "y26" / "mi" / "lenawee.pdf",
     "MI-26163": DATA / "inbox" / "manual" / "MF-199" / "official-candidate-list_november-3-2026.pdf",
@@ -2053,6 +2055,36 @@ NE_SOURCES = {
         "Unofficial November 2026 General Election Candidate List (updated 9/1)",
         "https://www.monroecounty.gov/",
         "mi/monroe.pdf",
+    ),
+    "MI-26157": (
+        "Tuscola County Clerk",
+        "Official Candidate List, 11/03/2026 State General",
+        "https://www.tuscolacounty.org/elections/",
+        "mi/tuscola.pdf",
+    ),
+    "MI-26015": (
+        "Barry County Clerk",
+        "Unofficial Candidate List, 11/03/2026 State General (9/2/2026)",
+        "https://www.barrycounty.org/departments_and_officials/officials/county_clerk/elections.php",
+        "mi/barry.pdf",
+    ),
+    "MI-26121": (
+        "Muskegon County Clerk",
+        "Unofficial Candidate List, November 3, 2026 General Election (updated 10/31)",
+        "https://co.muskegon.mi.us/502/Election-Information",
+        "mi/muskegon.pdf",
+    ),
+    "MI-26115-v": (
+        "Monroe County Clerk",
+        "Official 2026 November Village and City of Luna Pier Candidates",
+        "https://co.monroe.mi.us/409/Elections",
+        "mi/monroe_villages.pdf",
+    ),
+    "MI-26115-s": (
+        "Monroe County Clerk",
+        "Official Monroe County School District Candidates, November 3, 2026",
+        "https://co.monroe.mi.us/409/Elections",
+        "mi/monroe_schools.pdf",
     ),
     "MI-26165": (
         "Wexford County Clerk",
@@ -6227,6 +6259,13 @@ for key, publisher, title, url, local in (
         "or/coos_cities.pdf",
     ),
     (
+        "UT-49035-magna",
+        "Magna Water District",
+        "Magna Water District Trustee Election, November 3, 2026",
+        "https://www.utah.gov/pmn/sitemap/notice/1105731.html",
+        "ut/magna_notice.html",
+    ),
+    (
         "NE-31079-hall",
         "Hall County Election Office",
         "Candidate Filings in the Hall County Election Office, 2026",
@@ -6258,13 +6297,6 @@ for key, publisher, title, url, local in (
         "NJ-34029-np",
         "Ocean County Clerk",
         "2026 General Election Official Non-Partisan Candidate Certification Sheet (updated 9-14-2026)",
-    (
-        "UT-49035-magna",
-        "Magna Water District",
-        "Magna Water District Trustee Election, November 3, 2026",
-        "https://www.utah.gov/pmn/sitemap/notice/1105731.html",
-        "ut/magna_notice.html",
-    ),
         "https://www.co.ocean.nj.us/WebContentFiles/d603176a-4d26-4c13-baa1-27433121818d.pdf",
         "nj/ocean_nonpartisan.pdf",
     ),
@@ -7324,7 +7356,7 @@ def parse() -> None:
         io.StringIO(raw.cached(SOURCE, FEEDS["NC"][0]).path.read_text(encoding="utf-8", errors="replace"))
     ):
         contest = re.sub(r"\s+", " ", row["contest_name"]).strip()
-        if re.match(r"(US|NC) |DISTRICT ATTORNEY", contest):
+        if re.match(r"(US|NC) |DISTRICT ATTORNEY", contest) or re.search(r"SOIL AND WATER|SANITARY", contest):
             continue
         key = (contest, row["party_contest"] or row["party_candidate"])
         if row["election_dt"] != "11/03/2026" and key in winners and row["name_on_ballot"].strip() not in winners[key]:
@@ -7501,7 +7533,7 @@ def parse() -> None:
                     frozenset(
                         "SPRINGS" if word == "SPR" else word for word in coverage_tables.tokens(name) - {"INDEPENDENT"}
                     )
-                ] = spelled.get(asks.lower(), 0)
+                ] = spelled.get(asks.lower()) or (int(asks) if asks.isdigit() else 0)
         for i, line in enumerate(printed):
             asks = re.search(r"(?i)\(?Vote ?for (?:up to )?(\w+)(?: candidates?)?\)?$", line.strip())
             if asks is None:
@@ -7712,10 +7744,14 @@ def parse() -> None:
 
     for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FEEDS["SC"][0]).path.read_text(encoding="utf-8-sig"))):
         title = row["Office"].strip()
-        if row["Status"] != "Active" or re.match(
-            r"(U\.S\.|State |Governor|Lieutenant|Secretary of State|Attorney General|Comptroller|Adjutant"
-            r"|Commissioner of Agriculture|Superintendent of Education|Solicitor|State Treasurer)",
-            title,
+        if (
+            row["Status"] != "Active"
+            or title == "Soil and Water District Commission"
+            or re.match(
+                r"(U\.S\.|State |Governor|Lieutenant|Secretary of State|Attorney General|Comptroller|Adjutant"
+                r"|Commissioner of Agriculture|Superintendent of Education|Solicitor|State Treasurer)",
+                title,
+            )
         ):
             continue
         counties = row["Associated Counties"].split(",")
@@ -8917,6 +8953,8 @@ def parse() -> None:
         ("MI-26031", "Cheboygan"),
         ("MI-26047", "Emmet"),
         ("MI-26029", "Charlevoix"),
+        ("MI-26157", "Tuscola"),
+        ("MI-26015", "Barry"),
     ):
         post, seats, unexpired = "", 0, False
         for line in text(key, "-layout").splitlines():
