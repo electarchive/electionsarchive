@@ -403,6 +403,8 @@ PROCEEDINGS = [
     {"tables": {n: f"1888:republican:b{n}" for n in (2, 3, 5, 7)}, "ordinal": "Ninth", "city": "Chicago", "days": (date(1888, 6, 19), date(1888, 6, 25)), "ballots": {1: date(1888, 6, 22), 2: date(1888, 6, 22), 3: date(1888, 6, 22), 4: date(1888, 6, 23), 5: date(1888, 6, 23), 6: date(1888, 6, 25), 7: date(1888, 6, 25), 8: date(1888, 6, 25)}, "deciding": 8},
     {"tables": {1: "1896:republican"}, "ordinal": "Eleventh", "city": "St. Louis", "days": (date(1896, 6, 16), date(1896, 6, 18)), "ballots": {1: date(1896, 6, 18)}, "deciding": 1, "caveat": "The table gives no votes held by each delegation, so none are stored. Its footnotes say the delegations of Colorado and Idaho had bolted the convention, Montana's other five votes were four blank and one for J. Donald Cameron, three of Nevada's delegates were absent, and one New York vote was passed; those votes are not in the table's columns and are not stored."},
     {"tables": {1: "1900:republican"}, "ordinal": "Twelfth", "city": "Philadelphia", "days": (date(1900, 6, 19), date(1900, 6, 21)), "ballots": {1: date(1900, 6, 21)}, "deciding": 1},
+    {"tables": {1: "1924:republican"}, "ordinal": "Eighteenth", "city": "Cleveland", "days": (date(1924, 6, 10), date(1924, 6, 12)), "ballots": {1: date(1924, 6, 12)}, "deciding": 1},
+    {"tables": {1: "1928:republican"}, "ordinal": "Nineteenth", "city": "Kansas City", "days": (date(1928, 6, 12), date(1928, 6, 15)), "ballots": {1: date(1928, 6, 14)}, "deciding": 1},
     {"tables": {1: "1968:republican:final"}, "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballots": {1: date(1968, 8, 7)}, "deciding": 1},
     {"tables": {1: "1972:republican"}, "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballots": {1: date(1972, 8, 22)}, "deciding": 1},
     {"tables": {1: "1976:republican"}, "ordinal": "Thirty-First", "city": "Kansas City", "days": (date(1976, 8, 16), date(1976, 8, 19)), "ballots": {1: date(1976, 8, 18)}, "deciding": 1},
@@ -438,6 +440,17 @@ CANDIDATES = {
     "Richardson": ("Elliot L. Richardson", "Q719808"),
     "Anderson": ("John B. Anderson", "Q936548"),
     "Bush": ("George Bush", "Q23505"),
+    "republican:Coolidge": ("Calvin Coolidge", "Q36023"),
+    "republican:La Follette": ("Robert M. La Follette", "Q878682"),
+    "republican:Johnson": ("Hiram W. Johnson", "Q143644"),
+    "republican:Hoover": ("Herbert Hoover", "Q35236"),
+    "republican:Lowden": ("Frank O. Lowden", "Q584973"),
+    "republican:Curtis": ("Charles Curtis", "Q271023"),
+    "republican:Watson": ("James E. Watson", "Q6133417"),
+    "republican:Norris": ("George W. Norris", "Q435947"),
+    "republican:Goff": ("Guy D. Goff", "Q1557460"),
+    "republican:Dawes": ("Charles G. Dawes", "Q184565"),
+    "republican:Hughes": ("Charles E. Hughes", "Q313252"),
     "Armstrong": ("Anne Armstrong", None),
     "Grant": ("Ulysses S. Grant", "Q34836"),
     "Blaine": ("James G. Blaine", "Q448778"),
@@ -1300,7 +1313,7 @@ def place(label: str) -> str | None:
 
 
 def number(cell: str) -> float:
-    text = cell.strip().replace(",", "")
+    text = re.sub(r"\\?t?ext(?:em|en)dash", "", cell).strip().replace(",", "")
     if re.fullmatch(r"[\dIl]+", text):
         text = text.replace("I", "1").replace("l", "1")
     fraction = FRACTION.search(text)
@@ -1578,7 +1591,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the 1868 to 1900 and 1968 to 1984 Republican, the 1856 to 1948 Democratic, and the 2016 and 2020 national conventions",
+            summary="The roll call of the states at the 1868 to 1900, 1924, 1928, and 1968 to 1984 Republican, the 1856 to 1948 Democratic, and the 2016 and 2020 national conventions",
             polity="US",
         )
 
