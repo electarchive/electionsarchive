@@ -1,7 +1,7 @@
 <script lang="ts">
   // eslint-disable-next-line no-restricted-imports
   import "../app.css";
-  import type { Snippet } from "svelte";
+  import type { Component, Snippet } from "svelte";
   import { onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { navigating, page } from "$app/state";
@@ -11,12 +11,8 @@
   import { ModeWatcher, setMode } from "mode-watcher";
   import { setContext } from "svelte";
   import { on } from "svelte/events";
-  import ConfirmationDialog from "#lib/components/confirmation-dialog.svelte";
-  import Explain from "#lib/components/explain.svelte";
   import Footer from "#lib/components/footer.svelte";
   import Header from "#lib/components/header.svelte";
-  import Provenance from "#lib/components/provenance.svelte";
-  import { Toaster } from "#lib/components/ui/sonner/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import embedStyles from "#lib/embed.css?url";
   import { palette } from "#lib/palette.svelte.js";
@@ -34,6 +30,22 @@
 
   setConfirmationContext(new ConfirmationStore());
   setContext("figures", new Set<string>());
+
+  let Overlays = $state<Component | null>(null);
+
+  $effect(() => {
+    const load = () => {
+      void import("#lib/components/overlays.svelte").then((module) => {
+        Overlays = module.default;
+      });
+    };
+    if ("requestIdleCallback" in window) {
+      const handle = requestIdleCallback(load, { timeout: 1500 });
+      return () => cancelIdleCallback(handle);
+    }
+    const handle = setTimeout(load, 300);
+    return () => clearTimeout(handle);
+  });
 
   const isPending = $derived(
     navigating.to != null && navigating.to.url.pathname !== page.url.pathname,
@@ -164,7 +176,6 @@
 <QueryClientProvider client={queryClient}>
   <SvelteQueryDevtools />
   <ModeWatcher modeStorageKey={embed == null ? undefined : "ea-embed-mode"} />
-  <Toaster />
   <Tooltip.Provider>
     {#if embed == null}
       <div class="grid grid-rows-[auto_1fr_auto] min-block-dvh">
@@ -199,7 +210,7 @@
     {/if}
   </Tooltip.Provider>
   <ProgressBar class="text-marker" displayThresholdMs={300} />
-  <ConfirmationDialog />
-  <Provenance />
-  <Explain />
+  {#if Overlays != null}
+    <Overlays />
+  {/if}
 </QueryClientProvider>

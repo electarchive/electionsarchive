@@ -2,7 +2,6 @@
   import { resolve } from "$app/paths";
   import { ArrowUpRightIcon } from "@lucide/svelte";
   import Monogram from "#lib/components/monogram.svelte";
-  import Shahmaran from "#lib/components/shahmaran.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -187,9 +186,10 @@
         rel="external"
         class="group flex items-center gap-2.5 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
       >
-        <Shahmaran
-          class="shrink-0 rotate-20 opacity-30 transition-[rotate,opacity] duration-700 inline-7 group-hover:rotate-[8deg] group-hover:opacity-70 group-focus-visible:rotate-[8deg] group-focus-visible:opacity-70 motion-reduce:transition-none"
-        />
+        <span
+          aria-hidden="true"
+          class="aspect-[277.9/301.2] shrink-0 rotate-20 bg-current mask-[url(/shahmaran.svg)] mask-contain mask-no-repeat opacity-30 transition-[rotate,opacity] duration-700 inline-7 group-hover:rotate-[8deg] group-hover:opacity-70 group-focus-visible:rotate-[8deg] group-focus-visible:opacity-70 motion-reduce:transition-none"
+        ></span>
         <span
           >{m.footer_credit()}
           <span
