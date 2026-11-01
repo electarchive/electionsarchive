@@ -712,7 +712,7 @@ def rows(state: str, url: str, path: Path, urls: dict[str, Path]):
                             "party": lookup["partyIds"].get(candidate["P"], {}).get("NM", "").removesuffix(" Party"),
                             "county": region[town],
                             "candidate": candidate["NM"].split(" and ")[0],
-                            "write_in": False,
+                            "write_in": lookup["partyIds"].get(candidate["P"], {}).get("NM") == "Write In",
                             "votes": int(tally["V"]),
                             "as_of": None,
                             "reporting": int(counted[1]),
