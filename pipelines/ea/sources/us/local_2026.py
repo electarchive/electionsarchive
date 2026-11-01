@@ -1412,15 +1412,30 @@ LOCAL_BODY = re.compile(
     r"|conservation|cemetery|\bparks?\b|airport|\bport\b|utility|levee|drainage|college|recreation"
     r"|public service|house of delegates|state senat|congress"
 )
+IN_TOWNSHIP_SPELLINGS = (
+    (r"\bst joe township\b", "st joseph township"),
+    (r"^(flat|haw|rock|sand|fall)(rock|creek)\b", r"\1 \2"),
+    (r"^stamperscreek\b", "stampers creek"),
+    (r"^vanburen\b", "van buren"),
+    (r"^greene township\b", "green township"),
+    (r"^(owen|clay)township\b", r"\1 township"),
+    (r"\btownshiptrustee\b", "township trustee"),
+    (r"^mayor of (attica|covington)$", r"\1 mayor"),
+)
 IN_ALIASES = (
     (r"^centerpoint town\b", "center point town", None),
     (r"^monroe city\b", "monroe city", "Monroe City"),
-    (r"^(zanesville town clerk treasurer) wells allen$", r"\1", None),
+    (r"^(zanesville town clerk treasurer) wells and allen$", r"\1", None),
     (r"^anderson school board\b", "anderson community school corporation school board", None),
     (r"^lewis cass school board\b", "lewis cass schools school board", None),
     (r"^msd of shakamak\b", "shakamak schools metropolitan school district school board", None),
-    (r"^northwestern school board\b", "northwestern school corporation school board", None),
+    (
+        r"^northwestern school board\b",
+        "northwestern school corporation school board",
+        "Northwestern School Corporation",
+    ),
     (r"^porter township school board\b", "porter township school corporation school board", None),
+    (r"^east porter school board\b", "east porter county school board", None),
     (r"^scott county school board\b", "scott county school district 1 school board", None),
     (r"^south spencer school board\b", "south spencer county school corporation school board", None),
     (r"^demotte town\b", "de motte town", None),
@@ -5548,13 +5563,6 @@ for key, publisher, title, url, local in (
         "fl/volusia_candidates.html",
     ),
     (
-        "OR-41059-umatilla",
-        "Umatilla County Elections",
-        "Contest and Candidate Listing for the November 3, 2026 General Election",
-        "https://www.umatillacounty.gov/departments/elections/general-election/contest-and-candidate-listing-for-the-november-3-2026-general-election",
-        "or/umatilla_candidates.html",
-    ),
-    (
         "TX-48187-schertz",
         "City of Schertz",
         "November 3, 2026 General Election: candidate information",
@@ -7165,12 +7173,29 @@ KY_BOARD_SEATS = {
     "Anchorage Independent Schools Board of Education": 3,
     "Campbellsville Independent School District Board of Education": 3,
 }
+NJ_SCHOOL_PINS = {
+    ("34023", "Monroe Twp Sch Dist"): "3410500",
+    ("34035", "Franklin Twp Sch Dist"): "3405490",
+    ("34041", "Franklin Twp Sch Dist"): "3405520",
+    ("34041", "Greenwich Twp Sch Dist"): "3406210",
+    ("34041", "Mansfield Twp Sch Dist"): "3409540",
+    ("34011", "Greenwich Twp Sch Dist"): "3406150",
+    ("34011", "Lawrence Twp Sch Dist"): "3408370",
+}
+NJ_EXTRA_SCHOOLS = (
+    ("34025", "3401140", "Avon Borough School District"),
+    ("34025", "3407650", "Interlaken Borough School District"),
+    ("34025", "3415150", "Lake Como Borough School District"),
+    ("34001", "3408671", "Longport Borough School District"),
+    ("34007", "3407080", "Hi-Nella Borough School District"),
+)
 KY_SHARED_CITIES = {
     "21093": "21123",
     "21121": "21235",
     "21161": "21023",
     "21187": "21077",
     "21211": "21103",
+    "05049": "05135 05065",
 }
 KY_CITY_SPELLINGS = {
     ("BOONE", "Erlanger"): "",
@@ -10194,6 +10219,7 @@ def parse() -> None:
                 [f"{DAY}:%", SOURCE],
             )
         } | {str(row["tail"]) for row in rows}
+        prior_taken = set(taken)
         state_used: set[str] = set()
         county_used: set[str] = set()
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
@@ -10219,7 +10245,6 @@ def parse() -> None:
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL', 'NE')"""
-        prior_taken = set(taken)
         ).fetchall():
             label = {
                 "Rowan County Sch": "Rowan-Salisbury Schools",
@@ -10280,6 +10305,8 @@ def parse() -> None:
                     if code_st == county_code[:2] and core and frozenset(theirs - generic) == core
                     for hit in found
                 ]
+            if pin := NJ_SCHOOL_PINS.get((county_code, label)):
+                hits = [hit for found in index.values() for hit in found if hit[0] == pin]
             alike = [hit for hit in hits if coverage_tables.tokens(hit[1]) == mine]
             if len(alike or hits) == 1:
                 code, district = (alike or hits)[0]
@@ -10292,6 +10319,16 @@ def parse() -> None:
                         "school",
                     )
                 )
+        for county_code, code, district in NJ_EXTRA_SCHOOLS:
+            unowned["NJ"].append(
+                (
+                    county_code,
+                    district,
+                    f"school:{code}",
+                    owned.get(f"school:{code}") or f"us/nj/{slug(district)}",
+                    "school",
+                )
+            )
         with zipfile.ZipFile(raw.fetch(SOURCE, GAZETTEER, suffix=".zip").path) as archive:
             gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).rename(
                 lambda column: column.strip()
@@ -10396,6 +10433,9 @@ def parse() -> None:
                             code
                             for name, code in sorted(counties.items(), key=lambda item: -len(item[0]))
                             if name in inside
+                            or state == "IN"
+                            and re.search(r"(?i)township (trustee|board member), ", str(row["contest"]))
+                            and inside.endswith(name.removesuffix("COUNTY"))
                         ),
                         "",
                     )
@@ -10488,6 +10528,8 @@ def parse() -> None:
                                         "sch",
                                         "dist",
                                         "pub",
+                                        "schs",
+                                        "sd",
                                     )
                                     if kind == "school"
                                     else ("township", "borough", "city", "town", "village", "charter")
@@ -10536,6 +10578,8 @@ def parse() -> None:
                         ]
             for row in found:
                 template, tail = tails.get((str(row["fips"]), str(row["contest"])), (None, None))
+                if state == "IN" and str(row["contest"]).startswith("East Porter School Board"):
+                    template = tail = None
                 if (
                     state == "NY"
                     and tail is not None
@@ -10634,6 +10678,14 @@ def parse() -> None:
                         ),
                     )
                 ]
+                if state == "CA":
+                    tokens = re.sub(
+                        r"\b(?:(\d)(?:st|nd|rd|th)|(first|second|third|fourth|fifth|sixth|seventh)) district\b",
+                        lambda hit: (
+                            f"district {hit[1] or ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'].index(hit[2])}"
+                        ),
+                        " ".join(tokens),
+                    ).split()
                 if state == "NY":
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
@@ -10678,14 +10730,6 @@ def parse() -> None:
                             if m[0].startswith("solomonville")
                             else "western arizona vocational district kingman region"
                             if m[0].startswith("w a v e")
-                if state == "CA":
-                    tokens = re.sub(
-                        r"\b(?:(\d)(?:st|nd|rd|th)|(first|second|third|fourth|fifth|sixth|seventh)) district\b",
-                        lambda hit: (
-                            f"district {hit[1] or ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'].index(hit[2])}"
-                        ),
-                        " ".join(tokens),
-                    ).split()
                             else f"northern arizona vocational institute of technology {m[1]}"
                         ),
                         " ".join(tokens),
@@ -10725,7 +10769,6 @@ def parse() -> None:
                         (r"^hanover park regional\b", "hanover park high"),
                         (r"^west morris regional\b", "west morris high"),
                         (r"^manchester regional high school\b", "passaic manchester regional high school"),
-                        (r"^bridgewater raritan raritan\b", "bridgewater raritan"),
                         (r"^becton regional\b", "carlstadt east rutherford regional"),
                         (r"^ramapo indian hills regional high school\b", "ramapo indian hill regional"),
                         (
@@ -10755,6 +10798,18 @@ def parse() -> None:
                         "eastern hancock county school board",
                         re.sub(r"^charles a beard memorial", "c a beard memorial", tokens),
                     )
+                    for pattern, repl in IN_TOWNSHIP_SPELLINGS:
+                        tokens = re.sub(pattern, repl, tokens)
+                    if not row["county"] and (
+                        county_name := re.sub(
+                            r"[^a-z0-9]+", " ", places.get(str(row["fips"]), "").rsplit(",", 1)[0].lower()
+                        )
+                        .replace(" county", "")
+                        .strip()
+                    ):
+                        tokens = re.sub(rf" {county_name}$", "", tokens)
+                    if row["county"] == "Hamilton":
+                        tokens = re.sub(r"^washington township\b", "westfield washington township", tokens)
                     in_pin = None
                     for pattern, repl, alias_pin in IN_ALIASES:
                         if re.search(pattern, tokens):
@@ -10790,7 +10845,12 @@ def parse() -> None:
                         (variant, *rest)
                         for full, *rest in [
                             *towns.get(str(row["fips"]), []),
-                            *(towns.get(KY_SHARED_CITIES.get(str(row["fips"]), ""), []) if state == "KY" else []),
+                            *(
+                                town
+                                for shared in KY_SHARED_CITIES.get(str(row["fips"]), "").split()
+                                for town in towns.get(shared, [])
+                                if state in ("KY", "AR")
+                            ),
                         ]
                         for variant in ([full, [word for word in full if word != "and"]] if "and" in full else [full])
                         + (
@@ -10864,13 +10924,14 @@ def parse() -> None:
                                     sort
                                     and said != sort
                                     and ((said, sort) != ("town", "township") or state == "IN")
-                                    and (state not in ("KY", "OR") or (said, sort) != ("city", "village"))
+                                    and (state not in ("KY", "OR", "AR") or (said, sort) != ("city", "village"))
                                     or not sort
                                     and (said == "township" or state == "NY" and said == "town")
                                 )
                                 or (
                                     sort == "school"
-                                    or state in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN", "IL", "NE")
+                                    or state
+                                    in ("MI", "CA", "NJ", "TX", "UT", "AZ", "MD", "VA", "RI", "NC", "IN", "IL", "NE")
                                 )
                                 and (sort == "school")
                                 != bool(re.search(r"\b(school|schools|sch|education)\b", " ".join(rest)))
@@ -10913,6 +10974,10 @@ def parse() -> None:
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
                     fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    fits = [fit for fit in fits if ("elementary" in fit[3].lower()) == ("elementary" in tokens)] or fits
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    fits = [fit for fit in fits if fit[4] in own_owners.get(str(row["fips"]), ())] or fits
                 if (
                     state == "NJ"
                     and row.get("tail") is None
@@ -10959,6 +11024,8 @@ def parse() -> None:
                                 role
                                 for pattern, role in (
                                     (r"^(?:town |city )?clerk treasurer$", "clerk-treasurer"),
+                                    (r"^(?:town |city )?recorder treasurer$", "recorder-treasurer"),
+                                    (r"^(?:town |city )?clerk recorder$", "clerk-recorder"),
                                     (
                                         (
                                             r"^(?:township |village |city |town )?(supervisor|clerk|treasurer|moderator|administrator)$"
@@ -10976,22 +11043,29 @@ def parse() -> None:
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
                                     (r"\bcommittee\b", "committee"),
                                     (r"\bdirectors?\b", "board-of-directors"),
-                if state == "CA" and len({fit[4] for fit in fits}) > 1:
-                    fits = [fit for fit in fits if ("elementary" in fit[3].lower()) == ("elementary" in tokens)] or fits
-                if state == "CA" and len({fit[4] for fit in fits}) > 1:
-                    fits = [fit for fit in fits if fit[4] in own_owners.get(str(row["fips"]), ())] or fits
                                     (
                                         r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmembers?\b|\bcouncilpersons?\b|\balderm[ae]n\b",
                                         "council",
                                     ),
                                     (r"\bcommission(?:er|ers)?\b", "commission"),
-                                    *(((r"^trustee$", "trustee"), (r"^board$", "township-board")) if state == "IN" else ()),
+                                    *(
+                                        ((r"^trustee$", "trustee"), (r"^board$", "township-board"))
+                                        if state == "IN"
+                                        else ()
+                                    ),
                                     (r"\btrustees?\b", "board-of-trustees"),
-                                    *(((r"^board$", "board"),) if state in ("IN", "NE") else ()),
+                                    *(((r"^board$", "board"),) if state == "NE" else ()),
                                 )
                                 if re.search(pattern, post)
                                 and (
-                                    role in ("office", "president", "clerk-treasurer")
+                                    role
+                                    in (
+                                        "office",
+                                        "president",
+                                        "clerk-treasurer",
+                                        "recorder-treasurer",
+                                        "clerk-recorder",
+                                    )
                                     or not re.search(r"president|clerk|tax|collector|fire|library", post)
                                 )
                             ),
@@ -11007,84 +11081,88 @@ def parse() -> None:
                     )
                     me_seated = state == "ME" and role in ("committee", "board-of-education")
                     seat = (
-                        post.partition("director")[2].strip().title()
-                        if role == "casco-bay-lines-director"
-                        else ""
-                        if role == "water-district-trustee"
-                        else None
-                    ) or (
-                        f"At-Large Wards {pair[1]} and {pair[2]}"
-                        if state == "OR"
-                        and role == "council"
-                        and (pair := re.search(r"\bwards? (\d+) and (\d+) at large\b", post))
-                        else f"At-Large {numbered[1]}"
-                        if state == "OR"
-                        and role == "council"
-                        and (numbered := re.search(r"\bat large (\d+)\b", post))
-                        else None
-                    ) or (
                         (
-                            f"Ward {(ward[1] or ward[2] or ward[3] or ward[5] or ward[6]).upper()}"
-                            + (
-                                f" Position {pos[1]}"
-                                if state in ("AR", "NV") and (pos := re.search(r"\bposition (\d+)\b", post))
-                                else ""
-                            )
-                            if ward[4] is None
-                            else f"{ward[4].title()} Ward"
+                            post.partition("director")[2].strip().title()
+                            if role == "casco-bay-lines-director"
+                            else ""
+                            if role == "water-district-trustee"
+                            else None
                         )
-                        if ward
-                        and (
-                            me_seated
-                            or role in ("council", "commission", "board-of-directors")
-                            or state == "NE"
+                        or (
+                            f"At-Large Wards {pair[1]} and {pair[2]}"
+                            if state == "OR"
+                            and role == "council"
+                            and (pair := re.search(r"\bwards? (\d+) and (\d+) at large\b", post))
+                            else f"At-Large {numbered[1]}"
+                            if state == "OR"
+                            and role == "council"
+                            and (numbered := re.search(r"\bat large (\d+)\b", post))
+                            else None
+                        )
+                        or (
+                            (
+                                f"Ward {(ward[1] or ward[2] or ward[3] or ward[5] or ward[6]).upper()}"
+                                + (
+                                    f" Position {pos[1]}"
+                                    if state in ("AR", "NV") and (pos := re.search(r"\bposition (\d+)\b", post))
+                                    else ""
+                                )
+                                if ward[4] is None
+                                else f"{ward[4].title()} Ward"
+                            )
+                            if ward
+                            and (
+                                me_seated
+                                or role in ("council", "commission", "board-of-directors")
+                                or state == "NE"
+                                and role == "board-of-education"
+                            )
+                            else f"{other[1].title()} {other[2].upper()}"
+                            if (
+                                other := re.search(
+                                    r"\b(seat|district|group|place|zone|position) (\d+|[a-f](?= |$))"
+                                    if state == "CA"
+                                    else r"\b(seat|district|group|place|zone|position) (\d+)\b",
+                                    post,
+                                )
+                            )
+                            and (me_seated or role in ("council", "commission", "board-of-directors"))
+                            else "At-Large"
+                            if (me_seated or role in ("council", "commission", "board-of-directors"))
+                            and re.search(r"\bat large\b", post)
+                            else f"{slot[1].title()} {slot[2]}"
+                            if state == "TX"
                             and role == "board-of-education"
-                        )
-                        else f"{other[1].title()} {other[2].upper()}"
-                        if (
-                            other := re.search(
-                                r"\b(seat|district|group|place|zone|position) (\d+|[a-f](?= |$))"
-                                if state == "CA"
-                                else r"\b(seat|district|group|place|zone|position) (\d+)\b",
-                                post,
+                            and (slot := re.search(r"\b(place|position|district) (\d+)\b", post))
+                            else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
+                            if state in ("CA", "UT", "MD", "IN", "NC")
+                            and (
+                                area := re.search(
+                                    r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
+                                )
                             )
-                        )
-                        and (me_seated or role in ("council", "commission", "board-of-directors"))
-                        else "At-Large"
-                        if (me_seated or role in ("council", "commission", "board-of-directors"))
-                        and re.search(r"\bat large\b", post)
-                        else f"{slot[1].title()} {slot[2]}"
-                        if state == "TX"
-                        and role == "board-of-education"
-                        and (slot := re.search(r"\b(place|position|district) (\d+)\b", post))
-                        else f"{area[1].replace('area', 'trustee area').title()} {area[2].upper()}"
-                        if state in ("CA", "UT", "MD", "IN", "NC")
-                        and (
-                            area := re.search(
-                                r"\b(area|district|seat)(?: no)? 0*(\d+|(?<=area )[a-z](?= |$)|[a-g](?= |$))", post
+                            else " ".join(rest[rest.index("board") + 1 :]).title()
+                            if state == "IN" and role == "board-of-education" and "board" in rest
+                            else nj_area
+                            if state == "NJ"
+                            and role == "board-of-education"
+                            and nj_multi
+                            and "education" in rest
+                            and (
+                                nj_area := " ".join(
+                                    word
+                                    for word in rest[rest.index("education") + 1 :]
+                                    if word not in ("unexpired", "term", "partial", "full")
+                                )
+                                .removeprefix("district ")
+                                .title()
                             )
+                            else chair[1].title()
+                            if state == "IL"
+                            and role == "board-of-education"
+                            and (chair := re.search(r"\b(president|subdistrict \w+)\b", post))
+                            else ""
                         )
-                        else " ".join(rest[rest.index("board") + 1 :]).title()
-                        if state == "IN" and role == "board-of-education" and "board" in rest
-                        else nj_area
-                        if state == "NJ"
-                        and role == "board-of-education"
-                        and nj_multi
-                        and "education" in rest
-                        and (
-                            nj_area := " ".join(
-                                word
-                                for word in rest[rest.index("education") + 1 :]
-                                if word not in ("unexpired", "term", "partial", "full")
-                            )
-                            .removeprefix("district ")
-                            .title()
-                        )
-                        else chair[1].title()
-                        if state == "IL"
-                        and role == "board-of-education"
-                        and (chair := re.search(r"\b(president|subdistrict \w+)\b", post))
-                        else ""
                     )
                     if (
                         state == "MI"
@@ -11099,6 +11177,15 @@ def parse() -> None:
                         )
                     ):
                         seat = f"{term[2]} Year Term"
+                    if (
+                        state == "NJ"
+                        and role == "board-of-education"
+                        and not seat
+                        and "board" in rest
+                        and "regional" in rest[: rest.index("board")]
+                        and "regional" not in label.lower()
+                    ):
+                        seat = " ".join(rest[: rest.index("board")]).title()
                     if role is not None:
                         code = owner.split(":", 1)[1]
                         template, tail = "", f"{state}:{code}:{role}" + (f":{slug(seat)}" if seat else "")
@@ -11117,6 +11204,8 @@ def parse() -> None:
                                 "supervisor": "Supervisor",
                                 "clerk": "Clerk",
                                 "clerk-treasurer": "Clerk-Treasurer",
+                                "recorder-treasurer": "Recorder-Treasurer",
+                                "clerk-recorder": "Clerk-Recorder",
                                 "moderator": "Moderator",
                                 "administrator": "Administrator",
                                 "collector": "Tax Collector",
@@ -11224,10 +11313,52 @@ def parse() -> None:
                         continue
                     minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
                 if (
+                    state == "IN"
+                    and tail is not None
+                    and tail not in minted
+                    and ":board-of-education:" in tail
+                    and used.get(tail, row["contest"]) != row["contest"]
+                    and (extra := re.sub(r"(?i)^.*?\bschool board\b,?\s*", "", str(row["contest"])))
+                    and (
+                        corp := next(
+                            (
+                                town
+                                for pool in towns.values()
+                                for town in pool
+                                if town[1] == "school" and town[3].split(":", 1)[1] == tail.split(":")[1]
+                            ),
+                            None,
+                        )
+                    )
+                ):
+                    tail = f"{tail}:{slug(extra)}"
+                    template = ""
+                    minted[tail] = (f"Board of Education, {extra}", corp[2], corp[3], corp[4])
+                    pinned.add(tail)
+                if (
+                    state == "IN"
+                    and tail is not None
+                    and ":board-of-education:" in tail
+                    and used.get(tail, row["contest"]) != row["contest"]
+                    and tail in minted
+                    and (extra := re.sub(r"(?i)^.*?\bschool board\b,?\s*", "", str(row["contest"])))
+                ):
+                    tail = f"{tail}:{slug(extra)}"
+                    minted[tail] = (
+                        f"{minted[tail.rsplit(':', 1)[0]][0]}, {extra}",
+                        *minted[tail.rsplit(":", 1)[0]][1:],
+                    )
+                    pinned.add(tail)
+                if (
                     template is None
                     or tail is None
                     or tail in taken
                     and not (state == "IN" and tail in state_used and tail not in county_used)
+                    and not (
+                        state == "CA"
+                        and tail not in prior_taken
+                        and re.search(r"(?i)school|unified|education", str(row["contest"]))
+                    )
                     or used.setdefault(tail, str(row["contest"])) != row["contest"]
                 ):
                     missed.add(f"{row['county']}: {row['contest']}")
@@ -11354,11 +11485,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             summary=f"{state}: local contests on the 2026-11-03 ballot, with candidates from official candidate lists and sample ballots: statewide candidate files (North Carolina), each contest matched to the same office's last contest in the archive; Los Angeles city runoffs, Cook County offices, Harris and Dallas county offices, and Miami-Dade runoffs, the San Diego and Orange county supervisor races, Maricopa County's clerk, justices of the peace, and constables, and the New York City Council District 3 special",
             polity="US",
         )
-                    and not (
-                        state == "CA"
-                        and tail not in prior_taken
-                        and re.search(r"(?i)school|unified|education", str(row["contest"]))
-                    )
         cs.manifest["scope"] = {"polity": "US", "state": state}
 
         def name(entity: object, text: str) -> None:
@@ -11870,6 +11996,17 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             except ValueError:
                 key = f"{key}:reissued"
                 contest = cs.key("us.contest", key)
+            holder = conn.execute(
+                "select entity_id from slug where path = %s",
+                [re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else "")],
+            ).fetchone()
+            if holder is not None and holder[0] != contest:
+                cs.minted.discard(contest)
+                cs.rows["external_id"] = [
+                    row for row in cs.rows["external_id"] if row["entity_id"] != contest
+                ]
+                counts["held slug"] = counts.get("held slug", 0) + 1
+                continue
             if area is not None:
                 if area not in at_large:
                     at_large[area] = conn.execute(
@@ -11996,17 +12133,6 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     id=candidacy,
                     person_id=person,
                     option_id=option,
-            holder = conn.execute(
-                "select entity_id from slug where path = %s",
-                [re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else "")],
-            ).fetchone()
-            if holder is not None and holder[0] != contest:
-                cs.minted.discard(contest)
-                cs.rows["external_id"] = [
-                    row for row in cs.rows["external_id"] if row["entity_id"] != contest
-                ]
-                counts["held slug"] = counts.get("held slug", 0) + 1
-                continue
                     role="head",
                     ballot_name=row["name"],
                     is_independent=bool(row["independent"]),
