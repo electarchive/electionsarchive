@@ -1077,6 +1077,7 @@ def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
             "party": pl.String,
             "group": pl.Int64,
             "printed": pl.Int64,
+            "county": pl.String,
         },
     )
     parts = []
@@ -1101,6 +1102,7 @@ def page_lines(raw_lines: pl.DataFrame) -> pl.DataFrame:
                 tail=pl.lit(None, dtype=pl.String),
                 party=pl.lit(row["party"], dtype=pl.String),
             ).with_columns(
+                county=pl.lit(row["county"] or beside["county"][0]),
                 office=pl.lit(row["office"] or beside["office"][0]),
                 district=pl.lit(row["district"] if row["office"] else beside["district"][0], dtype=pl.String),
                 group=pl.lit(row["group"] if row["group"] is not None else beside["group"][0], dtype=pl.Int64),
@@ -1452,6 +1454,12 @@ def emit() -> Path:
                 external, contest = candidates[0]
             if (
                 minted is None
+                and not any(
+                    alias["action"] == "redo"
+                    and (alias["year"], alias["county"], alias["office"], alias["side"])
+                    == (str(year), str(county), str(office), str(side or ""))
+                    for alias in aliases()
+                )
                 and conn.execute(
                     """select 1 from result_set rs join changeset c on c.id = rs.changeset_id
                    where rs.contest_id = %s and rs.is_default and rs.status = 'active'""",
@@ -1649,7 +1657,8 @@ def emit() -> Path:
                 }
                 report.setdefault("differs from the compilation", []).append(f"{tag} {external} {gap}")
             result_set = cs.key(f"{SOURCE}.result_set", external)
-            if default is not None:
+            replaced_in_place = default is not None and str(default) == str(result_set)
+            if default is not None and not replaced_in_place:
                 old = dict(
                     zip(
                         COLUMNS,
@@ -1660,7 +1669,7 @@ def emit() -> Path:
                     )
                 )
             source, artifact_id, path, sha = sources[int(year)]
-            if default is not None:
+            if default is not None and not replaced_in_place:
                 cs.add("result_set", **old, status="superseded", is_default=False)
             cs.add(
                 "result_set",
@@ -1671,7 +1680,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                supersedes_id=default,
+                supersedes_id=None if replaced_in_place else default,
                 is_default=True,
                 completeness=1,
             )
