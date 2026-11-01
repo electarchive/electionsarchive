@@ -1429,8 +1429,9 @@ IN_ALIASES = (
     (r"^anderson school board\b", "anderson community school corporation school board", None),
     (r"^lewis cass school board\b", "lewis cass schools school board", None),
     (r"^msd of shakamak\b", "shakamak schools metropolitan school district school board", None),
-    (r"^northwestern school board\b", "northwestern school corporation school board", None),
+    (r"^northwestern school board\b", "northwestern school corporation school board", "Northwestern School Corporation"),
     (r"^porter township school board\b", "porter township school corporation school board", None),
+    (r"^east porter school board\b", "east porter county school board", None),
     (r"^scott county school board\b", "scott county school district 1 school board", None),
     (r"^south spencer school board\b", "south spencer county school corporation school board", None),
     (r"^demotte town\b", "de motte town", None),
@@ -10553,6 +10554,8 @@ def parse() -> None:
                         ]
             for row in found:
                 template, tail = tails.get((str(row["fips"]), str(row["contest"])), (None, None))
+                if state == "IN" and str(row["contest"]).startswith("East Porter School Board"):
+                    template = tail = None
                 if (
                     state == "NY"
                     and tail is not None
@@ -11257,6 +11260,29 @@ def parse() -> None:
                         missed.add(f"{row['county']}: {row['contest']} unexpired")
                         continue
                     minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
+                if (
+                    state == "IN"
+                    and tail is not None
+                    and tail not in minted
+                    and ":board-of-education:" in tail
+                    and used.get(tail, row["contest"]) != row["contest"]
+                    and (extra := re.sub(r"(?i)^.*?\bschool board\b,?\s*", "", str(row["contest"])))
+                    and (
+                        corp := next(
+                            (
+                                town
+                                for pool in towns.values()
+                                for town in pool
+                                if town[1] == "school" and town[3].split(":", 1)[1] == tail.split(":")[1]
+                            ),
+                            None,
+                        )
+                    )
+                ):
+                    tail = f"{tail}:{slug(extra)}"
+                    template = ""
+                    minted[tail] = (f"Board of Education, {extra}", corp[2], corp[3], corp[4])
+                    pinned.add(tail)
                 if (
                     state == "IN"
                     and tail is not None
