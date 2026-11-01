@@ -9856,9 +9856,12 @@ def parse() -> None:
             if row["key"] == "NY"
             else row["key"] + "-s"
             if row["key"] + "-s" in NE_SOURCES and "Board of Education" in row["contest"]
+            else "RI"
+            if row["key"] == "RI-summary"
             else row["key"]
         ].append(
             {
+                **({"feed": row["key"]} if row["key"] == "RI-summary" else {}),
                 "county": row.get("county") or row["contest"].split(" County")[0],
                 "contest": row["contest"],
                 "seats": int(row.get("seats") or 1),
