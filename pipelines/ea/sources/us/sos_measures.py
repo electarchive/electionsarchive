@@ -52,7 +52,7 @@ NCSL_COLUMNS = (
     "IRStatusDefinition",
 )
 TX = "https://elections.sos.state.tx.us/"
-TX_ELECTIONS = (85, 95, 103, 117, 132, 133, 147, 158)
+TX_ELECTIONS = (29, 25, 67, 68, 74, 85, 95, 103, 117, 132, 133, 147, 158)
 CA = "https://elections.cdn.sos.ca.gov/sov/"
 CA_1998 = {
     (date(1998, 6, 2), "219"): ("Ballot Measures. Application.", "Legislative Referendum"),
@@ -2905,7 +2905,9 @@ def texas() -> list[dict[str, object]]:
                         "state": "TX",
                         "day": day,
                         "number": match[1],
-                        "label": match[2].strip(),
+                        "label": match[2].strip() if day.year > 2000 else f"Proposition {match[1]}",
+                        "title": None if day.year > 2000 else match[2].strip(),
+                        "kind": None if day.year > 2000 else "Legislative Referendum",
                         "url": url,
                         "county": row[0],
                         "answer": answer,
