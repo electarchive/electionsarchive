@@ -23,6 +23,7 @@ export function basemap(
   scheme: string,
   isDetailed: boolean,
   outline: Array<Array<[number, number]>> | null,
+  isBoxed = false,
 ) {
   engine.drop("basemap");
   if (outline == null || !SCHEMES.has(scheme)) {
@@ -58,6 +59,12 @@ export function basemap(
     engine.add(
       {
         ...spec,
+        ...(isBoxed && {
+          filter:
+            "filter" in spec && spec.filter != null
+              ? ["all", ["!", ["has", "inset"]], spec.filter]
+              : ["!", ["has", "inset"]],
+        }),
         id: `basemap:${id}`,
         source:
           "source-layer" in spec &&

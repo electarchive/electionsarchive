@@ -162,6 +162,8 @@ def settle(geom: BaseGeometry, layer: str, props: dict, zooms: tuple[int, int], 
         geom = make_valid(geom).intersection(land)
     if geom.is_empty or geom.geom_type == "GeometryCollection":
         return None
+    if zone is not zones[-1]:
+        props = props | {"inset": 1}
 
     def place(p):
         px, py = project.transform(p[0], p[1])

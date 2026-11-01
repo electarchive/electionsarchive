@@ -105,7 +105,11 @@
       code?: string;
       group: "territory" | "overseas" | "abroad";
     }> | null;
-    parted?: { isOnly: boolean; ks: Array<number> } | null;
+    parted?: {
+      isOnly: boolean;
+      ks: Array<number>;
+      inset: { scheme: string; day: string; ks: Array<number> } | null;
+    } | null;
     approximate: Array<number>;
     noun: string;
     votes: string;
@@ -266,7 +270,7 @@
       return {
         top: edge + (up == null ? 0 : 20),
         right: edge + 36,
-        bottom: Math.max(edge, stripHeight + 16),
+        bottom: Math.max(edge, stripHeight + 16, band),
         left: edge,
       };
     },
@@ -827,9 +831,102 @@
       return entries.length === 0 ? [] : [{ group, entries }];
     }),
   );
+  const wanted = $derived(
+    parted?.inset == null ? null : JSON.stringify(parted.inset),
+  );
+  let insets = $state<
+    Awaited<ReturnType<typeof orpc.maps.insets.call>> | "failed"
+  >([]);
+  const boxed = $derived(
+    insets === "failed" || isSummary ? [] : (parted?.inset?.ks ?? []),
+  );
+  const kept = $derived.by(() => {
+    const apart = new Set((outlying ?? []).map((entry) => entry.k));
+    const due = new Set(
+      (blank ?? []).filter((entry) => !entry.isOutside).map((entry) => entry.k),
+    );
+    return new Set(
+      boxed.filter((k) => !apart.has(k) && (rows.has(k) || due.has(k))),
+    );
+  });
+  const isBoxed = $derived(kept.size > 0);
+  const stature = $derived(Math.min(96, Math.max(44, boxHeight * 0.17)));
+  const band = $derived(
+    isBoxed
+      ? stature + 32 + (narrow && segments.length > 0 ? stripHeight + 6 : 0)
+      : 0,
+  );
+  const panes = $derived.by(() => {
+    if (!isBoxed || insets === "failed") {
+      return [];
+    }
+    const shaped = insets.flatMap((box) => {
+      const units = box.units.filter((piece) => kept.has(piece.k));
+      if (units.length === 0) {
+        return [];
+      }
+      const pad = Math.max(box.width, box.height) * 0.05;
+      const width = box.width + pad * 2;
+      const height = box.height + pad * 2;
+      return [
+        {
+          ...box,
+          units,
+          view: `${box.x - pad} ${box.y - pad} ${width} ${height}`,
+          ratio: width / height,
+        },
+      ];
+    });
+    let total = 0;
+    for (const box of shaped) {
+      total += stature * box.ratio + 6;
+    }
+    const tallest = stature * Math.min(1, (boxWidth * 0.55) / total);
+    return shaped.map((box) => ({
+      ...box,
+      inline: tallest * box.ratio,
+      block: tallest,
+    }));
+  });
+  const hues = $derived(
+    panes.length === 0
+      ? new Map<number, string>()
+      : new Map(fills((css) => css)),
+  );
+  const tour = $derived(
+    panes.flatMap((box) =>
+      box.units.filter((piece) => rows.has(piece.k)).map((piece) => piece.k),
+    ),
+  );
+
+  $effect(() => {
+    void wanted;
+    const ask = untrack(() => parted?.inset);
+    if (ask == null) {
+      insets = [];
+      return;
+    }
+    let isCurrent = true;
+    void orpc.maps.insets.call(ask).then(
+      (found) => {
+        if (isCurrent) {
+          insets = found;
+        }
+      },
+      () => {
+        if (isCurrent) {
+          insets = "failed";
+        }
+      },
+    );
+    return () => {
+      isCurrent = false;
+    };
+  });
   const away = $derived(
     new Set([
       ...(outlying ?? []).map((entry) => entry.k),
+      ...boxed,
       ...places.rows
         .filter(
           (row) =>
@@ -852,6 +949,7 @@
               .filter((entry) => entry.isOutside)
               .map((entry) => entry.k),
             ...(outlying ?? []).map((entry) => entry.k),
+            ...boxed,
           ],
         ],
       ],
@@ -1011,7 +1109,10 @@
       Math.log(Math.tan(Math.PI / 4 + (latitude * Math.PI) / 360));
     const wide = ((frame.east - frame.west) * Math.PI) / 180;
     const tall = y(frame.north) - y(frame.south);
-    return Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04));
+    return (
+      Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04)) *
+      (isBoxed ? 0.84 : 1)
+    );
   });
   let isKeyed = $state(false);
   const leads = $derived.by(() => {
@@ -1160,6 +1261,10 @@
   const isDeclared = $derived(places.rows.every((row) => row.valid === 0));
   let isShaded = $state(false);
   const current = $derived(focus == null ? null : (rows.get(focus) ?? null));
+  const isSheet = $derived(
+    (pinned != null && current != null) ||
+      (nearPinned && beside != null && pinned == null),
+  );
   const moved = $derived(
     focus == null || !isCompared ? null : (changes.get(focus) ?? null),
   );
@@ -1814,7 +1919,8 @@
     const shown = isSummary ? null : outline;
     const isDetailed = isBasemap;
     const polity = scheme;
-    untrack(() => basemap(engine, polity, isDetailed, shown));
+    const isHidden = isBoxed;
+    untrack(() => basemap(engine, polity, isDetailed, shown, isHidden));
   });
 
   $effect(() => {
@@ -2454,8 +2560,17 @@
         class={cn(
           "pointer-events-none absolute inset-x-0 z-40 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit",
           {
-            "inset-be-3": remote.length === 0,
-            "inset-be-11 pointer-coarse:inset-be-14": remote.length > 0,
+            "inset-be-3": remote.length === 0 && !isSheet,
+            "inset-be-11 pointer-coarse:inset-be-14":
+              remote.length > 0 && !isSheet,
+          },
+          {
+            "sm:inset-be-3 max-sm:inset-bs-3": remote.length === 0 && isSheet,
+            "sm:inset-be-11 pointer-coarse:sm:inset-be-14 max-sm:inset-bs-3":
+              remote.length > 0 && isSheet,
+            "max-sm:hidden": isSheet && opening != null,
+            "max-sm:inset-bs-3 max-sm:inset-be-auto":
+              panes.length > 0 && !isSheet,
           },
         )}
         role="status"
@@ -2526,6 +2641,156 @@
         </button>
       {/if}
     </div>
+    {#if panes.length > 0}
+      <div
+        class="pointer-events-none absolute inset-s-2 inset-be-2 flex items-end gap-1.5"
+        style:inset-block-end={narrow && segments.length > 0
+          ? `${stripHeight + 14}px`
+          : undefined}
+        data-insets
+        transition:fade={{ duration: calm ? 0 : 150 }}
+      >
+        {#each panes as box (box.name)}
+          <div
+            class="pointer-events-auto grid overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border"
+            role="group"
+            aria-label={box.name}
+            onpointerleave={() => {
+              pointer = null;
+              if (pinned == null) {
+                focus = null;
+              }
+            }}
+          >
+            <span
+              class="truncate px-1.5 pbs-1 text-[0.625rem] leading-none font-semibold text-muted-foreground max-inline-(--inline)"
+              style:--inline="{box.inline}px">{box.name}</span
+            >
+            <svg
+              class="block"
+              viewBox={box.view}
+              style:inline-size="{box.inline}px"
+              style:block-size="{box.block}px"
+              aria-hidden={tour.length === 0}
+            >
+              {#each box.units as piece (piece.k)}
+                {const row = $derived(rows.get(piece.k))}
+                {const fill = $derived(
+                  hues.get(piece.k) ??
+                    "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
+                )}
+                {#if row == null}
+                  <path
+                    d={piece.d}
+                    {fill}
+                    stroke="color-mix(in oklab, var(--muted-foreground) 34%, var(--card))"
+                    stroke-width="0.75"
+                    stroke-linejoin="round"
+                    vector-effect="non-scaling-stroke"
+                  />
+                {:else}
+                  <path
+                    class="cursor-pointer outline-none"
+                    d={piece.d}
+                    {fill}
+                    stroke="var(--card)"
+                    stroke-width="0.75"
+                    stroke-linejoin="round"
+                    vector-effect="non-scaling-stroke"
+                    role="button"
+                    tabindex={piece.k ===
+                    (focus != null && tour.includes(focus) ? focus : tour[0])
+                      ? 0
+                      : -1}
+                    aria-label={row.name}
+                    data-k={piece.k}
+                    onpointermove={(event) => {
+                      if (!isHover(event)) {
+                        return;
+                      }
+                      const bounds = event.currentTarget
+                        .closest("[data-insets]")
+                        ?.parentElement?.getBoundingClientRect();
+                      if (bounds != null) {
+                        pointer = {
+                          x: event.clientX - bounds.left,
+                          y: event.clientY - bounds.top,
+                        };
+                      }
+                      if (pinned == null) {
+                        focus = piece.k;
+                      }
+                    }}
+                    onfocus={(event) => {
+                      const bounds = event.currentTarget
+                        .closest("[data-insets]")
+                        ?.parentElement?.getBoundingClientRect();
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      pointer =
+                        bounds == null
+                          ? null
+                          : {
+                              x: rect.left - bounds.left + rect.width / 2,
+                              y: rect.top - bounds.top + rect.height / 2,
+                            };
+                      focus = piece.k;
+                    }}
+                    onblur={() => {
+                      pointer = null;
+                      if (pinned == null) {
+                        focus = null;
+                      }
+                    }}
+                    onclick={(event) => {
+                      if (isTouch(event) && pinned !== piece.k) {
+                        pinned = piece.k;
+                        focus = piece.k;
+                      } else {
+                        open(piece.k);
+                      }
+                    }}
+                    onkeydown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        open(piece.k);
+                        return;
+                      }
+                      const [dx, dy] = headings[event.key] ?? [0, 0];
+                      if (dx === 0 && dy === 0) {
+                        return;
+                      }
+                      event.preventDefault();
+                      const at = tour.indexOf(piece.k) + (dx + dy > 0 ? 1 : -1);
+                      const next = tour[(at + tour.length) % tour.length];
+                      event.currentTarget
+                        .closest("[data-insets]")
+                        ?.querySelector<SVGPathElement>(`[data-k="${next}"]`)
+                        ?.focus();
+                    }}
+                  />
+                {/if}
+              {/each}
+              {#if focus != null}
+                {const lit = $derived(
+                  box.units.find((piece) => piece.k === focus),
+                )}
+                {#if lit != null}
+                  <path
+                    d={lit.d}
+                    fill="none"
+                    stroke="var(--foreground)"
+                    stroke-width="1.5"
+                    stroke-linejoin="round"
+                    vector-effect="non-scaling-stroke"
+                    pointer-events="none"
+                  />
+                {/if}
+              {/if}
+            </svg>
+          </div>
+        {/each}
+      </div>
+    {/if}
     {#if segments.length > 0 || globe != null}
       <div
         class="pointer-events-none absolute inset-e-2 inset-be-2 flex flex-wrap-reverse justify-end gap-1.5 max-sm:inset-s-2 max-sm:inset-e-14"
@@ -3416,10 +3681,9 @@
           <XIcon class="block-4 inline-4" />
         </button>
       </div>
-      <a
-        class="flex items-center justify-center rounded-sm border border-foreground bg-marker text-sm font-semibold text-[#15171a] block-11"
-        href={unit(place.path)}>{m.map_open({ place: place.name })}</a
-      >
+      {@render opener(place.k, place.name, place.path, () =>
+        open(place.k, place.path, own?.tiles),
+      )}
     </div>
   {/if}
   {#if pinned != null && current != null}
@@ -3475,16 +3739,44 @@
       {@render readout(true)}
       {#if current.path != null}
         {const place = $derived(current)}
-        <button
-          type="button"
-          class="flex items-center justify-center rounded-sm border border-foreground bg-marker text-sm font-semibold text-[#15171a] block-11"
-          onclick={() => open(place.k)}
-          >{m.map_open({ place: place.name })}</button
-        >
+        {const path = $derived(current.path)}
+        {@render opener(place.k, place.name, path, () => open(place.k))}
       {/if}
     </div>
   {/if}
 </div>
+
+{#snippet opener(k: number, name: string, path: string, go: () => void)}
+  {const isOpening = $derived(opening === k)}
+  <a
+    class={cn(
+      "flex items-center justify-center gap-2 rounded-sm border border-foreground bg-marker text-sm font-semibold text-[#15171a] block-11",
+      { "cursor-progress": isOpening },
+    )}
+    href={unit(path)}
+    aria-busy={isOpening}
+    aria-disabled={isOpening}
+    onclick={(event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+      event.preventDefault();
+      if (opening == null) {
+        go();
+      }
+    }}
+  >
+    {#if isOpening}
+      <span
+        class="animate-spin rounded-full border-2 border-[#15171a]/25 border-bs-[#15171a] block-3.5 inline-3.5 motion-reduce:animate-none"
+        aria-hidden="true"
+      ></span>
+      {m.map_opening({ place: name })}
+    {:else}
+      {m.map_open({ place: name })}
+    {/if}
+  </a>
+{/snippet}
 
 {#snippet gap(shape: "absent" | "norun", label: string, names: Array<string>)}
   {const isListed = $derived(names.length <= 5)}

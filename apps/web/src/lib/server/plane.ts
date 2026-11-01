@@ -14,6 +14,7 @@ const {
       srid: number;
       within: Array<Array<number>>;
       insets?: Array<{
+        name: string;
         within: Array<Array<number>>;
         clip?: Array<number>;
         srid: number;
@@ -131,12 +132,37 @@ export const outside = async (
   });
 };
 
-export const parted = async (scheme: string, area: string, day: string) => {
+const live = async (scheme: string, contest: string, day: string) =>
+  remember(`live:${scheme}:${contest}:${day}`, async () => {
+    const found = await db.execute<{ part: number }>(sql`
+      with recursive tree(id, depth) as (
+        select c.id, 1 from contest c where c.allocation_parent_id = ${contest}::uuid
+        union all
+        select c.id, tree.depth + 1 from contest c join tree on c.allocation_parent_id = tree.id
+        where tree.depth < 3
+      )
+      select distinct ${part(scheme, "g.geom")} as part
+      from (select distinct id from tree) t
+      join contest c on c.id = t.id
+      cross join lateral (
+        select g.geom from area_geometry g where g.area_id = c.district_area_id
+        order by g.valid @> ${day}::date desc, upper(g.valid) desc nulls first limit 1
+      ) g
+    `);
+    return found.rows.map((row) => row.part);
+  });
+
+export const parted = async (
+  scheme: string,
+  area: string,
+  day: string,
+  contest: { id: string; ks: Array<number> } | null = null,
+) => {
   const insets = insetsOf(scheme);
   if (insets.length === 0) {
     return;
   }
-  const [rows, own] = await Promise.all([
+  const [rows, own, held] = await Promise.all([
     remember(`parted:${scheme}:${day}`, async () => {
       const found = await db.execute<{
         k: number;
@@ -170,6 +196,7 @@ export const parted = async (scheme: string, area: string, day: string) => {
         order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
       ) me
     `),
+    contest == null ? null : live(scheme, contest.id, day),
   ]);
   if (rows.length === 0 || own.rows.length === 0) {
     return;
@@ -179,6 +206,7 @@ export const parted = async (scheme: string, area: string, day: string) => {
     return {
       isOnly: true,
       ks: rows.filter((row) => row.part === mine).map((row) => row.k),
+      inset: null,
     };
   }
   const outer = rows.filter((row) => row.part !== -1);
@@ -201,6 +229,109 @@ export const parted = async (scheme: string, area: string, day: string) => {
             `)
           ).rows.map((row) => row.k),
         );
-  const ks = outer.filter((row) => !inner.has(row.k)).map((row) => row.k);
-  return ks.length === 0 ? undefined : { isOnly: false, ks };
+  const counted = new Set(contest?.ks);
+  const alive =
+    held == null
+      ? null
+      : new Set([
+          ...held,
+          ...outer.filter((row) => counted.has(row.k)).map((row) => row.part),
+        ]);
+  const isAlive = (part: number) => alive == null || alive.has(part);
+  const ks = outer
+    .filter(
+      (row) =>
+        !inner.has(row.k) ||
+        (!isAlive(row.part) && insets[row.part]?.detached !== true),
+    )
+    .map((row) => row.k);
+  const boxed = outer
+    .filter(
+      (row) =>
+        inner.has(row.k) &&
+        isAlive(row.part) &&
+        insets[row.part]?.detached !== true,
+    )
+    .map((row) => row.k);
+  return ks.length === 0 && boxed.length === 0
+    ? undefined
+    : {
+        isOnly: false,
+        ks,
+        inset: boxed.length === 0 ? null : { scheme, day, ks: boxed },
+      };
+};
+
+export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
+  const insets = insetsOf(scheme);
+  if (insets.length === 0 || ks.length === 0) {
+    return [];
+  }
+  const found = await db.execute<{
+    k: number;
+    part: number;
+    d: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>(sql`
+    with picked as materialized (
+      select a.k, a.scheme_code as scheme, g.geom as raw, coalesce(
+        (select c.geom from display.clipped c
+          join display.meta dm on dm.mask_version = c.mask_version
+          where c.area_id = a.id and c.valid = g.valid and c.geom_hash = md5(ST_AsBinary(g.geom))),
+        g.geom) as geom
+      from area a
+      cross join lateral (
+        select geom, valid from area_geometry where area_id = a.id
+        order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+      ) g
+      where a.k = any(${sql.param(ks)}::int[]) and a.scheme_code = ${scheme}
+    ),
+    planed as materialized (
+      select k, ${part(scheme, "raw")} as part, ${plane("geom", "scheme")} as geom from picked
+    ),
+    framed as (
+      select k, part, geom,
+        min(ST_XMin(geom)) over w as west, max(ST_XMax(geom)) over w as east,
+        min(ST_YMin(geom)) over w as south, max(ST_YMax(geom)) over w as north
+      from planed where part <> -1 and geom is not null
+      window w as (partition by part)
+    )
+    select k, part, ST_AsSVG(ST_Scale(coalesce((
+        select ST_Collect(d.geom) from ST_Dump(ST_SimplifyPreserveTopology(geom, span / 500)) d
+        where ST_Area(d.geom) >= (span / 500) ^ 2
+      ), ST_SimplifyPreserveTopology(geom, span / 500)), 0.001, 0.001), 0, 1) as d,
+      west / 1000 as x, -north / 1000 as y, (east - west) / 1000 as width, (north - south) / 1000 as height
+    from (select *, greatest(east - west, north - south) as span from framed) f
+    order by part, k
+  `);
+  const parts = new Map<
+    number,
+    {
+      name: string;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      units: Array<{ k: number; d: string }>;
+    }
+  >();
+  for (const row of found.rows) {
+    const seen = parts.get(row.part);
+    if (seen == null) {
+      parts.set(row.part, {
+        name: insets[row.part]?.name ?? "",
+        x: row.x,
+        y: row.y,
+        width: row.width,
+        height: row.height,
+        units: [{ k: row.k, d: row.d }],
+      });
+    } else {
+      seen.units.push({ k: row.k, d: row.d });
+    }
+  }
+  return [...parts.values()];
 };

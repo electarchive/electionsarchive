@@ -647,20 +647,20 @@ const Places = v.nullable(
   }),
 );
 
+const Parted = v.object({
+  isOnly: v.boolean(),
+  ks: v.array(v.number()),
+  inset: v.nullable(
+    v.object({ scheme: v.string(), day: v.string(), ks: v.array(v.number()) }),
+  ),
+});
+
 const Sketch = v.object({
   tiles: v.nullable(v.string()),
   own: v.nullable(
-    v.object({
-      tiles: v.string(),
-      k: v.number(),
-      parted: v.optional(
-        v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
-      ),
-    }),
+    v.object({ tiles: v.string(), k: v.number(), parted: v.optional(Parted) }),
   ),
-  parted: v.optional(
-    v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
-  ),
+  parted: v.optional(Parted),
   nested: v.optional(
     v.nullable(v.object({ tiles: v.string(), ks: v.array(v.number()) })),
   ),
@@ -9679,9 +9679,7 @@ export const contests = {
               }),
             ),
           ),
-          parted: v.optional(
-            v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
-          ),
+          parted: v.optional(Parted),
           frame: v.nullable(
             v.object({
               west: v.number(),
@@ -9753,16 +9751,25 @@ export const contests = {
         kids.filter((kid) => kid.scheme === input.level).map((kid) => kid.k),
       );
       const absent = whole.filter((row) => !present.has(row.k));
-      const offside =
+      const [offside, cut] =
         input.level == null
-          ? []
-          : await outside(
-              input.level,
-              area.id,
-              [...present, ...whole.map((row) => row.k)],
-              day,
-            );
-      const off = new Set(offside.map((entry) => entry.k));
+          ? [[], undefined]
+          : await Promise.all([
+              outside(
+                input.level,
+                area.id,
+                [...present, ...whole.map((row) => row.k)],
+                day,
+              ),
+              parted(input.level, area.id, day, {
+                id: contest.id,
+                ks: [...present],
+              }),
+            ]);
+      const off = new Set([
+        ...offside.map((entry) => entry.k),
+        ...(cut?.inset?.ks ?? []),
+      ]);
       const [frame, blankLabels] = await Promise.all([
         framing(
           area.id,
@@ -9854,7 +9861,10 @@ export const contests = {
                   and c.code in ('60', '66', '69', '72', '78')
               `)
               : null,
-            parted(group.scheme, area.id, row.asOf ?? day),
+            parted(group.scheme, area.id, row.asOf ?? day, {
+              id: contest.id,
+              ks: isLevel ? [...present] : [],
+            }),
           ]);
           const strip = [
             ...(outlying?.rows ?? []).map((entry) => ({
@@ -9933,9 +9943,7 @@ export const contests = {
             north: v.number(),
           }),
         ),
-        parted: v.optional(
-          v.object({ isOnly: v.boolean(), ks: v.array(v.number()) }),
-        ),
+        parted: v.optional(Parted),
         levels: v.array(
           v.object({
             code: v.string(),
@@ -12206,13 +12214,14 @@ async function sketch(
     contest == null ? [] : await universe(contest, level, area.id, day);
   const counted = new Set(ks);
   const absent = whole.filter((row) => !counted.has(row.k));
-  const offside = await outside(
-    level,
-    area.id,
-    [...ks, ...whole.map((row) => row.k)],
-    day,
-  );
-  const off = new Set(offside.map((entry) => entry.k));
+  const [offside, split] = await Promise.all([
+    outside(level, area.id, [...ks, ...whole.map((row) => row.k)], day),
+    parted(level, area.id, day, contest == null ? null : { id: contest, ks }),
+  ]);
+  const off = new Set([
+    ...offside.map((entry) => entry.k),
+    ...(split?.inset?.ks ?? []),
+  ]);
   const [frame, found, nested, labels, outlying] = await Promise.all([
     framing(
       area.id,
@@ -12282,10 +12291,8 @@ async function sketch(
       stored(row.tiles) != null &&
       projectionOf(row.scheme) === projectionOf(level),
   );
-  const [split, ownSplit] = await Promise.all([
-    parted(level, area.id, day),
-    own == null ? undefined : parted(own.scheme, area.id, day),
-  ]);
+  const ownSplit =
+    own == null ? undefined : await parted(own.scheme, area.id, day);
   const strip = [
     ...(outlying?.rows ?? []).map((entry) => ({
       ...entry,
