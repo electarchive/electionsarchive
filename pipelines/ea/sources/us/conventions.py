@@ -635,7 +635,7 @@ CANDIDATES = {
     "1924:democratic:Thompson": ("Thompson", None),
     "1924:democratic:Kendrick": ("John B. Kendrick", "Q437232"),
     "democratic:Roosevelt": ("Franklin D. Roosevelt", "Q8007"),
-    "democratic:Farley": ("James A. Farley", None),
+    "democratic:Farley": ("James A. Farley", "Q954859"),
     "democratic:Tydings": ("Millard Tydings", "Q354099"),
     "democratic:Garner": ("John Nance Garner", "Q298991"),
     "democratic:Hull": ("Cordell Hull", "Q202979"),
@@ -2277,12 +2277,15 @@ def emit() -> Path:
                     if slug in made:
                         ballot_options[column] = made[slug]
                         continue
-                    if qid is None:
+                    if qid is None or qid not in people:
                         person = cs.key("us.person", slug)
                         if person in cs.minted and person not in added:
                             added.add(person)
                             cs.add("person", id=person)
                             name(person, label)
+                        if qid is not None and person not in added:
+                            added.add(person)
+                            cs.add("external_id", entity_id=person, scheme="wikidata", value=qid)
                     else:
                         person = people[qid]
                     option = ballot_options[column] = made[slug] = cs.key("us.option", f"{key}:{slug}")
