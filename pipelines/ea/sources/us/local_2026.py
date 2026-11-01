@@ -5346,6 +5346,69 @@ for key, publisher, title, url, local in (
         "in/hamilton_westfield_ballot.pdf",
     ),
     (
+        "IN-18001-townships",
+        "Adams County Clerk",
+        "Candidate List - Abbreviated, 2026 General Election, Adams County",
+        "https://www.co.adams.in.us/DocumentCenter/View/48062",
+        "in/597/18001/adams_candidates_general.pdf",
+    ),
+    (
+        "IN-18065-townships",
+        "Henry County Clerk",
+        "2026 General Election candidate list, Henry County",
+        "https://www.henrycounty.in.gov/DocumentCenter/View/944/2026-GENERAL-ELECTION-CANDIDATE-LIST-PDF",
+        "in/597/18065/henry_candidates.pdf",
+    ),
+    (
+        "IN-18085-townships",
+        "Kosciusko County Clerk",
+        "Candidate List - Abbreviated, 2026 General Election, Kosciusko County",
+        "https://www.kosciusko.in.gov/egov/apps/document/center.egov?view=item&id=4188",
+        "in/597/18085/kosciusko_school_filings.pdf",
+    ),
+    (
+        "IN-18179-townships",
+        "Wells County Clerk",
+        "Summary Candidate - Office Report, 2026 General Election, Wells County",
+        "https://wellscounty.org/wp-content/uploads/2026/08/Summary_Candidate_Office_20260812_100702AM.pdf",
+        "in/597/18179/wells_summary.pdf",
+    ),
+    (
+        "IN-18183-townships",
+        "Whitley County Clerk",
+        "2026 General Election candidates, Whitley County",
+        "https://www.whitleycounty.in.gov/egov/apps/document/center.egov?view=item&id=1943",
+        "in/597/18183/whitley_page.html",
+    ),
+    (
+        "IN-18049-towns",
+        "Fulton County Clerk",
+        "2026 General Election sample ballot, Fulton County",
+        "https://www.co.fulton.in.us/DocumentCenter/View/1856/Sample-Ballots",
+        "in/597/18049/fulton_sample.pdf",
+    ),
+    (
+        "MI-26135",
+        "Oscoda County Clerk",
+        "Candidate Filings for November 3, 2026 General Election, Oscoda County",
+        "https://www.oscodacountymi.com/elections/",
+        "mi/597/26135/oscoda_candlist.pdf",
+    ),
+    (
+        "MI-26151",
+        "Sanilac County Clerk",
+        "Official Candidate List, 11/03/2026 State General (10/30/2026)",
+        "https://www.sanilaccounty.gov/departments/county_clerk/election_information/elections_results.php",
+        "mi/597/26151/sanilac_candlist.pdf",
+    ),
+    (
+        "MI-26127",
+        "Oceana County Clerk",
+        "Official Candidate List, 11/03/2026 State General (10/27/2026)",
+        "https://oceana.mi.us/wp-content/uploads/2026/10/Official-Candidate-List-November-3-2026-4.pdf",
+        "mi/597/26127/oceana_candlist.pdf",
+    ),
+    (
         "FL-12127-volusia",
         "Volusia County Supervisor of Elections",
         "Current candidates, 2026",
@@ -9072,6 +9135,8 @@ def parse() -> None:
         ("MI-26029", "Charlevoix"),
         ("MI-26157", "Tuscola"),
         ("MI-26015", "Barry"),
+        ("MI-26151", "Sanilac"),
+        ("MI-26127", "Oceana"),
     ):
         post, seats, unexpired = "", 0, False
         for line in text(key, "-layout").splitlines():
