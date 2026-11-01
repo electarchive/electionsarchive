@@ -13521,8 +13521,12 @@ async function races(
                     )) as party_id, max(coalesce(x.seats, 1)) as seats
                   from tree t
                   join contest_option o on o.contest_id = t.id
-                  join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-                  join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+                  cross join lateral (
+                    select x.seats from outcome x
+                    join result_set rs on rs.id = x.result_set_id and ${latest("rs")}
+                    where x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                    offset 0
+                  ) x
                   where not exists (select from contest k where k.allocation_parent_id = t.id)
                     and not (o.kind = 'candidate' and o.parent_option_id is not null and exists (
                       select from contest_option l
