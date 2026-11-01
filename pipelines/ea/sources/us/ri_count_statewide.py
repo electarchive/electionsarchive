@@ -28,6 +28,16 @@ CITATION = (
 )
 
 
+TRANSCRIBED = Path(__file__).with_name("ri_count_1964.tsv")
+
+
+def transcribed() -> tuple[dict[str, list[int | None]], list[int | None], int]:
+    rows = [line.split("\t") for line in TRANSCRIBED.read_text().splitlines()[1:]]
+    values = {name: [int(v) for v in cells] for name, *cells in rows}
+    total = values.pop("state total")
+    return dict(values), list(total), len(total)
+
+
 def volume(year: int) -> dict[str, object] | None:
     path = VOLUMES / f"ri-count-{year}.json"
     return json.loads(path.read_text()) if path.exists() else None
@@ -109,13 +119,16 @@ def parse() -> None:
             }
             got: dict[str, dict[str, dict[str, int]]] = {}
             for leaf in spec["leaves"]:  # type: ignore[attr-defined]
-                text = subprocess.run(
-                    ["pdftotext", "-layout", "-f", str(leaf), "-l", str(leaf), str(pdf), "-"],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                ).stdout
-                lines, total, width = table(text)
+                if year == 1964:
+                    lines, total, width = transcribed()
+                else:
+                    text = subprocess.run(
+                        ["pdftotext", "-layout", "-f", str(leaf), "-l", str(leaf), str(pdf), "-"],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout
+                    lines, total, width = table(text)
                 if total is None or len(total) != width:
                     print(year, leaf, "no usable total row")
                     continue
