@@ -767,6 +767,31 @@ def missed(frame: pl.DataFrame) -> pl.DataFrame:
     )
 
 
+def reread_votes(raw_lines: pl.DataFrame) -> pl.DataFrame:
+    rows = missed(raw_lines)
+    values: dict[tuple[int, int, int], int | None] = {}
+    for (year, page), page_rows in rows.group_by("year", "page", maintain_order=True):
+        reply = replies(page_rows, "reread", int(year), int(page))
+        for rid in page_rows["rid"]:
+            value = (reply or {}).get(str(rid))
+            values[(int(year), int(page), int(rid))] = value if isinstance(value, int) else None
+    rows = rows.with_columns(
+        read=pl.Series(
+            [values[(int(y), int(p), int(r))] for y, p, r in zip(rows["year"], rows["page"], rows["rid"], strict=True)],
+            dtype=pl.Int64,
+        )
+    )
+    return (
+        rows.with_columns(
+            sure=pl.col("read").is_not_null().all().over("year", "stage", "group")
+            & (pl.col("read").sum().over("year", "stage", "group") == pl.col("printed"))
+        )
+        .filter(pl.col("sure"))
+        .select("year", "page", "y0", "x0", "read")
+        .with_columns(twice=pl.lit(True), summed=pl.lit(True))
+    )
+
+
 def read() -> None:
     request(held(pl.read_parquet(PARSED / "lines.parquet")), "county_pages", "read", READ_DPI)
 
@@ -945,16 +970,24 @@ def emit() -> Path:
             .otherwise(pl.col("name"))
         )
     )
-    both = twice(raw_lines)
+    both = pl.concat([twice(raw_lines), reread_votes(raw_lines)], how="diagonal_relaxed").unique(
+        ["year", "page", "y0", "x0"], keep="last"
+    )
     lines = (
         lines.join(both, on=["year", "page", "y0", "x0"], how="left")
-        .with_columns(pl.col("twice").fill_null(False), votes=pl.coalesce("read", "votes"))
+        .with_columns(
+            pl.col("twice").fill_null(False),
+            pl.col("summed").fill_null(False),
+            votes=pl.coalesce("read", "votes"),
+        )
         .drop("read")
         .with_columns(
             agrees=pl.when(
                 pl.col("agrees").is_null()
                 & pl.col("twice").all().over("year", "stage", "county", "office", "district", "side")
             )
+            .then(True)
+            .when(pl.col("summed").all().over("year", "stage", "county", "office", "district", "side"))
             .then(True)
             .otherwise(pl.col("agrees"))
         )
