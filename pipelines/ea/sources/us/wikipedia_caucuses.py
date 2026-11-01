@@ -363,6 +363,8 @@ def parse() -> None:
             print(f"{year} {party} {state}: {source}: no date")
             continue
         total = None
+        unbound = next((i for i, cell in enumerate(header) if re.search(r"\bunbound$", cell, re.IGNORECASE)), None)
+        bound = next((i for i, cell in enumerate(header) if re.search(r"(?<!un)bound$", cell, re.IGNORECASE)), None)
         for cells in lines:
             if len(cells) <= who:
                 continue
@@ -426,8 +428,33 @@ def parse() -> None:
                     "convention": float(re.sub(r"[^\d.]", "", cells[convention]) or 0)
                     if measure == 17 and convention is not None and convention < len(cells)
                     else None,
+                    "unbound": int(re.sub(r"\D", "", cells[unbound]) or 0)
+                    if unbound is not None and bound is not None and unbound < len(cells)
+                    else None,
+                    "bound": int(re.sub(r"\D", "", cells[bound]) or 0)
+                    if unbound is not None and bound is not None and bound < len(cells)
+                    else None,
                 }
             )
+        event = [row for row in rows if (row["year"], row["party"], row["state"]) == (year, party, state)]
+        if (year, party, state) in CONVENTIONS and event and all(row["unbound"] is not None for row in event):
+            loose = sum(int(str(row["unbound"])) for row in event)
+            pool = next((row for row in event if row["kind"] == "uncommitted"), None)
+            if pool is None:
+                pool = event[0] | {
+                    "candidate": "Unbound",
+                    "kind": "uncommitted",
+                    "value": None,
+                    "measure": None,
+                    "bound": 0,
+                    "unbound": 0,
+                }
+                rows.append(pool)
+            for row in event:
+                row["preference"] = row["unbound"] if row["kind"] == "candidate" and row["unbound"] else None
+                row["delegates"] = row["bound"]
+            pool["delegates"] = int(str(pool["bound"] or 0)) + loose
+            pool["preference"] = None
         counted = sum(
             float(str(row["value"]))
             for row in rows
@@ -625,6 +652,25 @@ def emit() -> Path:
                     body_md=(
                         "The party counted ranked ballots; these are the final-round totals after the transfers, "
                         "and ballots that ran out of choices are not counted."
+                    ),
+                )
+            leaning = (
+                [
+                    f"{candidate} {count}"
+                    for candidate, count in lines.select("candidate", "preference").iter_rows()
+                    if count
+                ]
+                if "preference" in lines.columns
+                else []
+            )
+            if convention and leaning:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=(
+                        "Unbound delegates count under Unbound. The article also lists the candidates some of them "
+                        f"declared for: {', '.join(leaning)}."
                     ),
                 )
             if total is not None and total > counted:
