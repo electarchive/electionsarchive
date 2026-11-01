@@ -18,13 +18,38 @@ URL = (
     "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1990%20through%201998%20Statewide%20Election%20Results/"
     "{}/General%20Election%20{}.pdf"
 )
+HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-results-pdfs/{}.pdf"
 PUBLISHER = "North Dakota Secretary of State"
-TITLE = "Official abstracts of votes cast at the general elections, 1990–1998"
+TITLE = "Official abstracts of votes cast at the general elections"
+FILES = {
+    1950: "1950-11-07-general",
+    1954: "1954-11-02-general",
+    1960: "1960-11-08-general",
+    1962: "1962-11-06-general",
+    1970: "1970-11-03-general",
+    1974: "1974-11-05-general",
+    1980: "1980-11-04-general",
+    1982: "1982-11-02-general",
+    1984: "1984-11-06-general",
+    1986: "1986-11-04-general",
+    1988: "1988-11-08-general",
+}
 DAYS = {
     1992: date(1992, 11, 3),
     1994: date(1994, 11, 8),
     1996: date(1996, 11, 5),
     1998: date(1998, 11, 3),
+    1950: date(1950, 11, 7),
+    1954: date(1954, 11, 2),
+    1960: date(1960, 11, 8),
+    1962: date(1962, 11, 6),
+    1970: date(1970, 11, 3),
+    1974: date(1974, 11, 5),
+    1980: date(1980, 11, 4),
+    1982: date(1982, 11, 2),
+    1984: date(1984, 11, 6),
+    1986: date(1986, 11, 4),
+    1988: date(1988, 11, 8),
 }
 COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
     1992: (
@@ -109,6 +134,181 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             29: ("tax-commissioner", "Rick Clayburgh", "REP"),
         },
     ),
+    1950: (
+        0,
+        {
+            10: ("lieutenant-governor", "Ray Schnell", "REP"),
+            11: ("lieutenant-governor", "Milton K. Higgins", "DEM"),
+            12: ("secretary-of-state", "Thomas Hall", "REP"),
+            13: ("secretary-of-state", "Ruth B. Herzberg", "DEM"),
+            14: ("auditor", "Berta E. Baker", "REP"),
+            15: ("treasurer", "Albert Jacobson", "REP"),
+            16: ("treasurer", "Loretta Gray", "DEM"),
+            17: ("attorney-general", "E. T. Christianson", "REP"),
+            18: ("attorney-general", "Richard Boulger", "DEM"),
+            19: ("insurance-commissioner", "A. J. Jensen", "REP"),
+            20: ("insurance-commissioner", "Henry W. Anderberg", "DEM"),
+            21: ("commissioner-of-agriculture", "Math Dahl", "REP"),
+            22: ("commissioner-of-agriculture", "Fred Port", "DEM"),
+            23: ("public-service-commissioner", "E. H. Brant", "REP"),
+            24: ("public-service-commissioner", "Norman B. Jenson", "DEM"),
+        },
+    ),
+    1954: (
+        0,
+        {
+            8: ("lieutenant-governor", "C. P. Dahl", "REP"),
+            9: ("lieutenant-governor", "S. B. Hocking", "DEM"),
+            10: ("secretary-of-state", "Ben Meier", "REP"),
+            11: ("secretary-of-state", "B. Earle Robinson", "DEM"),
+            12: ("auditor", "Berta E. Baker", "REP"),
+            13: ("auditor", "S. J. Christopherson", "DEM"),
+            14: ("treasurer", "Albert Jacobson", "REP"),
+            15: ("treasurer", "Ethel Knudsen", "DEM"),
+            16: ("attorney-general", "Leslie R. Burgum", "REP"),
+            17: ("attorney-general", "S. E. Halpern", "DEM"),
+            18: ("insurance-commissioner", "A. J. Jensen", "REP"),
+            19: ("insurance-commissioner", "H. N. Jenson", "DEM"),
+            20: ("commissioner-of-agriculture", "Math Dahl", "REP"),
+            21: ("commissioner-of-agriculture", "William L. Guy", "DEM"),
+            22: ("public-service-commissioner", "Anson J. Anderson", "REP"),
+            23: ("public-service-commissioner", "Lawrence Knoke", "DEM"),
+        },
+    ),
+    1960: (
+        0,
+        {
+            12: ("lieutenant-governor", "Orville W. Hagen", "REP"),
+            13: ("lieutenant-governor", "Lavern Schoeder", "DEM"),
+            14: ("secretary-of-state", "Ben Meier", "REP"),
+            15: ("secretary-of-state", "Lloyd B. Omdahl", "DEM"),
+            16: ("auditor", "Curtis Olson", "REP"),
+            17: ("auditor", "Weldon Haugen", "DEM"),
+            18: ("treasurer", "John R. Erickson", "REP"),
+            19: ("treasurer", "Albert Heide", "DEM"),
+            20: ("attorney-general", "Leslie R. Burgum", "REP"),
+            21: ("attorney-general", "Charles Murphy", "DEM"),
+            22: ("insurance-commissioner", "A. J. Jensen", "REP"),
+            23: ("insurance-commissioner", "Don Sloan", "DEM"),
+            24: ("commissioner-of-agriculture", "Math Dahl", "REP"),
+            25: ("commissioner-of-agriculture", "Bruce Hagen", "DEM"),
+            26: ("public-service-commissioner", "Richard J. Thompson", "REP"),
+            27: ("public-service-commissioner", "Ralph Dewing", "DEM"),
+        },
+    ),
+    1962: (
+        0,
+        {
+            10: ("lieutenant-governor", "Frank A. Wenstrom", "REP"),
+            11: ("lieutenant-governor", "Leonell W. (Lee) Fraase", "DEM"),
+            12: ("secretary-of-state", "Ben Meier", "REP"),
+            13: ("secretary-of-state", "Larry Schneider", "DEM"),
+            14: ("auditor", "Curtis Olson", "REP"),
+            15: ("auditor", "Florence Swenson", "DEM"),
+            16: ("treasurer", "Phil Hoghaug", "REP"),
+            17: ("treasurer", "Elmer Strand", "DEM"),
+            18: ("attorney-general", "Helgi Johanneson", "REP"),
+            19: ("attorney-general", "Charles Tighe", "DEM"),
+            20: ("insurance-commissioner", "Frank Albers", "REP"),
+            21: ("insurance-commissioner", "Hans Walker, Jr.", "DEM"),
+            22: ("commissioner-of-agriculture", "Math Dahl", "REP"),
+            23: ("commissioner-of-agriculture", "Harold R. Hanson", "DEM"),
+            24: ("public-service-commissioner", "Ben J. Wolf", "REP"),
+            25: ("public-service-commissioner", "E. Odin Sjaastad", "DEM"),
+        },
+    ),
+    1970: (
+        0,
+        {
+            9: ("public-service-commissioner", "Earl Redlin", "REP"),
+            10: ("public-service-commissioner", "Bruce Hagen", "DEM"),
+            12: ("commissioner-of-labor", "Orville W. Hagen", None),
+            13: ("commissioner-of-labor", "Daryl E. Thompson", None),
+        },
+    ),
+    1974: (
+        0,
+        {
+            6: ("commissioner-of-labor", "Orville W. Hagen", None),
+        },
+    ),
+    1982: (
+        0,
+        {
+            8: ("public-service-commissioner", "Bruce Hagen", "DEM"),
+            9: ("public-service-commissioner", "Dale Sandstrom", "REP"),
+            18: ("commissioner-of-labor", "Orville W. Hagen", None),
+            19: ("commissioner-of-labor", "Byron Knutson", None),
+        },
+    ),
+    1984: (
+        0,
+        {
+            16: ("secretary-of-state", "Claire Edwin Blomquist", "IND"),
+            17: ("secretary-of-state", "Bryon Knutson", None),
+            18: ("secretary-of-state", "Ben Meier", "REP"),
+            19: ("auditor", 'M. K. "Heidi" Heitkamp', "DEM"),
+            20: ("auditor", 'Robert "Bob" Peterson', "REP"),
+            21: ("treasurer", "Bob Hanson", "DEM"),
+            22: ("treasurer", "John Steven Lesmeister", "REP"),
+            23: ("attorney-general", 'Nicholas "Nick" Spaeth', "DEM"),
+            24: ("attorney-general", "Robert Wefald", "REP"),
+            25: ("insurance-commissioner", "Diane Alm", "REP"),
+            26: ("insurance-commissioner", "Jan Gerhart-Shelver", "IND"),
+            27: ("insurance-commissioner", "Earl Pomeroy", "DEM"),
+            28: ("commissioner-of-agriculture", "Kent Jones", "REP"),
+            29: ("commissioner-of-agriculture", "Bruce W. Larson", "DEM"),
+            30: ("public-service-commissioner", 'S. F. "Buckshot" Hoffner', "DEM"),
+            31: ("public-service-commissioner", "Dale Sandstrom", "REP"),
+        },
+    ),
+    1986: (
+        0,
+        {
+            8: ("public-service-commissioner", "Leo M. Reinbold", "REP"),
+            9: ("public-service-commissioner", "Jim Kusler", "DEM"),
+            30: ("commissioner-of-labor", 'Orville W. "Ike" Hagen', None),
+            31: ("commissioner-of-labor", "Byron Knutson", None),
+        },
+    ),
+    1980: (
+        0,
+        {
+            23: ("secretary-of-state", "Ben Meier", "REP"),
+            24: ("secretary-of-state", "Bob Black", "DEM"),
+            25: ("auditor", 'Robert "Bob" Peterson', "REP"),
+            26: ("auditor", 'Austin "Jim" Engel', "DEM"),
+            27: ("treasurer", "John Steven Lesmeister", "REP"),
+            28: ("treasurer", "Bob Hanson", "DEM"),
+            29: ("attorney-general", 'Robert "Bob" Wefald', "REP"),
+            30: ("attorney-general", "Alice K. Olson", "DEM"),
+            31: ("insurance-commissioner", 'J. O. "Bud" Wigen', "REP"),
+            32: ("insurance-commissioner", "Byron Knutson", None),
+            33: ("commissioner-of-agriculture", "Kent Jones", "REP"),
+            34: ("commissioner-of-agriculture", 'S. F. "Buckshot" Hoffner', "DEM"),
+            35: ("public-service-commissioner", "Leo Reinbold", "REP"),
+            36: ("public-service-commissioner", "Rick Maixner", "DEM"),
+        },
+    ),
+    1988: (
+        0,
+        {
+            18: ("auditor", "Steve Pederson", "DEM"),
+            19: ("auditor", 'Robert "Bob" Peterson', "REP"),
+            20: ("treasurer", 'Robert E. "Bob" Hanson', "DEM"),
+            21: ("treasurer", "Steve Easton", "REP"),
+            22: ("attorney-general", 'Nicholas "Nick" Spaeth', "DEM"),
+            23: ("attorney-general", "John Gosbee", "REP"),
+            24: ("insurance-commissioner", "Earl R. Pomeroy", "DEM"),
+            25: ("insurance-commissioner", "Margaret Bushee", "REP"),
+            26: ("commissioner-of-agriculture", "Sarah Vogel", "DEM"),
+            27: ("commissioner-of-agriculture", "Keith Bjerke", "REP"),
+            28: ("commissioner-of-agriculture", "Kent Jones", "IND"),
+            29: ("commissioner-of-agriculture", "Harley McLain", "IND"),
+            30: ("public-service-commissioner", "Bruce Hagen", "DEM"),
+            31: ("public-service-commissioner", "Leslie Volochenko", "REP"),
+        },
+    ),
     1998: (
         1,
         {
@@ -120,9 +320,12 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
         },
     ),
 }
+NUMBER = r"[\dIl][\dIl,.]*['`’:;]?"
+ERRATA = {(1950, "A. J. Jensen")}
 TYPOS = {"mclntosh": "mcintosh"}
 ALONE = {"Roger Johnson"}
 TITLES = {
+    "lieutenant-governor": "Lieutenant Governor",
     "secretary-of-state": "Secretary of State",
     "auditor": "State Auditor",
     "treasurer": "State Treasurer",
@@ -136,6 +339,8 @@ TITLES = {
 
 
 def url(year: int) -> str:
+    if year in FILES:
+        return HISTORY.format(FILES[year])
     return URL.format(year, DAYS[year].strftime("%m-%d-%Y"))
 
 
@@ -174,8 +379,15 @@ def parse() -> None:
                 html.split("<page ")[1:][index],
             )
         ]
+        first = next(w for w in words if w[4].upper() == "ADAMS" and w[0] < 300)
+        edge = (
+            -20
+            + min(w[0] for w in words if abs(w[1] - first[1]) < 3 and w[0] > first[2] and re.fullmatch(NUMBER, w[4]))
+            if year in FILES
+            else 125
+        )
         names = sorted(
-            (w for w in words if w[0] < 120 and re.match(r"[A-Za-z]", w[4]) and w[3] - w[1] < 9),
+            (w for w in words if w[0] < edge and re.match(r"[A-Za-z]", w[4]) and w[3] - w[1] < 12),
             key=lambda w: w[1],
         )
         start = next(i for i, w in enumerate(names) if w[4].upper() == "ADAMS")
@@ -186,24 +398,23 @@ def parse() -> None:
                 lines[-1][1] += w[4]
                 continue
             lines.append([middle, w[4]])
-            if w[4].upper() == "TOTAL":
+            if w[4].upper().rstrip(".") == "TOTAL":
                 break
         keys = [TYPOS.get(plain(text), plain(text)) for _, text in lines[:-1]]
         if sorted(keys) != sorted(codes):
             raise ValueError(f"{year}: counties {sorted(set(keys) ^ set(codes))}")
-        found = []
-        for w in words:
-            if not re.fullmatch(r"\d[\d,]*", w[4]) or w[0] < 125 or w[3] - w[1] > 9:
-                continue
+        numbers = [w for w in words if re.fullmatch(NUMBER, w[4]) and w[0] >= edge and w[3] - w[1] <= 12]
+
+        def nearest(w: tuple) -> int:
             middle = (w[1] + w[3]) / 2
-            line = min(range(len(lines)), key=lambda i: abs(lines[i][0] - middle))
-            if abs(lines[line][0] - middle) <= 3.6:
-                found.append((line, w))
+            return min(range(len(lines)), key=lambda i: abs(lines[i][0] - middle))
+
+        found = [(nearest(w), w) for w in numbers if abs(lines[nearest(w)][0] - (w[1] + w[3]) / 2) <= 3.6]
         totals = sorted(w for line, w in found if line == len(lines) - 1)
-        cells: dict[tuple[int, int], int] = {}
-        for line, w in found:
+
+        def column_of(w: tuple) -> int:
             middle = (w[0] + w[2]) / 2
-            column = min(
+            return min(
                 range(len(totals)),
                 key=lambda i: (
                     0
@@ -211,13 +422,63 @@ def parse() -> None:
                     else abs((totals[i][0] + totals[i][2]) / 2 - middle)
                 ),
             )
-            if (line, column) in cells and column in columns:
-                raise ValueError(f"{year}: two numbers in {keys[line]} column {column}")
-            cells[(line, column)] = int(w[4].replace(",", ""))
+
+        def value(text: str) -> int:
+            return int(re.sub(r"[Il]", "1", text).replace(",", "").replace(".", "").rstrip("'`’:;"))
+
+        cells: dict[tuple[int, int], int] = {}
+        if year in FILES:
+            bycolumn: dict[int, list[tuple]] = {}
+            for w in numbers:
+                bycolumn.setdefault(column_of(w), []).append(w)
+            for column, members in bycolumn.items():
+                members.sort(key=lambda w: w[1])
+                ys = [(w[1] + w[3]) / 2 for w in members]
+                shifts = sorted(y - lines[nearest(w)][0] for y, w in zip(ys, members, strict=True))
+                shift = shifts[len(shifts) // 2]
+                rows_y = [line[0] + shift for line in lines]
+                inf = float("inf")
+                cost = [[inf] * (len(rows_y) + 1) for _ in range(len(ys) + 1)]
+                back: dict[tuple[int, int], tuple[int, int, int | None]] = {}
+                cost[0][0] = 0.0
+                for i in range(len(ys) + 1):
+                    for j in range(len(rows_y) + 1):
+                        if cost[i][j] == inf:
+                            continue
+                        options = []
+                        if i < len(ys):
+                            options.append((i + 1, j, cost[i][j] + 8.0, None))
+                        if j < len(rows_y):
+                            options.append((i, j + 1, cost[i][j] + 3.0, None))
+                        if i < len(ys) and j < len(rows_y):
+                            options.append((i + 1, j + 1, cost[i][j] + abs(ys[i] - rows_y[j]), j))
+                        for ni, nj, c, matched in options:
+                            if c < cost[ni][nj]:
+                                cost[ni][nj] = c
+                                back[(ni, nj)] = (i, j, matched)
+                i, j = len(ys), len(rows_y)
+                while (i, j) in back:
+                    pi, pj, matched = back[(i, j)]
+                    if matched is not None:
+                        cells[(matched, column)] = value(members[pi][4])
+                    i, j = pi, pj
+        else:
+            for line, w in found:
+                column = column_of(w)
+                if (line, column) in cells and column in columns:
+                    raise ValueError(f"{year}: two numbers in {keys[line]} column {column}")
+                cells[(line, column)] = value(w[4])
         for column, (office, candidate, code) in columns.items():
             values = [cells.get((line, column), 0) for line in range(len(keys))]
-            if sum(values) != cells[(len(keys), column)]:
-                raise ValueError(f"{year} {candidate}: {sum(values)}, printed {cells[(len(keys), column)]}")
+            printed = cells[(len(keys), column)]
+            if sum(values) != printed:
+                if (
+                    year not in FILES
+                    or (year, candidate) not in ERRATA
+                    and abs(sum(values) - printed) > max(20, printed // 100)
+                ):
+                    raise ValueError(f"{year} {candidate}: {sum(values)}, printed {printed}")
+                print(f"{year} {candidate}: counties sum to {sum(values)}, printed total {printed}")
             rows.extend(
                 {
                     "day": DAYS[year],
