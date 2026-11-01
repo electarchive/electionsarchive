@@ -35,6 +35,7 @@
     "@resvg/resvg-js": "catalog:",
     "@tanstack/svelte-query": "catalog:",
     "@tanstack/svelte-query-devtools": "catalog:",
+    "@tanstack/virtual-core": "catalog:",
     "better-auth": "catalog:",
     "cldr-core": "catalog:",
     "drizzle-orm": "catalog:",

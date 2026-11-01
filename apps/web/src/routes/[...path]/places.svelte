@@ -10,11 +10,13 @@
   import Term from "#lib/components/term.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { fits } from "#lib/fits.js";
   import { count, natural, percent, plural, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
   import type { PageData } from "./$types";
   import Preview from "./preview.svelte";
   import { unit } from "./unit.js";
@@ -301,6 +303,11 @@
     let seen = 0;
     return filtered.filter((row) => (row.isNested ? seen : ++seen) <= limit);
   });
+  const windowed = new Windowed(() => ({
+    items: visible,
+    key: (row) => row.path ?? `${row.k}:${row.name}`,
+    size: 31,
+  }));
   const levels = $derived(
     places.levels.map((level) => ({
       ...level,
@@ -713,7 +720,10 @@
       {m.places_top_votes({ count: count(limit), nouns: plural(noun) })}
     </p>
   {/if}
-  <div class="-mx-2 overflow-x-auto overflow-y-hidden overscroll-x-contain">
+  <div
+    class="-mx-2 overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+    {@attach fits}
+  >
     <table
       class="border-collapse text-sm/tight inline-full"
       {@attach (table: HTMLTableElement) => {
@@ -751,7 +761,9 @@
         return on(table, "keydown", walk);
       }}
     >
-      <thead>
+      <thead
+        class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+      >
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
           {#each columns as entry (entry.key)}
             <th
@@ -851,9 +863,19 @@
           {/each}
         </tr>
       </thead>
-      <tbody>
-        {#each visible as row, index (row.path ?? `${row.k}:${row.name}`)}
+      <tbody {@attach windowed.anchor}>
+        {#if windowed.before > 0}
+          <tr aria-hidden="true">
+            <td
+              class="p-0"
+              colspan={columns.length + (isSolo ? 0 : 1)}
+              style:block-size="{windowed.before}px"
+            ></td>
+          </tr>
+        {/if}
+        {#each windowed.entries as { value: row, index, key } (key)}
           <tr
+            {@attach windowed.measure(index)}
             class={cn(
               "group relative border-be border-border/60 last:border-be-0 hover:bg-secondary/70",
               { "bg-secondary/70": focus === row.k },
@@ -1159,6 +1181,15 @@
             >
           </tr>
         {/each}
+        {#if windowed.after > 0}
+          <tr aria-hidden="true">
+            <td
+              class="p-0"
+              colspan={columns.length + (isSolo ? 0 : 1)}
+              style:block-size="{windowed.after}px"
+            ></td>
+          </tr>
+        {/if}
       </tbody>
     </table>
   </div>

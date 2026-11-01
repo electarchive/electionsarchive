@@ -1,14 +1,15 @@
 <script lang="ts">
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import { createQuery } from "@tanstack/svelte-query";
-  import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
-  import { count, percent, plural, points } from "#lib/format.js";
+  import { count, plural } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
+  import LedgerUnits from "./ledger-units.svelte";
   import Preview from "./preview.svelte";
 
   let {
@@ -129,6 +130,11 @@
   const visible = $derived(
     all || query !== "" ? matched : matched.slice(0, LIMIT),
   );
+  const windowed = new Windowed(() => ({
+    items: visible,
+    key: (entry) => String(entry.k ?? "direct"),
+    size: 49,
+  }));
   const isOpen = (k: number | null) =>
     isFlat ||
     query.trim() !== "" ||
@@ -203,10 +209,14 @@
       </p>
     {/if}
 
-    <ul class="grid border-bs border-border">
-      {#each visible as entry (entry.k ?? "direct")}
+    <ul class="grid border-bs border-border" {@attach windowed.anchor}>
+      {#if windowed.before > 0}
+        <li aria-hidden="true" style:block-size="{windowed.before}px"></li>
+      {/if}
+      {#each windowed.entries as { value: entry, index, key } (key)}
         {const open = $derived(isOpen(entry.k))}
         <li
+          {@attach windowed.measure(index)}
           class={cn("border-be border-border/60", {
             "bg-secondary/40": focus != null && focus === entry.k,
           })}
@@ -270,86 +280,15 @@
           {/if}
           {#if open}
             <div id="{uid}-{entry.k ?? 'direct'}" class="pbe-2">
-              <table class="border-collapse text-sm/tight inline-full">
-                <tbody>
-                  {#each full.includes(entry.k) || entry.units.length <= 15 ? entry.units : entry.units.slice(0, 12) as row (row.k)}
-                    <tr
-                      class="border-bs border-border/40 first:border-bs-0 hover:bg-secondary/70"
-                    >
-                      <th
-                        class={cn("py-1.5 pe-2 text-start font-normal", {
-                          "ps-5": !isFlat,
-                          "ps-2": isFlat,
-                        })}
-                        scope="row"
-                      >
-                        <span class="font-medium">{row.name}</span>
-                        <span
-                          class="mbs-1.5 flex overflow-hidden rounded-xs bg-muted block-2 sm:hidden"
-                          aria-hidden="true"
-                        >
-                          {#each row.shares as share, index (index)}
-                            {#if share > 0}
-                              <span
-                                class="shrink-0 bg-(--party) not-last:border-e not-last:border-card"
-                                style:--party={colors[index]}
-                                style:inline-size="{share * 100}%"
-                              ></span>
-                            {/if}
-                          {/each}
-                        </span>
-                      </th>
-                      <td class="px-2 py-1.5 inline-[34%] max-sm:hidden">
-                        <span
-                          class="flex overflow-hidden rounded-xs bg-muted block-3"
-                          aria-hidden="true"
-                        >
-                          {#each row.shares as share, index (index)}
-                            {#if share > 0}
-                              <span
-                                class="shrink-0 bg-(--party) not-last:border-e not-last:border-card"
-                                style:--party={colors[index]}
-                                style:inline-size="{share * 100}%"
-                              ></span>
-                            {/if}
-                          {/each}
-                        </span>
-                      </td>
-                      <td class="px-2 py-1.5 whitespace-nowrap">
-                        {#if row.leader != null}
-                          <span class="flex items-center gap-1.5">
-                            <Name
-                              class="truncate font-semibold max-inline-40"
-                              label={titles[row.leader] ?? ""}
-                              color={colors[row.leader]}
-                              person={legend[row.leader]?.person}
-                              party={legend[row.leader]?.party}
-                            />
-                            <span
-                              class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                              >{percent(row.shares[row.leader] ?? 0)}</span
-                            >
-                          </span>
-                        {:else if row.valid === 0}
-                          <span class="text-[0.8125rem] text-muted-foreground"
-                            >{m.places_no_votes()}</span
-                          >
-                        {/if}
-                      </td>
-                      <td
-                        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums max-sm:hidden"
-                      >
-                        {row.margin == null ? "" : points(row.margin)}
-                      </td>
-                      <td
-                        class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
-                      >
-                        {count(row.valid)}
-                      </td>
-                    </tr>
-                  {/each}
-                </tbody>
-              </table>
+              <LedgerUnits
+                units={full.includes(entry.k) || entry.units.length <= 15
+                  ? entry.units
+                  : entry.units.slice(0, 12)}
+                {isFlat}
+                {colors}
+                {titles}
+                {legend}
+              />
               {#if !full.includes(entry.k) && entry.units.length > 15}
                 <button
                   type="button"
@@ -373,6 +312,9 @@
           {/if}
         </li>
       {/each}
+      {#if windowed.after > 0}
+        <li aria-hidden="true" style:block-size="{windowed.after}px"></li>
+      {/if}
     </ul>
     {#if !all && query === "" && matched.length > LIMIT}
       <button

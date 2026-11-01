@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
+  import { fits } from "#lib/fits.js";
   import { percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -378,9 +379,14 @@
         {/each}
       </svg>
     </Measured>
-    <div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
+    <div
+      class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+      {@attach fits}
+    >
       <table class="border-collapse text-sm tabular-nums inline-full">
-        <thead>
+        <thead
+          class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+        >
           <tr class="border-be text-xs text-muted-foreground">
             <th scope="col" class="py-1.5 pe-3 text-start font-semibold"
               >{m.versus_year()}</th

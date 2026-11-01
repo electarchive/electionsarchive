@@ -12,6 +12,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
   import type { PageData } from "./$types";
   import Bar from "./bar.svelte";
   import Holders from "./holders.svelte";
@@ -203,6 +204,12 @@
           .includes(query.trim().toLocaleLowerCase()),
     ),
   );
+  const placeRows = new Windowed(() => ({
+    items:
+      isAllPlaces || query.trim() !== "" ? children : children.slice(0, 20),
+    key: (_, index) => String(index),
+    size: 29,
+  }));
   const size = $derived(
     kind === "all" ? polity.places.total : (polity.places.sizes[kind] ?? 0),
   );
@@ -1053,9 +1060,13 @@
         {m.places_filter_empty({ query })}
       </p>
     {:else}
-      <ul class="grid text-sm">
-        {#each isAllPlaces || query.trim() !== "" ? children : children.slice(0, 20) as child, index (index)}
+      <ul class="grid text-sm" {@attach placeRows.anchor}>
+        {#if placeRows.before > 0}
+          <li aria-hidden="true" style:block-size="{placeRows.before}px"></li>
+        {/if}
+        {#each placeRows.entries as { value: child, index, key } (key)}
           <li
+            {@attach placeRows.measure(index)}
             class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 py-1 last:border-be-0"
           >
             {#if child.path == null}
@@ -1082,6 +1093,9 @@
             {/if}
           </li>
         {/each}
+        {#if placeRows.after > 0}
+          <li aria-hidden="true" style:block-size="{placeRows.after}px"></li>
+        {/if}
       </ul>
       {#if !isAllPlaces && query.trim() === "" && size > 20}
         <button

@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
+  import { fits } from "#lib/fits.js";
   import { count as figure } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -91,9 +92,14 @@
       {status}
     </p>
   </div>
-  <div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
+  <div
+    class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+    {@attach fits}
+  >
     <table class="border-collapse text-sm inline-full">
-      <thead>
+      <thead
+        class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+      >
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
           <th
             class="sticky inset-s-0 z-10 bg-card pe-3 pbe-1.5 text-start align-bottom font-normal"

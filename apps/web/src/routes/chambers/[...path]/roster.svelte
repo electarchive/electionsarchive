@@ -11,6 +11,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { era, swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
 
   const {
     mode,
@@ -206,6 +207,11 @@
           (a.from ?? "").localeCompare(b.from ?? ""),
       );
   });
+  const memberRows = new Windowed(() => ({
+    items: isOpen || query !== "" || party != null ? shown : shown.slice(0, 40),
+    key: (_, index) => String(index),
+    size: 45,
+  }));
   const events = $derived(
     members
       .flatMap((member) => [
@@ -597,8 +603,11 @@
           </span>
         {/if}
       </div>
-      <ul class="grid">
-        {#each isOpen || query !== "" || party != null ? shown : shown.slice(0, 40) as member, index (index)}
+      <ul class="grid" {@attach memberRows.anchor}>
+        {#if memberRows.before > 0}
+          <li aria-hidden="true" style:block-size="{memberRows.before}px"></li>
+        {/if}
+        {#each memberRows.entries as { value: member, index, key } (key)}
           {const switches = $derived(
             member.segments.slice(1).map((segment, step) => {
               const isLeft =
@@ -635,6 +644,7 @@
                 : null,
           )}
           <li
+            {@attach memberRows.measure(index)}
             class="grid grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-center gap-x-4 gap-y-0.5 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,1.4fr)]"
             style:--party={tint(member.party)}
           >
@@ -752,6 +762,9 @@
             {/if}
           </li>
         {/each}
+        {#if memberRows.after > 0}
+          <li aria-hidden="true" style:block-size="{memberRows.after}px"></li>
+        {/if}
       </ul>
     </div>
     {#if shown.length === 0}

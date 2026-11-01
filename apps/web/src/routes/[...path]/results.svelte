@@ -5,6 +5,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { fits } from "#lib/fits.js";
   import {
     count,
     credit,
@@ -939,11 +940,15 @@
 
 <div
   class={cn({
-    "overflow-x-auto overflow-y-hidden overscroll-x-contain": span != null,
+    "overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible":
+      span != null,
   })}
+  {@attach fits}
 >
   <table class="border-collapse text-sm/tight inline-full">
-    <thead>
+    <thead
+      class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+    >
       <tr class="border-be text-[0.8125rem] text-muted-foreground">
         <th class="px-2 py-1.5 text-start font-medium" scope="col"
           >{isQuestion ? m.col_answer() : m.col_option()}</th

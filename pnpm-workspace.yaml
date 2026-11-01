@@ -42,6 +42,7 @@ catalog:
   "@tanstack/eslint-plugin-query": ^5.105.0
   "@tanstack/svelte-query": ^6.3.6
   "@tanstack/svelte-query-devtools": ^6.3.6
+  "@tanstack/virtual-core": ^3.19.9
   "@types/mdast": 4.0.4
   "@types/node": ^24.19.2
   "@types/pg": ^8.23.1

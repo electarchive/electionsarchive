@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { SvelteSet } from "svelte/reactivity";
   import type { orpc } from "#lib/rpc.js";
+  import { fits } from "#lib/fits.js";
   import { count, natural, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
 
   let {
     contest,
@@ -53,6 +55,11 @@
       }),
   );
   const visible = $derived(isAll ? rows : rows.slice(0, 100));
+  const windowed = new Windowed(() => ({
+    items: visible,
+    key: (row) => String(row.k),
+    size: 33,
+  }));
   const noun = $derived(
     contest.places?.levels.find((level) => level.code === contest.places?.level)
       ?.noun ?? "",
@@ -79,9 +86,14 @@
 {#if contest.places == null || contest.places.rows.length === 0}
   <p class="p-3.5 text-sm text-muted-foreground">{m.workbench_no_places()}</p>
 {:else}
-  <div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
+  <div
+    class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+    {@attach fits}
+  >
     <table class="text-sm inline-full">
-      <thead>
+      <thead
+        class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+      >
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
           {#each columns as entry (entry.key)}
             <th
@@ -109,9 +121,19 @@
           {/each}
         </tr>
       </thead>
-      <tbody>
-        {#each visible as row (row.k)}
+      <tbody {@attach windowed.anchor}>
+        {#if windowed.before > 0}
+          <tr aria-hidden="true">
+            <td
+              class="p-0"
+              colspan={columns.length}
+              style:block-size="{windowed.before}px"
+            ></td>
+          </tr>
+        {/if}
+        {#each windowed.entries as { value: row, index, key } (key)}
           <tr
+            {@attach windowed.measure(index)}
             class={cn("cursor-pointer border-be last:border-be-0", {
               "bg-secondary": hovered === row.name,
               "bg-primary/15": picked.has(row.name),
@@ -173,6 +195,15 @@
             >
           </tr>
         {/each}
+        {#if windowed.after > 0}
+          <tr aria-hidden="true">
+            <td
+              class="p-0"
+              colspan={columns.length}
+              style:block-size="{windowed.after}px"
+            ></td>
+          </tr>
+        {/if}
       </tbody>
     </table>
   </div>

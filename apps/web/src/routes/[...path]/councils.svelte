@@ -2,9 +2,11 @@
   import { resolve } from "$app/paths";
   import { SvelteMap } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
+  import { fits } from "#lib/fits.js";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
   import type { PageData } from "./$types";
 
   const {
@@ -16,6 +18,11 @@
   const uid = $props.id();
 
   let isAll = $state(false);
+  const rows = new Windowed(() => ({
+    items: isAll ? councils : councils.slice(0, 20),
+    key: (_, index) => String(index),
+    size: 33,
+  }));
 
   const tally = $derived.by(() => {
     const parties = new SvelteMap<
@@ -139,9 +146,14 @@
       </table>
     </div>
   </div>
-  <div class="overflow-x-auto overflow-y-hidden overscroll-x-contain">
+  <div
+    class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+    {@attach fits}
+  >
     <table class="border-collapse text-sm inline-full">
-      <thead>
+      <thead
+        class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+      >
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
           <th class="pe-3 pbe-1.5 text-start font-normal" scope="col">
             {m.col_council()}
@@ -160,9 +172,14 @@
           </th>
         </tr>
       </thead>
-      <tbody>
-        {#each isAll ? councils : councils.slice(0, 20) as council, index (index)}
-          <tr class="border-be border-border/60">
+      <tbody {@attach rows.anchor}>
+        {#if rows.before > 0}
+          <tr aria-hidden="true">
+            <td class="p-0" colspan="4" style:block-size="{rows.before}px"></td>
+          </tr>
+        {/if}
+        {#each rows.entries as { value: council, index, key } (key)}
+          <tr {@attach rows.measure(index)} class="border-be border-border/60">
             <th class="py-1.5 pe-3 text-start font-normal" scope="row">
               {#if council.path == null}
                 {council.name}
@@ -225,6 +242,11 @@
             </td>
           </tr>
         {/each}
+        {#if rows.after > 0}
+          <tr aria-hidden="true">
+            <td class="p-0" colspan="4" style:block-size="{rows.after}px"></td>
+          </tr>
+        {/if}
       </tbody>
     </table>
   </div>
