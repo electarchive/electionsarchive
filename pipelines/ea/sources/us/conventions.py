@@ -85,7 +85,19 @@ CONVENTIONS = [
         "nominee": "Trump",
         "city": "Cleveland",
     },
+    {
+        "key": "2016-02-01:president:democratic",
+        "party": "democratic",
+        "title": "2016 Democratic National Convention",
+        "table": "Democratic presidential nomination ballot",
+        "days": (date(2016, 7, 25), date(2016, 7, 28)),
+        "ballots": [date(2016, 7, 26)],
+        "required": 2383,
+        "nominee": "Clinton",
+        "city": "Philadelphia",
+    },
 ]
+ABROAD = "DA"
 METHOD = (
     "The roll call of the states on the presidential nomination, one ballot per contest, with each delegation's "
     "votes as the convention secretary recorded them. The party has published no official report of the proceedings "
@@ -93,6 +105,11 @@ METHOD = (
     "the convention, pinned to the revision current when it was fetched, until an official tally is found. Each "
     "delegation's total is the delegates it held, abstentions included; abstentions are that total less the votes "
     "recorded for candidates."
+)
+ABROAD_NOTE = (
+    "Democrats Abroad is stored as an unlocated delegation, apart from the states and territories. Eight of its "
+    "superdelegates cast half votes, so its 21 delegates cast 17 votes, and its total here is the 17 votes. One "
+    "superdelegate position assigned to no state did not vote and is not counted in any delegation."
 )
 REPORTED = (
     "The delegations of Alaska, the District of Columbia, and Utah announced votes for candidates who had left the "
@@ -121,17 +138,20 @@ def roll_call(text: str, caption: str) -> tuple[list[str], dict[str, list[int]]]
     labels = [match.group(1) if match else "Abstain" for match in candidates]
     votes: dict[str, list[int]] = {}
     for row in rows[1:]:
-        place = re.search(r"\{\{flag(?:country)?\|([^}]*)\}\}", row)
+        place = re.search(r"\{\{flag(?:country)?\|([^}]*)\}\}|\[\[(Democrats Abroad)\]\]", row)
         if place is None:
             continue
-        cells = re.sub(r"\{\{refn\|.*?\|group=[^}]*\}\}", "", row, flags=re.DOTALL).split("\n|")[1:]
+        code = ABROAD if place.group(2) else PLACES[place.group(1)]
+        cells = re.sub(
+            r"\{\{refn\|.*?\|group=[^}]*\}\}|<ref[^>]*/>|<ref[^>]*>.*?</ref>", "", row, flags=re.DOTALL
+        ).split("\n|")[1:]
         if len(cells) != len(labels):
-            raise ValueError(f"{place.group(1)}: {len(cells)} cells for {len(labels)} columns")
+            raise ValueError(f"{code}: {len(cells)} cells for {len(labels)} columns")
         values = []
         for cell in cells:
             recorded = cell.split("|")[-1].split("<br>")[0].strip()
             values.append(0 if recorded in {"·", "–", ""} else int(recorded.replace(",", "")))
-        votes[PLACES[place.group(1)]] = values
+        votes[code] = values
     return labels, votes
 
 
@@ -141,7 +161,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the 2016 Republican National Convention",
+            summary="The roll call of the states at the 2016 national conventions",
             polity="US",
         )
 
@@ -195,8 +215,22 @@ def emit() -> Path:
             artifact = raw.cached(SOURCE, page(title))
             parsed = json.loads(artifact.path.read_text())["parse"]
             labels, table = roll_call(parsed["wikitext"], convention["table"])
-            if set(table) != set(units):
-                raise ValueError(f"{title}: delegations {sorted(set(units) ^ set(table))} do not match the states")
+            expected = set(units) | ({ABROAD} if ABROAD in table else set())
+            if set(table) != expected:
+                raise ValueError(f"{title}: delegations {sorted(expected ^ set(table))} do not match the states")
+            if ABROAD in table:
+                units[ABROAD] = cs.unit("us.state", ABROAD)
+                if units[ABROAD] in cs.minted:
+                    cs.add(
+                        "reporting_unit",
+                        id=units[ABROAD],
+                        polity_id=us,
+                        scheme_code="us.state",
+                        code=ABROAD,
+                        area_relation="unlocated",
+                        kind="abroad_mission",
+                    )
+                    name(units[ABROAD], "Democrats Abroad")
             source = cs.source("Wikipedia", f"{title}, revision {parsed['revid']}")
             cs.add(
                 "source",
@@ -267,6 +301,8 @@ def emit() -> Path:
                 )
                 if key == "2016-02-01:president:republican":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=REPORTED)
+                else:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=ABROAD_NOTE)
                 ballot_options = {}
                 for label in labels[:-1]:
                     surname = label.split()[-1]
