@@ -10125,6 +10125,11 @@ def parse() -> None:
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
             index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
+        for district, label in (
+            ("3407590", "Hunterdon Central High School District"),
+            ("3417550", "West Morris High School District"),
+        ):
+            index[("34", coverage_tables.tokens(label))].append((district, label))
         unowned: dict[str, list[tuple[str, str, str, str, str]]] = defaultdict(list)
         owned = dict(
             conn.execute(
