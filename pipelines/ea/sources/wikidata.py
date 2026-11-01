@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "17"
+VERSION = "18"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -32,6 +32,7 @@ COUNTRIES = {
     "IE": "Q27",
     "CH": "Q39",
     "GB": "Q145",
+    "PL": "Q36",
     "EU": None,
 }
 LANGUAGES = '"en", "mul", "fr", "de", "it", "pt", "tr", "ga", "rm"'
@@ -80,6 +81,13 @@ THRESHOLD = 4
 SPLIT = r"\s[-–—]\s"
 LINKED = ("party", "federation", "parliamentary_group", "independent_group")
 MATCHES: dict[tuple[str, str], str | None] = {
+    ("PL", "PPP Polish Labor Party"): "Q2102505",
+    ("PL", "PO Civic Platform"): "Q156868",
+    ("PL", "KNP Congress of the new right"): "Q1584987",
+    ("PL", "UPR Real Politics Union"): "Q1270771",
+    ("PL", "UW\xa0-\xa0Unia Wolnosci"): "Q2307945",
+    ("GB", "Mebyon Kernow - The Party for Cornwall"): "Q161957",
+    ("US", "American Delta Party"): "Q27868752",
     ("BR", "Partido Social Trabalhista"): "Q28678919",
     ("BR", "Partido da Democracia Crista"): "Q65160541",
     ("CA", "Progressive"): "Q2112263",
