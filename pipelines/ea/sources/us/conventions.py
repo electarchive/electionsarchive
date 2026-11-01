@@ -237,7 +237,7 @@ TABLES += [
         for name, found, only in (
             ("b3", (235, 236), {236: "scatter"}),
             ("b5", (247, 248), {248: "scatter"}),
-            ("b6", (248, 249), {248: "table", 249: "scatter"}),
+            ("b6", (248, 249), {248: "table"}),
             ("b10", (269, 270), {270: "scatter"}),
         )
     ),
@@ -432,7 +432,8 @@ PROCEEDINGS = [
     {"tables": {1: "1904:republican"}, "ordinal": "Thirteenth", "city": "Chicago", "days": (date(1904, 6, 21), date(1904, 6, 23)), "ballots": {1: date(1904, 6, 23)}, "deciding": 1},
     {"tables": {1: "1908:republican"}, "ordinal": "Fourteenth", "city": "Chicago", "days": (date(1908, 6, 16), date(1908, 6, 19)), "ballots": {1: date(1908, 6, 19)}, "deciding": 1},
     {"tables": {1: "1912:republican"}, "ordinal": "Fifteenth", "city": "Chicago", "days": (date(1912, 6, 18), date(1912, 6, 22)), "ballots": {1: date(1912, 6, 22)}, "deciding": 1},
-    {"tables": {n: f"1916:republican:b{n}" for n in (1, 2)}, "ordinal": "Sixteenth", "city": "Chicago", "days": (date(1916, 6, 7), date(1916, 6, 10)), "ballots": dict.fromkeys(range(1, 4), date(1916, 6, 10)), "deciding": 3},
+    {"tables": {n: f"1916:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Sixteenth", "city": "Chicago", "days": (date(1916, 6, 7), date(1916, 6, 10)), "ballots": dict.fromkeys(range(1, 4), date(1916, 6, 10)), "deciding": 3},
+    {"tables": {n: f"1920:republican:b{n}" for n in range(1, 11)}, "ordinal": "Seventeenth", "city": "Chicago", "days": (date(1920, 6, 8), date(1920, 6, 12)), "ballots": dict.fromkeys(range(1, 5), date(1920, 6, 11)) | dict.fromkeys(range(5, 11), date(1920, 6, 12)), "deciding": 10, "caveat": "On the tenth ballot several delegations changed their votes after they were first called and before the result was announced; the tabulation stored here is the one the convention declared."},
     {"tables": {1: "1924:republican"}, "ordinal": "Eighteenth", "city": "Cleveland", "days": (date(1924, 6, 10), date(1924, 6, 12)), "ballots": {1: date(1924, 6, 12)}, "deciding": 1},
     {"tables": {1: "1928:republican"}, "ordinal": "Nineteenth", "city": "Kansas City", "days": (date(1928, 6, 12), date(1928, 6, 15)), "ballots": {1: date(1928, 6, 14)}, "deciding": 1},
     {"tables": {1: "1968:republican:final"}, "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballots": {1: date(1968, 8, 7)}, "deciding": 1},
@@ -486,6 +487,12 @@ CANDIDATES = {
     "republican:Borah": ("William E. Borah", "Q895819"),
     "republican:Kellogg": ("Frank B. Kellogg", "Q193009"),
     "republican:W. L. Ward": ("William L. Ward", None),
+    "republican:Ward": ("William L. Ward", "Q3539740"),
+    "republican:Pritchard": ("Jeter C. Pritchard", "Q1688490"),
+    "republican:Warren": ("Charles B. Warren", "Q5075344"),
+    "republican:Lenroot": ("Irvine L. Lenroot", "Q1673264"),
+    "republican:Hays": ("Will H. Hays", "Q2094258"),
+    "republican:MacGregor": ("H. F. MacGregor", None),
     "republican:du Pont": ("T. Coleman du Pont", "Q2383282"),
     "republican:La Follette": ("Robert M. La Follette", "Q878682"),
     "republican:Johnson": ("Hiram W. Johnson", "Q143644"),
@@ -826,7 +833,7 @@ COLUMNS = {
         "Not voting",
     ),
 }
-LABELS = {"Washbarne": "Washburne", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer", "Owens": "Owen"}
+LABELS = {"Washbarne": "Washburne", "Poinddexter": "Poindexter", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer", "Owens": "Owen"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1904:democratic": [
@@ -1144,7 +1151,15 @@ CORRECTIONS = {
         (216, "PA", (0.0, 0.276, 1.0, 0.288), {"Absent": 1}, "listed as absent below the tabulation"),
         (216, "CA", (0.0, 0.276, 1.0, 0.288), {"Absent": 1}, "listed as absent below the tabulation"),
     ],
+    "1920:republican:b1": [
+        (230, "MO", (0.09, 0.765, 0.37, 0.779), {"Not voting": 1}, "listed as not voting below the tabulation"),
+    ],
+    "1920:republican:b9": [
+        (263, "OK", (0.08, 0.714, 0.83, 0.729), {"Absent": 0.5}, "listed as absent and not voting below the tabulation"),
+        (263, "TX", (0.08, 0.714, 0.83, 0.729), {"Absent": 0.5}, "listed as absent and not voting below the tabulation"),
+    ],
     "1920:republican:b10": [
+        (270, "OK", (0.14, 0.212, 0.38, 0.227), {"Absent": 0.5}, "listed as absent below the tabulation"),
         (269, "IL", (0.56, 0.395, 0.88, 0.405), {"Harding": 38.2, "Johnson": 18.8}, "printed in fifths: 38 1/5 and 18 4/5"),
     ],
     "1920:republican:b3": [
@@ -1157,6 +1172,19 @@ CORRECTIONS = {
         (253, "PA", (0.455, 0.630, 0.49, 0.640), {"votes": 76}, "the row is left out of the table; the delegates total of 984 counts its 76, all listed under the scattering votes"),
     ],
     "1920:republican:b5": [
+        (248, "WA", (0.0, 0.113, 1.0, 0.122), {"Poindexter": 14}, "14, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "NY", (0.0, 0.113, 1.0, 0.122), {"Poindexter": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "WI", (0.0, 0.123, 1.0, 0.133), {"La Follette": 24}, "24, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "WV", (0.0, 0.133, 1.0, 0.142), {"Sutherland": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "DE", (0.0, 0.144, 1.0, 0.153), {"du Pont": 6}, "6, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "CO", (0.0, 0.154, 1.0, 0.174), {"Hoover": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "ME", (0.0, 0.154, 1.0, 0.174), {"Hoover": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "NY", (0.0, 0.154, 1.0, 0.174), {"Hoover": 3}, "3, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "WI", (0.0, 0.154, 1.0, 0.174), {"Hoover": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "MN", (0.0, 0.175, 1.0, 0.184), {"Kellogg": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "NY", (0.0, 0.186, 1.0, 0.195), {"Ward": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "NY", (0.0, 0.196, 1.0, 0.205), {"Butler": 4}, "4, listed among the scattering votes; the second read of the leaf came back empty"),
+        (248, "PA", (0.0, 0.206, 1.0, 0.216), {"Knox": 1}, "1, listed among the scattering votes; the second read of the leaf came back empty"),
         (247, "MA", (0.636, 0.438, 0.677, 0.448), {"Johnson": 0}, "printed under Johnson but left out of the Johnson total; the rest of the delegation went to Coolidge"),
     ],
     "1868:democratic:b1": [
