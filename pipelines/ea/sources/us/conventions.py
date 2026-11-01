@@ -271,14 +271,20 @@ TABLES += [
     {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (38, 39, 40, 41), "narrated": True},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
-DNC_1912 = (203, 207, 211, 212, 217, 219, 221, 222, 225, 227, 230, 233, 237, 248, 250, 253, 257, 259, 260, 262, 266, 270, 272, 276, 278, 283, 293, 297, 305, 308, 311, 312, 315, 318, 320, 322, 323, 327, 330, 331, 333, 336, 344, 348, 351, 358)  # fmt: skip
+DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (213, 214), (217, 218), (219, 220), (221, 222), (223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (261, 262), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (324, 325), (327, 328), (330, 331), (332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
 DNC_1868 = (78, 80, 83, 86, 99, 102, 109, 112, 114, 117, 119, 122, 125, 127, 130, 132, 135, 138, 147, 150, 152)  # fmt: skip
 TABLES += [
-    *ballots(
-        "officialreportof00demoiala",
-        "1912",
-        {n: (page, min(page + 2, after)) for n, (page, after) in enumerate(pairwise((*DNC_1912, 361)), start=1)},
-        party="democratic",
+    *(
+        {
+            "table": f"1912:democratic:b{n}",
+            "item": "officialreportof00demoiala",
+            "leaves": found,
+            "parts": {found[0]: "tail"} if found[0] in previous else {},
+        }
+        | ({"parts": {found[-1]: "head"}} if found[-1] in after else {})
+        for n, (previous, found, after) in enumerate(
+            zip(((),) + DNC_1912[:-1], DNC_1912, DNC_1912[1:] + ((),), strict=True), start=1
+        )
     ),
     *leaves("official00demo", "1900", {"": (165, 166, 167)}, party="democratic"),
     *leaves("officialproce00de", "1896", {"b5": (346,)}, party="democratic"),
@@ -393,6 +399,8 @@ ABBREVIATIONS = {
     "districtofcolumbia": "DC", "distofcolumbia": "DC", "portorico": "PR", "philippineislands": "PH",
     "philippines": "PH", "phillippines": "PH", "dakota": "DT", "indianterritory": "IT", "dalaware": "DE",
     "southsarolina": "SC", "canalzone": "CZ", "nocar": "NC", "nodak": "ND", "socar": "SC", "sodak": "SD",
+    "nhampshire": "NH", "ncarolina": "NC", "ndakota": "ND", "scarolina": "SC", "sdakota": "SD", "wvirginia": "WV",
+    "distofcol": "DC", "njersey": "NJ", "nmexico": "NM", "nyork": "NY", "risland": "RI",
 }  # fmt: skip
 COLUMNS = {
     "1916:republican:b1": (
@@ -665,6 +673,7 @@ def candidate(label: str, table: str) -> str:
 def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
     cells: list[dict[str, object]] = []
     totals: dict[str, float] = {}
+    shifted: dict[str, float] = {}
     problems: list[str] = []
     fixed = {(code, column) for _, code, _, figures, _ in CORRECTIONS.get(spec["table"], ()) for column in figures}
     for leaf, scatter in product(spec["leaves"], (False, True)):
@@ -715,7 +724,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             or COLUMNS.get(spec["table"])
             or tuple(
                 "votes"
-                if re.search(r"vote|delegate|whole|^\s*total\.?\s*$", column["label"], re.IGNORECASE)
+                if re.search(r"vot(?!ing)|delegate|whole|^\s*total\.?\s*$", column["label"], re.IGNORECASE)
                 else candidate(column["label"], spec["table"])
                 for column in header
             )
@@ -723,10 +732,31 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
         if len(roles) != len(header):
             problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
             continue
+        rows = read["rows"]
+        if part := spec.get("parts", {}).get(leaf):
+            end = next(
+                (i + 1 for i, row in enumerate(rows) if re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE)),
+                len(rows),
+            )
+            rows = rows[:end] if part == "head" else rows[end:]
         seen: dict[str | None, int] = {}
-        for row in read["rows"]:
-            if len(row["values"]) != len(header):
-                problems.append(f"leaf {leaf}: {row['label']} has {len(row['values'])} cells")
+        for row in rows:
+            values = row["values"]
+            if (
+                roles[0] == "votes"
+                and place(row["label"]) is None
+                and re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE)
+            ):
+                if len(values) == len(header) - 1:
+                    values = ["", *values]
+                elif len(values) == len(header) and values[0].strip() and not number(values[-1]):
+                    shifted |= {
+                        role: number(value)
+                        for role, value in zip(roles[1:], values, strict=False)
+                        if role and value.strip()
+                    }
+            if len(values) != len(header):
+                problems.append(f"leaf {leaf}: {row['label']} has {len(values)} cells")
                 continue
             code = place(row["label"])
             seen[code] = seen.get(code, 0) + 1
@@ -736,7 +766,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             if code is None and not re.match(r"^\s*(totals?\b|$)", row["label"], re.IGNORECASE):
                 problems.append(f"leaf {leaf}: unknown row {row['label']!r}")
                 continue
-            for role, column, value in zip(roles, header, row["values"], strict=True):
+            for role, column, value in zip(roles, header, values, strict=True):
                 if role is None or (not value.strip() and roles.count(role) > 1):
                     continue
                 try:
@@ -746,7 +776,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         problems.append(f"leaf {leaf}: {row['label']} {role} reads {value!r}")
                     continue
                 if code is None:
-                    totals[role] = figure
+                    if value.strip() and (figure or role != "votes"):
+                        totals[role] = figure
                     continue
                 cells.append(
                     {
@@ -759,6 +790,9 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         "box": [column["x0"] / 1000, row["y0"] / 1000, column["x1"] / 1000, row["y1"] / 1000],
                     }
                 )
+    held = sum(cell["value"] for cell in cells if cell["column"] == "votes")
+    if shifted and totals.get("votes", held) != held:
+        totals = shifted
     totals |= TOTALS.get(spec["table"], {})
     for leaf, code, box, figures, _ in CORRECTIONS.get(spec["table"], ()):
         image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
