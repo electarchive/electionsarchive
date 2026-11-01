@@ -7,6 +7,7 @@
   import { count as figure, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { reveal, settle } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -46,8 +47,9 @@
 
 <section
   id="rounds"
-  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0"
+  class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5 [contain-intrinsic-size:auto_none] min-inline-0 data-settled:[content-visibility:auto]"
   aria-labelledby="{uid}-title"
+  {@attach settle}
 >
   <div class="grid gap-0.5">
     <h2 id="{uid}-title" class="text-lg font-bold">{m.count_table()}</h2>
@@ -58,17 +60,7 @@
   <div
     class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
     {@attach fits}
-    {@attach (node: HTMLElement) => {
-      const cell = node.querySelector<HTMLElement>(
-        `thead th:nth-child(${count.round + 1})`,
-      );
-      if (cell != null) {
-        node.scrollLeft = Math.max(
-          0,
-          cell.offsetLeft + cell.offsetWidth - node.clientWidth,
-        );
-      }
-    }}
+    {@attach reveal(`thead th:nth-child(${count.round + 1})`)}
   >
     <table class="border-collapse text-sm inline-full">
       <thead

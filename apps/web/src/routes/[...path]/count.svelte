@@ -8,6 +8,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { reveal } from "#lib/settle.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -158,15 +159,7 @@
   </div>
   <ol
     class="-mx-1 grid auto-cols-[minmax(1.75rem,1fr)] grid-flow-col overflow-x-auto"
-    {@attach (node: HTMLElement) => {
-      const cell = node.children[shown - 1];
-      if (cell instanceof HTMLElement) {
-        node.scrollLeft = Math.max(
-          0,
-          cell.offsetLeft + cell.offsetWidth - node.clientWidth,
-        );
-      }
-    }}
+    {@attach reveal(`:scope > :nth-child(${shown})`)}
   >
     {#each rounds as entry (entry.round)}
       {const isShown = $derived(entry.round === shown)}

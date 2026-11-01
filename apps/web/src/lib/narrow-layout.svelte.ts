@@ -1,13 +1,34 @@
 import { browser } from "$app/env";
 import { createSubscriber } from "svelte/reactivity";
 
+let isNarrow: boolean | null = null;
+
+const rootRem = () =>
+  Number(getComputedStyle(document.documentElement).fontSize.slice(0, -2));
+
 const subscribe = createSubscriber((update) => {
-  const resize = new ResizeObserver(update);
-  const rootStyle = new MutationObserver(update);
+  let rem = rootRem();
+  let width: number | null = null;
+  const refresh = () => {
+    const next = width == null ? null : width < 48 * rem;
+    if (next !== isNarrow) {
+      isNarrow = next;
+      update();
+    }
+  };
+  const resize = new ResizeObserver(([entry]) => {
+    width = entry?.contentBoxSize[0]?.inlineSize ?? width;
+    refresh();
+  });
+  const rootStyle = new MutationObserver(() => {
+    rem = rootRem();
+    refresh();
+  });
   resize.observe(document.body);
   rootStyle.observe(document.documentElement, { attributeFilter: ["style"] });
 
   return () => {
+    isNarrow = null;
     resize.disconnect();
     rootStyle.disconnect();
   };
@@ -20,9 +41,5 @@ export function isNarrowLayout(): boolean {
   }
 
   subscribe();
-  const rem = Number(
-    getComputedStyle(document.documentElement).fontSize.slice(0, -2),
-  );
-
-  return document.body.clientWidth < 48 * rem;
+  return isNarrow ?? document.body.clientWidth < 48 * rootRem();
 }
