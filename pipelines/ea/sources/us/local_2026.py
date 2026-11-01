@@ -6721,6 +6721,8 @@ KY_BOARD_SEATS = {
     "Erlanger-Elsmere Independent School District Board of Education": 3,
     "Ludlow Independent School District Board of Education": 3,
     "Walton-Verona Independent School District Board of Education": 3,
+    "Anchorage Independent Schools Board of Education": 3,
+    "Campbellsville Independent School District Board of Education": 3,
 }
 KY_SHARED_CITIES = {
     "21093": "21123",
@@ -7452,7 +7454,8 @@ def parse() -> None:
     }
     independents = {
         frozenset(
-            "SPRINGS" if word == "SPR" else word for word in coverage_tables.tokens(label) - {"INDEPENDENT", "D"}
+            "SPRINGS" if word == "SPR" else word
+            for word in coverage_tables.tokens(label) - {"INDEPENDENT", "D", "WORTHINGTON"}
         ): (
             f"{st}{code}",
             label,
@@ -7483,9 +7486,10 @@ def parse() -> None:
         )
         ballot_text[str(county)] = printed
         for name, asks in re.findall(
-            r"(?i)BOARD OF EDUCATION,?\s+([A-Za-z .'&-]{3,70}?)\s*\(Vote for ([A-Za-z]+)\)", " ".join(printed)
+            r"(?i)BOARD OF EDUCATION,?\s+([A-Za-z0-9 .,'&()-]{3,90}?)\s*\(?Vote for (?:up to )?([A-Za-z0-9]+)\)?",
+            " ".join(printed),
         ):
-            if re.search(r"(?i)\bind", name):
+            if re.search(r"(?i)\bind", name) and not re.search(r"(?i)unexpired", name):
                 board_seats[
                     frozenset(
                         "SPRINGS" if word == "SPR" else word for word in coverage_tables.tokens(name) - {"INDEPENDENT"}
@@ -7544,6 +7548,8 @@ def parse() -> None:
             )
         found = kentucky.get(coverage_tables.tokens(f"{place} County School District"))
         described = coverage_tables.tokens(str(description or ""))
+        if "OPS" in described:
+            described |= {"OWENSBORO"}
         own = (
             None
             if post != "SCHOOL BOARD MEMBER" or "COUNTY" in described
@@ -7552,7 +7558,7 @@ def parse() -> None:
         if own is not None:
             code, label = independents[own]
             base = f"{label} Board of Education"
-            seats = KY_BOARD_SEATS.get(base) or board_seats.get(own)
+            seats = KY_BOARD_SEATS.get(base) or next((n for stem, n in board_seats.items() if own <= stem), 0)
             if seats:
                 contest = base + (" (Unexpired Term)" if "UNEXPIRED" in described else "")
                 schools[contest] = ("Board of Education", label, f"school:{code}")
