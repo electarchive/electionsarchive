@@ -1,7 +1,7 @@
 import json
 import math
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 from ea.sources.us.place_units import STATE_FIPS
@@ -73,13 +73,6 @@ class Tiles:
 
 
 TILES = {
-    "us-cd": Tiles(
-        "us.cd",
-        5070,
-        2,
-        {code: postal for postal, code in (STATE_FIPS | INSETS).items()},
-        {year: date(year, 11, 2) + timedelta((1 - date(year, 11, 2).weekday()) % 7) for year in range(1992, 2027, 2)},
-    ),
     "ca-fed": Tiles(
         "ca.fed",
         3347,

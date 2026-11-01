@@ -3885,9 +3885,6 @@ function hexMarkdown(
       )
       .toArray()
       .join("\n"),
-    ...(layout.credit == null
-      ? []
-      : [m.map_hex_credit({ credit: layout.credit })]),
     ...(layout.cartogram == null ? [] : [m.twin_hexes_cartogram()]),
   ];
 }

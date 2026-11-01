@@ -85,7 +85,7 @@ def main() -> None:
     )
     commands.add_parser(
         "cartograms",
-        help="build the US House district cartograms and their tile grids, then the hex tile maps",
+        help="build the US House cartogram and tile layouts for every House election, then the other hex tile maps",
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
     commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")

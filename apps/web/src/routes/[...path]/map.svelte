@@ -141,7 +141,6 @@
     up?: { name: string; path: string } | null;
     tallies?: Array<number | null> | null;
     hexes?: Array<{
-      credit: string | null;
       cells: Array<{ k: number; q: number; r: number; isApart: boolean }>;
       borders: Array<{ isNation: boolean; edges: Array<Array<number>> }>;
       labels: Array<{ q: number; r: number; text: string; k?: number }>;
@@ -155,7 +154,13 @@
           isApart: boolean;
         }>;
         states: Array<string>;
-        labels: Array<{ x: number; y: number; text: string }>;
+        labels: Array<{
+          x: number;
+          y: number;
+          text: string;
+          seats: number | null;
+        }>;
+        counts: Array<{ k: number; x: number; y: number; seats: number }>;
       } | null;
       isPartial: boolean;
     }> | null;
@@ -582,8 +587,6 @@
       height,
     };
   };
-  const hexagon = (x: number, y: number) =>
-    `M${x.toFixed(3)} ${(y - 1).toFixed(3)}l0.866 0.5v1l-0.866 0.5l-0.866 -0.5v-1z`;
   const tiled = $derived.by(() => {
     if (hexed == null) {
       return null;
@@ -591,15 +594,6 @@
     const center = (q: number, r: number) => ({
       x: Math.sqrt(3) * (q + (r & 1) / 2),
       y: -1.5 * r,
-    });
-    const cells = hexed.cells.map((cell) => {
-      const at = center(cell.q, cell.r);
-      return {
-        k: cell.k,
-        ...at,
-        d: hexagon(at.x, at.y),
-        isApart: cell.isApart,
-      };
     });
     const corners = [
       [0, -1],
@@ -609,6 +603,71 @@
       [-0.866, 0.5],
       [-0.866, -0.5],
     ];
+    const steps = [
+      [0, -2],
+      [1, -1],
+      [1, 1],
+      [0, 2],
+      [-1, 1],
+      [-1, -1],
+    ];
+    const spot = (x: number, y: number) =>
+      `${((x * Math.sqrt(3)) / 2).toFixed(3)} ${(y / 2).toFixed(3)}`;
+    const trace = (spots: Array<{ q: number; r: number }>) => {
+      const lattice = spots.map(({ q, r }) => [2 * q + (r & 1), -3 * r]);
+      const inside = new Set(lattice.map(([x = 0, y = 0]) => `${x},${y}`));
+      const next = new Map<string, [number, number]>();
+      for (const [x = 0, y = 0] of lattice) {
+        for (const [side, [ax = 0, ay = 0]] of steps.entries()) {
+          const [bx = 0, by = 0] = steps[(side + 1) % 6] ?? [];
+          if (!inside.has(`${x + ax + bx},${y + ay + by}`)) {
+            next.set(`${x + ax},${y + ay}`, [x + bx, y + by]);
+          }
+        }
+      }
+      let d = "";
+      for (const [start] of next) {
+        const [sx = 0, sy = 0] = start.split(",").map(Number);
+        d += `M${spot(sx, sy)}`;
+        let at = next.get(start);
+        next.delete(start);
+        while (at != null && `${at[0]},${at[1]}` !== start) {
+          d += `L${spot(at[0], at[1])}`;
+          const key = `${at[0]},${at[1]}`;
+          at = next.get(key);
+          next.delete(key);
+        }
+        d += "Z";
+      }
+      return d;
+    };
+    const members = new Map<
+      number,
+      { isApart: boolean; spots: Array<{ q: number; r: number }> }
+    >();
+    for (const cell of hexed.cells) {
+      const seen = members.get(cell.k);
+      if (seen == null) {
+        members.set(cell.k, { isApart: cell.isApart, spots: [cell] });
+      } else {
+        seen.spots.push(cell);
+      }
+    }
+    const grouped = new Map<
+      number,
+      { k: number; x: number; y: number; d: string; isApart: boolean }
+    >();
+    for (const [k, { isApart, spots }] of members) {
+      let x = 0;
+      let y = 0;
+      for (const cell of spots) {
+        const at = center(cell.q, cell.r);
+        x += at.x / spots.length;
+        y += at.y / spots.length;
+      }
+      grouped.set(k, { k, x, y, d: trace(spots), isApart });
+    }
+    const cells = [...grouped.values()];
     const line = (edges: Array<Array<number>>) =>
       edges
         .map(([q = 0, r = 0, e = 1]) => {
@@ -623,24 +682,25 @@
     let right = -Infinity;
     let top = Infinity;
     let bottom = -Infinity;
-    for (const cell of cells) {
-      left = Math.min(left, cell.x);
-      right = Math.max(right, cell.x);
-      top = Math.min(top, cell.y);
-      bottom = Math.max(bottom, cell.y);
+    for (const cell of hexed.cells) {
+      const at = center(cell.q, cell.r);
+      left = Math.min(left, at.x);
+      right = Math.max(right, at.x);
+      top = Math.min(top, at.y);
+      bottom = Math.max(bottom, at.y);
     }
     return {
       cells,
-      at: new Map(cells.map((cell) => [cell.k, cell])),
+      at: grouped,
       ...framed(left - 1.2, top - 1.4, right + 1.2, bottom + 1.4),
       seam: 0.12,
       size: 0.62,
-      credit: hexed.credit,
       labels: hexed.labels.map((label) => ({
         ...center(label.q, label.r),
         text: label.text,
         seats: seated?.get(label.k ?? -1) ?? null,
       })),
+      counts: [],
       nations: line(
         hexed.borders.flatMap((border) =>
           border.isNation ? border.edges : [],
@@ -665,8 +725,8 @@
       ...framed(left - 1.5, top - 1.5, right + 1.5, bottom + 1.5),
       seam: 0.3,
       size: 1.9,
-      credit: null,
-      labels: cartogram.labels.map((label) => ({ ...label, seats: null })),
+      labels: cartogram.labels,
+      counts: cartogram.counts,
       nations: cartogram.states.join(""),
       regions: "",
     };
@@ -736,13 +796,7 @@
       ? new Map(fills((css) => engine.read(css)))
       : new Map<number, string>();
   });
-  const credited = $derived(
-    grid == null
-      ? (sources ?? engine.credits)
-      : grid.credit == null
-        ? []
-        : [m.map_hex_credit({ credit: grid.credit })],
-  );
+  const credited = $derived(grid == null ? (sources ?? engine.credits) : []);
   const stretch = $derived(
     grid == null ? 1 : Math.min(boxWidth / grid.width, boxHeight / grid.height),
   );
@@ -1437,6 +1491,7 @@
 
   function fills(read: (css: string) => string) {
     const result: Array<[number, string]> = [];
+    const grays = new Map<string, boolean>();
     const empty = read(
       "color-mix(in oklab, var(--muted-foreground) 6%, var(--card))",
     );
@@ -1503,15 +1558,17 @@
           ? 100
           : (LEANS[bin(row.margin)] ?? 100);
       let tone = colors[shown] ?? "var(--muted-foreground)";
-      const [red = 0, green = 0, blue = 0] = (
-        /\d+, \d+, \d+/u.exec(read(tone))?.[0] ?? ""
-      )
-        .split(", ")
-        .map(Number);
-      if (
-        !dimmed &&
-        Math.max(red, green, blue) - Math.min(red, green, blue) < 24
-      ) {
+      let isGray = grays.get(tone);
+      if (isGray == null) {
+        const [red = 0, green = 0, blue = 0] = (
+          /\d+, \d+, \d+/u.exec(read(tone))?.[0] ?? ""
+        )
+          .split(", ")
+          .map(Number);
+        isGray = Math.max(red, green, blue) - Math.min(red, green, blue) < 24;
+        grays.set(tone, isGray);
+      }
+      if (!dimmed && isGray) {
         strength = 100;
       }
       if (view === "bubbles") {
@@ -2248,31 +2305,6 @@
         </div>
       </div>
     {/if}
-    {#each views as choice (choice.name)}
-      {const isOn = $derived(shape === choice.name)}
-      <button
-        type="button"
-        class={cn(
-          "flex items-center gap-1.5 rounded-sm border border-foreground/40 bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:border-foreground/70 hover:bg-secondary pointer-coarse:block-10",
-          {
-            "border-primary bg-primary text-primary-foreground hover:border-primary hover:bg-primary":
-              isOn,
-          },
-        )}
-        aria-pressed={isOn}
-        onclick={() => {
-          shape = isOn ? null : choice.name;
-          zoom = { scale: 1, x: 0, y: 0 };
-        }}
-        >{#if choice.name === "cartogram"}<ShapesIcon
-            class={cn("block-3.5 inline-3.5", { "fill-current": isOn })}
-            aria-hidden="true"
-          />{m.map_view_cartogram()}{:else}<HexagonIcon
-            class={cn("block-3.5 inline-3.5", { "fill-current": isOn })}
-            aria-hidden="true"
-          />{m.map_view_hexes()}{/if}</button
-      >
-    {/each}
     {#if tiers.length > 1}
       <div
         class="scroll-fade-x flex max-inline-full"
@@ -2328,17 +2360,57 @@
         {/each}
       </div>
     {/if}
-    <div class="ms-auto flex items-center gap-2">
-      {#if explore != null}
-        <a
-          href={page.url.searchParams.get("group") === "alliance"
-            ? resolve("/map/[...path]?group=alliance", { path: explore })
-            : resolve("/map/[...path]", { path: explore })}
-          class="flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
-          >{m.atlas_explore()}</a
+    <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
+      {#if views.length > 0}
+        <div
+          class="flex @max-md:inline-full"
+          role="group"
+          aria-label={m.map_shape()}
         >
+          {#each [null, ...views.map((choice) => choice.name)] as choice (choice)}
+            {const isOn = $derived(shape === choice)}
+            <button
+              type="button"
+              class={cn(
+                "relative -ms-px flex items-center justify-center gap-1.5 border border-foreground/40 bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:z-10 hover:border-foreground/70 hover:bg-secondary @max-md:flex-1 pointer-coarse:block-10",
+                {
+                  "z-20 border-primary bg-primary text-primary-foreground hover:z-20 hover:border-primary hover:bg-primary":
+                    isOn,
+                },
+              )}
+              aria-pressed={isOn}
+              onclick={() => {
+                if (!isOn) {
+                  shape = choice;
+                  zoom = { scale: 1, x: 0, y: 0 };
+                }
+              }}
+              >{#if choice == null}<MapIcon
+                  class="block-3.5 inline-3.5"
+                  aria-hidden="true"
+                />{m.map_view_map()}{:else if choice === "cartogram"}<ShapesIcon
+                  class={cn("block-3.5 inline-3.5", { "fill-current": isOn })}
+                  aria-hidden="true"
+                />{m.map_view_cartogram()}{:else}<HexagonIcon
+                  class={cn("block-3.5 inline-3.5", { "fill-current": isOn })}
+                  aria-hidden="true"
+                />{m.map_view_hexes()}{/if}</button
+            >
+          {/each}
+        </div>
       {/if}
-      <Export name="map" />
+      <div class="flex items-center gap-2">
+        {#if explore != null}
+          <a
+            href={page.url.searchParams.get("group") === "alliance"
+              ? resolve("/map/[...path]?group=alliance", { path: explore })
+              : resolve("/map/[...path]", { path: explore })}
+            class="flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
+            >{m.atlas_explore()}</a
+          >
+        {/if}
+        <Export name="map" />
+      </div>
     </div>
   </div>
   <div
@@ -2496,6 +2568,21 @@
           stroke-linecap="round"
           pointer-events="none"
         />
+        {#each grid.size * stretch * zoom.scale < 7 ? [] : grid.counts as mark (mark.k)}
+          <text
+            class="fill-foreground font-figures tabular-nums"
+            x={mark.x}
+            y={mark.y}
+            font-size={grid.size * 0.7}
+            text-anchor="middle"
+            dominant-baseline="central"
+            stroke="var(--card)"
+            stroke-width={grid.size * 0.2}
+            stroke-linejoin="round"
+            paint-order="stroke"
+            pointer-events="none">{count(mark.seats)}</text
+          >
+        {/each}
         {#each grid.size * stretch * zoom.scale < 7 ? [] : grid.labels as label (label.text)}
           <text
             class="fill-foreground font-semibold"
