@@ -16,6 +16,8 @@ TITLE = "Primary Election Results by County"
 LANDING = "https://electionstats.sos.nm.gov/"
 SERVE = "https://nm.elstats2.civera.com/eng/files/serve/{id}"
 FILES = {date(2004, 6, 1): 455, date(2006, 6, 6): 453, date(2010, 6, 1): 451, date(2012, 6, 5): 449}
+TABLE = "https://nm.elstats.civera.com/api/download_contest/{id}_table.csv?split_party=false"
+TABLES = {date(2002, 6, 4): {4960: "senate:democratic"}}
 COUNTIES = [
     "001",
     "003",
@@ -60,6 +62,12 @@ METHOD = (
 )
 
 
+TABLE_METHOD = (
+    "County totals are from the Secretary of State's election statistics archive table for the contest, which "
+    "transcribes the State Canvassing Board's Canvass of Returns; each candidate's county cells sum to the state total."
+)
+
+
 def fetch() -> None:
     for number in FILES.values():
         url = SERVE.format(id=number)
@@ -70,6 +78,16 @@ def fetch() -> None:
                 ["curl", "-sL", "-m", "600", "-A", "Mozilla/5.0", url], capture_output=True, check=True
             ).stdout
             raw.store(SOURCE, url, body, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+    for contests in TABLES.values():
+        for contest in contests:
+            url = TABLE.format(id=contest)
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                body = subprocess.run(
+                    ["curl", "-sL", "-m", "120", "-A", "Mozilla/5.0", url], capture_output=True, check=True
+                ).stdout
+                raw.store(SOURCE, url, body, suffix=".csv", retrieved_at=datetime.now(UTC), media_type="text/csv")
 
 
 def office_of(heading: str, office: str | None) -> str | None:
@@ -123,6 +141,20 @@ def parse() -> None:
                     else:
                         office = line
                         contest = f"{kind}:{party}"
+    for day, contests in TABLES.items():
+        for contest, district in contests.items():
+            table = pl.read_csv(raw.cached(SOURCE, TABLE.format(id=contest)).path, has_header=False, infer_schema=False)
+            names = table.row(0)
+            counties = table.filter(pl.col("column_0") == "County")
+            if counties.height != len(COUNTIES):
+                raise ValueError(f"{day} {district}: {counties.height} county rows")
+            for index, name in enumerate(names):
+                if index < 2 or not name or name.startswith("Total"):
+                    continue
+                for county, cell in zip(COUNTIES, counties[:, index], strict=True):
+                    rows.append(
+                        (str(day), district, f"35{county}", re.sub(r"\s+", " ", name).strip().upper(), int(cell))
+                    )
     frame = pl.DataFrame(rows, schema=["day", "district", "county", "column", "votes"], orient="row")
     frame = frame.filter(pl.col("votes").sum().over("day", "district", "county") > 0)
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -138,7 +170,7 @@ def emit():
     return usrep_county.emit(
         SOURCE,
         VERSION,
-        "New Mexico's U.S. House, Senate, and presidential primaries of 2004, 2006, 2010, and 2012 by county from the "
+        "New Mexico's U.S. House, Senate, and presidential primaries of 2002, 2004, 2006, 2010, and 2012 by county from the "
         "Secretary of State's compilation of the canvass of returns",
         PUBLISHER,
         TITLE,
@@ -146,7 +178,10 @@ def emit():
         "NM",
         "35",
         pl.read_parquet(PARSED / "lines.parquet"),
-        [raw.cached(SOURCE, SERVE.format(id=number)) for number in FILES.values()],
-        lambda key: METHOD,
+        [
+            *(raw.cached(SOURCE, SERVE.format(id=number)) for number in FILES.values()),
+            *(raw.cached(SOURCE, TABLE.format(id=contest)) for contests in TABLES.values() for contest in contests),
+        ],
+        lambda key: TABLE_METHOD if key.startswith("2002-") else METHOD,
         official=True,
     )
