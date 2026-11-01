@@ -6898,10 +6898,6 @@ export const contests = {
             order by t.kind, t.lang = 'en' desc, s.kind = 'official_body' desc, s.kind = 'community', t.id
           `),
         ]);
-      const declaredParties = [
-        ...new Set(
-          [...declared.rows, ...split.rows]
-            .map((row) => row.party)
       const path = slugs.get(contest.id) ?? null;
       const covers =
         area == null
@@ -7160,6 +7156,10 @@ export const contests = {
                 ),
             );
       covers?.catch(() => null);
+      const declaredParties = [
+        ...new Set(
+          [...declared.rows, ...split.rows]
+            .map((row) => row.party)
             .filter((id) => id != null),
         ),
       ];

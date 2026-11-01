@@ -5476,6 +5476,9 @@ function placesMarkdown(
   const isCompared =
     !isTally && then != null && places.rows.some((row) => row.earlier != null);
   const noun =
+    places.levels.find((level) => level.code === places.level)?.noun ??
+    places.level;
+  const hasMargin = places.rows.some((row) => row.margin != null);
   const hasDelegates = places.rows.some((row) => row.delegates != null);
   const hasFinal = (places.ballots ?? 0) > 1;
   const voted = (
@@ -5485,9 +5488,6 @@ function placesMarkdown(
     ballot?.[0] == null
       ? null
       : `${places.legend[ballot[0][0]]?.label ?? ""} ${m.delegates_of({ votes: count(ballot[0][1]), total: count(total) })}`;
-    places.levels.find((level) => level.code === places.level)?.noun ??
-    places.level;
-  const hasMargin = places.rows.some((row) => row.margin != null);
   let placed = 0;
   let pooled = 0;
   for (const row of places.rows) {
