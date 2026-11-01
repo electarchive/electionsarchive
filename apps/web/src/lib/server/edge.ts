@@ -2,6 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { version as build, building } from "$app/env";
 import { CLOUDFLARE_PURGE_TOKEN, CLOUDFLARE_ZONE_ID } from "$app/env/private";
 import { BASE_URL } from "$app/env/public";
+import { createHash } from "node:crypto";
 import { cookieName, isLocale } from "#lib/paraglide/runtime.js";
 import { redis } from "#lib/server/redis.js";
 
@@ -16,12 +17,11 @@ const SIGNED = /(?:^|;\s*)(?:__Secure-)?better-auth\./u;
 function isShareable(
   { cookies, isDataRequest, locals, request, url }: RequestEvent,
   response: Response,
-  isLive: boolean,
 ) {
   if (
     !["GET", "HEAD"].includes(request.method) ||
     response.status !== 200 ||
-    (response.headers.has("cache-control") && !(isLive && isDataRequest)) ||
+    (response.headers.has("cache-control") && !isDataRequest) ||
     response.headers.has("set-cookie") ||
     locals.user != null ||
     PERSONAL.test(url.pathname) ||
@@ -38,9 +38,25 @@ function isShareable(
   );
 }
 
-export function mark(event: RequestEvent, response: Response) {
+async function settled(response: Response) {
+  if (response.headers.get("content-type") !== "application/json") {
+    return null;
+  }
+  const text = await response.clone().text();
+  return text.startsWith('{"type":"data","nodes":[') &&
+    !text.includes('{"type":"error"')
+    ? text
+    : null;
+}
+
+export async function mark(event: RequestEvent, response: Response) {
   const isLive = LIVE.test(event.url.pathname);
-  if (!isShareable(event, response, isLive)) {
+  const isOpen = isShareable(event, response);
+  const data =
+    isOpen && event.isDataRequest && !isLive
+      ? await settled(response)
+      : undefined;
+  if (!isOpen || data === null) {
     if (isLive) {
       response.headers.set("cache-control", "no-store");
     } else if (!response.headers.has("cache-control")) {
@@ -57,6 +73,12 @@ export function mark(event: RequestEvent, response: Response) {
   varies.add(LOCALE);
   response.headers.set("vary", [...varies].join(", "));
   response.headers.set("cache-control", "no-cache");
+  if (data != null) {
+    response.headers.set(
+      "etag",
+      `"${createHash("sha1").update(data).digest("base64url")}"`,
+    );
+  }
   response.headers.set(
     "cloudflare-cdn-cache-control",
     isLive
