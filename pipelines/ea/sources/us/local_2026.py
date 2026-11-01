@@ -1466,6 +1466,7 @@ IN_ALIASES = (
     (r"^shelby northwestern\b", "northwestern", "Northwestern Consolidated School Corporation"),
     (r"^norwell\b", "northern wells", None),
     (r"^new palestine community schools", "southern hancock", None),
+    (r"^northwest hendricks school board\b", "north west hendricks schools school board", None),
     (r"^ohio county community", "rising sun ohio", None),
     (
         r"^scott county school board (?=district 2 vienna)",
