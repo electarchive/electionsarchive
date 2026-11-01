@@ -116,6 +116,7 @@ def emit() -> Path:
         made: dict[str, tuple[UUID, UUID, str, str, str]] = {}
         elections: set[UUID] = set()
         kept = 0
+        legacy: dict[UUID, tuple[str] | None] = {}
         for (district, seat_label), people in frame.group_by(["district", "seat"], maintain_order=True):
             first = people.row(0, named=True)
             county = counties.get(ceda._core(f"{first['county']} County"))
@@ -129,6 +130,15 @@ def emit() -> Path:
                     continue
                 made[district] = special
             polity, area, place, path, code = made[district]
+            if polity not in legacy:
+                legacy[polity] = conn.execute(
+                    """select split_part(value, ':', 2) || ':' || split_part(value, ':', 3) || ':' || split_part(value, ':', 4)
+                       from external_id where entity_id = %s and scheme = 'us.polity' and value like 'special:%%:district:%%'
+                       order by value limit 1""",
+                    [polity],
+                ).fetchone()
+            if legacy[polity] is not None:
+                code = legacy[polity][0]
             election = cs.key("us.election", f"{DAY}:WA:{code}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
