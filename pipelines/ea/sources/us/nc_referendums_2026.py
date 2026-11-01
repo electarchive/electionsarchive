@@ -60,12 +60,11 @@ def parse() -> None:
                 if current["text"] == "":
                     current["text"] = choice[2]
             continue
-        if line == line.upper() and TITLE_WORDS.search(line):
-            current = (
-                None if line.startswith("CONSTITUTIONAL AMENDMENT") else {"title": line, "options": "", "text": ""}
-            )
-            if current is not None:
-                rows.append(current)
+        if line.startswith("CONSTITUTIONAL AMENDMENT"):
+            current = None
+        elif line == line.upper() and TITLE_WORDS.search(line):
+            current = {"title": line, "options": "", "text": ""}
+            rows.append(current)
         elif current is not None and current["options"].count("|") == 1 and not current["options"].endswith("Against|"):
             current["text"] += " " + line
     PARSED.mkdir(parents=True, exist_ok=True)
