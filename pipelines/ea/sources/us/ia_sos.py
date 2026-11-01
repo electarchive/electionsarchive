@@ -13,6 +13,7 @@ from PIL import Image
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
+from ea.sources.us import ia_scans
 from ea.store import DATA, connect
 
 SOURCE = "us.ia_sos"
@@ -334,6 +335,107 @@ def resolve(row: list[dict[int, float]], total: int) -> list[int] | None:
     return None
 
 
+SCANNED = {day: parts for day, parts in ia_scans.SCANS.items() if day[:4] in {"1982", "1986"}}
+HEADINGS = {
+    "1982-11-02": {
+        "secretary-of-state": {
+            "ODELL": "Mary Jane Odell",
+            "SORENSEN": "Al Sorensen",
+            "HENRY": "Joseph Henry",
+            "OLSON": "Sylvia Olson",
+        },
+        "auditor": {"JOHNSON": "Richard D. Johnson", "SLOCKETT": "Tom Slockett", "KOLOC": "Anne R. Koloc"},
+        "treasurer": {
+            "BARINGER": "Maurice E. Baringer",
+            "FITZGERALD": "Michael L. Fitzgerald",
+            "DOUMAKES": "Don Doumakes",
+        },
+        "secretary-of-agriculture": {
+            "LOUNSBERRY": "Robert H. Lounsberry",
+            "RIORDAN": "Jim R. Riordan",
+            "DUBERT": "Jim Dubert",
+            "OLSON": "Ben L. Olson",
+        },
+        "attorney-general": {
+            "CONLON": "Walter Conlon",
+            "MILLER": "Tom Miller",
+            "VANDERLINDEN": "Brent Lee Vanderlinden",
+            "HEYNE": "Dean Heyne",
+        },
+    },
+    "1986-11-04": {
+        "secretary-of-state": {"ROBERTS": "Dawn Roberts", "BAXTER": "Elaine Baxter"},
+        "auditor": {"JOHNSON": "Richard D. Johnson", "DICKERSON": "Beverly Dickerson"},
+        "treasurer": {"NYSTROM": "Jack Nystrom", "FITZGERALD": "Michael L. Fitzgerald"},
+        "secretary-of-agriculture": {
+            "JOHNSON": "Thatcher Johnson",
+            "COCHRAN": "Dale M. Cochran",
+            "BANOWETZ": "Delbert V. Banowetz",
+        },
+        "attorney-general": {"DAVIS": "James C. Davis", "MILLER": "Tom Miller", "COLLINS": "Eddie Collins"},
+    },
+}
+
+
+CHECKED = {("1982-11-02", "treasurer", "Mahaska"): "a", ("1982-11-02", "treasurer", "Pocahontas"): "b"}
+
+
+def scanned(counties: list[str]) -> list[dict[str, object]]:
+    found = ia_scans.stored(SCANNED)
+    keys = {re.sub(r"[^a-z]", "", county.lower()): county for county in counties}
+    rows: list[dict[str, object]] = []
+    for day, parts in SCANNED.items():
+        for office, pages in parts:
+            names = HEADINGS[day][office]
+            tables: dict[str, dict[str, dict[str, int]]] = {}
+            for reader in ia_scans.READS:
+                heads: list[str] = []
+                tables[reader] = {}
+                for page in pages:
+                    read = found[(day, page, reader)]
+                    columns = [re.sub(r"[^A-Z]", "", str(c).upper()) for c in read["columns"]] or heads
+                    if not heads:
+                        heads = [c for c in columns if c]
+                    for line in read["rows"]:
+                        values = [
+                            int(v) if v is not None and v.isdigit() else 0
+                            for c, v in zip(columns, line["values"], strict=False)
+                            if c
+                        ]
+                        tables[reader][re.sub(r"[^a-z]", "", line["county"].lower())] = dict(
+                            zip(heads, values, strict=False)
+                        )
+            printed = tables["a"].pop("totals")
+            tables["b"].pop("totals")
+            sums = dict.fromkeys(heads, 0)
+            office_rows: list[dict[str, object]] = []
+            for key, county in keys.items():
+                one, two = tables["a"].get(key), tables["b"].get(key)
+                if (day, office, county) in CHECKED:
+                    one = two = tables[CHECKED[(day, office, county)]][key]
+                if one is None or one != two or sum(v for h, v in one.items() if h != "TOTALS") != one["TOTALS"]:
+                    print(day, office, county, "no agreeing read", one, two)
+                    continue
+                for head, value in one.items():
+                    sums[head] += value
+                office_rows.extend(
+                    {
+                        "day": day,
+                        "office": office,
+                        "county": county,
+                        "candidate": SC if head == "SC" else names[head],
+                        "votes": value,
+                    }
+                    for head, value in one.items()
+                    if head != "TOTALS"
+                )
+            if all(sums[head] == value for head, value in printed.items()):
+                rows.extend(office_rows)
+            else:
+                print(day, office, "left out: county reads do not sum to the printed totals")
+    return rows
+
+
 def parse() -> None:
     (PARSED / "ocr").mkdir(parents=True, exist_ok=True)
     with connect() as conn:
@@ -392,6 +494,7 @@ def parse() -> None:
             for position, index in enumerate(order):
                 if sums[position] not in printed[index]:
                     print(day, office, labels[index], "sums to", sums[position], "printed", sorted(printed[index]))
+    rows.extend(scanned(counties))
     keys = {re.sub(r"[^a-z]", "", county.lower()): county for county in counties}
     text = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, URL.format(1996)).path), "-"],
@@ -432,7 +535,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Iowa's governor, U.S. Senate, and statewide offices by county 1990 and 1994 "
+            summary="Iowa's statewide offices by county 1982 and 1986, governor, U.S. Senate, and statewide offices 1990 and 1994 "
             "and president and U.S. Senate by county 1996, from the Secretary of State's canvass summaries",
             polity="US",
         )
@@ -454,8 +557,9 @@ def emit() -> Path:
             url="https://sos.iowa.gov/elections/results/",
             license="Public record",
         )
-        for day in [*TABLES, "1996-11-05"]:
-            cs.artifact(raw.cached(SOURCE, URL.format(day[:4])), source)
+        for day in [*SCANNED, *TABLES, "1996-11-05"]:
+            link = ia_scans.URL if day in SCANNED else URL
+            cs.artifact(raw.cached(SOURCE, link.format(day[:4])), source)
         counties: dict[str, UUID] = {
             plain(text): unit
             for text, unit in conn.execute(

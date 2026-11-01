@@ -153,11 +153,16 @@ def requests(
 def reads(
     scans: dict[str, list[tuple[str, tuple[int, ...]]]],
 ) -> dict[tuple[str, int, str], dict[str, object]]:
-    wanted = requests(scans)
-    ready, note = batch.ensure(SOURCE, "canvass-scans", wanted)
+    ready, note = batch.ensure(SOURCE, "canvass-scans", requests(scans))
     print(note)
     if not ready:
         raise SystemExit(note)
+    return stored(scans)
+
+
+def stored(
+    scans: dict[str, list[tuple[str, tuple[int, ...]]]],
+) -> dict[tuple[str, int, str], dict[str, object]]:
     found: dict[tuple[str, int, str], dict[str, object]] = {}
     for day, parts in scans.items():
         source, url, _, _, dpis = LAYOUTS[day[:4]]
