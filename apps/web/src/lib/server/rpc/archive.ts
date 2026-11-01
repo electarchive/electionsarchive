@@ -21974,6 +21974,7 @@ export const people = {
         majority: number | null;
         unopposed: boolean;
         written: boolean | null;
+        balloted: boolean;
         office: string | null;
         outcome: string | null;
         note: string | null;
@@ -22093,6 +22094,12 @@ export const people = {
         )
         select p.root, p.date::text as date, p.year, p.kind, p.election, t.main::int as measure, t.votes,
           (select bool_and(m.written) from mine m join grp g on g.id = m.contest_id and g.root = p.root) as written,
+          exists (
+            select from mine m join contest c on c.id = m.contest_id join election e on e.id = c.election_id
+            where not m.written and e.date_from = p.date
+              and c.office_id = (select office_id from contest where id = p.root)
+              and m.contest_id not in (select g.id from grp g where g.root = p.root)
+          ) as balloted,
           (select office_id from contest where id = p.root) as office,
           g.majority, exists (
             select from result_set rs where rs.contest_id = p.root and ${latest("rs")} and rs.kind = 'tacit'
@@ -22155,7 +22162,8 @@ export const people = {
         (row.votes == null ||
           row.total == null ||
           row.total === 0 ||
-          row.votes / row.total < 0.05);
+          row.votes / row.total < 0.05 ||
+          row.balloted);
       const kept = rows.rows.filter((row) => !isStray(row));
       const lone = kept.filter(
         (row) =>
