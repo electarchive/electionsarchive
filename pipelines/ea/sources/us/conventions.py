@@ -219,16 +219,27 @@ TABLES += [
         {
             "b1": (227, 230),
             "b2": (232, 233),
-            "b3": (235,),
             "b4": (240, 241),
-            "b5": (247,),
-            "b6": (248, 249),
             "b7": (252, 253),
             "b8": (259, 260),
             "b9": (262, 263),
-            "b10": (269,),
         },
         scatter=True,
+    ),
+    *(
+        {
+            "scatter": True,
+            "table": f"1920:republican:{name}",
+            "item": "officialreportof00repuiala",
+            "leaves": found,
+            "reads": only,
+        }
+        for name, found, only in (
+            ("b3", (235, 236), {236: "scatter"}),
+            ("b5", (247, 248), {248: "scatter"}),
+            ("b6", (248, 249), {248: "table", 249: "scatter"}),
+            ("b10", (269, 270), {270: "scatter"}),
+        )
     ),
     *leaves("officialreportsi00repuiala", "1916", {"b1": (212, 213)}, scatter=True),
     {
@@ -459,6 +470,17 @@ CANDIDATES = {
     "Anderson": ("John B. Anderson", "Q936548"),
     "Bush": ("George Bush", "Q23505"),
     "republican:Coolidge": ("Calvin Coolidge", "Q36023"),
+    "republican:Wood": ("Leonard Wood", "Q887716"),
+    "republican:Harding": ("Warren G. Harding", "Q35286"),
+    "republican:Sproul": ("William C. Sproul", "Q537771"),
+    "republican:Butler": ("Nicholas Murray Butler", "Q271517"),
+    "republican:Poindexter": ("Miles Poindexter", "Q1934657"),
+    "republican:Sutherland": ("Howard Sutherland", "Q473723"),
+    "republican:Knox": ("Philander C. Knox", "Q707811"),
+    "republican:Borah": ("William E. Borah", "Q895819"),
+    "republican:Kellogg": ("Frank B. Kellogg", "Q193009"),
+    "republican:W. L. Ward": ("William L. Ward", None),
+    "republican:du Pont": ("T. Coleman du Pont", "Q2383282"),
     "republican:La Follette": ("Robert M. La Follette", "Q878682"),
     "republican:Johnson": ("Hiram W. Johnson", "Q143644"),
     "republican:Hoover": ("Herbert Hoover", "Q35236"),
@@ -1466,7 +1488,7 @@ def fetch() -> None:
             image = scan(spec, leaf, fetch=True)
             data = base64.b64encode(cropped(image.path, region(spec, leaf))).decode()
             for effort, scatter in product(READS.values(), (False, True)):
-                if scatter and not spec.get("scatter"):
+                if skipped(spec, leaf, scatter):
                     continue
                 ask = (
                     SCATTER
@@ -1559,6 +1581,11 @@ def region(spec: dict[str, object], leaf: int) -> str | None:
     return part if part in QUADRANTS else spec.get("crop")
 
 
+def skipped(spec: dict[str, object], leaf: int, scatter: bool) -> bool:
+    only = spec.get("reads", {}).get(leaf)
+    return (scatter and not spec.get("scatter")) or (only is not None and only != ("scatter" if scatter else "table"))
+
+
 def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
     if scatter:
         return "s"
@@ -1623,7 +1650,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
     problems: list[str] = []
     fixed = {(code, column) for _, code, _, figures, _ in CORRECTIONS.get(spec["table"], ()) for column in figures}
     for leaf, scatter in product(spec["leaves"], (False, True)):
-        if scatter and not spec.get("scatter"):
+        if skipped(spec, leaf, scatter):
             continue
         image = scan(spec, leaf)
         try:
