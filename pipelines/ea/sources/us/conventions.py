@@ -774,7 +774,10 @@ UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippin
 ABSTAINED = {"votes", "Present and Not Voting", "Abstention", "not voting", "Not voting", "Not Voting", "Not Voting or Absent", "Absent"}
 OFFICIAL = (
     "The roll call of the states on the presidential nomination, as tabulated in {}, read from the scanned volume "
-    "page by page. Each delegation's total is the votes it held, abstentions included; abstentions are that total less the "
+    "page by page."
+)
+HELD_TOTALS = (
+    " Each delegation's total is the votes it held, abstentions included; abstentions are that total less the "
     "votes recorded for candidates."
 )
 HELD = (
@@ -2595,6 +2598,8 @@ def emit() -> Path:
                     as_of=datetime.combine(day, datetime.min.time(), UTC),
                 )
                 method = OFFICIAL.format(REPORTS[party])
+                if own or held is not None:
+                    method += HELD_TOTALS
                 if held is not None and not own:
                     deciding = (
                         "the ballot"
