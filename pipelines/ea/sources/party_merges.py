@@ -5,7 +5,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "party_merges"
-VERSION = "5"
+VERSION = "6"
 MERGES = {
     "330bfd15-7970-5a47-9c1a-cb2b2632b5d7": "bc509349-9b70-5653-a994-69f2077ef882",
     "9fab4680-3011-5c3a-bd33-bdc6e96693aa": "8788ac83-2ebc-584d-9382-d46868efd147",
@@ -38,6 +38,14 @@ MERGES = {
     "16ed9ee8-671c-5fb0-bbc3-8c6effc6bc66": "f531cf55-0cff-5e42-b0b4-5f366ff4b5b6",
     "decadb53-e730-5947-928d-f2cbffccc144": "933c685f-6756-5684-bcce-171ac6c0c8a9",
     "9e9cf478-d831-50fb-8604-1dcbe00ef89e": "f5fe8cbc-050a-5762-937e-4129dc87e975",
+    "47c81367-8e80-5a27-9440-5637c5b65d96": "fcb086d6-ef40-5c4e-a62e-033854b073b0",
+    "09809440-9f17-5c43-883f-d92c46f33880": "93f3380f-2111-5f8d-9f44-cfc4181c16df",
+    "ebc05e4f-d994-5697-a1b9-66826bc17f4c": "025b0880-7cf9-50e6-adaf-6acc17c79547",
+    "f1af9cb3-8302-5072-83e4-cfe42eeb38d9": "025b0880-7cf9-50e6-adaf-6acc17c79547",
+    "9e642475-115e-5942-91d9-bf7267ffbb5f": "01a13ba1-d3a6-7084-b7c4-4e5edc77d918",
+    "b3b0a83f-55da-5600-a49c-c96af2f37dba": "01a13ba1-d3a6-7084-b7c4-4e6f52f34575",
+    "3a3f4d1a-b29e-56d5-a13d-28d8cbb573ff": "01a13ba1-d3a6-7084-b7c4-4e6f52f34575",
+    "01a14094-d257-77f4-bbc1-a318134dab58": "01a14094-d257-77f4-bbc1-a3191ff76419",
 }
 
 
