@@ -1,153 +1,5 @@
 court	number	seat	position	term	seats	candidate	source
-circuit	5		incumbent	full	1	Vicky L. Alspaugh	https://www.barrycounty.org/departments_and_officials/officials/county_clerk/elections.php
-circuit	18		non-incumbent	full	1	Michael Huber	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
-district	75		incumbent	full	1	Michael D. Carpenter	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
-district	74		non-incumbent	full	1	James A. Perry	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
-district	74		non-incumbent	full	1	Brian H. Jean	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
-circuit	19		incumbent	full	1	David A. Thompson	https://www.benzieco.net/government/elections/
 circuit	2		incumbent	full	1	Jennifer L. Smith- DenDooven	https://www.berriencounty.org/DocumentCenter/View/24628
-probate	Berrien		incumbent	full	1	Mabel Johnson Mayfield	https://www.berriencounty.org/DocumentCenter/View/24628
-district	5		incumbent	full	1	Gordon Gary Hosbein	https://www.berriencounty.org/DocumentCenter/View/24628
-district	5		non-incumbent	full	1	Jennifer E. Fields	https://www.berriencounty.org/DocumentCenter/View/24628
-district	5		non-incumbent	full	1	Myrene Kay Koch	https://www.berriencounty.org/DocumentCenter/View/24628
-circuit	15		incumbent	full	1	Zachary William Stempien	https://www.countyofbranch.com/
-district	3A		incumbent	full	1	Brent R. Weigle	https://www.countyofbranch.com/
-circuit	37		incumbent	full	1	Sarah S. Lincoln	https://www.calhouncountymi.gov/
-district	10		incumbent	full	2	Paul K. Beardslee	https://www.calhouncountymi.gov/
-district	10		incumbent	full	2	Michelle L. Richardson	https://www.calhouncountymi.gov/
-district	4		incumbent	full	1	Stacey A. Rentfrow	https://www.casscountymi.org/
-circuit	33		incumbent	full	1	Roy Charles Hayes III	https://charlevoixcountymi.documents-on-demand.com/
-district	90		incumbent	full	1	Angela L. Lasher	https://charlevoixcountymi.documents-on-demand.com/
-district	89		incumbent	full	1	Michael J. Ekdahl	https://www.cheboygancounty.net/
-circuit	55		incumbent	full	1	Tara S. Hovey	https://www.clarecounty-mi.gov/
-district	80		incumbent	full	1	Joshua M. Farrell	https://www.clarecounty-mi.gov/
-circuit	29		incumbent	full	1	Shannon L.W. Schlegel	https://www.clinton-county.org/
-district	65A		incumbent	full	1	Andrew M. Stevens	https://www.clinton-county.org/
-district	65B		non-incumbent	full	1	Laura M. Bever	https://www.gratiotmi.com/
-circuit	39		incumbent	full	1	Michael R. Olsaver	https://www.electionlenawee.com/app/download/14987887430/Official+Candidate+Listing+November+3%2C+2026+General+Election.pdf
-district	2A		incumbent	full	1	Todd M. Morgan	https://www.electionlenawee.com/app/download/14987887430/Official+Candidate+Listing+November+3%2C+2026+General+Election.pdf
-circuit	51		incumbent	full	1	Susan Kasley Sniegowski	https://oceana.mi.us/wp-content/uploads/2026/10/Official-Candidate-List-November-3-2026-4.pdf
-district	79		incumbent	full	1	John D. Middlebrook	https://oceana.mi.us/wp-content/uploads/2026/10/Official-Candidate-List-November-3-2026-4.pdf
-circuit	49		non-incumbent	full	1	Dennis L. Duvall Jr.	https://www.osceolacountymi.gov/
-district	77		incumbent	full	1	Peter Michael Jaklevic	https://www.osceolacountymi.gov/
-district	3B		non-incumbent	full	1	Tim George	https://www.stjosephcountymi.gov/
-circuit	24		incumbent	full	1	Timothy C. Wrathell	https://www.sanilaccounty.gov/departments/county_clerk/election_information/elections_results.php
-probate	Sanilac		non-incumbent	full	1	Sara L. Grout	https://www.sanilaccounty.gov/departments/county_clerk/election_information/elections_results.php
-district	71B		incumbent	full	1	Jason E. Bitzer	https://www.tuscolacounty.org/elections/
-district	71B		incumbent	full	1	Craig S. Datz	https://www.tuscolacounty.org/elections/
-circuit	28		incumbent	full	1	Jason J. Elmore	https://www.wexfordcounty.org/
-district	84		incumbent	full	1	Corey J. Wiggins	https://www.wexfordcounty.org/
-circuit	48		incumbent	full	1	Matt Antkoviak	https://www.allegancounty.org/departments/elections
-district	57		non-incumbent	full	1	Timothy Slais	https://www.allegancounty.org/departments/elections
-district	57		non-incumbent	full	1	Heidi L. Wolf	https://www.allegancounty.org/departments/elections
-district	57		incumbent	partial 1/1/2031	1	Christopher E. Burnett	https://www.allegancounty.org/departments/elections
-district	57		incumbent	partial 1/1/2031	1	Tom Siver	https://www.allegancounty.org/departments/elections
-district	58		incumbent	full	2	Juanita F. Bocanegra	https://www.allegancounty.org/departments/elections
-district	58		incumbent	full	2	Anna White	https://www.allegancounty.org/departments/elections
-district	58		incumbent	full	2	Paul Ledford	https://www.allegancounty.org/departments/elections
-circuit	7			full	3	Chris Christenson	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-circuit	7			full	3	Mark W. Latchana	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-circuit	7			full	3	Anthony J. McDowell	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	1st Division		full	1	David J. Goggins	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	2nd Division A		full	1	Jennifer Manley	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	3rd Division		full	1	Vikki Bayeh Haley	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	4th Division A		full	1	K.C. Baran	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	4th Division A		full	1	Cheryl A. Lopez	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	5th Division C		full	2	David Guinn	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	67	5th Division C		full	2	Tabitha M. Marsh	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-probate	Genesee			full	1	Andrea L. LeGendre	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-probate	Genesee			full	1	Ashley Prew	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
-district	2B		incumbent	full	1	Megan R.M. Stiverson	https://www.co.hillsdale.mi.us/
-probate	Ingham		incumbent	full	1	Richard J. Garcia	https://www.dropbox.com/scl/fi/5b4627tqe8txa3n6x8jxs/Ingham-November-Candidate-List-2026.pdf
-circuit	9		incumbent	full	1	Gary C. Giguere Jr.	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
-probate	Kalamazoo		incumbent	full	1	Tiffany A. Ankley	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
-district	8		incumbent	full	1	Kathleen P. Hemingway	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
-district	8		non-incumbent	full	2	Mark A. Holsomback	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
-district	8		non-incumbent	full	2	Rachel Vinales	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
-circuit	17		incumbent	full	3	Maureen A. Gottlieb	https://www.kentcountymi.gov/DocumentCenter/View/8870
-circuit	17		incumbent	full	3	Scott A. Noto	https://www.kentcountymi.gov/DocumentCenter/View/8870
-circuit	17		incumbent	full	3	Clay M. West	https://www.kentcountymi.gov/DocumentCenter/View/8870
-probate	Kent		incumbent	full	1	David M. Murkowski	https://www.kentcountymi.gov/DocumentCenter/View/8870
-district	61		incumbent	full	2	Kellen A. Dotson	https://www.kentcountymi.gov/DocumentCenter/View/8870
-district	61		incumbent	full	2	Angela T. Ross	https://www.kentcountymi.gov/DocumentCenter/View/8870
-district	62A		incumbent	full	1	Pablo Cortes	https://www.kentcountymi.gov/DocumentCenter/View/8870
-district	62B		incumbent	full	1	Amanda H. Sterkenburg	https://www.kentcountymi.gov/DocumentCenter/View/8870
-district	63		incumbent	full	1	Jeffrey J. O'Hara	https://www.kentcountymi.gov/DocumentCenter/View/8870
-district	63		incumbent	partial 1/1/2029	1	Kirsten L. Holz	https://www.kentcountymi.gov/DocumentCenter/View/8870
-circuit	44			full	1	Andrea Banfield	https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf
-circuit	44			full	1	Kristina S. Lyke	https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf
-district	53		incumbent	full	1	Daniel Bain	https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf
-circuit	16		incumbent	full	4	Julie Gatti	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-circuit	16		incumbent	full	4	Tanya A. Grillo	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-circuit	16		incumbent	full	4	James M. Maceroni	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-circuit	16		incumbent	full	4	Matthew S. Switalski	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-circuit	16		non-incumbent	full	1	James L. Spagnuolo	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-circuit	16		non-incumbent	full	1	Genevieve L. Taylor	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-probate	Macomb		incumbent	full	1	Sara A. Schimke	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	37		incumbent	full	1	Michael C. Chupa	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	38		incumbent	full	1	Kathleen G. Galen	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	38		incumbent	full	1	Richard W. Goodman	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	39		non-incumbent	full	1	Derek G. Boedeker	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	39		non-incumbent	full	1	Dana C. Freers	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	40		incumbent	full	1	Joseph Craigen Oster	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	41A		incumbent	full	1	Annemarie Marino Lepore	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	41B		incumbent	full	1	Jacob Michael Femminineo Jr.	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-district	42	1st Division	incumbent	full	1	Jennifer Andary	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
-circuit	41		incumbent	full	1	Christopher S. Ninomiya	https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/
-district	95A		non-incumbent	full	1	Alexander Sieminski	https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/
-district	95A		non-incumbent	full	1	Jeffrey T. Rogg	https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/
-circuit	42		incumbent	full	1	Michael J. Beale	https://www.co.midland.mi.us/
-circuit	38		non-incumbent	full	1	Lauren K. Beaudry	https://www.monroecounty.gov/
-circuit	38		non-incumbent	full	1	Maria Zagorski	https://www.monroecounty.gov/
-probate	Monroe		incumbent	full	1	Cheryl R. Sweeney	https://www.monroecounty.gov/
-district	1		incumbent	full	1	Michael Brown	https://www.monroecounty.gov/
-circuit	8			full	1	Ed Sternisha	https://www.montcalm.us/
-circuit	8			full	1	Lori J. Shearer	https://www.montcalm.us/
-district	64B			full	1	Adam James Eggleston	https://www.montcalm.us/
-circuit	14		incumbent	full	1	Kathy Hoogstra	https://co.muskegon.mi.us/502/Election-Information
-district	60		incumbent	full	2	Maria Ladas Hoopes	https://co.muskegon.mi.us/502/Election-Information
-district	60		incumbent	full	2	Paula Baker Mathes	https://co.muskegon.mi.us/502/Election-Information
-circuit	6		incumbent	full	6	Mary Ellen T. Brennan	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		incumbent	full	6	David M. Cohen	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		incumbent	full	6	Lisa Gorcyca	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		incumbent	full	6	Nanci Grant	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		incumbent	full	6	Jeffery S. Matis	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		incumbent	full	6	Lorie N. Savin	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		non-incumbent	full	1	Victoria King	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	6		non-incumbent	full	1	Lisa Marie Neilson	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-probate	Oakland		incumbent	partial 1/1/2029	1	Nicole S. Huddleston	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-probate	Oakland		non-incumbent	full	1	Elisabeth Dery	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-probate	Oakland		non-incumbent	full	1	Jessica Ann Hallmark	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	35		incumbent	full	1	Jim Plakas	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	43		incumbent	full	1	Brian Christian Hartwell	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	45		incumbent	full	1	Jaimie Powell Horowitz	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	46		incumbent	full	1	Shelia Johnson	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	47		non-incumbent	full	1	Moneka Sanford	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	47		non-incumbent	full	1	Michael Sawicky	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	48		incumbent	full	1	Kimberly Small	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	50		incumbent	full	2	Jeremy Darnell Bowie	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	50		incumbent	full	2	Cynthia T. Walker	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	51		non-incumbent	full	1	Carmen J. DeFranco	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	51		non-incumbent	full	1	Pamela J. Monville	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	52	1st Division	incumbent	full	1	Travis M. Reeds	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	52	2nd Division	incumbent	full	1	Joseph G. Fabrizio	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	52	3rd Division	incumbent	full	1	Laura E. Polizzi	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-district	52	4th Division	incumbent	full	1	Maureen M. McGinnis	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
-circuit	20		incumbent	full	1	Jon Hulsing	https://app.miottawa.org/ElectionManagement/viewPublicFile.action?viewFile=%2Fmnt%2Fottawa-apps%2Fcontent%2FappImages%2FElectionManagement%2FcandidateFile-226.pdf
-circuit	10		incumbent	full	1	Manvel Trice III	https://www.saginawcounty.com/
-probate	Saginaw		incumbent	full	1	Barbara L. Meter	https://www.saginawcounty.com/
-district	70	2nd Division	incumbent	full	2	Elian E.H. Fichtner	https://www.saginawcounty.com/
-district	70	2nd Division	incumbent	full	2	A.T. Frank	https://www.saginawcounty.com/
-circuit	31		incumbent	full	1	Daniel A. Damman	https://stclaircountyclerk.org/Public/File/november_2026_candidate_list_pdf
-probate	St. Clair		incumbent	full	1	Jennifer Deegan	https://stclaircountyclerk.org/Public/File/november_2026_candidate_list_pdf
-district	72		incumbent	full	1	Mona S. Armstrong	https://stclaircountyclerk.org/Public/File/november_2026_candidate_list_pdf
-circuit	22		incumbent	full	2	Patrick J. Conlin, Jr.	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
-circuit	22		incumbent	full	2	Tracy E. Van den Bergh	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
-probate	Washtenaw		non-incumbent	full	1	Alethia Jean Battles	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
-probate	Washtenaw		non-incumbent	full	1	Jennifer Lawrence	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
-district	14A		incumbent	full	1	Anna Maria Frushour	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
-district	14B		incumbent	full	1	Erane C. Washington	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
-district	15		incumbent	full	1	Tamara Garwood	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
 circuit	3		incumbent	full	16	David J. Allen	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 circuit	3		incumbent	full	16	Chandra W. Baker-Robinson	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 circuit	3		incumbent	full	16	Christopher M. Blount	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
@@ -166,23 +18,106 @@ circuit	3		incumbent	full	16	Margaret M. Van Houten	https://www.waynecountymi.go
 circuit	3		incumbent	full	16	Shannon Nicol Walker	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 circuit	3		non-incumbent	full	1	Shakira Lynn Hawkins	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 circuit	3		incumbent	partial 1/1/2031	1	Aliyah S. Sabree	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-probate	Wayne		non-incumbent	full	3	Sarah Colegrove	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-probate	Wayne		non-incumbent	full	3	Suzanne Fanning	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-probate	Wayne		non-incumbent	full	3	Vanessa M. Moss	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+circuit	4		incumbent	full	1	John G. McBain Jr.	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	4		incumbent	partial 1/1/2031	1	Allison L. Bates	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	5		incumbent	full	1	Vicky L. Alspaugh	https://www.barrycounty.org/departments_and_officials/officials/county_clerk/elections.php
+circuit	6		incumbent	full	6	Mary Ellen T. Brennan	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		incumbent	full	6	David M. Cohen	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		incumbent	full	6	Lisa Gorcyca	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		incumbent	full	6	Nanci Grant	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		incumbent	full	6	Jeffery S. Matis	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		incumbent	full	6	Lorie N. Savin	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		non-incumbent	full	1	Victoria King	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	6		non-incumbent	full	1	Lisa Marie Neilson	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+circuit	7		incumbent	full	3	Chris Christenson	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+circuit	7		incumbent	full	3	Mark W. Latchana	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+circuit	7		incumbent	full	3	Anthony J. McDowell	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+circuit	8		non-incumbent	full	1	Ed Sternisha	https://www.montcalm.us/
+circuit	8		non-incumbent	full	1	Lori J. Shearer	https://www.montcalm.us/
+circuit	9		incumbent	full	1	Gary C. Giguere Jr.	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
+circuit	10		incumbent	full	1	Manvel Trice III	https://www.saginawcounty.com/
+circuit	11		incumbent	full	1	Brian D. Rahilly	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	11		incumbent	full	1	Robert T. Steinhoff	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	12		incumbent	full	1	Brittany A. Bulleit	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	13		incumbent	full	1	Kevin A. Elsenheimer	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	14		incumbent	full	1	Kathy Hoogstra	https://co.muskegon.mi.us/502/Election-Information
+circuit	15		incumbent	full	1	Zachary William Stempien	https://www.countyofbranch.com/
+circuit	16		incumbent	full	4	Julie Gatti	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+circuit	16		incumbent	full	4	Tanya A. Grillo	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+circuit	16		incumbent	full	4	James M. Maceroni	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+circuit	16		incumbent	full	4	Matthew S. Switalski	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+circuit	16		non-incumbent	full	1	James L. Spagnuolo	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+circuit	16		non-incumbent	full	1	Genevieve L. Taylor	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+circuit	17		incumbent	full	3	Maureen A. Gottlieb	https://www.kentcountymi.gov/DocumentCenter/View/8870
+circuit	17		incumbent	full	3	Scott A. Noto	https://www.kentcountymi.gov/DocumentCenter/View/8870
+circuit	17		incumbent	full	3	Clay M. West	https://www.kentcountymi.gov/DocumentCenter/View/8870
+circuit	18		non-incumbent	full	1	Michael Huber	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
+circuit	19		incumbent	full	1	David A. Thompson	https://www.benzieco.net/government/elections/
+circuit	20		incumbent	full	1	Jon Hulsing	https://app.miottawa.org/ElectionManagement/viewPublicFile.action?viewFile=%2Fmnt%2Fottawa-apps%2Fcontent%2FappImages%2FElectionManagement%2FcandidateFile-226.pdf
+circuit	22		incumbent	full	2	Patrick J. Conlin, Jr.	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
+circuit	22		incumbent	full	2	Tracy E. Van den Bergh	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
+circuit	24		incumbent	full	1	Timothy C. Wrathell	https://www.sanilaccounty.gov/departments/county_clerk/election_information/elections_results.php
+circuit	25		incumbent	full	1	Matt Wiese	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	26		incumbent	full	1	K. Edward Black	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	28		incumbent	full	1	Jason J. Elmore	https://www.wexfordcounty.org/
+circuit	29		incumbent	full	1	Shannon L.W. Schlegel	https://www.clinton-county.org/
+circuit	30		incumbent	full	3	Rosemarie Elizabeth Aquilina	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	30		incumbent	full	3	Carol N. Koenig	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	30		incumbent	full	3	Wanda M. Stokes	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	30		incumbent	partial 1/1/2029	1	Patricia Tremblay	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	31		incumbent	full	1	Daniel A. Damman	https://stclaircountyclerk.org/Public/File/november_2026_candidate_list_pdf
+circuit	32		incumbent	full	1	Michael K. Pope	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	33		incumbent	full	1	Roy Charles Hayes III	https://charlevoixcountymi.documents-on-demand.com/
+circuit	35		incumbent	full	1	Matthew J. Stewart	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	36		non-incumbent	full	1	Kelly Ward	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	37		incumbent	full	1	Sarah S. Lincoln	https://www.calhouncountymi.gov/
+circuit	38		non-incumbent	full	1	Lauren K. Beaudry	https://www.monroecounty.gov/
+circuit	38		non-incumbent	full	1	Maria Zagorski	https://www.monroecounty.gov/
+circuit	39		incumbent	full	1	Michael R. Olsaver	https://www.electionlenawee.com/app/download/14987887430/Official+Candidate+Listing+November+3%2C+2026+General+Election.pdf
+circuit	40		incumbent	full	1	Mike Hodges	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	41		incumbent	full	1	Christopher S. Ninomiya	https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/
+circuit	42		incumbent	full	1	Michael J. Beale	https://www.co.midland.mi.us/
+circuit	44		non-incumbent	full	1	Andrea Banfield	https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf
+circuit	44		non-incumbent	full	1	Kristina S. Lyke	https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf
+circuit	46		incumbent	full	1	George J. Mertz	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	48		incumbent	full	1	Matt Antkoviak	https://www.allegancounty.org/departments/elections
+circuit	49		non-incumbent	full	1	Dennis L. Duvall Jr.	https://www.osceolacountymi.gov/
+circuit	51		incumbent	full	1	Susan Kasley Sniegowski	https://oceana.mi.us/wp-content/uploads/2026/10/Official-Candidate-List-November-3-2026-4.pdf
+circuit	52		incumbent	full	1	Gerald M. Prill	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+circuit	55		incumbent	full	1	Tara S. Hovey	https://www.clarecounty-mi.gov/
+circuit	56		incumbent	full	1	Kelly E. Morton	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	1		incumbent	full	1	Michael Brown	https://www.monroecounty.gov/
+district	4		incumbent	full	1	Stacey A. Rentfrow	https://www.casscountymi.org/
+district	5		incumbent	full	1	Gordon Gary Hosbein	https://www.berriencounty.org/DocumentCenter/View/24628
+district	5		non-incumbent	full	1	Jennifer E. Fields	https://www.berriencounty.org/DocumentCenter/View/24628
+district	5		non-incumbent	full	1	Myrene Kay Koch	https://www.berriencounty.org/DocumentCenter/View/24628
+district	7		non-incumbent	full	1	Rachel Keeley	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	8		incumbent	full	1	Kathleen P. Hemingway	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
+district	8		non-incumbent	full	2	Mark A. Holsomback	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
+district	8		non-incumbent	full	2	Rachel Vinales	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
+district	10		incumbent	full	2	Paul K. Beardslee	https://www.calhouncountymi.gov/
+district	10		incumbent	full	2	Michelle L. Richardson	https://www.calhouncountymi.gov/
+district	12		incumbent	full	1	Nicole Hughes	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	12		incumbent	full	1	George D. Lyons	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	12		non-incumbent	full	1	Jared L. Hopkins	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	12		non-incumbent	full	1	Stormie Rae McGee	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	15		incumbent	full	1	Tamara Garwood	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
 district	16		incumbent	full	1	Sean Patrick Kavanagh	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	17		incumbent	full	1	Krista Haroutunian	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	18		incumbent	full	1	Mark A. McConnell	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	19		incumbent	full	1	Mark W. Somers	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	20		incumbent	full	1	Mark J. Plawecki	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	21		non-incumbent	full	1	Nicholas Opalewski	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	23		incumbent	full	1	Brittany A. Johnson	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	24		incumbent	full	1	John T. Courtright	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-district	28		incumbent	full	1	Elisabeth M. Mullins	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-district	31		incumbent	full	1	Alexis Grace Krot	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-district	32A		incumbent	full	1	Rebekah Ruth Coleman	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-district	34		incumbent	full	1	Lisa Martin	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
-district	21		non-incumbent	full	1	Nicholas Opalewski	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	25		non-incumbent	full	1	David M. Loeckner	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	25		non-incumbent	full	1	Krystle-Marie Medina	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	28		incumbent	full	1	Elisabeth M. Mullins	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	2A		incumbent	full	1	Todd M. Morgan	https://www.electionlenawee.com/app/download/14987887430/Official+Candidate+Listing+November+3%2C+2026+General+Election.pdf
+district	2B		incumbent	full	1	Megan R.M. Stiverson	https://www.co.hillsdale.mi.us/
+district	31		incumbent	full	1	Alexis Grace Krot	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	34		incumbent	full	1	Lisa Martin	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	35		incumbent	full	1	Jim Plakas	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
 district	36		incumbent	full	6	Demetria Brue	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	36		incumbent	full	6	E. Lynise Bryant	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	36		incumbent	full	6	Adrienne Hinnant-Johnson	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
@@ -196,3 +131,112 @@ district	36		non-incumbent	full	3	Jo A. Irby	https://www.waynecountymi.gov/Gover
 district	36		incumbent	partial 1/1/2031	3	Ponce D. Clay	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	36		incumbent	partial 1/1/2031	3	Herman Griffin IV	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
 district	36		incumbent	partial 1/1/2031	3	Chastity A. Youngblood	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	37		incumbent	full	1	Michael C. Chupa	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	38		incumbent	full	1	Kathleen G. Galen	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	38		incumbent	full	1	Richard W. Goodman	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	39		non-incumbent	full	1	Derek G. Boedeker	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	39		non-incumbent	full	1	Dana C. Freers	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	3A		incumbent	full	1	Brent R. Weigle	https://www.countyofbranch.com/
+district	3B		non-incumbent	full	1	Tim George	https://www.stjosephcountymi.gov/
+district	40		incumbent	full	1	Joseph Craigen Oster	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	42	1st Division	incumbent	full	1	Jennifer Andary	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	43		incumbent	full	1	Brian Christian Hartwell	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	45		incumbent	full	1	Jaimie Powell Horowitz	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	46		incumbent	full	1	Shelia Johnson	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	47		non-incumbent	full	1	Moneka Sanford	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	47		non-incumbent	full	1	Michael Sawicky	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	48		incumbent	full	1	Kimberly Small	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	50		incumbent	full	2	Jeremy Darnell Bowie	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	50		incumbent	full	2	Cynthia T. Walker	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	51		non-incumbent	full	1	Carmen J. DeFranco	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	51		non-incumbent	full	1	Pamela J. Monville	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	52	1st Division	incumbent	full	1	Travis M. Reeds	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	52	2nd Division	incumbent	full	1	Joseph G. Fabrizio	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	52	3rd Division	incumbent	full	1	Laura E. Polizzi	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	52	4th Division	incumbent	full	1	Maureen M. McGinnis	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+district	53		incumbent	full	1	Daniel Bain	https://milivcounty.gov/wp-content/uploads/Candidate-Filings-November-2026.pdf
+district	55		incumbent	full	1	Richard L. Hillman	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	57		non-incumbent	full	1	Timothy Slais	https://www.allegancounty.org/departments/elections
+district	57		non-incumbent	full	1	Heidi L. Wolf	https://www.allegancounty.org/departments/elections
+district	57		incumbent	partial 1/1/2031	1	Christopher E. Burnett	https://www.allegancounty.org/departments/elections
+district	57		incumbent	partial 1/1/2031	1	Tom Siver	https://www.allegancounty.org/departments/elections
+district	58		incumbent	full	2	Juanita F. Bocanegra	https://www.allegancounty.org/departments/elections
+district	58		incumbent	full	2	Anna White	https://www.allegancounty.org/departments/elections
+district	58		incumbent	full	2	Paul Ledford	https://www.allegancounty.org/departments/elections
+district	60		incumbent	full	2	Maria Ladas Hoopes	https://co.muskegon.mi.us/502/Election-Information
+district	60		incumbent	full	2	Paula Baker Mathes	https://co.muskegon.mi.us/502/Election-Information
+district	61		incumbent	full	2	Kellen A. Dotson	https://www.kentcountymi.gov/DocumentCenter/View/8870
+district	61		incumbent	full	2	Angela T. Ross	https://www.kentcountymi.gov/DocumentCenter/View/8870
+district	63		incumbent	full	1	Jeffrey J. O'Hara	https://www.kentcountymi.gov/DocumentCenter/View/8870
+district	63		incumbent	partial 1/1/2029	1	Kirsten L. Holz	https://www.kentcountymi.gov/DocumentCenter/View/8870
+district	67	1st Division	incumbent	full	1	David J. Goggins	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+district	67	2nd Division	incumbent	full	1	Jennifer Manley	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	67	3rd Division	incumbent	full	1	Vikki Bayeh Haley	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+district	67	4th Division	non-incumbent	full	1	K.C. Baran	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	67	4th Division	non-incumbent	full	1	Cheryl A. Lopez	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	67	5th Division	incumbent	full	2	David Guinn	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	67	5th Division	incumbent	full	2	Tabitha M. Marsh	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	70	2nd Division	incumbent	full	2	Elian E.H. Fichtner	https://www.saginawcounty.com/
+district	70	2nd Division	incumbent	full	2	A.T. Frank	https://www.saginawcounty.com/
+district	72		incumbent	full	1	Mona S. Armstrong	https://stclaircountyclerk.org/Public/File/november_2026_candidate_list_pdf
+district	74		non-incumbent	full	1	James A. Perry	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
+district	74		non-incumbent	full	1	Brian H. Jean	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
+district	75		incumbent	full	1	Michael D. Carpenter	https://www.baycountymi.gov/Documents/Departments/Clerk/Elections/Election%20Notices/November%203,%202026%20Official%20Candidates%20&amp;%20Proposals.pdf
+district	76		incumbent	full	1	Eric R. Janes	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	77		incumbent	full	1	Peter Michael Jaklevic	https://www.osceolacountymi.gov/
+district	78		incumbent	full	1	Ellsworth J. Stay Jr.	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	79		incumbent	full	1	John D. Middlebrook	https://oceana.mi.us/wp-content/uploads/2026/10/Official-Candidate-List-November-3-2026-4.pdf
+district	80		incumbent	full	1	Joshua M. Farrell	https://www.clarecounty-mi.gov/
+district	82		incumbent	full	1	Mary A. Beebe	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	84		incumbent	full	1	Corey J. Wiggins	https://www.wexfordcounty.org/
+district	89		incumbent	full	1	Michael J. Ekdahl	https://www.cheboygancounty.net/
+district	90		incumbent	full	1	Angela J. Lasher	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	92		incumbent	full	1	Beth Ann Gibson	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	94		non-incumbent	full	1	Andrew Hayse	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	94		non-incumbent	full	1	Trent Stupak	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	96		non-incumbent	full	1	Patrick J. Crowley	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	96		non-incumbent	full	1	Derek G. Swajanen	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	97		incumbent	full	1	Nicholas J. Daavettila	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	14A		incumbent	full	1	Anna Maria Frushour	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
+district	14B		incumbent	full	1	Erane C. Washington	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
+district	32A		incumbent	full	1	Rebekah Ruth Coleman	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+district	41A		incumbent	full	1	Annemarie Marino Lepore	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	41B		incumbent	full	1	Jacob Michael Femminineo Jr.	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+district	54A		incumbent	full	1	Stacia Buchanan	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	56A		incumbent	full	1	Adrianne K. Van Langevelde	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	56A		incumbent	partial 1/1/2029	1	Reid S. Felsing	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	62A		incumbent	full	1	Pablo Cortes	https://www.kentcountymi.gov/DocumentCenter/View/8870
+district	62B		incumbent	full	1	Amanda H. Sterkenburg	https://www.kentcountymi.gov/DocumentCenter/View/8870
+district	64A		incumbent	full	1	Raymond Peter Voet	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	64B		incumbent	full	1	Adam James Eggleston	https://www.montcalm.us/
+district	65A		incumbent	full	1	Andrew M. Stevens	https://www.clinton-county.org/
+district	65B		non-incumbent	full	1	Laura M. Bever	https://www.gratiotmi.com/
+district	71A		non-incumbent	full	1	David N. Richardson	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	71A		non-incumbent	full	1	Maureen Flanigan Salayko	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+district	71B		incumbent	full	1	Jason E. Bitzer	https://www.tuscolacounty.org/elections/
+district	71B		incumbent	full	1	Craig S. Datz	https://www.tuscolacounty.org/elections/
+district	95A		non-incumbent	full	1	Alexander Sieminski	https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/
+district	95A		non-incumbent	full	1	Jeffrey T. Rogg	https://www.menomineecountymi.gov/departments/clerk/elections/2026-election-information/
+district	95B		incumbent	full	1	Julie Ann LaCost	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+probate	Berrien		incumbent	full	1	Mabel Johnson Mayfield	https://www.berriencounty.org/DocumentCenter/View/24628
+probate	Chippewa		incumbent	full	1	Eric G. Blubaugh	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+probate	Genesee		non-incumbent	full	1	Andrea L. LeGendre	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+probate	Genesee		non-incumbent	full	1	Ashley Prew	http://www.geneseecountymi.gov/2026%20Candidate%20List.pdf?t=202610221428180
+probate	Huron		incumbent	full	1	Julienne M. Ferris	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+probate	Huron		incumbent	full	1	Jessica Leigh Testolin-Reinke	https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026
+probate	Ingham		incumbent	full	1	Richard J. Garcia	https://www.dropbox.com/scl/fi/5b4627tqe8txa3n6x8jxs/Ingham-November-Candidate-List-2026.pdf
+probate	Kalamazoo		incumbent	full	1	Tiffany A. Ankley	https://www.kalcounty.gov/DocumentCenter/View/6469/Unofficial-November-2026-Candidate-List?bidId=
+probate	Kent		incumbent	full	1	David M. Murkowski	https://www.kentcountymi.gov/DocumentCenter/View/8870
+probate	Macomb		incumbent	full	1	Sara A. Schimke	https://macombgovdocs.org/clerk/pdfs/elect-2026-11-03-Official-Candidate-List-printable.pdf
+probate	Monroe		incumbent	full	1	Cheryl R. Sweeney	https://www.monroecounty.gov/
+probate	Oakland		incumbent	partial 1/1/2029	1	Nicole S. Huddleston	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+probate	Oakland		non-incumbent	full	1	Elisabeth Dery	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+probate	Oakland		non-incumbent	full	1	Jessica Ann Hallmark	https://cdn.oaklandcountymi.gov/oakland-sitefinity-prod/docs/default-source/clerk/clerk-elections/elections-voting/11032026-candidate-list.pdf
+probate	Saginaw		incumbent	full	1	Barbara L. Meter	https://www.saginawcounty.com/
+probate	Sanilac		non-incumbent	full	1	Sara L. Grout	https://www.sanilaccounty.gov/departments/county_clerk/election_information/elections_results.php
+probate	St. Clair		incumbent	full	1	Jennifer Deegan	https://stclaircountyclerk.org/Public/File/november_2026_candidate_list_pdf
+probate	Washtenaw		non-incumbent	full	1	Alethia Jean Battles	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
+probate	Washtenaw		non-incumbent	full	1	Jennifer Lawrence	https://content.civicplus.com/api/assets/mi-washtenawcounty/27e0db62-cc1a-41cd-8654-e0a8a5c4f6d0
+probate	Wayne		non-incumbent	full	3	Sarah Colegrove	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+probate	Wayne		non-incumbent	full	3	Suzanne Fanning	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election
+probate	Wayne		non-incumbent	full	3	Vanessa M. Moss	https://www.waynecountymi.gov/Government/Elected-Officials/Clerk/Elections/Election-Results-Candidates/November-3rd-2026-General-Election

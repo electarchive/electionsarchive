@@ -15,6 +15,8 @@ VERSION = "1"
 DAY = date(2026, 11, 3)
 ROWS = Path(__file__).with_name("mi_judicial_2026.tsv")
 RAW = "us.local_2026"
+LISTING = "https://mi-boe.entellitrak.com/etk-mi-boe-prod/page.request.do?page=page.miboePublicReport&electionType=GEN&electionYear=2026"
+STALE = "Superseded by the statewide candidate listing's seat and incumbency labels"
 OFFICES = {
     "circuit": "Judge of Circuit Court",
     "district": "Judge of District Court",
@@ -62,6 +64,10 @@ def emit() -> Path:
             ).fetchall()
         }
         labels = {v[0]: (v[1], v[2]) for k, v in local_2026.FEEDS.items() if k.startswith("MI-")}
+        labels[LISTING] = (
+            "Michigan Department of State, Bureau of Elections",
+            "Official Candidate Listing, All State and Judicial Offices, November 3, 2026 general election",
+        )
         for key, url in local_2026.FILES.items():
             if key.startswith("MI-") and url not in labels:
                 labels[url] = (
@@ -150,6 +156,7 @@ def emit() -> Path:
                 name(offices[court], f"{title}, MI")
 
         persons: set[UUID] = set()
+        contests: set[UUID] = set()
         made = candidates = 0
         for (court, number, seat, position, term), members in sorted(blocks.items()):
             seats = int(members[0]["seats"])
@@ -165,6 +172,7 @@ def emit() -> Path:
             label = f"{OFFICES[court]}, {place}" + (f" ({tag})" if tag else "")
             key = f"{DAY}:MI:{slug(OFFICES[court])}:{slug(place)}:{slug(seat)}:{slug(position)}:{slug(term)}"
             contest = cs.key("us.contest", key)
+            contests.add(contest)
             cs.add(
                 "contest",
                 id=contest,
@@ -223,5 +231,19 @@ def emit() -> Path:
                 )
                 cs.add("citation", entity_id=candidacy, source_id=sources[row["source"]], locator=None)
                 candidates += 1
+        for (stale,) in conn.execute(
+            """select c.id from contest c join changeset ch on ch.id = c.changeset_id
+               join entity e on e.id = c.id
+               where ch.pipeline = %s and e.retired_by is null and not c.id = any(%s)""",
+            [SOURCE, list(contests)],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=stale, reason=STALE)
+            for (orphan,) in conn.execute(
+                """select distinct cy.person_id from candidacy cy join contest_option o on o.id = cy.option_id
+                   where o.contest_id = %s""",
+                [stale],
+            ).fetchall():
+                if orphan not in persons:
+                    cs.add("entity_retirement", entity_id=orphan, reason=STALE)
         print(made, "contests,", candidates, "candidates,", len(districts), "districts")
         return cs.write()
