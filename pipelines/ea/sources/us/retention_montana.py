@@ -15,7 +15,17 @@ QUESTIONS = (
     ("2008-11-04", 2008, 3, "Patricia Cotter", (1500, 1700), (1700, 1900)),
     ("2010-11-02", 2010, 6, "Mike Wheat", None, None),
     ("2012-11-06", 2012, 15, "Brian Morris", None, None),
+    ("2016-11-08", 2016, 10, "Mike McGrath", None, None),
+    ("2016-11-08", 2016, 12, "Jim Shea", None, None),
+    ("2018-11-06", 2018, 6, "Beth Baker", None, None),
+    ("2018-11-06", 2018, 7, "Ingrid Gustafson", None, None),
+    ("2020-11-03", 2020, 12, "Jim Shea", None, None),
 )
+LATER = {
+    2016: "2016-general/2016GeneralStatewideCanvass.pdf",
+    2018: "2018-general/2018-General-Report-State-Canvass.pdf",
+    2020: "2020-general/State_Canvass_Report.pdf",
+}
 
 
 def lines(pdf, page):
@@ -34,9 +44,13 @@ def number(word):
     return int(word.replace(",", ""))
 
 
+def location(year):
+    return mt_judicial.BASE + LATER[year].rsplit("/", 1)[1] if year in LATER else mt_judicial.location(year)
+
+
 def fetch() -> None:
-    for year, (_, name) in mt_judicial.FILES.items():
-        url = mt_judicial.location(year)
+    for year, name in {**{y: n for y, (_, n) in mt_judicial.FILES.items()}, **LATER}.items():
+        url = location(year)
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -63,7 +77,7 @@ def rows():
         }
     found: list[dict[str, object]] = []
     for day, year, page, judge, yes_band, no_band in QUESTIONS:
-        url = mt_judicial.location(year)
+        url = location(year)
         pdf = raw.cached(SOURCE, url).path
         cells: dict[str, tuple[tuple[int, scan.Box], tuple[int, scan.Box]]] = {}
         printed: tuple[int, int] | None = None
