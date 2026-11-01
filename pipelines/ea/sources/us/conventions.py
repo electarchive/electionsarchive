@@ -241,9 +241,9 @@ TABLES += [
     *leaves(
         "officialproceedi00repu_0",
         "1888",
-        {"b1": (376, 377), "b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)},
+        {"b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)},
     ),
-    *ballots("officialproceedi00repu_0", "1888", {4: (395, 395), 6: (407, 407), 8: (416, 416)}),
+    *ballots("officialproceedi00repu_0", "1888", {1: (376, 377), 4: (395, 395), 6: (407, 407), 8: (416, 416)}),
     *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
     *ballots("proceedingsofeig00repu", "1884", {1: (150, 151), 2: (155, 156), 4: (171, 172)}),
     *ballots(
@@ -876,6 +876,9 @@ CORRECTIONS = {
         (159, "IA", (0.43, 0.395, 0.66, 0.406), {"Blaine": 26, "Edmunds": 0}, "printed under Edmunds; the Blaine and Edmunds totals each differ from the rows by exactly these 26 votes"),
         (159, "RI", (0.49, 0.643, 0.54, 0.654), {"Arthur": 0}, "the printed Arthur vote exceeds both the delegation's 8 and the Arthur total"),
         (159, "LA", (0.43, 0.432, 0.48, 0.443), {"not voting": 1}, "16 held, 15 recorded; 819 of 820 votes cast"),
+    ],
+    "1888:republican:b1": [
+        (376, "GA", (0.343, 0.712, 0.377, 0.723), {"not voting": 1}, "24 held, 23 recorded; 831 of 832 votes cast"),
     ],
     "1888:republican:b2": [
         (380, "GA", (0.423, 0.311, 0.459, 0.321), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
