@@ -1,3 +1,4 @@
+import html
 import re
 from collections import defaultdict
 from datetime import UTC, date, datetime
@@ -27,6 +28,18 @@ FILES = {
     date(2022, 5, 24): "2022/Total Votes Results_fb34a8c4-3127-4742-8c5b-691de9c22401.xlsx",
     date(2024, 5, 21): "2024/Total Votes Results_dd4a2851-411f-4720-abea-3ce4cf813d1f.xlsx",
 }
+EARLY = {
+    date(
+        2000, 7, 18
+    ): "https://web.archive.org/web/20061214035125id_/http://www.sos.state.ga.us/elections/election_results/2000_0718/summary.htm",
+    date(
+        2002, 8, 20
+    ): "https://web.archive.org/web/20061214021707id_/http://www.sos.state.ga.us/elections/election_results/2002_0820/summary.htm",
+    date(
+        2004, 7, 20
+    ): "https://web.archive.org/web/20210728072428id_/https://sos.ga.gov/elections/election_results/2004_0720/summary.htm",
+}
+CANDIDATE = re.compile(r"^(.+?)\s+([\d,]+)\s+([\d.]+) ?%$")
 COURTS = {"Supreme": "Justice of the Supreme Court", "Appeals": "Judge of the Court of Appeals"}
 NOTE = (
     "Statewide totals from the Georgia Secretary of State's results report for the nonpartisan election held with the "
@@ -36,6 +49,8 @@ UNCONTESTED = "The judge was unopposed; write-in votes are included where the re
 
 
 def fetch() -> None:
+    for url in EARLY.values():
+        raw.fetch(SOURCE, url, suffix=".htm")
     for day, name in FILES.items():
         try:
             raw.cached(SOURCE, f"{URL}#{day}")
@@ -56,8 +71,40 @@ def clean(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().rstrip(",")
 
 
-def lines() -> list[dict[str, object]]:
+def early() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
+    for day, url in EARLY.items():
+        text = html.unescape(re.sub(r"<[^>]+>", "\n", raw.cached(SOURCE, url).path.read_text(errors="replace")))
+        cells = [line.strip() for line in text.splitlines() if line.strip()]
+        race = 0
+        for index, cell in enumerate(cells):
+            court = {
+                "JUSTICE OF THE SUPREME COURT": COURTS["Supreme"],
+                "JUDGE OF THE COURT OF APPEALS": COURTS["Appeals"],
+            }.get(cell.upper())
+            if court is None:
+                continue
+            race += 1
+            block = []
+            for follow in cells[index + 3 :]:
+                match = CANDIDATE.match(follow)
+                if match is None:
+                    break
+                block.append((clean(match[1]), int(match[2].replace(",", "")), float(match[3])))
+            total = sum(votes for _, votes, _ in block)
+            for name, votes, percent in block:
+                assert abs(votes / total * 100 - percent) < 0.06, (day, name, votes, total, percent)
+                found.append(
+                    {"day": day, "office": f"{court} {race}", "court": court, "candidate": name, "votes": votes}
+                )
+            found.append(
+                {"day": day, "office": f"{court} {race}", "court": court, "candidate": "Total Votes", "votes": total}
+            )
+    return found
+
+
+def lines() -> list[dict[str, object]]:
+    found: list[dict[str, object]] = early()
     for day in FILES:
         for cells in sheet(raw.cached(SOURCE, f"{URL}#{day}").path)[1:]:
             office = cells.get("A", "")
@@ -83,7 +130,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Georgia Supreme Court and Court of Appeals nonpartisan elections 2012–2024, statewide, "
+            summary="Georgia Supreme Court and Court of Appeals nonpartisan elections 2000–2004 and 2012–2024, statewide, "
             "from the Secretary of State's results reports",
             polity="US-GA",
         )
@@ -99,6 +146,8 @@ def emit() -> Path:
         )
         for day in FILES:
             cs.artifact(raw.cached(SOURCE, f"{URL}#{day}"), source)
+        for url in EARLY.values():
+            cs.artifact(raw.cached(SOURCE, url), source)
         state_unit, state_area, polity = conn.execute(
             """select u.id, u.area_id, p.id from polity p
                join reporting_unit u on u.polity_id = p.id and u.scheme_code = 'us.state'
@@ -125,6 +174,12 @@ def emit() -> Path:
         groups: dict[tuple[date, str, str], list[dict[str, object]]] = defaultdict(list)
         for row in rows:
             groups[(row["day"], str(row["court"]), str(row["office"]))].append(row)
+        later = {
+            f"GA:{slug(first)}-{slug(last)}"
+            for row in rows
+            if row["day"].year > 2010 and row["candidate"] not in ("Total Votes", "Write-in")
+            for first, last in [identity(str(row["candidate"]))]
+        }
         made = 0
         for (day, title, _), group in sorted(groups.items()):
             office = cs.key("us.office", f"{slug(title)}:GA")
@@ -226,7 +281,8 @@ def emit() -> Path:
                         persons.add(person_key)
                         if person in cs.minted:
                             cs.add("person", id=person)
-                        name(person, display(choice))
+                        if day.year > 2010 or person in cs.minted and person_key not in later:
+                            name(person, display(choice))
                     options[choice] = cs.key("us.option", f"{contest_key}:{slug(choice)}")
                     cs.add(
                         "contest_option",
