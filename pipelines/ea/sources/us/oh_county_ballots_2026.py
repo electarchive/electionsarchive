@@ -529,6 +529,9 @@ def pick(
         if len(narrowed) > 1 and word in kind.lower():
             narrowed = [c for c in narrowed if word in c[2].lower()] or narrowed
     text = row["text"].lower()
+    if len(narrowed) > 1 and "liquor" in kind.lower():
+        sunday = "sunday" in kind.lower()
+        narrowed = [c for c in narrowed if ("sunday" in c[2].lower().split("purpose:")[0]) == sunday] or narrowed
     if len(narrowed) > 1:
         narrowed = [
             c
