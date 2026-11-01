@@ -68,6 +68,10 @@ PARTY = re.compile(r"(?:[,.]\s*(r&d|d&r|r|d|i|ind|l|lib|1)|\s(?-i:(r|d|l)))\s*\.
 CLEAN = re.compile(
     r"[A-Z][A-Za-z'.\-]*(?: (?:[A-Z]|de[A-Z]|(?:de|du|dupont|van|von|der|la|di) (?=[A-Z]|[a-z]+ [A-Z]))[A-Za-z'.\-]*)+(?:,? (?:Jr|Sr|II|III|IV)\.?)?"
 )
+TAIL = re.compile(r"[A-Z][A-Za-z'\-]+(?:,? [A-Za-z'\-.]+){0,3}")
+PERIOD_TOWN = re.compile(
+    r"(.+?(?<! St)(?<! Mt)[a-z])\.,? (?:(Jr|Sr|II|III|IV)\.?,? )?([A-Z][a-z]{2,}(?: [A-Z][a-z]+)?)"
+)
 STRANDED = re.compile(r"(.+[a-z])\. ([A-Z][a-z]+)\. (d|r)")
 TRAILING = re.compile(r"(.+?[A-Za-z.]) (d|r)")
 
@@ -312,12 +316,16 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
             "printed": None,
             "total_party": None,
             "group": None,
+            "tail": None,
         }
         out.append(entry)
         group.append(entry)
 
     last_page = 0
+    tailable: dict[str, object] | None = None
     for row in all_rows:
+        prior, tailable = tailable, None
+        before = len(out)
         if last_page and row.page - last_page > 10:
             state.update(office=None, district=None, opening=False)
         last_page = row.page
@@ -366,12 +374,90 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
             else:
                 pending_number = found
         elif left and re.search(r"[A-Za-z]{3}", left_text) and state["office"] is not None:
-            if pending_number is not None:
+            if (
+                prior is not None
+                and cut_short(prior)
+                and re.fullmatch(TAIL, left_text.strip(" .,-"))
+                and not left_text.startswith("Total")
+            ):
+                prior["tail"] = left_text.strip(" .,-")
+                prior["x1"] = max(float(prior["x1"]), max(w.x1 for w in left) / row.width)
+                prior["y1"] = max(float(prior["y1"]), max(w.y1 for w in left) / row.height)
+            elif pending_number is not None:
                 record(row, left, pending_number)
                 pending_number = None
             else:
                 pending = left
+        if len(out) > before:
+            tailable = out[-1]
     return out
+
+
+SUFFIX = re.compile(r"(?:Jr|Sr|St|II|III|IV)\.?", re.IGNORECASE)
+HEAD_TOWN = re.compile(r"(.+ [A-Z]\.?) ([A-Z][a-z]+(?: [A-Z][a-z]+)?)")
+INITIAL_SURNAME = re.compile(r"([A-Z]\.?) ([A-Z][a-z]+)")
+
+
+def cut_short(entry: dict[str, object]) -> bool:
+    name = re.sub(r"[, ]+(?:Jr|Sr|II|III|IV)\.?$", "", str(entry["name"]))
+    return (
+        entry["town"] is None
+        and name != "Scatter"
+        and bool(
+            re.fullmatch(r"(?i)[rdl]|r&d|d&r|[a-z]+|.*(?:^| )[A-Z]\.?", name)
+            or HEAD_TOWN.fullmatch(name)
+            or INITIAL_SURNAME.fullmatch(name)
+        )
+    )
+
+
+def joined(name: str, town: str | None, tail: str) -> tuple[str, str | None]:
+    parts = [
+        part.strip()
+        for part in tail.split(",")
+        if SUFFIX.fullmatch(part.strip()) or len(re.sub(r"[^A-Za-z]", "", part)) >= 3
+    ]
+    tail_town = None
+    if len(parts) > 1 and not SUFFIX.fullmatch(parts[-1]):
+        tail_town = parts.pop()
+    words = " ".join(parts).replace(",", " ").split()
+    suffix = words.pop() if len(words) > 1 and SUFFIX.fullmatch(words[-1]) else None
+    held = re.search(r"[, ]+(Jr|Sr|St|II|III|IV)\.?(?= |$)", name)
+    if held:
+        suffix, name = suffix or held[1], name[: held.start()] + name[held.end() :]
+    if suffix:
+        suffix = {"st": "Sr.", "sr": "Sr.", "jr": "Jr."}.get(suffix.lower().rstrip("."), suffix)
+    if re.fullmatch(r"(?i)[rdl]|r&d|d&r", name):
+        name = ""
+    name = re.sub(r"(^| )([A-Z])$", r"\1\2.", name)
+    head = HEAD_TOWN.fullmatch(name)
+    initial = INITIAL_SURNAME.fullmatch(name)
+    if re.fullmatch(r"[A-Z]\.", name) and len(words) == 2:
+        name, town = f"{words[0]} {name} {words[1]}", tail_town or town
+    elif name in TOWNS and len(words) == 2:
+        name, town = " ".join(words), name
+    elif initial and initial[2] in TOWNS and len(words) == 2 and tail_town is None:
+        name, town = f"{words[0]} {initial[1]} {words[1]}", initial[2]
+    elif initial and initial[2] not in TOWNS and len(words) == 2 and words[1] in TOWNS and tail_town is None:
+        name, town = f"{words[0]} {initial[1]} {initial[2]}", words[1]
+    elif initial and tail_town and len(words) == 1:
+        name, town = f"{words[0]} {initial[1]} {initial[2]}", tail_town
+    elif head and len(words) == 1 and tail_town is None:
+        last_is_town, word_is_town = head[2] in TOWNS, words[0] in TOWNS
+        if last_is_town and not word_is_town:
+            name, town = f"{head[1]} {words[0]}", head[2]
+        elif word_is_town and not last_is_town:
+            town = words[0]
+        else:
+            name = f"{name} {words[0]} ?"
+    elif head:
+        name = f"{name} {' '.join(words)} ?"
+    else:
+        name, town = f"{name} {' '.join(words)}".strip(), tail_town or town
+    return (f"{name}, {suffix}" if suffix else name), town
+
+
+TOWNS: set[str] = set()
 
 
 def link(year: int, kind: str) -> str:
@@ -421,7 +507,7 @@ def parse() -> None:
             print(f"{year}: no county office pages")
             continue
         found = {number: page for number, page in words(path, pages[0], pages[-1]).items() if number in pages}
-        frame = pl.DataFrame(lines(rows(found)))
+        frame = pl.DataFrame(lines(rows(found)), infer_schema_length=None, schema_overrides={"tail": pl.String})
         runs = frame["run"].n_unique()
         print(f"{year}: {frame.height} lines, {runs} runs")
         frames.append(
@@ -756,11 +842,26 @@ def request(frame: pl.DataFrame, job: str, prefix: str, dpi: int) -> None:
     print(batch.ensure(SOURCE, job, wanted)[1])
 
 
-SPELLINGS = {"Cheryl A. Bums": "Cheryl A. Burns"}
+SPELLINGS = {
+    "Cheryl A. Bums": "Cheryl A. Burns",
+    "William D. Paine U": "William D. Paine II",
+    "William D. Paine H": "William D. Paine II",
+    "Peter R. Lovely, St.": "Peter R. Lovely, Sr.",
+}
 
 
-def repair(name: str, town: str | None, party: str | None) -> tuple[str, str | None, str | None]:
+def repair(
+    name: str, town: str | None, party: str | None, tail: str | None = None
+) -> tuple[str, str | None, str | None]:
+    if tail:
+        name, town = joined(name, town, tail)
+    name = re.sub(r"\b([A-Z]), (?=[A-Z][a-z])", r"\1. ", name)
     name = SPELLINGS.get(name, name)
+    name = re.sub(r"[, ]+11$", " II", name)
+    name = re.sub(r"[, ]+(?:111|HI|IH)$", " III", name)
+    found = PERIOD_TOWN.fullmatch(name) if town is None else None
+    if found:
+        return found[1] + (f", {found[2]}" if found[2] else ""), found[3], party
     found = STRANDED.fullmatch(name) if town is None else None
     if found and not re.fullmatch(r"(?:Jr|Sr|II|III|IV)", found[2]):
         return found[1], found[2], party or found[3]
@@ -779,25 +880,56 @@ def person(name: str) -> tuple[str, str]:
     return (re.sub(r"[^a-z]", "", words[-1].lower()), words[0][:1].lower()) if words else ("", "")
 
 
+def garbled(name: str) -> bool:
+    return any(
+        re.search(r"[a-z][A-Z]", word) and not re.match(r"(?:Mc|Mac|De|Di|Du|Le|La|O')[A-Z]", word)
+        for word in name.split()
+    )
+
+
+def distance(left: str, right: str) -> int:
+    row = list(range(len(right) + 1))
+    for i, a in enumerate(left, 1):
+        last, row[0] = row[0], i
+        for j, b in enumerate(right, 1):
+            last, row[j] = row[j], min(row[j] + 1, row[j - 1] + 1, last + (a != b))
+    return row[-1]
+
+
+def misread(option: str, name: str) -> bool:
+    ours, theirs = person(option), person(name)
+    if ours[1] != theirs[1] or len(theirs[0]) < 4 or len(ours[0]) < 4:
+        return False
+    first = [re.sub(r"[^a-z]", "", word.lower()) for word in (option.split()[0], name.split()[0])]
+    return distance(ours[0], theirs[0]) <= (1 if min(len(ours[0]), len(theirs[0])) < 6 else 2) and (
+        first[0] == first[1] or len(first[0]) > 3 and distance(first[0], first[1]) <= 1
+    )
+
+
 def emit() -> Path:
     from ea.changeset import Changeset
     from ea.sources.us.nh_sos_county import COLUMNS, CONTEST, TEMPLATE, WRITE_IN
     from ea.store import connect
 
     raw_lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("county").is_not_null())
+    TOWNS.update(
+        raw_lines.filter(pl.col("tail").is_null() & pl.col("town").str.contains(r"^[A-Z][a-z]+(?: [A-Z][a-z]+)?$"))[
+            "town"
+        ].unique()
+    )
     fixes = {
         key: repair(*key)
-        for key in raw_lines.select("name", "town", "party").unique().iter_rows()
+        for key in raw_lines.select("name", "town", "party", "tail").unique().iter_rows()
         if key[0] != "Scatter"
     }
     lines = blocks(
         raw_lines.with_columns(
-            pl.struct("name", "town", "party")
+            pl.struct("name", "town", "party", "tail")
             .map_elements(
                 lambda row: dict(
                     zip(
                         ("name", "town", "party"),
-                        fixes.get((row["name"], row["town"], row["party"]), tuple(row.values())),
+                        fixes.get((row["name"], row["town"], row["party"], row["tail"]), tuple(row.values())[:3]),
                         strict=True,
                     )
                 ),
@@ -805,8 +937,13 @@ def emit() -> Path:
             )
             .alias("fixed")
         )
-        .drop("name", "town", "party")
+        .drop("name", "town", "party", "tail")
         .unnest("fixed")
+        .with_columns(
+            name=pl.when(pl.col("writein") & pl.col("name").str.contains(r"^(?:\S+|[A-Z]\.? \S+)$"))
+            .then(pl.lit("Scatter"))
+            .otherwise(pl.col("name"))
+        )
     )
     both = twice(raw_lines)
     lines = (
@@ -1009,6 +1146,7 @@ def emit() -> Path:
                         or len(mine[0]) > 4
                         and difflib.SequenceMatcher(None, person(option[1])[0], mine[0]).ratio() >= 0.8
                         and person(option[1])[1] == mine[1]
+                        or misread(option[1], name)
                     )
                 ]
                 if len(hits) > 1:
@@ -1018,6 +1156,7 @@ def emit() -> Path:
                 if (
                     not hits
                     and CLEAN.fullmatch(name)
+                    and not garbled(name)
                     and not re.search(r"[a-z]\. [A-Za-z]|- ", name)
                     and len(mine[0]) > 2
                     and (len(name.split()) > 2 or len(name.split()[0]) > 2)
@@ -1040,9 +1179,11 @@ def emit() -> Path:
                 and not [m for m in matched.values() if m not in others]
                 and any(option[2] == "candidate" for option in options)
             ):
-                failed = f"no line matches the contest's options: {fresh}"
+                failed = f"no line matches the contest's options: {[option[1] for option in options]}"
             if failed:
-                report.setdefault("candidate mismatch", []).append(f"{tag} {external}: {failed}")
+                report.setdefault("candidate mismatch", []).append(
+                    f"{tag} {external}: {failed} | {list(zip(totals['name'], rows.group_by('name', maintain_order=True).agg(pl.col('town').first())['town']))}"
+                )
                 continue
             if minted is not None:
                 title = TITLES[str(office)]
