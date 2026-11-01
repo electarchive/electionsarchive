@@ -13,9 +13,9 @@
   import { on } from "svelte/events";
   import ConfirmationDialog from "#lib/components/confirmation-dialog.svelte";
   import Explain from "#lib/components/explain.svelte";
+  import Footer from "#lib/components/footer.svelte";
   import Header from "#lib/components/header.svelte";
   import Provenance from "#lib/components/provenance.svelte";
-  import Shahmaran from "#lib/components/shahmaran.svelte";
   import { Toaster } from "#lib/components/ui/sonner/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import embedStyles from "#lib/embed.css?url";
@@ -185,32 +185,7 @@
         >
           {@render children()}
         </div>
-        <footer class="border-bs">
-          <div
-            class="mx-auto flex items-center gap-3 px-4 py-5 text-sm text-muted-foreground max-inline-7xl max-sm:px-3"
-          >
-            <a
-              href="https://www.firatciftci.com"
-              class="group flex items-center gap-3 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
-            >
-              <Shahmaran
-                class="shrink-0 rotate-20 opacity-30 transition-[rotate,opacity] duration-700 inline-9 group-hover:rotate-[8deg] group-hover:opacity-70 group-focus-visible:rotate-[8deg] group-focus-visible:opacity-70 motion-reduce:transition-none"
-              />
-              <span
-                >{m.footer_credit()}
-                <span
-                  class="font-semibold text-foreground underline decoration-border underline-offset-4 group-hover:decoration-current"
-                  >Firat Ciftci</span
-                ></span
-              >
-            </a>
-            <a
-              href={resolve("/agents")}
-              class="ms-auto underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-current focus-visible:outline-2 focus-visible:outline-ring"
-              >{m.agents_nav()}</a
-            >
-          </div>
-        </footer>
+        <Footer />
       </div>
     {:else}
       <div class="p-3.5" data-embed>

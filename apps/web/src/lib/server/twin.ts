@@ -59,6 +59,7 @@ import {
   person,
   results,
 } from "#lib/server/pages.js";
+import { isProject, project } from "#lib/server/project.js";
 import { router } from "#lib/server/rpc/router.js";
 import { comeback, recordLede, verdict } from "#lib/verdict.js";
 
@@ -251,6 +252,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   }
   if (head === "map" && rest.length > 0) {
     return atlasPage(rest.join("/"), search);
+  }
+  if (rest.length === 0 && isProject(head)) {
+    return { kind: "project" as const, ...project(head) };
   }
   switch (rest.length === 0 ? head : "") {
     case "coverage": {
@@ -561,6 +565,9 @@ function markdown(
     }
     case "methodology": {
       return methodologyMarkdown(data);
+    }
+    case "project": {
+      return projectMarkdown(data, origin);
     }
     case "coverage_overview": {
       return overviewMarkdown(data, link);
@@ -3708,6 +3715,24 @@ function electionMarkdown(
         ]),
     ...hexMarkdown(states?.places ?? null, hexes),
   ].filter((block) => block !== "");
+}
+
+function projectMarkdown(
+  data: Extract<Data, { kind: "project" }>,
+  origin: string,
+) {
+  return [
+    `# ${data.title}`,
+    data.lede,
+    ...(data.updated == null
+      ? []
+      : [m.project_updated({ date: date(data.updated) })]),
+    ...data.sections.flatMap((section) => [
+      `## ${section.title}`,
+      section.body.replaceAll("](/", () => `](${origin}/`),
+      ...(section.quote == null ? [] : [`> ${section.quote}`]),
+    ]),
+  ];
 }
 
 function methodologyMarkdown(data: Extract<Data, { kind: "methodology" }>) {

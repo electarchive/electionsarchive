@@ -25,6 +25,13 @@ Pages follow the place, then the election, then the contest, then the reporting 
 - [Skill](${origin}/agents/skill.md): ${READ_ONLY ? "how to connect, and the data model in one page." : "how to propose a change: the data model, the evidence rule, the workflow, and every operation, with worked examples."}
 - [For agents](${origin}/agents): setup, tools, and rules for people connecting an agent.
 
+## About
+
+- [License](${origin}/license.md): the data is CC BY 4.0 unless a source's own license differs (each result set records it), the code is AGPL-3.0, and how to cite.
+- [Architecture](${origin}/architecture.md): how data gets into the archive and how it comes out.
+- [Contribute](${origin}/contribute.md): how to report errors today and how proposals will work.
+- [About](${origin}/about.md), [Privacy](${origin}/privacy.md), and [Terms of use](${origin}/terms.md).
+
 ## Countries
 
 ${polities
