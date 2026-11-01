@@ -66,9 +66,14 @@ const licensed = (set: string) =>
 
 export const served = (set: string) => sql.raw(licensed(set));
 
-export const latest = (set: string) =>
+const newest = (set: string) =>
+  `(${set}.is_default and ${set}.stage <> 'notional' and ${licensed(set)} and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and ${licensed("later")} and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`;
+
+export const latest = (set: string) => sql.raw(newest(set));
+
+const held = (contest: string, election: string) =>
   sql.raw(
-    `(${set}.is_default and ${set}.stage <> 'notional' and ${licensed(set)} and not exists (select from result_set later where later.contest_id = ${set}.contest_id and later.is_default and ${licensed("later")} and array_position(${ORDER}, later.stage) < array_position(${ORDER}, ${set}.stage)))`,
+    `case when ${election}.kind = 'indirect' then coalesce((select (rs.as_of at time zone 'UTC')::date from result_set rs where rs.contest_id = ${contest}.id and rs.as_of is not null and ${newest("rs")} order by array_position(${ORDER}, rs.stage) limit 1), ${election}.date_from) else ${election}.date_from end`,
   );
 
 const umbrella = (election: string) =>
@@ -10465,7 +10470,7 @@ export const contests = {
           select c.id from contest c join chain on c.previous_round_id = chain.id
         )
         select c.id, (select s.path from slug s where s.entity_id = c.id and s.is_current) as path,
-          c.round_number as round, e.kind::text as kind, e.date_from::text as date
+          c.round_number as round, e.kind::text as kind, ${held("c", "e")}::text as date
         from chain join contest c on c.id = chain.id join election e on e.id = c.election_id
         order by e.date_from, c.round_number
       `);
@@ -12936,7 +12941,7 @@ async function races(
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         (select p.office_id from contest p where p.id = c.allocation_parent_id and c.kind = 'elector_slate') as elects,
         case when c.kind = 'office' then null else c.body_id end as body,
-        e.date_from::text as day, c.round_number as round,
+        ${held("c", "e")}::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", k.stage as "isStage", z.seats as size,
         c.kind = 'office' and exists (
           select from office o where o.id = c.office_id
