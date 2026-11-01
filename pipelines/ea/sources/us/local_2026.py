@@ -38,6 +38,7 @@ STATES = (
     if os.environ.get("LOCAL_STATES")
     else None
 )
+GROUPS = None if STATES is None else STATES | ({"ceda"} if "CA" in STATES else set())
 FILES = {
     "06037": "https://content.lavote.gov/docs/rrcc/documents/final-list-of-qualified-candidates-to-appear-on-the-ballot9fcf3b64-1a33-4882-9e17-8cbc3b3c8d76.pdf",
     "0644000": "https://cityclerk.lacity.org/election/2026_General_Municipal_Election_List_of_Certified_Candidates.pdf",
@@ -7385,7 +7386,13 @@ def ca_school_variants(label: str) -> list[list[str]]:
         )
         if word not in ("school", "schools", "district") and not word.isdigit()
     ]
-    return [words, [word for word in words if word != "joint"], [word for word in words if word != "union"]]
+    return [
+        words,
+        *(
+            [word for word in words if word not in drop]
+            for drop in ({"joint"}, {"union"}, {"elementary"}, {"union", "elementary"})
+        ),
+    ]
 
 
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
@@ -7439,7 +7446,7 @@ def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, s
                 (len(mine & theirs) / len(mine | theirs), tail)
                 for tail, theirs, their_marks in pool[county] + pool[""]
                 if their_marks == marks
-                and not (tail.startswith("ceda:") and other_place(mine, theirs))
+                and not ((tail.startswith("ceda:") or state == "CA") and other_place(mine, theirs))
                 and not (tail.endswith(":family-court") and re.search(r"(?i)\bcounty court\b", contest))
                 and not (
                     (
@@ -10212,6 +10219,7 @@ def parse() -> None:
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
                where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL', 'NE')"""
+        prior_taken = set(taken)
         ).fetchall():
             label = {
                 "Rowan County Sch": "Rowan-Salisbury Schools",
@@ -10670,6 +10678,14 @@ def parse() -> None:
                             if m[0].startswith("solomonville")
                             else "western arizona vocational district kingman region"
                             if m[0].startswith("w a v e")
+                if state == "CA":
+                    tokens = re.sub(
+                        r"\b(?:(\d)(?:st|nd|rd|th)|(first|second|third|fourth|fifth|sixth|seventh)) district\b",
+                        lambda hit: (
+                            f"district {hit[1] or ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'].index(hit[2])}"
+                        ),
+                        " ".join(tokens),
+                    ).split()
                             else f"northern arizona vocational institute of technology {m[1]}"
                         ),
                         " ".join(tokens),
@@ -10698,14 +10714,6 @@ def parse() -> None:
                 nj_multi = False
                 if state == "NJ":
                     joined = " ".join(tokens)
-                if state == "CA":
-                    tokens = re.sub(
-                        r"\b(?:(\d)(?:st|nd|rd|th)|(first|second|third|fourth|fifth|sixth|seventh)) district\b",
-                        lambda hit: (
-                            f"district {hit[1] or ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'].index(hit[2])}"
-                        ),
-                        " ".join(tokens),
-                    ).split()
                     nj_multi = bool(
                         re.search(r"\bregional\b|^morris school district\b|^school district of the chathams\b", joined)
                     )
@@ -10926,7 +10934,9 @@ def parse() -> None:
                     and (
                         fits[0][4].startswith("school:")
                         or not re.search(
-                            r"\b(school|unified|college|district(?! \d)|area|primary|nominating|special)\b",
+                            r"\b(school|unified|college|district(?! (?:\d+|[a-f](?: |$)))|area|primary|nominating|special)\b"
+                            if state == "CA"
+                            else r"\b(school|unified|college|district(?! \d)|area|primary|nominating|special)\b",
                             re.sub(r"\b(school|water district)\b", "", " ".join(fits[0][2]))
                             if state == "ME"
                             else " ".join(fits[0][2]),
@@ -10966,6 +10976,10 @@ def parse() -> None:
                                     (r"\bboard of education\b|\bschool board\b|\bboe\b", "board-of-education"),
                                     (r"\bcommittee\b", "committee"),
                                     (r"\bdirectors?\b", "board-of-directors"),
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    fits = [fit for fit in fits if ("elementary" in fit[3].lower()) == ("elementary" in tokens)] or fits
+                if state == "CA" and len({fit[4] for fit in fits}) > 1:
+                    fits = [fit for fit in fits if fit[4] in own_owners.get(str(row["fips"]), ())] or fits
                                     (
                                         r"\bcouncil\b|\bcouncilors?\b|\bcouncilm[ae]n\b|\bcouncilmembers?\b|\bcouncilpersons?\b|\balderm[ae]n\b",
                                         "council",
@@ -11260,11 +11274,11 @@ def parse() -> None:
     )
     if STATES is not None:
         held = PARSED / "candidates.parquet"
-        frame = frame.filter(pl.col("tail").str.split(":").list.first().is_in(sorted(STATES)))
+        frame = frame.filter(pl.col("tail").str.split(":").list.first().is_in(sorted(GROUPS)))
         if held.exists():
             frame = pl.concat(
                 [
-                    pl.read_parquet(held).filter(~pl.col("tail").str.split(":").list.first().is_in(sorted(STATES))),
+                    pl.read_parquet(held).filter(~pl.col("tail").str.split(":").list.first().is_in(sorted(GROUPS))),
                     frame,
                 ],
                 how="diagonal_relaxed",
@@ -11297,7 +11311,7 @@ def emit() -> None:
     groups = whole["tail"].str.split(":").list.first()
     present = set(groups)
     failed = []
-    for state in sorted(present if STATES is None else present & STATES):
+    for state in sorted(present if GROUPS is None else present & GROUPS):
         try:
             print(f"changeset {state} {emit_state(whole.filter(groups == state), state)}")
         except Exception as error:
@@ -11340,6 +11354,11 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
             summary=f"{state}: local contests on the 2026-11-03 ballot, with candidates from official candidate lists and sample ballots: statewide candidate files (North Carolina), each contest matched to the same office's last contest in the archive; Los Angeles city runoffs, Cook County offices, Harris and Dallas county offices, and Miami-Dade runoffs, the San Diego and Orange county supervisor races, Maricopa County's clerk, justices of the peace, and constables, and the New York City Council District 3 special",
             polity="US",
         )
+                    and not (
+                        state == "CA"
+                        and tail not in prior_taken
+                        and re.search(r"(?i)school|unified|education", str(row["contest"]))
+                    )
         cs.manifest["scope"] = {"polity": "US", "state": state}
 
         def name(entity: object, text: str) -> None:
@@ -11977,6 +11996,17 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     id=candidacy,
                     person_id=person,
                     option_id=option,
+            holder = conn.execute(
+                "select entity_id from slug where path = %s",
+                [re.sub(r"/[0-9-]+-\w+/", f"/{DAY}-general/", path) + ("-unexpired" if split else "")],
+            ).fetchone()
+            if holder is not None and holder[0] != contest:
+                cs.minted.discard(contest)
+                cs.rows["external_id"] = [
+                    row for row in cs.rows["external_id"] if row["entity_id"] != contest
+                ]
+                counts["held slug"] = counts.get("held slug", 0) + 1
+                continue
                     role="head",
                     ballot_name=row["name"],
                     is_independent=bool(row["independent"]),
