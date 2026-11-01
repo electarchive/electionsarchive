@@ -7355,6 +7355,22 @@ def other_place(mine: frozenset[str], theirs: frozenset[str]) -> bool:
     return bool(ours and others and sorted("".join(ours)) != sorted("".join(others)))
 
 
+CA_SCHOOL_KINDS = {
+    "joint",
+    "jt",
+    "union",
+    "unified",
+    "elementary",
+    "high",
+    "city",
+    "school",
+    "schools",
+    "district",
+    "sch",
+    "dist",
+}
+
+
 def ca_school_variants(label: str) -> list[list[str]]:
     words = [
         word
@@ -10488,10 +10504,14 @@ def parse() -> None:
                     held = {
                         path
                         for (path,) in conn.execute(
-                            "select path from slug where path ~ '^us/ca/[^/]+/2026-11-03-general$'"
+                            """select s.path from slug s join entity en on en.id = s.entity_id
+                               join changeset cs on cs.id = en.changeset_id
+                               where s.path ~ '^us/ca/[^/]+/2026-11-03-general$' and cs.pipeline <> %s""",
+                            [SOURCE],
                         )
                     }
                     pools = dict(towns)
+                    own_owners = {county_code: {town[3] for town in pool} for county_code, pool in pools.items()}
                     for county_code, pool in pools.items():
                         own = {tuple(town[0]) for town in pool if town[1] == "school"}
                         towns[county_code] = [
