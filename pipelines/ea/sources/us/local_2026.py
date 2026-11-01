@@ -6463,13 +6463,6 @@ for key, publisher, title, url, local in (
         "ks/harper.pdf",
     ),
     (
-        "KS-20077-townships",
-        "Harper County Clerk",
-        "General Election Sample Ballot, November 3, 2026",
-        "https://www.harpercountyks.gov/_files/ugd/e0b4f1_e8204facf47c4dac9dd07b8f5fe3e522.pdf",
-        "ks/harper.pdf",
-    ),
-    (
         "KS-20099",
         "Labette County Clerk",
         "2026 General Election Sample Ballots",
@@ -6489,20 +6482,6 @@ for key, publisher, title, url, local in (
         "Certification of Candidates and Notice of General Election, November 3, 2026",
         "https://www.mgcountyks.org/DocumentCenter/View/1518/Notice-of-General-Election-Nov-3rd-20260001",
         "ks/montgomery.pdf",
-    ),
-    (
-        "KS-20125-cities",
-        "Montgomery County Election Officer",
-        "Certification of Candidates and Notice of General Election, November 3, 2026",
-        "https://www.mgcountyks.org/DocumentCenter/View/1518/Notice-of-General-Election-Nov-3rd-20260001",
-        "ks/montgomery.pdf",
-    ),
-    (
-        "KS-20021-cities",
-        "Cherokee County Clerk",
-        "General Sample Ballots, November 3, 2026",
-        "https://cherokeecountyks.gov/main/images/documents/County-Clerk/Sample-Ballots/11-3-26_General_Sample_Ballots.pdf",
-        "ks/cherokee.pdf",
     ),
     (
         "NE-31019-buffalo",
@@ -10125,11 +10104,6 @@ def parse() -> None:
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
             index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
-        for district, label in (
-            ("3407590", "Hunterdon Central High School District"),
-            ("3417550", "West Morris High School District"),
-        ):
-            index[("34", coverage_tables.tokens(label))].append((district, label))
         unowned: dict[str, list[tuple[str, str, str, str, str]]] = defaultdict(list)
         owned = dict(
             conn.execute(
@@ -10580,10 +10554,10 @@ def parse() -> None:
                         ),
                     )
                     in_pin = None
-                    for pattern, repl, alias_pin in IN_ALIASES:
+                    for pattern, repl, pinned in IN_ALIASES:
                         if re.search(pattern, tokens):
                             tokens = re.sub(pattern, repl, tokens)
-                            in_pin = alias_pin
+                            in_pin = pinned
                             break
                     tokens = tokens.split()
                 if tokens[:3] == ["governing", "board", "member"]:
