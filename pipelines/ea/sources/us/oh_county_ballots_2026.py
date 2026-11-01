@@ -69,6 +69,7 @@ NOISE = re.compile(
     r"^(Sample Generated|\d\d-\d\d-|Page \d+ of|VOTE BOTH SIDES|Members of the|November 3, 2026$|B A L L O\s*$|S A M P L E|\d+$)"
 )
 STOP = re.compile(r"^(YES|NO|SI|FOR\b.*|AGAINST\b.*|A FAVOR\b.*|EN CONTRA\b.*)$")
+OPTION = re.compile(r"^(?:For|Against)\b")
 HINTS = {
     "Worthington-Charter-Amendment-Referendum-Petition-Signature-Requirement-(by-Petition)": "Charter Amendment: 1.05 - Petition",
     "Worthington-Charter-Amendment-Referendum-Petition-Signature-Requirement-(Commission)": "Charter Amendment: Section 1.05 - Commission",
@@ -306,6 +307,10 @@ def cuyahoga() -> list[dict[str, str]]:
     return rows
 
 
+def body_text(body: list[str]) -> str:
+    return " ".join(body).strip()
+
+
 def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str]]:
     lines = [line.strip() for line in lines if line.strip() and not NOISE.match(line.strip())]
     rows = []
@@ -339,7 +344,8 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
                 body.append(re.sub(r"^.*?passage\.?\s*", "", lines[ahead], count=1))
                 break
         while cursor < len(lines) and not STOP.match(lines[cursor]):
-            body.append(lines[cursor])
+            if not (body_text(body) == "" and OPTION.match(lines[cursor])):
+                body.append(lines[cursor])
             cursor += 1
         text = re.sub(r"\s+", " ", " ".join(body)).strip()
         text = re.split(r"\s*(?:For the (?:Tax )?\w+ Against|S a m p l e|This sample ballot was produced)", text)[
