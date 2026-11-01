@@ -556,73 +556,79 @@
           ></span>
         {/if}
         <span class="flex-1 min-inline-0 [@media(width>=48rem)]:*:truncate">
-          <span class="block"
-            ><Name
-              class="font-semibold text-foreground"
-              label={row.label}
-              color={swatch(row.color, row.key)}
-              hasSwatch={false}
-              person={(page ?? other)?.person}
-              party={(page ?? other)?.party}
-            />{#if line.isAbbreviated}&nbsp;<span
-                class="whitespace-nowrap text-muted-foreground"
-                >·&nbsp;{line.subtitle}</span
-              >{/if}
-            {#if page?.isIncumbent === true && page.person != null}
-              <span class="ms-1 text-xs text-muted-foreground"
-                >{m.results_incumbent()}</span
-              >
-            {/if}
-            {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
-              <span class="ms-1 text-xs text-muted-foreground"
-                >{m.results_write_in()}</span
-              >
-            {/if}
-            {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
-              {#if page.note == null || page.isDeclined}
-                <span
-                  class={cn("ms-1 px-1 text-xs font-semibold", {
-                    "rounded-xs bg-(--party) knockout": line.mark != null,
-                    "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
-                      page.isDeclined,
-                    "highlighter text-foreground":
-                      line.mark == null &&
-                      !page.isDeclined &&
-                      !LOST.has(page.outcome),
-                    "text-muted-foreground": LOST.has(page.outcome),
-                  })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+          <span class="flex flex-wrap items-baseline gap-x-1.5 *:shrink-0">
+            <span class="shrink! min-inline-0 [@media(width>=48rem)]:truncate"
+              ><Name
+                class="font-semibold text-foreground"
+                label={row.label}
+                color={swatch(row.color, row.key)}
+                hasSwatch={false}
+                person={(page ?? other)?.person}
+                party={(page ?? other)?.party}
+              />{#if line.isAbbreviated}&nbsp;<span
+                  class="whitespace-nowrap text-muted-foreground"
+                  >·&nbsp;{line.subtitle}</span
+                >{/if}</span
+            >
+            <span
+              class="hidden flex-wrap items-baseline gap-x-1.5 *:shrink-0 has-[*]:flex"
+            >
+              {#if page?.isIncumbent === true && page.person != null}
+                <span class="text-xs text-muted-foreground"
+                  >{m.results_incumbent()}</span
                 >
-              {:else}
+              {/if}
+              {#if page?.isWriteIn === true && page.person != null && !isWrittenIn}
+                <span class="text-xs text-muted-foreground"
+                  >{m.results_write_in()}</span
+                >
+              {/if}
+              {#if page?.outcome != null && (seats == null || line.mark != null || page.isDeclined)}
+                {#if page.note == null || page.isDeclined}
+                  <span
+                    class={cn("px-1 text-xs font-semibold", {
+                      "rounded-xs bg-(--party) knockout": line.mark != null,
+                      "rounded-xs text-foreground ring-1 ring-(--party) ring-inset":
+                        page.isDeclined,
+                      "highlighter text-foreground":
+                        line.mark == null &&
+                        !page.isDeclined &&
+                        !LOST.has(page.outcome),
+                      "text-muted-foreground": LOST.has(page.outcome),
+                    })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+                  >
+                {:else}
+                  <Term
+                    class={cn("px-1 text-xs font-semibold", {
+                      "rounded-xs bg-(--party) knockout": line.mark != null,
+                      "highlighter text-foreground":
+                        line.mark == null && !LOST.has(page.outcome),
+                      "text-muted-foreground": LOST.has(page.outcome),
+                    })}
+                    label={OUTCOMES[page.outcome]?.() ?? page.outcome}
+                    definition={explain(page.note)}
+                  />
+                {/if}
+              {/if}
+              {#if page?.isDeclined === true}
                 <Term
-                  class={cn("ms-1 px-1 text-xs font-semibold", {
-                    "rounded-xs bg-(--party) knockout": line.mark != null,
-                    "highlighter text-foreground":
-                      line.mark == null && !LOST.has(page.outcome),
-                    "text-muted-foreground": LOST.has(page.outcome),
-                  })}
-                  label={OUTCOMES[page.outcome]?.() ?? page.outcome}
-                  definition={explain(page.note)}
+                  class="text-xs text-muted-foreground"
+                  label={m.outcome_declined()}
+                  definition={page.note == null
+                    ? m.outcome_declined_definition()
+                    : explain(page.note)}
                 />
               {/if}
-            {/if}
-            {#if page?.isDeclined === true}
-              <Term
-                class="ms-1 text-xs text-muted-foreground"
-                label={m.outcome_declined()}
-                definition={page.note == null
-                  ? m.outcome_declined_definition()
-                  : explain(page.note)}
-              />
-            {/if}
-            {#if line.isOverall && overall != null}
-              <Term
-                class="ms-1 rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
-                label={m.outcome_overall()}
-                definition={m.outcome_overall_definition({
-                  place: definite(overall.place),
-                })}
-              />
-            {/if}
+              {#if line.isOverall && overall != null}
+                <Term
+                  class="rounded-xs px-1 text-xs font-semibold text-foreground ring-1 ring-(--party) ring-inset"
+                  label={m.outcome_overall()}
+                  definition={m.outcome_overall_definition({
+                    place: definite(overall.place),
+                  })}
+                />
+              {/if}
+            </span>
           </span>
           {#if line.subtitle != null && !line.isAbbreviated}
             <span class="block text-[0.8125rem] text-pretty">
