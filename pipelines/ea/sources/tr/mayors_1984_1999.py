@@ -20,9 +20,10 @@ from ea.sources.tr.ysk_mayors import API, page
 from ea.store import connect
 
 SOURCE = "tr.mayors_1984_1999"
-VERSION = "6"
+VERSION = "7"
 YEARS = (1963, 1968, 1973, 1977, 1984, 1989, 1994, 1999)
 UNPUBLISHED = Path(__file__).with_name("mayors_1984_1999_unpublished.tsv")
+UNMERGED = Path(__file__).with_name("mayors_1984_1999_unmerged.tsv")
 TITLE = re.compile(r"^(.+?)'(?:d[ae]|t[ae]) (\d{4}) Türkiye yerel seçimleri$")
 METHOD = (
     "YSK's printed results for this election give mayors only by province. These counts are Turkish Wikipedia's "
@@ -32,6 +33,24 @@ METHOD = (
 )
 PROVINCES = {"afyon": "afyonkarahisar", "icel": "mersin", "urfa": "sanliurfa"}
 EXTRA = {"SODEP": "sosyal-demokrasi-partisi", "MSP": "milli-selamet-partisi"}
+SUCCESSORS = {
+    "adana": ("osmaniye",),
+    "ankara": ("kirikkale",),
+    "bolu": ("duzce",),
+    "bursa": ("yalova",),
+    "cankiri": ("karabuk",),
+    "gaziantep": ("kilis",),
+    "gumushane": ("bayburt",),
+    "hakkari": ("sirnak",),
+    "istanbul": ("yalova",),
+    "kars": ("ardahan", "igdir"),
+    "kocaeli": ("yalova",),
+    "konya": ("aksaray", "karaman"),
+    "mardin": ("batman", "sirnak"),
+    "nigde": ("aksaray",),
+    "siirt": ("batman", "sirnak"),
+    "zonguldak": ("bartin", "karabuk"),
+}
 Row = tuple[str, str, str, int]
 
 
@@ -201,6 +220,21 @@ def emit() -> Path:
         for (year, _, _, _), (_, rows, _) in tables.items():
             for abbreviation, party_text, _, _ in rows:
                 abbreviations[(year, fold(party_text))] = abbreviation
+        mine = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x join changeset c on c.id = x.changeset_id
+                   where x.scheme = 'tr.polity' and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        held_beldes: dict[tuple[str, str], dict[str, str]] = defaultdict(dict)
+        for value, path in conn.execute(
+            """select x.value, s.path from external_id x join slug s on s.entity_id = x.entity_id and s.is_current
+               where x.scheme = 'tr.polity' and s.path ~ '^tr/[^/]+/[^/]+/[^/]+$'"""
+        ).fetchall():
+            held_beldes[(path.split("/")[1], path.split("/")[3])][path] = value
+        matches: dict[str, tuple[str, dict[str, str]]] = {}
         races: list[tuple[int, list[str], str, str, list[Row], dict[str, int]]] = []
         for (year, province, kind, name), (page_title, rows, totals) in tables.items():
             province = PROVINCES.get(province, province)
@@ -214,8 +248,43 @@ def emit() -> Path:
             province = PROVINCES.get(province, province)
             central = slug(district)
             keys = [f"{province}-{central}-{slug(name)}", f"{province}-{slug(name)}", f"{province}-merkez-{slug(name)}"]
+            if keys[0] in mine:
+                family = (province, *SUCCESSORS.get(province, ()))
+                found = {
+                    path: value for place in family for path, value in held_beldes.get((place, slug(name)), {}).items()
+                }
+                if not found:
+                    found = {
+                        path: value
+                        for place in family
+                        for part in re.split(r"[()/,-]", name)
+                        if slug(part)
+                        for path, value in held_beldes.get((place, slug(part)), {}).items()
+                    }
+                if len(found) > 1 and len({path.split("/")[3] for path in found}) == 1:
+                    found = {path: value for path, value in found.items() if path.split("/")[2] == central} or found
+                matches[keys[0]] = (name, found)
             races.append((year, keys, entries[0][0], name, [("", entries[0][1], entries[0][2], entries[0][3])], {}))
 
+        mayors: dict[UUID, list[UUID]] = defaultdict(list)
+        for polity_id, office_id in conn.execute("select polity_id, id from office where kind = 'mayor'").fetchall():
+            mayors[polity_id].append(office_id)
+        for value, (_, found) in matches.items():
+            if len(found) == 1:
+                target = cs.key("tr.polity", next(iter(found.values())))
+                cs.merge(cs.key("tr.polity", value), target)
+                if len(mayors[target]) == 1:
+                    cs.merge(cs.key("tr.office", f"{value}-mayor"), mayors[target][0])
+        with UNMERGED.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+            writer.writerow(("place", "name", "candidates"))
+            writer.writerows(
+                sorted(
+                    (value, name, " ".join(sorted(found)))
+                    for value, (name, found) in matches.items()
+                    if len(found) != 1
+                )
+            )
         turkey = cs.polity("TR")
         plates = {slug(text): f"{plate:02d}" for plate, text in enumerate(PLATES, 1)}
         provinces = {cs.area("tr.il", plate) for plate in plates.values()}
@@ -249,7 +318,9 @@ def emit() -> Path:
         prior = dict(conn.execute("select value, entity_id from external_id where scheme = 'tr.election'").fetchall())
         skipped: list[tuple[str, str, str]] = []
         made: set[str] = set()
-        placed: set[tuple[UUID, date]] = set()
+        placed: dict[tuple[UUID, date], UUID] = {}
+        moved: dict[str, UUID] = {}
+        doubled: dict[str, UUID] = {}
         results: list[dict[str, str | int | float | None]] = []
         complete = 0
         for year, keys, page_title, name, rows, totals in sorted(races, key=lambda race: (race[0], race[1][0])):
@@ -265,6 +336,8 @@ def emit() -> Path:
                     continue
             contest_key = f"{day}:{key}-mayor"
             if contest_key in made or (cs.key("tr.polity", key), day) in placed:
+                if (cs.key("tr.polity", key), day) in placed:
+                    doubled[contest_key] = placed[(cs.key("tr.polity", key), day)]
                 skipped.append((str(year), label, "second table for the same municipality"))
                 continue
             office = cs.key("tr.office", f"{key}-mayor")
@@ -318,12 +391,13 @@ def emit() -> Path:
                 skipped.append((str(year), label, f"unknown party {unknown}"))
                 continue
             if taken.get(f"{paths[polity]}/{day}-local", prior.get(contest_key)) != prior.get(contest_key):
+                moved[contest_key] = taken[f"{paths[polity]}/{day}-local"]
                 skipped.append((str(year), label, "election already held"))
                 continue
             election = cs.key("tr.election", contest_key)
             made.add(contest_key)
-            placed.add((polity, day))
             contest = cs.key("tr.contest", contest_key)
+            placed[(polity, day)] = contest
             path = paths[polity]
             place = english.get(polity, name)
             cs.add(
@@ -524,5 +598,61 @@ def emit() -> Path:
                 if candidacy is not None:
                     cs.add("entity_retirement", entity_id=candidacy, reason=reason)
                 cs.add("entity_retirement", entity_id=option, reason=reason)
+        survivors = dict(
+            conn.execute(
+                """select c.election_id, c.id from contest c join office o on o.id = c.office_id and o.kind = 'mayor'
+                   where c.election_id = any(%s::uuid[])""",
+                [list(moved.values())],
+            ).fetchall()
+        )
+        staged = {table: {str(row["id"]) for row in cs.rows.get(table, [])} for table in ("contest", "election")}
+        reason = "A duplicate of a municipal race the archive already held, left behind when the archive merged the town into its belde."
+        retiring: dict[str, UUID | None] = {}
+        for contest_id, election_id, value in conn.execute(
+            """select c.id::text, c.election_id::text, x.value from contest c join changeset ch on ch.id = c.changeset_id
+               join external_id x on x.entity_id = c.id and x.scheme = 'tr.contest'
+               where ch.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if contest_id not in staged["contest"]:
+                retiring[contest_id] = doubled.get(value, survivors.get(moved.get(value)))
+                cs.add("entity_retirement", entity_id=contest_id, reason=reason)
+                if election_id not in staged["election"]:
+                    cs.add("entity_retirement", entity_id=election_id, reason=reason)
+        tenures = conn.execute("select * from tenure where contest_id = any(%s::uuid[])", [list(retiring)])
+        columns = [column.name for column in tenures.description or ()]
+        for values in tenures.fetchall():
+            row = dict(zip(columns, values, strict=True))
+            cs.add(
+                "tenure",
+                **{column: value for column, value in row.items() if column not in ("changeset_id", "recorded_from")}
+                | {
+                    "contest_id": retiring[str(row["contest_id"])],
+                    "office_id": cs.survivors.get(row["office_id"], row["office_id"]),
+                },
+            )
+        for (person,) in conn.execute(
+            """select distinct cy.person_id::text from candidacy cy join contest_option o on o.id = cy.option_id
+               join external_id x on x.entity_id = cy.person_id and x.scheme = %s
+               where o.contest_id = any(%s::uuid[])
+                 and not exists (select from tenure t where t.person_id = cy.person_id)
+                 and not exists (
+                   select from candidacy other join contest_option oo on oo.id = other.option_id
+                   where other.person_id = cy.person_id and oo.contest_id <> all(%s::uuid[]))""",
+            [f"{SOURCE}.person", list(retiring), list(retiring)],
+        ).fetchall():
+            cs.add("entity_retirement", entity_id=person, reason=reason)
+        used = {row["unit_id"] for row in results}
+        for (unit,) in conn.execute(
+            """select ru.id::text from reporting_unit ru join changeset ch on ch.id = ru.changeset_id
+               where ch.pipeline = %s""",
+            [SOURCE],
+        ).fetchall():
+            if unit not in used:
+                cs.add(
+                    "entity_retirement",
+                    entity_id=unit,
+                    reason="A municipal reporting unit the archive no longer uses, after merging the town into its belde.",
+                )
         print(f"{len(made)} contests ({complete} complete); {len(skipped)} unpublished")
         return cs.write()
