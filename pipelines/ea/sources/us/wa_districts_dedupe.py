@@ -5,12 +5,23 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.wa_districts_dedupe"
-VERSION = "1"
+VERSION = "2"
 DAY = "2026-11-03"
 ADOPTED = {
     "special:53037:district:kittitas-county-public-utility-district": "53037:utility:1",
     "special:53049:district:pacific-county-public-utility-district": "53049:utility:2",
+    "special:53039:district:klickitat-county-public-utility-district": "53039:utility:1",
 }
+HELD_CONTESTS = {
+    "53039:district:klickitat-county-public-utility-district": "53039:utility:1",
+}
+KEYED = (
+    "us.office",
+    "us.contest",
+    "us.option",
+    "us.candidacy",
+    "us.wa_districts_2026.person",
+)
 
 
 def fold(name: str) -> str:
@@ -71,4 +82,15 @@ def emit() -> Path:
             cs.merge(cs.unit("us.special_district", code), cs.unit("us.special_district", target[4]))
             if target[1] in elections and polity in elections:
                 cs.merge(elections[polity], elections[target[1]])
+        for twin, kept in HELD_CONTESTS.items():
+            for scheme, value, entity in conn.execute(
+                "select scheme, value, entity_id from external_id where scheme = any(%s) and value like %s",
+                [list(KEYED), f"%{twin}%"],
+            ).fetchall():
+                target = conn.execute(
+                    "select entity_id from external_id where scheme = %s and value = %s",
+                    [scheme, value.replace(twin, kept)],
+                ).fetchone()
+                if target is not None and target[0] != entity:
+                    cs.merge(entity, target[0])
         return cs.write()
