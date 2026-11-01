@@ -143,5 +143,6 @@
     121,
     122
   ],
-  "autorotate": true
+  "autorotate": true,
+  "totals": true
 }
