@@ -349,18 +349,18 @@ def emit() -> Path:
             office = "question" if question else canonical
             if not question and (path, office) not in owners:
                 office_kind = "mayor" if office == "mayor" else "other"
-                title = f"{place} {heading}" if office != "mayor" else f"Mayor of {place}"
+                office_title = f"{place} {heading}" if office != "mayor" else f"Mayor of {place}"
                 owner = owners[(path, office)] = (
                     cs.key("us.body", f"RI:{code}:{office}")
                     if body
-                    else offices.key(cs, f"RI:{code}:{office}", polity, office_kind, title)
+                    else offices.key(cs, f"RI:{code}:{office}", polity, office_kind, office_title)
                 )
                 if owner in cs.minted:
                     if body:
                         cs.add("body", id=owner, polity_id=polity, kind="council")
                     else:
                         cs.add("office", id=owner, polity_id=polity, kind=office_kind)
-                    name(owner, title)
+                    name(owner, office_title)
             if (day, path) not in elections and f"{path}/{day}-{election_kind}" in foreign["election"]:
                 elections[(day, path)] = foreign["election"][f"{path}/{day}-{election_kind}"]
             if (day, path) not in elections:
