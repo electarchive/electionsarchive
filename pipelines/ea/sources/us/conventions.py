@@ -208,6 +208,10 @@ def leaves(
     ]
 
 
+TABLES += [
+    {"table": "1924:republican", "htid": "mdp.39015030802287", "leaves": (219, 220)},
+    {"table": "1928:republican", "htid": "mdp.39015030802295", "leaves": (284,)},
+]
 ROLL_1880 = (214, 219, 223, 224, 226, 227, 229, 230, 232, 233, 235, 238, 239, 241, 242, 244, 246, 247, 251, 252, 254, 255, 257, 258, 260, 262, 264, 266, 269, 276, 279, 281, 282, 284, 286, 287, 290)  # fmt: skip
 TABLES += [
     *leaves(
@@ -444,10 +448,25 @@ COLUMNS = {
     ),
     "1920:republican:b5": ("votes", "Wood", "Lowden", None, "Johnson", "Harding", "Sproul"),
     "1900:democratic": ("votes", "Bryan"),
+    "1928:republican": (
+        "votes",
+        "Hoover",
+        "Lowden",
+        "Curtis",
+        "Watson",
+        "Norris",
+        "Goff",
+        "Coolidge",
+        "Dawes",
+        "Not voting",
+    ),
 }
 LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
+    "1928:republican": [
+        (284, "MO", (0.21, 0.771, 0.58, 0.785), {"Hughes": 1}, "the footnote to the row: 'Missouri cast one vote for Charles E. Hughes'"),
+    ],
     "1912:democratic:b2": [
         (207, "CT", (0.755, 0.617, 0.795, 0.631), {"Baldwin": 14}, "the row prints only the delegation of 14; the announced and printed Baldwin total of 14 has no other source"),
         (207, "IN", (0.803, 0.724, 0.843, 0.738), {"Marshall": 30}, "the row prints only the delegation of 30; the announced and printed Marshall total of 31 is Indiana's 30 and Michigan's 1"),
