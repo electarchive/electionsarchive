@@ -1,0 +1,178 @@
+[[feed]]
+id = "us.enr_2026.ar"
+adapter = "us.enr_2026"
+params = { state = "AR" }
+publisher = "Arkansas Secretary of State"
+url = "https://arkansas.tally-enr.com/"
+
+[[feed]]
+id = "us.enr_2026.ct"
+adapter = "us.enr_2026"
+params = { state = "CT" }
+publisher = "Connecticut Secretary of the State"
+url = "https://ctemspublic.pcctg.net/"
+
+[[feed]]
+id = "us.enr_2026.fl"
+adapter = "us.enr_2026"
+params = { state = "FL" }
+publisher = "Florida Division of Elections"
+url = "https://results.elections.myflorida.com"
+
+[[feed]]
+id = "us.enr_2026.ga"
+adapter = "us.enr_2026"
+params = { state = "GA" }
+publisher = "Georgia Secretary of State"
+url = "https://results.sos.ga.gov"
+
+[[feed]]
+id = "us.enr_2026.ia"
+adapter = "us.enr_2026"
+params = { state = "IA" }
+publisher = "Iowa Secretary of State"
+url = "https://sos.iowa.gov/elections/results/"
+
+[[feed]]
+id = "us.enr_2026.id"
+adapter = "us.enr_2026"
+params = { state = "ID" }
+publisher = "Idaho Secretary of State"
+url = "https://voteidaho.gov"
+
+[[feed]]
+id = "us.enr_2026.il"
+adapter = "us.enr_2026"
+params = { state = "IL" }
+publisher = "Illinois State Board of Elections"
+url = "https://elections.il.gov/ElectionOperations/ElectionResults.aspx"
+
+[[feed]]
+id = "us.enr_2026.in"
+adapter = "us.enr_2026"
+params = { state = "IN" }
+publisher = "Indiana Secretary of State"
+url = "https://enr.indianavoters.in.gov"
+
+[[feed]]
+id = "us.enr_2026.ks"
+adapter = "us.enr_2026"
+params = { state = "KS" }
+publisher = "Kansas Secretary of State"
+url = "https://sos.ks.gov/elections/election-results.html"
+
+[[feed]]
+id = "us.enr_2026.la"
+adapter = "us.enr_2026"
+params = { state = "LA" }
+publisher = "Louisiana Secretary of State"
+url = "https://voterportal.sos.la.gov/graphical"
+
+[[feed]]
+id = "us.enr_2026.md"
+adapter = "us.enr_2026"
+params = { state = "MD" }
+publisher = "Maryland State Board of Elections"
+url = "https://elections.maryland.gov/elections/2026/primary_results/"
+
+[[feed]]
+id = "us.enr_2026.mn"
+adapter = "us.enr_2026"
+params = { state = "MN" }
+publisher = "Minnesota Secretary of State"
+url = "https://electionresultsfiles.sos.mn.gov/20260811/"
+
+[[feed]]
+id = "us.enr_2026.nc"
+adapter = "us.enr_2026"
+params = { state = "NC" }
+publisher = "North Carolina State Board of Elections"
+url = "https://www.ncsbe.gov/results-data"
+
+[[feed]]
+id = "us.enr_2026.ok"
+adapter = "us.enr_2026"
+params = { state = "OK" }
+publisher = "Oklahoma State Election Board"
+url = "https://results.okelections.gov/OKER/"
+
+[[feed]]
+id = "us.enr_2026.pa"
+adapter = "us.enr_2026"
+params = { state = "PA" }
+publisher = "Pennsylvania Department of State"
+url = "https://www.electionreturns.pa.gov/"
+
+[[feed]]
+id = "us.enr_2026.ri"
+adapter = "us.enr_2026"
+params = { state = "RI" }
+publisher = "Rhode Island Board of Elections"
+url = "https://elections.ri.gov/elections/previous-election-results"
+
+[[feed]]
+id = "us.enr_2026.sc"
+adapter = "us.enr_2026"
+params = { state = "SC" }
+publisher = "South Carolina State Election Commission"
+url = "https://scvotes.gov/"
+
+[[feed]]
+id = "us.enr_2026.ut"
+adapter = "us.enr_2026"
+params = { state = "UT" }
+publisher = "Utah Lieutenant Governor's Office"
+url = "https://electionresults.utah.gov"
+
+[[feed]]
+id = "us.enr_2026.va"
+adapter = "us.enr_2026"
+params = { state = "VA" }
+publisher = "Virginia Department of Elections"
+url = "https://historical.elections.virginia.gov"
+
+[[feed]]
+id = "us.enr_2026.wa"
+adapter = "us.enr_2026"
+params = { state = "WA" }
+publisher = "Washington Secretary of State"
+url = "https://results.votewa.gov"
+
+[[feed]]
+id = "us.enr_2026.wv"
+adapter = "us.enr_2026"
+params = { state = "WV" }
+publisher = "West Virginia Secretary of State"
+url = "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout"
+
+[[feed]]
+id = "us.enr_2026.al"
+adapter = "us.enr_2026"
+params = { state = "AL" }
+publisher = "Alabama Secretary of State"
+url = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
+note = "county election sites only"
+
+[[feed]]
+id = "us.enr_2026.mi"
+adapter = "us.enr_2026"
+params = { state = "MI" }
+publisher = "Michigan Board of State Canvassers"
+url = "https://mielections.us/election/results/2026PRI_CENR.html"
+note = "county election sites only"
+
+[[feed]]
+id = "us.enr_2026.ne"
+adapter = "us.enr_2026"
+params = { state = "NE" }
+publisher = "Nebraska Secretary of State"
+url = "https://sos.nebraska.gov/elections"
+note = "county election sites only"
+
+[[feed]]
+id = "us.enr_2026.oh"
+adapter = "us.enr_2026"
+params = { state = "OH" }
+publisher = "Ohio Secretary of State"
+url = "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/"
+note = "county election sites only"

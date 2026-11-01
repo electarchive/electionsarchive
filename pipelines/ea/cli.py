@@ -135,6 +135,14 @@ def main() -> None:
     )
     batching.add_argument("target", nargs="?", help="job or prefix (us.scans/al-osr-1970) or account name")
     batching.add_argument("usd", nargs="?", type=float, help="dollars for approve or account")
+    living = commands.add_parser("live", help="poll official election night feeds into the live schema")
+    living.add_argument(
+        "action",
+        choices=("run", "sync", "status"),
+        help="poll this poller's enabled feeds until stopped, load ea/live_feeds.toml into live.feed, or list feeds",
+    )
+    living.add_argument("--poller", default="fsn1", help="which feeds to poll, by their poller column")
+    living.add_argument("--once", action="store_true", help="poll each due feed once and stop")
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -172,6 +180,13 @@ def main() -> None:
                 if args.action == "emit" and not (scans.MANIFESTS / f"{args.name}.json").exists()
                 else getattr(scans, args.action)(args.name)
             )
+        case "live":
+            from ea import live
+
+            if args.action == "run":
+                live.run(args.poller, args.once)
+            else:
+                print(getattr(live, args.action)())
         case "batch":
             from ea import batch
 
