@@ -81,7 +81,7 @@ SPLIT = r"\s[-–—]\s"
 LINKED = ("party", "federation", "parliamentary_group", "independent_group")
 MATCHES: dict[tuple[str, str], str | None] = {
     ("BR", "Partido Social Trabalhista"): "Q28678919",
-    ("BR", "Partido da Democracia Cristã"): "Q65160541",
+    ("BR", "Partido da Democracia Crista"): "Q65160541",
     ("CA", "Progressive"): "Q2112263",
     ("GB", "Loughton Residents Association"): "Q24965757",
     ("US", "Forward Party"): "Q108816586",
