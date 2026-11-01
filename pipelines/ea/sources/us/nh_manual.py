@@ -258,6 +258,15 @@ def lines(all_rows: list[Row], heading=header) -> list[dict[str, object]]:
         text = re.sub(r"(?:\s*\.){2,}", "", text).strip(" .,-")
         votes, clean, taken = value
         boxed = [*left, *taken]
+        if (
+            state["run"] == 0
+            and len(taken) == 2
+            and taken[0].text == "1"
+            and len(taken[1].text) < 3
+            and re.search(r"[A-Za-z][.,]$", " ".join(word.text for word in left).strip())
+        ):
+            votes, clean, _ = number(taken[1:]) or value
+            text += " l" if votes != value[0] else ""
         total = re.fullmatch(r"(?:\W*\w{0,2}\s*)?otal\W*vote\W*(.*)", text, re.IGNORECASE)
         if total:
             letters = re.sub(r"[^a-z]", "", total[1].lower())
