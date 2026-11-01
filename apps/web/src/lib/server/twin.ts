@@ -4544,6 +4544,9 @@ function contestMarkdown(
             ),
           }
         : contest,
+      then,
+      link,
+    ),
     ...(contest.nomination == null
       ? []
       : [
@@ -4555,9 +4558,6 @@ function contestMarkdown(
           "",
         ]),
     ...delegatesMarkdown(contest.delegates ?? null, link),
-      then,
-      link,
-    ),
     ...(additional != null || !lists?.isOpen
       ? []
       : [
@@ -5206,6 +5206,9 @@ function countMarkdown(contest: Extract<Data, { kind: "contest" }>["contest"]) {
             ]),
       ],
     ),
+  ];
+}
+
 function delegatesMarkdown(
   delegates: Extract<Data, { kind: "contest" }>["contest"]["delegates"],
   link: Link,
@@ -5251,9 +5254,6 @@ function delegatesMarkdown(
         ? []
         : ["", ...listed(m.delegates_final_ballot(), delegates.final)]),
     ].join("\n"),
-  ];
-}
-
   ];
 }
 
