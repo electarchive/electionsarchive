@@ -363,6 +363,7 @@ export class Engine {
   >();
   #sources = new Map<string, { group: string; isVector: boolean }>();
   #painted = new Map<string, Map<number, State>>();
+  #pointed = new Map<string, string>();
   #marks = new Map<string, { source: string; k: number }>();
   #tinted = new Map<number, string>();
   #bands = new Map<string, Array<[string, number]>>();
@@ -862,6 +863,11 @@ export class Engine {
     }>,
     group = "",
   ) {
+    const key = JSON.stringify(places);
+    if (this.#pointed.get(id) === key && this.gl?.getSource(id) != null) {
+      return id;
+    }
+    this.#pointed.set(id, key);
     return this.shapes(
       id,
       {
@@ -1034,11 +1040,32 @@ export class Engine {
       for (const [k, state] of states) {
         held.set(k, state);
       }
-    } else {
+    } else if (held == null) {
       gl.removeFeatureState(where);
+    } else {
+      for (const k of held.keys()) {
+        if (!states.has(k)) {
+          gl.removeFeatureState({ ...where, id: k });
+        }
+      }
+    }
+    if (!isMerged || held == null) {
       this.#painted.set(source, new Map(states));
     }
     for (const [k, state] of states) {
+      const last = isMerged ? undefined : held?.get(k);
+      if (last != null) {
+        const keys = Object.keys(last);
+        if (
+          keys.length === Object.keys(state).length &&
+          keys.every((key) => Object.is(last[key], state[key]))
+        ) {
+          continue;
+        }
+        if (keys.some((key) => !(key in state))) {
+          gl.removeFeatureState({ ...where, id: k });
+        }
+      }
       gl.setFeatureState(
         { ...where, id: k },
         Object.fromEntries(
