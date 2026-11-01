@@ -150,6 +150,13 @@ AZ_1998_MEASURES = {
     "304": ("State lottery commission", "Legislative Referendum"),
 }
 AZ_SCANS = {
+    1974: (date(1974, 11, 5), "canvass1974ge.pdf"),
+    1976: (date(1976, 11, 2), "canvass1976ge.pdf"),
+    1980: (date(1980, 11, 4), "canvass1980ge.pdf"),
+    1982: (date(1982, 11, 2), "canvass1982ge.pdf"),
+    1984: (date(1984, 11, 6), "canvass1984ge.pdf"),
+    1986: (date(1986, 11, 4), "canvass1986ge.pdf"),
+    1990: (date(1990, 11, 6), "canvass1990ge.pdf"),
     1992: (date(1992, 11, 3), "canvass1992ge.pdf"),
     1994: (date(1994, 11, 8), "canvass1994ge.pdf"),
     1996: (date(1996, 11, 5), "canvass1996ge.pdf"),
@@ -186,6 +193,7 @@ AZ_SCAN_MEASURES = {
         "100": ("Effective dates of laws", "Legislative Referendum"),
         "101": ("Property tax exemptions", "Legislative Referendum"),
         "102": ("Jurisdiction over juveniles", "Initiative"),
+        "200": ("Drug education, treatment, and penalties for controlled substances", "Initiative"),
         "201": ("Gaming compacts with Indian tribes", "Initiative"),
         "203": ("Lottery revenues for health programs and AHCCCS eligibility", "Initiative"),
         "300": ("Legislative salaries", "Legislative Referendum"),
@@ -3568,7 +3576,16 @@ def arizona() -> list[dict[str, object]]:
                     raise ValueError(f"{url}: no page size")
                 sizes[url] = (float(found[1]), float(found[2]))
             numbers = [int(value) for value in line["counts"].split()]
-            title, kind = AZ_SCAN_MEASURES[year][line["number"]]
+            number = line["number"]
+            if year in AZ_SCAN_MEASURES and number in AZ_SCAN_MEASURES[year]:
+                title, kind = AZ_SCAN_MEASURES[year][number]
+            elif number.startswith("2"):
+                title, kind = "Initiative measure", "Initiative"
+            elif number.startswith("1"):
+                title, kind = "Constitutional amendment", "Legislative Referendum"
+            else:
+                title, kind = "Referred measure", "Legislative Referendum"
+            counties = tuple(county for county in AZ_COUNTIES if county != "La Paz" or len(numbers) == 16)
             rows.extend(
                 {
                     "state": "AZ",
@@ -3587,7 +3604,7 @@ def arizona() -> list[dict[str, object]]:
                     "x1": sizes[url][0] * 100 / 72,
                     "y1": sizes[url][1] * 100 / 72,
                 }
-                for county, value in zip(AZ_COUNTIES, numbers[:-1], strict=True)
+                for county, value in zip(counties, numbers[:-1], strict=True)
             )
     return rows
 
