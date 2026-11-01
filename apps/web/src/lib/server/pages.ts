@@ -20,7 +20,6 @@ import {
 } from "#lib/server/rpc/archive.js";
 import { router } from "#lib/server/rpc/router.js";
 import { canonicalPath } from "#lib/server/territory.js";
-import land from "#lib/server/world.txt?raw";
 
 async function found<T>(promise: Promise<T>) {
   try {
@@ -82,74 +81,174 @@ function ahead(
   })();
 }
 
-async function draw() {
-  const result = await db.execute<{
-    id: string;
+const STRATA: Array<{
+  path: string;
+  body: string;
+  isNation: boolean;
+  isGrouped?: boolean;
+}> = [
+  { path: "us", body: "U.S. House", isNation: true },
+  { path: "gb", body: "House of Commons", isNation: true },
+  { path: "ca", body: "House of Commons", isNation: true },
+  { path: "ch", body: "National Council", isNation: true },
+  { path: "tr", body: "Grand National Assembly", isNation: true },
+  { path: "it", body: "Chamber of Deputies", isNation: true },
+  { path: "de", body: "Bundestag", isNation: true },
+  { path: "fr", body: "National Assembly", isNation: true },
+  { path: "eu", body: "European Parliament", isNation: true, isGrouped: true },
+  { path: "br", body: "Chamber of Deputies", isNation: true },
+  { path: "us/ma", body: "State House", isNation: false },
+  {
+    path: "us/nv/clark-county",
+    body: "Clark County Commission",
+    isNation: false,
+  },
+  { path: "gb/northern-ireland", body: "Stormont", isNation: false },
+  { path: "gb/scotland", body: "Scottish Parliament", isNation: false },
+  { path: "gb/leeds", body: "Leeds Council", isNation: false },
+];
+
+async function strata() {
+  const found = await db.execute<{
     path: string;
-    covered: boolean;
-    box: string;
-    inset: string;
-  }>(
-    sql`
-      with shapes as (
-        select distinct on (pt.polity_id) pt.polity_id as id, ag.geom
-        from polity_territory pt join polity y on y.id = pt.polity_id
-        join area_geometry ag on ag.area_id = pt.area_id
-        where y.kind = 'sovereign_state' and upper_inf(pt.valid)
-          and exists (select from election e where e.polity_id = y.id)
-        order by pt.polity_id, upper(ag.valid) desc nulls first, lower(ag.valid) desc nulls last
-      ),
-      context as (
-        select distinct on (a.id) a.id, ag.geom
-        from area a join area_geometry ag on ag.area_id = a.id
-        where a.scheme_code = 'eu.member_state'
-        order by a.id, upper(ag.valid) desc nulls first
-      ),
-      projected as (
-        select id, ST_Scale(ST_Transform(geom, 8857), 0.001, 0.001) as geom, true as covered from shapes
-        union all
-        select id, ST_Scale(ST_Transform(geom, 8857), 0.001, 0.001), false from context
-      ),
-      cleaned as (
-        select id, covered, ST_SimplifyPreserveTopology(ST_Collect(d.geom), 12) as geom
-        from projected cross join lateral ST_Dump(projected.geom) d
-        where ST_Area(d.geom) > 600
-        group by id, covered
-      ),
-      bounds as (
-        select ST_Extent(geom) as box,
-          ST_Scale(ST_Transform(ST_Segmentize(ST_MakeEnvelope(-11, 35, 45, 61, 4326), 1), 8857), 0.001, 0.001) as europe
-        from cleaned
-      )
-      select c.id, ST_AsSVG(c.geom, 0, 0) as path, c.covered,
-        concat_ws(' ', floor(ST_XMin(b.box)) - 40, -ceil(ST_YMax(b.box)) - 40,
-          ceil(ST_XMax(b.box) - ST_XMin(b.box)) + 80, ceil(ST_YMax(b.box) - ST_YMin(b.box)) + 80) as box,
-        concat_ws(' ', floor(ST_XMin(b.europe)), -ceil(ST_YMax(b.europe)),
-          ceil(ST_XMax(b.europe) - ST_XMin(b.europe)), ceil(ST_YMax(b.europe) - ST_YMin(b.europe))) as inset
-      from cleaned c cross join bounds b
-      order by c.covered, c.id
-    `,
-  );
-  return {
-    box: result.rows[0]?.box ?? "0 0 1 1",
-    inset: result.rows[0]?.inset ?? "0 0 1 1",
-    land,
-    shapes: result.rows.map((row) => ({
-      id: row.id,
-      path: row.path,
-      isCovered: row.covered,
-    })),
+    name: string | null;
+    series: unknown;
+    parties: unknown;
+  }>(sql`
+    select s.path, r.record->'series' as series, r.record->'parties' as parties,
+      (select n.text from name n where n.entity_id = r.polity_id and n.kind in ('official', 'english')
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as name
+    from slug s join polity_record r on r.polity_id = s.entity_id
+    where s.is_current and s.path = any(${sql.param(STRATA.map((entry) => entry.path))}::text[])
+  `);
+  const records = new Map(found.rows.map((row) => [row.path, row]));
+  const parties: Array<{
+    id: string;
+    label: string;
+    short: string | null;
+    color: string | null;
+  }> = [];
+  const indices = new Map<string, number>();
+  const SPECIAL: Record<string, number> = {
+    "": -1,
+    independent: -2,
+    others: -3,
   };
+  const rows = STRATA.flatMap((wanted) => {
+    const row = records.get(wanted.path);
+    const series = (row?.series ?? []) as Array<{
+      name: string;
+      isOwn?: boolean;
+      points: Array<{
+        date: string;
+        path: string;
+        filled: number;
+        parties: Array<{
+          party: string | null;
+          group?: string | null;
+          seats: number;
+          isIndependent?: boolean;
+        }>;
+      }>;
+    }>;
+    const listed = new Map(
+      (
+        (row?.parties ?? []) as Array<{
+          id: string;
+          lean: number | null;
+          color: string | null;
+          label: string;
+          short: string | null;
+        }>
+      ).map((party) => [party.id, party]),
+    );
+    const body = series.find(
+      (entry) => entry.name === wanted.body && entry.isOwn !== false,
+    );
+    if (row == null || body == null || body.points.length === 0) {
+      return [];
+    }
+    let last = 0;
+    const points = body.points.flatMap((point) => {
+      if (point.filled <= 0 || point.filled * 2 < last) {
+        return [];
+      }
+      last = point.filled;
+      const pooled = new Map<string, number>();
+      for (const entry of point.parties) {
+        const party =
+          wanted.isGrouped === true &&
+          entry.group != null &&
+          listed.has(entry.group)
+            ? entry.group
+            : entry.party;
+        const key =
+          party != null && listed.has(party)
+            ? party
+            : entry.isIndependent === true
+              ? "independent"
+              : "";
+        pooled.set(key, (pooled.get(key) ?? 0) + entry.seats);
+      }
+      const seats = new Map<string, number>();
+      for (const [key, won] of pooled) {
+        const folded =
+          listed.has(key) && won / point.filled < 0.01 ? "others" : key;
+        seats.set(folded, (seats.get(folded) ?? 0) + won);
+      }
+      const lean = (key: string) =>
+        listed.get(key)?.lean ?? (key === "independent" ? 900 : 1000);
+      const index = (key: string) => {
+        const special = SPECIAL[key];
+        if (special != null) {
+          return special;
+        }
+        const known = indices.get(key);
+        if (known != null) {
+          return known;
+        }
+        const party = listed.get(key);
+        parties.push({
+          id: key,
+          label: party?.label ?? "",
+          short: party?.short ?? null,
+          color: party?.color ?? null,
+        });
+        indices.set(key, parties.length - 1);
+        return parties.length - 1;
+      };
+      return [
+        {
+          date: point.date,
+          path: point.path,
+          total: point.filled,
+          seats: [...seats]
+            .toSorted(([a, x], [b, y]) => lean(a) - lean(b) || y - x)
+            .map(([key, held]): [number, number] => [index(key), held]),
+        },
+      ];
+    });
+    return [
+      {
+        path: wanted.path,
+        name: row.name ?? wanted.path,
+        body: body.name,
+        isNation: wanted.isNation,
+        points,
+      },
+    ];
+  });
+  return { rows, parties };
 }
 
 export async function home() {
-  return remember("home", welcome);
+  return remember("home:v5", welcome);
 }
 
 async function welcome() {
-  const [polities, shapes, dated, held] = await Promise.all([
+  const [polities, layers, dated] = await Promise.all([
     call(router.polities.list, { kinds: ["sovereign_state", "supranational"] }),
-    draw(),
+    strata(),
     db.execute<{
       id: string;
       name: string | null;
@@ -208,22 +307,12 @@ async function welcome() {
           order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc, n.recorded_from desc, n.id limit 1) as polity
       from picked p join slug s on s.entity_id = p.id and s.is_current
     `),
-    db.execute<{ id: string; years: Array<number> }>(sql`
-      select e.polity_id as id,
-        array_agg(distinct extract(year from e.date_from)::int) as years
-      from election e join polity y on y.id = e.polity_id
-      where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
-        and e.kind = 'general' and e.date_from <= current_date and not exists (select from entity_merge m where m.entity_id = e.id)
-      group by e.polity_id
-    `),
   ]);
-  const years = new Map(held.rows.map((row) => [row.id, row.years]));
-  const covered = polities
-    .filter(
-      (polity) =>
-        polity.kind === "sovereign_state" || polity.kind === "supranational",
-    )
-    .map((polity) => ({ ...polity, years: years.get(polity.id) ?? [] }));
+  const covered = polities.filter(
+    (polity) =>
+      (polity.kind === "sovereign_state" || polity.kind === "supranational") &&
+      polity.first != null,
+  );
   const elections = dated.rows.map((row) => ({
     id: row.id,
     name: row.name ?? "",
@@ -241,8 +330,9 @@ async function welcome() {
   );
   return {
     kind: "home" as const,
+    today: new Date().toISOString().slice(0, 10),
     polities: covered,
-    atlas: shapes,
+    strata: layers,
     recent: recent.map((election, at) => ({
       ...election,
       lead: leads[at] ?? null,
@@ -250,7 +340,7 @@ async function welcome() {
     upcoming: elections
       .filter((election) => election.when === "upcoming")
       .toSorted((a, b) => a.date.localeCompare(b.date)),
-    today: elections.filter((election) => election.when === "today"),
+    past: elections.filter((election) => election.when === "today"),
   };
 }
 

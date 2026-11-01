@@ -437,13 +437,11 @@ export async function twin({ request, url }: RequestEvent) {
         : null;
     if (format === "json") {
       return Response.json(
-        data.kind === "home"
-          ? { ...data, atlas: undefined }
-          : ledger?.places != null
-            ? { ...data, ledger }
-            : winners != null && winners.rows.length > 0
-              ? { ...data, winners: { ...winners, maps: undefined } }
-              : data,
+        ledger?.places != null
+          ? { ...data, ledger }
+          : winners != null && winners.rows.length > 0
+            ? { ...data, winners: { ...winners, maps: undefined } }
+            : data,
         { headers },
       );
     }
@@ -1353,22 +1351,70 @@ function overviewMarkdown(
 }
 
 function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
-  const listed = data.polities.filter((polity) => polity.first != null);
-  let elections = 0;
-  const years: Array<number> = [];
-  for (const polity of listed) {
-    elections += polity.elections + polity.within;
-    years.push(...[polity.first, polity.last].filter((year) => year != null));
-  }
+  const day = Date.parse(`${data.today}T00:00:00Z`);
+  const party = (key: number) =>
+    key === -3
+      ? m.option_others()
+      : key === -2
+        ? m.option_independents()
+        : (data.strata.parties[key]?.label ?? m.home_strata_unknown());
   return [
     `# ${m.wordmark()}`,
-    years.length === 0
-      ? m.home_intro()
-      : m.home_title({
-          elections: count(elections),
-          first: String(Math.min(...years)),
-          last: String(Math.max(...years)),
-        }),
+    m.home_headline(),
+    m.home_lede(),
+    ...(data.upcoming.length === 0
+      ? []
+      : [
+          `## ${m.home_next()}`,
+          table(
+            [m.col_date(), m.col_election()],
+            data.upcoming.map((election) => [
+              date(election.date),
+              [
+                link(election.name, election.path),
+                Date.parse(`${election.date}T00:00:00Z`) - day <=
+                  7 * 86_400_000 &&
+                /^us\/\d{4}-\d{2}-\d{2}-general$/u.test(election.path)
+                  ? link(m.home_next_live(), `live/${election.path}`)
+                  : null,
+              ]
+                .filter((part) => part != null)
+                .join(", "),
+            ]),
+          ),
+        ]),
+    ...(data.strata.rows.length === 0
+      ? []
+      : [
+          `## ${m.home_strata_title()}`,
+          table(
+            [
+              m.col_polity(),
+              m.chamber_title_col(),
+              m.polity_elections(),
+              m.person_years(),
+              m.home_latest(),
+            ],
+            data.strata.rows.map((row) => {
+              const latest = row.points.at(-1);
+              const leader = latest?.seats.toSorted((x, y) => y[1] - x[1])[0];
+              return [
+                link(row.name, row.path),
+                row.body,
+                count(row.points.length),
+                span(
+                  Number(row.points[0]?.date.slice(0, 4)),
+                  Number(latest?.date.slice(0, 4)),
+                ),
+                latest == null || leader == null
+                  ? null
+                  : `${link(latest.date.slice(0, 4), latest.path)}: ${party(leader[0])}, ${m.home_strata_seats(
+                      { seats: count(leader[1]), total: count(latest.total) },
+                    )}`,
+              ];
+            }),
+          ),
+        ]),
     ...(data.recent.length === 0 ? [] : [`## ${m.home_recent()}`]),
     ...data.recent.flatMap((election) => {
       const race = election.lead;
@@ -1407,36 +1453,31 @@ function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
         ),
       ];
     }),
-    ...(data.upcoming.length === 0
-      ? []
-      : [
-          `## ${m.home_upcoming()}`,
-          table(
-            [m.col_date(), m.col_election()],
-            data.upcoming.map((election) => [
-              date(election.date),
-              link(election.name, election.path),
-            ]),
-          ),
-        ]),
-    ...(data.today.length === 0
+    ...(data.past.length === 0
       ? []
       : [
           `## ${m.home_today()}`,
           m.home_today_lede(),
           table(
             [m.col_date(), m.col_election(), m.col_polity()],
-            data.today.map((election) => [
+            data.past.map((election) => [
               date(election.date),
               link(election.name, election.path),
               election.polity,
             ]),
           ),
         ]),
-    `## ${m.home_polities()}`,
+    `## ${m.home_tools_title()}`,
+    [
+      `- ${m.home_tools_twins()}: ${m.home_tools_twins_body()}`,
+      `- ${link(m.home_tools_agents(), "agents")}: ${m.home_tools_agents_body()}`,
+      `- ${link(m.home_tools_coverage(), "coverage")}: ${m.home_tools_coverage_body()}`,
+      `- ${link(m.home_tools_compare(), "compare")}: ${m.home_tools_compare_body()}`,
+    ].join("\n"),
+    `## ${m.home_places()}`,
     table(
       [m.col_polity(), m.polity_elections(), m.person_years(), m.home_latest()],
-      listed.map((polity) => [
+      data.polities.map((polity) => [
         link(polity.name, polity.path),
         count(polity.elections + polity.within),
         span(polity.first, polity.last),

@@ -1,52 +1,26 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import PauseIcon from "@lucide/svelte/icons/pause";
-  import PlayIcon from "@lucide/svelte/icons/play";
   import SearchIcon from "@lucide/svelte/icons/search";
-  import XIcon from "@lucide/svelte/icons/x";
-  import Export from "#lib/components/export.svelte";
-  import { count, date } from "#lib/format.js";
-  import { keep } from "#lib/linked.js";
+  import { date, dates } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { getLocale } from "#lib/paraglide/runtime.js";
   import { finder } from "#lib/search.svelte.js";
-  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Lead from "./lead.svelte";
+  import Strata from "./strata.svelte";
 
   const { data }: { data: PageData } = $props();
 
-  const EXAMPLES = ["Bundestag", "Georgia", "İstanbul", "Pelosi", "Zürich"];
-  const NOW = new Date().getUTCFullYear();
+  const EXAMPLES = [
+    { term: "1860 presidential", hint: m.home_try_lincoln() },
+    { term: "1832", hint: m.home_try_reform() },
+    { term: "EU referendum", hint: m.home_try_brexit() },
+    { term: "Bundestag", hint: m.home_try_bundestag() },
+    { term: "sheriff", hint: m.home_try_sheriff() },
+    { term: "Swiss referendums", hint: m.home_try_swiss() },
+  ];
+  const DAY = 86_400_000;
 
-  let focus = $state<string | null>(null);
-  let year = $state<number | null>(
-    Number(page.url.searchParams.get("year")) || null,
-  );
-  let isPlaying = $state(false);
-
-  const totals = $derived.by(() => {
-    let elections = 0;
-    const years: Array<number> = [];
-    for (const polity of data.polities) {
-      elections += polity.elections + polity.within;
-      years.push(...[polity.first, polity.last].filter((year) => year != null));
-    }
-    return {
-      elections,
-      first: years.length === 0 ? null : Math.min(...years),
-      last: years.length === 0 ? null : Math.max(...years),
-    };
-  });
-  const listed = $derived(
-    data.polities
-      .filter((polity) => polity.first != null)
-      .toSorted(
-        (a, b) =>
-          (a.first ?? NOW) - (b.first ?? NOW) || a.name.localeCompare(b.name),
-      ),
-  );
   const jsonLd = $derived({
     "@context": "https://schema.org",
     "@graph": [
@@ -65,152 +39,97 @@
         description: m.home_meta_description(),
         inLanguage: "en-US",
         publisher: { "@id": `${page.url.origin}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${page.url.origin}/search?q={query}`,
+          "query-input": "required name=query",
+        },
       },
     ],
   });
-  const byId = $derived(new Map(listed.map((polity) => [polity.id, polity])));
-  const depth = $derived.by(() => {
-    const firsts = data.atlas.shapes.flatMap((shape) => {
-      const first = byId.get(shape.id)?.first;
-      return first == null ? [] : [first];
-    });
-    return { low: Math.min(...firsts), high: Math.max(...firsts) };
-  });
-  const lit = $derived(focus == null ? null : (byId.get(focus) ?? null));
-  const union = $derived(
-    data.polities.find((polity) => polity.kind === "supranational")?.id,
+  const upcoming = $derived(
+    data.upcoming.map((election) => {
+      const days = Math.round(
+        (Date.parse(`${election.date}T00:00:00Z`) -
+          Date.parse(`${data.today}T00:00:00Z`)) /
+          DAY,
+      );
+      return {
+        ...election,
+        days,
+        isLive:
+          days <= 7 && /^us\/\d{4}-\d{2}-\d{2}-general$/u.test(election.path),
+      };
+    }),
   );
+  const next = $derived(
+    upcoming[0]?.days != null && upcoming[0].days <= 14 ? upcoming[0] : null,
+  );
+  const later = $derived(next == null ? upcoming : upcoming.slice(1));
+  const places = $derived(
+    data.polities
+      .flatMap((polity) =>
+        polity.path == null ? [] : [{ ...polity, path: polity.path }],
+      )
+      .toSorted((a, b) => a.name.localeCompare(b.name)),
+  );
+  const tools = $derived([
+    {
+      key: "twins",
+      href: `${resolve("/[...path]", { path: "us/2024-11-05-general" })}.md`,
+      title: m.home_tools_twins(),
+      body: m.home_tools_twins_body(),
+    },
+    {
+      key: "agents",
+      href: resolve("/agents"),
+      title: m.home_tools_agents(),
+      body: m.home_tools_agents_body(),
+    },
+    {
+      key: "coverage",
+      href: resolve("/coverage"),
+      title: m.home_tools_coverage(),
+      body: m.home_tools_coverage_body(),
+    },
+    {
+      key: "compare",
+      href: resolve("/compare"),
+      title: m.home_tools_compare(),
+      body: m.home_tools_compare_body(),
+    },
+  ]);
 
-  const span = $derived.by(() => {
-    const all = data.polities.flatMap((polity) => polity.years);
-    return all.length === 0
-      ? null
-      : { first: Math.min(...all), last: Math.max(...all) };
-  });
-  const tally = $derived(
-    Map.groupBy(
-      data.polities.flatMap((polity) => polity.years),
-      (held) => held,
-    ),
-  );
-  const held = $derived(
-    year == null
-      ? []
-      : data.polities.filter((polity) => polity.years.includes(year ?? 0)),
-  );
-  const heldIds = $derived(new Set(held.map((polity) => polity.id)));
-  const onRecord = $derived(
-    year == null
-      ? 0
-      : listed.filter((polity) => (polity.first ?? Infinity) <= (year ?? 0))
-          .length,
-  );
-  const along = (value: number) =>
-    span == null || span.last === span.first
-      ? 0.5
-      : (value - span.first) / (span.last - span.first);
-
-  $effect(() => {
-    keep({ year: year == null ? null : String(year) });
-  });
-
-  $effect(() => {
-    if (!isPlaying || span == null) {
-      return;
+  function when(days: number, value: string) {
+    if (days <= 0) {
+      return m.home_next_today();
     }
-    const last = span.last;
-    const timer = setInterval(() => {
-      if ((year ?? last) >= last) {
-        isPlaying = false;
-      } else {
-        year = (year ?? last) + 1;
-      }
-    }, 140);
-    return () => clearInterval(timer);
-  });
-
-  function fill(id: string, first: number | null | undefined) {
-    if (year == null) {
-      return `color-mix(in oklab, var(--marker) ${strength(first)}%, var(--card))`;
+    if (days === 1) {
+      return m.home_next_tomorrow();
     }
-    if (heldIds.has(id)) {
-      return "var(--marker)";
-    }
-    return (first ?? Infinity) <= year
-      ? "color-mix(in oklab, var(--marker) 22%, var(--card))"
-      : "color-mix(in oklab, var(--muted-foreground) 8%, var(--card))";
+    return dates({
+      weekday: days < 7 ? "long" : undefined,
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${value}T00:00:00Z`));
   }
 
-  function pick(event: PointerEvent) {
-    if (span == null) {
-      return;
-    }
-    const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    const x = Math.max(
-      0,
-      Math.min(1, (event.clientX - box.left) / Math.max(box.width, 1)),
-    );
-    year = Math.round(span.first + x * (span.last - span.first));
-  }
+  const past = $derived(
+    data.past.map((election) => ({
+      ...election,
+      title: election.name
+        .replace(/^\d{4} /u, "")
+        .replace(/(?:, \p{L}+ \d{1,2}, \d{4}| \(\p{L}+ \d{1,2}\))$/u, ""),
+    })),
+  );
 
-  function strength(first: number | null | undefined) {
-    if (first == null) {
-      return 0;
-    }
-    const span = Math.max(1, depth.high - depth.low);
-    return 26 + Math.sqrt((depth.high - first) / span) * 74;
-  }
-
-  function seek(term: string) {
+  function seek(event: Event, term: string) {
+    event.preventDefault();
     finder.value = term;
     finder.isOpen = true;
   }
 </script>
-
-{#snippet shapes(isInset: boolean)}
-  <path d={data.atlas.land} class="fill-muted-foreground/8" />
-  {#each data.atlas.shapes as shape (shape.id)}
-    {#if shape.isCovered}
-      {const polity = $derived(byId.get(shape.id))}
-      <a
-        href={polity?.path == null
-          ? undefined
-          : resolve("/[...path]", { path: polity.path })}
-        aria-label={polity?.name}
-        tabindex={isInset ? -1 : undefined}
-        onpointerenter={() => (focus = shape.id)}
-        onpointerleave={() => (focus = null)}
-        onfocus={() => (focus = shape.id)}
-        onblur={() => (focus = null)}
-      >
-        <path
-          d={shape.path}
-          style:fill={fill(shape.id, polity?.first)}
-          class={cn(
-            "stroke-foreground/50 transition-[fill,stroke] duration-300 motion-reduce:transition-none",
-            { "stroke-foreground": focus === shape.id },
-          )}
-          stroke-width={focus === shape.id ? 2 : 0.75}
-          vector-effect="non-scaling-stroke"
-        />
-      </a>
-    {:else}
-      <path
-        d={shape.path}
-        class={cn(
-          "fill-muted-foreground/15 stroke-card transition-[fill] duration-300 motion-reduce:transition-none",
-          {
-            "fill-muted-foreground/40":
-              (focus != null && focus === union) ||
-              (union != null && heldIds.has(union)),
-          },
-        )}
-        stroke-width="0.75"
-        vector-effect="non-scaling-stroke"
-      />
-    {/if}
-  {/each}
-{/snippet}
 
 <svelte:head>
   <title>{m.home_meta_title()}</title>
@@ -240,434 +159,221 @@
   {@html `<script type="application/ld+json">${JSON.stringify(jsonLd).replaceAll("<", "\\u003c")}</script>`}
 </svelte:head>
 
-<main class="pbe-16">
-  <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
-    <header
-      class="col-span-12 grid gap-5 bg-card px-3.5 pbs-7 pbe-6 sm:pbs-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:gap-10"
-    >
+<main class="grid pbe-16">
+  <header
+    class="grid gap-x-12 gap-y-7 border-be px-3.5 pbs-8 pbe-7 sm:pbs-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+  >
+    <div class="grid content-start gap-5">
       <h1
-        class="title text-[clamp(2rem,1.2rem+2.6vw,3.5rem)] max-inline-[20ch]"
+        class="text-[clamp(2.25rem,1.3rem+3.4vw,4.25rem)] leading-[0.95] font-[800] tracking-[-0.03em] text-balance max-inline-[16ch]"
       >
-        {totals.first == null || totals.last == null
-          ? m.home_intro()
-          : m.home_title({
-              elections: count(totals.elections),
-              first: String(totals.first),
-              last: String(totals.last),
-            })}
+        {m.home_headline()}
       </h1>
-      <div class="grid gap-2">
-        <button
-          type="button"
-          class="flex items-center gap-3 rounded-sm border border-foreground bg-card ps-3 pe-2 text-start text-base text-muted-foreground block-12 min-inline-0 hover:bg-secondary hover:text-foreground"
-          onclick={() => seek("")}
-        >
-          <SearchIcon class="shrink-0 text-foreground block-5 inline-5" />
-          <span class="grow truncate">{m.home_search_cta()}</span>
-          <kbd class="max-sm:hidden">⌘K</kbd>
-        </button>
-        <p
-          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.8125rem]"
-        >
-          <span class="text-muted-foreground">{m.home_search_try()}</span>
-          {#each EXAMPLES as example (example)}
-            <button
-              type="button"
-              class="py-0.5 font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-              onclick={() => seek(example)}>{example}</button
-            >
-          {/each}
-        </p>
-      </div>
-    </header>
-
-    {#if data.recent.length > 0}
-      <section
-        class="col-span-12 grid gap-1 bg-card px-3.5 pbs-4 pbe-2"
-        aria-labelledby="recent-title"
+      <p
+        class="font-serif text-[1.0625rem]/relaxed text-pretty text-muted-foreground max-inline-[52ch]"
       >
-        <h2 id="recent-title" class="heading">
-          {m.home_recent()}
-        </h2>
-        <ol class="grid gap-x-10 lg:grid-cols-2">
-          {#each data.recent as election (election.path)}
-            <li
-              class="border-be border-border last:border-be-0 lg:[&:nth-last-child(2):nth-child(odd)]:border-be-0"
-            >
-              <a
-                class="group grid gap-3 py-4"
-                href={resolve("/[...path]", { path: election.path })}
-              >
-                <span
-                  class="flex flex-wrap items-baseline justify-between gap-x-4"
-                >
-                  <span
-                    class="text-lg/tight font-[740] tracking-[-0.012em] text-balance underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
-                    >{election.name}</span
-                  >
-                  <time
-                    class="font-figures text-[0.8125rem] text-muted-foreground"
-                    datetime={election.date}>{date(election.date)}</time
-                  >
-                </span>
-                <Lead race={election.lead} />
-              </a>
-            </li>
-          {/each}
-        </ol>
-      </section>
-    {/if}
-
-    <section
-      class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card px-3.5 pbs-3.5 pbe-3 lg:col-span-8"
-      aria-labelledby="atlas-title"
-      data-export
-    >
-      <Export name="atlas" class="absolute inset-e-2 inset-bs-2" />
-      <div class="grid gap-0.5 pe-8">
-        <h2 id="atlas-title" class="heading">
-          {m.home_map_title()}
-        </h2>
-        <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-          {m.home_map_lede()}
-        </p>
-      </div>
-      {#if span != null}
-        <div
-          class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-end gap-x-3 pbs-5"
+        {m.home_lede()}
+      </p>
+      <form
+        class="grid gap-2 max-inline-[36rem]"
+        role="search"
+        action={resolve("/search")}
+        method="get"
+        onsubmit={(event) =>
+          seek(event, String(new FormData(event.currentTarget).get("q") ?? ""))}
+      >
+        <label class="sr-only" for="home-search">{m.home_search_label()}</label>
+        <span
+          class="flex items-center gap-3 rounded-sm border border-foreground bg-card ps-3 pe-1.5 block-12 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring"
         >
+          <SearchIcon class="shrink-0 block-5 inline-5" aria-hidden="true" />
+          <input
+            id="home-search"
+            class="grow bg-transparent text-base outline-none min-inline-0 placeholder:text-muted-foreground"
+            type="search"
+            name="q"
+            autocomplete="off"
+            placeholder={m.home_search_cta()}
+          />
+          <kbd class="text-xs text-muted-foreground max-sm:hidden">⌘K</kbd>
           <button
-            type="button"
-            class="flex items-center justify-center rounded-sm border border-input bg-card block-8 inline-8 hover:bg-secondary"
-            aria-label={isPlaying ? m.scrubber_pause() : m.scrubber_play()}
-            aria-pressed={isPlaying}
-            onclick={() => {
-              if (!isPlaying && (year == null || year >= span.last)) {
-                year = span.first;
-              }
-              isPlaying = !isPlaying;
-            }}
+            type="submit"
+            class="rounded-xs bg-primary px-3 text-sm font-semibold text-primary-foreground block-9 hover:bg-primary/90"
+            >{m.home_search_submit()}</button
           >
-            {#if isPlaying}
-              <PauseIcon class="block-4 inline-4" />
-            {:else}
-              <PlayIcon class="block-4 inline-4" />
-            {/if}
-          </button>
-          <div class="grid gap-1">
-            <div
-              class="relative cursor-grab touch-pan-y rounded-sm outline-offset-4 select-none block-8 before:absolute before:inset-x-0 before:-inset-y-3 active:cursor-grabbing"
-              role="slider"
-              tabindex="0"
-              aria-label={m.home_scrub_slider()}
-              aria-valuemin={span.first}
-              aria-valuemax={span.last}
-              aria-valuenow={year ?? span.last}
-              onpointerdown={(event) => {
-                event.currentTarget.setPointerCapture(event.pointerId);
-                isPlaying = false;
-                pick(event);
-              }}
-              onpointermove={(event) => {
-                if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-                  pick(event);
-                }
-              }}
-              onkeydown={(event) => {
-                const moves: Record<string, number> = {
-                  ArrowLeft: -1,
-                  ArrowDown: -1,
-                  ArrowRight: 1,
-                  ArrowUp: 1,
-                  PageDown: -10,
-                  PageUp: 10,
-                  Home: -Infinity,
-                  End: Infinity,
-                };
-                const move = moves[event.key];
-                if (move != null) {
-                  event.preventDefault();
-                  isPlaying = false;
-                  year = Math.max(
-                    span.first,
-                    Math.min(span.last, (year ?? span.last) + move),
-                  );
-                }
-              }}
+        </span>
+        <div class="grid gap-2 pbs-3">
+          <p class="text-[0.8125rem] text-muted-foreground">
+            {m.home_search_try()}
+          </p>
+          <ul class="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap">
+            {#each EXAMPLES as example (example.term)}
+              <li class="grid">
+                <a
+                  class="group grid gap-0.5 rounded-xs border border-border bg-card px-2.5 py-1.5 leading-tight transition-colors hover:border-foreground focus-visible:border-foreground"
+                  href="{resolve('/search')}?q={encodeURIComponent(
+                    example.term,
+                  )}"
+                  onclick={(event) => seek(event, example.term)}
+                >
+                  <span class="text-sm font-semibold">{example.term}</span>
+                  <span
+                    class="text-xs text-muted-foreground group-hover:text-foreground"
+                    >{example.hint}</span
+                  >
+                </a>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      </form>
+    </div>
+
+    {#if upcoming.length > 0}
+      <section
+        class="grid content-start gap-3 lg:border-s lg:ps-8"
+        aria-labelledby="next-title"
+      >
+        <h2 id="next-title" class="text-[0.8125rem] font-bold">
+          {m.home_next()}
+        </h2>
+        {#if next != null}
+          <div class="grid gap-2 border-be pbe-4">
+            <p
+              class="font-figures text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] leading-none font-[780] tracking-[-0.025em]"
             >
-              <span
-                class="absolute inset-x-0 inset-be-0 bg-border block-px"
-                aria-hidden="true"
-              ></span>
-              {#each tally as [value, group] (value)}
-                <span
-                  class={cn(
-                    "absolute inset-be-0 -translate-x-1/2 rounded-t-[1px] transition-colors duration-150 inline-0.5 motion-reduce:transition-none",
-                    {
-                      "bg-muted-foreground/45": value !== year,
-                      "bg-foreground": value === year,
-                    },
-                  )}
-                  style:inset-inline-start="{along(value) * 100}%"
-                  style:block-size="{Math.min(100, 25 + group.length * 25)}%"
-                  aria-hidden="true"
-                ></span>
-              {/each}
-              {#if year != null}
-                <span
-                  class="pointer-events-none absolute inset-y-0 -translate-x-1/2 bg-foreground inline-px"
-                  style:inset-inline-start="{along(year) * 100}%"
-                  aria-hidden="true"
-                ></span>
-                <span
-                  class="pointer-events-none absolute inset-be-[calc(100%+0.25rem)] rounded-xs bg-foreground px-1.5 font-figures text-xs font-semibold text-background tabular-nums"
-                  style:inset-inline-start="{along(year) * 100}%"
-                  style:translate="{-along(year) * 100}% 0"
-                  aria-hidden="true">{year}</span
+              <time datetime={next.date}>{when(next.days, next.date)}</time>
+            </p>
+            <a
+              class="justify-self-start text-lg/tight font-[720] text-balance underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+              href={resolve("/[...path]", { path: next.path })}>{next.name}</a
+            >
+            <p class="flex flex-wrap gap-x-4 gap-y-1 pbs-1 text-sm">
+              {#if next.isLive}
+                <a
+                  class="inline-flex items-center gap-2 rounded-sm bg-primary px-3 font-semibold text-primary-foreground block-9 hover:bg-primary/90"
+                  href={resolve("/live/[...path]", { path: next.path })}
+                  ><span
+                    class="rounded-full bg-marker block-2 inline-2"
+                    aria-hidden="true"
+                  ></span>{m.home_next_live()}</a
                 >
               {/if}
-            </div>
-            <div
-              class="flex justify-between font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
-              aria-hidden="true"
-            >
-              <span>{span.first}</span><span>{span.last}</span>
-            </div>
+              <a
+                class="inline-flex items-center font-semibold underline decoration-border underline-offset-4 block-9 hover:decoration-foreground"
+                href={resolve("/[...path]", { path: next.path })}
+                >{m.home_next_open()}</a
+              >
+            </p>
           </div>
-          {#if year == null}
-            <span
-              class="text-xs text-muted-foreground max-inline-[18ch] max-sm:hidden"
-              >{m.home_scrub_hint()}</span
-            >
-          {:else}
-            <button
-              type="button"
-              class="flex items-center gap-1 rounded-sm px-2 text-xs font-semibold block-8 hover:bg-secondary"
-              onclick={() => {
-                isPlaying = false;
-                year = null;
-              }}
-            >
-              <XIcon class="block-3.5 inline-3.5" />{m.home_scrub_all()}
-            </button>
-          {/if}
-        </div>
-      {/if}
-      {#if year != null}
-        <div class="grid gap-0.5" aria-live="polite">
-          <p
-            class="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-figures text-[clamp(2rem,4vw,3rem)] leading-none font-[780] tracking-[-0.03em]"
-          >
-            {year}
-            <span
-              class="font-sans text-[0.8125rem] font-normal tracking-normal text-muted-foreground"
-              >{m.home_scrub_record({
-                count: count(onRecord),
-                total: count(listed.length),
-              })}</span
-            >
-          </p>
-          <p class="text-sm font-semibold text-pretty">
-            {held.length === 0
-              ? m.home_scrub_quiet()
-              : m.home_scrub_held({
-                  places: new Intl.ListFormat(getLocale(), {
-                    type: "conjunction",
-                  }).format(held.map((polity) => polity.name)),
-                })}
-          </p>
-        </div>
-      {/if}
-      <div class="relative">
-        <svg
-          class="block block-auto inline-full"
-          viewBox={data.atlas.box}
-          role="img"
-          aria-label={m.home_map_title()}
-        >
-          {@render shapes(false)}
-        </svg>
-        <svg
-          class="absolute inset-e-0 inset-be-[8%] block rounded-sm border bg-card block-auto inline-[46%] max-sm:static max-sm:mbs-2 max-sm:inline-full"
-          viewBox={data.atlas.inset}
-          aria-hidden="true"
-        >
-          {@render shapes(true)}
-        </svg>
-        {#if year == null}
-          <div
-            class="absolute inset-e-0 inset-bs-0 grid gap-1 text-[0.6875rem] text-muted-foreground inline-36 max-sm:static max-sm:inline-full"
-          >
-            <span>{m.home_map_key_since()}</span>
-            <span
-              class="block rounded-xs block-2"
-              style:background={`linear-gradient(to right, var(--marker), color-mix(in oklab, var(--marker) 22%, var(--card)))`}
-            ></span>
-            <span class="flex justify-between font-figures tabular-nums">
-              <span>{depth.low}</span><span>{depth.high}</span>
-            </span>
-          </div>
-        {:else}
-          <ul
-            class="absolute inset-e-0 inset-bs-0 grid gap-1 text-[0.6875rem] text-muted-foreground max-sm:static max-sm:mbs-2 max-sm:flex max-sm:flex-wrap max-sm:gap-x-3"
-          >
-            {#each [{ key: "held", label: m.home_scrub_key_held(), color: "var(--marker)" }, { key: "record", label: m.home_scrub_key_record(), color: "color-mix(in oklab, var(--marker) 22%, var(--card))" }, { key: "none", label: m.home_scrub_key_none(), color: "color-mix(in oklab, var(--muted-foreground) 8%, var(--card))" }] as item (item.key)}
-              <li class="flex items-center gap-1.5">
-                <span
-                  class="rounded-xs ring-1 ring-border block-2.5 inline-2.5"
-                  style:background-color={item.color}
-                ></span>{item.label}
+        {/if}
+        {#if later.length > 0}
+          <ul class="grid gap-1.5 text-sm">
+            {#each later as election (election.path)}
+              <li
+                class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-baseline gap-x-3"
+              >
+                <time
+                  class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                  datetime={election.date}
+                  >{when(election.days, election.date)}</time
+                >
+                <a
+                  class="font-semibold text-pretty underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href={resolve("/[...path]", { path: election.path })}
+                  >{election.name}</a
+                >
               </li>
             {/each}
           </ul>
         {/if}
-        {#if lit != null}
-          <div
-            class="pointer-events-none absolute inset-s-0 inset-be-2 grid gap-0.5 rounded-sm bg-card/95 px-3 py-2 text-xs shadow-menu ring-1 ring-border"
-          >
-            <span class="text-base/tight font-[720]">{lit.name}</span>
-            <span class="text-muted-foreground"
-              >{m.home_elections({
-                count: lit.elections,
-              })}{#if lit.first != null && lit.last != null}, {m.polity_span({
-                  first: String(lit.first),
-                  last: String(lit.last),
-                })}{/if}</span
-            >
-            {#if lit.latest != null}
-              <span>{lit.latest.name}</span>
-            {/if}
-          </div>
-        {/if}
-      </div>
-    </section>
+      </section>
+    {/if}
+  </header>
 
-    <aside
-      class="col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3.5 pbe-3 lg:col-span-4"
-      aria-labelledby="polities-title"
+  {#if data.strata.rows.length > 0}
+    <section
+      class="grid gap-5 border-be px-3.5 pbs-8 pbe-8"
+      aria-labelledby="strata-title"
     >
-      <h2 id="polities-title" class="text-[0.8125rem] font-bold">
-        {m.home_polities()}
-      </h2>
-      <ol class="grid">
-        {#each listed as polity (polity.id)}
-          {const from = $derived(
-            (((polity.first ?? NOW) - (depth.low - 4)) /
-              (NOW - (depth.low - 4))) *
-              100,
-          )}
-          <li>
-            <svelte:element
-              this={polity.path == null ? "div" : "a"}
-              href={polity.path == null
-                ? undefined
-                : resolve("/[...path]", { path: polity.path })}
-              class={cn(
-                "grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 gap-y-1 rounded-xs p-1.5 transition-opacity duration-300 motion-reduce:transition-none",
-                { "bg-secondary": focus === polity.id },
-                {
-                  "opacity-40":
-                    year != null && (polity.first ?? Infinity) > year,
-                },
-                { "hover:bg-secondary": polity.path != null },
-              )}
-              role={polity.path == null ? "presentation" : undefined}
-              onpointerenter={() => (focus = polity.id)}
-              onpointerleave={() => (focus = null)}
-              onfocus={() => (focus = polity.id)}
-              onblur={() => (focus = null)}
+      <div class="grid gap-1.5">
+        <h2 id="strata-title" class="heading">{m.home_strata_title()}</h2>
+        <p
+          class="text-[0.8125rem] text-pretty text-muted-foreground max-inline-[72ch]"
+        >
+          {m.home_strata_lede()}
+        </p>
+      </div>
+      <Strata strata={data.strata} today={data.today} />
+    </section>
+  {/if}
+
+  {#if data.recent.length > 0}
+    <section
+      class="grid gap-1 border-be px-3.5 pbs-6 pbe-2"
+      aria-labelledby="recent-title"
+    >
+      <h2 id="recent-title" class="heading">{m.home_recent()}</h2>
+      <ol class="grid gap-x-10 md:grid-cols-2 xl:grid-cols-3">
+        {#each data.recent as election (election.path)}
+          <li class="border-be border-border/70">
+            <a
+              class="group grid gap-3 py-4"
+              href={resolve("/[...path]", { path: election.path })}
             >
-              <span class="truncate text-[0.9375rem] font-semibold"
-                >{polity.name}</span
-              >
               <span
-                class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
-                >{m.home_map_since({ year: String(polity.first) })}</span
-              >
-              <span
-                class="relative col-span-2 block overflow-hidden bg-muted block-1"
-                aria-hidden="true"
+                class="flex flex-wrap items-baseline justify-between gap-x-4"
               >
                 <span
-                  class="absolute inset-y-0 inset-e-0 min-inline-1"
-                  style:inset-inline-start="{from}%"
-                  style:background-color={`color-mix(in oklab, var(--marker) ${strength(polity.first)}%, var(--muted))`}
-                ></span>
+                  class="text-lg/tight font-[740] tracking-[-0.012em] text-balance underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
+                  >{election.name}</span
+                >
+                <time
+                  class="font-figures text-[0.8125rem] text-muted-foreground"
+                  datetime={election.date}>{date(election.date)}</time
+                >
               </span>
-            </svelte:element>
+              <Lead race={election.lead} />
+            </a>
           </li>
         {/each}
       </ol>
-    </aside>
+    </section>
+  {/if}
 
-    {#if data.upcoming.length > 0}
+  <div class="grid border-be lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+    {#if data.past.length > 0}
       <section
-        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3.5 pbe-3.5"
-        aria-labelledby="upcoming-title"
-      >
-        <h2 id="upcoming-title" class="text-[0.8125rem] font-bold">
-          {m.home_upcoming()}
-        </h2>
-        <ul class="grid gap-1 text-sm">
-          {#each data.upcoming as election (election.path)}
-            <li class="flex flex-wrap items-baseline gap-x-3">
-              <span class="font-figures text-xs tabular-nums inline-28"
-                >{date(election.date)}</span
-              >
-              <a
-                class="hover:highlighter"
-                href={resolve("/[...path]", { path: election.path })}
-                >{election.name}</a
-              >
-            </li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
-
-    {#if data.today.length > 0}
-      <section
-        class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3.5"
-        aria-labelledby="today-title"
+        class="grid content-start gap-3 px-3.5 pbs-6 pbe-6"
+        aria-labelledby="past-title"
       >
         <div class="grid gap-0.5">
-          <h2 id="today-title" class="heading">
-            {m.home_today()}
-          </h2>
+          <h2 id="past-title" class="heading">{m.home_today()}</h2>
           <p class="text-[0.8125rem] text-muted-foreground">
             {m.home_today_lede()}
           </p>
         </div>
-        <ol
-          class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-x-6"
-        >
-          {#each data.today as election (election.path)}
-            {const name = $derived(
-              election.name
-                .replace(/^\d{4} /, "")
-                .replace(
-                  /(?:, \p{L}+ \d{1,2}, \d{4}| \(\p{L}+ \d{1,2}\))$/u,
-                  "",
-                ),
-            )}
+        <ol class="grid gap-x-6 sm:grid-cols-2">
+          {#each past as election (election.path)}
             <li
-              class="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2"
+              class="grid grid-cols-[3.75rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2"
             >
               <span class="font-figures text-xl font-[760] tracking-[-0.02em]"
                 >{election.date.slice(0, 4)}</span
               >
               <span class="grid gap-0.5">
                 <a
-                  class="justify-self-start text-[0.9375rem] font-semibold hover:highlighter"
+                  class="justify-self-start text-[0.9375rem] font-semibold underline decoration-transparent underline-offset-4 hover:decoration-foreground"
                   href={resolve("/[...path]", { path: election.path })}
-                  >{name}</a
+                  >{election.title}</a
                 >
                 <span class="text-xs text-muted-foreground"
                   >{[
-                    election.polity != null && !name.includes(election.polity)
+                    election.polity != null &&
+                    !election.title.includes(election.polity)
                       ? election.polity
                       : null,
-                    new Intl.DateTimeFormat(getLocale(), {
+                    dates({
                       month: "long",
                       day: "numeric",
                       timeZone: "UTC",
@@ -682,5 +388,46 @@
         </ol>
       </section>
     {/if}
-  </article>
+
+    <section
+      class="grid content-start gap-3 px-3.5 pbs-6 pbe-6 lg:border-s"
+      aria-labelledby="tools-title"
+    >
+      <h2 id="tools-title" class="heading">{m.home_tools_title()}</h2>
+      <ul class="grid gap-4 sm:grid-cols-2">
+        {#each tools as tool (tool.key)}
+          <li class="grid content-start gap-1">
+            <a
+              class="justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={tool.href}>{tool.title}</a
+            >
+            <p class="text-[0.8125rem] text-pretty text-muted-foreground">
+              {tool.body}
+            </p>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  </div>
+
+  {#if places.length > 0}
+    <section class="grid gap-3 px-3.5 pbs-6" aria-labelledby="places-title">
+      <h2 id="places-title" class="heading">{m.home_places()}</h2>
+      <ul class="columns-2 gap-x-6 text-sm sm:columns-3 lg:columns-5">
+        {#each places as polity (polity.id)}
+          <li class="flex break-inside-avoid items-baseline gap-2 py-0.5">
+            <a
+              class="truncate font-semibold underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+              href={resolve("/[...path]", { path: polity.path })}
+              >{polity.name}</a
+            >
+            <span
+              class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums"
+              >{m.home_since({ year: String(polity.first) })}</span
+            >
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
 </main>
