@@ -130,9 +130,14 @@ def held(conn: Connection, precinct: bool) -> set[str]:
                and exists (select 1 from result_set rs join source s on s.id = rs.source_id
                            where rs.contest_id = e.entity_id and s.publisher <> 'Federal Election Commission'
                              and not (%s and exists (select 1 from changeset c where c.id = rs.changeset_id and c.pipeline = %s))
-                             and (not %s or exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
-                                                    where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')))""",
-            [TARGET, bool(os.environ.get("OE_REEMIT")), SOURCE, precinct],
+                             and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
+                                         where v.result_set_k = rs.k and u.scheme_code = any(%s)))""",
+            [
+                TARGET,
+                bool(os.environ.get("OE_REEMIT")),
+                SOURCE,
+                ["us.precinct"] if precinct else ["us.county", "us.town", "us.place"],
+            ],
         ).fetchall()
     }
 
