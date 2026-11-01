@@ -142,6 +142,48 @@ AZ_1998_MEASURES = {
     "303": ("Land use and conservation appropriations", "Legislative Referendum"),
     "304": ("State lottery commission", "Legislative Referendum"),
 }
+AZ_SCANS = {
+    1992: (date(1992, 11, 3), "canvass1992ge.pdf"),
+    1994: (date(1994, 11, 8), "canvass1994ge.pdf"),
+    1996: (date(1996, 11, 5), "canvass1996ge.pdf"),
+}
+AZ_SCAN_MEASURES = {
+    1992: {
+        "100": ("Election of certain state officers", "Legislative Referendum"),
+        "101": ("State mine inspector", "Legislative Referendum"),
+        "102": ("State lands", "Legislative Referendum"),
+        "103": ("Judgments of death", "Legislative Referendum"),
+        "104": ("Political subdivision expenditure limitations", "Legislative Referendum"),
+        "105": ("County charters", "Legislative Referendum"),
+        "106": ("School district debt capacity", "Legislative Referendum"),
+        "107": ("Term limits for members of Congress, the legislature, and state executive officers", "Initiative"),
+        "108": ("Public debt, revenue, and taxation", "Initiative"),
+        "109": ("Judicial department", "Legislative Referendum"),
+        "110": ("Preborn child protection", "Initiative"),
+        "200": ("Lawful methods of taking wildlife", "Initiative"),
+        "300": ("Legal holidays", "Legislative Referendum"),
+        "301": ("Legislative salaries", "Legislative Referendum"),
+    },
+    1994: {
+        "100": ("Creating the office of Lieutenant Governor", "Legislative Referendum"),
+        "101": ("Exchange of state trust land", "Legislative Referendum"),
+        "102": ("Personal property tax exemption for agricultural producers", "Legislative Referendum"),
+        "103": ("Right to recover damages", "Initiative"),
+        "200": ("State taxes on tobacco products", "Initiative"),
+        "201": ("Leghold traps, poisons, and snares on public land", "Initiative"),
+        "300": ("State criteria for takings", "Popular Referendum"),
+        "301": ("Civil justice system", "Popular Referendum"),
+        "302": ("Legislative salaries", "Legislative Referendum"),
+    },
+    1996: {
+        "100": ("Effective dates of laws", "Legislative Referendum"),
+        "101": ("Property tax exemptions", "Legislative Referendum"),
+        "102": ("Jurisdiction over juveniles", "Initiative"),
+        "201": ("Gaming compacts with Indian tribes", "Initiative"),
+        "203": ("Lottery revenues for health programs and AHCCCS eligibility", "Initiative"),
+        "300": ("Legislative salaries", "Legislative Referendum"),
+    },
+}
 AZ_FILES = {
     date(2000, 11, 7): "2000/General/Canvass2000GE.pdf",
     date(2002, 11, 5): "2002/General/Canvass2002GE.pdf",
@@ -2700,6 +2742,8 @@ def fetch() -> None:
             media_type="application/pdf",
         )
     store_manual(AZ_1998_URL, AZ_1998[1], "application/pdf")
+    for _, file in AZ_SCANS.values():
+        store_manual(f"manual://MF-556/{file}", f"MF-556/{file}", "application/pdf")
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, path if path.startswith("https:") else AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -3501,6 +3545,42 @@ def arizona() -> list[dict[str, object]]:
                     ),
                 }
                 for county, value in zip(AZ_COUNTIES, numbers, strict=False)
+            )
+    sizes: dict[str, tuple[float, float]] = {}
+    with (Path(__file__).parent / "az_canvass_scans.tsv").open() as handle:
+        for line in csv.DictReader(handle, delimiter="\t"):
+            year = int(line["year"])
+            day, file = AZ_SCANS[year]
+            url = f"manual://MF-556/{file}"
+            if url not in sizes:
+                info = subprocess.run(
+                    ["pdfinfo", str(raw.cached(SOURCE, url).path)], capture_output=True, text=True, check=True
+                ).stdout
+                found = re.search(r"Page size:\s+([\d.]+) x ([\d.]+)", info)
+                if found is None:
+                    raise ValueError(f"{url}: no page size")
+                sizes[url] = (float(found[1]), float(found[2]))
+            numbers = [int(value) for value in line["counts"].split()]
+            title, kind = AZ_SCAN_MEASURES[year][line["number"]]
+            rows.extend(
+                {
+                    "state": "AZ",
+                    "day": day,
+                    "number": line["number"],
+                    "label": f"Proposition {line['number']}",
+                    "title": title,
+                    "kind": kind,
+                    "url": url,
+                    "county": county,
+                    "answer": line["answer"],
+                    "votes": value,
+                    "page": int(line["page"]),
+                    "x0": 0.0,
+                    "y0": 0.0,
+                    "x1": sizes[url][0] * 100 / 72,
+                    "y1": sizes[url][1] * 100 / 72,
+                }
+                for county, value in zip(AZ_COUNTIES, numbers[:-1], strict=True)
             )
     return rows
 
