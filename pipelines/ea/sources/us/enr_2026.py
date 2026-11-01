@@ -161,6 +161,7 @@ IL_CITIES = {
     "CITY OF GALESBURG": "Knox",
     "CITY OF ROCKFORD": "Winnebago",
 }
+SEAT = re.compile(r"district\s+(\d+)(?:\s*[,-]\s*office\s+(\d+))?", re.IGNORECASE)
 IL_STATEWIDE = ("190-ATTORNEY%20GENERAL", "200-SECRETARY%20OF%20STATE", "210-COMPTROLLER", "220-TREASURER")
 IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
 KS_CONTEST = re.compile(
@@ -1064,10 +1065,13 @@ def plan(
         ).fetchall():
             if not WRITE_IN.search(label):
                 published[contest][1].add(person(label))
+        seats: dict[UUID, tuple[str, str]] = {}
         for contest, text in conn.execute(
             "select entity_id, text from name where entity_id = any(%s)", [list(published)]
         ).fetchall():
             titles.setdefault(contest, set()).update(slug(text).split("-"))
+            if found := SEAT.search(text):
+                seats[contest] = (found[1], found[2] or "")
         twins: dict[tuple[UUID | None, frozenset[str], frozenset[str]], list[UUID]] = {}
         for contest, (_, wanted) in published.items():
             if len(wanted) > 1 and not wanted <= {"yes", "no"}:
@@ -1099,12 +1103,14 @@ def plan(
         matched = {"other": 0, "state": 0}
         picks = []
 
-        def choose(people: frozenset[str], words: set[str], places: list[str], wide: bool):
+        def choose(
+            people: frozenset[str], words: set[str], places: list[str], wide: bool, seat: tuple[str, str] | None = None
+        ):
             scored = []
             for contest, (key, wanted) in published.items():
                 segment = key.split(":")[2]
                 if wide:
-                    if contest not in statewide:
+                    if contest not in statewide or (seat and seats.get(contest, seat) != seat):
                         continue
                 elif (
                     re.fullmatch(r"\d{5}|\d{10}", segment)
@@ -1150,12 +1156,13 @@ def plan(
                 if w not in STOP
             }
             wide = office == "state"
-            best, ok = choose(people, words, places, wide)
+            seat = (found[1], found[2] or "") if wide and (found := SEAT.search(name)) else None
+            best, ok = choose(people, words, places, wide, seat)
             if ok:
                 picks.append((best[0], name, places, office))
                 continue
             split = (
-                [([place], choose(people, words, [place], wide)) for place in places]
+                [([place], choose(people, words, [place], wide, seat)) for place in places]
                 if len(places) > 1 and not wide
                 else []
             )
