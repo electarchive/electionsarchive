@@ -52,6 +52,7 @@
   import Seated from "./seated.svelte";
   import Series from "./series.svelte";
   import States from "./states.svelte";
+  import Sweep from "./sweep.svelte";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
 
@@ -105,6 +106,12 @@
       orpc.elections.alongside.queryKey({ input: { id } }),
       sections.alongside,
     );
+    if (sections.winners != null) {
+      client.setQueryData(
+        orpc.elections.winners.queryKey({ input: { id } }),
+        sections.winners,
+      );
+    }
   });
 
   const STATUSES: Record<string, () => string> = {
@@ -327,9 +334,12 @@
     isNavigated &&
       new Set(ordered.flatMap((race) => race.scope ?? [])).size > 1,
   );
+  const isSwept = $derived(
+    scope == null && (sections.winners?.tiers.length ?? 0) > 0,
+  );
   const shown = $derived(
     isNavigated
-      ? focus === -1 && (isGrid || isBallot)
+      ? focus === -1 && (isGrid || isBallot || isSwept)
         ? -1
         : Math.max(focus, 0)
       : null,
@@ -1679,6 +1689,14 @@
 {/if}
 
 {#snippet body()}
+  {#if isSwept && focus === -1}
+    <Sweep
+      {id}
+      year={election.date?.slice(0, 4) ?? ""}
+      hexes={hexes.data ?? null}
+    />
+  {/if}
+
   {#if election.composition != null && focus === -1}
     {const composition = $derived(election.composition)}
     <section class="col-span-12 grid gap-2 bg-card px-3.5 py-3">
@@ -2575,9 +2593,15 @@
 
 {#snippet board()}
   <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
-    <h2 id="board-title" class="sr-only">
-      {m.board_title({ count: races.length })}
-    </h2>
+    {#if isSwept}
+      <h2 id="board-title" class="pbs-4 heading">
+        {m.sweep_offices_title()}
+      </h2>
+    {:else}
+      <h2 id="board-title" class="sr-only">
+        {m.board_title({ count: races.length })}
+      </h2>
+    {/if}
     <ol
       class="grid gap-x-10 lg:grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]"
     >
@@ -2982,7 +3006,7 @@
       race={ordered.find((race) => race.electors != null)?.name ?? null}
     />
   {:else if parts.length >= 40}
-    <Winners {id} {parts} />
+    <Winners {id} {parts} hasMap={!isSwept} />
   {:else if parts.length > 0}
     <States {id} />
     {#if election.seated != null}

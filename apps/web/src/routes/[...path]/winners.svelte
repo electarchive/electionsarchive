@@ -14,9 +14,11 @@
   const {
     id,
     parts,
+    hasMap = true,
   }: {
     id: string;
     parts: Array<{ path: string | null; place: string | null; name: string }>;
+    hasMap?: boolean;
   } = $props();
 
   const uid = $props.id();
@@ -171,7 +173,7 @@
           )}
       />
     </div>
-    {#if shape != null}
+    {#if shape != null && hasMap}
       {#if shape.map.tiles != null}
         {#key shape.places.level}
           <PlaceMap

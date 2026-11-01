@@ -718,6 +718,8 @@ function depth(path: string) {
   return path.split("/").length;
 }
 
+const TIERS = ["metro", "seat", "district", "town"] as const;
+
 function key(row: { party: string | null; person: string | null }) {
   return row.party == null
     ? `person:${row.person ?? ""}`
@@ -16031,7 +16033,7 @@ export const elections = {
         method: "GET",
         path: "/elections/{id}/winners",
         summary:
-          "List who won the office in each of an election's child elections, grouped by region",
+          "List who won the office in each of an election's child elections, grouped by region, with each party's wins by tier, its share of the vote, and who held each office after the previous election",
       }),
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid(), v.toLowerCase()) }))
@@ -16042,6 +16044,7 @@ export const elections = {
           v.object({
             id: v.string(),
             k: v.nullable(v.number()),
+        before: v.nullable(v.object({ path: v.string(), date: v.string() })),
             name: v.string(),
           }),
         ),
@@ -16050,140 +16053,497 @@ export const elections = {
           v.object({
             path: v.string(),
             at: v.nullable(v.number()),
+        parties: v.array(
+          v.object({
+            key: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+            party: v.nullable(v.string()),
+            won: v.array(v.number()),
+            held: v.array(v.number()),
+            share: v.nullable(v.number()),
+            earlier: v.nullable(v.number()),
+          }),
+        ),
+        tiers: v.array(
+          v.object({
+            code: v.picklist(TIERS),
+            total: v.number(),
+            before: v.number(),
+          }),
+        ),
+        measure: v.nullable(
+          v.object({
+            mayors: v.number(),
+            councils: v.number(),
+            valid: v.number(),
+          }),
+        ),
             group: v.nullable(v.string()),
             person: v.nullable(v.string()),
             party: v.nullable(v.string()),
             label: v.nullable(v.string()),
             short: v.nullable(v.string()),
+            tier: v.picklist(TIERS),
             color: v.nullable(v.string()),
             isLed: v.boolean(),
           }),
         ),
       }),
     )
+            share: v.nullable(v.number()),
+            margin: v.nullable(v.number()),
+            prior: v.nullable(v.string()),
     .handler(async ({ input }) => {
-      const offices = await db.execute<{ id: string }>(sql`
-        select c.id from election k join contest c on c.election_id = k.id and c.kind = 'office'
-        where k.parent_id = ${input.id}::uuid
-      `);
-      const decisions = await decide(offices.rows.map((row) => row.id));
-      const decided = decisions
-        .entries()
-        .filter(([id, chain]) => chain.final !== id)
-        .toArray();
-      const found = await db.execute<{
-        path: string;
-        group: string | null;
-        area: string | null;
-        date: string;
-        person: string | null;
-        party: string | null;
-        label: string | null;
-        color: string | null;
-        shaped: string | null;
-        led: boolean | null;
-      }>(sql`
-        with top as (
-          select pt.area_id as id from election e
-          join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-          where e.id = ${input.id}::uuid limit 1
-        )
-        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, g.id as group, z.id as shaped
-        from election k
-        join slug s on s.entity_id = k.id and s.is_current
-        left join lateral (
-          select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, ar.id as area, pick.led,
-            (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-             where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
-            ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${input.id}::uuid`, sql`k.date_from`)} as color
-          from contest c
-          left join unnest(
-            ${sql.param(decided.map(([id]) => id))}::uuid[],
-            ${sql.param(decided.map(([, chain]) => chain.final))}::uuid[]
-          ) as d(id, final) on d.id = c.id
-          join result_set rs on rs.contest_id = coalesce(d.final, c.id) and ${latest("rs")}
-          cross join lateral (
-            select coalesce(c.district_area_id, (
-              select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
-              order by pt.valid @> k.date_from desc limit 1
-            )) as id
-          ) ar
-          left join area da on da.id = ar.id
-          cross join lateral (
-            (
-              select x.option_id as id, false as led from outcome x
-              where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-              order by x.option_id limit 1
-            )
-            union all
-            (
-              select o.id, true from (
-                select y.option_k, sum(y.value) as value from result_rollup y
-                where y.result_set_k = rs.k and y.area_k = da.k and y.measure = 1 and y.option_k <> 0
-                  and y.count_round = (
-                    select max(z.count_round) from result_rollup z
-                    where z.result_set_k = rs.k and z.area_k = da.k and z.measure = 1 offset 0
-                  )
-                group by y.option_k
-                offset 0
-              ) t
-              join contest_option o on o.k = t.option_k
-              order by t.value desc limit 1
-            )
-            limit 1
-          ) pick
-          join contest_option o on o.id = pick.id
-          left join entity_merge pm on pm.entity_id = o.party_id
-          where c.election_id = k.id and c.kind = 'office'
-          order by c.id limit 1
-        ) w on true
-        left join lateral (
-          with recursive up(id, depth) as (
-            select w.area, 0
-            union all
-            select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
-            where up.depth < 6 and up.id <> (select id from top)
+      const crown = async (election: string) => {
+        const offices = await db.execute<{ id: string }>(sql`
+          select c.id from election k join contest c on c.election_id = k.id and c.kind = 'office'
+          where k.parent_id = ${election}::uuid
+        `);
+        const decisions = await decide(offices.rows.map((row) => row.id));
+        const decided = decisions
+          .entries()
+          .filter(([id, chain]) => chain.final !== id)
+          .toArray();
+        const found = await db.execute<{
+          path: string;
+          group: string | null;
+          area: string | null;
+          date: string;
+          person: string | null;
+          party: string | null;
+          label: string | null;
+          color: string | null;
+          shaped: string | null;
+          led: boolean | null;
+          votes: Array<[string | null, string | null, number]> | null;
+          office: string | null;
+        }>(sql`
+          with top as (
+            select pt.area_id as id from election e
+            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            where e.id = ${election}::uuid limit 1
           )
-          select up.id from up
-          where exists (select from area_parent p where p.area_id = up.id and p.parent_id = (select id from top))
-          order by up.depth limit 1
-        ) g on true
-        left join lateral (
-          with recursive up(id, depth) as (
-            select w.area, 0
-            union all
-            select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
-            where up.depth < 6 and p.valid @> k.date_from
+          select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, w.led, w.votes, w.office, g.id as group, z.id as shaped
+          from election k
+          join slug s on s.entity_id = k.id and s.is_current
+          left join lateral (
+            select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, ar.id as area, pick.led,
+              (select f.kind::text from office f where f.id = c.office_id) as office,
+              (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+               where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
+              ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${election}::uuid`, sql`k.date_from`)} as color,
+              (
+                select json_agg(json_build_array(
+                  coalesce(qm.into_id, q.party_id),
+                  (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+                   where cy.option_id = q.id and cy.role = 'head' order by cy.id limit 1),
+                  t.value
+                ))
+                from (
+                  select y.option_k, sum(y.value)::float8 as value from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = da.k and y.measure = 1 and y.option_k <> 0
+                    and y.count_round = (
+                      select max(z.count_round) from result_rollup z
+                      where z.result_set_k = rs.k and z.area_k = da.k and z.measure = 1 offset 0
+                    )
+                  group by y.option_k
+                  offset 0
+                ) t
+                join contest_option q on q.k = t.option_k
+                left join entity_merge qm on qm.entity_id = q.party_id
+              ) as votes
+            from contest c
+            left join unnest(
+              ${sql.param(decided.map(([id]) => id))}::uuid[],
+              ${sql.param(decided.map(([, chain]) => chain.final))}::uuid[]
+            ) as d(id, final) on d.id = c.id
+            join result_set rs on rs.contest_id = coalesce(d.final, c.id) and ${latest("rs")}
+            cross join lateral (
+              select coalesce(c.district_area_id, (
+                select pt.area_id from polity_territory pt where pt.polity_id = k.polity_id
+                order by pt.valid @> k.date_from desc limit 1
+              )) as id
+            ) ar
+            left join area da on da.id = ar.id
+            cross join lateral (
+              (
+                select x.option_id as id, false as led from outcome x
+                where x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+                order by x.option_id limit 1
+              )
+              union all
+              (
+                select o.id, true from (
+                  select y.option_k, sum(y.value) as value from result_rollup y
+                  where y.result_set_k = rs.k and y.area_k = da.k and y.measure = 1 and y.option_k <> 0
+                    and y.count_round = (
+                      select max(z.count_round) from result_rollup z
+                      where z.result_set_k = rs.k and z.area_k = da.k and z.measure = 1 offset 0
+                    )
+                  group by y.option_k
+                  offset 0
+                ) t
+                join contest_option o on o.k = t.option_k
+                order by t.value desc limit 1
+              )
+              limit 1
+            ) pick
+            join contest_option o on o.id = pick.id
+            left join entity_merge pm on pm.entity_id = o.party_id
+            where c.election_id = k.id and c.kind = 'office'
+            order by c.id limit 1
+          ) w on true
+          left join lateral (
+            with recursive up(id, depth) as (
+              select w.area, 0
+              union all
+              select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
+              where up.depth < 6 and up.id <> (select id from top) and p.valid @> k.date_from
+            )
+            select up.id from up
+            where exists (
+              select from area_parent p
+              where p.area_id = up.id and p.parent_id = (select id from top) and p.valid @> k.date_from
+            )
+            order by up.depth limit 1
+          ) g on true
+          left join lateral (
+            with recursive up(id, depth) as (
+              select w.area, 0
+              union all
+              select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
+              where up.depth < 6 and p.valid @> k.date_from
+            )
+            select up.id from up
+            where exists (select from area_geometry ag where ag.area_id = up.id)
+            order by up.depth limit 1
+          ) z on true
+          where k.parent_id = ${election}::uuid
+        `);
+        const segments = new Map(
+          found.rows.flatMap((row) =>
+            row.group == null ? [] : [[row.path.split("/", 2)[1], row.group]],
+          ),
+        );
+        for (const row of found.rows) {
+          row.group ??= segments.get(row.path.split("/", 2)[1]) ?? null;
+        }
+        let least = Infinity;
+        for (const row of found.rows) {
+          least = Math.min(least, depth(row.path));
+        }
+        const heads = new Map(
+          Map.groupBy(
+            found.rows.filter((row) => depth(row.path) === least),
+            (row) => row.group ?? "",
           )
-          select up.id from up
-          where exists (select from area_geometry ag where ag.area_id = up.id)
-          order by up.depth limit 1
-        ) z on true
-        where k.parent_id = ${input.id}::uuid
-      `);
-      if (found.rows.length < 40) {
-        return { noun: null, groups: [], maps: [], rows: [] };
-      }
-      const segments = new Map(
-        found.rows.flatMap((row) =>
-          row.group == null ? [] : [[row.path.split("/", 2)[1], row.group]],
+            .entries()
+            .map(([group, members]) => [
+              group,
+              members.toSorted((a, b) => a.path.length - b.path.length)[0],
+            ]),
+        );
+        return found.rows.map((row) => {
+          const level = depth(row.path) - least;
+          const tally = new Map<string, number>();
+          for (const [party, person, value] of row.votes ?? []) {
+            const at = key({ party, person });
+            tally.set(at, (tally.get(at) ?? 0) + value);
+          }
+          const tier: (typeof TIERS)[number] =
+            level >= 2
+              ? "town"
+              : level === 1 || row.group == null
+                ? "district"
+                : heads.get(row.group) === row
+                  ? row.area === row.group
+                    ? "metro"
+                    : "seat"
+                  : row.area === row.group
+                    ? "town"
+                    : "district";
+          return {
+            ...row,
+            tier,
+            tally,
+            place: row.path.slice(0, row.path.lastIndexOf("/")),
+          };
+        });
+      };
+      const [rows, earlier, held] = await Promise.all([
+        crown(input.id),
+        db.execute<{ id: string; path: string; date: string }>(
+          sql`
+            select p.id, s.path, p.date_from::text as date
+            from election e
+            join election p on p.polity_id = e.polity_id and p.kind = e.kind and p.parent_id is null
+              and p.rerun_of_id is null and p.date_from < e.date_from
+            join slug s on s.entity_id = p.id and s.is_current
+            where e.id = ${input.id}::uuid
+              and (select count(*) from election x where x.parent_id = p.id) * 2
+                >= (select count(*) from election x where x.parent_id = e.id)
+            order by p.date_from desc limit 1
+          `,
         ),
       );
-      for (const row of found.rows) {
-        row.group ??= segments.get(row.path.split("/", 2)[1]) ?? null;
+      const current = new Set([
+        ...rows.flatMap((row) => row.party ?? []),
+        ...(measure?.totals.keys() ?? [])
+          .filter((entry) => entry.startsWith("party:"))
+          .map((entry) => entry.slice(6)),
+      ]);
+      const heirs = new Map<string, string>();
+      for (const party of current) {
+        if (root(party) === party || !heirs.has(root(party))) {
+          heirs.set(root(party), party);
+        }
       }
-      const groups = [...new Set(found.rows.flatMap((row) => row.group ?? []))];
-      const date = found.rows[0]?.date ?? "infinity";
-      const [labels, nouns, areas, territory] = await Promise.all([
-        names(
-          [
-            ...groups,
-            ...found.rows.flatMap((row) =>
-              [row.person, row.party, row.area].filter((id) => id != null),
-            ),
-          ],
-          found.rows[0]?.date ?? null,
+        db.execute<{ kind: string }>(
+          sql`select e.kind::text as kind from election e where e.id = ${input.id}::uuid`,
         ),
+      ]);
+      if (rows.length < 40) {
+        return {
+          noun: null,
+          before: null,
+          groups: [],
+          maps: [],
+          parties: [],
+          tiers: [],
+          measure: null,
+          rows: [],
+        };
+      }
+      const before = earlier.rows[0] ?? null;
+      const earliest = before == null ? [] : await crown(before.id);
+      const groups = [...new Set(rows.flatMap((row) => row.group ?? []))];
+      const date = rows[0]?.date ?? "infinity";
+      const isLayered =
+        held.rows[0]?.kind === "local" &&
+        rows.filter((row) => row.office === "mayor").length * 10 >=
+          rows.length * 9 &&
+        rows.filter((row) => row.tier === "metro" || row.tier === "seat")
+          .length *
+          2 >=
+          groups.length;
+      const measured = async (
+        election: string,
+        crowned: typeof rows,
+        day: string,
+      ) => {
+        const regions = [...new Set(crowned.flatMap((row) => row.group ?? []))];
+        const [tallies, places] = await Promise.all([
+          db.execute<{ contest: string; k: number }>(sql`
+            select c.id as contest, rs.k from contest c
+            left join office f on f.id = c.office_id
+            join result_set rs on rs.contest_id = c.id and ${latest("rs")}
+            where c.election_id = ${election}::uuid and c.kind = 'body_seats' and f.kind is distinct from 'mayor'
+          `),
+          db.execute<{ id: string; k: number }>(sql`
+            select a.id, a.k from area a where a.id = any(${sql.param(regions)}::uuid[])
+          `),
+        ]);
+        const summed =
+          tallies.rows.length === 0 || places.rows.length === 0
+            ? []
+            : (
+                await db.execute<{
+                  tally: number;
+                  area: number;
+                  round: number;
+                  party: string | null;
+                  value: number;
+                }>(sql`
+                  select y.result_set_k as tally, y.area_k as area, y.count_round as round,
+                    coalesce(pm.into_id, o.party_id) as party, sum(y.value)::float8 as value
+                  from result_rollup y
+                  join contest_option o on o.k = y.option_k
+                  left join entity_merge pm on pm.entity_id = o.party_id
+                  where y.result_set_k = any(${sql.param(tallies.rows.map((row) => row.k))}::bigint[])
+                    and y.area_k = any(${sql.param(places.rows.map((row) => row.k))}::bigint[])
+                    and y.measure = 1 and y.option_k <> 0
+                  group by 1, 2, 3, 4
+                `)
+              ).rows;
+        const parties = [...new Set(summed.flatMap((row) => row.party ?? []))];
+        const painted =
+          parties.length === 0
+            ? []
+            : (
+                await db.execute<{ id: string; color: string | null }>(sql`
+                  select p.id, ${paint(sql`p.id`, sql`select ${election}::uuid`, sql`${day}::date`)} as color
+                  from unnest(${sql.param(parties)}::uuid[]) as p(id)
+                `)
+              ).rows;
+        const tone = new Map(painted.map((row) => [row.id, row.color]));
+        const contests = new Map(
+          tallies.rows.map((row) => [row.k, row.contest]),
+        );
+        const ids = new Map(places.rows.map((row) => [row.k, row.id]));
+        const last = new Map<string, number>();
+        for (const row of summed) {
+          const at = `${row.tally}:${row.area}`;
+          last.set(at, Math.max(last.get(at) ?? 0, row.round));
+        }
+        const councils = {
+          rows: summed
+            .filter((row) => last.get(`${row.tally}:${row.area}`) === row.round)
+            .map((row) => ({
+              contest: contests.get(row.tally) ?? "",
+              area: ids.get(row.area) ?? "",
+              party: row.party,
+              color: tone.get(row.party ?? "") ?? null,
+              value: row.value,
+            })),
+        };
+        const colors = new Map<string, string>();
+        const local = new Map(
+          Map.groupBy(councils.rows, (row) => row.area)
+            .entries()
+            .map(([region, entries]) => [
+              region,
+              new Map(
+                Map.groupBy(entries, (row) => row.contest)
+                  .entries()
+                  .map(([contest, members]) => {
+                    const sums = new Map<string, number>();
+                    let all = 0;
+                    for (const entry of members) {
+                      const party = key({ party: entry.party, person: null });
+                      sums.set(party, (sums.get(party) ?? 0) + entry.value);
+                      all += entry.value;
+                      if (entry.color != null) {
+                        colors.set(party, entry.color);
+                      }
+                    }
+                    return [contest, { sums, all }];
+                  }),
+              ),
+            ]),
+        );
+        const widest = new Map<string, number>();
+        for (const tallied of local.values()) {
+          const top = tallied
+            .entries()
+            .toArray()
+            .toSorted((a, b) => b[1].all - a[1].all)[0];
+          if (top != null) {
+            widest.set(top[0], (widest.get(top[0]) ?? 0) + 1);
+          }
+        }
+        const general = widest
+          .entries()
+          .toArray()
+          .toSorted((a, b) => b[1] - a[1])[0]?.[0];
+        const totals = new Map<string, number>();
+        let mayors = 0;
+        let counted = 0;
+        let valid = 0;
+        for (const region of regions) {
+          const tallied = local.get(region);
+          const metro = crowned.find(
+            (row) =>
+              row.tier === "metro" &&
+              row.group === region &&
+              row.tally.size > 0,
+          );
+          let tally = tallied?.get(general ?? "")?.sums ?? null;
+          if (tally != null) {
+            counted += 1;
+          } else if (metro != null) {
+            tally = metro.tally;
+            mayors += 1;
+          } else {
+            tally =
+              tallied
+                ?.values()
+                .toArray()
+                .toSorted((a, b) => b.all - a.all)[0]?.sums ?? null;
+            if (tally == null) {
+              continue;
+            }
+            counted += 1;
+          }
+          for (const [party, value] of tally) {
+            totals.set(party, (totals.get(party) ?? 0) + value);
+            valid += value;
+          }
+        }
+        return mayors + counted === regions.length && valid > 0
+          ? { totals, colors, valid, mayors, councils: counted }
+          : null;
+      };
+      const [measure, measureBefore] = isLayered
+        ? await Promise.all([
+            measured(input.id, rows, date),
+            before == null
+              ? null
+              : measured(before.id, earliest, earliest[0]?.date ?? before.date),
+          ])
+        : [null, null];
+      const relations =
+        before == null
+          ? []
+          : (
+              await db.execute<{ from: string; to: string; kind: string }>(sql`
+                select coalesce(fm.into_id, r.from_party_id) as from, coalesce(tm.into_id, r.to_party_id) as to, r.kind::text as kind
+                from party_relation r
+                left join entity_merge fm on fm.entity_id = r.from_party_id
+                left join entity_merge tm on tm.entity_id = r.to_party_id
+                where r.to_party_id is not null and (r.date is null or r.date <= ${date}::date)
+                  and (r.election_id is null or r.election_id in (${input.id}::uuid, ${before.id}::uuid))
+                union all
+                select coalesce(fm.into_id, a.party_id), coalesce(tm.into_id, a.parent_party_id), a.kind::text
+                from party_affiliation a
+                left join entity_merge fm on fm.entity_id = a.party_id
+                left join entity_merge tm on tm.entity_id = a.parent_party_id
+                where a.kind = 'regional_branch' and a.valid @> ${date}::date
+              `)
+            ).rows;
+      const root = ancestry(
+        relations.map((row) => ({ ...row, toLabel: "" })),
+        "party",
+      const heir = (party: string) =>
+        current.has(party) ? party : (heirs.get(root(party)) ?? party);
+      const rekey = (entry: string) =>
+        entry.startsWith("party:") ? `party:${heir(entry.slice(6))}` : entry;
+      const retally = (tally: Map<string, number>) => {
+        const next = new Map<string, number>();
+        for (const [entry, value] of tally) {
+          next.set(rekey(entry), (next.get(rekey(entry)) ?? 0) + value);
+        }
+        return next;
+      };
+      const prior = earliest.map((row) => ({
+        ...row,
+        party: row.party == null ? null : heir(row.party),
+        tally: retally(row.tally),
+      }));
+      const then = new Map(prior.map((row) => [row.place, row]));
+      if (measureBefore != null) {
+        measureBefore.totals = retally(measureBefore.totals);
+        measureBefore.colors = new Map(
+          measureBefore.colors
+            .entries()
+            .map(([entry, color]) => [rekey(entry), color]),
+        );
+      }
+      const mentioned = [
+        ...groups,
+        ...[...rows, ...prior].flatMap((row) =>
+          [row.person, row.party, row.area].filter((id) => id != null),
+        ),
+        ...[
+          ...(measure?.totals.keys() ?? []),
+          ...(measureBefore?.totals.keys() ?? []),
+        ]
+          .filter((entry) => entry.startsWith("party:"))
+          .map((entry) => entry.slice(6)),
+      ];
+      const [labels, nouns, areas, territory] = await Promise.all([
+        names([...new Set(mentioned)], rows[0]?.date ?? null),
         db.execute<{ noun: string }>(sql`
           select sc.noun from area a join scheme sc on sc.code = a.scheme_code
           where a.id = any(${sql.param(groups)}::uuid[])
@@ -16205,7 +16565,7 @@ export const elections = {
             where g.area_id = a.id and g.valid @> ${date}::date limit 1
           ) g on true
           cross join lateral (select ${spot("coalesce(g.label_point, ST_PointOnSurface(g.geom))", "a.scheme_code")} as p) at
-          where a.id = any(${sql.param([...new Set([...groups, ...found.rows.flatMap((row) => [row.area, row.shaped].filter((id) => id != null))])])}::uuid[])
+          where a.id = any(${sql.param([...new Set([...groups, ...rows.flatMap((row) => [row.area, row.shaped].filter((id) => id != null))])])}::uuid[])
         `),
         db.execute<{ id: string; k: number }>(sql`
           select a.id, a.k from election e
@@ -16218,14 +16578,14 @@ export const elections = {
       const top = area.get(groups[0] ?? "")?.scheme;
       const levels = [
         groups.flatMap((group) => {
-          const own = found.rows.filter((row) => row.group === group);
+          const own = rows.filter((row) => row.group === group);
           const pick =
-            own.find((row) => row.area === group) ??
-            own.find((row) => depth(row.path) === 3);
+            own.find((row) => row.tier === "metro") ??
+            own.find((row) => row.tier === "seat");
           return pick == null ? [] : [{ row: pick, at: group }];
         }),
         Map.groupBy(
-          found.rows.filter(
+          rows.filter(
             (row) =>
               row.area != null &&
               area.get(row.area)?.scheme !== top &&
@@ -16234,37 +16594,66 @@ export const elections = {
           (row) => row.area ?? "",
         )
           .entries()
-          .flatMap(([at, rows]) => {
-            const row = rows.toSorted(
+          .flatMap(([at, members]) => {
+            const row = members.toSorted(
               (a, b) => depth(a.path) - depth(b.path),
             )[0];
             return row == null ? [] : [{ row, at }];
           })
           .toArray(),
       ].filter((level) => level.length > 1);
-      const legend = Map.groupBy(
-        levels.flat().map((entry) => entry.row),
-        key,
-      )
-        .entries()
-        .toArray()
-        .toSorted((a, b) => b[1].length - a[1].length)
-        .map(([entry, rows]) => ({
+      const named = (row: { party: string | null; person: string | null }) =>
+        labels.full.get(row.party ?? row.person ?? "") ?? null;
+      const shown = levels.flat().map((entry) => entry.row);
+      const legend = [
+        ...Map.groupBy(shown, key)
+          .entries()
+          .toArray()
+          .toSorted(
+            (a, b) =>
+              (measure?.totals.get(b[0]) ?? 0) -
+                (measure?.totals.get(a[0]) ?? 0) || b[1].length - a[1].length,
+          ),
+        ...Map.groupBy(
+          shown.flatMap((row) => then.get(row.place) ?? []),
+          key,
+        ),
+      ]
+        .filter(
+          ([entry], index, all) =>
+            all.findIndex(([other]) => other === entry) === index,
+        )
+        .map(([entry, members]) => ({
           key: entry,
           label:
-            labels.full.get(rows[0]?.party ?? rows[0]?.person ?? "") ??
-            rows[0]?.label ??
+            named(members[0] ?? { party: null, person: null }) ??
+            members[0]?.label ??
             "",
-          short: labels.short.get(rows[0]?.party ?? "") ?? null,
-          color: rows[0]?.color ?? null,
-          person: rows[0]?.party == null ? (rows[0]?.person ?? null) : null,
-          party: rows[0]?.party ?? null,
+          short: labels.short.get(members[0]?.party ?? "") ?? null,
+          color: members[0]?.color ?? null,
+          person:
+            members[0]?.party == null ? (members[0]?.person ?? null) : null,
+          party: members[0]?.party ?? null,
         }));
       const position = new Map(legend.map((item, index) => [item.key, index]));
       const nation = territory.rows[0];
       const maps =
         nation == null
           ? []
+      const split = (tally: Map<string, number>, winner: string) => {
+        let valid = 0;
+        let rival = 0;
+        for (const [entry, value] of tally) {
+          valid += value;
+          if (entry !== winner) {
+            rival = Math.max(rival, value);
+          }
+        }
+        const own = tally.get(winner) ?? 0;
+        return valid === 0
+          ? { valid, share: null, margin: null }
+          : { valid, share: own / valid, margin: (own - rival) / valid };
+      };
           : await Promise.all(
               levels.map(async (level) => {
                 const first = area.get(level[0]?.at ?? "");
@@ -16294,6 +16683,15 @@ export const elections = {
                               ? []
                               : [
                                   {
+                            const old = then.get(row.place);
+                            const { valid, margin } = split(
+                              row.tally,
+                              key(row),
+                            );
+                            const oldValid =
+                              old == null
+                                ? 0
+                                : split(old.tally, key(old)).valid;
                                     k: place.k,
                                     at:
                                       place.x == null || place.y == null
@@ -16306,12 +16704,30 @@ export const elections = {
                                     path: row.path,
                                     contest: true,
                                     isRemainder: false,
-                                    valid: 0,
-                                    shares: legend.map(() => 0),
+                                    valid,
+                                    shares: legend.map((item) =>
+                                      valid === 0
+                                        ? 0
+                                        : (row.tally.get(item.key) ?? 0) /
+                                          valid,
+                                    ),
                                     leader: position.get(key(row)) ?? null,
-                                    margin: null,
-                                    earlier: null,
-                                    prior: null,
+                                    margin:
+                                      margin == null
+                                        ? null
+                                        : Math.max(margin, 0),
+                                    earlier:
+                                      old == null || oldValid === 0
+                                        ? null
+                                        : legend.map(
+                                            (item) =>
+                                              (old.tally.get(item.key) ?? 0) /
+                                              oldValid,
+                                          ),
+                                    prior:
+                                      old == null
+                                        ? null
+                                        : (position.get(key(old)) ?? null),
                                   },
                                 ];
                           }),
@@ -16323,31 +16739,146 @@ export const elections = {
       return {
         noun: nouns.rows[0]?.noun ?? null,
         maps: maps.flat(),
-
+        parties,
+        tiers: (isLayered ? TIERS : [])
+          .map((code) => ({
+            code,
+            total: rows.filter((row) => row.tier === code).length,
+            before: prior.filter((row) => row.tier === code).length,
+          }))
+          .filter((tier) => tier.total > 0),
+        measure:
+          measure == null
+            ? null
+            : {
+                mayors: measure.mayors,
+                councils: measure.councils,
+                valid: measure.valid,
+              },
+      const counts = (crowned: typeof rows) => {
+        const found = new Map<string, Array<number>>();
+        for (const row of crowned) {
+          if (row.label == null) {
+            continue;
+          }
+          const at = row.party == null ? "independent" : key(row);
+          const entry = found.get(at) ?? TIERS.map(() => 0);
+          const index = TIERS.indexOf(row.tier);
+          entry[index] = (entry[index] ?? 0) + 1;
+          found.set(at, entry);
+        }
+        return found;
+      };
+      const pooled = (totals: Map<string, number> | undefined) => {
+        const next = new Map<string, number>();
+        for (const [entry, value] of totals ?? []) {
+          const at = entry.startsWith("party:") ? entry : "independent";
+          next.set(at, (next.get(at) ?? 0) + value);
+        }
+        return next;
+      };
+      const all = (values: Array<number>) => {
+        let sum = 0;
+        for (const value of values) {
+          sum += value;
+        }
+        return sum;
+      };
+      const shares = pooled(measure?.totals);
+      const shared = pooled(measureBefore?.totals);
+      const won = counts(rows);
+      const kept = counts(prior);
+      const sample = new Map([...prior, ...rows].map((row) => [key(row), row]));
+      const parties = [
+        ...new Set([
+          ...won.keys(),
+          ...kept.keys(),
+          ...shares.keys(),
+          ...shared.keys(),
+        ]),
+      ]
+        .flatMap((entry) => {
+          const share =
+            measure == null ? null : (shares.get(entry) ?? 0) / measure.valid;
+          const earlierShare =
+            measureBefore == null
+              ? null
+              : (shared.get(entry) ?? 0) / measureBefore.valid;
+          if (
+            !won.has(entry) &&
+            !kept.has(entry) &&
+            (share ?? 0) < 0.01 &&
+            (earlierShare ?? 0) < 0.01
+          ) {
+            return [];
+          }
+          const row = sample.get(entry);
+          const party = entry.startsWith("party:") ? entry.slice(6) : null;
+          return [
+            {
+              key: entry,
+              label:
+                party == null
+                  ? entry
+                  : (labels.full.get(party) ?? row?.label ?? ""),
+              short: labels.short.get(party ?? "") ?? null,
+              color:
+                party == null
+                  ? null
+                  : (rows.find((other) => key(other) === entry)?.color ??
+                    measure?.colors.get(entry) ??
+                    row?.color ??
+                    measureBefore?.colors.get(entry) ??
+                    null),
+              party,
+              won: won.get(entry) ?? TIERS.map(() => 0),
+              held: kept.get(entry) ?? TIERS.map(() => 0),
+              share,
+              earlier: earlierShare,
+            },
+          ];
+        })
+        .filter((entry) => entry.label !== "")
+        .toSorted(
+          (a, b) =>
+            Number(a.party == null) - Number(b.party == null) ||
+            (b.share ?? 0) - (a.share ?? 0) ||
+            all(b.won) - all(a.won),
+        );
         groups: groups
           .map((id) => ({
+        before:
+          before == null ? null : { path: before.path, date: before.date },
             id,
             k: area.get(id)?.k ?? null,
             name: labels.full.get(id) ?? "",
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name, "tr")),
-        rows: found.rows.map((row) => ({
-          path: row.path,
-          at: area.get(row.shaped ?? "")?.k ?? null,
-          group: row.group,
-          person: row.person,
-          party: row.party,
-          label:
-            labels.full.get(row.person ?? "") ??
-            labels.full.get(row.party ?? "") ??
-            row.label,
-          short:
-            labels.short.get(row.party ?? "") ??
-            labels.full.get(row.party ?? "") ??
-            null,
-          color: row.color,
-          isLed: row.led === true,
-        })),
+        rows: rows.map((row) => {
+          const old = then.get(row.place);
+          const { share, margin } = split(row.tally, key(row));
+          return {
+            path: row.path,
+            at: area.get(row.shaped ?? "")?.k ?? null,
+            group: row.group,
+            tier: row.tier,
+            person: row.person,
+            party: row.party,
+            label:
+              labels.full.get(row.person ?? "") ??
+              labels.full.get(row.party ?? "") ??
+              row.label,
+            short:
+              labels.short.get(row.party ?? "") ??
+              labels.full.get(row.party ?? "") ??
+              null,
+            color: row.color,
+            isLed: row.led === true,
+            share,
+            margin,
+            prior: old?.label == null ? null : key(old),
+          };
+        }),
       };
     }),
   local: os

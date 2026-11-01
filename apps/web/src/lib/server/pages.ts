@@ -1236,9 +1236,11 @@ export async function archive(path: string, search: URLSearchParams) {
         polity: string;
         date: string | null;
         tier: string | null;
+        isLocal: boolean;
       }>(sql`
         select e.polity_id as polity, e.date_from::text as date,
-          case when p.kind = 'county' then 'county' when p.kind = 'federal_unit' and p.iso_code like 'US-%' then 'state' end as tier
+          case when p.kind = 'county' then 'county' when p.kind = 'federal_unit' and p.iso_code like 'US-%' then 'state' end as tier,
+          e.kind = 'local' and (select count(*) from election c where c.parent_id = e.id) >= 40 as "isLocal"
         from election e join polity p on p.id = e.polity_id where e.id = ${slug.entity_id}::uuid
       `),
     ]);
@@ -1257,6 +1259,7 @@ export async function archive(path: string, search: URLSearchParams) {
       alongside,
       local,
       counties,
+      winners,
     ] = await found(
       Promise.all([
         call(router.elections.get, { ...input, within: scope?.id }),
@@ -1278,6 +1281,9 @@ export async function archive(path: string, search: URLSearchParams) {
               polity: day.polity,
               date: day.date,
             }),
+        scope != null || day?.isLocal !== true
+          ? null
+          : call(router.elections.winners, input),
       ]),
     );
     const race = unit === "" ? null : unit;
@@ -1298,7 +1304,15 @@ export async function archive(path: string, search: URLSearchParams) {
       election,
       cycle,
       series,
-      sections: { governments, regions, tiers, alongside, local, counties },
+      sections: {
+        governments,
+        regions,
+        tiers,
+        alongside,
+        local,
+        counties,
+        winners,
+      },
       within,
     };
   }

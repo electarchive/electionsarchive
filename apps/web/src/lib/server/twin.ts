@@ -192,6 +192,82 @@ const table = (
     .map((row) => `| ${row.join(" | ")} |`)
     .join("\n");
 
+const sweepMarkdown = (winners: Winners) => {
+  const titles = {
+    metro: m.sweep_tier_metro,
+    seat: m.sweep_tier_seat,
+    district: m.sweep_tier_district,
+    town: m.sweep_tier_town,
+  };
+  const order = ["metro", "seat", "district", "town"] as const;
+  const tiers = winners.tiers.map((tier) => ({
+    ...tier,
+    at: order.indexOf(tier.code),
+  }));
+  const since = winners.before?.date.slice(0, 4) ?? null;
+  const shown = (now: number, then: number) =>
+    since == null
+      ? count(now)
+      : `${count(now)} (${now > then ? "+" : ""}${count(now - then)})`;
+  const measure = winners.measure;
+  const nouns = plural(winners.noun ?? "");
+  return [
+    `## ${m.sweep_table_title()}`,
+    table(
+      [
+        m.col_party(),
+        ...(measure == null
+          ? []
+          : [
+              m.sweep_vote(),
+              ...(since == null ? [] : [m.sweep_since({ year: since })]),
+            ]),
+        ...tiers.map(
+          (tier) =>
+            `${titles[tier.code]()} (${m.sweep_of({ count: count(tier.total) })})`,
+        ),
+        m.sweep_all(),
+      ],
+      winners.parties.map((party) => [
+        party.party == null
+          ? m.sweep_independents()
+          : (party.short ?? party.label),
+        ...(measure == null
+          ? []
+          : [
+              percent(party.share ?? 0),
+              ...(since == null
+                ? []
+                : [points((party.share ?? 0) - (party.earlier ?? 0), 1)]),
+            ]),
+        ...tiers.map((tier) =>
+          shown(party.won[tier.at] ?? 0, party.held[tier.at] ?? 0),
+        ),
+        shown(
+          sum(tiers.map((tier) => party.won[tier.at] ?? 0)),
+          sum(tiers.map((tier) => party.held[tier.at] ?? 0)),
+        ),
+      ]),
+    ),
+    ...(measure == null
+      ? []
+      : [
+          measure.mayors === 0
+            ? m.sweep_measure_councils({
+                count: count(measure.councils),
+                nouns,
+              })
+            : measure.councils === 0
+              ? m.sweep_measure_mayors({ count: count(measure.mayors), nouns })
+              : m.sweep_measure_mixed({
+                  mayors: count(measure.mayors),
+                  councils: count(measure.councils),
+                  nouns,
+                }),
+        ]),
+  ];
+};
+
 const byline = (
   crumbs: Array<{ name: string; path: string | null }>,
   link: Link,
@@ -435,17 +511,22 @@ export async function twin({ request, url }: RequestEvent) {
     const winners =
       data.kind === "election" &&
       data.election.elections.filter((child) => !child.isStage).length >= 40
-        ? await call(router.elections.winners, { id: data.id }).catch(
+        ? (data.sections.winners ??
+          (await call(router.elections.winners, { id: data.id }).catch(
             () => null,
-          )
+          )))
         : null;
     if (format === "json") {
+      const plain =
+        data.kind === "election"
+          ? { ...data, sections: { ...data.sections, winners: undefined } }
+          : data;
       return Response.json(
         ledger?.places != null
-          ? { ...data, ledger }
+          ? { ...plain, ledger }
           : winners != null && winners.rows.length > 0
-            ? { ...data, winners: { ...winners, maps: undefined } }
-            : data,
+            ? { ...plain, winners: { ...winners, maps: undefined } }
+            : plain,
         { headers },
       );
     }
@@ -620,6 +701,9 @@ function markdown(
           link,
         ),
         ...knownMarkdown(data.known, link, false),
+        ...(winners == null || winners.tiers.length === 0
+          ? []
+          : sweepMarkdown(winners)),
         ...(winners == null || winners.rows.length === 0
           ? []
           : [
