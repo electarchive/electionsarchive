@@ -742,7 +742,7 @@ COLUMNS = {
         "Not voting",
     ),
 }
-LABELS = {"Washbarne": "Washburne", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour"}
+LABELS = {"Washbarne": "Washburne", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1904:democratic": [
@@ -1136,6 +1136,52 @@ CORRECTIONS = {
         (266, "DE", (0.433, 0.294, 0.536, 0.306), {"Bayard": 6, "McDonald": 0}, "the figure sits in the Bayard column, whose printed total of 170 counts it"),
         (266, "NJ", (0.536, 0.536, 0.632, 0.548), {"Randall": 11, "Thurman": 0}, "the figure sits in the Randall column, whose printed total of 78 counts it"),
         (266, "WA", (0.584, 0.804, 0.632, 0.816), {"Randall": 1}, "the figure sits in the Randall column, whose printed total of 78 counts it"),
+    ],
+    "1872:democratic": [
+        (66, "DE", (0.19, 0.517, 0.52, 0.529), {"Bayard": 6}, "Delaware, Bayard, 6, in the scattering list"),
+        (66, "FL", (0.19, 0.531, 0.52, 0.543), {"not voting": 2}, "Florida, blank, 2, in the scattering list"),
+        (66, "GA", (0.19, 0.546, 0.52, 0.558), {"not voting": 4}, "Georgia, blank, 4, in the scattering list"),
+        (66, "NJ", (0.19, 0.561, 0.52, 0.573), {"Bayard": 9}, "New Jersey, Bayard, 9, in the scattering list"),
+        (66, "PA", (0.53, 0.517, 0.85, 0.529), {"Black": 21}, "Pennsylvania, Black, 21, in the scattering list"),
+        (66, "WV", (0.53, 0.531, 0.85, 0.543), {"not voting": 2}, "West Virginia, blank, 2, in the scattering list"),
+    ],
+    "1880:democratic:b1": [
+        (124, "AL", (0.258, 0.188, 0.848, 0.199), {"votes": 20, "Bayard": 7, "Hancock": 7, "Field": 5, "Thurman": 1}, "20 held: 7, 7, 5, and 1 under Bayard, Hancock, Field, and Thurman"),
+        (124, "CO", (0.258, 0.227, 0.848, 0.238), {"votes": 6, "Field": 1, "Loveland": 5}, "6 held: 1 under Field and 5 under Loveland"),
+        (124, "CT", (0.258, 0.24, 0.848, 0.251), {"votes": 12, "Bayard": 4, "Thurman": 2, "Hendricks": 3, "Payne": 2, "not voting": 1}, "12 held, 11 recorded; the printed totals, 727\u00bd cast of 738, leave the vote unrecorded"),
+        (124, "IL", (0.258, 0.293, 0.848, 0.304), {"Morrison": 42, "Ewing": 0}, "42, in the Morrison column, whose printed total of 62 counts it"),
+        (124, "IA", (0.258, 0.319, 0.848, 0.33), {"Morrison": 6, "McDonald": 2, "Ewing": 0}, "6 under Morrison and 2 under McDonald, which their printed totals count"),
+        (124, "KY", (0.258, 0.345, 0.848, 0.356), {"McDonald": 1, "Morrison": 0}, "1, in the McDonald column, whose printed total of 3 counts it"),
+        (124, "MA", (0.258, 0.397, 0.848, 0.408), {"not voting": 1.5}, "26 held, 24\u00bd recorded; the printed totals, 727\u00bd cast of 738, leave the votes unrecorded"),
+        (124, "MI", (0.258, 0.41, 0.848, 0.421), {"not voting": 6}, "22 held, 16 recorded; the printed totals, 727\u00bd cast of 738, leave the votes unrecorded"),
+        (124, "NJ", (0.258, 0.501, 0.848, 0.512), {"votes": 18, "Bayard": 10, "Hendricks": 4, "Randall": 3, "Parker": 1, "McClellan": 0}, "18 held: 10 for Bayard, 4 for Hendricks, 3 for Randall, and 1 in the Parker column, whose printed total of 1 counts it"),
+        (124, "PA", (0.258, 0.566, 0.848, 0.577), {"not voting": 1}, "58 held, 57 recorded; the printed totals, 727\u00bd cast of 738, leave the vote unrecorded"),
+        (124, "TN", (0.258, 0.605, 0.848, 0.616), {"not voting": 1}, "24 held, 23 recorded; the printed totals, 727\u00bd cast of 738, leave the vote unrecorded"),
+        (124, "WI", (0.258, 0.67, 0.848, 0.681), {"Morrison": 10, "McClellan": 1, "Ewing": 0, "Lothrop": 0}, "10 under Morrison and 1 under McClellan, which their printed totals count"),
+    ],
+    "1884:democratic:b2": [
+        (280, "IL", (0.48, 0.333, 0.872, 0.343), {"not voting": 1}, "44 held, 43 recorded; the row is printed 'Illinois (1 absent)'"),
+        (280, "NC", (0.48, 0.558, 0.872, 0.568), {"Bayard": 22, "Hendricks": 0}, "22, in the Bayard column, whose printed total of 151\u00bd counts it"),
+        (280, "DC", (0.48, 0.745, 0.872, 0.755), {"Hendricks": 2, "Thurman": 0}, "2, in the Hendricks column, whose printed total of 123\u00bd counts it"),
+        (280, "UT", (0.48, 0.795, 0.872, 0.805), {"Hendricks": 1, "Thurman": 0}, "1, in the Hendricks column, whose printed total of 123\u00bd counts it"),
+    ],
+    "1896:democratic:b1": [
+        (330, "MA", (0.385, 0.441, 0.923, 0.453), {"Hill": 1, "Pennoyer": 0}, "1, in the Hill column beside Not Voting, whose printed total of 1 counts it"),
+    ],
+    "1896:democratic:b2": [
+        (335, "CO", (0.460, 0.239, 0.922, 0.253), {"votes": 8, "Teller": 8, "Pennoyer": 0}, "8 held: 8 Teller; one read sets an extra column in the row"),
+        (335, "CT", (0.460, 0.253, 0.922, 0.267), {"votes": 12, "Pattison": 2, "Not Voting": 10}, "12 held: 2 Pattison, 10 Not Voting; one read sets an extra column in the row"),
+        (335, "DE", (0.460, 0.267, 0.922, 0.282), {"votes": 6, "Bryan": 1, "Pattison": 3, "Not Voting": 2}, "6 held: 1 Bryan, 3 Pattison, 2 Not Voting; one read sets an extra column in the row"),
+        (335, "ME", (0.460, 0.412, 0.922, 0.426), {"votes": 12, "Bryan": 2, "Bland": 2, "Pattison": 5, "Not Voting": 3}, "12 held: 2 Bryan, 2 Bland, 5 Pattison, 3 Not Voting; one read sets an extra column in the row"),
+        (335, "MD", (0.460, 0.426, 0.922, 0.440), {"votes": 16, "Bryan": 4, "Pattison": 11, "Not Voting": 1}, "16 held: 4 Bryan, 11 Pattison, 1 Not Voting; one read sets an extra column in the row"),
+        (335, "MA", (0.460, 0.440, 0.922, 0.454), {"votes": 30, "Bryan": 1, "Bland": 2, "Matthews": 1, "Pattison": 3, "Stevenson": 5, "Hill": 1, "Not Voting": 17}, "30 held: 1 Bryan, 2 Bland, 1 Matthews, 3 Pattison, 5 Stevenson, 1 Hill, 17 Not Voting; one read sets an extra column in the row"),
+        (335, "MN", (0.460, 0.469, 0.922, 0.483), {"votes": 18, "Bryan": 4, "Boies": 2, "Pattison": 1, "Blackburn": 2, "Stevenson": 4, "Not Voting": 5}, "18 held: 4 Bryan, 2 Boies, 1 Pattison, 2 Blackburn, 4 Stevenson, 5 Not Voting; one read sets an extra column in the row"),
+        (335, "NH", (0.460, 0.556, 0.922, 0.570), {"votes": 8, "Pattison": 1, "Not Voting": 7}, "8 held: 1 Pattison, 7 Not Voting; one read sets an extra column in the row"),
+        (335, "NJ", (0.460, 0.570, 0.922, 0.584), {"votes": 20, "Pattison": 2, "Not Voting": 18}, "20 held: 2 Pattison, 18 Not Voting; one read sets an extra column in the row"),
+        (335, "NY", (0.460, 0.584, 0.922, 0.598), {"votes": 72, "Not Voting": 72}, "72 held: 72 Not Voting; one read sets an extra column in the row"),
+        (335, "RI", (0.460, 0.670, 0.922, 0.685), {"votes": 8, "Pattison": 6, "Not Voting": 2}, "8 held: 6 Pattison, 2 Not Voting; one read sets an extra column in the row"),
+        (335, "VT", (0.460, 0.757, 0.922, 0.771), {"votes": 8, "Bryan": 4, "Not Voting": 4}, "8 held: 4 Bryan, 4 Not Voting; one read sets an extra column in the row"),
+        (335, "WI", (0.460, 0.814, 0.922, 0.828), {"votes": 24, "Bryan": 4, "Blackburn": 1, "Not Voting": 19}, "24 held: 4 Bryan, 1 Blackburn, 19 Not Voting; one read sets an extra column in the row"),
     ],
     "1892:democratic": [
         (182, "NC", (0.483, 0.577, 0.82, 0.589), {"Cleveland": 10 / 3, "Campbell": 0, "Morrison": 1}, "3⅓ for Cleveland and 1 in the Morrison column, which the delegation of 22 and the printed totals count"),
@@ -1549,6 +1595,12 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
         header = read["header"]
         if not read["rows"]:
             continue
+        if (
+            header
+            and re.fullmatch(r"states?\.?", header[0]["label"].strip(), re.IGNORECASE)
+            and all(len(row["values"]) < len(header) for row in read["rows"])
+        ):
+            header = header[1:]
         if scatter:
             for column in header:
                 if place(column["label"]) is None:
