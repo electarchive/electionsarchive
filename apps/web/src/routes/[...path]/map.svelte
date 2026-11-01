@@ -80,6 +80,7 @@
     up = null,
     tallies = null,
     hexes = null,
+    onopen,
   }: {
     places: Places;
     isTally?: boolean;
@@ -164,6 +165,7 @@
       } | null;
       isPartial: boolean;
     }> | null;
+    onopen?: (k: number) => void;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2, 0.3, 0.45];
@@ -1413,6 +1415,10 @@
   }
 
   function open(k: number, path = rows.get(k)?.path, layer = tiles) {
+    if (onopen != null) {
+      onopen(k);
+      return;
+    }
     if (path == null) {
       return;
     }

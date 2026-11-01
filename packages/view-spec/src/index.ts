@@ -56,6 +56,13 @@ export const viewSpec = v.object({
     ),
     [],
   ),
+  pages: v.optional(
+    v.pipe(
+      v.array(v.pipe(v.string(), v.maxLength(40))),
+      v.minLength(1),
+      v.maxLength(12),
+    ),
+  ),
   panels: v.pipe(
     v.array(
       v.intersect([
@@ -78,11 +85,25 @@ export const viewSpec = v.object({
               "scatter",
               "ternary",
               "sankey",
+              "strip",
             ]),
           }),
           v.object({ kind: v.literal("table") }),
+          v.object({
+            kind: v.literal("list"),
+            list: v.picklist(["closest", "movers", "flips"]),
+          }),
+          v.object({ kind: v.literal("summary") }),
+          v.object({ kind: v.literal("place") }),
+          v.object({
+            kind: v.literal("note"),
+            text: v.optional(v.pipe(v.string(), v.maxLength(2000))),
+          }),
         ]),
         v.object({
+          contest: v.optional(publicId("ct")),
+          title: v.optional(v.pipe(v.string(), v.maxLength(80))),
+          page: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0))),
           area: v.optional(
             v.object({
               x: v.pipe(v.number(), v.integer(), v.minValue(0)),
@@ -94,7 +115,7 @@ export const viewSpec = v.object({
         }),
       ]),
     ),
-    v.minLength(1),
+    v.maxLength(200),
   ),
 });
 

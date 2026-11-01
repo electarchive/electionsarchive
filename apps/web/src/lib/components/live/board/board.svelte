@@ -7,9 +7,9 @@
   import EyeIcon from "@lucide/svelte/icons/eye";
   import LayoutGridIcon from "@lucide/svelte/icons/layout-grid";
   import LinkIcon from "@lucide/svelte/icons/link";
+  import MaximizeIcon from "@lucide/svelte/icons/maximize";
   import MinimizeIcon from "@lucide/svelte/icons/minimize";
   import PlusIcon from "@lucide/svelte/icons/plus";
-  import PresentationIcon from "@lucide/svelte/icons/presentation";
   import SettingsIcon from "@lucide/svelte/icons/settings-2";
   import { onMount } from "svelte";
   import { on } from "svelte/events";
@@ -402,7 +402,7 @@
       go((board.current + 1) % board.pages.length);
     } else if (event.key === "[") {
       go((board.current - 1 + board.pages.length) % board.pages.length);
-    } else if (event.key === "p") {
+    } else if (event.key === "f") {
       void present();
     } else if (event.key === "e" && !isStacked && !isPresenting) {
       isArranging = !isArranging;
@@ -565,11 +565,11 @@
       <Button
         size="sm"
         variant="ghost"
-        title="{isPresenting ? m.board_present_exit() : m.board_present()} (P)"
+        title="{isPresenting ? m.board_present_exit() : m.board_present()} (F)"
         onclick={present}
       >
         {#if isPresenting}<MinimizeIcon
-          />{m.board_present_exit()}{:else}<PresentationIcon
+          />{m.board_present_exit()}{:else}<MaximizeIcon
           />{m.board_present()}{/if}
       </Button>
       {#if !isPresenting}
@@ -880,7 +880,7 @@
       <Dialog.Title>{m.board_shortcuts()}</Dialog.Title>
     </Dialog.Header>
     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-      {#each [["1–9", m.board_shortcut_pages()], ["[ ]", m.board_shortcut_next()], ["E", m.board_shortcut_arrange()], ["A", m.board_shortcut_add()], ["P", m.board_shortcut_present()], ["← → ↑ ↓", m.board_shortcut_move()], ["Shift ← → ↑ ↓", m.board_shortcut_resize()]] as [keys, text] (keys)}
+      {#each [["1–9", m.board_shortcut_pages()], ["[ ]", m.board_shortcut_next()], ["E", m.board_shortcut_arrange()], ["A", m.board_shortcut_add()], ["F", m.board_shortcut_present()], ["← → ↑ ↓", m.board_shortcut_move()], ["Shift ← → ↑ ↓", m.board_shortcut_resize()]] as [keys, text] (keys)}
         <dt>
           <kbd
             class="rounded-xs border border-border bg-muted px-1.5 py-0.5 font-figures text-xs"
