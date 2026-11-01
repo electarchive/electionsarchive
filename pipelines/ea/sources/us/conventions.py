@@ -152,7 +152,6 @@ def page(title: str) -> str:
 LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
 EXPLOREUK = "https://exploreuk.uky.edu/dips/{item}/data/books_b92_77_27211776_{item}/{leaf:04d}.jpg"
 HATHI = "https://babel.hathitrust.org/cgi/pt?id={htid}&seq={leaf}"
-INBOX = DATA / "inbox" / "manual" / "MF-557"
 RNC = "sim_republican-national-convention-proceedings_{}"
 TABLES = [
     {"table": "1968:republican:first", "item": RNC.format("august-5-8-1968"), "leaves": (409, 410)},
@@ -333,9 +332,9 @@ TABLES += [
 ]
 TABLES += [
     {"table": "1904:democratic", "uky": "xt7tx921cw1r", "leaves": (259,)},
-    {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295)},
+    {"table": "1920:democratic:b1", "htid": "mdp.39015030799285", "leaves": (293, 294, 295), "rotate": True},
     {"table": "1920:democratic:b44", "htid": "mdp.39015030799285", "leaves": (504, 505)},
-    {"table": "1924:democratic:b1", "htid": "mdp.39015030799251", "leaves": (356, 357, 358)},
+    {"table": "1924:democratic:b1", "htid": "mdp.39015030799251", "leaves": (356, 357, 358), "rotate": True},
     {"table": "1948:democratic", "htid": "mdp.39015030799574", "leaves": tuple(range(314, 325)), "narrated": True},
     {"table": "1956:democratic", "htid": "uc1.$b619008", "leaves": (463, 464)},
 ]
@@ -788,27 +787,36 @@ def scan(spec: dict[str, object], leaf: int, fetch: bool = False) -> raw.Artifac
     if "htid" not in spec:
         url = LEAF.format(item=spec["item"], leaf=leaf)
         return raw.fetch(SOURCE, url, suffix=".jpg") if fetch else raw.cached(SOURCE, url)
-    url = HATHI.format(htid=spec["htid"], leaf=leaf)
     try:
-        cached = raw.cached(SOURCE, url)
-        if cached.path.stat().st_size or not fetch:
-            return cached
+        return raw.cached(SOURCE, HATHI.format(htid=spec["htid"], leaf=leaf))
     except LookupError:
         if not fetch:
             raise
+    return render(spec, leaf)
+
+
+def render(spec: dict[str, object], leaf: int) -> raw.Artifact:
     import subprocess
     import tempfile
 
-    (pdf,) = (INBOX / str(spec["htid"]).replace("$", "")).glob(f"*-{leaf}-*.pdf")
+    from PIL import Image
+
+    (pdf,) = (DATA / "inbox" / "manual").glob(f"MF-*/{str(spec['htid']).replace('$', '')}/*-{leaf}-*.pdf")
     with tempfile.TemporaryDirectory() as folder:
         out = Path(folder) / "page"
-        subprocess.run(
-            ["pdftoppm", "-r", "300", "-gray", "-jpeg", "-jpegopt", "quality=90", "-singlefile", str(pdf), str(out)],
-            check=True,
-        )
-        image = out.with_suffix(".jpg").read_bytes()
-    retrieved = datetime.fromtimestamp(pdf.stat().st_mtime, UTC)
-    return raw.store(SOURCE, url, image, suffix=".jpg", retrieved_at=retrieved, media_type="image/jpeg")
+        subprocess.run(["pdftoppm", "-r", "300", "-gray", "-png", "-singlefile", str(pdf), str(out)], check=True)
+        with Image.open(out.with_suffix(".png")) as opened:
+            image = opened.rotate(-90, expand=True) if spec.get("rotate") else opened.copy()
+    data = io.BytesIO()
+    image.save(data, "JPEG", quality=90)
+    return raw.store(
+        SOURCE,
+        HATHI.format(htid=spec["htid"], leaf=leaf),
+        data.getvalue(),
+        suffix=".jpg",
+        retrieved_at=datetime.fromtimestamp(pdf.stat().st_mtime, UTC),
+        media_type="image/jpeg",
+    )
 
 
 def cropped(path: Path, crop: str | None) -> bytes:
