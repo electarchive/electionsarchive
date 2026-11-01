@@ -623,7 +623,8 @@ async function baselines(
       select rs.k from result_set rs
       where rs.contest_id = p.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
         and (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
-      order by rs.is_default desc, rs.stage = 'certified' desc limit 1
+      order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part')) desc nulls last,
+        rs.is_default desc, rs.stage = 'certified' desc limit 1
     ) x
   `);
   const priorOf = new Map(picked.rows.map((row) => [row.k, row.prior]));
@@ -700,7 +701,8 @@ async function load(state: string, midterm: string, presidential: string) {
         select rs.k from result_set rs
         where rs.contest_id = ch.id and rs.stage in ('official', 'certified') and rs.status = 'active' and rs.kind = 'counted'
           and (select u.scheme_code from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k limit 1) in ('us.county', 'us.county_part')
-        order by rs.is_default desc, rs.stage = 'certified' desc limit 1
+        order by (select sum(v.value) from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = rs.k and v.measure = 1 and u.scheme_code in ('us.county', 'us.county_part')) desc nulls last,
+          rs.is_default desc, rs.stage = 'certified' desc limit 1
       ) x
     ), totals as (
       select s.k, s.midterm, case when u.scheme_code = 'us.county' then u.id else u.parent_id end as unit, sum(v.value)::float8 as votes
