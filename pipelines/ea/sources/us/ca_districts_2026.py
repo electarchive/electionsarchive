@@ -668,6 +668,14 @@ INBOX_DOCS = {
         "Colusa County Clerk-Recorder",
         "Notice of Election, November 3, 2026 General Election",
     ),
+    "06001-n": manual(
+        "MF-539",
+        "ca-alameda-2026-11-03-general-not-on-ballot-candidate-list.html",
+        "https://www.acvote.alamedacountyca.gov/candidates/candidate-list",
+        "Alameda County Registrar of Voters",
+        "Candidate List: General Election, November 3, 2026, contests not on the ballot",
+        "text/html",
+    ),
     "06051-s": manual(
         "MF-531",
         "mono-2026-general-candidates.html",
@@ -1602,30 +1610,28 @@ ALAMEDA_KEPT = re.compile(
 )
 
 
-def alameda() -> list[dict[str, str | int | bool]]:
+def alameda(off_ballot: bool = False) -> list[dict[str, str | int | bool]]:
     rows = []
-    text = html.unescape(
-        re.sub(
-            r"<[^>]+>",
-            "\n",
-            re.sub(
-                r"(?s)<(script|style).*?</\1>", "", raw.cached(local_2026.SOURCE, feed("06001")[0]).path.read_text()
-            ),
-        )
+    page = (
+        inbox_doc("06001-n").read_text()
+        if off_ballot
+        else raw.cached(local_2026.SOURCE, feed("06001")[0]).path.read_text()
     )
+    status = "Not On Ballot" if off_ballot else "On Ballot"
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", re.sub(r"(?s)<(script|style).*?</\1>", "", page)))
     text = [line.strip() for line in text.splitlines() if line.strip()]
     contest = None
     seats = 1
     seen: set[tuple[str, str, str]] = set()
     for index, line in enumerate(text):
-        if line.endswith(" -") and text[index + 1 : index + 2] == ["On Ballot"]:
+        if line.endswith(" -") and text[index + 1 : index + 2] == [status]:
             found = ALAMEDA.match(line[:-2])
             contest = (
                 found
                 if found is not None
                 and ALAMEDA_KEPT.search(found["body"])
                 and not re.search(
-                    r"(?i)school|(?<!community )college|education|city|unified|congress|assembly|senate|equalization",
+                    r"(?i)school|(?<!community )college|education|city(?! of alameda healthcare)|unified|congress|assembly|senate|equalization",
                     line,
                 )
                 else None
@@ -1635,7 +1641,11 @@ def alameda() -> list[dict[str, str | int | bool]]:
         if contest is None:
             continue
         name = None
-        if (
+        if off_ballot:
+            if line == "CANDIDATE" and text[index + 2] == "BALLOT DESIGNATION":
+                agency = text[text.index("Filing Agency:", index) + 1]
+                name = text[index + 1] if agency == "Alameda County" else None
+        elif (
             line == "CANDIDATE"
             and text[index + 1] != "BALLOT DESIGNATION"
             or line == "DETAILS"
@@ -1663,6 +1673,7 @@ def alameda() -> list[dict[str, str | int | bool]]:
                         "seats": seats,
                         "name": " ".join(cased(name).split()),
                         "unexpired": contest["short"] is not None,
+                        **({"tacit": True, "doc": "06001-n"} if off_ballot else {}),
                     }
                 )
     return rows
@@ -2224,6 +2235,7 @@ def candidates() -> pl.DataFrame:
                 *san_bernardino(),
                 *santa_clara(),
                 *alameda(),
+                *alameda(off_ballot=True),
                 *contra_costa(),
                 *fresno(),
                 *kern(),
