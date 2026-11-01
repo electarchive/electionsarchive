@@ -110,6 +110,11 @@
   });
   const today = new Date().toISOString().slice(0, 10);
   const summary = $derived(recordLede(entries, today));
+  const description = $derived(
+    summary.lede == null
+      ? m.meta_person({ name: person.name })
+      : `${m.meta_person({ name: person.name })} ${summary.lede}`,
+  );
   const years = $derived(
     entries
       .filter((entry) => entry.outcome != null || entry.date < today)
@@ -385,9 +390,11 @@
 
 <svelte:head>
   <title>{person.name} | {m.wordmark()}</title>
+  <meta name="description" content={description} />
   <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
   <meta property="og:type" content="profile" />
   <meta property="og:title" content={person.name} />
+  <meta property="og:description" content={description} />
 </svelte:head>
 
 <ShareImage

@@ -148,7 +148,7 @@
 
 <svelte:head>
   <title>electionsarchive.com</title>
-  {#if page.route.id !== "/" && page.route.id !== "/[...path]" && page.route.id !== "/live/[...path]"}
+  {#if !["/", "/[...path]", "/live/[...path]", "/people/[slug]", "/parties/[...path]"].includes(page.route.id ?? "")}
     <meta
       name="description"
       content="Every election in ten polities, down to the finest reporting unit, with a source for every number."

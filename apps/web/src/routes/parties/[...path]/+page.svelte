@@ -38,6 +38,14 @@
       party.polity?.path != null &&
       !party.scope.polity.path.startsWith(`${party.polity.path}/`),
   );
+  const heading = $derived(
+    party.scope == null
+      ? party.name
+      : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
+          party: party.name,
+          place: party.scope.polity.name,
+        }),
+  );
   const color = $derived(swatch(party.color, `party:${data.id}`));
   const former = $derived(formerly(party.names ?? [], getLocale()));
   const header = $derived(data.logos.header);
@@ -57,6 +65,15 @@
           [year, entries.toSorted((a, b) => b.races - a.races)] as const,
       )
       .toArray(),
+  );
+  const description = $derived(
+    data.record.first == null || data.record.last == null
+      ? m.meta_party_empty({ party: heading })
+      : m.meta_party({
+          party: heading,
+          first: String(data.record.first),
+          last: String(data.record.last),
+        }),
   );
   const places = $derived(
     new Intl.ListFormat(getLocale(), { type: "conjunction" })
@@ -103,14 +120,8 @@
 </script>
 
 <svelte:head>
-  <title
-    >{party.scope == null
-      ? party.name
-      : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
-          party: party.name,
-          place: party.scope.polity.name,
-        })} | {m.wordmark()}</title
-  >
+  <title>{heading} | {m.wordmark()}</title>
+  <meta name="description" content={description} />
   <link
     rel="canonical"
     href="{page.url.origin}{page.url.pathname}{party.scope == null
@@ -118,7 +129,8 @@
       : page.url.search}"
   />
   <meta property="og:type" content="profile" />
-  <meta property="og:title" content={party.name} />
+  <meta property="og:title" content={heading} />
+  <meta property="og:description" content={description} />
 </svelte:head>
 
 <ShareImage
@@ -155,12 +167,7 @@
             />
           {/if}
           <h1 class="title">
-            {party.scope == null
-              ? party.name
-              : (isAbroad ? m.party_abroad_title : m.party_scope_title)({
-                  party: party.name,
-                  place: party.scope.polity.name,
-                })}{#if party.scope == null && party.short != null && !party.name.includes(party.short)}&nbsp;<span
+            {heading}{#if party.scope == null && party.short != null && !party.name.includes(party.short)}&nbsp;<span
                 class="font-sans text-[0.5em] font-semibold tracking-normal whitespace-nowrap text-muted-foreground"
                 >{party.short}</span
               >{/if}

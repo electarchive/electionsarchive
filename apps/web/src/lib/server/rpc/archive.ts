@@ -24658,6 +24658,8 @@ export const parties = {
     .output(
       v.object({
         count: v.number(),
+        first: v.nullable(v.number()),
+        last: v.nullable(v.number()),
         elections: v.array(
           v.object({
             name: v.string(),
@@ -24680,6 +24682,8 @@ export const parties = {
         won: number;
         seats: number;
         total: number;
+        first: number | null;
+        last: number | null;
       }>(sql`
         with recursive ids(id) as (
           select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
@@ -24740,7 +24744,9 @@ export const parties = {
           count(distinct t.id)::int as races,
           count(distinct w.contest_id) filter (where not w.chamber)::int as won,
           coalesce(sum(w.seats) filter (where w.chamber), 0)::int as seats,
-          count(*) over ()::int as total
+          count(*) over ()::int as total,
+          min(min(t.year)) over ()::int as first,
+          max(min(t.year)) over ()::int as last
         from tops t
         left join won w on w.contest_id = t.id
         group by t.election
@@ -24751,6 +24757,8 @@ export const parties = {
       const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
       return {
         count: found.rows[0]?.total ?? 0,
+        first: found.rows[0]?.first ?? null,
+        last: found.rows[0]?.last ?? null,
         elections: found.rows.map((row) => ({
           name: labels.full.get(row.election) ?? "",
           path: slugs.get(row.election) ?? null,

@@ -617,7 +617,10 @@ export const GET: RequestHandler = async ({ params }) => {
     ) as Parameters<typeof satori>[0],
     { width: WIDTH, height: HEIGHT, fonts: await fonts },
   );
-  const png = new Resvg(svg, { fitTo: { mode: "width", value: WIDTH * 2 } })
+  const png = new Resvg(svg, {
+    fitTo: { mode: "width", value: WIDTH * 2 },
+    font: { loadSystemFonts: false },
+  })
     .render()
     .asPng();
   return new Response(new Uint8Array(png), {
