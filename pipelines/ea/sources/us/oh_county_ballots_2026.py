@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 from datetime import UTC, date, datetime
@@ -57,11 +58,15 @@ SOURCES = {
         "Ballot text, November 3, 2026 General Election",
     ),
 }
-HELD = {HAMILTON, SUMMIT, CUYAHOGA}
 NOISE = re.compile(
     r"^(Sample Generated|\d\d-\d\d-|Page \d+ of|VOTE BOTH SIDES|Members of the|November 3, 2026$|B A L L O\s*$|S A M P L E|\d+$)"
 )
 STOP = re.compile(r"^(YES|NO|SI|FOR\b.*|AGAINST\b.*|A FAVOR\b.*|EN CONTRA\b.*)$")
+ALIASES = {"Stark County District Library": "Stark County"}
+COUNTY_OF = {"Stark County District Library": "Stark"}
+SCHOOLS = "us.oh_questions_2026"
+DIRECTORY = "https://educationdata.urban.org/api/v1/school-districts/ccd/directory/2022/?fips=39"
+PRECINCT = re.compile(r"(?<=[a-z])\s+(?:\d+-?[A-Z]|[A-Z])$|(?<=[A-Z])\s+\d+-[A-Z]$")
 START = re.compile(
     r"^(?:\d+(?:\s\d)?\s+)?(?:T)?(Proposed|PROPOSED|Special Election|SPECIAL ELECTION|Advisory|ADVISORY|Local|LOCAL)\b"
 )
@@ -275,9 +280,13 @@ def token(note: str) -> re.Pattern[str]:
     return re.compile(rf"(?<![\d.]){re.escape(numbers[-1])}" if numbers else "(?!)")
 
 
-def pick(row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str]]], used: set[UUID]) -> UUID | None:
-    parts = row["entity"].split("|")
-    options: list[tuple[UUID, str, str]] = []
+def pick(
+    row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str, str]]], used: set[UUID], fips: str
+) -> UUID | None:
+    parts = [
+        ALIASES.get(part, PRECINCT.sub("", part).replace("CUY ", "CUYAHOGA ")) for part in row["entity"].split("|")
+    ]
+    options: list[tuple[UUID, str, str, str]] = []
     for size in range(len(parts), 0, -1):
         for start in range(len(parts) - size + 1):
             options += [
@@ -285,6 +294,7 @@ def pick(row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str]]], 
             ]
         if options:
             break
+    options = [c for c in options if c[3] in ("", fips)]
     kind = row["kind"].upper()
     if any(
         word in kind
@@ -334,11 +344,11 @@ def pick(row: dict[str, str], contests: dict[str, list[tuple[UUID, str, str]]], 
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "issues.parquet").filter(~pl.col("url").is_in(HELD))
-    counties = {ceda._core(f"{county} County") for county in frame["county"]}
+    frame = pl.read_parquet(PARSED / "issues.parquet")
+    counties = {ceda._core(f"{county} County") for county in [*frame["county"], *COUNTY_OF.values()]}
     with connect() as conn:
         fips = {
-            code
+            ceda._core(name): code
             for code, name in conn.execute(
                 """select c.code, n.text from area a
                    join area_code c on c.area_id = a.id
@@ -348,7 +358,11 @@ def emit() -> Path:
             ).fetchall()
             if ceda._core(name) in counties
         }
-        contests: dict[str, list[tuple[UUID, str, str]]] = {}
+        home = {
+            entry["leaid"]: str(entry["county_code"])
+            for entry in json.loads(raw.cached(SCHOOLS, DIRECTORY).path.read_text())["results"]
+        }
+        contests: dict[str, list[tuple[UUID, str, str, str]]] = {}
         for contest, code, name, note in conn.execute(
             """select c.id, split_part(x.value, ':', 3), n.text, coalesce(t.body_md, '') from contest c
                join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value like %s
@@ -357,10 +371,14 @@ def emit() -> Path:
                left join note t on t.entity_id = c.id and t.kind = 'context'""",
             [f"{DAY}:OH:%:question:%"],
         ).fetchall():
-            if len(code) == 10 and code[:5] not in fips:
+            if len(code) == 10:
+                home[code] = code[:5]
+            elif len(code) == 5:
+                home[code] = code
+            if home.get(code, "") not in ("", *fips.values()):
                 continue
             for key in keys(name):
-                contests.setdefault(key, []).append((contest, name, note))
+                contests.setdefault(key, []).append((contest, name, note, home.get(code, "")))
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -369,12 +387,14 @@ def emit() -> Path:
             polity="US-OH",
         )
         sources: dict[str, UUID] = {}
-        for url, (_, _, publisher, title) in SOURCES.items():
-            if url in HELD:
-                continue
-            sources[url] = cs.source(publisher, title)
-            cs.add("source", id=sources[url], kind="official_body", publisher=publisher, title=title, url=url)
-            cs.artifact(raw.cached(SOURCE, url), sources[url])
+        covered = {
+            contest
+            for (contest,) in conn.execute("select contest_id from ballot_question_text where source_id is not null")
+        }
+        for folder in DATA.glob("changesets/*"):
+            table = folder / "ballot_question_text.parquet"
+            if table.exists() and json.loads((folder / "manifest.json").read_text())["pipeline"] == SOURCE:
+                covered |= {UUID(str(contest)) for contest in pl.read_parquet(table)["contest_id"]}
         kept = 0
         used: set[UUID] = set()
         pending = list(frame.iter_rows(named=True))
@@ -383,13 +403,28 @@ def emit() -> Path:
             progress = False
             deferred = []
             for row in pending:
-                contest = pick(row, contests, used)
+                county = COUNTY_OF.get(row["entity"], row["county"])
+                contest = pick(row, contests, used, fips[ceda._core(f"{county} County")])
                 if contest is None:
                     deferred.append(row)
                     continue
                 progress = True
                 used.add(contest)
+                if contest in covered:
+                    continue
                 kept += 1
+                if row["url"] not in sources:
+                    _, _, publisher, title = SOURCES[row["url"]]
+                    sources[row["url"]] = cs.source(publisher, title)
+                    cs.add(
+                        "source",
+                        id=sources[row["url"]],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url=row["url"],
+                    )
+                    cs.artifact(raw.cached(SOURCE, row["url"]), sources[row["url"]])
                 cs.add("citation", entity_id=contest, source_id=sources[row["url"]])
                 cs.add(
                     "ballot_question_text",

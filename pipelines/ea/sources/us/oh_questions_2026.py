@@ -32,6 +32,74 @@ SCHEMES = {
 }
 
 
+LIQUOR = "Miscellaneous, local liquor option"
+ADDED: list[dict[str, str]] = [
+    {
+        "county": "Hamilton",
+        "kind": "City",
+        "name": "Cheviot",
+        "label": "Current expenses",
+        "text": "Tax levy, renewal: 3 mills, 5 years, beginning 2026. Purpose: Current expenses.",
+    },
+    {
+        "county": "Stark",
+        "kind": "County",
+        "name": "Stark",
+        "label": "Current expenses (Stark County District Library)",
+        "text": "Tax levy, renewal and increase: 2.3 mills, 8 years, beginning 2027. Purpose: Current expenses (Stark County District Library).",
+    },
+    {
+        "county": "Hamilton",
+        "kind": "City",
+        "name": "Cincinnati",
+        "label": "Liquor permit D6, Sunday sale, Cincinnati precinct 9-D",
+        "text": f"{LIQUOR}: Sunday sale at a grocery store. Purpose: Liquor permit D6, Sunday sale, Cincinnati precinct 9-D.",
+    },
+    {
+        "county": "Hamilton",
+        "kind": "Village",
+        "name": "Terrace Park",
+        "label": "Liquor permit D6, Sunday sale, Terrace Park precinct A",
+        "text": f"{LIQUOR}: Sunday sale at a bar and restaurant. Purpose: Liquor permit D6, Sunday sale, Terrace Park precinct A.",
+    },
+    {
+        "county": "Hamilton",
+        "kind": "Township",
+        "name": "Springfield",
+        "label": "Liquor permit D6, Sunday sale, Springfield Township precinct C",
+        "text": f"{LIQUOR}: Sunday sale at a bar and restaurant. Purpose: Liquor permit D6, Sunday sale, Springfield Township precinct C.",
+    },
+    {
+        "county": "Summit",
+        "kind": "City",
+        "name": "Akron",
+        "label": "Sunday sale of wine and mixed beverages, Akron precinct 4-F",
+        "text": f"{LIQUOR}: Sunday sale for consumption off the premises. Purpose: Sunday sale of wine and mixed beverages, Akron precinct 4-F.",
+    },
+    {
+        "county": "Summit",
+        "kind": "City",
+        "name": "Akron",
+        "label": "Liquor permit C2, Akron precinct 6-C",
+        "text": f"{LIQUOR}: permit C2 at a convenience store. Purpose: Liquor permit C2, Akron precinct 6-C.",
+    },
+    {
+        "county": "Summit",
+        "kind": "City",
+        "name": "Akron",
+        "label": "Liquor permit D6, Sunday sale, Akron precinct 6-C",
+        "text": f"{LIQUOR}: Sunday sale at a convenience store. Purpose: Liquor permit D6, Sunday sale, Akron precinct 6-C.",
+    },
+    {
+        "county": "Summit",
+        "kind": "City",
+        "name": "Cuyahoga Falls",
+        "label": "Liquor permit D6, Sunday sale, Cuyahoga Falls precinct 4-C",
+        "text": f"{LIQUOR}: Sunday sale at a bar. Purpose: Liquor permit D6, Sunday sale, Cuyahoga Falls precinct 4-C.",
+    },
+]
+
+
 WORDING: dict[str, str] = json.loads(Path(__file__).with_name("oh_franklin_wording.json").read_text())
 
 
@@ -100,6 +168,7 @@ def parse() -> None:
                 "label": label,
             }
         )
+    rows += ADDED
     PARSED.mkdir(parents=True, exist_ok=True)
     out = pl.DataFrame(rows)
     out.write_parquet(PARSED / "questions.parquet")
@@ -144,7 +213,9 @@ def emit() -> Path:
                 candidates.setdefault(("town", geoid[:5] + ceda._core(full)), []).append(
                     (f"town:{geoid}", geoid, full.title())
                 )
+        school_county: dict[str, str] = {}
         for entry in json.loads(raw.cached(SOURCE, DIRECTORY).path.read_text())["results"]:
+            school_county[entry["leaid"]] = str(entry["county_code"])
             candidates.setdefault(("school", ceda._core(entry["lea_name"])), []).append(
                 (f"school:{entry['leaid']}", entry["leaid"], entry["lea_name"])
             )
@@ -180,8 +251,12 @@ def emit() -> Path:
                 scheme = "us.town"
             elif row["kind"] == "School District":
                 options = schools.get(ceda._core(name), [])
+                if len(options) > 1:
+                    options = [o for o in options if school_county.get(o.split(":")[1]) == county]
                 key = options[0] if len(options) == 1 else None
                 spec = candidates.get(("school", ceda._core(name)), [])
+                if len(spec) > 1:
+                    spec = [s for s in spec if school_county.get(s[1]) == county]
                 scheme = "us.school_district"
             else:
                 options = places.get(ceda._city(name), [])
