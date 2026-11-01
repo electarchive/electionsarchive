@@ -22,6 +22,13 @@ URL = "https://www.electionreturns.pa.gov/Home/ReportCenter"
 PUBLISHER = "Pennsylvania Department of State"
 TITLE = "Election returns by county: municipal election judicial contests"
 YEARS = {
+    2001: date(2001, 11, 6),
+    2003: date(2003, 11, 4),
+    2005: date(2005, 11, 8),
+    2007: date(2007, 11, 6),
+    2009: date(2009, 11, 3),
+    2011: date(2011, 11, 8),
+    2015: date(2015, 11, 3),
     2017: date(2017, 11, 7),
     2019: date(2019, 11, 5),
     2021: date(2021, 11, 2),
@@ -33,7 +40,12 @@ COURTS = {
     "Judge of the Superior Court": "Judge of the Superior Court",
     "Judge of the Commonwealth Court": "Judge of the Commonwealth Court",
 }
-PARTIES = {"Democratic": "democratic-party", "Republican": "republican-party", "Green": "green-party"}
+PARTIES = {
+    "Democratic": "democratic-party",
+    "Republican": "republican-party",
+    "Green": "green-party",
+    "Libertarian": "libertarian-party",
+}
 MAJOR = ("Democratic", "Republican")
 NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 METHOD = (
@@ -45,6 +57,51 @@ SEATS = (
     "Voters may choose up to as many candidates as there are seats; the seats go to the highest vote-getters statewide, "
     "regardless of party."
 )
+
+
+SUPREME = "Justice of the Supreme Court"
+SUPERIOR = "Judge of the Superior Court"
+COMMONWEALTH = "Judge of the Commonwealth Court"
+NAMED: dict[tuple[int, str, str], list[tuple[str, int, int]]] = {
+    (2001, SUPREME, "Democratic"): [("Kate Ford Elliott", 954053, 0)],
+    (2001, SUPREME, "Republican"): [("Michael Eakin", 1051360, 0)],
+    (2001, SUPREME, "Retention"): [("Stephen Zappala Sr", 978709, 320175)],
+    (2001, SUPERIOR, "Retention"): [("Stephen J. McEwen Jr", 909377, 302669)],
+    (2001, COMMONWEALTH, "Retention"): [("Shelly Friedman", 890799, 317068)],
+    (2003, SUPREME, "Democratic"): [("Max Baer", 1284846, 0)],
+    (2003, SUPREME, "Republican"): [("Joan Orie Melvin", 1192952, 0)],
+    (2005, SUPREME, "Retention"): [
+        ("Sandra Schultz Newman", 797465, 676848),
+        ("Russell M. Nigro", 706251, 736036),
+    ],
+    (2007, SUPREME, "Republican"): [("Maureen Lally-Green", 994760, 0), ("Mike Krancer", 783635, 0)],
+    (2007, SUPREME, "Retention"): [("Thomas G. Saylor", 1184546, 586330)],
+    (2009, SUPREME, "Democratic"): [("Jack Panella", 815106, 0)],
+    (2009, SUPREME, "Republican"): [("Joan Orie Melvin", 925459, 0)],
+    (2009, SUPERIOR, "Libertarian"): [("Marakay J. Rogers", 127492, 0)],
+    (2009, SUPERIOR, "Retention"): [("Kate Ford Elliott", 973175, 439272)],
+    (2009, COMMONWEALTH, "Retention"): [("Dan Pellegrini", 948784, 461799)],
+    (2011, SUPERIOR, "Democratic"): [("David Wecht", 1030004, 0)],
+    (2011, SUPERIOR, "Republican"): [("Vic Stabile", 859484, 0)],
+    (2011, COMMONWEALTH, "Democratic"): [("Kathryn Boockvar", 890831, 0)],
+    (2011, COMMONWEALTH, "Republican"): [("Anne Covey", 968796, 0)],
+    (2011, SUPREME, "Retention"): [("Michael Eakin", 1097368, 393728)],
+    (2015, SUPREME, "Democratic"): [
+        ("Kevin M. Dougherty", 1088716, 0),
+        ("David Wecht", 1079452, 0),
+        ("Christine Donohue", 1069161, 0),
+    ],
+    (2015, SUPREME, "Republican"): [
+        ("Judith Ference Olson", 895741, 0),
+        ("Michael George", 803748, 0),
+        ("Anne Covey", 802891, 0),
+    ],
+    (2015, SUPREME, "Independent Judicial Alliance"): [("Paul Panepinto", 145190, 0)],
+    (2015, SUPERIOR, "Democratic"): [("Alice Beck Dubow", 1058753, 0)],
+    (2015, SUPERIOR, "Republican"): [("Emil Giordano", 933691, 0)],
+    (2015, COMMONWEALTH, "Democratic"): [("Michael H. Wojcik", 1060314, 0)],
+    (2015, COMMONWEALTH, "Republican"): [("Paul Lalley", 946079, 0)],
+}
 
 
 def flat(text: str) -> str:
@@ -89,10 +146,84 @@ def fetch() -> None:
             )
 
 
+def attributed(year: int, table: list[dict[str, str]]) -> list[dict[str, object]]:
+    slots: dict[tuple[str, str, str], int] = defaultdict(int)
+    rows: list[tuple[tuple[str, str, int], dict[str, str]]] = []
+    for cells in table[1:]:
+        group = (cells["C"], cells.get("E", ""))
+        county = (cells["B"],) + group
+        rows.append(((*group, slots[county]), cells))
+        slots[county] += 1
+    sums: dict[tuple[str, str, int], list[int]] = defaultdict(lambda: [0, 0, 0])
+    for slot, cells in rows:
+        total = sums[slot]
+        total[0] += number(cells.get("G"))
+        total[1] += number(cells.get("H"))
+        total[2] += number(cells.get("I"))
+    chosen: dict[tuple[str, str, int], str] = {}
+    groups: dict[tuple[str, str], list[tuple[str, str, int]]] = defaultdict(list)
+    for slot in sums:
+        groups[slot[:2]].append(slot)
+    for (office, party), members in groups.items():
+        retention = office.endswith("(Retention)")
+        title = office.replace(" (Retention)", "")
+        names = NAMED.get((year, title, "Retention" if retention else party), [])
+        if len(names) != len(members):
+            print(f"skip {year} {office} {party}: {len(members)} slots, {len(names)} named", file=sys.stderr)
+            continue
+        pairs = {}
+        for name, votes, against in names:
+            ranked = sorted(
+                members,
+                key=lambda slot: abs((sums[slot][1] if retention else sums[slot][0]) - votes),
+            )
+            best = ranked[0]
+            got = sums[best][1] if retention else sums[best][0]
+            close = abs(got - votes) <= votes * 0.001
+            if retention and against:
+                close = close and abs(sums[best][2] - against) <= against * 0.01
+            if close and best not in pairs:
+                pairs[best] = name
+        if len(pairs) != len(names):
+            print(f"skip {year} {office} {party}: totals do not match the named candidates", file=sys.stderr)
+            continue
+        chosen.update(pairs)
+    whole = {
+        office
+        for office, party in groups
+        if not office.endswith("(Retention)")
+        and all(
+            slot in chosen for other, other_party in groups if other == office for slot in groups[(other, other_party)]
+        )
+    }
+    found: list[dict[str, object]] = []
+    for slot, cells in rows:
+        if slot not in chosen or (not slot[0].endswith("(Retention)") and slot[0] not in whole):
+            continue
+        found.append(
+            {
+                "day": YEARS[year],
+                "office": COURTS[cells["C"].replace(" (Retention)", "")],
+                "retention": cells["C"].endswith("(Retention)"),
+                "candidate": chosen[slot],
+                "party": cells.get("E", ""),
+                "county": cells["B"],
+                "votes": number(cells.get("G")),
+                "yes": number(cells.get("H")),
+                "no": number(cells.get("I")),
+            }
+        )
+    return found
+
+
 def lines() -> list[dict[str, object]]:
     found: list[dict[str, object]] = []
     for year, day in YEARS.items():
-        for cells in sheet(raw.cached(SOURCE, f"{URL}#{year}").path)[1:]:
+        table = sheet(raw.cached(SOURCE, f"{URL}#{year}").path)
+        if year < 2017:
+            found += attributed(year, table)
+            continue
+        for cells in table[1:]:
             office = cells["C"].replace(" (Retention)", "")
             retention = cells["C"].endswith("(Retention)")
             found.append(
@@ -118,7 +249,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Pennsylvania statewide judicial elections 2017–2025 by county, from the Department of State's official county returns",
+            summary="Pennsylvania statewide judicial elections 2001–2025 by county, from the Department of State's official county returns",
             polity="US-PA",
         )
         source = cs.source(PUBLISHER, TITLE)
