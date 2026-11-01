@@ -1,6 +1,9 @@
 import json
 import re
 import subprocess
+import tempfile
+import zipfile
+from collections import Counter, defaultdict
 from datetime import UTC, date, datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -33,6 +36,30 @@ MF_LOOKUP = (
     "Ashtabula Athens Tuscarawas Mahoning Licking Perry Clark Greene Harrison Geauga Richland Fulton Portage Lucas"
 ).split()
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
+MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
+MONTGOMERY_KEY = "https://lookup.boe.ohio.gov/vtrapp/montgomery/ballotlist.aspx#sample-ballots.zip"
+WATERMARK = re.compile(r"(?:\s+[elpmaS])(?:\s+[elpmaS]){3,}(?=\s|$)")
+DROPPED = {
+    "he": "the",
+    "axable": "taxable",
+    "eported": "reported",
+    "ervices": "services",
+    "estaurant": "restaurant",
+    "ime": "time",
+    "irm": "firm",
+    "irst": "first",
+    "mposed": "imposed",
+    "mprovements": "improvements",
+    "ntent": "intent",
+    "nterested": "interested",
+    "ocial": "social",
+    "efferson": "Jefferson",
+}
+DROPPED_PATTERN = re.compile(
+    r"(?<![\w/])(?:%s)(?![\w])|(?<![\w/])n(?= (?:Council|this precinct|his precinct))|(?<=in )his(?= precinct)|(?<=\. )o(?= the City)"
+    % "|".join(DROPPED)
+)
+LEAD = re.compile(r"^(?:Sample\s*)*\d+\s+")
 SOURCES = {
     HAMILTON: (
         "Hamilton",
@@ -101,6 +128,17 @@ def fetch() -> None:
                 retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
                 media_type="application/pdf",
             )
+    try:
+        raw.cached(SOURCE, MONTGOMERY_KEY)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            MONTGOMERY_KEY,
+            MONTGOMERY_ZIP.read_bytes(),
+            suffix=".zip",
+            retrieved_at=datetime.fromtimestamp(MONTGOMERY_ZIP.stat().st_mtime, UTC),
+            media_type="application/zip",
+        )
     fetch_franklin()
     for county, path in mf_files():
         key = mf_key(county, path)
@@ -439,9 +477,68 @@ def stark() -> list[dict[str, str]]:
     return rows
 
 
+def columns(path: Path) -> list[str]:
+    pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(path)], capture_output=True, text=True, check=True).stdout)[1])
+    lines: list[str] = []
+    for page in range(1, pages + 1):
+        for left in (0, 204, 408):
+            lines += subprocess.run(
+                ["pdftotext", "-f", str(page), "-l", str(page), "-x", str(left), "-y", "0", "-W", "204", "-H", "1116", str(path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.split("\n")
+    return lines
+
+
+def repair(text: str) -> str:
+    def fix(match: re.Match[str]) -> str:
+        word = match[0]
+        return DROPPED.get(word) or {"n": "in", "his": "this", "o": "to"}[word]
+
+    return DROPPED_PATTERN.sub(fix, text)
+
+
+def montgomery() -> list[dict[str, str]]:
+    variants: dict[tuple[str, str], list[list[str]]] = defaultdict(list)
+    heads: dict[tuple[str, str], tuple[str, str]] = {}
+    with tempfile.TemporaryDirectory() as folder, zipfile.ZipFile(raw.cached(SOURCE, MONTGOMERY_KEY).path) as archive:
+        archive.extractall(folder)
+        for path in sorted(Path(folder).rglob("*.pdf")):
+            for row in ballot_issues(columns(path), MONTGOMERY_KEY, "Montgomery"):
+                number = LEAD.match(row["text"])
+                if number is None:
+                    continue
+                text = WATERMARK.sub("", row["text"][number.end() :]).strip()
+                key = (number[0].strip(), row["entity"])
+                variants[key].append(text.split())
+                heads[key] = (row["kind"], row["entity"])
+    rows = []
+    for key, texts in variants.items():
+        size = Counter(len(words) for words in texts).most_common(1)[0][0]
+        words = [
+            Counter(text[index] for text in texts if len(text) == size).most_common(1)[0][0] for index in range(size)
+        ]
+        kind, entity = heads[key]
+        if entity.startswith("Income Tax|"):
+            kind, entity = f"{kind} Income Tax", entity.removeprefix("Income Tax|")
+        rows.append(
+            {
+                "url": MONTGOMERY_KEY,
+                "county": "Montgomery",
+                "kind": kind,
+                "entity": entity,
+                "text": repair(" ".join(words)),
+                "publisher": "Montgomery County Board of Elections",
+                "title": "Sample ballots, November 3, 2026 General Election",
+            }
+        )
+    return rows
+
+
 def parse() -> None:
     frame = pl.DataFrame(
-        hamilton() + summit() + cuyahoga() + wayne() + lorain() + franklin() + mf_samples() + stark(),
+        hamilton() + summit() + cuyahoga() + wayne() + lorain() + franklin() + mf_samples() + montgomery() + stark(),
         infer_schema_length=None,
     )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -469,6 +566,9 @@ def arabic(numeral: str) -> int:
 
 
 def references(text: str) -> str:
+    text = " ".join(
+        [text, *(f"{a}.{b.zfill(2)}" for a, b in re.findall(r"(?<![\d.-])(\d{1,2})-(\d{1,2})(?![\d-])", text))]
+    )
     article = re.search(r"Article ([IVX]+)\b", text)
     if article is None:
         return text
