@@ -1177,10 +1177,29 @@ def plan(
             if split and all(found[1] for _, found in split):
                 picks.extend((found[0][0], name, place, office) for place, found in split)
                 continue
+            if wide and len(people) > 1:
+                parts = [
+                    (contest, keys[0], wanted)
+                    for contest, (keys, wanted) in published.items()
+                    if contest in statewide
+                    and wanted
+                    and wanted <= people
+                    and contest in seats
+                    and (seat is None or seats[contest][0] == seat[0])
+                ]
+                if (
+                    len({seats[contest][0] for contest, _, _ in parts}) == 1
+                    and sum(len(wanted) for _, _, wanted in parts) == len(people)
+                    and set().union(*(wanted for _, _, wanted in parts)) == people
+                ):
+                    picks.extend(
+                        ((1.0, 0, 0, contest, key), name, places, office, wanted) for contest, key, wanted in parts
+                    )
+                    continue
             unmatched.append(
                 f"{'state' if wide else 'local'} {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if len(best) > 1 and best[0][1] else 'no contest'}"
             )
-        for (_, _, _, contest, key), name, places, office in sorted(
+        for (_, _, _, contest, key), name, places, office, *only in sorted(
             picks, key=lambda pick: (-pick[0][0], -pick[0][1], -pick[0][2])
         ):
             segment = key.split(":")[2]
@@ -1203,6 +1222,11 @@ def plan(
                 & (pl.col("contest") == name)
                 & pl.col("county").is_in(places)
             )
+            if only:
+                part = part.filter(
+                    ~pl.col("write_in")
+                    & pl.col("candidate").map_elements(lambda c: person(c) in only[0], return_dtype=pl.Boolean)
+                )
             earlier = next((i for i, entry in enumerate(work) if entry[1] == key), None)
             if earlier is not None:
                 old = work[earlier]
