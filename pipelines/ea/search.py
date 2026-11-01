@@ -70,6 +70,7 @@ docs as (
             when 'election' then (select polity_id from election where id = e.id)
             when 'contest' then (select el.polity_id from contest c join election el on el.id = c.election_id where c.id = e.id)
             when 'party' then (select polity_id from party where id = e.id)
+            when 'body' then (select polity_id from body where id = e.id)
         end as polity_id,
         string_agg(distinct n.text, ' ') || case when e.type = 'polity' then coalesce(' ' || (
             select string_agg(distinct substr(mn.text, 10), ' ') from office o
@@ -87,15 +88,17 @@ docs as (
             when 'person' then ln(1 + (select count(*) from candidacy cy where cy.person_id = e.id)) / 2
                 + (select count(*) from external_id x where x.entity_id = e.id and x.scheme = 'wikidata')
                 + coalesce(pr.prominence, 0)
+            when 'body' then 2 + ln(1 + (select count(*) from tenure t where t.body_id = e.id)) / 3
         end as rank_boost
     from entity e
     join name n on n.entity_id = e.id
     left join prom pr on pr.person_id = e.id
     left join search_size sz on sz.id = e.id
-    where e.type in ('polity', 'election', 'contest', 'party', 'person')
+    where e.type in ('polity', 'body', 'election', 'contest', 'party', 'person')
         and not exists (select from entity_merge m where m.entity_id = e.id)
         and e.retired_by is null
-        and (e.type in ('party', 'person') or exists (select from slug s where s.entity_id = e.id and s.is_current))
+        and (e.type in ('party', 'person') or exists (select from slug s where s.entity_id = e.id and s.is_current)
+            or e.type = 'body' and exists (select from body b where b.id = e.id and b.kind <> 'electoral_college'))
     group by e.id, e.type, pr.prominence, sz.people
 )
 select entity_id, type, polity_id, text, to_tsvector('simple', text) as tsv, rank_boost
