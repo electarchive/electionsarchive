@@ -4,7 +4,7 @@ import json
 import re
 import unicodedata
 from datetime import UTC, date, datetime
-from itertools import pairwise, product
+from itertools import product
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -212,7 +212,6 @@ TABLES += [
     {"table": "1924:republican", "htid": "mdp.39015030802287", "leaves": (219, 220)},
     {"table": "1928:republican", "htid": "mdp.39015030802295", "leaves": (284,)},
 ]
-ROLL_1880 = (214, 219, 223, 224, 226, 227, 229, 230, 232, 233, 235, 238, 239, 241, 242, 244, 246, 247, 251, 252, 254, 255, 257, 258, 260, 262, 264, 266, 269, 276, 279, 281, 282, 284, 286, 287, 290)  # fmt: skip
 TABLES += [
     *leaves(
         "officialreportof00repuiala",
@@ -232,27 +231,61 @@ TABLES += [
         scatter=True,
     ),
     *leaves("officialreportsi00repuiala", "1916", {"b1": (212,)}, scatter=True),
-    *ballots("officialreportsi00repuiala", "1916", {2: (214, 216), 3: (216, 220)}, scatter=True),
-    *ballots("officialreportfi00repuiala", "1912", {1: (442, 448)}),
-    *ballots("officialreporto00repu", "1908", {1: (236, 242)}),
-    *ballots("officialproceedi00repuiala", "1904", {1: (209, 214)}),
+    *ballots("officialreportsi00repuiala", "1916", {2: (215, 215), 3: (216, 216)}, scatter=True),
+    *ballots("officialreportfi00repuiala", "1912", {1: (445, 446)}),
+    *ballots("officialreporto00repu", "1908", {1: (239, 239)}),
+    *ballots("officialproceedi00repuiala", "1904", {1: (212, 212)}),
     *leaves("12threpubnaticon00blumrich", "1900", {"": (157,)}),
     *leaves("officialproceedi00repu", "1896", {"": (132,)}),
-    *ballots("proceedingsoften00repu", "1892", {1: (144, 150)}),
+    *ballots("proceedingsoften00repu", "1892", {1: (148, 148)}),
     *leaves(
         "officialproceedi00repu_0",
         "1888",
         {"b1": (376, 377), "b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)},
     ),
-    *ballots("officialproceedi00repu_0", "1888", {4: (394, 396), 6: (406, 408), 8: (416, 418)}),
+    *ballots("officialproceedi00repu_0", "1888", {4: (395, 395), 6: (407, 407), 8: (416, 416)}),
     *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
-    *ballots("proceedingsofeig00repu", "1884", {1: (148, 152), 2: (153, 157), 4: (165, 176)}),
+    *ballots("proceedingsofeig00repu", "1884", {1: (150, 151), 2: (155, 156), 4: (171, 172)}),
     *ballots(
         "proceedingsofrep00inrepu",
         "1880",
         {
-            n: (page, min(max(after, page + 1), page + 4))
-            for n, (page, after) in enumerate(pairwise(ROLL_1880), start=1)
+            1: (215, 215),
+            2: (219, 220),
+            3: (223, 224),
+            4: (225, 225),
+            5: (226, 227),
+            6: (227, 228),
+            7: (229, 230),
+            8: (230, 230),
+            9: (232, 233),
+            10: (233, 234),
+            11: (235, 236),
+            12: (238, 239),
+            13: (239, 240),
+            14: (241, 242),
+            15: (242, 243),
+            16: (244, 245),
+            17: (246, 247),
+            18: (248, 248),
+            19: (251, 252),
+            20: (253, 253),
+            21: (254, 255),
+            22: (255, 256),
+            23: (257, 258),
+            24: (258, 259),
+            25: (261, 261),
+            26: (263, 263),
+            27: (264, 265),
+            28: (266, 267),
+            29: (269, 270),
+            30: (276, 277),
+            31: (279, 280),
+            32: (281, 282),
+            33: (282, 283),
+            34: (285, 285),
+            35: (286, 287),
+            36: (288, 288),
         },
     ),
     *leaves(
@@ -260,7 +293,7 @@ TABLES += [
         "1876",
         {"b1": (84,), "b2": (87,), "b5": (103, 104), "b6": (105, 106), "b7": (108, 109)},
     ),
-    *ballots("proceedingsrepu00nelsgoog", "1876", {3: (100, 101), 4: (101, 102)}),
+    *ballots("proceedingsrepu00nelsgoog", "1876", {3: (100, 101), 4: (102, 102)}),
     *leaves(
         "proceedingsoffir00inrepu",
         "1860",
