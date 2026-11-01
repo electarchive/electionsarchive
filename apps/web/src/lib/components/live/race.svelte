@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { LiveElection, LiveRace } from "@ea/analytics/live";
+  import { resolve } from "$app/paths";
   import { untrack } from "svelte";
   import type { Geography, Mode } from "#lib/live/standing.js";
   import { count, percent } from "#lib/format.js";
-  import { clock, lead, stamp } from "#lib/live/format.js";
+  import { clock, lead, placeSlug, stamp } from "#lib/live/format.js";
   import { estimateAt, history } from "#lib/live/history.js";
   import { standing, sum } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -11,7 +12,7 @@
   import Dial from "./dial.svelte";
   import Feed from "./feed.svelte";
   import Field from "./field.svelte";
-  import Map from "./map.svelte";
+  import LiveMap from "./map.svelte";
   import Outstanding from "./outstanding.svelte";
   import Table from "./table.svelte";
   import Tote from "./tote.svelte";
@@ -21,6 +22,7 @@
     election,
     race,
     geography,
+    base = null,
     clock: time,
     at = $bindable(null),
     isOffline = false,
@@ -29,6 +31,7 @@
     election: LiveElection;
     race: LiveRace;
     geography: Geography | null;
+    base?: string | null;
     clock: number;
     at?: string | null;
     isOffline?: boolean;
@@ -38,6 +41,23 @@
   const RECOUNT: Record<string, number> = { mi: 2000 };
 
   let mode = $state<Mode>("lead");
+
+  const counties = $derived(
+    new Map(
+      race.units.flatMap((unit) =>
+        unit.scheme === "us.county" ? [[unit.id, unit.name] as const] : [],
+      ),
+    ),
+  );
+
+  function href(unitId: string) {
+    const name = counties.get(unitId);
+    return base == null || name == null
+      ? null
+      : resolve("/live/[...path]", {
+          path: `${base}/place/${placeSlug(name)}`,
+        });
+  }
   let selected = $state<string | null>(null);
   let hovered = $state<string | null>(null);
   let seen = new Set<string>();
@@ -357,7 +377,7 @@
 
   {#if isLive}
     <section class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-2">
-      <Map
+      <LiveMap
         {geography}
         {options}
         {now}
@@ -365,10 +385,11 @@
         modes={["lead", "bubbles", "shift", "counted"]}
         title={m.night_map_counted_title()}
         bind:mode
+        {href}
         bind:selected
         bind:hovered
       />
-      <Map
+      <LiveMap
         {geography}
         {options}
         {now}
@@ -377,6 +398,7 @@
         title={m.night_map_left_title()}
         caption={m.night_map_left_caption()}
         mode="remaining"
+        {href}
         bind:selected
         bind:hovered
       />
@@ -385,7 +407,7 @@
     <section
       class="grid gap-8 bg-background px-4 py-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
     >
-      <Map
+      <LiveMap
         {geography}
         {options}
         {now}
@@ -393,6 +415,7 @@
         modes={["lead", "bubbles", "shift", "counted"]}
         title={m.night_map_counted_title()}
         bind:mode
+        {href}
         bind:selected
         bind:hovered
       />
@@ -435,13 +458,20 @@
     <section
       class="grid gap-8 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
     >
-      <Outstanding {options} {now} {estimate} bind:selected bind:hovered />
+      <Outstanding
+        {options}
+        {now}
+        {estimate}
+        {href}
+        bind:selected
+        bind:hovered
+      />
       <Feed {options} {pair} frames={race.frames} at={view} onPick={pick} />
     </section>
   {/if}
 
   <section class="bg-background px-4 py-6 sm:px-8">
-    <Table {options} {now} {estimate} bind:selected bind:hovered />
+    <Table {options} {now} {estimate} {href} bind:selected bind:hovered />
   </section>
 
   <footer

@@ -10,6 +10,8 @@ import type {
 
 export type Geography = {
   tiles: string;
+  scheme: string;
+  outline: Array<Array<[number, number]>>;
   frame: { west: number; south: number; east: number; north: number };
   places: Array<{ areaId: string; k: number; at: [number, number] }>;
 };

@@ -2,7 +2,7 @@
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
   import type { Standing } from "#lib/live/standing.js";
   import { count, percent } from "#lib/format.js";
-  import { compact, lead, surname, tone } from "#lib/live/format.js";
+  import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
   import { sum, toward } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -11,12 +11,14 @@
     options,
     now,
     estimate,
+    href,
     selected = $bindable(null),
     hovered = $bindable(null),
   }: {
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
+    href?: (unitId: string) => string | null;
     selected?: string | null;
     hovered?: string | null;
   } = $props();
@@ -127,24 +129,26 @@
     <ul class="grid gap-1">
       {#each top as entry (entry.row.unit.id)}
         {const leanTone = $derived(tone(options[entry.lean >= 0 ? a : b]))}
-        <li>
-          <button
-            type="button"
+        {const link = $derived(href?.(entry.row.unit.id) ?? null)}
+        <li
+          onpointerenter={() => (hovered = entry.row.unit.id)}
+          onpointerleave={() => (hovered = null)}
+        >
+          <svelte:element
+            this={link == null ? "div" : "a"}
+            href={link ?? undefined}
             class={cn(
-              "grid grid-cols-[minmax(6rem,8rem)_1fr_auto] items-center gap-3 rounded-xs p-1 text-start  text-[0.8125rem] inline-full hover:highlighter",
+              "grid grid-cols-[minmax(6rem,8rem)_1fr_auto] items-center gap-3 rounded-xs p-1 text-start text-[0.8125rem] inline-full hover:highlighter",
               {
                 highlighter:
                   hovered === entry.row.unit.id ||
                   selected === entry.row.unit.id,
               },
             )}
-            onpointerenter={() => (hovered = entry.row.unit.id)}
-            onpointerleave={() => (hovered = null)}
-            onclick={() =>
-              (selected =
-                selected === entry.row.unit.id ? null : entry.row.unit.id)}
           >
-            <span class="truncate font-semibold">{entry.row.unit.name}</span>
+            <span class="truncate font-semibold"
+              >{placeName(entry.row.unit.name)}</span
+            >
             <span
               class="relative flex overflow-hidden rounded-xs block-3"
               style:inline-size="{(entry.expected / widest) * 100}%"
@@ -165,7 +169,7 @@
                 lean: `${surname(options[entry.lean >= 0 ? a : b])} +${lead(entry.lean, 0)}`,
               })}
             </span>
-          </button>
+          </svelte:element>
         </li>
       {/each}
     </ul>

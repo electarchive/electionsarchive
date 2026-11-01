@@ -6,6 +6,8 @@
   } from "@ea/analytics/live";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import HexagonIcon from "@lucide/svelte/icons/hexagon";
+  import MapIcon from "@lucide/svelte/icons/map";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import { percent } from "#lib/format.js";
@@ -19,12 +21,14 @@
   import { party, summarize, tally } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
+  import Hexes from "./hexes.svelte";
   import Nation from "./nation.svelte";
 
   const {
     election,
     estimates,
     nation,
+    house,
     clock,
     isOffline,
   }: {
@@ -35,6 +39,16 @@
       codes: Record<string, string>;
       labels: Record<string, string>;
     } | null;
+    house: {
+      map: Geography | null;
+      codes: Record<string, string>;
+      cartogram: {
+        box: [number, number, number, number];
+        districts: Array<{ key: string; d: string; x: number; y: number }>;
+        states: Array<string>;
+        labels: Array<{ x: number; y: number; text: string }>;
+      } | null;
+    } | null;
     clock: number;
     isOffline: boolean;
   } = $props();
@@ -43,6 +57,8 @@
 
   let view = $state<View>("senate");
   let hovered = $state<string | null>(null);
+  let layout = $state<"shapes" | "hexes">("shapes");
+  let probe = $state<string | null>(null);
 
   const VIEWS: Array<{ id: View; label: () => string }> = [
     { id: "senate", label: m.night_nation_senate },
@@ -141,6 +157,36 @@
     }
     return found;
   });
+
+  const districts = $derived(
+    new Map<string, Summary>(
+      summaries.flatMap((summary) =>
+        summary.race.office === "house" && summary.race.district != null
+          ? [
+              [
+                `${summary.race.state}-${Number.parseInt(summary.race.district, 10)}`,
+                summary,
+              ] as const,
+            ]
+          : [],
+      ),
+    ),
+  );
+  const districtColors = $derived(
+    Object.fromEntries(
+      [...districts].map(([key, summary]) => [key, strength(summary)]),
+    ),
+  );
+  const hasShapes = $derived(house?.map != null);
+  const hasHexes = $derived(house?.cartogram != null);
+  const isHexes = $derived(
+    (layout === "hexes" && hasHexes) || (!hasShapes && hasHexes),
+  );
+
+  function districtHref(key: string) {
+    const summary = districts.get(key);
+    return summary == null ? null : raceHref(summary);
+  }
 
   const balance = $derived(tally(summaries, office));
   const totalRaces = $derived(
@@ -250,6 +296,26 @@
   {/if}
 {/snippet}
 
+{#snippet district(key: string)}
+  {const summary = $derived(districts.get(key))}
+  {#if summary == null}
+    <span class="text-sm font-semibold">{key.toUpperCase()}</span>
+    <span class="text-muted-foreground">{m.night_nation_none()}</span>
+  {:else}
+    <span class="text-sm font-semibold"
+      >{name(summary.race.state)}, {summary.race.district === "0"
+        ? m.night_nation_house()
+        : m.night_rail_house({ district: summary.race.district ?? "" })}</span
+    >
+    {@render chip(summary)}
+    {#if summary.counted != null}
+      <span class="text-muted-foreground"
+        >{m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
+      >
+    {/if}
+  {/if}
+{/snippet}
+
 <article class="grid gap-px bg-border">
   <header class="grid gap-4 bg-background px-4 pbs-6 pbe-5 sm:px-8">
     <p
@@ -319,29 +385,85 @@
     class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10"
   >
     <div class="grid content-start gap-3">
-      <div
-        role="radiogroup"
-        aria-label={m.night_nation_views()}
-        class="flex flex-wrap gap-1"
-      >
-        {#each VIEWS as entry (entry.id)}
-          <button
-            type="button"
-            role="radio"
-            aria-checked={view === entry.id}
-            class={cn(
-              "rounded-xs px-2.5 py-1 text-[0.8125rem] font-semibold transition-colors",
-              {
-                "bg-primary text-primary-foreground": view === entry.id,
-                "text-muted-foreground hover:highlighter hover:text-foreground":
-                  view !== entry.id,
-              },
-            )}
-            onclick={() => (view = entry.id)}>{entry.label()}</button
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div
+          role="radiogroup"
+          aria-label={m.night_nation_views()}
+          class="flex flex-wrap gap-1"
+        >
+          {#each VIEWS as entry (entry.id)}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={view === entry.id}
+              class={cn(
+                "rounded-xs px-2.5 py-1 text-[0.8125rem] font-semibold transition-colors",
+                {
+                  "bg-primary text-primary-foreground": view === entry.id,
+                  "text-muted-foreground hover:highlighter hover:text-foreground":
+                    view !== entry.id,
+                },
+              )}
+              onclick={() => (view = entry.id)}>{entry.label()}</button
+            >
+          {/each}
+        </div>
+        {#if view === "house" && hasShapes && hasHexes}
+          <div
+            role="radiogroup"
+            aria-label={m.night_house_layout()}
+            class="flex gap-0.5 rounded-sm p-0.5 ring-1 ring-border"
           >
-        {/each}
+            {#each [{ id: "shapes" as const, label: m.night_house_shapes(), Icon: MapIcon }, { id: "hexes" as const, label: m.night_house_hexes(), Icon: HexagonIcon }] as entry (entry.id)}
+              <button
+                type="button"
+                role="radio"
+                aria-checked={layout === entry.id}
+                class={cn(
+                  "inline-flex items-center gap-1.5 rounded-xs px-2 py-0.5 text-[0.8125rem] font-semibold transition-colors",
+                  {
+                    "bg-secondary text-foreground": layout === entry.id,
+                    "text-muted-foreground hover:text-foreground":
+                      layout !== entry.id,
+                  },
+                )}
+                onclick={() => (layout = entry.id)}
+                ><entry.Icon
+                  class="block-3.5 inline-3.5"
+                  aria-hidden="true"
+                />{entry.label}</button
+              >
+            {/each}
+          </div>
+        {/if}
       </div>
-      {#if nation == null}
+      {#if view === "house" && house != null && (hasShapes || hasHexes)}
+        {#if isHexes && house.cartogram != null}
+          <Hexes
+            cartogram={house.cartogram}
+            colors={districtColors}
+            label={m.night_house_hexes_label()}
+            bind:hovered={probe}
+            href={districtHref}
+            tip={district}
+          />
+        {:else if house.map != null}
+          <Nation
+            geography={house.map}
+            codes={house.codes}
+            colors={districtColors}
+            label={m.night_house_map()}
+            bind:hovered={probe}
+            onPick={async (key: string) => {
+              const link = districtHref(key);
+              if (link != null) {
+                await goto(link);
+              }
+            }}
+            tip={district}
+          />
+        {/if}
+      {:else if nation == null}
         <div
           class="aspect-[1.6] animate-pulse rounded-sm bg-muted inline-full motion-reduce:animate-none"
         ></div>
@@ -361,7 +483,9 @@
       <p class="text-xs text-muted-foreground">
         {view === "reporting"
           ? m.night_nation_legend_reporting()
-          : m.night_nation_legend()}
+          : view === "house" && house != null && (hasShapes || hasHexes)
+            ? m.night_house_legend()
+            : m.night_nation_legend()}
       </p>
     </div>
 
@@ -589,13 +713,16 @@
                     aria-label={m.night_nation_seats({ count: house.length })}
                   >
                     {#each house.toSorted((x, y) => Number.parseInt(x.race.district ?? "0", 10) - Number.parseInt(y.race.district ?? "0", 10)) as seat (seat.race.id)}
-                      <span
-                        class="rounded-[1px] block-2.5 inline-2.5"
+                      <a
+                        href={raceHref(seat)}
+                        class="rounded-[1px] block-2.5 inline-2.5 hover:outline-1 hover:outline-foreground"
                         style:background-color={seat.leader == null
                           ? WAITING
                           : strength(seat)}
                         title={seat.race.title}
-                      ></span>
+                        aria-label={seat.race.title}
+                        onclick={(event) => event.stopPropagation()}
+                      ></a>
                     {/each}
                   </span>
                 {/if}

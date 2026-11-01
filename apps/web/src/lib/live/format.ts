@@ -68,3 +68,16 @@ export function day(at: string | number, zone = ZONE) {
     timeZone: zone,
   }).format(new Date(at));
 }
+
+export function placeName(name: string) {
+  return name.replace(/, [A-Z]{2}$/u, "");
+}
+
+export function placeSlug(name: string) {
+  return placeName(name)
+    .normalize("NFKD")
+    .replaceAll(/\p{M}/gu, "")
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/gu, "-")
+    .replaceAll(/^-|-$/gu, "");
+}

@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
+  import MapIcon from "@lucide/svelte/icons/map";
+  import XIcon from "@lucide/svelte/icons/x";
   import { untrack } from "svelte";
   import type {
     Geography,
@@ -8,8 +10,10 @@
     UnitStanding,
   } from "#lib/live/standing.js";
   import { count, percent } from "#lib/format.js";
-  import { compact, lead, surname, tone } from "#lib/live/format.js";
+  import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
+  import { prefs } from "#lib/live/prefs.svelte.js";
   import { remainder } from "#lib/live/standing.js";
+  import { basemap, SCHEMES } from "#lib/map/basemap.js";
   import { Engine } from "#lib/map/engine.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -22,6 +26,8 @@
     modes = ["lead", "bubbles", "shift", "counted", "remaining"],
     title,
     caption,
+    anchor = null,
+    href,
     mode = $bindable("lead"),
     selected = $bindable(null),
     hovered = $bindable(null),
@@ -33,6 +39,8 @@
     modes?: Array<Mode>;
     title?: string;
     caption?: string;
+    anchor?: string | null;
+    href?: (unitId: string) => string | null;
     mode?: Mode;
     selected?: string | null;
     hovered?: string | null;
@@ -81,6 +89,7 @@
   );
 
   let pointer = $state<{ x: number; y: number } | null>(null);
+  let clicked = $state<string | null>(null);
   let frameWidth = $state(0);
   let frameHeight = $state(0);
   let tipWidth = $state(220);
@@ -121,6 +130,7 @@
         const unit = k == null ? null : (unitOfK.get(k) ?? null);
         if (kind === "click") {
           selected = unit === selected ? null : unit;
+          clicked = selected;
           return;
         }
         if (isTouch) {
@@ -143,7 +153,7 @@
 
   function fill(row: UnitStanding): string | null {
     const muted =
-      "color-mix(in oklab, var(--muted-foreground) 9%, var(--background))";
+      "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))";
     switch (mode) {
       case "lead": {
         if (row.leader == null) {
@@ -236,7 +246,7 @@
             "fill-color": [
               "coalesce",
               ["feature-state", "color"],
-              "color-mix(in oklab, var(--muted-foreground) 9%, var(--background))",
+              "color-mix(in oklab, var(--muted-foreground) 14%, var(--background))",
             ],
             "fill-color-transition": { duration: 600 },
           },
@@ -272,6 +282,8 @@
               "case",
               ["boolean", ["feature-state", "pinned"], false],
               2.4,
+              ["boolean", ["feature-state", "anchor"], false],
+              2.4,
               ["boolean", ["feature-state", "hover"], false],
               1.6,
               0,
@@ -281,6 +293,34 @@
         "focus",
         { group: "live-layers" },
       );
+      if (geography.outline.length > 0) {
+        engine.add(
+          {
+            id: "live-veil",
+            type: "fill",
+            source: engine.shapes(
+              "live-veil",
+              {
+                type: "Polygon",
+                coordinates: [
+                  [
+                    [-180, -85],
+                    [180, -85],
+                    [180, 85],
+                    [-180, 85],
+                    [-180, -85],
+                  ],
+                  ...geography.outline,
+                ],
+              },
+              "live-layers",
+            ),
+            paint: { "fill-color": "var(--background)", "fill-opacity": 0.55 },
+          },
+          "etch",
+          { group: "live-layers", rank: 1 },
+        );
+      }
       engine.frame(geography.frame);
       painted = geography.tiles;
     }
@@ -345,17 +385,52 @@
         : (kOf.get(now.units.get(selected)?.unit.areaId ?? "") ?? null);
     engine.mark("hover", source, hoverK);
     engine.mark("pinned", source, pinnedK);
+    engine.mark(
+      "anchor",
+      source,
+      anchor == null ? null : (kOf.get(anchor) ?? null),
+    );
   }
 
   $effect(() => {
-    void [now, mode, estimate, hovered, selected, engine.theme, circles];
+    void [
+      now,
+      mode,
+      estimate,
+      hovered,
+      selected,
+      anchor,
+      engine.theme,
+      circles,
+    ];
     if (engine.isLoaded && geography != null) {
       untrack(draw);
     }
   });
 
+  $effect(() => {
+    if (engine.gl == null || geography == null) {
+      return;
+    }
+    const scheme = geography.scheme;
+    const outline = geography.outline;
+    const isDetailed = prefs.isBasemap;
+    untrack(() => basemap(engine, scheme, isDetailed, outline));
+  });
+
+  const pinned = $derived(
+    selected == null || selected !== clicked
+      ? null
+      : (now.units.get(selected) ?? null),
+  );
   const focus = $derived(
-    hovered == null ? null : (now.units.get(hovered) ?? null),
+    hovered == null || (hovered === selected && pinned != null)
+      ? null
+      : (now.units.get(hovered) ?? null),
+  );
+  const isLive = $derived(estimate?.status === "estimating" && !now.isFinal);
+  const hasBasemap = $derived(
+    geography != null && SCHEMES.has(geography.scheme),
   );
   const tipLeft = $derived(
     pointer == null
@@ -388,6 +463,14 @@
     }
   });
 </script>
+
+<svelte:window
+  onkeydown={(event: KeyboardEvent) => {
+    if (event.key === "Escape" && selected != null) {
+      selected = null;
+    }
+  }}
+/>
 
 <figure class="grid content-start gap-2.5" aria-busy={geography == null}>
   <div
@@ -464,13 +547,52 @@
           {m.night_map_none()}
         </p>
       {/if}
+      {#if hasBasemap}
+        <button
+          type="button"
+          class={cn(
+            "absolute inset-e-2 inset-be-2 z-20 grid place-items-center rounded-sm bg-background/90 shadow-xs ring-1 ring-border backdrop-blur-sm block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10",
+            { "text-muted-foreground": !prefs.isBasemap },
+          )}
+          aria-label={m.map_basemap()}
+          aria-pressed={prefs.isBasemap}
+          title={m.map_basemap()}
+          onclick={() => (prefs.isBasemap = !prefs.isBasemap)}
+        >
+          <MapIcon class="block-4 inline-4" />
+        </button>
+      {/if}
     </div>
+    {#if pinned != null}
+      {const link = $derived(href?.(pinned.unit.id) ?? null)}
+      <div
+        class="z-20 mbs-2 grid gap-1.5 rounded-sm bg-popover px-3 py-2.5 text-[0.8125rem] shadow-menu ring-1 ring-border sm:absolute sm:inset-e-2 sm:inset-bs-2 sm:mbs-0 sm:inline-64"
+        role="region"
+        aria-label={pinned.unit.name}
+      >
+        <div class="flex items-start justify-between gap-2">
+          <span class="font-semibold">{placeName(pinned.unit.name)}</span>
+          <button
+            type="button"
+            class="-me-1.5 -mbs-1 grid shrink-0 place-items-center rounded-xs text-muted-foreground block-6 inline-6 hover:bg-secondary hover:text-foreground"
+            aria-label={m.night_map_close()}
+            title={m.night_map_close()}
+            onclick={() => (selected = null)}
+          >
+            <XIcon class="block-3.5 inline-3.5" />
+          </button>
+        </div>
+        {@render detail(pinned, 6)}
+        {#if link != null}
+          <a
+            href={link}
+            class="border-bs border-border pbs-1.5 text-xs font-semibold underline-offset-2 hover:underline"
+            >{m.night_map_open({ place: placeName(pinned.unit.name) })}</a
+          >
+        {/if}
+      </div>
+    {/if}
     {#if pointer != null && focus != null}
-      {const total = $derived(focus.total)}
-      {const rest = $derived(remainder(focus, estimate, options, now.pair))}
-      {const isLive = $derived(
-        estimate?.status === "estimating" && !now.isFinal,
-      )}
       <div
         class="pointer-events-none absolute z-30 grid gap-1.5 rounded-sm bg-popover/95 px-3 py-2.5 text-[0.8125rem] shadow-menu ring-1 ring-border backdrop-blur-sm inline-56"
         style:inset-inline-start="{tipLeft}px"
@@ -478,63 +600,88 @@
         bind:offsetWidth={tipWidth}
         bind:offsetHeight={tipHeight}
       >
-        <span class="font-semibold">{focus.unit.name}</span>
-        {#if total > 0}
-          {#each focus.order.slice(0, 3) as index (index)}
-            <span class="flex items-baseline gap-2 font-figures tabular-nums">
-              <span
-                class="shrink-0 self-center rounded-full block-2 inline-2"
-                style:background-color={tone(options[index])}
-              ></span>
-              <span class="grow truncate font-sans min-inline-0"
-                >{surname(options[index])}</span
-              >
-              <span class="text-muted-foreground"
-                >{count(focus.votes[index] ?? 0)}</span
-              >
-              <span class="text-end font-semibold min-inline-11"
-                >{percent((focus.votes[index] ?? 0) / total)}</span
-              >
-            </span>
-          {/each}
-          <span class="text-xs text-muted-foreground">
-            {m.night_tip_counted({
-              share: percent(
-                Math.min(1, total / Math.max(1, rest.expected)),
-                0,
-              ),
-            })}
-          </span>
-        {:else}
-          <span class="text-xs text-muted-foreground"
-            >{m.night_tip_waiting()}</span
-          >
-        {/if}
-        {#if isLive && rest.left >= 1}
-          <span
-            class="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 border-bs border-border pbs-1.5 text-xs"
-          >
-            <span class="text-muted-foreground">{m.night_table_left()}</span>
-            <span class="text-end font-figures font-semibold tabular-nums"
-              >{compact(rest.left)}</span
-            >
-            {#if rest.lean != null}
-              <span class="text-muted-foreground">{m.night_table_lean()}</span>
-              <span
-                class="text-end font-figures font-semibold tabular-nums"
-                style:color={rest.lean >= 0 ? toneA : toneB}
-                >{signedText(rest.lean)}</span
-              >
-            {/if}
-          </span>
-        {/if}
-        {#if focus.baseSigned != null}
-          <span class="text-xs text-muted-foreground">
-            {m.night_tip_baseline({ margin: signedText(focus.baseSigned) })}
-          </span>
-        {/if}
+        <span class="font-semibold">{placeName(focus.unit.name)}</span>
+        {@render detail(focus, 3)}
       </div>
     {/if}
   </div>
-  <p class="text-xs text-muted-foreground">{caption ?? legend}</p>
+  <p
+    class="flex flex-wrap justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground"
+  >
+    <span>{caption ?? legend}</span>
+    {#if hasBasemap && prefs.isBasemap}
+      <span class="text-[0.6875rem]">{m.map_basemap_credit()}</span>
+    {/if}
+  </p>
 </figure>
+
+{#snippet detail(row: UnitStanding, limit: number)}
+  {const total = $derived(row.total)}
+  {const rest = $derived(remainder(row, estimate, options, now.pair))}
+  {#if total > 0}
+    {#each row.order.slice(0, limit) as index (index)}
+      {const share = $derived((row.votes[index] ?? 0) / total)}
+      <span class="grid gap-0.5">
+        <span class="flex items-baseline gap-2 font-figures tabular-nums">
+          <span
+            class="shrink-0 self-center rounded-full block-2 inline-2"
+            style:background-color={tone(options[index])}
+          ></span>
+          <span
+            class={cn("grow truncate font-sans min-inline-0", {
+              "font-semibold": index === row.leader,
+            })}>{surname(options[index])}</span
+          >
+          <span class="text-muted-foreground"
+            >{count(row.votes[index] ?? 0)}</span
+          >
+          <span class="text-end font-semibold min-inline-11"
+            >{percent(share)}</span
+          >
+        </span>
+        {#if limit > 3}
+          <span
+            class="mis-4 relative overflow-hidden rounded-xs bg-muted block-1"
+            aria-hidden="true"
+          >
+            <span
+              class="absolute inset-y-0 inset-s-0 transition-[inline-size] duration-500 motion-reduce:transition-none"
+              style:inline-size="{share * 100}%"
+              style:background-color={tone(options[index])}
+            ></span>
+          </span>
+        {/if}
+      </span>
+    {/each}
+    <span class="text-xs text-muted-foreground">
+      {m.night_tip_counted({
+        share: percent(Math.min(1, total / Math.max(1, rest.expected)), 0),
+      })}
+    </span>
+  {:else}
+    <span class="text-xs text-muted-foreground">{m.night_tip_waiting()}</span>
+  {/if}
+  {#if isLive && rest.left >= 1}
+    <span
+      class="grid grid-cols-[1fr_auto] gap-x-3 gap-y-0.5 border-bs border-border pbs-1.5 text-xs"
+    >
+      <span class="text-muted-foreground">{m.night_table_left()}</span>
+      <span class="text-end font-figures font-semibold tabular-nums"
+        >{compact(rest.left)}</span
+      >
+      {#if rest.lean != null}
+        <span class="text-muted-foreground">{m.night_table_lean()}</span>
+        <span
+          class="text-end font-figures font-semibold tabular-nums"
+          style:color={rest.lean >= 0 ? toneA : toneB}
+          >{signedText(rest.lean)}</span
+        >
+      {/if}
+    </span>
+  {/if}
+  {#if row.baseSigned != null}
+    <span class="text-xs text-muted-foreground">
+      {m.night_tip_baseline({ margin: signedText(row.baseSigned) })}
+    </span>
+  {/if}
+{/snippet}

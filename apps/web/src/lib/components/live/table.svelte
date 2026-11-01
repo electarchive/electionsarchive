@@ -17,12 +17,14 @@
     options,
     now,
     estimate,
+    href,
     selected = $bindable(null),
     hovered = $bindable(null),
   }: {
     options: Array<LiveOption>;
     now: Standing;
     estimate: LiveEstimate | null;
+    href?: (unitId: string) => string | null;
     selected?: string | null;
     hovered?: string | null;
   } = $props();
@@ -329,16 +331,13 @@
             hovered === row.unit.id || selected === row.unit.id,
           )}
           {const isOpen = $derived(entry.left != null && entry.left >= 1)}
+          {const link = $derived(href?.(row.unit.id) ?? null)}
           <tr
-            class={cn(
-              "group cursor-pointer border-be border-border transition-colors",
-              { highlighter: isMarked },
-            )}
-            aria-selected={selected === row.unit.id}
+            class={cn("group border-be border-border transition-colors", {
+              highlighter: isMarked,
+            })}
             onpointerenter={() => (hovered = row.unit.id)}
             onpointerleave={() => (hovered = null)}
-            onclick={() =>
-              (selected = selected === row.unit.id ? null : row.unit.id)}
           >
             <th
               scope="row"
@@ -351,9 +350,17 @@
                     ? "var(--border)"
                     : tone(options[row.leader])}
                 ></span>
-                <span class="whitespace-nowrap" title={row.unit.name}
-                  >{place(row.unit.name)}</span
-                >
+                {#if link == null}
+                  <span class="whitespace-nowrap" title={row.unit.name}
+                    >{place(row.unit.name)}</span
+                  >
+                {:else}
+                  <a
+                    href={link}
+                    class="whitespace-nowrap underline-offset-2 hover:underline"
+                    title={row.unit.name}>{place(row.unit.name)}</a
+                  >
+                {/if}
               </span>
             </th>
             <td class="py-3 ps-5 pe-3">
