@@ -110,6 +110,7 @@ def scan() -> str:
                         "pdftoppm",
                         "-r",
                         str(dpi),
+                        *(("-scale-to", "7900") if dpi > 200 else ()),
                         "-gray",
                         "-png",
                         "-singlefile",
