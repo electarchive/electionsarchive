@@ -17,8 +17,10 @@
     stamp,
     surname,
     tone,
+    zoneName,
   } from "#lib/live/format.js";
   import { party, summarize, tally } from "#lib/live/summary.js";
+  import { ZONES } from "#lib/live/zones.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import Hexes from "./hexes.svelte";
@@ -205,10 +207,18 @@
   );
   const closings = $derived(
     [...Map.groupBy(election.pollClose, (entry) => entry.at)]
-      .map(([at, entries]) => ({
-        at,
-        states: entries.map((entry) => entry.state).toSorted(),
-      }))
+      .map(([at, entries]) => {
+        const states = entries.map((entry) => entry.state).toSorted();
+        return {
+          at,
+          states,
+          local: [
+            ...Map.groupBy(states, (code) =>
+              stamp(at, ZONES[code] ?? "America/New_York"),
+            ),
+          ].map(([time, codes]) => ({ time, codes })),
+        };
+      })
       .toSorted((a, b) => a.at.localeCompare(b.at)),
   );
 
@@ -607,7 +617,14 @@
         </section>
       {/if}
       <section class="grid gap-2">
-        <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
+        <div class="grid gap-0.5">
+          <h2 class="heading text-lg!">{m.night_nation_closings()}</h2>
+          {#if closings[0] != null}
+            <p class="text-xs text-muted-foreground">
+              {m.night_closings_zone({ zone: zoneName(closings[0].at) })}
+            </p>
+          {/if}
+        </div>
         <ol class="grid gap-1.5">
           {#each closings as closing (closing.at)}
             {const isPast = $derived(Date.parse(closing.at) <= clock)}
@@ -617,9 +634,30 @@
                 { "text-muted-foreground": isPast },
               )}
             >
-              <span class="font-figures font-semibold tabular-nums"
-                >{clockOf(closing.at)}</span
-              >
+              <span class="group relative justify-self-start">
+                <button
+                  type="button"
+                  aria-describedby="closing-{closing.at}"
+                  class="cursor-help font-figures font-semibold tabular-nums underline decoration-current/45 decoration-dotted underline-offset-[0.2em]"
+                  >{clockOf(closing.at)}</button
+                >
+                <span
+                  id="closing-{closing.at}"
+                  role="tooltip"
+                  class="pointer-events-none invisible absolute inset-s-0 inset-bs-full z-20 mbs-1.5 grid gap-1 rounded-sm bg-popover px-3 py-2 text-xs text-foreground opacity-0 shadow-menu ring-1 ring-border transition-opacity duration-150 min-inline-48 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none"
+                >
+                  <span class="font-semibold">{m.night_closings_local()}</span>
+                  {#each closing.local as entry (entry.time)}
+                    <span class="flex items-baseline justify-between gap-4">
+                      <span class="uppercase">{entry.codes.join(", ")}</span>
+                      <span
+                        class="font-figures whitespace-nowrap text-muted-foreground tabular-nums"
+                        >{entry.time}</span
+                      >
+                    </span>
+                  {/each}
+                </span>
+              </span>
               <span class="flex flex-wrap gap-1">
                 {#each closing.states as code (code)}
                   <a

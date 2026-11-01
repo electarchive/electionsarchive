@@ -8,6 +8,7 @@
   import Race from "#lib/components/live/race.svelte";
   import Races from "#lib/components/live/races.svelte";
   import { placeName, placeSlug, stamp } from "#lib/live/format.js";
+  import { localize } from "#lib/live/prefs.svelte.js";
   import { remainder, standing } from "#lib/live/standing.js";
   import { closing, describe, summarize } from "#lib/live/summary.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -186,6 +187,8 @@
     }, 30_000);
     return () => clearInterval(timer);
   });
+
+  $effect(localize);
 </script>
 
 <svelte:head>

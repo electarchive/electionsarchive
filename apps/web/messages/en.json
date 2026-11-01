@@ -3758,6 +3758,8 @@
   "night_nation_none": "No race here",
   "night_nation_reporting": "Reporting",
   "night_nation_seats": "{count} seats",
+  "night_closings_local": "Local closing time",
+  "night_closings_zone": "Times are in your time zone, {zone}.",
   "night_nation_senate": "Senate",
   "night_nation_state": "State",
   "night_nation_states": "States reporting",

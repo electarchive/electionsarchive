@@ -3,6 +3,7 @@
   import { untrack } from "svelte";
   import type { Edge } from "#lib/live/simulate.js";
   import Race from "#lib/components/live/race.svelte";
+  import { localize } from "#lib/live/prefs.svelte.js";
   import { plan, snapshot, stamps, start } from "#lib/live/simulate.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageProps } from "./$types";
@@ -33,6 +34,8 @@
       held = live;
     }
   });
+
+  $effect(localize);
 </script>
 
 <svelte:head>

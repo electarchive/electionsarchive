@@ -1,8 +1,7 @@
 import type { LiveOption } from "@ea/analytics/live";
 import { dates, numbers } from "#lib/format.js";
+import { prefs } from "#lib/live/prefs.svelte.js";
 import { swatch } from "#lib/party.js";
-
-export const ZONE = "America/New_York";
 
 export function tone(option: LiveOption | undefined) {
   if (option == null) {
@@ -39,7 +38,7 @@ export function compact(value: number) {
   }).format(value);
 }
 
-export function clock(at: string | number | null, zone = ZONE) {
+export function clock(at: string | number | null, zone = prefs.zone) {
   if (at == null) {
     return "";
   }
@@ -48,7 +47,7 @@ export function clock(at: string | number | null, zone = ZONE) {
   );
 }
 
-export function stamp(at: string | number | null, zone = ZONE) {
+export function stamp(at: string | number | null, zone = prefs.zone) {
   if (at == null) {
     return "";
   }
@@ -60,13 +59,21 @@ export function stamp(at: string | number | null, zone = ZONE) {
   }).format(new Date(at));
 }
 
-export function day(at: string | number, zone = ZONE) {
+export function day(at: string | number, zone = prefs.zone) {
   return dates({
     weekday: "short",
     month: "short",
     day: "numeric",
     timeZone: zone,
   }).format(new Date(at));
+}
+
+export function zoneName(at: string | number, zone = prefs.zone) {
+  return (
+    dates({ timeZoneName: "short", timeZone: zone })
+      .formatToParts(new Date(at))
+      .find((part) => part.type === "timeZoneName")?.value ?? zone
+  );
 }
 
 export function placeName(name: string) {
