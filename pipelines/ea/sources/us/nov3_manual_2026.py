@@ -232,6 +232,11 @@ COUNTIES = {
         "MF-541/solano/Notice_of_Measures.pdf",
     ),
     "06083": ("CA", "https://sbcvote.com/", "MF-541/santa-barbara/bt000040.pdf"),
+    "06099": (
+        "CA",
+        "https://www.stanvote.gov/pdf/public_notices/20261103_notice_of_election_publication-measure-k-modesto.pdf",
+        "MF-541/stanislaus/20261103_notice_of_election_publication-measure-k-modesto.pdf",
+    ),
     "44001": (
         "RI",
         "https://www.barrington.ri.gov/DocumentCenter/View/2978/BOC-Booklet-Questions-Info-revised-10-6",
