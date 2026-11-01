@@ -238,6 +238,25 @@ TABLES += [
         {"b1": (84,), "b2": (87,), "b5": (103, 104), "b6": (105, 106), "b7": (108, 109)},
     ),
     *ballots("proceedingsrepu00nelsgoog", "1876", {3: (100, 101), 4: (101, 102)}),
+    *leaves(
+        "proceedingsoffir00inrepu",
+        "1860",
+        {"b1": (154,), "b2": (157,), "b3": (158,)},
+    ),
+    {
+        "table": "1856:republican:informal",
+        "item": "proceedingsoffir00inrepu",
+        "leaves": (58,),
+        "columns": (None, "Fremont", "McLean", "Banks", "Sumner", "Seward"),
+    },
+    {
+        "table": "1856:republican:formal",
+        "item": "proceedingsoffir00inrepu",
+        "leaves": (63,),
+        "columns": (None, "Fremont", "McLean", "Seward"),
+    },
+    {"table": "1864:republican", "item": "proceedingsoffir00inrepu", "leaves": (236, 237, 238), "narrated": True},
+    {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (38, 39, 40, 41), "narrated": True},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
 DNC = [
@@ -305,6 +324,17 @@ ROLL = (
     "the cell is blank. Read the rows and columns that continue the table from a previous page in the same way. If "
     "the page holds no such table, return an empty header and no rows."
 )
+NARRATED = (
+    "This page is from the official report of the proceedings of a national party convention, which narrates the "
+    "roll call on the presidential nomination state by state: the chairman of each delegation announces how many "
+    "votes it casts for each candidate. Read only those announcements, one row per state or territory in the order "
+    "announced. The header lists the candidates named, left to right, by surname as printed, never the state "
+    "column; each row's values hold one string per header column, in the same order, empty where the delegation "
+    "cast no votes for that candidate. Write votes as digits, spelling out no numbers, and where a delegation "
+    "changes its vote before the result is announced, record the changed vote. Where the delegation's votes held "
+    "are stated, put them in a first column labeled 'Votes'. If the page holds no announcements, return an empty "
+    "header and no rows."
+)
 ABBREVIATIONS = {
     "ala": "AL", "ariz": "AZ", "ark": "AR", "calif": "CA", "cal": "CA", "colo": "CO", "conn": "CT", "del": "DE",
     "dc": "DC", "fla": "FL", "ga": "GA", "ill": "IL", "ind": "IN", "kans": "KS", "kan": "KS", "ky": "KY", "la": "LA",
@@ -336,8 +366,14 @@ def fetch() -> None:
             image = raw.fetch(SOURCE, LEAF.format(item=spec["item"], leaf=leaf), suffix=".jpg")
             data = base64.b64encode(image.path.read_bytes()).decode()
             for effort in READS.values():
-                ask = ROLL if spec.get("ballot") is None else ROLL + BALLOT.format(ordinal(spec["ballot"]))
-                wanted[read_key(effort, image.sha256, spec.get("ballot"))] = (
+                ask = (
+                    NARRATED
+                    if spec.get("narrated")
+                    else ROLL
+                    if spec.get("ballot") is None
+                    else ROLL + BALLOT.format(ordinal(spec["ballot"]))
+                )
+                wanted[read_key(effort, image.sha256, variant(spec))] = (
                     MessageCreateParamsNonStreaming(
                         model="claude-haiku-5-5",
                         max_tokens=16000,
@@ -361,8 +397,14 @@ def fetch() -> None:
     print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
 
 
-def read_key(effort: str, digest: str, ballot: object = None) -> str:
-    prompt = PROMPT if ballot is None else f"{PROMPT}b{ballot}"
+def variant(spec: dict[str, object]) -> str | None:
+    if spec.get("narrated"):
+        return "n"
+    return None if spec.get("ballot") is None else f"b{spec['ballot']}"
+
+
+def read_key(effort: str, digest: str, kind: str | None = None) -> str:
+    prompt = PROMPT if kind is None else f"{PROMPT}{kind}"
     return f"anthropic-batch:claude-haiku-5-5/{prompt}/{effort}/{digest}"
 
 
