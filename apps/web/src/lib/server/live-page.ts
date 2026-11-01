@@ -2,7 +2,7 @@ import { call, ORPCError } from "@orpc/server";
 import { error } from "@sveltejs/kit";
 import { placeSlug } from "#lib/live/format.js";
 import { remember } from "#lib/server/cache.js";
-import { geography, house, states } from "#lib/server/live-board.js";
+import { control, geography, house, states } from "#lib/server/live-board.js";
 import { router } from "#lib/server/rpc/router.js";
 
 async function night(path: string) {
@@ -50,6 +50,7 @@ async function place(path: string, slug: string, at: string | null) {
     isRace: false,
     nation: null,
     house: null,
+    control: null,
     geography: map == null ? null : { ...map, frame: widen(map.frame) },
     place: { id: unit.id, areaId: unit.areaId, name: unit.name, slug },
     at,
@@ -107,6 +108,11 @@ export async function livePage(path: string, at: string | null) {
     house: isNation
       ? await remember(`live:house:v2:${election.date}`, async () =>
           house(election.id, election.date),
+        )
+      : null,
+    control: isNation
+      ? await remember(`live:control:v1:${election.date}`, async () =>
+          control(election.races, election.date),
         )
       : null,
     geography:

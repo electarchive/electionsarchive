@@ -13,6 +13,7 @@
     plan,
     replay,
     seeds,
+    sketch,
     stamps,
     start,
   } from "#lib/live/simulate.js";
@@ -62,7 +63,12 @@
   const election = $derived(isOffline && held != null ? held : live);
   const estimates = $derived(
     Object.fromEntries(
-      election.races.map((race) => [race.id, estimateAt(race, null)]),
+      election.races.map((race) => [
+        race.id,
+        race.units.length === 0
+          ? sketch(race, estimateAt(race, null))
+          : estimateAt(race, null),
+      ]),
     ),
   );
   const marks = $derived(stamps(runs, lead, edges, to));

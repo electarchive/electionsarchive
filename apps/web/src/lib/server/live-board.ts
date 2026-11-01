@@ -198,3 +198,130 @@ export async function house(electionId: string, date: string) {
           },
   };
 }
+
+const SIDES = new Set(["senate", "house", "governor"]);
+
+export async function control(
+  races: Array<{
+    id: string;
+    office: string;
+    options: Array<{ party: { id: string } | null }>;
+  }>,
+  date: string,
+) {
+  const ids = races
+    .filter((race) => SIDES.has(race.office))
+    .map((race) => race.id);
+  const [held, kept] = await Promise.all([
+    db.execute<{ contest: string; person: string; party: string | null }>(sql`
+      with held as (
+        select c.id as contest, t.id as tenure, t.person_id as person, t.contest_id as won
+        from contest c
+        join lateral (
+          select t.id, t.person_id, t.contest_id from tenure t left join seat s on s.id = t.seat_id
+          where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
+            and (t.seat_id = c.seat_id or t.office_id = c.office_id
+              or (c.seat_id is null and c.office_id is null and t.body_id = c.body_id and (s.district_area_id = c.district_area_id
+                or exists (select from area_code x join area_code y on y.code = x.code where x.area_id = s.district_area_id and y.area_id = c.district_area_id))))
+          order by t.from_date desc limit 1
+        ) t on true
+        where c.id = any(${sql.param(ids)}::uuid[])
+      )
+      select h.contest, h.person, coalesce(
+        (select ta.party_id from tenure_affiliation ta where ta.tenure_id = h.tenure and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
+        (select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = h.person and o.party_id is not null
+          order by (o.contest_id = h.won) desc nulls last, o.contest_id desc limit 1)
+      ) as party
+      from held h
+    `),
+    db.execute<{ office: string; person: string; party: string | null }>(sql`
+      with up as (
+        select c.seat_id, c.office_id from contest c where c.id = any(${sql.param(ids)}::uuid[])
+      ),
+      sitting as (
+        select distinct on (coalesce(t.seat_id, t.office_id)) t.id, t.person_id, t.contest_id,
+          case when b.kind = 'upper_house' then 'senate' else 'governor' end as office
+        from tenure t
+        left join body b on b.id = t.body_id
+        left join office o on o.id = t.office_id
+        left join polity bp on bp.id = b.polity_id
+        left join polity op on op.id = o.polity_id
+        where t.from_date <= ${date}::date and (t.to_date is null or t.to_date > ${date}::date)
+          and ((b.kind = 'upper_house' and bp.iso_code = 'US' and t.seat_id not in (select seat_id from up where seat_id is not null))
+            or (o.kind = 'governor' and op.iso_code ~ '^US-[A-Z]{2}$' and op.iso_code not in ('US-AS', 'US-DC', 'US-GU', 'US-MP', 'US-PR', 'US-VI') and t.office_id not in (select office_id from up where office_id is not null)))
+        order by coalesce(t.seat_id, t.office_id), t.from_date desc
+      )
+      select s.office, s.person_id as person, coalesce(
+        (select ta.party_id from tenure_affiliation ta where ta.tenure_id = s.id and ta.kind = 'party' and ta.valid @> ${date}::date limit 1),
+        (select o.party_id from candidacy ca join contest_option o on o.id = ca.option_id where ca.person_id = s.person_id and o.party_id is not null
+          order by (o.contest_id = s.contest_id) desc nulls last, o.contest_id desc limit 1)
+      ) as party
+      from sitting s
+    `),
+  ]);
+  const parties = [
+    ...new Set([
+      ...held.rows.flatMap((row) => (row.party == null ? [] : [row.party])),
+      ...kept.rows.flatMap((row) => (row.party == null ? [] : [row.party])),
+      ...races.flatMap((race) =>
+        race.options.flatMap((option) =>
+          option.party == null ? [] : [option.party.id],
+        ),
+      ),
+    ]),
+  ];
+  const parents = await db.execute<{ party: string; parent: string }>(sql`
+    select party_id as party, parent_party_id as parent from party_affiliation
+    where kind = 'regional_branch' and valid @> ${date}::date and party_id = any(${sql.param(parties)}::uuid[])
+  `);
+  const families: Record<string, string> = Object.fromEntries(
+    parents.rows.map((row) => [row.party, row.parent]),
+  );
+  const family = (party: string | null) =>
+    party == null ? null : (families[party] ?? party);
+  const roots = [...new Set(parties.map((party) => family(party) ?? party))];
+  const [named, people, colors] = await Promise.all([
+    names(roots, date),
+    names(
+      [...held.rows, ...kept.rows].map((row) => row.person),
+      date,
+    ),
+    db.execute<{ party: string; color: string }>(sql`
+      select party_id as party, color from party_color
+      where valid @> ${date}::date and party_id = any(${sql.param(roots)}::uuid[])
+    `),
+  ]);
+  const tint = new Map(colors.rows.map((row) => [row.party, row.color]));
+  const holdovers = {
+    senate: {} as Record<string, number>,
+    governor: {} as Record<string, number>,
+  };
+  for (const row of kept.rows) {
+    const side =
+      row.office === "senate" ? holdovers.senate : holdovers.governor;
+    const key = family(row.party) ?? "";
+    side[key] = (side[key] ?? 0) + 1;
+  }
+  return {
+    holders: Object.fromEntries(
+      held.rows.map((row) => [
+        row.contest,
+        { party: family(row.party), name: people.full.get(row.person) ?? "" },
+      ]),
+    ),
+    holdovers,
+    families,
+    parties: Object.fromEntries(
+      roots.map((root) => [
+        root,
+        {
+          name: named.full.get(root) ?? "",
+          short: named.short.get(root) ?? named.full.get(root) ?? "",
+          color: tint.get(root) ?? null,
+        },
+      ]),
+    ),
+  };
+}
+
+export type Control = Awaited<ReturnType<typeof control>>;

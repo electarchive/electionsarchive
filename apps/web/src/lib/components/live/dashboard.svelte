@@ -8,13 +8,16 @@
   import HexagonIcon from "@lucide/svelte/icons/hexagon";
   import MapIcon from "@lucide/svelte/icons/map";
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
+  import type { Chamber, Control, Seat } from "#lib/live/nation.js";
   import type { Geography } from "#lib/live/standing.js";
   import type { Summary } from "#lib/live/summary.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { percent } from "#lib/format.js";
+  import { fits } from "#lib/fits.js";
+  import { numbers, percent } from "#lib/format.js";
   import {
     clock as clockOf,
+    compact,
     lead,
     stamp,
     surname,
@@ -22,10 +25,24 @@
     zoneName,
   } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
+  import {
+    chamber,
+    pulse,
+    seat as seatOf,
+    sides as sidesOf,
+    STATES,
+  } from "#lib/live/nation.js";
   import { party, summarize, tally } from "#lib/live/summary.js";
   import { ZONES } from "#lib/live/zones.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
+  import { Windowed } from "#lib/windowed.svelte.js";
+  import Chambers from "./dashboard/chamber.svelte";
+  import Explorer from "./dashboard/explorer.svelte";
+  import Flip from "./dashboard/flip.svelte";
+  import Ladder from "./dashboard/ladder.svelte";
+  import Pulse from "./dashboard/pulse.svelte";
   import Hexes from "./hexes.svelte";
   import Locals from "./locals.svelte";
   import Nation from "./nation.svelte";
@@ -35,6 +52,7 @@
     estimates,
     nation,
     house,
+    control,
     clock,
     isOffline,
     forecasts = true,
@@ -56,6 +74,7 @@
         labels: Array<{ x: number; y: number; text: string }>;
       } | null;
     } | null;
+    control: Control | null;
     clock: number;
     isOffline: boolean;
     forecasts?: boolean;
@@ -63,29 +82,47 @@
 
   const toLive = liveLinks();
 
-  type View = "senate" | "governor" | "house" | "reporting";
+  type Mode = "lead" | "chance" | "flips" | "counted";
 
-  let view = $state<View>("senate");
+  let view = $state<Chamber>("senate");
+  let mode = $state<Mode>("lead");
   let hovered = $state<string | null>(null);
   let layout = $state<"shapes" | "hexes">("shapes");
   let probe = $state<string | null>(null);
 
-  const NAMES: Record<View, () => string> = {
+  const NAMES: Record<Chamber, () => string> = {
     senate: m.night_nation_senate,
     governor: m.night_nation_governor,
     house: m.night_nation_house,
-    reporting: m.night_nation_reporting,
   };
-  const VIEWS = $derived<Array<SegmentedOption<View>>>(
-    (["senate", "governor", "house", "reporting"] as const).map((value) => ({
+  const VIEWS = $derived<Array<SegmentedOption<Chamber>>>(
+    (["senate", "governor", "house"] as const).map((value) => ({
       value,
       label: NAMES[value](),
     })),
+  );
+  const MODES = $derived<Array<SegmentedOption<Mode>>>(
+    (
+      [
+        ["lead", m.night_color_lead],
+        ["chance", m.night_color_chance],
+        ["flips", m.night_color_flips],
+        ["counted", m.night_color_counted],
+      ] as const
+    )
+      .filter(([value]) => forecasts || value !== "chance")
+      .map(([value, label]) => ({ value, label: label() })),
   );
   const LAYOUTS = $derived<Array<SegmentedOption<"shapes" | "hexes">>>([
     { value: "shapes", label: m.night_house_shapes(), icon: MapIcon },
     { value: "hexes", label: m.night_house_hexes(), icon: HexagonIcon },
   ]);
+  const LEGENDS: Record<Mode, () => string> = {
+    lead: m.night_nation_legend,
+    chance: m.night_nation_legend_chance,
+    flips: m.night_nation_legend_flips,
+    counted: m.night_nation_legend_reporting,
+  };
   const MUTED =
     "color-mix(in oklab, var(--muted-foreground) 7%, var(--background))";
   const WAITING =
@@ -94,6 +131,63 @@
   const summaries = $derived(
     election.races.map((race) => summarize(race, estimates[race.id] ?? null)),
   );
+  const pair = $derived(sidesOf(control));
+  const seats = $derived(
+    pair == null
+      ? []
+      : summaries
+          .filter((summary) => summary.race.office !== "other")
+          .map((summary) => seatOf(summary, control, pair)),
+  );
+  const seatById = $derived(
+    new Map(seats.map((entry) => [entry.summary.race.id, entry])),
+  );
+  const chambers = $derived(
+    pair == null
+      ? null
+      : {
+          senate: chamber(
+            seats.filter(
+              (entry) =>
+                entry.summary.race.office === "senate" &&
+                STATES.has(entry.summary.race.state),
+            ),
+            "senate",
+            control?.holdovers.senate ?? {},
+            pair,
+          ),
+          house: chamber(
+            seats.filter(
+              (entry) =>
+                entry.summary.race.office === "house" &&
+                STATES.has(entry.summary.race.state),
+            ),
+            "house",
+            {},
+            pair,
+          ),
+          governor: chamber(
+            seats.filter(
+              (entry) =>
+                entry.summary.race.office === "governor" &&
+                STATES.has(entry.summary.race.state),
+            ),
+            "governor",
+            control?.holdovers.governor ?? {},
+            pair,
+          ),
+        },
+  );
+  const points = $derived(
+    pair == null
+      ? []
+      : pulse(
+          seats.filter((entry) => entry.summary.race.office === "house"),
+          control,
+          pair,
+        ),
+  );
+
   const byState = $derived(
     Map.groupBy(summaries, (summary) => summary.race.state),
   );
@@ -102,21 +196,39 @@
       (nation?.labels[a] ?? a).localeCompare(nation?.labels[b] ?? b),
     ),
   );
+  const states = new Windowed(() => ({
+    items: codes,
+    key: (code) => code,
+    size: 33,
+    threshold: 40,
+  }));
   const locals = $derived(
     summaries.filter((summary) => summary.race.office === "other"),
   );
-  const office = $derived<LiveOffice>(view === "reporting" ? "senate" : view);
   const counting = $derived(
     summaries.filter((summary) => summary.total > 0).length,
-  );
-  const certified = $derived(
-    summaries.filter((summary) => summary.race.certified != null).length,
   );
   const statesIn = $derived(
     codes.filter((code) =>
       (byState.get(code) ?? []).some((summary) => summary.total > 0),
     ).length,
   );
+  const houseVotes = $derived(points.at(-1) ?? null);
+  const houseTotal = $derived(
+    houseVotes == null
+      ? 0
+      : houseVotes.left + houseVotes.right + houseVotes.other,
+  );
+  const remaining = $derived.by(() => {
+    let found = 0;
+    for (const entry of seats) {
+      if (entry.summary.race.office === "house") {
+        found += entry.remaining ?? 0;
+      }
+    }
+    return found;
+  });
+  const flips = $derived(seats.filter((entry) => entry.isFlip).length);
   const newest = $derived(election.newest);
   const isLive = $derived(counting > 0 && !election.isCertified);
 
@@ -124,6 +236,30 @@
     return (byState.get(code) ?? []).filter(
       (summary) => summary.race.office === wanted,
     );
+  }
+
+  function tint(id: string | null) {
+    if (id == null) {
+      return WAITING;
+    }
+    if (pair != null) {
+      for (const side of pair) {
+        if (side.id === id) {
+          return side.color;
+        }
+      }
+    }
+    return swatch(control?.parties[id]?.color, `party:${id}`);
+  }
+
+  function short(id: string | null) {
+    if (id == null) {
+      return "–";
+    }
+    if (id === "") {
+      return m.night_explorer_independent();
+    }
+    return control?.parties[id]?.short ?? "–";
   }
 
   function strength(summary: Summary) {
@@ -136,6 +272,51 @@
         ? Math.round(30 + 60 * Math.min(summary.margin / 0.3, 1))
         : 100;
     return `color-mix(in oklab, ${tone(option)} ${share}%, var(--background))`;
+  }
+
+  function reporting(share: number | null) {
+    return share == null
+      ? MUTED
+      : `color-mix(in oklab, var(--foreground) ${Math.round(10 + 78 * share)}%, var(--background))`;
+  }
+
+  function shade(summary: Summary, wanted: Mode = mode) {
+    const entry = seatById.get(summary.race.id);
+    if (wanted === "counted") {
+      return reporting(summary.counted ?? (summary.total > 0 ? 0.02 : null));
+    }
+    if (entry == null || wanted === "lead") {
+      return strength(summary);
+    }
+    if (wanted === "flips") {
+      if (!entry.isFlip) {
+        return summary.total > 0 ? MUTED : WAITING;
+      }
+      return `color-mix(in oklab, ${tint(entry.side)} ${entry.rating === "won" ? 100 : 70}%, var(--background))`;
+    }
+    if (entry.rating === "waiting" || entry.rating === "counting") {
+      return summary.total > 0
+        ? `color-mix(in oklab, ${tone(summary.leader ?? undefined)} 22%, var(--background))`
+        : WAITING;
+    }
+    const isLeft = entry.left >= entry.right;
+    const sure = Math.abs(entry.left - entry.right);
+    const color = pair == null ? WAITING : pair[isLeft ? 0 : 1].color;
+    return `color-mix(in oklab, ${color} ${Math.round(18 + 82 * sure)}%, var(--background))`;
+  }
+
+  function seatShade(entry: Seat) {
+    if (entry.rating === "won") {
+      return tint(entry.side);
+    }
+    if (entry.rating === "waiting" || entry.side == null) {
+      return WAITING;
+    }
+    if (entry.rating === "counting") {
+      return `color-mix(in oklab, ${tint(entry.side)} 28%, var(--background))`;
+    }
+    const share = { solid: 82, likely: 62, lean: 44, tossup: 28 }[entry.rating];
+    return `color-mix(in oklab, ${tint(entry.side)} ${share}%, var(--background))`;
   }
 
   function reported(code: string) {
@@ -152,20 +333,16 @@
   const colors = $derived.by(() => {
     const found: Record<string, string> = {};
     for (const code of Object.keys(nation?.codes ?? {})) {
-      if (view === "reporting") {
-        const share = reported(code);
-        found[code] =
-          share == null
-            ? MUTED
-            : `color-mix(in oklab, var(--foreground) ${Math.round(10 + 78 * share)}%, var(--background))`;
-        continue;
-      }
-      const races = of(code, office);
+      const races = of(code, view);
       if (races.length === 0) {
         found[code] = MUTED;
         continue;
       }
       if (view === "house") {
+        if (mode === "counted") {
+          found[code] = reporting(reported(code));
+          continue;
+        }
         const seats = tally(races, "house");
         const top = seats.groups[0];
         const share = top == null ? 0 : (top.won + top.leading) / races.length;
@@ -176,7 +353,7 @@
         continue;
       }
       const first = races[0];
-      found[code] = first == null ? MUTED : strength(first);
+      found[code] = first == null ? MUTED : shade(first);
     }
     return found;
   });
@@ -197,7 +374,7 @@
   );
   const districtColors = $derived(
     Object.fromEntries(
-      [...districts].map(([key, summary]) => [key, strength(summary)]),
+      [...districts].map(([key, summary]) => [key, shade(summary)]),
     ),
   );
   const hasShapes = $derived(house?.map != null);
@@ -208,24 +385,9 @@
 
   function districtHref(key: string) {
     const summary = districts.get(key);
-    return summary == null ? null : raceHref(summary);
+    return summary == null ? null : toLive(summary.race.slug);
   }
 
-  const balance = $derived(tally(summaries, office));
-  const totalRaces = $derived(
-    summaries.filter((summary) => summary.race.office === office).length,
-  );
-  const closest = $derived(
-    summaries
-      .filter(
-        (summary) =>
-          summary.race.office === office &&
-          summary.total > 0 &&
-          summary.race.certified == null,
-      )
-      .toSorted((a, b) => a.margin - b.margin)
-      .slice(0, 6),
-  );
   const closings = $derived(
     [...Map.groupBy(election.pollClose, (entry) => entry.at)]
       .map(([at, entries]) => {
@@ -242,6 +404,23 @@
       })
       .toSorted((a, b) => a.at.localeCompare(b.at)),
   );
+  const next = $derived(
+    closings.find((closing) => Date.parse(closing.at) > clock) ?? null,
+  );
+
+  function wait(at: string) {
+    const minutes = Math.max(1, Math.round((Date.parse(at) - clock) / 60_000));
+    return minutes < 60
+      ? numbers({ style: "unit", unit: "minute", unitDisplay: "short" }).format(
+          minutes,
+        )
+      : numbers({
+          style: "unit",
+          unit: "hour",
+          unitDisplay: "short",
+          maximumFractionDigits: minutes < 600 ? 1 : 0,
+        }).format(minutes / 60);
+  }
 
   function href(code: string): string {
     return toLive(
@@ -249,12 +428,28 @@
     );
   }
 
-  function raceHref(summary: Summary) {
-    return toLive(summary.race.slug);
-  }
-
   function name(code: string) {
     return nation?.labels[code] ?? code.toUpperCase();
+  }
+
+  function label(entry: Seat) {
+    const { race } = entry.summary;
+    if (race.office !== "house") {
+      return name(race.state);
+    }
+    const number = Number.parseInt(race.district ?? "", 10);
+    return `${race.state.toUpperCase()}-${Number.isNaN(number) || number === 0 ? "AL" : number}`;
+  }
+
+  function fullLabel(entry: Seat) {
+    const ahead = entry.summary.winner ?? entry.summary.leader;
+    return ahead == null
+      ? `${entry.summary.race.title}: ${m.night_nation_waiting()}`
+      : `${entry.summary.race.title}: ${surname(ahead)} +${lead(entry.summary.margin)}`;
+  }
+
+  function seatHref(entry: Seat) {
+    return toLive(entry.summary.race.slug);
   }
 </script>
 
@@ -265,25 +460,29 @@
     <span class="text-muted-foreground">{m.night_nation_waiting()}</span>
   {:else}
     {const option = $derived(summary.winner ?? summary.leader)}
-    <span class="inline-flex items-center gap-1.5">
+    {const entry = $derived(seatById.get(summary.race.id))}
+    <span class="flex items-center gap-1.5 whitespace-nowrap min-inline-0">
       <span
-        class="rounded-full block-2 inline-2"
+        class="shrink-0 rounded-full block-2 inline-2"
         style:background-color={tone(option)}
       ></span>
-      <span class={cn({ "font-semibold": summary.winner != null })}
-        >{surname(option)}</span
+      <span
+        class={cn("truncate min-inline-0", {
+          "font-semibold": summary.winner != null,
+        })}>{surname(option)}</span
       >
-      <span class="font-figures text-muted-foreground tabular-nums"
+      <span class="shrink-0 font-figures text-muted-foreground tabular-nums"
         >+{lead(summary.margin)}</span
       >
+      {#if entry?.isFlip === true}
+        <Flip party={short(entry.side)} color={tint(entry.side)} />
+      {/if}
     </span>
   {/if}
 {/snippet}
 
 {#snippet tip(code: string)}
-  {const races = $derived(
-    view === "reporting" ? (byState.get(code) ?? []) : of(code, office),
-  )}
+  {const races = $derived(of(code, view))}
   <span class="text-sm font-semibold">{name(code)}</span>
   {#if races.length === 0}
     <span class="text-muted-foreground">{m.night_nation_none()}</span>
@@ -307,15 +506,28 @@
     >
   {:else}
     {#each races.slice(0, 3) as summary (summary.race.id)}
-      <span class="flex items-center justify-between gap-3">
-        <span
-          >{summary.race.office === "senate"
-            ? m.night_nation_senate()
-            : summary.race.office === "governor"
-              ? m.night_nation_governor()
-              : summary.race.title}</span
-        >
-        {@render chip(summary)}
+      {const entry = $derived(seatById.get(summary.race.id))}
+      <span class="grid gap-0.5">
+        <span class="flex items-center justify-between gap-3">
+          <span>{summary.race.title}</span>
+          {@render chip(summary)}
+        </span>
+        {#if entry != null}
+          <span class="flex justify-between gap-3 text-muted-foreground">
+            <span
+              >{m.night_tip_held({
+                party: short(entry.held),
+                name: entry.holder,
+              })}</span
+            >
+            {#if forecasts && entry.rating !== "waiting" && entry.rating !== "counting" && entry.rating !== "won" && pair != null}
+              <span class="font-figures tabular-nums"
+                >{entry.left >= entry.right ? pair[0].short : pair[1].short}
+                {percent(Math.max(entry.left, entry.right), 0)}</span
+              >
+            {/if}
+          </span>
+        {/if}
       </span>
     {/each}
     {const share = $derived(reported(code))}
@@ -333,12 +545,21 @@
     <span class="text-sm font-semibold">{key.toUpperCase()}</span>
     <span class="text-muted-foreground">{m.night_nation_none()}</span>
   {:else}
+    {const entry = $derived(seatById.get(summary.race.id))}
     <span class="text-sm font-semibold"
       >{name(summary.race.state)}, {summary.race.district === "0"
         ? m.night_nation_house()
         : m.night_rail_house({ district: summary.race.district ?? "" })}</span
     >
     {@render chip(summary)}
+    {#if entry != null}
+      <span class="text-muted-foreground"
+        >{m.night_tip_held({
+          party: short(entry.held),
+          name: entry.holder,
+        })}</span
+      >
+    {/if}
     {#if summary.counted != null}
       <span class="text-muted-foreground"
         >{m.night_tip_counted({ share: percent(summary.counted, 0) })}</span
@@ -386,7 +607,7 @@
     {#if !forecasts}
       <p class="text-sm text-muted-foreground">{m.board_forecast_off()}</p>
     {/if}
-    <dl class="flex flex-wrap gap-x-8 gap-y-2">
+    <dl class="grid grid-cols-2 gap-x-8 gap-y-3 sm:flex sm:flex-wrap">
       <div class="grid">
         <dt class="text-xs text-muted-foreground">{m.night_nation_states()}</dt>
         <dd class="font-figures text-2xl font-[760] tabular-nums">
@@ -405,19 +626,105 @@
           >
         </dd>
       </div>
-      <div class="grid">
-        <dt class="text-xs text-muted-foreground">
-          {m.night_nation_certified()}
-        </dt>
-        <dd class="font-figures text-2xl font-[760] tabular-nums">
-          {certified}
-        </dd>
-      </div>
+      {#if pair != null}
+        <div class="grid">
+          <dt class="text-xs text-muted-foreground">
+            {m.night_kpi_house_votes()}
+          </dt>
+          <dd class="font-figures text-2xl font-[760] tabular-nums">
+            {compact(houseTotal)}
+          </dd>
+        </div>
+        {#if forecasts && remaining > 0}
+          <div class="grid">
+            <dt class="text-xs text-muted-foreground">
+              {m.night_kpi_remaining()}
+            </dt>
+            <dd class="font-figures text-2xl font-[760] tabular-nums">
+              {compact(remaining)}
+            </dd>
+          </div>
+        {/if}
+        {#if houseVotes != null && houseTotal > 0}
+          {const margin = $derived(
+            (houseVotes.left - houseVotes.right) / houseTotal,
+          )}
+          <div class="grid">
+            <dt class="text-xs text-muted-foreground">
+              {m.night_kpi_house_margin()}
+            </dt>
+            <dd
+              class="font-figures text-2xl font-[760] tabular-nums"
+              style:color={pair[margin >= 0 ? 0 : 1].color}
+            >
+              {pair[margin >= 0 ? 0 : 1].short.slice(0, 1)}+{lead(margin)}
+            </dd>
+          </div>
+        {/if}
+        <div class="grid">
+          <dt class="text-xs text-muted-foreground">{m.night_kpi_flips()}</dt>
+          <dd class="font-figures text-2xl font-[760] tabular-nums">
+            {flips}
+          </dd>
+        </div>
+      {/if}
+      {#if next != null}
+        <div class="grid">
+          <dt class="text-xs text-muted-foreground">{m.night_kpi_next()}</dt>
+          <dd class="font-figures text-2xl font-[760] tabular-nums">
+            {wait(next.at)}<span
+              class="ms-1.5 text-base font-semibold text-muted-foreground uppercase"
+              >{next.states.slice(0, 4).join(" ")}{next.states.length > 4
+                ? ` +${next.states.length - 4}`
+                : ""}</span
+            >
+          </dd>
+        </div>
+      {/if}
     </dl>
   </header>
 
+  {#if chambers != null && pair != null}
+    <div class="grid gap-px bg-border lg:grid-cols-3">
+      <Chambers
+        view={chambers.senate}
+        sides={pair}
+        title={NAMES.senate()}
+        {forecasts}
+        label={fullLabel}
+        href={seatHref}
+        shade={seatShade}
+      />
+      <Chambers
+        view={chambers.house}
+        sides={pair}
+        title={NAMES.house()}
+        {forecasts}
+        label={fullLabel}
+        href={seatHref}
+        shade={seatShade}
+      />
+      <Chambers
+        view={chambers.governor}
+        sides={pair}
+        title={m.night_nation_governors()}
+        {forecasts}
+        label={fullLabel}
+        href={seatHref}
+        shade={seatShade}
+      />
+    </div>
+    {#if forecasts}
+      <p
+        class="bg-background px-4 py-2 text-xs text-pretty text-muted-foreground sm:px-8"
+      >
+        {m.night_chamber_note({ prior: percent(0.7, 0) })}
+      </p>
+    {/if}
+  {/if}
+
   <section
-    class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10"
+    class="grid gap-6 bg-background px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10"
   >
     <div class="grid content-start gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
@@ -426,13 +733,22 @@
           bind:value={view}
           label={m.night_nation_views()}
         />
-        {#if view === "house" && hasShapes && hasHexes}
+        <div class="flex flex-wrap items-center gap-2">
           <Segmented
-            options={LAYOUTS}
-            bind:value={layout}
-            label={m.night_house_layout()}
+            options={MODES}
+            bind:value={mode}
+            label={m.night_color_label()}
+            size="sm"
           />
-        {/if}
+          {#if view === "house" && hasShapes && hasHexes}
+            <Segmented
+              options={LAYOUTS}
+              bind:value={layout}
+              label={m.night_house_layout()}
+              size="sm"
+            />
+          {/if}
+        </div>
       </div>
       {#if view === "house" && house != null && (hasShapes || hasHexes)}
         {#if isHexes && house.cartogram != null}
@@ -476,130 +792,22 @@
         />
       {/if}
       <p class="text-xs text-muted-foreground">
-        {view === "reporting"
-          ? m.night_nation_legend_reporting()
-          : view === "house" && house != null && (hasShapes || hasHexes)
-            ? m.night_house_legend()
-            : m.night_nation_legend()}
+        {view === "house" && mode === "lead"
+          ? m.night_house_legend()
+          : LEGENDS[mode]()}
       </p>
     </div>
 
-    <aside class="grid content-start gap-6">
-      {#if view !== "reporting"}
-        <section class="grid gap-2">
-          <h2 class="heading text-lg!">
-            {NAMES[view]()}
-          </h2>
-          <div
-            class="flex overflow-hidden rounded-xs bg-muted block-5"
-            aria-hidden="true"
-          >
-            {#each balance.groups as group (party(group.option))}
-              <span
-                class="transition-[inline-size] duration-700 block-full motion-reduce:transition-none"
-                style:inline-size="{(group.won / Math.max(1, totalRaces)) *
-                  100}%"
-                style:background-color={tone(group.option)}
-              ></span>
-              <span
-                class="transition-[inline-size] duration-700 block-full motion-reduce:transition-none"
-                style:inline-size="{(group.leading / Math.max(1, totalRaces)) *
-                  100}%"
-                style:background-color="color-mix(in oklab, {tone(group.option)} 45%,
-                var(--background))"
-              ></span>
-            {/each}
-          </div>
-          <ul class="grid gap-1 text-[0.8125rem]">
-            {#each balance.groups as group (party(group.option))}
-              <li class="flex items-center justify-between gap-3">
-                <span class="flex items-center gap-1.5"
-                  ><span
-                    class="rounded-full block-2.5 inline-2.5"
-                    style:background-color={tone(group.option)}
-                  ></span>{group.option.party?.name ??
-                    surname(group.option)}</span
-                >
-                <span class="font-figures tabular-nums"
-                  >{m.night_nation_balance({
-                    won: group.won,
-                    leading: group.leading,
-                  })}</span
-                >
-              </li>
-            {/each}
-            <li
-              class="flex items-center justify-between gap-3 text-muted-foreground"
-            >
-              <span>{m.night_nation_waiting()}</span>
-              <span class="font-figures tabular-nums">{balance.waiting}</span>
-            </li>
-          </ul>
-        </section>
-        <section class="grid gap-2">
-          <h2 class="heading text-lg!">{m.night_nation_closest()}</h2>
-          {#if closest.length === 0}
-            <ul class="grid gap-2" aria-hidden="true">
-              {#each { length: 4 } as _, index (index)}
-                <li
-                  class="animate-pulse rounded-xs bg-muted block-9 motion-reduce:animate-none"
-                ></li>
-              {/each}
-            </ul>
-          {:else}
-            <ul class="grid">
-              {#each closest as summary (summary.race.id)}
-                <li>
-                  <a
-                    href={raceHref(summary)}
-                    class="grid gap-1 border-be border-border px-1 py-2 hover:highlighter"
-                  >
-                    <span
-                      class="flex items-baseline justify-between gap-3 text-[0.8125rem]"
-                    >
-                      <span class="font-semibold"
-                        >{name(summary.race.state)}{summary.race.district ==
-                        null
-                          ? ""
-                          : ` ${summary.race.district}`}</span
-                      >
-                      {@render chip(summary)}
-                    </span>
-                    <span
-                      class="relative flex overflow-hidden rounded-xs bg-muted block-1.5"
-                      aria-hidden="true"
-                    >
-                      <span
-                        class="block-full"
-                        style:inline-size="{(summary.counted ?? 0) * 100}%"
-                        style:background-color="var(--foreground)"
-                      ></span>
-                    </span>
-                    <span
-                      class="flex justify-between text-xs text-muted-foreground"
-                    >
-                      <span
-                        >{summary.counted == null
-                          ? ""
-                          : m.night_tip_counted({
-                              share: percent(summary.counted, 0),
-                            })}</span
-                      >
-                      {#if summary.chance != null && summary.favorite != null}
-                        <span class="font-figures tabular-nums"
-                          >{m.night_nation_chance({
-                            name: surname(summary.favorite),
-                            chance: percent(summary.chance, 0),
-                          })}</span
-                        >
-                      {/if}
-                    </span>
-                  </a>
-                </li>
-              {/each}
-            </ul>
-          {/if}
-        </section>
+    <aside class="grid content-start gap-8">
+      {#if chambers != null && pair != null}
+        <Ladder
+          view={chambers[view]}
+          sides={pair}
+          {forecasts}
+          {label}
+          href={seatHref}
+          {tint}
+        />
       {/if}
       <section class="grid gap-2">
         <div class="grid gap-0.5">
@@ -659,12 +867,43 @@
     </aside>
   </section>
 
-  <section class="grid gap-3 bg-background px-4 py-6 sm:px-8">
+  {#if pair != null}
+    <Pulse {points} sides={pair} />
+    <Explorer
+      {seats}
+      sides={pair}
+      {forecasts}
+      {label}
+      href={seatHref}
+      {tint}
+      {short}
+      place={name}
+    />
+  {/if}
+
+  <section
+    class="grid grid-cols-[minmax(0,1fr)] gap-3 bg-background px-4 py-6 sm:px-8"
+  >
     <h2 class="heading text-lg!">{m.night_nation_table()}</h2>
-    <div class="relative overflow-x-auto">
-      <table class="border-collapse text-[0.8125rem] inline-full">
-        <thead>
-          <tr class="border-be border-foreground text-start">
+    <div
+      class="relative overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
+      {@attach fits}
+    >
+      <table
+        class="table-fixed border-collapse text-[0.8125rem] inline-full min-inline-240"
+      >
+        <colgroup>
+          <col class="inline-40" />
+          <col class="inline-32" />
+          <col />
+          <col />
+          <col class="inline-[27%]" />
+          <col class="inline-20" />
+        </colgroup>
+        <thead
+          class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
+        >
+          <tr class="text-start">
             <th scope="col" class="py-1.5 ps-1 text-start font-semibold"
               >{m.night_nation_state()}</th
             >
@@ -685,8 +924,14 @@
             >
           </tr>
         </thead>
-        <tbody>
-          {#each codes as code (code)}
+        <tbody {@attach states.anchor}>
+          {#if states.before > 0}
+            <tr aria-hidden="true">
+              <td class="p-0" colspan="6" style:block-size="{states.before}px"
+              ></td>
+            </tr>
+          {/if}
+          {#each states.entries as { value: code, index, key } (key)}
             {const all = $derived(byState.get(code) ?? [])}
             {const share = $derived(reported(code))}
             {const house = $derived(of(code, "house"))}
@@ -701,11 +946,14 @@
                 "cursor-pointer border-be border-border hover:highlighter",
                 { highlighter: hovered === code },
               )}
+              {@attach states.measure(index)}
               onpointerenter={() => (hovered = code)}
               onpointerleave={() => (hovered = null)}
               onclick={async () => goto(href(code))}
             >
-              <th scope="row" class="py-1.5 ps-1 text-start font-semibold"
+              <th
+                scope="row"
+                class="truncate py-1.5 ps-1 pe-3 text-start font-semibold"
                 ><a href={href(code)} class="hover:underline">{name(code)}</a
                 ></th
               >
@@ -720,13 +968,16 @@
                       style:inline-size="{(share ?? 0) * 100}%"
                     ></span>
                   </span>
-                  <span class="font-figures text-muted-foreground tabular-nums"
+                  <span
+                    class="text-end font-figures text-muted-foreground tabular-nums inline-12"
                     >{share == null ? "–" : percent(share, 0)}</span
                   >
                 </span>
               </td>
-              <td class="py-1.5">{@render chip(of(code, "senate")[0])}</td>
-              <td class="py-1.5">{@render chip(of(code, "governor")[0])}</td>
+              <td class="py-1.5 pe-4">{@render chip(of(code, "senate")[0])}</td>
+              <td class="py-1.5 pe-4">
+                {@render chip(of(code, "governor")[0])}
+              </td>
               <td class="py-1.5">
                 {#if house.length === 0}
                   <span class="text-muted-foreground">–</span>
@@ -737,11 +988,11 @@
                   >
                     {#each house.toSorted((x, y) => Number.parseInt(x.race.district ?? "0", 10) - Number.parseInt(y.race.district ?? "0", 10)) as seat (seat.race.id)}
                       <a
-                        href={raceHref(seat)}
+                        href={toLive(seat.race.slug)}
                         class="rounded-[1px] block-2.5 inline-2.5 hover:outline-1 hover:outline-foreground"
                         style:background-color={seat.leader == null
                           ? WAITING
-                          : strength(seat)}
+                          : shade(seat, "lead")}
                         title={seat.race.title}
                         aria-label={seat.race.title}
                         onclick={(event) => event.stopPropagation()}
@@ -756,6 +1007,12 @@
               >
             </tr>
           {/each}
+          {#if states.after > 0}
+            <tr aria-hidden="true">
+              <td class="p-0" colspan="6" style:block-size="{states.after}px"
+              ></td>
+            </tr>
+          {/if}
         </tbody>
       </table>
     </div>

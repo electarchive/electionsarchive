@@ -1,11 +1,12 @@
 import type {
   LiveElection,
+  LiveEstimate,
   LiveFrame,
   LiveRace,
   LiveUnitCount,
 } from "@ea/analytics/live";
 import { hash, stream } from "#lib/live/random.js";
-import { pair, sum } from "#lib/live/standing.js";
+import { pair, ranked, sum } from "#lib/live/standing.js";
 
 export type Order =
   | "realistic"
@@ -569,4 +570,63 @@ export function stamps(
       ),
     ),
   ].toSorted((x, y) => x - y);
+}
+
+function normal(z: number) {
+  const t = 1 / (1 + 0.2316419 * Math.abs(z));
+  const tail =
+    0.3989423 *
+    Math.exp((-z * z) / 2) *
+    t *
+    (0.3193815 +
+      t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return z > 0 ? 1 - tail : tail;
+}
+
+export function sketch(race: LiveRace, found: LiveEstimate): LiveEstimate {
+  const frame = race.frames.at(-1);
+  if (
+    found.status === "estimating" ||
+    race.certified != null ||
+    frame?.reporting == null ||
+    frame.expected == null ||
+    frame.expected <= 0
+  ) {
+    return found;
+  }
+  const total = sum(frame.totals);
+  const share = Math.min(1, frame.reporting / frame.expected);
+  const order = ranked(frame.totals).filter(
+    (index) => race.options[index]?.isWriteIn !== true,
+  );
+  const first = race.options[order[0] ?? 0];
+  const second = race.options[order[1] ?? 1];
+  if (total === 0 || share < 0.1 || first == null || second == null) {
+    return found;
+  }
+  const margin =
+    ((frame.totals[order[0] ?? 0] ?? 0) - (frame.totals[order[1] ?? 1] ?? 0)) /
+    total;
+  const spread = 0.004 + 0.22 * (1 - share) ** 1.3;
+  const chance = normal(margin / spread);
+  const expected = total / share;
+  return {
+    ...found,
+    status: "estimating",
+    counted: total,
+    expectedTotal: {
+      low: expected * 0.97,
+      mid: expected,
+      high: expected * 1.03,
+    },
+    shareIn: { low: share, mid: share, high: share },
+    margin: {
+      low: margin - 1.28 * spread,
+      mid: margin,
+      high: margin + 1.28 * spread,
+    },
+    leader: first.id,
+    runnerUp: second.id,
+    winProbability: { [first.id]: chance, [second.id]: 1 - chance },
+  };
 }

@@ -99,6 +99,7 @@
     {estimates}
     nation={data.nation}
     house={data.house}
+    control={data.control}
     forecasts={data.shown.forecasts}
     {clock}
     {isOffline}
