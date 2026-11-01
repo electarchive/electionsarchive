@@ -6993,7 +6993,7 @@ def ca_school_variants(label: str) -> list[list[str]]:
         )
         if word not in ("school", "schools", "district") and not word.isdigit()
     ]
-    return [words, [word for word in words if word != "joint"]]
+    return [words, [word for word in words if word != "joint"], [word for word in words if word != "union"]]
 
 
 def resolve(conn, state: str, wanted: set[tuple[str, str]]) -> dict[tuple[str, str], tuple[str, str]]:
@@ -10296,9 +10296,7 @@ def parse() -> None:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
-                    fits = (
-                        own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
-                    )
+                    fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
                 if (
                     state == "NJ"
                     and row.get("tail") is None
@@ -10457,6 +10455,14 @@ def parse() -> None:
                             owner,
                             path,
                         )
+                if (
+                    template is None
+                    and state == "CA"
+                    and place
+                    and (coe := re.search(r"(?i)\bcounty board of education\b.*?\barea (\d+)\b", str(row["contest"])))
+                ):
+                    template, tail = "", f"CA:{row['fips']}:county-board-of-education:trustee-area-{coe[1]}"
+                    minted[tail] = (f"County Board of Education, Trustee Area {coe[1]}", place, "", "")
                 if (
                     template is None
                     and place
