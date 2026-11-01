@@ -22,6 +22,7 @@ HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-r
 PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
+    1944: "1944-11-07-general",
     1948: "1948-11-02-general",
     1950: "1950-11-07-general",
     1954: "1954-11-02-general",
@@ -41,6 +42,7 @@ FILES = {
     1990: "1990-11-06-general",
 }
 DAYS = {
+    1944: date(1944, 11, 7),
     1992: date(1992, 11, 3),
     1994: date(1994, 11, 8),
     1996: date(1996, 11, 5),
@@ -144,6 +146,33 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             27: ("public-service-commissioner", "Susan Wefald", "REP"),
             28: ("tax-commissioner", "Bob Hanson", "DEM"),
             29: ("tax-commissioner", "Rick Clayburgh", "REP"),
+        },
+    ),
+    1944: (
+        0,
+        {
+            18: ("lieutenant-governor", "C. P. Dahl", None),
+            19: ("lieutenant-governor", "S. B. Hocking", None),
+            20: ("lieutenant-governor", "Oscar W. Hagen", None),
+            21: ("lieutenant-governor", "W. H. Northrup", None),
+            22: ("secretary-of-state", "Thomas Hall", None),
+            23: ("secretary-of-state", "Carl Anderson", None),
+            24: ("secretary-of-state", "G. A. Forthun", None),
+            25: ("auditor", "Berta E. Baker", None),
+            26: ("auditor", "Alice D. Wagner", None),
+            27: ("treasurer", "Otto Krueger", None),
+            28: ("treasurer", "Julia M. Lynch", None),
+            29: ("treasurer", "Vic Gilbreath", None),
+            30: ("treasurer", "Karl M. Lundh", None),
+            31: ("attorney-general", "Nels G. Johnson", None),
+            32: ("attorney-general", "John A. Layne", None),
+            33: ("attorney-general", "Olaf M. Thorsen", None),
+            34: ("attorney-general", "H. E. Mielke", None),
+            35: ("insurance-commissioner", "Oscar E. Erickson", None),
+            36: ("insurance-commissioner", "Ed. P. Cosgriff", None),
+            37: ("insurance-commissioner", "O. R. Vold", None),
+            38: ("commissioner-of-agriculture", "Math Dahl", None),
+            39: ("public-service-commissioner", "C. W. McDonnell", None),
         },
     ),
     1948: (
@@ -415,7 +444,15 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
 NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
 EDGES = {1966: 100}
-ERRATA = {(1950, "A. J. Jensen"), (1966, "B. C. Thompson")}
+ERRATA = {
+    (1944, "Nels G. Johnson"),
+    (1944, "Thomas Hall"),
+    (1944, "Oscar W. Hagen"),
+    (1944, "Olaf M. Thorsen"),
+    (1950, "A. J. Jensen"),
+    (1966, "B. C. Thompson"),
+}
+READ_1944 = {("wells", 32): 1386, ("grant", 35): 1606}
 TYPOS = {"mclntosh": "mcintosh"}
 READ_1964: dict[tuple[str, int], int] = {
     ("lamoure", 17): 1713,
@@ -640,6 +677,9 @@ def parse() -> None:
                         if re.search(r"[?<So]", members[pi][4]) or re.search(r",\d{1,2}$", members[pi][4]):
                             unreadable.add((matched, column))
                     i, j = pi, pj
+            if year == 1944:
+                for (county, column), amount in READ_1944.items():
+                    cells[(keys.index(county), column)] = amount
         else:
             for line, w in found:
                 column = column_of(w)
@@ -684,7 +724,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="North Dakota's president, U.S. Senate, governor, and other statewide offices by county "
-            "1948–1998 from the Secretary of State's official abstracts",
+            "1944–1998 from the Secretary of State's official abstracts",
             polity="US",
         )
 
