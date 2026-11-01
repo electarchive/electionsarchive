@@ -24,10 +24,12 @@ TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
     1950: "1950-11-07-general",
     1954: "1954-11-02-general",
+    1958: "1958-11-04-general",
     1960: "1960-11-08-general",
     1962: "1962-11-06-general",
     1970: "1970-11-03-general",
     1974: "1974-11-05-general",
+    1978: "1978-11-07-general",
     1980: "1980-11-04-general",
     1982: "1982-11-02-general",
     1984: "1984-11-06-general",
@@ -41,10 +43,12 @@ DAYS = {
     1998: date(1998, 11, 3),
     1950: date(1950, 11, 7),
     1954: date(1954, 11, 2),
+    1958: date(1958, 11, 4),
     1960: date(1960, 11, 8),
     1962: date(1962, 11, 6),
     1970: date(1970, 11, 3),
     1974: date(1974, 11, 5),
+    1978: date(1978, 11, 7),
     1980: date(1980, 11, 4),
     1982: date(1982, 11, 2),
     1984: date(1984, 11, 6),
@@ -175,6 +179,15 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             23: ("public-service-commissioner", "Lawrence Knoke", "DEM"),
         },
     ),
+    1958: (
+        0,
+        {
+            12: ("lieutenant-governor", "C. P. Dahl", "REP"),
+            13: ("lieutenant-governor", "Lavern Schoeder", "DEM"),
+            18: ("treasurer", "John R. Erickson", "REP"),
+            19: ("treasurer", "Ray Thompson", "DEM"),
+        },
+    ),
     1960: (
         0,
         {
@@ -271,6 +284,14 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             31: ("commissioner-of-labor", "Byron Knutson", None),
         },
     ),
+    1978: (
+        0,
+        {
+            6: ("public-service-commissioner", 'Richard "Dick" Elkin', "REP"),
+            7: ("public-service-commissioner", 'Robert E. "Bob" Hanson', "DEM"),
+            11: ("commissioner-of-labor", "Orville W. Hagen", None),
+        },
+    ),
     1980: (
         0,
         {
@@ -320,7 +341,7 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
         },
     ),
 }
-NUMBER = r"[\dIl][\dIl,.]*['`’:;]?"
+NUMBER = r"[\dIl][\dIl,.?]*['`’:;]?"
 ERRATA = {(1950, "A. J. Jensen")}
 TYPOS = {"mclntosh": "mcintosh"}
 ALONE = {"Roger Johnson"}
@@ -424,9 +445,10 @@ def parse() -> None:
             )
 
         def value(text: str) -> int:
-            return int(re.sub(r"[Il]", "1", text).replace(",", "").replace(".", "").rstrip("'`’:;"))
+            return int(re.sub(r"[Il]", "1", text).replace(",", "").replace(".", "").replace("?", "0").rstrip("'`’:;"))
 
         cells: dict[tuple[int, int], int] = {}
+        unreadable: set[tuple[int, int]] = set()
         if year in FILES:
             bycolumn: dict[int, list[tuple]] = {}
             for w in numbers:
@@ -461,6 +483,8 @@ def parse() -> None:
                     pi, pj, matched = back[(i, j)]
                     if matched is not None:
                         cells[(matched, column)] = value(members[pi][4])
+                        if "?" in members[pi][4] or re.search(r",\d{1,2}$", members[pi][4]):
+                            unreadable.add((matched, column))
                     i, j = pi, pj
         else:
             for line, w in found:
@@ -469,8 +493,12 @@ def parse() -> None:
                     raise ValueError(f"{year}: two numbers in {keys[line]} column {column}")
                 cells[(line, column)] = value(w[4])
         for column, (office, candidate, code) in columns.items():
-            values = [cells.get((line, column), 0) for line in range(len(keys))]
             printed = cells[(len(keys), column)]
+            gaps = [line for line in range(len(keys)) if (line, column) in unreadable]
+            if len(gaps) == 1:
+                cells[(gaps[0], column)] = 0
+                cells[(gaps[0], column)] = printed - sum(cells.get((line, column), 0) for line in range(len(keys)))
+            values = [cells.get((line, column), 0) for line in range(len(keys))]
             if sum(values) != printed:
                 if (
                     year not in FILES
