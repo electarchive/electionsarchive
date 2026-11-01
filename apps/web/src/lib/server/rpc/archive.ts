@@ -23699,7 +23699,8 @@ export const people = {
         select c.id as root, o.owner, o.owner is not distinct from c.body_id as "isBody", e.date_from::text as from,
           coalesce(
             (select min(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
-              where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
+              where (c2.body_id = c.body_id or c2.office_id = c.office_id)
+                and c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
                 and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
                 and e2.kind in ('general', 'local') and e2.date_from > e.date_from + 60
                 and (not r.retention or exists (
@@ -23707,7 +23708,8 @@ export const people = {
                   where o2.contest_id = c2.id and cy2.person_id = any(r.people)))),
             e.date_from + (e.date_from - (
               select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
-              where c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
+              where (c2.body_id = c.body_id or c2.office_id = c.office_id)
+                and c2.body_id is not distinct from c.body_id and c2.office_id is not distinct from c.office_id
                 and c2.district_area_id is not distinct from c.district_area_id and c2.party_scope_id is null
                 and e2.kind in ('general', 'local') and e2.date_from < e.date_from - 60
                 and e2.date_from > e.date_from - 3650
