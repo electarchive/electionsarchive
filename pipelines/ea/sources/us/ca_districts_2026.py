@@ -2435,7 +2435,7 @@ def emit() -> Path:
         frame = frame.with_columns(
             pl.col("doc")
             .replace("", None)
-            .fill_null(pl.col("county").replace_strict(names))
+            .fill_null(pl.col("county").replace_strict(names, default=None))
             .replace_strict(sources)
             .alias("source")
         )
