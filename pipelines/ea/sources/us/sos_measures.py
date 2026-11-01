@@ -1537,6 +1537,11 @@ AL_2022_URL = (
     "https://www.sos.alabama.gov/sites/default/files/election-data/2022-11/"
     "Final%20Canvass%20of%20Results%20(canvassed%20by%20state%20canvassing%20board%2011-28-2022).pdf"
 )
+AL_2026_URL = "https://www.sos.alabama.gov/sites/default/files/election-data/2026-07/2026_Primary_Election.zip"
+AL_2026 = {
+    "1": ("Allow Denial of Bail for Additional Offenses", "Legislative Referendum"),
+    "2": ("Prohibit Reducing a District Attorney's Compensation During the Term", "Legislative Referendum"),
+}
 AL_2022 = {
     "C": ("Recompiled Constitution Ratification Question", "Legislative Referendum", True),
     "1": ("Allow Denial of Bail for Offenses Enumerated by State Legislature", "Legislative Referendum", True),
@@ -2599,6 +2604,7 @@ def fetch() -> None:
         time.sleep(1)
     raw.fetch(SOURCE, WV_2005, suffix=".pdf")
     raw.fetch(SOURCE, AL_2022_URL, suffix=".pdf")
+    raw.fetch(SOURCE, AL_2026_URL, suffix=".zip")
     for contest in SC_2022_FILES.values():
         raw.fetch(SOURCE, SC_ELSTATS.format(contest), suffix=".csv")
     for day in NC_DAYS:
@@ -5193,6 +5199,39 @@ def alabama_primaries() -> list[dict[str, object]]:
     return rows
 
 
+def alabama_2026() -> list[dict[str, object]]:
+    totals: dict[tuple[str, str, str], int] = {}
+    with zipfile.ZipFile(raw.cached(SOURCE, AL_2026_URL).path) as archive:
+        names = sorted(name for name in archive.namelist() if name.endswith(".xls"))
+        if len(names) != 67:
+            raise ValueError(f"AL 2026: {len(names)} county files")
+        for name in names:
+            county = name.rsplit("-", 1)[1].removesuffix(".xls").replace("_", " ")
+            for row in fastexcel.read_excel(archive.read(name)).load_sheet(0, header_row=None).to_polars().rows():
+                title = str(row[0] or "").strip()
+                answer = str(row[2] or "").strip()
+                if title.startswith("PROPOSED STATEWIDE AMENDMENT ") and answer in ("Yes", "No"):
+                    key = (county, title.rsplit(" ", 1)[1], answer.upper())
+                    totals[key] = totals.get(key, 0) + sum(int(value) for value in row[3:] if value is not None)
+    if len(totals) != 67 * 4:
+        raise ValueError(f"AL 2026: {len(totals)} county answers")
+    return [
+        {
+            "state": "AL",
+            "day": date(2026, 5, 19),
+            "number": number,
+            "label": f"Amendment {number}",
+            "title": AL_2026[number][0],
+            "kind": AL_2026[number][1],
+            "url": AL_2026_URL,
+            "county": county,
+            "answer": answer,
+            "votes": votes,
+        }
+        for (county, number, answer), votes in totals.items()
+    ]
+
+
 def alabama_2022() -> list[dict[str, object]]:
     text = subprocess.run(
         ["pdftotext", "-layout", str(raw.cached(SOURCE, AL_2022_URL).path), "-"],
@@ -7363,6 +7402,7 @@ def parse() -> None:
             *south_carolina(),
             *south_carolina_2022(),
             *alabama_2022(),
+            *alabama_2026(),
             *alabama_primaries(),
             *hawaii(),
             *new_mexico(),
