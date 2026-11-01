@@ -2374,10 +2374,12 @@ CA_TOTALS_NOTE = (
     " Only the statewide totals are recorded: they were entered by hand from the Secretary of State's scanned Statement"
     " of Vote, which prints each measure's yes and no votes, and the box shown on each figure is approximate."
 )
+METHODOLOGY_FACTS = "The measure's number, title, type, and outcome are from NCSL's Statewide Ballot Measures Database."
 CA_CATB_NOTE = (
-    " Only the statewide totals are recorded, from the Secretary of State's Statement of Vote as reproduced by the"
-    " California Target Book. Each figure was read from the scanned page by machine, checked against a second reading, and"
-    " confirmed by eye wherever the two differed; the box shown on each figure is approximate."
+    " Only the statewide totals are recorded, from the Secretary of State's Statement of Vote as scanned from the printed"
+    " volume and posted by the California Target Book. Each figure was read from the scanned page by machine and checked"
+    " against a second reading or the page's text layer; a figure the checks did not settle was left out. The box shown"
+    " on each figure is approximate."
 )
 NM_2003_NOTE = (
     " The county figures were transcribed by hand from the scanned canvass certified on October 14, 2003, and each"
@@ -3999,8 +4001,12 @@ def oklahoma_history() -> list[dict[str, object]]:
                 current["body"].append(stripped)  # type: ignore[union-attr]
         for block in blocks:
             body = "\n".join(block["body"])  # type: ignore[arg-type]
-            yes = re.search(r"(?i)\bYes\.{2,}\s*([\d,]+)", body) or re.search(r"FOR THE [A-Z]+-YES\s+NOP\s+([\d,]+)", body)
-            no = re.search(r"(?i)\bNo\.{2,}\s*([\d,]+)", body) or re.search(r"AGAINST THE [A-Z]+-NO\s+NOP\s+([\d,]+)", body)
+            yes = re.search(r"(?i)\bYes\.{2,}\s*([\d,]+)", body) or re.search(
+                r"FOR THE [A-Z]+-YES\s+NOP\s+([\d,]+)", body
+            )
+            no = re.search(r"(?i)\bNo\.{2,}\s*([\d,]+)", body) or re.search(
+                r"AGAINST THE [A-Z]+-NO\s+NOP\s+([\d,]+)", body
+            )
             if block["day"] is None:
                 raise ValueError(f"{url} SQ {block['number']}: no election date")
             if yes is None or no is None:
@@ -7987,7 +7993,11 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=METHODOLOGY.format(publisher=PUBLISHERS[state][0])
+                body_md=(
+                    METHODOLOGY_FACTS
+                    if state == "CA" and day.year < 1998
+                    else METHODOLOGY.format(publisher=PUBLISHERS[state][0])
+                )
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
