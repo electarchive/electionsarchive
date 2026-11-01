@@ -10597,7 +10597,11 @@ def parse() -> None:
                         re.sub(
                             r"^mason county (central|eastern)\b",
                             r"mason \1",
-                            re.sub(r"\bausable\b", "au sable", " ".join(tokens)),
+                            re.sub(
+                                r"\bausable\b",
+                                "au sable",
+                                re.sub(r"^village of minden city\b", "village of minden", " ".join(tokens)),
+                            ),
                         ),
                     ).split()
                 if state == "AZ":
