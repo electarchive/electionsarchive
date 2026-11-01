@@ -10400,6 +10400,8 @@ def parse() -> None:
             label = re.sub(r" (city|town|village)$", "", full)
             if st == "NE" and label == "De Witt":
                 label = "DeWitt"
+            if st == "MI" and full == "Minden City village":
+                label = "Minden"
             cities[(st, coverage_tables.tokens(label))].append((geoid, label, full))
             if st == "KY" and label.endswith(" City"):
                 cities[(st, coverage_tables.tokens(label.removesuffix(" City")))].append((geoid, label, full))
