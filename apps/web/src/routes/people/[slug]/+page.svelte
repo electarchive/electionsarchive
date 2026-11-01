@@ -15,6 +15,7 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
+  import { recordLede } from "#lib/verdict.js";
   import type { PageData } from "./$types";
   import Career from "./career.svelte";
   import Parties from "./parties.svelte";
@@ -107,27 +108,12 @@
       }));
   });
   const today = new Date().toISOString().slice(0, 10);
-  const held = $derived(
-    entries.filter((entry) => entry.outcome != null || entry.date < today),
-  );
-  const next = $derived(
+  const summary = $derived(recordLede(entries, today));
+  const years = $derived(
     entries
-      .filter((entry) => entry.outcome == null && entry.date >= today)
-      .map((entry) => entry.date)
-      .toSorted((a, b) => a.localeCompare(b))
-      .at(0) ?? null,
+      .filter((entry) => entry.outcome != null || entry.date < today)
+      .map((entry) => entry.year),
   );
-  const races = $derived(held.map((entry) => entry.outcome));
-  const won = $derived(
-    races.filter((outcome) => outcome === "elected" || outcome === "won")
-      .length,
-  );
-  const advanced = $derived(
-    races.filter((outcome) => outcome === "advanced").length,
-  );
-  const years = $derived(held.map((entry) => entry.year));
-  const first = $derived(Math.min(...years));
-  const last = $derived(Math.max(...years));
   const endings: Record<string, () => string> = {
     died: m.person_ended_died,
     resigned: m.person_ended_resigned,
@@ -509,30 +495,9 @@
           <p
             class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
           >
-            {#if races.length > 0}
-              {races.length === 1
-                ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
-                    year: String(first),
-                  })
-                : first === last
-                  ? (advanced > 0
-                      ? m.person_lede_advanced_year
-                      : m.person_lede_year)({
-                      won: count(won),
-                      advanced: count(advanced),
-                      count: count(races.length),
-                      year: String(first),
-                    })
-                  : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
-                      won: count(won),
-                      advanced: count(advanced),
-                      count: count(races.length),
-                      first: String(first),
-                      last: String(last),
-                    })}
-            {/if}
-            {#if next != null}
-              {m.person_lede_upcoming({ date: date(next) })}
+            {summary.lede}
+            {#if summary.next != null}
+              {m.person_lede_upcoming({ date: date(summary.next) })}
             {/if}
           </p>
         {/if}

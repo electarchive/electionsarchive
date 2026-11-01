@@ -355,3 +355,79 @@ export function comeback(contest: Page["contest"], rounds: Page["rounds"]) {
         share: percent(leader.share),
       });
 }
+
+export function recordLede(
+  record: Array<{
+    date: string;
+    year: number;
+    outcome: string | null;
+    isPrimary: boolean;
+  }>,
+  today: string,
+) {
+  const held = record.filter(
+    (entry) => entry.outcome != null || entry.date < today,
+  );
+  const next =
+    record
+      .filter((entry) => entry.outcome == null && entry.date >= today)
+      .map((entry) => entry.date)
+      .toSorted((a, b) => a.localeCompare(b))
+      .at(0) ?? null;
+  const races = held.filter((entry) => !entry.isPrimary);
+  const isPrimary = races.length === 0;
+  const shown = isPrimary ? held : races;
+  if (shown.length === 0) {
+    return { lede: null, next };
+  }
+  let won = 0;
+  let advanced = 0;
+  for (const entry of shown) {
+    if (entry.outcome === "elected" || entry.outcome === "won") {
+      won += 1;
+    } else if (entry.outcome === "advanced") {
+      advanced += 1;
+    }
+  }
+  const years = shown.map((entry) => entry.year);
+  const first = String(Math.min(...years));
+  const last = String(Math.max(...years));
+  const counts = {
+    won: count(won),
+    advanced: count(advanced),
+    count: count(shown.length),
+  };
+  if (shown.length === 1) {
+    const single = isPrimary
+      ? won > 0
+        ? m.person_lede_primary_single_won
+        : m.person_lede_primary_single
+      : won > 0
+        ? m.person_lede_single_won
+        : m.person_lede_single;
+    return { lede: single({ year: first }), next };
+  }
+  if (isPrimary) {
+    return {
+      lede:
+        first === last
+          ? m.person_lede_primaries_year({ ...counts, year: first })
+          : m.person_lede_primaries({ ...counts, first, last }),
+      next,
+    };
+  }
+  return {
+    lede:
+      first === last
+        ? (advanced > 0 ? m.person_lede_advanced_year : m.person_lede_year)({
+            ...counts,
+            year: first,
+          })
+        : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
+            ...counts,
+            first,
+            last,
+          }),
+    next,
+  };
+}

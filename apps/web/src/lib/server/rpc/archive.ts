@@ -21692,6 +21692,7 @@ export const people = {
             isUnopposed: v.optional(v.boolean()),
             isWriteIn: v.optional(v.boolean()),
             outcome: v.nullable(v.string()),
+            isPrimary: v.boolean(),
             note: v.optional(v.nullable(v.string())),
             electoral: v.nullable(
               v.object({ votes: v.number(), total: v.number() }),
@@ -22295,6 +22296,8 @@ export const people = {
               isUnopposed: row.unopposed,
               isWriteIn: row.written === true,
               outcome: indirect == null ? row.outcome : indirect.outcome,
+              isPrimary:
+                row.scoped || row.kind === "primary" || row.kind === "caucus",
               note: indirect == null ? row.note : null,
               isIndependent: row.party == null && row.independent,
               electoral:
@@ -22339,6 +22342,7 @@ export const people = {
           outcome: "elected",
           electoral: null,
           party: null,
+          isPrimary: false,
         })),
       ].toSorted((a, b) => b.date.localeCompare(a.date));
       const held = await db.execute<{
