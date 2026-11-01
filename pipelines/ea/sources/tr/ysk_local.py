@@ -30,7 +30,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "10"
+VERSION = "11"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -1275,6 +1275,11 @@ def own_area(spans: dict[UUID, list[tuple[date | None, date | None, UUID]]], pol
     )
 
 
+def successors() -> dict[str, str]:
+    table = pl.read_csv(Path(__file__).with_name("municipality_successors.tsv"), separator="\t")
+    return dict(table.iter_rows())
+
+
 def emit() -> Path:
     if len(ANAGRAMS) != sum(" " in label for label in LABELS):
         raise ValueError("two party labels share their letters")
@@ -1682,6 +1687,7 @@ def emit() -> Path:
             name(city_units[plate], f"{PROVINCES[int(plate) - 1]} Büyükşehir Belediyesi")
 
         spans = own_areas(conn)
+        later = successors()
 
         def mayor_contest(
             key: str, polity: UUID, office: UUID, path: str, english: str, native: str, day: date, area: UUID | None
@@ -1907,6 +1913,8 @@ def emit() -> Path:
             tallies.setdefault(contest_key, []).append((option_key, kind, votes))
         people: set[UUID] = set()
         seen: set[str] = set()
+        placed: set[str] = set()
+        promoted: dict[str, str] = {}
         won_by: dict[tuple[int, str, str | None], int] = {}
         unlisted: set[str] = set()
         for (year, office_kind, plate, district, town, key, path), candidates in sorted(
@@ -1926,15 +1934,19 @@ def emit() -> Path:
                 office = cs.key("tr.office", f"{key}-mayor")
                 english, native, area = label_text, f"{label_text} Büyükşehir", provinces[plate]
             else:
-                polity = cs.key("tr.polity", key)
-                office = cs.key("tr.office", f"{key}-mayor")
+                path = later.get(str(path), str(path))
+                home = path[3:].replace("/", "-")
+                if home != key:
+                    promoted[key] = home
+                polity = cs.key("tr.polity", home)
+                office = cs.key("tr.office", f"{home}-mayor")
                 english, native = label_text, label_text
                 area = (
                     own_area(spans, polity, day)
                     or districts[(plate, RENAMED_DISTRICTS.get((plate, district_text), district_text))]
                 )
-                if key not in seen:
-                    seen.add(key)
+                if home not in seen:
+                    seen.add(home)
                     cs.add("polity", id=polity, kind="municipality", iso_code=None)
                     name(polity, f"{label_text} Municipality", "en")
                     name(polity, f"{label_text} Belediyesi", kind="native")
@@ -1943,17 +1955,18 @@ def emit() -> Path:
                     cs.add("office", id=office, polity_id=polity, kind="mayor")
                     name(office, f"Mayor of {label_text}", "en")
                     name(office, f"{label_text} Belediye Başkanı", kind="native")
-                    if town is None:
-                        created = path.split("/", 1)[1] in CREATED_2014
-                        cs.add(
-                            "polity_territory",
-                            polity_id=polity,
-                            area_id=area,
-                            valid_from=DAYS[2014] if created else None,
-                            valid_from_precision="day",
-                            valid_to=None,
-                            valid_to_precision="day",
-                        )
+                if town is None and home not in placed:
+                    placed.add(home)
+                    created = path.split("/", 1)[1] in CREATED_2014
+                    cs.add(
+                        "polity_territory",
+                        polity_id=polity,
+                        area_id=area,
+                        valid_from=DAYS[2014] if created else None,
+                        valid_from_precision="day",
+                        valid_to=None,
+                        valid_to_precision="day",
+                    )
             election, contest, contest_key = mayor_contest(key, polity, office, path, english, native, day, area)
             declared = cs.key(f"{SOURCE}.result_set", contest_key)
             annulled = key in ANNULLED.get(year, set())
@@ -2147,6 +2160,9 @@ def emit() -> Path:
                 y1=pl.col("box").list.get(3),
             ),
         )
+        for key, home in promoted.items():
+            cs.merge(cs.key("tr.polity", key), cs.key("tr.polity", home))
+            cs.merge(cs.key("tr.office", f"{key}-mayor"), cs.key("tr.office", f"{home}-mayor"))
         written = {(str(row["entity_id"]), row["body_md"]) for row in cs.rows["note"]}
         for note, entity, text in conn.execute(
             """select n.id, n.entity_id, n.body_md from note n join changeset c on c.id = n.changeset_id
