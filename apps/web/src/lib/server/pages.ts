@@ -873,6 +873,19 @@ export async function chamber(path: string) {
   };
 }
 
+async function season(id: string) {
+  const result = await db.execute<{ path: string }>(sql`
+    select s.path from election e
+    join contest c on c.election_id = e.id
+    join slug s on s.entity_id = c.id and s.is_current
+    where e.id = coalesce((select election_id from contest where id = ${id}::uuid), ${id}::uuid)
+      and e.kind = 'primary'
+      and exists (select from contest k where k.allocation_parent_id = c.id)
+      and not exists (select from contest o where o.election_id = e.id and o.id <> c.id)
+  `);
+  return result.rows[0]?.path ?? null;
+}
+
 export async function archive(path: string, search: URLSearchParams) {
   const segments = path.split("/");
   const result = await db.execute<{
@@ -954,6 +967,7 @@ export async function archive(path: string, search: URLSearchParams) {
     };
   }
   if (slug.type === "contest") {
+    const merged = season(slug.entity_id);
     const got = call(router.contests.get, {
       id: slug.entity_id,
       unit,
@@ -1049,7 +1063,10 @@ export async function archive(path: string, search: URLSearchParams) {
       kind: "contest" as const,
       id: slug.entity_id,
       unit,
-      contest,
+      contest:
+        (await merged) == null
+          ? contest
+          : { ...contest, election: { ...contest.election, path: null } },
       lists,
       rounds,
       ballot: ballot(),
@@ -1066,6 +1083,10 @@ export async function archive(path: string, search: URLSearchParams) {
     };
   }
   if (slug.type === "election") {
+    const merged = await season(slug.entity_id);
+    if (merged != null) {
+      redirect(307, `/${merged}`);
+    }
     const input = { id: slug.entity_id };
     const place = search.get("in");
     const [scoped, held] = await Promise.all([

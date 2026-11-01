@@ -36,10 +36,14 @@
     data.kind === "contest"
       ? [
           ...data.contest.breadcrumbs,
-          {
-            name: data.contest.election.name,
-            path: data.contest.election.path,
-          },
+          ...(data.contest.election.path == null
+            ? []
+            : [
+                {
+                  name: data.contest.election.name,
+                  path: data.contest.election.path,
+                },
+              ]),
         ]
       : data.kind === "election"
         ? [

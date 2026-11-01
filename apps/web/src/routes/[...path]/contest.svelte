@@ -119,6 +119,9 @@
     electoral_votes: m.term_electoral_votes,
     state_delegate_equivalents: m.term_state_delegate_equivalents,
     caucus_delegates: m.term_caucus_delegates,
+    pledged_delegates: m.term_pledged_delegates,
+    automatic_delegates: m.term_automatic_delegates,
+    delegation: m.term_delegation,
     live: m.term_stage_live,
     preliminary: m.term_stage_preliminary,
     official: m.term_stage_official,
@@ -1486,7 +1489,7 @@
         <summary
           class="cursor-pointer text-muted-foreground marker:text-border hover:text-foreground"
         >
-          {m.cycle_parts()}
+          {m.cycle_others()}
           <span class="font-figures tabular-nums"
             >{count(cycle.others.length)}</span
           >

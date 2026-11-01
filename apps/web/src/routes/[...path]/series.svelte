@@ -66,7 +66,7 @@
             : (days[entry.date ?? ""] ?? []).filter(
                   (peer) => !peer.isRemainder && !peer.notional,
                 ).length > 1
-              ? `${year} ${entry.name.split(", ").at(-1) ?? ""}`
+              ? `${year} ${(entry.name.split(", ").at(-1) ?? "").replace(/^\d{4} /u, "")}`
               : (seen[year] ?? []).filter(
                     (peer) => !peer.isRemainder && !peer.notional,
                   ).length > 1 && entry.date != null
