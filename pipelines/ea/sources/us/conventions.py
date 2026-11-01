@@ -408,7 +408,7 @@ TABLES += [
 ]
 CAPTIONS_1852 = {1: 29, 2: 30, 3: 30, 4: 31, 5: 31, 6: 32, 7: 32, 8: 32, 9: 35, 10: 36, 11: 36, 12: 37, 13: 37, 14: 37, 15: 38, 16: 38, 17: 39, 18: 40, 19: 41, 20: 42, 21: 42, 22: 43, 23: 43, 24: 43, 25: 44, 26: 44, 27: 45, 28: 45, 29: 46, 30: 46, 31: 47, 32: 47, 33: 47, 34: 49, 35: 52, 36: 52, 37: 53, 38: 53, 39: 54, 40: 54, 41: 54, 42: 55, 43: 55, 44: 56, 45: 56, 46: 56, 47: 57, 48: 57}  # fmt: skip
 TABLES += [
-    spec | {"scatter": True, "bycandidate": True}
+    spec | {"transcribed": "conventions_baltimore_1852.tsv"}
     for spec in ballots(
         "proceedingsofde00demo",
         "1852",
@@ -447,6 +447,11 @@ BALTIMORE_RULING = (
     "the ballot. After the second ballot the convention resolved that Douglas, having received two-thirds of all the "
     "votes given, was the regular nominee, and the President declared him nominated by the unanimous vote of the convention."
 )
+BALTIMORE_1852 = (
+    "The proceedings give the rule as two-thirds of the votes. South Carolina cast no vote, and the other 30 "
+    "delegations held 288 votes, so the needed figure stored here is 192. No candidate reached it before the "
+    "forty-ninth ballot, on which Franklin Pierce was nominated."
+)
 PROCEEDINGS = [
     {"tables": {1: "1868:republican"}, "ordinal": "Fourth", "city": "Chicago", "days": (date(1868, 5, 20), date(1868, 5, 21)), "ballots": {1: date(1868, 5, 21)}, "deciding": 1, "held": 1},
     {"tables": {n: f"1860:republican:b{n}" for n in (1, 2, 3)}, "ordinal": "Second", "city": "Chicago", "days": (date(1860, 5, 16), date(1860, 5, 18)), "ballots": dict.fromkeys(range(1, 4), date(1860, 5, 18)), "deciding": 3},
@@ -472,6 +477,7 @@ PROCEEDINGS = [
 ]  # fmt: skip
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
+    {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 49)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
     {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)} | {58: "1860:democratic:baltimore-b1", 59: "1860:democratic:baltimore-b2"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 6, 23)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)) | dict.fromkeys((58, 59), date(1860, 6, 23)), "deciding": 59, "cities": dict.fromkeys((58, 59), "Baltimore"), "required": dict.fromkeys(range(1, 58), 202) | {58: 127, 59: 130}, "caveat": dict.fromkeys(range(1, 58), CHARLESTON_RULING) | dict.fromkeys((58, 59), BALTIMORE_RULING)},
     {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
@@ -609,6 +615,20 @@ CANDIDATES = {
     "democratic:James Buchanan": ("James Buchanan", "Q12325"),
     "democratic:Franklin Pierce": ("Franklin Pierce", "Q12312"),
     "democratic:F. Pierce": ("Franklin Pierce", "Q12312"),
+    "1852:democratic:Cass": ("Lewis Cass", "Q503119"),
+    "1852:democratic:Buchanan": ("James Buchanan", "Q12325"),
+    "1852:democratic:Marcy": ("William L. Marcy", "Q389258"),
+    "1852:democratic:Douglas": ("Stephen A. Douglas", "Q433174"),
+    "1852:democratic:Lane": ("Joseph Lane", "Q372848"),
+    "1852:democratic:Houston": ("Sam Houston", "Q216547"),
+    "1852:democratic:Weller": ("John B. Weller", "Q277673"),
+    "1852:democratic:Dodge": ("Henry Dodge", "Q881703"),
+    "1852:democratic:Butler": ("William O. Butler", "Q693499"),
+    "1852:democratic:Dickinson": ("Daniel S. Dickinson", "Q1162460"),
+    "1852:democratic:Pierce": ("Franklin Pierce", "Q12312"),
+    "1852:democratic:King": ("William R. King", "Q298985"),
+    "1852:democratic:Boyd": ("Linn Boyd", "Q1826895"),
+    "1852:democratic:Ingersoll": ("R. J. Ingersoll", None),
     "1860:democratic:Douglas": ("Stephen A. Douglas", "Q433174"),
     "1860:democratic:Guthrie": ("James Guthrie", "Q1680480"),
     "1860:democratic:Hunter": ("Robert M. T. Hunter", "Q1355895"),
@@ -1486,6 +1506,50 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1852:democratic:b3": (
+        "Buchanan's list prints Maryland, 15, where Virginia, which gave Buchanan its 15 votes on the ballots before and after, is meant; Maryland's 8 votes are also printed for Cass. The rows are stored as printed.",
+        {},
+    ),
+    "1852:democratic:b5": (
+        "The printed Douglas total is 34, against 33 in the state figures. The rows are stored as printed.",
+        {"column Douglas": (34, 33, "the state figures add to 33")},
+    ),
+    "1852:democratic:b6": (
+        "The printed Cass total is 114, against 116 in the state figures. The rows are stored as printed.",
+        {"column Cass": (114, 116, "the state figures add to 116")},
+    ),
+    "1852:democratic:b12": (
+        "The ballot gives Rhode Island 5 votes (Cass 3, Douglas 1, and Marcy 1) for a delegation of 4, and the printed totals count all five. The rows are stored as printed.",
+        {},
+    ),
+    "1852:democratic:b13": (
+        "Cass's list omits Louisiana, which gave Cass its 6 votes on the ballots before and after; the printed Cass total of 98 counts them, against 92 in the state figures. The rows are stored as printed.",
+        {"column Cass": (98, 92, "the state figures add to 92")},
+    ),
+    "1852:democratic:b15": (
+        "Douglas's list gives Florida 3, which with Dickinson's 1 is more than Florida's 3 votes. The printed Douglas total is 51, against 52 in the state figures. The rows are stored as printed.",
+        {"column Douglas": (51, 52, "the state figures add to 52")},
+    ),
+    "1852:democratic:b17": (
+        "Douglas's list omits Illinois, which gave Douglas its 11 votes on the ballots before and after. The printed Douglas total is 50, against 40 in the state figures. The rows are stored as printed.",
+        {"column Douglas": (50, 40, "the state figures add to 40")},
+    ),
+    "1852:democratic:b23": (
+        "Butler's list gives Maine 3, which with Buchanan's 5 and Douglas's 3 is more than Maine's 8 votes, while the lists account for only 2 of New Hampshire's 5. The rows are stored as printed.",
+        {},
+    ),
+    "1852:democratic:b31": (
+        "The printed Buchanan total is 83, against 78 in the state figures. The rows are stored as printed.",
+        {"column Buchanan": (83, 78, "the state figures add to 78")},
+    ),
+    "1852:democratic:b34": (
+        "The table prints Marcy 33 (Massachusetts 2, New York 22, and North Carolina 9) and gives North Carolina only 9 of its 10 votes. The president announced the result as Cass 130, Douglas 53, Buchanan 49, Marcy 35, Dickinson 16, Houston 5, and Butler 1. The rows are stored as the table prints them.",
+        {},
+    ),
+    "1852:democratic:b46": (
+        "Marcy's list gives Delaware 1, which with Cass's 3 is more than Delaware's 3 votes, while the lists account for only 7 of Maryland's 8. The rows are stored as printed.",
+        {},
+    ),
     "1852:democratic:b49": (
         (
             "The proceedings narrate this ballot state by state (pages 57 to 64). As first called, Vermont gave "
@@ -2244,7 +2308,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the Republican national conventions from 1860 to 1984, the Democratic conventions from 1856 to 1956, and the 2016 and 2020 conventions",
+            summary="The roll call of the states at the Republican national conventions from 1860 to 1984, the Democratic conventions from 1852 to 1956, and the 2016 and 2020 conventions",
             polity="US",
         )
 
