@@ -12457,9 +12457,10 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
       from shapes s
     ),
     pieces as materialized (
-      select w.id, d.geom, w.scheme, not ST_IsEmpty(w.geom) and ST_Area(d.geom) >= coalesce((select t * t from bounds), 0) as visible
+      select w.id, d.geom, w.scheme, not e.empty and ST_Area(d.geom) >= coalesce((select t * t from bounds), 0) as visible
       from dry w
-      cross join lateral ST_Dump(case when ST_IsEmpty(w.geom) then w.raw else w.geom end) d
+      cross join lateral (select ST_IsEmpty(w.geom) as empty offset 0) e
+      cross join lateral ST_Dump(case when e.empty then w.raw else w.geom end) d
     ),
     parts as (
       select p.id, ST_Simplify(p.geom, least(greatest(ST_XMax(p.geom) - ST_XMin(p.geom), ST_YMax(p.geom) - ST_YMin(p.geom)) / 500, 0.01), true) as geom, p.scheme
