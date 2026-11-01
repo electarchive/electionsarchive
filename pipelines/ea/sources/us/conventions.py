@@ -428,6 +428,7 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1892:democratic"}, "title": DNC + "in Chicago, Ill., June 21st, 22nd and 23rd, 1892", "publisher": "Cameron, Amberg & Co.", "city": "Chicago", "days": (date(1892, 6, 21), date(1892, 6, 23)), "ballots": {1: date(1892, 6, 22)}, "deciding": 1},
     {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in (3, 4, 5)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
     {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47)}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
+    {"party": "democratic", "tables": {1: "1904:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention held in St. Louis, Missouri, July 6, 7, 8, and 9, 1904", "publisher": "University of Kentucky Libraries, ExploreUK", "city": "St. Louis", "days": (date(1904, 7, 6), date(1904, 7, 9)), "ballots": {1: date(1904, 7, 9)}, "deciding": 1, "caveat": "Ohio's 46 votes for Parker stand under the unit rule: a poll of the delegation gave Parker 28, Hearst 6, McClellan 9, Cockrell 2, and Olney 1, and the chair let the announced vote stand. The table is the roll after the Idaho, Nevada, West Virginia, and Washington delegations changed their votes."},
     {"party": "democratic", "tables": {1: "1924:democratic:b1"}, "title": "Official report of the proceedings of the Democratic National Convention held in Madison Square Garden, New York City, June 24, 25, 26, 27, 28, 30, July 1, 2, 3, 4, 5, 7, 8, and 9, 1924, resulting in the nomination of John W. Davis (of West Virginia) for president and Charles W. Bryan (of Nebraska) for vice-president", "publisher": "Bookwalter-Ball-Greathouse Printing Co.", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": {1: date(1924, 6, 30)}, "deciding": 103},
     {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
     {"party": "democratic", "tables": {1: "1956:democratic"}, "title": "Official report of the proceedings of the Democratic National Convention and committee, held at Chicago, Illinois, August 13 to August 17, 1956, resulting in the nomination of Adlai E. Stevenson of Illinois for President and Estes Kefauver of Tennessee for Vice President", "publisher": "Democratic National Committee", "city": "Chicago", "days": (date(1956, 8, 13), date(1956, 8, 17)), "ballots": {1: date(1956, 8, 16)}, "deciding": 1},
@@ -594,6 +595,18 @@ CANDIDATES = {
     "democratic:Garner": ("John Nance Garner", "Q298991"),
     "democratic:Hull": ("Cordell Hull", "Q202979"),
     "democratic:Byrd": ("Harry F. Byrd", "Q775382"),
+    "1904:Parker": ("Alton B. Parker", "Q443866"),
+    "1904:Hearst": ("William Randolph Hearst", "Q294931"),
+    "1904:Gray": ("George Gray", "Q249041"),
+    "1904:Miles": ("Nelson A. Miles", "Q549005"),
+    "1904:Cockrell": ("Francis M. Cockrell", "Q1259413"),
+    "1904:Olney": ("Richard Olney", None),
+    "1904:Wall": ("Edward C. Wall", None),
+    "1904:McClellan": ("George B. McClellan Jr.", "Q5536568"),
+    "1904:Towne": ("Charles A. Towne", "Q1063591"),
+    "1904:Pattison": ("Robert E. Pattison", "Q883224"),
+    "1904:Williams": ("John Sharp Williams", "Q1701734"),
+    "1904:Coler": ("Bird S. Coler", None),
     "1948:democratic:Truman": ("Harry S. Truman", "Q11613"),
     "1948:democratic:Russell": ("Richard B. Russell Jr.", "Q718415"),
     "1948:democratic:McNutt": ("Paul V. McNutt", "Q887892"),
@@ -1970,6 +1983,8 @@ def emit() -> Path:
             source_url = (
                 f"https://babel.hathitrust.org/cgi/pt?id={first_spec['htid']}"
                 if "htid" in first_spec
+                else f"https://exploreuk.uky.edu/catalog/{first_spec['uky']}"
+                if "uky" in first_spec
                 else f"https://archive.org/details/{first_spec['item']}"
             )
             title = (
