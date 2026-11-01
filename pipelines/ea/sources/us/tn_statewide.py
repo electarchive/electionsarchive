@@ -61,7 +61,11 @@ def emit() -> Path:
         for year, (url, landing, day, numbers) in VOLUMES.items():
             title = TITLE.format(day=day)
             sources[year] = cs.source(PUBLISHER, title)
-            if conn.execute("select 1 from result_set where source_id = %s limit 1", [sources[year]]).fetchone():
+            if conn.execute(
+                """select 1 from result_set r join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                   where r.source_id = %s and x.value ~ ':TN:(governor|senate)' limit 1""",
+                [sources[year]],
+            ).fetchone():
                 continue
             cs.add(
                 "source",
