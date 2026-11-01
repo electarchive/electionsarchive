@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "15"
+VERSION = "16"
 TITLE = "Political parties and their colors"
 HAND_COLORS = Path(__file__).with_name("tr_party_colors.tsv")
 HAND_POSITIONS = Path(__file__).with_name("tr_party_positions.tsv")
@@ -161,6 +161,36 @@ MATCHES: dict[tuple[str, str], str | None] = {
     ("DE", "UNABHÄNGIGE ARBEITER-PARTEI (Deutsche Sozialisten)"): "Q2492232",
     ("CA-BC", "CentreBC"): "Q135759425",
     ("CA", "United Party of Canada (UP)"): "Q135475223",
+    ("BR", "Partido Liberal"): "Q2653155",
+    ("BR", "Partido Progressista Reformador"): "Q3366642",
+    ("TR", "Millet Partisi"): "Q936433",
+    ("TR", "Adalet Birlik Partisi"): "Q117794481",
+    ("TR", "Güç Birliği Partisi"): "Q117794509",
+    ("TR", "Değişen Türkiye Partisi"): "Q6076282",
+    ("TR", "Yeni Demokrasi Hareketi"): "Q6068626",
+    ("TR", "Sosyalist Birlik Partisi"): "Q7551793",
+    ("GB", "Social Democratic and Labour Party"): "Q175443",
+    ("GB", "Christian People's Alliance"): "Q5110023",
+    ("GB", "Northern Ireland Labour Party"): "Q7058511",
+    ("GB", "Irish National Federation"): "Q15980738",
+    ("GB", "Irish National League"): "Q1672869",
+    ("GB", "Irish Conservative"): "Q6070653",
+    ("GB", "Irish Unionist"): "Q6071313",
+    ("GB", "Nationalist Party of Northern Ireland"): "Q6979788",
+    ("GB", "Peelite"): "Q2633397",
+    ("GB", "Liberal-Labour"): "Q6540572",
+    ("GB", "Derwentside Independent"): "Q5263365",
+    ("GB", "Vanguard"): "Q3896802",
+    ("GB", "Aontú"): "Q61090509",
+    ("GB", "NI Women's Coalition"): "Q7058538",
+    ("GB", "The For Britain Movement"): "Q42530925",
+    ("DE", "Kommunistischer Bund Westdeutschland"): "Q1412555",
+    ("DE", "Radikalsoziale Freiheitspartei"): "Q2125717",
+    ("DE", "Deutsche Konservative Partei/Deutsche Rechts-Partei"): "Q584965",
+    ("DE", "CHRISTLICHE MITTE – Für ein Deutschland nach GOTTES Geboten"): "Q896165",
+    ("IT", "Partito Socialista Unificato"): "Q3896817",
+    ("IT", "CasaPound Italia"): "Q25648673",
+    ("CA-BC", "Conservative Party"): "Q918860",
 }
 INHERITED: dict[tuple[str, str], str] = {
     ("FR", "ENS"): "Q109929254",
