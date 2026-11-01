@@ -179,7 +179,30 @@ NAMED = [
     r" - (?P<name>(?!OFFICE|DIVISION|DISTRICT|RETENTION)[A-Z][A-Z.,' \"-]+)$",
     r"-(?P<name>[A-Z]{3,})$",
 ]
-ORDINALS = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
+ORDINALS = [
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eighth",
+    "Ninth",
+    "Tenth",
+    "Eleventh",
+    "Twelfth",
+    "Thirteenth",
+    "Fourteenth",
+    "Fifteenth",
+    "Sixteenth",
+    "Seventeenth",
+    "Eighteenth",
+    "Nineteenth",
+    "Twentieth",
+    "Twenty-first",
+    "Twenty-second",
+]
 SUFFIXES = {"JR", "SR", "II", "III", "IV"}
 NICKNAMES = {"BRAD": "BRADFORD"}
 DISTRICTED = {
@@ -1518,7 +1541,6 @@ def emit() -> Path:
                 if share is None
                 else f"Judicial retention, {round(share * 100)} percent of Yes and No votes ({states[state]})",
             )
-                ordinal = ORDINALS[number - 1] if number <= len(ORDINALS) else ""
         districts: dict[str, UUID] = {}
 
         def electorate(state: str, court: str, number: int | None, at_large: bool, seen: set[str]) -> UUID:
@@ -1532,6 +1554,7 @@ def emit() -> Path:
                     raise ValueError(f"no Arizona electorate holds {sorted(seen)}")
                 text = ARIZONA[code][0]
             else:
+                ordinal = ORDINALS[number - 1] if number <= len(ORDINALS) else ""
                 code, text = {
                     "FL": (f"FL:dca-{number}", f"{ordinal} District Court of Appeal"),
                     "IL": (f"IL:judicial-{number}", f"{ordinal} Judicial District"),
@@ -1558,7 +1581,6 @@ def emit() -> Path:
             year = int(day[:4])
             election_key = f"{day}:{state}"
             if election_key not in keyed["us.election"]:
-                "district-court": "Judge of the District Court",
                 print(f"{election_key}: no election, skipped")
                 continue
             number, post = row["number"], row["post"]
@@ -1572,6 +1594,7 @@ def emit() -> Path:
                 else "Judge of the Court of Special Appeals",
                 "district-court-of-appeal": "Judge of the District Court of Appeal",
                 "appellate-court": "Judge of the Appellate Court",
+                "district-court": "Judge of the District Court",
                 "court-of-civil-appeals": "Judge of the Court of Civil Appeals",
                 "court-of-criminal-appeals": "Judge of the Court of Criminal Appeals",
             }[court]
@@ -1592,8 +1615,6 @@ def emit() -> Path:
                 id=contest,
                 election_id=cs.key("us.election", election_key),
                 kind="office",
-                else f"District {number}, Department {post}"
-                if court == "district-court"
                 office_id=office,
                 district_area_id=area,
                 term="full",
@@ -1607,6 +1628,8 @@ def emit() -> Path:
                 if state == "KS"
                 else f"District {number}" + (f", Office {post}" if post else "")
                 if state == "OK" and number is not None
+                else f"District {number}, Department {post}"
+                if court == "district-court"
                 else None
             )
             if minted or (state == "OK" and year == 2010 and seat):
