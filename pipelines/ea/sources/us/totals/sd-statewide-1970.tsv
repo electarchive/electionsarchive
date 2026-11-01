@@ -1,9 +1,17 @@
 source	state	date	office	title	name	party	votes	winner	page
 sd-statewide-1970	SD	1970-11-03	lieutenant-governor	Lieutenant Governor	Bob Bartron	Republican	115451		5
 sd-statewide-1970	SD	1970-11-03	lieutenant-governor	Lieutenant Governor	William Dougherty	Democrat	117855	1	5
+sd-statewide-1970	SD	1970-11-03	attorney-general	Attorney General	Gordon Mydland	Republican	116493	1	6
+sd-statewide-1970	SD	1970-11-03	attorney-general	Attorney General	Ramon Roubideaux	Democrat	114633		6
 sd-statewide-1970	SD	1970-11-03	secretary-of-state	Secretary Of State	Alma Larson	Republican	136094	1	7
 sd-statewide-1970	SD	1970-11-03	secretary-of-state	Secretary Of State	Ruth Eubank	Democrat	96756		7
+sd-statewide-1970	SD	1970-11-03	auditor	Auditor	Alice Kundert	Republican	116454	1	8
+sd-statewide-1970	SD	1970-11-03	auditor	Auditor	William Schroeder	Democrat	112543		8
+sd-statewide-1970	SD	1970-11-03	treasurer	Treasurer	Neal Strand	Republican	124120	1	9
+sd-statewide-1970	SD	1970-11-03	treasurer	Treasurer	Barbara Authier	Democrat	104481		9
 sd-statewide-1970	SD	1970-11-03	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Ralph Ginn	Republican	122746	1	10
 sd-statewide-1970	SD	1970-11-03	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Kenne Fridley	Democrat	105571		10
+sd-statewide-1970	SD	1970-11-03	public-utilities-commissioner	Public Utilities Commissioner	Ken Donnenwirth	Republican	111794		11
+sd-statewide-1970	SD	1970-11-03	public-utilities-commissioner	Public Utilities Commissioner	Jack Weiland	Democrat	114614	1	11
 sd-statewide-1970	SD	1970-11-03	superintendent-of-public-instruction	Superintendent Of Public Instruction	Gordon A. Diedtrich	""	87975		12
 sd-statewide-1970	SD	1970-11-03	superintendent-of-public-instruction	Superintendent Of Public Instruction	Donald P. Barnhart	""	94128	1	12

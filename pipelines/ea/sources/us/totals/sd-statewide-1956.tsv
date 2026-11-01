@@ -1,9 +1,17 @@
 source	state	date	office	title	name	party	votes	winner	page
+sd-statewide-1956	SD	1956-11-06	lieutenant-governor	Lieutenant Governor	L. R. Houck	Rep.	149022	1	7
+sd-statewide-1956	SD	1956-11-06	lieutenant-governor	Lieutenant Governor	John F. Lindley	Dem.	135565		7
+sd-statewide-1956	SD	1956-11-06	attorney-general	Attorney General	Phil Saunders	Rep.	156149	1	8
+sd-statewide-1956	SD	1956-11-06	attorney-general	Attorney General	William H. Heuermann	Dem.	127988		8
 sd-statewide-1956	SD	1956-11-06	secretary-of-state	Secretary Of State	Clara Halls	Rep.	147923	1	9
 sd-statewide-1956	SD	1956-11-06	secretary-of-state	Secretary Of State	Selma Sandness	Dem.	136317		9
 sd-statewide-1956	SD	1956-11-06	auditor	Auditor	Fay Allbee	Rep.	148100	1	10
 sd-statewide-1956	SD	1956-11-06	auditor	Auditor	Otto Knudtson	Dem.	134989		10
+sd-statewide-1956	SD	1956-11-06	treasurer	Treasurer	Ed. T. Elkins	Rep.	148907	1	11
+sd-statewide-1956	SD	1956-11-06	treasurer	Treasurer	Henry Tiesen	Dem.	133818		11
 sd-statewide-1956	SD	1956-11-06	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Bernard Linn	Rep.	151208	1	12
 sd-statewide-1956	SD	1956-11-06	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Charles E. Donnelly, Jr.	Dem.	131863		12
 sd-statewide-1956	SD	1956-11-06	public-utilities-commissioner	Public Utilities Commissioner	Chris A. Merkle	Rep.	150043	1	13
 sd-statewide-1956	SD	1956-11-06	public-utilities-commissioner	Public Utilities Commissioner	R. Y. Bagby	Dem.	131291		13
+sd-statewide-1956	SD	1956-11-06	superintendent-of-public-instruction	Superintendent Of Public Instruction	Harold S. Freeman	""	165714	1	14
+sd-statewide-1956	SD	1956-11-06	superintendent-of-public-instruction	Superintendent Of Public Instruction	Milton Buechler	""	74130		14

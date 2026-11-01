@@ -1,72 +1,16 @@
 source	state	date	office	title	name	party	votes	winner	page
+sd-statewide-1954	SD	1954-11-02	lieutenant-governor	Lieutenant Governor	L. R. (Roy) Houck	Rep.	124703	1	6
+sd-statewide-1954	SD	1954-11-02	lieutenant-governor	Lieutenant Governor	J. M. Magness	Dem.	103866		6
+sd-statewide-1954	SD	1954-11-02	attorney-general	Attorney General	Phil Saunders	Rep.	127692	1	7
+sd-statewide-1954	SD	1954-11-02	attorney-general	Attorney General	Fred J. Nichol	Dem.	102726		7
+sd-statewide-1954	SD	1954-11-02	secretary-of-state	Secretary Of State	Geraldine Ostroot	Rep.	135611	1	8
+sd-statewide-1954	SD	1954-11-02	secretary-of-state	Secretary Of State	Selma Sandness	Dem.	94273		8
+sd-statewide-1954	SD	1954-11-02	auditor	Auditor	Lawrence E. Mayes	Rep.	130485	1	9
+sd-statewide-1954	SD	1954-11-02	auditor	Auditor	Harris Olien	Dem.	96343		9
+sd-statewide-1954	SD	1954-11-02	treasurer	Treasurer	Ed T. Elkins	Rep.	127611	1	10
+sd-statewide-1954	SD	1954-11-02	treasurer	Treasurer	Otto Ronning	Dem.	99086		10
 sd-statewide-1954	SD	1954-11-02	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Bernard Linn	Rep.	126888	1	11
 sd-statewide-1954	SD	1954-11-02	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	J. F. Hines	Dem.	101791		11
 sd-statewide-1954	SD	1954-11-02	public-utilities-commissioner	Public Utilities Commissioner	Fred Lindekugel	Rep.	122512	1	12
 sd-statewide-1954	SD	1954-11-02	public-utilities-commissioner	Public Utilities Commissioner	Carl Anderson	Dem.	104903		12
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Aurora	""	1150		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Beadle	""	4743		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Bennett	""	711		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Bon Homme	""	1868		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Brookings	""	3666		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Brown	""	7581		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Brule	""	1523		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Buffalo	""	395		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Butte	""	1636		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Campbell	""	832		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Charles Mix	""	2569		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Clark	""	1882		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Clay	""	1782		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Codington	""	3668		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Corson	""	1266		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Custer	""	1245		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Davison	""	3751		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Day	""	2784		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Deuel	""	1305		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Dewey	""	1226		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Douglas	""	1125		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Edmunds	""	1550		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Fall River	""	1457		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Faulk	""	1034		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Grant	""	2365		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Gregory	""	1796		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Haakon	""	951		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hamlin	""	1469		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hand	""	2231		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hanson	""	1039		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Harding	""	616		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hughes	""	2534		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hutchinson	""	2268		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hyde	""	794		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Jackson	""	497		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Jerauld	""	1134		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Jones	""	658		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Kingsbury	""	2125		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Lake	""	2812		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Lawrence	""	3380		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Lincoln	""	2389		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Lyman	""	1081		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	McCook	""	1860		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	McPherson	""	1034		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Marshall	""	1735		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Meade	""	2292		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Mellette	""	590		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Miner	""	1379		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Minnehaha	""	15938	1	13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Moody	""	1402		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Pennington	""	7282		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Perkins	""	1655		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Potter	""	1290		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Roberts	""	2704		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Sanborn	""	1267		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Spink	""	2910		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Stanley	""	567		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Sully	""	773		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Tripp	""	1875		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Turner	""	2158		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Union	""	2043		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Walworth	""	1957		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Yankton	""	2691		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Ziebach	""	618		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Shannon	""	499		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Todd	""	757		13
-sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Washabaugh	""	291		13
+sd-statewide-1954	SD	1954-11-02	superintendent-of-public-instruction	Superintendent Of Public Instruction	Harold S. Freeman	""	138455	1	13

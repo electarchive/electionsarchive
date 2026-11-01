@@ -1,10 +1,12 @@
 source	state	date	office	title	name	party	votes	winner	page
+sd-statewide-1928	SD	1928-11-06	railroad-commissioner	Railroad Commissioner	James E. Truesdale	Dem.	93523		2
+sd-statewide-1928	SD	1928-11-06	railroad-commissioner	Railroad Commissioner	Dawes E. Brisbine	Rep.	142259	1	2
 sd-statewide-1928	SD	1928-11-06	attorney-general	Attorney General	Ray E. Dougherty	Dem.	99604		4
 sd-statewide-1928	SD	1928-11-06	attorney-general	Attorney General	M. Q. Sharpe	Rep.	137079	1	4
-sd-statewide-1928	SD	1928-11-06	attorney-general	Attorney General	Lars J. Grinager	F. L.	3611		4
+sd-statewide-1928	SD	1928-11-06	attorney-general	Attorney General	Lars J. Grinager	F.L.	3611		4
 sd-statewide-1928	SD	1928-11-06	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Conrad Zimbelman	Dem.	90461		4
 sd-statewide-1928	SD	1928-11-06	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	O. P. J. Engstrom	Rep.	145608	1	4
-sd-statewide-1928	SD	1928-11-06	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Robert S. Pond	F. L.	2746		4
+sd-statewide-1928	SD	1928-11-06	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Robert S. Pond	F.L.	2746		4
 sd-statewide-1928	SD	1928-11-06	superintendent-of-public-instruction	Superintendent Of Public Instruction	Beatrice O. Tilley	Dem.	97373		6
 sd-statewide-1928	SD	1928-11-06	superintendent-of-public-instruction	Superintendent Of Public Instruction	E. C. Giffen	Rep.	140344	1	6
 sd-statewide-1928	SD	1928-11-06	superintendent-of-public-instruction	Superintendent Of Public Instruction	Mrs. Minnie Glenn	F. L.	3567		6
@@ -17,3 +19,6 @@ sd-statewide-1928	SD	1928-11-06	auditor	Auditor	Wm. F. Yegge	F. L.	2671		8
 sd-statewide-1928	SD	1928-11-06	secretary-of-state	Secretary Of State	J. O. Johnson	Dem.	93959		8
 sd-statewide-1928	SD	1928-11-06	secretary-of-state	Secretary Of State	Gladys Pyle	Rep.	151583	1	8
 sd-statewide-1928	SD	1928-11-06	secretary-of-state	Secretary Of State	R. W. Hixon	F. L.	1797		8
+sd-statewide-1928	SD	1928-11-06	lieutenant-governor	Lieutenant Governor	John T. Grigsby	Dem.	112149		9
+sd-statewide-1928	SD	1928-11-06	lieutenant-governor	Lieutenant Governor	C. E. Coyne	Rep.	137259	1	9
+sd-statewide-1928	SD	1928-11-06	lieutenant-governor	Lieutenant Governor	Elza G. Anderson	F. L.	2039		9

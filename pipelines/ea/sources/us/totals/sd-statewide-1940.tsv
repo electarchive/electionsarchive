@@ -1,7 +1,17 @@
 source	state	date	office	title	name	party	votes	winner	page
 sd-statewide-1940	SD	1940-11-05	lieutenant-governor	Lieutenant Governor	Miller	Rep.	167868	1	4
 sd-statewide-1940	SD	1940-11-05	lieutenant-governor	Lieutenant Governor	Hafner	Dem.	123649		4
+sd-statewide-1940	SD	1940-11-05	attorney-general	Attorney General	Temmey	Rep.	170269	1	5
+sd-statewide-1940	SD	1940-11-05	attorney-general	Attorney General	Foley	Dem.	122173		5
 sd-statewide-1940	SD	1940-11-05	secretary-of-state	Secretary Of State	Ringsrud	Rep.	178995	1	6
 sd-statewide-1940	SD	1940-11-05	secretary-of-state	Secretary Of State	Twedell	Dem.	115097		6
+sd-statewide-1940	SD	1940-11-05	auditor	Auditor	Warner	Rep.	170813	1	7
+sd-statewide-1940	SD	1940-11-05	auditor	Auditor	Holter	Dem.	119151		7
 sd-statewide-1940	SD	1940-11-05	treasurer	Treasurer	Douglas	Rep.	169630	1	8
 sd-statewide-1940	SD	1940-11-05	treasurer	Treasurer	Scott	Dem.	119737		8
+sd-statewide-1940	SD	1940-11-05	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Hammerquist	Rep.	175751	1	9
+sd-statewide-1940	SD	1940-11-05	commissioner-of-school-and-public-lands	Commissioner Of School And Public Lands	Venables	Dem.	115869		9
+sd-statewide-1940	SD	1940-11-05	public-utilities-commissioner	Public Utilities Commissioner	Doherty	Rep.	172611	1	10
+sd-statewide-1940	SD	1940-11-05	public-utilities-commissioner	Public Utilities Commissioner	Schliessmann	Dem.	116085		10
+sd-statewide-1940	SD	1940-11-05	superintendent-of-public-instruction	Superintendent Of Public Instruction	Hines	""	123422	1	12
+sd-statewide-1940	SD	1940-11-05	superintendent-of-public-instruction	Superintendent Of Public Instruction	Shaw	""	100902		12
