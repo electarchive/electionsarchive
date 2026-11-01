@@ -1,44 +1,55 @@
-import { dev } from "$app/env";
 import { call, ORPCError } from "@orpc/server";
 import { error } from "@sveltejs/kit";
-import { NIGHT } from "#lib/server/rpc/rehearsal.js";
+import { remember } from "#lib/server/cache.js";
+import { geography, states } from "#lib/server/live-board.js";
 import { router } from "#lib/server/rpc/router.js";
 import type { PageServerLoad } from "./$types";
 
-const play = { started: 0 };
-
-export const load: PageServerLoad = async ({ params, url }) => {
-  const asked = dev ? url.searchParams.get("rehearsal") : null;
-  const now = Date.now();
-  if (asked === "play" && now - play.started > NIGHT * 30_000 + 300_000) {
-    play.started = now;
-  }
-  const played = Math.floor((now - play.started) / 30_000) + 1;
-  const shown: Record<string, number> = {
-    play: played,
-    night: NIGHT,
-    final: NIGHT,
-  };
+async function night(path: string) {
   try {
-    return {
-      night: await call(router.live.get, {
-        path: params.path,
-        rehearsal:
-          asked == null
-            ? undefined
-            : {
-                started: asked === "play" ? play.started : null,
-                shown: shown[asked] ?? Number(asked),
-                isFinal:
-                  asked === "final" || (asked === "play" && played > NIGHT + 1),
-              },
-      }),
-      at: url.searchParams.get("at"),
-    };
+    return await call(router.live.election, { path });
   } catch (error_) {
     if (error_ instanceof ORPCError && error_.code === "NOT_FOUND") {
       error(404);
     }
     throw error_;
   }
+}
+
+export const load: PageServerLoad = async ({ params, url }) => {
+  const first = await night(params.path);
+  const isRace = first.election.slug !== params.path;
+  const found = isRace ? await night(first.election.slug) : first;
+  const { election } = found;
+  const isNation = election.slug.split("/").length === 2;
+  const focus = isRace
+    ? (first.election.races[0] ?? null)
+    : (election.races.find((race) => race.office === "senate") ??
+      election.races.find((race) => race.office === "governor") ??
+      election.races[0] ??
+      null);
+  const areas = [
+    ...new Set(
+      (focus?.units ?? []).flatMap((unit) =>
+        unit.areaId == null ? [] : [unit.areaId],
+      ),
+    ),
+  ];
+  return {
+    ...found,
+    focus: isNation ? null : (focus?.slug ?? null),
+    isRace,
+    nation: isNation
+      ? await remember(`live:nation:${election.date}`, async () =>
+          states(election.date),
+        )
+      : null,
+    geography:
+      isNation || focus == null
+        ? null
+        : await remember(`live:geography:${focus.slug}`, async () =>
+            geography(areas, election.date),
+          ),
+    at: url.searchParams.get("at"),
+  };
 };
