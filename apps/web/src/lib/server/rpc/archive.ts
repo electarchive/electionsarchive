@@ -12127,12 +12127,6 @@ async function races(
       ),
       kept as materialized (
         select id, stage, own from base where own or not exists (select from base where own)
-      ),
-      runs as (
-        select n.previous_round_id as id, array_agg(n.id) as ids
-        from contest n join election ne on ne.id = n.election_id
-        where ne.kind = 'runoff' and n.previous_round_id in (select id from kept)
-        group by n.previous_round_id
       )
       select c.id, c.kind::text as kind, k.own as "isOwn",
         case when c.kind = 'ballot_question' then c.id::text
@@ -12160,7 +12154,7 @@ async function races(
         ) then 'alliance' else 'party' end as grouping
       from kept k
       join contest c on c.id = k.id
-      join election e on e.id = c.election_id
+      cross join lateral (select x.kind, x.date_from from election x where x.id = c.election_id offset 0) e
       left join seat st on st.id = c.seat_id
       left join area a on a.id = c.district_area_id
       left join scheme sc on sc.code = a.scheme_code
@@ -12169,7 +12163,11 @@ async function races(
         where z.body_id = c.body_id and (z.valid @> e.date_from or z.valid_from between e.date_from and e.date_from + 150)
         order by z.valid_from desc nulls last limit 1
       ) z on true
-      left join runs on runs.id = c.id
+      left join lateral (
+        select array_agg(n.id) as ids
+        from contest n join election ne on ne.id = n.election_id
+        where n.previous_round_id = c.id and ne.kind = 'runoff'
+      ) runs on true
     `),
     db.execute<{ id: string; k: number }>(sql`
       select a.id, a.k from polity_territory pt join area a on a.id = pt.area_id
