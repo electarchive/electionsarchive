@@ -1,41 +1,27 @@
 <script lang="ts">
   import { READ_ONLY } from "$app/env/public";
-  import { afterNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import {
     ArrowLeftRightIcon,
-    AtSignIcon,
-    ChevronRightIcon,
     GaugeIcon,
-    KeyRoundIcon,
     LayoutDashboardIcon,
-    LogInIcon,
-    LogOutIcon,
     MenuIcon,
     MonitorIcon,
     MoonIcon,
     SunIcon,
     UserIcon,
   } from "@lucide/svelte";
-  import { setMode, userPrefersMode } from "mode-watcher";
+  import { userPrefersMode } from "mode-watcher";
+  import { tick } from "svelte";
+  import type HeaderMenus from "#lib/components/header-menus.svelte";
   import Monogram from "#lib/components/monogram.svelte";
   import Search from "#lib/components/search.svelte";
   import Term from "#lib/components/term.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
-  import * as Drawer from "#lib/components/ui/drawer/index.js";
-  import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
-  import { Segmented } from "#lib/components/ui/segmented/index.js";
-  import { Switch } from "#lib/components/ui/switch/index.js";
-  import { palette } from "#lib/palette.svelte.js";
+  import { idle } from "#lib/idle.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
-
-  const THEMES = [
-    { value: "system", label: m.theme_system(), icon: MonitorIcon },
-    { value: "light", label: m.theme_light(), icon: SunIcon },
-    { value: "dark", label: m.theme_dark(), icon: MoonIcon },
-  ] as const;
 
   const LINKS = [
     {
@@ -62,7 +48,9 @@
     },
   ];
 
-  let isMenuOpen = $state(false);
+  let Menus = $state<typeof HeaderMenus | null>(null);
+  let initial = $state<"theme" | "account" | "menu" | null>(null);
+  let loading: Promise<void> | undefined;
 
   const signIn = $derived(
     `${resolve("/sign-in")}?next=${encodeURIComponent(page.url.pathname)}`,
@@ -75,17 +63,80 @@
       : undefined;
   }
 
-  function theme(value: unknown) {
-    const found = THEMES.find((option) => option.value === value);
-    if (found != null) {
-      setMode(found.value);
-    }
+  function load() {
+    loading ??= import("#lib/components/header-menus.svelte").then(
+      async (module) => {
+        const focused =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement.dataset.menu
+            : undefined;
+        Menus = module.default;
+        if (focused != null && initial == null) {
+          await tick();
+          document
+            .querySelector<HTMLElement>(`[data-menu="${focused}"]`)
+            ?.focus();
+        }
+      },
+    );
   }
 
-  afterNavigate(() => {
-    isMenuOpen = false;
-  });
+  function placeholder(
+    menu: "theme" | "account" | "menu",
+    popup: "menu" | "dialog",
+  ) {
+    return {
+      type: "button",
+      "aria-haspopup": popup,
+      "aria-expanded": "false",
+      onclick: () => {
+        initial = menu;
+        load();
+      },
+    };
+  }
+
+  $effect(() => idle(load));
 </script>
+
+{#snippet themeTrigger(props: Record<string, unknown>)}
+  <Button {...props} variant="ghost" size="icon" data-menu="theme">
+    {#if userPrefersMode.current === "dark"}
+      <MoonIcon />
+    {:else if userPrefersMode.current === "light"}
+      <SunIcon />
+    {:else}
+      <MonitorIcon />
+    {/if}
+    <span class="sr-only">{m.theme_menu()}</span>
+  </Button>
+{/snippet}
+
+{#snippet accountTrigger(props: Record<string, unknown>)}
+  <Button {...props} variant="ghost" size="icon" data-menu="account">
+    <UserIcon />
+    <span class="sr-only">{m.account_menu()}</span>
+  </Button>
+{/snippet}
+
+{#snippet menuTrigger(props: Record<string, unknown>)}
+  <Button
+    {...props}
+    variant="ghost"
+    size="icon"
+    class="ms-auto -me-1.5 block-9 inline-9 lg:hidden"
+    data-menu="menu"
+  >
+    <MenuIcon class="block-5 inline-5" />
+    <span class="sr-only">{m.header_menu()}</span>
+  </Button>
+{/snippet}
+
+{#snippet signInButton()}
+  <Button href={signIn} variant="ghost">
+    {m.sign_in_submit()}
+  </Button>
+{/snippet}
 
 <header class="border-be">
   <div
@@ -131,209 +182,27 @@
         </Button>
       {/each}
     </nav>
-    <div class="flex items-center gap-1 max-lg:hidden">
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger>
-          {#snippet child({ props })}
-            <Button {...props} variant="ghost" size="icon">
-              {#if userPrefersMode.current === "dark"}
-                <MoonIcon />
-              {:else if userPrefersMode.current === "light"}
-                <SunIcon />
-              {:else}
-                <MonitorIcon />
-              {/if}
-              <span class="sr-only">{m.theme_menu()}</span>
-            </Button>
-          {/snippet}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content align="end" class="inline-56">
-          <DropdownMenu.RadioGroup
-            value={userPrefersMode.current}
-            onValueChange={theme}
-          >
-            <DropdownMenu.GroupHeading
-              >{m.theme_menu()}</DropdownMenu.GroupHeading
-            >
-            {#each THEMES as theme (theme.value)}
-              <DropdownMenu.RadioItem value={theme.value}>
-                <theme.icon class="text-muted-foreground" />
-                {theme.label}
-              </DropdownMenu.RadioItem>
-            {/each}
-          </DropdownMenu.RadioGroup>
-          <DropdownMenu.Separator />
-          <DropdownMenu.CheckboxItem bind:checked={palette.isSafe}>
-            {m.palette_safe()}
-          </DropdownMenu.CheckboxItem>
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
-      {#if page.data.user == null}
-        <Button href={signIn} variant="ghost">
-          {m.sign_in_submit()}
-        </Button>
-      {:else}
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger>
-            {#snippet child({ props })}
-              <Button {...props} variant="ghost" size="icon">
-                <UserIcon />
-                <span class="sr-only">{m.account_menu()}</span>
-              </Button>
-            {/snippet}
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content align="end" class="inline-56">
-            <DropdownMenu.Label class="grid gap-0.5">
-              <span class="truncate text-foreground">{page.data.user.name}</span
-              >
-              <span class="truncate font-normal">{page.data.user.email}</span>
-            </DropdownMenu.Label>
-            <DropdownMenu.Separator />
-            <DropdownMenu.Item>
-              {#snippet child({ props })}
-                <a {...props} href={resolve("/settings/username")}>
-                  <AtSignIcon class="text-muted-foreground" />
-                  {m.username_nav()}
-                </a>
-              {/snippet}
-            </DropdownMenu.Item>
-            {#if !READ_ONLY}
-              <DropdownMenu.Item>
-                {#snippet child({ props })}
-                  <a {...props} href={resolve("/settings/keys")}>
-                    <KeyRoundIcon class="text-muted-foreground" />
-                    {m.keys_nav()}
-                  </a>
-                {/snippet}
-              </DropdownMenu.Item>
-            {/if}
-            <form method="POST" action={resolve("/sign-out")}>
-              <DropdownMenu.Item class="inline-full">
-                {#snippet child({ props })}
-                  <button {...props} type="submit">
-                    <LogOutIcon class="text-muted-foreground" />
-                    {m.sign_out()}
-                  </button>
-                {/snippet}
-              </DropdownMenu.Item>
-            </form>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
-      {/if}
-    </div>
-    <Drawer.Root bind:open={isMenuOpen} shouldScaleBackground={false}>
-      <Drawer.Trigger>
-        {#snippet child({ props })}
-          <Button
-            {...props}
-            variant="ghost"
-            size="icon"
-            class="ms-auto -me-1.5 block-9 inline-9 lg:hidden"
-          >
-            <MenuIcon class="block-5 inline-5" />
-            <span class="sr-only">{m.header_menu()}</span>
-          </Button>
-        {/snippet}
-      </Drawer.Trigger>
-      <Drawer.Content class="sm:mx-auto sm:max-inline-xl">
-        <Drawer.Title class="sr-only">{m.header_menu()}</Drawer.Title>
-        <div
-          class="grid gap-4 px-3 pbs-3 pbe-[calc(env(safe-area-inset-bottom)+1rem)]"
-        >
-          <nav class="grid" aria-label={m.header_menu()}>
-            {#each LINKS as link (link.href)}
-              <a
-                href={link.href}
-                class="group/link flex items-center gap-3 rounded-sm px-2 py-2.5 hover:highlighter aria-[current=page]:highlighter"
-                aria-current={current(link.href)}
-              >
-                <span
-                  class="grid shrink-0 place-items-center rounded-sm border border-input bg-card block-10 inline-10 group-aria-[current=page]/link:border-foreground"
-                >
-                  <link.icon class="block-4.5 inline-4.5" />
-                </span>
-                <span class="grid flex-1 gap-0.5 min-inline-0">
-                  <span class="text-[0.9375rem]/tight font-semibold"
-                    >{link.label}</span
-                  >
-                  <span
-                    class="text-[0.8125rem]/snug text-pretty text-muted-foreground"
-                    >{link.about}</span
-                  >
-                </span>
-                <ChevronRightIcon
-                  class="shrink-0 text-muted-foreground block-4 inline-4"
-                />
-              </a>
-            {/each}
-          </nav>
-          <div class="grid gap-3 border-bs px-2 pbs-4">
-            <div class="flex items-center justify-between gap-3">
-              <span class="text-sm font-semibold">{m.theme_menu()}</span>
-              <Segmented
-                options={[...THEMES]}
-                value={userPrefersMode.current}
-                label={m.theme_menu()}
-                size="sm"
-                onValueChange={theme}
-              />
-            </div>
-            <label class="flex items-center justify-between gap-3 text-sm">
-              {m.palette_safe()}
-              <Switch bind:checked={palette.isSafe} />
-            </label>
-          </div>
-          <div class="grid gap-3 border-bs px-2 pbs-4">
-            {#if page.data.user == null}
-              <p
-                class="text-[0.8125rem]/snug text-pretty text-muted-foreground"
-              >
-                {m.header_sign_in_about()}
-              </p>
-              <Button href={signIn} class="block-10">
-                <LogInIcon />
-                {m.sign_in_submit()}
-              </Button>
-            {:else}
-              <div class="flex items-center gap-3">
-                <span
-                  class="grid shrink-0 place-items-center rounded-full border border-input bg-card block-9 inline-9"
-                >
-                  <UserIcon class="block-4 inline-4" />
-                </span>
-                <span class="grid text-sm min-inline-0">
-                  <span class="truncate font-semibold"
-                    >{page.data.user.name}</span
-                  >
-                  <span class="truncate text-muted-foreground"
-                    >{page.data.user.email}</span
-                  >
-                </span>
-              </div>
-              <div
-                class="grid grid-cols-[repeat(auto-fit,minmax(6.5rem,1fr))] gap-2"
-              >
-                <Button href={resolve("/settings/username")} size="sm">
-                  <AtSignIcon />
-                  {m.username_nav()}
-                </Button>
-                {#if !READ_ONLY}
-                  <Button href={resolve("/settings/keys")} size="sm">
-                    <KeyRoundIcon />
-                    {m.keys_nav()}
-                  </Button>
-                {/if}
-                <form method="POST" action={resolve("/sign-out")} class="grid">
-                  <Button type="submit" size="sm">
-                    <LogOutIcon />
-                    {m.sign_out()}
-                  </Button>
-                </form>
-              </div>
-            {/if}
-          </div>
-        </div>
-      </Drawer.Content>
-    </Drawer.Root>
+    {#if Menus != null}
+      <Menus
+        links={LINKS}
+        {current}
+        {signIn}
+        {initial}
+        {themeTrigger}
+        {accountTrigger}
+        {menuTrigger}
+        {signInButton}
+      />
+    {:else}
+      <div class="flex items-center gap-1 max-lg:hidden">
+        {@render themeTrigger(placeholder("theme", "menu"))}
+        {#if page.data.user == null}
+          {@render signInButton()}
+        {:else}
+          {@render accountTrigger(placeholder("account", "menu"))}
+        {/if}
+      </div>
+      {@render menuTrigger(placeholder("menu", "dialog"))}
+    {/if}
   </div>
 </header>

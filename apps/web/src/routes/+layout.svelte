@@ -15,6 +15,7 @@
   import Header from "#lib/components/header.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import embedStyles from "#lib/embed.css?url";
+  import { idle } from "#lib/idle.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { makeQueryClient } from "#lib/query-client.js";
@@ -33,19 +34,13 @@
 
   let Overlays = $state<Component | null>(null);
 
-  $effect(() => {
-    const load = () => {
+  $effect(() =>
+    idle(() => {
       void import("#lib/components/overlays.svelte").then((module) => {
         Overlays = module.default;
       });
-    };
-    if ("requestIdleCallback" in window) {
-      const handle = requestIdleCallback(load, { timeout: 1500 });
-      return () => cancelIdleCallback(handle);
-    }
-    const handle = setTimeout(load, 300);
-    return () => clearTimeout(handle);
-  });
+    }),
+  );
 
   const isPending = $derived(
     navigating.to != null && navigating.to.url.pathname !== page.url.pathname,
