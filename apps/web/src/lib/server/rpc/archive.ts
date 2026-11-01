@@ -3856,7 +3856,7 @@ async function places(
             where (select "isShort" from short) and ${POOLED} and u.kind = 'standard'
               and exists (select from sets cross join lateral (select from result_value x where x.result_set_k = sets.k and x.unit_k = u.k limit 1) v)
             union all
-            select ${POOL}, true, (
+            select ${POOL}, true, null::int, null::text, (
               select v.channel from sets cross join lateral (select x.channel from result_value x where x.result_set_k = sets.k and x.unit_k = u.k and x.measure = any(${COUNTED}) and x.option_k <> 0 limit 1) v limit 1
             )
             from reporting_unit u
