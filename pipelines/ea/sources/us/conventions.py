@@ -239,7 +239,7 @@ TABLES += [
     *leaves("12threpubnaticon00blumrich", "1900", {"": (157,)}),
     *leaves("officialproceedi00repu", "1896", {"": (132,)}),
     *ballots("proceedingsoften00repu", "1892", {1: (144, 150)}),
-    *leaves("officialproceedi00repu_0", "1888", {"b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)}),
+    *leaves("officialproceedi00repu_0", "1888", {"b1": (376, 377), "b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)}),
     *ballots("officialproceedi00repu_0", "1888", {4: (394, 396), 6: (406, 408), 8: (416, 418)}),
     *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
     *ballots("proceedingsofeig00repu", "1884", {1: (148, 152), 2: (153, 157), 4: (165, 176)}),
