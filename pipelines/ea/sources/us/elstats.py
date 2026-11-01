@@ -37,7 +37,7 @@ TENANTS = {
     "VT": ("vt2.elstats", "Vermont Secretary of State", "https://electionarchive.vermont.gov"),
     "VA": ("va2.elstats", "Virginia Department of Elections", "https://historical.elections.virginia.gov"),
 }
-HELD = {"NH": "Withdrawn: its terms do not permit redistribution; no result set may be loaded from this archive"}
+HELD = {"NH": "Withdrawn: NHPR's terms do not permit redistribution, so its New Hampshire sets were replaced by Secretary of State numbers and withdrawn; no result set may be loaded from it"}
 MA_PUBLISHER = "Massachusetts Secretary of the Commonwealth"
 TITLE = "Election statistics archive"
 MASSACHUSETTS = "https://electionstats.state.ma.us/elections/"
