@@ -345,6 +345,8 @@ def scan() -> str:
                         "pdftoppm",
                         "-r",
                         str(dpi),
+                        "-scale-to",
+                        "7900",
                         "-gray",
                         "-png",
                         "-singlefile",
