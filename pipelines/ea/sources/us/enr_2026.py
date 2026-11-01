@@ -162,7 +162,9 @@ IL_CITIES = {
     "CITY OF ROCKFORD": "Winnebago",
 }
 APPEALS = re.compile(r"\bcourt of appeals?\b", re.IGNORECASE)
-SEAT = re.compile(r"district\s+(\d+)(?:\s*[,-]\s*office\s+(\d+))?", re.IGNORECASE)
+SEAT = re.compile(
+    r"(?:(?:district|seat)\s+0*(\d+)|\b0*(\d+)(?:st|nd|rd|th)\s+district)(?:\s*[,-]\s*office\s+(\d+))?", re.IGNORECASE
+)
 IL_STATEWIDE = ("190-ATTORNEY%20GENERAL", "200-SECRETARY%20OF%20STATE", "210-COMPTROLLER", "220-TREASURER")
 IL_CONTEST = re.compile(r"UNITED STATES SENATOR|GOVERNOR.*|(\d+)(?:ST|ND|RD|TH) CONGRESS")
 KS_CONTEST = re.compile(
@@ -1075,7 +1077,7 @@ def plan(
         ).fetchall():
             titles.setdefault(contest, set()).update(slug(text).split("-"))
             if found := SEAT.search(text):
-                seats[contest] = (found[1], found[2] or "")
+                seats[contest] = (found[1] or found[2], found[3] or "")
         twins: dict[tuple[UUID | None, frozenset[str], frozenset[str]], list[UUID]] = {}
         for contest, (_, wanted) in published.items():
             if len(wanted) > 1 and not wanted <= {"yes", "no"}:
@@ -1160,7 +1162,7 @@ def plan(
                 if w not in STOP
             }
             wide = office == "state" or bool(APPEALS.search(name))
-            seat = (found[1], found[2] or "") if wide and (found := SEAT.search(name)) else None
+            seat = (found[1] or found[2], found[3] or "") if wide and (found := SEAT.search(name)) else None
             best, ok = choose(people, words, places, wide, seat)
             if ok:
                 picks.append((best[0], name, places, office))
