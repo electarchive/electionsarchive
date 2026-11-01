@@ -16,6 +16,14 @@
    "state": "NE",
    "district": 1
   },
+  "l3": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 3
+  },
   "l5": {
    "year": 2000,
    "chamber": "state-legislature",
@@ -23,6 +31,46 @@
    "special": false,
    "state": "NE",
    "district": 5
+  },
+  "l7": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 7
+  },
+  "l9": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 9
+  },
+  "l11": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 11
+  },
+  "l13": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 13
+  },
+  "l15": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 15
   },
   "l17": {
    "year": 2000,
@@ -40,6 +88,14 @@
    "state": "NE",
    "district": 18
   },
+  "l19": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 19
+  },
   "l21": {
    "year": 2000,
    "chamber": "state-legislature",
@@ -56,6 +112,38 @@
    "state": "NE",
    "district": 23
   },
+  "l25": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 25
+  },
+  "l27": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 27
+  },
+  "l29": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 29
+  },
+  "l31": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 31
+  },
   "l33": {
    "year": 2000,
    "chamber": "state-legislature",
@@ -63,6 +151,14 @@
    "special": false,
    "state": "NE",
    "district": 33
+  },
+  "l35": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 35
   },
   "l37": {
    "year": 2000,
@@ -95,6 +191,14 @@
    "special": false,
    "state": "NE",
    "district": 43
+  },
+  "l45": {
+   "year": 2000,
+   "chamber": "state-legislature",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 45
   },
   "l47": {
    "year": 2000,
@@ -463,6 +567,348 @@
      "label": "Bob Wickersham",
      "contest": "l49",
      "candidate": "Bob Wickersham"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l3",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.322,
+    0.95,
+    0.412
+   ],
+   "hint": "Read only the table headed District 3, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Jon Bruning",
+     "contest": "l3",
+     "candidate": "Jon Bruning"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l7",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.579,
+    0.95,
+    0.668
+   ],
+   "hint": "Read only the table headed District 7, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "John Hilgert",
+     "contest": "l7",
+     "candidate": "John Hilgert"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l9",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.691,
+    0.95,
+    0.78
+   ],
+   "hint": "Read only the table headed District 9, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Chip Maxwell",
+     "contest": "l9",
+     "candidate": "Chip Maxwell"
+    },
+    {
+     "label": "Scott Knudsen",
+     "contest": "l9",
+     "candidate": "Scott Knudsen"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l11",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.8,
+    0.95,
+    0.89
+   ],
+   "hint": "Read only the table headed District 11, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Ernie Chambers",
+     "contest": "l11",
+     "candidate": "Ernie Chambers"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 31,
+   "id": "l13",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.109,
+    0.95,
+    0.197
+   ],
+   "hint": "Read only the table headed District 13, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Dan Lynch",
+     "contest": "l13",
+     "candidate": "Dan Lynch"
+    },
+    {
+     "label": "Lowen Kruse",
+     "contest": "l13",
+     "candidate": "Lowen Kruse"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 31,
+   "id": "l15",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.219,
+    0.95,
+    0.307
+   ],
+   "hint": "Read only the table headed District 15, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Ray Janssen",
+     "contest": "l15",
+     "candidate": "Ray Janssen"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 31,
+   "id": "l19",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.772,
+    0.95,
+    0.862
+   ],
+   "hint": "Read only the table headed District 19, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Gene Tyson",
+     "contest": "l19",
+     "candidate": "Gene Tyson"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 32,
+   "id": "l25",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.501,
+    0.95,
+    0.592
+   ],
+   "hint": "Read only the table headed District 25, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Ron Raikes",
+     "contest": "l25",
+     "candidate": "Ron Raikes"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 32,
+   "id": "l27",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.612,
+    0.95,
+    0.702
+   ],
+   "hint": "Read only the table headed District 27, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "DiAnna R. Schimek",
+     "contest": "l27",
+     "candidate": "DiAnna R. Schimek"
+    },
+    {
+     "label": "Paul Edwards",
+     "contest": "l27",
+     "candidate": "Paul Edwards"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 32,
+   "id": "l29",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.722,
+    0.95,
+    0.812
+   ],
+   "hint": "Read only the table headed District 29, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "James W. Hewitt",
+     "contest": "l29",
+     "candidate": "James W. Hewitt"
+    },
+    {
+     "label": "Mike Foley",
+     "contest": "l29",
+     "candidate": "Mike Foley"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 33,
+   "id": "l31",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.106,
+    0.95,
+    0.19
+   ],
+   "hint": "Read only the table headed District 31, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Mark Quandahl",
+     "contest": "l31",
+     "candidate": "Mark Quandahl"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 33,
+   "id": "l35",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.329,
+    0.95,
+    0.426
+   ],
+   "hint": "Read only the table headed District 35, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Lonnie L. Logan",
+     "contest": "l35",
+     "candidate": "Lonnie L. Logan"
+    },
+    {
+     "label": "Ray Aguilar",
+     "contest": "l35",
+     "candidate": "Ray Aguilar"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 34,
+   "id": "l45",
+   "orientation": "counties_down",
+   "crop": [
+    0.05,
+    0.428,
+    0.95,
+    0.515
+   ],
+   "hint": "Read only the table headed District 45, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Doug Patton",
+     "contest": "l45",
+     "candidate": "Doug Patton"
+    },
+    {
+     "label": "D. Paul Hartnett",
+     "contest": "l45",
+     "candidate": "D. Paul Hartnett"
     },
     {
      "label": "Write In",

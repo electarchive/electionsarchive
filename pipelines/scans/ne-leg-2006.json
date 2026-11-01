@@ -16,6 +16,54 @@
    "state": "NE",
    "district": 2
   },
+  "l4": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 4
+  },
+  "l6": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 6
+  },
+  "l8": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 8
+  },
+  "l10": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 10
+  },
+  "l12": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 12
+  },
+  "l14": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 14
+  },
   "l16": {
    "year": 2006,
    "chamber": "state-legislature",
@@ -32,6 +80,14 @@
    "state": "NE",
    "district": 18
   },
+  "l20": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 20
+  },
   "l22": {
    "year": 2006,
    "chamber": "state-legislature",
@@ -47,6 +103,22 @@
    "special": false,
    "state": "NE",
    "district": 24
+  },
+  "l26": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 26
+  },
+  "l28": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 28
   },
   "l30": {
    "year": 2006,
@@ -96,6 +168,14 @@
    "state": "NE",
    "district": 40
   },
+  "l42": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 42
+  },
   "l44": {
    "year": 2006,
    "chamber": "state-legislature",
@@ -103,6 +183,22 @@
    "special": false,
    "state": "NE",
    "district": 44
+  },
+  "l46": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 46
+  },
+  "l48": {
+   "year": 2006,
+   "chamber": "state-legislature",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 48
   }
  },
  "pages": [
@@ -386,6 +482,294 @@
      "label": "Frank Shoemaker",
      "contest": "l44",
      "candidate": "Frank Shoemaker"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l4",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.25,
+    0.48,
+    0.303
+   ],
+   "hint": "Read only the table headed District 4, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Pete Pirsch",
+     "contest": "l4",
+     "candidate": "Pete Pirsch"
+    },
+    {
+     "label": "Tony Sorrentino",
+     "contest": "l4",
+     "candidate": "Tony Sorrentino"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l6",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.308,
+    0.48,
+    0.39
+   ],
+   "hint": "Read only the table headed District 6, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Lynne Sarafian Anderson",
+     "contest": "l6",
+     "candidate": "Lynne Sarafian Anderson"
+    },
+    {
+     "label": "John E. Nelson",
+     "contest": "l6",
+     "candidate": "John E. Nelson"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l8",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.396,
+    0.48,
+    0.449
+   ],
+   "hint": "Read only the table headed District 8, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Tom White",
+     "contest": "l8",
+     "candidate": "Tom White"
+    },
+    {
+     "label": "Marc Kraft",
+     "contest": "l8",
+     "candidate": "Marc Kraft"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l10",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.456,
+    0.48,
+    0.508
+   ],
+   "hint": "Read only the table headed District 10, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Mike Friend",
+     "contest": "l10",
+     "candidate": "Mike Friend"
+    },
+    {
+     "label": "Robert Wimberley",
+     "contest": "l10",
+     "candidate": "Robert Wimberley"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l12",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.517,
+    0.48,
+    0.569
+   ],
+   "hint": "Read only the table headed District 12, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Jean Stothert",
+     "contest": "l12",
+     "candidate": "Jean Stothert"
+    },
+    {
+     "label": "Steve Lathrop",
+     "contest": "l12",
+     "candidate": "Steve Lathrop"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l14",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.575,
+    0.48,
+    0.628
+   ],
+   "hint": "Read only the table headed District 14, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Tim Gay",
+     "contest": "l14",
+     "candidate": "Tim Gay"
+    },
+    {
+     "label": "Ian M. Hartfield",
+     "contest": "l14",
+     "candidate": "Ian M. Hartfield"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l20",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.148,
+    0.93,
+    0.201
+   ],
+   "hint": "Read only the table headed District 20, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Carol Casey",
+     "contest": "l20",
+     "candidate": "Carol Casey"
+    },
+    {
+     "label": "Brad Ashford",
+     "contest": "l20",
+     "candidate": "Brad Ashford"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l26",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.398,
+    0.93,
+    0.45
+   ],
+   "hint": "Read only the table headed District 26, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Steve Guittar",
+     "contest": "l26",
+     "candidate": "Steve Guittar"
+    },
+    {
+     "label": "Amanda M. McGill",
+     "contest": "l26",
+     "candidate": "Amanda M. McGill"
+    }
+   ]
+  },
+  {
+   "page": 17,
+   "id": "l28",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.457,
+    0.93,
+    0.511
+   ],
+   "hint": "Read only the table headed District 28, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Bill Avery",
+     "contest": "l28",
+     "candidate": "Bill Avery"
+    },
+    {
+     "label": "Bob Swanson",
+     "contest": "l28",
+     "candidate": "Bob Swanson"
+    }
+   ]
+  },
+  {
+   "page": 18,
+   "id": "l42",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.442,
+    0.48,
+    0.496
+   ],
+   "hint": "Read only the table headed District 42, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Thomas F. Hansen",
+     "contest": "l42",
+     "candidate": "Thomas F. Hansen"
+    },
+    {
+     "label": "Marc Kaschke",
+     "contest": "l42",
+     "candidate": "Marc Kaschke"
+    }
+   ]
+  },
+  {
+   "page": 18,
+   "id": "l46",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.287,
+    0.93,
+    0.347
+   ],
+   "hint": "Read only the table headed District 46, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Carol J. Brown",
+     "contest": "l46",
+     "candidate": "Carol J. Brown"
+    },
+    {
+     "label": "Danielle Nantkes",
+     "contest": "l46",
+     "candidate": "Danielle Nantkes"
+    }
+   ]
+  },
+  {
+   "page": 18,
+   "id": "l48",
+   "orientation": "counties_down",
+   "crop": [
+    0.51,
+    0.352,
+    0.93,
+    0.419
+   ],
+   "hint": "Read only the table headed District 48, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "George H. Schlothauer",
+     "contest": "l48",
+     "candidate": "George H. Schlothauer"
+    },
+    {
+     "label": "John N. Harms",
+     "contest": "l48",
+     "candidate": "John N. Harms"
     }
    ]
   }
