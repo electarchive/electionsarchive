@@ -1,3 +1,4 @@
+import base64
 import json
 import re
 from datetime import UTC, date, datetime
@@ -10,7 +11,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us.wikipedia_primaries import API
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.conventions"
 VERSION = "1"
@@ -125,9 +126,186 @@ def page(title: str) -> str:
     )
 
 
+LEAF = "https://archive.org/download/{item}/page/n{leaf}.jpg"
+RNC = "sim_republican-national-convention-proceedings_{}"
+TABLES = [
+    {"table": "1968:republican:first", "item": RNC.format("august-5-8-1968"), "leaves": (409, 410)},
+    {"table": "1968:republican:final", "item": RNC.format("august-5-8-1968"), "leaves": (419, 420)},
+    {"table": "1972:republican", "item": RNC.format("august-21-23-1972_30"), "leaves": (361, 362)},
+    {"table": "1976:republican", "item": RNC.format("august-16-19-1976_31"), "leaves": (451, 452)},
+    {"table": "1980:republican", "item": RNC.format("july-14-17-1980"), "leaves": (479, 480)},
+    {
+        "table": "1984:republican",
+        "item": RNC.format("august-20-23-1984_33"),
+        "leaves": (444, 445),
+        "columns": ("votes", "Reagan", None, "Abstention", None, None, None),
+    },
+]
+READS = {"a": "low", "b": "medium"}
+PROMPT = "1"
+ROLL = (
+    "This page is from the official report of the proceedings of a national party convention. Read the tabulation "
+    "of the ballot for president: one row per state or territory, in the order printed, including any totals row "
+    "(labeled as printed, such as 'Totals'). The header lists only the numeric columns, left to right (the column "
+    "of votes or delegates each state holds, then each candidate, abstention, or other column, labels as printed); "
+    "never the state column. Each row's values hold one string per header column, in the same order, empty where "
+    "the cell is blank. Read the rows and columns that continue the table from a previous page in the same way. If "
+    "the page holds no such table, return an empty header and no rows."
+)
+ABBREVIATIONS = {
+    "ala": "AL", "ariz": "AZ", "ark": "AR", "calif": "CA", "cal": "CA", "colo": "CO", "conn": "CT", "del": "DE",
+    "dc": "DC", "fla": "FL", "ga": "GA", "ill": "IL", "ind": "IN", "kans": "KS", "kan": "KS", "ky": "KY", "la": "LA",
+    "md": "MD", "mass": "MA", "mich": "MI", "minn": "MN", "miss": "MS", "mo": "MO", "mont": "MT", "nebr": "NE",
+    "neb": "NE", "nev": "NV", "nh": "NH", "nj": "NJ", "nmex": "NM", "nm": "NM", "ny": "NY", "nc": "NC", "nd": "ND",
+    "ndak": "ND", "okla": "OK", "ore": "OR", "oreg": "OR", "pa": "PA", "pr": "PR", "ri": "RI", "sc": "SC",
+    "sd": "SD", "sdak": "SD", "tenn": "TN", "tex": "TX", "vt": "VT", "va": "VA", "vi": "VI", "wash": "WA",
+    "wva": "WV", "wis": "WI", "wisc": "WI", "wyo": "WY", "virginislands": "VI", "puertorico": "PR",
+    "districtofcolumbia": "DC", "canalzone": "CZ",
+}  # fmt: skip
+NAMES = {re.sub(r"[^a-z]", "", re.sub(r" \(.*\)|, U\.S\.", "", name).lower()): code for name, code in PLACES.items()}
+HALF = re.compile(r"\s*(?:½|1/2|'/2|\.5)$")
+
+
 def fetch() -> None:
     for convention in CONVENTIONS:
         raw.fetch(SOURCE, page(convention["title"]), suffix=".json")
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+    from ea import batch, scans
+
+    price_in, price_out = batch.PRICES["claude-haiku-5-5"]
+    wanted: dict[str, batch.Want] = {}
+    for spec in TABLES:
+        for leaf in spec["leaves"]:
+            image = raw.fetch(SOURCE, LEAF.format(item=spec["item"], leaf=leaf), suffix=".jpg")
+            data = base64.b64encode(image.path.read_bytes()).decode()
+            for effort in READS.values():
+                wanted[read_key(effort, image.sha256)] = (
+                    MessageCreateParamsNonStreaming(
+                        model="claude-haiku-5-5",
+                        max_tokens=16000,
+                        system=scans.SYSTEM,
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": [
+                                    {
+                                        "type": "image",
+                                        "source": {"type": "base64", "media_type": "image/jpeg", "data": data},
+                                    },
+                                    {"type": "text", "text": ROLL},
+                                ],
+                            }
+                        ],
+                        output_config={"effort": effort, "format": {"type": "json_schema", "schema": scans.SCHEMA}},
+                    ),
+                    (3000 * price_in + 4000 * price_out) / 1e6,
+                )
+    print(batch.ensure(SOURCE, "rollcalls", wanted)[1])
+
+
+def read_key(effort: str, digest: str) -> str:
+    return f"anthropic-batch:claude-haiku-5-5/{PROMPT}/{effort}/{digest}"
+
+
+def place(label: str) -> str | None:
+    plain = re.sub(r"[^a-z]", "", label.lower().split("(")[0])
+    return NAMES.get(plain) or ABBREVIATIONS.get(plain)
+
+
+def number(cell: str) -> float:
+    text = cell.strip().replace(",", "")
+    half = HALF.search(text)
+    text = text[: half.start()] if half else text
+    if text in {"", "-", "—", "–", ".", "·", "*"} and not half:
+        return 0.0
+    return (float(text) if text else 0.0) + (0.5 if half else 0.0)
+
+
+def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]], dict[str, float], list[str]]:
+    cells: list[dict[str, object]] = []
+    totals: dict[str, float] = {}
+    problems: list[str] = []
+    for leaf in spec["leaves"]:
+        image = raw.cached(SOURCE, LEAF.format(item=spec["item"], leaf=leaf))
+        try:
+            response = json.loads(raw.cached(SOURCE, read_key(effort, image.sha256)).path.read_text())
+        except LookupError:
+            problems.append(f"leaf {leaf}: not read")
+            continue
+        text = next((block["text"] for block in response["content"] if block["type"] == "text"), "{}")
+        read = json.loads(text)
+        header = read["header"]
+        roles = spec.get("columns") or tuple(
+            "votes" if re.search(r"vote|delegate", column["label"], re.IGNORECASE) else column["label"].strip()
+            for column in header
+        )
+        if len(roles) != len(header):
+            problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
+            continue
+        for row in read["rows"]:
+            if len(row["values"]) != len(header):
+                problems.append(f"leaf {leaf}: {row['label']} has {len(row['values'])} cells")
+                continue
+            code = place(row["label"])
+            if code is None and not re.match(r"^\s*totals?\b", row["label"], re.IGNORECASE):
+                problems.append(f"leaf {leaf}: unknown row {row['label']!r}")
+                continue
+            for role, column, value in zip(roles, header, row["values"], strict=True):
+                if role is None:
+                    continue
+                try:
+                    figure = number(value)
+                except ValueError:
+                    problems.append(f"leaf {leaf}: {row['label']} {role} reads {value!r}")
+                    continue
+                if code is None:
+                    totals[role] = figure
+                    continue
+                cells.append(
+                    {
+                        "table": spec["table"],
+                        "state": code,
+                        "column": role,
+                        "value": figure,
+                        "leaf": leaf,
+                        "sha256": image.sha256,
+                        "box": [column["x0"] / 1000, row["y0"] / 1000, column["x1"] / 1000, row["y1"] / 1000],
+                    }
+                )
+    return cells, totals, problems
+
+
+def parse() -> None:
+    folder = DATA / "parsed" / SOURCE
+    folder.mkdir(parents=True, exist_ok=True)
+    frames, report = [], []
+    for spec in TABLES:
+        reads = {effort: table(spec, effort) for effort in READS.values()}
+        (first, printed, problems), (second, _, others) = reads["low"], reads["medium"]
+        values = {(cell["state"], cell["column"]): cell["value"] for cell in first}
+        other = {(cell["state"], cell["column"]): cell["value"] for cell in second}
+        disagree = sorted(key for key in values.keys() | other.keys() if values.get(key) != other.get(key))
+        failures = [*problems, *others, *(f"reads disagree on {state} {column}" for state, column in disagree)]
+        held = {state for state, _ in values}
+        for state in sorted(held):
+            votes = values.get((state, "votes"), 0)
+            cast = sum(value for (code, column), value in values.items() if code == state and column != "votes")
+            if votes != cast:
+                failures.append(f"{state}: {cast:g} cast of {votes:g} held")
+        for column, total in printed.items():
+            summed = sum(value for (_, name), value in values.items() if name == column)
+            if summed != total:
+                failures.append(f"column {column}: states sum to {summed:g}, printed total {total:g}")
+        report.append(f"## {spec['table']}\n\n{len(held)} delegations, {len(values)} cells, printed totals {printed}")
+        report.extend(f"- {failure}" for failure in failures)
+        report.append("")
+        if not failures:
+            frames.append(pl.DataFrame(first))
+    (folder / "rollcalls.md").write_text("\n".join(report))
+    if frames:
+        pl.concat(frames).write_parquet(folder / "rollcalls.parquet")
+    print("\n".join(report))
 
 
 def roll_call(text: str, caption: str) -> tuple[list[str], dict[str, list[int]]]:
