@@ -332,13 +332,19 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
             head[0],
         )
         cursor = index + 1
-        if lines[cursor].startswith("necessary for passage"):
-            cursor += 1
         body = []
+        for ahead in range(index, min(index + 3, len(lines))):
+            if "passage" in lines[ahead]:
+                cursor = ahead + 1
+                body.append(re.sub(r"^.*?passage\.?\s*", "", lines[ahead], count=1))
+                break
         while cursor < len(lines) and not STOP.match(lines[cursor]):
             body.append(lines[cursor])
             cursor += 1
         text = re.sub(r"\s+", " ", " ".join(body)).strip()
+        text = re.split(r"\s*(?:For the (?:Tax )?\w+ Against|S a m p l e|This sample ballot was produced)", text)[
+            0
+        ].strip()
         kind = head[0] + (" " + head[1] if len(head) > 1 and head[1].startswith("(") else "")
         key = (tuple(head), text)
         if text and key not in seen:
