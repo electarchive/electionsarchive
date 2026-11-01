@@ -9879,7 +9879,7 @@ def parse() -> None:
                             path,
                         )
                     )
-                if state == "CA":
+                if state in ("CA", "NE"):
                     held = {
                         path
                         for (path,) in conn.execute(
@@ -10001,6 +10001,8 @@ def parse() -> None:
                 ]
                 if state == "NY":
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
+                if state == "NE":
+                    tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
                 if tokens[:3] == ["governing", "board", "member"]:
                     tokens = tokens[3:]
                 for formal in (
