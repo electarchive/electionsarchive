@@ -406,6 +406,23 @@ PROCEEDINGS = [
     {"tables": {1: "1980:republican"}, "ordinal": "Thirty-Second", "city": "Detroit", "days": (date(1980, 7, 14), date(1980, 7, 17)), "ballots": {1: date(1980, 7, 16)}, "deciding": 1},
     {"tables": {1: "1984:republican"}, "ordinal": "Thirty-Third", "city": "Dallas", "days": (date(1984, 8, 20), date(1984, 8, 23)), "ballots": {1: date(1984, 8, 22)}, "deciding": 1},
 ]  # fmt: skip
+DNC = "Official Proceedings of the National Democratic Convention, Held "
+PROCEEDINGS += [
+    {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
+    {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1},
+    {"party": "democratic", "tables": {n: f"1868:democratic:b{n}" for n in range(1, 22)}, "title": DNC + "at New York, July 4–9, 1868", "publisher": "Rockwell & Rollins", "city": "New York", "days": (date(1868, 7, 4), date(1868, 7, 9)), "ballots": dict.fromkeys(range(1, 7), date(1868, 7, 7)) | dict.fromkeys(range(7, 19), date(1868, 7, 8)) | dict.fromkeys(range(19, 23), date(1868, 7, 9)), "deciding": 22},
+    {"party": "democratic", "tables": {2: "1876:democratic:b2"}, "title": DNC + "in St. Louis, Mo., June 27th, 28th and 29th, 1876", "publisher": "Woodward, Tiernan & Hale", "city": "St. Louis", "days": (date(1876, 6, 27), date(1876, 6, 29)), "ballots": dict.fromkeys(range(1, 3), date(1876, 6, 28)), "deciding": 2, "held": 2},
+    {"party": "democratic", "tables": {2: "1880:democratic:b2"}, "title": DNC + "in Cincinnati, O., June 22d, 23d, and 24th, 1880", "publisher": "Daily Journal Book and Job Rooms", "city": "Cincinnati", "days": (date(1880, 6, 22), date(1880, 6, 24)), "ballots": {1: date(1880, 6, 23), 2: date(1880, 6, 24)}, "deciding": 2, "held": 2},
+    {"party": "democratic", "tables": {1: "1884:democratic:b1"}, "title": DNC + "in Chicago, Ill., July 8th, 9th, 10th and 11th, 1884", "publisher": "Nabu Press", "city": "Chicago", "days": (date(1884, 7, 8), date(1884, 7, 11)), "ballots": {1: date(1884, 7, 10), 2: date(1884, 7, 11)}, "deciding": 2},
+    {"party": "democratic", "tables": {1: "1892:democratic"}, "title": DNC + "in Chicago, Ill., June 21st, 22nd and 23rd, 1892", "publisher": "Cameron, Amberg & Co.", "city": "Chicago", "days": (date(1892, 6, 21), date(1892, 6, 23)), "ballots": {1: date(1892, 6, 22)}, "deciding": 1},
+    {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in (3, 4, 5)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
+    {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47) if n != 2}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
+]  # fmt: skip
+TWO_THIRDS = range(1832, 1936)
+REPORTS = {
+    "republican": "the official report of the convention's proceedings published by the Republican National Committee",
+    "democratic": "the convention's official proceedings",
+}
 CANDIDATES = {
     "Nixon": ("Richard M. Nixon", "Q9588"),
     "N. Rockefeller": ("Nelson A. Rockefeller", "Q11237"),
@@ -450,13 +467,87 @@ CANDIDATES = {
     "Haymond": ("Creed Haymond", None),
     "Reed": ("Thomas B. Reed", "Q2094078"),
     "Quay": ("Matthew S. Quay", "Q6059259"),
+    "democratic:James Buchanan": ("James Buchanan", "Q12325"),
+    "democratic:Franklin Pierce": ("Franklin Pierce", "Q12312"),
+    "democratic:F. Pierce": ("Franklin Pierce", "Q12312"),
+    "democratic:Stephen A. Douglas": ("Stephen A. Douglas", "Q433174"),
+    "democratic:Lewis Cass": ("Lewis Cass", "Q503119"),
+    "democratic:George B. McClellan": ("George B. McClellan", "Q310192"),
+    "democratic:McClellan": ("George B. McClellan", "Q310192"),
+    "democratic:Thomas H. Seymour": ("Thomas H. Seymour", "Q885448"),
+    "democratic:T. H. Seymour": ("Thomas H. Seymour", "Q885448"),
+    "democratic:Seymour": ("Horatio Seymour", "Q887320"),
+    "democratic:Pendleton": ("George H. Pendleton", "Q552459"),
+    "democratic:A. Johnson": ("Andrew Johnson", "Q8612"),
+    "democratic:R. Johnson": ("Reverdy Johnson", "Q1373189"),
+    "democratic:Hancock": ("Winfield S. Hancock", "Q435517"),
+    "democratic:Church": ("Sanford E. Church", "Q2221573"),
+    "democratic:English": ("James E. English", "Q885957"),
+    "democratic:Packer": ("Asa Packer", "Q4803147"),
+    "democratic:Parker": ("Joel Parker", "Q886702"),
+    "democratic:Doolittle": ("James R. Doolittle", "Q1681056"),
+    "democratic:Blair": ("Francis P. Blair Jr.", "Q1350196"),
+    "democratic:Hendricks": ("Thomas A. Hendricks", "Q310843"),
+    "democratic:Field": ("Stephen J. Field", None),
+    "democratic:Adams": ("Charles Francis Adams", "Q75174"),
+    "democratic:Chase": ("Salmon P. Chase", "Q433051"),
+    "democratic:Hoffman": ("John T. Hoffman", "Q880736"),
+    "democratic:T. Ewing, Jr": ("Thomas Ewing Jr.", "Q3525101"),
+    "democratic:Tilden": ("Samuel J. Tilden", "Q281566"),
+    "democratic:Allen": ("William Allen", "Q880659"),
+    "democratic:Bayard": ("Thomas F. Bayard", "Q708034"),
+    "democratic:Thurman": ("Allen G. Thurman", "Q1850376"),
+    "democratic:Cleveland": ("Grover Cleveland", "Q35171"),
+    "democratic:Randall": ("Samuel J. Randall", "Q942678"),
+    "democratic:McDonald": ("Joseph E. McDonald", "Q436858"),
+    "democratic:Carlisle": ("John G. Carlisle", "Q1379029"),
+    "democratic:Flower": ("Roswell P. Flower", "Q881163"),
+    "democratic:Hoadly": ("George Hoadly", "Q373780"),
+    "democratic:Hill": ("David B. Hill", "Q888410"),
+    "democratic:Boies": ("Horace Boies", "Q889115"),
+    "democratic:Gorman": ("Arthur P. Gorman", None),
+    "democratic:Stevenson": ("Adlai E. Stevenson", "Q310839"),
+    "1956:democratic:Stevenson": ("Adlai E. Stevenson II", "Q311719"),
+    "democratic:Morrison": ("William R. Morrison", "Q6799712"),
+    "democratic:Campbell": ("James E. Campbell", "Q881053"),
+    "democratic:Russell": ("William E. Russell", "Q680460"),
+    "democratic:Whitney": ("William C. Whitney", None),
+    "democratic:Pattison": ("Robert E. Pattison", "Q883224"),
+    "democratic:Bryan": ("William Jennings Bryan", "Q205282"),
+    "democratic:Bland": ("Richard P. Bland", "Q531828"),
+    "democratic:Matthews": ("Claude Matthews", "Q1096925"),
+    "democratic:Blackburn": ("Joseph C. S. Blackburn", None),
+    "democratic:McLean": ("John R. McLean", None),
+    "democratic:Turpie": ("David Turpie", "Q260534"),
+    "democratic:Clark": ("Champ Clark", "Q465651"),
+    "democratic:Wilson": ("Woodrow Wilson", "Q34296"),
+    "democratic:Harmon": ("Judson Harmon", "Q617264"),
+    "democratic:Underwood": ("Oscar W. Underwood", "Q454609"),
+    "democratic:Marshall": ("Thomas R. Marshall", "Q299001"),
+    "democratic:Marshal": ("Thomas R. Marshall", "Q299001"),
+    "democratic:Baldwin": ("Simeon E. Baldwin", "Q886146"),
+    "democratic:Sulzer": ("William Sulzer", "Q881099"),
+    "democratic:Kern": ("John W. Kern", "Q454957"),
+    "democratic:Kern.*": ("John W. Kern", "Q454957"),
+    "democratic:Foss": ("Eugene N. Foss", None),
+    "democratic:Gaynor": ("William J. Gaynor", None),
+    "democratic:J. H. Lewis": ("J. Hamilton Lewis", "Q462565"),
+    "democratic:James": ("Ollie M. James", "Q381568"),
+    "democratic:Harriman": ("W. Averell Harriman", "Q345531"),
+    "1956:democratic:Johnson": ("Lyndon B. Johnson", "Q9640"),
+    "democratic:Symington": ("Stuart Symington", "Q962660"),
+    "democratic:Chandler": ("A. B. Chandler", "Q573029"),
+    "1956:democratic:Davis": ("James C. Davis", "Q1680229"),
+    "democratic:Battle": ("John S. Battle", "Q684712"),
+    "democratic:Timmerman": ("George Bell Timmerman Jr.", "Q362853"),
+    "democratic:Lausche": ("Frank J. Lausche", "Q888606"),
+    "democratic:McCormack": ("John W. McCormack", "Q377602"),
 }
-UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippine Islands"}
-ABSTAINED = {"votes", "Abstention", "not voting", "Not voting"}
+UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippine Islands", "CZ": "Canal Zone"}
+ABSTAINED = {"votes", "Abstention", "not voting", "Not voting", "Not Voting", "Not Voting or Absent", "Absent"}
 OFFICIAL = (
-    "The roll call of the states on the presidential nomination, as tabulated in the official report of the "
-    "convention's proceedings published by the Republican National Committee, read from the scanned volume page by "
-    "page. Each delegation's total is the votes it held, abstentions included; abstentions are that total less the "
+    "The roll call of the states on the presidential nomination, as tabulated in {}, read from the scanned volume "
+    "page by page. Each delegation's total is the votes it held, abstentions included; abstentions are that total less the "
     "votes recorded for candidates."
 )
 HELD = (
@@ -526,7 +617,7 @@ ABBREVIATIONS = {
     "sd": "SD", "sdak": "SD", "tenn": "TN", "tex": "TX", "vt": "VT", "va": "VA", "vi": "VI", "wash": "WA",
     "wva": "WV", "wis": "WI", "wisc": "WI", "wyo": "WY", "virginislands": "VI", "puertorico": "PR",
     "districtofcolumbia": "DC", "distofcolumbia": "DC", "portorico": "PR", "philippineislands": "PH",
-    "philippines": "PH", "phillippines": "PH", "dakota": "DT", "indianterritory": "IT", "dalaware": "DE",
+    "philippines": "PH", "philippinies": "PH", "phillippines": "PH", "dakota": "DT", "indianterritory": "IT", "dalaware": "DE",
     "southsarolina": "SC", "canalzone": "CZ", "nocar": "NC", "nodak": "ND", "socar": "SC", "sodak": "SD",
     "nhampshire": "NH", "ncarolina": "NC", "ndakota": "ND", "scarolina": "SC", "sdakota": "SD", "wvirginia": "WV",
     "distofcol": "DC", "dofc": "DC", "virginis": "VI", "panamacanalzone": "CZ", "njersey": "NJ", "nmexico": "NM", "nyork": "NY", "risland": "RI",
@@ -1434,7 +1525,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the 1868 to 1900 and 1968 to 1984 Republican and the 2016 and 2020 national conventions",
+            summary="The roll call of the states at the 1868 to 1900 and 1968 to 1984 Republican, the 1856 to 1912 Democratic, and the 2016 and 2020 national conventions",
             polity="US",
         )
 
@@ -1624,7 +1715,19 @@ def emit() -> Path:
                     name(units[code], UNPLACED[code])
             return units[code]
 
-        republican = cs.key("us.party", "republican-party")
+        systems = {
+            "majority": system,
+            "two-thirds": cs.key("us.electoral_system", "national-convention:two-thirds-of-delegates"),
+        }
+        if systems["two-thirds"] in cs.minted:
+            cs.add(
+                "electoral_system",
+                id=systems["two-thirds"],
+                polity_id=us,
+                rules={"formula": "repeated_ballot", "majorities": [{"fromRound": 1, "share": 2 / 3, "strict": False}]},
+                rules_version=1,
+            )
+            name(systems["two-thirds"], "Two-thirds of the convention's delegates, with repeated ballots")
         people = dict(
             conn.execute(
                 """select x.value, coalesce(m.into_id, x.entity_id) from external_id x
@@ -1641,14 +1744,21 @@ def emit() -> Path:
                 n: next(spec for spec in TABLES if spec["table"] == ballot)
                 for n, ballot in convention["tables"].items()
             }
+            party = convention.get("party", "republican")
+            scope = cs.key("us.party", f"{party}-party")
             item = next(iter(specs.values()))["item"]
-            title = f"Official Report of the Proceedings of the {convention['ordinal']} Republican National Convention"
-            source = cs.source("Republican National Committee", title)
+            title = (
+                convention["title"]
+                if "title" in convention
+                else f"Official Report of the Proceedings of the {convention['ordinal']} Republican National Convention"
+            )
+            publisher = convention.get("publisher", "Republican National Committee")
+            source = cs.source(publisher, title)
             cs.add(
                 "source",
                 id=source,
                 kind="official_body",
-                publisher="Republican National Committee",
+                publisher=publisher,
                 title=title,
                 url=f"https://archive.org/details/{item}",
             )
@@ -1671,7 +1781,7 @@ def emit() -> Path:
                             width=opened.width,
                             height=opened.height,
                         )
-            election = cs.key("us.election", f"{first}:republican-national-convention")
+            election = cs.key("us.election", f"{first}:{party}-national-convention")
             cs.add(
                 "election",
                 id=election,
@@ -1682,45 +1792,62 @@ def emit() -> Path:
                 date_to=last,
                 status="held",
             )
-            name(election, f"{year} Republican National Convention")
-            path = f"us/{first}-republican-national-convention"
+            name(election, f"{year} {party.title()} National Convention")
+            path = f"us/{first}-{party}-national-convention"
             cs.add("slug", path=path, entity_id=election)
             held = None
             if "held" in convention:
-                full = rolls.filter(pl.col("table") == convention["tables"][convention["held"]])
+                full = rolls.filter(
+                    (pl.col("table") == convention["tables"][convention["held"]]) & (pl.col("column") != "votes")
+                )
                 held = dict(full.group_by("state").agg(pl.col("value").sum()).iter_rows())
                 for ballot in convention["tables"].values():
-                    cast = rolls.filter(pl.col("table") == ballot).group_by("state").agg(pl.col("value").sum())
+                    cast = (
+                        rolls.filter((pl.col("table") == ballot) & (pl.col("column") != "votes"))
+                        .group_by("state")
+                        .agg(pl.col("value").sum())
+                    )
                     for state, value in cast.iter_rows():
                         if value > held.get(state, 0):
                             raise ValueError(f"{ballot}: {state} cast {value:g}, more than {held.get(state, 0):g}")
+            loaded = rolls.filter(pl.col("table").is_in(list(convention["tables"].values())))
+            seated = loaded.filter(pl.col("column") == "votes").group_by("table").agg(pl.col("value").sum())["value"]
+            rule = "two-thirds" if party == "democratic" and year in TWO_THIRDS else "majority"
             previous = None
             for number, spec in specs.items():
                 day = convention["ballots"][number]
                 cells = rolls.filter(pl.col("table") == spec["table"])
                 if cells.is_empty():
                     raise ValueError(f"{spec['table']} did not pass its checks")
-                key = f"{first}:president:republican:convention:{number}"
+                own = "votes" in set(cells["column"])
+                key = f"{first}:president:{party}:convention:{number}"
                 contest = cs.key("us.contest", key)
-                if held is not None:
+                if party == "democratic" and len(seated):
+                    total = seated.max()
+                elif held is not None:
                     total = sum(held.values())
-                elif "votes" in set(cells["column"]):
+                elif own:
                     total = cells.filter(pl.col("column") == "votes")["value"].sum()
                 else:
                     total = None
-                required = None if total is None else int(total) // 2 + 1
+                if total is None:
+                    required = None
+                elif rule == "two-thirds":
+                    required = -(-int(total) * 2 // 3)
+                else:
+                    required = int(total) // 2 + 1
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
                     kind="office",
                     office_id=cs.key("us.office", "president"),
-                    party_scope_id=republican,
+                    party_scope_id=scope,
                     district_area_id=nation,
                     magnitude=1,
                     round_number=number,
                     previous_round_id=previous,
-                    electoral_system_id=system,
+                    electoral_system_id=systems[rule],
                     rules_override=None if required is None else {"required": required},
                     default_result_kind="counted",
                 )
@@ -1741,23 +1868,30 @@ def emit() -> Path:
                     completeness=1,
                     as_of=datetime.combine(day, datetime.min.time(), UTC),
                 )
-                method = OFFICIAL
-                if held is not None:
+                method = OFFICIAL.format(REPORTS[party])
+                if held is not None and not own:
                     deciding = (
                         "the ballot"
                         if len(convention["ballots"]) == 1
                         else f"the {('first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth')[convention['held'] - 1]} ballot"
                     )
                     method += HELD.format(deciding)
-                method += f" The convention met in {convention['city']} and voted on {day:%B %-d, %Y}"
+                method += f" The convention met in {convention['city']} and " + (
+                    f"took this ballot in its session of {day:%B %-d, %Y}"
+                    if party == "democratic"
+                    else f"voted on {day:%B %-d, %Y}"
+                )
+                share = "two-thirds" if rule == "two-thirds" else "a majority"
                 method += (
                     "."
                     if required is None
-                    else f"; {required:,} votes, a majority of the delegates, were needed to nominate."
+                    else f"; {required:,} votes, {share} of the delegates, were needed to nominate."
                 )
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
                 if "caveat" in convention:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=convention["caveat"])
+                if spec["table"] in MISPRINTS:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=MISPRINTS[spec["table"]][0])
                 if "first" in convention:
                     _, printed, _ = table(next(s for s in TABLES if s["table"] == convention["first"]), "low")
                     ranked = sorted(((v, k) for k, v in printed.items() if k != "votes" and v), reverse=True)
@@ -1775,10 +1909,18 @@ def emit() -> Path:
                     for column, total in cells.group_by("column").agg(pl.col("value").sum()).iter_rows()
                     if column not in ABSTAINED and total
                 }
-                ballot_options = {}
+                ballot_options, made = {}, {}
                 for column in totals:
-                    label, qid = CANDIDATES.get(f"{year}:{column}") or CANDIDATES[column]
+                    label, qid = (
+                        CANDIDATES.get(f"{year}:{party}:{column}")
+                        or CANDIDATES.get(f"{year}:{column}")
+                        or CANDIDATES.get(f"{party}:{column}")
+                        or CANDIDATES[column]
+                    )
                     slug = re.sub(r"[^a-z]+", "-", label.lower()).strip("-")
+                    if slug in made:
+                        ballot_options[column] = made[slug]
+                        continue
                     if qid is None:
                         person = cs.key("us.person", slug)
                         if person in cs.minted and person not in added:
@@ -1787,13 +1929,13 @@ def emit() -> Path:
                             name(person, label)
                     else:
                         person = people[qid]
-                    option = ballot_options[column] = cs.key("us.option", f"{key}:{slug}")
+                    option = ballot_options[column] = made[slug] = cs.key("us.option", f"{key}:{slug}")
                     cs.add(
                         "contest_option",
                         id=option,
                         contest_id=contest,
                         kind="candidate",
-                        party_id=republican,
+                        party_id=scope,
                         ballot_label=label,
                     )
                     cs.add(
@@ -1805,7 +1947,7 @@ def emit() -> Path:
                         ballot_name=label,
                         is_independent=False,
                     )
-                if held is not None:
+                if held is not None and not own:
                     for state, value in held.items():
                         values.append((str(result_set), str(unit(state)), None, DELEGATION, value))
                 for cell in cells.iter_rows(named=True):
@@ -1835,6 +1977,8 @@ def emit() -> Path:
                     )
                 if number == convention["deciding"]:
                     winner = max(totals, key=lambda column: totals[column])
+                    if rule == "two-thirds" and totals[winner] < required:
+                        raise ValueError(f"{spec['table']}: {winner} has {totals[winner]:g} of {required} needed")
                     cs.add("outcome", result_set_id=result_set, option_id=ballot_options[winner], kind="won")
         cs.frame(
             "result_value",
@@ -1847,12 +1991,18 @@ def emit() -> Path:
                         "channel": 0,
                         "measure": measure,
                         "count_round": 0,
-                        "value": value,
+                        "value": round(value, 6),
                         "flags": 0,
                     }
                     for rs, unit, option, measure, value in values
                 ],
-                schema_overrides={"channel": pl.Int16, "measure": pl.Int16, "count_round": pl.Int16, "flags": pl.Int16},
+                schema_overrides={
+                    "channel": pl.Int16,
+                    "measure": pl.Int16,
+                    "count_round": pl.Int16,
+                    "value": pl.Float64,
+                    "flags": pl.Int16,
+                },
             ),
         )
         return cs.write()
