@@ -101,6 +101,16 @@ MF_564_COUNTIES = [
     "Williams",
     "Wyandot",
 ]
+MF_568 = DATA / "inbox" / "manual" / "MF-568"
+MF_568_COUNTIES = [
+    "Allen",
+    "Ashland",
+    "Auglaize",
+    "Brown",
+    "Carroll",
+    "Champaign",
+    "Coshocton",
+]
 MF_LOOKUP = [
     *MF_LOOKUP,
     *MF_555_COUNTIES,
@@ -109,6 +119,7 @@ MF_LOOKUP = [
     *MF_562_COUNTIES,
     *MF_563_COUNTIES,
     *MF_564_COUNTIES,
+    *MF_568_COUNTIES,
 ]
 MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 MONTGOMERY_ZIP = INBOX / "montgomery" / "oh-2026-general-montgomery-sample-ballots.zip"
@@ -231,6 +242,8 @@ def fetch() -> None:
 
 
 def mf_dir(county: str) -> Path:
+    if county in MF_568_COUNTIES:
+        return MF_568
     if county in MF_564_COUNTIES:
         return MF_564
     if county in MF_563_COUNTIES:
