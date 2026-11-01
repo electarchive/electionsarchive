@@ -10802,6 +10802,23 @@ def parse() -> None:
                 if (
                     template is None
                     and state == "CA"
+                    and (
+                        yosemite := re.search(
+                            r"(?i)^yosemite community college district\b.*?\barea (\d+)\b", str(row["contest"])
+                        )
+                    )
+                ):
+                    tail = f"CA:06047:college:yosemite-community-college-district:trustee-area-{yosemite[1]}"
+                    template = tail if tail in exact else ""
+                    minted[tail] = (
+                        f"Board of Trustees, Trustee Area {yosemite[1]}",
+                        "Yosemite Community College District",
+                        "special:06047:yosemite-community-college-district",
+                        "",
+                    )
+                if (
+                    template is None
+                    and state == "CA"
                     and place
                     and (coe := re.search(r"(?i)\bcounty board of education\b.*?\barea (\d+)\b", str(row["contest"])))
                 ):
