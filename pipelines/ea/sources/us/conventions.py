@@ -230,11 +230,18 @@ TABLES += [
         },
         scatter=True,
     ),
-    *leaves("officialreportsi00repuiala", "1916", {"b1": (212,)}, scatter=True),
-    *ballots("officialreportsi00repuiala", "1916", {2: (215, 215), 3: (216, 216)}, scatter=True),
+    *leaves("officialreportsi00repuiala", "1916", {"b1": (212, 213)}, scatter=True),
+    {
+        "scatter": True,
+        "table": "1916:republican:b2",
+        "item": "officialreportsi00repuiala",
+        "leaves": (215, 216),
+        "ballot": 2,
+    },
+    {"table": "1916:republican:b3", "item": "officialreportsi00repuiala", "leaves": (234, 235), "ballot": 3},
     *ballots("officialreportfi00repuiala", "1912", {1: (445, 446)}),
     *ballots("officialreporto00repu", "1908", {1: (239, 239)}),
-    *ballots("officialproceedi00repuiala", "1904", {1: (212, 212)}),
+    *leaves("officialproceedi00repuiala", "1904", {"": (212,)}),
     *leaves("12threpubnaticon00blumrich", "1900", {"": (157,)}),
     *leaves("officialproceedi00repu", "1896", {"": (132,)}),
     *ballots("proceedingsoften00repu", "1892", {1: (148, 148)}),
@@ -243,49 +250,55 @@ TABLES += [
         "1888",
         {"b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)},
     ),
-    *ballots("officialproceedi00repu_0", "1888", {1: (376, 377), 4: (395, 395), 6: (407, 407), 8: (416, 416)}),
-    *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
-    *ballots("proceedingsofeig00repu", "1884", {1: (150, 151), 2: (155, 156), 4: (171, 172)}),
+    {"table": "1888:republican:b1", "item": "officialproceedi00repu_0", "leaves": (376, 377), "parts": {377: "top"}},
+    *ballots("officialproceedi00repu_0", "1888", {4: (395, 395), 6: (407, 407), 8: (416, 416)}),
+    *leaves("proceedingsofeig00repu", "1884", {"b2": (156,), "b3": (159,)}),
+    {
+        "table": "1884:republican:b1",
+        "item": "proceedingsofeig00repu",
+        "leaves": (150, 151),
+        "parts": {150: "b1", 151: "head"},
+    },
+    {"table": "1884:republican:b4", "item": "proceedingsofeig00repu", "leaves": (171, 172), "ballot": 4},
     *ballots(
         "proceedingsofrep00inrepu",
         "1880",
+        {1: (215, 215), 12: (238, 239), 16: (244, 245), 23: (257, 258), 26: (263, 263), 30: (276, 277)},
+    ),
+    *leaves(
+        "proceedingsofrep00inrepu",
+        "1880",
         {
-            1: (215, 215),
-            2: (219, 220),
-            3: (223, 224),
-            4: (225, 225),
-            5: (226, 227),
-            6: (227, 228),
-            7: (229, 230),
-            8: (230, 230),
-            9: (232, 233),
-            10: (233, 234),
-            11: (235, 236),
-            12: (238, 239),
-            13: (239, 240),
-            14: (241, 242),
-            15: (242, 243),
-            16: (244, 245),
-            17: (246, 247),
-            18: (248, 248),
-            19: (251, 252),
-            20: (253, 253),
-            21: (254, 255),
-            22: (255, 256),
-            23: (257, 258),
-            24: (258, 259),
-            25: (261, 261),
-            26: (263, 263),
-            27: (264, 265),
-            28: (266, 267),
-            29: (269, 270),
-            30: (276, 277),
-            31: (279, 280),
-            32: (281, 282),
-            33: (282, 283),
-            34: (285, 285),
-            35: (286, 287),
-            36: (288, 288),
+            "b2": (219, 220),
+            "b3": (223, 224),
+            "b4": (225,),
+            "b5": (226, 227),
+            "b6": (228,),
+            "b7": (229, 230),
+            "b8": (231,),
+            "b9": (232, 233),
+            "b10": (234,),
+            "b11": (235, 236),
+            "b13": (240,),
+            "b14": (241, 242),
+            "b15": (243,),
+            "b17": (246, 247),
+            "b18": (248,),
+            "b19": (251, 252),
+            "b20": (253,),
+            "b21": (254, 255),
+            "b22": (256,),
+            "b24": (259,),
+            "b25": (261,),
+            "b27": (264, 265),
+            "b28": (266, 267),
+            "b29": (269, 270),
+            "b31": (279, 280),
+            "b32": (281, 282),
+            "b33": (283,),
+            "b34": (285,),
+            "b35": (286, 287),
+            "b36": (288,),
         },
     ),
     *leaves(
@@ -293,7 +306,7 @@ TABLES += [
         "1876",
         {"b1": (84,), "b2": (87,), "b5": (103, 104), "b6": (105, 106), "b7": (108, 109)},
     ),
-    *ballots("proceedingsrepu00nelsgoog", "1876", {3: (100, 101), 4: (102, 102)}),
+    *ballots("proceedingsrepu00nelsgoog", "1876", {3: (100, 101), 4: (101, 102)}),
     *leaves(
         "proceedingsoffir00inrepu",
         "1860",
@@ -607,6 +620,7 @@ QUADRANTS = {
     "tr": (0.5, 0.04, 1.0, 0.525),
     "bl": (0.0, 0.515, 0.5, 0.98),
     "br": (0.5, 0.515, 1.0, 0.98),
+    "top": (0.0, 0.04, 1.0, 0.47),
 }
 PROMPT = "1"
 BALLOT = (
@@ -692,7 +706,7 @@ COLUMNS = {
         "Not voting",
     ),
 }
-LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour"}
+LABELS = {"Washbarne": "Washburne", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
     "1904:democratic": [
@@ -872,6 +886,88 @@ CORRECTIONS = {
     "1876:republican:b5": [
         (103, "NJ", (0.615, 0.690, 0.662, 0.703), {"Hayes": 6, "Morton": 0}, "the figure sits in the Hayes column, whose printed total counts it"),
     ],
+    "1876:republican:b4": [
+        (101, "AL", (0.44, 0.744, 0.81, 0.755), {"Blaine": 16, "Bristow": 4}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "AR", (0.44, 0.757, 0.81, 0.768), {"Blaine": 1, "Morton": 11, "Wheeler": 0}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "CA", (0.44, 0.770, 0.81, 0.781), {"Blaine": 6, "Conkling": 3, "Hayes": 3}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "CO", (0.44, 0.783, 0.81, 0.794), {"Blaine": 6}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "CT", (0.44, 0.795, 0.81, 0.806), {"Blaine": 2, "Bristow": 9, "Hayes": 1}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "DE", (0.44, 0.808, 0.81, 0.819), {"Blaine": 6}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "FL", (0.44, 0.820, 0.81, 0.831), {"Blaine": 2, "Conkling": 2, "Hartranft": 4}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+        (101, "GA", (0.44, 0.833, 0.81, 0.845), {"Blaine": 9, "Bristow": 2, "Conkling": 6, "Morton": 4, "Washburne": 1}, "the lower read missed the head of the table below the third ballot; read by hand, and with the next page the columns sum to the printed totals"),
+    ],
+    "1884:republican:b1": [
+        (150, "AL", (0.43, 0.635, 0.95, 0.647), {"not voting": 1}, "20 held, 19 recorded; 818 of 820 votes cast"),
+        (150, "LA", (0.43, 0.795, 0.95, 0.807), {"not voting": 1}, "16 held, 15 recorded; 818 of 820 votes cast"),
+    ],
+    "1884:republican:b2": [
+        (156, "LA", (0.43, 0.435, 0.95, 0.445), {"not voting": 1}, "16 held, 15 recorded; 819 of 820 votes cast"),
+    ],
+    "1884:republican:b4": [
+        (171, "IL", (0.43, 0.545, 0.95, 0.557), {"not voting": 1}, "44 held, 43 recorded; 813 of 820 votes cast"),
+        (171, "NC", (0.43, 0.767, 0.95, 0.779), {"not voting": 1}, "22 held, 21 recorded; 813 of 820 votes cast"),
+        (171, "NY", (0.43, 0.755, 0.95, 0.767), {"not voting": 1}, "72 held, 71 recorded; 813 of 820 votes cast"),
+        (171, "TN", (0.43, 0.842, 0.95, 0.854), {"not voting": 1}, "24 held, 23 recorded; 813 of 820 votes cast"),
+        (171, "TX", (0.43, 0.855, 0.95, 0.867), {"not voting": 3}, "26 held, 23 recorded; 813 of 820 votes cast"),
+    ],
+    "1880:republican:b2": [
+        (219, "IN", (0.59, 0.825, 0.65, 0.839), {"Blaine": 25}, "printed 25, which the Indiana row of 30 and the printed Blaine total count"),
+    ],
+    "1880:republican:b27": [
+        (264, "NJ", (0.79, 0.848, 0.84, 0.863), {"Washburne": 2, "Windom": 0}, "the figure sits in the Washburne column"),
+    ],
+    "1880:republican:b31": [
+        (280, "VT", (0.625, 0.21, 0.675, 0.224), {"Edmunds": 10, "Windom": 0}, "printed under the Windom heading, which this page swaps with Edmunds"),
+    ],
+    "1904:republican": [
+        (212, "NC", (0.49, 0.171, 0.9, 0.183), {"votes": 24, "For Theodore Roosevelt": 24}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "ND", (0.49, 0.185, 0.9, 0.197), {"votes": 8, "For Theodore Roosevelt": 8}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "OH", (0.49, 0.199, 0.9, 0.210), {"votes": 46, "For Theodore Roosevelt": 46}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "OR", (0.49, 0.213, 0.9, 0.224), {"votes": 8, "For Theodore Roosevelt": 8}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "PA", (0.49, 0.226, 0.9, 0.238), {"votes": 68, "For Theodore Roosevelt": 68}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "RI", (0.49, 0.240, 0.9, 0.251), {"votes": 8, "For Theodore Roosevelt": 8}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "SC", (0.49, 0.254, 0.9, 0.265), {"votes": 18, "For Theodore Roosevelt": 18}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "SD", (0.49, 0.267, 0.9, 0.279), {"votes": 8, "For Theodore Roosevelt": 8}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "TN", (0.49, 0.281, 0.9, 0.293), {"votes": 24, "For Theodore Roosevelt": 24}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "TX", (0.49, 0.295, 0.9, 0.306), {"votes": 36, "For Theodore Roosevelt": 36}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "UT", (0.49, 0.309, 0.9, 0.320), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "VT", (0.49, 0.322, 0.9, 0.334), {"votes": 8, "For Theodore Roosevelt": 8}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "VA", (0.49, 0.336, 0.9, 0.347), {"votes": 24, "For Theodore Roosevelt": 24}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "WA", (0.49, 0.350, 0.9, 0.361), {"votes": 10, "For Theodore Roosevelt": 10}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "WV", (0.49, 0.363, 0.9, 0.375), {"votes": 14, "For Theodore Roosevelt": 14}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "WI", (0.49, 0.377, 0.9, 0.389), {"votes": 26, "For Theodore Roosevelt": 26}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "WY", (0.49, 0.391, 0.9, 0.402), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "DC", (0.49, 0.405, 0.9, 0.416), {"votes": 2, "For Theodore Roosevelt": 2}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "AK", (0.49, 0.418, 0.9, 0.430), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "AZ", (0.49, 0.432, 0.9, 0.443), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "IT", (0.49, 0.446, 0.9, 0.457), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "NM", (0.49, 0.459, 0.9, 0.471), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "OK", (0.49, 0.473, 0.9, 0.485), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "HI", (0.49, 0.487, 0.9, 0.498), {"votes": 6, "For Theodore Roosevelt": 6}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "PH", (0.49, 0.501, 0.9, 0.512), {"votes": 2, "For Theodore Roosevelt": 2}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+        (212, "PR", (0.49, 0.514, 0.9, 0.526), {"votes": 2, "For Theodore Roosevelt": 2}, "the right-hand column of the table, which the lower read leaves out; read by hand, and with the left-hand column the rows add to the printed 994"),
+    ],
+    "1908:republican": [
+        (239, "SC", (0.4, 0.679, 0.95, 0.689), {"not voting": 1}, "18 held, 17 recorded; 979 of 980 votes cast"),
+    ],
+    "1888:republican:b4": [
+        (395, "MS", (0.632, 0.521, 0.671, 0.531), {"Gresham": 3}, "a broken 3, which the Mississippi row of 18 and the printed Gresham total of 98 count"),
+        (395, "AL", (0.51, 0.327, 0.93, 0.337), {"not voting": 1}, "20 held, 19 recorded; 828 of 832 votes cast"),
+        (395, "GA", (0.51, 0.389, 0.93, 0.399), {"not voting": 1}, "24 held, 23 recorded; 828 of 832 votes cast"),
+        (395, "MO", (0.51, 0.531, 0.93, 0.541), {"not voting": 1}, "32 held, 31 recorded; 828 of 832 votes cast"),
+        (395, "NY", (0.51, 0.589, 0.93, 0.599), {"not voting": 1}, "72 held, 71 recorded; 828 of 832 votes cast"),
+    ],
+    "1888:republican:b6": [
+        (407, "FL", (0.51, 0.464, 0.93, 0.475), {"not voting": 1}, "8 held, 7 recorded; 830 of 832 votes cast"),
+        (407, "GA", (0.51, 0.475, 0.93, 0.485), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
+    ],
+    "1888:republican:b8": [
+        (416, "GA", (0.51, 0.307, 0.93, 0.315), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
+        (416, "TN", (0.51, 0.568, 0.93, 0.576), {"not voting": 1}, "24 held, 23 recorded; 830 of 832 votes cast"),
+    ],
+    "1892:republican": [
+        (148, "NC", (0.627, 0.669, 0.70, 0.676), {"Blaine": 8 / 3}, "printed 2⅔, which the printed Blaine total of 182⅙ counts"),
+    ],
     "1884:republican:b3": [
         (159, "IA", (0.43, 0.395, 0.66, 0.406), {"Blaine": 26, "Edmunds": 0}, "printed under Edmunds; the Blaine and Edmunds totals each differ from the rows by exactly these 26 votes"),
         (159, "RI", (0.49, 0.643, 0.54, 0.654), {"Arthur": 0}, "the printed Arthur vote exceeds both the delegation's 8 and the Arthur total"),
@@ -904,6 +1000,13 @@ CORRECTIONS = {
     ],
     "1916:republican:b1": [
         (212, "AL", (0.568, 0.175, 0.600, 0.186), {"Weeks": 3}, "a faint 3, which the Weeks total counts"),
+        (213, "MO", (0.1, 0.330, 0.9, 0.362), {"Absent": 1}, "listed as absent below the tabulation"),
+        (213, "TN", (0.1, 0.330, 0.9, 0.362), {"Absent": 0.5}, "listed as absent below the tabulation"),
+        (213, "PA", (0.1, 0.330, 0.9, 0.362), {"Absent": 1}, "listed as absent below the tabulation"),
+    ],
+    "1916:republican:b2": [
+        (216, "PA", (0.0, 0.276, 1.0, 0.288), {"Absent": 1}, "listed as absent below the tabulation"),
+        (216, "CA", (0.0, 0.276, 1.0, 0.288), {"Absent": 1}, "listed as absent below the tabulation"),
     ],
     "1920:republican:b10": [
         (269, "IL", (0.56, 0.395, 0.88, 0.405), {"Harding": 38.2, "Johnson": 18.8}, "printed in fifths: 38 1/5 and 18 4/5"),
@@ -1062,6 +1165,7 @@ CORRECTIONS = {
     ],
 }  # fmt: skip
 TOTALS = {
+    "1880:republican:b31": {"Edmunds": 11, "Windom": 3},
     "1864:republican": {"Lincoln": 484, "Grant": 22},
     "1904:democratic": {
         "Parker": 679,
@@ -1116,6 +1220,52 @@ TOTALS = {
     "1864:democratic": {"Thomas H. Seymour": 23.5},
 }
 MISPRINTS = {
+    "1884:republican:b1": (
+        (
+            "The printed totals give John Sherman 30 votes and Hawley 13, against 31 and 12 in the state rows, "
+            "where New Jersey's single vote is printed in the Sherman column. The rows are stored as printed."
+        ),
+        {
+            "column J. Sherman": (30, 31, "the state figures add to 31"),
+            "column Hawley": (13, 12, "the state figures add to 12"),
+        },
+    ),
+    "1912:republican": (
+        (
+            "The printed total of the votes column is 1,550, against the 1,078 votes the state rows hold. The "
+            "Massachusetts row prints 20 for Taft and 21 present and not voting against a delegation of 36, the "
+            "Illinois row accounts for 57 of its 58 votes, and the present-and-not-voting rows add to 348 against a "
+            "printed total of 349. The rows are stored as printed."
+        ),
+        {
+            "MA": (36, 41, "20 and 21 against a delegation of 36"),
+            "IL": (58, 57, "57 of 58 votes accounted for"),
+            "column votes": (1550, 1078, "the state rows hold 1,078 votes"),
+            "column Present and Not Voting": (349, 348, "the state figures add to 348"),
+        },
+    ),
+    "1880:republican:b7": (
+        (
+            "The printed Sherman total, which the chair also announced, is 94; the state rows add to 95, and with "
+            "95 the columns add to the 756 delegates. The state figures are stored as printed."
+        ),
+        {"column Sherman": (94, 95, "the state figures add to 95")},
+    ),
+    "1880:republican:b24": (
+        (
+            "The printed Sherman total of 73 is a misprint for 93, the figure the chair announced and the state "
+            "rows give."
+        ),
+        {"column Sherman": (73, 93, "the state figures add to 93, as announced")},
+    ),
+    "1880:republican:b31": (
+        (
+            "The page that continues this table prints the Windom and Edmunds headings in each other's places, so "
+            "Vermont's 10 votes, cast for Edmunds on every other ballot, and the totals of 11 and 3 sit under the "
+            "swapped headings. They are stored as Edmunds 11 and Windom 3, as the chair announced."
+        ),
+        {},
+    ),
     "1856:republican:informal": (
         (
             "The Proceedings print the New Hampshire row as 15 for Fremont and 14 for McLean, against a delegation "
@@ -1192,7 +1342,7 @@ def fetch() -> None:
     for spec in TABLES:
         for leaf in spec["leaves"]:
             image = scan(spec, leaf, fetch=True)
-            data = base64.b64encode(cropped(image.path, spec.get("crop"))).decode()
+            data = base64.b64encode(cropped(image.path, region(spec, leaf))).decode()
             for effort, scatter in product(READS.values(), (False, True)):
                 if scatter and not spec.get("scatter"):
                     continue
@@ -1202,7 +1352,7 @@ def fetch() -> None:
                     else NARRATED
                     if spec.get("narrated")
                     else ROLL
-                    if spec.get("ballot") is None or spec.get("crop")
+                    if spec.get("ballot") is None or region(spec, leaf)
                     else ROLL + BALLOT.format(ordinal(spec["ballot"]))
                 )
                 wanted[read_key(effort, image.sha256, variant(spec, scatter, leaf))] = (
@@ -1282,6 +1432,11 @@ def cropped(path: Path, crop: str | None) -> bytes:
         return out.getvalue()
 
 
+def region(spec: dict[str, object], leaf: int) -> str | None:
+    part = spec.get("parts", {}).get(leaf)
+    return part if part in QUADRANTS else spec.get("crop")
+
+
 def variant(spec: dict[str, object], scatter: bool = False, leaf: int | None = None) -> str | None:
     if scatter:
         return "s"
@@ -1310,6 +1465,7 @@ def place(label: str) -> str | None:
 
 def number(cell: str) -> float:
     text = re.sub(r"\\?t?ext(?:em|en)dash", "", cell).strip().replace(",", "")
+    text = re.sub(r"(?<=\d)1-6$", "⅙", re.sub(r"[•*]+$", "", text))
     if re.fullmatch(r"[\dIl]+", text):
         text = text.replace("I", "1").replace("l", "1")
     fraction = FRACTION.search(text)
@@ -1354,6 +1510,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
         text = next((block["text"] for block in response["content"] if block["type"] == "text"), "{}")
         read = json.loads(text)
         header = read["header"]
+        if not read["rows"]:
+            continue
         if scatter:
             for column in header:
                 if place(column["label"]) is None:
@@ -1399,7 +1557,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
             problems.append(f"leaf {leaf}: {len(header)} columns for {len(roles)} roles")
             continue
         rows = read["rows"]
-        x0, y0, x1, y1 = QUADRANTS.get(spec.get("crop"), (0.0, 0.0, 1.0, 1.0))
+        x0, y0, x1, y1 = QUADRANTS.get(region(spec, leaf), (0.0, 0.0, 1.0, 1.0))
         if spec.get("parts", {}).get(leaf) == "head":
             rows = rows[
                 : next(
