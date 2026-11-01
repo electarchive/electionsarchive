@@ -12,10 +12,11 @@ from ea.sources.us.ne_house_generals import BASE, BOOKS, LANDING, PUBLISHER
 from ea.store import DATA, connect
 
 SOURCE = "us.ne_leg"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 TITLE = "General election canvass: Member of the Legislature"
-YEARS = (2004, 2010)
+YEARS = (2004, 2010, 2012)
+TWO_COLUMN = {2012: 14}
 UNITS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
 TENS = {"twenty": 20, "thirty": 30, "forty": 40}
@@ -25,8 +26,30 @@ WORDS = (
     | TENS
     | {f"{ten}-{unit}": value + k for ten, value in TENS.items() for k, unit in enumerate(UNITS, 1)}
 )
-DISTRICT = re.compile(r"\s*(?:Legislative )?District ([A-Za-z-]+|\d+)\W*")
+DISTRICT = re.compile(r"\s*(?:Legislative )?District ([A-Za-z-]+|\d+)\W*(?:\d+ year term)?\s*")
 ROW = re.compile(r"\s*([A-Z][A-Za-z ]+?)\*?\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*")
+
+
+def pages(path: str, first: int | None) -> list[str]:
+    def text(*args: str) -> str:
+        return subprocess.run(
+            ["pdftotext", "-layout", *args, path, "-"], capture_output=True, check=True, text=True
+        ).stdout
+
+    if first is None:
+        return text().splitlines()
+    count = int(
+        re.search(
+            r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", path], capture_output=True, check=True, text=True).stdout
+        )[1]
+    )
+    lines = text("-l", str(first - 1)).splitlines()
+    for page in range(first, count + 1):
+        for x in ("0", "306"):
+            lines.extend(
+                text("-f", str(page), "-l", str(page), "-x", x, "-y", "0", "-W", "306", "-H", "792").splitlines()
+            )
+    return lines
 
 
 def fetch() -> None:
@@ -47,15 +70,12 @@ def parse() -> None:
     rows = []
     for year in YEARS:
         day, path = BOOKS[year]
-        lines = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
-            capture_output=True,
-            check=True,
-            text=True,
-        ).stdout.splitlines()
+        lines = pages(str(raw.cached(SOURCE, BASE + path).path), TWO_COLUMN.get(year))
         start = next(k for k, line in enumerate(lines) if re.fullmatch(r"\s*Member of the Legislature\s*", line))
         blocks: list[tuple[int, list[str], list[tuple[str, list[int]]], list[list[int]]]] = []
+        previous: list[str] = []
         for line in lines[start + 1 :]:
+            above, previous = previous, re.split(r"\s{2,}", line.strip())
             if found := DISTRICT.fullmatch(line):
                 word = found[1].lower()
                 number = int(word) if word.isdigit() else WORDS.get(word)
@@ -65,7 +85,14 @@ def parse() -> None:
             elif not blocks:
                 continue
             elif line.strip().startswith("County"):
-                blocks[-1][1][:] = re.split(r"\s{2,}", line.strip())[1:]
+                names = previous[1:]
+                blocks[-1][1][:] = (
+                    [b if b == "Scattering" else f"{a} {b}" for a, b in zip(above, names, strict=True)]
+                    if len(above) == len(names) and not above[0].startswith("District")
+                    else names
+                )
+            elif blocks[-1][3] == [] and not blocks[-1][1] and line.strip() and not any(c.isdigit() for c in line):
+                blocks[-1][1][:] = previous
             elif blocks[-1][1] and (found := ROW.fullmatch(line)):
                 district, names, parts, total = blocks[-1]
                 votes = [int(n.replace(",", "")) for n in found[2].split()]
@@ -116,7 +143,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nebraska's Legislature generals by county, 2004 and 2010 (Secretary of State canvass books)",
+            summary="Nebraska's Legislature generals by county, 2004, 2010, and 2012 (Secretary of State canvass books)",
             polity="US-NE",
         )
         source = cs.source(PUBLISHER, TITLE)
