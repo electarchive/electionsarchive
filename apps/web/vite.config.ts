@@ -7,6 +7,7 @@ import { execFileSync } from "node:child_process";
 import { hostname } from "node:os";
 import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
+import { codeVersion } from "./code-version.ts";
 
 export default defineConfig(({ command }) => {
   if (command === "serve") {
@@ -23,6 +24,9 @@ export default defineConfig(({ command }) => {
         inspector: { toggleKeyCombo: "control-o" },
       }),
       devtoolsJson(),
+      codeVersion({
+        inputs: ["../../pnpm-lock.yaml", "../../packages/db/migrations"],
+      }),
       command === "build" &&
         paraglideVitePlugin({
           project: "./project.inlang",

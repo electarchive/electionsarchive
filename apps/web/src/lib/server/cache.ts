@@ -6,6 +6,7 @@ import { Buffer } from "node:buffer";
 import { promisify } from "node:util";
 import { deserialize, serialize } from "node:v8";
 import { zstdCompress, zstdDecompress } from "node:zlib";
+import { codeVersion } from "virtual:code-version";
 import { db } from "#lib/server/db/index.js";
 import { redis } from "#lib/server/redis.js";
 
@@ -14,6 +15,7 @@ const BUDGET = 1024 ** 3;
 const LARGEST = 64 * 1024 ** 2;
 const LIFETIME = 30 * 86_400;
 const CHECK = 5000;
+const GENERATION = codeVersion ?? build;
 
 const pack = promisify(zstdCompress);
 const unpack = promisify(zstdDecompress);
@@ -58,7 +60,7 @@ async function recall(key: string) {
     return null;
   }
   try {
-    const found = await reader.get(`c:${build}:${key}`);
+    const found = await reader.get(`c:${GENERATION}:${key}`);
     if (found == null) {
       return null;
     }
@@ -90,7 +92,7 @@ function keep(key: string, version: string, value: unknown) {
     if (writer != null && payload.length <= LARGEST) {
       void pack(payload)
         .then(async (packed) =>
-          writer.set(`c:${build}:${key}`, packed, { EX: LIFETIME }),
+          writer.set(`c:${GENERATION}:${key}`, packed, { EX: LIFETIME }),
         )
         .catch(() => null);
     }

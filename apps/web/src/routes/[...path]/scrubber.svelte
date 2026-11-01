@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { browser } from "$app/env";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
@@ -8,6 +9,7 @@
   import {
     createQuery,
     keepPreviousData,
+    queryOptions,
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
@@ -19,6 +21,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import type { PageData } from "./$types";
   import Balance from "./balance.svelte";
   import PlaceMap from "./map.svelte";
   import Seats from "./seats.svelte";
@@ -27,14 +30,38 @@
     id,
     place,
     latest,
+    seed,
   }: {
     id: string;
     place: string;
     latest: { path: string | null; date: string | null } | null;
+    seed: Extract<PageData, { kind: "polity" }>["polity"]["scrubber"];
   } = $props();
 
   const uid = $props.id();
   const client = useQueryClient();
+
+  untrack(() => {
+    const path = latest?.path;
+    if (!browser || seed == null || path == null) {
+      return;
+    }
+    void client.prefetchQuery(
+      queryOptions({
+        queryKey: orpc.elections.locate.queryKey({ input: { path } }),
+        queryFn: async () => {
+          const found = await Promise.resolve(seed);
+          if (found == null) {
+            return orpc.elections.locate.call({ path });
+          }
+          const input = { input: { id: found.located.id } };
+          client.setQueryData(orpc.elections.get.queryKey(input), found.hub);
+          client.setQueryData(orpc.seats.hexes.queryKey(input), found.hexes);
+          return found.located;
+        },
+      }),
+    );
+  });
 
   const record = createQuery(() =>
     orpc.polities.record.queryOptions({ input: { id } }),

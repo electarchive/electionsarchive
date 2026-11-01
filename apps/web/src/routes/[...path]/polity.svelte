@@ -523,7 +523,12 @@
 {/if}
 
 {#if isNational}
-  <Scrubber {id} place={polity.name} latest={polity.latest} />
+  <Scrubber
+    {id}
+    place={polity.name}
+    latest={polity.latest}
+    seed={polity.scrubber}
+  />
 {:else if (polity.latest != null && polity.latest.races.length > 0) || polity.next != null}
   <section
     class={cn(
