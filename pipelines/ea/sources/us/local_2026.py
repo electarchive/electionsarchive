@@ -11586,6 +11586,25 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
         )
         .filter(~pl.col("tail").is_in(merged) | pl.struct("tail", "unexpired", "name").is_first_distinct())
     )
+    keys = ["tail", "template", "unexpired"]
+    frame = frame.with_row_index("_row").with_columns(_lead=pl.col("fips").first().over(keys))
+    frame = (
+        pl.concat(
+            [
+                frame.filter(pl.col("fips") == pl.col("_lead")),
+                frame.filter(pl.col("fips") != pl.col("_lead"))
+                .join(
+                    frame.filter(pl.col("fips") == pl.col("_lead")).select([*keys, "name"]).unique(),
+                    on=[*keys, "name"],
+                    how="anti",
+                )
+                .unique([*keys, "name"], keep="first", maintain_order=True),
+            ]
+        )
+        .sort("_row")
+        .with_columns(fips=pl.col("_lead"))
+        .drop("_row", "_lead")
+    )
     tails = sorted(set(frame["template"]))
     with connect() as conn:
         cs = Changeset(
