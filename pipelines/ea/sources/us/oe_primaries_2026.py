@@ -679,7 +679,7 @@ MD_URL = "https://elections.maryland.gov/elections/2026/primary_results/{}"
 
 def town_counties(state: str) -> dict[str, str]:
     if state not in TOWN_CACHE:
-        found = TOWN_CACHE.setdefault(state, {})
+        found: dict[str, str] = {}
         with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
             for line in io.TextIOWrapper(archive.open(archive.namelist()[0]), encoding="utf-8"):
                 cells = line.rstrip("\n").split("\t")
@@ -690,6 +690,7 @@ def town_counties(state: str) -> dict[str, str]:
         for (former, name), fips in elstats.FORMER.items():
             if former == state:
                 found[name] = fips
+        TOWN_CACHE[state] = found
     return TOWN_CACHE[state]
 
 

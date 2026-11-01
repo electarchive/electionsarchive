@@ -30,6 +30,7 @@ url = "https://results.sos.ga.gov"
 id = "us.enr_2026.ia"
 adapter = "us.enr_2026"
 params = { state = "IA" }
+poller = "muktedir"
 publisher = "Iowa Secretary of State"
 url = "https://sos.iowa.gov/elections/results/"
 
@@ -93,6 +94,7 @@ url = "https://www.ncsbe.gov/results-data"
 id = "us.enr_2026.ok"
 adapter = "us.enr_2026"
 params = { state = "OK" }
+poller = "muktedir"
 publisher = "Oklahoma State Election Board"
 url = "https://results.okelections.gov/OKER/"
 
@@ -114,6 +116,7 @@ url = "https://elections.ri.gov/elections/previous-election-results"
 id = "us.enr_2026.sc"
 adapter = "us.enr_2026"
 params = { state = "SC" }
+poller = "muktedir"
 publisher = "South Carolina State Election Commission"
 url = "https://scvotes.gov/"
 
@@ -142,6 +145,7 @@ url = "https://results.votewa.gov"
 id = "us.enr_2026.wv"
 adapter = "us.enr_2026"
 params = { state = "WV" }
+poller = "muktedir"
 publisher = "West Virginia Secretary of State"
 url = "https://sos.wv.gov/elections/election-data/historical-election-results-and-turnout"
 

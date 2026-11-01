@@ -617,7 +617,7 @@ def rows(state: str, url: str, path: Path):
         )
         for block in text.split("<div class='race'>")[1:]:
             found = KS_CONTEST.fullmatch(html.unescape(re.search(r"<h3>(.*?)</h3>", block)[1]).strip())
-            if found is None:
+            if found is None or found["party"]:
                 continue
             counted = re.search(r"Precincts Reporting: (\d+) of (\d+)", block)
             for county in re.findall(r"<area [^>]*title=\"(.*?)\" />", block, re.DOTALL):

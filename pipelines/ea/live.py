@@ -87,6 +87,9 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             if as_of.tzinfo is None or as_of > fetched_at + timedelta(minutes=10):
                 issue(conn, feed, "stamp", f"{contest_key}: feed stamp {stamp} read as the fetch time")
                 as_of = fetched_at
+            if as_of.date() < enr_2026.DAY - timedelta(days=1):
+                issue(conn, feed, "stamp", f"{contest_key}: feed stamp {stamp} predates the election; frame held back")
+                continue
             if not any(sums.values()):
                 continue
             previous = conn.execute(
