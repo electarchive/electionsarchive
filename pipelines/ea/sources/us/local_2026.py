@@ -10905,6 +10905,16 @@ def parse() -> None:
                         if role == "water-district-trustee"
                         else None
                     ) or (
+                        f"At-Large Wards {pair[1]} and {pair[2]}"
+                        if state == "OR"
+                        and role == "council"
+                        and (pair := re.search(r"\bwards? (\d+) and (\d+) at large\b", post))
+                        else f"At-Large {numbered[1]}"
+                        if state == "OR"
+                        and role == "council"
+                        and (numbered := re.search(r"\bat large (\d+)\b", post))
+                        else None
+                    ) or (
                         (
                             f"Ward {(ward[1] or ward[2] or ward[3] or ward[5]).upper()}"
                             + (
