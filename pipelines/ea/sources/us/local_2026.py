@@ -7181,6 +7181,10 @@ NJ_SCHOOL_PINS = {
     ("34041", "Mansfield Twp Sch Dist"): "3409540",
     ("34011", "Greenwich Twp Sch Dist"): "3406150",
     ("34011", "Lawrence Twp Sch Dist"): "3408370",
+    ("34015", "Franklin Sch Dist Township"): "3405430",
+    ("34015", "Monroe Twp Sch Dist"): "3410470",
+    ("34015", "Washington Twp Sch Dist"): "3417070",
+    ("34041", "Washington Twp Sch Dist"): "3417160",
 }
 NJ_EXTRA_SCHOOLS = (
     ("34025", "3401140", "Avon Borough School District"),
@@ -8963,7 +8967,7 @@ def parse() -> None:
         if not started or not re.match(r"\s*\d+\s", line):
             continue
         cells = re.split(r"\s{2,}", line.strip())
-        if len(cells) < 3 or " - " in cells[1]:
+        if len(cells) < 3 or " - " in cells[1] or "fire commissioners" in cells[1].lower():
             continue
         place = cells[1]
         seats[place] += 1
@@ -11345,7 +11349,12 @@ def parse() -> None:
                     tail = tail.removesuffix(":remainder")
                 if (
                     tail is not None
-                    and used.setdefault(tail, str(row["contest"])) != row["contest"]
+                    and (
+                        used.setdefault(tail, str(row["contest"])) != row["contest"]
+                        or state == "NJ"
+                        and tail in taken
+                        and tail in minted
+                    )
                     and row["unexpired"]
                 ):
                     tail = f"{tail}:unexpired"
