@@ -9,6 +9,7 @@ import { toward } from "#lib/live/standing.js";
 import { summarize } from "#lib/live/summary.js";
 import { era } from "#lib/party.js";
 import { remember } from "#lib/server/cache.js";
+import { compactPlaces } from "#lib/server/compare.js";
 import { db } from "#lib/server/db/index.js";
 import { logos, partiesIn } from "#lib/server/logos.js";
 import { proseColumns, proseJoin } from "#lib/server/prose.js";
@@ -1360,6 +1361,98 @@ export async function results(search: URLSearchParams) {
   };
 }
 
+async function compared(
+  first: { id: string; type: string } | undefined,
+  second: { id: string; type: string } | undefined,
+) {
+  if (first == null || second == null || first.type !== second.type) {
+    return { people: null, places: null, parties: null };
+  }
+  if (first.type === "person") {
+    return {
+      people: await Promise.all(
+        [first, second].map(async (row) => ({
+          id: row.id,
+          ...(await call(router.people.get, { id: row.id })),
+        })),
+      ),
+      places: null,
+      parties: null,
+    };
+  }
+  if (first.type === "polity") {
+    return {
+      people: null,
+      places: compactPlaces(
+        await call(router.polities.compare, { a: first.id, b: second.id }),
+      ),
+      parties: null,
+    };
+  }
+  if (first.type !== "party") {
+    return { people: null, places: null, parties: null };
+  }
+  const [one, two] = await Promise.all(
+    [first, second].map(async (row) => {
+      const [party, history] = await Promise.all([
+        call(router.parties.get, { id: row.id }),
+        call(router.parties.history, { id: row.id }),
+      ]);
+      return { id: row.id, party, history };
+    }),
+  );
+  return {
+    people: null,
+    places: null,
+    parties: {
+      parties: [one, two].map((side) => ({
+        id: side?.id ?? "",
+        name: side?.party.name ?? "",
+        short: side?.party.short ?? null,
+        color: side?.party.color ?? null,
+      })),
+      series: (one?.history ?? []).flatMap((series) => {
+        const other = two?.history.find((entry) => entry.id === series.id);
+        if (other == null) {
+          return [];
+        }
+        const dates = [
+          ...new Set(
+            [...series.points, ...other.points].map((point) => point.date),
+          ),
+        ].toSorted((a, b) => a.localeCompare(b));
+        const points = dates.map((date) => {
+          const sides = [series, other].map((entry) => {
+            const point = entry.points.find(
+              (candidate) => candidate.date === date,
+            );
+            return point?.votes == null || point.total == null
+              ? null
+              : {
+                  share: point.votes / point.total,
+                  seats: point.seats,
+                  filled: point.filled,
+                };
+          });
+          const any =
+            series.points.find((point) => point.date === date) ??
+            other.points.find((point) => point.date === date);
+          return {
+            date,
+            year: any?.year ?? Number(date.slice(0, 4)),
+            name: any?.name ?? "",
+            path: any?.path ?? null,
+            sides,
+          };
+        });
+        return points.some((point) => point.sides.every((side) => side != null))
+          ? [{ id: series.id, name: series.name, points }]
+          : [];
+      }),
+    },
+  };
+}
+
 export async function comparison(ids: Array<string>) {
   const found = await db.execute<{
     id: string;
@@ -1416,7 +1509,8 @@ export async function comparison(ids: Array<string>) {
             select p.at, p.kind, x.side, coalesce(
               (select s.entity_id from slug s where p.kind = 'polity' and s.is_current and s.path = x.key limit 1),
               (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'person'
-                where p.kind = 'person' and n.text = x.key limit 1),
+                where p.kind = 'person' and n.text = x.key
+                order by (select count(*) from candidacy cy where cy.person_id = n.entity_id) desc limit 1),
               (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'party'
                 where p.kind = 'party' and n.text = x.key limit 1)
             ) as id
@@ -1471,19 +1565,8 @@ export async function comparison(ids: Array<string>) {
           where a.side = 1 and a.id is not null and b.id is not null
           order by a.at
         `);
-  const sided =
-    first?.type === "party" && second?.type === "party"
-      ? await Promise.all(
-          [first, second].map(async (row) => {
-            const [party, history] = await Promise.all([
-              call(router.parties.get, { id: row.id }),
-              call(router.parties.history, { id: row.id }),
-            ]);
-            return { id: row.id, party, history };
-          }),
-        )
-      : null;
-  const [one, two] = sided ?? [];
+  const work = compared(first, second);
+  const body = eager(work);
   const suggested =
     second != null || first == null
       ? null
@@ -1582,79 +1665,18 @@ export async function comparison(ids: Array<string>) {
         from (${suggested}) r
         order by r.rank desc, r.tie desc
       `);
+  await Promise.race([
+    work,
+    new Promise((done) => {
+      setTimeout(done, 1200);
+    }),
+  ]);
   return {
     kind: "comparison" as const,
     sides: found.rows,
     examples: examples?.rows ?? [],
     rivals: rivals?.rows ?? [],
-    people:
-      first?.type === "person" && second?.type === "person"
-        ? await Promise.all(
-            [first, second].map(async (row) => ({
-              id: row.id,
-              ...(await call(router.people.get, { id: row.id })),
-            })),
-          )
-        : null,
-    places:
-      first?.type === "polity" && second?.type === "polity"
-        ? await call(router.polities.compare, { a: first.id, b: second.id })
-        : null,
-    parties:
-      sided == null
-        ? null
-        : {
-            parties: [one, two].map((side) => ({
-              id: side?.id ?? "",
-              name: side?.party.name ?? "",
-              short: side?.party.short ?? null,
-              color: side?.party.color ?? null,
-            })),
-            series: (one?.history ?? []).flatMap((series) => {
-              const other = two?.history.find(
-                (entry) => entry.id === series.id,
-              );
-              if (other == null) {
-                return [];
-              }
-              const dates = [
-                ...new Set(
-                  [...series.points, ...other.points].map(
-                    (point) => point.date,
-                  ),
-                ),
-              ].toSorted((a, b) => a.localeCompare(b));
-              const points = dates.map((date) => {
-                const sides = [series, other].map((entry) => {
-                  const point = entry.points.find(
-                    (candidate) => candidate.date === date,
-                  );
-                  return point?.votes == null || point.total == null
-                    ? null
-                    : {
-                        share: point.votes / point.total,
-                        seats: point.seats,
-                        filled: point.filled,
-                      };
-                });
-                const any =
-                  series.points.find((point) => point.date === date) ??
-                  other.points.find((point) => point.date === date);
-                return {
-                  date,
-                  year: any?.year ?? Number(date.slice(0, 4)),
-                  name: any?.name ?? "",
-                  path: any?.path ?? null,
-                  sides,
-                };
-              });
-              return points.some((point) =>
-                point.sides.every((side) => side != null),
-              )
-                ? [{ id: series.id, name: series.name, points }]
-                : [];
-            }),
-          },
+    body: body(),
   };
 }
 

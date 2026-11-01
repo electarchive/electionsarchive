@@ -1,119 +1,207 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
-  import Measured from "#lib/components/measured.svelte";
-  import Name from "#lib/components/name.svelte";
   import { fits } from "#lib/fits.js";
-  import { percent, points } from "#lib/format.js";
+  import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Duel from "./duel.svelte";
+  import Ledger from "./ledger.svelte";
+  import Tape from "./tape.svelte";
+
+  type Data = NonNullable<Awaited<PageData["body"]>["parties"]>;
+  type Side = Data["series"][number]["points"][number]["sides"][number];
 
   const {
     data,
     first,
-  }: {
-    data: NonNullable<PageData["parties"]>;
-    first: { id: string; name: string } | undefined;
-  } = $props();
+  }: { data: Data; first: { id: string; name: string } | undefined } = $props();
 
-  const PAD = { top: 12, right: 12, bottom: 24, left: 36 };
+  const DAY = 86_400_000;
 
-  let width = $state(0);
-  let hovered = $state<{ series: number; point: number } | null>(null);
-  let opened = $state<Array<string>>([]);
-
-  const sides = $derived(
-    data.parties.map((party) => ({
-      ...party,
-      label: party.short ?? party.name,
-      tone: swatch(party.color, `party:${party.id}`),
-    })),
+  const names = $derived(
+    data.parties.map((party) => party.short ?? party.name),
   );
+  const a = $derived(names[0] ?? "");
+  const b = $derived(names[1] ?? "");
+  const tones = $derived(
+    data.parties.map((party) => swatch(party.color, `party:${party.id}`)),
+  );
+  const toneA = $derived(tones[0] ?? "var(--foreground)");
+  const toneB = $derived(tones[1] ?? "var(--foreground)");
+
   const charts = $derived(
-    data.series.map((series) => {
-      const shares = series.points.flatMap((point) =>
-        point.sides.flatMap((side) => (side == null ? [] : [side.share])),
-      );
-      const placed = series.points.map((point) => ({
+    data.series.map((series, index) => {
+      const rows = series.points.map((point, at) => ({
         ...point,
-        at:
+        key: `${index}:${at}`,
+        x:
           point.year +
           (Date.parse(`${point.date}T00:00:00Z`) - Date.UTC(point.year, 0, 1)) /
-            31_622_400_000,
-        label:
-          series.points.filter((other) => other.year === point.year).length > 1
-            ? new Intl.DateTimeFormat(getLocale(), {
-                month: "short",
-                year: "numeric",
-                timeZone: "UTC",
-              }).format(Date.parse(`${point.date}T00:00:00Z`))
-            : String(point.year),
+            DAY /
+            366,
       }));
+      let top = 0;
+      for (const row of rows) {
+        for (const side of row.sides) {
+          top = Math.max(top, side?.share ?? 0);
+        }
+      }
       return {
-        ...series,
-        points: placed,
-        top: Math.max(0.1, Math.ceil(Math.max(...shares) * 10) / 10),
-        low: Math.min(...placed.map((point) => point.at)),
-        high: Math.max(...placed.map((point) => point.at)),
+        index,
+        id: series.id,
+        name: series.name,
+        rows,
+        top: Math.max(0.1, Math.ceil(top * 10) / 10),
+        peak: Math.max(0.01, top),
       };
     }),
   );
-  const height = $derived(
-    Math.round(Math.min(300, Math.max(200, width * 0.34))),
-  );
-  const sx = (chart: { low: number; high: number }, year: number) =>
-    chart.high === chart.low
-      ? PAD.left + (width - PAD.left - PAD.right) / 2
-      : PAD.left +
-        ((year - chart.low) / (chart.high - chart.low)) *
-          (width - PAD.left - PAD.right);
-  const sy = (chart: { top: number }, value: number) =>
-    PAD.top +
-    ((chart.top - value) / chart.top) * (height - PAD.top - PAD.bottom);
-  const ticks = $derived(
-    charts.map((chart) => {
-      const shown: Array<number> = [];
-      let last = -Infinity;
-      for (const [point, row] of chart.points.entries()) {
-        const x = sx(chart, row.at);
-        if (x - last >= 30) {
-          shown.push(point);
-          last = x;
+
+  const summary = $derived.by(() => {
+    const ahead = [0, 0];
+    const best = [0, 0];
+    const sums = [0, 0];
+    const seats = [0, 0];
+    let total = 0;
+    let latest: (typeof charts)[number]["rows"][number] | null = null;
+    for (const chart of charts) {
+      for (const row of chart.rows) {
+        const [one, two] = row.sides;
+        for (const [side, entry] of row.sides.entries()) {
+          if (entry != null) {
+            best[side] = Math.max(best[side] ?? 0, entry.share);
+            seats[side] = (seats[side] ?? 0) + (entry.seats ?? 0);
+          }
+        }
+        if (one == null || two == null) {
+          continue;
+        }
+        total += 1;
+        sums[0] = (sums[0] ?? 0) + one.share;
+        sums[1] = (sums[1] ?? 0) + two.share;
+        ahead[one.share >= two.share ? 0 : 1] =
+          (ahead[one.share >= two.share ? 0 : 1] ?? 0) + 1;
+        if (latest == null || row.date > latest.date) {
+          latest = row;
         }
       }
-      return shown;
+    }
+    return { ahead, best, sums, seats, total, latest };
+  });
+
+  const tape = $derived.by(() => {
+    const { ahead, best, sums, seats, total, latest } = summary;
+    const mean = (side: number) =>
+      total === 0 ? 0 : (sums[side] ?? 0) / total;
+    const last = (side: number) => latest?.sides[side]?.share ?? null;
+    return [
+      {
+        label: m.versus_tape_ahead(),
+        values: [ahead[0] ?? 0, ahead[1] ?? 0],
+        text: [count(ahead[0] ?? 0), count(ahead[1] ?? 0)],
+      },
+      {
+        label: m.versus_tape_average(),
+        values: [mean(0), mean(1)],
+        text: [percent(mean(0)), percent(mean(1))],
+      },
+      {
+        label: m.versus_tape_best(),
+        values: [best[0] ?? 0, best[1] ?? 0],
+        text: [percent(best[0] ?? 0), percent(best[1] ?? 0)],
+      },
+      {
+        label: m.versus_tape_latest({ year: String(latest?.year ?? "") }),
+        values: [last(0), last(1)],
+        text: [
+          last(0) == null ? "–" : percent(last(0) ?? 0),
+          last(1) == null ? "–" : percent(last(1) ?? 0),
+        ],
+      },
+      {
+        label: m.versus_tape_seats(),
+        values: [seats[0] ?? 0, seats[1] ?? 0],
+        text: [count(seats[0] ?? 0), count(seats[1] ?? 0)],
+      },
+    ] satisfies Array<{
+      label: string;
+      values: [number | null, number | null];
+      text: [string, string];
+    }>;
+  });
+
+  const cells = $derived(
+    charts.flatMap((chart) => {
+      const years = new Map<number, (typeof chart.rows)[number]>();
+      for (const row of chart.rows) {
+        years.set(row.year, row);
+      }
+      return [...years.values()].map((row) => ({
+        key: row.key,
+        row: chart.index,
+        year: row.year,
+        href: row.path,
+        chart,
+        point: row,
+        halves: row.sides.map((side, index) =>
+          side == null
+            ? null
+            : {
+                color: tones[index] ?? "var(--foreground)",
+                strength: Math.min(1, side.share / chart.peak),
+              },
+        ) as [
+          { color: string; strength: number } | null,
+          { color: string; strength: number } | null,
+        ],
+      }));
     }),
   );
-  const line = (chart: (typeof charts)[number], side: number) => {
-    let last: number | null = null;
-    let text = "";
-    for (const point of chart.points) {
-      const value = point.sides[side]?.share;
-      if (value != null) {
-        text += `${last == null || point.at - last > 8 ? "M" : "L"}${sx(chart, point.at).toFixed(1)},${sy(chart, value).toFixed(1)}`;
-        last = point.at;
-      }
-    }
-    return text;
-  };
+
+  const actives = $state<Record<number, string | null>>({});
 </script>
 
-{#snippet share(
-  side: { share: number; seats: number | null; filled: number | null } | null,
-  isStrong = false,
-)}
+{#snippet marker(side: number)}
+  <span
+    class={cn("inline-block shrink-0 block-2 inline-2", {
+      "rounded-full": side === 0,
+    })}
+    style:background-color={side === 0 ? toneA : toneB}
+    aria-hidden="true"
+  ></span>
+{/snippet}
+
+{#snippet share(side: Side, isStrong = false)}
   {#if side == null}
     <span class="text-muted-foreground">–</span>
   {:else}
-    <span class={cn({ "font-semibold": isStrong })}>{percent(side.share)}</span>
+    <span class={cn("font-figures tabular-nums", { "font-semibold": isStrong })}
+      >{percent(side.share)}</span
+    >
     {#if side.seats != null && (side.filled ?? 0) > 1}
-      <span class="ms-1 text-xs text-muted-foreground max-sm:hidden"
+      <span class="ms-1 font-figures text-xs text-muted-foreground tabular-nums"
         >{m.lists_seats({ count: side.seats })}</span
       >
     {/if}
+  {/if}
+{/snippet}
+
+{#snippet gap(sides: Array<Side>)}
+  {const one = $derived(sides[0])}
+  {const two = $derived(sides[1])}
+  {#if one == null || two == null}
+    <span class="text-muted-foreground">–</span>
+  {:else if Math.abs(one.share - two.share) < 0.0005}
+    {m.versus_even()}
+  {:else}
+    <span class="inline-flex items-center gap-1.5 font-figures tabular-nums">
+      {@render marker(one.share > two.share ? 0 : 1)}{points(
+        Math.abs(one.share - two.share),
+      )}
+    </span>
   {/if}
 {/snippet}
 
@@ -128,271 +216,209 @@
       >
     {/if}
   </p>
-{/if}
-
-{#each charts as chart, index (chart.id)}
-  {const focus = $derived(
-    hovered?.series === index ? (chart.points[hovered.point] ?? null) : null,
-  )}
+{:else}
   <section
-    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
-    aria-labelledby="party-series-{index}"
-    data-export
+    class="col-span-12 grid justify-items-center gap-4 bg-card px-3.5 pbs-4 pbe-5"
   >
-    <Export name="parties" class="absolute inset-e-2 inset-bs-2" />
-    <div class="grid gap-0.5 pe-8">
-      <h2 id="party-series-{index}" class="heading">
-        {chart.name}
-      </h2>
-      <p class="text-[0.8125rem] text-muted-foreground">
-        {m.versus_parties_key()}
+    {#if summary.total > 0}
+      <p
+        class="text-center text-lg/snug font-semibold text-balance max-inline-[60ch]"
+      >
+        {m.versus_verdict_parties({
+          a,
+          b,
+          one: count(summary.ahead[0] ?? 0),
+          total: count(summary.total),
+        })}
+      </p>
+    {/if}
+    <div class="inline-full max-inline-3xl">
+      <Tape names={[a, b]} colors={[toneA, toneB]} rows={tape} />
+    </div>
+  </section>
+
+  <section
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-4 pbe-4"
+    aria-labelledby="ledger"
+  >
+    <div class="grid gap-0.5 pe-10">
+      <h2 id="ledger" class="heading">{m.versus_ledger_title()}</h2>
+      <p class="text-xs text-pretty text-muted-foreground">
+        {m.versus_ledger_parties_key({ a, b })}
       </p>
     </div>
-    <div class="flex flex-wrap gap-x-5 gap-y-1 text-[0.8125rem]">
-      {#each sides as side, at (side.id)}
-        <span class="inline-flex items-center gap-2" style:--party={side.tone}>
-          <svg
-            class="block-2.5 inline-6"
-            viewBox="0 0 24 10"
-            aria-hidden="true"
-          >
-            <line
-              x1="0"
-              x2="24"
-              y1="5"
-              y2="5"
-              class="stroke-(--party)"
-              stroke-width="2"
-              stroke-dasharray={at === 0 ? "" : "5 3"}
-            />
-            {#if at === 0}
-              <circle cx="12" cy="5" r="3.5" class="fill-(--party)" />
-            {:else}
-              <rect x="9" y="2" width="6" height="6" class="fill-(--party)" />
+    <Ledger
+      rows={charts.map((chart) => chart.name)}
+      {cells}
+      label={m.versus_ledger_title()}
+    >
+      {#snippet readout(cell: (typeof cells)[number])}
+        <div class="grid gap-1 text-[0.8125rem]">
+          <p class="flex flex-wrap items-baseline gap-x-2">
+            <span class="font-figures font-bold tabular-nums">{cell.year}</span>
+            <span class="font-semibold">{cell.chart.name}</span>
+            {#if cell.point.path != null}
+              <a
+                class="truncate text-xs text-muted-foreground underline decoration-current/40 underline-offset-2 hover:text-foreground"
+                href={resolve("/[...path]", { path: cell.point.path })}
+                >{cell.point.name}</a
+              >
             {/if}
-          </svg>
-          <Name
-            class="font-semibold"
-            label={side.label}
-            party={side.id}
-            color={side.tone}
-            hasSwatch={false}
-          />
-          {#if focus != null}
-            <span class="font-figures text-xs tabular-nums"
-              >{@render share(focus.sides[at] ?? null)}</span
-            >
-          {/if}
-        </span>
-      {/each}
-      {#if focus != null}
-        <span class="ms-auto font-figures text-xs text-muted-foreground"
-          >{focus.label}</span
-        >
-      {/if}
-    </div>
-    <Measured
-      bind:width
-      class="min-inline-0"
-      reserve="clamp(200px, 34vw, 300px)"
-    >
-      <svg
-        viewBox="0 0 {width} {height}"
-        class="block overflow-visible inline-full"
-        style:block-size="{height}px"
-        role="img"
-        aria-label={chart.name}
-        onpointerleave={() => (hovered = null)}
-        onpointermove={(event) => {
-          const box = event.currentTarget.getBoundingClientRect();
-          const x = event.clientX - box.left;
-          let best = { point: 0, distance: Infinity };
-          for (const [point, row] of chart.points.entries()) {
-            const distance = Math.abs(sx(chart, row.at) - x);
-            if (distance < best.distance) {
-              best = { point, distance };
-            }
-          }
-          hovered = { series: index, point: best.point };
-        }}
-      >
-        {#each [chart.top, chart.top / 2, 0] as tick (tick)}
-          <line
-            x1={PAD.left}
-            x2={width - PAD.right}
-            y1={sy(chart, tick)}
-            y2={sy(chart, tick)}
-            class={cn("stroke-border", { "stroke-foreground/40": tick === 0 })}
-          />
-          <text
-            x={PAD.left - 6}
-            y={sy(chart, tick) + 3.5}
-            text-anchor="end"
-            class="fill-muted-foreground font-figures text-[0.625rem]"
-            >{Math.round(tick * 100)}</text
-          >
-        {/each}
-        {#each chart.points as row, point (row.date)}
-          <text
-            x={sx(chart, row.at)}
-            y={height - 6}
-            text-anchor="middle"
-            class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
-              hidden: !(ticks[index] ?? []).includes(point),
-              "fill-foreground": focus === row,
-            })}>{row.year}</text
-          >
-        {/each}
-        {#if focus != null}
-          <line
-            x1={sx(chart, focus.at)}
-            x2={sx(chart, focus.at)}
-            y1={PAD.top}
-            y2={height - PAD.bottom}
-            class="stroke-foreground/30"
-          />
-        {/if}
-        {#each sides as side, at (side.id)}
-          <g style:--party={side.tone}>
-            <path
-              d={line(chart, at)}
-              fill="none"
-              class="stroke-(--party)"
-              stroke-width="2"
-              stroke-dasharray={at === 0 ? "" : "5 3"}
-              stroke-linejoin="round"
-            />
-            {#each chart.points as row (row.date)}
-              {const value = $derived(row.sides[at]?.share ?? null)}
-              {const r = $derived(focus === row ? 5 : 3.5)}
-              {#if value != null}
-                {#if at === 0}
-                  <circle
-                    cx={sx(chart, row.at)}
-                    cy={sy(chart, value)}
-                    {r}
-                    class="fill-(--party)"
-                  />
-                {:else}
-                  <rect
-                    x={sx(chart, row.at) - r * 0.9}
-                    y={sy(chart, value) - r * 0.9}
-                    width={r * 1.8}
-                    height={r * 1.8}
-                    class="fill-(--party)"
-                  />
-                {/if}
-              {/if}
-            {/each}
-          </g>
-        {/each}
-      </svg>
-    </Measured>
-    <div
-      class="overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
-      {@attach fits}
-    >
-      <table class="border-collapse text-sm tabular-nums inline-full">
-        <thead
-          class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
-        >
-          <tr class="border-be text-xs text-muted-foreground">
-            <th scope="col" class="py-1.5 pe-3 text-start font-semibold"
-              >{m.versus_year()}</th
-            >
-            {#each sides as side (side.id)}
-              <th scope="col" class="px-2 py-1.5 text-end font-semibold"
-                ><Name
-                  label={side.label}
-                  party={side.id}
-                  color={side.tone}
-                  hasSwatch={false}
-                /></th
-              >
-            {/each}
-            <th scope="col" class="py-1.5 ps-2 text-end font-semibold"
-              >{m.versus_gap()}</th
-            >
-          </tr>
-        </thead>
-        <tbody>
-          {#each opened.includes(chart.id) ? chart.points.toReversed() : chart.points
-                .toReversed()
-                .slice(0, 12) as row (row.date)}
-            {const a = $derived(row.sides[0]?.share ?? null)}
-            {const b = $derived(row.sides[1]?.share ?? null)}
-            {const lead = $derived(
-              a == null || b == null ? null : (sides[a >= b ? 0 : 1] ?? null),
-            )}
-            <tr
-              class={cn("border-be border-border/60", {
-                "bg-secondary": focus === row,
-              })}
-            >
-              <th
-                scope="row"
-                class="py-1.5 pe-3 text-start font-normal whitespace-nowrap"
-              >
-                {#if row.path == null}
-                  <span class="font-figures">{row.label}</span>
-                {:else}
-                  <a
-                    class="font-figures hover:highlighter"
-                    href={resolve("/[...path]", { path: row.path })}
-                    title={row.name}>{row.label}</a
-                  >
-                {/if}
-              </th>
-              {#each sides as side, at (side.id)}
-                <td
-                  class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap"
-                  >{@render share(row.sides[at] ?? null, true)}</td
+          </p>
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-0.5">
+            {#each cell.point.sides as side, index (index)}
+              <span class="flex items-center gap-1.5">
+                {@render marker(index)}<span class="font-semibold"
+                  >{names[index]}</span
                 >
-              {/each}
-              <td
-                class="py-1.5 ps-2 text-end font-figures text-[0.8125rem] whitespace-nowrap"
-              >
-                {#if a == null || b == null || lead == null}
-                  <span class="text-muted-foreground">–</span>
-                {:else if Math.abs(a - b) < 0.0005}
-                  {m.versus_even()}
-                {:else}
-                  <span
-                    class="inline-flex items-center justify-end gap-1.5"
-                    style:--party={lead.tone}
-                  >
-                    <span
-                      class="shrink-0 rounded-xs bg-(--party) chip block-2 inline-2"
-                    ></span>
-                    <span
-                      class="font-sans text-xs text-muted-foreground max-sm:sr-only"
-                      >{lead.label}</span
-                    >
-                    {points(Math.abs(a - b)).replace(/^-/u, "+")}
-                  </span>
-                {/if}
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-    {#if chart.points.length > 12}
-      {const isOpen = $derived(opened.includes(chart.id))}
-      <button
-        type="button"
-        class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
-        aria-expanded={isOpen}
-        onclick={() =>
-          (opened = isOpen
-            ? opened.filter((id) => id !== chart.id)
-            : [...opened, chart.id])}
-        >{isOpen
-          ? m.polity_results_fewer()
-          : m.polity_results_more({
-              count: String(chart.points.length),
-            })}</button
-      >
-    {/if}
+                {@render share(
+                  side,
+                  side != null &&
+                    side.share >= (cell.point.sides[1 - index]?.share ?? 0),
+                )}
+              </span>
+            {/each}
+            <span class="text-muted-foreground"
+              >{@render gap(cell.point.sides)}</span
+            >
+          </div>
+        </div>
+      {/snippet}
+    </Ledger>
   </section>
-{/each}
+
+  {#each charts as chart (chart.id)}
+    {const ordered = $derived(chart.rows.toReversed())}
+    <section
+      class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-4 pbe-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-x-6"
+      aria-labelledby="party-series-{chart.index}"
+      data-export
+    >
+      <div class="grid content-start gap-3">
+        <div class="relative grid gap-1 pe-10">
+          <Export
+            name="series-{chart.index}"
+            class="absolute inset-e-0 inset-bs-0"
+          />
+          <h2 id="party-series-{chart.index}" class="heading">{chart.name}</h2>
+          <p class="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+            {#each names as name, side (side)}
+              <span class="flex items-center gap-1.5">
+                <svg width="22" height="8" aria-hidden="true">
+                  <line
+                    x1="0"
+                    x2="22"
+                    y1="4"
+                    y2="4"
+                    style:stroke={side === 0 ? toneA : toneB}
+                    stroke-width="2"
+                    stroke-dasharray={side === 0 ? null : "5 3"}
+                  />
+                </svg>{name}</span
+              >
+            {/each}
+          </p>
+        </div>
+        <Duel
+          points={chart.rows.map((row) => ({
+            key: row.key,
+            x: row.x,
+            a: row.sides[0]?.share ?? null,
+            b: row.sides[1]?.share ?? null,
+            ref: null,
+            marks: [null, null],
+          }))}
+          colors={[toneA, toneB]}
+          fills={[toneA, toneB]}
+          low={0}
+          high={chart.top}
+          format={(value: number) => String(Math.round(value * 100))}
+          bind:active={actives[chart.index]}
+        >
+          {#snippet readout(point: { key: string })}
+            {const row = $derived(
+              chart.rows.find((entry) => entry.key === point.key),
+            )}
+            {#if row != null}
+              <p class="flex items-baseline gap-2">
+                <span class="font-figures font-bold tabular-nums"
+                  >{row.year}</span
+                >
+                <span class="truncate text-muted-foreground">{row.name}</span>
+              </p>
+              <div
+                class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2"
+              >
+                {#each row.sides as side, index (index)}
+                  <span class="flex items-center gap-1.5"
+                    >{@render marker(index)}{names[index]}</span
+                  >
+                  <span>{@render share(side)}</span>
+                {/each}
+              </div>
+            {/if}
+          {/snippet}
+        </Duel>
+      </div>
+      <div
+        class="relative overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-104 data-fits:overflow-visible lg:overflow-y-auto lg:max-block-104"
+        {@attach fits}
+      >
+        <table class="text-[0.8125rem] inline-full">
+          <thead
+            class="sticky inset-bs-0 z-2 bg-background text-xs text-muted-foreground [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]"
+          >
+            <tr>
+              <th class="pe-2 text-start font-semibold block-7"
+                >{m.versus_year()}</th
+              >
+              {#each names as name, side (side)}
+                <th class="pe-2 text-start font-semibold">
+                  <span class="flex items-center gap-1.5"
+                    >{@render marker(side)}<span class="truncate">{name}</span
+                    ></span
+                  >
+                </th>
+              {/each}
+              <th
+                class="text-end font-semibold"
+                title={m.versus_gap_help({ a, b })}>{m.versus_gap()}</th
+              >
+            </tr>
+          </thead>
+          <tbody>
+            {#each ordered as row (row.key)}
+              {const one = $derived(row.sides[0]?.share ?? -1)}
+              {const two = $derived(row.sides[1]?.share ?? -1)}
+              <tr
+                class={cn("border-be border-border", {
+                  highlighter: actives[chart.index] === row.key,
+                })}
+                onpointerenter={() => (actives[chart.index] = row.key)}
+              >
+                <td class="pe-2 font-figures tabular-nums block-7">
+                  {#if row.path == null}
+                    {row.year}
+                  {:else}
+                    <a
+                      class="underline decoration-current/30 underline-offset-2 hover:decoration-current"
+                      href={resolve("/[...path]", { path: row.path })}
+                      title={row.name}>{row.year}</a
+                    >
+                  {/if}
+                </td>
+                <td class="pe-2"
+                  >{@render share(row.sides[0] ?? null, one > two)}</td
+                >
+                <td class="pe-2"
+                  >{@render share(row.sides[1] ?? null, two > one)}</td
+                >
+                <td class="text-end">{@render gap(row.sides)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {/each}
+{/if}

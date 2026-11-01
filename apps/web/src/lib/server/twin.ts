@@ -337,9 +337,10 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       return coverageOverview();
     }
     case "compare": {
-      return comparison(
+      const found = await comparison(
         [search.get("a"), search.get("b")].filter((id) => id != null),
       );
+      return { ...found, body: await found.body };
     }
     case "search": {
       return results(search);
@@ -6408,8 +6409,9 @@ function comparisonMarkdown(
     ];
   }
   heading.push(`${link(a.name, `id/${a.id}`)} / ${link(b.name, `id/${b.id}`)}`);
-  if (data.people != null) {
-    const [one, two] = data.people;
+  const { people, places, parties } = data.body;
+  if (people != null) {
+    const [one, two] = people;
     const theirs = new Map(
       (two?.record ?? []).flatMap((entry) =>
         entry.path == null ? [] : [[entry.path, entry]],
@@ -6470,23 +6472,27 @@ function comparisonMarkdown(
         : table([m.col_year(), m.col_contest(), a.name, b.name], shared),
     ];
   }
-  if (data.places != null) {
+  if (places != null) {
     const top = (
-      options: Array<{ label: string; share: number }> | undefined,
+      options:
+        | Array<{ k: number; share: number; who: string | null }>
+        | undefined,
     ) => {
       const best = options?.toSorted((x, y) => y.share - x.share)[0];
-      return best == null ? null : `${best.label}, ${percent(best.share)}`;
+      return best == null
+        ? null
+        : `${best.who ?? places.keys[best.k]?.label ?? ""}, ${percent(best.share)}`;
     };
-    const questions = data.places.series
+    const questions = places.series
       .filter((series) => series.isQuestion)
       .flatMap((series) => series.points)
       .toSorted((x, y) => x.date.localeCompare(y.date));
     return [
       ...heading,
-      ...(data.places.series.length === 0
+      ...(places.series.length === 0
         ? [m.versus_places_none()]
         : [
-            ...data.places.series
+            ...places.series
               .filter((series) => !series.isQuestion)
               .map((series) => ({
                 ...series,
@@ -6519,12 +6525,12 @@ function comparisonMarkdown(
           ])),
     ];
   }
-  if (data.parties != null) {
+  if (parties != null) {
     return [
       ...heading,
-      ...(data.parties.series.length === 0
+      ...(parties.series.length === 0
         ? [m.versus_parties_none()]
-        : data.parties.series.flatMap((series) => [
+        : parties.series.flatMap((series) => [
             `## ${series.name}`,
             table(
               [m.col_date(), m.col_election(), a.name, b.name],

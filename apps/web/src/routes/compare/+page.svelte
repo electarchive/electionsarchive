@@ -288,12 +288,26 @@
       <p class="col-span-12 bg-card px-3.5 py-4 text-sm text-muted-foreground">
         {m.versus_mismatch()}
       </p>
-    {:else if data.people != null}
-      <People people={data.people} />
-    {:else if data.places != null}
-      <Places data={data.places} />
-    {:else if data.parties != null}
-      <Parties data={data.parties} first={sides[0]} />
+    {:else if sides.length === 2}
+      {#await data.body}
+        <div
+          class="col-span-12 grid gap-px"
+          role="status"
+          aria-label={m.versus_loading()}
+        >
+          <div class="bg-card block-44 motion-safe:animate-pulse"></div>
+          <div class="bg-card block-56 motion-safe:animate-pulse"></div>
+          <div class="bg-card block-80 motion-safe:animate-pulse"></div>
+        </div>
+      {:then body}
+        {#if body.people != null}
+          <People people={body.people} />
+        {:else if body.places != null}
+          <Places data={body.places} />
+        {:else if body.parties != null}
+          <Parties data={body.parties} first={sides[0]} />
+        {/if}
+      {/await}
     {/if}
   </article>
 </main>
