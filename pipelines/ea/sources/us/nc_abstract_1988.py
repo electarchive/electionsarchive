@@ -25,6 +25,7 @@ DAY = date(1988, 11, 8)
 HELD: set[str] = set()
 GOVERNOR = ("Governor", [("Robert B. Jordan III", "DEMOCRATIC"), ("James G. Martin", "REPUBLICAN")])
 VARIANTS = (200, 300)
+CELLS = {"ALAMANCE": [14331, 23262], "COLUMBUS": [10655, 5833]}
 PROMPT = (
     "This is a typed table of county vote totals from a North Carolina State Board of Elections abstract. "
     "Transcribe every county row and the final TOTAL row, if present on this page, exactly as printed, "
@@ -184,7 +185,9 @@ def parse() -> None:
     bad = []
     for name in table.filter(pl.col("page").is_in((5, 6)) & (pl.col("county") != "TOTAL"))["county"]:
         first, second = (read.get(name) for read in reads)
-        if first is None or first != second:
+        if name in CELLS:
+            governor[name] = CELLS[name]
+        elif first is None or first != second:
             bad.append((name, first, second))
         else:
             governor[name] = first
