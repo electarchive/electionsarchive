@@ -264,7 +264,9 @@
       <Day {data} />
     {:else}
       {const Polity = $derived((await import("./polity.svelte")).default)}
-      <Polity id={data.id} polity={data.polity} />
+      {#key data.id}
+        <Polity id={data.id} polity={data.polity} />
+      {/key}
     {/if}
   </article>
 </main>
