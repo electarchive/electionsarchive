@@ -10639,6 +10639,8 @@ def parse() -> None:
                         (r"^west morris regional\b", "west morris high"),
                         (r"^manchester regional high school\b", "passaic manchester regional high school"),
                         (r"^bridgewater raritan raritan\b", "bridgewater raritan"),
+                        (r"^becton regional\b", "carlstadt east rutherford regional"),
+                        (r"^ramapo indian hills regional high school\b", "ramapo indian hill regional"),
                         (
                             r"^scotch plains township board of education$",
                             "scotch plains fanwood regional board of education scotch plains township",
@@ -11084,7 +11086,7 @@ def parse() -> None:
                     and tail.endswith(":unexpired")
                 ):
                     base = minted[tail.removesuffix(":unexpired")]
-                    if ", " in base[0] or not base[2]:
+                    if (", " in base[0] and not (state == "NJ" and base[2].startswith("school:"))) or not base[2]:
                         missed.add(f"{row['county']}: {row['contest']} unexpired")
                         continue
                     minted[tail] = (f"{base[0]} (Unexpired Term)", *base[1:])
