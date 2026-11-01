@@ -10432,7 +10432,8 @@ export const contests = {
       const focus =
         chain.at(-1) ?? (contest.id === contest.root ? null : contest.place);
       const same = (a: string, b: string) =>
-        sql.raw(`((${a}.office_id is not null and (${b}.office_id = ${a}.office_id
+        sql.raw(`(${b}.office_id = any(array_append(array(select id from twin), ${a}.office_id)) or ${b}.body_id = ${a}.body_id)
+          and ((${a}.office_id is not null and (${b}.office_id = ${a}.office_id
             or (${b}.office_id in (select id from twin) and ${b}.district_area_id is not distinct from ${a}.district_area_id)))
           or (${a}.office_id is null and ${b}.office_id is null and ${b}.body_id = ${a}.body_id
             and ${b}.district_area_id is not distinct from ${a}.district_area_id))
@@ -10483,7 +10484,7 @@ export const contests = {
                 and ${same("r", "c")}
               order by e.date_from limit 1)
           ),
-          prev as (
+          prev as materialized (
             select coalesce(max(e.date_from), (select d from g limit 1) - 400) as d
             from g cross join contest c join election e on e.id = c.election_id
             where c.party_scope_id is null and c.allocation_parent_id is null and c.previous_round_id is null
@@ -10493,8 +10494,11 @@ export const contests = {
           picked as materialized (
             select c.id, c.party_scope_id as party, c.district_area_id as district, e.date_from as d,
               c.id = g.id as "isGeneral", c.district_area_id is not distinct from g.district_area_id as "isSame"
+            from g join contest c on c.id = g.id join election e on e.id = c.election_id
+            union all
+            select c.id, c.party_scope_id, c.district_area_id, e.date_from, false, c.district_area_id is not distinct from g.district_area_id
             from g cross join prev cross join contest c join election e on e.id = c.election_id
-            where c.id = g.id or (
+            where c.id <> g.id and (
               c.allocation_parent_id is null and c.previous_round_id is null
               and e.kind in ('primary', 'caucus') and e.date_from > prev.d and e.date_from <= g.d
               and (g.office_id is not null or g.body_id is not null) and ${same("g", "c")}
