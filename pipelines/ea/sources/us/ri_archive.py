@@ -19,11 +19,18 @@ BASE = "https://web.archive.org/web/2012id_/http://www.elections.state.ri.us/ele
 PUBLISHER = "Rhode Island Board of Elections"
 TITLE = "Election results by city and town"
 PAGES = {
+    "1988-11-08": {
+        "1988/governor.php": ["Governor", "Lieutenant Governor"],
+        "1988/other.php": ["Secretary of State", "Attorney General", "General Treasurer"],
+    },
     "1990-11-06": {
         "1990/governor.php": ["Governor", "Lieutenant Governor"],
         "1990/other.php": ["Secretary of State", "Attorney General", "General Treasurer"],
     },
     "1994-11-08": {
+        "https://web.archive.org/web/2013id_/http://www.elections.ri.gov/elections/results/1994/ltgovernor.php": [
+            "Lieutenant Governor"
+        ],
         "1994/sos.php": ["Secretary of State"],
         "1994/ag.php": ["Attorney General"],
         "1994/treasurer.php": ["General Treasurer"],
@@ -41,6 +48,9 @@ PAGES = {
         "2002/generalelection/generaltreas.php": ["General Treasurer"],
     },
 }
+SPLITS = {"1988/governor.php": [2, 3], "1988/other.php": [2, 2, 3]}
+MISPRINTED = {("1994-11-08", "JEFFREY CURTIS JOHNSON"): 20104}
+HELD = {("1988-11-08", "General Treasurer")}
 TOWN_PAGES = [
     ("barrington", "sumbarr"),
     ("bristol", "sumbris"),
@@ -115,8 +125,12 @@ METHOD = (
 )
 
 
+def url(page: str) -> str:
+    return page if page.startswith("http") else BASE + page
+
+
 def cells(page: str) -> list[list[str]]:
-    text = raw.cached(SOURCE, BASE + page).path.read_text(errors="replace")
+    text = raw.cached(SOURCE, url(page)).path.read_text(errors="replace")
     table = []
     for row in re.findall(r"<tr[^>]*>(.*?)</tr>", text, re.DOTALL | re.IGNORECASE):
         values = [
@@ -141,7 +155,7 @@ def person(label: str, party: str | None = None) -> tuple[str, str]:
 
 
 def fetch() -> None:
-    addresses = [BASE + page for pages in PAGES.values() for page in pages]
+    addresses = [url(page) for pages in PAGES.values() for page in pages]
     addresses += [BASE + PAGES_2006.format(page) for page in ["topticket", *(page for _, page in TOWN_PAGES)]]
     for address in addresses:
         try:
@@ -168,7 +182,7 @@ def parse() -> None:
             table = cells(page)
             start = next(n for n, row in enumerate(table) if row[0].replace(" ", "") in ("CITY/TOWN", "COMMUNITY"))
             heads = table[start][1:]
-            if page.endswith("other.php"):
+            if page in SPLITS or page.endswith("other.php"):
                 start += 1
                 heads = table[start]
             names = [person(head) for head in heads]
@@ -177,7 +191,10 @@ def parse() -> None:
                 for row in table[start + 1 :]
                 if re.fullmatch(r"[A-Z .']+", row[0]) or row[0].startswith("STATE TOTAL")
             ]
-            per = len(names) // len(offices)
+            counts = SPLITS.get(page) or [len(names) // len(offices)] * len(offices)
+            owner = [office for office, count in zip(offices, counts, strict=True) for _ in range(count)]
+            if len(owner) != len(names):
+                raise ValueError(f"{page}: {len(names)} candidates for {counts}")
             totals = next(row for row in body if row[0].startswith("STATE TOTAL"))
             totals = [int(value.replace(",", "")) for value in totals[1:]]
             seen = set()
@@ -190,14 +207,12 @@ def parse() -> None:
                 if len(votes) != len(names):
                     raise ValueError(f"{page} {row[0]}: {len(votes)} values for {len(names)} candidates")
                 for index, (name, party) in enumerate(names):
-                    rows.append((day, offices[index // per], name, party, county[key], votes[index]))
+                    rows.append((day, owner[index], name, party, county[key], votes[index]))
             if len(seen) != 39:
                 raise ValueError(f"{page}: {len(seen)} towns")
             for index, (name, party) in enumerate(names):
-                summed = sum(
-                    row[5] for row in rows if row[0] == day and row[1] == offices[index // per] and row[2] == name
-                )
-                if summed != totals[index]:
+                summed = sum(row[5] for row in rows if row[0] == day and row[1] == owner[index] and row[2] == name)
+                if summed != MISPRINTED.get((day, name), totals[index]):
                     raise ValueError(f"{page} {name}: towns sum to {summed}, printed {totals[index]}")
     day = "2006-11-07"
     statewide: dict[tuple[str, str], int] = {}
@@ -253,6 +268,7 @@ def parse() -> None:
     frame = (
         pl.DataFrame(rows, schema=["day", "title", "candidate", "party", "county", "votes"], orient="row")
         .filter(pl.col("title") != "Governor")
+        .filter(~pl.struct("day", "title").is_in([{"day": d, "title": t} for d, t in HELD]))
         .group_by("day", "title", "candidate", "party", "county")
         .agg(pl.col("votes").sum())
         .select(
@@ -303,7 +319,7 @@ def emit() -> Path:
             )
         for pages in PAGES.values():
             for page in pages:
-                cs.artifact(raw.cached(SOURCE, BASE + page), source)
+                cs.artifact(raw.cached(SOURCE, url(page)), source)
         cs.artifact(raw.cached(SOURCE, BASE + PAGES_2006.format("topticket")), source)
         for _, page in TOWN_PAGES:
             cs.artifact(raw.cached(SOURCE, BASE + PAGES_2006.format(page)), source)
