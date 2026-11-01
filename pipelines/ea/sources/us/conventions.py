@@ -477,7 +477,7 @@ PROCEEDINGS = [
 ]  # fmt: skip
 DNC = "Official Proceedings of the National Democratic Convention, Held "
 PROCEEDINGS += [
-    {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 49)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
+    {"party": "democratic", "tables": {n: f"1852:democratic:b{n}" for n in range(1, 50)}, "title": "Proceedings of the Democratic National Convention, Held at Baltimore, June 1–5, 1852, for the Nomination of Candidates for President and Vice President of the United States", "publisher": "R. Armstrong", "city": "Baltimore", "days": (date(1852, 6, 1), date(1852, 6, 5)), "ballots": dict.fromkeys(range(1, 18), date(1852, 6, 3)) | dict.fromkeys(range(18, 34), date(1852, 6, 4)) | dict.fromkeys(range(34, 50), date(1852, 6, 5)), "deciding": 49, "required": 192, "caveat": BALTIMORE_1852},
     {"party": "democratic", "tables": {n: f"1856:democratic:b{n}" for n in range(1, 18)}, "title": DNC + "in Cincinnati, June 2–6, 1856", "publisher": "Enquirer Company Steam Printing Establishment", "city": "Cincinnati", "days": (date(1856, 6, 2), date(1856, 6, 6)), "ballots": dict.fromkeys(range(1, 15), date(1856, 6, 5)) | dict.fromkeys(range(15, 18), date(1856, 6, 6)), "deciding": 17, "held": 1},
     {"party": "democratic", "tables": {n: f"1860:democratic:b{n}" for n in range(1, 58)} | {58: "1860:democratic:baltimore-b1", 59: "1860:democratic:baltimore-b2"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1860, at Charleston and Baltimore", "publisher": "Nevin's Print", "city": "Charleston", "days": (date(1860, 4, 23), date(1860, 6, 23)), "ballots": dict.fromkeys(range(1, 13), date(1860, 5, 1)) | dict.fromkeys(range(13, 58), date(1860, 5, 2)) | dict.fromkeys((58, 59), date(1860, 6, 23)), "deciding": 59, "cities": dict.fromkeys((58, 59), "Baltimore"), "required": dict.fromkeys(range(1, 58), 202) | {58: 127, 59: 130}, "caveat": dict.fromkeys(range(1, 58), CHARLESTON_RULING) | dict.fromkeys((58, 59), BALTIMORE_RULING)},
     {"party": "democratic", "tables": {1: "1864:democratic"}, "title": "Official Proceedings of the Democratic National Convention, Held in 1864 at Chicago", "publisher": "Times Steam Book and Job Printing House", "city": "Chicago", "days": (date(1864, 8, 29), date(1864, 8, 31)), "ballots": {1: date(1864, 8, 31)}, "deciding": 1, "held": 1, "caveat": FIRST_1864},
@@ -920,6 +920,13 @@ COLUMNS = {
 LABELS = {"Washbarne": "Washburne", "Poinddexter": "Poindexter", "Elaine": "Blaine", "Mcclellan": "McClellan", "Macgregor": "MacGregor", "Du Pont": "du Pont", "La Follette": "La Follette", "T.H.Seymour": "T. H. Seymour", "Mcdonald": "McDonald", "Pennroyer": "Pennoyer", "Pennrover": "Pennoyer", "Owens": "Owen"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
+    "1852:democratic:b49": [
+        (65, "LA", (0.2, 0.822, 0.59, 0.885), {"Cass": 0, "Douglas": 0, "Butler": 0, "Houston": 0}, "none; both reads set Ohio's scattering votes one column early, under Louisiana"),
+        (65, "OH", (0.2, 0.822, 0.42, 0.838), {"Cass": 2}, "2, printed for Ohio"),
+        (65, "OH", (0.2, 0.839, 0.44, 0.853), {"Douglas": 2}, "2, printed for Ohio"),
+        (65, "OH", (0.2, 0.854, 0.43, 0.868), {"Butler": 1}, "1, printed for Ohio"),
+        (65, "OH", (0.2, 0.870, 0.41, 0.885), {"Houston": 1}, "1, printed for Ohio"),
+    ],
     "1904:democratic": [
         (259, "CO", (0.443, 0.226, 0.862, 0.238), {"Wall": 0, "Towne": 0, "McClellan": 1}, "1, set in the unlabeled column between Wall and Towne, which the printed totals (McClellan 3) and the roll as called give to McClellan"),
         (259, "MO", (0.443, 0.468, 0.862, 0.480), {"Cockrell": 36}, "36, all for Cockrell; one read drops a digit"),
@@ -2211,6 +2218,7 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                 "box": list(box),
             }
             for column, figure in figures.items()
+            if figure or not spec.get("bycandidate")
         ]
     return cells, totals, problems
 
