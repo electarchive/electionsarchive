@@ -17,8 +17,19 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of Votes Cast in the General Election held on November 5, 1996"
 BASE = "https://web.archive.org/web/20081126222630/www.app.sboe.state.nc.us/NCSBE/Elec/Results/PastElect/results9/"
-PAGES = {"attygen": "Attorney General", "secstate": "Secretary of State"}
-PARTIES = {"D": "DEMOCRATIC", "R": "REPUBLICAN", "L": "LIBERTARIAN", "NL": "NATURAL LAW"}
+PAGES = {
+    "governor": "Governor",
+    "ltgov": "Lieutenant Governor",
+    "secstate": "Secretary of State",
+    "auditor": "Auditor",
+    "treasure": "Treasurer",
+    "suptinst": "Superintendent of Public Instruction",
+    "attygen": "Attorney General",
+    "agricul": "Commissioner of Agriculture",
+    "insuran": "Commissioner of Insurance",
+    "labor": "Commissioner of Labor",
+}
+PARTIES = {"D": "DEMOCRATIC", "R": "REPUBLICAN", "L": "LIBERTARIAN", "NL": "NATURAL LAW", "WI": None, "I": "INDEPENDENT"}
 
 
 def fetch() -> None:
@@ -47,35 +58,46 @@ def parse() -> None:
             ]
             for row in table
         ]
-        grid = [[cell for cell in row if cell] for row in grid]
-        names = next(row for row in grid if row[:1] == ["County"])[1:]
-        parties = next(row for row in grid if row and re.fullmatch(r"\([A-Z]+\)", row[0]))
-        parties = [PARTIES[p.strip("()")] for p in parties]
+        header = next(row for row in grid if row[:1] == ["County"])
+        slots = [i for i, cell in enumerate(header) if i > 0 and cell]
+        names = [header[i] for i in slots]
+        parties_raw = [
+            row[i].strip("()")
+            for row in grid
+            if row and row[0] == "" and any(re.fullmatch(r"\([A-Z]+\)", cell) for cell in row)
+            for i in slots
+        ]
+        parties = [PARTIES[p] for p in parties_raw]
+        writeins = [p == "WI" for p in parties_raw]
         summed = [0] * len(names)
         printed: list[int] = []
         for row in grid:
-            if len(row) == len(names) and all(re.fullmatch(r"[\d,]+", v) for v in row):
-                printed = [int(v.replace(",", "")) for v in row]
+            cells = [row[i].replace(",", "") if i < len(row) else "" for i in slots]
+            if not all(re.fullmatch(r"\d*", v) for v in cells) or not any(cells):
                 continue
-            if len(row) != len(names) + 1:
-                continue
-            values = [int(v.replace(",", "")) for v in row[1:] if re.fullmatch(r"[\d,]+", v)]
-            if len(values) != len(names):
-                continue
-            if row[0] == "Grand Total":
+            values = [int(v or 0) for v in cells]
+            label = row[0] if row else ""
+            if label in ("Grand Total", "TOTAL", ""):
                 printed = values
             else:
-                key = re.sub(r"[^a-z]", "", row[0].lower())
+                key = re.sub(r"[^a-z]", "", label.lower())
                 if key not in counties:
-                    raise ValueError(f"no county {row[0]}")
+                    raise ValueError(f"no county {label}")
                 for i, value in enumerate(values):
                     summed[i] += value
-                    rows.append((title, counties[key], names[i].upper(), parties[i], value))
+                    rows.append((title, counties[key], names[i].upper(), parties[i], writeins[i], value))
         if printed != summed:
             raise ValueError(f"{title}: counties sum to {summed}, printed {printed}")
     frame = pl.DataFrame(
         rows,
-        schema={"title": pl.String, "county": pl.String, "candidate": pl.String, "party": pl.String, "votes": pl.Int64},
+        schema={
+            "title": pl.String,
+            "county": pl.String,
+            "candidate": pl.String,
+            "party": pl.String,
+            "writein": pl.Boolean,
+            "votes": pl.Int64,
+        },
         orient="row",
     ).with_columns(
         year=pl.lit(1996, pl.Int32),
@@ -86,7 +108,6 @@ def parse() -> None:
         magnitude=pl.lit(1, pl.Int16),
         kind=pl.lit("county"),
         code=pl.lit("county"),
-        writein=pl.lit(False),
         measure=pl.lit(1, pl.Int16),
     )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -120,7 +141,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="North Carolina's 1996 attorney general and secretary of state by county from the State Board of Elections' abstract",
+        summary="North Carolina's 1996 Council of State contests by county from the State Board of Elections' abstract",
         cite=cite,
         method=(
             "County totals come from the State Board of Elections' abstract of votes cast (a Wayback Machine copy of "
