@@ -1594,10 +1594,6 @@ def emit() -> Path:
                 cs.add("slug", path=path, entity_id=contest)
                 cs.add("citation", entity_id=contest, source_id=sources[int(year)][0])
                 report.setdefault("contest added from the manual", []).append(tag)
-            for option, label, _, _ in replaced:
-                for (candidacy,) in conn.execute("select id from candidacy where option_id = %s", [option]).fetchall():
-                    cs.add("entity_retirement", entity_id=candidacy, reason="The manual prints another candidate")
-                cs.add("option_drop", option_id=option, contest_id=contest, reason="The manual prints another candidate")
             for offset, name in enumerate(fresh):
                 option = cs.key("us.option", f"{external}:{slug(name)}")
                 if name == "Scatter" or WRITE_IN.search(name):
