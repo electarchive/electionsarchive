@@ -271,7 +271,7 @@ TABLES += [
     {"table": "1872:republican", "item": "presidentialele00conggoog", "leaves": (38, 39, 40, 41), "narrated": True},
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
-DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (212, 213, 214), (217, 218), (219, 220), (221, 222), (222, 223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (261,), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (323, 324, 325), (327, 328), (330, 331), (332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
+DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (212, 213, 214), (217, 218), (219, 220), (221, 222), (222, 223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (260, 261, 262), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (323, 324, 325), (327, 328), (330, 331), (331, 332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
 DNC_1868 = (78, 80, 83, 86, 99, 102, 109, 112, 114, 117, 119, 122, 125, 127, 130, 132, 135, 138, 147, 150, 152)  # fmt: skip
 TABLES += [
     *(
@@ -280,7 +280,7 @@ TABLES += [
             "item": "officialreportof00demoiala",
             "leaves": found,
             "parts": {leaf: "head" for leaf in found if leaf in after}
-            | {leaf: f"b{n}" for leaf in found if leaf in previous or (n, leaf) == (40, 333)},
+            | {leaf: f"b{n}" for leaf in found if leaf in previous or (n, leaf) in {(19, 262), (40, 333)}},
         }
         for n, (previous, found, after) in enumerate(
             zip(((),) + DNC_1912[:-1], DNC_1912, DNC_1912[1:] + ((),), strict=True), start=1
@@ -447,6 +447,18 @@ CORRECTIONS = {
     ],
     "1912:democratic:b16": [
         (254, "WI", (0.645, 0.799, 0.701, 0.816), {"Harmon": 0, "Bryan": 1}, "1, printed in the Harmon column; the printed totals (Harmon 29, Bryan 1) count it for Bryan"),
+    ],
+    "1912:democratic:b19": [
+        (261, "LA", (0.85, 0.381, 0.9, 0.397), {"Foss": 1}, "the row records 19 of its 20 and leaves the Foss cell blank; the announced and printed Foss total of 1 has no other source"),
+    ],
+    "1912:democratic:b40": [
+        (331, "AL", (0.496, 0.872, 0.708, 0.895), {"votes": 24, "Underwood": 24}, "24 and 24; one read returns nothing for this page"),
+        (331, "AZ", (0.496, 0.895, 0.651, 0.911), {"votes": 6, "Clark": 4, "Wilson": 2}, "6, 4, and 2; one read returns nothing for this page"),
+        (331, "AR", (0.496, 0.911, 0.592, 0.935), {"votes": 18, "Clark": 18}, "18 and 18; one read returns nothing for this page"),
+        (332, "IN", (0.84, 0.353, 0.88, 0.369), {"Kern": 1, "Not voting": 0}, "1, printed in the not-voting column; the printed totals (Kern 1, not voting ½) count it for Kern"),
+        (332, "UT", (0.49, 0.888, 0.7, 0.904), {"votes": 8, "Clark": 1.5, "Wilson": 6.5}, "8, 1½, and 6½; one read stops above the last three rows"),
+        (332, "VT", (0.49, 0.905, 0.7, 0.921), {"votes": 8, "Wilson": 8}, "8 and 8; one read stops above the last three rows"),
+        (332, "VA", (0.49, 0.924, 0.7, 0.94), {"votes": 24, "Clark": 12, "Wilson": 10, "Underwood": 2}, "24, 12, 10, and 2; one read stops above the last three rows"),
     ],
     "1912:democratic:b23": [
         (273, "VT", (0.754, 0.649, 0.777, 0.665), {"Bryan": 0, "Foss": 8}, "8, printed in the Bryan column; the printed totals (Bryan 1, Foss 45) count it for Foss"),
@@ -618,6 +630,7 @@ CORRECTIONS = {
 TOTALS = {
     "1912:democratic:b4": {"Marshall": 31, "Kern": 2},
     "1912:democratic:b15": {"Harmon": 29},
+    "1912:democratic:b40": {"Not voting": 0.5},
     "1920:republican:b10": {"Harding": 692.2, "Johnson": 80.8},
     "1868:democratic:b1": {"Hancock": 33.5},
     "1868:democratic:b6": {"Blair": 5},
@@ -807,6 +820,8 @@ def table(spec: dict[str, object], effort: str) -> tuple[list[dict[str, object]]
                         for role, value in zip(roles[1:], values, strict=False)
                         if role and value.strip()
                     }
+            if len(values) == len(header) + 1 and not values[-1].strip(" .…"):
+                values = values[:-1]
             if len(values) != len(header):
                 problems.append(f"leaf {leaf}: {row['label']} has {len(values)} cells")
                 continue
