@@ -94,24 +94,28 @@ const tiled = async (id: string, within: string | undefined) => {
     scheme: string;
     root: string;
   }>(sql`
-    with recursive tree(id) as (
-      select ${id}::uuid
+    with recursive tree(id, day) as (
+      select id, date_from from election where id = ${id}::uuid
       union all
-      select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
+      select e.id, e.date_from from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
     ), up(id, parent, day) as (
       select id, parent_id, date_from from election where id = ${id}::uuid
       union all
       select e.id, e.parent_id, e.date_from from election e join up on e.id = up.parent
     )
-    select distinct a.k, ac.code, extract(year from e.date_from)::int as year, a.scheme_code as scheme,
+    select distinct a.k, ac.code, extract(year from tree.day)::int as year, a.scheme,
       (select day::text from up where parent is null) as root
-    from contest c join tree on tree.id = c.election_id
-    join election e on e.id = c.election_id
-    join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'gb.pcon', 'ca.fed', 'fr.circonscription', 'de.wahlkreis')
-    join area_code ac on ac.area_id = a.id and (ac.valid @> e.date_from or ac.valid is null or a.scheme_code = 'us.cd')
-    where c.kind = 'body_seats' and c.allocation_parent_id is null and c.party_scope_id is null
-      and (coalesce(c.magnitude, 1) = 1 or a.scheme_code in ('us.cd', 'gb.pcon')) and not c.notional
-      and ${within == null ? sql`true` : inside(within, sql`c.district_area_id`, sql`e.date_from`)}
+    from tree
+    cross join lateral (
+      select a.id, a.k, a.scheme_code as scheme from contest c
+      join area a on a.id = c.district_area_id and a.scheme_code in ('us.cd', 'gb.pcon', 'ca.fed', 'fr.circonscription', 'de.wahlkreis')
+      where c.election_id = tree.id and c.kind = 'body_seats' and c.allocation_parent_id is null
+        and c.party_scope_id is null and not c.notional
+        and (coalesce(c.magnitude, 1) = 1 or a.scheme_code in ('us.cd', 'gb.pcon'))
+      offset 0
+    ) a
+    join area_code ac on ac.area_id = a.id and (ac.valid @> tree.day or ac.valid is null or a.scheme = 'us.cd')
+    where ${within == null ? sql`true` : inside(within, sql`a.id`, sql`tree.day`)}
   `);
   const first = found.rows[0];
   if (first == null) {
@@ -228,18 +232,20 @@ const stated = async (id: string) => {
     polity: string;
     isUsed: boolean;
   }>(sql`
-    with recursive tree(id) as (
-      select ${id}::uuid
+    with recursive tree(id, day) as (
+      select id, date_from from election where id = ${id}::uuid
       union all
-      select e.id from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
+      select e.id, e.date_from from election e join tree on e.parent_id = tree.id where e.kind not in ('runoff', 'indirect')
     ),
     districts as (
-      select c.district_area_id as id, e.date_from from contest c join tree on tree.id = c.election_id join election e on e.id = c.election_id
+      select distinct c.id, tree.day from tree cross join lateral (
+        select c.district_area_id as id from contest c where c.election_id = tree.id offset 0
+      ) c
     ),
     used as (
       select id from districts
       union
-      select ap.parent_id from districts d join area_parent ap on ap.area_id = d.id and ap.valid @> d.date_from
+      select ap.parent_id from districts d join area_parent ap on ap.area_id = d.id and ap.valid @> d.day
       union
       select ac.area_id from tree join election k on k.id = tree.id and k.id <> ${id}::uuid
       join polity y on y.id = k.polity_id join area_code ac on ac.code = y.iso_code
@@ -915,10 +921,10 @@ export const seats = {
             join area_geometry gp on gp.area_id = p.area and gp.valid @> p.drawn
             join area_geometry gn on gn.area_id = n.area and gn.valid @> n.drawn
             cross join lateral (select ST_Intersection(${coarse("gp")}, ${coarse("gn")}, 0.00001) as geom) x
-            where p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
+            where k.prior is null and p.magnitude = n.magnitude and gp.geom && gn.geom and ST_Intersects(gp.geom, gn.geom)
               and (n.magnitude = 1 or ST_Area(x.geom) > 0.5 * ST_Area(gn.geom))
             order by ST_Area(x.geom) desc limit 1
-          ) g on k.prior is null
+          ) g on true
           where n.body = (select body from chamber)
         ),
         top as materialized (
@@ -1885,8 +1891,10 @@ export const seats = {
       ),
     )
     .handler(async ({ input }) => {
-      const district = await tiled(input.id, input.within);
-      const state = input.within == null ? await stated(input.id) : null;
+      const [district, state] = await Promise.all([
+        tiled(input.id, input.within),
+        input.within == null ? stated(input.id) : null,
+      ]);
       return [district, state].filter((layout) => layout != null);
     }),
   additional: os
