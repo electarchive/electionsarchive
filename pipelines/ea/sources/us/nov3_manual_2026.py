@@ -17,6 +17,7 @@ PARSED = DATA / "parsed" / SOURCE
 DAY = date(2026, 11, 3)
 TITLE = "Official county ballot measures and sample ballots, November 3, 2026 election"
 SCHOOLS = {
+    ("ID", "American Falls Joint School District No. 381"): "1600060",
     ("TX", "Nixon-Smiley Consolidated Independent School District"): "4832740",
     ("TX", "Poth Independent School District"): "4835550",
     ("TX", "Stockdale Independent School District"): "4841610",
