@@ -26,6 +26,7 @@ FILES = {
     1954: "1954-11-02-general",
     1958: "1958-11-04-general",
     1960: "1960-11-08-general",
+    1964: "1964-11-03-general",
     1962: "1962-11-06-general",
     1970: "1970-11-03-general",
     1974: "1974-11-05-general",
@@ -46,6 +47,7 @@ DAYS = {
     1954: date(1954, 11, 2),
     1958: date(1958, 11, 4),
     1960: date(1960, 11, 8),
+    1964: date(1964, 11, 3),
     1962: date(1962, 11, 6),
     1970: date(1970, 11, 3),
     1974: date(1974, 11, 5),
@@ -232,6 +234,27 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             25: ("public-service-commissioner", "E. Odin Sjaastad", "DEM"),
         },
     ),
+    1964: (
+        0,
+        {
+            16: ("lieutenant-governor", "Frank A. Wenstrom", "REP"),
+            17: ("lieutenant-governor", "Charles Tighe", "DEM"),
+            18: ("secretary-of-state", "Ben Meier", "REP"),
+            19: ("secretary-of-state", "Elmer Strand", "DEM"),
+            20: ("auditor", "Curtis Olson", "REP"),
+            21: ("auditor", "Ted Miller", "DEM"),
+            22: ("treasurer", "Phil Hoghaug", "REP"),
+            23: ("treasurer", "Walter Christensen", "DEM"),
+            24: ("attorney-general", "Helgi Johanneson", "REP"),
+            25: ("attorney-general", "Lee W. Fraase", "DEM"),
+            26: ("insurance-commissioner", "Ted Weisenburger", "REP"),
+            27: ("insurance-commissioner", "K. O. Nygaard", "DEM"),
+            28: ("commissioner-of-agriculture", "Arne Dahl", "REP"),
+            29: ("commissioner-of-agriculture", "Isak Hystad", "DEM"),
+            30: ("public-service-commissioner", "Dean Miller", "REP"),
+            31: ("public-service-commissioner", "Bruce Hagen", "DEM"),
+        },
+    ),
     1970: (
         0,
         {
@@ -353,8 +376,36 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
     ),
 }
 NUMBER = r"[\dIl][\dIl,.?]*['`’:;]?"
+BANDED = {1964}
 ERRATA = {(1950, "A. J. Jensen")}
 TYPOS = {"mclntosh": "mcintosh"}
+READ_1964: dict[tuple[str, int], int] = {
+    ("lamoure", 17): 1713,
+    ("mchenry", 17): 2133,
+    ("mcintosh", 17): 762,
+    ("lamoure", 18): 2021,
+    ("mchenry", 18): 2210,
+    ("mcintosh", 18): 2061,
+    ("lamoure", 20): 2054,
+    ("grant", 21): 835,
+    ("mchenry", 23): 2192,
+    ("sioux", 23): 610,
+    ("eddy", 26): 1030,
+    ("ransom", 31): 1820,
+    ("sargent", 31): 1594,
+    ("sheridan", 31): 622,
+    ("sioux", 31): 637,
+    ("slope", 31): 395,
+    ("steele", 31): 1261,
+    ("stutsman", 31): 4547,
+    ("towner", 31): 1350,
+    ("traill", 31): 2236,
+    ("walsh", 31): 3682,
+    ("ward", 31): 9370,
+    ("wells", 31): 2018,
+    ("williams", 31): 4765,
+}
+GAPS_1964 = {("pierce", 16), ("logan", 18), ("cass", 19), ("emmons", 20)}
 ALONE = {"Roger Johnson"}
 TITLES = {
     "lieutenant-governor": "Lieutenant Governor",
@@ -460,7 +511,52 @@ def parse() -> None:
 
         cells: dict[tuple[int, int], int] = {}
         unreadable: set[tuple[int, int]] = set()
-        if year in FILES:
+        if year in BANDED:
+            bands: list[list[tuple]] = []
+            for w in sorted(
+                (w for w in numbers if w[1] > lines[0][0] - 8), key=lambda w: (w[1] + w[3]) / 2
+            ):
+                if bands and (w[1] + w[3]) / 2 - bands[-1][-1][1] < 2.4:
+                    bands[-1].append(((w[0], (w[1] + w[3]) / 2, w[2], w[3], w[4])))
+                else:
+                    bands.append([(w[0], (w[1] + w[3]) / 2, w[2], w[3], w[4])])
+            bands = [band for band in bands if len(band) > 3]
+            while len(bands) < len(lines):
+                widest = max(range(len(bands)), key=lambda i: len(bands[i]))
+                members = bands[widest]
+                cut = max(range(1, len(members)), key=lambda i: members[i][1] - members[i - 1][1])
+                bands[widest : widest + 1] = [members[:cut], members[cut:]]
+            if len(bands) != len(lines):
+                raise ValueError(f"{year}: {len(bands)} bands for {len(lines)} rows")
+            for band in bands[-1:]:
+                band.sort()
+                merged = [band[0]]
+                for w in band[1:]:
+                    if len(w[4]) == 1 and -3 <= w[0] - merged[-1][2] < 5 and abs(w[1] - merged[-1][1]) < 1.5:
+                        merged[-1] = (merged[-1][0], merged[-1][1], w[2], w[3], merged[-1][4] + w[4])
+                    else:
+                        merged.append(w)
+                band[:] = merged
+            totals = sorted(bands[-1])
+            placed: dict[tuple[int, int], tuple] = {}
+            for line, band in enumerate(bands):
+                for w in band:
+                    column = column_of(w)
+                    middle = sorted(x[1] for x in band)[len(band) // 2]
+                    if (line, column) in placed and abs(placed[(line, column)][1] - middle) <= abs(w[1] - middle):
+                        continue
+                    placed[(line, column)] = w
+                    cells[(line, column)] = value(w[4])
+                    unreadable.discard((line, column))
+                    if "?" in w[4] or re.search(r",\d{1,2}$", w[4]):
+                        unreadable.add((line, column))
+            for (county, column), amount in READ_1964.items():
+                cells[(keys.index(county), column)] = amount
+            for county, column in GAPS_1964:
+                cells[(keys.index(county), column)] = 0
+                unreadable.add((keys.index(county), column))
+            unreadable -= {(keys.index(county), column) for county, column in READ_1964}
+        elif year in FILES:
             bycolumn: dict[int, list[tuple]] = {}
             for w in numbers:
                 bycolumn.setdefault(column_of(w), []).append(w)
