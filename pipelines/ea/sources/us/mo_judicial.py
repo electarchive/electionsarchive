@@ -11,7 +11,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.retention import display, identity
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.mo_judicial"
 VERSION = "1"
@@ -27,6 +27,18 @@ FILES = {
 }
 MANUAL = "https://www.sos.mo.gov/cmsimages/bluebook/{}/7_Elec.pdf"
 MANUALS = {
+    date(2000, 11, 7): (
+        "2001-2002",
+        "1-1",
+        ["Michael A. Wolff"],
+        "https://www.sos.mo.gov/cmsimages/bluebook/2001-2002/0645-0651.pdf",
+    ),
+    date(2002, 11, 5): (
+        "2003-2004",
+        "21-21",
+        ["Laura D. Stith"],
+        "https://www.sos.mo.gov/cmsimages/bluebook/2003-2004/622-655.pdf",
+    ),
     date(2004, 11, 2): (
         "2005-2006",
         "36-36",
@@ -77,11 +89,17 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            body = subprocess.run(
-                ["curl", "-sL", "-m", "180", f"https://web.archive.org/web/2020if_/{url}"],
-                capture_output=True,
-                check=True,
-            ).stdout
+            edition, name = url.split("/")[-2:]
+            delivered = DATA / "inbox" / "manual" / "MF-567" / edition / name
+            body = (
+                delivered.read_bytes()
+                if delivered.exists()
+                else subprocess.run(
+                    ["curl", "-sL", "-m", "180", f"https://web.archive.org/web/2020if_/{url}"],
+                    capture_output=True,
+                    check=True,
+                ).stdout
+            )
             raw.store(
                 SOURCE,
                 url,
@@ -112,10 +130,12 @@ def manual_lines() -> list[dict[str, object]]:
         seen: dict[str, list[int]] = {}
         printed: list[int] | None = None
         for line in text[start:]:
+            line = re.sub(r"November \d+, \d{4}", "", line)
             line = re.sub(
                 r"OFFICIAL MANUAL.*$", "", re.sub(r"(,\d{3})\d{3} OFFICIAL MANUAL", r"\1 OFFICIAL MANUAL", line.strip())
             )
-            for name, figures in re.findall(r"([A-Z][A-Z .'-]*?[A-Z]) ((?:\d[\d,]* ?)+)", line):
+            for name, figures in re.findall(r"([A-Za-z][A-Za-z .'-]*?[A-Za-z]) ((?:\d[\d,]* ?)+)", line):
+                name = name.upper()
                 values = [int(value.replace(",", "")) for value in figures.split()]
                 if len(values) != width:
                     continue
