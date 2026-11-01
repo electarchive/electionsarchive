@@ -11122,6 +11122,15 @@ def parse() -> None:
                         )
                     ):
                         seat = f"{term[2]} Year Term"
+                    if (
+                        state == "NJ"
+                        and role == "board-of-education"
+                        and not seat
+                        and "board" in rest
+                        and "regional" in rest[: rest.index("board")]
+                        and "regional" not in label.lower()
+                    ):
+                        seat = " ".join(rest[: rest.index("board")]).title()
                     if role is not None:
                         code = owner.split(":", 1)[1]
                         template, tail = "", f"{state}:{code}:{role}" + (f":{slug(seat)}" if seat else "")
