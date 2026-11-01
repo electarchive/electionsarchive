@@ -22,6 +22,7 @@ HISTORY = "https://sos.nd.gov/sites/default/files/documents/elections/election-r
 PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
+    1940: "1940-11-05-general",
     1944: "1944-11-07-general",
     1948: "1948-11-02-general",
     1950: "1950-11-07-general",
@@ -42,6 +43,7 @@ FILES = {
     1990: "1990-11-06-general",
 }
 DAYS = {
+    1940: date(1940, 11, 5),
     1944: date(1944, 11, 7),
     1992: date(1992, 11, 3),
     1994: date(1994, 11, 8),
@@ -173,6 +175,30 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             37: ("insurance-commissioner", "O. R. Vold", None),
             38: ("commissioner-of-agriculture", "Math Dahl", None),
             39: ("public-service-commissioner", "C. W. McDonnell", None),
+        },
+    ),
+    1940: (
+        0,
+        {
+            14: ("lieutenant-governor", "Oscar W. Hagen", None),
+            15: ("lieutenant-governor", "Leslie R. Burgum", None),
+            16: ("secretary-of-state", "Herman Thorson", None),
+            17: ("secretary-of-state", "Alfred S. Dale", None),
+            18: ("auditor", "Berta E. Baker", None),
+            19: ("auditor", "Bernhard M. Klinger", None),
+            20: ("treasurer", "Carl Anderson", None),
+            21: ("treasurer", "Max H. Strehlow", None),
+            22: ("attorney-general", "Alvin C. Strutz", None),
+            23: ("attorney-general", "Halvor L. Halvorson", None),
+            24: ("insurance-commissioner", "Oscar E. Erickson", None),
+            25: ("insurance-commissioner", "Ole H. Olson", None),
+            26: ("commissioner-of-agriculture", "Math Dahl", None),
+            27: ("commissioner-of-agriculture", "A. L. Lindstrom", None),
+            28: ("public-service-commissioner", "Ben C. Larkin", None),
+            29: ("public-service-commissioner", "C. W. McDonnell", None),
+            30: ("public-service-commissioner", "J. C. Costello", None),
+            31: ("public-service-commissioner", "Rudolph Raber", None),
+            32: ("public-service-commissioner", "Conrad C. Johnson", None),
         },
     ),
     1948: (
@@ -445,6 +471,9 @@ NUMBER = r"[\dIl][\dIl,.?<]*['`’:;]?|(?=.*\d)[\dIlS][\dIlo,.?<]*['`’:;]?"
 BANDED = {1964}
 EDGES = {1966: 100}
 ERRATA = {
+    (1940, "Alvin C. Strutz"),
+    (1940, "Math Dahl"),
+    (1940, "Alfred S. Dale"),
     (1944, "Nels G. Johnson"),
     (1944, "Thomas Hall"),
     (1944, "Oscar W. Hagen"),
