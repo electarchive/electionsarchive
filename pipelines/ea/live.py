@@ -10,7 +10,7 @@ from uuid import UUID
 
 import httpx
 
-from ea.sources.us import enr_2026
+from ea.sources.us import enr_2026, nyc_enr_live
 from ea.store import DATA, Connection, connect
 
 FEEDS = Path(__file__).with_name("live_feeds.toml")
@@ -48,11 +48,16 @@ def sync() -> str:
 
 
 def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) -> str:
-    if adapter != "us.enr_2026":
-        raise ValueError(f"unknown adapter {adapter}")
     fetched_at = datetime.now(UTC)
     pages: dict[str, tuple[bytes, str]] = {}
-    enr_2026.collect(client, {params["state"]}, lambda _, url, content, suffix: pages.update({url: (content, suffix)}))
+    if adapter == "us.enr_2026":
+        enr_2026.collect(
+            client, {params["state"]}, lambda _, url, content, suffix: pages.update({url: (content, suffix)})
+        )
+    elif adapter == "us.nyc_enr":
+        pages = nyc_enr_live.collect(client)
+    else:
+        raise ValueError(f"unknown adapter {adapter}")
     with connect() as conn:
         if not any(not url.endswith(enr_2026.LISTINGS) for url in pages):
             record(conn, feed, fetched_at, None, None, None, "error", "no result pages")
@@ -77,7 +82,11 @@ def poll(feed: str, adapter: str, params: dict[str, str], client: httpx.Client) 
             paths[url].write_bytes(content)
             index[url] = paths[url].name
         (folder / "index.json").write_text(json.dumps(index, indent=1))
-        tallies, unmatched = enr_2026.plan(conn, enr_2026.table({params["state"]: paths}), lambda _, __: None)
+        tallies, unmatched = (
+            enr_2026.plan(conn, enr_2026.table({params["state"]: paths}), lambda _, __: None)
+            if adapter == "us.enr_2026"
+            else nyc_enr_live.plan(conn, feed, paths)
+        )
         for line in sorted(set(unmatched)):
             issue(conn, feed, "unmatched", line)
         written = 0

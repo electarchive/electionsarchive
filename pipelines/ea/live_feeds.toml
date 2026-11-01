@@ -182,3 +182,10 @@ params = { state = "OH" }
 publisher = "Ohio Secretary of State"
 url = "https://www.ohiosos.gov/elections/election-results-and-data/2026-official-elections-results/"
 note = "county election sites only"
+
+[[feed]]
+id = "us.nyc_enr"
+adapter = "us.nyc_enr"
+publisher = "Board of Elections in the City of New York"
+url = "https://enr.boenyc.gov/"
+note = "city contests and districts inside the city; statewide races and districts that cross the city line wait for a statewide feed"
