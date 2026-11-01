@@ -17,9 +17,7 @@ HOST = "www.livevoterturnout.com"
 def fetch() -> None:
     _, index = raw._index(SOURCE)
     listed = enr_clarity.tenants(PLATFORM)
-    for fips in sorted({row["county_fips"][:2] for row in listed}):
-        for layer in enr_clarity.LAYERS:
-            raw.fetch(SOURCE, enr_clarity.CENSUS.format(fips=fips, layer=layer), suffix=".zip")
+    enr_clarity.fetch_shapes(SOURCE, {row["county_fips"][:2] for row in listed})
     for row in listed:
         fetched = 0
         for number in range(1, int(row["last"] or 0) + 6):

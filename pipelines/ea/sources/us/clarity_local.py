@@ -2,6 +2,7 @@ import io
 import json
 import re
 import zipfile
+from collections import Counter
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -656,6 +657,46 @@ def parse() -> None:
             ),
             [],
         ).append(row)
+    choices: dict[tuple[object, ...], set[str]] = {}
+    places: dict[tuple[object, ...], set[object]] = {}
+    for line in lines:
+        key = (line["county"], line["election"], line["contest"])
+        places.setdefault(key, set())
+        choices.setdefault(key, set())
+        if line["place"] is not None:
+            places[key].add(line["place"])
+        if line["choice"] != "Write-ins":
+            choices[key].add(re.sub(r"[^a-z0-9]+", "", str(line["choice"]).lower()))
+    joined: dict[tuple[object, ...], object] = {}
+    merged: Counter[tuple[object, ...]] = Counter()
+    for rows in groups.values():
+        kept: list[dict[str, object]] = []
+        for row in rows:
+            key = (row["county"], row["election"], row["contest"])
+            base = next(
+                (
+                    other
+                    for other in kept
+                    if other["magnitude"] == row["magnitude"]
+                    and choices[key]
+                    and choices[(other["county"], other["election"], other["contest"])] == choices[key]
+                    and not places[(other["county"], other["election"], other["contest"])] & places[key]
+                ),
+                None,
+            )
+            if base is None:
+                kept.append(row)
+            else:
+                joined[key] = base["contest"]
+                places[(base["county"], base["election"], base["contest"])] |= places[key]
+                merged[(base["county"], base["election"], base["contest"])] += 1
+                base["joined"] = merged[(base["county"], base["election"], base["contest"])]
+        rows[:] = kept
+    contests = [row for row in contests if (row["county"], row["election"], row["contest"]) not in joined]
+    for row in contests:
+        row.setdefault("joined", 0)
+    for line in lines:
+        line["contest"] = joined.get((line["county"], line["election"], line["contest"]), line["contest"])
     for rows in groups.values():
         if len(rows) == 1:
             continue
@@ -1030,6 +1071,12 @@ def emit() -> Path:
                 + (f"-{slug(row['variant'])}" if row["variant"] else "")
             )
             contest = cs.key("us.contest", contest_key)
+            for number in range(2, 2 + int(row.get("joined") or 0)):
+                for (stale,) in conn.execute(
+                    "select entity_id from external_id where scheme = 'us.contest' and value = %s and entity_id <> %s",
+                    [f"{contest_key}:contest-{number}", contest],
+                ).fetchall():
+                    cs.merge(stale, contest)
             if contest_path in slugs and slugs[contest_path] != contest:
                 continue
             slugs[contest_path] = contest

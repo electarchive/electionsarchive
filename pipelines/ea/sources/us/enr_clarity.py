@@ -27,6 +27,7 @@ VERSION = "1"
 HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
+SCHOOL_LAYERS = ("elsd", "scsd")
 TITLE = "Election night reporting results"
 OWN_MEMBERSHIPS = {
     "us.oh_franklin",
@@ -306,7 +307,7 @@ SPECIALS = (
     (r"(?:PUBLIC |MUNICIPAL )?IMPROVEMENT DISTRICT|\bPID\b", "improvement", "Improvement District"),
     (r"LIBRARY DISTRICT", "library", "Library District"),
     (
-        r"COMMUNITY COLLEGE(?: DISTRICT)?|JUNIOR COLLEGE(?: DISTRICT)?|COLLEGE DISTRICT|\bACC\b",
+        r"COMMUNITY COLLEGE(?: DISTRICT)?|JUNIOR COLLEGE(?: DISTRICT)?|COLLEGE DISTRICT|\bACC\b(?! INS)",
         "college",
         "Community College District",
     ),
@@ -347,6 +348,10 @@ PARTIAL = (
     "Only part of this jurisdiction's vote is here: the counties that report it on their election night sites "
     "cover about {share} of its land area. Votes cast in {missing} are missing, so no winner is recorded."
 )
+PARTIAL_DISTRICT = (
+    "Only part of this district's vote is here: the district reaches into {missing}, "
+    "whose votes are missing, so no winner is recorded."
+)
 SUPERSEDED = (
     "A city-wide official count of this contest, covering the whole jurisdiction, replaces this county-part count as the "
     "default result set; this set stays as the counties' own figures."
@@ -381,13 +386,23 @@ def tenants(platform: str = "clarity") -> list[dict[str, str]]:
         ]
 
 
+def fetch_shapes(source: str, states: set[str]) -> None:
+    for fips in sorted(states):
+        for layer in LAYERS:
+            raw.fetch(source, CENSUS.format(fips=fips, layer=layer), suffix=".zip")
+        for layer in SCHOOL_LAYERS:
+            try:
+                raw.fetch(source, CENSUS.format(fips=fips, layer=layer), suffix=".zip")
+            except httpx.HTTPStatusError as error:
+                if error.response.status_code != 404:
+                    raise
+
+
 def fetch() -> None:
     _, index = raw._index(SOURCE)
     cutoff = date.today() - timedelta(days=14)
     settled = date.today() - timedelta(days=120)
-    for fips in sorted({row["county_fips"][:2] for row in tenants()}):
-        for layer in LAYERS:
-            raw.fetch(SOURCE, CENSUS.format(fips=fips, layer=layer), suffix=".zip")
+    fetch_shapes(SOURCE, {row["county_fips"][:2] for row in tenants()})
     failures = 0
     for row in tenants():
         tenant = row["tenant"]
@@ -579,13 +594,22 @@ def parse(
             kind = {"21": "borough", "25": "city", "43": "town", "47": "village"}[lsad]
             jurisdictions[("us.place", str(record["GEOID"]))] = (str(record["NAME"]), kind, str(record["NAME"]))
             geoms.append(("us.place", str(record["GEOID"]), geom))
-        for record, geom in _shapes(fips, "unsd", source):
-            jurisdictions[("us.school_district", str(record["GEOID"]))] = (
-                str(record["NAME"]),
-                "school",
-                str(record["NAME"]),
-            )
-            geoms.append(("us.school_district", str(record["GEOID"]), geom))
+        for layer in ("unsd", *SCHOOL_LAYERS):
+            try:
+                records = _shapes(fips, layer, source)
+            except LookupError:
+                if layer == "unsd":
+                    raise
+                continue
+            for record, geom in records:
+                if not re.search(r"[A-Za-z]", SCHOOL_WORDS.sub(" ", _plain(str(record["NAME"])))):
+                    continue
+                jurisdictions[("us.school_district", str(record["GEOID"]))] = (
+                    str(record["NAME"]),
+                    "school",
+                    str(record["NAME"]),
+                )
+                geoms.append(("us.school_district", str(record["GEOID"]), geom))
     shares: dict[tuple[str, str], dict[str, float]] = {}
     with connect() as conn:
         conn.execute("create temp table shape (scheme text, code text, geojson text)")
@@ -842,6 +866,32 @@ def parse(
         for (code, _), into in sorted(canonical.items()):
             if into != code:
                 print(f"special district {code} resolved to {into}")
+    specials = (
+        table.filter(pl.col("scheme") == "us.special_district")["code"].unique().to_list() if table.height else []
+    )
+    with connect() as conn:
+        held: dict[UUID, list[str]] = {}
+        for value, entity in conn.execute(
+            "select value, entity_id from external_id where scheme = 'us.polity' and value = any(%s) order by value",
+            [[f"special:{code}" for code in specials]],
+        ).fetchall():
+            held.setdefault(entity, []).append(value.removeprefix("special:"))
+    days: dict[str, set[object]] = {}
+    for code, day in table.filter(pl.col("scheme") == "us.special_district").select("code", "day").iter_rows():
+        days.setdefault(code, set()).add(day)
+    joined: dict[str, str] = {}
+    for codes in held.values():
+        shared = [code for code in codes if any(days[code] & days[other] for other in codes if other != code)]
+        if len(shared) > 1:
+            into = max(shared, key=lambda code: (len(days[code]), code))
+            joined |= {code: into for code in shared if code != into}
+    table = table.with_columns(
+        code=pl.when(pl.col("scheme") == "us.special_district")
+        .then(pl.col("code").replace(joined))
+        .otherwise(pl.col("code")),
+    )
+    if joined:
+        print(f"{len(joined)} special district codes join a merged district's contests under one code")
     totals = frame.filter(pl.col("place").is_null()).drop("place")
     counted = (
         frame.filter(pl.col("place").is_not_null())
@@ -998,7 +1048,7 @@ def _district(text: str, pattern: str, kind: str, noun: str, county_name: str, c
     head = re.sub(r"\s+", " ", re.sub(r"\b(?:OF|THE|FOR|ELECTION|DIRECTORS?)\b", " ", head)).strip(" ,-/")
     if head in ("", "COUNTY") or head.startswith("COUNTY "):
         head = f"{county_name} {head or 'COUNTY'}" if head.startswith("COUNTY") else f"{county_name} COUNTY"
-    if kind == "college" and re.search(r"\bACC\b|AUSTIN", text):
+    if kind == "college" and re.search(r"\bACC\b(?! INS)|AUSTIN", text):
         head, noun = "AUSTIN", "Community College District"
     display = f"{_title(head)} {noun}" + (f" {number[1]}" if number else "")
     if kind == "reclamation" and re.search(r"METROPOLITAN|GREATER CHICAGO", text):
@@ -1297,6 +1347,61 @@ def emit(
     counties_listed = sorted(set(contests["county"].to_list()))
     pattern = "|".join(states)
     with connect() as conn:
+        alias_codes: dict[str, list[str]] = {}
+        for (codes,) in conn.execute(
+            """select array_agg(substr(value, 9) order by value) from external_id
+               where scheme = 'us.polity' and value like 'special:%' group by entity_id having count(*) > 1"""
+        ).fetchall():
+            for code in codes:
+                alias_codes[code] = [other for other in codes if other != code]
+        codes_of = dict(
+            contests.filter(pl.col("scheme") == "us.special_district")
+            .select("contest_key", "code")
+            .unique()
+            .iter_rows()
+        )
+        candidates = {
+            contest_key: [
+                contest_key,
+                *(contest_key.replace(f":{code}:", f":{other}:", 1) for other in alias_codes[code]),
+            ]
+            for contest_key, code in codes_of.items()
+            if code in alias_codes
+        }
+        known: dict[str, tuple[UUID, bool]] = {
+            value: (entity, mine)
+            for value, entity, mine in conn.execute(
+                """select x.value, coalesce(m.into_id, x.entity_id), coalesce(bool_or(g.pipeline = %s), false)
+                   from external_id x
+                   left join entity_merge m on m.entity_id = x.entity_id
+                   left join result_set r on r.contest_id = x.entity_id
+                   left join changeset g on g.id = r.changeset_id
+                   where x.scheme = 'us.contest' and x.value = any(%s) group by 1, 2""",
+                [
+                    source,
+                    list({*contests["contest_key"].to_list(), *(key for keys in candidates.values() for key in keys)}),
+                ],
+            ).fetchall()
+        }
+        claimed = {known[key][0] for key in contests["contest_key"].unique().to_list() if key in known}
+        reused: dict[str, str] = {}
+        stale_keys: dict[str, list[str]] = {}
+        for contest_key, keys in candidates.items():
+            found = sorted(
+                (key for key in keys if key in known and (key == contest_key or known[key][0] not in claimed)),
+                key=lambda key: not known[key][1],
+            )
+            if found:
+                into = known[found[0]][0]
+                claimed.add(into)
+                reused[contest_key] = found[0]
+                stale_keys[found[0]] = [key for key in found[1:] if known[key][1] and known[key][0] != into]
+                claimed.update(known[key][0] for key in stale_keys[found[0]])
+        if reused:
+            print(
+                f"{sum(key != into for key, into in reused.items())} contests keep the key of a merged district's code"
+            )
+        contests = contests.with_columns(contest_key=pl.col("contest_key").replace(reused))
         polities: dict[str, tuple[UUID, str, str]] = {}
         for scheme, code, polity, text, path in conn.execute(
             """select a.scheme_code, c.code, t.polity_id, n.text, s.path from area a
@@ -1315,18 +1420,19 @@ def emit(
                 "select path, entity_id from slug where path like any(%s)", [[f"us/{st.lower()}/%" for st in states]]
             ).fetchall()
         )
-        taken = set(
-            conn.execute(
-                """select e.date_from, x.value from contest c
-                   join election e on e.id = c.election_id
-                   join result_set r on r.contest_id = c.id
-                   join changeset g on g.id = r.changeset_id
-                   join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
-                     and x.scheme in ('us.office', 'us.body')
-                   where split_part(x.value, ':', 1) = any(%s) and g.pipeline <> %s""",
-                [states, source],
-            ).fetchall()
-        )
+        taken: dict[tuple[object, str], set[str]] = {}
+        for held_on, value, key in conn.execute(
+            """select e.date_from, x.value, k.value from contest c
+               join election e on e.id = c.election_id
+               join result_set r on r.contest_id = c.id
+               join changeset g on g.id = r.changeset_id
+               join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
+                 and x.scheme in ('us.office', 'us.body')
+               left join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
+               where split_part(x.value, ':', 1) = any(%s) and g.pipeline <> %s""",
+            [states, source],
+        ).fetchall():
+            taken.setdefault((held_on, value), set()).add("*" if key is None else ":".join(key.split(":")[2:5]))
         bodies = {
             value
             for (value,) in conn.execute(
@@ -1334,22 +1440,23 @@ def emit(
                 [states],
             ).fetchall()
         }
-        asked = set(
-            conn.execute(
-                """select e.date_from, a.code from contest c
-                   join election e on e.id = c.election_id
-                   join result_set r on r.contest_id = c.id
-                   join changeset g on g.id = r.changeset_id
-                   join area_code a on a.area_id = c.district_area_id
-                   where c.kind = 'ballot_question' and g.pipeline <> %s and left(a.code, 2) = any(%s)""",
-                [source, fips],
-            ).fetchall()
-        )
+        asked: dict[tuple[object, str], set[str]] = {}
+        for held_on, area, key in conn.execute(
+            """select e.date_from, a.code, k.value from contest c
+               join election e on e.id = c.election_id
+               join result_set r on r.contest_id = c.id
+               join changeset g on g.id = r.changeset_id
+               join area_code a on a.area_id = c.district_area_id
+               left join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
+               where c.kind = 'ballot_question' and g.pipeline <> %s and left(a.code, 2) = any(%s)""",
+            [source, fips],
+        ).fetchall():
+            asked.setdefault((held_on, area), set()).add("*" if key is None else ":".join(key.split(":")[2:5]))
         held = {
             value
             for (value,) in conn.execute(
                 """select x.value from external_id x
-                   join result_set r on r.contest_id = x.entity_id
+                   join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
                    join changeset g on g.id = r.changeset_id
                    where x.scheme = 'us.contest' and g.pipeline <> %s and split_part(x.value, ':', 2) = any(%s)""",
                 [source, states],
@@ -1455,6 +1562,11 @@ def emit(
         for code in fips:
             for layer in LAYERS:
                 cs.artifact(raw.cached(source, CENSUS.format(fips=code, layer=layer)), census)
+            for layer in SCHOOL_LAYERS:
+                try:
+                    cs.artifact(raw.cached(source, CENSUS.format(fips=code, layer=layer)), census)
+                except LookupError:
+                    continue
         sources: dict[str, UUID] = {}
         staged: set[UUID] = set()
         publishers: dict[str, str] = {}
@@ -1775,14 +1887,26 @@ def emit(
             if uuid5(NAMESPACE, f"external_id:us.contest\x1f{contest_key}") in cs.retired:
                 skipped["retired"] += 1
                 continue
+            piece = {"*", ":".join(contest_key.split(":")[2:5])} if scheme == "us.special_district" else None
             if (
                 contest_key in held
-                or (not question and any((day, alias) in taken for alias in aliases))
-                or (question and (day, code) in asked)
+                or (
+                    not question
+                    and any(
+                        (day, alias) in taken and (piece is None or bool(piece & taken[(day, alias)]))
+                        for alias in aliases
+                    )
+                )
+                or (question and (day, code) in asked and (piece is None or bool(piece & asked[(day, code)])))
             ):
                 skipped["held by another pipeline"] += 1
                 continue
-            shares = made[(scheme, code)][2] if (scheme, code) in made else {code[:5]: 1.0}
+            shares = dict(made[(scheme, code)][2]) if (scheme, code) in made else {code[:5]: 1.0}
+            for other in alias_codes.get(code, []) if scheme == "us.special_district" else []:
+                for county, share in (
+                    made[(scheme, other)][2] if (scheme, other) in made else {other[:5]: 1.0}
+                ).items():
+                    shares.setdefault(county, share)
             carried = set(rows["county"].to_list())
             whole = sum(shares.values()) or 1.0
             missing = (
@@ -1791,7 +1915,7 @@ def emit(
                 else sorted(county for county, share in shares.items() if share >= 0.01 and county not in carried)
             )
             completeness = 1.0 if not missing else round(sum(shares.get(county, 0.0) for county in carried) / whole, 3)
-            if completeness < floor:
+            if completeness < floor and scheme != "us.special_district":
                 skipped["under half its area reported"] += 1
                 continue
             uniform = st == "TX" and (
@@ -1904,6 +2028,13 @@ def emit(
                 + (f"-{first['variant']}" if first["variant"] else "")
             )
             contest = cs.key("us.contest", contest_key)
+            for (stale,) in conn.execute(
+                """select distinct coalesce(m.into_id, x.entity_id) from external_id x
+                   left join entity_merge m on m.entity_id = x.entity_id
+                   where x.scheme = 'us.contest' and x.value = any(%s) and coalesce(m.into_id, x.entity_id) <> %s""",
+                [stale_keys.get(contest_key, []), contest],
+            ).fetchall():
+                cs.merge(stale, contest)
             contest_path = next(
                 (
                     candidate
@@ -2122,7 +2253,9 @@ def emit(
                     "note",
                     entity_id=result_set,
                     kind="caveat",
-                    body_md=PARTIAL.format(share=f"{completeness:.0%}", missing=lacking),
+                    body_md=(PARTIAL_DISTRICT if scheme == "us.special_district" else PARTIAL).format(
+                        share=f"{completeness:.0%}", missing=lacking
+                    ),
                 )
             totals = (
                 counted.filter(pl.col("place").is_null())

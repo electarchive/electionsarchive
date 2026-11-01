@@ -8,8 +8,8 @@ from ea.sources.us.enr_clarity_twins import LIVE, _person
 from ea.store import connect
 
 SOURCE = "us.special_district_merge"
-VERSION = "1"
-PIPELINES = ["us.enr_clarity", "us.enr_clarity_json", "us.enr_static", "us.kane_il"]
+VERSION = "2"
+PIPELINES = ["us.enr_clarity", "us.enr_clarity_json", "us.enr_static", "us.kane_il", "us.tx_collin", "us.stl_boe"]
 GENERIC = re.compile(
     r"\b(?:no|number|ward|wd|district|dist|subdistrict|subdivision|protection|fire|water|sewer|sewerage|drainage|drain|"
     r"gravity|grav|road|rd|lighting|light|recreation|recreational|hospital|hosp|service|services|ser|serv|svc|area|"
@@ -23,10 +23,11 @@ GENERIC = re.compile(
 )
 ALIASES = {("17", "foxmetrowaterdistrict4"): "foxmetrowaterreclamationdistrict"}
 UNRELATED = {"increasesfundingsourcespublicschoolscommunitycollegedistrict"}
-STRAYS = {"special:48085:college:austin-community-college-district"}
 MISREAD = {
     "special:17043:fire:bloomingdale-emergency-services-district-13": "Bloomingdale's ESD 13 is Bloomingdale School "
-    "District 13, an elementary school district, not an emergency services district; the archive holds no polity for it yet"
+    "District 13, an elementary school district, not an emergency services district",
+    "special:48085:college:austin-community-college-district": "Collin County's 1999 line on casualty and accident "
+    "insurance (Acc Ins) is a state constitutional amendment, not an Austin Community College District question",
 }
 PREFERRED = "(select text from name n where n.entity_id = {0} and n.is_preferred and n.lang = 'en' limit 1)"
 
@@ -138,7 +139,7 @@ def emit() -> Path:
                 where x.value like 'special:%%' and {LIVE.format("p")}
                 order by p.id, x.value"""
         ).fetchall():
-            if polity not in cs.survivors and value not in STRAYS:
+            if polity not in cs.survivors and value not in MISREAD:
                 county = value.split(":")[1]
                 folded = _folded(text)
                 named[(county[:2], ALIASES.get((county[:2], folded), folded))].append(

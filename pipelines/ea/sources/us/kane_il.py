@@ -26,8 +26,7 @@ def _days() -> list[str]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, f"{HOST}/", suffix=".html")
-    for layer in enr_clarity.LAYERS:
-        raw.fetch(SOURCE, enr_clarity.CENSUS.format(fips="17", layer=layer), suffix=".zip")
+    enr_clarity.fetch_shapes(SOURCE, {"17"})
     for day in _days():
         raw.fetch(SOURCE, f"{HOST}/{day}/Contests/", suffix=".html")
 
