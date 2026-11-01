@@ -28,6 +28,11 @@ FRANKLIN = "https://vote.franklincountyohio.gov"
 FRANKLIN_PAGE = f"{FRANKLIN}/election-info/2026"
 FRANKLIN_DIR = INBOX / "franklin" / "notices"
 LORAIN_FILE = "https://www.voteloraincountyohio.gov/_files/ugd/2568d0_fd0d57cfa16c443899cf8c9653a28945.pdf"
+MF = DATA / "inbox" / "manual" / "MF-540"
+MF_LOOKUP = (
+    "Ashtabula Athens Tuscarawas Mahoning Licking Perry Clark Greene Harrison Geauga Richland Fulton Portage Lucas"
+).split()
+MF_SAMPLES = [*MF_LOOKUP, "Sandusky"]
 SOURCES = {
     HAMILTON: (
         "Hamilton",
@@ -75,7 +80,7 @@ SCHOOLS = "us.oh_questions_2026"
 DIRECTORY = "https://educationdata.urban.org/api/v1/school-districts/ccd/directory/2022/?fips=39"
 PRECINCT = re.compile(r"(?<=[a-z])\s+(?:\d+-?[A-Z]|[A-Z])$|(?<=[A-Z])\s+\d+-[A-Z]$")
 START = re.compile(
-    r"^(?:\d+(?:\s\d)?\s+)?(?:T)?(Proposed|PROPOSED|Special Election|SPECIAL ELECTION|Advisory|ADVISORY|Local|LOCAL)\b"
+    r"^(?:Sample\s*)*(?:[#]?\d+[.]?(?:\s\d)?\s*)?(?:T)?(Proposed|PROPOSED|Special Election|SPECIAL ELECTION|Advisory|ADVISORY|Local|LOCAL)\b"
 )
 
 
@@ -96,6 +101,46 @@ def fetch() -> None:
                 media_type="application/pdf",
             )
     fetch_franklin()
+    for county, path in mf_files():
+        key = mf_key(county, path)
+        try:
+            raw.cached(SOURCE, key)
+        except LookupError:
+            raw.store(
+                SOURCE,
+                key,
+                path.read_bytes(),
+                suffix=".pdf",
+                retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
+                media_type="application/pdf",
+            )
+
+
+def mf_files() -> list[tuple[str, Path]]:
+    return [
+        (county, path)
+        for county in [*MF_SAMPLES, "Stark"]
+        for path in sorted((MF / county.lower()).glob("*.pdf"))
+        if county != "Stark" or "legal ad" in path.name
+    ]
+
+
+def mf_page(county: str) -> str:
+    if county in MF_LOOKUP:
+        return f"https://lookup.boe.ohio.gov/vtrapp/{county.lower()}/ballotlist.aspx"
+    return f"https://www.boe.ohio.gov/{county.lower()}"
+
+
+def mf_key(county: str, path: Path) -> str:
+    return f"{mf_page(county)}#{path.name}"
+
+
+def mf_meta(county: str, path: Path) -> dict[str, str]:
+    kind = "Legal notice" if county == "Stark" else "Sample ballot"
+    return {
+        "publisher": f"{county} County Board of Elections",
+        "title": f"{kind} {path.stem}, November 3, 2026 General Election",
+    }
 
 
 def franklin_notices() -> list[str]:
@@ -279,7 +324,7 @@ def ballot_issues(lines: list[str], url: str, county: str) -> list[dict[str, str
             print("no header:", county, head)
             continue
         head[0] = re.sub(
-            r"^(?:\d+(?:\s\d)?\s+)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)", "", head[0]
+            r"^(?:Sample\s*)*(?:#?\d+\.?(?:\s\d)?\s*)?T?(?=Proposed|PROPOSED|Special|SPECIAL|Advisory|ADVISORY|Local|LOCAL)", "", head[0]
         )
         cursor = index + 1
         if lines[cursor].startswith("necessary for passage"):
@@ -326,8 +371,60 @@ def lorain() -> list[dict[str, str]]:
     return ballot_issues(ocr(LORAIN_FILE), LORAIN_FILE, "Lorain")
 
 
+def mf_samples() -> list[dict[str, str]]:
+    rows: dict[tuple[str, str, str, str], dict[str, str]] = {}
+    for county, path in mf_files():
+        if county == "Stark":
+            continue
+        key = mf_key(county, path)
+        text = subprocess.run(
+            ["pdftotext", "-raw", str(raw.cached(SOURCE, key).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        for row in ballot_issues(text.split("\n"), key, county):
+            rows.setdefault((county, row["kind"], row["entity"], row["text"]), {**row, **mf_meta(county, path)})
+    return list(rows.values())
+
+
+def stark() -> list[dict[str, str]]:
+    rows = []
+    for county, path in mf_files():
+        if county != "Stark":
+            continue
+        key = mf_key(county, path)
+        text = subprocess.run(
+            ["pdftotext", "-raw", str(raw.cached(SOURCE, key).path), "-"], capture_output=True, text=True, check=True
+        ).stdout
+        heading = text.split("Notice is hereby given")[0].replace("LEGAL NOTICE", "")
+        entity = re.sub(r"\s+", " ", heading).strip()
+        entity = re.sub(r"\s*\(.*\)$", "", entity)
+        entity = re.sub(r"(?<=Township) (?:Fire|Road) District(?: Number One)?$", "", entity).strip()
+        if entity == "Stark County Library District":
+            entity = "Stark County District Library"
+        quoted = re.search(r"\u201c(.+?)\u201d", text, flags=re.DOTALL)
+        if quoted is None:
+            print("no quote:", path.name)
+            continue
+        body = re.sub(r"\s+", " ", quoted[1]).strip()
+        lower = body.lower()
+        if "income" in lower:
+            kind = "Proposed Income Tax"
+        elif lower.startswith("shall bonds"):
+            kind = "Proposed Bond Issue"
+        else:
+            kind = "Proposed Tax Levy"
+        for word in ("additional", "renewal"):
+            if re.match(rf"(an? )?{word}|.{{0,40}}\b{word}\b", lower):
+                kind += f" ({word.title()})"
+                break
+        rows.append({"url": key, "county": county, "kind": kind, "entity": entity, "text": body, **mf_meta(county, path)})
+    return rows
+
+
 def parse() -> None:
-    frame = pl.DataFrame(hamilton() + summit() + cuyahoga() + wayne() + lorain() + franklin(), infer_schema_length=None)
+    frame = pl.DataFrame(
+        hamilton() + summit() + cuyahoga() + wayne() + lorain() + franklin() + mf_samples() + stark(),
+        infer_schema_length=None,
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "issues.parquet")
     print(frame.group_by("county").len().rows())
@@ -496,8 +593,9 @@ def emit() -> Path:
                     _, _, publisher, title = SOURCES.get(row["url"]) or (
                         "",
                         None,
-                        "Franklin County Board of Elections",
-                        f"Notice of election: {re.sub(r'-+', ' ', urlparse(row['url']).path.rsplit('/', 1)[-1].removeprefix('Notice-of-Election-'))}, November 3, 2026 General Election",
+                        row.get("publisher") or "Franklin County Board of Elections",
+                        row.get("title")
+                        or f"Notice of election: {re.sub(r'-+', ' ', urlparse(row['url']).path.rsplit('/', 1)[-1].removeprefix('Notice-of-Election-'))}, November 3, 2026 General Election",
                     )
                     sources[row["url"]] = cs.source(publisher, title)
                     cs.add(
