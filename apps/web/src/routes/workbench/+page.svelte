@@ -19,6 +19,7 @@
   import { toast } from "svelte-sonner";
   import { on } from "svelte/events";
   import { MediaQuery, SvelteSet } from "svelte/reactivity";
+  import { copy } from "#lib/clipboard.js";
   import { Button, buttonVariants } from "#lib/components/ui/button/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
@@ -683,7 +684,7 @@
           variant="outline"
           size="sm"
           onclick={async () => {
-            await navigator.clipboard.writeText(location.href);
+            await copy(location.href);
             toast.success(m.workbench_copied());
           }}><LinkIcon />{m.workbench_copy()}</Button
         >

@@ -16,6 +16,7 @@
   import type { SegmentedOption } from "#lib/components/ui/segmented/index.js";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
   import type { Board, Cell, Kind, Panel } from "#lib/live/board/layout.js";
+  import { copy } from "#lib/clipboard.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import * as Dialog from "#lib/components/ui/dialog/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
@@ -358,7 +359,7 @@
     const url = new URL(page.url.href);
     url.hash = `b=${packed}`;
     try {
-      await navigator.clipboard.writeText(url.toString());
+      await copy(url.toString());
       isShared = true;
       setTimeout(() => {
         isShared = false;

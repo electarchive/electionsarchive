@@ -80,7 +80,9 @@ export const SIZES: Record<
 };
 
 export function id() {
-  return crypto.randomUUID().slice(0, 8);
+  return [...crypto.getRandomValues(new Uint8Array(4))]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function collides(a: Panel, b: Panel) {

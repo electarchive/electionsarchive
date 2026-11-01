@@ -8,6 +8,7 @@
   import ShareIcon from "@lucide/svelte/icons/share";
   import { getContext, onDestroy, untrack } from "svelte";
   import { toast } from "svelte-sonner";
+  import { copy } from "#lib/clipboard.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { m } from "#lib/paraglide/messages.js";
   import { provenance } from "#lib/provenance.svelte.js";
@@ -73,9 +74,9 @@
   }
 
   function vector(source: SVGSVGElement) {
-    const copy = source.cloneNode(true) as SVGSVGElement;
+    const clone = source.cloneNode(true) as SVGSVGElement;
     const box = source.getBoundingClientRect();
-    const copies = [copy, ...copy.querySelectorAll("*")];
+    const copies = [clone, ...clone.querySelectorAll("*")];
     for (const [index, original] of [
       source,
       ...source.querySelectorAll("*"),
@@ -99,10 +100,10 @@
         target.removeAttribute("class");
       }
     }
-    copy.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    copy.setAttribute("width", String(Math.round(box.width)));
-    copy.setAttribute("height", String(Math.round(box.height)));
-    copy.style.setProperty(
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    clone.setAttribute("width", String(Math.round(box.width)));
+    clone.setAttribute("height", String(Math.round(box.height)));
+    clone.style.setProperty(
       "background-color",
       background(trigger?.closest("[data-export]") ?? source),
     );
@@ -110,7 +111,7 @@
       new Blob(
         [
           new XMLSerializer()
-            .serializeToString(copy)
+            .serializeToString(clone)
             .replaceAll(/(\.\d{2})\d+/g, "$1"),
         ],
         { type: "image/svg+xml" },
@@ -220,9 +221,7 @@
       <DropdownMenu.Separator />
       <DropdownMenu.Item
         onSelect={() =>
-          void navigator.clipboard
-            .writeText(page.url.href)
-            .then(() => toast.success(m.export_copied()))}
+          void copy(page.url.href).then(() => toast.success(m.export_copied()))}
       >
         <LinkIcon class="text-muted-foreground" />{m.export_link()}
       </DropdownMenu.Item>
@@ -234,11 +233,9 @@
           const title =
             root?.querySelector("h2, h3")?.textContent.trim() ?? document.title;
           const height = Math.ceil((root?.offsetHeight ?? 480) + 40);
-          void navigator.clipboard
-            .writeText(
-              `<iframe src="${url.href}" title="${title.replaceAll('"', "&quot;")}" loading="lazy" style="inline-size:100%;block-size:${height}px;border:0" data-ea-embed></iframe>\n<script>(()=>{if(window.eaEmbed)return;window.eaEmbed=1;const o=${JSON.stringify(url.origin)};const tone=f=>{for(let e=f.parentElement;e;e=e.parentElement){const c=getComputedStyle(e).backgroundColor.match(/[\\d.]+/g);if(c&&(c[3]===undefined||+c[3]>0))return .2126*c[0]+.7152*c[1]+.0722*c[2]<128?"dark":"light"}return"light"};addEventListener("message",e=>{if(e.origin!==o)return;for(const f of document.querySelectorAll("iframe[data-ea-embed]"))if(f.contentWindow===e.source){if(e.data?.type==="ea:height")f.style.blockSize=e.data.height+"px";if(e.data?.type==="ea:ready")e.source.postMessage({type:"ea:theme",mode:tone(f)},o)}})})()<\/script>`,
-            )
-            .then(() => toast.success(m.export_embed_copied()));
+          void copy(
+            `<iframe src="${url.href}" title="${title.replaceAll('"', "&quot;")}" loading="lazy" style="inline-size:100%;block-size:${height}px;border:0" data-ea-embed></iframe>\n<script>(()=>{if(window.eaEmbed)return;window.eaEmbed=1;const o=${JSON.stringify(url.origin)};const tone=f=>{for(let e=f.parentElement;e;e=e.parentElement){const c=getComputedStyle(e).backgroundColor.match(/[\\d.]+/g);if(c&&(c[3]===undefined||+c[3]>0))return .2126*c[0]+.7152*c[1]+.0722*c[2]<128?"dark":"light"}return"light"};addEventListener("message",e=>{if(e.origin!==o)return;for(const f of document.querySelectorAll("iframe[data-ea-embed]"))if(f.contentWindow===e.source){if(e.data?.type==="ea:height")f.style.blockSize=e.data.height+"px";if(e.data?.type==="ea:ready")e.source.postMessage({type:"ea:theme",mode:tone(f)},o)}})})()<\/script>`,
+          ).then(() => toast.success(m.export_embed_copied()));
         }}
       >
         <CodeIcon class="text-muted-foreground" />{m.export_embed()}

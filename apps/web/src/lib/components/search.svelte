@@ -24,6 +24,7 @@
   import { setMode } from "mode-watcher";
   import { toast } from "svelte-sonner";
   import { on } from "svelte/events";
+  import { copy } from "#lib/clipboard.js";
   import Logo from "#lib/components/logo.svelte";
   import * as Command from "#lib/components/ui/command/index.js";
   import { date } from "#lib/format.js";
@@ -146,9 +147,9 @@
             label: m.cmd_copy_link(),
             icon: LinkIcon,
             run: () =>
-              void navigator.clipboard
-                .writeText((page.shallow?.url ?? page.url).href)
-                .then(() => toast.success(m.export_copied())),
+              void copy((page.shallow?.url ?? page.url).href).then(() =>
+                toast.success(m.export_copied()),
+              ),
           },
           ...(editable.entity == null
             ? []

@@ -4,6 +4,7 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
 import { execFileSync } from "node:child_process";
+import { hostname } from "node:os";
 import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 
@@ -30,7 +31,7 @@ export default defineConfig(({ command }) => {
           strategy: ["cookie", "globalVariable", "baseLocale"],
         }),
     ],
-    server: { allowedHosts: [".ts.net"] },
+    server: { allowedHosts: [".ts.net", hostname().split(".", 1)[0] ?? ""] },
     optimizeDeps: {
       include: [
         "@lucide/svelte/icons/*",

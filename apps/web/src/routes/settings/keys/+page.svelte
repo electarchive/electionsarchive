@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { CopyIcon } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
+  import { copy } from "#lib/clipboard.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Input } from "#lib/components/ui/input/index.js";
   import { Label } from "#lib/components/ui/label/index.js";
@@ -76,9 +77,7 @@
         <Button
           size="lg"
           onclick={() =>
-            void navigator.clipboard
-              .writeText(created.key)
-              .then(() => toast.success(m.keys_copied()))}
+            void copy(created.key).then(() => toast.success(m.keys_copied()))}
         >
           <CopyIcon />{m.keys_copy()}
         </Button>

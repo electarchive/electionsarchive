@@ -2,6 +2,7 @@
   import { READ_ONLY } from "$app/env/public";
   import { CopyIcon } from "@lucide/svelte";
   import { toast } from "svelte-sonner";
+  import { copy } from "#lib/clipboard.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
@@ -60,10 +61,8 @@
     { title: m.agents_rule_credit_title(), body: m.agents_rule_credit() },
   ]);
 
-  function copy(text: string) {
-    void navigator.clipboard
-      .writeText(text)
-      .then(() => toast.success(m.agents_copied()));
+  function copyText(text: string) {
+    void copy(text).then(() => toast.success(m.agents_copied()));
   }
 </script>
 
@@ -99,7 +98,7 @@
               <Button
                 variant="outline"
                 size="sm"
-                onclick={() => copy(endpoint.url)}
+                onclick={() => copyText(endpoint.url)}
               >
                 <CopyIcon />{m.agents_copy()}
               </Button>
@@ -152,7 +151,11 @@
               <span class="text-xs text-muted-foreground"
                 >{m.agents_config()}</span
               >
-              <Button variant="ghost" size="sm" onclick={() => copy(config)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onclick={() => copyText(config)}
+              >
                 <CopyIcon />{m.agents_copy()}
               </Button>
             </div>
