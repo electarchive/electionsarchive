@@ -432,7 +432,7 @@ ABBREVIATIONS = {
     "philippines": "PH", "phillippines": "PH", "dakota": "DT", "indianterritory": "IT", "dalaware": "DE",
     "southsarolina": "SC", "canalzone": "CZ", "nocar": "NC", "nodak": "ND", "socar": "SC", "sodak": "SD",
     "nhampshire": "NH", "ncarolina": "NC", "ndakota": "ND", "scarolina": "SC", "sdakota": "SD", "wvirginia": "WV",
-    "distofcol": "DC", "njersey": "NJ", "nmexico": "NM", "nyork": "NY", "risland": "RI",
+    "distofcol": "DC", "dofc": "DC", "virginis": "VI", "panamacanalzone": "CZ", "njersey": "NJ", "nmexico": "NM", "nyork": "NY", "risland": "RI",
 }  # fmt: skip
 COLUMNS = {
     "1916:republican:b1": (
@@ -464,6 +464,11 @@ COLUMNS = {
 LABELS = {"Washbarne": "Washburne", "Mcclellan": "McClellan", "T.H.Seymour": "T. H. Seymour"}
 RELABEL = {("1920:republican:b5", 247, "OR", 2): "RI"}
 CORRECTIONS = {
+    "1956:democratic": [
+        (464, "NV", (0.78, 0.358, 0.83, 0.378), {"Symington": 0.5, "Timmerman": 0}, "the half vote is set under Symington, which the printed totals count"),
+        (464, "NM", (0.78, 0.403, 0.83, 0.423), {"Symington": 0.5, "Timmerman": 0}, "the half vote is set under Symington, which the printed totals count"),
+        (464, "NC", (0.78, 0.434, 0.83, 0.454), {"Symington": 0.5, "Timmerman": 0}, "the half vote is set under Symington, which the printed totals count"),
+    ],
     "1928:republican": [
         (284, "MO", (0.21, 0.771, 0.58, 0.785), {"Hughes": 1}, "the footnote to the row: 'Missouri cast one vote for Charles E. Hughes'"),
     ],
@@ -734,6 +739,7 @@ CORRECTIONS = {
     ],
 }  # fmt: skip
 TOTALS = {
+    "1948:democratic": {"Russell": 263, "McNutt": 0.5, "Truman": 947.5},
     "1856:democratic:b7": {"James Buchanan": 143.5},
     "1856:democratic:b17": {"James Buchanan": 296},
     "1912:democratic:b4": {"Marshall": 31, "Kern": 2},
@@ -1081,7 +1087,7 @@ def parse() -> None:
             summed = sum(value for (_, name), value in values.items() if name == column)
             if abs(summed - total) > 1e-6:
                 failures.append(f"column {column}: states sum to {summed:g}, printed total {total:g}")
-        placed = next((read for read in (first, second) if all(max(cell["box"]) <= 1 for cell in read)), None)
+        placed = next((read for read in (first, second) if read and all(max(cell["box"]) <= 1 for cell in read)), None)
         if placed is None:
             failures.append("no read places its cells on the page")
         report.append(f"## {spec['table']}\n\n{len(held)} delegations, {len(values)} cells, printed totals {printed}")
