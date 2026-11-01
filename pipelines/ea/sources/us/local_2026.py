@@ -10920,8 +10920,7 @@ def parse() -> None:
                             path,
                         )
                 if (
-                    template is None
-                    and state == "CA"
+                    state == "CA"
                     and (
                         yosemite := re.search(
                             r"(?i)^yosemite community college district\b.*?\barea (\d+)\b", str(row["contest"])
