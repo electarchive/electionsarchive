@@ -123,6 +123,24 @@ CA_FILES = {
     date(2022, 11, 8): "2022-general/sov/props.xlsx",
 }
 AZ = "https://web.archive.org/web/2020id_/http://apps.azsos.gov/election/"
+AZ_1998_URL = "https://apps.azsos.gov/election/1998/General/Canvass1998GE.pdf"
+AZ_1998 = (date(1998, 11, 3), "MF-556/Canvass1998GE.pdf")
+AZ_1998_MEASURES = {
+    "100": ("Public retirement systems", "Legislative Referendum"),
+    "101": ("Salaries of elected state officers", "Legislative Referendum"),
+    "102": ("Investment of state monies", "Legislative Referendum"),
+    "103": ("Primary election law", "Legislative Referendum"),
+    "104": ("Initiative and referendum", "Legislative Referendum"),
+    "105": ("Initiative and referendum: vetoing, amending, and repealing voter-approved measures", "Initiative"),
+    "200": ("Citizens Clean Elections Act", "Initiative"),
+    "201": ("Cockfighting", "Initiative"),
+    "202": ("Candidate declarations on abolishing the federal income tax", "Initiative"),
+    "300": ("Drug offenses: controlled substances", "Popular Referendum"),
+    "301": ("Drug offenses: probation and treatment", "Popular Referendum"),
+    "302": ("Legislative salaries", "Legislative Referendum"),
+    "303": ("Land use and conservation appropriations", "Legislative Referendum"),
+    "304": ("State lottery commission", "Legislative Referendum"),
+}
 AZ_FILES = {
     date(2000, 11, 7): "2000/General/Canvass2000GE.pdf",
     date(2002, 11, 5): "2002/General/Canvass2002GE.pdf",
@@ -2655,6 +2673,7 @@ def fetch() -> None:
             retrieved_at=datetime(2026, 10, 30, tzinfo=UTC),
             media_type="application/pdf",
         )
+    store_manual(AZ_1998_URL, AZ_1998[1], "application/pdf")
     for path in [*AZ_FILES.values(), *AZ_RECOUNTS.values()]:
         raw.fetch(SOURCE, path if path.startswith("https:") else AZ + path, suffix=".pdf")
         time.sleep(1)
@@ -3417,8 +3436,10 @@ def alaska() -> list[dict[str, object]]:
 def arizona() -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     recounted = {(day, prop): AZ + path for (day, prop), path in AZ_RECOUNTS.items()}
-    for day, path in [*AZ_FILES.items(), *((day, path) for (day, _), path in AZ_RECOUNTS.items())]:
+    for day, path in [*AZ_FILES.items(), *((day, path) for (day, _), path in AZ_RECOUNTS.items()), AZ_1998]:
         url = path if path.startswith("https:") else AZ + path
+        if day == AZ_1998[0]:
+            url = AZ_1998_URL
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, text=True, check=True
         )
@@ -3443,6 +3464,15 @@ def arizona() -> list[dict[str, object]]:
                     "county": county,
                     "answer": match[1],
                     "votes": value,
+                    **(
+                        {
+                            "label": f"Proposition {prop}",
+                            "title": AZ_1998_MEASURES[prop][0],
+                            "kind": AZ_1998_MEASURES[prop][1],
+                        }
+                        if day == AZ_1998[0]
+                        else {}
+                    ),
                 }
                 for county, value in zip(AZ_COUNTIES, numbers, strict=False)
             )
