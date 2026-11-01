@@ -339,6 +339,11 @@ COUNTIES = {
         "https://www.latahcountyid.gov/auditor/elections",
         "MF-431/Latah/LATAH COUNTY VOTER GUIDE NOV 2026.PDF",
     ),
+    "35013": (
+        "NM",
+        "https://www.lascruces.gov/go-bond",
+        "N3M-web/nm/lascruces-go-bond.html",
+    ),
     "35049": (
         "NM",
         "https://www.santafecountynm.gov/uploads/documents/2026_Constitutional_Amendments_and_Bond_Questions_General_Election.pdf",
