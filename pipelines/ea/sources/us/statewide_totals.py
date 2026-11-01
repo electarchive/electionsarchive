@@ -172,6 +172,20 @@ def emit(
                     held.add((office, year))
                 taken.add(contest_key)
                 foreign.add(election_id)
+        for office, year, contest_key, election_kind in conn.execute(
+            """select o.value, extract(year from e.date_from)::int, k.value, e.kind from result_set rs
+               join contest c on c.id = rs.contest_id
+               join election e on e.id = c.election_id
+               join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
+               join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'
+               where rs.is_default and rs.status = 'active'
+                 and not exists (select 1 from external_id x
+                                 where x.entity_id = rs.id and x.scheme = %s)""",
+            [f"{pipeline}.result_set"],
+        ):
+            if election_kind == "general":
+                held.add((office, year))
+            taken.add(contest_key)
         generals: dict[tuple[str, str], dict[UUID, tuple[date, date]]] = {}
         for election_id, code, kind, date_from, date_to in conn.execute(
             """select distinct e.id, substr(p.iso_code, 4), e.kind, e.date_from, e.date_to from election e
