@@ -1310,9 +1310,17 @@ def _rollup(
               join ancestors a on a.unit_k = u.unit_k and coalesce(a.on_date, 'infinity') = u.day
               left join area origin on origin.id = a.origin_id
               left join area reached on reached.id = a.area_id
-              where district.id is null
+              where (district.id is null
                  or (origin.id = district.id or origin.scheme_code is distinct from district.scheme_code)
-                and (reached.id = district.id or reached.scheme_code is distinct from district.scheme_code)
+                and (reached.id = district.id or reached.scheme_code is distinct from district.scheme_code))
+                and not exists (
+                  select from grain g join ancestors o on o.unit_k = g.unit_k and o.on_date is not distinct from g.on_date
+                    and o.origin_id = g.area_id
+                  join area held on held.id = o.area_id
+                  where g.unit_k = a.unit_k and g.on_date is not distinct from a.on_date
+                    and a.origin_id is distinct from g.area_id and a.area_id <> a.origin_id
+                    and held.scheme_code = reached.scheme_code and held.id <> reached.id
+                )
               group by u.result_set_k, u.unit_k, a.area_id
             ),
             spans as (
