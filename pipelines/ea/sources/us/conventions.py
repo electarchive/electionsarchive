@@ -417,6 +417,8 @@ PROCEEDINGS += [
     {"party": "democratic", "tables": {1: "1892:democratic"}, "title": DNC + "in Chicago, Ill., June 21st, 22nd and 23rd, 1892", "publisher": "Cameron, Amberg & Co.", "city": "Chicago", "days": (date(1892, 6, 21), date(1892, 6, 23)), "ballots": {1: date(1892, 6, 22)}, "deciding": 1},
     {"party": "democratic", "tables": {n: f"1896:democratic:b{n}" for n in (3, 4, 5)}, "title": "Official Proceedings of the Democratic National Convention Held in Chicago, Ill., July 7th, 8th, 9th, 10th and 11th, 1896", "publisher": "Wilson, Humphreys & Co.", "city": "Chicago", "days": (date(1896, 7, 7), date(1896, 7, 11)), "ballots": dict.fromkeys(range(1, 6), date(1896, 7, 10)), "deciding": 5},
     {"party": "democratic", "tables": {n: f"1912:democratic:b{n}" for n in range(1, 47) if n != 2}, "title": "Official Report of the Proceedings of the Democratic National Convention, Held in Baltimore, Maryland, June 25, 26, 27, 28, 29 and July 1 and 2, 1912", "publisher": "The Peterson Linotyping Co.", "city": "Baltimore", "days": (date(1912, 6, 25), date(1912, 7, 2)), "ballots": {1: date(1912, 6, 27)} | dict.fromkeys(range(2, 13), date(1912, 6, 28)) | dict.fromkeys(range(13, 27), date(1912, 6, 29)) | dict.fromkeys(range(27, 43), date(1912, 7, 1)) | dict.fromkeys(range(43, 47), date(1912, 7, 2)), "deciding": 46},
+    {"party": "democratic", "tables": {1: "1924:democratic:b1"}, "title": "Official report of the proceedings of the Democratic National Convention held in Madison Square Garden, New York City, June 24, 25, 26, 27, 28, 30, July 1, 2, 3, 4, 5, 7, 8, and 9, 1924, resulting in the nomination of John W. Davis (of West Virginia) for president and Charles W. Bryan (of Nebraska) for vice-president", "publisher": "Bookwalter-Ball-Greathouse Printing Co.", "city": "New York", "days": (date(1924, 6, 24), date(1924, 7, 9)), "ballots": {1: date(1924, 6, 30)}, "deciding": 103},
+    {"party": "democratic", "tables": {1: "1948:democratic"}, "title": "Democracy at work, being the official report of the Democratic National Convention, Philadelphia, Pennsylvania, July 12 to July 14, inclusive, 1948, resulting in the nomination of Harry S. Truman of Missouri for President and Alben W. Barkley of Kentucky for Vice-President", "publisher": "Local Democratic Political Committee of Pennsylvania", "city": "Philadelphia", "days": (date(1948, 7, 12), date(1948, 7, 14)), "ballots": {1: date(1948, 7, 14)}, "deciding": 1},
 ]  # fmt: skip
 TWO_THIRDS = range(1832, 1936)
 REPORTS = {
@@ -542,6 +544,29 @@ CANDIDATES = {
     "democratic:Timmerman": ("George Bell Timmerman Jr.", "Q362853"),
     "democratic:Lausche": ("Frank J. Lausche", "Q888606"),
     "democratic:McCormack": ("John W. McCormack", "Q377602"),
+    "1924:democratic:McAdoo": ("William G. McAdoo", "Q741058"),
+    "1924:democratic:Smith": ("Alfred E. Smith", "Q430714"),
+    "1924:democratic:Underwood": ("Oscar W. Underwood", "Q454609"),
+    "1924:democratic:Robinson": ("Joseph T. Robinson", "Q888196"),
+    "1924:democratic:Saulsbury": ("Willard Saulsbury Jr.", "Q1394349"),
+    "1924:democratic:Houston": ("David F. Houston", "Q1174390"),
+    "1924:democratic:Ralston": ("Samuel M. Ralston", "Q884561"),
+    "1924:democratic:Davis (Kansas)": ("Jonathan M. Davis", "Q929317"),
+    "1924:democratic:Ritchie": ("Albert C. Ritchie", "Q887807"),
+    "1924:democratic:Ferris": ("Woodbridge N. Ferris", "Q880349"),
+    "1924:democratic:Cox": ("James M. Cox", "Q440117"),
+    "1924:democratic:Bryan": ("Charles W. Bryan", "Q887229"),
+    "1924:democratic:Brown": ("Brown", None),
+    "1924:democratic:Silzer": ("George S. Silzer", "Q884298"),
+    "1924:democratic:Glass": ("Carter Glass", "Q1045879"),
+    "1924:democratic:Davis (W. Va.)": ("John W. Davis", "Q1332779"),
+    "1924:democratic:Sweet": ("William E. Sweet", "Q884020"),
+    "1924:democratic:Harrison": ("Pat Harrison", "Q369437"),
+    "1924:democratic:Thompson": ("Thompson", None),
+    "1924:democratic:Kendrick": ("John B. Kendrick", "Q437232"),
+    "1948:democratic:Truman": ("Harry S. Truman", "Q11613"),
+    "1948:democratic:Russell": ("Richard B. Russell Jr.", "Q718415"),
+    "1948:democratic:McNutt": ("Paul V. McNutt", "Q887892"),
 }
 UNPLACED = {"DT": "Dakota Territory", "IT": "Indian Territory", "PH": "Philippine Islands", "CZ": "Canal Zone"}
 ABSTAINED = {"votes", "Abstention", "not voting", "Not voting", "Not Voting", "Not Voting or Absent", "Absent"}
@@ -1525,7 +1550,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="The roll call of the states at the 1868 to 1900 and 1968 to 1984 Republican, the 1856 to 1912 Democratic, and the 2016 and 2020 national conventions",
+            summary="The roll call of the states at the 1868 to 1900 and 1968 to 1984 Republican, the 1856 to 1948 Democratic, and the 2016 and 2020 national conventions",
             polity="US",
         )
 
@@ -1746,7 +1771,12 @@ def emit() -> Path:
             }
             party = convention.get("party", "republican")
             scope = cs.key("us.party", f"{party}-party")
-            item = next(iter(specs.values()))["item"]
+            first_spec = next(iter(specs.values()))
+            source_url = (
+                f"https://babel.hathitrust.org/cgi/pt?id={first_spec['htid']}"
+                if "htid" in first_spec
+                else f"https://archive.org/details/{first_spec['item']}"
+            )
             title = (
                 convention["title"]
                 if "title" in convention
@@ -1760,7 +1790,7 @@ def emit() -> Path:
                 kind="official_body",
                 publisher=publisher,
                 title=title,
-                url=f"https://archive.org/details/{item}",
+                url=source_url,
             )
             pages = {}
             for spec in specs.values():
