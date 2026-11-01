@@ -25643,10 +25643,72 @@ export const search = {
               .replace(/[,\s]+$/u, "");
       const room = unit == null ? input.limit : 50;
       const depth = Math.max(80, room * 3);
+      const widen = (text: string) =>
+        text.replaceAll(
+          /(?<=^|\s)(?:washington,? d\.?c\.?|great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=[\s,]|$)/giu,
+          (word) =>
+            ALIASES[word.toLowerCase()] ??
+            ALIASES[word.toLowerCase().replaceAll(".", "").replace(",", "")] ??
+            word,
+        );
+      const said = fold(widen(input.q))
+        .split(/[\s,]+/u)
+        .filter((word) => word !== "");
+      const year = said.find((word) => /^(?:1[6-9]|2[01])\d{2}$/u.test(word));
+      const rest = said
+        .filter(
+          (word) =>
+            word !== year &&
+            ![
+              "election",
+              "elections",
+              "general",
+              "result",
+              "results",
+              "vote",
+              "votes",
+              "national",
+              "federal",
+              "midterm",
+              "midterms",
+              "the",
+              "in",
+              "of",
+              "for",
+            ].includes(word),
+        )
+        .join(" ");
+      const isMidterm = said.some((word) => word.startsWith("midterm"));
+      const DEMONYMS: Record<string, string> = {
+        america: "united states",
+        american: "united states",
+        "united states of america": "united states",
+        british: "united kingdom",
+        german: "germany",
+        french: "france",
+        italian: "italy",
+        brazilian: "brazil",
+        turkey: "turkiye",
+        turkish: "turkiye",
+        canadian: "canada",
+        swiss: "switzerland",
+        irish: "ireland",
+        european: "european union",
+      };
+      const place =
+        year == null
+          ? null
+          : rest === ""
+            ? isMidterm
+              ? "united states"
+              : ""
+            : (DEMONYMS[rest] ??
+              units.find((row) => row.code === rest)?.name ??
+              rest);
       const q =
         state == null
-          ? asked
-              .replaceAll(
+          ? widen(
+              asked.replaceAll(
                 /\b(?:c?isd|usd)\b/giu,
                 (word) =>
                   ({
@@ -25654,16 +25716,8 @@ export const search = {
                     cisd: "consolidated independent school district",
                     usd: "unified school district",
                   })[word.toLowerCase()] ?? word,
-              )
-              .replace(
-                /^(?:washington,? d\.?c\.?|great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=\s|$)/iu,
-                (word) =>
-                  ALIASES[word.toLowerCase()] ??
-                  ALIASES[
-                    word.toLowerCase().replaceAll(".", "").replace(",", "")
-                  ] ??
-                  word,
-              )
+              ),
+            )
           : `${state}'s ${
               Number.isNaN(seat)
                 ? "at-large"
@@ -25687,22 +25741,57 @@ export const search = {
       }>(sql`
         with q as (select lower(unaccent(${q})) as t),
         terms as (
-          select to_tsquery('simple', string_agg(quote_literal(w) || case when n = last then ':*' else '' end, ' & ' order by n)) as tq,
-            plainto_tsquery('simple', q.t) as pq,
-            to_tsquery('simple', string_agg(quote_literal(w), ' & ' order by n) filter (where n < last)) as known
+          select to_tsquery('simple', string_agg('(' || quote_literal(w) || case when n = last then ':*' else '' end || alt || ')', ' & ' order by n)) as tq,
+            to_tsquery('simple', string_agg('(' || quote_literal(w) || alt || ')', ' & ' order by n)) as pq,
+            to_tsquery('simple', string_agg('(' || quote_literal(w) || alt || ')', ' & ' order by n) filter (where n < last)) as known
           from q, (
-            select w, n, max(n) over () as last
+            select w, n, max(n) over () as last,
+              case
+                when w ~ '^[a-z]{2,}ies$' then ' | ' || quote_literal(left(w, -3) || 'y')
+                when w ~ '^[a-z]{3,}[^su]s$' then ' | ' || quote_literal(left(w, -1))
+                when w ~ '^[a-z]{2,}[^aeiou]y$' then ' | ' || quote_literal(left(w, -1) || 'ies')
+                when w ~ '^[a-z]{3,}$' and w !~ 's$' then ' | ' || quote_literal(w || 's')
+                else ''
+              end as alt
             from q, regexp_split_to_table(q.t, '\\s+') with ordinality as t(w, n) where w <> ''
           ) words
           group by q.t
         ),
         picked as materialized (
           select entity_id from (
-            select d.entity_id, row_number() over (partition by d.type order by d.tsv @@ terms.pq desc, d.rank_boost desc, length(d.text)) as n
-            from search_document d, terms
+            select d.entity_id, row_number() over (
+              partition by d.type
+              order by d.tsv @@ terms.pq desc, d.rank_boost desc,
+                case y.kind when 'sovereign_state' then 0 when 'supranational' then 0 when 'federal_unit' then 1 else 2 end,
+                length(d.text)
+            ) as n
+            from search_document d cross join terms left join polity y on y.id = d.polity_id
             where ${prefixed} and d.type::text = any(${sql.param([...kinds])}::text[])
           ) ranked
           where n <= ${depth}
+        ),
+        named as (
+          select d.entity_id as id from search_document d
+          where ${place != null && place !== ""} and d.type = 'polity' and d.tsv @@ plainto_tsquery('simple', ${place ?? ""})
+            and exists (select from name n where n.entity_id = d.entity_id and lower(unaccent(n.text)) = ${place ?? ""})
+            and exists (
+              select from election e where e.polity_id = d.entity_id
+                and e.date_from >= make_date(${Number(year ?? 0)}, 1, 1) and e.date_from < make_date(${Number(year ?? 0) + 1}, 1, 1)
+            )
+          order by (select case y.kind when 'sovereign_state' then 0 when 'supranational' then 0 when 'federal_unit' then 1 else 2 end from polity y where y.id = d.entity_id),
+            (select max(g.population) from coverage_government g where g.polity_id = d.entity_id) desc nulls last
+          limit 1
+        ),
+        intended as materialized (
+          select d.entity_id, d.type, 4 + 0.5 * (e.kind = 'general')::int + 0.5 * (e.parent_id is null)::int as score, true as matched, true as exact, d.rank_boost
+          from election e join search_document d on d.entity_id = e.id
+          where ${place != null && kinds.includes("election")}
+            and e.date_from >= make_date(${Number(year ?? 0)}, 1, 1) and e.date_from < make_date(${Number(year ?? 0) + 1}, 1, 1)
+            and (${!isMidterm && !said.includes("general")} or e.kind = 'general')
+            and case when ${place === ""}
+              then e.parent_id is null and e.kind = 'general' and e.polity_id in (select id from polity where kind in ('sovereign_state', 'supranational'))
+              else e.polity_id in (select id from named)
+            end
         ),
         strict as materialized (
           select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + 0.5 * (d.tsv @@ terms.pq)::int + d.rank_boost * 0.15 as score, true as matched,
@@ -25718,7 +25807,11 @@ export const search = {
           order by word_similarity(q.t, d.text) desc, d.rank_boost desc limit 40
         ),
         pool as materialized (
-          select * from strict union all select * from fuzzy
+          select * from intended
+          union all
+          select * from strict where entity_id not in (select entity_id from intended)
+          union all
+          select * from fuzzy where entity_id not in (select entity_id from intended)
         ),
         seats as (
           select c.id, array_agg(t.polity_id) as polities
