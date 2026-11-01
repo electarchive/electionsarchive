@@ -161,4 +161,5 @@ def emit() -> Path:
         summary="Nebraska natural resources district, public power district, community college, educational service unit, and other district board races on the November 3, 2026 ballot, with candidates from the Secretary of State's final statewide list",
         sources={URL: (PUBLISHER, TITLE)},
         frame=frame,
+        retire_stale=True,
     )

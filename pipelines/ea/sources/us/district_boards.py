@@ -31,6 +31,7 @@ def emit(
     summary: str,
     sources: dict[str, tuple[str, str]],
     frame: pl.DataFrame,
+    retire_stale: bool = False,
 ) -> Path:
     lower = state.lower()
     with connect() as conn:
@@ -177,4 +178,26 @@ def emit(
                 cs.add("citation", entity_id=candidacy, source_id=source, locator=None)
                 kept += 1
         print(f"{kept} candidates")
+        if retire_stale:
+            emitted = [str(row["id"]) for row in cs.rows.get("contest", [])]
+            reason = "This race is filed under the district's current contest identifier; the contest moves there."
+            stale = conn.execute(
+                """select co.id from contest co join entity e on e.id = co.id and e.retired_by is null
+                   join election el on el.id = co.election_id
+                   join external_id x on x.entity_id = co.id and x.scheme = 'us.contest'
+                   join changeset c on c.id = x.changeset_id
+                   where c.pipeline = %s and el.date_from = %s and x.value like %s and co.id <> all(%s::uuid[])""",
+                [source_id, DAY, f"{DAY}:{state}:%", emitted],
+            ).fetchall()
+            for (contest,) in stale:
+                for option, candidacy in conn.execute(
+                    """select o.id, ca.id from contest_option o left join candidacy ca on ca.option_id = o.id
+                       where o.contest_id = %s""",
+                    [contest],
+                ).fetchall():
+                    if candidacy is not None:
+                        cs.add("entity_retirement", entity_id=candidacy, reason=reason)
+                    cs.add("entity_retirement", entity_id=option, reason=reason)
+                cs.add("entity_retirement", entity_id=contest, reason=reason)
+            print(f"{len(stale)} stale contests retired")
         return cs.write()
