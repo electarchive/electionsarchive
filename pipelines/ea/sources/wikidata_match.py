@@ -15,7 +15,7 @@ from ea.store import DATA, connect
 SOURCE = "wikidata_match"
 VERSION = "4"
 TITLE = "Labels and positions held (P39) of people"
-BUCKETS = 300
+BUCKETS = 900
 SLACK = 1
 KINDS = ("governor", "head_of_state", "head_of_government", "mayor", "upper_house", "lower_house", "unicameral")
 STOP = {"of", "the", "de", "la", "du", "des", "and"}
