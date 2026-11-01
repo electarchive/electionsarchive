@@ -167,6 +167,13 @@ def emit() -> Path:
         if os.environ.get("ONLY_ENDS"):
             only = {item for item, _ in ends}
             statements = defaultdict(list, {item: rows for item, rows in statements.items() if item in only})
+        elsewhere: dict[tuple[UUID, UUID], list[tuple[date | None, date | None]]] = defaultdict(list)
+        for person, party, start, end in conn.execute(
+            """select m.person_id, m.party_id, m.valid_from, m.valid_to from person_party_membership m
+               join changeset c on c.id = m.changeset_id where c.pipeline <> %s and m.party_id is not null""",
+            [SOURCE],
+        ).fetchall():
+            elsewhere[person, party].append((start, end))
         added = unmatched = undated = 0
         held: list[str] = []
         withheld: set[tuple[UUID, UUID]] = set()
@@ -190,7 +197,9 @@ def emit() -> Path:
                     withheld.add((people[item][0], parties[party][0]))
                     continue
                 dated = any(other == party and (s or e) for other, s, _, e, _ in rows)
-                if start is None and end is None and (len(named) > 1 or dated):
+                if start is None and end is None and (
+                    len(named) > 1 or dated or (people[item][0], parties[party][0]) in elsewhere
+                ):
                     undated += 1
                     continue
                 spans[parties[party][0]].append((start, start_precision, end, end_precision))
@@ -206,6 +215,12 @@ def emit() -> Path:
                     joined.append([start, start_precision, end, end_precision])
                 override = ends.get((item, party))
                 for start, start_precision, end, end_precision in joined:
+                    if party is not None and any(
+                        (end is None or other_start is None or other_start < end)
+                        and (other_end is None or start is None or start < other_end)
+                        for other_start, other_end in elsewhere.get((people[item][0], party), [])
+                    ):
+                        continue
                     row_source = source
                     if override is not None and (end is None or end > date.fromisoformat(override["end"])):
                         end, end_precision = date.fromisoformat(override["end"]), override["precision"]
