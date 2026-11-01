@@ -161,6 +161,121 @@ TABLES = [
         "columns": ("votes", "Reagan", None, "Abstention", None, None, None),
     },
 ]
+
+
+def volume(item: str, year: str, offset: int, back: int, pages: dict[str, int | list[int]]) -> list[dict[str, object]]:
+    specs = []
+    for name, found in pages.items():
+        found = [found] if isinstance(found, int) else found
+        leaves = sorted({page - offset - step for page in found for step in range(back + 1)})
+        specs.append({"table": f"{year}:republican:{name}", "item": item, "leaves": tuple(leaves)})
+    return specs
+
+
+TABLES += [
+    *volume(
+        "officialreportof00repuiala",
+        "1920",
+        1,
+        1,
+        {
+            "b1": [228, 231],
+            "b2": [233, 234],
+            "b3": [236, 237],
+            "b4": [241, 242],
+            "b5": 248,
+            "b6": [249, 250],
+            "b7": [253, 254],
+            "b8": [260, 261],
+            "b9": [263, 264],
+            "b10": 270,
+        },
+    ),
+    *volume("officialreportsi00repuiala", "1916", 0, 1, {"b1": 213, "b2": 215, "b3": 216}),
+    *volume(
+        "officialreportfi00repuiala", "1912", 0, 2, {"p220": 220, "p224": 224, "p232": 232, "p257": 257, "p427": 427}
+    ),
+    *volume("officialreporto00repu", "1908", 0, 2, {"p150": 150, "p181": 181}),
+    *volume("officialproceedi00repuiala", "1904", 0, 2, {"p171": 171}),
+    *volume("12threpubnaticon00blumrich", "1900", 0, 2, {"p158": 158}),
+    *volume("officialproceedi00repu", "1896", 0, 2, {"p133": 133}),
+    *volume("proceedingsoften00repu", "1892", 0, 2, {"p89": 89, "p92": 92}),
+    *volume(
+        "officialproceedi00repu_0",
+        "1888",
+        1,
+        1,
+        {
+            "b1": 381,
+            "b2": 385,
+            "b3": 389,
+            "b4": 396,
+            "b5": 398,
+            "b6": 408,
+            "b7": 411,
+            "b8": 416,
+        },
+    ),
+    *volume("proceedingsofeig00repu", "1884", 0, 1, {"b1": 146, "b2": 154, "b3": 159, "b4": 162}),
+    *volume(
+        "proceedingsofrep00inrepu",
+        "1880",
+        0,
+        2,
+        {
+            f"p{page}": page
+            for page in (
+                176,
+                221,
+                225,
+                226,
+                228,
+                229,
+                231,
+                232,
+                234,
+                235,
+                237,
+                241,
+                243,
+                248,
+                253,
+                254,
+                256,
+                260,
+                262,
+                266,
+                268,
+                269,
+                271,
+                281,
+                283,
+                284,
+                286,
+                288,
+                312,
+            )
+        },
+    ),
+    *volume(
+        "proceedingsrepu00nelsgoog",
+        "1876",
+        0,
+        1,
+        {
+            "b1": 84,
+            "b2": 87,
+            "b3": 100,
+            "b4": 102,
+            "b5": 104,
+            "b6": 106,
+            "b7": 109,
+        },
+    ),
+    *volume("presidentialele00conggoog", "1872", 0, 2, {"p34": 34}),
+    *volume("presidentialelec00repu", "1868", 0, 2, {"p98": 98}),
+    *volume("proceedingsoffir00inrepu", "1856-64", 0, 2, {f"p{page}": page for page in (135, 163, 171, 234, 250)}),
+]
 PROCEEDINGS = [
     {"table": "1968:republican:final", "first": "1968:republican:first", "ordinal": "Twenty-Ninth", "city": "Miami Beach", "days": (date(1968, 8, 5), date(1968, 8, 8)), "ballot": date(1968, 8, 7)},
     {"table": "1972:republican", "ordinal": "Thirtieth", "city": "Miami Beach", "days": (date(1972, 8, 21), date(1972, 8, 23)), "ballot": date(1972, 8, 22)},
