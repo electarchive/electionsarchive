@@ -6627,6 +6627,13 @@ for key, publisher, title, url, local in (
         "ca/atascadero_nominees.pdf",
     ),
     (
+        "AZ-04003-county",
+        "Cochise County Elections",
+        "2026 Candidate Information",
+        "https://www.cochise.az.gov/652/2026-Candidate-Information",
+        "az/cochise_county.html",
+    ),
+    (
         "CA-06079-san-luis-obispo",
         "City of San Luis Obispo City Clerk",
         "Municipal Elections: Candidate Filings for the November 3, 2026 Election",
