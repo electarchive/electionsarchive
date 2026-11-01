@@ -4573,7 +4573,7 @@
   "night_state_map_title": "{race} by county",
   "night_pick_title": "Pick a state",
   "night_pick_hint": "Each state's page lists its whole ballot, from the Senate down to the school board.",
-  "night_pick_legend": "S marks a Senate race and G a governor's race. Each takes the color of the candidate ahead, or of the party that holds the seat until votes come in.",
+  "night_pick_legend": "S marks a Senate race and G a governor's race. A dashed outline shows the party that holds the seat. A tinted box shows the candidate ahead. A solid box shows the winner.",
   "night_pick_senate": "S",
   "night_pick_governor": "G",
   "night_pick_label": "States with races tonight",
@@ -4715,5 +4715,18 @@
         "countPlural=*": "{countText} runoffs went from {from} candidates to {to}"
       }
     }
-  ]
+  ],
+  "night_state_card_more": "{count} more",
+  "night_pick_senate_title": "U.S. Senate",
+  "night_pick_governor_title": "Governor",
+  "night_pick_quiet": "No Senate or governor race here. The state's page lists the rest of its ballot.",
+  "night_pick_open": "See every {state} race",
+  "night_state_districts_label": "Map of {chamber} districts",
+  "night_state_districts_legend": "Darker shades mean a wider lead. Until votes come in, each district shows a pale tint of the party that holds it. Hover over or tap a district to see its race.",
+  "night_dial_dots_empty": "Likely final results show up here once enough votes are in to estimate them.",
+  "night_dial_history_empty": "No estimates yet",
+  "night_left_empty": "The places with the most votes left to count show up here once the estimate starts.",
+  "night_nation_map_missing": "This election has no national map.",
+  "night_state_also": "Also running: {names}",
+  "night_state_held_seat": "{party} seat"
 }

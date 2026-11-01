@@ -1,7 +1,9 @@
 import { sql } from "drizzle-orm";
+import type { Geography } from "#lib/live/standing.js";
 import type { LivePage } from "#lib/server/live-page.js";
 import { remember } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+import { geography } from "#lib/server/live-board.js";
 import { names } from "#lib/server/rpc/archive.js";
 
 export type BallotTier =
@@ -37,6 +39,7 @@ export type BallotContest = {
   seat: string | null;
   seats: number;
   held: string | null;
+  area: string | null;
   isMeasure: boolean;
   isSpecial: boolean;
   options: Array<BallotOption>;
@@ -203,8 +206,9 @@ async function statewide(id: string, date: string, stateName: string) {
     chamber: string | null;
     seats: number | null;
     held: string | null;
+    area: string | null;
   }>(sql`
-    select c.id, s.path, c.kind::text as kind, o.kind::text as office, b.kind::text as body, bp.kind::text as scope,
+    select c.id, s.path, c.district_area_id as area, c.kind::text as kind, o.kind::text as office, b.kind::text as body, bp.kind::text as scope,
       coalesce(c.body_id, o.body_id) as chamber, c.magnitude as seats, prior.party as held
     from contest c
     join slug s on s.entity_id = c.id and s.is_current
@@ -213,11 +217,11 @@ async function statewide(id: string, date: string, stateName: string) {
     left join polity bp on bp.id = b.polity_id
     left join lateral (
       select coalesce(a.parent_party_id, x.party_id) as party from (
-        select p.id, p.election_id from contest p where c.seat_id is not null and p.seat_id = c.seat_id
+        select p.id, p.election_id, p.party_scope_id from contest p where c.seat_id is not null and p.seat_id = c.seat_id
         union all
-        select p.id, p.election_id from contest p where c.seat_id is null and c.office_id is not null and p.office_id = c.office_id
+        select p.id, p.election_id, p.party_scope_id from contest p where c.seat_id is null and c.office_id is not null and p.office_id = c.office_id
         union all
-        select p.id, p.election_id from contest p
+        select p.id, p.election_id, p.party_scope_id from contest p
         where c.seat_id is null and c.office_id is null and c.district_area_id is not null
           and p.district_area_id = c.district_area_id and p.body_id = c.body_id
       ) p
@@ -226,7 +230,7 @@ async function statewide(id: string, date: string, stateName: string) {
       join outcome oc on oc.result_set_id = rs.id and oc.kind in ('elected', 'won')
       join contest_option x on x.id = oc.option_id
       left join party_affiliation a on a.party_id = x.party_id and a.kind = 'regional_branch' and a.valid @> ${date}::date
-      where c.kind <> 'ballot_question' and p.id <> c.id and e.date_from < ${date}::date
+      where c.kind <> 'ballot_question' and p.id <> c.id and p.party_scope_id is null and e.date_from < ${date}::date
         and e.date_from > ${date}::date - 4400 and e.kind <> 'primary'
       order by e.date_from desc limit 1
     ) prior on true
@@ -254,21 +258,20 @@ async function statewide(id: string, date: string, stateName: string) {
       with up as (
         select c.body_id as body, c.district_area_id as area from contest c
         where c.election_id = ${id}::uuid and c.body_id = any(${sql.param(bodies)}::uuid[])
-      ), last as (
-        select p.body_id as body, max(e.date_from) as at from contest p join election e on e.id = p.election_id
-        where p.body_id = any(${sql.param(bodies)}::uuid[]) and e.kind = 'general'
-          and e.date_from < ${date}::date and e.date_from > ${date}::date - 1500
-        group by 1
+      ), recent as (
+        select distinct on (p.body_id, p.district_area_id) p.body_id as body, p.district_area_id as area, p.id
+        from contest p join election e on e.id = p.election_id
+        where p.body_id = any(${sql.param(bodies)}::uuid[]) and p.district_area_id is not null and p.party_scope_id is null
+          and e.kind <> 'primary' and e.date_from < ${date}::date and e.date_from > ${date}::date - 1500
+        order by p.body_id, p.district_area_id, e.date_from desc
       )
-      select p.body_id as body, coalesce(a.parent_party_id, x.party_id) as party, count(*)::int as seats
-      from last
-      join contest p on p.body_id = last.body
-      join election e on e.id = p.election_id and e.date_from = last.at and e.kind = 'general'
-      join result_set rs on rs.contest_id = p.id and rs.is_default
+      select r.body, coalesce(a.parent_party_id, x.party_id) as party, count(*)::int as seats
+      from recent r
+      join result_set rs on rs.contest_id = r.id and rs.is_default
       join outcome oc on oc.result_set_id = rs.id and oc.kind in ('elected', 'won')
       join contest_option x on x.id = oc.option_id
       left join party_affiliation a on a.party_id = x.party_id and a.kind = 'regional_branch' and a.valid @> ${date}::date
-      where not exists (select from up where up.body = p.body_id and up.area is not distinct from p.district_area_id)
+      where not exists (select from up where up.body = r.body and up.area = r.area)
       group by 1, 2
     `),
   ]);
@@ -305,6 +308,7 @@ async function statewide(id: string, date: string, stateName: string) {
         seat: district,
         seats: row.seats ?? 1,
         held: row.held,
+        area: district == null ? null : row.area,
         isMeasure: row.tier === "measures",
         isSpecial: seat.includes("special"),
         options: own.map((option) => ({
@@ -442,6 +446,7 @@ export async function ballotLocals(path: string) {
                 seat: null,
                 seats: row.seats ?? 1,
                 held: null,
+                area: null,
                 isMeasure: row.kind === "ballot_question",
                 isSpecial: /special|unexpired|short-term/u.test(seat),
                 options: (byContest.get(row.id) ?? []).map((option) => ({
@@ -475,7 +480,7 @@ export async function liveBallot(page: LivePage) {
     return null;
   }
   const state = election.slug.split("/", 2)[1] ?? "";
-  return remember(`live:ballot:v3:${election.slug}`, async () => {
+  return remember(`live:ballot:v6:${election.slug}`, async () => {
     const stateName = election.title
       .replace(/^\d{4} /u, "")
       .replace(/ general election$/u, "");
@@ -483,7 +488,18 @@ export async function liveBallot(page: LivePage) {
       statewide(election.id, election.date, stateName),
       tally(election.id),
     ]);
-    return { state, name: stateName, ...found, locals };
+    const groups = Map.groupBy(
+      found.contests.filter((entry) => entry.contest.area != null),
+      (entry) => (entry.tier === "house" ? "house" : (entry.chamber ?? "")),
+    );
+    const maps: Record<string, Geography | null> = {};
+    for (const [key, list] of groups) {
+      const ids = [
+        ...new Set(list.flatMap((entry) => entry.contest.area ?? [])),
+      ];
+      maps[key] = await geography(ids, election.date, ids, false);
+    }
+    return { state, name: stateName, ...found, maps, locals };
   });
 }
 

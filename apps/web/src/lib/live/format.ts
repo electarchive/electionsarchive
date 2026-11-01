@@ -15,8 +15,20 @@ export function tone(option: LiveOption | undefined) {
   );
 }
 
+const SUFFIXES = new Set(["jr", "sr", "ii", "iii", "iv", "v"]);
+
 export function surname(option: LiveOption | undefined) {
-  return option?.label.trim().split(/\s+/u).at(-1) ?? "";
+  const words = (option?.label ?? "")
+    .trim()
+    .split(/\s+/u)
+    .map((word) => word.replace(/,$/u, ""));
+  while (
+    words.length > 1 &&
+    SUFFIXES.has((words.at(-1) ?? "").replace(/\.$/u, "").toLowerCase())
+  ) {
+    words.pop();
+  }
+  return words.at(-1) ?? "";
 }
 
 export function initial(option: LiveOption | undefined) {

@@ -7,6 +7,7 @@
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import SearchIcon from "@lucide/svelte/icons/search";
   import type { Standing } from "#lib/live/standing.js";
+  import { isHover } from "#lib/explain.svelte.js";
   import { count, percent } from "#lib/format.js";
   import { compact, lead, surname, tone } from "#lib/live/format.js";
   import { remainder } from "#lib/live/standing.js";
@@ -336,7 +337,9 @@
             class={cn("group border-be border-border transition-colors", {
               highlighter: isMarked,
             })}
-            onpointerenter={() => (hovered = row.unit.id)}
+            onpointerenter={(event) => {
+              if (isHover(event)) hovered = row.unit.id;
+            }}
             onpointerleave={() => (hovered = null)}
           >
             <th

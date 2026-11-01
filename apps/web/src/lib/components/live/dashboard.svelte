@@ -13,6 +13,7 @@
   import type { Summary } from "#lib/live/summary.js";
   import BoardLink from "#lib/components/live/board-link.svelte";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
+  import { isHover } from "#lib/explain.svelte.js";
   import { fits } from "#lib/fits.js";
   import { numbers, percent } from "#lib/format.js";
   import {
@@ -24,6 +25,7 @@
     tone,
     zoneName,
   } from "#lib/live/format.js";
+  import { provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import {
     chamber,
@@ -252,6 +254,9 @@
     }
     return swatch(control?.parties[id]?.color, `party:${id}`);
   }
+
+  const parties = $derived(reach(election.races));
+  provideReach(() => parties);
 
   function short(id: string | null) {
     if (id == null) {
@@ -704,10 +709,19 @@
     <Picker
       {codes}
       labels={nation?.labels ?? {}}
-      senate={(code: string) => of(code, "senate")[0]}
-      governor={(code: string) => of(code, "governor")[0]}
+      senate={(code: string) => of(code, "senate")}
+      governor={(code: string) => of(code, "governor")}
       counted={reported}
-      color={strength}
+      describe={(summary: Summary) => {
+        const entry = seatById.get(summary.race.id);
+        return {
+          held:
+            entry?.held == null
+              ? null
+              : { short: short(entry.held), color: tint(entry.held) },
+          isFlip: entry?.isFlip ?? false,
+        };
+      }}
       {href}
     />
   </section>
@@ -805,9 +819,11 @@
           />
         {/if}
       {:else if nation == null}
-        <div
-          class="aspect-[1.6] animate-pulse rounded-sm bg-muted inline-full motion-reduce:animate-none"
-        ></div>
+        <p
+          class="grid aspect-[1.6] place-items-center rounded-sm border border-dashed border-border p-4 text-center text-sm text-muted-foreground inline-full"
+        >
+          {m.night_nation_map_missing()}
+        </p>
       {:else}
         <Nation
           geography={nation.map}
@@ -897,16 +913,6 @@
 
   {#if pair != null}
     <Pulse {points} sides={pair} />
-    <Explorer
-      {seats}
-      sides={pair}
-      {forecasts}
-      {label}
-      href={seatHref}
-      {tint}
-      {short}
-      place={name}
-    />
   {/if}
 
   <section
@@ -975,7 +981,9 @@
                 { highlighter: hovered === code },
               )}
               {@attach states.measure(index)}
-              onpointerenter={() => (hovered = code)}
+              onpointerenter={(event) => {
+                if (isHover(event)) hovered = code;
+              }}
               onpointerleave={() => (hovered = null)}
               onclick={async () => goto(href(code))}
             >
@@ -1045,6 +1053,19 @@
       </table>
     </div>
   </section>
+
+  {#if pair != null}
+    <Explorer
+      {seats}
+      sides={pair}
+      {forecasts}
+      {label}
+      href={seatHref}
+      {tint}
+      {short}
+      place={name}
+    />
+  {/if}
 
   {#if locals.length > 0}
     <Locals

@@ -211,7 +211,6 @@
 <section
   class="grid gap-x-10 gap-y-6 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)_minmax(0,14rem)]"
   aria-labelledby="dial-title"
-  aria-busy={isWaiting}
 >
   <div class="grid content-start gap-2.5">
     <div class="flex items-center gap-1">
@@ -260,8 +259,9 @@
             >
           {:else}
             <span
-              class="animate-pulse rounded-xs bg-muted block-7 inline-14 motion-reduce:animate-none"
-            ></span>
+              class="font-figures text-xl leading-none font-semibold text-muted-foreground/50"
+              aria-hidden="true">–</span
+            >
           {/if}
         {/each}
       </div>
@@ -284,7 +284,7 @@
         ></span>
       {:else}
         <span
-          class="absolute inset-0 animate-pulse rounded-full bg-muted motion-reduce:animate-none"
+          class="absolute inset-0 rounded-full border border-dashed border-border"
         ></span>
       {/if}
       <span class="absolute -inset-y-1 inset-s-1/2 bg-foreground/50 inline-px"
@@ -307,8 +307,15 @@
         <div class="relative overflow-hidden rounded-xs bg-muted/40 block-14">
           {#if spark.line === ""}
             <span
-              class="absolute inset-0 animate-pulse bg-muted/60 motion-reduce:animate-none"
+              class="absolute inset-x-0 inset-bs-1/2 border-bs border-dashed border-foreground/25"
+              aria-hidden="true"
             ></span>
+            <span
+              class="absolute inset-0 grid place-items-center text-[0.6875rem] text-muted-foreground"
+              ><span class="bg-background/80 px-1.5"
+                >{m.night_dial_history_empty()}</span
+              ></span
+            >
           {:else}
             <svg
               viewBox="0 0 100 40"
@@ -463,21 +470,6 @@
                 : (dot.id % 20) * 12}ms"
             />
           {/each}
-        {:else if !isLive}
-          {#each Array.from({ length: 40 }, (_, index) => index) as index (index)}
-            {const column = $derived(index % 20)}
-            {const row = $derived(Math.floor(index / 20))}
-            <circle
-              cx={width / 2 + (column - 9.5) * 8}
-              cy={PLOT -
-                4 -
-                row * 8 -
-                Math.round(Math.exp(-((column - 9.5) ** 2) / 20) * 5) * 8}
-              r="3"
-              fill="var(--muted)"
-              class="animate-pulse motion-reduce:animate-none"
-            />
-          {/each}
         {/if}
         <line
           x1="0"
@@ -495,6 +487,17 @@
           stroke="var(--foreground)"
           stroke-width="1.25"
         />
+        {#if !isLive}
+          <foreignObject x="0" y="0" {width} height={PLOT - 8}>
+            <p
+              class="grid place-items-center p-4 text-center text-xs/snug text-pretty text-muted-foreground block-full"
+            >
+              <span class="bg-background/85 px-2 py-1 max-inline-64"
+                >{m.night_dial_dots_empty()}</span
+              >
+            </p>
+          </foreignObject>
+        {/if}
         {#if isLive && !isSettled}
           <path
             d="M{x(band.mid)} {PLOT + 2} l-5 -8 h10 z"
@@ -568,8 +571,9 @@
           >
         {:else}
           <span
-            class="block animate-pulse rounded-xs bg-muted block-7 inline-20 motion-reduce:animate-none"
-          ></span>
+            class="block text-xl/tight font-semibold text-muted-foreground/50"
+            aria-hidden="true">–</span
+          >
         {/if}
       </dd>
     </div>
@@ -589,8 +593,9 @@
           >
         {:else}
           <span
-            class="block animate-pulse rounded-xs bg-muted block-7 inline-20 motion-reduce:animate-none"
-          ></span>
+            class="block text-xl/tight font-semibold text-muted-foreground/50"
+            aria-hidden="true">–</span
+          >
         {/if}
       </dd>
     </div>

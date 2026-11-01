@@ -66,7 +66,7 @@
   );
 </script>
 
-<section class="grid gap-3" aria-busy={isWaiting}>
+<section class="grid gap-3">
   <div class="relative">
     <ol class="grid grid-cols-2 items-end gap-4">
       {#each top as index, position (options[index]?.id ?? index)}
@@ -114,8 +114,9 @@
           >
             {#if isWaiting}
               <span
-                class="animate-pulse rounded-xs bg-muted block-9 inline-24 motion-reduce:animate-none"
-              ></span>
+                class="font-figures text-[clamp(1.75rem,1.2rem+1.6vw,2.375rem)] leading-none font-[780] tracking-tight text-muted-foreground/50"
+                aria-hidden="true">–</span
+              >
             {:else}
               <Counter
                 value={share(index)}
@@ -167,10 +168,6 @@
           ></span>
         {/if}
       {/each}
-    {:else}
-      <span
-        class="absolute inset-0 animate-pulse bg-muted motion-reduce:animate-none"
-      ></span>
     {/if}
     <span
       class="absolute inset-y-0 inset-s-1/2 -translate-x-1/2 bg-background inline-0.5"
@@ -187,10 +184,16 @@
         aria-expanded={isOpen}
         onclick={() => (isOpen = !isOpen)}
       >
-        <span>{m.night_others({ count: rest.length })}</span>
-        <span class="font-figures font-semibold text-foreground tabular-nums"
-          >{now.total > 0 ? percent(others / now.total) : "–"}</span
+        <span
+          >{rest.length === 1
+            ? options[rest[0] ?? 0]?.label
+            : m.night_others({ count: rest.length })}</span
         >
+        {#if now.total > 0}
+          <span class="font-figures font-semibold text-foreground tabular-nums"
+            >{percent(others / now.total)}</span
+          >
+        {/if}
         <ChevronDownIcon
           class={cn("transition-transform block-3.5 inline-3.5", {
             "rotate-180": isOpen,
@@ -220,7 +223,7 @@
           ></span>
         {:else if !isWaiting}
           <span
-            class="absolute inset-0 animate-pulse bg-[repeating-linear-gradient(-45deg,var(--border)_0_4px,transparent_4px_8px)] motion-reduce:animate-none"
+            class="absolute inset-0 bg-[repeating-linear-gradient(-45deg,var(--border)_0_4px,transparent_4px_8px)]"
           ></span>
         {/if}
       </div>

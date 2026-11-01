@@ -4,6 +4,7 @@
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import type { Desk } from "#lib/live/board/desk.svelte.js";
+  import { isHover } from "#lib/explain.svelte.js";
   import { count, percent } from "#lib/format.js";
   import {
     compact,
@@ -128,7 +129,9 @@
             "bg-accent": desk.unit === row.unit.id,
             "hover:bg-muted": desk.unit !== row.unit.id,
           })}
-          onpointerenter={() => (desk.unit = row.unit.id)}
+          onpointerenter={(event) => {
+            if (isHover(event)) desk.unit = row.unit.id;
+          }}
           onpointerleave={() => {
             if (desk.unit === row.unit.id) {
               desk.unit = null;

@@ -4,6 +4,7 @@
   import Flip from "#lib/components/live/dashboard/flip.svelte";
   import { percent } from "#lib/format.js";
   import { lead, tone } from "#lib/live/format.js";
+  import { lineup, useReach } from "#lib/live/lineup.js";
   import { highlight } from "#lib/live/local.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -22,26 +23,20 @@
     tokens?: Array<string>;
   } = $props();
 
+  const parties = useReach();
+
   function lines(entry: Entry) {
     const { summary } = entry;
     const winners = new Set(
       summary.race.certified?.winners ??
         (summary.winner == null ? [] : [summary.winner.id]),
     );
-    return summary.race.options
-      .map((option, index) => ({ option, votes: summary.totals[index] ?? 0 }))
-      .filter((line) => !line.option.isWriteIn || line.votes > 0)
-      .toSorted(
-        (a, b) =>
-          b.votes - a.votes ||
-          Number(b.option.isIncumbent) - Number(a.option.isIncumbent),
-      )
-      .slice(0, Math.min(4, entry.contest.seats + 1))
-      .map((line) => ({
-        ...line,
-        share: summary.total > 0 ? line.votes / summary.total : null,
-        isWinner: winners.has(line.option.id),
-      }));
+    return lineup(
+      summary.race,
+      summary.totals,
+      parties(),
+      Math.min(4, entry.contest.seats + 1),
+    ).main.map((line) => ({ ...line, isWinner: winners.has(line.option.id) }));
   }
 </script>
 

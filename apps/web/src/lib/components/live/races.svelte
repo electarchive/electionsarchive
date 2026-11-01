@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LiveOption, LiveRace } from "@ea/analytics/live";
   import type { Summary } from "#lib/live/summary.js";
+  import { isHover } from "#lib/explain.svelte.js";
   import { percent } from "#lib/format.js";
   import { lead, surname, tone } from "#lib/live/format.js";
   import { liveLinks } from "#lib/live/links.js";
@@ -218,7 +219,9 @@
                 },
               )}
               style:background-color={color}
-              onpointerenter={() => (probed = entry.race.slug)}
+              onpointerenter={(event) => {
+                if (isHover(event)) probed = entry.race.slug;
+              }}
               onfocus={() => (probed = entry.race.slug)}
               onblur={() => (probed = null)}>{entry.race.district ?? ""}</a
             >

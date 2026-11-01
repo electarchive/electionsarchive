@@ -1,12 +1,14 @@
 <script lang="ts">
   import SearchIcon from "@lucide/svelte/icons/search";
   import type { Entry, Seating, Side } from "#lib/live/ballot.js";
+  import type { Geography } from "#lib/live/standing.js";
   import { Button } from "#lib/components/ui/button/index.js";
   import { Segmented } from "#lib/components/ui/segmented/index.js";
   import { count } from "#lib/format.js";
   import { fold, tokenize } from "#lib/live/local.js";
   import { m } from "#lib/paraglide/messages.js";
   import Bar from "./bar.svelte";
+  import Districts from "./districts.svelte";
   import Rows from "./rows.svelte";
 
   const {
@@ -15,12 +17,16 @@
     seats,
     href,
     label,
+    geography,
+    shade,
   }: {
     name: string;
     entries: Array<Entry>;
     seats: Seating;
     href: (entry: Entry) => string;
     label: (entry: Entry) => string;
+    geography: Geography | null;
+    shade: (entry: Entry) => string;
   } = $props();
 
   const PAGE = 12;
@@ -130,6 +136,9 @@
       {/each}
     </tbody>
   </table>
+  {#if geography != null}
+    <Districts {geography} {entries} {name} {label} {href} {shade} />
+  {/if}
 
   <div class="grid gap-2">
     <div class="flex flex-wrap items-center gap-2">

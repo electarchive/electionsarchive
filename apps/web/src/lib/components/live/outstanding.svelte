@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { LiveEstimate, LiveOption } from "@ea/analytics/live";
   import type { Standing } from "#lib/live/standing.js";
+  import { isHover } from "#lib/explain.svelte.js";
   import { count, percent } from "#lib/format.js";
   import { compact, lead, placeName, surname, tone } from "#lib/live/format.js";
   import { sum, toward } from "#lib/live/standing.js";
@@ -73,7 +74,7 @@
   });
 </script>
 
-<section class="grid gap-3" aria-busy={estimate == null}>
+<section class="grid gap-3">
   <header class="grid gap-1">
     <div class="flex items-center gap-1.5">
       <h3 class="heading text-lg!">{m.night_left_title()}</h3>
@@ -116,26 +117,20 @@
     {/if}
   {/if}
   {#if top.length === 0}
-    <ul class="grid gap-2" aria-hidden="true">
-      {#each { length: 6 } as _, index (index)}
-        <li class="grid grid-cols-[7rem_1fr] items-center gap-3">
-          <span
-            class="animate-pulse rounded-xs bg-muted block-3 motion-reduce:animate-none"
-          ></span>
-          <span
-            class="animate-pulse rounded-xs bg-muted block-3 motion-reduce:animate-none"
-            style:inline-size="{90 - index * 12}%"
-          ></span>
-        </li>
-      {/each}
-    </ul>
+    <p
+      class="rounded-xs border border-dashed border-border p-4 text-sm text-pretty text-muted-foreground"
+    >
+      {m.night_left_empty()}
+    </p>
   {:else}
     <ul class="grid gap-1">
       {#each top as entry (entry.row.unit.id)}
         {const leanTone = $derived(tone(options[entry.lean >= 0 ? a : b]))}
         {const link = $derived(href?.(entry.row.unit.id) ?? null)}
         <li
-          onpointerenter={() => (hovered = entry.row.unit.id)}
+          onpointerenter={(event) => {
+            if (isHover(event)) hovered = entry.row.unit.id;
+          }}
           onpointerleave={() => (hovered = null)}
         >
           <svelte:element

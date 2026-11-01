@@ -167,25 +167,41 @@
   );
 
   const COLUMNS = $derived<
-    Array<{ id: Key | null; label: string; isEnd: boolean }>
+    Array<{ id: Key | null; label: string; isEnd: boolean; width: number }>
   >([
-    { id: "race", label: m.night_explorer_race(), isEnd: false },
-    { id: null, label: m.night_explorer_held(), isEnd: false },
-    { id: null, label: m.night_explorer_leader(), isEnd: false },
-    { id: "margin", label: m.night_explorer_margin(), isEnd: false },
-    { id: "counted", label: m.night_explorer_counted(), isEnd: false },
-    { id: "remaining", label: m.night_explorer_remaining(), isEnd: true },
+    { id: "race", label: m.night_explorer_race(), isEnd: false, width: 12 },
+    { id: null, label: m.night_explorer_held(), isEnd: false, width: 10 },
+    { id: null, label: m.night_explorer_leader(), isEnd: false, width: 11 },
+    { id: "margin", label: m.night_explorer_margin(), isEnd: false, width: 10 },
+    {
+      id: "counted",
+      label: m.night_explorer_counted(),
+      isEnd: false,
+      width: 7.5,
+    },
+    {
+      id: "remaining",
+      label: m.night_explorer_remaining(),
+      isEnd: true,
+      width: 7,
+    },
     ...(forecasts
       ? [
           {
             id: "chance" as const,
             label: m.night_explorer_chance(),
             isEnd: true,
+            width: 9.5,
           },
         ]
       : []),
-    { id: "at", label: m.night_explorer_updated(), isEnd: true },
+    { id: "at", label: m.night_explorer_updated(), isEnd: true, width: 6 },
   ]);
+  const minimum = $derived.by(() => {
+    let total = 0;
+    for (const column of COLUMNS) total += column.width;
+    return total;
+  });
 
   function sortBy(next: Key) {
     if (key === next) {
@@ -232,7 +248,15 @@
     class="relative overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0 not-data-fits:overflow-y-auto not-data-fits:max-block-svh data-fits:overflow-visible"
     {@attach fits}
   >
-    <table class="border-collapse text-[0.8125rem] inline-full min-inline-208">
+    <table
+      class="table-fixed border-collapse text-[0.8125rem] inline-full"
+      style:min-inline-size="{minimum}rem"
+    >
+      <colgroup>
+        {#each COLUMNS as column (column.label)}
+          <col style:inline-size="{column.width}rem" />
+        {/each}
+      </colgroup>
       <thead
         class="sticky inset-bs-0 z-2 bg-background [&_th]:shadow-[inset_0_-1px_0_var(--color-foreground)]"
       >

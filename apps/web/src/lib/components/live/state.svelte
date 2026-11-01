@@ -14,16 +14,21 @@
     stamp,
     tone,
   } from "#lib/live/format.js";
+  import { provideReach, reach } from "#lib/live/lineup.js";
   import { liveLinks } from "#lib/live/links.js";
   import { standing } from "#lib/live/standing.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import LiveMap from "./map.svelte";
   import Bar from "./state/bar.svelte";
+  import Card from "./state/card.svelte";
   import Chamber from "./state/chamber.svelte";
+  import Districts from "./state/districts.svelte";
   import Local from "./state/local.svelte";
   import Measure from "./state/measure.svelte";
+  import Peek from "./state/peek.svelte";
   import Rows from "./state/rows.svelte";
+  import Sheet from "./state/sheet.svelte";
   import Ticket from "./state/ticket.svelte";
 
   const {
@@ -151,6 +156,11 @@
   );
   const houseSeats = $derived(seating(house, {}, ballot.parties));
 
+  const parties = $derived(
+    reach(everything.map((entry) => entry.summary.race)),
+  );
+  provideReach(() => parties);
+
   const sections = $derived(
     [
       { id: "top", label: m.night_state_top(), count: top.length },
@@ -223,6 +233,9 @@
     );
     return `${m.night_state_before()}: ${parts.join(", ")}`;
   }
+
+  let sheet = $state<Entry | null>(null);
+  let isSheet = $state(false);
 
   function isStrong(entry: Entry) {
     return (
@@ -444,48 +457,64 @@
           {before(houseSeats)}
         </p>
       </div>
-      <ol class="flex flex-wrap gap-1" aria-label={m.night_state_house()}>
-        {#each house as entry (entry.contest.id)}
-          <li>
-            <a
-              href={href(entry)}
-              class={cn(
-                "grid place-items-center rounded-xs font-figures text-xs font-semibold tabular-nums block-9 inline-9 hover:outline-2 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground",
-                { "text-background": isStrong(entry) },
-              )}
-              style:background-color={shade(entry)}
-              title={seatLabel(entry)}
-              >{entry.contest.seat === "at-large"
-                ? "AL"
-                : (entry.contest.seat ?? "")}</a
-            >
-          </li>
-        {/each}
-      </ol>
-      {#if house.length > 8}
-        {const half = $derived(Math.ceil(house.length / 2))}
-        <div class="grid gap-x-10 gap-y-0 lg:grid-cols-2">
-          <Rows
-            entries={house.slice(0, half)}
-            heading={m.night_state_district()}
-            label={seatLabel}
-            {href}
-          />
-          <Rows
-            entries={house.slice(half)}
-            heading={m.night_state_district()}
-            label={seatLabel}
-            {href}
-          />
+      <div
+        class="grid gap-x-10 gap-y-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+      >
+        <div
+          class="grid content-start gap-4 lg:sticky lg:inset-bs-14 lg:self-start"
+        >
+          {#if ballot.maps.house != null}
+            <Districts
+              geography={ballot.maps.house}
+              entries={house}
+              name={m.night_state_house()}
+              label={seatLabel}
+              {href}
+              {shade}
+            />
+          {/if}
+          <ol class="flex flex-wrap gap-1" aria-label={m.night_state_house()}>
+            {#each house as entry (entry.contest.id)}
+              <li>
+                <Peek
+                  href={href(entry)}
+                  title={seatLabel(entry)}
+                  class={cn(
+                    "grid place-items-center rounded-xs font-figures text-xs font-semibold tabular-nums block-9 inline-9 hover:outline-2 hover:outline-foreground focus-visible:outline-2 focus-visible:outline-foreground data-[state=open]:outline-2 data-[state=open]:outline-foreground",
+                    { "text-background": isStrong(entry) },
+                  )}
+                  style="background-color: {shade(entry)}"
+                  onTouch={() => {
+                    sheet = entry;
+                    isSheet = true;
+                  }}
+                >
+                  {#snippet card()}
+                    <Card
+                      summary={entry.summary}
+                      heading={seatLabel(entry)}
+                      held={entry.held}
+                      isFlip={entry.isFlip}
+                    />
+                  {/snippet}
+                  {entry.contest.seat === "at-large"
+                    ? "AL"
+                    : (entry.contest.seat ?? "")}
+                </Peek>
+              </li>
+            {/each}
+          </ol>
+          <p class="text-xs text-pretty text-muted-foreground">
+            {m.night_state_districts_legend()}
+          </p>
         </div>
-      {:else}
         <Rows
           entries={house}
           heading={m.night_state_district()}
           label={seatLabel}
           {href}
         />
-      {/if}
+      </div>
     </section>
   {/if}
 
@@ -506,6 +535,8 @@
             seats={chamber.seats}
             {href}
             label={seatLabel}
+            geography={ballot.maps[chamber.id] ?? null}
+            {shade}
           />
         {/each}
       </div>
@@ -561,3 +592,15 @@
     </div>
   {/if}
 </article>
+
+{#if sheet != null}
+  {const entry = $derived(sheet)}
+  <Sheet
+    bind:isOpen={isSheet}
+    title={`${m.night_state_house()}, ${seatLabel(entry)}`}
+    href={href(entry)}
+    action={m.night_state_results()}
+  >
+    <Card summary={entry.summary} held={entry.held} isFlip={entry.isFlip} />
+  </Sheet>
+{/if}
