@@ -10203,6 +10203,17 @@ def parse() -> None:
                 "Coconino Association For Vocation Industry & Technology(caviat)": "Coconino Association for Vocation Industry and Technology",
                 "Western Arizona Vocational District #50": "Western Arizona Vocational District",
                 "Southwest Technical Education District of Yuma (stedy)": "Southwest Technical Education District of Yuma",
+                "Boone County School District 1": "Boone Central Schools",
+                "Lyons Decatur Ne Sch Dist 20": "Lyons-Decatur Northeast Schools",
+                "Valentine Rural High Sch District 6": "Valentine Community Schools",
+                "Elkhorn Sch Dist 10": "Elkhorn Public Schools",
+                "Elkhorn Valley Sch Di 80": "Elkhorn Valley Schools",
+                "Creighton City Sch Dis 13": "Creighton Community Public Schools",
+                "Crofton Vlg Sch Dist 96": "Crofton Community Schools",
+                "Mc Cook City Sch Dist 17": "McCook Public Schools",
+                "Papillion-Lavista Public School Dist 27": "Papillion-La Vista Community Schools",
+                "Red Cloud City Sch Dis 2": "Red Cloud Community Schools",
+                "Mc Cool Junction School Dist 83": "McCool Junction Public Schools",
             }.get(label, label)
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
@@ -10590,6 +10601,21 @@ def parse() -> None:
                     tokens = re.sub(r"\b(de|au|le)(kalb|sable|ray|witt)\b", r"\1 \2", " ".join(tokens)).split()
                 if state == "NE":
                     tokens = re.sub(r"\b(bell|silver)(creek)\b", r"\1 \2", " ".join(tokens)).split()
+                    tokens = re.sub(
+                        r"^richardson county school district (1|23|29|70)\b",
+                        lambda m: {
+                            "1": "pawnee city public schools",
+                            "23": "johnson brock public schools",
+                            "29": "auburn public schools",
+                            "70": "humboldt table rock steinauer public schools",
+                        }[m[1]],
+                        " ".join(tokens),
+                    ).split()
+                    tokens = re.sub(
+                        r"^(isanti|sem) (community|public) schools\b",
+                        lambda m: "santee community schools" if m[1] == "isanti" else "sumner eddyville miller schools",
+                        " ".join(tokens),
+                    ).split()
                 if state == "MI":
                     tokens = re.sub(
                         r"^walkerville public schools\b",
@@ -10802,7 +10828,7 @@ def parse() -> None:
                 fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
                 if state == "IN" and in_pin is not None:
                     fits = [fit for fit in fits if fit[3] == in_pin] or fits
-                if state == "NJ" and len({fit[4] for fit in fits}) > 1:
+                if state in ("NJ", "NE") and len({fit[4] for fit in fits}) > 1:
                     plain = [
                         word for word in tokens if word not in ("high", "school", "schools", "district", "sch", "dist")
                     ]
@@ -10907,8 +10933,8 @@ def parse() -> None:
                         role = post.split()[-1]
                     ward = re.search(
                         r"\bward (\d+)\b|\b(\d+)(?:st|nd|rd|th)? ward\b|\bw(\d+)\b|\b(north|south|east|west|central) ward\b"
-                        r"|\bward (f\d+)\b",
-                        post,
+                        r"|\bward (f\d+)\b" + (r"|\bward ([a-e])$" if state == "NE" else r"|(?!)()"),
+                        re.sub(r"\bdistrict \d+ (?=ward\b)", "", post) if state == "NE" else post,
                     )
                     me_seated = state == "ME" and role in ("committee", "board-of-education")
                     seat = (
@@ -10929,7 +10955,7 @@ def parse() -> None:
                         else None
                     ) or (
                         (
-                            f"Ward {(ward[1] or ward[2] or ward[3] or ward[5]).upper()}"
+                            f"Ward {(ward[1] or ward[2] or ward[3] or ward[5] or ward[6]).upper()}"
                             + (
                                 f" Position {pos[1]}"
                                 if state in ("AR", "NV") and (pos := re.search(r"\bposition (\d+)\b", post))
@@ -10938,9 +10964,22 @@ def parse() -> None:
                             if ward[4] is None
                             else f"{ward[4].title()} Ward"
                         )
-                        if ward and (me_seated or role in ("council", "commission", "board-of-directors"))
-                        else f"{other[1].title()} {other[2]}"
-                        if (other := re.search(r"\b(seat|district|group|place|zone|position) (\d+)\b", post))
+                        if ward
+                        and (
+                            me_seated
+                            or role in ("council", "commission", "board-of-directors")
+                            or state == "NE"
+                            and role == "board-of-education"
+                        )
+                        else f"{other[1].title()} {other[2].upper()}"
+                        if (
+                            other := re.search(
+                                r"\b(seat|district|group|place|zone|position) (\d+|[a-f](?= |$))"
+                                if state == "CA"
+                                else r"\b(seat|district|group|place|zone|position) (\d+)\b",
+                                post,
+                            )
+                        )
                         and (me_seated or role in ("council", "commission", "board-of-directors"))
                         else "At-Large"
                         if (me_seated or role in ("council", "commission", "board-of-directors"))
