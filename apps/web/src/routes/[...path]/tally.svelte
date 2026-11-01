@@ -94,6 +94,7 @@
                 href={href(round)}
                 aria-current={round === count.round ? "step" : undefined}
                 data-sveltekit-reset="false"
+                data-sveltekit-preload-data="hover"
                 >{round === count.last
                   ? m.count_final()
                   : m.count_round({ round })}</a

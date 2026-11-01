@@ -38,6 +38,37 @@ function eager<T>(promise: Promise<T>) {
   return (): T | Promise<T> => (settled == null ? promise : settled.value);
 }
 
+let looking = 0;
+
+function ahead(
+  count: { round: number; last: number; initial: number } | null,
+  asked: number,
+  load: (round: number) => Promise<unknown>,
+) {
+  if (count == null || count.last < 2 || looking >= 2) {
+    return;
+  }
+  const keys = new Set(
+    [count.round + 1, count.round - 1, count.last]
+      .filter((round) => round >= 1 && round <= count.last)
+      .map((round) => (round === count.initial ? 0 : round))
+      .filter((round) => round !== asked),
+  );
+  if (keys.size === 0) {
+    return;
+  }
+  looking++;
+  void (async () => {
+    try {
+      for (const round of keys) {
+        await load(round).catch(() => null);
+      }
+    } finally {
+      looking--;
+    }
+  })();
+}
+
 async function draw() {
   const result = await db.execute<{
     id: string;
@@ -968,7 +999,7 @@ export async function archive(path: string, search: URLSearchParams) {
   }
   if (slug.type === "contest") {
     const merged = season(slug.entity_id);
-    const got = call(router.contests.get, {
+    const input = {
       id: slug.entity_id,
       unit,
       by: search.get("by") ?? undefined,
@@ -976,7 +1007,8 @@ export async function archive(path: string, search: URLSearchParams) {
       match,
       round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
       group: search.get("group") ?? undefined,
-    });
+    } as const;
+    const got = call(router.contests.get, input);
     const ballot = eager(
       got
         .then(async () =>
@@ -1059,6 +1091,9 @@ export async function archive(path: string, search: URLSearchParams) {
       own != null && level?.tiles != null && own.frame != null
         ? null
         : await around;
+    ahead(contest.count, input.round, async (round) =>
+      call(router.contests.get, { ...input, round }),
+    );
     return {
       kind: "contest" as const,
       id: slug.entity_id,

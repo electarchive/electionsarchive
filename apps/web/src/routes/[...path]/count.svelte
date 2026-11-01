@@ -133,6 +133,7 @@
       href={href(round)}
       aria-label={label}
       data-sveltekit-reset="false"
+      data-sveltekit-preload-data="hover"
       onclick={() => go(round)}><Icon class="block-4 inline-4" /></a
     >
   {/if}
@@ -184,6 +185,7 @@
           aria-label={name(entry.round)}
           tabindex={isShown ? 0 : -1}
           data-sveltekit-reset="false"
+          data-sveltekit-preload-data="hover"
           onclick={() => go(entry.round)}
           onkeydown={(event) => {
             const next =

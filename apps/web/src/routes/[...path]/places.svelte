@@ -262,14 +262,12 @@
         .filter((entry) => entry.row.within == null)
         .map((entry) => [entry.row.k, entry.row]),
     );
+    const nested = Map.groupBy(sorted, (entry) => entry.row.within);
     return sorted
       .filter(
         (entry) => entry.row.within == null || !parents.has(entry.row.within),
       )
-      .flatMap((entry) => [
-        entry,
-        ...sorted.filter((child) => child.row.within === entry.row.k),
-      ])
+      .flatMap((entry) => [entry, ...(nested.get(entry.row.k) ?? [])])
       .map((entry) => {
         const parent =
           entry.row.within == null ? null : parents.get(entry.row.within);
