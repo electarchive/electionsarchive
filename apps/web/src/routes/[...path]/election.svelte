@@ -10,6 +10,7 @@
   } from "@tanstack/svelte-query";
   import { tick, untrack } from "svelte";
   import { SvelteSet } from "svelte/reactivity";
+  import { compose, partyOn, stand } from "#lib/caucus.js";
   import Name from "#lib/components/name.svelte";
   import NoteBody from "#lib/components/note-body.svelte";
   import { Button } from "#lib/components/ui/button/index.js";
@@ -27,7 +28,7 @@
   import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
-  import { independent, swatch } from "#lib/party.js";
+  import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -601,7 +602,7 @@
       orpc.bodies.get.queryOptions({ input: { id: body } }),
     ),
   }));
-  const after = $derived(
+  const seatings = $derived(
     new Map(
       bodies.flatMap((body, index) => {
         const data = sitting[index]?.data;
@@ -614,7 +615,66 @@
         if (data == null || term == null) {
           return [];
         }
-        const info = new Map(data.parties.map((party) => [party.id, party]));
+        let next: string | undefined;
+        for (const entry of data.makeup) {
+          if (
+            entry.start > term.start &&
+            (next == null || entry.start < next)
+          ) {
+            next = entry.start;
+          }
+        }
+        return [[body, { data, term, next }] as const];
+      }),
+    ),
+  );
+  const rolls = createQueries(() => ({
+    queries: bodies.map((body) => {
+      const seating = seatings.get(body);
+      return {
+        ...orpc.bodies.members.queryOptions({
+          input: {
+            id: body,
+            from: seating?.term.start ?? "1000-01-01",
+            until: seating?.next,
+          },
+        }),
+        enabled:
+          seating?.term.parties.some((entry) => entry.caucus != null) ===
+            true &&
+          ordered.some(
+            (race) =>
+              race.body === body &&
+              race.results.some(
+                (row) =>
+                  (row.seats ?? 0) > 0 &&
+                  row.party == null &&
+                  row.isIndependent === true,
+              ),
+          ),
+        staleTime: Infinity,
+        meta: { quiet: true },
+      };
+    }),
+  }));
+  const caucusing = $derived(
+    new Map(
+      rolls.flatMap((roll) => {
+        const start = roll.data?.start;
+        return start == null
+          ? []
+          : (roll.data?.members ?? []).flatMap((member) => {
+              const key = partyOn(member, start);
+              return key != null && key.includes(">")
+                ? [[member.person, key] as const]
+                : [];
+            });
+      }),
+    ),
+  );
+  const after = $derived(
+    new Map(
+      [...seatings].map(([body, { data, term }]) => {
         let total = 0;
         for (const party of term.parties) {
           total += party.seats;
@@ -626,45 +686,26 @@
               (entry.to == null || entry.to > term.start),
           )?.seats ?? total;
         return [
-          [
-            body,
-            {
-              total: Math.max(size, total),
-              isWhole: total <= size,
-              parts: term.parties
-                .map((entry) => {
-                  const party = info.get(entry.party ?? "");
-                  const isAppointed = entry.category === "appointed";
-                  const group =
-                    entry.category === "elected"
-                      ? null
-                      : isAppointed
-                        ? m.seats_appointed()
-                        : m.seats_ex_officio();
-                  return {
-                    key:
-                      group == null
-                        ? (entry.party ?? "none")
-                        : `category:${entry.category}`,
-                    name: group ?? party?.label ?? m.board_after_other(),
-                    label:
-                      group ??
-                      party?.short ??
-                      party?.label ??
-                      m.board_after_other(),
-                    color: swatch(
-                      group == null
-                        ? (party?.color ?? null)
-                        : independent(isAppointed ? 1 : 2),
-                      `party:${entry.party ?? ""}`,
-                    ),
-                    value: entry.seats,
-                    lean: entry.party == null ? Infinity : (party?.lean ?? 1e9),
-                  };
-                })
-                .toSorted((a, b) => a.lean - b.lean),
-            },
-          ],
+          body,
+          {
+            total: Math.max(size, total),
+            isWhole: total <= size,
+            parts: compose(term.parties, data.parties)
+              .map((party) => ({
+                key: party.key,
+                party: party.party,
+                name: party.label ?? m.board_after_other(),
+                label: party.short ?? party.label ?? m.board_after_other(),
+                color: swatch(
+                  party.color,
+                  party.party == null ? party.key : `party:${party.party}`,
+                ),
+                value: party.seats,
+                lean: party.lean ?? (party.party == null ? Infinity : 1e9),
+                isStriped: party.isStriped,
+              }))
+              .toSorted((a, b) => a.lean - b.lean),
+          },
         ];
       }),
     ),
@@ -725,37 +766,96 @@
         .filter((race) => tucked.has(race.anchor))
         .map((race) => ({ ...race, partner: null })),
     ].map((race) => {
-      const winners = race.results.filter((row) => (row.seats ?? 0) > 0);
+      const winners = race.results
+        .filter((row) => (row.seats ?? 0) > 0)
+        .map((row) => ({
+          ...row,
+          keys: [row.key],
+          persons: null as Array<string> | null,
+          isStriped: false,
+          isSplit: false,
+        }));
       let total = 0;
       for (const row of winners) {
         total += row.seats ?? 0;
       }
       const loose = winners.filter(
-        (row) =>
-          row.party == null &&
-          row.isIndependent === true &&
-          row.key.startsWith("person:"),
+        (row) => row.party == null && row.isIndependent === true,
       );
-      let unaffiliated = 0;
+      const pieces: Array<{
+        row: (typeof loose)[number];
+        band: string;
+        persons: Array<string> | null;
+        seats: number;
+      }> = [];
       for (const row of loose) {
-        unaffiliated += row.seats ?? 0;
+        const held = race.holders?.seats[row.key] ?? [];
+        const persons =
+          row.person == null
+            ? held.flatMap((holder) => holder.person ?? [])
+            : [row.person];
+        if (persons.length === 0 || persons.length !== row.seats) {
+          pieces.push({
+            row,
+            band: "independents",
+            persons: null,
+            seats: row.seats ?? 0,
+          });
+          continue;
+        }
+        for (const [band, list] of Map.groupBy(
+          persons,
+          (person) => caucusing.get(person) ?? "independents",
+        )) {
+          pieces.push({ row, band, persons: list, seats: list.length });
+        }
       }
-      const grouped =
-        loose[0] == null || loose.length < 2
-          ? winners
-          : [
-              ...winners.filter((row) => !loose.includes(row)),
-              {
-                ...loose[0],
-                key: "independents",
-                label: m.seats_independents(),
-                short: null,
-                color: null,
-                lean: null,
-                person: null,
-                seats: unaffiliated,
-              },
-            ];
+      const bands = Map.groupBy(pieces, (piece) => piece.band);
+      const crew = new Map(
+        stand(
+          bands.keys(),
+          seatings.get(race.body ?? "")?.data.parties ?? [],
+        ).map((party) => [party.id, party]),
+      );
+      const grouped = [
+        ...winners.filter((row) => !loose.includes(row)),
+        ...bands.entries().flatMap(([band, list]) => {
+          const made = crew.get(band);
+          const first = list[0];
+          if (first == null) {
+            return [];
+          }
+          if (
+            made == null &&
+            list.length === 1 &&
+            first.seats === first.row.seats
+          ) {
+            return [first.row];
+          }
+          let seats = 0;
+          for (const piece of list) {
+            seats += piece.seats;
+          }
+          return [
+            {
+              ...first.row,
+              key: band,
+              label: made?.label ?? m.seats_independents(),
+              short: null,
+              color: made?.color ?? null,
+              lean: made?.lean ?? null,
+              person: null,
+              seats,
+              keys: [...new Set(list.map((piece) => piece.row.key))],
+              persons: list.every((piece) => piece.persons != null)
+                ? list.flatMap((piece) => piece.persons ?? [])
+                : null,
+              isStriped: made?.isStriped ?? false,
+              isSplit: list.some((piece) => piece.seats !== piece.row.seats),
+            },
+          ];
+        }),
+      ];
       const seated =
         race.count === 1 && total <= 1 && race.kind !== "elector_slate"
           ? []
@@ -779,14 +879,16 @@
           return head == null
             ? null
             : rows.length === 1
-              ? { ...head, keys: [head.key] }
+              ? { ...head, slots: [head.key] }
               : {
                   ...head,
                   label: rows.map((row) => row.short ?? row.label).join("/"),
                   short: null,
                   seats,
                   share,
-                  keys: rows.map((row) => row.key),
+                  keys: rows.flatMap((row) => row.keys),
+                  slots: rows.map((row) => row.key),
+                  isStriped: false,
                 };
         })
         .filter((row) => row != null)
@@ -834,14 +936,29 @@
       const change =
         race.before == null ||
         pooled * 20 > filled ||
-        seated.every((row) => !before.has(row.key))
+        seated.every((row) => row.keys.every((key) => !before.has(key)))
           ? null
           : Object.fromEntries(
-              [...seated, ...lost].flatMap((row) => {
-                const earlier = before.get(row.key);
-                return earlier == null
-                  ? []
-                  : [[row.key, (row.seats ?? 0) - earlier]];
+              [
+                ...grouped,
+                ...lost.map((row) => ({
+                  ...row,
+                  keys: [row.key],
+                  isSplit: false,
+                })),
+              ].flatMap((row) => {
+                if (row.isSplit) {
+                  return [];
+                }
+                let earlier = 0;
+                for (const key of row.keys) {
+                  const seats = before.get(key);
+                  if (seats == null) {
+                    return [];
+                  }
+                  earlier += seats;
+                }
+                return [[row.key, (row.seats ?? 0) - earlier]];
               }),
             );
       const whole =
@@ -1134,7 +1251,7 @@
                     )
                     .map((row) => {
                       let delta: number | null = 0;
-                      for (const key of row.keys) {
+                      for (const key of row.slots) {
                         const step = change?.[key];
                         delta =
                           step == null || delta == null ? null : delta + step;
@@ -1158,6 +1275,7 @@
                           : (row.seats ?? 0),
                         delta: change == null || isTallied ? undefined : delta,
                         photo: null,
+                        isStriped: row.isStriped,
                       };
                     }),
                   isCount: true,
@@ -1222,7 +1340,13 @@
           ...row,
           seats: row.seats ?? 0,
           here: 0,
-          members: race.holders?.seats[row.key] ?? [],
+          members: row.keys.flatMap((key) =>
+            (race.holders?.seats[key] ?? []).filter(
+              (holder) =>
+                row.persons == null ||
+                row.persons.includes(holder.person ?? ""),
+            ),
+          ),
         })),
         lost:
           change == null
@@ -3139,10 +3263,7 @@
               })}
         </p>
         <Balance
-          parts={race.whole.parts.map((part) => ({
-            ...part,
-            party: part.key === "none" ? null : part.key,
-          }))}
+          parts={race.whole.parts}
           total={race.whole.total}
           isWhole={race.whole.isWhole}
           isCount

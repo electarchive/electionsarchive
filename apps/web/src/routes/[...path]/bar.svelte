@@ -23,6 +23,7 @@
       color: string;
       value: number;
       detail?: string | null;
+      isStriped?: boolean;
     }>;
     total: number;
     isCount: boolean;
@@ -61,6 +62,7 @@
         color: "var(--muted-foreground)",
         value,
         members: tiny.length,
+        isStriped: false,
       },
       ...shown.slice(1),
     ];
@@ -97,7 +99,13 @@
           {#snippet child({ props })}
             <span
               {...props}
-              class="block shrink-0 basis-0 bg-(--party) transition-opacity hover:opacity-80"
+              class={cn(
+                "block shrink-0 basis-0 bg-(--party) transition-opacity hover:opacity-80",
+                {
+                  "bg-[repeating-linear-gradient(45deg,transparent_0_3px,var(--card)_3px_4.5px)]":
+                    part.isStriped,
+                },
+              )}
               style:--party={part.color}
               style:flex-grow={part.value}
             ></span>
@@ -142,7 +150,10 @@
       >
         <span class="flex items-baseline gap-1.5">
           <span
-            class="shrink-0 self-center rounded-xs block-2 inline-2"
+            class={cn("shrink-0 self-center rounded-xs block-2 inline-2", {
+              "bg-[repeating-linear-gradient(45deg,transparent_0_2px,var(--card)_2px_3px)]":
+                part.isStriped,
+            })}
             style:background-color={part.color}
           ></span>
           <span class="font-semibold">{part.label}</span>

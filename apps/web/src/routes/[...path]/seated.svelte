@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createQuery } from "@tanstack/svelte-query";
+  import { compose } from "#lib/caucus.js";
   import { m } from "#lib/paraglide/messages.js";
-  import { independent } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import Seats from "./seats.svelte";
 
@@ -26,6 +26,8 @@
       short: string | null;
       color: string | null;
       lean: number | null;
+      party?: string | null;
+      isStriped?: boolean;
       seats: number;
       here: number;
       members: Array<{
@@ -95,6 +97,9 @@
       parties: [
         ...own.map(({ id, party }) => ({
           party: id,
+          caucus: party.key.includes(">")
+            ? party.key.slice(party.key.indexOf(">") + 1)
+            : null,
           category: "elected" as const,
           seats: party.seats,
           isIndependent: id == null,
@@ -114,60 +119,34 @@
     if (total <= filled) {
       return null;
     }
-    const info = new Map<
-      string,
-      {
-        label: string;
-        short: string | null;
-        color: string | null;
-        lean: number | null;
-      }
-    >([
-      ...data.parties.map((party) => [party.id, party] as const),
-      ...own.flatMap(({ id, party }) =>
-        id == null ? [] : [[id, party] as const],
-      ),
+    const composed = compose(term.parties, [
+      ...data.parties,
+      ...own.flatMap(({ id, party }) => (id == null ? [] : [{ ...party, id }])),
     ]);
+    const keys = new Set(composed.map((party) => party.key));
     const local = new Map<string, number>();
     const held = new Map<string, (typeof parties)[number]["members"]>();
     for (const party of parties) {
-      const id = /^party:(.+)$/.exec(party.key)?.[1] ?? null;
-      const key =
-        id != null && term.parties.some((entry) => entry.party === id)
-          ? id
+      const id = /^party:(.+)$/.exec(party.key)?.[1] ?? party.key;
+      const key = keys.has(id)
+        ? id
+        : party.party == null && keys.has("independent")
+          ? "independent"
           : "none";
       local.set(key, (local.get(key) ?? 0) + party.seats);
       held.set(key, [...(held.get(key) ?? []), ...party.members]);
     }
-    return term.parties.map((entry) => {
-      if (entry.category !== "elected") {
-        const isAppointed = entry.category === "appointed";
-        return {
-          key: `category:${entry.category}`,
-          label: isAppointed ? m.seats_appointed() : m.seats_ex_officio(),
-          short: null,
-          color: independent(isAppointed ? 1 : 2),
-          lean: Number.MAX_SAFE_INTEGER,
-          seats: entry.seats,
-          here: 0,
-          members: [],
-        };
-      }
-      const key = entry.party ?? "none";
-      const party = entry.party == null ? null : info.get(entry.party);
-      return {
-        key,
-        label:
-          party?.label ??
-          (entry.isIndependent ? m.seats_independents() : m.record_none()),
-        short: party?.short ?? null,
-        color: party?.color ?? null,
-        lean: party?.lean ?? null,
-        seats: entry.seats,
-        here: Math.min(entry.seats, local.get(key) ?? 0),
-        members: region == null ? (held.get(key) ?? []) : [],
-      };
-    });
+    return composed.map((party) => ({
+      key: party.key,
+      label: party.label ?? m.record_none(),
+      short: party.short,
+      color: party.color,
+      lean: party.lean,
+      isStriped: party.isStriped,
+      seats: party.seats,
+      here: Math.min(party.seats, local.get(party.key) ?? 0),
+      members: region == null ? (held.get(party.key) ?? []) : [],
+    }));
   });
 </script>
 

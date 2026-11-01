@@ -26,6 +26,7 @@
       detail?: string | null;
       delta?: number | null;
       photo?: { src: string } | null;
+      isStriped?: boolean;
     }>;
     total: number;
     isCount: boolean;
@@ -56,7 +57,13 @@
   >
     {#if part.photo == null && present.length > 2 && !(isPictured && part.person != null)}
       <span
-        class="me-1.5 inline-block rounded-xs bg-(--party) align-[-0.02em] block-[0.62em] inline-[0.62em]"
+        class={cn(
+          "me-1.5 inline-block rounded-xs bg-(--party) align-[-0.02em] block-[0.62em] inline-[0.62em]",
+          {
+            "bg-[repeating-linear-gradient(45deg,transparent_0_2px,var(--card)_2px_3px)]":
+              part.isStriped,
+          },
+        )}
       ></span>
     {/if}<span
       class={cn({

@@ -52,6 +52,7 @@
       color: string | null;
       lean: number | null;
       near?: string | null;
+      isStriped?: boolean;
       seats: number;
       here: number;
       members: Array<Member>;
@@ -242,6 +243,11 @@
   });
   const dot = $derived(0.84 * layout.thick * S);
   const ring = $derived(Math.max(0.6, 0.22 * dot));
+  const striped = $derived(
+    new Set(
+      folded.flatMap((party) => (party.isStriped === true ? [party.key] : [])),
+    ),
+  );
 
   const seats = $derived.by(() => {
     const positions: Array<{ angle: number; radius: number }> = [];
@@ -700,6 +706,30 @@
                   : `color-mix(in oklab, ${colors.get(seat.party)} 28%, var(--card))`}
           />
         {/each}
+        {#if striped.size > 0}
+          <g class="pointer-events-none" aria-hidden="true">
+            <defs>
+              <pattern
+                id="{uid}-stripe"
+                width={0.7 * dot}
+                height={0.7 * dot}
+                patternUnits="userSpaceOnUse"
+                patternTransform="rotate(45)"
+              >
+                <rect width={0.24 * dot} height={0.7 * dot} class="fill-card" />
+              </pattern>
+            </defs>
+            {#each seats.filter( (seat) => striped.has(seat.party) ) as seat (seat.index)}
+              <circle
+                cx={seat.x}
+                cy={seat.y}
+                r={dot}
+                fill="url(#{uid}-stripe)"
+                opacity="0.6"
+              />
+            {/each}
+          </g>
+        {/if}
         {#if tip != null}
           <g
             class="pointer-events-none fill-none stroke-foreground"
@@ -906,9 +936,14 @@
           ></button>
         {/if}
         <span
-          class={cn("shrink-0 rounded-xs block-2.5 inline-2.5", {
-            "opacity-35": isMuted,
-          })}
+          class={cn(
+            "shrink-0 rounded-xs block-2.5 inline-2.5",
+            { "opacity-35": isMuted },
+            {
+              "bg-[repeating-linear-gradient(45deg,transparent_0_2px,var(--card)_2px_3px)]":
+                party.isStriped === true,
+            },
+          )}
           style:background-color={color}
         ></span>
         <span class="flex-1 truncate font-semibold min-inline-0">

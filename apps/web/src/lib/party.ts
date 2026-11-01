@@ -54,10 +54,9 @@ export function independent(rank: number) {
 }
 
 export function swatch(color: string | null | undefined, key: string) {
+  const id = key.replace(/^party:/, "");
   const chosen =
-    (key.startsWith("party:") ? palette.overrides[key.slice(6)] : undefined) ??
-    color ??
-    SIDES.get(key);
+    palette.overrides[id.slice(id.indexOf(">") + 1)] ?? color ?? SIDES.get(key);
   if (key === "independent" && chosen == null) {
     return independent(0);
   }

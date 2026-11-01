@@ -210,6 +210,33 @@ export function stand(
   ];
 }
 
+export function compose(
+  entries: Array<Parameters<typeof effective>[0] & { seats: number }>,
+  parties: Array<Party>,
+) {
+  const seats = new Map<string, number>();
+  for (const entry of entries) {
+    const key = effective(entry) ?? "none";
+    seats.set(key, (seats.get(key) ?? 0) + entry.seats);
+  }
+  const info = new Map(
+    stand(seats.keys(), parties).map((party) => [party.id, party]),
+  );
+  return [...seats].map(([key, value]) => {
+    const party = info.get(key);
+    return {
+      key,
+      party: party == null || party.isMade ? null : key,
+      label: party?.label ?? null,
+      short: party?.short ?? null,
+      color: party?.color ?? null,
+      lean: party?.lean ?? null,
+      isStriped: party?.isStriped ?? false,
+      seats: value,
+    };
+  });
+}
+
 export const isUnplaced = (party: { key: string; lean: number | null }) =>
   party.lean == null && /^(?:party:)?[0-9a-f]{8}-/.test(party.key);
 
