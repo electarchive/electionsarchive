@@ -239,7 +239,11 @@ TABLES += [
     *leaves("12threpubnaticon00blumrich", "1900", {"": (157,)}),
     *leaves("officialproceedi00repu", "1896", {"": (132,)}),
     *ballots("proceedingsoften00repu", "1892", {1: (144, 150)}),
-    *leaves("officialproceedi00repu_0", "1888", {"b1": (376, 377), "b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)}),
+    *leaves(
+        "officialproceedi00repu_0",
+        "1888",
+        {"b1": (376, 377), "b2": (380,), "b3": (383, 384), "b5": (397,), "b7": (410,)},
+    ),
     *ballots("officialproceedi00repu_0", "1888", {4: (394, 396), 6: (406, 408), 8: (416, 418)}),
     *leaves("proceedingsofeig00repu", "1884", {"b3": (159,)}),
     *ballots("proceedingsofeig00repu", "1884", {1: (148, 152), 2: (153, 157), 4: (165, 176)}),
@@ -279,6 +283,7 @@ TABLES += [
     {"table": "1868:republican", "item": "presidentialelec00repu", "leaves": (97,), "columns": ("Grant",)},
 ]
 DNC_1912 = ((203, 204, 205), (207, 208), (211, 212), (212, 213, 214), (217, 218), (219, 220), (221, 222), (222, 223, 224), (225, 226), (227, 228), (230, 231, 232), (233, 234), (237, 238), (248, 249), (250, 251), (253, 254), (257, 258), (259, 260), (260, 261, 262), (262, 263), (266, 267), (270, 271, 272), (272, 273), (276, 277), (278, 279), (283, 284), (293, 294), (297, 298), (305, 306), (308, 309), (311, 312), (312, 313, 314), (315, 316), (318, 319), (320, 321), (322, 323), (323, 324, 325), (327, 328), (330, 331), (331, 332, 333), (333, 334, 335), (336, 337), (344, 345), (348, 349), (351, 352), (358, 359))  # fmt: skip
+CHARLESTON = {1: 79, 2: 80, 3: 80, 4: 80, 5: 80, 6: 80, 7: 81, 8: 81, 9: 81, 10: 82, 11: 82, 12: 82, 13: 83, 14: 83, 15: 83, 16: 83, 17: 84, 18: 84, 19: 84, 20: 84, 21: 84, 22: 84, 23: 85, 24: 86, 25: 86, 26: 86, 27: 86, 28: 86, 29: 87, 30: 87, 31: 87, 32: 87, 33: 87, 34: 88, 35: 88, 36: 89, 37: 89, 38: 89, 39: 90, 40: 90, 41: 90, 42: 90, 43: 90, 44: 91, 45: 91, 46: 91, 47: 91, 48: 91, 49: 92, 50: 92, 51: 92, 52: 92, 53: 92, 54: 93, 55: 93, 56: 93, 57: 93}  # fmt: skip
 DNC_1868 = (78, 80, 83, 86, 99, 102, 109, 112, 114, 117, 119, 122, 125, 127, 130, 132, 135, 138, 147, 150, 152)  # fmt: skip
 TABLES += [
     *(
@@ -294,12 +299,17 @@ TABLES += [
         )
     ),
     *leaves("official00demo", "1900", {"": (165, 166, 167)}, party="democratic"),
-    *leaves("officialproce00de", "1896", {"b5": (346,)}, party="democratic"),
+    *leaves(
+        "officialproce00de",
+        "1896",
+        {"b1": (330,), "b2": (335,), "b3": (338,), "b4": (340,), "b5": (346,)},
+        party="democratic",
+    ),
     *leaves("cu31924002684375", "1892", {"": (182,)}, party="democratic"),
-    *leaves("officialproceedi0000demo_u0f5", "1884", {"b1": (266,)}, party="democratic"),
-    *leaves("officialp00demo", "1880", {"b2": (139,)}, party="democratic"),
-    *leaves("officialproc00demo", "1876", {"b2": (167,)}, party="democratic"),
-    *leaves("officialproceed01convgoog", "1872", {"": (66,)}, party="democratic"),
+    *leaves("officialproceedi0000demo_u0f5", "1884", {"b1": (266,), "b2": (280,)}, party="democratic"),
+    *leaves("officialp00demo", "1880", {"b1": (124,), "b2": (139,)}, party="democratic"),
+    *leaves("officialproc00demo", "1876", {"b1": (165,), "b2": (167,)}, party="democratic"),
+    *leaves("officialproceed01convgoog", "1872", {"": (66,)}, scatter=True, party="democratic"),
     *leaves(
         "officialproceedi00demo",
         "1868",
@@ -313,6 +323,12 @@ TABLES += [
         "ballot": 22,
     },
     *leaves("officialproceed00demo", "1864", {"": (43,)}, party="democratic"),
+    *ballots(
+        "officialpr00demo",
+        "1860",
+        {n: (start, min(start + 1, 93)) for n, start in CHARLESTON.items()},
+        party="democratic",
+    ),
     *leaves("officialpr00demo", "1860", {"baltimore-b1": (168,), "baltimore-b2": (173,)}, party="democratic"),
     *leaves("officialproceedi00indemo", "1856", {"b13": (41,), "b14": (42,)}, party="democratic"),
     *(
