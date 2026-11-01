@@ -948,11 +948,6 @@
       block: tallest,
     }));
   });
-  const hues = $derived(
-    panes.length === 0
-      ? new Map<number, string>()
-      : new Map(fills((css) => css)),
-  );
   const tour = $derived(
     panes.flatMap((box) =>
       box.units.filter((piece) => rows.has(piece.k)).map((piece) => piece.k),
@@ -982,6 +977,174 @@
     return () => {
       isCurrent = false;
     };
+  });
+  let zooms = $state.raw<Awaited<ReturnType<typeof orpc.maps.zooms.call>>>([]);
+  let lit = $state<number | null>(null);
+  const asking = $derived(
+    nested == null && places.rows.length >= 24
+      ? `${tiles} ${places.rows.length}`
+      : null,
+  );
+  $effect(() => {
+    void asking;
+    zooms = [];
+    const ask = untrack(() =>
+      asking == null
+        ? null
+        : {
+            tiles,
+            ks: places.rows.map((row) => row.k).toSorted((a, b) => a - b),
+          },
+    );
+    if (ask == null) {
+      return;
+    }
+    let isCurrent = true;
+    void orpc.maps.zooms.call(ask).then(
+      (found) => {
+        if (isCurrent) {
+          zooms = found;
+        }
+      },
+      () => {},
+    );
+    return () => {
+      isCurrent = false;
+    };
+  });
+  const lensHeight = $derived.by(() => {
+    let ratio = 0;
+    for (const zone of zooms) {
+      ratio += zone.width / zone.height;
+    }
+    const fitted = (boxWidth - 18 * zooms.length) / Math.max(ratio, 1);
+    return Math.floor(
+      Math.min(narrow ? 168 : 240, Math.max(narrow ? 140 : 136, fitted)),
+    );
+  });
+  const lenses = $derived(
+    isSummary
+      ? []
+      : zooms.map((zone, index) => {
+          const parent = zone.within == null ? null : zooms[zone.within];
+          const named =
+            zone.name === ""
+              ? m.map_zoom_closer()
+              : zone.kind === "around"
+                ? m.map_zoom_area({ place: zone.name })
+                : zone.name;
+          return {
+            index,
+            root: zone.within ?? index,
+            within: zone.within,
+            frame: zone.frame,
+            units: zone.units,
+            label:
+              parent != null &&
+              parent.name === zone.name &&
+              zone.kind !== "exact"
+                ? m.map_zoom_closer()
+                : named,
+            view: `${zone.x} ${zone.y} ${zone.width} ${zone.height}`,
+            inline: lensHeight * (zone.width / zone.height),
+            inner: zooms.flatMap((other) =>
+              other.within === index
+                ? [
+                    {
+                      x: other.x,
+                      y: other.y,
+                      width: other.width,
+                      height: other.height,
+                    },
+                  ]
+                : [],
+            ),
+          };
+        }),
+  );
+  const hues = $derived(
+    panes.length === 0 && lenses.length === 0
+      ? new Map<number, string>()
+      : new Map(fills((css) => css)),
+  );
+  const lensTour = $derived([
+    ...new Set(
+      lenses.flatMap((lens) =>
+        lens.units.filter((piece) => rows.has(piece.k)).map((piece) => piece.k),
+      ),
+    ),
+  ]);
+
+  $effect(() => {
+    const framed = lenses.filter((lens) => lens.within == null);
+    if (engine.gl == null) {
+      return;
+    }
+    untrack(() => {
+      engine.drop("zooms");
+      if (framed.length === 0) {
+        return;
+      }
+      const source = engine.shapes(
+        "zooms",
+        {
+          type: "FeatureCollection",
+          features: framed.map((lens) => {
+            const { west, south, east, north } = lens.frame;
+            return {
+              type: "Feature",
+              properties: { index: lens.index },
+              geometry: {
+                type: "Polygon",
+                coordinates: [
+                  [
+                    [west, south],
+                    [east, south],
+                    [east, north],
+                    [west, north],
+                    [west, south],
+                  ],
+                ],
+              },
+            };
+          }),
+        },
+        "zooms",
+      );
+      engine.add(
+        {
+          id: "zooms",
+          type: "line",
+          source,
+          paint: {
+            "line-color": "var(--foreground)",
+            "line-opacity": 0.45,
+            "line-width": 1,
+            "line-dasharray": [3, 2],
+          },
+        },
+        "lines",
+        { group: "zooms" },
+      );
+      engine.add(
+        {
+          id: "zooms-lit",
+          type: "line",
+          source,
+          filter: ["==", ["get", "index"], -1],
+          paint: { "line-color": "var(--foreground)", "line-width": 2 },
+        },
+        "lines",
+        { group: "zooms" },
+      );
+    });
+  });
+
+  $effect(() => {
+    const index = lit;
+    if (engine.gl != null) {
+      engine.filter("zooms-lit", ["==", ["get", "index"], index ?? -1]);
+    }
   });
   const away = $derived(
     new Set([
@@ -2772,119 +2935,7 @@
               style:block-size="{box.block}px"
               aria-hidden={tour.length === 0}
             >
-              {#each box.units as piece (piece.k)}
-                {const row = $derived(rows.get(piece.k))}
-                {const fill = $derived(
-                  hues.get(piece.k) ??
-                    "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
-                )}
-                {#if row == null}
-                  <path
-                    d={piece.d}
-                    {fill}
-                    stroke="color-mix(in oklab, var(--muted-foreground) 34%, var(--card))"
-                    stroke-width="0.75"
-                    stroke-linejoin="round"
-                    vector-effect="non-scaling-stroke"
-                  />
-                {:else}
-                  <path
-                    class="cursor-pointer outline-none"
-                    d={piece.d}
-                    {fill}
-                    stroke="var(--card)"
-                    stroke-width="0.75"
-                    stroke-linejoin="round"
-                    vector-effect="non-scaling-stroke"
-                    role="button"
-                    tabindex={piece.k ===
-                    (focus != null && tour.includes(focus) ? focus : tour[0])
-                      ? 0
-                      : -1}
-                    aria-label={row.name}
-                    data-k={piece.k}
-                    onpointermove={(event) => {
-                      if (!isHover(event)) {
-                        return;
-                      }
-                      const bounds = event.currentTarget
-                        .closest("[data-insets]")
-                        ?.parentElement?.getBoundingClientRect();
-                      if (bounds != null) {
-                        pointer = {
-                          x: event.clientX - bounds.left,
-                          y: event.clientY - bounds.top,
-                        };
-                      }
-                      if (pinned == null) {
-                        focus = piece.k;
-                      }
-                    }}
-                    onfocus={(event) => {
-                      const bounds = event.currentTarget
-                        .closest("[data-insets]")
-                        ?.parentElement?.getBoundingClientRect();
-                      const rect = event.currentTarget.getBoundingClientRect();
-                      pointer =
-                        bounds == null
-                          ? null
-                          : {
-                              x: rect.left - bounds.left + rect.width / 2,
-                              y: rect.top - bounds.top + rect.height / 2,
-                            };
-                      focus = piece.k;
-                    }}
-                    onblur={() => {
-                      pointer = null;
-                      if (pinned == null) {
-                        focus = null;
-                      }
-                    }}
-                    onclick={(event) => {
-                      if (isTouch(event) && pinned !== piece.k) {
-                        pinned = piece.k;
-                        focus = piece.k;
-                      } else {
-                        open(piece.k);
-                      }
-                    }}
-                    onkeydown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        open(piece.k);
-                        return;
-                      }
-                      const [dx, dy] = headings[event.key] ?? [0, 0];
-                      if (dx === 0 && dy === 0) {
-                        return;
-                      }
-                      event.preventDefault();
-                      const at = tour.indexOf(piece.k) + (dx + dy > 0 ? 1 : -1);
-                      const next = tour[(at + tour.length) % tour.length];
-                      event.currentTarget
-                        .closest("[data-insets]")
-                        ?.querySelector<SVGPathElement>(`[data-k="${next}"]`)
-                        ?.focus();
-                    }}
-                  />
-                {/if}
-              {/each}
-              {#if focus != null}
-                {const lit = $derived(
-                  box.units.find((piece) => piece.k === focus),
-                )}
-                {#if lit != null}
-                  <path
-                    d={lit.d}
-                    fill="none"
-                    stroke="var(--foreground)"
-                    stroke-width="1.5"
-                    stroke-linejoin="round"
-                    vector-effect="non-scaling-stroke"
-                    pointer-events="none"
-                  />
-                {/if}
-              {/if}
+              {@render drawing(box.units, tour, "insets")}
             </svg>
           </div>
         {/each}
@@ -3249,6 +3300,66 @@
       </div>
     {/if}
   </div>
+  {#if lenses.length > 0}
+    <section
+      class="scroll-fade-x flex items-start gap-4 overflow-x-auto pbe-1"
+      aria-label={m.map_zooms_label()}
+      data-zooms
+      transition:fade={{ duration: calm ? 0 : 150 }}
+    >
+      {#each lenses as lens (lens.index)}
+        <figure
+          class={cn("grid shrink-0 gap-1.5", {
+            "-ms-2 border-s border-dashed border-foreground/40 ps-2":
+              lens.within != null,
+          })}
+          onpointerenter={() => (lit = lens.root)}
+          onpointerleave={() => {
+            lit = null;
+            pointer = null;
+            if (pinned == null) {
+              focus = null;
+            }
+          }}
+        >
+          <figcaption class="flex min-inline-0">
+            <button
+              type="button"
+              class="truncate text-start text-[0.8125rem] font-semibold underline-offset-2 hover:underline focus-visible:underline"
+              style:max-inline-size="{lens.inline}px"
+              title={m.map_zoom_show({ place: lens.label })}
+              onclick={() => engine.fit(lens.frame)}>{lens.label}</button
+            >
+          </figcaption>
+          <svg
+            class="block rounded-sm bg-card ring-1 ring-border"
+            viewBox={lens.view}
+            style:inline-size="{lens.inline}px"
+            style:block-size="{lensHeight}px"
+            role="group"
+            aria-label={lens.label}
+          >
+            {@render drawing(lens.units, lensTour, "zooms")}
+            {#each lens.inner as box, at (at)}
+              <rect
+                x={box.x}
+                y={box.y}
+                width={box.width}
+                height={box.height}
+                fill="none"
+                stroke="var(--foreground)"
+                stroke-opacity="0.55"
+                stroke-width="1"
+                stroke-dasharray="3 2"
+                vector-effect="non-scaling-stroke"
+                pointer-events="none"
+              />
+            {/each}
+          </svg>
+        </figure>
+      {/each}
+    </section>
+  {/if}
 
   <div
     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-[0.8125rem]"
@@ -3844,6 +3955,131 @@
     </div>
   {/if}
 </div>
+
+{#snippet drawing(
+  units: Array<{ k: number; d: string }>,
+  tour: Array<number>,
+  scope: "insets" | "zooms",
+)}
+  {#each units as piece (piece.k)}
+    {const row = $derived(rows.get(piece.k))}
+    {const fill = $derived(
+      hues.get(piece.k) ??
+        "color-mix(in oklab, var(--muted-foreground) 14%, var(--card))",
+    )}
+    {#if row == null}
+      <path
+        d={piece.d}
+        {fill}
+        stroke="color-mix(in oklab, var(--muted-foreground) 34%, var(--card))"
+        stroke-width="0.75"
+        stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
+      />
+    {:else}
+      <path
+        class="cursor-pointer outline-none"
+        d={piece.d}
+        {fill}
+        stroke="var(--card)"
+        stroke-width="0.75"
+        stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
+        role="button"
+        tabindex={piece.k ===
+        (focus != null && tour.includes(focus) ? focus : tour[0])
+          ? 0
+          : -1}
+        aria-label={row.name}
+        data-k={piece.k}
+        onpointermove={(event) => {
+          if (!isHover(event)) {
+            return;
+          }
+          const bounds =
+            scope === "insets"
+              ? event.currentTarget
+                  .closest("[data-insets]")
+                  ?.parentElement?.getBoundingClientRect()
+              : null;
+          pointer =
+            bounds == null
+              ? null
+              : {
+                  x: event.clientX - bounds.left,
+                  y: event.clientY - bounds.top,
+                };
+          if (pinned == null) {
+            focus = piece.k;
+          }
+        }}
+        onfocus={(event) => {
+          const bounds =
+            scope === "insets"
+              ? event.currentTarget
+                  .closest("[data-insets]")
+                  ?.parentElement?.getBoundingClientRect()
+              : null;
+          const rect = event.currentTarget.getBoundingClientRect();
+          pointer =
+            bounds == null
+              ? null
+              : {
+                  x: rect.left - bounds.left + rect.width / 2,
+                  y: rect.top - bounds.top + rect.height / 2,
+                };
+          focus = piece.k;
+        }}
+        onblur={() => {
+          pointer = null;
+          if (pinned == null) {
+            focus = null;
+          }
+        }}
+        onclick={(event) => {
+          if (isTouch(event) && pinned !== piece.k) {
+            pinned = piece.k;
+            focus = piece.k;
+          } else {
+            open(piece.k);
+          }
+        }}
+        onkeydown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            open(piece.k);
+            return;
+          }
+          const [dx, dy] = headings[event.key] ?? [0, 0];
+          if (dx === 0 && dy === 0) {
+            return;
+          }
+          event.preventDefault();
+          const at = tour.indexOf(piece.k) + (dx + dy > 0 ? 1 : -1);
+          const next = tour[(at + tour.length) % tour.length];
+          event.currentTarget
+            .closest(`[data-${scope}]`)
+            ?.querySelector<SVGPathElement>(`[data-k="${next}"]`)
+            ?.focus();
+        }}
+      />
+    {/if}
+  {/each}
+  {#if focus != null}
+    {const lit = $derived(units.find((piece) => piece.k === focus))}
+    {#if lit != null}
+      <path
+        d={lit.d}
+        fill="none"
+        stroke="var(--foreground)"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+        vector-effect="non-scaling-stroke"
+        pointer-events="none"
+      />
+    {/if}
+  {/if}
+{/snippet}
 
 {#snippet opener(k: number, name: string, path: string, go: () => void)}
   {const isOpening = $derived(opening === k)}

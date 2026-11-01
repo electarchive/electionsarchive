@@ -335,3 +335,303 @@ export const boxes = async (scheme: string, day: string, ks: Array<number>) => {
   }
   return [...parts.values()];
 };
+
+type Measured = {
+  k: number;
+  id: string;
+  x: number;
+  y: number;
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+  size: number;
+  lon: number;
+  lat: number;
+};
+
+const clusters = (units: Array<Measured>, reach: number, least: number) => {
+  const seen = new Set<number>();
+  const found: Array<Array<Measured>> = [];
+  const near = (unit: Measured) =>
+    units.filter(
+      (other) => Math.hypot(other.x - unit.x, other.y - unit.y) <= reach,
+    );
+  for (const unit of units) {
+    if (seen.has(unit.k) || near(unit).length < least) {
+      continue;
+    }
+    const group: Array<Measured> = [];
+    const queue = [unit];
+    seen.add(unit.k);
+    for (let at = 0; at < queue.length; at++) {
+      const next = queue[at];
+      if (next == null) {
+        continue;
+      }
+      group.push(next);
+      const around = near(next);
+      if (around.length < least) {
+        continue;
+      }
+      for (const other of around) {
+        if (!seen.has(other.k)) {
+          seen.add(other.k);
+          queue.push(other);
+        }
+      }
+    }
+    found.push(group);
+  }
+  return found;
+};
+
+const extent = (units: Array<Measured>) => {
+  let [west, south, east, north] = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const unit of units) {
+    west = Math.min(west, unit.west);
+    south = Math.min(south, unit.south);
+    east = Math.max(east, unit.east);
+    north = Math.max(north, unit.north);
+  }
+  return { west, south, east, north };
+};
+
+const padded = (box: ReturnType<typeof extent>) => {
+  const span = Math.max(box.east - box.west, box.north - box.south);
+  const pad = span * 0.08;
+  let width = box.east - box.west + pad * 2;
+  let height = box.north - box.south + pad * 2;
+  width = Math.max(width, height * 0.8);
+  height = Math.max(height, width / 1.5);
+  const x = (box.west + box.east) / 2;
+  const y = (box.south + box.north) / 2;
+  return {
+    west: x - width / 2,
+    south: y - height / 2,
+    east: x + width / 2,
+    north: y + height / 2,
+  };
+};
+
+const dense = (
+  units: Array<Measured>,
+  span: number,
+  tiny: number,
+  depth = 0,
+): Array<Array<Measured>> =>
+  clusters(
+    units.filter((unit) => unit.size < span / tiny),
+    span / (tiny * 0.55),
+    5,
+  ).flatMap((group) => {
+    const box = extent(group);
+    if (group.length < 6) {
+      return [];
+    }
+    if (Math.max(box.east - box.west, box.north - box.south) < span / 7) {
+      return [group];
+    }
+    return depth < 3 ? dense(group, span, tiny * 1.5, depth + 1) : [];
+  });
+
+const degrees = (x: number, y: number) => {
+  const radius = 6_378_137;
+  return [
+    ((x / radius) * 180) / Math.PI,
+    ((2 * Math.atan(Math.exp(y / radius)) - Math.PI / 2) * 180) / Math.PI,
+  ] as const;
+};
+
+const reach = (box: ReturnType<typeof extent>) => {
+  const [west, south] = degrees(box.west, box.south);
+  const [east, north] = degrees(box.east, box.north);
+  return (east - west) * (north - south) * 10;
+};
+
+export const zooms = async (tiles: string, ks: Array<number>) => {
+  const none = { day: null, ids: [], zones: [] };
+  if (ks.length < 24 || ks.length > 5000) {
+    return none;
+  }
+  const set = await db.execute<{ scheme: string; day: string }>(sql`
+    select scheme_code as scheme, as_of::text as day from boundary_set
+    where coalesce(tiles_key, scheme_code || '/' || vintage) = ${tiles}
+    order by as_of desc limit 1
+  `);
+  const held = set.rows[0];
+  if (held == null) {
+    return none;
+  }
+  const { scheme, day } = held;
+  const clipped =
+    "coalesce((select c.geom from display.clipped c join display.meta dm on dm.mask_version = c.mask_version where c.area_id = picked.id and c.valid = picked.valid and c.geom_hash = md5(ST_AsBinary(picked.raw))), picked.raw)";
+  const picked = (wanted: Array<number>) => sql`
+    picked as materialized (
+      select a.k, a.id, a.scheme_code as scheme, g.geom as raw, g.valid
+      from area a
+      cross join lateral (
+        select geom, valid from area_geometry where area_id = a.id
+        order by valid @> ${day}::date desc, upper(valid) desc nulls first limit 1
+      ) g
+      where a.k = any(${sql.param(wanted)}::int[]) and a.scheme_code = ${scheme}
+    )
+  `;
+  const measured = await db.execute<Measured & { part: number }>(sql`
+    with ${picked(ks)},
+    planed as materialized (
+      select k, id, ${insetsOf(scheme).length === 0 ? sql`-1` : part(scheme, "raw")} as part,
+        ${plane(`coalesce((select c.geom from display.coarse c where c.area_id = picked.id and c.valid = picked.valid), ${clipped})`, "scheme")} as geom,
+        ST_PointOnSurface(raw) as spot
+      from picked
+    )
+    select k, id::text, part, ST_XMin(geom) as west, ST_YMin(geom) as south,
+      ST_XMax(geom) as east, ST_YMax(geom) as north, sqrt(ST_Area(geom)) as size,
+      (ST_XMin(geom) + ST_XMax(geom)) / 2 as x, (ST_YMin(geom) + ST_YMax(geom)) / 2 as y,
+      ST_X(spot) as lon, ST_Y(spot) as lat
+    from planed where geom is not null and not ST_IsEmpty(geom)
+  `);
+  const main = measured.rows.filter((row) => row.part === -1);
+  const whole = extent(main);
+  const span = Math.max(whole.east - whole.west, whole.north - whole.south);
+  if (main.length < 24 || !Number.isFinite(span)) {
+    return none;
+  }
+  const inside = (box: ReturnType<typeof extent>) =>
+    main.filter(
+      (unit) =>
+        unit.east > box.west &&
+        unit.west < box.east &&
+        unit.north > box.south &&
+        unit.south < box.north,
+    );
+  const found: Array<{
+    core: Array<Measured>;
+    box: ReturnType<typeof extent>;
+    within: number | null;
+  }> = [];
+  for (const group of dense(main, span, 80)
+    .toSorted((a, b) => b.length - a.length)
+    .slice(0, 3)) {
+    const box = padded(extent(group));
+    const at = found.length;
+    found.push({ core: group, box, within: null });
+    const inner = Math.max(box.east - box.west, box.north - box.south);
+    const nested = dense(inside(box), inner, 30).toSorted(
+      (a, b) => b.length - a.length,
+    )[0];
+    if (nested != null && nested.length < group.length) {
+      found.push({ core: nested, box: padded(extent(nested)), within: at });
+    }
+  }
+  if (found.length === 0) {
+    return none;
+  }
+  const frames = found.map((entry, index) => ({
+    index,
+    ...entry.box,
+    ks: inside(entry.box).map((unit) => unit.k),
+  }));
+  const [drawn, lineage] = await Promise.all([
+    db.execute<{ index: number; k: number; d: string }>(sql`
+      with ${picked([...new Set(frames.flatMap((frame) => frame.ks))])},
+      planed as materialized (
+        select k, ${plane(clipped, "scheme")} as geom from picked
+      ),
+      frames as (
+        select * from unnest(
+          ${sql.param(frames.map((frame) => frame.index))}::int[],
+          ${sql.param(frames.map((frame) => frame.west))}::float8[],
+          ${sql.param(frames.map((frame) => frame.south))}::float8[],
+          ${sql.param(frames.map((frame) => frame.east))}::float8[],
+          ${sql.param(frames.map((frame) => frame.north))}::float8[]
+        ) f(index, west, south, east, north)
+      )
+      select f.index, p.k, ST_AsSVG(ST_Scale(ST_SimplifyPreserveTopology(
+          ST_ClipByBox2D(p.geom, ST_MakeEnvelope(f.west, f.south, f.east, f.north, 3857)),
+          greatest(f.east - f.west, f.north - f.south) / 700), 0.001, 0.001), 0, 1) as d
+      from frames f
+      join planed p on p.geom && ST_MakeEnvelope(f.west, f.south, f.east, f.north, 3857)
+      order by f.index, p.k
+    `),
+    db.execute<{
+      index: number;
+      place: string;
+      covered: number;
+      total: number;
+      isNear: boolean;
+      size: number;
+      scheme: string;
+    }>(sql`
+      with cores as (
+        select * from unnest(
+          ${sql.param(found.map((_, index) => index))}::int[],
+          ${sql.param(found.map((entry) => JSON.stringify(entry.core.map((unit) => [unit.lon, unit.lat]))))}::jsonb[],
+          ${sql.param(found.map((entry) => reach(entry.box)))}::float8[]
+        ) c(index, points, reach)
+      ),
+      spots as (
+        select c.index, c.reach, jsonb_array_length(c.points) as total,
+          ST_Collect(ST_Point((p ->> 0)::float8, (p ->> 1)::float8, 4326)) as points
+        from cores c cross join jsonb_array_elements(c.points) p
+        group by c.index, c.reach, c.points
+      ),
+      probed as (
+        select distinct s.index, g.area_id, g.valid
+        from spots s
+        cross join lateral ST_Dump(s.points) p
+        join area_geometry g on g.geom && p.geom and g.valid @> ${day}::date
+        join area a on a.id = g.area_id and a.scheme_code <> ${scheme}
+        join scheme sc on sc.code = a.scheme_code and sc.kind = 'administrative'
+      )
+      select s.index, g.area_id::text as place, s.total,
+        ST_NumGeometries(ST_Intersection(coalesce((select c.geom from display.coarse c where c.area_id = g.area_id and c.valid = g.valid), g.geom), s.points)) as covered,
+        ST_Area(Box2D(g.geom)) < s.reach as "isNear", ST_Area(g.geom) as size, a.scheme_code as scheme
+      from probed p
+      join spots s on s.index = p.index
+      join area_geometry g on g.area_id = p.area_id and g.valid = p.valid
+      join area a on a.id = p.area_id
+      order by s.index, ST_Area(g.geom)
+    `),
+  ]);
+  const placed = Map.groupBy(lineage.rows, (row) => row.index);
+  const zones = found.map((entry, index) => {
+    const candidates = placed.get(index) ?? [];
+    const smallest = (rows: Array<(typeof candidates)[number]>) => {
+      const least = rows[0]?.size ?? 0;
+      return rows
+        .filter((row) => row.size <= least * 1.02)
+        .toSorted((a, b) => a.scheme.localeCompare(b.scheme))[0];
+    };
+    const near = candidates.filter((row) => row.isNear);
+    const whole = smallest(near.filter((row) => row.covered * 2 >= row.total));
+    const most = smallest(near.filter((row) => row.covered * 5 >= row.total));
+    const broad = candidates.find(
+      (row) => !row.isNear && row.covered * 2 >= row.total,
+    );
+    const [place, kind] =
+      whole != null
+        ? [whole.place, "exact" as const]
+        : most != null
+          ? [most.place, "around" as const]
+          : [broad?.place ?? null, "inside" as const];
+    const [west, south] = degrees(entry.box.west, entry.box.south);
+    const [east, north] = degrees(entry.box.east, entry.box.north);
+    return {
+      place,
+      kind,
+      within: entry.within,
+      core: entry.core.map((unit) => unit.k),
+      cores: entry.core.map((unit) => unit.id),
+      frame: { west, south, east, north },
+      x: entry.box.west / 1000,
+      y: -entry.box.north / 1000,
+      width: (entry.box.east - entry.box.west) / 1000,
+      height: (entry.box.north - entry.box.south) / 1000,
+      units: drawn.rows
+        .filter((row) => row.index === index)
+        .map((row) => ({ k: row.k, d: row.d })),
+    };
+  });
+  return { day, ids: main.map((unit) => unit.id), zones };
+};
