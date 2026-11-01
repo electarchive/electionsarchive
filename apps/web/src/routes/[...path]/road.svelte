@@ -89,6 +89,9 @@
     const generals = rounds.filter((round) => round.kind === "general");
     const american = rounds.some((round) => round.path?.split("/")[0] === "us");
     const runoff = rounds.some((round) => round.kind === "runoff");
+    const balloted = rounds.some((round) =>
+      /\/ballot-\d+(\/|$)/.test(round.path ?? ""),
+    );
     const chained = rounds
       .filter((round) => !known.has(round.id))
       .map((round) => {
@@ -109,11 +112,11 @@
                   ? m.round_runoff()
                   : m.round_second()
                 : round.kind === "indirect" && !runoff
-                  ? rounds.length === 2
+                  ? rounds.length === 2 && !balloted
                     ? index === 0
                       ? m.round_electoral()
                       : m.round_indirect()
-                    : m.round_ballot({ round: index + 1 })
+                    : m.round_ballot({ round: round.round })
                   : round.kind === "indirect"
                     ? m.round_first()
                     : round.kind === "general"
@@ -135,7 +138,7 @@
                           )
                           ? m.round_primary()
                           : m.round_general()
-                        : m.round_number({ round: index + 1 }),
+                        : m.round_number({ round: round.round }),
           path: round.path,
           isCurrent: round.isCurrent,
           isMinor: false,

@@ -12269,7 +12269,7 @@ async function universe(
     pending: boolean;
   }>(sql`
     with recursive base as (
-      select c.office_id, c.body_id, c.party_scope_id, ec.date_from, ec.date_to
+      select c.office_id, c.body_id, c.party_scope_id, ec.date_from, ec.date_to, ec.kind
       from contest c join election ec on ec.id = c.election_id
       where c.id = ${contest}::uuid and (c.office_id is not null or c.body_id is not null)
     ),
@@ -12312,7 +12312,7 @@ async function universe(
       where inside.depth < 2 and inside.scheme <> ${level} and (inside.depth = 0 or a.scheme_code = ${level})
     )
     select distinct candidate.id, candidate.k, candidate.held, false as outside,
-      not candidate.held and (select b.party_scope_id is not null from base b) as pending
+      not candidate.held and (select b.party_scope_id is not null and b.kind <> 'indirect' from base b) as pending
     from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
     union

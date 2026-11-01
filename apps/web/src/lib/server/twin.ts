@@ -4652,11 +4652,14 @@ function contestMarkdown(
                     : m.round_second()
                   : round.kind === "indirect" &&
                       rounds.every((other) => other.kind !== "runoff")
-                    ? rounds.length === 2
+                    ? rounds.length === 2 &&
+                      rounds.every(
+                        (other) => !/\/ballot-\d+(\/|$)/.test(other.path ?? ""),
+                      )
                       ? index === 0
                         ? m.round_electoral()
                         : m.round_indirect()
-                      : m.round_ballot({ round: index + 1 })
+                      : m.round_ballot({ round: round.round })
                     : round.kind === "indirect"
                       ? m.round_first()
                       : round.kind === "general"
@@ -4670,7 +4673,7 @@ function contestMarkdown(
                             )
                             ? m.round_primary()
                             : m.round_general()
-                          : m.round_number({ round: index + 1 });
+                          : m.round_number({ round: round.round });
             return [
               `### ${round.isCurrent ? label : link(label, round.path)}${round.date == null ? "" : `, ${date(round.date)}`}`,
               round.leaders
