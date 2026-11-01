@@ -11571,7 +11571,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     ),
                     (None,),
                 )[0]
-            state = fips.split("-")[0] if fips in FEEDS else PUBLISHERS[fips][0]
+            publisher_state = fips.split("-")[0] if fips in FEEDS else PUBLISHERS[fips][0]
             for feed in group["feed"].unique(maintain_order=True):
                 if feed not in sources:
                     _, publisher, source_title = (
@@ -11610,7 +11610,7 @@ def emit_state(frame: pl.DataFrame, state: str) -> Path:
                     "election",
                     id=elections[scope],
                     polity_id=polity,
-                    parent_id=cs.key("us.election", f"{DAY}:{state}"),
+                    parent_id=cs.key("us.election", f"{DAY}:{publisher_state}"),
                     kind="general",
                     date_from=DAY,
                     date_to=DAY,
