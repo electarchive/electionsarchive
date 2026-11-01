@@ -23,6 +23,7 @@ from PIL import Image
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import ak_sovc, fl_sos, gov_counties, ri_countbook
+from ea.sources.us.ca_totals import CA_INITIATIVES, CA_TITLES, CA_TOTALS
 from ea.store import DATA, connect
 
 SOURCE = "us.sos_measures"
@@ -2259,6 +2260,10 @@ STATEWIDE_ONLY = (
     " Only the statewide totals are recorded: the state's archived results pages for this election carry no county "
     "table for ballot questions."
 )
+CA_TOTALS_NOTE = (
+    " Only the statewide totals are recorded: they were entered by hand from the Secretary of State's scanned Statement"
+    " of Vote, which prints each measure's yes and no votes, and the box shown on each figure is approximate."
+)
 NM_2003_NOTE = (
     " The county figures were transcribed by hand from the scanned canvass certified on October 14, 2003, and each"
     " column was checked against the canvass's printed statewide totals."
@@ -2429,6 +2434,9 @@ def fetch() -> None:
     raw.fetch(SOURCE, AL_2010_PRIMARY, suffix=".pdf")
     raw.fetch(SOURCE, GA_2022_URL, suffix=".json")
     raw.fetch(SOURCE, MS_2004, suffix=".pdf")
+    for rows in CA_TOTALS.values():
+        for url in {row[3] for row in rows}:
+            raw.fetch(SOURCE, url, suffix=".pdf")
     store_manual(TX_2022, TX_2022_FILE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     for candidate in WV_2012_CANDIDATES.values():
         raw.fetch(SOURCE, WV_2012.format(candidate), suffix=".html")
@@ -5510,6 +5518,33 @@ def texas_2022() -> list[dict[str, object]]:
     return rows
 
 
+def california_totals() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for day, entries in CA_TOTALS.items():
+        for number, yes, no, url, page, yes_box, no_box in entries:
+            for answer, votes, box in (("YES", yes, yes_box), ("NO", no, no_box)):
+                rows.append(
+                    {
+                        "state": "CA",
+                        "day": day,
+                        "number": number,
+                        "label": f"Proposition {number}",
+                        "title": CA_TITLES[number],
+                        "kind": "Initiative" if number in CA_INITIATIVES else "Legislative Referendum",
+                        "url": url,
+                        "county": "statewide",
+                        "answer": answer,
+                        "votes": votes,
+                        "page": page,
+                        "x0": box[0],
+                        "y0": box[1],
+                        "x1": box[2],
+                        "y1": box[3],
+                    }
+                )
+    return rows
+
+
 def georgia_2022() -> list[dict[str, object]]:
     export = json.loads(raw.cached(SOURCE, GA_2022_URL).path.read_text())
     rows: list[dict[str, object]] = []
@@ -7146,6 +7181,7 @@ def parse() -> None:
             *mississippi_2004(),
             *georgia_2022(),
             *texas_2022(),
+            *california_totals(),
             *wisconsin(),
             *wisconsin_manual(),
             *iowa(),
@@ -7590,7 +7626,7 @@ def emit() -> Path:
                 + (MAINE if state == "ME" else "")
                 + (OVERSEAS if (rows["code"] == "ME:uocava").any() else "")
                 + (LIMITED if (rows["code"] == "RI:limited").any() else "")
-                + (SCANNED if rows["page"].is_not_null().any() and state not in ("AL", "MS") else "")
+                + (SCANNED if rows["page"].is_not_null().any() and state not in ("AL", "MS", "CA") else "")
                 + (GA_PRELIMINARY if preliminary else "")
                 + (AL_2006_NOTE if (rows["url"] == AL_2006_PRIMARY).any() else "")
                 + (NM_2003_NOTE if (rows["url"] == NM_2003).any() else "")
@@ -7604,6 +7640,8 @@ def emit() -> Path:
                         if state == "GA" and day.year == 2022
                         else TX_2022_NOTE
                         if state == "TX"
+                        else CA_TOTALS_NOTE
+                        if state == "CA" and day.year < 1998
                         else AK_STATEWIDE_NOTE
                         if state == "AK"
                         else ND_2004_NOTE
