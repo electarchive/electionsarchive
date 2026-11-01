@@ -1163,6 +1163,17 @@ def amended(lines: pl.DataFrame) -> pl.DataFrame:
                     name=pl.when(at).then(pl.lit(fix["name"])).otherwise(pl.col("name")),
                     town=pl.when(at).then(pl.lit(fix["town"])).otherwise(pl.col("town")),
                 )
+            elif fix["op"] == "read":
+                lines = lines.with_columns(
+                    agrees=pl.when(
+                        (pl.col("year") == year) & (pl.col("page") == page) & ((pl.col("y0") - y0).abs() < 6e-5)
+                    )
+                    .then(True)
+                    .otherwise(pl.col("agrees")),
+                    twice=pl.col("twice")
+                    | ((pl.col("year") == year) & (pl.col("page") == page) & ((pl.col("y0") - y0).abs() < 6e-5)),
+                )
+                continue
             elif fix["op"] == "votes":
                 lines = lines.with_columns(
                     votes=pl.when(
