@@ -102,6 +102,7 @@ url = "https://results.okelections.gov/OKER/"
 id = "us.enr_2026.pa"
 adapter = "us.enr_2026"
 params = { state = "PA" }
+poller = "muktedir"
 publisher = "Pennsylvania Department of State"
 url = "https://www.electionreturns.pa.gov/"
 

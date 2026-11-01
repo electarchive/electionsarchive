@@ -101,6 +101,7 @@ OK_HEADERS = {
 }
 OK_RACE = re.compile(r"FOR (GOVERNOR|UNITED STATES SENATOR|UNITED STATES REPRESENTATIVE DISTRICT (\d+))")
 PA_API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
+PA_ELECTION: dict[date, str] = {}
 PA_OFFICES = {"2": "senate", "3": "governor", "11": "house"}
 NOTE = (
     "Unofficial election night results as the publisher's reporting site showed them at the time given. Counts change as "
@@ -385,25 +386,22 @@ def collect(client: httpx.Client, only: set[str], store: Callable[[str, str, byt
         else:
             store("IN", url, content, ".json")
     if not only or "PA" in only:
-        found = os.environ.get("ENR_2026_PA_ID")
-        for election in [found] if found else range(113, 160):
-            probe = get(
-                client,
-                f"{PA_API}GetOfficeData?officeId=11&methodName=GetOfficeData&electionid={election}&electiontype=G&isactive=0",
-            )
-            if probe and re.search(rf'"ElectionYear":\s*"{DAY.year}"', json.loads(probe) or ""):
-                break
-        else:
-            election = None
+        if DAY not in PA_ELECTION:
+            listing = get(client, f"{PA_API}GetAllElections?methodName=GetAllElections")
+            for entry in json.loads(json.loads(json.loads(listing))[0]["ElectionData"]) if listing else []:
+                if entry["ElectionType"] == "G" and entry["ElectionDate"] == f"{DAY:%m/%d/%Y}":
+                    PA_ELECTION[DAY] = f"electionid={entry['Electionid']}&electiontype=G&isactive={entry['ISActive']}"
+        election = PA_ELECTION.get(DAY)
+        if election is None:
             print("PA: no general election id")
         for office in PA_OFFICES if election else ():
-            url = f"{PA_API}GetOfficeData?officeId={office}&methodName=GetOfficeData&electionid={election}&electiontype=G&isactive=0"
+            url = f"{PA_API}GetOfficeData?officeId={office}&methodName=GetOfficeData&{election}"
             content = get(client, url)
             if not content or content == b'""':
                 continue
             store("PA", url, content, ".json")
             for district in re.findall(r"\$\$(\d+)\$\$", json.loads(content)):
-                url = f"{PA_API}GetCountyBreak?officeId={office}&districtId={district}&methodName=GetCountyBreak&electionid={election}&electiontype=G&isactive=0"
+                url = f"{PA_API}GetCountyBreak?officeId={office}&districtId={district}&methodName=GetCountyBreak&{election}"
                 detail = get(client, url)
                 if detail:
                     store("PA", url, detail, ".json")
@@ -780,7 +778,8 @@ def rows(state: str, url: str, path: Path):
     if state == "AR":
         for contest in json.loads(path.read_bytes())["ContestData"]:
             found = AR_CONTEST.fullmatch(contest["ContestName"])
-            for fips, location in contest["Locations"].items():
+            places = contest.get("Locations") or {contest.get("DistrictID") or "": contest}
+            for fips, location in places.items():
                 for choice in [*location["Choices"], *location["WriteinChoices"]]:
                     named = re.fullmatch(r"([A-Z]{3}) (.+)", choice["Name"])
                     yield {
@@ -801,8 +800,8 @@ def rows(state: str, url: str, path: Path):
                         if "TotalVotes" in choice
                         else sum(vote["Votes"] for vote in choice["Votes"]),
                         "as_of": None,
-                        "reporting": None,
-                        "total": None,
+                        "reporting": contest.get("PrecinctsReporting"),
+                        "total": contest.get("TotalPrecincts"),
                     }
         return
     detail = json.loads(path.read_bytes())
