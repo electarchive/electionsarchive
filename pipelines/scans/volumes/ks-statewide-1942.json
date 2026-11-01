@@ -1,0 +1,51 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "year": 1942,
+  "day": "1942-11-03",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/39/download"
+  },
+  "autorotate": true,
+  "title": "Kansas Election Statistics, statewide offices 1942, general election",
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "Auditor of State",
+    "treasurer": "Treasurer of State",
+    "attorney-general": "Attorney General",
+    "superintendent-of-public-instruction": "State Superintendent of Public Instruction",
+    "commissioner-of-insurance": "Commissioner of Insurance"
+  },
+  "hint": "Read only general election tables; skip primary election tables. Each statewide office is one table with county rows; copy the state total row as printed_total.",
+  "leaves": [
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    21,
+    22,
+    23,
+    24,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63
+  ]
+}

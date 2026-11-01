@@ -1,0 +1,36 @@
+{
+  "polity": "US-KS",
+  "publisher": "Kansas Secretary of State",
+  "license": "Public record",
+  "raw_source": "us.ks_es",
+  "year": 1956,
+  "day": "1956-11-06",
+  "file": {
+    "url": "https://kgi.contentdm.oclc.org/digital/api/collection/p16884coll129/id/53/download"
+  },
+  "autorotate": true,
+  "title": "Kansas Election Statistics, statewide offices 1956, general election",
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "Auditor of State",
+    "treasurer": "Treasurer of State",
+    "attorney-general": "Attorney General",
+    "superintendent-of-public-instruction": "State Superintendent of Public Instruction",
+    "commissioner-of-insurance": "Commissioner of Insurance"
+  },
+  "hint": "Read only general election tables; skip primary election tables. Each statewide office is one table with county rows; copy the state total row as printed_total.",
+  "leaves": [
+    15,
+    16,
+    17,
+    18,
+    20,
+    21,
+    22,
+    23,
+    24,
+    27,
+    28
+  ]
+}

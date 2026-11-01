@@ -1,0 +1,34 @@
+{
+  "year": 1928,
+  "day": "1928-11-06",
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 6, 1928",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1928G.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General",
+    "commissioner-of-school-and-public-lands": "Commissioner of School and Public Lands",
+    "superintendent-of-public-instruction": "State Superintendent of Public Instruction",
+    "railroad-commissioner": "Railroad Commissioner",
+    "public-utilities-commissioner": "Public Utilities Commissioner"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ]
+}

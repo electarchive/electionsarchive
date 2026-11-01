@@ -1,0 +1,43 @@
+{
+  "year": 1940,
+  "day": "1940-11-05",
+  "polity": "US-SD",
+  "publisher": "South Dakota Secretary of State",
+  "title": "Official election returns and registration figures for South Dakota, general election November 5, 1940",
+  "license": "Public record",
+  "file": {
+    "url": "https://sdsos.gov/elections-voting/assets/historicalelectiondata/1940G.pdf"
+  },
+  "raw_source": "us.scans",
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General",
+    "commissioner-of-school-and-public-lands": "Commissioner of School and Public Lands",
+    "superintendent-of-public-instruction": "State Superintendent of Public Instruction",
+    "railroad-commissioner": "Railroad Commissioner",
+    "public-utilities-commissioner": "Public Utilities Commissioner"
+  },
+  "leaves": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+  ]
+}
