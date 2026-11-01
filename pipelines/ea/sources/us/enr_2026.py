@@ -988,6 +988,7 @@ def plan(
         codes.setdefault((code[:2], plain(text)), code)
     unmatched: list[str] = []
     work: list[tuple[str, str, UUID, pl.DataFrame, UUID | None]] = []
+    local_keys: set[str] = set()
     for (state, office, district), group in frame.group_by("state", "office", "district", maintain_order=True):
         contest_key = f"{DAY}:{state}:{office}" + (f":{district}" if district else "")
         found = conn.execute(
@@ -1100,9 +1101,6 @@ def plan(
         for (_, _, _, contest, key), name, places in sorted(
             picks, key=lambda pick: (-pick[0][0], -pick[0][1], -pick[0][2])
         ):
-            if any(entry[1] == key for entry in work):
-                unmatched.append(f"local {state}: {name} ({', '.join(places[:2])}): duplicate of {key}")
-                continue
             segment = key.split(":")[2]
             place = None
             if not re.fullmatch(r"\d{5}", segment) and re.match(r"\d|sd", segment):
@@ -1117,18 +1115,30 @@ def plan(
                     unmatched.append(f"local {state}: {name}: no unit for {key}")
                     continue
                 place = found[0]
-            matched += 1
-            work.append(
-                (
-                    state,
-                    key,
-                    contest,
-                    local.filter(
-                        (pl.col("state") == state) & (pl.col("contest") == name) & pl.col("county").is_in(places)
-                    ),
-                    place,
-                )
+            part = local.filter(
+                (pl.col("state") == state) & (pl.col("contest") == name) & pl.col("county").is_in(places)
             )
+            earlier = next((i for i, entry in enumerate(work) if entry[1] == key), None)
+            if earlier is not None:
+                old = work[earlier]
+                if (
+                    key in local_keys
+                    and old[4] == place
+                    and not set(old[3]["county"]) & set(part["county"])
+                ):
+                    base = old[3] if "piece" in old[3].columns else old[3].with_columns(piece=pl.lit(0))
+                    work[earlier] = (
+                        *old[:3],
+                        pl.concat([base, part.with_columns(piece=pl.lit(base["piece"].max() + 1))]),
+                        place,
+                    )
+                    matched += 1
+                    continue
+                unmatched.append(f"local {state}: {name} ({', '.join(places[:2])}): duplicate of {key}")
+                continue
+            matched += 1
+            local_keys.add(key)
+            work.append((state, key, contest, part, place))
         print(f"local {state}: {matched} of {len(races)} feed races matched")
     tallies = []
     for state, contest_key, contest, group, place in work:
@@ -1180,7 +1190,12 @@ def plan(
             else:
                 unmatched.append(f"{contest_key}: no option for {name}")
         reporting = (
-            group.group_by("county")
+            group.group_by("piece")
+            .agg(pl.col("reporting").max(), pl.col("total").max())
+            .select(pl.col("reporting").sum(), pl.col("total").sum())
+            .row(0)
+            if "piece" in group.columns
+            else group.group_by("county")
             .agg(pl.col("reporting").max(), pl.col("total").max())
             .select(pl.col("reporting").sum(), pl.col("total").sum())
             .row(0)
