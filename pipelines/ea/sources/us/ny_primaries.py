@@ -29,7 +29,16 @@ FILES = {
     date(2010, 9, 14): ["elections/2010/Primary/2010PrimaryElectionResults.pdf"],
     date(2014, 9, 9): ["elections/2014/Primary/2014StateLocalPrimaryElectionResults.pdf"],
 }
-PARTIES = {"rep": "republican", "republican": "republican", "dem": "democratic", "democratic": "democratic"}
+PARTIES = {
+    "rep": "republican",
+    "republican": "republican",
+    "dem": "democratic",
+    "democratic": "democratic",
+    "independence": "independence",
+    "conservative": "conservative",
+    "working": "working-families",
+    "green": "green",
+}
 LEGISLATIVE = {
     "democratic": "dp",
     "republican": "rp",
@@ -38,7 +47,7 @@ LEGISLATIVE = {
     "working families": "workp",
     "green": "greenp",
 }
-RENAMED = {"RUTH H. THOMPSON": "RUTH HASSELL-THOMPSON"}
+RENAMED = {"RUTH H. THOMPSON": "RUTH HASSELL-THOMPSON", "JOHN R. DAVIS, JR.": "JACK DAVIS"}
 NUMBER = re.compile(r"^\d[\d,]*$")
 TITLE_HOUSE = re.compile(
     r"^\s*(?:Congress\s+(\d+)\s*(?:st|nd|rd|th)?|(\d+)(?:st|nd|rd|th) CD)\s*-\s*([A-Za-z ]+?)(?:\s{2,}(.*))?$"
@@ -166,7 +175,7 @@ def parse() -> None:
                 party = PARTIES.get(party.split()[0], None) if office in ("house", "senate") else ""
                 if party == "" and any(text.lower() == "candidate" for line in head for _, text in line):
                     continue
-                if party is None or special or (office, party, district, special) in seen:
+                if party is None or (office, party, district, special) in seen:
                     continue
                 seen.add((office, party, district, special))
                 labels = columns(head, anchor)
@@ -184,7 +193,7 @@ def parse() -> None:
                         rows.append(
                             (
                                 day.year,
-                                f"{office}:{party}" if party else office,
+                                f"{office}:special:{party}" if special else f"{office}:{party}" if party else office,
                                 day,
                                 special,
                                 "NY",
