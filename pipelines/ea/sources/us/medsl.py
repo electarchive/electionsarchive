@@ -258,7 +258,9 @@ def parse() -> None:
     frame.write_parquet(PARSED / "congress.parquet")
 
 
-def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
+def precincts(
+    files: dict[tuple[str, int], Path], states: list[str] | None = None, general: bool = False
+) -> pl.DataFrame:
     frames = []
     for (chamber, year), path in files.items():
         frame = pl.scan_csv(
@@ -272,6 +274,10 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 {"state_postal": "state_po", "jurisdiction": "jurisdiction_name", "party": "party_detailed"},
                 strict=False,
             ).with_columns(date=pl.lit("2016-11-08"))
+        if states is not None:
+            frame = frame.filter(pl.col("state_po").is_in(states))
+        if general:
+            frame = frame.filter(pl.col("stage").str.to_uppercase() == "GEN")
         fips = pl.col("county_fips").str.replace(r"\.0$", "")
         frames.append(
             frame.with_columns(pl.col("precinct", "mode").fill_null(""))

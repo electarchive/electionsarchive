@@ -1,8 +1,11 @@
+import csv
 import html
 import json
+import os
 import re
 import struct
 import subprocess
+import sys
 import unicodedata
 from collections import defaultdict
 from datetime import UTC, date, datetime, timedelta
@@ -756,14 +759,107 @@ def kansas_precincts() -> None:
     precincts.write_parquet(PARSED / "kansas.parquet")
 
 
+OFFICIAL_SCHEMA = {
+    "day": pl.String,
+    "state": pl.String,
+    "court": pl.String,
+    "number": pl.Int16,
+    "post": pl.Int16,
+    "name": pl.String,
+    "answer": pl.String,
+    "votes": pl.Int64,
+    "page": pl.Int32,
+    "x0": pl.Int32,
+    "y0": pl.Int32,
+    "x1": pl.Int32,
+    "y1": pl.Int32,
+    "origin": pl.String,
+    "county": pl.String,
+    "flags": pl.Int16,
+}
+
+
+def selected_states() -> set[str] | None:
+    return (
+        {state.strip() for state in os.environ["RETENTION_STATES"].split(",") if state.strip()}
+        if os.environ.get("RETENTION_STATES")
+        else None
+    )
+
+
+def state_codes(path: Path) -> set[str]:
+    with path.open(errors="replace", newline="") as handle:
+        header = handle.readline()
+        handle.seek(0)
+        reader = csv.reader(handle, delimiter="\t" if "\t" in header else ",")
+        names = next(reader)
+        column = names.index("state_po" if "state_po" in names else "state_postal")
+        return {row[column] for row in reader if len(row) > column} - {""}
+
+
+def merge_parts() -> None:
+    parts = PARSED / "parts"
+    merged = {
+        kind: pl.concat([pl.read_parquet(path) for path in sorted((parts / kind).iterdir())])
+        for kind in ("rows", "official", "names")
+    }
+    merged["rows"].write_parquet(PARSED / "medsl.parquet")
+    merged["official"].sort("order").drop("order").write_parquet(PARSED / "official.parquet")
+    merged["names"].write_parquet(PARSED / "names.parquet")
+
+
 def parse() -> None:
+    inputs = [(year, raw.cached(source, url).path) for year, files in FILES.items() for source, url in files]
+    wanted = selected_states()
+    official = pl.DataFrame(
+        kansas() + oklahoma() + oklahoma_counties() + arizona() + california() + retention_iowa.rows(),
+        schema=OFFICIAL_SCHEMA,
+    ).with_row_index("order")
+    PARSED.mkdir(parents=True, exist_ok=True)
+    parts = PARSED / "parts"
+    for kind in ("rows", "official", "names"):
+        (parts / kind).mkdir(parents=True, exist_ok=True)
+    if wanted is None:
+        for kind in ("rows", "official", "names"):
+            for old in (parts / kind).iterdir():
+                old.unlink()
+        states = sorted(set(official["state"]).union(*(state_codes(path) for _, path in inputs)))
+        del official
+        for state in states:
+            subprocess.run(
+                ["systemd-run", "--user", "--scope", "--quiet", "-p", "MemoryMax=2G", "-p", "MemorySwapMax=0"]
+                + [sys.argv[0], "parse", SOURCE],
+                env={**os.environ, "RETENTION_STATES": state},
+                check=True,
+            )
+        merge_parts()
+        return
+    dropped, answers, count = [], [], 0
+    for state in sorted(wanted):
+        part = parse_state(state, inputs, official.filter(pl.col("state") == state))
+        part["rows"].write_parquet(parts / "rows" / f"{state}.parquet")
+        part["official"].write_parquet(parts / "official" / f"{state}.parquet")
+        pl.DataFrame(
+            list(part["names"].items()), schema={"person": pl.String, "name": pl.String}, orient="row"
+        ).write_parquet(parts / "names" / f"{state}.parquet")
+        dropped.append(part["dropped"])
+        answers.append(part["answers"])
+        count += part["questions"]
+        del part
+    merge_parts()
+    if "KS" in wanted:
+        kansas_precincts()
+    with pl.Config(tbl_rows=100, fmt_str_lengths=70, tbl_width_chars=200):
+        print("unnamed and dropped:")
+        print(pl.concat(dropped).sort("state", "year"))
+        print(pl.concat(answers).filter(pl.col("answers") != 2))
+    print(count, "MEDSL questions")
+
+
+def parse_state(only: str, inputs: list[tuple[int, Path]], official: pl.DataFrame) -> dict:
     frame = (
         pl.concat(
-            [
-                medsl.precincts({("retention", year): raw.cached(source, url).path})
-                for year, files in FILES.items()
-                for source, url in files
-            ],
+            [medsl.precincts({("retention", year): path}, states=[only], general=True) for year, path in inputs],
             how="diagonal_relaxed",
         )
         .filter(pl.col("measure") == 1, ~pl.col("writein"), pl.col("stage") == "GEN")
@@ -841,27 +937,6 @@ def parse() -> None:
             .then(pl.concat_str("year", "state", "code", "jurisdiction", "precinct", separator=":"))
             .otherwise("code"),
         )
-    )
-    official = pl.DataFrame(
-        kansas() + oklahoma() + oklahoma_counties() + arizona() + california() + retention_iowa.rows(),
-        schema={
-            "day": pl.String,
-            "state": pl.String,
-            "court": pl.String,
-            "number": pl.Int16,
-            "post": pl.Int16,
-            "name": pl.String,
-            "answer": pl.String,
-            "votes": pl.Int64,
-            "page": pl.Int32,
-            "x0": pl.Int32,
-            "y0": pl.Int32,
-            "x1": pl.Int32,
-            "y1": pl.Int32,
-            "origin": pl.String,
-            "county": pl.String,
-            "flags": pl.Int16,
-        },
     )
     variants: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     for state, name, mixed in [
@@ -948,8 +1023,7 @@ def parse() -> None:
         .join(answers, on=["year", "state", "court", "person"])
         .filter(pl.col("answers") == 2)
     )
-    PARSED.mkdir(parents=True, exist_ok=True)
-    frame.group_by(
+    rows = frame.group_by(
         "year",
         "day",
         "state",
@@ -963,22 +1037,15 @@ def parse() -> None:
         "code",
         "county",
         "answer",
-    ).agg(pl.col("votes").sum()).write_parquet(PARSED / "medsl.parquet")
-    official.write_parquet(PARSED / "official.parquet")
-    kansas_precincts()
-    pl.DataFrame(
-        [(key, text) for key, text in names.items()], schema={"person": pl.String, "name": pl.String}, orient="row"
-    ).write_parquet(PARSED / "names.parquet")
-    with pl.Config(tbl_rows=100, fmt_str_lengths=70, tbl_width_chars=200):
-        print("unnamed and dropped:")
-        print(dropped)
-        print(answers.filter(pl.col("answers") != 2))
-    print(
-        frame.select("state", "year", "court", "person").unique().height,
-        "MEDSL questions,",
-        official.select("day", "state", "court", "number", "post").unique().height,
-        "official questions",
-    )
+    ).agg(pl.col("votes").sum())
+    return {
+        "rows": rows,
+        "official": official,
+        "names": names,
+        "dropped": dropped,
+        "answers": answers,
+        "questions": frame.select("state", "year", "court", "person").unique().height,
+    }
 
 
 def emit() -> Path:
@@ -1184,7 +1251,13 @@ def emit() -> Path:
             "IN": indiana_source,
             "IA": iowa_source,
         }
-        methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD, "CA": CALIFORNIA_METHOD, "IA": IOWA_METHOD}
+        methods = {
+            "KS": KANSAS_METHOD,
+            "OK": OKLAHOMA_METHOD,
+            "AZ": ARIZONA_METHOD,
+            "CA": CALIFORNIA_METHOD,
+            "IA": IOWA_METHOD,
+        }
         artifacts = {
             url: cs.artifact(raw.cached(SOURCE, url), official_sources[state])
             for url, state in official.select("origin", "state").unique().sort("origin").iter_rows()
