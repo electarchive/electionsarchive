@@ -4516,7 +4516,7 @@
   "night_chamber_expected": "{party} expected {seats}, 80% range {low} to {high}",
   "night_chamber_net": "Net gain of {count} for {party}",
   "night_chamber_net_none": "No net change in seats so far",
-  "night_chamber_note": "Majority odds combine each race's estimate as if races moved independently, so the true range is wider. A race with no estimate yet counts as {prior} for the party holding the seat. Striped cells are seats not up this year.",
+  "night_chamber_note": "Striped seats aren't up this year. Until a race reports votes, the odds give the party that holds the seat a {prior} chance of keeping it.",
   "night_rating_won": "Won",
   "night_rating_solid": "Solid",
   "night_rating_likely": "Likely",
