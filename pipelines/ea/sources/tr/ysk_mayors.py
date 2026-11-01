@@ -1,6 +1,7 @@
 import json
 import re
 import subprocess
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
 from urllib.parse import quote
@@ -187,7 +188,7 @@ def parse() -> None:
     frame.write_parquet(PARSED / "mayors_2004.parquet")
 
 
-VERSION = "5"
+VERSION = "6"
 DAY_2004 = date(2004, 3, 28)
 PAGE_2004 = "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html"
 METHOD_2004 = (
@@ -205,6 +206,13 @@ AREAS = {
     ("55", "19 Mayıs"): "19-May",
     ("56", "Aydınlar"): "Tillo",
 }
+NAMES = {("03", "Sarvan"): "Serban", ("54", "Merkez"): "Adapazarı", ("55", "19 Mayıs"): "Ondokuzmayıs"}
+
+
+def variants(plate: str, text: str) -> list[str]:
+    base = re.sub(r"\s*\(.*\)$", "", text)
+    names = [base, *re.findall(r"\((.*?)\)", text), AREAS.get((plate, base)), NAMES.get((plate, base))]
+    return list(dict.fromkeys(slug(name) for name in names if name))
 
 
 def emit() -> Path:
@@ -249,9 +257,51 @@ def emit() -> Path:
             ).fetchall()
         }
         spans = own_areas(conn)
-        existing = {
-            value for (value,) in conn.execute("select value from external_id where scheme = 'tr.polity'").fetchall()
+        held = {
+            value: cs.survivors.get(entity, entity)
+            for value, entity in conn.execute(
+                "select value, entity_id from external_id where scheme = 'tr.polity'"
+            ).fetchall()
         }
+        existing = set(held)
+        current = dict(
+            conn.execute(
+                """select s.entity_id, s.path from slug s join polity p on p.id = s.entity_id
+                   where s.is_current and s.path ~ '^tr/[^/]+(/[^/]+){0,2}$'"""
+            ).fetchall()
+        )
+        latest: dict[UUID, date] = {}
+        for polity_id, day in conn.execute(
+            """select e.polity_id, max(e.date_from) from election e join changeset c on c.id = e.changeset_id
+               where c.pipeline <> %s and e.kind = 'local' group by 1""",
+            [SOURCE],
+        ).fetchall():
+            polity_id = cs.survivors.get(polity_id, polity_id)
+            latest[polity_id] = max(day, latest.get(polity_id, day))
+        busy = {
+            cs.survivors.get(polity_id, polity_id)
+            for (polity_id,) in conn.execute(
+                """select e.polity_id from election e join changeset c on c.id = e.changeset_id
+                   where c.pipeline <> %s and e.date_from = %s""",
+                [SOURCE, DAY_2004],
+            ).fetchall()
+        }
+        values: dict[UUID, str] = {}
+        for value, polity_id in sorted(held.items()):
+            values.setdefault(polity_id, value)
+        twins: dict[tuple[str, str], set[UUID]] = defaultdict(set)
+        for polity_id, path in current.items():
+            if polity_id in latest and polity_id not in busy and path.count("/") in (2, 3):
+                twins[(path.split("/")[1], path.split("/")[-1])].add(polity_id)
+        offices_of: dict[UUID, list[tuple[UUID, bool]]] = defaultdict(list)
+        for polity_id, office_id, ours in conn.execute(
+            """select o.polity_id, o.id, c.pipeline = %s from office o join changeset c on c.id = o.changeset_id
+               join entity e on e.id = o.id and e.retired_by is null
+               where o.kind = 'mayor' and not exists (select from entity_merge m where m.entity_id = o.id)
+               order by o.id""",
+            [SOURCE],
+        ).fetchall():
+            offices_of[cs.survivors.get(polity_id, polity_id)].append((office_id, ours))
         territorial = {polity for (polity,) in conn.execute("select polity_id from polity_territory").fetchall()}
         mayoral = cs.key("tr.electoral_system", "mayor")
         parent = cs.key("tr.election", f"{DAY_2004}:local")
@@ -278,7 +328,6 @@ def emit() -> Path:
             )
         cs.artifact(raw.cached(SOURCE, RESULTS_2004), source)
         seen: set[str] = set()
-        moved: dict[str, str] = {}
         used: set[UUID] = set()
         declared_sets: list[str] = []
         district = legacy = ""
@@ -312,31 +361,66 @@ def emit() -> Path:
                     else [province_slug, "merkez", slug(label_text)]
                 )
                 english = label_text
-            key = "-".join(parts)
-            path = "tr/" + "/".join(parts)
-            if key in seen:
-                raise ValueError(f"two 2004 municipalities share {key}")
-            seen.add(key)
+            printed = "-".join(parts)
+            if level == "district":
+                options = [] if central else [f"{province_slug}-{name}" for name in variants(plate, district)]
+            elif district:
+                towns = ["merkez"] if central else variants(plate, district)
+                options = [f"{province_slug}-{town}-{name}" for town in towns for name in variants(plate, label_text)]
+            else:
+                options = [
+                    f"{province_slug}{middle}-{name}"
+                    for name in variants(plate, label_text)
+                    for middle in ("", "-merkez")
+                ]
             if level == "town" and not district:
                 before = "-".join(
                     [province_slug, "merkez" if legacy.startswith("Merkez") else slug(legacy), slug(label_text)]
                 )
-                if before != key:
-                    moved[before] = key
-                    cs.renamed[f"{DAY_2004}:{key}-mayor"] = f"{DAY_2004}:{before}-mayor"
+                options.append(before)
+            options = [printed, *dict.fromkeys(option for option in options if option != printed)]
+            found = [option for option in options if option in held]
+            theirs = [option for option in found if held[option] in latest]
+            key = max(theirs, key=lambda option: latest[held[option]]) if theirs else printed
+            if not theirs and level == "town":
+                near = {
+                    polity_id
+                    for name in variants(plate, label_text)
+                    for polity_id in twins.get((province_slug, name), ())
+                }
+                if len(near) == 1:
+                    key = values[next(iter(near))]
+                    found.append(key)
+            if key in seen:
+                raise ValueError(f"two 2004 municipalities share {key}")
+            seen.add(key)
+            if key != printed:
+                cs.renamed[f"{DAY_2004}:{key}-mayor"] = f"{DAY_2004}:{printed}-mayor"
+            path = current.get(held[key], "tr/" + "/".join(parts)) if key in held else "tr/" + "/".join(parts)
             lookup = f"{province} Merkez" if central or not district else re.sub(r"\s*\(.*\)$", "", district)
             lookup = AREAS.get((plate, lookup), lookup)
             area = districts.get((plate, upper(SPELLINGS.get(upper(lookup), lookup))))
             if area is None:
                 raise ValueError(f"no 2004 ilçe area for {key} ({lookup})")
             polity = cs.key("tr.polity", key)
-            office = cs.key("tr.office", f"{key}-mayor")
+            absorbed = {held[option] for option in found} - {polity}
+            for other in sorted(absorbed):
+                cs.merge(other, polity)
+            sitting = [
+                (office_id, ours) for place in (polity, *sorted(absorbed)) for office_id, ours in offices_of[place]
+            ]
+            chosen = [office_id for office_id, ours in sitting if not ours] or [office_id for office_id, _ in sitting]
+            office = chosen[0] if chosen else cs.key("tr.office", f"{key}-mayor")
+            for office_id, ours in sitting:
+                if office_id != office and (ours or office_id not in {o for o, _ in offices_of[polity]}):
+                    cs.merge(office_id, office)
             if key not in existing:
                 cs.add("polity", id=polity, kind="municipality", iso_code=None)
                 name(polity, f"{english} Municipality", "en")
                 name(polity, f"{english} Belediyesi", kind="native")
                 cs.add("polity_parent", polity_id=polity, parent_id=turkey)
                 cs.add("slug", path=path, entity_id=polity)
+            if office in cs.minted:
                 cs.add("office", id=office, polity_id=polity, kind="mayor")
                 name(office, f"Mayor of {english}", "en")
                 name(office, f"{english} Belediye Başkanı", kind="native")
@@ -382,14 +466,14 @@ def emit() -> Path:
             name(contest, f"Mayor of {english}", "en")
             cs.add("slug", path=f"{path}/{DAY_2004}-local/mayor", entity_id=contest)
             scheme = "tr.ilce" if level == "district" else "tr.belde"
-            unit = cs.unit(scheme, key)
+            unit = cs.unit(scheme, printed)
             used.add(unit)
             cs.add(
                 "reporting_unit",
                 id=unit,
                 polity_id=turkey,
                 scheme_code=scheme,
-                code=key,
+                code=printed,
                 area_relation="within",
                 area_id=area,
                 kind="aggregate",
@@ -467,10 +551,6 @@ def emit() -> Path:
             "outcome", pl.DataFrame(schema={"result_set_id": pl.String, "option_id": pl.String, "kind": pl.String})
         )
         cs.manifest["scope"] = {**cs.manifest["scope"], "clears": declared_sets}
-        for before, after in moved.items():
-            if before in existing:
-                cs.merge(cs.key("tr.polity", before), cs.key("tr.polity", after))
-                cs.merge(cs.key("tr.office", f"{before}-mayor"), cs.key("tr.office", f"{after}-mayor"))
         for (unit,) in conn.execute(
             """select ru.id from reporting_unit ru join changeset ch on ch.id = ru.changeset_id
                where ch.pipeline = %s""",
