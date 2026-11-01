@@ -189,6 +189,7 @@ NOTE = (
 )
 
 WRITE_IN = re.compile(r"write-?in|scattering|\(W\)$", re.IGNORECASE)
+NO_CANDIDATE = re.compile(r"^no candidate", re.IGNORECASE)
 
 
 def office_name(text: str) -> str:
@@ -196,6 +197,10 @@ def office_name(text: str) -> str:
     if found is None:
         return text.strip()
     return f"United States Representative {found[1]}" if found[1] else "United States Senator"
+
+
+def stem(word: str) -> str:
+    return word[:-1] if len(word) > 4 and word.endswith("s") and not word.endswith("ss") else word
 
 
 def person(label: str) -> str:
@@ -1047,7 +1052,7 @@ def plan(
             people = frozenset(
                 person(candidate)
                 for candidate in group.filter(~pl.col("write_in"))["candidate"].unique()
-                if candidate and not WRITE_IN.search(candidate)
+                if candidate and not WRITE_IN.search(candidate) and not NO_CANDIDATE.match(candidate)
             )
             races.setdefault((name, people), []).append(county)
         matched = 0
@@ -1067,7 +1072,10 @@ def plan(
                     continue
                 overlap = len(people & wanted) / len(people | wanted) if people | wanted else 1
                 if overlap >= 0.6:
-                    found = words & (titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:]))
+                    tokens = titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:])
+                    found = words & tokens
+                    if not found - GENERIC:
+                        found |= {w for w in words if stem(w) in {stem(t) for t in tokens}}
                     scored.append((round(overlap, 2), len(found - GENERIC), len(found), contest, key))
             scored.sort(key=lambda hit: (-hit[0], -hit[1], -hit[2]))
             best = [hit for hit in scored if hit[:3] == scored[0][:3]] if scored else []
@@ -1121,11 +1129,7 @@ def plan(
             earlier = next((i for i, entry in enumerate(work) if entry[1] == key), None)
             if earlier is not None:
                 old = work[earlier]
-                if (
-                    key in local_keys
-                    and old[4] == place
-                    and not set(old[3]["county"]) & set(part["county"])
-                ):
+                if key in local_keys and old[4] == place and not set(old[3]["county"]) & set(part["county"]):
                     base = old[3] if "piece" in old[3].columns else old[3].with_columns(piece=pl.lit(0))
                     work[earlier] = (
                         *old[:3],
