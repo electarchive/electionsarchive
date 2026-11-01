@@ -13,7 +13,7 @@ from ea.sources.tr.ysk import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "tr.tbmm_album"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://cdn.tbmm.gov.tr/TbmmWeb/Albumler/Tbmm_Albumu/Cilt2.pdf"
 TITLE = "TBMM Albümü 1920-2010, 2. Cilt (1950-1980)"
@@ -268,6 +268,8 @@ def emit() -> Path:
                 is_preferred=preferred,
             )
         counts: Counter[str] = Counter()
+        regrouped: dict[object, set[str]] = {}
+        regrouped_names: dict[object, str] = {}
         written: set[object] = set()
         merged: set[object] = set()
         for row in entries.filter(pl.col("term").is_in(list(OPENINGS))).iter_rows(named=True):
@@ -277,6 +279,13 @@ def emit() -> Path:
                 f"{SOURCE}.person",
                 f"{fold(row['registered'] or row['name'])}:{fold(row['birthplace'] or '')}:{row['born']}",
             )
+            whole = row["name"] if row["registered"] is None else f"{row['name']} ({row['registered']})"
+            grouped = re.match(r"^(.*?)\s*(?:\(([^()]*)\))?$", whole)
+            assert grouped is not None
+            shown, registered = grouped[1], grouped[2]
+            if person not in cs.minted and registered != row["registered"]:
+                regrouped[person] = {title(digits.sub("", text).strip()) for text in (shown, registered) if text}
+                regrouped_names[person] = title(digits.sub("", shown).strip())
             if person in cs.minted and person not in written:
                 written.add(person)
                 died = None if row["died"] is None else date.fromisoformat(row["died"])
@@ -288,7 +297,7 @@ def emit() -> Path:
                     death_date=died,
                     death_precision="day",
                 )
-                for text, preferred in ((row["name"], True), (row["registered"], False)):
+                for text, preferred in ((shown, True), (registered, False)):
                     if text is not None:
                         cs.add(
                             "name",
@@ -354,6 +363,30 @@ def emit() -> Path:
                         valid_to=ended if died else closing,
                     )
                     counts[term, "party"] += 1
+        held = conn.execute(
+            """select n.id, n.entity_id, n.text from name n join changeset ch on ch.id = n.changeset_id
+               where ch.pipeline = %s and n.entity_id = any(%s::uuid[])""",
+            [SOURCE, list(regrouped)],
+        ).fetchall()
+        for person, texts in regrouped.items():
+            for text in texts - {held_text for _, entity, held_text in held if entity == person}:
+                cs.add(
+                    "name",
+                    entity_id=person,
+                    text=text,
+                    lang="tr",
+                    kind="official",
+                    is_preferred=text == regrouped_names[person],
+                )
+        for name_id, entity, text in held:
+            if text not in regrouped[entity]:
+                cs.add(
+                    "name_drop",
+                    name_id=name_id,
+                    entity_id=entity,
+                    text=text,
+                    reason="Split at the wrong parenthesis when the album's name was read.",
+                )
         for key, count in sorted(counts.items()):
             print(key, count)
         return cs.write()
