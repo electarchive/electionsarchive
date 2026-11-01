@@ -7,7 +7,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.nyc_ed_links"
-VERSION = "2"
+VERSION = "3"
 COUNTIES = "36005|36047|36061|36081|36085"
 LEVELS = (
     ("us.sldu", "c.code like 'NY:%%'"),
@@ -94,7 +94,8 @@ def emit() -> Path:
         )
         nearest = pl.DataFrame(
             conn.execute(
-                """select distinct on (u.id) u.id::text, u.code, c.area_id::text, u.valid_from, u.valid_to
+                """select distinct on (u.id) u.id::text, u.code, c.area_id::text, u.valid_from, u.valid_to,
+                     greatest(c.valid_from - u.valid_from, u.valid_from - coalesce(c.valid_to, u.valid_from), 0) > 0
                    from reporting_unit u join entity e on e.id = u.id
                    join area_code c on c.code = u.code
                    join area a on a.id = c.area_id and a.scheme_code = 'us.nyc_ed'
@@ -103,10 +104,10 @@ def emit() -> Path:
                      and exists (select from result_value v where v.unit_k = u.k and v.measure = 1 and v.value > 0)
                    order by u.id, greatest(c.valid_from - u.valid_from, u.valid_from - coalesce(c.valid_to, u.valid_from), 0)"""
             ).fetchall(),
-            schema=["unit_id", "ed", "area_id", "valid_from", "valid_to"],
+            schema=["unit_id", "ed", "area_id", "valid_from", "valid_to", "approximate"],
             orient="row",
         )
-        print(f"{nearest.height} unlocated election districts with votes linked approximately to the nearest edition")
+        print(f"{nearest.height} unlocated election districts with votes linked to the nearest edition")
         everyone = pl.concat(
             [
                 placed.select("unit_id", "ed", "area_id", "valid_from", "valid_to", "day", approximate=pl.lit(False)),
@@ -114,7 +115,7 @@ def emit() -> Path:
                     "unit_id", "ed", "area_id", "valid_from", "valid_to", day="valid_from", approximate=pl.lit(False)
                 ),
                 nearest.select(
-                    "unit_id", "ed", "area_id", "valid_from", "valid_to", day="valid_from", approximate=pl.lit(True)
+                    "unit_id", "ed", "area_id", "valid_from", "valid_to", day="valid_from", approximate="approximate"
                 ),
             ]
         )
@@ -187,7 +188,7 @@ def emit() -> Path:
         placement = pl.concat(
             [
                 placed.select("unit_id", "area_id", "valid_from", "valid_to", approximate=pl.lit(False)),
-                nearest.select("unit_id", "area_id", "valid_from", "valid_to", approximate=pl.lit(True)),
+                nearest.select("unit_id", "area_id", "valid_from", "valid_to", approximate="approximate"),
             ]
         ).select(
             "unit_id",
