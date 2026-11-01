@@ -53,6 +53,12 @@ export type LiveRace = {
   baseline: Array<LiveBaseline>;
   certified: { totals: Array<number>; winners: Array<string> } | null;
   source: { publisher: string; url: string | null };
+  jurisdiction?: {
+    name: string;
+    kind: "county" | "municipal" | "school" | "special" | "judicial" | "state";
+  } | null;
+  seats?: number;
+  isMeasure?: boolean;
 };
 
 export type LiveElection = {
