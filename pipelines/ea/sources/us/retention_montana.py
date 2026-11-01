@@ -1,5 +1,6 @@
 import html
 import re
+import subprocess
 from datetime import UTC, datetime
 
 from ea import raw, scan
@@ -25,7 +26,14 @@ LATER = {
     2016: "2016-general/2016GeneralStatewideCanvass.pdf",
     2018: "2018-general/2018-General-Report-State-Canvass.pdf",
     2020: "2020-general/State_Canvass_Report.pdf",
+    2022: "2022-general/2022General-StateCanvassReport.pdf",
+    2024: "2024-general/2024-General-Election-Report-State-Canvass.pdf",
 }
+DAYS = {2016: "2016-11-08", 2018: "2018-11-06", 2020: "2020-11-03", 2022: "2022-11-08", 2024: "2024-11-05"}
+HEADING = re.compile(
+    r"Shall (?:Judge|Justice) (.+?) of(?: the)?(?: DISTRICT COURT JUDGE)?(?: the)? DISTRICT (\d+),? DEPT\.? (\d+)",
+    re.IGNORECASE,
+)
 
 
 def lines(pdf, page):
@@ -65,9 +73,9 @@ def fetch() -> None:
             )
 
 
-def rows():
+def county_codes():
     with connect() as conn:
-        fips = {
+        return {
             mt_judicial.key(name): code
             for code, name in conn.execute(
                 """select u.code, n.text from reporting_unit u
@@ -75,6 +83,77 @@ def rows():
                    where u.scheme_code = 'us.county' and u.code like '30%%'"""
             ).fetchall()
         }
+
+
+def districts(fips):
+    found: list[dict[str, object]] = []
+    for year, day in DAYS.items():
+        url = location(year)
+        pdf = raw.cached(SOURCE, url).path
+        pages = int(
+            subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True)
+            .stdout.split("Pages:")[1]
+            .split()[0]
+        )
+        for page in range(1, pages + 1):
+            buffer: list[str] = []
+            heading = None
+            cells: dict[str, tuple[tuple[int, scan.Box], tuple[int, scan.Box]]] = {}
+            for words in lines(pdf, page):
+                texts = [w for w, _ in words]
+                if [t.lower() for t in texts] == ["yes", "no"]:
+                    heading = HEADING.search(" ".join(buffer))
+                    cells = {}
+                    continue
+                figures = [(number(w), b) for w, b in words if NUMBER.fullmatch(w)]
+                label = " ".join(w for w, b in words if not NUMBER.fullmatch(w))
+                if len(figures) == 2 and heading is not None:
+                    if label == "Total":
+                        if len(cells) < 1:
+                            raise ValueError(f"Montana {year} {heading[0]}: no counties")
+                        sums = (sum(c[0][0] for c in cells.values()), sum(c[1][0] for c in cells.values()))
+                        if sums != (figures[0][0], figures[1][0]):
+                            raise ValueError(f"Montana {year} {heading[0]}: counties sum to {sums}, printed {figures}")
+                        judge = re.sub(r'\s*"[^"]*"\s*', " ", heading[1]).strip()
+                        for code, pair in cells.items():
+                            for answer, (votes, box) in zip(("yes", "no"), pair, strict=True):
+                                found.append(
+                                    {
+                                        "day": day,
+                                        "state": "MT",
+                                        "court": "district-court",
+                                        "number": int(heading[2]),
+                                        "post": int(heading[3]),
+                                        "name": judge,
+                                        "answer": answer,
+                                        "votes": votes,
+                                        "page": page,
+                                        "x0": box[0],
+                                        "y0": box[1],
+                                        "x1": box[2],
+                                        "y1": box[3],
+                                        "origin": url,
+                                        "county": code,
+                                        "flags": 0,
+                                    }
+                                )
+                        heading = None
+                        cells = {}
+                        buffer = []
+                        continue
+                    name = label + " clark" if mt_judicial.key(label + " clark") in fips else label
+                    if mt_judicial.key(name) not in fips:
+                        raise ValueError(f"Montana {year} page {page}: unknown county {label!r}")
+                    cells[fips[mt_judicial.key(name)]] = (figures[0], figures[1])
+                    continue
+                buffer.append(" ".join(texts))
+                if len(buffer) > 12:
+                    del buffer[0]
+    return found
+
+
+def rows():
+    fips = county_codes()
     found: list[dict[str, object]] = []
     for day, year, page, judge, yes_band, no_band in QUESTIONS:
         url = location(year)
@@ -131,4 +210,4 @@ def rows():
                         "flags": 0,
                     }
                 )
-    return found
+    return found + districts(fips)

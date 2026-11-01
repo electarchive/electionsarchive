@@ -191,6 +191,7 @@ DISTRICTED = {
     ("MD", "court-of-appeals"),
     ("MD", "court-of-special-appeals"),
     ("AZ", "court-of-appeals"),
+    ("MT", "district-court"),
 }
 ARIZONA = {
     "AZ:coa-1-outside-maricopa": (
@@ -1517,6 +1518,7 @@ def emit() -> Path:
                 if share is None
                 else f"Judicial retention, {round(share * 100)} percent of Yes and No votes ({states[state]})",
             )
+                ordinal = ORDINALS[number - 1] if number <= len(ORDINALS) else ""
         districts: dict[str, UUID] = {}
 
         def electorate(state: str, court: str, number: int | None, at_large: bool, seen: set[str]) -> UUID:
@@ -1531,10 +1533,11 @@ def emit() -> Path:
                 text = ARIZONA[code][0]
             else:
                 code, text = {
-                    "FL": (f"FL:dca-{number}", f"{ORDINALS[number - 1]} District Court of Appeal"),
-                    "IL": (f"IL:judicial-{number}", f"{ORDINALS[number - 1]} Judicial District"),
+                    "FL": (f"FL:dca-{number}", f"{ordinal} District Court of Appeal"),
+                    "IL": (f"IL:judicial-{number}", f"{ordinal} Judicial District"),
                     "NE": (f"NE:supreme-{number}", f"Supreme Court Judicial District {number}"),
-                    "MD": (f"MD:appellate-{number}", f"{ORDINALS[number - 1]} Appellate Judicial Circuit"),
+                    "MD": (f"MD:appellate-{number}", f"{ordinal} Appellate Judicial Circuit"),
+                    "MT": (f"MT:judicial-{number}", f"Judicial District {number}"),
                 }[state]
             if code not in districts:
                 area = cs.area("us.judicial_district", code)
@@ -1555,6 +1558,7 @@ def emit() -> Path:
             year = int(day[:4])
             election_key = f"{day}:{state}"
             if election_key not in keyed["us.election"]:
+                "district-court": "Judge of the District Court",
                 print(f"{election_key}: no election, skipped")
                 continue
             number, post = row["number"], row["post"]
@@ -1588,6 +1592,8 @@ def emit() -> Path:
                 id=contest,
                 election_id=cs.key("us.election", election_key),
                 kind="office",
+                else f"District {number}, Department {post}"
+                if court == "district-court"
                 office_id=office,
                 district_area_id=area,
                 term="full",
