@@ -23,7 +23,9 @@ PUBLISHER = "North Dakota Secretary of State"
 TITLE = "Official abstracts of votes cast at the general elections"
 FILES = {
     1940: "1940-11-05-general",
+    1942: "1942-11-03-general",
     1944: "1944-11-07-general",
+    1946: "1946-11-05-general",
     1948: "1948-11-02-general",
     1950: "1950-11-07-general",
     1954: "1954-11-02-general",
@@ -44,7 +46,9 @@ FILES = {
 }
 DAYS = {
     1940: date(1940, 11, 5),
+    1942: date(1942, 11, 3),
     1944: date(1944, 11, 7),
+    1946: date(1946, 11, 5),
     1992: date(1992, 11, 3),
     1994: date(1994, 11, 8),
     1996: date(1996, 11, 5),
@@ -199,6 +203,49 @@ COLUMNS: dict[int, tuple[int, dict[int, tuple[str, str, str | None]]]] = {
             30: ("public-service-commissioner", "J. C. Costello", None),
             31: ("public-service-commissioner", "Rudolph Raber", None),
             32: ("public-service-commissioner", "Conrad C. Johnson", None),
+        },
+    ),
+    1942: (
+        0,
+        {
+            9: ("lieutenant-governor", "Quentin N. Burdick", None),
+            10: ("lieutenant-governor", "Henry Holt", None),
+            11: ("secretary-of-state", "Herman Thorson", None),
+            12: ("secretary-of-state", "Thomas Hall", None),
+            13: ("auditor", "Berta E. Baker", None),
+            14: ("auditor", "Albert H. Haut", None),
+            15: ("treasurer", "Carl Anderson", None),
+            16: ("treasurer", "John Omland", None),
+            17: ("attorney-general", "Alvin C. Strutz", None),
+            18: ("attorney-general", "Walter O. Buck", None),
+            19: ("insurance-commissioner", "Oscar E. Erickson", None),
+            20: ("insurance-commissioner", "John N. Hagan", None),
+            21: ("commissioner-of-agriculture", "Math Dahl", None),
+            22: ("commissioner-of-agriculture", "C. P. Dahl", None),
+            23: ("public-service-commissioner", "S. S. McDonald", None),
+            24: ("public-service-commissioner", "George Schuett", None),
+        },
+    ),
+    1946: (
+        0,
+        {
+            10: ("lieutenant-governor", "Quentin Burdick", "DEM"),
+            11: ("lieutenant-governor", "C. P. Dahl", "REP"),
+            12: ("secretary-of-state", "B. E. Robinson", "DEM"),
+            13: ("secretary-of-state", "Thomas Hall", "REP"),
+            14: ("auditor", "Vernon B. Hathaway", "DEM"),
+            15: ("auditor", "Berta E. Baker", "REP"),
+            16: ("treasurer", "Douglas Dahlin", "DEM"),
+            17: ("treasurer", "H. W. Swenson", "REP"),
+            18: ("attorney-general", "Agnes Molzahn", "DEM"),
+            19: ("attorney-general", "Nels G. Johnson", "REP"),
+            20: ("insurance-commissioner", "Tom Lynch", "DEM"),
+            21: ("insurance-commissioner", "Otto Krueger", "REP"),
+            22: ("commissioner-of-agriculture", "Mike Purdy", "DEM"),
+            23: ("commissioner-of-agriculture", "Math Dahl", "REP"),
+            24: ("public-service-commissioner", "J. Arthur Engen", "DEM"),
+            25: ("public-service-commissioner", "Ben C. Larkin", "REP"),
+            26: ("public-service-commissioner", "Martin A. Stanley", "DEM"),
         },
     ),
     1948: (
@@ -474,6 +521,12 @@ ERRATA = {
     (1940, "Alvin C. Strutz"),
     (1940, "Math Dahl"),
     (1940, "Alfred S. Dale"),
+    (1942, "Henry Holt"),
+    (1942, "Herman Thorson"),
+    (1942, "Berta E. Baker"),
+    (1942, "Walter O. Buck"),
+    (1942, "C. P. Dahl"),
+    (1946, "Thomas Hall"),
     (1944, "Nels G. Johnson"),
     (1944, "Thomas Hall"),
     (1944, "Oscar W. Hagen"),
@@ -587,7 +640,7 @@ def parse() -> None:
                 lines[-1][1] += w[4]
                 continue
             lines.append([middle, w[4]])
-            if w[4].upper().rstrip(".") == "TOTAL":
+            if w[4].upper().rstrip(".") in {"TOTAL", "TOTALS"}:
                 break
         keys = [TYPOS.get(plain(text), plain(text)) for _, text in lines[:-1]]
         if sorted(keys) != sorted(codes):
@@ -709,6 +762,8 @@ def parse() -> None:
             if year == 1944:
                 for (county, column), amount in READ_1944.items():
                     cells[(keys.index(county), column)] = amount
+            if year == 1946:
+                cells[(keys.index("richland"), 17)] = 3503
         else:
             for line, w in found:
                 column = column_of(w)
