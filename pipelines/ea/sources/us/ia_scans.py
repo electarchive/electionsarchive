@@ -96,8 +96,8 @@ ASK_RIGHT = (
 LAYOUTS: dict[str, tuple[str, str, str, str, dict[str, int]]] = {
     "1982": (SOURCE, URL, "1", ASK, READS),
     "1986": (SOURCE, URL, "1", ASK, READS),
-    "1978": (SOURCE, URL_1978, "3", ASK_RIGHT, {"a": 130, "b": 170}),
-    "1998": ("us.ia_redbook", URL_1998, "2", ASK_PAGE, {"a": 170, "b": 220}),
+    "1978": (SOURCE, URL_1978, "3", ASK_RIGHT, {"a": 130, "b": 170, "c": 150, "d": 200}),
+    "1998": ("us.ia_redbook", URL_1998, "2", ASK_PAGE, {"a": 170, "b": 220, "c": 190, "d": 250}),
 }
 
 
@@ -141,7 +141,7 @@ def requests(
                     }
                     params = MessageCreateParamsNonStreaming(
                         model=MODEL,
-                        max_tokens=6000,
+                        max_tokens=16000,
                         system=SYSTEM,
                         messages=[{"role": "user", "content": [block, {"type": "text", "text": ask}]}],
                         output_config={"format": {"type": "json_schema", "schema": SCHEMA}},
