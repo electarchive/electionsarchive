@@ -458,6 +458,7 @@
     queries: ordered.map((race, index) => {
       const path = race.path ?? "";
       const by = race.places?.level;
+      const year = election.date?.slice(0, 4);
       return {
         queryKey: ["swing", race.path ?? race.anchor, by],
         enabled:
@@ -475,7 +476,6 @@
             vs: "previous",
             by,
           });
-          const year = election.date?.slice(0, 4);
           return compared.places == null ||
             compared.target?.year == null ||
             year == null ||
