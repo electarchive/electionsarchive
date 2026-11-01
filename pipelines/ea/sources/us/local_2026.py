@@ -1237,6 +1237,11 @@ FEEDS.update(
             "City of Millersburg",
             "November 2026 City Council Election",
         ),
+        "OR-41015-gold-beach": (
+            "https://www.goldbeachoregon.gov/index.asp?SEC=45A33D13-25D1-43A0-A2D4-35A62BC4E8D8",
+            "City of Gold Beach",
+            "Candidate filings for Council Positions 1 and 3, November 3, 2026 General Election",
+        ),
         "OR-41055-wasco": (
             "https://www.shermancountyor.gov/DocumentCenter/View/987/City-of-Wasco-Filed-Candidates",
             "City of Wasco",
@@ -1406,11 +1411,6 @@ LOCAL_BODY = re.compile(
     r"|conservation|cemetery|\bparks?\b|airport|\bport\b|utility|levee|drainage|college|recreation"
     r"|public service|house of delegates|state senat|congress"
 )
-IN_SKIP = {
-    "US REPRESENTATIVE",
-    "STATE REPRESENTATIVE",
-    "STATE SENATOR",
-    "SECRETARY OF STATE",
 IN_ALIASES = (
     (r"^centerpoint town\b", "center point town", None),
     (r"^demotte town\b", "de motte town", None),
@@ -1451,6 +1451,11 @@ IN_ALIASES = (
     (r"^tipton tri central\b", "tri central", None),
 )
 
+IN_SKIP = {
+    "US REPRESENTATIVE",
+    "STATE REPRESENTATIVE",
+    "STATE SENATOR",
+    "SECRETARY OF STATE",
     "STATE COMPTROLLER (AUDITOR OF STATE)",
     "TREASURER OF STATE",
     "OTHER",
@@ -1545,6 +1550,7 @@ DELIVERED = {
     "OR-41043-tangent": DATA / "inbox" / "y26" / "or" / "tangent.html",
     "OR-41043-lyons": DATA / "inbox" / "y26" / "or" / "lyons.html",
     "OR-41043-millersburg": DATA / "inbox" / "y26" / "or" / "millersburg.txt",
+    "OR-41015-gold-beach": DATA / "inbox" / "y26" / "or" / "gold_beach.pdf",
     "OR-41055-wasco": DATA / "inbox" / "y26" / "or" / "sherman_wasco.pdf",
     "OR-41055-moro": DATA / "inbox" / "y26" / "or" / "sherman_moro.pdf",
     "OR-41055-grass-valley": DATA / "inbox" / "y26" / "or" / "sherman_grass_valley.pdf",
@@ -6463,6 +6469,13 @@ for key, publisher, title, url, local in (
         "ks/harper.pdf",
     ),
     (
+        "KS-20077-townships",
+        "Harper County Clerk",
+        "General Election Sample Ballot, November 3, 2026",
+        "https://www.harpercountyks.gov/_files/ugd/e0b4f1_e8204facf47c4dac9dd07b8f5fe3e522.pdf",
+        "ks/harper.pdf",
+    ),
+    (
         "KS-20099",
         "Labette County Clerk",
         "2026 General Election Sample Ballots",
@@ -6482,6 +6495,20 @@ for key, publisher, title, url, local in (
         "Certification of Candidates and Notice of General Election, November 3, 2026",
         "https://www.mgcountyks.org/DocumentCenter/View/1518/Notice-of-General-Election-Nov-3rd-20260001",
         "ks/montgomery.pdf",
+    ),
+    (
+        "KS-20125-cities",
+        "Montgomery County Election Officer",
+        "Certification of Candidates and Notice of General Election, November 3, 2026",
+        "https://www.mgcountyks.org/DocumentCenter/View/1518/Notice-of-General-Election-Nov-3rd-20260001",
+        "ks/montgomery.pdf",
+    ),
+    (
+        "KS-20021-cities",
+        "Cherokee County Clerk",
+        "General Sample Ballots, November 3, 2026",
+        "https://cherokeecountyks.gov/main/images/documents/County-Clerk/Sample-Ballots/11-3-26_General_Sample_Ballots.pdf",
+        "ks/cherokee.pdf",
     ),
     (
         "NE-31019-buffalo",
@@ -6701,6 +6728,20 @@ for key, publisher, title, url, local in (
         "or/lake_cities.html",
     ),
     (
+        "OR-41015-districts",
+        "Curry County Clerk",
+        "Candidate Register, November 3, 2026 General Election (Harbor Water P.U.D.)",
+        "https://www.co.curry.or.us/",
+        "or/curry_candidate_register.pdf",
+    ),
+    (
+        "OR-41065-districts",
+        "Wasco County Clerk",
+        "2026 General Election: Filed Candidates (Chenowith Water People's Utility District)",
+        "https://www.co.wasco.or.us/",
+        "or/wasco_districts.html",
+    ),
+    (
         "OR-41015-brookings",
         "City of Brookings",
         "General Election 2026 Information",
@@ -6799,6 +6840,13 @@ for key, publisher, title, url, local in (
         "az/sierra_vista_candidates.pdf",
     ),
     (
+        "AZ-04003-county",
+        "Cochise County Elections",
+        "2026 Candidate Information",
+        "https://www.cochise.az.gov/652/2026-Candidate-Information",
+        "az/cochise_county.html",
+    ),
+    (
         "AZ-04009-county",
         "Graham County Elections",
         "Candidates and Propositions, 2026 General Election",
@@ -6860,13 +6908,6 @@ for key, publisher, title, url, local in (
         "Notice of Nominees for Public Office, General Municipal Election November 3, 2026 (August 25, 2026)",
         "https://www.atascadero.org/",
         "ca/atascadero_nominees.pdf",
-    ),
-    (
-        "AZ-04003-county",
-        "Cochise County Elections",
-        "2026 Candidate Information",
-        "https://www.cochise.az.gov/652/2026-Candidate-Information",
-        "az/cochise_county.html",
     ),
     (
         "CA-06079-san-luis-obispo",
@@ -7154,7 +7195,15 @@ KY_CITY_SPELLINGS = {
     ("TODD", "Gurthrie"): "Guthrie",
     ("TRIMBLE", "Trimble Milton"): "Milton",
 }
-TACIT_FEEDS = {"TX-48209-udc", "CA-06071-s", "TX-48439-carroll", "TX-48453-lv", "TX-48453-ud", "TX-48355-fb", "TX-48085-wsud"}
+TACIT_FEEDS = {
+    "TX-48209-udc",
+    "CA-06071-s",
+    "TX-48439-carroll",
+    "TX-48453-lv",
+    "TX-48453-ud",
+    "TX-48355-fb",
+    "TX-48085-wsud",
+}
 NEW_PARTIES = {
     "NY:middle-party": "Middle Party",
     "NY:working-families-perseverance": "Working Families/Perseverance",
@@ -10107,6 +10156,16 @@ def parse() -> None:
         index: dict[tuple[str, frozenset[str]], list[tuple[str, str]]] = defaultdict(list)
         for st, district, label in saipe.select("State FIPS Code", "District ID", "Name").iter_rows():
             index[(st, coverage_tables.tokens(label))].append((f"{st}{district}", label))
+        for district, label in (
+            ("3407590", "Hunterdon Central High School District"),
+            ("3417550", "West Morris High School District"),
+            ("04V0003", "Cochise Technology District"),
+            ("04V0005", "Coconino Association for Vocation Industry and Technology"),
+            ("04V0015", "Western Arizona Vocational District"),
+            ("04V0017", "Northern Arizona Vocational Institute of Technology"),
+            ("04V0027", "Southwest Technical Education District of Yuma"),
+        ):
+            index[(district[:2], coverage_tables.tokens(label))].append((district, label))
         unowned: dict[str, list[tuple[str, str, str, str, str]]] = defaultdict(list)
         owned = dict(
             conn.execute(
@@ -10116,7 +10175,7 @@ def parse() -> None:
         )
         for st, county_code, label in conn.execute(
             """select g.state, g.county, g.name from coverage_government g
-               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL')"""
+               where g.kind = 'school' and g.polity_id is null and g.county is not null and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL', 'NE')"""
         ).fetchall():
             label = {
                 "Rowan County Sch": "Rowan-Salisbury Schools",
@@ -10124,6 +10183,14 @@ def parse() -> None:
                 "Southeastern Cass County School District": "Lewis Cass Schools",
                 "Northwestrn Consolidated School District": "Northwestern Consolidated School Corporation",
                 "Union County School Corporation": "Union County-College Corner Joint School District",
+                "Colorado R Union High School District 2": "Colorado River Union High School District",
+                "Indian Oasis-Baboquivara Unified School District 40": "Indian Oasis-Baboquivari Unified District",
+                "Santa Cruz Valley School District 35": "Santa Cruz Valley Unified District",
+                "Fredonia-Moccasin Bi-County School District 6": "Fredonia-Moccasin Unified District",
+                "Solomonville School District 5": "Solomon Elementary District",
+                "Coconino Association For Vocation Industry & Technology(caviat)": "Coconino Association for Vocation Industry and Technology",
+                "Western Arizona Vocational District #50": "Western Arizona Vocational District",
+                "Southwest Technical Education District of Yuma (stedy)": "Southwest Technical Education District of Yuma",
             }.get(label, label)
             mine = frozenset(token for token in coverage_tables.tokens(label) if not token.isdigit())
             hits = [
@@ -10178,10 +10245,6 @@ def parse() -> None:
             gazetteer.filter(
                 pl.col("USPS").is_in(
                     ["OR", "FL", "MI", "KY", "OK", "NV", "AR", "AZ", "MD", "LA", "IN", "NE", "KS", "WY", "NY"]
-                "Colorado R Union High School District 2": "Colorado River Union High School District",
-                "Indian Oasis-Baboquivara Unified School District 40": "Indian Oasis-Baboquivari Unified District",
-                "Santa Cruz Valley School District 35": "Santa Cruz Valley Unified District",
-                "Fredonia-Moccasin Bi-County School District 6": "Fredonia-Moccasin Unified District",
                 )
                 & (pl.col("FUNCSTAT") == "A")
             )
@@ -10323,7 +10386,7 @@ def parse() -> None:
                        join external_id x on x.entity_id = g.polity_id and x.scheme = 'us.polity'
                            and x.value ~ '^(place|town|school):'
                        join slug s on s.entity_id = g.polity_id
-                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL'))
+                       where g.state = %s and (g.kind in ('municipality', 'township') or g.kind = 'school' and g.state in ('MI', 'CA', 'NJ', 'TX', 'UT', 'AZ', 'MD', 'VA', 'RI', 'LA', 'NC', 'IN', 'IL', 'NE'))
                        order by g.id, x.value desc, s.path""",
                         [state],
                     ),
@@ -10525,6 +10588,42 @@ def parse() -> None:
                             re.sub(r"\bausable\b", "au sable", " ".join(tokens)),
                         ),
                     ).split()
+                if state == "AZ":
+                    tokens = re.sub(
+                        r"^navit (blue ridge|holbrook|show low)\b|^w a v e kingman region\b|^solomonville school district 5\b"
+                        r"|^(holbrook unified school district) ward \d+\b",
+                        lambda m: (
+                            m[2]
+                            if m[2]
+                            else "solomon elementary school district"
+                            if m[0].startswith("solomonville")
+                            else "western arizona vocational district kingman region"
+                            if m[0].startswith("w a v e")
+                            else f"northern arizona vocational institute of technology {m[1]}"
+                        ),
+                        " ".join(tokens),
+                    ).split()
+                    tokens = re.sub(
+                        r"^(?:(colorado|tuba) city|lake havasu city) unified\b",
+                        lambda m: f"{m[1] or 'lake havasu'} unified",
+                        re.sub(
+                            r"^(tonto) school district 33\b|^ft thomas school district 7\b|^parker school district 27\b"
+                            r"|^quartzsite elementary district\b|^safford school district 1\b|^ray school district 3\b"
+                            r"|^maricopa school district 20\b|^baboquivari unified\b|^santa cruz valley school district 35\b",
+                            lambda m: {
+                                "tonto": "tonto basin elementary school district",
+                                "ft": "fort thomas unified school district",
+                                "parker": "parker unified school district",
+                                "quartzsite": "quartzsite elementary school district",
+                                "safford": "safford unified school district",
+                                "ray": "ray unified school district",
+                                "maricopa": "maricopa unified school district",
+                                "baboquivari": "indian oasis baboquivari unified",
+                                "santa": "santa cruz valley unified school district",
+                            }[m[0].split()[0]],
+                            " ".join(tokens),
+                        ),
+                    ).split()
                 nj_multi = False
                 if state == "NJ":
                     joined = " ".join(tokens)
@@ -10572,35 +10671,13 @@ def parse() -> None:
                         ),
                     )
                     in_pin = None
-                    for pattern, repl, pinned in IN_ALIASES:
+                    for pattern, repl, alias_pin in IN_ALIASES:
                         if re.search(pattern, tokens):
                             tokens = re.sub(pattern, repl, tokens)
-                            in_pin = pinned
+                            in_pin = alias_pin
                             break
                     tokens = tokens.split()
                 if tokens[:3] == ["governing", "board", "member"]:
-                if state == "AZ":
-                    tokens = re.sub(
-                        r"^(?:(colorado|tuba) city|lake havasu city) unified\b",
-                        lambda m: f"{m[1] or 'lake havasu'} unified",
-                        re.sub(
-                            r"^(tonto) school district 33\b|^ft thomas school district 7\b|^parker school district 27\b"
-                            r"|^quartzsite elementary district\b|^safford school district 1\b|^ray school district 3\b"
-                            r"|^maricopa school district 20\b|^baboquivari unified\b|^santa cruz valley school district 35\b",
-                            lambda m: {
-                                "tonto": "tonto basin elementary school district",
-                                "ft": "fort thomas unified school district",
-                                "parker": "parker unified school district",
-                                "quartzsite": "quartzsite elementary school district",
-                                "safford": "safford unified school district",
-                                "ray": "ray unified school district",
-                                "maricopa": "maricopa unified school district",
-                                "baboquivari": "indian oasis baboquivari unified",
-                                "santa": "santa cruz valley unified school district",
-                            }[m[0].split()[0]],
-                            " ".join(tokens),
-                        ),
-                    ).split()
                     tokens = tokens[3:]
                 for formal in (
                     ["public", "schools", "of", "the", "city", "of"],
@@ -10709,6 +10786,8 @@ def parse() -> None:
                 if state == "IL" and re.search(r"(?i)\bregional (superintendent|office)\b", str(row["contest"])):
                     fits = []
                 fits = [fit for fit in fits if fit[0] == max(f[0] for f in fits)]
+                if state == "IN" and in_pin is not None:
+                    fits = [fit for fit in fits if fit[3] == in_pin] or fits
                 if state == "NJ" and len({fit[4] for fit in fits}) > 1:
                     plain = [
                         word for word in tokens if word not in ("high", "school", "schools", "district", "sch", "dist")
@@ -10729,8 +10808,6 @@ def parse() -> None:
                 if len(fits) > 1:
                     fits = [fit for fit in fits if fit[1]] if len({fit[4] for fit in fits if fit[1]}) == 1 else fits
                 if state == "CA" and len({fit[4] for fit in fits}) > 1:
-                if state == "IN" and in_pin is not None:
-                    fits = [fit for fit in fits if fit[3] == in_pin] or fits
                     own = [fit for fit in fits if fit[5].endswith(f"-district-{slug(str(row['county']))}-county")]
                     fits = own or [fit for fit in fits if not re.search(r"-district-[a-z-]+-county$", fit[5])] or fits
                 if (
@@ -10763,7 +10840,9 @@ def parse() -> None:
                 ):
                     _, _, rest, label, owner, path = fits[0]
                     post = " ".join(
-                        re.sub(r"\b(member|members|of the|partial term|full term|unexpired term)\b", " ", " ".join(rest)).split()
+                        re.sub(
+                            r"\b(member|members|of the|partial term|full term|unexpired term)\b", " ", " ".join(rest)
+                        ).split()
                     )
                     post = post.replace("receiver of taxes", "tax collector")
                     post = re.sub(r"^(?:(?:city|village|township|town) ){2,}", "", post)
@@ -10919,12 +10998,9 @@ def parse() -> None:
                             owner,
                             path,
                         )
-                if (
-                    state == "CA"
-                    and (
-                        yosemite := re.search(
-                            r"(?i)^yosemite community college district\b.*?\barea (\d+)\b", str(row["contest"])
-                        )
+                if state == "CA" and (
+                    yosemite := re.search(
+                        r"(?i)^yosemite community college district\b.*?\barea (\d+)\b", str(row["contest"])
                     )
                 ):
                     tail = f"CA:06047:college:yosemite-community-college-district:trustee-area-{yosemite[1]}"
