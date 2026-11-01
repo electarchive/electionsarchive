@@ -1,4 +1,5 @@
 import csv
+import html
 import json
 import re
 from collections import defaultdict
@@ -47,7 +48,9 @@ def fold(text: str) -> str:
 def cell(line: str) -> str:
     text = re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", line[1:])
     text = re.sub(r"^\s*(?:style|bgcolor|align|width|rowspan|colspan)[^|]*\|", "", text)
-    return re.sub(r"\s+", " ", re.sub(r"<[^>]*>|''+", "", text)).strip()
+    text = re.sub(r"\s*<br\s*/?>\s*", "; ", re.sub(r"\{\{\s*adn\s*\|[^{}]*\}\}", "", text))
+    text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]*>|''+", "", text))).strip()
+    return re.sub(r"(?<=\S)\s*\*+$", "", text)
 
 
 def read_tables(

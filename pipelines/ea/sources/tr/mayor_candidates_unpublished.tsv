@@ -2,7 +2,6 @@ year	province	reason
 1963	1963-11-17:adana-mayor	BĞMSZ: 877 against 336
 1963	1963-11-17:afyonkarahisar-dazkiri-mayor	no option for CKMP
 1963	1963-11-17:afyonkarahisar-dinar-mayor	no option for BĞMSZ
-1963	1963-11-17:afyonkarahisar-sincanli-mayor	Hakkı Güzel: 2 namesakes, new person
 1963	1963-11-17:agri-mayor	no option for BĞMSZ
 1963	1963-11-17:agri-mayor	no option for BĞMSZ
 1963	1963-11-17:agri-mayor	no option for BĞMSZ
@@ -30,6 +29,8 @@ year	province	reason
 1963	1963-11-17:bilecik-bozuyuk-dodurga-mayor	contest already has candidacies
 1963	1963-11-17:bitlis-mayor	BĞMSZ: 82 against 155
 1963	1963-11-17:bitlis-mayor	BĞMSZ: 73 against 155
+1963	1963-11-17:bitlis-tatvan-mayor	BĞMSZ: 59 against 0
+1963	1963-11-17:bitlis-tatvan-mayor	BĞMSZ: 34 against 0
 1963	1963-11-17:bolu-duzce-cilimli-mayor	contest already has candidacies
 1963	1963-11-17:bolu-gerede-dortdivan-mayor	: 269 against 260
 1963	1963-11-17:bolu-gerede-yenicaga-mayor	no contest
@@ -53,13 +54,13 @@ year	province	reason
 1963	1963-11-17:canakkale-lapseki-umurbey-mayor	contest already has candidacies
 1963	1963-11-17:cankiri-kursunlu-atkaracalar-mayor	no contest
 1963	1963-11-17:cankiri-merkez-korgun-mayor	no contest
+1963	1963-11-17:cankiri-merkez-nkiri-mayor	BĞMSZ: 186 against 341
+1963	1963-11-17:cankiri-merkez-nkiri-mayor	BĞMSZ: 155 against 341
 1963	1963-11-17:cankiri-orta-kalfat-mayor	contest already has candidacies
 1963	1963-11-17:cankiri-orta-yaylakent-mayor	contest already has candidacies
 1963	1963-11-17:corum-mayor	BĞMSZ: 507 against 794
 1963	1963-11-17:corum-mayor	BĞMSZ: 177 against 794
 1963	1963-11-17:corum-mayor	BĞMSZ: 110 against 794
-1963	1963-11-17:corum-osmancik-mayor	Kemal Erdem: 2 namesakes, new person
-1963	1963-11-17:corum-sungurlu-mayor	Ali İhsan Emralioğlu: 2 namesakes, new person
 1963	1963-11-17:denizli-acipayam-dariveren-mayor	contest already has candidacies
 1963	1963-11-17:denizli-acipayam-kizilhisar-serinhisar-mayor	no contest
 1963	1963-11-17:denizli-acipayam-yesilyuva-mayor	contest already has candidacies
@@ -103,7 +104,6 @@ year	province	reason
 1963	1963-11-17:izmir-bergama-zeytindag-mayor	contest already has candidacies
 1963	1963-11-17:izmir-bornova-mayor	YTP: 318 against 0
 1963	1963-11-17:izmir-bornova-mayor	BĞMSZ: 218 against 0
-1963	1963-11-17:izmir-cesme-mayor	Mehmet Aldemir: 2 namesakes, new person
 1963	1963-11-17:izmir-kemalpasa-parsa-bagyurdu-mayor	contest already has candidacies
 1963	1963-11-17:izmir-odemis-adagide-ovakent-mayor	contest already has candidacies
 1963	1963-11-17:izmir-odemis-adagume-konakli-mayor	contest already has candidacies
@@ -117,7 +117,6 @@ year	province	reason
 1963	1963-11-17:kayseri-felahiye-cukur-ozvatan-mayor	no contest
 1963	1963-11-17:kayseri-mayor	BĞMSZ: 133 against 0
 1963	1963-11-17:kayseri-merkez-agirnas-tasoren-mayor	contest already has candidacies
-1963	1963-11-17:kayseri-yesilhisar-mayor	Kemal Doğan: 3 namesakes, new person
 1963	1963-11-17:kirklareli-babaeski-buyukmandira-mayor	contest already has candidacies
 1963	1963-11-17:kirklareli-luleburgaz-ahmetbey-mayor	: 772 against 112
 1963	1963-11-17:kirklareli-pehlivankoy-mayor	BĞMSZ: 307 against 0
@@ -144,7 +143,7 @@ year	province	reason
 1963	1963-11-17:konya-kulu-omeranli-tavsancali-mayor	contest already has candidacies
 1963	1963-11-17:konya-merkez-ismil-demirkent-mayor	contest already has candidacies
 1963	1963-11-17:konya-merkez-tepekoy-tepekent-mayor	contest already has candidacies
-1963	1963-11-17:konya-sarayonu-halici-ladik-mayor	contest already has candidacies
+1963	1963-11-17:konya-sarayonu-halici-ladik-mayor	no contest
 1963	1963-11-17:kutahya-simav-citgol-mayor	contest already has candidacies
 1963	1963-11-17:malatya-arapkir-mayor	AP: 712 against 550
 1963	1963-11-17:malatya-darende-balaban-gerimter-mayor	no contest
@@ -166,9 +165,8 @@ year	province	reason
 1963	1963-11-17:maras-goksun-cardak-mayor	no contest
 1963	1963-11-17:mardin-mayor	BĞMSZ: 1195 against 1468
 1963	1963-11-17:mardin-mayor	BĞMSZ: 273 against 1468
-1963	1963-11-17:mardin-midyat-mayor	Seyfi Güneştan: 2 namesakes, new person
 1963	1963-11-17:mugla-fethiye-gunlukbasi-foca-mayor	no contest
-1963	1963-11-17:mugla-merkez-bayirkoy-mayor	contest already has candidacies
+1963	1963-11-17:mugla-merkez-bayirkoy-mayor	no contest
 1963	1963-11-17:mugla-merkez-pisi-yesilyurt-mayor	contest already has candidacies
 1963	1963-11-17:mugla-merkez-yerkesik-mayor	: 1154 against 815
 1963	1963-11-17:mugla-yatagan-turgut-leyne-mayor	no contest
@@ -375,7 +373,7 @@ year	province	reason
 1973	1973-12-09:aydin-sultanhisar-salavatli-mayor	contest already has candidacies
 1973	1973-12-09:balikesir-ayvalik-altinova-mayor	contest already has candidacies
 1973	1973-12-09:balikesir-ayvalik-kucukkoy-mayor	contest already has candidacies
-1973	1973-12-09:balikesir-balya-ilica-sifa-mayor	contest already has candidacies
+1973	1973-12-09:balikesir-balya-ilica-sifa-mayor	no contest
 1973	1973-12-09:balikesir-bandirma-aksakal-mayor	contest already has candidacies
 1973	1973-12-09:balikesir-bandirma-edincik-mayor	contest already has candidacies
 1973	1973-12-09:balikesir-bigadic-iskelekoy-mayor	contest already has candidacies
@@ -852,7 +850,7 @@ year	province	reason
 1973	1973-12-09:konya-merkez-yarma-mayor	contest already has candidacies
 1973	1973-12-09:konya-sarayonu-bashuyuk-mayor	contest already has candidacies
 1973	1973-12-09:konya-sarayonu-cesmelisebil-mayor	contest already has candidacies
-1973	1973-12-09:konya-sarayonu-halici-ladik-mayor	contest already has candidacies
+1973	1973-12-09:konya-sarayonu-halici-ladik-mayor	no contest
 1973	1973-12-09:konya-seydisehir-gevrekli-mayor	contest already has candidacies
 1973	1973-12-09:konya-seydisehir-ketenli-mayor	contest already has candidacies
 1973	1973-12-09:konya-seydisehir-ortakaraoren-mayor	contest already has candidacies
@@ -1182,23 +1180,7 @@ year	province	reason
 1973	1973-12-09:zonguldak-merkez-catalagzi-mayor	contest already has candidacies
 1973	1973-12-09:zonguldak-merkez-kilimli-mayor	contest already has candidacies
 1973	1973-12-09:zonguldak-merkez-kozlu-mayor	contest already has candidacies
-1984	ankara	Hüseyin Erdal: 2 namesakes, new person
-1984	izmir	Burhan Özfatura: 2 namesakes, new person
-1989	ankara	Oğuzhan Asiltürk: 2 namesakes, new person
-1989	gaziantep	Celal Doğan: 3 namesakes, new person
-1989	izmir	Burhan Özfatura: 2 namesakes, new person
-1989	izmir	Şevket Kazan: 2 namesakes, new person
-1989	kayseri	Niyazi Bahçecioğlu: 2 namesakes, new person
-1989	konya	Halil Ürün: 2 namesakes, new person
-1994	adana	Mehmet Ceylan: 2 namesakes, new person
-1994	eskisehir	Zeki Ünal: 2 namesakes, new person
-1994	gaziantep	Celal Doğan: 3 namesakes, new person
-1994	istanbul	İlhan Kesici: 2 namesakes, new person
-1994	istanbul	Ertuğrul Günay: 2 namesakes, new person
 1994	istanbul	BĞMSZ: 2388 against 2385
-1994	izmir	Burhan Özfatura: 2 namesakes, new person
-1994	kayseri	Niyazi Bahçecioğlu: 2 namesakes, new person
-1994	konya	Halil Ürün: 2 namesakes, new person
 1999	adana	ANAP: 126605 against 126635
 1999	adana	DSP: 96105 against 96126
 1999	adana	MHP: 71789 against 71802
@@ -1207,34 +1189,10 @@ year	province	reason
 1999	adana	HADEP: 41823 against 41832
 1999	adana	DYP: 19980 against 19985
 1999	adana	ÖDP: 2815 against 2816
-1999	ankara	Ali Yiğit: 2 namesakes, new person
-1999	ankara	Kemal Ataman: 2 namesakes, new person
-1999	bursa	Mehmet Kartal: 2 namesakes, new person
-1999	diyarbakir	İsmail Yılmaz: 2 namesakes, new person
-1999	gaziantep	Celal Doğan: 3 namesakes, new person
-1999	izmir	Burhan Özfatura: 2 namesakes, new person
-2004	2004-03-28:adana-feke-mayor	Ahmet Sel: 3 namesakes, new person
-2004	2004-03-28:adana-kozan-mayor	Mehmet Demir: 2 namesakes, new person
-2004	2004-03-28:adiyaman-mayor	Mehmet Özdemir: 2 namesakes, new person
-2004	2004-03-28:adiyaman-samsat-mayor	Yusuf Fırat: 3 namesakes, new person
-2004	2004-03-28:adiyaman-tut-mayor	Mehmet Demir: 2 namesakes, new person
 2004	2004-03-28:afyonkarahisar-afyon-gebeceler-mayor	no contest
 2004	2004-03-28:afyonkarahisar-sincanli-savran-mayor	no contest
 2004	2004-03-28:afyonkarahisar-suhut-efe-mayor	no contest
-2004	2004-03-28:afyonkarahisar-sultandagi-mayor	Mehmet Şahin: 3 namesakes, new person
-2004	2004-03-28:agri-eleskirt-mayor	Sebahattin Sarı: 2 namesakes, new person
-2004	2004-03-28:aksaray-eskil-mayor	Niyazi Alçay: 2 namesakes, new person
-2004	2004-03-28:aksaray-gulagac-mayor	Faruk Teymen: 3 namesakes, new person
-2004	2004-03-28:aksaray-mayor	Mustafa Şahin: 2 namesakes, new person
-2004	2004-03-28:amasya-goynucek-mayor	Mustafa Yılmaz: 2 namesakes, new person
 2004	2004-03-28:amasya-suluova-mayor	Bağımsız Türkiye Partisi: 51 against 3748
-2004	2004-03-28:amasya-tasova-mayor	Özgür Özdemir: 2 namesakes, new person
-2004	2004-03-28:ankara-ayas-mayor	Hasan Ekinci: 2 namesakes, new person
-2004	2004-03-28:ankara-ayas-mayor	Hüseyin Erdal: 2 namesakes, new person
-2004	2004-03-28:ankara-etimesgut-mayor	Enver Demirel: 4 namesakes, new person
-2004	2004-03-28:ankara-etimesgut-mayor	Osman Kılıç: 2 namesakes, new person
-2004	2004-03-28:ankara-mamak-mayor	Hüseyin Şahin: 2 namesakes, new person
-2004	2004-03-28:antalya-alanya-mayor	Ahmet Çelik: 2 namesakes, new person
 2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-ak-parti-mayor	no contest
 2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-anap-mayor	no contest
 2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-bagimsiz-mayor	no contest
@@ -1252,111 +1210,212 @@ year	province	reason
 2004	2004-03-28:antalya-beldelere-gore-buyuksehir-belediye-baskanligi-secim-sonuclari-tkp-mayor	no contest
 2004	2004-03-28:antalya-il-genel-meclisi-yeni-turkiye-partisi-2002-width-1-mayor	no contest
 2004	2004-03-28:antalya-kas-mayor	Saadet Partisi: 0 against 7
-2004	2004-03-28:antalya-kemer-mayor	Mustafa Gül: 3 namesakes, new person
-2004	2004-03-28:antalya-kumluca-mayor	İbrahim Öztürk: 2 namesakes, new person
-2004	2004-03-28:ardahan-hanak-mayor	Ayhan Büyükkaya: 2 namesakes, new person
 2004	2004-03-28:artvin-savsat-mayor	Bağımsız: 551 against 589
 2004	2004-03-28:artvin-savsat-mayor	Bağımsız: 38 against 589
 2004	2004-03-28:aydin-didim-ak-yenikoy-mayor	no contest
-2004	2004-03-28:aydin-karacasu-mayor	Mustafa Büyükyapıcı: 3 namesakes, new person
-2004	2004-03-28:aydin-yenipazar-mayor	Mehmet Yüsran Erden: 2 namesakes, new person
-2004	2004-03-28:bartin-ulus-mayor	Hasan Hüseyin Uzun: 2 namesakes, new person
-2004	2004-03-28:batman-besiri-mayor	Sait Karabulut: 2 namesakes, new person
-2004	2004-03-28:batman-sason-mayor	Muzaffer Arslan: 2 namesakes, new person
-2004	2004-03-28:bingol-kigi-mayor	Yılmaz Gündüz: 2 namesakes, new person
-2004	2004-03-28:bingol-solhan-mayor	İsmail Yılmaz: 2 namesakes, new person
-2004	2004-03-28:bingol-yedisu-mayor	Mehmet Şerif Memioğlu: 2 namesakes, new person
-2004	2004-03-28:bitlis-adilcevaz-mayor	Adnan Göksoy: 2 namesakes, new person
-2004	2004-03-28:bitlis-hizan-mayor	Cezail Aktaş: 2 namesakes, new person
-2004	2004-03-28:bolu-goynuk-mayor	Ahmet Çankaya: 2 namesakes, new person
-2004	2004-03-28:burdur-tefenni-mayor	Ahmet Çelik: 2 namesakes, new person
-2004	2004-03-28:bursa-harmancik-mayor	Mustafa Çetinkaya: 2 namesakes, new person
-2004	2004-03-28:bursa-keles-mayor	Mehmet Kaman: 2 namesakes, new person
-2004	2004-03-28:canakkale-ezine-mayor	İsmail Yılmaz: 2 namesakes, new person
-2004	2004-03-28:canakkale-gelibolu-mayor	Münir Mustafa Özacar: 3 namesakes, new person
-2004	2004-03-28:cankiri-kizilirmak-mayor	Bayar Soysal: 3 namesakes, new person
-2004	2004-03-28:denizli-beyagac-mayor	Mustafa Akçay: 3 namesakes, new person
-2004	2004-03-28:denizli-guney-mayor	Halil Ayhan: 3 namesakes, new person
-2004	2004-03-28:diyarbakir-bismil-mayor	Mehmet Aydın: 3 namesakes, new person
-2004	2004-03-28:diyarbakir-cermik-mayor	Mehmet Demir: 2 namesakes, new person
-2004	2004-03-28:diyarbakir-cungus-mayor	Ali Suat Akmeşe: 2 namesakes, new person
-2004	2004-03-28:duzce-akcakoca-mayor	Fikret Albayrak: 2 namesakes, new person
-2004	2004-03-28:edirne-havsa-mayor	Oğuz Tekin: 2 namesakes, new person
-2004	2004-03-28:edirne-lalapasa-mayor	Bülent Şahinşah: 2 namesakes, new person
-2004	2004-03-28:elazig-aricak-mayor	Ahmet Yılmaz: 3 namesakes, new person
-2004	2004-03-28:elazig-keban-mayor	Hadi Turan: 2 namesakes, new person
-2004	2004-03-28:erzurum-oltu-mayor	Necmettin Taşci: 2 namesakes, new person
-2004	2004-03-28:eskisehir-inonu-mayor	Kadir Bozkurt: 2 namesakes, new person
-2004	2004-03-28:gaziantep-islahiye-mayor	Mustafa Şahin: 2 namesakes, new person
-2004	2004-03-28:gaziantep-islahiye-mayor	Mustafa Öztürk: 4 namesakes, new person
-2004	2004-03-28:gaziantep-oguzeli-mayor	Ali Şahin: 3 namesakes, new person
-2004	2004-03-28:giresun-mayor	Mehmet Özdemir: 2 namesakes, new person
-2004	2004-03-28:giresun-mayor	Mustafa Şahin: 2 namesakes, new person
-2004	2004-03-28:gumushane-torul-mayor	İbrahim Aydın: 2 namesakes, new person
-2004	2004-03-28:hatay-belen-mayor	Mehmet Demir: 2 namesakes, new person
-2004	2004-03-28:hatay-dortyol-mayor	Fadıl Keskin: 2 namesakes, new person
-2004	2004-03-28:isparta-mayor	Yusuf Ziya Günaydın: 2 namesakes, new person
-2004	2004-03-28:isparta-yalvac-mayor	Tekin Bayram: 2 namesakes, new person
-2004	2004-03-28:isparta-yenisarbademli-mayor	Mustafa Erdem: 2 namesakes, new person
-2004	2004-03-28:istanbul-beykoz-mayor	Alaattin Köseler: 2 namesakes, new person
-2004	2004-03-28:istanbul-beykoz-mayor	Osman Kılıç: 2 namesakes, new person
-2004	2004-03-28:istanbul-eyup-mayor	Osman Kılıç: 2 namesakes, new person
-2004	2004-03-28:izmir-gaziemir-mayor	Halil İbrahim Şenol: 2 namesakes, new person
-2004	2004-03-28:izmir-karsiyaka-mayor	Yunus Kılıç: 2 namesakes, new person
-2004	2004-03-28:izmir-kemalpasa-mayor	Yunus Kılıç: 2 namesakes, new person
-2004	2004-03-28:izmir-tire-mayor	Tayfur Çiçek: 3 namesakes, new person
-2004	2004-03-28:karabuk-yenice-mayor	Zeki Çaylı: 3 namesakes, new person
 2004	2004-03-28:karabuk-yenice-yortan-mayor	no contest
-2004	2004-03-28:karaman-sariveliler-mayor	Hayri Samur: 2 namesakes, new person
-2004	2004-03-28:kars-arpacay-mayor	Enver Akkaya: 2 namesakes, new person
-2004	2004-03-28:kars-kagizman-mayor	Mehmet Alkan: 2 namesakes, new person
-2004	2004-03-28:kastamonu-doganyurt-mayor	Ahmet Kaya: 4 namesakes, new person
-2004	2004-03-28:kastamonu-ihsangazi-mayor	Ahmet Özdemir: 3 namesakes, new person
 2004	2004-03-28:kayseri-yesilhisar-mayor	Saadet Partisi: 0 against 42
-2004	2004-03-28:konya-ahirli-mayor	Mehmet Özkaya: 2 namesakes, new person
 2004	2004-03-28:konya-beysehir-kurucaova-mayor	no contest
-2004	2004-03-28:konya-bozkir-mayor	Bayram Şahin: 2 namesakes, new person
 2004	2004-03-28:konya-doganhisar-mayor	Bağımsız: 1326 against 1378
 2004	2004-03-28:konya-doganhisar-mayor	Bağımsız: 52 against 1378
 2004	2004-03-28:konya-selcuklu-tepekoy-mayor	no contest
 2004	2004-03-28:konya-selcuklu-yukselen-bilecik-mayor	no contest
 2004	2004-03-28:konya-tuzlukcu-mayor	Genç Parti: 0 against 15
-2004	2004-03-28:kutahya-cavdarhisar-mayor	Halil Başer: 3 namesakes, new person
 2004	2004-03-28:kutahya-simav-kelemyenice-gumussu-mayor	no contest
-2004	2004-03-28:malatya-arapkir-mayor	Mustafa Şahin: 2 namesakes, new person
 2004	2004-03-28:malatya-mayor	Bağımsız: 287 against 531
 2004	2004-03-28:malatya-mayor	Bağımsız: 152 against 531
 2004	2004-03-28:malatya-mayor	Bağımsız: 92 against 531
-2004	2004-03-28:manisa-alasehir-mayor	İbrahim Öztürk: 2 namesakes, new person
-2004	2004-03-28:manisa-kirkagac-mayor	Mehmet Aydın: 3 namesakes, new person
-2004	2004-03-28:manisa-kula-mayor	Selim Aşkın: 2 namesakes, new person
 2004	2004-03-28:manisa-soma-yagcilli-mayor	no contest
-2004	2004-03-28:mardin-yesilli-mayor	Hayrettin Demir: 3 namesakes, new person
-2004	2004-03-28:nevsehir-avanos-mayor	Kemal Çelik: 2 namesakes, new person
-2004	2004-03-28:nevsehir-derinkuyu-mayor	Mustafa Erdem: 2 namesakes, new person
 2004	2004-03-28:nigde-merkez-yildiztepe-inli-mayor	no contest
+2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
+2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
+2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
+1963	1963-11-17:adana-karatas-kazan-mayor	Hasan Basri Demirci: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:adana-magara-mayor	Recep Aktürk: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:balikesir-bandirma-bagdic-mayor	Mehmet Ulubak: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:bursa-karacabey-keles-mayor	İsmail Saydam: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:bursa-karacabey-keles-mayor	Mehmet Akif Orhan: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:cankiri-merkez-diven-mayor	Hafız Tüfekçi: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:cankiri-merkez-irsunlu-mayor	Mustafa Gencer: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:cankiri-merkez-nkiri-mayor	Gürhan Titrek: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:cankiri-merkez-rkes-mayor	Abdulkadir Aydemir: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:erzincan-ilic-keman-mayor	Mehmet Köprücüoğlu: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:izmir-cesme-mayor	Mehmet Aldemir: 2 namesakes, new person
+1963	1963-11-17:kars-igdir-bisiimes-mayor	Halis Tunç: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:kocaeli-merkez-kacaeli-mayor	Enver Atafırat: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:mardin-midyat-mayor	Seyfi Güneştan: 2 namesakes, new person
+1963	1963-11-17:mersin-erdemli-golnar-mayor	Mehmet Zeybek: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:mersin-icel-mayor	Zeki Ayan: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:mus-merkez-mus-mayor	Abdülhadi Toplu: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:ordu-kumru-mayor	Zülal Önürme: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:ordu-ulubey-mayor	Mithat Kısacıkoğlu: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:sanliurfa-merkez-urfa-mayor	Mustafa Kılıç: 2 namesakes, new person
+1963	1963-11-17:tokat-almus-ortova-mayor	Ömer Erözdemir: matched to a mayor elsewhere that year, new person
+1963	1963-11-17:yozgat-yozgat-mayor	Salim Korkmaz: 2 namesakes, new person
+1963	1963-11-17:zonguldak-merkez-zanguldak-mayor	Salih Ekmel Çetiner: 2 namesakes, new person
+1989	gaziantep	Celal Doğan: 2 namesakes, new person
+1994	gaziantep	Celal Doğan: 2 namesakes, new person
+1994	istanbul	İlhan Kesici: 2 namesakes, new person
+1999	gaziantep	Celal Doğan: 2 namesakes, new person
+1999	istanbul	Ali Talip Özdemir: 2 namesakes, new person
+1999	konya	Ahmet Kart: matched to a mayor elsewhere that year, new person
+1999	mersin	Şefik Zengin: 2 namesakes, new person
+2004	2004-03-28:adana-aladag-mayor	Yusuf Şahin: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:adana-feke-mayor	Ahmet Sel: 3 namesakes, new person
+2004	2004-03-28:adana-imamoglu-mayor	Gazi Adamhasan: 2 namesakes, new person
+2004	2004-03-28:adiyaman-celikhan-mayor	Mehmet Bora: 2 namesakes, new person
+2004	2004-03-28:adiyaman-mayor	Abdülkadir Kırmızı: 2 namesakes, new person
+2004	2004-03-28:adiyaman-samsat-mayor	Yusuf Fırat: 3 namesakes, new person
+2004	2004-03-28:afyonkarahisar-cay-mayor	İsmail Kökcür: 2 namesakes, new person
+2004	2004-03-28:afyonkarahisar-cobanlar-mayor	Sefa Değirmen: 2 namesakes, new person
+2004	2004-03-28:afyonkarahisar-sandikli-mayor	Menderes Koçak: 2 namesakes, new person
+2004	2004-03-28:agri-eleskirt-mayor	Sebahattin Sarı: 3 namesakes, new person
+2004	2004-03-28:agri-patnos-mayor	Yiğit Demir: 2 namesakes, new person
+2004	2004-03-28:aksaray-eskil-mayor	Niyazi Alçay: 3 namesakes, new person
+2004	2004-03-28:aksaray-gulagac-mayor	Faruk Teymen: 3 namesakes, new person
+2004	2004-03-28:aksaray-mayor	Mustafa Şahin: 2 namesakes, new person
+2004	2004-03-28:amasya-tasova-mayor	Özgür Özdemir: 2 namesakes, new person
+2004	2004-03-28:ankara-beypazari-mayor	İbrahim Demir: 2 namesakes, new person
+2004	2004-03-28:ankara-etimesgut-mayor	Enver Demirel: 4 namesakes, new person
+2004	2004-03-28:ankara-polatli-mayor	Sami Çay: 2 namesakes, new person
+2004	2004-03-28:ankara-sereflikochisar-mayor	Eren Edemen: 2 namesakes, new person
+2004	2004-03-28:antalya-kemer-mayor	Mustafa Gül: 3 namesakes, new person
+2004	2004-03-28:ardahan-hanak-mayor	Ayhan Büyükkaya: 2 namesakes, new person
+2004	2004-03-28:aydin-incirliova-mayor	Şerif Temel: 2 namesakes, new person
+2004	2004-03-28:aydin-karacasu-mayor	Mustafa Büyükyapıcı: 3 namesakes, new person
+2004	2004-03-28:aydin-yenipazar-mayor	Mehmet Yüsran Erden: 2 namesakes, new person
+2004	2004-03-28:balikesir-bandirma-mayor	Mustafa Gönenlioğlu: 2 namesakes, new person
+2004	2004-03-28:balikesir-dursunbey-mayor	Önder İkiz: 2 namesakes, new person
+2004	2004-03-28:bartin-ulus-mayor	Hasan Hüseyin Uzun: 2 namesakes, new person
+2004	2004-03-28:batman-besiri-mayor	Sait Karabulut: 2 namesakes, new person
+2004	2004-03-28:batman-sason-mayor	Muzaffer Arslan: 2 namesakes, new person
+2004	2004-03-28:bilecik-bozuyuk-mayor	Mahmut Fındık: 2 namesakes, new person
+2004	2004-03-28:bilecik-inhisar-mayor	Ayhan Ödübek: 2 namesakes, new person
+2004	2004-03-28:bingol-kigi-mayor	Yılmaz Gündüz: 3 namesakes, new person
+2004	2004-03-28:bingol-mayor	Bedri Tuğ: 2 namesakes, new person
+2004	2004-03-28:bingol-solhan-mayor	Mehmet Emin Düşen: 2 namesakes, new person
+2004	2004-03-28:bingol-yedisu-mayor	Mehmet Şerif Memioğlu: 2 namesakes, new person
+2004	2004-03-28:bitlis-adilcevaz-mayor	Adnan Göksoy: 2 namesakes, new person
+2004	2004-03-28:bitlis-hizan-mayor	Cezail Aktaş: 3 namesakes, new person
+2004	2004-03-28:bitlis-mayor	Yaşar Buhan: 2 namesakes, new person
+2004	2004-03-28:bolu-goynuk-mayor	Ahmet Çankaya: 3 namesakes, new person
+2004	2004-03-28:bursa-harmancik-mayor	Mustafa Çetinkaya: 3 namesakes, new person
+2004	2004-03-28:bursa-keles-mayor	Mehmet Kaman: 2 namesakes, new person
+2004	2004-03-28:bursa-yenisehir-mayor	Mehmet Kaya: 2 namesakes, new person
+2004	2004-03-28:canakkale-gelibolu-mayor	Münir Mustafa Özacar: 3 namesakes, new person
+2004	2004-03-28:cankiri-ilgaz-mayor	Mustafa Er: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:cankiri-kizilirmak-mayor	Bayar Soysal: 3 namesakes, new person
+2004	2004-03-28:denizli-beyagac-mayor	Mustafa Akçay: 4 namesakes, new person
+2004	2004-03-28:denizli-guney-mayor	Halil Ayhan: 4 namesakes, new person
+2004	2004-03-28:denizli-serinhisar-mayor	Mehmet Kobaş: 2 namesakes, new person
+2004	2004-03-28:diyarbakir-cungus-mayor	Ali Suat Akmeşe: 3 namesakes, new person
+2004	2004-03-28:duzce-akcakoca-mayor	Fikret Albayrak: 2 namesakes, new person
+2004	2004-03-28:edirne-havsa-mayor	Oğuz Tekin: 2 namesakes, new person
+2004	2004-03-28:edirne-lalapasa-mayor	Bülent Şahinşah: 3 namesakes, new person
+2004	2004-03-28:elazig-keban-mayor	Hadi Turan: 2 namesakes, new person
+2004	2004-03-28:elazig-keban-mayor	Ahmet Turan Özcan: 2 namesakes, new person
+2004	2004-03-28:elazig-maden-mayor	Şaban Yürekli: 2 namesakes, new person
+2004	2004-03-28:erzurum-karayazi-mayor	Sedat Karaduman: 2 namesakes, new person
+2004	2004-03-28:erzurum-oltu-mayor	Necmettin Taşci: 3 namesakes, new person
+2004	2004-03-28:erzurum-senkaya-mayor	Süleyman Önder: 2 namesakes, new person
+2004	2004-03-28:erzurum-tortum-mayor	Mehmet Toraman: 2 namesakes, new person
+2004	2004-03-28:eskisehir-inonu-mayor	Kadir Bozkurt: 3 namesakes, new person
+2004	2004-03-28:eskisehir-mahmudiye-mayor	Halil Ataseven: 2 namesakes, new person
+2004	2004-03-28:gaziantep-oguzeli-mayor	Ali Şahin: 2 namesakes, new person
+2004	2004-03-28:gaziantep-sahinbey-mayor	Mehmet Karakaya: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:giresun-espiye-mayor	İbrahim Önal: 2 namesakes, new person
+2004	2004-03-28:hatay-dortyol-mayor	Fadıl Keskin: 2 namesakes, new person
+2004	2004-03-28:hatay-kumlu-mayor	Ekrem Baldıran: 2 namesakes, new person
+2004	2004-03-28:igdir-karakoyunlu-mayor	Kurban Kaya: 2 namesakes, new person
+2004	2004-03-28:igdir-tuzluca-mayor	Mehmet Gültekin: 2 namesakes, new person
+2004	2004-03-28:isparta-egirdir-mayor	Osman Nuri Özmeral: 2 namesakes, new person
+2004	2004-03-28:isparta-gonen-mayor	Mete Elcim: 2 namesakes, new person
+2004	2004-03-28:isparta-mayor	Yusuf Ziya Günaydın: 2 namesakes, new person
+2004	2004-03-28:isparta-yalvac-mayor	Tekin Bayram: 2 namesakes, new person
+2004	2004-03-28:isparta-yenisarbademli-mayor	Mustafa Erdem: 2 namesakes, new person
+2004	2004-03-28:istanbul-beykoz-mayor	Alaattin Köseler: 3 namesakes, new person
+2004	2004-03-28:istanbul-beykoz-mayor	Osman Kılıç: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:istanbul-eyup-mayor	Osman Kılıç: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:istanbul-kucukcekmece-mayor	Kemal Naci Ekşi: 2 namesakes, new person
+2004	2004-03-28:istanbul-pendik-mayor	Mehmet Salih Usta: 2 namesakes, new person
+2004	2004-03-28:istanbul-uskudar-mayor	Yılmaz Bayat: 2 namesakes, new person
+2004	2004-03-28:izmir-cigli-mayor	Hasan Hüseyin Evin: 2 namesakes, new person
+2004	2004-03-28:izmir-foca-mayor	Serdar Mersin: 2 namesakes, new person
+2004	2004-03-28:izmir-gaziemir-mayor	Halil İbrahim Şenol: 2 namesakes, new person
+2004	2004-03-28:izmir-kemalpasa-mayor	Mehmet Ali Özüdoğru: 2 namesakes, new person
+2004	2004-03-28:izmir-tire-mayor	Tayfur Çiçek: 3 namesakes, new person
+2004	2004-03-28:kahramanmaras-caglayancerit-mayor	Ahmet Nazım Engizek: 2 namesakes, new person
+2004	2004-03-28:kahramanmaras-pazarcik-mayor	Yakup Hamdi Bozdağ: 2 namesakes, new person
+2004	2004-03-28:karabuk-yenice-mayor	Zeki Çaylı: 3 namesakes, new person
+2004	2004-03-28:karaman-mayor	Mehmet Yıldırım: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:karaman-sariveliler-mayor	Hayri Samur: 2 namesakes, new person
+2004	2004-03-28:kars-arpacay-mayor	Enver Akkaya: 2 namesakes, new person
+2004	2004-03-28:kars-kagizman-mayor	Mehmet Alkan: 2 namesakes, new person
+2004	2004-03-28:kastamonu-doganyurt-mayor	Ahmet Kaya: 4 namesakes, new person
+2004	2004-03-28:kastamonu-doganyurt-mayor	Ali Fuat Kara: 2 namesakes, new person
+2004	2004-03-28:kayseri-tomarza-mayor	İsmet Yılmaz: 2 namesakes, new person
+2004	2004-03-28:kayseri-yahyali-mayor	Mahmut Postallı: 2 namesakes, new person
+2004	2004-03-28:konya-cumra-mayor	Mustafa Tuğlu: 2 namesakes, new person
+2004	2004-03-28:konya-karapinar-mayor	Kamil Bülbül Okuyucu: 2 namesakes, new person
+2004	2004-03-28:konya-kulu-mayor	Orhan Yüksel: 2 namesakes, new person
+2004	2004-03-28:konya-taskent-mayor	İskender Özkaradayı: 2 namesakes, new person
+2004	2004-03-28:kutahya-aslanapa-mayor	Muhsin Gürel: 2 namesakes, new person
+2004	2004-03-28:kutahya-cavdarhisar-mayor	Halil Başer: 3 namesakes, new person
+2004	2004-03-28:kutahya-saphane-mayor	İbrahim Tokyay: 2 namesakes, new person
+2004	2004-03-28:malatya-doganyol-mayor	Behsat Karakaya: 2 namesakes, new person
+2004	2004-03-28:manisa-golmarmara-mayor	Hüseyin Akdemir: 2 namesakes, new person
+2004	2004-03-28:manisa-kula-mayor	Selim Aşkın: 2 namesakes, new person
+2004	2004-03-28:mardin-yesilli-mayor	Hayrettin Demir: 4 namesakes, new person
+2004	2004-03-28:mugla-dalaman-mayor	Ömer Halit Malatyalı: 2 namesakes, new person
+2004	2004-03-28:mugla-ortaca-mayor	Cemil Durmuş: 2 namesakes, new person
+2004	2004-03-28:mugla-ula-mayor	Mustafa Karadağ: matched to a mayor elsewhere that year, new person
+2004	2004-03-28:mus-bulanik-mayor	Yusuf Özdemir: 2 namesakes, new person
+2004	2004-03-28:mus-korkut-mayor	Sami Pekbay: 2 namesakes, new person
+2004	2004-03-28:mus-varto-mayor	Abdulbari Han: 2 namesakes, new person
+2004	2004-03-28:nevsehir-avanos-mayor	Mustafa Kenan Sarıtaş: 2 namesakes, new person
+2004	2004-03-28:nigde-ulukisla-mayor	Metin Meral: 2 namesakes, new person
+2004	2004-03-28:ordu-korgan-mayor	Turhan Ateş: 2 namesakes, new person
+2004	2004-03-28:ordu-kumru-mayor	İhsan Cayak: 2 namesakes, new person
 2004	2004-03-28:ordu-mesudiye-mayor	İsa Gül: 3 namesakes, new person
-2004	2004-03-28:ordu-mesudiye-mayor	Ahmet Özdemir: 3 namesakes, new person
-2004	2004-03-28:osmaniye-duzici-mayor	Ökkeş Namlı: 2 namesakes, new person
+2004	2004-03-28:osmaniye-duzici-mayor	Ökkeş Namlı: 3 namesakes, new person
 2004	2004-03-28:osmaniye-sumbas-mayor	Mustafa Nuri Nuhoğlu: 3 namesakes, new person
+2004	2004-03-28:rize-ikizdere-mayor	Ayhan Biberoğlu: 2 namesakes, new person
+2004	2004-03-28:sakarya-akyazi-mayor	Hasan Akcan: 2 namesakes, new person
+2004	2004-03-28:sakarya-ferizli-mayor	Ali Genç: 2 namesakes, new person
+2004	2004-03-28:sakarya-geyve-mayor	Atilla Zeytinoğlu: 2 namesakes, new person
+2004	2004-03-28:sakarya-hendek-mayor	Ahmet Mercan: 2 namesakes, new person
 2004	2004-03-28:sakarya-karapurcek-mayor	Orhan Yıldırım: 4 namesakes, new person
+2004	2004-03-28:sakarya-merkez-adapazari-merkez-mayor	Süleyman Dişli: 2 namesakes, new person
 2004	2004-03-28:sakarya-pamukova-mayor	Cevat Keser: 3 namesakes, new person
-2004	2004-03-28:sakarya-tarakli-mayor	Hüseyin Doğan: 3 namesakes, new person
-2004	2004-03-28:samsun-19-mayis-mayor	Osman Topaloğlu: 2 namesakes, new person
+2004	2004-03-28:sakarya-tarakli-mayor	Mehmet Aydın: 2 namesakes, new person
+2004	2004-03-28:samsun-19-mayis-mayor	Osman Topaloğlu: 3 namesakes, new person
 2004	2004-03-28:samsun-alacam-mayor	İlyas Acar: 2 namesakes, new person
 2004	2004-03-28:samsun-kavak-mayor	Şerif Ün: 3 namesakes, new person
-2004	2004-03-28:samsun-tekkekoy-mayor	Hasan Togar: 2 namesakes, new person
+2004	2004-03-28:samsun-tekkekoy-mayor	Hasan Togar: 3 namesakes, new person
 2004	2004-03-28:samsun-vezirkopru-mayor	İbrahim Sadık Edis: 2 namesakes, new person
-2004	2004-03-28:sanliurfa-ceylanpinar-mayor	Mehmet Kahraman: 2 namesakes, new person
 2004	2004-03-28:sanliurfa-harran-mayor	Mehmet Özyavuz: 2 namesakes, new person
-2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
-2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
-2004	2004-03-28:sanliurfa-mayor	Bağımsız: 0 against 404
-2004	2004-03-28:sinop-boyabat-mayor	Hasan Kara: 2 namesakes, new person
+2004	2004-03-28:sanliurfa-suruc-mayor	Bekir Demirbilek: 2 namesakes, new person
+2004	2004-03-28:siirt-kurtalan-mayor	Nevzat Karaatay: 3 namesakes, new person
+2004	2004-03-28:siirt-sirvan-mayor	Mehmet Fadıl Bilgir: 2 namesakes, new person
+2004	2004-03-28:sinop-boyabat-mayor	Hasan Kara: 3 namesakes, new person
+2004	2004-03-28:sinop-erfelek-mayor	Mehmet Uzun: 2 namesakes, new person
 2004	2004-03-28:sinop-mayor	Baki Ergül: 2 namesakes, new person
 2004	2004-03-28:sinop-turkeli-mayor	Halil Dilek Özcan: 3 namesakes, new person
+2004	2004-03-28:sirnak-beytussebap-mayor	Kamil Dürmüş: 3 namesakes, new person
+2004	2004-03-28:sirnak-uludere-mayor	Salih Tanık: 2 namesakes, new person
+2004	2004-03-28:sivas-hafik-mayor	Selahattin Çuhadaroğlu: 3 namesakes, new person
 2004	2004-03-28:sivas-susehri-mayor	Sedat Sel: 2 namesakes, new person
+2004	2004-03-28:sivas-yildizeli-mayor	Yılmaz Navruz: 3 namesakes, new person
+2004	2004-03-28:tekirdag-cerkezkoy-mayor	Halil İbrahim Erkan: 2 namesakes, new person
+2004	2004-03-28:tekirdag-marmaraereglisi-mayor	Emin Yılmaz: 2 namesakes, new person
+2004	2004-03-28:tekirdag-saray-mayor	İbrahim Duraklı: 2 namesakes, new person
 2004	2004-03-28:tekirdag-saray-mayor	Nazmi Çoban: 2 namesakes, new person
+2004	2004-03-28:tekirdag-saray-mayor	Özgen Erkiş: 2 namesakes, new person
 2004	2004-03-28:tekirdag-sarkoy-mayor	Süleyman Altınok: 3 namesakes, new person
-2004	2004-03-28:tokat-pazar-mayor	Mehmet Şahin: 3 namesakes, new person
-2004	2004-03-28:yozgat-candir-mayor	Mustafa Ertanörgün: 2 namesakes, new person
+2004	2004-03-28:trabzon-arsin-mayor	Ramis Sunguroğlu: 2 namesakes, new person
+2004	2004-03-28:trabzon-carsibasi-mayor	Abdullah Kul: 2 namesakes, new person
+2004	2004-03-28:trabzon-koprubasi-mayor	Sebahattin İmamoğlu: 2 namesakes, new person
+2004	2004-03-28:tunceli-cemisgezek-mayor	Nevzat Altan: 2 namesakes, new person
+2004	2004-03-28:usak-mayor	Mustafa Yeldanlı: 2 namesakes, new person
+2004	2004-03-28:yalova-termal-mayor	İbrahim Taner: 2 namesakes, new person
+2004	2004-03-28:yozgat-candir-mayor	Mustafa Ertanörgün: 3 namesakes, new person
