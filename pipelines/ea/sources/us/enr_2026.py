@@ -69,6 +69,86 @@ EV_MEMBER = re.compile(r"Member, (?:United States Senate|House of Representative
 SUFFIXES = ("jr", "sr", "ii", "iii", "iv")
 YESNO = {"for": "yes", "against": "no"}
 STOP = {"the", "of", "and", "for", "district", "county", "city", "town", "board", "office"}
+GENERIC = {
+    "an",
+    "to",
+    "in",
+    "on",
+    "by",
+    "be",
+    "or",
+    "is",
+    "as",
+    "at",
+    "with",
+    "shall",
+    "vote",
+    "yes",
+    "no",
+    "prop",
+    "proposition",
+    "proposal",
+    "proposed",
+    "question",
+    "issue",
+    "measure",
+    "referendum",
+    "bond",
+    "bonds",
+    "millage",
+    "levy",
+    "tax",
+    "renewal",
+    "additional",
+    "increase",
+    "rate",
+    "limiting",
+    "operating",
+    "purposes",
+    "general",
+    "new",
+    "election",
+    "judge",
+    "court",
+    "retain",
+    "retention",
+    "justice",
+    "appeals",
+    "supreme",
+    "associate",
+}
+NOBODY = r"(?i)^no candidat"
+ORDINALS = {
+    word: str(number)
+    for number, word in enumerate(
+        [
+            "first",
+            "second",
+            "third",
+            "fourth",
+            "fifth",
+            "sixth",
+            "seventh",
+            "eighth",
+            "ninth",
+            "tenth",
+            "eleventh",
+            "twelfth",
+            "thirteenth",
+            "fourteenth",
+            "fifteenth",
+            "sixteenth",
+            "seventeenth",
+            "eighteenth",
+            "nineteenth",
+        ],
+        1,
+    )
+}
+TENS = {
+    word: number
+    for number, word in enumerate(["twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"], 2)
+}
 FL_OFFICES = {"USS": "senate", "USR": "house", "GOV": "governor"}
 IL_ELECTIONS = {2022: 62, 2024: 66, 2026: 70}
 IL_CITIES = {
@@ -123,6 +203,8 @@ def person(label: str) -> str:
         w for w in re.sub(r"[^a-z ]", " ", slug(label.replace("’", "'")).replace("-", " ")).split() if w not in SUFFIXES
     ]
     words = ["yes" if w in ("for", "yes") else "no" if w in ("against", "no") else w for w in words]
+    if words and words[0] in ("yes", "no"):
+        return words[0]
     return words[0][0] + words[-1] if len(words) > 1 else words[0] if words else ""
 
 
@@ -886,6 +968,11 @@ def table(pages: dict[str, dict[str, Path]]) -> pl.DataFrame:
 def plan(
     conn: Connection, frame: pl.DataFrame, scatter: Callable[[str, UUID], UUID | None]
 ) -> tuple[list[tuple[str, str, UUID, dict[tuple[UUID, UUID], int], tuple[int, int], str | None]], list[str]]:
+    frame = frame.filter(~pl.col("candidate").fill_null("").str.contains(NOBODY)).with_columns(
+        candidate=pl.when(pl.col("party").is_not_null() & pl.col("candidate").str.starts_with(pl.col("party") + " "))
+        .then(pl.col("candidate").str.slice(pl.col("party").str.len_chars() + 1))
+        .otherwise(pl.col("candidate"))
+    )
     local = frame.filter(pl.col("office") == "other")
     frame = frame.filter(pl.col("office") != "other")
     counties: dict[tuple[str, str], UUID] = {}
@@ -913,15 +1000,19 @@ def plan(
     for state in local["state"].unique(maintain_order=True):
         published: dict[UUID, tuple[str, set[str]]] = {}
         titles: dict[UUID, set[str]] = {}
-        for key, id in conn.execute(
-            """select x.value, x.entity_id from external_id x
+        held: dict[UUID, tuple[UUID | None, datetime]] = {}
+        for key, id, area, recorded in conn.execute(
+            """select x.value, x.entity_id, c.district_area_id, c.recorded_from from external_id x
+               join contest c on c.id = x.entity_id
                where x.scheme = 'us.contest' and x.value like %s""",
             [f"{DAY}:{state}:%"],
         ).fetchall():
             if not re.fullmatch(rf"{DAY}:{state}:(house:\d+|senate|governor)", key):
                 published[id] = (key, set())
+                held[id] = (area, recorded)
         for contest, label in conn.execute(
-            """select o.contest_id, coalesce(ca.ballot_name, o.ballot_label, '') from contest_option o
+            """select o.contest_id, coalesce(case when o.kind = 'answer' then o.ballot_label end, ca.ballot_name, o.ballot_label, '')
+               from contest_option o
                left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
                where o.parent_option_id is null and o.kind <> 'write_in' and o.contest_id = any(%s)""",
             [list(published)],
@@ -932,13 +1023,24 @@ def plan(
             "select entity_id, text from name where entity_id = any(%s)", [list(published)]
         ).fetchall():
             titles.setdefault(contest, set()).update(slug(text).split("-"))
+        twins: dict[tuple[UUID | None, frozenset[str], frozenset[str]], list[UUID]] = {}
+        for contest, (_, wanted) in published.items():
+            if len(wanted) > 1 and not wanted <= {"yes", "no"}:
+                twins.setdefault(
+                    (held[contest][0], frozenset(wanted), frozenset(titles.get(contest, set()))), []
+                ).append(contest)
+        for same in twins.values():
+            for contest in sorted(same, key=lambda id: held[id][1])[:-1]:
+                del published[contest]
         towns: dict[str, set[str]] = {}
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id
                where u.scheme_code = 'us.place' and u.code = any(%s)""",
             [list({key.split(":")[2] for key, _ in published.values()})],
         ).fetchall():
-            towns.setdefault(code, set()).update(w for w in slug(text).split("-") if len(w) > 2 and w not in STOP)
+            towns.setdefault(code, set()).update(
+                w for w in slug(text).split("-") if len(w) > 2 and w not in STOP | {"township", "charter", "village"}
+            )
         races: dict[tuple[str, frozenset[str]], list[str]] = {}
         for (name, county), group in local.filter(pl.col("state") == state).group_by("contest", "county"):
             people = frozenset(
@@ -954,8 +1056,8 @@ def plan(
             scored = []
             for contest, (key, wanted) in published.items():
                 segment = key.split(":")[2]
-                if re.fullmatch(r"\d{5}", segment) and (
-                    len(places) != 1 or codes.get((FIPS[state], plain(places[0]))) != segment
+                if re.fullmatch(r"\d{5}|\d{10}", segment) and (
+                    len(places) != 1 or codes.get((FIPS[state], plain(places[0]))) != segment[:5]
                 ):
                     continue
                 if len(places) == 1 and not re.match(r"\d|sd|house$|senate$", segment):
@@ -964,22 +1066,26 @@ def plan(
                     continue
                 overlap = len(people & wanted) / len(people | wanted) if people | wanted else 1
                 if overlap >= 0.6:
-                    scored.append(
-                        (
-                            round(overlap, 2),
-                            len(words & (titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:]))),
-                            contest,
-                            key,
-                        )
-                    )
-            scored.sort(key=lambda hit: (-hit[0], -hit[1]))
-            best = [hit for hit in scored if hit[:2] == scored[0][:2]] if scored else []
+                    found = words & (titles.get(contest, set()) | set(re.split(r"[:-]", key)[2:]))
+                    scored.append((round(overlap, 2), len(found - GENERIC), len(found), contest, key))
+            scored.sort(key=lambda hit: (-hit[0], -hit[1], -hit[2]))
+            best = [hit for hit in scored if hit[:3] == scored[0][:3]] if scored else []
             if len(best) == 1 and not ((people <= {"yes", "no"} or len(people) < 2) and best[0][1] < 1):
                 return best, True
             return best, False
 
         for (name, people), places in races.items():
-            words = {re.sub(r"^0+(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w) for w in slug(name).split("-") if w not in STOP}
+            spelled = re.sub(
+                rf"\b({'|'.join(TENS)})[- ]({'|'.join(ORDINALS)})\b",
+                lambda found: f"{TENS[found[1]]}{ORDINALS[found[2]]}",
+                name.lower(),
+            )
+            spelled = re.sub(rf"\b({'|'.join(ORDINALS)})\b", lambda found: ORDINALS[found[1]], spelled)
+            words = {
+                re.sub(r"^(?:p|pos|0+)(?=\d)|(?<=\d)(st|nd|rd|th)$", "", w)
+                for w in slug(spelled).split("-")
+                if w not in STOP
+            }
             best, ok = choose(people, words, places)
             if ok:
                 picks.append((best[0], name, places))
@@ -989,9 +1095,11 @@ def plan(
                 picks.extend((found[0][0], name, place) for place, found in split)
                 continue
             unmatched.append(
-                f"local {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if best else 'no contest'}"
+                f"local {state}: {name} ({', '.join(places[:2])}): {'ambiguous' if len(best) > 1 and best[0][1] else 'no contest'}"
             )
-        for (_, _, contest, key), name, places in sorted(picks, key=lambda pick: (-pick[0][0], -pick[0][1])):
+        for (_, _, _, contest, key), name, places in sorted(
+            picks, key=lambda pick: (-pick[0][0], -pick[0][1], -pick[0][2])
+        ):
             if any(entry[1] == key for entry in work):
                 unmatched.append(f"local {state}: {name} ({', '.join(places[:2])}): duplicate of {key}")
                 continue
@@ -1025,7 +1133,8 @@ def plan(
     tallies = []
     for state, contest_key, contest, group, place in work:
         options = conn.execute(
-            """select o.id, o.kind, coalesce(ca.ballot_name, o.ballot_label, '') from contest_option o
+            """select o.id, o.kind, coalesce(case when o.kind = 'answer' then o.ballot_label end, ca.ballot_name, o.ballot_label, '')
+               from contest_option o
                left join candidacy ca on ca.option_id = o.id and ca.role = 'head'
                where o.contest_id = %s and o.parent_option_id is null""",
             [contest],
@@ -1063,6 +1172,9 @@ def plan(
                 ((len(tokens & set(words)), option) for option, words in named if words and words[-1] in tokens),
                 key=lambda hit: -hit[0],
             )
+            answer = person(name)
+            if answer in ("yes", "no"):
+                hits = [(1, option) for option, words in named if words and words[0] == answer] or hits
             if hits and (len(hits) == 1 or hits[0][0] > hits[1][0]):
                 ballots[name] = hits[0][1]
             else:
